@@ -77,8 +77,6 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
         }
     }, [agentId])
 
-    // Files in the CURRENT directory that are published → name → their link. Published files
-    // are tracked by their full workspace path, so match the part before the last slash.
     const publishedFileByName = useMemo(() => {
         const map: Record<string, PublishedFile> = {}
         for (const f of published) {
@@ -99,7 +97,6 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
             return
         }
         await loadPublished()
-        // A new link starts with the access the workspace gives it: the share dialog is where it changes.
         if (publishedAccess && result.slug) setSharingSlug(result.slug)
     }, [agentId, currentPath, loadPublished, publishedAccess, t, errorText])
 

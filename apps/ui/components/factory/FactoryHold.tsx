@@ -1,16 +1,11 @@
 'use client'
 
-// A hold is the flowchart delay: a solid red D-shaped barrier across the belt, with the time left under
-// it. The flat side stands across the belt; the half-disc bulge faces the side the work comes from.
-// Nothing in it animates: the time changes each tick, which is the message.
-
 import { type P } from './factory-rest'
 
 const HALF = 18 // half of the 36 px flat side
 const BULGE = 12 // depth of the half-disc
 const RED = '#ef4444', EDGE = '#7f1d1d', PILL = '#b91c1c'
 
-// 590 000 ms reads 9:50; a started second counts as a whole one.
 export const formatLeft = (ms: number) => {
     const s = Math.max(0, Math.ceil(ms / 1000))
     return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`

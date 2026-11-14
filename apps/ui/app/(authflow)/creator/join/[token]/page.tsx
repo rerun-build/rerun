@@ -18,7 +18,6 @@ export default async function CreatorJoinPage({ params }: { params: Promise<{ to
 
     const { session } = await getServerSession()
 
-    // An anonymous session carries no email, which is what tells a visitor apart from an account.
     if (!session?.email) {
         return <CreatorJoinRedirect token={token} name={result.invite.name.trim().split(/\s+/)[0]} email={result.invite.email} />
     }

@@ -19,7 +19,6 @@ import type { HitlWidgetProps } from './registry'
 
 type Entry = { slug: string; name: string; outcome: ServiceSetupOutcome }
 
-// A paid app picks its account in a web-only picker; everything else connects from the phone.
 const APP_ONLY_ON_WEB = 'app'
 
 function methodOf(service: ResolvedService): AuthMethodSummary | undefined {
@@ -51,9 +50,6 @@ function ServiceHeader({ service }: { service: ResolvedService }) {
     )
 }
 
-// The apps a coworker suggests connecting, one at a time. A sign-in opens in the in-app browser and
-// comes back to the app; a key is typed here and goes onto the Box. The reply leaves once every app
-// is connected or skipped.
 export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidgetProps) {
     const t = useTranslations('mobileHitl')
     const { session, me } = useAuth()

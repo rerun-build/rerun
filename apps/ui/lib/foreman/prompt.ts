@@ -6,8 +6,6 @@ import { foremanUseCases, isMobileApp } from './phase'
 import type { ForemanState } from './phase'
 import { phaseSpec } from './phases'
 
-// One definition of a Box, a SOUL and a skill for both foremen. A second description written beside
-// this one would drift from it, slowly and invisibly.
 const RERUN_PRIMER = `How Rerun is put together, because every tool argument depends on it:
 - A workspace runs on one machine, which holds the AI subscriptions, the API keys, the shared files and the shared database every coworker in it uses.
 - A Box is a rectangle on that board: a division of the company, a client or a project, with its coworkers drawn inside it. It costs nothing, holds no machine of its own, and a workspace can have as many as it likes, including ones that stand empty until there is someone to put in them.
@@ -29,8 +27,6 @@ const IDENTITY = 'You are called the Chief of Staff and have no other name: neve
 
 const LANGUAGE_RULE = '- Answer in the language the user writes in. Everything you write inside Rerun, names, handles, SOUL, skills, stays in English.'
 
-// The hub only walks the onboarding: getting to know them, the first agent they agree on, the trial. The
-// build is the app's, and everything after it is the foreman on the engine's.
 const ONBOARDING_CHARTER = `You are the Chief of Staff of this Rerun workspace. You are getting to know the person you are talking to and settling, with them, the first coworker that will take work off their plate. ${IDENTITY}
 
 ${RERUN_PRIMER}
@@ -71,12 +67,8 @@ ${LANGUAGE_RULE}
 
 ${ENGINE_CAPABILITIES}`
 
-// A workspace keeps its machine for a while after its plan lapses, and its foreman with it. Said
-// nowhere, the model tries a creation, reads the refusal, and tells the user about a breakage.
 const NO_PLAN_NOTE = 'This workspace has no active plan right now. Its coworkers are paused and nothing new can be created or run until it has one. Say so plainly the first time it matters, in one line, and open the billing panel with open_settings so they can pick it back up. Never invent a discount, a free plan or an exception, and never try a creation to prove a point.'
 
-// What brought them here, when they came in on a link rather than on the home page. It is where the
-// conversation starts, never a decision already taken: they have not agreed to anything yet.
 function intentBlock(state: ForemanState): string {
     const { intent } = state
     if (!intent) return ''
@@ -93,8 +85,6 @@ function intentBlock(state: ForemanState): string {
     return `What they arrived with:\n${arrival}\n${weight}`
 }
 
-// Exported for the build: an agent drafted for this company needs to know what it sells and to whom,
-// or it gets a SOUL that could belong to anybody.
 export function foremanProfileBlock(state: ForemanState): string {
     const { answers, foreman } = state
     const lines = [state.firstName ? `First name: ${state.firstName}` : null, answers.company_name || answers.company_url ? `Company: ${[answers.company_name, answers.company_url].filter(Boolean).join(' - ')}` : null, answers.company_offering ? `What they sell: ${answers.company_offering}` : null, answers.company_audience ? `Who they sell to: ${answers.company_audience}` : null, answers.industry ? `Industry: ${answers.industry}` : null, answers.position ? `Their role: ${answers.position}` : null, foremanUseCases(foreman).length ? `What they want off their plate: ${foremanUseCases(foreman).join(' · ')}` : null, foreman.needs?.length ? `What goes wrong for them: ${foreman.needs.map(describeNeed).join(' · ')}` : null, !foreman.needs?.length && foreman.pains?.length ? `What slows them down: ${foreman.pains.join(' · ')}` : null, !foreman.needs?.length && foreman.challenge ? `Their challenge right now: ${foreman.challenge}` : null, answers.tools?.length ? `Apps they named: ${answers.tools.join(', ')}` : null].filter(Boolean)
@@ -102,12 +92,8 @@ export function foremanProfileBlock(state: ForemanState): string {
     return lines.length ? `What you already know about them, so you never ask twice:\n${lines.join('\n')}` : ''
 }
 
-// Read on every turn, so their correction is carried whole only up to a point.
 const MAX_AGREED_ASK = 600
 
-// What the onboarding ended on. The profile above is what the interview heard first, and the card
-// they confirmed after it can have changed the job: without this, the foreman on the engine reads the
-// interview alone and offers again the job they corrected away from.
 function agreedPlanBlock(state: ForemanState): string | null {
     const agreed = state.foreman.plan?.items.find(item => item.kind === 'agent')
     if (agreed?.kind !== 'agent') return null
@@ -117,22 +103,14 @@ function agreedPlanBlock(state: ForemanState): string | null {
     return lines.filter(Boolean).join('\n')
 }
 
-// The browser is only a guess for a message written before the user has typed anything, which never
-// happens on the engine: said on every turn, it outweighs the language they actually write in.
 function languageBlock(state: ForemanState, { browserGuess }: { browserGuess: boolean }): string | null {
     if (state.foreman.language) return `They have been writing in ${state.foreman.language} so far. Keep to it when a message is too short to tell, and switch as soon as they write in another language.`
     if (browserGuess && state.language) return `Nobody has told you their language yet. Their browser is set to ${state.language}: use it only for a message you write before they have written anything. As soon as they have written, the language of their own messages decides, whatever the browser says.`
     return null
 }
 
-// The app is on the App Store and on Google Play, which both forbid selling a digital service or
-// pointing to a sale outside their own payment: the price, the card and the payment stay on the web,
-// and the trial it starts asks for none of them.
 export const MOBILE_APP_BLOCK = `They are in the Rerun mobile app. Never mention a price, a cost, a card, a payment, a subscription, a plan they would buy or a trial, and never give a link to a pricing or billing page, even one search_docs returned. If they ask what it costs or how to pay, say in one line that billing lives in their account settings, and go back to their coworker. There is no way to reach the team from this chat in the app: where you would call contact_team, tell them in one line they can write to the team from rerun.build.`
 
-// The phase block sits last, right before the board, and says so: this conversation is never
-// restarted, so a user who comes back days later still carries the instructions of the phase they
-// were in, higher up in the transcript.
 export function foremanSystemPrompt(state: ForemanState): string {
     const phase = phaseSpec(state.phase).instructions(state)
 
@@ -141,8 +119,6 @@ export function foremanSystemPrompt(state: ForemanState): string {
     return blocks.join('\n\n')
 }
 
-// The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
-// the charter, who they are, and the board.
 export function foremanEngineInstructions(state: ForemanState): string {
     const blocks = [ENGINE_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: false }), foremanProfileBlock(state), agreedPlanBlock(state), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 

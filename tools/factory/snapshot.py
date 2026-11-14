@@ -1,5 +1,3 @@
-"""The line as one picture for the app (rerun#319): build_snapshot() returns a dict valid against factorySnapshotSchema
-(packages/contracts/src/factory-snapshot.ts). Reads the ledger only, except the epic cache rows (kv job '-', k 'epic:<n>') it writes. No import of dispatch at module level."""
 import datetime
 import json
 
@@ -13,16 +11,15 @@ WAIT_STATES = ("waiting", "queued", "review_wait", "fix_wait")
 TYPES = ("coder", "reviewer", "researcher", "designer")
 MAX_JOBS = 300
 MAX_EPICS = 50
-MAX_READS = 5  # GitHub reads of epic titles per beat
+MAX_READS = 5
 KINDS = ("feature", "review_fix", "fix", "upgrade", "refactor", "research", "other")
-# SPEC 5b: first match wins, longest prefix first, whole path segments.
 DEPARTMENTS = (
     ("docs/research", "design"), ("supabase", "database"), ("apps/engine", "engine"),
     ("apps/ui/app/api", "backend"), ("packages/contracts", "backend"),
     ("apps/ui", "frontend"), ("packages/ui", "frontend"), ("packages/i18n", "frontend"),
     ("tools/factory", "tooling"), (".github", "tooling"), ("deploy", "tooling"), ("docs", "docs"),
 )
-MAX_BYTES = 256 * 1024  # FACTORY_SNAPSHOT_MAX_BYTES in packages/contracts/src/factory-snapshot.ts
+MAX_BYTES = 256 * 1024
 
 
 def iso(t):
@@ -59,7 +56,6 @@ def _reason(j):
 
 
 def _department(paths):
-    """(main, others): main has the most paths (a tie goes to table order); None when no path matches."""
     count = {}
     for p in paths:
         for prefix, dept in DEPARTMENTS:
@@ -91,7 +87,6 @@ def _kind(title, labels):
 
 
 def _epic(store, n, read_epic, budget):
-    """Cached title and kind of epic n. A failed or skipped read is not cached: the next beat tries again."""
     row = store.db.execute("SELECT v FROM kv WHERE job='-' AND k=?", ("epic:%d" % n,)).fetchone()
     if row:
         try:
@@ -168,7 +163,6 @@ def _size(v):
 
 
 def _fit(snap):
-    """Keep the picture at or under MAX_BYTES: drop history and runs of ended jobs, then of the others, oldest enteredAt first."""
     total = _size(snap)
     if total <= MAX_BYTES:
         return snap

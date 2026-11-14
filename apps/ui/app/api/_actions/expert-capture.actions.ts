@@ -8,11 +8,6 @@ import { captureSetupSchema, type AgentCapturePlan, type CaptureSourceSpace } fr
 import type { ActionResult } from './space.actions'
 import { failureOf } from '@/lib/i18n/action-error'
 
-// The runtime half of expert authoring: the same capture the admin console runs, scoped to what the
-// caller owns. Every action re-resolves the sandbox, the template and the agents, so the client only
-// ever supplies ids that are checked against the caller before anything reaches the engine. The
-// checks themselves live in `lib/templates/author-capture.ts`, shared with the MCP server.
-
 const planInputSchema = z.object({
     templateId: z.string().uuid(),
     spaceId: z.string().uuid(),

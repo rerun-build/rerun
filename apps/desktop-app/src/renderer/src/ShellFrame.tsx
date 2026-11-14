@@ -1,8 +1,6 @@
 import { Logo } from '@rerun/ui/logo'
 import type { ReactNode } from 'react'
 
-// The frame of the shell's full-window pages: a strip to drag the window by where the web app would
-// draw its own, and a centered column under it.
 export function ShellFrame({ children }: { children: ReactNode }) {
     return (
         <div className="flex h-full flex-col bg-background">

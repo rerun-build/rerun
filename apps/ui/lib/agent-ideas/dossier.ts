@@ -18,8 +18,6 @@ function asObject<T>(value: unknown): T | null {
 
 type BrainRead = { pages: BrainPage[]; warning: string | null }
 
-// A workspace without a machine, or one whose machine is off, still has what Supabase holds: the
-// dossier is thinner and says so, rather than failing the whole run.
 async function readBrain(workspaceId: number): Promise<BrainRead> {
     const engine = await findWorkspaceEngine(workspaceId)
     if (!engine) return { pages: [], warning: 'Ce workspace n’a pas de machine : pas de brain, le dossier vient de Supabase seul.' }

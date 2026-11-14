@@ -2,10 +2,6 @@ import { claimDelivery, connectionForAccount, handleLinkupEnvelope, markDelivery
 import { eventIdOf, parseEnvelope, verifyLinkupSignature } from '@/lib/apps/linkup/envelope'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
-// Linkup's deliveries for every account a paid app connected: messages, invitations, sign-outs. Each
-// webhook is signed with a secret of its own, stored on its connection, so the account is looked up
-// before the signature can be checked. Linkup retries on a 5xx and gives up on any other 4xx, so a
-// delivery we cannot place is answered 2xx and left to the daily reconciliation.
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 

@@ -1,16 +1,10 @@
-// How often an open tab tells the hub it is still there, and how long that claim is trusted. The
-// window is three beats wide so one request lost to a slow network never turns someone present into
-// someone absent.
 export const PRESENCE_HEARTBEAT_MS = 30_000
 export const PRESENCE_TTL_MS = 90_000
 
-// A visible tab on a second screen is not someone watching. Without this, an app left open
-// overnight would silence every email until morning.
 export const PRESENCE_IDLE_MS = 5 * 60_000
 
 export type PresenceRow = { user_id: string; last_seen_at: string }
 
-// A timestamp in the future is clock skew between two Next processes, not an absence.
 export function isPresent(lastSeenAt: string | null | undefined, now: Date): boolean {
     if (!lastSeenAt) return false
     return now.getTime() - new Date(lastSeenAt).getTime() < PRESENCE_TTL_MS

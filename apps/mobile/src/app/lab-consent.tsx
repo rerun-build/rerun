@@ -7,8 +7,6 @@ import { OnboardingShell } from '@/components/onboarding/OnboardingShell'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: the AI consent asked once per account before anything leaves for an AI provider.
-//   /lab-consent?scheme=dark
 export default function ConsentLab() {
     const params = useLocalSearchParams<{ scheme?: ColorScheme }>()
     const system = useColorSchemeName()

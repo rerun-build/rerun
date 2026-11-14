@@ -8,17 +8,11 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-/**
- * Answering a coworker's question out loud. Unlike the composer's voice message, nothing is kept:
- * the audio is transcribed and dropped, and the words land in the answer field as if they had been
- * typed, so the answer travels as the text the question asked for.
- */
 export function useQuestionVoice(): QuestionVoice {
     const t = useTranslations('chat.voice')
     const [transcribing, setTranscribing] = useState(false)
     const deliverRef = useRef<((transcript: string) => void) | null>(null)
 
-    // The recorder calls finish when it hits its length cap, and finish needs the recorder to stop.
     const finishRef = useRef<() => void>(() => {})
     const recorder = useVoiceRecorder({
         onError: message => toast.error(message),
@@ -37,7 +31,6 @@ export function useQuestionVoice(): QuestionVoice {
     const finish = useCallback(async () => {
         setTranscribing(true)
         try {
-            // Null when the recording was stopped before the microphone came up: nothing was said.
             const recording = await stop()
             const transcript = recording ? await transcribeVoiceRecording(recording.blob, recording.format.transcriptionFormat) : ''
             if (!transcript) {

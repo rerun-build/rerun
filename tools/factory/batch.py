@@ -1,5 +1,3 @@
-"""batch.py: pick_batch takes up to 3 ready chunks for one builder run. The first eligible chunk (readyq.eligible)
-sets the builder; each next one needs the same builder, eligibility, and paths that overlap no chunk already picked."""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import readyq

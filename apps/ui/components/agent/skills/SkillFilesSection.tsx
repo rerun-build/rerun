@@ -15,8 +15,6 @@ type SkillFilesSectionProps = {
     agentId: string
     slug: string
     files: string[]
-    // A connector-managed skill hides these controls entirely; a sealed one keeps them in place,
-    // off, wearing the reason.
     readOnly?: boolean
     addLockedReason?: string
     deleteLockedReason?: string

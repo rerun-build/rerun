@@ -1,9 +1,5 @@
 import { defineQuotas, type QuotaLimit } from '@/lib/apps/quotas'
 
-// What one WhatsApp number may send through its coworkers. WhatsApp bans a number for unsolicited
-// messages far faster than LinkedIn restricts a profile: a first message to somebody counts twice,
-// once as a message and once as a new conversation, the limit that matters.
-
 export type QuotaAction = 'message' | 'new_conversation' | 'number_check' | 'attachment_download'
 
 const DEFAULT_QUOTAS: Record<QuotaAction, QuotaLimit[]> = {

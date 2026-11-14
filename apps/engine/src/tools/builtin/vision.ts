@@ -19,21 +19,10 @@ const MEDIA_TYPES: Record<string, string> = {
     '.webp': 'image/webp',
 }
 
-// A CLI provider is handed a prompt, not a message array: the Claude Code transport only forwards
-// inline image parts when the prompt is streamed in, and even then the CLI drops them often enough
-// that the model answers "no image was provided" without any error. Both CLIs read image files
-// natively, so pointing them at the path is the only reliable way in, and it skips base64-ing a
-// screenshot the agent already has on disk. Codex does it through `view_image`; Claude through its
-// `Read`, which this one-shot call alone reopens, since a run has no built-in at all.
 const CLAUDE_VISION_TOOLS = ['Read'] as const
 
-// A call that never settles would hold the whole run on this tool, and Stop with it: the SDK waits
-// for every pending tool before it lets the run end.
 const VISION_TIMEOUT_MS = 10 * 60 * 1000
 
-// OpenAI scales every image down to fit 2048px before looking at it, so nothing the model sees is
-// lost here. What is saved is the request: base64 grows a file by a third, and a phone photo or a
-// full-page screenshot then weighs 10MB and more on its way through the hub.
 const VISION_MAX_EDGE = 2048
 const VISION_MAX_BYTES = 4 * 1024 * 1024
 
@@ -56,8 +45,6 @@ async function imageMessages(ctx: RunContext, target: string, mediaType: string,
 export const NO_VISION_MODEL =
     'None of the models switched on for this OpenCode connection can read images. Switch one on that can (most Go models do), or go on without the image.'
 
-// The model the run is on, unless it is an OpenCode model that cannot see: then another model of the
-// same connection that can, or null when it has none.
 function visionModelFor(ctx: RunContext): ModelOverride | undefined | null {
     const { provider, model, connection } = ctx.agent.resolved
     if (modelSeesImages(provider, model, connection)) return undefined

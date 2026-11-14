@@ -11,9 +11,6 @@ export const LOGO_TOO_LARGE = 'Image is too large (max 8MB).'
 
 const IMAGE_PATH = /\.(png|jpe?g|svg|webp|gif|ico)$/i
 
-// One field takes both a site ("acme.com", "https://acme.com/pricing") and a direct link to a logo
-// file: a path ending in an image extension is the logo itself, anything else is a site whose
-// favicon becomes the logo.
 export function readLogoLink(input: string): LogoLink | null {
     const trimmed = input.trim()
     if (URL.canParse(trimmed)) {

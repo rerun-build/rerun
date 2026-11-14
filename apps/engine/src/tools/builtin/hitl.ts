@@ -10,13 +10,8 @@ export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service
 export type HitlToolName = (typeof HITL_TOOL_NAMES)[number]
 export const HITL_TOOL_SET = new Set<string>(HITL_TOOL_NAMES)
 
-// It closes a turn beside its message or its card: a row in the chat, nothing for the model to
-// read. So it neither turns the message before it into narration nor hides a card.
 export const TRAILING_TOOL_SET = new Set<string>(['skill_propose'])
 
-// Both CLI providers surface Rerun's builtin tools through the bridged `rerun` MCP server, which
-// namespaces them. Claude Code always prefixes `mcp__`; Codex only does when `prefix_mcp_tool_names`
-// is on, so accept the bare form too.
 const BRIDGE_PREFIX = /^(?:mcp__)?rerun__/
 
 export function canonicalBridgeName(name: string | undefined): string {
@@ -45,8 +40,6 @@ function rejectedToolCallIds(messages: ModelMessage[]): Set<string> {
     return ids
 }
 
-// A HITL call whose input the model got wrong never reached the user, so the run is not waiting on
-// anyone: treating it as pending would pin an unanswerable form above the composer.
 export function findPendingHitl(messages: ModelMessage[]): PendingHitl | null {
     const rejected = rejectedToolCallIds(messages)
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -64,42 +57,28 @@ export function findPendingHitl(messages: ModelMessage[]): PendingHitl | null {
     return null
 }
 
-// An invalid call is one the tool never ran: the model gets the validation error back and must be
-// given the next step to fix it, instead of ending the turn on a question nobody was asked.
 type StepLike = { text?: string; toolCalls?: ReadonlyArray<{ toolName: string; toolCallId?: string; invalid?: boolean }>; content?: ReadonlyArray<{ type: string; toolCallId?: string }> }
 
-// A HITL call that threw delivered no card either: the model has to read the error and go on
-// rather than end its turn on nothing.
 export function lastStepHasHitlCall(steps: ReadonlyArray<StepLike>): boolean {
     const last = steps[steps.length - 1]
     const failed = new Set((last?.content ?? []).filter(part => part.type === 'tool-error').map(part => part.toolCallId))
     return !!last?.toolCalls?.some(c => !c.invalid && !(c.toolCallId && failed.has(c.toolCallId)) && isHitlToolName(c.toolName))
 }
 
-// A card sent with no message around it: the model drafted its explanation in its thinking and went
-// straight to the call, so the user sees a question about a summary they never got.
 export function hitlStepLacksMessage(steps: ReadonlyArray<StepLike>): boolean {
     return lastStepHasHitlCall(steps) && !(steps[steps.length - 1]?.text ?? '').trim()
 }
 
-// The turn ends on the card once it has its message. A card without one buys the model exactly one
-// more step to write it, and the turn ends after that step whatever it holds. CLI providers run
-// their whole turn as one step, so for them the first HITL step is always the last.
 export function hitlTurnIsOver(steps: ReadonlyArray<StepLike>, cli: boolean): boolean {
     if (lastStepHasHitlCall(steps.slice(0, -1))) return true
     return lastStepHasHitlCall(steps) && (cli || !hitlStepLacksMessage(steps))
 }
 
-// A model that writes its message first is left to judge whether it did: the card may have come
-// after a message, or after nothing.
 export const HITL_ACK = {
     status: 'delivered',
     instruction: 'Delivered to the user. Call no other tool. If you wrote nothing to the user before this call, they are looking at a bare card: write now, as your normal message, what you found, why you ask, and in full what the question is about, then end your turn. The card shows below that message, so point to it as the card below, never above. If you already did, end your turn now. The user will reply in the chat and you will continue from their reply.',
 } as const
 
-// A model that calls first is told, not asked: a Claude's note before a call comes back as a
-// thinking block the chat folds away, so a model that wrote one believes the user has read it and
-// ends its turn on a line pointing at the card. The message is expected now, whatever came before.
 export const HITL_ACK_CALL_FIRST = {
     status: 'delivered',
     instruction: 'Delivered to the user. Whatever you wrote before this call was at most a note, and a note written before a call is not shown to them: they are looking at the card. Write your message now, as your normal reply: what you found, why you ask, and in full what the card asks about, then end your turn. The card shows below that message, so point to it as the card below, never above. Call no other tool. The user will reply in the chat and you will continue from their reply.',
@@ -124,8 +103,6 @@ export function jsonTolerantArray<S extends z.ZodTypeAny>(schema: S) {
     }, schema)
 }
 
-// Several models serialise an omitted optional field as an explicit `null`, which `.optional()`
-// rejects. The whole call would then fail validation and the form would never reach the user.
 function nullTolerantOptional<S extends z.ZodTypeAny>(schema: S) {
     return z.preprocess(v => (v === null ? undefined : v), schema.optional())
 }
@@ -146,7 +123,6 @@ export function approvalSummary(input: Record<string, unknown> | undefined): str
         return approvals.length > 1 ? `${first} (+${approvals.length - 1} more)` : first
     }
 
-    // Read compatibility for approval calls persisted before the tool accepted batches.
     return String(input?.action ?? 'The coworker requests approval')
 }
 
@@ -174,14 +150,10 @@ export function takeoverSummary(input: Record<string, unknown> | undefined): str
     return reason ? `Needs you in the browser: ${reason}` : 'The coworker needs you in the browser'
 }
 
-// Nobody watches a delegate, and the foreman's chat has no card for it.
 export function offersTakeover(config: AgentConfig): boolean {
     return config.tools.browser && !config.ephemeral && config.kind !== 'foreman' && desktopAvailable()
 }
 
-// The rules on options and on what goes in the card live in the `asking_the_user` section of the
-// prompt: the description keeps the shape of a call, not the whole doctrine, since it rides along
-// on every step.
 const askUserDescription = (cards: boolean) =>
     `Ask the user one or more questions at once, then END YOUR TURN until they reply. Use it only when you cannot proceed without their input. Anything they are asked to review or choose among (a hook, slides, images) must be in the turn that asks, in full, even when you showed it earlier or are asking again: its text in your message${cards ? ', its files in a card_file call made before this one' : ''}. Put every open question in the questions array, not across several turns. A question offers short options as buttons, or none for a free-text answer: options only when concrete choices help, never for a value only the user knows (a URL, a name, a number). Set multiple: true when the options combine. The user can always type a custom answer, attach files (they arrive as workspace paths) or skip a question. Keep each question to one short line and each option to a few words: longer explanations go in your message.`
 
@@ -289,8 +261,6 @@ export function requestSecretTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
     }
 }
 
-// Registered alongside mcp_register rather than through the tool catalog: it only makes sense to an
-// agent that can add MCP servers to itself.
 export function mcpSignInTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
     return {
         request_mcp_sign_in: hitlTool(

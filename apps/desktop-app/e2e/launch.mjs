@@ -1,6 +1,3 @@
-// More windows, and what the app no longer offers inside itself:
-//   pnpm verify:desktop --scenario apps/desktop-app/e2e/launch.mjs
-
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
@@ -21,7 +18,6 @@ export default async function launchScenario({ app, page, step, base }) {
     await page.goto(base)
     await page.waitForSelector('[data-foreman-split]', { timeout: 60_000 })
 
-    // The help menu offers the desktop app in a browser, never inside it.
     await page.getByRole('button', { name: /help/i }).first().click()
     await page.getByRole('menuitem').first().waitFor()
     check((await page.getByRole('menuitem', { name: 'Get the desktop app' }).count()) === 0, 'the app does not offer itself')

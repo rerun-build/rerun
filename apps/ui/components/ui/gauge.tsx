@@ -8,7 +8,6 @@ type GaugeProps = {
     ratio: number
     complete?: boolean
     strokeWidth?: number
-    /** Start and end colours of the filled arc; any CSS colour, `var(--x)` included. */
     gradient?: readonly [string, string]
     className?: string
 }
@@ -18,8 +17,6 @@ export function Gauge({ ratio, complete, strokeWidth = 2, gradient, className }:
     const r = 9 - strokeWidth
     const c = 2 * Math.PI * r
     const clamped = Math.min(Math.max(ratio, 0), 1)
-    // Runs from the arc's start to its tip, so a short arc still shows both colours; past half a turn
-    // the tip would fold back towards the start, so the ramp stops at the opposite side.
     const tipAngle = 2 * Math.PI * Math.min(clamped, 0.5)
     return (
         <svg className={cn('size-4.5 [--gauge-duration:300ms]', className)} viewBox="0 0 18 18" aria-hidden>

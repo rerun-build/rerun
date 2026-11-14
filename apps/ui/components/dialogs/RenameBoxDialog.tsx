@@ -15,8 +15,6 @@ import { z } from 'zod'
 
 type FormValues = { name: string }
 
-// A Box is a rectangle on the board and a name, nothing else: renaming it is the whole of its
-// settings, so it is a dialog rather than a panel.
 export function RenameBoxDialog({ space, open, onOpenChange }: { space: SpacePublic | undefined; open: boolean; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('dialogs.renameBox')
     const tCommon = useTranslations('common')
@@ -26,7 +24,6 @@ export function RenameBoxDialog({ space, open, onOpenChange }: { space: SpacePub
     const canManage = useCanManageSpace(space?.id)
     const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { name: space?.name ?? '' } })
 
-    // The name catches up by realtime, so the field is rearmed on each opening rather than tracked.
     useEffect(() => {
         if (open) form.reset({ name: space?.name ?? '' })
     }, [open, space?.name, form])

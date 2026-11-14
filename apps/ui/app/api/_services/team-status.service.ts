@@ -9,13 +9,10 @@ import { findWorkspaceEngine } from './workspace-engine.service'
 
 const TEAM_AGENT_COLUMNS = ['id', 'name', 'handle', 'space_id', 'engine_agent_id', 'disabled_at'] as const
 const MAX_RUNNING_PER_AGENT = 20
-// The newest run can be the one still in flight, so a few are read to find the last that ended.
 const RECENT_RUNS = 5
 
 type AgentRuns = { running: EngineRun[]; lastFinished: EngineRun | null }
 
-// The engine's own busy flag is not used: it is one flag per coworker, and the first of two
-// parallel runs to end sets it back to idle while the other still works.
 async function readAgentRuns(conn: EngineConnection, engineAgentId: string): Promise<AgentRuns | null> {
     try {
         const [running, recent] = await Promise.all([listRuns(conn, engineAgentId, { status: 'running', limit: MAX_RUNNING_PER_AGENT }), listRuns(conn, engineAgentId, { limit: RECENT_RUNS })])
@@ -31,7 +28,6 @@ export async function readTeamStatus(workspaceId: number, { spaceId, agentId }: 
     const checkedAt = new Date().toISOString()
     if (!agents?.length) return { checkedAt, agents: [] }
 
-    // A machine powered off or archived answers nothing: asking it would only spend the timeout.
     const machineDown = !!(workspace?.boxes_disabled_at || workspace?.boxes_archived_at)
     const engine = machineDown ? null : await findWorkspaceEngine(workspaceId)
     const [runsByAgent, sessions] = await Promise.all([

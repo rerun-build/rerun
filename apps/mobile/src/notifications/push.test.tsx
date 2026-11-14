@@ -14,7 +14,6 @@ const mockApi = jest.fn().mockResolvedValue(undefined)
 jest.mock('@/api/client', () => ({ api: (...args: unknown[]) => mockApi(...args), appBuild: 7 }))
 jest.mock('expo-application', () => ({ nativeApplicationVersion: '1.0.0' }))
 const RERUN_CLOUD_CONFIG = { extra: { eas: { projectId: 'project-1' } }, android: { googleServicesFile: './google-services.json' } }
-// Read through a global: push.ts reads the config while the test file is still importing it.
 const testGlobal = globalThis as { mockExpoConfig?: object }
 jest.mock('expo-constants', () => ({
     get expoConfig() {

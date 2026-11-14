@@ -5,7 +5,6 @@ import { useIsWorkspaceAdmin } from '@/auth/AuthProvider'
 import { ApiKeyConnect, ChatGptConnect, ClaudeConnect } from '@/components/providers/connect'
 import { ProvidersAdminOnly } from '@/components/providers/screens'
 
-// `reconnect` signs an existing connection in again instead of adding one.
 export default function ConnectProviderSheet() {
     const params = useLocalSearchParams<{ provider: string; reconnect?: string }>()
     const provider = addableProviderSchema.safeParse(params.provider)

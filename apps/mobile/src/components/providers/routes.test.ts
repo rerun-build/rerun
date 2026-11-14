@@ -6,7 +6,6 @@ jest.mock('expo-router', () => ({ router: {} }))
 jest.mock('@/api/client', () => ({ api: jest.fn() }))
 
 describe('how a connection is put back on its feet', () => {
-    // OpenCode is listed with the plans, but it is a key: "Sign in again" would add a second connection.
     it('signs in again only on Claude and ChatGPT, and pastes a new key everywhere else', () => {
         expect(signsIn('claude')).toBe(true)
         expect(signsIn('codex')).toBe(true)

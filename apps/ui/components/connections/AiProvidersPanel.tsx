@@ -54,22 +54,16 @@ const ORANGE_STRIPES = 'color-mix(in oklab, var(--color-orange-500) 6%, transpar
 
 type ConnectionsPage = { kind: 'list' } | { kind: 'add'; provider: AddableProvider } | { kind: 'detail'; connectionId: string; reconnect?: boolean }
 
-// `reconnect` is set when the provider turned the credential away: it is still on file, so the
-// connection reads as connected and would otherwise offer no way to sign in again.
 export type InitialConnection = { connectionId: string; reconnect: boolean }
 
-// The workspace's AI providers: the default model on top, then every source its agents run on,
-// grouped by how it is paid for. Opening a source or adding one drills down into the panel.
 export function AiProvidersPanel({
     initialConnection,
     onInitialConnectionConsumed,
     initialAddProvider,
     onInitialAddProviderConsumed,
 }: {
-    // A chat error asking to sign a connection in again lands straight on that connection.
     initialConnection?: InitialConnection | null
     onInitialConnectionConsumed?: () => void
-    // The model picker names a provider to add, so the panel opens on its form.
     initialAddProvider?: AddableProvider | null
     onInitialAddProviderConsumed?: () => void
 }) {
@@ -96,12 +90,9 @@ export function AiProvidersPanel({
         onInitialAddProviderConsumed?.()
     }, [initialAddProvider, onInitialAddProviderConsumed])
 
-    // Derived rather than synced: a connection that disappeared (deleted here, or gone on a
-    // refresh) simply drops the panel back to the list.
     const selected = page.kind === 'detail' ? connections.find(c => c.id === page.connectionId) : undefined
     const stepKey = page.kind === 'add' ? `add:${page.provider}` : (selected?.id ?? 'list')
     const current = effectiveDefault(boxDefault)
-    // Same rule as the engine's: the first connection plugged in adopts the default.
     const willBecomeBoxDefault = !boxDefault && connections.every(c => c.id === RERUN_CONNECTION_ID || !c.connected)
 
     const open = (connectionId: string) => setPage({ kind: 'detail', connectionId })
@@ -273,9 +264,7 @@ type SourceGroupProps = {
     credit: RerunCredit
     taken: Set<string>
     onOpen: (connectionId: string) => void
-    // Absent for a workspace with no plan: what it already holds stays reachable, nothing new can be added.
     onAdd?: (provider: AddableProvider) => void
-    // Set for a member: the buttons stay in place, disabled, with this reason.
     addDisabledReason?: string
     pitch: string
     providers: AddableProvider[]
@@ -285,7 +274,6 @@ export function SourceGroup({ title, only, sources, credit, taken, onOpen, onAdd
     const t = useTranslations('connections')
     if (!onAdd && sources.length === 0) return null
 
-    // The pitch already offers every provider, so the header's Add only shows once the group has entries.
     const addLabel = only === 'plan' ? t('panel.addSubscription') : t('panel.addApiKey')
     const addMenu =
         onAdd && sources.length > 0 ? (

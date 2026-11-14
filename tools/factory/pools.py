@@ -1,12 +1,8 @@
-"""Worker types read from the dispatch settings. Pure: no network, no ledger."""
-
-
 def _coworkers(items):
     return [{"id": c["id"], "name": c["name"], "runs": c.get("runs", 1)} for c in items]
 
 
 def types(cfg):
-    """{type: {"coworkers": [{"id", "name", "runs"}], "max_jobs": int or None}}."""
     if "types" in cfg:
         return {t: {"coworkers": _coworkers(v.get("coworkers", [])),
                     "max_jobs": v.get("max_jobs")}
@@ -24,7 +20,6 @@ def names(cfg):
 
 
 def pick(cfg, worker, busy):
-    """First coworker id of the type not in busy; None if all busy or type unknown."""
     t = types(cfg).get(worker)
     if t is None:
         return None
@@ -37,10 +32,6 @@ def max_jobs(cfg, worker):
 
 
 def pick_copy(cfg, worker, running):
-    """(id, copy) for the first coworker of the type with a free run; None if none.
-
-    running is a list of (id, copy) of jobs whose run is out; copy None counts as 1.
-    """
     t = types(cfg).get(worker)
     if t is None:
         return None

@@ -3,7 +3,6 @@ import type { McpServer } from '../agents/types.js'
 import { isAuthError } from './mcp-auth.js'
 import { probeMcp, type McpProbe, type McpSpawn } from './mcp.js'
 
-// Long enough for an `npx` stdio server already in the npm cache, short enough for a panel waiting on it.
 export const MCP_STATUS_TIMEOUT_MS = 15_000
 
 export function classifyProbe(name: string, probe: McpProbe): McpServerStatus {

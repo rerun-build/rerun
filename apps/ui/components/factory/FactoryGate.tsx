@@ -1,8 +1,5 @@
 'use client'
 
-// A review is the flowchart decision: a solid diamond gate standing on the belt. The belt enters at its
-// left corner; a pass leaves by the right corner, a fail by the bottom corner. Nothing in it is see-through.
-
 import { type P } from './factory-rest'
 import { type PodView } from './factory-scene'
 

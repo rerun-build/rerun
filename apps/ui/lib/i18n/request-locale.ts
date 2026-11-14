@@ -9,9 +9,6 @@ import { cache } from 'react'
 
 const SUPABASE_SESSION_COOKIE = /^sb-.+-auth-token/
 
-// The cookie mirrors the account's choice on the device that made it, so the account row is only
-// read on another device, and never for a visitor without a session. The users row comes from the
-// same cached read the dashboard makes anyway.
 async function storedAccountLocale(cookieStore: Awaited<ReturnType<typeof cookies>>): Promise<string | null> {
     if (!cookieStore.getAll().some(cookie => SUPABASE_SESSION_COOKIE.test(cookie.name))) return null
     const { user } = await getSessionWorkspace()

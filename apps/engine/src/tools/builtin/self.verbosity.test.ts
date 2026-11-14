@@ -38,8 +38,6 @@ describe('verbosity_set', () => {
         expect(config.description).toBe('A configured agent')
     })
 
-    // Changing how long its answers are is far less invasive than rewriting its identity or
-    // installing packages, so it rides on the self-improvement switch alone.
     it('is offered even when soul edits and tool installs are both off', async () => {
         const tools = selfTools(ctxWith({ enabled: true, allowSoulEdit: false, allowToolInstall: false }))
         expect(tools.verbosity_set).toBeDefined()

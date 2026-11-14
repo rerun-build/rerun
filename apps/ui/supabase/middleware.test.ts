@@ -14,7 +14,6 @@ const mocks = vi.hoisted(() => ({
     selectMaybeSingle: vi.fn(),
 }))
 
-// The JWT the request carries says what the auth server would: same refresh, same user.
 const getClaims = vi.fn(async () => {
     const { data } = await mocks.getUser()
     return { data: data.user ? { claims: { sub: data.user.id, is_anonymous: data.user.is_anonymous } } : null, error: null }

@@ -27,8 +27,6 @@ async function drain(stream: ReadableStream<UIMessageChunk>): Promise<UIMessageC
 const settledWith = (outcome: RunOutcome): Promise<RunOutcome> => Promise.resolve(outcome)
 
 describe('cutOffWhenSettled', () => {
-    // The provider hangs, so the source never closes. Without the cut the SSE response and the
-    // replay buffer stay open forever, and the dashboard reconnects to a stream that says nothing.
     it('closes a stream whose source never ends once the run failed', async () => {
         const source = open()
         source.push({ type: 'text-start', id: '0' })
@@ -47,8 +45,6 @@ describe('cutOffWhenSettled', () => {
         expect(chunks).toEqual([])
     }, 10_000)
 
-    // A run that reached `done` produced its finish part, so its stream ends on its own: cutting it
-    // would truncate the tail of a perfectly good answer.
     it('lets a finished run drain to its last chunk', async () => {
         const source = open()
         const chunks = drain(cutOffWhenSettled(source.stream, settledWith({ kind: 'done' })))

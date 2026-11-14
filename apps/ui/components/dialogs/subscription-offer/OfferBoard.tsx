@@ -19,10 +19,6 @@ import { cn } from '@/lib/utils'
 
 import { CHATGPT_MARK, CLAUDE_MARK, OPENROUTER_MARK } from './offer-board-marks'
 
-// The template board puts a connector two cells out, which is right when an agent has a ring of
-// them. Here each coworker has exactly one, and the point is that it belongs to it: the source tile
-// sits one free cell above its agent, close enough that the cable between them reads as a tether.
-// The three marks are the three answers the dialog offers, one per coworker.
 const CREW = [
     { key: 'sales', col: 4, row: 7, mark: CLAUDE_MARK },
     { key: 'customer_support', col: 7, row: 7, mark: CHATGPT_MARK },

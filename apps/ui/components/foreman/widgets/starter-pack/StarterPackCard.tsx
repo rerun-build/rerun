@@ -10,16 +10,11 @@ import type { StarterPackCard as Card } from '@/lib/foreman/starter-pack'
 import { CheckIcon, LockIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-// One card of the starter pack. It sells a use case, its title, and what lands is the coworker of
-// the template behind it, named on the art. The board capture keeps the template card's own frame:
-// it is fitted to 1200x630 with no bleed, so any other frame would crop it into a close-up.
-
 const MAX_APPS = 3
 
 type StarterPackCardProps = {
     card: Card
     picked: boolean
-    // The three places are taken: this one can only be added once another is dropped.
     locked: boolean
     onToggle: () => void
     className?: string
@@ -63,7 +58,6 @@ export function StarterPackCard({ card, picked, locked, onToggle, className }: S
                         size="sm"
                         variant={picked ? 'default' : 'outline'}
                         disabled={locked}
-                        // The whole card toggles: without this, a click on the button would toggle it twice.
                         onClick={event => {
                             event.stopPropagation()
                             onToggle()

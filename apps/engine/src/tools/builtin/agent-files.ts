@@ -4,8 +4,6 @@ import { makeFsTools } from './fsTools.js'
 import { workspaceDir } from '../../config/paths.js'
 import { listAgentIndex } from '../../db/repos/agents.js'
 
-// Rooted at the agent's workspace, never at its whole directory: its .env, config and databases stay
-// out of reach of a file tool.
 export async function agentWorkspaceOf(ref: string): Promise<string> {
     const wanted = ref.trim().replace(/^@/, '')
     const agents = (await listAgentIndex()).filter(agent => !agent.name.endsWith(' delegate'))

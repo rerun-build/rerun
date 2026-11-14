@@ -16,8 +16,6 @@ import { useTranslations } from 'next-intl'
 export type ProfilePanelProps = {
     name: string
     avatarUrl: string | null
-    // What the initials are drawn from while the account has no name: its email. An account born
-    // from a phone number has neither, and a number makes no initials.
     fallbackLabel: string | null
     uploadAvatar: (file: File) => Promise<void>
     removeAvatar: () => Promise<void>

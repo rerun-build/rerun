@@ -2,8 +2,6 @@ import { TABLE_SOURCES_MAX_ROWS, type TableSourcesResult } from '@rerun/contract
 import { describe, expect, it, vi } from 'vitest'
 import { resolveTableSources, showsSourcesColumn, sourcesRequestRows, type RowSources } from './table-sources'
 
-// Which provider a call shows under is the catalog's business, and the open source build has none:
-// here a call is named after its vendor, so the test holds in both builds.
 vi.mock('@rerun/contracts', async importOriginal => ({
     ...(await importOriginal<typeof import('@rerun/contracts')>()),
     paidDataSourceOfCall: (_capability: string, servedBy: string | null) =>

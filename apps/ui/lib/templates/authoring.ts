@@ -9,13 +9,8 @@ import { uploadTemplateImageBytes, type TemplateImageFolder } from './images'
 import { generateImageAltText, generateTemplateContent, generateTemplateFaq, generateTemplateMeta } from './prefill'
 import { uniqueTemplateSlug } from './write'
 
-// Writing a template is the same job whoever does it: the admin editor and the author panel run
-// the same prefill and the same image upload. What differs is who
-// is allowed to, so the guard stays in the action files and everything below is auth-free.
-
 export type UploadResult = { ok: true; url: string } | ActionFailure
 export type ContentPrefillResult = { ok: true; tagline: string; longDescription: string } | ActionFailure
-// `slug` is absent for an author: they do not own the URL of the page, so their prefill leaves it alone.
 export type MetaPrefillResult =
     | { ok: true; title: string; slug?: string; category: TemplateCategory; tags: string[]; metaTitle: string; metaDescription: string }
     | ActionFailure
@@ -58,8 +53,6 @@ export async function runContentPrefill(input: unknown): Promise<ContentPrefillR
     return { ok: true, tagline, longDescription }
 }
 
-// `currentSlug` doubles as the switch: given one, the writer proposes a new slug for that row;
-// given none, the caller has no say over the URL and only the copy comes back.
 export async function runMetaPrefill(input: unknown, currentSlug?: string): Promise<MetaPrefillResult> {
     const parsed = templateBriefSchema.safeParse(input)
     if (!parsed.success) return issues(parsed.error)

@@ -33,7 +33,6 @@ function errorMessageOf(payload: unknown): string | null {
     return typeof payload.error === 'string' ? payload.error : null
 }
 
-// What every call to the hub carries: the build, and once signed in the token and the workspace.
 export function hubHeaders(clientHeader: string, { accessToken, workspaceId }: Pick<ApiRequest, 'accessToken' | 'workspaceId'>): Record<string, string> {
     const headers: Record<string, string> = { [CLIENT_HEADER]: clientHeader }
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`

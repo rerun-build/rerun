@@ -16,7 +16,6 @@ import { AlertCircleIcon, BellRing, LockIcon, RefreshCw, SendIcon, ShieldCheckIc
 import { cn } from '@/lib/utils'
 import { StepHero, type AppPresentation } from './PaidAppViews'
 
-// A QR code to scan from another screen, or a code to type when the dialog is on the phone itself.
 export type WhatsappLinkMethod = 'qr' | 'code'
 
 export type WhatsappConnectInput = { phoneNumber: string; method: WhatsappLinkMethod }
@@ -35,7 +34,6 @@ const METHODS: WhatsappLinkMethod[] = ['qr', 'code']
 type ConnectScreenProps = {
     defaultCountry: CountryCode
     defaultMethod: WhatsappLinkMethod
-    // A reconnect links the same number again, so it comes filled in.
     initialPhone?: string
     pending: boolean
     error: string | null
@@ -106,8 +104,6 @@ type LinkScreenProps = {
     onSwitchMethod: () => void
 }
 
-// The code is shown until the phone links it, checked every few seconds; the QR code renews on its
-// own while it waits. Past its three minutes, a new one is asked for.
 export function WhatsappLinkScreen({ method, phoneNumber, link, expired, pending, error, onNewCode, onSwitchMethod }: LinkScreenProps) {
     const t = useTranslations('apps.whatsapp.link')
     const steps = [t('steps.open'), t('steps.settings'), method === 'qr' ? t('steps.pointQr') : t('steps.typeCode')]
@@ -168,7 +164,6 @@ function LinkCode({ method, link, expired }: { method: WhatsappLinkMethod; link:
             </div>
         )
     }
-    // A QR code is read on a white ground whatever the theme: the phone's camera needs the contrast.
     return (
         <div className={cn('mb-4 rounded-xl border bg-white p-3', expired && 'opacity-30')}>
             {link?.qrCodeImage ? <img src={link.qrCodeImage} alt={t('qrAlt')} className="size-44 sm:size-52" /> : <Skeleton className="size-44 bg-neutral-200 sm:size-52" />}

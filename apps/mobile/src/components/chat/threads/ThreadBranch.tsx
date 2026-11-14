@@ -29,8 +29,6 @@ const CONNECTOR_INSET = 14
 
 const isAutomated = (thread: ThreadItem) => thread.source === 'schedule' || thread.source === 'trigger'
 
-// What stands in for the opening message when the hub never saw one: a run the engine started, a
-// coworker's request, or a thread older than the column that keeps it.
 function genericOpener(thread: ThreadItem, t: ReturnType<typeof useTranslations<'mobileChat.threadBranch.opener'>>): string {
     if (thread.source === 'schedule') return t('schedule', { name: thread.automationName ?? thread.title })
     if (thread.source === 'trigger') return t('trigger', { name: thread.automationName ?? thread.title })
@@ -40,8 +38,6 @@ function genericOpener(thread: ThreadItem, t: ReturnType<typeof useTranslations<
 
 const minutesSince = (iso: string) => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 60_000))
 
-// The web's `Stripes fade="right"` turned half a turn: the hatch is strongest at the chevron and
-// fades toward the title.
 function Hatch() {
     const theme = useTheme()
     const id = useId().replace(/[^a-zA-Z0-9]/g, '')
@@ -64,11 +60,6 @@ function Hatch() {
     )
 }
 
-/**
- * A thread in General, as the web's `ThreadBranch`: the message it opened with in a small bubble,
- * and under it the thread's row, joined by a curve whose tone says where the thread stands. The row
- * is hatched rather than filled, so it never reads as one more bubble; a tap opens the thread.
- */
 export function ThreadBranch({ thread, onOpen }: { thread: ThreadItem; onOpen: () => void }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.threadBranch')

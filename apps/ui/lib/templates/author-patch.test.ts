@@ -2,11 +2,6 @@ import { templateDocumentSchema } from '@rerun/contracts'
 import { describe, expect, it } from 'vitest'
 import { mergeAuthorDocument, pickSentFields, templateAuthorPatchSchema } from './expert'
 
-// The MCP surface sends the one field it means to change, unlike the panel which posts the whole
-// form. What guards that difference is here: zod's `.partial()` does NOT cancel the `.default()`
-// every picked field carries, so parsing alone hands back a full document and the merge would blank
-// the page the caller only meant to touch up. Silent failure, hence the test.
-
 const stored = templateDocumentSchema.parse({
     slug: 'inbox-triage',
     title: 'Inbox triage',

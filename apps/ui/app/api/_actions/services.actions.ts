@@ -6,10 +6,6 @@ import { getCatalogServicesBySlugs, getServiceAlternatives, getServiceDetails, i
 import type { InstallResult, ResetConnectionResult, ServiceAlternative, ServiceChecklistItem, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
 import { failureOf, refusalOf, type ActionFailure, type SuccessResult } from '@/lib/i18n/action-error'
 
-// Install (or configure) a service on an agent. Used by both the chat config form and
-// the Services settings tab — the same compile path either way. Returns needs_config
-// (without compiling) when required inputs are still missing. `key` is a slug for the base
-// account or `slug@id` for another one; `newInstance` adds a fresh account.
 export async function installServiceAction(
     agentId: string,
     key: string,
@@ -26,7 +22,6 @@ export async function installServiceAction(
     }
 }
 
-// Browse the library (optionally filtered). `installed` is resolved per agent.
 export async function searchServicesAction(agentId: string, query?: string, category?: string): Promise<ServiceSearchResult[]> {
     try {
         const { actor } = await assertAgentAccess(agentId, 'use')
@@ -37,9 +32,6 @@ export async function searchServicesAction(agentId: string, query?: string, cate
     }
 }
 
-// Browse the global catalog with no agent context (agent-creation dialog). Paginated so it
-// scales past 1000 services; `installed` is always false and selection is applied at creation
-// via createAgentWithSetupAction. Free-text lookup uses searchCatalogServicesAction instead.
 export async function listCatalogServicesAction(opts?: { category?: string; limit?: number; offset?: number }): Promise<ServiceSearchResult[]> {
     try {
         return await listCatalogServices(opts)
@@ -48,8 +40,6 @@ export async function listCatalogServicesAction(opts?: { category?: string; limi
     }
 }
 
-// Resolve full catalog metadata for specific slugs (agent-creation dialog tile cache, e.g.
-// the finish-setup checklist whose services may lie outside the loaded browse pages).
 export async function getCatalogServicesBySlugsAction(slugs: string[]): Promise<ServiceSearchResult[]> {
     try {
         return await getCatalogServicesBySlugs(slugs)
@@ -75,7 +65,6 @@ export async function getServiceDetailsAction(agentId: string, key: string): Pro
     }
 }
 
-// Flip an OAuth service to active after the user finishes the sign-in popup.
 export async function markServiceAuthorizedAction(agentId: string, key: string): Promise<{ success: boolean }> {
     try {
         const { actor } = await assertAgentAccess(agentId, 'manage')
@@ -86,8 +75,6 @@ export async function markServiceAuthorizedAction(agentId: string, key: string):
     }
 }
 
-// Reset a connected service so the user can go through its sign-in (or its config) again.
-// Non-destructive: nothing the install compiled is removed, only the stored token.
 export async function resetServiceConnectionAction(agentId: string, key: string): Promise<{ ok: true; result: ResetConnectionResult } | ActionFailure> {
     try {
         const { actor } = await assertAgentAccess(agentId, 'manage')
@@ -107,10 +94,6 @@ export async function uninstallServiceAction(agentId: string, key: string): Prom
     }
 }
 
-// --- Agent creation ---
-
-// Create the agent and install the services the user picked, all at drop. Services that
-// need secrets come back in the checklist for the user to finish configuring.
 export async function createAgentWithSetupAction(params: { name: string; description?: string; serviceSlugs?: string[]; workspaceId: number; spaceId: string; col?: number; row?: number }): Promise<{ ok: true; agentId: string; active: boolean; checklist: ServiceChecklistItem[] } | ActionFailure> {
     try {
         const { actor } = await assertSpaceAccess(params.spaceId, 'manage')

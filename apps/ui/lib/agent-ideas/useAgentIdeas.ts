@@ -6,8 +6,6 @@ import { loadAgentIdeasAction } from '@/app/api/_actions/agent-ideas.actions'
 import { useSession } from '@/supabase/session/SessionProvider'
 import type { StoredAgentIdeas, StoredIdea } from './stored'
 
-// One read per workspace and page load, shared by the board and the dialog. A run still in flight is
-// not kept: the next reader asks again, which is how the ideas show up without a reload.
 const settled = new Map<number, StoredIdea[]>()
 const loading = new Map<number, Promise<StoredAgentIdeas | null>>()
 
@@ -27,9 +25,6 @@ function loadIdeas(workspaceId: number): Promise<StoredIdea[]> {
     })
 }
 
-// The agents imagined for this company, best first. Empty until they land, and it stays empty when
-// there are none or the read fails: every reader has a list of its own to fall back on. `refreshKey`
-// changing asks again while the run has not settled, the dialog passes its open state.
 export function useAgentIdeas(refreshKey: unknown = null): StoredIdea[] {
     const workspaceId = useSession().workspace?.id ?? null
     const [loaded, setLoaded] = useState<{ workspaceId: number; ideas: StoredIdea[] } | null>(null)

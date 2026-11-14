@@ -3,10 +3,6 @@ import type { TemplateCardImage } from '@/lib/templates/card-image'
 import { MAX_STARTER_PICKS } from '@/lib/onboarding/starter-packs'
 import { asString, asStringArray } from '@/lib/mcp/args'
 
-// What `show_starter_pack` carries and what it is answered with. The app writes the card itself
-// (scripted.ts), already resolved against the library, so the widget draws it without a fetch and
-// a reload redraws it from the transcript alone. Pure, so the server and the widget read it alike.
-
 export const SHOW_STARTER_PACK_TOOL = 'show_starter_pack'
 
 export type StarterPackCard = {
@@ -15,7 +11,6 @@ export type StarterPackCard = {
     line: string
     focus?: string
     title: string
-    // The coworker the template lands, named on the card's art.
     agent: string
     image: TemplateCardImage | null
     connectors: string[]
@@ -61,11 +56,6 @@ export function readStarterPackAnswer(output: unknown): StarterPackAnswer | null
     return chosen.length ? { answered: true, chosen } : { answered: false }
 }
 
-/**
- * The cards they picked, read as the plan they become: each template in the Box the card was laid
- * into, with the skill its install starts on. A slug the card never offered is dropped rather than
- * trusted, and past the trial's ceiling the rest is dropped too.
- */
 export function starterPackPlan(input: unknown, chosen: string[]): { items: { kind: 'template'; slug: string; title: string; focus?: string; box?: string }[]; boxes: { name: string }[] } {
     const { cards, box, boxes } = readStarterPack(input)
     const picked = cards.filter(card => chosen.includes(card.slug)).slice(0, MAX_STARTER_PICKS)
@@ -74,11 +64,6 @@ export function starterPackPlan(input: unknown, chosen: string[]): { items: { ki
 
 const FOCUS_HEADING = '## Start with:'
 
-/**
- * The template's own install, opened on the skill the card sold. They hired it for that one use case,
- * so that is what it gets working first; the rest of its install follows as its author wrote it.
- * Written once: an install that already opens on a focus is left as it is.
- */
 export function installWithFocus(install: string, focus: string): string {
     if (install.trimStart().startsWith(FOCUS_HEADING)) return install
     return `${FOCUS_HEADING} ${focus}\n\nThey hired you from a card that promised this, so get it working first, on their real company, before anything else this guide sets up.\n\n${install.trimStart()}`

@@ -1,12 +1,8 @@
 import { companySiteUrl } from './firecrawl'
 
-// Mailbox providers whose domain says nothing about the company. Matched on the label before the
-// TLD too, so yahoo.fr, hotmail.co.uk or gmx.de fall out without listing every country.
 const PERSONAL_DOMAINS = new Set(['gmail.com', 'googlemail.com', 'icloud.com', 'me.com', 'mac.com', 'aol.com', 'proton.me', 'pm.me', 'hey.com', 'fastmail.com', 'zoho.com', 'qq.com', '163.com', '126.com', 'naver.com', 'daum.net', 'web.de', 'mail.ru', 'bk.ru', 'inbox.ru', 'list.ru', 'yandex.ru', 'ya.ru', 'orange.fr', 'wanadoo.fr', 'free.fr', 'sfr.fr', 'laposte.net', 'bbox.fr', 'neuf.fr', 'skynet.be', 'telenet.be', 'libero.it', 'virgilio.it', 'tiscali.it', 'btinternet.com', 'comcast.net', 'verizon.net', 'att.net', 'sbcglobal.net', 'bigpond.com', 'uol.com.br', 'bol.com.br', 'terra.com.br', 'rediffmail.com'])
 const PERSONAL_LABELS = new Set(['yahoo', 'ymail', 'hotmail', 'outlook', 'live', 'msn', 'gmx', 'protonmail', 'yandex', 'mail', 'email', 'tutanota', 'tuta'])
 
-// The site a work address points at, for a sign-up that gave no website: `jane@acme.io` reads
-// acme.io. A personal mailbox names nothing, so it gives null rather than a guess.
 export function workEmailSite(email: string | null | undefined): string | null {
     const domain = email?.split('@')[1]?.trim().toLowerCase()
     if (!domain) return null

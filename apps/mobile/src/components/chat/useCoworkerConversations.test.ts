@@ -44,8 +44,6 @@ describe('useCoworkerConversations', () => {
         expect(result.current.conversations.map(c => c.id)).toEqual(['from-the-web', 'general'])
     })
 
-    // RER-7: iOS holds the app while the web starts the chat, the INSERT and the UPDATE go by unheard,
-    // and the run writes its row again only when it ends.
     it('shows a chat started on the web while the app was away, as soon as the app is back', async () => {
         mockFetchConversations.mockResolvedValueOnce([general]).mockResolvedValue([general, startedOnTheWeb])
         const { result } = await renderHook(() => useCoworkerConversations('a1'))

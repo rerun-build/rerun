@@ -1,7 +1,6 @@
 import type { DesktopShellPlatform, DesktopUpdateState } from '@rerun/contracts'
 import type { FindRequest, FindResult, ServerConnectResult, ServerInfo } from '../../shared/ipc-channels'
 
-// What the preload hands the shell's own pages (see src/preload/index.ts).
 export type ShellLocalApi = {
     locale: string
     platform: DesktopShellPlatform

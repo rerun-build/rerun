@@ -28,8 +28,6 @@ function badgeMarkup(slug: string): string {
     )
 }
 
-// Rendered from a shadow root so nothing in the page's own CSS can restyle or hide it. Closing it
-// lasts for the tab only, enough to get it out of the way of a full-screen mini-app.
 function badgeScript(slug: string): string {
     const key = `rerun-badge-hidden:${slug}`
     return (

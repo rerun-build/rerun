@@ -4,7 +4,6 @@ import { create } from 'zustand'
 
 import type { AppSlug } from './apps'
 
-// Never rendered: the list of paid apps is always empty in this build.
 export function AppsMenuSection(_props: { apps: AppSlug[]; onOpen: (slug: AppSlug) => void }) {
     return null
 }

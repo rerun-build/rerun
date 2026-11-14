@@ -26,7 +26,6 @@ type NotificationEmailInput = {
 export async function sendNotificationEmail(input: NotificationEmailInput): Promise<SendEmailResult> {
     const resend = getClient()
     if (!resend) {
-        // No API key in this environment (e.g. local dev): skip sending, do not crash.
         console.warn('[email] RESEND_API_KEY missing, skipping notification email')
         return { ok: true, id: null }
     }
@@ -221,8 +220,6 @@ export async function sendPublishedAccessCodeEmail(input: { to: string; code: st
 export async function sendSignInCodeEmail(input: { to: string; code: string; signInUrl?: string; expiresInMinutes: number; locale?: Locale }): Promise<SendEmailResult> {
     const resend = getClient()
     if (!resend) {
-        // Local dev and staging send no email at all, so the log is the only way to sign in there.
-        // Never on the production mailer, where a logged code would open a real account.
         if (IS_PRODUCTION_MAILER) console.error('[email] RESEND_API_KEY missing, skipping sign-in code email')
         else console.warn(`[email] RESEND_API_KEY missing, sign-in code for ${input.to}: ${input.code}`)
         return { ok: true, id: null }

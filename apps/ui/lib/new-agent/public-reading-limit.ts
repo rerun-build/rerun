@@ -1,8 +1,3 @@
-// The landing page's composer reads a job with a model, for a visitor nobody knows yet. Two windows
-// keep that from becoming an open tap: one per caller, wide enough for someone rewriting a
-// description several times, and one for everybody, which is what bounds the bill if the callers
-// are many. Counted in memory, so per server instance: an approximation is enough for a reading the
-// composer works without.
 const PER_CALLER = { max: 20, windowMs: 5 * 60 * 1000 }
 const EVERYONE = { max: 600, windowMs: 60 * 60 * 1000 }
 const MAX_TRACKED_CALLERS = 5000

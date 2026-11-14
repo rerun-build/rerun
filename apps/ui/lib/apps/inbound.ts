@@ -16,16 +16,12 @@ type ConnectionUpdate = Database['public']['Tables']['app_connections']['Update'
 type WebhookEventInsert = Database['public']['Tables']['app_webhook_events']['Insert']
 type WebhookEventUpdate = Database['public']['Tables']['app_webhook_events']['Update']
 
-// Linkup gives up on a delivery after 10 seconds, and every coworker is woken in parallel within it.
-// The voice notes of the message are transcribed first, in a share of that time: past it the coworker
-// wakes without the words rather than not at all.
 const FIRE_TIMEOUT_MS = 8_000
 const TRANSCRIBE_BUDGET_MS = 4_000
 const MIN_FIRE_TIMEOUT_MS = 2_000
 
 export type InboundConnection = { id: string; workspace_id: number; app_slug: AppSlug; label: string | null; status: string; provider_webhook_secret: string | null }
 
-// Linkup's account ids are unique across its platforms, so the account alone names the app.
 export async function connectionForAccount(supabase: Client, accountId: string): Promise<InboundConnection | null> {
     const { data } = await selectMany(supabase, 'app_connections', ['id', 'workspace_id', 'app_slug', 'label', 'status', 'provider_webhook_secret'] as const, { provider_account_id: accountId, status: { neq: 'deleted' } }, { column: 'created_at', ascending: false }, 1)
     const row = data?.[0]
@@ -33,8 +29,6 @@ export async function connectionForAccount(supabase: Client, accountId: string):
     return { ...row, app_slug: row.app_slug }
 }
 
-// Claimed before the handler runs and stamped after it succeeds, like stripe_events: a duplicate of
-// a processed delivery is dropped, a retry of one whose handler crashed runs again.
 export async function claimDelivery(supabase: Client, eventId: string, slug: AppSlug): Promise<boolean> {
     const { error } = await supabase.from('app_webhook_events').insert<WebhookEventInsert>({ event_id: eventId, app_slug: slug })
     if (!error) return true
@@ -95,7 +89,6 @@ async function wakeSubscribers(supabase: Client, connection: InboundConnection, 
     return fired.filter(Boolean).length
 }
 
-// Handles one verified, deduplicated delivery. Throws only on what a retry could fix.
 export async function handleLinkupEnvelope(supabase: Client, connection: InboundConnection, envelope: LinkupEnvelope): Promise<void> {
     const kind = appDefinition(connection.app_slug).envelopeKind(envelope)
     if (kind.kind === 'ignored') return
@@ -105,8 +98,6 @@ export async function handleLinkupEnvelope(supabase: Client, connection: Inbound
         return
     }
 
-    // Not through updateConnection: updated_at is what the reconciliation measures an unpaid pause
-    // from, and a busy inbox must not keep resetting it.
     if (connection.status === 'connected') {
         const { error } = await supabase.from('app_connections').update<ConnectionUpdate>({ last_event_at: new Date().toISOString() }).eq('id', connection.id)
         if (error) throw new Error(error.message)

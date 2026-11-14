@@ -5,8 +5,6 @@ import Link from 'next/link'
 import { confirmLogin } from './actions'
 import { getTranslations } from 'next-intl/server'
 
-// Opening the link does not sign in: the emailed token works once and the browser's prefetch would
-// spend it. The click, a POST through a server action, consumes it and opens the session.
 export default async function ConfirmPage({ searchParams }: { searchParams: Promise<{ token_hash?: string; type?: string }> }) {
     const { token_hash, type } = await searchParams
     const t = await getTranslations('auth.confirm')

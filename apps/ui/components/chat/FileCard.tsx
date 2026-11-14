@@ -9,24 +9,15 @@ import type { FileCard as FileCardData, FileCardEntry } from '@rerun/contracts'
 import { useState } from 'react'
 
 type FileCardProps = {
-    /** Absent on read-only transcripts rendered outside a Box: the tiles stay inert. */
     agentId?: string
     card: FileCardData
-    /** Where the bytes come from when they are not a Box's: the foreman's bucket, the design lab. */
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
-    /** Where the shared space is read from when `rawUrlFor` stands for one agent's files only: the foreman on its engine. */
     sharedFiles?: FileAccess
 }
 
 export type FileAccess = { rawUrlFor?: RawUrlFor; readFile?: ReadChatFile }
 
-/**
- * Files the agent chose to show, as the same tiles a user attachment gets, opening the same
- * lightbox. Images and videos read as an album, so the user can compare the candidates of a choice. The
- * names come from the engine: `attachmentDisplayName` would eat the head of a legitimate file name
- * that happens to look like the composer's uniqueness prefix.
- */
 export function FileCard({ agentId, card, rawUrlFor, readFile, sharedFiles }: FileCardProps) {
     const [openIndex, setOpenIndex] = useState<number | null>(null)
     const { files } = card

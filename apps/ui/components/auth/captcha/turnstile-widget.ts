@@ -35,12 +35,6 @@ const loadTurnstile = scriptLoader({
     failure: () => new CaptchaError('turnstile', 'captcha_failed', 'script'),
 })
 
-// Cloudflare's check that a visitor is not a script. It draws nothing unless Cloudflare wants the
-// visitor to tick a box (`onInteractive`). Only a check that draws nothing is timed, for
-// `silentTimeoutMs`, chosen by the caller after what awaits the visitor past it: a visitor ticking
-// the box takes the time they need. The timer starts before the script has loaded: a network that
-// never delivers it is the same dead end as a check that never answers. A script that failed to
-// load is fetched again on the next ask.
 export function mountTurnstile(container: HTMLElement, siteKey: string, onInteractive: (interactive: boolean) => void, silentTimeoutMs: number): CaptchaWidget {
     let waiter: Waiter | null = null
     let timeout: ReturnType<typeof setTimeout> | null = null

@@ -13,10 +13,6 @@ import { findModel } from '@/mocks/models'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: the composer's attachments, its `/` and `@` menus, and a live composer to type into
-// with mock skills and coworkers.
-//   /lab-composer?scheme=dark   scheme forces a theme
-
 const noop = () => {}
 
 const SKILLS = [

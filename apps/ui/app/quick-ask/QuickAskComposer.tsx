@@ -6,8 +6,6 @@ import { handOverQuickAsk, QUICK_ASK_MAX_LENGTH } from '@/lib/desktop-shell/quic
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 
-// One field for the Chief of Staff, over whatever the person is doing. Enter sends: the text is handed
-// to the main window, which opens a new conversation with it; Escape puts the window away.
 export function QuickAskComposer() {
     const t = useTranslations('desktopShell.quickAsk')
     const field = useRef<HTMLTextAreaElement>(null)

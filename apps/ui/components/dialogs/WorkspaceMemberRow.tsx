@@ -26,7 +26,6 @@ type MemberRowProps = {
     busy: boolean
     onRoleChange: (role: WorkspaceRole) => void
     onRemove: () => void
-    // Opens the Boxes of this person. Absent where the viewer may not read them.
     onOpen?: () => void
 }
 
@@ -57,7 +56,6 @@ export function WorkspaceMemberRow({ member, profile, isSelf, viewerIsAdmin, isL
                                 {t('adminBadge')}
                             </Badge>
                         )}
-                        {/* The menu is portaled, and React still bubbles its clicks to the row. */}
                         <div className="flex" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
                             <DropdownMenu>
                                 <TooltipDisabledReason reason={viewerIsAdmin ? undefined : t('adminOnly')}>

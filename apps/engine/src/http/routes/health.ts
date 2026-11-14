@@ -18,7 +18,6 @@ healthRoutes.get('/health', c =>
         status: 'ok',
         activeAgents: activeAgentCount(),
         activeRuns: activeRunCount(),
-        // Claims and controllers should move together; a gap between them is a leaked conversation.
         claimedSessions: sessionClaimCount(),
         desktopViewers: desktopViewerCount(),
         capabilities: [

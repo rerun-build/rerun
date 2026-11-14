@@ -6,9 +6,6 @@ export const DARK_ICON_SURFACE: Rgb = [10, 10, 10]
 export const LIGHT_ICON_SURFACE: Rgb = [250, 250, 250] // oklch(0.98 0 0), cf. theme.css
 export const MIN_GRAPHIC_CONTRAST = 3
 
-// Une encre est « pâle » quand elle est quasi blanche ET quasi grise. Le garde-fou de chroma est
-// ce qui distingue un mark blanc, invisible sur fond clair, d'une marque claire mais colorée
-// (jaune Mailchimp, cyan Intercom) qui se lit très bien et doit garder ses couleurs.
 const PALE_INK_CONTRAST = 1.5
 const PALE_INK_CHROMA = 30
 const PALE_INK_SHARE = 0.85

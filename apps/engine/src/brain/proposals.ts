@@ -75,8 +75,6 @@ export async function insertProposal(input: InsertProposal): Promise<ProposalRow
     return row
 }
 
-// An agent refining its own pending change to a page replaces it instead of stacking a second
-// card the person would have to compare with the first.
 export async function replaceOpenProposal(id: string, input: InsertProposal): Promise<void> {
     const client = await getBrainDb()
     await client.execute({
@@ -92,7 +90,6 @@ export async function getProposal(id: string): Promise<ProposalRow | null> {
     return rs.rows[0] ? toRow(rs.rows[0]) : null
 }
 
-// Dismissed ones count too: a change the person turned down is not offered to them again.
 export async function findProposalByFingerprint(fingerprint: string): Promise<ProposalRow | null> {
     const client = await getBrainDb()
     const rs = await client.execute({ sql: 'SELECT * FROM brain_proposals WHERE fingerprint = ? LIMIT 1', args: [fingerprint] })
@@ -130,8 +127,6 @@ export async function countOpenProposals(): Promise<number> {
     return Number(rs.rows[0]?.n ?? 0)
 }
 
-// Compare and set: false means the row had already been decided, which is what stops a double
-// click from writing the page twice.
 async function transition(id: string, from: BrainProposalStatus[], to: BrainProposalStatus, decidedBy: string | null): Promise<boolean> {
     const client = await getBrainDb()
     const rs = await client.execute({

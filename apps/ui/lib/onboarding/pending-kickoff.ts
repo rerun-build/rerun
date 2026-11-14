@@ -1,13 +1,8 @@
 import { z } from 'zod'
 
-// The first message of a freshly created agent, parked in localStorage until it is actually
-// delivered by startKickoffAction. Cleared only after a successful send, so a reload during the
-// finish-setup wizard cannot lose it: HomeContent replays any leftover entry at boot.
 const pendingKickoffSchema = z.object({
     agentId: z.string().min(1),
-    // Detailed onboarding brief, sent verbatim when present.
     kickoff: z.string().optional(),
-    // Use-case description, reformulated server-side into a short first message.
     description: z.string().optional(),
 })
 
@@ -17,8 +12,6 @@ const parkedSchema = z.record(z.string().min(1), pendingKickoffSchema.omit({ age
 
 type Parked = z.infer<typeof parkedSchema>
 
-// One entry per agent: two coworkers created a few seconds apart each keep their own first message,
-// where a single slot let the second overwrite the first.
 const STORAGE_KEY = 'rerun:pending-kickoffs'
 const LEGACY_STORAGE_KEY = 'rerun:pending-kickoff'
 
@@ -64,7 +57,6 @@ export function savePendingKickoff(entry: PendingKickoff): void {
         const { agentId, ...rest } = pendingKickoffSchema.parse(entry)
         writeParked({ ...readParked(), [agentId]: rest })
     } catch {
-        // SSR, quota exceeded or an entry without an agent: the kickoff simply won't survive a reload.
     }
 }
 
@@ -84,6 +76,5 @@ export function clearPendingKickoff(agentId: string): void {
     try {
         writeParked(Object.fromEntries(Object.entries(readParked()).filter(([id]) => id !== agentId)))
     } catch {
-        // ignore
     }
 }

@@ -6,7 +6,6 @@ import { useAuth } from '@/auth/AuthProvider'
 import { cachedInbox } from '@/data/local-cache'
 import { useLiveReload } from '@/data/useLiveReload'
 
-// `fresh`: read from the hub since the app opened, not the copy the phone kept from the last visit.
 type InboxState = { state: 'loading' } | { state: 'error' } | { state: 'ready'; items: InboxItem[]; running: number; fresh: boolean }
 
 type Inbox = InboxState & {
@@ -17,19 +16,14 @@ type Inbox = InboxState & {
 
 const InboxContext = createContext<Inbox | null>(null)
 
-// Several rows change at once when a run moves (its session, then its notification): one read for the burst.
 const BURST_MS = 400
 
-// The web's inbox, read once for the home's bell and its sheet, again whenever a session, a
-// notification or a read changes in Realtime, and when the app comes back to the foreground.
 export function InboxProvider({ children }: { children: ReactNode }) {
     const { session, me } = useAuth()
     const accessToken = session?.access_token
     const userId = session?.user.id
     const workspaceId = me?.workspace.id
     const [read, setRead] = useState<{ workspaceId: number; inbox: InboxState } | null>(null)
-    // Row id → the first read that may show it again: one started after the write landed. A read
-    // already on its way when the row was marked would otherwise bring it back.
     const [hidden, setHidden] = useState<Record<string, number>>({})
     const [version, setVersion] = useState(0)
     const latestVersion = useRef(0)

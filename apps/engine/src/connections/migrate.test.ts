@@ -67,8 +67,6 @@ describe('migrateConnections', () => {
         expect((await readConfig('alpha')).connectionId).not.toBe((await readConfig('beta')).connectionId)
     })
 
-    // The whole point of the migration: an agent's .env keeps everything that is not a provider
-    // credential, because MCP servers, the shell tool and the connectors all read it.
     it('strips only the provider keys from the agent env', async () => {
         await seedAgent('alpha', { provider: 'anthropic' }, { ANTHROPIC_API_KEY: 'k', STRIPE_API_KEY: 'sk_test_x', MY_VAR: 'hello' })
 
@@ -77,8 +75,6 @@ describe('migrateConnections', () => {
         expect(await readEnvFile(agentEnvPath('alpha'))).toEqual({ STRIPE_API_KEY: 'sk_test_x', MY_VAR: 'hello' })
     })
 
-    // The fold shipped before OpenCode existed: on a v0 data-dir, an OPENCODE_API_KEY in an agent's
-    // .env can only be a variable of the user's shell, and it stays where it is.
     it('leaves a provider added after the fold alone', async () => {
         await seedAgent('alpha', { provider: 'opencode' }, { OPENCODE_API_KEY: 'oc_sk_shell', MY_VAR: 'hello' })
 
@@ -117,8 +113,6 @@ describe('migrateConnections', () => {
         expect(await readFile(codexAuthPath(created.id), 'utf8')).toBe('{"tokens":{}}')
     })
 
-    // An agent whose credential was never set has nothing to point at, and must not silently
-    // inherit another agent's subscription.
     it('leaves an agent with no credential unattached', async () => {
         await seedAgent('alpha', { provider: 'claude' }, { CLAUDE_CODE_OAUTH_TOKEN: CLAUDE_TOKEN })
         await seedAgent('gamma', { provider: 'anthropic' }, {})
@@ -139,8 +133,6 @@ describe('migrateConnections', () => {
         expect((await readConfig('alpha')).connectionId).toBe(first[0].id)
     })
 
-    // Rerun Balanced used to be stored as the OpenRouter id it ran on. Left as it is, the
-    // connections tab lists it next to the current id as a second row spelled "Balanced".
     it('renames the id Rerun Balanced was stored under, and the box default naming it', async () => {
         await mkdir(connectionDir(RERUN_CONNECTION_ID), { recursive: true })
         const legacy = { name: 'Rerun', provider: 'rerun', models: ['qwen/qwen3.7-max'], extraModels: [], createdAt: '2026-01-01T00:00:00.000Z' }

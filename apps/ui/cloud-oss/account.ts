@@ -5,7 +5,6 @@ import type { Database } from '@/app/api/database.types'
 
 type Client = SupabaseClient<Database>
 
-// No billing in this build: nothing charges, nothing has to be stopped before an account goes.
 export async function subscriptionStillCharges(_subscriptionId: string): Promise<boolean> {
     return false
 }

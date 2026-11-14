@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""test_rotate_engine_key: deploy/vps/rotate-engine-key.sh run with sh in a temp clone against a fake docker
-(fixtures/fake_docker.py) and a fake openssl. Behaviour checks, and in every run the hard rule: no key value in
-the script's output, in any argv docker was called with, or in the text of any SQL program."""
 import json, os, re, shutil, subprocess, sys, tempfile, unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -100,7 +97,6 @@ class RotateEngineKey(unittest.TestCase):
     def rotate(self, answer="ROTATE\n"):
         return self.run_script("rotate", answer)
 
-    # 1
     def test_check_changes_nothing_and_reports_one_row(self):
         before = self.read(".env")
         self.assertEqual(self.run_script("check"), 0, self.out)
@@ -150,7 +146,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertIn("db-rehearsal skipped", self.out)
         self.assertEqual(self.keys(), [OLD])
 
-    # 2
     def test_rotate_happy_path(self):
         self.assertEqual(self.rotate(), 0, self.out)
         calls = self.state["calls"]
@@ -187,7 +182,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertGreater(len(hub), 3 + 1)
         self.assertIn("rotate complete", self.out)
 
-    # 4
     def test_quoting_single_double_none_reads_the_same_key(self):
         for line, quoting in (("'%s'" % OLD, "single"), ('"%s"' % OLD, "double"), (OLD, "none")):
             self.write(".env", "RERUN_ENGINE_API_KEY=%s\n" % line)
@@ -199,7 +193,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertEqual(self.rotate(), 0, self.out)
         self.assertEqual(self.keys(), [NEW])
 
-    # 5
     def test_zero_matching_rows_is_refused_before_anything_stops(self):
         self.state["rows"] = [{"workspace": "w1", "engine_api_key": OTHER, "updated_at": None}]
         before = self.read(".env")
@@ -213,7 +206,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertIn("rows_old=0 rows_new=0", self.out)
         self.assertIn("nothing was stopped", self.out)
         self.assertFalse(self.exists(".env.engine-key-rotation"))
-        # The owner corrects .env to the key the database holds; rotate then works.
         self.write(".env", "RERUN_ENGINE_API_KEY='%s'\n" % OTHER)
         self.assertEqual(self.rotate(), 0, self.out)
         self.assertEqual(self.keys(), [NEW])
@@ -254,7 +246,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertEqual(self.read(".env"), before)
         self.assertEqual(self.read(".env.engine-key-rotation"), ("OLD=%s\nNEW=%s\n" % (OLD, NEW)).encode())
 
-    # 6
     def test_minting_nothing_or_a_bad_value_stops_before_anything(self):
         for value in (None, "", "XYZ" * 22, "0123456789abcdef" * 3):
             self.openssl(value)
@@ -266,7 +257,6 @@ class RotateEngineKey(unittest.TestCase):
             self.assertEqual(self.read(".env"), before)
             self.assertFalse(self.exists(".env.engine-key-rotation"))
 
-    # 7
     def test_resume_finishes_with_the_same_new_key_and_mints_nothing(self):
         self.state["rows"][0]["engine_api_key"] = NEW
         self.write(".env.engine-key-rotation", "OLD=%s\nNEW=%s\n" % (OLD, NEW))
@@ -278,7 +268,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertEqual(self.env_value(), "'%s'" % NEW)
         self.assertEqual(self.read(".env.engine-key-rotation"), ("PREVIOUS=%s\n" % OLD).encode())
 
-    # 8
     def test_rollback_after_a_rotation_restores_the_old_key(self):
         self.assertEqual(self.rotate(), 0, self.out)
         self.assertEqual(self.run_script("rollback", "ROLLBACK\n"), 0, self.out)
@@ -317,7 +306,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertEqual(self.read(".env.engine-key-rotation"), rec.encode())
         self.assertEqual(self.state["calls"], [])
 
-    # 9
     def test_engine_open_without_a_key_fails_and_keeps_the_record(self):
         self.state["engine_open"] = True
         self.assertEqual(self.rotate(), 1, self.out)
@@ -329,21 +317,18 @@ class RotateEngineKey(unittest.TestCase):
         self.assertNotIn("verify engine-new-key", self.out)
         self.assertIn("rollback", self.out)
         self.assertEqual(self.read(".env.engine-key-rotation"), ("OLD=%s\nNEW=%s\n" % (OLD, NEW)).encode())
-        # What the FAIL text tells the owner to do: rollback undoes the change in progress.
         self.state["engine_open"] = False
         self.assertEqual(self.run_script("rollback", "ROLLBACK\n"), 0, self.out)
         self.assertEqual(self.keys(), [OLD])
         self.assertEqual(self.env_value(), "'%s'" % OLD)
         self.assertEqual(self.read(".env.engine-key-rotation"), ("PREVIOUS=%s\n" % NEW).encode())
 
-    # 10
     def test_app_refusing_the_new_key_fails(self):
         self.state["app_refuses"] = True
         self.assertEqual(self.rotate(), 1, self.out)
         self.assertIn("verify app-new-key http=401 FAIL", self.out)
         self.assertTrue(self.exists(".env.engine-key-rotation"))
 
-    # 11
     def test_wrong_word_changes_nothing(self):
         before = self.read(".env")
         self.rotate("yes\n")
@@ -354,7 +339,6 @@ class RotateEngineKey(unittest.TestCase):
         self.assertEqual(self.keys(), [OLD])
         self.assertFalse(self.exists(".env.engine-key-rotation"))
 
-    # 12
     def test_resume_with_an_unknown_key_in_env_stops_and_starts_nothing(self):
         self.write(".env", "RERUN_ENGINE_API_KEY='%s'\n" % OTHER)
         self.write(".env.engine-key-rotation", "OLD=%s\nNEW=%s\n" % (OLD, NEW))
@@ -380,7 +364,6 @@ class ScriptText(unittest.TestCase):
             self.raw = f.read()
         self.s = self.raw.decode("utf-8")
 
-    # 13
     def test_no_trace_no_env_value_on_docker_exec_no_key_printed(self):
         self.assertNotIn(b"\r", self.raw)
         self.assertNotIn("set -x", self.s)

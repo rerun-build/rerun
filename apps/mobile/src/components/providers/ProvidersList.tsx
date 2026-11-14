@@ -26,12 +26,9 @@ type ProvidersListProps = {
     onAdd: (provider: AddableProvider) => void
     onAddKind: (kind: Exclude<AiConnectionKind, 'included'>) => void
     onChangeDefault: () => void
-    // Why the caller can only read the providers (a member), or null when they run them.
     readOnlyReason?: AccessReason | null
 }
 
-// The web's AI providers panel: the default model, what comes with Rerun, then the user's own plans
-// and keys. An empty group offers its providers in place, a full one ends on its Add row.
 export function ProvidersList({ view, failed, onClose, onOpen, onAdd, onAddKind, onChangeDefault, readOnlyReason }: ProvidersListProps) {
     const t = useTranslations('mobileProviders.list')
     const readOnly = !!readOnlyReason

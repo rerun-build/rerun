@@ -9,12 +9,6 @@ import { useTranslations } from 'next-intl'
 
 type Variant = 'welcome' | 'build' | 'signin'
 
-// Account dialog for anonymous visitors. Three entry points share the exact same anonymous-aware flow
-// (useAnonymousSignUp) and only differ in copy and in whether they can be dismissed: `welcome` is the
-// wall an anonymous visitor meets when there is no welcome card to answer, and the only one that
-// cannot be closed. `build` is opened from the Foreman column once the card is answered, `signin`
-// from a pill; both stay one click away, so closing them loses nothing. `copy` replaces the
-// variant's words on the first screen when the dialog reopens on a provider sign-in that came back failed.
 export function AuthDialog({ open, onOpenChange, variant = 'welcome', copy: override }: { open: boolean; onOpenChange: (open: boolean) => void; variant?: Variant; copy?: OAuthRetryCopy | null }) {
     const t = useTranslations('dialogs.auth')
     const blocking = variant === 'welcome'

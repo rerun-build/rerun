@@ -12,15 +12,10 @@ export type WhatsAppRecipient = { ok: true; phone: string } | { ok: false; reaso
 
 const RECIPIENT_COLUMNS = ['phone', 'verified_at', 'contact_consent_at', 'whatsapp_opted_out_at', 'whatsapp_unreachable_at'] as const
 
-// Both flags describe a number, and the row keeps them when its owner verifies another one. A flag
-// older than the verification was earned by the previous number.
 function standsFor(flaggedAt: string | null, verifiedAt: string): boolean {
     return !!flaggedAt && new Date(flaggedAt) >= new Date(verifiedAt)
 }
 
-// The last gate before a message is built: a number Rerun may write to is one its owner proved, on
-// which they agreed to be contacted, which has since neither said stop nor turned out dead, and
-// whose country WhatsApp can reach at all for this kind of message.
 export async function loadWhatsAppRecipient(supabase: SupabaseClient<Database>, userId: string, category: WhatsAppCategory): Promise<WhatsAppRecipient> {
     const { data } = await selectMaybeSingle(supabase, 'user_phones', RECIPIENT_COLUMNS, { user_id: userId })
 
@@ -49,8 +44,6 @@ export function markWhatsAppUnreachable(supabase: SupabaseClient<Database>, phon
     return flag(supabase, phone, { whatsapp_unreachable_at: at })
 }
 
-// Someone who answers a message is in a conversation with Clément in the Bird inbox: the sequence
-// leaves them be from then on.
 export function markWhatsAppReplied(supabase: SupabaseClient<Database>, phone: string, at: string): Promise<boolean> {
     return flag(supabase, phone, { whatsapp_replied_at: at })
 }

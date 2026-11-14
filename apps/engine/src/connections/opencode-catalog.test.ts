@@ -25,13 +25,10 @@ afterEach(() => {
 })
 
 describe('parseOpencodeCatalog', () => {
-    // The snapshot is generated from these very fixtures: if the parser drifts, the two disagree.
     it('turns the recorded catalogs into the snapshot, byte for byte', () => {
         expect([...parseOpencodeCatalog(goCatalog, 'go'), ...parseOpencodeCatalog(consoleCatalog, 'console')]).toEqual(OPENCODE_SNAPSHOT)
     })
 
-    // A Go subscription is served the free models; Console answers one with a 429 that tells the
-    // caller to subscribe to Go, so they are worth listing on one side and not on the other.
     it('keeps the free models of Go, and drops those of Console', () => {
         const go = parseOpencodeCatalog(goCatalog, 'go')
         expect(go).toHaveLength(30)

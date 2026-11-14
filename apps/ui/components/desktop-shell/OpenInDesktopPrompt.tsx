@@ -15,8 +15,6 @@ function desktopChannel() {
     return isDesktopShellChannel(value) ? value : null
 }
 
-// A browser that signed a desktop app in offers, once per tab, to open the page in the app: the
-// link of an email lands in the browser, the work happens in the app.
 export function OpenInDesktopPrompt() {
     const t = useTranslations('desktopShell.openInApp')
     const pathname = usePathname()

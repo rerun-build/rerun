@@ -1,5 +1,3 @@
-// `env()` caches on its first call, which happens while the imports below run, so the hub the
-// injection is judged against has to be in place before them.
 process.env.RERUN_HUB_BASE_URL = 'https://app.rerun.build'
 process.env.RERUN_API_KEY = 'space-key'
 

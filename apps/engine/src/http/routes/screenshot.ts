@@ -3,10 +3,6 @@ import { chromium, type Browser } from 'patchright'
 import { z } from 'zod'
 import { env } from '../../config/env.js'
 
-// The image service of the hub's share cards and board pictures, answered by this engine's own
-// Chromium: GET /screenshot with the query the hub's `capturePage` sends. Only pages of the hub
-// this engine reports to are shot, so the route cannot be used to fetch anything else.
-
 const querySchema = z.object({
     url: z.string().url(),
     width: z.coerce.number().int().min(16).max(4096),
@@ -41,7 +37,6 @@ export const shootPage: Shooter = async ({ url, width, height, scale, format, wa
         const page = await context.newPage()
         await page.goto(url, { waitUntil: 'load', timeout: timeoutMs })
         if (waitFor) await page.waitForSelector(waitFor, { timeout: timeoutMs })
-        // CDP rather than page.screenshot: it writes WebP as well as PNG.
         const cdp = await context.newCDPSession(page)
         const { data } = await cdp.send('Page.captureScreenshot', { format })
         return Buffer.from(data, 'base64')

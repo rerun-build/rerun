@@ -32,7 +32,6 @@ export function TemplateMetaSection() {
                             const result = await actions.prefillMeta(brief)
                             if (!result.ok) return result
                             setValue('title', result.title, { shouldDirty: true })
-                            // The author surface leaves the URL alone, so its prefill returns no slug.
                             if (result.slug) setValue('slug', result.slug, { shouldDirty: true })
                             setValue('category', result.category, { shouldDirty: true })
                             setValue('tags', result.tags, { shouldDirty: true })

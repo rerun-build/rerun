@@ -2,7 +2,6 @@ import { Clock, CircleX, GitMerge, Hammer, Hourglass, Link2, OctagonPause, Octag
 import type { FactoryJobState } from '@rerun/contracts'
 import { STATUS_COLOR } from './factory-scene'
 
-// The one map from a job's state to its icon and colour. Nothing else imports lucide for states.
 const GREY = '#9ca3af'
 
 export const JOB_STATE_VIEW: Record<FactoryJobState, { icon: LucideIcon; color: string; dim?: boolean }> = {
@@ -33,5 +32,4 @@ export function groupOf(state: FactoryJobState): JobGroup {
     return (Object.keys(JOB_GROUPS) as JobGroup[]).find((g) => JOB_GROUPS[g].includes(state)) ?? 'ended'
 }
 
-// The id of the Loader's tile on the floor (factory-scene.ts, from-snapshot.ts).
 export const LOADER_TILE = 'Delegator'

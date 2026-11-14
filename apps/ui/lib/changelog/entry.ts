@@ -56,12 +56,6 @@ export function toRow(input: ChangelogEntryInput): Database['public']['Tables'][
     }
 }
 
-// Une annonce ne choisit jamais sa date : le « déjà lu » de chaque personne est un curseur, donc une
-// entrée antidatée passe sous le curseur de tout le monde et n'est montrée à personne. Publier,
-// c'est maintenant ; dépublier remet à null.
-//
-// `backdated` est l'exception voulue : une entrée rétroactive, écrite pour la page publique, porte
-// la date où la nouveauté est sortie, justement pour n'ouvrir la popup de personne.
 export function publishedAtFor(publish: boolean, existing: string | null, backdated?: string): string | null {
     if (!publish) return null
     if (backdated) return new Date(backdated).toISOString()
@@ -90,7 +84,6 @@ export async function upsertChangelogEntry(
 
     const { data: existing, error: readError } = await selectMaybeSingle(supabase, 'changelog_entries', ['id', 'published_at'] as const, { slug: row.slug })
     if (readError) return { ok: false, status: 500, error: readError.message }
-    // Saving a draft over a live slug would unpublish it.
     if (draftsOnly && existing?.published_at) return { ok: false, status: 409, error: 'This entry is already published, only an admin can change it' }
 
     await normalizeRowImages(supabase, row)

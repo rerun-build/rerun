@@ -4,8 +4,6 @@ import { connectorServerStates, type ConnectorServerState } from '../services/re
 import type { Provider } from '@rerun/contracts'
 import type { LoadedAgent } from '../agents/types.js'
 
-// Names the app behind a server, and which of its accounts when the agent holds several or the
-// account has a label, so the model can pick the right server for "the support inbox".
 export function describeConnectorState(state: ConnectorServerState, states: Map<string, ConnectorServerState>): string {
     const parts = [`app "${state.slug}"`]
     if (state.label) parts.push(`account ${state.label}`)
@@ -18,8 +16,6 @@ function hasOtherInstances(state: ConnectorServerState, states: Map<string, Conn
     return false
 }
 
-// A catalog app's server reaches the hub with request headers whether or not the user connected
-// the account behind it, so for those the registry status is the only truthful answer.
 function connectorAuth(state: ConnectorServerState, states: Map<string, ConnectorServerState>): string {
     const app = describeConnectorState(state, states)
     if (state.status === 'needs_auth') return `not connected yet (${app})`

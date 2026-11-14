@@ -4,8 +4,6 @@ import { isScheduledSource } from './prefs'
 
 export type UnseenRun = Database['public']['Functions']['unseen_runs']['Returns'][number]
 
-// One line of the inbox and of the board card. Every run of the same scheduled task is folded into
-// one line: an hourly task left alone for a day is « ×24 », not twenty-four lines.
 export type UnseenGroup = {
     key: string
     agentId: string
@@ -23,7 +21,6 @@ export function groupKeyOf(run: Pick<UnseenRun, 'session_id' | 'agent_id' | 'sou
     return isScheduledSource(run.source) && run.slug ? `${run.agent_id}:${run.source}:${run.slug}` : run.session_id
 }
 
-// Newest first, like the rows the function returns.
 export function groupUnseenRuns(runs: UnseenRun[]): UnseenGroup[] {
     const groups = new Map<string, UnseenGroup>()
     for (const run of runs) {
@@ -43,8 +40,6 @@ export function groupUnseenRuns(runs: UnseenRun[]): UnseenGroup[] {
 
 export const unseenCount = (runs: UnseenRun[]) => runs.reduce((sum, run) => sum + run.run_count, 0)
 
-// A row the user marked seen in this tab stays hidden even if a fetch that started before the write
-// brings it back. Only a run that finished after that moment shows it again.
 export function withoutSeenLocally(runs: UnseenRun[], seenLocally: Record<string, number>): UnseenRun[] {
     return runs.filter(run => {
         const seenAt = seenLocally[run.session_id]

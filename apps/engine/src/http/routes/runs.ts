@@ -8,7 +8,6 @@ import { abortRun } from '../../runtime/run-control.js'
 import { abortSubRun } from '../../tools/builtin/sub-run-watch.js'
 import { emitRunTerminal, triggerFromRun } from '../../runtime/run-events.js'
 
-// The run read answers the goal as one record built from the three stored columns; null for a run without one.
 function goalRecord(goalJson: string | null, state: string | null, verdictsJson: string | null): RunGoalRecord | null {
     if (!goalJson) return null
     const parsed = runGoalRecordSchema.safeParse({ ...JSON.parse(goalJson), state: state ?? 'running', verdicts: JSON.parse(verdictsJson ?? '[]') })
@@ -43,9 +42,6 @@ runRoutes.post('/:rid/cancel', async c => {
     const aborted = abortRun(rid)
     if (run.status === 'running') {
         await cancelRun(agentId, rid)
-        // When the run loop is still there it announces its own end. When it is not -- the process
-        // restarted, or the row outlived its loop -- nobody would ever tell the hub, and the
-        // conversation would stay "working" on the dashboard with no way back.
         if (!aborted) {
             await emitRunTerminal({
                 agentId,

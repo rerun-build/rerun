@@ -43,8 +43,6 @@ function CopyButton({ text, disabled }: { text: string; disabled?: boolean }) {
     )
 }
 
-// The web's code block in a chat answer (Streamdown, framed by globals.css): a header naming the
-// language over a body on the page colour, both inside the muted frame of the answer's bubbles.
 function Frame({ label, copyText, incomplete, children }: { label: string; copyText: string; incomplete?: boolean; children: React.ReactNode }) {
     const theme = useTheme()
     return (
@@ -93,10 +91,6 @@ export function CodeBlock({ code, language }: { code: string; language: string }
     )
 }
 
-/**
- * A ```draft fence: a text the user sends or pastes elsewhere (an email, a post, a message). It reads
- * as prose rather than code, and copies exactly as written. The fence's meta names it.
- */
 export function DraftBlock({ code, title }: { code: string; title: string }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.markdown')

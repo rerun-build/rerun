@@ -2,7 +2,6 @@ import { loadAgentFromDisk } from '../agents/loader.js'
 import { modelFor } from '../agents/providers.js'
 import { runExactRead } from './exact-read.js'
 
-// Reads one number from the coworker's own resolved model; writes nothing, changes no setting.
 function arg(name: string): string | undefined {
     const i = process.argv.indexOf(`--${name}`)
     return i >= 0 ? process.argv[i + 1] : undefined

@@ -6,7 +6,6 @@ import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-web-gaps-'))
 
-// Hosts in these tests are made up: they resolve to a public address, except the ones named private.
 vi.mock('node:dns/promises', () => ({
     lookup: async (host: string) => [{ address: host.startsWith('internal.') ? '10.0.0.7' : '93.184.216.34', family: 4 }],
 }))
@@ -31,7 +30,6 @@ function ctxWith(env: Record<string, string> = {}, abortSignal?: AbortSignal) {
     return { agent: { id: 'surfer', env, config: { tools: { paidData: false } } }, sessionId: 's', logger: { warn: () => {} }, hostBreaker: new HostBreaker(), abortSignal } as any
 }
 
-// The line saying where the whole page is saved is asserted on its own, in the saved-page tests.
 const withoutSavedLine = (text: string): string => text.replace(/\nSaved whole: [^\n]*/, '')
 
 async function call(ctx: ReturnType<typeof ctxWith>, name: string, args: Record<string, unknown>, timeoutMs?: number): Promise<string> {

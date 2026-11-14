@@ -40,7 +40,6 @@ describe('providerKeyProblem', () => {
         expect(fetchMock.mock.calls[0][1].headers).toEqual({ Authorization: 'Bearer oc_sk_bad' })
     })
 
-    // A key with Console credits and no Go plan may be refused the Go usage: it still runs.
     it('lets an OpenCode key through on anything but a 401', async () => {
         answer(403)
         expect(await providerKeyProblem('opencode', { OPENCODE_API_KEY: 'oc_sk_console' })).toBeNull()

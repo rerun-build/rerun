@@ -12,8 +12,6 @@ export type LiveCounter = {
 
 type Options = { flush: (snapshot: LiveSnapshot) => Promise<void>; minIntervalMs?: number }
 
-// Throttled, last-write-wins progress writer for runs whose provider does not report steps
-// while it works. A flush never throws into the caller: live figures are best effort.
 export function createLiveCounter({ flush, minIntervalMs = 2000 }: Options): LiveCounter {
     let toolCalls = 0
     let usage: Partial<Usage> | undefined
@@ -28,7 +26,6 @@ export function createLiveCounter({ flush, minIntervalMs = 2000 }: Options): Liv
         try {
             await flush(snapshot())
         } catch {
-            // best effort
         }
     }
 

@@ -10,8 +10,6 @@ import { AppText } from '@/components/ui/AppText'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// A workspace without a subscription has no machine to run coworkers. The app sells nothing and points
-// nowhere to buy (App Store guideline 3.1.1): it keeps the account and the other workspaces within reach.
 export function NoPlan() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()

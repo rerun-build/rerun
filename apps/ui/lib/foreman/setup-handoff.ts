@@ -11,18 +11,6 @@ import { requireString } from '@/lib/mcp/args'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { headers } from 'next/headers'
 
-// The end of the guided setup: the team asks for what it still needs, each agent in its own chat,
-// rather than the foreman walking the user through one Apps tab at a time. Every agent is started
-// at once and none of them is waited for: what the user sees is their whole company working, and
-// then coming back to them one by one with a sign-in card or a question.
-//
-// So this is send_message without the wait: the engine buffers the run on its side and nothing has
-// to stay connected to the stream for the user to be asked. The session row is mirrored here rather
-// than left to the notification webhook, which only writes one for a session the engine announced
-// with `agent.session.created`, and /chat announces nothing. Without that row the run executes for
-// nobody: it never reaches the agent's chat, and the `awaiting_*` state it stops on has nothing to
-// be written to.
-
 type Handoff = { agentId: string; message: string }
 
 export type HandoffResult = { agentId: string; started: boolean; inactive?: boolean; conversationId?: string | null; runId?: string | null; ranItsOwnInstall?: boolean; error?: string }
@@ -32,10 +20,6 @@ function handoff(raw: unknown): Handoff {
     return { agentId: requireString(value.agentId, 'agents[].agentId'), message: requireString(value.message, 'agents[].message') }
 }
 
-// An agent installed from a template carries the install its author wrote for this exact moment,
-// and its system prompt is already told the user sends those instructions as a message. Handing it
-// anything else would have it improvise a setup beside the one it was shipped with. It goes out
-// wrapped, so the agent's chat draws a setup block rather than a guide the user never typed.
 async function messageFor(conn: EngineConnection, engineAgentId: string, written: string, agentName: string | undefined): Promise<{ message: string; title: string; ranItsOwnInstall: boolean }> {
     try {
         const detail = await engineGetAgent(conn, engineAgentId)
@@ -57,8 +41,6 @@ function installInFlight(refusal: string): string | null {
     }
 }
 
-// The guide is the publisher's words: the browser is all that says the user's language before they write.
-// Outside a request (an MCP client, a job) there is no browser to ask.
 async function browserLanguage(): Promise<string | undefined> {
     try {
         return preferredLanguage((await headers()).get('accept-language')) ?? undefined
@@ -76,8 +58,6 @@ async function start(actor: Actor, { agentId, message }: Handoff, fresh: boolean
         const res = await engineChat(conn, engineAgentId, { message: written.message, source: 'api', install: written.ranItsOwnInstall, userLanguage, callableAgentIds })
         if (!res.ok) {
             const refusal = await res.text().catch(() => '')
-            // Its install already runs elsewhere, started from its own chat or by an earlier
-            // handoff: the user is sent to that conversation rather than asked everything twice.
             const inFlight = installInFlight(refusal)
             if (inFlight) {
                 const conversationId = await ensureSessionRow(agentId, inFlight, written.title, { source: 'api' })
@@ -88,13 +68,8 @@ async function start(actor: Actor, { agentId, message }: Handoff, fresh: boolean
 
         const engineSessionId = res.headers.get('x-session-id')
         const runId = res.headers.get('x-run-id')
-        // Dropping the stream reads as one subscriber leaving: the agent carries on working, and
-        // the user reads it live in its own chat.
         await res.body?.cancel().catch(() => {})
 
-        // The id handed back is the row's, never the engine's: that is the one the agent panel opens
-        // a conversation on. Answering with both would be two ids for one conversation, and the
-        // wrong one lands the user on an empty chat beside the run they came to watch.
         const conversationId = engineSessionId ? await ensureSessionRow(agentId, engineSessionId, written.title, { source: 'api', status: 'working' }) : null
 
         return { agentId, started: true, conversationId, runId, ranItsOwnInstall: written.ranItsOwnInstall }
@@ -103,22 +78,13 @@ async function start(actor: Actor, { agentId, message }: Handoff, fresh: boolean
     }
 }
 
-// `fresh` names the agents a caller has just created with the very install it hands over: there is
-// nothing on the engine to read back that it does not already hold. `actor` is whose access each
-// setup starts with: the member behind a foreman turn, or, left out, the workspace itself.
 export async function startAgentSetup(ctx: Pick<WorkspaceContext, 'supabase'> & { workspace: Pick<WorkspaceContext['workspace'], 'id'>; actor?: Actor }, args: Record<string, unknown>, { fresh = new Set<string>() }: { fresh?: ReadonlySet<string> } = {}): Promise<unknown> {
     const actor = ctx.actor ?? workspaceActor(ctx.workspace.id)
     const listed = Array.isArray(args.agents) ? args.agents.map(handoff) : []
     if (!listed.length) throw new Error('start_agent_setup needs at least one agent: its agentId and the message to hand it.')
 
-    // The same agent twice would start two runs at once on it, and ask the user the same thing in
-    // two conversations. One setup per agent, the first message written for it.
     const requests = listed.filter((request, index) => listed.findIndex(other => other.agentId === request.agentId) === index)
 
-    // An agent the plan does not run cannot be addressed at all: resolveAgentTarget refuses it, and
-    // that refusal would land in `failed` beside a real breakage, so the last screen of the funnel
-    // would announce half the team as broken when it is a slot to buy. Read it first, report it for
-    // what it is.
     const { data: rows } = await selectMany(
         ctx.supabase,
         'agents',
@@ -128,8 +94,6 @@ export async function startAgentSetup(ctx: Pick<WorkspaceContext, 'supabase'> & 
     const inactive = new Set((rows ?? []).flatMap(row => (row.disabled_at ? [row.id] : [])))
     const names = new Map((rows ?? []).map(row => [row.id, row.name]))
 
-    // One agent that cannot be reached is reported beside the ones that started, never thrown: the
-    // rest of the team is already asking the user, and saying otherwise would be a lie on screen.
     const agents = await Promise.all(requests.map(request => (inactive.has(request.agentId) ? Promise.resolve<HandoffResult>({ agentId: request.agentId, started: false, inactive: true }) : start(actor, request, fresh.has(request.agentId), names.get(request.agentId)))))
     const waiting = agents.filter(result => result.inactive)
     const failed = agents.filter(result => !result.started && !result.inactive)

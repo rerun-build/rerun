@@ -87,9 +87,6 @@ function TooltipLabeled({
   )
 }
 
-// A tooltip that only exists to say why a control is off. `buttonVariants` carries
-// `disabled:pointer-events-none`, so a disabled button emits no hover of its own: the trigger has
-// to be a wrapper around it, and that wrapper takes the focus the disabled control cannot.
 function TooltipDisabledReason({
   reason,
   children,

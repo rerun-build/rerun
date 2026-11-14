@@ -66,7 +66,6 @@ export function OutroSlide({ payload, agentName, onReplay, onClose }: RewindSlid
     )
 }
 
-// Sits under the recap card on a portrait story and under the headline on a wide one.
 function OutroActions({ onReplay, onClose, className }: { onReplay: () => void; onClose: () => void; className?: string }) {
     const t = useTranslations('rewind.outro')
     return (

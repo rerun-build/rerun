@@ -1,13 +1,4 @@
 #!/bin/sh
-# Removes what updates and old builds leave behind on this server, for every stack on it, and nothing
-# that is in use or holds data: images without a tag that no container uses (what a pull replaced), and
-# build cache that no image uses. It never removes a tagged image, a container, a volume or a network.
-#   sudo sh deploy/vps/tidy.sh report      disk use and what Docker holds; changes nothing
-#   sudo sh deploy/vps/tidy.sh run         removes the two kinds above; shows the disk before and after
-#   sudo sh deploy/vps/tidy.sh install     a systemd timer that does `run` every Sunday at 04:30
-#   sudo sh deploy/vps/tidy.sh uninstall   takes that timer away again
-# The timer runs a copy of this file that belongs to root, not the file in the clone, so changing the
-# clone cannot change what root runs. After an update of this file, run install again.
 set -eu
 SELF=$(cd "$(dirname "$0")" && pwd)/tidy.sh
 UNITS=${TIDY_ROOT:-}/etc/systemd/system

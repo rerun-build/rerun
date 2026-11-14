@@ -5,8 +5,6 @@ import { useEffect, useRef } from 'react'
 
 const INTERACTION_EVENTS = ['pointerdown', 'keydown', 'wheel', 'touchstart'] as const
 
-// Tells the hub this tab is in the foreground, which is what lets the notification fan-out skip the
-// email for someone who is already getting the toast.
 export function usePresenceHeartbeat(enabled: boolean) {
     const lastInteraction = useRef(0)
 

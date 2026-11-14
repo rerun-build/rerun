@@ -14,11 +14,6 @@ export function isValidCron(expr: string): boolean {
     }
 }
 
-/**
- * Whether croner can run a schedule in `timezone`: an IANA name ('Europe/Paris') or an alias the
- * platform knows ('UTC'). croner takes any string when the schedule is built and only throws when
- * it computes a run, so this asks it for one.
- */
 export function isValidTimezone(timezone: string): boolean {
     try {
         new Cron('* * * * *', { timezone }).nextRun()
@@ -28,11 +23,6 @@ export function isValidTimezone(timezone: string): boolean {
     }
 }
 
-/**
- * The next run after `from`, or null when croner can't compute one: a timezone or cron edited into
- * the file by hand, or written before both were checked. Such a schedule never fires, and the
- * scheduler's tick goes on to the others instead of throwing.
- */
 function nextCronRun(schedule: Schedule, from: Date): Date | null {
     try {
         return cronFor(schedule).nextRun(from)

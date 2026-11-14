@@ -6,7 +6,6 @@ import { spacing } from '@/theme/tokens'
 
 export const BOTTOM_BAR_SIZE = 48
 
-// The bar sits a little into the home indicator's inset, as Grok's does, and never under the edge.
 export function bottomBarInset(bottom: number) {
     return Math.max(bottom - 6, spacing.sm)
 }

@@ -4,7 +4,6 @@ import { createRef, type Ref } from 'react'
 import { Composer, type ComposerHandle } from './Composer'
 
 jest.mock('@/lib/haptics', () => ({ selectionAsync: jest.fn(), impactAsync: jest.fn(), ImpactFeedbackStyle: { Light: 'light', Medium: 'medium' } }))
-// The glass is a SwiftUI host, which Jest cannot mount: a plain view stands in for it.
 jest.mock('@/components/ui/GlassSurface', () => {
     const React = require('react')
     const { View } = require('react-native')

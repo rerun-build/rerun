@@ -7,10 +7,6 @@ import { Button } from '@/components/ui/button'
 
 import type { ShownTemplate, TemplateChoice } from './template-choice'
 
-// The decision the card above asks for, right under it. Same shell as the QuestionForm an agent
-// asks through, because it answers the same way. Apart from the card because it leaves once the
-// decision is made, where the card stays with its verdict.
-
 type ForemanTemplateActionsProps = {
     shown: ShownTemplate
     allowCustom: boolean
@@ -31,8 +27,6 @@ export function ForemanTemplateActions({ shown, allowCustom, onAnswer }: Foreman
                         {t('buildElse')}
                     </Button>
                 )}
-                {/* Le composer s'efface tant que la carte attend : sans cette sortie, la conversation
-                    reste close sur une carte que personne ne veut. */}
                 <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => onAnswer({ answered: false })}>
                     {t('notNow')}
                 </Button>

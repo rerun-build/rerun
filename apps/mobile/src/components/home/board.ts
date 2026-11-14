@@ -11,7 +11,6 @@ export type HomeCoworker = {
     handle: string | null
     description: string | null
     status: AgentStatus
-    // Switched off, by hand or because the plan has no room left for it.
     paused: boolean
     spaceId: string
     latest: AgentConversationsOverview[number]['latest']
@@ -37,10 +36,8 @@ export function sectionOf(coworker: HomeCoworker): SectionKey {
     return 'coworkers'
 }
 
-// The avatar's mood: a paused coworker sleeps like one whose machine is off.
 export const moodStatus = (coworker: HomeCoworker): AgentStatus => (coworker.paused ? 'offline' : coworker.status)
 
-// The one line under a coworker's name: what it needs from you, what it is doing, or where it left off.
 export function lineOf(coworker: HomeCoworker, t: HomeTranslator = translatorFor('mobileHome')): StatusLine {
     const title = coworker.latest?.title?.trim()
     const about = coworker.description?.trim() ?? ''
@@ -55,7 +52,6 @@ export function lineOf(coworker: HomeCoworker, t: HomeTranslator = translatorFor
     return { text: title || about, tone: 'muted' }
 }
 
-// The most recently active first.
 export function byRecency(a: HomeCoworker, b: HomeCoworker): number {
     return (b.latest?.updatedAt ?? '').localeCompare(a.latest?.updatedAt ?? '')
 }
@@ -65,21 +61,15 @@ export function minutesSince(iso: string | null | undefined, now = Date.now()): 
     return Math.max(0, Math.floor((now - Date.parse(iso)) / 60000))
 }
 
-// Every coworker in one list, the most recently active first.
 export function recentCoworkers(coworkers: HomeCoworker[]): HomeCoworker[] {
     return [...coworkers].sort(byRecency)
 }
 
-// The coworkers by Box, in the order the Boxes were made, as on the web board. A Box without a
-// coworker left is left out.
 export function sectionsByBox(coworkers: HomeCoworker[], boxes: Box[], unnamedLabel: string): HomeSection[] {
     const ordered = [...coworkers].sort(byRecency)
     return boxes.map(box => ({ key: box.id, label: box.name?.trim() || unnamedLabel, members: ordered.filter(coworker => coworker.spaceId === box.id) })).filter(section => section.members.length > 0)
 }
 
-// The coworkers pinned on this phone, in the order they were arranged, and everyone else. A pin of a
-// coworker deleted since is simply skipped.
-// The Foreman as a cell of the pinned grid: it can be pinned like a coworker, never listed among them.
 export function foremanOnBoard(running: boolean): HomeCoworker {
     return { id: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0 }
 }
@@ -91,7 +81,6 @@ export function withPinned(coworkers: HomeCoworker[], pinnedIds: readonly string
     return { pinned, others: coworkers.filter(coworker => !kept.has(coworker.id)) }
 }
 
-// The order after a pinned row was dragged from one place to another.
 export function moveIn<T>(items: readonly T[], from: number, to: number): T[] {
     const next = [...items]
     const [moved] = next.splice(from, 1)

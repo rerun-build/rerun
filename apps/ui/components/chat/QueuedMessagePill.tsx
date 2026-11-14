@@ -10,29 +10,19 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
 type QueuedMessagePillProps = {
-    /** The message waiting, or null when nothing is queued. */
     text: string | null
-    /** A run still holds the conversation, so sending now means stopping it first. */
     busy: boolean
-    /** A stop or a send is under way: both actions wait rather than fire twice. */
     pending: boolean
     onSendNow: () => void
     onDiscard: () => void
 }
 
-// Strip clipped over the composer while a message waits behind the run in flight. Same shape as the
-// subscription CTA clipped under it, mirrored: stripes densest on the outer edge, and opening
-// through grid rows rather than height so nothing has to be measured. It sits outside PromptInput,
-// so it carries the tooltip provider its buttons used to inherit.
 export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }: QueuedMessagePillProps) {
-    // The strip keeps rendering its last message while it collapses, otherwise discarding empties
-    // the line before the row has finished closing.
     const t = useTranslations('chat.queued')
     const [lastText, setLastText] = useState(text ?? '')
     if (text !== null && text !== lastText) setLastText(text)
 
     const preview = queuedPreview(text ?? lastText)
-    // A disabled button emits no hover of its own, so the reason has to come from the wrapper.
     const waiting = pending ? t('stopping') : undefined
 
     return (
@@ -55,7 +45,6 @@ export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }:
                         )}
                         <TooltipDisabledReason reason={waiting} className="relative shrink-0">
                             <PromptInputButton className="relative" tooltip={waiting ? undefined : busy ? t('sendNowStops') : t('sendNow')} aria-label={t('sendNowLabel')} disabled={pending} onClick={onSendNow}>
-                                {/* The composer's own send glyph: same action, so the same arrow. */}
                                 <CornerDownLeftIcon className="size-4 rotate-90" />
                             </PromptInputButton>
                         </TooltipDisabledReason>

@@ -6,9 +6,6 @@ import { PaneSizeProvider } from '@/components/layout/PaneSize'
 import { isSplit, sidebarWidth } from '@/components/layout/split'
 import { useTheme } from '@/theme/theme'
 
-// The coworker list beside the stack when the window is wide enough (an iPad, an unfolded iPhone Duo),
-// the stack alone otherwise. The stack keeps its place in the tree either way, so folding the phone or
-// resizing the window never resets the conversation on screen.
 export function SplitShell({ enabled, children }: { enabled: boolean; children: ReactNode }) {
     const theme = useTheme()
     const { width } = useWindowDimensions()

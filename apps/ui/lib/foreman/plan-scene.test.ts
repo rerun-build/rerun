@@ -6,10 +6,6 @@ import { findRadialRect, type SpaceRect } from '@/lib/board/space-layout'
 
 import { isPlanPreviewId, planCardScene, planScene, settledPlanScene } from './plan-scene'
 
-// What this file is really holding: the preview has to be the board the plan produces, not a
-// drawing of it. So the Boxes are checked against the very function createBoxes calls, and the
-// agents against the walls of their own Box.
-
 const ORGANISATION = readPlan({
     title: 'Retalk, laid out on Rerun',
     boxes: [{ name: 'Marketing', role: 'Everything that brings people in' }, { name: 'Sales' }, { name: 'Finance' }],
@@ -66,8 +62,6 @@ describe('planScene', () => {
         }
     })
 
-    // A card written before divisions existed, and the agents a model filed nowhere: they still
-    // need a floor to stand on, or the tiles float over bare grid.
     it('gives a nameless list a Box of its own', () => {
         const scene = planScene(readPlan({ title: 'Your team', items: [{ kind: 'agent', name: 'Content Writer' }] }))
 
@@ -83,8 +77,6 @@ describe('planScene', () => {
         expect(scene.tiles).toEqual([])
     })
 
-    // Six divisions and three agents is the real shape of the funnel, and the one the rosette has
-    // to hold: three Boxes are drawn empty.
     it('holds six divisions around the first one', () => {
         const scene = planScene(
             readPlan({
@@ -98,14 +90,10 @@ describe('planScene', () => {
         expect(new Set(scene.containers.map(container => container.id)).size).toBe(6)
     })
 
-    // Same plan, same scene: an unchanged tile has to keep the animation shorthand it was mounted
-    // with, or every redraw restages the whole board.
     it('is the same scene twice over', () => {
         expect(planScene(ORGANISATION)).toEqual(planScene(ORGANISATION))
     })
 
-    // A division added at the top used to shift every key below it, so five Boxes nobody touched
-    // vanished for a frame and traced themselves again, each behind its own cascade delay.
     it('keeps the identity of the divisions a new one pushes down', () => {
         const before = planScene(ORGANISATION)
         const after = planScene(
@@ -132,8 +120,6 @@ describe('planScene', () => {
         expect(isPlanPreviewId('__placeholder__')).toBe(false)
     })
 
-    // The handover: a real Box lands exactly on its ghost, so the ghost goes and the divisions
-    // after it keep the place the server is about to give them.
     it('stops drawing a division a real Box now stands on', () => {
         const whole = planScene(ORGANISATION)
         const first = whole.containers[0]
@@ -163,7 +149,6 @@ describe('planScene', () => {
         expect(scene.landedAt).toBeGreaterThan(Math.max(...scene.tiles.map(tile => tile.dropDelay ?? 0)))
     })
 
-    // Reduced motion: nothing to wait for, so nothing to settle either.
     it('is simply there under reduced motion', () => {
         const scene = planScene(ORGANISATION, { animated: false })
 
@@ -174,8 +159,6 @@ describe('planScene', () => {
 })
 
 describe('settledPlanScene', () => {
-    // The tiles land at full strength and only then go translucent: agent-drop-in drives the
-    // opacity to 1 and does not hold it, so the mock-up cannot be declared before the fall.
     it('turns the landed board into a mock-up without moving anything', () => {
         const scene = planScene(ORGANISATION)
         const settled = settledPlanScene(scene)
@@ -186,8 +169,6 @@ describe('settledPlanScene', () => {
         expect(settled.tiles.map(tile => tile.position)).toEqual(scene.tiles.map(tile => tile.position))
     })
 
-    // L'empreinte compte autant que les tuiles : une Box au trait plein se lit comme une région
-    // déjà créée, quelle que soit l'opacité de ce qu'on a posé dedans.
     it('hollows the Boxes out instead of leaving them drawn for good', () => {
         const scene = planScene(ORGANISATION)
         const settled = settledPlanScene(scene)

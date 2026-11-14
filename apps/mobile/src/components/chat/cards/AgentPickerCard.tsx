@@ -8,8 +8,6 @@ import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
-// The web's tab names (apps/ui/lib/board/types.ts) a pick may ask for, in English as the model writes
-// them; the phone opens the ones it has.
 const TAB_LABELS: Record<string, string> = { chat: 'Chat', actions: 'To handle', services: 'Apps', mcp: 'MCP', skills: 'Skills', data: 'Database', memories: 'Knowledge', files: 'Files', scheduled: 'Routines', triggers: 'Triggers' }
 const PHONE_SCREENS: Record<string, 'apps' | 'files' | 'routines'> = { services: 'apps', mcp: 'apps', files: 'files', scheduled: 'routines', triggers: 'routines' }
 
@@ -25,8 +23,6 @@ function resolveTab(value: string): string | null {
     return Object.entries(TAB_LABELS).find(([id, label]) => id === wanted || label.toLowerCase() === wanted)?.[0] ?? null
 }
 
-// Tolerant on purpose, like the web's `readAgentPicks`: the call is drawn while it streams, so the
-// array and its last entry can be half written.
 export function readAgentPicks(toolName: string, input: unknown): AgentPick[] {
     const entries = toolName === 'open_connector_setup' ? [{ ...(input as object), tab: 'services' }] : input && typeof input === 'object' ? (input as { agents?: unknown }).agents : undefined
     if (!Array.isArray(entries)) return []
@@ -45,11 +41,6 @@ function open({ agentId, tab, conversationId }: AgentPick) {
     else router.push({ pathname: '/chat/[id]', params: { id: conversationId ?? 'new', to: agentId } })
 }
 
-/**
- * The Foreman's shortcut to the coworkers it talks about: one chip per coworker, opening its chat or
- * the screen it named. Names come from the workspace, not from the model's arguments, so a made-up or
- * deleted coworker drops out.
- */
 export function AgentPickerCard({ picks }: { picks: AgentPick[] }) {
     const t = useTranslations('mobileCards')
     const theme = useTheme()

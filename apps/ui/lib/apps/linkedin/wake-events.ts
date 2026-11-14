@@ -1,7 +1,3 @@
-// Shared with the browser, which is why it lives apart from the signature code in events.ts.
-
-// The events a coworker can be woken by, as the user picks them. Linkup names them one way on the
-// subscription and another on the payload: `message_received` arrives as `message`.
 export const WAKE_EVENTS = ['message_received', 'accepted_invitation', 'invitation_received'] as const
 
 export type WakeEvent = (typeof WAKE_EVENTS)[number]

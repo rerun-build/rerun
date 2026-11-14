@@ -2,10 +2,6 @@
 
 import { useCallback, useSyncExternalStore } from 'react'
 
-// Which admin sidebar groups the user has folded/unfolded. Only stores the
-// deviations from each group's `defaultOpen`, so a group added later keeps its
-// intended default instead of inheriting a stale entry.
-
 const STORAGE_KEY = 'rerun-admin-nav-groups'
 
 type GroupState = Record<string, boolean>

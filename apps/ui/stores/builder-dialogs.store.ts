@@ -1,10 +1,8 @@
 import { create } from 'zustand'
 
-// The creation dialogs of the board, opened from its toolbar and from the control center alike.
 type BuilderDialogsState = {
     newAgentOpen: boolean
     libraryOpen: boolean
-    // A template the library is asked to open on, rather than on its gallery.
     librarySlug: string | null
     newBoxOpen: boolean
     openNewAgent: () => void

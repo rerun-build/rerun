@@ -16,7 +16,6 @@ export async function fetchBoxes(caller: Caller): Promise<Box[]> {
     return boxSchema.array().parse(await api('/api/v1/boxes', caller))
 }
 
-// The Home in one read: its coworkers, the latest conversation of each, and the Boxes they sit in.
 export type BoardRead = { agents: BoardAgent[]; overview: AgentConversationsOverview; boxes: Box[] }
 
 export async function fetchBoard(caller: Caller): Promise<BoardRead> {

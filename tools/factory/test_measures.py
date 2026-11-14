@@ -15,7 +15,6 @@ class Queue(unittest.TestCase):
         m = measures.queue_measures(ready, fires, t(60), cfg)
         self.assertEqual(m["depth"], 1)
         self.assertEqual(m["wait_s"], [10, 40, 60])
-        # waiting from 0, slot free 0-10 and 30-40: 20 s; busy 10-30 and 40-60 do not count
         self.assertEqual(m["stalled_s"], 20)
 
 

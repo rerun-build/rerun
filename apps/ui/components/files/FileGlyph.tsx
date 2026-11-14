@@ -10,8 +10,6 @@ const INK_SOFT = 'rgb(var(--iso-tile-idle-ink) / 0.14)'
 
 export const GLYPH_INK_MUTED = 'rgb(var(--iso-tile-idle-ink) / 0.5)'
 
-// The face colour and the specular band come from the idle agent tile: chrome in light,
-// anthracite in dark. Volume is a brightness() on the same single colour, never a second token.
 function Face({ d, tone, sheen = true }: { d: string; tone?: number; sheen?: boolean }) {
     return (
         <div
@@ -77,7 +75,6 @@ export function ImageGlyph({ src, alt }: { src: string; alt: string }) {
             className="relative size-16 overflow-hidden rounded-[5px]"
             style={{ backgroundColor: 'var(--iso-tile-idle)', boxShadow: `inset 0 0 0 1px ${INK}` }}
         >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={src} alt={alt} loading="lazy" decoding="async" className="size-full object-cover" />
         </div>
     )

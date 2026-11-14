@@ -1,11 +1,4 @@
 #!/usr/bin/env node
-// Regenerates the OpenCode model snapshot the hub and the engine fall back on when the live catalog
-// cannot be read. Both catalogs are public, no key needed. Run after `pnpm build:contracts`:
-//
-//   node scripts/opencode-snapshot.mjs
-//
-// The raw catalogs are kept as engine fixtures, so the parser is tested against what OpenCode
-// really answered when the snapshot was taken.
 import { writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'

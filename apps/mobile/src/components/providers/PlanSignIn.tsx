@@ -15,12 +15,9 @@ import { fonts, radius, spacing } from '@/theme/tokens'
 
 import { ErrorLine, SheetFrame, StepTrack, type TrackStep } from './bits'
 
-// Same constants as apps/ui/components/connections/plan-connect/chatgpt-setup.ts.
 export const CHATGPT_SECURITY_URL = 'https://chatgpt.com/#settings/Security'
-// ChatGPT's own labels, as its English settings show them.
 const SETTING_PATH = ['Settings', 'Security', 'Enable device code authorization for Codex']
 
-// Adding a plan ends on its name; signing one in again ends on the coworkers starting again.
 export type SignInEnding = { kind: 'name'; name: string; placeholder: string; onName: (name: string) => void; onDone: () => void; saving: boolean; error: string | null } | { kind: 'reconnect' }
 
 type EndingTranslator = ReturnType<typeof useTranslations<'mobileProviders.ending'>>
@@ -56,8 +53,6 @@ type ClaudeSignInProps = {
     onBack: () => void
 }
 
-// The web's ClaudePlanSteps: approve on Claude, paste back what it shows. The field also takes a
-// `claude setup-token` token pasted by hand.
 export function ClaudeSignIn({ phase, error, code, onCode, onOpenClaude, onPaste, onSubmit, ending, onBack }: ClaudeSignInProps) {
     const opened = phase !== 'idle'
     const busy = phase === 'checking'
@@ -107,14 +102,11 @@ type ChatGptSignInProps = {
     stuck: boolean
     error: string | null
     onGetCode: () => void
-    // Called as OpenAI's page opens, before the browser covers the code.
     onOpenVerification?: () => void
     ending: SignInEnding
     onBack: () => void
 }
 
-// The web's ChatGptPlanSteps. OpenAI only takes the device code once the account allows it, and
-// nothing says it is off: the approval just never comes. So the switch comes first.
 export function ChatGptSignIn({ phase, pending, expired, stuck, error, onGetCode, onOpenVerification, ending, onBack }: ChatGptSignInProps) {
     const [settingsOpened, setSettingsOpened] = useState(false)
     const [workspacePlan, setWorkspacePlan] = useState(false)

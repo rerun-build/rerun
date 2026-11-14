@@ -35,8 +35,6 @@ async function gateContext(slug: string): Promise<{ entry: PublishedEntry | null
     return { entry, brand: entry ? await loadWorkspaceBrand(entry.workspace_id) : RERUN_BRAND }
 }
 
-// A crawler unfurling the link is no one in particular: whatever it reads, anyone the link is
-// forwarded to reads too, so the title of the page never reaches the preview.
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
     const { slug } = await params
     const origin = publishedSiteOrigin(slug)

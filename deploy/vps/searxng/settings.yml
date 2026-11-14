@@ -1,6 +1,3 @@
-# SearXNG for webgate only: no published port, so the limiter (bot protection for public
-# instances) stays off. The secret key comes from SEARXNG_SECRET in the environment, which
-# SearXNG reads over server.secret_key.
 use_default_settings: true
 
 server:

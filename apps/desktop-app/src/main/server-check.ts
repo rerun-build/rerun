@@ -12,8 +12,6 @@ function isServerConfig(value: unknown): value is DesktopServerConfig {
     return config.app === 'rerun' && typeof config.apiVersion === 'number' && typeof config.minShellVersion === 'string'
 }
 
-// Asks a server whether it is a Rerun hub this shell can show. `fetchImpl` is the session's `fetch`,
-// so a staging password or a proxy the person set up answers like it does for the window.
 export type Fetcher = (url: string, init?: RequestInit) => Promise<Response>
 
 export async function checkServer(origin: string, shellVersion: string, fetchImpl: Fetcher, timeoutMs = 8000): Promise<ServerCheck> {

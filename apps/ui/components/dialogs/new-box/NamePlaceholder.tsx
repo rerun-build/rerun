@@ -20,8 +20,6 @@ const SWAPS = {
 const LETTERS = { hidden: {}, shown: { transition: { staggerChildren: 0.025 } } }
 const LETTER = { hidden: { opacity: 0, y: '0.3em' }, shown: { opacity: 1, y: 0 } }
 
-// The empty name field, giving ideas rather than one example: the names of the pills under it, one
-// after the other. It inherits its type and colour from the line it sits in.
 export function NamePlaceholder({ names, effect }: { names: string[]; effect: PlaceholderEffect }) {
     const t = useTranslations('dialogs.newBox')
     const reducedMotion = useReducedMotion()
@@ -72,7 +70,6 @@ function SpelledName({ names }: { names: string[] }) {
     )
 }
 
-// Opens on the first name whole, so the field never starts empty, then erases it and types the next.
 function TypedName({ names }: { names: string[] }) {
     const [{ index, length, erasing }, setStroke] = useState({ index: 0, length: names[0].length, erasing: false })
     const name = names[index % names.length]

@@ -1,24 +1,13 @@
 import type { NoteIcon } from '@rerun/emails'
 
-// The glyph that opens a compact note in a newsletter issue. It sits in an 18px gutter next to a
-// one-line item, so it carries no tile, no frame and no tint of its own: twelve coloured glyphs
-// stacked in a column read as a warning panel, not as a changelog.
-
 export const ICON_SIZE = 18
-// Drawn at 2x and served down to its 18px slot, the way any bitmap in an email has to be to survive
-// a retina screen.
 const SCALE = 2
 const VIEWBOX = 18
 
-// Flattened against the card the notes sit on rather than left transparent, for the reason stated
-// in theme.ts: every colour in this design system resolves to a solid hex before it reaches a mail
-// client.
 const SURFACE = '#171717'
 const INK = '#a1a1a1'
 const STROKE_WIDTH = 1.4
 
-// Nucleo outline-18 glyphs, inlined the way the banner inlines its own: this route draws raw SVG,
-// so it cannot mount a React icon component.
 const ICONS = {
     fix:
         '<path d="M11.75,16.25v-2.644c2.071-1.018,3.5-3.143,3.5-5.606,0-2.657-1.661-4.922-4-5.826V7.25c0,.552-.448,1-1,1h-2.5c-.552,0-1-.448-1-1V2.174c-2.339,.904-4,3.168-4,5.826,0,2.463,1.429,4.588,3.5,5.606v2.644" fill="none" stroke="COLOR" stroke-linecap="round" stroke-linejoin="round" stroke-width="SW"/>',

@@ -18,7 +18,6 @@ async function read(req: Request) {
         const url = new URL(req.url)
         const path = url.searchParams.get('path')
         const agentId = url.searchParams.get('agentId')
-        // `shared` is the whole workspace, so it carries no id: the session names the engine.
         const shared = url.searchParams.get('scope') === 'shared'
 
         if (!path) {
@@ -46,13 +45,10 @@ async function read(req: Request) {
             return Response.json({ error: 'File not found' }, { status: res.status === 404 ? 404 : 502 })
         }
 
-        // An engine older than byte ranges answers 200 with the whole file, which is still a valid answer.
         return new Response(res.body, {
             status: res.status === 206 ? 206 : 200,
             headers: {
                 ...pickHeaders(res, RANGE_HEADERS),
-                // Our own mapping wins over the engine's: it labels a voice recording octet-stream,
-                // which no browser will play back, and a `.html` text/html, which must not render here.
                 ...rawFileHeaders(path),
                 'Cache-Control': 'private, max-age=60',
             },

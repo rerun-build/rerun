@@ -5,16 +5,12 @@ import { dirname, join } from 'node:path'
 export type WindowBounds = { x?: number; y?: number; width: number; height: number; maximized: boolean }
 
 export type ShellSettings = {
-    // The origin the app opens on, when the person picked one. Unset, the build's default.
     serverUrl?: string
     windowBounds?: WindowBounds
-    // The language the web app last told the shell, for the menus.
     locale?: string
     openAtLogin?: boolean
-    // Windows and Linux: closing the window keeps the app in the tray.
     closeToTray?: boolean
     quickAsk?: boolean
-    // The balloon that says so was shown once.
     explainedTray?: boolean
 }
 
@@ -37,8 +33,6 @@ export function readSettings(): ShellSettings {
     return cache
 }
 
-// Written to a temporary file and renamed over the old one: a crash mid-write leaves the previous
-// settings, never half of a JSON file.
 export function updateSettings(patch: Partial<ShellSettings>): ShellSettings {
     const next = { ...readSettings(), ...patch }
     cache = next

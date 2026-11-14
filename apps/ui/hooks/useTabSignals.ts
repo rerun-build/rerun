@@ -9,7 +9,6 @@ const ORIGINAL_HREF = 'data-original-href'
 
 let badgedIcon: Promise<string | null> | null = null
 
-// The app icon with a red dot in its corner, drawn once and reused.
 function drawBadgedIcon(): Promise<string | null> {
     badgedIcon ??= new Promise(resolve => {
         const image = new Image()
@@ -43,8 +42,6 @@ function setFavicon(href: string | null) {
 
 type BadgingNavigator = Navigator & { setAppBadge?: (count?: number) => Promise<void>; clearAppBadge?: () => Promise<void> }
 
-// What is waiting for you, seen from outside the tab: « (3) Rerun » in the title, a dot on the
-// favicon, and the count on the icon of the installed app.
 export function useTabSignals(count: number) {
     useEffect(() => {
         const label = count > 99 ? '99+' : String(count)
@@ -58,7 +55,6 @@ export function useTabSignals(count: number) {
         const badging = navigator as BadgingNavigator
         if (count > 0) badging.setAppBadge?.(count).catch(() => {})
         else badging.clearAppBadge?.().catch(() => {})
-        // The desktop app puts it on the Dock, the taskbar and its tray icon.
         desktopShell('badge')?.badge.set(count)
 
         return () => {

@@ -3,22 +3,12 @@
 import { motion, useReducedMotion } from 'motion/react'
 import { cn } from './cn'
 
-/**
- * Text that writes itself in: each word fades up from a blur, one after the other, the way a model
- * streams a sentence. Renders inline spans only, so it can sit inside a heading without breaking it.
- *
- * It plays on mount, so remount it (a `key` on the parent) to replay it on a new sentence.
- */
 export function TextGenerateEffect({
     text,
     className,
-    /** Seconds each word takes to land. */
     duration = 0.5,
-    /** Seconds between two words. */
     stagger = 0.09,
-    /** Seconds before the first word, to let a container's own transition finish first. */
     delay = 0,
-    /** Radius (px) each word is blurred by before it lands. */
     blur = 8,
 }: {
     text: string
@@ -42,8 +32,6 @@ export function TextGenerateEffect({
         >
             {words.map((word, index) => (
                 <span key={`${word}-${index}`}>
-                    {/* The space stays outside the animated span: inside an inline-block it would
-                        stop collapsing at a line break and stretch the last word of every line. */}
                     <motion.span
                         className="inline-block"
                         variants={{ hidden: { opacity: 0, filter: `blur(${blur}px)` }, visible: { opacity: 1, filter: 'blur(0px)' } }}

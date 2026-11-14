@@ -33,7 +33,6 @@ function SourceLineRow({ line }: { line: PaidSourceLine }) {
     )
 }
 
-// Under the reply of a turn that bought paid data: who it came from, and what each source gave.
 export function PaidSourcesPill({ sources }: { sources: PaidTurnSources }) {
     const t = useTranslations('chat.paidSources')
     const { emails } = sources

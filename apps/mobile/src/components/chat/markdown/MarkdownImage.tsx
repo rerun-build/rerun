@@ -11,8 +11,6 @@ import { useTheme } from '@/theme/theme'
 
 const MAX_HEIGHT = 360
 
-// An image of an answer at its own proportions, as wide as the thread allows and never taller than a
-// screenful. A file on the Box goes through the hub with the same headers as every other call.
 export function MarkdownImage({ url, alt }: { url: string | null; alt: string }) {
     const theme = useTheme()
     const { session, me } = useAuth()

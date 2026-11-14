@@ -9,7 +9,6 @@ const { seen, lineageWrite } = vi.hoisted(() => ({ seen: { lineage: undefined as
 
 vi.mock('../tools/registry.js', () => ({
     buildTools: async (ctx: { lineage?: unknown }) => {
-        // The lineage is set before the tools are built, so the tools can read it.
         seen.lineage = ctx.lineage
         return { tools: {}, close: async () => {} }
     },
@@ -71,7 +70,6 @@ async function runWith(message: string, trigger: Trigger) {
     const agent = await getAgent(id)
     const run = await runAgent(agent, session.id, message, undefined, undefined, undefined, trigger)
     const outcome = await run.settled
-    // The lineage write is fire-and-forget: give it a moment to land before reading the row.
     await new Promise(r => setTimeout(r, 100))
     return { run, outcome, row: await getRun(id, run.runId) }
 }

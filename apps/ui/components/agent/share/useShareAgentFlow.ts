@@ -12,17 +12,11 @@ type ShareRefusal = { ok: false; error: string } & Pick<Refusal, 'code' | 'param
 export type SharePlanResult = { ok: true; plan: AgentSharePlan } | ShareRefusal
 export type ShareCreateResult = { ok: true; url: string; warnings: string[]; reused: boolean } | ShareRefusal
 
-// One action per prop, each answering a discriminated result rather than throwing, so the same flow
-// can be mounted by a surface that authorizes its caller differently. Same contract as
-// `CaptureActions`, for the same reason.
 export type ShareActions = {
     plan: () => Promise<SharePlanResult>
     create: (include: AgentShareInclude) => Promise<ShareCreateResult>
 }
 
-// Nothing is on by default. What makes an agent an agent (its instructions, skills, schedules and
-// webhooks) travels either way; the three switches are all data, and someone sending a colleague an
-// agent wants a colleague, not the archives of a client. Turning one on is a deliberate act.
 const DEFAULT_INCLUDE: AgentShareInclude = { memories: false, database: false, files: false }
 
 export type ShareStep = 'configure' | 'link'
@@ -41,11 +35,7 @@ export type ShareFlow = {
     create: () => Promise<void>
 }
 
-// Mounted only while the dialog is on screen, like useCaptureFlow: the inspection streams a plan
-// off the source box, so it has no business running behind a closed dialog.
 export function useShareAgentFlow(actions: ShareActions): ShareFlow {
-    // A server action rejects rather than answering when the request itself fails (offline, a redeploy
-    // invalidating the action id), and a silent no-op reads as "nothing happened, click again".
     const failedRequest = useTranslations('agent.useShareAgentFlow')('failedRequest')
     const errorText = useErrorText()
     const [plan, setPlan] = React.useState<AgentSharePlan | null>(null)
@@ -56,8 +46,6 @@ export function useShareAgentFlow(actions: ShareActions): ShareFlow {
     const [busy, setBusy] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
-    // Held in a ref so a shell that rebuilds its actions object on every render does not re-run the
-    // inspection. The flow is mounted only while the dialog is open, so the mount value is the one.
     const planRef = React.useRef(actions.plan)
 
     React.useEffect(() => {
@@ -95,8 +83,6 @@ export function useShareAgentFlow(actions: ShareActions): ShareFlow {
             }
             setUrl(result.url)
             setReused(result.reused)
-            // The three booleans are the point of the event: in a month they say whether the safe
-            // defaults held or whether everybody turns everything on.
             if (!result.reused) track('agent_share_created', { carries_memories: include.memories, carries_database: include.database, carries_files: include.files })
         } catch {
             setError(failedRequest)
@@ -111,8 +97,6 @@ export function useShareAgentFlow(actions: ShareActions): ShareFlow {
         loading,
         include,
         setInclude,
-        // Instructions and skills are the agent; memories, its database and its files are someone's
-        // work. Only the second kind deserves a confirmation before it leaves the workspace.
         carriesData: include.memories || include.database || include.files,
         url,
         reused,

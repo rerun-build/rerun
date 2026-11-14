@@ -9,7 +9,6 @@ export type TakeoverRequestState = {
     reason: string
     site: string | null
     opened: boolean
-    // The browser is being handed back, or already was: nothing is left to press.
     locked: boolean
     finishing: boolean
     onOpen: () => void
@@ -17,7 +16,6 @@ export type TakeoverRequestState = {
     onDone: () => void
 }
 
-// What the run asks of the person while it waits on its screen, laid out like the thread's HITL cards.
 export function TakeoverAsk({ takeover }: { takeover: TakeoverRequestState }) {
     const t = useTranslations('chat.takeover')
     const { locked } = takeover

@@ -34,7 +34,6 @@ export function LinkedinProDialog() {
     const [screen, setScreen] = useState<LinkedinProScreen>(ACCOUNTS)
     const [pending, setPending] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
-    // The connection whose approval has waited long enough to send the person back to the phone.
     const [slowFor, setSlowFor] = useState<string | null>(null)
     const [defaultCountry] = useState(() => countryFromLocale(typeof navigator === 'undefined' ? undefined : navigator.language))
 
@@ -45,8 +44,6 @@ export function LinkedinProDialog() {
         return result.ok ? result.value : null
     }, [errorText])
 
-    // One checkpoint call at a time, shared by the poll and the button: two answers of "connected"
-    // landing together would finish the connection twice, and the second one deletes the account.
     const inFlight = useRef<Promise<CheckpointResult> | null>(null)
     const check = useCallback((connectionId: string, code?: string) => {
         if (inFlight.current) return inFlight.current
@@ -61,8 +58,6 @@ export function LinkedinProDialog() {
     const approving = open && screen.kind === 'checkpoint' && screen.checkpointType === 'app_approval'
     const approvalWait: ApprovalWait | null = !approving ? null : slowFor === connectionId ? 'slow' : 'polling'
 
-    // The approval in the LinkedIn app is only visible by asking Linkup, so it is asked every few
-    // seconds; a failed poll stays silent, the button surfaces errors once the wait turns slow.
     useEffect(() => {
         if (!approving || !connectionId) return
         let active = true
@@ -98,7 +93,6 @@ export function LinkedinProDialog() {
         }
     }, [open, reconnectId, errorText])
 
-    // Everything a closed dialog leaves behind is reset here, so the next opening starts clean.
     const close = (next: boolean) => {
         if (next) return
         if (screen.kind === 'checkpoint') void cancelAppConnectAction(SLUG, screen.connectionId)
@@ -173,7 +167,6 @@ export function LinkedinProDialog() {
         setPending(null)
         if (!result.ok) return setError(errorText(result))
         toast.success(result.value.trialSlot ? t('paidApp.slotAddedTrial', { price: formatNumber(0, locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }) : t('paidApp.slotAdded'))
-        // The webhook moves the slot count, a moment after Stripe answers.
         setTimeout(() => void load(), 1500)
         await load()
     }

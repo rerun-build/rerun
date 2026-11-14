@@ -10,14 +10,8 @@ import { BUDDY_GEOMETRY, BUDDY_VIEW, BuddyArt } from './buddy/BuddyArt'
 import { CAPSULE_HELD, CAPSULE_STEEL, CapsuleArt } from './buddy/CapsuleArt'
 import { BUDDY_STATE_COLOR, buddyColor, buddyLook, buddyMood, type BuddyMood } from './buddy/buddy-look'
 
-// A tile drawn as a buddy standing on its footprint. What keeps it from looking pasted on is what
-// it does to the floor: it lights a pool of its colour around it and presses a contact shadow
-// right under its base.
-
-// How far above the block's back corner the hand and lock badges float.
 export const BUDDY_BADGE_GAP = 10
 
-// Which moods move the block. The motion itself lives in styles.css, keyed on `data-buddy-motion`.
 const MOTION: Partial<Record<BuddyMood, 'bob' | 'shudder'>> = { working: 'bob', error: 'shudder' }
 
 const POOL_MOTION: Partial<Record<BuddyMood, string>> = {
@@ -26,8 +20,6 @@ const POOL_MOTION: Partial<Record<BuddyMood, string>> = {
     error: 'iso-buddy-pool 1.2s ease-in-out infinite',
 }
 
-// A buddy carries one label. With a pinned status it rolls between the name and the status instead
-// of stacking a second pill under the first.
 const LABEL_ROW_HEIGHT = 14
 const LABEL_ROW = 'flex h-[14px] items-center justify-center px-1.5'
 const LABEL_PILL = 'iso-buddy-label overflow-hidden rounded-[5px] text-[7.5px] font-medium tracking-tight whitespace-nowrap'
@@ -37,10 +29,7 @@ const LABEL_SLIDE = '380ms cubic-bezier(0.22, 1, 0.36, 1)'
 const STATE_MOODS: ReadonlySet<BuddyMood> = new Set(['working', 'error', 'waiting'])
 
 const POOL_STRENGTH: Record<BuddyMood, number> = { idle: 0.32, working: 0.55, error: 0.5, waiting: 0.5, asleep: 0.06 }
-// A resting buddy under the pointer or selected lights its floor the way a busy one does.
 const ACTIVE_POOL_STRENGTH = 0.6
-// How much taller a selected buddy stands, as a share of its depth. The motion lives in styles.css,
-// keyed on `data-buddy-stretched`.
 const SELECTED_STRETCH = 0.6
 
 type TileBuddyProps = {
@@ -48,14 +37,9 @@ type TileBuddyProps = {
     style: TileStyle
     width: number
     height: number
-    // How far below the tile's box the floor sits: the box starts above the footprint by the flat
-    // tile's thickness.
     floorOffset: number
-    // Hovered or selected.
     active?: boolean
-    // Selected: the buddy grows taller without leaving the floor.
     stretched?: boolean
-    // Placement preview: one plain colour, eyes shut, nothing moving.
     ghost?: { valid: boolean }
     reducedMotion?: boolean
     paused?: boolean
@@ -165,9 +149,6 @@ type BuddyLabelProps = {
     status: ReactNode
     maxWidth: number
     reducedMotion?: boolean
-    // Holds the roll where it is. The slide is a CSS animation the paused board freezes, the
-    // pill's width a transition it cannot: a turn taken meanwhile would resize the pill around a
-    // row that no longer moves.
     paused?: boolean
 }
 
@@ -175,8 +156,6 @@ function BuddyLabel({ id, name, status, maxWidth, reducedMotion, paused }: Buddy
     const nameRef = useRef<HTMLSpanElement>(null)
     const statusRef = useRef<HTMLSpanElement>(null)
     const [widths, setWidths] = useState<{ name: number; status: number } | null>(null)
-    // Even turns show the name, odd turns the status. One counter moves both the rows and the
-    // pill's width, so they cannot drift apart.
     const [turn, setTurn] = useState(0)
     const rolls = name != null && status != null && !reducedMotion
     const showsStatus = rolls && turn % 2 === 1
@@ -187,14 +166,11 @@ function BuddyLabel({ id, name, status, maxWidth, reducedMotion, paused }: Buddy
             return
         }
         if (paused) return
-        // The first hold is cut short by a share of its own: a board of busy buddies would
-        // otherwise flip all at once.
         const hold = turn === 0 ? LABEL_NAME_HOLD_MS * (0.25 + hashUnit(id, 11)) : showsStatus ? LABEL_STATUS_HOLD_MS : LABEL_NAME_HOLD_MS
         const timer = setTimeout(() => setTurn(current => current + 1), hold)
         return () => clearTimeout(timer)
     }, [rolls, paused, turn, showsStatus, id])
 
-    // offsetWidth ignores the board's zoom transform.
     useLayoutEffect(() => {
         const nameRow = nameRef.current
         const statusRow = statusRef.current

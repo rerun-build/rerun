@@ -16,8 +16,6 @@ describe('buildTriggerIndex', () => {
         expect(await buildTriggerIndex('allOff')).toBe('')
     })
 
-    // The call count moves on every call, and the index sits in the cached system prompt: trigger_get
-    // carries it, with the token.
     it('lists the enabled triggers by slug, with neither their call count nor their token', async () => {
         const fresh = await writeTrigger('hooks', { name: 'Stripe refund', body: 'Record it.', methods: ['POST', 'GET'] })
         const called = await writeTrigger('hooks', { name: 'GitHub push', body: 'Review it.' })

@@ -3,8 +3,6 @@ import { registerRunStream, subscribeRunStream } from './run-streams.js'
 
 const HEARTBEAT_MS = 15_000
 
-// Builds the run's UI message stream and hands it to the hub, which drains it into its
-// buffer on its own: the run therefore advances even with no HTTP consumer attached.
 export function registerRun(runId: string, execute: (writer: UIMessageStreamWriter) => Promise<void>): Response {
     const stream = createUIMessageStream({
         execute: ({ writer }) => execute(writer),

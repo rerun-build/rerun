@@ -10,9 +10,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 
-// The servers of a self-hosted install: an engine somebody runs on a machine of their own, attached
-// to one workspace. The pool of Rerun Cloud never shows here (see SERVERS_ENABLED).
-
 export const PAIRING_TOKEN_PREFIX = 'rrn_pair_'
 const PAIRING_TTL_MS = 15 * 60_000
 
@@ -41,8 +38,6 @@ export async function createPairingToken(workspaceId: number, userId: string): P
     return { token, expiresAt }
 }
 
-// Reaches the engine the way the app will from now on: /health answers without a key, and the key is
-// proven on a call that needs it. Said in words a person in front of their terminal can act on.
 async function checkReachable(baseUrl: string, apiKey: string): Promise<EngineHealth> {
     const conn = { baseUrl, apiKey }
     let health: EngineHealth
@@ -59,8 +54,6 @@ async function checkReachable(baseUrl: string, apiKey: string): Promise<EngineHe
     return health
 }
 
-// The address an engine is reached at: what it says when it says one, else where its request came
-// from on the engine's default port.
 export function engineAddress(advertised: string | null | undefined, callerIp: string | null): string | null {
     if (advertised?.trim()) return buildBaseUrl(advertised)
     if (!callerIp) return null
@@ -81,7 +74,6 @@ export async function redeemPairingToken(input: { token: string; url: string | n
 
     await checkReachable(input.url, input.apiKey)
 
-    // The token is spent before the engine is attached, so two servers racing on one token attach once.
     const { data: claimed, error } = await supabase
         .from('engine_pairing_tokens')
         .update<TokenUpdate>({ used_at: new Date().toISOString() })
@@ -104,7 +96,6 @@ export async function attachServerManually(workspaceId: number, input: { url: st
 
 export type WorkspaceServer = {
     address: string
-    // False for a machine of Rerun Cloud's pool, which cannot be removed from here.
     removable: boolean
     health: { reachable: true; commit: string | null; activeAgents: number; startedAt: string | null } | { reachable: false }
 }
@@ -120,8 +111,6 @@ export async function readWorkspaceServer(workspaceId: number): Promise<Workspac
     }
 }
 
-// Detaches a server somebody else hosts. Its data-dir stays on it: attaching it again brings every
-// coworker back.
 export async function detachWorkspaceServer(workspaceId: number): Promise<void> {
     const engine = await findWorkspaceEngine(workspaceId)
     if (!engine) return

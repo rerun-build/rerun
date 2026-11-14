@@ -8,13 +8,6 @@ import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 import { type ComponentProps, type CSSProperties, type ReactNode, useRef } from 'react'
 
-/**
- * À partir de `md`, un panneau qui glisse depuis la droite du board. En dessous, une sheet qui monte
- * du bas comme celle du Foreman : tirée par sa poignée ou son en-tête d'un cran à l'autre ou jusqu'à
- * la fermeture (voir `useSheetResize`), le board reste vivant au-dessus. Le rail n'y existe pas :
- * `mobileBar` s'ancre tout en haut, sous la poignée, et `mobileHeader` remplace `header` juste dessous.
- * Sans en-tête, seule la poignée tire la sheet.
- */
 export function SidePanel({
     isOpen,
     onDismiss,
@@ -67,7 +60,6 @@ export function SidePanel({
             >
                 <span className="h-1 w-8 rounded-full bg-muted-foreground/25" />
             </button>
-            {/* clip-path, not overflow alone: the top veil's backdrop-filter bleeds square past rounded corners. */}
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[inherit] md:flex-row md:[clip-path:inset(0_round_13px)]">
                 <div className="flex min-h-0 min-w-0 max-w-full flex-1 flex-col bg-background">
                     <div onPointerDown={onPointerDown} className="max-md:touch-none">

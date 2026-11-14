@@ -7,9 +7,6 @@ import { useTheme } from '@/theme/theme'
 
 const FADE_IN_MS = 700
 
-// The board of the web's /auth, a team of coworkers at work, played by the hub in a WebView. It stays
-// hidden until the page says its first frame is painted, so nothing flashes while it loads, and
-// offline it never shows: the background and the Foreman hold the screen on their own.
 export function AuthBoard({ height }: { height: number }) {
     const theme = useTheme()
     const opacity = useSharedValue(0)

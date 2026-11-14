@@ -1,14 +1,9 @@
 #!/bin/sh
-# Sets one or more keys in the server's .env, asking for each value at a hidden prompt, then restarts
-# the app so it reads them. Run from the clone:
-#   sudo sh deploy/vps/set-env.sh RERUN_GITHUB_MCP_CLIENT_ID RERUN_GITHUB_MCP_CLIENT_SECRET
-# An empty answer leaves that key as it was. Nothing typed is printed.
 set -eu
 cd "$(dirname "$0")/../.."
 [ -f .env ] || { echo "No .env here. Write it first: sh deploy/vps/make-env.sh"; exit 1; }
 [ "$#" -gt 0 ] || { echo "Name the keys to set, e.g.: sudo sh deploy/vps/set-env.sh RERUN_GITHUB_MCP_CLIENT_ID"; exit 1; }
 
-# Same writer as make-env.sh: the value goes in single quotes, read by awk from the environment.
 put() {
     case "$2" in *"'"*) echo "The value of $1 contains a single quote, which .env cannot hold. Nothing changed for it."; return 0 ;; esac
     K="$1" V="$2" awk 'BEGIN { k = ENVIRON["K"]; line = k "=\047" ENVIRON["V"] "\047" }

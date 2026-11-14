@@ -10,10 +10,8 @@ import { text } from "../theme";
 
 export interface AgentIdleProps {
   agentName: string;
-  /** Preformatted by the sender: this package never touches a Date. */
   createdLabel: string;
   agentUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;

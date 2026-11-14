@@ -8,8 +8,6 @@ import { usePaneInsets } from '@/components/layout/PaneSize'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// The frame of the onboarding, NoPlan's: the account and the other workspaces stay within reach while
-// the first team is being set up.
 export function OnboardingShell({ children }: { children: ReactNode }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()

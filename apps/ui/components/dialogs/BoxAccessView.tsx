@@ -29,7 +29,6 @@ export type BoxAccessViewProps = {
     onAccessChange: (userId: string, access: AccessLevel) => void
     onRemove: (userId: string) => void
     onAdd: (userIds: string[], access: AccessLevel) => Promise<boolean>
-    // The lab opens straight on the picker.
     initialPage?: 'list' | 'add'
 }
 

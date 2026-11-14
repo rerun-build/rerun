@@ -15,8 +15,6 @@ import { radius, spacing } from '@/theme/tokens'
 
 import type { EventCard } from './cards'
 
-// One thing the coworker did, on the muted surface of the thread's cards: its glyph (or the app's
-// logo), what happened, a note, and on the right what the person can still do about it.
 export function EventRow({ symbol, icon, title, note, trailing, children }: { symbol: IconName; icon?: ReactNode; title: string; note?: string; trailing?: ReactNode; children?: ReactNode }) {
     const theme = useTheme()
     return (
@@ -42,8 +40,6 @@ export function EventRow({ symbol, icon, title, note, trailing, children }: { sy
 
 type Undo = 'idle' | 'pending' | 'done'
 
-// A change the Rerun agent made to the Brain itself, already landed: an edit can still be undone from
-// here, as on the web. Opening the page stays on the web, which has the Brain.
 function BrainChangeRow({ change }: { change: BrainChange }) {
     const t = useTranslations('mobileCards')
     const tBrain = useTranslations('mobileCards.brain')

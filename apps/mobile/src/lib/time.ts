@@ -4,7 +4,6 @@ import { useLocale, useTranslations } from 'use-intl'
 
 const clocks = new Map<string, Intl.DateTimeFormat>()
 
-// The words follow the app's language, the 12 or 24 hour clock is the phone's.
 function clock(locale: string): Intl.DateTimeFormat {
     let format = clocks.get(locale)
     if (!format) {
@@ -20,8 +19,6 @@ export function messageTime(iso: string, locale: string): string {
 
 export type RelativeDayWords = { today: string; yesterday: string }
 
-// Hermes has no Intl.RelativeTimeFormat: "Today" and "Yesterday" come from the pack, the rest from the
-// date formatter it does have.
 export function messageDayLabel(iso: string, locale: string, words: RelativeDayWords, now: Date = new Date()): string {
     const date = new Date(iso)
     const daysAgo = calendarDaysBetween(date, now)
@@ -51,7 +48,6 @@ export function useMessageTimes() {
     }
 }
 
-// "now", "5m", "3h", "2d": how long ago, in as few characters as possible.
 export function useTimeAgo(): (minutes: number) => string {
     const t = useTranslations('mobileCommon.time')
     return minutes => {

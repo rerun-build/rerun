@@ -16,7 +16,6 @@ describe('pinPlanBoxes', () => {
         expect(pinned.items).toEqual([{ kind: 'agent', name: 'Triage', role: 'answers', box: 'Support' }])
     })
 
-    // A Box the board does not hold would be built as one more at the build.
     it('lands an agent filed nowhere, or somewhere unknown, in the first Box', () => {
         const pinned = pinPlanBoxes({ items: [{ kind: 'agent', name: 'A', role: 'a' }, { kind: 'agent', name: 'B', role: 'b', box: 'Finance' }] }, BOARD)
         expect((pinned.items as { box: string }[]).map(item => item.box)).toEqual(['Product', 'Product'])
@@ -30,7 +29,6 @@ describe('pinPlanBoxes', () => {
 describe('pinTemplateBoxes', () => {
     const CARD = { templates: [{ slug: 'buyer-signals', title: 'Buyer signals', why: 'Finds leads' }], allow_custom: true }
 
-    // The template lands in one Box, and the rest of the board stays drawn around it.
     it('lays out every Box the board drew and files the template under the one it named', () => {
         const pinned = pinTemplateBoxes({ ...CARD, box: ' sales ' }, BOARD)
         expect(pinned.boxes).toEqual(BOARD.map(name => ({ name })))

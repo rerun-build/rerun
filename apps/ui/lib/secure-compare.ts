@@ -1,6 +1,5 @@
 import { timingSafeEqual } from 'node:crypto'
 
-// Constant time, so a shared secret cannot be guessed one byte at a time from response latency.
 export function secretMatches(value: string | null, expected: string): boolean {
     const a = Buffer.from(value ?? '')
     const b = Buffer.from(expected)

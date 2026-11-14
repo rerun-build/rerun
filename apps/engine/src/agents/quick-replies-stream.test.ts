@@ -5,7 +5,6 @@ import { QuickRepliesSplitter, createQuickRepliesCapture, offersQuickReplies, pa
 
 const BLOCK = '<quick_replies>\nFind 100 more\nExport them as CSV\n</quick_replies>'
 
-// Feeds the deltas through one text block and returns what came out, with the blocks recorded.
 function split(deltas: string[], id = 't'): { text: string[]; blocks: string[][] } {
     const blocks: string[][] = []
     const splitter = new QuickRepliesSplitter(replies => blocks.push(replies))
@@ -184,7 +183,6 @@ describe('withoutQuickRepliesCalls', () => {
 })
 
 describe('quick reply that announces a value', () => {
-    // The replies of the 03/11 case: "Here is the repo URL" went out alone and the coworker had to ask again.
     it('reaches the chat as a reply to finish in the composer, not one to send', () => {
         const { blocks } = split(['Please send the repository URL.\n\n', "<quick_replies>\nHere is the repo URL\nI'll upload a local clone\nUse the last release as the start\n</quick_replies>"])
         const call = quickRepliesCall({ toolCallId: 'qr-1', replies: blocks[0] })

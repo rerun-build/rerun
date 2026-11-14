@@ -24,7 +24,6 @@ export default function CoworkerFilesScreen() {
 
     const urlOf = (file: CoworkerFile) => rawFileUrl({ agentId, path: file.path })
 
-    // The viewer pages through the tab the file was opened from.
     const open = (file: CoworkerFile) => {
         const siblings = view?.files.filter(other => other.kind === file.kind) ?? [file]
         openViewer(

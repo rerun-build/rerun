@@ -13,9 +13,7 @@ type TextFieldProps = {
     value: string
     onChangeText: (text: string) => void
     placeholder?: string
-    // Masked, and never offered to autofill.
     secret?: boolean
-    // Typed as is: no capital, no correction (an address, an id, a key).
     verbatim?: boolean
     multiline?: boolean
     autoFocus?: boolean

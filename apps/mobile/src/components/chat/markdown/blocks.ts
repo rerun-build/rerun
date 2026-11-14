@@ -27,11 +27,6 @@ function mathFencesOf(text: string): number {
     return count
 }
 
-/**
- * Streamdown's `parseMarkdownIntoBlocks`, the splitter the web cuts an answer with, ported as is so a
- * reply falls into the same bubbles on both clients: an open HTML element or `$$` math block holds
- * the blocks after it until it closes, and footnotes keep the whole text in one block.
- */
 export function markdownBlocksOf(markdown: string): string[] {
     if (FOOTNOTE_REFERENCE.test(markdown) || FOOTNOTE_DEFINITION.test(markdown)) return [markdown]
     const blocks: string[] = []

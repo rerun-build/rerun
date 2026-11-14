@@ -2,7 +2,6 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-// pxpipe-proxy is a library here: only its `.` and `./transform` exports, never the proxy.
 const ALLOWED = new Set(['pxpipe-proxy', 'pxpipe-proxy/transform'])
 const IMPORT_RE = /(?:from\s*|import\s*\(\s*|import\s+|require\(\s*)['"](pxpipe-proxy(?:\/[^'"]*)?)['"]/g
 

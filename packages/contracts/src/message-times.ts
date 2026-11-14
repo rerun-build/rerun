@@ -14,7 +14,6 @@ function opensStretch(previous: string, time: string): boolean {
     return current.getTime() - before.getTime() >= TIME_BREAK_GAP_MS || calendarDaysBetween(before, current) !== 0
 }
 
-/** The messages that open a stretch of the conversation: the first one, a new day, or a word after an hour of silence. */
 export function timeBreaksOf(times: readonly string[]): Set<number> {
     const breaks = new Set<number>()
     times.forEach((time, index) => {
@@ -23,7 +22,6 @@ export function timeBreaksOf(times: readonly string[]): Set<number> {
     return breaks
 }
 
-/** A person who picks the thread back up hours later starts a new group, under its own separator. */
 export function splitTurnsAtBreaks<M extends { id: string }>(turns: readonly AuthorTurn<M>[], breaks: ReadonlySet<number>): AuthorTurn<M>[] {
     return turns.flatMap(turn => {
         const pieces: AuthorTurn<M>[] = []

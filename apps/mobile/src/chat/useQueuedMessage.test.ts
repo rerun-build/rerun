@@ -3,7 +3,6 @@ import { act, renderHook } from '@testing-library/react-native'
 import { draftOf, setDraft } from './composer-drafts'
 import { useQueuedMessage } from './useQueuedMessage'
 
-// The queue's files, kept in memory: the path is the folder's name and the file's.
 const mockFiles = new Map<string, string>()
 jest.mock('expo-file-system', () => {
     class Directory {

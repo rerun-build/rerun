@@ -5,7 +5,6 @@
 @import "../../../packages/ui/src/styles.css";
 
 @source "../../../packages/ui/src";
-/* Rerun Cloud's side of @rerun/cloud/* (marketing cards…): a checkout without cloud/ has nothing there. */
 @source "../../../cloud/packages/cloud/src";
 @source "../node_modules/streamdown/dist/*.js";
 @source "../node_modules/@streamdown/code/dist/*.js";
@@ -14,13 +13,9 @@
 @source "../node_modules/@streamdown/cjk/dist/*.js";
 
 @custom-variant dark (&:is(.dark *));
-/* Rewind slides follow the shape of their story card, not the viewport: a wide card splits text and visual in two columns. */
 @custom-variant story-landscape (@media (orientation: landscape) and (width >= 40rem) and (height >= 30rem));
 @custom-variant rewind-wide (@container rewind (width >= 40rem) and (aspect-ratio > 1));
 
-/* Core design tokens (background/foreground/card/popover/primary/secondary/muted/
-   accent/destructive/border/input/ring + radius-sm..xl) : source partagée dans
-   @rerun/ui/theme.css. Ici uniquement les tokens spécifiques à apps/ui. */
 @theme inline {
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
@@ -38,7 +33,6 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
-  /* Tokens repris du design Pricing de la landing (cloud/apps/landing) pour BillingDialog */
   --color-charcoal-700: #343434;
   --color-charcoal-900: #202020;
   --color-brand: var(--brand);
@@ -54,32 +48,26 @@
   --animate-link-dot: link-dot 2s linear infinite;
 }
 
-/* Models marquee (ModelsDialog right column). Ported from cloud/apps/landing. */
 @keyframes scroll {
   to {
     transform: translate(calc(-50% - 0.5rem));
   }
 }
 
-/* Slow horizontal pan of a bg-clip-text gradient (Expert story titles). */
 @keyframes gradient-text-pan {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
 
-/* One dot of a dotted path lighting up as the signal passes over it (LinkedinRerunLink). */
 @keyframes link-dot {
   0%, 22%, 100% { background-color: color-mix(in oklab, var(--muted-foreground) 25%, transparent); box-shadow: none; }
   6% { background-color: var(--foreground); box-shadow: 0 0 6px color-mix(in oklab, var(--foreground) 60%, transparent); }
 }
 
-/* Marquee pill: faint neutral fill (theme-aware via --foreground). */
 .model-pill {
   background: color-mix(in oklab, var(--foreground) 3%, var(--background));
 }
 
-/* Halo de la barre de crédits. La teinte arrive par --credits-accent (posée inline, brand ou rouge
-   d'épuisement) ; le thème clair réduit le rayon et l'opacité, sinon le halo bave sur le fond. */
 .credits-bar-glow {
   --credits-highlight: 55%;
   filter: drop-shadow(0 0 6px color-mix(in oklab, var(--credits-accent) 55%, transparent));
@@ -90,12 +78,6 @@ html:not(.dark) .credits-bar-glow {
   filter: drop-shadow(0 0 2px color-mix(in oklab, var(--credits-accent) 25%, transparent));
 }
 
-/* Dose de blanc en tête du dégradé des barres de progression. Le dégradé lui-même est posé inline
-   par la primitive Progress : un color-mix avec une variable en position de pourcentage ne survit
-   pas au compilateur CSS, il se fait jeter à la compilation (même raison que la barre de crédits).
-   Le thème clair reçoit moins de blanc, sinon le début de la barre se confond avec la piste.
-   `--progress-stripe-ink` encre les hachures posées par-dessus : l'encre par défaut des Stripes est
-   calibrée pour un fond de panneau, elle disparaîtrait sur une barre de 2 px remplie de couleur. */
 .progress-fill {
   --progress-highlight: 55%;
   --progress-stripe-ink: rgb(0 0 0 / 0.18);
@@ -106,8 +88,6 @@ html:not(.dark) .progress-fill {
   --progress-stripe-ink: rgb(0 0 0 / 0.14);
 }
 
-/* Barre de progression indéterminée : la phase où les octets sont partis mais où le serveur écrit
-   encore. Un remplissage figé à 100% se lit comme un bug, un va-et-vient se lit comme une attente. */
 .progress-indeterminate {
   animation: progress-indeterminate 1.2s ease-in-out infinite;
 }
@@ -121,15 +101,9 @@ html:not(.dark) .progress-fill {
   }
 }
 
-/* Core tokens (background/foreground/card/...) + --radius : @rerun/ui/theme.css.
-   Ici uniquement les tokens sidebar/chart propres à apps/ui. */
 :root {
   --brand: #4d34f7;
-  /* La marque posée en texte ou en point sur le fond : #4d34f7 se perd sur le noir, le thème sombre
-     reprend la lavande du badge brand. */
   --brand-text: var(--brand);
-  /* Gouttière autour du panneau du dashboard : plus sombre que le fond en thème sombre, plus claire
-     que lui en thème clair, pour que le panneau se détache dans les deux cas. */
   --frame: oklch(0.925 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -203,9 +177,6 @@ html:not(.dark) .progress-fill {
   }
 }
 
-/* iOS Safari zooms into any editable field whose font-size < 16px on focus.
-   Force >=16px on touch/small viewports. Unlayered so it wins over Tailwind
-   text-xs/text-sm utilities; desktop (>=md) keeps its smaller sizes. */
 @media screen and (max-width: 767px) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
   textarea,
@@ -249,7 +220,6 @@ html:not(.dark) .progress-fill {
   margin-bottom: 0.25rem;
 }
 
-/* Unlayered like the heading margins above, which Streamdown's `[&>*:first-child]:mt-0` utility cannot override. */
 [data-streamdown^="heading-"]:first-child {
   margin-top: 0;
 }
@@ -343,8 +313,6 @@ html:not(.dark) .progress-fill {
   border-bottom: none;
 }
 
-/* Inside a chat answer's stack (MessageBubbles) every block takes the bubble's shape: 20px corners
-   on the muted surface, no border, and the stack's own gap instead of a margin. */
 [data-bubble-frame="bare"] [data-streamdown="code-block"],
 [data-bubble-frame="bare"] [data-streamdown="mermaid-block"],
 [data-bubble-frame="bare"] [data-streamdown="table-wrapper"] {
@@ -382,17 +350,12 @@ html:not(.dark) .progress-fill {
   margin-bottom: 0;
 }
 
-/* Streamdown wraps every streamed word in a span it blurs in. It ships no reduced-motion
-   rule of its own, so the words land instantly here instead. */
 @media (prefers-reduced-motion: reduce) {
   [data-sd-animate] {
     animation: none;
   }
 }
 
-/* Wider, softer border beam for selected cards (CreateAgentDialog): the bright band
-   is spread across the whole edge instead of a short arc, and dialed down so it stays
-   subtle. Override only — the shared @rerun/ui arcs preset is untouched. */
 .beam-soft.border-beam--arcs {
   background: conic-gradient(
     from var(--border-beam-angle),
@@ -410,11 +373,6 @@ html:not(.dark) .beam-soft.border-beam--arcs.border-beam--white {
   --beam-1: rgba(0, 0, 0, 0.4);
 }
 
-/* Thin, theme-aware scrollbars so Windows classic scrollbars look like the
-   discreet macOS ones instead of the wide white default.
-   In @layer base and not unlayered: `* { scrollbar-width: thin }` would otherwise outrank the
-   `scrollbar-width: none` that `no-scrollbar` and `[scrollbar-width:none]` set from
-   @layer utilities, and every hidden-scrollbar row would keep its bar on Firefox. */
 @layer base {
   * {
     scrollbar-width: thin;
@@ -458,9 +416,6 @@ html:not(.dark) .beam-soft.border-beam--arcs.border-beam--white {
   }
 }
 
-/* Sonner injects its own stylesheet at runtime, outside of any cascade layer, so Tailwind
-   utilities passed through `toastOptions.classNames` would always lose against it. These rules
-   stay unlayered too, and outrank it on specificity. */
 @media (max-width: 639.98px) {
   [data-sonner-toaster] [data-sonner-toast][data-styled='true'] {
     padding: 10px 12px;
@@ -471,7 +426,6 @@ html:not(.dark) .beam-soft.border-beam--arcs.border-beam--white {
     line-height: 1.35;
   }
 
-  /* Server error strings land here at any length, and a toast that tall covers the screen. */
   [data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-description] {
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -480,9 +434,6 @@ html:not(.dark) .beam-soft.border-beam--arcs.border-beam--white {
   }
 }
 
-/* Sonner's own close button rules for the dark theme already sit at the same specificity as the
-   selectors above, and its runtime stylesheet is appended last, so it wins every tie. The `html`
-   prefix is what puts these ahead of it. */
 html [data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button] {
   left: auto;
   right: 8px;
@@ -507,14 +458,10 @@ html [data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-b
   box-shadow: none;
 }
 
-/* A loading toast never gets a close button, and would otherwise carry an orphan gutter. */
 html [data-sonner-toaster] [data-sonner-toast][data-styled='true']:has([data-close-button]) [data-content] {
   padding-right: 24px;
 }
 
-/* Only pointer devices hide the button: a touch screen has no hover to reveal it with. Keeping
-   every opacity rule inside this query also leaves sonner's `[data-front='false'] > * { opacity: 0 }`
-   untouched, so stacked toasts don't show a floating close button behind the front one. */
 @media (pointer: fine) {
   html [data-sonner-toaster] [data-sonner-toast][data-styled='true'] [data-close-button] {
     opacity: 0;
@@ -526,11 +473,6 @@ html [data-sonner-toaster] [data-sonner-toast][data-styled='true']:has([data-clo
   }
 }
 
-/* The desktop app (apps/desktop-app). The server marks <html data-desktop-shell="mac|win|linux"> from
-   the app's User-Agent, so none of this reaches a browser. The window has no title bar of its own:
-   a strip at the top (`ShellTitleBar`) drags it, with the native buttons over it (the traffic
-   lights on macOS, the caption buttons on the right elsewhere). Everything the app lays out against
-   the viewport starts under the strip; in native full screen the strip folds away. */
 :root {
   --shell-titlebar-h: 0px;
   --shell-titlebar-bg: var(--background);
@@ -548,7 +490,6 @@ html[data-desktop-shell][data-desktop-fullscreen] {
   --shell-titlebar-h: 0px;
 }
 
-/* The board sits in its frame: the strip takes the frame's color and reads as its top gutter. */
 html[data-desktop-shell]:has([data-foreman-split]) {
   --shell-titlebar-bg: var(--frame);
 }
@@ -567,7 +508,6 @@ html[data-desktop-shell] .min-h-screen {
   min-height: calc(100dvh - var(--shell-titlebar-h));
 }
 
-/* Centered dialogs center in the space under the strip. */
 html[data-desktop-shell] [data-slot='dialog-content'],
 html[data-desktop-shell] [data-slot='alert-dialog-content'] {
   margin-top: calc(var(--shell-titlebar-h) / 2);
@@ -582,7 +522,6 @@ html[data-desktop-shell] [data-slot='sheet-content'][data-side='top'] {
   top: var(--shell-titlebar-h);
 }
 
-/* The Quick ask window is frameless and rounded: no strip, and nothing painted around its card. */
 html[data-desktop-shell]:has([data-quick-ask]) {
   --shell-titlebar-h: 0px;
 }
@@ -602,8 +541,6 @@ html:has([data-quick-ask]) body {
   user-select: none;
 }
 
-/* A drag region swallows the clicks of anything drawn over it: a menu or a popover that opens high
-   enough to cross the strip stays clickable. */
 html[data-desktop-shell] :is([data-radix-popper-content-wrapper], [role='dialog'], [role='menu'], [role='listbox'], [data-sonner-toaster]) {
   -webkit-app-region: no-drag;
   app-region: no-drag;

@@ -24,10 +24,6 @@ import { serviceIconProps } from '@/lib/services/icons'
 import { cn } from '@/lib/utils'
 import { AppRerunLink } from './AppRerunLink'
 
-// The screens every paid app shares in its dialog: what it does before the first account, the
-// accounts and slots, the drilled-in page header, the success. Each app adds its own sign-in.
-
-// What an app says about itself on its intro screen.
 export type AppPresentation = {
     slug: AppSlug
     capabilities: { icon: ComponentType<{ className?: string }>; key: AppCapability }[]
@@ -41,8 +37,6 @@ function slotPriceLabel(t: AppsTranslator, overview: Pick<AppsOverview, 'slotPri
     return t(overview.interval === 'yearly' ? 'slotPrice.yearly' : 'slotPrice.monthly', { price: formatAmount(overview.slotPriceCents, 'usd') })
 }
 
-// The app's logo from the services catalog, drawn like every other app of the library. The plain
-// provider row lends its logo while the app's own row has none.
 export function AppIcon({ slug, size = 'sm', tone }: { slug: AppSlug; size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'; tone?: ComponentProps<typeof Icon>['tone'] }) {
     const { serviceSlug, brandSlug } = appInfo(slug)
     const { resolved } = useCatalogServices([serviceSlug, brandSlug])
@@ -58,7 +52,6 @@ function slotTotal(overview: AppsOverview): number {
     return Math.max(overview.stripeSlots + (overview.subscriberTrialEndsAt ? 1 : 0), overview.connections.length)
 }
 
-// Why nothing new can be connected right now, if so.
 function blockedReason(t: AppsTranslator, overview: AppsOverview): string | undefined {
     if (!overview.subscribed) return t('blocked.notSubscribed')
     if (overview.paused) return t('blocked.paused')
@@ -80,8 +73,6 @@ function offer(t: AppsTranslator, overview: AppsOverview): { headline: string; d
     return { headline: t('offer.buySlot.headline', { price }), detail: t('offer.buySlot.detail') }
 }
 
-// Returned as an element rather than a string so its callers, which only render it, get it in the
-// viewer's language without having to hold a translator themselves.
 export function connectHint(overview: AppsOverview | null, reconnectLabel: string | null | undefined): ReactNode {
     return <ConnectHint overview={overview} reconnectLabel={reconnectLabel} />
 }
@@ -118,14 +109,12 @@ type IntroScreenProps = {
     onAddSlot: () => void
 }
 
-// Accounts and slots belong to the workspace and its bill: a member sees them, an admin changes them.
 function useBlockedReason(overview: AppsOverview): { reason: string | undefined; adminOnly: boolean } {
     const t = useTranslations('apps')
     const isAdmin = useIsWorkspaceAdmin()
     return isAdmin ? { reason: blockedReason(t, overview), adminOnly: false } : { reason: t('blocked.adminOnly'), adminOnly: true }
 }
 
-// What a workspace sees before its first account: what the app does, what it costs, one way in.
 export function IntroScreen({ presentation, overview, pending, onConnectStart, onAddSlot }: IntroScreenProps) {
     const t = useTranslations('apps')
     const { name, providerLabel } = appInfo(presentation.slug)
@@ -187,7 +176,6 @@ type AccountsScreenProps = {
     onAddSlot: () => void
 }
 
-// Every account and every slot in one list: a slot is either an account or a dashed place for one.
 export function AccountsScreen({ overview, pending, onConnectStart, onReconnect, onDisconnect, onAddSlot }: AccountsScreenProps) {
     const t = useTranslations('apps')
     const locale = useLocale()
@@ -236,7 +224,6 @@ function freeSlotHint(t: AppsTranslator, overview: AppsOverview): string {
 
 const OPEN_SLOT = 'flex w-full items-center gap-3 rounded-md border border-dashed p-3 text-left transition-colors hover:border-foreground/30 hover:bg-accent/20 disabled:pointer-events-none disabled:opacity-60'
 
-// A slot with nothing in it yet: what gets the dashed border instead of an account.
 function OpenSlotButton({ title, description, className, ...props }: ComponentProps<'button'> & { title: string; description: string }) {
     return (
         <button type="button" className={cn(OPEN_SLOT, className)} {...props}>
@@ -277,7 +264,6 @@ function AddSlotRow({ overview, blocked, pending, onAddSlot }: { overview: AppsO
     )
 }
 
-// A WhatsApp number without a display name has no letters: its last two digits stand in.
 function initials(name: string): string {
     const letters = name
         .split(/[\s,]+/)
@@ -303,7 +289,6 @@ function AccountStatus({ connection }: { connection: AppConnectionView }) {
         )
     }
     if (connection.status === 'needs_reconnect') {
-        // The Reconnect button beside it already says so, and a phone has no room for both.
         return (
             <Badge size="xs" tone="orange" className="shrink-0 max-sm:hidden">
                 {t('needsReconnect')}
@@ -416,7 +401,6 @@ export function AccountsSkeleton() {
     )
 }
 
-// The top of a drilled-in page, as in AI providers: back, the app, what this page does.
 export function AppPageHeader({ slug, title, hint, backLabel, onBack }: { slug: AppSlug; title: string; hint: ReactNode; backLabel: string; onBack: () => void }) {
     return (
         <div className="flex items-center gap-3 border-b px-3 py-2.5">

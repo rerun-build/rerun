@@ -9,24 +9,16 @@ import { text } from "../theme";
 
 export interface TrialEndingProps {
   workspaceName: string | null;
-  /** "12 March", preformatted. */
   trialEndsLabel: string;
   daysLeft: number;
-  /** Until when the workspace is saved once paused, "11 June". Preformatted. */
   keptUntilLabel: string;
   billingUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
 }
 
-/**
- * Has to read true for both kinds of trial: the one every account starts at signup without a card,
- * and the one that came out of Checkout with a card. Nothing in the database says which, so the
- * copy states the condition instead of asserting the state.
- */
 export default function TrialEnding({
   workspaceName,
   trialEndsLabel,

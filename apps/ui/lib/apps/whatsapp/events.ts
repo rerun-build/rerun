@@ -3,10 +3,6 @@ import type { AttachmentRef } from '@/lib/apps/linkup/client'
 import type { EnvelopeKind, LinkupEnvelope } from '@/lib/apps/linkup/envelope'
 import { WAKE_EVENT_LABELS, type WakeEvent } from './wake-events'
 
-// What a WhatsApp delivery means to the coworkers woken by it. Linkup documents the LinkedIn shape
-// of a message and only says WhatsApp sends the same event, so every field is read defensively,
-// from where the LinkedIn payload and WhatsApp's read receipts put it.
-
 function isOutbound(envelope: LinkupEnvelope): boolean {
     return envelope.event.direction === 'outbound' || envelope.event.sender?.is_self_sent === true
 }
@@ -14,7 +10,6 @@ function isOutbound(envelope: LinkupEnvelope): boolean {
 export function envelopeKind(envelope: LinkupEnvelope): EnvelopeKind<WakeEvent> {
     const type = envelope.event.type
     if (type === 'disconnection') return { kind: 'disconnection', reason: envelope.event.reason ?? 'WhatsApp unlinked the number' }
-    // What the user types on their own phone comes back as a message too: it is not news to them.
     if (type === 'message' && !isOutbound(envelope)) return { kind: 'wake', event: 'message_received' }
     return { kind: 'ignored' }
 }
@@ -28,14 +23,11 @@ function messageIdOf(envelope: LinkupEnvelope): string | null {
     return envelope.event.message_id ?? envelope.event.metadata?.message_id ?? envelope.event.metadata?.entity_urn ?? null
 }
 
-// A WhatsApp file is named by the message that carries it.
 export function attachmentBase(envelope: LinkupEnvelope): AttachmentRef {
     const messageId = messageIdOf(envelope)
     return messageId ? { message_id: messageId } : {}
 }
 
-// What the coworker reads in its trigger payload: who wrote, from which number, and what. The
-// number is what every WhatsApp tool takes.
 export function wakePayload(event: WakeEvent, envelope: LinkupEnvelope, accountLabel: string | null, attachments: AttachmentSummary[] = []): Record<string, unknown> {
     const { event: body } = envelope
     const conversationId = body.conversation_id ?? body.metadata?.conversation_id ?? body.metadata?.conversation_urn ?? null

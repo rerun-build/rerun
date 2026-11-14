@@ -30,7 +30,6 @@ describe('remember', () => {
 })
 
 describe('General', () => {
-    // The suite runs in a bare Node environment: the storage is a map standing in for the browser's.
     beforeEach(() => {
         const store = new Map<string, string>()
         vi.stubGlobal('localStorage', { getItem: (key: string) => store.get(key) ?? null, setItem: (key: string, value: string) => void store.set(key, value), clear: () => store.clear() })

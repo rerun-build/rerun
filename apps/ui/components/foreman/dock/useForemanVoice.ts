@@ -12,16 +12,11 @@ import { usePushToTalk } from './usePushToTalk'
 
 export type ForemanVoiceStatus = 'idle' | 'listening' | 'transcribing'
 
-/**
- * Space held on the board records, letting go transcribes and hands the words to the Foreman as if
- * they had been typed in the pill. Only the transcript travels: the recording is not kept.
- */
 export function useForemanVoice(enabled: boolean) {
     const t = useTranslations('foreman.voice')
     const [listening, setListening] = useState(false)
     const [transcribing, setTranscribing] = useState(false)
 
-    // The recorder calls finish when it hits its length cap, and finish needs the recorder to stop.
     const finishRef = useRef<() => void>(() => {})
     const recorder = useVoiceRecorder({
         onError: message => {
@@ -42,7 +37,6 @@ export function useForemanVoice(enabled: boolean) {
         setListening(false)
         setTranscribing(true)
         try {
-            // Null when Space was let go before the microphone came up: there is nothing to send.
             const recording = await stop()
             if (!recording) return
             const transcript = await transcribeVoiceRecording(recording.blob, recording.format.transcriptionFormat)

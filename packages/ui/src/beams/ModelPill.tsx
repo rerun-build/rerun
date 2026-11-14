@@ -5,11 +5,6 @@ import type { ModelLogoSlug } from './model-logos'
 
 export type ModelPillItem = { name: string; logo: ModelLogoSlug }
 
-// La pastille « une marque, un modèle » : un anneau figé plutôt qu'un faisceau qui tourne, parce
-// qu'elle apparait rarement seule. Douze qui tournent en même temps, c'est un sapin de Noël.
-//
-// Le fond vient de `.model-pill`, déclarée dans les globals des deux apps : un color-mix sur
-// --foreground, donc la pastille suit le thème sans que le package ait à connaitre les tokens.
 export function ModelPill({ item, className }: { item: ModelPillItem; className?: string }) {
     const Logo = MODEL_ICONS[item.logo]
     return (

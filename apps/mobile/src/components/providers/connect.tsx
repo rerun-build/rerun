@@ -15,8 +15,6 @@ import { ApiKeyForm } from './ApiKeyForm'
 import { leave } from './routes'
 import { ChatGptSignIn, ClaudeSignIn, type ChatGptPhase, type ClaudePhase, type SignInEnding } from './PlanSignIn'
 
-// OpenAI refuses the code on its own page while the setting is off, and the app only ever sees the
-// wait go on: past this, the wait is more likely that than a slow user.
 const STUCK_AFTER_MS = 30_000
 
 type Surface = 'add_provider' | 'reconnect'
@@ -26,8 +24,6 @@ function connected(provider: AddableProvider, method: AiConnectionMethod, surfac
     track('ai_connection_connected', { provider, method, surface })
 }
 
-// Adding a plan ends on its name: the connection already exists, under the suggested one, once the
-// sign-in lands. Signing one in again ends where it was opened from.
 type Caller = ReturnType<typeof useAiConnections>['caller']
 
 function useEnding(provider: AddableProvider, connectionId: string | null, reconnect: boolean, view: AiConnectionsView | null, caller: Caller): SignInEnding {
@@ -82,8 +78,6 @@ export function ClaudeConnect({ reconnectId }: { reconnectId: string | null }) {
         }
     }
 
-    // The code Claude shows can only be exchanged by the sign-in that asked for it; with none armed,
-    // or for a `claude setup-token` token, the text is stored as a token.
     const submit = async (raw: string) => {
         const text = raw.trim()
         if (!text || !caller || phase === 'checking') return
@@ -169,8 +163,6 @@ export function ChatGptConnect({ reconnectId }: { reconnectId: string | null }) 
         return () => clearInterval(timer)
     }, [pending])
 
-    // Polled until the user approves, the code expires, or the screen goes. A poll that did not reach
-    // the hub is tried again on the next tick, like a pending one.
     useEffect(() => {
         if (!pending || !caller) return
         let cancelled = false
@@ -210,12 +202,10 @@ export function ChatGptConnect({ reconnectId }: { reconnectId: string | null }) 
     const phase: ChatGptPhase = connectionId ? 'connected' : pending ? 'waiting' : starting ? 'starting' : 'idle'
     const stuck = expired || (pending !== null && now - startedAt > STUCK_AFTER_MS)
 
-    // The code is what the user types on OpenAI's page, so opening the page puts it on the clipboard.
     const shown = pending ? { userCode: pending.userCode, verificationUrl: pending.verificationUrl } : null
     return <ChatGptSignIn phase={phase} pending={shown} expired={expired} stuck={stuck} error={error} onGetCode={getCode} onOpenVerification={() => pending && Clipboard.setStringAsync(pending.userCode)} ending={ending} onBack={() => leave()} />
 }
 
-// `reconnectId` replaces the key of a connection its provider turned away rather than adding one.
 export function ApiKeyConnect({ provider, reconnectId = null }: { provider: Exclude<AddableProvider, 'claude' | 'codex'>; reconnectId?: string | null }) {
     const { view, caller } = useAiConnections()
     const entry = view?.addable.find(candidate => candidate.provider === provider)

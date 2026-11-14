@@ -1,6 +1,3 @@
-// A page of Rerun opened in the app from a browser (`rerun-desktop://open?path=…`):
-//   pnpm verify:desktop --scenario apps/desktop-app/e2e/open-links.mjs
-
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
@@ -29,7 +26,6 @@ export default async function openLinksScenario({ app, page, step, base }) {
     check(await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].isVisible()), 'and brings the window back')
     await step('page opened from a link')
 
-    // The app tidies its own query afterwards: the page it settles on is the reference.
     await page.waitForTimeout(1500)
     const settled = page.url()
     for (const hostile of ['https://evil.example/', '//evil.example/x', 'javascript:alert(1)']) {

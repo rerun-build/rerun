@@ -2,13 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-/**
- * `card` frames the element the way the design system pages do, `plain` drops it on the app
- * background with no border, `checker` puts a checkerboard behind it so a component with no
- * background of its own can be isolated for a capture. Light and dark stay the responsibility of
- * the page theme toggle: a theme island can add `.dark` but cannot subtract it, so a real light
- * backdrop only exists when the whole page is light.
- */
 export type KitBackdrop = 'card' | 'plain' | 'checker'
 
 export const KIT_BACKDROPS: { value: KitBackdrop; label: string }[] = [
@@ -50,8 +43,6 @@ export function KitControlsProvider({ children }: { children: ReactNode }) {
     const [scale, setScaleState] = useState(1)
     const [solo, setSoloState] = useState<string | null>(null)
 
-    // Read once on mount rather than through useSearchParams, which would force every gallery page
-    // into a Suspense boundary for a value only the client ever needs.
     useEffect(() => {
         const params = new URLSearchParams(window.location.search)
         setSoloState(params.get('solo'))

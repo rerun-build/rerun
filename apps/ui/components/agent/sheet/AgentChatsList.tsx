@@ -31,11 +31,6 @@ type AgentChatsListProps = {
     onClose: () => void
 }
 
-/**
- * One list for the coworker's threads and for what waits on the user: a request is a thread like
- * any other, only marked, and opening it leads back into it. General is not listed: it has its own
- * tab, always there. The filter replaces the inbox the panel used to carry beside the chat.
- */
 export function AgentChatsList({ agentId, agentName, activeSessionId, initialFilter, onSelect, onCreateNew, onClose }: AgentChatsListProps) {
     const t = useTranslations('agent.agentChatsList')
     const [filter, setFilter] = useState<ChatsFilter>(initialFilter)
@@ -44,7 +39,6 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
     const attention = useAttentionSessions(agentId)
     const setSessionStatus = useBoardStore(s => s.setSessionStatus)
     const markSessionsHandled = useBoardStore(s => s.markSessionsHandled)
-    // The history is read once per opening: what runs right now comes from the board's live statuses.
     const sessions = useBoardStore(s => s.sessions)
 
     useEffect(() => {
@@ -71,7 +65,6 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
             onSelect(entry.id, entry.title)
             return
         }
-        // A conversation another coworker started lives on the engine only until someone opens it.
         setAdopting(entry.engineSessionId)
         try {
             onSelect(await adoptEngineSessionAction(agentId, entry.engineSessionId, entry.title), entry.title)
@@ -156,7 +149,6 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
     )
 }
 
-// `history` arrives most recent first, so the days come out in order too.
 export function groupByDay(entries: SessionHistoryEntry[], locale?: string) {
     const now = new Date()
     const days: { day: string; entries: SessionHistoryEntry[] }[] = []
@@ -173,8 +165,6 @@ export function ChatRow({ entry, active, running, adopting, onOpen }: { entry: S
     const t = useTranslations('agent.agentChatsList')
     const locale = useLocale()
     const SourceIcon = entry.source === 'trigger' ? WebhookIcon : CalendarClock
-    // A run titled before the hub retitled them, or by an engine that sends no final answer, is still
-    // named after its routine: the routine line would only repeat it.
     const routine = isAutomated(entry) && entry.automationName && entry.automationName !== entry.title ? entry.automationName : null
     return (
         <button

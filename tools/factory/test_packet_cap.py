@@ -11,7 +11,7 @@ class PacketCap(unittest.TestCase):
         self.assertFalse(limits.packet_oversize("a" * 50, {"packet_cap": 100}, 50))
 
     def test_multibyte(self):
-        s = "\u00e9" * 2049  # 2049 chars, 4098 bytes
+        s = "\u00e9" * 2049
         self.assertEqual(len(s), 2049)
         self.assertTrue(limits.packet_oversize(s))
         self.assertFalse(limits.packet_oversize("\u00e9" * 2048))

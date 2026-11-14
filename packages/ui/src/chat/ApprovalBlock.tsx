@@ -19,7 +19,6 @@ export const APPROVAL_CHOICES: { value: ApprovalChoice; variant: 'default' | 'ou
 export type ApprovalBlockProps = {
     label: string
     icon?: LucideIcon
-    // A connector tool identifies itself by its brand logo, which is an image and not a glyph.
     iconSrc?: string
     message?: string
     preview?: string

@@ -54,8 +54,6 @@ describe('reconcileInterruptedRuns', () => {
         sent.length = 0
     })
 
-    // Repairing SQLite is not enough: the dashboard reads the conversation status from the hub, so
-    // without a terminal event every session caught by a restart stays "working" forever.
     it('fails the runs a restart interrupted and tells the hub about each one', async () => {
         const session = await createSession(id, 'interrupted')
         const run = await startRun(id, session.id)
@@ -72,8 +70,6 @@ describe('reconcileInterruptedRuns', () => {
         expect((completion?.metadata as Record<string, unknown>).errorCode).toBe('engine_restarted')
     })
 
-    // A box that was down for days would otherwise announce every run it ever interrupted, one
-    // notification and one email per conversation.
     it('repairs an old run without announcing it', async () => {
         const session = await createSession(id, 'ancient')
         const run = await startRun(id, session.id)
@@ -87,7 +83,6 @@ describe('reconcileInterruptedRuns', () => {
         expect(sent).toHaveLength(0)
     })
 
-    // The foreman is not in the agent index, so it has to be named for its runs to be repaired.
     it('fails the runs a restart caught on the foreman too', async () => {
         await ensureForeman()
         const session = await createSession(FOREMAN_AGENT_ID, 'foreman')
@@ -104,8 +99,6 @@ describe('reconcileInterruptedRuns', () => {
         expect(sent).toHaveLength(0)
     })
 
-    // The skill writing job lives in memory only, so a restart mid-write would leave its row on
-    // `accepted` for good, with the chat spinning on it.
     it('fails the skill proposal a restart caught being written, and leaves the others alone', async () => {
         const session = await createSession(id, 'writing')
         const base = { sessionId: session.id, runId: null, mode: 'create' as const, slug: null, title: 'Weekly report', summary: 'How it goes out', instruction: 'Send it Monday.' }

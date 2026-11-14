@@ -1,12 +1,7 @@
-// Deliberately no 'server-only' import, for the same reason as lib/email/client.ts: a Trigger.dev
-// task that pulls this in is bundled outside the Next.js RSC pipeline.
-
 import { DEFAULT_WHATSAPP_FROM } from '@rerun/cloud/senders'
 import { birdConfig } from '@/lib/bird/config'
 import type { WhatsAppComponent, WhatsAppLanguage } from './templates'
 
-// A template authored in our workspace has to name its sender, and that sender has to sit on the
-// same WhatsApp Business Account as the template.
 function whatsappSender(): string | null {
     return process.env.BIRD_WHATSAPP_FROM || DEFAULT_WHATSAPP_FROM
 }
@@ -27,10 +22,6 @@ export type SendWhatsAppInput = {
 
 type BirdBody = { id?: string; error?: { code?: string; type?: string; message?: string; request_id?: string } }
 
-// Staging runs on a clone of the production database, so every number is a real user's.
-// WHATSAPP_REDIRECT_TO sends the whole delivery to one phone. Without it nothing leaves anywhere
-// the recipients are not ours to write to: a local stack, and a staging that only set
-// EMAIL_REDIRECT_TO, which is what marks it as a clone.
 export function whatsappDestination(to: string): string | null {
     const redirect = process.env.WHATSAPP_REDIRECT_TO
     if (redirect) return redirect
@@ -58,8 +49,6 @@ export async function sendWhatsAppTemplate(input: SendWhatsAppInput): Promise<Se
     try {
         const response = await fetch(`${config.baseUrl}/whatsapp/messages`, {
             method: 'POST',
-            // Bird replays the first answer for a key it has already seen, so a retry after a lost
-            // response never sends, nor charges, a second message.
             headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json', 'Idempotency-Key': input.idempotencyKey },
             body: JSON.stringify({
                 to,

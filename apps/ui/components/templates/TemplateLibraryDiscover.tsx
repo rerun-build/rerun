@@ -16,8 +16,6 @@ import { cn } from '@/lib/utils'
 const PICKS = 4
 const NEWEST = 4
 const CREATORS_SHOWN = 5
-// As many cards as the row has columns, so the row never ends on a gap: four on two lines, then
-// three, four and five on one as the column widens.
 const CREATOR_CARD_VISIBILITY = ['', '', '', '@min-[40rem]:hidden @min-[52rem]:flex', 'hidden @min-[60rem]:flex']
 
 export function TemplateLibraryDiscover({
@@ -50,7 +48,6 @@ export function TemplateLibraryDiscover({
         const featured = templates.filter(t => t.featured)
         return (featured.length > 0 ? featured : templates).slice(0, PICKS)
     }, [templates, signals, personal])
-    // Whatever the picks above already show is left out, so the two grids never repeat a card.
     const newest = useMemo(() => newestFirst(templates.filter(t => !picks.includes(t))).slice(0, NEWEST), [templates, picks])
 
     const grid = (items: LibraryTemplate[], key: string) => (
@@ -94,7 +91,6 @@ export function TemplateLibraryDiscover({
     )
 }
 
-// Mirrors the page above: the spotlight band, then one section of tiles.
 export function TemplateLibraryDiscoverSkeleton() {
     return (
         <div className="flex flex-col gap-8">

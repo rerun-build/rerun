@@ -11,7 +11,6 @@ function soonestRoutine(schedules: AgentSchedule[], now: number): TeamPulse['nex
     for (const schedule of schedules) {
         const next = nextRunAt(schedule, at)
         const due = next ? new Date(next).getTime() : null
-        // A one-shot keeps its date until the engine marks it fired, a tick after it is due.
         if (due == null || due <= now) continue
         if (!soonest || due < soonest.at) soonest = { name: schedule.name, at: due }
     }

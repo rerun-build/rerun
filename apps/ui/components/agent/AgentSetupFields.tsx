@@ -11,9 +11,6 @@ import { useTranslations } from 'next-intl'
 
 export type AgentSetupDraft = { required: boolean | null; prompt: string }
 
-// The same two fields are answered in two places: on the agent itself, and again in the capture
-// review right before the archive is built. One component so the wording, and what "yes" implies,
-// cannot drift between them.
 export function AgentSetupFields({ value, onChange, disabled }: { value: AgentSetupDraft; onChange: (next: AgentSetupDraft) => void; disabled?: boolean }) {
     const t = useTranslations('agent.agentSetupFields')
     const choices = [
@@ -37,8 +34,6 @@ export function AgentSetupFields({ value, onChange, disabled }: { value: AgentSe
                 <Segmented
                     options={choices}
                     value={value.required === null ? '' : value.required ? 'yes' : 'no'}
-                    // Saying yes in front of an empty field means starting from the default rather
-                    // than from a blank page. An answer already written is never overwritten.
                     onChange={next => {
                         const required = next === 'yes'
                         onChange({ required, prompt: required && !prompt ? DEFAULT_INSTALL_PROMPT : value.prompt })

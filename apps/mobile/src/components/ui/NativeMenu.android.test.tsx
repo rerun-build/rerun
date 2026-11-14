@@ -3,8 +3,6 @@ import { BackHandler, Keyboard, Platform, Text, View } from 'react-native'
 
 import { LongPressMenu, MenuItem, MenuSection, MenuToggle, NativeMenu, SubMenu } from '@/components/ui/NativeMenu'
 
-// Compose views need the native ExpoUI module: each is drawn here as the plain view it stands for, the
-// menu's rows shown only while the menu is expanded.
 jest.mock('@expo/ui/jetpack-compose', () => {
     const { createContext, use } = jest.requireActual('react')
     const { Pressable, Text: RNText, View } = jest.requireActual('react-native')

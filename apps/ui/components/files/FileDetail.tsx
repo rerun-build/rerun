@@ -23,11 +23,8 @@ type FileDetailProps = {
     onBack: () => void
     onDownload: () => void
     onDelete: () => void
-    // Editing: omitted where files are read-only, which drops the Edit button entirely.
     writeFile?: (path: string, content: string, baseHash: string | null) => Promise<SaveFileResult>
     onSaved?: (path: string) => void
-    // Publishing (agent files only): the public URL when the file is published, and the handlers.
-    // Omitted for space/shared files, which cannot be published.
     publicUrl?: string
     onPublish?: () => void
     onUnpublish?: () => void
@@ -39,7 +36,6 @@ export function FileDetail({ name, path, rawUrl, readFile, siblings, onBack, onD
     const locale = useLocale()
     const t = useTranslations('files.detail')
     const { content, truncated, loading, error, replaceContent } = useFileContent({ path, name, read: readFile })
-    // Keyed on the path rather than a boolean, so opening another file leaves the editor by itself.
     const [editingPath, setEditingPath] = useState<string | null>(null)
     const previewRef = useRef<HTMLDivElement>(null)
 
@@ -119,8 +115,6 @@ function isTypingTarget(target: EventTarget | null) {
     return target instanceof HTMLElement && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable)
 }
 
-// The workspace files live inside the Knowledge base dialog, so being in a dialog is fine; being in
-// one stacked on top of the viewer (editor, delete confirm, context menu) is not.
 function isInsideForeignOverlay(active: Element | null, viewer: HTMLElement) {
     const overlay = active?.closest('[role="dialog"], [role="alertdialog"], [role="menu"]')
     return Boolean(overlay && !overlay.contains(viewer))

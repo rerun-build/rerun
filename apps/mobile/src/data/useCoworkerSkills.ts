@@ -6,8 +6,6 @@ import { useAuth } from '@/auth/AuthProvider'
 
 const known = new Map<string, SkillSummary[]>()
 
-// The skills a coworker offers the composer's `/` menu. The last list read opens the next
-// conversation while a fresh one lands; a hub that cannot answer leaves the menu empty.
 export function useCoworkerSkills(agentId: string | null): SkillSummary[] {
     const { session, me } = useAuth()
     const accessToken = session?.access_token

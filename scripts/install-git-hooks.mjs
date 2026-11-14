@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-// Points git at scripts/git-hooks, whose pre-push keeps vulnerability fixes off the public repository.
-// The setting is shared by every worktree of the checkout. Nothing to do outside a git checkout (a
-// Docker stage), nor when the checkout already runs hooks of its own: they are left as they are.
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync } from 'node:fs'

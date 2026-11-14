@@ -6,8 +6,6 @@ import { useTranslations } from 'next-intl'
 
 import { OfferBoard } from './OfferBoard'
 
-// The board of a workspace already running on the two plans: every coworker is cabled to a Claude
-// or a ChatGPT tile, and the cable lights up when it works.
 export function OfferBoardPanel({ className, alive = true }: { className?: string; alive?: boolean }) {
     const t = useTranslations('dialogs.subscriptionOffer')
     return (

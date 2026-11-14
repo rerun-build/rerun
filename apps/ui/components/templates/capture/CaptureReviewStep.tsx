@@ -5,9 +5,6 @@ import type { AgentSetupDraft } from '@/components/agent/AgentSetupFields'
 import type { AgentCapturePlan } from '@/lib/templates/capture'
 import { CaptureAgentReviewSection } from './CaptureAgentReviewSection'
 
-// The archive is a copy of the whole agent folder, so this screen is where the reviewer sees what
-// the engine already rewrote on the way out and decides what else should not travel. Each agent
-// gets its own section and its own sign-off: one blanket "looks fine" would cover none of them.
 export function CaptureReviewStep({
     plans,
     excluded,

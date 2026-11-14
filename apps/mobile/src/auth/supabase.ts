@@ -10,8 +10,6 @@ export const supabase = createClient<Database>(environment.supabaseUrl, environm
     auth: { storage: secureStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: false, flowType: AUTH_FLOW_TYPE },
 })
 
-// The refresh timer does not run while iOS holds the app in the background, so a token can expire
-// there: the refresh restarts, and catches up, as soon as the app is in front again.
 AppState.addEventListener('change', state => {
     if (state === 'active') supabase.auth.startAutoRefresh()
     else supabase.auth.stopAutoRefresh()

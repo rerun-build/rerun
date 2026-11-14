@@ -8,7 +8,6 @@ import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
 import type { Coworker, RunPhase } from '@/mocks/data'
 import { spacing } from '@/theme/tokens'
 
-// Under the last message while a coworker runs: its buddy at work and the phase.
 export function RunStatus({ coworker, phase }: { coworker: Pick<Coworker, 'id' | 'kind' | 'name'>; phase: RunPhase }) {
     const t = useTranslations('mobileChat.runPhase')
     const pulse = useSharedValue(0.4)

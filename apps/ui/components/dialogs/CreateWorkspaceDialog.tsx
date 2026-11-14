@@ -37,8 +37,6 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
     const errorText = useErrorText()
     const { index: step, direction, goForward, back, reset: resetStepper } = useStepper(STEPS.length)
     const current = STEPS[step]
-    // Already the active workspace server-side: the dialog is only still open to report the
-    // invitations that failed, and closing it can only lead into the new workspace.
     const [created, setCreated] = useState(false)
 
     const schema = useMemo(() => z.object({ name: z.string().trim().min(1, t('nameRequired')), iconFile: z.string(), members: z.array(z.string()), memberDraft: z.string() }), [t])
@@ -92,8 +90,6 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
         }
         setCreated(true)
 
-        // Sent before leaving, because they target the active workspace, and reported here, because
-        // a toast would not survive the reload.
         if (members.length > 0) {
             const outcomes = await Promise.all(members.map(email => inviteToWorkspaceAction(email)))
             const failed = outcomes.filter(o => !o.ok).length

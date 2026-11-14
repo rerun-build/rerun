@@ -1,8 +1,4 @@
-"""Whether a sign-in renewal is due, read from list_ai_connections."""
-
-
 def left(answer):
-    """minutesLeft of the default connection's signIn, else None."""
     if not isinstance(answer, dict):
         return None
     connections = answer.get("connections")
@@ -22,6 +18,5 @@ def left(answer):
 
 
 def due(answer, limit):
-    """True when the time left is known and at most limit minutes."""
     m = left(answer)
     return m is not None and m <= limit

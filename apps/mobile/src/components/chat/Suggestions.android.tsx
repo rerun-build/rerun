@@ -7,7 +7,6 @@ import { radius, spacing, withAlpha } from '@/theme/tokens'
 
 const HEIGHT = 36
 
-// The iOS glass chips' Android twin: the same pills on an opaque surface, a ripple on press.
 export function Suggestions({ items, onPick }: { items: string[]; onPick: (text: string) => void }) {
     const theme = useTheme()
     return (

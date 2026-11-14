@@ -10,7 +10,6 @@ import { brandIconFilter } from '@rerun/ui/brand-icon'
 
 type ServiceAlternativesProps = {
     alternatives: ServiceAlternative[]
-    // The alternative whose details are loading, which also freezes the others.
     swapping: string | null
     disabled?: boolean
     error?: string | null

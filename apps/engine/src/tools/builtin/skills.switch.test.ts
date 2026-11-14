@@ -6,8 +6,6 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-skills-c2-'))
 process.env.RERUN_API_KEY = ''
 
-// `tool` is the identity in the AI SDK: recording what it is given exposes every input schema the
-// catalog builds, without a second list of tools to keep in step.
 const built = vi.hoisted(() => [] as { inputSchema?: unknown }[])
 vi.mock('ai', async importOriginal => {
     const original = await importOriginal<typeof import('ai')>()

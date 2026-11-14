@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CardTagSplitter, createCardTagGuard, cutsCardTag } from './card-tag-stream.js'
 
-// The end of the SEO optimizer message of 28 October: the questions asked in prose, then the card
-// written as an empty tag instead of the call.
 const MESSAGE = "Le classement nominatif reste possible si tu le veux, mais c'est ta décision de fondateur, pas la mienne.\n\nDeux précisions avant de lancer la chaîne : ChatSEO n'est pas connecté."
 const EMPTY_TAG = '<ask_user>\n</ask_user>'
 

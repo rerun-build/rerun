@@ -37,7 +37,6 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelMcp')
     const [servers, setServers] = useState<EngineMcpServer[]>([])
-    // The connector store already joins every server name to the app or custom entry that owns it.
     const { map: connectors, loaded: connectorsLoaded } = useConnectorServices(agentId)
     const [loading, setLoading] = useState(true)
     const [unreachable, setUnreachable] = useState(false)
@@ -61,8 +60,6 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
         load()
     }, [load])
 
-    // Mutate by delta: the engine merges by name under a per-agent lock, so a stale local
-    // list can never clobber servers added elsewhere (other tabs, installs, the agent itself).
     const mutate = useCallback(async (body: { upsert?: EngineMcpServer[]; remove?: string[] }): Promise<{ success: boolean } & Refusal> => {
         const result = await patchAgentMcpServersAction(agentId, body)
         if (result.success && result.detail) {

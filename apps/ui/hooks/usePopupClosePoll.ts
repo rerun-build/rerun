@@ -2,10 +2,6 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
-// Watches an OAuth popup and fires onClosed when the user dismisses it, so the caller can
-// leave its "waiting for authorization" state. Owns the interval's lifecycle: cleared on
-// re-watch, on unmount, and a blocked popup (window.open returned null) reports closed
-// immediately instead of polling forever.
 export function usePopupClosePoll(onClosed: () => void): (popup: Window | null) => void {
     const onClosedRef = useRef(onClosed)
     onClosedRef.current = onClosed

@@ -9,8 +9,6 @@ import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 
-// Fetch côté serveur des spaces : le premier paint affiche déjà le bon contenu (spaces réels OU
-// bloc placeholder), sans flash le temps de l'hydratation client.
 export default async function Home() {
     let initialSpaces: SpacePublic[] = []
     let initialWorkspaceId: number | null = null
@@ -23,15 +21,9 @@ export default async function Home() {
     if (user) {
         const { data: userRow } = await selectMaybeSingle(supabase, 'users', ['workspace_id', 'account_role'] as const, { id: user.id })
 
-        // Un creator accepté qui n'a pas encore signé les conditions du programme n'entre pas :
-        // la vérification passe AVANT resolveCreatorLandingWorkspace, qui lui provisionnerait
-        // sinon un sandbox qu'il n'a pas le droit d'ouvrir.
         if (userRow?.account_role === 'expert' && (await hasPendingCreatorTerms(user.id))) redirect('/creator/join')
 
         if (userRow?.workspace_id) {
-            // Un creator qui arrive pour la première fois est basculé sur son sandbox AVANT le rendu.
-            // L'onglet suit son propre pin plutôt que `users.workspace_id` : la page atterrit en
-            // nommant le sandbox dans l'URL, que la session lit avant le pin.
             const workspaceId = await resolveCreatorLandingWorkspace(user.id, userRow.workspace_id, userRow.account_role === 'expert')
             if (workspaceId !== userRow.workspace_id) redirect(`/?${WORKSPACE_PARAM}=${workspaceId}`)
             initialWorkspaceId = workspaceId

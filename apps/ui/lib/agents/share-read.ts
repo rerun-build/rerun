@@ -6,11 +6,7 @@ import { removePrivateFiles } from '@/lib/storage/private'
 import { selectAll, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AGENT_SHARE_BUCKET, AGENT_SHARE_TOKEN_LENGTH, shareUrl } from './share-create'
 
-// The card is read straight off the frozen `preview` jsonb, never off the source agent's row: a
-// rename or a delete on the sender's side must not rewrite what was already sent.
 export async function readAgentShare(supabase: SupabaseClient<Database>, token: string): Promise<AgentSharePreview | null> {
-    // Checked before the query so an enumeration attempt costs nothing, and so a malformed token
-    // and a revoked one are indistinguishable from outside.
     if (!isOpaqueToken(token, AGENT_SHARE_TOKEN_LENGTH)) return null
 
     const { data: share } = await selectMaybeSingle(supabase, 'agent_shares', ['preview', 'revoked_at'] as const, { token })
@@ -23,8 +19,6 @@ export async function readAgentShare(supabase: SupabaseClient<Database>, token: 
 export type WorkspaceShare = {
     id: string
     url: string
-    // The agent the link was made from, null once it has been deleted. The name beside it is the
-    // one frozen at share time, so a rename since then does not rewrite what was sent.
     sourceAgentId: string | null
     agentName: string
     createdAt: string
@@ -49,9 +43,6 @@ export async function listWorkspaceShares(supabase: SupabaseClient<Database>, wo
     )
 }
 
-// Revoking has to remove the object too. A row flagged revoked while the tarball stays reachable
-// to the service role is a flag, not a revocation, and the whole point of freezing a snapshot is
-// that deleting it is the one way to take it back.
 export async function revokeAgentShare(supabase: SupabaseClient<Database>, shareId: string, workspaceId: number): Promise<void> {
     const { data: share } = await selectMaybeSingle(supabase, 'agent_shares', ['archive_path', 'workspace_id'] as const, { id: shareId })
     if (!share || share.workspace_id !== workspaceId) throw new Error('Share link not found')

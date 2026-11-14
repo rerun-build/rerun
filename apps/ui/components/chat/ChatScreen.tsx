@@ -20,21 +20,17 @@ import { useDesktopStore } from '@/stores/desktop.store'
 
 type ChatScreenProps = {
     agentId: string
-    // Whether this conversation is the one on screen: a hidden one keeps its takeover but no connection.
     active: boolean
     site: string | null
     takeoverAsk: TakeoverAskInput | null
     onTakeoverDone: (summary: string) => void
     onTakeoverSkip: () => void
     scroller: HTMLElement | null
-    // The chat's own box, where the thumbnail floats when the thread scrolls away from the screen.
     floatingHost: HTMLElement | null
     arriveRef?: RefObject<HTMLDivElement | null>
-    // What the thread shows instead when there is no screen to show: the run's activity loader.
     fallback: ReactNode
 }
 
-// The coworker's screen as the last block of the run that uses it, with the takeover it asks for.
 export function ChatScreen({ agentId, active, takeoverAsk, onTakeoverDone, onTakeoverSkip, ...block }: ChatScreenProps) {
     const takeover = useTakeoverRequest(agentId, takeoverAsk, onTakeoverDone, onTakeoverSkip)
     const selected = useBoardStore(s => s.selectedAgentId === agentId)

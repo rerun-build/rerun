@@ -1,7 +1,3 @@
-// The window chrome in the real window: the strip the web draws, the insets under it, a dialog over
-// it, native full screen. With `--native` each step also captures the window as macOS draws it.
-//   pnpm verify:desktop --native --scenario apps/desktop-app/e2e/title-bar.mjs
-
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
@@ -58,7 +54,6 @@ export default async function titleBarScenario({ app, page, step, base, shell })
         }
     }
 
-    // A dialog over the strip: centered in the space under it, the strip still a drag region.
     await shell.resize(1280, 800)
     await page.goto(base)
     await page.waitForSelector('[data-foreman-split]')
@@ -69,7 +64,6 @@ export default async function titleBarScenario({ app, page, step, base, shell })
     await page.getByRole('button', { name: /help/i }).first().click().catch(() => {})
     await page.keyboard.press('Escape')
 
-    // Native full screen hides the traffic lights: the strip folds away and comes back.
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].setFullScreen(true))
     const full = await waitUntil(() => measure(page), (box) => box.fullscreen && box.strip?.height === 0, 'the strip folds in full screen')
     check(Math.round(full.frame.top) === 0, 'the board takes the whole screen')

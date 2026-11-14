@@ -6,9 +6,6 @@ import { knownCoworkerAccess, UNKNOWN_ACCESS, type CoworkerAccess } from '@/auth
 import { useAuth } from '@/auth/AuthProvider'
 import { cachedBoard, loadCoworkerDetail, readCoworkerDetails, readCoworkerScreen } from '@/data/local-cache'
 
-// The caller's level on a coworker, for a screen opened with only its id (the chat's model sheet, a
-// card opening its apps). The copy the phone kept answers first, the hub is always asked and its
-// answer wins: a Box handed over or taken back since the last visit shows on the next open.
 export function useCoworkerAccess(agentId: string): CoworkerAccess {
     const { session, me } = useAuth()
     const accessToken = session?.access_token

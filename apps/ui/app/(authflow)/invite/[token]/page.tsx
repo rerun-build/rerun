@@ -41,6 +41,5 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     const result = await acceptInvitationAction(token)
     if (!result.ok) return <Shell title={t('joinFailed')} message={result.code ? tErrors(result.code, result.params as never) : result.error} />
 
-    // Named in the URL so a tab already pinned on another workspace lands on the joined one.
     redirect(`${routes.home}?${WORKSPACE_PARAM}=${result.workspaceId}`)
 }

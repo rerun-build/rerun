@@ -22,13 +22,10 @@ import { publicHttpUrl } from '../url.js'
 const ACTIONS = ['screenshot', 'left_click', 'right_click', 'double_click', 'mouse_move', 'left_click_drag', 'scroll', 'type', 'key', 'wait'] as const
 type Action = (typeof ACTIONS)[number]
 
-// Long enough for a click to repaint what it changed, so the picture sent back shows the result.
 const SETTLE_MS = 600
 const APP_OPEN_SETTLE_MS = 2_000
 const DEFAULT_SCROLL_AMOUNT = 3
 const DEFAULT_WAIT_SECONDS = 1
-// Nothing else ends a model that keeps clicking: the loop only stops on its own final answer. A CLI
-// keeps every picture of the run in its context, where the engine cannot drop the old ones.
 const MAX_ACTIONS_PER_RUN = 200
 const MAX_ACTIONS_PER_CLI_RUN = 60
 const VIEW_IMAGE_NOTE = 'Open screenshotPath with view_image to see your screen before the next action.'
@@ -52,22 +49,16 @@ type Done = { status: 'done'; screen: [number, number] } & ({ screenshotId: stri
 
 const refused = (reason: string): Refused => ({ status: 'refused', reason })
 
-// Nobody watches a delegate, and the foreman has no screen to show.
 export function offersComputer(config: AgentConfig): boolean {
     return config.tools.computer && !config.ephemeral && config.kind !== 'foreman' && computerAvailable()
 }
 
-// Decided on the model the run uses, not on the agent's setting: driving a screen means reading its
-// screenshots, and an OpenCode model without vision never gets them.
 export function runOffersComputer(config: AgentConfig, provider: Provider, model: string, connection?: LoadedConnection | null): boolean {
     return offersComputer(config) && modelSeesImages(provider, model, connection)
 }
 
-// One screen per agent and runs of one agent can overlap (a chat, a schedule, a call from another
-// coworker): the first to touch the screen keeps it until it ends, and the others wait their turn.
 const screenOwners = new Map<string, RunContext>()
 const screenWaiters = new Map<string, Set<() => void>>()
-// Covers a whole scheduled run (one to three minutes), well inside the CLIs' one-hour tool timeout.
 const SCREEN_WAIT_MS = 5 * 60_000
 const SCREEN_TAKEN = 'Another run of this coworker is using the screen right now. Carry on without it, or tell the user to retry once that run is over.'
 
@@ -76,7 +67,6 @@ function freeScreen(agentId: string): void {
     for (const wake of screenWaiters.get(agentId) ?? []) wake()
 }
 
-// True when the screen was released, false when the wait ran out first.
 async function waitForScreen(agentId: string, remainingMs: number, signal: AbortSignal | undefined): Promise<boolean> {
     const released = new AbortController()
     const wake = () => released.abort()
@@ -98,9 +88,7 @@ async function waitForScreen(agentId: string, remainingMs: number, signal: Abort
 export const agentsOnScreen = (): string[] => [...screenOwners.keys()]
 
 const HUMAN_DRIVING = 'The user is driving your screen right now, so your hands are off it. Wait for them: say what you were about to do and end your turn, or carry on with work that needs no screen.'
-// Short enough that a person who takes the screen mid-sentence is not typed over for long.
 const TYPE_CHUNK = 40
-// A person who clicks once in the screen pauses the agent; only one who stays on it sends it away.
 const HANDS_OFF_WAIT_MS = 30_000
 const HANDS_OFF_POLL_MS = 500
 
@@ -162,8 +150,6 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
     const maxActions = CLI_PROVIDERS.has(ctx.provider) ? MAX_ACTIONS_PER_CLI_RUN : MAX_ACTIONS_PER_RUN
     let actions = 0
 
-    // Codex's bridge carries text only, and Codex reads a picture from a file with a tool of its
-    // own. Every other provider gets the picture attached by the run, under the id returned here.
     const keep = async (screenshot: Screenshot): Promise<{ screenshotId: string } | { screenshotPath: string; next: string }> => {
         if (ctx.provider !== 'codex') {
             ctx.screenshots ??= createScreenshotStore()
@@ -178,8 +164,6 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
     }
     const dropScreens = () => void rm(resolve(tmpdir(), 'rerun-desktop', 'screens', id), { recursive: true, force: true }).catch(() => {})
 
-    // The check and the claim run with no await between them, so two runs woken by the same release
-    // cannot both take the screen.
     const takeScreen = async (signal: AbortSignal | undefined): Promise<boolean> => {
         const deadline = Date.now() + SCREEN_WAIT_MS
         for (;;) {
@@ -187,7 +171,6 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
             if (owner === ctx) return true
             if (!owner) {
                 screenOwners.set(id, ctx)
-                // A browser already on the screen (handed back after a sign-in) is what the run looks at.
                 releases.push(holdDesktop(id), holdOpenBrowser(id), () => {
                     if (screenOwners.get(id) === ctx) freeScreen(id)
                 })

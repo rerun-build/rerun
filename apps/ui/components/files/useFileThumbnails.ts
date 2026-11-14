@@ -13,8 +13,6 @@ type Options = {
     resetKey: string
 }
 
-// Thumbnails are fetched one small request at a time, only for tiles the user can actually see,
-// and thrown away when the directory changes.
 export function useFileThumbnails({ read, resetKey }: Options) {
     const [cache, setCache] = useState<Cache>({ key: resetKey, heads: NO_HEADS })
     const queue = useRef<Queue>({ key: resetKey, paths: [], inFlight: 0, requested: new Set() })

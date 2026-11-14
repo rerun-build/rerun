@@ -1,20 +1,14 @@
-"""Roster: coworkers, areas, required reviewers and builders, read from roster.json.
-
-Pure functions, no network. `load(text)` validates and returns a roster; the other
-functions take that roster as first argument.
-"""
 import json
 import re
 
 CLASSES = ("rule", "plan", "build", "advise", "gate", "watch")
 LEVELS = ("writer", "reviewer", "issues", "none")
-EXEMPT = ("tests", "docs")   # these areas stand in for the file; only sensitive areas still apply
-STACK = "stack"              # builder value: "next matching area"
+EXEMPT = ("tests", "docs")
+STACK = "stack"
 GATE_SENSITIVE = "BRUCE"
 
 
 def glob_re(glob):
-    """Glob to regex, case-insensitive, whole path. `**/` = 0+ dirs, `**` = anything, `*` = no '/', `?` = one char."""
     out, i = [], 0
     while i < len(glob):
         if glob.startswith("**/", i):
@@ -99,7 +93,6 @@ def _matches(roster, path):
 
 
 def _touched(roster, path):
-    """Areas a file touches. tests/docs files match only those, plus any sensitive area (never dropped)."""
     hit = _matches(roster, path)
     if any(a["name"] in EXEMPT for a in hit):
         return [a for a in hit if a["name"] in EXEMPT or a["sensitive"]]
@@ -107,7 +100,6 @@ def _touched(roster, path):
 
 
 def areas(roster, files):
-    """{area name: [files]} in table order (default last)."""
     got = {}
     for f in files:
         for a in _touched(roster, f):
@@ -117,7 +109,6 @@ def areas(roster, files):
 
 
 def required(roster, files, builder=None):
-    """UPPERCASE reviewer names: owner of each touched area (the chunk builder is replaced by the default owner), plus BRUCE on a sensitive area."""
     by_name = {a["name"]: a for a in roster["areas"] + [roster["default"]]}
     need, builder = set(), (builder or "").lower()
     for name in areas(roster, files):
@@ -132,7 +123,6 @@ def required(roster, files, builder=None):
 
 
 def builder(roster, paths):
-    """Lowercase handle of the coworker who builds a chunk with these paths; raises when paths need two builders."""
     paths = list(paths)
     if not paths:
         return roster["default"]["builder"]
@@ -150,11 +140,10 @@ def builder(roster, paths):
     return next(iter(picked))
 
 
-NO_CLAIM = ("tests", "docs", "default")   # these areas never claim
+NO_CLAIM = ("tests", "docs", "default")
 
 
 def glob_areas(roster, pattern):
-    """Claiming areas a chunk path glob may touch (approximate: a sample path, or an area glob under the pattern's literal prefix)."""
     sample, lit = re.sub(r"\*+", "x", pattern), re.split(r"[*?]", pattern)[0]
     got = set()
     for a in roster["areas"]:
@@ -164,7 +153,6 @@ def glob_areas(roster, pattern):
 
 
 def overlaps(roster, files, others):
-    """{area: [refs]} for the claiming areas `files` share with `others` = [{"ref": "#77", "files": [...]} or {"ref": "#12", "globs": [...]}]."""
     mine = {n for n in areas(roster, files) if n not in NO_CLAIM}
     out = {}
     for o in others:
@@ -177,15 +165,12 @@ def overlaps(roster, files, others):
 
 
 def owner(roster, area, builder=None):
-    """UPPERCASE owner of an area; the chunk builder is replaced by the default owner."""
     a = {x["name"]: x for x in roster["areas"] + [roster["default"]]}[area]
     who = a["owner"]
     return (roster["default"]["owner"] if who == (builder or "").lower() else who).upper()
 
 
 def claims_check(conflicts, verdicts):
-    """conflicts = [(area, ref, OWNER)]; verdicts = {NAME: (word, url, note)} at the head.
-    Returns (ok, lines). A claim clears only when the owner's ACCEPT note holds `ref` (e.g. #77) as a whole token."""
     lines, ok = [], True
     for area, ref, who in sorted(conflicts):
         v = verdicts.get(who)

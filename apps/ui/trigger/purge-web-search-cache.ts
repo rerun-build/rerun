@@ -4,8 +4,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 
 const purgeQueue = queue({ name: 'purge-web-search-cache', concurrencyLimit: 1 })
 
-// A stale entry is never served and gets overwritten when its query comes back, so this only keeps
-// the queries asked once from piling up.
 export async function purgeWebSearchCache(): Promise<{ purged: number }> {
     const cutoff = new Date(Date.now() - SEARCH_CACHE_TTL_MS).toISOString()
     const { count, error } = await createServiceRoleClient().from('web_search_cache').delete({ count: 'exact' }).lt('fetched_at', cutoff)
@@ -21,7 +19,6 @@ export const purgeWebSearchCacheDaily = schedules.task({
     cron: { pattern: '40 3 * * *', timezone: 'Europe/Paris' },
     queue: purgeQueue,
     maxDuration: 300,
-    // Tomorrow's run is the retry.
     retry: { maxAttempts: 1 },
     run: async () => purgeWebSearchCache(),
 })

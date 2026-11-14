@@ -43,11 +43,9 @@ function rememberPlace(side: ScreenSide, width: number) {
     } catch {}
 }
 
-// Opacity and scale only: the thumbnail holds no glass, which goes blank under a fade.
 const ENTER = new Keyframe({ 0: { opacity: 0, transform: [{ scale: 0.9 }] }, 100: { opacity: 1, transform: [{ scale: 1 }] } }).duration(280)
 const EXIT = new Keyframe({ 0: { opacity: 1, transform: [{ scale: 1 }] }, 100: { opacity: 0, transform: [{ scale: 0.9 }] } }).duration(220)
 
-// The latest copy of the screen the thread's block is showing, without a socket of its own.
 export function ScreenMirror({ frames }: { frames: ScreenFrames }) {
     const frame = useSyncExternalStore(frames.subscribe, frames.current)
     if (!frame) return <ScreenFace status="loading" />
@@ -55,16 +53,12 @@ export function ScreenMirror({ frames }: { frames: ScreenFrames }) {
 }
 
 type FloatingScreenProps = {
-    // Where the edge it slides along sits, under the chat's header.
     top: number
     label: string
     onTakeControl: () => void
     children: ReactNode
 }
 
-// The web's `FloatingScreen`: the screen the thread scrolled away from, kept at the top of the chat. It
-// slides along that edge only: let go, it lands on the nearer side and stays there. Its inner bottom
-// corner resizes it, a handle always drawn since a phone has no hover. A tap takes control.
 export function FloatingScreen({ top, label, onTakeControl, children }: FloatingScreenProps) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.screen')

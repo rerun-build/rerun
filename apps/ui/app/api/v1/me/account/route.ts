@@ -5,10 +5,8 @@ import { ACCOUNT_DELETION_REAUTH_MS, deleteAccountRequestSchema, REAUTH_REQUIRED
 
 export const dynamic = 'force-dynamic'
 
-// What stands in the way of deleting the account: a workspace only this user holds, still billed.
 export const GET = apiRoute({ auth: 'user' }, async ({ ctx }) => ({ blockers: await accountDeletionBlockers(createServiceRoleClient(), ctx.user.id) }))
 
-// Irreversible, so a token alone is not enough: the person signed in minutes ago, or signs in again.
 export const DELETE = apiRoute({ auth: 'user', body: deleteAccountRequestSchema }, async ({ ctx }) => {
     const signedInAt = ctx.user.last_sign_in_at ? Date.parse(ctx.user.last_sign_in_at) : 0
     if (signedInAt < Date.now() - ACCOUNT_DELETION_REAUTH_MS) return Response.json({ error: 'Sign in again to delete your account.', reason: REAUTH_REQUIRED }, { status: 403 })

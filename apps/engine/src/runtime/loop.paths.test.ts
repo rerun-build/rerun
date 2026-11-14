@@ -9,8 +9,6 @@ process.env.RERUN_LOG_LEVEL = 'fatal'
 
 const { sent, stream, prep, curator, recalls } = vi.hoisted(() => ({
     sent: [] as Array<Record<string, unknown>>,
-    // `turns` plays one entry per step and `parts` is what every step past the queue gets; `calls`
-    // keeps what each step asked of the model.
     stream: { parts: [] as unknown[], turns: [] as unknown[][], calls: [] as Array<Record<string, unknown>>, beforeStream: null as (() => void) | null },
     prep: { toolsError: null as Error | null, modelError: null as Error | null, toolsGate: null as Promise<void> | null, closeError: null as Error | null, callTargets: [] as string[] },
     curator: { calls: [] as unknown[][] },
@@ -131,7 +129,6 @@ function textTurn(text: string, providerMetadata?: Record<string, unknown>): unk
     ]
 }
 
-// A card normally comes with the message that explains it; pass an empty `text` for one that went out bare.
 function toolTurn(toolName: string, input: Record<string, unknown>, text = 'Here is what I found so far.', toolCallId = 'call-1'): unknown[] {
     return [
         { type: 'stream-start', warnings: [] },
@@ -153,7 +150,6 @@ async function run(message: string, opts: { agentId?: string; override?: Record<
     const agent = await getAgent(agentId)
     const started = await runAgent(agent, session.id, message, opts.override as never, undefined, undefined, opts.trigger as never)
     const outcome = await started.settled
-    // The terminal event and the curator run after `settled` resolves.
     await new Promise(r => setTimeout(r, 10))
     return { started, sessionId: session.id, outcome, agentId }
 }
@@ -245,8 +241,6 @@ describe('run loop paths', () => {
         expect(await listRunSteps(id, started.runId)).toHaveLength(1)
     })
 
-    // The provider caches the prompt by its prefix: the next turn replays the row, so the row holds
-    // the turn as it was sent, the context the engine appended included.
     it('stores the user turn exactly as it was sent, its context part marked', async () => {
         stream.parts = textTurn('Noted.')
 
@@ -274,7 +268,6 @@ describe('run loop paths', () => {
         expect(stored[1].text).toMatch(/^<user>\nYassine: the person you are talking to/)
     })
 
-    // The recall waits on the hub's embedding, so it runs alongside the preparation, not after it.
     it('starts the memory recall before the tools are even built', async () => {
         let release!: () => void
         prep.toolsGate = new Promise(r => (release = r))
@@ -328,8 +321,6 @@ describe('run loop paths', () => {
         expect((await getRun(id, started.runId))?.costMicros).toBe(12346)
     })
 
-    // OpenCode reports what a step was worth to the user: nothing on the Go plan, the list price on
-    // Console. Both are real costs, so a Go run stores 0 rather than null.
     it('stores the OpenCode cost, a Go call at zero', async () => {
         stream.parts = textTurn('paid', { opencode: { billingSource: 'balance', cost: 0.00042 } })
         const { started } = await run('console?')
@@ -428,8 +419,6 @@ describe('run loop paths', () => {
         })
     })
 
-    // The replies close the message as a block of its text; the engine cuts it out on its way and
-    // keeps them beside the row the chat reads them from.
     describe('the quick replies block', () => {
         const BLOCK = '<quick_replies>\nFind 100 more\nExport them as CSV\n</quick_replies>'
         const answerOf = async (sessionId: string, agentId = id) => (await listMessages(agentId, sessionId)).filter(m => m.role === 'assistant').at(-1)
@@ -461,8 +450,6 @@ describe('run loop paths', () => {
         })
     })
 
-    // A model that learned the replies block writes a card the same way, as a tag in its text with
-    // no call behind it: the tag goes before the chat, the row and the history see it.
     describe('a card written as a tag', () => {
         it('stores the message without the tag, waits on nobody, and completes', async () => {
             stream.parts = textTurn('Which angle do you want?\n\n<ask_user>\n</ask_user>')

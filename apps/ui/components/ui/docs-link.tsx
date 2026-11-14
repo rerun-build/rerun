@@ -1,7 +1,6 @@
 import { ExternalLinkIcon } from '@/lib/icons'
 import { docsUrl } from '@/lib/site'
 
-// `normal-case` because this sits next to the uppercase section titles of the dialogs.
 export function DocsLink({ path, children }: { path?: string; children: string }) {
     return (
         <a

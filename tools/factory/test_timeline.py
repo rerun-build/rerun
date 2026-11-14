@@ -1,4 +1,3 @@
-"""timeline.py tests: ledgers are made by store.Store on a temp folder, read through the read-only reader."""
 import os, sys, tempfile, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import holds

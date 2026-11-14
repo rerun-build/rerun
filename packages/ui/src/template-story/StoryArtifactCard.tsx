@@ -18,8 +18,6 @@ const ENTER = { duration: 0.36, ease: [0.22, 1, 0.36, 1] as const }
 const LEAVE = { duration: 0.22, ease: [0.4, 0, 1, 1] as const }
 const TICK = { duration: 0.42, ease: [0.22, 1, 0.36, 1] as const }
 
-// The stem runs from the card down towards its tile, and stops short of it: over a waiting agent the
-// card floats higher to clear the raised hand, which a stem down to the tile would cross.
 const STEM_PX = 38
 
 export type StoryCardHeader = { name: string; icon: string | null }
@@ -28,9 +26,7 @@ export type StoryArtifactPlacement = {
     key: string
     x: number
     y: number
-    // How far above the anchor the card's bottom edge floats, in screen pixels.
     lift: number
-    // Screen scale of the card: below 1 on a frame too narrow to hold it at full size.
     scale: number
     header: StoryCardHeader
     actions: readonly string[]
@@ -39,7 +35,6 @@ export type StoryArtifactPlacement = {
 
 type CardState = 'running' | 'approval' | 'success' | 'done'
 
-// Same colours as the tiles: amber while the agent works, cyan when it waits for you, green once done.
 const STATE: Record<CardState, { tone: NonNullable<BorderBeamProps['tone']>; beam: NonNullable<BorderBeamProps['tone']>; stem: string }> = {
     running: { tone: 'orange', beam: 'orange', stem: 'rgb(249 115 22)' },
     approval: { tone: 'cyan', beam: 'cyan', stem: 'rgb(34 211 238)' },
@@ -54,10 +49,6 @@ function cardState(result: TemplateStoryArtifact | null, running: boolean): Card
     return 'done'
 }
 
-// What the agent is doing, laid over the grid's world layer so it follows the camera. Same two nodes
-// as TourModelPills: the outer one holds the anchor and the counter-scale that keeps the card the
-// same size on screen whatever the zoom, the inner one owns the entrance. On one node the
-// counter-scale would fight the pop.
 export function StoryArtifactLayer({
     artifact,
     zoom,
@@ -93,8 +84,6 @@ export function StoryArtifactLayer({
     )
 }
 
-// The card pinned to the top of a frame too short to float it over its tile: a phone, a narrow column.
-// It leaves the anchor behind, so it drops its stem too.
 export function StoryDockedCard({
     artifact,
     top,
@@ -125,8 +114,6 @@ export function StoryDockedCard({
     )
 }
 
-// The card over the tile: the service (or the agent) and its status on top, then one line that rolls
-// through the step's actions, each pushing the last one out, and settles on what the step produced.
 export function StoryActivityCard({
     header,
     actions,
@@ -221,7 +208,6 @@ export function StoryActivityCard({
     )
 }
 
-// One line of the card's single-line window: it comes up from below and leaves through the top.
 function TickLine({ children }: { children: ReactNode }) {
     return (
         <motion.div

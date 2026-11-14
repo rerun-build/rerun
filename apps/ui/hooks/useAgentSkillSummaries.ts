@@ -4,10 +4,6 @@ import { useCallback, useSyncExternalStore } from 'react'
 import { listSkillSummariesAction } from '@/app/api/_actions/agent.actions'
 import type { EngineSkillSummary } from '@/lib/engine/types'
 
-// The `/` menu of every conversation tab of an agent lists the same skills. One store per agent
-// reads them once; what changes them says so: a run that ended (the agent may have written one),
-// a proposal that landed, the Skills tab after its own listing.
-
 const NONE: EngineSkillSummary[] = []
 
 const snapshots = new Map<string, EngineSkillSummary[]>()

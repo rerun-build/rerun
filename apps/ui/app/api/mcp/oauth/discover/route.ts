@@ -1,9 +1,6 @@
 import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { discoverAuthServer } from '@/lib/mcp-oauth'
 
-// Pre-flight before the popup: checks the MCP server is public and advertises an OAuth
-// authorization server, so an error shows up before Connect. /start runs its own discovery and
-// resolves the client there, so nothing returned here is trusted later.
 export async function POST(req: Request) {
     try {
         await requireWorkspaceId()

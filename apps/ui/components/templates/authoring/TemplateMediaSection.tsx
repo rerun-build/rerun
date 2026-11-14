@@ -59,8 +59,6 @@ export function TemplateMediaSection() {
     )
 }
 
-// The gallery is ordered and the first image is the cover, so reordering is a real
-// editorial action rather than a nicety.
 function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: GalleryImage[]) => void }) {
     const t = useTranslations('templates.authoring.media')
     const errorText = useErrorText()
@@ -105,7 +103,6 @@ function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: 
                                 className="flex items-center gap-3 rounded-lg border border-foreground/10 bg-background p-2"
                             >
                                 <GripVerticalIcon className="size-4 shrink-0 cursor-grab text-muted-foreground" />
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={image.url} alt="" className="h-10 w-16 shrink-0 rounded object-cover" />
                                 <div className="flex-1">
                                     <Input

@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react-native'
 
 import { CoworkerRow } from '@/components/home/CoworkerRow'
 
-// The swipe itself needs the native gesture handler: drawn here as the row beside its action.
 jest.mock('react-native-gesture-handler/ReanimatedSwipeable', () => {
     const { forwardRef } = jest.requireActual('react')
     const { View } = jest.requireActual('react-native')

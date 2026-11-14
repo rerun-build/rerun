@@ -15,13 +15,11 @@ import { useTheme } from '@/theme/theme'
 import { brand, spacing, withAlpha } from '@/theme/tokens'
 
 export const AVATAR = 48
-// The Home's side margin, its row title and the line under it, at Apple's default Headline and Subheadline sizes.
 export const HOME_GUTTER = 20
 export const ROW_TITLE = { fontSize: 17, lineHeight: 22 } as const
 export const ROW_LINE = { fontSize: 15, lineHeight: 20 } as const
 export const ROW_PADDING = 17
 export const ROW_LINE_GAP = 4
-// At the default text size: the padding around a name line, the gap and the status line under it.
 export const COWORKER_ROW_HEIGHT = 2 * ROW_PADDING + ROW_TITLE.lineHeight + ROW_LINE_GAP + ROW_LINE.lineHeight
 const PIN_ACTION_WIDTH = 96
 
@@ -32,13 +30,9 @@ type CoworkerRowProps = {
     line: StatusLine
     minutesAgo: number | null
     unread: boolean
-    // The conversation open beside the list, on a wide window.
     selected?: boolean
     onPress: () => void
-    // The finger lands before the tap ends: enough of a head start to read the conversation. Held
-    // back a few frames so a scroll or a pin swipe starting on the row does not read anything.
     onPressIn?: () => void
-    // A swipe to the left pins the row to the top of the list, or unpins it.
     pin?: PinControl
 }
 
@@ -88,7 +82,6 @@ export function CoworkerRow({ coworker, line, minutesAgo, unread, selected = fal
             accessibilityHint={t('row.opensConversation')}
             accessibilityActions={pin ? [{ name: 'togglePin', label: pin.pinned ? t('row.unpin') : t('row.pinToTop') }] : undefined}
             onAccessibilityAction={event => event.nativeEvent.actionName === 'togglePin' && pin?.onToggle()}
-            // Opaque under the content: the pin action waits behind the row.
             style={selected ? { backgroundColor: theme.muted } : pin ? { backgroundColor: theme.background } : undefined}
             accessibilityState={{ selected }}
         >

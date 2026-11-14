@@ -1,4 +1,3 @@
-"""testdispatch.py tests: every gh call goes through a fake factory.run; nothing reaches GitHub."""
 import contextlib, io, json, os, subprocess, sys, unittest
 from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -16,8 +15,6 @@ def done(out="", code=0, err=""):
 
 
 class Fake:
-    """factory.run stand-in: answer(cmd) picks the reply; every call is kept."""
-
     def __init__(self, answer):
         self.calls, self.answer = [], answer
 
@@ -167,7 +164,7 @@ class TestProbeMerge(Cli):
                          [("POST", "git"), ("POST", "merges"), ("POST", "issues"), ("DELETE", "issues"), ("POST", "issues"), ("PATCH", "issues"), ("DELETE", "git")])
         ref = next(x for x in w[0] if x.startswith("ref=refs/heads/"))[len("ref=refs/heads/"):]
         self.assertTrue(ref.startswith("factory-probe/"))
-        self.assertIn("sha=" + "p" * 40, w[0])  # dev~1
+        self.assertIn("sha=" + "p" * 40, w[0])
         self.assertIn("base=" + ref, w[1])
         self.assertIn("head=dev", w[1])
         self.assertEqual(w[-1][-1], "repos/%s/git/refs/heads/%s" % (FULL, ref))

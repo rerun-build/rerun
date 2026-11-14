@@ -21,7 +21,6 @@ import { ShareDialog } from './ShareDialog'
 
 const SKELETON_ROWS = 3
 
-// What one coworker published, a card per link. A card opens the share dialog.
 export function AgentPublishedPanel({ agentId, agentName }: { agentId: string; agentName: string }) {
     const t = useTranslations('published.panel')
     const locale = useLocale()

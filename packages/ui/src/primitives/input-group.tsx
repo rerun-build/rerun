@@ -8,8 +8,6 @@ import { Button } from "./button"
 import { Input } from "../forms/input"
 import { Textarea } from "../forms/textarea"
 
-// Dimmed by its own control, never by a disabled button sitting in an addon: a composer whose
-// model pill is fixed would otherwise render its typed text at half opacity.
 function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

@@ -4,14 +4,8 @@ import { MAX_PLAN_BOXES, MAX_PLAN_ITEMS } from './plan-items'
 import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 import { SETTINGS_PANELS, SETTINGS_PANEL_LABELS, type SettingsPanel } from '@/lib/settings/panels'
 
-// Which gestes the foremen are allowed to make. Pure data, no server import: the hub route wires
-// the onboarding half to its handlers (lib/foreman/tools.ts), the engine foreman is briefed with the
-// workspace half (./engine-brief), the browser resolves the client tools of both
-// (components/foreman/foremanClientTools.ts), and the tests read it without booting any of them.
-
 export type ForemanToolDef = { name: string; description: string; inputSchema: object }
 
-// The account MCP tools the engine foreman is handed, run on the hub (foreman-hub.service.ts).
 export const FOREMAN_MCP_TOOL_NAMES = [
     'list_spaces',
     'list_agents',
@@ -56,8 +50,6 @@ export const FOREMAN_MCP_TOOL_NAMES = [
     'revoke_agent_share',
 ] as const
 
-// No MCP tool covers the Boxes, but the app's own server actions do, so these three are declared
-// here and dispatched onto them.
 export const FOREMAN_BOX_TOOL_DEFS = [
     {
         name: 'create_boxes',
@@ -92,9 +84,6 @@ export const FOREMAN_BOX_TOOL_DEFS = [
     },
 ] as const
 
-// The only tool that reads something outside the workspace. Rerun's own documentation is the one
-// place where the answer to "what is a trigger", "what does a run cost" or "can I plug my own key"
-// is written down; without it the model answers those from whatever it remembers of the charter.
 export const FOREMAN_DOCS_TOOL_DEFS = [
     {
         name: 'search_docs',
@@ -108,8 +97,6 @@ export const FOREMAN_DOCS_TOOL_DEFS = [
     },
 ] as const
 
-// A Record rather than a list, so a tab added to the panel fails to compile here instead of reaching
-// the model with no hint of what it shows.
 const AGENT_TAB_HINTS: Record<AgentFocusTab, string> = {
     chat: 'talk to it',
     actions: 'its conversations waiting on the user',
@@ -141,8 +128,6 @@ const SETTINGS_PANEL_HINTS: Record<SettingsPanel, string> = {
     delete_account: 'where the user deletes their own Rerun account, only when they ask how to',
 }
 
-// The rail label rides along with each id, because the user names a tab by what they read on
-// screen ("Apps", "Capabilities"), not by its id.
 function describeTabs<T extends string>(tabs: readonly T[], labels: Record<T, string>, hints: Record<T, string>): string {
     return tabs.map(tab => `\`${tab}\` ("${labels[tab]}": ${hints[tab]})`).join(', ')
 }
@@ -165,11 +150,6 @@ const PLAN_BOXES_SCHEMA = {
     },
 }
 
-// What a plan is allowed to hold, narrowed to the kinds this conversation can really land.
-//
-// The narrowing is the whole point: a team is designed, not picked, so a funnel that never met a
-// ready-made one reads a schema where an agent is the only shape a plan item has. A template it
-// cannot write down is a template the build phase never re-arms install_template for.
 function planItemsSchema(kinds: readonly PlanItemKind[], pinned: readonly string[] | null): object {
     const ready = kinds.includes('template')
     const shared = kinds.includes('share')
@@ -211,8 +191,6 @@ function planItemsSchema(kinds: readonly PlanItemKind[], pinned: readonly string
     }
 }
 
-// `pinned` is the onboarding's own layout: the Boxes are the ones the welcome card drew, so the model
-// writes agents only and the app lays the Boxes into the call itself (pin-plan-boxes.ts).
 export function showPlanDef(kinds: readonly PlanItemKind[], pinned: readonly string[] | null = null): { name: 'show_plan'; description: string; inputSchema: object } {
     return {
         name: 'show_plan',
@@ -231,8 +209,6 @@ export function showPlanDef(kinds: readonly PlanItemKind[], pinned: readonly str
     }
 }
 
-// `pinned` is the same layout as show_plan's: during the onboarding the template lands in one of the
-// Boxes the welcome card drew, and the app lays all of them into the call itself (pin-plan-boxes.ts).
 export function showTemplatesDef(pinned: readonly string[] | null = null): { name: 'show_templates'; description: string; inputSchema: object } {
     const box = pinned
         ? { type: 'string', enum: [...pinned], description: 'During onboarding, with a single template: the Box of their board it lands in.' }
@@ -268,9 +244,6 @@ export function showTemplatesDef(pinned: readonly string[] | null = null): { nam
     }
 }
 
-// The onboarding half of the belt: the gestes a first arrival needs, none of which the MCP server
-// carries. They are dispatched onto what the app already does (the company reader, the users row,
-// the template library, the installer), and handed out phase by phase.
 export const FOREMAN_ONBOARDING_TOOL_DEFS = [
     {
         name: 'analyze_website',
@@ -368,9 +341,6 @@ export const FOREMAN_ONBOARDING_TOOL_DEFS = [
     },
 ] as const
 
-// Questions asked as a widget under the message rather than as a sentence. The browser renders
-// them and answers with addToolResult, so the turn resumes on the answer itself: nothing has to be
-// parsed back out of what the user typed, and the answer survives a reload inside the transcript.
 export const FOREMAN_WIDGET_TOOL_DEFS = [
     {
         name: 'ask_choice',
@@ -454,10 +424,6 @@ export function isForemanWidgetTool(name: string): name is ForemanWidgetToolName
     return (FOREMAN_WIDGET_TOOL_NAMES as readonly string[]).includes(name)
 }
 
-// The tools the foreman calls but the server cannot run: they open a panel or frame the board,
-// which only exist in the browser. They are declared server-side without an `execute`, streamed to
-// the client as a tool call, and resolved through the board store, the same actions the user drives
-// with the mouse. The engine foreman hands them over as intents (./engine-brief).
 export const FOREMAN_CLIENT_TOOL_DEFS = [
     {
         name: 'focus_agent',
@@ -570,8 +536,6 @@ export function accountToolDef(name: string): ForemanToolDef {
     return def
 }
 
-// The hub foreman only walks the onboarding: getting to know them, the plan, the trial. Everything
-// that acts on the workspace is the engine foreman's, once the build has claimed the machine.
 const HUB_ONBOARDING_TOOL_NAMES = ['analyze_website', 'save_profile'] as const
 const HUB_CLIENT_TOOL_NAMES = ['open_template_card'] as const
 
@@ -582,8 +546,6 @@ export const FOREMAN_TOOL_DEFS: ForemanToolDef[] = [
     ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => (HUB_CLIENT_TOOL_NAMES as readonly string[]).includes(def.name)),
 ]
 
-// Every name the hub belt can hold, as a union: a phase that lists a tool under a name nobody
-// declares stops compiling instead of quietly handing the model a shorter belt than it reads about.
 export type ForemanToolName = (typeof FOREMAN_DOCS_TOOL_DEFS)[number]['name'] | (typeof HUB_ONBOARDING_TOOL_NAMES)[number] | ForemanWidgetToolName | (typeof HUB_CLIENT_TOOL_NAMES)[number]
 
 export const FOREMAN_TOOL_NAMES = FOREMAN_TOOL_DEFS.map(def => def.name) as readonly ForemanToolName[]

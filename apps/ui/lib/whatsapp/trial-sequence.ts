@@ -1,6 +1,3 @@
-// The WhatsApp sequence between the start and the end of a trial: one message a day at most, in
-// the voice of a coworker, to bring its owner back to what their coworkers are doing. No
-// 'server-only', like the rest of this folder: a Trigger.dev task runs it.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
@@ -63,8 +60,6 @@ async function ownerOf(supabase: Client, workspaceId: number): Promise<string | 
     return data?.[0]?.user_id ?? null
 }
 
-// The request a coworker is waiting on: the newest question, approval or connection it asked for
-// on a session that is still blocked on it.
 async function waitingRequest(supabase: Client, team: TeamMember[], runs: Run[]): Promise<Run | null> {
     if (!team.length) return null
     const { data: sessions } = await selectMany(supabase, 'sessions', ['engine_session_id'] as const, { agent_id: team.map(agent => agent.id), status: [...BLOCKING_STATUSES] })
@@ -92,8 +87,6 @@ async function signalsOf(supabase: Client, workspace: { id: number; startedAt: D
     }
 }
 
-// What the coworker said at the end of a run, read from its engine. The 200 characters kept in the
-// run log stand in when the engine cannot be reached.
 async function runOutput(workspaceId: number, run: Run): Promise<string> {
     if (!run.engine_agent_id || !run.engine_session_id) return run.message
     try {
@@ -140,7 +133,6 @@ function lastChatDay(ctx: Context): string {
     return lastChat ? new Date(lastChat.created_at).toLocaleDateString('en-US', { weekday: 'long', timeZone: 'UTC' }) : NEVER_CHATTED
 }
 
-// Null when the message has nothing true and specific enough to say.
 async function messageFor(ctx: Context, key: TrialMessageKey): Promise<WhatsAppMessage | null> {
     const voice = { firstName: ctx.firstName }
     const doneRuns = ctx.runs.filter(run => run.kind === 'done')
@@ -193,7 +185,6 @@ async function sweepWorkspace(supabase: Client, workspace: TrialWorkspace, now: 
 
     const userId = await ownerOf(supabase, workspace.id)
     if (!userId) return { skipped: 'no_owner' }
-    // Checked before any model or engine is asked anything: most refusals are a missing number.
     const recipient = await loadWhatsAppRecipient(supabase, userId, 'marketing')
     if (!recipient.ok) return { skipped: recipient.reason }
 
@@ -219,17 +210,11 @@ async function sweepWorkspace(supabase: Client, workspace: TrialWorkspace, now: 
     const message = await messageFor(ctx, pick.key)
     if (!message) return { skipped: `${pick.key}: no_phrase` }
 
-    // One message per trial day, and one trial per workspace: `trial_ends_at` is never cleared and
-    // gates a second one in basePlanCheckoutParams.
     const result = await deliverWhatsApp(supabase, { userId, workspaceId: workspace.id, message, language: 'en', dedupeKey: `trial:${workspace.id}:day${pick.day}` })
     if (result.sent) return { sent: pick.key }
     return result.reason === 'duplicate' ? null : { skipped: `${pick.key}: ${result.reason}` }
 }
 
-/**
- * Every workspace still in its trial whose daily slot is open gets at most one message, to its
- * owner. `only` narrows the sweep to a few workspaces, which is how it is tried by hand.
- */
 export async function sweepTrialSequence(supabase: Client, now: Date, only?: number[]): Promise<TrialSequenceReport> {
     const { data } = await selectMany(
         supabase,

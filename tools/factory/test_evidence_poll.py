@@ -1,4 +1,3 @@
-"""evidence.ci_at_commit tests: fake fetcher keyed by API path. No network."""
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import evidence as E
@@ -18,7 +17,7 @@ class EvidencePoll(unittest.TestCase):
         data = {REFS: [{"ref": "refs/heads/chunk/71-c1", "object": {"sha": NEW}}]}
         data.update(runs(OLD, ("completed", "failure")))
         data.update(runs(NEW, ("completed", "success")))
-        v, d = E.ci_at_commit(T.fake(data), FULL, "chunk/71-c1")  # green at the pushed head, the old red commit does not count
+        v, d = E.ci_at_commit(T.fake(data), FULL, "chunk/71-c1")
         self.assertEqual((v, d["sha"], d["ci"]), ("OK", NEW, "GREEN"))
         data.update(runs(NEW, ("completed", "success"), ("in_progress", None)))
         self.assertEqual(E.ci_at_commit(T.fake(data), FULL, "chunk/71-c1")[0], "WAITING")

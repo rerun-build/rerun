@@ -18,7 +18,6 @@ export function useAccessOptions(): Record<BoxAccess, AccessOption> {
     }
 }
 
-// Width of an options list whose items carry a description, so the sentence fits under a narrow trigger.
 export const OPTION_LIST_CLASS = 'w-72'
 
 export function OptionWithDescription({ label, description }: { label: string; description: string }) {

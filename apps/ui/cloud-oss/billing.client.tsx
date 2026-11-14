@@ -6,8 +6,6 @@ import type { SubscriptionProvider } from '@/components/agent/ModelPickerProvide
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
 import type { TrialStep } from '@/lib/foreman/next-steps'
 
-// Nothing is sold in this build, so every surface that would sell or meter the plan renders
-// nothing. Their callers only reach them on states a self-hosted workspace never takes.
 export function BillingDialog() {
     return null
 }
@@ -32,8 +30,6 @@ export function CreditsUsageBar(_props: { usedMicros?: number | null; budgetMicr
     return null
 }
 
-// No credit is sold here, so a refused payment is the install's own OpenRouter key running dry:
-// said plainly, with the way out the caller offers.
 export const OUT_OF_CREDIT_MESSAGE = 'The account behind Rerun models has no balance left. Top up the OpenRouter account of this install, or switch to another model.'
 
 export function BudgetExhaustedNotice({ ownConnection }: {

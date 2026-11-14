@@ -51,7 +51,6 @@ function unwrap(result: ActionResult, errorText: ReturnType<typeof useErrorText>
     if (!result.ok) throw new Error(errorText(result))
 }
 
-// The name and the photo ride on the session's user, so reading them back is a token refresh.
 async function refreshSession() {
     await createClient().auth.refreshSession()
 }
@@ -126,8 +125,6 @@ function SignInTab() {
     const verifyEmailCode = async (email: string, code: string) => {
         const { data, error } = await createClient().auth.verifyOtp({ email, token: code, type: 'email_change' })
         if (error) throw error
-        // Supabase answers a success while the change still waits on the current address, which is
-        // how a project left on double confirmation behaves.
         if (data.user?.email?.toLowerCase() !== email) throw new Error(t('emailChangeNeedsCurrentAddress'))
         void syncAccountEmailAction()
         toast.success(t('emailUpdated'))
@@ -135,14 +132,11 @@ function SignInTab() {
     }
 
     const onPhoneChanged = async () => {
-        // An account born from a number is filed under it, so its address just moved with it.
         await Promise.all([refreshSession(), refreshPhoneStep()])
         toast.success(t('phoneUpdated'))
         await backToList()
     }
 
-    // Never the fallback of the sign-in button: a plain sign-in from here would leave this account
-    // for another one.
     const connectProvider = async (provider: OAuthProvider) => {
         const { label, queryParams } = OAUTH_PROVIDER_CONFIG[provider]
         setBusyProvider(provider)

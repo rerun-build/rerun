@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-// Sign-in from the iOS app. The hub answers a refusal with `error` to show and `reason` to count.
-
 export const phoneChannelSchema = z.enum(['sms', 'whatsapp'])
 export type PhoneChannel = z.infer<typeof phoneChannelSchema>
 
@@ -25,9 +23,6 @@ export type AppSession = z.infer<typeof appSessionSchema>
 
 export const emailCodeRequestSchema = z.object({ email: z.string().trim().email().max(320) })
 
-// `mailed` when the hub sent the code still good for this address again, or holds it back because it
-// left less than a minute ago. Otherwise the app asks Supabase for a new one. Whether the address had
-// an account is not said here: that would tell anyone who holds one, before any code is checked.
 export const emailCodePreparedSchema = z.object({ mailed: z.boolean() })
 
 export const signInRefusalSchema = z.object({
@@ -43,6 +38,5 @@ export const accountDeletionStatusSchema = z.object({
 
 export const deleteAccountRequestSchema = z.object({ confirmation: z.literal('DELETE') })
 
-// Deleting the account needs a sign-in this recent: a stolen token alone does not destroy anything.
 export const ACCOUNT_DELETION_REAUTH_MS = 10 * 60_000
 export const REAUTH_REQUIRED = 'reauth_required'

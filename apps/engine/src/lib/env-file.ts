@@ -17,8 +17,6 @@ export function parseEnvFile(text: string): Record<string, string> {
     return out
 }
 
-// One line per key, so a line break inside a value would write a second key the caller never set.
-// Surrounding whitespace is trimmed here because parseEnvFile drops it on the way back anyway.
 export function serializeEnv(env: Record<string, string>): string {
     return Object.entries(env)
         .map(([k, v]) => {

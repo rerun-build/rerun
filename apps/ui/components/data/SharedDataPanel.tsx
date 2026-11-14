@@ -19,8 +19,6 @@ type SharedDataPanelProps = {
     onTableDropped?: () => void
 }
 
-// The database every agent of the workspace reads and writes, as opposed to the private one each
-// agent keeps to itself.
 export function SharedDataPanel({ initial, onInitialConsumed, table, onTableDropped }: SharedDataPanelProps) {
     const t = useTranslations('data.shared')
     const { title: emptyTitle, description: emptyDescription } = useSharedTablesEmpty()

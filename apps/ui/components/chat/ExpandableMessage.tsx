@@ -16,7 +16,6 @@ type ExpandableMessageProps = {
     children: string
 }
 
-/** A user message taller than the cap ends in a fade and opens on a centred pill. */
 export function ExpandableMessage({ agentId, mentions, children }: ExpandableMessageProps) {
     const t = useTranslations('chat.message')
     const contentRef = useRef<HTMLDivElement>(null)
@@ -33,7 +32,6 @@ export function ExpandableMessage({ agentId, mentions, children }: ExpandableMes
         return () => observer.disconnect()
     }, [])
 
-    // Zero until the first measure: the message opens flush rather than flashing a fade it does not need.
     const overflows = contentHeight > COLLAPSED_HEIGHT
     const collapsed = overflows && !expanded
 

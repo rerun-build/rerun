@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 
-// Starts from `from` and jumps to `value` once the slide has settled, so the change is seen animating.
 export function useSettledValue(value: number, delaySeconds: number, from = 0): number {
     const [shown, setShown] = useState(from)
 

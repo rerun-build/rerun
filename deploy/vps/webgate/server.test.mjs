@@ -1,4 +1,3 @@
-// node --test deploy/vps/webgate/server.test.mjs   (Node 22 does not take the directory form)
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'

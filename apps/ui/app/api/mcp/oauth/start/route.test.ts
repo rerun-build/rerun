@@ -86,8 +86,6 @@ describe('POST /api/mcp/oauth/start', () => {
         expect(decodeContext(cookie.value)).not.toHaveProperty('scope')
     })
 
-    // PostHog advertises 160 scopes (~2.9 KB): carried in the cookie, they pushed it past the
-    // 4096 bytes a browser stores, and the callback found no context.
     it('keeps a long scope list in the authorize URL and out of the cookie', async () => {
         const scopes = Array.from({ length: 160 }, (_, i) => `resource_${String(i).padStart(3, '0')}:write`)
         documents[RESOURCE_METADATA_URL] = { authorization_servers: ['https://auth.acme.test'], scopes_supported: scopes }

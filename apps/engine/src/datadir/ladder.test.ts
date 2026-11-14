@@ -108,8 +108,6 @@ describe('a data-dir from before the ladder', () => {
         expect(existsSync(connectionsMigratedPath())).toBe(false)
     })
 
-    // Every box running today folded its keys long before the ladder: its marker must keep the
-    // baseline step from folding a second time.
     it('takes a box that already folded its keys to v1 without touching them', async () => {
         await mkdir(connectionsDir(), { recursive: true })
         await writeFile(connectionsMigratedPath(), '2026-01-01T00:00:00.000Z\n', 'utf8')
@@ -172,7 +170,6 @@ describe('v3 to v4: secret-file-modes', () => {
         await chmod(path, fileMode)
     }
 
-    // What an engine from before this step left behind: everything at the default modes.
     async function legacyAgent(id: string) {
         await mkdir(mcpDir(id), { recursive: true })
         await chmod(mcpDir(id), 0o755)
@@ -229,8 +226,6 @@ describe('v3 to v4: secret-file-modes', () => {
     })
 })
 
-// Append-only: a shipped step is never removed nor renamed, because a data-dir archived before it
-// still needs it. Updating this snapshot is the change to look at twice.
 describe('data-dir ladder', () => {
     it('numbers its steps from 1 without gaps', () => {
         expect(DATA_DIR_MIGRATIONS.map(s => s.version)).toEqual(DATA_DIR_MIGRATIONS.map((_, i) => i + 1))

@@ -14,8 +14,6 @@ import { widgetOf, type OnboardingWidget } from './parts'
 
 export const KICKOFF = '[[foreman:start]]'
 
-// A card just answered sends the conversation back on its own, as on the web. A build ends on an answered
-// call too, and sent back it would land on a hub that is done with the onboarding.
 export function resumesAfterAnswer({ messages }: { messages: UIMessage[] }): boolean {
     if (messages.at(-1)?.parts.some(part => part.type === 'tool-build_team')) return false
     return lastAssistantMessageIsCompleteWithToolCalls({ messages })
@@ -36,8 +34,6 @@ function onboardingTransport(callerRef: RefObject<ChatCaller | null>, sessionRef
 
 export type OnboardingHistory = 'loading' | 'ready' | 'error'
 
-// The hub's onboarding conversation. Unlike a coworker's chat, the hub keeps no transcript of its own to
-// replay: every send carries the whole conversation, and the cards are answered as tool outputs.
 export function useOnboardingChat(caller: ChatCaller | null) {
     const callerRef = useRef(caller)
     const sessionRef = useRef<string>(randomUUID())
@@ -47,7 +43,6 @@ export function useOnboardingChat(caller: ChatCaller | null) {
         callerRef.current = caller
     }, [caller])
 
-    // The refs go to the transport untouched: it reads them when a send leaves, never while rendering.
     // eslint-disable-next-line react-hooks/refs
     const [transport] = useState(() => onboardingTransport(callerRef, sessionRef))
 

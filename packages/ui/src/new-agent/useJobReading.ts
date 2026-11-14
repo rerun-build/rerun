@@ -12,12 +12,6 @@ function readable(text: string): string {
     return text.trim().slice(0, MAX_READABLE_LENGTH)
 }
 
-// Reads the description at each pause in the typing. The last reading stays up while the next one
-// is on its way, so a name does not blink out between two words; `seed` is a reading already known
-// for a text, which a still of the lab opens on.
-//
-// `settle` is for the moment the user clicks Create before the reading of what they just typed has
-// come back: it resolves with that reading, asked for at once rather than after the pause.
 export function useJobReading(text: string, read: JobReader, seed?: { text: string; reading: JobReading }) {
     const key = readable(text)
     const cache = useRef(new Map<string, Promise<JobReading>>(seed ? [[readable(seed.text), Promise.resolve(seed.reading)]] : []))

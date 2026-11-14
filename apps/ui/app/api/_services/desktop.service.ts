@@ -23,9 +23,6 @@ export class DesktopUnavailableError extends AppError {
 
 export type WorkspaceDesktop = { conn: EngineConnection; socketBase: string }
 
-// Where a browser reaches the screens of the workspace's machine: an engine on this very machine
-// (local development) directly, a box on one of Rerun Cloud's hosts through that host's relay, and a
-// self-hosted engine on its own address.
 async function socketBaseOf(conn: EngineConnection, hostId: string | null, boxIndex: number | null): Promise<string> {
     const engine = new URL(conn.baseUrl)
     if (LOCAL_ENGINE.test(engine.hostname)) return `ws://${engine.host}${DESKTOP_WS_PATH}`
@@ -44,7 +41,6 @@ export async function resolveWorkspaceDesktop(workspaceId: number): Promise<Work
     return { conn, socketBase: await socketBaseOf(conn, data.host_id, data.box_index) }
 }
 
-// Every agent of a machine answers on the same address: the ticket is what picks the screen.
 export function desktopSocketUrl(desktop: WorkspaceDesktop, engineAgentId: string, mode: DesktopViewMode): string {
     return `${desktop.socketBase}?ticket=${encodeURIComponent(mintDesktopTicket(desktop.conn.apiKey ?? '', engineAgentId, mode))}`
 }

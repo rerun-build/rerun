@@ -3,7 +3,6 @@ import { FakeToolCallSplitter, createFakeToolCallGuard } from './fake-tool-call-
 
 const MESSAGE = "Il me manque le screen de trafic. L'article sera en anglais américain comme les précédents sur ton compte."
 
-// The end of the Article Creator message of 20 October: the call typed as text, answers invented.
 const FAKE_RESULT = `<function_results>
 <result>
 <name>mcp__rerun__ask_user</name>

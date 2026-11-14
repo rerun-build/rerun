@@ -10,7 +10,7 @@ class Eligible(unittest.TestCase):
     def test_two_chunks_and_one_stage_fill_3_slots_fourth_refused(self):
         st = {"busy": [("j", "A")], "stages": 1, "cfg": {"builder_capacity": 3, "per_job_cap": 2}}
         self.assertEqual(readyq.eligible(item("B"), st), (True, None))
-        st["busy"].append(("k", "B"))  # 2 chunks + 1 stage = 3 slots
+        st["busy"].append(("k", "B"))
         self.assertEqual(readyq.eligible(item("C"), st), (False, "no free slot"))
 
     def test_deps_cap_lease_attempts_fire_cap(self):

@@ -1,10 +1,6 @@
 import { SEO_DESCRIPTION_MAX_LENGTH, SEO_DESCRIPTION_MIN_LENGTH, TEMPLATE_TITLE_MAX_LENGTH } from '@rerun/contracts'
 import { copyOf } from '@/lib/copy-name'
 
-// Cheap ceilings: a compromised account cannot flood the table. Keep enough room for expert
-// authors to cover the full catalogue instead of blocking them after a few categories. The
-// gallery cap matters more since the MCP surface exists, where an append loop has no form to stop
-// it.
 export const MAX_TEMPLATES_PER_AUTHOR = 100
 export const MAX_TEMPLATE_GALLERY_IMAGES = 8
 

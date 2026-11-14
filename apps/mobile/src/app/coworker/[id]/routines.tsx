@@ -17,7 +17,6 @@ export default function CoworkerRoutinesScreen() {
     const t = useTranslations('mobileCoworker.routines')
     const tCommon = useTranslations('mobileCommon')
     const [routines, setRoutines] = useState<RoutineView[] | null>(() => (me ? (readCoworkerDetails(me.workspace.id, agentId).routines ?? null) : null))
-    // A switch flips what the hub holds: it waits for the hub's copy, never the one kept from the last visit.
     const [fresh, setFresh] = useState(false)
     const [failed, setFailed] = useState(false)
     const [savingKeys, setSavingKeys] = useState<string[]>([])

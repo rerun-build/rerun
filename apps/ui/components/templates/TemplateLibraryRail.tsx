@@ -24,7 +24,6 @@ export function TemplateLibraryRail({
 }: {
     view: LibraryView
     query: string
-    // Null while the catalogue loads: the rail keeps its shape and only the numbers wait.
     counts: LibraryRailCounts
     onView: (view: LibraryView) => void
     onQuery: (query: string) => void

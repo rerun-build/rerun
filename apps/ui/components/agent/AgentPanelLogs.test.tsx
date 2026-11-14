@@ -4,8 +4,6 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { EngineRun } from '@/lib/engine/types'
 
-// The runs list is three tabs, Running, Done and Failed. It always opens on Running; the search filters the open tab.
-
 const mocks = vi.hoisted(() => ({
     listRunsAction: vi.fn(),
     getRunStepsAction: vi.fn(async () => []),
@@ -45,8 +43,6 @@ async function mount() {
     await settle()
 }
 
-// The component's module graph is heavy: importing it inside the first test took over 5 s on a loaded CI
-// machine and failed the whole file. Import it once here, with its own time limit; each test's import is then warm.
 beforeAll(async () => { await import('./AgentPanelLogs') }, 60_000)
 
 beforeEach(() => {

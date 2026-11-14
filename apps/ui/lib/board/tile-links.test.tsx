@@ -5,9 +5,6 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { TileLinks, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 import { factoryScene } from '@/components/factory/factory-scene'
 
-// The board's link layer: a cable must still draw as one thin path with its comet, and the trace and
-// belt variants the factory added must draw their own parts without touching the cable's.
-
 const tile = (id: string, col: number, row: number): Tile => ({ id, position: { col, row }, span: 2, style: { color: '#fff' } })
 const TILES = [tile('a', 1, 1), tile('b', 7, 1), tile('c', 1, 7), tile('d', 7, 7)]
 
@@ -43,7 +40,6 @@ describe('TileLinks', () => {
         const el = draw([{ source: 'a', target: 'c', variant: 'trace', color: '#4ade80' }])
         const trails = [...el.querySelectorAll('.iso-trace-trail')]
         expect(trails).toHaveLength(3)
-        // The fade lives on stroke-opacity: the rest animation owns `opacity`.
         const fades = trails.map(t => Number(t.getAttribute('stroke-opacity')))
         expect(fades[0]).toBeGreaterThan(fades[1])
         expect(fades[1]).toBeGreaterThan(fades[2])
@@ -69,7 +65,6 @@ describe('TileLinks', () => {
     describe('chevrons', () => {
         const chevrons = (el: Element) => [...el.querySelectorAll('[data-belt-chevron]')]
         const pts = (c: Element) => (c.getAttribute('points') ?? '').trim().split(/\s+/).map(p => p.split(',').map(Number) as [number, number])
-        // Tile centre in the SVG frame of `draw` (offset 0, half size 500): same convention as the layer.
         const centre = (t: Tile) => {
             const u = t.position!.col + (t.span ?? 1) / 2
             const v = t.position!.row + (t.span ?? 1) / 2

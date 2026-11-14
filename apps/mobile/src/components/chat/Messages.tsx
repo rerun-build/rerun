@@ -24,13 +24,11 @@ import { splitIntoBubbles } from './markdown/blocks'
 
 const THUMB = 120
 
-// The web's agent bubble (`AGENT_BUBBLE_SURFACE`, px-3.5 py-2 on 20px corners), stacked 6 apart.
 export const BUBBLE_RADIUS = 20
 export const BUBBLE_PADDING_X = 14
 export const BUBBLE_PADDING_Y = 8
 export const BUBBLE_GAP = 6
 
-// The web's `ExpandableMessage`: a user message taller than this opens on a pill.
 const COLLAPSED_HEIGHT = 384
 
 function ExpandableText({ children }: { children: ReactNode }) {
@@ -41,8 +39,6 @@ function ExpandableText({ children }: { children: ReactNode }) {
     return (
         <View>
             <View style={{ maxHeight: overflows && !expanded ? COLLAPSED_HEIGHT : undefined, overflow: 'hidden' }}>
-                {/* Collapsed, the text is measured clamped to the cap: keeping the tallest height stops it from
-                    unfolding and folding again in a loop that shakes the whole thread. */}
                 <View onLayout={event => setHeight(Math.max(height, event.nativeEvent.layout.height))}>{children}</View>
             </View>
             {overflows && (
@@ -57,11 +53,6 @@ function ExpandableText({ children }: { children: ReactNode }) {
     )
 }
 
-// Entering rises from below: the bubble a send just created rises into place. The list wraps
-// the messages already there in a LayoutAnimationConfig, so only a new one moves.
-// `children` takes the text's place inside the bubble: a voice message draws its player there.
-// `footer` sits under the bubble, outside the tap that brings the time up, so its buttons answer alone.
-// The tap that brings the time up lives inside the right-aligned column, so only the bubble answers it.
 export function UserBubble({ text, media, owner = null, stamp, children, footer }: { text: string; media?: ViewerItem[]; owner?: FileOwner | null; stamp?: MessageStamp; children?: ReactNode; footer?: ReactNode }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.messages')
@@ -113,8 +104,6 @@ export function Action({ symbol, label, onPress, selected }: { symbol: IconName;
     )
 }
 
-// An answer drawn as a stack of bubbles, one per beat, the way the web's `MessageBubbles` cuts it: a
-// code block, a table or an image alone stands bare at full width.
 function AssistantBubbles({ text, streaming, owner }: { text: string; streaming: boolean; owner: FileOwner | null }) {
     const theme = useTheme()
     const bubbles = useMemo(() => splitIntoBubbles(text), [text])
@@ -126,7 +115,6 @@ function AssistantBubbles({ text, streaming, owner }: { text: string; streaming:
     return (
         <View style={{ alignItems: 'flex-start', gap: BUBBLE_GAP }}>
             {bubbles.map((bubble, i) => (
-                // Keyed by position: a stream only ever grows the last bubble or opens a new one after it.
                 <View key={i} style={frames[bubble.frame]}>
                     <Markdown text={bubble.markdown} streaming={streaming && i === bubbles.length - 1} surface={bubble.frame === 'bubble' ? 'bubble' : 'page'} owner={owner} />
                 </View>

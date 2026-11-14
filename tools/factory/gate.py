@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
-"""Chunk proof gate (chunk A of factory-tooling). Reads evidence from GitHub itself; every receipt is bound
-to the PR's current head SHA. Exit 0 PASS, 3 FAIL, 1 could not answer (API error is never PASS).
-Commands: gate <repo> <PR>   |   review <repo> <PR> ACCEPT|REJECT --as NAME --note 'text' [--sha HEAD]"""
 import fnmatch, json, os, re, subprocess, sys
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # own dir first: the installed copy and a clean clone both find factory.py beside gate.py
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
 
 GH = F.GH
 TESTF = r"\.spec\.[jt]sx?$|\.test\.[jt]sx?$|(^|/)tests?/.*\.(ts|tsx|js|jsx|rs|py)$|__tests__/.*\.(ts|tsx|js|jsx)$|_test\.(py|go)$|(^|/)test_[^/]*\.py$"
 REVIEW_RE = re.compile(r"^\s*Review (ACCEPT|REJECT) @([0-9a-f]{8}): ([A-Za-z][A-Za-z0-9_-]*) (ACCEPT|REJECT)\b")
-ANSI = re.compile(r"(?:\x1b|\^\[)\[[0-9;]*m")  # real ESC, or the caret form (^[) some log paths show
+ANSI = re.compile(r"(?:\x1b|\^\[)\[[0-9;]*m")
 
 
-LAST = {}  # repo and head of the PR the last gate() read, for the status post
+LAST = {}
 
 
 class NoAnswer(Exception):
@@ -20,7 +17,6 @@ class NoAnswer(Exception):
 
 
 def gh_json(path, paginate=False, jq=".[]"):
-    """Raises NoAnswer on any API error. paginate=True returns the flat list of items (jq picks them per page)."""
     cmd = [GH, "api"] + (["--paginate", "--jq", jq] if paginate else []) + [path]
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     if r.returncode:
@@ -60,22 +56,21 @@ LINE_TS = re.compile(r"\d{2}:\d{2}:\d{2}(?:\.\d+)?Z (.*)$")
 
 def _ut_name(mod_cls, meth):
     segs = mod_cls.split(".")
-    if segs[-1] == meth:  # python 3.11+ prints 'test_x (mod.Class.test_x)'
+    if segs[-1] == meth:
         segs = segs[:-1]
     if segs[:3] == ["unittest", "loader", "_FailedTest"] or segs[-1:] == ["_FailedTest"]:
-        segs = [meth, "_FailedTest"]  # import error: the module is named by the 'test' word, e.g. 'test_gate'
+        segs = [meth, "_FailedTest"]
         return "::".join(segs)
     return "::".join(segs + [meth])
 
 
 def _py_result(ln, pending):
-    """One log line -> a python (unittest or pytest) result tuple, 'pending' (docstring form) or None."""
     m = LINE_TS.search(ln)
     t = (m.group(1) if m else ln).strip()
     if not t:
         return None
     line = t[:120]
-    if pending:  # second line of '-v' output with a docstring: 'First doc line ... ok'
+    if pending:
         m = re.search(r" \.\.\. (ok|FAIL|ERROR)\b", t)
         if m:
             return ("unittest", pending, UT_RES[m.group(1)], line)
@@ -85,7 +80,7 @@ def _py_result(ln, pending):
             return ("unittest", _ut_name(m.group(2), m.group(1)), UT_RES[m.group(3)], line)
         _PENDING[0] = _ut_name(m.group(2), m.group(1))
         return "pending"
-    m = re.match(r"^(FAIL|ERROR): (\w+) \(([\w.]+)\)\s*$", t)  # failure detail block, also without -v
+    m = re.match(r"^(FAIL|ERROR): (\w+) \(([\w.]+)\)\s*$", t)
     if m:
         return ("unittest", _ut_name(m.group(3), m.group(2)), False, line)
     if re.match(r"^FAILED \((failures|errors|skipped)=", t):
@@ -93,19 +88,18 @@ def _py_result(ln, pending):
     if re.match(r"^OK( \(.*\))?$", t):
         return ("unittest-run", "unittest::summary", True, line)
     m = re.match(r"^(?:\[gw\d+\] \[\s*\d+%\] )?(PASSED|FAILED|ERROR) (\S+::\S+)", t) or None
-    if m:  # pytest -rA short summary or xdist: 'PASSED path::Class::test'
+    if m:
         return ("pytest", m.group(2), m.group(1) == "PASSED", line)
     m = re.match(r"^(\S+::\S+) (PASSED|FAILED|ERROR)\b", t)
-    if m:  # pytest -v: 'path::Class::test PASSED [ 50%]'
+    if m:
         return ("pytest", m.group(1), m.group(2) == "PASSED", line)
     return None
 
 
 def results(log):
-    """[(kind, name, ok, line)] from jest PASS/FAIL lines, cargo nextest PASS/FAIL lines and cargo 'test x ... ok'."""
     out = []
-    binary = None  # cargo test: current integration binary (tests/<stem>.rs), so names read '<stem>::test'
-    pending = None  # unittest -v with a docstring: 'test_x (mod.Class)' then 'Doc line ... ok'
+    binary = None
+    pending = None
     ran = False
     for ln in log.splitlines():
         py = _py_result(ln, pending)
@@ -123,7 +117,7 @@ def results(log):
             binary = None if r.group(1) else os.path.basename(r.group(2))
             continue
         m = re.search(r"Z\s+(PASS|FAIL|SIGABRT|SIGSEGV|TIMEOUT|LEAK-FAIL)\s+\[\s*[\d.]+s\]\s+(?:\(\s*\d+/\d+\)\s+)?(\S+)\s+(\S+)\s*$", ln)
-        if m:  # cargo nextest: 'PASS [ 0.072s] ( 1/1666) crate::bin test_name' -> name 'crate::bin::test_name'
+        if m:
             out.append(("nextest-it" if "::" in m.group(2) else "nextest-unit", m.group(2) + "::" + m.group(3), m.group(1) == "PASS", ln.split("Z ", 1)[1].strip()[:120]))
             continue
         m = re.search(r"Z (PASS|FAIL) (\S+)", ln)
@@ -142,20 +136,17 @@ def _norm(x):
 
 
 def same(a, b):
-    """DONE_TEST names: equal, or one ends with '::' + the other. Never last-segment-only."""
     a, b = _norm(a), _norm(b)
-    if b.endswith(".py") and a.startswith(b + "::"):  # DONE_TEST names a python file: any test inside it
+    if b.endswith(".py") and a.startswith(b + "::"):
         return True
-    if re.fullmatch(r"test_\w+", b) and a.startswith(b + "::"):  # a bare python test module (`test_trigger`): any test inside it
+    if re.fullmatch(r"test_\w+", b) and a.startswith(b + "::"):
         return True
     if a == b or a.endswith("::" + b) or b.endswith("::" + a):
         return True
-    # file paths: jest logs print package-relative paths; match on a "/" boundary, the shorter side must itself contain "/"
     return ("/" in b and a.endswith("/" + b)) or ("/" in a and b.endswith("/" + a))
 
 
 def rust_prefix(path):
-    """('bin', stem) for crates/x/tests/<stem>.rs; ('mod', 'a::b') for crates/x/src/a/b.rs (inline #[cfg(test)] mod tests); else None."""
     parts = _norm(path).split("/")
     if not parts[-1].endswith(".rs"):
         return None
@@ -171,8 +162,6 @@ def rust_prefix(path):
 
 
 def py_hit(tf, name, kind):
-    """Python test file -> its ids. pytest: the node id's file part is the file. unittest: the dotted module in the id
-    (as run, maybe a package-relative or longer path) matches the file's path without '.py' on a segment boundary."""
     tf = _norm(tf)
     if kind == "pytest":
         return same(name.split("::")[0], tf)
@@ -188,10 +177,6 @@ def py_hit(tf, name, kind):
 
 
 def test_hit(tf, name, kind=""):
-    """Does test result `name` (of `kind` from results()) belong to changed test file `tf`? Rust integration file
-    tests/<stem>.rs: only an integration-binary result of binary <stem>. Rust src/<mod>.rs: only a unit result under
-    '<mod>::tests::' right after the crate prefix (nextest-unit 'crate::<mod>::tests::t', cargo-unit '<mod>::tests::t').
-    Everything else (jest): same()."""
     if _norm(tf).endswith(".py"):
         return py_hit(tf, name, kind)
     rp = rust_prefix(tf)
@@ -209,7 +194,6 @@ def test_hit(tf, name, kind=""):
 
 
 def inline_rust_test(f):
-    """Only ADDED patch lines count (context, removed lines and @@ headers do not)."""
     return bool(re.search(r"(^|/)src/.*\.rs$", f["filename"]) and re.search(r"(?m)^\+(?!\+\+).*(#\[(\w+::)?test\]|cfg\(test\)|mod tests)", f.get("patch") or ""))
 
 
@@ -233,7 +217,6 @@ def parse_issue(full, jobrepo, jobn, chunk):
 
 
 def chunk_limits(full, n, jobrepo, jobn, ids):
-    """LIMITS per chunk of a multi-chunk PR: each chunk's commits ('<id>: ...', '<id> fix: ...') against its own max-lines."""
     cm = gh_json("repos/%s/pulls/%s/commits?per_page=100" % (full, n), paginate=True)
     why = []
     for cid in ids:
@@ -251,7 +234,6 @@ RECEIPT_RE = re.compile(r"^\s*Receipt (\w+): done-test (\w+) \(base exit (-?\d+)
 
 
 def receipts(body, ref):
-    """{chunk: (done_test_ok, fail_before_ok)} from the 'Receipt' lines of a PR whose head ref is factory/job-<n>; any other PR gets {}."""
     if not re.fullmatch(r"factory/job-\d+", ref or ""):
         return {}
     return {c: (v == "ok" and int(h) == 0, int(b) != 0) for c, v, b, h in RECEIPT_RE.findall(body or "")}
@@ -262,8 +244,6 @@ def _list(x):
 
 
 def open_claims(full, n, jobn):
-    """Other open work as roster.overlaps input: files of every open PR, and chunk paths of unchecked chunks of other open issues.
-    The PR itself and everything of the same job (branch chunk/<issue>-<id>) are skipped."""
     import ledger as L
     out, same = [], str(jobn) if jobn else None
     for p in _list(gh_json("repos/%s/pulls?state=open&per_page=100" % full, paginate=True)):
@@ -286,7 +266,6 @@ def open_claims(full, n, jobn):
 
 
 def claims_line(ro, names, builder, others, verdict):
-    """(ok, receipt) of the CLAIMS check; without a roster it passes."""
     if not ro:
         return True, "no roster"
     import roster as R
@@ -308,7 +287,6 @@ def gate(repo, n):
     def put(cid, ok, receipt):
         res[cid] = {"ok": bool(ok), "receipt": receipt, "sha": head}
 
-    # chunk id and work order
     m = re.search(r"Job: ([\w./-]+)#(\d+), chunk (\w+)", pbody)
     mb = re.fullmatch(r"chunk/(\d+)-(\w+)", pr["head"]["ref"])
     jobrepo, jobn, chunk = (m.group(1), m.group(2), m.group(3)) if m else ((full, mb.group(1), mb.group(2)) if mb else (full, None, None))
@@ -320,14 +298,12 @@ def gate(repo, n):
     if jobn:
         line, ibody, fld = parse_issue(full, jobrepo, jobn, chunk)
 
-    # 1 CI_GREEN
     cs = head_checks(full, head)
     if not cs and not gh_json("repos/%s/commits/%s" % (full, head)):
         raise NoAnswer("cannot read checks")
     st = F.ci_state(cs)
     put("CI_GREEN", st == "GREEN", "%s: %d check-runs on %s, e.g. %s" % (st, len(cs), s8, cs[0]["url"] if cs else "none"))
 
-    # 2 DONE_TEST
     dt = fld.get("done-test")
     jobpr = re.fullmatch(r"factory/job-\d+", pr["head"]["ref"]) is not None
     rc = receipts(pbody, pr["head"]["ref"])
@@ -360,11 +336,10 @@ def gate(repo, n):
         else:
             put("DONE_TEST", False, "'%s' not found as passed in any job log on %s" % (dt, s8))
 
-    # 3 FAIL_BEFORE
     tfiles = [f["filename"] for f in files if f["status"] in ("added", "modified") and (re.search(TESTF, f["filename"]) or inline_rust_test(f))]
     commits = [c["sha"] for c in gh_json("repos/%s/pulls/%s/commits?per_page=100" % (full, n), paginate=True) if c["sha"] != head]
     if jobpr:
-        pass  # judged from the receipt lines above
+        pass
     elif not tfiles:
         put("FAIL_BEFORE", False, "PR touches no test file: nothing that failed before")
     else:
@@ -379,7 +354,7 @@ def gate(repo, n):
             for sha, c in red:
                 try:
                     older = results(job_log(full, c["url"]))
-                except NoAnswer:  # an older red check with no readable log (runner lost, expired): cannot prove, cannot abort
+                except NoAnswer:
                     nolog.add(c["url"])
                     continue
                 for k, name, ok, ln in older:
@@ -391,12 +366,11 @@ def gate(repo, n):
             (rec if hit else missing).append(hit or tf)
         put("FAIL_BEFORE", not missing, ("; ".join(rec)) if not missing else "no failing log on an older commit for: " + ", ".join(missing) + ("; %d older red check(s) had no readable log" % len(nolog) if nolog else ""))
 
-    # 4 REVIEWS
     need, stop = {"LINUS"}, []
     builder = (fld.get("builder") or "").strip().lower() or None
     roster_err, ro = None, None
     try:
-        ro = F.base_roster(full)  # read at dev (fallback: default branch), never at the PR base or head
+        ro = F.base_roster(full)
     except F.RosterError as e:
         roster_err = str(e)
     for f in files:
@@ -431,7 +405,6 @@ def gate(repo, n):
         "need ACCEPT @%s from: %s (have: %s)%s" % (s8, ", ".join(bad), ", ".join("%s %s" % (k, v[0]) for k, v in verdict.items()) or "none on this head",
                                                     "; ACCEPT by builder %s refused" % ", ".join(sorted(set(refused))) if refused else ""))
 
-    # 4b CLAIMS
     names = [f["filename"] for f in files]
     try:
         others = open_claims(full, n, jobn) if ro and not roster_err else []
@@ -442,7 +415,6 @@ def gate(repo, n):
     else:
         put("CLAIMS", *claims_line(ro, names, builder, others, verdict))
 
-    # 5 LIMITS
     mx = int(re.sub(r"\D", "", fld.get("max-lines", "")) or 800)
     wf = [f["filename"] for f in files if re.search(F.WF, f["filename"])]
     globs = []
@@ -464,7 +436,6 @@ def gate(repo, n):
         why.append("do-not-touch: " + ", ".join(dnt[:3]))
     put("LIMITS", not why, "; ".join(why) or "%d lines <= %d, %d files, no workflow file, %d do-not-touch globs" % (lines, mx, len(files), len(globs)))
 
-    # 6 HANDOFF
     miss = F.has_heads(pbody, F.PR_HEADS)
     put("HANDOFF", not miss, "missing sections: " + ", ".join(miss) if miss else "all %d PR_HEADS sections present in PR body" % len(F.PR_HEADS))
 
@@ -488,7 +459,6 @@ def _post(full, sha, state, context, desc):
 
 
 def post_status(code, post=_post):
-    """After gate(): the factory/review status at the head it read (exit 0 success, 3 failure). Adds only; any error goes to stderr and changes nothing."""
     if code not in (0, 3) or "head" not in LAST:
         return
     try:
@@ -537,7 +507,7 @@ if __name__ == "__main__":
             print("usage: gate <repo> <PR>")
             sys.exit(2)
         code = gate(a[0], a[1].lstrip("#"))
-        if os.environ.get("GATE_POST_STATUS") == "1":  # the runner sets it; a person running gate posts nothing
+        if os.environ.get("GATE_POST_STATUS") == "1":
             post_status(code)
         sys.exit(code)
     except NoAnswer as e:

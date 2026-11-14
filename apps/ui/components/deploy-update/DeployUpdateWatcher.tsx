@@ -14,9 +14,6 @@ const CHUNK_LOAD_FAILURE = /Loading chunk|Failed to load chunk|ChunkLoadError/
 const UNATTENDED_RELOAD_KEY = 'deploy-update-reloaded-at'
 const UNATTENDED_RELOAD_COOLDOWN_MS = 10 * 60_000
 
-// Nobody is looking at a hidden tab, so it catches up with the deploy on its own and its owner
-// comes back to a working app instead of a failed action. The cooldown keeps a build that never
-// matches its own /api/version from reloading in a loop.
 function reloadIfUnattended() {
     if (pageAttention() !== 'hidden') return
     const reloadedAt = Number(sessionStorage.getItem(UNATTENDED_RELOAD_KEY))
@@ -36,8 +33,6 @@ export function DeployUpdateWatcher() {
 
     useEffect(() => {
         const originalFetch = window.fetch
-        // Callers usually swallow a failed server action in their own catch, so the stale deploy is
-        // caught on the response itself, before Next turns it into an UnrecognizedActionError.
         window.fetch = async (...args) => {
             const response = await originalFetch(...args)
             if (response.headers.get(ACTION_NOT_FOUND_HEADER) === '1') setStale(true)

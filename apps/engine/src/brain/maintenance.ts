@@ -7,8 +7,6 @@ const MAINTENANCE_INTERVAL_MS = 10 * 60 * 1000
 
 let lastRunAt = 0
 
-// The files are the source of truth and the shell can reach them, so a page edited or removed by
-// hand (or restored from an archive) is folded back into the index here.
 export async function syncBrainIndex(): Promise<{ reindexed: number; removed: number }> {
     const client = await getBrainDb()
     const [files, rs] = await Promise.all([listPageFiles(), client.execute('SELECT slug, hash FROM brain_pages')])

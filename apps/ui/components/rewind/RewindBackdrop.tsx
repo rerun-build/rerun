@@ -5,7 +5,6 @@ import { useReducedMotion } from 'motion/react'
 
 export type RewindBackdropShape = NonNullable<GrainGradientProps['shape']>
 
-// Caps the canvas under a wide story card at 2x DPR, so two slides crossfading stay cheap.
 const MAX_PIXEL_COUNT = 2_000_000
 
 export function RewindBackdrop({ base, colors, shape }: { base: string; colors: string[]; shape: RewindBackdropShape }) {

@@ -9,13 +9,10 @@ function frameOf(event: IpcMainEvent | IpcMainInvokeEvent): { url: string; isMai
     return { url: frame.url, isMainFrame: frame === event.sender.mainFrame }
 }
 
-// Checked against the server the window shows now: after "Change Server…" that is the new one, which
-// the configured server (an environment override, the saved setting) may not be yet.
 export function audienceOf(event: IpcMainEvent | IpcMainInvokeEvent): SenderAudience | null {
     return senderAudience(frameOf(event), currentServer(), LOCAL_ORIGIN)
 }
 
-// A handler answers the audiences it names and throws for anyone else, before reading its arguments.
 export function handle<Args extends unknown[], Result>(
     channel: string,
     audiences: readonly SenderAudience[],

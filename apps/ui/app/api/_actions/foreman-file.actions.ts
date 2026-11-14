@@ -7,22 +7,16 @@ import { FOREMAN_FILES_BUCKET, foremanFileKey } from '@/lib/foreman/files'
 import { readForemanFile } from '@/lib/foreman/read-attachment'
 import { removePrivateFiles } from '@/lib/storage/private'
 
-/** Drops an attachment the user took back out of the composer after its bytes had landed. */
 export async function deleteForemanFileAction(sessionId: string, path: string): Promise<void> {
     const ctx = await requireWorkspaceContext()
     await removePrivateFiles(ctx.supabase, FOREMAN_FILES_BUCKET, [foremanFileKey(ctx, sessionId, path)])
 }
 
-/** Backs the lightbox when the user opens a text attachment of a foreman conversation. */
 export async function readForemanFileAction(sessionId: string, path: string): Promise<{ content: string; truncated: boolean }> {
     const ctx = await requireWorkspaceContext()
     return readForemanFile(ctx, sessionId, path)
 }
 
-/**
- * Whether the foreman on the workspace's engine takes files in its own workspace. Boxes update on
- * their own schedule, and one that predates it answers 403 to every upload.
- */
 export async function foremanEngineFilesAction(): Promise<boolean> {
     try {
         const ctx = await requireWorkspaceContext()

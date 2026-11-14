@@ -8,9 +8,6 @@ import type { LoadedConnection } from './types.js'
 const CLAUDE_OAUTH_CLIENT_ID = '9d1c250a-e61b-44d9-88ed-5944d1962f5e'
 const CLAUDE_OAUTH_TOKEN_URL = 'https://platform.claude.com/v1/oauth/token'
 const REFRESH_SKEW_MS = 5 * 60_000
-// Anthropic revokes the old access token the moment it hands out a new one, and a running CLI holds
-// the token it was spawned with. So a refresh happens while no CLI is out on this connection, hours
-// before the token runs out, and only the last minutes force one under a live run.
 const IDLE_REFRESH_WINDOW_MS = 4 * 3_600_000
 const IDLE_RETRY_BACKOFF_MS = 10 * 60_000
 const NETWORK_RETRY_DELAYS_MS = [1_000, 4_000]
@@ -48,8 +45,6 @@ async function refresh(connection: LoadedConnection, refreshToken: string): Prom
     const res = await postRefresh(refreshToken)
     const data = (await res.json().catch(() => ({}))) as { access_token?: string; refresh_token?: string; expires_in?: number; error?: unknown; error_description?: unknown }
     if (!res.ok || !data.access_token) {
-        // A 400/401 is a refresh token Anthropic no longer honours: every run on this connection now
-        // fails with "OAuth access token has expired" until the user signs in again.
         const dead = res.status === 400 || res.status === 401
         logger[dead ? 'error' : 'warn']({ connection: connection.id, status: res.status, error: data.error, description: data.error_description, hasAccessToken: !!data.access_token }, 'claude token refresh failed')
         if (dead) recordCredentialRejected(connection.id)
@@ -71,8 +66,6 @@ async function refresh(connection: LoadedConnection, refreshToken: string): Prom
         else delete env[EXPIRES_KEY]
         await writeEnvFile(path, env)
 
-        // The connection object is shared by every agent drawing on it, so mutating it in place is
-        // what makes the fresh token visible box-wide without a reload.
         connection.env[TOKEN_KEY] = nextToken
         connection.env[REFRESH_KEY] = nextRefresh
         if (expiresAt !== undefined) connection.env[EXPIRES_KEY] = String(expiresAt)
@@ -124,8 +117,6 @@ export async function ensureFreshClaudeToken(connection: LoadedConnection | null
     return task
 }
 
-// How long the sign-in has left and whether the engine is due to renew it, for connections it
-// renews (a refresh token and a finite expiry time). Returns only these two derived values.
 export function claudeSignInLeft(connection: LoadedConnection | null, now = Date.now()): { minutesLeft: number; renewalDue: boolean } | null {
     if (!connection || !connection.env[REFRESH_KEY]) return null
     const expiresAtRaw = connection.env[EXPIRES_KEY]
@@ -140,9 +131,6 @@ export function claudeTokenOf(connection: LoadedConnection | null): string | und
     return connection?.env[TOKEN_KEY]
 }
 
-// Whether the token a CLI was spawned with has since been swapped for a new one or run out. Either
-// way a 401 from that CLI says nothing about the connection itself. A lapse the engine could not
-// make up for because the refresh token is dead is the one exception: that 401 is a real sign-out.
 export function claudeTokenOutlived(connection: LoadedConnection | null, spawnToken: string | undefined): boolean {
     if (!connection || !spawnToken) return false
     if (connection.env[TOKEN_KEY] !== spawnToken) return true
@@ -150,8 +138,6 @@ export function claudeTokenOutlived(connection: LoadedConnection | null, spawnTo
     return Number.isFinite(expiresAt) && expiresAt <= Date.now() && !isCredentialRejected(connection.id)
 }
 
-// Held for as long as a CLI spawned on this connection may still be calling Anthropic with the
-// token it was given. Giving back the last one is the idle moment a refresh waits for.
 export function acquireClaudeLease(connection: LoadedConnection | null): () => void {
     if (!connection) return () => {}
     leases.set(connection.id, (leases.get(connection.id) ?? 0) + 1)

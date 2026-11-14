@@ -16,7 +16,6 @@ function anonymous(id: string, createdAt: Date, isAnonymous = true): AuthUser {
     return { id, is_anonymous: isAnonymous, created_at: createdAt.toISOString() };
 }
 
-// Pages over the live list the way GoTrue does, so a user deleted mid-scan shifts the next page.
 function authAdmin(initial: AuthUser[], failingIds: string[] = []) {
     const live = [...initial];
     return {

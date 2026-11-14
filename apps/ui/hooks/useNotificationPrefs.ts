@@ -10,11 +10,6 @@ import { updateNotificationPrefsAction } from '@/app/api/_actions/notifications.
 import { coworkerRuleOf, mergeNotificationPrefs, normalizeNotificationPrefs, type CoworkerRule, type NotificationPrefs, type NotificationPrefsPatch } from '@/lib/notifications/prefs'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// What was just changed, shown before the users row comes back over realtime. Shared, so the bell,
-// the dialog and the inbox menu never disagree for the second the write takes. `basis` is the stored
-// value it was built on: the pending value goes once that changes, not when another surface mounts.
-// `inFlight` counts the writes still running: the row of the first of two quick changes must not
-// clear what the second one is still saving.
 const usePendingPrefs = create<{ pending: NotificationPrefs | null; basis: unknown; inFlight: number }>(() => ({ pending: null, basis: undefined, inFlight: 0 }))
 
 let saving: Promise<void> = Promise.resolve()

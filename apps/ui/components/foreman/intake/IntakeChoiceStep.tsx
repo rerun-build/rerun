@@ -7,9 +7,6 @@ import { useState } from 'react'
 import { Field } from '@/components/ui/field'
 import { IntakeField } from './IntakeField'
 
-// A question answered by picking one of a few lines, or by writing your own. The same shape as an
-// agent's ask_choice, because it is the same question asked one screen earlier.
-
 type IntakeChoiceStepProps = {
     label: string
     options: string[]
@@ -37,8 +34,6 @@ export function IntakeChoiceStep({ label, options, value, placeholder, disabled,
                             disabled={disabled}
                             onChoose={() => {
                                 setCustom(false)
-                                // Un choix unique répond tout seul, comme dans QuestionForm : c'est ce
-                                // qui fait qu'une carte se remplit en quatre clics et pas en huit.
                                 onChoose(option)
                             }}
                         />

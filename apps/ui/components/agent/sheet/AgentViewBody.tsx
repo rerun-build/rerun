@@ -24,7 +24,6 @@ type AgentViewBodyProps = {
     onOpenSession: (sessionId: string, title: string, runId: string | null) => void
 }
 
-// A deep link into a file, a table, a skill or a routine is read here, where the list that drills into it lives.
 export function AgentViewBody({ agent, tab, onOpenSession }: AgentViewBodyProps) {
     const agentFileFocus = useBoardStore(s => s.agentFileFocus)
     const clearAgentFileFocus = useBoardStore(s => s.clearAgentFileFocus)

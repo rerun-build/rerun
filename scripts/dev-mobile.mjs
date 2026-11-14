@@ -1,27 +1,4 @@
 #!/usr/bin/env node
-// The Expo iOS app in the simulator or on the paired iPhone, from a bare checkout to a running bundle.
-//
-//   pnpm dev:mobile                     this workspace's own simulator, reusing a dev client already built for the same native inputs
-//   pnpm dev:mobile --device            the paired iPhone, signed with the Apple ID added in Xcode (a free one is enough)
-//   pnpm dev:mobile [--device] --rebuild   ignore the cached dev client and force the native build
-//   pnpm dev:mobile --android [--rebuild]  this workspace's own Android emulator (dev-mobile-android.mjs)
-//
-// The app talks to the Next server of this workspace (apps/ui, on CONDUCTOR_PORT), so the script
-// starts it too, unless the `ui` run script already serves that port or EXPO_PUBLIC_API_URL points
-// the app at a deployed hub.
-//
-// The native project is built with xcodebuild rather than `expo run:ios`: the latter targets the
-// paired iPhone first and dies on code signing. `ios/` is generated and gitignored, so a fresh
-// workspace goes through `expo prebuild` first. The built Rerun.app only depends on the native inputs,
-// the JS comes from Metro, so every successful build is kept in a cache shared by all the workspaces of
-// this Mac, keyed by those inputs. A workspace whose key was already built skips prebuild and build.
-// The key leaves pnpm-lock.yaml out, it changes with every PR: a native module bumped through the
-// lockfile alone needs --rebuild.
-// Every dev build uses the personal team config (see app.config.ts): no Sign in with Apple
-// capability and a `.dev` bundle ID, so the same `ios/` serves the simulator and a free-signed iPhone.
-// Metro gets CONDUCTOR_PORT + 2 and each workspace gets its own simulator, "Rerun · <workspace>",
-// so two workspaces can run the app at once. Metro's `i` key opens the first booted simulator of the
-// Mac, whichever workspace it belongs to: reload with `r` or ⌘R instead.
 
 import { spawn, spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
@@ -35,12 +12,10 @@ import { apiAnswers, startApi, waitForApi, waitForMetro } from './dev-mobile-sha
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const APP_DIR = join(REPO_ROOT, 'apps/mobile')
 const IOS_DIR = join(APP_DIR, 'ios')
-// Outside ios/: prebuild recreates that directory from scratch and would take the build cache with it.
 const DERIVED_DATA_DIR = join(APP_DIR, '.expo/xcode-build')
 const PREBUILD_STAMP = join(DERIVED_DATA_DIR, '.rerun-prebuild-stamp')
 const TEAM_STAMP = join(DERIVED_DATA_DIR, '.rerun-apple-team')
 const NATIVE_INPUTS = ['package.json', 'app.json', 'app.config.ts']
-// Outside every worktree, so archiving a workspace does not take the dev clients with it.
 const CLIENT_CACHE_DIR = join(homedir(), 'Library/Caches/rerun-mobile')
 const INSTALLED_DIR = join(CLIENT_CACHE_DIR, 'installed')
 const CLIENT_KEY = /^[0-9a-f]{64}$/
@@ -63,8 +38,6 @@ function dotenvValue(key) {
 const remoteApiUrl = process.env.EXPO_PUBLIC_API_URL || dotenvValue('EXPO_PUBLIC_API_URL')
 const usesLocalApi = !remoteApiUrl
 
-// The simulator shares the Mac's loopback; the iPhone reaches the Mac over Wi-Fi, and ATS lets a raw
-// IP through in clear. An explicit EXPO_PUBLIC_API_URL (say, staging) wins over both.
 function apiUrl() {
     if (!usesLocalApi) return remoteApiUrl
     if (!onDevice) return `http://localhost:${API_PORT}`
@@ -72,8 +45,6 @@ function apiUrl() {
     return `http://${lanIp || 'localhost'}:${API_PORT}`
 }
 
-// CocoaPods from Homebrew: the system 1.11 is too old for React Native 0.86. Without
-// EXPO_NO_GIT_STATUS, prebuild stops on a prompt as soon as the worktree is dirty.
 const env = { ...process.env, PATH: `/opt/homebrew/bin:${process.env.PATH}`, EXPO_NO_GIT_STATUS: '1', RERUN_PERSONAL_TEAM: '1', EXPO_PUBLIC_API_URL: apiUrl() }
 
 function log(message) {
@@ -93,16 +64,10 @@ function runOrExit(command, args, options = {}) {
     }
 }
 
-// `-quiet` still lets through every clang and swift warning of the ~130 pods, tens of thousands of
-// lines that bury both the progress and a real failure. Errors are untouched.
 const QUIET_WARNINGS = ['GCC_WARN_INHIBIT_ALL_WARNINGS=YES', 'SWIFT_SUPPRESS_WARNINGS=YES']
 
-// Xcode 26 keeps every compiled object in a CAS under the derived data of this workspace, which
-// survives a wiped ios/ (not a new workspace), so a rebuild only pays for what actually changed.
-// Off unless asked for.
 const BUILD_CACHE = ['COMPILATION_CACHE_ENABLE_CACHING=YES']
 
-// A quiet xcodebuild prints nothing for the ten-odd minutes of a cold build, so it gets a heartbeat.
 function runBuild(args) {
     return new Promise(done => {
         const startedAt = Date.now()
@@ -150,8 +115,6 @@ function latestIosRuntime() {
     return iosRuntimes.at(-1).identifier
 }
 
-// A booted simulator stays up after Ctrl-C so the next run starts at once, which is why the ones of
-// archived workspaces get deleted here: they would keep their RAM forever.
 function deleteArchivedWorkspaceSimulators() {
     const workspacePath = process.env.CONDUCTOR_WORKSPACE_PATH
     if (!workspacePath) return
@@ -173,21 +136,16 @@ function workspaceSimulator() {
         log(`creating the simulator "${name}"`)
         const udid = capture('xcrun', ['simctl', 'create', name, SIMULATOR_TYPE, latestIosRuntime()]).trim()
         if (!udid) fail(`could not create the simulator "${name}"`)
-        // The first boot of a new simulator never settles on a busy Mac: its home screen stays grey and
-        // every app launch hangs. A second boot comes up clean, so the first one is just a setup pass.
         log('setting it up, its first boot takes a few minutes')
         runOrExit('xcrun', ['simctl', 'bootstatus', udid, '-b'], { stdio: 'ignore' })
         runOrExit('xcrun', ['simctl', 'shutdown', udid])
         simulator = { name, udid, state: 'Shutdown' }
     }
-    // `simctl boot` returns long before the first boot settles, and an install landing in between
-    // hangs the simulator's installd for good.
     if (simulator.state !== 'Booted') log(`booting ${name}`)
     runOrExit('xcrun', ['simctl', 'bootstatus', simulator.udid, '-b'], { stdio: 'ignore' })
     return { name, udid: simulator.udid }
 }
 
-// `list devices` reports a cached Developer Mode status, only `info details` asks the phone.
 function pickPhone() {
     const phones = (devicectlJson(['list', 'devices'])?.devices ?? []).filter(
         device => device.hardwareProperties?.platform === 'iOS' && device.hardwareProperties?.reality === 'physical' && device.connectionProperties?.pairingState === 'paired',
@@ -203,10 +161,6 @@ function pickPhone() {
     return { name, udid: phone.hardwareProperties.udid, coreDeviceId: phone.identifier }
 }
 
-// Xcode fetches the teams of the Apple IDs in Settings > Accounts on demand and only caches them
-// once a project picked one, so the team is looked up wherever a previous signing left it:
-// RERUN_APPLE_TEAM_ID, the last team this script used, the Xcode cache, the generated project, the
-// signing certificate. A free account shows up as a "Personal Team".
 function pickTeamId() {
     const remembered = existsSync(TEAM_STAMP) ? readFileSync(TEAM_STAMP, 'utf8').trim() : ''
     const teamId = process.env.RERUN_APPLE_TEAM_ID || remembered || teamFromXcodeCache() || teamFromProject() || teamFromCertificate()
@@ -253,8 +207,6 @@ function nativeInputsHash() {
     return hash.digest('hex')
 }
 
-// The Xcode version invalidates a client built by an older toolchain, the team a client signed for
-// another one.
 function clientKey({ sdk, bundleId, teamId }) {
     return createHash('sha256')
         .update(nativeInputsHash())
@@ -263,8 +215,6 @@ function clientKey({ sdk, bundleId, teamId }) {
         .digest('hex')
 }
 
-// Copied under a temporary name then renamed: two workspaces building the same key at once never
-// leave a half-copied client, the second rename just finds the entry there and drops its copy.
 function storeClient(builtApp, entry) {
     const copy = `${entry}.tmp-${process.pid}`
     rmSync(copy, { recursive: true, force: true })
@@ -325,9 +275,6 @@ if (reusesClient) {
     utimesSync(clientEntry, now, now)
 } else {
     if (!prebuildIsCurrent) {
-        // A merging prebuild can keep a capability the config dropped, but a clean one throws away
-        // ios/ and its pods, which costs a full pod install and a cold compile. So the clean pass is
-        // what --rebuild buys, and an ordinary edit to app.json only pays for what it changed.
         const clean = forceRebuild ? ['--clean'] : []
         log(`native inputs changed, running expo prebuild${clean.length ? ' --clean' : ''}`)
         runOrExit('pnpm', ['exec', 'expo', 'prebuild', '--platform', 'ios', ...clean])
@@ -354,8 +301,6 @@ if (reusesClient) {
     pruneClients()
 }
 
-// The app already on a simulator may come from another native version, so it is only kept when this
-// script installed it for the same key.
 const installedMarker = join(INSTALLED_DIR, target.udid)
 const installedKey = existsSync(installedMarker) ? readFileSync(installedMarker, 'utf8') : ''
 
@@ -376,7 +321,6 @@ if (usesLocalApi) {
 }
 
 log(`starting Metro on port ${METRO_PORT}`)
-// No --ios: Expo would open the app on the first booted simulator of the Mac, not this workspace's.
 const metro = spawn('pnpm', ['exec', 'expo', 'start', '--dev-client', ...(onDevice ? ['--host', 'lan'] : []), '--port', String(METRO_PORT)], {
     stdio: 'inherit',
     env,
@@ -396,8 +340,6 @@ if (!(await waitForMetro(METRO_PORT))) {
         log(`could not open Rerun on ${target.name}. A free Apple ID needs a one-time approval on the phone: Settings > General > VPN & Device Management > your Apple ID > Trust. Then open the app or scan the QR code`)
     }
 } else {
-    // --initialUrl is read by the dev launcher itself: unlike an exp+rerun:// URL, it skips the
-    // "Open in Rerun?" prompt of a fresh simulator.
     const launch = spawnSync('xcrun', ['simctl', 'launch', '--terminate-running-process', target.udid, bundleId, '--initialUrl', `http://localhost:${METRO_PORT}`], { stdio: 'ignore', env, timeout: 180_000 })
     if (launch.status === 0) log(`Rerun opened on ${target.name}`)
     else log(`could not open Rerun on ${target.name}, open it by hand in the simulator`)

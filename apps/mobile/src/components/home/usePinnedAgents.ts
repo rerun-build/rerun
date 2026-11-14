@@ -3,8 +3,6 @@ import { useCallback, useSyncExternalStore } from 'react'
 
 import { useAuth } from '@/auth/AuthProvider'
 
-// The coworkers pinned on this phone, per workspace. Nothing on the web pins a coworker, so the order
-// stays a preference of the device: no column, no route.
 const folder = () => new Directory(Paths.document, 'pinned-coworkers')
 const fileOf = (workspaceId: number) => new File(folder(), `${workspaceId}.json`)
 

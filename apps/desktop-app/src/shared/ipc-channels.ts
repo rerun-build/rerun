@@ -1,7 +1,5 @@
 import type { DesktopShellCapability, DesktopShellChannel, DesktopShellPlatform } from '@rerun/contracts'
 
-// The IPC channels between the preload and the main process. Requests go through `invoke`, events
-// come back on the `event:` channels.
 export const IPC = {
     bootstrap: 'rerun-shell:bootstrap',
     windowGetState: 'rerun-shell:window:get-state',

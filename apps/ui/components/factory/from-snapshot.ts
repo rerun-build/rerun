@@ -1,8 +1,3 @@
-// Adapter from the delegator's snapshot (packages/contracts, FactorySnapshot) to the Factory scene.
-// Boxes, coworker tiles and belts come from `factoryScene(0, now)`; pods, cabinets, counts and the hold
-// come from the jobs. `FactoryFrame` has no field for blocked jobs, cracked jobs or a silent delegator,
-// so they ride as extra fields. FactoryOverlay.tsx does not draw those three yet.
-
 import { agentTileStyle, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
 import { type CabinetView, type Cell, COPY_CELLS, FEATURE_CELLS, type FactoryFrame, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
@@ -19,7 +14,6 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     const base = factoryScene(0, now)
     const tileOf = (id: string) => base.tiles.find(t => t.id === id)!
 
-    // Cells for copies, by coworker: the sample loop's own.
     const copyCells: Record<string, { room: string; cells: Cell[] }> = {
         code: { room: 'build', cells: COPY_CELLS.code },
         LINUS: { room: 'review', cells: COPY_CELLS.LINUS },
@@ -41,7 +35,6 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     const counts = { queued: 0, building: 0, review: 0, checks: 0, merged: 0, runs: 0 }
     let rejects = 0
 
-    // The tile a job draws on: a copy tile when copy > 1 and it has a cell, else the coworker's own.
     const holderOf = (job: FactoryJob, who: string): string => {
         const slots = copyCells[who]
         const cell = slots && job.copy && job.copy >= 2 ? slots.cells[job.copy - 2] : undefined
@@ -113,7 +106,6 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         }
     }
 
-    // Cabinets: one per parent feature, as many as the stock box holds. A job with no parent has no feature sphere.
     const parents = [...new Set(jobs.map(j => j.parent).filter((p): p is number => p !== null))].sort((a, b) => a - b).slice(0, FEATURE_CELLS.length)
     const slotOf = (j: FactoryJob): SlotView => {
         const done = j.state === 'merged' || j.state === 'rejected'
@@ -128,7 +120,6 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Feature #${c.issue}${c.title ? ' ' + c.title : ''}: ${c.slots.filter(s => s.state !== 'empty').length} of ${c.slots.length}`,
     }))
 
-    // Coworker tiles: working when the pool has a run out, else idle.
     const out = new Map<string, number>()
     for (const pool of snapshot.pools) for (const c of pool.coworkers) out.set(c.name, c.out)
     const tiles: Tile[] = base.tiles.filter(t => KEEP.includes(t.id)).map(tile => {
@@ -141,7 +132,6 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy } }
     })
 
-    // Belts: the base ones between kept tiles, then one to each cabinet. Red when held, else the colour of what runs on it.
     const lineColor = new Map<string, string>()
     for (const p of pods) {
         const color = p.state === 'checks' ? STATUS_COLOR.checks : p.state === 'fixing' ? STATUS_COLOR.fixing : p.state === 'working' ? STATUS_COLOR[p.band === 'review' ? 'review' : 'build'] : null

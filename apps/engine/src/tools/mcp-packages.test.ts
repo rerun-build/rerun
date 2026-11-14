@@ -7,7 +7,6 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-mcp-packages-'
 process.env.RERUN_LOG_LEVEL = 'fatal'
 process.env.RERUN_API_KEY = 'engine-key'
 
-// A fake npm: it lays the tree `npm install --prefix <dir> <spec>` would, or fails as told.
 const npm = vi.hoisted(() => ({
     runs: [] as string[],
     envs: [] as Array<Record<string, string> | undefined>,
@@ -171,8 +170,6 @@ describe('withInstalledPackage', () => {
         expect(withInstalledPackage(server)).toBe(server)
     })
 
-    // Every message prepares the server again: a spec that just failed must not cost a full npm
-    // install each time, only once the retry spell is over.
     it('does not retry a failed install before the retry spell', async () => {
         npm.fail = 'ERR 404 not found'
         const server = npx('-y', 'mcp-tool@7.7.7')
@@ -180,7 +177,6 @@ describe('withInstalledPackage', () => {
         await installInBackground('mcp-tool@7.7.7')
         expect(npm.runs).toEqual(['mcp-tool@7.7.7'])
 
-        // npm is only spawned once the install folder exists: the runs list fills a tick later.
         const settle = () => new Promise(resolve => setTimeout(resolve, 50))
         npm.runs.length = 0
         withInstalledPackage(server)

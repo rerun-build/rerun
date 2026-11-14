@@ -18,8 +18,6 @@ function isPrivateIpv4(host: string): boolean {
     return a === 10 || a === 127 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 169 && b === 254) || (a === 100 && b >= 64 && b <= 127)
 }
 
-// The only places iOS lets the app speak plain HTTP to: the person's own network, a Tailscale address
-// included, never the open internet.
 export function isLocalNetworkHost(host: string): boolean {
     const name = host.toLowerCase()
     if (name === 'localhost' || name.endsWith('.local')) return true
@@ -54,8 +52,6 @@ function reachableOverHttp(url: string): boolean {
 
 type Request = (path: string, init: { signal: AbortSignal }) => Promise<unknown>
 
-// Asks a hub how a phone signs in to it. An address that answers but is not a Rerun hub, or is one
-// from before the app could pick a server, is told apart from one that does not answer at all.
 export async function lookUpServer(origin: string, request: Request = createApiClient({ baseUrl: origin, clientHeader })): Promise<ServerLookup> {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS)

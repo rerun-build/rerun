@@ -37,7 +37,6 @@ export function PanelEditorFooter({ children }: { children: ReactNode }) {
 type PanelDeleteButtonProps = Omit<ComponentProps<typeof Button>, 'children' | 'variant' | 'size' | 'loading'> & {
     label: string
     busy?: boolean
-    // Faux quand le bouton n'est qu'un trigger d'AlertDialog : la dialog porte alors la confirmation.
     confirm?: boolean
     confirmTitle?: string
     confirmDescription?: ReactNode
@@ -45,7 +44,6 @@ type PanelDeleteButtonProps = Omit<ComponentProps<typeof Button>, 'children' | '
     size?: 'icon-sm' | 'icon-xs'
 }
 
-// La confirmation passe par une dialog, sauf quand l'appelant en fournit déjà une.
 export function PanelDeleteButton({ label, busy = false, confirm = true, confirmTitle, confirmDescription, confirmLabel, size = 'icon-sm', className, onClick, ...props }: PanelDeleteButtonProps) {
     const t = useTranslations('ui')
     const button = (

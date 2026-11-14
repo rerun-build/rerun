@@ -27,16 +27,12 @@ function ScreenPill({ symbol, label }: { symbol: 'globe' | 'mouse-pointer'; labe
 type ScreenCardProps = {
     live: boolean
     site: string | null
-    // The 16:9 face: the live screen and what covers it until it paints.
     screen: ReactNode
     takeover?: TakeoverRequestState
     onTakeControl: () => void
     onLayout?: (event: LayoutChangeEvent) => void
 }
 
-// The web's `ScreenCard`: the coworker's screen as a block of its thread, where the run uses it. A
-// takeover the run asks for joins the same block, under a rule. A phone has no hover: what a tap does
-// stays written on the screen.
 export function ScreenCard({ live, site, screen, takeover, onTakeControl, onLayout }: ScreenCardProps) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.pane')
@@ -45,7 +41,6 @@ export function ScreenCard({ live, site, screen, takeover, onTakeControl, onLayo
     return (
         <View onLayout={onLayout} style={{ width: '95%', borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: theme.border, backgroundColor: surface }}>
             {takeover && <BorderBeam tone="brand" radius={radius.lg} surface={surface} />}
-            {/* Padded rather than given a margin: Yoga sizes a margined aspect-ratio box off its height. */}
             <View style={{ padding: takeover ? 6 : 0 }}>
                 <View style={{ aspectRatio: 16 / 9, borderRadius: takeover ? radius.md : radius.lg - 1, borderCurve: 'continuous', overflow: 'hidden', backgroundColor: theme.card }}>
                     {screen}

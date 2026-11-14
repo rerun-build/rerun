@@ -16,16 +16,12 @@ function boardAgentFromRow(row: Parameters<typeof agentFromRow>[0]): BoardAgent 
     return agent
 }
 
-// The caller's level on each Box of the workspace. An admin manages them all without a read.
 async function boxAccessOfSpace(actor: Actor): Promise<(spaceId: string) => BoxAccess> {
     if (isAdminActor(actor)) return () => 'manage'
     const map = await spaceAccessMap(actor)
     return spaceId => map.get(spaceId) ?? 'none'
 }
 
-// The server side of the board's hydrate: every agent the caller reaches, in the Boxes it sees, with
-// the status its live sessions give it and the caller's level on its Box. Reachability is not in
-// here, it comes from the health poll, so a Box that does not answer never holds up the list.
 export async function listBoardAgents(ctx: WorkspaceContext): Promise<BoardAgent[]> {
     const actor = actorFromContext(ctx)
     const [{ data, error }, accessOf] = await Promise.all([selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }), boxAccessOfSpace(actor)])

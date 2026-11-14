@@ -9,21 +9,16 @@ import type { ChatEndpoints } from './endpoints'
 
 export type ChatCaller = { accessToken: string; workspaceId: number }
 
-// Read when a send leaves, not when the transport is built: the conversation can be born from the first
-// send, and the token can be refreshed between two.
 export type ChatLink = {
     endpoints: ChatEndpoints
     sessionRef: RefObject<string | null>
     runRef: RefObject<string | null>
     callerRef: RefObject<ChatCaller | null>
     onSessionRef: RefObject<(sessionId: string) => void>
-    // The message a stream let go on the way out left on screen, for the next replay to land on.
     resumeOntoRef: RefObject<string | null>
-    // Set when the last reconnect could not reach the hub at all, for the hook to fall back on the transcript.
     reconnectFailedRef: RefObject<boolean>
 }
 
-// The engine keeps the conversation, so a send carries only the text of the new message, as on the web.
 export function lastUserText(messages: UIMessage[]): string {
     const last = messages[messages.length - 1]
     if (!last || last.role !== 'user') return ''
@@ -33,8 +28,6 @@ export function lastUserText(messages: UIMessage[]): string {
         .join('')
 }
 
-// The engine's stream opens without a message id, so a replay would add its run as a new message
-// next to the one already on screen. Naming that message in the opening chunk makes it take its place.
 export function withStartMessageId(stream: ReadableStream<UIMessageChunk>, messageId: string): ReadableStream<UIMessageChunk> {
     let named = false
     return stream.pipeThrough(
@@ -71,8 +64,6 @@ class ChatTransport extends DefaultChatTransport<UIMessage> {
     }
 }
 
-// The hub streams the engine's UI message stream as it comes; expo/fetch is the fetch that hands a
-// React Native app the body as a stream. A send names the run in a response header.
 export function createChatTransport(link: ChatLink) {
     const headers = () => {
         const caller = link.callerRef.current
@@ -91,7 +82,6 @@ export function createChatTransport(link: ChatLink) {
         api: `${environment.apiUrl}${link.endpoints.sendPath}`,
         headers,
         fetch: streamingFetch,
-        // `queued` tells the hub the text waited behind a run: it retries the engine instead of dropping it.
         prepareSendMessagesRequest: ({ messages, body }) => ({ body: { ...link.endpoints.sendBody(link.sessionRef.current, lastUserText(messages)), ...(body?.queued === true && { queued: true }) } }),
         prepareReconnectToStreamRequest: () => ({ api: `${environment.apiUrl}/api/chat/resume?agentId=${encodeURIComponent(link.endpoints.agentId)}&runId=${encodeURIComponent(link.runRef.current ?? '')}`, headers: headers() }),
     })

@@ -18,8 +18,6 @@ function Frame({ children }: { children: React.ReactNode }) {
 
 export type TeamStartState = 'starting' | 'failed' | 'blocked' | 'started'
 
-// The step between the confirmed plan and the build. The app sells nothing: it starts the workspace on
-// its own the moment the plan is confirmed, and only says something when that did not go through.
 export function TeamStartCard({ state, onRetry }: { state: TeamStartState; onRetry: () => void }) {
     const theme = useTheme()
     const t = useTranslations('mobileOnboarding')
@@ -72,9 +70,6 @@ function TaskRow({ task }: { task: BuildTask }) {
     )
 }
 
-// The build, live: one row per thing being put on the board. Once it is done, the coworker it put first
-// is the one to start, as the button the web leaves under its build. A build that put nobody on the board
-// is run again from here: the composer is gone past the plan.
 export function BuildCard({ tasks, result, starting, onStartLead, onRetry }: { tasks: BuildTask[]; result: BuildResult | null; starting: boolean; onStartLead: () => void; onRetry: (() => void) | null }) {
     const done = result !== null
     const t = useTranslations('mobileOnboarding')
@@ -103,8 +98,6 @@ export function BuildCard({ tasks, result, starting, onStartLead, onRetry }: { t
     )
 }
 
-// No machine is free for the build: the web's waitlist wall. Their answers are kept, and the screen opens
-// on its own once a machine frees up.
 export function WaitlistNotice() {
     const t = useTranslations('mobileOnboarding')
     return (

@@ -8,10 +8,6 @@ import { mcpPackagesDir } from '../config/paths.js'
 import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
 
-// `npx -y <spec>` checks the registry, or clones a `github:` spec, every time it starts, which is on
-// every message for a CLI provider. The package is installed once instead, and the server launched
-// straight from its bin. Until the first install lands the run keeps `npx`, never waiting on npm.
-
 export const PACKAGE_REFRESH_MS = 24 * 60 * 60 * 1000
 const INSTALL_TIMEOUT_MS = 5 * 60 * 1000
 
@@ -20,8 +16,6 @@ type Installed = { installId: string; spec: string; installedAt: number; bin: st
 
 const NPX_YES_FLAGS = new Set(['-y', '--yes'])
 
-// Only the plain form the catalog uses: yes flags, the package, then the server's own arguments.
-// Anything else (`-p`, `--package`, `--`, `-c`) keeps going through npx as declared.
 export function parseNpxLaunch(server: McpServer): NpxLaunch | null {
     if (!server.command || basename(server.command) !== 'npx') return null
     let index = 0
@@ -31,8 +25,6 @@ export function parseNpxLaunch(server: McpServer): NpxLaunch | null {
     return { spec, rest: server.args.slice(index + 1) }
 }
 
-// A spec that names an exact version or a git ref installs the same tree forever. Anything else
-// (`@latest`, a range, a bare name) is refreshed once a day, as npx would have picked it up.
 export function isPinnedSpec(spec: string): boolean {
     const hashAt = spec.indexOf('#')
     if (hashAt > 0) return hashAt < spec.length - 1
@@ -53,7 +45,6 @@ function readInstalled(spec: string): Installed | null {
     }
 }
 
-// npx runs the bin named after the package when it has several, the only one otherwise.
 function binOf(installDir: string): string | null {
     const manifest = JSON.parse(readFileSync(resolve(installDir, 'package.json'), 'utf8')) as { dependencies?: Record<string, string> }
     const name = Object.keys(manifest.dependencies ?? {})[0]
@@ -65,8 +56,6 @@ function binOf(installDir: string): string | null {
     return picked ? resolve(installDir, 'node_modules', '.bin', picked) : null
 }
 
-// The package's install scripts run with the same environment as the server itself: native addons
-// still build, the engine's configuration is out of reach.
 function npmInstall(spec: string, installDir: string): Promise<void> {
     return new Promise((done, fail) => {
         const child = spawn('npm', ['install', '--prefix', installDir, '--no-audit', '--no-fund', '--loglevel=error', spec], { stdio: ['ignore', 'ignore', 'pipe'], env: childProcessEnv({}) })
@@ -85,8 +74,6 @@ function npmInstall(spec: string, installDir: string): Promise<void> {
     })
 }
 
-// Each install lands in its own folder and `current.json` is swapped last, so a server still running
-// from the previous tree keeps its files. Only that previous tree is kept beside the new one.
 async function install(spec: string): Promise<void> {
     const root = specDir(spec)
     const previous = readInstalled(spec)?.installId
@@ -109,9 +96,6 @@ async function install(spec: string): Promise<void> {
     }
 }
 
-// A spec that failed to install (no bin to launch, a native build the box cannot do, a registry
-// outage) is not tried again on every message: each attempt is a full `npm install`, up to five
-// minutes of network and CPU, and the server keeps running through npx in the meantime.
 export const INSTALL_RETRY_MS = 60 * 60 * 1000
 
 const installing = new Map<string, Promise<void>>()

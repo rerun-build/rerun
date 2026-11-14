@@ -31,7 +31,6 @@ const MANIFEST = serviceManifestSchema.parse({
     authMethods: [{ id: 'composio', kind: 'composio', composio: { toolkit: 'gmail', authConfigId: 'ac_gmail' }, mcpServers: [{ name: 'gmail', transport: 'http', url: 'https://rerun.test/api/mcp/composio/gmail' }] }],
 })
 
-// A self-hosted catalog row: the id is resolved at /start and carried in the sealed context.
 const UNSET_MANIFEST = { ...MANIFEST, authMethods: [{ ...MANIFEST.authMethods[0], composio: { toolkit: 'gmail', authConfigId: '' } }] }
 
 const ACTIVE: ComposioConnectedAccount = { id: 'ca_1', userId: 'local_agent_agent-1', authConfigId: 'ac_gmail', status: 'ACTIVE', toolkit: 'gmail' }

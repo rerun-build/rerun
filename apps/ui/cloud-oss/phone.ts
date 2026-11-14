@@ -1,5 +1,3 @@
-// No phone in this build: signing in by SMS needs a paid sender. Every account reads as one that
-// was never asked for a number, which keeps the phone out of the getting-started list and the walls.
 export type PhoneStatus = 'none' | 'pending' | 'skipped' | 'unverifiable' | 'verified'
 
 export const PHONE_ENABLED = false

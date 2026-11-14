@@ -25,7 +25,6 @@ type UseAgentFileNavigationProps = {
     onOpenFile: (path: string, name: string) => void
 }
 
-/** Owns directory loading and the one-shot navigation requested by a chat file link. */
 export function useAgentFileNavigation({ agentId, focusPath, onFocusConsumed, onOpenFile }: UseAgentFileNavigationProps) {
     const t = useTranslations('agent.agentFileNavigation')
     const [initialFocus] = useState(() => focusedFile(focusPath))

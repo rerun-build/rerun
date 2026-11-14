@@ -9,10 +9,6 @@ import { FOREMAN_FILES_BUCKET, foremanFileKey } from './files'
 
 export type ForemanFileRead = { content: string; truncated: boolean }
 
-/**
- * Reads a file the user attached to a foreman conversation. Text only: the foreman runs on a model
- * with no vision, so an image is named rather than pretended to be read.
- */
 export async function readForemanFile(ctx: Pick<WorkspaceContext, 'userId' | 'workspace' | 'supabase'>, sessionId: string, path: string): Promise<ForemanFileRead> {
     const name = path.split('/').pop() ?? path
     if (filePreviewKind(name) !== 'text') {

@@ -2,7 +2,6 @@
 
 import { TILE_H, TILE_W } from '../iso'
 
-// How long a refusal stays on screen before the board clears it.
 export const DROP_REFUSAL_MS = 2000
 
 export function DropHint({

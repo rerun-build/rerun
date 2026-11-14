@@ -51,7 +51,6 @@ export function ExpertTemplateList({
 
 const ROW_TITLE_WIDTHS = ['w-32', 'w-24', 'w-36', 'w-28']
 
-// Mirrors ExpertTemplateRow so the rows land where the placeholders were.
 function ExpertTemplateListSkeleton({ rows = 4 }: { rows?: number }) {
     return (
         <div className="min-h-0 flex-1 overflow-y-auto">

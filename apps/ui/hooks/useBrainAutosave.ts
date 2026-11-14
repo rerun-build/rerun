@@ -12,8 +12,6 @@ export type AutosaveStatus = 'idle' | 'pending' | 'saving' | 'saved' | 'error' |
 
 const DEBOUNCE_MS = 1000
 
-// The last write of a page that was just left can still be in flight when it is opened again: read
-// before it lands and the page comes back with a hash its own write already replaced.
 const pendingSaves = new Map<string, Promise<void>>()
 
 export const pendingBrainSave = (slug: string) => pendingSaves.get(slug) ?? Promise.resolve()
@@ -23,9 +21,6 @@ type UseBrainAutosaveOptions = {
     onSaved: (detail: BrainPageDetail) => void
 }
 
-// A page saves itself a second after the last keystroke, against the version it was opened at. If
-// an agent's change landed in between, the write is refused and the person picks a side; nothing
-// is lost either way, the other version stays in the history.
 export function useBrainAutosave({ page, onSaved }: UseBrainAutosaveOptions) {
     const [status, setStatus] = useState<AutosaveStatus>('idle')
     const [error, setError] = useState<string | null>(null)
@@ -81,7 +76,6 @@ export function useBrainAutosave({ page, onSaved }: UseBrainAutosaveOptions) {
         timer.current = setTimeout(() => void flushRef.current(), DEBOUNCE_MS)
     }, [])
 
-    // One write at a time: the next one waits and starts from the hash the previous one returned.
     const flush = useCallback(async () => {
         if (timer.current) {
             clearTimeout(timer.current)
@@ -113,7 +107,6 @@ export function useBrainAutosave({ page, onSaved }: UseBrainAutosaveOptions) {
         [schedule],
     )
 
-    // Their version wins: the draft is dropped and the editor reloads from what the page says now.
     const loadTheirs = useCallback(async (): Promise<BrainPage | null> => {
         const latest = await readBrainPageAction(page.slug)
         if (!latest) return null
@@ -128,7 +121,6 @@ export function useBrainAutosave({ page, onSaved }: UseBrainAutosaveOptions) {
         return latest.page
     }, [page.slug])
 
-    // This draft wins, written on top of the version that refused it.
     const keepMine = useCallback(async () => {
         const latest = await readBrainPageAction(page.slug)
         baseHash.current = latest?.page.hash ?? null
@@ -139,7 +131,6 @@ export function useBrainAutosave({ page, onSaved }: UseBrainAutosaveOptions) {
         await flush()
     }, [page.slug, flush])
 
-    // Leaving the page, closing the dialog or switching to another one never drops a keystroke.
     useEffect(
         () => () => {
             if (timer.current) clearTimeout(timer.current)

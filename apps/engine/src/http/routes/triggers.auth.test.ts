@@ -21,7 +21,6 @@ const { createServer } = await import('../server.js')
 const app = createServer()
 const auth = { authorization: 'Bearer dev-key', 'content-type': 'application/json' }
 
-// The factory runner creates a trigger and fires it with the dev engine key set (rerun#60 C2).
 describe('trigger create and fire with the engine key set', () => {
     it('refuses create and fire without the key', async () => {
         const create = await app.request('/agents/a1/triggers', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: 'stage', body: 'go' }) })

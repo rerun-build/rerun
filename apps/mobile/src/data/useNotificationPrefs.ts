@@ -11,13 +11,8 @@ import { translatorFor } from '@/i18n/translator'
 type Caller = { accessToken: string; workspaceId: number }
 type Store = { userId: string | null; prefs: NotificationPrefs | null; failed: boolean }
 
-// One copy for every screen that shows a rule (the settings, a coworker's page, an inbox row), so a
-// change made on one is already there when the next opens.
 let store: Store = { userId: null, prefs: null, failed: false }
 const listeners = new Set<() => void>()
-// Writes go out one after the other, and the hub's answer is only taken once none is left on its way:
-// an earlier answer would put back what a later tap just changed. A read that left before a write
-// is dropped the same way, even if it lands after the write answered.
 let queue: Promise<unknown> = Promise.resolve()
 let pending = 0
 let writes = 0

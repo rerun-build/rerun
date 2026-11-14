@@ -11,14 +11,8 @@ import { loadTranscript, readTranscript, sameTranscript } from '@/data/local-cac
 
 export type HistoryState = 'loading' | 'ready' | 'error'
 
-// Let go of the stream this long before iOS takes its time back, while the app can still run.
 const GRACE_MARGIN_S = 5
 
-// One conversation with a coworker or the Foreman, streamed from the engine through the hub.
-// `initialSessionId` is null for a new conversation, which the first send creates; the page keeps its
-// chat across that birth instead of starting over.
-// `onRefused` gets back a message the engine turned down because a run still held the conversation,
-// so it can wait for that run rather than vanish.
 export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated, onRefused }: { endpoints: ChatEndpoints; initialSessionId: string | null; onSessionCreated?: (sessionId: string) => void; onRefused?: (text: string, behindRunId: string | null) => void }) {
     const { session, me } = useAuth()
     const callerRef = useRef<ChatCaller | null>(null)
@@ -30,15 +24,10 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
     const resumeOntoRef = useRef<string | null>(null)
     const reconnectFailedRef = useRef(false)
     const [sessionId, setSessionId] = useState(initialSessionId)
-    // The transcript kept from the last visit opens the conversation at once; the hub's answer
-    // replaces it behind, the way a messaging app opens a thread.
     const [cached] = useState(() => (initialSessionId && me ? readTranscript(me.workspace.id, initialSessionId) : null))
     const [history, setHistory] = useState<HistoryState>(initialSessionId && !cached ? 'loading' : 'ready')
-    // False while what is on screen is only the kept transcript: nothing that acts on the run's
-    // current state (a question to answer, quick replies) is offered on it.
     const [fresh, setFresh] = useState(!initialSessionId)
     const [pageId] = useState(() => initialSessionId ?? `new-${endpoints.agentId}-${Date.now()}`)
-    // When the run on screen began, for the timer under the last message.
     const [runStartedAt, setRunStartedAt] = useState(() => Date.now())
 
     useEffect(() => {
@@ -53,7 +42,6 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         setSessionId(id)
         createdRef.current?.(id)
     })
-    // The refs go to the transport untouched: it reads them when a send leaves, never while rendering.
     // eslint-disable-next-line react-hooks/refs
     const [transport] = useState(() => createChatTransport({ endpoints, sessionRef, runRef, callerRef, onSessionRef, resumeOntoRef, reconnectFailedRef }))
 
@@ -61,7 +49,6 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
     const { setMessages, resumeStream, status, stop: dropStream, clearError } = chat
     const shownRef = useRef(chat.messages)
     const statusRef = useRef(status)
-    // The message the running stream writes: once it has written, the last one on screen is its own.
     const streamedRef = useRef<string | null>(null)
     useEffect(() => {
         shownRef.current = chat.messages
@@ -72,19 +59,14 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         streamedRef.current = last?.role === 'assistant' ? last.id : null
     }, [chat.messages, status])
 
-    // The transcript the engine kept is the one to show: it carries what a stream may have dropped.
     const refresh = useCallback(
         async ({ resume }: { resume: boolean }) => {
             const caller = callerRef.current
             const id = sessionRef.current
             if (!caller || !id) return
-            // The running run is looked up while the transcript loads; the stream is only picked up
-            // once the transcript is in place, since it goes on from the messages already there.
             const [messages, runId] = await Promise.all([loadTranscript(caller.workspaceId, id, () => endpoints.messages(caller, id)), resume ? endpoints.activeRun(caller, id).catch(() => null) : null])
             setHistory('ready')
             setFresh(true)
-            // A send left while the read was on its way: the hub's copy predates it, and the stream
-            // on screen is already the one to follow. The end of that run reads the transcript again.
             if (statusRef.current === 'submitted' || statusRef.current === 'streaming') return
             if (!sameTranscript(messages, shownRef.current)) setMessages(messages)
             if (!runId) return
@@ -95,19 +77,14 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         [endpoints, setMessages, resumeStream]
     )
 
-    // A kept transcript stays on screen when the hub cannot be reached: the error is only for a
-    // conversation with nothing to show.
     const failToLoad = useCallback(() => setHistory(current => (current === 'loading' ? 'error' : current)), [])
 
     useEffect(() => {
         if (!initialSessionId || !me) return
         refresh({ resume: true }).catch(failToLoad)
-        // Read once per conversation opened; the caller only has to be there.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialSessionId, Boolean(me)])
 
-    // The stream was let go when the app left with a run on screen: the run goes on in the engine and
-    // is picked up again on return, so the conversation stays busy in between.
     const [away, setAway] = useState(false)
     const awayRef = useRef(false)
     const busy = status === 'streaming' || status === 'submitted' || away
@@ -121,12 +98,8 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         setAway(false)
     }, [])
 
-    // Set when the run followed on return is no longer the one holding the conversation: the read at
-    // the end of the stream then picks the newer one up.
     const newerRunRef = useRef(false)
 
-    // Back with the run's id in hand, its stream is picked up at once, without waiting for the
-    // transcript: the replay lands on the message left on screen, and the transcript is read once it ends.
     const rejoin = useCallback(async () => {
         const caller = callerRef.current
         const id = sessionRef.current
@@ -141,25 +114,18 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
             .catch(() => {})
         await resumeStream()
         await lookedUp
-        // The hub could not be reached at all: the error it left is not the conversation's, and the
-        // transcript read is the one that stays quiet until the network is back.
         if (!reconnectFailedRef.current) return
         clearError()
         newerRunRef.current = false
         await refresh({ resume: true })
     }, [endpoints, refresh, resumeStream, clearError])
 
-    // A stream left open in the background dies of an iOS timeout on return, shown as an error over
-    // a transcript that is fine. So the app drops it on its way out, without stopping the run. A
-    // conversation not born yet keeps its stream: its id only comes with the response.
     const letGo = useCallback(() => {
         awayRef.current = true
         setAway(true)
         dropStream().catch(() => {})
     }, [dropStream])
 
-    // iOS grants about thirty seconds once the app leaves the screen: the stream stays open through
-    // them, so a quick look elsewhere comes back to a conversation that never stopped.
     const graceRef = useRef<ReturnType<typeof setTimeout> | 'asking' | null>(null)
     const endGrace = useCallback(() => {
         if (graceRef.current && graceRef.current !== 'asking') clearTimeout(graceRef.current)
@@ -203,7 +169,6 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
             }
             if (state !== 'active') return
             if (graceRef.current) {
-                // Kept is false when iOS took its time back first: the app slept and the stream with it.
                 endGrace().then(kept => {
                     const broken = statusRef.current === 'error'
                     if (kept && !broken) return
@@ -215,8 +180,6 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
                 return
             }
             if (awayRef.current) {
-                // Settles once there is nothing left to follow: no run, or the stream it picked up
-                // has ended. Before that, the status below takes over.
                 rejoin().catch(() => {}).finally(comeBack)
                 return
             }
@@ -225,13 +188,10 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         return () => subscription.remove()
     }, [refresh, rejoin, letGo, endGrace, clearError, comeBack])
 
-    // The stream picked up again speaks for itself: busy follows the status from here.
     useEffect(() => {
         if (awayRef.current && status !== 'ready') comeBack()
     }, [status, comeBack])
 
-    // Once a stream ends, the stored transcript replaces it: same text, plus the ids and outputs the
-    // engine settled on.
     const wasBusy = useRef(false)
     useEffect(() => {
         if (wasBusy.current && !busy) {
@@ -242,7 +202,6 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         wasBusy.current = busy
     }, [busy, refresh])
 
-    // Someone else's message is running in this conversation: follow it rather than show an error.
     const { error } = chat
     useEffect(() => {
         if (!error || !error.message.includes('run_in_flight')) return
@@ -253,8 +212,6 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         refresh({ resume: true }).catch(() => {})
     }, [error, clearError, refresh])
 
-    // Signed on the way out, as the web signs it: the avatar shows on the bubble before the
-    // transcript comes back with the author the engine stored.
     const authorId = me?.user.id
     const send = useCallback(
         (text: string, files?: FileUIPart[], options?: { queued?: boolean }) => {
@@ -272,13 +229,11 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
         if (caller && id) await endpoints.stop(caller, id, runRef.current).catch(() => {})
     }, [chat, endpoints])
 
-    // Sends the last message again, as the web's Try again does.
     const regenerate = useCallback(() => {
         setRunStartedAt(Date.now())
         return chat.regenerate()
     }, [chat])
 
-    // The run holding the conversation, as last named by the hub: what a queued message waits behind.
     const activeRunId = useCallback(() => runRef.current, [])
 
     return { messages: chat.messages, status, runStartedAt, activeRunId, regenerate, error: error && !error.message.includes('run_in_flight') ? error : undefined, busy, sessionId, history, fresh, send, stop, retry: () => refresh({ resume: true }).catch(() => setHistory('error')) }

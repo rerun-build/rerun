@@ -3,8 +3,6 @@ import { Button } from '@/components/ui/button'
 import { ArrowRightIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-// The one heading every block of the library's main column wears, so the page reads as a stack of
-// equal sections under a single, larger page title.
 export function TemplateLibrarySection({ title, subtitle, action, children, className }: { title: string; subtitle?: string; action?: ReactNode; children: ReactNode; className?: string }) {
     return (
         <section className={cn('flex flex-col gap-4', className)}>

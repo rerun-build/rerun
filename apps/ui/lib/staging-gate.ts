@@ -1,10 +1,3 @@
-// Staging sits behind one shared password, asked by the browser's own Basic Auth prompt. The
-// password only exists on the staging host: with no `STAGING_PASSWORD` set, there is no gate.
-//
-// Only pages are closed. A machine caller (a Stripe webhook, an OAuth callback, an engine) has no
-// prompt to answer and its route authenticates itself, and the PostHog relay under /ingest must
-// not lose a beacon to a 401.
-
 export const STAGING_GATE_CHALLENGE = 'Basic realm="Rerun staging", charset="UTF-8"'
 
 const OPEN_PREFIXES = ['/api/', '/ingest/'] as const

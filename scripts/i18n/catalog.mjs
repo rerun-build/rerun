@@ -1,5 +1,3 @@
-// Shared by `pnpm i18n:check` and `pnpm i18n:translate`: reads the packs of packages/i18n, flattens
-// them to dotted keys, and checks a translated string against its English source.
 import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
@@ -52,7 +50,6 @@ export function flatten(tree, prefix = '') {
     return out
 }
 
-// Rebuilt in the order of the English source, so a pack's diff lines up with the source's.
 export function unflattenLike(source, flat, prefix = '') {
     const out = {}
     for (const [key, value] of Object.entries(source)) {
@@ -89,9 +86,6 @@ export function readGlossary() {
     return JSON.parse(readFileSync(path.join(PACKAGE_DIR, 'glossary.json'), 'utf8'))
 }
 
-// `{name}`, `{count, plural, ...}` and `{when, date}` as "name", "count:plural", "when:date", and the
-// rich text tags as "<link>": what a translation must carry over unchanged. A small walk over the ICU
-// syntax, so the text of a branch (`=0 {coworkers}`) is never taken for an argument.
 export function placeholdersOf(message) {
     const found = new Set()
     const walkText = index => {
@@ -131,8 +125,6 @@ const DASHES = /[—–]/
 export function problemsOf({ key, source, translation, locale, glossary }) {
     const problems = []
     if (typeof translation !== 'string' || !translation.trim()) return [`${key}: empty`]
-    // Same arguments with the same types, except that a language may need a plural or a select on an
-    // argument English uses as is ("{failed} failed" becomes "{failed, plural, ...} en échec").
     const loose = placeholder => placeholder.replace(/:(plural|select|selectordinal)$/, '')
     const sourcePlaceholders = placeholdersOf(source)
     const translationPlaceholders = placeholdersOf(translation).map(placeholder => (sourcePlaceholders.includes(placeholder) ? placeholder : sourcePlaceholders.includes(loose(placeholder)) ? loose(placeholder) : placeholder))
@@ -147,7 +139,6 @@ export function problemsOf({ key, source, translation, locale, glossary }) {
     return problems
 }
 
-// A longer language may take more room, within reason: past this the layout is likely to break.
 export function tooLong(source, translation) {
     return translation.length > Math.max(source.length * 1.4, source.length + 12)
 }

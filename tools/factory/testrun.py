@@ -16,7 +16,6 @@ def _rc(path, cmd, timeout):
 
 
 def run(base_path, head_path, cmd, timeout=600):
-    """The done-test must fail on base and pass on head."""
     base, head = _rc(base_path, cmd, timeout), _rc(head_path, cmd, timeout)
     verdict = "passes_on_base" if base == 0 else "fails_on_head" if head else "ok"
     return {"verdict": verdict, "base": base, "head": head}

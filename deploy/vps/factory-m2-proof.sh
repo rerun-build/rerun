@@ -1,10 +1,4 @@
 #!/bin/sh
-# Runs the whole milestone 2 proof (deploy/vps/FACTORY-M2.md, steps 2 to 10) in one go, with the waits,
-# and prints the status table after each test. About 11 minutes. From the clone on the server:
-#   sudo sh deploy/vps/factory-m2-proof.sh
-# It touches only the rerun-dev project (development engine, stub model, runner). The live engine is
-# not started, stopped or read. No key is printed. A failed step is reported and the script goes on,
-# so the later tests still leave evidence.
 set -u
 cd "$(dirname "$0")/../.."
 [ "$(id -u)" = 0 ] || { echo "Run it with sudo: sudo sh deploy/vps/factory-m2-proof.sh"; exit 1; }

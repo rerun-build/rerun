@@ -3,7 +3,6 @@ import { useColorScheme } from 'react-native'
 
 import { palette, type ColorScheme, type Palette } from '@/theme/tokens'
 
-// Set only by a ThemeScope: the lab draws the same component in both themes side by side.
 const ForcedScheme = createContext<ColorScheme | null>(null)
 
 export function ThemeScope({ scheme, children }: { scheme: ColorScheme; children: ReactNode }) {

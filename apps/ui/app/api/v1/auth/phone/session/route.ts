@@ -9,8 +9,6 @@ import { phoneSignInRequestSchema, type AppSession } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// Signs into the account this number holds, or creates it, and hands the session to the app. Every
-// try is counted before the code is looked at: a wrong one and the review code alike.
 export const POST = apiRoute({ auth: 'public', body: phoneSignInRequestSchema }, async ({ req, body }): Promise<AppSession | Response> => {
     const phone = isPhoneCountry(body.country) ? toE164(body.phone, body.country) : null
     if (!phone) return phoneRefused('invalid_number')

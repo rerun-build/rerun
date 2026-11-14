@@ -9,9 +9,6 @@ const CAPSULE_HELD_DEEP = '#b91c1c'
 const HALF_W = 28
 const HALF_H = HALF_W / 2
 
-// The flowchart terminator: an upright steel capsule standing on the buddy's floor point, inside
-// the buddy's view box, so the tile keeps its place. No face, nothing animated. It is unlit at
-// rest, lit while it works, red under a hold (the `waiting` mood); any other mood reads as idle.
 export function CapsuleArt({ uid, mood, plain }: { uid: string; mood: BuddyMood; plain?: string }) {
     const held = mood === 'waiting'
     const lit = mood === 'working'

@@ -52,13 +52,10 @@ export function useFileNavigation<T>({ list, initialPath = '', initialShowHidden
     }, [list, showHidden])
 
     useEffect(() => {
-        // Directory selection is synchronized with the engine filesystem here.
         // eslint-disable-next-line react-hooks/set-state-in-effect
         void load(requestedPath)
     }, [requestedPath, load])
 
-    // The displayed directory is the last one that finished listing, not the one that was just
-    // clicked: the step animation then carries the real grid instead of sliding in a skeleton.
     const currentPath = directory?.path ?? requestedPath
 
     const enter = useCallback((name: string) => setRequestedPath(currentPath ? `${currentPath}/${name}` : name), [currentPath])
@@ -71,8 +68,6 @@ export function useFileNavigation<T>({ list, initialPath = '', initialShowHidden
 
     const goHome = useCallback(() => setRequestedPath(''), [])
 
-    // Refreshing while a navigation is still in flight abandons it, so the requested path is pulled
-    // back in line: otherwise the effect would never re-fire and that navigation would be lost.
     const reload = useCallback(() => {
         setRequestedPath(currentPath)
         void load(currentPath)

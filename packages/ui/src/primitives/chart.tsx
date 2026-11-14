@@ -9,7 +9,6 @@ import { formatNumber } from "@rerun/i18n/format"
 import { cn } from "../cn"
 import { useUiLocale } from "../locale"
 
-// Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
 
 const INITIAL_DIMENSION = { width: 320, height: 200 } as const

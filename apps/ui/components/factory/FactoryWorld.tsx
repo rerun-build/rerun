@@ -14,18 +14,13 @@ import { floorFrame } from './factory-camera'
 import { FactoryOverlay } from './FactoryOverlay'
 import { LOOP_MS, factoryScene, type Cell, type FactoryFrame } from './factory-scene'
 
-// The feature spheres and scanner gates stand above the floor, so the camera frames the Boxes with headroom above them.
 const OVERHEAD_PX = 120
-// Room kept under the floor for the bar until it is measured, and the gap around it.
 const BAR_PX = 110
 const BAR_MARGIN_PX = 20
-// Kept free at each side of the floor: a Box's name stands on its upper-left edge and overhangs it.
 const SIDE_PX = 40
 
 const TICK_MS = 250
 
-// The board re-renders only when what it draws changes: a value keeps its identity until its content
-// does. The scene is rebuilt every tick, but tiles and links change only when a task changes stage.
 function useStable<T>(value: T): T {
     const key = JSON.stringify(value)
     const held = useRef({ key, value })
@@ -33,7 +28,6 @@ function useStable<T>(value: T): T {
     return held.current.value
 }
 
-// The moving parts keep a clock of their own, so the spheres glide while the board stays still.
 type SceneFn = (t: number, now: number) => FactoryFrame
 
 function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }: { start: number; tiles: Tile[]; routes: Map<string, AxisPoint[]>; scene: SceneFn; selectedIssue: number | null; onSelectJob: ((issue: number) => void) | undefined }) {
@@ -46,10 +40,6 @@ function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }
     return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} holdLeftMs={frame.holdLeftMs} links={frame.links} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} />
 }
 
-// The factory, drawn by the board's own world. The world takes the whole stage; a thin glass bar
-// carries the gauges and the counts, and a band drops in while sending is held.
-// `workspace` keys the owner's own arrangement of the floor in the browser. `rightInset` is the width a
-// column laid over the stage's right edge covers: the floor and the bar fit in what is left of it.
 export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker, rightInset = 0, snapshot = null, topBar }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void; rightInset?: number; snapshot?: FactorySnapshot | null; topBar?: ReactNode }) {
     const [clock, setClock] = useState(() => ({ start: Date.now(), now: Date.now() }))
     const [expired, setExpired] = useState<Set<string>>(() => new Set())
@@ -60,17 +50,11 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
 
     const t = (clock.now - clock.start) % LOOP_MS
     const frame = useMemo(() => scene(t, clock.now), [scene, t, clock.now])
-    // Two bubbles at most, the newest: more read as noise.
-    // A toast's id carries the loop's number, so the same moment in the next loop is a new toast.
     const loop = Math.floor((clock.now - clock.start) / LOOP_MS)
     const toasts = useStable(frame.toasts.map(toast => ({ ...toast, id: `${toast.id}#${loop}` })).filter(toast => !expired.has(toast.id)).slice(-2))
-    // Every coworker and floor object can be dragged to a free cell, as on the board; where it was put
-    // is kept per workspace, and the belts route from there.
     const sceneTiles = useStable(frame.tiles)
     const storageKey = layoutStorageKey(workspace)
     const saved = useSyncExternalStore(subscribeLayout, () => loadLayout(storageKey), () => null)
-    // A stored place outside every Box is refused, so a stale or edited value cannot move a tile off
-    // the floor.
     const boxes = frame.containers
     const moves = useMemo(() => readMoves(saved, sceneTiles, boxes), [saved, sceneTiles, boxes])
     const tiles = useMemo(() => applyMoves(sceneTiles, moves, boxes), [sceneTiles, moves, boxes])
@@ -80,16 +64,12 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     const canDropTile = useCallback((id: string, cell: Cell) => dropReason(sceneTiles, moves, id, cell, boxes), [sceneTiles, moves, boxes])
     const moved = Object.keys(moves).length > 0
     const links = useStable(frame.links)
-    // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
     const routes = useMemo(() => routeTileLinks(tiles, links), [tiles, links])
     const onToastExpire = useCallback((id: string) => setExpired(prev => new Set(prev).add(id)), [])
     const worldOverlay = useCallback(() => <LiveOverlay start={clock.start} tiles={tiles} routes={routes} scene={scene} selectedIssue={selectedIssue} onSelectJob={onSelectJob} />, [clock.start, tiles, routes, scene, selectedIssue, onSelectJob])
-    // A coworker's tile opens its panel on a click. A click that ends a drag is not a click: IsoGrid
-    // selects only a press released before the drag threshold.
     const gridTiles = useMemo(() => (onOpenCoworker ? tiles.map(t => (t.style?.buddy ? { ...t, selectable: true } : t)) : tiles), [tiles, onOpenCoworker])
     const onTileSelect = useCallback((id: string | null) => { if (id && onOpenCoworker) onOpenCoworker(id) }, [onOpenCoworker])
 
-    // A feature whose sphere fills throws the app's own confetti; a single merge has its own shake.
     const fullCabinets = frame.cabinets.filter(c => c.slots.every(s => s.state !== 'empty')).length
     const full = useRef(fullCabinets)
     useEffect(() => {
@@ -106,15 +86,11 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
         { id: `${c.id}-c`, position: { col: c.col_end, row: c.row_start }, span: 1, style: { color: '' } },
         { id: `${c.id}-d`, position: { col: c.col_start, row: c.row_end }, span: 1, style: { color: '' } },
     ] as Tile[]), [frame.containers])
-    // The floor is framed in what the column and the bar leave visible, and centred there: the pan is
-    // in world px inside the zoom, so a shift of k screen px is k / zoom.
     const barSpace = bar ? bar.height + 2 * BAR_MARGIN_PX : BAR_PX
     const topSpace = topBar ? (top ? top.height + 2 * BAR_MARGIN_PX : BAR_PX) : 0
     const camera = useMemo(() => {
         if (!size) return null
         const { width, height, shiftX, shiftY } = floorFrame({ stage: size, rightInset, topSpace, bottomSpace: barSpace, overhead: OVERHEAD_PX, side: SIDE_PX })
-        // The whole floor is always in view: in a narrow stage it is framed below the board's usual
-        // zoom floor rather than cut.
         const c = frameTemplateBoard(corners, { width, height }, 2, 0.94, 0.1)
         return { zoom: c.zoom, pan: { x: c.pan.x + shiftX / c.zoom, y: c.pan.y + shiftY / c.zoom } }
     }, [size, corners, rightInset, barSpace, topSpace])
@@ -140,8 +116,6 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
                 worldOverlay={worldOverlay}
             />
 
-            {/* The bar lives in the visible part of the stage and wraps its groups onto more rows when
-                that part is narrow, so no number is ever cut. */}
             <FactoryBarFrame edge="bottom" rightInset={rightInset} frameRef={barRef}>
                 <div className="flex items-center gap-2 pr-1">
                     <span className={`size-2 rounded-full ${frame.held ? 'bg-red-500' : 'animate-pulse bg-emerald-500 motion-reduce:animate-none'}`} />

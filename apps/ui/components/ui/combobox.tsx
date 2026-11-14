@@ -10,7 +10,6 @@ import { ChevronsUpDownIcon, GripVerticalIcon, XIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { useMemo, useRef, useState, type ReactNode } from 'react'
 
-// A `disabled` option stays listed and cannot be picked; `hint` says why, on its right.
 export type ComboboxOption = { value: string; label: string; keywords?: string[]; leading?: ReactNode; disabled?: boolean; hint?: string }
 
 export type ComboboxGroup = { id: string; heading?: string; options: ComboboxOption[] }

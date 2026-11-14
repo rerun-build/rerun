@@ -19,7 +19,6 @@ type CustomMcpRowProps = {
     onConnect: () => void
     onEdit: () => void
     onRemove: () => void
-    // Why connecting, editing or removing the server is out of reach: the buttons stay, disabled.
     disabledReason?: string
 }
 

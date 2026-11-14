@@ -1,6 +1,5 @@
 export class UploadHttpError extends Error {
     status: number
-    // What the server said, when it said something: the fallback message is only for the logs.
     serverMessage: string | null
     constructor(status: number, message: string, serverMessage: string | null = null) {
         super(message)
@@ -42,7 +41,6 @@ function serverMessageOf(responseText: string): string | null {
         const message = (parsed as { error?: unknown }).error
         if (typeof message === 'string' && message) return message
     } catch {
-        // An empty or non-JSON body is the normal shape of a proxy-level rejection.
     }
     return null
 }
@@ -55,18 +53,13 @@ function messageFor(status: number, responseText: string): string {
     return 'Upload failed. Retry in a moment.'
 }
 
-// `fetch` cannot report how much of a request body has been sent, which is the whole point here, so
-// this is the one place in the app that still reaches for XMLHttpRequest.
 export function xhrUpload({ url, body, onProgress, onSent }: XhrUploadParams): XhrUploadHandle {
     const xhr = new XMLHttpRequest()
 
-    // oxlint-disable-next-line eslint-plugin-promise(avoid-new)
     const promise = new Promise<unknown>((resolve, reject) => {
         xhr.upload.addEventListener('progress', event => {
             if (event.lengthComputable) onProgress(event.loaded, event.total)
         })
-        // The bytes have left the browser, but the server is still writing them. Callers use this to
-        // switch the bar to indeterminate instead of parking it at 100%.
         xhr.upload.addEventListener('loadend', () => onSent())
         xhr.addEventListener('load', () => {
             if (xhr.status >= 200 && xhr.status < 300) {

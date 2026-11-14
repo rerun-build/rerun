@@ -8,7 +8,6 @@ def _git(cwd, args, stdin):
 
 
 def apply(workdir, patch, allowed, max_lines=MAX_LINES):
-    """Apply patch in workdir: 'applied', 'oversized' (outside paths or too long) or 'failed'."""
     stat = _git(workdir, ["apply", "--numstat"], patch)
     if stat.returncode:
         return "failed"

@@ -8,8 +8,6 @@ import { mix, withAlpha } from '@/theme/tokens'
 const HEIGHT = 36
 const INSET = 2
 
-// The iOS segmented picker's Android twin, drawn by the app rather than Material's outlined buttons:
-// a muted track, the chosen segment on a raised card, a ripple on press.
 export function SegmentedControl<Value extends string>({ options, value, onChange }: SegmentedControlProps<Value>) {
     const theme = useTheme()
     return (

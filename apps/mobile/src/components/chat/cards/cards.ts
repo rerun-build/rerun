@@ -4,10 +4,8 @@ type ToolPart = { type: string; toolName?: string; state?: string; output?: unkn
 
 export type ChatCard = { kind: 'table'; card: TableCard } | { kind: 'file'; card: FileCard }
 
-// A picture Codex generated on a ChatGPT plan comes back shaped like a file card.
 const CARD_TOOLS = { card_table: tableCardSchema, card_file: fileCardSchema, image_generation: fileCardSchema } as const
 
-// The card a tool call drew, once its output is in and parses; anything else stays a step.
 export function cardOf(part: ToolPart): ChatCard | null {
     const name = stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
     if (part.state !== 'output-available' || !(name in CARD_TOOLS)) return null
@@ -18,7 +16,6 @@ export function cardOf(part: ToolPart): ChatCard | null {
 
 export type SizeUnit = 'b' | 'kb' | 'mb'
 
-// A file's size as the web card rounds it: whole bytes and kilobytes, megabytes to one decimal.
 export function sizeParts(size: number): { unit: SizeUnit; value: number; fractionDigits: number } {
     if (size < 1024) return { unit: 'b', value: size, fractionDigits: 0 }
     if (size < 1024 * 1024) return { unit: 'kb', value: Math.round(size / 1024), fractionDigits: 0 }
@@ -27,7 +24,6 @@ export function sizeParts(size: number): { unit: SizeUnit; value: number; fracti
 
 const HASHED_TONES = ['brand', 'cyan', 'green', 'orange', 'yellow', 'neutral'] as const
 
-// The tone the agent gave a value, or a stable one hashed from it, as the web card picks it.
 export function toneOf(value: string, tones?: Record<string, string>): string {
     const explicit = tones?.[value]
     if (explicit) return explicit
@@ -44,8 +40,6 @@ export type EventCard =
 
 type EventPart = ToolPart & { input?: unknown }
 
-// What a coworker did that the person should see rather than a step: a notification it sent, a setup
-// it finished, a change to the Brain. Anything unreadable stays a step.
 export function eventCardOf(part: EventPart): EventCard | null {
     if (part.state !== 'output-available') return null
     const name = stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
@@ -68,8 +62,6 @@ export function eventCardOf(part: EventPart): EventCard | null {
 
 export type ConnectCard = { kind: 'service-installed'; name: string; toolNames: string[] } | { kind: 'service-needs-auth'; slug: string; name: string } | { kind: 'mcp-server'; card: McpRegisterCard }
 
-// An app or a server the coworker just connected, as the web shows it. Browsing the catalog stays a
-// step: only an actual install, or a server registered outside the catalog, is worth a card.
 export function connectCardOf(part: EventPart): ConnectCard | null {
     if (part.state !== 'output-available') return null
     const name = stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))

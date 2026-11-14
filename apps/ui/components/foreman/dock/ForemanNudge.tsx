@@ -10,10 +10,6 @@ import { ForemanDockBubble } from './ForemanDockBubble'
 
 type ForemanNudgeProps = { corner: ForemanCorner; nudge: Nudge; onOpen: () => void; onLater: () => void }
 
-/**
- * The Foreman stopped on a question or an approval while its column was closed. The card only says
- * so: the answer is given in the column, where the question's own form is.
- */
 export function ForemanNudge({ corner, nudge, onOpen, onLater }: ForemanNudgeProps) {
     const t = useTranslations('foreman.nudge')
     const approval = nudge.kind === 'approval'

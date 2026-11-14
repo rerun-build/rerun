@@ -6,8 +6,6 @@ import { clearLocalCache, saveTranscript } from '@/data/local-cache'
 import type { ChatEndpoints } from './endpoints'
 import { useCoworkerChat } from './useCoworkerChat'
 
-// As the SDK does it: a resume only reports 'submitted' once the reconnect has answered, and its
-// promise settles when the stream ends, or at once when the reconnect found nothing.
 const mockChat = {
     initialStatus: 'streaming',
     setStatus: (_status: string) => {},
@@ -272,7 +270,6 @@ describe('useCoworkerChat opening a conversation', () => {
     })
 })
 
-// A run followed from the opening of the conversation: its id is known and its message is on screen.
 async function followRun(endpoints: ChatEndpoints) {
     mockChat.initialStatus = 'ready'
     mockChat.messages = [

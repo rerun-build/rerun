@@ -19,9 +19,6 @@ export async function claimParkedSignIn(claim: string, claimant: Claimant): Prom
     }
 }
 
-// The engine write the callback left to the app: the same bundle and the same registry flip the web
-// callback does, once the person who started the sign-in asked for it with their bearer. A catalog
-// service reached through a plain MCP sign-in is flipped by its route, which knows the key.
 export async function finishParkedSignIn(agentId: string, actor: Actor, parked: ParkedSignIn): Promise<void> {
     if (parked.kind === 'composio') {
         await markComposioAuthorized(agentId, parked.key, parked.connectedAccountId, undefined, actor)

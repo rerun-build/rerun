@@ -51,7 +51,6 @@ type AlertProps = React.ComponentProps<"div"> &
     animated?: boolean
     glow?: boolean
     pattern?: BorderBeamProps["pattern"]
-    /** Overrides the beam color derived from `variant`. */
     tone?: BorderBeamProps["tone"]
     beamProps?: Partial<BorderBeamProps>
     stripes?: boolean

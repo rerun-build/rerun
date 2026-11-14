@@ -17,7 +17,6 @@ const { provisionUser } = await import('./user-provisioning.service')
 const account = { id: 'user-1', is_anonymous: false } as User
 const visitor = { id: 'user-1', is_anonymous: true } as User
 
-// The request client only reads the users row; the service role answers the stamp with the row it wrote.
 const existing = (signedUpAt: string | null) => fakeSupabase(table => (table === 'users' ? { data: { id: 'user-1', workspace_id: 7, signed_up_at: signedUpAt } } : undefined))
 const stampLands = () => {
     service = fakeSupabase(table => (table === 'users' ? { data: [{ id: 'user-1' }] } : undefined))

@@ -1,7 +1,5 @@
 import type { UIMessage } from 'ai'
 
-// The web's tool-calls lab (apps/ui/app/render/lab/tool-calls/fixtures.ts), for the iOS one.
-
 type ToolKind = 'think' | 'gmail_search' | 'gmail_send' | 'slack_post' | 'hubspot_update' | 'notion_read' | 'shell_exec' | 'fs_read' | 'fs_write' | 'web_search' | 'web_fetch'
 
 const TOOLS: Record<Exclude<ToolKind, 'think'>, { name: string; arg: string; details: string[] }> = {
@@ -31,7 +29,6 @@ function partOf(id: string, kind: ToolKind, i: number, state: 'done' | 'error' |
     return { ...base, state: 'output-available', output: 'Done' } as Part
 }
 
-/** A coworker's turn: its steps, then the answer once they are all done. */
 export function stepsMessage(id: string, kinds: ToolKind[], { failing = [], running = false }: { failing?: number[]; running?: boolean } = {}): UIMessage {
     const parts = kinds.map((kind, i) => partOf(id, kind, i, running && i === kinds.length - 1 ? 'running' : failing.includes(i) ? 'error' : 'done'))
     const answer: Part = { type: 'text', text: 'Ten cold emails are out, the three agencies that replied are flagged in HubSpot.' } as Part

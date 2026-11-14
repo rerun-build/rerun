@@ -19,13 +19,6 @@ import { pickSentFields, templateAuthorPatchSchema, templateEditBlockReason } fr
 import { templateSubmitChecklist } from '@/lib/templates/submit'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 
-// The template-authoring half of the account MCP server (app/api/mcp/account/route.ts). The key
-// names a workspace, so the author is resolved from it once, here, and every handler below is
-// handed a scope it cannot widen. Everything these handlers do is a call into lib/templates: the
-// panel in the app runs the same functions, which is why "submitted from Claude Code" and
-// "submitted from the app" cannot drift apart.
-
-// `.strict()` so a misspelled field is an error the model can read rather than a silent no-op.
 const updatePatchSchema = templateAuthorPatchSchema.strict()
 
 const captureRequestSchema = z.object({
@@ -35,8 +28,6 @@ const captureRequestSchema = z.object({
     setup: captureSetupSchema.optional(),
 })
 
-// A raw ZodError serialises as a JSON blob the calling model has to parse to learn it priced a
-// template at $2. One sentence instead.
 function readableZodError(error: z.ZodError): Error {
     return new Error(error.issues.map(issue => `${issue.path.join('.') || 'input'}: ${issue.message}`).join('; '))
 }
@@ -52,10 +43,7 @@ function projectPlan(plan: AgentCapturePlan) {
         connectorSlugs: plan.connectorSlugs,
         skills: plan.skills.map(skill => ({ name: skill.name, description: skill.description })),
         schedules: plan.schedules.map(schedule => ({ name: schedule.name, cron: schedule.cron })),
-        // The instruction and the accepted methods, never the URL: the copy is issued its own.
         triggers: plan.triggers.map(trigger => ({ name: trigger.name, description: trigger.description, methods: trigger.methods, enabled: trigger.enabled })),
-        // Names only, never values: the archive ships `.env` keys empty, and this is the shopping
-        // list whoever installs the template will be asked for.
         envKeys: plan.envKeys,
         mcpAuth: plan.mcpAuth,
         memoryCount: plan.memoryCount,
@@ -69,9 +57,6 @@ function projectPlan(plan: AgentCapturePlan) {
     }
 }
 
-// The wizard in the app starts from the engine's own exclusions, and a model that shipped a memory
-// folder by omission could not take it back once the archive sits behind a public install button.
-// Same defaults here; `keep` is the deliberate way out of one.
 function toSelections(plans: AgentCapturePlan[], requested: z.infer<typeof captureRequestSchema>[]) {
     return requested.map(entry => {
         const plan = plans.find(candidate => candidate.agentRowId === entry.agentId)
@@ -122,8 +107,6 @@ async function runTemplateTool(workspaceId: number, name: string, args: Record<s
         case 'get_template': {
             const detail = await loadAuthorTemplate(scope.userId, requireString(args.templateId, 'templateId'))
             const doc = detail.document
-            // The one thing the checklist cannot answer on its own, and the one that decides
-            // whether a paid submission goes through.
             const checklist = templateSubmitChecklist(doc, englishTranslator('templates.expert.footer'), { payoutsReady: await isPayoutReady(doc.creatorId) })
 
             return {
@@ -169,9 +152,6 @@ async function runTemplateTool(workspaceId: number, name: string, args: Record<s
             const templateId = requireString(args.templateId, 'templateId')
             const sent = Object.fromEntries(Object.entries(args).filter(([key]) => key !== 'templateId'))
 
-            // `.partial()` does not cancel the `.default()` every field carries, so parsing alone
-            // would hand back an empty tagline and a price of 0 for a call that only meant to fix
-            // the title. Only the keys the caller actually sent make it into the patch.
             const patch = pickSentFields(updatePatchSchema.parse(sent), sent)
             if (Object.keys(patch).length === 0) throw new Error('Nothing to update: pass at least one field besides templateId.')
 
@@ -210,9 +190,6 @@ async function runTemplateTool(workspaceId: number, name: string, args: Record<s
                     name: space.name,
                     agents: space.agents.map(agent => ({ agentId: agent.id, name: agent.name, handle: agent.handle, description: agent.description, status: agent.status })),
                 })),
-                // Reaching this line already means the key passed the sandbox gate, so an empty list
-                // is an empty sandbox and never a refusal. A model that reads it as one stops before
-                // building the very agents that would fill it.
                 ...(spaces.length === 0
                     ? { note: 'This key is on an eligible sandbox and it holds no coworker yet, which is the normal state before you build any. This is not a refusal: a refusal comes back as an error naming the condition that failed. Create the coworkers with create_agent, in a Box from list_spaces, and they appear here.' }
                     : {}),

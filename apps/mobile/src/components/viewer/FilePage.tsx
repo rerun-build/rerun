@@ -10,12 +10,8 @@ import { Icon } from '@/components/ui/Icon'
 import { filePreviewOf } from '@/components/viewer/file-preview'
 import { textPageHtml } from '@/components/viewer/text-page'
 
-// Below the viewer's close button, title and counter.
 const HEADER_ROOM = 64
 
-// A file that is not a photo, read in a web view from its copy in the cache: iOS draws PDFs, text,
-// spreadsheets and office documents there, Android web pages and text (see filePreviewOf). What it cannot
-// draw says so, the share sheet stays a tap away.
 export function FilePage({ url, name, load }: { url: string; name: string; load: () => Promise<string> }) {
     const t = useTranslations('mobileCommon')
     const { width, height } = useWindowDimensions()
@@ -23,7 +19,6 @@ export function FilePage({ url, name, load }: { url: string; name: string; load:
     const [uri, setUri] = useState<string | null>(null)
     const [failed, setFailed] = useState(false)
     const preview = filePreviewOf(name)
-    // Downloaded once per file: the loader is rebuilt on every render of the viewer.
     const loadRef = useRef(load)
     useEffect(() => {
         loadRef.current = load

@@ -6,15 +6,10 @@ const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_VERSION}`
 const GRAPH_VIDEO_BASE = `https://graph-video.facebook.com/${GRAPH_VERSION}`
 const MAX_PAGE_SIZE = 100
 
-// The Facebook Login for Business configuration on the Rerun app: Pages as assets, the seven
-// Pages permissions, and a system-user token that never expires. The permissions live in the
-// configuration, so the authorize URL carries config_id instead of a scope.
 const LOGIN_CONFIG_ID = '1664481615043702'
 
 const POST_FIELDS = 'id,message,created_time,updated_time,permalink_url,full_picture,status_type,is_published,shares,reactions.summary(total_count).limit(0),comments.summary(total_count).limit(0)'
 const COMMENT_FIELDS = 'id,message,created_time,from,like_count,comment_count,is_hidden,permalink_url,attachment'
-// Meta retired the *_impressions metrics in favour of *_media_view; asking for a retired one
-// fails the whole call, so the defaults only name metrics checked against the live API.
 const DEFAULT_PAGE_METRICS = ['page_media_view', 'page_total_media_view_unique', 'page_follows', 'page_post_engagements']
 const DEFAULT_POST_METRICS = ['post_media_view', 'post_total_media_view_unique', 'post_clicks', 'post_reactions_by_type_total']
 
@@ -42,8 +37,6 @@ async function graph(token: string, method: string, path: string, params: Record
     return typeof data === 'object' && !Array.isArray(data) ? data : { result: data }
 }
 
-// The connected token belongs to the business, but Page endpoints only accept the Page's own
-// token, which the business token can always read back.
 async function pageToken(token: string, pageId: string): Promise<string> {
     const data = await graph(token, 'GET', `/${encodeURIComponent(pageId)}`, { fields: 'access_token' })
     if (typeof data.access_token !== 'string') throw new Error(`No access to Page ${pageId}. List the connected Pages with facebook_list_pages.`)

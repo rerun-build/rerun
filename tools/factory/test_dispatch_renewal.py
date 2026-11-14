@@ -10,7 +10,6 @@ def issue(n):
 
 
 class Account(World):
-    """A World whose account also answers list_ai_connections."""
     sign_in = {"minutesLeft": 120, "renewalDue": True}
     broken = False
 

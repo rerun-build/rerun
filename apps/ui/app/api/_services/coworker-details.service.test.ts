@@ -32,8 +32,6 @@ const { deleteCoworker, listCoworkerFiles, listCoworkerRoutines, readCoworkerNot
 const ctx = { userId: 'u1', role: 'member', boxScope: 'all', workspace: { id: 7 }, supabase: {} } as unknown as WorkspaceContext
 const actor = { kind: 'user', userId: 'u1', workspaceId: 7, role: 'member', boxScope: 'all' }
 
-// What the caller reaches on the coworker's Box: `none` stands for a coworker of another workspace,
-// of a Box closed to them, or one that is gone.
 function rowsAre({ access = 'manage', prefs = null }: { access?: 'none' | 'use' | 'manage'; prefs?: unknown }) {
     mocks.assertAgentAccess.mockImplementation(async (_agentId: string, need: 'use' | 'manage') => {
         if (access === 'none') throw new AuthorizationError('coworkerNotFound')

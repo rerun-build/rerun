@@ -49,7 +49,6 @@ describe('skill routes', () => {
         expect(await res.json()).toMatchObject({ slug: 'weekly-report', body: 'Collect the numbers, then write.' })
     })
 
-    // Unlike the import, which answers 409, a plain create replaces a skill of the same name.
     it('overwrites a skill created twice under the same name', async () => {
         const res = await send('POST', '', { name: 'Weekly Report', description: 'v2', body: 'Second version.' })
         expect(res.status).toBe(201)

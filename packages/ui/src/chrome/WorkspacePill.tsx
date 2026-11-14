@@ -13,8 +13,6 @@ export type WorkspacePillProps = ComponentProps<'button'> & {
     stripes?: boolean
 }
 
-// Les enfants portent `relative` : les hachures sont un calque absolu, qui peint donc au-dessus du
-// contenu resté en flux.
 export function WorkspacePill({ name, iconUrl, fallbackIconUrl, stripes = false, className, ...props }: WorkspacePillProps) {
     return (
         <ChromePill start="avatar" end="icon" className={className} {...props}>

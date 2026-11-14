@@ -9,11 +9,9 @@ export type ForemanVoicePhase = 'listening' | 'transcribing'
 
 type ForemanPillVoiceProps = {
     phase: ForemanVoicePhase
-    /** The recorder's own microphone. Without it the waveform idles: it would open a second one. */
     stream: MediaStream | null
 }
 
-/** Space held down: the field turns into the voice being recorded, then into its transcription. */
 export function ForemanPillVoice({ phase, stream }: ForemanPillVoiceProps) {
     const t = useTranslations('foreman.voice')
     const hearing = phase === 'listening' && stream !== null

@@ -25,7 +25,6 @@ export type LinkedinProDialogViewProps = {
     error: string | null
     defaultCountry: string
     approvalWait?: ApprovalWait | null
-    // For the lab: the connect screen opened on the cookie.
     initialSignIn?: 'password' | 'cookie'
     onConnectStart: () => void
     onReconnect: (connection: AppConnectionView) => void

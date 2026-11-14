@@ -13,7 +13,6 @@ export type DeclineReasonFormProps = {
     placeholder?: string
 }
 
-// The step a refusal goes through so the coworker learns why, not only that the user said no.
 export function DeclineReasonForm({ note, onNoteChange, onBack, onConfirm, disabled, placeholder }: DeclineReasonFormProps) {
     const t = useKitTranslations()
     return (

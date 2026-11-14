@@ -4,8 +4,6 @@ import { cn } from '@/lib/utils'
 const DOTS = 6
 const STEP_SECONDS = 0.14
 
-// Two tiles joined by two dotted paths, each lit one dot after the other: one carries what the left
-// side sends in, the other what the right side sends back.
 export function LinkedPair({ left, right, label, className }: { left: ReactNode; right: ReactNode; label: string; className?: string }) {
     return (
         <div role="img" aria-label={label} className={cn('flex items-center justify-center gap-2.5', className)}>

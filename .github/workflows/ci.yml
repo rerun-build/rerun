@@ -11,10 +11,6 @@ concurrency:
 
 jobs:
   check:
-    # Runs in the open source repository and the special-place-ai-heaven fork, not in a private clone.
-    # The fork runs it only for its own branches, so code from someone else's pull request never
-    # runs on a self-hosted runner. The fork uses the org's self-hosted heavy pool unless the
-    # repository variable TP_RUNS_ON names another runner as JSON, e.g. "ubuntu-latest" (with quotes).
     if: >-
       github.repository == 'rerun-build/rerun' ||
       (github.repository == 'special-place-ai-heaven/rerun' &&
@@ -29,23 +25,15 @@ jobs:
           node-version: 26
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # pnpm 12 ignores a "pnpm" block in package.json with only a warning; its settings live in
-      # pnpm-workspace.yaml. An upstream sync that brings the block back fails here instead.
       - run: |
           node -e "process.exit(require('./package.json').pnpm ? 1 : 0)"
       - run: pnpm --filter @rerun/contracts build
       - run: pnpm -r --if-present ts-check
-      # Every package that has a lint script: the app, the engine and the contracts package.
       - run: pnpm -r --if-present lint
-      # Capped: the self-hosted host is shared, and one worker per core starves the other jobs on it.
-      # One test worker per CPU. 8 was set for the self-hosted pool; on GitHub's ubuntu-latest (4 CPUs) it ran
-      # two workers per core and tests near vitest's 5 s limit timed out at random (three on 2026-11-14).
       - run: pnpm --filter rerun run test --maxWorkers=4
       - run: pnpm --filter rerun-engine run test --maxWorkers=4
 
   migrations:
-    # Runs in the open source repository and its fork, not in a private clone of it. Hosted: it
-    # needs Docker, which the fork's self-hosted pool (runners inside a container) does not offer.
     if: github.repository == 'rerun-build/rerun' || github.repository == 'special-place-ai-heaven/rerun'
     name: Migrations and seed on a fresh database
     runs-on: ubuntu-latest
@@ -59,7 +47,6 @@ jobs:
       - name: "Engine key replacement: database rehearsal"
         run: |
           set -eu
-          # A made-up key for this throwaway database, not a secret: "feed" sixteen times, 64 hex characters.
           key=feedfeedfeedfeedfeedfeedfeedfeedfeedfeedfeedfeedfeedfeedfeedfeed
           db() { docker exec -i -u postgres supabase_db_rerun psql -X -q -t -A -v ON_ERROR_STOP=1 -d postgres; }
           printf '%s\n' "insert into public.engine_pool (engine_host, engine_api_key, status) values ('http://engine:3000', '$key', 'claimed');" | db
@@ -68,15 +55,11 @@ jobs:
           printf '%s\n' "$out"
           printf '%s\n' "$out" | grep -Fxq 'db-rows-holding-current-key 1 (expect 1)'
           printf '%s\n' "$out" | grep -Fxq 'db-rehearsal swapped (rolled back)'
-          # The lookup of triggers and publications must answer with names or "none", never "error".
           printf '%s\n' "$out" | grep -Eq '^db-triggers-on-engine_pool [A-Za-z0-9_,]+$'
           printf '%s\n' "$out" | grep -Eq '^db-publications-with-engine_pool [A-Za-z0-9_,]+$'
           if printf '%s\n' "$out" | grep -Eq '^db-(triggers|publications)-.* error$'; then exit 1; fi
           test "$(printf '%s\n' "select count(*) from public.engine_pool where engine_api_key = '$key';" | db)" = 1
 
-  # The images take ~20 minutes to build: a pull request only builds them when it touches what
-  # goes into them beyond the code the other jobs already check, and every push to master and
-  # staging builds them anyway before anything ships.
   docker-inputs:
     if: (github.repository == 'rerun-build/rerun' || github.repository == 'special-place-ai-heaven/rerun') && github.event_name == 'pull_request'
     name: Docker inputs changed
@@ -96,10 +79,7 @@ jobs:
           fi
 
   images:
-    # Runs in the open source repository only, not in a private clone of it.
     needs: docker-inputs
-    # Not always(): that also ignores the cancel a newer commit sends, and a superseded run then
-    # builds on for 20 minutes while the new one waits behind it.
     if: >-
       !cancelled() && (github.repository == 'rerun-build/rerun' || github.repository == 'special-place-ai-heaven/rerun') &&
       ((github.event_name == 'push' && github.ref != 'refs/heads/dev') || needs.docker-inputs.outputs.changed == 'true')

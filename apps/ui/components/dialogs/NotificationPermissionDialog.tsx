@@ -8,9 +8,6 @@ import { useNotificationsStore } from '@/stores/notifications.store'
 import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 
-// Asked once, when the onboarding ends and there is an agent to hear from: a run can outlive the
-// tab being looked at, and the browser permission is the only thing standing between a finished
-// agent and the user hearing about it. Every way out marks the question answered, Escape included.
 export function NotificationPermissionDialog() {
     const t = useTranslations('dialogs.notificationPermission')
     const open = useNotificationsStore(state => state.permissionPromptOpen)
@@ -18,8 +15,6 @@ export function NotificationPermissionDialog() {
 
     return (
         <AlertDialog open={open} onOpenChange={next => !next && answer()}>
-            {/* `sm:p-0` as well as `p-0`: the content keeps a separate `sm:p-4`, and a base padding
-                reset leaves it standing, ringing the card with a stray gutter above 640px. */}
             <AlertDialogContent size="lg" className="gap-0 overflow-hidden p-0 sm:p-0">
                 <div className="relative flex flex-col items-center gap-3 px-6 pt-8 pb-6 text-center">
                     <Stripes />

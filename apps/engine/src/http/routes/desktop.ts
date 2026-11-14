@@ -42,7 +42,6 @@ agentDesktopRoutes.post('/takeover', async c => {
     return c.json(status())
 })
 
-// keepOpen: the person hands the browser back to the run that asked for it, which carries on in it.
 agentDesktopRoutes.delete('/takeover', async c => {
     const id = c.req.param('id')!
     return c.json(await (c.req.query('keepOpen') === '1' ? handBackTakeover(id) : finishTakeover(id)))

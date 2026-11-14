@@ -5,13 +5,6 @@ import { ModelPill } from '../beams'
 
 import type { TourModelPill } from './tour-models'
 
-// The badges of the subscription slide, laid over the world layer of the grid so they pan and zoom
-// with the board. Two nested elements, same reason as CursorOverlay: the outer one holds the anchor
-// and the counter-scale that keeps the pill the same size on screen whatever the camera does, the
-// inner one owns the entrance. Put both on one node and the counter-scale fights the pop.
-//
-// The badge is centred with the CSS `translate` property and not with a transform: motion owns
-// `transform` on both nodes, and a Tailwind -translate-x-1/2 there would simply be overwritten.
 const ENTER = { duration: 0.36, ease: [0.22, 1, 0.36, 1] as const }
 const LEAVE = { duration: 0.3, ease: [0.4, 0, 1, 1] as const }
 

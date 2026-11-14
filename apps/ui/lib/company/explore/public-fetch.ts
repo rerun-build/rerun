@@ -2,8 +2,6 @@ import { resolvesToPublicAddresses } from '@/lib/net/public-fetch'
 
 const BROWSER_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0 Safari/537.36'
 
-// These fetches run from our own servers, unlike the Firecrawl calls: a domain that resolves to a
-// private address must not turn the lab into a probe of our network.
 async function assertPublicHost(hostname: string) {
     if (!(await resolvesToPublicAddresses(hostname))) throw new Error(`${hostname} resolves to a private address`)
 }

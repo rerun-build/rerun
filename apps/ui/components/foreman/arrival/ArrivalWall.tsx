@@ -9,8 +9,6 @@ import { useAnonymousSignUp } from '@/components/auth/useAnonymousSignUp'
 
 const SURFACE = 'ready_made_arrival'
 
-// The account and the phone code, asked in the column rather than in a dialog over the board: what
-// they picked stays in sight the whole way. Both are the forms the dialogs mount.
 function AccountStep() {
     const { form } = useAnonymousSignUp({ surface: SURFACE, active: true })
 

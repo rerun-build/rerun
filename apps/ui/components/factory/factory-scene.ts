@@ -1,11 +1,3 @@
-// The factory as a production line on a Rerun board (docs/research/2026-11-14-factory-world/SPEC.md).
-// Coworkers are the board's 2x2 buddies; a copy is the same buddy, see-through. A task is a glass sphere
-// riding the belts between them and filling with its progress; a review is a scanner gate that passes
-// it on, sends it back for a fix, or turns a defect into the reject bin; a finished task pours into its
-// feature's sphere. The layout is below, at BOXES.
-// `factoryScene(t)` is a pure function of the time in the loop.
-// shortcut: the jobs are a fixed sample loop; the real page feeds the delegator's snapshot instead.
-
 import { agentTileStyle, type BuddyLook, type Container, type Tile, type TileLink, type TileResultItem, type TileToast } from '@rerun/ui/iso-grid'
 
 export type Cell = { col: number; row: number }
@@ -16,11 +8,6 @@ const TRANSIT_MS = 1_400
 const SHAKE_MS = 700
 const SLIDE_MS = 900
 
-// The floor reads left to right: the Loader sends to `code` in Build, `code` hands down to LINUS in
-// Review, LINUS sends back to the Loader through the open lane between the boxes, and the Loader fills
-// the feature spheres in Stock below it. Every object has at least two free cells around it, and the
-// copies sit straight out from or on a diagonal of their coworker, three at most to a face, so every
-// line is straight or a single bend and none crosses another (link-routes.test.ts holds this).
 const box = (id: string, label: string, col_start: number, row_start: number, col_end: number, row_end: number): Container =>
     ({ id, label, color: '#ffffff', col_start, row_start, col_end, row_end })
 const BOXES: Container[] = [
@@ -33,7 +20,6 @@ const BOXES: Container[] = [
 
 export const LOADER: Cell = { col: 7, row: 9 }
 export const CODE: Cell = { col: 22, row: 9 }
-// The cells a copy of a coworker takes, in the order copies are made.
 export const COPY_CELLS = {
     code: [{ col: 18, row: 5 }, { col: 22, row: 1 }, { col: 25, row: 4 }, { col: 30, row: 5 }, { col: 34, row: 9 }, { col: 26, row: 13 }],
     LINUS: [{ col: 26, row: 23 }, { col: 22, row: 27 }],
@@ -42,11 +28,9 @@ export const COPY_CELLS = {
 const LARRY: Cell = { col: 26, row: 17 }
 export const LINUS: Cell = { col: 22, row: 23 }
 const BRUCE: Cell = { col: 26, row: 27 }
-// The reject bin: beside the scanners, with free floor between it and every coworker and belt.
 const REJECT_BIN: Cell = { col: 18, row: 27 }
 const SEARCH: Cell = { col: 2, row: 24 }
 const DIETER: Cell = { col: 2, row: 29 }
-// Where the feature spheres stand in Stock: one under the Loader, one beside it.
 export const FEATURE_CELLS: Cell[] = [{ col: 7, row: 15 }, { col: 2, row: 15 }]
 
 const LOOKS: Record<string, BuddyLook> = {
@@ -63,7 +47,6 @@ const CODE_COPIES = COPY_CELLS.code
 const LINUS_COPIES = COPY_CELLS.LINUS
 const SEARCH_COPY = COPY_CELLS.search[0]
 
-// Features and their spheres: one share per task of the feature, the count known from the cut.
 export type Feature = { issue: number; title: string; tasks: number[]; at: Cell }
 export const FEATURES: Feature[] = [
     { issue: 320, title: 'Factory world', tasks: [330, 331, 332, 333, 334, 335, 336], at: FEATURE_CELLS[0] },
@@ -72,10 +55,6 @@ export const FEATURES: Feature[] = [
 
 type JobSpec = { issue: number; title: string; start: number; build: number; review: number; checks: number; fix?: number; defect?: boolean }
 
-// A wave of seven: six builds at once on `code`, the seventh on LARRY. #333 is sent back once by its
-// review and comes round again; #338 is a defect and goes to the reject bin. Three tasks arrive while
-// sending is held and go when the hold ends. #340 and #341 are cut and not started: their share of
-// the feature stays empty.
 const SPEC: JobSpec[] = [
     { issue: 330, title: 'Fab floor', start: 0, build: 13_000, review: 4_500, checks: 5_000 },
     { issue: 331, title: 'Ledger read route', start: 400, build: 16_500, review: 5_000, checks: 5_500 },
@@ -134,8 +113,6 @@ function plan(): Job[] {
 }
 export const JOBS = plan()
 
-// A task sphere rides the belts on the floor, from tile to tile: `path` is the tile ids it passes,
-// `travel` how far along it is. A queued sphere waits on the loader's belt at `queue`.
 export type Band = 'build' | 'review' | 'checks' | 'merge'
 export type PodView = {
     id: string; issue: number; title: string
@@ -146,7 +123,6 @@ export type PodView = {
     verdict?: 'pass' | 'fail' // set while the scanner shows it, at the end of a review
     scan: number // 0..1 through a review, for the scanner's sweep
 }
-// Status colours, shared by the lines and the spheres.
 export const STATUS_COLOR = { queued: '#8ea2ff', held: '#ef4444', build: '#f5a524', review: '#2dd4a3', fixing: '#fb923c', checks: '#6ea8ff', complete: '#ffe08a', rejected: '#f87171' } as const
 export type SlotView = { issue: number; state: 'empty' | 'merged' | 'rejected'; arriving: number } // arriving: 0..1 while sliding in
 export type CabinetView = Feature & { slots: SlotView[] }
@@ -248,7 +224,6 @@ export function factoryScene(t: number, now: number): FactoryFrame {
             counts.checks++
             pod(via(reviewHolder, 'LINUS', 'Delegator'), ride, 'checks', 'checks')
         } else {
-            // Complete: full, a gentle shake, the ride to its feature, and it pours in.
             const travel = (t - leg.from - SHAKE_MS) / TRANSIT_MS
             pod(via('Delegator', `cab-${job.feature.issue}`), travel, 'merge', 'complete')
             if (t >= leg.from + SHAKE_MS + TRANSIT_MS) slotState.set(job.issue, { issue: job.issue, state: 'merged', arriving: clamp((t - leg.from - SHAKE_MS - TRANSIT_MS) / SLIDE_MS) })
@@ -266,11 +241,9 @@ export function factoryScene(t: number, now: number): FactoryFrame {
             style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Feature #${c.issue} ${c.title}: ${filled} of ${c.slots.length}` })
     }
 
-    // The reject bin: defects end here, beside the scanners.
     tiles.push({ id: 'rejects', position: REJECT_BIN, span: 2, containerId: 'review', selectable: false, draggable: false,
         style: { color: '#2a1416', sheen: true, depth: 2 }, ariaLabel: `Reject bin: ${rejects}` })
 
-    // The studio keeps a rhythm of its own.
     const researching = t % 30_000 < 16_000
     if (researching) {
         tiles.push(coworker('search-copy', 'search', SEARCH_COPY, 'studio', 'working', { copy: true }))
@@ -289,10 +262,7 @@ export function factoryScene(t: number, now: number): FactoryFrame {
     tiles.push(loader)
     if (held) toast(HOLD.from + 300, 'Delegator', 'Loader', 'Sending held: sign-in renewal. Running builds finish.')
 
-    // The belts join the loader, `code`, LINUS, the reject bin and the feature spheres.
     const lines: [string, string][] = [['Delegator', 'code'], ['code', 'LINUS'], ['LINUS', 'Delegator'], ['code', 'LARRY'], ['LINUS', 'BRUCE'], ['LINUS', 'rejects'], ...FEATURES.map(f => ['Delegator', `cab-${f.issue}`] as [string, string])]
-    // A line glows in the colour of what runs on it: build amber, review green, checks blue, a merge
-    // gold, a held line red; a quiet line keeps the board's own blue-white.
     const QUIET = '#8ea2ff'
     const lineColor = new Map<string, string>()
     for (const p of pods) {

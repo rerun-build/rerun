@@ -9,14 +9,9 @@ import { BUDDY_GEOMETRY, BuddyArt } from './BuddyArt'
 import { buddyEyes, type BuddyMood } from './buddy-look'
 import type { BoxGeometry } from './RoundedBox'
 
-// An agent's buddy away from the board: the same block, colour and eyes, drawn from the same id.
-
-// Below this width the board's block is too squat for its face to read: the buddy stands taller,
-// its face is painted flat and larger, and it loses its mouth.
 const SMALL_BELOW = 40
 const SMALL_GEOMETRY: BoxGeometry = { ...BUDDY_GEOMETRY, depth: 30 }
 const SMALL_FACE_SCALE = 1.6
-// Eyes whose thin strokes do not survive a few pixels are drawn as their closest solid shape.
 const SMALL_EYES: Partial<Record<BuddyEyes, BuddyEyes>> = { glasses: 'round', shades: 'visor', line: 'pill', dot: 'round' }
 const FULL_LOOK: BuddyLook = {}
 
@@ -31,17 +26,10 @@ const MOTION: Partial<Record<BuddyMood, 'bob' | 'shudder'>> = { working: 'bob', 
 type AgentBuddyProps = {
     agentId: string
     mood?: BuddyMood
-    // Width in pixels of the square the block is centred in.
     size: number
-    // False holds it still, blink included: a long list of buddies should not twinkle.
     animated?: boolean
-    // Gives it a blink and a wandering gaze, for a buddy standing alone as an illustration. Off on
-    // a board, where every tile would glance at once.
     alive?: boolean
-    // The side its face is turned to. A buddy looks at what it stands next to: right when its text
-    // follows it, left (the board's pose) when it stands alone.
     facing?: 'left' | 'right'
-    // Sits on the bottom corner its face is turned away from.
     badge?: ReactNode
     className?: string
 }

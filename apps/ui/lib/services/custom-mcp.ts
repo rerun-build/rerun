@@ -4,13 +4,10 @@ import { siteDomain } from '@/lib/onboarding/site-favicon'
 import { connectorMcpServerNames, type ServiceRegistry } from '@/lib/services/registry'
 import type { CustomMcpServer, McpTransportKind } from '@/lib/services/types'
 
-// The engine's own server for the Rerun bridge, never something the user registered.
 const BRIDGE_SERVER_NAME = 'rerun'
 
-// Second-level suffixes under which a brand sits one label deeper (acme.co.uk, not co.uk).
 const TWO_LABEL_SUFFIXES = new Set(['co.uk', 'org.uk', 'ac.uk', 'com.au', 'net.au', 'co.nz', 'co.jp', 'co.kr', 'co.in', 'com.br', 'com.mx', 'com.tr', 'co.za', 'com.sg', 'com.cn'])
 
-// Hosts that serve anyone's deployment: their favicon is the host's, not the server's.
 const SHARED_HOST_DOMAINS = new Set([
     'workers.dev',
     'pages.dev',
@@ -30,7 +27,6 @@ const SHARED_HOST_DOMAINS = new Set([
     'rerun.build',
 ])
 
-// Mirror of the engine's resolveTransport, so the panel names the transport the engine will dial.
 export function resolveMcpTransport(server: EngineMcpServer): McpTransportKind {
     if (server.transport) return server.transport
     if (server.command) return 'stdio'
@@ -52,8 +48,6 @@ export function mcpServerHost(url: string | undefined): string | null {
     return literalHttpUrl(url)?.hostname ?? null
 }
 
-// mcp.linear.app → linear.app. Null when the host cannot stand for a brand: localhost, an IP, or a
-// shared deployment host.
 export function mcpIconDomain(host: string | null): string | null {
     const domain = host ? siteDomain(host) : null
     if (!domain) return null
@@ -64,7 +58,6 @@ export function mcpIconDomain(host: string | null): string | null {
     return SHARED_HOST_DOMAINS.has(registrable) ? null : registrable
 }
 
-// linear.app → linear, the label a catalog slug is most likely to carry.
 export function brandLabel(domain: string): string {
     const labels = domain.split('.')
     return labels[labels.length - (TWO_LABEL_SUFFIXES.has(labels.slice(-2).join('.')) ? 3 : 2)]

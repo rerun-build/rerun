@@ -7,8 +7,6 @@ import { BanIcon } from '@/lib/icons'
 import { shortRelativeTime } from '@/lib/time'
 import { useLocale, useTranslations } from 'next-intl'
 
-// One block for the whole set: the rows share its border and are told apart by a divider rather
-// than each floating on its own. The empty case keeps the block so the section holds its shape.
 export function ApiKeyList({ keys, busy, disabledReason, onRevoke }: { keys: ApiKeyView[]; busy: boolean; disabledReason?: string; onRevoke: (key: ApiKeyView) => void }) {
     const t = useTranslations('dialogs.apiKeys')
     return (
@@ -38,8 +36,6 @@ function Row({ apiKey, busy, disabledReason, onRevoke }: { apiKey: ApiKeyView; b
 
             <span className="shrink-0 text-[11px] text-muted-foreground">{apiKey.lastUsedAt ? t('lastUsed', { time: shortRelativeTime(apiKey.lastUsedAt, locale) }) : t('neverUsed')}</span>
 
-            {/* Revoking breaks whatever runs on that key, so the click only asks: the confirmation
-                dialog is what actually revokes. */}
             <TooltipDisabledReason reason={disabledReason} className="shrink-0">
                 <Button
                     type="button"

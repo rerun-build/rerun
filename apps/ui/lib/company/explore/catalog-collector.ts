@@ -3,8 +3,6 @@ import { fetchPublic } from './public-fetch'
 import { mapWithConcurrency, productUrlsOf } from './site'
 import { CollectorSkipped, type Collector } from './types'
 
-// Only the products a shop puts forward get a brain page each; the rest of the catalogue stays on
-// the site, where an agent reads it when it needs to.
 export const MAX_CATALOG_PRODUCTS = 25
 const MAX_DESCRIPTION = 2_000
 const SHOPIFY_PAGE_SIZE = 250
@@ -33,7 +31,6 @@ export type CatalogFindings = {
     platform: string | null
     shopUrl: string
     total: number | null
-    // The count stopped at the last page read, or at what the site map listed.
     totalIsLowerBound: boolean
     collections: string[]
     products: CatalogProduct[]
@@ -108,8 +105,6 @@ function absolute(href: string | null | undefined, base: string): string | null 
     }
 }
 
-// The same product is linked as /products/x, /collections/y/products/x or /fr/products/x: its last
-// path segment is what they share.
 function productKey(url: string): string {
     try {
         const segments = new URL(url).pathname.split('/').filter(Boolean)
@@ -166,8 +161,6 @@ export function readWooProduct(product: WooProduct, shopUrl: string): CatalogPro
     }
 }
 
-// What the shop puts forward first, in the order it does, then the platform's own order. Colour
-// variants often stand as products of their own under one name: the first one speaks for them.
 export function rankProducts(products: CatalogProduct[], featuredUrls: string[]): CatalogProduct[] {
     const rank = new Map<string, number>()
     for (const url of featuredUrls) {
@@ -234,8 +227,6 @@ async function readShopify(shopUrl: string): Promise<PlatformCatalog | null> {
     return {
         total: products.length,
         totalIsLowerBound: lastPageFull,
-        // The biggest first, leaving out the empty ones and those holding nearly everything ("All
-        // products", "Discount eligible"), which say nothing about the ranges.
         collections: (collections?.data.collections ?? [])
             .filter(collection => collection.products_count !== 0 && (collection.products_count ?? 0) < products.length * CATCH_ALL_SHARE && (collection.title ?? '').length <= MAX_COLLECTION_TITLE)
             .sort((a, b) => (b.products_count ?? 0) - (a.products_count ?? 0))
@@ -302,14 +293,12 @@ function metaProperty(html: string, key: string): string | null {
     return content ? decodeEntities(content) : null
 }
 
-// "Sac à dos dragon — OriGiNe-CI": the page title carries the shop's name after the product's.
 function withoutSiteName(title: string, siteName: string | null): string {
     if (!siteName) return title
     const parts = title.split(/\s+[—–|-]\s+/)
     return parts.length > 1 && parts[parts.length - 1].trim().toLowerCase() === siteName.toLowerCase() ? parts.slice(0, -1).join(' — ') : title
 }
 
-// The schema.org Product most shops publish for search engines, else the page's sharing tags.
 export function readProductPage(html: string, url: string): CatalogProduct | null {
     let product: ProductLd | null = null
     for (const match of html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
@@ -344,8 +333,6 @@ async function fetchProductPage(url: string): Promise<CatalogProduct | null> {
 
 type RawHtmlResponse = { data?: { rawHtml?: string; metadata?: { creditsUsed?: number } } }
 
-// The sheets are read for free from our servers first; Firecrawl only gets the few a shop refuses
-// to serve us.
 async function readProductPages(urls: string[]): Promise<{ products: CatalogProduct[]; credits: number }> {
     const fetched = (await mapWithConcurrency(urls.slice(0, MAX_CATALOG_PRODUCTS), FETCH_CONCURRENCY, fetchProductPage)).filter((product): product is CatalogProduct => product !== null)
     if (fetched.length) return { products: fetched, credits: 0 }
@@ -378,8 +365,6 @@ export const catalogCollector: Collector<'catalog'> = {
         const productUrls = site?.productUrls ?? []
         if (stack && !detected && productUrls.length < MIN_PRODUCT_URLS) throw new CollectorSkipped('Pas de boutique en ligne')
 
-        // Without the stack (a home page that blocks our fetch) the platform is unknown: the free
-        // catalogue endpoints are tried in turn before anything is scraped.
         const candidates = detected ? [detected] : stack ? [] : Object.keys(PLATFORM_READERS)
         let platform: string | null = detected
         let catalog: PlatformCatalog | null = null

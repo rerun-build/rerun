@@ -19,11 +19,6 @@ type MarkdownTextareaProps = Omit<ComponentProps<'textarea'>, 'value' | 'onChang
     dialogDescription?: string
 }
 
-/**
- * Textarea with an affordance to open the same long-form markdown editor as the chat composer.
- * `onChange` always receives the text, never an event, so it plugs straight into a `useState`
- * setter or a react-hook-form `field.onChange`.
- */
 export function MarkdownTextarea({
     value,
     onChange,

@@ -4,10 +4,6 @@ import type { AppTool } from '@/lib/apps/tools'
 import { whatsappSessionClosed } from './connect'
 import type { QuotaAction } from './quotas'
 
-// The WhatsApp tools a coworker gets. Linkup documents list_inbox for LinkedIn and email only, but
-// it answers for a WhatsApp account too (checked on staging, 19/10/2026), groups included. Its
-// category filter is ignored for WhatsApp, so the tool does not offer one.
-
 export type WhatsappTool = AppTool<QuotaAction>
 
 const phoneNumber = { type: 'string', description: 'Number in international format, e.g. +33612345678' }
@@ -15,8 +11,6 @@ const count = (max: number) => ({ type: 'integer', minimum: 1, maximum: max, des
 
 type ConversationPage = { messages?: unknown[]; total_message_count?: number }
 
-// A number the account never wrote to nor heard from: what WhatsApp watches for spam. Linkup
-// answers a chat it has never seen with an error rather than an empty page.
 export async function isNewConversation(accountId: string, params: Record<string, unknown>): Promise<QuotaAction | null> {
     try {
         const page = await runAction<ConversationPage>(accountId, 'messages', 'get_conversation', { phone_number: params.phone_number, count: 1 })

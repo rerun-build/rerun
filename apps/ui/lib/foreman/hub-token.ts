@@ -1,13 +1,7 @@
 import { createHmac, timingSafeEqual } from 'crypto'
 
-// Proves a call to /api/hub comes from the foreman: the engine key every coworker of the box holds
-// is not enough, since `x-rerun-agent: foreman` opens the account tools. The hub signs one with
-// every foreman turn's brief, the engine keeps it in memory only, and the secret never leaves the hub.
-// Twelve hours outlive the longest run the turn starts.
 export const FOREMAN_HUB_TOKEN_TTL_MS = 12 * 60 * 60 * 1000
 
-// `uid` is the member the turn speaks for, so the hub acts with their access rather than the
-// workspace's. A token minted before it existed carries none and still acts as the workspace.
 export type ForemanHubClaims = { ws: number; uid?: string; exp: number }
 
 function secret(): string | undefined {
@@ -44,9 +38,6 @@ export function verifyForemanHubToken(raw: string | null | undefined, workspaceI
     return { ws: claims.ws, exp: claims.exp, ...(typeof claims.uid === 'string' && claims.uid ? { uid: claims.uid } : {}) }
 }
 
-// Required as soon as the hub holds a secret to sign with. Without one (a local hub) a foreman call
-// carrying no token is let through, and logged. FOREMAN_HUB_TOKEN_REQUIRED=0 restores that tolerance
-// on a hub that has the secret, for a fleet whose engines do not forward the token yet.
 export function foremanHubTokenRequired(): boolean {
     return secret() !== undefined && process.env.FOREMAN_HUB_TOKEN_REQUIRED !== '0'
 }

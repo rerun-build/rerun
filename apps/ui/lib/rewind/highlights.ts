@@ -4,8 +4,6 @@ import { generateText } from 'ai'
 import { z } from 'zod'
 import type { ReportedAgent } from './merge'
 
-// Plain JSON rather than structured output, for the same reason as lib/company/analyze.ts: Gemini on
-// OpenRouter through the openai-compatible provider does not take a json_schema response_format.
 const HIGHLIGHTS_MODEL = process.env.RERUN_REWIND_MODEL ?? 'google/gemini-2.5-flash'
 const MAX_HIGHLIGHTS = 3
 const MAX_OUTPUTS_PER_AGENT = 5
@@ -51,8 +49,6 @@ function digestOf(agents: ReportedAgent[]): string {
         .join('\n\n')
 }
 
-// A failure here costs the story one slide, never the whole Rewind.
-// `language` is the English name of the workspace's language: the slide is read by its members.
 export async function writeHighlights(agents: ReportedAgent[], language = 'English'): Promise<RewindHighlight[]> {
     const model = highlightsModel()
     const digest = digestOf(agents)

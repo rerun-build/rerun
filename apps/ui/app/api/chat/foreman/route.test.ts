@@ -78,7 +78,6 @@ describe('POST /api/chat/foreman', () => {
 
         afterEach(() => vi.restoreAllMocks())
 
-        // The onboarding is on the house: there is no credit to check, so none can run out on it.
         it('reaches the model without asking how much credit the workspace has left', async () => {
             const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => openRouterStream())
 
@@ -97,8 +96,6 @@ describe('POST /api/chat/foreman', () => {
             expect(logRerunUsage).toHaveBeenCalledWith({ workspaceId: 7, model: 'openai/gpt-6-sol', tier: 'smart', inputTokens: 120, outputTokens: 4, costMicros: 3000 })
         })
 
-        // Two answers once streamed over each other in the browser, which sent the transcript back
-        // with every copy: the turn reads and saves each of them once.
         it('saves a transcript whose answers were pushed twice with each answer once', async () => {
             vi.spyOn(globalThis, 'fetch').mockImplementation(async () => openRouterStream())
             const doubled = [...hello, { id: 'a', role: 'assistant', parts: [{ type: 'text', text: 'Hi' }] }, { id: 'b', role: 'assistant', parts: [{ type: 'text', text: 'Hey' }] }, { id: 'a', role: 'assistant', parts: [{ type: 'text', text: 'Hi there' }] }, { id: 'u2', role: 'user', parts: [{ type: 'text', text: 'Again' }] }]

@@ -1,5 +1,3 @@
-"""factory.py tests on a temp clone with a local bare remote. FactoryCase points factory's paths and git at a temp
-dir, so nothing touches /data. Run: python -I -m unittest discover -s . -p test_*.py"""
 import contextlib, io, json, os, shutil, stat, subprocess, sys, tempfile, threading, types, unittest
 from unittest import mock
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -23,13 +21,11 @@ def write(d, name, text):
 
 
 def _writable(fn, p, *_):
-    os.chmod(p, stat.S_IWRITE)  # git object files are read-only, rmtree on Windows needs this
+    os.chmod(p, stat.S_IWRITE)
     fn(p)
 
 
 class FactoryCase(unittest.TestCase):
-    """<tmp>/origin.git is a bare remote with branch dev; F.REPOS/rerun is its clone, as ensure_clone leaves it."""
-
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="factory-test-")
         self.addCleanup(shutil.rmtree, self.tmp, **({"onexc": _writable} if sys.version_info >= (3, 12) else {"onerror": _writable}))
@@ -58,7 +54,6 @@ class FactoryCase(unittest.TestCase):
         return path
 
     def wt(self, issue="7", chunk="1", base="dev"):
-        """What `wt new` leaves behind, without the GitHub calls."""
         path = os.path.join(F.WT, REPO, "%s-%s" % (issue, chunk))
         branch = "chunk/%s-%s" % (issue, chunk)
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -92,8 +87,6 @@ class FactoryCase(unittest.TestCase):
 
 
 class WtDoneSaves(FactoryCase):
-    """G1: wt done never destroys work."""
-
     def test_unpushed_commits_are_pushed_to_a_rescue_branch_first(self):
         p = self.wt()
         sha = self.commit(p)
@@ -154,7 +147,7 @@ class WtDoneSaves(FactoryCase):
         p = self.wt()
         sha = self.commit(p)
         git(p, "push", "--quiet", "origin", "chunk/7-1")
-        git(self.origin, "branch", "-D", "chunk/7-1")  # PR closed unmerged, branch deleted on GitHub
+        git(self.origin, "branch", "-D", "chunk/7-1")
         self.assertTrue(git(self.clone, "rev-parse", "--verify", "--quiet", "refs/remotes/origin/chunk/7-1"))
         code, out = self.call(F.cmd_wt, ["done", REPO, "7", "1"])
         self.assertEqual(code, 0, out)
@@ -163,15 +156,13 @@ class WtDoneSaves(FactoryCase):
 
 
 def make_link(link, target):
-    if os.name == "nt":  # a junction needs no symlink privilege; it is the case that once emptied a target
+    if os.name == "nt":
         subprocess.run(["cmd", "/c", "mklink", "/J", os.path.normpath(link), os.path.normpath(target)], check=True, capture_output=True)
     else:
         os.symlink(target, link)
 
 
 class WtDoneCleans(FactoryCase):
-    """G2: saved or merged work is still cleaned up, links inside the worktree are only unlinked."""
-
     def assert_gone(self, p, out):
         self.assertIn("removed worktree", out)
         self.assertFalse(os.path.isdir(p))
@@ -221,7 +212,6 @@ class WtDoneCleans(FactoryCase):
         self.assertTrue(os.path.isfile(os.path.join(p, "left.txt")))
 
     def merge_dev(self, sha):
-        """merge-dev with GitHub faked: the merge and the branch delete happen on the bare remote."""
         merger = self.make_clone("merger")
         pr = {"base": {"ref": "dev"}, "head": {"ref": "chunk/7-1", "sha": sha}, "state": "open", "draft": False, "merge_commit_sha": "0" * 40}
         real_run = F.run
@@ -230,7 +220,7 @@ class WtDoneCleans(FactoryCase):
             return [] if path.endswith("/files?per_page=100") else {"default_branch": "main"} if path == "repos/" + FULL else pr
 
         def fake_run(cmd, *a, **k):
-            if cmd[-3].endswith("gate.py"):  # merge-dev runs the gate itself: one case, PASS
+            if cmd[-3].endswith("gate.py"):
                 return subprocess.CompletedProcess(cmd, 0, "GATE PASS", "")
             if cmd[0] != F.GH:
                 return real_run(cmd, *a, **k)
@@ -249,8 +239,6 @@ class WtDoneCleans(FactoryCase):
 
 
 class BuilderCap(FactoryCase):
-    """G3: at most MAX_BUILDERS active worktrees, also under two simultaneous calls and on `pr-open --fix`. G4: memory floor."""
-
     def setUp(self):
         super().setUp()
         for k, v in (("MAX_BUILDERS", 2), ("MEMINFO", os.path.join(self.tmp, "no-meminfo")), ("LOCK_WAIT_S", 30)):
@@ -261,7 +249,6 @@ class BuilderCap(FactoryCase):
 
     @contextlib.contextmanager
     def wt_new_fakes(self, before_clone=lambda: None):
-        """`wt new` with GitHub, /data and du faked; ensure_clone returns the test clone after before_clone()."""
         def fake_clone(full):
             before_clone()
             return self.clone
@@ -382,7 +369,6 @@ class BuilderCap(FactoryCase):
         self.assertFalse(os.path.exists(self.lock))
 
     def test_two_breakers_of_one_stale_lock_do_not_both_get_in(self):
-        """C sees the stale lock; before C acts, B breaks it and holds a fresh one. C must wait, not delete B's lock."""
         open(self.lock, "w").close()
         old = os.path.getmtime(self.lock) - F.LOCK_STALE_S - 10
         os.utime(self.lock, (old, old))
@@ -392,7 +378,7 @@ class BuilderCap(FactoryCase):
             t = real(p)
             if p == self.lock and not swapped:
                 swapped.append(1)
-                os.remove(self.lock)  # B breaks the stale lock and takes a fresh one
+                os.remove(self.lock)
                 open(self.lock, "w").close()
             return t
 
@@ -403,7 +389,7 @@ class BuilderCap(FactoryCase):
             code, out = self.call(grab, [])
         self.assertEqual(code, 2, out)
         self.assertIn("holds", out)
-        self.assertTrue(os.path.exists(self.lock))  # B's lock survives
+        self.assertTrue(os.path.exists(self.lock))
         self.assertFalse(os.path.exists(self.lock + ".break"))
         os.remove(self.lock)
 
@@ -416,7 +402,6 @@ class BuilderCap(FactoryCase):
         self.assertFalse(os.path.exists(self.lock))
 
     def fix(self, chunk):
-        """`pr-open --fix` in worktree 7-<chunk>, its PR already open; GitHub faked, the push goes to the bare remote."""
         p = os.path.join(F.WT, REPO, "7-" + chunk)
         real_run = F.run
 
@@ -464,7 +449,7 @@ class BuilderCap(FactoryCase):
         write(self.tmp, "meminfo", "MemTotal:       16384000 kB\nMemFree:          100000 kB\nMemAvailable:   %8d kB\n" % kb)
 
     def test_meminfo_reader(self):
-        self.assertIsNone(F.avail_mem_gb())  # no /proc/meminfo (Windows, macOS): skipped, not failed
+        self.assertIsNone(F.avail_mem_gb())
         self.meminfo(2 * 1048576)
         self.assertEqual(F.avail_mem_gb(), 2.0)
 
@@ -484,7 +469,6 @@ class BuilderCap(FactoryCase):
 
 
 class WtRegister(FactoryCase):
-    """G5: one record per worktree with owner and run id; `wt list` shows owner, age and state, also for older worktrees."""
     wt_new_fakes = BuilderCap.wt_new_fakes
 
     def setUp(self):
@@ -510,8 +494,8 @@ class WtRegister(FactoryCase):
         created = rec.pop("created")
         self.assertEqual(rec, {"repo": FULL, "issue": "7", "chunk": "3", "branch": "chunk/7-3", "base": "dev", "owner": "alice", "run": "run-42"})
         self.assertRegex(created, r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
-        self.assertLess(abs(F.age_h({"created": created})), 0.02)  # UTC, not local time
-        self.new("3", "--owner", "bob")  # EXISTS: the record stays the first owner's
+        self.assertLess(abs(F.age_h({"created": created})), 0.02)
+        self.new("3", "--owner", "bob")
         self.assertEqual(self.record("3")["owner"], "alice")
         code, out = self.call(F.cmd_wt, ["done", REPO, "7", "3"])
         self.assertEqual(code, 0, out)
@@ -526,7 +510,7 @@ class WtRegister(FactoryCase):
 
     def test_wt_list_shows_owner_age_state_and_older_worktrees(self):
         self.new("3", "--owner", "alice")
-        self.wt(chunk="1")  # made before the register: no record
+        self.wt(chunk="1")
         open(F.marker(REPO, "chunk/7-1"), "w").close()
         with self.wt_new_fakes():
             code, out = self.call(F.cmd_wt, ["list"])
@@ -538,8 +522,6 @@ class WtRegister(FactoryCase):
 
 
 class WtSweep(FactoryCase):
-    """G6: `wt sweep` is a dry run by default; --apply acts on REMOVE and RESCUE through `wt done` and never loses work."""
-
     def setUp(self):
         super().setUp()
         self.prs = {}
@@ -582,7 +564,7 @@ class WtSweep(FactoryCase):
             code, out = self.sweep("--apply")
         self.assertEqual(code, 0, out)
         self.assertEqual(len(fetches), 1, fetches)
-        self.assertEqual(out.count("REMOVE"), 7, out)  # six lines and the summary
+        self.assertEqual(out.count("REMOVE"), 7, out)
 
     def behind_merged_head(self):
         p = self.wt(chunk="1")
@@ -634,7 +616,7 @@ class WtSweep(FactoryCase):
         p = self.wt(chunk="1")
         sha = self.old_commit(p)
         git(p, "push", "--quiet", "origin", "chunk/7-1")
-        git(self.origin, "branch", "-D", "chunk/7-1")  # PR closed unmerged, branch deleted on GitHub
+        git(self.origin, "branch", "-D", "chunk/7-1")
         self.pr("1", 9, "CLOSED", sha)
         code, out = self.sweep("--apply")
         self.assertEqual(code, 0, out)
@@ -647,22 +629,22 @@ class WtSweep(FactoryCase):
         self.old_commit(dirty)
         write(dirty, "left.txt", "uncommitted\n")
         stuck = self.wt(chunk="2")
-        stuck_sha = self.old_commit(stuck)  # idle and unpushed, but the rescue push will fail
+        stuck_sha = self.old_commit(stuck)
         merged = self.wt(chunk="3")
         sha = self.commit(merged)
         git(merged, "push", "--quiet", "origin", "chunk/7-3")
         self.pr("3", 11, "MERGED", sha)
-        fresh = self.wt(chunk="4")  # no PR, nothing unpushed
+        fresh = self.wt(chunk="4")
         recent = self.wt(chunk="5")
-        self.commit(recent)  # unpushed but not idle
-        reused = self.wt(chunk="6")  # an old merged PR of the same branch name, other head
+        self.commit(recent)
+        reused = self.wt(chunk="6")
         self.pr("6", 5, "MERGED", "0" * 40)
         git(self.clone, "config", "remote.origin.pushurl", os.path.join(self.tmp, "nowhere.git"))
         code, out = self.sweep("--apply")
         self.assertEqual(code, 0, out)
         self.assertEqual(self.verdicts(out), {REPO + "/7-1": "RESCUE", REPO + "/7-2": "RESCUE", REPO + "/7-3": "REMOVE",
                                               REPO + "/7-4": "KEEP", REPO + "/7-5": "KEEP", REPO + "/7-6": "KEEP"})
-        self.assertIn("KEPT %s/7-1" % REPO, out)  # uncommitted changes: `wt done` refuses
+        self.assertIn("KEPT %s/7-1" % REPO, out)
         self.assertIn("KEPT %s/7-2" % REPO, out)
         self.assertEqual(git(stuck, "rev-parse", "HEAD"), stuck_sha)
         self.assertTrue(os.path.isfile(os.path.join(dirty, "left.txt")))
@@ -706,8 +688,6 @@ class WorkOverride(unittest.TestCase):
 
 
 class PlanGate(FactoryCase):
-    """`wt new` makes no worktree unless the issue carries a PLAN READY or SMALL FIX line; unreadable GitHub refuses too."""
-
     def new(self, body, comments):
         def fake_api(path, *a, **k):
             if path.endswith("/issues/7"):
@@ -744,8 +724,6 @@ class PlanGate(FactoryCase):
 
 
 class WtNewSweepAndInstall(BuilderCap):
-    """#125: `wt new` sweeps finished worktrees before it refuses, and installs dependencies."""
-
     def setUp(self):
         super().setUp()
         self.lookups = []
@@ -842,7 +820,6 @@ class WtNewInstall(BuilderCap):
 
         with self.wt_new_fakes(), mock.patch.object(F, "run", fake):
             if lock:
-                # the lockfile is tracked on dev in the test origin: add it before the worktree is made
                 write(self.clone, "pnpm-lock.yaml", "lockfileVersion: 9\n")
                 git(self.clone, "add", "-A")
                 git(self.clone, "commit", "--quiet", "-m", "lock")

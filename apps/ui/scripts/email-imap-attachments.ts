@@ -3,13 +3,6 @@ import { serviceManifestSchema } from '../lib/services/manifest'
 import { createServiceRoleClient } from '../supabase/serviceRole'
 import { selectSingle } from '../supabase/supabase-helpers'
 
-// One-shot: opens attachment files to the email-imap-smtp service, rooted in the coworker workspace.
-// Needs an engine that resolves ${RERUN_WORKSPACE} in a server config: on an older one the root is "".
-//
-//   ../engine/node_modules/.bin/tsx --env-file=.env scripts/email-imap-attachments.ts [--write]
-//
-// Add `--env-file=.env.profile.staging` after `.env` to target the staging project.
-
 const SLUG = 'email-imap-smtp'
 const OLD_SENTENCE = 'Saving attachments to disk is not available.'
 const NEW_SENTENCE =

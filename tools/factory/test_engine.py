@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""test_engine (rerun#60 C3a): the engine client against a local fake HTTP server; the key never shows in output."""
 import contextlib, io, json, os, sys, threading, unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -135,8 +134,6 @@ class Answer:
 
 
 class TriggerCallsTest(unittest.TestCase):
-    """C3b: trigger list/create/fire against a scripted opener (what the engine would answer)."""
-
     def engine(self, status, body, sent):
         def opener(req, timeout):
             sent.append(req)
@@ -166,7 +163,7 @@ class TriggerCallsTest(unittest.TestCase):
         self.assertEqual((body["token"], body["method"], body["body"]), ("tok-1", "POST", '{"v":1}'))
         self.assertNotIn("tok-1", sent[0].full_url)
         self.assertEqual(sent[0].get_header("Authorization"), "Bearer " + KEY)
-        with self.assertRaises(engine.EngineError):  # 200 is not the 202 of a started run
+        with self.assertRaises(engine.EngineError):
             self.engine(200, {"runId": "r1"}, []).fire_trigger("a1", "slug", "tok-1", {})
 
     def test_fire_errors_hide_key_and_token(self):

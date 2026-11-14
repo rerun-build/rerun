@@ -5,13 +5,10 @@ import { readCachedSearch, searchCacheKey, storeSearch } from '@/lib/search/cach
 import { searchTheWeb, WEB_SEARCH_PAGE_SIZE } from '@/lib/search/web-search'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
-// The one door a coworker's web_search goes through. The engine calls it with its RERUN_API_KEY,
-// which names one workspace, so the search provider key never leaves the app.
 export const dynamic = 'force-dynamic'
 
 const bodySchema = z.object({ query: z.string().min(1), maxResults: z.number().int().min(1).max(20).default(5) })
 
-// Kept for diagnosis only: a search that worked is never failed by its own bookkeeping.
 async function recordWebSearch(event: Database['public']['Tables']['web_search_events']['Insert']): Promise<void> {
     try {
         const { error } = await createServiceRoleClient().from('web_search_events').insert<Database['public']['Tables']['web_search_events']['Insert']>(event)
@@ -60,7 +57,6 @@ export async function POST(req: Request): Promise<Response> {
         return Response.json({ results })
     }
 
-    // Always the full page, so a later search asking for more results is served from the cache too.
     const search = await searchTheWeb(query, WEB_SEARCH_PAGE_SIZE)
     if (!search) return Response.json({ error: 'Web search is not configured' }, { status: 503 })
 

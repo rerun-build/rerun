@@ -10,7 +10,6 @@ export type AgentPickerRow = {
     id: string
     name: string
     disabled: boolean
-    // The tab the row opens on, under the name the user reads. With it the row reads as an action.
     tab?: string
 }
 

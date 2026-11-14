@@ -21,13 +21,11 @@ import { useMemo, useState, type ReactNode, type Ref } from 'react'
 
 type BrainSidebarProps = {
     pages: BrainPageSummary[]
-    // False on a box from before the Brain: the files and the database still work there.
     pagesAvailable: boolean
     selection: BrainSelection | null
     openProposals: number
     publishedEnabled: boolean
     files: SharedFilesTree
-    // Null while the shared database is being listed.
     tables: EngineDbTable[] | null
     searchRef: Ref<HTMLInputElement>
     onSelect: (selection: BrainSelection) => void
@@ -160,15 +158,12 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
     )
 }
 
-// One tree for everything the workspace shares, as Notion keeps its pages and databases side by
-// side: what agents proposed, the company pages, the shared folder and the shared database.
 export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, searchRef, onSelect, onUpload }: BrainSidebarProps) {
     const t = useTranslations('brain.sidebar')
     const [query, setQuery] = useState('')
     const card = pages.filter(page => isCardType(page.type))
     const products = pages.filter(page => page.type === 'product')
     const others = pages.filter(page => !isCardType(page.type) && page.type !== 'product')
-    // Null until the person folds or unfolds it: open then only while one of them is selected.
     const [productsExpanded, setProductsExpanded] = useState<boolean | null>(null)
 
     const results = useMemo(() => {
@@ -182,7 +177,6 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
     }, [query, pages, files.knownFiles, tables])
 
     const isSelected = (page: BrainPageSummary) => (selection?.kind === 'page' || selection?.kind === 'history') && selection.slug === page.slug
-    // A shop's catalogue brings up to 25 product pages: folded away, they leave the other pages in view.
     const productsOpen = productsExpanded ?? products.some(isSelected)
 
     const pageRow = (page: BrainPageSummary, depth = 0) => (

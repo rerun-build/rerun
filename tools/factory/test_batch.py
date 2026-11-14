@@ -11,7 +11,7 @@ class PickBatch(unittest.TestCase):
         ready = [chunk("A"), chunk("B", paths=["A.py"]), chunk("C", builder="margaret"), chunk("D", deps=["X"]),
                  chunk("E"), chunk("F"), chunk("G")]
         got = batch.pick_batch(ready, {"cfg": {"builder_capacity": 3, "per_job_cap": 2}})
-        self.assertEqual([c["chunk"] for c in got], ["A", "E", "F"])  # B overlaps, C other builder, D dep open, G over 3
+        self.assertEqual([c["chunk"] for c in got], ["A", "E", "F"])
 
     def test_none_when_no_slot(self):
         st = {"busy": [("k", "x")] * 3, "cfg": {"builder_capacity": 3}}

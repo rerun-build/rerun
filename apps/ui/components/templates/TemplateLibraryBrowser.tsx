@@ -26,11 +26,8 @@ import { landingUrl } from '@/lib/site'
 import { templateStatusLabel } from '@/lib/templates/status'
 import { cn } from '@/lib/utils'
 
-// The statuses the library read actually returns to an admin: `archived` is never fetched.
 const LIBRARY_STATUSES: TemplateStatus[] = ['published', 'unlisted', 'in_review', 'draft']
 
-// The library's browsing side: the rail on the left, the page it points at on the right. It knows
-// nothing of the dialog or of the detail panel, which is what lets the render lab mount it alone.
 export function TemplateLibraryBrowser({
     templates,
     directory,
@@ -42,7 +39,6 @@ export function TemplateLibraryBrowser({
     onScratch,
 }: {
     templates: LibraryTemplate[] | null
-    // Null while it loads: Discover then introduces the template authors alone.
     directory: LibraryCreator[] | null
     isAdmin: boolean
     signals: ViewerSignals
@@ -61,8 +57,6 @@ export function TemplateLibraryBrowser({
     const [statuses, setStatuses] = useState<TemplateStatus[]>([])
     const scrollerRef = useRef<HTMLDivElement>(null)
 
-    // What anybody may browse: the published catalogue plus the viewer's own work. The admin-only
-    // statuses widen the lists, never Discover, which stays the page a visitor sees.
     const catalogue = useMemo(() => (templates ? filterTemplates(templates, EMPTY_LIBRARY_FILTERS) : null), [templates])
     const counts = useMemo<LibraryRailCounts>(
         () => catalogue && { all: catalogue.length, mine: catalogue.filter(isInMyLibrary).length, stack: stackApps(catalogue, signals.connectorSlugs), categories: categoryCounts(catalogue) },
@@ -191,8 +185,6 @@ function headingFor(t: LibraryTranslator, tCategory: TemplateCategoryCopy, { vie
     }
 }
 
-// The apps the catalogue actually uses, most used first: offering one nothing declares would only
-// ever lead to an empty grid.
 function connectorOptionsOf(templates: LibraryTemplate[]): FilterOption[] {
     return appCounts(templates).map(({ connector }) => ({ value: connector.slug, label: connector.name, icon: <ConnectorGlyph icon={connector.icon} /> }))
 }
@@ -204,8 +196,6 @@ function ConnectorGlyph({ icon }: { icon: string | null }) {
     return <Glyph className="size-2.5 shrink-0" />
 }
 
-// Below lg the rail would leave the page too narrow, so its links fold into one row: the main views,
-// then one chip per group that unfolds its entries underneath.
 type CompactNavGroup = 'apps' | 'categories'
 
 function CompactNav({ view, query, counts, onView, onQuery, onScratch }: { view: LibraryView; query: string; counts: LibraryRailCounts; onView: (view: LibraryView) => void; onQuery: (query: string) => void; onScratch: () => void }) {
@@ -298,8 +288,6 @@ function CompactNav({ view, query, counts, onView, onQuery, onScratch }: { view:
     )
 }
 
-// `quiet` is the active state of an entry that carries a brand logo, which a filled chip would
-// leave unreadable.
 function NavChip({ active, quiet = false, className, ...props }: ComponentProps<'button'> & { active: boolean; quiet?: boolean }) {
     return (
         <button
@@ -315,7 +303,6 @@ function NavChip({ active, quiet = false, className, ...props }: ComponentProps<
     )
 }
 
-// Rows rather than height: a wrapping list has no height to animate to.
 function NavGroupPanel({ open, children }: { open: boolean; children: ReactNode }) {
     return (
         <div inert={!open} className={cn('grid transition-[grid-template-rows] duration-200 ease-out motion-reduce:transition-none', open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]')}>

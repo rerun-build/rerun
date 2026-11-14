@@ -9,8 +9,6 @@ export type { ActiveForemanPhase, PhaseSpec } from './spec'
 export { phaseTools } from './spec'
 export { forcesFirstPlan, pinnedPlanBoxes, planKinds } from './plan'
 
-// No spec for `waitlist` nor `companion`: the route turns both away before any model is called, the
-// first until a machine frees up, the second to the foreman on the workspace's engine.
 export const PHASES: Record<ActiveForemanPhase, PhaseSpec> = {
     discover: DISCOVER_PHASE,
     plan: PLAN_PHASE,

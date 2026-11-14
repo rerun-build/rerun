@@ -8,8 +8,6 @@ import { boardImageMaxZoom, stageBoardScene } from '@/lib/og/board-scene'
 import { CARD_BACKGROUND } from '@/lib/og/size'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
-// Rendering surface for the screenshot service: the board the query describes, at the exact pixel
-// size it asks for, and nothing else.
 export const metadata: Metadata = {
     title: 'Board render',
     robots: { index: false, follow: false },
@@ -29,8 +27,6 @@ function toSearchParams(search: Search): URLSearchParams {
 }
 
 export default async function BoardRenderPage({ searchParams }: { searchParams: Promise<Search> }) {
-    // Checked here as well as on the capture route: this page is outside auth, and unsigned it
-    // would write any text it is handed on our own domain.
     const request = readBoardImageRequest(toSearchParams(await searchParams))
     if (!request) notFound()
 
@@ -38,7 +34,6 @@ export default async function BoardRenderPage({ searchParams }: { searchParams: 
 
     return (
         <main className="overflow-hidden" style={{ width: request.width, height: request.height, background: CARD_BACKGROUND[request.theme] }}>
-            {/* The dev overlay renders in the corner of the viewport, so it lands inside the capture. */}
             <style>{'nextjs-portal{display:none}'}</style>
             <TemplateCardStage
                 agents={agents}

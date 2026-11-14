@@ -21,8 +21,6 @@ import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
 const FOREMAN_SIZE = 72
-// The sheet runs this far below the screen, so lifting it over the keyboard never uncovers a gap
-// under its bottom edge.
 const SHEET_RUNOFF = 400
 const STEP_ENTER_MS = 260
 const STEP_EXIT_MS = 140
@@ -43,9 +41,6 @@ function Foreman({ thinking }: { thinking: boolean }) {
     )
 }
 
-// The sign-in screen: the board of coworkers at work fills the top, the Foreman sits on the edge of a
-// sheet that holds every step. The sheet is the screen, so it never closes: it grows and shrinks to
-// the step it shows and rides over the keyboard.
 export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: StartLayout }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
@@ -53,8 +48,6 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
     const { step, direction, back, canGoBack, thinking } = useSignInFlow()
     const keyboard = useAnimatedKeyboard()
     const t = useTranslations('mobileAuth')
-    // Android's back gesture walks the steps back as the sheet's own back button does, rather than leave
-    // the app; the country sheet pushed over this screen takes the gesture back while it is open.
     useFocusedSystemBack(canGoBack, back)
 
     const paddingTop = FOREMAN_SIZE / 2 + spacing.lg
@@ -70,8 +63,6 @@ export function SignInSheet({ startLayout = 'phone-first' }: { startLayout?: Sta
         setRestingContent(measured)
     }
 
-    // A layout prop rather than a transform: iOS keeps the accessibility frames of a transformed view where
-    // they were, so the Back button would be found, by VoiceOver and by UI tests, off the sheet it rides on.
     const lift = useAnimatedStyle(() => ({ bottom: Math.max(0, keyboard.height.get() - insets.bottom) - SHEET_RUNOFF }))
     const frame = useAnimatedStyle(() => {
         const covered = Math.max(paddingBottom, keyboard.height.get() + spacing.lg)

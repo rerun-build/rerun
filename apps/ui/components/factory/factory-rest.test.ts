@@ -4,7 +4,6 @@ import { TILE_H, routeTileLinks } from '@rerun/ui/iso-grid'
 import { atDistance, centreOf, inScanner, lineUp, podPath, restDistances, settles, sphereShapes, tileShapes, toWorld, workSpot } from './factory-rest'
 import { LOOP_MS, factoryScene } from './factory-scene'
 
-// Bounding boxes are enough to report a collision by name; the module itself tests the exact shapes.
 const box = (shape: { x: number; y: number }[]) => ({ x0: Math.min(...shape.map(p => p.x)), x1: Math.max(...shape.map(p => p.x)), y0: Math.min(...shape.map(p => p.y)), y1: Math.max(...shape.map(p => p.y)) })
 
 describe('where a sphere being worked rests', () => {
@@ -84,7 +83,6 @@ describe('the fixed work spot and the line-up', () => {
     })
 })
 
-// The same separating-axis test as the module, written out so the check does not lean on it.
 function overlapsExactly(a: { x: number; y: number }[], b: { x: number; y: number }[]) {
     for (const shape of [a, b]) {
         for (let i = 0; i < shape.length; i++) {

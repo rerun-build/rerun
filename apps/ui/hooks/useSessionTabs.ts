@@ -7,7 +7,6 @@ export type SessionTab = {
     uid: string
     id: string | null
     title: string
-    // The coworker's main conversation: pinned first, never closed, never written to storage.
     kind?: 'general'
 }
 
@@ -19,21 +18,16 @@ export type SessionTabsState = {
 export const GENERAL_TAB_TITLE = 'General'
 export const NEW_THREAD_TITLE = 'New conversation'
 
-// The threads opened in this panel, most recent last, each one a tab after General. Past this many
-// the oldest are forgotten, and reopened from the coworker's threads list.
 export const MAX_REMEMBERED_TABS = 8
 
 export const isGeneralTab = (tab: SessionTab | undefined): boolean => tab?.kind === 'general'
 
 export const generalTabUid = (agentId: string) => `general:${agentId}`
 
-// Its id is null until the row is known: read on mount, or created by the first message sent there.
 function generalTab(agentId: string): SessionTab {
     return { uid: generalTabUid(agentId), id: null, title: GENERAL_TAB_TITLE, kind: 'general' }
 }
 
-// General learns its row id. A thread tab opened on that same id before it was known (a notification,
-// the inbox, the search) folds into the pinned tab, so one conversation never has two tabs.
 export function adoptGeneralId(state: SessionTabsState, sessionId: string): SessionTabsState {
     const general = state.tabs[0]
     if (!isGeneralTab(general)) return state
@@ -44,8 +38,6 @@ export function adoptGeneralId(state: SessionTabsState, sessionId: string): Sess
     return { tabs, activeIndex }
 }
 
-// Keeps the newest threads, and always the active one: a list saved under the old, higher ceiling
-// can hold it among the oldest. General, when it leads the list, is neither counted nor dropped.
 export function remember(state: SessionTabsState): SessionTabsState {
     const pinned = isGeneralTab(state.tabs[0]) ? state.tabs.slice(0, 1) : []
     const threads = state.tabs.slice(pinned.length)
@@ -65,8 +57,6 @@ function newTab(): SessionTab {
     return { uid: nanoid(), id: null, title: NEW_THREAD_TITLE }
 }
 
-// What the storage holds: the threads only. `pinned` says the saved `activeIndex` already counts
-// General in front; a state saved before General existed counted threads from zero.
 type StoredState = { tabs: SessionTab[]; activeIndex: number; pinned?: 'general' }
 
 export function loadFromStorage(agentId: string): SessionTabsState | null {
@@ -75,8 +65,6 @@ export function loadFromStorage(agentId: string): SessionTabsState | null {
         if (!raw) return null
         const parsed = JSON.parse(raw) as StoredState
         if (!parsed?.tabs) return null
-        // Migration: anciens onglets stockés sans `uid` → en générer un. Le plafond a baissé
-        // depuis que les onglets se voient : un état sauvé au-dessus est ramené dessous.
         const threads = parsed.tabs.filter(t => !isGeneralTab(t)).map(t => (t.uid ? t : { ...t, uid: nanoid() }))
         const activeIndex = Math.min(Math.max(0, (parsed.activeIndex ?? 0) + (parsed.pinned === 'general' ? 0 : 1)), threads.length)
         return remember({ tabs: [generalTab(agentId), ...threads], activeIndex })
@@ -101,7 +89,6 @@ export function useSessionTabs(agentId: string) {
     stateRef.current = state
 
     useEffect(() => {
-        // The General id resolved so far belongs to the previous coworker: the new one resolves its own.
         setState(loadFromStorage(agentId) ?? freshState(agentId))
     }, [agentId])
 
@@ -111,7 +98,6 @@ export function useSessionTabs(agentId: string) {
 
     const activeSessionId = state.tabs[state.activeIndex]?.id ?? null
 
-    // A conversation nobody has spoken in yet is the new one: asking again lands on it.
     const createNew = useCallback(() => {
         setState(prev => {
             const blank = prev.tabs.findIndex(t => t.id === null && !isGeneralTab(t))
@@ -124,7 +110,6 @@ export function useSessionTabs(agentId: string) {
         setState(prev => (index === prev.activeIndex ? prev : { ...prev, activeIndex: index }))
     }, [])
 
-    // Closing the last thread leaves General on screen: it is never closed itself.
     const closeTab = useCallback((index: number) => {
         setState(prev => {
             if (isGeneralTab(prev.tabs[index])) return prev
@@ -159,7 +144,6 @@ export function useSessionTabs(agentId: string) {
         }))
     }, [])
 
-    // General keeps its name whatever the hub writes on its row.
     const updateTabTitle = useCallback((sessionId: string, title: string) => {
         setState(prev => ({
             ...prev,

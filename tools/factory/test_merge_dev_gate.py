@@ -1,4 +1,3 @@
-"""merge-dev runs gate.py itself and refuses unless it exits 0."""
 import contextlib, io, os, subprocess, sys, unittest
 from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

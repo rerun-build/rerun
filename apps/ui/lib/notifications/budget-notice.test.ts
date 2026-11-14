@@ -19,7 +19,6 @@ describe('decideBudgetNotice', () => {
 describe('suppressesErrorEmail', () => {
     it('suppresses an error carrying the budget code', () => {
         expect(suppressesErrorEmail('error', { errorCode: RERUN_BUDGET_ERROR_CODE })).toBe(true)
-        // A restart reports every conversation it interrupted at once.
         expect(suppressesErrorEmail('error', { errorCode: ENGINE_RESTARTED_ERROR_CODE })).toBe(true)
     })
 

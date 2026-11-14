@@ -25,14 +25,9 @@ type FileGridProps = {
     onDelete: (name: string) => void
     onRename: (oldName: string, newName: string) => void
     onDownload: (name: string) => void
-    // Publishing (agent files only): map of file or folder name (in the current dir) to its public
-    // URL when published, plus publish/unpublish handlers. A published folder is served as a site.
-    // Omitted for space/shared files.
     publishedByName?: Record<string, string>
     onPublish?: (name: string) => Promise<void>
     onUnpublish?: (name: string) => Promise<void>
-    // Bumped when a file is saved: the thumbnail cache is keyed on the directory alone, which does
-    // not change when its content does.
     contentRevision?: number
 }
 

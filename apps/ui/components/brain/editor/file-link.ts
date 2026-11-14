@@ -7,13 +7,10 @@ type FileLinkOptions = { onOpen: (path: string) => void }
 
 export const SHARED_FILE_SCHEME = 'shared:'
 
-// Dragged from the Files tree of the sidebar onto a page.
 export const SHARED_FILE_DRAG_TYPE = 'application/x-rerun-shared-file'
 
 const fileName = (path: string) => path.split('/').filter(Boolean).pop() ?? path
 
-// Angle brackets keep a path with spaces or parentheses in one destination, and leave it readable
-// to an agent reading the raw page.
 export function fileLinkMarkdown({ path, name }: FileLinkAttrs): string {
     const label = name.replace(/([\\[\]])/g, '\\$1')
     const destination = /[\s()<>]/.test(path) ? `<${SHARED_FILE_SCHEME}${path.replace(/>/g, '%3E')}>` : `${SHARED_FILE_SCHEME}${path}`
@@ -29,12 +26,9 @@ function decodePath(href: string): string {
     }
 }
 
-// The outline file glyph of the Nucleo pack: the node view is plain DOM, outside React.
 const FILE_GLYPH =
     '<svg viewBox="0 0 18 18" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.16,6.25h-3.41c-.552,0-1-.448-1-1V1.852"/><path d="M2.75,14.25V3.75c0-1.105,.895-2,2-2h5.586c.265,0,.52,.105,.707,.293l3.914,3.914c.188,.188,.293,.442,.293,.707v7.586c0,1.105-.895,2-2,2H4.75c-1.105,0-2-.895-2-2Z"/></svg>'
 
-// A file of the shared folder cited on a page: `[q3.pdf](shared:reports/q3.pdf)` in the markdown,
-// a chip in the editor. Agents read the same path with shared_read.
 export const FileLink = Node.create<FileLinkOptions>({
     name: 'fileLink',
     group: 'inline',

@@ -12,7 +12,6 @@ export type MessageStamp = { createdAt: string; shown: boolean; onToggle: () => 
 
 const ignoreLongPress = () => {}
 
-/** Messenger's tap on a bubble: when it was sent comes up just under it, a second tap puts it away. */
 export function MessageTimeReveal({ stamp, side, children }: { stamp?: MessageStamp; side: 'left' | 'right'; children: ReactNode }) {
     const times = useMessageTimes()
     if (!stamp) return children
@@ -22,9 +21,7 @@ export function MessageTimeReveal({ stamp, side, children }: { stamp?: MessageSt
                 Haptics.selectionAsync()
                 stamp.onToggle()
             }}
-            // A long press selects the text: letting go of it must not bring the time up as well.
             onLongPress={ignoreLongPress}
-            // The links, photos and buttons inside stay their own elements for VoiceOver.
             accessible={false}
             style={{ alignItems: side === 'right' ? 'flex-end' : 'stretch' }}
         >

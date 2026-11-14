@@ -17,7 +17,6 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
-// The engine image this fork publishes (.github/workflows/images.yml), the one docker-compose.yml runs.
 const ENGINE_IMAGE = 'ghcr.io/special-place-ai-heaven/rerun-engine:dev'
 const POLL_MS = 3000
 
@@ -171,7 +170,6 @@ export function ServersDialog({ open, onOpenChange }: { open: boolean; onOpenCha
     useEffect(() => {
         if (!open) return
         void refresh()
-        // A server started from the command attaches itself: the dialog notices on its own.
         const timer = setInterval(() => void refresh(), POLL_MS)
         return () => clearInterval(timer)
     }, [open, refresh])

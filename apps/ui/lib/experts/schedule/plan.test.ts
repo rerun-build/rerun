@@ -40,7 +40,6 @@ describe('window', () => {
     })
 
     it('skips a spring-forward gap rather than returning a non-existent wall time', () => {
-        // Chile springs forward at 00:00 local, so 2026-09-06 00:00 does not exist in Santiago.
         const instant = zonedWallTimeToInstant(2026, 9, 6, 0, 0, 'America/Santiago')
         expect(getLocalParts(instant, 'America/Santiago').hour).toBe(1)
     })
@@ -113,8 +112,6 @@ describe('planInviteCampaign', () => {
     })
 
     it('does not let an eastern timezone swallow the daily cap', () => {
-        // Tokyo's local morning happens hours before Rome's in UTC, so a naive cursor would spend
-        // the whole cap on Tokyo every day and Rome would wait weeks.
         const experts = [...makeExperts('Asia/Tokyo', 200), ...makeExperts('Europe/Rome', 200)]
         const { scheduled } = planInviteCampaign(experts, { ...baseParams, dailyCap: 30 })
 
@@ -148,7 +145,6 @@ describe('planInviteCampaign', () => {
             const key = capDayKey(sendAt, 'UTC')
             perDay.set(key, (perDay.get(key) ?? 0) + 1)
         }
-        // 50 experts at 20 a day is three days of work; a planner that idles takes far longer.
         expect(perDay.size).toBeLessThanOrEqual(3)
         expect(Math.max(...perDay.values())).toBeLessThanOrEqual(20)
     })

@@ -7,8 +7,6 @@ import { text, theme } from "../theme";
 
 export interface SignInCodeProps {
   code: string;
-  // Left out for an account that is already signed in and confirms a new address: the code is
-  // typed where it was asked for, and a sign-in link would lead that account nowhere.
   signInUrl?: string;
   expiresInMinutes: number;
   appUrl: string;

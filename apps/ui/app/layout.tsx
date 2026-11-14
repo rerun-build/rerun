@@ -44,11 +44,7 @@ export const metadata: Metadata = {
   keywords: ["Rerun", "AI agents", "autonomous agents", "agent orchestration", "AI workforce", "no-code agents"],
   authors: [{ name: site.name }],
   metadataBase: new URL(site.url),
-  // iOS Safari otherwise wraps what looks like a phone number or an address in a link before React
-  // hydrates, and the markup no longer matches the server's (React error #418).
   formatDetection: { telephone: false, email: false, address: false },
-  // Next resolves the OpenGraph and Twitter titles against their own template, never against
-  // `title.template`, so the suffix has to be declared here for child pages to inherit it.
   openGraph: {
     type: "website",
     siteName: site.name,
@@ -77,8 +73,6 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
   viewportFit: "cover",
-  // Chrome Android otherwise leaves the layout viewport at its full height under an open keyboard,
-  // so `dvh` and anything `fixed` keep sizing against a screen half of which is the keyboard.
   interactiveWidget: "resizes-content",
 };
 

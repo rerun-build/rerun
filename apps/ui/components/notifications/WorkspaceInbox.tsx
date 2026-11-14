@@ -21,18 +21,14 @@ import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// A `done` row is one finished conversation, or every unseen run of one scheduled task, so it
-// carries the sessions it stands for.
 export type InboxItem = Omit<AttentionSession, 'status'> & { status: SessionStatus | 'done'; agentName: string; count?: number; sessionIds?: string[]; latestSessionId?: string }
 
-// Declared once, outside the inbox: a component reference the memoised rows can compare, where a render function would hand them a new element on every pass.
 function InboxItemMenu({ item, onOpenChange }: RowMenuProps<InboxItem>) {
     return <InboxRowMenu agentId={item.agentId} agentName={item.agentName} onOpenChange={onOpenChange} />
 }
 
 type View = null | 'hub' | { notification: AnnouncedNotification }
 
-/** Every agent's « To handle » list in one place, parked in the board's bottom-left corner. */
 export function WorkspaceInbox() {
     const t = useTranslations('notifications.inbox')
     const tReasons = useTranslations('notifications.inbox.reasons')
@@ -43,7 +39,6 @@ export function WorkspaceInbox() {
     const setSessionStatus = useBoardStore(s => s.setSessionStatus)
     const markSessionsHandled = useBoardStore(s => s.markSessionsHandled)
     const sessions = useAttentionSessions()
-    // Until its notification is read, a row may well be someone else's: it waits rather than flashes.
     const reasonsLoaded = sessions.every(s => s.reason !== undefined)
 
     const unseen = useUnseenGroups()
@@ -106,7 +101,6 @@ export function WorkspaceInbox() {
         [dismiss]
     )
 
-    // The notification says what arrived; its row in the list, once loaded, carries the session it belongs to.
     const rowOf = useCallback(
         (notification: AnnouncedNotification) => items.find(i => i.agentId === notification.agentId && i.engineSessionId !== null && i.engineSessionId === notification.engineSessionId),
         [items]
@@ -138,7 +132,6 @@ export function WorkspaceInbox() {
         const board = useBoardStore.getState()
         board.focusAgentOnBoard(item.agentId, 'chat')
         board.setPendingOpenSession({ agentId: item.agentId, sessionId: item.latestSessionId ?? item.id, runId: null })
-        // The conversation opened marks itself read; the other runs of the same task go with it.
         if (item.sessionIds) void useUnseenRunsStore.getState().markSeen(item.sessionIds)
     }, [])
     const markRead = useCallback(
@@ -216,7 +209,6 @@ export function WorkspaceInbox() {
     )
 }
 
-/** The shared surface, with « Mark all as read » asking first: the app's confirm dialog cannot live in `@rerun/ui`. */
 export function InboxSurface({ items, onMarkAllRead, keepOpen = false, ...props }: InboxSurfaceProps<InboxItem>) {
     const t = useTranslations('notifications.inbox.markAll')
     const [confirmOpen, setConfirmOpen] = useState(false)

@@ -1,35 +1,4 @@
 #!/usr/bin/env node
-// Opens the hub of this workspace in a real browser, signed in, and captures what a change looks like
-// before anyone calls it done.
-//
-//   pnpm verify:ui /settings /templates                     every path, at every width, in both themes
-//   pnpm verify:ui --scenario .context/verify/flow.mjs      a scripted walk: clicks, typing, a capture per step
-//   pnpm verify:ui / --widths 375,1440 --themes dark --headed
-//   pnpm verify:ui --engine --scenario …                     with a local engine behind the workspace
-//   pnpm verify:ui --fresh /                                 a brand new account, to walk the signup
-//   pnpm verify:ui --onboarded /                             an account past the onboarding
-//   pnpm verify:ui --locale fr /                             the app in a language pack (fr, es, pt, de, or en-XA)
-//
-// Local stack only. The hub has to run on the Docker Supabase (`pnpm db:start`, then `pnpm cloud env:local`):
-// a hub on production provisions a real user and a real workspace on every page load, and the
-// production profile carries the live Stripe keys. The script checks both before the first request.
-//
-// It signs in as a throwaway account of its own, `verify-<workspace>@rerun.local`, created on the
-// local stack through the admin API and opened through the app's own magic link page.
-//
-// Its workspace is linked to an engine on CONDUCTOR_PORT + 1, through a pool row of the local stack:
-// without one, a workspace that has no machine sits behind the waitlist wall. `--engine` also starts
-// that engine (data in `.context/verify/engine-data`), for the changes that need it to answer.
-//
-// The account outlives the run, so what a scenario builds is still there the next time; `--fresh`
-// deletes it first.
-//
-// A scenario is a module whose default export receives `{ page, step, base, admin, workspaceId }`:
-// `await step('name')` captures the page at that point, `page` is a Playwright page already signed in
-// on the hub, `admin` a service-role client of the local stack to seed what the walk needs.
-//
-// Everything lands in `.context/verify/<timestamp>/`: one PNG per path, width and theme, and a
-// `report.json` with the load timings, the console errors and every failed request.
 
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -143,11 +112,7 @@ const outDir = join(REPO_ROOT, '.context/verify', new Date().toISOString().repla
 mkdirSync(outDir, { recursive: true })
 const server = await ensureServer(base, outDir)
 
-// Chromium's Local Network Access checks hold every request the page makes to the loopback stack
-// (127.0.0.1:54421) and the dev server's HMR socket behind a permission prompt nobody answers.
 const browser = await chromium.launch({ headless: !options.headed, args: ['--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests'] })
-// A language pack is picked by the cookie the Account dialog writes, and the browser asks for it too.
-// The test accounts (`@rerun.local`) are in the early access of the language packs.
 const context = await browser.newContext(options.locale ? { locale: options.locale } : {})
 await context.addCookies([
     { name: 'rerun-consent', value: `v1:denied:${Date.now()}`, url: base },

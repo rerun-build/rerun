@@ -4,7 +4,6 @@ import { BackHandler } from 'react-native'
 import { useFocusedSystemBack } from '@/lib/focused-system-back'
 import { useSystemBack } from '@/lib/system-back'
 
-// Played as a plain effect: the screen is focused. `mockFocused` false stands for a route pushed over it.
 const mockFocused = { current: true }
 jest.mock('expo-router', () => {
     const { useEffect } = jest.requireActual<typeof import('react')>('react')

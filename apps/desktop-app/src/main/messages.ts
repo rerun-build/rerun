@@ -4,8 +4,6 @@ import { createTranslator } from 'use-intl/core'
 import { desktopAppMessages, resolveShellLocale } from '../shared/messages'
 import { readSettings, updateSettings } from './settings'
 
-// The language of the menus and dialogs: the one the web app last told (the person's choice in
-// Rerun), else the system's.
 let locale: Locale = resolveShellLocale(readSettings().locale, ...app.getPreferredSystemLanguages())
 let translator = createTranslator({ locale, messages: desktopAppMessages(locale) })
 const listeners = new Set<() => void>()

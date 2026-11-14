@@ -12,8 +12,6 @@ export type PlanStats = {
     flaggedKept: string[]
 }
 
-// A file being flagged says nothing about whether it still travels: the engine can flag without
-// excluding, and the reviewer can put an excluded one back in. Everything here reads the live list.
 export function planStats(plan: AgentCapturePlan, excluded: string[]): PlanStats {
     const dropped = new Set(excluded)
     const kept = plan.files.filter(file => !dropped.has(file.path))

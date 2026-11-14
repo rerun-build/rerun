@@ -34,8 +34,6 @@ export function CaptureReviewGroup({
     )
 }
 
-// A row rather than a sentence: the labels line up down the card, so a reviewer scans the column
-// instead of re-reading the same prose for every agent.
 export function CaptureReviewRow({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <div className="flex items-start gap-3 text-xs">

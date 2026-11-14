@@ -6,16 +6,6 @@ import { readRegistry, upsertRegistryEntry } from '@/lib/services/registry'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// A Composio service's MCP server, hosted by the UI — sibling of /api/mcp/managed/<provider>,
-// but the third-party token never exists on our side at all: Composio holds it, and every
-// tools/call is forwarded to Composio scoped by a per-agent user_id.
-//
-// Auth model: the engine authenticates via `x-rerun-key` (its RERUN_API_KEY → space), and
-// `x-rerun-agent` (the ENGINE agent id) is resolved to the Supabase agent WITHIN that workspace —
-// so the user_id is derived server-side and a box can never reach another workspace's
-// connections, even with a forged header. The COMPOSIO_API_KEY stays on this server.
-// An extra account of the app is compiled with `x-rerun-instance: <instanceId>`, which picks its
-// own user_id, so each account of one coworker reaches its own connected account.
 export const dynamic = 'force-dynamic'
 
 const SUPPORTED_PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05', '2024-10-07']
@@ -37,10 +27,6 @@ function isNotConnectedError(message: string): boolean {
     return /connected account|no connection|not connected|inactive|expired/i.test(message)
 }
 
-// A coworker gets the app's tools as soon as it is installed, before the user connects the account
-// behind it, so "not connected" is more often a first connection than a lost one: only an active
-// entry was ever connected. That one goes back to needs_auth, so the Services tab shows Reconnect
-// instead of a silently broken connector. Failures are logged, never surfaced to the agent.
 async function settleNotConnected(workspaceId: number, engineAgentId: string, key: string): Promise<'never' | 'lost'> {
     try {
         const conn = await getWorkspaceConnection(workspaceId)
@@ -60,7 +46,6 @@ function notConnectedMessage(name: string, slug: string, connection: 'never' | '
     return `${situation} Call suggest_service with slug "${slug}" so the user gets a Connect card, then end your turn.`
 }
 
-// suggest_service only knows catalog slugs, so the agent is pointed at the app, not the account.
 async function notConnectedResponse(id: unknown, ctx: { workspaceId: number; engineAgentId: string; slug: string; instanceId?: string; name: string; tool: string; rawMessage: string }): Promise<Response> {
     const key = serviceRegistryKey(ctx.slug, ctx.instanceId)
     const connection = await settleNotConnected(ctx.workspaceId, ctx.engineAgentId, key)
@@ -78,7 +63,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
         return new Response('Unauthorized', { status: 401 })
     }
 
-    // A malformed id must not fall back to the base account: that would act as the wrong mailbox.
     const instanceHeader = req.headers.get('x-rerun-instance')
     if (instanceHeader && !SERVICE_INSTANCE_ID_RE.test(instanceHeader)) return new Response('Invalid x-rerun-instance', { status: 400 })
     const instanceId = instanceHeader || undefined
@@ -146,8 +130,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
             return rpcResult(id, { content: [{ type: 'text', text: JSON.stringify(out.data) }], structuredContent: out.data })
         } catch (err) {
             const message = err instanceof Error ? err.message : 'Tool failed'
-            // Order matters: Composio reports a missing connected account as a 404 too, so the
-            // not-connected check must run before the 404 → unknown-tool mapping.
             if (isNotConnectedError(message)) {
                 return notConnectedResponse(id, { workspaceId: engine.workspaceId, engineAgentId, slug, instanceId, name: manifest.name, tool: name, rawMessage: message })
             }

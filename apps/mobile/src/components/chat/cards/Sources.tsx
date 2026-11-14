@@ -10,7 +10,6 @@ import { spacing } from '@/theme/tokens'
 
 export type Source = { url: string; title?: string }
 
-// The pages a message drew on, folded under it.
 export function Sources({ sources }: { sources: Source[] }) {
     const t = useTranslations('mobileCards.sources')
     const theme = useTheme()

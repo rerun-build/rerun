@@ -9,7 +9,6 @@ import { Skeleton } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
-// The desktop app's own settings, in the account dialog of the desktop app only.
 export function DesktopAppPanel() {
     const t = useTranslations('desktopShell.settings')
     const shell = desktopShell('settings')

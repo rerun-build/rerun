@@ -24,7 +24,7 @@ class Core(Base):
             self.c.get("/issues/71")
             with self.assertRaises(ghclient.GhError) as cm:
                 self.c.get("/issues/999")
-        self.assertEqual(self.f.calls[0][3], "token " + SECRET)  # sent only in the auth header
+        self.assertEqual(self.f.calls[0][3], "token " + SECRET)
         self.assertEqual(cm.exception.status, 404)
         for text in (out.getvalue(), err.getvalue(), str(cm.exception), repr(cm.exception), repr(self.c)):
             self.assertNotIn(SECRET, text)
@@ -53,5 +53,5 @@ class Calls(Base):
         self.assertEqual(self.f.calls[-2][:3], ("POST", "/repos/o/r/pulls", {"title": "t", "head": "b", "base": "dev", "body": "body"}))
         self.assertEqual(self.f.calls[-1][2], {"title": "x", "body": "y"})
         self.assertTrue(all(x[3] == "token " + SECRET for x in self.f.calls))
-        c._open = lambda m, u, b=None: ([1], '<http://other.example/x>; rel="next"')  # off-host link: stop, no token sent
+        c._open = lambda m, u, b=None: ([1], '<http://other.example/x>; rel="next"')
         self.assertEqual(list(c.pages("/x")), [1])

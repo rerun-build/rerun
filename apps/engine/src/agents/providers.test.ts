@@ -62,8 +62,6 @@ describe('claudeMcpConfig', () => {
         expect(allowedTools).not.toContain('mcp__rerun__mcpish')
     })
 
-    // The engine holds the connection: the CLI gets an in-process relay under the same name, so the
-    // tools keep their `mcp__<server>__<tool>` names and the allow list does not change.
     it('hands a server the engine already holds to the CLI as an in-process relay under its own name', () => {
         const relay = { name: 'discord', tools: [], call: async () => ({ content: [] }) }
         const { mcpServers, allowedTools } = claudeMcpConfig(undefined, [{ ...server({ name: 'discord', command: 'npx', args: ['-y', 'mcp-discord'] }), relay }, server({ name: 'gh', url: 'https://gh.example/mcp' })])
@@ -86,8 +84,6 @@ describe('claudeMcpConfig', () => {
         expect(allowedTools).toEqual([])
     })
 
-    // What lets the CLI run several call_agent calls of one step at the same time; every other
-    // bridged tool keeps running one after another.
     it('marks call_agent, and only call_agent, as a tool whose calls may overlap', () => {
         const tools: ToolSet = {
             call_agent: tool({ description: 'call', inputSchema: z.object({ agent: z.string() }), execute: async () => 'ok' }),
@@ -238,9 +234,6 @@ describe('codexMcpConfig', () => {
     })
 })
 
-// The bridge is a real MCP server over loopback HTTP, so the only honest check that Rerun's tools
-// survive the AI SDK -> Codex conversion is to speak MCP to it. Guards the schema conversion of
-// ask_user in particular: its `z.preprocess` wrapper is the fragile part.
 describe('codex bridge server', () => {
     type Sdk = { _start(): Promise<{ url: string; bearerToken: string }>; _stop(): Promise<void> }
     let sdk: Sdk
@@ -293,8 +286,6 @@ describe('codex bridge server', () => {
         expect(JSON.parse(result.content[0].text).status).toBe('delivered')
     })
 
-    // jsonTolerantArray's safety net has to survive the conversion, or a model that stringifies the
-    // array would break HITL on Codex while still working on Claude.
     it('still accepts a stringified array', async () => {
         const { result } = await rpc('tools/call', { name: 'ask_user', arguments: { questions: JSON.stringify([{ question: 'Ready?' }]) } })
         expect(JSON.parse(result.content[0].text).status).toBe('delivered')
@@ -314,7 +305,6 @@ describe('codex bridge server', () => {
     })
 })
 
-// Claude Code always prefixes `mcp__`; Codex only does when `prefix_mcp_tool_names` is on.
 describe('canonicalHitlName', () => {
     it.each(['mcp__rerun__ask_user', 'rerun__ask_user', 'ask_user'])('strips the bridge namespace from %s', name => {
         expect(canonicalHitlName(name)).toBe('ask_user')

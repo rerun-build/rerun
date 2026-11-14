@@ -22,11 +22,6 @@ export type CodexSession = { rateLimits: CodexRateLimits | null; models: string[
 
 type ModelList = { data?: { id?: unknown; hidden?: unknown }[]; nextCursor?: unknown }
 
-// The provider drops `account/rateLimits/updated` before anyone can see it and exposes no way to
-// send a request of our own, so the reading takes a short app-server session: handshake, the plan
-// limits and the model list the account is offered by this binary, gone. Resolves to null on any
-// failure: a missing gauge is never worth an error. A list that never comes back does not cost the
-// gauge that did: the timer settles whatever arrived.
 export function readCodexSession(connectionId: string, timeoutMs = READ_TIMEOUT_MS): Promise<CodexSession | null> {
     return new Promise(resolve => {
         const { cmd, args } = codexCommand()
@@ -80,7 +75,6 @@ export function readCodexSession(connectionId: string, timeoutMs = READ_TIMEOUT_
                 answered()
             } else if (message.id === MODELS_ID) {
                 const list = message.error ? undefined : (message.result as ModelList | undefined)
-                // A partial page would read as models the account lacks: no reading beats a wrong one.
                 const data = list?.nextCursor ? [] : (list?.data ?? [])
                 session.models = data.filter(model => typeof model.id === 'string' && model.hidden !== true).map(model => model.id as string)
                 answered()
@@ -104,7 +98,6 @@ export function refreshCodexPlanLimits(connection: LoadedConnection | null): Pro
     const task = (async () => {
         await ensureCodexAuth(connection)
         const session = await readCodexSession(connection.id)
-        // The CLI may have rotated the token while it was up, exactly as it does during a run.
         await syncCodexAuth(connection)
         recordPlanLimits(connection.id, planLimitWindowsFromCodex(session?.rateLimits ?? null))
         if (session) recordCliModels(connection.id, session.models, session.version, codexOffPin(session.version))
@@ -121,9 +114,6 @@ export function pendingCodexPlanLimits(connectionId: string): Promise<void> | un
     return inFlight.get(connectionId)
 }
 
-// Called on the paths that must not wait for a process: the caller answers with the reading it
-// has, and the fresh one is there for the next ask. Paced on the last attempt rather than the last
-// reading, so a connection that cannot be read is not respawned on every list.
 export function refreshStaleCodexPlanLimits(connections: LoadedConnection[]): void {
     for (const connection of connections) {
         if (Date.now() - (attemptedAt.get(connection.id) ?? 0) < STALE_AFTER_MS) continue

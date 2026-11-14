@@ -66,8 +66,6 @@ describe('toResumableStreamResponse', () => {
         expect(await readAll(res.body!)).toContain('"n":1')
     })
 
-    // Proxies and load balancers drop an idle SSE connection long before an agent that thinks for a
-    // few minutes says anything.
     it('keeps a silent run alive with SSE comments until it speaks', async () => {
         vi.useFakeTimers()
         const hold = gate()

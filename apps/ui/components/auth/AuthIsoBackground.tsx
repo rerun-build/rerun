@@ -8,14 +8,6 @@ import type { StageScript } from './auth-stage-board'
 import { stageLinkId } from './auth-stage-board'
 import { useStageScript } from './useStageScript'
 
-// Décor des anciennes surfaces d'auth en deux colonnes (/invite et /creator/join). Comme la scène
-// plein cadre, il joue une histoire écrite plutôt que de tirer des statuts et des liens au hasard :
-// un audit attend sa relecture, des leads passent à l'outreach avant l'approbation de la campagne,
-// puis une alerte prix attend une décision. Chaque `waiting_human` vient donc après du travail et
-// repart une fois l'accord donné.
-
-// Disposition locale, volontairement plus aérée que la démo dashboard (agents collés) : un grand
-// space et des agents espacés d'une case (chaque agent occupe un bloc 2×2, AGENT_SPAN=2).
 const DEMO_SPACE: SpacePublic = {
     id: 'auth-space-1',
     workspace_id: 1,
@@ -40,9 +32,6 @@ const LEADS = 'demo-agent-leads'
 const PRICING = 'demo-agent-pricing'
 const LEAD_HANDOFF = stageLinkId(LEADS, OUTREACH)
 
-// Le cycle commence par deux tâches en parallèle. L'audit demande une relecture ; le scraper passe
-// ses leads à l'agent d'outreach, qui prépare la campagne et attend son approbation avant l'envoi.
-// La veille prix prend ensuite le relais et ne répond jamais seule à un changement sensible.
 export const AUTH_ISO_SCRIPT: StageScript = {
     startAt: 900,
     period: 72_000,
@@ -99,7 +88,6 @@ export function AuthIsoBackground() {
             return link ? [link] : []
         })
     }, [hotLinks])
-    // Une attente humaine prend la priorité visuelle ; sinon le halo suit une tâche en cours.
     const selectedId = agents.find(agent => agent.status === 'waiting_human')?.id
         ?? agents.find(agent => agent.status === 'working')?.id
         ?? null

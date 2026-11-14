@@ -5,7 +5,6 @@ import { createClient } from '@/supabase/server'
 
 export type DesktopApproval = { ok: true; code: string } | { ok: false; reason: 'signed-out' | 'invalid' | 'unavailable' }
 
-// The person confirmed, in their browser, that the desktop app may sign in as them.
 export async function approveDesktopSignIn(challenge: string): Promise<DesktopApproval> {
     if (!isPkceChallenge(challenge)) return { ok: false, reason: 'invalid' }
     const supabase = await createClient()

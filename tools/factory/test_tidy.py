@@ -1,4 +1,3 @@
-"""deploy/vps/tidy.sh run against stand-ins for docker and systemctl: what it removes, and what install leaves on disk."""
 import os, shutil, subprocess, tempfile, unittest
 
 SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "deploy", "vps", "tidy.sh")
@@ -11,7 +10,7 @@ class Tidy(unittest.TestCase):
         self.tmp = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         self.root = os.path.join(self.tmp, "root")
-        for name in ("docker", "systemctl"):  # each stand-in only records how it was called
+        for name in ("docker", "systemctl"):
             path = os.path.join(self.tmp, name)
             with open(path, "w") as f:
                 f.write('#!/bin/sh\necho "%s $*" >> "$CALLS"\n' % name)

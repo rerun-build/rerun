@@ -1,16 +1,10 @@
 #!/usr/bin/env python3
-"""The factory runner loop (rerun#60 chunk C7). Plain code, no model. Commands: setup | run | once | enqueue JOB STAGE.
-Start: ensure_triggers, open the store, resolve unfinished fires. Every poll_s: read the run row over HTTP for every
-running fire (the row is the truth, no events), record ends in the store, apply limits.run_outcome (CANCEL -> cancel;
-error/RESTARTED -> fire again at most once per stage, then failed), and start the next queued stage by firing its trigger
-with the packet payload (intent row committed before the fire). The queue is the store's queue table; `enqueue` only drops a JSON request file in the inbox dir of the runner volume (atomic rename) and the loop ingests it each tick, so the loop is the only process that opens the store. A trigger entry may carry its own run_limit_s/stall_s/token_cap.
-SIGTERM stops the loop between ticks. The engine key and trigger tokens are never printed."""
 import argparse, json, os, signal, subprocess, sys, tempfile, threading, time, uuid
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import applypatch as AP, batch as BT, checkout as CO, engine as E, evidence as EV, factory as F, ghclient as GH, intake as IN, limits as L, publish as PB, followups as FU, readyq as RQ, store as S, testrun as TR, trigger as T, wake
-from publish import body as pr_body  # not via PB: tests swap PB for a fake with publish only
+from publish import body as pr_body
 
 POLL_S = 30
 INBOX_NAME = "inbox"
@@ -26,10 +20,9 @@ STUB = {"name": "stub", "provider": "custom", "baseUrl": "http://stub-model:8080
 DEFAULT_MODEL = "stub-fast"
 
 class NeedsSetup(RuntimeError):
-    """runner.json names a coworker the state file has no id for yet."""
+    pass
 
 def state_path(cfg):
-    """The state file (coworker ids written by `setup`): runner.json key state_file, else beside the ledger in the runner volume."""
     return cfg.get("state_file") or os.path.join(os.path.dirname(store_path(cfg)), STATE_NAME)
 
 def read_state(cfg):
@@ -52,8 +45,6 @@ def write_state(cfg, state):
     os.replace(tmp, path)
 
 def resolve(cfg, state, strict=True):
-    """A copy of cfg whose trigger entries without an `agent` take it from state['agents'][entry['agent_name']].
-    runner.json is a template (no ids); an entry that cannot be resolved raises RuntimeError, or is left out when not strict."""
     out = dict(cfg)
     out["triggers"] = []
     for e in cfg["triggers"]:
@@ -69,13 +60,10 @@ def resolve(cfg, state, strict=True):
     return out
 
 def load_runtime(cfg=None, strict=True):
-    """runner.json resolved with the state file: what `run`, `once` and status_report all read (one config, one store path)."""
     cfg = cfg if cfg is not None else T.load_config()
     return resolve(cfg, read_state(cfg), strict)
 
 def setup(eng, cfg):
-    """Create or reuse, in this order: the stub's `custom` connection (set as the box default), one coworker per trigger entry
-    that names an `agent_name`, then the triggers. Ids go to the state file. A second run creates nothing. Returns the lines to print."""
     out, state = [], read_state(cfg)
     listing = eng._call("GET", "/connections")
     conn = next((c for c in listing.get("connections") or [] if c.get("name") == STUB["name"] and c.get("provider") == "custom"), None)
@@ -119,14 +107,10 @@ def setup(eng, cfg):
 def iso(epoch):
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(epoch))
 
-# ---- queue (store.queue table; the CLI writes inbox request files) ----
 def inbox_path(cfg):
-    """Where `enqueue` drops request files: <runner volume>/inbox, beside the ledger. The loop is the only store writer."""
     return cfg.get("inbox_dir") or os.path.join(os.path.dirname(store_path(cfg)), INBOX_NAME)
 
 def enqueue(inbox, job, stage, chunk="", payload=None):
-    """Queue a stage from the CLI: one small JSON request file in the inbox dir, written to a temp name and renamed
-    (atomic). No store access: the loop ingests the file at its next tick. The packet payload defaults to {job, stage, chunk}."""
     os.makedirs(inbox, exist_ok=True)
     body = {"job": job, "stage": stage, "chunk": chunk, "payload": payload or {"job": job, "stage": stage, "chunk": chunk}}
     name = "%013d-%s.json" % (int(time.time() * 1000), uuid.uuid4().hex[:8])
@@ -137,8 +121,6 @@ def enqueue(inbox, job, stage, chunk="", payload=None):
     return name
 
 def ingest(st, inbox):
-    """Move every request file of the inbox into the store's queue (oldest name first), then delete the file.
-    An unreadable or incomplete file is renamed *.bad and skipped. Returns the number queued."""
     try:
         names = sorted(n for n in os.listdir(inbox) if n.endswith(".json") and not n.startswith("."))
     except FileNotFoundError:
@@ -166,7 +148,7 @@ def ingest(st, inbox):
     return n
 
 class ChainFailed(Exception):
-    """The publish chain of a finished build did not complete."""
+    pass
 
 
 class Runner:
@@ -176,7 +158,6 @@ class Runner:
         self.by_slug = {e["slug"]: e for e in cfg["triggers"]}
         self.by_stage = {e["stage"]: e for e in cfg["triggers"]}
 
-    # -- one tick --
     def tick(self):
         ingest(self.st, inbox_path(self.cfg))
         self.resolve_pending()
@@ -195,8 +176,6 @@ class Runner:
         return e["agent"] if e else None
 
     def resolve_pending(self):
-        """An intent with no run id (crash between intent and fire): find its run by trigger slug, else fail it after a
-        few ticks. Never fired again from here."""
         for f in self.st.pending():
             agent = self._agent(f)
             if not agent:
@@ -227,7 +206,6 @@ class Runner:
             ok = True
         except E.EngineError:
             ok = False
-        # no step yet: last_step_at stays None and limits counts the stall from the run's start, never from now
         return {"last_step_at": last, "tokens": tokens} if ok else {"tokens": tokens}
 
     def check(self, f):
@@ -253,7 +231,7 @@ class Runner:
                     return self.chain_failed(f, str(e), tin, tout)
             ev = self.evidence(f) if self.evidence else ("OK", "")
             if ev[0] != "OK":
-                return  # the run ended but no evidence yet: stays running, read again next tick
+                return
             if f["stage"] == "review" and self.issues and isinstance(ev[1], str):
                 self.follow_up(f["job"], ev[1])
             self.st.close_run(rid, "done", iso(self.clock()), tin, tout)
@@ -272,11 +250,10 @@ class Runner:
             else:
                 self.st.close_run(rid, "failed", iso(self.clock()), tin, tout, err)
                 log("run %s failed: refire already used" % rid)
-        else:  # FAILED, MISSING
+        else:
             self.st.close_run(rid, "failed", iso(self.clock()), tin, tout, why)
 
     def follow_up(self, job, verdict):
-        """One issue per follow-up note of a done review; the keys already opened live in the job kv (the client cannot list)."""
         kv = self.st.get_all(job)
         done = {k[9:] for k in kv if k.startswith("followup:")}
         try:
@@ -286,7 +263,6 @@ class Runner:
             log("follow-up issues for %s stopped: %s" % (job, type(e).__name__))
 
     def chain_failed(self, f, why, tin, tout):
-        """A failed publish chain is a failed attempt, never done: limits.failure says RETRY (requeue) or NEEDS_BOSS (escalate)."""
         what, note = L.failure(self.st.attempts(f["job"], f["chunk"]), self.cfg, why)
         self.st.close_run(f["run_id"], "error" if what == "RETRY" else "failed", iso(self.clock()), tin, tout, note or why)
         if what == "RETRY":
@@ -295,16 +271,14 @@ class Runner:
         log("chunk %s of job %s escalated: %s" % (f["chunk"], f["job"], note))
 
     def finish_build(self, f):
-        """A build run ended: check out base and head, apply the chunk's patch, run its done-test (fails on base, passes on
-        head), publish only the chunk's paths. Job kv keys: repo_url, base, base_branch, title, patch:<chunk>, test:<chunk>."""
         job, chunk = f["job"], f["chunk"]
         kv, paths = self.st.get_all(job), self.st.get_ready(job, chunk)["paths"]
-        if "repo_url" not in kv:  # a job never registered for publishing has no chain to fail
+        if "repo_url" not in kv:
             return log("chunk %s: job %s has no repo_url, nothing to publish" % (chunk, job))
         d = self.cfg.get("work_dir") or os.path.join(os.path.dirname(store_path(self.cfg)), "work")
         try:
             base, head = (CO.Checkout(os.path.join(d, job, n), kv["repo_url"], kv["base"]).ensure() for n in ("base", "head"))
-            if "patch:" + chunk not in kv and self.compare_diff:  # no patch given: the pushed chunk branch against the job base
+            if "patch:" + chunk not in kv and self.compare_diff:
                 kv["patch:" + chunk] = self.compare_diff(kv["base"], "chunk/%s-%s" % (job, chunk))
                 self.st.set(job, "patch:" + chunk, kv["patch:" + chunk])
             if (r := AP.apply(head, kv["patch:" + chunk], paths)) != "applied":
@@ -322,22 +296,19 @@ class Runner:
             raise ChainFailed("publish chain stopped: %s" % type(e).__name__) from e
 
     def run_gate(self, repo, job):
-        """After publish: gate.py <repo> <pr> as a child (posts the commit status, token from our env). Only logged, never changes chunk state."""
         try:
             pr = self.pr_by_head and self.pr_by_head("factory/job-%s" % job)
             if not pr:
                 return log("gate skipped for job %s: no PR found" % job)
             env = dict(os.environ, GATE_POST_STATUS="1", FACTORY_GH="gh",
-                       FACTORY_WORK=os.path.join(os.environ.get("FACTORY_DATA_DIR", "/state"), "work"))  # /data/work is read-only here
+                       FACTORY_WORK=os.path.join(os.environ.get("FACTORY_DATA_DIR", "/state"), "work"))
             p = subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "gate.py"), repo, str(pr["number"])],
                                env=env, capture_output=True, text=True, timeout=600)
             log("gate %s#%s exit %s" % (repo, pr["number"], p.returncode))
-        except Exception as e:  # a gate that cannot run is a log line, not a failed chunk
+        except Exception as e:
             log("gate for job %s did not run: %s" % (job, type(e).__name__))
 
     def see_merges(self):
-        """A published chunk stays 'running' until its job PR (branch factory/job-<job>) is merged; one merged PR marks every
-        published chunk of that job 'merged'. A GitHub error means not seen yet."""
         if not self.pr_by_head:
             return
         for (job,) in self.st.db.execute("SELECT DISTINCT job FROM ready_chunks WHERE state='running'").fetchall():
@@ -357,7 +328,7 @@ class Runner:
         st = self.st.get_all(f["job"]).get("payload:" + f["stage"])
         if st:
             payload = json.loads(st)
-        if f["chunk"]:  # a chunk refire takes the ready path only: no queue row, the old attempt's lease is closed
+        if f["chunk"]:
             for l in self.st.open_leases():
                 if l["job"] == f["job"] and l["chunk"] == f["chunk"] and l.get("attempt", 0) == f["refire"]:
                     self.st.close_lease(l["id"], "requeued", at=iso(self.clock()))
@@ -394,7 +365,7 @@ class Runner:
                 log("no token for %s, skipped" % ent["slug"])
                 continue
             self.st.set(job, "payload:" + stage, json.dumps(q["payload"]))
-            fid = self.st.dequeue_to_intent(q["id"], job, q["chunk"], stage, ent.get("coworker", ""), ent["slug"])  # intent in, queue row out, before the fire
+            fid = self.st.dequeue_to_intent(q["id"], job, q["chunk"], stage, ent.get("coworker", ""), ent["slug"])
             busy.add(job)
             try:
                 run_id, _ = T.fire(self.eng, ent["agent"], ent["slug"], token, q["payload"])
@@ -405,19 +376,16 @@ class Runner:
             log("fired stage %s of job %s: run %s" % (stage, job, run_id))
 
     def over_total(self, job):
-        """True when the job's closed runs used job_token_cap tokens or more (key missing: no total cap)."""
         cap = L._pos(self.cfg.get("job_token_cap"))
         used = self.st.db.execute("SELECT COALESCE(SUM(tokens_in+tokens_out),0) FROM fires WHERE job=?", (job,)).fetchone()[0]
         return bool(cap) and used >= cap
 
     def lease_closed(self, f):
-        """True when the fire's attempt (its refire number) has a lease for its chunk and none of that attempt is open."""
         ls = [l for l in self.st.db.execute("SELECT closed_at FROM leases WHERE job=? AND chunk=? AND attempt=?",
                                             (f["job"], f["chunk"], f["refire"]))] if f["chunk"] else []
         return bool(ls) and all(l[0] for l in ls)
 
     def sweep_leases(self):
-        """Close an expired lease only after eng.cancel succeeded or the run row is terminal; a failed cancel keeps it open."""
         at = iso(self.clock())
         for l in self.st.open_leases():
             mine = lambda f: f["chunk"] == l["chunk"]
@@ -435,8 +403,6 @@ class Runner:
             self.st.close_lease(l["id"], "expired", at=at)
 
     def fire_reviews(self, job, pr, head, checks, owners):
-        """Queue the review stage once per roster owner, only when every check at head is green; the wake claim
-        (job-independent key: event, owner, head) lets a second look at the same head fire nothing."""
         if F.ci_state(checks) != "GREEN":
             return []
         new = [o for o in sorted(set(owners)) if wake.claim_wake(self.st, wake.review_event(pr), o, head)]
@@ -445,15 +411,12 @@ class Runner:
         return new
 
     def after_reject(self, job, chunk, owners):
-        """A REJECT of a chunk: limits.after_reject rules; ARBITER queues the arbiter stage, FIX queues nothing here."""
         what, why = L.after_reject(owners)
         if what == "ARBITER":
             self.st.enqueue(job, "arbiter", chunk, {"job": job, "stage": "arbiter", "chunk": chunk, "why": why})
         return what
 
     def fire_batch(self, batch):
-        """One builder run for a picked batch (batch.pick_batch). Each chunk gets its own lease and attempt; all leases
-        end together, 2 x run_limit_s from now (as start_ready). Returns the run id, None when no token."""
         ent = self.by_stage.get("build")
         token = ent and self.tokens.get("%s/%s" % (ent["agent"], ent["slug"]))
         if not token or not batch:
@@ -479,7 +442,6 @@ class Runner:
         return run_id
 
     def start_ready(self):
-        """Fire ready chunks (stage 'build') that readyq.eligible allows; running plain stages share the slot count."""
         ent = self.by_stage.get("build")
         fires = self.st.pending() + self.st.running()
         busy, stages = [(f["job"], f["chunk"]) for f in fires if f["chunk"]], sum(1 for f in fires if not f["chunk"])
@@ -490,7 +452,7 @@ class Runner:
             first = next((c for c in left if RQ.eligible(c, self._ready_state(merged, busy, stages, c["job"]))[0]), None)
             if not first:
                 return
-            same = [c for c in left if c["job"] == first["job"]]  # a batch is one job's chunks
+            same = [c for c in left if c["job"] == first["job"]]
             batch = BT.pick_batch(same, self._ready_state(merged, busy, stages, first["job"]))
             run_id = self.fire_batch(batch)
             left = [c for c in left if c not in batch]
@@ -504,8 +466,6 @@ class Runner:
 TOKEN_FILE = "/run/secrets/gh_token"
 
 def load_token(cfg):
-    """Read the key file named by cfg gh_token_file once and put its content in GH_TOKEN and FACTORY_GIT_TOKEN.
-    A missing, unreadable or empty file raises RuntimeError naming the path only, never the content."""
     path = cfg.get("gh_token_file") or TOKEN_FILE
     try:
         with open(path, encoding="utf-8") as f:
@@ -517,7 +477,6 @@ def load_token(cfg):
     os.environ["GH_TOKEN"] = os.environ["FACTORY_GIT_TOKEN"] = tok
 
 def build(cfg=None, eng=None, clock=time.time, gh=None):
-    """gh: the one GitHub client (ghclient.Client) for open_pr and issues; default made from cfg github_api / repo, token from GH_TOKEN."""
     cfg = load_runtime(cfg)
     gh = gh or GH.Client(cfg.get("github_api", "https://api.github.com"), cfg.get("repo", "special-place-ai-heaven/rerun"))
     eng = eng or E.Engine()
@@ -526,13 +485,10 @@ def build(cfg=None, eng=None, clock=time.time, gh=None):
     return Runner(eng, st, cfg, tokens, clock, open_pr=gh.open_pr, issues=gh, pr_by_head=lambda b: gh.pr_by_head(b), compare_diff=getattr(gh, "compare_diff", None), evidence=lambda f: stage_evidence(gh, st, f))
 
 def unmerged_receipts(st, job):
-    """Receipts of the job's chunks not yet merged: the body of this PR lists only those."""
     merged = {c for (c,) in st.db.execute("SELECT chunk FROM ready_chunks WHERE job=? AND state='merged'", (job,))}
     return {k[8:]: json.loads(v) for k, v in st.get_all(job).items() if k.startswith("receipt:") and k[8:] not in merged}
 
 def stage_evidence(gh, st, f):
-    """Evidence for an ended run: a build run needs its pushed branch and CI (evidence.stage_check); other stages: OK.
-    A job without repo_url never published, so it has nothing to check. A GitHub error means no evidence yet."""
     kv = st.get_all(f["job"])
     if f["stage"] != "build" or "repo_url" not in kv:
         return "OK", ""
@@ -548,13 +504,11 @@ def _trusted(item):
     return item.get("author_association") in TRUSTED_ASSOCIATIONS or (item.get("user") or {}).get("login") == FACTORY_LOGIN
 
 def intake_issue(st, gh, repo, n, base_branch="dev"):
-    """`intake REPO#N`: the issue (body, then comments) is the plan text; the job kv gets repo_url, title, base_branch and the
-    sha of base_branch as `base`. Nothing is stored when the plan has no valid chunk. Returns (state, errors)."""
     issue = gh.issue(n)
-    parts = [issue.get("body") or ""] if _trusted(issue) else []  # only the repo's own people write the plan
+    parts = [issue.get("body") or ""] if _trusted(issue) else []
     text = "\n".join(parts + [c.get("body") or "" for c in gh.comments(n) if _trusted(c)])
     meta = {"repo_url": "https://github.com/" + repo, "title": issue["title"], "base_branch": base_branch}
-    sha = gh.branch_sha(base_branch)  # resolved before register: a GitHub error then stores no job
+    sha = gh.branch_sha(base_branch)
     state, errors = IN.register(st, str(n), meta, text)
     if state:
         st.set(str(n), "base", sha)
@@ -632,7 +586,7 @@ def main(argv=None):
             if a.cmd == "once":
                 print("runner: %s" % e, file=sys.stderr)
                 return 1
-            log("waiting for setup: %s" % e)  # stay up so `setup` can be exec'd in this container
+            log("waiting for setup: %s" % e)
             if stop.wait(10):
                 return 0
         except (E.EngineError, T.TriggerError, RuntimeError) as e:

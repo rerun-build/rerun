@@ -1,11 +1,3 @@
-// Deliberately not gated on cookie consent, unlike the client. Nothing here reads or writes the
-// visitor's terminal (server to server towards eu.i.posthog.com), so article 5(3) ePrivacy does
-// not apply, and `distinctId` is always an email or `expert:<id>`, never an identifier taken from
-// a PostHog cookie: a visitor who refused can never be reconciled with one of these events. The
-// events themselves stand on contract performance (`subscription_started`,
-// `email_verification_completed`) or legitimate interest (the expert funnel). The privacy policy
-// has to cover this server-side measurement.
-
 import { createHash } from 'node:crypto'
 import { PostHog } from 'posthog-node'
 import type { AnalyticsEventMap, EventName } from './index'

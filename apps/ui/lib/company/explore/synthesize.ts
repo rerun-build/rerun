@@ -9,7 +9,6 @@ const SYNTHESIS_MODEL = process.env.RERUN_COMPANY_BRIEF_MODEL ?? 'anthropic/clau
 
 const PAGE_CHARS = 5_000
 const BLOCK_CHARS = 12_000
-// 25 products at this length stay within one block.
 const CATALOG_DESCRIPTION_CHARS = 300
 
 const businessCardSchema = z.object({
@@ -78,7 +77,6 @@ function block(tag: string, value: unknown): string {
     return `<source tag="${tag}">\n${text.slice(0, BLOCK_CHARS)}\n</source>`
 }
 
-// Every collector's raw output, cut to what a model can use, each in a tagged block the brief cites.
 export function sourcesForPrompt(sources: Sources): string {
     const blocks: string[] = []
     const { dns, stack, site, search, registry, linkedinPerson, linkedinCompany, googleBusiness, catalog } = sources
@@ -145,7 +143,6 @@ export const synthesisCollector: Collector<'synthesis'> = {
             model: openrouter(SYNTHESIS_MODEL),
             schema: synthesisSchema,
             prompt: prompt(input, sources),
-            // The card plus a 900-word brief, and the model's thinking counts against the same cap.
             maxOutputTokens: 16_000,
         })
 

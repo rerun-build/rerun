@@ -13,7 +13,6 @@ async function store(agentId: string, config: AgentConfig, off: Set<string>): Pr
     await writeAgentConfig(agentId, next)
 }
 
-// The agent lock is not reentrant: callers must not hold it already.
 export function setSkillEnabled(agentId: string, slug: string, enabled: boolean): Promise<void> {
     return withAgentLock(agentId, async () => {
         const config = await readAgentConfig(agentId)
@@ -24,7 +23,6 @@ export function setSkillEnabled(agentId: string, slug: string, enabled: boolean)
     })
 }
 
-// A deleted skill must not leave its slug behind, or a new skill made under that name starts off.
 export function forgetSkill(agentId: string, slug: string): Promise<void> {
     return withAgentLock(agentId, async () => {
         const config = await readAgentConfig(agentId)

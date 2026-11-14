@@ -24,8 +24,6 @@ export async function migrate(): Promise<void> {
     await raw().executeMultiple(DDL)
 }
 
-// A reconciler, not a ladder step: a `rerun.db` removed from a data-dir already past the baseline
-// would otherwise come back empty, with no step left to recreate the index.
 export async function ensureAgentsIndex(): Promise<void> {
     await raw().execute(AGENTS_INDEX_DDL)
 }

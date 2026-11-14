@@ -2,8 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 
 import type { Database } from './database.types'
 
-// Hors navigateur, autoRefreshToken lance un setInterval qui ne s'arrête jamais et garde en vie le
-// contexte de la requête qui a créé le client : un client par requête faisait fuir la landing.
 const SERVER_AUTH = { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
 
 export function createPublicClient() {

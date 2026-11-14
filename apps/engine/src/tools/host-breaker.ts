@@ -6,11 +6,6 @@ const HTTP_FAILURE_IN_OUTPUT = /\bHTTP\/[0-9.]+\s+(401|403|407|429|5\d\d)\b|\bER
 
 export type HostAttempt = { text: string; failed: boolean }
 
-/**
- * Counts consecutive failures per host within one run. A host that refused the threshold in a row
- * is closed for the rest of the run: the sub-agent that started this work looped for 34 minutes on
- * a source that answered 403 to every tool, every user agent and every mirror it could think of.
- */
 export class HostBreaker {
     private failures = new Map<string, number>()
 

@@ -1,31 +1,13 @@
-// Routes for every link of a board, laid out together so they can share the floor: each end sits on
-// the face of its tile that looks at the other end, the ends of one face are spread side by side
-// around its centre, every route leaves its face perpendicular, routes keep to separate lanes where
-// they run in the same corridor, and no route passes over a tile or an extra footprint.
-//
-// Coordinates are the grid's two iso axes: u along "col", v along "row". A tile of span s anchored at
-// (col,row) covers u in [col, col+s] and v in [row, row+s]; its faces are the four sides of that
-// square. Routes are found on the integer lattice (shortest path with a cost for bends, shared
-// stretches and crossings), then each straight stretch is moved off its lattice line onto its port
-// or onto a free lane.
-
 import { DEFAULT_SPAN, TILE_H, TILE_W, isPlaced } from './iso'
 import type { Tile, TileLink } from './types'
 
 export type AxisPoint = { u: number; v: number }
-// A footprint the routes keep off, in grid cells like a tile's: anchor and span.
 export type LinkFootprint = { col: number; row: number; span: number }
 
-// Screen px between two parallel lines one axis unit apart.
 const AXIS_PX = (TILE_W * TILE_H) / Math.hypot(TILE_W, TILE_H)
-// A belt's band in world px: wide enough to carry the factory's spheres.
 export const BELT_WIDTH = 13
-// The spacing of ends on a face and of lanes in a corridor, in axis units: a belt's width and a gap.
 export const LINK_PITCH = (BELT_WIDTH + 3) / AXIS_PX
 
-// Inside the router every length is in half cells (S per cell): the lattice then has a line down the
-// middle of a one-cell gap and through the face centre of a one-cell tile, which a whole-cell lattice
-// misses on tight boards. Points are scaled back on the way out.
 const S = 2
 const PITCH = LINK_PITCH * S
 const HALF = (BELT_WIDTH / 2 / AXIS_PX) * S
@@ -38,8 +20,6 @@ const NEAR_CELLS = 2 * S
 const OFF_FACE = 6 // an end on the face beside the one looking at the other end
 const AWAY_FACE = 12 // an end on a face turned away from it
 const CLEAR = 1 // lattice lines closer than half a cell to a tile are closed
-// A pair is searched only in a window around its two tiles, so the cost follows the links and not the
-// board's extent. Past these limits it falls back to the plain bend (plainPath).
 const WINDOW = 6 * S // floor around the two tiles
 const MAX_CELLS = 60_000 // the largest window searched, in lattice points
 const MAX_STEPS = 30_000 // lattice states expanded per search
@@ -47,7 +27,6 @@ const LANES = [0, -0.5, 0.5, -1, 1, -1.5, 1.5, -2, 2]
 
 const RANK: Record<NonNullable<TileLink['variant']>, number> = { belt: 0, cable: 1, trace: 2, beam: 3 }
 
-// Directions: 0 +u, 1 +v, 2 -u, 3 -v.
 const DU = [1, 0, -1, 0]
 const DV = [0, 1, 0, -1]
 
@@ -59,23 +38,19 @@ type Route = { source: string; target: string; name: string; from: End; to: End;
 const boxOf = (col: number, row: number, span: number): Box => ({ u0: col, v0: row, u1: col + span, v1: row + span })
 const overlaps = (a: Box, b: Box) => a.u0 < b.u1 && a.u1 > b.u0 && a.v0 < b.v1 && a.v1 > b.v0
 
-// A face: its plane on the normal axis, and its centre and span along the face.
 function face(b: Box, dir: number) {
     return dir % 2 === 0
         ? { plane: dir === 0 ? b.u1 : b.u0, centre: (b.v0 + b.v1) / 2, lo: b.v0, hi: b.v1 }
         : { plane: dir === 1 ? b.v1 : b.v0, centre: (b.u0 + b.u1) / 2, lo: b.u0, hi: b.u1 }
 }
-// The point at `normal` on the face's normal axis and `along` on the other one.
 const onFace = (dir: number, normal: number, along: number): AxisPoint => (dir % 2 === 0 ? { u: normal, v: along } : { u: along, v: normal })
 
-// How well a face looks at the other end, as a cost: the face toward the larger gap is free.
 function faceCost(dir: number, du: number, dv: number) {
     const toward = dir % 2 === 0 ? du * DU[dir] : dv * DV[dir]
     if (toward <= 0) return AWAY_FACE
     return toward >= (dir % 2 === 0 ? Math.abs(dv) : Math.abs(du)) ? 0 : OFF_FACE
 }
 
-// A small binary heap of [priority, state].
 class Heap {
     private items: [number, number][] = []
     get size() { return this.items.length }
@@ -109,16 +84,11 @@ class Heap {
     }
 }
 
-// What the routes found so far have taken of the floor, kept sparse so nothing is sized to the board:
-// per lattice point, bit 1/2 the edge to +u/+v carries a route, bit 4/8 a route runs through along u/v.
 type Floor = { boxes: Box[]; taken: Map<number, number> }
 
-// A lattice point as a number. Exact while |u| and |v| stay under 2^20, which every searched window
-// does (a pair further out than that is never searched, cf. MAX_CELLS).
 const OFFSET = 2 ** 20
 const pointKey = (u: number, v: number) => (u + OFFSET) * 2 ** 21 + (v + OFFSET)
 const takenAt = (floor: Floor, u: number, v: number) => floor.taken.get(pointKey(u, v)) ?? 0
-// The point and bit holding the edge from (u,v) in direction `d`.
 const edgeAt = (u: number, v: number, d: number): [number, number, number] =>
     d === 0 ? [u, v, 1] : d === 1 ? [u, v, 2] : d === 2 ? [u - 1, v, 1] : [u, v - 1, 2]
 
@@ -127,7 +97,6 @@ function closed(boxes: Box[], a: AxisPoint, b: AxisPoint, skip?: Box) {
     return boxes.some(box => box !== skip && overlaps(r, box))
 }
 
-// The lattice tip of a face: one unit out from its centre.
 function tipOf(box: Box, dir: number): AxisPoint {
     const f = face(box, dir)
     return onFace(dir, Math.round(f.plane) + (dir < 2 ? 1 : -1), Math.round(f.centre))
@@ -135,9 +104,6 @@ function tipOf(box: Box, dir: number): AxisPoint {
 
 type Found = { from: number; to: number; path: AxisPoint[]; searched: boolean }
 
-// The cheapest lattice path from a face of `a` to a face of `b`, as points from face to face, searched
-// in a window around the two tiles. Null when the window is too large, the target cannot be reached
-// inside it, or the search runs past its step budget.
 function search(floor: Floor, a: Box, b: Box): Found | null {
     const minU = Math.floor(Math.min(a.u0, b.u0)) - WINDOW
     const minV = Math.floor(Math.min(a.v0, b.v0)) - WINDOW
@@ -146,7 +112,6 @@ function search(floor: Floor, a: Box, b: Box): Found | null {
     if (w * h > MAX_CELLS || Math.abs(minU) + w >= OFFSET || Math.abs(minV) + h >= OFFSET) return null
     const reach = NEAR_CELLS + 1
     const boxes = floor.boxes.filter(box => box.u1 > minU - reach && box.u0 < minU + w + reach && box.v1 > minV - reach && box.v0 < minV + h + reach)
-    // Per window point: bit 1/2 the edge to +u/+v is closed by a tile; `near` within two cells of one.
     const shut = new Uint8Array(w * h)
     const near = new Uint8Array(w * h)
     for (const box of boxes) {
@@ -198,8 +163,6 @@ function search(floor: Floor, a: Box, b: Box): Found | null {
         }
     }
 
-    // A goal reached is pushed back as a virtual state -1 - (state * 4 + goal), so the cheapest
-    // arrival, bend into the face included, is the one popped first.
     while (heap.size) {
         const [, s] = heap.pop()
         if (s < 0) {
@@ -253,7 +216,6 @@ function search(floor: Floor, a: Box, b: Box): Found | null {
     return null
 }
 
-// The path's corners, from face point to face point.
 function corners(path: AxisPoint[]) {
     return path.filter((p, i) => {
         if (i === 0 || i === path.length - 1) return true
@@ -262,7 +224,6 @@ function corners(path: AxisPoint[]) {
     })
 }
 
-// Marks a searched path, one lattice step at a time, as taken.
 function take(floor: Floor, path: AxisPoint[]) {
     const mark = (u: number, v: number, bits: number) => floor.taken.set(pointKey(u, v), takenAt(floor, u, v) | bits)
     for (let i = 1; i < path.length; i++) {
@@ -275,9 +236,6 @@ function take(floor: Floor, path: AxisPoint[]) {
     }
 }
 
-// The plain bend between two tiles, from face centre to face centre, as the board drew it before
-// routes were searched: the fallback for a pair too far apart, walled in, or too costly to search.
-// Its points are its corners only. Null when the two tiles overlap.
 function plainPath(a: Box, b: Box): Found | null {
     const ca = { u: Math.round((a.u0 + a.u1) / 2), v: Math.round((a.v0 + a.v1) / 2) }
     const cb = { u: Math.round((b.u0 + b.u1) / 2), v: Math.round((b.v0 + b.v1) / 2) }
@@ -300,7 +258,6 @@ function plainPath(a: Box, b: Box): Found | null {
     return null
 }
 
-// The run of a segment along its own axis: from the line of the one before to the line of the next.
 function extent(route: Route, i: number) {
     const a = i === 0 ? route.startRun : route.segs[i - 1].c
     const b = i === route.segs.length - 1 ? route.endRun : route.segs[i + 1].c
@@ -308,20 +265,15 @@ function extent(route: Route, i: number) {
 }
 
 const dirOf = (a: AxisPoint, b: AxisPoint) => (b.u > a.u ? 0 : b.v > a.v ? 1 : b.u < a.u ? 2 : 3)
-// Which way `d` turns from heading `h`: +1 the way +u turns to +v, -1 the other way, 0 straight on.
 const turn = (h: number, d: number) => DU[h] * DV[d] - DV[h] * DU[d]
 const samePoint = (a: AxisPoint, b: AxisPoint) => a.u === b.u && a.v === b.v
 
-// Which side of path `b` path `a` keeps to, both walked from one point with heading `h`: where they
-// part, the one turning further toward +1 is on that side. Two links leaving one face, or running
-// down one corridor, sit side by side in that order and never cross where they part.
 function sideOf(a: AxisPoint[], b: AxisPoint[], h: number) {
     const ra = stretches(a), rb = stretches(b)
     let i = 0, j = 0, usedA = 0, usedB = 0
     while (i < ra.length && j < rb.length) {
         if (ra[i].dir !== rb[j].dir) return Math.sign(turn(h, ra[i].dir) - turn(h, rb[j].dir))
         h = ra[i].dir
-        // Both walk on together as far as the shorter stretch goes.
         const step = Math.min(ra[i].length - usedA, rb[j].length - usedB)
         usedA += step
         usedB += step
@@ -331,7 +283,6 @@ function sideOf(a: AxisPoint[], b: AxisPoint[], h: number) {
     return 0
 }
 
-// A path as its straight stretches, whether its points are unit steps or corners only.
 function stretches(path: AxisPoint[]) {
     const out: { dir: number; length: number }[] = []
     for (let k = 1; k < path.length; k++) {
@@ -344,7 +295,6 @@ function stretches(path: AxisPoint[]) {
     return out
 }
 
-// A route's lattice path from point `p` on, walked so that its stretch on `axis` heads toward +.
 function onwardFrom(route: Route, p: AxisPoint, forward: boolean) {
     const path = forward ? route.lattice : [...route.lattice].reverse()
     const on = (a: AxisPoint, b: AxisPoint) =>
@@ -355,7 +305,6 @@ function onwardFrom(route: Route, p: AxisPoint, forward: boolean) {
 
 const byName = (a: Route, b: Route) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
 
-// What routing reads of a tile and of a link.
 export type RoutedTile = Pick<Tile, 'id' | 'position' | 'span'>
 export type RoutedLink = Pick<TileLink, 'source' | 'target' | 'variant'>
 
@@ -365,8 +314,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
     const boxById = new Map([...placed.values()].map(t => [t.id, scaled(t.position.col, t.position.row, t.span ?? DEFAULT_SPAN)]))
     const boxes = [...[...boxById.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([, b]) => b), ...obstacles.map(o => scaled(o.col, o.row, o.span))]
 
-    // One route per pair of tiles, whatever the direction or variant: a beam lies on its cable, and
-    // a sphere rides a belt either way.
     const pairs = new Map<string, { source: string; target: string; rank: number }>()
     const ordered = links
         .map(l => ({ source: l.source, target: l.target, rank: RANK[l.variant ?? 'beam'] }))
@@ -380,9 +327,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
     if (!pairs.size) return out
     const floor: Floor = { boxes, taken: new Map() }
 
-    // 1. Lattice paths, one link after the other: belts first, so the lines that stay take the floor.
-    // A pair the search gives up on takes the plain bend; two overlapping tiles get a line between
-    // their centres.
     const routes: Route[] = []
     for (const { source, target, rank } of pairs.values()) {
         const a = boxById.get(source)!, b = boxById.get(target)!
@@ -393,8 +337,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
             out.set(`${target}->${source}`, [centre(b), centre(a)])
             continue
         }
-        // A beam lives for one call: it leaves no mark, so one starting or stopping never moves another
-        // line's path.
         if (found.searched && rank < RANK.beam) take(floor, found.path)
         const pts = corners(found.path)
         const from = { tile: source, box: a, dir: found.from }
@@ -406,7 +348,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         })
         const startRun = face(a, from.dir).plane
         const endRun = face(b, to.dir).plane
-        // A straight run gets a jog in its middle, kept only if its two ends cannot be lined up (step 2).
         const straight = segs.length === 1
         if (straight) {
             const s = segs[0]
@@ -415,7 +356,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         routes.push({ source, target, name: `${source}\n${target}`, from, to, startRun, endRun, segs, lattice: found.path, straight })
     }
 
-    // 2. Ports: the ends of one face, ordered by where they go, centred on it a pitch apart.
     const groups = new Map<string, { route: Route; atSource: boolean }[]>()
     for (const route of routes) {
         for (const atSource of [true, false]) {
@@ -429,7 +369,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         const f = face(box, dir)
         const n = ends.length
         const pitch = n > 1 ? Math.min(PITCH, (f.hi - f.lo - 2 * HALF) / (n - 1)) : 0
-        // Along the face, coordinates grow toward the +1 side of the outward heading, or away from it.
         const along = turn(dir, dir % 2 === 0 ? 1 : 0)
         const path = (e: (typeof ends)[number]) => (e.atSource ? e.route.lattice : [...e.route.lattice].reverse())
         const sorted = [...ends].sort((x, y) => along * sideOf(path(x), path(y), dir) || byName(x.route, y.route) || Number(y.atSource) - Number(x.atSource))
@@ -440,11 +379,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         })
     }
 
-    // A straight line keeps one lane from face to face, never a sideways step mid-run. Its two ends are
-    // lined up by moving the group of ends on one face as a whole: preferably the face with fewer ends,
-    // else the other, else both half way, as long as every end stays inside its face. A lone end can
-    // then sit off its face's centre. A face lined up once stays put, so a second straight line through
-    // it keeps its jog.
     const endSeg = (e: { route: Route; atSource: boolean }) => (e.atSource ? e.route.segs[0] : e.route.segs[e.route.segs.length - 1])
     const keyOf = (end: End) => `${end.tile}\n${end.dir}`
     const anchored = new Set<string>()
@@ -462,7 +396,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         if (Math.abs(gap) < 1e-9) continue
         const fromKey = keyOf(route.from), toKey = keyOf(route.to)
         const fewerAtTarget = groups.get(toKey)!.length <= groups.get(fromKey)!.length
-        // [source group shift, target group shift]
         const options = fewerAtTarget ? [[0, gap], [-gap, 0], [-gap / 2, gap / 2]] : [[-gap, 0], [0, gap], [-gap / 2, gap / 2]]
         for (const [bySource, byTarget] of options) {
             const s = shifted(fromKey, route.from, bySource)
@@ -476,15 +409,12 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         }
     }
 
-    // 3. Lanes: the stretches sharing a lattice line run side by side in the order of where they
-    // part, centred on the line, the whole group moved off it if a tile or another belt is in the way.
     const settled: { route: Route; i: number }[] = routes.flatMap(route => route.segs.map((s, i) => ({ route, i })).filter(x => x.route.segs[x.i].fixed))
     const clear = (route: Route, i: number) => {
         const seg = route.segs[i]
         const [lo, hi] = extent(route, i)
         const c = seg.c
         const band = seg.axis === 0 ? { u0: lo, u1: hi, v0: c - HALF, v1: c + HALF } : { u0: c - HALF, u1: c + HALF, v0: lo, v1: hi }
-        // A stretch from a face starts on it: only the ones between two corners are held off the tiles.
         if (i > 0 && i < route.segs.length - 1 && hi - lo > 1e-9 && boxes.some(b => overlaps(band, b))) return false
         return settled.every(({ route: r, i: j }) => {
             const other = r.segs[j]
@@ -493,7 +423,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
             return Math.min(hi, ohi) - Math.max(lo, olo) <= 1e-9
         })
     }
-    // Moving a stretch also lengthens or shortens the two it joins, so those must stay clear too.
     const fits = (route: Route, i: number) => [i - 1, i, i + 1].every(k => k < 0 || k >= route.segs.length || clear(route, k))
     type Free = { route: Route; i: number; lo: number; hi: number; forward: boolean }
     const lines = new Map<string, Free[]>()
@@ -506,7 +435,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
     }))
     const bundles: Free[][] = []
     for (const all of lines.values()) {
-        // A jog has no length on the lattice: it shares no run, so it is placed on its own.
         const members = all.filter(m => m.hi - m.lo > 1e-9).sort((x, y) => x.lo - y.lo)
         bundles.push(...all.filter(m => m.hi - m.lo <= 1e-9).map(m => [m]))
         let group: Free[] = []
@@ -536,7 +464,6 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         settled.push(...group.map(m => ({ route: m.route, i: m.i })))
     }
 
-    // 4. Points: the face point, a corner between each two stretches, the other face point.
     for (const route of routes) {
         const { segs } = route
         const at = (axis: 0 | 1, run: number, line: number): AxisPoint => (axis === 0 ? { u: run, v: line } : { u: line, v: run })

@@ -1,6 +1,3 @@
-// Rendering an OG card is expensive (satori + sharp, or a headless capture) and crawlers refetch
-// the same handful of URLs. This is a per-process memo in front of the HTTP cache, nothing more:
-// it dies with the instance and is not shared between them.
 const OG_CACHE_CONTROL = 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800'
 
 type CachedOg = { body: Buffer; contentType: string; expiresAt: number }

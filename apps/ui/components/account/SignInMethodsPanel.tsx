@@ -69,13 +69,10 @@ function OAuthRow({
 }
 
 export type SignInMethodsPanelProps = {
-    // Null while the account's methods are being read.
     methods: SignInMethods | null
-    // Why a provider cannot be connected from here, an in-app browser Google refuses for one.
     unavailableReasons?: Partial<Record<OAuthProvider, string>>
     busyProvider?: OAuthProvider | null
     onChangeEmail: () => void
-    // Absent where phone sign-in is not offered: the row is left out.
     onChangePhone?: () => void
     onConnect: (provider: OAuthProvider) => void
     onDisconnect: (provider: OAuthProvider) => void

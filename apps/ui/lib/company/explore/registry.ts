@@ -2,9 +2,6 @@ import { CollectorSkipped, type Collector } from './types'
 import { companyNameGuess } from './company-name'
 import { mentionsName } from './social'
 
-// The French public company search (recherche-entreprises.api.gouv.fr): free, no key, and it
-// carries officers and revenue where they are published.
-
 export type RegistryCompany = {
     siren: string
     name: string
@@ -22,13 +19,11 @@ export type RegistryCompany = {
 export type RegistryFindings = {
     matchedBy: 'siren' | 'name'
     query: string
-    // A name match is only trusted when the person who signed up is among the officers.
     personIsOfficer: boolean
     company: RegistryCompany | null
     candidates: { siren: string; name: string; city: string | null }[]
 }
 
-// INSEE headcount brackets (tranche_effectif_salarie).
 const HEADCOUNT_BRACKETS: Record<string, string> = {
     NN: 'non déclaré',
     '00': '0 salarié',
@@ -48,7 +43,6 @@ const HEADCOUNT_BRACKETS: Record<string, string> = {
     '53': '10 000 et plus',
 }
 
-// A SIREN (9 digits) or SIRET (14) printed next to its label, as French legal notices must.
 export function findSiren(text: string): string | null {
     const match = text.match(/\b(?:SIREN|SIRET|RCS)\b[^0-9]{0,60}(\d{3}[\s.]?\d{3}[\s.]?\d{3})/i)
     return match ? match[1].replace(/\D/g, '') : null

@@ -2,8 +2,6 @@ import type { AgentStatus } from '@/lib/board/types'
 import { AlertCircleIcon, CircleCheckIcon, CircleIcon, ClockIcon, LoaderIcon, MessageCircleQuestionIcon, PlugIcon, PowerOffIcon, ShieldCheckIcon, TriangleAlertIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-// String-keyed so the awaiting_* session statuses render before the enum
-// migration reaches the generated DB types; unknown values fall back to a dot.
 const STATUS_ICONS: Record<string, LucideIcon> = {
     idle: CircleCheckIcon,
     working: LoaderIcon,

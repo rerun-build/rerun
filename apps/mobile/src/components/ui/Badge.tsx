@@ -6,8 +6,6 @@ import { brand, radius, withAlpha, type ColorScheme } from '@/theme/tokens'
 
 export type BadgeTone = 'brand' | 'green' | 'red' | 'orange' | 'yellow' | 'cyan' | 'neutral'
 
-// The web tones (packages/ui/src/styles.css), with darker text in light mode: the web pastels do not
-// read on a white card at phone sizes.
 export const TONES: Record<string, Record<ColorScheme, string>> = {
     brand: { light: brand.base, dark: brand.soft },
     green: { light: '#059669', dark: '#34d399' },
@@ -22,7 +20,6 @@ const SIZES = {
     sm: { paddingHorizontal: 10, paddingVertical: 3, fontSize: 12, lineHeight: 16 },
 } as const
 
-// A tone the app does not know (sent by a newer hub) draws as neutral.
 export function Badge({ label, tone = 'neutral', size = 'sm' }: { label: string; tone?: BadgeTone | (string & {}); size?: keyof typeof SIZES }) {
     const theme = useTheme()
     const color = TONES[tone]?.[theme.scheme] ?? theme.mutedForeground

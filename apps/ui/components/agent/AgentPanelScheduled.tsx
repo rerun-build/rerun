@@ -57,14 +57,12 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     const [view, setView] = useState<View>({ mode: 'list' })
     const canManage = useCanManageAgent(agentId)
 
-    // A routine opened from elsewhere lands on its editor, on the render that carries the request.
     const requestedFocus = focusSlug ?? null
     const [openedFocus, setOpenedFocus] = useState<string | null>(null)
     if (requestedFocus !== openedFocus) {
         setOpenedFocus(requestedFocus)
         if (requestedFocus) setView({ mode: 'edit', slug: requestedFocus })
     }
-    // In a ref: the callback may come inline, and in the deps it would clear the request each render.
     const consumeFocusRef = useRef(onFocusConsumed)
     useEffect(() => {
         consumeFocusRef.current = onFocusConsumed
@@ -169,7 +167,6 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     )
 }
 
-// datetime-local <-> ISO helpers (the engine stores runAt as an ISO instant).
 function isoToLocalInput(iso?: string | null): string {
     if (!iso) return ''
     const d = new Date(iso)
@@ -259,7 +256,6 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
     const errorText = useErrorText()
     const isEdit = !!slug
     const { pick, setPick, availableGroups, providerFor, agentModel } = useRunModel(agentId)
-    // Only the prompt is sealed: pausing a task or moving its hour stays available.
     const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
@@ -364,8 +360,6 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
     }
 
     const canSave = name.trim() && body.trim() && (scheduleMode === 'cron' ? cron.trim() : runAtLocal)
-    // Mirrors the engine, which refuses a manual run of a task still paused for the install: that run
-    // would get the install prompt and ask its questions a second time.
     const waitingForSetup = setup.pending && !savedEnabled
 
     return (
@@ -455,8 +449,6 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
         </PanelEditorShell>
     )
 }
-
-// --- Run history (per schedule) ---
 
 function ScheduleRuns({ agentId, schedule, slug, onBack, onOpenSession }: { agentId: string; schedule?: EngineSchedule; slug: string; onBack: () => void; onOpenSession: (sessionId: string, title: string, runId: string | null) => void }) {
     const t = useTranslations('agent.agentPanelScheduled')

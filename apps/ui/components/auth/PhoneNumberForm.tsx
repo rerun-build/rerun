@@ -17,13 +17,10 @@ export type PhoneNumberRequest = { phone: string; country: CountryCode }
 const FALLBACK_COUNTRY = countryFromLocale(undefined)
 const neverChanges = () => () => {}
 
-// A phone number taken in as typed, without a code. `submit` rejects with the message to show under
-// the field; `skip` is the way past without a number.
 export function PhoneNumberForm({ submit, skip }: { submit: (request: PhoneNumberRequest) => Promise<void>; skip: () => Promise<void> }) {
     const t = useTranslations('auth.phone')
     const phoneSchema = useMemo(() => z.object({ phone: z.string().trim().min(1, t('errors.phoneRequired')) }), [t])
     const [skipping, setSkipping] = useState(false)
-    // The server has no idea where the visitor is, so the guess only joins in on the client.
     const localeCountry = useSyncExternalStore(
         neverChanges,
         () => countryFromLocale(navigator.language),

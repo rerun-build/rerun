@@ -13,8 +13,6 @@ const PACKS: Record<Locale, () => Promise<{ default: MessageTree }>> = {
     de: () => import('../messages/de/index'),
 }
 
-// Every key of the English source, with the pack's strings over it and then the extra namespaces
-// (Rerun Cloud's own strings), so a key missing anywhere still reads in English.
 export async function loadMessages(locale: AppLocale, extra: MessageTree[] = []): Promise<Messages> {
     const english = withoutContext((await PACKS[DEFAULT_LOCALE]()).default) as Messages
     if (locale === PSEUDO_LOCALE) return pseudoMessages(mergeMessages(english, ...extra))

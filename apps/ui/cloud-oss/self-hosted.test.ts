@@ -11,8 +11,6 @@ import { DEFAULT_SENDERS, DEFAULT_WHATSAPP_FROM } from './senders'
 import { SERVERS_ENABLED } from './servers'
 import { SUPPORT_CHAT_ENABLED } from './support'
 
-// What a checkout without `cloud/` runs: a self-hosted install that sells nothing, sends no email of
-// its own, has its own servers and nobody of Rerun's behind a chat.
 describe('the self-hosted side of @rerun/cloud', () => {
     it('is not Rerun Cloud and sells nothing', () => {
         expect(RERUN_CLOUD).toBe(false)
@@ -45,8 +43,6 @@ describe('the self-hosted side of @rerun/cloud', () => {
     })
 })
 
-// Each test imports `./email` again after `vi.resetModules()`, and that first load of the mail and template
-// modules takes several seconds on a busy CI runner: it has hit the default 5 s limit more than once.
 const COLD_IMPORT = { timeout: 30_000 }
 
 describe('the email of a self-hosted install', () => {

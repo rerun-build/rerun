@@ -10,9 +10,9 @@ class Failure(unittest.TestCase):
         self.assertEqual(limits.failure(s.attempts("j", "A"), {"retries": 1})[0], "RETRY")
         s.bump_attempt("j", "A")
         s.close()
-        s = store.Store(p)  # restart: the count comes from the ledger
+        s = store.Store(p)
         act, why = limits.failure(s.attempts("j", "A"), {"retries": 1}, "boom")
         self.assertEqual(act, "NEEDS_BOSS")
         self.assertIn("boom", why)
         self.assertEqual(limits.failure(1, {"retries": 2})[0], "RETRY")
-        self.assertEqual(limits.failure(1, {})[0], "NEEDS_BOSS")  # default 1 retry
+        self.assertEqual(limits.failure(1, {})[0], "NEEDS_BOSS")

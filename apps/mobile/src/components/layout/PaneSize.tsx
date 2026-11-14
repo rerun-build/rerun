@@ -10,8 +10,6 @@ export type PaneSide = 'sidebar' | 'detail'
 const PaneSizeContext = createContext<PaneSize | null>(null)
 const PaneSideContext = createContext<PaneSide | null>(null)
 
-// The size of the pane a screen is drawn in: the detail column beside the sidebar, a sheet on an iPad.
-// Outside any pane it is the window, which on an iPhone is the same thing.
 export function usePaneSize(): PaneSize {
     const window = useWindowDimensions()
     const pane = useContext(PaneSizeContext)
@@ -23,8 +21,6 @@ export function useIsSplit(): boolean {
     return isSplit(width)
 }
 
-// The horizontal safe-area insets a screen owes to the window edges it actually touches: the sidebar
-// never touches the right edge, the detail column beside it never touches the left one.
 export function usePaneInsets(): { left: number; right: number } {
     const { left, right } = useSafeAreaInsets()
     const side = useContext(PaneSideContext)

@@ -29,12 +29,9 @@ type ConnectionDetailProps = {
     onSignInAgain: () => void
     replacement: { key: string; onKey: (key: string) => void; busy: boolean; error: string | null; onSave: () => void }
     onRemove: () => void
-    // Why the caller can only read the connection (a member), or null when they run it.
     readOnlyReason?: AccessReason | null
 }
 
-// The web's ConnectionDetail: what is wrong first, then the plan's usage, the models, OpenRouter's
-// router, and the delete at the very bottom. Every edit persists at once.
 export function ConnectionDetail({ connection, view, error, onBack, onRename, onModels, onBaseUrl, onExtraModels, onSignInAgain, replacement, onRemove, readOnlyReason }: ConnectionDetailProps) {
     const t = useTranslations('mobileProviders.detail')
     const readOnly = !!readOnlyReason
@@ -81,7 +78,6 @@ function Notice({ tone, children }: { tone: 'orange' | 'red'; children: ReactNod
     return <View style={{ gap: spacing.md, padding: spacing.lg, borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: 1, borderColor: withAlpha(color, 0.3), backgroundColor: withAlpha(color, theme.scheme === 'dark' ? 0.1 : 0.06) }}>{children}</View>
 }
 
-// No Top up here: the app sells nothing.
 function CreditBlock({ view }: { view: AiConnectionsView }) {
     const t = useTranslations('mobileProviders.credit')
     const body = (
@@ -165,8 +161,6 @@ function PlanUsage({ connection }: { connection: AiConnectionView }) {
     )
 }
 
-// The web's ModelBuckets as switches, with its three locks: the default model, a custom one (removed
-// below), and the last one left on.
 function Models({ connection, defaultModel, readOnly, onModels }: { connection: AiConnectionView; defaultModel: string | null; readOnly: boolean; onModels: (models: string[]) => void }) {
     const theme = useTheme()
     const t = useTranslations('mobileProviders.models')

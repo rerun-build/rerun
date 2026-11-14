@@ -14,14 +14,11 @@ import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 const POLL_MS = 30_000
-// The Loader's panel over the floor's right edge: the floor fits beside it.
 const LOADER_PANEL_PX = 380
-// Below this width the panels cover the whole stage and the floor is not fitted beside them.
 const BREAKPOINT_PX = 768
 
 type Answer = Awaited<ReturnType<typeof readFactorySnapshotAction>>
 
-// The live Factory. Without a picture yet (no answer, or the read refused) the sample loop plays.
 export default function FactoryPage() {
     const [answer, setAnswer] = useState<Answer>(null)
 
@@ -47,7 +44,6 @@ export default function FactoryPage() {
     const [selected, setSelected] = useState<number | null>(null)
     const [loaderOpen, setLoaderOpen] = useState(false)
 
-    // The board's agents are loaded by the board page only; here they are loaded once when missing.
     const hydrated = useBoardStore(s => s.hydrated)
     const hydrate = useBoardStore(s => s.hydrate)
     const agents = useBoardStore(s => s.agents)
@@ -80,7 +76,6 @@ export default function FactoryPage() {
         useBoardStore.getState().focusAgentOnBoard(id, 'logs')
     }, [])
     const openByName = useCallback((name: string) => {
-        // The Loader is an actor, not a coworker: it opens its own panel in the right-side slot.
         if (name === LOADER_TILE) {
             useBoardStore.getState().selectAgent(null)
             setLoaderOpen(true)
@@ -91,7 +86,6 @@ export default function FactoryPage() {
     }, [coworkers, openCoworker])
 
     const boss = agents.find(a => [a.handle, a.name].some(n => n?.toLowerCase() === 'boss'))
-    // The width the open actor panel covers: the floor and its bars fit in what is left of it.
     const rightInset = viewport < BREAKPOINT_PX ? 0 : loaderOpen ? LOADER_PANEL_PX : selectedAgentId ? loadSidePanelWidth(viewport) + SIDE_PANEL_GAP : 0
 
     return (

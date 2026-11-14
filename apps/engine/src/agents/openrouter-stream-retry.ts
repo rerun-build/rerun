@@ -7,19 +7,14 @@ type StreamResult = Awaited<ReturnType<Parameters<WrapStream>[0]['doStream']>>
 type StreamPart = StreamResult['stream'] extends ReadableStream<infer Part> ? Part : never
 type FinishPart = Extract<StreamPart, { type: 'finish' }>
 
-// Long enough for the hub to come back when its container is replaced mid-step.
 const RETRY_DELAYS_MS = [2_000, 8_000]
 
 type AttemptEnd = { kind: 'finished' } | { kind: 'cut'; finish?: FinishPart } | { kind: 'aborted'; error: unknown }
 
-// `@ai-sdk/openai` closes a stream the server hung up on with a finish of its own making: `other`,
-// no raw reason, no usage. OpenRouter never sends a real one without both.
 function isCutFinish(part: StreamPart): part is FinishPart {
     return part.type === 'finish' && part.finishReason.raw === undefined && part.usage.inputTokens.total === undefined
 }
 
-// Once one of these has reached the run, replaying the step would show it twice. Reasoning does not
-// count: it is what a long step spends its minutes on, and the chat folds it away.
 function commitsTheStep(part: StreamPart): boolean {
     if (part.type === 'text-delta') return part.delta.length > 0
     return part.type === 'tool-input-start' || part.type === 'tool-call' || part.type === 'tool-result' || part.type === 'file' || part.type === 'source'
@@ -37,12 +32,6 @@ function cutFinish(finish: FinishPart | undefined): FinishPart {
     return { ...finish, type: 'finish', usage, finishReason: { unified: 'error', raw: STREAM_CUT_RAW_REASON } }
 }
 
-/**
- * Replays a step whose stream was cut before it produced anything that cannot be taken back, which
- * is what a hub deploy or crash does to a step still reasoning. A cut it cannot replay ends the step
- * on a failed finish, so the run stops as interrupted instead of passing for a turn the model chose
- * to end.
- */
 export function createStreamRetryMiddleware(retryDelaysMs: readonly number[] = RETRY_DELAYS_MS): LanguageModelMiddleware {
     return {
         specificationVersion: 'v3',

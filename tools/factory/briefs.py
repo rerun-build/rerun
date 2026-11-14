@@ -1,9 +1,3 @@
-"""Briefs for the first step of a researcher's and a designer's job (#198, #248).
-
-Pure. The text has no Final state block and no TAIL: dispatch.py appends them.
-"""
-
-
 def _brief(j, tag, work, commit_what):
     n = j["issue"]
     return "\n".join([

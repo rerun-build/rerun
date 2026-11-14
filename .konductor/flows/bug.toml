@@ -1,6 +1,3 @@
-# Konductor flow for a Linear issue labeled Bug: move the card to In Progress, investigate, plan (approved by the flow), review, fix the review
-# (plan approved by you), summary on the issue, PR, wait for your merge, then close the card.
-# Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Bug"
 match = { labels = ["Bug"] }
 

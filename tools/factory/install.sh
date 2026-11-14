@@ -1,8 +1,4 @@
 #!/bin/sh
-# Install the factory tools: tools/factory/install.sh --prefix DIR
-# Writes DIR/bin/<wrappers> and DIR/factory/<sources>. The only edit is the install path:
-# the string /data/tools/factory becomes DIR/factory in the copies (wrappers and sources);
-# in the sources @@JEV_KEYFILE@@ becomes the --jev-keyfile path.
 set -eu
 HERE=$(cd "$(dirname "$0")" && pwd)
 PREFIX=

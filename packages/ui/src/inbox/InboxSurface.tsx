@@ -22,19 +22,15 @@ export type InboxEntry = {
     agentName: string
     status: string
     title: string
-    /** The question, approval, heads-up or error the agent left for the user, when one was recorded. */
     message: string | null
     updatedAt: string | null
-    /** The runs folded into a `done` row, every run of one scheduled task being one row. */
     count?: number
 }
 
 export type InboxAnnouncement = {
     key: string
     item: InboxEntry
-    /** More than one: the arrivals are announced together, as a count. */
     bundled: number
-    /** A loud announcement carries a beam in its status tone. */
     loud: boolean
 }
 
@@ -60,7 +56,6 @@ const PILL_STACK_SIZE = 3
 const LIST_DEFAULT_MAX_HEIGHT = 'min(22rem, 50dvh)'
 const LIST_MIN_HEIGHT = 160
 const LIST_MAX_HEIGHT = 576
-// Header, chips and footer of the card, plus the corner row it rises from.
 const LIST_CHROME_HEIGHT = 224
 const DRAG_THRESHOLD = 3
 const KEYBOARD_RESIZE_STEP = 32
@@ -70,47 +65,30 @@ const listMaxHeightFor = (height: number | null, fallback: string) =>
 
 export type InboxSurfaceProps<T extends InboxEntry> = {
     items: T[]
-    /** One coworker id per conversation still running, for the line above the list. */
     running?: string[]
     open: boolean
     onOpenChange: (open: boolean) => void
     onOpenItem: (item: T) => void
     onMarkRead: (item: T) => void
     onMarkAllRead: () => void
-    /** False retire le bouton Préférences : une vitrine n'a pas de réglages à ouvrir, et le laisser
-     *  désactivé ne fait qu'ajouter un libellé éteint. */
     showSettings?: boolean
-    /** Without it, Preferences stays on show but disabled, with `settingsDisabledReason` as its tooltip. */
     onOpenSettings?: () => void
     settingsDisabledReason?: string
-    /** Bumped each time a new item lands: the pill sends out one ring to say so. */
     pulse?: number
-    /** Set while a dialog portaled out of the card is up: its clicks and its Escape are its own. */
     keepOpen?: boolean
     resizable?: boolean
-    /** Any CSS length, a `var()` included, for a card bounded by something other than the viewport. */
     listMaxHeight?: string
     cardClassName?: string
-    /** The arrival the hub announces: one of its rows, perched above the pill until it folds back in. */
     announcement?: InboxAnnouncement | null
     onAnnouncementClick?: () => void
-    /** True while the pointer or the focus is on the announcement. */
     onAnnouncementHoldChange?: (held: boolean) => void
-    /** Under a row: why it reached you. */
     rowReason?: (item: T) => ReactNode
-    /** Beside a row: what can be changed about it, a menu the app brings. A component, not a render function, so the memoised row keeps its props stable. */
     RowMenu?: ComponentType<RowMenuProps<T>>
-    /** True while a row's menu is open: it is portaled out of the card, which would otherwise close on its clicks. */
     onRowMenuOpenChange?: (open: boolean) => void
-    /** When set, the card rises from the pill around this body instead of the list. */
     detail?: ReactNode
     detailClassName?: string
 }
 
-/**
- * The pill grows into the card and stays on as its footer. Only the pill takes room in the corner row: the
- * open card is laid over it, so opening never shoves the Getting started pill aside.
- */
 export function InboxSurface<T extends InboxEntry>({
     items,
     running = [],
@@ -149,8 +127,6 @@ export function InboxSurface<T extends InboxEntry>({
     const justDraggedRef = useRef(false)
     const [activeSection, setActiveSection] = useState<string | null>(null)
     const mask = useScrollFade(listEl)
-    // Closing only starts the card's fold: the pill stays hidden until the card has shrunk back to its
-    // size, or both shadows stack up while it folds and the pill's beam pops in over it.
     const hasDetail = detail !== null && detail !== undefined
     const cardOpen = open || hasDetail
     const [cardMounted, setCardMounted] = useState(cardOpen)
@@ -163,17 +139,13 @@ export function InboxSurface<T extends InboxEntry>({
         pillRef.current?.focus()
     }, [cardMounted])
 
-    // The pill is hidden under the open card: it can only take the focus back once it shows again.
     const closeToPill = () => {
         refocusPillRef.current = true
         onOpenChange(false)
     }
 
-    // Mounting the card and its rows is the heaviest render of the inbox: as a transition it is sliced
-    // across frames instead of freezing the one that follows the click.
     const togglePill = () => startTransition(() => onOpenChange(!open))
 
-    // The card opens from, and folds back into, the pill's exact size.
     useEffect(() => {
         const pill = pillRef.current
         if (!pill) return
@@ -207,7 +179,6 @@ export function InboxSurface<T extends InboxEntry>({
     )
     const sectionKey = sections.map(section => section.key).join(',')
 
-    // A short last section can never reach the top of the list: once scrolled to the bottom, it is the one shown.
     useEffect(() => {
         if (!listEl) return
         const onScroll = () => {
@@ -238,8 +209,6 @@ export function InboxSurface<T extends InboxEntry>({
         event.currentTarget.setPointerCapture(event.pointerId)
         dragRef.current = { startY: event.clientY, startHeight: listEl.clientHeight, moved: false, height: null, frame: null }
     }
-    // The height is written straight to the list while dragging, at most once a frame: a React render
-    // per pointermove re-rendered every row and made the drag stutter. State only catches up on release.
     const onHandlePointerMove = (event: PointerEvent<HTMLButtonElement>) => {
         const drag = dragRef.current
         if (!drag || !listEl) return
@@ -332,7 +301,6 @@ export function InboxSurface<T extends InboxEntry>({
 
             <AnimatePresence onExitComplete={() => setCardMounted(false)}>
                 {cardOpen && (
-                    // Folded to the pill's size, the card shows only its footer, which is the pill itself.
                     <motion.div
                         id={cardId}
                         role="region"
@@ -352,7 +320,6 @@ export function InboxSurface<T extends InboxEntry>({
                             </motion.div>
                         ) : (
                         <div className={cn('relative flex shrink-0 flex-col', cardClassName, dragging && 'select-none')}>
-                            {/* Its own compositor layer: rasterized once, then only moved and clipped while the card morphs around it. */}
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={fade} className="flex flex-col border-b border-border will-change-transform">
                                 {resizable && (
                                     <button
@@ -509,7 +476,6 @@ function pillSummary(items: InboxEntry[], t: KitTranslator): string {
     return [needs > 0 && t('inbox.needsYouCount', { count: needs }), done > 0 && t('inbox.doneCount', { count: done })].filter(Boolean).join(' · ')
 }
 
-// `compact` keeps only the bell below `sm`: the full summary crowds the bottom bar on a phone.
 function InboxPillContent({ items, compact = false }: { items: InboxEntry[]; compact?: boolean }) {
     const t = useKitTranslations()
     const stack = [...new Set(items.map(item => item.agentId).filter(Boolean))].slice(0, PILL_STACK_SIZE)
@@ -561,14 +527,10 @@ const noop = () => {}
 
 type InboxRowProps<T extends InboxEntry> = { item: T; onOpen: (item: T) => void; onMarkRead: (item: T) => void; reason?: ReactNode; Menu?: ComponentType<RowMenuProps<T>>; onMenuOpenChange?: (open: boolean) => void }
 
-// `memo` drops the type parameter: the cast gives it back, so a row hands its caller the item type it was given.
 export const InboxRow = memo(function InboxRow({ item, onOpen, onMarkRead, reason, Menu, onMenuOpenChange = noop }: InboxRowProps<InboxEntry>) {
     const locale = useUiLocale()
     const t = useKitTranslations()
     const meta = ATTENTION_STATUS_META[item.status] ?? ATTENTION_STATUS_META.waiting_human
-    // A Radix tooltip per row made opening the card slow. The button only shows on hover or focus
-    // anyway, so its tooltip is mounted the first time the row gets either.
-    // Arming swaps the button for a new one: if it held the keyboard focus, the new one takes it back.
     const [tooltipArmed, setTooltipArmed] = useState(false)
     const markReadRef = useRef<HTMLButtonElement>(null)
     const refocusMarkRead = useRef(false)
@@ -583,7 +545,6 @@ export const InboxRow = memo(function InboxRow({ item, onOpen, onMarkRead, reaso
         markReadRef.current?.focus()
     }, [tooltipArmed])
 
-    // A row carrying its own button cannot be a <button>: nested buttons are invalid HTML.
     const activate = (event: KeyboardEvent<HTMLDivElement>) => {
         if (event.key !== 'Enter' && event.key !== ' ') return
         event.preventDefault()
@@ -624,7 +585,6 @@ export const InboxRow = memo(function InboxRow({ item, onOpen, onMarkRead, reaso
                     <MarkReadButton ref={markReadRef} onMarkRead={() => onMarkRead(item)} />
                 )}
             </RevealOnHover>
-            {/* React bubbles through portals: the menu's own clicks would open the row. */}
             {Menu && (
                 <span className="shrink-0" onClick={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
                     <Menu item={item} onOpenChange={onMenuOpenChange} />
@@ -634,7 +594,6 @@ export const InboxRow = memo(function InboxRow({ item, onOpen, onMarkRead, reaso
     )
 }) as <T extends InboxEntry>(props: InboxRowProps<T>) => ReactNode
 
-// Spreads what the tooltip trigger slots onto it (ref, data-state, pointer handlers) and keeps its own click.
 function MarkReadButton({ onMarkRead, onClick, onKeyDown, ...props }: { onMarkRead: () => void } & ComponentProps<typeof Button>) {
     const t = useKitTranslations()
     return (
@@ -658,7 +617,6 @@ function MarkReadButton({ onMarkRead, onClick, onKeyDown, ...props }: { onMarkRe
     )
 }
 
-// A finger has no hover: on touch screens the action simply stays out.
 function RevealOnHover({ children }: { children: ReactNode }) {
     return (
         <span className="grid shrink-0 transition-[grid-template-columns,opacity] duration-200 ease-out pointer-fine:grid-cols-[0fr] pointer-fine:opacity-0 pointer-fine:group-hover:grid-cols-[1fr] pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:grid-cols-[1fr] pointer-fine:group-focus-within:opacity-100 motion-reduce:transition-none">

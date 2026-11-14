@@ -14,10 +14,6 @@ import { RUNNING } from '@/mocks/delegate'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: what the chat gained to match the web, a skill proposal in every state, the Brain's
-// Undo, a task's Stop and the answer's actions. Taps play the flow locally.
-//   /lab-skill?scheme=dark   scheme forces a theme
-
 const PROPOSAL: SkillProposal = {
     id: 'lab-skill',
     sessionId: 'lab',
@@ -46,7 +42,6 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
     )
 }
 
-// Remember writes in the background, then lands; No settles at once.
 function LiveProposal() {
     const [proposal, setProposal] = useState(PROPOSAL)
     const [pending, setPending] = useState(false)

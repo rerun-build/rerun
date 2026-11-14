@@ -1,9 +1,6 @@
 import { callHub } from '../runtime/hub.js'
 import type { Trigger } from './loader.js'
 
-// The public URL is built from the agent's Rerun id, which only the hub knows: the engine
-// addresses agents by its own local ids. A self-hosted engine with no hub simply has no URL to
-// give, so callers fall back to telling the user to copy it from the Triggers tab.
 export async function triggerPublicUrl(agentId: string, trigger: Trigger): Promise<string | null> {
     if (!trigger.token) return null
     try {

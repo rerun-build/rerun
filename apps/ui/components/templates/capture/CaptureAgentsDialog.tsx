@@ -23,15 +23,7 @@ type CaptureAgentsDialogProps = {
     onCaptured: () => void
 }
 
-// Capturing into a template that already exists. Same frame and same panel as the create wizard,
-// minus its title step: only the labels of the two exits change. The progress panel still lists the
-// naming stage, which reads as done here because the template is already named.
-//
-// The flow is mounted only while the dialog is open, so closing it is what resets the selection.
 export function CaptureAgentsDialog({ open, onOpenChange, actions, onCaptured }: CaptureAgentsDialogProps) {
-    // The stepper sits above the conditional mount, because the progress panel is passed as `aside`
-    // and has to know the step too. Rewound before the reopened dialog paints, or the panel would
-    // flash the step the previous run ended on.
     const stepper = useStepper(STEPS.length)
     const { reset } = stepper
     useLayoutEffect(() => {
@@ -50,8 +42,6 @@ export function CaptureAgentsDialog({ open, onOpenChange, actions, onCaptured }:
 function CaptureFlow({ stepper, actions, onCaptured, onClose }: { stepper: Stepper; actions: CaptureActions; onCaptured: () => void; onClose: () => void }) {
     const t = useTranslations('templates.capture.dialog')
     const { goTo } = stepper
-    // Held here rather than inside the panel: StepTransition keys its subtree on the step, so a hook
-    // mounted in there would lose its plans on the way to the review.
     const flow = useCaptureFlow(actions)
 
     const step = STEPS[stepper.index]

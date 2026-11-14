@@ -13,7 +13,6 @@ import { logger } from '../lib/logger.js'
 import type { LoadedAgent } from '../agents/types.js'
 import type { SkillProposalRow } from '../db/schema.js'
 
-// A CLI provider that hangs would otherwise leave the row on `accepted` with nothing to settle it.
 const APPLY_TIMEOUT_MS = 10 * 60 * 1000
 
 const draftSchema = z.object({
@@ -50,16 +49,10 @@ async function draft(agent: LoadedAgent, row: SkillProposalRow, abortSignal: Abo
         abortSignal,
     })
 
-    // An edit keeps the folder it was read from: writeSkill would re-slugify from the name and
-    // fork a second skill the moment the two ever drifted apart.
     const slug = editing ? editing.slug : slugify(output.name || row.title)
     return { ...output, name: editing ? editing.name : output.name, slug }
 }
 
-// The accept click comes with no model of its own, so the job writes on the pair the proposing
-// conversation ran on: the agent's own pair may be one the user is not paying through, like a
-// Rerun budget already spent while they chat on their Claude subscription. A connection removed or
-// signed out since then falls back to the agent's pair rather than sending its model elsewhere.
 async function agentForProposal(agent: LoadedAgent, row: SkillProposalRow): Promise<LoadedAgent> {
     if (!row.provider || !row.model) return agent
     const resolved = await resolveRunModel(agent, { connectionId: row.connectionId ?? undefined, provider: row.provider, model: row.model })

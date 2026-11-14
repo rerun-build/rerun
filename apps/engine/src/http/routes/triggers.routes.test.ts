@@ -62,7 +62,6 @@ describe('trigger routes', () => {
         expect((await send('POST', '', { name: 'No methods', body: 'x', methods: [] })).status).toBe(400)
     })
 
-    // Looks wrong: an unusable name is a bad request, but the loader throws a plain Error.
     it('answers 500 on a name with no letter or digit', async () => {
         expect((await send('POST', '', { name: '!!!', body: 'x' })).status).toBe(500)
     })

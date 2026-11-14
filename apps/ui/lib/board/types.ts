@@ -11,8 +11,6 @@ export type SessionStatus = Database['public']['Enums']['session_status']
 export type AgentStatus = Database['public']['Enums']['agent_status']
 export type InteractionMode = 'select' | 'space'
 
-// A Box created before the server started naming them, or one renamed to nothing. Every screen that
-// prints a Box name goes through this rather than showing an empty label.
 export const UNNAMED_BOX_LABEL = 'Untitled Box'
 
 export const BOX_NAME_MAX = 60
@@ -25,15 +23,11 @@ export type SessionEntry = {
     status: SessionStatus
 }
 
-// Lien « vivant » entre deux agents : un appel en cours (call_agent) de `source` vers `target`.
-// Dérivé en temps réel des runs/sessions de l'engine (cf. checkAllAgentsHealth).
 export type AgentLink = {
     source: string
     target: string
 }
 
-// String-keyed (not Record<SessionStatus>) so the awaiting_* values work before
-// the session_status enum migration lands in the generated DB types.
 const STATUS_PRIORITY: Record<string, number> = {
     working: 3,
     awaiting_approval: 2.5,
@@ -69,15 +63,11 @@ export type IsoAgent = {
     name: string
     handle: string | null
     description: string | null
-    // The template this agent was installed from, null when it was built by hand. Drives the
-    // content lock, which is why the board carries it.
     templateId: string | null
     status: AgentStatus
     position: GridPosition
     workspaceId: number
     spaceId: string
-    // Switched off: the agent exists in full but nothing can run it. Orthogonal to `status`, which
-    // describes what a live agent is doing right now.
     disabledAt: string | null
     disabledReason: string | null
 }
@@ -102,15 +92,10 @@ export function agentFromRow(row: AgentRowFields): IsoAgent {
 
 export const PLAN_LIMIT_REASON = 'plan_limit'
 
-// An agent the user can bring back themselves, as opposed to one held by a template subscription
-// that has ended. Mirrors isPlanLimited on the server.
 export function isPlanLimited(agent: Pick<IsoAgent, 'disabledReason'>): boolean {
     return agent.disabledReason === null || agent.disabledReason === PLAN_LIMIT_REASON
 }
 
-// The tabs of the agent side panel. Declared here rather than in AgentPanel so the board store and
-// the foreman's tool belt can name one without importing the component it drives. The panel groups
-// them into the screens of `agent-sheet-views.ts`.
 export const AGENT_FOCUS_TABS = ['chat', 'actions', 'services', 'mcp', 'skills', 'data', 'memories', 'files', 'published', 'scheduled', 'triggers', 'tools', 'monitoring', 'logs', 'setup', 'settings'] as const
 
 export type AgentFocusTab = (typeof AGENT_FOCUS_TABS)[number]
@@ -134,8 +119,6 @@ export const AGENT_TAB_LABELS: Record<AgentFocusTab, string> = {
     settings: 'Settings',
 }
 
-// The foreman hears the tab the way the user names it, which is the label they read ("Apps",
-// "Capabilities") as often as the id, so both resolve to the id.
 export function resolveTab<T extends string>(value: string, labels: Record<T, string>): T | null {
     const wanted = value.trim().toLowerCase()
     const match = (Object.entries(labels) as [T, string][]).find(([id, label]) => id === wanted || label.toLowerCase() === wanted)

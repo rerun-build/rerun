@@ -7,8 +7,6 @@ import { DesktopViewer, type DesktopViewerHandle } from '@/components/desktop/De
 type NativeBridge = { postMessage: (message: string) => void }
 
 type DesktopViewBridge = DesktopViewerHandle & {
-    // Small JPEG copies of the screen posted to the app as `frame` messages, for its floating
-    // thumbnail: a second socket would cost the machine a viewer, and a loader each time it shows.
     mirror: (on: boolean, width?: number) => void
 }
 
@@ -23,10 +21,6 @@ const MIRROR_FRAME_MS = 1000 / 8
 const MIRROR_QUALITY = 0.7
 const DEFAULT_MIRROR_WIDTH = 400
 
-// A coworker's screen and nothing else, for the iOS app's web view. The socket travels in the
-// fragment, which no request carries: the page itself needs no session, the ticket in the socket URL
-// is the only key, spent within a minute. The app types through `window.rerunDesktop`, hears of a
-// dropped connection to ask for a fresh ticket, and can ask for copies of the screen to mirror it.
 export default function DesktopView() {
     const viewer = useRef<DesktopViewerHandle>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)

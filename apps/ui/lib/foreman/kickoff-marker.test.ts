@@ -18,14 +18,11 @@ describe('kickoff marker', () => {
         expect(isKickoffText('[[foreman:start]]')).toBe(true)
     })
 
-    // What someone types in the landing composer is free text: it holds newlines and brackets, which
-    // is exactly why a prompt travels under the marker rather than inside it.
     it('survives a prompt full of the characters the marker is made of', () => {
         const text = 'Watch [[my]] feed\nand post ]] a summary'
         expect(parseKickoff(buildKickoffMarker({ kind: 'prompt', text }))?.intent).toEqual({ kind: 'prompt', text })
     })
 
-    // The landing composer reads a name and apps in the prompt, and both ride the head line.
     it('carries the name and the apps the landing composer read with the prompt', () => {
         const intent: KickoffIntent = { kind: 'prompt', text: 'Sort my inbox every morning', name: 'Inbox Sorter', apps: ['gmail', 'google-sheets'] }
         expect(parseKickoff(buildKickoffMarker(intent))?.intent).toEqual(intent)
@@ -44,8 +41,6 @@ describe('kickoff marker', () => {
         expect(parsed?.intent).toEqual({ kind: 'prompt', text: 'Sort my inbox', name: 'a'.repeat(60), apps: ['gmail'] })
     })
 
-    // Written under the welcome card: no arriving intent, so the starter pack step still owns the
-    // conversation, and the line shows in the stack as theirs.
     it('carries a line written under the welcome card without making it an arriving intent', () => {
         const marker = buildOwnKickoff('  Chase my unpaid invoices\nevery Monday ]] ')
         expect(isKickoffText(marker)).toBe(true)
@@ -62,8 +57,6 @@ describe('kickoff marker', () => {
         expect(isKickoffText('Hello')).toBe(false)
     })
 
-    // The stack shows what the user wrote and never the marker, so a bare start disappears whole
-    // while a prompt keeps its words.
     it('leaves nothing of a bare start and everything of a prompt', () => {
         expect(stripKickoff(buildKickoffMarker(null))).toBe('')
         expect(stripKickoff(buildKickoffMarker({ kind: 'prompt', text: 'Sort my inbox' }))).toBe('Sort my inbox')

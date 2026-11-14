@@ -23,18 +23,14 @@ export const rewindAgentReportSchema = z.object({
     to: z.string(),
     runs: z.object({ total: z.number(), done: z.number(), error: z.number(), cancelled: z.number() }),
     workedMs: z.number(),
-    // Runs started per UTC hour, index 0 being the hour that starts at `from`.
     hourly: z.array(z.number()).length(REWIND_HOURS_PER_WEEK),
     bySource: z.array(countByName),
     models: z.array(countByName),
     tokens: z.number(),
-    // Null when no run of the week reported a cost: CLI providers (Claude, Codex) never do.
     costMicros: z.number().nullable(),
     longestRun: z.object({ runId: z.string(), durationMs: z.number(), startedAt: z.string(), title: z.string() }).nullable(),
     tools: z.object({ total: z.number(), errors: z.number(), top: z.array(countByName) }),
-    // Keyed by catalog slug when the agent's connector registry knows the server, by server name otherwise.
     connectors: z.array(countByName),
-    // Engine agent ids of the agents that opened a conversation with this one.
     calledBy: z.array(z.object({ agentId: z.string(), count: z.number() })),
     sessions: z.number(),
     memories: z.object({

@@ -21,11 +21,6 @@ function backdropClass(backdrop: KitBackdrop) {
     return 'bg-card'
 }
 
-/**
- * One element of the gallery, framed and ready to be filmed. `zoom` is used rather than a transform
- * because it reflows: the frame grows with the element instead of letting it spill out of a clipped
- * box, which is what a designer wants when reading a 4x icon.
- */
 export function KitStage({
     id,
     name,
@@ -43,7 +38,6 @@ export function KitStage({
     backdrop?: KitBackdrop
     scale?: number
     replay?: boolean
-    /** Drops the frame's padding, for a child that paints to the edge or brings its own. */
     bare?: boolean
     className?: string
     children: ReactNode
@@ -64,9 +58,6 @@ export function KitStage({
         return () => window.removeEventListener('keydown', onKey)
     }, [soloed, controls])
 
-    // `zoom` rather than a transform: it reflows, so the frame grows with the element instead of
-    // letting it spill out of a clipped box. A scaled box also has to carry its own centring, since
-    // the flex parent measures it before the zoom applies.
     const body = (
         <div key={run} style={resolvedScale === 1 ? undefined : ({ zoom: resolvedScale } as CSSProperties)} className={bare ? 'size-full' : 'm-auto w-fit'}>
             {children}
@@ -78,8 +69,6 @@ export function KitStage({
             <div
                 data-kit-solo={id}
                 style={backdropStyle(resolvedBackdrop)}
-                // Above the site chrome, not just above the page: a capture surface that still has a
-                // cookie banner and a support bubble on it is not a capture surface.
                 className={cn('fixed inset-0 z-9999 flex items-center justify-center overflow-auto p-10', resolvedBackdrop === 'checker' ? 'bg-background' : backdropClass(resolvedBackdrop))}
             >
                 {body}

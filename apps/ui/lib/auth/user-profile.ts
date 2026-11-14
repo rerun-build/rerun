@@ -15,11 +15,6 @@ function readString(metadata: Metadata, keys: string[]): string | null {
     return null
 }
 
-// What the person chose in their account lives in `app_metadata`, which only the service role
-// writes: Google rewrites `user_metadata` at every sign-in, and the browser can write it too, so a
-// photo kept there would neither last nor be safe to hand to an <img>. An `avatar_url` that is
-// present but empty is a photo that was removed, and it does not fall back to the one Google holds.
-// Empty rather than null: Supabase reads a null metadata value as "drop the key".
 export function readProfile(authUser: Pick<User, 'app_metadata' | 'user_metadata'>): UserProfile {
     const chosen: Metadata = authUser.app_metadata
     const avatarWasChosen = !!chosen && 'avatar_url' in chosen
@@ -29,8 +24,6 @@ export function readProfile(authUser: Pick<User, 'app_metadata' | 'user_metadata
     }
 }
 
-// Someone who signed in by email code has no name anywhere: the part before the @ is the only
-// thing that tells them apart from a teammate. An Apple relay address has nothing to show there.
 export function displayNameOf(authUser: Pick<User, 'app_metadata' | 'user_metadata' | 'email'>): string | null {
     const name = readProfile(authUser).name
     if (name) return name

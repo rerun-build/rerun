@@ -1,7 +1,3 @@
-// Background work, run in the process of the web app: there is no Trigger.dev here. A task is
-// started at most once per idempotency key while the process lives, and the nightly purges run on
-// a cron of their own. A restart drops what was in flight, which every task here can afford: each
-// is asked again by the screen or the flow that needs it.
 import type { AnyTask, TaskOutput } from '@trigger.dev/sdk/v3'
 import { Cron } from 'croner'
 
@@ -15,7 +11,6 @@ const RUNNERS: Record<string, () => Promise<Runner>> = {
     'prefill-expert-application': async () => (await import('@/trigger/prefill-expert-application')).prefillExpertApplicationRun,
 }
 
-// A key is remembered for a day after its run started, like Trigger.dev keeps it.
 const KEY_TTL_MS = 24 * 60 * 60_000
 const runs = new Map<string, { output: Promise<unknown>; startedAt: number }>()
 
@@ -73,7 +68,6 @@ const SCHEDULES: { pattern: string; run: () => Promise<unknown> }[] = [
 
 const started = globalThis as { rerunSchedulesStarted?: boolean }
 
-// Called by the dashboard layout; only the first call starts the crons.
 export function startBackgroundSchedules(): void {
     if (started.rerunSchedulesStarted) return
     started.rerunSchedulesStarted = true

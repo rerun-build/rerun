@@ -16,17 +16,14 @@ export type ReadChatFile = (path: string) => Promise<{ content: string; truncate
 type AttachmentLightboxProps = {
     agentId?: string
     paths: readonly string[]
-    /** Shown instead of the name read from each path, when the caller knows the real one. */
     names?: readonly string[]
     index: number
     rawUrlFor?: RawUrlFor
-    /** Reads the text of a file that does not live on a Box (the foreman's bucket). */
     readFile?: ReadChatFile
     onIndexChange: (index: number) => void
     onClose: () => void
 }
 
-/** Full-screen view of one attachment, with arrows across the message's other files. */
 export function AttachmentLightbox({ agentId, paths, names, index, rawUrlFor, readFile, onIndexChange, onClose }: AttachmentLightboxProps) {
     const t = useTranslations('chat.attachments')
     const path = paths[index]

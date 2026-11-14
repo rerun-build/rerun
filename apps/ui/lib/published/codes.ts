@@ -15,9 +15,6 @@ const CODE_TTL_MINUTES = 10
 const MAX_CODE_ATTEMPTS = 5
 const CODE_DIGITS = 6
 
-// The answer to "send me a code" is the same whether the address is invited or not, so the gate
-// never tells who is on the list. What stops a script from mailing an invitee all day, or from
-// guessing codes, is these windows.
 const SEND_WINDOW_SECONDS = 10 * 60
 const SENDS_PER_ADDRESS = 3
 const SENDS_PER_CALLER = 20

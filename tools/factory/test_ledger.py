@@ -1,11 +1,9 @@
-"""ledger.py tests (ledger comment, chunk line) and the gate.same() bare-module rule. No network."""
 import json, os, sys, unittest
 from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gate as G
 import ledger as L
 
-# The nine chunk lines of rerun#53, as accepted (PLAN READY): every one must pass the shape check.
 PLAN53 = """## Chunks
 - [ ] 1. Trigger client, read-only run reader, probe, check-triggers (body and model only), challenge.md body | builder: larry | test: factory tools/factory/test_trigger.py | done-test: test_trigger::TestFire::test_fire_ok | paths: tools/factory/trigger.py, tools/factory/triggers/challenge.md, tools/factory/runner.json, tools/factory/install.sh, tools/factory/test_trigger.py | max-lines: 300 | depends on: -
 - [ ] 2. Ledger comment parse/render with `<`/`>` escaping, chunk-line parser and shape check, `gate.same()` bare-module match | builder: hopper | test: factory tools/factory/test_ledger.py | done-test: test_ledger::TestLedger::test_roundtrip_with_comment_end | paths: tools/factory/ledger.py, tools/factory/gate.py, tools/factory/test_ledger.py | max-lines: 300 | depends on: -
@@ -43,7 +41,7 @@ class TestLedger(unittest.TestCase):
         self.assertEqual(L.parse(body), s)
         line = next(l for l in body.splitlines() if l.startswith(L.STATE_OPEN))
         self.assertTrue(line.endswith(" -->"))
-        self.assertEqual(line.count("-->"), 1)  # the reason's "-->" is > inside the JSON, so it cannot end the comment
+        self.assertEqual(line.count("-->"), 1)
         self.assertEqual(json.loads(line[len(L.STATE_OPEN):-4])["blocked"]["reason"], s["blocked"]["reason"])
         self.assertNotIn("<b>", line)
 
@@ -130,7 +128,7 @@ class TestSame(unittest.TestCase):
         self.assertTrue(G.same(name, "test_trigger"))
         self.assertFalse(G.same("test_triggerx::TestFire::test_fire_ok", "test_trigger"))
         self.assertFalse(G.same("test_ledger::TestFire::test_fire_ok", "test_trigger"))
-        self.assertFalse(G.same("TestFire::test_x", "TestFire"))  # only python test module names, not a class
+        self.assertFalse(G.same("TestFire::test_x", "TestFire"))
 
 
 if __name__ == "__main__":

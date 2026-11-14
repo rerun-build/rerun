@@ -4,7 +4,6 @@ import { getSystemDb } from '../systemDb.js'
 import { skillProposals, type SkillProposalRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'
 
-// What the proposing run billed, read back by the writing job.
 export type SkillProposalModel = { connectionId: string | null; provider: Provider; model: string }
 
 export type InsertSkillProposal = SkillProposalModel & {
@@ -74,8 +73,6 @@ export async function listSessionSkillProposals(agentId: string, sessionId: stri
     return db.select().from(skillProposals).where(eq(skillProposals.sessionId, sessionId)).orderBy(desc(skillProposals.createdAt))
 }
 
-// Every rule that ever joined a proposal keeps its print here, so a proposal carrying three rules
-// still tombstones all three once it is dismissed.
 export async function findSkillProposalByFingerprint(agentId: string, fingerprint: string): Promise<SkillProposalRow | undefined> {
     const { db } = await getSystemDb(agentId)
     const rows = await db
@@ -97,8 +94,6 @@ export async function openSkillProposalForSession(agentId: string, sessionId: st
     return rows[0]
 }
 
-// The rules given later in the same conversation join the row already waiting, so one widget
-// grows instead of a new one appearing under every message.
 export async function appendSkillProposalInstruction(
     agentId: string,
     id: string,
@@ -108,7 +103,6 @@ export async function appendSkillProposalInstruction(
     if (!current || current.status !== 'proposed') return undefined
     const instructions = [...(JSON.parse(current.instructionsJson) as string[]), input.instruction]
     const fingerprints = [...(JSON.parse(current.fingerprintsJson) as string[]), input.fingerprint]
-    // The latest rule's run wins: it is the model the user is on by the time they decide.
     const patch = {
         instructionsJson: JSON.stringify(instructions),
         fingerprintsJson: JSON.stringify(fingerprints),
@@ -122,8 +116,6 @@ export async function appendSkillProposalInstruction(
     return { ...current, ...patch }
 }
 
-// Compare and set: false means the row had already moved on, which is what stops a double click
-// from running the writing job twice.
 export async function transitionSkillProposal(
     agentId: string,
     id: string,
@@ -140,8 +132,6 @@ export async function transitionSkillProposal(
     return updated.length > 0
 }
 
-// The writing job is fire-and-forget in memory, so a restart mid-write would leave the row on
-// `accepted` with nothing left to settle it. Failing it hands the user a Retry instead.
 export async function failInterruptedSkillProposals(agentId: string): Promise<number> {
     const { db } = await getSystemDb(agentId)
     const failed = await db

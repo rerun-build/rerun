@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { resolveAuthConfigId } from './client'
 
-// The resolver caches per toolkit for the life of the process, so each test uses its own toolkit.
 beforeEach(() => {
     vi.stubEnv('COMPOSIO_API_KEY', 'test-key')
 })
@@ -66,7 +65,6 @@ describe('resolveAuthConfigId', () => {
     })
 
     it('says the app needs its own OAuth app when Composio refuses managed auth, and tries again next time', async () => {
-        // Illustrative body in the documented error envelope; the docs name no slug for this refusal.
         const refusal = { error: { message: 'Composio managed auth is not available for this toolkit', code: 400, slug: 'Auth_Config_ValidationError', status: 400 } }
         const fetchMock = vi
             .fn()

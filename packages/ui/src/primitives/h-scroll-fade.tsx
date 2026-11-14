@@ -5,8 +5,6 @@ import { useKitTranslations } from '../locale'
 import { ChevronLeft, ChevronRight } from '../icons'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-// Horizontal scroll row with edge fades + arrows that appear only in the directions you can still
-// scroll. The fade color must match the surface behind it (e.g. `from-popover` inside a dialog).
 export function HScrollFade({ children, className, fadeClassName = 'from-popover' }: { children: React.ReactNode; className?: string; fadeClassName?: string }) {
     const ref = useRef<HTMLDivElement>(null)
     const [canLeft, setCanLeft] = useState(false)
@@ -32,8 +30,6 @@ export function HScrollFade({ children, className, fadeClassName = 'from-popover
         }
     }, [update])
 
-    // One child plus the gap, so a row of cards advances by a card rather than by a third of one.
-    // Floored at the old fixed step: a row of pills would otherwise crawl one pill at a time.
     const scrollBy = (dir: -1 | 1) => {
         const el = ref.current
         if (!el) return

@@ -4,13 +4,6 @@ import { triggerMethodSchema } from './trigger.js'
 
 export * from './template-display.js'
 
-// A template is an editorial description of an agent setup: the copy and the SEO of a
-// public page on the landing, plus a hand-written account of the agents it describes.
-//
-// It is not runnable and carries nothing secret. Everything here is served to anonymous
-// visitors, so anything that would be a credential has no business in this document —
-// the write path scans for pasted keys before storing it.
-
 const slugSchema = z
     .string()
     .trim()
@@ -27,9 +20,6 @@ export const templateImageSchema = z.object({
 })
 export type TemplateImage = z.infer<typeof templateImageSchema>
 
-// The connector list is never authored: it is derived from the agents, then stored with the
-// name and icon resolved off the services catalog. The denormalisation is what lets a public
-// page render a connector row per card without resolving every slug against `services`.
 export const templateConnectorSchema = z.object({
     slug: slugSchema,
     name: z.string(),
@@ -47,18 +37,12 @@ export const templateScheduleSchema = z.object({
     cron: z.string().min(1),
 })
 
-// A webhook the agent answers to. Neither the URL nor the token can appear here: a copy is issued
-// its own secret at install time, and this document is served to anonymous visitors. The `body`,
-// the instruction the agent receives when the URL is called, stays out for the other reason: it is
-// the author's work, and it already travels inside the archive.
 export const templateTriggerSchema = z.object({
     name: z.string().min(1),
     description: z.string().default(''),
     methods: z.array(triggerMethodSchema).default(['POST']),
 })
 
-// The questions are an SEO surface: they end up in a FAQPage node on the public page, so they
-// are written as what someone types into a search box, not as internal notes.
 export const templateFaqItemSchema = z.object({
     question: z.string().min(1),
     answer: z.string().default(''),
@@ -66,23 +50,15 @@ export const templateFaqItemSchema = z.object({
 export type TemplateFaqItem = z.infer<typeof templateFaqItemSchema>
 
 export const templateAgentSchema = z.object({
-    // The stable identifier behind React keys and iso board tiles, so a rename never
-    // orphans anything.
     key: agentKeySchema,
     name: z.string().min(1),
     role: z.string().default(''),
     description: z.string().default(''),
-    // Catalog service slugs, captured off the agent's own connector registry. The template
-    // level connector list is the union of these.
     connectorSlugs: z.array(z.string()).default([]),
-    // Whether the agent walks its new owner through a setup when they install it. `null` is an
-    // author who has not answered yet, which is not the same as "needs nothing" and blocks a submit.
     setupRequired: z.boolean().nullable().default(null),
     skills: z.array(templateSkillSchema).default([]),
     schedules: z.array(templateScheduleSchema).default([]),
     triggers: z.array(templateTriggerSchema).default([]),
-    // Engine TOOL_KEYS values, kept as plain strings so a tool leaving the engine does not
-    // make an already published template unparseable.
     tools: z.array(z.string()).default([]),
 })
 export type TemplateAgent = z.infer<typeof templateAgentSchema>
@@ -110,8 +86,6 @@ export type TemplateStoryStep = z.infer<typeof templateStoryStepSchema>
 
 export const templateStorySchema = z.array(templateStoryStepSchema).max(TEMPLATE_STORY_MAX_STEPS)
 
-// The sections that turn a role template into a landing page. Everything in it was observed on a
-// real run in our demo workspace: no field here is a promise, each one is a measurement or a quote.
 export const TEMPLATE_COST_ROUTES = ['subscription', 'credits', 'api_key'] as const
 export type TemplateCostRoute = (typeof TEMPLATE_COST_ROUTES)[number]
 
@@ -125,13 +99,11 @@ export const templateProofSchema = z.object({
     costUsd: z.number().min(0).nullable().default(null),
     model: z.string().trim().default(''),
     approvals: z.array(z.string().trim().min(1)).default([]),
-    // YYYY-MM-DD: a measured cost is only true on the day it was measured.
     runDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'YYYY-MM-DD'),
 })
 export type TemplateProof = z.infer<typeof templateProofSchema>
 
 export const templateWeeklyCostSchema = z.object({
-    // Display strings, not numbers: "Included in your Claude Pro plan" is the honest answer for a route.
     routes: z
         .array(z.object({ route: z.enum(TEMPLATE_COST_ROUTES), cost: z.string().trim().min(1), note: z.string().trim().default('') }))
         .min(1)
@@ -162,8 +134,6 @@ export type TemplateRolePage = z.infer<typeof templateRolePageSchema>
 
 export const EMPTY_TEMPLATE_ROLE_PAGE: TemplateRolePage = { proof: null, weeklyCost: null, whoHires: [], compare: [] }
 
-// Exported so a surface with a narrower mandate than the admin editor can `pick` its own slice
-// off it, and inherit every limit from here rather than restating them.
 export const templateDocumentObject = z.object({
     slug: slugSchema,
     title: z.string().min(1).max(TEMPLATE_TITLE_MAX_LENGTH, `Title must be ${TEMPLATE_TITLE_MAX_LENGTH} characters or fewer`),
@@ -171,26 +141,18 @@ export const templateDocumentObject = z.object({
     longDescription: z.string().default(''),
     category: z.enum(TEMPLATE_CATEGORIES).default('other'),
     tags: z.array(z.string()).default([]),
-    // Index 0 is the cover.
     gallery: z.array(templateImageSchema).default([]),
     videoUrl: z.string().default(''),
     ogImageUrl: z.string().default(''),
-    // The account that owns the template. null means Rerun itself authored it. The credited
-    // expert is derived from it (`users.expert_profile_id`), so the marketplace fiche and the account
-    // stay two separate objects.
     creatorId: z.string().uuid().nullable().default(null),
     metaTitle: z.string().default(''),
     metaDescription: z.string().default(''),
     setupMinutes: z.number().int().positive().default(5),
-    // The author writes both, we provision the Stripe objects from them at approval. The price and
-    // product ids stay out of the document: it round-trips through the author's own editor.
     pricingModel: z.enum(TEMPLATE_PRICING_MODELS).default('free'),
     priceAmountCents: z.number().int().min(0).max(MAX_TEMPLATE_PRICE_CENTS).default(0),
     featured: z.boolean().default(false),
     leadMagnet: z.boolean().default(false),
     status: z.enum(TEMPLATE_STATUSES).default('draft'),
-    // Independent surfaces: a template can live in the in-app library without being
-    // indexable, or the other way round. `status` stays the master gate.
     showInMarketplace: z.boolean().default(true),
     showInLibrary: z.boolean().default(true),
 

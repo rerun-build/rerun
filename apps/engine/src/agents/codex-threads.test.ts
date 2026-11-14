@@ -18,7 +18,6 @@ describe('codexThreadToResume', () => {
         expect(codexThreadToResume('agent', 'session', 'cnx-a', 'msg-3')).toBeUndefined()
     })
 
-    // Each connection has its own Codex home: a thread of one is unknown to the other.
     it('starts over on another connection', () => {
         expect(codexThreadToResume('agent', 'session', 'cnx-b', 'msg-2')).toBeUndefined()
     })

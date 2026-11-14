@@ -28,7 +28,6 @@ export function TemplateFaqSection() {
                         run={async brief => {
                             const result = await actions.prefillFaq({ brief, longDescription: getValues('longDescription') })
                             if (!result.ok) return result
-                            // `replace` rather than setValue: the field array owns the keys the inputs render against.
                             replace(result.faq)
                             return result
                         }}

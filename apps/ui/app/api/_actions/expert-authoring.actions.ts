@@ -16,10 +16,6 @@ import {
 import { templateEditBlockCode } from '@/lib/templates/expert'
 import { failure, failureOf } from '@/lib/i18n/action-error'
 
-// The authoring surface, author side: the same five jobs the admin console runs, gated on owning an
-// editable template instead of on being an admin. Nothing here writes the row, so the guard only
-// has to establish that the caller is entitled to spend our credits on this template.
-
 async function assertEditable(templateId: string) {
     const owned = await assertTemplateOwnedByUser(templateId)
     return templateEditBlockCode(owned.status)
@@ -30,7 +26,6 @@ export async function uploadMyTemplateImageAction(templateId: string, formData: 
         const blocked = await assertEditable(templateId)
         if (blocked) return failure(blocked)
 
-        // An author never overrides the social card, so the folder is not theirs to choose.
         return await runImageUpload(formData, 'gallery')
     } catch (err) {
         return failureOf(err, 'uploadImageFailed')
@@ -48,7 +43,6 @@ export async function prefillMyTemplateContentAction(templateId: string, input: 
     }
 }
 
-// No `currentSlug`: the author does not own the URL of the page, so nothing comes back for it.
 export async function prefillMyTemplateMetaAction(templateId: string, input: unknown): Promise<MetaPrefillResult> {
     try {
         const blocked = await assertEditable(templateId)

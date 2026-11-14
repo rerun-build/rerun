@@ -57,8 +57,6 @@ export type RunOutcome = { kind: 'done' | 'error' | 'cancelled'; error?: string;
 export type AgentRun = {
     result: StreamTextResult<ToolSet, never>
     runId: string
-    // Always resolves, exactly once, whatever the provider does. Callers that need to know a run is
-    // over must await this rather than `result.finishReason`, which never settles when a stream hangs.
     settled: Promise<RunOutcome>
     contextUsage?: () => ContextOccupancy | undefined
     quickReplies?: () => QuickRepliesCapture | undefined
@@ -66,8 +64,6 @@ export type AgentRun = {
 
 export type { RunTrigger }
 
-// A provider teardown that hangs must not hold the run open: the row, the hub event and the session
-// claim all matter more than a clean CLI exit.
 const CLOSE_TIMEOUT_MS = 15_000
 
 function canonicalizeHitlNames(messages: ModelMessage[]): ModelMessage[] {
@@ -115,7 +111,6 @@ function serviceSummary(input: Record<string, unknown> | undefined): string {
 
 function hitlKind(toolName: string): NotificationKind {
     if (toolName === 'ask_user') return 'question'
-    // A secret request is a connector to finish setting up, from the user's point of view.
     if (toolName === 'suggest_service' || toolName === 'request_secret' || toolName === 'request_mcp_sign_in') return 'connector'
     return 'approval'
 }
@@ -136,14 +131,11 @@ async function emitHitlEvent(agent: LoadedAgent, sessionId: string, runId: strin
     await sendNotification({ event: 'agent.notification', kind, agentId: agent.id, sessionId, runId, message, metadata: { toolCallId: pending.toolCallId, toolName: pending.toolName, input: pending.input, ...authorMetadata(author) } }).catch(() => {})
 }
 
-// The proposal never pauses the run, so it is announced after the terminal event: sent first, the
-// run's `done` would put the conversation back to idle right behind it.
 async function emitSkillProposalEvent(agent: LoadedAgent, sessionId: string, runId: string, notice: SkillProposalNotice, author: MessageAuthor | undefined): Promise<void> {
     const message = notice.mode === 'edit' ? `Wants to update a skill: ${notice.title}` : `Wants to save a new skill: ${notice.title}`
     await sendNotification({ event: 'agent.notification', kind: 'approval', agentId: agent.id, sessionId, runId, message, metadata: { toolName: 'skill_propose', proposalId: notice.proposalId, ...authorMetadata(author) } }).catch(() => {})
 }
 
-// OpenRouter's own cost, or what OpenCode says a step was worth to the user: 0 on the Go plan.
 function costMicrosFrom(providerMetadata: unknown): number | null {
     const metadata = providerMetadata as { openrouter?: { usage?: { cost?: unknown } }; opencode?: { cost?: unknown } } | undefined
     const cost = metadata?.opencode?.cost ?? metadata?.openrouter?.usage?.cost
@@ -215,17 +207,12 @@ export async function runAgent(agent: LoadedAgent, sessionId: string, userText: 
     return runTurn(agent, sessionId, userText, override, writer, runId, trigger)
 }
 
-// How a turn ends. Everything terminal about a run is expressed as one of these three and handed to
-// `settle`, which is the single place that writes the row, frees the session and tells the hub.
 type Settlement =
     | { kind: 'done'; text: string; usage: LanguageModelUsage | undefined; costMicros: number | null; messages: ModelMessage[] }
     | { kind: 'error'; error: unknown; errorCode?: RunErrorCode | null; messages?: ModelMessage[] }
     | { kind: 'cancelled' }
 
 async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: string, override: ModelOverride | undefined, writer: UIMessageStreamWriter | undefined, runId: string | undefined, trigger: RunTrigger): Promise<AgentRun> {
-    // The run row and its abort controller exist before any preparation step can throw: for chat
-    // and headless callers the row was already inserted, and a throw in `resolveRunModel` or the
-    // tool/MCP setup would otherwise leave it `running` forever with no terminal event for the hub.
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
     const controller = registerRunAbort(run.id, baseAgent.id)
     const author = trigger.source === 'chat' ? trigger.author : undefined
@@ -244,16 +231,11 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     let goalOption: GoalOption | undefined
     let goalChecked: 'met' | 'not_met' | undefined
     const goalOf = trigger.source === 'chat' ? trigger.goal : undefined
-    // A CLI turn is one SDK step however many tools the CLI ran inside it, so its progress is the
-    // tool calls seen on the stream: `step_count` means "tool calls" for these providers.
     let live: LiveCounter | undefined
     const stepsToWrite = (): number => Math.max(steps, live?.snapshot().toolCalls ?? 0)
     const partialResults: PartialResult[] = []
     const skillProposals: SkillProposalNotice[] = []
 
-    // The CLI process owns the bridged MCP server that calls back into `tools`, so it goes down
-    // first. Codex's own token refresh only lands in auth.json once it has exited, hence the sync
-    // last. Every teardown path below funnels through this.
     const close = async (): Promise<void> => {
         await closeModel().catch(err => logger.warn({ err: String(err), agent: agent.id }, 'close model failed'))
         await closeTools().catch(err => logger.warn({ err: String(err), agent: agent.id }, 'close tools failed'))
@@ -283,10 +265,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         resolveSettled = resolve
     })
 
-    // The one and only terminal path of a run. `streamText` gives no guarantee that `onFinish` or
-    // `onError` is ever called -- a CLI provider that wedges on an expired token simply stops
-    // streaming -- so every way a turn can end funnels here, and the guard makes a second arrival
-    // a no-op instead of a duplicate row write and a duplicate hub event.
     const settle = async (settlement: Settlement): Promise<RunOutcome> => {
         if (settled) return settledPromise
         settled = true
@@ -308,14 +286,12 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                 if (row?.role === 'assistant') answerRow = row
             }
             pending = findPendingHitl(messages)
-            // A turn that ends on a card ignores the replies: the card already says how to answer.
             const replies = quickReplies?.()
             if (replies && answerRow && !pending) await setMessageToolCalls(agent.id, answerRow.id, [quickRepliesCall(replies)]).catch(() => {})
             if (provider === 'codex') await keepCodexThread().catch(() => forgetCodexThread(agent.id, sessionId))
             if (goalOf) {
                 if (goalOption?.hook) goalChecked = goalOption.hook.state() === 'met' ? 'met' : 'not_met'
                 else {
-                    // Any other provider: one check on the final answer, no continuation.
                     const verdict = checkGoal(goalOf, settlement.text, 1)
                     await recordGoalVerdict(agent.id, run.id, verdict).catch(() => {})
                     goalChecked = verdict.met ? 'met' : 'not_met'
@@ -347,36 +323,24 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             forgetCodexThread(agent.id, sessionId)
             logger.error({ err: errorMessage, errorCode, agent: agent.id, run: run.id }, 'run error')
             if (errorCode === RUN_ERROR_CODES.usageLimit && connection && connection.id !== RERUN_CONNECTION_ID) armPlanLimitLatch(connection.id)
-            // The token is still on file, so the connection would keep reading "Ready" while every
-            // run on it fails. The keyless Rerun connection answers for the hub's key, not the user's.
             if (errorCode === RUN_ERROR_CODES.unauthorized && connection && connection.id !== RERUN_CONNECTION_ID) recordCredentialRejected(connection.id)
-            // Codex's answer to a real request outranks the list it gave: the model is greyed out from now
-            // on, and a box default naming it moves to one the account serves.
             if (errorCode === RUN_ERROR_CODES.modelNotInPlan && provider === 'codex' && connection) {
                 const refusedOn = connection
                 recordRefusedModel(refusedOn.id, model)
                 await repairBoxDefault(refusedOn).catch(err => logger.warn({ err: String(err), connection: refusedOn.id }, 'box default repair failed'))
             }
-            // A turn that failed mid-flight still said things worth keeping; without this the user
-            // loses everything the agent had already produced.
             if (settlement.messages) for (const message of canonicalizeHitlNames(settlement.messages)) await appendMessage(agent.id, sessionId, message).catch(() => {})
             await failRun(agent.id, run.id, errorMessage).catch(() => {})
             outcome = { kind: 'error', error: errorMessage, errorCode }
         }
 
-        // Codex only writes its rotated token to auth.json once the CLI has exited, so the next run
-        // must not be able to start before this returns. Capped rather than awaited outright: a
-        // teardown that hangs used to be enough to keep the whole conversation busy forever.
         await closeSafely()
         void cliAuthP?.then(release => release(), () => {})
-        // Last, not first: freeing the session claim before the transcript is written and before
-        // the provider is down let a second send in on a history missing this turn.
         unregisterRunAbort(run.id)
         await syncAgentStatus(agent.id).catch(() => {})
         resolveSettled(outcome)
 
         if (pending) {
-            // A run waiting on a human stays "awaiting" only because no terminal event is sent.
             await emitHitlEvent(agent, sessionId, run.id, pending, author)
         } else {
             await emitRunTerminal({
@@ -406,27 +370,18 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         return outcome
     }
 
-    // The thread is only worth resuming once it holds the same turns as the session: the marker is
-    // the last message written, so anything appended after this turn sends the next one to a new thread.
     const keepCodexThread = async (): Promise<void> => {
         const throughMessageId = codexThreadId ? await lastMessageId(agent.id, sessionId) : undefined
         if (!codexThreadId || !throughMessageId) return forgetCodexThread(agent.id, sessionId)
         rememberCodexThread(agent.id, sessionId, { threadId: codexThreadId, connectionId: connection?.id ?? RERUN_CONNECTION_ID, throughMessageId })
     }
 
-    // Stop has to be able to end a run the provider refuses to end: codex ignores the abort signal
-    // until its turn has started, which is exactly the state an expired token leaves it in.
     setRunCancel(run.id, () => {
         void settle({ kind: 'cancelled' }).catch(err => logger.warn({ err: String(err), agent: agent.id, run: run.id }, 'run cancel failed'))
     })
 
     try {
-        // The recall waits on the hub's embedding: it runs alongside the whole preparation rather
-        // than after it. It never rejects, a failed search only means no memories this turn.
         const memoriesP = recallMemories(baseAgent, userText)
-        // An override can name a different box connection than the agent's default, so the run works
-        // off a view of the agent bound to the connection it will actually bill. The connection object
-        // itself stays the shared instance, so a token refreshed here is refreshed for everyone.
         const resolved = await resolveRunModel(baseAgent, override)
         agent = resolved === baseAgent.resolved ? baseAgent : { ...baseAgent, resolved }
         ;({ connection, provider, model } = resolved)
@@ -444,7 +399,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         if (!lineage.jobRef && parsedJob) lineage.jobRef = parsedJob.jobRef
         ctx.lineage = lineage
         void setRunLineage(agent.id, run.id, lineage).catch(() => {})
-        // The goal comes only from the caller of /chat: it is stored once, here, and nothing a run does can change it.
         const goal = trigger.source === 'chat' ? trigger.goal : undefined
         if (goal) {
             await setRunGoal(agent.id, run.id, JSON.stringify(goal))
@@ -460,8 +414,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             return buildTools(ctx)
         })
         const preparedP = CLI_PROVIDERS.has(provider) ? Promise.all(agent.config.mcpServers.map(s => prepareMcpServer(agent.id, s, agent.env, agent.hubAgentId))) : Promise.resolve([])
-        // Claude reaches its servers through the engine's connections; Codex starts its own without
-        // holding up the model, so it keeps dialing them as declared.
         const mcpServersP = provider === 'claude' ? preparedP.then(servers => withPooledRelays(agent, servers)) : preparedP
         cliAuthP = ensureCliAuth(provider, connection)
 
@@ -473,8 +425,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const pastAuthorIds = await listSessionAuthorIds(agent.id, sessionId).catch(() => [])
         const shared = isSharedConversation(author ? [...pastAuthorIds, author.id] : pastAuthorIds)
 
-        // The tools come first: their schemas ride along on every step, so the compaction threshold
-        // has to count them with the history.
         const built = await toolsP
         closeTools = built.close
         const { tools } = built
@@ -483,14 +433,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)
 
-        // Read before the turn is stored: a resumed thread only gets this turn, so the session must
-        // hold nothing the thread has not seen.
         const resumeThreadId = provider === 'codex' ? codexThreadToResume(agent.id, sessionId, connection?.id ?? RERUN_CONNECTION_ID, await lastMessageId(agent.id, sessionId)) : undefined
 
-        // The turn is stored as it is sent, its context part included: the history the next turn
-        // replays is then byte for byte the prompt the provider already cached. Only the signature
-        // stays out of the row, `signHistoryMessage` puts it back on a shared conversation.
-        // A shared conversation already signs each turn with its sender.
         const suffix = [recall, shared ? '' : userBlock(author?.name), userLanguageBlock(trigger.source === 'chat' ? trigger.userLanguage : undefined), nowBlock()].filter(Boolean).join('\n\n')
         const context = suffix ? [contextTextPart(suffix)] : []
         appendP = appendMessage(agent.id, sessionId, { role: 'user', content: [{ type: 'text', text: userText }, ...context] }, author)
@@ -507,7 +451,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
-        // Cut out of the text whoever wrote it; only a coworker that offers replies gets the buttons.
         if (offersQuickReplies(agent.config)) quickReplies = resolvedModel.quickReplies
         const languageModel = resolvedModel.model
 
@@ -523,9 +466,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             abortSignal: controller.signal,
             experimental_repairToolCall: repairToolCall,
             stopWhen: ({ steps }) => hitlTurnIsOver(steps, CLI_PROVIDERS.has(provider)),
-            // The step that writes the message a bare card is missing gets no tool: `toolChoice`
-            // rather than an empty `activeTools`, since Anthropic refuses a transcript holding
-            // tool_use blocks when the request defines no tool.
             prepareStep: ({ messages, steps }) => {
                 const step = stepWithScreenshots(messages, ctx.screenshots, provider, model, connection)
                 return {
@@ -558,13 +498,9 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                 }
                 await settle({ kind: 'error', error, errorCode: classifyProviderError(provider, error) })
             },
-            // The only callback the SDK runs when the abort lands before the first step: without it
-            // a run stopped early would never write its terminal row.
             onAbort: async () => {
                 await settle({ kind: 'cancelled' })
             },
-            // `totalUsage`, not `usage`: the latter is the last step alone, and a run that called
-            // tools paid every step before it.
             onFinish: async ({ response, totalUsage, text, providerMetadata, finishReason, rawFinishReason }) => {
                 if (controller.signal.aborted) {
                     await settle({ kind: 'cancelled' })
@@ -573,9 +509,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                 logger.info({ agent: agent.id, provider, cachedInputTokens: totalUsage.cachedInputTokens, costMicros: runCostMicros, anthropic: providerMetadata?.anthropic }, 'run usage')
                 const threadId = providerMetadata?.['codex-app-server']?.threadId
                 if (typeof threadId === 'string') codexThreadId = threadId
-                // A CLI provider reports a spent subscription or a blown context as a plain finish,
-                // not as an error. Taken at face value it stores an empty turn as a success and the
-                // reason the agent said nothing is lost.
                 if (!toolCallWithheld && isFailedFinish(finishReason, rawFinishReason)) {
                     const errorCode = classifyFinishReason(finishReason, rawFinishReason)
                     await settle({
@@ -590,9 +523,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             },
         })
 
-        // Drains the stream so the run advances with no HTTP consumer attached, and closes the run
-        // when the provider ends the turn without ever reaching a callback. `teeStream` hands out a
-        // fresh branch on every access, so this takes nothing away from `toUIMessageStream`.
         void (async () => {
             let drainError: unknown
             await result.consumeStream({
@@ -613,8 +543,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         return { result, runId: run.id, settled: settledPromise, contextUsage, quickReplies }
     } catch (err) {
-        // Everything past `streamText` is handled by its own callbacks: the `return` above makes
-        // this catch unreachable once the stream has started, so a run is closed exactly once.
         if (controller.signal.aborted) {
             await settle({ kind: 'cancelled' })
             throw err

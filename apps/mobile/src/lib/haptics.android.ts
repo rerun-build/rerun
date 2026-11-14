@@ -2,8 +2,6 @@ import { AndroidHaptics, ImpactFeedbackStyle, NotificationFeedbackType, performA
 
 export { ImpactFeedbackStyle, NotificationFeedbackType }
 
-// expo-haptics plays iOS's patterns on Android through the vibrator, a raw buzz that runs strong on a
-// Pixel. The system's own feedback constants are tuned per device, as Android's own apps feel.
 export function selectionAsync(): Promise<void> {
     return performAndroidHapticsAsync(AndroidHaptics.Segment_Tick)
 }

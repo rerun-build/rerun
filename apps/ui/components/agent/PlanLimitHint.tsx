@@ -10,8 +10,6 @@ import { useLocale, useTranslations } from 'next-intl'
 
 const TONE_CLASS: Record<PlanLimitTone, string> = { brand: 'text-muted-foreground', warning: 'text-amber-500', destructive: 'text-destructive' }
 
-// The badge counts down without a preposition ("5m", "3h"). shortRelativeTime reads that compact form
-// for a past moment, so it is handed a "now" mirrored on the other side of the reset.
 function compactUntil(iso: string, locale: string): string {
     const reset = new Date(iso).getTime()
     return shortRelativeTime(iso, locale, new Date(2 * reset - Date.now()))
@@ -19,7 +17,6 @@ function compactUntil(iso: string, locale: string): string {
 
 function usePlanWindowName() {
     const t = useTranslations('agent.planLimitHint.windows')
-    // OpenCode Go's rolling window is five hours long, and its plan says so.
     return (window: PlanLimitWindow, provider?: string) => {
         if (window.kind === 'session') return provider === 'opencode' ? t('fiveHour') : t('session')
         if (window.kind === 'weekly') return t('weekly')
@@ -28,7 +25,6 @@ function usePlanWindowName() {
     }
 }
 
-// One line per window of a plan, with its reset: what a hover on its usage spells out.
 export function PlanLimitDetail({ windows, provider }: { windows: PlanLimitWindow[]; provider?: string }) {
     const t = useTranslations('agent.planLimitHint')
     const locale = useLocale()
@@ -45,7 +41,6 @@ export function PlanLimitDetail({ windows, provider }: { windows: PlanLimitWindo
     )
 }
 
-// The windows a model pill rings, in one line for a screen reader.
 export function usePlanWindowsSummary() {
     const t = useTranslations('agent.planLimitHint')
     const windowName = usePlanWindowName()
@@ -62,8 +57,6 @@ export function useRerunCreditDetail() {
     }
 }
 
-// How far into its plan a subscription is, beside its name in a model picker. One figure for the
-// whole group: the limits are the subscription's, every model under it draws on the same ones.
 export function PlanLimitHint({ windows, provider }: { windows: PlanLimitWindow[]; provider?: string }) {
     const locale = useLocale()
     const tightest = tightestPlanWindow(windows)
@@ -79,8 +72,6 @@ export function PlanLimitHint({ windows, provider }: { windows: PlanLimitWindow[
     )
 }
 
-// The same figure for the Rerun group, whose usage is the workspace's monthly credit rather than a
-// plan's rate windows.
 export function RerunCreditHint({ credit }: { credit: RerunCredit }) {
     const t = useTranslations('agent.planLimitHint')
     const tShared = useTranslations('agent.modelsShared')

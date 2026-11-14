@@ -1,4 +1,3 @@
-"""Gate: a multi-chunk PR body; LIMITS judged per chunk by its commit. GitHub calls are stand-ins."""
 import contextlib, io, os, sys, tempfile, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gate as G

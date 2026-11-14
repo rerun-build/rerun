@@ -6,10 +6,6 @@ import { CHANNEL } from './identity'
 import { currentServer, getMainWindow, loadAppPath, openExternal, showMainWindow } from './main-window'
 import { partitionFor } from './server'
 
-// Sign-in through the system browser (Google refuses an embedded web view, and the browser has the
-// person's passwords): RFC 8252 with PKCE. The app keeps the verifier and a state; the browser gets
-// the challenge, signs in on the web, and hands a one-time code back through the app's URL scheme.
-
 type Pending = { verifier: string; state: string; startedAt: number }
 
 const PENDING_TTL_MS = 15 * 60_000
@@ -32,7 +28,6 @@ function livePending(): Pending | null {
 export async function startBrowserSignIn(provider?: DesktopSignInProvider): Promise<void> {
     const origin = currentServer()
     if (!origin) return
-    // A second click restarts with new secrets: only the last browser tab can finish.
     const verifier = base64url(randomBytes(32))
     pending = { verifier, state: base64url(randomBytes(24)), startedAt: Date.now() }
     const url = new URL(DESKTOP_AUTH_PATH, origin)
@@ -74,7 +69,6 @@ async function finish(code: string, current: Pending): Promise<DesktopSignInResu
     return result
 }
 
-// The browser came back through `rerun-desktop://auth/callback`.
 export async function completeFromLink(code: string, state: string): Promise<void> {
     showMainWindow()
     const current = livePending()
@@ -85,7 +79,6 @@ export async function completeFromLink(code: string, state: string): Promise<voi
     await finish(code, current)
 }
 
-// The code the browser shows, pasted by hand where the link could not reach the app.
 export async function completeFromPastedCode(code: string): Promise<DesktopSignInResult> {
     const current = livePending()
     const trimmed = code.trim()

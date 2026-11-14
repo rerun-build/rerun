@@ -31,7 +31,6 @@ export function NotificationCard({ message }: { message: string }) {
     )
 }
 
-// `schedules` and `triggers` are the slugs the install switched on.
 export function SetupCompleteCard({ agentId, summary, schedules, triggers }: { agentId?: string; summary: string; schedules: string[]; triggers: string[] }) {
     const t = useTranslations('chat.setupEvents')
     const agentName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name)
@@ -56,8 +55,6 @@ export function SetupCompleteCard({ agentId, summary, schedules, triggers }: { a
     )
 }
 
-// The tool output is frozen at the time of the call, so whether the sign-in is still owed is asked
-// again: an old card in the history must not keep offering a connection made since.
 export function NeedsAuthCard({ agentId, slug, name }: { agentId?: string; slug: string; name: string }) {
     const t = useTranslations('chat')
     const { resolved } = useCatalogServices([slug])

@@ -6,7 +6,6 @@ const minutesAgo = (minutes: number) => new Date(Date.now() - minutes * 60_000).
 
 const message = (id: string, role: 'user' | 'assistant', text: string, minutes: number): UIMessage => ({ id, role, parts: [{ type: 'text', text }], metadata: { createdAt: minutesAgo(minutes) } })
 
-// Pulse's General: a conversation spread over two days, with threads opened between its messages.
 export const GENERAL_MESSAGES: UIMessage[] = [
     message('g1', 'user', 'Morning! What did the pricing post do yesterday?', 26 * 60),
     message('g2', 'assistant', '1,204 views and 38 reactions, the best post this month. Most of the comments ask about the free trial.', 26 * 60 - 1),

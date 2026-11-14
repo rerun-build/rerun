@@ -2,7 +2,6 @@
 
 import { create } from 'zustand'
 
-// The Weekly Rewind is not part of the open source build: nothing is ever stored or shown.
 type RewindState = { weeks: { viewed: boolean }[]; shown: unknown; openLatest: () => void }
 
 export const useRewindStore = create<RewindState>(() => ({ weeks: [], shown: null, openLatest: () => {} }))

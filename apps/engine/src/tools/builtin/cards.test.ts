@@ -15,7 +15,6 @@ const { tableCardSchema, fileCardSchema, CARD_MAX_CELL_CHARS, CARD_MAX_COLUMNS, 
 const AGENT = 'agent-cards'
 const tools = cardTools({ agent: { id: AGENT } } as any)
 
-// Through the input schema, as the AI SDK does, so its defaults apply.
 async function run(name: string, args: Record<string, unknown>): Promise<string> {
     const tool = tools[name] as any
     return (await tool.execute(tool.inputSchema.parse(args), {} as any)) as string
@@ -23,7 +22,6 @@ async function run(name: string, args: Record<string, unknown>): Promise<string>
 
 let savedViews = 0
 
-// A card only shows a saved view, so each one is drawn through a view saved for it.
 async function card({ scope = 'agent', table, limit, ...view }: Record<string, unknown>) {
     const name = `View ${++savedViews}`
     expect(await run('table_view_save', { scope, table, name, ...view })).toContain('Saved')
@@ -72,8 +70,6 @@ describe('card_table', () => {
         expect(shown.columnsTruncated).toBe(false)
     })
 
-    // The row reader also selects `rowid AS "__rowid"` for the data browser's delete path; a card
-    // must not carry it into the model context nor render it as a column.
     it('drops the internal rowid from the rows', async () => {
         const shown = await card({ table: 'contacts', limit: 5 })
         for (const row of shown.rows) expect(Object.keys(row)).toEqual(shown.columns)
@@ -211,8 +207,6 @@ describe('card_file', () => {
         expect(file).toEqual({ path: 'reports/summary.md', name: 'summary.md', size: 7, scope: 'agent' })
     })
 
-    // The model happily hands back the absolute path it saw in a shell listing, but the app's file
-    // proxy addresses files relative to the workspace.
     it('relativises an absolute path inside the workspace', async () => {
         const [file] = (await show([{ path: resolve(workspaceDir(AGENT), 'reports/summary.md') }])).files
         expect(file.path).toBe('reports/summary.md')
@@ -228,7 +222,6 @@ describe('card_file', () => {
         expect(file).toMatchObject({ path: 'remakes/slide-1.png', name: 'slide-1.png', scope: 'shared' })
     })
 
-    // A sub-coworker names the absolute path it wrote to, and nothing tells the parent to change scope.
     it('reads an absolute shared path as shared whatever the scope given', async () => {
         const [file] = (await show([{ path: resolve(sharedDir(), 'remakes/slide-1.png') }])).files
         expect(file).toMatchObject({ path: 'remakes/slide-1.png', scope: 'shared' })
@@ -256,7 +249,6 @@ describe('card_file', () => {
         expect(await run('card_file', { files: [{ path: '../shared-db/shared.db', scope: 'shared' }] })).toContain('Could not show that file')
     })
 
-    // A partial card would hide from the model that one slide is missing.
     it('shows nothing when one of the files is missing, and names it', async () => {
         const result = await run('card_file', { files: [{ path: 'shots/a.png' }, { path: 'shots/nope.png' }, { path: 'shots/b.png' }] })
         expect(result).toContain('nothing was shown')

@@ -16,7 +16,6 @@ type CoworkerAvatarProps = {
     facing?: 'left' | 'right'
 }
 
-// The Foreman's orb, or the coworker's buddy in its current mood.
 export function CoworkerAvatar({ coworker, size, animated = true, facing = 'left' }: CoworkerAvatarProps) {
     if (coworker.kind === 'foreman') return <ForemanOrb size={size * 0.86} state={coworker.status === 'working' ? 'thinking' : 'idle'} facing={facing} animated={animated} style={{ margin: size * 0.07 }} />
     return <AgentBuddy agentId={coworker.id} size={size} mood={moodOf(coworker.status)} animated={animated} facing={facing} />

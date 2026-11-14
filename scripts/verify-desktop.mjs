@@ -1,30 +1,4 @@
 #!/usr/bin/env node
-// Opens the desktop app (apps/desktop-app, Electron) on the hub of this workspace, signed in, and
-// captures it, the way `pnpm verify:ui` does for the browser.
-//
-//   pnpm verify:desktop                                       the board, in both themes, at every size
-//   pnpm verify:desktop --scenario .context/verify/flow.mjs   a scripted walk: clicks, typing, a capture per step
-//   pnpm verify:desktop --signed-out                          a first launch, before any sign-in
-//   pnpm verify:desktop --sizes 1440x900,820x640 --themes dark --native
-//   pnpm verify:desktop --no-build                            reuses the last build of apps/desktop-app/out
-//   pnpm verify:desktop --engine --scenario …                with a local engine behind the workspace
-//   pnpm verify:desktop --packaged                            the packaged app (asar, fuses), as installed
-//
-// Local stack only, with the same checks as verify:ui (scripts/verify/shared.mjs). The app is the
-// development channel ("Rerun Dev") pointed at the hub through RERUN_DESKTOP_URL, with a data folder
-// of its own for the run, so nothing of an installed Rerun is read or touched.
-//
-// `--native` also captures the real window with macOS's `screencapture`, title bar and traffic lights
-// included (the terminal needs the Screen Recording permission). Without it the captures are the
-// page, as Playwright sees it.
-//
-// A scenario is a module whose default export receives
-// `{ app, page, step, base, admin, workspaceId, account, outDir, shell }`: `app` is Playwright's
-// ElectronApplication (`app.evaluate` runs in the main process), `page` the main window, `shell` a few
-// helpers (resize the window, switch the system theme, read the window's state).
-//
-// Everything lands in `.context/verify/<timestamp>-desktop/`: the PNGs and a `report.json` with the
-// console errors and the failed requests of every page.
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
@@ -78,8 +52,6 @@ function parseArgs(argv) {
     return options
 }
 
-// The packaged app is the development channel built with RERUN_DESKTOP_E2E=1: the same asar and fuses as
-// a release, except the inspector fuse Playwright needs. Unsigned.
 const PACKAGED_APP = join(DESKTOP_DIR, `release/dev/mac-${process.arch}/Rerun Dev.app/Contents/MacOS/Rerun Dev`)
 
 function buildShell(packaged) {
@@ -114,8 +86,6 @@ function shellHelpers(app, page) {
     }
 }
 
-// The real window as macOS draws it (title bar, traffic lights), by its CGWindowID: the window
-// helper is compiled once into the temporary folder.
 const WINDOW_ID_HELPER = join(tmpdir(), 'rerun-verify-window-id')
 
 function windowIds(pid) {

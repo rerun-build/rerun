@@ -5,7 +5,6 @@ import { Icon } from '@/components/ui/icon'
 import type { AuthMethodSummary } from '@/lib/services/types'
 import { ArrowRight, KeyIcon, LinkIcon, LogIn, TerminalSquare, type LucideIcon } from '@/lib/icons'
 
-// The kinds that get their own fallback label and explainer; the others share the generic one.
 export function methodKindKey(kind: AuthMethodSummary['kind']): 'oauth' | 'key' | 'stdio' | 'app' | 'other' {
     return kind === 'oauth' || kind === 'key' || kind === 'stdio' || kind === 'app' ? kind : 'other'
 }
@@ -23,8 +22,6 @@ function methodKindIcon(kind: AuthMethodSummary['kind']): LucideIcon {
     }
 }
 
-// Auth methods as a list to drill into: picking one opens its own configuration view.
-// Renders nothing when a service exposes a single method.
 export function AuthMethodPicker({ methods, onSelect }: { methods: AuthMethodSummary[]; onSelect: (id: string) => void }) {
     const t = useTranslations('services.authMethod')
     if (methods.length <= 1) return null

@@ -12,8 +12,6 @@ type RenameInputProps = {
     onCancel?: () => void
 }
 
-// Mounted only while renaming, so the current name is the initial state and no effect has to
-// push it back in.
 function RenameInput({ name, onSubmit, onCancel }: RenameInputProps) {
     const [value, setValue] = useState(name)
     const inputRef = useRef<HTMLInputElement>(null)

@@ -4,14 +4,11 @@ import { theme, TONES, type ToneName } from "../theme";
 
 export interface PanelProps {
   children: React.ReactNode;
-  /** Tints the frame. Left neutral when omitted. */
   tone?: ToneName;
-  /** Machine output (an error, a log line) rather than prose. */
   mono?: boolean;
   style?: React.CSSProperties;
 }
 
-/** The framed block that sits inside a card: an agent's message, an error, a log line. */
 export function Panel({ children, tone, mono = false, style }: PanelProps) {
   const t = tone ? TONES[tone] : null;
   return (

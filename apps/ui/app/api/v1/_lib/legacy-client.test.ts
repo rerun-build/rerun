@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { agentConfigSchema, agentDetailSchema, agentModelsSchema, agentViewSchema, aiConnectionsViewSchema, type AgentModels, type AgentView, type AiConnectionsView } from '@rerun/contracts'
 import { agentModelsForClient, agentViewForClient, aiConnectionsForClient, clientKnowsProvider } from './legacy-client'
 
-// The provider list as the iOS builds already shipped parse it.
 const legacyProvider = z.enum(['rerun', 'anthropic', 'claude', 'codex', 'openai', 'google', 'openrouter'])
 const legacyConnectionsView = aiConnectionsViewSchema.extend({
     connections: z.array(aiConnectionsViewSchema.shape.connections.element.extend({ provider: legacyProvider })),
@@ -94,8 +93,6 @@ describe('clientKnowsProvider', () => {
     })
 })
 
-// The point of the filter: what an older build receives parses with the schemas it was built with,
-// even with OpenCode as the machine's default and as a coworker's pin.
 describe('responses for an older build', () => {
     const old = request('ios/1.3.0 (39)')
 

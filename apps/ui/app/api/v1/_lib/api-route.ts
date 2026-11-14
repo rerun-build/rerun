@@ -7,9 +7,6 @@ import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { ApiError } from '@/lib/api-error'
 
-// `public` is for what an app needs before anyone signs in (sign-in itself, the version gate). `user` only
-// proves who is calling, for the routes a caller reaches before it has a workspace. `admin` is a member
-// who runs the workspace (billing, AI providers); any other member gets a 403.
 type AuthLevel = 'public' | 'user' | 'member' | 'admin'
 
 export type UserContext = { user: User; supabase: SupabaseClient<Database> }
@@ -36,7 +33,6 @@ type RouteSegment = { params: Promise<Record<string, string>> }
 
 export { ApiError }
 
-// The status of an action result that folded a refusal in, or the one the route would answer otherwise.
 export function deniedStatus(code: DeniedCode | undefined, fallback: number): number {
     if (code === 'forbidden') return 403
     if (code === 'not_found') return 404
@@ -99,9 +95,7 @@ export function apiRoute<A extends AuthLevel, B extends z.ZodType | undefined = 
         } catch (err) {
             if (err instanceof z.ZodError) return errorResponse(400, 'Invalid request', { issues: err.issues })
             if (err instanceof ApiError) return errorResponse(err.status, err.message)
-            // Reached, but the caller only uses this Box and the route changes it.
             if (err instanceof AccessDeniedError) return errorResponse(403, err.message)
-            // Past authentication, a resource outside the caller's workspace or Boxes reads as missing.
             if (err instanceof AuthorizationError) return errorResponse(404, 'Not found')
             console.error(`[api/v1] ${req.method} ${path} failed`, err)
             return errorResponse(500, 'Internal error')

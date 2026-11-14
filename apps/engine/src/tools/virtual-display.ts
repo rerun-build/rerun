@@ -16,12 +16,6 @@ let exitHooked = false
 
 const NOTHING_TO_RELEASE = () => {}
 
-/**
- * A windowed Chromium passes bot checks that the headless one fails, so on a box without a screen
- * every agent gets an Xvfb of its own: what one agent has open never shows on another's screen. It
- * lives while something holds it and a minute past the last release. The display is null where none
- * can run (no Xvfb installed, or not Linux), and the browser falls back to headless.
- */
 export async function holdDisplay(agentId: string): Promise<DisplayHold> {
     if (process.env.DISPLAY) return { display: process.env.DISPLAY, release: NOTHING_TO_RELEASE }
     if (process.platform !== 'linux') return { display: null, release: NOTHING_TO_RELEASE }

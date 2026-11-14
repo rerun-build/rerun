@@ -1,9 +1,3 @@
-// Single source of truth for the experts marketplace vocabulary, shared by the landing
-// (public filters + owner claim/edit flow) and apps/ui (admin edit form + LinkedIn importer).
-// Values here are what lands in the `experts` table, so the LLM importer, the public filters
-// and both edit forms all agree. No React here on purpose: server code and Trigger.dev tasks
-// import this module, so it must stay free of component imports.
-
 import type { BadgeTone } from '../primitives/badge'
 
 export const EXPERT_TYPES = ['studio', 'freelancer', 'expert'] as const
@@ -12,9 +6,6 @@ export const EXPERT_AVAILABILITIES = ['available', 'soon', 'unavailable'] as con
 
 export const EXPERT_STATUSES = ['draft', 'invited', 'published', 'declined'] as const
 
-// Where the fiche came from, and — for a fiche that came from the public creator program — where
-// its application stands. Orthogonal to `status`, which tracks the marketplace listing: an accepted
-// creator keeps a `draft` listing until they fill and publish their own profile.
 export const EXPERT_SOURCES = ['seed', 'import', 'application'] as const
 
 export const EXPERT_APPLICATION_STATUSES = ['pending', 'accepted', 'rejected'] as const

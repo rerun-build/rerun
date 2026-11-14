@@ -28,13 +28,8 @@ import { AnimatePresence } from 'motion/react'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-// Combien de conversations d'agents restent montées derrière celle qu'on regarde. Chaque panneau
-// gardé vivant retient tout son transcript dans le DOM et se re-rend avec le board : sans plafond,
-// une session de travail d'une heure finit par en empiler une dizaine et tout ralentit.
 const KEEP_ALIVE_PANELS = 3
 
-// Le panneau d'un agent qui répond encore possède le stream en cours : on le garde même s'il est
-// vieux, et on évacue le plus ancien des autres.
 function trimOpenedAgents(ids: string[], busy: Set<string>): string[] {
     const kept = [...ids]
     for (let i = 0; kept.length > KEEP_ALIVE_PANELS && i < kept.length - 1; ) {
@@ -44,17 +39,8 @@ function trimOpenedAgents(ids: string[], busy: Set<string>): string[] {
     return kept
 }
 
-// What floats over the chat, one at a time: the coworker's card, or its list of threads.
-// `entered` is the card's button a screen grew out of, while that screen is open over the card.
 type Surface = { kind: 'card'; entered?: CardOrigin } | { kind: 'chats'; filter: ChatsFilter }
 
-/**
- * At rest the panel is the chat and nothing else: the list of conversations on the left, the
- * coworker's name in the middle, the close button on the right. The name opens the card, and a
- * destination picked on the card grows out of its button to fill the panel, the card receding
- * behind it; the way back folds the screen into that button. A screen opened by a link has no
- * button to grow from: it takes the thread's place at once.
- */
 export function AgentPanel() {
     const t = useTranslations('agent')
     const agents = useBoardStore(s => s.agents)
@@ -79,14 +65,11 @@ export function AgentPanel() {
     const [pendingOpenSession, setPendingOpenSession] = useState<{ sessionId: string; title: string; runId: string | null } | null>(null)
     const [deleteOpen, setDeleteOpen] = useState(false)
     const [shareOpen, setShareOpen] = useState(false)
-    // A file or table link opens its screen on the very render that carries it, before the screen
-    // reads and clears it. The two signals are mutually exclusive in the store.
     const displayedTab: AgentViewTab | null = agentFileFocus?.agentId === selectedAgentId ? 'files' : agentDataFocus?.agentId === selectedAgentId ? 'data' : viewTab
 
     const attentionCount = useMemo(() => sessions.filter(s => s.agentId === selectedAgentId && ATTENTION_STATUSES.has(s.status)).length, [sessions, selectedAgentId])
     const working = useMemo(() => sessions.some(s => s.agentId === selectedAgentId && s.status === 'working'), [sessions, selectedAgentId])
 
-    // Rangés du plus ancien au plus récemment ouvert : c'est cet ordre que le plafond consomme.
     useEffect(() => {
         if (!selectedAgentId) return
         setOpenedAgentIds(prev => {
@@ -104,13 +87,11 @@ export function AgentPanel() {
         })
     }, [agents])
 
-    // Another coworker opens on its thread, never on the screen the previous one was showing.
     useEffect(() => {
         setSurface(null)
         setViewTab(null)
     }, [selectedAgentId])
 
-    // A file or table link keeps its screen once the screen has consumed the link.
     useEffect(() => {
         if (agentFileFocus?.agentId === selectedAgentId) setViewTab('files')
         else if (agentDataFocus?.agentId === selectedAgentId) setViewTab('data')
@@ -118,7 +99,6 @@ export function AgentPanel() {
         setSurface(null)
     }, [agentFileFocus, agentDataFocus, selectedAgentId])
 
-    // External surfaces can open an agent on a precise tab without owning this panel's local state.
     useEffect(() => {
         if (!agentFocusRequest) return
         const tab = agentFocusRequest.tab
@@ -157,22 +137,10 @@ export function AgentPanel() {
 
     const toggleSurface = (next: Surface) => setSurface(current => (current?.kind === next.kind ? null : next))
 
-    // Un agent éteint n'a rien à montrer : son fil et ses écrans décriraient un agent qui tourne.
-    // La pilule du nom passe au-dessus du voile, donc Settings et la suppression restent accessibles
-    // pour libérer un slot. Sauf workspace en pause : sa machine est archivée, Settings n'a plus rien
-    // à lire non plus.
     const locked = !!agent && (workspacePaused || (!!agent.disabledAt && displayedTab !== 'settings'))
-    // A locked coworker has no conversations to list: the surface and its scrim stay down together.
     const shownSurface = surface?.kind === 'chats' && locked ? null : surface
     const enteredFrom = displayedTab && shownSurface?.kind === 'card' ? shownSurface.entered : undefined
-    // A screen grown out of the card covers the thread, its pills and the card, all kept underneath
-    // so they are already in place when it folds back.
     const threadShown = !displayedTab || !!enteredFrom
-    // Once grown, nothing it covers is painted any more: blurred and faded layers under an opaque
-    // screen ran a phone's GPU out of tiles, and Android Chrome left holes in the screen (RER-93).
-    // The blurred ones (veil, pills, scrim) go, since a hidden backdrop-filter still paints in
-    // Chromium; the thread and the card stay mounted, only hidden. The way back clears
-    // `enteredFrom`, so they are all there again before the screen folds.
     const covered = !!enteredFrom && grownFrom === enteredFrom
 
     const screen = agent && displayedTab && (
@@ -196,8 +164,6 @@ export function AgentPanel() {
                 </>
             )}
             <AgentDesktopView />
-            {/* Les chats restent montés même quand la sheet est fermée (selectedAgentId null)
-                ou qu'on regarde un écran — ne pas démonter pour préserver le stream. */}
             {openedAgentIds.map(id => (
                 <div key={id} className={threadShown && selectedAgentId === id ? cn('absolute inset-0 flex flex-col', covered && 'invisible') : 'hidden'}>
                     <AgentPanelChat

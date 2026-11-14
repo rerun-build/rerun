@@ -10,14 +10,8 @@ import { useEffect, useState } from 'react'
 
 const REFRESH_MS = 50
 
-/**
- * `processing` is the composer sending a voice message, `transcribing` an answer being turned into
- * words: the first says nothing while it works, the second says so.
- */
 export type VoiceRecorderBarStatus = 'starting' | 'recording' | 'processing' | 'transcribing' | 'failed'
 
-// The composer's bar stands on its own above the dock; the answer one sits in the row the textarea
-// was in, so it carries no padding and no height of its own.
 const SIZES = {
     composer: { box: 'min-h-16 w-full gap-3 px-3 py-2', waveform: 48, startingLabel: 'waitingForMicrophone' },
     answer: { box: 'min-h-7 min-w-0 flex-1 gap-2', waveform: 24, startingLabel: 'microphone' },
@@ -25,17 +19,11 @@ const SIZES = {
 
 type VoiceRecorderBarProps = {
     status: VoiceRecorderBarStatus
-    /** The recorder's own microphone, so the waveform draws off it instead of opening a second one. */
     stream: MediaStream | null
     getLiveState: () => VoiceLiveState
     size?: keyof typeof SIZES
 }
 
-/**
- * Replaces the field a recording is made from: the composer's textarea, or a question's answer row.
- * The timer is polled here rather than pushed down as props: at 20 reads a second, driving it from
- * the chat's own state would re-render the whole conversation.
- */
 export function VoiceRecorderBar({ status, stream, getLiveState, size = 'composer' }: VoiceRecorderBarProps) {
     const t = useTranslations('chat.voice')
     const [durationMs, setDurationMs] = useState(0)
@@ -57,7 +45,6 @@ export function VoiceRecorderBar({ status, stream, getLiveState, size = 'compose
     }
 
     const recording = status === 'recording'
-    // Without the recorder's stream the waveform would open a microphone of its own: it idles instead.
     const hearing = recording && stream !== null
 
     return (

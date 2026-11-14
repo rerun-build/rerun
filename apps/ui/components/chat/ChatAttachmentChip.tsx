@@ -32,8 +32,6 @@ export function ChatAttachmentChip({ file, upload, onRemove, onRetry }: ChatAtta
 
     return (
         <div className={`group relative flex items-center gap-2 rounded-lg border bg-background py-1.5 pl-1.5 pr-1 text-xs ${failed ? 'border-destructive/50' : 'border-border'}`}>
-            {/* La pastille de succès se pose sur le coin de la vignette : dans une chip aussi basse,
-                une colonne de plus pousse le nom du fichier et la ligne d'état se lit moins bien. */}
             <span className="relative shrink-0">
                 {isImage && file.url ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -58,8 +56,6 @@ export function ChatAttachmentChip({ file, upload, onRemove, onRetry }: ChatAtta
                 {upload?.status === 'done' && <span className="text-[10px] text-muted-foreground">{formatBytes(upload.size, locale)}</span>}
             </div>
 
-            {/* Le padding droit de la chip est plus court que le gauche : le padding propre des boutons
-                le complète, et les deux bords se lisent alors à la même distance du contenu. */}
             <span className="flex shrink-0 items-center gap-0.5">
                 {failed && (
                     <Tooltip>

@@ -10,9 +10,6 @@ const STALE_AFTER_MS = 5 * 60_000
 const inFlight = new Map<string, Promise<void>>()
 const attemptedAt = new Map<string, number>()
 
-// Nothing here ever flags the key as refused: what `/usage` answers a key with Console credits and no
-// Go plan has not been measured, and a valid key read as refused would lock the user out. A run
-// answered with a 401 is what raises it.
 export function refreshOpencodePlanLimits(connection: LoadedConnection | null): Promise<void> {
     const key = connection?.config.provider === 'opencode' ? connection.env[CONNECTION_TOKEN_KEY.opencode] : undefined
     if (!connection || !key) return Promise.resolve()
@@ -41,8 +38,6 @@ export function pendingOpencodePlanLimits(connectionId: string): Promise<void> |
     return inFlight.get(connectionId)
 }
 
-// For the paths that answer with the reading they have: paced on the last attempt, so a key that
-// cannot be read is not asked again on every list.
 export function refreshStaleOpencodePlanLimits(connections: LoadedConnection[]): void {
     for (const connection of connections) {
         if (connection.config.provider !== 'opencode') continue

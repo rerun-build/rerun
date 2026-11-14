@@ -18,9 +18,6 @@ import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
 import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 
-// Asked before every new code: Supabase voids the previous code each time it mints one, so while
-// the last one is still good it is mailed again instead. `resent: false` means ask Supabase, `held`
-// that the last one left less than a minute ago and nothing new was mailed.
 export async function resendLiveSignInCode(email: string): Promise<{ resent: boolean; held: boolean }> {
     const supabase = await createClient()
     const { data } = await supabase.auth.getUser()
@@ -34,8 +31,6 @@ export type EmailSignInPreparation = { ok: true; created: boolean } | (ActionFai
 
 const preparationRefused = (reason: EmailPreparationFailure) => ({ ...failure(EMAIL_PREPARATION_CODES[reason]), reason })
 
-// What every ask for a code goes through before Supabase hears of it: the robot check, then the pace
-// of the network behind the caller. `null` when the caller may go on.
 async function refuseCodeAsk(captcha: CaptchaProof | undefined): Promise<{ ip: string; refusal: EmailPreparationFailure | null }> {
     const ip = callerIp(await headers())
     if (!(await verifyCaptcha(captcha, ip))) return { ip, refusal: 'captcha_failed' }
@@ -43,7 +38,6 @@ async function refuseCodeAsk(captcha: CaptchaProof | undefined): Promise<{ ip: s
     return { ip, refusal: null }
 }
 
-// Called before Supabase is asked for a new code, which it then mails to an account that exists.
 export async function prepareEmailSignIn(input: z.input<typeof prepareSchema>): Promise<EmailSignInPreparation> {
     const parsed = prepareSchema.safeParse(input)
     if (!parsed.success) return preparationRefused('invalid_email')
@@ -57,10 +51,6 @@ export async function prepareEmailSignIn(input: z.input<typeof prepareSchema>): 
 
 export type AnonymousEmailPreparation = { ok: true; exists: boolean } | (ActionFailure & { reason: EmailPreparationFailure })
 
-// The address an anonymous visitor claims goes through the same gate as the auth page's, and the
-// domain rule with it. Whether the address has an account is what the visitor's browser needs next:
-// a known one is signed into, a new one is claimed on the anonymous user. It is only said past the
-// robot check and the pace, like `created` above.
 export async function prepareAnonymousEmailStep(input: z.input<typeof prepareSchema>): Promise<AnonymousEmailPreparation> {
     const parsed = prepareSchema.safeParse(input)
     if (!parsed.success) return preparationRefused('invalid_email')
@@ -74,10 +64,6 @@ export async function prepareAnonymousEmailStep(input: z.input<typeof prepareSch
 
 export type SignupCompletion = { ok: true; signedUp: boolean } | { ok: false }
 
-// The browser converts the anonymous session on its own, and the server stamps the signup on
-// whichever request comes next. This is that request, made so the signup form can wait for the
-// stamp instead of leaving the tab to learn it from realtime. Same inputs as the middleware's
-// provisioning; from `/` alone, so the invite paths are not looked at.
 export async function completeSignupAction(): Promise<SignupCompletion> {
     const supabase = await createClient()
     const { data } = await supabase.auth.getUser()

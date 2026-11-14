@@ -17,7 +17,6 @@ export function rewindWeekStarting(monday: Date): RewindWeek {
     }
 }
 
-// The last full Monday-to-Sunday UTC week before `now`.
 export function lastCompletedWeek(now: Date): RewindWeek {
     return rewindWeekStarting(new Date(mondayOf(now).getTime() - 7 * DAY_MS))
 }
@@ -26,7 +25,6 @@ export function weekBefore(week: RewindWeek): RewindWeek {
     return rewindWeekStarting(new Date(Date.parse(week.from) - 7 * DAY_MS))
 }
 
-// `weekStart` is a `YYYY-MM-DD` Monday; the returned instant is the exclusive end of that week.
 export function weekEndOf(weekStart: string): string {
     return new Date(Date.parse(`${weekStart}T00:00:00.000Z`) + 7 * DAY_MS).toISOString()
 }

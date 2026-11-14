@@ -1,29 +1,9 @@
 "$schema" = "https://conductor.build/schemas/settings.repo.schema.json"
 
 [scripts]
-# The team's checkout clones the private `cloud/` next to the code when it has access to it (a contributor
-# without it gets the open source build, and a visible warning rather than a failed setup), then runs
-# cloud/'s own setup steps when they are there: joining the tailnet, linking the Supabase project,
-# starting on the production profile. Each of them is allowed to fail, so a workspace without
-# credentials still finishes its setup.
-#
-# `cloud/` is a pnpm workspace of its own: the root `postinstall` installs it after the root, since its
-# packages link to the dependencies of `apps/ui`, and puts in place the links of `cloud/links.txt`.
-#
-# `@rerun/contracts` resolves to its gitignored `dist/`, so the UI and the engine fail on "Can't resolve
-# '@rerun/contracts'" until it is built.
 setup = "([ -e cloud/.git ] || git clone -q \"$(git remote get-url origin | sed -E 's#/rerun(\\.git)?$#/rerun-cloud.git#')\" cloud || echo 'WARNING: cloud/ was not cloned. Without access to rerun-cloud this is the open source build; with access, fix git auth and rerun the setup.' >&2) && ([ ! -f cloud/conductor/tailscale-up.sh ] || bash cloud/conductor/tailscale-up.sh setup) && pnpm install --force && pnpm build:contracts && (pnpm cloud db:link || true) && (pnpm cloud env:prod || true)"
 run_mode = "concurrent"
 
-# Cloud workspaces only: on the Mac the actions live in `.conductor/settings.local.toml` of the main
-# checkout, which also carries the personal prompts and the cloud MCP keys. `CONDUCTOR_PORT` does not
-# exist in the cloud, hence the fixed ports: ui 3050, landing 3049, admin 3052, emails 3053, docs 3333.
-#
-# A cloud workspace is shown ready while its setup still runs `pnpm install`: every action that needs
-# the dependencies goes through `wait-for-setup.sh`, or it fails on `Command "next" not found`.
-#
-# Each server action first runs `free-port.sh` on its ports: a server left over from an earlier run
-# or from `pnpm verify:ui` would otherwise make it die on EADDRINUSE.
 [scripts.run.ui]
 available_in = [ "cloud" ]
 command = "bash .conductor/wait-for-setup.sh && bash .conductor/free-port.sh 3050 && pnpm --filter rerun exec next dev -p 3050"

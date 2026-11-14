@@ -14,7 +14,6 @@ const MAX_EXACT = 100
 const SKIPPED_DIRS = new Set(['node_modules', '.git'])
 export const SKIM_NOTE = 'A page is good for an overview and can be wrong about one random value in four without saying so. Read the file for any exact value.'
 
-// Off unless the coworker's page switch says so; nothing sets it yet. The registry adds the tool only when this is true.
 export function skimPagesEnabled(agent: LoadedAgent): boolean {
     return agent.config.pages?.skim === true
 }
@@ -94,7 +93,6 @@ export function skimPagesTools(ctx: RunContext): ToolSet {
                 if (!Number.isInteger(page) || page < 1 || page > pages.length) throw new Error(`page must be from 1 to ${pages.length}, got ${page}`)
                 ctx.screenshots ??= createScreenshotStore()
                 const screenshotId = ctx.screenshots.add({ image: Buffer.from(pages[page - 1]!.png), mediaType: 'image/png' })
-                // The ids and numbers come from the source text of the requested page, never from the picture.
                 const perPage = Math.ceil(text.length / pages.length)
                 const exact = exactValues(text.slice((page - 1) * perPage, page * perPage))
                 return { screenshotId, page, pages: pages.length, exact, ...(tree === undefined ? {} : { tree }), note: SKIM_NOTE }

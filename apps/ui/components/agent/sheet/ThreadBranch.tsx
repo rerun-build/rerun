@@ -21,7 +21,6 @@ export function threadStateOf(status: SessionStatus): ThreadState {
     return 'done'
 }
 
-/** The same tones as the branches of a `call_agent` delegation (`SubRunTree`), plus orange for a thread waiting on us. */
 const BRANCH_TONE: Record<ThreadState, string> = {
     live: 'border-brand/70',
     needs: 'border-orange-400/70',
@@ -38,8 +37,6 @@ const THREAD_STRIPES_INK = 'color-mix(in oklab, var(--foreground) 6%, transparen
 
 const isAutomated = (thread: ThreadRow) => thread.source === 'schedule' || thread.source === 'trigger'
 
-// What stands in for the opening message when the hub never saw one: a run the engine started, a
-// coworker's request, or a thread older than the column that keeps it.
 function genericOpener(thread: ThreadRow, originAgentName: string | null, t: ReturnType<typeof useTranslations<'agent.threadBranch.opener'>>): string {
     if (thread.source === 'schedule') return t('schedule', { name: thread.automationName ?? thread.title })
     if (thread.source === 'trigger') return t('trigger', { name: thread.automationName ?? thread.title })
@@ -47,12 +44,6 @@ function genericOpener(thread: ThreadRow, originAgentName: string | null, t: Ret
     return t('started')
 }
 
-/**
- * A thread in General: the message it opened with, in a small bubble, and under it the thread's
- * row, joined by a curve that leaves the bubble's bottom like a delegation's branches in
- * `SubRunTree`. The row is hatched rather than filled, so it never reads as one more bubble, and a
- * click on it opens the thread in its tab.
- */
 export function ThreadBranch({ thread, onOpen }: { thread: ThreadRow; onOpen: () => void }) {
     const t = useTranslations('agent.threadBranch')
     const tOpener = useTranslations('agent.threadBranch.opener')
@@ -64,14 +55,12 @@ export function ThreadBranch({ thread, onOpen }: { thread: ThreadRow; onOpen: ()
     const opener = thread.firstMessage ?? genericOpener(thread, originAgentName, tOpener)
     return (
         <div className="flex w-full flex-col gap-2" data-thread-row={thread.id}>
-            {/* The clamp sits on an inner span: on the padded box itself, a third line would show through the bottom padding. Its right padding keeps the overhang of a last italic glyph. */}
             <div className={cn('w-fit max-w-full rounded-2xl rounded-bl-md bg-muted px-3 py-1.5 text-xs text-foreground/80', !thread.firstMessage && 'text-muted-foreground italic')}>
                 <span className="line-clamp-2 pr-0.5 break-words">{opener}</span>
             </div>
             <div className="relative w-full pl-7">
                 <span aria-hidden className={cn('absolute -top-2 left-3.5 h-6 w-3 rounded-bl-md border-b border-l transition-colors duration-500', BRANCH_TONE[state])} />
                 <button type="button" onClick={onOpen} title={thread.automationName && thread.automationName !== thread.title ? thread.automationName : undefined} className="group relative flex h-8 max-w-full items-center gap-2 overflow-hidden rounded-lg border border-border px-2.5 text-left text-sm transition-colors hover:border-foreground/20 [&>:not(:first-child)]:relative">
-                    {/* Turned half a turn, the hatch keeps its slant and fades toward the title instead of the chevron. */}
                     <Stripes fade="right" color={THREAD_STRIPES_INK} band={4} period={8} className="rotate-180 opacity-60 transition-opacity group-hover:opacity-100" />
                     {state === 'live' && <StateDot state="live" />}
                     {isAutomated(thread) && <SourceIcon aria-hidden className="size-3.5 shrink-0 text-muted-foreground" />}

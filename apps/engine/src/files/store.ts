@@ -62,14 +62,10 @@ export async function fileSize(root: string, rel: string): Promise<number> {
     return info.size
 }
 
-// Streamed rather than read whole: a video sent to the chat can weigh more than a 512 MB Box can hold.
 export async function readByteStream(root: string, rel: string, range?: ByteRange): Promise<ReadableStream<Uint8Array>> {
     return Readable.toWeb(createReadStream(await resolveWithinReal(root, rel), range)) as ReadableStream<Uint8Array>
 }
 
-// Written through a temp file for the same reason as `writeStream`: a disk that fills up mid-write
-// would otherwise leave a half-written file behind. A symlink is written through directly, since
-// renaming over it would replace the link instead of its target.
 export async function writeText(root: string, rel: string, content: string): Promise<void> {
     const target = await resolveWithinReal(root, rel)
     await mkdir(dirname(target), { recursive: true })
@@ -97,8 +93,6 @@ export async function writeBytes(root: string, rel: string, data: Uint8Array): P
     await writeFile(target, data)
 }
 
-// Written through a temp file rather than straight to `target`: an upload that is cut off midway,
-// or refused by the cap, would otherwise leave a truncated file that an agent reads as a whole one.
 export async function writeStream(root: string, rel: string, body: ReadableStream<Uint8Array>, maxBytes: number): Promise<number> {
     const target = await resolveWithinReal(root, rel)
     await mkdir(dirname(target), { recursive: true })
@@ -127,8 +121,6 @@ export async function writeStream(root: string, rel: string, body: ReadableStrea
     }
 }
 
-// `.`, `a/..` and the absolute root all resolve to the root itself, which `resolveWithinReal` lets
-// through. The link itself is what gets removed or moved, never what it points to.
 async function resolveBelow(root: string, rel: string, action: string): Promise<string> {
     const target = await resolveWithinReal(root, rel, { followLast: false })
     if (relative(root, target) === '') throw badRequest(`The root folder cannot be ${action}`)

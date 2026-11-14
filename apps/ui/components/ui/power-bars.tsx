@@ -2,15 +2,12 @@ import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
 type PowerBarsProps = {
-    // Capability rating on a 1..max scale. Undefined/0 renders nothing.
     power?: number
     max?: number
     size?: 'sm' | 'md'
     className?: string
 }
 
-// Ascending signal-style bars showing a model's relative power. The first `power`
-// bars are filled; the rest are faint. Bar heights grow left-to-right.
 export function PowerBars({ power, max = 6, size = 'sm', className }: PowerBarsProps) {
     const t = useTranslations('ui')
     if (!power) return null

@@ -20,7 +20,6 @@ afterEach(() => {
         try {
             closeSync(fd)
         } catch {
-            // closed by the engine
         }
         fd = null
     }

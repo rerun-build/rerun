@@ -136,7 +136,6 @@ export async function recordGoalVerdict(agentId: string, id: string, verdict: Go
         .where(and(eq(runs.id, id), eq(runs.goalState, 'running')))
 }
 
-// A goal still running when its run ends was never checked against a final answer.
 const goalUnchecked = sql`CASE WHEN ${runs.goalState} = 'running' THEN 'unchecked' ELSE ${runs.goalState} END`
 
 export async function bumpRunStep(agentId: string, id: string, stepCount: number): Promise<void> {
@@ -146,7 +145,6 @@ export async function bumpRunStep(agentId: string, id: string, stepCount: number
 
 export type RunLivePatch = { stepCount: number; usage?: { inputTokens?: number; outputTokens?: number; totalTokens?: number; reasoningTokens?: number; cachedInputTokens?: number } }
 
-// Live progress write. Guarded on status so a late flush can never touch a settled row.
 export async function updateRunLive(agentId: string, id: string, { stepCount, usage }: RunLivePatch): Promise<void> {
     const { db } = await getSystemDb(agentId)
     const set: Partial<RunRow> = { stepCount }
@@ -189,8 +187,6 @@ export async function cancelRun(agentId: string, id: string): Promise<void> {
 
 export type InterruptedRun = { id: string; sessionId: string; triggerSource: string | null; triggerSlug: string | null; startedAt: string }
 
-// Returns the rows it repaired rather than a count: a run interrupted mid-flight also left a
-// conversation stuck on the hub, and only these ids can tell it the run is over.
 export async function failInterruptedRuns(agentId: string): Promise<InterruptedRun[]> {
     const { db } = await getSystemDb(agentId)
     const stale = await db

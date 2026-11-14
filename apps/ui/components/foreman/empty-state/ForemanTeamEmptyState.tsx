@@ -10,9 +10,6 @@ import { BookOpenIcon, CalendarClockIcon, LayersIcon, WandSparklesIcon, type Luc
 import type { TeamEmptyStateAction, TeamEmptyStateModel, TeamEmptyStateRow, TeamPulse } from '@/lib/foreman/team-empty-state'
 import { cn } from '@/lib/utils'
 
-// The float window bottoms out at 360×420: in a column that short, the orb, the subtitle, the pulse
-// and the row descriptions go before anything you can press. Measured on the size container the
-// scroller of the conversation sets, padding of the stack included.
 const SHORT_HIDDEN = '[@container(max-height:460px)]:hidden'
 const SHORT_ROW = '[@container(max-height:460px)]:py-1.5'
 const SHORT_STACK = '[@container(max-height:460px)]:gap-2 [@container(max-height:460px)]:p-0'

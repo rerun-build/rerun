@@ -7,18 +7,13 @@ import * as engine from '@/lib/engine/client'
 import type { BrainPageSummary, BrainPageType, BrainProposal, BrainRevision } from '@rerun/contracts'
 import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal } from '@/lib/i18n/action-error'
 
-// A box that predates the brain answers 404 on every /brain route: the dialog shows an "update
-// your box" state rather than an error.
 const isMissingRoute = (err: unknown) => err instanceof engine.EngineRequestError && err.status === 404
 
-// Every write names a person in the page history; the engine has no users of its own.
 async function authorContext() {
     const ctx = await requireWorkspaceContext()
     return { conn: await getWorkspaceConnection(ctx.workspace.id), author: `user:${ctx.userEmail ?? ctx.userId}` }
 }
 
-// A workspace gets its machine when its first coworker is built: until then, an onboarding user who
-// opens the Brain reaches a workspace with nowhere to keep it.
 export type BrainOverview = { available: true; pages: BrainPageSummary[]; openProposals: number } | { available: false; reason: 'no_machine' | 'outdated' }
 
 export async function loadBrainAction(): Promise<BrainOverview> {
@@ -101,8 +96,6 @@ export async function listBrainProposalsAction(): Promise<BrainProposal[]> {
     }
 }
 
-// Polled from the workspace menu, so it never throws: no box, an old box or a box that is down
-// all read as nothing to review.
 export async function countBrainProposalsAction(): Promise<number> {
     try {
         return await engine.countBrainProposals(await requireWorkspaceConnection())

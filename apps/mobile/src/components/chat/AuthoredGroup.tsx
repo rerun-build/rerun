@@ -13,7 +13,6 @@ import { brand, fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 const SIZE = 28
 const NAMED_FOR_MS = 1800
 
-// The web's `CardAvatar` tints: the initials sit on one of five, hashed from the name.
 const TINTS = [brand.base, '#0891b2', '#16a34a', '#ea580c', '#db2777']
 
 const firstNameOf = (author: AuthorProfile) => (author.id === FORMER_MEMBER.id ? author.name : author.name.split(' ')[0])
@@ -44,11 +43,6 @@ export function AuthorAvatar({ author, size = SIZE }: { author: AuthorProfile; s
     )
 }
 
-/**
- * The web's `AuthoredGroup`: consecutive messages one person sent, signed once by their avatar at the
- * foot of the group. A `null` author is one not resolved yet: the avatar's place is held so the
- * bubbles never shift. A long press on the avatar names them, the web's hover tooltip.
- */
 export function AuthoredGroup({ author, children }: { author: AuthorProfile | null; children: ReactNode }) {
     const theme = useTheme()
     const [named, setNamed] = useState(false)

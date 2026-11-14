@@ -4,7 +4,6 @@ import { SupabaseClient } from '@supabase/supabase-js'
 export type TableName = keyof Database['public']['Tables']
 export type TableRow<T extends TableName> = Database['public']['Tables'][T]['Row']
 
-// A bare null is not a valid filter: PostgREST needs `is.null`, so use `{ isNull: true }`.
 export type FilterValue<T> =
     | T
     | T[]
@@ -20,8 +19,6 @@ export type FilterValue<T> =
     | { notNull: true }
     | { isNull: true }
 
-// Columns listed inside `or` are combined with OR (the rest of the filters stay ANDed), e.g.
-// `{ enabled: true, or: { name: { ilike }, slug: { ilike } } }` → enabled AND (name OR slug).
 export type OrFilters<T extends TableName> = {
     [K in keyof TableRow<T>]?: FilterValue<TableRow<T>[K]>
 }
@@ -32,32 +29,26 @@ export type Filters<T extends TableName> = {
     or?: OrFilters<T>
 }
 
-// Types pour les jointures
 export type JoinConfig<TJ extends TableName, Cols extends readonly (keyof TableRow<TJ>)[]> = {
     table: TJ
     foreignKey: string
     columns: Cols
 }
 
-// Type final avec jointures typées
 export type WithJoins<T extends TableName, J extends Record<string, JoinConfig<any, any>> = Record<string, never>> = Pick<TableRow<T>, keyof TableRow<T>> & {
     [K in keyof J]: J[K] extends JoinConfig<infer TJ, infer Cols> ? Pick<TableRow<TJ>, Cols[number]> : never
 }
 
-// Type pour les filtres de jointures
 export type JoinFilters<J extends Record<string, JoinConfig<any, any>>> = {
     [K in keyof J]?: J[K] extends JoinConfig<infer TJ, any> ? Filters<TJ> : never
 }
 
-// Wrap a value for a PostgREST filter string, quoting when it holds characters that would
-// otherwise break the `or=(...)` grammar (comma, parentheses, dot, quotes, whitespace).
 function quoteOrValue(v: unknown): string {
     const s = String(v)
     if (!/[,.()"\s]/.test(s)) return s
     return `"${s.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
 }
 
-// Turn one column filter into a PostgREST condition string for use inside `.or(...)`.
 function orCondition(column: string, value: unknown): string {
     if (Array.isArray(value)) return `${column}.in.(${value.map(quoteOrValue).join(',')})`
     if (value !== null && typeof value === 'object') {
@@ -89,11 +80,8 @@ function applyFilters<T extends TableName>(query: any, filters: Filters<T>) {
         }
 
         if (Array.isArray(value)) {
-            // Support direct array as IN clause
             query = query.in(key, value)
         } else if (typeof value === 'object' && value !== null) {
-            // Support object-based filters. The range bounds are applied independently, so
-            // `{ gte, lte }` keeps both ends instead of silently dropping the second one.
             if ('gt' in value) query = query.gt(key, value.gt)
             if ('gte' in value) query = query.gte(key, value.gte)
             if ('lt' in value) query = query.lt(key, value.lt)
@@ -115,7 +103,6 @@ function applyFilters<T extends TableName>(query: any, filters: Filters<T>) {
                 query = query.is(key, null)
             }
         } else {
-            // Simple equality
             query = query.eq(key, value)
         }
     }
@@ -131,7 +118,6 @@ function applyJoinFilters<J extends Record<string, JoinConfig<any, any>>>(joinSe
 
         if (!filters || Object.keys(filters).length === 0) return selection
 
-        // Construire les filtres pour cette jointure
         const filterParts: string[] = []
         for (const [key, value] of Object.entries(filters)) {
             if (value === undefined) continue
@@ -163,11 +149,9 @@ function applyJoinFilters<J extends Record<string, JoinConfig<any, any>>>(joinSe
             }
         }
 
-        // Ajouter les filtres à la sélection avec !inner pour forcer une jointure interne
         if (filterParts.length > 0) {
             const [tablePart, columnsPart] = rest.split('(')
             const columns = columnsPart.replace(')', '')
-            // Syntaxe PostgREST correcte pour les filtres de relation
             return `${alias}:${tablePart}!inner(${columns}).${filterParts.join('.')}`
         }
 
@@ -231,7 +215,6 @@ export async function selectAll<T extends TableName, K extends keyof TableRow<T>
 
         allData.push(...data)
 
-        // Si on a moins que la limite, on a tout récupéré
         if (data.length < limit) break
 
         offset += limit
@@ -240,8 +223,6 @@ export async function selectAll<T extends TableName, K extends keyof TableRow<T>
     return { data: allData, error: null }
 }
 
-// `*` by default: a head count selects nothing, and a table without an `id` column (workspace_members,
-// services, ...) answers an error on `id` that every caller would read as a count of zero.
 export async function selectCount<T extends TableName>(supabase: SupabaseClient<Database>, table: T, filters: Filters<T>, column: string = '*') {
     let query = supabase.from(table).select(column, { count: 'exact', head: true })
     query = applyFilters(query, filters)
@@ -250,13 +231,9 @@ export async function selectCount<T extends TableName>(supabase: SupabaseClient<
     return { data: count as number | null, error }
 }
 
-// ===== FONCTIONS AVEC JOINTURES =====
-
 export async function selectSingleWithJoins<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[], J extends Record<string, JoinConfig<any, any>>>(supabase: SupabaseClient<Database>, table: T, selection: S, joins: J, filters: Filters<T>, joinFilters?: JoinFilters<J>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }) {
-    // Construire la sélection avec jointures
     let joinSelections = Object.entries(joins).map(([alias, config]) => `${alias}:${config.foreignKey}(${Array.isArray(config.columns) ? config.columns.join(',') : config.columns})`)
 
-    // Appliquer les filtres de jointures
     joinSelections = applyJoinFilters(joinSelections, joins, joinFilters)
 
     const fullSelection = [...selection, ...joinSelections].join(',')
@@ -273,10 +250,8 @@ export async function selectSingleWithJoins<T extends TableName, K extends keyof
 }
 
 export async function selectMaybeSingleWithJoins<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[], J extends Record<string, JoinConfig<any, any>>>(supabase: SupabaseClient<Database>, table: T, selection: S, joins: J, filters: Filters<T>, joinFilters?: JoinFilters<J>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }) {
-    // Construire la sélection avec jointures
     let joinSelections = Object.entries(joins).map(([alias, config]) => `${alias}:${config.foreignKey}(${Array.isArray(config.columns) ? config.columns.join(',') : config.columns})`)
 
-    // Appliquer les filtres de jointures
     joinSelections = applyJoinFilters(joinSelections, joins, joinFilters)
 
     const fullSelection = [...selection, ...joinSelections].join(',')
@@ -293,10 +268,8 @@ export async function selectMaybeSingleWithJoins<T extends TableName, K extends 
 }
 
 export async function selectManyWithJoins<T extends TableName, K extends keyof TableRow<T>, S extends readonly K[], J extends Record<string, JoinConfig<any, any>>>(supabase: SupabaseClient<Database>, table: T, selection: S, joins: J, filters: Filters<T>, joinFilters?: JoinFilters<J>, orderBy?: { column: keyof TableRow<T>; ascending?: boolean }, limit?: number, offset?: number) {
-    // Construire la sélection avec jointures
     let joinSelections = Object.entries(joins).map(([alias, config]) => `${alias}:${config.foreignKey}(${Array.isArray(config.columns) ? config.columns.join(',') : config.columns})`)
 
-    // Appliquer les filtres de jointures
     joinSelections = applyJoinFilters(joinSelections, joins, joinFilters)
 
     const fullSelection = [...selection, ...joinSelections].join(',')
@@ -304,7 +277,6 @@ export async function selectManyWithJoins<T extends TableName, K extends keyof T
     let query = supabase.from(table).select(fullSelection)
     query = applyFilters(query, filters)
 
-    // Appliquer les filtres de jointures directement sur la requête
     if (joinFilters) {
         for (const [joinAlias, joinFilter] of Object.entries(joinFilters)) {
             for (const [column, value] of Object.entries(joinFilter)) {

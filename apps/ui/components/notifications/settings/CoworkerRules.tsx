@@ -28,7 +28,6 @@ type CoworkerRulesProps = {
     coworkers: CoworkerOption[]
     rules: Record<string, CoworkerRule>
     onChange: (agentId: string, rule: CoworkerRule) => void
-    /** Listed even while it has no rule of its own, and scrolled into view. */
     pinnedId?: string | null
     renderPicker: (props: CoworkerPickerProps) => ReactNode
 }

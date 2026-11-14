@@ -7,7 +7,7 @@ from test_intake import OK1, OK2, plan
 from test_ready_start import Eng, T0
 
 
-class Client(ghclient.Client):  # fakegh has no ref or pulls routes: those two answers are set by the test
+class Client(ghclient.Client):
     merged = False
     def branch_sha(self, branch): return "basesha"
     def pr_by_head(self, branch): return {"number": 5, "state": "open", "merged": self.merged, "merge_sha": None}
@@ -34,10 +34,10 @@ class E2EJob(unittest.TestCase):
                 try:
                     self.assertEqual(R.intake_issue(r.st, gh, "o/r", 71)[1], [])
                     r.tick()
-                    self.assertEqual([x["chunk"] for x in r.st.running()], ["A1"])  # A2 waits for A1
+                    self.assertEqual([x["chunk"] for x in r.st.running()], ["A1"])
                     eng.runs["run1"]["status"] = "done"
                     r.tick()
-                    self.assertEqual(applied, ["DIFF"])  # patch came from the pushed chunk branch
+                    self.assertEqual(applied, ["DIFF"])
                     self.assertIn("published:A1", r.st.get_all("71"))
                     gh.merged = True
                     r.tick(); r.tick()

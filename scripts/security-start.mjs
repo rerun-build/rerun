@@ -1,15 +1,9 @@
 #!/usr/bin/env node
-// Turns the current workspace into the private workspace of a vulnerability fix. It opens a draft
-// GitHub security advisory (or takes an existing one, a private report for instance) and its
-// temporary private fork, then, in this worktree only: adds the fork as a remote, makes it the push
-// target, and breaks the push URL of `origin`, so that nothing of the fix reaches the public
-// repository before the advisory is published. Usage in .claude/skills/security-fix/SKILL.md.
 
 import { execFileSync, spawnSync } from 'node:child_process'
 
 const PUBLIC_REPO = 'rerun-build/rerun'
 const PUBLIC_URL = /github\.com[:/]rerun-build\/rerun(\.git)?\/?$/i
-// Not a URL git can reach: a push to origin fails here, even with --no-verify.
 const BLOCKED_PUSH_URL = 'no-push://this-workspace-holds-a-vulnerability-fix-push-to-the-advisory-fork'
 const SEVERITIES = ['low', 'medium', 'high', 'critical']
 const FORK_READY_ATTEMPTS = 30
@@ -95,13 +89,11 @@ function forkCloneUrl(fullName, originUrl) {
     return usesSsh ? `git@github.com:${fullName}.git` : `https://github.com/${fullName}.git`
 }
 
-// The fork of an existing advisory comes back without clone_url, the one just created with it.
 function privateFork(advisory, originUrl) {
     const fork = advisory.private_fork ?? ghApi('POST', `repos/${PUBLIC_REPO}/security-advisories/${advisory.ghsa_id}/forks`)
     return { ...fork, clone_url: forkCloneUrl(fork.full_name, originUrl) }
 }
 
-// Exit code 2 means the repository exists but has no branch yet, 128 covers every other failure.
 function probeFork(cloneUrl) {
     const probe = spawnSync('git', ['ls-remote', '--exit-code', '--heads', cloneUrl], { encoding: 'utf8', stdio: ['ignore', 'ignore', 'pipe'] })
     return { status: probe.status, stderr: (probe.stderr ?? '').trim() }

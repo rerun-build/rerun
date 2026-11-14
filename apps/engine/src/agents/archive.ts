@@ -27,20 +27,10 @@ import { buildCommit } from '../runtime/build-info.js'
 import { badRequest } from '../lib/errors.js'
 import { readRegistry, type RegistryEntry, type ServiceRegistry } from '../services/registry.js'
 
-// An allowlist, not a denylist: anything an agent folder gains later stays out of the archive
-// until someone adds it here on purpose. The goal is a copy as complete as the original, so what
-// stays out is only what cannot travel without carrying someone's credentials or history:
-// `mcp/` (OAuth bundles) and `data/system.db` (transcripts, tool-call arguments, telemetry).
-// `data/agent.db` is the agent's own tables, built by its db_* tools, so it is behaviour.
-// `triggers/` travels redacted: a webhook is behaviour, its token is not, so the file ships with
-// an empty one and the receiving engine mints a URL of its own.
 export const ARCHIVE_ROOTS = ['SOUL.md', 'INSTALL.md', 'config.json', '.env', 'skills', 'schedules', 'triggers', 'workspace', 'memory', 'data/agent.db'] as const
 
 const SKIP_DIRS = new Set(['node_modules', '.git', '__pycache__', '.venv', 'venv', '.next', 'dist', '.cache', '.pytest_cache', '.turbo'])
 
-// Archived memories are the ones the decay sweep already retired; `listMemoryFiles` hides them
-// from the agent too. Paid answers are data the workspace bought (emails, phones), and saved pages
-// what it read, not behaviour.
 const SKIP_PATHS = new Set(['memory/archive', 'workspace/.rerun/paid-data', 'workspace/.rerun/pages'])
 
 const ENV_PATH = '.env'
@@ -51,10 +41,6 @@ const REGISTRY_PATH = 'workspace/.rerun/services.json'
 const AGENT_DB_PATH = 'data/agent.db'
 export const MANIFEST_PATH = '.rerun-capture.json'
 
-// Re-provisioned by the engine that receives the copy. An empty value would be worse than an
-// absent one: `claude-token.ts` reads these back and would try to refresh a blank token. The
-// provider credentials moved to box connections, so an agent should no longer carry them at all —
-// they stay listed for an archive taken from a box that has not migrated yet.
 const ENGINE_MANAGED_KEYS = new Set<string>([...CONNECTION_ENV_KEYS, 'RERUN_API_KEY', 'RERUN_HUB_BASE_URL'])
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024
@@ -63,8 +49,6 @@ const MAX_SCAN_BYTES = 1024 * 1024
 
 export const ARCHIVE_LIMITS = { maxFileBytes: MAX_FILE_BYTES, maxTotalBytes: MAX_TOTAL_BYTES }
 
-// Any `${...}` span, `${agent.id}` included, which the engine's own resolver would reject for its
-// dot. Removing them is how a value gets judged on what is left, not on what it references.
 const PLACEHOLDER = /\$\{[^}]*\}/g
 const LONG_TOKEN = /[A-Za-z0-9_-]{24,}/
 
@@ -94,8 +78,6 @@ async function walk(root: string, prefix: string, out: string[]): Promise<void> 
     }
 }
 
-// Generalised over the roots because duplication walks a wider set than a capture does: a copy
-// staying on the box keeps its `mcp/` OAuth bundles, which no archive may ever carry.
 export async function listPathsUnder(id: string, roots: readonly string[]): Promise<string[]> {
     const root = agentDir(id)
     const paths: string[] = []
@@ -116,19 +98,11 @@ function sanitizeVar(value: string): string {
     return value.replace(/[^A-Za-z0-9_]/g, '_').toUpperCase()
 }
 
-// `mcp_register` and PATCH /agents/:id/mcp-servers both accept a literal value where the UI
-// compiler would have written a `${VAR}` reference, so config.json has to be treated as
-// secret-bearing rather than trusted. What it must NOT do is break a value that only references:
-// `Bearer ${RERUN_SVC_X_KEY}` is the shape the compiler emits and the shape the engine's resolver
-// expects, so the judgement is made on the residue once every `${...}` is out.
 export function scrubConfig(config: AgentConfig, agentId?: string): { config: AgentConfig; strippedKeys: string[] } {
     const strippedKeys: string[] = []
 
     const scrubValue = (server: McpServer, field: 'env' | 'headers', key: string, value: string): string => {
         if (!value) return value
-        // The compiler writes the source agent id into a header so a managed proxy knows who is
-        // calling. Not a secret, but not transferable either: hand back the `${agent.id}` token
-        // the compiler substitutes at install time.
         const rewritten = agentId ? value.replaceAll(agentId, '${agent.id}') : value
         const residue = rewritten.replace(PLACEHOLDER, '').trim()
         if (!residue || (!LONG_TOKEN.test(residue) && scanTextForSecrets(residue).length === 0)) return rewritten
@@ -148,16 +122,9 @@ export function scrubConfig(config: AgentConfig, agentId?: string): { config: Ag
         headers: scrubRecord(server, 'headers', server.headers),
     }))
 
-    // A connection id means nothing on the box that receives the copy. `provider` and `model` are
-    // left alone because the capture review reads them off the plan, not because the copy runs on
-    // them: the import drops all three and starts the copy on the receiving box's default.
     return { config: { ...config, mcpServers, connectionId: null }, strippedKeys }
 }
 
-// The copy holds each connector's shape but neither its secrets nor its tokens, so leaving an
-// entry `active` would have the agent claim tools it cannot reach. Account labels and emails name
-// the original owner's accounts, not the ones the copy will connect, so a label that is one of
-// them goes too; an ordinal label ("Gmail 2") stays, it is what tells two accounts apart.
 function redactRegistry(registry: ServiceRegistry): { content: string; reason: string } {
     const services: Record<string, RegistryEntry> = {}
     let reset = 0
@@ -178,7 +145,6 @@ function withoutKey<T extends object>(value: T, omitted: string): T {
     return Object.fromEntries(Object.entries(value).filter(([key]) => key !== omitted)) as T
 }
 
-// The catalog apps the agent uses, one per app however many accounts it holds.
 export function registryConnectorSlugs(registry: ServiceRegistry | null): string[] {
     return [...new Set(Object.keys(registry?.services ?? {}).map(key => parseServiceRegistryKey(key).slug))].sort()
 }
@@ -217,8 +183,6 @@ export async function mcpAuthServers(id: string, registry: ServiceRegistry | nul
 
 type Redaction = { content: string; reason: string }
 
-// One place decides what a redacted file contains, so the plan sizes and scans exactly the bytes
-// the tarball will carry. Returns null for a file that travels untouched.
 async function redactionFor(id: string, path: string, agent: LoadedAgent): Promise<Redaction | null> {
     if (path === ENV_PATH) {
         const keys = Object.keys(agent.env)
@@ -239,8 +203,6 @@ async function redactionFor(id: string, path: string, agent: LoadedAgent): Promi
 
     if (path.startsWith(TRIGGERS_PREFIX)) {
         const slug = path.slice(TRIGGERS_PREFIX.length).replace(/\.md$/, '')
-        // A file the loader would not read back is not a trigger: it travels as it is rather than
-        // being rewritten from a parse that never happened.
         if (!isSafeTriggerSlug(slug) || !path.endsWith('.md')) return null
         return { content: redactTriggerForArchive(await readTrigger(id, slug)), reason: 'webhook secret dropped, the copy is issued a URL of its own' }
     }
@@ -298,8 +260,6 @@ export async function planArchive(id: string, exclude: string[] = []): Promise<A
     let memoryCount = 0
 
     for (const { path, bytes, redaction } of await resolveEntries(id, agent, exclude)) {
-        // A redacted file is ours: it is scanned on the bytes we rewrote and never flagged on its
-        // path, or `.env` would come back unchecked right after we emptied it.
         const flagged = redaction ? scanTextForSecrets(redaction.content) : [...scanPathForSecrets(path), ...(await scanFile(root, path, bytes))]
         if (path.startsWith('memory/')) memoryCount += 1
         if (redaction?.reason) redactions.push({ path, reason: redaction.reason })
@@ -344,10 +304,6 @@ export async function planArchive(id: string, exclude: string[] = []): Promise<A
     }
 }
 
-// Staged into a temp directory rather than tarred straight out of the agent folder: the archive
-// carries redacted bytes for `.env`, `config.json` and the connector registry, and tar reads entry
-// contents from disk. Staging also means a run in flight cannot mutate a file halfway through the
-// stream.
 async function stageArchive(id: string, agent: LoadedAgent, exclude: string[]): Promise<{ staging: string; entries: ResolvedEntry[] }> {
     const root = agentDir(id)
     await checkpointAgentDb(id)
@@ -365,8 +321,6 @@ async function stageArchive(id: string, agent: LoadedAgent, exclude: string[]): 
 
     const keep = new Set(entries.map(entry => entry.path))
 
-    // Every ancestor of a kept file, so the filter can answer "descend into this directory?"
-    // without scanning the whole list per entry.
     const keepDirs = new Set<string>()
     for (const path of keep) {
         const parts = path.split('/')
@@ -389,16 +343,12 @@ async function stageArchive(id: string, agent: LoadedAgent, exclude: string[]): 
     return { staging, entries }
 }
 
-// Written to a file rather than piped straight out: tar returns a Minipass stream, not a
-// node stream.Readable, and the response needs a real one. It also gives an exact byte size.
 export async function buildArchive(id: string, exclude: string[] = []): Promise<{ stream: Readable; bytes: number }> {
     const agent = await getAgent(id)
     const { staging, entries } = await stageArchive(id, agent, exclude)
     const tarball = resolve(staging, '..', `${id}-${Date.now()}.tar.gz`)
 
     try {
-        // The archive has to say what was done to it: a copy read months later cannot re-derive
-        // which keys it is missing or which connectors were never authorized.
         const manifest = {
             version: 1,
             sourceAgentId: id,

@@ -16,8 +16,6 @@ async function latestConversationId(ctx: WorkspaceContext, agentId: string): Pro
     return sessions?.[0]?.id ?? null
 }
 
-// What the button reads to know it was already pressed: a lead that has a conversation has started
-// its install, on this device or another, today or weeks ago.
 export async function readLeadInstallAction(agentId: string): Promise<{ conversationId: string | null }> {
     try {
         const ctx = await requireWorkspaceContext()
@@ -28,9 +26,6 @@ export async function readLeadInstallAction(agentId: string): Promise<{ conversa
     }
 }
 
-// The button the Foreman leaves under the build: the lead's install runs only once the user asks
-// for it. A press that lands on a lead already started opens the conversation it runs in rather
-// than a second install beside it.
 export async function startLeadSetupAction(agentId: string): Promise<StartLeadSetupResult> {
     try {
         const ctx = await requireWorkspaceContext()

@@ -8,8 +8,6 @@ import { fonts, radius, spacing, withAlpha } from '@/theme/tokens'
 
 export type StartedBy = { agentId: string | null; name: string }
 
-// The web's header over a conversation another coworker opened (AgentSheetChat): who started it,
-// so the first message does not read as the person's own.
 export function StartedByBanner({ startedBy }: { startedBy: StartedBy }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.origins')

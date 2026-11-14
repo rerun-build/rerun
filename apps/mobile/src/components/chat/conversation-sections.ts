@@ -3,8 +3,6 @@ import type { SystemSymbolIcon } from '@/components/ui/system-symbols'
 
 export type ConversationState = 'needs-you' | 'running' | 'new' | 'earlier'
 
-// `status` and `unseen` are absent for a hub older than them, and for the Foreman's tabs: such a
-// conversation falls into Earlier.
 type Stateful = { status?: SessionStatus; unseen?: boolean }
 
 export function stateOf({ status, unseen }: Stateful): ConversationState {
@@ -33,7 +31,6 @@ export function glyphOf(conversation: Stateful): SystemSymbolIcon | undefined {
     return undefined
 }
 
-// The sections that have a conversation, in the menu's order, and the rest, folded under Earlier.
 export function conversationSections<T extends Stateful>(conversations: T[]) {
     const sections = CONVERSATION_SECTIONS.map(section => ({ ...section, conversations: conversations.filter(conversation => stateOf(conversation) === section.state) })).filter(section => section.conversations.length > 0)
     const earlier = conversations.filter(conversation => stateOf(conversation) === 'earlier')

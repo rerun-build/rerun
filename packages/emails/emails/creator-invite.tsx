@@ -5,9 +5,6 @@ import { Button } from "../components/Button";
 import { emailTranslator, type EmailLocale } from "../i18n";
 import { theme, text } from "../theme";
 
-// One email for the whole program. `outreach` writes to someone whose listing we prefilled from
-// their public work and who never asked for anything, `application` answers someone who applied:
-// same link, same box, only the opening changes.
 export type CreatorInviteContext = "outreach" | "application";
 
 export interface CreatorInviteProps {
@@ -20,8 +17,6 @@ export interface CreatorInviteProps {
   locale?: EmailLocale;
 }
 
-// This one keeps the expert card as its visual: a portrait of the recipient's own listing beats
-// any generic illustration, so it gets no hero band.
 export default function CreatorInvite({
   firstName,
   joinUrl,

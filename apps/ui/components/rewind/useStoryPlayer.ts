@@ -3,7 +3,6 @@
 import { useMotionValue, type MotionValue } from 'motion/react'
 import { useCallback, useEffect, useState } from 'react'
 
-// Tapping back early in a slide goes to the previous one; later, it replays the current one.
 const RESTART_THRESHOLD = 0.15
 
 export type StoryPlayer = {
@@ -16,7 +15,6 @@ export type StoryPlayer = {
     setHeld: (held: boolean) => void
 }
 
-// The last slide never advances by itself: the story ends on it and waits for the viewer.
 export function useStoryPlayer(count: number, durationMs: number, startAt = 0): StoryPlayer {
     const [index, setIndex] = useState(Math.min(startAt, count - 1))
     const [held, setHeld] = useState(false)

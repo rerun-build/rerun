@@ -14,8 +14,6 @@ describe('the import scope', () => {
         expect([...IMPORT_TOOL_NAMES].filter(name => forbidden.test(name))).toEqual([])
     })
 
-    // Outside agents (Grok, OpenAI-based ones) refuse a tool whose description runs past 1,024
-    // characters, and an import key is precisely what those agents hold.
     it('keeps every import tool description within 1,024 characters', () => {
         expect(importToolDefs(ACCOUNT_TOOL_DEFS).filter(tool => tool.description.length > 1024).map(tool => tool.name)).toEqual([])
     })

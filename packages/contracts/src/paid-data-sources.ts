@@ -1,6 +1,3 @@
-// Where the data a coworker bought comes from, as the chat and the tables show it. Treg names the
-// route that served a call (`servedBy`, "<vendor>.<route>"): a vendor that owns its data is named,
-// a scraper or reseller is not, the platform the data was read from is shown instead.
 import { capabilityOfCall, isPaidDataCapability, isPaidDataTool, paidDataEntry, type PaidDataCapability, type PaidDataGroup } from './paid-data.js'
 import { stripBridgePrefix } from './chat-tool-name.js'
 import { parseHubOutput } from './tool-output.js'
@@ -9,8 +6,6 @@ export type PaidSource = { id: string; name: string; domain: string | null; kind
 
 type Brand = { name: string; domain: string }
 
-// Vendors whose own database answers the call. Any other vendor (crawl4ai, tikhub, anyapi…) only
-// fetches from a platform or resells another one, and is never shown.
 const DATA_VENDORS: Record<string, Brand> = {
     aiark: { name: 'AI Ark', domain: 'ai-ark.com' },
     apollo: { name: 'Apollo', domain: 'apollo.io' },
@@ -48,7 +43,6 @@ const DATA_VENDORS: Record<string, Brand> = {
     zerobounce: { name: 'ZeroBounce', domain: 'zerobounce.net' },
 }
 
-// Data read from a platform is shown under that platform, whoever fetched it.
 const PLATFORM_ORIGINS: Partial<Record<PaidDataGroup, Brand>> = {
     search: { name: 'Google', domain: 'google.com' },
     linkedin: { name: 'LinkedIn', domain: 'linkedin.com' },
@@ -67,7 +61,6 @@ const CAPABILITY_ORIGINS: Partial<Record<PaidDataCapability, Brand>> = {
     'ai-search.perplexity.answer': { name: 'Perplexity', domain: 'perplexity.ai' },
 }
 
-// Resellers whose whole catalog is read from one platform, whatever group the call belongs to.
 const VENDOR_ORIGINS: Record<string, Brand> = {
     enrichlayer: { name: 'LinkedIn', domain: 'linkedin.com' },
 }
@@ -84,14 +77,12 @@ export function paidDataSourceOf(capability: PaidDataCapability, servedBy: strin
     return brand ? { id: `vendor:${vendor}`, ...brand, kind: 'vendor' } : GENERIC_SOURCE
 }
 
-// The same, for a call the engine names by its raw capability string (the provenance index).
 export function paidDataSourceOfCall(capability: string, servedBy: string | null | undefined): PaidSource {
     return isPaidDataCapability(capability) ? paidDataSourceOf(capability, servedBy) : GENERIC_SOURCE
 }
 
 type PaidCallStatus = 'found' | 'nothing_found' | 'pending' | 'failed' | 'not_run'
 
-// What one call bought, kept small enough to survive the history trimming a big answer.
 export type PaidCallReceipt = { status: PaidCallStatus; servedBy: string | null; found: number; asked: number; verdict: string | null }
 
 type PaidCallOutputLike = {
@@ -112,7 +103,6 @@ function verdictOf(capability: PaidDataCapability, output: PaidCallOutputLike): 
     return asText(output.result?.verification?.verdict)?.toLowerCase() ?? null
 }
 
-// Null for an output that is not a paid data answer, or one the engine never ran.
 export function paidCallReceipt(capability: PaidDataCapability, params: Record<string, unknown> | undefined, rawOutput: unknown): PaidCallReceipt | null {
     const output = parseHubOutput<PaidCallOutputLike>(rawOutput)
     if (!output || typeof output !== 'object') return null
@@ -134,7 +124,6 @@ export function paidCallReceipt(capability: PaidDataCapability, params: Record<s
 export type PaidSourceLine = { source: PaidSource; capability: PaidDataCapability; label: string; found: number; asked: number }
 
 export type PaidTurnSources = {
-    // Each source once, in the order the coworker first used it.
     sources: PaidSource[]
     lines: PaidSourceLine[]
     emails: { checked: number; valid: number }
@@ -145,7 +134,6 @@ type MessageLike = { id: string; role: string; parts: readonly PartLike[] }
 
 const toolNameOf = (part: PartLike): string => stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
 
-// A call that was refused, failed or is still running bought nothing: only answered calls count.
 const COUNTED: ReadonlySet<PaidCallStatus> = new Set(['found', 'nothing_found'])
 
 type CountedCall = { capability: PaidDataCapability; receipt: PaidCallReceipt }
@@ -166,7 +154,6 @@ function countedCalls(parts: readonly PartLike[]): CountedCall[] {
 
 function sourcesOfParts(parts: readonly PartLike[]): PaidTurnSources | null {
     const calls = countedCalls(parts)
-    // A miss names no provider: it counts against whoever served the same capability in the turn.
     const servedSource = new Map<PaidDataCapability, PaidSource>()
     for (const { capability, receipt } of calls) {
         if (receipt.servedBy && !servedSource.has(capability)) servedSource.set(capability, paidDataSourceOf(capability, receipt.servedBy))
@@ -189,9 +176,6 @@ function sourcesOfParts(parts: readonly PartLike[]): PaidTurnSources | null {
     return sources.size ? { sources: [...sources.values()], lines: [...lines.values()], emails } : null
 }
 
-// The sources of each turn, keyed by the id of the turn's last assistant message: that is where the
-// chat shows them. A turn is everything since a user message, one assistant message live, several
-// once reloaded from the engine's history.
 export function paidDataSourcesByTurn(messages: readonly MessageLike[]): Map<string, PaidTurnSources> {
     const byTurn = new Map<string, PaidTurnSources>()
     let turn: PartLike[] = []

@@ -3,13 +3,9 @@ import type { SheetDetent } from '@/components/layout/useSheetResize'
 export const SIDE_PANEL_DEFAULT_WIDTH = 640
 export const SIDE_PANEL_MIN_WIDTH = 480
 export const SIDE_PANEL_MAX_WIDTH = 800
-/** Doit rester d'accord avec le `60vw` de la classe `max-w` de `SidePanel`. */
 export const SIDE_PANEL_MAX_VIEWPORT_RATIO = 0.6
-/** Le panneau flotte sur le board ; doit rester d'accord avec les `md:top-2 md:right-2 md:bottom-2` de `SidePanel`. */
 export const SIDE_PANEL_GAP = 8
 
-// Une seule largeur pour tous les panneaux latéraux ; la clé garde son ancien nom pour
-// ne pas réinitialiser celle que les utilisateurs ont déjà réglée sur le panneau agent.
 export const SIDE_PANEL_WIDTH_STORAGE_KEY = 'rerun-agent-panel-width'
 
 export function getSidePanelMaxWidth(viewportWidth: number): number {
@@ -49,7 +45,6 @@ export function saveSidePanelWidth(width: number, viewportWidth: number): number
 
 export const SIDE_PANEL_SHEET_DETENT_STORAGE_KEY = 'rerun:agent-sheet-detent'
 
-/** Sous `md` le panneau est une sheet : son contenu n'a pas de hauteur propre, elle s'ouvre au grand cran. */
 export function loadSidePanelSheetDetent(): SheetDetent {
     try {
         return localStorage.getItem(SIDE_PANEL_SHEET_DETENT_STORAGE_KEY) === 'medium' ? 'medium' : 'large'

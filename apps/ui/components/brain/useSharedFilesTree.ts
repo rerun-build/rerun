@@ -16,12 +16,9 @@ export type SharedFilesTree = {
     toggle: (dir: string) => void
     expand: (dir: string) => void
     refresh: (dir: string) => Promise<void>
-    // Every file listed so far, across the folders opened: what the page editor can cite.
     knownFiles: SharedFileRef[]
 }
 
-// The shared folder as the sidebar shows it: a tree loaded one folder at a time, when it is opened.
-// The folder view in the main panel reads the same listing, so a rename shows up in both at once.
 export function useSharedFilesTree(): SharedFilesTree {
     const [listings, setListings] = useState<Record<string, FileEntry[]>>({})
     const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set())

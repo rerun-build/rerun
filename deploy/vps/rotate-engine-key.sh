@@ -1,18 +1,4 @@
 #!/bin/sh
-# Replaces the key the app and the engine share: RERUN_ENGINE_API_KEY in .env (the engine gets it as
-# RERUN_API_KEY) and the engine's row in public.engine_pool, which is where the app reads it. App and
-# engine are stopped while it changes, then started and checked. Run from the clone:
-#   sudo sh deploy/vps/rotate-engine-key.sh check      shows what a rotation would find; changes nothing
-#                                                      (it runs the database step with a throwaway key and rolls it back)
-#   sudo sh deploy/vps/rotate-engine-key.sh rotate     new key in the database and .env, restart, verify
-#   sudo sh deploy/vps/rotate-engine-key.sh rollback   puts the previous key back the same way
-#   sudo sh deploy/vps/rotate-engine-key.sh finish     deletes the record of a finished rotation; rollback is then no longer possible
-# A rotation that stopped part-way is finished by running rotate again; it reuses the same new key.
-# How the key values travel: read from .env and from the record file .env.engine-key-rotation
-# (root-only, git-ignored) into shell variables; to the database only as COPY data on psql's standard
-# input, never in the SQL text; to curl only as a header on standard input (-H @-); written only to
-# .env (the set-env.sh writer) and the record file. No key is on any command line and none is printed:
-# every line prints names, counts and HTTP codes only.
 set -eu
 cd "$(dirname "$0")/../.."
 LC_ALL=C
@@ -28,15 +14,10 @@ DBM=none
 
 say() { printf '%s\n' "$*"; }
 
-# The key in .env: the last RERUN_ENGINE_API_KEY= line, one pair of surrounding quotes removed (as update.sh does).
 envkey() { sed -n 's/^RERUN_ENGINE_API_KEY=//p' .env 2>/dev/null | tail -n 1 | sed "s/^'\(.*\)'\$/\1/; s/^\"\(.*\)\"\$/\1/"; }
 
-# Acceptable: 32 or more of A-Z a-z 0-9 _ . ~ + / = - and nothing else (no blank, tab, quote or backslash).
 ok_key() { case "$1" in ''|*[!A-Za-z0-9_.~+/=-]*) return 1 ;; esac; [ "${#1}" -ge 32 ]; }
 
-# Same writer as set-env.sh: the value goes in single quotes, read by awk from the environment.
-# .env.tmp is written under the umask 077 set above, given the owner and mode of .env (--reference is GNU
-# coreutils, which the server has) and renamed over .env in one step, so .env is never left half written.
 put() {
     case "$2" in *"'"*) echo "The value of $1 contains a single quote, which .env cannot hold. Nothing changed for it."; return 0 ;; esac
     K="$1" V="$2" awk 'BEGIN { k = ENVIRON["K"]; line = k "=\047" ENVIRON["V"] "\047" }
@@ -45,7 +26,6 @@ put() {
         chown --reference=.env .env.tmp && chmod --reference=.env .env.tmp && mv -f .env.tmp .env
 }
 
-# The record file: OLD= and NEW= while a swap is in progress, PREVIOUS= once it finished.
 recval() { sed -n "s/^$1=//p" "$REC" 2>/dev/null | tail -n 1; }
 recstate() {
     if [ ! -f "$REC" ]; then echo absent
@@ -54,8 +34,6 @@ recstate() {
     else echo unreadable; fi
 }
 
-# Database access, SQL always on standard input. -e PGPASSWORD with no value makes docker take it from its own
-# environment, so the password is on no command line.
 psql_socket() { docker exec -i -u postgres "$DBC" psql -X -q -t -A -v ON_ERROR_STOP=1 -d postgres; }
 psql_local() { docker exec -i "$DBC" psql -X -q -t -A -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d postgres; }
 psql_password() { PGPASSWORD="$PW" docker exec -i -e PGPASSWORD "$DBC" psql -X -q -t -A -v ON_ERROR_STOP=1 -h 127.0.0.1 -U postgres -d postgres; }
@@ -72,14 +50,12 @@ pick_db() {
     return 1
 }
 
-# Opening lines of a program that needs the keys: they go in only as the one COPY data line.
 sql_keys() {
     printf '%s\n' "-- rotate-engine-key: $1" '\set VERBOSITY terse' 'begin;' \
         'create temp table k(old text, new text) on commit drop;' 'copy k from stdin;'
     printf '%s\t%s\n' "$KEY_FROM" "$KEY_TO"
     printf '%s\n' '\.'
 }
-# Prints rows_old|rows_new|tables. Changes nothing: it ends in rollback.
 sql_count() {
     sql_keys count
     cat <<'SQL'
@@ -90,9 +66,6 @@ select (select count(*) from public.engine_pool p join k on p.engine_api_key = k
 rollback;
 SQL
 }
-# One transaction: old to new when exactly one row holds old and none new; nothing when it is already done;
-# anything else aborts with the two counts (never a key) and psql exits non-zero. $1 names the program,
-# $2 ends it: "swap commit" is the change, "rehearse rollback" runs the very same statements and undoes them.
 sql_swap() {
     sql_keys "$1"
     cat <<'SQL'
@@ -112,8 +85,6 @@ select case when o = 0 and n = 1 then 'already' else 'swapped' end from s;
 SQL
     printf '%s\n' "$2;"
 }
-# Runs the database step for real and rolls it back, so a database that would refuse it says so before
-# anything is stopped. Prints one line; returns 1 when the step would fail.
 rehearse() {
     RES=$( { sql_swap rehearse rollback | db; } 2>&1 ) && RC=0 || RC=$?
     case "$RES" in *"$KEY_FROM"*|*"$KEY_TO"*) RES='(message withheld: it held a key)' ;; esac
@@ -127,7 +98,6 @@ rehearse() {
         *) say "db-rehearsal FAIL: no answer from the database step."; RES=''; return 1 ;; esac
     RES=''
 }
-# Sets ROWS_OLD ROWS_NEW TABLES from the count program; numbers and names only, else "error".
 counts() {
     C=$(sql_count | db 2>/dev/null) || C=''
     case "$C" in *'|'*'|'*) ;; *) C='error|error|error' ;; esac
@@ -138,7 +108,6 @@ counts() {
     case "$ROWS_OLD$ROWS_NEW" in ''|*[!0-9]*) ROWS_OLD=error ROWS_NEW=error ;; esac
     case "$TABLES" in *[!A-Za-z0-9_.,]*) TABLES=error ;; esac
 }
-# Prints triggers|publications: what else fires on or copies public.engine_pool. No key goes in.
 sql_info() {
     cat <<'SQL'
 -- rotate-engine-key: info
@@ -148,7 +117,6 @@ select coalesce((select string_agg(tgname::text, ',' order by tgname::text) from
         where schemaname = 'public' and tablename = 'engine_pool'), '');
 SQL
 }
-# Sets TRIGGERS PUBLICATIONS from the info program; names only, else "error".
 info() {
     C=$(sql_info | db 2>/dev/null) || C=''
     case "$C" in *'|'*) ;; *) C='error|error' ;; esac
@@ -158,7 +126,6 @@ info() {
     case "$PUBLICATIONS" in *[!A-Za-z0-9_,]*) PUBLICATIONS=error ;; esac
 }
 
-# HTTP code of a request made inside the engine container. With a key, the Bearer header goes on standard input.
 code() {
     KEY_H=$1
     shift
@@ -169,7 +136,6 @@ code() {
     fi
     KEY_H=''
 }
-# Asks again every POLL seconds for up to WAIT seconds, while a service may still be starting, until the code is $1.
 poll() {
     UNTIL=$1
     shift
@@ -186,8 +152,6 @@ expect() {
     if [ "$3" = "$2" ]; then say "$1 http=$3 ok"; else say "$1 http=${3:-none} FAIL (want $2)"; FAILS=$((FAILS + 1)); fi
 }
 
-# Starts app and engine, but only when .env holds exactly the expected, acceptable key: never an engine
-# with a blank or unknown key.
 up() {
     KEY_NOW=$(envkey)
     if ok_key "$KEY_NOW" && [ "$KEY_NOW" = "$1" ]; then
@@ -205,7 +169,6 @@ stopped_help() {
     exit 1
 }
 
-# Old to new, in this order: record, stop, database, .env, start, verify. Safe to run again after any stop.
 swap() {
     KEY_REC_BEFORE=$(cat "$REC" 2>/dev/null) || KEY_REC_BEFORE=''
     printf 'OLD=%s\nNEW=%s\n' "$KEY_FROM" "$KEY_TO" > "$REC"
@@ -218,14 +181,11 @@ swap() {
         say "db-swap gave no clean answer (exit $RC); counting the rows to see whether the change went in."
         printf '%s\n' "$RES" | grep '^ERROR' | head -n 3 || true
         RES=''
-        # The answer may be lost after the commit: the rows, not the exit code, say what happened.
         counts
         if [ "$ROWS_NEW" = 1 ] && [ "$ROWS_OLD" = 0 ]; then
             say "db-swap swapped (the database holds the new key; its answer was lost)"
         elif [ "$ROWS_OLD" = 1 ] && [ "$ROWS_NEW" = 0 ]; then
             say "db-swap FAIL: the database is unchanged."
-            # Nothing changed, so the record goes back to what it was: a stale in-progress record would make
-            # rotate and rollback expect keys that are in neither place.
             if [ -n "$KEY_REC_BEFORE" ]; then printf '%s\n' "$KEY_REC_BEFORE" > "$REC"; else rm -f "$REC"; fi
             KEY_REC_BEFORE=''
             say "record put back as it was before this run"
@@ -248,7 +208,6 @@ swap() {
     if [ "$KEY_NOW" = "$KEY_TO" ]; then
         say "env-key already new"
     elif [ "$KEY_NOW" = "$KEY_FROM" ]; then
-        # A failed write is caught by the re-read below, which leaves the containers stopped.
         put RERUN_ENGINE_API_KEY "$KEY_TO" || true
         if [ "$(envkey)" != "$KEY_TO" ]; then
             say "env-key FAIL: .env did not take the new key. App and engine are left STOPPED."
@@ -267,7 +226,6 @@ swap() {
     say "5/6 verify"
     FAILS=0
     HEALTH=$(poll 200 '' http://localhost:3000/health)
-    # The engine is reachable from outside the server: one that answers without a key is stopped before anything else.
     NOKEY=$(code '' http://localhost:3000/agents)
     case "$NOKEY" in
         ''|000|401) ;;
@@ -323,7 +281,6 @@ check() {
         counts
         say "db-tables-with-engine_api_key ${TABLES:-none}"
         say "db-rows-holding-current-key $ROWS_OLD (expect 1)"
-        # The database step itself, with a throwaway key that is kept nowhere, rolled back.
         KEY_TO=$(openssl rand -hex 32 2>/dev/null) || KEY_TO=''
         case "$KEY_TO" in *[!0-9a-f]*) KEY_TO='' ;; esac
         MINTED=${#KEY_TO}
@@ -348,7 +305,6 @@ check() {
     say "record $(recstate)"
 }
 
-# Deletes the record of a finished rotation, and only that: an in-progress record is what rotate and rollback need.
 finish() {
     STATE=$(recstate)
     if [ "$STATE" != finished ]; then
@@ -368,7 +324,6 @@ case "$MODE" in
     *) say "Usage: $ME check|rotate|rollback|finish"; exit 2 ;;
 esac
 
-# Everything that can refuse comes before the record is written and anything is stopped.
 KEY_CUR=$(envkey)
 STATE=$(recstate)
 if [ "$STATE" = unreadable ]; then
@@ -417,8 +372,6 @@ if ! pick_db; then
     exit 1
 fi
 say "db-access=$DBM"
-# Look before stopping anything: the database step is run and rolled back. The old key must be in exactly
-# one row (or the new one already is, when an earlier run got that far); anything else is refused here.
 if ! rehearse; then
     say "Nothing changed, nothing was stopped."
     say "Zero rows holding the old key most likely means the key in .env is quoted or written differently from the one in the database."

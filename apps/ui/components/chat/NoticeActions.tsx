@@ -8,17 +8,6 @@ import type { ReactNode } from 'react'
 
 export type NoticeAction = { key: string; leading: ReactNode; title: string; description: string; cta: string; variant?: 'default' | 'outline'; onClick: () => void }
 
-// The way out of a chat notice, as cells rather than a row of small buttons. "Switch model" sitting
-// in the corner was the only door to plugging in a Claude or ChatGPT plan, and nobody read it that
-// way: a cell has room for the icons of what it connects and a line saying what happens next.
-//
-// The cell itself is not the button. A whole clickable cell read as an info box, so the move is
-// carried by a real Button, the first one filled and the rest outlined, which also says which
-// way out the notice recommends.
-//
-// Two actions share the width and stack their text under the icon, the button closing the column;
-// a lone action would leave that layout half empty, so it lies down on one row instead, its button
-// dropping under the text when a narrow panel has no room for both.
 export function NoticeActions({ actions }: { actions: NoticeAction[] }) {
     if (actions.length === 0) return null
     const stacked = actions.length > 1

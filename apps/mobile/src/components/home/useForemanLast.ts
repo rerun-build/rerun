@@ -7,8 +7,6 @@ import { cachedForeman } from '@/data/local-cache'
 
 export type ForemanLast = { title: string | null; running: boolean }
 
-// What the Foreman's row on the Home says: the title of its last conversation, first as the phone
-// kept it, then as the hub tells it each time the Home comes back into view.
 export function useForemanLast(): ForemanLast {
     const { session, me } = useAuth()
     const accessToken = session?.access_token

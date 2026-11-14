@@ -3,18 +3,10 @@ import { generateText } from 'ai'
 import { hasOpenRouterKey, openrouter } from '@/lib/ai/openrouter'
 import { clampBoxNames } from '@/lib/onboarding/intake'
 
-// The teams of a company someone described in their own words under "Other", for which no hand
-// written list exists. The fast industry decision cannot answer this: it only picks one value out of
-// a fixed list, so this asks the small model the app already names coworkers with, on the same key.
-//
-// Nothing here throws. A null sends the caller back to the universal divisions.
-
 const TEAMS_MODEL = 'anthropic/claude-haiku-4.5'
 
-// The board is drawing while they answer the next question: past this, the universal divisions stay.
 const TIMEOUT_MS = 4000
 
-// "1. Product", "- Product", "**Product**" and "Product," all read as "Product".
 const LIST_MARK = /^\s*(?:[-*•]|\d+[.)])\s*/
 
 export async function proposeBoxNames(words: string): Promise<string[] | null> {

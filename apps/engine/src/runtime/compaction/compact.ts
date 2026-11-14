@@ -25,15 +25,12 @@ const SUMMARY_PREAMBLE =
 const SUMMARY_SYSTEM =
     'You compress a coworker conversation transcript into a dense handoff summary. Preserve facts, decisions, file paths, identifiers, command outputs, error messages, and anything needed to continue the work. Use these sections: Historical Task Snapshot, Completed Actions, Blocked / Open Issues, Pending User Asks. Be concise; drop pleasantries and redundant detail. Never invent information.'
 
-// A summary of a long history on a slow model takes minutes, so the ceiling is generous: it only has
-// to keep a provider that never answers from holding the run, which then goes on uncompacted.
 const COMPACTION_TIMEOUT_MS = 15 * 60 * 1000
 
 function partToText(part: unknown): string {
     if (typeof part === 'string') return part
     if (!part || typeof part !== 'object') return ''
     const p = part as Record<string, unknown>
-    // The memories recalled for a turn and its timestamp were context, not conversation.
     if (isContextPart(p)) return ''
     if (p.type === 'text' && typeof p.text === 'string') return p.text
     if (p.type === 'tool-call') return `→ called ${String(p.toolName)}(${JSON.stringify(p.input ?? {}).slice(0, 1000)})`
@@ -44,13 +41,6 @@ function partToText(part: unknown): string {
     return ''
 }
 
-/**
- * A turn the model reasoned through carries that reasoning in the row, but replaying it buys
- * nothing: a thought is only ever signed for the turn that produced it, and a turn cut short
- * persists one with no signature at all, which the provider then drops with a warning. The model
- * keeps its own thoughts in memory for the length of a multi-step turn, which is the only place
- * they are required.
- */
 export function withoutReasoning(message: ModelMessage): ModelMessage {
     if (!Array.isArray(message.content)) return message
     const content = message.content.filter(part => part.type !== 'reasoning')
@@ -89,8 +79,6 @@ async function summarizeMiddle(ctx: RunContext, override: ModelOverride | undefi
     }
 }
 
-// An OpenCode model OpenCode published after this build is only known to the live catalog, which
-// also has the fresher figure for the others.
 export function runContextWindow(model: string, provider: Provider, connection?: LoadedConnection | null): number | undefined {
     if (provider === 'opencode') return opencodeModel(model)?.contextWindow ?? modelContextWindow(model, provider)
     if (provider === 'custom') return customContextWindow(connection, model)

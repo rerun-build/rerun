@@ -4,8 +4,6 @@ import { logger } from '../lib/logger.js'
 import { chunkText } from './chunks.js'
 
 const PASS_LIMIT = 500
-// The hub being down shows as every call failing; stopping after a few spares a pass of 500
-// five-second timeouts.
 const MAX_CONSECUTIVE_FAILURES = 3
 
 let running: Promise<number> | null = null
@@ -28,7 +26,6 @@ async function embedPass(): Promise<{ embedded: number; hubDown: boolean }> {
             continue
         }
         failures = 0
-        // Guarded by the text hash: the page may have been rewritten while we were waiting on the hub.
         const updated = await client.execute({
             sql: 'UPDATE brain_chunks SET embedding = vector32(?) WHERE id = ? AND text_hash = ?',
             args: [`[${vector.join(',')}]`, String(row.id), String(row.text_hash)],
@@ -38,10 +35,6 @@ async function embedPass(): Promise<{ embedded: number; hubDown: boolean }> {
     return { embedded, hubDown: false }
 }
 
-// Writes never wait on the hub: chunks land without a vector, stay findable by keyword meanwhile,
-// and this fills them in behind. Single-flight, so a burst of writes runs one pass, then one more
-// if writes landed while it ran: a pass only sees the rows its first query found. Not when the hub
-// is down, though: the maintenance tick retries later.
 export function embedPendingChunks(): Promise<number> {
     if (running) {
         rerun = true

@@ -4,7 +4,6 @@ export function isAiStatusHubTool(name: string): name is 'rerun_credit' {
     return name === 'rerun_credit'
 }
 
-// This install sells no credit, so it has none to report.
 export async function readRerunCredit(_workspaceId: number): Promise<{ credit: HubRerunCredit | null }> {
     return { credit: null }
 }

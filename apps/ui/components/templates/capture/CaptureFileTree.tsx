@@ -47,7 +47,6 @@ function leavesOf(node: TreeNode, out: AgentArchiveEntry[] = []): AgentArchiveEn
     return out
 }
 
-// A folder is worth opening on arrival when it hides something the admin has to arbitrate.
 function pathsToFlagged(nodes: TreeNode[], open: Set<string> = new Set()): Set<string> {
     for (const node of nodes) {
         if (node.file) continue
@@ -111,7 +110,6 @@ function TreeRow({
         })
     }
 
-    // A half-kept folder resolves to "keep everything", so one click always has an obvious effect.
     function toggleSelf() {
         onToggle(
             leaves.map(file => file.path),

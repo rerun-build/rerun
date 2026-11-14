@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { isRecord } from "./record.js";
 
-// The one question of the settings: which runs are worth hearing about at all.
 export const NOTIFICATION_SCOPES = [
   "everything",
   "mine",
@@ -15,17 +14,12 @@ export const COWORKER_MODES = ["default", "everything", "muted"] as const;
 
 export type CoworkerMode = (typeof COWORKER_MODES)[number];
 
-// `follow` is left out until someone decides: an absent key is what lets the author of a scheduled
-// task, or the owner as a last resort, follow the coworker for them. An explicit `false` is a
-// « Stop following » and is never overridden.
 export type CoworkerRule = { mode: CoworkerMode; follow?: boolean };
 
 export const EMAIL_CATEGORIES = ["billing", "product"] as const;
 
 export type EmailCategory = (typeof EMAIL_CATEGORIES)[number];
 
-// Stored as jsonb in `users.email_notification_prefs`. A row without `version: 2` is the old
-// channel × run type × kind matrix, which is not converted: it starts over on the recommended setting.
 export type NotificationPrefs = {
   version: 2;
   scope: NotificationScope;
@@ -33,8 +27,6 @@ export type NotificationPrefs = {
   sound: boolean;
   email: boolean;
   coworkers: Record<string, CoworkerRule>;
-  // « Notify me » on one scheduled task or trigger, keyed by `taskKey`. An absent key leaves the
-  // task to its coworker's follow.
   tasks: Record<string, boolean>;
   categories: Record<EmailCategory, boolean>;
 };
@@ -62,8 +54,6 @@ export function coworkerRuleOf(
 export const hasOwnRule = (rule: CoworkerRule) =>
   rule.mode !== "default" || rule.follow === true;
 
-// Back to the shared setting. A coworker that was followed keeps an explicit « stop following »,
-// otherwise the author of one of its scheduled tasks would be made to follow it again.
 export const resetRule = (rule: CoworkerRule): CoworkerRule =>
   rule.follow !== undefined
     ? { mode: "default", follow: false }
@@ -86,8 +76,6 @@ export function taskRuleOf(
   return prefs.tasks[taskKey(agentId, source!, slug)];
 }
 
-// What the « Notify me » switch of one task shows: its own rule when it has one, otherwise whatever
-// already makes its runs reach you. A muted coworker reaches no one, whatever its tasks say.
 export function taskNotifies(
   prefs: NotificationPrefs,
   agentId: string,
@@ -133,8 +121,6 @@ function anyKindOn(value: unknown): boolean {
   );
 }
 
-// A v1 email matrix with every kind off is someone who unsubscribed from run emails: that choice
-// survives the reset, the rest of the matrix does not.
 function unsubscribedFromRunEmails(raw: Record<string, unknown>): boolean {
   const channels = isRecord(raw.channels) ? raw.channels : null;
   return !!channels && isRecord(channels.email) && !anyKindOn(channels.email);
@@ -195,7 +181,6 @@ export function normalizeNotificationPrefs(value: unknown): NotificationPrefs {
   };
 }
 
-// A coworker rule is always sent whole: the merge replaces it by agent id.
 const coworkerRuleSchema = z.object({
   mode: z.enum(COWORKER_MODES),
   follow: z.boolean().optional(),
@@ -212,8 +197,6 @@ export const notificationPrefsSchema = z.object({
   categories: z.object({ billing: z.boolean(), product: z.boolean() }),
 });
 
-// Every write reads the current jsonb, merges the patch on top, and writes the full object back, so a
-// surface that only touches one field never clobbers the rest.
 export const notificationPrefsPatchSchema = z
   .object({
     scope: z.enum(NOTIFICATION_SCOPES),
@@ -221,7 +204,6 @@ export const notificationPrefsPatchSchema = z
     sound: z.boolean(),
     email: z.boolean(),
     coworkers: z.record(z.string(), coworkerRuleSchema),
-    // Null drops the key, back to the coworker's follow.
     tasks: z.record(z.string(), z.boolean().nullable()),
     categories: z
       .object({ billing: z.boolean(), product: z.boolean() })

@@ -15,8 +15,6 @@ skillProposalRoutes.get('/', async c => {
     return c.json({ proposals: rows.map(toSkillProposal) })
 })
 
-// Accepting answers before the writing is done: the job holds no session claim, opens no run and
-// appends no message, so nothing about it reaches the conversation.
 skillProposalRoutes.post('/:pid/accept', async c => {
     const agentId = c.req.param('id')!
     const pid = c.req.param('pid')!

@@ -1,11 +1,3 @@
-// Managed OAuth: the authorization-code + PKCE flow for a provider whose client is Rerun's
-// own (a single app, credentials in env), so the user never registers anything with the
-// provider. Runs on rerun.build because it has the TLS domain + registered redirect_uri the
-// raw-IP engine lacks. The resulting token is handed to the ENGINE token store (never
-// Supabase), exactly like lib/mcp-oauth.ts, but with a fixed client instead of discovery/DCR.
-//
-// Server-only. Import from route handlers.
-
 import type { ManagedOAuthConfig } from '@/lib/managed/types'
 import { base64url } from '@/lib/mcp-oauth'
 import { openContext, sealContext } from '@/lib/oauth/context-cookie'
@@ -14,18 +6,13 @@ import { createHash, randomBytes } from 'node:crypto'
 export const MANAGED_COOKIE_PREFIX = 'managed_oauth_'
 export const MANAGED_COOKIE_PATH = '/api/oauth/managed'
 
-// One-request PKCE + install context, round-tripped through an httpOnly cookie keyed by
-// `state` between /start and /callback. Holds no long-lived secret.
 export type ManagedOAuthContext = {
     verifier: string
     agentId: string
-    // Registry key of the entry being connected: the bare slug, or `<slug>@<instanceId>`.
     key: string
     provider: string
     serverName: string
     redirectUri: string
-    // Started from the iOS app: the callback redirects back into it instead of answering with the
-    // popup page, and reads the workspace from this signed grant since that browser has no session.
     mobileGrant?: string
 }
 
@@ -44,8 +31,6 @@ export function appOrigin(req: Request): string {
     return `${proto}://${host}`
 }
 
-// The redirect target, derived identically in /start and /callback so they always agree.
-// Must match a redirect URI registered on the provider's OAuth client.
 export function managedCallbackUrl(req: Request, provider: string): string {
     return `${appOrigin(req)}${MANAGED_COOKIE_PATH}/${provider}/callback`
 }

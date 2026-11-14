@@ -1,6 +1,5 @@
 import type { NotificationKind } from '@/lib/engine/types'
 
-/** The session status a notification leaves behind, which is what puts a row in the hub. A `done` leaves none: it is announced to whoever it reached, then gone. */
 export const ANNOUNCED_STATUS: Partial<Record<NotificationKind, string>> = {
     question: 'awaiting_question',
     approval: 'awaiting_approval',
@@ -13,9 +12,7 @@ export type AnnouncedNotification = {
     id: string
     agentId: string | null
     status: string
-    /** One line, as the hub row words it. */
     headline: string
-    /** The full markdown message. */
     message: string
     engineSessionId: string | null
     engineRunId: string | null
@@ -32,10 +29,6 @@ const BUNDLE_FROM = 2
 
 export type AnnouncerState = { cursor: number; bundled: number }
 
-/**
- * Moves past the arrival on show. Two or more waiting behind it are announced as one bundle
- * rather than played one after the other.
- */
 export function advance(state: AnnouncerState, total: number): AnnouncerState {
     if (state.cursor >= total) return state
     const next = state.cursor + 1

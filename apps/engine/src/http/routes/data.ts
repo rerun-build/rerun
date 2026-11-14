@@ -31,7 +31,6 @@ function toCsvValue(value: unknown): string {
     return str
 }
 
-// `sourceAgentIds` names the agents whose paid data calls the rows of this database can come from.
 export function createDataRouter(getClient: (c: Context) => Promise<Client>, hidden: string[] = [], sourceAgentIds?: (c: Context) => string[] | Promise<string[]>): Hono {
     const routes = new Hono()
 

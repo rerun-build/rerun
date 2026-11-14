@@ -1,9 +1,3 @@
-# A model stand-in for the factory dev engine: an OpenAI-chat server that answers with fixed text, so the
-# runner can be proven with no model connection and no spend. stub-fast answers at once; stub-hold streams
-# one chunk, then holds up to STUB_HOLD_SECONDS (default 1800, far above the 120 s run limit of the challenge-hold stage, so the runner cancels it first).
-#
-#   sudo docker compose -f deploy/vps/stub-model.yml up -d
-# In the dev engine, add a custom connection with base URL http://stub-model:8080/v1 and no key.
 name: rerun-dev
 
 services:

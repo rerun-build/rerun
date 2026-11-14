@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl'
 
 const renderMarkdown = (text: string) => <MessageResponse>{text}</MessageResponse>
 
-/** A settled or running thought on one line of the folded steps. */
 export function ReasoningStep({ text, isStreaming = false }: { text: string; isStreaming?: boolean }) {
     const t = useTranslations('chat.reasoning')
     return (

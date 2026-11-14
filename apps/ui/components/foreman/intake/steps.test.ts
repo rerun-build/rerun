@@ -62,8 +62,6 @@ describe('toIntake', () => {
         expect(toIntake({ ...EMPTY_DRAFT, industry: 'studio' }, null).industry).toBe('studio')
     })
 
-    // Ce que la décision rapide a trouvé voyage à part de ce qu'ils ont coché : c'est ce que le
-    // board a dessiné, et le serveur doit pouvoir s'y rabattre quand la lecture complète échoue.
     it('carries the decided industry beside the picked one', () => {
         const intake = toIntake({ ...EMPTY_DRAFT, companyUrl: 'century21.fr' }, null, 'real-estate')
         expect(intake.industry).toBeNull()

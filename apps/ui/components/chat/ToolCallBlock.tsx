@@ -36,7 +36,6 @@ export function toolStatusOf(state: ToolState): ToolCallStatus {
 
 const hasDetails = ({ input, inputText, output, errorText }: ToolCallBlockProps) => Object.keys(argsOf(input) ?? {}).length > 0 || output !== undefined || !!inputText || !!errorText
 
-/** A tool call on one line of the folded steps: what it was called with, and the full exchange on click. */
 export function ToolCallStep(props: ToolCallBlockProps) {
     const tTools = useTranslations('tools')
     const { label, iconProps } = useToolDisplay(props.agentId)(props.toolName, props.input)

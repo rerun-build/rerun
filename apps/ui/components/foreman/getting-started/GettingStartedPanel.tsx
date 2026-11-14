@@ -123,10 +123,6 @@ function RewardNote({ title, description, className }: { title: string; descript
     )
 }
 
-/**
- * What finishing is worth. Only a trial wins days; a paid plan finishes on a plain "all set", and
- * has nothing dangled in front of it on the way.
- */
 export function GettingStartedReward({ progress, reward, className }: { progress: GettingStartedProgress; reward: Reward; className?: string }) {
     const t = useTranslations('foreman.gettingStarted.reward')
     const total = stepsOf(progress).length

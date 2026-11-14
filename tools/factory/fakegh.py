@@ -1,4 +1,3 @@
-"""Local fake GitHub REST server for tests: in-memory data, Link-header paging, records calls. Loopback only."""
 import json, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs

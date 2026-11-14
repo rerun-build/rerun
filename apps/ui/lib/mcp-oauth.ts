@@ -1,10 +1,3 @@
-// MCP OAuth (authorization-code + PKCE + Dynamic Client Registration), driven by the UI
-// because rerun.build has a domain + TLS the engine (raw IP) does not. The resulting token
-// is handed to the engine token store (apps/engine mcp-auth.ts) — never persisted in
-// Supabase. Mirrors the hand-rolled PKCE style of lib/engine/claude-oauth.ts.
-//
-// Server-only (uses node:crypto). Import from route handlers.
-
 import { assertPublicUrl, fetchPublic } from '@/lib/net/public-fetch'
 import { openContext, sealContext } from '@/lib/oauth/context-cookie'
 import { createHash, randomBytes } from 'node:crypto'
@@ -18,9 +11,6 @@ export function base64url(buf: Buffer): string {
 export const OAUTH_COOKIE_PREFIX = 'mcp_oauth_'
 export const OAUTH_COOKIE_PATH = '/api/mcp/oauth'
 
-// The one-request PKCE + provider context, round-tripped through an httpOnly cookie keyed
-// by `state` between /start and /callback. Holds no long-lived secret — just the PKCE
-// verifier and the endpoints/client needed to finish and later refresh.
 export type OAuthContext = {
     verifier: string
     agentId: string
@@ -30,8 +20,6 @@ export type OAuthContext = {
     clientId: string
     clientSecret?: string
     redirectUri: string
-    // Started from the iOS app: the callback redirects back into it instead of answering with the
-    // popup page, and reads the workspace from this signed grant since that browser has no session.
     mobileGrant?: string
 }
 
@@ -53,8 +41,6 @@ function appOrigin(req: Request): string {
     return `${proto}://${host}`
 }
 
-// The redirect_uri, derived identically in /discover (DCR), /start (authorize) and
-// /callback (exchange) so the three always agree.
 export function callbackUrl(req: Request): string {
     return `${appOrigin(req)}${OAUTH_COOKIE_PATH}/callback`
 }
@@ -69,10 +55,6 @@ async function fetchJson(url: string): Promise<Record<string, unknown> | null> {
     }
 }
 
-// RFC 8414 §3.1 / OIDC Discovery: when the authorization-server issuer has a path, the
-// well-known segment is inserted between host and path (path-aware), not appended after it.
-// A root issuer (no path) collapses to the plain well-known URL. Ordered most- to
-// least-specific so a path issuer like https://login.wrike.com/oauth2 resolves.
 function authServerMetadataUrls(issuer: string): string[] {
     const u = new URL(issuer)
     const path = trimSlash(u.pathname)
@@ -87,13 +69,8 @@ function authServerMetadataUrls(issuer: string): string[] {
     return urls
 }
 
-// No public suffix list here: a two-label parent like co.uk or com.au is caught by its shape instead.
 const TWO_LABEL_PUBLIC_SUFFIX = /^(?:co|com|net|org|gov|edu|ac)\.[a-z]{2}$/
 
-// A provider that hosts its MCP server on a subdomain (mcp.acme.com) often publishes the OAuth
-// metadata on the parent domain only, and skips the RFC 9728 protected-resource document that
-// would point there — Firecrawl's mcp.firecrawl.dev is served by www.firecrawl.dev. Walk the
-// labels up, stopping at the registrable domain.
 function parentOrigins(origin: string): string[] {
     const labels = new URL(origin).hostname.split('.')
     const origins: string[] = []
@@ -111,9 +88,6 @@ function registrableDomain(hostname: string): string {
     return TWO_LABEL_PUBLIC_SUFFIX.test(parent) ? labels.slice(-3).join('.') : parent
 }
 
-// The endpoints a metadata document names are where the person is sent and where the code goes.
-// They stay on the site of the server, or of the authorization server its protected-resource
-// document named: a document anyone can publish must not turn our redirect into a door to a third party.
 async function endpointOnSite(value: unknown, label: string, sites: URL[]): Promise<string> {
     if (typeof value !== 'string') throw new Error(`this server advertises no ${label}`)
     const parsed = await assertPublicUrl(value)
@@ -121,22 +95,15 @@ async function endpointOnSite(value: unknown, label: string, sites: URL[]): Prom
     return value
 }
 
-// Protected-resource metadata → authorization-server metadata. Falls back to treating the
-// MCP origin as the authorization server when no protected-resource document is published.
 export async function discoverAuthServer(mcpUrl: string): Promise<DiscoveredMetadata> {
     const url = await assertPublicUrl(mcpUrl)
     const origin = url.origin
-    // RFC 9728: the well-known segment is inserted before the resource path, so a server at
-    // /mcp publishes at /.well-known/oauth-protected-resource/mcp. Try that first, then root.
     const path = trimSlash(url.pathname)
     const prm =
         (path ? await fetchJson(`${origin}/.well-known/oauth-protected-resource${path}`) : null) ??
         (await fetchJson(`${origin}/.well-known/oauth-protected-resource`))
     const servers = prm?.authorization_servers as string[] | undefined
     const bases = servers?.length ? [servers[0]] : [origin, ...parentOrigins(origin)]
-    // RFC 9728: the protected resource lists the scopes it actually accepts. Prefer these over
-    // the authorization server's global scopes_supported, which may advertise scopes (or scope
-    // combinations) the resource rejects with invalid_scope at /authorize.
     const resourceScopes = Array.isArray(prm?.scopes_supported) ? (prm!.scopes_supported as string[]) : undefined
     let meta: Record<string, unknown> | null = null
     let foundAt: string | null = null
@@ -164,11 +131,6 @@ export async function discoverAuthServer(mcpUrl: string): Promise<DiscoveredMeta
     }
 }
 
-// Client ID Metadata Document (draft-ietf-oauth-client-id-metadata-document): the client_id is
-// this document's own HTTPS URL, which the authorization server dereferences to read our
-// registration. Used instead of Dynamic Client Registration for servers that advertise
-// client_id_metadata_document_supported and reject DCR for non-loopback (hosted) redirect URIs,
-// as Indeed's secure.indeed.com does.
 export function clientMetadataDocumentUrl(req: Request): string {
     return `${appOrigin(req)}${OAUTH_COOKIE_PATH}/client-metadata`
 }
@@ -185,7 +147,6 @@ export function clientMetadataDocument(req: Request): Record<string, unknown> {
     }
 }
 
-// Dynamic Client Registration (RFC 7591) as a public PKCE client.
 export async function registerClient(registrationEndpoint: string, redirectUri: string): Promise<ClientInfo> {
     const res = await fetchPublic(registrationEndpoint, {
         method: 'POST',
@@ -206,20 +167,11 @@ export async function registerClient(registrationEndpoint: string, redirectUri: 
 
 type PreRegisteredClient = { mcpOrigin: string; clientIdEnv: string; clientSecretEnv: string; engineRefreshes?: boolean }
 
-// For authorization servers offering neither DCR nor Client ID Metadata Documents, an OAuth app
-// registered by Rerun itself. Keyed on the MCP origin rather than the authorization server, so
-// another MCP server naming github.com as its issuer cannot borrow our app. Its secret never
-// reaches the browser or the context cookie, and reaches the engine token store only when the
-// provider's tokens expire and its token endpoint refuses a refresh without it.
 const PRE_REGISTERED_CLIENTS: PreRegisteredClient[] = [
-    // GitHub OAuth App tokens never expire, so the engine never needs the secret to refresh.
     { mcpOrigin: 'https://api.githubcopilot.com', clientIdEnv: 'RERUN_GITHUB_MCP_CLIENT_ID', clientSecretEnv: 'RERUN_GITHUB_MCP_CLIENT_SECRET' },
-    // Asana access tokens last one hour and its token endpoint only takes authenticated clients.
     { mcpOrigin: 'https://mcp.asana.com', clientIdEnv: 'RERUN_ASANA_MCP_CLIENT_ID', clientSecretEnv: 'RERUN_ASANA_MCP_CLIENT_SECRET', engineRefreshes: true },
 ]
 
-// Their registration endpoint answers every caller with one shared client and keeps its own
-// redirect URIs, echoing ours back without registering it: HeyGen hands out "HeyGen MCP Default".
 const CLIENT_METADATA_DOCUMENT_FIRST = ['https://mcp.heygen.com']
 
 function preRegisteredClient(mcpUrl: string): { clientId: string; clientSecret: string; engineRefreshes: boolean } | null {
@@ -242,16 +194,12 @@ export async function resolveClient(metadata: DiscoveredMetadata, mcpUrl: string
         try {
             return await registerClient(metadata.registrationEndpoint, callbackUrl(req))
         } catch (err) {
-            // Some servers (e.g. Indeed) restrict DCR to loopback redirect URIs and reject our
-            // hosted https callback. Fall back to a Client ID Metadata Document when advertised.
             if (!metadata.clientIdMetadataDocumentSupported) throw err
         }
     }
     return metadata.clientIdMetadataDocumentSupported ? { clientId: clientMetadataDocumentUrl(req) } : null
 }
 
-// Enough to name the client without a full context: the mobile claim only holds the MCP URL and
-// the client id of the parked bundle.
 type ClientRef = { mcpUrl: string; clientId?: string; clientSecret?: string }
 
 function clientSecret(ref: ClientRef, forEngine: boolean): string | undefined {
@@ -265,7 +213,6 @@ function clientSecretFor(ref: ClientRef): string | undefined {
     return clientSecret(ref, false)
 }
 
-// The secret the engine token store keeps to refresh on its own.
 export function engineClientSecret(ref: ClientRef): string | undefined {
     return clientSecret(ref, true)
 }

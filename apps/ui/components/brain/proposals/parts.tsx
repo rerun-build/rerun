@@ -19,14 +19,12 @@ import { Prose } from './Prose'
 
 const BUDDY_SIZE = 56
 
-// The coworker's mascot, the same block, colour and eyes as on the board, drawn from its id.
 export function CoworkerBuddy({ proposal }: { proposal: BrainProposal }) {
     return <AgentBuddy agentId={proposal.agentId} size={BUDDY_SIZE} animated={false} facing="right" />
 }
 
 const PAGE_TAG = 'inline-flex items-center gap-1 rounded-md border border-border bg-background px-1.5 py-0.5 text-xs font-medium text-foreground'
 
-// A new page has nothing to open yet.
 function PageTag({ proposal, onOpenPage }: { proposal: BrainProposal; onOpenPage: (slug: string) => void }) {
     const PageIcon = BRAIN_PAGE_ICONS[proposal.type]
     const content = (
@@ -121,7 +119,6 @@ export function Byline({ proposal, onOpenPage }: { proposal: BrainProposal; onOp
     )
 }
 
-// What the page says now, struck through in red, and what it will say once accepted, in green.
 export function FactChanges({ proposal }: { proposal: BrainProposal }) {
     if (!proposal.highlights.length) return <p className="text-sm">{proposal.reason}</p>
     return (

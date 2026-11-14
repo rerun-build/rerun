@@ -15,9 +15,6 @@ export function Button({ href, children }: ButtonProps) {
   );
 }
 
-// The design system's relief, flattened to the one shadow layer that survives: light from
-// above on the top edge, a drop below. Outlook desktop drops box-shadow entirely and renders
-// the flat white button, which is the same button one step down.
 const button: React.CSSProperties = {
   backgroundColor: theme.text.strong,
   borderRadius: "10px",

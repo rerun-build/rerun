@@ -44,8 +44,6 @@ describe('API key enforcement', () => {
         expect((await app.request('/nowhere', { headers: { authorization: 'Bearer k' } })).status).toBe(404)
     })
 
-    // The public trigger URL is proxied by the UI, which adds the key; the engine itself never
-    // serves an anonymous fire.
     it('guards the trigger fire endpoint too', async () => {
         const res = await app.request('/agents/someone/triggers/hook/fire', {
             method: 'POST',

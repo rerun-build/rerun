@@ -17,8 +17,6 @@ import { useSession } from '@/supabase/session/SessionProvider'
 import type { LibraryTemplate } from './library'
 import { useTemplateImportFlow } from './useTemplateImportFlow'
 
-// La porte que ce clic va franchir. `blocked` = rien à franchir, la template n'est pas installable.
-// `installed` = ses coworkers sont déjà sur le board : le clic les ouvre au lieu d'en poser d'autres.
 export type TemplateGate = 'plan' | 'purchase' | 'place' | 'installed' | 'blocked'
 
 export type TemplateStep = { label: string; caption: string; icon: LucideIcon }
@@ -27,22 +25,14 @@ export type TemplateCta = {
     gate: TemplateGate
     label: string
     note: string | null
-    // Ce que l'utilisateur va traverser, dans l'ordre, avant que ses agents soient sur le board.
-    // Vide quand un seul clic suffit : il n'y a rien à annoncer.
     steps: TemplateStep[]
     disabled: boolean
-    // Rendered as the button's title, so a disabled button still explains itself on hover.
     disabledReason: string | null
     pending: boolean
     run: () => void
     secondary?: { label: string; run: () => void }
 }
 
-// Installer une template, c'est franchir trois portes dans cet ordre : avoir un plan, posséder la
-// template, poser les agents. Chaque surface (la fiche d'un lien partagé, le panneau de la library)
-// pose la même question au même endroit, et chaque retour de Stripe rentre à nouveau dans l'échelle
-// plutôt que dans un chemin parallèle. Le libellé du bouton dit toujours la porte suivante, et
-// `steps` annonce d'avance celles qui restent derrière.
 export function useTemplateCta(template: LibraryTemplate, onDone: () => void): TemplateCta {
     const { workspace } = useSession()
     const isAdmin = useIsAdmin()
@@ -65,8 +55,6 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
 
     const placeLabel = t('place', { count })
 
-    // Un seul essai gratuit par workspace, avec ou sans carte selon le bras du test. Ici pour le
-    // libellé seulement : le serveur tranche au clic.
     const offer = trialOffer(workspace)
     const trialEligible = offer !== 'paid'
     const trialTerms = trialOfferLine(priceArm, offer, tTrial, locale)
@@ -84,44 +72,31 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
     const status = workspace?.subscription_status
     const entitled = isSubscriptionEntitled(status)
 
-    // Porte 1. Trial sans carte, Checkout carte ou facturation immédiate : c'est le serveur qui
-    // tranche (startPlan). La template est parkée AVANT : c'est la seule trace qui survive à
-    // l'aller-retour, et c'est elle que PostPaymentDialog relit au retour pour reprendre l'échelle
-    // là où elle s'est arrêtée.
     const startTrial = () => {
         useOnboardingStore.getState().setPendingTemplate({ slug: template.slug, title: template.title, agentCount: count, needsPlacement: true })
         startTransition(() => startPlan('template_cta'))
     }
 
-    // Porte 2.
     const buy = () => {
         track('template_purchase_started', { slug: template.slug, price_kind: template.pricing.model, amount_cents: template.pricing.amountCents })
         startTransition(async () => {
             const result = await startTemplateCheckoutAction(template.slug)
             if (!result.ok) {
-                // Le plan manquant ne devrait plus arriver ici (la porte 1 passe avant), mais le
-                // serveur reste l'autorité : s'il le dit, on repart par le trial.
                 if ('needsPlan' in result) startTrial()
                 else toast.error(errorText(result))
                 return
             }
-            // Free and already-owned come back from the server rather than being assumed here: the
-            // template may have been bought from another tab.
             if (result.outcome.kind === 'checkout') window.location.href = result.outcome.url
             else startImport(template)
         })
     }
 
-    // Porte 3.
     const use = () => startImport(template)
 
     if (count === 0) {
         return { gate: 'blocked', label: t('useTemplate'), note: t('nothingCaptured'), steps: [], disabled: true, disabledReason: null, pending: false, run: () => {} }
     }
 
-    // Les coworkers déjà posés s'ouvrent d'abord : une seconde équipe aux mêmes noms, chacune à
-    // installer de zéro, ne se pose que sur un « Install again » explicite. Un abonnement échu passe
-    // quand même, c'est lui qui rallume les coworkers déjà là.
     if (installed && (template.access !== 'lapsed' || isAdmin)) {
         return {
             gate: 'installed',
@@ -139,7 +114,6 @@ export function useTemplateCta(template: LibraryTemplate, onDone: () => void): T
         }
     }
 
-    // The sandbox has no plan and no card of its own, so it can hold a draft but never a purchase.
     if (paid && workspace?.is_sandbox && !template.isMine && !isAdmin) {
         return { gate: 'blocked', label: hireLabel, note: null, steps: [], disabled: true, disabledReason: t('sandboxCannotBuy'), pending: false, run: () => {} }
     }

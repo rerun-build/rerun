@@ -1,7 +1,5 @@
 import { CLAUDE_PATH, OPENAI_PATH } from '@/lib/engine/provider-icons'
 
-// The catalog has no tile icon for the two chat plans, so their brand marks are inlined, already
-// drawn for a dark tile (the tone filter only reads a catalog URL, never a data one).
 function inlineMark(svg: string) {
     return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }

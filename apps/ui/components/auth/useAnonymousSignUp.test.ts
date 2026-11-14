@@ -3,10 +3,6 @@ import { act, createElement, useState, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-// The account dialog mounts closed and only draws the form once opened. Turnstile draws its widget
-// into a container once, when the hook that owns it mounts: the widget must therefore be owned by
-// something rendered inside the form, never by the dialog itself.
-
 vi.mock('@/app/(authflow)/auth/actions', () => ({
     completeSignupAction: vi.fn(),
     prepareAnonymousEmailStep: vi.fn(),
@@ -49,7 +45,6 @@ let host: HTMLDivElement
 beforeEach(() => {
     process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = SITE_KEY
     ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
-    // The Cloudflare script is never fetched: appending it is what makes it "loaded".
     vi.spyOn(document.head, 'appendChild').mockImplementation(node => {
         window.turnstile = turnstile
         queueMicrotask(() => (node as HTMLScriptElement).onload?.(new Event('load')))
@@ -69,8 +64,6 @@ afterEach(async () => {
     vi.resetModules()
 })
 
-// Mounted closed, like SignInPill or ForemanHeader mount AuthDialog: the hook runs first, the form
-// shows up later.
 async function mountDialogLike(): Promise<(open: boolean) => Promise<void>> {
     const { useAnonymousSignUp } = await import('./useAnonymousSignUp')
     let setOpen: (open: boolean) => void = () => {}

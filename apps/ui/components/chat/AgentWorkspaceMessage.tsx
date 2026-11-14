@@ -87,12 +87,10 @@ const NO_MENTIONS: ComposerMention[] = []
 
 type AgentWorkspaceMessageProps = Omit<MessageResponseProps, 'allowedTags' | 'components' | 'remarkPlugins'> & {
     agentId?: string
-    /** Bare URLs read as their short label, and these `@agent` and `/skill` as their token, as they did in the composer. */
     composerTokens?: boolean
     mentions?: ComposerMention[]
 }
 
-/** Message markdown with in-app navigation for absolute agent workspace links. */
 export function AgentWorkspaceMessage({ agentId, composerTokens, mentions = NO_MENTIONS, ...props }: AgentWorkspaceMessageProps) {
     const remarkPlugins = useMemo(() => {
         const plugins: NonNullable<MessageResponseProps['remarkPlugins']> = [...Object.values(defaultRemarkPlugins)]

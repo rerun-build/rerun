@@ -19,12 +19,9 @@ const CONSEQUENCES = [
 ] as const
 
 export type DeleteAccountPanelProps = {
-    // Null while the account is being checked.
     blockers: AccountDeletionBlocker[] | null
-    // Billing opens on the workspace in hand, so only its own blocker gets the shortcut.
     currentWorkspaceId: number | null
     onOpenBilling: () => void
-    // Throws with the message to show when the account could not be deleted.
     deleteAccount: (confirmation: string) => Promise<void>
 }
 

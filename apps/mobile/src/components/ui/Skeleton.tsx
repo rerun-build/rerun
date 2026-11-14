@@ -5,8 +5,6 @@ import Animated, { Easing, cancelAnimation, useAnimatedStyle, useReducedMotion, 
 import { useTheme } from '@/theme/theme'
 import { radius } from '@/theme/tokens'
 
-// A block standing in for content still on its way. The shape is drawn by the caller, after the
-// layout it replaces.
 export function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
     const theme = useTheme()
     const reducedMotion = useReducedMotion()

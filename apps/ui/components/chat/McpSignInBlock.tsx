@@ -19,15 +19,11 @@ import { cn } from '@/lib/utils'
 
 type McpSignInBlockProps = McpSignInRequest & {
     agentId: string
-    // Sends the reply that resumes the run, once.
     onDone: (summary: string) => void
     onSkip: () => void
-    // Rendered in the thread rather than docked above the composer: no dock margin.
     inline?: boolean
 }
 
-// The sign-in an agent asks for after registering a server that answered 401: the user connects
-// here and the agent picks up on its own, the way a suggested app does.
 export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }: McpSignInBlockProps) {
     const t = useTranslations('chat')
     const tServices = useTranslations('services')
@@ -35,7 +31,6 @@ export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }
     const { statuses, loading } = useMcpServerStatuses(agentId)
     const [signIn, setSignIn] = useState<{ popup: Window | null } | null>(null)
     const [submitted, setSubmitted] = useState(false)
-    // An OAuth result can be delivered twice within one render, so the latch answering the agent is a ref.
     const submittedRef = useRef(false)
     const refetched = useRef(false)
 
@@ -43,7 +38,6 @@ export function McpSignInBlock({ agentId, name, reason, onDone, onSkip, inline }
     const status = statuses.get(name)
     const connected = status?.status === 'connected'
 
-    // The agent registered the server moments ago, so both stores can predate it.
     useEffect(() => {
         if (refetched.current || !connectors.loaded || loading || (server && status)) return
         refetched.current = true

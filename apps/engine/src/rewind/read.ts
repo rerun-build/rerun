@@ -14,7 +14,6 @@ function clip(text: string): string {
     return flat.length > OUTPUT_MAX_CHARS ? `${flat.slice(0, OUTPUT_MAX_CHARS)}…` : flat
 }
 
-// Every account of an app counts toward that app, whatever its registry key or server name.
 async function connectorSlugsByServer(agentId: string): Promise<Map<string, string>> {
     const registry = await readRegistry(agentId)
     const slugs = new Map<string, string>()

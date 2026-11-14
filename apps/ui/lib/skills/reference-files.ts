@@ -4,11 +4,6 @@ import type { EngineConnection } from '@/lib/engine/types'
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
 import { SKILL_ENTRY, isTextSkillFile } from './folder-import'
 
-// A skill is a folder, and the engine only ever returns the paths of the files it bundles. These
-// helpers put the rest of that folder within reach of a caller that has no filesystem: their size,
-// their content one at a time, and their removal — all through the files router the engine already
-// mounts on /agents/:id/skills/:slug/files.
-
 export const MAX_SKILL_FILE_CHARS = TEXT_FILE_PAGE_CHARS
 
 const MAX_LISTED_DIRECTORIES = 20
@@ -33,9 +28,6 @@ function directoryOf(path: string): string {
     return cut === -1 ? '.' : path.slice(0, cut)
 }
 
-// One listing per distinct directory rather than one stat per file: a skill keeps its references
-// side by side, so this is a call or two. A directory that fails to list costs the size of its
-// files, never the listing itself.
 export async function describeSkillFiles(conn: EngineConnection, agentId: string, slug: string, files: string[]): Promise<SkillFileInfo[]> {
     const base = skillFilesBase(agentId, slug)
     const directories = [...new Set(files.map(directoryOf))].slice(0, MAX_LISTED_DIRECTORIES)
@@ -76,17 +68,12 @@ export async function readSkillReferenceFile(conn: EngineConnection, agentId: st
         const totalChars = page.totalChars ?? (truncated ? null : offset + page.content.length)
         return { path: target, content: page.content, offset: page.offset ?? 0, nextOffset, totalChars, truncated }
     } catch (err) {
-        // The engine answers a missing file with a bare 500 from the filesystem, so the reason a
-        // read failed is worth stating as the caller can act on it rather than as a stack.
         const message = err instanceof Error ? err.message : 'unknown error'
         if (/failed: (404|500)/.test(message)) throw new Error(`No readable file "${target}" in skill "${slug}". Call get_skill to see the files it carries.`)
         throw new Error(`Could not read "${target}" in skill "${slug}": ${message}`)
     }
 }
 
-// Validation is separate from the deletions themselves so a caller can reject a bad path before
-// touching the skill: upsert_skill writes the body first, and a removal refused after that swap
-// would fail the call on a skill it had already changed.
 export function planSkillFileRemovals(paths: string[]): string[] {
     const targets: string[] = []
     for (const target of paths.map(normalizeSkillFilePath).filter(Boolean)) {

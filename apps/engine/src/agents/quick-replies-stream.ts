@@ -9,7 +9,6 @@ export type QuickRepliesCapture = { toolCallId: string; replies: string[] }
 
 export type QuickRepliesCaptureHandle = { middleware: LanguageModelMiddleware; read: () => QuickRepliesCapture | undefined }
 
-// A sub-agent answers another agent, and the foreman hands over its own next steps.
 export function offersQuickReplies(config: AgentConfig): boolean {
     return config.tools.quickReplies && !config.ephemeral && config.kind !== 'foreman'
 }
@@ -21,8 +20,6 @@ export function quickRepliesCall(capture: QuickRepliesCapture): { toolCallId: st
 const BULLET = /^(?:[-*•]|\d+[.)])\s+/
 const QUOTES = /^["'“”‘’«»\s]+|["'“”‘’«»\s]+$/g
 
-// The model is told the limits, but a reply over them must not sink the whole block as
-// `parseQuickReplies` would: the list is trimmed to what fits first.
 export function parseQuickRepliesBlock(body: string): string[] {
     const replies = body
         .split('\n')
@@ -38,9 +35,6 @@ const FENCE_OPENER = /^```[a-zA-Z]*(\n)?/
 const AFTER_CLOSE = /^\n?(?:```\n?)?/
 const CLOSERS = ['\n```\n', '```\n']
 
-// A suffix the stream has to hold back: whitespace that may be the gap before the block, then
-// what may be the start of the opening tag, bare or behind the code fence a model sometimes wraps
-// it in. Anything else is released at once.
 function couldStartBlock(suffix: string): boolean {
     const rest = suffix.replace(/^\s+/, '')
     if (rest === '' || QUICK_REPLIES_OPEN.startsWith(rest) || '```'.startsWith(rest)) return true
@@ -58,16 +52,11 @@ function holdbackLength(text: string): number {
     return 0
 }
 
-// Right after the closing tag, the line break and the fence a model may close the block with are
-// not part of the message either.
 const couldCloseFence = (text: string): boolean => CLOSERS.some(closer => closer.startsWith(text))
 
 type Mode = 'text' | 'block' | 'after'
 type BlockState = { pending: string; mode: Mode }
 
-// Cuts the block out of one text block of the stream, delta by delta. In text mode, everything
-// but a tail that could still turn into the tag goes out as it comes; once the tag opened, nothing
-// goes out until it closes or the text ends. The text after a closed block flows again.
 export class QuickRepliesSplitter {
     private readonly states = new Map<string, BlockState>()
 
@@ -171,9 +160,6 @@ export function createQuickRepliesCapture(): QuickRepliesCaptureHandle {
     return { middleware, read: () => (replies ? { toolCallId, replies } : undefined) }
 }
 
-// The call the old tool left in stored turns. A model that sees it imitates a call to a tool that
-// no longer exists, so the history the model reads goes without it; a turn that held nothing else
-// goes entirely.
 export function withoutQuickRepliesCalls(message: ModelMessage): ModelMessage | null {
     if (!Array.isArray(message.content)) return message
     const content = message.content.filter(part => {

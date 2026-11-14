@@ -28,8 +28,6 @@ export type TokenUsageChartProps = {
     chartType?: 'area' | 'bar' | 'donut' | 'stat'
     buckets: EngineUsageBucket[] | null
     className?: string
-    // Recharts draws itself over ~1.5s in JS, which no CSS lever stops: a screenshot taken while the
-    // area is still growing shows a half-drawn chart. Off for anything captured by rerun-shot.
     animated?: boolean
 }
 

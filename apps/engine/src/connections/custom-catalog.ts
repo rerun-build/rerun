@@ -22,8 +22,6 @@ function positiveNumber(value: unknown): number | null {
     return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : null
 }
 
-// The OpenAI shape is `{ data: [{ id }] }`; a few servers answer the bare array. The window comes
-// under whichever name the server family uses, and most say nothing.
 export function parseModelList(body: unknown): DiscoveredModel[] {
     const rows = Array.isArray(body) ? body : Array.isArray((body as { data?: unknown })?.data) ? (body as { data: unknown[] }).data : []
     const models: DiscoveredModel[] = []
@@ -86,8 +84,6 @@ function networkDetail(err: unknown): string {
 
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '0.0.0.0'])
 
-// `localhost` seen from an engine in a container is the container itself, and Ollama or LM Studio
-// listen on the machine around it. Docker names that machine `host.docker.internal`.
 export function candidateBaseUrls(baseUrl: string): string[] {
     const trimmed = trimBaseUrl(baseUrl)
     const url = new URL(trimmed)
@@ -96,8 +92,6 @@ export function candidateBaseUrls(baseUrl: string): string[] {
     return [trimmed, trimBaseUrl(url.toString())]
 }
 
-// The address the connection should store is the first one that answered at all: an endpoint that
-// turned the key away is reachable, and saying so beats calling it unreachable.
 export async function probeCustomEndpoint(input: CustomProbeInput): Promise<CustomProbeResult> {
     const apiKey = input.apiKey || undefined
     let unreachable: CustomProbeResult | null = null
@@ -126,8 +120,6 @@ function connectionKey(connection: LoadedConnection): string | undefined {
     return connection.env[CONNECTION_TOKEN_KEY.custom] || undefined
 }
 
-// A connection whose endpoint stopped answering keeps its last reading: its models still run the
-// moment the server is back, and a switched-off model must not vanish from the list meanwhile.
 export function refreshCustomCatalog(connection: LoadedConnection): Promise<void> {
     const running = inFlight.get(connection.id)
     if (running) return running
@@ -157,8 +149,6 @@ export function customDiscoveredModels(connectionId: string): DiscoveredModel[] 
     return readings.get(connectionId)?.models ?? null
 }
 
-// Synchronous on purpose, like the OpenCode catalog: compaction reads it mid-run. The endpoint's
-// own figure first, then what the owner typed, then a default so compaction always has a threshold.
 export function customContextWindow(connection: LoadedConnection | null | undefined, model: string): number {
     const listed = connection ? readings.get(connection.id)?.models.find(entry => entry.id === model)?.contextWindow : null
     return listed ?? connection?.config.contextWindow ?? CUSTOM_DEFAULT_CONTEXT_WINDOW

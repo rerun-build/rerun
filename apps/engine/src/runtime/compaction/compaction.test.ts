@@ -161,8 +161,6 @@ describe('modelContextWindow', () => {
         expect(modelContextWindow('claude-sonnet-5[1m]', 'claude')).toBe(1_000_000)
     })
 
-    // The session that could no longer be answered: ~421k tokens on codex/gpt-5.6-sol. The old
-    // 1_050_000 window put the trigger at 787_500 and compaction never ran.
     it('would have compacted the session that got stuck', () => {
         const window = modelContextWindow('gpt-5.6-sol', 'codex')!
         expect(421_000).toBeGreaterThan(window * COMPACTION_TRIGGER_RATIO)

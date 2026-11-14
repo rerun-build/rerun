@@ -8,7 +8,6 @@ afterEach(() => {
 
 describe('adminEmails', () => {
     it('reads the server list when the browser one was built empty', () => {
-        // An image built without the list bakes NEXT_PUBLIC_ADMIN_EMAILS in as '', not as missing.
         vi.stubEnv('NEXT_PUBLIC_ADMIN_EMAILS', '')
         vi.stubEnv('ADMIN_EMAILS', 'owner@example.com')
         expect(adminEmails()).toEqual(['owner@example.com'])

@@ -15,7 +15,6 @@ import { isPhoneCountry, toE164 } from '@/lib/phone/normalize'
 import { VERIFICATION_CODE_LENGTH, verificationLanguage, type VerificationChannel } from '@/lib/phone/verification'
 import { createClient } from '@/supabase/server'
 
-// `reason` is what the client reports to analytics, `error` what it shows.
 export type PhoneActionRefusal = ActionFailure & { reason: PhoneFailure; retryAfterSeconds?: number }
 export type PhoneActionResult = { ok: true } | PhoneActionRefusal
 export type PhoneSendActionResult = { ok: true; channel: VerificationChannel } | PhoneActionRefusal
@@ -41,7 +40,6 @@ const refused = (reason: PhoneFailure, retryAfterSeconds?: number): PhoneActionR
 
 const invalidNumber = () => refused('invalid_number')
 
-// The logs keep why a send was turned away, beside what Bird answered.
 function sendRefused(result: { error: PhoneFailure; retryAfterSeconds?: number }, { channel, country }: { channel: VerificationChannel; country: string }): PhoneActionRefusal {
     console.warn('[phone] send refused', result.error, channel, country)
     return refused(result.error, result.retryAfterSeconds)
@@ -61,7 +59,6 @@ export async function skipPhoneStepAction(): Promise<PhoneActionResult> {
     return (await skipPhoneVerification(userId)) ? { ok: true } : refused('unavailable')
 }
 
-// The phone wall's "Continue": the number is kept as typed, without a code.
 export async function savePhoneNumberAction(input: z.input<typeof numberSchema>): Promise<PhoneActionResult> {
     const parsed = numberSchema.safeParse(input)
     const phone = parsed.success ? signInPhone(parsed.data) : null
@@ -89,7 +86,6 @@ export async function sendPhoneSignInCodeAction(input: z.input<typeof signInSend
     return result.ok ? result : sendRefused(result, parsed.data)
 }
 
-// Signs the visitor into the account this number holds, or creates it.
 export async function verifyPhoneSignInCodeAction(input: z.input<typeof signInSchema>): Promise<PhoneSignInActionResult> {
     const parsed = signInSchema.safeParse(input)
     const phone = parsed.success ? signInPhone(parsed.data) : null
@@ -107,7 +103,6 @@ async function signedInAccount(): Promise<PhoneAccount | null> {
 
 const signInFirst = (): PhoneActionRefusal => ({ ...failure('signInToChangeNumber'), reason: 'signed_out' })
 
-// The number a signed-in account adds or moves to, from its account settings.
 export async function sendPhoneChangeCodeAction(input: z.input<typeof sendSchema>): Promise<PhoneSendActionResult> {
     const parsed = sendSchema.safeParse(input)
     const phone = parsed.success ? signInPhone(parsed.data) : null

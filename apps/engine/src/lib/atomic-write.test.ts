@@ -15,7 +15,6 @@ describe('writeFileAtomic', () => {
         expect(await readdir(dir)).toEqual(['file.md'])
     })
 
-    // A reader racing the writers sees one whole version or another, never an empty file.
     it('never exposes an empty file to a concurrent reader', async () => {
         const dir = mkdtempSync(resolve(tmpdir(), 'rerun-atomic-'))
         const path = resolve(dir, 'file.md')

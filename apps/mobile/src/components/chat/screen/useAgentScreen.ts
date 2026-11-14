@@ -10,8 +10,6 @@ const MIRROR_WIDTH = 480
 
 export type ScreenStatus = 'loading' | 'live' | 'error' | 'disconnected'
 
-// The latest copy of the screen, read by the floating thumbnail alone: eight frames a second through
-// React state would redraw the whole conversation each time.
 export type ScreenFrames = { subscribe: (listener: () => void) => () => void; current: () => string | null }
 
 function createFrames() {
@@ -41,26 +39,19 @@ function messageOf(data: string): { type?: unknown; uri?: unknown } {
 
 export type AgentScreen = {
     status: ScreenStatus
-    // The viewer page to load, once the hub gave a socket; the screen is live once it painted.
     uri: string | null
     attachWebView: (view: WebView<object> | null) => void
     onMessage: (event: WebViewMessageEvent) => void
     frames: ScreenFrames
-    // Copies of the screen for the floating thumbnail, only while it shows.
     mirror: (on: boolean) => void
 }
 
-// One connection's state, named by what opened it: a new one starts loading on the render that asks.
 type Connection = { key: string | null; status: ScreenStatus; uri: string | null }
 
-// The web's `useAgentScreen`: a connection to watch a coworker's screen, only while `enabled`. Its
-// ticket lives a minute, so a dropped socket is reopened with a fresh one, a few times, as the full
-// screen does.
 export function useAgentScreen(agentId: string, enabled: boolean): AgentScreen {
     const { session, me } = useAuth()
     const accessToken = session?.access_token ?? null
     const workspaceId = me?.workspace.id ?? null
-    // A refreshed token must not drop a screen that is already showing.
     const callerRef = useRef<{ accessToken: string; workspaceId: number } | null>(null)
     useEffect(() => {
         callerRef.current = accessToken && workspaceId !== null ? { accessToken, workspaceId } : null
@@ -89,7 +80,6 @@ export function useAgentScreen(agentId: string, enabled: boolean): AgentScreen {
         }
     }, [agentId, key, frames])
 
-    // Enabled again, the screen starts from a connection never seen: the last one's socket is gone.
     const [wasEnabled, setWasEnabled] = useState(enabled)
     if (wasEnabled !== enabled) {
         setWasEnabled(enabled)

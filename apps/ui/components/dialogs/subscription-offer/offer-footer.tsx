@@ -26,7 +26,6 @@ export function OfferFooter({ onBack, children }: { onBack?: () => void; childre
     )
 }
 
-// The decline sits apart from the ways in, on the far side of the footer.
 export function DeclineButton({ onClick }: { onClick: () => void }) {
     const t = useTranslations('dialogs.subscriptionOffer')
     return (

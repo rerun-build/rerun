@@ -15,10 +15,6 @@ const API_KEY_AUTH_COLUMNS = ['id', 'workspace_id', 'revoked_at', 'created_by_us
 
 export type ApiKeyScope = 'account' | 'agent_import'
 
-// `createdByUserId` is the member the key acts for: the key carries its creator's access (role and
-// Boxes), and signs what goes through it, who sent a message, who wrote a schedule. Null for a key
-// from before it was recorded, or one the back-office created: that key acts as the workspace.
-// `boundAgentId` is the coworker an import key has created, and the only one it may touch after.
 export type AuthenticatedApiKey = {
     keyId: string
     workspaceId: number
@@ -27,23 +23,18 @@ export type AuthenticatedApiKey = {
     boundAgentId: string | null
 }
 
-// Base64url over random bytes: URL-safe, header-safe, no ambiguity about encoding.
 export function generateApiKey(): string {
     return KEY_PREFIX + randomBytes(KEY_BYTES).toString('base64url')
 }
 
-// Only the hash is stored, so a database dump never yields a usable key.
 export function hashApiKey(key: string): string {
     return createHash('sha256').update(key).digest('hex')
 }
 
-// The fragment kept in clear so the admin list can tell two keys apart.
 export function apiKeyPrefix(key: string): string {
     return key.slice(0, DISPLAY_PREFIX_LENGTH)
 }
 
-// A key in use is a human at work, which is what keeps a sandbox from being archived as idle.
-// Throttled to one write an hour, like the heartbeat's, and as best-effort as the marker above.
 async function stampSandboxActivity(workspaceId: number): Promise<void> {
     try {
         const staleBefore = new Date(Date.now() - ACTIVITY_STAMP_INTERVAL_MS).toISOString()
@@ -67,7 +58,6 @@ export async function authenticateApiKey(token: string): Promise<AuthenticatedAp
     const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['subscription_status', 'is_sandbox'] as const, { id: data.workspace_id })
     if (!workspace || !isWorkspaceApiEntitled(workspace)) return null
 
-    // Best-effort freshness marker: never let it fail or slow down the call it authenticates.
     supabase
         .from('api_keys')
         .update<Database['public']['Tables']['api_keys']['Update']>({ last_used_at: new Date().toISOString() })
@@ -88,8 +78,6 @@ export async function authenticateApiKey(token: string): Promise<AuthenticatedAp
     }
 }
 
-// Conditional on the key still being unbound, so of two create_agent racing on one import key
-// only the first is kept: false tells the loser to undo the coworker it just created.
 export async function bindImportKey(keyId: string, agentId: string): Promise<boolean> {
     const { data, error } = await createServiceRoleClient()
         .from('api_keys')

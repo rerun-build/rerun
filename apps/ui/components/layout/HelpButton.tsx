@@ -14,8 +14,6 @@ import { useRef } from 'react'
 export function HelpButton() {
     const t = useTranslations('layout.help')
     const { session } = useSession()
-    // The menu hands focus back to its trigger as it closes, which the checklist popover would read
-    // as a click outside and close on the spot.
     const openingGettingStarted = useRef(false)
 
     return (

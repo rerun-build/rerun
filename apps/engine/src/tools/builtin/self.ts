@@ -27,9 +27,6 @@ import { mcpSignInTool } from './hitl.js'
 
 const run = promisify(execFile)
 
-// A server dialed with a key the user gave is not asking for a sign-in when it answers 401: it is
-// turning that key down, and only a new value will fix it. The key can sit in any field
-// resolveServerSecrets fills in.
 function serverCarriesCredential(server: McpServer): boolean {
     const holdsPlaceholder = (value: string | undefined) => value?.includes('${') === true
     return Object.keys(server.headers).length > 0 || holdsPlaceholder(server.url) || holdsPlaceholder(server.command) || server.args.some(holdsPlaceholder)

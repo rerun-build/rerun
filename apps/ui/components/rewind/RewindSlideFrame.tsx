@@ -17,8 +17,6 @@ const TONES: Record<RewindTone, { base: string; colors: string[]; shape: RewindB
     ink: { base: '#0a0a0a', colors: ['#4d34f7', '#3a3a3a', '#b7a8ff'], shape: 'dots' },
 }
 
-// `visual` is the slide's data: pinned to the bottom of a portrait card, beside the copy on a wide one.
-// `centered` stacks everything in the middle instead, for a slide that is all copy.
 export function RewindSlideFrame({ tone, eyebrow, children, visual, centered = false, className }: { tone: RewindTone; eyebrow?: string; children: ReactNode; visual?: ReactNode; centered?: boolean; className?: string }) {
     const palette = TONES[tone]
     const split = Boolean(visual) && !centered
@@ -26,7 +24,6 @@ export function RewindSlideFrame({ tone, eyebrow, children, visual, centered = f
     return (
         <div className="absolute inset-0 overflow-hidden text-white" style={{ background: palette.base }}>
             <RewindBackdrop base={palette.base} colors={palette.colors} shape={palette.shape} />
-            {/* Keeps white copy readable wherever the shader peaks: the headline sits in the top band, the data in the bottom one. */}
             <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-black/55 via-black/15 to-black/75 rewind-wide:bg-linear-to-r rewind-wide:from-black/65 rewind-wide:via-black/30 rewind-wide:to-black/45" />
             <div
                 className={cn(

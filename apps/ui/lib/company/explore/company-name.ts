@@ -11,8 +11,6 @@ const squash = (text: string) =>
         .toLowerCase()
         .replace(/[^a-z0-9]/g, '')
 
-// "Home | Acme", "Acme - Book a demo" and ". x X    Acme    X x ." all name Acme: the part that is
-// not boilerplate and overlaps the domain wins.
 export function nameFromTitle(title: string, domain: string): string | null {
     const label = squash(domainLabel(domain))
     const parts = title
@@ -23,8 +21,6 @@ export function nameFromTitle(title: string, domain: string): string | null {
     return parts.find(part => label.includes(squash(part)) || squash(part).includes(label)) ?? parts[0]
 }
 
-// The best name we have before the synthesis has read anything: what the site calls itself, then
-// the domain.
 export function companyNameGuess(input: ExploreInput, stack: StackFindings | null, site: SiteFindings | null): string {
     const title = stack?.meta.title ?? site?.pages.find(page => page.category === 'home')?.title
     const siteName = stack?.meta.siteName

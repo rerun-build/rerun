@@ -8,7 +8,6 @@ class ReadyStore(unittest.TestCase):
         self.p = os.path.join(self.d, "s.db")
 
     def test_survives_reopen_and_old_db(self):
-        # an old database: only the fires table, no ready_chunks
         db = sqlite3.connect(self.p)
         db.execute("CREATE TABLE fires(id INTEGER PRIMARY KEY AUTOINCREMENT, job TEXT NOT NULL, chunk TEXT NOT NULL DEFAULT '', "
                    "stage TEXT NOT NULL, coworker TEXT NOT NULL DEFAULT '', slug TEXT NOT NULL DEFAULT '', intent_at TEXT NOT NULL, "

@@ -83,15 +83,9 @@ import {
   useState,
 } from "react";
 
-// ============================================================================
-// Helpers
-// ============================================================================
-
 const withinSize = (maxFileSize?: number) => (file: File) =>
   maxFileSize ? file.size <= maxFileSize : true;
 
-// Every file the size gate drops has to be named. Reporting only when the whole batch is rejected
-// let a single oversized file vanish out of a valid drop with nothing said about it.
 type PromptInputTranslator = ReturnType<typeof useTranslations<"chat.promptInput">>;
 
 const reportOversized = (
@@ -138,12 +132,8 @@ const captureScreenshot = async (): Promise<File | null> => {
 
     video.srcObject = stream;
 
-    // Video element uses callback-based API, wrapping in Promise is necessary
-    // oxlint-disable-next-line eslint-plugin-promise(avoid-new)
     await new Promise<void>((resolve, reject) => {
-      // oxlint-disable-next-line eslint-plugin-unicorn(prefer-add-event-listener)
       video.onloadedmetadata = () => resolve();
-      // oxlint-disable-next-line eslint-plugin-unicorn(prefer-add-event-listener)
       video.onerror = () => reject(new Error("Failed to load screen stream"));
     });
 
@@ -164,8 +154,6 @@ const captureScreenshot = async (): Promise<File | null> => {
     }
 
     context.drawImage(video, 0, 0, width, height);
-    // canvas.toBlob uses callback-based API, wrapping in Promise is necessary
-    // oxlint-disable-next-line eslint-plugin-promise(avoid-new)
     const blob = await new Promise<Blob | null>((resolve) => {
       canvas.toBlob(resolve, "image/png");
     });
@@ -194,10 +182,6 @@ const captureScreenshot = async (): Promise<File | null> => {
   }
 };
 
-// ============================================================================
-// Provider Context & Types
-// ============================================================================
-
 export interface AttachmentsContext {
   files: (FileUIPart & { id: string })[];
   add: (files: File[] | FileList) => void;
@@ -216,7 +200,6 @@ export interface TextInputContext {
 export interface PromptInputControllerProps {
   textInput: TextInputContext;
   attachments: AttachmentsContext;
-  /** INTERNAL: Allows PromptInput to register its file textInput + "open" callback */
   __registerFileInput: (
     ref: RefObject<HTMLInputElement | null>,
     open: () => void
@@ -240,7 +223,6 @@ export const usePromptInputController = () => {
   return ctx;
 };
 
-// Optional variants (do NOT throw). Useful for dual-mode components.
 const useOptionalPromptInputController = () =>
   useContext(PromptInputController);
 
@@ -261,24 +243,17 @@ export type PromptInputProviderProps = PropsWithChildren<{
   initialInput?: string;
 }>;
 
-/**
- * Optional global provider that lifts PromptInput state outside of PromptInput.
- * If you don't use it, PromptInput stays fully self-managed.
- */
 export const PromptInputProvider = ({
   initialInput: initialTextInput = "",
   children,
 }: PromptInputProviderProps) => {
-  // ----- textInput state
   const [textInput, setTextInput] = useState(initialTextInput);
   const clearInput = useCallback(() => setTextInput(""), []);
 
-  // ----- attachments state (global when wrapped)
   const [attachmentFiles, setAttachmentFiles] = useState<
     (FileUIPart & { id: string })[]
   >([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  // oxlint-disable-next-line eslint(no-empty-function)
   const openRef = useRef<() => void>(() => {});
 
   const add = useCallback((files: File[] | FileList) => {
@@ -320,14 +295,12 @@ export const PromptInputProvider = ({
     });
   }, []);
 
-  // Keep a ref to attachments for cleanup on unmount (avoids stale closure)
   const attachmentsRef = useRef(attachmentFiles);
 
   useEffect(() => {
     attachmentsRef.current = attachmentFiles;
   }, [attachmentFiles]);
 
-  // Cleanup blob URLs on unmount to prevent memory leaks
   useEffect(
     () => () => {
       for (const f of attachmentsRef.current) {
@@ -385,10 +358,6 @@ export const PromptInputProvider = ({
   );
 };
 
-// ============================================================================
-// Component Context & Hooks
-// ============================================================================
-
 const LocalAttachmentsContext = createContext<AttachmentsContext | null>(null);
 
 const DragOverContext = createContext(false);
@@ -396,7 +365,6 @@ const DragOverContext = createContext(false);
 export const usePromptInputDragOver = () => useContext(DragOverContext);
 
 export const usePromptInputAttachments = () => {
-  // Prefer local context (inside PromptInput) as it has validation, fall back to provider
   const provider = useOptionalProviderAttachments();
   const local = useContext(LocalAttachmentsContext);
   const context = local ?? provider;
@@ -407,10 +375,6 @@ export const usePromptInputAttachments = () => {
   }
   return context;
 };
-
-// ============================================================================
-// Referenced Sources (Local to PromptInput)
-// ============================================================================
 
 export interface ReferencedSourcesContext {
   sources: (SourceDocumentUIPart & { id: string })[];
@@ -516,27 +480,18 @@ export type PromptInputProps = Omit<
   HTMLAttributes<HTMLFormElement>,
   "onSubmit" | "onError"
 > & {
-  // e.g., "image/*" or leave undefined for any
   accept?: string;
   multiple?: boolean;
-  // When true, accepts drops anywhere on document. Default false (opt-in).
   globalDrop?: boolean;
-  // Render a hidden input with given name and keep it in sync for native form posts. Default false.
   syncHiddenInput?: boolean;
-  // Minimal constraints
   maxFiles?: number;
-  // bytes
   maxFileSize?: number;
   onError?: (err: {
     code: "max_files" | "max_file_size" | "accept";
     message: string;
   }) => void;
-  // Hand the original File objects to the caller. The attachment list only keeps object URLs, which
-  // is enough to preview a file but not to upload one without reading it back into memory first.
-  // `subDir` is the folder a dropped file came from, relative to the drop, and '' for a plain file.
   onAttach?: (added: (UploadEntry & { id: string })[]) => void;
   onRemoveAttachment?: (id: string) => void;
-  // Without this, a rejected onSubmit is swallowed by the catch below and the failure is invisible.
   onSubmitError?: (error: unknown) => void;
   onSubmit: (
     message: PromptInputMessage,
@@ -561,25 +516,20 @@ export const PromptInput = ({
   ...props
 }: PromptInputProps) => {
   const t = useTranslations("chat.promptInput");
-  // Try to use a provider controller if present
   const controller = useOptionalPromptInputController();
   const usingProvider = !!controller;
 
-  // Refs
   const inputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
-  // ----- Local attachments (only used when no provider)
   const [items, setItems] = useState<(FileUIPart & { id: string })[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const files = usingProvider ? controller.attachments.files : items;
 
-  // ----- Local referenced sources (always local to PromptInput)
   const [referencedSources, setReferencedSources] = useState<
     (SourceDocumentUIPart & { id: string })[]
   >([]);
 
-  // Keep a ref to files for cleanup on unmount (avoids stale closure)
   const filesRef = useRef(files);
 
   useEffect(() => {
@@ -603,7 +553,6 @@ export const PromptInput = ({
 
       return patterns.some((pattern) => {
         if (pattern.endsWith("/*")) {
-          // e.g: image/* -> image/
           const prefix = pattern.slice(0, -1);
           return f.type.startsWith(prefix);
         }
@@ -651,9 +600,6 @@ export const PromptInput = ({
         return;
       }
 
-      // Ids and object URLs are built here rather than inside the setItems updater: an updater only
-      // runs synchronously while nothing else is queued on this fiber, so on a drop (which sets
-      // dragOver first) the list handed to onAttach was still empty and nothing was ever uploaded.
       const attached = capped.map((entry) => ({ ...entry, id: nanoid() }));
       setItems((prev) => [
         ...prev,
@@ -690,7 +636,6 @@ export const PromptInput = ({
     [onRemoveAttachment]
   );
 
-  // Wrapper that validates files before calling provider's add
   const addWithProviderValidation = useCallback(
     (fileList: File[] | FileList) => {
       const incoming = [...fileList];
@@ -751,8 +696,6 @@ export const PromptInput = ({
 
   const add = usingProvider ? addWithProviderValidation : addLocal;
 
-  // Drops go through this one so a dropped folder keeps its shape. The provider path has no notion
-  // of a folder, so it only ever sees the flattened files.
   const addEntries = useCallback(
     (entries: UploadEntry[]) => {
       if (usingProvider) {
@@ -773,7 +716,6 @@ export const PromptInput = ({
     clearReferencedSources();
   }, [clearAttachments, clearReferencedSources]);
 
-  // Let provider know about our hidden file input so external menus can call openFileDialog()
   useEffect(() => {
     if (!usingProvider) {
       return;
@@ -781,27 +723,21 @@ export const PromptInput = ({
     controller.__registerFileInput(inputRef, () => inputRef.current?.click());
   }, [usingProvider, controller]);
 
-  // Note: File input cannot be programmatically set for security reasons
-  // The syncHiddenInput prop is no longer functional
   useEffect(() => {
     if (syncHiddenInput && inputRef.current && files.length === 0) {
       inputRef.current.value = "";
     }
   }, [files, syncHiddenInput]);
 
-  // Attach drop handlers on nearest form and document (opt-in)
   useEffect(() => {
     const form = formRef.current;
     if (!form) {
       return;
     }
     if (globalDrop) {
-      // when global drop is on, let the document-level handler own drops
       return;
     }
 
-    // Counted rather than set on enter and cleared on leave: dragenter/dragleave also fire when the
-    // pointer crosses a child, so a boolean makes the overlay flicker over the composer's contents.
     let depth = 0;
     const onDragEnter = (e: DragEvent) => {
       if (!e.dataTransfer?.types?.includes("Files")) {
@@ -833,7 +769,6 @@ export const PromptInput = ({
       if (!e.dataTransfer) {
         return;
       }
-      // Read through the entries API rather than dataTransfer.files, which is empty for a folder.
       void entriesFromDataTransfer(e.dataTransfer).then((entries) => {
         if (entries.length > 0) {
           addEntries(entries);
@@ -901,7 +836,6 @@ export const PromptInput = ({
       if (event.currentTarget.files) {
         add(event.currentTarget.files);
       }
-      // Reset input value to allow selecting files that were previously removed
       event.currentTarget.value = "";
     },
     [add]
@@ -949,21 +883,15 @@ export const PromptInput = ({
             return (formData.get("message") as string) || "";
           })();
 
-      // Reset form immediately after capturing text to avoid race condition
-      // where user input during async blob conversion would be lost
       if (!usingProvider) {
         form.reset();
       }
 
       try {
-        // The parts keep their blob: URLs. Turning them into data URLs base64-encoded the whole file
-        // into a string on the way out, which cost a third more memory than the file itself and was
-        // only ever decoded straight back into a Blob.
         const submittedFiles: FileUIPart[] = files.map(({ id: _id, ...item }) => item);
 
         const result = onSubmit({ files: submittedFiles, text }, event);
 
-        // Handle both sync and async onSubmit
         if (result instanceof Promise) {
           try {
             await result;
@@ -972,25 +900,21 @@ export const PromptInput = ({
               controller.textInput.clear();
             }
           } catch (error) {
-            // Don't clear on error - user may want to retry
             onSubmitError?.(error);
           }
         } else {
-          // Sync function completed without throwing, clear inputs
           clear();
           if (usingProvider) {
             controller.textInput.clear();
           }
         }
       } catch (error) {
-        // Don't clear on error - user may want to retry
         onSubmitError?.(error);
       }
     },
     [usingProvider, controller, files, onSubmit, onSubmitError, clear]
   );
 
-  // Render with or without local provider
   const inner = (
     <TooltipProvider>
       <input
@@ -1022,7 +946,6 @@ export const PromptInput = ({
     </LocalReferencedSourcesContext.Provider>
   );
 
-  // Always provide LocalAttachmentsContext so children get validated add function
   return (
     <LocalAttachmentsContext.Provider value={attachmentsCtx}>
       <DragOverContext.Provider value={dragOver}>
@@ -1076,10 +999,8 @@ export const PromptInputTextarea = ({
 
   const handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement> = useCallback(
     (e) => {
-      // Call the external onKeyDown handler first
       onKeyDown?.(e);
 
-      // If the external handler prevented default, don't run internal logic
       if (e.defaultPrevented) {
         return;
       }
@@ -1093,9 +1014,6 @@ export const PromptInputTextarea = ({
         }
         e.preventDefault();
 
-        // A usable submit button, wherever it sits in the form, is the signal that submitting is
-        // allowed. When the composer only offers Stop controls there is none, and Enter must not
-        // start a second, parallel run.
         const { form } = e.currentTarget;
         const submitButton = form?.querySelector(
           'button[type="submit"]:not([disabled])'
@@ -1107,7 +1025,6 @@ export const PromptInputTextarea = ({
         form?.requestSubmit();
       }
 
-      // Remove last attachment when Backspace is pressed and textarea is empty
       if (
         e.key === "Backspace" &&
         e.currentTarget.value === "" &&
@@ -1148,7 +1065,6 @@ export const PromptInputTextarea = ({
         attachments.add(files);
       }
 
-      // Files are claimed first; the caller's handler still sees the paste, already prevented.
       onPaste?.(event);
     },
     [attachments, onPaste]
@@ -1321,9 +1237,6 @@ export const PromptInputActionMenuItem = ({
   <DropdownMenuItem className={cn(className)} {...props} />
 );
 
-// Note: Actions that perform side-effects (like opening a file dialog)
-// are provided in opt-in modules (e.g., prompt-input-attachments).
-
 export type PromptInputSubmitProps = ComponentProps<typeof InputGroupButton> & {
   status?: ChatStatus;
   onStop?: () => void;
@@ -1481,8 +1394,6 @@ export const PromptInputTabLabel = ({
   className,
   ...props
 }: PromptInputTabLabelProps) => (
-  // Content provided via children in props
-  // oxlint-disable-next-line eslint-plugin-jsx-a11y(heading-has-content)
   <h3
     className={cn(
       "mb-2 px-3 font-medium text-muted-foreground text-xs",

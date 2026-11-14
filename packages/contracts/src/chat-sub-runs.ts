@@ -3,7 +3,6 @@ import { isToolPart, toolNameOf } from './chat-tool-name.js'
 export const SUB_RUN_STALLED_AFTER_MS = 3 * 60_000
 export const SUB_RUN_FAILURE_STREAK = 3
 export const SUB_RUN_LONG_CALL_MS = 20_000
-// The engine sends the last characters of a sub-run's text, not the first: PREVIEW_LENGTH in sub-run-watch.ts.
 export const SUB_RUN_PREVIEW_LENGTH = 600
 
 export type SubRunStatus = 'queued' | 'running' | 'done' | 'error' | 'stopped' | 'dispatched'
@@ -39,7 +38,6 @@ type PartLike = { type: string; id?: string; data?: unknown; toolName?: string; 
 
 export const SUB_RUN_TOOL_NAMES: Record<SubRunProgress['kind'], string> = { delegate: 'delegate_tasks', 'call-agent': 'call_agent' }
 
-// The `subRuns` namespace, in the reader's language.
 export type SubRunCopy = (
     key:
         | 'untitledTask'
@@ -77,7 +75,6 @@ export function subRunProgressOf(part: PartLike): SubRunProgress | null {
     return null
 }
 
-// A task the engine sent without a title is named after its place in the delegation.
 export function titledSubRun(progress: SubRunProgress, t: SubRunCopy): SubRunProgress {
     if (progress.tasks.every(task => task.title)) return progress
     const untitled = (index: number) => (progress.kind === 'call-agent' ? t('untitledAgent') : t('untitledTask', { index: index + 1 }))
@@ -86,16 +83,9 @@ export function titledSubRun(progress: SubRunProgress, t: SubRunCopy): SubRunPro
 
 export type SubRunPairing = {
     byToolCallId: Map<string, SubRunProgress>
-    /** Keyed by the data part id: progress no tool row could take, which has to render on its own. */
     orphans: Map<string, SubRunProgress>
 }
 
-/**
- * Hands each progress part to the tool row it belongs to. A direct API provider shares the tool call
- * id with the part. A CLI provider (claude, codex) cannot: its MCP bridge gives the tool an id of its
- * own, so what is left after the exact matches is paired by order, kind by kind. The engine emits
- * one part per call, before its first await, which keeps both lists in the same order.
- */
 export function pairSubRuns(parts: readonly PartLike[]): SubRunPairing {
     const byToolCallId = new Map<string, SubRunProgress>()
     const orphans = new Map<string, SubRunProgress>()
@@ -166,7 +156,6 @@ const plainLine = (line: string) =>
         .replace(/\*\*|__|`/g, '')
         .trim()
 
-/** The one line a settled sub-run is summed up by: the first whole sentence of what its preview still holds. */
 export function subRunOutcome(preview?: string): string | undefined {
     let text = preview?.trim() ?? ''
     if (preview && preview.length >= SUB_RUN_PREVIEW_LENGTH) {
@@ -182,7 +171,6 @@ export function subRunOutcome(preview?: string): string | undefined {
     return plainLine(line).split(/(?<=[.!?])\s/)[0] || undefined
 }
 
-/** Seconds as `3.4s` under 10s, `12s` under a minute, `1m 05s` beyond. */
 export function formatElapsed(seconds: number): string {
     if (seconds < 10) return `${seconds.toFixed(1)}s`
     if (seconds < 60) return `${Math.floor(seconds)}s`
@@ -195,8 +183,6 @@ const progressLabel = (task: SubRunTask, t: SubRunCopy) => (task.toolCalls === u
 
 export type SubRunHeadline = { label: string; summary?: string }
 
-// build_team reports on the same block as a delegation: one row per agent of the plan, built rather
-// than delegated.
 export function subRunHeadline(progress: SubRunProgress, live: boolean, toolName: string, t: SubRunCopy): SubRunHeadline {
     const { kind, tasks } = titledSubRun(progress, t)
     const counts = countSubRuns(tasks)
@@ -213,7 +199,6 @@ export function subRunHeadline(progress: SubRunProgress, live: boolean, toolName
     }
 
     const building = toolName === 'build_team'
-    // The onboarding builds one agent: its name is the whole headline, and a count of one says nothing.
     if (building && tasks.length === 1) {
         const name = tasks[0].title
         if (live) return { label: t('headline.building', { name }) }

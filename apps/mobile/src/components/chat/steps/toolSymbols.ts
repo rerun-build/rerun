@@ -1,7 +1,5 @@
 import type { IconName } from '@/components/ui/Icon'
 
-// The web's tool icons (apps/ui/lib/tool-meta.ts), tool for tool. The labels are shared
-// through @rerun/contracts.
 const TOOL_SYMBOLS: Record<string, IconName> = {
     shell_exec: 'terminal',
 

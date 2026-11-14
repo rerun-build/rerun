@@ -65,15 +65,8 @@ import { allocateServiceInstance, listCatalogServices, listInstalledServices, lo
 import { readTeamStatus } from './team-status.service'
 import { getWorkspaceConnection, NoEngineError } from './workspace-engine.service'
 
-// Dispatch for the account MCP server (app/api/mcp/account/route.ts). Every handler takes
-// its workspace from the authenticated API key, never from an argument, and reaches agents
-// only through resolveAgentTarget, or a Box through resolveSpaceTarget — the same ownership
-// chokepoints the browser session uses.
-
 type SkillFile = { path: string; content: string }
 
-// A malformed entry is rejected rather than dropped: silently skipping it would answer "skill
-// written" on a call whose reference file never landed.
 function asSkillFiles(v: unknown): SkillFile[] {
     if (v === undefined) return []
     if (!Array.isArray(v)) throw new Error('files must be an array, e.g. [{"path": "references/api.md", "content": "…"}].')
@@ -103,17 +96,10 @@ function asSqlStatements(v: unknown): { sql: string; params: SqlParam[] }[] | un
     return statements.length > 0 ? statements : undefined
 }
 
-// The import endpoint reads a SKILL.md, but takes name and description as explicit fields
-// that win over the frontmatter — so they never have to survive a round trip through YAML we
-// wrote by hand. The empty block is there so a body opening on a `---` rule isn't swallowed
-// as frontmatter.
 function toSkillMarkdown(body: string): string {
     return `---\n---\n\n${body.trim()}\n`
 }
 
-// Safety and tone settings, read the same way whether they arrive at creation or on an
-// update. Only the keys actually present end up in the patch: an absent key must stay absent
-// or a PATCH would reset the rest of the config to its defaults.
 function readConfigPatch(args: Record<string, unknown>, pin: ModelPin | undefined): EngineAgentConfigPatch {
     const patch: EngineAgentConfigPatch = { ...pin }
     const verbosity = asString(args.verbosity)
@@ -134,8 +120,6 @@ function namesModelPin(args: Record<string, unknown>): boolean {
     return args.connectionId !== undefined || args.provider !== undefined || args.model !== undefined
 }
 
-// A workspace that has not claimed its machine yet has no connection to check a pin against, and
-// the coworker being created is what claims it: the pair is then written as asked.
 function unverifiedModelPin(args: Record<string, unknown>): ModelPin {
     const provider = asString(args.provider)
     const parsed = provider === undefined ? null : providerSchema.safeParse(provider)
@@ -157,9 +141,6 @@ async function newAgentModelPin(workspaceId: number, args: Record<string, unknow
 
 type CheckedModelPin = { pin: ModelPin; connections: BoxConnection[] }
 
-// The pin of an existing coworker, or of one of its automations. The connection the coworker runs
-// on today is only read when the call names a model and nothing else, which is the one case where
-// it decides the answer.
 async function checkedModelPin(conn: EngineConnection, engineAgentId: string, args: Record<string, unknown>): Promise<CheckedModelPin | undefined> {
     if (!namesModelPin(args)) return undefined
     const { connections } = await engineListConnections(conn)
@@ -169,8 +150,6 @@ async function checkedModelPin(conn: EngineConnection, engineAgentId: string, ar
     return pin ? { pin, connections } : undefined
 }
 
-// What the coworker runs on once the box has resolved its config, which is the only honest answer
-// to "did the change take": a pin can be written and still lose to something else.
 function projectRunsOn(detail: EngineAgentDetail, connections: BoxConnection[]) {
     return {
         connectionId: detail.resolvedConnectionId,
@@ -181,9 +160,6 @@ function projectRunsOn(detail: EngineAgentDetail, connections: BoxConnection[]) 
     }
 }
 
-// The guided-setup answer, written exactly the way the app writes it (lib/templates/capture.ts and
-// the agent panel): the answer is stamped complete on the spot, because the caller is the author
-// and the author never installs their own agent — only the copy an import creates starts pending.
 function readSetup(args: Record<string, unknown>): { setup: Partial<EngineAgentSetup>; install: string } | undefined {
     const raw = args.setup
     if (raw === undefined) return undefined
@@ -225,9 +201,6 @@ function defaultContentType(body: string): string {
     return head === '{' || head === '[' ? 'application/json' : 'text/plain'
 }
 
-// The public URL carries the token, so it stands in for it rather than being returned next to
-// it: nothing here should invite the caller to recompose the URL by hand. It is built from the
-// Rerun agent id, not the engine's local one, since that is what /api/t/... resolves.
 async function projectTrigger(agentId: string, trigger: EngineTrigger) {
     return {
         slug: trigger.slug,
@@ -254,7 +227,6 @@ async function waitForRun(conn: EngineConnection, engineAgentId: string, runId: 
     return run
 }
 
-// Only the Boxes the caller manages are candidates: a coworker is created where it can be set up.
 async function resolveSpaceId(actor: Actor, requested?: string): Promise<string> {
     const supabase = createServiceRoleClient()
     const [{ data: all }, manageable] = await Promise.all([selectMany(supabase, 'spaces', ['id', 'name'] as const, { workspace_id: actor.workspaceId }), manageableSpaceIds(actor)])
@@ -270,15 +242,12 @@ async function resolveSpaceId(actor: Actor, requested?: string): Promise<string>
     return spaces[0].id
 }
 
-// installServiceSlugs silently skips a slug the catalog doesn't know, which would otherwise
-// read as "connector installed" to the caller. Fail on it instead, before touching the agent.
 async function assertCatalogService(slug: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data } = await selectMaybeSingle(supabase, 'services', ['enabled'] as const, { slug })
     if (!data?.enabled) throw new Error(`Unknown app "${slug}". Use search_connectors to find the right slug.`)
 }
 
-// `key` is what detach_connector and the app address one account by, `slug` the app it belongs to.
 function connectorView({ key, slug, name, label, status }: InstalledService) {
     return { key, slug, name, label, status }
 }
@@ -309,16 +278,10 @@ function readMemoryEntries(value: unknown): MemoryEntry[] {
     })
 }
 
-// `actor` is whose access the call runs with: the workspace for an API key, the member a foreman
-// turn speaks for. `actorUserId` is the member recorded as the author of what the call starts (an
-// API key's creator, the foreman's member).
-// A picture dated further ahead than this is refused: a forged far-future madeAt would freeze every later real beat.
 const FACTORY_SNAPSHOT_MAX_SKEW_MS = 120_000
 
 export async function dispatchAccountTool(actor: Actor, name: string, args: Record<string, unknown>, { actorUserId = null }: { actorUserId?: string | null } = {}): Promise<unknown> {
     const workspaceId = actor.workspaceId
-    // Every tool that takes a `model` pins it, on a coworker, a scheduled task, a trigger or the
-    // workspace default, so the plan is checked once for all of them.
     if (typeof args.model === 'string') await assertModelEntitled(args.model, workspaceId)
     switch (name) {
         case 'list_spaces': {
@@ -348,8 +311,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         case 'get_agent': {
             const agentId = requireString(args.agentId, 'agentId')
             const { conn, engineAgentId, contentLocked } = await resolveAgentTarget(agentId, actor)
-            // A part that cannot be read still answers empty, so one failing route does not hide the
-            // rest of the agent, but it is named in `unavailable`: an empty list has to mean empty.
             const unavailable: string[] = []
             const unreadable = (part: string) => () => {
                 unavailable.push(part)
@@ -374,22 +335,16 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 name: detail.config.displayName ?? detail.config.name,
                 description: detail.config.description,
                 soul: contentLocked ? LOCKED_NOTICE : detail.soul,
-                // The pair the box would actually run, not the pin: an agent that picked nothing
-                // still has a provider and a model, they just come from the Box default.
                 provider: detail.resolvedProvider ?? detail.config.provider,
                 model: detail.resolvedModel ?? detail.config.model,
                 runsOn: projectRunsOn(detail, aiConnections),
                 verbosity: detail.config.verbosity,
                 tools: detail.config.tools,
                 selfImprovement: detail.config.selfImprovement,
-                // `required: null` is an unanswered agent, which is what a template submission
-                // blocks on, and is not the same statement as "this one needs nothing".
                 setup: { required: detail.config.setup.required, completedAt: detail.config.setup.completedAt, prompt: detail.install },
                 mcpServers: detail.config.mcpServers.map(server => ({ name: server.name, transport: server.transport, url: server.url })),
                 skills: skills.map(skill => ({ slug: skill.slug, name: skill.name, description: skill.description })),
                 schedules: schedules.map(schedule => ({ slug: schedule.slug, name: schedule.name, cron: schedule.cron, runAt: schedule.runAt, enabled: schedule.enabled })),
-                // No URL here: it carries the trigger's secret, and this is the wide read. Use
-                // list_triggers to get it deliberately.
                 triggers: triggers.map(trigger => ({ slug: trigger.slug, name: trigger.name, methods: trigger.methods, enabled: trigger.enabled, lastFiredAt: trigger.lastFiredAt })),
                 connectors: connectors.map(connectorView),
                 ...(unavailable.length > 0 ? { unavailable } : {}),
@@ -416,9 +371,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
 
             if (slugs.length > 0) await installServiceSlugs(agent.id, slugs, actor)
 
-            // The registry is the only honest answer: the checklist installServiceSlugs
-            // returns holds the needs_config bucket alone, and would quietly drop a connector
-            // that installed fine but still waits on a sign-in.
             const connectors = slugs.length > 0 ? (await listInstalledServices(agent.id, actor)).services : []
 
             return {
@@ -426,9 +378,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 name: agent.name,
                 handle: agent.handle,
                 spaceId,
-                // The plan caps active agents, so a creation can legitimately succeed and hand back
-                // something that will not run until a slot frees up. Saying so is the only way the
-                // caller can tell that apart from a working agent.
                 active: !agent.disabled_at,
                 ...(agent.disabled_at ? { inactiveReason: 'No free coworker slot on the current plan. Start Pro for unlimited coworkers, or delete a coworker to activate it.' } : {}),
                 connectors: connectors.map(connectorView),
@@ -443,18 +392,15 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             }
             const source = await assertAgentInWorkspace(agentId, 'manage', actor)
 
-            // A copy's schedules are re-based to now, so every one of them would fire a second time.
             const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
             const schedules = await engineListSchedules(conn, engineAgentId)
             if (schedules.length > 0) {
                 throw new Error(`This coworker has scheduled tasks (${schedules.map(schedule => schedule.name || schedule.slug).join(', ')}), and every copy would run them a second time. Delete them with delete_schedule first, or copy a coworker without any.`)
             }
 
-            // Resolved only when asked for, as in update_agent: the default is the source's own Box.
             const requestedSpaceId = asString(args.spaceId)
             const spaceId = requestedSpaceId ? await resolveSpaceId(actor, requestedSpaceId) : source.space_id
 
-            // One after the other: each copy derives a unique handle from the ones already there.
             const copies: { id: string; name: string; handle: string | null; enabled: boolean }[] = []
             for (let i = 0; i < count; i++) {
                 try {
@@ -462,7 +408,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                     copies.push({ id: agent.id, name: agent.name, handle: agent.handle, enabled: !agent.disabled_at })
                 } catch (err) {
                     if (copies.length === 0) throw err
-                    // Saying what already exists keeps a retry from making those copies again.
                     throw new Error(`Copy ${i + 1} of ${count} failed (${err instanceof Error ? err.message : String(err)}). Already made: ${copies.map(copy => copy.id).join(', ')}.`)
                 }
             }
@@ -481,7 +426,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const soul = typeof args.soul === 'string' ? args.soul : undefined
             if (contentLocked && soul !== undefined) throw new Error(LOCKED_WRITE_ERROR)
 
-            // Checked before the rename and the move below: a refused pin must leave nothing done.
             const checked = await checkedModelPin(conn, engineAgentId, args)
             const patch: EngineAgentConfigPatch & { soul?: string; install?: string } = readConfigPatch(args, checked?.pin)
             const description = asString(args.description)
@@ -498,8 +442,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const renamed = newName ? await renameAgent(agentId, newName) : null
             const rehandled = newHandle ? await changeAgentHandle(agentId, newHandle) : null
 
-            // Resolved only when asked for: resolveSpaceId falls back to the single Box of an
-            // account that has one, so calling it blind would move the agent on every update.
             const requestedSpaceId = asString(args.spaceId)
             const moved = requestedSpaceId ? await moveAgentToBox(agentId, await resolveSpaceId(actor, requestedSpaceId), actor) : null
             if (moved && !moved.ok) throw new Error(moved.error)
@@ -556,8 +498,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         case 'delete_agent': {
             const agentId = requireString(args.agentId, 'agentId')
             requireConfirmation(args, 'the coworker, its skills, its scheduled tasks, its memory and its files')
-            // Not resolveAgentTarget: it goes through the engine, and a coworker whose engine side is
-            // broken must still be deletable.
             await assertAgentInWorkspace(agentId, 'manage', actor)
             await deleteAgent(agentId)
             return { agentId, deleted: true }
@@ -588,8 +528,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const files = await describeSkillFiles(conn, engineAgentId, skill.slug, skill.files)
             const connector = connectorSkillOwners(await readRegistry(conn, engineAgentId)).get(skill.slug)
             const origin = connector ? { connector, readOnly: true } : {}
-            // A program would act on filler as if it were the procedure, so this surface says what
-            // happened rather than handing back the placeholder the panels blur.
             return contentLocked ? { ...skill, body: LOCKED_NOTICE, locked: true, files, ...origin } : { ...skill, files, ...origin }
         }
 
@@ -608,21 +546,15 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const { conn, engineAgentId, contentLocked } = await resolveAgentTarget(requireString(args.agentId, 'agentId'), actor, 'manage')
             if (contentLocked) throw new Error(LOCKED_WRITE_ERROR)
             const files = asSkillFiles(args.files)
-            // Both checks run before the write: a removal refused afterwards would fail the call
-            // on a skill whose body had already been replaced.
             const removeFiles = planSkillFileRemovals(asStringArray(args.removeFiles))
             const written = new Set(files.map(file => normalizeSkillFilePath(file.path)))
             const contradiction = removeFiles.find(path => written.has(path))
             if (contradiction) throw new Error(`"${contradiction}" is in both files and removeFiles. Pick one.`)
 
-            // The engine writes with overwrite: true, so a name that slugifies onto a connector
-            // skill would replace it just as surely as passing its slug.
             const target = asString(args.slug) ?? slugify(requireString(args.name, 'name'))
             const owner = connectorSkillOwners(await readRegistry(conn, engineAgentId)).get(target)
             if (owner) throw new Error(connectorSkillReadOnlyError(target, owner))
 
-            // One atomic call: the engine stages the whole folder and swaps it in, so a bad
-            // reference file can no longer leave the body rewritten and the files missing.
             const skill = await engineImportSkill(conn, engineAgentId, toSkillMarkdown(requireString(args.body, 'body')), files, {
                 name: requireString(args.name, 'name'),
                 description: asString(args.description) ?? '',
@@ -630,8 +562,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 overwrite: true,
             })
 
-            // Deletions come after the swap: a failure here leaves a file behind, where deleting
-            // first would lose it whenever the write that follows is rejected.
             if (removeFiles.length === 0) return { slug: skill.slug, name: skill.name, description: skill.description, files: skill.files }
             await removeSkillFiles(conn, engineAgentId, skill.slug, removeFiles)
             const updated = await engineGetSkill(conn, engineAgentId, skill.slug)
@@ -644,8 +574,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const memories = readMemoryEntries(args.memories)
             const written: string[] = []
             const failed: { index: number; error: string }[] = []
-            // One at a time: each write embeds through the hub, and a burst of a hundred would
-            // queue there anyway while making a partial failure harder to report entry by entry.
             for (const [index, memory] of memories.entries()) {
                 try {
                     const { id } = await engineCreateMemory(conn, engineAgentId, memory)
@@ -669,8 +597,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const slash = path.lastIndexOf('/')
             const name = path.slice(slash + 1)
             if (!name) throw new Error('path must name a file, e.g. "assets/logo.png".')
-            // The JSON write caps its content at MAX_TEXT_WRITE_CHARS on the engine; a longer text
-            // travels as bytes through the raw upload, the same door as a binary.
             if (!isBase64 && content.length <= MAX_TEXT_WRITE_CHARS) {
                 await engineWriteFileText(conn, base, path, content)
             } else {
@@ -802,8 +728,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const requested = asString(args.method)
             const method = requested ? parseTriggerMethod(requested) : (trigger.methods[0] ?? 'POST')
 
-            // Both of these would come back from the engine as a bare 404 or 405, which reads as
-            // "the trigger you just created does not exist". Answer them before firing.
             if (!trigger.methods.includes(method)) throw new Error(`This trigger does not accept ${method}. It accepts: ${trigger.methods.join(', ')}.`)
             if (!trigger.enabled) throw new Error(`Trigger "${slug}" is disabled, and a disabled trigger turns every call away. Enable it with upsert_trigger before testing.`)
 
@@ -846,7 +770,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const [{ conn, engineAgentId }, callableAgentIds] = await Promise.all([resolveAgentTarget(agentId, actor), callableEngineAgentIds(actor)])
             const waitSeconds = clamp(asNumber(args.waitSeconds), DEFAULT_WAIT_SECONDS, MAX_WAIT_SECONDS)
 
-            // Checked before anything starts: a bad goal never costs a run.
             let goal: RunGoal | undefined
             if (args.goal !== undefined) {
                 const parsed = runGoalSchema.safeParse(args.goal)
@@ -863,12 +786,8 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
 
             const runId = res.headers.get('x-run-id')
             const sessionId = res.headers.get('x-session-id')
-            // The engine buffers the run's stream on its side, so dropping the response here
-            // reads as one subscriber leaving: the agent keeps working either way.
             await res.body?.cancel().catch(() => {})
             if (!runId) throw new Error('The engine accepted the message but did not return a run id.')
-            // Same reason as the foreman's setup hand-over: /chat announces no session, so without
-            // this the conversation never shows up in the agent's chat.
             if (sessionId) await recordSessionParticipant(await ensureSessionRow(agentId, sessionId, requireString(args.message, 'message'), { source: 'api', status: 'working' }), actorUserId)
 
             const run = await waitForRun(conn, engineAgentId, runId, waitSeconds)
@@ -892,8 +811,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const before = await engineGetRun(conn, engineAgentId, runId)
             await engineCancelRun(conn, engineAgentId, runId)
             const after = await engineGetRun(conn, engineAgentId, runId)
-            // From the status before the call: the engine's own "aborted" cannot say it, since a row
-            // can read running with no live loop behind it.
             return { ...projectRun(after), wasRunning: before.status === 'running' }
         }
 
@@ -908,9 +825,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 output: run.output ?? null,
                 ...(toolCalls
                     ? {
-                          // A run's own tool results are unbounded, and a run that itself read
-                          // runs nests them. Handed back whole they cost more context than the
-                          // run they describe.
                           toolCalls: toolCalls.map(call => ({
                               step: call.stepNumber,
                               tool: call.toolName,
@@ -1007,8 +921,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const key = instance?.key ?? manifest.slug
             const declared = await declareService(agentId, manifest, actor, instance)
 
-            // The registry is the truth: a credential-free service still lands on needs_auth
-            // when its single method is an OAuth sign-in.
             const { services } = await listInstalledServices(agentId, actor)
             const installed = services.find(service => service.key === key)
             const status = installed?.status ?? 'needs_config'
@@ -1040,7 +952,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
 
         case 'factory_report': {
             if (!isAdminActor(actor)) throw new AccessDeniedError('adminOnly')
-            // The cap is on the snapshot as received, before validation.
             const text = JSON.stringify(args.snapshot ?? null)
             const size = Buffer.byteLength(text, 'utf8')
             if (size > FACTORY_SNAPSHOT_MAX_BYTES) throw new Error(`factory_report: the snapshot is over ${FACTORY_SNAPSHOT_MAX_BYTES} bytes`)
@@ -1051,11 +962,6 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         }
 
         default:
-            // Two more halves live next door, chained in that order: sharing, which any account
-            // can use, then template authoring, which resolves an expert sandbox author before it
-            // runs anything. The ungated one has to come first so an unknown name does not pay a
-            // gate it was never aiming at. The last default is the one that answers for a name no
-            // file knows.
             return await dispatchShareTool(actor, name, args)
     }
 }

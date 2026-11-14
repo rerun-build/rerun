@@ -14,7 +14,6 @@ const BUTTON = 32
 const WAVE_WIDTH = 128
 const RESTING_PEAKS = Array.from({ length: PEAK_COUNT }, () => 0.25)
 
-/** The player drawn inside the user bubble: play, the waveform to seek on, the timer. */
 export function VoiceMessageBubble({ voice, playback }: { voice: VoiceMessage; playback: VoicePlayback }) {
     const { readable, playable, loaded, loading, playing, elapsedMs, progress, toggle, seekAt } = playback
     const peaks = voice.peaks.length > 0 ? voice.peaks : RESTING_PEAKS

@@ -1,4 +1,3 @@
-// No 'server-only': the app notices and the WhatsApp sweeps that read this run as Trigger.dev tasks.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { realEmail } from '@/lib/auth/placeholder-email'
@@ -12,14 +11,12 @@ function text(metadata: Metadata, key: string): string {
     return typeof value === 'string' ? value.trim() : ''
 }
 
-// Email sign-ups name themselves with first_name, OAuth ones with given_name or a full name.
 function firstNameOf(metadata: Metadata): string | null {
     const first = text(metadata, 'first_name') || text(metadata, 'given_name')
     if (first) return first
     return (text(metadata, 'full_name') || text(metadata, 'name')).split(/\s+/)[0] || null
 }
 
-// Null for an anonymous visitor or an account with no real address: nobody to email.
 export async function loadRecipient(supabase: SupabaseClient<Database>, userId: string): Promise<Recipient | null> {
     const { data, error } = await supabase.auth.admin.getUserById(userId)
     if (error || !data.user || data.user.is_anonymous) return null
@@ -27,7 +24,6 @@ export async function loadRecipient(supabase: SupabaseClient<Database>, userId: 
     return email ? { email, firstName: firstNameOf(data.user.user_metadata) } : null
 }
 
-// A WhatsApp message needs a first name and no address: someone who signed in by phone has none.
 export async function loadFirstName(supabase: SupabaseClient<Database>, userId: string): Promise<string | null> {
     const { data, error } = await supabase.auth.admin.getUserById(userId)
     if (error || !data.user) return null

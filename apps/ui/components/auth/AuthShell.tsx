@@ -8,17 +8,6 @@ import { AuthScene } from './AuthScene'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { useTranslations } from 'next-intl'
 
-// Le cadre commun à toutes les entrées de compte : la scène iso occupe tout le fond, le
-// formulaire flotte au centre sans carte, l'en-tête (logo, titre, sous-titre) centré au-dessus,
-// et les mentions ferment le bas.
-//
-// `titleAs` existe pour la dialog : Radix exige que le titre soit son propre DialogTitle, alors
-// que la page /auth veut un h1. Le style reste écrit une seule fois, ici.
-//
-// `variant` distingue les deux cadres. Les deux sont peints en `--background` : la dialog rejoue
-// la page telle quelle, décor compris, et un `--popover` plus clair y trahirait la carte. Seules
-// les mentions diffèrent, la page devant rester au-dessus de la barre de consentement quand la
-// dialog la gère déjà elle-même (`bottom-[var(--consent-inset)]` en bottom sheet).
 export function AuthShell({
     title,
     subtitle,
@@ -65,7 +54,6 @@ export function AuthShell({
 
 export function AuthTerms() {
     const t = useTranslations('auth')
-    // A self-hosted install has its own terms, if any: Rerun's do not bind its users.
     if (!RERUN_CLOUD) return null
     return t.rich('terms', {
         terms: chunks => (

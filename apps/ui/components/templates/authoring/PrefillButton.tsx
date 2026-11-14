@@ -10,8 +10,6 @@ import { toTemplateBrief, type TemplateBrief } from '@/lib/templates/describe'
 import type { TemplateFormValues } from '@/lib/templates/edit-schema'
 
 type Props = {
-    // The caller writes the result back into the form itself, so every section keeps ownership
-    // of the fields it fills.
     run: (brief: TemplateBrief) => Promise<{ ok: true } | { ok: false; error: string }>
     label?: string
 }

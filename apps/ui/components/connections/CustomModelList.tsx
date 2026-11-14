@@ -10,17 +10,11 @@ import { useForm } from 'react-hook-form'
 type CustomModelListProps = {
     models: string[]
     onChange: (next: string[]) => void
-    // Ids already offered by the curated catalog side of this connection, so the two lists stay
-    // disjoint and consumers can concatenate them without deduping.
     reserved: string[]
-    // How the ids it takes are spelled: OpenRouter's `vendor/model`, or whatever a custom server calls its own.
     hint?: ReactNode
     placeholder?: string
 }
 
-// The connection's library of model ids beyond the curated catalog, so a custom OpenRouter-
-// compatible router's own ids reach the engine. Added models become selectable everywhere a model
-// is picked: the in-chat selector and the scheduler.
 export function CustomModelList({ models, onChange, reserved, hint, placeholder = 'vendor/model' }: CustomModelListProps) {
     const t = useTranslations('connections.customModels')
     const [adding, setAdding] = useState(false)

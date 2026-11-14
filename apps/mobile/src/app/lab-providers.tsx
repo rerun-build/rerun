@@ -18,9 +18,6 @@ import { AppText } from '@/components/ui/AppText'
 import { AI_CONNECTIONS_CREDIT_USED_UP, AI_CONNECTIONS_FULL, AI_CONNECTIONS_KEYS, AI_CONNECTIONS_RECONNECT, AI_CONNECTIONS_RERUN_ONLY, AI_CONNECTIONS_TRIAL, MOCK_USAGE } from '@/mocks/aiConnections'
 import { spacing } from '@/theme/tokens'
 
-// Dev only: every AI providers screen in each of its states, on mock data, in the form sheet they
-// open in. `rerun://lab-providers?screen=list&state=full`, `&role=member` for the read-only copy.
-
 const VIEWS: Record<string, AiConnectionsView> = { 'rerun-only': AI_CONNECTIONS_RERUN_ONLY, full: AI_CONNECTIONS_FULL, keys: AI_CONNECTIONS_KEYS, reconnect: AI_CONNECTIONS_RECONNECT, credit: AI_CONNECTIONS_CREDIT_USED_UP, trial: AI_CONNECTIONS_TRIAL }
 
 const noop = () => {}

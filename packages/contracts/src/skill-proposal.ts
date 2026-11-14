@@ -6,8 +6,6 @@ export type SkillProposalMode = z.infer<typeof skillProposalModeSchema>
 export const skillProposalStatusSchema = z.enum(['proposed', 'accepted', 'applied', 'failed', 'dismissed'])
 export type SkillProposalStatus = z.infer<typeof skillProposalStatusSchema>
 
-// Nullable rather than optional: strict structured output needs every key required, and the CLI
-// providers serialise an omitted field as an explicit null anyway.
 export const skillProposalInputSchema = z.object({
     mode: skillProposalModeSchema,
     slug: z.string().nullable(),

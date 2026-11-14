@@ -7,7 +7,6 @@ const html = (buddy: Record<string, unknown>, extra: Record<string, unknown> = {
     renderToStaticMarkup(
         createElement(TileBuddy, { id: 'code', style: { color: '#444', buddy, label: 'code' }, width: 120, height: 120, floorOffset: 0, ...extra } as never),
     )
-// The floor glow is a div before the svg.
 const svg = (s: string) => s.slice(s.indexOf('<svg'))
 
 describe('a working buddy', () => {

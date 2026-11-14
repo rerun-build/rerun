@@ -50,8 +50,6 @@ function Dot({ at, count, answered, progress, onPick }: { at: number; count: num
     )
 }
 
-// The web's step dots: the current step hollow inside a halo, answered ones filled, the rest faint.
-// The halo and the fills follow the pager's offset, so they move under the finger.
 function StepDots({ count, current, progress, done, onPick }: { count: number; current: number; progress: SharedValue<number>; done: (index: number) => boolean; onPick: (index: number) => void }) {
     const t = useTranslations('mobileHitl.steps')
     const theme = useTheme()
@@ -85,8 +83,6 @@ type HitlStepsProps = {
     actions?: ReactNode
 }
 
-// The steps of a HITL widget as pages swiped sideways, the card's height following the page under the
-// finger, with the dots and the widget's actions underneath. A single step is drawn as is.
 export function HitlSteps({ count, index, onIndexChange, done, renderStep, actions }: HitlStepsProps) {
     const reduceMotion = useReducedMotion()
     const pager = useAnimatedRef<Animated.ScrollView>()

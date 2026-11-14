@@ -6,19 +6,15 @@ import { shouldPushToTalk } from '@/lib/foreman/push-to-talk'
 
 const OVERLAYS = '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]'
 
-// A tap is not a hold: the microphone only opens once Space has stayed down this long, so a stray
-// press on the board never lights the capture indicator, let alone the permission prompt.
 const HOLD_MS = 200
 
 type Options = {
     enabled: boolean
     onStart: () => void
     onRelease: () => void
-    /** The hold was lost rather than let go: the window lost the keyboard, or Escape. Nothing is sent. */
     onAbort: () => void
 }
 
-/** Hold Space on the board, outside anything that would take the key, to talk; let go to send. */
 export function usePushToTalk({ enabled, onStart, onRelease, onAbort }: Options) {
     const handlers = useRef({ onStart, onRelease, onAbort })
     useEffect(() => {
@@ -44,7 +40,6 @@ export function usePushToTalk({ enabled, onStart, onRelease, onAbort }: Options)
 
         const down = (event: KeyboardEvent) => {
             if (held) {
-                // The repeats of the held key would scroll the page.
                 if (event.code === 'Space') event.preventDefault()
                 else if (event.key === 'Escape') settle('abort')
                 return

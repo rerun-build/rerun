@@ -75,8 +75,6 @@ describe('skill_propose', () => {
         expect(announced).toEqual([{ proposalId: rows[0].id, mode: 'create', title: rows[0].title }])
     })
 
-    // One ack whatever the model wrote before: a proposal is mentioned in the message, never a
-    // reason to write that message a second time.
     it('asks for one sentence in the message and nothing else', async () => {
         const fresh = runOn('session-written', 'claude-sub', 'claude', 'claude-opus-5-5', { skillProposals: [] })
         const result = parse(await propose(fresh, { ...rule, title: 'Written first', instruction: 'Every report opens with the numbers.' }))

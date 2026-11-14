@@ -4,7 +4,6 @@ import { shade } from './buddy-look'
 export type Point = { x: number; y: number }
 
 export type BoxGeometry = {
-    // Centre of the bottom diamond, the point that sits on the floor.
     base: Point
     halfW: number
     halfH: number
@@ -16,8 +15,6 @@ function lerp(a: Point, b: Point, t: number): Point {
     return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }
 }
 
-// A diamond whose four corners are rounded by quadratic curves. `sideInset` is how far its widest
-// point stands inside the sharp corner, which is where the rounded side walls start.
 export function roundedDiamond(center: Point, halfW: number, halfH: number, radius: number) {
     const corners = [
         { x: center.x, y: center.y - halfH },
@@ -40,8 +37,6 @@ export function boxTop(geometry: BoxGeometry): Point {
     return { x: geometry.base.x, y: geometry.base.y - geometry.depth }
 }
 
-// The front-left wall's own plane: x runs along its bottom edge (0…halfW), y down from its top
-// edge (0…depth). Anything drawn inside reads as painted on that wall.
 export function leftWallPlane({ base, halfW, halfH, depth }: BoxGeometry) {
     return `translate(${base.x - halfW} ${base.y - depth}) matrix(1 ${halfH / halfW} 0 1 0 0)`
 }
@@ -57,13 +52,8 @@ type RoundedBoxProps = {
     onTop?: ReactNode
 }
 
-// How far above its resting height the top may rise, as a share of the depth.
 const STRETCH_HEADROOM = 1
 
-// Scales its children's height from the horizontal line `y`, the way a wall grows from the floor.
-// The `iso-buddy-wall` animation scales around the origin, so the line is brought there first.
-// `painted` marks what is drawn on the wall rather than the wall itself: a selected buddy's wall
-// grows taller, what is painted on it keeps its size and stays in the middle.
 export function GrowsFrom({ y, painted, children }: { y: number; painted?: boolean; children: ReactNode }) {
     return (
         <g transform={`translate(0 ${y})`}>
@@ -74,10 +64,6 @@ export function GrowsFrom({ y, painted, children }: { y: number; painted?: boole
     )
 }
 
-// A thick, soft block: the rounded diamond swept down. The side is one surface, and the fold
-// between its two halves is a gradient, the way light turns around a rounded edge. When it moves,
-// only its top does (`iso-buddy-top`) and the walls stretch under it: the bottom diamond stays
-// where it stands on the floor.
 export function RoundedBox({ uid, geometry, color, top, topLight, rim, left, onTop }: RoundedBoxProps) {
     const { halfW, halfH, depth, radius } = geometry
     const topCenter = boxTop(geometry)

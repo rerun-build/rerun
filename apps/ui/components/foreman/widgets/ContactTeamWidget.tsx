@@ -11,9 +11,6 @@ import { cn } from '@/lib/utils'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { ForemanOutcomeRow } from './ForemanOutcomeRow'
 
-// The foreman handing a stuck user to a person. Nothing leaves before they click: the click sends
-// the foreman's summary into the support chat under their account, and opens it.
-
 export type ContactTeamResult = { sent: true } | { answered: false }
 
 type ContactTeamWidgetProps = {
@@ -51,7 +48,6 @@ export function ContactTeamWidget({ input, output, onAnswer }: ContactTeamWidget
         )
     }
 
-    // Typed over: the tool is closed and cannot take a second answer, but the way to a person stays.
     if (output) {
         return (
             <ForemanOutcomeRow

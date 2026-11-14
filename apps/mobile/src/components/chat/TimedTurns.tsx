@@ -10,15 +10,10 @@ import type { MessageStamp } from './MessageTimeReveal'
 
 type TimedTurnsProps = {
     messages: UIMessage[]
-    // `undefined` leaves the turn unsigned, `null` holds the avatar's place while the profile loads.
     authorOf: (authorId: string) => AuthorProfile | null | undefined
     renderMessage: (message: UIMessage, index: number, stamp: MessageStamp) => ReactNode
 }
 
-/**
- * The thread as the web's `AgentChat` lays it out: iMessage's day and time over each stretch of the
- * conversation, the messages one person sent signed once, and the time of the one bubble tapped.
- */
 export function TimedTurns({ messages, authorOf, renderMessage }: TimedTurnsProps) {
     const times = useMessageTimes(messages)
     const breaks = useMemo(() => timeBreaksOf(times), [times])

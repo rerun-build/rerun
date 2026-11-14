@@ -1,4 +1,3 @@
-"""Minimal GitHub REST client. Token is read from the environment per call and sent only in the auth header."""
 import json, os, re, urllib.parse, urllib.request, urllib.error
 
 
@@ -27,7 +26,7 @@ class Client:
                 data = r.read()
                 return (data.decode("utf-8", "replace") if raw else json.loads(data or b"null")), r.headers.get("Link")
         except urllib.error.HTTPError as e:
-            e.close()  # left open, Python's clean-up warning repeats the server's status text
+            e.close()
             raise GhError("%s %s failed: HTTP %d" % (method, url.split("?")[0], e.code), e.code) from None
         except urllib.error.URLError as e:
             raise GhError("%s %s failed: %s" % (method, url.split("?")[0], type(e.reason).__name__)) from None
@@ -46,7 +45,7 @@ class Client:
             m = re.search(r'<([^>]+)>;\s*rel="next"', link or "")
             url = m.group(1) if m else None
             if url and urllib.parse.urlsplit(url)[:2] != urllib.parse.urlsplit(self.base)[:2]:
-                url = None  # never send the token to another host
+                url = None
 
     def issue(self, n):
         return self.get("/issues/%d" % n)
@@ -64,7 +63,6 @@ class Client:
         return self.get("/commits/%s/check-runs" % sha)["check_runs"]
 
     def pr_by_head(self, branch):
-        """Newest open PR for the branch (else newest PR of any state) as a summary, or None."""
         head = urllib.parse.quote(self.repo.split("/")[0] + ":" + branch, safe="")
         prs = self.get("/pulls?state=all&head=" + head)
         prs = sorted(prs, key=lambda p: (p["state"] == "open", p["number"]), reverse=True)
@@ -81,9 +79,9 @@ class Client:
         except GhError as e:
             if e.status != 404:
                 raise
-            found = None  # lookup route absent: let the POST report the real error
+            found = None
         if found and found["state"] == "open":
-            return found  # retry-safe: one open PR per head
+            return found
         return self.req("POST", "/pulls", {"title": title, "head": head, "base": base, "body": body})
 
     def branch_sha(self, branch):

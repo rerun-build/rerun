@@ -36,7 +36,6 @@ export function toolStatusOf(state: string | undefined): StepStatus {
     return 'running'
 }
 
-// The web shimmers what is running; a phone breathes it, like the run status under the thread.
 function Breathing({ children }: { children: ReactNode }) {
     const pulse = useSharedValue(1)
     useEffect(() => {
@@ -46,7 +45,6 @@ function Breathing({ children }: { children: ReactNode }) {
     return <Animated.View style={[{ flexShrink: 1 }, fade]}>{children}</Animated.View>
 }
 
-// Distinct tools in order of first use, so a new one lands at the end of the stack instead of reshuffling it.
 const usedSymbols = (items: StepItem[]): IconName[] => [...new Set(items.map(item => item.symbol))]
 
 function ToolStack({ items }: { items: StepItem[] }) {
@@ -82,12 +80,10 @@ function Activity({ label }: { label: string }) {
     )
 }
 
-// Glides to each new step while the reader sits at the bottom; once they scroll up to read, it leaves them there.
 function StepList({ items }: { items: StepItem[] }) {
     const scroll = useRef<ScrollViewInstance>(null)
     const placedCount = useRef(0)
     const pinned = useRef(true)
-    // Only a finger moves the pin: the glide's own scroll events would unpin it halfway down.
     const touched = useRef(false)
     const [scrolledDown, setScrolledDown] = useState(false)
 
@@ -107,7 +103,6 @@ function StepList({ items }: { items: StepItem[] }) {
                 onScrollBeginDrag={() => {
                     touched.current = true
                 }}
-                // A new step moves the list, a step opened to read it does not.
                 onContentSizeChange={() => {
                     if (!pinned.current || placedCount.current === items.length) return
                     touched.current = false
@@ -115,7 +110,6 @@ function StepList({ items }: { items: StepItem[] }) {
                     placedCount.current = items.length
                 }}
             >
-                {/* The bubble's tap that brings the time up would freeze the scroll, see HorizontalScroll. */}
                 <View onStartShouldSetResponder={takeTouch}>
                     {items.map(item => (
                         <Animated.View key={item.key} entering={FadeIn.duration(300)}>
@@ -129,10 +123,6 @@ function StepList({ items }: { items: StepItem[] }) {
     )
 }
 
-/**
- * The web's `StepGroup`: the run of steps between two pieces of text, the coworker and what it is
- * doing while it works, beside a pill with every tool used so far. The pill opens on the full list.
- */
 export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: string | null }) {
     const t = useTranslations('mobileSteps.group')
     const theme = useTheme()
@@ -175,9 +165,6 @@ export function StepGroup({ items, agentId }: { items: StepItem[]; agentId: stri
     )
 }
 
-/** One step of an agent's work on a single line, which opens on what went in and what came out. */
-// `defaultOpen`: a step that opens on its own while it runs (a delegation and its tasks), and folds
-// back once it settles.
 export function StepRow({ symbol, label, detail, status, elapsed, defaultOpen = false, children }: { symbol: IconName; label: string; detail?: string; status: StepStatus; elapsed?: ReactNode; defaultOpen?: boolean; children?: ReactNode }) {
     const theme = useTheme()
     const [open, setOpen] = useState(defaultOpen)
@@ -240,8 +227,6 @@ function Mono({ text, tone = 'default', maxHeight = 160 }: { text: string; tone?
     )
 }
 
-// The arguments the way the web reads them: a lone preview, a shell command or a file path stands
-// alone, anything else as JSON.
 function argsText(toolName: string, args: Record<string, unknown>): string {
     if (typeof args.preview === 'string' && Object.keys(args).length <= 1) return args.preview
     if (toolName === 'shell_exec' && typeof args.command === 'string') return args.command
@@ -262,7 +247,6 @@ function outputText(output: unknown, t: ToolTranslator, locale: string): string 
 
 type ToolCallStepProps = { toolName: string; state: string | undefined; input?: unknown; inputText?: string; output?: unknown; errorText?: string; agentName?: (agentId: string) => string | undefined }
 
-/** A tool call on one line of the folded steps: what it was called with, and the full exchange on a tap. */
 export function ToolCallStep({ toolName, state, input, inputText, output, errorText, agentName }: ToolCallStepProps) {
     const t = useTranslations('mobileSteps.tool')
     const tTools = useTranslations('tools')
@@ -286,7 +270,6 @@ export function ToolCallStep({ toolName, state, input, inputText, output, errorT
     )
 }
 
-/** A settled or running thought on one line of the folded steps. */
 export function ReasoningStep({ text, streaming }: { text: string; streaming: boolean }) {
     const t = useTranslations('mobileSteps.reasoning')
     const theme = useTheme()
@@ -305,7 +288,6 @@ export function ReasoningStep({ text, streaming }: { text: string; streaming: bo
 
 export type CompactionData = { status: 'running' | 'done' | 'error'; messagesCompacted?: number; tokensRecovered?: number }
 
-/** The compaction of the conversation's context on one line of the folded steps. */
 export function CompactionStep({ data }: { data: CompactionData }) {
     const t = useTranslations('mobileSteps.compaction')
     const locale = useLocale()

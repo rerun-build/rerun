@@ -8,8 +8,6 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useState, type FormEvent } from 'react'
 import { startDesktopBrowserSignIn, stopWaitingForBrowser } from './desktop-sign-in'
 
-// What the desktop app's sign-in page shows while the person signs in in their browser. The app
-// reloads on its own once the browser hands the code back; the code can also be pasted by hand.
 export function DesktopSignInWaiting({ provider }: { provider: DesktopSignInProvider }) {
     const t = useTranslations('desktopShell.signIn')
     const [error, setError] = useState<DesktopSignInError | null>(null)

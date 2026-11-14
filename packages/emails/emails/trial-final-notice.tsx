@@ -8,20 +8,12 @@ import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface TrialFinalNoticeProps {
-  /**
-   * Whether Stripe holds a card for this trial. The two readers are in opposite situations: one is
-   * about to be charged and must not be told their workspace is pausing, the other is about to see it paused.
-   */
   hasCard: boolean;
   workspaceName: string | null;
-  /** "12 March, 14:00 UTC", preformatted. */
   trialEndsLabel: string;
-  /** When an unpaid workspace is paused, same format. */
   pausedLabel: string;
-  /** Until when the paused workspace is saved, "11 June". Preformatted. */
   keptUntilLabel: string;
   billingUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;

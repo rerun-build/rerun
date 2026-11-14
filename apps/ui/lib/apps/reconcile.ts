@@ -1,14 +1,7 @@
 import { inNamespace } from './linkup/namespace'
 
-// What the daily reconciliation does with each account Linkup holds for us. Pure: the task feeds
-// it Linkup's list and our rows, and only deletes what this returns.
-
-// A connection in progress has an account at Linkup before its row says connected: the dialog may
-// still be waiting on a 2FA code.
 export const CONNECTING_GRACE_MS = 60 * 60_000
 
-// An account paused for want of a paid slot is kept a week for its owner to buy one back, then
-// deleted: it costs Rerun every day it stays connected.
 export const UNPAID_PAUSE_GRACE_MS = 7 * 86_400_000
 
 export type LinkupAccountRef = { account_id: string; platform: string; account_name: string | null; created_at: string }
@@ -17,8 +10,6 @@ export type ConnectionRef = { id: string; provider_account_id: string | null; st
 
 export type AccountVerdict = { accountId: string; connectionId: string | null; reason: 'orphan' | 'not_connected' | 'unpaid_pause' | 'stale_connect' }
 
-// Only the accounts of `namespace` and of the apps' `platforms` are judged: the other environments
-// share the Linkup key, and their accounts are not orphans of this one.
 export function accountsToDelete(accounts: LinkupAccountRef[], connections: ConnectionRef[], now: Date, namespace: string, platforms: readonly string[]): AccountVerdict[] {
     const live = new Map<string, ConnectionRef>()
     for (const connection of connections) {

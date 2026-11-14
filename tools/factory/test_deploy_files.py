@@ -1,4 +1,3 @@
-"""Checks of the dev-engine and runner compose files and the status script (rerun#60 C2). Text checks only: no docker."""
 import ast, os, re, unittest
 
 VPS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "deploy", "vps")
@@ -112,7 +111,6 @@ class FactoryM2Doc(unittest.TestCase):
         for need in ("trigger.py", "engine.py", "store.py", "limits.py", "runner_loop.py", "status_report.py", "runner.json"):
             self.assertIn(need, loop)
     def test_install_copies_every_module_its_files_import(self):
-        # Computed from the import statements, those inside functions too: a hand-kept list missed ledger and roster.
         here = os.path.join(VPS, "..", "..", "tools", "factory")
         with open(os.path.join(here, "install.sh"), encoding="utf-8") as f:
             loop = re.search(r"for f in ([^;]+); do", f.read()).group(1).split()
@@ -128,7 +126,6 @@ class FactoryM2Doc(unittest.TestCase):
         self.assertEqual(sorted(missing), [])
 
 
-# Removals that take more than leftovers: tagged images, containers, volumes, networks.
 WIDE = ("system prune", "volume prune", "container prune", "network prune", "--volumes", "image prune -a", "image prune --all")
 
 

@@ -1,11 +1,4 @@
 #!/bin/sh
-# Adds what webgate and searxng (docker-compose.vps.yml) need to the server's existing .env, the one
-# make-env.sh wrote. The file is root's, so run from the clone:
-#   sudo sh deploy/vps/add-web.sh
-#
-# WEBGATE_KEY and SEARXNG_SECRET are generated and CRAWL4AI_URL is set, each only when missing, so a
-# second run changes nothing. CRAWL4AI_TOKEN is asked for at a hidden prompt; Enter alone keeps the
-# one already there. No value is printed.
 set -eu
 cd "$(dirname "$0")/../.."
 
@@ -16,11 +9,8 @@ umask 077
 trap 'stty echo 2>/dev/null || true; rm -f .env.tmp' EXIT
 trap 'exit 1' INT TERM
 
-# The last value of KEY in a file, without surrounding quotes.
 value_in() { sed -n "s/^$2=//p" "$1" | tail -n 1 | sed "s/^'\(.*\)'\$/\1/; s/^\"\(.*\)\"\$/\1/"; }
 
-# Sets KEY to VALUE in .env, replacing its line or adding one, as in make-env.sh. A value holding a
-# single quote cannot be written that way: the script stops and .env stays as it was.
 put() {
     case "$2" in *"'"*) echo "The value of $1 contains a single quote, which .env cannot hold. Nothing was changed for it."; exit 1 ;; esac
     K="$1" V="$2" awk 'BEGIN { k = ENVIRON["K"]; line = k "=\047" ENVIRON["V"] "\047" }

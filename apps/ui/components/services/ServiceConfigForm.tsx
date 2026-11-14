@@ -21,22 +21,13 @@ import { useTranslations } from 'next-intl'
 type ServiceConfigFormProps = {
     agentId: string
     slug: string
-    // Which account of the app this form sets up, when it is not the base one (`slug@id`).
     instanceKey?: string
-    // Adds another account next to the ones the coworker holds; its key comes back from the install.
     newInstance?: boolean
     name: string
     authMethods: AuthMethodSummary[]
-    // Pre-select a method (e.g. the one a previous install used); defaults to recommended.
     initialMethodId?: string
-    // Open straight on the sign-in step for a service already compiled and waiting on auth,
-    // so the user doesn't walk through the config form again just to reach Connect.
     initialAuthTarget?: { oauth?: OAuthTarget; managed?: ManagedTarget; composio?: ComposioTarget; app?: AppTarget }
-    // Called after a successful install/connect — e.g. to auto-send a chat follow-up so the
-    // agent continues with the new tools available.
     onInstalled?: (key: string, name: string) => void
-    // Connects at mount, for a caller whose own Connect button already was the user's click.
-    // The popup is the one it opened inside that click handler.
     autoConnect?: { popup: Window | null }
 }
 
@@ -58,8 +49,6 @@ function hasSignInTarget(target: AuthTarget | undefined): boolean {
     return Boolean(target?.oauth || target?.managed || target?.composio)
 }
 
-// Nothing to pick and nothing to type: the only thing left between the user and the sign-in
-// popup is a click, so the caller's own Connect button can be that click.
 export function connectsInOneClick(authMethods: AuthMethodSummary[], initialMethodId?: string, initialAuthTarget?: AuthTarget): boolean {
     if (hasSignInTarget(initialAuthTarget)) return true
     if (authMethods.length === 0 || (authMethods.length > 1 && !initialMethodId)) return false
@@ -67,21 +56,14 @@ export function connectsInOneClick(authMethods: AuthMethodSummary[], initialMeth
     return isConnectKind(method.kind) && !method.inputs.some(i => !i.secret)
 }
 
-// One install form, rendered identically inline in chat AND in the Services settings tab.
-// When a service offers several auth methods, a picker swaps the fields; submitting compiles
-// the selected method into engine primitives. OAuth methods surface an inline sign-in step,
-// so the form handles both credential and browser-sign-in flows end-to-end.
 export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, name, authMethods, initialMethodId, initialAuthTarget, onInstalled, autoConnect }: ServiceConfigFormProps) {
     const t = useTranslations('services')
     const errorText = useErrorText()
     const driver = useServiceSetupDriver()
-    // Null until the install allocated the new account's key, so a retry reuses it.
     const [activeKey, setActiveKey] = useState<string | null>(() => (newInstance ? null : (instanceKey ?? slug)))
     const [methodId, setMethodId] = useState(() => pickDefaultMethod(authMethods, initialMethodId).id)
     const method = useMemo(() => authMethods.find(m => m.id === methodId) ?? authMethods[0], [authMethods, methodId])
     const hasChoice = authMethods.length > 1
-    // A method already used by a previous install opens straight on its view; otherwise the user
-    // picks one first.
     const [choosing, setChoosing] = useState(() => hasChoice && !initialMethodId)
 
     const form = useForm<Record<string, string>>({ defaultValues: Object.fromEntries(method.inputs.map(i => [i.key, ''])) })
@@ -97,8 +79,6 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
     const [signInStart, setSignInStart] = useState<{ popup: Window | null } | null>(() => (autoConnect && hasSignInTarget(initialAuthTarget) ? autoConnect : null))
     const [error, setError] = useState<string | null>(null)
 
-    // Reset the form to the newly selected method's fields when the method changes. Skipped on
-    // the first render, which would otherwise wipe an initialAuthTarget before it ever shows.
     const mountedMethodId = useRef(method.id)
     useEffect(() => {
         if (mountedMethodId.current === method.id) return
@@ -113,8 +93,6 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
     }, [method, form])
 
     const isConnect = isConnectKind(method.kind)
-    // Connect methods get their secret from the sign-in flow, but may still need non-secret
-    // pre-auth config (e.g. a data region the compiler needs to pick the host).
     const visibleInputs = isConnect ? method.inputs.filter(i => !i.secret) : method.inputs
     const missingRequired = visibleInputs.some(i => i.required && !(values[i.key] ?? '').trim())
 
@@ -131,7 +109,6 @@ export function ServiceConfigForm({ agentId, slug, instanceKey, newInstance, nam
         const res = await driver.install(agentId, activeKey ?? slug, vals, method.id, activeKey ? undefined : { newInstance: true })
         const key = res.ok ? res.result.key : (activeKey ?? slug)
         if (res.ok) setActiveKey(key)
-        // Cancelled while the engine was answering: no sign-in step left to hand the popup to.
         if (unmountedRef.current) {
             popup?.close()
             return

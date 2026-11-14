@@ -9,8 +9,6 @@ import { CheckIcon, Package, PencilIcon, ShieldCheckIcon, UsersIcon, type Lucide
 import { cn } from '@/lib/utils'
 import type { CaptureStep } from './useCaptureFlow'
 
-// The create wizard names the template before it captures anything; the standalone capture starts
-// on an existing one, so it passes a capture step and the naming stage simply reads as done.
 export type ProgressStep = 'title' | CaptureStep
 
 type StageState = 'upcoming' | 'current' | 'done'
@@ -21,9 +19,6 @@ type CaptureStage = {
     points: readonly string[]
 }
 
-// What the capture actually does, step by step. The security points are the protections
-// `apps/engine/src/agents/archive.ts` applies, so this panel states them rather than promising
-// something the pipeline does not do.
 const CAPTURE_STAGES: readonly CaptureStage[] = [
     { step: 'title', icon: PencilIcon, points: ['private', 'signed'] },
     { step: 'select', icon: UsersIcon, points: ['snapshot', 'edits'] },
@@ -33,14 +28,9 @@ const CAPTURE_STAGES: readonly CaptureStage[] = [
 
 const EDGE_FADE = 'linear-gradient(to bottom, transparent, black 12%, black 88%, transparent)'
 
-// Right hand column of the capture wizards: the four stages stacked top to bottom, the current one
-// always scrolled back to the middle. The step is the only thing that moves the list, so the
-// container is `overflow-hidden`: it still scrolls programmatically, just never under the wheel.
 export function CaptureProgressPanel({ step }: { step: ProgressStep }) {
     const scrollRef = React.useRef<HTMLDivElement>(null)
     const activeRef = React.useRef<HTMLDivElement>(null)
-    // Half the visible height, so the first and the last stage can reach the middle at all: without
-    // it `scrollTo` clamps at the ends and only the inner stages would ever centre.
     const [pad, setPad] = React.useState(0)
 
     React.useEffect(() => {
@@ -88,13 +78,11 @@ type CaptureStageCardProps = {
     ref?: React.Ref<HTMLDivElement>
     stage: CaptureStage
     state: StageState
-    // False on the first stage, which has nothing above it to connect to.
     connected: boolean
 }
 
 function CaptureStageCard({ ref, stage, state, connected }: CaptureStageCardProps) {
     const t = useTranslations('templates.capture.stages')
-    // The point keys differ per stage, which the typed lookup cannot follow through `stage.step`.
     const point = (key: string) => t(`${stage.step}.points.${key}` as Parameters<typeof t>[0])
     return (
         <li className="flex flex-col">
@@ -137,8 +125,6 @@ const STRIPE_COLORS: Record<StageState, string> = {
     done: 'rgb(34 197 94 / 0.14)',
 }
 
-// One layer per state cross-fading rather than a single `Stripes` whose `color` changes: the colour
-// is an inline `backgroundImage`, so swapping it would snap instead of transitioning.
 function StageStripes({ state }: { state: StageState }) {
     return (
         <>

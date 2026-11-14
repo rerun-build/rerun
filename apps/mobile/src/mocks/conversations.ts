@@ -1,7 +1,5 @@
 import type { SessionSource, SessionStatus } from '@rerun/contracts'
 
-// A coworker's conversations as the hub could hand them to the app: its status, where it came from,
-// and whether it finished after the person last opened it (`session_reads`).
 export type LabConversation = {
     id: string
     title: string
@@ -9,7 +7,6 @@ export type LabConversation = {
     source: SessionSource
     minutesAgo: number
     unseen: boolean
-    // What the coworker waits on, for a conversation that needs the person.
     ask?: string
     steps?: number
 }

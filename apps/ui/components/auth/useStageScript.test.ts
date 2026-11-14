@@ -15,8 +15,6 @@ const SCRIPT: StageScript = {
     ],
 }
 
-// Rejoue le scénario image par image, comme le faisait le lecteur qui cumulait les délais : c'est
-// la référence dont la lecture par l'heure ne doit jamais s'écarter.
 function playedUpTo(script: StageScript, time: number) {
     const statuses: Record<string, string> = {}
     const hotLinks: Record<string, string[]> = {}

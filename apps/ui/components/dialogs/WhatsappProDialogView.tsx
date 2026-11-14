@@ -38,7 +38,6 @@ export type WhatsappProDialogViewProps = {
     onDone: () => void
 }
 
-// The number a reconnect links again, read back from its label: "Jane (+33612345678)" or the bare number.
 function numberInLabel(label: string | null | undefined): string {
     return label?.match(/\+\d{7,15}/)?.[0] ?? ''
 }

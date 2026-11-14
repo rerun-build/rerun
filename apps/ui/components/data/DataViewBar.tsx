@@ -16,16 +16,13 @@ import { useState } from 'react'
 type DataViewBarProps = {
     views: TableView[]
     activeId: string
-    /** Why views cannot be added here, e.g. an engine that predates them. */
     unavailableReason?: string
     onSelect: (id: string) => void
     onAdd: (layout: CardLayout) => void
-    /** A view is being created: the layout picker waits for it. */
     adding?: boolean
     onEdit: (view: TableView) => void
     onDelete: (view: TableView) => void
     onExpand?: () => void
-    /** Search and table actions, at the right end of the tabs. */
     actions?: React.ReactNode
 }
 

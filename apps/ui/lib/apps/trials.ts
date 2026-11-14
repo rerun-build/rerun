@@ -1,4 +1,3 @@
-// No 'server-only': swept hourly from Trigger.dev.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { selectMany } from '@/supabase/supabase-helpers'
@@ -34,8 +33,6 @@ async function settle(supabase: Client, workspaceId: number, slug: AppSlug, upda
     if (error) throw new Error(error.message)
 }
 
-// This install sells no slot, so a subscriber trial that ends is settled and charges nothing: the
-// account keeps the slot it already holds.
 export async function sweepSubscriberTrials(supabase: Client, now: Date): Promise<{ reminded: number; free: number; failed: string[] }> {
     const { data: apps } = await selectMany(supabase, 'workspace_apps', ['workspace_id', 'app_slug', 'trial_ends_at', 'trial_settled_at', 'trial_reminder_sent_at', 'status'] as const, { trial_ends_at: { notNull: true }, trial_settled_at: { isNull: true } })
     const report = { reminded: 0, free: 0, failed: [] as string[] }

@@ -1,8 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
-// Held for the one moment the panel is open on a template the catalogue has not delivered yet:
-// opening the library straight on a slug. Traced on TemplateDetailPanel, down to the media band's
-// ratio and the five rows of the meta block, so nothing shifts when the real one lands.
 export function TemplateDetailPanelSkeleton() {
     return (
         <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">

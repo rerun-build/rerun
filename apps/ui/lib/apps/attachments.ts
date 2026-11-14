@@ -4,19 +4,12 @@ import { site } from '@/lib/site'
 import { ATTACHMENT_PATH, ATTACHMENT_REF_KEYS, downloadAttachment, type AttachmentRef } from './linkup/client'
 import type { LinkupAttachment } from './linkup/envelope'
 
-// A file somebody sent to a connected account. Linkup hands an attachment as a `download_url` on its
-// own API, behind the Rerun key, so a coworker can do nothing with it as is. This turns it into what
-// it can use: a public link that serves the file for a day, and the words of a voice note.
-
 const LINKUP_HOST = 'api.linkupapi.com'
 
 export const ATTACHMENT_URL_TTL_MS = 24 * 60 * 60_000
 
-// The request bodies the transcription API takes; a voice note runs about 2 KB a second.
 export const TRANSCRIBE_MAX_BYTES = 10 * 1024 * 1024
 
-// Which attachment the coworker means, from the `download_url` Linkup gave it or from the ids
-// themselves. The account in that URL is never used: the call acts with the coworker's own.
 export function parseAttachmentRef(input: Record<string, unknown>): AttachmentRef | null {
     const ref: AttachmentRef = {}
     const given = typeof input.download_url === 'string' ? input.download_url.trim() : ''
@@ -39,8 +32,6 @@ export function parseAttachmentRef(input: Record<string, unknown>): AttachmentRe
     }
     return ref.message_id || ref.asset_urn || ref.attachment_id ? ref : null
 }
-
-// --- The public link ---
 
 type AttachmentTicket = { c: string; r: AttachmentRef; exp: number; t?: string }
 
@@ -77,7 +68,6 @@ export function readAttachmentTicketFromEnv(token: string): AttachmentTicket | n
     return secret ? readAttachmentTicket(token, secret) : null
 }
 
-// The file name closes the URL because an API taking a link often reads the format from it.
 export function attachmentUrl(connectionId: string, ref: AttachmentRef, file: { name: string; mimeType: string | null }, now: number = Date.now()): { url: string; expiresAt: string } | null {
     const secret = urlSecret()
     if (!secret) return null
@@ -86,8 +76,6 @@ export function attachmentUrl(connectionId: string, ref: AttachmentRef, file: { 
     const base = (process.env.NEXT_PUBLIC_APP_URL ?? site.url).replace(/\/$/, '')
     return { url: `${base}/api/public/attachments/${token}/${encodeURIComponent(file.name)}`, expiresAt: new Date(exp).toISOString() }
 }
-
-// --- Formats and names ---
 
 const EXTENSION_BY_MIME: Record<string, string> = {
     'audio/ogg': 'ogg',
@@ -140,7 +128,6 @@ export function extensionOf(mimeType: string | null | undefined, name?: string |
     return extensionOfName(name) ?? EXTENSION_BY_MIME[baseMime(mimeType) ?? ''] ?? 'bin'
 }
 
-// The `input_audio.format` the transcription API takes, or null when the file is not speech it reads.
 export function audioFormatOf(mimeType: string | null | undefined, name?: string | null): string | null {
     const mime = baseMime(mimeType)
     if (mime && !mime.startsWith('audio/') && mime !== 'video/mp4' && mime !== 'application/octet-stream') return null
@@ -153,7 +140,6 @@ export function isAudioAttachment(attachment: { type?: string; mime_type?: strin
     return attachment.type === 'audio' || (baseMime(attachment.mime_type)?.startsWith('audio/') ?? false)
 }
 
-// A name the coworker's files and a URL both take: no folders, nothing a shell trips on.
 export function safeFileName(name: string | null | undefined, fallbackStem: string, extension: string): string {
     const cleaned = (name ?? '')
         .normalize('NFKC')
@@ -167,8 +153,6 @@ export function safeFileName(name: string | null | undefined, fallbackStem: stri
     const stem = cleaned || fallbackStem.replace(/[^a-zA-Z0-9_-]+/g, '').slice(0, 60) || 'attachment'
     return `${stem}.${extension}`
 }
-
-// --- Reading the bytes ---
 
 export async function readCapped(stream: ReadableStream<Uint8Array>, maxBytes: number): Promise<Uint8Array | null> {
     const reader = stream.getReader()
@@ -200,8 +184,6 @@ export async function transcribeStream(stream: ReadableStream<Uint8Array>, forma
     }
 }
 
-// --- What a woken coworker reads ---
-
 export type AttachmentSummary = {
     type: string
     name: string
@@ -215,8 +197,6 @@ export type AttachmentSummary = {
     transcriptError?: string
 }
 
-// `base` carries the ids that live on the message rather than on each file: the WhatsApp message,
-// the LinkedIn conversation.
 export function attachmentRefOf(attachment: LinkupAttachment, base: AttachmentRef): AttachmentRef | null {
     return parseAttachmentRef({ ...base, download_url: attachment.download_url, message_id: attachment.message_id ?? base.message_id, asset_urn: attachment.asset_urn, attachment_id: attachment.attachment_id })
 }
@@ -238,8 +218,6 @@ function summaryOf(attachment: LinkupAttachment, ref: AttachmentRef | null, conn
     }
 }
 
-// Every voice note is transcribed before the coworker wakes, within `budgetMs`: past it the coworker
-// wakes without the words and fetches them itself with the download tool.
 export async function summarizeAttachments(input: { accountId: string; connectionId: string; attachments: LinkupAttachment[]; base: AttachmentRef; budgetMs: number }): Promise<AttachmentSummary[]> {
     const signal = AbortSignal.timeout(input.budgetMs)
     return Promise.all(

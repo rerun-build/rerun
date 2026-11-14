@@ -13,10 +13,6 @@ import { ONBOARDING_STEPS, type OnboardingLabStep } from '@/mocks/onboarding'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: the onboarding of a new account, each step on mock data. Answering a card moves the mock
-// conversation on, so the flow can be clicked through.
-//   /lab-onboarding?step=company&scheme=dark
-//   step: industry | company | company-filled | role | name | pack | choice | input | either | typed | plan | trial | failed | blocked | building | built | waitlist
 type IntakeLabStep = 'industry' | 'company' | 'company-filled' | 'role' | 'name'
 
 const INTAKE: Record<IntakeLabStep, { initial: Parameters<typeof useIntake>[0]['initial']; index: number; knownFirstName: string | null }> = {

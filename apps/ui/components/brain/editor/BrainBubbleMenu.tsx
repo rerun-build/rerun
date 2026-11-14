@@ -25,7 +25,6 @@ function MenuButton({ icon: Glyph, label, active, onClick }: { icon: LucideIcon;
 
 const normalizeUrl = (value: string) => (/^[a-z][a-z0-9+.-]*:/i.test(value) ? value : `https://${value}`)
 
-// Formatting on the selection, the way Notion shows it: nothing on screen until text is selected.
 export function BrainBubbleMenu({ editor }: { editor: Editor }) {
     const t = useTranslations('brain.editor.bubble')
     const [linkDraft, setLinkDraft] = useState<string | null>(null)

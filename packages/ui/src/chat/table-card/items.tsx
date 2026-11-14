@@ -5,8 +5,6 @@ import { Badge } from '../../primitives'
 import { CardAvatar, CardThumb } from './CardMedia'
 import { cellText, formatCell, formatText, toneOf, type CellContext } from './format-cell'
 
-// One row drawn the way a layout draws it. The chat card and the database views of the app lay these
-// out differently, a few in a preview against a full page, but each row reads the same in both.
 export type RowItemProps = {
     row: Record<string, unknown>
     fields: CardFields
@@ -78,7 +76,6 @@ export type BoardColumnHeaderProps = {
     value: string
     total: number
     sum?: number
-    /** Format of the summed column. */
     valueFormat?: string
     context: CellContext
     className?: string

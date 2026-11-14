@@ -7,7 +7,6 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-live-'))
 
 const { stream, seen } = vi.hoisted(() => ({
     stream: { parts: [] as unknown[] },
-    // step_count as the row held it at the moment settle began writing the final figures
     seen: { beforeFinish: undefined as number | undefined },
 }))
 

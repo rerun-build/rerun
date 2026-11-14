@@ -10,14 +10,11 @@ import { toast } from 'sonner'
 const POLL_INTERVAL = 10_000
 const GRACE_IDLE = 2
 const GRACE_WORKING = 5
-// A Box absent from the caller's reach this many polls in a row leaves the board: one miss can be a
-// Box created a moment ago that the health read did not see yet.
 const SPACE_GONE_STRIKES = 2
 
 export function useAgentHealthSync(workspaceId: number | undefined) {
     const offlineStrikes = useRef<Record<string, number>>({})
     const missingSpaceStrikes = useRef<Record<string, number>>({})
-    // Un check plus long que l'intervalle ne doit pas en lancer un second par-dessus.
     const inFlight = useRef(false)
 
     const sync = useCallback(async () => {

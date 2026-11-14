@@ -40,7 +40,6 @@ describe('the model behind a Rerun alias', () => {
         await vi.waitFor(async () => expect(await answeringModel('rerun', 'rerun-smart')).toBe('anthropic/claude-haiku-5.5'))
     })
 
-    // An older hub answers 404: the alias stands for itself, which keeps the message first, as before.
     it('stays the alias when the hub cannot say, and the hub is not asked again on the next run', async () => {
         const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('Not found', { status: 404 }))
         const { answeringModel } = await freshModule()

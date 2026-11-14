@@ -13,22 +13,17 @@ const RESULT_TYPES = ['managed-oauth-success', 'managed-oauth-error'] as const
 
 type ManagedConnectProps = {
     agentId: string
-    // The registry key of the account being connected: the slug, or `slug@id` for another account.
     instanceKey: string
     provider: string
     serverName: string
     name: string
     onAuthorized: (accountEmail?: string) => void
-    // Starts the sign-in at mount, in the window the caller opened inside its click handler.
     autoStart?: boolean
     pendingPopup?: Window | null
 }
 
 type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 
-// Connect a managed service: Rerun brokers the OAuth (one app) in a popup, then runs the
-// provider's API calls itself. The token lands on the engine; here we only drive the popup and
-// react to its result over a same-origin BroadcastChannel (survives COOP-severed openers).
 export function ManagedConnect({ agentId, instanceKey, provider, serverName, name, onAuthorized, autoStart, pendingPopup }: ManagedConnectProps) {
     const t = useTranslations('services.connect')
     const [state, setState] = useState<ConnectState>('idle')

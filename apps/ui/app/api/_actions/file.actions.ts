@@ -32,8 +32,6 @@ export async function writeFileAction(agentId: string, filePath: string, content
     return saveTextFile(conn, `/agents/${engineAgentId}/files`, filePath, content, baseHash)
 }
 
-// Thumbnails only need the first few lines. Slicing here keeps the browser payload tiny even
-// though the engine hands us a 100k page.
 export async function readFileHeadAction(agentId: string, filePath: string): Promise<string> {
     const { conn, engineAgentId } = await getAgentChatTarget(agentId)
     const { content } = await engine.readFileText(conn, `/agents/${engineAgentId}/files`, filePath)

@@ -25,7 +25,6 @@ const renderMarkdown = (text: string) => <MessageResponse>{text}</MessageRespons
 type AttachedFile = { uploadId: string; file: FileUIPart & { id: string } }
 
 type QuestionFormProps = Pick<QuestionFormBaseProps, 'ref' | 'textareaRef' | 'textareaProps' | 'inline'> & {
-    /** Where a joined file lands. Null when none can reach the coworker: no paperclip then. */
     target: UploadTarget | null
     maxFileSize?: number
     questions: QuestionItem[]
@@ -34,7 +33,6 @@ type QuestionFormProps = Pick<QuestionFormBaseProps, 'ref' | 'textareaRef' | 'te
     disabled?: boolean
 }
 
-// The upload hook needs a target on every render, including the ones where attachments are off.
 const NO_UPLOADS: UploadTarget = { kind: 'shared' }
 
 function toFilePart(file: File): AttachedFile['file'] {
@@ -68,8 +66,6 @@ export function QuestionForm({ ref, target, maxFileSize = MAX_UPLOAD_FILE_BYTES,
     })
     useEffect(() => () => Object.values(attachedRef.current).flat().forEach(revokePreview), [])
 
-    // A file dropped from the answer has already landed on the Box when its upload finished, so it is
-    // deleted there too. Best effort, like the composer: chat-uploads/ tolerates an orphan.
     const discard = (entries: AttachedFile[]) => {
         for (const entry of entries) {
             const item = uploads.byId.get(entry.uploadId)
@@ -95,8 +91,6 @@ export function QuestionForm({ ref, target, maxFileSize = MAX_UPLOAD_FILE_BYTES,
             const room = MAX_FILES - Object.values(attached).flat().length
             if (files.length > room) toast.error(t('tooManyFiles', { max: MAX_FILES, rejected: files.length - Math.max(0, room) }))
             const picked = files.slice(0, Math.max(0, room))
-            // Only the sized ones are enqueued, so the ids come back lined up with them. The cap is
-            // the target's, which is lower on the hub than on a Box.
             const sized = picked.filter(file => file.size <= maxFileSize)
             const oversized = picked.filter(file => file.size > maxFileSize)
             if (oversized.length > 0) {

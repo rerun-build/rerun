@@ -3,7 +3,6 @@
 import { BoxIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-// The house Box name pills, in the New agent chip style: low, filled, the picked one lit.
 export function NameChips({ names, picked, onPick, className }: { names: string[]; picked: string | null; onPick: (name: string) => void; className?: string }) {
     if (names.length === 0) return null
 

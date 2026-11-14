@@ -11,7 +11,6 @@ const THUMB_WIDTH = 1280
 const THUMB_HEIGHT = 800
 const THUMB_SCALE = 0.5
 
-// No capture for what has nothing to look at: the grid shows the file's icon instead.
 function isCapturable(contentType: string): boolean {
     return !contentType.startsWith('video/') && !contentType.startsWith('audio/') && !contentType.startsWith('application/zip') && contentType !== 'application/octet-stream'
 }
@@ -26,8 +25,6 @@ async function imageThumbnail(storageKey: string): Promise<Buffer | null> {
         .toBuffer()
 }
 
-// The capture service opens the link like a member would: a one-minute ticket for this access
-// version, redeemed on the page's own host, then the page itself.
 async function pageThumbnail(slug: string, accessVersion: number, requestUrl: string): Promise<Buffer | null> {
     const origin = publishedSiteOrigin(slug)
     if (!origin) return null
@@ -45,7 +42,6 @@ async function pageThumbnail(slug: string, accessVersion: number, requestUrl: st
     return capture.body
 }
 
-// Best effort, after the publish answered: a link without a thumbnail shows its icon.
 export async function captureThumbnail(slug: string, requestUrl: string): Promise<void> {
     try {
         const entry = await loadPublished(slug)

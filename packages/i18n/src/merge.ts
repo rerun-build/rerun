@@ -1,10 +1,7 @@
 export type MessageTree = { [key: string]: string | MessageTree }
 
-// Keys of a namespace that describe the strings for the translator and never reach a screen.
 export const CONTEXT_KEY = '_context'
 
-// A key missing from a pack falls back to its English source, so a half-translated pack still shows
-// a whole screen.
 export function mergeMessages<T extends MessageTree>(base: T, ...overlays: (MessageTree | undefined)[]): T {
     const out: MessageTree = { ...base }
     for (const overlay of overlays) {

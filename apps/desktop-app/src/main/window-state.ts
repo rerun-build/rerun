@@ -3,8 +3,6 @@ import { readSettings, updateSettings, type WindowBounds } from './settings'
 
 const DEFAULT_SIZE = { width: 1440, height: 900 }
 
-// The last size and place of the window, kept when it still fits on a connected display: a window
-// saved on an external monitor that is gone reopens centered on the main one.
 export function restoredBounds(): WindowBounds {
     const saved = readSettings().windowBounds
     const workArea = screen.getPrimaryDisplay().workAreaSize

@@ -9,8 +9,6 @@ const { beforeEach, describe, expect, it, vi } = await import('vitest')
 const { mkdir, readFile, rm, writeFile } = await import('node:fs/promises')
 const { agentDir, boxDefaultPath, connectionsDir } = await import('../config/paths.js')
 
-// The default is read once per process, so each test boots a fresh copy of the module to see
-// what the engine sees on start.
 async function boot() {
     vi.resetModules()
     return import('./default.js')
@@ -66,7 +64,6 @@ describe('writeBoxDefault', () => {
         expect(await second.readBoxDefault()).toEqual({ connectionId: 'cnx-3', model: 'gpt-5' })
     })
 
-    // Each cached agent holds a pair resolved against the old default.
     it('drops the cached agents so the next lookup resolves against the new default', async () => {
         const { writeBoxDefault, clearBoxDefault } = await boot()
         const { getAgent } = await import('../agents/registry.js')

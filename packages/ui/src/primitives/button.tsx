@@ -24,8 +24,6 @@ function Button({
     }) {
     const Comp = asChild ? Slot.Root : 'button'
 
-    // `outset: 1` = la bordure de 1px que buttonVariants pose sur toutes les variantes : sans lui
-    // l'anneau se dessine à l'intérieur d'elle, en double trait au rayon décalé.
     const beamProps: BorderBeamProps | null = highlight ? { tone: 'white', pattern: 'arcs', animated: true, glow: true, outset: 1, ...(highlight === true ? {} : highlight) } : null
 
     if (asChild) {

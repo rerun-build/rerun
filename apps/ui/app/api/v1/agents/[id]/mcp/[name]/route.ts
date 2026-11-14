@@ -5,8 +5,6 @@ import type { McpServerView } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// The server a coworker asks to be signed in to. Read again on every call: the coworker registers it
-// moments before asking.
 export const GET = apiRoute({ auth: 'member' }, async ({ ctx, params }): Promise<McpServerView> => {
     const found = await getCustomMcpServer(params.id, params.name, actorFromContext(ctx))
     if (!found) throw new ApiError(404, `MCP server not found: ${params.name}`)

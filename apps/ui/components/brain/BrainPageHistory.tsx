@@ -39,8 +39,6 @@ function PreviewSkeleton() {
     )
 }
 
-// Every version of a page, newest first, as Notion lays its history out: what the page said on the
-// left, who changed it and when on the right.
 export function BrainPageHistory({ page, revisions, titles, onBack, onOpenPage, onOpenFile, onRestore }: BrainPageHistoryProps) {
     const t = useTranslations('brain')
     const locale = useLocale()
@@ -62,7 +60,6 @@ export function BrainPageHistory({ page, revisions, titles, onBack, onOpenPage, 
         }
     }, [page.slug, selectedId])
 
-    // Escape steps back to the page rather than closing the whole Brain.
     useEffect(() => {
         const onKey = (event: KeyboardEvent) => {
             if (event.key !== 'Escape' || document.querySelector('[role="alertdialog"]')) return

@@ -4,12 +4,6 @@ import * as React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { EMAIL_PREVIEWS, NEWSLETTERS, renderEmail, TONES, TrialEnded, theme } from '@rerun/emails'
 
-// The email design system only holds if the templates keep going through it. These three checks
-// are what stop the old habits from creeping back: per-file colour constants, flexbox that no
-// mail client runs, and alpha colours the Word engine drops on the floor.
-
-// Structural colours that are not design tokens: the light edge on the button relief, and the
-// transparent keyword.
 const STRUCTURAL_COLOURS = new Set(['#ffffff'])
 
 function allowedColours(): Set<string> {
@@ -23,8 +17,6 @@ function allowedColours(): Set<string> {
     return new Set(values.map(value => value.toLowerCase()))
 }
 
-// Newsletters go through the same checks: they are written by hand, one file per issue, and
-// nothing else would stop a pasted hex from landing in one.
 const NEWSLETTER_PREVIEW_PROPS = {
     appUrl: 'https://app.rerun.build',
     unsubscribeUrl: 'https://app.rerun.build/unsubscribe?token=test',
@@ -85,7 +77,6 @@ describe('email templates', () => {
     it('only uses colours declared in the theme', async () => {
         const allowed = allowedColours()
         for (const { id, html } of await renderAll()) {
-            // The lookbehind skips numeric HTML entities (&#8203;), which are not colours.
             const strays = [...new Set(html.match(/(?<!&)#[0-9a-f]{3,8}\b/gi) ?? [])]
                 .map(hex => hex.toLowerCase())
                 .filter(hex => !allowed.has(hex))
@@ -118,7 +109,6 @@ describe('email templates in the reader\'s language', () => {
         expect(text).not.toContain('YOUR TRIAL HAS ENDED')
     })
 
-    // A key missing from a pack, or a message the ICU parser refuses, would print its key path.
     it.each(['fr', 'es', 'pt', 'de'] as const)('renders every preview in %s with no missing or broken message', async locale => {
         const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
         for (const preview of EMAIL_PREVIEWS) {

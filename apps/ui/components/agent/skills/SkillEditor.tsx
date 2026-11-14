@@ -31,11 +31,7 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
     const errorText = useErrorText()
     const tShared = useTranslations('agent.modelsShared')
     const isEdit = !!slug
-    // Only an existing skill is sealed: writing a new one on a template's agent stays open, and an
-    // empty form has nothing to hide anyway.
     const locked = useTemplateContentLock(agentId) && isEdit
-    // A sealed skill is shown, never edited: the body in this form is the filler the server sent,
-    // so saving it would write that filler over the real procedure.
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : tShared('boxManageReason')
     const readOnly = readOnlyProp || locked || !canManage
@@ -133,8 +129,6 @@ export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onB
             <PanelEditorShell>
                 <PanelEditorHeader title={readOnly ? t('titleView') : isEdit ? t('titleEdit') : t('titleNew')} onBack={onBack}>
                     {isEdit && !readOnlyProp && (
-                        // Kept in place when sealed rather than removed: a button that disappears never
-                        // says why it went.
                         <TooltipDisabledReason reason={locked ? t('locks.download') : undefined}>
                             <Button size="icon-sm" variant="ghost" loading={downloading} disabled={locked} onClick={handleDownload} title={t('download')} aria-label={t('download')}>
                                 <DownloadIcon className="size-4" />

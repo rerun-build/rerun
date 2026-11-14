@@ -6,10 +6,6 @@ import { useTranslations } from 'use-intl'
 
 import { fitAttachments, imageAttachment, MAX_ATTACHMENTS, type ComposerAttachment } from './attachments'
 
-/**
- * Picking files off the phone, with what did not fit said out loud. Shared by the composer and the
- * answer to a coworker's question, which attach the same way to the same folder.
- */
 export function useAttachmentPicker(attachments: ComposerAttachment[], onChange: (next: ComposerAttachment[]) => void) {
     const t = useTranslations('mobileChat.composer')
 
@@ -23,7 +19,6 @@ export function useAttachmentPicker(attachments: ComposerAttachment[], onChange:
     const pickPhotos = async () => {
         const room = MAX_ATTACHMENTS - attachments.length
         if (room <= 0) return
-        // Compatible hands over a JPEG instead of the library's HEIC, which the models do not all read.
         const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, selectionLimit: room, quality: 0.8, preferredAssetRepresentationMode: ImagePicker.UIImagePickerPreferredAssetRepresentationMode.Compatible })
         if (!result.canceled) add(result.assets.map((asset, index) => ({ ...imageAttachment(asset.uri, attachments.length + index), size: asset.fileSize })))
     }

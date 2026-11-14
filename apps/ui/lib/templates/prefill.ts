@@ -134,8 +134,6 @@ export type TemplateMeta = {
     metaDescription: string
 }
 
-// The title the brief carries was typed in the new template dialog, before a single agent was
-// captured, so it is a working name and never a constraint on the one written here.
 export async function generateTemplateMeta(brief: TemplateBrief): Promise<TemplateMeta> {
     const { object } = await generateObject({
         model: openrouter(PREFILL_MODEL),
@@ -158,9 +156,6 @@ The "Template" line is the working name its author typed before capturing anythi
     }
 }
 
-// The long description is passed as context to be avoided, not summarised: a FAQ that repeats
-// the section above it earns nothing in search. It stays out of the brief because the brief is
-// shared with the writer that produces that description in the first place.
 export async function generateTemplateFaq({ brief, longDescription }: { brief: TemplateBrief; longDescription: string }): Promise<TemplateFaqItem[]> {
     const context = longDescription.trim()
         ? `${describeTemplate(brief)}\n\nThe page already says this above the FAQ, so do not restate it:\n${longDescription.trim()}`
@@ -183,14 +178,10 @@ Never answer a question the brief does not support, and never promise an outcome
     }))
 }
 
-// Truncating at the limit takes the question mark with it, and an entry that does not end on
-// one reads as a cut off string in the accordion.
 function asQuestion(value: string): string {
     return value.endsWith('?') ? value : `${value}?`
 }
 
-// The image itself is the source of truth here: the template only tells the writer which
-// vocabulary belongs to this job, so the alt text lands on the page it illustrates.
 export async function generateImageAltText({
     brief,
     imageUrl,

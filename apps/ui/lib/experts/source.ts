@@ -1,7 +1,5 @@
 export type ExpertSource = 'linkedin' | 'x'
 
-// Pasted lines are tolerated without a scheme ("linkedin.com/in/jane"), but the source is decided
-// on the parsed hostname rather than a substring match, so "https://evil.com/x.com" is not an X URL.
 export function normalizeProfileUrl(raw: string): string | null {
     const trimmed = raw.trim()
     if (!trimmed) return null

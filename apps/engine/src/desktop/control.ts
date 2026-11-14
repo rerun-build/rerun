@@ -2,7 +2,6 @@ import { execFile } from 'node:child_process'
 import { BAR_WINDOW_NAME, DOCK_WINDOW_NAME } from './panels.js'
 import { SCREEN_CAPTURE_BINARY, desktopEnv, ensureDesktop } from './session.js'
 
-// Past this size a model scales the picture down itself and its coordinates stop matching ours.
 const VIEW_MAX_WIDTH = 1280
 const VIEW_MAX_HEIGHT = 720
 const JPEG_QUALITY = 75
@@ -56,10 +55,8 @@ export type MouseButton = keyof typeof BUTTONS
 export type ScrollDirection = keyof typeof SCROLL_BUTTONS
 export type Screenshot = { image: Buffer; mediaType: 'image/jpeg'; width: number; height: number }
 
-// The agent points at what it saw, which is the capture, not the screen: `scale` is the way back.
 export type ScreenControl = { env: NodeJS.ProcessEnv; width: number; height: number; scale: number; signal?: AbortSignal }
 
-// Something the agent may not do on its screen, as opposed to something that broke.
 export class ControlRefusal extends Error {}
 
 type RunOptions = { signal?: AbortSignal; input?: string }
@@ -95,8 +92,6 @@ function onScreen(control: ScreenControl, [x, y]: ViewPoint): [string, string] {
     return [clamp(x, control.width), clamp(y, control.height)]
 }
 
-// The dock opens the terminal and the files whatever the agent's own switches say, so it is the
-// person's to click.
 async function refusePanel(control: ScreenControl): Promise<void> {
     const location = (await xdotool(control, ['getmouselocation', '--shell'])).toString()
     const window = /^WINDOW=(\d+)$/m.exec(location)?.[1]
@@ -125,7 +120,6 @@ export async function drag(control: ScreenControl, from: ViewPoint, to: ViewPoin
         await xdotool(control, ['mousedown', BUTTONS.left])
         await movePointer(control, to)
     } finally {
-        // Without the run's signal: a stop in the middle of a drag must still let go of the button.
         await run('xdotool', ['mouseup', BUTTONS.left], control.env).catch(() => {})
     }
 }
@@ -136,7 +130,6 @@ export async function scroll(control: ScreenControl, point: ViewPoint, direction
     await xdotool(control, ['click', '--repeat', String(amount), SCROLL_BUTTONS[direction]])
 }
 
-// Through stdin: an argument that happens to be the name of an xdotool command would be run as one.
 export async function typeText(control: ScreenControl, text: string): Promise<void> {
     await xdotool(control, ['type', '--delay', TYPE_DELAY_MS, '--file', '-'], { input: text })
 }
@@ -156,7 +149,6 @@ export function keyCombos(keys: string): string[] {
     })
 }
 
-// One combo per call, for the same reason the text goes through stdin.
 export async function pressKeys(control: ScreenControl, keys: string): Promise<void> {
     for (const combo of keyCombos(keys)) {
         try {

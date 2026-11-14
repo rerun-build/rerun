@@ -4,9 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type ScrollFadeOptions = {
     fadeSize?: number
-    /** `x` pour une rangée qui défile à l'horizontale : le fondu se pose alors à gauche et à droite. */
     axis?: 'x' | 'y'
-    /** Recolle le défilement au bas quand le contenu grandit sous un lecteur qui y était déjà. */
     pinBottom?: boolean
 }
 
@@ -22,17 +20,6 @@ function contentPadding(content: Element | null, axis: 'x' | 'y'): [number, numb
     return axis === 'x' ? [parseFloat(style.paddingLeft), parseFloat(style.paddingRight)] : [parseFloat(style.paddingTop), parseFloat(style.paddingBottom)]
 }
 
-/**
- * Le masque d'un conteneur qui défile : un fondu en haut tant qu'il reste du contenu au-dessus, un
- * autre en bas tant qu'il en reste en dessous, et aucun masque du tout quand tout tient dans la
- * boîte — poser un masque inconditionnel ronge le premier et le dernier élément alors qu'il n'y a
- * rien à dissoudre. Un fondu ne couvre jamais plus que le contenu qui a déjà défilé, la marge
- * intérieure du contenu n'en fait pas partie : une conversation collée en bas qui ne déborde que de
- * son padding laisse son premier message net.
- *
- * L'élément est passé en état, pas en ref : il arrive parfois d'une librairie qui possède le
- * conteneur, et un `ref.current` lu une fois au montage manquerait celui qui n'est pas encore là.
- */
 export function useScrollEdges(element: HTMLElement | null, { fadeSize = 24, axis = 'y', pinBottom = false }: ScrollFadeOptions = {}) {
     const atBottomRef = useRef(true)
     const [fade, setFade] = useState({ top: 0, bottom: 0 })
@@ -56,8 +43,6 @@ export function useScrollEdges(element: HTMLElement | null, { fadeSize = 24, axi
         }
         onResize()
         element.addEventListener('scroll', update, { passive: true })
-        // Le conteneur ET son contenu : le masque se recalcule quand la boîte est redimensionnée
-        // comme quand le contenu grandit dessous, ce que fait une réponse en train de s'écrire.
         const observer = new ResizeObserver(onResize)
         observer.observe(element)
         if (element.firstElementChild) observer.observe(element.firstElementChild)

@@ -58,7 +58,6 @@ type SubRunTreeProps = {
     onStopTask?: (taskId: string) => void
 }
 
-/** A delegation's tasks hanging from one trunk: the last calls of each while it works, its result once it settles. */
 export function SubRunTree({ tasks, toolDisplay, onStopTask }: SubRunTreeProps) {
     return (
         <div className="@container flex flex-col gap-1 px-1 pt-1 pb-1">
@@ -195,7 +194,6 @@ function Outcome({ task }: { task: SubRunTask }) {
 function LiveSteps({ task, tone, toolDisplay }: { task: SubRunTask; tone: Tone; toolDisplay: ToolDisplayOf }) {
     const t = useTranslations('chat.subRun')
     const calls: SubRunCall[] = task.calls?.length ? task.calls : task.activity ? [{ tool: task.activity, summary: '', elapsedMs: task.idleMs ?? 0 }] : []
-    // The engine only keeps the last calls of a task, its count still has them all.
     const total = task.calls?.length ? Math.max(task.toolCalls ?? 0, calls.length) : calls.length
     const visible = calls.slice(-VISIBLE_LIVE_CALLS)
     const hidden = total - visible.length

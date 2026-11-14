@@ -10,17 +10,12 @@ import { TemplateDetailPanel } from '@/components/templates/TemplateDetailPanel'
 import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 
-// La page d'atterrissage d'un lien de template. Elle remplace le wizard de recrutement à elle seule :
-// rien à configurer, une seule décision. C'est exactement la fiche de la library, en une colonne, et
-// c'est son footer partagé qui sait quelle porte le bouton franchit (plan, achat, placement).
 export function TemplateDeepLinkDialog({ slug }: { slug: string }) {
     const t = useTranslations('dialogs.templateDeepLink')
     const template = useTemplateFlowStore(s => s.linkTemplate)
     const closeLink = useTemplateFlowStore(s => s.closeLink)
     const isAdmin = useIsAdmin()
 
-    // La fiche charge sa propre template : c'est aussi ce qui la fait revenir intacte après un
-    // checkout annulé, où seul le slug traverse.
     useEffect(() => {
         if (useTemplateFlowStore.getState().linkTemplate?.slug === slug) return
         let cancelled = false
@@ -42,8 +37,6 @@ export function TemplateDeepLinkDialog({ slug }: { slug: string }) {
         <Dialog open onOpenChange={open => !open && closeLink()}>
             <DialogContent className="gap-0 overflow-hidden p-0 max-sm:h-[85dvh] sm:max-w-lg">
                 <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col sm:h-[min(52rem,92dvh)]">
-                    {/* Le panneau affiche déjà le titre : celui-ci n'existe que pour Radix, qui exige
-                        un titre et une description accessibles sur tout contenu de dialog. */}
                     <DialogHeader className="sr-only">
                         <DialogTitle>{template ? t('titleNamed', { title: template.title }) : t('title')}</DialogTitle>
                         <DialogDescription>{t('description')}</DialogDescription>
@@ -55,8 +48,6 @@ export function TemplateDeepLinkDialog({ slug }: { slug: string }) {
     )
 }
 
-// Calqué sur TemplateDetailPanel : le média 16:9, le titre, le bloc meta et le bouton se trouvent
-// déjà à leur place quand la template arrive.
 function TemplateDetailSkeleton() {
     return (
         <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">

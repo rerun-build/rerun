@@ -5,8 +5,6 @@ import type { Provider } from '@rerun/contracts'
 import type { LoadedAgent } from './types.js'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-availability-'))
-// `env()` caches on first call, and the first call happens while the imports below run, so the hub
-// credentials the keyless Rerun connection is judged on have to be in place before them.
 process.env.RERUN_HUB_BASE_URL = 'https://hub.example.com'
 process.env.RERUN_API_KEY = 'hub-key'
 
@@ -33,13 +31,10 @@ async function makeAgent(connectionId: string | null, provider: Provider | null,
     return { id: 'a1', config, soul: '', install: '', env: {}, resolved: await resolveConfiguredModel(config) }
 }
 
-// An agent that picked nothing: the state a freshly created one starts in.
 function boxDefaultAgent(): Promise<LoadedAgent> {
     return makeAgent(null, null, null)
 }
 
-// Each test starts from a bare box. `ensureRerunConnection` is called explicitly rather than here,
-// so a test can describe a box that has no keyless fallback at all.
 beforeEach(async () => {
     await clearBoxDefault()
     await rm(connectionsDir(), { recursive: true, force: true })
@@ -187,8 +182,6 @@ describe('resolveConfiguredModel', () => {
 
     it('still maps a bare provider onto the oldest connection of that provider', async () => {
         const first = await connect('anthropic', { ANTHROPIC_API_KEY: 'k1' })
-        // Age is the creation time to the millisecond, then the random id: two connections opened in
-        // the same millisecond, as a fast machine does here, would be ordered by chance.
         await new Promise(resolve => setTimeout(resolve, 2))
         await connect('anthropic', { ANTHROPIC_API_KEY: 'k2' })
         const resolved = await resolveConfiguredModel(agentConfigSchema.parse({ name: 'a1', provider: 'anthropic', model: 'claude-opus-4-8' }))
@@ -205,7 +198,6 @@ describe('resolveAutomationModel over a box-default agent', () => {
     })
 })
 
-// What a ChatGPT account without the Sol models answers to Codex's `model/list`, read on a real box.
 const CHATGPT_PLAN_MODELS = ['gpt-6-luna', 'gpt-5.6-terra', 'gpt-5.6-luna']
 
 async function chatgpt(served: string[] | null = CHATGPT_PLAN_MODELS) {

@@ -5,8 +5,6 @@ const FALLBACK_WORDS = 5
 const ENDS_A_CLAUSE = /[,.;:!?]$/
 const TRAILING_PUNCTUATION = /[\s,.;:!?—–-]+$/
 
-// The name used when the model has not answered: the one the text declares, or its first words up
-// to the end of the first clause. A rough name is fixed in one click; an agent never created is not.
 export function fallbackAgentName(task: string): string {
     const declared = declaredAgentName(task)
     if (declared) return declared

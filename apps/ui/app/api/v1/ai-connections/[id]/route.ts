@@ -13,7 +13,6 @@ export const PATCH = apiRoute({ auth: 'admin', body: updateConnectionSchema }, a
     })
 )
 
-// Rerun comes with the plan: the web offers no delete for it either.
 export const DELETE = apiRoute({ auth: 'admin' }, async ({ ctx, params }) => {
     if (params.id === RERUN_CONNECTION_ID) throw new ApiError(400, 'Rerun comes with your plan and cannot be removed.')
     return answeringConnectionErrors(async () => {

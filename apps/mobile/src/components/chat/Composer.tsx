@@ -26,12 +26,10 @@ const LINE_HEIGHT = 21
 
 export type ComposerHandle = {
     focus: () => void
-    /** Puts text back in the composer, unless something is already typed there. */
     restore: (text: string) => boolean
 }
 
 type ComposerProps = {
-    // Either held by the caller through `value`, or the conversation's draft kept under `draftKey`.
     value?: string
     onChangeText?: (text: string) => void
     draftKey?: string
@@ -41,20 +39,17 @@ type ComposerProps = {
     onStop: () => void
     running: boolean
     placeholder: string
-    // Left out until the conversation can carry them: no model chip, no attachments, no voice messages.
     model?: Model
     onOpenModel?: () => void
     canAttach?: boolean
     voice?: VoiceSender
     target?: { coworker: Coworker; choices: Coworker[]; onPick: (id: string) => void }
-    // What `/` and `@` offer, as on the web: none of either leaves its menu shut.
     skills?: SkillSummary[]
     mentionAgents?: MentionAgent[]
     autoFocus?: boolean
     ref?: Ref<ComposerHandle>
 }
 
-// A pill at rest, a card once in use (focused, holding text or attachments, or listening).
 export function Composer({ value: heldValue, onChangeText, draftKey, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], autoFocus, ref }: ComposerProps) {
     const theme = useTheme()
     const glass = useGlassStyle()
@@ -68,7 +63,6 @@ export function Composer({ value: heldValue, onChangeText, draftKey, attachments
     }
     useImperativeHandle(ref, () => ({ focus: () => input.current?.focus(), restore: (text: string) => draftKey !== undefined && restoreDraft(draftKey, text) }), [draftKey])
     const [caret, setCaret] = useState(value.length)
-    // Where the caret goes once the text a menu just wrote is on screen.
     const pendingCaret = useRef<number | null>(null)
     const t = useTranslations('mobileChat.composer')
     const { add, pickPhotos, takePhoto, pickFiles } = useAttachmentPicker(attachments, onAttachmentsChange)
@@ -106,7 +100,6 @@ export function Composer({ value: heldValue, onChangeText, draftKey, attachments
         input.current?.focus()
     }
 
-    // Only the composer being typed in: the pager keeps its neighbours' composers mounted.
     const onPasted = useEffectEvent((uris: string[]) => add(uris.map(imageAttachment)))
     useEffect(() => {
         if (!focused || !canAttach) return
@@ -122,8 +115,6 @@ export function Composer({ value: heldValue, onChangeText, draftKey, attachments
         onStop()
     }
 
-    // As on the web: with nothing to send the mic is the main action, or stop while a turn runs; once
-    // there is something to send, send takes over and the mic steps back (or out, for text).
     const actions = running ? (
         canSend ? (
             <>
@@ -160,7 +151,6 @@ export function Composer({ value: heldValue, onChangeText, draftKey, attachments
                     {!expanded && canAttach && <AttachMenu onPhotos={pickPhotos} onCamera={takePhoto} onFiles={pickFiles} skills={skills} onSkill={pickSkill} />}
                     {recorder.status === 'idle' ? (
                         <View style={{ flex: 1 }}>
-                            {/* A multiline input wraps its placeholder: this one stays on a single line, cut short. */}
                             {value.length === 0 && (
                                 <Text numberOfLines={1} pointerEvents="none" style={[inputText, { position: 'absolute', left: 0, right: 0, top: 0, color: theme.mutedForeground }]}>
                                     {placeholder}

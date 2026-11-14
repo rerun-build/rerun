@@ -26,8 +26,6 @@ import {
 } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-// How long a card that deserves it keeps its beam after landing: long enough to be seen arriving,
-// short enough that a board full of cards is not a board full of moving outlines.
 const ARRIVAL_BEAM_MS = 4000
 
 const BEAMED_KINDS = new Set<CompanyFinding['kind']>(['identity', 'brain'])
@@ -265,7 +263,6 @@ export function DiscoveryCard({ finding, still }: { finding: CompanyFinding; sti
                                         transition={{ duration: 1.4, repeat: 2, ease: 'easeOut' }}
                                     />
                                 )}
-                                {/* eslint-disable-next-line @next/next/no-img-element -- LinkedIn photo URLs are third-party */}
                                 <img src={finding.photoUrl} alt="" className="relative size-10 rounded-full object-cover" />
                             </div>
                         ) : (

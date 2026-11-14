@@ -12,8 +12,6 @@ import { useTypewriter } from './useTypewriter'
 
 const KEY = 'min-w-5 gap-1 px-1 py-0 text-[10px] font-normal text-muted-foreground shadow-none'
 
-// The pill grows by a CSS transition: once it has run, the field is wider than the caret last saw
-// it, so the end of the line is brought back.
 const GROW_MS = 220
 
 function revealCaret(input: HTMLInputElement) {
@@ -27,13 +25,11 @@ type ForemanPillFieldProps = {
     draft: string
     focused: boolean
     onDraftChange: (draft: string) => void
-    /** Has to be stable: it is also called when the field goes away. */
     onFocusChange: (focused: boolean) => void
     onEngage: () => void
     onSubmit: () => void
 }
 
-/** What is typed here is sent from here and answered above the ball. Only the ball opens the column. */
 export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange, onFocusChange, onEngage, onSubmit }: ForemanPillFieldProps) {
     const t = useTranslations('foreman.pill')
     const reducedMotion = useReducedMotion()
@@ -48,7 +44,6 @@ export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange,
         return () => clearTimeout(timer)
     }, [writing, inputRef])
 
-    // A field replaced while it held the caret never blurs: the pill would stay wide for nobody.
     useEffect(() => () => onFocusChange(false), [onFocusChange])
 
     return (

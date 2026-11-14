@@ -34,7 +34,6 @@ export interface EmailPreview {
 }
 
 const APP_URL = "https://app.rerun.build";
-// The end-of-access notices are mandatory, so they carry no unsubscribe link at all.
 const BILLING_URL = `${APP_URL}/?billing=1`;
 
 const KIND_LABELS: Record<AgentNotificationKind, string> = {
@@ -56,8 +55,6 @@ const KIND_MESSAGES: Record<AgentNotificationKind, string> = {
     "I need access to Google Drive to read the spreadsheet you mentioned.",
 };
 
-// Real published slugs, so the gallery shows the cards the endpoint actually captures rather
-// than the generic fallback a slug nobody published resolves to.
 const RECOMMENDED = [
   {
     title: "Turn slow Shopify stock into bundles and campaigns",
@@ -82,9 +79,6 @@ const RECOMMENDED = [
   },
 ];
 
-// The row the email falls back to when a capture is not there: no board on the template, or a
-// screenshot that failed on the way out. Worth relooking at, it is also what a reader with images
-// turned off comes closest to seeing.
 const RECOMMENDED_NO_IMAGE = RECOMMENDED.map(({ imageUrl, ...rest }) => rest);
 
 const notificationPreviews: EmailPreview[] = (
@@ -104,10 +98,6 @@ const notificationPreviews: EmailPreview[] = (
   ),
 }));
 
-/**
- * Every template and every variant of it, in one list. The admin gallery renders this, so a
- * new variant is visible the moment it is added here.
- */
 export const EMAIL_PREVIEWS: EmailPreview[] = [
   ...notificationPreviews,
   {

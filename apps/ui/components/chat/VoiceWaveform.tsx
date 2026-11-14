@@ -5,9 +5,7 @@ import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 type VoiceWaveformProps = {
-    /** Amplitudes in 0..1, spread across the full width whatever the bubble's size. */
     peaks: readonly number[]
-    /** 0..1. Bars before it read as played. */
     progress?: number
     barWidth?: number
     barGap?: number
@@ -17,18 +15,13 @@ type VoiceWaveformProps = {
     className?: string
 }
 
-// The bar geometry and the alpha ramp come from the static mode of components/ui/live-waveform,
-// so a message plays back in the same visual language it was recorded in.
 const PLAYED_ALPHA_FLOOR = 0.4
 const PLAYED_ALPHA_RANGE = 0.6
 const UNPLAYED_ALPHA_SCALE = 0.3
 
-/** The waveform of a recorded voice message, doubling as its progress bar. */
 export function VoiceWaveform({ peaks, progress = 0, barWidth = 3, barGap = 1, barRadius = 1.5, minBarHeight = 4, height = 32, className }: VoiceWaveformProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [width, setWidth] = useState(0)
-    // Sampling the inherited colour is what makes the bars follow a text-* class, and re-sampling
-    // it on a theme change is what makes them follow light / dark.
     const [barColor, setBarColor] = useState('')
     const { resolvedTheme } = useTheme()
 

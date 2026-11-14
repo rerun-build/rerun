@@ -20,8 +20,6 @@ const MERGED = 'Added to the proposal already waiting in this conversation. Say 
 const ALREADY = 'Already proposed once. Nothing shown, and do not raise it again.'
 const NOT_SAVED = 'Could not save the proposal. Nothing shown. Do not retry.'
 
-// The row is matched to its proposal through this result rather than through the tool call id: the
-// MCP bridge the CLI providers go through hands `execute` an id the transcript never carries.
 function proposalResult(status: 'shown' | 'merged', proposalId: string, message: string): string {
     return JSON.stringify({ status, proposalId, message })
 }
@@ -37,8 +35,6 @@ export function proposalFingerprint(input: { mode: string; slug: string | null; 
     return createHash('sha256').update(`${input.mode}|${target}|${rule}`).digest('hex').slice(0, 32)
 }
 
-// Every guard answers the model in plain words instead of throwing: a thrown tool comes back as an
-// invalid call, which the model then retries.
 export async function proposalGuard(agentId: string, input: SkillProposalInput, off: ReadonlySet<string> = new Set()): Promise<string | null> {
     if (input.mode === 'edit') {
         if (!input.slug) return 'An edit proposal needs the slug of the skill to change. Nothing shown.'
@@ -79,8 +75,6 @@ export function skillProposeTool(ctx: RunContext): ToolSet {
                         ...billedBy,
                         sessionId: ctx.sessionId,
                         runId: ctx.runId ?? null,
-                        // The id `execute` receives on the Claude bridge is a per-process JSON-RPC counter:
-                        // it repeats across runs and the column is unique for the whole agent.
                         toolCallId: newId(),
                         mode: input.mode,
                         slug: input.slug,

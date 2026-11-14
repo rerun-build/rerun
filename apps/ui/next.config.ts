@@ -2,29 +2,18 @@ import { withPostHogConfig } from "@posthog/nextjs-config";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-// Dokploy builds without .git, so a production build stamps itself. Written back to process.env so
-// every process of the same build inlines one value.
 process.env.NEXT_PUBLIC_BUILD_SHA ??= process.env.NODE_ENV === "production" ? `build-${Date.now()}` : "dev";
 
 const nextConfig: NextConfig = {
-  // A phone on the same wifi opens the dev server by its LAN address, which Next refuses to serve
-  // scripts to unless it is listed here. A Conductor cloud workspace serves it behind
-  // *.conductor.show: without that origin the page arrives but never hydrates, so every click dies.
   allowedDevOrigins: [...(process.env.ALLOWED_DEV_ORIGINS?.split(",") ?? []), "*.conductor.show"],
   transpilePackages: ["@rerun/ui", "@rerun/emails", "@rerun/db", "@rerun/analytics", "@rerun/i18n"],
-  // ssh2 (the Incus hosts transport) loads an optional native crypto binding; bundled, Turbopack
-  // cannot place the .node asset in an ESM chunk. Left external, Node requires it at runtime and
-  // falls back to pure JS when the binding is missing.
   serverExternalPackages: ["ssh2"],
-  // Inlined into both bundles at build time, so a tab can compare the build it runs against the one
-  // /api/version reports. Locally both read "dev" and the update prompt never fires.
   env: {
     NEXT_PUBLIC_BUILD_SHA: process.env.NEXT_PUBLIC_BUILD_SHA,
   },
   experimental: {
     serverActions: { bodySizeLimit: "64mb" },
   },
-  // The brand pages live in the back office of Rerun Cloud, an app of its own.
   async redirects() {
     const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL;
     if (!adminUrl) return [];
@@ -43,12 +32,10 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-// A build that reports no errors (staging leaves the project token empty) has no source maps to upload.
 const posthogApiKey = process.env.POSTHOG_PERSONAL_API_KEY;
 const posthogProjectId = process.env.POSTHOG_PROJECT_ID;
 const reportsErrorsToPostHog = Boolean(process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN);
 
-// The app picks its language per request (lib/i18n/request-locale.ts), never from the URL.
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 export default withPostHogConfig(withNextIntl(nextConfig), {

@@ -7,8 +7,6 @@ describe('DEFAULT_INSTALL_PROMPT', () => {
         expect(isSetupAnswered({ required: true, prompt: DEFAULT_INSTALL_PROMPT })).toBe(true)
     })
 
-    // A rewrite that drops one of these leaves the buyer with an agent that guesses, asks for
-    // secrets in the chat, or never hands the message box back.
     it.each(['ask_user', 'suggest_service', 'memory_write', 'install_complete'])('tells the agent to use %s', tool => {
         expect(DEFAULT_INSTALL_PROMPT).toContain(tool)
     })

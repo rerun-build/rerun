@@ -1,4 +1,3 @@
-"""clocks.py (rerun#207): run clocks and retry class."""
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import clocks as C

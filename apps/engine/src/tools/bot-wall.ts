@@ -1,10 +1,5 @@
-// A challenge or block page carries almost no text of its own. Real pages that merely embed the
-// vendor's script (Leboncoin ships DataDome on every page, signup forms embed Turnstile) are far
-// longer, so the marker alone is never enough.
 const WALL_MAX_TEXT_LENGTH = 3_000
 
-// `clearsByItself`: a JavaScript challenge that a real browser passes after a few seconds, worth
-// waiting for. The others are final answers.
 const WALLS: Array<BotWall & { marker: RegExp }> = [
     { provider: 'Cloudflare', clearsByItself: true, marker: /<title>\s*just a moment\.\.\.|cf-chl-|checking your browser before|verify(ing)? you are human|additional verification required/i },
     { provider: 'DataDome', clearsByItself: true, marker: /captcha-delivery\.com/i },

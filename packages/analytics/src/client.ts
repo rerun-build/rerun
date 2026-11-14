@@ -2,22 +2,6 @@ import posthog from 'posthog-js'
 import type { BeforeSendFn } from 'posthog-js'
 import { SIGNUP_INTENT_COOKIE, sharedCookieDomain as sharedCookieDomainFor, type AnalyticsEventMap, type Attribution, type EventName } from './index'
 
-// Nothing in here is allowed to touch the browser storage before `startAnalytics` has been called,
-// which the apps do on load for everyone who has not refused: the consent model is opt-out, so
-// only an explicit refusal keeps this closed, and `stopAnalytics` is what a refusal calls. The
-// guard lives here rather than on the call sites: the `rr_*` cookies exist only to feed PostHog,
-// so gating the writer gates all of them at once.
-//
-// PostHog itself is never `init`ed before then. `opt_out_capturing_by_default` would not be
-// enough: it leaves the persistence on, and `init` loads the remote config over the network no
-// matter what. `capture` / `identify` / `register` / `reset` on an uninitialised instance are
-// silent no-ops, so the existing call sites need no guard of their own.
-//
-// A refusal leaves exactly one thing on, `startSessionReplay`: PostHog boots with its persistence
-// in memory and a `before_send` that lets nothing but the replay out. The session is watchable
-// without a byte written to the device, without an identity on it and without a single analytics
-// event. `storageAllowed` stays false there, which is what keeps `track` and `identifyPerson`
-// closed even though the instance is live.
 type AnalyticsMode = 'off' | 'replay' | 'full'
 
 let storageAllowed = false
@@ -25,7 +9,6 @@ let mode: AnalyticsMode = 'off'
 
 const ATTRIBUTION_COOKIE = 'rr_attribution'
 
-// Every cookie this module writes, cleared when consent is withdrawn.
 const FUNNEL_COOKIES = [
     ATTRIBUTION_COOKIE,
     SIGNUP_INTENT_COOKIE,
@@ -36,17 +19,12 @@ const FUNNEL_COOKIES = [
 
 const HYDRATION_MISMATCH = /Minified React error #(418|423|425)\b/
 
-// Chrome and Edge wrap every translated string in a <font>, and Google Translate marks <html> on top.
-// We never render a <font> ourselves.
 function isPageTranslated(): boolean {
     if (typeof document === 'undefined') return false
     const root = document.documentElement.classList
     return root.contains('translated-ltr') || root.contains('translated-rtl') || document.querySelector('font') !== null
 }
 
-// A translator rewrites the server HTML before React hydrates it, so a translated page fails
-// hydration for a reason that is not ours. React recovers by rendering on the client; the report is
-// noise that buries the real mismatches, which still go through on an untranslated page.
 export const dropHydrationNoiseOnTranslatedPage: BeforeSendFn = event => {
     if (event?.event !== '$exception') return event
     const exceptions = (event.properties?.$exception_list ?? []) as { value?: string }[]
@@ -64,11 +42,6 @@ const POSTHOG_BASE_CONFIG = {
     before_send: dropHydrationNoiseOnTranslatedPage,
 } as const
 
-// PostHog builds the properties of a `$snapshot` from the replay payload and a distinct id alone,
-// never from the super properties, so a recording whose distinct id stays the in-memory anonymous
-// one carries nothing that points back at a person. Everything that would carry more is dropped on
-// the way out; the capture flags below only spare the browser the work of producing events this
-// function is going to refuse anyway.
 const replaySnapshotsOnly: BeforeSendFn = event => (event?.event === '$snapshot' ? event : null)
 
 const POSTHOG_REPLAY_ONLY_CONFIG = {
@@ -84,9 +57,6 @@ const POSTHOG_REPLAY_ONLY_CONFIG = {
     before_send: replaySnapshotsOnly,
 } as const
 
-// An event sent as the page goes away can die in the batch queue: PostHog has already flushed it on
-// its own `pagehide`, and a hidden tab may be frozen or killed before the next flush. `leavingPage`
-// sends it on its own, as a beacon. `set` and `setOnce` land on the person, for the cohorts.
 export function track<E extends EventName>(
     event: E,
     properties: AnalyticsEventMap[E],
@@ -125,7 +95,6 @@ export function setSharedCookie(name: string, value: string, maxAgeDays = 90) {
     writeCookie(name, value, maxAgeDays)
 }
 
-// Deleting is always allowed: withdrawing consent has to be able to clean up after itself.
 export function deleteSharedCookie(name: string) {
     writeCookie(name, '', 0)
 }
@@ -149,9 +118,6 @@ function referrerDomain(): string | undefined {
 
 let pendingAttribution: Attribution | undefined
 
-// Read on arrival, kept in memory only. Without this a visitor landing with `?utm_source=x` who
-// navigates client-side before accepting would lose their UTMs: by then the URL no longer carries
-// them and the cookie was never allowed to be written.
 export function rememberAttribution() {
     if (typeof window === 'undefined' || pendingAttribution) return
 
@@ -174,10 +140,6 @@ export function persistAttribution() {
     setSharedCookie(ATTRIBUTION_COOKIE, JSON.stringify(pendingAttribution))
 }
 
-// `lateExtensions` is for a page that has to paint fast on a modest phone: the recorder, the
-// heatmaps and the dead clicks script they pull in (~70 KB and two long tasks) wait for the
-// visitor's first gesture, or a few seconds after `load`, and surveys are not loaded at all. The
-// replay then starts from that moment, not from the first millisecond.
 type PosthogRuntime = { token?: string; debug?: boolean; lateExtensions?: boolean }
 
 const LATE_EXTENSIONS_CONFIG = {
@@ -220,14 +182,8 @@ export function startAnalytics({
     storageAllowed = true
     if (captureAttribution) persistAttribution()
 
-    // A deployment without a token has analytics deliberately off (staging, local dev). The `rr_*`
-    // cookies still work there, which is what makes the funnel testable without a PostHog project.
     if (!token || mode === 'full') return
 
-    // An instance already running for the replay alone cannot be widened in place: its persistence,
-    // its autocapture and its `before_send` are all read at `init`. So the visitor who accepts
-    // after having refused gets a reload, which comes back through here with the consent cookie
-    // already written and `mode` back to `off`.
     if (mode === 'replay') {
         location.reload()
         return
@@ -240,9 +196,6 @@ export function startAnalytics({
     }
 
     posthog.init(token, { ...POSTHOG_BASE_CONFIG, ...LATE_EXTENSIONS_CONFIG, debug })
-    // Heatmaps and dead clicks go back to the project settings. `set_config` skips `undefined`, so
-    // the client-side `false` is cleared on the config itself; the `set_config` inside
-    // `startSessionRecording` then has every extension read it again.
     onFirstGestureOrLater(() => {
         posthog.config.capture_heatmaps = undefined
         posthog.config.capture_dead_clicks = undefined
@@ -250,8 +203,6 @@ export function startAnalytics({
     })
 }
 
-// The one measurement a refusal does not switch off. Only ever called for a visitor who refused,
-// so it must stay storage-free and anonymous: see `POSTHOG_REPLAY_ONLY_CONFIG`.
 export function startSessionReplay({ token, debug = false, lateExtensions = false }: PosthogRuntime) {
     if (!token || mode !== 'off') return
     mode = 'replay'
@@ -260,14 +211,10 @@ export function startSessionReplay({ token, debug = false, lateExtensions = fals
         return
     }
 
-    // `before_send` refuses heatmaps and dead clicks here anyway, so they are never loaded.
     posthog.init(token, { ...POSTHOG_REPLAY_ONLY_CONFIG, ...LATE_EXTENSIONS_CONFIG, debug })
     onFirstGestureOrLater(() => posthog.startSessionRecording())
 }
 
-// Gated like the cookies rather than like `capture`: an `identify` writes the email into the
-// distinct id of the instance, which is the one property a `$snapshot` carries, so letting it
-// through in replay-only mode would put a name on a recording a visitor refused to be measured by.
 export function identifyPerson(
     distinctId: string,
     properties?: Record<string, unknown>,
@@ -294,23 +241,15 @@ function clearPosthogStorage() {
             if (key.startsWith('ph_') || key.startsWith('__ph_opt_in_out_')) localStorage.removeItem(key)
         }
     } catch {
-        // localStorage can be denied outright, and the cookies are already gone
     }
 }
 
-// PostHog cannot be un-initialised: autocapture, pageleave and the exception handlers stay wired
-// whatever we call. So the storage is wiped, persistence is turned off to stop it being written
-// again, and the page is reloaded to drop the listeners. `opt_out_capturing()` is deliberately not
-// called, it would write an orphan `__ph_opt_in_out_*` key of its own.
 export function stopAnalytics(replay?: PosthogRuntime) {
     if (typeof window === 'undefined') return
     storageAllowed = false
     for (const name of FUNNEL_COOKIES) deleteEverywhere(name)
     clearPosthogStorage()
 
-    // The reload is what hands the replay over: the page comes back with the refusal in the cookie,
-    // and the app starts PostHog again in replay-only mode. Nothing to hand over when it was never
-    // running, so that case starts the replay on the spot.
     if (mode === 'full') {
         posthog.set_config({ disable_persistence: true })
         location.reload()
@@ -325,7 +264,6 @@ export function readAttribution(): Attribution {
         try {
             return JSON.parse(raw) as Attribution
         } catch {
-            // fall through to posthog-native props
         }
     }
     return {

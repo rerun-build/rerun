@@ -4,10 +4,6 @@ type RunHandle = { controller: AbortController; agentId: string; cancel?: () => 
 
 const controllers = new Map<string, RunHandle>()
 
-// One live run per conversation. Two runs on the same session read the same history before
-// either has written its user message, so they answer past each other and interleave their
-// messages into one transcript. Claimed synchronously, before the run row is even inserted,
-// so a duplicate request cannot slip through the await.
 type SessionClaim = { runId: string; claimedAt: number; authorId?: string }
 
 const sessionClaims = new Map<string, SessionClaim>()
@@ -19,9 +15,6 @@ export function registerRunAbort(runId: string, agentId: string): AbortControlle
     return controller
 }
 
-// The abort signal alone is not enough to stop a hung run: the codex provider ignores it until its
-// turn has actually started, which is exactly the case when an expired token wedges the handshake.
-// The run loop registers here what it takes to really close itself down.
 export function setRunCancel(runId: string, cancel: () => void): void {
     const handle = controllers.get(runId)
     if (handle) handle.cancel = cancel
@@ -56,8 +49,6 @@ export function agentHasLiveRun(agentId: string): boolean {
     return false
 }
 
-// A coworker is busy while any of its runs is live, not while the latest one is: two runs of one
-// coworker used to flip it to idle as soon as the first one ended.
 export async function syncAgentStatus(agentId: string): Promise<void> {
     await setAgentStatus(agentId, agentHasLiveRun(agentId) ? 'busy' : 'idle')
 }
@@ -76,8 +67,6 @@ export function abortRun(runId: string): boolean {
     controllers.delete(runId)
     releaseSession(runId)
     handle.controller.abort()
-    // Closes the run for good: writes its terminal row, tells the hub, and tears the provider
-    // process down. Without it a provider that ignores the abort keeps the conversation "working".
     handle.cancel?.()
     return true
 }

@@ -28,10 +28,6 @@ const ICONS: Record<NoticeKind, ComponentType<{ className?: string }>> = {
     generic: AlertTriangleIcon,
 }
 
-// A spent subscription is the one case where the header says whose plan ran out: a Box can hold a
-// Claude plan and a ChatGPT plan at once, and only one of them is out. The brand mark carries that
-// faster than any wording, and the title names the window (session, week, Opus) rather than
-// repeating "usage limit".
 function header(kind: NoticeKind, message: string, fallbackTitle: string, tErrors: ChatErrorCopy): { title: string; icon: ComponentType<{ className?: string }> } {
     const title = chatErrorTitle(kind, message, tErrors) ?? fallbackTitle
     if (kind !== 'usage_limit') return { title, icon: ICONS[kind] }
@@ -40,9 +36,6 @@ function header(kind: NoticeKind, message: string, fallbackTitle: string, tError
     return { title, icon: plan === 'claude' ? ClaudeGlyph : plan === 'opencode' ? OpencodeGlyph : OpenAIGlyph }
 }
 
-// The dead end this replaces: a raw provider stack, or "A run is already in flight on this
-// conversation." with nothing to click. Every kind here says what happened and, where there is one,
-// offers the move that fixes it.
 export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnections, onReconnect, onStopRun, onContinue, onRetry, onNewConversation }: { kind: NoticeKind; message: string; onSwitchModel?: () => void; onOpenConnections?: () => void; onReconnect?: () => void; onStopRun?: () => void; onContinue?: () => void; onRetry?: () => void; onNewConversation?: () => void }) {
     const t = useTranslations('chat.providerError')
     const tErrors = useTranslations('chatErrors')
@@ -79,8 +72,6 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
             onClick: onContinue,
         })
     }
-    // A refusal repeats on every send, so only a transient failure is offered a retry. A rejected
-    // thinking replay is the engine's, and a fresh run does not carry it.
     if ((kind === 'overloaded' || kind === 'generic' || kind === 'thinking_replay') && onRetry) {
         actions.push({
             key: 'retry',

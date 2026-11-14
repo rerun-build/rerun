@@ -3,8 +3,6 @@
 import { cn } from '../cn'
 import { useKitTranslations } from '../locale'
 
-// `animated={false}` is for the OG capture: a ping halo caught mid-cycle makes two screenshots of the
-// same card differ. Frozen, it renders at its base scale, which is the frame the animation starts on.
 export function LiveIndicator({ className, animated = true }: { className?: string; animated?: boolean }) {
     const t = useKitTranslations()
     return (

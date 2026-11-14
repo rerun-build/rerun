@@ -8,8 +8,6 @@ import { nowIso } from '../lib/ids.js'
 import { agentDisabled } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 
-// Deliberately without the in-flight collapsing fireSchedule does: two calls to the same webhook
-// are two distinct events, and each caller must get its own run id back.
 export async function fireTrigger(agentId: string, trigger: Trigger, message: string): Promise<{ runId: string; sessionId: string }> {
     const agent = await getAgent(agentId)
     if (!agent.config.enabled) throw agentDisabled()

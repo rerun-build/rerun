@@ -23,8 +23,6 @@ describe('hitlCallBefore', () => {
     })
 })
 
-// Reloaded from the engine, a tool output sits behind the AI SDK `{ type: 'json', value }` envelope
-// the live stream never has.
 describe('paid call figures reloaded from history', () => {
     it('reads what a paid call billed under the envelope', () => {
         expect(billedMicrosOf({ type: 'json', value: { status: 'found', billedMicros: 4_500 } })).toBe(4_500)

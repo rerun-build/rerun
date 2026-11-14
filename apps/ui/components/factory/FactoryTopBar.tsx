@@ -35,8 +35,6 @@ function Chip({ name, label, count, filter, active, onPress, color }: {
     )
 }
 
-// The ledger as the top bar of the Factory: one row of counts; a chip drops the filtered ledger down, and
-// a selected task drops its card down in its place.
 export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCoworker }: {
     snapshot: FactorySnapshot | null
     selected: number | null
@@ -64,7 +62,6 @@ export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCowor
         return () => document.removeEventListener('pointerdown', onDown)
     }, [open, onSelect])
 
-    // The panel slides in on the frame after it mounts.
     const [shown, setShown] = useState(false)
     useEffect(() => {
         if (!open) { setShown(false); return }

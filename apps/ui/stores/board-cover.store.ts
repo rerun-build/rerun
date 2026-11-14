@@ -1,8 +1,6 @@
 import { useEffect } from 'react'
 import { create } from 'zustand'
 
-// Counts the modal overlays currently drawn over the board: behind one, its animations only cost
-// a backdrop blur recomputed on every frame.
 type BoardCoverState = {
     covers: number
     cover: () => () => void

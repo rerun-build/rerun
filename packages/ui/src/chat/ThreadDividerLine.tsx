@@ -12,7 +12,6 @@ const FADE_TOWARD_EDGE = {
     right: '[mask-image:linear-gradient(to_left,transparent,black_70%)]',
 }
 
-// Both halves flow toward the label, so the right one runs its pattern backwards.
 function WaveLine({ side, flowing }: { side: 'left' | 'right'; flowing: boolean }) {
     const patternId = `divider-wave${useId().replace(/[^a-zA-Z0-9]/g, '')}`
     const middle = WAVE_HEIGHT / 2

@@ -132,7 +132,6 @@ describe('writeSchedule', () => {
         expect(await readSchedule(id, 'daily')).toMatchObject({ connectionId: null, provider: null, model: null })
     })
 
-    // Looks wrong: cron/runAt coalesce, so a one-off switched to a cron keeps its runAt, which wins in isDue.
     it('cannot clear cron, runAt or timezone with null, since those coalesce', async () => {
         await writeSchedule(id, { name: 'Daily', body: 'v1', runAt: '2026-10-01T00:00:00.000Z', timezone: 'Europe/Paris' })
         const updated = await writeSchedule(id, { name: 'Daily', body: 'v2', cron: '0 9 * * *', runAt: null, timezone: null })
@@ -220,8 +219,6 @@ describe('slug safety', () => {
     })
 })
 
-// The scheduler marks a schedule fired while the agent may be rewriting it: a read landing in the
-// middle of a write used to see an empty file and write back a schedule with no cron and no body.
 describe('concurrent writes', () => {
     it('keeps the cron, the body and the last edit while the schedule is marked fired', async () => {
         const created = await writeSchedule(id, { name: 'Daily', body: 'Old.', cron: '0 9 * * *' })

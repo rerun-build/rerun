@@ -20,8 +20,6 @@ describe('curationSchema', () => {
     })
 })
 
-// Capture is the user's call, through skill_propose and the row they accept in the chat. An edit
-// reaching for a writer here would break at the import line rather than in production.
 describe('the curator never writes a skill', () => {
     it('imports nothing from the skill loader but its summaries', () => {
         const source = readFileSync(new URL('./curator.ts', import.meta.url), 'utf8')

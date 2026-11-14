@@ -19,7 +19,6 @@ export type RewindAgentInput = {
     spaceId: string
     name: string
     spaceName: string | null
-    // Null when the agent's Box could not be reached.
     report: RewindAgentReport | null
 }
 

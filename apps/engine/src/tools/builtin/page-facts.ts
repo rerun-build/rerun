@@ -3,8 +3,6 @@ const MAX_H1_CHARS = 120
 const MAX_HREFLANG = 15
 const MAX_LINKS_LISTED = 30
 
-// Where the HTML came from decides what the facts prove: the HTML a site serves is what a crawler
-// reads first, the HTML after JavaScript is what a browser ends up showing.
 export type PageSource = 'served' | 'rendered'
 
 type PageFactsOptions = { url: string; source: PageSource; xRobotsTag?: string | null; redirectedTo?: string | null }
@@ -20,7 +18,6 @@ export function stripHtml(html: string): string {
         .trim()
 }
 
-// An entity past the last code point is left as written: String.fromCodePoint would throw on it.
 function codePointOrText(entity: string, code: number): string {
     return Number.isFinite(code) && code <= 0x10ffff ? String.fromCodePoint(code) : entity
 }
@@ -110,9 +107,6 @@ function listed(items: string[], max: number): string {
     return items.length > max ? `${items.slice(0, max).join(', ')} (+${items.length - max} more)` : items.join(', ')
 }
 
-// The <head> and the structure a crawler reads, which the plain text of a page throws away. Without
-// them a coworker auditing a site concludes that a tag it never saw is missing. Null when the body
-// carries none of it, so a JSON or text answer served as HTML gets no empty block.
 export function pageFacts(html: string, { url, source, xRobotsTag, redirectedTo }: PageFactsOptions): string | null {
     let base: URL
     try {

@@ -6,7 +6,6 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-providers-gaps
 process.env.RERUN_HUB_BASE_URL = 'https://hub.example.com/'
 process.env.RERUN_API_KEY = 'hub-key'
 process.env.RERUN_CODEX_PATH = '/opt/codex/bin/codex'
-// The provider SDKs read these from the shell, and a developer routing through a gateway has them set.
 delete process.env.ANTHROPIC_BASE_URL
 delete process.env.OPENAI_BASE_URL
 
@@ -173,7 +172,6 @@ describe('resolveModel on a custom endpoint', () => {
         expect(request.body.model).toBe('llama3.3:70b')
         for (const field of ['reasoning', 'usage', 'provider', 'prompt_cache_key']) expect(request.body).not.toHaveProperty(field)
         expect(JSON.stringify(request.body)).not.toContain('cache_control')
-        // A local model can read its prompt for longer than the five minutes Node waits for headers.
         expect((fetchMock.mock.calls[0] as [string, RequestInit & { dispatcher?: unknown }])[1].dispatcher).toBeDefined()
     })
 
@@ -197,7 +195,6 @@ describe('resolveModel on a custom endpoint', () => {
 })
 
 describe('modelFor', () => {
-    // Reasoning is asked for only where a thought can be shown: a one-shot call has no one to show it to.
     it('reaches the hub without the reasoning request on a one-shot call', async () => {
         respondWith(CHAT_COMPLETION)
 
@@ -231,7 +228,6 @@ describe('modelFor', () => {
     it('signs an openai call with the key of the connection', async () => {
         respondWith({})
 
-        // Only the outgoing request matters here, not parsing a Responses API payload.
         await generateText({ model: modelFor(agentOn('openai', 'gpt-5', { OPENAI_API_KEY: 'oa-key' })), prompt: 'hello', maxRetries: 0 }).catch(() => undefined)
 
         const request = sent()
@@ -247,9 +243,6 @@ describe('modelFor', () => {
         expect(sent().headers.get('x-goog-api-key')).toBe('g-key')
     })
 
-    // The comment on connectionEnv promises an agent with no connection fails rather than borrowing
-    // an ambient key. The Anthropic SDK reads ANTHROPIC_API_KEY from process.env when apiKey is
-    // undefined, so that promise only holds while the engine process carries no such variable.
     it('lets an agent with no connection fall through to an ambient ANTHROPIC_API_KEY', async () => {
         process.env.ANTHROPIC_API_KEY = 'ambient-key'
         respondWith(ANTHROPIC_MESSAGE)
@@ -350,7 +343,6 @@ describe('resolveModel on the codex subscription', () => {
         await resolved.close()
     })
 
-    // Every agent on the keyless box shares the Rerun home rather than one of its own.
     it('falls back to the rerun connection home for a codex agent without a connection', async () => {
         const resolved = resolveModel(agentOn('codex', 'gpt-5.5', null))
         expect(codexAppServerCalls[0]!.defaultSettings.env.CODEX_HOME).toBe(codexHomeDir('rerun'))

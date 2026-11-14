@@ -19,8 +19,6 @@ vi.mock('../../agents/providers.js', async importOriginal => {
             return new MockLanguageModelV3({
                 doGenerate: async options => {
                     model.prompts.push(options.prompt)
-                    // Deaf to the abort signal on purpose: the call that held a run for hours had
-                    // no socket left to cancel.
                     if (model.hang) return new Promise(() => {})
                     return {
                         content: [{ type: 'text', text: 'a ring on a white background' }],

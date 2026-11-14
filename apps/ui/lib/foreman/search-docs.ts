@@ -1,8 +1,5 @@
 import { docsUrl } from '@/lib/site'
 
-// The public documentation, read live from the Mintlify export rather than from apps/docs. The docs
-// ship on their own branch and are served from another host, so reading them over the wire is what
-// keeps what the foreman quotes identical to what the user finds behind the link it hands them.
 const CORPUS_PATH = '/llms-full.txt'
 const CORPUS_TTL_MS = 60 * 60 * 1000
 const FETCH_TIMEOUT_MS = 10_000
@@ -20,9 +17,6 @@ export type ForemanDocsResult = {
 
 let corpus: { sections: DocsSection[]; readAt: number } | null = null
 
-// Mintlify writes one page per `# Title` / `Source: url` pair, with the headings of the page below
-// it. A section is what gets ranked and quoted: a whole page is several thousand tokens of which the
-// question usually needs one part.
 export function parseDocsSections(text: string): DocsSection[] {
     const pages = [...text.matchAll(/^# (.+)[\r\n]+Source: (\S+)[^\n]*$/gm)]
 
@@ -54,14 +48,11 @@ function anchor(heading: string): string {
         .replace(/^-|-$/g, '')
 }
 
-// Words carried by half the corpus rank every section equally, which is the same as ranking none.
 const IGNORED_TERMS = new Set(['the', 'and', 'for', 'with', 'you', 'your', 'that', 'this', 'what', 'how', 'why', 'when', 'does', 'can', 'are', 'from', 'about', 'rerun', 'agent', 'agents'])
 
 function queryTerms(query: string): string[] {
     const words = query.toLowerCase().match(/[a-z0-9]+/g) ?? []
     const kept = [...new Set(words)].filter(word => word.length > 2 && !IGNORED_TERMS.has(word))
-    // A question made only of common words still deserves an answer, so nothing is dropped when
-    // dropping would leave nothing.
     return kept.length ? kept : [...new Set(words)].filter(word => word.length > 2)
 }
 
@@ -74,8 +65,6 @@ export function rankDocsSections(sections: DocsSection[], query: string, limit =
         .filter(entry => entry.score > 0)
         .sort((a, b) => b.score - a.score)
 
-    // One page rarely answers with four of its own sections, and when it does the user is better
-    // served by the link than by the whole page pasted back.
     const perPage = new Map<string, number>()
     const picked: DocsSection[] = []
     for (const { section } of scored) {
@@ -99,8 +88,6 @@ function scoreSection(section: DocsSection, terms: string[]): number {
         if (hits) matched += 1
         score += hits + (title.includes(term) ? 6 : 0)
     }
-    // A section holding every word of the question beats one repeating a single word, whatever its
-    // length.
     return score ? score + matched * 10 : 0
 }
 
@@ -131,10 +118,6 @@ function sectionTitle(section: DocsSection): string {
     return section.heading ? `${section.page} - ${section.heading}` : section.page
 }
 
-/**
- * Answers a question about Rerun itself out of the public documentation. Never throws: a
- * documentation the app cannot reach right now still has a home page worth handing to the user.
- */
 export async function searchForemanDocs(query: string): Promise<ForemanDocsResult> {
     const documentation = docsUrl()
 

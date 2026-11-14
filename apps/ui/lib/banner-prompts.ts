@@ -1,8 +1,3 @@
-// Random full-bleed "fluid glass" banner prompts, derived from blob-prompts.ts. Same visual DNA
-// (color/form/material/light/render) but the texture fills the whole frame edge to edge — no
-// centered blob, no negative space, no background removal. Each axis is a list of interchangeable
-// phrases; a prompt picks one per axis and assembles them into a single sentence.
-
 const COLOR = [
     'vibrant purple with electric acid-green and black accents',
     'deep navy blue glass with cyan and ice-blue highlights',
@@ -68,8 +63,6 @@ export function randomBannerPrompt(): string {
     ].join(' ')
 }
 
-// n distinct prompts. Mirrors blob-prompts' guard against an infinite loop when the combination
-// space can't fill the requested count.
 export function randomBannerPrompts(n: number): string[] {
     const seen = new Set<string>()
     let guard = 0

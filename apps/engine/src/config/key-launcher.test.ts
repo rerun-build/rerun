@@ -24,7 +24,6 @@ afterEach(() => {
     rmSync(dir, { recursive: true, force: true })
 })
 
-// A stand-in for the engine entry: the real key intake, the real auth middleware, two routes.
 function fixture(): string {
     const file = join(dir, 'server.mts')
     const src = (name: string) => pathToFileURL(resolve(engineDir, 'src', name)).href
@@ -94,11 +93,9 @@ describe('image launcher', () => {
         expect((await fetch(`${base}/agents`)).status).toBe(401)
         expect((await fetch(`${base}/agents`, { headers: { authorization: `Bearer ${KEY}` } })).status).toBe(200)
 
-        // The launcher exec'd: the process we started is node itself.
         expect(readFileSync(`/proc/${pid}/cmdline`, 'utf8').split('\0')[0]).toBe(process.execPath)
         expect(readFileSync(`/proc/${pid}/environ`, 'utf8')).not.toContain('RERUN_API_KEY')
 
-        // No process of the engine's tree holds the name (the host may run other things that do).
         for (const entry of treeOf(pid)) {
             let environ = ''
             try {
@@ -109,12 +106,10 @@ describe('image launcher', () => {
             expect(environ.split('\0').filter(line => line.startsWith('RERUN_API_KEY='))).toEqual([])
         }
 
-        // The descriptor the key arrived on is closed after the read (the number may be reused by a socket, never by a pipe).
         let target = ''
         try {
             target = readlinkSync(`/proc/${pid}/fd/3`)
         } catch {
-            // gone
         }
         expect(target.startsWith('pipe:')).toBe(false)
     })

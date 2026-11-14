@@ -32,7 +32,6 @@ async function requireAccount(): Promise<User> {
     return session
 }
 
-// Supabase merges the keys it is handed into the stored metadata, so only what changes is sent.
 async function writeChosenProfile(account: User, chosen: { full_name?: string; avatar_url?: string }, userMetadata?: Record<string, unknown>) {
     const { error } = await createServiceRoleClient().auth.admin.updateUserById(account.id, {
         app_metadata: chosen,
@@ -48,7 +47,6 @@ export async function updateMyNameAction(params: { name: string }): Promise<Acti
         if (!name) return failure('nameRequired')
         if (name.length > PROFILE_NAME_MAX) return failure('keepItUnder', { max: PROFILE_NAME_MAX })
 
-        // The greeting of an email and the foreman read the first name from `user_metadata`.
         await writeChosenProfile(account, { full_name: name }, { full_name: name, first_name: name.split(' ')[0] })
         return { ok: true }
     } catch (err) {
@@ -56,9 +54,6 @@ export async function updateMyNameAction(params: { name: string }): Promise<Acti
     }
 }
 
-// Saved on the account for the emails and notifications it receives, and mirrored in a cookie so
-// this device reads it without a query. The cookie sits on `.rerun.build`, where the landing reads it
-// too. `null` goes back to following the browser.
 export async function updateMyLocaleAction(params: { locale: Locale | typeof PSEUDO_LOCALE | null }): Promise<ActionResult> {
     try {
         const account = await requireAccount()
@@ -70,7 +65,6 @@ export async function updateMyLocaleAction(params: { locale: Locale | typeof PSE
             const service = createServiceRoleClient()
             const { error } = await service.from('users').update<Database['public']['Tables']['users']['Update']>({ locale }).eq('id', account.id)
             if (error) throw new Error(error.message)
-            // The sign-in code emails are Supabase's own templates, which can only read the metadata.
             const { error: metadataError } = await service.auth.admin.updateUserById(account.id, { user_metadata: { locale } })
             if (metadataError) throw new Error(metadataError.message)
         }
@@ -86,8 +80,6 @@ export async function updateMyLocaleAction(params: { locale: Locale | typeof PSE
     }
 }
 
-// The URL is written here and nowhere else: it ends up in an <img> on a teammate's screen, so
-// nothing the browser sends may reach it verbatim.
 export async function uploadMyAvatarAction(formData: FormData): Promise<ActionResult> {
     try {
         const account = await requireAccount()
@@ -118,8 +110,6 @@ export type ConnectedIdentity = { email: string | null; canDisconnect: boolean }
 export type SignInMethods = {
     email: string | null
     oauth: Record<OAuthProvider, ConnectedIdentity | null>
-    // `signsInHere` is false when an older account verified the same number: it is the one the
-    // number opens.
     phone: { number: string; signsInHere: boolean } | null
 }
 
@@ -133,7 +123,6 @@ export async function getSignInMethodsAction(): Promise<ActionResult<{ methods: 
             const identity = identities.find(candidate => candidate.provider === provider)
             if (!identity) return null
             const email = identity.identity_data?.email
-            // Supabase refuses to remove the last identity of an account.
             return { email: typeof email === 'string' ? email : null, canDisconnect: identities.length > 1 }
         }
 
@@ -154,14 +143,11 @@ export async function getSignInMethodsAction(): Promise<ActionResult<{ methods: 
     }
 }
 
-// `a.mail.example.com` is refused by a block on any of its parents, as at signup.
 function domainAndParents(email: string): string[] {
     const labels = (email.split('@')[1] ?? '').split('.')
     return labels.map((_, index) => labels.slice(index).join('.')).filter(Boolean)
 }
 
-// What signing up checks on an address, asked again before the account moves to a new one: the
-// `before_user_created` hook only runs when an account is born.
 export async function prepareEmailChangeAction(params: { email: string }): Promise<ActionResult> {
     try {
         const account = await requireAccount()
@@ -182,7 +168,6 @@ export async function prepareEmailChangeAction(params: { email: string }): Promi
     }
 }
 
-// Called once the new address is confirmed. Best effort: the account has already moved.
 export async function syncAccountEmailAction(): Promise<void> {
     try {
         const account = await requireAccount()

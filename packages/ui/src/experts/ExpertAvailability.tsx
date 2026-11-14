@@ -6,9 +6,6 @@ import { availabilityDot } from './options'
 import { useKitTranslations } from '../locale'
 import type { Expert } from './types'
 
-// A client component so the dot is created on the client side of the boundary. Rendered from a
-// server component, a large RSC payload can hand the tooltip trigger its child as a lazy chunk, and
-// Radix Slot renders a lazy child as nothing on the server: the dot vanished and hydration failed.
 export function ExpertAvailability({ availability, className }: { availability: Expert['availability']; className?: string }) {
     const t = useKitTranslations()
     return (

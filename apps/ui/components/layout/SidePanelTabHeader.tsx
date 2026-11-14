@@ -17,8 +17,6 @@ export type SidePanelTab = {
 type SidePanelTabHeaderProps = {
     tab: SidePanelTab
     onClose: () => void
-    // Whose panel this is. With a title the header names its owner, stays put from one tab to the
-    // next, and the tab moves down to the second line.
     leading?: ReactNode
     title?: string
 }

@@ -1,8 +1,6 @@
 import type { AccessLevel, SpaceVisibility } from '@/app/api/_auth/access'
 import { useBoardStore } from '@/stores/board.store'
 
-// An admin's own board after they changed who can access a Box. Realtime only brings back their own
-// `space_members` rows, so the rows of the others are written here for the panels that count them.
 export function syncBoardVisibility(spaceId: string, visibility: SpaceVisibility) {
     useBoardStore.setState(state => ({ spaces: state.spaces.map(space => (space.id === spaceId ? { ...space, visibility } : space)) }))
 }

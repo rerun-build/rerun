@@ -11,8 +11,6 @@ export function useBoxViewer(): BoxViewer {
     return useMemo(() => ({ userId, role, boxScope }), [userId, role, boxScope])
 }
 
-// The caller's level on a Box, from the board's own rows. `none` while the session is still loading,
-// so a manage-only control starts disabled rather than flashing open.
 export function useSpaceAccess(spaceId: string | null | undefined): BoxAccess {
     const viewer = useBoxViewer()
     const space = useBoardStore(state => (spaceId ? state.spaces.find(s => s.id === spaceId) : undefined))
@@ -20,7 +18,6 @@ export function useSpaceAccess(spaceId: string | null | undefined): BoxAccess {
     return boxAccessFor(viewer, space, grants)
 }
 
-// A coworker carries no access of its own: it is its Box's.
 export function useAgentAccess(agentId: string | null | undefined): BoxAccess {
     const spaceId = useBoardStore(state => (agentId ? state.agents.find(a => a.id === agentId)?.spaceId : undefined))
     return useSpaceAccess(spaceId)
@@ -34,7 +31,6 @@ export function useCanManageSpace(spaceId: string | null | undefined): boolean {
     return useSpaceAccess(spaceId) === 'manage'
 }
 
-// The Boxes a coworker may be created in or moved to.
 export function useManageableSpaceIds(): Set<string> {
     const viewer = useBoxViewer()
     const spaces = useBoardStore(state => state.spaces)
