@@ -43,7 +43,7 @@ const DV = [0, 1, 0, -1]
 type Box = { u0: number; v0: number; u1: number; v1: number }
 type End = { tile: string; box: Box; dir: number }
 type Seg = { axis: 0 | 1; base: number; c: number; fixed: boolean }
-type Route = { source: string; target: string; name: string; from: End; to: End; startRun: number; endRun: number; segs: Seg[]; lattice: AxisPoint[] }
+type Route = { source: string; target: string; name: string; from: End; to: End; startRun: number; endRun: number; segs: Seg[]; lattice: AxisPoint[]; straight: boolean }
 
 const boxOf = (col: number, row: number, span: number): Box => ({ u0: col, v0: row, u1: col + span, v1: row + span })
 const overlaps = (a: Box, b: Box) => a.u0 < b.u1 && a.u1 > b.u0 && a.v0 < b.v1 && a.v1 > b.v0
@@ -334,12 +334,13 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
         })
         const startRun = face(a, from.dir).plane
         const endRun = face(b, to.dir).plane
-        // A straight run gets a jog in its middle: its two ends may sit at different places on their faces.
-        if (segs.length === 1) {
+        // A straight run gets a jog in its middle, kept only if its two ends cannot be lined up (step 2).
+        const straight = segs.length === 1
+        if (straight) {
             const s = segs[0]
             segs.splice(0, 1, { ...s }, { axis: s.axis === 0 ? 1 : 0, base: Math.round((startRun + endRun) / 2), c: Math.round((startRun + endRun) / 2), fixed: false }, { ...s })
         }
-        routes.push({ source, target, name: `${source}\n${target}`, from, to, startRun, endRun, segs, lattice: found.path })
+        routes.push({ source, target, name: `${source}\n${target}`, from, to, startRun, endRun, segs, lattice: found.path, straight })
     }
 
     // 2. Ports: the ends of one face, ordered by where they go, centred on it a pitch apart.
@@ -365,6 +366,42 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
             seg.c = f.centre + (i - (n - 1) / 2) * pitch
             seg.fixed = true
         })
+    }
+
+    // A straight line keeps one lane from face to face, never a sideways step mid-run. Its two ends are
+    // lined up by moving the group of ends on one face as a whole: preferably the face with fewer ends,
+    // else the other, else both half way, as long as every end stays inside its face. A lone end can
+    // then sit off its face's centre. A face lined up once stays put, so a second straight line through
+    // it keeps its jog.
+    const endSeg = (e: { route: Route; atSource: boolean }) => (e.atSource ? e.route.segs[0] : e.route.segs[e.route.segs.length - 1])
+    const keyOf = (end: End) => `${end.tile}\n${end.dir}`
+    const anchored = new Set<string>()
+    const shifted = (key: string, end: End, by: number) => {
+        if (Math.abs(by) < 1e-9) return []
+        if (anchored.has(key)) return null
+        const f = face(end.box, end.dir)
+        const moved = groups.get(key)!.map(e => endSeg(e).c + by)
+        return Math.min(...moved) - HALF < f.lo - 1e-9 || Math.max(...moved) + HALF > f.hi + 1e-9 ? null : moved
+    }
+    for (const route of routes) {
+        if (!route.straight) continue
+        const head = route.segs[0], tail = route.segs[2]
+        const gap = head.c - tail.c // how far the target's end must move to meet the source's
+        if (Math.abs(gap) < 1e-9) continue
+        const fromKey = keyOf(route.from), toKey = keyOf(route.to)
+        const fewerAtTarget = groups.get(toKey)!.length <= groups.get(fromKey)!.length
+        // [source group shift, target group shift]
+        const options = fewerAtTarget ? [[0, gap], [-gap, 0], [-gap / 2, gap / 2]] : [[-gap, 0], [0, gap], [-gap / 2, gap / 2]]
+        for (const [bySource, byTarget] of options) {
+            const s = shifted(fromKey, route.from, bySource)
+            const t = shifted(toKey, route.to, byTarget)
+            if (!s || !t) continue
+            if (s.length) groups.get(fromKey)!.forEach((e, i) => { endSeg(e).c = s[i] })
+            if (t.length) groups.get(toKey)!.forEach((e, i) => { endSeg(e).c = t[i] })
+            anchored.add(fromKey)
+            anchored.add(toKey)
+            break
+        }
     }
 
     // 3. Lanes: the stretches sharing a lattice line run side by side in the order of where they
