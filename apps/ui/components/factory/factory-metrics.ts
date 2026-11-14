@@ -73,6 +73,7 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
     const inStates = (...states: string[]) => String(snapshot.jobs.filter(j => states.includes(j.state)).length)
     let runCount = 0
     let tokens = 0
+    let known = 0
     let anyRuns = false
     for (const job of snapshot.jobs) {
         if (!job.runs) continue
@@ -80,7 +81,10 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
         for (const r of job.runs) {
             if (!sameLocalDay(Date.parse(r.startedAt), now)) continue
             runCount++
-            tokens += r.tokensIn + r.tokensOut
+            if (r.tokensIn > 0 || r.tokensOut > 0) {
+                known++
+                tokens += r.tokensIn + r.tokensOut
+            }
         }
     }
     return {
@@ -92,7 +96,7 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
             checks: { text: inStates('checks') },
             shipped: { text: String(snapshot.endedToday.merged) },
             runs: anyRuns ? { text: String(runCount) } : { ...NO_DATA },
-            totalTokens: anyRuns ? { text: tokenText(tokens) } : { ...NO_DATA },
+            totalTokens: known > 0 ? { text: tokenText(tokens) } : { ...NO_DATA },
             cachedShare: { ...NO_DATA },
             avgDuration: { ...NO_DATA },
             errorRate: { ...NO_DATA },
