@@ -110,3 +110,16 @@ export function restDistances(pods: PodView[], tiles: Tile[], routes: Map<string
     }
     return out
 }
+
+// Where a task being worked rests: one fixed spot straight in front of its holder, at the front corner
+// of the holder's floor diamond plus what a sphere stands above its position (36, or the gate's 62)
+// and 4 px of air. The same holder gives the same spot, whatever the task or the time.
+export function workSpot(holder: Tile, scanner: boolean): P {
+    const c = toWorld(centreOf(holder))
+    return { x: c.x, y: c.y + ((holder.span ?? 2) * TILE_H) / 2 + (scanner ? 66 : 40) }
+}
+
+// Tasks waiting on the belt line up from its start, the exit of the Loader; index 0 is nearest to it.
+export const QUEUE_START_PX = 22
+export const QUEUE_GAP_PX = 40
+export const lineUp = (points: P[], index: number): P => atDistance(points, QUEUE_START_PX + index * QUEUE_GAP_PX)
