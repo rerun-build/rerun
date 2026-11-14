@@ -50,7 +50,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         const own = tileOf(who)
         copyTiles.push({
             id, position: cell, span: 2, containerId: slots.room, selectable: false, draggable: false, justPlaced: true,
-            style: { ...own.style, ...agentTileStyle('working', who), buddy: own.style.buddy, opacity: 0.55 }, ariaLabel: `${who}, a copy`,
+            style: { ...own.style, ...agentTileStyle('idle', who), glow: agentTileStyle('working', who).glow, buddy: own.style.buddy, opacity: 0.55 }, ariaLabel: `${who}, a copy`,
         })
         copyLinks.push({ source: who, target: id, variant: 'trace', color: who === 'LINUS' ? STATUS_COLOR.review : who === 'code' ? STATUS_COLOR.build : '#f472b6' })
         return id
@@ -135,7 +135,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         if (tile.id === 'rejects') return { ...tile, ariaLabel: `Reject bin: ${rejects}` }
         if (tile.id === 'Delegator') {
             const state = held ? 'waiting_human' : counts.queued + counts.checks > 0 ? 'working' : 'idle'
-            return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', ...(held ? { badge: 'lock' as const } : {}) } }
+            return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', shape: 'capsule' as const, ...(held ? { badge: 'lock' as const } : {}) } }
         }
         const working = (out.get(tile.id) ?? 0) > 0
         return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy } }
