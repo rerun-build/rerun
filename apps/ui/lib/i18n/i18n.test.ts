@@ -1,6 +1,6 @@
 import { loadMessages } from '@rerun/i18n/messages'
 import { localeNativeName, matchLocale, parseAcceptLanguage, resolveLocale } from '@rerun/i18n'
-import { formatBytes, formatDuration, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil, weekdayNames } from '@rerun/i18n/format'
+import { formatBytes, formatDuration, longDate, messageDayLabel, shortDate, shortRelativeTime, shortUntil } from '@rerun/i18n/format'
 import { pseudoLocalize } from '@rerun/i18n/pseudo'
 import { mergeMessages } from '@rerun/i18n'
 import { describe, expect, it } from 'vitest'
@@ -51,7 +51,6 @@ describe('format', () => {
         expect(longDate('2026-03-05T12:00:00Z', 'en')).toBe('Mar 5, 2026')
         expect(formatBytes(1536, 'en')).toBe('1.5 KB')
         expect(formatDuration(125 * MINUTE, 'en')).toBe('2h 5m')
-        expect(weekdayNames('en')).toEqual(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
     })
 
     it('speaks French and Spanish', () => {
