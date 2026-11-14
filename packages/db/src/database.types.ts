@@ -2114,6 +2114,44 @@ export type Database = {
         }
         Relationships: []
       }
+      rerun_credit_purchases: {
+        Row: {
+          created_at: string
+          id: string
+          micros: number
+          packs: number
+          refunded_micros: number
+          stripe_ref: string
+          workspace_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          micros: number
+          packs: number
+          refunded_micros?: number
+          stripe_ref: string
+          workspace_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          micros?: number
+          packs?: number
+          refunded_micros?: number
+          stripe_ref?: string
+          workspace_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rerun_credit_purchases_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rerun_usage_events: {
         Row: {
           billed: boolean
@@ -3861,6 +3899,15 @@ export type Database = {
           points: Json
         }[]
       }
+      grant_rerun_credit_purchase: {
+        Args: {
+          p_micros: number
+          p_packs: number
+          p_stripe_ref: string
+          p_workspace_id: number
+        }
+        Returns: boolean
+      }
       grant_rerun_topup: {
         Args: { p_micros: number; p_workspace_id: number }
         Returns: undefined
@@ -3909,6 +3956,10 @@ export type Database = {
       resolve_notification_incidents: {
         Args: { p_source_key: string }
         Returns: string[]
+      }
+      revoke_rerun_credit_purchase: {
+        Args: { p_refunded_micros: number; p_stripe_ref: string }
+        Returns: number
       }
       touch_sandbox_activity: { Args: { p_user_id: string }; Returns: undefined }
       unseen_runs: {
