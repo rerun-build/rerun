@@ -878,10 +878,11 @@
         "output": "Ausgabe",
         "filters": { "running": "Läuft", "failed": "Fehlgeschlagen", "done": "Fertig" },
         "search": "Läufe durchsuchen",
-        "hiddenRunning": "{count, plural, one {# laufender Lauf} other {# laufende Läufe}}",
-        "hiddenFailed": "{count, plural, one {# fehlgeschlagener Lauf} other {# fehlgeschlagene Läufe}}",
-        "hiddenDone": "{count, plural, one {# fertiger Lauf} other {# fertige Läufe}}",
-        "hidden": "{parts} ausgeblendet",
+        "nothingRunning": "Nichts läuft. Siehe <failed>Fehlgeschlagen</failed> oder <done>Fertig</done>.",
+        "currentStep": "jetzt: {tool}",
+        "rowTitle": "{stage} #{n}: {title}",
+        "stage": "{stage, select, build {Build} review {Review} fix {Korrektur} other {Lauf}}",
+        "goalRow": "Ziel: {prefix}",
         "noMatch": "Kein Lauf passt zu „{query}“"
     },
     "agentRunHistory": {

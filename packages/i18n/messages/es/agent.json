@@ -887,10 +887,11 @@
         "output": "Salida",
         "filters": { "running": "En curso", "failed": "Fallidas", "done": "Hechas" },
         "search": "Buscar ejecuciones",
-        "hiddenRunning": "{count, plural, one {# ejecución en curso} other {# ejecuciones en curso}}",
-        "hiddenFailed": "{count, plural, one {# ejecución fallida} other {# ejecuciones fallidas}}",
-        "hiddenDone": "{count, plural, one {# ejecución hecha} other {# ejecuciones hechas}}",
-        "hidden": "{parts} ocultas",
+        "nothingRunning": "No hay nada en curso. Mira <failed>Fallidas</failed> o <done>Hechas</done>.",
+        "currentStep": "ahora: {tool}",
+        "rowTitle": "{stage} #{n}: {title}",
+        "stage": "{stage, select, build {Build} review {Revisión} fix {Corrección} other {Ejecución}}",
+        "goalRow": "Objetivo: {prefix}",
         "noMatch": "Ninguna ejecución coincide con \"{query}\""
     },
     "agentRunHistory": {

@@ -878,10 +878,11 @@
         "output": "Saída",
         "filters": { "running": "Em curso", "failed": "Falhadas", "done": "Concluídas" },
         "search": "Pesquisar execuções",
-        "hiddenRunning": "{count, plural, one {# execução em curso} other {# execuções em curso}}",
-        "hiddenFailed": "{count, plural, one {# execução falhada} other {# execuções falhadas}}",
-        "hiddenDone": "{count, plural, one {# execução concluída} other {# execuções concluídas}}",
-        "hidden": "{parts} ocultas",
+        "nothingRunning": "Nada em curso. Veja <failed>Falhadas</failed> ou <done>Concluídas</done>.",
+        "currentStep": "agora: {tool}",
+        "rowTitle": "{stage} #{n}: {title}",
+        "stage": "{stage, select, build {Build} review {Revisão} fix {Correção} other {Execução}}",
+        "goalRow": "Objetivo: {prefix}",
         "noMatch": "Nenhuma execução corresponde a \"{query}\""
     },
     "agentRunHistory": {

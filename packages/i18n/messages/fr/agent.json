@@ -887,10 +887,11 @@
         "output": "Sortie",
         "filters": { "running": "En cours", "failed": "Échecs", "done": "Terminées" },
         "search": "Rechercher des exécutions",
-        "hiddenRunning": "{count, plural, one {# exécution en cours} other {# exécutions en cours}}",
-        "hiddenFailed": "{count, plural, one {# exécution en échec} other {# exécutions en échec}}",
-        "hiddenDone": "{count, plural, one {# exécution terminée} other {# exécutions terminées}}",
-        "hidden": "{parts} masquée(s)",
+        "nothingRunning": "Rien n’est en cours. Voir <failed>Échecs</failed> ou <done>Terminées</done>.",
+        "currentStep": "maintenant : {tool}",
+        "rowTitle": "{stage} #{n} : {title}",
+        "stage": "{stage, select, build {Build} review {Revue} fix {Correction} other {Exécution}}",
+        "goalRow": "Objectif : {prefix}",
         "noMatch": "Aucune exécution ne correspond à « {query} »"
     },
     "agentRunHistory": {
