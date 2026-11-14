@@ -1,13 +1,15 @@
 'use client'
 
 import { IsoGrid, frameTemplateBoard, routeTileLinks, useRenderedFrame, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
 import { fireRerunConfetti } from '@/lib/confetti'
+import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { applyMoves, canMove, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
 import { METRICS, type MetricDef, type MetricKey, type MetricValues } from './factory-metrics'
 import { FactoryOverlay } from './FactoryOverlay'
-import { LOOP_MS, factoryScene, type FactoryFrame } from './factory-scene'
+import { LOOP_MS, factoryScene, type Cell, type FactoryFrame } from './factory-scene'
 
 // The feature spheres and scanner gates stand above the floor, so the camera frames the Boxes with headroom above them.
 const OVERHEAD_PX = 120
@@ -39,7 +41,8 @@ function LiveOverlay({ start, tiles, routes, scene }: { start: number; tiles: Ti
 
 // The factory, drawn by the board's own world. The world takes the whole stage; a thin glass bar
 // carries the gauges and the counts, and a band drops in while sending is held.
-export function FactoryWorld({ theme = 'dark', scene = factoryScene }: { theme?: 'light' | 'dark'; scene?: SceneFn }) {
+// `workspace` keys the owner's own arrangement of the floor in the browser.
+export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample' }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string }) {
     const [clock, setClock] = useState(() => ({ start: Date.now(), now: Date.now() }))
     const [expired, setExpired] = useState<Set<string>>(() => new Set())
     useEffect(() => {
@@ -53,7 +56,17 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene }: { theme?:
     // A toast's id carries the loop's number, so the same moment in the next loop is a new toast.
     const loop = Math.floor((clock.now - clock.start) / LOOP_MS)
     const toasts = useStable(frame.toasts.map(toast => ({ ...toast, id: `${toast.id}#${loop}` })).filter(toast => !expired.has(toast.id)).slice(-2))
-    const tiles = useStable(frame.tiles)
+    // Every coworker and floor object can be dragged to a free cell, as on the board; where it was put
+    // is kept per workspace, and the belts route from there.
+    const sceneTiles = useStable(frame.tiles)
+    const storageKey = layoutStorageKey(workspace)
+    const saved = useSyncExternalStore(subscribeLayout, () => loadLayout(storageKey), () => null)
+    const moves = useMemo(() => readMoves(saved, sceneTiles), [saved, sceneTiles])
+    const tiles = useMemo(() => applyMoves(sceneTiles, moves), [sceneTiles, moves])
+    const onTileMove = useCallback((id: string, cell: Cell) => {
+        if (canMove(sceneTiles, moves, id, cell)) saveLayout(storageKey, { ...moves, [id]: cell })
+    }, [sceneTiles, moves, storageKey])
+    const moved = Object.keys(moves).length > 0
     const links = useStable(frame.links)
     // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
     const routes = useMemo(() => routeTileLinks(tiles, links), [tiles, links])
@@ -111,6 +124,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene }: { theme?:
                 camera={camera}
                 cameraTransitionMs={0}
                 showLinks
+                onTileMove={onTileMove}
                 selectedTileId={null}
                 scrollGestures
                 worldOverlay={worldOverlay}
@@ -128,6 +142,13 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene }: { theme?:
                             {METRICS.filter(m => m.group === group).map(m => <Metric key={m.key} def={m} value={values[m.key]} />)}
                         </div>
                     ))}
+                    {moved && (
+                        <div className="flex items-center border-l border-border/70 pl-4">
+                            <Button type="button" variant="outline" size="sm" onClick={() => saveLayout(storageKey, null)}>
+                                Reset layout
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
 
