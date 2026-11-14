@@ -66,11 +66,14 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     const sceneTiles = useStable(frame.tiles)
     const storageKey = layoutStorageKey(workspace)
     const saved = useSyncExternalStore(subscribeLayout, () => loadLayout(storageKey), () => null)
-    const moves = useMemo(() => readMoves(saved, sceneTiles), [saved, sceneTiles])
+    // A stored place outside every Box is refused, so a stale or edited value cannot move a tile off
+    // the floor.
+    const boxes = frame.containers
+    const moves = useMemo(() => readMoves(saved, sceneTiles, boxes), [saved, sceneTiles, boxes])
     const tiles = useMemo(() => applyMoves(sceneTiles, moves), [sceneTiles, moves])
     const onTileMove = useCallback((id: string, cell: Cell) => {
-        if (canMove(sceneTiles, moves, id, cell)) saveLayout(storageKey, { ...moves, [id]: cell })
-    }, [sceneTiles, moves, storageKey])
+        if (canMove(sceneTiles, moves, id, cell, boxes)) saveLayout(storageKey, { ...moves, [id]: cell })
+    }, [sceneTiles, moves, storageKey, boxes])
     const moved = Object.keys(moves).length > 0
     const links = useStable(frame.links)
     // The belts' routes, once per layout: the same call TileLinks makes on the same tiles and links.
