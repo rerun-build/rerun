@@ -92,6 +92,25 @@ describe('acting on LinkedIn', () => {
     })
 })
 
+describe('company pages', () => {
+    it('reads and searches company pages', () => {
+        expect([linkedinTool('get_company')?.category, linkedinTool('get_company')?.action]).toEqual(['profiles', 'get_company'])
+        expect(linkedinTool('search_companies')?.quota?.action).toBe('search_result')
+    })
+
+    it('posts on a page, metered like a post of the user', () => {
+        const post = linkedinTool('create_company_post')!
+        expect([post.category, post.action, post.quota?.action]).toEqual(['content', 'create_company', 'post'])
+        expect(missingRequired(post, toolParams(post, { message: 'We are hiring' }))).toEqual(['company_url'])
+    })
+
+    it('reacts, comments and reposts as a page it is given', () => {
+        for (const name of ['react_to_post', 'comment_on_post', 'repost']) {
+            expect(Object.keys(linkedinTool(name)!.inputSchema.properties)).toContain('company_url')
+        }
+    })
+})
+
 describe('toolParams', () => {
     it('drops what the tool does not declare and caps the page size', () => {
         const search = linkedinTool('search_people')!
