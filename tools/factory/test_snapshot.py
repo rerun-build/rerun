@@ -12,6 +12,10 @@ def kinds(v):
     return {k: type(x).__name__ for k, x in v.items()}
 
 
+def plain(v, *drop):
+    return {k: x for k, x in v.items() if k not in drop}
+
+
 class Snapshot(unittest.TestCase):
     def setUp(self):
         tmp = tempfile.TemporaryDirectory()
@@ -36,13 +40,13 @@ class Snapshot(unittest.TestCase):
         self.put(7, "merged", pr=11, round=2)
         snap = self.build({"kind": "sign-in renewal", "until": NOW + 60})
         self.assertEqual(set(snap), set(sample))
-        self.assertEqual(kinds(snap["jobs"][0]), kinds(sample["jobs"][0]))  # sample job 0 is a running one
-        self.assertEqual(kinds(snap["jobs"][2]), {**kinds(sample["jobs"][5]), "pr": "int", "round": "int"})
-        self.assertEqual(kinds(snap["jobs"][1]), kinds(sample["jobs"][2]))
+        self.assertEqual(kinds(snap["jobs"][0]), kinds(plain(sample["jobs"][0], "history", "runs")))  # sample job 0 is a running one
+        self.assertEqual(kinds(snap["jobs"][2]), {**kinds(plain(sample["jobs"][5], "history", "runs")), "pr": "int", "round": "int"})
+        self.assertEqual(kinds(snap["jobs"][1]), kinds(plain(sample["jobs"][2], "history", "runs")))
         self.assertEqual(set(snap["holds"][0]), set(sample["holds"][0]))
         self.assertEqual(kinds(snap["holds"][0]), kinds(sample["holds"][0]))
         self.assertEqual(set(snap["pools"][0]), set(sample["pools"][0]))
-        self.assertEqual(kinds(snap["pools"][0]["coworkers"][0]), kinds(sample["pools"][0]["coworkers"][0]))
+        self.assertEqual(kinds(snap["pools"][0]["coworkers"][0]), kinds(plain(sample["pools"][0]["coworkers"][0], "id")))
         self.assertEqual(kinds(snap["endedToday"]), kinds(sample["endedToday"]))
         self.assertEqual(set(snap["endedToday"]), set(sample["endedToday"]))
         self.assertEqual(snap["jobs"][0]["steps"], 4)
@@ -86,7 +90,8 @@ class Snapshot(unittest.TestCase):
         self.put(5, "blocked")
         self.st.put_job("6", "merged", {"issue": 6, "title": "old"}, at="2020-01-01T00:00:00Z")
         snap = self.build({"kind": "sign-in renewal", "until": 1794000060.0})
-        self.assertEqual(snap["pools"], [
+        pools = [{**p, "coworkers": [plain(c, "id") for c in p["coworkers"]]} for p in snap["pools"]]
+        self.assertEqual(pools, [
             {"type": "coder", "coworkers": [{"name": "CODE", "runs": 2, "out": 2}]},
             {"type": "reviewer", "coworkers": [{"name": "LINUS", "runs": 1, "out": 1}]}])
         self.assertEqual(snap["holds"], [{"kind": "sign-in renewal", "until": snapshot.iso(1794000060.0)}])

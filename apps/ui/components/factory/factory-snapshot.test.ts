@@ -37,6 +37,8 @@ describe('factorySnapshotSchema', () => {
             (s: Sample) => { s.jobs[0].secret = 'x' },
             (s: Sample) => { s.holds[0].x = 1 },
             (s: Sample) => { s.pools[0].coworkers[0].x = 1 },
+            (s: Sample) => { s.jobs[0].history[0].x = 1 },
+            (s: Sample) => { s.jobs[0].runs[0].x = 1 },
             (s: Sample) => { s.endedToday.x = 1 },
         ]) {
             const s = sample()
@@ -61,5 +63,62 @@ describe('factorySnapshotSchema', () => {
         const many = sample()
         many.jobs = Array.from({ length: 301 }, (_, i) => ({ ...many.jobs[0], issue: 1000 + i }))
         expect(factorySnapshotSchema.safeParse(many).success).toBe(false)
+    })
+
+    it('accepts the old shape: no history, runs or pool ids', () => {
+        const s = sample()
+        for (const j of s.jobs) { delete j.history; delete j.runs }
+        for (const p of s.pools) for (const c of p.coworkers) delete c.id
+        expect(factorySnapshotSchema.safeParse(s).success).toBe(true)
+    })
+
+    it('accepts the new shape in the sample, with history, runs and pool ids', () => {
+        const s = factorySnapshotSchema.parse(sample())
+        for (const i of [0, 1, 5]) {
+            expect(s.jobs[i].history!.length).toBeGreaterThanOrEqual(2)
+            expect(s.jobs[i].runs!.length).toBeGreaterThanOrEqual(1)
+        }
+        expect(s.jobs[5].history!.at(-1)!.state).toBe('merged')
+        expect(s.jobs[3].history).toBeUndefined()
+        expect(s.jobs[4].runs).toBeUndefined()
+        expect(s.jobs[0].runs!.some(r => r.endedAt === null)).toBe(true)
+        for (const p of s.pools) for (const c of p.coworkers) expect(c.id).toBeTruthy()
+    })
+
+    it('refuses one past each new limit', () => {
+        const cases: Array<[string, (s: Sample, n: number) => void, number]> = [
+            ['history entries', (s, n) => { s.jobs[0].history = Array.from({ length: n }, () => ({ ...s.jobs[0].history[0] })) }, 30],
+            ['history reason', (s, n) => { s.jobs[0].history[0].reason = 'x'.repeat(n) }, 300],
+            ['history runId', (s, n) => { s.jobs[0].history[0].runId = 'x'.repeat(n) }, 64],
+            ['runs', (s, n) => { s.jobs[0].runs = Array.from({ length: n }, () => ({ ...s.jobs[0].runs[0] })) }, 12],
+            ['run stage', (s, n) => { s.jobs[0].runs[0].stage = 'x'.repeat(n) }, 20],
+            ['run coworkerId', (s, n) => { s.jobs[0].runs[0].coworkerId = 'x'.repeat(n) }, 64],
+            ['run status', (s, n) => { s.jobs[0].runs[0].status = 'x'.repeat(n) }, 20],
+            ['run runId', (s, n) => { s.jobs[0].runs[0].runId = 'x'.repeat(n) }, 64],
+            ['pool id', (s, n) => { s.pools[0].coworkers[0].id = 'x'.repeat(n) }, 64],
+        ]
+        for (const [name, poke, limit] of cases) {
+            const at = sample()
+            poke(at, limit)
+            expect(factorySnapshotSchema.safeParse(at).success, `${name} at ${limit}`).toBe(true)
+            const past = sample()
+            poke(past, limit + 1)
+            expect(factorySnapshotSchema.safeParse(past).success, `${name} at ${limit + 1}`).toBe(false)
+        }
+    })
+
+    it('refuses a history state the ledger does not have', () => {
+        const s = sample()
+        s.jobs[0].history[0].state = 'cancelled'
+        expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
+    })
+
+    it('refuses an unknown key inside a history entry or a run', () => {
+        const a = sample()
+        a.jobs[0].history[0].extra = 1
+        expect(factorySnapshotSchema.safeParse(a).success).toBe(false)
+        const b = sample()
+        b.jobs[0].runs[0].extra = 1
+        expect(factorySnapshotSchema.safeParse(b).success).toBe(false)
     })
 })
