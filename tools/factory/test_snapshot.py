@@ -100,6 +100,16 @@ class Snapshot(unittest.TestCase):
         self.assertEqual(snap["endedToday"], {"merged": 1, "rejected": 0, "blocked": 1, "failed": 0, "returned": 0})
         self.assertEqual(self.build()["holds"], [])
 
+    def test_a_job_closed_by_hand_carries_closedOutside(self):
+        self.put(5, "blocked", reason="x")
+        self.put(6, "failed")
+        self.st.set("5", "closed_seen", "1794000000")
+        snap = self.build()
+        j = {x["issue"]: x for x in snap["jobs"]}
+        self.assertIs(j[5]["closedOutside"], True)
+        self.assertNotIn("closedOutside", j[6])
+        json.dumps(snap)
+
 
 if __name__ == "__main__":
     unittest.main()

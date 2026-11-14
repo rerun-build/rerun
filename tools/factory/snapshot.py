@@ -154,6 +154,8 @@ def _job(store, cfg, names, j):
         "parent": parsed.get("parent"), "dependsOn": list(parsed.get("deps") or [])[:20],
         "reason": _reason(j), "history": history, "runs": runs,
     }
+    if "closed_seen" in store.get_all(str(j["issue"])):
+        job["closedOutside"] = True
     if main:
         job["department"] = main
         if others:
