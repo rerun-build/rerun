@@ -1,12 +1,23 @@
 import { attachmentTool } from '@/lib/apps/attachment-tool'
 import { runAction, runFlatEndpoint, type LinkupCategory } from '@/lib/apps/linkup/client'
-import type { AppTool, AppToolContext } from '@/lib/apps/tools'
+import type { AppScope, AppTool, AppToolContext } from '@/lib/apps/tools'
 import type { QuotaAction } from './quotas'
 
 // The LinkedIn tools a coworker gets. Linkup bills Rerun by the account, not by the call, so a quota
 // only guards what LinkedIn watches on the user's account.
 
-export type LinkedinTool = AppTool<QuotaAction>
+export const LINKEDIN_SCOPES = {
+    profiles: { summary: "a member's contact details, posts, comments and reactions, who viewed the user, the user's numbers, visiting a profile, editing the user's own profile" },
+    network: { summary: 'connections, followers and following, people LinkedIn suggests, following and unfollowing, declining an invitation' },
+    posts: { summary: 'the home feed, post search, one post with its comments, reactions and numbers, answering a comment, reposting' },
+    messages: { summary: 'reacting to a message, editing or unsending one' },
+    company_pages: { summary: 'company search, a company page, posting as a page the user admins' },
+    groups_events: { summary: 'group search, a group with its members and posts, an event and inviting connections to it' },
+    sales_navigator: { summary: 'lead and account search with every filter, lead and account lists, saved searches, InMail credits, unlocking a lead', requires: 'a Sales Navigator seat' },
+    recruiter: { summary: 'talent search, candidates and their notes, projects and their pipeline, jobs and applicants, the Recruiter inbox and InMails', requires: 'a LinkedIn Recruiter seat' },
+} satisfies Record<string, AppScope>
+
+export type LinkedinTool = AppTool<QuotaAction, keyof typeof LINKEDIN_SCOPES>
 
 const profileUrl = { type: 'string', description: 'LinkedIn profile URL, e.g. https://www.linkedin.com/in/jane-doe' }
 const count = (max: number) => ({ type: 'integer', minimum: 1, maximum: max, description: `How many to return, at most ${max}.` })
@@ -101,9 +112,9 @@ const SALES_NAV_COMPANY_FILTERS = {
 }
 
 const RECRUITER = 'Needs a LinkedIn Recruiter seat.'
-const projectUrn = { type: 'string', description: 'From linkedin_pro_recruiter_list_projects' }
-const candidateUrn = { type: 'string', description: 'The hire_identity_urn of the candidate, from linkedin_pro_recruiter_search_people' }
-const jobId = { type: 'string', description: 'From linkedin_pro_recruiter_list_jobs' }
+const projectUrn = { type: 'string', description: 'From recruiter_list_projects' }
+const candidateUrn = { type: 'string', description: 'The hire_identity_urn of the candidate, from recruiter_search_people' }
+const jobId = { type: 'string', description: 'From recruiter_list_jobs' }
 
 // The Recruiter variants of classic actions are the same Linkup action with `recruiter: true`, set
 // here rather than left to the coworker.
@@ -157,6 +168,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'search_companies',
+        scope: 'company_pages',
         description: 'Search LinkedIn company pages by keyword, location, sector or size.',
         inputSchema: {
             type: 'object',
@@ -176,6 +188,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_company',
+        scope: 'company_pages',
         description: 'A LinkedIn company page: description, industry, size, headquarters, website, followers.',
         inputSchema: { type: 'object', properties: { company_url: companyUrl }, required: ['company_url'] },
         category: 'profiles',
@@ -183,6 +196,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_contact_info',
+        scope: 'profiles',
         description: 'The email, phone numbers and websites a LinkedIn member shares with the user, usually only 1st-degree connections. Counts as a profile view.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl }, required: ['profile_url'] },
         category: 'profiles',
@@ -191,7 +205,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_profile_posts',
-        description: "A member's own posts, newest first, each with its published_at date. Also the way to date a post from linkedin_pro_read_feed, which gives none.",
+        scope: 'profiles',
+        description: "A member's own posts, newest first, each with its published_at date. Also the way to date a post from read_feed, which gives none.",
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(500), cursor, include_reshares: { type: 'boolean', description: 'Also return the posts they reshared' } }, required: ['profile_url'] },
         category: 'profiles',
         action: 'get_posts',
@@ -199,6 +214,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_profile_comments',
+        scope: 'profiles',
         description: 'The comments a member wrote lately on any post, newest first.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(100), cursor }, required: ['profile_url'] },
         category: 'profiles',
@@ -207,6 +223,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_profile_reactions',
+        scope: 'profiles',
         description: 'The posts a member reacted to lately, newest first.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(100), cursor }, required: ['profile_url'] },
         category: 'profiles',
@@ -215,6 +232,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_profile_viewers',
+        scope: 'profiles',
         description: "Who viewed the user's profile lately. LinkedIn blurs some viewers, more so on a free account.",
         inputSchema: { type: 'object', properties: { count: count(100), offset } },
         category: 'profiles',
@@ -223,6 +241,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_my_analytics',
+        scope: 'profiles',
         description: "The user's LinkedIn numbers over the last 7 days: profile views, post impressions, search appearances, followers.",
         inputSchema: { type: 'object', properties: {} },
         category: 'profiles',
@@ -230,6 +249,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'visit_profile',
+        scope: 'profiles',
         description: 'Visit a profile as the user, so the member sees the user in "Who viewed your profile". A light first touch before an invitation.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl }, required: ['profile_url'] },
         category: 'profiles',
@@ -238,6 +258,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'update_my_profile',
+        scope: 'profiles',
         description:
             "Edit the user's own LinkedIn profile: name, headline, about, website, experience, education, skills, pictures. Changes apply in order. An experience or education entry with an id edits it, with id and delete: true removes it, without id adds one. Read linkedin_pro_get_my_profile first for the ids.",
         inputSchema: {
@@ -359,6 +380,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'decline_invitation',
+        scope: 'network',
         description: 'Decline a received invitation, with the entity_urn and shared_secret from linkedin_pro_list_received_invitations. The sender is not told.',
         inputSchema: { type: 'object', properties: { entity_urn: { type: 'string' }, shared_secret: { type: 'string' } }, required: ['entity_urn', 'shared_secret'] },
         category: 'network',
@@ -374,6 +396,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'check_connection',
+        scope: 'network',
         description: 'Whether someone is a 1st-degree connection of the user, from the copy Linkup keeps. Free and silent: nothing reaches LinkedIn.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl }, required: ['profile_url'] },
         category: 'network',
@@ -381,6 +404,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'list_connections',
+        scope: 'network',
         description: "The user's 1st-degree connections, most recent first: name, headline, profile URL. Page with offset.",
         inputSchema: { type: 'object', properties: { count: count(1000), offset } },
         category: 'network',
@@ -389,6 +413,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'list_followers',
+        scope: 'network',
         description: 'The people who follow the user on LinkedIn.',
         inputSchema: { type: 'object', properties: { count: count(100), offset } },
         category: 'network',
@@ -397,6 +422,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'list_following',
+        scope: 'network',
         description: 'The people and pages the user follows on LinkedIn.',
         inputSchema: { type: 'object', properties: { count: count(100), offset } },
         category: 'network',
@@ -405,6 +431,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_recommendations',
+        scope: 'network',
         description: 'The "People you may know" LinkedIn suggests to the user right now.',
         inputSchema: { type: 'object', properties: { count: count(100) } },
         category: 'network',
@@ -413,6 +440,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_event',
+        scope: 'groups_events',
         description: 'A LinkedIn event: title, organizer, date, attendees count, and whether the user attends.',
         inputSchema: { type: 'object', properties: { event_url: eventUrl }, required: ['event_url'] },
         category: 'network',
@@ -420,6 +448,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'invite_to_event',
+        scope: 'groups_events',
         description: "Invite some of the user's 1st-degree connections to a LinkedIn event, 50 at most per call.",
         inputSchema: {
             type: 'object',
@@ -432,6 +461,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'follow',
+        scope: 'network',
         description: 'Follow a member or a company page as the user.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, company_url: companyUrl, company_id: { type: 'string', description: 'Numeric id of the company page, instead of company_url' } } },
         category: 'network',
@@ -440,6 +470,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'unfollow',
+        scope: 'network',
         description: 'Stop following a member or a company page.',
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, company_url: companyUrl, company_id: { type: 'string', description: 'Numeric id of the company page, instead of company_url' } } },
         category: 'network',
@@ -447,6 +478,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'search_groups',
+        scope: 'groups_events',
         description: 'Find LinkedIn groups by keyword.',
         inputSchema: { type: 'object', properties: { keyword: { type: 'string' }, count: count(100), offset } },
         category: 'network',
@@ -455,6 +487,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_group',
+        scope: 'groups_events',
         description: 'A LinkedIn group: name, description, members count, rules. Works on groups the user is not in.',
         inputSchema: { type: 'object', properties: { group_url: groupUrl }, required: ['group_url'] },
         category: 'network',
@@ -462,6 +495,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_group_members',
+        scope: 'groups_events',
         description: 'The members of a LinkedIn group the user belongs to.',
         inputSchema: { type: 'object', properties: { group_url: groupUrl, count: count(1000), offset, first_degree_only: { type: 'boolean', description: "Only the user's 1st-degree connections" } }, required: ['group_url'] },
         category: 'network',
@@ -470,6 +504,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_group_posts',
+        scope: 'groups_events',
         description: 'The posts of a LinkedIn group the user belongs to, newest first.',
         inputSchema: { type: 'object', properties: { group_url: groupUrl, count: count(100), cursor }, required: ['group_url'] },
         category: 'network',
@@ -485,7 +520,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
             properties: {
                 profile_url: profileUrl,
                 conversation_id: { type: 'string', description: 'Reply in this conversation instead of naming a profile' },
-                recipient_urn: { type: 'string', description: 'urn:li:fs_salesProfile:… from linkedin_pro_sales_nav_search_people: sends a Sales Navigator InMail' },
+                recipient_urn: { type: 'string', description: 'urn:li:fs_salesProfile:… from sales_nav_search_people, in the sales_navigator scope: sends a Sales Navigator InMail' },
                 sales_nav: { type: 'boolean', description: 'Reply in a Sales Navigator InMail thread' },
                 message_text: { type: 'string' },
                 subject: { type: 'string', description: 'InMail only' },
@@ -539,6 +574,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'react_to_message',
+        scope: 'messages',
         description: 'Put an emoji reaction on a message of a conversation, or take it off with remove: true. message_id is the entity_urn from linkedin_pro_get_conversation.',
         inputSchema: { type: 'object', properties: { message_id: { type: 'string' }, conversation_id: { type: 'string' }, emoji: { type: 'string' }, remove: { type: 'boolean' } }, required: ['message_id', 'emoji'] },
         category: 'messages',
@@ -546,6 +582,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'edit_message',
+        scope: 'messages',
         description: 'Change the text of a message the user sent, within 60 minutes of sending it.',
         inputSchema: { type: 'object', properties: { message_id: { type: 'string' }, message_text: { type: 'string' } }, required: ['message_id', 'message_text'] },
         category: 'messages',
@@ -553,6 +590,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'delete_message',
+        scope: 'messages',
         description: 'Unsend a message the user sent, for everyone, within 60 minutes of sending it.',
         inputSchema: { type: 'object', properties: { message_id: { type: 'string' } }, required: ['message_id'] },
         category: 'messages',
@@ -560,8 +598,9 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'read_feed',
+        scope: 'posts',
         description:
-            "Scroll the user's LinkedIn home feed, as they would see it: each post with its author, text, kind (regular, sponsored, reshare), media, reaction, comment and repost counts and its URL. No publication date: get it from linkedin_pro_get_profile_posts of the author. Pass next_cursor from the last answer to scroll further.",
+            "Scroll the user's LinkedIn home feed, as they would see it: each post with its author, text, kind (regular, sponsored, reshare), media, reaction, comment and repost counts and its URL. No publication date: get it from get_profile_posts of the author. Pass next_cursor from the last answer to scroll further.",
         inputSchema: { type: 'object', properties: { count: count(100), cursor } },
         category: 'content',
         action: 'get_feed',
@@ -569,6 +608,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_post',
+        scope: 'posts',
         description: 'One LinkedIn post: author, text, media, date and counts.',
         inputSchema: { type: 'object', properties: { post_url: postUrl }, required: ['post_url'] },
         category: 'content',
@@ -576,6 +616,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_post_analytics',
+        scope: 'posts',
         description: "The numbers of a post the user wrote: impressions, members reached, reactions, comments, reposts, who viewed it. Only the user's own posts.",
         inputSchema: { type: 'object', properties: { post_url: postUrl }, required: ['post_url'] },
         category: 'content',
@@ -583,6 +624,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'search_posts',
+        scope: 'posts',
         description: 'Search LinkedIn posts by keyword, author, company or date, the way LinkedIn search does.',
         inputSchema: {
             type: 'object',
@@ -610,7 +652,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_post_comments',
-        description: "The comments under a LinkedIn post, each with the tracking_id, comment_urn and commenter's profile_urn that linkedin_pro_answer_comment needs.",
+        scope: 'posts',
+        description: "The comments under a LinkedIn post, each with the tracking_id, comment_urn and commenter's profile_urn that answer_comment needs.",
         inputSchema: { type: 'object', properties: { post_url: postUrl, count: count(1000), offset }, required: ['post_url'] },
         category: 'content',
         action: 'get_comments',
@@ -618,6 +661,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_post_reactions',
+        scope: 'posts',
         description: 'Who reacted to a LinkedIn post, and how.',
         inputSchema: { type: 'object', properties: { post_url: postUrl, count: count(1000), offset }, required: ['post_url'] },
         category: 'content',
@@ -642,7 +686,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'answer_comment',
-        description: "Reply to a comment under a LinkedIn post, as the user, with the comment's tracking_id, comment_urn and commenter profile_urn from linkedin_pro_get_post_comments.",
+        scope: 'posts',
+        description: "Reply to a comment under a LinkedIn post, as the user, with the comment's tracking_id, comment_urn and commenter profile_urn from get_post_comments.",
         inputSchema: {
             type: 'object',
             properties: {
@@ -661,6 +706,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'repost',
+        scope: 'posts',
         description: "Repost a LinkedIn post on the user's feed, or on a company page they admin.",
         inputSchema: { type: 'object', properties: { post_url: postUrl, company_url: asPage }, required: ['post_url'] },
         category: 'content',
@@ -688,6 +734,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'create_company_post',
+        scope: 'company_pages',
         description: 'Publish a post on a company page the user admins: text, with an image, a video or a carousel by public URL. Only when the user asked for it or approved the text.',
         inputSchema: {
             type: 'object',
@@ -706,6 +753,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_search_people',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Lead search with every Sales Navigator filter. Values within one filter are OR, filters together are AND. Ids for the filters come from linkedin_pro_typeahead with category sales_nav. Page with offset, up to 2500.`,
         inputSchema: { type: 'object', properties: { ...SALES_NAV_PEOPLE_FILTERS, count: count(100), offset } },
         category: 'profiles',
@@ -715,6 +763,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_search_companies',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Account search with every Sales Navigator filter: headcount and its growth, revenue, Fortune rank, hiring, funding. Page with offset, up to 2500.`,
         inputSchema: { type: 'object', properties: { ...SALES_NAV_COMPANY_FILTERS, count: count(100), offset } },
         category: 'profiles',
@@ -724,6 +773,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_get_profile',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} A lead as Sales Navigator shows it.`,
         inputSchema: { type: 'object', properties: { profile: { type: 'string', description: 'Profile URL, Sales Navigator lead URL or urn' } }, required: ['profile'] },
         category: 'profiles',
@@ -732,6 +782,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_get_company',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} A company as Sales Navigator shows it, with its headcount over time, and on request its decision makers, warm paths in and news.`,
         inputSchema: {
             type: 'object',
@@ -747,6 +798,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_check_inmail',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Which of up to 100 profiles accept a free InMail (Open Profile). Nothing is sent.`,
         inputSchema: { type: 'object', properties: { profiles: { type: 'array', items: { type: 'string' }, maxItems: 100 } }, required: ['profiles'] },
         category: 'profiles',
@@ -754,6 +806,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_check_inmail_seat',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Whether the seat can send an InMail right now, to anyone or to one profile. Nothing is sent.`,
         inputSchema: { type: 'object', properties: { profile: { type: 'string' } } },
         category: 'profiles',
@@ -761,6 +814,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_inmail_balance',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} How many InMail credits the seat has left.`,
         inputSchema: { type: 'object', properties: {} },
         category: 'profiles',
@@ -769,6 +823,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_unlock_profile',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Reveal an out-of-network lead, spending one of the seat's 25 monthly unlocks. Only when the user asked for it.`,
         inputSchema: { type: 'object', properties: { profile: { type: 'string', description: 'Profile URL, slug, member id or Sales Navigator lead reference' } }, required: ['profile'] },
         category: 'profiles',
@@ -776,6 +831,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_list_lists',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} The seat's lead and account lists.`,
         inputSchema: { type: 'object', properties: { type: { type: 'string', enum: ['lead', 'account'] }, ownership: { type: 'string', enum: ['all', 'owned', 'editable'] }, count: count(100), offset } },
         category: 'profiles',
@@ -784,6 +840,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_create_list',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Create an empty lead or account list.`,
         inputSchema: { type: 'object', properties: { name: { type: 'string' }, type: { type: 'string', enum: ['lead', 'account'] }, description: { type: 'string' } }, required: ['name', 'type'] },
         category: 'profiles',
@@ -791,6 +848,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_add_to_list',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Add up to 25 profiles to a lead list, or up to 100 companies to an account list.`,
         inputSchema: {
             type: 'object',
@@ -802,6 +860,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_remove_from_lists',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Unsave leads or companies. LinkedIn takes them out of every list at once.`,
         inputSchema: { type: 'object', properties: { profiles: stringList(), companies: stringList() } },
         category: 'profiles',
@@ -809,6 +868,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_delete_list',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Delete a lead or account list.`,
         inputSchema: { type: 'object', properties: { list_id: { type: 'string' }, unsave_entities: { type: 'boolean', description: 'Also unsave what the list held' } }, required: ['list_id'] },
         category: 'profiles',
@@ -816,6 +876,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_list_saved_searches',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} The seat's saved searches, each with its saved_search_id.`,
         inputSchema: { type: 'object', properties: { type: { type: 'string', enum: ['people', 'company'] }, count: count(100), offset } },
         category: 'profiles',
@@ -824,7 +885,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_save_search',
-        description: `${SALES_NAV} Save a lead search (type people) or an account search (type company) under a new name, with the filters of linkedin_pro_sales_nav_search_people or linkedin_pro_sales_nav_search_companies.`,
+        scope: 'sales_navigator',
+        description: `${SALES_NAV} Save a lead search (type people) or an account search (type company) under a new name, with the filters of sales_nav_search_people or sales_nav_search_companies.`,
         inputSchema: {
             type: 'object',
             properties: { name: { type: 'string' }, type: { type: 'string', enum: ['people', 'company'] }, ...SALES_NAV_COMPANY_FILTERS, ...SALES_NAV_PEOPLE_FILTERS },
@@ -835,6 +897,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'sales_nav_delete_saved_search',
+        scope: 'sales_navigator',
         description: `${SALES_NAV} Delete a saved search.`,
         inputSchema: { type: 'object', properties: { saved_search_id: { type: 'string' } }, required: ['saved_search_id'] },
         category: 'profiles',
@@ -842,6 +905,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_search_people',
+        scope: 'recruiter',
         description: `${RECRUITER} Talent search with every Recruiter filter. Ids for locations, companies, schools, skills and occupations come from linkedin_pro_typeahead with category recruiter. Pass search_request_id from the first page with the next offset, up to 1000.`,
         inputSchema: {
             type: 'object',
@@ -892,7 +956,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_get_candidate',
-        description: `${RECRUITER} A candidate as Recruiter shows it, by the profile_urn (urn:li:ts_profile:…) from linkedin_pro_recruiter_search_people.`,
+        scope: 'recruiter',
+        description: `${RECRUITER} A candidate as Recruiter shows it, by the profile_urn (urn:li:ts_profile:…) from recruiter_search_people.`,
         inputSchema: { type: 'object', properties: { profile_urn: { type: 'string' }, include_activity: { type: 'boolean', description: "Also the team's activity on them" } }, required: ['profile_urn'] },
         category: 'profiles',
         action: 'get',
@@ -901,6 +966,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_check_inmail',
+        scope: 'recruiter',
         description: `${RECRUITER} What an InMail would cost for each of up to 100 candidates. Nothing is sent.`,
         inputSchema: { type: 'object', properties: { profiles: { type: 'array', items: { type: 'string' }, maxItems: 100, description: 'Candidate profile_urns' } }, required: ['profiles'] },
         category: 'profiles',
@@ -909,6 +975,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_check_inmail_seat',
+        scope: 'recruiter',
         description: `${RECRUITER} Whether the Recruiter seat can send an InMail right now. Nothing is sent.`,
         inputSchema: { type: 'object', properties: {} },
         category: 'profiles',
@@ -917,6 +984,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_list_inbox',
+        scope: 'recruiter',
         description: `${RECRUITER} The Recruiter inbox by folder.`,
         inputSchema: {
             type: 'object',
@@ -933,6 +1001,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_get_conversation',
+        scope: 'recruiter',
         description: `${RECRUITER} The messages of one Recruiter thread.`,
         inputSchema: { type: 'object', properties: { conversation_id: { type: 'string' }, count: count(50), offset, mark_as_read: { type: 'boolean' } }, required: ['conversation_id'] },
         category: 'messages',
@@ -942,6 +1011,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_inbox_summary',
+        scope: 'recruiter',
         description: `${RECRUITER} The Recruiter inbox counters: unread, awaiting a reply, recent messages.`,
         inputSchema: { type: 'object', properties: {} },
         category: 'messages',
@@ -950,6 +1020,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_send_inmail',
+        scope: 'recruiter',
         description: `${RECRUITER} Send a Recruiter InMail to a candidate (recipient_urn, subject, message_text), or reply in a Recruiter thread (conversation_id, message_text). A paid InMail spends one of the seat's credits. Read the thread first and never send the same message twice.`,
         inputSchema: {
             type: 'object',
@@ -970,6 +1041,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_list_jobs',
+        scope: 'recruiter',
         description: `${RECRUITER} The job postings of the Recruiter contract, or one of them by job_id.`,
         inputSchema: { type: 'object', properties: { job_id: { type: 'string' }, count: count(1000), offset, fetch_details: { type: 'boolean', description: 'Full details, true by default' } } },
         category: 'recruiter',
@@ -978,7 +1050,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_get_job_candidates',
-        description: `${RECRUITER} The applicants to a job, each with the application_id linkedin_pro_recruiter_get_cv takes.`,
+        scope: 'recruiter',
+        description: `${RECRUITER} The applicants to a job, each with the application_id recruiter_get_cv takes.`,
         inputSchema: {
             type: 'object',
             properties: {
@@ -997,6 +1070,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_get_cv',
+        scope: 'recruiter',
         description: `${RECRUITER} The CV an applicant attached, base64-encoded.`,
         inputSchema: { type: 'object', properties: { application_id: { type: 'string' } }, required: ['application_id'] },
         category: 'recruiter',
@@ -1004,7 +1078,8 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_create_job',
-        description: `${RECRUITER} Create a job posting as a draft. linkedin_pro_recruiter_publish_job makes it public.`,
+        scope: 'recruiter',
+        description: `${RECRUITER} Create a job posting as a draft. recruiter_publish_job makes it public.`,
         inputSchema: {
             type: 'object',
             properties: {
@@ -1028,6 +1103,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_publish_job',
+        scope: 'recruiter',
         description: `${RECRUITER} Publish a draft job. Only when the user approved the posting.`,
         inputSchema: { type: 'object', properties: { job_id: jobId }, required: ['job_id'] },
         category: 'recruiter',
@@ -1035,6 +1111,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_close_job',
+        scope: 'recruiter',
         description: `${RECRUITER} Close an open job.`,
         inputSchema: { type: 'object', properties: { job_id: jobId }, required: ['job_id'] },
         category: 'recruiter',
@@ -1042,6 +1119,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_list_projects',
+        scope: 'recruiter',
         description: `${RECRUITER} The Recruiter projects, with their candidates per stage.`,
         inputSchema: { type: 'object', properties: { state: { type: 'string', enum: ['ACTIVE', 'CLOSED', 'DRAFT'] }, count: count(100), offset } },
         category: 'recruiter',
@@ -1050,6 +1128,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_create_project',
+        scope: 'recruiter',
         description: `${RECRUITER} Create a Recruiter project, private by default.`,
         inputSchema: { type: 'object', properties: { name: { type: 'string' }, description: { type: 'string' }, private: { type: 'boolean' } }, required: ['name'] },
         category: 'recruiter',
@@ -1057,6 +1136,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_add_to_project',
+        scope: 'recruiter',
         description: `${RECRUITER} File a candidate into a project.`,
         inputSchema: { type: 'object', properties: { project_urn: projectUrn, candidate_urn: candidateUrn }, required: ['project_urn', 'candidate_urn'] },
         category: 'recruiter',
@@ -1064,6 +1144,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_list_project_candidates',
+        scope: 'recruiter',
         description: `${RECRUITER} The pipeline of a project: its candidates and their stage.`,
         inputSchema: { type: 'object', properties: { project_urn: projectUrn, states: { type: 'string', description: 'Stage names as the project shows them, e.g. contacted' }, count: count(100), offset }, required: ['project_urn'] },
         category: 'recruiter',
@@ -1072,6 +1153,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_get_project_candidate',
+        scope: 'recruiter',
         description: `${RECRUITER} The stage and source of one candidate in a project.`,
         inputSchema: { type: 'object', properties: { project_urn: projectUrn, candidate_urn: candidateUrn }, required: ['project_urn', 'candidate_urn'] },
         category: 'recruiter',
@@ -1079,6 +1161,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_move_candidate',
+        scope: 'recruiter',
         description: `${RECRUITER} Move a candidate to another stage of a project.`,
         inputSchema: {
             type: 'object',
@@ -1090,6 +1173,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_add_note',
+        scope: 'recruiter',
         description: `${RECRUITER} Add a note on a candidate, seen by the Recruiter team.`,
         inputSchema: { type: 'object', properties: { candidate_urn: candidateUrn, text: { type: 'string' } }, required: ['candidate_urn', 'text'] },
         category: 'recruiter',
@@ -1097,6 +1181,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_get_candidate_notes',
+        scope: 'recruiter',
         description: `${RECRUITER} The notes and tags on a candidate.`,
         inputSchema: { type: 'object', properties: { profile_urn: { type: 'string' } }, required: ['profile_urn'] },
         category: 'recruiter',
@@ -1104,6 +1189,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'recruiter_recommended_candidates',
+        scope: 'recruiter',
         description: `${RECRUITER} The candidates LinkedIn recommends for a project.`,
         inputSchema: { type: 'object', properties: { project_urn: projectUrn, count: count(100), offset }, required: ['project_urn'] },
         category: 'recruiter',

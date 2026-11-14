@@ -1,6 +1,6 @@
 import { attachmentTool } from '@/lib/apps/attachment-tool'
 import { LinkupError, runAction } from '@/lib/apps/linkup/client'
-import type { AppTool } from '@/lib/apps/tools'
+import type { AppScope, AppTool } from '@/lib/apps/tools'
 import { whatsappSessionClosed } from './connect'
 import type { QuotaAction } from './quotas'
 
@@ -8,7 +8,13 @@ import type { QuotaAction } from './quotas'
 // it answers for a WhatsApp account too (checked on staging, 19/10/2026), groups included. Its
 // category filter is ignored for WhatsApp, so the tool does not offer one.
 
-export type WhatsappTool = AppTool<QuotaAction>
+export const WHATSAPP_SCOPES = {
+    messages: { summary: "forwarding, reacting to, editing and deleting a message, the typing indicator, older history, declining a call, a contact's profile" },
+    chats: { summary: 'archiving, pinning, muting and deleting a chat' },
+    groups: { summary: 'creating a group, its details, its participants and invite link, leaving it' },
+} satisfies Record<string, AppScope>
+
+export type WhatsappTool = AppTool<QuotaAction, keyof typeof WHATSAPP_SCOPES>
 
 const phoneNumber = { type: 'string', description: 'Number in international format, e.g. +33612345678' }
 const count = (max: number) => ({ type: 'integer', minimum: 1, maximum: max, description: `How many to return, at most ${max}.` })
@@ -52,6 +58,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'get_contact_profile',
+        scope: 'messages',
         description: 'The WhatsApp profile of a number: display name, about text, picture and, for a WhatsApp Business number, its business profile.',
         inputSchema: { type: 'object', properties: { phone_number: phoneNumber }, required: ['phone_number'] },
         category: 'profiles',
@@ -105,6 +112,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'forward_message',
+        scope: 'messages',
         description: 'Forward a message, by its id from whatsapp_pro_get_conversation, to a number or to a chat. The same care as a sent message: only to people who expect to hear from the user.',
         inputSchema: { type: 'object', properties: { message_id: { type: 'string' }, phone_number: phoneNumber, conversation_id: conversationId }, required: ['message_id'] },
         category: 'messages',
@@ -114,6 +122,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'react_to_message',
+        scope: 'messages',
         description: 'Put an emoji reaction on a message, by its id from whatsapp_pro_get_conversation, or take it off with remove: true.',
         inputSchema: { type: 'object', properties: { message_id: { type: 'string' }, emoji: { type: 'string' }, remove: { type: 'boolean' } }, required: ['message_id', 'emoji'] },
         category: 'messages',
@@ -121,6 +130,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'edit_message',
+        scope: 'messages',
         description: 'Change the text of a text message the user sent, within 15 minutes of sending it.',
         inputSchema: { type: 'object', properties: { message_id: { type: 'string' }, message_text: { type: 'string' } }, required: ['message_id', 'message_text'] },
         category: 'messages',
@@ -128,6 +138,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'delete_message',
+        scope: 'messages',
         description: 'Delete a message the user sent, for everyone, within about 2.5 days of sending it.',
         inputSchema: { type: 'object', properties: { message_id: { type: 'string' } }, required: ['message_id'] },
         category: 'messages',
@@ -135,6 +146,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'send_typing',
+        scope: 'messages',
         description: 'Show "typing…", or "recording audio…" with recording: true, in a chat for a few seconds, before a reply that takes time.',
         inputSchema: { type: 'object', properties: { phone_number: phoneNumber, conversation_id: conversationId, recording: { type: 'boolean' } } },
         category: 'messages',
@@ -142,6 +154,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'sync_history',
+        scope: 'messages',
         description: 'Pull older messages of a chat from the phone, 50 at most, when whatsapp_pro_get_conversation stops short. They show up there a few seconds later.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId, count: count(50) }, required: ['conversation_id'] },
         category: 'messages',
@@ -150,6 +163,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'reject_call',
+        scope: 'messages',
         description: 'Decline an incoming WhatsApp call by its call_id.',
         inputSchema: { type: 'object', properties: { call_id: { type: 'string' } }, required: ['call_id'] },
         category: 'messages',
@@ -157,6 +171,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'archive_conversation',
+        scope: 'chats',
         description: 'Archive a chat, or bring it back with archived: false.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId, archived: { type: 'boolean' } }, required: ['conversation_id'] },
         category: 'messages',
@@ -164,6 +179,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'pin_conversation',
+        scope: 'chats',
         description: 'Pin a chat at the top of the list, or unpin it with pinned: false.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId, pinned: { type: 'boolean' } }, required: ['conversation_id'] },
         category: 'messages',
@@ -171,6 +187,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'mute_conversation',
+        scope: 'chats',
         description: 'Mute a chat for duration_hours, or for good without it. muted: false unmutes it.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId, duration_hours: { type: 'number' }, muted: { type: 'boolean' } }, required: ['conversation_id'] },
         category: 'messages',
@@ -178,6 +195,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'delete_conversation',
+        scope: 'chats',
         description: "Remove a chat from the user's chat list. The other person keeps it.",
         inputSchema: { type: 'object', properties: { conversation_id: conversationId }, required: ['conversation_id'] },
         category: 'messages',
@@ -185,6 +203,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'create_group',
+        scope: 'groups',
         description: 'Create a WhatsApp group with the user as admin. Only with people who know the user: WhatsApp bans numbers that add strangers. Answers the conversation_id of the group.',
         inputSchema: { type: 'object', properties: { name: { type: 'string' }, participants: phoneNumbers('Numbers in international format') }, required: ['name', 'participants'] },
         category: 'messages',
@@ -193,6 +212,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'get_group',
+        scope: 'groups',
         description: 'A group: name, description, and participants with who is admin.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId }, required: ['conversation_id'] },
         category: 'messages',
@@ -200,6 +220,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'update_group',
+        scope: 'groups',
         description: 'Rename a group or change its description. The user must be an admin.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId, name: { type: 'string' }, description: { type: 'string' } }, required: ['conversation_id'] },
         category: 'messages',
@@ -207,8 +228,9 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'update_group_participants',
+        scope: 'groups',
         description:
-            'Add, remove, promote to admin or demote participants of a group the user admins. Answers one result per number: a reason privacy_settings means the person must join by the link of whatsapp_pro_get_group_invite_link.',
+            'Add, remove, promote to admin or demote participants of a group the user admins. Answers one result per number: a reason privacy_settings means the person must join by the link of get_group_invite_link.',
         inputSchema: {
             type: 'object',
             properties: { conversation_id: conversationId, participants: phoneNumbers('Numbers in international format'), operation: { type: 'string', enum: ['add', 'remove', 'promote', 'demote'] } },
@@ -220,6 +242,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'get_group_invite_link',
+        scope: 'groups',
         description: 'The invite link of a group, or a new one with revoke: true, which stops the old link.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId, revoke: { type: 'boolean' } }, required: ['conversation_id'] },
         category: 'messages',
@@ -227,6 +250,7 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     },
     {
         name: 'leave_group',
+        scope: 'groups',
         description: 'Leave a group. Only when the user asked for it.',
         inputSchema: { type: 'object', properties: { conversation_id: conversationId }, required: ['conversation_id'] },
         category: 'messages',

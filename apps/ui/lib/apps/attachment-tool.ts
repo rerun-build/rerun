@@ -61,7 +61,7 @@ async function runDownload(context: AppToolContext, params: Record<string, unkno
     }
 }
 
-export function attachmentTool<Q extends string>(quotaAction: Q): AppTool<Q> {
+export function attachmentTool<Q extends string>(quotaAction: Q): AppTool<Q, never> {
     return {
         name: 'download_attachment',
         description:

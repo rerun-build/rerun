@@ -4,16 +4,16 @@ import { APP_INFO, type AppInfo } from './catalog'
 import { LINKEDIN_WEBHOOK_EVENTS, linkedinProfile, linkedinSignInRefusal } from './linkedin/connect'
 import * as linkedinEvents from './linkedin/events'
 import * as linkedinQuotas from './linkedin/quotas'
-import { LINKEDIN_TOOLS } from './linkedin/tools'
+import { LINKEDIN_SCOPES, LINKEDIN_TOOLS } from './linkedin/tools'
 import { deleteAccount, type LinkupError, type LinkupPlatform } from './linkup/client'
 import { WHATSAPP_WEBHOOK_EVENTS, whatsappProfile, whatsappSessionClosed, whatsappSignInRefusal } from './whatsapp/connect'
 import * as whatsappEvents from './whatsapp/events'
 import * as whatsappQuotas from './whatsapp/quotas'
-import { WHATSAPP_TOOLS } from './whatsapp/tools'
+import { WHATSAPP_SCOPES, WHATSAPP_TOOLS } from './whatsapp/tools'
 import type { AttachmentSummary } from './attachments'
 import type { AttachmentRef } from './linkup/client'
 import type { EnvelopeKind, LinkupEnvelope } from './linkup/envelope'
-import type { AppTool } from './tools'
+import type { AppScope, AppTool } from './tools'
 import { APP_ADDON_KEYS, type AppSlug } from './types'
 
 // What the socle needs to know about one paid app on the server. Adding an app is one entry here,
@@ -24,6 +24,7 @@ export type AppDefinition = AppInfo & {
     platform: LinkupPlatform
     webhookEvents: readonly string[]
     tools: AppTool[]
+    scopes: Record<string, AppScope>
     quotaClaim(action: string, at: Date): { periods: string[]; maxes: number[] }
     quotaRefusal(action: string): string
     envelopeKind(envelope: LinkupEnvelope): EnvelopeKind
@@ -50,6 +51,7 @@ const APPS: Record<AppSlug, AppDefinition> = {
         platform: 'linkedin',
         webhookEvents: LINKEDIN_WEBHOOK_EVENTS,
         tools: LINKEDIN_TOOLS,
+        scopes: LINKEDIN_SCOPES,
         quotaClaim: linkedinQuotas.quotaClaim,
         quotaRefusal: linkedinQuotas.quotaRefusal,
         envelopeKind: linkedinEvents.envelopeKind,
@@ -67,6 +69,7 @@ const APPS: Record<AppSlug, AppDefinition> = {
         platform: 'whatsapp',
         webhookEvents: WHATSAPP_WEBHOOK_EVENTS,
         tools: WHATSAPP_TOOLS,
+        scopes: WHATSAPP_SCOPES,
         quotaClaim: whatsappQuotas.quotaClaim,
         quotaRefusal: whatsappQuotas.quotaRefusal,
         envelopeKind: whatsappEvents.envelopeKind,
