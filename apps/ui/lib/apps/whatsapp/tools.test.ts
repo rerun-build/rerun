@@ -8,10 +8,8 @@ vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importO
 const tool = (name: string) => WHATSAPP_TOOLS.find(candidate => candidate.name === name)!
 
 describe('the WhatsApp tool set', () => {
-    it('never hands the coworker a login, a deletion or a webhook', () => {
-        const actions = WHATSAPP_TOOLS.map(candidate => candidate.action)
-        expect(actions).not.toContain('login')
-        expect(actions.some(action => /delete|webhook/.test(action))).toBe(false)
+    it('never hands the coworker the account itself: no login, no checkpoint, no account deletion, no webhook', () => {
+        for (const candidate of WHATSAPP_TOOLS) expect(candidate.action).not.toMatch(/login|checkpoint|account|webhook/)
         expect(new Set(WHATSAPP_TOOLS.map(candidate => candidate.name)).size).toBe(WHATSAPP_TOOLS.length)
     })
 
@@ -42,6 +40,46 @@ describe('the WhatsApp tool set', () => {
         expect(toolParams(tool('list_conversations'), {})).toEqual({ count: 20 })
         const read = tool('get_conversation')
         expect(missingRequired(read, toolParams(read, { conversation_id: '120363431168837418@g.us' }))).toEqual([])
+    })
+})
+
+describe('managing chats and groups', () => {
+    beforeEach(() => {
+        vi.mocked(runAction).mockReset()
+    })
+
+    it('meters a forward like a message, and as a new conversation only toward a number', async () => {
+        const forward = tool('forward_message')
+        expect(forward.quota?.action).toBe('message')
+        await expect(forward.extraQuota!('acc', { message_id: 'm1', conversation_id: '120363431168837418@g.us' })).resolves.toBeNull()
+        expect(runAction).not.toHaveBeenCalled()
+        vi.mocked(runAction).mockResolvedValue({ total_message_count: 0, messages: [] })
+        await expect(forward.extraQuota!('acc', { message_id: 'm1', phone_number: '+33612345678' })).resolves.toBe('new_conversation')
+    })
+
+    it('counts a new group, and people added to one, as a new conversation', async () => {
+        expect(tool('create_group').quota?.action).toBe('new_conversation')
+        const participants = tool('update_group_participants')
+        await expect(participants.extraQuota!('acc', { operation: 'add' })).resolves.toBe('new_conversation')
+        await expect(participants.extraQuota!('acc', { operation: 'remove' })).resolves.toBeNull()
+        expect(missingRequired(participants, toolParams(participants, { conversation_id: 'g@g.us', participants: ['+33612345678'] }))).toEqual(['operation'])
+    })
+
+    it('edits, deletes and reacts to messages, and tidies the chat list', () => {
+        expect(['react_to_message', 'edit_message', 'delete_message', 'archive_conversation', 'delete_conversation', 'leave_group'].map(name => tool(name).action)).toEqual([
+            'react_message',
+            'edit_message',
+            'delete_message',
+            'archive_conversation',
+            'delete_conversation',
+            'leave_group',
+        ])
+    })
+
+    it('reads the profile of a contact by number and the archived chats', () => {
+        const profile = tool('get_contact_profile')
+        expect([profile.category, profile.action]).toEqual(['profiles', 'get'])
+        expect(toolParams(tool('list_conversations'), { archived: true })).toEqual({ archived: true, count: 20 })
     })
 })
 
