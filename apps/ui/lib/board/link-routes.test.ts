@@ -137,6 +137,33 @@ describe('routeTileLinks', () => {
         expect(sidewaysSteps(routes)).toEqual([])
     })
 
+    it('keeps an existing straight line straight when a new end joins its face', () => {
+        const tiles = [tile('a', 1, 4), tile('b', 12, 4), tile('c', 12, 12)]
+        const alone = routeTileLinks(tiles, [link('a', 'b')]).get('a->b')!
+        const joined = routeTileLinks(tiles, [link('a', 'b'), link('a', 'c')]).get('a->b')!
+        expect(alone).toHaveLength(2)
+        expect(joined).toHaveLength(2)
+        // It slides along the face by half a pitch to make room, and keeps its shape.
+        expect(Math.abs(joined[0].v - alone[0].v)).toBeCloseTo(LINK_PITCH / 2)
+        expect(joined[1].v).toBeCloseTo(joined[0].v)
+    })
+
+    it('moves no line but by its port when a call starts or stops', () => {
+        const tiles = [tile('a', 1, 1), tile('b', 13, 1), tile('c', 1, 13), tile('d', 13, 13), tile('e', 7, 22)]
+        const cables = [link('a', 'b', 'cable'), link('a', 'c', 'cable'), link('b', 'd', 'cable'), link('c', 'e', 'cable')]
+        const quiet = routeTileLinks(tiles, cables)
+        const calls = [link('a', 'd', 'beam'), link('d', 'e', 'beam')]
+        for (let n = 1; n <= calls.length; n++) {
+            const busy = routeTileLinks(tiles, [...cables, ...calls.slice(0, n)])
+            for (const c of cables) {
+                const before = quiet.get(`${c.source}->${c.target}`)!
+                const after = busy.get(`${c.source}->${c.target}`)!
+                expect(after.length, `${c.source}->${c.target}`).toBe(before.length)
+                after.forEach((p, i) => expect(Math.max(Math.abs(p.u - before[i].u), Math.abs(p.v - before[i].v)), `${c.source}->${c.target}`).toBeLessThanOrEqual(LINK_PITCH / 2 + EPS))
+            }
+        }
+    })
+
     it('routes around a tile standing between the two ends', () => {
         const tiles = [tile('a', 1, 1), tile('b', 13, 1), tile('wall', 7, 1)]
         const { hits, routes } = findConflicts(tiles, [link('a', 'b')])
