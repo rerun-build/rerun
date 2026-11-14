@@ -385,6 +385,10 @@ export type IsoGridProps = {
     // A tile pulled while it is not draggable, or dropped in a `readOnly` container: it stays where
     // it was, and the host says why.
     onTileMoveRefused?: (id: string) => void
+    // The host's verdict for a tile dropped on `cell`: `null` lands it, a short line says why not. When
+    // given it replaces the board's own occupied and read-only checks, and the dragged ghost follows the
+    // pointer instead of being held inside one box.
+    canDropTile?: (id: string, cell: GridPosition, containerId: string | null) => string | null
     onTileContextMenu?: (id: string, x: number, y: number) => void
     onResizeContainerLocal?: (id: string, patch: ResizePatch) => void
     onResizeContainerCommit?: (id: string) => void
