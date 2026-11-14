@@ -141,8 +141,9 @@ nothing that rides `offset-path` may carry its own scale or translate.
 
 An at-a-glance tree, top of the pyramid first:
 
-1. **Feature**: what the owner asked for (the parent issue, its title), with progress rolled up from all
-   its tasks.
+1. **Parent task**: what the work is for, whatever its kind (owner: "A feature or PARENT TASK... sometimes
+   main task will be a code review and fixing"): the parent issue's title, a kind tag (feature, review +
+   fix, fix, upgrade, refactor, research; from the parent issue), and progress rolled up from all its tasks.
 2. **Department**, in the order work flows through the stack: Design, Database, Engine, Backend services,
    Frontend, Dispatcher and tooling, Docs. A task's department comes from the files its issue allows
    (`docs/research` design specs: Design; `supabase`: Database; `apps/engine`: Engine; `packages/contracts`,
@@ -155,8 +156,8 @@ An at-a-glance tree, top of the pyramid first:
    status, steps, time and tokens; opening one goes to that run's steps.
 
 Selecting a task lights the chain it waits on and everything waiting on it; a blocked task shows its stuck
-chain in red. Tasks with no feature sit under "No feature" at the bottom. Data: the snapshot carries each
-job's department (computed by the delegator from the issue's allowed paths) and each feature's title.
+chain in red. Tasks with no parent sit under "No parent task" at the bottom. Data: the snapshot carries each job's
+department (computed by the delegator from the issue's allowed paths) and each parent's title and kind.
 
 ## 5c. A coworker's run log
 
