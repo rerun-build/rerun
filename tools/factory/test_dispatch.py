@@ -504,24 +504,30 @@ class Clocks(Base):
         self.tick()
         self.assertEqual(self.w.cancels, [("b1", "run1")])
 
-    def test_a_long_build_whose_step_count_never_moves_is_not_cancelled_with_the_shipped_settings(self):
+    # The step count moves live with every tool call (seen 2026-11-14: 3 to 7 steps in one minute of a build).
+    # A healthy run's count moves at least every ~14 min (one shell call is capped at 600 s, one ci-wait at 450 s).
+    def test_a_long_build_whose_step_count_keeps_moving_is_not_cancelled_with_the_shipped_settings(self):
         self.cfg["clocks"] = D.settings()["clocks"]
         self.w.clock = T0
         self.tick()
-        self.w.runs["run1"] = run_shape("run1", 1, T0)
+        for i, at in enumerate((0, 840, 1680, 2520)):
+            self.w.clock = T0 + at
+            self.w.runs["run1"] = run_shape("run1", 1 + i, T0)
+            self.tick()
+        self.assertEqual(self.w.cancels, [])
+
+    def test_a_build_silent_past_the_stall_limit_is_cancelled_with_the_shipped_settings(self):
+        self.cfg["clocks"] = D.settings()["clocks"]
+        self.w.clock = T0
         self.tick()
-        self.w.clock = T0 + 1500
+        self.w.runs["run1"] = run_shape("run1", 5, T0)
+        self.tick()
+        self.w.clock = T0 + 1199
         self.tick()
         self.assertEqual(self.w.cancels, [])
-        self.w.clock = T0 + 2701
+        self.w.clock = T0 + 1201
         self.tick()
         self.assertEqual(self.w.cancels, [("b1", "run1")])
-        self.w.runs["run2"] = run_shape("run2", 1, T0 + 2701)
-        self.tick()
-        self.w.clock = T0 + 2701 + 2701
-        self.tick()
-        self.assertEqual(self.state(), "failed")
-        self.assertIn("2700", self.job_data()["reason"])
 
     def test_stalled_run_is_cancelled_and_sent_once_more(self):
         self.w.clock = T0
