@@ -240,6 +240,23 @@ describe('FactoryTasks', () => {
             expect(heading('Earlier').getAttribute('aria-expanded')).toBe('true')
         })
 
+        it('leaves a job closed by hand out of Problems and shows it under Ended today as closed by hand', () => {
+            render([job({ issue: 1, state: 'failed', closedOutside: true, enteredAt: at(14, 9, 5) }), job({ issue: 2, state: 'blocked', enteredAt: at(14, 9, 6) })])
+            expect(chips()).toContain('Problems 1')
+            expect(chips()).toContain('Ended today 1')
+            act(() => heading('Ended today').click())
+            expect(group('ended')!.textContent).toContain('closed by hand')
+            expect(Array.from(group('problems')!.querySelectorAll('[data-row]')).map((r) => r.textContent?.match(/#(\d+)/)?.[1])).toEqual(['2'])
+        })
+
+        it('shows a closed-by-hand job of an earlier day under Earlier', () => {
+            render([job({ issue: 3, state: 'returned', closedOutside: true, enteredAt: at(12, 9, 5) })])
+            expect(chips()).toContain('Problems 0')
+            expect(chips()).toContain('Earlier 1')
+            act(() => heading('Earlier').click())
+            expect(host.querySelector('[data-closed-by-hand]')).not.toBeNull()
+        })
+
         it('the Problems chip filters to the problem rows', () => {
             render(mixed())
             act(() => chipOf('Problems').click())
