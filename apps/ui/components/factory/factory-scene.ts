@@ -170,7 +170,12 @@ const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 
 function coworker(id: string, who: string, position: Cell, room: string, state: 'working' | 'idle' | 'waiting_human', opts: { copy?: boolean; behind?: boolean } = {}): Tile {
     return {
         id, position, span: 2, containerId: room, selectable: false, draggable: false, justPlaced: !!opts.copy,
-        style: { ...agentTileStyle(state, who), buddy: { ...LOOKS[who] }, ...(opts.copy ? { opacity: 0.55 } : opts.behind ? { opacity: 0.5 } : {}) },
+        style: {
+            ...(state === 'working' && who !== 'Delegator'
+                ? { ...agentTileStyle('idle', who), glow: `color-mix(in srgb, ${LOOKS[who].color} 60%, transparent)`, buddy: { ...LOOKS[who], mood: 'working' as const, ownColor: true } }
+                : { ...agentTileStyle(state, who), buddy: { ...LOOKS[who] } }),
+            ...(opts.copy ? { opacity: 0.55 } : opts.behind ? { opacity: 0.5 } : {}),
+        },
         ariaLabel: opts.copy ? `${who}, a copy` : who,
     }
 }
