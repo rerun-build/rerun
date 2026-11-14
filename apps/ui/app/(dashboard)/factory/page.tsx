@@ -4,9 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { readFactorySnapshotAction } from '@/app/api/_actions/factory.actions'
 import { AgentPanel } from '@/components/agent/AgentPanel'
+import { FactoryLoader } from '@/components/factory/FactoryLoader'
 import { FactoryInspector } from '@/components/factory/FactoryInspector'
 import { FactoryTasks } from '@/components/factory/FactoryTasks'
 import { FactoryWorld } from '@/components/factory/FactoryWorld'
+import { LOADER_TILE } from '@/components/factory/factory-state'
 import { sceneFromSnapshot } from '@/components/factory/from-snapshot'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -45,6 +47,7 @@ export default function FactoryPage() {
     const [selected, setSelected] = useState<number | null>(null)
     const [tab, setTab] = useState<'tasks' | 'inspect'>('tasks')
     const [collapsed, setCollapsed] = useState(false)
+    const [loaderOpen, setLoaderOpen] = useState(false)
 
     // The board's agents are loaded by the board page only; here they are loaded once when missing.
     const hydrated = useBoardStore(s => s.hydrated)
@@ -67,8 +70,17 @@ export default function FactoryPage() {
 
     const coworkers = useMemo(() => snapshot?.pools.flatMap(p => p.coworkers) ?? [], [snapshot])
     const names = useMemo(() => Object.fromEntries(coworkers.flatMap(c => (c.id ? [[c.id, c.name]] : []))), [coworkers])
-    const openCoworker = useCallback((id: string) => useBoardStore.getState().focusAgentOnBoard(id, 'logs'), [])
+    const openCoworker = useCallback((id: string) => {
+        setLoaderOpen(false)
+        useBoardStore.getState().focusAgentOnBoard(id, 'logs')
+    }, [])
     const openByName = useCallback((name: string) => {
+        // The Loader is an actor, not a coworker: it opens its own panel in the right-side slot.
+        if (name === LOADER_TILE) {
+            useBoardStore.getState().selectAgent(null)
+            setLoaderOpen(true)
+            return
+        }
         const id = coworkers.find(c => c.name === name)?.id
         if (id) openCoworker(id)
     }, [coworkers, openCoworker])
@@ -90,7 +102,7 @@ export default function FactoryPage() {
             />
             <div className="absolute left-4 top-4">
                 <button type="button" disabled={!boss} title={boss ? 'Open the chat with Boss' : 'No coworker named boss in this workspace'}
-                    onClick={() => boss && useBoardStore.getState().focusAgentOnBoard(boss.id, 'chat')}
+                    onClick={() => { if (!boss) return; setLoaderOpen(false); useBoardStore.getState().focusAgentOnBoard(boss.id, 'chat') }}
                     className="rounded-lg border border-border/60 bg-background/75 px-3 py-1.5 text-sm backdrop-blur-xl enabled:hover:bg-accent disabled:opacity-50">
                     Talk to Boss
                 </button>
@@ -111,6 +123,16 @@ export default function FactoryPage() {
                             ? <FactoryTasks jobs={snapshot?.jobs ?? []} repo={snapshot?.repo ?? ''} endedToday={snapshot?.endedToday ?? EMPTY_ENDED} selected={selected} onSelect={onSelect} sample={!snapshot} />
                             : <FactoryInspector job={job} jobs={snapshot?.jobs ?? []} repo={snapshot?.repo ?? ''} names={names} onSelect={onSelect} onOpenCoworker={openCoworker} />}
                     </div>
+                </aside>
+            )}
+            {loaderOpen && (
+                <aside data-loader-panel style={{ width: COLUMN_PX }} className="absolute inset-y-0 right-0 z-20 flex flex-col border-l border-border/60 bg-background/95 backdrop-blur-xl">
+                    <div className="flex items-center justify-between border-b border-border/60 p-2">
+                        <span className="px-2 text-xs font-medium">Loader</span>
+                        <button type="button" data-loader-close aria-label="Close the Loader panel" onClick={() => setLoaderOpen(false)}
+                            className="rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent">×</button>
+                    </div>
+                    <div className="min-h-0 flex-1 overflow-y-auto"><FactoryLoader snapshot={snapshot ?? null} /></div>
                 </aside>
             )}
             <AgentPanel />
