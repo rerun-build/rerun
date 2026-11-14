@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { act, createElement, createRef } from 'react'
+import { act, createRef } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { FactoryBarFrame } from './FactoryBarFrame'
@@ -9,7 +9,7 @@ let root: Root
 type Props = Partial<Parameters<typeof FactoryBarFrame>[0]>
 const render = (props: Props = {}) =>
     act(() => {
-        root.render(createElement(FactoryBarFrame, { edge: 'bottom', rightInset: 0, ...props }, 'hello bar'))
+        root.render(<FactoryBarFrame edge="bottom" rightInset={0} {...props}>hello bar</FactoryBarFrame>)
     })
 const outer = () => host.querySelector('[data-bar-frame]') as HTMLElement
 const inner = () => outer().firstElementChild as HTMLElement
