@@ -22,6 +22,8 @@ RUNNING = ("building", "reviewing", "fixing")
 END = ("merged", "rejected", "blocked", "failed", "returned")
 BACK = {"building": "queued", "reviewing": "review_wait", "fixing": "fix_wait"}  # where a transient failure sends a job back to
 LOST_BEATS = 3  # beats a send without a run id is looked for in list_runs
+RECONCILE_BEATS = 10  # a pass reads GitHub once; an end state fixed by hand needs no faster answer
+RECONCILE_MAX = 20  # jobs looked at in one pass
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 
 
@@ -396,6 +398,24 @@ class Dispatcher:
             self.save(job, "queued")
             log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
 
+    def reconcile(self):
+        """Every RECONCILE_BEATS beats: a reported end state whose issue was closed by hand ends merged or is recorded closed."""
+        if self.beats % RECONCILE_BEATS:
+            return
+        cands = [j for j in self.jobs() if j["state"] in ("blocked", "failed", "returned") and j.get("relabelled")
+                 and "closed_seen" not in self.store.get_all(str(j["issue"]))]
+        if not cands:
+            return
+        closed = {c["number"] for c in json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "closed",
+                                                           "--json", "number", "--limit", "1000"]) or "[]")}
+        cands.sort(key=lambda j: j["issue"])
+        for j in [j for j in cands if j["issue"] in closed][:RECONCILE_MAX]:
+            if j.get("pr") and json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "MERGED":
+                self.end(j, "merged", "merged outside the delegator")
+            else:
+                self.store.set(str(j["issue"]), "closed_seen", self.now())
+                log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+
     # --- coworker runs
 
     def send(self, j, agent, step, message, state, copy=1):
@@ -761,6 +781,10 @@ class Dispatcher:
             self.intake()
         except (Error, ValueError, KeyError) as e:
             log("-", "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.reconcile()
+        except (Error, ValueError, KeyError) as e:
+            log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
         for j in self.jobs():
             try:
                 if j["state"] not in END:
