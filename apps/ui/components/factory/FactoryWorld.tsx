@@ -1,5 +1,6 @@
 'use client'
 
+import type { FactorySnapshot } from '@rerun/contracts'
 import { IsoGrid, frameTemplateBoard, routeTileLinks, useRenderedFrame, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 
@@ -7,7 +8,7 @@ import { fireRerunConfetti } from '@/lib/confetti'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { applyMoves, canMove, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
-import { METRICS, type MetricDef, type MetricKey, type MetricValues } from './factory-metrics'
+import { METRICS, barModel, type MetricDef, type MetricKey, type MetricValues } from './factory-metrics'
 import { FactoryOverlay } from './FactoryOverlay'
 import { LOOP_MS, factoryScene, type Cell, type FactoryFrame } from './factory-scene'
 
@@ -47,7 +48,7 @@ function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }
 // carries the gauges and the counts, and a band drops in while sending is held.
 // `workspace` keys the owner's own arrangement of the floor in the browser. `rightInset` is the width a
 // column laid over the stage's right edge covers: the floor and the bar fit in what is left of it.
-export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker, rightInset = 0 }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void; rightInset?: number }) {
+export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker, rightInset = 0, snapshot = null }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void; rightInset?: number; snapshot?: FactorySnapshot | null }) {
     const [clock, setClock] = useState(() => ({ start: Date.now(), now: Date.now() }))
     const [expired, setExpired] = useState<Set<string>>(() => new Set())
     useEffect(() => {
@@ -113,24 +114,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
         return { zoom: c.zoom, pan: { x: c.pan.x - rightInset / 2 / c.zoom, y: c.pan.y + (OVERHEAD_PX - barSpace) / 2 / c.zoom } }
     }, [size, corners, rightInset, barSpace])
 
-    const signInMin = Math.max(0, 412 - Math.floor((clock.now - clock.start) / 60_000))
-    // shortcut: the run measures are sample numbers that grow with the loop; the page reads the
-    // engine's stats endpoint (runs dataset, 24h) instead.
-    const runs = 118 + frame.counts.runs
-    const values: MetricValues = {
-        queued: { text: String(frame.counts.queued) },
-        building: { text: String(frame.counts.building) },
-        review: { text: String(frame.counts.review) },
-        checks: { text: String(frame.counts.checks) },
-        shipped: { text: String(frame.counts.merged) },
-        runs: { text: String(runs) },
-        totalTokens: { text: `${(runs * 0.31).toFixed(1)}M` },
-        cachedShare: { text: '87%', fill: 87 },
-        avgDuration: { text: '2m 41s' },
-        errorRate: { text: '1.7%' },
-        planWeek: { text: '56%', fill: 56 },
-        signIn: frame.held ? { text: 'renewing', fill: 2, warn: true } : { text: `${signInMin} min`, fill: Math.min(100, (signInMin / 480) * 100) },
-    }
+    const { sample, values } = barModel({ snapshot, counts: frame.counts, held: frame.held, now: clock.now, start: clock.start })
 
     return (
         <div ref={ref} className={`${theme} relative h-dvh w-full overflow-hidden bg-background text-foreground`}>
@@ -157,7 +141,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
                     <div className="flex items-center gap-2 pr-1">
                         <span className={`size-2 rounded-full ${frame.held ? 'bg-red-500' : 'animate-pulse bg-emerald-500 motion-reduce:animate-none'}`} />
                         <span className="text-sm font-semibold tracking-tight">Factory</span>
-                        <span className="text-[10px] text-muted-foreground">sample</span>
+                        {sample && <span className="text-[10px] text-muted-foreground">sample</span>}
                     </div>
                     {(['jobs', 'runs', 'plan'] as const).map(group => (
                         <div key={group} className="flex flex-wrap items-center justify-center gap-4 border-l border-border/70 pl-4">
@@ -193,7 +177,7 @@ function Metric({ def, value }: { def: MetricDef; value: MetricValues[MetricKey]
     return (
         <Tooltip>
             <TooltipTrigger asChild>
-                <div className="flex cursor-help flex-col items-center justify-center leading-none" tabIndex={0}>
+                <div className="flex cursor-help flex-col items-center justify-center leading-none" tabIndex={0} {...(value.title ? { title: value.title } : {})}>
                     <span className={`font-mono text-base font-semibold tabular-nums ${value.warn ? 'text-red-500' : (TONES[def.key] ?? 'text-foreground')}`}>{value.text}</span>
                     {value.fill !== undefined && (
                         <span className="mt-1 h-1 w-14 overflow-hidden rounded-full bg-muted">
