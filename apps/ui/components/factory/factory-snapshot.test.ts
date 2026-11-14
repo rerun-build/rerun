@@ -165,4 +165,21 @@ describe('factorySnapshotSchema', () => {
             expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
         }
     })
+
+    it('accepts closedOutside: true on a job and the old shape without it', () => {
+        const s = sample()
+        const j = s.jobs.find((x: { issue: number }) => x.issue === 334)
+        expect(j.closedOutside).toBe(true)
+        expect(factorySnapshotSchema.safeParse(s).success).toBe(true)
+        delete j.closedOutside
+        expect(factorySnapshotSchema.safeParse(s).success).toBe(true)
+    })
+
+    it('refuses closedOutside false, a string or null', () => {
+        for (const v of [false, 'true', null]) {
+            const s = sample()
+            s.jobs[0].closedOutside = v
+            expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
+        }
+    })
 })

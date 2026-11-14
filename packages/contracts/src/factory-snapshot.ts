@@ -24,6 +24,8 @@ import { z } from 'zod'
 // - department, departments (optional): the main department of the job and the other ones it touches, computed by the
 //   delegator from the issue's allowed paths (SPEC 5b).
 // - epics (optional): one per distinct `parent`, title from GitHub. Optional so the app accepts the old and the new producer.
+// - closedOutside (optional): `closedOutside` is optional so the app accepts the old and the new producer; it comes from the
+//   ledger kv key `closed_seen` set by `reconcile` (tools/factory/dispatch.py:402-417). Only `true` exists; a producer omits the key.
 // - every string cut to its limit (some reasons are not cut in dispatch.py).
 // Holds: only those still running, `until` from epoch seconds to ISO.
 
@@ -74,6 +76,7 @@ export const factoryJobSchema = z.object({
     tokensOut: count.nullable(),
     parent: z.number().int().positive().nullable(), // the feature it was cut from, when the cut names one
     dependsOn: z.array(z.number().int().positive()).max(20),
+    closedOutside: z.literal(true).optional(), // its issue was closed by hand with no merged pull request
     reason: z.string().max(300).nullable(), // why it waits, or why it ended blocked, failed or returned
     history: z.array(factoryHistoryEntrySchema).max(30).optional(), // oldest first
     runs: z.array(factoryRunSchema).max(12).optional(),
