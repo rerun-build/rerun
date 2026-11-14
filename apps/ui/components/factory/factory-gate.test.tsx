@@ -35,13 +35,13 @@ describe('a review is a diamond gate', () => {
     })
 
     it('lights the exit the verdict names', () => {
+        // Find each verdict's first moment from the scene alone (cheap), then render only those two frames:
+        // rendering all 336 frames of the loop took over 5 s on a loaded CI machine.
         const seen: Record<string, string | undefined> = {}
-        for (let t = 0; t <= LOOP_MS; t += 250) {
-            const { frame, html } = render(t)
-            for (const v of ['pass', 'fail'] as const) {
-                if (seen[v] || !frame.pods.some(p => p.verdict === v)) continue
-                seen[v] = gates(html).find(g => g.includes(`data-verdict="${v}"`))
-            }
+        for (const v of ['pass', 'fail'] as const) {
+            let at = -1
+            for (let t = 0; t <= LOOP_MS && at < 0; t += 250) if (factoryScene(t, 0).pods.some(p => p.verdict === v)) at = t
+            if (at >= 0) seen[v] = gates(render(at).html).find(g => g.includes(`data-verdict="${v}"`))
         }
         expect(seen.pass).toBeDefined()
         expect(seen.fail).toBeDefined()
