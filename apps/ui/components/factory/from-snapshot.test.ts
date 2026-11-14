@@ -1,8 +1,14 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { factoryJobStateSchema, factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
 import { sceneFromSnapshot } from './from-snapshot'
+
+const sampleTime = vi.hoisted(() => ({ t: 0 }))
+vi.mock('./factory-scene', async importOriginal => {
+    const actual = await importOriginal<typeof import('./factory-scene')>()
+    return { ...actual, factoryScene: (_t: number, now: number) => actual.factoryScene(sampleTime.t, now) }
+})
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')
@@ -110,5 +116,51 @@ describe('sceneFromSnapshot', () => {
             s.jobs = [{ ...s.jobs[0], state }]
             expect(() => sceneFromSnapshot(s, NOW), state).not.toThrow()
         }
+    })
+})
+
+const COWORKERS = ['code', 'LARRY', 'LINUS', 'BRUCE', 'search', 'DIETER']
+const nothingRunning = (): FactorySnapshot => {
+    const s = sample()
+    s.jobs = s.jobs.map(j => ({ ...j, state: 'merged' as const }))
+    s.holds = []
+    s.pools = s.pools.map(p => ({ ...p, coworkers: p.coworkers.map(c => ({ ...c, out: 0 })) }))
+    return s
+}
+const look = (style: object) => { const { buddy: _b, label: _l, ...rest } = style as Record<string, unknown>; return rest }
+
+describe('sceneFromSnapshot: live tiles', () => {
+    it('gives every coworker and the loader the same neutral idle style when nothing runs, whatever the sample time', () => {
+        for (const t of [0, 2_000, 5_000, 9_000, 14_000, 20_000, 31_000]) {
+            sampleTime.t = t
+            const f = sceneFromSnapshot(nothingRunning(), NOW)
+            const ids = [...COWORKERS, 'Delegator']
+            const styles = ids.map(id => look(f.tiles.find(x => x.id === id)!.style))
+            for (const [i, st] of styles.entries()) {
+                expect(st, `${ids[i]} at t=${t}`).toEqual(styles[0])
+                expect(st).toMatchObject({ glow: 'var(--iso-tile-idle-glow)', color: 'var(--iso-tile-idle)', opacity: 1 })
+            }
+        }
+        sampleTime.t = 0
+    })
+
+    it('shows the working look only for a coworker the pools say has a run out, and for the loader when jobs are queued or in checks', () => {
+        sampleTime.t = 14_000
+        const s = nothingRunning()
+        s.pools = s.pools.map(p => ({ ...p, coworkers: p.coworkers.map(c => (c.name === 'LINUS' ? { ...c, out: 1 } : c)) }))
+        const f = sceneFromSnapshot(s, NOW)
+        const st = (id: string) => f.tiles.find(x => x.id === id)!.style
+        expect(st('LINUS').glow).toBe('rgba(245, 158, 11, 0.6)')
+        expect(st('code').glow).toBe('var(--iso-tile-idle-glow)')
+        expect(st('Delegator').glow).toBe('var(--iso-tile-idle-glow)')
+        s.jobs[0].state = 'queued'
+        expect(sceneFromSnapshot(s, NOW).tiles.find(x => x.id === 'Delegator')!.style.glow).toBe('rgba(245, 158, 11, 0.6)')
+        sampleTime.t = 0
+    })
+
+    it('puts no results flag on the loader, merged jobs or not', () => {
+        const f = sceneFromSnapshot(sample(), LATER)
+        expect(sample().jobs.some(j => j.state === 'merged')).toBe(true)
+        expect(f.tiles.find(x => x.id === 'Delegator')!.style.results).toBeUndefined()
     })
 })
