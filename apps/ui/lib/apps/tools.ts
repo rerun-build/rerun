@@ -24,8 +24,14 @@ export class AppToolRefusal extends Error {
     }
 }
 
-export type AppTool<Q extends string = string> = {
+// One entry of an app's directory: the tools a coworker reads on demand instead of carrying them on
+// every run.
+export type AppScope = { summary: string; requires?: string }
+
+export type AppTool<Q extends string = string, S extends string = string> = {
     name: string
+    // Without a scope the tool is loaded on every run; with one it is read from the directory.
+    scope?: S
     description: string
     inputSchema: JsonSchema
     category: LinkupCategory

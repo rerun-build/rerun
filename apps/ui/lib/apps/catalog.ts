@@ -10,15 +10,22 @@ export type AppInfo = {
     providerLabel: string
     // The service catalogue row coworkers install it from.
     serviceSlug: string
+    // The MCP server its catalogue row declares, which the engine prefixes every tool name with.
+    serverName: string
     // The plain catalogue row that lends its logo while the app's own row has none.
     brandSlug: string
     wakeEventLabels: Record<string, string>
 }
 
 export const APP_INFO: Record<AppSlug, AppInfo> = {
-    linkedin: { slug: 'linkedin', name: 'LinkedIn Pro', providerLabel: 'LinkedIn', serviceSlug: 'linkedin-pro', brandSlug: 'linkedin', wakeEventLabels: LINKEDIN_WAKE_EVENT_LABELS },
-    whatsapp: { slug: 'whatsapp', name: 'WhatsApp Pro', providerLabel: 'WhatsApp', serviceSlug: 'whatsapp-pro', brandSlug: 'whatsapp', wakeEventLabels: WHATSAPP_WAKE_EVENT_LABELS },
+    linkedin: { slug: 'linkedin', name: 'LinkedIn Pro', providerLabel: 'LinkedIn', serviceSlug: 'linkedin-pro', serverName: 'linkedin_pro', brandSlug: 'linkedin', wakeEventLabels: LINKEDIN_WAKE_EVENT_LABELS },
+    whatsapp: { slug: 'whatsapp', name: 'WhatsApp Pro', providerLabel: 'WhatsApp', serviceSlug: 'whatsapp-pro', serverName: 'whatsapp_pro', brandSlug: 'whatsapp', wakeEventLabels: WHATSAPP_WAKE_EVENT_LABELS },
 }
+
+// The two tools every paid app adds to its loaded ones: the directory of the rest, and the call that
+// runs a tool read there.
+export const APP_LIST_TOOLS = 'list_tools'
+export const APP_RUN_TOOL = 'run_tool'
 
 export function appInfo(slug: AppSlug): AppInfo {
     return APP_INFO[slug]
