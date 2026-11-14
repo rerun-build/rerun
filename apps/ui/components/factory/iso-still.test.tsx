@@ -38,7 +38,7 @@ describe('the still state of the iso-grid', () => {
         expect(CSS).toMatch(/\[data-buddy-still\][^{]*\.iso-buddy-eyes[^{]*\{[^}]*animation:\s*none/)
     })
 
-    it('the live floor sets it: nothing running means every belt and every coworker tile is still', () => {
+    it('the live floor sets it: nothing running means every belt is still, while idle coworkers keep their faces animated', () => {
         const s = sample()
         s.jobs = s.jobs.map(j => ({ ...j, state: 'merged' as const }))
         s.holds = []
@@ -47,7 +47,8 @@ describe('the still state of the iso-grid', () => {
         const belts = f.links.filter(l => l.variant === 'belt')
         expect(belts.length).toBeGreaterThan(0)
         expect(belts.every(l => l.still === true)).toBe(true)
-        expect(f.tiles.filter(t => !t.id.startsWith('cab-') && t.id !== 'rejects').every(t => t.style.still === true)).toBe(true)
+        expect(f.tiles.filter(t => !t.id.startsWith('cab-') && t.id !== 'rejects').some(t => t.style.still === true)).toBe(false) // idle faces still blink and look around
+        expect(f.tiles.find(t => t.id === 'code')!.style.still).not.toBe(true)
         expect(f.tiles.some(t => t.id.includes('-copy-'))).toBe(false) // no ghost copy without a job running
     })
 

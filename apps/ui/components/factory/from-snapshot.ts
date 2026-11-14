@@ -135,10 +135,10 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         if (tile.id === 'rejects') return { ...tile, ariaLabel: `Reject bin: ${rejects}` }
         if (tile.id === 'Delegator') {
             const state = held ? 'waiting_human' : counts.queued + counts.checks > 0 ? 'working' : 'idle'
-            return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', ...(held ? { badge: 'lock' as const } : {}), ...(state === 'idle' ? { still: true } : {}) } }
+            return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', ...(held ? { badge: 'lock' as const } : {}) } }
         }
         const working = (out.get(tile.id) ?? 0) > 0
-        return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy, ...(working ? {} : { still: true }) } }
+        return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy } }
     })
 
     // Belts: the base ones between kept tiles, then one to each cabinet. Red when held, else the colour of what runs on it.
