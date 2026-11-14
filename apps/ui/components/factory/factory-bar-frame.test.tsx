@@ -9,7 +9,7 @@ let root: Root
 type Props = Partial<Parameters<typeof FactoryBarFrame>[0]>
 const render = (props: Props = {}) =>
     act(() => {
-        root.render(createElement(FactoryBarFrame, { edge: 'bottom', rightInset: 0, ...props, children: 'hello bar' }))
+        root.render(createElement(FactoryBarFrame, { edge: 'bottom', rightInset: 0, ...props }, 'hello bar'))
     })
 const outer = () => host.querySelector('[data-bar-frame]') as HTMLElement
 const inner = () => outer().firstElementChild as HTMLElement
