@@ -7,6 +7,34 @@ The factory is a production line in Rerun's own isometric world, dark by default
 finite, known thing: a feature is cut into a known number of tasks, each task passes known stages, so every
 level on the floor is exact and every motion says something true. Nothing moves for decoration.
 
+## 0. Shape language (binding; owner, 2026-11-14)
+
+Owner: "shapes must mean something", "like in diagrams a shape says something", "the ghosts or replicas
+are the only things transparent", "idle coworkers or other shapes, do not animate the body shape, only
+their faces". Every object on the floor takes its meaning from a flowchart shape (ISO 5807) or, for work in
+flight, a Petri-net token. A new object must use one of these shapes for its meaning, or this table changes
+first.
+
+| Shape | Means | On the floor |
+|---|---|---|
+| Rectangle (process) with a face | a mind that does work | a Rerun coworker, in its own Rerun colour; unlit when idle, glowing when it has a run out |
+| Rectangle, see-through | the same process running again in parallel | a copy (ghost); drawn only while that copy runs a job |
+| Diamond (decision) | a yes/no choice | review: a diamond gate on the belt; pass leaves by one corner, fail by the other |
+| Capsule (terminator) | where the flow starts and ends | the Loader (the delegator): faceless; intake, checks and merge happen there; clicking it opens the Loader tab |
+| Cylinder (stored data) | where results collect | a feature: a tank filling gold as its tasks merge; the reject store: a red tank beside review |
+| Token (Petri net) | one unit of work in flight | a task: a solid sphere, two-tone (filled part in its state colour, the rest dark) |
+| Flow line with arrows | direction of flow | a belt, with chevrons pointing the way work moves; still when nothing is on it |
+| D-shape (delay) | waiting | a hold: a red D-shaped barrier across the belts, with the time left |
+
+Only copies are see-through. Spheres, tanks, gates and coworkers are solid.
+
+Idle means still bodies: an idle coworker, the Loader, a gate, a tank or a belt does not move its shape (no
+bob, squash, sway, running slats or travelling light). Only faces stay alive when idle: a coworker's eyes
+may blink and look around. Motion of a body says work is happening.
+
+Where section 1 below says otherwise (glass spheres, an open bin, a buddy for the loader, a scanner box),
+this section wins; section 1 is kept for what each object is and how it moves while working.
+
 ## 1. Objects
 
 | Object | What it is | How it looks |
