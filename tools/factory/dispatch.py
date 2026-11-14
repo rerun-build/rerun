@@ -817,11 +817,15 @@ class Dispatcher:
                     self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
         self.report_line()
 
+    def read_epic(self, n):
+        return json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,labels"]))
+
     def report_line(self):
         """Each beat: the whole line to the app, once. Never raises: a failed report must not stop the beat."""
         try:
             now = self.now()
-            snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats)
+            snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
+                                           read_epic=self.read_epic)
             self.account("factory_report", {"snapshot": snap}, timeout=10)
             self.report_logged.clear()
         except Exception as e:  # noqa: BLE001 - the report only, never the beat

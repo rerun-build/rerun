@@ -1,5 +1,5 @@
 """The line as one picture for the app (rerun#319): build_snapshot() returns a dict valid against factorySnapshotSchema
-(packages/contracts/src/factory-snapshot.ts). Read-only on the ledger. No import of dispatch at module level."""
+(packages/contracts/src/factory-snapshot.ts). Reads the ledger only, except the epic cache rows (kv job '-', k 'epic:<n>') it writes. No import of dispatch at module level."""
 import datetime
 import json
 
@@ -12,6 +12,16 @@ END = ("merged", "rejected", "blocked", "failed", "returned")
 WAIT_STATES = ("waiting", "queued", "review_wait", "fix_wait")
 TYPES = ("coder", "reviewer", "researcher", "designer")
 MAX_JOBS = 300
+MAX_EPICS = 50
+MAX_READS = 5  # GitHub reads of epic titles per beat
+KINDS = ("feature", "review_fix", "fix", "upgrade", "refactor", "research", "other")
+# SPEC 5b: first match wins, longest prefix first, whole path segments.
+DEPARTMENTS = (
+    ("docs/research", "design"), ("supabase", "database"), ("apps/engine", "engine"),
+    ("apps/ui/app/api", "backend"), ("packages/contracts", "backend"),
+    ("apps/ui", "frontend"), ("packages/ui", "frontend"), ("packages/i18n", "frontend"),
+    ("tools/factory", "tooling"), (".github", "tooling"), ("deploy", "tooling"), ("docs", "docs"),
+)
 MAX_BYTES = 256 * 1024  # FACTORY_SNAPSHOT_MAX_BYTES in packages/contracts/src/factory-snapshot.ts
 
 
@@ -48,6 +58,75 @@ def _reason(j):
     return _cut(text or None, 300)
 
 
+def _department(paths):
+    """(main, others): main has the most paths (a tie goes to table order); None when no path matches."""
+    count = {}
+    for p in paths:
+        for prefix, dept in DEPARTMENTS:
+            if p == prefix or p.startswith(prefix + "/"):
+                count[dept] = count.get(dept, 0) + 1
+                break
+    order = []
+    for _, dept in DEPARTMENTS:
+        if dept in count and dept not in order:
+            order.append(dept)
+    if not order:
+        return None, []
+    main = max(order, key=lambda d: (count[d], -order.index(d)))
+    return main, [d for d in order if d != main]
+
+
+def _kind(title, labels):
+    for lab in labels or []:
+        name = str((lab or {}).get("name") or "").lower().replace("-", "_")
+        if name in KINDS:
+            return name
+    t = str(title or "").lower()
+    if "review" in t and "fix" in t:
+        return "review_fix"
+    for word in ("fix", "upgrade", "refactor", "research", "feature"):
+        if word in t:
+            return word
+    return "other"
+
+
+def _epic(store, n, read_epic, budget):
+    """Cached title and kind of epic n. A failed or skipped read is not cached: the next beat tries again."""
+    row = store.db.execute("SELECT v FROM kv WHERE job='-' AND k=?", ("epic:%d" % n,)).fetchone()
+    if row:
+        try:
+            c = json.loads(row[0])
+            return str(c["title"])[:256], c["kind"]
+        except (ValueError, KeyError, TypeError):
+            pass
+    if read_epic is not None and budget[0] > 0:
+        budget[0] -= 1
+        try:
+            r = read_epic(n)
+            title = str(r["title"])[:256]
+            kind = _kind(title, r.get("labels"))
+            store.set("-", "epic:%d" % n, json.dumps({"title": title, "kind": kind}))
+            return title, kind
+        except Exception:  # noqa: BLE001 - an unreadable epic keeps its number
+            pass
+    return "#%d" % n, "other"
+
+
+def _epics(store, kept, read_epic):
+    live, rest = set(), set()
+    for j in kept:
+        p = cutshape.parse({"number": j["issue"], "body": j.get("body") or ""}).get("parent")
+        if p is not None:
+            (live if j["state"] not in END else rest).add(p)
+    chosen = (sorted(live, reverse=True) + sorted(rest - live, reverse=True))[:MAX_EPICS]
+    budget = [MAX_READS]
+    out = []
+    for n in sorted(chosen):
+        title, kind = _epic(store, n, read_epic, budget)
+        out.append({"issue": n, "title": title, "kind": kind})
+    return out
+
+
 def _job(store, cfg, names, j):
     running = j["state"] in RUNNING
     parsed = cutshape.parse({"number": j["issue"], "body": j.get("body") or ""})
@@ -64,7 +143,8 @@ def _job(store, cfg, names, j):
     runs = [{"stage": _cut(r[0], 20), "coworkerId": ids.get(r[1]) or _cut(r[1], 64), "status": _cut(r[2], 20),
              "startedAt": r[3], "endedAt": r[4], "tokensIn": int(r[5] or 0), "tokensOut": int(r[6] or 0),
              "runId": _cut(r[7], 64)} for r in rows]
-    return {
+    main, others = _department(parsed.get("paths") or [])
+    job = {
         "issue": j["issue"], "title": str(j.get("title") or "")[:256], "state": j["state"],
         "enteredAt": _entered(store, j), "pr": j.get("pr"),
         "round": rnd if isinstance(rnd, int) and 1 <= rnd <= 9 else None,
@@ -74,6 +154,11 @@ def _job(store, cfg, names, j):
         "parent": parsed.get("parent"), "dependsOn": list(parsed.get("deps") or [])[:20],
         "reason": _reason(j), "history": history, "runs": runs,
     }
+    if main:
+        job["department"] = main
+        if others:
+            job["departments"] = others
+    return job
 
 
 def _size(v):
@@ -97,7 +182,7 @@ def _fit(snap):
     return snap
 
 
-def build_snapshot(store, cfg, now, holds_active, beat=0):
+def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None):
     names = pools.names(cfg)
     all_jobs = store.jobs()
     live = [j for j in all_jobs if j["state"] not in END]
@@ -121,5 +206,5 @@ def build_snapshot(store, cfg, now, holds_active, beat=0):
     holds_list = [{"kind": holds_active["kind"][:40], "until": iso(holds_active["until"])}] if holds_active else []
     snap = {"version": 1, "madeAt": iso(now), "beat": beat, "repo": cfg["repo"],
             "jobs": [_job(store, cfg, names, j) for j in kept], "holds": holds_list, "pools": pool_list,
-            "endedToday": ended_today}
+            "endedToday": ended_today, "epics": _epics(store, kept, read_epic)}
     return _fit(snap)
