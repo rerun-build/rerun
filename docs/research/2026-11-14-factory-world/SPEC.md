@@ -22,14 +22,25 @@ first.
 
 | Shape | Means | On the floor |
 |---|---|---|
-| Rectangle (process) with a face | a mind that does work | a Rerun coworker, always in its own Rerun colour: unlit when idle, glowing in that same colour when it has a run out (never turned gold or any state colour; state colours belong to tasks and belts) |
-| Rectangle, see-through | the same process running again in parallel | a copy (ghost); drawn only while that copy runs a job |
+| Rectangle (process) with a face | a mind that does work | a Rerun coworker in its own colour (the look Rerun derives from its id). Idle (owner: "idle ones have all grey body and a colored head"): grey body, top in its own colour, normal height, faint glow, still, face blinking. Working (owner: "we will have 2x tall, colored top, and colored body with glow"): about twice as tall (Rerun's stretched stance), top AND body in its own colour, a strong glow in that colour around the whole block, the bob, its floor cell lit, the label taking turns between name and "Working". Not gold: on Rerun's board gold marks working; on the floor height and a lit body do, and the colour keeps saying who it is |
+| Rectangle, see-through | the same process running again in parallel | a copy (ghost): drawn only while it runs a job, so always in its coworker's working look (tall, own colour, glow), see-through |
 | Diamond (decision) | a yes/no choice | review: a diamond gate on the belt; pass leaves by one corner, fail by the other |
 | Capsule (terminator) | where the flow starts and ends | the Loader (the delegator): faceless; intake, checks and merge happen there; clicking it opens the Loader tab |
 | Cylinder (stored data) | where results collect | a feature: a tank filling gold as its tasks merge; the reject store: a red tank beside review |
 | Token (Petri net) | one unit of work in flight | a task: a solid sphere, two-tone (filled part in its state colour, the rest dark) |
 | Flow line with arrows | direction of flow | a belt, with chevrons pointing the way work moves; still when nothing is on it |
 | D-shape (delay) | waiting | a hold: a red D-shaped barrier across the belts, with the time left |
+
+**Moods** (owner: "yes moods are important"; Rerun's own moods, `BuddyMood` in `packages/ui/src/iso-grid/types.ts`,
+faces in `components/buddy/BuddyFace.tsx`, motions `MOTION` in `components/buddy/AgentBuddy.tsx`):
+
+| Mood | Face and body (as Rerun draws them) | On the floor, when |
+|---|---|---|
+| idle | eyes blink and look around; body still; grey body, coloured top | it has no run out |
+| working | animated face; the jello bob; about twice as tall; top and body in its colour; stronger glow | it has a run out |
+| error | crossed eyes (glasses, visor and shades keep their frame), a frown, the shudder; its top keeps its colour, the glow turns red | a task it holds is blocked or failed, or its last run ended in error or stalled, until that is resolved |
+| waiting | Rerun's waiting face | its run waits on a person (a question to the owner) |
+| asleep | Rerun's asleep face, dimmed | switched off, or in no pool |
 
 Only copies are see-through. Spheres, tanks, gates and coworkers are solid.
 
