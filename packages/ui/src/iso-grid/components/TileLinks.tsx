@@ -1,7 +1,8 @@
 'use client'
 
 import { memo, useMemo } from 'react'
-import { DEFAULT_SPAN, ISO_DIM_MS, ISO_DIM_OPACITY, TILE_H, TILE_W, hashUnit, isPlaced } from '../iso'
+import { ISO_DIM_MS, ISO_DIM_OPACITY, TILE_H, TILE_W, hashUnit, isPlaced } from '../iso'
+import { BELT_WIDTH, routeTileLinks, type AxisPoint, type RoutedLink, type RoutedTile } from '../link-routes'
 import type { Container, Tile, TileLink, WorldOffset } from '../types'
 
 const HALF_W = TILE_W / 2
@@ -47,82 +48,13 @@ type Link = {
     color?: string
 }
 
-// Coordonnées le long des deux axes iso : u suit l'axe « col », v l'axe « row ». Le centre d'une
-// tile de footprint span ancrée en (col,row) tombe en (col + span/2, row + span/2), et son losange
-// s'étend de span/2 de part et d'autre sur chaque axe. Une arête du losange est donc un u ou un v
-// constant, et son milieu (le centre d'une face) est le point où un segment aligné sur l'autre axe
-// la traverse.
-type TileAxis = { u: number; v: number; half: number }
-type AxisPoint = { u: number; v: number }
-
-function tileAxis(tile: Tile): TileAxis {
-    const span = tile.span ?? DEFAULT_SPAN
-    return { u: tile.position.col + span / 2, v: tile.position.row + span / 2, half: span / 2 }
-}
-
-// Même convention d'écran que tileBox/ContainerBlock : isoPosition().left + TILE_W/2.
+// Même convention d'écran que tileBox/ContainerBlock : isoPosition().left + TILE_W/2. Les tracés
+// eux-mêmes viennent de routeTileLinks, qui place tous les liens du board ensemble.
 function axisToWorld(point: AxisPoint, worldOffset: WorldOffset) {
     return {
         x: (point.u - point.v) * HALF_W + HALF_W + worldOffset.left,
         y: (point.u + point.v) * HALF_H + worldOffset.top,
     }
-}
-
-// Tracé du câble entre deux tiles, en segments alignés sur les axes de la grille. Les extrémités
-// sont posées au milieu d'une face (jamais vers un coin) : un segment ne peut servir de sortie que
-// s'il est assez long pour franchir le losange de sa tile, sinon c'est l'autre segment qui perce
-// le bloc, et il le fait hors du centre de face. On essaie donc le coude simple sur chaque axe,
-// puis, si aucun des deux ne tient, un tracé en Z qui rentre perpendiculairement des deux côtés.
-function routeLink(source: TileAxis, target: TileAxis): AxisPoint[] {
-    const du = target.u - source.u
-    const dv = target.v - source.v
-    const su = Math.sign(du) || 1
-    const sv = Math.sign(dv) || 1
-
-    if (Math.abs(du) >= source.half && Math.abs(dv) > target.half) {
-        return [
-            { u: source.u + su * source.half, v: source.v },
-            { u: target.u, v: source.v },
-            { u: target.u, v: target.v - sv * target.half },
-        ]
-    }
-
-    if (Math.abs(dv) >= source.half && Math.abs(du) > target.half) {
-        return [
-            { u: source.u, v: source.v + sv * source.half },
-            { u: source.u, v: target.v },
-            { u: target.u - su * target.half, v: target.v },
-        ]
-    }
-
-    if (Math.abs(du) >= source.half + target.half) {
-        const from = source.u + su * source.half
-        const to = target.u - su * target.half
-        const mid = (from + to) / 2
-        return [
-            { u: from, v: source.v },
-            { u: mid, v: source.v },
-            { u: mid, v: target.v },
-            { u: to, v: target.v },
-        ]
-    }
-
-    if (Math.abs(dv) >= source.half + target.half) {
-        const from = source.v + sv * source.half
-        const to = target.v - sv * target.half
-        const mid = (from + to) / 2
-        return [
-            { u: source.u, v: from },
-            { u: source.u, v: mid },
-            { u: target.u, v: mid },
-            { u: target.u, v: to },
-        ]
-    }
-
-    return [
-        { u: source.u, v: source.v },
-        { u: target.u, v: target.v },
-    ]
 }
 
 // Chaque câble a sa propre vitesse, sa propre pause et son propre point de départ dans le cycle :
@@ -142,8 +74,7 @@ function traceTiming(id: string) {
     return { period, travelRatio: travel / period, phase: hashUnit(id, 6) * period }
 }
 
-// A belt's band and its slats, in world px: wide enough to carry the factory's spheres.
-const BELT_WIDTH = 13
+// A belt's slats; its band is BELT_WIDTH, which the router spaces the belts by.
 const BELT_SLATS = '1.4 6'
 
 // The lit line behind a trace's head, as stacked strokes that grow fainter the further back they
@@ -153,10 +84,6 @@ const TRACE_TRAIL = [
     { share: 0.3, opacity: 0.32, width: 1.2 },
     { share: 0.55, opacity: 0.1, width: 1 },
 ]
-
-function dedupe(points: AxisPoint[]) {
-    return points.filter((point, index) => index === 0 || point.u !== points[index - 1].u || point.v !== points[index - 1].v)
-}
 
 type ScreenPoint = { x: number; y: number }
 type Route = { link: Link; points: ScreenPoint[]; d: string; length: number }
@@ -226,11 +153,21 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
 
     // Géométrie écran de chaque lien, dans le repère du SVG (origine décalée de svgHalfW/H). Le calque
     // des comètes est un frère du SVG calé sur la même origine, donc il partage ces coordonnées.
+    // Les tracés ne suivent que le plan du board — places, tailles, paires reliées — : un changement
+    // de statut ou de couleur, fréquent, ne relance pas le routage.
+    const layout = useMemo(
+        () => JSON.stringify([tiles.map(t => ({ id: t.id, position: t.position, span: t.span })), liveLinks.map(l => ({ source: l.source, target: l.target, variant: l.variant }))]),
+        [tiles, liveLinks],
+    )
+    const routed = useMemo(() => {
+        const [routedTiles, routedLinks] = JSON.parse(layout) as [RoutedTile[], RoutedLink[]]
+        return routeTileLinks(routedTiles, routedLinks)
+    }, [layout])
     const routes = useMemo<Route[]>(() => {
         const out: Route[] = []
         for (const link of links) {
-            const route = dedupe(routeLink(tileAxis(link.source), tileAxis(link.target)))
-            if (route.length < 2) continue
+            const route = routed.get(link.id)
+            if (!route || route.length < 2) continue
             const points = route.map(point => {
                 const world = axisToWorld(point, worldOffset)
                 return { x: world.x + svgHalfW, y: world.y + svgHalfH }
@@ -238,7 +175,7 @@ export const TileLinks = memo(function TileLinks({ tiles, liveLinks, containers,
             out.push({ link, points, d: points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' '), length: polylineLength(points) })
         }
         return out
-    }, [links, worldOffset, svgHalfW, svgHalfH])
+    }, [links, routed, worldOffset, svgHalfW, svgHalfH])
 
     if (routes.length === 0) return null
 

@@ -18,8 +18,7 @@ describe('sceneFromSnapshot', () => {
         expect(pod(f, 331)).toMatchObject({ band: 'review', state: 'working' })
         expect(pod(f, 332)).toMatchObject({ state: 'held', path: ['Delegator', 'code'], travel: 0, level: 0 })
         expect(pod(f, 333)).toMatchObject({ band: 'build', state: 'fixing' })
-        expect(pod(f, 335)).toBeUndefined() // merged: it fills its cabinet slot
-        expect(f.cabinets[0].slots.find(s => s.issue === 335)?.state).toBe('merged')
+        expect(pod(f, 335)).toBeUndefined() // merged, and counted
         expect(f.counts).toMatchObject({ queued: 1, building: 2, review: 1, checks: 0, merged: 1 })
     })
 
@@ -67,15 +66,18 @@ describe('sceneFromSnapshot', () => {
         expect(f.tiles.some(t => t.id === 'LINUS-copy-331')).toBe(false)
     })
 
-    it('puts a job with no parent in the No feature cabinet', () => {
+    it('gives a job with no parent no feature sphere, and a parent its own', () => {
         const f = sceneFromSnapshot(sample(), NOW)
-        expect(f.cabinets).toHaveLength(1)
-        expect(f.cabinets[0]).toMatchObject({ issue: 0, title: 'No feature' })
-        expect(f.tiles.some(t => t.id === 'cab-0')).toBe(true)
+        expect(f.cabinets).toEqual([])
+        expect(f.tiles.some(t => t.id.startsWith('cab-'))).toBe(false)
         const s = sample()
         s.jobs[0].parent = 320
+        s.jobs[5].parent = 320
         const g = sceneFromSnapshot(s, NOW)
-        expect(g.cabinets.map(c => c.title).sort()).toEqual(['#320', 'No feature'])
+        expect(g.cabinets).toHaveLength(1)
+        expect(g.cabinets[0]).toMatchObject({ issue: 320, title: '#320', tasks: [330, 335] })
+        expect(g.cabinets[0].slots.find(x => x.issue === 335)?.state).toBe('merged')
+        expect(g.tiles.some(t => t.id === 'cab-320')).toBe(true)
     })
 
     it('every state of the contracts enum is mapped', () => {

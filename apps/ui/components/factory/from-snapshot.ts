@@ -5,32 +5,25 @@
 
 import { agentTileStyle, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
-import { type CabinetView, type Cell, type FactoryFrame, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
+import { type CabinetView, type Cell, COPY_CELLS, FEATURE_CELLS, type FactoryFrame, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
 
 export type SnapshotFrame = FactoryFrame & { blocked: { issue: number; reason: string }[]; cracked: number[]; notAnswering: boolean; lastBeatMs: number }
 
 const BEAT_MS = 30_000
-const PITCH = 5
 const KEEP = ['Delegator', 'code', 'LARRY', 'LINUS', 'BRUCE', 'search', 'DIETER', 'rejects']
 const QUIET = '#8ea2ff'
 const clamp = (x: number) => Math.max(0, Math.min(1, x))
 const dedupe = (xs: string[]) => xs.filter((x, i) => i === 0 || x !== xs[i - 1])
 
-type Box = { col_start: number; row_start: number }
-// The same three-line formula as `places()` in factory-scene.ts, which is not exported.
-const places = (b: Box, perRow: number, n: number): Cell[] =>
-    Array.from({ length: n }, (_, i) => ({ col: b.col_start + 1 + PITCH * (i % perRow), row: b.row_start + 1 + PITCH * Math.floor(i / perRow) }))
-
 export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): SnapshotFrame {
     const base = factoryScene(0, now)
-    const box = (id: string) => base.containers.find(c => c.id === id)!
     const tileOf = (id: string) => base.tiles.find(t => t.id === id)!
 
-    // Cells for copies, by coworker: the cells of its box after its own.
+    // Cells for copies, by coworker: the sample loop's own.
     const copyCells: Record<string, { room: string; cells: Cell[] }> = {
-        code: { room: 'build', cells: places(box('build'), 4, 8).slice(1, 7) },
-        LINUS: { room: 'review', cells: places(box('review'), 2, 4).slice(1, 3) },
-        search: { room: 'studio', cells: places(box('studio'), 2, 4).slice(1, 2) },
+        code: { room: 'build', cells: COPY_CELLS.code },
+        LINUS: { room: 'review', cells: COPY_CELLS.LINUS },
+        search: { room: 'studio', cells: COPY_CELLS.search },
     }
 
     const live = snapshot.holds.filter(h => Date.parse(h.until) > now)
@@ -122,18 +115,15 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         }
     }
 
-    // Cabinets: "No feature" first when a job has no parent, then one per parent; the stock box holds two.
-    const stock = box('stock')
-    const cabCells: Cell[] = [{ col: stock.col_start + 1, row: stock.row_start + 3 }, { col: stock.col_start + 6, row: stock.row_start + 3 }]
-    const parents = [...new Set(jobs.map(j => j.parent).filter((p): p is number => p !== null))].sort((a, b) => a - b)
-    const keys: (number | null)[] = [...(jobs.some(j => j.parent === null) ? [null] : []), ...parents].slice(0, cabCells.length)
+    // Cabinets: one per parent feature, as many as the stock box holds. A job with no parent has no feature sphere.
+    const parents = [...new Set(jobs.map(j => j.parent).filter((p): p is number => p !== null))].sort((a, b) => a - b).slice(0, FEATURE_CELLS.length)
     const slotOf = (j: FactoryJob): SlotView => {
         const done = j.state === 'merged' || j.state === 'rejected'
         return { issue: j.issue, state: j.state === 'merged' ? 'merged' : j.state === 'rejected' ? 'rejected' : 'empty', arriving: done ? 1 : 0 }
     }
-    const cabinets: CabinetView[] = keys.map((p, i) => {
+    const cabinets: CabinetView[] = parents.map((p, i) => {
         const mine = jobs.filter(j => j.parent === p)
-        return { issue: p ?? 0, title: p === null ? 'No feature' : `#${p}`, tasks: mine.map(j => j.issue), at: cabCells[i], slots: mine.map(slotOf) }
+        return { issue: p, title: `#${p}`, tasks: mine.map(j => j.issue), at: FEATURE_CELLS[i], slots: mine.map(slotOf) }
     })
     const cabTiles: Tile[] = cabinets.map(c => ({
         id: `cab-${c.issue}`, position: c.at, span: 2, containerId: 'stock', selectable: false, draggable: false,

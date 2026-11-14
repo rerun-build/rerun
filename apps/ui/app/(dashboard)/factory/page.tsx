@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { readFactorySnapshotAction } from '@/app/api/_actions/factory.actions'
 import { FactoryWorld } from '@/components/factory/FactoryWorld'
 import { sceneFromSnapshot } from '@/components/factory/from-snapshot'
+import { useSession } from '@/supabase/session/SessionProvider'
 
 const POLL_MS = 30_000
 
@@ -31,6 +32,7 @@ export default function FactoryPage() {
 
     const snapshot = answer?.snapshot
     const scene = useCallback((_: number, now: number) => sceneFromSnapshot(snapshot!, now), [snapshot])
+    const { workspace } = useSession()
 
-    return <FactoryWorld {...(snapshot ? { scene } : {})} />
+    return <FactoryWorld {...(snapshot ? { scene } : {})} {...(workspace ? { workspace: String(workspace.id) } : {})} />
 }

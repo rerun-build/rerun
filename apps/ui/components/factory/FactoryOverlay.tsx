@@ -6,37 +6,20 @@
 // transition between ticks; the slosh, shakes and glows are CSS. Under reduced motion the transitions
 // and loops stop and the spheres step from place to place.
 
-import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type Tile } from '@rerun/ui/iso-grid'
+import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
 
 import { STATUS_COLOR, type CabinetView, type PodView } from './factory-scene'
 
 const QUEUE_GAP = 40 // px between waiting spheres on the loader's line
+const REST_PX = 24 // how far short of the end of its line a sphere being worked rests
 
 type P = { x: number; y: number }
-type Axis = { u: number; v: number; half: number }
-type AxisPoint = { u: number; v: number }
 
-// Mirrors TileLinks: tile centre on the grid's two axes, and the axis-aligned route between faces.
+// The world's own frame, as TileLinks draws it: a tile's centre on the grid's two axes, and a point of
+// a route from routeTileLinks in px.
 const CENTER = isoPosition(GRID_SIZE / 2, GRID_SIZE / 2)
-const tileAxis = (t: Tile): Axis => { const s = t.span ?? 2; return { u: t.position.col + s / 2, v: t.position.row + s / 2, half: s / 2 } }
+const centreOf = (t: Tile): AxisPoint => { const s = t.span ?? 2; return { u: t.position.col + s / 2, v: t.position.row + s / 2 } }
 const toWorld = (p: AxisPoint): P => ({ x: (p.u - p.v) * (TILE_W / 2) + TILE_W / 2 - CENTER.left, y: (p.u + p.v) * (TILE_H / 2) - CENTER.top })
-function routeLink(source: Axis, target: Axis): AxisPoint[] {
-    const du = target.u - source.u, dv = target.v - source.v
-    const su = Math.sign(du) || 1, sv = Math.sign(dv) || 1
-    if (Math.abs(du) >= source.half && Math.abs(dv) > target.half)
-        return [{ u: source.u + su * source.half, v: source.v }, { u: target.u, v: source.v }, { u: target.u, v: target.v - sv * target.half }]
-    if (Math.abs(dv) >= source.half && Math.abs(du) > target.half)
-        return [{ u: source.u, v: source.v + sv * source.half }, { u: source.u, v: target.v }, { u: target.u - su * target.half, v: target.v }]
-    if (Math.abs(du) >= source.half + target.half) {
-        const from = source.u + su * source.half, to = target.u - su * target.half, mid = (from + to) / 2
-        return [{ u: from, v: source.v }, { u: mid, v: source.v }, { u: mid, v: target.v }, { u: to, v: target.v }]
-    }
-    if (Math.abs(dv) >= source.half + target.half) {
-        const from = source.v + sv * source.half, to = target.v - sv * target.half, mid = (from + to) / 2
-        return [{ u: source.u, v: from }, { u: source.u, v: mid }, { u: target.u, v: mid }, { u: target.u, v: to }]
-    }
-    return [{ u: source.u, v: source.v }, { u: target.u, v: target.v }]
-}
 
 function along(points: P[], f: number): P {
     const lens = points.slice(1).map((p, i) => Math.hypot(p.x - points[i].x, p.y - points[i].y))
@@ -50,42 +33,40 @@ function along(points: P[], f: number): P {
     }
     return points[points.length - 1]
 }
+const lengthOf = (points: P[]) => points.slice(1).reduce((a, p, i) => a + Math.hypot(p.x - points[i].x, p.y - points[i].y), 0)
 const atDistance = (points: P[], px: number): P => {
-    const total = points.slice(1).reduce((a, p, i) => a + Math.hypot(p.x - points[i].x, p.y - points[i].y), 0)
+    const total = lengthOf(points)
     return along(points, total ? Math.min(1, px / total) : 0)
 }
 
 const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)
 
-export function FactoryOverlay({ tiles, pods, cabinets, rejects, held }: { tiles: Tile[]; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean }) {
+// `routes` are the board's own, from routeTileLinks on the same tiles and links, so a sphere rides
+// the belt drawn under it.
+export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
+    // A leg ends on one face of a tile and the next leaves from another, so both points are kept: the
+    // sphere crosses the tile between them. A pair with no line (a blocked job parked at a coworker)
+    // goes straight from centre to centre.
     const route = (ids: string[]): P[] => {
         const pts: P[] = []
         for (let i = 1; i < ids.length; i++) {
             const a = byId.get(ids[i - 1]), b = byId.get(ids[i])
             if (!a || !b) continue
-            const seg = routeLink(tileAxis(a), tileAxis(b)).map(toWorld)
-            pts.push(...(pts.length ? seg.slice(1) : seg))
+            pts.push(...(routes.get(`${a.id}->${b.id}`) ?? [centreOf(a), centreOf(b)]).map(toWorld))
         }
         return pts
     }
-    // The path up to the middle of its last line, where a sphere rests while it is worked.
-    const toMiddleOfLast = (ids: string[]): P[] => {
-        const head = ids.length > 2 ? route(ids.slice(0, -1)) : []
-        const last = route(ids.slice(-2))
-        if (last.length < 2) return head
-        const total = last.slice(1).reduce((acc, q, i) => acc + Math.hypot(q.x - last[i].x, q.y - last[i].y), 0)
-        const mid = along(last, 0.5)
-        const kept: P[] = [last[0]]
-        let run = 0
-        for (let i = 1; i < last.length; i++) {
-            const seg = Math.hypot(last[i].x - last[i - 1].x, last[i].y - last[i - 1].y)
-            if (run + seg >= total / 2) break
-            run += seg
-            kept.push(last[i])
-        }
-        kept.push(mid)
-        return head.length ? [...head, ...kept.slice(1)] : kept
+    // A sphere being worked rests just short of the end of its line, in front of whoever works it.
+    // Spheres resting on one line queue back from there instead of stacking on one spot.
+    const settles = (p: PodView) => p.state === 'working' || p.state === 'checks' || p.state === 'fixing'
+    const restRank = new Map<string, number>()
+    const onLine = new Map<string, number>()
+    for (const p of pods) {
+        if (!settles(p)) continue
+        const line = p.path.slice(-2).join('>')
+        restRank.set(p.id, onLine.get(line) ?? 0)
+        onLine.set(line, (onLine.get(line) ?? 0) + 1)
     }
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
@@ -96,10 +77,10 @@ export function FactoryOverlay({ tiles, pods, cabinets, rejects, held }: { tiles
                 return t ? <FeatureOrb key={c.issue} cab={c} tile={t} /> : null
             })}
             {pods.map(p => {
-                const settle = p.state === 'working' || p.state === 'checks' || p.state === 'fixing'
-                const pts = settle ? toMiddleOfLast(p.path) : route(p.path)
+                const pts = route(p.path)
                 if (pts.length < 2) return null
-                const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : along(pts, p.travel)
+                const rest = Math.max(0, lengthOf(pts) - REST_PX - (restRank.get(p.id) ?? 0) * QUEUE_GAP)
+                const at = p.state === 'queued' || p.state === 'held' ? atDistance(pts, 22 + p.queue * QUEUE_GAP) : settles(p) ? atDistance(pts, rest * p.travel) : along(pts, p.travel)
                 return p.state === 'working' && p.band === 'review' && p.travel >= 1
                     ? <Scanner key={p.id} pod={p} at={at}><Orb pod={p} at={{ x: 0, y: 0 }} /></Scanner>
                     : <Orb key={p.id} pod={p} at={at} />
@@ -172,8 +153,7 @@ function Scanner({ pod, at, children }: { pod: PodView; at: P; children: React.R
 // The reject bin: an open bin of dark red glass. Each defect that lands in it adds a dull red sphere
 // to the heap, and the count sits on its rim.
 function RejectBin({ tile, count }: { tile: Tile; count: number }) {
-    const a = tileAxis(tile)
-    const c = toWorld({ u: a.u, v: a.v })
+    const c = toWorld(centreOf(tile))
     const W = 38, H = 26
     return (
         <div className="fab-bin absolute" data-filled={count > 0 || undefined} style={{ left: 0, top: 0, transform: `translate(${c.x}px, ${c.y}px)` }}>
@@ -196,8 +176,7 @@ function RejectBin({ tile, count }: { tile: Tile; count: number }) {
 // A feature: a large glass sphere on its tile, filling as its tasks end. Merged tasks fill it gold,
 // rejected ones settle as a red layer at the bottom; the empty part is the exact work left.
 function FeatureOrb({ cab, tile }: { cab: CabinetView; tile: Tile }) {
-    const a = tileAxis(tile)
-    const c = toWorld({ u: a.u, v: a.v })
+    const c = toWorld(centreOf(tile))
     const R = 30
     const n = cab.slots.length
     const merged = cab.slots.filter(x => x.state === 'merged').reduce((acc, x) => acc + x.arriving, 0)
