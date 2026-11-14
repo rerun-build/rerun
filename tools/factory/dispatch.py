@@ -458,6 +458,7 @@ class Dispatcher:
         r = self.account("get_run", {"agentId": j["agent"], "runId": j["run"]})
         if r.get("status") == "running":
             return self.clock_check(j, r)
+        self.record_tokens(j, r)
         if r.get("status") == "done":
             j["attempt"] = 1
             g = r.get("goal")
@@ -472,15 +473,27 @@ class Dispatcher:
         row = dict(r, runId=r.get("runId") or j["run"], startedAt=r.get("startedAt") or "1970-01-01T00:00:00Z")
         kind, _ = clocks.outcome(row, None, self.now(), self.cfg.get("clocks"))
         if clocks.klass(kind, row) == "transient":
-            self.store.close_run(j["run"], "error", error=why[:200])
+            self.store.close_run(j["run"], "error", error=why[:200], **self.kept_tokens(j["run"]))
             return self.transient(j, why)
         if clocks.klass(kind, row) == "plan_limit":
             return self.plan_limit(j, why, str(r.get("error") or "-"))
         return self.failed_attempt(j, why, "ended")
 
+    def record_tokens(self, j, r):
+        """Write the ended run's token counts into its fire; status and ended_at stay as they are."""
+        ti, to = r.get("inputTokens"), r.get("outputTokens")
+        if all(isinstance(x, int) and not isinstance(x, bool) and x >= 0 for x in (ti, to)):
+            self.store.db.execute("UPDATE fires SET tokens_in=?, tokens_out=? WHERE run_id=?", (ti, to, j["run"]))
+        else:
+            log(j["issue"], "token counts of run %s unknown: left at 0" % j["run"])
+
+    def kept_tokens(self, run_id):
+        row = self.store.db.execute("SELECT tokens_in, tokens_out FROM fires WHERE run_id=?", (run_id,)).fetchone()
+        return {"tokens_in": row[0], "tokens_out": row[1]} if row else {}
+
     def plan_limit(self, j, why, error):
         """Class plan_limit: back to the state it was sent from, no failed attempt, no retry count; all sending held."""
-        self.store.close_run(j["run"], "error", error=why[:200])
+        self.store.close_run(j["run"], "error", error=why[:200], **self.kept_tokens(j["run"]))
         now = self.now()
         holds.arm(self.store, "plan limit", now + holds.PLAN_LIMIT_HOLD_S)
         j.update(state=BACK[j["state"]], retry_attempt=j.get("attempt", 1), sending=None)
