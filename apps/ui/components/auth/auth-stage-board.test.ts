@@ -1,33 +1,32 @@
 import { AGENT_SPAN } from '@rerun/ui/iso-grid'
 import { describe, expect, it } from 'vitest'
 
-import { CABLE_DRAW_MS, routeBetween, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'
+import { CABLE_DRAW_MS, routeBoard, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'
 import type { AxisRoute } from '@/lib/board/iso-route'
 
 import { buildAuthStage, stageLinkId } from './auth-stage-board'
 
 // Le décor est tiré par un glouton scoré : il dégrade au lieu d'échouer, donc rien à l'exécution ne
 // signale qu'un connecteur de plus a fait repasser la scène sous la barre. Ces tests sont ce
-// garde-fou, sur le cast et le scénario tels qu'ils sont écrits.
+// garde-fou, sur le cast et le scénario tels qu'ils sont écrits, et sur les tracés que TileLinks
+// dessine au repos : les câbles du board fini, routés ensemble.
 
 const stage = buildAuthStage()
 
 const tileById = new Map(stage.tiles.map(tile => [tile.id, tile]))
 const containerOf = (tileId: string) => tileById.get(tileId)?.containerId
 
-const cableRoutes = stage.links
-    .filter(link => link.variant === 'cable')
-    .map(link => {
-        const source = tileById.get(link.source)
-        const target = tileById.get(link.target)
-        if (!source || !target) throw new Error(`lien vers une tuile absente: ${stageLinkId(link.source, link.target)}`)
-        return {
-            id: stageLinkId(link.source, link.target),
-            sourceId: link.source,
-            targetId: link.target,
-            points: routeBetween(source, target).slice(),
-        }
-    })
+const cableLinks = stage.links.filter(link => link.variant === 'cable')
+const drawn = routeBoard(stage.tiles, cableLinks)
+const cableRoutes = cableLinks.map(link => {
+    if (!tileById.has(link.source) || !tileById.has(link.target)) throw new Error(`lien vers une tuile absente: ${stageLinkId(link.source, link.target)}`)
+    return {
+        id: stageLinkId(link.source, link.target),
+        sourceId: link.source,
+        targetId: link.target,
+        points: drawn.get(`${link.source}->${link.target}`) ?? [],
+    }
+})
 
 const asRoute = (cable: (typeof cableRoutes)[number]): AxisRoute => ({ points: cable.points, sourceId: cable.sourceId })
 

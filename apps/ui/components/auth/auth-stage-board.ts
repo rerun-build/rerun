@@ -1,8 +1,8 @@
 import { AGENT_SPAN, GRID_SIZE, TILE_H, TILE_W, agentTileStyle, connectorTileStyle, hashUnit } from '@rerun/ui/iso-grid'
-import type { Container, GridPosition, Tile, TileLink } from '@rerun/ui/iso-grid'
+import type { Container, GridPosition, RoutedLink, RoutedTile, Tile, TileLink } from '@rerun/ui/iso-grid'
 
 import { containerFromSpace } from '@/lib/board/iso-adapter'
-import { CABLE_DRAW_MS, routeBetween, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'
+import { CABLE_DRAW_MS, routeAlone, routeBoard, routeHitsBox, routesCross, tileAxisBox } from '@/lib/board/iso-route'
 import type { AxisRoute } from '@/lib/board/iso-route'
 import type { SpacePublic } from '@/lib/board/types'
 
@@ -518,6 +518,21 @@ type Obstacles = {
     beams: AxisRoute[]
 }
 
+// The tiles already on the board as footprints the router keeps off, all but the ones a link joins.
+const obstaclesBut = (world: Obstacles, ...ids: string[]) =>
+    world.tiles.filter(tile => !ids.includes(tile.id)).map(tile => ({ col: tile.position.col, row: tile.position.row, span: tile.span }))
+
+// How many cable conflicts (two crossing, one under a tile) the board has once its cables are routed
+// together as TileLinks draws them, with `connector` and its cable added when given.
+const conflictsOnBoard = (world: Obstacles, connector?: { tile: RoutedTile; agentId: string }) =>
+    cableConflicts(
+        connector ? [...world.tiles, connector.tile] : world.tiles,
+        [
+            ...world.cables.map(cable => ({ source: cable.sourceId, target: cable.targetId, variant: 'cable' as const })),
+            ...(connector ? [{ source: connector.agentId, target: connector.tile.id, variant: 'cable' as const }] : []),
+        ],
+    ).length
+
 const routeLength = (points: AxisRoute['points']) =>
     points.slice(1).reduce((total, point, index) => total + Math.abs(point.u - points[index].u) + Math.abs(point.v - points[index].v), 0)
 
@@ -560,24 +575,34 @@ function placeConnectors(placed: PlacedBox, tools: Map<string, ConnectorSlug[]>,
             // Ordre total et déterministe : hashUnit n'a que 10 000 seaux, sur une vingtaine de
             // candidats deux clés se répètent assez souvent pour qu'on dépende sinon de la
             // stabilité du tri.
-            const candidates = ring
-                .filter(cell => blockDistance(agent.cell, AGENT_SPAN, cell) <= CONNECTOR_REACH)
+            const free = ring
                 .filter(cell => taken.every(other => chebyshev(other, cell) >= CONNECTOR_SPACING))
                 .filter(cell => world.tiles.every(tile => blockDistance(tile.position, tile.span, cell) >= 1))
                 .sort((a, b) => {
                     const delta = hashUnit(`${id}@${a.col},${a.row}`, 41) - hashUnit(`${id}@${b.col},${b.row}`, 41)
                     return delta !== 0 ? delta : a.col - b.col || a.row - b.row
                 })
+            const candidates = free.filter(cell => blockDistance(agent.cell, AGENT_SPAN, cell) <= CONNECTOR_REACH)
+            // Within reach first; when every cell there damages something, the rest of the ring before
+            // settling for the least damage.
+            const pool = candidates.length > 0 ? [...candidates, ...free.filter(cell => !candidates.includes(cell))] : ring
 
             let best: { cell: GridPosition; route: CableRoute; score: number } | null = null
+            let conflictsBefore: number | undefined
 
-            for (const cell of candidates.length > 0 ? candidates : ring) {
+            for (const cell of pool) {
                 const route: CableRoute = {
-                    points: routeBetween({ position: agent.cell, span: AGENT_SPAN }, { position: cell, span: 1 }),
+                    points: routeAlone({ id: agent.id, position: agent.cell, span: AGENT_SPAN }, { id, position: cell, span: 1 }, obstaclesBut(world, agent.id)),
                     sourceId: agent.id,
                     targetId: id,
                 }
-                const cost = placementCost(route, cell, agent, world)
+                // The estimate routes the cable alone. A cell that could still win is checked on the
+                // board as drawn, every cable placed so far routed together with this one, and charged
+                // for the conflicts it adds there.
+                let cost = placementCost(route, cell, agent, world)
+                if (best !== null && cost * 64 + routeLength(route.points) >= best.score) continue
+                const added = conflictsOnBoard(world, { tile: { id, position: cell, span: 1 }, agentId: agent.id }) - (conflictsBefore ??= conflictsOnBoard(world))
+                if (added > 0) cost += COST_CROSSES_CABLE * added
                 // À prix égal, le câble le plus court gagne.
                 const score = cost * 64 + routeLength(route.points)
                 if (best === null || score < best.score) best = { cell, route, score }
@@ -882,7 +907,11 @@ export function buildAuthStage(): AuthStage {
 
     for (const beam of agentBeams) {
         world.beams.push({
-            points: routeBetween({ position: cellOf.get(beam.source)!, span: AGENT_SPAN }, { position: cellOf.get(beam.target)!, span: AGENT_SPAN }),
+            points: routeAlone(
+                { id: beam.source, position: cellOf.get(beam.source)!, span: AGENT_SPAN },
+                { id: beam.target, position: cellOf.get(beam.target)!, span: AGENT_SPAN },
+                obstaclesBut(world, beam.source, beam.target),
+            ),
             sourceId: beam.source,
         })
     }
@@ -967,26 +996,35 @@ export function buildAuthStage(): AuthStage {
         else frames.push({ at: change.at, changes: [change] })
     }
 
-    if (process.env.NODE_ENV !== 'production') warnOnCrossings(world)
+    if (process.env.NODE_ENV !== 'production') warnOnCrossings(tiles, links)
 
     return { tiles, links, containers, agentIds, dropDelays, appearDelays, script: { frames, period: CYCLE_PERIOD, startAt: boardReady + STAGE_SETTLE_MS } }
 }
 
-// L'invariant du décor, revérifié sur le board fini : aucun câble n'en croise un autre, aucun ne
-// disparaît sous une tuile. Le glouton l'obtient sur le cast actuel, mais il dégrade au lieu
-// d'échouer — c'est ce qui préviendra le jour où quelqu'un ajoutera un outil de trop.
-function warnOnCrossings(world: Obstacles) {
+// L'invariant du décor, revérifié sur le board fini et sur les tracés tels que TileLinks les
+// dessine au repos (les câbles seuls) : aucun câble n'en croise un autre, aucun ne disparaît sous une
+// tuile. Le glouton l'obtient sur le cast actuel, mais il dégrade au lieu d'échouer — c'est ce qui
+// préviendra le jour où quelqu'un ajoutera un outil de trop.
+export function cableConflicts(tiles: RoutedTile[], links: RoutedLink[]) {
+    const cables = links.filter(link => link.variant === 'cable')
+    const routes = routeBoard(tiles, cables)
+    const drawn = cables.map(link => ({ id: stageLinkId(link.source, link.target), sourceId: link.source, targetId: link.target, points: routes.get(`${link.source}->${link.target}`) ?? [] }))
     const problems: string[] = []
 
-    for (let i = 0; i < world.cables.length; i++) {
-        for (let j = i + 1; j < world.cables.length; j++) {
-            if (routesCross(world.cables[i], world.cables[j])) problems.push(`câbles ${i} et ${j} se croisent`)
+    for (let i = 0; i < drawn.length; i++) {
+        for (let j = i + 1; j < drawn.length; j++) {
+            if (routesCross(drawn[i], drawn[j])) problems.push(`${drawn[i].id} x ${drawn[j].id}`)
         }
-        for (const tile of world.tiles) {
-            if (tile.id === world.cables[i].sourceId || tile.id === world.cables[i].targetId) continue
-            if (routeHitsBox(world.cables[i].points, tileAxisBox(tile))) problems.push(`le câble ${i} passe sous ${tile.id}`)
+        for (const tile of tiles) {
+            if (tile.id === drawn[i].sourceId || tile.id === drawn[i].targetId) continue
+            if (routeHitsBox(drawn[i].points, tileAxisBox(tile))) problems.push(`${drawn[i].id} sous ${tile.id}`)
         }
     }
+    return problems
+}
+
+function warnOnCrossings(tiles: Tile[], links: TileLink[]) {
+    const problems = cableConflicts(tiles, links)
 
     if (problems.length > 0) console.warn(`[auth-stage-board] ${problems.length} conflits de tracé:`, problems)
 }

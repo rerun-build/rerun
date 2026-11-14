@@ -1,7 +1,7 @@
 // The owner's own arrangement of the factory floor: where each coworker and floor object was dragged
 // to, kept in the browser per workspace. A copy moves with its coworker, keeping its place beside it.
 
-import type { Tile } from '@rerun/ui/iso-grid'
+import { containerContainsTile, type ContainerCells, type Tile } from '@rerun/ui/iso-grid'
 
 import { COPY_CELLS, type Cell } from './factory-scene'
 
@@ -35,24 +35,31 @@ type Footprint = { id: string; col: number; row: number; span: number }
 const overlap = (a: Footprint, b: Footprint) =>
     a.col < b.col + b.span && b.col < a.col + a.span && a.row < b.row + b.span && b.row < a.row + a.span
 
-// Whether `id` may stand at `cell`: no object, and no cell a copy takes when it comes, under it.
-export function canMove(tiles: Tile[], moves: Moves, id: string, cell: Cell) {
-    if (!isMovable(id) || !tiles.some(t => t.id === id)) return false
-    const next = { ...moves, [id]: cell }
-    const placed: Footprint[] = applyMoves(tiles, next)
+// Whether a whole arrangement holds: no two objects on one cell, no object on a cell a copy takes when
+// it comes, and, given the scene's boxes, every object and copy slot inside one of them.
+export function layoutFits(tiles: Tile[], moves: Moves, containers?: ContainerCells[]) {
+    const placed: Footprint[] = applyMoves(tiles, moves)
         .filter(t => isMovable(t.id))
         .map(t => ({ id: t.id, ...t.position, span: t.span ?? 2 }))
     for (const owner of OWNERS) {
         if (!tiles.some(t => t.id === owner)) continue
-        const s = shiftOf(tiles, next, owner)
+        const s = shiftOf(tiles, moves, owner)
         COPY_CELLS[owner].forEach((c, i) => placed.push({ id: `${owner}-copy#${i}`, col: c.col + s.col, row: c.row + s.row, span: 2 }))
     }
+    if (containers && !placed.every(p => containers.some(c => containerContainsTile(c, p, p.span)))) return false
     return placed.every((a, i) => placed.every((b, j) => j <= i || !overlap(a, b)))
 }
 
-// What the browser kept, if it still reads as a layout: unknown ids, odd values and entries that would
-// now overlap are left out.
-export function readMoves(raw: string | null, tiles: Tile[]): Moves {
+// Whether `id` may stand at `cell`, the rest of the arrangement as it is.
+export function canMove(tiles: Tile[], moves: Moves, id: string, cell: Cell, containers?: ContainerCells[]) {
+    return isMovable(id) && tiles.some(t => t.id === id) && layoutFits(tiles, { ...moves, [id]: cell }, containers)
+}
+
+// What the browser kept, if it still reads as a layout. Entries with odd values are left out. The
+// arrangement is checked as a whole, as it was built drag by drag: if it no longer holds, the scene's
+// objects go back to their default places. Objects not in the scene now (a feature sphere that comes
+// and goes) keep their place for when they come back.
+export function readMoves(raw: string | null, tiles: Tile[], containers?: ContainerCells[]): Moves {
     let parsed: unknown
     try {
         parsed = JSON.parse(raw ?? '{}')
@@ -60,14 +67,16 @@ export function readMoves(raw: string | null, tiles: Tile[]): Moves {
         return {}
     }
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
-    const moves: Moves = {}
+    const here: Moves = {}
+    const away: Moves = {}
     for (const [id, value] of Object.entries(parsed)) {
         const cell = value as Partial<Cell> | null
-        if (!cell || !Number.isInteger(cell.col) || !Number.isInteger(cell.row)) continue
+        if (!isMovable(id) || !cell || !Number.isSafeInteger(cell.col) || !Number.isSafeInteger(cell.row)) continue
         const at = { col: cell.col!, row: cell.row! }
-        if (canMove(tiles, moves, id, at)) moves[id] = at
+        if (tiles.some(t => t.id === id)) here[id] = at
+        else away[id] = at
     }
-    return moves
+    return layoutFits(tiles, here, containers) ? { ...away, ...here } : away
 }
 
 export const layoutStorageKey = (workspace: string) => `rerun.factory-layout.${workspace}`
