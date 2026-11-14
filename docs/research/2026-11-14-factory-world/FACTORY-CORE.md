@@ -20,6 +20,31 @@ missing, a wall, a faster path, a pool sitting idle) may change the plan at once
 widen, narrow, re-route or re-gate. Nothing waits for a person to re-approve a plan whose goal has not
 changed. What stays fixed is only the epic's goal and the owner's rules.
 
+## 0. Signals drive everything (owner: "self improving mechanisms, self healing based on the signals (statuses of tasks) received")
+
+Healing and improving are not schedules or a person's review: they are reactions to signals.
+
+- **Signals** are the facts the line already produces, each written to the ledger with its time: a task's
+  state change (`transitions`), a run started or ended with its status, steps, tokens and minutes
+  (`fires`), a review verdict and its reasons, a fix round, a gate passed or failed, a CI or check result,
+  a stall (steps not moving against the clock), a hold starting or ending, plan usage, dev's health after
+  each merge.
+- **Detectors** read the stream and name a pattern, for example: one task failing twice the same way (a
+  plan fault, not bad luck); several tasks failing the same check at once (an environment wall, not
+  several bugs); reviews sending tasks back mostly in one department (tasks cut too large there); a run
+  stalling (wrong model or effort, or a wall); a gate failing on the same join twice (needs wrong in the
+  cut).
+- **Actions** answer a detected pattern: retry, fix round, re-cut, re-route, split out a spike, hold,
+  tighten or loosen a gate, change width, change a task's model or effort. Every action is itself a
+  signal, so the ledger shows why the plan changed.
+- **Self-healing** is detector plus action within the running epic (section 4).
+- **Self-improving** is the same loop one level up: each action's effect is judged by the signals that
+  follow it (did the re-cut task pass? did the wider line fail more?). The settings the actions use (size
+  limits per department and kind, width, gate strictness, model choices, retry counts) are **policies
+  kept as data** in the ledger, versioned, never hard-coded; a policy change that the following signals
+  show to be worse is rolled back by the same loop, and every change and its measured effect is written
+  down. No setting changes without a signal behind it.
+
 ## 1. The chunker: any epic into a graph that runs in parallel
 - **A planner proposes, the chunker decides.** Boss (or any planner) writes a cut; the chunker validates it
   in the factory before anything runs: file overlaps between parallel tasks, needs that do not exist,
@@ -74,13 +99,15 @@ the dispatcher adjust their numbers from it; every adjustment and its measured e
 change that made things worse is visible and rolled back. Measure, change, measure.
 
 ## 6. Order of building
-1. The chunker's validator in `tools/factory` (replaces `check_cut.py`).
-2. The epic scorecard.
-3. Integration gates at joins.
-4. Self-healing: classification, blast radius, environment repair (dev freeze and revert first).
-5. Re-planning while running (split, merge, re-layer a subgraph).
-6. Adaptive width and per-task model choice.
-7. Size learning.
+1. The signal record: every signal above written to the ledger with its time, and shown in the ledger.
+2. The chunker's validator in `tools/factory` (replaces `check_cut.py`).
+3. The epic scorecard and the policy table (policies as data, versioned).
+4. Integration gates at joins.
+5. Detectors and actions for self-healing: classification, blast radius, environment repair (dev freeze and
+   revert first).
+6. Re-planning while running (split, merge, re-layer a subgraph).
+7. The improving loop: actions judged by the signals that follow; policies adjusted and rolled back.
+8. Adaptive width and per-task model choice, size learning: as policies the loop tunes.
 The ledger (SPEC.md 5b) comes first so all of this can be watched.
 
 ## 7. What exists today (as_of 2026-11-14)
