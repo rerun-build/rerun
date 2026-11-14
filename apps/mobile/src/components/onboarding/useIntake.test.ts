@@ -52,6 +52,7 @@ describe('useIntake', () => {
         const { result } = await renderHook(() => useIntake({ knownFirstName: null, decideIndustry: async () => 'saas' as const, submit: async () => {} }))
         expect(pressBack()).toBe(false)
 
+        await act(async () => result.current.choose({ industry: 'studio' }))
         await act(async () => result.current.set({ companyUrl: 'rerun.build' }))
         await act(async () => result.current.next())
         await act(async () => {})
