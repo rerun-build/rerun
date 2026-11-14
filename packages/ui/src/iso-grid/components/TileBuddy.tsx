@@ -68,7 +68,8 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
     const mood = ghost ? 'asleep' : buddyMood(style)
     const plain = ghost ? (ghost.valid ? 'var(--iso-tile-muted)' : '#ef4444') : undefined
     const capsule = style.shape === 'capsule'
-    const light = plain ?? (capsule && mood === 'idle' ? CAPSULE_STEEL : capsule && mood === 'waiting' ? CAPSULE_HELD : mood === 'idle' ? buddyColor(id, look) : BUDDY_STATE_COLOR[mood])
+    const light = plain ?? (capsule && mood === 'idle' ? CAPSULE_STEEL : capsule && mood === 'waiting' ? CAPSULE_HELD : mood === 'idle' ? buddyColor(id, look) : look.ownColor && mood === 'working' ? buddyColor(id, look) : BUDDY_STATE_COLOR[mood])
+    const lifted = stretched || (mood === 'working' && look.ownColor === true)
     const delay = `${(-hashUnit(id, 7) * 4).toFixed(2)}s`
 
     const blockWidth = BUDDY_GEOMETRY.halfW * 2
@@ -79,7 +80,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
     const artLeft = floor.x - (anchor.x - BUDDY_VIEW.x) * unit
     const artTop = floor.y - (anchor.y - BUDDY_VIEW.y) * unit
     const shadowWidth = blockWidth * unit * 1.02
-    const labelTop = floor.y - BUDDY_GEOMETRY.depth * unit * (stretched ? 1 + SELECTED_STRETCH : 1)
+    const labelTop = floor.y - BUDDY_GEOMETRY.depth * unit * (lifted ? 1 + SELECTED_STRETCH : 1)
 
     const motion = reducedMotion || capsule ? undefined : MOTION[mood]
     const poolMotion = reducedMotion ? undefined : POOL_MOTION[mood]
@@ -131,7 +132,7 @@ export function TileBuddy({ id, style, width, height, floorOffset, active, stret
                 className="absolute pointer-events-none"
                 data-buddy-motion={motion}
                 data-buddy-still={style.still ? '' : undefined}
-                data-buddy-stretched={stretched ? '' : undefined}
+                data-buddy-stretched={lifted ? '' : undefined}
                 style={{
                     ['--buddy-stretch' as string]: SELECTED_STRETCH,
                     left: artLeft,
