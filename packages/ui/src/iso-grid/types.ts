@@ -22,6 +22,8 @@ export type InteractionMode = 'select' | 'draw'
 export type TileStyle = {
     // Couleur de base des trois faces du bloc iso.
     color: string
+    // A buddy that keeps its eyes open and does not blink. Opt-in.
+    still?: boolean
     // Opacité globale du bloc (ex. 0.45 pour « offline »). Défaut: 1.
     opacity?: number
     // Couleur du halo (drop-shadow) quand la tile est levée (survol/sélection/ghost).
@@ -246,7 +248,10 @@ export type Container = {
 // 'trace' = the cable's quiet line with a slow neon trace on top: a glowing head travels end to end, the
 // line behind it lit and fading, the line ahead dark. 'belt' = a conveyor on the floor: a dark band with
 // running slats and a neon edge in the link's colour, with the same trace along its middle.
-export type TileLink = { source: string; target: string; variant?: 'beam' | 'cable' | 'trace' | 'belt'; appearDelay?: number; color?: string }
+export type TileLink = { source: string; target: string; variant?: 'beam' | 'cable' | 'trace' | 'belt'; appearDelay?: number; color?: string
+    // Drawn as a plain line: no slats, no trace light, no comet. Opt-in; a link without it is unchanged.
+    still?: boolean
+}
 
 // Bulle affichée au-dessus d'une tile, comme un message entre deux collègues : le nom de celui qui
 // parle, puis le message, et une pointe vers sa tuile. Le rendu et l'expiration vivent dans le package.

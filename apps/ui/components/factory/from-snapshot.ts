@@ -135,10 +135,10 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         if (tile.id === 'rejects') return { ...tile, ariaLabel: `Reject bin: ${rejects}` }
         if (tile.id === 'Delegator') {
             const state = held ? 'waiting_human' : counts.queued + counts.checks > 0 ? 'working' : 'idle'
-            return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', ...(held ? { badge: 'lock' as const } : {}) } }
+            return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', ...(held ? { badge: 'lock' as const } : {}), ...(state === 'idle' ? { still: true } : {}) } }
         }
         const working = (out.get(tile.id) ?? 0) > 0
-        return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy } }
+        return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy, ...(working ? {} : { still: true }) } }
     })
 
     // Belts: the base ones between kept tiles, then one to each cabinet. Red when held, else the colour of what runs on it.
@@ -151,7 +151,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     const belts: TileLink[] = [
         ...base.links.filter(l => KEEP.includes(l.source) && KEEP.includes(l.target) && l.variant === 'belt'),
         ...cabinets.map(c => ({ source: 'Delegator', target: `cab-${c.issue}`, variant: 'belt' as const, color: QUIET })),
-    ].map(l => ({ ...l, color: held ? STATUS_COLOR.held : lineColor.get(`${l.source}>${l.target}`) ?? QUIET }))
+    ].map(l => ({ ...l, color: held ? STATUS_COLOR.held : lineColor.get(`${l.source}>${l.target}`) ?? QUIET, still: !lineColor.has(`${l.source}>${l.target}`) }))
 
     return {
         containers: base.containers,
