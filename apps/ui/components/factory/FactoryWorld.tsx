@@ -41,7 +41,7 @@ function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }
         return () => clearInterval(id)
     }, [])
     const frame = scene((now - start) % LOOP_MS, now)
-    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} />
+    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={frame.held} holdLeftMs={frame.holdLeftMs} links={frame.links} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} />
 }
 
 // The factory, drawn by the board's own world. The world takes the whole stage; a thin glass bar

@@ -6,10 +6,11 @@
 // transition between ticks; the slosh, shakes and glows are CSS. Under reduced motion the transitions
 // and loops stop and the spheres step from place to place.
 
-import { type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
+import { type AxisPoint, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 
 import { along, atDistance, centreOf, inScanner, podPath, restDistances, settles, toWorld, type P } from './factory-rest'
 import { Gate, GATE_CSS } from './FactoryGate'
+import { HOLD_CSS, HoldBarrier } from './FactoryHold'
 import { FeatureTank, RejectTank, TANK_CSS } from './FactoryTank'
 import { Sphere, SPHERE_CSS } from './FactorySphere'
 import { type CabinetView, type PodView } from './factory-scene'
@@ -18,18 +19,25 @@ const QUEUE_GAP = 40 // px between waiting spheres on the loader's line
 
 // `routes` are the board's own, from routeTileLinks on the same tiles and links, so a sphere rides
 // the belt drawn under it.
-export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
+export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, holdLeftMs = 0, links = [], selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean; holdLeftMs?: number; links?: TileLink[]; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
     // A sphere being worked rests short of whoever works it, clear of every block and every other
     // resting sphere (factory-rest.ts).
     const rests = restDistances(pods, tiles, routes)
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
-            <style>{FAB_CSS + SPHERE_CSS + GATE_CSS + TANK_CSS}</style>
+            <style>{FAB_CSS + SPHERE_CSS + GATE_CSS + TANK_CSS + HOLD_CSS}</style>
             {byId.get('rejects') && <RejectTank tile={byId.get('rejects')!} count={rejects} />}
             {cabinets.map(c => {
                 const t = byId.get(`cab-${c.issue}`)
                 return t ? <FeatureTank key={c.issue} cab={c} tile={t} /> : null
+            })}
+            {held && links.filter(l => l.variant === 'belt' && l.source === 'Delegator').map(l => {
+                const key = `${l.source}->${l.target}`
+                const pts = (routes.get(key) ?? []).map(toWorld)
+                if (pts.length < 2) return null
+                const angle = (Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x) * 180) / Math.PI
+                return <HoldBarrier key={key} at={atDistance(pts, 48)} angle={angle} leftMs={holdLeftMs} />
             })}
             {pods.map(p => {
                 const pts = podPath(p.path, byId, routes)
