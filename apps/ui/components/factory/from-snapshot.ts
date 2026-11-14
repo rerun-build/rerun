@@ -98,8 +98,6 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
                 break
             case 'blocked': {
                 blocked.push({ issue: job.issue, reason: job.reason ?? '' })
-                const at = job.coworker && KEEP.includes(job.coworker) ? job.coworker : null
-                pod(at ? dedupe(['Delegator', at]) : ['Delegator', 'code'], at ? 1 : 0, 'build', 'queued', 0)
                 break
             }
             case 'merged':
@@ -123,11 +121,11 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     }
     const cabinets: CabinetView[] = parents.map((p, i) => {
         const mine = jobs.filter(j => j.parent === p)
-        return { issue: p, title: `#${p}`, tasks: mine.map(j => j.issue), at: FEATURE_CELLS[i], slots: mine.map(slotOf) }
+        return { issue: p, title: '', tasks: mine.map(j => j.issue), at: FEATURE_CELLS[i], slots: mine.map(slotOf) }
     })
     const cabTiles: Tile[] = cabinets.map(c => ({
         id: `cab-${c.issue}`, position: c.at, span: 2, containerId: 'stock', selectable: false, draggable: false,
-        style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Feature #${c.issue} ${c.title}: ${c.slots.filter(s => s.state !== 'empty').length} of ${c.slots.length}`,
+        style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Feature #${c.issue}${c.title ? ' ' + c.title : ''}: ${c.slots.filter(s => s.state !== 'empty').length} of ${c.slots.length}`,
     }))
 
     // Coworker tiles: working when the pool has a run out, else idle.
