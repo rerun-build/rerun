@@ -200,3 +200,27 @@ describe('sceneFromSnapshot: live tiles', () => {
         expect(f.tiles.find(x => x.id === 'code')!.style.opacity).toBe(1)
     })
 })
+
+describe('belts ask for chevrons', () => {
+    it('asks for chevrons on every belt of the live floor, and on no trace', () => {
+        for (const now of [NOW, LATER]) {
+            const links = sceneFromSnapshot(sample(), now).links
+            const belts = links.filter(l => l.variant === 'belt')
+            expect(belts.length).toBeGreaterThan(0)
+            expect(belts.every(l => l.chevrons === true)).toBe(true)
+            const traces = links.filter(l => l.variant === 'trace')
+            expect(traces.length).toBeGreaterThan(0)
+            expect(traces.some(l => l.chevrons)).toBe(false)
+        }
+    })
+
+    it('asks for chevrons on every belt of the sample loop', () => {
+        for (const t of [0, 6_000, 50_000]) {
+            const links = factoryScene(t, 0).links
+            const belts = links.filter(l => l.variant === 'belt')
+            expect(belts.length).toBeGreaterThan(0)
+            expect(belts.every(l => l.chevrons === true)).toBe(true)
+            expect(links.filter(l => l.variant === 'trace').some(l => l.chevrons)).toBe(false)
+        }
+    })
+})

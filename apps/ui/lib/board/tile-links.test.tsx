@@ -110,13 +110,17 @@ describe('TileLinks', () => {
             expect(el.querySelectorAll('.iso-belt-slats, .iso-trace-trail')).toHaveLength(0)
         })
 
-        it('draws at least one chevron per belt of the factory sample, and none as the links are', () => {
-            const frame = factoryScene(6_000, 0)
-            const belts = frame.links.filter(l => l.variant === 'belt')
-            expect(belts.length).toBeGreaterThan(0)
-            expect(chevrons(draw(frame.links, frame.tiles))).toHaveLength(0)
-            const el = draw(frame.links.map(l => (l.variant === 'belt' ? { ...l, chevrons: true } : l)), frame.tiles)
-            expect(chevrons(el).length).toBeGreaterThanOrEqual(belts.length)
+        it('draws at least one chevron per belt of the factory sample, quiet frame too, and none on a link without the field', () => {
+            for (const t of [0, 6_000]) {
+                const frame = factoryScene(t, 0)
+                const belts = frame.links.filter(l => l.variant === 'belt')
+                expect(belts.length).toBeGreaterThan(0)
+                expect(belts.every(l => l.chevrons === true)).toBe(true)
+                const el = draw(frame.links, frame.tiles)
+                expect(chevrons(el).length).toBeGreaterThanOrEqual(belts.length)
+                const bare = frame.links.map(l => { const { chevrons: _c, ...rest } = l; return rest })
+                expect(chevrons(draw(bare, frame.tiles))).toHaveLength(0)
+            }
         })
     })
 })
