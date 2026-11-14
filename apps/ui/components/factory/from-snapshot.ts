@@ -3,7 +3,7 @@
 // come from the jobs. `FactoryFrame` has no field for blocked jobs, cracked jobs or a silent delegator,
 // so they ride as extra fields. FactoryOverlay.tsx does not draw those three yet.
 
-import { agentTileStyle, type Tile, type TileLink } from '@rerun/ui/iso-grid'
+import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
 import { type CabinetView, type Cell, COPY_CELLS, FEATURE_CELLS, type FactoryFrame, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
 
@@ -15,9 +15,17 @@ const QUIET = '#8ea2ff'
 const clamp = (x: number) => Math.max(0, Math.min(1, x))
 const dedupe = (xs: string[]) => xs.filter((x, i) => i === 0 || x !== xs[i - 1])
 
+const lookOf = (id: string): BuddyLook => ({ eyes: buddyEyes(id, {}), mouth: buddyMouth(id, {}), color: buddyColor(id, {}) })
+const workStyle = (name: string, id: string) => {
+    const look = lookOf(id)
+    return { ...agentTileStyle('idle', name), glow: `color-mix(in srgb, ${look.color} 60%, transparent)`, buddy: { ...look, mood: 'working' as const, ownColor: true } }
+}
+
 export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): SnapshotFrame {
     const base = factoryScene(0, now)
     const tileOf = (id: string) => base.tiles.find(t => t.id === id)!
+    const ids = new Map<string, string>()
+    for (const pool of snapshot.pools) for (const c of pool.coworkers) if (c.id && !ids.has(c.name)) ids.set(c.name, c.id)
 
     // Cells for copies, by coworker: the sample loop's own.
     const copyCells: Record<string, { room: string; cells: Cell[] }> = {
@@ -50,7 +58,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         const own = tileOf(who)
         copyTiles.push({
             id, position: cell, span: 2, containerId: slots.room, selectable: false, draggable: false, justPlaced: true,
-            style: { ...own.style, ...agentTileStyle('idle', who), glow: agentTileStyle('working', who).glow, buddy: own.style.buddy, opacity: 0.55 }, ariaLabel: `${who}, a copy`,
+            style: { ...own.style, ...workStyle(who, ids.get(who) ?? who), opacity: 0.55 }, ariaLabel: `${who}, a copy`,
         })
         copyLinks.push({ source: who, target: id, variant: 'trace', color: who === 'LINUS' ? STATUS_COLOR.review : who === 'code' ? STATUS_COLOR.build : '#f472b6' })
         return id
@@ -138,7 +146,8 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
             return { ...tile, style: { ...agentTileStyle(state, 'Delegator'), buddy: tile.style.buddy, label: 'Loader', shape: 'capsule' as const, ...(held ? { badge: 'lock' as const } : {}) } }
         }
         const working = (out.get(tile.id) ?? 0) > 0
-        return { ...tile, style: { ...agentTileStyle('idle', tile.id), ...(working ? { glow: agentTileStyle('working', tile.id).glow } : {}), buddy: tile.style.buddy } }
+        const id = ids.get(tile.id) ?? tile.id
+        return { ...tile, style: working ? workStyle(tile.id, id) : { ...agentTileStyle('idle', tile.id), buddy: lookOf(id) } }
     })
 
     // Belts: the base ones between kept tiles, then one to each cabinet. Red when held, else the colour of what runs on it.
