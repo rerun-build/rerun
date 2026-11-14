@@ -5,9 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { factoryJobStateSchema, type FactoryJob } from '@rerun/contracts'
 import { JOB_STATE_VIEW, groupOf } from './factory-state'
 import { STATUS_COLOR } from './factory-scene'
-import { FactoryTasks, SAMPLE_TEXT, formatInState } from './FactoryTasks'
+import { FactoryTasks, SAMPLE_TEXT, formatEndedAt, formatInState, isLocalToday } from './FactoryTasks'
 
-const NOW = Date.parse('2026-11-14T12:00:00Z')
+const NOW = new Date(2026, 10, 14, 12, 0).getTime()
 const ended = { merged: 23, rejected: 0, blocked: 0, failed: 0, returned: 0 }
 const job = (over: Partial<FactoryJob>): FactoryJob => ({
     issue: 1, title: 'A title', state: 'building', enteredAt: new Date(NOW - 12_000).toISOString(), pr: null, round: null,
@@ -123,5 +123,72 @@ describe('FactoryTasks', () => {
         const [a, b] = rows()
         expect(a.getAttribute('aria-pressed')).toBe('false')
         expect(b.getAttribute('aria-pressed')).toBe('true')
+    })
+
+    const chipOf = (name: string) => Array.from(host.querySelectorAll<HTMLButtonElement>('[data-chip]')).find((c) => c.textContent?.includes(name))!
+    const at = (d: number, h: number, min: number) => new Date(2026, 10, d, h, min).toISOString()
+    const earlierHeader = () => Array.from(host.querySelectorAll<HTMLButtonElement>('button[aria-expanded]')).find((b) => b.textContent?.includes('Earlier'))!
+
+    it('keeps only jobs that ended on the local today in Ended today and puts older ended jobs in a collapsed Earlier group with its count', () => {
+        render([
+            job({ issue: 1, state: 'merged', enteredAt: at(14, 9, 5) }),
+            job({ issue: 2, state: 'failed', enteredAt: at(13, 22, 10) }),
+            job({ issue: 3, state: 'blocked', enteredAt: at(13, 8, 30) }),
+        ])
+        expect(chipOf('Ended today').textContent).toContain('1')
+        expect(chipOf('Earlier').textContent).toContain('2')
+        expect(rows()).toHaveLength(1)
+        expect(earlierHeader().getAttribute('aria-expanded')).toBe('false')
+        act(() => earlierHeader().click())
+        expect(earlierHeader().getAttribute('aria-expanded')).toBe('true')
+        expect(rows()).toHaveLength(3)
+    })
+
+    it('chip counts follow the split and the Earlier chip filters and opens the group', () => {
+        render([
+            job({ issue: 1 }), job({ issue: 2, state: 'queued' }),
+            job({ issue: 3, state: 'merged', enteredAt: at(14, 9, 5) }),
+            job({ issue: 4, state: 'rejected', enteredAt: at(12, 9, 5) }),
+        ])
+        expect(chipOf('Active').textContent).toContain('1')
+        expect(chipOf('Waiting').textContent).toContain('1')
+        expect(chipOf('Ended today').textContent).toContain('1')
+        expect(chipOf('Earlier').textContent).toContain('1')
+        act(() => chipOf('Earlier').click())
+        expect(rows()).toHaveLength(1)
+        expect(rows()[0].textContent).toContain('#4')
+        expect(earlierHeader().getAttribute('aria-expanded')).toBe('true')
+    })
+
+    it('shows HH:MM for an ended job of today and Mon 19:48 style for an earlier day', () => {
+        render([
+            job({ issue: 1, state: 'merged', enteredAt: at(14, 9, 5) }),
+            job({ issue: 2, state: 'rejected', enteredAt: at(14, 10, 6) }),
+            job({ issue: 3, state: 'blocked', enteredAt: at(14, 11, 7) }),
+            job({ issue: 4, state: 'failed', enteredAt: at(14, 7, 8) }),
+            job({ issue: 5, state: 'returned', enteredAt: at(14, 6, 9) }),
+            job({ issue: 6, state: 'merged', enteredAt: at(9, 19, 48) }),
+        ])
+        act(() => earlierHeader().click())
+        const cells = Array.from(host.querySelectorAll('[data-ended-at]')).map((e) => e.textContent)
+        expect(cells).toEqual(['09:05', '10:06', '11:07', '07:08', '06:09', 'Mon 19:48'])
+    })
+
+    it('running rows keep the ticking time in state', () => {
+        render([job({})])
+        expect(host.querySelector('[data-ended-at]')).toBeNull()
+        expect(rows()[0].textContent).toContain('12s')
+        act(() => { vi.advanceTimersByTime(1000) })
+        expect(rows()[0].textContent).toContain('13s')
+    })
+
+    it('isLocalToday and formatEndedAt around local midnight', () => {
+        const now = new Date(2026, 10, 14, 0, 1).getTime()
+        const before = new Date(2026, 10, 13, 23, 59).toISOString()
+        const after = new Date(2026, 10, 14, 0, 1).toISOString()
+        expect(isLocalToday(before, now)).toBe(false)
+        expect(isLocalToday(after, now)).toBe(true)
+        expect(formatEndedAt(before, now)).toBe('Fri 23:59')
+        expect(formatEndedAt(after, now)).toBe('00:01')
     })
 })
