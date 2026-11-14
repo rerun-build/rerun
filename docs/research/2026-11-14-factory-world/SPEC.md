@@ -17,7 +17,7 @@ first.
 
 | Shape | Means | On the floor |
 |---|---|---|
-| Rectangle (process) with a face | a mind that does work | a Rerun coworker, in its own Rerun colour; unlit when idle, glowing when it has a run out |
+| Rectangle (process) with a face | a mind that does work | a Rerun coworker, always in its own Rerun colour: unlit when idle, glowing in that same colour when it has a run out (never turned gold or any state colour; state colours belong to tasks and belts) |
 | Rectangle, see-through | the same process running again in parallel | a copy (ghost); drawn only while that copy runs a job |
 | Diamond (decision) | a yes/no choice | review: a diamond gate on the belt; pass leaves by one corner, fail by the other |
 | Capsule (terminator) | where the flow starts and ends | the Loader (the delegator): faceless; intake, checks and merge happen there; clicking it opens the Loader tab |
