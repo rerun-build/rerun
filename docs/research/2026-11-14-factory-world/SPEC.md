@@ -122,6 +122,51 @@ nothing that rides `offset-path` may carry its own scale or translate.
 - **Settings:** Rerun's dialog pattern (`PanelEditorShell`, `Segmented`, `Switch`) over the delegator's
   settings: pools, runs per coworker, clocks, holds. Needs a write path to the delegator (later).
 
+## 5a. The page around the floor (owner, 2026-11-14; supersedes the right column of #332)
+
+- **Top bar: the ledger.** The bottom stats panel's frame, reused as one shared component, sits at the top
+  too, centred over the visible floor; both bars re-centre when a side panel opens or closes, and the camera
+  fits the floor between them. Collapsed it is one row of chips with counts (Running, Waiting, Problems,
+  Done today); a chip drops the ledger down under the bar filtered to it; selecting a task (a row or a
+  sphere) drops its card down instead. The drop-down grows downward with its content and scrolls inside
+  above the bottom bar; a click away slides it back up and clears the selection.
+- **Right side: actors only.** Clicking a coworker, "Talk to Boss" or the Loader opens that actor's panel
+  on the right (Rerun's coworker panel; the Loader's own panel from the snapshot). Task information never
+  goes there, so the two never cover each other.
+- **Spheres:** hovering shows a small card (#issue and title, stage, who holds it, time in stage, PR);
+  clicking selects the task. A task being worked docks at a fixed spot in front of the copy or coworker
+  working it; it moves along a belt only during a handoff; waiting tasks queue in order at the Loader.
+
+## 5b. The ledger (owner: "a hierarchical tree of codependency, like backend, frontend, and other tech by type")
+
+An at-a-glance tree, top of the pyramid first:
+
+1. **Feature**: what the owner asked for (the parent issue, its title), with progress rolled up from all
+   its tasks.
+2. **Department**, in the order work flows through the stack: Design, Database, Engine, Backend services,
+   Frontend, Dispatcher and tooling, Docs. A task's department comes from the files its issue allows
+   (`docs/research` design specs: Design; `supabase`: Database; `apps/engine`: Engine; `packages/contracts`,
+   `apps/ui/app/api`: Backend services; `apps/ui`, `packages/ui`, `packages/i18n`: Frontend;
+   `tools/factory`, `.github`, `deploy`: Dispatcher and tooling; other `docs`: Docs). A task touching
+   several sits in its main one (most files) and carries tags for the others. Each department shows its
+   rolled-up progress.
+3. **Task**: a factory job: state icon, title, who holds it, "needs #n" for each unmet dependency.
+4. **Subtask**: the stages the task actually went through (build, review, fix, checks, merge) with who,
+   status, steps, time and tokens; opening one goes to that run's steps.
+
+Selecting a task lights the chain it waits on and everything waiting on it; a blocked task shows its stuck
+chain in red. Tasks with no feature sit under "No feature" at the bottom. Data: the snapshot carries each
+job's department (computed by the delegator from the issue's allowed paths) and each feature's title.
+
+## 5c. A coworker's run log
+
+Rerun's coworker panel, Activity, Logs: three tabs with counts, Running first and always the opening tab
+(owner: "the running ones are my interest 95% of the time"). Running rows are live (steps, time, the step
+it is on now). Each row says what the run was (#issue, build/review/fix, title; a run with no factory job
+shows its goal or first message); a row opens once to its steps. Done and Failed are their own tabs; the
+Failed count turns red while it has entries. An empty Running tab says so in one line with links to the
+other tabs.
+
 ## 6. Where the data comes from
 
 **Push.** On every beat the delegator sends one snapshot of the line to the app through the account tool
