@@ -137,30 +137,37 @@ nothing that rides `offset-path` may carry its own scale or translate.
   clicking selects the task. A task being worked docks at a fixed spot in front of the copy or coworker
   working it; it moves along a belt only during a handoff; waiting tasks queue in order at the Loader.
 
-## 5b. The ledger (owner: "a hierarchical tree of codependency, like backend, frontend, and other tech by type")
+## 5b. The ledger (owner: "a hierarchical tree of codependency"; "we manage them hierarchically depending on their codependency of how they fit together")
 
-An at-a-glance tree, top of the pyramid first:
+An at-a-glance work breakdown, structured by how the work fits together:
 
-1. **Epic** (the parent task): what the work is for, whatever its kind (owner: "A feature or PARENT TASK... sometimes
-   main task will be a code review and fixing"): the parent issue's title, a kind tag (feature, review +
-   fix, fix, upgrade, refactor, research; from the parent issue), and progress rolled up from all its tasks.
-2. **Department**, in the order work flows through the stack: Design, Database, Engine, Backend services,
-   Frontend, Dispatcher and tooling, Docs. A task's department comes from the files its issue allows
-   (`docs/research` design specs: Design; `supabase`: Database; `apps/engine`: Engine; `packages/contracts`,
+1. **Epic**: what the work is for, of any kind (owner: "sometimes main task will be a code review and
+   fixing"): the parent issue's title, a kind tag (feature, review + fix, fix, upgrade, refactor,
+   research), progress rolled up from all its tasks.
+2. **Layer**: the epic's dependency layers. Layer 1 holds the tasks that need nothing in the epic; layer n
+   holds the tasks whose needs are all in layers below n. The tasks of one layer can run in parallel; the
+   layers are the order the work must go in, which is how the delegator schedules it. A need outside the
+   epic, or already merged, counts as met. A cycle is shown as an error row, never hidden.
+3. **Task**: a factory job: state icon, title, who holds it, "needs #n" for each unmet need, and a
+   department tag in its colour. The department comes from the files its issue allows (`docs/research`
+   design specs: Design; `supabase`: Database; `apps/engine`: Engine; `packages/contracts`,
    `apps/ui/app/api`: Backend services; `apps/ui`, `packages/ui`, `packages/i18n`: Frontend;
-   `tools/factory`, `.github`, `deploy`: Dispatcher and tooling; other `docs`: Docs). A task touching
-   several sits in its main one (most files) and carries tags for the others. Each department shows its
-   rolled-up progress.
-3. **Task**: a factory job: state icon, title, who holds it, "needs #n" for each unmet dependency.
+   `tools/factory`, `.github`, `deploy`: Dispatcher and tooling; other `docs`: Docs); a task touching
+   several takes its main one (most files) and smaller tags for the others.
 4. **Subtask**: the stages the task actually went through (build, review, fix, checks, merge) with who,
    status, steps, time and tokens; opening one goes to that run's steps.
 
-Selecting a task lights the chain it waits on and everything waiting on it; a blocked task shows its stuck
-chain in red. Tasks with no epic sit under "No epic" at the bottom. Industry names: the tree is a work breakdown
-structure; Epic, Department (Jira calls it a component), Task (story), Subtask; the "needs" chain is the
-dependency graph and its longest chain the critical path. Sprints are not a level: the factory runs waves
-(a batch of jobs the delegator takes on together), shown as a "This wave" chip that filters the tree. Data: the snapshot carries each job's
-department (computed by the delegator from the issue's allowed paths) and each parent's title and kind.
+The critical path (the longest chain of needs through the layers) is lit: the task on it that slips delays
+the epic. Selecting a task lights the chain it waits on and everything waiting on it; a blocked task shows
+its stuck chain in red. Chips filter without flattening the tree: Running, Waiting, Problems, Done today,
+This wave (the layer the delegator is working now), and one per department. Tasks with no epic sit under
+"No epic" at the bottom.
+
+Industry names: the tree is a work breakdown structure; Epic, Task (story), Subtask; the needs form the
+dependency graph and its longest chain the critical path; sprints are not a level (the factory runs waves).
+Data: the snapshot carries each job's department (computed by the delegator from the issue's allowed
+paths) and each epic's title and kind; layers and the critical path are computed on the page from
+`parent` and `dependsOn`.
 
 ## 5c. A coworker's run log
 
