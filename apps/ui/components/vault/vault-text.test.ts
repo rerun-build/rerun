@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { VaultItemSummary } from '@rerun/contracts'
 
-import { matchesVaultQuery, usedBySummary, vaultAccountsFor, vaultGroupOf, type UsedByText } from './vault-text'
+import { coworkerFaces, matchesVaultQuery, usedBySummary, vaultAccountsFor, vaultGroupOf, type UsedByText } from './vault-text'
 
 const text: UsedByText = {
     everyone: 'Every coworker',
@@ -24,6 +24,20 @@ describe('usedBySummary', () => {
 
     it('counts the coworkers the reader cannot see without naming them', () => {
         expect(usedBySummary({ sharedWithAll: false, coworkers: [], hiddenCoworkers: 3 }, text)).toBe('3 hidden')
+    })
+})
+
+describe('coworkerFaces', () => {
+    it('draws everyone as one mark, whoever is attached', () => {
+        expect(coworkerFaces({ sharedWithAll: true, coworkers: [coworker('Alice')], hiddenCoworkers: 2 }, 3)).toEqual({ everyone: true, ids: [], more: 0 })
+    })
+
+    it('shows the first coworkers and counts the rest, the hidden ones included', () => {
+        expect(coworkerFaces({ sharedWithAll: false, coworkers: [], hiddenCoworkers: 0 }, 3)).toEqual({ everyone: false, ids: [], more: 0 })
+        expect(coworkerFaces({ sharedWithAll: false, coworkers: [coworker('Alice'), coworker('Bob')], hiddenCoworkers: 0 }, 3)).toEqual({ everyone: false, ids: ['Alice', 'Bob'], more: 0 })
+        const four = [coworker('Alice'), coworker('Bob'), coworker('Carol'), coworker('Dan')]
+        expect(coworkerFaces({ sharedWithAll: false, coworkers: four, hiddenCoworkers: 2 }, 3)).toEqual({ everyone: false, ids: ['Alice', 'Bob', 'Carol'], more: 3 })
+        expect(coworkerFaces({ sharedWithAll: false, coworkers: [], hiddenCoworkers: 2 }, 3)).toEqual({ everyone: false, ids: [], more: 2 })
     })
 })
 

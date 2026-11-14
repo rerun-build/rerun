@@ -4,8 +4,9 @@ import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 import type { VaultEntryView, VaultListing } from '@/app/api/_services/vault.service'
-import { AddButton, EmptyPitch, Group } from '@/components/connections/AiProvidersPanel'
+import { AddButton, EmptyPitch } from '@/components/connections/AiProvidersPanel'
 import { Button } from '@/components/ui/button'
+import { DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { PanelScroller } from '@/components/ui/panel-list'
@@ -14,7 +15,7 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
-import { ChevronRightIcon, KeyIcon, SearchIcon, ServerIcon } from '@/lib/icons'
+import { KeyIcon, SearchIcon, ServerIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
 import { Badge } from '@rerun/ui/primitives'
 import { VaultAddApp } from './VaultAddApp'
@@ -22,15 +23,23 @@ import { VaultEntryDetail } from './VaultEntryDetail'
 import { AppIcon } from '@/components/apps/PaidAppViews'
 import { PaidAccountStatusBadge, VaultPaidAccountDetail } from './VaultPaidAccountDetail'
 import type { VaultPaidAccount } from '@/app/api/_services/vault-apps.service'
-import { matchesVaultQuery, usedBySummary, vaultGroupOf, type UsedByText, type VaultGroup } from './vault-text'
+import { VaultAppTile } from './VaultAppTile'
+import { VaultCoworkerFaces, type VaultUsage } from './VaultCoworkerFaces'
+import { matchesVaultQuery, vaultGroupOf } from './vault-text'
 
 type VaultPage = { kind: 'list' } | { kind: 'detail'; id: string } | { kind: 'paid'; connectionId: string } | { kind: 'add' }
 
 // Past this many entries the list gets a search field: a handful is read at a glance.
 const SEARCH_FROM = 8
-const GROUPS: VaultGroup[] = ['apps', 'mcp', 'secrets']
 
-export function VaultPanel({ listing, paid = [], error, onChanged }: { listing: VaultListing | null; paid?: VaultPaidAccount[]; error: string | null; onChanged: () => Promise<void> }) {
+type Props = {
+    listing: VaultListing | null
+    paid?: VaultPaidAccount[]
+    error: string | null
+    onChanged: () => Promise<void>
+}
+
+export function VaultPanel({ listing, paid = [], error, onChanged }: Props) {
     const t = useTranslations('vault')
     const [page, setPage] = useState<VaultPage>({ kind: 'list' })
     const [query, setQuery] = useState('')
@@ -43,56 +52,69 @@ export function VaultPanel({ listing, paid = [], error, onChanged }: { listing: 
 
     const slugs = useMemo(() => [...new Set((listing?.entries ?? []).flatMap(entry => (entry.slug ? [entry.slug] : [])))], [listing])
     const { resolved: catalog } = useCatalogServices(slugs)
-    const iconOf = (entry: VaultEntryView) => {
+    const iconOf = (entry: VaultEntryView, size: 'sm' | 'md' = 'sm') => {
         const row = entry.slug ? catalog.get(entry.slug) : undefined
-        if (row) return <Icon {...serviceIconProps(row.icon, row.category)} size="sm" />
-        return <Icon icon={entry.kind === 'secret' ? KeyIcon : ServerIcon} size="sm" />
+        if (row) return <Icon {...serviceIconProps(row.icon, row.category)} size={size} />
+        return <Icon icon={entry.kind === 'secret' ? KeyIcon : ServerIcon} size={size} />
     }
 
     const addReason = listing && !listing.canAdd ? t('reasons.manageAny') : undefined
+    const empty = listing?.entries.length === 0 && paid.length === 0
 
     return (
-        <PanelSteps stepKey={stepKey} depth={stepKey === 'list' ? 0 : 1}>
-            {page.kind === 'add' && listing ? (
-                <VaultAddApp
-                    listing={listing}
-                    onBack={back}
-                    onAdded={async id => {
-                        await onChanged()
-                        setPage({ kind: 'detail', id })
-                    }}
-                />
-            ) : selectedPaid && listing ? (
-                <VaultPaidAccountDetail account={selectedPaid} listing={listing} onBack={back} onChanged={onChanged} />
-            ) : selected && listing ? (
-                <VaultEntryDetail entry={selected} listing={listing} icon={iconOf(selected)} onBack={back} onChanged={onChanged} />
-            ) : !listing ? (
-                error ? <p className="p-4 text-sm text-muted-foreground">{error}</p> : <VaultSkeleton />
-            ) : (
-                <PanelScroller className="space-y-6 p-4">
-                    {listing.entries.length >= SEARCH_FROM && (
-                        <div className="relative">
-                            <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                            <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} className="pl-8" aria-label={t('search')} />
-                        </div>
-                    )}
-                    {listing.entries.length === 0 && paid.length === 0 ? (
-                        <EmptyPitch
-                            text={t('empty')}
-                            actions={
-                                <TooltipDisabledReason reason={addReason}>
-                                    <Button variant="outline" disabled={!!addReason} onClick={() => setPage({ kind: 'add' })}>
-                                        {t('addApp')}
-                                    </Button>
-                                </TooltipDisabledReason>
-                            }
+        <>
+            <DialogHeader className="h-12 shrink-0 flex-row items-center justify-between gap-3 border-b pr-12 pl-4">
+                <DialogTitle>{t('title')}</DialogTitle>
+                {stepKey === 'list' && listing && !empty && (
+                    <TooltipDisabledReason reason={addReason}>
+                        <AddButton label={t('add')} disabled={!!addReason} onClick={() => setPage({ kind: 'add' })} />
+                    </TooltipDisabledReason>
+                )}
+            </DialogHeader>
+            <div className="flex min-h-0 flex-1 flex-col">
+                <PanelSteps stepKey={stepKey} depth={stepKey === 'list' ? 0 : 1}>
+                    {page.kind === 'add' && listing ? (
+                        <VaultAddApp
+                            listing={listing}
+                            onBack={back}
+                            onAdded={async id => {
+                                await onChanged()
+                                setPage({ kind: 'detail', id })
+                            }}
                         />
+                    ) : selectedPaid && listing ? (
+                        <VaultPaidAccountDetail account={selectedPaid} listing={listing} onBack={back} onChanged={onChanged} />
+                    ) : selected && listing ? (
+                        <VaultEntryDetail entry={selected} listing={listing} icon={iconOf(selected)} onBack={back} onChanged={onChanged} />
+                    ) : !listing ? (
+                        error ? <p className="p-4 text-sm text-muted-foreground">{error}</p> : <VaultSkeleton />
+                    ) : empty ? (
+                        <PanelScroller className="p-4">
+                            <EmptyPitch
+                                text={t('empty')}
+                                actions={
+                                    <TooltipDisabledReason reason={addReason}>
+                                        <Button variant="outline" disabled={!!addReason} onClick={() => setPage({ kind: 'add' })}>
+                                            {t('addApp')}
+                                        </Button>
+                                    </TooltipDisabledReason>
+                                }
+                            />
+                        </PanelScroller>
                     ) : (
-                        <VaultGroups listing={listing} paid={paid} query={query} iconOf={iconOf} onOpen={id => setPage({ kind: 'detail', id })} onOpenPaid={connectionId => setPage({ kind: 'paid', connectionId })} onAdd={() => setPage({ kind: 'add' })} addReason={addReason} />
+                        <PanelScroller className="space-y-4 p-4">
+                            {listing.entries.length >= SEARCH_FROM && (
+                                <div className="relative">
+                                    <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                                    <Input value={query} onChange={e => setQuery(e.target.value)} placeholder={t('search')} className="pl-8" aria-label={t('search')} />
+                                </div>
+                            )}
+                            <VaultGroups listing={listing} paid={paid} query={query} iconOf={iconOf} onOpen={id => setPage({ kind: 'detail', id })} onOpenPaid={connectionId => setPage({ kind: 'paid', connectionId })} />
+                        </PanelScroller>
                     )}
-                </PanelScroller>
-            )}
-        </PanelSteps>
+                </PanelSteps>
+            </div>
+        </>
     )
 }
 
@@ -101,83 +123,81 @@ type VaultGroupsProps = {
     paid: VaultPaidAccount[]
     onOpenPaid: (connectionId: string) => void
     query: string
-    iconOf: (entry: VaultEntryView) => React.ReactNode
+    iconOf: (entry: VaultEntryView, size?: 'sm' | 'md') => React.ReactNode
     onOpen: (id: string) => void
-    onAdd: () => void
-    addReason?: string
 }
 
-function VaultGroups({ listing, paid, query, iconOf, onOpen, onOpenPaid, onAdd, addReason }: VaultGroupsProps) {
+// The apps as tiles, recognised by their logo; the MCP servers and the secrets, which have none, as rows below.
+function VaultGroups({ listing, paid, query, iconOf, onOpen, onOpenPaid }: VaultGroupsProps) {
     const t = useTranslations('vault')
-    const usedByText: UsedByText = {
-        everyone: t('row.everyone'),
-        unused: t('row.unused'),
-        usedBy: names => t('row.usedBy', { names }),
-        usedByMore: (names, count) => t('row.usedByMore', { names, count }),
-        hidden: count => t('detail.hiddenCoworkers', { count }),
-    }
-    const groupTitle: Record<VaultGroup, string> = { apps: t('groups.apps'), mcp: t('groups.mcp'), secrets: t('groups.secrets') }
     const shown = listing.entries.filter(entry => matchesVaultQuery(entry, query))
     const shownPaid = paid.filter(account => [account.name, account.label ?? ''].some(text => text.toLowerCase().includes(query.trim().toLowerCase())))
     const coworkerName = new Map(listing.coworkers.map(coworker => [coworker.id, coworker.name]))
     if (shown.length === 0 && shownPaid.length === 0) return <p className="py-6 text-center text-sm text-muted-foreground">{t('noMatch')}</p>
 
-    const addMenu = (
-        <TooltipDisabledReason reason={addReason}>
-            <AddButton label={t('add')} disabled={!!addReason} onClick={onAdd} />
-        </TooltipDisabledReason>
-    )
+    const apps = shown.filter(entry => vaultGroupOf(entry) === 'apps')
+    const others = shown.filter(entry => vaultGroupOf(entry) !== 'apps')
 
     return (
         <>
-            {GROUPS.map((group, index) => {
-                const entries = shown.filter(entry => vaultGroupOf(entry) === group)
-                if (entries.length === 0 && group !== 'apps') return null
-                return (
-                    <Group key={group} title={groupTitle[group]} addMenu={group === 'apps' || index === 0 ? addMenu : undefined}>
-                        {entries.map(entry => (
-                            <PanelRow
-                                key={entry.id}
-                                onClick={() => onOpen(entry.id)}
-                                leading={iconOf(entry)}
-                                title={entry.label ? `${entry.name} · ${entry.label}` : entry.name}
-                                description={usedBySummary(entry, usedByText)}
-                                actions={
+            {(apps.length > 0 || shownPaid.length > 0) && (
+                <div className="@container">
+                    <div className="grid grid-cols-2 gap-2 @md:grid-cols-3">
+                        {apps.map(entry => (
+                            <VaultAppTile key={entry.id} icon={iconOf(entry, 'md')} name={entry.name} label={entry.label} badges={<VaultStatusBadge entry={entry} />} usage={entry} onClick={() => onOpen(entry.id)} />
+                        ))}
+                        {shownPaid.map(account => (
+                            <VaultAppTile
+                                key={account.connectionId}
+                                icon={<AppIcon slug={account.slug} size="md" />}
+                                name={account.name}
+                                label={account.label}
+                                badges={
                                     <>
-                                        <VaultStatusBadge entry={entry} />
-                                        <ChevronRightIcon className="ml-1 size-4 text-muted-foreground" />
+                                        <Badge size="xs" tone="brand" glow={false}>
+                                            {t('paid.badge')}
+                                        </Badge>
+                                        <PaidAccountStatusBadge account={account} />
                                     </>
                                 }
+                                usage={paidUsage(account, coworkerName)}
+                                onClick={() => onOpenPaid(account.connectionId)}
                             />
                         ))}
-                        {group === 'apps' &&
-                            shownPaid.map(account => (
-                                <PanelRow
-                                    key={account.connectionId}
-                                    onClick={() => onOpenPaid(account.connectionId)}
-                                    leading={<AppIcon slug={account.slug} />}
-                                    title={
-                                        <span className="flex min-w-0 items-center gap-1.5">
-                                            <span className="truncate">{account.label ? `${account.name} · ${account.label}` : account.name}</span>
-                                            <Badge size="xs" tone="brand" glow={false}>
-                                                {t('paid.badge')}
-                                            </Badge>
-                                        </span>
-                                    }
-                                    description={usedBySummary({ sharedWithAll: false, coworkers: account.agentIds.map(id => ({ id, engineAgentId: id, name: coworkerName.get(id) ?? '', spaceId: '' })).filter(c => c.name), hiddenCoworkers: account.hiddenAgents + account.agentIds.filter(id => !coworkerName.has(id)).length }, usedByText)}
-                                    actions={
-                                        <>
-                                            <PaidAccountStatusBadge account={account} />
-                                            <ChevronRightIcon className="ml-1 size-4 text-muted-foreground" />
-                                        </>
-                                    }
-                                />
-                            ))}
-                    </Group>
-                )
-            })}
+                    </div>
+                </div>
+            )}
+            {others.length > 0 && (
+                <div className="space-y-1.5">
+                    {others.map(entry => (
+                        <PanelRow
+                            key={entry.id}
+                            onClick={() => onOpen(entry.id)}
+                            leading={iconOf(entry)}
+                            title={entry.label ? `${entry.name} · ${entry.label}` : entry.name}
+                            description={entry.kind === 'mcp' ? t('addPage.mcp') : t('addPage.secret')}
+                            actions={
+                                <>
+                                    <VaultStatusBadge entry={entry} />
+                                    <VaultCoworkerFaces usage={entry} />
+                                </>
+                            }
+                        />
+                    ))}
+                </div>
+            )}
         </>
     )
+}
+
+// A paid account names its coworkers by their hub id; the ones the reader cannot see are only counted.
+function paidUsage(account: VaultPaidAccount, coworkerName: Map<string, string>): VaultUsage {
+    const seen = account.agentIds.filter(id => coworkerName.has(id))
+    return {
+        sharedWithAll: false,
+        coworkers: seen.map(id => ({ id, engineAgentId: id, name: coworkerName.get(id) as string, spaceId: '' })),
+        hiddenCoworkers: account.hiddenAgents + account.agentIds.length - seen.length,
+    }
 }
 
 export function VaultStatusBadge({ entry }: { entry: Pick<VaultEntryView, 'status'> }) {
@@ -199,21 +219,28 @@ export function VaultStatusBadge({ entry }: { entry: Pick<VaultEntryView, 'statu
 
 function VaultSkeleton() {
     return (
-        <div className="space-y-6 p-4">
-            {[3, 1].map((rows, group) => (
-                <div key={group} className="space-y-2">
-                    <Skeleton className="h-3 w-24" />
-                    {Array.from({ length: rows }, (_, i) => (
-                        <div key={i} className="flex items-center gap-3 rounded-md border p-3">
-                            <Skeleton className="size-8 rounded-md" />
-                            <div className="flex-1 space-y-1.5">
-                                <Skeleton className="h-3.5 w-28" />
-                                <Skeleton className="h-2.5 w-40" />
+        <div className="space-y-4 p-4">
+            <div className="@container">
+                <div className="grid grid-cols-2 gap-2 @md:grid-cols-3">
+                    {Array.from({ length: 6 }, (_, i) => (
+                        <div key={i} className="flex flex-col gap-3 rounded-md border p-3">
+                            <Skeleton className="size-10 rounded-lg" />
+                            <div className="space-y-1.5">
+                                <Skeleton className="h-3.5 w-20" />
+                                <Skeleton className="h-2.5 w-28 max-w-full" />
                             </div>
+                            <Skeleton className="h-6 w-14" />
                         </div>
                     ))}
                 </div>
-            ))}
+            </div>
+            <div className="flex items-center gap-3 rounded-md border p-3">
+                <Skeleton className="size-8 rounded-md" />
+                <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3.5 w-28" />
+                    <Skeleton className="h-2.5 w-20" />
+                </div>
+            </div>
         </div>
     )
 }
