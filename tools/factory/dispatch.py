@@ -916,18 +916,19 @@ class Dispatcher:
 
     def heartbeat(self):
         self.beats += 1
-        count = {}
+        count, dead = {}, 0
         for j in self.jobs():
             count[j["state"]] = count.get(j["state"], 0) + 1
+            dead += j["state"] == "waiting" and bool(j.get("dead"))
         today = ledger_store.now()[:10]
-        ended = {s: 0 for s in ("merged", "blocked", "failed", "returned")}
+        ended = {s: 0 for s in ("merged", "blocked", "failed", "returned", "rejected")}
         for j in self.jobs():
             if j["state"] in ended and str(j.get("updated_at") or "").startswith(today):
                 ended[j["state"]] += 1
         stages = states.STAGES
-        line = "%s beat %d | %s | ended today: %s | unreadable %d" % (
+        line = "%s beat %d | %s | ended today: %s | unreadable %d, dead waits %d" % (
             iso(self.now()), self.beats, ", ".join("%s %d" % (s, count.get(s, 0)) for s in stages),
-            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable)
+            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable, dead)
         print(line, flush=True)
         path = self.cfg.get("heartbeat_file", "/state/heartbeat")
         tmp = "%s.%d.tmp" % (path, os.getpid())

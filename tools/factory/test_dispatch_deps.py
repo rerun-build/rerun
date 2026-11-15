@@ -35,7 +35,7 @@ class DeadDeps(Base):
         self.w.issues = [issue(5, "#7"), issue(7)]
         self.ended(7, "rejected")
         self.tick()
-        self.assertNotIn("dead", self.out.getvalue())
+        self.assertNotIn("waits on dead", self.out.getvalue())
         self.assertEqual(self.w.issue(5)["comments"], [])
 
     def test_a_dependency_closed_as_not_planned_is_dead(self):
@@ -60,6 +60,14 @@ class DeadDeps(Base):
         self.tick()
         self.assertIn("waits on #7 (not a factory job)", self.out.getvalue())
         self.assertEqual(self.w.issue(5)["comments"], [])
+
+    def test_the_beat_line_counts_rejected_today_and_jobs_waiting_on_a_dead_dependency(self):
+        self.w.issues = [issue(5, "#7")]
+        self.ended(7, "rejected")
+        self.tick(2)
+        line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
+        self.assertIn("| ended today: merged 0, blocked 0, failed 0, returned 0, rejected 1 |", line)
+        self.assertTrue(line.endswith(" | unreadable 0, dead waits 1"), line)
 
     def test_a_waiting_issue_given_its_label_back_waits_again(self):
         self.w.issues = [issue(5, "#7")]
