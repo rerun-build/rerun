@@ -34,6 +34,7 @@ TABLE = {
     "blocked": _end(True, ("merged",)),
     "failed": _end(True, ("merged",)),
     "returned": _end(True, ("merged",)),
+    "superseded": _end(False),
 }
 
 NAMES = tuple(TABLE)
