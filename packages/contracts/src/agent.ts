@@ -12,6 +12,7 @@ export const mcpServerSchema = z.object({
     url: z.string().optional(),
     env: z.record(z.string(), z.string()).default({}),
     headers: z.record(z.string(), z.string()).default({}),
+    tools: z.array(z.string().min(1).max(128)).max(200).optional(),
 })
 export type McpServer = z.infer<typeof mcpServerSchema>
 export const strictMcpServerSchema = mcpServerSchema.extend({ name: mcpServerNameSchema })
