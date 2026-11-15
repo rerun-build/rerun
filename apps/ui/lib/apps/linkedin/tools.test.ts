@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
+import * as engine from '@/lib/engine/client'
 import { runAction, runFlatEndpoint } from '@/lib/apps/linkup/client'
 import { missingRequired, toolParams } from '@/lib/apps/tools'
 import { LINKEDIN_TOOLS, linkedinTool } from './tools'
 
 vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/linkup/client')>()), runFlatEndpoint: vi.fn(), runAction: vi.fn() }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/engine/client')>()), supportsStreamedUploads: vi.fn(), uploadFileStream: vi.fn() }))
 
 describe('the LinkedIn tool set', () => {
     it('never hands the coworker the account itself: no login, no checkpoint, no account deletion, no webhook', () => {
@@ -15,7 +17,7 @@ describe('the LinkedIn tool set', () => {
     })
 
     it('meters every action LinkedIn could restrict the account for', () => {
-        for (const name of ['send_invitation', 'send_message', 'get_profile', 'search_people', 'comment_on_post', 'visit_profile', 'invite_to_event', 'follow', 'answer_comment', 'repost', 'create_post']) {
+        for (const name of ['send_invitation', 'send_message', 'get_profile', 'search_people', 'comment_on_post', 'visit_profile', 'follow', 'answer_comment', 'repost', 'create_post']) {
             expect(linkedinTool(name)?.quota).toBeDefined()
         }
     })
@@ -57,10 +59,9 @@ describe('reading LinkedIn', () => {
 })
 
 describe('acting on LinkedIn', () => {
-    it('counts an event invitation once per person invited', () => {
+    it('invites to an event without spending the connection invitations of the day', () => {
         const invite = linkedinTool('invite_to_event')!
-        expect(invite.quota?.action).toBe('invitation')
-        expect(invite.quota?.amount?.({ profiles: ['a', 'b', 'c'] })).toBe(3)
+        expect([invite.category, invite.action, invite.quota]).toEqual(['network', 'invite_to_event', undefined])
         expect(missingRequired(invite, toolParams(invite, { event_url: 'https://www.linkedin.com/events/1' }))).toEqual(['profiles'])
     })
 
@@ -164,6 +165,33 @@ describe('Recruiter', () => {
         expect(runAction).toHaveBeenLastCalledWith('acc-1', 'messages', 'send', { recipient_urn: 'urn:li:ts_profile:1', subject: 'Role', message_text: 'Hi', recruiter: true })
         await linkedinTool('recruiter_get_candidate')!.run!(context, { profile_urn: 'urn:li:ts_profile:1' })
         expect(runAction).toHaveBeenLastCalledWith('acc-1', 'profiles', 'get', { profile_urn: 'urn:li:ts_profile:1', recruiter: true })
+    })
+
+    it('saves the CV of an applicant into the files instead of answering its bytes', async () => {
+        vi.mocked(engine.supportsStreamedUploads).mockResolvedValue(true)
+        vi.mocked(engine.uploadFileStream).mockImplementation(async (_conn, _base, input) => ({ path: `${input.dir}/${input.name}`, bytes: (await new Response(input.body).arrayBuffer()).byteLength }))
+        const content = Buffer.from('%PDF-1.4 cv').toString('base64')
+        vi.mocked(runAction).mockResolvedValueOnce({ application_id: '269', candidate: { name: 'Jane Doe' }, cv: { content, encoding: 'base64', filename: 'Jane_Doe_CV.pdf', content_type: 'application/pdf', size_bytes: 11 } })
+
+        const answer = await linkedinTool('recruiter_get_cv')!.run!(context, { application_id: '269' })
+
+        expect(runAction).toHaveBeenLastCalledWith('acc-1', 'recruiter', 'get_cv', { application_id: '269' })
+        expect(answer).toEqual({
+            application_id: '269',
+            candidate: { name: 'Jane Doe' },
+            cv: { filename: 'Jane_Doe_CV.pdf', content_type: 'application/pdf', size: 11, path: expect.stringMatching(/^attachments\/linkedin\/\d{8}-\d{6}-Jane_Doe_CV\.pdf$/) },
+        })
+        expect(JSON.stringify(answer)).not.toContain(content)
+    })
+
+    it('says so when the CV could not be saved, still without its bytes', async () => {
+        vi.mocked(engine.supportsStreamedUploads).mockResolvedValue(false)
+        const content = Buffer.from('%PDF-1.4 cv').toString('base64')
+        vi.mocked(runAction).mockResolvedValueOnce({ application_id: '269', cv: { content, filename: 'Jane_Doe_CV.pdf', content_type: 'application/pdf' } })
+
+        const answer = await linkedinTool('recruiter_get_cv')!.run!(context, { application_id: '269' })
+
+        expect(answer).toEqual({ application_id: '269', cv: { filename: 'Jane_Doe_CV.pdf', content_type: 'application/pdf', size: 11, fileError: 'Your machine is updating and cannot take the file yet.' } })
     })
 
     it('meters InMails, candidate views and searches', () => {

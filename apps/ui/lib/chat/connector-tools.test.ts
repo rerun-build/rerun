@@ -145,6 +145,7 @@ describe('a tool a paid app runs from its directory', () => {
     it('is named after the tool that ran, with or without the server prefix', () => {
         expect(resolveConnectorTool('linkedin_pro_run_tool', map, undefined, { tool: 'sales_nav_search_people', arguments: { keyword: 'cto' } })?.label).toBe('Sales Nav Search People')
         expect(resolveConnectorTool('mcp__linkedin_pro__run_tool', map, undefined, { tool: 'linkedin_pro_recruiter_list_jobs' })?.label).toBe('Recruiter List Jobs')
+        expect(resolveConnectorTool('mcp__linkedin_pro__run_tool', map, undefined, { tool: 'mcp__linkedin_pro__visit_profile' })?.label).toBe('Visit Profile')
     })
 
     it('keeps the name of the call while its input has not streamed in', () => {

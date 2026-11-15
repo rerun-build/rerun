@@ -1,3 +1,4 @@
+import { bareToolName } from '@rerun/contracts'
 import { APP_LIST_TOOLS, APP_RUN_TOOL, type AppInfo } from './catalog'
 import { missingRequired, toolParams, type AppScope, type AppTool } from './tools'
 
@@ -78,9 +79,8 @@ function argumentsOf(value: unknown): Record<string, unknown> | null {
 // The model's provider checks a loaded tool's arguments against its schema; a tool run by name has
 // only this check, so a parameter it does not take is refused instead of silently dropped.
 export function resolveRunTool(app: AppDirectory, call: Record<string, unknown>): RunToolCall {
-    const prefix = `${app.serverName}_`
     const asked = typeof call.tool === 'string' ? call.tool.trim() : ''
-    const name = asked.startsWith(prefix) ? asked.slice(prefix.length) : asked
+    const name = bareToolName(asked, app.serverName)
     const tool = app.tools.find(candidate => candidate.name === name)
     if (!tool) {
         return { refusal: `${asked ? `Unknown tool "${asked}"` : 'No tool was named'}. Nothing was run. Read a scope with ${loadedAs(app, APP_LIST_TOOLS)} for its tool names: ${Object.keys(app.scopes).join(', ')}.` }

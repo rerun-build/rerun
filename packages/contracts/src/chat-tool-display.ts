@@ -70,8 +70,9 @@ export function toolLabelOf(toolName: string, input: unknown, t: ToolCopy): stri
     const capability = toolName === PAID_DATA_TOOL ? capabilityOfCall(toolName, input) : null
     if (capability) return t(`paidData.${capability}`)
     if (isLabelledTool(toolName)) return t(`labels.${toolName}`)
-    if (toolName.startsWith('mcp_')) return formatToolName(toolName.replace(/^mcp__?/, '').replace(/__/g, ' '))
-    return formatToolName(toolName)
+    const name = ranToolName(toolName, input)
+    if (name.startsWith('mcp_')) return formatToolName(name.replace(/^mcp__?/, '').replace(/__/g, ' '))
+    return formatToolName(name)
 }
 
 const HEADLINE_ARGS = ['preview', 'command', 'path', 'query', 'url']
@@ -81,6 +82,25 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const isReadable = (value: unknown): value is string => typeof value === 'string' && !!value && !UUID_PATTERN.test(value.trim())
 
 export const argsOf = (input: unknown) => (input && typeof input === 'object' ? (input as Record<string, unknown>) : undefined)
+
+// The call a paid app runs a tool of its directory through.
+export const APP_RUN_TOOL = 'run_tool'
+
+// A tool name as its server lists it, whichever prefix a provider or a model put before it.
+export function bareToolName(name: string, server: string): string {
+    const prefix = [`mcp__${server}__`, `${server}__`, `${server}_`].find(candidate => name.startsWith(candidate))
+    return prefix ? name.slice(prefix.length) : name
+}
+
+// A step that ran a tool of an app's directory is named after that tool, under the server prefix
+// of the call, not after the call.
+export function ranToolName(toolName: string, input: unknown): string {
+    if (!toolName.endsWith(`_${APP_RUN_TOOL}`)) return toolName
+    const ran = argsOf(input)?.tool
+    if (typeof ran !== 'string' || !ran) return toolName
+    const head = toolName.slice(0, -APP_RUN_TOOL.length)
+    return head + bareToolName(ran, head.replace(/^mcp__/, '').replace(/_+$/, ''))
+}
 
 export function agentIdOf(input: unknown): string | undefined {
     const agentId = argsOf(input)?.agentId

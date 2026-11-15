@@ -1,4 +1,5 @@
-import { attachmentTool } from '@/lib/apps/attachment-tool'
+import { attachmentTool, copyToFiles } from '@/lib/apps/attachment-tool'
+import { extensionOf, safeFileName } from '@/lib/apps/attachments'
 import { runAction, runFlatEndpoint, type LinkupCategory } from '@/lib/apps/linkup/client'
 import type { AppScope, AppTool, AppToolContext } from '@/lib/apps/tools'
 import type { QuotaAction } from './quotas'
@@ -98,7 +99,7 @@ const SALES_NAV_COMPANY_FILTERS = {
     headcount_growth: { ...minMax, description: 'Percent' },
     department_headcount: { type: 'object', properties: { department: { type: 'string' }, min: { type: 'number' }, max: { type: 'number' } } },
     department_headcount_growth: { type: 'object', properties: { department: { type: 'string' }, min: { type: 'number' }, max: { type: 'number' } } },
-    annual_revenue: { type: 'object', properties: { min: { type: 'number' }, max: { type: 'number' }, currency: { type: 'string' } }, description: 'In millions, USD unless currency says otherwise' },
+    annual_revenue: { type: 'object', properties: { min: { type: 'number' }, max: { type: 'number' }, currency: { type: 'string' } }, description: 'In millions, USD unless currency says otherwise. min and max take only 0, 0.5, 1, 2.5, 5, 10, 20, 50, 100, 500, 1000 or 1001 (more than 1000)' },
     fortune: { type: 'array', items: { type: 'string', enum: ['50', '51-100', '101-250', '251-500'] } },
     followers: { type: 'array', items: { type: 'string', enum: ['1-50', '51-100', '101-1000', '1001-5000', '5000+'] } },
     hiring_on_linkedin: { type: 'boolean' },
@@ -120,6 +121,19 @@ const jobId = { type: 'string', description: 'From recruiter_list_jobs' }
 // here rather than left to the coworker.
 function onRecruiterSeat(category: LinkupCategory, action: string) {
     return (context: AppToolContext, params: Record<string, unknown>) => runAction(context.accountId, category, action, { ...params, recruiter: true })
+}
+
+type CvAnswer = { cv?: { content?: string; filename?: string; content_type?: string } } & Record<string, unknown>
+
+// Linkup answers the CV as base64, which a coworker cannot read and which would fill its context:
+// the file goes into its files and the answer names it.
+async function saveCv(context: AppToolContext, params: Record<string, unknown>) {
+    const { cv, ...answer } = await runAction<CvAnswer>(context.accountId, 'recruiter', 'get_cv', params)
+    if (!cv?.content) return answer
+    const bytes = new Uint8Array(Buffer.from(cv.content, 'base64'))
+    const filename = safeFileName(cv.filename, `cv-${String(params.application_id)}`, extensionOf(cv.content_type, cv.filename))
+    const copy = await copyToFiles(context, new Blob([bytes]).stream(), filename, bytes.byteLength)
+    return { ...answer, cv: { filename, content_type: cv.content_type ?? null, size: bytes.byteLength, ...copy } }
 }
 
 export const LINKEDIN_TOOLS: LinkedinTool[] = [
@@ -327,7 +341,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
                 type: {
                     type: 'string',
                     description:
-                        'classic: location, company, current_company, past_company, school, industry, service_category, title, people. sales_nav adds function, seniority, company_type, profile_language, relationship, lead_interactions, persona, account_list, lead_list. recruiter adds zip, skill, group, occupation, project, company_size, connection_degree, workplace, joined_within, activity_type, scope.',
+                        'classic: location, company, current_company, past_company, school, industry, service_category, title, people. sales_nav: company, current_company, past_company, industry, school, location, title, function, seniority, company_type, profile_language, relationship, lead_interactions, persona, people, account_list, lead_list. recruiter: company, current_company, past_company, location, zip, skill, school, industry, group, occupation, title, project, seniority, function, company_size, connection_degree, workplace, profile_language, joined_within, activity_type, scope.',
                 },
                 category: { type: 'string', enum: ['classic', 'sales_nav', 'recruiter'] },
                 keyword: { type: 'string', description: 'Required for classic. Leave out on sales_nav to list a fixed facet' },
@@ -457,7 +471,6 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         },
         category: 'network',
         action: 'invite_to_event',
-        quota: { action: 'invitation', amount: args => (Array.isArray(args.profiles) ? Math.min(args.profiles.length, 50) : 1) },
     },
     {
         name: 'follow',
@@ -1071,10 +1084,11 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     {
         name: 'recruiter_get_cv',
         scope: 'recruiter',
-        description: `${RECRUITER} The CV an applicant attached, base64-encoded.`,
+        description: `${RECRUITER} The CV an applicant attached, saved into your files: the answer gives the candidate and the path of the file.`,
         inputSchema: { type: 'object', properties: { application_id: { type: 'string' } }, required: ['application_id'] },
         category: 'recruiter',
         action: 'get_cv',
+        run: saveCv,
     },
     {
         name: 'recruiter_create_job',

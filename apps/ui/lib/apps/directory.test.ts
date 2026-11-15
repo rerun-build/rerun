@@ -80,9 +80,9 @@ describe('reading the directory', () => {
 })
 
 describe('running a tool by its name', () => {
-    it('finds the tool with or without the server prefix', () => {
+    it('finds the tool with or without the prefix a provider names it with', () => {
         const args = { profile_url: 'https://www.linkedin.com/in/jane-doe' }
-        for (const tool of ['visit_profile', 'linkedin_pro_visit_profile']) {
+        for (const tool of ['visit_profile', 'linkedin_pro_visit_profile', 'linkedin_pro__visit_profile', 'mcp__linkedin_pro__visit_profile']) {
             expect(resolveRunTool(linkedin, { tool, arguments: args })).toEqual({ tool: LINKEDIN_TOOLS.find(candidate => candidate.name === 'visit_profile'), args })
         }
     })

@@ -13,23 +13,23 @@ function timestamp(now: Date): string {
     return now.toISOString().slice(0, 19).replace(/[-:]/g, '').replace('T', '-')
 }
 
-async function copyToFiles(context: AppToolContext, body: ReadableStream<Uint8Array>, name: string, size: number | null): Promise<{ path: string; size: number } | { fileError: string }> {
+export async function copyToFiles(context: AppToolContext, body: ReadableStream<Uint8Array>, name: string, size: number | null): Promise<{ path: string; size: number } | { fileError: string }> {
     if (size !== null && size > MAX_UPLOAD_FILE_BYTES) {
         await body.cancel().catch(() => {})
-        return { fileError: `The file is over ${MAX_UPLOAD_FILE_BYTES / 1024 / 1024} MB, too large to copy into your files. Use the url.` }
+        return { fileError: `The file is over ${MAX_UPLOAD_FILE_BYTES / 1024 / 1024} MB, too large to copy into your files.` }
     }
     try {
         const conn = await context.engine()
         if (!(await engine.supportsStreamedUploads(conn))) {
             await body.cancel().catch(() => {})
-            return { fileError: 'Your machine is updating and cannot take the file yet. Use the url.' }
+            return { fileError: 'Your machine is updating and cannot take the file yet.' }
         }
         const result = await engine.uploadFileStream(conn, `/agents/${context.engineAgentId}/files`, { dir: `attachments/${context.slug}`, name: `${timestamp(new Date())}-${name}`, body, size })
         return { path: result.path, size: result.bytes }
     } catch (err) {
         await body.cancel().catch(() => {})
         console.warn(`[apps:${context.slug}] attachment copy failed`, err instanceof Error ? err.message : err)
-        return { fileError: 'The file could not be copied into your files. Use the url.' }
+        return { fileError: 'The file could not be copied into your files.' }
     }
 }
 
@@ -49,13 +49,15 @@ async function runDownload(context: AppToolContext, params: Record<string, unkno
         toTranscript && format ? transcribeStream(toTranscript, format, AbortSignal.timeout(TRANSCRIBE_TIMEOUT_MS)) : Promise.resolve<Transcription | null>(null),
     ])
 
+    const copied = 'fileError' in copy ? { fileError: `${copy.fileError} Use the url.` } : copy
+
     return {
         name,
         mimeType,
         size: file.size,
         url: link?.url ?? null,
         expiresAt: link?.expiresAt ?? null,
-        ...copy,
+        ...copied,
         ...(transcription ?? {}),
         ...(params.transcribe === true && !format ? { transcriptError: 'Only a voice note or an audio file can be transcribed.' } : {}),
     }

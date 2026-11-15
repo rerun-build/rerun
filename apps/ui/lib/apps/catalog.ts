@@ -25,7 +25,7 @@ export const APP_INFO: Record<AppSlug, AppInfo> = {
 // The two tools every paid app adds to its loaded ones: the directory of the rest, and the call that
 // runs a tool read there.
 export const APP_LIST_TOOLS = 'list_tools'
-export const APP_RUN_TOOL = 'run_tool'
+export { APP_RUN_TOOL } from '@rerun/contracts'
 
 export function appInfo(slug: AppSlug): AppInfo {
     return APP_INFO[slug]

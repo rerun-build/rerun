@@ -38,14 +38,10 @@ export async function isNewConversation(accountId: string, params: Record<string
     }
 }
 
-// A forward to a chat named by its conversation_id goes to someone the number already talks to.
+// A message or a forward to a chat named by its conversation_id goes to someone the number already
+// talks to.
 async function isNewRecipient(accountId: string, params: Record<string, unknown>): Promise<QuotaAction | null> {
     return params.phone_number ? isNewConversation(accountId, params) : null
-}
-
-// Adding people to a group reaches them the way a first message does.
-async function addsToGroup(_accountId: string, params: Record<string, unknown>): Promise<QuotaAction | null> {
-    return params.operation === 'add' ? 'new_conversation' : null
 }
 
 export const WHATSAPP_TOOLS: WhatsappTool[] = [
@@ -93,22 +89,22 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
     {
         name: 'send_message',
         description:
-            'Send a WhatsApp message to a number, as the user. Only to people who expect to hear from them: WhatsApp bans numbers that message strangers. Read the conversation with whatsapp_pro_get_conversation first and never send the same message twice. Attach files by public URL; an audio file goes as a voice note. To reply to one message, pass its id from the conversation as quoted_message_id.',
+            'Send a WhatsApp message to a number, or to a group or chat by its conversation_id, as the user. Only to people who expect to hear from them: WhatsApp bans numbers that message strangers. Read the conversation with whatsapp_pro_get_conversation first and never send the same message twice. Attach files by public URL; an audio file goes as a voice note. To reply to one message, pass its id from the conversation as quoted_message_id.',
         inputSchema: {
             type: 'object',
             properties: {
                 phone_number: phoneNumber,
+                conversation_id: conversationId,
                 message_text: { type: 'string' },
                 media_links: { type: 'array', items: { type: 'string' }, maxItems: 10, description: 'Public URLs of files to attach' },
                 voice_message: { type: 'boolean', description: 'Send the attached audio as a voice note even without an audio extension' },
                 quoted_message_id: { type: 'string', description: 'The id of the message this one replies to' },
             },
-            required: ['phone_number'],
         },
         category: 'messages',
         action: 'send',
         quota: { action: 'message' },
-        extraQuota: isNewConversation,
+        extraQuota: isNewRecipient,
     },
     {
         name: 'forward_message',
@@ -208,7 +204,6 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
         inputSchema: { type: 'object', properties: { name: { type: 'string' }, participants: phoneNumbers('Numbers in international format') }, required: ['name', 'participants'] },
         category: 'messages',
         action: 'create_group',
-        quota: { action: 'new_conversation' },
     },
     {
         name: 'get_group',
@@ -238,7 +233,6 @@ export const WHATSAPP_TOOLS: WhatsappTool[] = [
         },
         category: 'messages',
         action: 'update_group_participants',
-        extraQuota: addsToGroup,
     },
     {
         name: 'get_group_invite_link',

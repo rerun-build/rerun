@@ -13,15 +13,25 @@ describe('the WhatsApp tool set', () => {
         expect(new Set(WHATSAPP_TOOLS.map(candidate => candidate.name)).size).toBe(WHATSAPP_TOOLS.length)
     })
 
-    it('meters every message, and a first one twice', () => {
-        expect(tool('send_message').quota?.action).toBe('message')
-        expect(tool('send_message').extraQuota).toBe(isNewConversation)
+    it('meters every message, and a first one twice', async () => {
+        const send = tool('send_message')
+        expect(send.quota?.action).toBe('message')
+        vi.mocked(runAction).mockReset().mockResolvedValue({ total_message_count: 0, messages: [] })
+        await expect(send.extraQuota!('acc', { phone_number: '+33612345678', message_text: 'Hi' })).resolves.toBe('new_conversation')
     })
 
-    it('keeps only the declared parameters and needs a number to write to', () => {
+    it('writes in a group by its conversation_id, which is never a new conversation', async () => {
+        const send = tool('send_message')
+        vi.mocked(runAction).mockReset()
+        expect(toolParams(send, { conversation_id: '120363431168837418@g.us', message_text: 'Hi all' })).toEqual({ conversation_id: '120363431168837418@g.us', message_text: 'Hi all' })
+        expect(missingRequired(send, toolParams(send, { conversation_id: '120363431168837418@g.us', message_text: 'Hi all' }))).toEqual([])
+        await expect(send.extraQuota!('acc', { conversation_id: '120363431168837418@g.us', message_text: 'Hi all' })).resolves.toBeNull()
+        expect(runAction).not.toHaveBeenCalled()
+    })
+
+    it('keeps only the declared parameters', () => {
         const send = tool('send_message')
         expect(toolParams(send, { phone_number: '+33612345678', message_text: 'Hi', account_id: 'someone-else' })).toEqual({ phone_number: '+33612345678', message_text: 'Hi' })
-        expect(missingRequired(send, toolParams(send, { message_text: 'Hi' }))).toEqual(['phone_number'])
     })
 
     it('posts a Status through Linkup content, unmetered, with only its own parameters', () => {
@@ -57,11 +67,10 @@ describe('managing chats and groups', () => {
         await expect(forward.extraQuota!('acc', { message_id: 'm1', phone_number: '+33612345678' })).resolves.toBe('new_conversation')
     })
 
-    it('counts a new group, and people added to one, as a new conversation', async () => {
-        expect(tool('create_group').quota?.action).toBe('new_conversation')
+    it('creates a group and changes its participants without a limit of its own', () => {
+        expect([tool('create_group').quota, tool('create_group').extraQuota]).toEqual([undefined, undefined])
         const participants = tool('update_group_participants')
-        await expect(participants.extraQuota!('acc', { operation: 'add' })).resolves.toBe('new_conversation')
-        await expect(participants.extraQuota!('acc', { operation: 'remove' })).resolves.toBeNull()
+        expect([participants.quota, participants.extraQuota]).toEqual([undefined, undefined])
         expect(missingRequired(participants, toolParams(participants, { conversation_id: 'g@g.us', participants: ['+33612345678'] }))).toEqual(['operation'])
     })
 
