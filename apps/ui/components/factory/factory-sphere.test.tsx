@@ -56,7 +56,7 @@ describe('a task is a two-tone sphere', () => {
 
     it('shows one sphere per task, and a red rim when held', () => {
         const { frame: f6, html: h6 } = render(6_000)
-        expect(orbs(h6).length).toBe(f6.pods.length) // the issue says eight; the sample loop has seven at 6 s
+        expect(orbs(h6).length).toBe(f6.pods.length)
         const { frame, html } = render(50_000)
         expect(frame.held).toBe(true)
         const held = orbs(html).filter(o => o.includes('data-state="held"'))

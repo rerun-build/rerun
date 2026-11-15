@@ -2,7 +2,7 @@ export const PEAK_COUNT = 48
 
 export const MAX_RECORDING_MS = 5 * 60 * 1000
 
-const MAX_LEVEL = 35 // 'z', the last base36 digit
+const MAX_LEVEL = 35
 
 function clamp01(value: number): number {
     if (!Number.isFinite(value)) return 0

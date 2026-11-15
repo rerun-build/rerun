@@ -89,8 +89,8 @@ export type PublishedAccessMode = 'public' | 'workspace' | 'password' | 'invited
 
 export type PublishResult = {
     status: 'published'
-    url: string // <slug>.rerun.site, or /p/<slug> where no publish host is configured
-    fileUrl: string | null // the bytes of a single file, for a service that downloads it; null for a page or a site
+    url: string
+    fileUrl: string | null
     slug: string
     path: string
     kind: 'file' | 'site'

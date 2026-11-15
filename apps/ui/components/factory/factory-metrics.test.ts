@@ -8,7 +8,7 @@ const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')
 const sample = (): FactorySnapshot => factorySnapshotSchema.parse(JSON.parse(readFileSync(SAMPLE, 'utf8')))
 const counts = { queued: 3, building: 2, review: 1, checks: 1, merged: 4, runs: 5 }
-const NOW = new Date(2026, 10, 14, 15, 0, 0).getTime() // local
+const NOW = new Date(2026, 10, 14, 15, 0, 0).getTime()
 const START = NOW - 5 * 60_000
 
 const withRuns = (runs: ((typeof sample extends () => infer S ? S : never)['jobs'][number]['runs']) | undefined): FactorySnapshot => {
@@ -75,7 +75,7 @@ describe('barModel', () => {
         expect(bar(withRuns([run(today, 0, 0)])).values.totalTokens).toEqual(dash)
         expect(bar(withRuns([run(today, 0, 0), run(today, 0, 0)])).values.totalTokens).toEqual(dash)
         expect(bar(withRuns([run(yesterday, 900, 100)])).values.totalTokens).toEqual(dash)
-        expect(bar(withRuns([run(today, 0, 0)])).values.runs.text).toBe('1') // the run still counts as a run
+        expect(bar(withRuns([run(today, 0, 0)])).values.runs.text).toBe('1')
     })
 
     it('adds only the known runs: a 0/0 run next to a counted one changes nothing, and 0 in one field alone is a known count', () => {

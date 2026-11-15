@@ -13,16 +13,16 @@ const PITCH = LINK_PITCH * S
 const HALF = (BELT_WIDTH / 2 / AXIS_PX) * S
 
 const BEND = 4
-const SHARE = 0.02 // per lattice step: a long shared run must not outweigh the choice of face
+const SHARE = 0.02
 const CROSS = 8
-const NEAR = 0.3 // a step within two cells of a tile: lines keep to the middle of open floor
+const NEAR = 0.3
 const NEAR_CELLS = 2 * S
-const OFF_FACE = 6 // an end on the face beside the one looking at the other end
-const AWAY_FACE = 12 // an end on a face turned away from it
-const CLEAR = 1 // lattice lines closer than half a cell to a tile are closed
-const WINDOW = 6 * S // floor around the two tiles
-const MAX_CELLS = 60_000 // the largest window searched, in lattice points
-const MAX_STEPS = 30_000 // lattice states expanded per search
+const OFF_FACE = 6
+const AWAY_FACE = 12
+const CLEAR = 1
+const WINDOW = 6 * S
+const MAX_CELLS = 60_000
+const MAX_STEPS = 30_000
 const LANES = [0, -0.5, 0.5, -1, 1, -1.5, 1.5, -2, 2]
 
 const RANK: Record<NonNullable<TileLink['variant']>, number> = { belt: 0, cable: 1, trace: 2, beam: 3 }
@@ -392,7 +392,7 @@ export function routeTileLinks(tiles: RoutedTile[], links: RoutedLink[], obstacl
     for (const route of routes) {
         if (!route.straight) continue
         const head = route.segs[0], tail = route.segs[2]
-        const gap = head.c - tail.c // how far the target's end must move to meet the source's
+        const gap = head.c - tail.c
         if (Math.abs(gap) < 1e-9) continue
         const fromKey = keyOf(route.from), toKey = keyOf(route.to)
         const fewerAtTarget = groups.get(toKey)!.length <= groups.get(fromKey)!.length

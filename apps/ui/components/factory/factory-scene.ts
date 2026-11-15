@@ -68,7 +68,7 @@ const SPEC: JobSpec[] = [
     { issue: 339, title: 'Phone width', start: 49_000, build: 8_500, review: 3_500, checks: 4_000 },
 ]
 const QUEUE_MS = 2_500
-const VERDICT_MS = 1_300 // the last stretch of a review, when the scanner shows its verdict
+const VERDICT_MS = 1_300
 
 type LegKind = 'queued' | 'build' | 'review' | 'fixing' | 'checks' | 'complete' | 'rejecting'
 type Leg = { kind: LegKind; from: number; to: number; verdict?: 'pass' | 'fail'; level: [number, number] }
@@ -117,17 +117,17 @@ export type Band = 'build' | 'review' | 'checks' | 'merge'
 export type PodView = {
     id: string; issue: number; title: string
     path: string[]; travel: number; queue: number
-    level: number // 0..1, how full the task's sphere is
-    band: Band // the stage colouring the sphere now
+    level: number
+    band: Band
     state: 'queued' | 'held' | 'working' | 'fixing' | 'checks' | 'complete' | 'rejected'
-    verdict?: 'pass' | 'fail' // set while the scanner shows it, at the end of a review
-    scan: number // 0..1 through a review, for the scanner's sweep
-    since?: number // epoch ms the task entered its stage
-    holder?: string // the coworker and its copy, `code · 3`
+    verdict?: 'pass' | 'fail'
+    scan: number
+    since?: number
+    holder?: string
     pr?: number
 }
 export const STATUS_COLOR = { queued: '#8ea2ff', held: '#ef4444', build: '#f5a524', review: '#2dd4a3', fixing: '#fb923c', checks: '#6ea8ff', complete: '#ffe08a', rejected: '#f87171' } as const
-export type SlotView = { issue: number; state: 'empty' | 'merged' | 'rejected'; arriving: number } // arriving: 0..1 while sliding in
+export type SlotView = { issue: number; state: 'empty' | 'merged' | 'rejected'; arriving: number }
 export type CabinetView = Feature & { slots: SlotView[] }
 
 export type FactoryFrame = {
@@ -137,7 +137,7 @@ export type FactoryFrame = {
     toasts: TileToast[]
     pods: PodView[]
     cabinets: CabinetView[]
-    rejects: number // tasks in the reject bin
+    rejects: number
     held: boolean
     holdLeftMs: number
     counts: { queued: number; building: number; review: number; checks: number; merged: number; runs: number }

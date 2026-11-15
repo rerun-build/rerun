@@ -216,7 +216,7 @@ describe('FactoryTasks', () => {
             expect(sections[0]).toBe('problems')
             expect(Array.from(group('problems')!.querySelectorAll('[data-row]')).map((r) => r.textContent?.match(/#(\d+)/)?.[1])).toEqual(['5', '6', '7', '8'])
             expect(group('problems')!.textContent).toContain('why')
-            expect(host.querySelectorAll('[data-row]').length).toBe(6) // 4 problems, 1 active, 1 waiting; the merged are folded
+            expect(host.querySelectorAll('[data-row]').length).toBe(6)
         })
 
         it('folds Ended today and Earlier by default and shows their counts on the headings', () => {

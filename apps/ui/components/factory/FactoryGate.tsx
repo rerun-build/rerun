@@ -3,7 +3,7 @@
 import { type P } from './factory-rest'
 import { type PodView } from './factory-scene'
 
-const HW = 34, HH = 28, CY = 30 // half-width, half-height, centre height above the belt point
+const HW = 34, HH = 28, CY = 30
 const GREY = '#5b6485', PASS = '#2dd4a3', FAIL = '#ef4444', STEEL = '#9fb0e8'
 
 export function Gate({ pod, at, children }: { pod: PodView; at: P; children: React.ReactNode }) {

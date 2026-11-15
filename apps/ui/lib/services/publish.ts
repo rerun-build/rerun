@@ -26,7 +26,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 
 export const PUBLISHED_BUCKET = 'published'
-const MAX_PUBLISH_BYTES = 25 * 1024 * 1024 // 25 MB — keep well under Storage's per-object limit.
+const MAX_PUBLISH_BYTES = 25 * 1024 * 1024
 const MAX_SITE_FILES = 300
 const MAX_SITE_DEPTH = 8
 const MAX_SITE_BYTES = 50 * 1024 * 1024

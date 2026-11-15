@@ -2,8 +2,8 @@
 
 import { type P } from './factory-rest'
 
-const HALF = 18 // half of the 36 px flat side
-const BULGE = 12 // depth of the half-disc
+const HALF = 18
+const BULGE = 12
 const RED = '#ef4444', EDGE = '#7f1d1d', PILL = '#b91c1c'
 
 export const formatLeft = (ms: number) => {

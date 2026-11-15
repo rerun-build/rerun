@@ -34,29 +34,29 @@ const factoryRunSchema = z.object({
 
 export const factoryJobSchema = z.object({
     issue: z.number().int().positive(),
-    title: z.string().max(256), // GitHub's own limit for an issue title
+    title: z.string().max(256),
     state: factoryJobStateSchema,
-    enteredAt: isoTime, // when the job entered its state
+    enteredAt: isoTime,
     pr: z.number().int().positive().nullable(),
-    round: z.number().int().min(1).max(9).nullable(), // the review round
-    coworker: z.string().max(64).nullable(), // who holds it now
-    copy: z.number().int().min(1).max(32).nullable(), // which run of that coworker
-    steps: count.nullable(), // steps of the current run
+    round: z.number().int().min(1).max(9).nullable(),
+    coworker: z.string().max(64).nullable(),
+    copy: z.number().int().min(1).max(32).nullable(),
+    steps: count.nullable(),
     tokensIn: count.nullable(),
     tokensOut: count.nullable(),
-    parent: z.number().int().positive().nullable(), // the feature it was cut from, when the cut names one
+    parent: z.number().int().positive().nullable(),
     dependsOn: z.array(z.number().int().positive()).max(20),
-    closedOutside: z.literal(true).optional(), // its issue was closed by hand with no merged pull request
-    reason: z.string().max(300).nullable(), // why it waits, or why it ended blocked, failed or returned
-    history: z.array(factoryHistoryEntrySchema).max(30).optional(), // oldest first
+    closedOutside: z.literal(true).optional(),
+    reason: z.string().max(300).nullable(),
+    history: z.array(factoryHistoryEntrySchema).max(30).optional(),
     runs: z.array(factoryRunSchema).max(12).optional(),
-    department: factoryDepartmentSchema.optional(), // the main department
-    departments: z.array(factoryDepartmentSchema).max(6).optional(), // the other ones touched
+    department: factoryDepartmentSchema.optional(),
+    departments: z.array(factoryDepartmentSchema).max(6).optional(),
 }).strict()
 
 export const factoryEpicSchema = z.object({
     issue: z.number().int().positive(),
-    title: z.string().max(256), // as the job title
+    title: z.string().max(256),
     kind: factoryEpicKindSchema,
 }).strict()
 

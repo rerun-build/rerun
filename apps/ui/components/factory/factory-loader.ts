@@ -1,6 +1,6 @@
 import type { FactoryJobState, FactorySnapshot, FactoryWorkerType } from '@rerun/contracts'
 
-export const BEAT_MS = 30_000 // same as from-snapshot.ts
+export const BEAT_MS = 30_000
 
 export type LoaderView = {
     alive: { beat: number; lastBeatAt: string; ageMs: number; answering: boolean }

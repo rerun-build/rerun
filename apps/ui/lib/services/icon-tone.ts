@@ -3,7 +3,7 @@ import type { BrandIconTone } from '@rerun/ui/brand-icon'
 export type Rgb = readonly [red: number, green: number, blue: number]
 
 export const DARK_ICON_SURFACE: Rgb = [10, 10, 10]
-export const LIGHT_ICON_SURFACE: Rgb = [250, 250, 250] // oklch(0.98 0 0), cf. theme.css
+export const LIGHT_ICON_SURFACE: Rgb = [250, 250, 250]
 export const MIN_GRAPHIC_CONTRAST = 3
 
 const PALE_INK_CONTRAST = 1.5

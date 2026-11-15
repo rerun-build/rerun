@@ -19,12 +19,12 @@ export type TileStyle = {
     image?: string
     imageFilter?: string
     depth?: number
-    shimmer?: boolean // sheen animé sur les faces (statut « working »)
-    sheen?: boolean // reflet spéculaire STATIQUE sur la face du dessus (look métal) ; ≠ shimmer
-    stripes?: boolean | 'hover' // rayures diagonales ; 'hover' = uniquement au survol/sélection
-    errorPulse?: boolean // overlay rouge pulsant (statut « error »)
-    pingRings?: boolean // anneaux cyan + halo (statut « waiting_human »)
-    badge?: 'hand' | 'lock' | null // pictogramme au-dessus de la tile
+    shimmer?: boolean
+    sheen?: boolean
+    stripes?: boolean | 'hover'
+    errorPulse?: boolean
+    pingRings?: boolean
+    badge?: 'hand' | 'lock' | null
     status?: TileStatus
     countdown?: TileCountdown
     results?: TileResults
@@ -100,12 +100,12 @@ export type TilePinnedStatus = {
 
 export type Tile = {
     id: string
-    position: GridPosition // ancre = cellule nord (coin haut) du footprint
-    span?: number // footprint N×N de la tile (1, 2, 3…) ; défaut DEFAULT_SPAN (=2)
-    containerId?: string // si défini, borne le drag/placement à l'intérieur de ce container
+    position: GridPosition
+    span?: number
+    containerId?: string
     style: TileStyle
-    selectable?: boolean // gate la sélection ; défaut: true si onTileSelect fourni
-    draggable?: boolean // gate le drag ; défaut: true si onTileMove fourni
+    selectable?: boolean
+    draggable?: boolean
     highlighted?: boolean
     dimmed?: boolean
     justPlaced?: boolean

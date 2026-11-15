@@ -1033,7 +1033,7 @@ export const IsoGrid = memo(function IsoGrid(props: IsoGridProps) {
         : boxDrag
           ? 'cursor-grabbing'
           : engagedHandle
-          ? // À l'écran, les pointes haut/bas du losange se déplacent verticalement, gauche/droite horizontalement.
+          ?
             engagedHandle === 'top' || engagedHandle === 'bottom'
               ? 'cursor-ns-resize'
               : 'cursor-ew-resize'
