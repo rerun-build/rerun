@@ -1,6 +1,7 @@
+import type { UIMessageStreamWriter } from 'ai'
 import { setAgentStatus } from '../db/repos/agents.js'
 
-type RunHandle = { controller: AbortController; agentId: string; cancel?: () => void }
+type RunHandle = { controller: AbortController; agentId: string; cancel?: () => void; writer?: UIMessageStreamWriter }
 
 const controllers = new Map<string, RunHandle>()
 
@@ -9,9 +10,9 @@ type SessionClaim = { runId: string; claimedAt: number; authorId?: string }
 const sessionClaims = new Map<string, SessionClaim>()
 const claimedSessions = new Map<string, string>()
 
-export function registerRunAbort(runId: string, agentId: string): AbortController {
+export function registerRunAbort(runId: string, agentId: string, writer?: UIMessageStreamWriter): AbortController {
     const controller = new AbortController()
-    controllers.set(runId, { controller, agentId })
+    controllers.set(runId, { controller, agentId, writer })
     return controller
 }
 
@@ -69,4 +70,18 @@ export function abortRun(runId: string): boolean {
     handle.controller.abort()
     handle.cancel?.()
     return true
+}
+
+export function announceToAgentRuns(agentId: string, part: Parameters<UIMessageStreamWriter['write']>[0]): number {
+    let written = 0
+    for (const handle of controllers.values()) {
+        if (handle.agentId !== agentId || !handle.writer) continue
+        try {
+            handle.writer.write(part)
+            written++
+        } catch {
+            continue
+        }
+    }
+    return written
 }
