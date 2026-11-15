@@ -1,10 +1,13 @@
 import { opencodeUsageSchema, type PlanLimitWindow, type PlanLimits } from '@rerun/contracts'
+import { saveReadings } from './plan-readings.js'
 
 const readings = new Map<string, PlanLimits>()
 
 export function recordPlanLimits(connectionId: string, windows: PlanLimitWindow[]): void {
     if (!windows.length) return
-    readings.set(connectionId, { windows, capturedAt: new Date().toISOString() })
+    const capturedAt = new Date().toISOString()
+    readings.set(connectionId, { windows, capturedAt })
+    void saveReadings(connectionId, windows, capturedAt).catch(() => {})
 }
 
 export function readPlanLimits(connectionId: string): PlanLimits | null {
