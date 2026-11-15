@@ -9,6 +9,7 @@ import planners
 import pools
 import proof
 import renewal
+import slots
 import snapshot
 import states
 import store as ledger_store
@@ -289,6 +290,7 @@ class Dispatcher:
         self.started = now()
         self.names = pools.names(cfg)
         self.planners = planners.Planners(cfg, account, gh)
+        self.quota = None
 
     def fill_ids(self):
         missing = [c for t in (self.cfg.get("types") or {}).values() for c in t.get("coworkers", []) if not c.get("id")]
@@ -325,6 +327,26 @@ class Dispatcher:
 
     def busy(self):
         return {j["agent"] for j in self.jobs() if j["state"] in RUNNING and j.get("agent")}
+
+    def slot_quotas(self):
+        total = self.cfg.get("slots")
+        if not total:
+            return None
+        waiting = {}
+        for j in self.jobs():
+            s = slots.station(j)
+            if s:
+                waiting[s] = waiting.get(s, 0) + 1
+        return slots.quotas(waiting, len(self.running()), total)
+
+    def take(self, j):
+        if self.quota is None:
+            return True
+        s = slots.station(j)
+        if self.quota.get(s, 0) <= 0:
+            return False
+        self.quota[s] -= 1
+        return True
 
     def running(self):
         return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")]
@@ -665,7 +687,7 @@ class Dispatcher:
             return
         if st == "queued":
             got = self.free(j.get("worker", "coder"))
-            if got:
+            if got and self.take(j):
                 self.start(j, got[0], "build", "building", copy=got[1], builder=got[0])
         elif st == "building":
             out = self.finished_run(j)
@@ -683,7 +705,7 @@ class Dispatcher:
             if self.conflicts(j):
                 return
             got = self.free("reviewer")
-            if not got:
+            if not got or not self.take(j):
                 return
             r = got[0]
             head = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "headRefOid"]))["headRefOid"]
@@ -711,7 +733,7 @@ class Dispatcher:
                 self.end(j, "rejected", verdict[:200] or last_line(out))
         elif st == "fix_wait":
             copy = self.free_copy_of(j["builder"])
-            if copy is not None:
+            if copy is not None and self.take(j):
                 self.start(j, j["builder"], "fix of #%s" % j["pr"], "fixing", copy=copy)
         elif st == "fixing":
             out = self.finished_run(j)
@@ -725,7 +747,7 @@ class Dispatcher:
             self.checks(j)
         elif st == "proof_wait":
             got = self.free_prover(j)
-            if got:
+            if got and self.take(j):
                 self.start(j, got[0], "proof of #%s at %s" % (j["pr"], j["head"][:7]), "proving", copy=got[1], prover=got[0], asks=proof.asks(j.get("body")))
         elif st == "proving":
             out = self.finished_run(j)
@@ -888,6 +910,7 @@ class Dispatcher:
                     log(n, "closed: likely-fixed for %d days" % self.cfg["likely_fixed_days"])
             except (Error, ValueError, KeyError) as e:
                 log("-", "backlog: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        self.quota = self.slot_quotas()
         for j in self.jobs():
             try:
                 if j["state"] not in END:

@@ -11,6 +11,7 @@
   "auto_plan_marker": true,
   "likely_fixed_days": 7,
   "proof": true,
+  "slots": 15,
   "ledger_file": "/state/ledger.db",
   "json_state_file": "/state/dispatch.json",
   "account_key_file": "/run/secrets/account_key",
