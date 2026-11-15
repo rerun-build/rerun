@@ -893,7 +893,8 @@ class Goals(Base):
         self.w.finish("r1", "VERDICT: REJECT @abcdef1: no")
         self.tick(2)
         self.assertEqual(goals, [
-            {"lastLineForms": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"}], "turnLimit": 3},
+            {"lastLineForms": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"},
+                               {"prefix": "DONE ELSEWHERE: ", "rest": "sentence"}], "turnLimit": 3},
             {"lastLineForms": [{"prefix": "VERDICT: ", "rest": "sentence"}], "turnLimit": 3},
             {"lastLineForms": [{"prefix": "PUSHED: ", "rest": "sha"}, {"prefix": "BLOCKED: ", "rest": "sentence"}], "turnLimit": 3}])
 
