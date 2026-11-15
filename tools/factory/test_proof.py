@@ -73,7 +73,23 @@ class Judge(unittest.TestCase):
 
     def test_missing_line(self):
         self.assertEqual(proof.judge("nothing", 1, HEAD), ("none", "no PROOF line"))
-        self.assertEqual(proof.judge("PROOF: PASS", 1, HEAD), ("none", "no PROOF line"))
+        self.assertEqual(
+            proof.judge("PROOF: PASS", 1, HEAD),
+            ("none", "proof names no commit, the head is abcdef1"),
+        )
+        self.assertEqual(proof.judge("PROOF: nothing to say", 1, HEAD), ("none", "no PROOF line"))
+
+    def test_at_names_the_commit(self):
+        self.assertEqual(proof.judge(met(1) + "\nPROOF: PASS at abcdef1", 1, HEAD), ("pass", None))
+        self.assertEqual(proof.judge("PROOF: FAIL at abcdef1: 1, 3", 3, HEAD), ("fail", "1, 3"))
+        self.assertEqual(
+            proof.judge("PROOF: PASS at 1234567", 1, HEAD),
+            ("none", "proof names 1234567, the head is abcdef1"),
+        )
+        self.assertEqual(
+            proof.judge("PROOF: FAIL", 1, HEAD),
+            ("none", "proof names no commit, the head is abcdef1"),
+        )
 
 
 if __name__ == "__main__":
