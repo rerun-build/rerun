@@ -1,0 +1,150 @@
+import json, os, sys, unittest
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import test_dispatch as T
+
+HEAD = T.HEAD
+BODY = "\n".join([
+    "PLAN READY",
+    "**Depends on**: none",
+    "**Worker**: coder",
+    "**Files**",
+    "- `a/b.py`",
+    "- `a/test_b.py`",
+    "**Test file**: `a/test_b.py`",
+    "**Change**",
+    "- first ask",
+    "- second ask",
+    "**Done-test**",
+    "- t",
+    "**Run**",
+    "```",
+    "cd a && run1",
+    "cd b && run2",
+    "```",
+])
+MET = "\n".join("ASK %d: MET a/b.py:%d test_%d" % (n, n, n) for n in range(1, 6))
+
+
+def met(missing=(), notmet=()):
+    lines = []
+    for n in range(1, 6):
+        if n in missing:
+            continue
+        lines.append("ASK %d: NOT MET no test" % n if n in notmet else "ASK %d: MET a/b.py:%d test_%d" % (n, n, n))
+    return "\n".join(lines)
+
+
+class ProofBase(T.Base):
+    def setUp(self):
+        super().setUp()
+        self.cfg["proof"] = True
+        self.w.issues[0]["body"] = BODY
+        self.w.workflows[HEAD] = [T.wf("ci", "success")]
+
+    def to_proof_wait(self):
+        self.to_checks()
+        self.tick()
+
+    def to_proving(self):
+        self.to_proof_wait()
+        self.tick()
+
+
+class Proof(ProofBase):
+    def test_green_checks_wait_for_a_prover_and_do_not_merge(self):
+        self.to_proof_wait()
+        self.assertEqual(self.state(), "proof_wait")
+        self.assertEqual(self.w.merges, [])
+
+    def test_prover_is_neither_builder_nor_reviewer_and_gets_the_asks(self):
+        self.to_proving()
+        self.assertEqual(self.state(), "proving")
+        agent, msg, _ = self.w.sends[-1]
+        self.assertEqual(agent, "r2")
+        for want in ("ASK 1: first ask", "ASK 2: second ask", "ASK 3: Done-test", "ASK 4: cd a && run1", "ASK 5: cd b && run2",
+                     "PROOF: PASS @<first 7 characters of the commit>"):
+            self.assertIn(want, msg)
+        self.assertNotIn("ASK 6", msg)
+        data = json.loads(self.w.rows("SELECT data FROM jobs WHERE job='5'")[0][0])
+        self.assertEqual(data["prover"], "r2")
+
+    def test_without_a_free_prover_the_job_keeps_waiting(self):
+        self.cfg["reviewers"] = [{"id": "r1", "name": "R1"}]
+        self.to_proof_wait()
+        sent = len(self.w.sends)
+        self.tick(3)
+        self.assertEqual(self.state(), "proof_wait")
+        self.assertEqual(len(self.w.sends), sent)
+
+    def test_pass_with_every_ask_met_goes_back_to_checks_and_merges(self):
+        self.to_proving()
+        self.w.finish("r2", MET + "\nPROOF: PASS @abcdef1")
+        self.tick()
+        self.assertEqual(self.state(), "checks")
+        self.tick()
+        self.assertEqual(self.state(), "merged")
+        self.assertEqual(len(self.w.merges), 1)
+
+    def test_pass_naming_four_of_five_asks_goes_to_fix(self):
+        self.to_proving()
+        self.w.finish("r2", met(missing=(5,)) + "\nPROOF: PASS @abcdef1")
+        self.tick()
+        self.assertEqual(self.state(), "fix_wait")
+        self.assertIn("PASS names 4 of the 5 asks", self.w.rows("SELECT data FROM jobs WHERE job='5'")[0][0])
+
+    def test_pass_with_an_ask_not_met_goes_to_fix(self):
+        self.to_proving()
+        self.w.finish("r2", met(notmet=(5,)) + "\nPROOF: PASS @abcdef1")
+        self.tick()
+        self.assertEqual(self.state(), "fix_wait")
+        self.assertIn("PASS with asks not met: 5", self.w.rows("SELECT data FROM jobs WHERE job='5'")[0][0])
+
+    def test_a_second_failed_proof_ends_rejected(self):
+        self.to_proving()
+        self.w.finish("r2", "PROOF: FAIL @abcdef1: 4, 5")
+        self.tick()
+        self.assertEqual(self.state(), "fix_wait")
+        self.tick()
+        self.w.finish("b1", "PUSHED: fix")
+        self.tick(2)
+        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.tick(2)
+        self.assertEqual(self.state(), "proof_wait")
+        self.tick()
+        self.w.finish("r2", "PROOF: FAIL @abcdef1: 4")
+        self.tick()
+        self.assertEqual(self.state(), "rejected")
+        self.assertEqual(self.w.merges, [])
+
+    def test_a_proof_naming_another_commit_ends_rejected(self):
+        self.to_proving()
+        self.w.finish("r2", MET + "\nPROOF: PASS @1234567")
+        self.tick()
+        self.assertEqual(self.state(), "rejected")
+        self.assertIn("proof names 1234567, the head is abcdef1", self.w.issue(5)["comments"][-1])
+
+    def test_an_output_without_a_proof_line_ends_rejected(self):
+        self.to_proving()
+        self.w.finish("r2", "done, looks fine")
+        self.tick()
+        self.assertEqual(self.state(), "rejected")
+        self.assertIn("no PROOF line", self.w.issue(5)["comments"][-1])
+
+
+class Deployed(unittest.TestCase):
+    def test_dispatch_json_turns_the_step_on(self):
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dispatch.json")) as f:
+            self.assertIs(json.load(f).get("proof"), True)
+
+
+class ProofOff(T.Base):
+    def test_without_the_key_green_checks_still_merge(self):
+        self.w.workflows[HEAD] = [T.wf("ci", "success")]
+        self.to_checks()
+        self.tick()
+        self.assertEqual(self.state(), "merged")
+        self.assertEqual(len(self.w.merges), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
