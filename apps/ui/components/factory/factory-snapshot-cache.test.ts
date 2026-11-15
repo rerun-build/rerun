@@ -17,7 +17,7 @@ describe('factory snapshot cacheRead', () => {
 
     it('keeps cacheRead through parsing and the sample carries it on the runs of #331 and #335', () => {
         const parsed = factorySnapshotSchema.parse(sample())
-        const runs = (issue: number) => parsed.jobs.find(j => j.issue === issue)!.runs
+        const runs = (issue: number) => parsed.jobs.find(j => j.issue === issue)!.runs!
         expect(runs(331)[0].cacheRead).toBe(900)
         expect(runs(335).map(r => r.cacheRead)).toEqual([1500, 600, 800])
         expect(runs(330)[0].cacheRead).toBeUndefined()
