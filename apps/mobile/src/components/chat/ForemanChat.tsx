@@ -33,7 +33,8 @@ export const LAST_CONVERSATION = 'last'
 
 const FOREMAN: Omit<ChatCoworker, 'role'> = { id: FOREMAN_AGENT_ID, kind: 'foreman', name: FOREMAN_DISPLAY_NAME, status: 'idle' }
 
-const TITLE_DELAY_MS = 4000
+const TITLE_POLL_MS = 2000
+const TITLE_POLL_MAX = 5
 
 type SurfaceState = ForemanSurface | 'loading' | 'error'
 
@@ -191,12 +192,34 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         showDraft()
     }
 
+    const titleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+    useEffect(
+        () => () => {
+            if (titleTimer.current) clearTimeout(titleTimer.current)
+            titleTimer.current = undefined
+        },
+        []
+    )
+
     const onSessionCreated = useCallback(
         (id: string) => {
             setBornKeys(known => ({ ...known, [id]: draftKey }))
             setDraftKey(`new-${Date.now()}`)
             open(id)
-            if (accessToken && workspaceId) setTimeout(() => readLastTitle({ accessToken, workspaceId }), TITLE_DELAY_MS)
+            if (titleTimer.current) clearTimeout(titleTimer.current)
+            titleTimer.current = undefined
+            if (!accessToken || !workspaceId) return
+            let reads = 0
+            const poll = () => {
+                titleTimer.current = setTimeout(() => {
+                    reads += 1
+                    readLastTitle({ accessToken, workspaceId }).then(last => {
+                        if (last?.sessionId === id && last.title) return
+                        if (reads < TITLE_POLL_MAX && titleTimer.current !== undefined) poll()
+                    })
+                }, TITLE_POLL_MS)
+            }
+            poll()
         },
         [draftKey, open, accessToken, workspaceId, readLastTitle]
     )
