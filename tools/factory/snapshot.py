@@ -21,6 +21,8 @@ DEPARTMENTS = (
     ("tools/factory", "tooling"), (".github", "tooling"), ("deploy", "tooling"), ("docs", "docs"),
 )
 MAX_BYTES = 256 * 1024
+MAX_PLANS = 5
+MAX_RUNS = 8
 
 
 def iso(t):
@@ -159,6 +161,13 @@ def _job(store, cfg, names, j):
     return job
 
 
+def _plan(p):
+    runs = [{"id": str(c["id"])[:64], "name": str(c["name"])[:64], "runId": str(c["runId"])[:64], "startedAt": c["startedAt"],
+             "steps": None if c.get("steps") is None else max(0, int(c["steps"]))} for c in p["coworkers"][:MAX_RUNS]]
+    return {"parent": int(p["parent"]), "title": str(p["title"])[:256], "coworkers": runs,
+            "children": max(0, int(p["children"])), "filed": max(0, int(p["filed"]))}
+
+
 def _size(v):
     return len(json.dumps(v, separators=(",", ":")).encode())
 
@@ -179,7 +188,7 @@ def _fit(snap):
     return snap
 
 
-def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None):
+def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planning=None):
     names = pools.names(cfg)
     all_jobs = store.jobs()
     live = [j for j in all_jobs if j["state"] not in END]
@@ -204,4 +213,6 @@ def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None):
     snap = {"version": 1, "madeAt": iso(now), "beat": beat, "repo": cfg["repo"],
             "jobs": [_job(store, cfg, names, j) for j in kept], "holds": holds_list, "pools": pool_list,
             "endedToday": ended_today, "epics": _epics(store, kept, read_epic)}
+    if planning:
+        snap["planning"] = [_plan(p) for p in planning[:MAX_PLANS]]
     return _fit(snap)
