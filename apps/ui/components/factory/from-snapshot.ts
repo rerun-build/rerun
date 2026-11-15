@@ -75,10 +75,12 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
                 pod(dedupe(['Delegator', 'code', job.coworker === 'LARRY' ? 'LARRY' : holderOf(job, 'code')]), clamp(since / 2_240), 'build', 'working', 0.4)
                 break
             case 'review_wait':
+            case 'proof_wait':
                 counts.review++
                 pod(['code', 'LINUS'], 0.5, 'review', 'queued', 0.4)
                 break
             case 'reviewing':
+            case 'proving':
                 counts.review++
                 counts.runs++
                 pod(dedupe(['code', 'LINUS', job.coworker === 'BRUCE' ? 'BRUCE' : holderOf(job, 'LINUS')]), clamp(since / 2_240), 'review', 'working', Math.min(0.7, 0.4 + 0.05 * steps), { scan: clamp(since / 3_000) % 1 })

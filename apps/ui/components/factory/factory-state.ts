@@ -13,6 +13,8 @@ export const JOB_STATE_VIEW: Record<FactoryJobState, { icon: LucideIcon; color: 
     fix_wait: { icon: TriangleAlert, color: STATUS_COLOR.fixing },
     fixing: { icon: Wrench, color: STATUS_COLOR.fixing },
     checks: { icon: ShieldCheck, color: STATUS_COLOR.checks },
+    proof_wait: { icon: Hourglass, color: STATUS_COLOR.review },
+    proving: { icon: ScanEye, color: STATUS_COLOR.review },
     merged: { icon: GitMerge, color: STATUS_COLOR.complete },
     rejected: { icon: OctagonX, color: STATUS_COLOR.rejected },
     blocked: { icon: OctagonPause, color: STATUS_COLOR.rejected },
@@ -23,7 +25,7 @@ export const JOB_STATE_VIEW: Record<FactoryJobState, { icon: LucideIcon; color: 
 export type JobGroup = 'active' | 'waiting' | 'ended'
 
 export const JOB_GROUPS: Record<JobGroup, FactoryJobState[]> = {
-    active: ['building', 'review_wait', 'reviewing', 'fix_wait', 'fixing', 'checks'],
+    active: ['building', 'review_wait', 'reviewing', 'fix_wait', 'fixing', 'checks', 'proof_wait', 'proving'],
     waiting: ['waiting', 'queued'],
     ended: ['merged', 'rejected', 'blocked', 'failed', 'returned'],
 }

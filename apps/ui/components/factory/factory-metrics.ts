@@ -87,7 +87,7 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
         values: {
             queued: { text: inStates('waiting', 'queued') },
             building: { text: inStates('building', 'fix_wait', 'fixing') },
-            review: { text: inStates('review_wait', 'reviewing') },
+            review: { text: inStates('review_wait', 'reviewing', 'proof_wait', 'proving') },
             checks: { text: inStates('checks') },
             shipped: { text: String(snapshot.endedToday.merged) },
             runs: anyRuns ? { text: String(runCount) } : { ...NO_DATA },
