@@ -36,9 +36,9 @@ class Refresh(Base):
             self.addCleanup(setattr, D, name, getattr(D, name))
             setattr(D, name, fake)
 
-    def run_main(self, sleep, code=NEW, handlers=None, once=None):
+    def run_main(self, sleep, code=NEW, handlers=None, once=None, **extra):
         handlers = {} if handlers is None else handlers
-        patches = [self.env(FACTORY_CODE_SHA=code, DISPATCH_ACCOUNT_URL="http://account.invalid"),
+        patches = [self.env(FACTORY_CODE_SHA=code, DISPATCH_ACCOUNT_URL="http://account.invalid", **extra),
                    unittest.mock.patch.object(signal, "signal", lambda s, h: handlers.__setitem__(s, h)),
                    unittest.mock.patch.object(time, "sleep", sleep), contextlib.redirect_stdout(self.out)]
         if once:
@@ -168,6 +168,15 @@ class Refresh(Base):
         self.assertFalse(os.path.exists(self.cfg["heartbeat_file"]))
         self.assertNotIn("dispatcher started", self.out.getvalue())
         self.assertEqual(self.asked(), [RUNS, COMMITS])
+
+    def test_with_the_start_check_off_the_dispatcher_runs_its_beats_and_asks_only_at_beat_ten(self):
+        self.fake_main()
+        slept = []
+        self.assertEqual(self.run_main(self.capped(slept), code=OLD, FACTORY_START_CHECK="0"), 75)
+        self.assertEqual(slept, [1] * 270)
+        self.assertEqual(self.asked(), [RUNS, COMMITS])
+        self.assertEqual(self.written("beat-ok"), "10")
+        self.assertIn("dispatcher started", self.out.getvalue())
 
     def test_run_exits_75_after_the_tenth_beat_when_the_target_appears_later(self):
         self.fake_main()

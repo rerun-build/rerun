@@ -51,6 +51,7 @@ class World:
         os.makedirs(self.state)
         self.clock, self.compile_rc, self.fail, self.empty = 1000.0, 0, set(), set()
         self.procs, self.spawned, self.git_calls, self.slept, self.known = [], [], [], [], set()
+        self.make = None
         self.l = L.Launcher(state=self.state, app=self.app, repo="o/r", run=self.run, spawn=self.spawn,
                             clock=lambda: self.clock, sleep=self.sleep, env={"KEEP": "1"})
 
@@ -60,7 +61,7 @@ class World:
 
     def spawn(self, argv, env):
         self.spawned.append((argv, env))
-        return self.procs.pop(0)
+        return self.make(env) if self.make else self.procs.pop(0)
 
     def beat(self, n, name="beat-ok"):
         p = os.path.join(self.state, name)
@@ -140,6 +141,7 @@ class Launch(unittest.TestCase):
         self.assertEqual(argv, ["python3", "-u", os.path.join(self.w.app, "dispatch.py"), "run"])
         self.assertEqual(env["FACTORY_CODE_SHA"], "app")
         self.assertEqual(env["KEEP"], "1")
+        self.assertEqual(env["FACTORY_START_CHECK"], "1")
         self.assertNotIn("FACTORY_SKIP_SHA", env)
         self.assertEqual(self.w.git_calls, [])
 
@@ -291,7 +293,7 @@ class Launch(unittest.TestCase):
         self.assertTrue(third.terminated)
         self.assertEqual(self.w.record(), rec(good=OLD, trial=NEW))
 
-    def test_a_trial_that_exits_75_moves_to_the_newer_commit_and_is_not_rolled_back(self):
+    def test_a_trial_that_exits_75_moves_to_the_newer_commit_and_a_failed_switch_rolls_it_back(self):
         self.w.cloned(OLD, NEW)
         self.w.save(rec(good=OLD, trial=NEW))
         self.w.refresh_to(NEWER)
@@ -302,8 +304,58 @@ class Launch(unittest.TestCase):
         self.w.fail = {"fetch"}
         self.w.refresh_to(NEWER)
         self.step(Proc(self.w, 75))
-        self.assertEqual(self.w.record(), rec(good=OLD, trial=NEW))
-        self.assertEqual(self.w.slept[-1], 5)
+        self.assertEqual(self.w.record(), rec(good=OLD, skip=NEW))
+        self.assertIn("rolled back %s" % NEW[:7], self.out.getvalue())
+        self.step(Proc(self.w, 1))
+        self.assertEqual(self.w.spawned[-1][1]["FACTORY_CODE_SHA"], OLD)
+        self.assertEqual(self.w.spawned[-1][1]["FACTORY_START_CHECK"], "0")
+
+    def test_a_switch_that_keeps_failing_lets_the_next_dispatcher_run_its_beats_with_the_start_check_off(self):
+        self.w.cloned(OLD)
+        self.w.save(rec(good=OLD))
+        self.w.fail = {"fetch"}
+        checks = []
+
+        def make(env):
+            checks.append(env.get("FACTORY_START_CHECK", "1"))
+            if len(checks) > 10:
+                raise AssertionError("no dispatcher was started with the start check off")
+            if checks[-1] != "0":
+                self.w.refresh_to(NEWER)
+                return Proc(self.w, 75)
+            return Proc(self.w, 0, beats=3, hang=True, stop_at=4)
+        self.w.make = make
+        with contextlib.redirect_stdout(self.out):
+            self.w.l.loop()
+        self.assertEqual(checks, ["1", "0"])
+        self.assertEqual(self.w.l.clean_beat(0), 3)
+        self.assertEqual(self.w.record(), rec(good=OLD))
+
+    def test_a_second_failed_switch_in_a_row_removes_the_clone_and_the_next_switch_clones_afresh(self):
+        self.w.cloned(OLD)
+        self.w.save(rec(good=OLD))
+        self.w.fail = {"fetch"}
+        self.w.refresh_to(NEWER)
+        self.step(Proc(self.w, 75))
+        self.assertTrue(os.path.isdir(os.path.join(self.w.src, ".git")))
+        self.w.refresh_to(NEWER)
+        self.step(Proc(self.w, 75))
+        self.assertFalse(os.path.exists(self.w.src))
+        self.assertIn("the clone was removed", self.out.getvalue())
+        self.assertEqual(self.w.l.record(), rec(good=OLD))
+        self.w.fail = set()
+        self.w.refresh_to(NEWER)
+        self.step(Proc(self.w, 75))
+        self.assertEqual([c[:2] for c in self.w.git_calls].count(["git", "clone"]), 1)
+        self.assertEqual(self.w.record(), rec(good=OLD, trial=NEWER))
+
+    def test_a_folder_without_git_where_the_clone_goes_is_removed_before_the_rename(self):
+        self.w.write(os.path.join(self.w.src, "junk.txt"), "x")
+        self.w.refresh_to(NEW)
+        self.step(Proc(self.w, 75))
+        self.assertEqual(self.w.record(), rec(trial=NEW))
+        self.assertFalse(os.path.exists(os.path.join(self.w.src, "junk.txt")))
+        self.assertTrue(os.path.isfile(os.path.join(self.w.factory, "dispatch.py")))
 
     def test_a_target_that_does_not_compile_keeps_the_current_code_and_is_skipped(self):
         self.w.cloned(OLD)
@@ -319,21 +371,17 @@ class Launch(unittest.TestCase):
         self.assertEqual(self.w.git_calls[-1], self.checkout(OLD))
         self.assertEqual((env["FACTORY_CODE_SHA"], env["FACTORY_SKIP_SHA"]), (OLD, NEW))
 
-    def test_a_half_made_clone_is_never_used_and_a_failed_fetch_is_tried_again_not_skipped(self):
+    def test_a_half_made_clone_is_never_used_and_a_failed_switch_is_tried_again_not_skipped(self):
         self.w.fail = {"sparse-checkout"}
         self.w.refresh_to(NEW)
         self.step(Proc(self.w, 75))
         self.assertFalse(os.path.exists(self.w.src))
         self.assertIn("trying again at the next check", self.out.getvalue())
-        self.w.fail = {"fetch"}
-        self.w.refresh_to(NEW)
-        self.step(Proc(self.w, 75))
-        self.assertEqual([c[:2] for c in self.w.git_calls].count(["git", "clone"]), 2)
-        self.assertTrue(os.path.isdir(os.path.join(self.w.src, ".git")))
         self.assertEqual(self.w.l.record(), rec())
         self.w.fail = set()
         self.w.refresh_to(NEW)
         self.step(Proc(self.w, 75))
+        self.assertEqual([c[:2] for c in self.w.git_calls].count(["git", "clone"]), 2)
         self.assertEqual(self.w.record(), rec(trial=NEW))
         self.assertNotIn("FACTORY_SKIP_SHA", self.w.spawned[-1][1])
 
@@ -371,7 +419,7 @@ class Compose(unittest.TestCase):
             c = f.read()
         self.assertIn('command: ["python3", "-u", "/app/launch.py"]', c)
         for need in ("../../tools/factory:/app:ro", "factory-dispatcher-data:/state", "FACTORY_DATA_DIR: /state", "read_only: true",
-                     "cap_drop:\n      - ALL", "no-new-privileges:true", "mem_limit: 256m", "cpus: 0.5", "- /tmp",
+                     "cap_drop:\n      - ALL", "no-new-privileges:true", "mem_limit: 512m", "cpus: 0.5", "- /tmp",
                      "stop_grace_period: 150s"):
             self.assertIn(need, c)
 

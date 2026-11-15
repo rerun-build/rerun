@@ -1165,7 +1165,7 @@ def main(argv=None):
     except OSError as e:
         print("dispatch: cannot read a key file: %s" % type(e).__name__, file=sys.stderr)
         return 1
-    if ask_refresh(gh, cfg["repo"], set()):
+    if os.environ.get("FACTORY_START_CHECK") != "0" and ask_refresh(gh, cfg["repo"], set()):
         return REFRESH_EXIT
     d = Dispatcher(cfg, account, gh)
     log("-", "dispatcher started: %d builders, %d reviewers, label %s, repo %s" % (

@@ -36,6 +36,7 @@ class Launcher:
         self.run, self.spawn, self.clock, self.sleep, self.env = run, spawn, clock, sleep, env
         self.backoff = BACKOFF_S
         self.stopping = False
+        self.start_check, self.failed_switches = True, 0
 
     def stop_soon(self, *_):
         self.stopping = True
@@ -76,6 +77,8 @@ class Launcher:
             self.call("git clone", ["git", "clone", "--filter=blob:none", "--no-checkout", "--sparse",
                                     "https://github.com/%s.git" % self.repo, tmp])
             self.git(*SPARSE, top=tmp)
+            if os.path.exists(self.src):
+                shutil.rmtree(self.src, ignore_errors=True)
             os.rename(tmp, self.src)
         self.git(*SPARSE)
         if fetch:
@@ -159,7 +162,7 @@ class Launcher:
     def step(self):
         code, sha = self.pick()
         rec = self.record()
-        env = dict(self.env, FACTORY_CODE_SHA=sha)
+        env = dict(self.env, FACTORY_CODE_SHA=sha, FACTORY_START_CHECK="1" if self.start_check else "0")
         if rec["skip"]:
             env["FACTORY_SKIP_SHA"] = rec["skip"]
         script = os.path.join(code, "dispatch.py")
@@ -170,11 +173,13 @@ class Launcher:
             return log("stopped: the dispatcher at %s exited %d" % (sha[:7], rc))
         if self.clock() - started >= BACKOFF_MAX_S:
             self.backoff = BACKOFF_S
+        self.start_check = True
         if rc == REFRESH_EXIT:
             if self.switch(sha):
                 self.backoff = BACKOFF_S
                 return
-        elif self.record()["trial"] == sha:
+            self.start_check = False
+        if self.record()["trial"] == sha:
             return self.roll_back(sha, rc, timed_out, rec["good"])
         log("dispatcher at %s exited %d: restarting in %d s" % (sha[:7], rc, self.backoff))
         self.sleep(self.backoff)
@@ -194,8 +199,14 @@ class Launcher:
         try:
             code = self.checkout(sha, True)
         except ERRORS as e:
-            log("refresh to %s failed: %s; keeping %s, trying again at the next check" % (sha[:7], e, current[:7]))
+            self.failed_switches += 1
+            note = ""
+            if self.failed_switches >= 2 and os.path.exists(self.src):
+                shutil.rmtree(self.src, ignore_errors=True)
+                self.failed_switches, note = 0, "; the clone was removed and is made again next time"
+            log("refresh to %s failed: %s; keeping %s, trying again at the next check%s" % (sha[:7], e, current[:7], note))
             return False
+        self.failed_switches = 0
         try:
             self.compiles(code)
         except ERRORS as e:
