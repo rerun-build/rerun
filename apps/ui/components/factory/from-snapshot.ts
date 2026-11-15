@@ -125,6 +125,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         }
     }
 
+    const desk = snapshot.planning?.findLast((p): p is typeof p & { parent: number } => p.parent !== null)
     for (const p of snapshot.planning ?? []) {
         if (p.parent === null) continue
         const before = seen.get(p.parent) ?? p.filed
@@ -134,7 +135,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     for (const [key, r] of rides) {
         const age = now - r.start
         if (age >= RIDE_MS) rides.delete(key)
-        else if (age >= 0 && r.parent === snapshot.planning?.at(-1)?.parent) pods.push({ id: `plan-ride-${key}`, issue: r.parent, title: `filed for #${r.parent}`, path: [`plan-${r.parent}`, 'Delegator'], travel: clamp(age / RIDE_MS), queue: 0, level: 0, band: 'build', state: 'working', scan: 0, since: r.start })
+        else if (age >= 0 && r.parent === desk?.parent) pods.push({ id: `plan-ride-${key}`, issue: r.parent, title: `filed for #${r.parent}`, path: [`plan-${r.parent}`, 'Delegator'], travel: clamp(age / RIDE_MS), queue: 0, level: 0, band: 'build', state: 'working', scan: 0, since: r.start })
     }
 
     const parents = [...new Set(jobs.map(j => j.parent).filter((p): p is number => p !== null))].sort((a, b) => a - b).slice(0, FEATURE_CELLS.length)
@@ -151,7 +152,6 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Feature #${c.issue}${c.title ? ' ' + c.title : ''}: ${c.slots.filter(s => s.state !== 'empty').length} of ${c.slots.length}`,
     }))
 
-    const desk = snapshot.planning?.at(-1)
     const runners = new Map<string, { id: string; name: string }>()
     for (const p of snapshot.planning ?? []) for (const c of p.coworkers) runners.set(c.id, c)
     const room = { span: 2, containerId: 'planning', selectable: false, draggable: false }
@@ -160,7 +160,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         ...[...runners.values()].filter(c => c.id !== BOSS_ID).slice(0, PLANNER_CELLS.length).map((c, i) => ({ ...room, id: `planner-${c.id.slice(0, 8)}`, position: PLANNER_CELLS[i], style: workStyle(c.name, c.id), ariaLabel: c.name })),
         ...(desk ? [{ ...room, id: `plan-${desk.parent}`, position: PLAN_TANK, style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Planning #${desk.parent} ${desk.title}: ${desk.filed} of ${desk.children} filed` }] : []),
     ]
-    const plans: PlanView[] = desk && desk.parent !== null ? [{ parent: desk.parent, title: desk.title, children: desk.children, filed: desk.filed }] : []
+    const plans: PlanView[] = desk ? [{ parent: desk.parent, title: desk.title, children: desk.children, filed: desk.filed }] : []
 
     const out = new Map<string, number>()
     for (const pool of snapshot.pools) for (const c of pool.coworkers) out.set(c.name, c.out)
