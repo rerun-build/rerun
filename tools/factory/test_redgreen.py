@@ -1,3 +1,5 @@
+import contextlib
+import io
 import os
 import subprocess
 import tempfile
@@ -101,6 +103,31 @@ class Prove(unittest.TestCase):
         os.makedirs(os.path.join(root, "sub"))
         code, _ = RG.run(["cd sub", "grep -q new lib.txt"], root)
         self.assertEqual(code, 0)
+
+
+class NotApplicable(unittest.TestCase):
+    def check(self, run_line):
+        root = tempfile.mkdtemp()
+        with open(os.path.join(root, "doc.md"), "w") as f:
+            f.write("## Liveness\n")
+        body = os.path.join(root, "issue.md")
+        with open(body, "w") as f:
+            f.write("**Red before green**: not applicable: docs only\n\n**Run**\n```\n%s\n```\n" % run_line)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = RG.main(["--root", root, "--issue", "517", "--issue-body-file", body])
+        return code, out.getvalue()
+
+    def test_the_run_lines_still_run_at_the_head_and_pass(self):
+        code, out = self.check("grep -q Liveness doc.md")
+        self.assertEqual(code, 0, out)
+        self.assertIn("not applicable (docs only)", out)
+        self.assertIn("the Run lines pass at the head (1 line)", out)
+
+    def test_a_run_line_that_fails_at_the_head_fails_the_check(self):
+        code, out = self.check("grep -q Missing doc.md")
+        self.assertEqual(code, 1, out)
+        self.assertIn("the Run lines fail at the head", out)
 
 
 if __name__ == "__main__":
