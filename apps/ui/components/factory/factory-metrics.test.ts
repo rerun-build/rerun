@@ -15,8 +15,9 @@ const withRuns = (runs: ((typeof sample extends () => infer S ? S : never)['jobs
     const s = sample()
     return { ...s, jobs: s.jobs.map((j, i) => { const { runs: _drop, ...rest } = j; return i === 0 && runs ? { ...rest, runs } : rest }) }
 }
-const run = (startedAt: Date, tokensIn: number, tokensOut: number) => ({
+const run = (startedAt: Date, tokensIn: number, tokensOut: number, cacheRead?: number) => ({
     stage: 'build', coworkerId: 'code', status: 'ok', startedAt: startedAt.toISOString(), endedAt: null, tokensIn, tokensOut, runId: null,
+    ...(cacheRead !== undefined ? { cacheRead } : {}),
 })
 const bar = (snapshot: FactorySnapshot | null, held = false) => barModel({ snapshot, counts, held, now: NOW, start: START })
 
@@ -57,9 +58,9 @@ describe('barModel', () => {
         expect(bar(withRuns([run(today, 40, 2)])).values.totalTokens.text).toBe('42')
     })
 
-    it('shows a dash with the title no data yet for cached, avg run, errors, plan week and sign-in', () => {
+    it('shows a dash with the title no data yet for avg run, errors, plan week and sign-in', () => {
         const m = bar(sample())
-        for (const k of ['cachedShare', 'avgDuration', 'errorRate', 'planWeek', 'signIn'] as const) {
+        for (const k of ['avgDuration', 'errorRate', 'planWeek', 'signIn'] as const) {
             expect(m.values[k]).toEqual({ text: '—', title: 'no data yet' })
         }
     })
@@ -82,5 +83,21 @@ describe('barModel', () => {
         const today = new Date(NOW - 60_000)
         expect(bar(withRuns([run(today, 0, 0), run(today, 1500, 0)])).values.totalTokens.text).toBe('2k')
         expect(bar(withRuns([run(today, 0, 40)])).values.totalTokens.text).toBe('40')
+    })
+
+    it('shows the share of input read from the cache over the runs started today', () => {
+        const today = new Date(NOW - 60_000)
+        const yesterday = new Date(NOW - 30 * 3_600_000)
+        expect(bar(withRuns([run(today, 1000, 0, 800), run(today, 3000, 0, 1200), run(yesterday, 5000, 0, 0)])).values.cachedShare).toEqual({ text: '50%', fill: 50 })
+        expect(bar(withRuns([run(today, 1000, 0, 1000)])).values.cachedShare.text).toBe('100%')
+        expect(bar(withRuns([run(today, 1000, 0, 0)])).values.cachedShare.text).toBe('0%')
+    })
+
+    it('leaves runs with no cache count out of the share, and shows a dash when none has one', () => {
+        const today = new Date(NOW - 60_000)
+        const dash = { text: '—', title: 'no data yet' }
+        expect(bar(withRuns([run(today, 1000, 0, 500), run(today, 9000, 0)])).values.cachedShare.text).toBe('50%')
+        expect(bar(withRuns([run(today, 9000, 0)])).values.cachedShare).toEqual(dash)
+        expect(bar(withRuns([])).values.cachedShare).toEqual(dash)
     })
 })

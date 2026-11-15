@@ -42,6 +42,11 @@ function sameLocalDay(a: number, b: number): boolean {
     return x.getFullYear() === y.getFullYear() && x.getMonth() === y.getMonth() && x.getDate() === y.getDate()
 }
 
+function cachedShareValue(cached: number, input: number) {
+    const n = Math.round((cached / input) * 100)
+    return { text: `${n}%`, fill: n }
+}
+
 export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarCounts; held: boolean; now: number; start: number }): { sample: boolean; values: MetricValues } {
     const { snapshot, counts, held, now, start } = input
     if (!snapshot) {
@@ -69,6 +74,8 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
     let runCount = 0
     let tokens = 0
     let known = 0
+    let cacheInput = 0
+    let cacheHits = 0
     let anyRuns = false
     for (const job of snapshot.jobs) {
         if (!job.runs) continue
@@ -76,6 +83,10 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
         for (const r of job.runs) {
             if (!sameLocalDay(Date.parse(r.startedAt), now)) continue
             runCount++
+            if (r.cacheRead !== undefined) {
+                cacheInput += r.tokensIn
+                cacheHits += r.cacheRead
+            }
             if (r.tokensIn > 0 || r.tokensOut > 0) {
                 known++
                 tokens += r.tokensIn + r.tokensOut
@@ -92,7 +103,7 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
             shipped: { text: String(snapshot.endedToday.merged) },
             runs: anyRuns ? { text: String(runCount) } : { ...NO_DATA },
             totalTokens: known > 0 ? { text: tokenText(tokens) } : { ...NO_DATA },
-            cachedShare: { ...NO_DATA },
+            cachedShare: cacheInput > 0 ? cachedShareValue(cacheHits, cacheInput) : { ...NO_DATA },
             avgDuration: { ...NO_DATA },
             errorRate: { ...NO_DATA },
             planWeek: { ...NO_DATA },
