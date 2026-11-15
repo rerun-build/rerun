@@ -1,6 +1,6 @@
 import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
-import { type CabinetView, type Cell, COPY_CELLS, FEATURE_CELLS, type FactoryFrame, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
+import { BOSS, BOSS_ID, type CabinetView, type Cell, COPY_CELLS, FEATURE_CELLS, type FactoryFrame, PLANNER_CELLS, PLAN_TANK, type PlanView, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
 
 export type SnapshotFrame = FactoryFrame & { blocked: { issue: number; reason: string }[]; cracked: number[]; notAnswering: boolean; lastBeatMs: number }
 
@@ -130,6 +130,17 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Feature #${c.issue}${c.title ? ' ' + c.title : ''}: ${c.slots.filter(s => s.state !== 'empty').length} of ${c.slots.length}`,
     }))
 
+    const desk = snapshot.planning?.at(-1)
+    const runners = new Map<string, { id: string; name: string }>()
+    for (const p of snapshot.planning ?? []) for (const c of p.coworkers) runners.set(c.id, c)
+    const room = { span: 2, containerId: 'planning', selectable: false, draggable: false }
+    const planTiles: Tile[] = [
+        { ...room, id: 'Boss', position: BOSS, style: runners.has(BOSS_ID) ? workStyle('Boss', BOSS_ID) : { ...agentTileStyle('idle', 'Boss'), buddy: lookOf(BOSS_ID) }, ariaLabel: 'Boss' },
+        ...[...runners.values()].filter(c => c.id !== BOSS_ID).slice(0, PLANNER_CELLS.length).map((c, i) => ({ ...room, id: `planner-${c.id.slice(0, 8)}`, position: PLANNER_CELLS[i], style: workStyle(c.name, c.id), ariaLabel: c.name })),
+        ...(desk ? [{ ...room, id: `plan-${desk.parent}`, position: PLAN_TANK, style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Planning #${desk.parent} ${desk.title}: ${desk.filed} of ${desk.children} filed` }] : []),
+    ]
+    const plans: PlanView[] = desk ? [{ parent: desk.parent, title: desk.title, children: desk.children, filed: desk.filed }] : []
+
     const out = new Map<string, number>()
     for (const pool of snapshot.pools) for (const c of pool.coworkers) out.set(c.name, c.out)
     const tiles: Tile[] = base.tiles.filter(t => KEEP.includes(t.id)).map(tile => {
@@ -152,14 +163,15 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     const belts: TileLink[] = [
         ...base.links.filter(l => KEEP.includes(l.source) && KEEP.includes(l.target) && l.variant === 'belt'),
         ...cabinets.map(c => ({ source: 'Delegator', target: `cab-${c.issue}`, variant: 'belt' as const, color: QUIET })),
+        ...(desk ? [{ source: `plan-${desk.parent}`, target: 'Delegator', variant: 'belt' as const, color: QUIET }] : []),
     ].map(l => ({ ...l, color: held ? STATUS_COLOR.held : lineColor.get(`${l.source}>${l.target}`) ?? QUIET, still: !lineColor.has(`${l.source}>${l.target}`), chevrons: true }))
 
     return {
         containers: base.containers,
-        tiles: [...tiles, ...copyTiles, ...cabTiles],
+        tiles: [...tiles, ...copyTiles, ...cabTiles, ...planTiles],
         links: [...belts, ...copyLinks],
         toasts: [],
-        pods, cabinets, rejects, held, holdLeftMs, counts,
+        pods, cabinets, plans, rejects, held, holdLeftMs, counts,
         blocked, cracked, notAnswering, lastBeatMs,
     }
 }
