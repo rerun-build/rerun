@@ -26,7 +26,8 @@ Five owner instructions given in one evening, ordered so that no step is cut aga
    - every comment a tool reads is kept (shebang, `@vitest-environment`, `@ts-expect-error`, eslint and prettier directives, `/// <reference`, `sourceMappingURL`, coverage and bundler markers, `noqa`, `type:`, `shellcheck`, Dockerfile `# syntax=`), found by grepping the repo, not from memory;
    - the type check, lint, tests and the image build pass on the purge pull request;
    - a machine proof shows only comments changed (TypeScript: the syntax tree printed without comments is identical before and after; Python: `ast.dump` identical apart from removed docstrings).
-   Applied migrations under `supabase/migrations` stay out if stripping changes a function body the database compares. Comments in `tools/factory` and the factory contract move into documentation, because briefs and plan checks cite them.
+   Applied migrations under `supabase/migrations` stay out, as applied history. The comments of `tools/factory` and the factory contract are not carried into documentation by the purge: the last commit that has them is dev 86d04999, and the feature documents of step 6 are written from it.
+   Left by the purge, by design or because the tool has no safe route: trailing `#` comments after code in shell, YAML and TOML, SQL comments, Kotlin, Markdown, files that declare themselves generated, and the tool directives on the keep list. In `apps/engine`, 8 more `no-empty` lint warnings (313 to 321): blocks that held only a comment are now empty.
 3. **No new comments.** The rule goes into the cut format and issue text at once, into the dispatcher's build and fix briefs at the next owner update, and a CI check fails a pull request that adds comment lines (directives excepted).
 4. **State machines, then review proof.** The factory's job states become one model with a test that fails when a state has no handler, no deadline or no screen entry. The proof step's states are added under that test:
    - CI check "Done-test red before green": the issue's Run lines fail with only the pull request's test files on dev's code, and pass at the head. Back-tested on this wave's merged pull requests before it is switched on.
@@ -46,7 +47,13 @@ Rehearsed on 2026-11-15 with the 65 upstream commits not yet in dev (upstream/de
 | stripped dev + upstream as it is | 187 |
 | stripped dev + upstream stripped first | 51, the same files as the first row |
 
-So every sync strips the upstream side before merging. Branch `upstream-stripped` holds the stripped upstream commits: its first commit is the stripped base (2bf98517 stripped), which dev records as merged with `git merge -s ours`. A sync checks out the last `upstream-stripped` commit, replaces its tree with the new upstream tip, runs `scripts/strip-comments/strip.py --write`, commits on top, and merges that commit into dev. The merge base is then the previous stripped commit, and only real changes conflict.
+So every sync strips the upstream side before merging. Branch `upstream-stripped` holds the stripped upstream commits: its first commit is the stripped base (e9b143cb, 2bf98517 stripped), which dev records as merged with `git merge -s ours`. A sync:
+
+1. checks out the upstream tip in a throwaway worktree and runs `scripts/strip-comments/strip.py --write` there;
+2. makes one commit whose tree is that stripped tree and whose two parents are the last `upstream-stripped` commit and the real upstream tip (`git add -A`, `git write-tree`, `git commit-tree <tree> -p <last upstream-stripped> -p <upstream tip>`), and moves `upstream-stripped` to it;
+3. merges that commit into dev on a sync branch, as today.
+
+The merge base is then the previous stripped commit, so only real changes conflict, and dev contains upstream's own commits, so `git rev-list dev..upstream/dev` reaches 0 after a sync. Rehearsed with this two-parent commit: 51 conflicted files, the same files as an unstripped merge.
 
 ## Guards: keeping antipatterns out
 
@@ -79,6 +86,8 @@ Benefit, measured: occurrences per guard per week on dev (blocked guards stay at
 
 | Step | State |
 |---|---|
-| 1 | #421 to #429 and #440 merged; #430, #431 building |
-| 2 | tool not written yet |
-| 3 to 6 | not started |
+| 1 | wave #421 to #431 merged; nothing labelled |
+| 2 | #444: CI, images, migrations and factory tests green; mobile and desktop suites run once on dev and on the purge |
+| 3 | rule given to me and in memory; cut-format line and dispatcher brief line not yet; no CI check yet |
+| 4 | red before green merged as #445 (back-test: 12 of 12 wave pull requests red on dev, green at the head); state model and dispatcher proof step not started |
+| 5, 6 | not started |
