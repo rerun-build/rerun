@@ -174,6 +174,20 @@ const AGENT_TOOL_DEFS = [
         },
     },
     {
+        name: 'set_mcp_server_tools',
+        description:
+            'Picks which tools of one attached tool server (MCP) the coworker gets. Unpicked tools are neither described to the model nor callable. An empty list clears the picks and gives all tools back. A server claimed by an installed app is refused: manage it from the Apps tab. The answer is the server name and its picks.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                agentId: { type: 'string', description: 'The coworker, by its id from list_agents.' },
+                name: { type: 'string', description: 'The name of the attached server.' },
+                tools: { type: 'array', items: { type: 'string' }, description: 'The tool names to keep, at most 200. An empty array gives all tools back.' },
+            },
+            required: ['agentId', 'name', 'tools'],
+        },
+    },
+    {
         name: 'list_ai_connections',
         description:
             'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT, OpenCode) and API keys plugged into it, plus the keyless Rerun one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default; for each subscription the plan windows (per cent used and reset time) and, for a Claude sign-in, the minutes it has left and whether a renewal is due. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',
