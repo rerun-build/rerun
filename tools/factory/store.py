@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS transitions(
   id INTEGER PRIMARY KEY AUTOINCREMENT, job TEXT NOT NULL, at TEXT NOT NULL,
   from_state TEXT, to_state TEXT NOT NULL, reason TEXT, round INTEGER, run_id TEXT);
 CREATE INDEX IF NOT EXISTS transitions_job ON transitions(job, id);
+CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, key TEXT NOT NULL, old TEXT, new TEXT);
 """
 JOB_STATES = states.NAMES
 FIRE_COLUMNS = (("cache_read", "INTEGER"), ("cache_write", "INTEGER"), ("seconds", "INTEGER"),
@@ -280,6 +281,15 @@ class Store:
 
     def transitions_of(self, job):
         return [dict(r) for r in self.db.execute("SELECT * FROM transitions WHERE job=? ORDER BY id", (job,))]
+
+    def add_event(self, key, old, new, at=None):
+        with self.db:
+            self.db.execute("INSERT INTO events(at, key, old, new) VALUES (?,?,?,?)",
+                            (at or now(), key, json.dumps(old), json.dumps(new)))
+
+    def events(self):
+        rows = self.db.execute("SELECT at, key, old, new FROM events ORDER BY id").fetchall()
+        return [{"at": r[0], "key": r[1], "from": json.loads(r[2]), "to": json.loads(r[3])} for r in rows]
 
     def steps_seen(self, fire_id, steps, at=None):
         self.db.execute("UPDATE fires SET steps=?, steps_at=? WHERE id=? AND steps IS NOT ?",
