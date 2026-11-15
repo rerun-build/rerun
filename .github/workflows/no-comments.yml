@@ -1,0 +1,39 @@
+name: No comments in code
+
+on:
+  pull_request:
+
+concurrency:
+  group: no-comments-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: github.repository == 'special-place-ai-heaven/rerun'
+    name: No comments in code
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm install --prefix /tmp/ts --no-save --silent typescript@5.9.3
+      - run: python -m pip install --quiet pyyaml
+      - name: Tests of the check
+        env:
+          TS_MODULE: /tmp/ts
+        run: python -I -m unittest discover -s scripts/strip-comments -p "test_*.py" -v
+      - name: Check the files this pull request adds or changes
+        run: |
+          git diff --name-only --diff-filter=AM HEAD^1 HEAD > /tmp/changed.txt
+          if [ ! -s /tmp/changed.txt ]; then echo "No added or changed files."; exit 0; fi
+          python -I scripts/strip-comments/strip.py --root . --ts-module /tmp/ts --check --only $(cat /tmp/changed.txt)
