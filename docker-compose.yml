@@ -18,10 +18,10 @@ services:
     env_file: .env
     environment:
       RERUN_ENGINE_URL: http://engine:3000
-      RERUN_ENGINE_API_KEY: ${RERUN_ENGINE_API_KEY}
+      RERUN_ENGINE_API_KEY: ${RERUN_ENGINE_API_KEY:?set RERUN_ENGINE_API_KEY in .env}
       RERUN_ENGINE_BROWSER_URL: ${RERUN_ENGINE_BROWSER_URL:-http://localhost:3001}
       RERUN_SHOT_URL: ${RERUN_SHOT_URL:-http://engine:3000}
-      RERUN_SHOT_API_KEY: ${RERUN_ENGINE_API_KEY}
+      RERUN_SHOT_API_KEY: ${RERUN_ENGINE_API_KEY:?set RERUN_ENGINE_API_KEY in .env}
       RERUN_SHOT_RENDER_ORIGIN: ${RERUN_SHOT_RENDER_ORIGIN:-http://app:3000}
     ports:
       - "${RERUN_BIND_ADDRESS:-127.0.0.1}:${RERUN_APP_PORT:-3000}:3000"
@@ -35,7 +35,7 @@ services:
       context: .
       dockerfile: apps/engine/Dockerfile
     environment:
-      RERUN_API_KEY: ${RERUN_ENGINE_API_KEY}
+      RERUN_API_KEY: ${RERUN_ENGINE_API_KEY:?set RERUN_ENGINE_API_KEY in .env}
       RERUN_HUB_BASE_URL: http://app:3000
       RERUN_LOG_LEVEL: ${RERUN_LOG_LEVEL:-info}
     ports:

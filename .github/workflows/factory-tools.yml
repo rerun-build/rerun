@@ -3,9 +3,9 @@ name: Factory tools
 on:
   push:
     branches: [dev]
-    paths: ['tools/factory/**', '.github/workflows/factory-tools.yml']
+    paths: ['tools/factory/**', 'deploy/vps/**', '.github/workflows/factory-tools.yml']
   pull_request:
-    paths: ['tools/factory/**', '.github/workflows/factory-tools.yml']
+    paths: ['tools/factory/**', 'deploy/vps/**', '.github/workflows/factory-tools.yml']
 
 concurrency:
   group: factory-tools-${{ github.ref }}

@@ -224,7 +224,7 @@ class Intake(Base):
         self.assertEqual(self.state(), "building")
 
     def test_no_plan_comment_when_the_issue_has_a_plan_line(self):
-        self.w.issues[0]["body"] = ready("intro\nPLAN READY: three chunks")
+        self.w.issues[0]["body"] = ready("intro\nPLAN READY (facts read on dev 4296d1f): three chunks")
         self.tick()
         self.assertEqual(self.w.issue(5)["comments"], [])
         self.assertEqual(len(self.w.sends), 1)

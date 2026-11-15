@@ -2,7 +2,7 @@ import unittest
 
 import cutshape
 
-FORM = """PLAN READY
+FORM = """PLAN READY (cut of #1; facts read on dev 4296d1f)
 
 **Worker**: coder
 **Test file**: `tools/factory/test_cutshape.py`
@@ -36,6 +36,28 @@ class CutShape(unittest.TestCase):
         self.assertEqual(p["paths"], ["tools/factory/cutshape.py", "tools/factory/test_cutshape.py"])
         self.assertEqual(p["test"], "tools/factory/test_cutshape.py")
         self.assertEqual(p["deps"], [])
+
+    def test_plan_line_names_the_dev_commit(self):
+        p = cutshape.parse({"number": 206, "body": FORM})
+        self.assertEqual(p["dev"], "4296d1f")
+        self.assertEqual(p["errors"], [])
+        upper = FORM.replace("4296d1f", "A" * 40, 1)
+        q = cutshape.parse({"number": 206, "body": upper})
+        self.assertEqual(q["dev"], "a" * 40)
+        self.assertEqual(q["errors"], [])
+
+    def test_plan_line_without_a_dev_commit_is_refused(self):
+        for first in ["PLAN READY", "PLAN READY dev 4296d1", "PLAN READY dev xyz1234", "PLAN READY dev " + "a" * 41, "PLAN READY device 4296d1f"]:
+            body = FORM.replace(FORM.splitlines()[0], first, 1)
+            p = cutshape.parse({"number": 206, "body": body})
+            self.assertIsNone(p["dev"], first)
+            self.assertTrue(any(e.startswith("plan line:") for e in p["errors"]), first)
+
+    def test_a_body_without_a_plan_line_is_not_refused_for_it(self):
+        body = FORM.replace(FORM.splitlines()[0], "SMALL FIX", 1)
+        p = cutshape.parse({"number": 206, "body": body})
+        self.assertIsNone(p["dev"])
+        self.assertEqual(p["errors"], [])
 
     def test_cycle_is_named_on_both_issues(self):
         res = cutshape.check([

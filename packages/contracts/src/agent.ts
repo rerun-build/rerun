@@ -214,6 +214,37 @@ export type McpServerStatus = z.infer<typeof mcpServerStatusSchema>
 
 export const mcpServerStatusListSchema = z.object({ servers: z.array(mcpServerStatusSchema) })
 
+export const mcpErrorClassSchema = z.enum(['auth', 'timeout', 'unreachable', 'closed', 'other'])
+export type McpErrorClass = z.infer<typeof mcpErrorClassSchema>
+
+export const mcpSessionStateSchema = z
+    .object({
+        name: z.string(),
+        state: z.enum(['connected', 'connecting', 'failed', 'idle']),
+        errorClass: mcpErrorClassSchema.optional(),
+    })
+    .strict()
+export type McpSessionState = z.infer<typeof mcpSessionStateSchema>
+
+export const mcpSessionStateListSchema = z.object({ servers: z.array(mcpSessionStateSchema) })
+export type McpSessionStateList = z.infer<typeof mcpSessionStateListSchema>
+
+export const mcpReconnectEffectSchema = z.enum(['next_call', 'next_message'])
+export type McpReconnectEffect = z.infer<typeof mcpReconnectEffectSchema>
+
+export const mcpReconnectResultSchema = z
+    .object({
+        name: z.string(),
+        reconnected: z.boolean(),
+        effect: mcpReconnectEffectSchema,
+        announced: z.number().int().nonnegative(),
+    })
+    .strict()
+export type McpReconnectResult = z.infer<typeof mcpReconnectResultSchema>
+
+export const mcpReconnectEventSchema = z.object({ name: z.string(), effect: mcpReconnectEffectSchema }).strict()
+export type McpReconnectEvent = z.infer<typeof mcpReconnectEventSchema>
+
 export const agentDetailSchema = z.object({
     id: z.string(),
     config: agentConfigSchema,

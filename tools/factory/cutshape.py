@@ -9,6 +9,8 @@ _FILES = re.compile(r"^\s*\*\*Files\*\*")
 _BULLET = re.compile(r"^\s*[-*+]\s+(.*)$")
 _TICK = re.compile(r"`([^`]*)`")
 _NUM = re.compile(r"#(\d+)")
+_PLAN = re.compile(r"^PLAN READY\b(.*)$")
+_DEV = re.compile(r"\bdev ([0-9a-f]{7,40})\b", re.I)
 
 
 def _bad_path(p):
@@ -88,7 +90,16 @@ def parse(issue):
             if test not in paths:
                 errors.append("test file: '%s' is not one of the Files paths" % test)
 
-    return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "parent": parent, "errors": errors}
+    dev = None
+    plan = next((m for m in (_PLAN.match(ln) for ln in lines) if m), None)
+    if plan:
+        found = _DEV.search(plan.group(1))
+        if found:
+            dev = found.group(1).lower()
+        else:
+            errors.append("plan line: the PLAN READY line must name the dev commit as 'dev <sha>' (7 to 40 hex)")
+
+    return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "parent": parent, "dev": dev, "errors": errors}
 
 
 def cycles(parsed):

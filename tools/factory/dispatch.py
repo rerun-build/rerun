@@ -8,6 +8,7 @@ import planners
 import pools
 import proof
 import renewal
+import slots
 import snapshot
 import states
 import store as ledger_store
@@ -173,7 +174,7 @@ def proof_brief(j, pr, head, asks):
         'The asks, in order:',
         *["ASK %d: %s" % (n, a) for n, a in enumerate(asks, 1)],
         '',
-        'For each ask write one line: `ASK <n>: MET <file>:<line> <test name>` (the file and the line in the diff, and the test that shows it) or `ASK <n>: NOT MET <why>`. A Run line is MET when the check "Done-test red before green" passed at this commit: that check ran every Run line of the issue at this commit and passes only when each one passes there and the done-test fails on dev\'s code; name the test file and line the Run line runs. When the issue carries `**Red before green**: not applicable`, that check runs the Run lines at this commit only, without the run on dev\'s code: a Run line is MET when the check reports that the Run lines pass at the head (name the check and the line).',
+        'For each ask write one line: `ASK <n>: MET <evidence>` (the file and the line in the diff and the test that shows it, or the check of this commit that shows it) or `ASK <n>: NOT MET <why>`; every ask number gets exactly one line, and only an ask you found not met is NOT MET. A Run line is MET when the check "Done-test red before green" passed at this commit: that check ran every Run line of the issue at this commit and passes only when each one passes there and the done-test fails on dev\'s code; name the test file and line the Run line runs. When the issue carries `**Red before green**: not applicable`, that check runs the Run lines at this commit only, without the run on dev\'s code: a Run line is MET when the check reports that the Run lines pass at the head (name the check and the line).',
         '',
         'Post those lines on the pull request with your review tool.',
         '',
@@ -288,6 +289,7 @@ class Dispatcher:
         self.started = now()
         self.names = pools.names(cfg)
         self.planners = planners.Planners(cfg, account, gh)
+        self.quota = None
 
     def fill_ids(self):
         missing = [c for t in (self.cfg.get("types") or {}).values() for c in t.get("coworkers", []) if not c.get("id")]
@@ -324,6 +326,26 @@ class Dispatcher:
 
     def busy(self):
         return {j["agent"] for j in self.jobs() if j["state"] in RUNNING and j.get("agent")}
+
+    def slot_quotas(self):
+        total = self.cfg.get("slots")
+        if not total:
+            return None
+        waiting = {}
+        for j in self.jobs():
+            s = slots.station(j)
+            if s:
+                waiting[s] = waiting.get(s, 0) + 1
+        return slots.quotas(waiting, len(self.running()), total)
+
+    def take(self, j):
+        if self.quota is None:
+            return True
+        s = slots.station(j)
+        if self.quota.get(s, 0) <= 0:
+            return False
+        self.quota[s] -= 1
+        return True
 
     def running(self):
         return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")]
@@ -467,7 +489,7 @@ class Dispatcher:
             return
         self.stop_lost()
         cands = [j for j in self.jobs() if j["state"] in ("blocked", "failed", "returned") and j.get("relabelled")
-                 and "closed_seen" not in self.store.get_all(str(j["issue"]))]
+                 and "closed_refs" not in self.store.get_all(str(j["issue"]))]
         if not cands:
             return
         closed = {c["number"] for c in json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "closed",
@@ -476,9 +498,25 @@ class Dispatcher:
         for j in [j for j in cands if j["issue"] in closed][:RECONCILE_MAX]:
             if j.get("pr") and json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "MERGED":
                 self.end(j, "merged", "merged outside the delegator")
-            else:
+                continue
+            number = self.merged_closer(j)
+            if number:
+                j["pr"] = number
+                self.end(j, "merged", "merged outside the delegator (#%s)" % number)
+                continue
+            kv = self.store.get_all(str(j["issue"]))
+            self.store.set(str(j["issue"]), "closed_refs", self.now())
+            if "closed_seen" not in kv:
                 self.store.set(str(j["issue"]), "closed_seen", self.now())
-                log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+            log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+
+    def merged_closer(self, j):
+        out = json.loads(self.gh(["issue", "view", str(j["issue"]), "-R", self.repo, "--json", "closedByPullRequestsReferences"]) or "{}")
+        for ref in out.get("closedByPullRequestsReferences") or []:
+            state = json.loads(self.gh(["pr", "view", str(ref["number"]), "-R", self.repo, "--json", "state"]) or "{}").get("state")
+            if state == "MERGED":
+                return ref["number"]
+        return None
 
     def send(self, j, agent, step, message, state, copy=1):
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
@@ -648,7 +686,7 @@ class Dispatcher:
             return
         if st == "queued":
             got = self.free(j.get("worker", "coder"))
-            if got:
+            if got and self.take(j):
                 self.start(j, got[0], "build", "building", copy=got[1], builder=got[0])
         elif st == "building":
             out = self.finished_run(j)
@@ -666,7 +704,7 @@ class Dispatcher:
             if self.conflicts(j):
                 return
             got = self.free("reviewer")
-            if not got:
+            if not got or not self.take(j):
                 return
             r = got[0]
             head = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "headRefOid"]))["headRefOid"]
@@ -694,7 +732,7 @@ class Dispatcher:
                 self.end(j, "rejected", verdict[:200] or last_line(out))
         elif st == "fix_wait":
             copy = self.free_copy_of(j["builder"])
-            if copy is not None:
+            if copy is not None and self.take(j):
                 self.start(j, j["builder"], "fix of #%s" % j["pr"], "fixing", copy=copy)
         elif st == "fixing":
             out = self.finished_run(j)
@@ -708,7 +746,7 @@ class Dispatcher:
             self.checks(j)
         elif st == "proof_wait":
             got = self.free_prover(j)
-            if got:
+            if got and self.take(j):
                 self.start(j, got[0], "proof of #%s at %s" % (j["pr"], j["head"][:7]), "proving", copy=got[1], prover=got[0], asks=proof.asks(j.get("body")))
         elif st == "proving":
             out = self.finished_run(j)
@@ -721,7 +759,7 @@ class Dispatcher:
                 self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
             elif kind == "none" and j.get("not_met") and not final_line(out, ("PROOF:",)):
                 self.end(j, "blocked", self.not_met_reason(j, out))
-            elif kind == "none" and why.startswith("proof names"):
+            elif kind == "none":
                 again = "%s: asked again" % why
                 if j.get("proof_asked"):
                     self.end(j, "blocked", again)
@@ -865,6 +903,7 @@ class Dispatcher:
             self.reconcile()
         except (Error, ValueError, KeyError) as e:
             log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        self.quota = self.slot_quotas()
         for j in self.jobs():
             try:
                 if j["state"] not in END:

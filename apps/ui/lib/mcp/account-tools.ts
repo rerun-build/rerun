@@ -142,6 +142,38 @@ const AGENT_TOOL_DEFS = [
         },
     },
     {
+        name: 'attach_mcp_server',
+        description:
+            'Attach a tool server (MCP) to a coworker, or replace the one of the same name. Use transport stdio with `command` and `args`, or http or sse with `url`; `env` and `headers` carry secrets the server needs. A server claimed by an installed app is refused: manage it from the Apps tab. The values of `env` and `headers` are never returned; the answer lists only their keys.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                agentId: { type: 'string', description: 'The coworker to attach the server to, by its id from list_agents.' },
+                name: { type: 'string', description: 'Server name: 1 to 64 letters, digits, underscores or hyphens. "rerun" is reserved.' },
+                transport: { type: 'string', enum: ['stdio', 'sse', 'http'], description: 'Defaults to stdio, or to http when only `url` is given.' },
+                command: { type: 'string', description: 'The program to start, for stdio.' },
+                args: { type: 'array', items: { type: 'string' }, description: 'Arguments of the command.' },
+                url: { type: 'string', description: 'The server address, for http or sse.' },
+                env: { type: 'object', description: 'Environment variables for the server process, as strings.', additionalProperties: { type: 'string' } },
+                headers: { type: 'object', description: 'HTTP headers sent to the server, as strings.', additionalProperties: { type: 'string' } },
+            },
+            required: ['agentId', 'name'],
+        },
+    },
+    {
+        name: 'detach_mcp_server',
+        description:
+            'Detach one tool server (MCP) from a coworker by its name and clear its stored sign-in token. The other servers stay. A server claimed by an installed app is refused: manage it from the Apps tab. The answer lists the names that remain.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                agentId: { type: 'string', description: 'The coworker to detach the server from, by its id from list_agents.' },
+                name: { type: 'string', description: 'The name of the server to remove.' },
+            },
+            required: ['agentId', 'name'],
+        },
+    },
+    {
         name: 'list_ai_connections',
         description:
             'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT, OpenCode) and API keys plugged into it, plus the keyless Rerun one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default; for each subscription the plan windows (per cent used and reset time) and, for a Claude sign-in, the minutes it has left and whether a renewal is due. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',

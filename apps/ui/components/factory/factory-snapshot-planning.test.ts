@@ -56,4 +56,16 @@ describe('the snapshot contract carries planning', () => {
         const full = Array.from({ length: 5 }, (_, i) => entry({ parent: 400 + i, coworkers: Array.from({ length: 8 }, () => run) }))
         expect(Buffer.byteLength(JSON.stringify(withPlanning(full)))).toBeLessThan(FACTORY_SNAPSHOT_MAX_BYTES)
     })
+
+    it('accepts an entry with no parent: parent null, empty title, no children, none filed', () => {
+        const none = entry({ parent: null, title: '', children: 0, filed: 0 })
+        expect(accepted([none])).toBe(true)
+        expect(factorySnapshotSchema.parse(withPlanning([none])).planning).toEqual([none])
+    })
+
+    it('still needs the parent key and refuses parent 0, -1, 1.5 and a string', () => {
+        const { parent: _parent, ...noKey } = entry()
+        expect(accepted([noKey])).toBe(false)
+        for (const bad of [0, -1, 1.5, '450']) expect(accepted([entry({ parent: bad })]), String(bad)).toBe(false)
+    })
 })
