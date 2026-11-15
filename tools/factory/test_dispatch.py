@@ -36,7 +36,7 @@ class World:
         self.ledger = None
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
-        self.commits = []
+        self.commits, self.dev_runs = [], []
 
     @staticmethod
     def goal_ok(goal):
@@ -122,6 +122,8 @@ class World:
             return json.dumps({"state": "open" if n in self.open_numbers else "closed", "state_reason": self.close_reasons.get(n, "completed")})
         if a[0] == "api" and "/commits?" in a[1]:
             return json.dumps(self.commits)
+        if a[0] == "api" and "/actions/workflows/" in a[1]:
+            return json.dumps({"workflow_runs": self.dev_runs})
         if a[0] == "api":
             sha = a[1].split("head_sha=")[1].split("&")[0]
             return json.dumps({"workflow_runs": self.workflows.get(sha, [])})

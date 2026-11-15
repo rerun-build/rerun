@@ -1094,29 +1094,15 @@ class Dispatcher:
         self.beat_end(clean)
 
     def beat_end(self, clean):
-        code = os.environ.get("FACTORY_CODE_SHA")
-        if not code:
+        if not os.environ.get("FACTORY_CODE_SHA"):
             return
-        state = os.environ.get("FACTORY_DATA_DIR", "/state")
         if clean:
             try:
-                refresh.write(os.path.join(state, "beat-ok"), str(self.beats))
+                refresh.write(os.path.join(os.environ.get("FACTORY_DATA_DIR", "/state"), "beat-ok"), str(self.beats))
             except OSError as e:
                 log("-", "beat-ok: %s" % type(e).__name__)
-        if self.beats % REFRESH_BEATS:
-            return
-        try:
-            sha = refresh.target(self.gh, self.repo, code, os.environ.get("FACTORY_SKIP_SHA"))
-            if sha:
-                refresh.write(os.path.join(state, "refresh-to"), sha)
-                log("-", "refresh to %s" % sha[:7])
-                self.refresh_to = sha
-            self.refresh_logged.clear()
-        except Exception as e:  # noqa: BLE001
-            text = str(e) if isinstance(e, Error) else type(e).__name__
-            if text not in self.refresh_logged:
-                self.refresh_logged.add(text)
-                log("-", "refresh check: %s" % text)
+        if not self.beats % REFRESH_BEATS:
+            self.refresh_to = ask_refresh(self.gh, self.repo, self.refresh_logged)
 
     def read_epic(self, n):
         return json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,labels"]))
@@ -1133,6 +1119,25 @@ class Dispatcher:
             if self.now() - self.started >= REPORT_QUIET_S and text not in self.report_logged:
                 self.report_logged.add(text)
                 log("-", "factory_report: %s" % text)
+
+
+def ask_refresh(gh, repo, logged):
+    code = os.environ.get("FACTORY_CODE_SHA")
+    if not code:
+        return None
+    try:
+        sha = refresh.target(gh, repo, code, os.environ.get("FACTORY_SKIP_SHA"))
+        if sha:
+            refresh.write(os.path.join(os.environ.get("FACTORY_DATA_DIR", "/state"), "refresh-to"), sha)
+            log("-", "refresh to %s" % sha[:7])
+        logged.clear()
+        return sha
+    except Exception as e:  # noqa: BLE001
+        text = str(e) if isinstance(e, (Error, refresh.NoTarget)) else type(e).__name__
+        if text not in logged:
+            logged.add(text)
+            log("-", "refresh check: %s" % text)
+        return None
 
 
 def read_secret(path):
@@ -1160,6 +1165,8 @@ def main(argv=None):
     except OSError as e:
         print("dispatch: cannot read a key file: %s" % type(e).__name__, file=sys.stderr)
         return 1
+    if ask_refresh(gh, cfg["repo"], set()):
+        return REFRESH_EXIT
     d = Dispatcher(cfg, account, gh)
     log("-", "dispatcher started: %d builders, %d reviewers, label %s, repo %s" % (
         len(pools.types(cfg).get("coder", {}).get("coworkers", [])), len(pools.types(cfg).get("reviewer", {}).get("coworkers", [])), cfg.get("label", "factory"), cfg["repo"]))
@@ -1174,7 +1181,10 @@ def main(argv=None):
         if d.refresh_to:
             d.close()
             return REFRESH_EXIT
-        time.sleep(cfg.get("poll_s", 30))
+        for _ in range(int(cfg.get("poll_s", 30))):
+            if stop:
+                break
+            time.sleep(1)
     d.close()
     return 0
 

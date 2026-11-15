@@ -1,15 +1,17 @@
-import datetime, json, os, shutil, subprocess, time
+import datetime, json, os, shutil, signal, subprocess, time
 
 import refresh
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REFRESH_EXIT = 75
 GOOD_BEATS = 3
-TRIAL_S = 300
+TRIAL_S = 480
+TRIAL_TRIES = 2
 STOP_S = 120
 POLL_S = 2
 BACKOFF_S, BACKOFF_MAX_S = 5, 60
 CALL_S = 300
+SPARSE = ["sparse-checkout", "set", "--no-cone", "/tools/factory/"]
 
 
 class Failed(Exception):
@@ -23,12 +25,20 @@ def log(msg):
     print("%s launch: %s" % (datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), msg), flush=True)
 
 
+def is_sha(value):
+    return isinstance(value, str) and bool(refresh.SHA.fullmatch(value))
+
+
 class Launcher:
     def __init__(self, state, app, repo, run=subprocess.run, spawn=subprocess.Popen, clock=time.time, sleep=time.sleep, env=os.environ):
         self.state, self.app, self.repo = state, app, repo
         self.src = os.path.join(state, "src")
         self.run, self.spawn, self.clock, self.sleep, self.env = run, spawn, clock, sleep, env
         self.backoff = BACKOFF_S
+        self.stopping = False
+
+    def stop_soon(self, *_):
+        self.stopping = True
 
     def path(self, name):
         return os.path.join(self.state, name)
@@ -40,7 +50,11 @@ class Launcher:
         except (OSError, ValueError):
             rec = {}
         rec = rec if isinstance(rec, dict) else {}
-        return {k: rec[k] if isinstance(rec.get(k), str) and refresh.SHA.fullmatch(rec[k]) else None for k in ("good", "trial", "skip")}
+        out = {k: rec[k] if is_sha(rec.get(k)) else None for k in ("good", "trial", "skip")}
+        t = rec.get("timeout")
+        ok = isinstance(t, dict) and is_sha(t.get("sha")) and isinstance(t.get("tries"), int)
+        out["timeout"] = {"sha": t["sha"], "tries": t["tries"]} if ok else None
+        return out
 
     def save(self, **change):
         refresh.write(self.path("launch.json"), json.dumps(dict(self.record(), **change)))
@@ -50,29 +64,30 @@ class Launcher:
         if p.returncode:
             raise Failed("%s exit %d: %s" % (what, p.returncode, ((p.stderr or "").strip().splitlines() or [""])[-1]))
 
-    def git(self, *args):
-        self.call("git " + args[0], ["git", "-C", self.src] + list(args))
+    def git(self, *args, top=None):
+        self.call("git " + args[0], ["git", "-C", top or self.src] + list(args))
 
     def checkout(self, sha, fetch):
         if not os.path.isdir(os.path.join(self.src, ".git")):
             if not fetch:
                 raise Failed("no clone in %s" % self.src)
-            try:
-                self.call("git clone", ["git", "clone", "--filter=blob:none", "--no-checkout", "--sparse",
-                                        "https://github.com/%s.git" % self.repo, self.src])
-                self.git("sparse-checkout", "set", "--no-cone", "/tools/factory/")
-            except ERRORS:
-                shutil.rmtree(self.src, ignore_errors=True)
-                raise
+            tmp = self.src + ".tmp"
+            shutil.rmtree(tmp, ignore_errors=True)
+            self.call("git clone", ["git", "clone", "--filter=blob:none", "--no-checkout", "--sparse",
+                                    "https://github.com/%s.git" % self.repo, tmp])
+            self.git(*SPARSE, top=tmp)
+            os.rename(tmp, self.src)
+        self.git(*SPARSE)
         if fetch:
             self.git("fetch", "-q", "--depth", "1", "origin", sha)
         self.git("checkout", "-q", "--detach", sha)
-        return os.path.join(self.src, "tools", "factory")
+        code = os.path.join(self.src, "tools", "factory")
+        if not os.path.isfile(os.path.join(code, "dispatch.py")):
+            raise Failed("%s has no tools/factory/dispatch.py" % sha[:7])
+        return code
 
     def compiles(self, code):
         files = sorted(os.path.join(d, f) for d, _, names in os.walk(code) for f in names if f.endswith(".py"))
-        if not files:
-            raise Failed("no python files in %s" % code)
         self.call("py_compile", ["python3", "-I", "-m", "py_compile"] + files)
 
     def pick(self):
@@ -98,7 +113,7 @@ class Launcher:
 
     def watch(self, p, sha, started):
         trial = self.record()["trial"] == sha
-        last, streak = None, 0
+        last, streak, told = None, 0, False
         while True:
             rc = p.poll()
             n = self.clean_beat(started)
@@ -109,10 +124,14 @@ class Launcher:
                     log("%s is good after %d clean beats" % (sha[:7], GOOD_BEATS))
                     trial = False
             if rc is not None:
-                return rc
-            if trial and self.clock() - started >= TRIAL_S:
+                return rc, False
+            if self.stopping and not told:
+                log("stop asked: passing it to the dispatcher at %s" % sha[:7])
+                p.terminate()
+                told = True
+            elif trial and not self.stopping and self.clock() - started >= TRIAL_S:
                 log("trial %s had %d of %d clean beats in %d s: stopping it" % (sha[:7], streak, GOOD_BEATS, TRIAL_S))
-                return self.stop(p)
+                return self.stop(p), True
             self.sleep(POLL_S)
 
     def stop(self, p):
@@ -127,6 +146,16 @@ class Launcher:
         p.kill()
         return p.wait()
 
+    def roll_back(self, sha, rc, timed_out, good):
+        t = self.record()["timeout"]
+        tries = (t["tries"] if t and t["sha"] == sha else 0) + 1
+        then = (good or "app")[:7]
+        if timed_out and tries < TRIAL_TRIES:
+            self.save(trial=None, timeout={"sha": sha, "tries": tries})
+            return log("rolled back %s: no %d clean beats in %d s; it gets one more trial; next start uses %s" % (sha[:7], GOOD_BEATS, TRIAL_S, then))
+        self.save(trial=None, skip=sha, timeout=None)
+        log("rolled back %s: exit %d before %d clean beats; skipped until a newer commit; next start uses %s" % (sha[:7], rc, GOOD_BEATS, then))
+
     def step(self):
         code, sha = self.pick()
         rec = self.record()
@@ -136,15 +165,17 @@ class Launcher:
         script = os.path.join(code, "dispatch.py")
         log("starting %s at %s" % (script, sha[:7]))
         started = self.clock()
-        rc = self.watch(self.spawn(["python3", "-u", script, "run"], env=env), sha, started)
+        rc, timed_out = self.watch(self.spawn(["python3", "-u", script, "run"], env=env), sha, started)
+        if self.stopping:
+            return log("stopped: the dispatcher at %s exited %d" % (sha[:7], rc))
         if self.clock() - started >= BACKOFF_MAX_S:
             self.backoff = BACKOFF_S
-        if self.record()["trial"] == sha:
-            self.save(trial=None, skip=sha)
-            return log("rolled back %s: exit %d before %d clean beats; next start uses %s" % (sha[:7], rc, GOOD_BEATS, (rec["good"] or "app")[:7]))
         if rc == REFRESH_EXIT:
-            self.backoff = BACKOFF_S
-            return self.switch(sha)
+            if self.switch(sha):
+                self.backoff = BACKOFF_S
+                return
+        elif self.record()["trial"] == sha:
+            return self.roll_back(sha, rc, timed_out, rec["good"])
         log("dispatcher at %s exited %d: restarting in %d s" % (sha[:7], rc, self.backoff))
         self.sleep(self.backoff)
         self.backoff = min(self.backoff * 2, BACKOFF_MAX_S)
@@ -155,29 +186,39 @@ class Launcher:
                 sha = f.read().strip()
             os.remove(self.path("refresh-to"))
         except OSError as e:
-            return log("refresh: no target (%s); keeping %s" % (type(e).__name__, current[:7]))
-        if not refresh.SHA.fullmatch(sha):
-            return log("refresh: the target is not a commit id; keeping %s" % current[:7])
+            log("refresh: no target (%s); keeping %s" % (type(e).__name__, current[:7]))
+            return False
+        if not is_sha(sha):
+            log("refresh: the target is not a commit id; keeping %s" % current[:7])
+            return False
         try:
             code = self.checkout(sha, True)
         except ERRORS as e:
-            return log("refresh to %s failed: %s; keeping %s, trying again at the next check" % (sha[:7], e, current[:7]))
+            log("refresh to %s failed: %s; keeping %s, trying again at the next check" % (sha[:7], e, current[:7]))
+            return False
         try:
             self.compiles(code)
         except ERRORS as e:
             self.save(skip=sha)
-            return log("refresh to %s failed: %s; keeping %s" % (sha[:7], e, current[:7]))
+            log("refresh to %s failed: %s; keeping %s" % (sha[:7], e, current[:7]))
+            return False
         self.save(trial=sha)
         log("trial %s: checked out and compiled" % sha[:7])
+        return True
+
+    def loop(self):
+        while not self.stopping:
+            self.step()
 
 
 def main():
     with open(os.path.join(HERE, "dispatch.json"), encoding="utf-8") as f:
         repo = json.load(f)["repo"]
     launcher = Launcher(os.environ.get("FACTORY_DATA_DIR", "/state"), HERE, repo)
+    signal.signal(signal.SIGTERM, launcher.stop_soon)
     log("launcher started: %s" % json.dumps(launcher.record()))
-    while True:
-        launcher.step()
+    launcher.loop()
+    log("launcher stopped")
 
 
 if __name__ == "__main__":

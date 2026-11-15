@@ -1,7 +1,12 @@
 import json, os, re
 
 SHA = re.compile(r"[0-9a-f]{40}")
-WORKFLOW = "Factory tools"
+RUNS = "repos/%s/actions/workflows/factory-tools.yml/runs?branch=dev&event=push&status=success&per_page=1"
+COMMITS = "repos/%s/commits?sha=%s&path=tools/factory&per_page=1"
+
+
+class NoTarget(Exception):
+    pass
 
 
 def write(path, text):
@@ -11,14 +16,19 @@ def write(path, text):
     os.replace(tmp, path)
 
 
+def commit_id(value):
+    if not isinstance(value, str) or not SHA.fullmatch(value):
+        raise ValueError("not a commit id")
+    return value
+
+
 def target(gh, repo, current, skip):
-    commits = json.loads(gh(["api", "repos/%s/commits?sha=dev&path=tools/factory&per_page=1" % repo]))
+    runs = json.loads(gh(["api", RUNS % repo])).get("workflow_runs") or []
+    if not runs:
+        raise NoTarget("no green push run of factory-tools.yml on dev")
+    head = commit_id(runs[0]["head_sha"])
+    commits = json.loads(gh(["api", COMMITS % (repo, head)]))
     if not commits:
-        return None
-    sha = commits[0]["sha"]
-    if not isinstance(sha, str) or not SHA.fullmatch(sha):
-        raise ValueError("newest commit id is not a commit id")
-    if sha in (current, skip):
-        return None
-    runs = json.loads(gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (repo, sha)])).get("workflow_runs") or []
-    return sha if any(r.get("name") == WORKFLOW and r.get("conclusion") == "success" for r in runs) else None
+        raise NoTarget("no tools/factory commit behind %s" % head[:7])
+    sha = commit_id(commits[0]["sha"])
+    return None if sha in (current, skip) else sha

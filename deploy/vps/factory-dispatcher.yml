@@ -29,6 +29,7 @@ services:
         max-size: 10m
         max-file: "3"
     restart: unless-stopped
+    stop_grace_period: 150s
     healthcheck:
       test: ["CMD", "python3", "-c", "import os,sys,time; sys.exit(0 if time.time() - os.path.getmtime('/state/heartbeat') < 120 else 1)"]
       interval: 30s
