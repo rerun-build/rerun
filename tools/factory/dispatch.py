@@ -8,6 +8,7 @@ import planners
 import pools
 import proof
 import renewal
+import sifter
 import slots
 import snapshot
 import states
@@ -285,6 +286,7 @@ class Dispatcher:
         self.store = ledger_store.Store(cfg["ledger_file"])
         self.store.import_json(cfg["json_state_file"])
         self.beats = 0
+        self.unreadable = 0
         self.renewal_unreadable = False
         self.report_logged = set()
         self.started = now()
@@ -392,8 +394,20 @@ class Dispatcher:
             return
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", self.label, "--state", "open",
                                      "--json", "number,title,body", "--limit", "100"]))
+        for i in issues:
+            body, fixed = sifter.sift(i.get("body"))
+            if not fixed:
+                continue
+            try:
+                self.gh(["issue", "edit", str(i["number"]), "-R", self.repo, "--body", body])
+            except Error as e:
+                log(i["number"], "sift not written: %s" % e)
+                continue
+            i["body"] = body
+            log(i["number"], "sifted: " + ", ".join(fixed))
         open_numbers = None
         shape = cutshape.check(issues)
+        self.unreadable = sum(1 for e in shape.values() if e)
         for i in sorted(issues, key=lambda i: i["number"]):
             if all(r <= 0 for r in rooms.values()):
                 break
@@ -860,9 +874,9 @@ class Dispatcher:
             if j["state"] in ended and str(j.get("updated_at") or "").startswith(today):
                 ended[j["state"]] += 1
         stages = states.STAGES
-        line = "%s beat %d | %s | ended today: %s" % (
+        line = "%s beat %d | %s | ended today: %s | unreadable %d" % (
             iso(self.now()), self.beats, ", ".join("%s %d" % (s, count.get(s, 0)) for s in stages),
-            ", ".join("%s %d" % (s, n) for s, n in ended.items()))
+            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable)
         print(line, flush=True)
         path = self.cfg.get("heartbeat_file", "/state/heartbeat")
         tmp = "%s.%d.tmp" % (path, os.getpid())
