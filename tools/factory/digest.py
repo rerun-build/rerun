@@ -122,3 +122,8 @@ def measures(store, now):
             "firstPassYield": sum(1 for m in merged if m[2] == 0) / n if n else None,
             "fixRounds": sum(m[2] for m in merged) / n if n else None,
             "blocks": blocks, "tokensPerMerged": tokens / n if n else None}
+
+
+def build(store, cfg, now):
+    return {"stations": stations(store, now), "threads": threads(store),
+            "anomalies": anomalies(store, cfg, now), "measures": measures(store, now)}
