@@ -749,7 +749,7 @@ class Dispatcher:
             if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
             elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
-                self.to(j, "fix_wait", verdict[:160], review=out[-1500:])
+                self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False)
             elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif stale:
@@ -771,7 +771,7 @@ class Dispatcher:
             last = final_line(out, ("PUSHED:", "BLOCKED:"))
             if not (last and last.startswith("PUSHED:")):
                 return self.blocked(j, out)
-            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=2)
+            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=j["round"] if j.get("same_round") else 2)
         elif st == "checks":
             self.checks(j)
         elif st == "proof_wait":
@@ -786,7 +786,8 @@ class Dispatcher:
             if kind == "pass":
                 self.to(j, "checks", "proved at %s" % j["head"][:7], proved=j["head"], checks_since=self.now())
             elif kind == "fail" and j["round"] == 1:
-                self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
+                self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]),
+                        same_round=False)
             elif kind == "none" and j.get("not_met") and not final_line(out, ("PROOF:",)):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif kind == "none":
@@ -811,7 +812,7 @@ class Dispatcher:
         if j.get("updated"):
             self.end(j, "failed", "#%s conflicts with dev again after one update" % j["pr"])
         else:
-            self.to(j, "fix_wait", "conflicts with dev; the builder merges dev in", updated=True,
+            self.to(j, "fix_wait", "conflicts with dev; the builder merges dev in", updated=True, same_round=True,
                     review="Not a rejection of the change itself: the branch now conflicts with dev, because other jobs merged first. "
                            "Merge dev into your branch (no rebase, no force push), resolve the conflicts, run the test files you touched, push.")
         return True
@@ -824,7 +825,7 @@ class Dispatcher:
         if verdict == "FAIL":
             if j.get("checks_fixed"):
                 return self.end(j, "failed", why)
-            return self.to(j, "fix_wait", why + "; back to the builder once", checks_fixed=True,
+            return self.to(j, "fix_wait", why + "; back to the builder once", checks_fixed=True, same_round=True,
                            review="Not a rejection of the change itself: GitHub's checks failed on commit %s (%s). Read the failed log "
                                   "(`gh run list --commit %s`, then `gh run view <id> --log-failed`), fix the cause, run the failing test files, push. "
                                   "A test that pins shipped behaviour is not edited to fit: where the failure says the change itself is wrong, end with BLOCKED."
