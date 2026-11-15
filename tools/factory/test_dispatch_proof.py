@@ -51,6 +51,9 @@ class ProofBase(T.Base):
 
 
 class Proof(ProofBase):
+    def reasons(self):
+        return [r[0] for r in self.w.rows("SELECT reason FROM transitions WHERE job=5 ORDER BY id")]
+
     def test_green_checks_wait_for_a_prover_and_do_not_merge(self):
         self.to_proof_wait()
         self.assertEqual(self.state(), "proof_wait")
@@ -116,12 +119,34 @@ class Proof(ProofBase):
         self.assertEqual(self.state(), "rejected")
         self.assertEqual(self.w.merges, [])
 
-    def test_a_proof_naming_another_commit_ends_rejected(self):
+    def test_a_proof_naming_another_commit_is_asked_again_then_blocks(self):
         self.to_proving()
         self.w.finish("r2", MET + "\nPROOF: PASS @1234567")
         self.tick()
-        self.assertEqual(self.state(), "rejected")
-        self.assertIn("proof names 1234567, the head is abcdef1", self.w.issue(5)["comments"][-1])
+        self.assertEqual(self.state(), "proof_wait")
+        self.assertIn("proof names 1234567, the head is abcdef1: asked again", self.reasons())
+        self.tick()
+        self.w.finish("r2", MET + "\nPROOF: PASS @1234567")
+        self.tick()
+        self.assertEqual(self.state(), "blocked")
+        self.assertIn("blocked: proof names 1234567, the head is abcdef1: asked again", self.reasons())
+        self.assertEqual(self.w.merges, [])
+
+    def test_a_proof_naming_no_commit_is_asked_again(self):
+        self.to_proving()
+        self.w.finish("r2", MET + "\nPROOF: PASS")
+        self.tick()
+        self.assertEqual(self.state(), "proof_wait")
+        self.assertIn("proof names no commit, the head is abcdef1: asked again", self.reasons())
+
+    def test_a_proof_with_at_merges_after_the_second_ask(self):
+        self.to_proving()
+        self.w.finish("r2", MET + "\nPROOF: PASS @1234567")
+        self.tick(2)
+        self.w.finish("r2", MET + "\nPROOF: PASS at abcdef1")
+        self.tick(2)
+        self.assertEqual(self.state(), "merged")
+        self.assertEqual(len(self.w.merges), 1)
 
     def test_an_output_without_a_proof_line_ends_rejected(self):
         self.to_proving()

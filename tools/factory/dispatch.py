@@ -713,6 +713,12 @@ class Dispatcher:
                 self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
             elif kind == "none" and j.get("not_met") and not final_line(out, ("PROOF:",)):
                 self.end(j, "blocked", self.not_met_reason(j, out))
+            elif kind == "none" and why.startswith("proof names"):
+                again = "%s: asked again" % why
+                if j.get("proof_asked"):
+                    self.end(j, "blocked", again)
+                else:
+                    self.to(j, "proof_wait", again, proof_asked=1)
             else:
                 self.end(j, "rejected", "proof: " + why[:190])
 
