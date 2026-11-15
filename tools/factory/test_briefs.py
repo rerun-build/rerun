@@ -22,6 +22,14 @@ class Briefs(unittest.TestCase):
         for s in ("options", "/data/tools/bin/wt new rerun 7 d1"):
             self.assertIn(s, d)
 
+    def test_research_and_design_briefs_name_the_last_commented_commit_and_a_new_worktree_per_take(self):
+        again = dict(self.J, take=2)
+        for b in (briefs.research_brief(self.J), briefs.design_brief(self.J)):
+            self.assertIn("86d04999", b)
+        self.assertIn("/data/tools/bin/wt new rerun 7 r2", briefs.research_brief(again))
+        self.assertIn("/data/tools/bin/wt new rerun 7 d2", briefs.design_brief(again))
+        self.assertIn("/data/tools/bin/wt new rerun 7 r1", briefs.research_brief(self.J))
+
 
 if __name__ == "__main__":
     unittest.main()
