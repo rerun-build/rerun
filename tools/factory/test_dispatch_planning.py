@@ -64,9 +64,9 @@ class Wiring(unittest.TestCase):
         self.assertEqual((plan[0]["parent"], plan[0]["title"], plan[0]["children"], plan[0]["filed"]), (450, "Floor", 1, 1))
         self.assertEqual(plan[0]["coworkers"], [{"id": BOSS, "name": "Boss", "runId": "run-b1", "startedAt": START, "steps": 4}])
 
-    def test_one_status_call_and_one_label_search_every_fifth_beat(self):
+    def test_one_status_call_and_one_label_search_every_second_beat(self):
         w = beats({"types": {"planner": PLANNER}}, 6)
-        self.assertEqual((w.team_calls, w.label_searches), (2, 2))
+        self.assertEqual((w.team_calls, w.label_searches), (4, 4))
         self.assertTrue(all("planning" in r for r in w.reports))
 
     def test_no_planner_pool_makes_no_call_and_no_key(self):
@@ -77,7 +77,7 @@ class Wiring(unittest.TestCase):
     def test_an_account_error_never_fails_the_beat(self):
         w = beats({"types": {"planner": PLANNER}, "prepare": lambda w: setattr(w, "team", RuntimeError("down"))}, 2)
         self.assertTrue(w.reports and all("planning" not in r for r in w.reports))
-        self.assertEqual(w.team_calls, 1)
+        self.assertEqual(w.team_calls, 2)
 
     def test_the_planner_pool_gets_no_work(self):
         w = beats({"types": {"planner": PLANNER}}, 3)
