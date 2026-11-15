@@ -516,12 +516,18 @@ class Dispatcher:
                 return j["state"]
             return "not a factory job" if not j and d not in labelled else "live"
         reason = self.store.get_all(n).get("close_reason")
-        if not reason:
-            r = json.loads(self.gh(["api", "repos/%s/issues/%d" % (self.repo, d)]))
+        if reason != "completed":
+            try:
+                r = json.loads(self.gh(["api", "repos/%s/issues/%d" % (self.repo, d)]))
+            except Error as e:
+                if re.search(r"HTTP 4(04|10)\b", str(e)):
+                    return "not found"
+                raise
             if r.get("state") != "closed":
                 return "live"
             reason = r.get("state_reason") or "completed"
-            self.store.set(n, "close_reason", reason)
+            if reason == "completed":
+                self.store.set(n, "close_reason", reason)
         return "met" if reason == "completed" else "closed as " + reason.replace("_", " ")
 
     def stop_lost(self):

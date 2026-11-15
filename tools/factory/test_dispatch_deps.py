@@ -1,7 +1,7 @@
 import json, os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import snapshot
-from test_dispatch import Base, ready
+from test_dispatch import Base, D, ready
 
 
 def issue(n, deps="none"):
@@ -98,6 +98,28 @@ class DeadDeps(Base):
         self.tick()
         self.assertEqual(self.state(), "building")
         self.assertEqual(len(self.lookups(8)), 2)
+
+    def test_a_dependency_closed_completed_between_two_beats_is_met(self):
+        self.w.issues = [issue(5, "#8")]
+        self.w.close_reasons[8] = "not_planned"
+        self.tick()
+        self.assertEqual(self.state(), "waiting")
+        self.w.close_reasons[8] = "completed"
+        self.tick()
+        self.assertEqual(self.state(), "building")
+
+    def test_a_dependency_that_does_not_exist_is_named_dead(self):
+        self.w.issues = [issue(5, "#9")]
+        gh = self.w.gh
+        def missing(a):
+            if a[:2] == ["api", "repos/o/r/issues/9"]:
+                raise D.Error("gh api repos/o/r/issues/9 failed: exit 1: gh: Not Found (HTTP 404)")
+            return gh(a)
+        self.w.gh = missing
+        self.tick()
+        self.assertEqual(self.state(), "waiting")
+        self.assertEqual(self.data()["dead"], [[9, "not found"]])
+        self.assertIn("#9 (not found)", self.w.issue(5)["comments"][0])
 
 
 if __name__ == "__main__":
