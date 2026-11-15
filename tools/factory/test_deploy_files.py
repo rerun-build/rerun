@@ -13,8 +13,13 @@ def code(text):
 
 
 class DevEngine(unittest.TestCase):
-    def test_key_comes_from_one_required_variable(self):
-        self.assertIn("RERUN_API_KEY: ${RERUN_DEV_ENGINE_KEY:?", read("dev-engine.yml"))
+    def test_key_is_one_required_variable_handed_over_as_a_secret(self):
+        c = code(read("dev-engine.yml"))
+        self.assertRegex(c, r"(?m)^x-required-key: \$\{RERUN_DEV_ENGINE_KEY:\?set RERUN_DEV_ENGINE_KEY in deploy/vps/\.env\}$")
+        self.assertIn("RERUN_API_KEY_FILE: /run/secrets/rerun_dev_engine_key", c)
+        self.assertRegex(c, r"(?m)^    secrets:\n      - rerun_dev_engine_key$")
+        self.assertRegex(c, r"(?m)^secrets:\n  rerun_dev_engine_key:\n    environment: RERUN_DEV_ENGINE_KEY$")
+        self.assertNotRegex(c, r"(?m)RERUN_API_KEY:")
 
     def test_no_literal_key_no_ports_no_socket(self):
         c = code(read("dev-engine.yml"))
