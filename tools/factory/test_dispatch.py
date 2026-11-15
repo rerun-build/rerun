@@ -111,6 +111,8 @@ class World:
             return json.dumps({"headRefOid": HEAD, "state": self.pr_state, "mergeable": self.mergeable})
         if a[:2] == ["pr", "list"]:
             return json.dumps(self.open_prs)
+        if a[0] == "api" and "/timeline" in a[1]:
+            return "[]"
         if a[0] == "api":
             sha = a[1].split("head_sha=")[1].split("&")[0]
             return json.dumps({"workflow_runs": self.workflows.get(sha, [])})

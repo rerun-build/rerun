@@ -1,5 +1,6 @@
 import argparse, datetime, hashlib, json, os, re, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
+import backlog
 import briefs
 import clocks
 import cutshape
@@ -908,6 +909,12 @@ class Dispatcher:
             self.reconcile()
         except (Error, ValueError, KeyError) as e:
             log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        if self.cfg.get("likely_fixed_days"):
+            try:
+                for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
+                    log(n, "closed: likely-fixed for %d days" % self.cfg["likely_fixed_days"])
+            except (Error, ValueError, KeyError) as e:
+                log("-", "backlog: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
         for j in self.jobs():
             try:

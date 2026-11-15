@@ -9,6 +9,7 @@
     "token_cap": 3000000
   },
   "auto_plan_marker": true,
+  "likely_fixed_days": 7,
   "proof": true,
   "slots": 15,
   "ledger_file": "/state/ledger.db",
