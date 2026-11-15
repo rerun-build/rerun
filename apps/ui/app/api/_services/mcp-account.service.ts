@@ -1,5 +1,5 @@
 import type { RunGoal } from '@rerun/contracts'
-import { connectorSkillReadOnlyError, FACTORY_SNAPSHOT_MAX_BYTES, factorySnapshotSchema, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, runGoalSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import { MCP_SERVER_NAME_RE, connectorSkillReadOnlyError, FACTORY_SNAPSHOT_MAX_BYTES, factorySnapshotSchema, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, runGoalSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentInWorkspace, callableEngineAgentIds, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import { putFactorySnapshot } from '@/lib/factory/snapshot-store'
@@ -31,6 +31,7 @@ import {
     listSkills as engineListSkills,
     listTriggers as engineListTriggers,
     patchAgent as enginePatchAgent,
+    patchMcpServers as enginePatchMcpServers,
     queryDb as engineQueryDb,
     rotateTriggerToken as engineRotateTriggerToken,
     runScheduleNow as engineRunScheduleNow,
@@ -41,7 +42,7 @@ import {
     writeFileText as engineWriteFileText,
 } from '@/lib/engine/client'
 import type { InstalledService } from '@/lib/services/types'
-import type { BoxConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineAgentSetup, EngineConnection, EngineRunDetail, EngineTrigger, EngineTriggerMethod } from '@/lib/engine/types'
+import type { BoxConnection, EngineAgentConfigPatch, EngineMcpServer, EngineAgentDetail, EngineAgentSetup, EngineConnection, EngineRunDetail, EngineTrigger, EngineTriggerMethod } from '@/lib/engine/types'
 import { MAX_DUPLICATES_PER_CALL, MAX_MEMORIES_PER_CALL, MAX_MEMORY_CHARS, MAX_UPLOAD_MB } from '@/lib/mcp/account-tools'
 import { asBooleanRecord, asNumber, asString, asStringArray, clamp, requireConfirmation, requireString } from '@/lib/mcp/args'
 import { connectionModels, readModelPin, type ModelPin } from '@/lib/mcp/model-pin'
@@ -49,7 +50,7 @@ import { projectRun } from '@/lib/mcp/run-projection'
 import { assertModelEntitled } from '@/app/api/_services/engine-plan.service'
 import { truncateField } from '@/lib/mcp/truncate'
 import { describeSkillFiles, normalizeSkillFilePath, planSkillFileRemovals, readSkillReferenceFile, removeSkillFiles } from '@/lib/skills/reference-files'
-import { connectorSkillOwners, readRegistry } from '@/lib/services/registry'
+import { connectorMcpServerNames, connectorSkillOwners, readRegistry } from '@/lib/services/registry'
 import { slugify } from '@/lib/slugify'
 import { MAX_TRIGGER_BODY_BYTES, triggerWebhookUrl } from '@/lib/triggers/webhook'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -58,6 +59,7 @@ import { changeAgentHandle, createAgent, deleteAgent, duplicateAgent, moveAgentT
 import { declareService, installServiceSlugs } from './agent-setup.service'
 import { LOCKED_NOTICE, LOCKED_WRITE_ERROR } from './agent-content.service'
 import { ensureSessionRow, resolveAgentTarget } from './chat.service'
+import { removeCustomMcpServer } from './custom-mcp.service'
 import { followCoworker, recordSessionParticipant } from './notification-audience.service'
 import { resolveSpaceTarget } from './space.service'
 import { dispatchShareTool } from './mcp-shares.service'
@@ -66,6 +68,45 @@ import { readTeamStatus } from './team-status.service'
 import { getWorkspaceConnection, NoEngineError } from './workspace-engine.service'
 
 type SkillFile = { path: string; content: string }
+
+function asStringRecord(v: unknown, field: string): Record<string, string> {
+    if (v === undefined || v === null) return {}
+    if (typeof v !== 'object' || Array.isArray(v)) throw new Error(`${field} must be an object of strings`)
+    const out: Record<string, string> = {}
+    for (const [key, value] of Object.entries(v)) {
+        if (typeof value !== 'string') throw new Error(`${field}.${key} must be a string`)
+        out[key] = value
+    }
+    return out
+}
+
+function readMcpServerArgs(args: Record<string, unknown>): EngineMcpServer {
+    const name = requireString(args.name, 'name')
+    if (name === 'rerun') throw new Error('"rerun" is reserved for the engine bridge. Pick another name.')
+    if (!MCP_SERVER_NAME_RE.test(name)) throw new Error('name must be 1-64 characters: letters, digits, underscores, or hyphens')
+    const command = asString(args.command)?.trim() || undefined
+    const url = asString(args.url)?.trim() || undefined
+    const requested = args.transport
+    if (requested !== undefined && requested !== 'stdio' && requested !== 'sse' && requested !== 'http') throw new Error('transport must be stdio, sse or http')
+    const transport = requested ?? (url ? 'http' : 'stdio')
+    if (transport === 'stdio' && !command) throw new Error('A stdio server needs a command.')
+    if (transport !== 'stdio' && !url) throw new Error(`A ${transport} server needs a url.`)
+    if (transport !== 'stdio') {
+        try {
+            new URL(url as string)
+        } catch {
+            throw new Error('url is not a valid address')
+        }
+    }
+    return {
+        name,
+        transport,
+        ...(transport === 'stdio' ? { command } : { url }),
+        args: asStringArray(args.args),
+        env: asStringRecord(args.env, 'env'),
+        headers: asStringRecord(args.headers, 'headers'),
+    }
+}
 
 function asSkillFiles(v: unknown): SkillFile[] {
     if (v === undefined) return []
@@ -465,6 +506,35 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 ...(identity ? { name: identity.name, handle: identity.handle } : {}),
                 ...(patched && checked ? { runsOn: projectRunsOn(patched, checked.connections) } : {}),
             }
+        }
+
+        case 'attach_mcp_server': {
+            const agentId = requireString(args.agentId, 'agentId')
+            const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+            const server = readMcpServerArgs(args)
+            if (connectorMcpServerNames(await readRegistry(conn, engineAgentId)).has(server.name)) {
+                throw new Error(`"${server.name}" belongs to an app. Manage it from the Apps tab.`)
+            }
+            await enginePatchMcpServers(conn, engineAgentId, { upsert: [server] })
+            return {
+                name: server.name,
+                transport: server.transport,
+                ...(server.command ? { command: server.command } : {}),
+                argCount: server.args.length,
+                ...(server.url ? { urlOrigin: new URL(server.url).origin } : {}),
+                envKeys: Object.keys(server.env).sort(),
+                headerKeys: Object.keys(server.headers).sort(),
+            }
+        }
+
+        case 'detach_mcp_server': {
+            const agentId = requireString(args.agentId, 'agentId')
+            const name = requireString(args.name, 'name')
+            const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+            const names = ((await engineGetAgent(conn, engineAgentId)).config.mcpServers ?? []).map(server => server.name)
+            if (!names.includes(name)) throw new Error(`Coworker has no tool server named "${name}".`)
+            await removeCustomMcpServer(agentId, name, actor)
+            return { removed: name, remaining: names.filter(other => other !== name) }
         }
 
         case 'list_ai_connections': {
