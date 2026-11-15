@@ -7,6 +7,11 @@ export type SnapshotFrame = FactoryFrame & { blocked: { issue: number; reason: s
 const BEAT_MS = 30_000
 const KEEP = ['Delegator', 'code', 'LARRY', 'LINUS', 'BRUCE', 'search', 'DIETER', 'rejects']
 const QUIET = '#8ea2ff'
+const RIDE_MS = 1_800
+const STAGGER_MS = 600
+const seen = new Map<number, number>()
+const rides = new Map<string, { parent: number; start: number }>()
+export const resetRides = () => { seen.clear(); rides.clear() }
 const clamp = (x: number) => Math.max(0, Math.min(1, x))
 const dedupe = (xs: string[]) => xs.filter((x, i) => i === 0 || x !== xs[i - 1])
 
@@ -114,6 +119,17 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
                 cracked.push(job.issue)
                 break
         }
+    }
+
+    for (const p of snapshot.planning ?? []) {
+        const before = seen.get(p.parent) ?? p.filed
+        for (let n = before + 1; n <= p.filed; n++) rides.set(`${p.parent}-${n}`, { parent: p.parent, start: now + (n - before - 1) * STAGGER_MS })
+        seen.set(p.parent, p.filed)
+    }
+    for (const [key, r] of rides) {
+        const age = now - r.start
+        if (age >= RIDE_MS) rides.delete(key)
+        else if (age >= 0 && r.parent === snapshot.planning?.at(-1)?.parent) pods.push({ id: `plan-ride-${key}`, issue: r.parent, title: `filed for #${r.parent}`, path: [`plan-${r.parent}`, 'Delegator'], travel: clamp(age / RIDE_MS), queue: 0, level: 0, band: 'build', state: 'working', scan: 0, since: r.start })
     }
 
     const parents = [...new Set(jobs.map(j => j.parent).filter((p): p is number => p !== null))].sort((a, b) => a - b).slice(0, FEATURE_CELLS.length)
