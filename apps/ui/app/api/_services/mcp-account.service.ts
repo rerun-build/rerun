@@ -384,7 +384,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 tools: detail.config.tools,
                 selfImprovement: detail.config.selfImprovement,
                 setup: { required: detail.config.setup.required, completedAt: detail.config.setup.completedAt, prompt: detail.install },
-                mcpServers: detail.config.mcpServers.map(server => ({ name: server.name, transport: server.transport, url: server.url })),
+                mcpServers: detail.config.mcpServers.map(server => ({ name: server.name, transport: server.transport, url: server.url, ...(server.tools?.length ? { tools: server.tools } : {}) })),
                 skills: skills.map(skill => ({ slug: skill.slug, name: skill.name, description: skill.description })),
                 schedules: schedules.map(schedule => ({ slug: schedule.slug, name: schedule.name, cron: schedule.cron, runAt: schedule.runAt, enabled: schedule.enabled })),
                 triggers: triggers.map(trigger => ({ slug: trigger.slug, name: trigger.name, methods: trigger.methods, enabled: trigger.enabled, lastFiredAt: trigger.lastFiredAt })),
@@ -536,6 +536,24 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             if (!names.includes(name)) throw new Error(`Coworker has no tool server named "${name}".`)
             await removeCustomMcpServer(agentId, name, actor)
             return { removed: name, remaining: names.filter(other => other !== name) }
+        }
+
+        case 'set_mcp_server_tools': {
+            const agentId = requireString(args.agentId, 'agentId')
+            const name = requireString(args.name, 'name')
+            const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+            const tools = args.tools
+            if (!Array.isArray(tools) || tools.length > 200 || tools.some(tool => typeof tool !== 'string' || tool.length === 0 || tool.length > 128)) {
+                throw new Error('tools must be a list of at most 200 names of 1 to 128 characters.')
+            }
+            const server = ((await engineGetAgent(conn, engineAgentId)).config.mcpServers ?? []).find(entry => entry.name === name)
+            if (!server) throw new Error(`Coworker has no tool server named "${name}".`)
+            if (connectorMcpServerNames(await readRegistry(conn, engineAgentId)).has(name)) {
+                throw new Error(`"${name}" belongs to an app. Manage it from the Apps tab.`)
+            }
+            const { tools: _previous, ...rest } = server
+            await enginePatchMcpServers(conn, engineAgentId, { upsert: [tools.length > 0 ? { ...rest, tools: tools as string[] } : rest] })
+            return { name, picks: tools as string[] }
         }
 
         case 'list_ai_connections': {
