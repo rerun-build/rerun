@@ -1,7 +1,7 @@
 import re
 
 HEADINGS = {"change": "change", "corrections": "change", "done-test": "done", "run": "run"}
-ASK_LINE = re.compile(r"^ASK (\d+): (MET \S.*|NOT MET \S.*)$")
+ASK_LINE = re.compile(r"^ASK (\d+): (MET|NOT MET)[.:,;]? +\S.*$")
 PROOF_LINE = re.compile(r"^PROOF: (PASS|FAIL) (?:@|at )([0-9a-f]{7,40})(?:: (.*))?$")
 
 
@@ -44,7 +44,7 @@ def judge(out, count, head):
     for l in lines:
         a = ASK_LINE.match(l)
         if a:
-            got[int(a.group(1))] = a.group(2).startswith("MET ")
+            got[int(a.group(1))] = a.group(2) == "MET"
     if m.group(1) == "FAIL":
         return "fail", (m.group(3) or "no ask numbers")[:200]
     if sorted(got) != list(range(1, count + 1)):
