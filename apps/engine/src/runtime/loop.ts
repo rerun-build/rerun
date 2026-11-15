@@ -160,7 +160,7 @@ type StepLike = {
     toolResults?: Array<{ toolCallId?: string; output?: unknown }>
 }
 
-async function recordStepTelemetry(agentId: string, sessionId: string, runId: string, provider: string, model: string, stepNumber: number, durationMs: number, step: StepLike, costMicros: number | null): Promise<void> {
+async function recordStepTelemetry(agentId: string, sessionId: string, runId: string, provider: string, model: string, stepNumber: number, durationMs: number, step: StepLike, costMicros: number | null, effort: string | null): Promise<void> {
     const calls = step.toolCalls ?? []
     const results = step.toolResults ?? []
     await insertRunStep(agentId, {
@@ -179,6 +179,7 @@ async function recordStepTelemetry(agentId: string, sessionId: string, runId: st
         totalTokens: step.usage?.totalTokens ?? null,
         cacheWriteTokens: step.usage?.inputTokenDetails?.cacheWriteTokens ?? null,
         costMicros,
+        effort,
         toolCallCount: calls.length,
         textLength: step.text?.length ?? 0,
         durationMs,
@@ -485,7 +486,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                 const stepCostMicros = costMicrosFrom(step.providerMetadata)
                 if (stepCostMicros !== null) runCostMicros = (runCostMicros ?? 0) + stepCostMicros
                 await bumpRunStep(agent.id, run.id, stepsToWrite()).catch(() => {})
-                await recordStepTelemetry(agent.id, sessionId, run.id, provider, model, steps, durationMs, step, stepCostMicros).catch(err => logger.warn({ err: String(err), agent: agent.id }, 'record step telemetry failed'))
+                await recordStepTelemetry(agent.id, sessionId, run.id, provider, model, steps, durationMs, step, stepCostMicros, agent.config.thinkingLevel ?? null).catch(err => logger.warn({ err: String(err), agent: agent.id }, 'record step telemetry failed'))
             },
             onError: async ({ error }) => {
                 if (controller.signal.aborted) {
