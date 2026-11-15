@@ -202,7 +202,23 @@
         "new": "New",
         "emptyTitle": "No MCP servers yet",
         "emptyDescription": "MCP servers give your coworker extra tools beyond built-in apps. Add one to extend what it can do.",
-        "appBadge": "App"
+        "appBadge": "App",
+        "state": {
+            "connected": "Connected",
+            "connecting": "Connecting",
+            "failed": "Failed",
+            "idle": "Idle",
+            "reconnecting": "Reconnecting"
+        },
+        "errorClass": {
+            "auth": "Sign-in needed",
+            "timeout": "Timed out",
+            "unreachable": "Unreachable",
+            "closed": "Closed",
+            "other": "Error"
+        },
+        "reconnect": "Reconnect",
+        "reconnectFailed": "Could not reconnect. Try again."
     },
     "mcpOAuthAuthorize": {
         "discoveryFailed": "Discovery failed",

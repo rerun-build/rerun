@@ -10,6 +10,7 @@ import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import { invalidateConnectorServices, useConnectorServices } from '@/hooks/useConnectorServices'
 import { refreshMcpServerStatuses } from '@/hooks/useMcpServerStatuses'
+import { useMcpSession } from '@/hooks/useMcpSession'
 import type { EngineMcpServer } from '@/lib/engine/types'
 import { serviceIconProps } from '@/lib/services/icons'
 import { BlocksIcon, PlugIcon, PlusIcon } from '@/lib/icons'
@@ -33,6 +34,38 @@ function serverSummary(s: EngineMcpServer): string {
     return `stdio · ${[s.command, ...(s.args ?? [])].filter(Boolean).join(' ') || '—'}`
 }
 
+type Translate = ReturnType<typeof useTranslations<'agent.agentPanelMcp'>>
+
+function stateLabel(t: Translate, state: string): string {
+    switch (state) {
+        case 'connected':
+            return t('state.connected')
+        case 'connecting':
+            return t('state.connecting')
+        case 'failed':
+            return t('state.failed')
+        case 'reconnecting':
+            return t('state.reconnecting')
+        default:
+            return t('state.idle')
+    }
+}
+
+function errorLabel(t: Translate, errorClass: string): string {
+    switch (errorClass) {
+        case 'auth':
+            return t('errorClass.auth')
+        case 'timeout':
+            return t('errorClass.timeout')
+        case 'unreachable':
+            return t('errorClass.unreachable')
+        case 'closed':
+            return t('errorClass.closed')
+        default:
+            return t('errorClass.other')
+    }
+}
+
 export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelMcp')
@@ -42,6 +75,8 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
     const [unreachable, setUnreachable] = useState(false)
     const [view, setView] = useState<View>({ mode: 'list' })
     const canManage = useCanManageAgent(agentId)
+    const { states, reconnecting, reconnect } = useMcpSession(agentId)
+    const [reconnectFailed, setReconnectFailed] = useState(false)
 
     const load = useCallback(async () => {
         setLoading(true)
@@ -127,6 +162,8 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
                     {newButton}
                 </PanelListHeader>
 
+                {reconnectFailed ? <p className="px-3 py-1 text-xs text-destructive">{t('reconnectFailed')}</p> : null}
+
                 {servers.length === 0 ? (
                     <EmptyState
                         icon={PlugIcon}
@@ -140,6 +177,28 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
                             {servers.map((s, i) => {
                                 const owner = connectors.get(s.name)
                                 const fromApp = !!owner && !owner.custom
+                                const live = states.get(s.name)
+                                const isReconnecting = reconnecting.has(s.name)
+                                const stateKey = isReconnecting ? 'reconnecting' : live?.state
+                                const busy = isReconnecting || live?.state === 'connecting'
+                                const reconnectButton = (
+                                    <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            disabled={!canManage || busy}
+                                            onClick={e => {
+                                                e.stopPropagation()
+                                                setReconnectFailed(false)
+                                                void reconnect(s.name).then(result => {
+                                                    if (!result.ok) setReconnectFailed(true)
+                                                })
+                                            }}
+                                        >
+                                            {t('reconnect')}
+                                        </Button>
+                                    </TooltipDisabledReason>
+                                )
                                 return (
                                     <PanelRow
                                         key={`${s.name}-${i}`}
@@ -148,11 +207,20 @@ export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
                                         title={s.name}
                                         description={serverSummary(s)}
                                         meta={
-                                            fromApp ? (
-                                                <Badge size="xs" tone="neutral" glow={false} leading={<BlocksIcon className="size-2.5" />}>
-                                                    {t('appBadge')}
-                                                </Badge>
-                                            ) : undefined
+                                            <>
+                                                {fromApp ? (
+                                                    <Badge size="xs" tone="neutral" glow={false} leading={<BlocksIcon className="size-2.5" />}>
+                                                        {t('appBadge')}
+                                                    </Badge>
+                                                ) : null}
+                                                {stateKey ? (
+                                                    <Badge size="xs" tone={stateKey === 'failed' ? 'red' : 'neutral'} glow={false}>
+                                                        {stateLabel(t, stateKey)}
+                                                        {stateKey === 'failed' && live?.errorClass ? ` · ${errorLabel(t, live.errorClass)}` : ''}
+                                                    </Badge>
+                                                ) : null}
+                                                {reconnectButton}
+                                            </>
                                         }
                                     />
                                 )
