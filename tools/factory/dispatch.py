@@ -27,6 +27,8 @@ LOST_BEATS = 3
 RECONCILE_BEATS = 10
 REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
+MAX_REPLANS = 2
+REPLAN_BY = ("Boss", "Scope Shaper")
 MERGE_TRIES = 5
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 
@@ -136,6 +138,21 @@ def build_brief(j):
         '',
         final_state(j, '`PR: <url>` or `BLOCKED: <one sentence>`'),
         TAIL,
+    ])
+
+
+def replan_brief(j, repo, n):
+    return "\n".join([
+        'One re-plan, sent by the dispatcher and not by Boss: %s issue #%s ("%s"). Re-plan %d of %d. You work alone: call no other coworker and send no question to Rob.' % (repo, j["issue"], j["title"], n, MAX_REPLANS),
+        '',
+        'The builder stopped this job with: %s' % (j.get("reason") or "-"),
+        '',
+        'Do three things:',
+        '1. Read the issue against today\'s dev in a throwaway checkout.',
+        '2. Add a `**Corrections**` block to the issue with `- ` bullets, and run each changed Run line once.',
+        '3. Put the issue back in the queue: `/data/tools/bin/gh issue edit %s -R %s --add-label factory --remove-label factory-blocked`' % (j["issue"], repo),
+        '',
+        'If the reason is not true on today\'s dev, say so in a comment and relabel unchanged.',
     ])
 
 
@@ -544,6 +561,25 @@ class Dispatcher:
                 return ref["number"]
         return None
 
+    def replan(self, j):
+        if clocks.klass("BLOCKED", blocked=j.get("reason")) != "plan" or j.get("replans", 0) >= MAX_REPLANS or j.get("replan_run"):
+            return
+        if "closed_seen" in self.store.get_all(str(j["issue"])):
+            return
+        t = pools.types(self.cfg).get("planner")
+        if t is None:
+            return
+        skip = self.unresolved() | {c["id"] for c in t["coworkers"] if c["name"] not in REPLAN_BY}
+        got = pools.pick_copy(self.cfg, "planner", self.running(), exclude=skip)
+        if got is None:
+            return
+        n = j.get("replans", 0) + 1
+        self.send(j, got[0], "replan", replan_brief(j, self.repo, n), "returned", copy=got[1])
+        if j.get("run"):
+            j["replans"] = n
+            j["replan_run"] = j["run"]
+            self.save(j, "re-plan %d of %d sent" % (n, MAX_REPLANS))
+
     def send(self, j, agent, step, message, state, copy=1):
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
         j["intent_at"] = iso(self.now())
@@ -947,6 +983,8 @@ class Dispatcher:
                     self.note_wait(j)
                 if j["state"] in END and not j.get("relabelled"):
                     self.report(j)
+                if j["state"] == "returned" and j.get("relabelled"):
+                    self.replan(j)
                 if j.get("errors"):
                     j["errors"] = 0
                     self.save(j, "pass ok")
