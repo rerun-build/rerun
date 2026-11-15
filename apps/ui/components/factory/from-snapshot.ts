@@ -126,6 +126,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     }
 
     for (const p of snapshot.planning ?? []) {
+        if (p.parent === null) continue
         const before = seen.get(p.parent) ?? p.filed
         for (let n = before + 1; n <= p.filed; n++) rides.set(`${p.parent}-${n}`, { parent: p.parent, start: now + (n - before - 1) * STAGGER_MS })
         seen.set(p.parent, p.filed)
@@ -159,7 +160,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         ...[...runners.values()].filter(c => c.id !== BOSS_ID).slice(0, PLANNER_CELLS.length).map((c, i) => ({ ...room, id: `planner-${c.id.slice(0, 8)}`, position: PLANNER_CELLS[i], style: workStyle(c.name, c.id), ariaLabel: c.name })),
         ...(desk ? [{ ...room, id: `plan-${desk.parent}`, position: PLAN_TANK, style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Planning #${desk.parent} ${desk.title}: ${desk.filed} of ${desk.children} filed` }] : []),
     ]
-    const plans: PlanView[] = desk ? [{ parent: desk.parent, title: desk.title, children: desk.children, filed: desk.filed }] : []
+    const plans: PlanView[] = desk && desk.parent !== null ? [{ parent: desk.parent, title: desk.title, children: desk.children, filed: desk.filed }] : []
 
     const out = new Map<string, number>()
     for (const pool of snapshot.pools) for (const c of pool.coworkers) out.set(c.name, c.out)
