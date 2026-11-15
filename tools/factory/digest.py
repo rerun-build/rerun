@@ -1,10 +1,14 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cutshape
 import limits as L
+import states
 
 STATIONS = (("build", "queued", "building"), ("review", "review_wait", "reviewing"),
             ("fix", "fix_wait", "fixing"), ("proof", "proof_wait", "proving"))
 SERVICE_WINDOW_S = 2 * 3600
+MAX_THREADS = 50
+MAX_BLOCKED = 20
 
 
 def stations(store, now):
@@ -29,3 +33,27 @@ def stations(store, now):
                     "serviceS": sum(spans) / len(spans) if spans else None,
                     "inUse": sum(1 for j in jobs if j["state"] == run)})
     return out
+
+
+def threads(store):
+    groups = {}
+    for j in store.jobs():
+        p = cutshape.parse({"number": j["issue"], "body": j.get("body") or ""})
+        if p["parent"] is not None:
+            groups.setdefault(p["parent"], {})[j["issue"]] = (j["state"], p["deps"])
+    out = []
+    for parent, jobs in groups.items():
+        live = {n: [d for d in deps if d in jobs and jobs[d][0] != "merged"] for n, (state, deps) in jobs.items() if state != "merged"}
+        if not live:
+            continue
+        def walk(n, path):
+            best = 0
+            for d in live[n]:
+                if d not in path:
+                    best = max(best, walk(d, path | {n}))
+            return best + 1
+
+        chain = max(walk(n, frozenset()) for n in live)
+        out.append({"parent": parent, "done": sum(1 for s, _ in jobs.values() if s == "merged"), "total": len(jobs),
+                    "chain": chain, "blockedBy": sorted(n for n, (s, _) in jobs.items() if s in states.PROBLEM)[:MAX_BLOCKED]})
+    return sorted(out, key=lambda t: t["parent"])[-MAX_THREADS:]
