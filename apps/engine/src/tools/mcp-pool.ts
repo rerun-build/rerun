@@ -103,6 +103,21 @@ async function connect(agentId: string, server: McpServer, spawn: McpSpawn): Pro
     }
 }
 
+function isConnectionLost(error: unknown): boolean {
+    const code = (error as { code?: unknown } | null)?.code
+    return (error instanceof McpError && code === -32000) || code === 'EPIPE' || code === 'ECONNRESET'
+}
+
+async function callOn(live: Live, name: string, args: Record<string, unknown>, options?: RequestOptions): Promise<CallResult> {
+    live.entry.inFlight++
+    try {
+        return await live.session.client.callTool({ name, arguments: args }, undefined, options)
+    } finally {
+        live.entry.inFlight--
+        arm(live.key, live.entry)
+    }
+}
+
 export async function acquireMcp(agentId: string, server: McpServer, spawn: McpSpawn): Promise<PooledMcp | null> {
     const first = await connect(agentId, server, spawn)
     if (!first) return null
@@ -112,12 +127,15 @@ export async function acquireMcp(agentId: string, server: McpServer, spawn: McpS
         call: async (name, args, options) => {
             const live = entries.get(first.key) === first.entry ? first : await connect(agentId, server, spawn)
             if (!live) throw new Error(`server "${server.name}" unreachable`)
-            live.entry.inFlight++
             try {
-                return await live.session.client.callTool({ name, arguments: args }, undefined, options)
-            } finally {
-                live.entry.inFlight--
-                arm(live.key, live.entry)
+                return await callOn(live, name, args, options)
+            } catch (e) {
+                if (!isConnectionLost(e) || options?.signal?.aborted) throw e
+                logger.info({ server: server.name }, 'mcp: connection lost, reconnecting once')
+                void drop(live.key, live.entry)
+                const fresh = await connect(agentId, server, spawn)
+                if (!fresh) throw new Error(`server "${server.name}" unreachable`)
+                return await callOn(fresh, name, args, options)
             }
         },
     }

@@ -15,6 +15,8 @@ const mcp = vi.hoisted(() => ({
     hanging: new Set<string>(),
     clients: [] as Array<{ target: string; onclose?: () => void }>,
     callGate: null as Promise<void> | null,
+    rejections: [] as unknown[],
+    answer: null as unknown,
 }))
 
 vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
@@ -48,6 +50,8 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
         async callTool(request: { name: string }, _schema: unknown, options: unknown) {
             mcp.calls.push({ target: this.target, name: request.name, options })
             if (mcp.callGate) await mcp.callGate
+            if (mcp.rejections.length) throw mcp.rejections.shift()
+            if (mcp.answer) return mcp.answer
             return { content: [{ type: 'text', text: `${request.name} ran` }] }
         }
         async close() {
@@ -58,6 +62,7 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
 }))
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
+const { McpError } = await import('@modelcontextprotocol/sdk/types.js')
 const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, acquireMcp, closeAllMcp, mcpSessionStates, pooledMcpCount, reconnectMcp, releaseAgentMcp } = await import('./mcp-pool.js')
 
 type Server = Parameters<typeof acquireMcp>[1]
@@ -75,6 +80,8 @@ beforeEach(async () => {
     mcp.failing.clear()
     mcp.hanging.clear()
     mcp.callGate = null
+    mcp.rejections.length = 0
+    mcp.answer = null
 })
 
 afterEach(() => {
@@ -181,6 +188,79 @@ describe('acquireMcp', () => {
         mcp.failing.add('https://gh.example/mcp')
         await expect(pooled!.call('search', {})).rejects.toThrow('server "gh" unreachable')
         expect(mcp.calls).toHaveLength(0)
+    })
+})
+
+describe('a connection that dies during a call', () => {
+    const ran = { content: [{ type: 'text', text: 'search ran' }] }
+    const closed = () => new McpError(-32000, 'Connection closed')
+
+    it('reconnects once and retries when the connection closes during a call', async () => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        mcp.rejections.push(closed())
+        expect(await pooled!.call('search', {})).toEqual(ran)
+        expect(mcp.connects).toHaveLength(2)
+        expect(mcp.calls).toHaveLength(2)
+        expect(mcp.calls[1]!.target).toBe('https://gh.example/mcp')
+    })
+
+    it('reports the second failure and makes no third attempt', async () => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        const second = closed()
+        mcp.rejections.push(closed(), second)
+        await expect(pooled!.call('search', {})).rejects.toBe(second)
+        expect(mcp.calls).toHaveLength(2)
+        expect(mcp.connects).toHaveLength(2)
+    })
+
+    it('does not retry a request timeout', async () => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        mcp.rejections.push(new McpError(-32001, 'Request timed out'))
+        await expect(pooled!.call('search', {})).rejects.toThrow('Request timed out')
+        expect(mcp.calls).toHaveLength(1)
+        expect(mcp.connects).toHaveLength(1)
+    })
+
+    it('does not retry another McpError', async () => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        mcp.rejections.push(new McpError(-32602, 'Invalid params'))
+        await expect(pooled!.call('search', {})).rejects.toThrow('Invalid params')
+        expect(mcp.calls).toHaveLength(1)
+    })
+
+    it('does not retry a call whose signal was aborted', async () => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        const controller = new AbortController()
+        controller.abort()
+        mcp.rejections.push(closed())
+        await expect(pooled!.call('search', {}, { signal: controller.signal })).rejects.toThrow('Connection closed')
+        expect(mcp.calls).toHaveLength(1)
+        expect(mcp.connects).toHaveLength(1)
+    })
+
+    it('does not retry a result the server answered with isError', async () => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        const failed = { isError: true, content: [{ type: 'text', text: 'tool failed' }] }
+        mcp.answer = failed
+        expect(await pooled!.call('search', {})).toBe(failed)
+        expect(mcp.calls).toHaveLength(1)
+        expect(mcp.connects).toHaveLength(1)
+    })
+
+    it.each(['ECONNRESET', 'EPIPE'])('retries on %s', async code => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        mcp.rejections.push(Object.assign(new Error(code), { code }))
+        expect(await pooled!.call('search', {})).toEqual(ran)
+        expect(mcp.calls).toHaveLength(2)
+        expect(mcp.connects).toHaveLength(2)
+    })
+
+    it('answers server unreachable when the retry cannot dial', async () => {
+        const pooled = await acquireMcp('a1', server('gh'), spawn)
+        mcp.rejections.push(closed())
+        mcp.failing.add('https://gh.example/mcp')
+        await expect(pooled!.call('search', {})).rejects.toThrow('server "gh" unreachable')
+        expect(mcp.calls).toHaveLength(1)
     })
 })
 
