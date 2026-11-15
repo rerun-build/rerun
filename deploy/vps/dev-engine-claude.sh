@@ -15,8 +15,8 @@ printf '%s\n' "$STATE"
 case "$STATE" in
     *connection=absent*)
         trap 'stty echo 2>/dev/null || true' EXIT INT TERM
+        stty -echo 2>/dev/null || { echo "This terminal cannot hide typing: nothing was asked and nothing was sent."; exit 1; }
         printf 'Token from "claude setup-token" (hidden, Enter to cancel): '
-        stty -echo 2>/dev/null || true
         read -r TOKEN || TOKEN=''
         stty echo 2>/dev/null || true
         echo
