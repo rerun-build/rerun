@@ -5,7 +5,8 @@ import { Readable } from 'node:stream'
 import { createAgentSchema, duplicateAgentSchema, mcpTokenSchema, updateAgentKeysSchema, updateAgentMcpServersSchema } from '@rerun/contracts'
 import { clearToken, saveToken } from '../../tools/mcp-auth.js'
 import { probeMcpStatuses } from '../../tools/mcp-status.js'
-import { agentMcpSpawn } from '../../tools/mcp-pool.js'
+import { agentMcpSpawn, mcpSessionStates, reconnectMcp } from '../../tools/mcp-pool.js'
+import { announceToAgentRuns } from '../../runtime/run-control.js'
 import { createAgent } from '../../agents/factory.js'
 import { agentConfigSchema, BRIDGE_SERVER_NAME, MCP_SERVER_NAME_RE } from '../../agents/types.js'
 import { readAgentEnv, writeAgentEnv } from '../../agents/env.js'
@@ -161,6 +162,34 @@ agentRoutes.get('/:id/mcp-servers/status', async c => {
     const [config, env] = await Promise.all([readAgentConfig(id), readAgentEnv(id)])
     const servers = config.mcpServers.filter(server => server.name !== BRIDGE_SERVER_NAME && (!names || names.includes(server.name)))
     return c.json({ servers: await probeMcpStatuses(id, servers, env, agentMcpSpawn({ id, env, config })) })
+})
+
+agentRoutes.get('/:id/mcp-servers/session', async c => {
+    const id = c.req.param('id')
+    if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
+    const config = await readAgentConfig(id)
+    const held = new Map(mcpSessionStates(id).map(state => [state.name, state]))
+    const servers = config.mcpServers
+        .filter(server => server.name !== BRIDGE_SERVER_NAME)
+        .map(server => {
+            const state = held.get(server.name)
+            if (!state) return { name: server.name, state: 'idle' as const }
+            return state.errorClass ? { name: state.name, state: state.state, errorClass: state.errorClass } : { name: state.name, state: state.state }
+        })
+    return c.json({ servers })
+})
+
+agentRoutes.post('/:id/mcp-servers/:name/reconnect', async c => {
+    const id = c.req.param('id')
+    if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
+    const name = c.req.param('name')
+    const config = await readAgentConfig(id)
+    if (!config.mcpServers.some(server => server.name === name)) return c.json({ error: 'server not found' }, 404)
+    if (name === BRIDGE_SERVER_NAME) return c.json({ error: 'the rerun server cannot be reconnected' }, 400)
+    const reconnected = reconnectMcp(id, name)
+    const effect = (await loadAgentView(id)).resolved.provider === 'codex' ? 'next_message' : 'next_call'
+    const announced = announceToAgentRuns(id, { type: 'data-mcp-reconnect', data: { name, effect } })
+    return c.json({ name, reconnected, effect, announced })
 })
 
 agentRoutes.put('/:id/mcp/:name/token', async c => {
