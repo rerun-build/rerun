@@ -76,6 +76,36 @@ export const factoryPlanningSchema = z.object({
     filed: count,
 }).strict()
 
+export const factoryDigestSchema = z.object({
+    stations: z.array(z.object({
+        station: z.string().max(20),
+        queue: count,
+        oldestWaitS: count,
+        serviceS: z.number().min(0).nullable(),
+        inUse: count,
+    }).strict()).max(12),
+    threads: z.array(z.object({
+        parent: z.number().int().positive(),
+        done: count,
+        total: count,
+        chain: count,
+        blockedBy: z.array(z.number().int().positive()).max(20),
+    }).strict()).max(50),
+    anomalies: z.array(z.object({
+        kind: z.enum(['past_clock', 'repeat_block', 'proof_fail_rate', 'budget_burn']),
+        issue: z.number().int().positive().nullable(),
+        detail: z.string().max(200),
+    }).strict()).max(50),
+    measures: z.object({
+        mergedPerHour: z.number().min(0),
+        leadTimeS: z.number().min(0).nullable(),
+        firstPassYield: z.number().min(0).max(1).nullable(),
+        fixRounds: z.number().min(0).nullable(),
+        blocks: z.object({ blocked: count, rejected: count, failed: count, returned: count }).strict(),
+        tokensPerMerged: z.number().min(0).nullable(),
+    }).strict(),
+}).strict()
+
 export const factorySnapshotSchema = z.object({
     version: z.literal(1),
     madeAt: isoTime,
@@ -84,6 +114,7 @@ export const factorySnapshotSchema = z.object({
     jobs: z.array(factoryJobSchema).max(300),
     epics: z.array(factoryEpicSchema).max(50).optional(),
     planning: z.array(factoryPlanningSchema).max(5).optional(),
+    digest: factoryDigestSchema.optional(),
     holds: z.array(factoryHoldSchema).max(10),
     pools: z.array(factoryPoolSchema).max(8),
     endedToday: z.object({ merged: count, rejected: count, blocked: count, failed: count, returned: count }).strict(),
