@@ -1,4 +1,4 @@
-import ast, os, re, sys, unittest
+import ast, os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import dispatch as D
 import states
