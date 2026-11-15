@@ -1,4 +1,4 @@
-import datetime, json, os, subprocess, time
+import datetime, json, os, shutil, subprocess, time
 
 import refresh
 
@@ -57,9 +57,13 @@ class Launcher:
         if not os.path.isdir(os.path.join(self.src, ".git")):
             if not fetch:
                 raise Failed("no clone in %s" % self.src)
-            self.call("git clone", ["git", "clone", "--filter=blob:none", "--no-checkout", "--sparse",
-                                    "https://github.com/%s.git" % self.repo, self.src])
-            self.git("sparse-checkout", "set", "--no-cone", "/tools/factory/")
+            try:
+                self.call("git clone", ["git", "clone", "--filter=blob:none", "--no-checkout", "--sparse",
+                                        "https://github.com/%s.git" % self.repo, self.src])
+                self.git("sparse-checkout", "set", "--no-cone", "/tools/factory/")
+            except ERRORS:
+                shutil.rmtree(self.src, ignore_errors=True)
+                raise
         if fetch:
             self.git("fetch", "-q", "--depth", "1", "origin", sha)
         self.git("checkout", "-q", "--detach", sha)
@@ -80,7 +84,7 @@ class Launcher:
                 except ERRORS as e:
                     log("cannot check out %s %s: %s" % (key, rec[key][:7], e))
                     if key == "trial":
-                        self.save(trial=None, skip=rec[key])
+                        self.save(trial=None)
         return self.app, "app"
 
     def clean_beat(self, started):
@@ -155,7 +159,11 @@ class Launcher:
         if not refresh.SHA.fullmatch(sha):
             return log("refresh: the target is not a commit id; keeping %s" % current[:7])
         try:
-            self.compiles(self.checkout(sha, True))
+            code = self.checkout(sha, True)
+        except ERRORS as e:
+            return log("refresh to %s failed: %s; keeping %s, trying again at the next check" % (sha[:7], e, current[:7]))
+        try:
+            self.compiles(code)
         except ERRORS as e:
             self.save(skip=sha)
             return log("refresh to %s failed: %s; keeping %s" % (sha[:7], e, current[:7]))

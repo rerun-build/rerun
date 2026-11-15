@@ -40,7 +40,7 @@ class World:
         self.src = os.path.join(self.state, "src")
         self.factory = os.path.join(self.src, "tools", "factory")
         os.makedirs(self.state)
-        self.clock, self.compile_rc = 1000.0, 0
+        self.clock, self.compile_rc, self.fail = 1000.0, 0, set()
         self.procs, self.spawned, self.git_calls, self.slept, self.known = [], [], [], [], set()
         self.l = L.Launcher(state=self.state, app=self.app, repo="o/r", run=self.run, spawn=self.spawn,
                             clock=lambda: self.clock, sleep=self.sleep, env={"KEEP": "1"})
@@ -62,6 +62,8 @@ class World:
     def run(self, argv, **kw):
         self.git_calls.append(list(argv))
         rc = 0
+        if argv[0] == "git" and (argv[3] if argv[1] == "-C" else argv[1]) in self.fail:
+            return subprocess.CompletedProcess(argv, 1, "", "fatal: boom\n")
         if argv[:2] == ["git", "clone"]:
             os.makedirs(os.path.join(argv[-1], ".git"))
         elif argv[3:4] == ["fetch"]:
@@ -224,6 +226,32 @@ class Launch(unittest.TestCase):
         argv, env = self.w.spawned[1]
         self.assertEqual(self.w.git_calls[-1], self.checkout(OLD))
         self.assertEqual((env["FACTORY_CODE_SHA"], env["FACTORY_SKIP_SHA"]), (OLD, NEW))
+
+    def test_a_half_made_clone_is_removed_and_a_failed_fetch_is_tried_again_not_skipped(self):
+        self.w.fail = {"sparse-checkout"}
+        self.w.refresh_to(NEW)
+        self.step(Proc(self.w, 75))
+        self.assertFalse(os.path.exists(self.w.src))
+        self.assertIn("trying again at the next check", self.out.getvalue())
+        self.w.fail = {"fetch"}
+        self.w.refresh_to(NEW)
+        self.step(Proc(self.w, 75))
+        self.assertEqual([c[:2] for c in self.w.git_calls].count(["git", "clone"]), 2)
+        self.assertTrue(os.path.isdir(os.path.join(self.w.src, ".git")))
+        self.assertEqual(self.w.l.record(), {"good": None, "trial": None, "skip": None})
+        self.w.fail = set()
+        self.w.refresh_to(NEW)
+        self.step(Proc(self.w, 75))
+        self.assertEqual(self.w.record(), {"good": None, "trial": NEW, "skip": None})
+        self.assertNotIn("FACTORY_SKIP_SHA", self.w.spawned[-1][1])
+
+    def test_a_trial_that_can_no_longer_be_checked_out_is_dropped_without_a_skip(self):
+        self.w.cloned(OLD)
+        self.w.save({"good": OLD, "trial": NEW})
+        self.step(Proc(self.w, 1))
+        self.assertEqual(self.w.record(), {"good": OLD, "trial": None, "skip": None})
+        self.assertIn("cannot check out trial %s" % NEW[:7], self.out.getvalue())
+        self.assertEqual(self.w.spawned[0][1]["FACTORY_CODE_SHA"], OLD)
 
     def test_a_refresh_target_that_is_not_a_commit_id_never_reaches_git(self):
         for text in ("--upload-pack=touch x", "", NEW[:39], NEW.upper(), None):
