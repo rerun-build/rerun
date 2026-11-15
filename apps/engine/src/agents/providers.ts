@@ -174,15 +174,18 @@ export function claudeMcpConfig(tools?: ToolSet, mcpServers: RunMcpServer[] = []
         const entry = server.relay ? relayMcpServer(server.relay, BRIDGE_TOOL_TIMEOUT_SEC * 1000) : nativeMcpEntry(server)
         if (!entry || server.name === BRIDGE_SERVER_NAME) continue
         servers[server.name] = entry
-        allowedTools.push(`mcp__${server.name}`)
+        const picked = server.tools ?? []
+        if (!server.relay && picked.length) allowedTools.push(...picked.map(tool => `mcp__${server.name}__${tool}`))
+        else allowedTools.push(`mcp__${server.name}`)
     }
     return { mcpServers: servers, allowedTools }
 }
 
 function codexNativeMcpEntry(server: McpServer): CodexMcpServerConfig | null {
     const kind = resolveTransport(server)
-    if (kind === 'stdio') return server.command ? { transport: 'stdio', command: server.command, args: server.args, env: server.env } : null
-    if (kind === 'http' && server.url) return { transport: 'http', url: server.url, httpHeaders: server.headers }
+    const enabled = server.tools?.length ? { enabledTools: server.tools } : {}
+    if (kind === 'stdio') return server.command ? { transport: 'stdio', command: server.command, args: server.args, env: server.env, ...enabled } : null
+    if (kind === 'http' && server.url) return { transport: 'http', url: server.url, httpHeaders: server.headers, ...enabled }
     return null
 }
 
