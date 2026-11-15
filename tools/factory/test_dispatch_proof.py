@@ -59,6 +59,14 @@ class Proof(ProofBase):
         self.assertEqual(self.state(), "proof_wait")
         self.assertEqual(self.w.merges, [])
 
+    def test_the_prover_reads_the_pull_request_with_packet_and_takes_run_lines_from_ci(self):
+        self.to_proving()
+        _, msg, _ = self.w.sends[-1]
+        self.assertIn("/data/tools/bin/packet rerun ", msg)
+        self.assertIn("Done-test red before green", msg)
+        self.assertIn("Red before green**: not applicable", msg)
+        self.assertNotIn("only when you ran it", msg)
+
     def test_prover_is_neither_builder_nor_reviewer_and_gets_the_asks(self):
         self.to_proving()
         self.assertEqual(self.state(), "proving")
