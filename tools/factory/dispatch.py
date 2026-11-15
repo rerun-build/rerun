@@ -30,6 +30,7 @@ MERGE_TRIES = 5
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
              "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
+DEP_TEXT = {"live": "#%d", "not a factory job": "#%d (not a factory job)", "returned": "returned #%d"}
 
 
 class Error(Exception):
@@ -263,6 +264,12 @@ def depends_on(issue):
     return cutshape.parse(issue)["deps"]
 
 
+def dead_comment(dead):
+    return ("The factory dispatcher does not start this issue: it waits on %s, and that will not finish by itself. "
+            "The dispatcher closes and relabels nothing. Take the dependency back into the factory, close it as completed, "
+            "or change the **Depends on** line." % ", ".join("#%d (%s)" % (d, why) for d, why in dead))
+
+
 def checks_verdict(runs):
     if not runs:
         return "WAIT", "no workflow runs yet"
@@ -411,6 +418,7 @@ class Dispatcher:
             log(i["number"], "sifted: " + ", ".join(fixed))
         shape = cutshape.check(issues)
         self.unreadable = sum(1 for e in shape.values() if e)
+        labelled = {i["number"] for i in issues}
         open_numbers = None
         if any(cutshape.parse(i)["deps"] for i in issues):
             open_numbers = {o["number"] for o in json.loads(self.gh(
@@ -444,20 +452,29 @@ class Dispatcher:
                     continue
                 deps = parsed["deps"]
                 if deps:
-                    unmet = [d for d in deps if d in open_numbers]
+                    got = {d: self.dep_state(d, open_numbers, labelled) for d in deps}
+                    unmet = [d for d in deps if got[d] != "met"]
                     if unmet:
-                        ret = [d for d in unmet if (self.store.get_job(str(d)) or {}).get("state") == "returned"]
-                        if not old or old.get("waiting") != unmet or old.get("waits_on_returned", []) != ret:
-                            line = "waits on " + ", ".join(("returned #%d" if d in ret else "#%d") % d for d in unmet)
+                        ret = [d for d in unmet if got[d] == "returned"]
+                        dead = [[d, got[d]] for d in unmet if got[d] not in ("live", "not a factory job")]
+                        line = "waits on " + ", ".join(DEP_TEXT.get(got[d], "dead #%d (" + got[d] + ")") % d for d in unmet)
+                        if not old or old["state"] != "waiting" or old.get("wait_line") != line:
                             data = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "waiting",
                                     "round": 1, "waiting": unmet, "worker": parsed["worker"], "paths": parsed["paths"],
-                                    "test": parsed["test"]}
+                                    "test": parsed["test"], "wait_line": line}
                             if ret:
                                 data["waits_on_returned"] = ret
+                            if dead:
+                                data["dead"] = dead
                             if take:
                                 data["take"] = take
                             self.save(data, line)
                             log(i["number"], line)
+                        digest = hashlib.sha256(json.dumps(dead).encode()).hexdigest()[:16] if dead else ""
+                        if self.store.get_all(str(i["number"])).get("dead_deps", "") != digest:
+                            if dead:
+                                self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", dead_comment(dead)])
+                            self.store.set(str(i["number"]), "dead_deps", digest)
                         continue
                 if self.cfg.get("auto_plan_marker", True):
                     v = json.loads(self.gh(["issue", "view", str(i["number"]), "-R", self.repo, "--json", "body,comments"]))
@@ -477,6 +494,24 @@ class Dispatcher:
                 log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
             except (Error, ValueError, KeyError) as e:
                 log(i["number"], "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
+
+    def dep_state(self, d, open_numbers, labelled):
+        n = str(d)
+        if d in open_numbers:
+            if self.store.get_all(n).get("close_reason"):
+                self.store.set(n, "close_reason", "")
+            j = self.store.get_job(n)
+            if j and j["state"] in states.PROBLEM and d not in labelled:
+                return j["state"]
+            return "not a factory job" if not j and d not in labelled else "live"
+        reason = self.store.get_all(n).get("close_reason")
+        if not reason:
+            r = json.loads(self.gh(["api", "repos/%s/issues/%d" % (self.repo, d)]))
+            if r.get("state") != "closed":
+                return "live"
+            reason = r.get("state_reason") or "completed"
+            self.store.set(n, "close_reason", reason)
+        return "closed as not planned" if reason == "not_planned" else "met"
 
     def stop_lost(self):
         live = [j for j in self.jobs() if j["state"] not in END]
