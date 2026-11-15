@@ -141,8 +141,8 @@ export function buildLedger(snapshot: FactorySnapshot): LedgerEpic[] {
 
 export type LedgerFilter = 'running' | 'waiting' | 'problems' | 'doneToday' | 'wave' | { department: FactoryDepartment }
 
-const RUNNING = new Set<FactoryJobState>(['building', 'reviewing', 'fixing', 'checks'])
-const WAITING = new Set<FactoryJobState>(['waiting', 'queued', 'review_wait', 'fix_wait'])
+const RUNNING = new Set<FactoryJobState>(['building', 'reviewing', 'proving', 'fixing', 'checks'])
+const WAITING = new Set<FactoryJobState>(['waiting', 'queued', 'review_wait', 'proof_wait', 'fix_wait'])
 const PROBLEMS = new Set<FactoryJobState>(['blocked', 'failed', 'returned', 'rejected'])
 
 export function filterLedger(epics: LedgerEpic[], filter: LedgerFilter | null, now: number): LedgerEpic[] {
