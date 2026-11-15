@@ -1,4 +1,4 @@
-import json, os, sys, tempfile, time, unittest
+import json, os, sys, time, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import backlog
 
