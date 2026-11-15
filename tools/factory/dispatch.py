@@ -4,6 +4,7 @@ import briefs
 import clocks
 import cutshape
 import holds
+import planners
 import pools
 import proof
 import renewal
@@ -283,6 +284,7 @@ class Dispatcher:
         self.report_logged = set()
         self.started = now()
         self.names = pools.names(cfg)
+        self.planners = planners.Planners(cfg, account, gh)
 
     def fill_ids(self):
         missing = [c for t in (self.cfg.get("types") or {}).values() for c in t.get("coworkers", []) if not c.get("id")]
@@ -870,7 +872,7 @@ class Dispatcher:
         try:
             now = self.now()
             snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
-                                           read_epic=self.read_epic)
+                                           read_epic=self.read_epic, planning=self.planners.read(self.beats))
             self.account("factory_report", {"snapshot": snap}, timeout=10)
             self.report_logged.clear()
         except Exception as e:  # noqa: BLE001 - the report only, never the beat
