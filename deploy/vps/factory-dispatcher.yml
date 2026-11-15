@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: factory-runner.Dockerfile
     working_dir: /app
-    command: ["python3", "-u", "/app/dispatch.py", "run"]
+    command: ["python3", "-u", "/app/launch.py"]
     environment:
       FACTORY_DATA_DIR: /state
       HOME: /tmp

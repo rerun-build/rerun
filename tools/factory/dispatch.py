@@ -1,4 +1,4 @@
-import argparse, datetime, hashlib, json, os, re, subprocess, sys, tempfile, time, urllib.error, urllib.request
+import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
 import backlog
 import briefs
@@ -8,6 +8,7 @@ import holds
 import planners
 import pools
 import proof
+import refresh
 import renewal
 import sifter
 import slots
@@ -25,6 +26,8 @@ GOALS = states.GOALS
 WAIT_STATES = states.WAIT_STATES
 LOST_BEATS = 3
 RECONCILE_BEATS = 10
+REFRESH_BEATS = 10
+REFRESH_EXIT = 75
 REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
 MAX_REPLANS = 2
@@ -322,6 +325,7 @@ class Dispatcher:
         self.names = pools.names(cfg)
         self.planners = planners.Planners(cfg, account, gh)
         self.quota = None
+        self.refresh_to, self.refresh_logged = None, set()
 
     def fill_ids(self):
         missing = [c for t in (self.cfg.get("types") or {}).values() for c in t.get("coworkers", []) if not c.get("id")]
@@ -1019,19 +1023,23 @@ class Dispatcher:
     def once(self):
         self.heartbeat()
         self.renewal_hold()
+        clean = True
         try:
             self.intake()
         except (Error, ValueError, KeyError) as e:
+            clean = False
             log("-", "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
         try:
             self.reconcile()
         except (Error, ValueError, KeyError) as e:
+            clean = False
             log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
                     log(n, "closed: likely-fixed for %d days" % self.cfg["likely_fixed_days"])
             except (Error, ValueError, KeyError) as e:
+                clean = False
                 log("-", "backlog: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
         for j in self.jobs():
@@ -1047,12 +1055,39 @@ class Dispatcher:
                     j["errors"] = 0
                     self.save(j, "pass ok")
             except (Error, ValueError, KeyError) as e:
+                clean = False
                 log(j["issue"], "%s: %s" % (j["state"], e if isinstance(e, Error) else type(e).__name__))
                 j["errors"] = j.get("errors", 0) + 1
                 self.save(j, "pass failed")
                 if j["errors"] >= 20 and j["state"] not in END:
                     self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
         self.report_line()
+        self.beat_end(clean)
+
+    def beat_end(self, clean):
+        code = os.environ.get("FACTORY_CODE_SHA")
+        if not code:
+            return
+        state = os.environ.get("FACTORY_DATA_DIR", "/state")
+        if clean:
+            try:
+                refresh.write(os.path.join(state, "beat-ok"), str(self.beats))
+            except OSError as e:
+                log("-", "beat-ok: %s" % type(e).__name__)
+        if self.beats % REFRESH_BEATS:
+            return
+        try:
+            sha = refresh.target(self.gh, self.repo, code, os.environ.get("FACTORY_SKIP_SHA"))
+            if sha:
+                refresh.write(os.path.join(state, "refresh-to"), sha)
+                log("-", "refresh to %s" % sha[:7])
+                self.refresh_to = sha
+            self.refresh_logged.clear()
+        except Exception as e:  # noqa: BLE001
+            text = str(e) if isinstance(e, Error) else type(e).__name__
+            if text not in self.refresh_logged:
+                self.refresh_logged.add(text)
+                log("-", "refresh check: %s" % text)
 
     def read_epic(self, n):
         return json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,labels"]))
@@ -1103,9 +1138,16 @@ def main(argv=None):
         d.once()
         d.close()
         return 0
-    while True:
+    stop = []
+    signal.signal(signal.SIGTERM, lambda *_: stop.append(True))
+    while not stop:
         d.once()
+        if d.refresh_to:
+            d.close()
+            return REFRESH_EXIT
         time.sleep(cfg.get("poll_s", 30))
+    d.close()
+    return 0
 
 
 if __name__ == "__main__":
