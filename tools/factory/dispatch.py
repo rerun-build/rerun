@@ -120,6 +120,13 @@ NO_COMMENTS_REVIEW = ('Rob\'s rule, 2026-11-14: no comments in code. A line the 
                       'and not a tool directive, is a reason to reject; it overrides the sprint rule above.')
 
 
+def stale_paragraph(j):
+    return [
+        'The plan was cut on dev %s. Dev changed these files since, in these files of the issue: %s. Before step 1, open a worktree from today\'s dev and run the Run lines as written, with no change. If every one passes, write no code, open no pull request and end with `DONE ELSEWHERE: <commit sha or #pr that did it>`. If one fails, go on with step 1 on today\'s code.' % (j.get("plan_dev"), ", ".join(j["stale"])),
+        '',
+    ]
+
+
 def build_brief(j):
     return "\n".join([
         'One job, sent by the dispatcher and not by Boss: rerun #%s, "%s". You work alone on it: call no other coworker, not Boss either, and send no question to Rob.' % (j["issue"], j["title"]),
@@ -136,13 +143,14 @@ def build_brief(j):
         '5. Leave the worktree open. It is closed after the merge by a sweep.',
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
+        *(stale_paragraph(j) if j.get("stale") else []),
         'If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>.',
         '',
         'If the issue text is wrong or cannot be done as written, do not improvise: end with BLOCKED and the reason. Never merge, never deploy, never touch the live server, and print nothing from a key file. On GitHub write coworker names without the at-sign.',
         '',
         'Other jobs run beside yours right now, in other folders and other files. Stay inside your own worktree.',
         '',
-        final_state(j, '`PR: <url>` or `BLOCKED: <one sentence>`'),
+        final_state(j, '`PR: <url>`, `BLOCKED: <one sentence>` or `DONE ELSEWHERE: <commit or #pr>`' if j.get("stale") else '`PR: <url>` or `BLOCKED: <one sentence>`'),
         TAIL,
     ])
 
@@ -798,6 +806,18 @@ class Dispatcher:
         j.update(kw, sending_step=step, attempt=j.pop("retry_attempt", 1))
         self.send(j, agent, step, self.message(dict(j, state=state)), state, copy)
 
+    def stale_files(self, j):
+        if not j.get("plan_dev"):
+            return None
+        try:
+            got = json.loads(self.gh(["api", "repos/%s/compare/%s...dev" % (self.repo, j["plan_dev"]), "--jq", "[.files[].filename]"]))
+            if not isinstance(got, list):
+                raise TypeError("compare answer is not a list")
+            return [p for p in j["paths"] if p in got]
+        except (Error, ValueError, TypeError) as e:
+            log(j["issue"], "plan check skipped: %s" % e)
+            return None
+
     def step(self, j):
         st = j["state"]
         if j.get("sending"):
@@ -809,12 +829,16 @@ class Dispatcher:
         if st == "queued":
             got = self.free(j.get("worker", "coder"))
             if got and self.take(j):
-                self.start(j, got[0], "build", "building", copy=got[1], builder=got[0])
+                self.start(j, got[0], "build", "building", copy=got[1], builder=got[0], stale=self.stale_files(j))
         elif st == "building":
             out = self.finished_run(j)
             if out is None:
                 return
-            last = final_line(out, ("PR:", "BLOCKED:"))
+            last = final_line(out, ("PR:", "BLOCKED:", "DONE ELSEWHERE:"))
+            done = re.match(r"DONE ELSEWHERE:\s*(#\d+|[0-9a-f]{7,40})\s*$", last) if last else None
+            if done and j.get("stale"):
+                j["done_by"] = done.group(1)
+                return self.end(j, "superseded", "done elsewhere: %s" % done.group(1))
             m = re.match(r"PR:\s*\S*/pull/(\d+)\s*$", last) if last else None
             if not m:
                 found = self.find_pr(j, out)
@@ -959,13 +983,18 @@ class Dispatcher:
                 text = "The factory dispatcher merged pull request %s at %s." % (pr, j["head"][:7])
             elif j["state"] == "returned":
                 text = "The factory dispatcher stopped this job: returned to the planner. Pull request: %s. Reason: %s" % (pr, j.get("reason") or "-")
+            elif j["state"] == "superseded":
+                text = "The factory dispatcher closed this issue: the Run lines pass on today's dev, so the work was already done by %s." % j.get("done_by")
             else:
                 text = "The factory dispatcher stopped this job: %s. Pull request: %s. Reason: %s" % (j["state"], pr, j.get("reason") or "-")
-            self.gh(["issue", "comment", n, "-R", self.repo, "--body", text])
+            if j["state"] == "superseded":
+                self.gh(["issue", "close", n, "-R", self.repo, "--comment", text])
+            else:
+                self.gh(["issue", "comment", n, "-R", self.repo, "--body", text])
             j["commented"] = True
             self.save(j, "commented")
         if not j.get("relabelled"):
-            done = "factory-done" if j["state"] == "merged" else "factory-blocked"
+            done = "factory-done" if j["state"] in ("merged", "superseded") else "factory-blocked"
             self.gh(["issue", "edit", n, "-R", self.repo, "--remove-label", self.label, "--add-label", done])
             j["relabelled"] = True
             self.save(j, "relabelled")

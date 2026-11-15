@@ -113,6 +113,8 @@ class World:
             return json.dumps({"headRefOid": HEAD, "state": self.pr_state, "mergeable": self.mergeable})
         if a[:2] == ["pr", "list"]:
             return json.dumps(self.open_prs)
+        if a[0] == "api" and "/compare/" in a[1]:
+            return "[]"
         if a[0] == "api" and "/timeline" in a[1]:
             return "[]"
         if a[0] == "api" and "/issues/" in a[1]:
@@ -894,7 +896,8 @@ class Goals(Base):
         self.w.finish("r1", "VERDICT: REJECT @abcdef1: no")
         self.tick(2)
         self.assertEqual(goals, [
-            {"lastLineForms": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"}], "turnLimit": 3},
+            {"lastLineForms": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"},
+                               {"prefix": "DONE ELSEWHERE: ", "rest": "sentence"}], "turnLimit": 3},
             {"lastLineForms": [{"prefix": "VERDICT: ", "rest": "sentence"}], "turnLimit": 3},
             {"lastLineForms": [{"prefix": "PUSHED: ", "rest": "sha"}, {"prefix": "BLOCKED: ", "rest": "sentence"}], "turnLimit": 3}])
 

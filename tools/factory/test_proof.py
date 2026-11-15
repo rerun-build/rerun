@@ -98,5 +98,20 @@ class Judge(unittest.TestCase):
         )
 
 
+class Marks(unittest.TestCase):
+    def test_a_mark_after_met_still_counts(self):
+        text = "\n".join([
+            "ASK 1: MET. The diff adds no comment lines",
+            "ASK 2: MET: test_x passes",
+            "ASK 3: NOT MET. no test for the empty case",
+            "PROOF: PASS @abcdef1",
+        ])
+        self.assertEqual(proof.judge(text, 3, HEAD), ("fail", "PASS with asks not met: 3"))
+        self.assertEqual(
+            proof.judge("ASK 1: MET.\nPROOF: PASS @abcdef1", 1, HEAD),
+            ("none", "proof lines name 0 of the 1 asks"),
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
