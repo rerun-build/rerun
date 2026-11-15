@@ -1,4 +1,4 @@
-import { agentTileStyle, type BuddyLook, type Container, type Tile, type TileLink, type TileResultItem, type TileToast } from '@rerun/ui/iso-grid'
+import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Container, type Tile, type TileLink, type TileResultItem, type TileToast } from '@rerun/ui/iso-grid'
 
 export type Cell = { col: number; row: number }
 
@@ -16,6 +16,7 @@ const BOXES: Container[] = [
     box('stock', 'Stock', 0, 14, 10, 20),
     box('review', 'Review', 17, 21, 29, 30),
     box('studio', 'Research & design', 0, 22, 10, 31),
+    box('planning', 'Planning', 0, 0, 10, 5),
 ]
 
 export const LOADER: Cell = { col: 7, row: 9 }
@@ -31,9 +32,20 @@ const BRUCE: Cell = { col: 26, row: 27 }
 const REJECT_BIN: Cell = { col: 18, row: 27 }
 const SEARCH: Cell = { col: 2, row: 24 }
 const DIETER: Cell = { col: 2, row: 29 }
+export const BOSS: Cell = { col: 1, row: 1 }
+export const PLAN_TANK: Cell = { col: 5, row: 1 }
+export const PLANNER_CELLS: Cell[] = [{ col: 8, row: 1 }, { col: 8, row: 3 }]
 export const FEATURE_CELLS: Cell[] = [{ col: 7, row: 15 }, { col: 2, row: 15 }]
 
+export const BOSS_ID = '39311ebf-8324-42a4-8ab4-770acd1653f2'
+const SHAPER_ID = '1b325848-c3fd-4e6f-9ad7-43f3adac08b6'
+const lookOf = (id: string): BuddyLook => ({ eyes: buddyEyes(id, {}), mouth: buddyMouth(id, {}), color: buddyColor(id, {}) })
+const PLAN = { from: 34_000, to: 47_000, parent: 321, title: 'Polish', filedAt: [40_000, 42_500, 45_000] }
+const RIDE_MS = 1_800
+
 const LOOKS: Record<string, BuddyLook> = {
+    Boss: lookOf(BOSS_ID),
+    'Scope Shaper': lookOf(SHAPER_ID),
     Delegator: { eyes: 'pixel', mouth: 'flat', color: '#334155' },
     code: { eyes: 'visor', mouth: 'smile', color: '#4d34f7' },
     LARRY: { eyes: 'glasses', mouth: 'flat', color: '#0ea5e9' },
@@ -129,6 +141,7 @@ export type PodView = {
 export const STATUS_COLOR = { queued: '#8ea2ff', held: '#ef4444', build: '#f5a524', review: '#2dd4a3', fixing: '#fb923c', checks: '#6ea8ff', complete: '#ffe08a', rejected: '#f87171' } as const
 export type SlotView = { issue: number; state: 'empty' | 'merged' | 'rejected'; arriving: number }
 export type CabinetView = Feature & { slots: SlotView[] }
+export type PlanView = { parent: number; title: string; children: number; filed: number }
 
 export type FactoryFrame = {
     containers: Container[]
@@ -137,6 +150,7 @@ export type FactoryFrame = {
     toasts: TileToast[]
     pods: PodView[]
     cabinets: CabinetView[]
+    plans?: PlanView[]
     rejects: number
     held: boolean
     holdLeftMs: number
@@ -161,6 +175,7 @@ function coworker(id: string, who: string, position: Cell, room: string, state: 
 
 export function factoryScene(t: number, now: number): FactoryFrame {
     const held = t >= HOLD.from && t < HOLD.to
+    const planning = t >= PLAN.from && t < PLAN.to
     const tiles: Tile[] = []
     const links: TileLink[] = []
     const toasts: TileToast[] = []
@@ -239,6 +254,22 @@ export function factoryScene(t: number, now: number): FactoryFrame {
         }
     }
 
+    const filed = PLAN.filedAt.filter(x => t >= x).length
+    const plans: PlanView[] = planning ? [{ parent: PLAN.parent, title: PLAN.title, children: PLAN.filedAt.length, filed }] : []
+    const deskId = `plan-${PLAN.parent}`
+    let riding = false
+    PLAN.filedAt.forEach((from, i) => {
+        if (!planning || t < from || t >= from + RIDE_MS) return
+        riding = true
+        pods.push({ id: `${deskId}-${i + 1}`, issue: PLAN.parent, title: `filed for #${PLAN.parent}`, path: [deskId, 'Delegator'], travel: ease((t - from) / RIDE_MS), queue: 0, level: 0, band: 'build', state: 'working', scan: 0, since: Math.round(now - (t - from)) })
+    })
+    tiles.push(coworker('Boss', 'Boss', BOSS, 'planning', planning ? 'working' : 'idle'))
+    if (planning) {
+        tiles.push(coworker('Scope Shaper', 'Scope Shaper', PLANNER_CELLS[0], 'planning', 'working'))
+        tiles.push({ id: deskId, position: PLAN_TANK, span: 2, containerId: 'planning', selectable: false, draggable: false, style: { color: '#1b2140', sheen: true, depth: 2 }, ariaLabel: `Planning #${PLAN.parent} ${PLAN.title}: ${filed} of ${PLAN.filedAt.length} filed` })
+        links.push({ source: deskId, target: 'Delegator', variant: 'belt', color: riding ? STATUS_COLOR.build : '#8ea2ff', still: !riding, chevrons: true })
+    }
+
     let q = 0
     for (const p of pods) if (p.state === 'queued' || p.state === 'held') p.queue = q++
 
@@ -282,5 +313,5 @@ export function factoryScene(t: number, now: number): FactoryFrame {
         links.push({ source: a, target: b, variant: 'belt', color: held ? STATUS_COLOR.held : lineColor.get(`${a}>${b}`) ?? QUIET, chevrons: true })
     }
 
-    return { containers: BOXES, tiles, links, toasts, pods, cabinets, rejects, held, holdLeftMs: held ? HOLD.to - t : 0, counts }
+    return { containers: BOXES, tiles, links, toasts, pods, cabinets, plans, rejects, held, holdLeftMs: held ? HOLD.to - t : 0, counts }
 }
