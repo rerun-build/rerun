@@ -27,7 +27,7 @@ class PlannerPool(unittest.TestCase):
     def test_the_other_pools_of_the_shipped_settings_are_unchanged(self):
         types = D.settings()["types"]
         self.assertEqual(list(types), ["coder", "reviewer", "researcher", "designer", "planner"])
-        self.assertEqual(types["coder"]["max_jobs"], 8)
+        self.assertEqual(types["coder"]["max_jobs"], 16)
 
     def test_the_dispatcher_never_sends_work_to_the_planner_pool(self):
         sent = run({"types": {"coder": {"max_jobs": 8, "coworkers": cw(["b1"])}, "reviewer": {"coworkers": cw(["r1"])},

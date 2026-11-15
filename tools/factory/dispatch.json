@@ -17,7 +17,7 @@
   "gh_token_file": "/run/secrets/gh_token",
   "types": {
     "coder": {
-      "max_jobs": 8,
+      "max_jobs": 16,
       "coworkers": [
         {
           "id": "b5e4deb4-fd07-427a-88cf-fba69fde503b",
