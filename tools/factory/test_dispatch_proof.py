@@ -4,7 +4,7 @@ import test_dispatch as T
 
 HEAD = T.HEAD
 BODY = "\n".join([
-    "PLAN READY",
+    "PLAN READY (facts read on dev 4296d1f)",
     "**Depends on**: none",
     "**Worker**: coder",
     "**Files**",
