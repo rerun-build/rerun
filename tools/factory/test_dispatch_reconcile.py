@@ -4,12 +4,13 @@ import dispatch as D
 
 
 class Reconcile(unittest.TestCase):
-    def make(self, closed=(), prs=None):
+    def make(self, closed=(), prs=None, refs=None):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         self.calls = []
         self.closed = list(closed)
         self.prs = prs or {}
+        self.refs = refs or {}
 
         def gh(args):
             self.calls.append(args)
@@ -19,6 +20,8 @@ class Reconcile(unittest.TestCase):
                 return "[]"
             if args[:2] == ["pr", "view"]:
                 return json.dumps({"state": self.prs.get(int(args[2]), "OPEN")})
+            if args[:2] == ["issue", "view"]:
+                return json.dumps({"closedByPullRequestsReferences": [{"number": n} for n in self.refs.get(int(args[2]), [])]})
             return "[]"
 
         cfg = {"repo": "o/r", "label": "factory", "max_jobs": 8, "auto_plan_marker": True,
@@ -123,6 +126,28 @@ class Reconcile(unittest.TestCase):
         self.once(10)
         seen = [n for n in range(100, 125) if "closed_seen" in self.d.store.get_all(str(n))]
         self.assertEqual(len(seen), 20)
+
+
+    def test_a_closed_job_without_a_pr_on_record_takes_the_merged_pr_that_closed_the_issue(self):
+        self.make([5], {9: "MERGED"}, {5: [9]})
+        self.seed(5, "returned")
+        self.once(10)
+        self.assertEqual(self.job(5)["state"], "merged")
+        self.assertEqual(self.job(5)["pr"], 9)
+        self.assertEqual(self.state(5)[-1]["reason"], "merged: merged outside the delegator (#9)")
+
+    def test_a_job_already_closed_seen_is_checked_once_and_leaves_the_problem_count(self):
+        self.make([5, 6], {9: "MERGED", 10: "CLOSED"}, {5: [9], 6: [10]})
+        self.seed(5, "returned")
+        self.seed(6, "returned")
+        self.d.store.set("5", "closed_seen", 1)
+        self.d.store.set("6", "closed_seen", 1)
+        self.once(10)
+        self.assertEqual(self.job(5)["state"], "merged")
+        self.assertEqual(self.job(6)["state"], "returned")
+        self.assertEqual(self.count("issue", "view"), 2)
+        self.once(10)
+        self.assertEqual(self.count("issue", "view"), 2)
 
 
 if __name__ == "__main__":

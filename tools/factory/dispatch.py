@@ -467,7 +467,7 @@ class Dispatcher:
             return
         self.stop_lost()
         cands = [j for j in self.jobs() if j["state"] in ("blocked", "failed", "returned") and j.get("relabelled")
-                 and "closed_seen" not in self.store.get_all(str(j["issue"]))]
+                 and "closed_refs" not in self.store.get_all(str(j["issue"]))]
         if not cands:
             return
         closed = {c["number"] for c in json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "closed",
@@ -476,9 +476,25 @@ class Dispatcher:
         for j in [j for j in cands if j["issue"] in closed][:RECONCILE_MAX]:
             if j.get("pr") and json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "MERGED":
                 self.end(j, "merged", "merged outside the delegator")
-            else:
+                continue
+            number = self.merged_closer(j)
+            if number:
+                j["pr"] = number
+                self.end(j, "merged", "merged outside the delegator (#%s)" % number)
+                continue
+            kv = self.store.get_all(str(j["issue"]))
+            self.store.set(str(j["issue"]), "closed_refs", self.now())
+            if "closed_seen" not in kv:
                 self.store.set(str(j["issue"]), "closed_seen", self.now())
-                log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+            log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+
+    def merged_closer(self, j):
+        out = json.loads(self.gh(["issue", "view", str(j["issue"]), "-R", self.repo, "--json", "closedByPullRequestsReferences"]) or "{}")
+        for ref in out.get("closedByPullRequestsReferences") or []:
+            state = json.loads(self.gh(["pr", "view", str(ref["number"]), "-R", self.repo, "--json", "state"]) or "{}").get("state")
+            if state == "MERGED":
+                return ref["number"]
+        return None
 
     def send(self, j, agent, step, message, state, copy=1):
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
