@@ -46,6 +46,13 @@ class DeadDeps(Base):
         self.assertIn("waits on dead #8 (closed as not planned)", self.out.getvalue())
         self.assertEqual(len(self.w.issue(5)["comments"]), 1)
 
+    def test_a_dependency_closed_as_a_duplicate_is_dead(self):
+        self.w.issues = [issue(5, "#8")]
+        self.w.close_reasons[8] = "duplicate"
+        self.tick()
+        self.assertEqual(self.state(), "waiting")
+        self.assertIn("waits on dead #8 (closed as duplicate)", self.out.getvalue())
+
     def test_a_dependency_closed_as_completed_long_ago_is_met_and_read_once(self):
         self.w.issues = [issue(5, "#7, #9")]
         self.tick(3)
