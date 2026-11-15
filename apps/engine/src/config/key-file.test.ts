@@ -33,6 +33,7 @@ describe.skipIf(!linux)('image launcher with a key file', () => {
     it.each([
         ['with a trailing newline', `${KEY}\n`],
         ['without a trailing newline', KEY],
+        ['with Windows line endings', `${KEY}\r\n`],
     ])('hands the key from the file to descriptor 3, %s', (_label, content) => {
         const file = join(dir, 'key')
         writeFileSync(file, content)

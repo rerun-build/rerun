@@ -5,6 +5,7 @@ if [ -n "${RERUN_API_KEY_FILE:-}" ]; then
     unset RERUN_API_KEY_FILE RERUN_API_KEY
     rerun_key=
     if [ -r "$rerun_key_file" ]; then IFS= read -r rerun_key < "$rerun_key_file" || :; fi
+    rerun_key="${rerun_key%"$(printf '\r')"}"
     if [ -z "$rerun_key" ]; then
         echo "docker-entrypoint: the file named by RERUN_API_KEY_FILE is missing or empty" >&2
         exit 1
