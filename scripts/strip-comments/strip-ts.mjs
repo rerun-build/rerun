@@ -169,7 +169,7 @@ function main() {
     const ts = loadTs(root, get('--ts'))
     const list = fs.readFileSync(get('--list'), 'utf8').split('\n').map((l) => l.trim()).filter(Boolean)
     const write = args.includes('--write')
-    const report = { files: 0, changed: 0, removed: 0, kept: 0, refused: [] }
+    const report = { files: 0, changed: 0, removed: 0, kept: 0, refused: [], changedFiles: [] }
     for (const rel of list) {
         const file = path.join(root, rel)
         const text = fs.readFileSync(file, 'utf8')
@@ -183,6 +183,7 @@ function main() {
         }
         report.kept += r.kept
         if (r.text === text) continue
+        report.changedFiles.push(rel)
         if (!r.same) {
             report.refused.push(rel + ' shape changed')
             continue

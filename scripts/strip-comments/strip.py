@@ -246,16 +246,19 @@ def strip_css(text):
     return "".join(lines), removed
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".")
     ap.add_argument("--write", action="store_true")
+    ap.add_argument("--check", action="store_true")
     ap.add_argument("--ts-module")
     ap.add_argument("--only", nargs="*", default=[])
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
+    if a.check:
+        a.write = False
     root = os.path.abspath(a.root)
     files = [f for f in tracked(root) if not a.only or f.startswith(tuple(a.only))]
-    report = {"ts": None, "py": [0, 0, 0], "hash": [0, 0, 0], "css": [0, 0, 0], "skipped_generated": 0, "refused": []}
+    report = {"ts": None, "py": [0, 0, 0], "hash": [0, 0, 0], "css": [0, 0, 0], "skipped_generated": 0, "refused": [], "with_comments": []}
     ts_files = []
     for rel in files:
         k = kind(rel)
@@ -288,6 +291,7 @@ def main():
         report[k][0] += 1
         if new == text:
             continue
+        report["with_comments"].append(rel)
         if not same:
             report["refused"].append(rel + " shape changed")
             continue
@@ -312,8 +316,22 @@ def main():
             sys.exit(1)
         report["ts"] = json.loads(res.stdout.strip().split("\n")[-1])
         report["refused"] += report["ts"].pop("refused")
+        report["with_comments"] += report["ts"].pop("changedFiles")
+    if a.check:
+        found = sorted(report["with_comments"])
+        if found:
+            print("Comments found in %d file(s). Rob's rule, 2026-11-14: \"any new work as a rule should NEVER make comments in code.\" "
+                  "Remove them (tool directives such as eslint-disable-next-line stay); an explanation that matters goes into the "
+                  "pull request body or the feature's document under docs/. Run `python scripts/strip-comments/strip.py --write --only <file>` "
+                  "to remove them." % len(found))
+            for f in found:
+                print("  " + f)
+            return 1
+        print("No comments in the %d file(s) checked." % len(files))
+        return 0
     print(json.dumps(report, indent=1))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
