@@ -77,7 +77,11 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
             case 'building':
                 counts.building++
                 counts.runs++
-                pod(dedupe(['Delegator', 'code', job.coworker === 'LARRY' ? 'LARRY' : holderOf(job, 'code')]), clamp(since / 2_240), 'build', 'working', 0.4)
+                pod(
+                    job.coworker === 'search' ? dedupe(['Delegator', holderOf(job, 'search')])
+                        : job.coworker === 'DIETER' ? ['Delegator', 'DIETER']
+                            : dedupe(['Delegator', 'code', job.coworker === 'LARRY' ? 'LARRY' : holderOf(job, 'code')]),
+                    clamp(since / 2_240), 'build', 'working', 0.4)
                 break
             case 'review_wait':
             case 'proof_wait':
