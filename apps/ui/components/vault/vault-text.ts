@@ -1,6 +1,6 @@
 import type { CoworkerVault, VaultEntryView } from '@/app/api/_services/vault.service'
 
-export type VaultGroup = 'apps' | 'mcp' | 'secrets'
+type VaultGroup = 'apps' | 'mcp' | 'secrets'
 
 export function vaultGroupOf(entry: Pick<VaultEntryView, 'kind'>): VaultGroup {
     if (entry.kind === 'mcp') return 'mcp'
@@ -29,7 +29,7 @@ export function usedBySummary(entry: Pick<VaultEntryView, 'sharedWithAll' | 'cow
     return more > 0 ? text.usedByMore(names.join(', '), more) : text.usedBy(names.join(', '))
 }
 
-export type CoworkerFaces = { everyone: boolean; ids: string[]; more: number }
+type CoworkerFaces = { everyone: boolean; ids: string[]; more: number }
 
 // The same answer drawn instead of written: the first few coworkers' buddies, and how many more.
 export function coworkerFaces(entry: Pick<VaultEntryView, 'sharedWithAll' | 'coworkers' | 'hiddenCoworkers'>, max: number): CoworkerFaces {
