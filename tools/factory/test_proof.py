@@ -55,10 +55,16 @@ class Judge(unittest.TestCase):
     def test_count_mismatch(self):
         two = "\n".join([met(1), met(2), "PROOF: PASS @abcdef1"])
         four = "\n".join([met(1), met(2), met(3), met(4), "PROOF: PASS @abcdef1"])
-        self.assertEqual(proof.judge(two, 3, HEAD), ("fail", "PASS names 2 of the 3 asks"))
-        self.assertEqual(proof.judge(four, 3, HEAD), ("fail", "PASS names 4 of the 3 asks"))
+        self.assertEqual(proof.judge(two, 3, HEAD), ("none", "proof lines name 2 of the 3 asks"))
+        self.assertEqual(proof.judge(four, 3, HEAD), ("none", "proof lines name 4 of the 3 asks"))
         bare = "ASK 1: MET\nPROOF: PASS @abcdef1"
-        self.assertEqual(proof.judge(bare, 1, HEAD), ("fail", "PASS names 0 of the 1 asks"))
+        self.assertEqual(proof.judge(bare, 1, HEAD), ("none", "proof lines name 0 of the 1 asks"))
+
+    def test_evidence_without_a_file_and_line_counts(self):
+        out = "\n".join(['ASK 1: MET check "No comments in code" passed at abcdef1',
+                         "ASK 2: MET apps/ui/a.ts:129,163 (tiles untouched) ts-check passed",
+                         "PROOF: PASS @abcdef1"])
+        self.assertEqual(proof.judge(out, 2, HEAD), ("pass", None))
 
     def test_not_met_and_fail(self):
         out = "\n".join([met(1), "ASK 2: NOT MET no test", met(3), "PROOF: PASS @abcdef1"])

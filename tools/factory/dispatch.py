@@ -173,7 +173,7 @@ def proof_brief(j, pr, head, asks):
         'The asks, in order:',
         *["ASK %d: %s" % (n, a) for n, a in enumerate(asks, 1)],
         '',
-        'For each ask write one line: `ASK <n>: MET <file>:<line> <test name>` (the file and the line in the diff, and the test that shows it) or `ASK <n>: NOT MET <why>`. A Run line is MET when the check "Done-test red before green" passed at this commit: that check ran every Run line of the issue at this commit and passes only when each one passes there and the done-test fails on dev\'s code; name the test file and line the Run line runs. When the issue carries `**Red before green**: not applicable`, that check runs the Run lines at this commit only, without the run on dev\'s code: a Run line is MET when the check reports that the Run lines pass at the head (name the check and the line).',
+        'For each ask write one line: `ASK <n>: MET <evidence>` (the file and the line in the diff and the test that shows it, or the check of this commit that shows it) or `ASK <n>: NOT MET <why>`; every ask number gets exactly one line, and only an ask you found not met is NOT MET. A Run line is MET when the check "Done-test red before green" passed at this commit: that check ran every Run line of the issue at this commit and passes only when each one passes there and the done-test fails on dev\'s code; name the test file and line the Run line runs. When the issue carries `**Red before green**: not applicable`, that check runs the Run lines at this commit only, without the run on dev\'s code: a Run line is MET when the check reports that the Run lines pass at the head (name the check and the line).',
         '',
         'Post those lines on the pull request with your review tool.',
         '',
@@ -721,7 +721,7 @@ class Dispatcher:
                 self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
             elif kind == "none" and j.get("not_met") and not final_line(out, ("PROOF:",)):
                 self.end(j, "blocked", self.not_met_reason(j, out))
-            elif kind == "none" and why.startswith("proof names"):
+            elif kind == "none":
                 again = "%s: asked again" % why
                 if j.get("proof_asked"):
                     self.end(j, "blocked", again)
