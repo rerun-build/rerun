@@ -246,6 +246,12 @@ export type McpReconnectResult = z.infer<typeof mcpReconnectResultSchema>
 export const mcpReconnectEventSchema = z.object({ name: z.string(), effect: mcpReconnectEffectSchema }).strict()
 export type McpReconnectEvent = z.infer<typeof mcpReconnectEventSchema>
 
+export const mcpServerToolSchema = z.object({ name: z.string(), description: z.string(), tokens: z.number().int().nonnegative(), picked: z.boolean() }).strict()
+export type McpServerTool = z.infer<typeof mcpServerToolSchema>
+
+export const mcpServerToolListSchema = z.object({ name: z.string(), picks: z.array(z.string()), tools: z.array(mcpServerToolSchema) })
+export type McpServerToolList = z.infer<typeof mcpServerToolListSchema>
+
 export const agentDetailSchema = z.object({
     id: z.string(),
     config: agentConfigSchema,
