@@ -1,5 +1,6 @@
 import argparse, datetime, hashlib, json, os, re, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
+import backlog
 import briefs
 import clocks
 import cutshape
@@ -406,16 +407,22 @@ class Dispatcher:
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", self.label, "--state", "open",
                                      "--json", "number,title,body", "--limit", "100"]))
         for i in issues:
-            body, fixed = sifter.sift(i.get("body"))
-            if not fixed:
+            old = self.store.get_job(str(i["number"]))
+            if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
+                continue
+            if not sifter.sift(i.get("body"))[1]:
                 continue
             try:
-                self.gh(["issue", "edit", str(i["number"]), "-R", self.repo, "--body", body])
+                fresh = json.loads(self.gh(["issue", "view", str(i["number"]), "-R", self.repo, "--json", "body"]))["body"]
+                body, fixed = sifter.sift(fresh)
+                if fixed:
+                    self.gh(["issue", "edit", str(i["number"]), "-R", self.repo, "--body", body])
             except Error as e:
                 log(i["number"], "sift not written: %s" % e)
                 continue
             i["body"] = body
-            log(i["number"], "sifted: " + ", ".join(fixed))
+            if fixed:
+                log(i["number"], "sifted: " + ", ".join(fixed))
         shape = cutshape.check(issues)
         self.unreadable = sum(1 for e in shape.values() if e)
         labelled = {i["number"] for i in issues}
@@ -461,13 +468,15 @@ class Dispatcher:
                         if not old or old["state"] != "waiting" or old.get("wait_line") != line:
                             data = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "waiting",
                                     "round": 1, "waiting": unmet, "worker": parsed["worker"], "paths": parsed["paths"],
-                                    "test": parsed["test"], "wait_line": line}
+                                    "test": parsed["test"], "plan_dev": parsed["dev"], "wait_line": line}
                             if ret:
                                 data["waits_on_returned"] = ret
                             if dead:
                                 data["dead"] = dead
                             if take:
                                 data["take"] = take
+                            if old and old.get("replans"):
+                                data["replans"] = old["replans"]
                             self.save(data, line)
                             log(i["number"], line)
                         digest = hashlib.sha256(json.dumps(dead).encode()).hexdigest()[:16] if dead else ""
@@ -484,9 +493,11 @@ class Dispatcher:
                                  "SMALL FIX: taken by the factory dispatcher on the owner's label."])
                         log(i["number"], "plan line posted")
                 job = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "queued", "round": 1,
-                       "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"]}
+                       "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"], "plan_dev": parsed["dev"]}
                 if take:
                     job["take"] = take
+                if old and old.get("replans"):
+                    job["replans"] = old["replans"]
                 if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":
                     job.update(state="review_wait", pr=old["pr"], builder=old.get("builder"))
                 rooms[parsed["worker"]] -= 1
@@ -974,6 +985,12 @@ class Dispatcher:
             self.reconcile()
         except (Error, ValueError, KeyError) as e:
             log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        if self.cfg.get("likely_fixed_days"):
+            try:
+                for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
+                    log(n, "closed: likely-fixed for %d days" % self.cfg["likely_fixed_days"])
+            except (Error, ValueError, KeyError) as e:
+                log("-", "backlog: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
         for j in self.jobs():
             try:

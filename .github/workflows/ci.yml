@@ -15,8 +15,8 @@ jobs:
       github.repository == 'rerun-build/rerun' ||
       (github.repository == 'special-place-ai-heaven/rerun' &&
        (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
-    name: Typecheck, lint, tests
-    runs-on: ${{ fromJSON(vars.TP_RUNS_ON || (github.repository == 'special-place-ai-heaven/rerun' && '{"group":"aap-crrr","labels":["self-hosted","linux","heavy"]}' || '"ubuntu-latest"')) }}
+    name: Typecheck and lint
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON_LIGHT || vars.TP_RUNS_ON || '"ubuntu-latest"') }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v6
@@ -30,8 +30,30 @@ jobs:
       - run: pnpm --filter @rerun/contracts build
       - run: pnpm -r --if-present ts-check
       - run: pnpm -r --if-present lint
-      - run: pnpm --filter rerun run test --maxWorkers=4
-      - run: pnpm --filter rerun-engine run test --maxWorkers=4
+
+  tests:
+    if: >-
+      github.repository == 'rerun-build/rerun' ||
+      (github.repository == 'special-place-ai-heaven/rerun' &&
+       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
+    strategy:
+      fail-fast: false
+      matrix:
+        part:
+          - { name: App tests, filter: rerun }
+          - { name: Engine tests, filter: rerun-engine }
+    name: ${{ matrix.part.name }}
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON_HEAVY || vars.TP_RUNS_ON || '"ubuntu-latest"') }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @rerun/contracts build
+      - run: pnpm --filter ${{ matrix.part.filter }} run test --maxWorkers=4
 
   migrations:
     if: github.repository == 'rerun-build/rerun' || github.repository == 'special-place-ai-heaven/rerun'

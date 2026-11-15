@@ -114,7 +114,11 @@ import {
     deleteConnectionResultSchema,
     engineToolsListSchema,
     engineMcpServerStatusListSchema,
+    engineMcpSessionStateListSchema,
+    engineMcpReconnectResultSchema,
     type EngineMcpServerStatus,
+    type EngineMcpSessionState,
+    type EngineMcpReconnectResult,
     engineFileContentSchema,
     engineFileEntriesListSchema,
     engineMemoriesListSchema,
@@ -289,6 +293,19 @@ export async function getMcpServerStatuses(conn: EngineConnection, agentId: stri
         if (e instanceof EngineRequestError && e.status === 404) return null
         throw e
     }
+}
+
+export async function getMcpSessionStates(conn: EngineConnection, agentId: string): Promise<EngineMcpSessionState[] | null> {
+    try {
+        return await request(conn, `/agents/${encodeURIComponent(agentId)}/mcp-servers/session`, { method: 'GET', signal: AbortSignal.timeout(20_000) }, d => engineMcpSessionStateListSchema.parse(d).servers)
+    } catch (e) {
+        if (e instanceof EngineRequestError && e.status === 404) return null
+        throw e
+    }
+}
+
+export async function reconnectMcpServer(conn: EngineConnection, agentId: string, name: string): Promise<EngineMcpReconnectResult> {
+    return request(conn, `/agents/${encodeURIComponent(agentId)}/mcp-servers/${encodeURIComponent(name)}/reconnect`, { method: 'POST' }, d => engineMcpReconnectResultSchema.parse(d))
 }
 
 export async function listAgentTools(conn: EngineConnection, agentId: string): Promise<EngineToolFamily[]> {

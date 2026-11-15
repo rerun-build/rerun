@@ -112,6 +112,8 @@ class World:
             return json.dumps({"headRefOid": HEAD, "state": self.pr_state, "mergeable": self.mergeable})
         if a[:2] == ["pr", "list"]:
             return json.dumps(self.open_prs)
+        if a[0] == "api" and "/timeline" in a[1]:
+            return "[]"
         if a[0] == "api" and "/issues/" in a[1]:
             n = int(a[1].rsplit("/", 1)[1])
             return json.dumps({"state": "open" if n in self.open_numbers else "closed", "state_reason": self.close_reasons.get(n, "completed")})

@@ -12,6 +12,7 @@ export const mcpServerSchema = z.object({
     url: z.string().optional(),
     env: z.record(z.string(), z.string()).default({}),
     headers: z.record(z.string(), z.string()).default({}),
+    tools: z.array(z.string().min(1).max(128)).max(200).optional(),
 })
 export type McpServer = z.infer<typeof mcpServerSchema>
 export const strictMcpServerSchema = mcpServerSchema.extend({ name: mcpServerNameSchema })
@@ -244,6 +245,12 @@ export type McpReconnectResult = z.infer<typeof mcpReconnectResultSchema>
 
 export const mcpReconnectEventSchema = z.object({ name: z.string(), effect: mcpReconnectEffectSchema }).strict()
 export type McpReconnectEvent = z.infer<typeof mcpReconnectEventSchema>
+
+export const mcpServerToolSchema = z.object({ name: z.string(), description: z.string(), tokens: z.number().int().nonnegative(), picked: z.boolean() }).strict()
+export type McpServerTool = z.infer<typeof mcpServerToolSchema>
+
+export const mcpServerToolListSchema = z.object({ name: z.string(), picks: z.array(z.string()), tools: z.array(mcpServerToolSchema) })
+export type McpServerToolList = z.infer<typeof mcpServerToolListSchema>
 
 export const agentDetailSchema = z.object({
     id: z.string(),

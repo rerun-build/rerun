@@ -30,6 +30,13 @@ class Intake(Base):
         self.assertEqual(self.state(), "building")
         self.assertIn("sifted: plan line names dev <sha>", self.out.getvalue())
 
+    def test_an_issue_whose_job_is_in_flight_is_not_rewritten(self):
+        self.tick()
+        self.assertEqual(self.state(), "building")
+        self.w.issues[0]["body"] = "PLAN READY (facts read on dev at 946e5ce)\n" + ready()
+        self.tick()
+        self.assertEqual([c for c in self.w.gh_calls if c[:3] == ["issue", "edit", "5"] and "--body" in c], [])
+
     def test_the_beat_line_counts_issues_still_unreadable(self):
         self.w.issues[0]["body"] = "PLAN READY (facts read on main)\n" + ready()
         self.tick(2)
