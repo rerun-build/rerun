@@ -1,11 +1,15 @@
 name: rerun-dev
 
+x-required-key: ${RERUN_DEV_ENGINE_KEY:?set RERUN_DEV_ENGINE_KEY in deploy/vps/.env}
+
 services:
   engine-dev:
     image: ghcr.io/special-place-ai-heaven/rerun-engine:${RERUN_DEV_IMAGE_TAG:-dev}
     environment:
       RERUN_LOG_LEVEL: ${RERUN_LOG_LEVEL:-info}
-      RERUN_API_KEY: ${RERUN_DEV_ENGINE_KEY:?set RERUN_DEV_ENGINE_KEY in deploy/vps/.env}
+      RERUN_API_KEY_FILE: /run/secrets/rerun_dev_engine_key
+    secrets:
+      - rerun_dev_engine_key
     volumes:
       - engine-dev-data:/data
     mem_limit: 3g
@@ -20,3 +24,7 @@ services:
 
 volumes:
   engine-dev-data:
+
+secrets:
+  rerun_dev_engine_key:
+    environment: RERUN_DEV_ENGINE_KEY
