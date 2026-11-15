@@ -1,4 +1,4 @@
-import os, sys
+import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cutshape
 import limits as L
@@ -16,6 +16,9 @@ BURN_WINDOW_S = 3600
 MAX_ANOMALIES = 50
 MEASURE_WINDOW_S = 86400
 BLOCK_STATES = ("blocked", "rejected", "failed", "returned")
+MARK = "<!-- factory-digest -->"
+POST_EVERY_S = 600
+CONTROL_TITLE = "factory control"
 
 
 def stations(store, now):
@@ -127,3 +130,35 @@ def measures(store, now):
 def build(store, cfg, now):
     return {"stations": stations(store, now), "threads": threads(store),
             "anomalies": anomalies(store, cfg, now), "measures": measures(store, now)}
+
+
+def block(d):
+    return MARK + "\n```json\n" + json.dumps(d, sort_keys=True) + "\n```"
+
+
+def post(gh, store, repo, d, now):
+    try:
+        if d is None:
+            return False
+        last = store.get_all("-").get("digest_at")
+        if last is not None and now - float(last) < POST_EVERY_S:
+            return False
+        store.set("-", "digest_at", now)
+        rows = json.loads(gh(["issue", "list", "-R", repo, "--state", "open", "--search",
+                              "Factory control in:title", "--json", "number,title"]))
+        number = next((r["number"] for r in rows if str(r["title"]).strip().lower() == CONTROL_TITLE), None)
+        if number is None:
+            return False
+        body = "body=" + block(d)
+        held = store.get_all("-").get("digest_comment", "")
+        if held.startswith("%d:" % number):
+            try:
+                gh(["api", "-X", "PATCH", "repos/%s/issues/comments/%s" % (repo, held.split(":", 1)[1]), "-f", body])
+                return True
+            except Exception:
+                pass
+        made = json.loads(gh(["api", "-X", "POST", "repos/%s/issues/%d/comments" % (repo, number), "-f", body]))
+        store.set("-", "digest_comment", "%d:%s" % (number, made["id"]))
+        return True
+    except Exception:
+        return False
