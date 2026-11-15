@@ -17,6 +17,7 @@ const mcp = vi.hoisted(() => ({
     callGate: null as Promise<void> | null,
     rejections: [] as unknown[],
     answer: null as unknown,
+    listed: ['search'],
 }))
 
 vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
@@ -45,7 +46,7 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
             if (mcp.failing.has(this.target)) throw new Error('ECONNREFUSED')
         }
         async listTools() {
-            return { tools: [{ name: 'search', inputSchema: { type: 'object' } }] }
+            return { tools: mcp.listed.map(name => ({ name, inputSchema: { type: 'object' } })) }
         }
         async callTool(request: { name: string }, _schema: unknown, options: unknown) {
             mcp.calls.push({ target: this.target, name: request.name, options })
@@ -82,6 +83,7 @@ beforeEach(async () => {
     mcp.callGate = null
     mcp.rejections.length = 0
     mcp.answer = null
+    mcp.listed = ['search']
 })
 
 afterEach(() => {
@@ -188,6 +190,50 @@ describe('acquireMcp', () => {
         mcp.failing.add('https://gh.example/mcp')
         await expect(pooled!.call('search', {})).rejects.toThrow('server "gh" unreachable')
         expect(mcp.calls).toHaveLength(0)
+    })
+})
+
+describe('picked tools', () => {
+    it('hands out only the picked tools of a server', async () => {
+        mcp.listed = ['a', 'b', 'c']
+        const pooled = await acquireMcp('a1', server('gh', { tools: ['a', 'c'] }), spawn)
+        expect(pooled?.tools.map(t => t.name)).toEqual(['a', 'c'])
+    })
+
+    it('ignores a picked name the server does not serve', async () => {
+        mcp.listed = ['a', 'b']
+        const pooled = await acquireMcp('a1', server('gh', { tools: ['a', 'zzz'] }), spawn)
+        expect(pooled?.tools.map(t => t.name)).toEqual(['a'])
+    })
+
+    it('hands out every tool when nothing is picked, and when the list is empty', async () => {
+        mcp.listed = ['a', 'b', 'c']
+        const none = await acquireMcp('a1', server('gh'), spawn)
+        const empty = await acquireMcp('a1', server('gh', { tools: [] }), spawn)
+        expect(none?.tools.map(t => t.name)).toEqual(['a', 'b', 'c'])
+        expect(empty?.tools.map(t => t.name)).toEqual(['a', 'b', 'c'])
+    })
+
+    it('refuses a call to a tool that is not picked and never reaches the server', async () => {
+        mcp.listed = ['a', 'b', 'c']
+        const pooled = await acquireMcp('a1', server('gh', { tools: ['a', 'c'] }), spawn)
+        await expect(pooled?.call('b', {})).rejects.toThrow('tool "b" is not picked for server "gh"')
+        expect(mcp.calls).toEqual([])
+    })
+
+    it('answers a picked tool as before', async () => {
+        mcp.listed = ['a', 'b', 'c']
+        const pooled = await acquireMcp('a1', server('gh', { tools: ['a', 'c'] }), spawn)
+        expect(await pooled?.call('a', {})).toEqual({ content: [{ type: 'text', text: 'a ran' }] })
+        expect(mcp.calls.map(c => c.name)).toEqual(['a'])
+    })
+
+    it('does not dial again when only the picks change', async () => {
+        mcp.listed = ['a', 'b', 'c']
+        await acquireMcp('a1', server('gh', { tools: ['a'] }), spawn)
+        const again = await acquireMcp('a1', server('gh', { tools: ['b', 'c'] }), spawn)
+        expect(mcp.connects).toHaveLength(1)
+        expect(again?.tools.map(t => t.name)).toEqual(['b', 'c'])
     })
 })
 

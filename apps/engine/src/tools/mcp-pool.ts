@@ -121,10 +121,12 @@ async function callOn(live: Live, name: string, args: Record<string, unknown>, o
 export async function acquireMcp(agentId: string, server: McpServer, spawn: McpSpawn): Promise<PooledMcp | null> {
     const first = await connect(agentId, server, spawn)
     if (!first) return null
+    const picked = server.tools?.length ? new Set(server.tools) : null
     return {
         name: server.name,
-        tools: first.session.tools,
+        tools: picked ? first.session.tools.filter(tool => picked.has(tool.name)) : first.session.tools,
         call: async (name, args, options) => {
+            if (picked && !picked.has(name)) throw new Error(`tool "${name}" is not picked for server "${server.name}"`)
             const live = entries.get(first.key) === first.entry ? first : await connect(agentId, server, spawn)
             if (!live) throw new Error(`server "${server.name}" unreachable`)
             try {
