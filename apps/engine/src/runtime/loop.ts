@@ -214,7 +214,7 @@ type Settlement =
 
 async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: string, override: ModelOverride | undefined, writer: UIMessageStreamWriter | undefined, runId: string | undefined, trigger: RunTrigger): Promise<AgentRun> {
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
-    const controller = registerRunAbort(run.id, baseAgent.id)
+    const controller = registerRunAbort(run.id, baseAgent.id, writer)
     const author = trigger.source === 'chat' ? trigger.author : undefined
 
     let agent = baseAgent
