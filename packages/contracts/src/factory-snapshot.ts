@@ -68,7 +68,7 @@ export const factoryPoolSchema = z.object({
 }).strict()
 
 export const factoryPlanningSchema = z.object({
-    parent: z.number().int().positive(),
+    parent: z.number().int().positive().nullable(),
     title: z.string().max(256),
     coworkers: z.array(z.object({ id: z.string().max(64), name: z.string().max(64), runId: z.string().max(64), startedAt: isoTime, steps: count.nullable() }).strict()).max(8),
     children: count,
