@@ -1,5 +1,7 @@
 import fcntl, json, os, sqlite3, time
 
+import states
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS fires(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,8 +37,7 @@ CREATE TABLE IF NOT EXISTS transitions(
   from_state TEXT, to_state TEXT NOT NULL, reason TEXT, round INTEGER, run_id TEXT);
 CREATE INDEX IF NOT EXISTS transitions_job ON transitions(job, id);
 """
-JOB_STATES = ("waiting", "queued", "building", "review_wait", "reviewing", "fix_wait", "fixing", "checks", "proof_wait", "proving",
-              "merged", "rejected", "blocked", "failed", "returned")
+JOB_STATES = states.NAMES
 FIRE_COLUMNS = (("cache_read", "INTEGER"), ("cache_write", "INTEGER"), ("seconds", "INTEGER"),
                 ("steps", "INTEGER"), ("steps_at", "TEXT"))
 OPEN = ("intent", "running")
