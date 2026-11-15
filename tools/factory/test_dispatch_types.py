@@ -39,7 +39,7 @@ class Types(unittest.TestCase):
         self.assertEqual(len(set(ids)), 4)
         self.assertEqual({c["name"]: c["runs"] for c in cfg["types"]["researcher"]["coworkers"]}, {"search": 3})
         self.assertEqual({c["name"]: c["runs"] for c in cfg["types"]["designer"]["coworkers"]}, {"DIETER": 3})
-        self.assertEqual(coder["max_jobs"], 8)
+        self.assertEqual(coder["max_jobs"], 16)
 
     def test_a_types_map_sends_the_build_and_the_review_to_the_first_free_coworker_of_the_type(self):
         def cw(ids):
