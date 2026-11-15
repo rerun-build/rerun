@@ -66,6 +66,8 @@ class Proof(ProofBase):
         self.assertIn("Done-test red before green", msg)
         self.assertIn("Red before green**: not applicable", msg)
         self.assertNotIn("only when you ran it", msg)
+        self.assertIn("the Run lines pass at the head", msg)
+        self.assertNotIn("that check ran nothing", msg)
 
     def test_prover_is_neither_builder_nor_reviewer_and_gets_the_asks(self):
         self.to_proving()

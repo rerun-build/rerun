@@ -173,7 +173,7 @@ def proof_brief(j, pr, head, asks):
         'The asks, in order:',
         *["ASK %d: %s" % (n, a) for n, a in enumerate(asks, 1)],
         '',
-        'For each ask write one line: `ASK <n>: MET <file>:<line> <test name>` (the file and the line in the diff, and the test that shows it) or `ASK <n>: NOT MET <why>`. A Run line is MET when the check "Done-test red before green" passed at this commit: that check ran every Run line of the issue at this commit and passes only when each one passes there and the done-test fails on dev\'s code; name the test file and line the Run line runs. When the issue carries `**Red before green**: not applicable`, that check ran nothing: the Run line is MET only when another check of this commit ran it and passed (name it), otherwise NOT MET.',
+        'For each ask write one line: `ASK <n>: MET <file>:<line> <test name>` (the file and the line in the diff, and the test that shows it) or `ASK <n>: NOT MET <why>`. A Run line is MET when the check "Done-test red before green" passed at this commit: that check ran every Run line of the issue at this commit and passes only when each one passes there and the done-test fails on dev\'s code; name the test file and line the Run line runs. When the issue carries `**Red before green**: not applicable`, that check runs the Run lines at this commit only, without the run on dev\'s code: a Run line is MET when the check reports that the Run lines pass at the head (name the check and the line).',
         '',
         'Post those lines on the pull request with your review tool.',
         '',

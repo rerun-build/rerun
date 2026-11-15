@@ -114,10 +114,18 @@ def main(argv=None):
     else:
         body = fetch_issue(os.environ["GITHUB_REPOSITORY"], n, os.environ["GH_TOKEN"])
     why = exempt(body)
-    if why:
-        report("Red before green for #%d: not applicable (%s)." % (n, why))
-        return 0
     lines = run_lines(body)
+    if why:
+        if not lines:
+            report("Red before green for #%d: not applicable (%s); the issue has no Run lines." % (n, why))
+            return 0
+        code, tail = run(list(a.prepare) + lines, root)
+        if code:
+            report("Red before green for #%d: not applicable (%s), but the Run lines fail at the head (exit %d)." % (n, why, code))
+            report("```\n%s\n```" % tail)
+            return 1
+        report("Red before green for #%d: not applicable (%s); the Run lines pass at the head (%d line%s)." % (n, why, len(lines), "" if len(lines) == 1 else "s"))
+        return 0
     if not lines:
         report("Red before green for #%d: the issue has no Run lines, nothing to prove." % n)
         return 0
