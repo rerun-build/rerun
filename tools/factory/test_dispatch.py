@@ -415,7 +415,7 @@ class Flow(Base):
         self.assertIn("e2e", self.w.issue(5)["comments"][-1])
         self.assertEqual(self.w.edits(5)[0][-1], "factory-blocked")
 
-    def test_refused_merge_ends_the_job(self):
+    def test_a_merge_refused_five_times_ends_the_job(self):
         self.to_checks()
         self.w.workflows[HEAD] = [wf("ci", "success")]
         gh, merges = self.w.gh, []
@@ -425,11 +425,29 @@ class Flow(Base):
                 raise D.Error("gh pr merge failed: exit 1")
             return gh(args)
         self.w.gh = merge_refused
+        self.tick(4, fresh=True)
+        self.assertEqual(len(merges), 4)
+        self.assertEqual(self.state(), "checks")
         self.tick(3, fresh=True)
-        self.assertEqual(len(merges), 1)
+        self.assertEqual(len(merges), 5)
         self.assertEqual(self.state(), "failed")
-        self.assertIn("merge of #42 at abcdef1 refused", self.w.issue(5)["comments"][-1])
+        self.assertIn("merge of #42 at abcdef1 refused 5 times", self.w.issue(5)["comments"][-1])
         self.assertEqual(self.w.edits(5)[0][-1], "factory-blocked")
+
+    def test_a_merge_refused_once_lands_on_the_next_beat(self):
+        self.to_checks()
+        self.w.workflows[HEAD] = [wf("ci", "success")]
+        gh, tries = self.w.gh, []
+        def refused_once(args):
+            if list(args[:2]) == ["pr", "merge"]:
+                tries.append(list(args))
+                if len(tries) == 1:
+                    raise D.Error("gh pr merge failed: exit 1")
+            return gh(args)
+        self.w.gh = refused_once
+        self.tick(2, fresh=True)
+        self.assertEqual(len(tries), 2)
+        self.assertEqual(self.state(), "merged")
 
     def test_cancelled_run_without_a_success_of_its_workflow_does_not_merge(self):
         self.to_checks()
