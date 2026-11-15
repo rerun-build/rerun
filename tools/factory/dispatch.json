@@ -11,6 +11,7 @@
   "auto_plan_marker": true,
   "likely_fixed_days": 7,
   "proof": true,
+  "one_file_one_job": true,
   "slots": 15,
   "ledger_file": "/state/ledger.db",
   "json_state_file": "/state/dispatch.json",
