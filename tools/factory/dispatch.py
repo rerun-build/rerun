@@ -75,6 +75,11 @@ def issue_run(body):
     return " ; ".join(l.strip() for l in m.group(1).strip().split("\n") if l.strip()) if m else "the Run command of the issue"
 
 
+def verdict_head(verdict):
+    m = re.search(r"@([0-9a-f]{7,40})\b", verdict)
+    return m.group(1)[:7] if m else None
+
+
 def final_state(j, forms):
     return "\n".join([
         'Final state',
@@ -603,12 +608,16 @@ class Dispatcher:
             if out is None:
                 return
             verdict = final_line(out, ("VERDICT:",)) or ""
-            if re.match(r"VERDICT:\s*ACCEPT", verdict):
+            named = verdict_head(verdict)
+            stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
+            if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
             elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
                 self.to(j, "fix_wait", verdict[:160], review=out[-1500:])
-            elif j.get("not_met") and not verdict:
+            elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))
+            elif stale:
+                self.end(j, "rejected", "verdict names %s, the head is %s: %s" % (named or "no commit", j["head"][:7], verdict[:100]))
             else:
                 self.end(j, "rejected", verdict[:200] or last_line(out))
         elif st == "fix_wait":
