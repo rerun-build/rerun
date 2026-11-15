@@ -2,7 +2,7 @@ import re
 
 HEADINGS = {"change": "change", "corrections": "change", "done-test": "done", "run": "run"}
 ASK_LINE = re.compile(r"^ASK (\d+): (MET \S+:\d+ \S.*|NOT MET \S.*)$")
-PROOF_LINE = re.compile(r"^PROOF: (PASS|FAIL) @([0-9a-f]{7,40})(?:: (.*))?$")
+PROOF_LINE = re.compile(r"^PROOF: (PASS|FAIL) (?:@|at )([0-9a-f]{7,40})(?:: (.*))?$")
 
 
 def plain(body):
@@ -34,6 +34,8 @@ def judge(out, count, head):
     lines = [l.strip() for l in plain(out).split("\n") if l.strip()]
     last = next((l for l in reversed(lines) if l.startswith("PROOF:")), None)
     m = PROOF_LINE.match(last) if last else None
+    if not m and last and re.match(r"PROOF: (PASS|FAIL)\b", last):
+        return "none", "proof names no commit, the head is %s" % head[:7]
     if not m:
         return "none", "no PROOF line"
     if m.group(2)[:7] != head[:7]:
