@@ -100,13 +100,13 @@ describe('run lineage migration', () => {
         expect(columns).toEqual(expect.arrayContaining(LINEAGE))
         const indexSql = "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'runs_agent_job_started_idx'"
         expect((await first.client.execute(indexSql)).rows).toHaveLength(1)
-        expect(await sqliteVersion(first.client)).toBe(6)
+        expect(await sqliteVersion(first.client)).toBe(7)
         closeSystemDb('v4')
 
         const second = await getSystemDb('v4')
         expect(await columnsOf('v4', 'runs')).toEqual(columns)
         expect((await second.client.execute(indexSql)).rows).toHaveLength(1)
-        expect(await sqliteVersion(second.client)).toBe(6)
+        expect(await sqliteVersion(second.client)).toBe(7)
     })
 })
 
@@ -126,8 +126,8 @@ describe('run goal migration', () => {
         const row = (await first.client.execute("SELECT goal_json, goal_state, goal_turns, goal_verdicts_json FROM runs WHERE id = 'r1'")).rows[0]
         expect([row.goal_json, row.goal_state, row.goal_turns, row.goal_verdicts_json]).toEqual([null, null, null, null])
         await expect(first.client.execute("UPDATE runs SET goal_state = 'bogus' WHERE id = 'r1'")).rejects.toThrow()
-        expect(await sqliteVersion(first.client)).toBe(6)
-        expect(SYSTEM_DB_MIGRATIONS.at(-1)).toMatchObject({ version: 6, id: 'run-goal' })
+        expect(await sqliteVersion(first.client)).toBe(7)
+        expect(SYSTEM_DB_MIGRATIONS.find(step => step.version === 6)).toMatchObject({ version: 6, id: 'run-goal' })
         closeSystemDb('v5goal')
         expect(await columnsOf('v5goal', 'runs')).toEqual(columns)
     })
