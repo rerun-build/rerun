@@ -26,7 +26,7 @@ const SHIMMER_BRIGHT = 'var(--logo-shimmer-bright)'
 const SHIMMER_DIM = 'var(--logo-shimmer-dim)'
 
 export function Logo({ size = 'md', className, ...rest }: LogoProps) {
-    const id = React.useId() // id de pattern SSR-safe par instance
+    const id = React.useId()
     return (
         <span data-slot="logo" className={cn(logoVariants({ size }), className)} {...rest}>
             <svg

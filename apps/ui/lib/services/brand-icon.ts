@@ -57,7 +57,7 @@ async function removeBackground(imageUrl: string): Promise<string> {
 
 async function storeAsset(slug: string, bytes: Uint8Array, ext: 'svg' | 'png', contentType: string): Promise<string> {
     const supabase = createServiceRoleClient()
-    await supabase.storage.createBucket(ICON_BUCKET, { public: true }).catch(() => {}) // idempotent
+    await supabase.storage.createBucket(ICON_BUCKET, { public: true }).catch(() => {})
 
     const path = `${slug}.${ext}`
     const { error } = await supabase.storage.from(ICON_BUCKET).upload(path, bytes, { contentType, upsert: true })
@@ -85,12 +85,12 @@ async function trimTransparentPng(bytes: Uint8Array): Promise<Uint8Array> {
 
 export type BrandIconResult = {
     source: 'simple-icons' | 'logo.dev'
-    matched: string // the Simple Icons slug or the logo.dev domain that produced the icon
+    matched: string
     domain: string
     tone: BrandIconTone
     iconUrl: string
-    sourceUrl?: string // logo.dev raw URL (fallback path only)
-    cutoutUrl?: string // FAL output URL (fallback path only)
+    sourceUrl?: string
+    cutoutUrl?: string
 }
 
 export async function buildBrandIcon(slug: string, website: string): Promise<BrandIconResult> {

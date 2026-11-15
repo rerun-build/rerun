@@ -73,7 +73,7 @@ const KEYFRAMES = `
 `
 
 export function AnimatedLogo({ size = 'md', frame = true, loop = true, duration, className, ...rest }: AnimatedLogoProps) {
-    const id = React.useId() // id de mask SSR-safe par instance
+    const id = React.useId()
     const cycle = duration ?? (loop ? 2.8 : 1.8)
     return (
         <span data-slot="animated-logo" className={cn(animatedLogoVariants({ size, frame }), className)} {...rest}>

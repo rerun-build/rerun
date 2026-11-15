@@ -57,6 +57,21 @@ class Check(unittest.TestCase):
         self.assertIn("a.ts", out)
         self.assertNotIn("b.tsx", out)
 
+    @unittest.skipUnless(TS_MODULE, "TS_MODULE names a folder with typescript installed")
+    def test_a_comment_at_the_end_of_a_code_line_fails_and_is_cut_but_jsx_text_stays(self):
+        root = repo({"a.ts": "export type P = {\n    level: number // why\n    band: string\n}\nexport const V = 1 // why\n",
+                     "b.tsx": "export const B = () => <p>// shown text</p>\n"})
+        code, out = check(root, "--ts-module", TS_MODULE)
+        self.assertEqual(code, 1)
+        self.assertIn("a.ts", out)
+        self.assertNotIn("b.tsx", out)
+        with contextlib.redirect_stdout(io.StringIO()):
+            strip.main(["--root", root, "--write", "--ts-module", TS_MODULE])
+        with open(os.path.join(root, "a.ts"), encoding="utf-8") as f:
+            self.assertEqual(f.read(), "export type P = {\n    level: number\n    band: string\n}\nexport const V = 1\n")
+        with open(os.path.join(root, "b.tsx"), encoding="utf-8") as f:
+            self.assertEqual(f.read(), "export const B = () => <p>// shown text</p>\n")
+
 
 if __name__ == "__main__":
     unittest.main()

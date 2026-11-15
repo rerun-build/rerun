@@ -17,7 +17,7 @@ vi.mock('./factory-scene', async importOriginal => {
 const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')
 const sample = (): FactorySnapshot => factorySnapshotSchema.parse(JSON.parse(readFileSync(SAMPLE, 'utf8')))
-const NOW = Date.parse('2026-11-14T03:24:40Z') // ten seconds after the sample, inside its hold
+const NOW = Date.parse('2026-11-14T03:24:40Z')
 const LATER = Date.parse('2026-11-14T03:40:00Z')
 const pod = (f: ReturnType<typeof sceneFromSnapshot>, issue: number) => f.pods.find(p => p.issue === issue)
 
@@ -28,7 +28,7 @@ describe('sceneFromSnapshot', () => {
         expect(pod(f, 331)).toMatchObject({ band: 'review', state: 'working' })
         expect(pod(f, 332)).toMatchObject({ state: 'held', path: ['Delegator', 'code'], travel: 0, level: 0 })
         expect(pod(f, 333)).toMatchObject({ band: 'build', state: 'fixing' })
-        expect(pod(f, 335)).toBeUndefined() // merged, and counted
+        expect(pod(f, 335)).toBeUndefined()
         expect(f.counts).toMatchObject({ queued: 1, building: 2, review: 1, checks: 0, merged: 1 })
     })
 

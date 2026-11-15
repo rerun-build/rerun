@@ -332,7 +332,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
         if (placement) {
             const space = spaceAtPosition(spaces, pos)
-            if (!space) return // tuile hors de tout espace : le ghost était rouge, on ignore.
+            if (!space) return
             if (!managesBoxes(get(), viewer, [space.id])) {
                 refuseUnmanagedBox()
                 return

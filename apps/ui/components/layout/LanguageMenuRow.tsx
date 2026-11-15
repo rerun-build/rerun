@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
 const AUTOMATIC = 'auto'
-const SUBMENU_WIDTH = 160 // w-40
+const SUBMENU_WIDTH = 160
 const VIEWPORT_MARGIN = 8
 
 export function LanguageMenuRow() {

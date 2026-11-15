@@ -3,7 +3,7 @@ import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type AxisPoint, type Tile } fro
 import type { PodView } from './factory-scene'
 
 export type P = { x: number; y: number }
-type Shape = P[] // a convex polygon
+type Shape = P[]
 
 const CENTER = isoPosition(GRID_SIZE / 2, GRID_SIZE / 2)
 export const centreOf = (t: Tile): AxisPoint => { const s = t.span ?? 2; return { u: t.position.col + s / 2, v: t.position.row + s / 2 } }
@@ -40,9 +40,9 @@ export function podPath(ids: string[], byId: Map<string, Tile>, routes: Map<stri
 export const settles = (p: PodView) => p.state === 'working' || p.state === 'checks' || p.state === 'fixing'
 export const inScanner = (p: PodView) => p.state === 'working' && p.band === 'review' && p.travel >= 1
 
-const REST_PX = 24 // how far short of the end of its line a sphere being worked rests at best
-const STEP_PX = 4 // how far back it moves at a time when that place is taken
-const BLOCK_UP = 30 // how high a coworker's block stands above its floor
+const REST_PX = 24
+const STEP_PX = 4
+const BLOCK_UP = 30
 const rect = (x0: number, y0: number, x1: number, y1: number): Shape => [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }]
 
 export function tileShapes(t: Tile): Shape[] {

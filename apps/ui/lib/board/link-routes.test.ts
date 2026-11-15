@@ -73,7 +73,7 @@ const portsOnPlusU = (routes: Map<string, AxisPoint[]>, id: string, targets: str
     targets.map(t => {
         const [first, second] = routes.get(`${id}->${t}`)!
         expect(first.u).toBeCloseTo(plane)
-        expect(second.v).toBeCloseTo(first.v) // leaves perpendicular to the face
+        expect(second.v).toBeCloseTo(first.v)
         expect(second.u).toBeGreaterThan(first.u)
         return first.v
     })

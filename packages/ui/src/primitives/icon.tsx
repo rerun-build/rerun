@@ -57,7 +57,7 @@ type IconProps = React.ComponentProps<'span'> &
 
 function Icon({ size = 'md', tone = 'neutral', className, glyphClassName, loading, ...props }: IconProps) {
     const { icon: Glyph, src, ...rest } = props as { icon?: React.ComponentType<{ className?: string }>; src?: string } & React.ComponentProps<'span'>
-    const id = React.useId() // id de pattern SSR-safe par instance
+    const id = React.useId()
     const c = CELL[size ?? 'md']
     return (
         <span data-slot="icon" data-size={size} className={cn(iconVariants({ size }), className)} {...rest}>

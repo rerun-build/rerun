@@ -5,9 +5,9 @@ import { type Tile } from '@rerun/ui/iso-grid'
 import { centreOf, toWorld } from './factory-rest'
 import { type CabinetView } from './factory-scene'
 
-const W = 52 // body width, px
-const H = 64 // body height, px
-const RY = 8 // half-height of the top and bottom ellipses
+const W = 52
+const H = 64
+const RY = 8
 
 export function FeatureTank({ cab, tile }: { cab: CabinetView; tile: Tile }) {
     const c = toWorld(centreOf(tile))
@@ -55,7 +55,7 @@ export function FeatureTank({ cab, tile }: { cab: CabinetView; tile: Tile }) {
     )
 }
 
-const RH = 40 // the reject store's body height, px
+const RH = 40
 
 export function RejectTank({ tile, count }: { tile: Tile; count: number }) {
     const c = toWorld(centreOf(tile))

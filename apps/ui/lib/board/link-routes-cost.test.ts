@@ -14,7 +14,7 @@ const RINGED = [tile('src', 0, 0), tile('target', 150, 150), tile('corner', 300,
 const LOG = process.env.ROUTE_COST_LOG
 
 function timed(tiles: Tile[], links: TileLink[]) {
-    let routes = routeTileLinks(tiles, links) // warm the code paths once
+    let routes = routeTileLinks(tiles, links)
     let ms = Infinity
     for (let i = 0; i < 3; i++) {
         const t0 = performance.now()

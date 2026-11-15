@@ -29,7 +29,7 @@ describe('the still state of the iso-grid', () => {
             expect(still, variant).not.toContain('iso-belt-slats')
         }
         expect(links({}, 'belt')).toContain('iso-belt-slats')
-        expect(links({ still: true }, 'belt')).toContain('<path') // the band itself is still drawn
+        expect(links({ still: true }, 'belt')).toContain('<path')
     })
 
     it('marks a buddy with `style.still` and stops its blink in the stylesheet; without it nothing changes', () => {
@@ -47,13 +47,13 @@ describe('the still state of the iso-grid', () => {
         const belts = f.links.filter(l => l.variant === 'belt')
         expect(belts.length).toBeGreaterThan(0)
         expect(belts.every(l => l.still === true)).toBe(true)
-        expect(f.tiles.filter(t => !t.id.startsWith('cab-') && t.id !== 'rejects').some(t => t.style.still === true)).toBe(false) // idle faces still blink and look around
+        expect(f.tiles.filter(t => !t.id.startsWith('cab-') && t.id !== 'rejects').some(t => t.style.still === true)).toBe(false)
         expect(f.tiles.find(t => t.id === 'code')!.style.still).not.toBe(true)
-        expect(f.tiles.some(t => t.id.includes('-copy-'))).toBe(false) // no ghost copy without a job running
+        expect(f.tiles.some(t => t.id.includes('-copy-'))).toBe(false)
     })
 
     it('the live floor lets a working belt and a working coworker move', () => {
-        const f = sceneFromSnapshot(sample(), NOW) // #330 builds on code, with a copy
+        const f = sceneFromSnapshot(sample(), NOW)
         expect(f.links.some(l => l.variant === 'belt' && l.still !== true)).toBe(true)
         expect(f.links.filter(l => l.variant === 'trace').every(l => l.still !== true)).toBe(true)
         expect(f.tiles.find(t => t.id === 'code')!.style.still).not.toBe(true)

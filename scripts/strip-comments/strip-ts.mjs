@@ -31,17 +31,27 @@ export function commentRanges(ts, sf) {
     const seen = new Set()
     const out = []
     const jsxEmpty = []
-    const take = (pos) => {
-        for (const r of ts.getLeadingCommentRanges(text, pos) || []) {
+    const add = (ranges) => {
+        for (const r of ranges || []) {
             if (seen.has(r.pos)) continue
             seen.add(r.pos)
             out.push({ pos: r.pos, end: r.end, keep: KEEP.test(text.slice(r.pos, r.end)) })
         }
     }
+    const take = (pos) => add(ts.getLeadingCommentRanges(text, pos))
+    const jsxTextAt = new Set()
+    const mark = (node) => {
+        for (const child of node.getChildren(sf)) {
+            if (child.kind === ts.SyntaxKind.JsxText) jsxTextAt.add(child.pos)
+            mark(child)
+        }
+    }
+    mark(sf)
     const visit = (node) => {
         for (const child of node.getChildren(sf)) {
             if (isJsDoc(ts, child)) continue
             if (child.kind !== ts.SyntaxKind.JsxText) take(child.pos)
+            if (!jsxTextAt.has(child.end)) add(ts.getTrailingCommentRanges(text, child.end))
             if (emptyJsxExpression(ts, child)) jsxEmpty.push(child)
             visit(child)
         }
