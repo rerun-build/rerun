@@ -58,7 +58,7 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
 }))
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
-const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, acquireMcp, closeAllMcp, pooledMcpCount, releaseAgentMcp } = await import('./mcp-pool.js')
+const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, acquireMcp, closeAllMcp, mcpSessionStates, pooledMcpCount, reconnectMcp, releaseAgentMcp } = await import('./mcp-pool.js')
 
 type Server = Parameters<typeof acquireMcp>[1]
 
@@ -209,5 +209,88 @@ describe('releaseAgentMcp', () => {
         await settle()
         expect(mcp.closed).toEqual(['https://gh.example/mcp', 'https://linear.example/mcp'])
         expect(pooledMcpCount()).toBe(1)
+    })
+})
+
+describe('reconnectMcp', () => {
+    it('reconnectMcp closes the held connection and the next call of a handle taken earlier dials again and succeeds', async () => {
+        const handle = await acquireMcp('a1', server('gh'), spawn)
+        expect(reconnectMcp('a1', 'gh')).toBe(true)
+        await settle()
+        expect(mcp.closed).toEqual(['https://gh.example/mcp'])
+        expect(await handle?.call('search', {})).toEqual({ content: [{ type: 'text', text: 'search ran' }] })
+        expect(mcp.connects).toHaveLength(2)
+        expect(pooledMcpCount()).toBe(1)
+    })
+
+    it('reconnectMcp answers false and closes nothing for a server the pool does not hold', async () => {
+        expect(reconnectMcp('a1', 'gh')).toBe(false)
+        await settle()
+        expect(mcp.closed).toEqual([])
+    })
+})
+
+describe('mcpSessionStates', () => {
+    it('mcpSessionStates lists a held server as connected', async () => {
+        await acquireMcp('a1', server('gh'), spawn)
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected' }])
+    })
+
+    it('mcpSessionStates lists a server still opening as connecting', async () => {
+        mcp.hanging.add('https://slow.example/mcp')
+        void acquireMcp('a1', server('slow'), spawn)
+        await settle()
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'slow', state: 'connecting' }])
+        reconnectMcp('a1', 'slow')
+    })
+
+    it('mcpSessionStates lists a server that did not answer as failed with errorClass timeout, and drops it after a later success', async () => {
+        vi.useFakeTimers()
+        mcp.hanging.add('https://slow.example/mcp')
+        const pending = acquireMcp('a1', server('slow'), spawn)
+        await vi.advanceTimersByTimeAsync(MCP_CONNECT_TIMEOUT_MS)
+        expect(await pending).toBeNull()
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'slow', state: 'failed', errorClass: 'timeout' }])
+        mcp.hanging.clear()
+        vi.useRealTimers()
+        expect(await acquireMcp('a1', server('slow'), spawn)).not.toBeNull()
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'slow', state: 'connected' }])
+    })
+
+    it('mcpSessionStates lists a refused server as failed with errorClass unreachable', async () => {
+        mcp.failing.add('https://down.example/mcp')
+        await acquireMcp('a1', server('down'), spawn)
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'down', state: 'failed', errorClass: 'unreachable' }])
+    })
+
+    it('mcpSessionStates never carries the error text', async () => {
+        mcp.failing.add('https://down.example/mcp')
+        await acquireMcp('a1', server('down'), spawn)
+        await acquireMcp('a1', server('gh'), spawn)
+        const states = mcpSessionStates('a1')
+        expect(states.map(s => s.name)).toEqual(['down', 'gh'])
+        for (const state of states) {
+            expect(Object.keys(state).every(k => ['name', 'state', 'errorClass'].includes(k))).toBe(true)
+            expect(['connected', 'connecting', 'failed']).toContain(state.state)
+            if (state.errorClass) expect(['auth', 'timeout', 'unreachable', 'closed', 'other']).toContain(state.errorClass)
+        }
+        expect(JSON.stringify(states)).not.toContain('ECONNREFUSED')
+    })
+
+    it('mcpSessionStates answers only the agent asked for', async () => {
+        await acquireMcp('a1', server('gh'), spawn)
+        await acquireMcp('a2', server('linear'), spawn)
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected' }])
+        expect(mcpSessionStates('a3')).toEqual([])
+    })
+})
+
+describe('releaseAgentMcp failures', () => {
+    it('releaseAgentMcp clears the failures of the agent', async () => {
+        mcp.failing.add('https://down.example/mcp')
+        await acquireMcp('a1', server('down'), spawn)
+        expect(mcpSessionStates('a1')).toHaveLength(1)
+        releaseAgentMcp('a1')
+        expect(mcpSessionStates('a1')).toEqual([])
     })
 })
