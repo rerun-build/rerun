@@ -25,6 +25,7 @@ LOST_BEATS = 3
 RECONCILE_BEATS = 10
 REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
+MERGE_TRIES = 5
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 
 
@@ -809,7 +810,11 @@ class Dispatcher:
             self.gh(["pr", "merge", str(j["pr"]), "-R", self.repo, "--merge", "--match-head-commit", j["head"], "--delete-branch"])
         except Error:
             if json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") != "MERGED":
-                return self.end(j, "failed", "merge of #%s at %s refused" % (j["pr"], j["head"][:7]))
+                tries = j.get("merge_refused", 0) + 1
+                if tries < MERGE_TRIES:
+                    j["merge_refused"] = tries
+                    return self.save(j, "merge of #%s at %s refused (%d of %d), tried again next beat" % (j["pr"], j["head"][:7], tries, MERGE_TRIES))
+                return self.end(j, "failed", "merge of #%s at %s refused %d times" % (j["pr"], j["head"][:7], tries))
         self.end(j, "merged", "#%s at %s" % (j["pr"], j["head"][:7]))
 
     def find_pr(self, j, out):
