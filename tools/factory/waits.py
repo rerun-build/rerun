@@ -1,6 +1,8 @@
+import states
+
 REASONS = ("dependency", "no free worker of its type", "back-off", "hold", "plan limit", "sign-in renewal")
 
-_QUEUE_STATES = ("queued", "review_wait", "fix_wait")
+_QUEUE_STATES = states.QUEUE
 
 
 def reason(job, now, hold=None):

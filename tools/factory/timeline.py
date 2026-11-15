@@ -1,7 +1,10 @@
-import argparse, calendar, json, sqlite3, sys, time
+import argparse, calendar, json, os, sqlite3, sys, time
 
-END = ("merged", "rejected", "blocked", "failed", "returned")
-CRIT = ("blocked", "failed", "rejected", "returned")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import states
+
+END = states.END
+CRIT = states.PROBLEM
 LONG_WAIT = 10 * 60
 DAY = 24 * 3600
 FMT = "%Y-%m-%dT%H:%M:%SZ"
@@ -69,7 +72,7 @@ def status_lines(rows, now):
         reason = " | reason: %s" % data["wait_reason"] if data.get("wait_reason") else ""
         who = ""
         cw = (rows.get("fires") or {}).get(j["job"])
-        if j["state"] in ("building", "reviewing", "fixing") and cw:
+        if j["state"] in states.RUNNING and cw:
             who = " | run on %s, copy %s" % (cw, data.get("copy") or 1)
         live.append("#%s %s for %d min | %s | %s%s%s" % (j["job"], j["state"], max(0, now - start) // 60, pr, waits, reason, who))
     return held + live + done
@@ -95,7 +98,7 @@ def gantt(rows, now, since):
             if end < since:
                 continue
             tags = []
-            if state in CRIT or (state in ("waiting", "queued") and end - start > LONG_WAIT):
+            if state in CRIT or (state in states.SLOW_WAIT and end - start > LONG_WAIT):
                 tags.append("crit")
             if left:
                 tags.append("done")

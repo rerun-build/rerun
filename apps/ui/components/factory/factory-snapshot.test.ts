@@ -16,10 +16,8 @@ describe('factorySnapshotSchema', () => {
     })
 
     it('holds the same job states as the delegator ledger', () => {
-        const store = readFileSync(path.join(ROOT, 'tools/factory/store.py'), 'utf8')
-        const block = store.match(/JOB_STATES = \(([\s\S]*?)\)/)
-        expect(block).not.toBeNull()
-        const states = [...block![1].matchAll(/"([a-z_]+)"/g)].map(m => m[1])
+        const table = readFileSync(path.join(ROOT, 'tools/factory/states.py'), 'utf8')
+        const states = [...table.matchAll(/^    "([a-z_]+)": _(?:row|end)\(/gm)].map(m => m[1])
         expect(states).toEqual(factoryJobStateSchema.options)
     })
 

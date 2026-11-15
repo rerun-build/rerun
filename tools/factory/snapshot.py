@@ -3,11 +3,12 @@ import json
 
 import cutshape
 import pools
+import states
 import store as ledger_store
 
-RUNNING = ("building", "reviewing", "fixing")
-END = ("merged", "rejected", "blocked", "failed", "returned")
-WAIT_STATES = ("waiting", "queued", "review_wait", "fix_wait")
+RUNNING = states.RUNNING
+END = states.END
+WAIT_STATES = states.WAIT_STATES
 TYPES = ("coder", "reviewer", "researcher", "designer")
 MAX_JOBS = 300
 MAX_EPICS = 50
