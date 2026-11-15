@@ -1044,6 +1044,18 @@ class Final(Base):
         self.assertEqual(self.state(), "blocked")
         self.assertIn("Reason: no final line", self.w.issue(5)["comments"][-1])
 
+    def test_run_and_files_are_read_from_a_body_with_windows_line_endings(self):
+        body = "**Files**\r\n- `a/b.py`\r\n\r\n**Run** (run on dev)\r\n```\r\npython3 -m unittest x\r\ncd y && z\r\n```\r\n"
+        self.assertEqual(D.issue_run(body), "python3 -m unittest x ; cd y && z")
+        self.assertEqual(D.issue_files(body), "a/b.py")
+
+    def test_builders_are_told_no_comments_and_reviewers_reject_them(self):
+        j = {"issue": 7, "title": "Fix x", "body": ""}
+        for b in (D.build_brief(j), D.fix_brief(j, 3, "r"), D.first_brief(dict(j, worker="researcher"))):
+            self.assertIn("NEVER make comments in code", b)
+            self.assertIn("eslint-disable-next-line", b)
+        self.assertIn("is a reason to reject", D.review_brief(j, 3, HEAD))
+
     def test_each_brief_has_one_final_state_block_with_forms_and_run(self):
         body = "**Files**\n- `a/b.py`\n\n**Run**\n```\npython3 -m unittest x\n```\n"
         j = {"issue": 7, "title": "Fix x", "body": body}

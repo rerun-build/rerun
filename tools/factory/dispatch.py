@@ -62,14 +62,18 @@ GOALS = {
 }
 
 
+def plain(body):
+    return str(body or "").replace("\r\n", "\n")
+
+
 def issue_files(body):
-    m = re.search(r"(?ms)^\*\*Files\*\*.*?\n(.*?)(?:\n\s*\n\*\*|\Z)", str(body or ""))
+    m = re.search(r"(?ms)^\*\*Files\*\*.*?\n(.*?)(?:\n\s*\n\*\*|\Z)", plain(body))
     paths = re.findall(r"`([^`\s]+)`", m.group(1)) if m else []
     return ", ".join(paths) or "the files the issue names"
 
 
 def issue_run(body):
-    m = re.search(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```", str(body or ""))
+    m = re.search(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```", plain(body))
     return " ; ".join(l.strip() for l in m.group(1).strip().split("\n") if l.strip()) if m else "the Run command of the issue"
 
 
@@ -90,6 +94,14 @@ TAIL = "\n".join([
     'The "Code tools" section of your own instructions decides which tools you have, and SymForge is off for everyone. Where the line above names a tool you do not have, your instructions win.',
 ])
 
+NO_COMMENTS = ('Rob\'s rule, 2026-11-14: "any new work as a rule should NEVER make comments in code." Add no comment to any code you write: '
+               'no `//` or `/* */` comments, no `#` comment lines, no docstrings. Tool directives that a linter or test runner reads '
+               '(`eslint-disable-next-line`, `@vitest-environment`, `@ts-expect-error`, `noqa`) stay. An explanation that matters goes into the '
+               'pull request body or the feature\'s document under `docs/`.')
+
+NO_COMMENTS_REVIEW = ('Rob\'s rule, 2026-11-14: no comments in code. A line the pull request adds that is a code comment or a docstring, '
+                      'and not a tool directive, is a reason to reject; it overrides the sprint rule above.')
+
 
 def build_brief(j):
     return "\n".join([
@@ -100,6 +112,7 @@ def build_brief(j):
         '',
         '1. Open your worktree for rerun #%s from dev, the way your instructions say.' % j["issue"],
         '2. Where the issue names a done-test, write it first and see it fail. Then make the change, in the files the issue names and nowhere else.',
+        NO_COMMENTS,
         '3. Run only the test files you touched, with the worker pool capped at 2. No full suite. Then run the lint and the type check of every package the change touched (`pnpm --filter <package> lint`, `pnpm --filter <package> ts-check`), and for Python files under `tools/factory` run `ruff check` on them where ruff is installed; fix what they report before opening the pull request. Lint warnings do not block; lint errors do. Give the lint and the type check each a shell call of their own, with `timeoutMs` set above the default of 120000 (the limit is 600000); never chain them with the commit or `pr-open`.',
         '4. Commit, push, and open one pull request into dev. Title: the issue title plus "(#%s)". Body: what changed, which test failed before and passes now, and the line "Closes #%s".' % (j["issue"], j["issue"]),
         '5. Leave the worktree open. It is closed after the merge by a sweep.',
@@ -120,7 +133,7 @@ def first_brief(j):
     w = j.get("worker", "coder")
     if w in ("researcher", "designer"):
         make = briefs.research_brief if w == "researcher" else briefs.design_brief
-        return "\n".join([make(j), "", final_state(j, '`PR: <url>` or `BLOCKED: <one sentence>`'), TAIL])
+        return "\n".join([make(j), "", NO_COMMENTS, "", final_state(j, '`PR: <url>` or `BLOCKED: <one sentence>`'), TAIL])
     return build_brief(j)
 
 
@@ -133,6 +146,8 @@ def review_brief(j, pr, head):
         'The checks of this commit may still be running. Do not wait for them and do not block on them: the dispatcher merges only when every check of this exact commit is green. Your verdict is on the diff alone, also where your own rules say a review needs green checks.',
         '',
         'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block.',
+        '',
+        NO_COMMENTS_REVIEW,
         '',
         'On GitHub write coworker names without the at-sign.',
         '',
@@ -148,6 +163,7 @@ def fix_brief(j, pr, review):
         str(review)[-1500:],
         '',
         'Fix exactly what blocks, in your open worktree for this job. Add or adjust the test, run only the test files you touched, commit and push to the same branch. No second pull request.',
+        NO_COMMENTS,
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
         'If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>.',
