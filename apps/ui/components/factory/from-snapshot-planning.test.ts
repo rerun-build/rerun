@@ -12,7 +12,7 @@ const SAMPLE = path.resolve(import.meta.dirname, '../../../../packages/contracts
 const NOW = Date.parse('2026-11-14T03:24:40Z')
 const SHAPER_ID = '1b325848-c3fd-4e6f-9ad7-43f3adac08b6'
 const run = (id: string, name: string) => ({ id, name, runId: `run-${name}`, startedAt: '2026-11-15T02:00:00Z', steps: 3 })
-const plan = (parent: number, coworkers: ReturnType<typeof run>[], extra: object = {}) => ({ parent, title: `Cut ${parent}`, coworkers, children: 3, filed: 2, ...extra })
+const plan = (parent: number | null, coworkers: ReturnType<typeof run>[], extra: object = {}) => ({ parent, title: `Cut ${parent}`, coworkers, children: 3, filed: 2, ...extra })
 const snap = (planning?: unknown[]): FactorySnapshot => factorySnapshotSchema.parse({ ...JSON.parse(readFileSync(SAMPLE, 'utf8')), ...(planning ? { planning } : {}) })
 const tile = (f: ReturnType<typeof sceneFromSnapshot>, id: string) => f.tiles.find(t => t.id === id)
 const style = (t: Tile | undefined) => t?.style as { glow?: string; buddy?: { mood?: string; ownColor?: boolean; color?: string } }
@@ -68,5 +68,28 @@ describe('the planning room from a snapshot', () => {
         expect(b.pods).toEqual(a.pods)
         expect(b.cabinets).toEqual(a.cabinets)
         expect(b.counts).toEqual(a.counts)
+    })
+
+    it('shows Boss and another planner working when the only entry has no parent, with no tank', () => {
+        const f = sceneFromSnapshot(snap([plan(null, [run(BOSS_ID, 'Boss'), run(SHAPER_ID, 'Scope Shaper')], { title: '', children: 0, filed: 0 })]), NOW)
+        expect(style(tile(f, 'Boss')).buddy?.mood).toBe('working')
+        expect(style(tile(f, `planner-${SHAPER_ID.slice(0, 8)}`)).buddy?.mood).toBe('working')
+        expect(f.tiles.filter(t => t.id.startsWith('plan-'))).toEqual([])
+        expect(f.plans).toEqual([])
+        expect(f.links.filter(l => l.source.startsWith('plan'))).toEqual([])
+    })
+
+    it('keeps Boss idle and no tank for an entry with no parent and no running planner', () => {
+        const f = sceneFromSnapshot(snap([plan(null, [], { title: '', children: 0, filed: 0 })]), NOW)
+        expect(style(tile(f, 'Boss')).buddy?.mood).toBeUndefined()
+        expect(f.tiles.filter(t => t.id.startsWith('plan-'))).toEqual([])
+        expect(f.plans).toEqual([])
+    })
+
+    it('keeps the tank of the newest entry with a parent when a later entry has none', () => {
+        const f = sceneFromSnapshot(snap([plan(449, []), plan(null, [run(BOSS_ID, 'Boss')], { title: '', children: 0, filed: 0 })]), NOW)
+        expect(style(tile(f, 'Boss')).buddy?.mood).toBe('working')
+        expect(f.tiles.filter(t => t.id.startsWith('plan-')).map(t => t.id)).toEqual(['plan-449'])
+        expect(f.plans).toEqual([{ parent: 449, title: 'Cut 449', children: 3, filed: 2 }])
     })
 })
