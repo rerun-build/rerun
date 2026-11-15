@@ -204,6 +204,7 @@ const RUN_GOAL_COLUMNS = [
     'goal_verdicts_json TEXT',
 ]
 const RUN_STEP_CACHE_COST_COLUMNS = ['cache_write_tokens INTEGER', 'cost_micros INTEGER']
+const RUN_STEP_EFFORT_COLUMNS = ['effort TEXT']
 
 const PAID_SOURCES_DDL = `
 CREATE TABLE IF NOT EXISTS system_meta (
@@ -278,6 +279,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'run-goal',
         up: async client => {
             await ensureColumns(client, 'runs', RUN_GOAL_COLUMNS)
+        },
+    },
+    {
+        version: 7,
+        id: 'step-effort',
+        up: async client => {
+            await ensureColumns(client, 'run_steps', RUN_STEP_EFFORT_COLUMNS)
         },
     },
 ]

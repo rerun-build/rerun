@@ -1,0 +1,19 @@
+{
+  "settable": ["copies", "wip"],
+  "copies": {
+    "code": 8,
+    "LARRY": 3,
+    "LINUS": 4,
+    "BRUCE": 4,
+    "search": 4,
+    "DIETER": 3,
+    "Boss": 2,
+    "Scope Shaper": 4,
+    "IKE": 4
+  },
+  "wip": {
+    "building": 12,
+    "review_wait": 8,
+    "proof_wait": 6
+  }
+}
