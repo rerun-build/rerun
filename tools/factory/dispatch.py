@@ -830,7 +830,11 @@ class Dispatcher:
             out = self.finished_run(j)
             if out is None:
                 return
-            last = final_line(out, ("PR:", "BLOCKED:"))
+            last = final_line(out, ("PR:", "BLOCKED:", "DONE ELSEWHERE:"))
+            done = re.match(r"DONE ELSEWHERE:\s*(#\d+|[0-9a-f]{7,40})\s*$", last) if last else None
+            if done and j.get("stale"):
+                j["done_by"] = done.group(1)
+                return self.end(j, "superseded", "done elsewhere: %s" % done.group(1))
             m = re.match(r"PR:\s*\S*/pull/(\d+)\s*$", last) if last else None
             if not m:
                 found = self.find_pr(j, out)
@@ -975,13 +979,18 @@ class Dispatcher:
                 text = "The factory dispatcher merged pull request %s at %s." % (pr, j["head"][:7])
             elif j["state"] == "returned":
                 text = "The factory dispatcher stopped this job: returned to the planner. Pull request: %s. Reason: %s" % (pr, j.get("reason") or "-")
+            elif j["state"] == "superseded":
+                text = "The factory dispatcher closed this issue: the Run lines pass on today's dev, so the work was already done by %s." % j.get("done_by")
             else:
                 text = "The factory dispatcher stopped this job: %s. Pull request: %s. Reason: %s" % (j["state"], pr, j.get("reason") or "-")
-            self.gh(["issue", "comment", n, "-R", self.repo, "--body", text])
+            if j["state"] == "superseded":
+                self.gh(["issue", "close", n, "-R", self.repo, "--comment", text])
+            else:
+                self.gh(["issue", "comment", n, "-R", self.repo, "--body", text])
             j["commented"] = True
             self.save(j, "commented")
         if not j.get("relabelled"):
-            done = "factory-done" if j["state"] == "merged" else "factory-blocked"
+            done = "factory-done" if j["state"] in ("merged", "superseded") else "factory-blocked"
             self.gh(["issue", "edit", n, "-R", self.repo, "--remove-label", self.label, "--add-label", done])
             j["relabelled"] = True
             self.save(j, "relabelled")
