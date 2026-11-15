@@ -1,4 +1,4 @@
-import os, re, sys, tempfile, unittest
+import os, sys, tempfile, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import store as S
 
