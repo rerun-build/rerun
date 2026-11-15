@@ -1,8 +1,3 @@
-"""timeline.py: the status of every job and a Mermaid gantt, read from the ledger without taking its lock.
-
-  python3 timeline.py status [--db PATH]
-  python3 timeline.py gantt [--db PATH] [--since ISO]
-"""
 import argparse, calendar, json, sqlite3, sys, time
 
 END = ("merged", "rejected", "blocked", "failed", "returned")
@@ -17,7 +12,6 @@ def parse(s):
 
 
 def read_rows(path):
-    """Jobs and transitions, read-only: never constructs store.Store, so the writer's lock is not touched."""
     db = sqlite3.connect("file:%s?mode=ro" % path, uri=True)
     db.row_factory = sqlite3.Row
     try:
@@ -64,7 +58,7 @@ def status_lines(rows, now):
                 done.append("#%s %s: %s" % (j["job"], j["state"], (last or {}).get("reason") or "no reason"))
             continue
         start = end
-        for t in reversed(mine):  # the run of transitions that kept this state
+        for t in reversed(mine):
             if t["to_state"] != j["state"]:
                 break
             start = parse(t["at"])
@@ -90,7 +84,7 @@ def gantt(rows, now, since):
            "    axisFormat %H:%M"]
     trs = _by_job(rows)
     for job in sorted(trs, key=_key):
-        runs = []  # [state, start]
+        runs = []
         for t in trs[job]:
             if not runs or runs[-1][0] != t["to_state"]:
                 runs.append([t["to_state"], parse(t["at"])])

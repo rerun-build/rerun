@@ -6,13 +6,10 @@ import { nextRunsByAgent, sameNextRuns, type NextRuns } from '@/lib/board/next-r
 import { useBoardStore } from '@/stores/board.store'
 
 const RECOMPUTE_MS = 30_000
-// A run that just came due is replaced by the one after it, once the clock is safely past it.
 const PAST_DUE_MS = 1000
 
 const NONE: NextRuns = {}
 
-// Each agent's soonest scheduled run. The same object comes back for as long as nothing moved, so
-// the board does not rebuild its tiles on every tick.
 export function useNextRuns(): NextRuns {
     const schedules = useBoardStore(state => state.agentSchedules)
     const [runs, setRuns] = useState<NextRuns>(NONE)

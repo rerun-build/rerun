@@ -7,8 +7,6 @@ import { useAuth } from '@/auth/AuthProvider'
 import { cachedAiConnections } from '@/data/local-cache'
 import { translatorFor } from '@/i18n/translator'
 
-// Opens on the last list read for the workspace rather than on a skeleton, and settles once its own
-// read lands.
 export function useAiConnections() {
     const { session, me } = useAuth()
     const accessToken = session?.access_token

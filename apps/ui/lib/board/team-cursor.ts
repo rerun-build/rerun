@@ -21,8 +21,6 @@ export function colorFromId(id: string): string {
     return `hsl(${Math.abs(hash) % 360} 70% 55%)`
 }
 
-// A broadcast carries whatever its sender wrote: only the id and the position are read from it,
-// the name and photo shown are those the workspace's member list holds for that id.
 export function cursorFromPayload(payload: unknown, memberOf: MemberLookup): TeamCursor | null {
     if (!payload || typeof payload !== 'object') return null
     const { userId, x, y } = payload as Record<string, unknown>
@@ -39,8 +37,6 @@ export function leavingUserId(payload: unknown): string | null {
     return typeof userId === 'string' && userId ? userId : null
 }
 
-// Returns whether the map changed. A newcomer beyond the cap is dropped, a cursor already there
-// keeps moving.
 export function placeCursor(cursors: Map<string, TimedCursor>, cursor: TeamCursor, now: number): boolean {
     if (!cursors.has(cursor.userId) && cursors.size >= MAX_CURSORS) return false
     cursors.set(cursor.userId, { ...cursor, ts: now })

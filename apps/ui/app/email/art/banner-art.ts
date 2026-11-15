@@ -1,7 +1,3 @@
-// The banner that opens every email: an icon in a tile over the app's own diagonal stripes. It
-// carries no text, so the URL only ever varies by variant: a closed set of images the Gmail proxy
-// caches once for every recipient, and nothing an email says depends on it loading.
-
 export const ART_WIDTH = 1040
 export const ART_HEIGHT = 176
 
@@ -20,17 +16,10 @@ const TILE = {
     radius: TILE_RADIUS,
 }
 
-// `Stripes` from @rerun/ui/primitives, transposed to SVG: repeating-linear-gradient(65deg, ink
-// 0 10px, transparent 10px 21px) with the default `bottom` fade. A CSS gradient angle is measured
-// on the gradient axis, so bands drawn 65deg from the top read as a -25deg pattern rotation here,
-// and every length doubles because the canvas renders at 2x.
 const STRIPE_ANGLE = -25
 const STRIPE_PERIOD = 42
 const STRIPE_WIDTH = 20
 
-// The stripes carry the variant's colour, and the primitive's white at 0.025 is the weight they all
-// have to land on. A tint that dark cannot reach that weight at the same opacity, so the opacity is
-// solved per tint to keep the same average channel lift over BASE.
 const STRIPE_WHITE_OPACITY = 0.025
 
 function stripeOpacity(ink: string): number {
@@ -40,8 +29,6 @@ function stripeOpacity(ink: string): number {
     return Number(((STRIPE_WHITE_OPACITY * (255 - base)) / (mean - base)).toFixed(3))
 }
 
-// Nucleo outline-18 glyphs, inlined the way the expert card inlines its own paths: the art route
-// draws raw SVG, so it cannot mount a React icon component.
 const ICONS = {
     check: '<polyline points="2.75 9.5 6.5 13.25 15.25 4.5" fill="none" stroke="COLOR" stroke-linecap="round" stroke-linejoin="round" stroke-width="SW"/>',
     bell:
@@ -94,8 +81,6 @@ const ICONS = {
         '<path d="m12.5,11.75c-.551,0-1,.449-1,1s.449,1,1,1,1-.449,1-1-.449-1-1-1Z" fill="COLOR"/>',
 } as const
 
-// `solid` tints the tile, `ink` draws the glyph and the stripes: on near-black the brand violet is
-// too dark to read, so it hands over to its light tint the way the app does.
 const VARIANTS = {
     done: { icon: 'check', solid: '#34d399', ink: '#34d399' },
     info: { icon: 'bell', solid: '#a1a1a1', ink: '#d4d4d4' },

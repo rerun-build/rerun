@@ -10,7 +10,6 @@ import type { WikilinkAttrs } from './wikilink'
 
 const MAX_RESULTS = 8
 
-// `/Link to page` and `/File` both hand over to the `[[` picker, which then lists one or the other.
 export type PickerMode = 'pages' | 'files'
 
 export type EditorTranslator = ReturnType<typeof useTranslations<'brain.editor'>>

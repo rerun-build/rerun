@@ -15,9 +15,6 @@ import { NamePlaceholder } from './NamePlaceholder'
 import type { PlaceholderEffect } from './placeholder-effects'
 import type { BoxDraft } from './useBoxDraft'
 
-// The New agent composer cut down to what a Box asks for: its name, written large because it is the
-// whole form, and the button that says the name back. The name pills sit under it. `controls` is
-// the room left of the button for an option the Box does not have yet.
 export function BoxComposer({ draft, suggestions, placeholderEffect, controls, creating, error, autoFocus, drawnCaret, className }: { draft: BoxDraft; suggestions: string[]; placeholderEffect: PlaceholderEffect; controls?: ReactNode; creating: boolean; error?: string; autoFocus: boolean; drawnCaret: boolean; className?: string }) {
     const t = useTranslations('dialogs.newBox')
     return (
@@ -42,13 +39,8 @@ export function BoxComposer({ draft, suggestions, placeholderEffect, controls, c
     )
 }
 
-// Between two names the placeholder can be empty, and the line would lose its height.
 const ZERO_WIDTH_SPACE = '\u200b'
 
-// A capture shows no caret, so the input is laid transparent over a mirror that can draw one. Live,
-// the mirror carries the placeholder, which a native one could not animate; once there is a name it
-// only holds the line's height and the input shows its own text, so a long name scrolls with its
-// caret.
 function NameInput({ name, onName, suggestions, placeholderEffect, autoFocus, drawnCaret }: { name: string; onName: (name: string) => void; suggestions: string[]; placeholderEffect: PlaceholderEffect; autoFocus: boolean; drawnCaret: boolean }) {
     const t = useTranslations('dialogs.newBox')
     const type = 'px-1 text-2xl font-medium tracking-tight whitespace-pre'

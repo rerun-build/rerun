@@ -20,7 +20,6 @@ describe('reasoning provider options', () => {
     })
 
     it('leaves the providers that are configured elsewhere alone', () => {
-        // The two CLIs take it through `defaultSettings`, the two OpenRouter ones through the body.
         expect(reasoningProviderOptions('claude')).toBeUndefined()
         expect(reasoningProviderOptions('codex')).toBeUndefined()
         expect(reasoningProviderOptions('rerun')).toBeUndefined()

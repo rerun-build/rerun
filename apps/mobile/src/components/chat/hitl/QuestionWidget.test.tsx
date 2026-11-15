@@ -7,8 +7,6 @@ jest.mock('@/lib/haptics', () => ({ selectionAsync: jest.fn(), impactAsync: jest
 jest.mock('@/components/ui/BorderBeam', () => ({ BorderBeam: () => null }))
 jest.mock('@/auth/AuthProvider', () => ({ useAuth: () => ({ session: null, me: null }) }))
 
-// The attach menu is a SwiftUI host, which Jest cannot mount: its rows are drawn as plain buttons so
-// the pick, the upload and the path the message names are exercised for real.
 jest.mock('@/components/ui/NativeMenu', () => {
     const React = require('react')
     const { Pressable, View } = require('react-native')

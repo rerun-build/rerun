@@ -1,7 +1,5 @@
 import type { ReactNode, Ref } from 'react'
 
-// The frame of a bar over the floor: it sits on one edge of the stage, in what a side panel leaves visible
-// (`right` is the width the panel covers), and wraps its content onto more rows when that part is narrow.
 export function FactoryBarFrame({ edge, rightInset, frameRef, className, children }: {
     edge: 'top' | 'bottom'
     rightInset: number

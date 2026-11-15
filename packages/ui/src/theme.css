@@ -1,8 +1,3 @@
-/* Thème partagé @rerun/ui : les design tokens shadcn core, source unique pour
-   apps/ui ET cloud/apps/landing. Importé une fois via @rerun/ui/styles.css.
-   Chaque app garde à part ses tokens spécifiques (fonts, sidebar/chart côté ui,
-   tokens côté landing). Ne pas redéfinir ici ce qui diverge entre apps. */
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -29,13 +24,6 @@
   --radius-xl: calc(var(--radius) * 1.4);
 }
 
-/* Le clair a sa propre échelle d'élévation, symétrique de celle du sombre : la page
-   est un blanc cassé et card/popover restent en blanc pur pour se détacher dessus.
-   --accent est volontairement un cran sous --muted, sinon les hover:bg-accent posés
-   sur du bg-background ne se voient pas.
-   `.light` répète `:root` pour que l'îlot marche dans les deux sens : les custom properties
-   s'héritent, donc un sous-arbre clair posé dans une page `.dark` doit les redéclarer, exactement
-   comme `.dark` le fait dans une page claire. Même ajout dans styles.css et iso-grid/styles.css. */
 :root,
 .light {
   --background: oklch(0.98 0 0);
@@ -58,14 +46,6 @@
   --ring: oklch(0.708 0 0);
   --radius: 0.625rem;
 
-  /* Famille « relief » : lumière venue d'en haut, donc liseré interne clair sur le haut et
-     les deux côtés, voile diffus sous l'arête haute, ombre portée dessous. Tout passe par
-     box-shadow, seule propriété du lot qui s'interpole : un background-image est discret et
-     sauterait en une frame au hover. Trois intensités, indexées sur la taille du bouton et
-     sur son remplissage : `cta` (gros bouton plein de la landing), `solid` (bouton plein de
-     l'app, deux fois plus court : liseré 1px et voile resserrés), `subtle` (remplissages
-     translucides ou clairs, qui ne portent qu'un liseré et une ombre au ras).
-     En clair les remplissages pleins sont quasi noirs et acceptent un voile blanc. */
   --relief-cta:
     inset 0 2px 0 0 rgb(255 255 255 / 0.2),
     inset 2px 0 0 0 rgb(255 255 255 / 0.09),
@@ -115,11 +95,6 @@
     0 1px 1px 0 rgb(0 0 0 / 0.06),
     0 3px 8px -4px rgb(0 0 0 / 0.16);
 
-  /* Destructif teinté (remplissage `destructive/10`, donc un rose très clair) : PAS de liseré
-     lumineux ici. Sur un fond déjà presque blanc, la lumière d'en haut n'a nulle part où aller
-     et retombe en bandeau rose pâle sur rose pâle. Le relief vient donc uniquement d'en bas,
-     par une arête et une ombre interne rouges, plus l'ombre portée. Le détourage est laissé à
-     la bordure du variant (`border-destructive/15`), qui tombe pile sur l'arête. */
   --relief-destructive:
     inset 0 -1px 0 0 rgb(150 20 20 / 0.12),
     inset 0 -8px 8px -8px rgb(150 20 20 / 0.1),
@@ -131,9 +106,6 @@
     0 1px 1px 0 rgb(150 20 20 / 0.08),
     0 3px 8px -4px rgb(210 35 35 / 0.2);
 
-  /* Destructif plein : là un remplissage rouge saturé porte une lumière, à condition qu'elle
-     soit ROUGE CLAIR et pas blanche. Un liseré blanc pur sur du rouge fait un reflet plastique
-     et désature l'arête haute. */
   --relief-destructive-solid:
     inset 0 1px 0 0 rgb(255 190 190 / 0.5),
     inset 1px 0 0 0 rgb(255 180 180 / 0.2),
@@ -172,11 +144,6 @@
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
 
-  /* Les remplissages pleins sont blancs en sombre : un voile blanc de plus ne rendrait rien.
-     Le relief vient donc de l'inverse, un voile sombre sur le bas, qui laisse le haut et
-     les côtés en blanc pur. Au hover ce voile s'efface : c'est ce qui fait « s'allumer »
-     le bouton, là où en clair c'est le voile blanc qui se renforce. `subtle` est le seul à
-     garder la polarité du clair, puisqu'il habille un remplissage sombre translucide. */
   --relief-cta:
     inset 0 2px 0 0 rgb(255 255 255 / 0.9),
     inset 2px 0 0 0 rgb(255 255 255 / 0.5),
@@ -232,9 +199,6 @@
     0 1px 2px 0 rgb(0 0 0 / 0.45),
     0 4px 12px -6px rgb(0 0 0 / 0.5);
 
-  /* En sombre le remplissage destructif teinté est un rouge profond, pas un rose délavé : il
-     supporte une lumière, à condition qu'elle soit rouge clair. L'ombre portée vire au rouge
-     pour que le bouton diffuse sa propre couleur au lieu d'un halo gris. */
   --relief-destructive:
     inset 0 1px 0 0 rgb(255 150 150 / 0.32),
     inset 0 8px 10px -8px rgb(255 130 130 / 0.14),
@@ -266,17 +230,10 @@
     0 5px 14px -6px rgb(245 60 60 / 0.3);
 }
 
-/* Hauteur de la barre de consentement quand elle occupe le bas de l'écran, publiée par
-   CookieBanner sur <html>. Les couches ancrées en bas (bottom sheet, toasts) s'en décalent
-   pour ne jamais passer dessous. Déclarée ici pour que `bottom-[var(--consent-inset)]`
-   ait toujours une valeur, même sans bannière montée. */
 :root {
   --consent-inset: 0px;
 }
 
-/* Grille du mobilier flottant du board : hauteur d'une coque, taille d'un contrôle posé dedans,
-   écart entre deux blocs voisins, distance au bord de la carte. Les blocs qui se placent les uns
-   par rapport aux autres (orbe Foreman, bannière de pause) calculent dessus. */
 :root {
   --chrome-size: 2.5rem;
   --chrome-control: 2rem;

@@ -26,17 +26,9 @@ type CreateTemplateDialogProps = {
     description?: string
 }
 
-// Creating and capturing are one dialog but two writes: the draft lands as soon as the title is in,
-// because the slug it produces is what addresses both the row and the archives the capture uploads.
-// Leaving after the title therefore keeps the draft, exactly as it did before the capture existed.
-//
-// The expert panel and the admin console mount the same wizard: what a template is addressed by (an
-// id there, a slug here) only ever reaches this component through `captureActions`.
 export function CreateTemplateDialog({ open, onOpenChange, onCreate, captureActions, onDone, description }: CreateTemplateDialogProps) {
     const t = useTranslations('dialogs.createTemplate')
     const [createdKey, setCreatedKey] = useState<string | null>(null)
-    // Held here rather than in the flow because the progress panel is passed as `aside` and reads
-    // the step too.
     const stepper = useStepper(STEPS.length)
     const { reset } = stepper
 
@@ -82,10 +74,6 @@ function CreateTemplateFlow({ stepper, createdKey, onCreated, onCreate, captureA
     const captureCopy = useCaptureStepCopy()
     const { goTo } = stepper
 
-    // The flow is held here rather than inside the capture panel, because StepTransition keys its
-    // subtree on the step: a hook mounted in there would lose its plans on the way to the review.
-    // Listing the spaces needs no template, so it warms up while the title is being typed; plan and
-    // capture are only reachable once the draft exists.
     const actions = useMemo(() => captureActions(createdKey ?? ''), [captureActions, createdKey])
     const flow = useCaptureFlow(actions)
 

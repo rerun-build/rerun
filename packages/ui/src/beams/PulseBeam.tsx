@@ -19,10 +19,6 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 const TAIL_COLOR = '#4028d9'
 const HEAD_COLOR = '#f5ecff'
 
-// Comète en dégradé continu : chaque couche est le même pulse décalé pour
-// aligner la tête, la longueur croît vers la queue. En interpolant finement
-// couleur/opacité/épaisseur sur beaucoup de pas, la tête vive fond en une
-// traînée sombre sans bandes visibles. t = 0 → queue, t = 1 → tête.
 const TRAIL = Array.from({ length: STEPS }, (_, i) => {
     const t = i / (STEPS - 1)
     return {
@@ -33,15 +29,9 @@ const TRAIL = Array.from({ length: STEPS }, (_, i) => {
     }
 })
 
-// La tête voyage de P_START (avant le nœud, hors-chemin) à P_END (au-delà du
-// centre, hors-chemin). Au repos — avant le delay initial et pendant les
-// pauses — la comète est donc entièrement hors du tracé, donc invisible : plus
-// de stub mauve figé au démarrage. strokeDashoffset = len - p aligne les têtes.
 const P_START = -8
 const P_END = 138
 
-// Un faisceau qui parcourt `d` en boucle. `pathLength={100}` normalise chaque tracé, donc les
-// longueurs et positions de tirets sont des pourcentages quelle que soit la longueur réelle.
 export function PulseBeam({ d, dur, delay, gap }: { d: string; dur: number; delay: number; gap: number }) {
     const transition = { duration: dur, ease: 'linear' as const, repeat: Infinity, repeatDelay: gap, delay }
     return (

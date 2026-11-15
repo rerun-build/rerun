@@ -1,16 +1,8 @@
 #!/usr/bin/env bash
-# Holds a cloud action until the workspace setup has installed the dependencies.
-#
-# A cloud workspace shows up as ready while its setup is still running `pnpm install`, so an action
-# started in the first minute fails on `Command "next" not found`. This waits for the install and
-# the contracts build to finish. If they never ran (setup failed or skipped), it runs them itself
-# after a grace period, so the action still starts.
 set -uo pipefail
 
 cd "$(dirname "$0")/.."
 
-# Anchored on the pnpm process itself, so a shell whose command line merely mentions these steps
-# (an action, an agent's Bash call) never counts as a running setup.
 SETUP_STEPS='^(node \S*pnpm\S* |pnpm )(install|build:contracts|db:link|env:prod|--filter @rerun/contracts build)'
 GRACE_SECONDS=30
 TIMEOUT_SECONDS=900

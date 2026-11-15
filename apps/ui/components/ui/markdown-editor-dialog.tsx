@@ -22,10 +22,6 @@ type MarkdownEditorDialogProps = {
     onSubmit?: (markdown: string) => void
 }
 
-/**
- * Long-form markdown editor. The caller remounts it with a fresh `key` on every open, so the
- * initial value is read once at mount and no reset effect is needed.
- */
 export function MarkdownEditorDialog({
     open,
     onOpenChange,
@@ -42,9 +38,6 @@ export function MarkdownEditorDialog({
 }: MarkdownEditorDialogProps) {
     const t = useTranslations('ui.markdown')
     const [markdown, setMarkdown] = useState(initialValue)
-    // TipTap normalizes whatever text it is given, so the first markdown it emits is the untouched
-    // baseline. Comparing against it lets us hand back the original text when nothing was edited,
-    // rather than a round-tripped version with re-escaped characters and merged soft breaks.
     const baselineRef = useRef<string | null>(null)
 
     const resolve = useCallback(() => (baselineRef.current !== null && markdown === baselineRef.current ? initialValue : markdown), [markdown, initialValue])
@@ -71,7 +64,6 @@ export function MarkdownEditorDialog({
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            {/* Radix focuses the content wrapper on open, which would undo the editor's autofocus. */}
             <DialogContent className="sm:max-w-3xl" onOpenAutoFocus={e => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>

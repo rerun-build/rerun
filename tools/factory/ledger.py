@@ -1,6 +1,3 @@
-"""Factory ledger (rerun#53 chunk 2): the one ledger comment of a job, and the chunk line of a plan.
-The runner reads only the one-line JSON between `<!-- factory-state ` and ` -->`. It is written with < and > as the JSON
-escapes \\u003c and \\u003e (still valid JSON), so no free text in it can end the HTML comment."""
 import fnmatch, json, re, time
 
 MARK = "<!-- factory-ledger -->"
@@ -9,7 +6,6 @@ STAGES = ("PLAN", "CHALLENGE", "BUILD", "TEST", "JOBPR", "REVIEW", "READY", "BLO
 CHUNK_STATES = ("PENDING", "BUILD", "TEST", "MERGED")
 HEAD = "| stage | chunk | coworker | run | fired | ended | status | input tokens |\n|---|---|---|---|---|---|---|---|"
 
-# Chunk line, behind the checkbox gate.parse_issue needs; fields split on "|" and the first ":" exactly as gate.py does.
 CHUNK_RE = re.compile(r"\s*- \[.\] ([a-z0-9]{1,12})\.\s*([^|]*)", re.I)
 FIELDS = ("builder", "test", "done-test", "paths", "max-lines", "depends on")
 SUITES = ("backend", "frontend", "layout", "factory")
@@ -46,7 +42,6 @@ def render(state, now=None):
 
 
 def parse(body):
-    """The state of a ledger comment body. ValueError when it is not one: the runner then goes BLOCKED and rewrites nothing."""
     body = (body or "").replace("\r\n", "\n")
     if not body.startswith(MARK):
         raise ValueError("not a ledger comment")
@@ -64,13 +59,11 @@ def parse(body):
 
 
 def find(comments):
-    """The oldest comment whose body starts with MARK, or None."""
     own = [c for c in comments if (c.get("body") or "").startswith(MARK)]
     return min(own, key=lambda c: (c["created_at"], c["id"])) if own else None
 
 
 def chunk_lines(text):
-    """The chunk lines of the `## Chunks` section of a plan or issue body."""
     out, inside = [], False
     for l in (text or "").replace("\r\n", "\n").split("\n"):
         if l.startswith("## "):
@@ -89,7 +82,6 @@ def fields(line):
 
 
 def chunk(line):
-    """A chunk line as {id, title, builder, suite, test, done_test, paths, max_lines, depends}, or None."""
     m = CHUNK_RE.match(line or "")
     if not m:
         return None
@@ -102,7 +94,6 @@ def chunk(line):
 
 
 def shape(line):
-    """What is wrong with a chunk line ([] when the runner accepts its shape)."""
     if not CHUNK_RE.match(line or ""):
         return ["not a chunk line"]
     f, c = fields(line), chunk(line)
@@ -125,5 +116,5 @@ def shape(line):
     if dt and len(dt.split()) != 1:
         why.append("done-test is not one test id")
     elif dt and test[:1] == ["factory"] and not FULL_ID.fullmatch(dt):
-        why.append("done-test is not module::Class::test")  # the id gate.results() prints for a unittest -v line
+        why.append("done-test is not module::Class::test")
     return why

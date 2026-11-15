@@ -20,8 +20,6 @@ export function ThemeToggle({ className }: { className?: string }) {
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
 
-    // Le thème résolu n'existe pas au SSR : aucun segment n'est actif tant que le client n'a pas
-    // hydraté, sinon le premier rendu en désigne un au hasard.
     useEffect(() => setMounted(true), [])
 
     return (

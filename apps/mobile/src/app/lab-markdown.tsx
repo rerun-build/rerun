@@ -13,9 +13,6 @@ import { StartedByBanner } from '@/components/chat/origins/StartedByBanner'
 import { ThemeScope } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: every markdown construct of the web's chat in a thread, to judge the native rendering.
-//   /lab-markdown?scheme=dark&part=1   part: 1 (text) | 2 (code, tables, media) | stream | steps | running
-
 const text = (id: string, role: 'user' | 'assistant', body: string): UIMessage => ({ id, role, parts: [{ type: 'text', text: body }] })
 
 const PROSE = `## Weekly report

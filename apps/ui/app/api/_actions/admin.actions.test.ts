@@ -7,7 +7,6 @@ vi.mock('@/supabase/server', () => ({ createClient: async () => ({ auth: { getUs
 import { isAdminAction } from './admin.actions'
 
 beforeEach(() => {
-    // A public image is built without the browser list: only the server's own environment names admins.
     vi.stubEnv('NEXT_PUBLIC_ADMIN_EMAILS', '')
     vi.stubEnv('ADMIN_EMAILS', 'owner@example.com')
 })

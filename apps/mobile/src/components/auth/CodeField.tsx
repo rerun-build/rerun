@@ -16,7 +16,6 @@ type CodeFieldProps = {
     invalid?: boolean
 }
 
-// One hidden input behind the boxes, so iOS can fill the code from the message it just received.
 export function CodeField({ length, value, onChangeText, onComplete, disabled, invalid }: CodeFieldProps) {
     const theme = useTheme()
     const input = useRef<TextInputInstance>(null)

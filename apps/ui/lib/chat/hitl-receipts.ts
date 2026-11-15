@@ -8,9 +8,6 @@ type MessageLike = { role: string; parts: readonly { type: string }[] }
 
 const toolNameOf = (part: HitlCallPart) => stripBridgePrefix(part.toolName ?? (part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : ''))
 
-// The question a user reply answers: the last human-in-the-loop call of the assistant turn right
-// before it. The reply text alone says what was decided; this call holds what was asked (slugs,
-// labels, details). The part itself is returned, not a copy, so the memoised message keeps its props.
 export function hitlCallBefore(messages: readonly MessageLike[], index: number): HitlCallPart | undefined {
     const previous = messages[index - 1]
     if (messages[index]?.role !== 'user' || previous?.role !== 'assistant') return undefined

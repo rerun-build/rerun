@@ -15,7 +15,6 @@ export type TakeoverRequestState = {
     reason: string
     site: string | null
     opened: boolean
-    // The browser is being handed back, or already was: nothing is left to press.
     locked: boolean
     finishing: boolean
     onOpen: () => void
@@ -23,9 +22,6 @@ export type TakeoverRequestState = {
     onDone: () => void
 }
 
-// The web's `useTakeoverRequest`: the browser takeover a run waits on, opened full screen, handed
-// back from there or from the thread, or left to the coworker. `onAnswer` gets the message that
-// resumes the run, once: answering twice starts two runs on the same conversation.
 export function useTakeoverRequest(agentId: string, coworkerName: string, pending: PendingHitl | null, onAnswer: (text: string) => void): TakeoverRequestState | undefined {
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
@@ -47,7 +43,6 @@ export function useTakeoverRequest(agentId: string, coworkerName: string, pendin
         onAnswer(text)
     }
 
-    // Opened again, the browser stays on the page the person left it on.
     const open = () => {
         if (locked) return
         awaitHandBack(callId).then(left => answer(serializeTakeoverResult(left)))

@@ -22,10 +22,8 @@ type ControlCenterPanelProps = {
     query: string
     onQueryChange: (query: string) => void
     placeholder: string
-    // Identifies the page and how deep it sits, so a step in or out slides the right way.
     pageKey: string
     depth: number
-    // The page's own trail, empty on the root.
     crumbs: string[]
     onBack: () => void
     sections: ControlSection[]
@@ -41,13 +39,11 @@ function caretAtEnd(input: EventTarget): boolean {
 
 type OrbAnchor = { vertical: 'top' | 'bottom'; horizontal: 'left' | 'right'; orbSize: number; style: CSSProperties }
 
-// Below this the panel stays centred: a phone has no room beside the orb, and the keyboard covers the bottom corners.
 const ANCHOR_QUERY = '(min-width: 640px)'
 
 const CENTERED = 'top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0 sm:max-w-xl'
 const ANCHORED = 'flex translate-x-0 translate-y-0 gap-3 rounded-none bg-transparent p-0 ring-0 sm:max-w-[28rem]'
 
-// The panel hangs off the parked orb, whichever corner it sits in, and grows away from it.
 function measureOrbAnchor(): OrbAnchor | null {
     if (!window.matchMedia(ANCHOR_QUERY).matches) return null
     const orb = document.querySelector('[data-foreman-orb]')?.getBoundingClientRect()
@@ -84,14 +80,11 @@ export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...
         </DialogHeader>
     )
 
-    // ⌘K pressed with the center open closes it and puts the caret in the Foreman's pill: the dialog
-    // would take it back to wherever it was before the center opened.
     const keepPillFocus = (event: Event) => {
         if (document.activeElement?.closest('[data-foreman-orb]')) event.preventDefault()
     }
 
     return (
-        // asSheet={false}: a bottom sheet would sit under the virtual keyboard the field opens.
         <Dialog open={open} onOpenChange={onOpenChange} asSheet={false}>
             {anchor ? (
                 <DialogContent
@@ -104,7 +97,6 @@ export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...
                     <div className="w-full overflow-hidden rounded-xl bg-popover shadow-2xl ring-1 ring-foreground/10">
                         <ControlCenterPanel {...panel} />
                     </div>
-                    {/* The overlay dims the parked orb: this one stands in for it, on the same spot. */}
                     <Orb size={anchor.orbSize} state="listening" facing={anchor.horizontal === 'left' ? 'right' : 'left'} />
                 </DialogContent>
             ) : (
@@ -125,8 +117,6 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
     const [trail, setTrail] = useState({ depth, direction: 1 })
     if (trail.depth !== depth) setTrail({ depth, direction: depth > trail.depth ? 1 : -1 })
 
-    // A new page or a new query starts from its first row. Results that land later (conversations)
-    // leave the selection where the user put it.
     const selectionScope = `${pageKey}|${query}`
     const [selectedScope, setSelectedScope] = useState(selectionScope)
     if (selectedScope !== selectionScope) {
@@ -139,7 +129,6 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
 
     function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
         if (event.key === 'Tab') {
-            // Focus stays in the field: the list is driven from it.
             event.preventDefault()
             if (!event.shiftKey) selectedRow?.onDrill?.()
             return
@@ -170,7 +159,6 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
                     <span className="truncate text-xs font-medium text-muted-foreground">{crumbs.join(' / ')}</span>
                 </div>
             )}
-            {/* No box around the field: the panel itself is the place to write. */}
             <CommandPrimitive.Input value={query} onValueChange={onQueryChange} placeholder={placeholder} className="w-full min-w-0 bg-transparent px-3 pt-2.5 pb-3.5 text-base text-foreground outline-hidden placeholder:text-muted-foreground/70" />
             <CommandList className="-mx-1 max-h-[min(26rem,55dvh)] border-t border-border/50 px-1">
                 <StepTransition stepKey={pageKey} direction={trail.direction}>
@@ -225,12 +213,10 @@ function RowLeading({ leading }: { leading: ControlRow['leading'] }) {
 
 export function ControlRowItem({ row }: { row: ControlRow }) {
     const mod = useModKeyLabel()
-    // The assistant's row quotes what was typed: the quote gives way, not the label.
     const asking = row.leading.kind === 'assistant'
 
     return (
         <CommandItem value={row.id} disabled={!!row.disabledReason} onSelect={row.onSelect} className="gap-2.5 [&>svg:last-child]:hidden">
-            {/* A command row sizes every svg it holds to 16px, which would crush the orb's bloom box. */}
             <span className={cn('flex size-5 shrink-0 items-center justify-center text-muted-foreground', asking && '[&_svg]:size-auto!')}>
                 <RowLeading leading={row.leading} />
             </span>

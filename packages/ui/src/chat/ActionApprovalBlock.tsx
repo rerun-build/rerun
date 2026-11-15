@@ -17,7 +17,6 @@ export type ActionApprovalBlockProps = {
     approvals: ApprovalItem[]
     onSubmit: (decisions: ApprovalDecision[]) => void
     disabled?: boolean
-    // Rendered in the conversation's own scroll rather than pinned above the composer: no dock margin.
     inline?: boolean
     className?: string
 }
@@ -31,9 +30,6 @@ export function ActionApprovalBlock({ approvals, onSubmit, disabled, inline, cla
     const [decisions, setDecisions] = useState<Record<number, DecisionValue>>({})
     const [submitted, setSubmitted] = useState(false)
     const [current, setCurrent] = useState(0)
-    // The state above only drives the disabled styling. Answering the agent twice starts two runs
-    // on the same conversation, so the latch that guards it has to be a ref: two callbacks fired
-    // from the same render both read the same stale `submitted`.
     const submittedRef = useRef(false)
 
     const locked = disabled || submitted

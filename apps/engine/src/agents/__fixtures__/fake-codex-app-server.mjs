@@ -1,5 +1,3 @@
-// Stands in for `codex app-server --listen stdio://`: answers the handshake, then fails every turn
-// the way Codex 0.166 does for a model the ChatGPT account cannot use.
 import { createInterface } from 'node:readline'
 
 const THREAD_ID = 'thread-1'

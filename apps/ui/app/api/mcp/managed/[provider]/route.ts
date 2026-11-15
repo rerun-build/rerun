@@ -2,14 +2,6 @@ import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.se
 import { getManagedProvider } from '@/lib/managed/registry'
 import { getTool, toolDefs } from '@/lib/managed/types'
 
-// A managed provider's MCP server, hosted by the UI — the "interface" an agent's tool points
-// at instead of the third party. A tiny stateless JSON-RPC 2.0 handler for the four
-// methods the engine's MCP http client uses. Rerun runs the provider's
-// API calls server-side.
-//
-// Auth model: the engine authenticates via `x-rerun-key` (its RERUN_API_KEY → workspace). The
-// third-party access token rides in `Authorization: Bearer`, injected by the engine's withAuth
-// from its own token store — Rerun uses it for this one call and never persists it.
 export const dynamic = 'force-dynamic'
 
 const SUPPORTED_PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05', '2024-10-07']

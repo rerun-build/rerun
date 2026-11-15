@@ -13,16 +13,12 @@ const PROPOSED = 'Sent for review. A person accepts or dismisses it from the Bra
 const UPDATED = 'Replaced your change still waiting for review on this page. Mention it in one short sentence at most.'
 const ALREADY = 'This exact change was already proposed once. Nothing sent, and do not raise it again.'
 
-// The card in the chat is matched to its proposal through this result rather than through the tool
-// call id: the MCP bridge the CLI providers go through hands `execute` an id the transcript never carries.
 function proposalResult(status: 'proposed' | 'updated', proposalId: string, slug: string, title: string, message: string): string {
     return JSON.stringify({ status, proposalId, slug, title, message })
 }
 
 const excerpt = (text: string, max = EXCERPT_CHARS) => (text.length > max ? `${text.slice(0, max - 3)}...` : text)
 
-// The foreman writes the brain as itself, on behalf of the person it is talking to: the engine has
-// no notion of users, and the person already said yes in the conversation.
 export const FOREMAN_BRAIN_AUTHOR = `agent:${FOREMAN_AGENT_ID}`
 
 const PROPOSAL_EXCERPT_CHARS = 1500
@@ -78,8 +74,6 @@ function readTools(): ToolSet {
 export function brainTools(ctx: RunContext): ToolSet {
     return {
         ...readTools(),
-        // A person correcting a fact in the chat already decided it: every coworker reads the fix
-        // from its next run instead of the old version waiting behind a review.
         brain_write: writeTool(
             `agent:${ctx.agent.config.name}`,
             `Save at once a fact about the company the user told you, corrected or confirmed in this conversation (sources: "told by the user in chat"); every coworker reads it from its next run. A fact you found yourself goes to brain_propose. First brain_search the old fact and fix every page repeating it. ${WRITE_PAGE_HOW}`,
@@ -133,8 +127,6 @@ function changeResult(status: 'saved' | 'deleted' | 'accepted' | 'dismissed', sl
     return JSON.stringify({ status, slug, title, ...extra })
 }
 
-// A stale hash or a page gone meanwhile is a 409 or a 404 the model can recover from by reading
-// again, so it comes back as an answer rather than as a failed call.
 async function recoverable(fn: () => Promise<string>): Promise<string> {
     try {
         return await fn()
@@ -180,8 +172,6 @@ function writeTool(author: string, description: string, refusal: () => string | 
 
 const NO_PERSON_HERE = 'No person is in this conversation, so nobody told you this fact: use brain_propose so a person reviews it.'
 
-// The foreman keeps the brain with the person rather than proposing to them: it writes, removes,
-// and settles what the agents proposed, each time because the person asked for it in the chat.
 export function foremanBrainTools(): ToolSet {
     return {
         ...readTools(),

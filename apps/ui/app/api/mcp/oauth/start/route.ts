@@ -3,10 +3,6 @@ import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthori
 import { describeSignInError } from '@/lib/net/network-error'
 import { NextResponse } from 'next/server'
 
-// Build the PKCE authorize URL and stash the one-request context (verifier + endpoints +
-// client) in an httpOnly cookie keyed by state, so /callback can finish and later refresh.
-// The endpoints and the client come from a discovery run here, never from the caller: the
-// callback POSTs the code to that token endpoint and the engine later sends the refresh token there.
 export async function POST(req: Request) {
     try {
         const { agentId, serverName, mcpUrl } = (await req.json()) as { agentId: string; serverName: string; mcpUrl: string }

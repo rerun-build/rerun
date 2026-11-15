@@ -21,7 +21,6 @@ vi.mock('@/lib/services/registry', async importOriginal => ({
 }))
 vi.mock('@/lib/services/embed', () => ({ embedText: vi.fn(async () => null), toVectorLiteral: vi.fn() }))
 vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
-// The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
 
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: true, composio: { toolkit: 'gmail', authConfigId: 'ac', allowedTools: [] } }
@@ -177,7 +176,6 @@ describe('resetServiceConnection', () => {
     })
 })
 
-// A member who only uses the Box still sees the coworker's apps, and changes none of them.
 describe('access level', () => {
     const MEMBER = { kind: 'user', userId: 'user-1', workspaceId: 7, role: 'member', boxScope: 'all' } as const
 

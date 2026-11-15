@@ -10,8 +10,6 @@ import { siteOf } from '@rerun/contracts'
 
 export type TakeoverAskInput = { callId: string; request: TakeoverRequest }
 
-// The browser takeover a run waits on: opening it in the desktop dialog, handing it back, or leaving
-// it to the coworker. `onDone` gets the chat message that resumes the run, once.
 export function useTakeoverRequest(agentId: string, ask: TakeoverAskInput | null, onDone: (summary: string) => void, onSkip: () => void): TakeoverRequestState | undefined {
     const openTakeover = useDesktopStore(s => s.openTakeover)
     const handBack = useDesktopStore(s => s.handBack)
@@ -20,7 +18,6 @@ export function useTakeoverRequest(agentId: string, ask: TakeoverAskInput | null
     const handedBack = useDesktopStore(s => (callId ? s.handedBack[callId] : undefined))
     const [openedCallId, setOpenedCallId] = useState<string | null>(null)
     const [finishing, setFinishing] = useState(false)
-    // Answering the agent twice starts two runs on the same conversation.
     const answeredRef = useRef<string | null>(null)
 
     useEffect(() => {

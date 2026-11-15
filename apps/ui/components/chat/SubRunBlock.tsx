@@ -19,7 +19,6 @@ type SubRunBlockProps = {
     errorText?: string
     progress: SubRunProgress
     onStopTask?: (taskId: string) => void
-    // One line among the folded steps, for a sub-run that has settled.
     dense?: boolean
 }
 
@@ -33,7 +32,6 @@ export function SubRunBlock({ toolName, agentId, state, output, errorText, progr
     const live = toolStatusOf(state) === 'running' && progress.tasks.some(isSubRunLive)
     const { label, summary } = subRunHeadline(progress, live, toolName, tSubRuns)
 
-    // One agent being built has a single row that repeats the headline: it stays folded unless it failed.
     const single = toolName === 'build_team' && progress.tasks.length === 1
     const [open, setOpen] = useState(live && !single)
     const wasLive = useRef(live)

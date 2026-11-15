@@ -22,10 +22,6 @@ function CloseButton({ onClose, closeLabel }: { onClose: () => void; closeLabel?
     )
 }
 
-// The frame every HITL widget is drawn in: the web's icon box and title, and a way to close it when the
-// ask can be closed. The beam on its border is the web's, orange for an approval. Without a `label` the
-// widget draws its own heading (a question puts the icon beside its text), the close button sits in
-// the corner.
 export function HitlCard({ symbol, label, beam = 'brand', onClose, closeLabel, children }: { symbol: IconName; label?: string; beam?: BeamTone; onClose?: () => void; closeLabel?: string; children: ReactNode }) {
     const theme = useTheme()
     return (
@@ -51,7 +47,6 @@ export function HitlCard({ symbol, label, beam = 'brand', onClose, closeLabel, c
     )
 }
 
-// A small action under a widget, the web's: the main one filled, the others outlined.
 export function HitlAction({ label, onPress, primary, tone, disabled }: { label: string; onPress: () => void; primary?: boolean; tone?: 'destructive'; disabled?: boolean }) {
     return <Button label={label} onPress={onPress} size="sm" disabled={disabled} variant={primary ? 'default' : tone === 'destructive' ? 'destructive' : 'outline'} />
 }

@@ -22,13 +22,10 @@ import { CopyLinkButton, ShareDialog } from './ShareDialog'
 
 type Answer = 'public' | 'kept'
 
-// A call made before links had an access carries neither its title nor its access: it was public.
 function withDefaults(result: PublishResult): PublishResult {
     return { ...result, title: result.title ?? result.path, access: result.access ?? 'public', requestedAccess: result.requestedAccess ?? null }
 }
 
-// What a coworker published, drawn where it said so. The tool output only tells what the link was
-// at that moment: the card reads it again, so a change made since (here or anywhere else) shows.
 export function PublishedChatCard({ agentId, result: raw }: { agentId?: string; result: PublishResult }) {
     const t = useTranslations('published.chat')
     const errorText = useErrorText()

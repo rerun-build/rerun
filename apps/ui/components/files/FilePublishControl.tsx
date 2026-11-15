@@ -12,8 +12,6 @@ type FilePublishControlProps = {
     publicUrl?: string
     onPublish: () => void
     onUnpublish?: () => void
-    // Set once links carry an access: the globe then speaks of a link rather than a public one,
-    // opens it through the member round trip, and reaches the share dialog.
     onShareSettings?: () => void
     openUrl?: string
 }

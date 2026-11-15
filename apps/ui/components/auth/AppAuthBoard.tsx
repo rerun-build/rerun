@@ -7,16 +7,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AuthStage, StageStatus } from './auth-stage-board'
 import { useAuthStage } from './useAuthStage'
 
-// Le décor d'auth tel que l'app iOS le montre au-dessus de sa feuille de connexion, chargé dans une
-// WebView. La scène est celle du web ; seule la caméra change. Les quatre boxes y sont posées en
-// paysage, aux coins d'un écran large, et un cadre portrait de téléphone qui les ferait tenir toutes
-// les quatre les réduirait à des miettes. La caméra fait donc le plan large le temps que le plateau
-// atterrisse, puis va de box en box, toujours vers celle qui travaille le plus.
-
 const MAX_ZOOM = 1.6
 const WIDE_MAX_ZOOM = 1
-// Assez long pour lire ce qui se passe dans une box avant d'en partir, et pour que la caméra ne
-// coure pas après chaque image du scénario.
 const DWELL_MS = 9000
 const CAMERA_TRANSITION_MS = 1800
 
@@ -92,7 +84,6 @@ export function AppAuthBoard() {
         if (!mounted) return
         const host = (window as Window & { ReactNativeWebView?: ReactNativeHost }).ReactNativeWebView
         if (!host) return
-        // Deux images : la première pose la grille, la seconde est la première peinte.
         const raf = requestAnimationFrame(() => requestAnimationFrame(() => host.postMessage(JSON.stringify({ type: 'ready' }))))
         return () => cancelAnimationFrame(raf)
     }, [mounted])

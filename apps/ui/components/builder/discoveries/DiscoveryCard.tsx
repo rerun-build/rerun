@@ -26,8 +26,6 @@ import {
 } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-// How long a card that deserves it keeps its beam after landing: long enough to be seen arriving,
-// short enough that a board full of cards is not a board full of moving outlines.
 const ARRIVAL_BEAM_MS = 4000
 
 const BEAMED_KINDS = new Set<CompanyFinding['kind']>(['identity', 'brain'])

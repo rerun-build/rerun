@@ -11,7 +11,6 @@ function stubFetch() {
 
 afterEach(() => vi.unstubAllGlobals())
 
-// Every id that lands in a path is encoded: a dotted segment stays a segment, never a step up the tree.
 describe('engine client paths', () => {
     it('encodes ids on connection routes', async () => {
         const fetchMock = stubFetch()

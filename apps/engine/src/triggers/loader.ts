@@ -39,8 +39,6 @@ const PROVIDERS: Provider[] = providerSchema.options
 const METHODS: TriggerMethod[] = triggerMethodSchema.options
 const DEFAULT_METHODS: TriggerMethod[] = ['POST']
 
-// Unlike a schedule slug, a trigger slug reaches the loader from an unauthenticated public URL,
-// so it is matched against this before it ever touches a path.
 const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,63}$/
 
 export function isSafeSlug(slug: string): boolean {
@@ -101,10 +99,6 @@ function serialize(trigger: Trigger): string {
     })
 }
 
-// The archive ships a trigger the way it ships a `.env`: every field the copy needs, none of the
-// ones that belong to this box. The token is emptied rather than kept, and the webhook arrives off
-// so a copy only starts listening once its installation is over. Serializing lives here because
-// the file format is the loader's, and an archive writing its own front matter would drift.
 export function redactTriggerForArchive(trigger: Trigger): string {
     return serialize({ ...trigger, token: '', enabled: false, lastFiredAt: null, fireCount: 0 })
 }
@@ -132,15 +126,10 @@ export async function readTrigger(agentId: string, slug: string): Promise<Trigge
     return toTrigger(slug, await readFile(triggerFile(agentId, slug), 'utf8'))
 }
 
-// Every read-modify-write of one trigger file goes through here. A burst of webhooks marks the same
-// trigger fired many times at once, and without it one cycle could read the file while another was
-// rewriting it, then write back a trigger with no token and no body.
 function withTriggerLock<T>(agentId: string, slug: string, fn: () => Promise<T>): Promise<T> {
     return withKeyedLock(`trigger:${agentId}:${slug}`, fn)
 }
 
-// A file with no front matter was not written by `serialize`: re-serializing it would turn it into
-// an enabled trigger with an empty token and body, which is how a token used to get lost.
 async function readTriggerForUpdate(agentId: string, slug: string): Promise<Trigger> {
     if (!isSafeSlug(slug)) throw new Error('invalid trigger slug')
     const raw = await readFile(triggerFile(agentId, slug), 'utf8')
@@ -162,8 +151,6 @@ export async function writeTrigger(agentId: string, input: TriggerInput, author?
             methods: input.methods ?? existing?.methods ?? DEFAULT_METHODS,
             lastFiredAt: existing?.lastFiredAt ?? null,
             fireCount: existing?.fireCount ?? 0,
-            // `!== undefined` rather than `??`: null is a value here, the one that says "follow the
-            // agent", and coalescing would silently keep the pair the caller just cleared.
             connectionId: input.connectionId !== undefined ? input.connectionId : (existing?.connectionId ?? null),
             provider: input.provider !== undefined ? input.provider : (existing?.provider ?? null),
             model: input.model !== undefined ? input.model : (existing?.model ?? null),
@@ -214,9 +201,6 @@ export async function clearTriggerModel(agentId: string, slug: string): Promise<
     })
 }
 
-// The counterpart of `setScheduleEnabled`, and for the same reason: the file is written at its own
-// slug, never at the one `writeTrigger` would re-derive from the name. A trigger switched on without
-// a token (one that arrived from an archive) gets one here, so an enabled trigger always has a URL.
 export async function setTriggerEnabled(agentId: string, slug: string, enabled: boolean): Promise<void> {
     if (!triggerExists(agentId, slug)) return
     await withTriggerLock(agentId, slug, async () => {

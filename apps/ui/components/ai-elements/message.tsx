@@ -129,7 +129,6 @@ export const MessageBranchContent = ({ children, ...props }: MessageBranchConten
     const { currentBranch, setBranches, branches } = useMessageBranch()
     const childrenArray = useMemo(() => (Array.isArray(children) ? children : [children]), [children])
 
-    // Use useEffect to update branches when they change
     useEffect(() => {
         if (branches.length !== childrenArray.length) {
             setBranches(childrenArray)
@@ -148,7 +147,6 @@ export type MessageBranchSelectorProps = ComponentProps<typeof ButtonGroup>
 export const MessageBranchSelector = ({ className, ...props }: MessageBranchSelectorProps) => {
     const { totalBranches } = useMessageBranch()
 
-    // Don't render if there's only one branch
     if (totalBranches <= 1) {
         return null
     }
@@ -200,8 +198,6 @@ export type MessageResponseProps = ComponentProps<typeof Streamdown>
 const streamdownPlugins = { cjk, code, math, mermaid, renderers: [{ language: DRAFT_LANGUAGE, component: DraftBlock }] }
 const linkSafetyOff = { enabled: false }
 
-// Streamdown only installs the animation plugin while `isAnimating` is on, so the word spans
-// exist for the answer being written and nowhere else: a read-only transcript stays plain DOM.
 export const MessageResponse = memo(
     ({ className, isAnimating, animated, ...props }: MessageResponseProps) => (
         <Streamdown
@@ -213,7 +209,6 @@ export const MessageResponse = memo(
             {...props}
         />
     ),
-    // remarkPlugins counts: the skills a message mentions can arrive after it has rendered.
     (prevProps, nextProps) => prevProps.children === nextProps.children && nextProps.isAnimating === prevProps.isAnimating && prevProps.animated === nextProps.animated && prevProps.remarkPlugins === nextProps.remarkPlugins
 )
 

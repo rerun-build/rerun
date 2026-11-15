@@ -5,9 +5,6 @@ type StopInput = { hook_event_name?: string; last_assistant_message?: string }
 type StopAnswer = { continue: true } | { decision: 'block'; reason: string }
 export type GoalStopHook = ((...args: unknown[]) => Promise<StopAnswer>) & { state: () => 'running' | 'met' | 'not_met' }
 
-// Sends the run back to work until its last line matches the goal, at most `turnLimit - 1` times.
-// It counts its own turns and ignores `stop_hook_active`, which the card hook uses. It reads only
-// the final answer: no process, no file, no socket.
 export function goalStopHook(goal: RunGoal, record: (v: GoalVerdict) => Promise<void>): GoalStopHook {
     let counter = 0
     let last: GoalVerdict | undefined

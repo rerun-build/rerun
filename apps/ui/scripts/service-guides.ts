@@ -5,16 +5,6 @@ import { serviceManifestSchema, type InputDef } from '../lib/services/manifest'
 import { createServiceRoleClient } from '../supabase/serviceRole'
 import { selectAll } from '../supabase/supabase-helpers'
 
-// Rewrites the credential help of the service catalogue: every pasted input gets a one-line
-// `help` and, when the value has to be created, a step-by-step `guide` (see the add-service skill).
-//
-//   ../engine/node_modules/.bin/tsx --env-file=.env scripts/service-guides.ts dump <out.json>
-//   ../engine/node_modules/.bin/tsx --env-file=.env scripts/service-guides.ts apply <guides.json> [--write]
-//
-// Add `--env-file=.env.profile.staging` after `.env` to target the staging project. `apply` only
-// prints the diff unless `--write` is passed. The raw manifest is patched in place, so a legacy
-// flat manifest (top-level `inputs`) keeps its shape.
-
 export type CatalogField = {
     slug: string
     name: string
@@ -42,7 +32,6 @@ export type FieldGuide = {
     notes: string
 }
 
-// A method whose inputs are replaced wholesale, e.g. one base64 field split into email + token.
 export type MethodRewrite = {
     slug: string
     methodId: string

@@ -24,7 +24,6 @@ describe('GET /api/paid-data', () => {
         expect((await GET(priceRequest('stolen'))).status).toBe(401)
     })
 
-    // The engine reads an answer without a positive multiplier as "paid data is on".
     it.each([
         [undefined, 1],
         ['1.5', 1.5],

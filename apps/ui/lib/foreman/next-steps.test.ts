@@ -27,8 +27,6 @@ describe('foremanNextSteps', () => {
         expect(steps).toEqual([{ kind: 'start_lead', label: 'Start installing closer', startedLabel: "closer's install has started", agentId: 'closer' }])
     })
 
-    // A template that installs several agents: the first one starts, the others wait on their own
-    // install button.
     it('starts the first agent of a template that brought several', () => {
         const messages = [assistant(build([agent('closer'), waiting('writer'), waiting('insights', { active: false })]))]
         expect(labels(messages)).toEqual(['Start installing closer'])

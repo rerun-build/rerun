@@ -7,14 +7,8 @@ import { BUDDY_FACE_CENTER, BuddyFace } from '@/components/buddy/BuddyFace'
 import { BuddyMotionScope } from '@/components/buddy/motion'
 import { ORB_CENTER as CENTER, ORB_RADIUS as RADIUS, advance, restingPose, startClock, type Matrix } from '@/components/orb/orb-motion'
 
-// Ported from packages/ui/src/foreman (Orb, ForemanBall, foreman-face, the `glass` material): the
-// Foreman is an indigo glass ball with two round eyes on a dark plate. Like on the web, its eyes
-// drift, the ball turns as if looking around, a band of light crosses the glass, and it bounces and
-// spins while it thinks.
-
 export type OrbState = 'idle' | 'thinking'
 
-// G takes a `matrix` and hands it to the native group as is; its typings only list the shorthands.
 const AnimatedG = Animated.createAnimatedComponent(G as ComponentType<GProps & { matrix?: Matrix }>)
 
 const FLOOR = CENTER.y + RADIUS
@@ -52,12 +46,10 @@ const MOTION: Record<OrbState, { amp: number; period: number }> = {
 }
 
 type ForemanOrbProps = {
-    // Diameter of the ball in points; its shadow spills a little under it.
     size: number
     state?: OrbState
     facing?: 'left' | 'right'
     animated?: boolean
-    // Holds the ball still in its resting pose, for one that is out of sight.
     paused?: boolean
     style?: StyleProp<ViewStyle>
 }
@@ -99,7 +91,6 @@ export function ForemanOrb({ size, state = 'idle', facing = 'left', animated = t
     }, false)
     useEffect(() => {
         life.setActive(living)
-        // A ball stopped halfway through a spin would be left without a face.
         if (!living) pose.set(restingPose(facing))
     }, [living, facing, life, pose])
 

@@ -1,7 +1,3 @@
-// A stand-in for the Supabase client's Realtime side: every channel opened, what it listens to, and
-// the status callback it handed to `subscribe`, so a test can play a join, a drop or a change.
-// Use it from a module mock: `jest.mock('@/auth/supabase', () => ({ supabase: require('@/test/realtime').fakeSupabase }))`.
-
 type ChannelStatus = 'SUBSCRIBED' | 'CLOSED' | 'CHANNEL_ERROR' | 'TIMED_OUT'
 type Binding = { event: string; table: string; filter?: string; callback: () => void }
 
@@ -35,7 +31,6 @@ export const fakeSupabase = {
         channels.push(channel)
         return channel
     },
-    // As the SDK does it: leaving a channel closes it, and its callback hears that CLOSED too.
     async removeChannel(channel: FakeChannel) {
         if (channel.removed) return 'ok'
         channel.removed = true
@@ -50,7 +45,6 @@ export const realtime = {
     },
     all: () => [...channels],
     live: () => channels.filter(channel => !channel.removed),
-    // Every channel still open reports the same status, as when the socket joins again or drops.
     report: (status: ChannelStatus) => realtime.live().forEach(channel => channel.status?.(status)),
     change: (table: string) =>
         realtime

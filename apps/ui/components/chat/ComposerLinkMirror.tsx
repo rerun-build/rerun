@@ -11,14 +11,11 @@ import { useTranslations } from 'next-intl'
 import { type ReactNode, type Ref, useRef, useState } from 'react'
 
 type TokenProps = {
-    /** The run of the textarea the token covers: laid out transparent, it reserves the token's room. */
     text: string
     className: string
     children: ReactNode
 }
 
-// The visible token sits over the room the transparent text reserves, at the textarea's own size so no gap opens
-// around it. Its tighter tracking pays back what the heavier weight widens, so it neither spills over nor falls short.
 function Token({ text, className, children }: TokenProps) {
     return (
         <>
@@ -49,7 +46,6 @@ type LinkChipProps = {
     text: string
     url: string
     onUnlink: () => void
-    /** Where the textarea's caret goes back once the menu closes: right after the chip. */
     onDone: () => void
 }
 
@@ -122,7 +118,6 @@ export function ComposerLinkMirror({ segments, className, ref, onPlaceCaret, onU
             {segments.map((segment, index) => {
                 const end = ends[index]
                 const start = end - segment.text.length
-                // Keyed by position: a chip whose menu is open must not hand that state to the link that slides into its place.
                 const key = `${start}:${segment.kind}`
                 if (segment.kind === 'text') {
                     return (

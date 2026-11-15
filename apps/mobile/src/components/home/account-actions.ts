@@ -8,7 +8,6 @@ import { translatorFor } from '@/i18n/translator'
 import { switchServer } from '@/config/custom-server'
 import { webHost } from '@/config/environment'
 
-// The web opens the same Crisp chat; the app has no widget of its own, so it opens the chat page.
 const CRISP_WEBSITE_ID = 'fa9be3a1-b3f1-4813-840f-d6e235a05179'
 
 export function initialsOf(user: Me['user'] | undefined): string | null {
@@ -38,8 +37,6 @@ export async function askToLeaveServer(signOut: () => Promise<void>) {
     await switchServer(null)
 }
 
-// Same rule as the web: a workspace only this account holds and that still bills stops the deletion,
-// and is named so it can be cancelled first.
 export async function askToDeleteAccount(accessToken: string, signOut: () => Promise<void>) {
     const t = translatorFor('mobileHome')
     try {
@@ -53,8 +50,6 @@ export async function askToDeleteAccount(accessToken: string, signOut: () => Pro
         await deleteAccount({ accessToken })
         await signOut()
     } catch (error) {
-        // The hub wants a sign-in from the last minutes behind an irreversible step: the person signs
-        // in again and asks once more.
         if (error instanceof ApiError && error.status === 403) {
             Alert.alert(t('account.reauthTitle'), t('account.reauthMessage'), [{ text: t('account.signOut'), onPress: () => void signOut() }, { text: t('account.cancel'), style: 'cancel' }])
             return

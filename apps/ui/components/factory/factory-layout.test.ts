@@ -4,7 +4,6 @@ import { routeTileLinks } from '@rerun/ui/iso-grid'
 import { applyMoves, canMove, dropReason, readMoves } from './factory-layout'
 import { COPY_CELLS, CODE, factoryScene } from './factory-scene'
 
-// Six builds run at 6 s into the loop, so `code`'s copies are on the floor.
 const scene = factoryScene(6_000, 0)
 const tiles = scene.tiles
 const containers = scene.containers
@@ -81,7 +80,6 @@ describe('factory layout', () => {
         expect(readMoves('not json', tiles)).toEqual({})
         expect(readMoves('[1]', tiles)).toEqual({})
         expect(readMoves(JSON.stringify({ rejects: { col: 12, row: 33 }, BRUCE: { col: 1.5, row: 2 }, ghost: { col: 1, row: 1 } }), tiles)).toEqual({ rejects: { col: 12, row: 33 } })
-        // Two objects on one cell: the arrangement does not hold, the scene goes back to its defaults.
         expect(readMoves(JSON.stringify({ rejects: { col: 12, row: 33 }, LARRY: at(tiles, 'LINUS') }), tiles)).toEqual({})
     })
 
@@ -99,7 +97,6 @@ describe('factory layout', () => {
         const far = JSON.stringify({ Delegator: { col: 1_000_000_000, row: 0 } })
         expect(readMoves(far, tiles, containers)).toEqual({})
         expect(canMove(tiles, {}, 'rejects', { col: 12, row: 33 }, containers)).toBe(false)
-        // Without the boxes the value is kept, and routing it still returns every line.
         const placed = applyMoves(tiles, readMoves(far, tiles))
         const routes = routeTileLinks(placed, scene.links)
         for (const l of scene.links) expect(routes.get(`${l.source}->${l.target}`)?.length ?? 0).toBeGreaterThanOrEqual(2)

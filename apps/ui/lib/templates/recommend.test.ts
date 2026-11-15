@@ -102,8 +102,6 @@ describe('recommendTemplates', () => {
         expect(result.picks).toHaveLength(2)
         expect(result.picks[0].line).toBe('Drafts the weekly report and files it in Notion')
         expect(result.picks[0].url).toBe(`${APP_URL}/?template=alpha`)
-        // The stamp of the stored capture, so a regenerated board reaches a reader through the
-        // Gmail image proxy, which keys on the URL alone.
         expect(result.picks[0].imageUrl).toBe(`${APP_URL}/og/templates/alpha/email-card?v=2.card.webp`)
     })
 })

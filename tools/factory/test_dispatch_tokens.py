@@ -6,8 +6,6 @@ TOKENS = "SELECT tokens_in, tokens_out FROM fires WHERE run_id=?"
 
 
 class Counting:
-    """The world's account, counting the get_run reads of each run."""
-
     def __init__(self, world):
         self.world, self.reads, self.account_orig = world, {}, world.account
         world.account = self.call
@@ -33,14 +31,14 @@ class RunTokens(T.Base):
 
     def test_the_counts_come_from_the_read_that_ends_the_run_not_from_an_extra_one(self):
         count = Counting(self.w)
-        self.tick(3)  # sent, then two beats while it runs
+        self.tick(3)
         rid = [r for r, a in self.w.order if a == "b1"][-1]
         before = count.reads.get(rid, 0)
         self.finish_with("b1", T.PR_LINE, 50, 7)
         self.tick()
         self.assertEqual(count.reads[rid], before + 1)
         self.tick(3)
-        self.assertEqual(count.reads[rid], before + 1)  # the next beats read other runs, never this one again
+        self.assertEqual(count.reads[rid], before + 1)
         self.assertEqual(self.w.rows(TOKENS, rid), [(50, 7)])
 
     def test_an_errored_run_keeps_its_counts_too(self):

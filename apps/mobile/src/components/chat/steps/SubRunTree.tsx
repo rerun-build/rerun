@@ -20,7 +20,6 @@ const INDENT = 24
 const TASK_ROW_HEIGHT = 32
 const STEP_ROW_HEIGHT = 24
 
-// The tools a task's live line names with a verb ("Searching ..."), each one a key of `subRun.verbs`.
 const STEP_VERBS = ['web_search', 'web_fetch', 'browser_navigate', 'shell_exec', 'fs_read', 'fs_write', 'fs_edit'] as const
 
 type StepVerbTool = (typeof STEP_VERBS)[number]
@@ -51,7 +50,6 @@ function useToneColor() {
 
 const settledSeconds = (task: SubRunTask) => (task.startedAt === undefined || task.finishedAt === undefined ? undefined : Math.max(0, (task.finishedAt - task.startedAt) / 1000))
 
-/** A delegation's tasks hanging from one trunk: the last calls of each while it works, its result once it settles. */
 export function SubRunTree({ tasks, onStopTask }: { tasks: SubRunTask[]; onStopTask?: (taskId: string) => void }) {
     return (
         <View style={{ gap: spacing.xs }}>
@@ -202,7 +200,6 @@ function LiveSteps({ task, tone }: { task: SubRunTask; tone: Tone }) {
     const t = useTranslations('mobileSteps.subRun')
     const theme = useTheme()
     const calls: SubRunCall[] = task.calls?.length ? task.calls : task.activity ? [{ tool: task.activity, summary: '', elapsedMs: task.idleMs ?? 0 }] : []
-    // The engine only keeps the last calls of a task, its count still has them all.
     const total = task.calls?.length ? Math.max(task.toolCalls ?? 0, calls.length) : calls.length
     const visible = calls.slice(-VISIBLE_LIVE_CALLS)
     const hidden = total - visible.length

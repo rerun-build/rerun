@@ -1,15 +1,7 @@
-/* CSS partagé du package @rerun/ui.
-   Importer une fois par app : @import "@rerun/ui/styles.css"; */
-
 @import "./theme.css";
 @import "./iso-grid/styles.css";
 @import "./foreman/styles.css";
 
-/* Logos de marque et reflets de la boîte <Icon>. Les couleurs source sont le rendu par défaut.
-   Seuls les assets classés trop sombres utilisent --dark-brand-icon-filter sur une surface sombre,
-   et les assets classés trop clairs --light-brand-icon-filter sur une surface claire.
-   `--icon-glint` est un triplet rgb, pas une couleur. En clair le glint et la grille sont noirs sur
-   fond quasi blanc : à intensité égale ils portent davantage, d'où des opacités plus basses. */
 :root,
 .light {
     --icon-glint: 0 0 0;
@@ -39,15 +31,11 @@
     --stripes-gutter-ink: rgb(255 255 255 / 0.075);
 }
 
-/* Balayage shimmer sur du texte (composant TextShimmer) */
 @keyframes text-shimmer {
     0% { background-position: 100% center; }
     100% { background-position: 0% center; }
 }
 
-/* Bordure conic-gradient masquée (composant BorderBeam).
-   L'overlay remplit le parent (qui doit être position:relative) et n'affiche que
-   l'anneau de largeur --beam-w grâce au masque content-box / mask-composite. */
 @property --border-beam-angle {
     syntax: "<angle>";
     inherits: false;
@@ -60,14 +48,7 @@
 
 .border-beam {
     position: absolute;
-    /* `inset: 0` cale l'overlay sur la boîte de padding du parent : sur un parent bordé, l'anneau
-       tombe DANS la bordure (double trait) et le `border-radius: inherit`, calculé pour la boîte
-       externe, ne suit plus la courbure. --beam-outset (= l'épaisseur de bordure du parent) le
-       ramène sur la boîte externe. */
     inset: calc(-1 * var(--beam-outset, 0px));
-    /* Un parent en `space-y-*` pose une marge sur tous ses enfants sauf le dernier, y compris sur
-       cet overlay : la marge rogne alors la boîte résolue par `inset` et l'anneau s'arrête avant le
-       bas du bloc, ce qui se lit comme un padding bottom manquant. */
     margin: 0 !important;
     padding: var(--beam-w, 1px);
     pointer-events: none;
@@ -78,7 +59,6 @@
     mask-composite: exclude;
 }
 
-/* Forme du dégradé : anneau plein alterné vs deux arcs qui balaient. */
 .border-beam--ring {
     background: conic-gradient(
         from var(--border-beam-angle),
@@ -99,8 +79,6 @@
     );
 }
 
-/* Couleurs : --beam-1 = teinte claire (celle qui "glow"), --beam-2 = base.
-   Couplées forme×ton pour reproduire à l'identique les variantes d'origine. */
 .border-beam--ring.border-beam--brand { --beam-1: #b7a8ff; --beam-2: var(--color-brand, #4d34f7); }
 .border-beam--ring.border-beam--white { --beam-1: rgba(255, 255, 255, 0.55); --beam-2: #fff; }
 .border-beam--ring.border-beam--neutral { --beam-1: rgba(0, 0, 0, 0.06); --beam-2: rgba(0, 0, 0, 0.18); }
@@ -123,8 +101,6 @@ html:not(.dark) .border-beam--arcs.border-beam--white { --beam-1: rgba(0, 0, 0, 
 .border-beam--arcs.border-beam--cyan { --beam-1: #22d3ee; --beam-2: color-mix(in oklab, #22d3ee 20%, transparent); }
 .border-beam--arcs.border-beam--yellow { --beam-1: #facc15; --beam-2: color-mix(in oklab, #facc15 20%, transparent); }
 
-/* Badge (composant Badge) : couleur du texte (--badge-fg) + fond soft (--badge-soft)
-   par ton, alignés sur les couleurs du BorderBeam. */
 .badge-beam { color: var(--badge-fg, currentColor); }
 .badge-beam--brand { --badge-fg: var(--color-brand, #4d34f7); --badge-soft: color-mix(in oklab, var(--color-brand, #4d34f7) 10%, transparent); }
 .dark .badge-beam--brand { --badge-fg: #b7a8ff; }
@@ -140,7 +116,6 @@ html:not(.dark) .badge-beam--white { --badge-fg: #111; --badge-soft: rgba(0, 0, 
 .badge-beam--yellow { --badge-fg: #facc15; --badge-soft: color-mix(in oklab, #facc15 12%, transparent); }
 html:not(.dark) .badge-beam--yellow { --badge-fg: #a16207; --badge-soft: color-mix(in oklab, #eab308 14%, transparent); }
 
-/* Animation (rotation de l'angle du dégradé) et glow optionnel. */
 .border-beam--spin {
     animation: border-beam-spin var(--beam-dur, 6s) linear infinite;
 }
@@ -149,9 +124,6 @@ html:not(.dark) .badge-beam--yellow { --badge-fg: #a16207; --badge-soft: color-m
     filter: drop-shadow(0 0 2px var(--beam-1));
 }
 
-/* Carte holographique Expert (composant @rerun/ui/experts HoloExpertCard).
-   Les couches (matrix/foil/glare/cross-field/scrim/halo) réagissent au pointeur
-   via les variables --mx/--my/--holo-* posées inline par le composant. */
 .holo-card {
   --mx: 50%;
   --my: 50%;
@@ -382,9 +354,6 @@ html:not(.dark) .badge-beam--yellow { --badge-fg: #a16207; --badge-soft: color-m
   opacity: var(--holo-opacity);
 }
 
-/* Hachures du segment en cours (composant StepperBar). Les bandes sont teintées avec --background
-   plutôt qu'un blanc en dur : sur la barre claire du thème sombre elles creusent, sur la barre
-   sombre du thème clair elles éclaircissent, sans deuxième règle. */
 .stepper-stripes {
     --stepper-stripe: color-mix(in oklab, var(--background) 35%, transparent);
     background-image: linear-gradient(

@@ -16,16 +16,12 @@ export function routeOf(state: ForemanStateResponse): OnboardingRoute {
     return ONBOARDING_PHASES.includes(state.phase) ? { kind: 'onboarding', state } : { kind: 'app' }
 }
 
-// Where the signed-in workspace stands, read off the hub's phase as the web reads it: still walking its
-// onboarding, waiting for a machine, or past it. Read again when the account changes and when the app
-// comes back to the foreground, where a plan started on the web shows up.
 export function useOnboardingRoute(): { route: OnboardingRoute; reload: () => void } {
     const { session, me, refreshMe } = useAuth()
     const [read, setRead] = useState<{ workspaceId: number; route: OnboardingRoute } | null>(null)
     const [version, setVersion] = useState(0)
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
-    // A workspace that just started its plan leaves the trial step: its phase is read again.
     const subscribed = me?.workspace.subscribed
 
     const reload = useCallback(() => setVersion(current => current + 1), [])

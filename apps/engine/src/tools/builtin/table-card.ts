@@ -22,13 +22,10 @@ import { groupTableRows, readTableRows, tableColumns, type RowFilter, type RowGr
 import { checkViewColumns } from '../../db/tableViews.js'
 
 const DEFAULT_LIMIT: Record<CardLayout, number> = { table: CARD_DEFAULT_ROWS, list: CARD_DEFAULT_ROWS, gallery: 6, board: 3 }
-// A board keeps the columns the agent ordered through `tones` even when they are not the largest,
-// so it reads more groups than it shows before picking.
 const GROUPS_READ = 200
 
 const scopeInput = z.enum(['agent', 'shared']).describe("'agent' for your own private database, 'shared' for the database every coworker of this space shares")
 
-// How a saved view draws the rows, and which rows. A card only ever shows a saved view.
 export const tableDisplayInput = {
     layout: z
         .enum(CARD_LAYOUTS)
@@ -127,8 +124,6 @@ export async function buildTableCard(client: Client, input: TableCardSpec, { hid
         scope,
         table,
         columns,
-        // readTableRows keeps `rowid AS "__rowid"` inside each row while leaving it out of `columns`:
-        // the data browser needs it to delete rows, a card must not carry it.
         rows: rows.map(row => Object.fromEntries(columns.map(column => [column, cell(row[column], media.has(column), images.has(column) ? workspace : undefined)]))),
         total,
         columnsTruncated: wanted.length > columns.length,
@@ -145,8 +140,6 @@ function cell(value: unknown, media: boolean, workspace: string | undefined): un
     if (typeof value !== 'string') return value
     if (!media) return value.length <= CARD_MAX_CELL_CHARS ? value : `${value.slice(0, CARD_MAX_CELL_CHARS)}…`
     if (value.length > CARD_MAX_MEDIA_CHARS) return null
-    // The chat loads a workspace image through the app's file proxy, which addresses files relative
-    // to the workspace. An absolute engine path there is a 404.
     if (workspace && isAbsolute(value) && value.startsWith(workspace + sep)) return relative(workspace, value)
     return value
 }
@@ -161,7 +154,6 @@ function orderGroups(groups: RowGroup[], tones: Record<string, string> | undefin
     return [...groups].sort((a, b) => rank(a) - rank(b) || b.total - a.total)
 }
 
-// The same text the chat compares each row's value with to place it under its column.
 function groupLabel(value: RowFilter['equals']): string {
     return value === null ? '' : String(value)
 }

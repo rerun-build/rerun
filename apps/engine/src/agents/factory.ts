@@ -19,7 +19,6 @@ export async function createAgent(input: CreateAgentInput): Promise<LoadedAgent>
     const id = newId()
     const config = agentConfigSchema.parse({ ...input.config, kind: 'user' })
     const env = input.keys ?? {}
-    // Refused keys must fail before the folder exists, or the agent is left on disk with no index row.
     serializeEnv(env)
     await mkdir(workspaceDir(id), { recursive: true })
     await mkdir(skillsDir(id), { recursive: true })

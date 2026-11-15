@@ -11,8 +11,6 @@ import { beginSubRun, endSubRun, followSubRun, renderSubRunOutcome, snapshotSubR
 
 type CallProgress = SubRunProgress & { agentName: string; sessionId?: string }
 
-// Every coworker on the machine but the caller and the delegates, narrowed to the ones the person
-// behind the run reaches when the hub says who that is.
 export function callTargetsOf(index: AgentRow[], callerId: string, callableAgentIds?: string[]): AgentRow[] {
     const callable = callableAgentIds ? new Set(callableAgentIds) : null
     return index.filter(a => a.id !== callerId && !a.name.endsWith(' delegate') && (!callable || callable.has(a.id)))
@@ -29,8 +27,6 @@ export function resolveTargetAgent(ref: string, targets: AgentRow[]): { agent: A
     return { error: `Coworker "${ref}" was not found. Available coworkers: ${allowed}` }
 }
 
-// Calls made in one step run side by side, so one caller could start a whole team at once on a
-// small machine. Four at a time, like delegate_tasks; the rest wait their turn.
 export const MAX_PARALLEL_CALLS = 4
 
 function callGate(limit: number) {
@@ -41,7 +37,6 @@ function callGate(limit: number) {
             if (active >= limit) await new Promise<void>(resolve => waiting.push(resolve))
             else active++
         },
-        // A waiter takes over the slot of the call that leaves, so `active` only drops when nobody waits.
         leave: () => {
             const next = waiting.shift()
             if (next) next()
@@ -71,8 +66,6 @@ export function callAgentTools(ctx: RunContext): ToolSet {
             execute: async ({ agent, message, context, wait, branch }, { toolCallId, abortSignal }) => {
                 const resolved = resolveTargetAgent(agent, targets)
 
-                // The CLI bridges hand over an id that is not the model's, so the UI pairs progress
-                // blocks to tool rows by order: every call emits one, before its first await.
                 const progress: CallProgress = { agentName: 'agent' in resolved ? resolved.agent.name : agent, status: 'queued', steps: 0, toolCalls: 0, failures: 0, calls: [] }
                 beginSubRun(progress)
                 const emit = () => ctx.writer?.write({ type: 'data-call-agent', id: toolCallId, data: snapshotSubRun(progress) })
@@ -97,9 +90,6 @@ export function callAgentTools(ctx: RunContext): ToolSet {
                     'agent',
                 )
 
-                // Mirrored on the hub before the run starts: a HITL call stops the run without any
-                // completion event, so its `awaiting_*` status has nowhere to land if the session
-                // row only appears later, when someone opens the conversation.
                 await sendNotification({
                     event: 'agent.session.created',
                     kind: 'info',
@@ -118,16 +108,11 @@ export function callAgentTools(ctx: RunContext): ToolSet {
                 progress.sessionId = session.id
                 emit()
 
-                // Taken after the progress block went out, so a call that waits its turn still shows as queued.
                 await gate.enter()
                 let run: AgentRun
                 try {
-                    // `fullStream` tees, so following the run for the caller's progress block and
-                    // publishing it to the run hub can happen side by side.
                     run = await startHeadlessRun(callee, session.id, prompt, undefined, { source: 'chat', callableAgentIds: ctx.callableAgentIds, calledBy: ctx.agent.id, lineage: { initiatorAgentId: ctx.agent.id, initiatorRunId: ctx.runId, initiatorSessionId: ctx.sessionId, branch } })
                 } catch (err) {
-                    // A run that never started emits no completion event of its own, so the session
-                    // just mirrored on the hub would stay `working` forever.
                     gate.leave()
                     const reason = err instanceof Error ? err.message : String(err)
                     endSubRun(progress, reason)
@@ -147,7 +132,6 @@ export function callAgentTools(ctx: RunContext): ToolSet {
 
                 if (!wait) {
                     gate.leave()
-                    // The run drains itself, so a dispatched call needs nothing here to keep going.
                     progress.status = 'dispatched'
                     emit()
                     return `Message dispatched to ${target.config.name}. It is handling it in its own session; you will not receive the answer here.`

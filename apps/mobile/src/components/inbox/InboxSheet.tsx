@@ -18,7 +18,6 @@ import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// The web's inbox: what waits on the person, then the finished runs they have not looked at.
 export function InboxSheet() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
@@ -27,10 +26,8 @@ export function InboxSheet() {
     const t = useTranslations('mobileHome.inbox')
     const items = inbox.state === 'ready' ? inbox.items : []
     const running = inbox.state === 'ready' ? inbox.running : 0
-    // Everything is cleared on the hub, not only the rows shown: never off the copy kept from the last visit.
     const fresh = inbox.state === 'ready' && inbox.fresh
 
-    // Opening a finished run is reading it, as on the web; a request stays until it is answered.
     const open = (item: InboxItem) => {
         if (item.status === 'done') inbox.markRead([item])
         router.back()
@@ -51,7 +48,6 @@ export function InboxSheet() {
             { text: t('markAllRead'), onPress: inbox.markAllRead },
         ])
 
-    // A form sheet lays out its scroll view itself: the header lives inside it, or the list covers it.
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl }}>
             <View collapsable={false} style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, marginBottom: spacing.md }}>

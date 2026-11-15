@@ -18,9 +18,6 @@ import { GLASS_BUTTON_SIZE } from '@/components/ui/GlassButton'
 import { ThemeScope, useColorSchemeName, useTheme } from '@/theme/theme'
 import { spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: the Home on mock coworkers, to judge the pinned grid, the Foreman's row and the bottom bar.
-//   /lab-home?pins=3&foreman=pinned&scheme=dark   pins: 0 to 9, foreman=pinned puts the Foreman first in the grid
-
 const noop = () => {}
 
 const mock = (id: string, name: string, status: HomeCoworker['status'], description: string, pending = 0, paused = false): HomeCoworker => ({ id, name, handle: null, description, status, paused, spaceId: 'box-1', latest: null, pending })

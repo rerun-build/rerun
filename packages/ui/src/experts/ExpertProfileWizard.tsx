@@ -25,7 +25,6 @@ const TYPE_ICONS: Record<(typeof EXPERT_TYPES)[number], LucideIcon> = {
     expert: Star,
 }
 
-// "Expert" is an admin-only badge; profiles pick between Freelancer and Studio here.
 const SELECTABLE_TYPES = ['freelancer', 'studio'] as const satisfies readonly (typeof EXPERT_TYPES)[number][]
 
 const STEPS = ['identity', 'about', 'pricing', 'expertise', 'links'] as const
@@ -110,8 +109,6 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
     const values = useWatch({ control: form.control }) as EditExpertValues
     const preview = toExpertPreview(expert, values)
 
-    // Continue is disabled on the identity step until a name and an email are entered; every other
-    // field is optional, so the remaining steps advance freely.
     const canNext = step !== 'identity' || ((values.name ?? '').trim().length > 0 && (values.email ?? '').trim().length > 0)
 
     const submit = form.handleSubmit(async submitted => {
@@ -120,8 +117,6 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
         if (!result.ok) setError(result.error)
     })
 
-    // Single submit path: Enter or the primary button either advances (validating the current step's
-    // fields first) or, on the last step, submits.
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (isLast) {
@@ -132,8 +127,6 @@ export function ExpertProfileWizard({ expert, bannerOptions, uploadAvatar, uploa
     }
 
     return (
-        // Below sm the preview is gone and the dialog is a bottom sheet: no height of its own,
-        // or the sheet keeps its full height under an open keyboard and buries the footer.
         <div className="flex min-h-0 flex-col sm:grid sm:h-[min(36rem,88dvh)] sm:grid-cols-2">
             <Form {...form}>
                 <form onSubmit={handleSubmit} className="flex min-h-0 flex-col p-4 sm:p-6">

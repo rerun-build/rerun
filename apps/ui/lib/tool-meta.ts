@@ -164,7 +164,6 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
 
     task_complete: SendIcon,
 
-    // The foreman's belt.
     list_spaces: BoxIcon,
     list_agents: UsersIcon,
     get_agent: BotIcon,
@@ -239,7 +238,6 @@ export function toolIconOf(toolName: string, input?: unknown): LucideIcon {
     return TOOL_ICONS[toolName] ?? (toolName.startsWith('mcp_') ? PuzzleIcon : WrenchIcon)
 }
 
-// A paid_data call is named after the capability it bought: "Reading TikTok", not "Paid data".
 export function getToolMeta(toolName: string, input: unknown, t: ToolCopy): ToolMeta {
     return { label: toolLabelOf(toolName, input, t), icon: toolIconOf(toolName, input) }
 }

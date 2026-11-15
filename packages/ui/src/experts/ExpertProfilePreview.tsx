@@ -13,9 +13,6 @@ import { useKitTranslations } from '../locale'
 
 const HIRE_CLASSNAME = 'w-full rounded-lg dark:bg-white dark:text-black dark:hover:bg-white/90 dark:hover:text-black'
 
-// `action` is the footer call to action. The landing passes its real hire button on a published
-// profile; in an edit wizard nothing is passed and the inert default is only there to show what the
-// card will look like.
 export function ExpertProfilePreview({ expert, action }: { expert: Expert; action?: ReactNode }) {
     const t = useKitTranslations()
     const subtitle = expert.location ?? ''

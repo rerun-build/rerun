@@ -10,7 +10,6 @@ type StepDotsProps = {
     current: number
     answered: boolean[]
     onSelect: (index: number) => void
-    /** The last step that can be opened. Every step by default; lower it to forbid skipping ahead. */
     reachable?: number
     disabled?: boolean
     className?: string

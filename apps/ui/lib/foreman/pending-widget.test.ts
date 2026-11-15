@@ -22,8 +22,6 @@ describe('findPendingWidget', () => {
         expect(findPendingWidget([assistant([{ type: 'tool-ask_choice', toolCallId: 'c1', state: 'output-available', output: { answered: true } }])], 'ready')).toBeNull()
     })
 
-    // Typing over a widget seals it, but the seal and the send land in the same tick: the user
-    // message is what says the question is behind us.
     it('lets go once the user has spoken after it', () => {
         expect(findPendingWidget([assistant(asking), user()], 'ready')).toBeNull()
     })
@@ -32,8 +30,6 @@ describe('findPendingWidget', () => {
         expect(findPendingWidget([assistant([{ type: 'tool-create_agent', toolCallId: 'c1', state: 'input-available', input: {} }])], 'ready')).toBeNull()
     })
 
-    // A call the provider refused has no input to render and nothing to answer, so the composer
-    // has to stay rather than hand over to an empty widget.
     it('ignores a widget that errored out', () => {
         expect(findPendingWidget([assistant([{ type: 'tool-ask_input', toolCallId: 'c1', state: 'output-error', errorText: 'boom' }])], 'ready')).toBeNull()
     })
@@ -77,7 +73,6 @@ describe('findPendingEngineHitl', () => {
         expect(findPendingEngineHitl([assistant(parts)], 'ready')).toEqual({ toolName: 'ask_user', toolCallId: 'h1', input: question })
     })
 
-    // Claude reaches the builtins through the bridged MCP server, which namespaces their names.
     it('reads a bridged call under its plain name', () => {
         const parts = [{ type: 'dynamic-tool', toolName: 'mcp__rerun__request_approval', toolCallId: 'h2', state: 'output-available', input: { approvals: [{ action: 'Delete Scout' }] } }]
         expect(findPendingEngineHitl([assistant(parts)], 'ready')?.toolName).toBe('request_approval')
@@ -105,7 +100,6 @@ describe('resumesAfterAnswer', () => {
         expect(resumesAfterAnswer({ messages: [assistant([{ type: 'step-start' }, ...asking])] })).toBe(false)
     })
 
-    // The browser's copy of a build never gets the empty step the script closes on.
     it('never sends a finished build back', () => {
         const built = assistant([{ type: 'step-start' }, checkout, { type: 'step-start' }, { type: 'tool-build_team', toolCallId: 'b1', state: 'output-available', output: { agents: [{}] } }, { type: 'data-delegate', id: 'b1', data: { tasks: [] } }])
         expect(resumesAfterAnswer({ messages: [built] })).toBe(false)

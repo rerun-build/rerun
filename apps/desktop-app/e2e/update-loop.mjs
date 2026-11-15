@@ -1,16 +1,4 @@
 #!/usr/bin/env node
-// The whole update loop on this Mac, from an installed 0.0.1 to 0.0.2 served by a local feed:
-//
-//   CSC_NAME="Apple Development: …" node apps/desktop-app/e2e/update-loop.mjs
-//
-// Squirrel.Mac only swaps an app for one signed by the same certificate, so both builds are signed
-// with the identity in CSC_NAME (any certificate of the keychain works; a release uses the Developer
-// ID). Both are the development channel built for tests (inspector fuse on), arm64 or x64 only.
-//
-// 1. builds 0.0.1 and 0.0.2 with the feed at http://127.0.0.1:<port>/
-// 2. serves 0.0.2's latest-mac.yml and zip, "installs" 0.0.1 in a temporary Applications folder
-// 3. launches it: it finds 0.0.2, downloads it, the page hears `ready`
-// 4. asks the page to install: the app quits, ShipIt swaps the bundle, the app comes back as 0.0.2
 
 import { execFileSync } from 'node:child_process'
 import { cpSync, createReadStream, existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs'
@@ -67,7 +55,6 @@ build('0.0.2')
 
 const applications = mkdtempSync(join(tmpdir(), 'rerun-update-loop-'))
 const installed = join(applications, 'Rerun Dev.app')
-// electron-builder unpacks x64 in mac/ and every other architecture in mac-<arch>/.
 cpSync(join(feedRoot, 'v1', ARCH === 'x64' ? 'mac' : `mac-${ARCH}`, 'Rerun Dev.app'), installed, { recursive: true, verbatimSymlinks: true })
 const plistVersion = () => execFileSync('/usr/libexec/PlistBuddy', ['-c', 'Print :CFBundleShortVersionString', join(installed, 'Contents/Info.plist')], { encoding: 'utf8' }).trim()
 log(`installed ${plistVersion()} in ${applications}`)
@@ -93,7 +80,6 @@ if (state?.status !== 'ready' || state.version !== '0.0.2') throw new Error('0.0
 
 await page.evaluate(() => window.rerunShell.update.install()).catch(() => {})
 await app.waitForEvent('close', { timeout: 60_000 }).catch(() => {})
-// ShipIt swaps the bundle once the app has quit, then relaunches it.
 const swapDeadline = Date.now() + 90_000
 while (Date.now() < swapDeadline && plistVersion() !== '0.0.2') await new Promise((done) => setTimeout(done, 1000))
 const after = plistVersion()

@@ -21,9 +21,6 @@ type FileEditorDialogProps = {
     onClose: () => void
 }
 
-// Mounted only while editing, so it opens on content that has finished loading and unmounting it is
-// what throws a draft away. Being modal is also what protects the draft: the panel behind cannot be
-// navigated away, which unmounting it would do silently.
 export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, onClose }: FileEditorDialogProps) {
     const { draft, dirty, saving, error, conflict, setDraft, save, overwrite, dismissConflict } = useFileDraft({ initialContent, onSave, onSaved })
     const t = useTranslations('files.editor')
@@ -36,14 +33,11 @@ export function FileEditorDialog({ fileName, initialContent, onSave, onSaved, on
     }, [dirty, saving, onClose])
 
     return (
-        // A dirty draft is not swipeable away on mobile either: the sheet only closes through the
-        // paths that ask first.
         <Dialog open dismissible={!dirty} onOpenChange={open => !open && requestClose()}>
             <DialogContent
                 aria-describedby={undefined}
                 showCloseButton={false}
                 className="flex h-[85dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl"
-                // Radix focuses the content wrapper on open, which would undo the editor's autofocus.
                 onOpenAutoFocus={event => event.preventDefault()}
             >
                 <div className="flex shrink-0 items-center gap-2 border-b border-border py-2 pr-2 pl-4">

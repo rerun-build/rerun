@@ -14,8 +14,6 @@ const ARGUMENTS: OfferArgument[] = [
     { key: 'unplug', icon: PlugIcon },
 ]
 
-// The connections a team holds, stacked like a facepile: three teammates, three accounts of their
-// own, the same three the board shows. Says "one each" faster than the sentence under it.
 const TEAM_CONNECTIONS = ['claude', 'codex', 'openrouter'] as const
 
 export function OfferArguments() {

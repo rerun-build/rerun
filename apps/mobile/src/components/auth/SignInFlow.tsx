@@ -9,7 +9,6 @@ export type SignInStep =
     | { name: 'phone' }
     | { name: 'email' }
     | { name: 'server' }
-    // `resendIn` is what the hub said is left of a code sent earlier.
     | { name: 'code'; method: 'phone'; channel: PhoneChannel; resendIn?: number }
     | { name: 'code'; method: 'email' }
 
@@ -21,19 +20,16 @@ type SignInFlow = {
     email: string
     setEmail: (email: string) => void
     step: SignInStep
-    // Which way the last move went, so a step slides in from the side it comes from.
     direction: 'forward' | 'back'
     goTo: (step: SignInStep) => void
     back: () => void
     canGoBack: boolean
-    // Something is on its way to the hub: the Foreman thinks while it is.
     thinking: boolean
     setThinking: (thinking: boolean) => void
 }
 
 const SignInFlowContext = createContext<SignInFlow | null>(null)
 
-// What the sign-in steps share: the country sheet and the code step read what the first step typed.
 export function SignInFlowProvider({ initialStep = { name: 'start' }, children }: { initialStep?: SignInStep; children: ReactNode }) {
     const [country, setCountry] = useState<CountryCode>(deviceCountry)
     const [phone, setPhone] = useState('')

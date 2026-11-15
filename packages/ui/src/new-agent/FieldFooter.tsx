@@ -29,9 +29,6 @@ export type FieldFooterProps = {
     creating: boolean
 }
 
-// The field's footer: the name, the apps read in the description (or "+ Apps") with their picker,
-// the timing it read (or "Schedule") with its planner, and the create button, which submits the
-// form the field sits in.
 export function FieldFooter({ name, nameProps, catalog, apps, onToggleApp, schedule, canCreate, creating }: FieldFooterProps) {
     const t = useKitTranslations()
     const locale = useUiLocale()
@@ -51,15 +48,10 @@ export function FieldFooter({ name, nameProps, catalog, apps, onToggleApp, sched
                 <PopoverTrigger asChild>
                     <ScheduleButton label={scheduled} />
                 </PopoverTrigger>
-                {/* Focus stays on the button: landing on the first row would ring an option nobody chose. */}
                 <PopoverContent container={portalContainer} align="start" sideOffset={8} onOpenAutoFocus={event => event.preventDefault()} className="w-[356px] max-w-[calc(100vw-2rem)] gap-0 rounded-xl p-1.5">
                     <SchedulePlanner read={schedule.read} app={shown[0]} choice={schedule.choice} onChoice={schedule.onChoice} />
                 </PopoverContent>
             </Popover>
-            {/* The only part of the row that gives way: a long name is cut in the button, where the pill
-                and the title already spell it out, rather than pushing the button to a line of its own.
-                Where the row is too narrow for the sentence at all, on a phone, the button is its arrow
-                and the pill and the timing are the ones that give way. */}
             <Button type="submit" data-aim="create" disabled={!canCreate || creating} className="ml-auto max-w-full min-w-0 shrink @max-[24rem]:w-8 @max-[24rem]:shrink-0 @max-[24rem]:px-0">
                 <span className="truncate @max-[24rem]:sr-only">{name ? t('newAgent.create', { name }) : t('newAgent.createCoworker')}</span>
                 <ArrowRightIcon className="size-3.5" />
@@ -78,12 +70,8 @@ function AddApps(props: ComponentProps<typeof Button>) {
     )
 }
 
-// A footer button that holds something lights up as a whole: the border is the one every button
-// already carries, transparent until now, so nothing moves by a pixel.
 const ACTIVE_CHIP = 'border-border bg-muted/60 hover:bg-muted dark:bg-muted/40 dark:hover:bg-muted/60'
 
-// The apps the agent starts with take the place of "+ Apps", bare logos in one lit button, which
-// still opens the picker.
 function PickedApps({ apps, ...props }: ComponentProps<typeof Button> & { apps: CatalogEntry[] }) {
     const t = useKitTranslations()
     return (
@@ -95,8 +83,6 @@ function PickedApps({ apps, ...props }: ComponentProps<typeof Button> & { apps: 
     )
 }
 
-// Empty, a clock and "Schedule". Once the description says when the job runs, or the planner does,
-// the button says it back, a shade brighter, with the chevron that tells it can be changed.
 function ScheduleButton({ label, className, ...props }: ComponentProps<typeof Button> & { label: string | null }) {
     const t = useKitTranslations()
     return (

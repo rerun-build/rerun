@@ -27,7 +27,6 @@ function ReceiptCard({ title, count, children }: { title: string; count?: string
     )
 }
 
-// The answers sent to a question block, drawn back instead of the text written for the coworker.
 export function QuestionReceipt({ answers }: { answers: QuestionAnswer[] }) {
     const t = useTranslations('mobileHitl.receipts')
     const theme = useTheme()

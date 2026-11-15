@@ -1,7 +1,3 @@
-"""Read an issue as data: dependencies, worker, files, test file; find cycles.
-
-Pure module: no network, no ledger.
-"""
 import re
 
 WORKERS = ("coder", "reviewer", "researcher", "designer")

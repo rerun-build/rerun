@@ -35,8 +35,6 @@ export function CreatorOnboarding({ invite, token }: { invite: CreatorInvite; to
         })
     }, [token, goTo, errorText])
 
-    // The claim runs on arrival at its own step rather than on the button, so a failed pool grab is
-    // retried from where it failed instead of sending people back to the welcome screen.
     useEffect(() => {
         if (stepper.index === 1 && !claiming && !claimError) claim()
     }, [stepper.index, claiming, claimError, claim])

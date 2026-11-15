@@ -7,11 +7,6 @@ import { Pencil } from '../icons'
 import { OptionMark } from './OptionMark'
 import { useKitTranslations } from '../locale'
 
-// La ligne qu'on clique pour répondre, et la ligne « autre chose » qui ouvre un champ à la place.
-// Extraite de QuestionForm parce que la carte d'accueil du Foreman pose les mêmes questions hors
-// d'une conversation : deux copies de ce balisage dériveraient l'une de l'autre, et une réponse au
-// Foreman ne se lirait plus comme une réponse à un agent.
-
 const ROW = 'flex w-full cursor-pointer items-start gap-2.5 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent data-[selected=true]:bg-accent aria-disabled:pointer-events-none aria-disabled:opacity-50'
 
 function activate(event: React.KeyboardEvent, choose: () => void) {
@@ -64,7 +59,6 @@ export function OptionRow({ index, label, description, selected, multi = false, 
 export type CustomOptionRowProps = {
     open: boolean
     onOpen: () => void
-    /** Le champ de saisie, rendu à la place du libellé une fois la ligne ouverte. */
     children: ReactNode
     label?: string
     className?: string

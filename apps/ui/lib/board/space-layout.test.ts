@@ -23,8 +23,6 @@ describe('freeRectOnSide', () => {
     })
 
     it('centers the neighbour on the face rather than aligning it on the source corner', () => {
-        // Source 4×4 : son milieu de face est en 2, le rect créé fait 8 et doit donc démarrer en -2
-        // pour que les deux partagent le même axe (c'est celui où se pose la marque « + »).
         const small = rect(0, 0, 4)
         expect(freeRectOnSide(small, 'bottom-right', [small])).toEqual({ colStart: 5, rowStart: -2, colEnd: 12, rowEnd: 5 })
         expect(freeRectOnSide(small, 'bottom-left', [small])).toEqual({ colStart: -2, rowStart: 5, colEnd: 5, rowEnd: 12 })
@@ -51,7 +49,6 @@ describe('freeRectOnSide', () => {
     })
 
     it('gives up when the neighbour would leave no gap, and keeps the side as soon as one fits', () => {
-        // La Box créée irait de la colonne 9 à 16 : un voisin en 17 la collerait.
         expect(freeRectOnSide(source, 'bottom-right', [source, rect(17, 0)])).toBeNull()
         expect(freeRectOnSide(source, 'bottom-right', [source, rect(18, 0)])).toEqual({ colStart: 9, rowStart: 0, colEnd: 16, rowEnd: 7 })
     })
@@ -66,8 +63,6 @@ describe('freeRectOnSide', () => {
 })
 
 describe('findFreeRect', () => {
-    // Le Foreman crée l'organisation d'un coup : six divisions doivent se lire comme un bloc, pas
-    // comme la diagonale de cinquante rangées que donnait l'empilement.
     const fill = (count: number, start: SpaceRect[] = []) => {
         const spaces = [...start]
         for (let i = 0; i < count; i++) spaces.push(asRect(findFreeRect(spaces)))
@@ -95,7 +90,6 @@ describe('findFreeRect', () => {
     })
 
     it('fills the hole of an existing board before extending it', () => {
-        // Deux Box empilées comme l'ancienne règle les posait : la place à leur droite est libre.
         expect(findFreeRect([rect(0, 0), rect(0, 9)])).toEqual({ colStart: 9, rowStart: 0, colEnd: 16, rowEnd: 7 })
     })
 
@@ -109,7 +103,6 @@ describe('findFreeRect', () => {
 })
 
 describe('findRadialRect', () => {
-    // Le board tel que le service le lit : de la plus ancienne Box à la plus récente.
     const grow = (count: number, start: SpaceRect[] = []) => {
         const spaces = [...start]
         for (let i = 0; i < count; i++) spaces.push(asRect(findRadialRect(spaces)))
@@ -140,8 +133,6 @@ describe('findRadialRect', () => {
                 expect(overlaps(spaces[i], spaces[j])).toBe(false)
             }
         }
-        // Neuf divisions tiennent dans le carré de trois anneaux autour du cœur : rien ne part en
-        // diagonale infinie comme le ferait un empilement.
         for (const space of spaces) {
             expect(Math.max(Math.abs(space.col_start), Math.abs(space.row_start))).toBeLessThanOrEqual(9)
         }
@@ -152,7 +143,6 @@ describe('findRadialRect', () => {
     })
 
     it('falls back to the lattice when no face is free anywhere', () => {
-        // Une Box étalée sur tout le treillis : ses quatre faces sont prises par ses voisines.
         const wide = [rect(0, 0, 40), rect(0, -9), rect(41, 0), rect(0, 41), rect(-9, 0)]
         expect(() => findRadialRect(wide)).not.toThrow()
     })

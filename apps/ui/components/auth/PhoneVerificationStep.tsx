@@ -9,10 +9,6 @@ import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 
-// What a new account answers before it enters the app, wherever it is drawn: the phone wall's dialog
-// and the arrival column mount the same form. `active` is whether it is on screen. The number is
-// taken in as typed, without a code: it reaches nobody until its owner verifies it from the account
-// settings, so a mistyped one neither signs in nor gets a message.
 export function PhoneVerificationStep({ active }: { active: boolean }) {
     const t = useTranslations('auth.phoneStep')
     const errorText = useErrorText()

@@ -13,14 +13,12 @@ const apiError = (init: { statusCode?: number; message?: string; data?: unknown;
         responseBody: init.responseBody,
     })
 
-// What `@ai-sdk/openai` hands over when the Responses stream carries an error event.
 const openAiStreamError = (code: string, message: string) => ({ type: 'error', sequence_number: 2, error: { type: 'invalid_request_error', code, message, param: null } })
 
 const MODEL_NOT_FOUND = 'The model `gpt-6-sol` does not exist or you do not have access to it.'
 
 const SCHEMA_REFUSAL = 'tools.0.custom.input_schema: input_schema does not support oneOf, allOf, or anyOf at the top level'
 
-// What OpenRouter answers when the model provider turns a request down.
 const openRouterRefusal = (raw: unknown) =>
     apiError({ statusCode: 400, message: 'Provider returned error', responseBody: JSON.stringify({ error: { message: 'Provider returned error', code: 400, metadata: { raw, provider_name: 'Anthropic' } } }) })
 
@@ -43,8 +41,6 @@ describe('classifyFinishReason', () => {
         expect(classifyFinishReason('error', 'error_during_execution')).toBe(RUN_ERROR_CODES.turnFailed)
     })
 
-    // A real max_tokens truncation is a successful turn; treating it as a failure would mark every
-    // long answer as an error.
     it('leaves a bare length truncation alone', () => {
         expect(classifyFinishReason('length', 'max_tokens')).toBeNull()
         expect(isFailedFinish('length', 'max_tokens')).toBe(false)
@@ -57,8 +53,6 @@ describe('classifyProviderError', () => {
         expect(classifyProviderError('claude', new Error('Claude AI usage limit reached|1750000000'))).toBe(RUN_ERROR_CODES.usageLimit)
     })
 
-    // Claude Code names the window that ran out instead of saying "usage limit": these are the four
-    // sentences it builds, one per rate limit type.
     it('matches the window claude code names when a plan runs out', () => {
         expect(classifyProviderError('claude', new Error("You've hit your session limit · resets 3pm"))).toBe(RUN_ERROR_CODES.usageLimit)
         expect(classifyProviderError('claude', new Error("You've hit your weekly limit · resets Nov 20, 3pm"))).toBe(RUN_ERROR_CODES.usageLimit)
@@ -66,8 +60,6 @@ describe('classifyProviderError', () => {
         expect(classifyProviderError('claude', new Error("You've hit your Sonnet limit"))).toBe(RUN_ERROR_CODES.usageLimit)
     })
 
-    // Read off the failed runs of real boxes: none of them carried an error code, so the chat showed
-    // the raw text with nothing to click.
     it('matches a model the plan does not include, and a spent plan worded differently', () => {
         expect(classifyProviderError('claude', apiError({ message: 'Fable 5.1 requires usage credits. Switch to another model to continue.' }))).toBe(RUN_ERROR_CODES.modelNotInPlan)
         expect(classifyProviderError('claude', apiError({ message: "You're out of usage credits. Switch to another model to continue." }))).toBe(RUN_ERROR_CODES.usageLimit)
@@ -79,8 +71,6 @@ describe('classifyProviderError', () => {
         expect(classifyProviderError('codex', new Error("You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro) or try again at 4:44 PM."))).toBe(RUN_ERROR_CODES.usageLimit)
     })
 
-    // The body a ChatGPT account without the model answers with, as the hub stored it for 16 failed
-    // runs: a spent quota resets, a missing model does not, so the two are told apart.
     it('reads a model the ChatGPT plan leaves out apart from a spent quota', () => {
         const body = '{"type":"error","status":400,"error":{"type":"invalid_request_error","message":"The \'gpt-6.1-sol\' model is not supported when using Codex with a ChatGPT account.","code":"model_not_found"}}'
         expect(classifyProviderError('codex', new Error(body))).toBe(RUN_ERROR_CODES.modelNotInPlan)

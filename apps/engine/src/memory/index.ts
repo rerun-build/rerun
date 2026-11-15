@@ -21,8 +21,6 @@ export async function buildMemoryIndex(agentId: string): Promise<string> {
         return memoryStatus(computeStrength(stats)) === 'active'
     })
     const dormantCount = files.length - active.length
-    // Oldest first, by creation: a write appends a line instead of reordering the whole index, which
-    // sits in the cached system prompt.
     const lines = active
         .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id))
         .map(f => `- (${f.kind}) ${headline(f.content)}`)

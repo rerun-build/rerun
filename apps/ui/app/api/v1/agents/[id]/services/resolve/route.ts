@@ -5,5 +5,4 @@ import { resolveServicesInputSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// The app-setup block's cards in one call: details and catalog metadata for every suggested slug.
 export const POST = apiRoute({ auth: 'member', body: resolveServicesInputSchema }, async ({ ctx, params, body }) => resolveServices(params.id, body.services, actorFromContext(ctx)))

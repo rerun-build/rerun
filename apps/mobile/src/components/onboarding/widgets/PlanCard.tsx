@@ -49,8 +49,6 @@ function Agent({ agent }: { agent: PlanAgent }) {
     )
 }
 
-// The coworker the assistant proposes, under the Box its work belongs to. Confirmed, the app writes it
-// down and builds it; sent back, the assistant asks what to change.
 export function PlanCard({ input, answered, onAnswer }: { input: unknown; answered: PlanOutput | null; onAnswer: (output: PlanOutput) => void }) {
     const theme = useTheme()
     const { title, boxes } = readPlan(input)

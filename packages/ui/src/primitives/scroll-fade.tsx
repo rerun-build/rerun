@@ -8,7 +8,6 @@ type ScrollFadeProps = {
     className?: string
     fadeSize?: number
     pinBottom?: boolean
-    /** The scrolling element itself, for a caller that has to move it (scroll back to the top…). */
     scrollRef?: RefObject<HTMLDivElement | null>
     children: ReactNode
 }

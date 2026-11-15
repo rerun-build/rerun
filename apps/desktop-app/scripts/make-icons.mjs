@@ -1,14 +1,4 @@
 #!/usr/bin/env node
-// The app icon of each channel, from the iOS app's icon (apps/mobile/assets/images/icon.png):
-// the macOS shape (a rounded square on a 1024 canvas, 100 px of margin, its own shadow), and a band
-// that names the channel on the staging and development apps so they are never mistaken for Rerun.
-// electron-builder turns each 1024 PNG into the .icns, .ico and Linux sizes.
-//
-//   node scripts/make-icons.mjs
-//
-// It also draws the tray icons: the R of the logo (`R_PATH` of packages/ui's Logo) as a macOS template
-// image (black, the system tints it) and in color for Windows and Linux, and the dot laid over the
-// taskbar button on Windows when something waits.
 
 import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

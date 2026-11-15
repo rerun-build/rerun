@@ -6,8 +6,6 @@ import { readRegistry, resolveRegistryEntry } from '@/lib/services/registry'
 import { describeSignInError } from '@/lib/net/network-error'
 import { NextResponse } from 'next/server'
 
-// Begin the managed OAuth flow: build the authorize URL for Rerun's own client and stash the
-// one-request PKCE context in an httpOnly cookie keyed by state, so /callback can finish it.
 export async function POST(req: Request, { params }: { params: Promise<{ provider: string }> }) {
     try {
         const { provider: providerId } = await params
@@ -19,8 +17,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
         const key = body.key ?? body.slug ?? ''
         const { actor } = await assertAgentAccess(agentId, 'manage')
 
-        // The token is stored under this name and the compiled server reads it back from there, so
-        // the registry entry wins over whatever the page sent.
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
         const entry = resolveRegistryEntry(await readRegistry(conn, engineAgentId), key)?.entry
         const serverName = entry?.managed?.serverName || body.serverName

@@ -25,9 +25,6 @@ function fire(slug: string, body: Record<string, unknown>) {
 
 const validPayload = (patch: Record<string, unknown> = {}) => ({ token, method: 'POST', query: '', contentType: 'application/json', body: '{}', bodyBytes: 2, ...patch })
 
-// Only the rejections are covered here: a successful fire starts a real run against a real model,
-// which belongs in the end-to-end pass. These are the gates that stand between a public URL and
-// someone else's agent, so they are the ones worth pinning down.
 describe('POST /agents/:id/triggers/:slug/fire', () => {
     it('answers 404 on a wrong token, without saying the trigger exists', async () => {
         const res = await fire('fire-me', validPayload({ token: 'wrong-token-000000000' }))

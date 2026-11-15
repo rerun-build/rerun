@@ -80,7 +80,6 @@ describe('server error mapping', () => {
         expect(await res.text()).toBe('short and stout')
     })
 
-    // Looks wrong: a malformed JSON body is the caller's fault but reads as a server fault.
     it('answers 500 without leaking the cause on an unexpected error', async () => {
         const res = await post(`/agents/${id}/schedules`, '{not json')
         expect(res.status).toBe(500)

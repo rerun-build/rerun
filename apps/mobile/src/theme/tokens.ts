@@ -49,7 +49,6 @@ export const radius = {
     pill: 999,
 } as const
 
-// The web gives a 32 px button a 10 px corner; the touch sizes keep that ratio.
 export const controlSize = {
     sm: { height: 36, radius: 10 },
     md: { height: 44, radius: 12 },
@@ -88,7 +87,6 @@ export function withAlpha(color: string, alpha: number): string {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
-// What CSS `color-mix(in srgb, a, b share%)` gives, for hex colours: React Native has no color-mix.
 export function mix(a: string, b: string, share: number): string {
     const from = channels(a)
     const to = channels(b)

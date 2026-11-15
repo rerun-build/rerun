@@ -20,13 +20,11 @@ export const LABEL_ENV_NAMES = [
 
 const MAX_LABEL = 200
 
-// Keeps letters, digits, space and - _ . / # : @ ; everything else (control characters included) is dropped.
 function clean(value: string | null | undefined): string {
     if (!value) return ''
     return value.replace(/[^A-Za-z0-9 _./#:@-]/g, '').slice(0, MAX_LABEL)
 }
 
-// Labels a run's processes can read to say who started them. Pure: no secret, address or token is read here.
 export function sessionLabels(input: SessionLabelInput): Record<string, string> {
     const raw: Array<[string, string | null | undefined]> = [
         ['RERUN_COWORKER', input.agentName],

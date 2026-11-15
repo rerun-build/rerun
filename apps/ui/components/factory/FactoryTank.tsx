@@ -1,8 +1,5 @@
 'use client'
 
-// A feature is stored data: a tank standing on its tile. It fills gold as its tasks merge, with a red
-// layer at the bottom for the rejected ones; solid, nothing see-through. The empty part is the work left.
-
 import { type Tile } from '@rerun/ui/iso-grid'
 
 import { centreOf, toWorld } from './factory-rest'
@@ -60,8 +57,6 @@ export function FeatureTank({ cab, tile }: { cab: CabinetView; tile: Tile }) {
 
 const RH = 40 // the reject store's body height, px
 
-// The reject store is stored data too: the same cylinder in solid red. It holds nothing you can see;
-// the count under it says how many.
 export function RejectTank({ tile, count }: { tile: Tile; count: number }) {
     const c = toWorld(centreOf(tile))
     const r = W / 2

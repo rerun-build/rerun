@@ -1,4 +1,3 @@
-"""stub_model.py tests: a real server on a loopback port; stub-hold is capped at a fraction of a second."""
 import json, os, sys, threading, time, unittest, urllib.error, urllib.request
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import stub_model as S

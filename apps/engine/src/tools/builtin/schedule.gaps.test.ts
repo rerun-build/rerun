@@ -185,7 +185,6 @@ describe('schedule_update', () => {
         const { id, run } = freshAgent()
         await writeSchedule(id, { name: 'Digest', body: 'digest', cron: '0 8 * * *' })
         await run('schedule_update', { slug: 'digest', runAt: '2026-10-01T12:00:00.000Z' })
-        // Looks wrong: schedule_create refuses both, but update cannot clear the cron it already has.
         expect(await readSchedule(id, 'digest')).toMatchObject({ cron: '0 8 * * *', runAt: '2026-10-01T12:00:00.000Z' })
     })
 

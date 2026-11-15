@@ -7,16 +7,12 @@ const INDUSTRY_WAIT_MS = 2500
 
 type IntakeOptions = {
     knownFirstName: string | null
-    // The fast guess at an industry from a site, made while the next questions are being answered.
     decideIndustry: (input: string) => Promise<TemplateCategory | null>
     submit: (intake: ForemanIntakeRequest) => Promise<void>
     initial?: Partial<IntakeDraft>
     initialIndex?: number
 }
 
-// The welcome card's state, the web card's order: the kind of company, the site, the role, then the
-// first name only when nobody gave it yet. The teams of a kind typed under "Other" are proposed by the
-// server when the card is saved: the app draws no board while it asks.
 export function useIntake({ knownFirstName, decideIndustry, submit, initial, initialIndex = 0 }: IntakeOptions) {
     const [draft, setDraft] = useState<IntakeDraft>({ ...EMPTY_DRAFT, ...initial })
     const [index, setIndex] = useState(initialIndex)
@@ -30,9 +26,6 @@ export function useIntake({ knownFirstName, decideIndustry, submit, initial, ini
     const step = steps[Math.min(index, steps.length - 1)]
     const last = index >= steps.length - 1
 
-    // Asked as the kind typed under "Other" is left behind, so the role question offers the roles of its
-    // industry rather than swapping its options under the finger. It waits a moment for the guess, then
-    // falls back on the roles every business has. A site is never guessed from: the kind is asked first.
     const guessIndustry = (final: IntakeDraft) => {
         const hint = industryHint(final)
         if (!hint) return
@@ -71,7 +64,6 @@ export function useIntake({ knownFirstName, decideIndustry, submit, initial, ini
         setIndex(current => current + 1)
     }
 
-    // A choice answers its step on the spot, as an option of a question does.
     const choose = (patch: Partial<IntakeDraft>) => {
         const final = { ...draft, ...patch }
         setDraft(final)
@@ -90,7 +82,6 @@ export function useIntake({ knownFirstName, decideIndustry, submit, initial, ini
         setIndex(current => current - 1)
     }
 
-    // The onboarding is the app's first screen: Android's back walks its steps back, as the Back button does.
     useSystemBack(index > 0 && !submitting, back)
 
     return { step, steps, index, draft, industry: draft.industry ?? decided, deciding, submitting, saveFailed, canAdvance: stepAnswered(step, draft), last, set, choose, next, back, skipWebsite }

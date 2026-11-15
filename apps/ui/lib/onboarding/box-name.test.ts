@@ -8,7 +8,6 @@ describe('industryFromAnswers', () => {
         expect(industryFromAnswers({ industry: 'saas' })).toBe('saas')
     })
 
-    // Rows written by earlier versions of the survey still have to promote the right category.
     it('falls back to the work type, then to the sector', () => {
         expect(industryFromAnswers({ work_type: 'consulting' })).toBe('agencies')
         expect(industryFromAnswers({ sector: 'legal' })).toBe('legal')
@@ -34,7 +33,6 @@ describe('firstBoxName', () => {
         expect(firstBoxName('saas', [INDUSTRY_BOX_NAMES.saas[0]])).toBe(INDUSTRY_BOX_NAMES.saas[1])
     })
 
-    // The whole point of the ladder: a Box is never created without a name.
     it('still names a Box when every suggestion is taken', () => {
         expect(firstBoxName('saas', INDUSTRY_BOX_NAMES.saas)).toBeTruthy()
         expect(firstBoxName(null, DEFAULT_BOX_NAMES)).toBeTruthy()

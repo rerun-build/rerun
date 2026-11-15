@@ -4,10 +4,6 @@ export const CARD_TAG_NUDGE = 'Your message ended on a card written as a tag (su
 
 type StopInput = { hook_event_name?: string; stop_hook_active?: boolean; last_assistant_message?: string }
 
-// Claude Code refuses to end its turn when a Stop hook answers `block`, and gives the model the
-// reason as feedback: the model gets to make the call it wrote as text, in the same process, on
-// the same cache. `stop_hook_active` is set on the Stop that follows a block, so the second one
-// always lets the turn end whatever the model did with the nudge.
 export async function cardTagStopHook(...args: unknown[]): Promise<{ continue: true } | { decision: 'block'; reason: string }> {
     const input = (args[0] ?? {}) as StopInput
     if (input.hook_event_name === 'Stop' && !input.stop_hook_active && cutsCardTag(input.last_assistant_message ?? '')) {

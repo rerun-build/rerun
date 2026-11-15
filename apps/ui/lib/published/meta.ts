@@ -4,8 +4,6 @@ function escapeAttribute(value: string): string {
     return value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-// A page the coworker wrote rarely says how it should unfurl. When it names no image of its own, it
-// gets the Rerun card; a page that sets its own og:image keeps every tag it wrote.
 export function injectPreviewMeta(html: string, meta: PreviewMeta): string {
     if (/<meta[^>]+property=["']og:image["']/i.test(html)) return html
     const tags = [

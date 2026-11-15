@@ -7,8 +7,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 type Directory = Map<string, AuthorProfile>
 
 export const UNNAMED = 'Teammate'
-// Someone who joined after the directory was read is missing from it, and so is someone who left:
-// only a fresh read tells them apart, and it is not worth more than one a minute.
 const REFRESH_AFTER_MS = 60_000
 
 const cache = new Map<number, { directory: Directory; readAt: number }>()
@@ -36,11 +34,6 @@ function directoryFor(workspaceId: number, authorIds: string[]): Promise<Directo
     return complete || Date.now() - cached.readAt < REFRESH_AFTER_MS ? Promise.resolve(cached.directory) : readDirectory(workspaceId)
 }
 
-/**
- * Resolves the author of a message to a name and a photo. Nothing is read until `authorIds` holds
- * someone. An id the workspace no longer knows is a former member, and nobody is known (`null`)
- * until the directory has been read.
- */
 export function useMemberProfiles(workspaceId: number | undefined, authorIds: readonly string[]): (authorId: string) => AuthorProfile | null {
     const [directory, setDirectory] = useState<Directory | null>(() => (workspaceId === undefined ? null : (cache.get(workspaceId)?.directory ?? null)))
     const wanted = authorIds.join(',')
@@ -59,11 +52,6 @@ export function useMemberProfiles(workspaceId: number | undefined, authorIds: re
     return useCallback((authorId: string) => (directory ? (directory.get(authorId) ?? FORMER_MEMBER) : null), [directory])
 }
 
-/**
- * Who is in the workspace, read as soon as it is known. Looking up someone the directory does not
- * hold reads it again, at most once a minute, so a teammate who just joined is found. Nobody is
- * known (`null`) before the directory has been read, and a stranger stays unknown.
- */
 export function useMemberDirectory(workspaceId: number | undefined): (userId: string) => AuthorProfile | null {
     const [directory, setDirectory] = useState<Directory | null>(() => (workspaceId === undefined ? null : (cache.get(workspaceId)?.directory ?? null)))
     const currentWorkspaceRef = useRef(workspaceId)

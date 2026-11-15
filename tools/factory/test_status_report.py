@@ -1,4 +1,3 @@
-"""status_report.py tests with a fake ledger and a fake engine: every row, and the key never in the output."""
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import status_report as S
@@ -8,7 +7,7 @@ KEY = "sk-dev-SECRET-KEY-0123456789"
 
 class FakeEngine:
     def __init__(self, runs):
-        self.runs, self._key = runs, KEY  # the key is held, as in engine.Engine
+        self.runs, self._key = runs, KEY
 
     def get_run(self, agent, rid):
         return self.runs.get(rid)
@@ -68,7 +67,7 @@ class TestReport(unittest.TestCase):
             s = store.Store(p)
             fid = s.intent("j", "", "challenge", "a1")
             s.fired(fid, "r9")
-            rows = S.read_fires(p)  # while the writer lock is held
+            rows = S.read_fires(p)
             s.close()
         self.assertEqual((rows[0]["run_id"], rows[0]["status"]), ("r9", "running"))
 

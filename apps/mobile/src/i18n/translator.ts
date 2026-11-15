@@ -13,8 +13,6 @@ export function currentLocale(): Locale {
     return current
 }
 
-// For code that runs outside the React tree (an alert raised from a callback, a push handler): the
-// strings of the language the provider last rendered in. Inside a component, `useTranslations`.
 export function translatorFor<Namespace extends keyof MobileMessages>(namespace: Namespace) {
     return createTranslator({ locale: current, messages: messagesFor(current), namespace })
 }

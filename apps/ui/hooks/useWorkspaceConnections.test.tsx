@@ -5,10 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { BoxConnection } from '@/lib/engine/types'
 
-// The list is refetched at the end of every run so the rings of the model pill follow the plan. A
-// refetch the engine cannot answer, right as it goes away, used to land as an empty list: every
-// picker read "Set up a model" and the composer locked until the providers dialog was opened.
-
 const mocks = vi.hoisted(() => ({ listAiConnectionsAction: vi.fn(), refreshAiConnectionsAction: vi.fn() }))
 
 vi.mock('@/app/api/_actions/workspace-connection.actions', () => ({

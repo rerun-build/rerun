@@ -9,7 +9,6 @@ import type { AppSlug } from '@/lib/apps/types'
 
 const MENU_GLYPHS: Record<AppSlug, ComponentType<{ className?: string }>> = { linkedin: LinkedInIcon, whatsapp: WhatsAppIcon }
 
-// The workspace menu's own place for the paid apps it runs, each shown once it holds an account.
 export function AppsMenuSection({ apps, onOpen }: { apps: AppSlug[]; onOpen: (slug: AppSlug) => void }) {
     const t = useTranslations('apps.menu')
     return (

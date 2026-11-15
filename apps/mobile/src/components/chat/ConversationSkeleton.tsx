@@ -10,10 +10,8 @@ import { radius, spacing } from '@/theme/tokens'
 
 import { BUBBLE_GAP, BUBBLE_PADDING_X, BUBBLE_PADDING_Y, BUBBLE_RADIUS } from './Messages'
 
-// A body line is 24 high: each bar sits in the middle of the line it stands for.
 const LINE = 24
 const BAR = 12
-// One line of body text inside the bubble's vertical padding.
 const USER_BUBBLE_HEIGHT = LINE + (spacing.md - 2) * 2
 
 type Turn = { role: 'user'; width: DimensionValue } | { role: 'assistant'; paragraphs: DimensionValue[][] }
@@ -31,8 +29,6 @@ const TURNS: Turn[] = [
     },
 ]
 
-// The transcript on its way, drawn after MessageView: the user's bubbles on the right, each
-// paragraph of the reply in a grey bubble of its own on the left.
 export function ConversationSkeleton() {
     const theme = useTheme()
     const t = useTranslations('mobileChat.pane')

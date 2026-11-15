@@ -2,9 +2,6 @@ import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-// Links, popups, payments and downloads, end to end on the local hub:
-//   pnpm verify:desktop --scenario apps/desktop-app/e2e/links.mjs
-
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
@@ -32,7 +29,6 @@ export default async function linksScenario({ app, page, step, base }) {
     })
     const opened = () => app.evaluate(() => globalThis.__opened)
 
-    // 1. ⌘F twice: the Control Center, then the shell's find bar.
     await page.locator('body').click({ position: { x: 600, y: 400 } }).catch(() => {})
     await page.keyboard.press('Meta+f')
     await page.waitForTimeout(400)
@@ -44,7 +40,6 @@ export default async function linksScenario({ app, page, step, base }) {
 
     const before = (await windowUrls(app)).length
 
-    // 2. A page of the server opened in a new window hands any other site to the browser and closes.
     await page.evaluate((url) => window.open(url, '_blank'), `${base}/api/version`)
     await waitUntil(() => windowUrls(app), (list) => list.length === before + 1, 'a same-origin page opens in a child window')
     await app.evaluate(async ({ BrowserWindow }) => {
@@ -54,7 +49,6 @@ export default async function linksScenario({ app, page, step, base }) {
     await waitUntil(opened, (list) => list.includes('https://published.example.rerun.site/?ticket=abc'), 'the published page opens in the browser')
     await waitUntil(() => windowUrls(app), (list) => list.length === before, 'the hop window closes')
 
-    // 3. A window opened only to download a file (a data export) closes once the file is saved.
     await app.evaluate(({ BrowserWindow, app: electronApp }, { origin, downloads }) => {
         electronApp.setPath('downloads', downloads)
         BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].webContents.session.webRequest.onHeadersReceived({ urls: [`${origin}/api/version?export=*`] }, (details, callback) =>
@@ -71,7 +65,6 @@ export default async function linksScenario({ app, page, step, base }) {
     await page.waitForSelector('[data-sonner-toast]', { timeout: 10_000 })
     await step('download toast')
 
-    // 4. A service sign-in coming back from the browser reaches the page, which claims it.
     await page.evaluate(() => {
         window.__oauth = []
         window.rerunShell.oauth.onReturn((result) => window.__oauth.push(result))

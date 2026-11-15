@@ -16,10 +16,6 @@ export async function runApifyActor<T>(actor: string, input: Record<string, unkn
     return items as T[]
 }
 
-// Same run, bounded in time and with what it cost. Pay-per-event actors bill their events on top of
-// the platform usage, so the two are added up from the run's own price list. A run still going at
-// the deadline is aborted so it stops billing. No log streaming: when that connection resets, `call`
-// was seen waiting on it for 17 minutes after the run had finished.
 export async function runApifyActorWithCost<T>(actor: string, input: Record<string, unknown>, { limit, waitSecs = 120 }: { limit?: number; waitSecs?: number } = {}): Promise<{ items: T[]; usd: number }> {
     const run = await getClient().actor(actor).call(input, { log: null, waitSecs })
     if (run.status === 'READY' || run.status === 'RUNNING') {

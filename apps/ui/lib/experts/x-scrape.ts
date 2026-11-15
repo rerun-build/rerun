@@ -1,10 +1,5 @@
 import { runApifyActor } from './apify'
 
-// Scrapes an X (Twitter) profile through Apify. An X bio is capped at 160 characters, so the
-// profile alone is not enough material to write an expert page: the latest tweets are fetched too
-// and handed to the LLM alongside it (see enrich.ts). Tweets are best-effort — a protected or
-// empty account still yields a draft. Types stay loose, the raw JSON is what the model reads.
-
 const DEFAULT_PROFILE_ACTOR = 'apidojo/twitter-user-scraper'
 const DEFAULT_TWEETS_ACTOR = 'apidojo/tweet-scraper'
 const MAX_TWEETS = 30
@@ -25,7 +20,6 @@ export type RawXUser = Record<string, unknown> & {
     isVerified?: boolean
     isBlueVerified?: boolean
     protected?: boolean
-    // The bio only ever holds t.co links; entities is where the real destinations live.
     entities?: { url?: { urls?: unknown[] }; description?: { urls?: unknown[] } }
 }
 
@@ -43,8 +37,6 @@ export type RawXProfile = {
     tweets: XTweet[]
 }
 
-// x.com/i/flow/login and friends are app routes, not profiles — importing them would create an
-// expert named after a UI screen.
 const RESERVED_HANDLES = new Set(['i', 'home', 'explore', 'search', 'notifications', 'messages', 'settings', 'intent', 'share', 'compose', 'login', 'signup'])
 
 export function xUsername(url: string): string {
@@ -88,16 +80,12 @@ function toTweet(item: Record<string, unknown>): XTweet {
     }
 }
 
-// X serves avatars as a 48px `_normal` thumbnail; the `_400x400` variant of the same object is
-// always generated and is what we want before the 512px re-encode.
 export function extractXPhotoUrl(profile: RawXProfile): string | null {
     const candidate = profile.profile.profilePicture
     if (typeof candidate !== 'string' || !candidate.startsWith('http')) return null
     return candidate.replace(/_(normal|bigger|mini|200x200)\.(jpg|jpeg|png|webp)$/i, '_400x400.$2')
 }
 
-// A profile_banners URL takes an optional trailing size; pinning the native 1500x500 avoids
-// depending on whichever default X decides to serve for the bare URL.
 export function extractXBannerUrl(profile: RawXProfile): string | null {
     const candidate = profile.profile.coverPicture
     if (typeof candidate !== 'string' || !candidate.startsWith('http')) return null

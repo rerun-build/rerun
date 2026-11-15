@@ -1,7 +1,5 @@
 import { capabilityOfCall, PAID_DATA_TOOL, type PaidDataCapability } from './paid-data.js'
 
-// The tools the chat's steps name, the same on every client (`labels.*` of the `tools` catalog): each
-// one draws its own icon beside it.
 const LABELLED_TOOLS = [
     'shell_exec', 'fs_read', 'fs_write', 'fs_edit', 'fs_list', 'fs_search', 'shared_read', 'shared_write', 'shared_edit', 'shared_list',
     'shared_search', 'browser_navigate', 'computer', 'computer_open_app', 'web_fetch', 'web_search', 'WebSearch', 'leads_people_search',
@@ -24,8 +22,6 @@ const LABELLED_TOOLS = [
     'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'notify_user', 'install_complete',
 ] as const
 
-// The tools that say what they are doing while they run (`activities.*`). A tool missing here falls
-// back on its label on each client.
 const ACTIVE_TOOLS = [
     'shell_exec', 'fs_read', 'fs_write', 'fs_edit', 'fs_list', 'fs_search', 'shared_read', 'shared_write', 'shared_edit', 'shared_list',
     'shared_search', 'browser_navigate', 'computer', 'computer_open_app', 'web_fetch', 'web_search', 'WebSearch', 'leads_people_search',
@@ -39,7 +35,6 @@ const ACTIVE_TOOLS = [
 export type LabelledTool = (typeof LABELLED_TOOLS)[number]
 export type ActiveTool = (typeof ACTIVE_TOOLS)[number]
 
-// The `tools` namespace, in the reader's language.
 export type ToolCopy = (key: `labels.${LabelledTool}` | `activities.${ActiveTool}` | `paidData.${PaidDataCapability}`) => string
 
 const labelledTools = new Set<string>(LABELLED_TOOLS)
@@ -65,7 +60,6 @@ export function formatToolName(name: string): string {
         .replace(/\b\w/g, c => c.toUpperCase())
 }
 
-// A paid_data call is named after the capability it bought: "Reading TikTok", not "Paid data".
 export function toolLabelOf(toolName: string, input: unknown, t: ToolCopy): string {
     const capability = toolName === PAID_DATA_TOOL ? capabilityOfCall(toolName, input) : null
     if (capability) return t(`paidData.${capability}`)
@@ -87,11 +81,9 @@ export function agentIdOf(input: unknown): string | undefined {
     return typeof agentId === 'string' && agentId ? agentId : undefined
 }
 
-// The one line of detail a step shows after its label: what it ran, read or looked up.
 export function toolHeadline(input: unknown, agentName?: string): string | undefined {
     const args = argsOf(input)
     if (!args) return undefined
-    // A paid_data call says what it looked up, not which capability: the label already names it.
     if (typeof args.capability === 'string' && argsOf(args.params)) return toolHeadline(args.params)
     const named = HEADLINE_ARGS.map(name => args[name]).find(isReadable)
     return named ?? (agentName || Object.values(args).find(isReadable))

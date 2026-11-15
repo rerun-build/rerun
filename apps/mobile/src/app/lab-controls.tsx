@@ -16,9 +16,6 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { ThemeScope, useTheme } from '@/theme/theme'
 import { palette, radius, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: the controls that iOS draws with SwiftUI and glass, as each platform draws them.
-//   /lab-controls   /lab-controls?scheme=dark
-
 const noop = () => {}
 const APPEARANCES = [
     { value: 'system', label: 'System' },

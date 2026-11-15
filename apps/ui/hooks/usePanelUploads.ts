@@ -13,10 +13,6 @@ type UsePanelUploadsOptions = {
 
 const RELOAD_DEBOUNCE_MS = 500
 
-/**
- * Wires the upload engine to a file panel: refreshes the tree as files land, and reports the outcome
- * once. Shared by the agent and Box panels, which behave identically apart from what they upload to.
- */
 export function usePanelUploads({ target, currentPath, onDirectoryChanged }: UsePanelUploadsOptions) {
     const t = useTranslations('files.uploadOutcome')
     const pathRef = useRef(currentPath)
@@ -35,8 +31,6 @@ export function usePanelUploads({ target, currentPath, onDirectoryChanged }: Use
         [],
     )
 
-    // A dropped folder finishes one file at a time. Reloading on each would refetch the tree hundreds
-    // of times, so they are coalesced, and only when the finished file landed in the open directory.
     const scheduleReload = useCallback((dir: string) => {
         if (dir !== pathRef.current) return
         if (reloadTimer.current) clearTimeout(reloadTimer.current)

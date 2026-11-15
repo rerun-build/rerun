@@ -11,8 +11,6 @@ import { slideFit } from './slide-fit'
 import { SlideStage } from './SlideStage'
 import { RAW_URL, ViewerPage, ViewerTopBar } from './ViewerChrome'
 
-// Rendered page by page with pdf.js rather than handed to the browser's viewer: Safari on iOS shows
-// only the first page of a PDF in a frame.
 type LoadedPdf = { doc: PDFDocumentProxy; aspect: number; landscape: boolean }
 type PdfLoad = { promise: Promise<LoadedPdf>; destroy: () => Promise<void> }
 
@@ -22,8 +20,6 @@ function openPdf(): PdfLoad {
     let destroyTask: () => Promise<void> = async () => {}
     const promise = (async () => {
         const pdfjs = await import('pdfjs-dist')
-        // The bundler only ships a worker it sees built this way; a bare `workerSrc` URL hands
-        // pdf.js a module chunk it cannot start.
         const worker = new Worker(new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url), { type: 'module' })
         const task = pdfjs.getDocument({ url: RAW_URL, worker: pdfjs.PDFWorker.create({ port: worker }) })
         destroyTask = async () => {

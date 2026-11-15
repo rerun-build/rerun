@@ -6,8 +6,6 @@ type StreamResult = Awaited<ReturnType<Parameters<WrapStream>[0]['doStream']>>
 type StreamPart = StreamResult['stream'] extends ReadableStream<infer Part> ? Part : never
 type FinishPart = Extract<StreamPart, { type: 'finish' }>
 
-// What OpenCode adds to the usage of every answer, on all four wire formats. `list_cost` is in USD
-// and is what the call is worth at list price, whoever pays it: on Go the plan does.
 export type OpencodeUsage = {
     billing_source?: unknown
     list_cost?: unknown
@@ -18,8 +16,6 @@ export type OpencodeCost = { billingSource: string; cost: number }
 
 const SEARCH_DEPTH = 4
 
-// Each format nests its usage somewhere else (`usage`, `message.usage`, `response.usage`,
-// `usageMetadata`), so the raw chunk is searched rather than walked by a path per format.
 export function findOpencodeUsage(value: unknown, depth = 0): OpencodeUsage | undefined {
     if (!value || typeof value !== 'object' || depth > SEARCH_DEPTH) return undefined
     const own = (value as { opencode?: unknown }).opencode
@@ -33,7 +29,6 @@ export function findOpencodeUsage(value: unknown, depth = 0): OpencodeUsage | un
 
 const asNumber = (value: unknown): number | undefined => (typeof value === 'number' && Number.isFinite(value) ? value : undefined)
 
-// The cost Rerun records is the real one: nothing on top of the Go plan, the list price on Console.
 export function opencodeCost(usage: OpencodeUsage): OpencodeCost | undefined {
     if (typeof usage.billing_source !== 'string') return undefined
     if (usage.billing_source === 'go') return { billingSource: 'go', cost: 0 }
@@ -58,11 +53,6 @@ function withOpencodeUsage(part: FinishPart, usage: OpencodeUsage): FinishPart {
     }
 }
 
-/**
- * Reads what OpenCode says a step cost off the raw chunks and grafts it on the finish part, where
- * `costMicrosFrom` in the run loop and the step telemetry read it. Stream only: the one-shot calls
- * (compaction, curator, vision) record no cost of their own.
- */
 export const opencodeUsageMiddleware: LanguageModelMiddleware = {
     specificationVersion: 'v3',
     transformParams: async ({ params }) => ({ ...params, includeRawChunks: true }),
@@ -83,10 +73,6 @@ export const opencodeUsageMiddleware: LanguageModelMiddleware = {
     },
 }
 
-/**
- * The chat format carries the reasoning in `delta.reasoning_content`, a field `@ai-sdk/openai`
- * drops: it is read back off the raw chunk, as on OpenRouter, without OpenRouter's request fields.
- */
 export const opencodeChatReasoningMiddleware: LanguageModelMiddleware = {
     specificationVersion: 'v3',
     transformParams: async ({ params }) => ({ ...params, includeRawChunks: true }),

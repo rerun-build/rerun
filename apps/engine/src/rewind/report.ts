@@ -26,7 +26,6 @@ export type RewindReportInput = {
     runs: RewindRunRow[]
     tools: RewindToolRow[]
     mcpServerNames: string[]
-    // MCP server name → catalog slug of the connector that installed it, when the registry knows.
     connectorSlugs: Map<string, string>
     sessionTitles: Map<string, string>
     sessions: number
@@ -52,8 +51,6 @@ export function runDurationMs(run: Pick<RewindRunRow, 'startedAt' | 'finishedAt'
     return Math.max(0, Date.parse(run.finishedAt) - Date.parse(run.startedAt))
 }
 
-// Native runs name an MCP tool `<server>_<tool>`, CLI providers `mcp__<server>__<tool>`. The longest
-// server wins so `google` never claims a `google-drive_search` call.
 export function connectorOfTool(toolName: string, serverNames: string[]): string | null {
     let match: string | null = null
     for (const server of serverNames) {
@@ -73,8 +70,6 @@ export function longestDoneRun(runs: RewindRunRow[]): RewindRunRow | null {
     return longest
 }
 
-// Automated runs first: what an agent did on its own is the story, a chat reply mostly echoes a
-// question. Longer runs next, as a rough proxy for substantial work.
 export function pickOutputRuns(runs: RewindRunRow[], limit = OUTPUT_RUNS): RewindRunRow[] {
     const automated = (run: RewindRunRow) => (run.triggerSource && run.triggerSource !== 'chat' ? 1 : 0)
     return runs

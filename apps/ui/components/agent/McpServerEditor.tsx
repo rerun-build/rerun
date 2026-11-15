@@ -74,7 +74,6 @@ export function McpServerEditor({
     const vars = useAgentVariables(agentId)
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
-    // `readOnly` is a server an app owns, with no footer at all. A use-only member keeps the footer, disabled, to read why.
     const fieldsLocked = readOnly || !canManage
 
     const handleSave = useCallback(async () => {

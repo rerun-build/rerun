@@ -39,10 +39,6 @@ const messageTurn = sse([
     ...messageEnd('end_turn'),
 ])
 
-// Anthropic binds a signed thinking block to the tool list it was produced with. The step that
-// writes the message of a bare card runs with `toolChoice: 'none'`: if the provider drops `tools`
-// from that request instead of sending `tool_choice: none`, the replayed block is refused with
-// "Invalid signature in thinking block ... The tools list differs".
 describe('the Anthropic request of the step that writes a bare card its message', () => {
     it('keeps the tool list and sends tool_choice none, with the signed thinking replayed', async () => {
         const sent: SentBody[] = []

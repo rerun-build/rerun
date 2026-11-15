@@ -1,6 +1,3 @@
-// The part of the stage the floor is fitted in, and how far its centre moves from the stage's centre.
-// The stage loses `rightInset` to a side panel, `topSpace` and `bottomSpace` to the bars, `overhead` to
-// the spheres and gates that stand above the floor and `side` at each side. Shifts are in screen px.
 export function floorFrame({ stage, rightInset, topSpace, bottomSpace, overhead, side }: {
     stage: { width: number; height: number }
     rightInset: number

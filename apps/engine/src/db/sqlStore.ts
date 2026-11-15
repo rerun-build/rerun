@@ -4,11 +4,6 @@ import { createClient, type Client } from '@libsql/client'
 const pool = new Map<string, Client>()
 const opening = new Map<string, Promise<Client>>()
 
-// WAL is a persistent header flag, so posting it once also lets the sqlite3 and python processes
-// that open the same file through RERUN_AGENT_DB / RERUN_SHARED_DB read while we write.
-// busy_timeout lives on the connection, and libsql 0.18 opens several, so it goes in the client's
-// own `timeout` option, which covers all of them. synchronous is set per connection and only
-// reaches the first one.
 async function open(key: string, file: string, dir: string): Promise<Client> {
     mkdirSync(dir, { recursive: true })
     const client = createClient({ url: `file:${file}`, timeout: 5000 })
@@ -42,8 +37,6 @@ export function closeStore(key: string): void {
     } catch {}
 }
 
-// Copying a database without folding the WAL back in hands out a file missing its most recent
-// writes, which is exactly the part an archive is taken for.
 export async function checkpointStore(client: Client): Promise<void> {
     try {
         await client.execute('PRAGMA wal_checkpoint(TRUNCATE)')
@@ -53,8 +46,6 @@ export async function checkpointStore(client: Client): Promise<void> {
 const BUSY = /SQLITE_BUSY|database is locked/i
 const RETRY_DELAYS = [25, 60, 150]
 
-// WAL lets readers and writers overlap, but writers still serialize against each other, which is
-// what a database several agents write to produces all the time.
 export async function withBusyRetry<T>(fn: () => Promise<T>): Promise<T> {
     for (let attempt = 0; ; attempt++) {
         try {
@@ -192,7 +183,6 @@ export async function readTableRows(
 export type GroupRowsOptions = { groupBy: string; sumColumn?: string; where?: RowFilter[]; q?: string; limit: number; hidden?: string[] }
 export type RowGroup = { value: SqlParam; total: number; sum?: number }
 
-/** Row counts per distinct value of `groupBy` over the whole table, largest group first. */
 export async function groupTableRows(client: Client, table: string, { groupBy, sumColumn, where, q, limit, hidden = [] }: GroupRowsOptions): Promise<RowGroup[]> {
     await requireTable(client, table, hidden)
     const allColumns = await columnsOf(client, table)
@@ -277,13 +267,8 @@ export async function purgeTable(client: Client, table: string, hidden: string[]
 
 export type SqlParam = string | number | boolean | null
 
-// Statement classification runs on SQL with its literals and comments blanked out, so a
-// keyword sitting inside a string can't be mistaken for a write. `WITH` needs the same
-// treatment as a bare verb: `WITH x AS (…) DELETE FROM …` is valid SQLite.
 const WRITE_KEYWORDS = /\b(insert|update|delete|drop|alter|create|replace|attach|detach|vacuum|reindex|pragma|begin|commit|rollback)\b/i
 
-// Strings and comments are blanked in one pass, whichever starts first winning: blanking comments
-// first would let a `--` or `/*` inside a string swallow the rest of the statement from the check.
 const STRINGS_AND_COMMENTS = /'(?:[^']|'')*'|--[^\n]*|\/\*[\s\S]*?\*\//g
 
 function blankSqlStringsAndComments(sql: string): string {
@@ -294,9 +279,6 @@ export function blankSqlLiterals(sql: string): string {
     return blankSqlStringsAndComments(sql).replace(/"(?:[^"]|"")*"/g, '""')
 }
 
-// The libsql build ships SQLite's fileio extension, so a plain SELECT could read or write any
-// file the engine can. A function name may be quoted (`"readfile"(…)`, `[readfile](…)`), so the
-// check runs on SQL where only comments and string literals are blanked, never identifiers.
 const FILE_ACCESS_FUNCTIONS = /\b(readfile|writefile|fsdir|load_extension)\b/i
 const VACUUM_INTO = /\bvacuum\b[\s\S]*\binto\b/i
 
@@ -312,8 +294,6 @@ export function assertReadOnlySql(sql: string): void {
     if (WRITE_KEYWORDS.test(bare)) throw new Error('This statement writes. Use the execute endpoint instead.')
 }
 
-// Without this, any agent could reach a database it was never granted by attaching the file
-// by path from a database it does own.
 export function assertNoAttach(sql: string): void {
     assertNoSqlFileAccess(sql)
     if (/\battach\b/i.test(blankSqlLiterals(sql))) throw new Error('ATTACH is not allowed. Each database is reached through its own tools.')

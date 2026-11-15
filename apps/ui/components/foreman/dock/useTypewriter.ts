@@ -4,11 +4,6 @@ import { useEffect, useState } from 'react'
 
 type Typing = { index: number; length: number; erasing: boolean }
 
-/**
- * Types each phrase, holds it, erases it, moves to the next: the placeholder suggests what to ask.
- * The first phrase is already written on mount, so the field never opens empty. Paused, it stays on
- * that first phrase.
- */
 export function useTypewriter(phrases: readonly string[], { paused = false, typeMs = 42, holdMs = 2600, eraseMs = 16 } = {}) {
     const [typing, setTyping] = useState<Typing>({ index: 0, length: phrases[0].length, erasing: false })
     const phrase = phrases[typing.index]

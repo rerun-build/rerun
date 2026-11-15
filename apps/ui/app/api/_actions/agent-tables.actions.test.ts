@@ -1,8 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-// The database tab of a coworker reads its table list here. A failed read once came back as an
-// empty list, which the tab drew as "No tables yet" for a coworker whose table was right there.
-
 const mocks = vi.hoisted(() => ({ getAgentChatTarget: vi.fn(), listDbTables: vi.fn() }))
 
 vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: mocks.getAgentChatTarget, resolveRunTarget: vi.fn(), sessionRowOf: vi.fn() }))

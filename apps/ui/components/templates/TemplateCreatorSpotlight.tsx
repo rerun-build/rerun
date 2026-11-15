@@ -14,13 +14,8 @@ import { creatorKindLabel, type LibraryCreatorSummary, templateHeadline } from '
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
-// The landing's profile opens its contact form on this anchor, so "Work with" lands on the form
-// rather than on a page where the same button has to be found again.
 const WORK_WITH_HASH = '#work-with'
 
-// The face as a photograph, their own words beside it, and the ways to reach them. The whole
-// creator half is one link to their public profile; the template they are recognised for keeps
-// its own column and its own action.
 export function TemplateCreatorSpotlight({ creator, template, selected, onSelectTemplate }: { creator: LibraryCreatorSummary; template: LibraryTemplate; selected: boolean; onSelectTemplate: () => void }) {
     const t = useTranslations('templates.spotlight')
     const tKind = useTranslations('templates.creatorKind')
@@ -29,9 +24,6 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
     return (
         <article className="@container/spotlight overflow-hidden rounded-2xl border bg-card">
             <div className="grid @min-[56rem]/spotlight:grid-cols-[minmax(0,1fr)_minmax(0,17rem)]">
-                {/* A link stretched under the half rather than wrapped around it: the buttons inside
-                    are links of their own, and an anchor cannot hold another. Everything above it lets
-                    the click through except those buttons. */}
                 <div className="group/creator relative grid transition-colors hover:bg-muted/20 @min-[40rem]/spotlight:grid-cols-[10rem_minmax(0,1fr)] @min-[56rem]/spotlight:grid-cols-[11rem_minmax(0,1fr)]">
                     <a href={profileUrl} target="_blank" rel="noreferrer" aria-label={t('viewProfile', { name: creator.name })} className="absolute inset-0 rounded-l-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset" />
                     <div className="pointer-events-none relative hidden min-h-48 bg-muted @min-[40rem]/spotlight:block">
@@ -47,8 +39,6 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                     <div className="pointer-events-none relative flex min-w-0 flex-col p-5 @min-[40rem]/spotlight:pl-3">
                         <CrownBadge />
                         <div className="mt-3 flex min-w-0 items-center gap-3">
-                            {/* The photo column folds away when the detail panel narrows the page; the
-                                face stays, as an avatar beside the name. */}
                             <TemplateCreatorAvatar creator={creator} size={44} className="@min-[40rem]/spotlight:hidden" />
                             <h3 className="font-heading flex min-w-0 items-center gap-2 text-[1.75rem] leading-tight font-semibold tracking-tight">
                                 <span className="truncate">{creator.name}</span>
@@ -72,8 +62,6 @@ export function TemplateCreatorSpotlight({ creator, template, selected, onSelect
                         </div>
                     </div>
                 </div>
-                {/* Same padding as the creator half and both actions pinned to the bottom, so "Work
-                    with" and "Open template" share one baseline whatever each column holds. */}
                 <div className="hidden border-l p-5 @min-[56rem]/spotlight:flex">
                     <RecognizedCard template={template} selected={selected} onSelect={onSelectTemplate} className="w-full" />
                 </div>
@@ -95,7 +83,6 @@ function CrownBadge() {
     )
 }
 
-// A brand keeps its own name; only the personal website gets a translated one.
 const SOCIALS: { key: keyof LibraryCreator['links']; brand?: string; icon: ComponentType<{ className?: string }> }[] = [
     { key: 'linkedin', brand: 'LinkedIn', icon: LinkedInIcon },
     { key: 'x', brand: 'X', icon: XIcon },

@@ -113,8 +113,6 @@ describe('backend', () => {
         expect(selectForemanBackend(useForemanStore.getState())).toBe('engine')
     })
 
-    // The onboarding's conversation stays on screen once the build moved the workspace to the
-    // engine: it is the next message that opens one there.
     it('keeps a pinned conversation where it started when the surface moves', () => {
         const store = useForemanStore.getState()
         store.setSurface('onboarding')

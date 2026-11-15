@@ -16,13 +16,8 @@ export const RUN_ERROR_CODES = {
 
 export type RunErrorCode = (typeof RUN_ERROR_CODES)[keyof typeof RUN_ERROR_CODES]
 
-// The raw finish reason `openrouterStreamRetryMiddleware` puts on a step whose stream was cut and
-// could not be replayed. A finish rather than an error part: `onFinish` is the callback that keeps
-// the steps the run had already completed.
 export const STREAM_CUT_RAW_REASON = 'stream_cut'
 
-// The message is what the chat classifies as an interrupted run, so the notice offers to pick the
-// run back up instead of showing a raw stack.
 export class ProviderStreamCutError extends Error {
     constructor() {
         super('the provider ended the turn without a result')
@@ -30,9 +25,6 @@ export class ProviderStreamCutError extends Error {
     }
 }
 
-// A request the provider turned down as malformed: the same request will be turned down again, so
-// the reason is kept in the message. It still reads "Provider returned error", which is what the chat
-// classifies as a refusal.
 export class ProviderRefusedError extends Error {
     constructor(reason: string | null) {
         super(reason ? `Provider returned error: ${reason}` : 'Provider returned error')
@@ -40,8 +32,6 @@ export class ProviderRefusedError extends Error {
     }
 }
 
-// A 401 on a Claude token the engine itself replaced or let lapse while the run held it: the
-// connection is fine, the run was only cut off, and the chat offers to pick it back up.
 export class ClaudeSignInRenewedError extends Error {
     constructor() {
         super('interrupted: Claude sign-in renewed during the run')
@@ -49,11 +39,6 @@ export class ClaudeSignInRenewedError extends Error {
     }
 }
 
-// The CLI providers report a failed turn as a *finish*, not as an error: codex maps
-// `turn/completed status:'failed'` to a plain finish part carrying `usage_limit_exceeded` or
-// `context_window_exceeded` as its raw reason, and claude-code does the same with
-// `error_during_execution`. Without this table a spent subscription reads as a successful, empty
-// turn: the run is stored `done`, a "completed" notification goes out and the curator runs.
 const RAW_FINISH_CODES: Record<string, RunErrorCode> = {
     usage_limit_exceeded: RUN_ERROR_CODES.usageLimit,
     context_window_exceeded: RUN_ERROR_CODES.contextWindow,
@@ -68,15 +53,10 @@ export function classifyFinishReason(finishReason: string | undefined, rawFinish
     return null
 }
 
-// `length` on its own is a genuine `max_tokens` truncation, which is a successful turn. Only a raw
-// reason we recognise as a failure turns a finish into an error.
 export function isFailedFinish(finishReason: string | undefined, rawFinishReason: string | undefined): boolean {
     return classifyFinishReason(finishReason, rawFinishReason) !== null
 }
 
-// A custom endpoint is a server its owner runs, often on their own machine: one that is stopped,
-// asleep or out of the engine's reach fails before any HTTP status exists, and the SDK's own
-// "Cannot connect to API" does not say which address it tried.
 export class CustomEndpointUnreachableError extends Error {
     constructor(host: string, code: string) {
         super(`Could not reach the custom endpoint at ${host} (${code}). Check that the server is running and reachable from the engine.`)
@@ -115,9 +95,6 @@ function errorText(error: unknown): string {
     return typeof error === 'object' && error !== null ? serialized(error) : String(error)
 }
 
-// What a failed run stores and shows. `@ai-sdk/openai` hands an error event of the Responses stream
-// over as the raw chunk, `{ type: 'error', error: { code, message } }`, which `String()` turns into
-// "[object Object]".
 export function errorMessageOf(error: unknown): string {
     if (error instanceof Error || typeof error !== 'object' || error === null) return String(error)
     const { message, error: inner } = error as { message?: unknown; error?: { message?: unknown } }
@@ -135,9 +112,6 @@ function parseJson(text: string): unknown {
     }
 }
 
-// OpenRouter answers a refusal with its own "Provider returned error" and puts what the model provider
-// said in `error.metadata.raw`, often a JSON body of its own. The SDK's parsed `data` drops `metadata`,
-// so it is read from the raw response body.
 export function upstreamReason(error: unknown): string | null {
     if (!APICallError.isInstance(error) || !error.responseBody) return null
     const body = parseJson(error.responseBody) as { error?: { message?: unknown; metadata?: { raw?: unknown } } } | null
@@ -151,8 +125,6 @@ export function upstreamReason(error: unknown): string | null {
     return typeof message === 'string' && message !== error.message ? message : null
 }
 
-// `@ai-sdk/google` already makes the body's message the error's own, so `upstreamReason` finds
-// nothing more in it: the error's message is then the reason, unless it is OpenRouter's bare refusal.
 export function refusalReason(error: unknown): string | null {
     const upstream = upstreamReason(error)
     if (upstream) return upstream
@@ -172,19 +144,14 @@ function apiCallErrorCode(error: unknown): RunErrorCode | null {
 
 export function classifyProviderError(provider: Provider, error: unknown): RunErrorCode | null {
     const text = `${errorText(error)} ${upstreamReason(error) ?? ''}`
-    // Both CLIs surface a spent subscription as free text on a generic error, with no status code
-    // and no error kind of their own. Claude Code names the window that ran out rather than saying
-    // "usage limit" at all: "You've hit your session limit · resets 3pm".
     if (MODEL_NOT_IN_PLAN.test(text)) return RUN_ERROR_CODES.modelNotInPlan
     if (SUBSCRIPTION_LIMIT.test(text)) return RUN_ERROR_CODES.usageLimit
     if (LoadAPIKeyError.isInstance(error)) return RUN_ERROR_CODES.unauthorized
-    // The AI SDK gives up on a retryable status after its own attempts and wraps the last one.
     const fromApiCall = apiCallErrorCode(RetryError.isInstance(error) ? error.lastError : error)
     if (fromApiCall) return fromApiCall
     if (/not logged in|please login|invalid api key|invalid x-api-key|unauthorized|authentication failed|failed to authenticate|authentication_error|invalid bearer token|oauth token has expired|been revoked|no auth credentials|\b401\b/i.test(text)) return RUN_ERROR_CODES.unauthorized
     if (PROVIDER_OVERLOADED.test(text)) return RUN_ERROR_CODES.overloaded
     if (CONTEXT_WINDOW.test(text)) return RUN_ERROR_CODES.contextWindow
-    // Checked last: a 400 that says why, a blown context or a bad key, is classified by its reason.
     if (APICallError.isInstance(error) && error.statusCode === 400) return RUN_ERROR_CODES.refused
     return null
 }

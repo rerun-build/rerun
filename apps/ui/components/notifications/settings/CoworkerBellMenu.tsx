@@ -34,14 +34,11 @@ function ItemText({ label, hint }: { label: string; hint: string }) {
     )
 }
 
-// The glyph says the state at a glance: a plain bell follows your setting, a ringing one gets
-// everything, a crossed one is muted, and the dot is a coworker whose scheduled tasks you follow.
 export function CoworkerBellMenu({ name, rule, scope, scheduledCount, onChange, onOpenSettings, open, onOpenChange, modal, align = 'end', className }: CoworkerBellMenuProps) {
     const t = useTranslations('notifications.settings')
     const openingSettings = useRef(false)
     const ModeIcon = COWORKER_MODE_META[rule.mode].icon
     const following = rule.follow === true
-    // Someone already following can always stop, whatever the count says.
     const noSchedule = scheduledCount === 0 && !following
 
     const hintOf = (mode: CoworkerMode) => (mode === 'default' ? t('modes.default.yourSetting', { scope: t(`scopes.${scope}.label`) }) : t(`modes.${mode}.hint`))

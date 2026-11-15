@@ -9,14 +9,10 @@ import { theme, text } from "../theme";
 
 export interface IncidentResolvedProps {
   agentName: string;
-  /** The source that recovered, e.g. `Schedule "weekly-export"`. */
   sourceLabel: string;
-  /** Why this recipient gets the email, e.g. "You follow Atlas's scheduled tasks." */
   reason?: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
-  /** Opens the conversation of the run that worked. Without it the button opens the board. */
   conversationUrl?: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;

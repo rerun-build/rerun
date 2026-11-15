@@ -15,10 +15,6 @@ export type Cursor = {
 
 const SPRING = { stiffness: 500, damping: 50 }
 
-// `showAvatars` is opt-in and off by default: `avatarUrl` is carried by presence for whoever needs
-// it, but a photo in the pill is a decision about the surface the cursors are on, not something to
-// inherit from the field being populated. The live board shows an arrow and a name; a scripted scene
-// that has to read as people turns it on.
 export function CursorOverlay({ cursors, zoom, showAvatars = false }: { cursors: Cursor[]; zoom: number; showAvatars?: boolean }) {
     return (
         <AnimatePresence>

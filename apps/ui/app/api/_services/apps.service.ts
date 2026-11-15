@@ -32,8 +32,6 @@ type TrialClaimInsert = Database['public']['Tables']['app_trial_claims']['Insert
 type BindingInsert = Database['public']['Tables']['app_connection_agents']['Insert']
 type BindingUpdate = Database['public']['Tables']['app_connection_agents']['Update']
 
-// Every account carries the environment it was created from: one Linkup key serves them all, and
-// each reconciliation only judges its own.
 function linkupAccountName(connectionId: string): string {
     return `${linkupNamespace()}:${connectionId}`
 }
@@ -44,7 +42,6 @@ function webhookUrl(): string {
 
 export type AppRefusalReason = 'needs_slot' | 'not_entitled' | 'paused' | 'too_many_attempts' | 'refused' | 'trial_used' | 'duplicate' | 'unknown'
 
-// `reason` is what the dialog acts on (back to the accounts, stop polling), `code` what it reads out.
 export class AppActionError extends AppError {
     constructor(
         readonly reason: AppRefusalReason,
@@ -56,10 +53,6 @@ export class AppActionError extends AppError {
     }
 }
 
-// --- Reading the workspace's state ---
-
-// No slot is sold on this install: the slots are the ones the workspace already holds, and no
-// workspace is on a trial.
 type SlotState = {
     workspaceId: number
     stripeSlots: number
@@ -122,8 +115,6 @@ export type AppsOverview = {
     paused: boolean
     subscriberTrialEndsAt: string | null
     allowance: ConnectAllowance
-    // The accounts a paid slot holds: the subscriber trial's and the ones paused for want of a slot
-    // are not on the bill, so they do not hold the billing dialog's "−" back.
     slotsInUse: number
     canRemoveSlot: boolean
     connections: AppConnectionView[]
@@ -166,14 +157,9 @@ export async function getAppsOverview(slug: AppSlug): Promise<AppsOverview> {
     }
 }
 
-// --- Buying a slot ---
-
-// Kept for the dialogs that still offer it: this install has nothing to sell a slot through.
 export async function addAppSlot(slug: AppSlug, _requestId: string): Promise<{ trialSlot: boolean }> {
     throw new AppActionError('not_entitled', 'appSlotsNotSold', { provider: appDefinition(slug).providerLabel })
 }
-
-// --- Connecting an account ---
 
 export type ConnectOutcome =
     | { status: 'connected'; connectionId: string; label: string | null; trialEndsAt: string | null }
@@ -206,16 +192,12 @@ async function openConnection(supabase: Client, workspaceId: number, userId: str
     return data.id
 }
 
-// Each call is one attempt at somebody's LinkedIn password, or one account opened at Linkup: the
-// form must not become a way to test a list of them.
 async function claimLoginAttempt(supabase: Client, workspaceId: number, slug: AppSlug): Promise<void> {
     if (!(await claimQuota(supabase, workspaceScope(workspaceId), `login_attempt:${slug}`, [dayKey(new Date())], [DAILY_LOGIN_ATTEMPT_LIMIT]))) {
         throw new AppActionError('too_many_attempts', 'tooManySignInAttempts')
     }
 }
 
-// Opens or reopens the connection row, then signs in at Linkup with what `signIn` sends. Shared by
-// every app: only what is sent to Linkup differs.
 async function startConnection(slug: AppSlug, reconnectId: string | undefined, signIn: (accountName: string) => Promise<LinkupLoginResult>): Promise<ConnectOutcome> {
     const { workspace, userId, supabase } = await requireWorkspaceContext()
     const state = await readSlotState(supabase, workspace.id, slug)
@@ -223,8 +205,6 @@ async function startConnection(slug: AppSlug, reconnectId: string | undefined, s
 
     const reconnecting = reconnectId ? state.holding.find(connection => connection.id === reconnectId) : undefined
     if (reconnectId && !reconnecting) throw new AuthorizationError('accountNotFound')
-    // Only a signed-out account is reconnected in place. One paused for want of a paid slot gets its
-    // slot back through Billing, never through a new sign-in.
     if (reconnecting && reconnecting.status !== 'needs_reconnect') throw new AppActionError('needs_slot', 'appAccountAwaitingSlot')
     if (!reconnecting && allowanceOf(state) === 'buy_slot') throw new AppActionError('needs_slot', 'appSlotsTaken', { provider: appDefinition(slug).providerLabel })
     await claimLoginAttempt(supabase, workspace.id, slug)
@@ -268,15 +248,12 @@ export async function submitAppCheckpoint(slug: AppSlug, connectionId: string, c
     const connection = await connectingRow(supabase, workspace.id, slug, connectionId)
     try {
         const result = await submitCheckpoint(connection.providerAccountId, code?.trim() || undefined)
-        // Only an account that once finished connecting has a label: a reconnect goes back to
-        // needs_reconnect on failure, a first connection is deleted.
         return advance(supabase, connection.slug, workspace.id, userId, connectionId, result, connection.label !== null)
     } catch (err) {
         throw refusal(connection.slug, err)
     }
 }
 
-// A new code sent by LinkedIn, or a new QR code for WhatsApp, which comes back in the answer.
 export async function resendAppCode(slug: AppSlug, connectionId: string): Promise<LinkupLinkCode | null> {
     const { workspace, supabase } = await requireWorkspaceContext()
     const connection = await connectingRow(supabase, workspace.id, slug, connectionId)
@@ -288,7 +265,6 @@ export async function resendAppCode(slug: AppSlug, connectionId: string): Promis
     }
 }
 
-// Abandoning the dialog halfway leaves an account at Linkup that nobody will finish connecting.
 export async function cancelAppConnect(slug: AppSlug, connectionId: string): Promise<void> {
     const { workspace, supabase } = await requireWorkspaceContext()
     const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['provider_account_id', 'status', 'label'] as const, { id: connectionId, workspace_id: workspace.id, app_slug: slug })
@@ -308,7 +284,6 @@ async function advance(supabase: Client, slug: AppSlug, workspaceId: number, use
             throw new AppActionError('duplicate', 'appAccountAlreadyConnected', { provider: appDefinition(slug).providerLabel })
         }
         if (error) throw new Error(error.message)
-        // A reconnect that came back as a new account leaves the old one billed at Linkup.
         if (reconnecting && previous?.provider_account_id) await deleteAccount(previous.provider_account_id).catch(err => console.warn(`[apps:${slug}] could not delete the replaced account`, err))
     }
 
@@ -334,8 +309,6 @@ async function finishConnection(supabase: Client, slug: AppSlug, workspaceId: nu
     const allowance: ConnectAllowance | 'reconnect' = state ? allowanceOf(state, connectionId) : 'reconnect'
     if (allowance === 'buy_slot') throw new AppActionError('needs_slot', 'appSlotsTaken', { provider: app.providerLabel })
 
-    // What can still fail with Linkup goes first: past this point the trial is claimed, and nothing
-    // left can throw but a write to our own database.
     if (!webhookKept) {
         const webhook = await createWebhook(accountId, webhookUrl(), app.webhookEvents)
         await updateConnection(supabase, connectionId, { provider_webhook_id: webhook.webhookId, provider_webhook_secret: webhook.secret })
@@ -375,10 +348,6 @@ async function ensureWorkspaceApp(supabase: Client, slug: AppSlug, workspaceId: 
     if (error) throw new Error(error.message)
 }
 
-// --- Disconnecting ---
-
-// The account is deleted at Linkup straight away, so it stops costing. The slot stays on the bill
-// until it is removed from Billing: a slot is what is sold, not an account.
 export async function disconnectConnection(slug: AppSlug, connectionId: string): Promise<void> {
     const { workspace, supabase } = await requireWorkspaceContext()
     const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['provider_account_id', 'status'] as const, { id: connectionId, workspace_id: workspace.id, app_slug: slug })
@@ -394,8 +363,6 @@ async function removeBindingsOf(supabase: Client, workspaceId: number, slug: App
     const { error } = await supabase.from('app_connection_agents').delete().in('connection_id', connectionIds)
     if (error) throw new Error(error.message)
 }
-
-// --- A coworker's account and its wake-ups ---
 
 export type AgentAppBinding = { connectionId: string; label: string | null; status: string; wakeOnEvents: string[] } | null
 
@@ -426,8 +393,6 @@ export async function attachAgentToConnection(slug: AppSlug, agentId: string, co
     if (error) throw new Error(error.message)
 }
 
-// The hub creates the trigger on the engine, and only it knows its token: the webhook fires it as
-// any caller of its public URL would. Turning every event off removes the trigger altogether.
 export async function setAgentWakeEvents(slug: AppSlug, agentId: string, events: string[]): Promise<void> {
     const owned = await assertAgentInWorkspace(agentId, 'manage')
     const { workspace, supabase } = await requireWorkspaceContext()

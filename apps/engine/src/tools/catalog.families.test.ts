@@ -30,8 +30,6 @@ describe('toolCatalog', () => {
         expect(toolCatalog().map(f => f.family).sort()).toEqual([...TOOL_KEYS, 'self'].sort())
     })
 
-    // The quick replies are a block of the message the engine reads, not a tool: the family is
-    // the switch alone.
     it('builds every family with described tools, the quick replies switch aside', () => {
         for (const family of toolCatalog()) {
             expect(family.description.length, family.family).toBeGreaterThan(0)

@@ -26,30 +26,17 @@ export type BadgeTone = NonNullable<BorderBeamProps['tone']>
 
 export interface BadgeProps extends VariantProps<typeof badgeVariants> {
     children: ReactNode
-    /** Couleur de l'anneau et du texte. Défaut 'brand'. */
     tone?: BadgeTone
-    /** Forme du BorderBeam. Défaut 'ring'. */
     pattern?: BorderBeamProps['pattern']
-    /** Fait tourner l'anneau. Défaut false (statique). */
     animated?: boolean
-    /** Glow autour de l'anneau. Défaut true. */
     glow?: boolean
-    /** Applique le balayage TextShimmer sur le texte (children string uniquement). Défaut false. */
     shimmer?: boolean
-    /** Largeur du trough shimmer en px (shimmer only). Défaut 16. */
     spread?: number
-    /** Contenu rendu avant le texte, hors shimmer (facepile, icône…). */
     leading?: ReactNode
-    /** Contenu rendu après le texte, hors shimmer (flèche, compteur…). */
     trailing?: ReactNode
     className?: string
 }
 
-/**
- * Pill « themed » : anneau BorderBeam + texte teinté au ton, avec fond soft,
- * transparent ou contrasté pour les médias. Décline les tons du BorderBeam en tailles sm/md/lg. Le shimmer
- * animé (héritage de ShinyText) est optionnel via `shimmer`.
- */
 export function Badge({
     children,
     tone = 'brand',

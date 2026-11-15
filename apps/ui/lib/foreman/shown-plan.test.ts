@@ -3,9 +3,6 @@ import { describe, expect, it } from 'vitest'
 
 import { lastShownPlan, lastShownStarterPlan, planRevisionAsk, templateCardPlan } from './shown-plan'
 
-// The transcripts below have the shape the browser really holds: one part per tool call, which
-// stays in the message once it has been answered.
-
 const assistant = (...parts: unknown[]) => ({ id: 'a', role: 'assistant', parts }) as unknown as UIMessage
 const user = (text: string) => ({ id: 'u', role: 'user', parts: [{ type: 'text', text }] }) as unknown as UIMessage
 
@@ -16,24 +13,18 @@ describe('lastShownPlan', () => {
         expect(lastShownPlan([assistant(plan('Your team'))])).toEqual({ title: 'Your team', boxes: [], items: [] })
     })
 
-    // "Change something" leaves the first card in the stream, answered. The board has to draw the
-    // second one.
     it('takes the last organisation, the earlier one staying readable in the stream', () => {
         const messages = [assistant({ ...plan('First draft'), state: 'output-available', output: { answered: true, confirmed: false } }), user('Add a Finance division'), assistant(plan('Second draft'))]
 
         expect(lastShownPlan(messages)).toMatchObject({ title: 'Second draft' })
     })
 
-    // What separates this from findPendingWidget: once "Looks good" is clicked nothing is waiting
-    // any more, and the board still has to draw the plan through the whole checkout.
     it('holds after the plan has been confirmed', () => {
         const confirmed = assistant({ ...plan('Your team'), state: 'output-available', output: { answered: true, confirmed: true } })
 
         expect(lastShownPlan([confirmed, assistant({ type: 'text', text: 'Let us get you set up.' })])).toMatchObject({ title: 'Your team' })
     })
 
-    // A call still being written carries a half-typed plan, and a Box is identified by its name:
-    // drawing it would restart the tracing of every outline on each token.
     it('waits for the card to be written before drawing it', () => {
         const streaming = assistant({ type: 'tool-show_plan', toolCallId: 'x', state: 'input-streaming', input: { title: 'Reta', boxes: [{ name: 'Mark' }] } })
 
@@ -46,7 +37,6 @@ describe('lastShownPlan', () => {
         expect(lastShownPlan([user('hello'), assistant({ type: 'text', text: 'hi' })])).toBeNull()
     })
 
-    // Someone pasting "tool-show_plan" into their own message does not get to draw a board.
     it('only reads the assistant', () => {
         expect(lastShownPlan([{ id: 'u', role: 'user', parts: [plan('Not mine')] } as unknown as UIMessage])).toBeNull()
     })
@@ -82,7 +72,6 @@ describe('templateCardPlan', () => {
         expect(plan).toEqual({ items: [{ kind: 'template', slug: 'buyer-signals', title: 'Buyer signals', box: 'Sales' }], boxes: [{ name: 'Product' }, { name: 'Sales' }, { name: 'Support' }] })
     })
 
-    // A transcript written before the app laid the Boxes into the card still draws and builds.
     it('falls back to the one Box a card without them named', () => {
         expect(templateCardPlan({ templates, box: 'Sales' })?.boxes).toEqual([{ name: 'Sales' }])
     })

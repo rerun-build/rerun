@@ -3,7 +3,6 @@ import type { UIMessage } from 'ai'
 
 import { cachedBoard, cachedMe, clearLocalCache, loadCoworkerDetail, loadTranscript, readCoworkerDetails, readCoworkerScreen, readTranscript, sameTranscript, saveCoworkerScreen, saveTranscript } from './local-cache'
 
-// The cache folder as a map of file name to its text, written in order.
 const mockDisk = new Map<string, { text: string; writtenAt: number }>()
 let mockClock = 0
 

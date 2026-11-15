@@ -40,7 +40,6 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
     const errorText = useErrorText()
     const isEdit = !!slug
     const { pick, setPick, availableGroups, providerFor, agentModel } = useRunModel(agentId)
-    // Only the prompt is sealed: the URL, the methods and the on/off switch stay available.
     const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason

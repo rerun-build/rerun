@@ -13,7 +13,6 @@ const { createSession, getSession } = await import('../../db/repos/sessions.js')
 
 type TracedEvent = { event: string; agentId?: string; sessionId?: string | null; title?: string | null; source?: string | null; originAgentId?: string | null; trigger?: unknown }
 const traced: TracedEvent[] = []
-// While set, every mocked run stays open until it resolves: what lets a test count the runs in flight.
 let hold: Promise<void> | null = null
 
 vi.doMock('../../runtime/notify.js', () => ({
@@ -206,8 +205,6 @@ describe('call_agent progress part', () => {
     })
 })
 
-// The CLI runs the call_agent calls of one step side by side (providers.ts marks the tool as
-// overlapping), so the tool itself bounds how many coworkers one caller has running.
 describe('call_agent calls made in the same step', () => {
     const started = () => traced.filter(e => e.event === 'run.started').length
 

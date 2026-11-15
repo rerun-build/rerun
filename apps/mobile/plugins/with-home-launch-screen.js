@@ -1,21 +1,9 @@
-// The iOS launch screen drawn as the Home's first frame: the skeleton
-// rows, at the very place the app draws them (HomeBoot, then the Home itself), in light and dark.
-// The app then fills the rows in place instead of cutting from a logo.
-//
-// It replaces what expo-splash-screen puts in SplashScreen.storyboard, so it must be listed before
-// that plugin in app.json: mods run last-registered first, and this one has to see its output.
-//
-// A launch screen takes no runtime attributes, so no corner radius on a view: every rounded shape
-// is an image, drawn here at prebuild in both appearances, the bars stretching between round caps.
-
 const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
 const { Buffer } = require('buffer')
 const { withDangerousMod, withMod } = require('expo/config-plugins')
 
-// Mirrors src/theme/tokens.ts, src/components/home/HomeSkeleton.tsx, the Home's header and the sidebar
-// of src/components/layout/split.ts: Node cannot import them. launch-layout.test.ts keeps both sides equal.
 const LAUNCH_LAYOUT = {
     background: { light: '#f8f8f8', dark: '#0a0a0a' },
     muted: { light: '#efefef', dark: '#232323' },
@@ -28,22 +16,17 @@ const LAUNCH_LAYOUT = {
     status: { top: 47, height: 12 },
     barRadius: 8,
     barWidths: index => ({ name: 40 + ((index * 17) % 30), status: 60 + ((index * 23) % 30) }),
-    // A regular-width screen (an iPad, an unfolded iPhone Duo) opens on the Home as a sidebar.
     sidebar: { share: 0.32, min: 260, max: 340 },
 }
 
-// SplashScreenBackground is written by expo-splash-screen, from its light and dark backgroundColor.
 const BACKGROUND_COLOR = 'SplashScreenBackground'
 const DARK = [{ appearance: 'luminosity', value: 'dark' }]
 const SCALES = [2, 3]
 
-// A corner never rounds past half the side, as React Native clamps it.
 function cornerOf(height) {
     return Math.min(LAUNCH_LAYOUT.barRadius, height / 2)
 }
 
-// The rounded shapes of the skeleton, by asset name. A bar is drawn at its height with a 1 pt middle
-// that stretches to any width.
 const SHAPES = {
     LaunchAvatar: { width: LAUNCH_LAYOUT.avatar.size, height: LAUNCH_LAYOUT.avatar.size, radius: LAUNCH_LAYOUT.avatar.radius, stretches: false },
     LaunchNameBar: { width: cornerOf(LAUNCH_LAYOUT.name.height) * 2 + 1, height: LAUNCH_LAYOUT.name.height, radius: cornerOf(LAUNCH_LAYOUT.name.height), stretches: true },
@@ -69,7 +52,6 @@ function size(id, attribute, constant, relation) {
     return { $: { firstAttribute: attribute, ...(relation ? { relation } : {}), constant: String(constant), id } }
 }
 
-// Constraints installed on one width class only: the rest of the storyboard holds for both.
 function widthClassVariations({ compactOnly, regularOnly }) {
     const mask = (include, exclude) => [{ $: { key: 'constraints' }, ...(include.length ? { include: include.map(reference => ({ $: { reference } })) } : {}), ...(exclude.length ? { exclude: exclude.map(reference => ({ $: { reference } })) } : {}) }]
     return [
@@ -92,7 +74,6 @@ function launchScreen(xml) {
     const containerId = container.$.id
     const safeArea = container.viewLayoutGuide.find(guide => guide.$.key === 'safeArea').$.id
 
-    // An invisible view as wide as the sidebar the app draws on a regular-width screen.
     const sidebar = 'RR-sidebar'
     const sidebarView = {
         $: { contentMode: 'scaleToFill', translatesAutoresizingMaskIntoConstraints: 'NO', id: sidebar, userLabel: sidebar },
@@ -122,7 +103,6 @@ function launchScreen(xml) {
         images.push(imageView(avatar, 'LaunchAvatar', { width: layout.avatar.size, height: layout.avatar.size, constraints: [size(`${avatar}-w`, 'width', layout.avatar.size), size(`${avatar}-h`, 'height', layout.avatar.size)] }))
         constraints.push(constraint(`${avatar}-left`, [avatar, 'leading'], [containerId, 'leading'], { constant: layout.avatar.left }), constraint(`${avatar}-top`, [avatar, 'top'], [safeArea, 'top'], { constant: rowTop + layout.avatar.top }))
 
-        // The text column the bars' widths are shares of, as in HomeSkeleton.
         columns.push({
             $: { contentMode: 'scaleToFill', translatesAutoresizingMaskIntoConstraints: 'NO', id: column, userLabel: column },
             rect: frame(),
@@ -175,13 +155,11 @@ function channels(hex) {
     return [1, 3, 5].map(offset => parseInt(hex.slice(offset, offset + 2), 16))
 }
 
-// The storyboard's own copy of a catalog colour, light only: the catalog's wins at run time.
 function namedColor(name, hex) {
     const [red, green, blue] = channels(hex).map(value => (value / 255).toFixed(3))
     return { $: { name }, color: [{ $: { red, green, blue, alpha: '1.000', colorSpace: 'custom', customColorSpace: 'sRGB' } }] }
 }
 
-// A filled rounded rectangle as a PNG, its edge antialiased by sampling each pixel 4 × 4 times.
 function roundedRectPng({ width, height, radius }, scale, hex) {
     const pixels = { width: Math.round(width * scale), height: Math.round(height * scale) }
     const r = radius * scale

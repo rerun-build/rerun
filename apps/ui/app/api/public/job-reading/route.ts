@@ -4,13 +4,6 @@ import { readAgentJob } from '@/lib/ai/read-agent-job'
 import { createReadingLimiter } from '@/lib/new-agent/public-reading-limit'
 import { readerCatalog } from '@/lib/new-agent/reader-catalog'
 
-// What the landing page's composer reads in the job a visitor describes: the same reading as the
-// New agent dialog, for someone who has no account yet. The body is the description as plain text,
-// which keeps the call a simple cross-origin request, with no preflight before each reading.
-//
-// It never fails: a refused caller, a slow model or an unreadable reply all answer an empty reading,
-// since the composer sends its visitor to the app just as well with nothing read.
-
 const LANDING_ORIGIN = new URL(process.env.NEXT_PUBLIC_LANDING_URL ?? 'https://rerun.build').origin
 const LOCAL_ORIGIN = /^http:\/\/localhost:\d+$/
 

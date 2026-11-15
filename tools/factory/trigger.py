@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""Trigger client of the factory runner (rerun#53 chunk 1, ported to HTTP in rerun#60 chunk C3b). Creates or reuses the
-stage triggers of runner.json over the engine's routes (engine.py), fires one once and reads the run row over HTTP.
-Commands: probe --stage STAGE | check-triggers.
-The engine key and the trigger tokens are secrets: no code path here prints, logs or raises them."""
 import json, os, sys, tempfile, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -13,7 +9,6 @@ CONFIG = os.path.join(HERE, "runner.json")
 TRIGGERS = os.path.join(HERE, "triggers")
 TOKENS_ENV, TOKENS_DEFAULT = "FACTORY_TRIGGER_TOKENS_FILE", "/state/trigger-tokens.json"
 PROBE_WAIT_S, PROBE_POLL_S, PROBE_MAX_INPUT = 600, 15, 300000
-# the keys limits.py reads (snake_case) <- the engine's run row (camelCase)
 RUN_KEYS = (("id", "id"), ("agent_id", "agentId"), ("session_id", "sessionId"), ("status", "status"),
             ("step_count", "stepCount"), ("started_at", "startedAt"), ("finished_at", "finishedAt"), ("error", "error"),
             ("input_tokens", "inputTokens"), ("output_tokens", "outputTokens"),
@@ -22,7 +17,7 @@ RUN_KEYS = (("id", "id"), ("agent_id", "agentId"), ("session_id", "sessionId"), 
 
 
 class TriggerError(Exception):
-    """Its message never holds the engine key or a trigger token."""
+    pass
 
 
 def load_config(path=None):
@@ -31,7 +26,6 @@ def load_config(path=None):
 
 
 def tokens_path(cfg=None):
-    """The token file: runner.json key token_file, else the env var, else the default in the runner volume."""
     return (cfg or {}).get("token_file") or os.environ.get(TOKENS_ENV) or TOKENS_DEFAULT
 
 
@@ -40,7 +34,6 @@ def _tkey(agent, slug):
 
 
 def load_tokens(path):
-    """{agent/slug: token} from the token file; {} when it does not exist yet."""
     try:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
@@ -54,11 +47,10 @@ def load_tokens(path):
 
 
 def save_tokens(path, tokens):
-    """Atomic write, mode 0600 from the first byte."""
     d = os.path.dirname(os.path.abspath(path))
     try:
         os.makedirs(d, exist_ok=True)
-        fd, tmp = tempfile.mkstemp(prefix=".tokens-", dir=d)  # mkstemp creates the file 0600
+        fd, tmp = tempfile.mkstemp(prefix=".tokens-", dir=d)
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 json.dump(tokens, f, sort_keys=True)
@@ -80,8 +72,6 @@ def stage_body(stage):
 
 
 def ensure_triggers(eng, cfg=None, stages=None):
-    """Create or reuse (by slug) the trigger of every runner.json entry (only those whose stage is in stages, when given);
-    keeps the tokens in the token file. A trigger that exists is never created a second time. Returns {agent/slug: token}."""
     cfg = cfg if cfg is not None else load_config()
     path = tokens_path(cfg)
     tokens = load_tokens(path)
@@ -97,7 +87,7 @@ def ensure_triggers(eng, cfg=None, stages=None):
             row = eng.create_trigger(agent, slug, stage_body(e["stage"]), model=e.get("model"))
             if row.get("slug") != slug:
                 raise TriggerError("the engine derived another slug than %s from the trigger name" % slug)
-            if e.get("model") and model_of(row) != e["model"]:  # create did not keep the model: set it by the update route
+            if e.get("model") and model_of(row) != e["model"]:
                 row = dict(row, **eng.set_trigger_model(agent, slug, e["model"]))
                 if model_of(row) != e["model"]:
                     raise TriggerError("trigger %s did not take the model" % slug)
@@ -110,7 +100,6 @@ def ensure_triggers(eng, cfg=None, stages=None):
 
 
 def fire(eng, agent, slug, token, payload):
-    """Fire the trigger once; (runId, sessionId). Never retried. Errors carry the HTTP status or the class only."""
     try:
         return eng.fire_trigger(agent, slug, token, payload)
     except E.EngineError as e:
@@ -118,19 +107,16 @@ def fire(eng, agent, slug, token, payload):
 
 
 def map_run(row):
-    """An engine run row -> the snake_case keys limits.py expects (a missing key reads as None); None stays None."""
     if not isinstance(row, dict):
         return None
     return {snake: row.get(camel, row.get(snake)) for snake, camel in RUN_KEYS}
 
 
 def read_run(eng, agent, run_id):
-    """The run row mapped to snake_case, or None when the engine does not know the run. Raises EngineError."""
     return map_run(eng.get_run(agent, run_id))
 
 
 def input_tokens(row):
-    """Column input_tokens, else usage_json inputTokens, else None."""
     if row.get("input_tokens") is not None:
         return row["input_tokens"]
     try:
@@ -145,8 +131,6 @@ def model_of(row):
 
 
 def cmd_check_triggers(a, eng=None):
-    """<slug> OK|DRIFT per runner.json entry: live body and model (GET triggers) against triggers/<stage>.md and runner.json.
-    Nothing else is printed (the rows hold the token), not even why."""
     entries = load_config()["triggers"]
     slugs = [e["slug"] for e in entries]
     live = {}
@@ -162,7 +146,7 @@ def cmd_check_triggers(a, eng=None):
         except Exception:
             ok = False
         bad += 0 if ok else 1
-        label = e["slug"] if slugs.count(e["slug"]) == 1 else "%s %s" % (e["slug"], e["coworker"])  # build/review: one slug, three coworkers
+        label = e["slug"] if slugs.count(e["slug"]) == 1 else "%s %s" % (e["slug"], e["coworker"])
         print("%s %s" % (label, "OK" if ok else "DRIFT"))
     return 1 if bad else 0
 
@@ -203,7 +187,7 @@ def main(argv):
         return 2
     try:
         return CMDS[argv[0]](argv[1:])
-    except Exception as e:  # anything unforeseen: the class name only, a message could quote a secret
+    except Exception as e:
         print("FAILED (%s)" % type(e).__name__)
         return 1
 

@@ -1,6 +1,5 @@
 import type { GoalLineForm, GoalVerdict, RunGoal } from '@rerun/contracts'
 
-// Fixed patterns, written here. Nothing from the goal is ever turned into a pattern.
 const REST_PATTERNS = {
     'pull-url': /^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/pull\/[1-9][0-9]*$/,
     sha: /^[0-9a-f]{7,40}$/,

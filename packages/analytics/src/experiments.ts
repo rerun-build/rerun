@@ -1,26 +1,7 @@
-// Le contrat du test A/B de la landing, partagé par les deux apps. Le cookie est posé sur
-// `.rerun.build` par le proxy de la landing, donc `app.rerun.build` sait relire le bras d'un
-// visiteur sans dépendre de la propagation des super-properties PostHog : leur persistance est
-// `localStorage+cookie`, et le localStorage ne traverse pas les sous-domaines.
-//
-// Rien ici n'importe posthog-js : le proxy edge de la landing lit ce fichier.
 export const EXPERIMENT_COOKIE = 'rerun-ab'
 
 export const EXPERIMENT_COOKIE_MAX_AGE = 90 * 24 * 60 * 60
 
-// Une clé porte sa version, et un changement de clé est le seul moyen de re-tirer le bras d'un
-// visiteur déjà enrôlé, dont le cookie vit 90 jours. Les titres du hero ont été testés ainsi de
-// `hero` à `hero7`, chaque clé re-tirant ceux qu'elle rebrassait. `hero7` s'est arrêté le
-// 15 octobre 2026 avec la home v2, qui n'a qu'un titre. Une lettre ne sert qu'à un seul titre,
-// tests successifs compris : de E à K, toutes sont brûlées.
-//
-// Retirer une valeur ou une clé ne demande pas de changer la clé restante : `parseExperimentCookie`
-// valide chaque paire contre cette liste, donc la paire `hero7` ou `hero_visual` des visiteurs
-// enrôlés quand ces tests tournaient encore est simplement ignorée.
-//
-// `price1` est le prix du plan de base, en dollars par mois. Ses valeurs sont les `PRICE_ARMS` de
-// `@rerun/contracts`, recopiées ici parce que ce fichier n'importe rien. Les robots et les visiteurs
-// non enrôlés voient `DEFAULT_PRICE_ARM`, pas la première valeur.
 export const EXPERIMENT_VALUES = {
     price1: ['49', '29'],
 } as const
@@ -33,13 +14,8 @@ export type ExperimentVariants = { [K in ExperimentKey]?: ExperimentValue<K> }
 
 export type PriceVariant = ExperimentValue<'price1'>
 
-// Dérivé plutôt que déclaré : la liste ne peut pas diverger de celle des valeurs. L'ordre est celui
-// de la déclaration ci-dessus, et c'est lui qui fixe l'ordre des paires dans le cookie.
 export const EXPERIMENT_KEYS = Object.keys(EXPERIMENT_VALUES) as readonly ExperimentKey[]
 
-// Une clé absente se tire à parts égales. Un poids de 0 retire un bras du tirage sans le retirer des
-// valeurs : `price1:49` reste un cookie valide, celui d'un workspace figé à 49 $, mais un visiteur
-// sans workspace qui le porte encore est re-tiré.
 export const EXPERIMENT_WEIGHTS: { [K in ExperimentKey]?: Record<ExperimentValue<K>, number> } = {
     price1: { '49': 0, '29': 1 },
 }
@@ -67,18 +43,12 @@ export function isRetiredVariant<K extends ExperimentKey>(key: K, value: Experim
     return EXPERIMENT_WEIGHTS[key]?.[value] === 0
 }
 
-// Un robot ne renvoie pas le cookie : il serait re-tiré à chaque visite, et Google lirait un <h1>
-// différent d'un crawl à l'autre. Il n'est donc pas enrôlé et reçoit la variante canonique, celle
-// que voit déjà un visiteur qui refuse le cookie.
 const CRAWLER_USER_AGENT = /bot|crawl|spider|slurp|facebookexternalhit|embedly|quora link preview|whatsapp|lighthouse|pagespeed|headlesschrome/i
 
 export function isCrawler(userAgent: string | null | undefined): boolean {
     return !userAgent || CRAWLER_USER_AGENT.test(userAgent)
 }
 
-// Prend la valeur déjà décodée : le proxy la reçoit ainsi de `request.cookies`, le navigateur la
-// décode lui-même avant d'appeler. Chaque valeur est validée contre la liste de SA clé, et une
-// clé retirée du test est ignorée.
 export function parseExperimentCookie(raw: string | undefined | null): ExperimentVariants {
     const variants: Record<string, string> = {}
     if (!raw) return variants
@@ -90,17 +60,12 @@ export function parseExperimentCookie(raw: string | undefined | null): Experimen
     return variants
 }
 
-// Le cookie porte tous les tests dans une seule valeur, donc changer une variante impose de
-// réécrire la ligne entière.
 export function serializeExperimentVariants(variants: ExperimentVariants): string {
     return EXPERIMENT_KEYS.filter(key => variants[key])
         .map(key => `${key}:${variants[key]}`)
         .join('|')
 }
 
-// Les buckets partent en super-properties plutôt qu'en events dédiés : chaque `hero_cta_clicked` ou
-// `account_created` les porte alors tout seul, ce qui suffit à découper le funnel jusqu'au signup
-// sans instrumenter une seule surface de plus.
 export function experimentProperties(variants: ExperimentVariants): Record<string, string> {
     const properties: Record<string, string> = {}
     for (const key of EXPERIMENT_KEYS) {
@@ -110,9 +75,6 @@ export function experimentProperties(variants: ExperimentVariants): Record<strin
     return properties
 }
 
-// Les tests précédents vivaient sous ces noms, dont la valeur reste en localStorage une fois le
-// cookie périmé : sans ce retrait, chaque event d'un visiteur revenu porterait encore le bucket d'un
-// titre qui n'est plus en ligne, à côté de celui du test en cours.
 export const STALE_EXPERIMENT_PROPERTIES = [
     'ab_hero',
     'ab_hero2',
@@ -132,8 +94,6 @@ export function readExperimentCookie(): ExperimentVariants {
     return parseExperimentCookie(match ? decodeURIComponent(match[1]) : undefined)
 }
 
-// Mêmes options que le cookie posé par le proxy, sans quoi on poserait un second cookie à côté du
-// sien au lieu de l'écraser.
 export function writeExperimentVariants(variants: ExperimentVariants) {
     const parts = [
         `${EXPERIMENT_COOKIE}=${encodeURIComponent(serializeExperimentVariants(variants))}`,

@@ -36,8 +36,6 @@ export function ExpertProfileDialog({ open, onOpenChange }: { open: boolean; onO
         }
     }, [open, loaded, error, errorText])
 
-    // Dropped on close so the next open refetches: a save rewrites the row, and a cached copy would
-    // come back stale.
     function handleOpenChange(next: boolean) {
         if (!next) {
             setLoaded(null)

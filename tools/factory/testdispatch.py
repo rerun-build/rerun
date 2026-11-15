@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
-"""The `one` test dispatch of the factory runner (rerun#53 chunk 5, Settled 9), the factory-suite check-run mode, and two
-probes. Commands: probe-one --repo R --ref BRANCH --suite S --pattern P | probe-merge --repo R --issue N
-GitHub only through the gh wrapper (factory.run); nothing here reads or prints a token."""
 import json, os, re, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
 import gate as G
 from limits import ts
 
-SUITES = ("backend", "frontend", "layout")  # the inputs of testpilot's one.yml
-PATTERN_RE = re.compile(r"[A-Za-z0-9_./* -]+")  # one.yml's own limit on `pattern`
+SUITES = ("backend", "frontend", "layout")
+PATTERN_RE = re.compile(r"[A-Za-z0-9_./* -]+")
 RUN_FIELDS = "databaseId,headSha,createdAt,status,conclusion,url"
 FACTORY_CHECK = "Factory tools tests"
 TAIL_LINES, TAIL_CHARS = 60, 200
-FIND_S, RUN_S, POLL_S = 3 * 120, 25 * 60, 20  # find: three ticks; run: one.yml's 20-minute timeout plus queueing
+FIND_S, RUN_S, POLL_S = 3 * 120, 25 * 60, 20
 PROBE_LABEL = "factory-blocked"
 
 
 def dispatch(full, branch, suite, pattern):
-    """`gh workflow run one.yml`, which prints nothing. (True, None) or (False, why). Inputs are checked first."""
     if suite not in SUITES or not PATTERN_RE.fullmatch(pattern or ""):
         return False, "suite must be one of %s and pattern only [A-Za-z0-9_./* -]" % ", ".join(SUITES)
     r = F.run([F.GH, "workflow", "run", "one.yml", "-R", full, "--ref", branch, "-f", "suite=" + suite, "-f", "pattern=" + pattern], check=False)
@@ -33,7 +29,6 @@ def gh_list(cmd):
 
 
 def find_run(full, branch, head, since):
-    """The newest one.yml dispatch run on branch with headSha == head and createdAt not before `since`, or None."""
     rs = gh_list(["run", "list", "-R", full, "-w", "one.yml", "-b", branch, "-e", "workflow_dispatch", "-L", "5", "--json", RUN_FIELDS]) or []
     mine = [x for x in rs if x.get("headSha") == head and ts(x["createdAt"]) >= ts(since)]
     return max(mine, key=lambda x: ts(x["createdAt"])) if mine else None
@@ -44,21 +39,17 @@ def view_run(full, run_id):
 
 
 def result(run):
-    """GREEN only for completed + success; not completed is WAITING; anything else RED."""
     if run.get("status") != "completed":
         return "WAITING"
     return "GREEN" if run.get("conclusion") == "success" else "RED"
 
 
 def log_tail(full, run_id):
-    """The packet's log_tail: last 60 lines of `gh run view --log-failed`, ANSI removed, each cut to 200 characters."""
     out = F.run([F.GH, "run", "view", str(run_id), "-R", full, "--log-failed"], check=False).stdout or ""
     return [G.ANSI.sub("", l)[:TAIL_CHARS] for l in out.splitlines()[-TAIL_LINES:]]
 
 
 def factory_state(full, sha, done_test):
-    """`factory` suite (rerun has no one.yml): check-run "Factory tools tests" on sha, and gate.results() of its log
-    showing done_test passed. (GREEN|RED, check url) or (WAITING, None)."""
     cs = [c for c in G.head_checks(full, sha) if c["name"] == FACTORY_CHECK]
     if not cs or any(c["status"] != "completed" for c in cs):
         return "WAITING", None
@@ -104,7 +95,6 @@ def cmd_probe_one(a):
 
 
 def gh_write(*args):
-    """(ok, JSON or None, error). F.api cannot tell an empty 204 success from an error, so writes use the exit code."""
     r = F.run([F.GH, "api"] + list(args), check=False)
     if r.returncode:
         return False, None, (r.stderr or r.stdout).strip()[-200:]
@@ -115,8 +105,6 @@ def gh_write(*args):
 
 
 def cmd_probe_merge(a):
-    """Proves the writes chunk 7 needs: ref create, merges API, label add/remove, comment PATCH. Writes only to a scratch
-    ref at dev~1 (deleted at the end, also on failure) and to the probe's own comment and label on --issue."""
     repo, issue = opt(a, "--repo"), opt(a, "--issue")
     if not repo or not issue:
         print("usage: probe-merge --repo R --issue N (no default: name an issue of that repo)")

@@ -2,9 +2,6 @@ import type { LanguageModelMiddleware } from 'ai'
 import { HITL_TOOL_NAMES } from '@rerun/contracts'
 import { logger } from '../lib/logger.js'
 
-// A model that closes its message with a <quick_replies> block learns that a tag in its text turns
-// into an element of the chat, and writes a card the same way: `<ask_user>` as text, no tool call.
-// The prompt forbids it and Opus writes it anyway, so the tag is cut out of the text on its way.
 export const CARD_TAG_NAMES = Object.keys(HITL_TOOL_NAMES)
 
 const BRIDGE_PREFIXES = ['', 'rerun__', 'mcp__rerun__']
@@ -14,23 +11,15 @@ const CARD_TAG = new RegExp(`<\\/?(?:mcp__rerun__|rerun__)?(${CARD_TAG_NAMES.joi
 const FENCE = /^\s*```/
 
 
-// A `<` that opens a card tag, or could still once more text arrives: the tag name is incomplete,
-// or complete and waiting for its `>`. Held back until its line ends, where the tags are cut.
 function opensCardTag(text: string): boolean {
     const body = text.slice(1).replace(/^\//, '')
     return TAG_BODIES.some(candidate => candidate.startsWith(body) || (body.startsWith(candidate) && /^(?:\s[^>]*)?\/?(?:>|$)/.test(body.slice(candidate.length))))
 }
 
-// A tag right behind a backtick is inline code: a coworker explaining the format keeps its text.
 const quoted = (line: string, offset: number): boolean => offset > 0 && line[offset - 1] === '`'
 
-// `released` counts the characters of the current line already sent, which hold no tag. `gap` is
-// trailing whitespace held back so a cut at the end leaves none behind.
 type LineState = { line: string; released: number; inFence: boolean; gap: string; cut: boolean }
 
-// Removes the card tags from one model call's text, delta by delta. Only the tail of a line from a
-// `<` that could still become a tag is held back; the tags of a complete line go when it ends, and
-// a line that held nothing but a tag goes whole. A tag inside a code fence stays.
 export class CardTagSplitter {
     private readonly states = new Map<string, LineState>()
 
@@ -80,7 +69,6 @@ export class CardTagSplitter {
         return state.cut || !state.gap ? [] : [state.gap]
     }
 
-    // The line without its tags; `null` when the tags were all it held, so the line goes whole.
     private clean(state: LineState, line: string): string | null {
         if (state.inFence) return line
         let removed = false
@@ -102,8 +90,6 @@ export class CardTagSplitter {
     }
 }
 
-// The Stop hook's view of a message is the stream's: a tag in a code fence or in inline code stays
-// in the text, so it is no reason to hold the turn.
 export function cutsCardTag(text: string): boolean {
     let cut = false
     const splitter = new CardTagSplitter(() => (cut = true))

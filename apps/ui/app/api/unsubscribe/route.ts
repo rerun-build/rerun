@@ -11,9 +11,6 @@ function isCategory(value: string | null): value is EmailCategory {
     return value !== null && (EMAIL_CATEGORIES as readonly string[]).includes(value)
 }
 
-// One-click unsubscribe endpoint for the RFC 8058 `List-Unsubscribe-Post` header. A token scoped to
-// `runs` turns off the agent notification emails, which is what the link at the bottom of a run
-// email promises; an unscoped one turns off the given account category, or all of them.
 export async function POST(request: Request): Promise<NextResponse> {
     const url = new URL(request.url)
     const token = url.searchParams.get('token')

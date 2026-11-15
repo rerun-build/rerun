@@ -2,10 +2,6 @@ import type { EngineUsageBucket } from '@rerun/contracts'
 import { agentTileStyle, connectorTileStyle, type AgentStatus, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 import type { AgentStatusEntry } from '@rerun/ui/monitoring'
 
-// Frozen board decorating the right column of the brand cards: a few agents laid out, all `idle`
-// (no continuous animation), with no toasts, links or callbacks. Same airy layout as the hero,
-// stripped of every movement. Swapping col and row mirrors it horizontally (isoPosition: left is
-// proportional to col - row), so the grid "looks" left without flipping the labels.
 const AGENTS: { id: string; name: string; col: number; row: number; status: AgentStatus }[] = [
     { id: 'a-research', name: 'Researcher', col: 1, row: 1, status: 'idle' },
     { id: 'a-seo', name: 'SEO Analyst', col: 3, row: 3, status: 'waiting_human' },
@@ -22,8 +18,6 @@ export const TILES: Tile[] = AGENTS.map(a => ({
 
 export const LINKS: TileLink[] = [{ source: 'a-copy', target: 'a-publish', variant: 'beam' }]
 
-// The default card's board: agents at work, one of them waiting on its human, and the model marks
-// an agent can run on wired around them.
 const DEFAULT_AGENTS: typeof AGENTS = [
     { id: 'a-seo', name: 'SEO Writer', col: 1, row: 1, status: 'idle' },
     { id: 'a-ecom', name: 'Ecom Manager', col: 2, row: 6, status: 'waiting_human' },
@@ -62,9 +56,4 @@ export const MOCK_BUCKETS: EngineUsageBucket[] = [140, 210, 180, 260, 320, 280, 
     runCount: Math.round(k / 20),
 }))
 
-// The isogrid is an orthographic projection (isoPosition = parallel projection, no vanishing point).
-// The same plane is reproduced WITHOUT `perspective`: rotateX(60deg) gives a vertical foreshortening
-// of cos(60deg) = 0.5, which is the TILE_H/TILE_W ratio, and rotateZ(45deg) aligns the edges on the
-// tile diagonals. With no perspective the result is identical wherever the element sits, so a single
-// transform stays co-planar everywhere.
 export const ISO_TILT = 'rotateX(60deg) rotateZ(45deg)'

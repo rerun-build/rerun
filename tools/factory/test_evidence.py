@@ -1,4 +1,3 @@
-"""evidence.py tests: the GitHub fetcher is a fake keyed by API path. No network."""
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import evidence as E
@@ -28,7 +27,7 @@ def fake(data):
 class TestEvidence(unittest.TestCase):
     def test_stale_plan_ready_ignored(self):
         old = [cm(1, "08:00", PLAN), cm(2, "08:10", "1. fine\nPLAN READY"), cm(3, "08:20", PLAN.replace("Chunk", "Chunk v2"))]
-        self.assertEqual(E.challenge(fake({COMMENTS: old}), FULL, 209, 3)[0], "NONE")  # round 1's PLAN READY is before plan 3
+        self.assertEqual(E.challenge(fake({COMMENTS: old}), FULL, 209, 3)[0], "NONE")
         verdict, d = E.challenge(fake({COMMENTS: old + [cm(4, "08:30", "1. done-test missing\nPLAN REJECT: 1 points open")]}), FULL, 209, 3)
         self.assertEqual((verdict, d["comment"]), ("REJECT", 4))
         self.assertIn("done-test missing", d["text"])

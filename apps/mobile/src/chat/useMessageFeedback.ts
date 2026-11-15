@@ -7,8 +7,6 @@ import { clearMessageFeedback, fetchMessageFeedback, rateMessage, updateMessageF
 import { useAuth } from '@/auth/AuthProvider'
 import { promptText, showActionSheet } from '@/components/ui/system-dialogs'
 
-// The row id is a promise: the vote shows on the tap while the hub is still copying the transcript
-// off the engine, and both the details and an undo wait for that row.
 type Vote = { rating: MessageFeedbackRating; feedbackId: Promise<string | null> }
 type SessionVotes = { sessionId: string | null; votes: ReadonlyMap<string, Vote> }
 
@@ -40,8 +38,6 @@ function askDetails(rating: MessageFeedbackRating, t: FeedbackTranslator): Promi
     )
 }
 
-// The web's useMessageFeedback: a thumb per answer, a second tap on the same one takes the vote back,
-// and the details are asked once the vote has landed (a sheet dismissed still counts).
 export function useMessageFeedback(sessionId: string | null, scope: MessageFeedbackScope) {
     const { session, me } = useAuth()
     const t = useTranslations('mobileChat.feedback')
@@ -64,7 +60,6 @@ export function useMessageFeedback(sessionId: string | null, scope: MessageFeedb
         fetchMessageFeedback(caller, sessionId, scope)
             .then(rows => {
                 if (cancelled) return
-                // A tap that beat this read is newer than anything it returns.
                 updateVotes(current => new Map([...rows.map(row => [row.messageId, { rating: row.rating, feedbackId: Promise.resolve<string | null>(row.id) }] as const), ...current]))
             })
             .catch(() => {})

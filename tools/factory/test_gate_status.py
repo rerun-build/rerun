@@ -1,4 +1,3 @@
-"""gate.post_status tests: the status call is a stand-in. Nothing reads a token or posts to GitHub."""
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gate as G
@@ -15,9 +14,9 @@ class GateStatus(unittest.TestCase):
         self.assertEqual(calls[0], ("o/r", HEAD, "success", "factory/review", "gate PASS @cccccccc"))
         self.assertEqual(calls[1][2], "failure")
         G.LAST.clear()
-        G.post_status(0, lambda *a: calls.append(a))  # nothing read, nothing posted
+        G.post_status(0, lambda *a: calls.append(a))
         self.assertEqual(len(calls), 2)
-        G.post_status(0, lambda *a: 1 / 0)  # a failing call never changes the gate's answer
+        G.post_status(0, lambda *a: 1 / 0)
         G.post_status(1, lambda *a: calls.append(a))
         self.assertEqual(len(calls), 2)
 

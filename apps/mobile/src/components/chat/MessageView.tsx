@@ -30,12 +30,8 @@ import { VoiceUserMessage } from './VoiceUserMessage'
 
 type ToolPart = { type: string; toolName?: string; toolCallId?: string; state?: string; errorText?: string; input?: unknown; inputText?: string; output?: unknown }
 
-// The Foreman's shortcuts to a coworker: no question, nothing to answer, a chip under its text.
 const FOREMAN_SHORTCUTS = new Set(['show_agents', 'open_connector_setup'])
 
-// The quick replies are chips under the message, never a step. A HITL call is answered through its
-// block and its reply draws a receipt, so it only keeps its step when it failed, which is where the
-// error shows.
 function isStep(part: ToolPart): boolean {
     const name = toolNameOf(part)
     if (name === QUICK_REPLIES_TOOL) return false
@@ -44,8 +40,6 @@ function isStep(part: ToolPart): boolean {
 
 type Origin = { kind: 'install'; agentName: string; guide: string } | { kind: 'scheduled'; name: string; prompt: string } | { kind: 'webhook'; payload: TriggerPayload }
 
-// A first message no one typed. The hub lifts the install and the routine into metadata and keeps
-// the bare guide or prompt as text; a message streamed before that still carries its raw marker.
 function originOf(message: UIMessage): Origin | null {
     const metadata = message.metadata as ConversationMessageMetadata | undefined
     const text = messageText(message)
@@ -63,23 +57,15 @@ type MessageViewProps = {
     message: UIMessage
     isLastAssistant: boolean
     running: boolean
-    // The coworker whose files a card points at; the Foreman's live elsewhere, and its cards stay steps.
     agentId: string | null
-    // Where the conversation's uploads sit, a voice message's recording among them.
     fileOwner: FileOwner | null
     coworkerName: string
-    // A call drawn elsewhere for now, like the notification pinned until read.
     hiddenCallId: string | null
-    // The conversation's skill proposals, which a `skill_propose` call points at; none for the Foreman.
     skillProposals?: SkillProposals
-    // Stops one task of a delegation while its run goes on.
     onStopTask?: (taskId: string) => void
-    // Sends the last turn again, as the web's Regenerate.
     onRegenerate?: () => void
     feedback?: MessageFeedback
-    // When the message was sent, brought up under a bubble on a tap. Origins and receipts carry none.
     stamp?: MessageStamp
-    // The data the turn bought, given only to the turn's last assistant message.
     paidSources?: PaidTurnSources
 }
 
@@ -102,8 +88,6 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
         if (reply?.kind === 'mcp') return <McpReceipt name={reply.name} />
         if (reply?.kind === 'takeover') return <TakeoverReceipt url={reply.url} />
         if (reply?.kind === 'cancelled') return <CancelledReceipt of={reply.of} />
-        // The files of a message just sent are still on the phone; once read back, the ones it
-        // carried are on the Box, behind the hub.
         const local = message.parts.flatMap(part => (part.type === 'file' ? [{ url: part.url, name: part.filename ?? t('photo'), image: part.mediaType.startsWith('image/') }] : []))
         const stored = fileOwner ? attachmentsOf(message).map(({ name, path }) => ({ url: ownedFileUrl(fileOwner, path), name })) : []
         const media: ViewerItem[] = local.length > 0 ? local : stored
@@ -116,7 +100,6 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
     const blocks: Block[] = []
     let buffer = ''
     let steps: StepItem[] = []
-    // A shortcut the Foreman draws before it writes about it, shown under that text as on the web.
     let underText: Block[] = []
     const lastPart = message.parts.length - 1
     const subRuns = pairSubRuns(message.parts as { type: string; id?: string; toolCallId?: string; toolName?: string; data?: unknown }[])
@@ -177,7 +160,6 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
         if (!isToolPart(part)) return
         if (part.toolCallId === hiddenCallId && hiddenCallId) return
         const toolName = toolNameOf(part)
-        // As on the web, the row follows the proposal it raised and stays out while the dock holds it.
         if (toolName === 'skill_propose') {
             const proposalId = skillProposalIdOf(part.output)
             const proposal = proposalId && !skillProposals?.pinnedIds.has(proposalId) ? skillProposals?.proposals.get(proposalId) : undefined
@@ -215,7 +197,6 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
         addStep({ key: part.toolCallId ?? `s${index}`, symbol: toolSymbolOf(toolName), status: toolStatusOf(part.state), runningLabel: toolActivityOf(toolName, part.input, tTools) ?? t('runningTool', { tool: toolLabelOf(toolName, part.input, tTools) }), node: <ToolCallStep toolName={toolName} state={part.state} input={part.input} inputText={part.inputText} output={part.output} errorText={part.errorText} /> }, index)
     })
     flushSteps()
-    // The coworker stands once in the thread, beside the last steps it took.
     if (isLastAssistant && lastGroupAt >= 0) blocks[lastGroupAt] = { ...blocks[lastGroupAt], node: <StepGroup items={lastGroupItems} agentId={agentId} /> }
     const closing = buffer
     buffer = ''

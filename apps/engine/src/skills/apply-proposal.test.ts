@@ -96,8 +96,6 @@ describe('applySkillProposal', () => {
         expect(after?.appliedSlug).toBe('weekly-report')
     })
 
-    // writeSkill re-slugifies from the name, so a skill whose name drifted from its folder would
-    // fork a second one on every edit.
     it('edits in place when the name no longer matches the folder', async () => {
         await writeSkillFolder(id, { slug: 'publishing', name: 'Publishing posts', description: 'How posts go out', body: 'Draft, review, publish.', files: [] })
         const before = readdirSync(skillsDir(id)).length
@@ -136,8 +134,6 @@ describe('applySkillProposal', () => {
     })
 })
 
-// The agent follows the box default, which is the keyless Rerun connection, while the user chats
-// on a subscription picked in the composer: the case where the Rerun budget is spent.
 describe('the model the skill is written with', () => {
     beforeEach(async () => {
         await rm(connectionsDir(), { recursive: true, force: true })

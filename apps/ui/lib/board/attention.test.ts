@@ -15,7 +15,6 @@ describe('attentionCountByAgent', () => {
         expect(counts).toEqual({ seo_chef: 2, writer: 1 })
     })
 
-    // Lu avec `?? 0` par le board : un agent tranquille n'a pas à porter un zéro sur sa face.
     it('leaves an agent with nothing pending out of the map', () => {
         expect(attentionCountByAgent([session('a', 'scout', 'idle')])).toEqual({})
         expect(attentionCountByAgent([])).toEqual({})

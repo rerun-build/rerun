@@ -7,8 +7,6 @@ import { CollectorSkipped, type Collector, type ExploreInput } from './types'
 
 const DEFAULT_ACTOR = 'apimaestro/linkedin-profile-detail'
 
-// Where the profile URL came from. Anything but `input` can be a namesake, which is the first thing
-// to check in the lab.
 export type ProfileSource = 'input' | 'site' | 'search'
 
 export type LinkedinPersonFindings = { url: string; source: ProfileSource; profile: RawLinkedinProfile }

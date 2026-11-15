@@ -11,11 +11,8 @@ export type RowFilter = z.infer<typeof rowFilterSchema>
 
 export const viewSortSchema = z.object({ column: z.string(), dir: z.enum(['asc', 'desc']) })
 
-// The same display vocabulary as a chat card, so a view the agent saved and a card it sends draw
-// the same way. Stored as JSON the agent can also write by hand, hence the forgiving catches.
 export const tableViewConfigSchema = z.object({
     layout: z.enum(CARD_LAYOUTS).catch('table'),
-    /** table layout only: which columns to show, in this order. */
     columns: z.array(z.string()).optional().catch(undefined),
     fields: cardFieldsSchema.optional().catch(undefined),
     formats: z.record(z.string(), z.string()).optional().catch(undefined),

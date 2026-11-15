@@ -5,8 +5,6 @@ type AccessSummaryInput = {
     isAdmin: boolean
     visibility: string | null | undefined
     access: BoxAccess
-    // Rows of `space_members` on the Box. Only an admin reads every row, so a member's count would
-    // be their own row at most: it is never shown to them.
     grantCount: number
     boxName: string
 }

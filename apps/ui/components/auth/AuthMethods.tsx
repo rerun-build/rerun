@@ -22,10 +22,6 @@ function Divider({ children }: { children: ReactNode }) {
 
 export type PhoneSurroundings = { beforePhone?: ReactNode; afterPhone?: ReactNode; phoneLastUsed?: boolean }
 
-// The ways into an account, one form at a time with the others a tap away. The forms belong to the
-// caller, which knows whether it signs in or upgrades an anonymous visitor: each is handed the
-// other ways in to draw beside its own field. The number leads everywhere: alone at the top on a
-// phone, where an in-app browser refuses Google, and under the providers on a computer.
 export function AuthMethods({
     initialMethod = 'phone',
     phoneLeadsAlone,
@@ -36,16 +32,11 @@ export function AuthMethods({
     lastUsed,
 }: {
     initialMethod?: AuthMethod
-    // Left out where nothing is rendered on the server, and read from the browser instead.
     phoneLeadsAlone?: boolean
-    // The provider buttons, Google and Apple. Null where none is configured.
     oauth: ReactNode
-    // Absent where signing in by phone is not offered: the email form leads alone.
     phone?: (surroundings: PhoneSurroundings) => ReactNode
     email: (beforeEmail: ReactNode) => ReactNode
-    // Switching remounts the form on its first step, which the form itself does not report.
     onMethodChange?: (method: AuthMethod) => void
-    // Forced by the lab; read from this browser everywhere else. The provider buttons read it themselves.
     lastUsed?: LastSignInMethod | null
 }) {
     const t = useTranslations('auth.methods')

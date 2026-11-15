@@ -1,10 +1,6 @@
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import type { MiddlewareHandler } from 'hono'
 
-// The foreman is rewritten from code at every boot, so nothing about it is editable over HTTP but
-// its model: the hub may talk to it, read it, its conversations and its runs, stop a run or one of
-// its delegated tasks, hand it the files of a chat message and pin the model it runs on, and that
-// is all.
 const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'GET', path: /^\/agents\/foreman$/ },
     { method: 'POST', path: /^\/agents\/foreman\/chat$/ },
@@ -23,7 +19,6 @@ const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'DELETE', path: /^\/agents\/foreman\/files$/ },
 ]
 
-// The only fields ensureForeman carries over a reboot, so the only ones worth accepting.
 const FOREMAN_MODEL_FIELDS = new Set(['connectionId', 'provider', 'model'])
 
 async function patchesOnlyTheModel(c: Parameters<MiddlewareHandler>[0]): Promise<boolean> {

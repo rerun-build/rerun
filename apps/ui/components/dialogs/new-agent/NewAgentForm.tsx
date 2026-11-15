@@ -7,15 +7,10 @@ import { type ReactNode, type RefObject, useRef } from 'react'
 
 const ORB_SIZE = 56
 
-// What a capture needs and a user never does: a draft and its reading to open on, the element the
-// pointer rests on, the cursor drawn in its place, and a caret drawn in the field.
 export type NewAgentStill = { draft: NewAgentDraft; reading?: JobReading; aim?: string; cursorRef?: RefObject<HTMLElement | null>; drawnCaret?: boolean; overlay?: ReactNode }
 
-// The floor shows across the room and fades before the dialog's edges, centred on the content.
 const FADE = 'radial-gradient(ellipse 820px 520px at 50% calc(50% + 240px), #000 0%, rgba(0,0,0,0.6) 50%, transparent 100%)'
 
-// The Orb's light falls on the floor too: the same cone from the same moving source, swung the same
-// way, with a little brighter lines where it lands.
 function floorLight(focused: boolean): FloorLight {
     const source = 'calc(50% + var(--orb-x, 0px)) calc(50% + var(--orb-y, 0px))'
     return {
@@ -25,12 +20,6 @@ function floorLight(focused: boolean): FloorLight {
     }
 }
 
-// The Orb is the only light in the dialog, and it follows the pointer. The question and its field
-// are one block; the suggestions sit a clear step below, and the templates a step further, as the
-// other way in.
-//
-// Nothing is created here: `onCreate` receives the agent as described, and whoever owns the dialog
-// sends it to the board to be placed.
 export function NewAgentForm({ suggestions, suggestionsHeading, catalog, read, onCreate, onBrowseTemplates, still }: { suggestions: AgentSuggestion[]; suggestionsHeading?: string; catalog: ConnectorCatalog | null; read: JobReader; onCreate: (agent: NewAgentRequest) => void; onBrowseTemplates: () => void; still?: NewAgentStill }) {
     const t = useTranslations('dialogs.newAgent')
     const rootRef = useRef<HTMLDivElement>(null)
@@ -40,7 +29,6 @@ export function NewAgentForm({ suggestions, suggestionsHeading, catalog, read, o
 
     return (
         <div ref={rootRef} className="relative isolate flex min-h-0 flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-background px-4 sm:h-full sm:overflow-hidden sm:px-10">
-            {/* Sits a little above the middle of the dialog, where the eye puts the centre. */}
             <div className="relative flex w-full max-w-[700px] flex-col items-center pt-6 pb-8 sm:my-auto sm:pt-0 sm:pb-12">
                 <div className="hidden sm:contents">
                     <Floor fade={FADE} lights={[floorLight(described)]} style={{ top: ORB_SIZE / 2 }} />

@@ -1,14 +1,3 @@
-// The 3D-glass band that opens an email, from the prompt to the JPEG. Two scripts fill it in:
-// generate-email-scenes.mts for the re-engagement banners, generate-newsletter-art.mts for the
-// header of a newsletter issue. The prompt grammar follows the `rerun-image-glass` skill and is
-// shared with scripts/generate-category-art.mts, so a banner, an issue header and a category tile
-// read as the same family: only the hero pictogram, the satellites and the tilt change.
-//
-// Two things are specific to an email. The hero has to be horizontal, because the square-ish render
-// is cut down to a wide band and a portrait glyph loses its head and its feet. And the bottom of
-// that band fades from the style's absolute black into the card surface, so the art melts into the
-// email instead of sitting on it as a black rectangle.
-
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -18,11 +7,8 @@ import sharp from 'sharp'
 
 const MODEL = 'openai/gpt-image-2'
 
-// The card is 520px wide, so 1040 covers it at 2x. The height is the widest band that still holds a
-// tilted glyph whole once the render is cut down to it.
 export const WIDTH = 1040
 export const HEIGHT = 480
-// How far up the band the card surface has taken over completely.
 const FADE = 170
 const CARD_SURFACE = '#171717'
 
@@ -30,15 +16,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const RAW_DIR = join(ROOT, '..', '..', '.context', 'images')
 
 export type GlassSubject = {
-    // How the hero is referred to in the rest of the prompt, so the sentences stay grammatical.
     noun: string
     hero: string
     satellites: string
     tilt: string
     dense: string
     sparse: string
-    // Only a human glyph overrides it: the blanket `no people` clause makes the model refuse to
-    // draw one.
     people?: string
 }
 
@@ -65,8 +48,6 @@ export function configureFal() {
     fal.config({ credentials: process.env.FAL_KEY })
 }
 
-// A draw that is already good is worth keeping: the raw render is cached under .context/images, and
-// a second run cuts that file again instead of paying for a new one. Delete it to force a render.
 async function draw(cacheKey: string, subject: GlassSubject): Promise<Buffer> {
     const cached = join(RAW_DIR, `${cacheKey}.png`)
     if (existsSync(cached)) return readFile(cached)
@@ -83,8 +64,6 @@ async function draw(cacheKey: string, subject: GlassSubject): Promise<Buffer> {
     return png
 }
 
-// The band is cut around where the light actually is rather than around the middle of the frame:
-// the hero is by far the brightest thing in the render, so the luminance centroid is the hero.
 async function bandTop(png: Buffer, height: number, band: number): Promise<number> {
     const { data, info } = await sharp(png).greyscale().resize({ width: 64 }).raw().toBuffer({ resolveWithObject: true })
 
@@ -115,7 +94,6 @@ export async function renderBand(cacheKey: string, subject: GlassSubject, outFil
     const { width = 0, height = 0 } = await sharp(png).metadata()
     const band = Math.round(width / (WIDTH / HEIGHT))
 
-    // JPEG, not PNG: the render is photographic, and a palette PNG bands visibly across the fade.
     const jpeg = await sharp(png)
         .extract({ left: 0, top: await bandTop(png, height, band), width, height: band })
         .resize(WIDTH, HEIGHT)

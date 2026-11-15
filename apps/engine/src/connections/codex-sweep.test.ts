@@ -43,7 +43,6 @@ describe('sweepCodexHome', () => {
         expect((await readdir(codexHomeDir(CODEX_ID))).sort()).toEqual(['auth.json', 'config.toml', 'skills'])
     })
 
-    // The rollouts are what a resumed thread is read back from: once they are gone, so is the thread.
     it('forgets the threads of the connection it sweeps', async () => {
         rememberCodexThread('agent', 'session', { threadId: 'thread-1', connectionId: CODEX_ID, throughMessageId: 'msg-1' })
         await sweepCodexHome(CODEX_ID)

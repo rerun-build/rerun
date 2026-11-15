@@ -1,8 +1,5 @@
 import { useSyncExternalStore } from 'react'
 
-// What is typed in each conversation's composer, by conversation as the web keys its drafts. Held
-// here rather than in the composer: a widget that answers in its place unmounts it, and the text
-// must still be there when it comes back.
 const drafts = new Map<string, string>()
 const listeners = new Set<() => void>()
 
@@ -23,7 +20,6 @@ export function setDraft(key: string, text: string) {
     listeners.forEach(listener => listener())
 }
 
-/** Puts text back in a conversation's composer, unless something is already typed there. */
 export function restoreDraft(key: string, text: string): boolean {
     if (draftOf(key).trim()) return false
     setDraft(key, text)

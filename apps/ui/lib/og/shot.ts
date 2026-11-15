@@ -1,11 +1,7 @@
 import { site } from '@/lib/site'
 
-// Rerun Shot: our own URL-in / image-out service (Fastify + Playwright). Anything satori cannot
-// draw - the isogrid board above all - is captured from a real browser instead of redrawn.
 const DEV = process.env.NODE_ENV === 'development'
 
-// The hosted service cannot reach a laptop, so in dev the default is a local instance
-// (`pnpm dev` in ~/Documents/Dev/rerun-shot), which is allowed to capture localhost.
 const SHOT_URL = process.env.RERUN_SHOT_URL ?? (DEV ? 'http://localhost:4600' : 'https://shot.rerun.build')
 const SHOT_API_KEY = process.env.RERUN_SHOT_API_KEY
 
@@ -17,19 +13,12 @@ export type CaptureFormat = 'png' | 'webp'
 
 export type Capture = { body: Buffer; contentType: string }
 
-// `requestUrl` is what the render page is reached on in dev, where the port is whatever `next dev`
-// settled for and rarely matches NEXT_PUBLIC_APP_URL. In production the request may arrive on an
-// internal host of the reverse proxy, so the configured public origin wins.
-// RERUN_SHOT_RENDER_ORIGIN is where the capturing browser reaches this app when that is not the
-// public address: a self-hosted engine next to it on the compose network.
 function renderOrigin(requestUrl: string): string {
     if (process.env.RERUN_SHOT_RENDER_ORIGIN) return process.env.RERUN_SHOT_RENDER_ORIGIN
     if (DEV) return new URL(requestUrl).origin
     return process.env.NEXT_PUBLIC_APP_URL ?? site.url
 }
 
-// `waitFor: null` captures a page we did not write, which carries no ready marker: the service then
-// shoots once the page has loaded.
 export async function capturePage(
     path: string,
     { requestUrl, width, height, scale = 1, format, fresh, waitFor = OG_READY_SELECTOR, dark }: { requestUrl: string; width: number; height: number; scale?: number; format: CaptureFormat; fresh?: boolean; waitFor?: string | null; dark?: boolean },

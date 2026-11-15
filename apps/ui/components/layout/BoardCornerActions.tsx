@@ -5,9 +5,6 @@ import { useEffect, useRef } from 'react'
 import { GettingStartedPill } from '@/components/foreman/getting-started/GettingStartedPill'
 import { WorkspaceInbox } from '@/components/notifications/WorkspaceInbox'
 
-// Le bas n'est pas toujours le bas : la bannière cookies est `fixed bottom-0 z-60` en mobile, donc
-// les boutons s'assoient sur l'inset qu'elle publie, comme la barre avec laquelle ils s'alignent.
-// La rangée publie sa largeur : l'orbe Foreman, parquée dans ce coin, s'assoit juste à sa droite.
 export function BoardCornerActions() {
     const rowRef = useRef<HTMLDivElement>(null)
     useEffect(() => {

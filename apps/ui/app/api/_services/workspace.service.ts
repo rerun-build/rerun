@@ -7,8 +7,6 @@ import type { WorkspaceSummary } from '@rerun/contracts'
 
 type Client = SupabaseClient<Database>
 
-// The workspaces the caller can switch to, as the web switcher lists them: every membership, the
-// expert sandbox left out, oldest first. Read with the caller's own client, so RLS scopes it.
 export async function listUserWorkspaces(supabase: Client, userId: string): Promise<WorkspaceSummary[]> {
     const { data: memberships, error: membershipsError } = await selectMany(supabase, 'workspace_members', ['workspace_id', 'role', 'box_scope'] as const, { user_id: userId })
     if (membershipsError) throw membershipsError

@@ -7,13 +7,9 @@ import { LINK_PITCH, TILE_H, TILE_W, routeTileLinks, type AxisPoint, type Tile, 
 import { LOOP_MS, factoryScene } from '@/components/factory/factory-scene'
 import { sceneFromSnapshot } from '@/components/factory/from-snapshot'
 
-// The router that lays out every link of a board at once: ends spread side by side on the face that
-// looks at the other end, routes leaving perpendicular, never sharing a stretch, never crossing a tile.
-
 const tile = (id: string, col: number, row: number, span = 2): Tile => ({ id, position: { col, row }, span, style: { color: '#fff' } })
 const link = (source: string, target: string, variant: TileLink['variant'] = 'belt'): TileLink => ({ source, target, variant })
 
-// Half a belt's width in axis units: 13 px on screen, over the px between two lines one axis unit apart.
 const HALF = 6.5 / ((TILE_W * TILE_H) / Math.hypot(TILE_W, TILE_H))
 const EPS = 1e-6
 
@@ -26,7 +22,6 @@ const segmentsOf = (key: string, points: AxisPoint[]): Seg[] =>
             : { key, axis: 1, c: a.u, lo: Math.min(a.v, b.v), hi: Math.max(a.v, b.v) }
     })
 
-// Every defect of a set of routes: two belts on one stretch, a belt over a tile, a crossing.
 function findConflicts(tiles: Tile[], links: TileLink[]) {
     const routes = routeTileLinks(tiles, links)
     const seen = new Set<string>()
@@ -62,8 +57,6 @@ function findConflicts(tiles: Tile[], links: TileLink[]) {
     return { routes, shared, crossings, hits }
 }
 
-// Sideways steps: a stretch no longer than a pitch between two stretches heading the same way, the S a
-// line makes when it changes lane mid-run instead of at a corner.
 function sidewaysSteps(routes: Map<string, AxisPoint[]>) {
     const steps: string[] = []
     for (const [key, points] of routes) {
@@ -76,7 +69,6 @@ function sidewaysSteps(routes: Map<string, AxisPoint[]>) {
     return steps
 }
 
-// The along-face coordinates of the ends leaving `id` through its +u face (u = col + span).
 const portsOnPlusU = (routes: Map<string, AxisPoint[]>, id: string, targets: string[], plane: number) =>
     targets.map(t => {
         const [first, second] = routes.get(`${id}->${t}`)!
@@ -95,7 +87,6 @@ describe('routeTileLinks', () => {
         expect(routes.get('b->a')).toEqual([...points].reverse())
     })
 
-    // The owner's rule: the ends of one face are centred on it and spaced a pitch apart.
     it.each([
         { n: 1, offsets: [0] },
         { n: 2, offsets: [-LINK_PITCH / 2, LINK_PITCH / 2] },
@@ -127,7 +118,6 @@ describe('routeTileLinks', () => {
     })
 
     it('keeps a straight line in one lane from face to face, with no sideways step', () => {
-        // The hub's +u face carries two ends, so its straight one sits off centre: the far end follows it.
         const tiles = [tile('hub', 1, 4), tile('ahead', 12, 4), tile('below', 12, 12)]
         const routes = routeTileLinks(tiles, [link('hub', 'ahead'), link('hub', 'below')])
         const straight = routes.get('hub->ahead')!
@@ -143,7 +133,6 @@ describe('routeTileLinks', () => {
         const joined = routeTileLinks(tiles, [link('a', 'b'), link('a', 'c')]).get('a->b')!
         expect(alone).toHaveLength(2)
         expect(joined).toHaveLength(2)
-        // It slides along the face by half a pitch to make room, and keeps its shape.
         expect(Math.abs(joined[0].v - alone[0].v)).toBeCloseTo(LINK_PITCH / 2)
         expect(joined[1].v).toBeCloseTo(joined[0].v)
     })

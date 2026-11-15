@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { cn } from '../../cn'
 import { ImageIcon } from '../../icons'
 
-/** Turns a file path the agent stored into a URL the reader can load, or null when it cannot. */
 export type FileUrl = (path: string) => string | null
 
 function resolveSrc(src: unknown, fileUrl?: FileUrl): string | null {
@@ -17,7 +16,6 @@ function resolveSrc(src: unknown, fileUrl?: FileUrl): string | null {
     return fileUrl?.(value) ?? null
 }
 
-/** An image the agent pointed at, which can be hotlink-blocked or gone: it falls back to a glyph. */
 export function CardThumb({ src, fileUrl, className }: { src: unknown; fileUrl?: FileUrl; className?: string }) {
     const url = resolveSrc(src, fileUrl)
     const [brokenUrl, setBrokenUrl] = useState<string | null>(null)
@@ -35,7 +33,6 @@ export function CardThumb({ src, fileUrl, className }: { src: unknown; fileUrl?:
 
 const AVATAR_TINTS = ['bg-brand/15 text-brand', 'bg-cyan-500/15 text-cyan-600', 'bg-green-500/15 text-green-600', 'bg-orange-500/15 text-orange-600', 'bg-pink-500/15 text-pink-600']
 
-/** A round photo when the row has one, the initials of the title on a hashed tint otherwise. */
 export function CardAvatar({ src, fileUrl, name, className }: { src?: unknown; fileUrl?: FileUrl; name: string; className?: string }) {
     const url = resolveSrc(src, fileUrl)
     const [brokenUrl, setBrokenUrl] = useState<string | null>(null)

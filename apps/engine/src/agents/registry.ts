@@ -19,14 +19,10 @@ export function unloadAgent(id: string): void {
     releaseAgentMcp(id)
 }
 
-// Every LoadedAgent carries the shared instance of its box connection, so a connection edit
-// invalidates all of them at once rather than being tracked per agent.
 export function clearAgentCache(): void {
     cache.clear()
 }
 
-// A server still declared keeps its connection: the pool redials it on its own if how it is dialed
-// changed. One taken out of the config is closed now rather than left to idle out.
 export async function reloadAgent(id: string): Promise<LoadedAgent> {
     cache.delete(id)
     const agent = await getAgent(id)

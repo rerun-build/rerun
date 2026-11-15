@@ -10,8 +10,6 @@ import './styles.css'
 
 const kitPacks = import.meta.glob<{ default: MessageTree }>('../../../../../packages/i18n/messages/*/kit.json', { eager: true })
 
-// The shell's pages follow the system's light or dark appearance, or the one a caller passes (the
-// find bar matches the app it sits on).
 function applyTheme(): void {
     const requested = new URLSearchParams(location.search).get('theme')
     const media = matchMedia('(prefers-color-scheme: dark)')

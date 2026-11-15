@@ -37,8 +37,6 @@ function clamp(value: number | undefined, max: number): number | undefined {
     return value === undefined ? undefined : Math.min(Math.max(1, Math.floor(value)), max)
 }
 
-// The API links related resources by URL rather than by id, so an id given by the agent has to
-// be expanded back into the href the payload expects.
 function hrefOf(collection: string, id: string): { href: string } {
     return { href: `${TYPEFORM_BASE}/${collection}/${id}` }
 }
@@ -323,8 +321,6 @@ export const typeformProvider: ManagedProvider = {
     oauth: {
         authorizationEndpoint: `${TYPEFORM_BASE}/oauth/authorize`,
         tokenEndpoint: `${TYPEFORM_BASE}/oauth/token`,
-        // Typeform spells the refresh-token scope "offline" (not the usual offline_access), and
-        // without it access tokens simply expire after a week with no way to renew them.
         scopes: ['offline', 'accounts:read', 'forms:read', 'forms:write', 'responses:read', 'themes:read', 'images:read', 'workspaces:read', 'webhooks:read', 'webhooks:write'],
         clientIdEnv: 'RERUN_TYPEFORM_CLIENT_ID',
         clientSecretEnv: 'RERUN_TYPEFORM_CLIENT_SECRET',

@@ -3,11 +3,6 @@ import { coversTheBoard } from '@/lib/foreman-open'
 export type ForemanCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 export type ForemanDockSide = 'left' | 'right'
 
-/**
- * Où la colonne se pose à partir de `md`. `width` et `height` sont la taille de la fenêtre flottante,
- * `dockWidth` la largeur de la piste docké : les deux voyagent avec l'autre mode, redocker puis
- * refaire flotter rend chaque taille qu'on avait tirée.
- */
 export type ForemanPlacement = ({ mode: 'dock'; side: ForemanDockSide } | { mode: 'float'; corner: ForemanCorner }) & ForemanSizes
 type ForemanSizes = { width: number; height: number; dockWidth: number }
 
@@ -22,17 +17,13 @@ export const FOREMAN_FLOAT_MIN_SIZE = { width: 360, height: 420 }
 export const FOREMAN_DOCK_DEFAULT_WIDTH = 480
 export const FOREMAN_DOCK_MIN_WIDTH = 360
 const FOREMAN_DOCK_MAX_WIDTH = 800
-/** La part de l'écran que la piste docké peut prendre au board. Doit rester d'accord avec le `60vw` des classes de piste. */
 const FOREMAN_DOCK_MAX_VIEWPORT_SHARE = 0.6
-/** L'écart au bord de l'écran sous lequel lâcher la colonne la docke au lieu de la faire flotter. */
 const DOCK_SNAP_DISTANCE = 80
-/** Ce que la fenêtre flottante laisse autour d'elle : 1rem de marge plus l'inset du board, de chaque côté. */
 const FLOAT_VIEWPORT_GUTTER = 50
 
 export const DEFAULT_FOREMAN_PLACEMENT: ForemanPlacement = { mode: 'dock', side: 'right', ...FOREMAN_FLOAT_DEFAULT_SIZE, dockWidth: FOREMAN_DOCK_DEFAULT_WIDTH }
 
 const CORNERS: readonly ForemanCorner[] = ['top-left', 'top-right', 'bottom-left', 'bottom-right']
-// Le suffixe de largeur du dock est arrivé après coup : un cookie écrit sans lui reste valide.
 const PLACEMENT_PATTERN = /^(dock|float)-(left|right|top-left|top-right|bottom-left|bottom-right):(\d{2,4})x(\d{2,4})(?::(\d{2,4}))?$/
 
 export function isForemanCorner(value: unknown): value is ForemanCorner {
@@ -66,7 +57,6 @@ export function loadForemanPlacement(): ForemanPlacement {
     }
 }
 
-/** Même montage que l'ouverture (lib/foreman-open) : le cookie laisse le serveur rendre la colonne déjà à sa place. */
 export function rememberForemanPlacement(placement: ForemanPlacement): void {
     if (coversTheBoard()) return
     const value = serializeForemanPlacement(placement)
@@ -102,10 +92,6 @@ export function resolveCorner(point: Point, viewport: Size): ForemanCorner {
     return `${vertical}-${horizontal}`
 }
 
-/**
- * La place où la colonne atterrira si on la lâche maintenant. Le dock se décide sur le pointeur, qui
- * doit toucher le bord ; le coin sur le centre de la fenêtre, qui est ce que l'œil voit bouger.
- */
 export function resolveDropTarget({ pointer, panelCenter, viewport, size }: { pointer: Point; panelCenter: Point; viewport: Size; size: ForemanSizes }): ForemanPlacement {
     if (pointer.x <= DOCK_SNAP_DISTANCE) return { mode: 'dock', side: 'left', ...size }
     if (pointer.x >= viewport.width - DOCK_SNAP_DISTANCE) return { mode: 'dock', side: 'right', ...size }
@@ -130,7 +116,6 @@ export function sameForemanPlacement(a: ForemanPlacement, b: ForemanPlacement): 
     return serializeForemanPlacement(a) === serializeForemanPlacement(b)
 }
 
-/** Le côté dont la colonne occupe une piste de grille, ou `null` quand elle flotte, se déplace ou est fermée. */
 export function dockedForemanSide({ open, placement, dragging }: { open: boolean | null; placement: ForemanPlacement; dragging: boolean }): ForemanDockSide | null {
     if (open === false || dragging || placement.mode !== 'dock') return null
     return placement.side

@@ -5,7 +5,6 @@ import { supabase } from '@/auth/supabase'
 
 const FAILED = 'We could not sign you in with Apple. Try again.'
 
-// Resolves false when the person closed the Apple sheet: nothing to show then.
 export async function signInWithApple(): Promise<boolean> {
     let credential: AppleAuthentication.AppleAuthenticationCredential
     try {
@@ -19,8 +18,6 @@ export async function signInWithApple(): Promise<boolean> {
     const { error } = await supabase.auth.signInWithIdToken({ provider: 'apple', token: credential.identityToken })
     if (error) throw new SignInError(FAILED, 'apple')
 
-    // Apple hands the name over on the very first sign-in only, and leaves it out of the token: kept
-    // where the web reads it, or the account would never have one.
     const fullName = [credential.fullName?.givenName, credential.fullName?.familyName].filter(Boolean).join(' ')
     if (fullName) await supabase.auth.updateUser({ data: { full_name: fullName } })
     return true

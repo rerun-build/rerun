@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""job-cost <repo>#<issue> (Rob, 2026-11-10). Read-only. Sums Rerun's run records for one job.
-A run belongs to the job when its session has a user message containing `JOB <repo>#<issue>`,
-or (the dispatcher's own run) one of its tool calls carries that tag."""
 import json, os, sqlite3, sys
 A = "/data/agents"
 if len(sys.argv) < 2 or "#" not in sys.argv[1]:
@@ -23,7 +20,6 @@ for d in sorted(os.listdir(A)):
             if rid not in runs and sid not in sess:
                 continue
             if sid in sess and rid not in runs:
-                # only runs started after the first tagged message of that session
                 first = con.execute("select min(created_at) from messages where session_id=? and role='user' and content_json like ?", (sid, like)).fetchone()[0]
                 if t1 and first and t1 < first:
                     continue

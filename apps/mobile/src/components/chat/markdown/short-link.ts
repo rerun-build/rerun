@@ -4,11 +4,6 @@ const NON_BREAKING_HYPHEN = '‑'
 const WORD_JOINER = '⁠'
 const LAST_SEGMENT_MAX = 24
 
-/**
- * `github.com/…/pull/839`: the host, then the tail of the path, which is what tells two links apart.
- * The web's `shortenUrl` (apps/ui/lib/chat/composer-links.ts), read by hand: React Native's `URL`
- * has no `hostname` nor `pathname`.
- */
 export function shortenUrl(url: string): string {
     const parts = url.match(URL_PARTS)
     if (!parts) return url

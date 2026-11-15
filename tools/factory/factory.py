@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Factory scripts (Rob, 2026-11-10). One call replaces several tool calls.
-Commands: packet, wt, pr-open, ci-wait, risk, merge-dev, job-open, release-pr, repo-check.
-GitHub only through the gh/git wrappers; the token is never read or printed here."""
 import calendar, contextlib, json, os, re, signal, subprocess, sys, time, shutil, urllib.request
 
 GH, GIT = os.environ.get("FACTORY_GH") or "/data/tools/bin/gh", "/data/tools/bin/git"
@@ -9,7 +6,7 @@ OWNERS = ("special-place-ai-heaven", "special-place-administrator")
 WORK = os.environ.get("FACTORY_WORK", "/data/work")
 REPOS, WT, STATE = WORK + "/repos", WORK + "/wt", WORK + "/state"
 MAX_WORK_GB, MIN_FREE_GB = 20, 30
-MAX_BUILDERS = None  # override (tests); None reads limits.capacity()
+MAX_BUILDERS = None
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 try:
     import limits
@@ -18,7 +15,6 @@ except Exception:
 
 
 def max_builders():
-    """Builder capacity from limits.capacity() (runner.json builder_capacity); 3 when limits cannot be imported or read."""
     if MAX_BUILDERS:
         return MAX_BUILDERS
     try:
@@ -28,8 +24,8 @@ def max_builders():
 
 
 MIN_FREE_MEM_GB, MEMINFO = 4, "/proc/meminfo"
-LOCK_WAIT_S, LOCK_STALE_S = 180, 900  # stale > the longest hold (`git worktree add`, run() timeout 300 s)
-WT_IDLE_HOURS = 48  # `wt sweep`: no new commit and no `wt new` for this long counts as idle
+LOCK_WAIT_S, LOCK_STALE_S = 180, 900
+WT_IDLE_HOURS = 48
 QUEUE_LIMIT_S, SLICE_S = 30 * 60, 450
 PR_HEADS = ["## Done", "## Evidence", "## Not changed", "## Unsure", "## Open", "## Next owner and their done-test"]
 WF = r"\.github/(workflows|actions)/|\.github/(CODEOWNERS|dependabot\.yml)$"
@@ -77,7 +73,6 @@ def api(path, *args, paginate=False):
     try:
         return json.loads(r.stdout)
     except Exception:
-        # --paginate concatenates arrays
         try:
             return json.loads("[" + r.stdout.replace("][", "],[") + "]")[0] if r.stdout.strip() else None
         except Exception:
@@ -88,8 +83,6 @@ class RosterError(Exception):
 
 
 def base_roster(full):
-    """The roster read at `dev` (fallback: the repo default branch), never at a PR base or head.
-    Returns None when the repo has no roster (404); raises RosterError on any other error or an invalid file."""
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import roster as R
 
@@ -144,7 +137,6 @@ def checks(full, sha):
 
 
 def ci_state(cs):
-    """GREEN, RED, WAITING or NONE"""
     if not cs:
         return "NONE"
     bad = [c for c in cs if c["status"] == "completed" and c["conclusion"] in ("failure", "timed_out", "cancelled", "action_required", "startup_failure")]
@@ -159,7 +151,6 @@ def ci_table(cs):
     return "\n".join("  %-40s %-11s %s" % (c["name"][:40], c["status"], c["conclusion"] or "-") for c in sorted(cs, key=lambda c: c["name"])) or "  (no checks)"
 
 
-# ---------- packet
 def cmd_packet(a):
     if len(a) < 2:
         die("usage: packet <repo> <issue-or-PR number> [--full]")
@@ -206,7 +197,6 @@ def cmd_packet(a):
         print("- %s %s: %s" % (c["created_at"], c["user"]["login"], trim(c["body"], 600).replace("\n", "\n  ")))
 
 
-# ---------- wt
 def du_gb(p):
     r = run(["du", "-sk", p], check=False)
     try:
@@ -228,7 +218,6 @@ def wt_dirs():
 
 
 def wt_strays():
-    """Entries of WT and of WT/<repo> that are not folders: not worktrees, and not ours to remove."""
     out = []
     if os.path.isdir(WT):
         for r in os.listdir(WT):
@@ -249,7 +238,6 @@ def reg_path(repo, d):
 
 
 def reg_read(repo, d):
-    """The register record of worktree WT/<repo>/<d>, or {} for one made before the register existed."""
     try:
         with open(reg_path(repo, d)) as f:
             return json.load(f)
@@ -265,7 +253,6 @@ def age_h(rec):
 
 
 def avail_mem_gb():
-    """MemAvailable in GB, or None where /proc/meminfo or the line does not exist (the check is skipped, not failed)."""
     try:
         with open(MEMINFO) as f:
             for l in f:
@@ -278,7 +265,6 @@ def avail_mem_gb():
 
 @contextlib.contextmanager
 def builder_lock():
-    """Exclusive-create lock file (portable, no fcntl) around counting builders and the change that adds one."""
     lk, end = os.path.join(STATE, "builders.lock"), time.time() + LOCK_WAIT_S
     while True:
         try:
@@ -288,20 +274,19 @@ def builder_lock():
             bk = lk + ".break"
             try:
                 if time.time() - os.path.getmtime(lk) > LOCK_STALE_S:
-                    os.close(os.open(bk, os.O_CREAT | os.O_EXCL | os.O_WRONLY))  # one breaker at a time
+                    os.close(os.open(bk, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
                     try:
-                        if time.time() - os.path.getmtime(lk) > LOCK_STALE_S:  # recheck: another breaker may have taken a fresh lock since
+                        if time.time() - os.path.getmtime(lk) > LOCK_STALE_S:
                             os.remove(lk)
                     finally:
                         os.remove(bk)
                     continue
-            except FileExistsError:  # another caller is breaking it: wait; clear a bk left by a breaker that crashed mid-break
-                # shortcut: removing a stale bk has no guard of its own; the race needs a crash inside the break step first, so rare
+            except FileExistsError:
                 with contextlib.suppress(OSError):
                     if time.time() - os.path.getmtime(bk) > LOCK_STALE_S:
                         os.remove(bk)
             except OSError:
-                continue  # released between the open and the check
+                continue
             if time.time() > end:
                 die("another `wt new` or `pr-open --fix` holds %s for over %d s. Try again; if it stays, tell @boss." % (lk, LOCK_WAIT_S))
             time.sleep(0.2)
@@ -317,7 +302,6 @@ def builder_lock():
 
 
 def cap_check(quiet=False):
-    """Refuse at the cap; with quiet, return True when there is no room instead of refusing."""
     active = [(r, d) for r, d, p in wt_dirs() if not os.path.exists(marker(r, run([GIT, "rev-parse", "--abbrev-ref", "HEAD"], cwd=p, check=False).stdout.strip()))]
     if len(active) >= max_builders():
         if quiet:
@@ -329,9 +313,7 @@ PLAN_RE = re.compile(r"^\s*(PLAN READY|SMALL FIX)\b", re.M)
 
 
 def plan_check(full, issue):
-    """No worktree without a plan: the issue must carry a line starting PLAN READY (plan written and challenged) or SMALL FIX."""
     it = api("repos/%s/issues/%s" % (full, issue))
-    # shortcut: only the first 100 comments are read, page when an issue outgrows that
     cm = api("repos/%s/issues/%s/comments?per_page=100" % (full, issue))
     if not isinstance(it, dict) or not isinstance(cm, list):
         die("cannot read %s#%s on GitHub, so its plan cannot be checked. No worktree made." % (full, issue))
@@ -357,13 +339,11 @@ def on_remote(p, sha):
     return bool(run([GIT, "for-each-ref", "--contains", sha, "refs/remotes/origin"], cwd=p).stdout.strip())
 
 
-SWEEP_FETCH = None  # while a sweep runs: {clone path: fetch worked}; one fetch per clone per sweep
+SWEEP_FETCH = None
 
 
 def unsaved(p, path, branch):
-    """Tips of the worktree and its branch that are on no remote branch, or None when origin cannot be fetched."""
-    # --prune: a tracking ref of a branch deleted on GitHub must not count as proof
-    if SWEEP_FETCH is not None and p in SWEEP_FETCH:  # a sweep fetched this clone once already
+    if SWEEP_FETCH is not None and p in SWEEP_FETCH:
         if not SWEEP_FETCH[p]:
             return None
     elif run([GIT, "fetch", "--quiet", "--prune", "origin"], cwd=p, check=False).returncode:
@@ -374,8 +354,6 @@ def unsaved(p, path, branch):
 
 
 def wt_save(p, path, branch):
-    """Die (nothing deleted) unless every commit of the worktree and its branch is on a remote branch.
-    Unpushed commits go to rescue/<branch>-<sha8> first. Uncommitted changes refuse: pushing them could publish stray files."""
     if os.path.isdir(path) and run([GIT, "status", "--porcelain"], cwd=path).stdout.strip():
         die("%s has uncommitted changes. Commit and push them, or remove them yourself, then `wt done` again. Nothing deleted." % path)
     left = unsaved(p, path, branch)
@@ -390,20 +368,17 @@ def wt_save(p, path, branch):
 
 
 def unlink_links(d):
-    """Remove symlinks and junctions under d without entering them, so removing d cannot empty their targets."""
     for e in os.scandir(d):
         if e.is_symlink() or getattr(os.path, "isjunction", lambda _: False)(e.path):
             try:
                 os.unlink(e.path)
             except OSError:
-                os.rmdir(e.path)  # a directory symlink or junction on Windows
+                os.rmdir(e.path)
         elif e.is_dir():
             unlink_links(e.path)
 
 
 def empty_on_old_base(p, path, branch):
-    """(old sha7, new sha7, base) when the worktree has no commit ahead of its base, nothing uncommitted and HEAD is not
-    the current origin/<base>; else None (today's EXISTS)."""
     base = run([GIT, "config", "branch.%s.factorybase" % branch], cwd=p, check=False).stdout.strip()
     if not base or run([GIT, "fetch", "--quiet", "origin", base], cwd=p, check=False).returncode:
         return None
@@ -452,10 +427,9 @@ def cmd_wt(a):
         wt_save(p, path, branch)
         if os.path.isdir(path):
             unlink_links(path)
-            # --force only because unlinking a committed symlink dirties the tree; wt_save proved the work is saved
             run([GIT, "worktree", "remove", "--force", path], cwd=p)
         run([GIT, "worktree", "prune"], cwd=p, check=False)
-        run([GIT, "branch", "-D", branch], cwd=p, check=False)  # -D is safe: wt_save proved its commits are on a remote branch
+        run([GIT, "branch", "-D", branch], cwd=p, check=False)
         for f in (marker(repo, branch), reg_path(repo, "%s-%s" % (issue, chunk))):
             try:
                 os.remove(f)
@@ -463,7 +437,7 @@ def cmd_wt(a):
                 pass
         print("removed worktree %s and local branch %s" % (path, branch))
         return
-    existing = os.path.isdir(path)  # decided under the lock below: an empty worktree on an old base is replaced
+    existing = os.path.isdir(path)
     st = shutil.disk_usage("/data")
     if st.free / 2**30 < MIN_FREE_GB:
         die("/data has %.0f GB free, floor is %d GB. Tell @boss." % (st.free / 2**30, MIN_FREE_GB))
@@ -471,13 +445,13 @@ def cmd_wt(a):
     if mem is not None and mem < MIN_FREE_MEM_GB:
         die("%.1f GB of memory available, floor is %d GB. Tell @boss." % (mem, MIN_FREE_MEM_GB))
     os.makedirs(STATE, exist_ok=True)
-    with builder_lock():  # one sweep at a time: a second call waits, then finds the room the first one made
-        summary, kept = wt_sweep(True, only="REMOVE", quiet=True)  # finished worktrees go first, at every call; RESCUE stays with the explicit `wt sweep --apply`
+    with builder_lock():
+        summary, kept = wt_sweep(True, only="REMOVE", quiet=True)
         if du_gb(WORK) > MAX_WORK_GB:
             die("/data/work is over %d GB. Tell @boss; old worktrees need `wt done`.\n%s\n%s" % (MAX_WORK_GB, summary, "\n".join(kept)))
         if not existing and cap_check(quiet=True):
-            print("\n".join([summary] + kept))  # why there is no room
-            cap_check()  # early refusal before any fetch or push; repeated under the lock below
+            print("\n".join([summary] + kept))
+            cap_check()
     plan_check(full, issue)
     p = ensure_clone(full)
     info = api("repos/%s" % full)
@@ -491,7 +465,7 @@ def cmd_wt(a):
         run([GIT, "fetch", "--quiet", "origin"], cwd=p)
         print("created job branch %s from %s" % (base, default))
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with builder_lock():  # count and create together, so two calls cannot both take the last slot
+    with builder_lock():
         replaced = None
         if os.path.isdir(path):
             replaced = empty_on_old_base(p, path, branch)
@@ -502,7 +476,7 @@ def cmd_wt(a):
             unlink_links(path)
             run([GIT, "worktree", "remove", "--force", path], cwd=p)
             run([GIT, "worktree", "prune"], cwd=p, check=False)
-            run([GIT, "branch", "-D", branch], cwd=p, check=False)  # nothing ahead of origin: no local-only commit is lost
+            run([GIT, "branch", "-D", branch], cwd=p, check=False)
             for f in (marker(repo, branch), reg_path(repo, "%s-%s" % (issue, chunk))):
                 try:
                     os.remove(f)
@@ -531,7 +505,6 @@ def cmd_wt(a):
 
 
 def install_deps(path):
-    """Install dependencies in a fresh worktree that has a pnpm lockfile. Never fails `wt new`."""
     if not os.path.isfile(os.path.join(path, "pnpm-lock.yaml")):
         return
     t0 = time.time()
@@ -547,16 +520,14 @@ def install_deps(path):
 
 
 def pr_lookup(full, branch):
-    """PRs with head `branch` as [{number, state OPEN|CLOSED|MERGED, headRefOid}], or None when GitHub cannot be asked."""
     try:
         r = run([GH, "pr", "list", "-R", full, "--head", branch, "--state", "all", "--limit", "20", "--json", "number,state,headRefOid"], check=False)
         return None if r.returncode else json.loads(r.stdout or "[]")
-    except (ValueError, OSError):  # OSError: gh missing or not startable
+    except (ValueError, OSError):
         return None
 
 
 def sweep_verdict(full, r, d, path):
-    """(KEEP|REMOVE|RESCUE, reason, PRs of the branch) for worktree WT/<r>/<d>. Anything unclear is KEEP."""
     if not re.fullmatch(r"\d+-[a-z0-9]{1,12}", d):
         return "KEEP", "not made by `wt new`", []
     branch = "chunk/" + d
@@ -570,7 +541,7 @@ def sweep_verdict(full, r, d, path):
     if any(x.get("state", "").upper() == "OPEN" for x in prs):
         return "KEEP", "PR #%s open" % ", #".join(str(x["number"]) for x in prs if x.get("state", "").upper() == "OPEN"), prs
     sha = run([GIT, "rev-parse", "HEAD"], cwd=path).stdout.strip()
-    def settled(x):  # head must match: branch names are reused. A merged PR also counts when our HEAD is an ancestor of its head
+    def settled(x):
         st = x.get("state", "").upper()
         if x.get("headRefOid") == sha and st in ("MERGED", "CLOSED"):
             return True
@@ -583,14 +554,11 @@ def sweep_verdict(full, r, d, path):
     idle = (time.time() - last) / 3600
     work = ", ".join(x for x in ("%d unpushed commit tip(s)" % len(left) if left else "", "uncommitted changes" if dirty else "") if x)
     if work and idle >= WT_IDLE_HOURS:
-        # uncommitted changes make `wt done` refuse (KEPT): only a human may commit or drop them
         return "RESCUE", "idle %dh, %s, no open PR" % (idle, work), prs
     return "KEEP", "active: idle %dh, %s" % (idle, work or "no merged or closed PR"), prs
 
 
 def wt_sweep(apply, only=None, quiet=False):
-    """Dry run unless apply. REMOVE and RESCUE go through `wt done`, which saves unpushed commits or refuses.
-    One `git fetch --prune origin` per clone. With quiet, KEEP lines are not printed; returns (summary line, KEEP lines)."""
     global SWEEP_FETCH
     n, kept = {"KEEP": 0, "REMOVE": 0, "RESCUE": 0}, []
     dirs = wt_dirs()
@@ -606,7 +574,7 @@ def wt_sweep(apply, only=None, quiet=False):
 
 def _sweep_each(dirs, apply, only, quiet, n, kept):
     for r, d, path in dirs:
-        full = reg_read(r, d).get("repo") or repo_full(r)  # shortcut: a worktree older than the register is assumed under OWNERS[0]
+        full = reg_read(r, d).get("repo") or repo_full(r)
         verdict, why, prs = sweep_verdict(full, r, d, path)
         n[verdict] += 1
         line = "%-6s %s/%s  %s" % (verdict, r, d, why)
@@ -654,7 +622,6 @@ def has_heads(text, heads):
     return [h for h in heads if h not in text]
 
 
-# ---------- pr-open
 def cmd_pr_open(a):
     if "--template" in a:
         print(PR_TEMPLATE)
@@ -677,7 +644,7 @@ def cmd_pr_open(a):
         if "--fix" not in a:
             die("PR already open: %s. To push a fix for red CI use `pr-open --fix`." % ex[0]["url"])
         if os.path.exists(marker(short(full), branch)):
-            with builder_lock():  # a green worktree turns active again: same cap as `wt new`, checked before the push
+            with builder_lock():
                 cap_check()
                 try:
                     os.remove(marker(short(full), branch))
@@ -703,7 +670,6 @@ def cmd_pr_open(a):
     print("PR %s\nbase %s <- %s | %s commits | %d files\nNext: `ci-wait %s %s`. Fix a red result yourself; hand over only when green." % (url, base, branch, ahead, len(changed), short(full), url.rsplit("/", 1)[-1]))
 
 
-# ---------- ci-wait
 def cmd_ci_wait(a):
     if len(a) < 2:
         die("usage: ci-wait <repo> <PR> [--once]")
@@ -744,7 +710,6 @@ def cmd_ci_wait(a):
         print("WAITING (queued is waiting, not failed). Call `ci-wait` again (30-minute limit, %d min used). Do not push again." % (waited // 60))
 
 
-# ---------- risk
 RULES = [
     ("STOP", r"^\.github/(workflows|actions)/|^\.github/(CODEOWNERS|dependabot\.yml)$", "workflow or GitHub settings file: Rob only"),
     ("BRUCE", r"auth|oidc|keycloak|login|session|token|secret|password|crypto|permission|guard|role|cors|csrf|sanitize|upload", "auth, secrets or trust boundary"),
@@ -835,7 +800,6 @@ def jev_risk(title, files, need):
         return "Jev: call failed (%s); decided on the path table alone." % str(e)[:80]
 
 
-# ---------- merge-dev
 def cmd_merge_dev(a):
     if len(a) < 2:
         die("usage: merge-dev <repo> <PR> [--note 'one-line verdict, posted on the PR']")
@@ -877,7 +841,6 @@ def cmd_merge_dev(a):
             print("KEPT worktree %s/%s-%s: the merge stands, clean the worktree up and run `wt done` again." % (short(full), mm.group(1), mm.group(2)))
 
 
-# ---------- job-open / release-pr
 def cmd_job_open(a):
     if "--template" in a:
         print(ISSUE_TEMPLATE)
@@ -919,7 +882,6 @@ def cmd_release_pr(a):
     print("RELEASE PR %s\ninto %s, merging is Rob's step. After Rob says \"merged\", @boss saves the EverOS release entry." % (r.stdout.strip().splitlines()[-1], info["default_branch"]))
 
 
-# ---------- repo-check
 def cmd_repo_check(a):
     if not a:
         die("usage: repo-check <repo>")
@@ -955,7 +917,6 @@ CMDS = {"packet": cmd_packet, "wt": cmd_wt, "pr-open": cmd_pr_open, "ci-wait": c
         "merge-dev": cmd_merge_dev, "job-open": cmd_job_open, "release-pr": cmd_release_pr, "repo-check": cmd_repo_check}
 
 if __name__ == "__main__":
-    # SIGTERM skips `finally` by default; exit normally so builders.lock is released
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))
     name = os.environ.get("FACTORY_CMD") or (sys.argv[1] if len(sys.argv) > 1 else "")
     args = sys.argv[1:] if os.environ.get("FACTORY_CMD") else sys.argv[2:]

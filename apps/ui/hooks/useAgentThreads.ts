@@ -6,21 +6,12 @@ import { listAgentThreadsAction } from '@/app/api/_actions/session.actions'
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { useBoardStore } from '@/stores/board.store'
 
-// Several rows of the same coworker change within a second when a run ends: one read covers them.
 const REFRESH_DEBOUNCE_MS = 500
 
-/**
- * The threads General hangs under its messages. Read once; `refresh` reads again, debounced, and
- * the panel calls it from the one realtime channel it already holds on the coworker's sessions (a
- * new thread, a title, an outcome). What runs right now comes from the board's live statuses, like
- * the dots of the tabs, so a thread that starts or finishes moves without waiting for that read.
- */
 export function useAgentThreads(agentId: string): { threads: ThreadRow[]; refresh: () => void } {
     const [rows, setRows] = useState<ThreadRow[]>([])
     const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-    // A read the network drops (a laptop waking up before its connection) is taken again at the
-    // next realtime event or resync; the rows in hand stay until then.
     const refresh = useCallback(() => {
         if (timer.current) clearTimeout(timer.current)
         timer.current = setTimeout(() => {

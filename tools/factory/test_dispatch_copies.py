@@ -75,7 +75,7 @@ class Copies(unittest.TestCase):
         def account(tool, args):
             if tool == "send_message" and state["first"]:
                 state["first"] = False
-                raise D.Error("account send_message failed: TimeoutError")  # never arrived
+                raise D.Error("account send_message failed: TimeoutError")
             return real(tool, args)
         self.d.account = account
         self.beat()
@@ -93,7 +93,7 @@ class Copies(unittest.TestCase):
         self.beat(D.LOST_BEATS)
         self.assertEqual(self.d.store.get_job("1")["state"], "queued")
         before = len(self.w.sends)
-        self.w.clock += 3600  # past the transient backoff
+        self.w.clock += 3600
         self.beat()
         self.assertTrue(any(s[0] == "c1" for s in self.w.sends[before:]))
 
@@ -107,7 +107,7 @@ class Copies(unittest.TestCase):
         def account(tool, args):
             if tool == "send_message" and state["first"]:
                 state["first"] = False
-                raise D.Error("account send_message failed: TimeoutError")  # never arrived
+                raise D.Error("account send_message failed: TimeoutError")
             return real(tool, args)
         self.d.account = account
         self.beat()

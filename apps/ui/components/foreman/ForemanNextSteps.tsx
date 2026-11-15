@@ -31,11 +31,8 @@ function openLeadChat(agentId: string, conversationId: string, runId: string | n
     useForemanStore.getState().close()
 }
 
-/** Starts the lead's install and opens its chat already attached to the run. */
 export async function startLeadInstall(agentId: string, installFailedText: string, errorText: ReturnType<typeof useErrorText>): Promise<boolean> {
     track('agent_install_started', { agent_id: agentId })
-    // A run picks its connection the moment it starts and keeps it to the end: started beside the
-    // offer, the first install would always bill Rerun credits, whatever plan gets connected.
     const { connections } = await listAiConnectionsAction()
     const hasOwnConnection = connections.some(connection => connection.id !== RERUN_CONNECTION_ID && connection.connected)
     if (!hasOwnConnection) await useSubscriptionOfferStore.getState().offer(agentId)
@@ -46,17 +43,11 @@ export async function startLeadInstall(agentId: string, installFailedText: strin
         return false
     }
     useForemanStore.getState().setStartedLead({ agentId, conversationId: result.conversationId })
-    // The agent's own tabs read whether its install is under way from the engine: they learn it now
-    // rather than offering to start it again beside the chat this opens.
     invalidateAgentContext(agentId)
     openLeadChat(agentId, result.conversationId, result.runId)
     return true
 }
 
-// The run is started here rather than from the agent's own install button so the chat opens already
-// attached to it, and the Foreman gets out of the way the moment it does. Once started, the button
-// gives way to a row that leads back to that chat: the build stays the last thing said, so nothing
-// else would take it off a column reopened later.
 function StartLeadButton({ step }: { step: StartLeadStep }) {
     const t = useTranslations('foreman.nextSteps')
     const errorText = useErrorText()
@@ -113,8 +104,6 @@ function openBilling() {
     useBillingStore.getState().openBilling(undefined, 'foreman')
 }
 
-// The same card form the folded trial row reopens. The build follows on its own once the workspace
-// turns entitled (useForemanScriptedSteps).
 function openCheckout(step: CheckoutStep) {
     track('onboarding_next_step_clicked', { step: step.kind })
     track('checkout_started', { plan: BASE_PLAN_SLUG, source: 'foreman' })

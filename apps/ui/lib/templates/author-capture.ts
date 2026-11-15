@@ -15,12 +15,6 @@ import {
 import { AppError } from '@/lib/i18n/action-error'
 import { templateEditBlockCode } from './expert'
 
-// The ownership half of a capture: which template it writes into, which space it reads from, which
-// agents it may touch. `capture.ts` does the work and asks no questions, so every entry point goes
-// through here first — the panel and the MCP server alike.
-
-// The template the capture writes into, resolved from ownership. The slug comes back from the row
-// and is never accepted from a caller: it addresses both the update and the archive path.
 async function requireCaptureTarget(userId: string, templateId: string): Promise<string> {
     const owned = await assertTemplateOwnedBy(userId, templateId)
     const blocked = templateEditBlockCode(owned.status)
@@ -28,8 +22,6 @@ async function requireCaptureTarget(userId: string, templateId: string): Promise
     return owned.slug
 }
 
-// Fails closed on the whole selection rather than dropping the offending id, so a probe learns
-// nothing about which agent exists.
 async function assertAgentsInSpace(agentIds: string[], spaceId: string, workspaceId: number): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data } = await selectMany(supabase, 'agents', ['id'] as const, { id: { in: agentIds }, space_id: spaceId, workspace_id: workspaceId })

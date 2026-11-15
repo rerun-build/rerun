@@ -59,10 +59,6 @@ const WEEKLY_REPORT_SUGGESTION: Omit<AgentSuggestion, 'id'> = {
     apps: ['google-sheets', 'slack'],
 }
 
-// Hand written per industry rather than derived from the template catalogue, which is too coarse
-// and too volatile to derive a first task from, and a suggestion that misses is worse than a
-// generic one. Eight per industry, the most universal first: the dialog draws the first three as
-// cards, the rest are what a Box theme and the ideas of a company draw from.
 export const INDUSTRY_AGENT_SUGGESTIONS: Record<TemplateCategory, AgentSuggestion[]> = {
     agencies: [
         {
@@ -598,8 +594,6 @@ export const INDUSTRY_AGENT_SUGGESTIONS: Record<TemplateCategory, AgentSuggestio
     other: [],
 }
 
-// Someone whose site told us nothing we can bucket, or who skipped the question, gets the jobs that
-// read as useful whatever the business, rather than an empty section.
 export const DEFAULT_AGENT_SUGGESTIONS: AgentSuggestion[] = [
     { id: 'default-seo', ...SEO_SUGGESTION },
     { id: 'default-inbox', ...INBOX_SUGGESTION },
@@ -618,8 +612,6 @@ export const DEFAULT_AGENT_SUGGESTIONS: AgentSuggestion[] = [
     { id: 'default-weekly-report', ...WEEKLY_REPORT_SUGGESTION },
 ]
 
-// Takes a plain string, not a `TemplateCategory`: the stored answer comes back out of a jsonb
-// column, so it is whatever was written there once, including a label a later revision drops.
 export function agentSuggestionsForIndustry(industry: string | null | undefined): AgentSuggestion[] {
     if (!industry || !isTemplateCategory(industry)) return DEFAULT_AGENT_SUGGESTIONS
     const suggestions = INDUSTRY_AGENT_SUGGESTIONS[industry]

@@ -45,7 +45,6 @@ describe('parseTriggerPayload', () => {
         expect(parsed?.body).toBe('hello </trigger_payload> world')
     })
 
-    // A `>` inside an attribute must not be read as the end of the tag.
     it('survives an angle bracket inside an attribute', () => {
         const parsed = parseTriggerPayload(`Go.\n\n${block(`${attrs} query="filter=a>b"`, 'ok')}`)
         expect(parsed?.query).toBe('filter=a>b')

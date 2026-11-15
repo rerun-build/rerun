@@ -8,7 +8,6 @@ export const runSchema = z.object({
     agentId: z.string(),
     sessionId: z.string(),
     status: runStatusSchema,
-    // Model steps; for the CLI providers (claude, codex) a turn is one step, so it counts tool calls.
     stepCount: z.number(),
     usageJson: z.string().nullable(),
     provider: z.string().nullable(),
@@ -24,7 +23,6 @@ export const runSchema = z.object({
     startedAt: z.string(),
     finishedAt: z.string().nullable(),
     error: z.string().nullable(),
-    // Lineage and job fields: absent on an older engine, null when unknown; absent and null mean the same.
     initiatorAgentId: z.string().nullable().optional(),
     initiatorRunId: z.string().nullable().optional(),
     initiatorSessionId: z.string().nullable().optional(),
@@ -32,7 +30,6 @@ export const runSchema = z.object({
     jobRef: z.string().nullable().optional(),
     branch: z.string().nullable().optional(),
     copyIndex: z.number().int().nullable().optional(),
-    // Present on a run read; null when the run had no goal. Absent on an older engine.
     goal: runGoalRecordSchema.nullable().optional(),
 })
 export type Run = z.infer<typeof runSchema>
@@ -56,7 +53,6 @@ export const runStepSchema = z.object({
     cachedInputTokens: z.number().nullable(),
     reasoningTokens: z.number().nullable(),
     totalTokens: z.number().nullable(),
-    // Absent on an engine that predates the `step-cache-cost` migration (system.db v3).
     cacheWriteTokens: z.number().nullable().optional(),
     costMicros: z.number().nullable().optional(),
     toolCallCount: z.number(),

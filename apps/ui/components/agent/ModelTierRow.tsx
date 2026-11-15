@@ -7,14 +7,10 @@ type ModelTierRowProps = {
     label: string
     description?: string
     power?: number
-    // Not included in the workspace's plan: the badge replaces whatever the row would trail with.
     locked?: boolean
     trailing?: ReactNode
 }
 
-// The inside of a Rerun tier's row, and of any row the plan locks, shared by every model picker. The
-// container (a CommandItem, a SelectItem) stays the picker's own, and so does the check that marks
-// the current pick.
 export function ModelTierRow({ label, description, power, locked, trailing }: ModelTierRowProps) {
     const t = useTranslations('agent.modelTierRow')
     return (

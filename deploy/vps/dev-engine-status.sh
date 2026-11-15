@@ -1,10 +1,4 @@
 #!/bin/sh
-# Read-and-probe check of the development engine (deploy/vps/dev-engine.yml) beside the live one.
-# Run from the clone, after the development engine is up:
-#   sudo sh deploy/vps/dev-engine-status.sh
-# One labelled line per check. No secret and no environment value is printed: the dev engine key is
-# read into a variable, used in one request, and unset. Only the development engine's own key
-# (RERUN_DEV_ENGINE_KEY in deploy/vps/.env) is read; the live key is never read.
 set -eu
 cd "$(dirname "$0")/../.."
 DEV=${DEV_ENGINE_CONTAINER:-rerun-dev-engine-dev-1}
@@ -23,7 +17,6 @@ say "P0 live-engine $BASE"
 say "P0 host-memory-free $(free -m | awk '/^Mem:/ {print $7 " MB available"}')"
 say "P0 host-disk-free $(df -h / | awk 'NR==2 {print $4 " free"}')"
 
-# P1: how the container is configured.
 say "P1 mounts $(docker inspect "$DEV" -f '{{range .Mounts}}[{{.Type}} {{.Name}} -> {{.Destination}}] {{end}}')"
 say "P1 privileged=$(docker inspect "$DEV" -f '{{.HostConfig.Privileged}}') capadd=$(docker inspect "$DEV" -f '{{.HostConfig.CapAdd}}') pidmode='$(docker inspect "$DEV" -f '{{.HostConfig.PidMode}}')' devices=$(docker inspect "$DEV" -f '{{len .HostConfig.Devices}}')"
 say "P1 network-mode=$(docker inspect "$DEV" -f '{{.HostConfig.NetworkMode}}') port-bindings=$(docker inspect "$DEV" -f '{{json .HostConfig.PortBindings}}')"
@@ -38,7 +31,6 @@ done
 say "P1 memory-limit=$(docker inspect "$DEV" -f '{{.HostConfig.Memory}}') nano-cpus=$(docker inspect "$DEV" -f '{{.HostConfig.NanoCpus}}') shm=$(docker inspect "$DEV" -f '{{.HostConfig.ShmSize}}')"
 say "P1 log-config $(docker inspect "$DEV" -f '{{.HostConfig.LogConfig.Type}} {{json .HostConfig.LogConfig.Config}}')"
 
-# P2: nothing of the live setup is reachable from inside.
 if dev test -e /data/hub.json; then say "P2 hub.json PRESENT"; else say "P2 hub.json absent"; fi
 CODE=$(dev curl -s -o /dev/null -m 5 -w '%{http_code}' http://app:3000 2>/dev/null || true)
 case "$CODE" in
@@ -46,11 +38,8 @@ case "$CODE" in
     *) say "P2 live-app-by-name REACHABLE http=$CODE" ;;
 esac
 
-# P3: health.
 say "P3 health http=$(dev curl -s -o /dev/null -m 5 -w '%{http_code}' http://localhost:3000/health || true)"
 
-# P4: create a coworker, create a webhook trigger, fire it, read the run row. The dev key is read from
-# deploy/vps/.env only, sent as a Bearer header to the dev engine only, and never printed.
 DEVKEY=$(sed -n 's/^RERUN_DEV_ENGINE_KEY=//p' deploy/vps/.env 2>/dev/null | tail -n 1)
 [ -n "$DEVKEY" ] || { say "P4 FAIL no RERUN_DEV_ENGINE_KEY in deploy/vps/.env"; exit 1; }
 dcurl() { T=$1; shift; printf 'Authorization: Bearer %s\n' "$DEVKEY" | docker exec -i "$DEV" curl -s -m "$T" -H @- "$@"; }
@@ -74,23 +63,17 @@ else
     say "P4 FAIL coworker not created"
 fi
 
-# P5: does a stray promise rejection end the process, and with what exit code.
 set +e
 dev node -e "setTimeout(()=>Promise.reject(new Error('x')));setTimeout(()=>{},5000)" >/dev/null 2>&1
 RC=$?
 set -e
 say "P5 node-unhandled-rejection exit-code=$RC"
 
-# P6: the dev engine: cancel a run that does not exist, with the dev key. 401 means the key is refused;
-# 404 means it was accepted.
 P6=$(dcurl 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' -d '{}' \
     "http://localhost:3000/agents/none/runs/none/cancel" || true)
 say "P6 dev-cancel-missing-run http=${P6:-none}"
 DEVKEY=
 
-# P8: the engine key sits in the environment of no process in the dev engine. `-e RERUN_API_KEY=` empties the
-# variable for the probe itself, so only processes that really hold a value are counted. Names only: no value
-# is read into a variable or printed. Our own process tree (this exec, its shell and children) is excluded.
 P8=$(docker exec -e RERUN_API_KEY= "$DEV" sh -c '
     me=$$; n=0
     for f in /proc/[0-9]*/environ; do
@@ -106,7 +89,6 @@ case "$P8" in
     *) say "P8 FAIL RERUN_API_KEY is set in the environment of $P8 process(es)" ;;
 esac
 
-# P8 also needs PID 1 to be tini (it execs the engine as its child), so the counts above cover the engine.
 P8PID1=$(docker exec "$DEV" sh -c 'cat /proc/1/comm' </dev/null 2>/dev/null || echo err)
 case "$P8PID1" in
     tini) say "P8 pid1-is-tini" ;;
@@ -114,8 +96,6 @@ case "$P8PID1" in
     *) say "P8 FAIL PID 1 is $P8PID1, not tini" ;;
 esac
 
-# P8 reaping: a docker exec starts a child that leaves a short-lived grandchild behind and exits. The
-# grandchild must be re-parented to PID 1 while it runs, and be gone (not defunct) a few seconds later.
 P8REAP=$(docker exec "$DEV" sh -c '
     sh -c "(sleep 2 &)"; sleep 0.5
     p=$(for f in /proc/[0-9]*/stat; do awk "\$2==\"(sleep)\" && \$4==1 {print \$1}" "$f" 2>/dev/null; done | head -n 1)
@@ -128,7 +108,6 @@ case "$P8REAP" in
     *) say "P8 FAIL orphaned child $P8REAP" ;;
 esac
 
-# P7: the live engine is unchanged since P0.
 AFTER=$(live_state "$LIVE")
 say "P7 live-engine $AFTER"
 if [ "$AFTER" = "$BASE" ]; then say "P7 live-engine unchanged"; else say "P7 live-engine CHANGED"; fi

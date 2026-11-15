@@ -14,12 +14,8 @@ type DeviceTokenUpdate = Database['public']['Tables']['device_tokens']['Update']
 
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send'
 
-// Expo holds the APNs and FCM credentials, so the hub sends a plain POST rather than keeping an HTTP/2
-// connection open to Apple, which a route handler is in no position to do.
 type ExpoMessage = { to: string; title: string; subtitle?: string; body?: string; sound?: 'default'; channelId?: AndroidPushChannel; priority?: 'high'; data: PushData }
 
-// On Android the channel, not the message, decides whether a push rings, and a normal-priority FCM
-// message waits for a sleeping phone to wake on its own: a question would sit unseen for minutes.
 function androidFieldsOf(silent: boolean): Pick<ExpoMessage, 'channelId' | 'priority'> {
     return silent ? { channelId: ANDROID_PUSH_CHANNELS.silent } : { channelId: ANDROID_PUSH_CHANNELS.messages, priority: 'high' }
 }
@@ -28,7 +24,6 @@ export type PushContext = {
     workspaceId: number
     agentId: string | null
     agentName: string
-    // The hub's conversation the notification is about, which the app opens on a tap.
     conversationId: string | null
     sourceKey: string
     notification: StoredNotification
@@ -36,8 +31,6 @@ export type PushContext = {
     members: RoutedMember[]
 }
 
-// Beside the email, and just as best-effort: the notification is already stored, and a push that
-// fails to leave must never fail the webhook that recorded it.
 export async function pushNotification(supabase: SupabaseClient<Database>, context: PushContext): Promise<void> {
     try {
         const prefsOf = new Map(context.members.map(member => [member.id, member.prefs]))
@@ -80,8 +73,6 @@ async function pushToUser(supabase: SupabaseClient<Database>, userId: string, no
     if (error) console.error('[push] failed to record the dispatch', error)
 }
 
-// A token Expo reports as dead is revoked rather than retried: the app was uninstalled, and keeping
-// it would spend the person's cap on a device that no longer exists.
 async function sendToExpo(supabase: SupabaseClient<Database>, messages: ExpoMessage[]): Promise<boolean> {
     const response = await fetch(EXPO_PUSH_URL, {
         method: 'POST',

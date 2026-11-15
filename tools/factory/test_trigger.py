@@ -1,4 +1,3 @@
-"""trigger.py tests (rerun#60 C3b): a local fake engine over HTTP; the engine key and trigger tokens never show in output."""
 import contextlib, io, json, os, shutil, stat, sys, tempfile, threading, unittest
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from unittest import mock
@@ -96,10 +95,10 @@ class TestEnsure(Base):
         tokens = T.ensure_triggers(self.eng, self.cfg)
         self.assertEqual(self.st.creates, [("agent-da", "factory-challenge")])
         self.assertEqual(tokens, {"agent-da/factory-challenge": TOKEN + "-factory-challenge"})
-        T.ensure_triggers(self.eng, self.cfg)  # second start: reuse by slug
+        T.ensure_triggers(self.eng, self.cfg)
         self.assertEqual(len(self.st.creates), 1)
         self.assertEqual(stat.S_IMODE(os.stat(self.tokfile).st_mode), 0o600)
-        self.assertEqual(T.load_tokens(self.tokfile), tokens)  # a restart reads the file back
+        self.assertEqual(T.load_tokens(self.tokfile), tokens)
         with open(self.tokfile) as f:
             self.assertNotIn(KEY, f.read())
 
@@ -210,12 +209,12 @@ class TestProbe(Base):
         self.assertEqual(len(self.st.creates), 1)
         self.st.runs["run-2"] = {"id": "run-2", "status": "done", "inputTokens": 1}
         self.main(["probe", "--stage", "challenge"])
-        self.assertEqual(len(self.st.creates), 1)  # the second probe reuses the trigger
+        self.assertEqual(len(self.st.creates), 1)
 
     def test_too_many_tokens_error_or_still_running_fails(self):
         for run, wait in (({"id": "run-1", "status": "done", "inputTokens": 300000}, 600), ({"id": "run-1", "status": "error", "inputTokens": 5}, 600),
                           ({"id": "run-1", "status": "running"}, 0)):
-            del self.st.fires[:]  # the fake names the next run run-1 again
+            del self.st.fires[:]
             code, out = self.probe(run, wait)
             self.assertEqual(code, 1, out)
             self.assertTrue(out.startswith("PROBE FAIL run-1 ses-1"), out)

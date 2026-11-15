@@ -60,8 +60,6 @@ describe('streaming a file into a workspace', () => {
         expect(res.status).toBe(400)
     })
 
-    // A body that lies about its size, or sends none at all, only gets caught mid-pipe. What matters
-    // then is that the refusal leaves nothing behind: a truncated file reads like a whole one.
     it('caps a body that outgrows the limit and leaves no partial file', async () => {
         const cap = 64
         const oversized = new Uint8Array(cap + 1)

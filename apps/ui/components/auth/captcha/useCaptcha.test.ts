@@ -35,7 +35,6 @@ let root: Root
 let host: HTMLDivElement
 let captcha: { getToken: () => Promise<unknown>; challenging: boolean }
 
-// How the network answers each vendor's script: it loads, it fails, or it never arrives.
 type ScriptMode = 'ready' | 'error' | 'silent'
 const scripts: { turnstile: ScriptMode; hcaptcha: ScriptMode } = { turnstile: 'ready', hcaptcha: 'ready' }
 
@@ -45,7 +44,6 @@ beforeEach(() => {
     scripts.turnstile = 'ready'
     scripts.hcaptcha = 'ready'
     ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
-    // The vendors' scripts are never fetched: appending one is what makes it "loaded".
     vi.spyOn(document.head, 'appendChild').mockImplementation(node => {
         const script = node as HTMLScriptElement
         const vendor = script.src.includes('hcaptcha') ? 'hcaptcha' : 'turnstile'

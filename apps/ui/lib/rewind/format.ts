@@ -20,8 +20,6 @@ export function formatWeekRange(weekStart: string, weekEnd: string, locale?: str
     return formatDayRange(new Date(weekStart), new Date(Date.parse(weekEnd) - 1), locale)
 }
 
-// The payload counts runs per UTC hour. Shifted by the viewer's offset, index 0 is Monday 00:00
-// where they are. The few runs pushed past either end of the week are dropped.
 export function localHourly(hourly: number[], utcOffsetMinutes: number): number[] {
     const shift = Math.round(utcOffsetMinutes / 60)
     return Array.from({ length: REWIND_HOURS_PER_WEEK }, (_, hour) => hourly[hour - shift] ?? 0)

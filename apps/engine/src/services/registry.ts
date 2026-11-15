@@ -4,11 +4,6 @@ import { resolve } from 'node:path'
 import { parseServiceRegistryKey } from '@rerun/contracts'
 import { workspaceDir } from '../config/paths.js'
 
-// The per-agent "installed connectors" registry is written by the UI into the agent's own
-// workspace, so it travels with the agent. The engine only reads it: it is the sole record of
-// which skills, mcp servers and env keys a connector install put in the agent folder. Keyed by
-// `serviceRegistryKey`: the bare catalog slug for the first account of an app, `<slug>@<id>` for
-// every other one.
 export type RegistryEntry = {
     status?: string
     label?: string
@@ -36,8 +31,6 @@ export async function readRegistry(id: string): Promise<ServiceRegistry | null> 
     }
 }
 
-// Skill slug → slug of the connector that installed it. An agent with no connector has no
-// registry at all, so absent, unreadable and footprint-less all answer the same empty map.
 export async function connectorSkillOwners(id: string): Promise<Map<string, string>> {
     const registry = await readRegistry(id)
     const owners = new Map<string, string>()
@@ -48,13 +41,8 @@ export async function connectorSkillOwners(id: string): Promise<Map<string, stri
     return owners
 }
 
-// `slug` names the catalog app, `key` the registry entry. `isDefault` marks the account installed
-// under the bare slug, the one an app with several accounts falls back to.
 export type ConnectorServerState = { key: string; slug: string; label?: string; status: string; isDefault: boolean }
 
-// MCP server name → the connector that installed it and where its setup stands. A connector can
-// put its server on the agent before the user connects the account behind it, so a server that
-// loads and lists tools may still answer every call with "not connected": only this status says so.
 export async function connectorServerStates(id: string): Promise<Map<string, ConnectorServerState>> {
     const registry = await readRegistry(id)
     const states = new Map<string, ConnectorServerState>()

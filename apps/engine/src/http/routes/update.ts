@@ -13,8 +13,6 @@ import { dataDir } from '../../config/paths.js'
 import { logger } from '../../lib/logger.js'
 import { childProcessEnv } from '../../lib/child-env.js'
 
-// The updater never needs the key or the pair token. It does need the data folder and every non-secret
-// setting the update command reads (desktop flag, Codex path, service name and user, log level).
 const UPDATE_CHILD_VARS = ['RERUN_SERVICE', 'RERUN_SERVICE_USER', 'RERUN_DESKTOP', 'RERUN_CODEX_PATH', 'RERUN_LOG_LEVEL'] as const
 
 export function updateChildEnv(): Record<string, string> {
@@ -28,8 +26,6 @@ export function updateChildEnv(): Record<string, string> {
 
 export const updateRoutes = new Hono()
 
-// Checked here, before anything is spawned: the hub waits 15 s for this answer and the download
-// belongs to the detached updater.
 const artifactSchema = z.object({
     url: z.string().url().refine(url => url.startsWith('https://'), 'artifact url must be https'),
     sha256: z.string().regex(/^[0-9a-f]{64}$/, 'sha256 must be 64 hex characters'),
@@ -41,10 +37,6 @@ const updateRequestSchema = z.object({ force: z.boolean().optional(), artifact: 
 
 let updating = false
 
-// Self-update: spawn a detached `rerun update` (download or git pull → migrate → restart). The child
-// stays in the systemd cgroup but finishes its work before it triggers the restart, and the restart
-// job is owned by systemd (PID 1), so the engine comes back on the new build even though the child
-// is killed by that very restart. Refuses while a run is in flight.
 updateRoutes.post('/', async c => {
     const raw = await c.req.json().catch(() => ({}))
     const parsed = updateRequestSchema.safeParse(raw)
@@ -52,7 +44,6 @@ updateRoutes.post('/', async c => {
     const { force = false, artifact } = parsed.data
 
     const activeRuns = activeRunCount()
-    // A restart would cut the screen of whoever is signing in for an agent right now.
     if (!force && (activeRuns > 0 || desktopViewerCount() > 0 || activeTakeovers().length > 0)) return c.json({ started: false, reason: 'busy', activeRuns })
     if (updating) return c.json({ started: false, reason: 'already-updating' })
     updating = true
@@ -67,7 +58,6 @@ updateRoutes.post('/', async c => {
         updating = false
         logger.error({ err: String(err) }, 'failed to spawn engine self-update')
     })
-    // An updater that gave up (checksum, disk, build) must not leave the box answering `already-updating` until its next restart.
     child.on('exit', code => {
         updating = false
         if (code) logger.error({ code }, 'engine self-update exited with an error')

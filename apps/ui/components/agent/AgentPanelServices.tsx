@@ -46,7 +46,6 @@ type AuthTargets = { oauth?: OAuthTarget; managed?: ManagedTarget; composio?: Co
 
 type SetupTarget = {
     slug: string
-    // The account being set up; absent while a new account has not been allocated yet.
     key?: string
     newInstance?: boolean
     name: string
@@ -58,8 +57,6 @@ type SetupTarget = {
     alternatives: ServiceAlternative[]
 }
 
-// A custom server is edited where it is listed, with the same editor as the MCP tab. The sign-in
-// window opens inside the Connect click, before anything is fetched, or the browser blocks it.
 type CustomStep = { kind: 'connect'; server: CustomMcpServer; popup: Window | null } | { kind: 'edit'; server: EngineMcpServer }
 
 function pendingAuthTarget(targets: AuthTargets): AuthTargets | undefined {
@@ -82,7 +79,6 @@ function toSetupTarget(details: ServiceDetails, icon: string | null, alternative
 
 const STATUS_RANK: Record<InstalledService['status'], number> = { active: 0, needs_auth: 1, needs_config: 2, error: 3 }
 
-// One status per app for the library tiles: the base account's, else the best account left.
 function statusByApp(installed: InstalledService[]): Map<string, InstalledService['status']> {
     const statuses = new Map<string, InstalledService['status']>()
     for (const s of installed) {
@@ -92,12 +88,8 @@ function statusByApp(installed: InstalledService[]): Map<string, InstalledServic
     return statuses
 }
 
-// Browse page size for the paginated catalog. Matches the server default; a full page back
-// means there may be more, so infinite scroll keeps going.
 const BROWSE_PAGE_SIZE = 60
 
-// Services tab: browse the library and manage installed services. Reuses the exact
-// same ServiceConfigForm shown inline in chat, so config is identical on both sides.
 export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelServices')
@@ -119,9 +111,6 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
 
-    // Paginated browse accumulation (empty query). A ref tracks server rows fetched so
-    // client-side dedup can't drift the offset, and a ref guard blocks the concurrent calls a
-    // fast scroll or observer re-fire would otherwise make.
     const [browseServices, setBrowseServices] = useState<ServiceSearchResult[]>([])
     const [browseHasMore, setBrowseHasMore] = useState(true)
     const [browseLoading, setBrowseLoading] = useState(false)
@@ -129,16 +118,12 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const browseLoadingRef = useRef(false)
     const sentinelRef = useRef<HTMLDivElement | null>(null)
 
-    // Ranked search results (non-empty query) — bounded, flat, no infinite scroll.
     const [searchResults, setSearchResults] = useState<ServiceSearchResult[]>([])
     const [searching, setSearching] = useState(false)
 
     const isSearchActive = query.trim().length > 0
-    // True while a query is typed but its results aren't ready yet — covers both the debounce
-    // window and the in-flight semantic search, so the skeleton shows immediately.
     const searchLoading = isSearchActive && (searching || query.trim() !== debouncedQuery.trim())
 
-    // Semantic search embeds the query, so debounce keystrokes to avoid one call each.
     useEffect(() => {
         const id = setTimeout(() => setDebouncedQuery(query), 300)
         return () => clearTimeout(id)
@@ -166,8 +151,6 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         setBrowseHasMore(true)
     }, [])
 
-    // Reload the installed section and re-seed the first browse page. Called on mount and after
-    // any (un)install so the "Installed" badge on browse tiles stays coherent.
     const load = useCallback(async () => {
         setLoading(true)
         const { services, custom: customServers } = await listAgentConnectorsAction(agentId)
@@ -182,20 +165,15 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         load()
     }, [load])
 
-    // Seed the first browse page once the initial load has cleared it.
     useEffect(() => {
         if (isSearchActive) return
         if (browseServices.length === 0) loadMoreBrowse()
     }, [isSearchActive, browseServices.length, loadMoreBrowse])
 
-    // Changing the category filter restarts the browse from an empty set, which the seed effect
-    // above then re-fetches with the new category.
     useEffect(() => {
         resetBrowse()
     }, [selectedCategory, resetBrowse])
 
-    // Run the ranked search when a query is active; annulable so a stale response can't clobber
-    // a newer one.
     useEffect(() => {
         const q = debouncedQuery.trim()
         if (!q) {
@@ -223,15 +201,10 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
             const icon = [...installed, ...browseServices, ...searchResults].find(s => s.slug === slug)?.icon ?? null
             const target = { ...toSetupTarget(details, icon, alternatives[slug] ?? []), ...(authTarget ? { initialAuthTarget: authTarget } : {}) }
             setSwapError(null)
-            // Already compiled and only waiting on the sign-in → the form opens straight on
-            // Connect rather than recompiling the service to rediscover a target we already hold.
             if (target.initialAuthTarget) {
                 setSetupTarget(target)
                 return
             }
-            // A single method with no fields → install straight away (OAuth sign-in or
-            // skill-only); an OAuth method then returns needs_auth → open the connect step.
-            // Anything with fields or a choice of methods → open the config form.
             const single = details.authMethods.length === 1 ? details.authMethods[0] : null
             if (single && single.inputs.length === 0) {
                 const res = await installServiceAction(agentId, key, {}, single.id)
@@ -247,8 +220,6 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         [agentId, load, installed, browseServices, searchResults],
     )
 
-    // Same shortcut as onInstall, except the install allocates a fresh account instead of
-    // reopening the one the coworker already holds.
     const onAddAccount = useCallback(
         async (slug: string) => {
             const details = await getServiceDetailsAction(agentId, slug)
@@ -273,9 +244,6 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     )
 
 
-    // Clear the stored sign-in, then hand over to onInstall: the entry now reads needs_auth, so
-    // it lands straight on Connect without recompiling anything. A paid app still bound to an
-    // account stays active, so its picker is opened explicitly.
     const onReconnect = useCallback(
         async (key: string) => {
             setError(null)
@@ -342,16 +310,12 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
         setSetupTarget(toSetupTarget(details, alternative.icon, [current, ...setupTarget.alternatives.filter(a => a.slug !== alternative.slug)].slice(0, MAX_OFFERED_ALTERNATIVES)))
     }
 
-    // Browse pages come back agent-less (never installed), so mark them from the separately
-    // loaded installed set. Search results already carry the correct status.
     const statusBySlug = useMemo(() => statusByApp(installed), [installed])
     const browseWithInstalled = useMemo(
         () => browseServices.map(s => ({ ...s, installStatus: statusBySlug.get(s.slug) ?? null, installed: statusBySlug.get(s.slug) === 'active' })),
         [browseServices, statusBySlug],
     )
 
-    // Load more browse pages while the sentinel is visible. The observer is recreated whenever
-    // the loaded set grows so it re-fires when a short page leaves the sentinel still in view.
     useEffect(() => {
         if (isSearchActive || !browseHasMore) return
         const el = sentinelRef.current
@@ -394,9 +358,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     }
 
     if (setupTarget) {
-        // An app the agent already runs would only be offered to be set up a second time.
         const alternatives = setupTarget.alternatives.filter(a => statusBySlug.get(a.slug) !== 'active')
-        // Two accounts of one app never share a form's state.
         const setupKey = setupTarget.key ?? `${setupTarget.slug}:new`
         return (
             <PanelSteps stepKey={`setup:${setupKey}`} depth={1}>

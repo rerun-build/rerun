@@ -6,8 +6,6 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { IsoGrid, type Tile } from '@rerun/ui/iso-grid'
 
-// The board lights the landing cell of a drag and says why a drop is refused for two seconds.
-
 const tile = (id: string, col: number, row: number): Tile => ({ id, position: { col, row }, span: 1, style: { color: '#fff' } })
 const TILES = [tile('a', 5, 5), tile('b', 8, 3)]
 
@@ -58,7 +56,6 @@ describe('IsoGrid canDropTile', () => {
         }
         let target = mount()
         const fire = (type: string, x: number, y: number) => act(() => { target.dispatchEvent(new PointerEvent(type, { bubbles: true, clientX: x, clientY: y, button: 0, pointerType: 'mouse', pointerId: 1 })) })
-        // a pointerdown on empty floor starts a pan, so each try gets a fresh board
         const hit = (() => {
             for (let y = 250; y < 550; y += 12) for (let x = 350; x < 650; x += 12) {
                 target = mount()

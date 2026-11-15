@@ -21,8 +21,6 @@ import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// The model a coworker runs, pinned on the coworker as the web picker does: every conversation with it
-// follows. The groups come from the hub, built by the web picker's own rules.
 export function AgentModelSheet({ agentId }: { agentId: string }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
@@ -30,15 +28,12 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
     const t = useTranslations('mobileProviders.modelSheet')
     const [models, setModels] = useState<AgentModels | null>(null)
     const [failed, setFailed] = useState(false)
-    // A coworker the caller only uses keeps the model its managers picked; the rows stay greyed until
-    // the caller's level is known.
     const lock = manageLock(useCoworkerAccess(agentId))
     const workspaceAdmin = useIsWorkspaceAdmin()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
 
-    // Read again on focus: a provider added from this sheet comes back with its models.
     useFocusEffect(
         useCallback(() => {
             if (!accessToken || !workspaceId) return
@@ -64,7 +59,6 @@ export function AgentModelSheet({ agentId }: { agentId: string }) {
     const boxDefault = models?.boxDefault
     const defaultGroup = models?.groups.find(group => group.connectionId === boxDefault?.connectionId)
 
-    // A form sheet lays out its scroll view itself: wrapped in a view, it is laid out at no height.
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>

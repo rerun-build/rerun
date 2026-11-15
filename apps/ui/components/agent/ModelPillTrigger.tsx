@@ -10,11 +10,6 @@ import { cn } from '@/lib/utils'
 
 type ModelPillTriggerProps = ComponentProps<'button'> & { provider?: string | null; label: string; usage?: PillUsage | null; usageLabel?: string | null }
 
-/**
- * The model pill in a composer footer. Shared shell so the agent chat's picker and the foreman's
- * fixed "Rerun Balanced" read as the same control: one opens a popover, the other opens nothing.
- * `type="button"` matters, the pill lives inside the composer's form.
- */
 export function ModelPillTrigger({ provider, label, usage, usageLabel, className, ...props }: ModelPillTriggerProps) {
     return (
         <button

@@ -1,4 +1,3 @@
-"""Plan intake: a plan text with the marker to a validated chunk list."""
 import re
 
 import ledger
@@ -7,7 +6,6 @@ MARKER = re.compile(r"^PLAN READY\b", re.M)
 
 
 def parse_plan(text):
-    """(chunks, errors): chunks the runner accepts (ledger.shape == []), one error per rejected or duplicate line."""
     text = (text or "").replace("\r\n", "\n")
     if not MARKER.search(text):
         return [], ["no PLAN READY marker"]
@@ -29,11 +27,6 @@ def parse_plan(text):
 
 
 def register(st, job, meta, text):
-    """Open a job from a plan: (state, errors). The ledger state lists the chunks PENDING; each chunk becomes a ready item
-    (builder, paths, deps) and the plain stage `challenge` goes to the stage queue. Nothing is stored when no chunk is valid.
-    A dependency is met when its chunk's ready state is 'merged' (see readyq/runner_loop); nothing writes it yet. It belongs
-    where a chunk PR merge is seen, not here. meta ({repo_url, title, base_branch}) and test:<chunk> ("suite file" of the
-    chunk's done-test) go to the job kv for finish_build."""
     chunks, errors = parse_plan(text)
     if not chunks:
         return None, errors

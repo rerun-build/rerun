@@ -4,9 +4,6 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg'
 
 import { useTheme } from '@/theme/theme'
 
-// Android blurs only what sits inside a BlurTargetView, and a blur masked by a gradient redraws the
-// screen under it on every frame: the twin keeps the fade alone, the background rising to near opaque at
-// the bar. Over a see-through backdrop (`veiled` off) it stops lighter, so the backdrop still shows.
 export function ProgressiveBlur({ height, veiled = true }: { height: number; veiled?: boolean }) {
     const theme = useTheme()
     const id = `fade-${useId().replace(/[^a-zA-Z0-9]/g, '')}`

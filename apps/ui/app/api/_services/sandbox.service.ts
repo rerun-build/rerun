@@ -9,22 +9,14 @@ import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 
 import type { ActionResult } from '@/app/api/_actions/space.actions'
 
-// A sandbox is a workspace flagged is_sandbox with unlimited agents and no billing, reserved for
-// expert accounts. It reuses the whole workspace/space/engine stack: exactly one Space backed by a
-// dedicated pool engine for now.
 const SANDBOX_SPACE_SIZE = 8
 const SANDBOX_ICON_URL = '/pricing/scale.png'
 const SANDBOX_BUDGET_USD = 5
 
-// Get-or-create, then make it the active workspace. Idempotent: it reuses the existing sandbox
-// workspace (and re-claims its engine if it lost one), so re-entry self-heals. The caller owns the
-// expert check — this module never decides who is entitled to a sandbox.
 export async function enterSandbox(userId: string): Promise<ActionResult<{ workspaceId: number }>> {
     const sandboxId = (await findSandboxWorkspaceId(userId)) ?? (await createSandboxWorkspace(userId))
     if (typeof sandboxId !== 'number') return sandboxId
 
-    // A locked sandbox is still entered: that is where its owner reads why it is archived and asks
-    // for it back. It just gets no machine on the way in.
     if (!(await isSandboxLockedById(sandboxId))) {
         const spaceResult = await ensureSandboxSpace(sandboxId)
         if (spaceResult) return spaceResult
@@ -36,16 +28,6 @@ export async function enterSandbox(userId: string): Promise<ActionResult<{ works
     return { ok: true, workspaceId: sandboxId }
 }
 
-// Where the home has to render for this user. A creator whose account was just flagged expert still
-// lands on the workspace the middleware provisioned for them: empty, so the client would open the
-// recruit wizard and end at a paywall, on an account already entitled to an unlimited sandbox.
-//
-// Only the first landing moves them. Once `users.workspace_id` points at the sandbox it stays there,
-// and an expert who later creates or joins another workspace is left alone — hence the guard on
-// "no sandbox yet" rather than on "current workspace is empty" alone.
-//
-// An empty pool is not a reason to stay behind: the sandbox becomes active without a Space and
-// useEnsureSandboxSpace keeps retrying the claim behind the "Preparing your sandbox…" board.
 export async function resolveCreatorLandingWorkspace(userId: string, workspaceId: number, isExpert: boolean): Promise<number> {
     if (!isExpert) return workspaceId
 
@@ -109,7 +91,6 @@ async function createSandboxWorkspace(userId: string): Promise<number | ActionFa
             rerun_budget_micros: SANDBOX_BUDGET_USD * MICROS_PER_USD,
             rerun_period_anchor: new Date().toISOString(),
             subscription_status: 'active',
-            // A sandbox has no onboarding: the funnel never runs there, so nothing would ever stamp it.
             onboarded_at: new Date().toISOString(),
         })
         .select('id')
@@ -129,15 +110,9 @@ async function createSandboxWorkspace(userId: string): Promise<number | ActionFa
     return workspaceId
 }
 
-// Claims the sandbox's machine and draws its single Box, if it has none yet. Returns an error
-// result when the pool is empty (nothing is claimed, so re-entry retries cleanly); returns null on
-// success or when the sandbox is already set up. Self-healing: the machine is looked up by
-// workspace, so a Box row lost on its own does not leave the engine stranded.
 export async function ensureSandboxSpace(workspaceId: number): Promise<(ActionFailure & { locked?: true }) | null> {
     const supabase = createServiceRoleClient()
 
-    // Before any claim, and not left to `ensureWorkspaceEngine`: once an expired archive is purged
-    // the workspace is no longer flagged archived, and this is the only door still shut.
     if (isSandboxLocked(await loadSandboxArchive(supabase, workspaceId))) return { ...failure('sandboxLocked'), locked: true }
 
     const engine = await ensureWorkspaceEngine(workspaceId)

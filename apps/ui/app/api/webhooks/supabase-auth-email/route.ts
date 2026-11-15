@@ -22,10 +22,6 @@ type AuthEmail = { to: string; code: string; tokenHash: string; type: EmailOtpTy
 
 const SIGN_IN_ACTIONS = new Set<string>(['signup', 'magiclink', 'email'])
 
-// The email_change hashes are named backwards for compatibility: `token_hash_new` pairs with the
-// current address and `token`, `token_hash` with the new address and `token_new`. An anonymous user
-// claiming an email has no current address, so only the second email goes out, and Supabase then
-// fills `token` rather than `token_new`.
 function emailsFor({ user, email_data: data }: SendEmailHookPayload): AuthEmail[] {
     if (SIGN_IN_ACTIONS.has(data.email_action_type) && user.email) {
         return [{ to: user.email, code: data.token, tokenHash: data.token_hash, type: data.email_action_type as EmailOtpType }]
@@ -43,7 +39,6 @@ function hookError(status: number, message: string) {
     return Response.json({ error: { http_code: status, message } }, { status })
 }
 
-// Supabase Auth's Send Email Hook: every auth email is rendered here and sent through Resend.
 export async function POST(req: Request) {
     const secret = process.env.SEND_EMAIL_HOOK_SECRET
     if (!secret) return hookError(500, 'SEND_EMAIL_HOOK_SECRET is not set')
@@ -61,7 +56,6 @@ export async function POST(req: Request) {
         return Response.json({})
     }
 
-    // A brand-new account has no language of its own yet and reads English.
     const locale = await recipientLocale(createServiceRoleClient(), payload.user.id, null)
     for (const email of emails) {
         if (!(await claimAuthEmailSend(normalizeEmail(email.to)))) return hookError(429, 'Too many codes were sent to this address. Try again later.')

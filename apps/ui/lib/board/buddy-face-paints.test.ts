@@ -3,9 +3,6 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-// `EyeDefs` only writes the gradients `eyePaints` says a face uses, and `eyePaints` mirrors the
-// branches of `Eyes` by hand. An eye painted with a gradient that was left out gets a
-// `fill="url(#…)"` that resolves to nothing and vanishes without a warning: this is the check.
 const MOODS: BuddyMood[] = ['idle', 'working', 'error', 'waiting', 'asleep']
 
 function litFace(eyes: BuddyEyes, mood: BuddyMood): string {

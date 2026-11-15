@@ -75,7 +75,7 @@ class Report(unittest.TestCase):
         self.fail = KeyError("x")
         self.assertEqual(self.once().count("factory_report: KeyError"), 1)
         self.fail = None
-        self.once()  # a good report clears the log set
+        self.once()
         self.fail = KeyError("x")
         self.assertEqual(self.once().count("factory_report: KeyError"), 1)
 

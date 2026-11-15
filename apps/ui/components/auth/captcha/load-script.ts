@@ -2,12 +2,9 @@ type ScriptOptions<Api> = {
     src: string
     readApi: () => Api | undefined
     failure: () => Error
-    // A vendor that only declares its API ready through a global callback named in the script URL.
     readyCallback?: string
 }
 
-// One load per page for a captcha vendor's script. A failed load is forgotten, so the next attempt
-// fetches it again instead of failing forever.
 export function scriptLoader<Api>({ src, readApi, failure, readyCallback }: ScriptOptions<Api>): () => Promise<Api> {
     let loading: Promise<Api> | null = null
     return () => {

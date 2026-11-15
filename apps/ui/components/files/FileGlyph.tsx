@@ -10,8 +10,6 @@ const INK_SOFT = 'rgb(var(--iso-tile-idle-ink) / 0.14)'
 
 export const GLYPH_INK_MUTED = 'rgb(var(--iso-tile-idle-ink) / 0.5)'
 
-// The face colour and the specular band come from the idle agent tile: chrome in light,
-// anthracite in dark. Volume is a brightness() on the same single colour, never a second token.
 function Face({ d, tone, sheen = true }: { d: string; tone?: number; sheen?: boolean }) {
     return (
         <div

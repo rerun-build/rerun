@@ -1,6 +1,3 @@
-// Written to the agent, not to the user: it is sent verbatim as the first message of the
-// installation conversation, so its vocabulary has to match the engine's own setup note
-// (apps/engine/src/agents/systemPrompt.ts) rather than invent tool names of its own.
 export const DEFAULT_INSTALL_PROMPT = `You are being installed on a new account. Nothing is connected, you hold no credentials, and you know nothing about this user yet. Walk them through it one step at a time, in this conversation.
 
 1. Introduce yourself in two or three lines: what you do, and what you will be able to do for them once you are set up.

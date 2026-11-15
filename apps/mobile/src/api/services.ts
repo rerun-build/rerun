@@ -23,7 +23,6 @@ export async function connectService(caller: Caller, agentId: string, slug: stri
     return connectTargetSchema.parse(await api(`${one(agentId, slug)}/connect`, { ...caller, method: 'POST' }))
 }
 
-// The claim the sign-in ended with: the hub writes the token on the Box and flips the entry only now.
 export async function claimServiceSignIn(caller: Caller, agentId: string, slug: string, claim: string): Promise<void> {
     await api(`${one(agentId, slug)}/authorized`, { ...caller, method: 'POST', body: { claim } })
 }

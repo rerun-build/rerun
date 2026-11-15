@@ -14,13 +14,6 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { failure } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
 
-// The creator side of the join link. `experts.creator_token` is the capability that turns an
-// invited expert into an account with a sandbox, so it is resolved here with the service-role
-// client and never handed back to the browser beyond what the welcome screen needs to display.
-//
-// The token itself is the authorization: it is only minted when the email leaves, so holding one
-// means an admin sent it. What can still retire it is the fiche being turned down or opted out.
-
 const INVITE_COLUMNS = ['id', 'name', 'email', 'slug', 'status', 'application_status', 'creator_token', 'creator_terms_accepted_at'] as const
 
 type InviteGate = { status: string; application_status: string | null }
@@ -33,9 +26,7 @@ export type CreatorInvite = {
     expertId: string
     name: string
     email: string | null
-    // Already attached to the caller's account, so the wizard resumes at the conditions.
     claimed: boolean
-    // Attached to somebody else's account: the link is spent.
     takenByAnother: boolean
     termsAccepted: boolean
 }
@@ -62,9 +53,6 @@ export async function loadCreatorInviteAction(token: string): Promise<LoadCreato
     if (!expert) return { status: 'not_found' }
     if (!isInviteOpen(expert)) return { status: 'not_accepted' }
 
-    // The link never expires: what retires it is the fiche ending up on an account. Whose account
-    // that is only matters once there is a real session, so the answer travels back as a flag and
-    // the page decides between "sign in first" and "this link is spent".
     const owner = await linkedUserId(supabase, expert.id)
     const { user } = await getServerSession()
 
@@ -81,8 +69,6 @@ export async function loadCreatorInviteAction(token: string): Promise<LoadCreato
     }
 }
 
-// The resume path: the terms wall sends people to /creator/join without a token, so the fiche is
-// resolved from the account instead.
 export async function loadOwnCreatorInviteAction(): Promise<LoadCreatorInviteResult> {
     const userId = await requireUserId()
     const supabase = createServiceRoleClient()
@@ -92,7 +78,6 @@ export async function loadOwnCreatorInviteAction(): Promise<LoadCreatorInviteRes
 
     const { data: expert } = await selectMaybeSingle(supabase, 'experts', INVITE_COLUMNS, { id: account.expert_profile_id })
     if (!expert) return { status: 'not_found' }
-    // No token means nothing was ever sent, so there is no invitation to resume either.
     if (!expert.creator_token || !isInviteOpen(expert)) return { status: 'not_accepted' }
 
     return {
@@ -108,9 +93,6 @@ export async function loadOwnCreatorInviteAction(): Promise<LoadCreatorInviteRes
     }
 }
 
-// Attaches the fiche to the caller's account, flags it expert, and opens the sandbox. Idempotent
-// from end to end: `enterSandbox` is get-or-create, so someone who already has a sandbox reuses it
-// instead of collecting a second engine.
 export async function claimCreatorSandboxAction(token?: string): Promise<ActionResult<{ workspaceId: number }>> {
     const { user, session, isAnonymous } = await getServerSession()
     if (!user?.id || isAnonymous || !session?.email) return failure('signInToClaimCreator')
@@ -153,8 +135,6 @@ export async function claimCreatorSandboxAction(token?: string): Promise<ActionR
     return enterSandbox(userId)
 }
 
-// The conditions themselves are not stored: what is checked in the browser is a display detail, and
-// a new version of the program is announced, not re-signed retroactively.
 export async function acceptCreatorTermsAction(): Promise<ActionResult> {
     const userId = await requireUserId()
     const supabase = createServiceRoleClient()

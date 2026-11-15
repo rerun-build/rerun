@@ -1,8 +1,3 @@
-/**
- * The single map of the gallery, shared by both indexes so they can never drift. `landing` pages
- * render the bricks of this package, `app` pages render what only `apps/ui` can import. The split
- * is a hard boundary: the two apps are separate Next builds and only this package crosses.
- */
 export type KitCategory = {
     slug: string
     label: string

@@ -44,8 +44,6 @@ const databaseNote = (sharedDb: boolean) =>
 const SHARED_DATABASE_NOTE =
     'Besides your private database, this workspace has one shared SQL database that every coworker here reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Your private database stays the default. Put data in the shared one only when another coworker of this workspace is expected to read or write it, or when the user asked for a dataset that belongs to the whole workspace: a common catalog, a queue several coworkers work through, a record the team keeps together. When you hesitate, choose private, because that choice is reversible and the other one is not. Never keep the same data in both: a table has one home, so if it belongs in the other database, move it and delete the original rather than copying it. You are not alone in there, so treat every table you did not create as someone else\'s work: call shared_db_schema before you create anything, extend an existing table with ALTER TABLE ADD COLUMN rather than recreating it, always CREATE TABLE IF NOT EXISTS because the table may not exist yet on this workspace, and never DROP or ALTER a table you did not create nor DELETE rows you did not insert unless the user explicitly asks. Name a shared table after its domain (leads, invoices), never after yourself, because a table named after a coworker is a private table sitting in a shared file. When your instructions say "your database" or "the database" without qualifying it, they mean your private one. A script opening RERUN_SHARED_DB must run PRAGMA busy_timeout = 5000 first and keep its transactions short, because other coworkers write to that file at the same time.'
 
-// The private schema grows with one agent, the shared one grows with the whole workspace and is paid on
-// every run of every agent, so it is the only one we cap.
 const SHARED_SCHEMA_BUDGET = { maxTables: 40, maxChars: 4000, more: (n: number) => `... and ${n} more tables, call shared_db_schema to see them.` }
 
 const VOCABULARY_NOTE =
@@ -74,9 +72,6 @@ const LANGUAGE_NOTE =
 
 const languageNames = new Intl.DisplayNames(['en'], { type: 'language' })
 
-// The workspace's language replaces the instruction's as the last resort of a run nobody started: a
-// routine written in English by a French team still reports in French. Stable for the agent, so it
-// sits in the cached part of the prompt.
 export function languageNote(workspaceLanguage: string | null | undefined): string {
     if (!workspaceLanguage) return LANGUAGE_NOTE
     let name = workspaceLanguage
@@ -104,8 +99,6 @@ function skillCaptureNote({ hasSkills }: { hasSkills: boolean }): string {
     ].join('\n\n')
 }
 
-// `normal` renders nothing on purpose: it is the model's native behaviour, so an agent nobody ever
-// tuned keeps byte-for-byte the prompt it had before this setting existed.
 const VERBOSITY_LENGTH: Record<Verbosity, string> = {
     minimal: 'Answer in one or two sentences. No preamble, no restatement of the question, no closing summary of what you just did, and no bullet list unless the answer is literally a list.',
     concise: 'Lead with the result and stop there. Drop context the user already has, recaps of the steps you just took, and closing offers of further help. Keep the details that would change what the user decides or does next, and nothing else.',
@@ -133,12 +126,6 @@ function section(tag: string, body: string): string {
     return body.trim() ? `<${tag}>\n${body.trim()}\n</${tag}>` : ''
 }
 
-/**
- * The system prompt in two blocks, so the provider caches each on its own: `stable` only changes
- * when the agent's configuration does, `volatile` holds what moves between two turns (the indexes,
- * the schemas, the day) and comes last, so a memory written or a table created rewrites the
- * volatile block alone rather than everything after it.
- */
 export type SystemPrompt = { stable: string; volatile: string }
 
 export function systemPromptText({ stable, volatile }: SystemPrompt): string {
@@ -150,8 +137,6 @@ const joinSections = (parts: string[]) => parts.filter(Boolean).join('\n\n')
 const utcDay = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 const utcTime = new Intl.DateTimeFormat('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 
-// Day granularity only: the volatile block is cached as a whole, so an hour in here would invalidate
-// it on every single turn instead of once a day.
 export function currentTimeNote(now: Date = new Date()): string {
     return `Today is ${utcDay.format(now)} (UTC). Your training data is not a clock, so never state or assume a date from it. Every user message ends with a <now> block carrying the exact UTC timestamp of that turn: read it whenever a date, a duration, or a deadline matters, and if it disagrees with this line the block wins, because a long run can cross midnight. Every other timestamp you read, in a tool result or in these instructions, is UTC too. The user may live in another timezone, so name the timezone you mean when you state a date or a time, or ask which one they are on when the difference changes the answer.`
 }
@@ -188,7 +173,6 @@ const DIRECT_SPEND_NOTE = 'You use it without asking first: call it directly, an
 const bigSpendNote = () =>
     `paid_data_catalog gives the price of each call or row in credits: before the first paid call of a task, add up what every call it takes will cost. Up to ${BIG_SPEND_CREDITS} credits over a task, you use it without asking first: call it directly, and tell the user in your reply what the spend got them and what it cost. Beyond that it is a big spend: before the first paid call of the task, say in one short line of your message what you are about to buy, how many rows or calls it takes and about how many credits it costs, then end your turn, in plain words, with no card and no tool (not ask_user, not request_approval). Buy once the user says yes, or the smaller volume they settle on, and never split a big spend into batches to stay under that line. A task you started under that line that is about to go past it stops there and asks the same way, before the call that crosses it.`
 
-// A run nobody typed into (a routine, a webhook, a delegate) has no one to answer: it buys what the task needs.
 const paidDataNote = (asksFirst: boolean) =>
     'paid_data costs the workspace Rerun credit, the same credit that pays for your model. Its catalog covers prospects and their work emails and phone numbers, company search and enrichment, SEO data (search volumes, keyword ideas, backlinks, domain authority), Google results, Google Maps and local businesses, and public profiles, posts, comments and reactions on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, without the user subscribing to Apollo, Semrush or any other tool: reach for it before suggesting such an app, and never gather this data by hand on your computer. paid_data_catalog reads that catalog for free: call it with a group before the first paid_data call of that group in a task, and with a capability id when you need its exact inputs. Pick the tool by the shape of what you need, not by its price. web_search and web_fetch find and read pages: an article, a documentation page, a company\'s website, a fact to check. paid_data returns rows: the people at a company with their work emails or phones, a list of companies matching criteria, a profile and its posts, keyword volumes, Google or Maps results. When the task is a list of people, contacts, companies, posts or metrics, paid_data is the tool from the first step: read its catalog and plan the batch before you open a search engine, and never spend a round of web searches assembling by hand what one paid call returns, because pages rarely give a decision-maker\'s name and almost never a working email. Reading public data that way is faster than your screen and never touches the user\'s own accounts; acting in their account (sending a message or an invitation, posting, commenting) stays with a connected app or your computer. A result your free tools left incomplete (companies but no decision-maker, names but no email, a profile but no posts) is not finished when the missing piece is what the task is about: complete it with paid_data in the same turn, sized as below, rather than leaving the user with the thinner version. The same goes for the data your own instructions say the work rests on (search volumes, where a site ranks today, real demand, prices): get every piece of it before you deliver, and never hand back a result that says one of them is still to check, nor offer that check as a next step. Rows paid_data returns are candidates, not your answer: before you show or save them, check each one against every criterion the user gave (place, kind of business, size, the signal they asked for) and against any filter the answer says the provider ignored, and drop the ones that miss. When a criterion is a signal no field of the rows carries (they need marketing, they are hiring, they are unhappy with a tool), write down the signals you will look for, check them on each candidate\'s own site or profile with web_fetch or browser_navigate in the same turn, and hand back each row you keep with the evidence you found: checking candidates is not assembling them by hand. Say how many you kept against how many were asked, never a count you do not hold. Size every spend yourself: when the user asks for a volume (1,000 leads), plan that volume; otherwise plan the smallest batch that answers the task, only the rows you will use. Never look up the same thing twice, and never buy what a page you already read gave you. When a call is billed well above what the catalog said, or returns nothing you can use at that price, that capability is closed for the rest of the task: say it in one line, finish with what you have, and never try it again with other inputs. The user knows this credit in credits, never in dollars (100 credits is one dollar): always state a cost or a balance in credits. A paid_data answer that fits comes back whole; a bigger one is saved whole in your workspace and you get its outline: read what you need with paid_data_read, or with jq / grep through shell_exec, free, and never buy the same thing twice to see more of it. The picture and video URLs of social platforms are signed and expire within hours: download one the task needs as soon as you have it. To the user this is paid data, never paid_data, a capability id or a catalog: say what a spend gets them and what it costs, in credits. ' + (asksFirst ? bigSpendNote() : DIRECT_SPEND_NOTE)
 
@@ -203,9 +187,6 @@ const cliBridgeNote = (provider: Provider, web: boolean) =>
 
 type TurnClosers = { cards: readonly HitlToolName[]; skillPropose: boolean }
 
-// The one place in the prompt that says whether the message or the calls closing the turn come
-// first. Each card's own description repeats it from the same turnOrder, and every other text says
-// what goes in the message and in the card, never which comes first.
 function turnOrderNote(order: TurnOrder, { cards, skillPropose }: TurnClosers): string {
     const message = 'your message, complete: the full result when you deliver one, what you found, why you ask and, in full, what the card asks about when you ask something'
     const calls = [skillPropose ? 'skill_propose, when you propose a skill' : '', cards.length ? `at most one card that asks the user something (${cards.join(', ')})` : ''].filter(Boolean)
@@ -246,9 +227,6 @@ const FOREMAN_OPERATING_NOTES =
 const FOREMAN_SHOWING_FILES_NOTE =
     "The user cannot reach this server: a path means nothing to them, and a link to one opens nothing. Every file they should see (an image, slides, a document, what a sub-coworker produced for you) goes in a card_file call, which draws it as tiles they open and download: scope 'agent' for your own workspace, 'shared' for the shared space. A file in a coworker's own workspace is shown by that coworker, so ask it with send_message. Never write a server path in your message, and never tell the user to open the server, a folder or an admin access to get a file."
 
-// The hub writes the foreman's charter and hands it the account tools; the engine adds what depends
-// on the box and the runtime it is on. None of the sections of an agent's own state apply: it keeps
-// no skills, no memory and no schedules of its own.
 async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order: TurnOrder): Promise<SystemPrompt> {
     const cfg = agent.config.tools
     const [sharedDbSchema, brain] = await Promise.all([
@@ -294,7 +272,6 @@ export async function buildSystemPrompt(agent: LoadedAgent, trigger: RunTrigger 
     const asks = cfg.askUser || cfg.requestApproval || cfg.suggestService || cfg.requestSecret
     const unattended = trigger.source !== 'chat' && (cfg.askUser || cfg.requestApproval)
 
-    // Who it is, where it runs, how it works, how it talks to the user, then this session.
     const stable = [
         section('identity', agent.soul.trim() || defaultSoul(agent.config)),
         section('vocabulary', VOCABULARY_NOTE),
@@ -334,8 +311,6 @@ export async function buildSystemPrompt(agent: LoadedAgent, trigger: RunTrigger 
     return { stable: joinSections(stable), volatile: joinSections(volatile) }
 }
 
-// A memory the conversation already holds, injected on an earlier turn, is in front of the model
-// already: sending it again would only grow a history that is now kept as sent.
 function alreadyInHistory(history: ModelMessage[]): string {
     return history
         .filter(m => m.role === 'user')
@@ -345,15 +320,12 @@ function alreadyInHistory(history: ModelMessage[]): string {
 
 const memoryLine = (m: { kind: string; content: string }) => `- (${m.kind}) ${m.content}`
 
-// Started as soon as the run begins: it waits on the hub's embedding, and only needs the message.
 export async function recallMemories(agent: LoadedAgent, userText: string): Promise<RecalledMemory[]> {
     if (!agent.config.tools.memory || !userText) return []
     return recallMemory(agent, userText, 5, { reinforce: 'touch', minSimilarity: AUTO_RECALL_MIN_SIMILARITY }).catch(() => [])
 }
 
 export function recallSection(memories: RecalledMemory[], history: ModelMessage[] = []): string {
-    // The whole line, kind prefix and closing newline included: a memory that is a prefix of
-    // another one already sent would otherwise pass for seen.
     const seen = alreadyInHistory(history)
     const fresh = memories.filter(m => !seen.includes(`${memoryLine(m)}\n`))
     if (fresh.length === 0) return ''

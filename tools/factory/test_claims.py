@@ -6,7 +6,7 @@ import roster as R
 from test_roster import PR73
 
 PR77 = ["apps/engine/Dockerfile", "apps/engine/docker-entrypoint.sh", "apps/engine/scripts/entrypoint-selftest-signals.sh",
-        "apps/engine/scripts/entrypoint-selftest.sh", "deploy/vps/dev-engine-status.sh"]   # fixture: files of #77
+        "apps/engine/scripts/entrypoint-selftest.sh", "deploy/vps/dev-engine-status.sh"]
 
 
 def rost():

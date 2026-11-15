@@ -14,24 +14,12 @@ import { readStarterPackAnswer, SHOW_STARTER_PACK_TOOL, starterPackPlan, type St
 import { loadStarterPack, nameCustomCoworker } from './starter-pack-offer'
 import { owedTemplatePurchase, type OwedTemplatePurchase } from './template-purchase'
 
-// The steps of the funnel nobody has to think about, run by the app instead of the model. Once the
-// plan card comes back confirmed, what follows is never a decision: the plan is written down as it
-// was shown, the trial card goes up, and the moment the trial is on the team is built. Handing those
-// to a model made each of them one more turn to wait on, and one more place it could decide
-// otherwise.
-//
-// They are written into the conversation as the same tool parts the model used to produce, so a
-// reload, the funnel analytics, the build's live block and the model's next turn all read them as
-// if nothing had changed.
-
 export const OPEN_CHECKOUT_TOOL = 'open_checkout'
 export const BUILD_TEAM_TOOL = 'build_team'
 export const OPEN_TEMPLATE_PURCHASE_TOOL = 'open_template_purchase'
 
 export type ScriptedIntent = 'confirm_plan' | 'offer_trial' | 'build'
 
-// `template` is the card of the template they arrived on, written into the conversation already
-// picked: the board and the column draw it from there, the same as a card they had answered.
 export type ForemanScript =
     | { kind: 'offer_pack'; pack: StarterPackInput }
     | { kind: 'offer_trial'; template?: TemplateCard }
@@ -61,8 +49,6 @@ function confirmedPlanCard(message: UIMessage): boolean {
     return output?.answered === true && output.confirmed === true
 }
 
-// Someone who arrived on a template link confirms it on its own card. Picking it is the plan: the
-// template holds its agents, so a plan card after it would only ask the same yes a second time.
 function chosenTemplatePlan(message: UIMessage): ReturnType<typeof templateCardPlan> {
     const tool = lastToolPart(message)
     if (tool?.type !== 'tool-show_templates' || tool.state !== 'output-available') return null
@@ -70,13 +56,8 @@ function chosenTemplatePlan(message: UIMessage): ReturnType<typeof templateCardP
     return typeof chosen === 'string' && chosen ? templateCardPlan(tool.input, chosen) : null
 }
 
-// The plan a ready-made link is written down as, and for a template the card it is shown on.
 type ArrivedPlan = { shown: { items: unknown[]; boxes: { name: string }[] }; template?: TemplateCard }
 
-// Someone who arrived on a template or on a shared coworker already chose it by clicking the link,
-// and its own setup asks the rest once it is installed: asking them to pick it again was one more
-// card and one more model turn before the trial. It lands in the first Box of their board, the one
-// the board centres on. A link that no longer resolves has no title and is left to the model.
 function arrivedReadyMadePlan(state: ForemanState, messages: UIMessage[]): ArrivedPlan | null {
     const last = messages.at(-1)
     const intent = state.intent
@@ -90,13 +71,6 @@ function arrivedReadyMadePlan(state: ForemanState, messages: UIMessage[]): Arriv
     return shown ? { shown, template } : null
 }
 
-// What the starter pack step does with this request. Someone who came in with nothing in hand is
-// offered the pack of their industry the moment the welcome card hands over, and never interviewed:
-// the cards they pick are the plan, and the line they write instead of picking is the one coworker
-// built for them. Typing over the cards is that same line, and so is a line written under the
-// welcome card before the pack ever went up: the kickoff carries it, and the cards are skipped. A
-// link they arrived on is left to its own card, and a conversation the pack never opened (the
-// welcome card failed, the model asked the profile itself) to the model.
 type StarterPackStep = { kind: 'offer' } | { kind: 'picked'; input: unknown; chosen: string[] } | { kind: 'custom'; asked: string }
 
 function lastStarterPackPart(messages: UIMessage[]): LoosePart | null {
@@ -135,8 +109,6 @@ function starterPackStep(state: ForemanState, messages: UIMessage[]): StarterPac
     return 'custom' in answer ? { kind: 'custom', asked: answer.custom } : { kind: 'picked', input: card.input, chosen: answer.chosen }
 }
 
-// The plan their answer to the pack becomes: the templates they picked, or one coworker written from
-// their own line. Neither goes back through a card: they already said yes on this one.
 async function writeStarterPlan(ctx: WorkspaceContext, state: ForemanState, step: Exclude<StarterPackStep, { kind: 'offer' }>): Promise<WrittenPlan> {
     const title = state.answers.company_name ?? state.workspaceName
     if (step.kind === 'picked') return writePlan(ctx, { ...starterPackPlan(step.input, step.chosen), title }, ['template'])
@@ -153,10 +125,7 @@ function isKickoff(message: UIMessage): boolean {
     return message.role === 'user' && (message.parts as LoosePart[]).some(part => part.type === 'text' && typeof part.text === 'string' && isKickoffText(part.text))
 }
 
-/** Which step the app runs itself for this request, or `null` when the model has something to decide. */
 export function scriptedIntent(phase: ForemanPhase, messages: UIMessage[]): ScriptedIntent | null {
-    // Whatever the request says: a build has nothing left to discuss, and a message typed while it
-    // was being built is answered by the team it builds.
     if (phase === 'build') return 'build'
 
     const last = messages.at(-1)
@@ -164,8 +133,6 @@ export function scriptedIntent(phase: ForemanPhase, messages: UIMessage[]): Scri
 
     if (phase === 'plan') return confirmedCard(last) ? 'confirm_plan' : null
 
-    // The trial card goes up on its own: right after the confirmation when the plan was written by an
-    // earlier request that did not get to put it up, and when a conversation opens on this step.
     if (phase === 'trial') return confirmedCard(last) || isKickoff(last) ? 'offer_trial' : null
 
     return null
@@ -173,11 +140,6 @@ export function scriptedIntent(phase: ForemanPhase, messages: UIMessage[]): Scri
 
 export type PreparedScript = { script: ForemanScript } | { planError: string } | null
 
-/**
- * Settles what has to happen before anything is streamed: the confirmed plan is written here, so a
- * plan that cannot be written goes back to the model with the reason instead of starting a stream
- * the app would have to abandon halfway.
- */
 export async function prepareScript(ctx: WorkspaceContext, state: ForemanState, messages: UIMessage[]): Promise<PreparedScript> {
     const pack = starterPackStep(state, messages)
     if (pack?.kind === 'offer') {
@@ -195,8 +157,6 @@ export async function prepareScript(ctx: WorkspaceContext, state: ForemanState, 
     try {
         const last = messages.at(-1)
         const readyMade = arrived ? arrived.shown : last ? chosenTemplatePlan(last) : null
-        // Installed ahead of the welcome card: the mark is written with the plan, and it is what
-        // brings the card back once the build is done.
         const installedFirst = !!arrived && !state.foreman.profileAt
         const written = pack
             ? await writeStarterPlan(ctx, state, pack)
@@ -208,7 +168,6 @@ export async function prepareScript(ctx: WorkspaceContext, state: ForemanState, 
     } catch (err) {
         const reason = err instanceof Error ? err.message : String(err)
         if (!pack) return { planError: reason }
-        // The model has no card to fix here: the pack goes back up, as it was offered.
         console.error('[foreman] starter pack plan refused:', reason)
         const offered = await loadStarterPack(ctx, state)
         return offered ? { script: { kind: 'offer_pack', pack: offered } } : { planError: reason }
@@ -221,8 +180,6 @@ export async function prepareScript(ctx: WorkspaceContext, state: ForemanState, 
     return null
 }
 
-// A plan is on, so the team can be built, unless what the plan holds is a template still to be
-// bought: then its card goes up first, and the build is what its answer brings.
 async function buildOrPurchase(ctx: WorkspaceContext, state: ForemanState): Promise<ForemanScript> {
     const purchase = await owedTemplatePurchase(ctx, state.foreman.plan)
     return purchase ? { kind: 'offer_purchase', purchase } : { kind: 'build', state }
@@ -234,7 +191,6 @@ export async function runScript(script: ForemanScript, { ctx, writer, signal, re
     writer.write({ type: 'start-step' })
 
     if (script.kind === 'offer_pack') {
-        // No output: the card answers it itself, and that answer is what brings the next request.
         writer.write({ type: 'tool-input-available', toolCallId, toolName: SHOW_STARTER_PACK_TOOL, input: script.pack })
         writer.write({ type: 'finish-step' })
         writer.write({ type: 'finish' })
@@ -248,7 +204,6 @@ export async function runScript(script: ForemanScript, { ctx, writer, signal, re
     }
 
     if (script.kind === 'offer_trial' || script.kind === 'offer_purchase') {
-        // No output: the card answers it itself, and that answer is what brings the next request.
         if (script.kind === 'offer_trial') writer.write({ type: 'tool-input-available', toolCallId, toolName: OPEN_CHECKOUT_TOOL, input: {} })
         else writer.write({ type: 'tool-input-available', toolCallId, toolName: OPEN_TEMPLATE_PURCHASE_TOOL, input: script.purchase })
         writer.write({ type: 'finish-step' })
@@ -257,8 +212,6 @@ export async function runScript(script: ForemanScript, { ctx, writer, signal, re
     }
 
     writer.write({ type: 'tool-input-available', toolCallId, toolName: BUILD_TEAM_TOOL, input: {} })
-    // Same id as the tool part: it is what pairs the live block to the build instead of leaving it to
-    // render on its own as a delegation.
     const emit = (tasks: SubRunTask[]) => writer.write({ type: 'data-delegate', id: toolCallId, data: { tasks } })
     try {
         const result = await buildTeamOnce({ ctx, state: script.state, emit, signal, reload })
@@ -267,9 +220,6 @@ export async function runScript(script: ForemanScript, { ctx, writer, signal, re
         writer.write({ type: 'tool-output-error', toolCallId, errorText: err instanceof Error ? err.message : String(err) })
     }
     writer.write({ type: 'finish-step' })
-    // An empty step to close on, so the saved transcript does not end on answered tool calls. It never
-    // reaches the browser's copy of the message: what keeps the browser from sending the finished team
-    // back is resumesAfterAnswer (pending-widget.ts).
     writer.write({ type: 'start-step' })
     writer.write({ type: 'finish-step' })
     writer.write({ type: 'finish' })

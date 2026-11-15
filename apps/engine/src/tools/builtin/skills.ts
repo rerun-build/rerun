@@ -22,12 +22,9 @@ function describeError(err: unknown): string {
 
 export function skillTools(ctx: RunContext): ToolSet {
     const id = ctx.agent.id
-    // Taken once, when the tools are built: a switch flipped mid-run applies from the next run.
     const off = disabledSkillSet({ disabledSkills: ctx.agent.config?.disabledSkills })
     const missing = (slug: string): boolean => off.has(slug) || !skillExists(id, slug)
 
-    // Read at call time, not once per run: a connector installed mid-conversation must protect
-    // its skills from the very next tool call.
     async function readOnlyReason(slug: string): Promise<string | null> {
         const service = (await connectorSkillOwners(id)).get(slug)
         return service ? connectorSkillReadOnlyError(slug, service) : null
@@ -132,8 +129,6 @@ export function skillTools(ctx: RunContext): ToolSet {
                 body: z.string().describe('The full markdown procedure'),
             }),
             execute: async ({ name, description, body }) => {
-                // writeSkill overwrites whatever sits at that slug, so a colliding name would
-                // silently replace a connector's SKILL.md.
                 if (off.has(slugify(name))) return OFF_SLUG
                 const readOnly = await readOnlyReason(slugify(name))
                 if (readOnly) return readOnly
@@ -165,8 +160,6 @@ export function skillTools(ctx: RunContext): ToolSet {
                 if (readOnly) return readOnly
                 const skill = await writeSkill(id, finalName, finalDescription, body)
                 if (!isDir) return `Imported skill ${skill.slug}`
-                // A link in the pack is left behind rather than copied: once inside the skill folder it
-                // would point wherever it likes, and the skill readers only check the path they are given.
                 await cp(source, skillDir(id, skill.slug), {
                     recursive: true,
                     force: true,

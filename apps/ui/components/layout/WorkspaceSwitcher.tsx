@@ -54,7 +54,6 @@ const PRICING_ICONS = ['/pricing/solo.png', '/pricing/team.png', '/pricing/scale
 
 type SessionWorkspace = NonNullable<ReturnType<typeof useSession>['workspace']>
 
-// A menu entry an admin uses and a member sees, disabled, with the reason on hover.
 function AdminOnly({ allowed, reason, className = 'flex w-full', children }: { allowed: boolean; reason: string; className?: string; children: ReactNode }) {
     if (allowed) return <>{children}</>
     return (
@@ -90,12 +89,8 @@ export function WorkspaceSwitcher() {
     const isAdmin = useIsAdmin()
     const workspaceAdmin = useIsWorkspaceAdmin()
     const isTemplateAuthor = useIsTemplateAuthor()
-    // In a store rather than here: the return from Stripe's hosted onboarding lands on the home
-    // page and has to reopen this panel on its payouts pane.
     const openCreator = useCreatorStore(s => s.openCreator)
     const setCreateTemplateOpen = useCreatorStore(s => s.setCreateOpen)
-    // Held in a store rather than here: the foreman opens these three panels too, from a chat that
-    // does not own this menu.
     const panel = useWorkspaceSettingsStore(s => s.panel)
     const openWorkspacePanel = useWorkspaceSettingsStore(s => s.openWorkspacePanel)
     const setPanel = useWorkspaceSettingsStore(s => s.setPanel)
@@ -103,23 +98,17 @@ export function WorkspaceSwitcher() {
     const [busy, setBusy] = useState(false)
     const [entering, setEntering] = useState(false)
     const [createOpen, setCreateOpen] = useState(false)
-    // The team invite email links straight to this dialog. Read rather than mirrored into state, and
-    // closing drops the param so a refresh does not reopen it.
     const searchParams = useSearchParams()
     const router = useRouter()
     const pathname = usePathname()
     const membersLinked = searchParams.get('members') === '1'
     const [profileOpen, setProfileOpen] = useState(false)
-    // The confirmation cannot live inside the menu: closing the menu would unmount it before it
-    // ever opens.
     const [powerAction, setPowerAction] = useState<PowerAction | null>(null)
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
     const brainProposals = useBrainProposalCount(Boolean(workspace) && !isAnonymous)
     const guided = useForemanStore(state => state.funnel === 'guided')
     const credit = useRerunCredit()
 
-    // An app joins the Apps section of the menu with its first account: counted on mount and again
-    // each time a dialog connects or removes one.
     const sandbox = workspace?.is_sandbox ?? true
     useEffect(() => {
         if (sandbox) return
@@ -129,9 +118,6 @@ export function WorkspaceSwitcher() {
 
     if (!workspace) return null
 
-    // A returning user on a fresh browser lands here anonymous: an empty board under "My workspace"
-    // reads as a lost account, so this corner is where the way back in sits. On a phone the funnel's
-    // sheet cannot be closed and carries its own sign-in, so the pill would only crowd the board.
     if (isAnonymous) {
         return (
             <div className={cn('absolute top-4 left-4 z-40', guided && 'max-md:hidden')}>
@@ -160,9 +146,6 @@ export function WorkspaceSwitcher() {
         setBusy(false)
     }
 
-    // Toujours par enterSandboxAction, jamais un simple switch même quand le sandbox existe déjà :
-    // l'action est un get-or-create qui réattribue aussi un engine au sandbox qui n'en a pas. Si le
-    // pool est vide, elle échoue sans basculer — on reste sur le workspace courant.
     async function handleEnterSandbox() {
         if (busy || entering) return
         setEntering(true)
@@ -191,8 +174,6 @@ export function WorkspaceSwitcher() {
         </AdminOnly>
     )
 
-    // A sandbox has no settings, members nor billing of its own, but it runs on a machine of its own,
-    // so it keeps its providers, its knowledge base and the API key the template tools require.
     const headerSection = (
         <div className="flex flex-col gap-2.5 p-1.5">
             <div className="flex items-center gap-2.5">
@@ -331,7 +312,6 @@ export function WorkspaceSwitcher() {
         </DropdownMenuSub>
     )
 
-    // The admin panel and the machine controls belong to Rerun Cloud; a self-hosted install has neither.
     const adminMenu = RERUN_CLOUD && isAdmin && (
         <DropdownMenuSub>
             <DropdownMenuSubTrigger className="gap-2 text-muted-foreground">
@@ -378,12 +358,9 @@ export function WorkspaceSwitcher() {
         </>
     )
 
-    // From the workspace and what runs on it, to switching away from it, to the person using it.
     const sections = [headerSection, workspaceItemsSection, workspacesSection, rolesSection, footerSection].filter(Boolean)
 
     return (
-        // Leaves room for the view controls in the top-right corner: on a phone the workspace name
-        // truncates rather than pushing the row under them.
         <div className="absolute top-4 left-4 z-40 flex max-w-[calc(100%-2*var(--chrome-edge)-var(--chrome-size)-var(--chrome-gap))] items-center gap-2">
             <DropdownMenu
                 onOpenChange={open => {

@@ -5,8 +5,6 @@ import type { RunContext } from '../../runtime/context.js'
 import { callHub } from '../../runtime/hub.js'
 import { HITL_TOOL_SET } from './hitl.js'
 
-// `send_message` waits on the agent it wrote to, and the first Box of a workspace claims a machine:
-// both routinely outlast the 20 s the service-catalog calls get.
 const FOREMAN_HUB_TIMEOUT_MS = 180_000
 
 let serialTail: Promise<unknown> = Promise.resolve()
@@ -17,8 +15,6 @@ function runSerially<T>(task: () => Promise<T>): Promise<T> {
     return next
 }
 
-// The CLI bridge only exposes tools whose input schema is zod, so the JSON Schema the hub sends
-// is converted rather than wrapped. A schema zod cannot read drops that one tool, not the run.
 function inputSchemaOf(spec: ForemanToolSpec, ctx: RunContext): z.ZodType | null {
     try {
         return z.fromJSONSchema(spec.inputSchema as Parameters<typeof z.fromJSONSchema>[0])
@@ -37,8 +33,6 @@ function hubTool(spec: ForemanToolSpec, inputSchema: z.ZodType, ctx: RunContext)
     })
 }
 
-// Transient, so the gesture reaches the open browser once and is gone: a reload must not reopen
-// every panel the foreman ever pointed at.
 function intentTool(spec: ForemanToolSpec, inputSchema: z.ZodType, ctx: RunContext) {
     return tool({
         description: spec.description,

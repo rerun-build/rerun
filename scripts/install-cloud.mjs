@@ -1,11 +1,4 @@
 #!/usr/bin/env node
-// Installs the private `cloud/` workspace after the root install, when it is in the checkout. Its
-// packages link to the dependencies of apps/ui, so it has to come second. A checkout without it (an
-// open source clone) has nothing to do, and neither has an install that left the app out (a Docker
-// stage or a CI job filtered to one package): the Dockerfiles install cloud/ on their own.
-//
-// It also puts in place the links cloud/links.txt lists (the team's skills, CLAUDE.local.md), and keeps
-// them out of git through .git/info/exclude.
 
 import { execFileSync, spawnSync } from 'node:child_process'
 import { appendFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, rmSync, symlinkSync } from 'node:fs'
@@ -39,7 +32,6 @@ function linkCloudFiles() {
         const path = join(REPO_ROOT, link)
         const current = lstatSync(path, { throwIfNoEntry: false })
         if (current?.isSymbolicLink() && readlinkSync(path) === target) {
-            // already in place
         } else {
             if (current?.isSymbolicLink()) rmSync(path)
             else if (current) {

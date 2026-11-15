@@ -5,23 +5,8 @@ export const AGENT_COLUMNS = ['id', 'name', 'handle', 'description', 'space_id',
 export const SPACE_COLUMNS = ['id', 'name', 'col_start', 'row_start', 'col_end', 'row_end'] as const
 
 export type ForemanAgentRow = Pick<Tables<'agents'>, (typeof AGENT_COLUMNS)[number]>
-// `access` is set when the person the foreman speaks for is not an admin: a Box they only use is
-// one whose coworkers they talk to but never change.
 export type ForemanSpaceRow = Pick<Tables<'spaces'>, (typeof SPACE_COLUMNS)[number]> & { access?: 'use' | 'manage' }
 
-// The board as text, handed over on every turn. Without it the agent opens each conversation with
-// list_spaces then list_agents before it can answer "how many agents do I have", and the tile
-// coordinates it needs to move anything are in no tool at all.
-//
-// What each coworker is doing is left out: written once per turn, it is stale before the turn ends
-// and was wrong outright for a run the board had not swept yet. get_team_status reads it live.
-//
-// The rows are read once by the phase resolver, which needs the same two tables to know where the
-// workspace stands, and rendered here.
-//
-// This block sits last in the system prompt, which is the strongest position in it, so an empty board
-// has to say what the phase allows rather than what the schema allows. Offering a Box to someone who
-// cannot be given create_boxes is how the foreman ends up announcing one it never made.
 export function renderBoardMap(spaces: ForemanSpaceRow[], agents: ForemanAgentRow[], { canCreateBox, hiddenBoxes = 0 }: { canCreateBox: boolean; hiddenBoxes?: number }): string {
     if (!spaces.length && hiddenBoxes > 0) {
         return canCreateBox
@@ -50,5 +35,4 @@ export function renderBoardMap(spaces: ForemanSpaceRow[], agents: ForemanAgentRo
         .join('\n\n')
 }
 
-// Said once when the foreman speaks for a member rather than an admin, under the board map.
 export const MEMBER_REACH_NOTE = 'The person you are talking to is a member, not an admin: the board above holds only the Boxes open to them. Create or change a coworker only in a Box they manage, and never mention a Box or a coworker that is not listed.'

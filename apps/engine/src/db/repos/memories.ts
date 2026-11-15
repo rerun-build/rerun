@@ -12,10 +12,6 @@ export type MemoryIndexRow = {
     accessCount: number
 }
 
-// `similarity` is the cosine between the query and the memory, null when either side has no vector.
-// It is the only figure that says how relevant a hit is in absolute terms: `score` only ranks.
-// `coverage` is the share of the query terms a keyword hit contains, 0 for a hit the keyword search
-// did not return: one common word out of five is not a match.
 export type MemoryHit = MemoryIndexRow & { score: number; similarity: number | null; coverage: number }
 
 const vec = (embedding: number[]) => `[${embedding.join(',')}]`
@@ -58,8 +54,6 @@ export async function deleteMemory(agentId: string, id: string): Promise<void> {
     await client.execute({ sql: 'DELETE FROM memories_fts WHERE memory_id = ?', args: [id] })
 }
 
-// The embedding is left as is: a renamed mention barely moves the meaning, and re-embedding every
-// matching memory would cost a call each.
 export async function rewriteMemoryText(agentId: string, needle: string, rewrite: (text: string) => string): Promise<void> {
     const { client } = await getSystemDb(agentId)
     const res = await client.execute({ sql: "SELECT id, content FROM memories WHERE agent_id = ? AND content LIKE ? ESCAPE '\\'", args: [agentId, `%${needle.replace(/[\\%_]/g, '\\$&')}%`] })
@@ -110,8 +104,6 @@ export async function vectorRecall(agentId: string, embedding: number[], k: numb
     })
 }
 
-// A question is mostly glue words, and ORed into the query each of them matches half the store:
-// the memories that share "the" and "is" with the question then outrank the one that answers it.
 const STOPWORDS = new Set(
     `a about after all also am an and any are as at be been but by can could did do does for from had has have he her him his how if in into is it its just me more my no not of on or our she so some than that the their them then there these they this to up us was we were what when where which who whom why will with would you your
     au aux avec ce ces cet cette comme dans de des du elle elles en est et il ils je la le les leur leurs lui ma mais me mes moi mon ne nos notre nous on ou où par pas pour qu que quel quelle quelles quels qui sa se ses son sont sur ta te tes toi ton tu un une vos votre vous ça été être
@@ -123,9 +115,6 @@ const STOPWORDS = new Set(
         .split(/\s+/)
 )
 
-// Unicode-aware, like the brain search: stripping everything outside a-z turns "comptabilité" into
-// "comptabilit" and drops Cyrillic or Arabic queries entirely. Diacritics are folded the way the
-// FTS5 tokenizer folds them, so a term here compares equal to a token there.
 function termsOf(text: string): string[] {
     const folded = text
         .toLowerCase()

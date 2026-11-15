@@ -6,8 +6,6 @@ import { useLocale, useTranslations } from 'next-intl'
 import type { TaskOutcome } from '@/lib/schedules/outcomes'
 import { shortRelativeTime } from '@/lib/time'
 
-// How a scheduled task or a trigger last ended, under its row. Without an outcome in the recent runs,
-// the last start the engine recorded is all there is.
 export function TaskOutcomeFooter({ outcome, lastStartedAt }: { outcome: TaskOutcome | undefined; lastStartedAt: string | null | undefined }) {
     const t = useTranslations('agent.taskOutcomeFooter')
     const locale = useLocale()

@@ -5,27 +5,16 @@ import { useEffect, useReducer } from 'react'
 import { getCatalogServicesBySlugsAction } from '@/app/api/_actions/services.actions'
 import type { ServiceSearchResult } from '@/lib/services/types'
 
-// Catalog rows for a handful of slugs, resolved once for the whole browser session.
-//
-// The cache is at module level on purpose: the surfaces that need this are drawn inside a chat
-// stream and are re-rendered on every tick of it, so a per-component fetch would ask the catalog for
-// the same three apps dozens of times per message.
-
-// `null` is an answer, not a gap: the catalog was asked and holds nothing under that slug. Stored so
-// the same miss is not looked up again for the rest of the session.
 const cache = new Map<string, ServiceSearchResult | null>()
 const inFlight = new Map<string, Promise<void>>()
 
 async function resolve(slugs: string[]): Promise<void> {
-    // The action never throws, it answers with an empty list, so a catalog that is down leaves every
-    // slug unresolved rather than leaving the caller in a permanent loading state.
     const rows = await getCatalogServicesBySlugsAction(slugs)
     const found = new Map(rows.map(row => [row.slug, row]))
     for (const slug of slugs) cache.set(slug, found.get(slug) ?? null)
 }
 
 export function useCatalogServices(slugs: string[]): { resolved: Map<string, ServiceSearchResult>; loading: boolean } {
-    // The list arrives as a fresh array on every render, so the effect keys off its content.
     const key = slugs.join(',')
     const [, rerender] = useReducer((tick: number) => tick + 1, 0)
 

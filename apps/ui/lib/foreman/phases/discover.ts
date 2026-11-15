@@ -1,23 +1,12 @@
 import type { PhaseSpec } from './spec'
 
-// The first minutes, when the welcome card did not get to run: it is the app that asks who this
-// person is now, before the model is ever called, so a conversation only lands here when that card
-// failed, was refused, or was closed halfway through. Everything it would have written is still
-// missing, and the same three fields are what open the next step.
 export const DISCOVER_PHASE: PhaseSpec = {
     phase: 'discover',
     instructions: state => {
-        // The first name is only asked when nothing holds it: a Google sign-up already carries one,
-        // and three questions is the whole budget of this step.
         const missing = [state.answers.company_url ? null : 'the address of their company website', state.answers.position ? null : 'what they do there', state.firstName ? null : 'their first name'].filter(Boolean)
 
-        // What they arrived with is honoured at the next step, never here. Left unsaid, this is the
-        // turn where the model opens the template they clicked and spends the whole step on it, for
-        // a company it still knows nothing about.
         const arrival = state.intent ? '\n- They arrived with something already in mind, and it is written above. Do not act on it here and do not let it become a fourth question: it is what the next step is built on, once you know who they are. One line saying you have it and will come back to it is the whole of what it earns now.' : ''
 
-        // Installed ahead of this step: the coworker they came for is on the board already, so
-        // nothing is designed after it and the three fields close the onboarding.
         if (state.foreman.installedFirst) {
             const installed = state.agents.map(agent => agent.name).filter(Boolean).join(', ')
             return `Right now: this person arrived on a link and what it carried is already installed on their board${installed ? ` (${installed})` : ''}, running its own setup in its own chat. You are not building anything: you are getting to know them, so that everything on this workspace knows their company.

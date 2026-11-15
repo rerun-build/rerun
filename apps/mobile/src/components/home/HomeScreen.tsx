@@ -37,8 +37,6 @@ import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// A wide window draws the Home as a sidebar beside the conversation: a tap swaps the conversation
-// instead of stacking one more screen, and the row of the open one stays lit.
 export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
@@ -71,7 +69,6 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const sections = board.state === 'ready' && group === 'box' ? sectionsByBox(others, board.boxes, t('untitledBox')) : []
     const recent = board.state === 'ready' && group === 'recent' ? recentCoworkers(others) : []
 
-    // The app icon shows the bell's count, never off the copy kept from the last visit.
     const unread = inbox.state === 'ready' && inbox.fresh ? inboxCount(inbox.items) : null
     useEffect(() => {
         if (unread !== null) setBadge(unread).catch(() => {})

@@ -2,9 +2,6 @@ import { MAX_MEMORIES_PER_CALL, MAX_UPLOAD_MB } from '@/lib/mcp/account-tools'
 
 import { importSource, type ImportSourceId } from './sources'
 
-// Addressed to the outside agent, in English whatever the user's language: it is the one reading
-// it. The rules are the ones a model breaks on its own, summarising a long file, passing an API
-// key along, creating a second coworker after an error.
 export function buildImportPrompt(sourceId: ImportSourceId, connectorUrl: string, spaceId: string | null): string {
     const source = importSource(sourceId)
     const createArgs = spaceId ? `name, description, soul and spaceId "${spaceId}"` : 'name, description and soul'

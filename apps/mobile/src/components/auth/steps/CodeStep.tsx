@@ -16,7 +16,6 @@ import { track } from '@/lib/analytics'
 import { internationalNumber } from '@/lib/phone'
 import { spacing } from '@/theme/tokens'
 
-// Same waits as the web: a new code after a minute, the other channel after 20 seconds.
 const RESEND_AFTER_SECONDS = 60
 const SWITCH_AFTER_SECONDS = 20
 const CHANNEL_NAMES: Record<PhoneChannel, string> = { whatsapp: 'WhatsApp', sms: 'SMS' }
@@ -27,7 +26,6 @@ export function CodeStep({ step }: { step: Extract<SignInStep, { name: 'code' }>
     const errorText = useSignInErrorText()
     const byPhone = step.method === 'phone'
     const [channel, setChannel] = useState<PhoneChannel>(step.method === 'phone' ? step.channel : 'sms')
-    // Opened on a code sent earlier, the wait before a new one is what the hub said is left of it.
     const [sentAt, setSentAt] = useState(() => Date.now() - (step.method === 'phone' && step.resendIn !== undefined ? (RESEND_AFTER_SECONDS - step.resendIn) * 1000 : 0))
     const [code, setCode] = useState('')
     const [verifying, setVerifying] = useState(false)
@@ -37,7 +35,6 @@ export function CodeStep({ step }: { step: Extract<SignInStep, { name: 'code' }>
     const resendIn = Math.max(0, RESEND_AFTER_SECONDS - elapsed)
     const otherChannel: PhoneChannel = channel === 'sms' ? 'whatsapp' : 'sms'
 
-    // Once the session opens, the root layout swaps the sign-in screens for the app on its own.
     const verify = async (value: string) => {
         setVerifying(true)
         setThinking(true)

@@ -11,51 +11,32 @@ import type { PhaseSpec } from './spec'
 
 const BESPOKE_TOOLS = ['ask_choice', 'ask_input', 'search_docs', 'show_plan', 'save_profile', 'contact_team'] as const
 
-// A template is never offered, only honoured: it exists on this belt for the one person who clicked
-// a library card before signing up, and for nobody else.
 export function arrivedOnATemplate(state: ForemanState): boolean {
     return state.intent?.kind === 'template' || state.intent?.kind === 'share'
 }
 
-// The welcome card has already read their site into the profile. Handed the reader again, the model
-// reads it a second time before every card, one more round trip for what the prompt already says.
 export function siteLeftUnread(state: ForemanState): boolean {
     return Boolean(state.answers.company_url) && !state.answers.company_offering
 }
 
-// The shapes a plan item is allowed to take, for the same reason and on the same rule as the belt:
-// a kind the model never reads about is a kind it cannot write down, and a plan without a template
-// item is a build phase that never gets install_template back.
 export function planKinds(state: ForemanState): readonly PlanItemKind[] {
     if (state.intent?.kind === 'template') return ['agent', 'template']
     if (state.intent?.kind === 'share') return ['agent', 'share']
     return ['agent']
 }
 
-// The divisions the welcome card drew on the board, and the only ones a first plan lays out: the
-// model files agents into them and never draws its own, so the board does not redraw itself under
-// someone who has not agreed to anything yet. A link lands in one of them and leaves the others
-// standing.
 export function pinnedPlanBoxes(state: ForemanState): string[] {
     return intakeBoxes(state.answers.industry, state.answers.boxes)
 }
 
-// A self-hosted install has no template library, so no starter pack opens this step and the model
-// writes the first card. A model that only announces the card would leave a new workspace with
-// nothing to click.
 export function forcesFirstPlan(state: ForemanState, messages: UIMessage[]): boolean {
     return !RERUN_CLOUD && state.phase === 'plan' && !state.intent && !!state.foreman.profileAt && lastShownPlan(messages) === null
 }
 
-// What to build, decided out loud with the user and written down before anything is paid for.
 export const PLAN_PHASE: PhaseSpec = {
     phase: 'plan',
     instructions: state => {
-        // Ce que l'interview a tiré d'eux : c'est la seule chose de ce prompt qu'ils ont dite
-        // eux-mêmes, donc elle fait foi. Vide seulement pour un profil passé à côté de l'interview.
         const picked = foremanUseCases(state.foreman)
-        // One agent, so one job and its one pain. A profile written when the interview took several
-        // jobs keeps its first, the one they ticked first.
         const job = picked[0]
         const needs = (state.foreman.needs ?? []).filter((need, index, all) => (all.some(other => other.job === job) ? need.job === job : index === 0)).slice(0, 1)
         const pains = state.foreman.pains ?? []
@@ -63,11 +44,6 @@ export const PLAN_PHASE: PhaseSpec = {
             ? [`what goes wrong in that job (${needs.map(describeNeed).join('; ')})`]
             : [pains.length ? `what slows them down (${pains.join('; ')})` : null, state.foreman.challenge ? `what they are up against right now (${state.foreman.challenge})` : null].filter(Boolean)
 
-        // Everyone has been through the welcome card by now, whatever link brought them here, so the
-        // profile is filled and nothing asks for it again. What a link changes is only what this
-        // step starts from. A profile that is still empty means the card failed: save_profile is
-        // still on the belt, because it is what names the workspace and stamps the onboarding the
-        // lifecycle emails key off.
         const websiteName = state.intent?.kind === 'prompt' ? state.intent.name : undefined
         const arrival =
             state.intent?.kind === 'template'
@@ -78,9 +54,6 @@ export const PLAN_PHASE: PhaseSpec = {
                     ? `They said what they wanted before they ever opened Rerun, and it is written above: design the coworker their own words call for rather than your own idea of their business. If they wrote when it should run, that is its \`when\`.${websiteName ? ` Name it "${websiteName}" on the card, the name it already carried on the website, unless they ask for another.` : ''} There is nothing ready-made to install here, the coworker of this plan is one you write for them.`
                     : `Design the coworker yourself, out of what you already know about them. There is no catalog to browse and nothing for them to pick from: they told you what they need, your job is to turn it into one coworker at work in their company. It is one you write for them, from their own words; there is nothing ready-made to install here.`
 
-        // Arriving on a link, the agents are the ones on the other side of it. Every rule below about
-        // working the agent out is about inventing one, and read
-        // beside a template it is an invitation to pad it.
         const agents = arrivedOnATemplate(state)
             ? ['The coworkers are the ones that come with it and nothing else. Do not write a coworker item beside it, not even one for a Box that would otherwise stay empty.']
             : [
@@ -90,7 +63,6 @@ export const PLAN_PHASE: PhaseSpec = {
                   'Say what it is for in their terms, not yours, and never tell them you guessed. If it is wrong, the card is where they will say so.',
                   'One coworker and never a second, whatever else you can see they would need: it is built the moment they confirm, then sets itself up with them in its own chat. The rest of their team comes once this one works, and offering it now is the choice that loses them. Say in one line above the card what this coworker will take off their plate.',
               ]
-        // Everyone keeps the divisions the welcome card drew, and the model only fills them.
         const fixedBoxes = `Their company is already laid out on the board beside you, in these Boxes: ${pinnedPlanBoxes(state).join(', ')}. They are fixed: never add, rename, drop or reorder one.`
         const layout =
             state.intent?.kind === 'template'

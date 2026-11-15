@@ -25,7 +25,6 @@ function accepted(sessionId: string | null, runId: string | null = 'engine-run-1
     return { ok: true, headers, body: null }
 }
 
-// An agent with nothing pending, so the message the foreman wrote is the one that goes through.
 function bespokeAgent() {
     return { config: { setup: { required: false, completedAt: null } }, install: '' }
 }
@@ -39,8 +38,6 @@ describe('startAgentSetup', () => {
         callableEngineAgentIds.mockResolvedValue(undefined)
     })
 
-    // The foreman of a member hands over with that member's access: a coworker in a Box closed to
-    // them is refused, and the run it starts calls only the coworkers they reach.
     it('starts the setup as the member behind the turn, and narrows what the run can call', async () => {
         const member = { kind: 'user', userId: 'user-2', workspaceId: 7, role: 'member', boxScope: 'assigned' }
         callableEngineAgentIds.mockResolvedValue(['engine-1'])
@@ -62,8 +59,6 @@ describe('startAgentSetup', () => {
         expect(engineChat).not.toHaveBeenCalled()
     })
 
-    // The whole point of the hand-over: /chat announces no session, so without this write the run
-    // happens on the engine and the agent's chat stays on an empty "New conversation".
     it('mirrors the session the engine opened', async () => {
         engineChat.mockResolvedValue(accepted('engine-session-1'))
 
@@ -74,9 +69,6 @@ describe('startAgentSetup', () => {
         expect(result.agents[0]).toMatchObject({ conversationId: 'session-row', runId: 'engine-run-1' })
     })
 
-    // The engine id opens nothing: the panel addresses a conversation by its row. Answering with
-    // both would hand the foreman two ids for one conversation, and the wrong one is the current
-    // bug, an empty chat opened beside the run.
     it('answers with the row id rather than the engine one', async () => {
         engineChat.mockResolvedValue(accepted('engine-session-1'))
 
@@ -86,8 +78,6 @@ describe('startAgentSetup', () => {
         expect(result.next).toContain('conversationId')
     })
 
-    // The message is already on its way when the copy fails, so the run did start: the only thing
-    // missing is somewhere to land the user.
     it('reports an agent whose session row could not be written as started, with no conversation', async () => {
         engineChat.mockResolvedValue(accepted('engine-session-5'))
         ensureSessionRow.mockResolvedValueOnce(null)
@@ -98,8 +88,6 @@ describe('startAgentSetup', () => {
         expect(result.agents[0].conversationId).toBeNull()
     })
 
-    // The install its author wrote replaces the foreman's message. It goes out wrapped so the chat
-    // draws a setup block, and the conversation is named after the setup rather than the guide.
     it('sends the install an agent plays instead of the written message', async () => {
         selectMany.mockResolvedValue({ data: [{ id: 'agent-2', name: 'Closer', disabled_at: null }] })
         engineGetAgent.mockResolvedValue({ config: { name: 'closer', setup: { required: true, completedAt: null } }, install: 'Run your own setup' })
@@ -112,7 +100,6 @@ describe('startAgentSetup', () => {
         expect(ensureSessionRow).toHaveBeenCalledWith('agent-2', 'engine-session-2', 'Install Closer', { source: 'api', status: 'working' })
     })
 
-    // The install already runs in a conversation of its own: the handoff lands the user there.
     it('opens the install already under way instead of starting a second one', async () => {
         selectMany.mockResolvedValue({ data: [{ id: 'agent-2', name: 'Closer', disabled_at: null }] })
         engineGetAgent.mockResolvedValue({ config: { name: 'closer', setup: { required: true, completedAt: null } }, install: 'Run your own setup' })
@@ -125,7 +112,6 @@ describe('startAgentSetup', () => {
         expect(ensureSessionRow).toHaveBeenCalledWith('agent-2', 'engine-install', 'Install Closer', { source: 'api' })
     })
 
-    // Reported beside the ones that started, never thrown: the rest of the team is already working.
     it('reports an agent that could not be reached without mirroring anything', async () => {
         engineChat.mockResolvedValue({ ok: false, status: 409, text: async () => 'run_in_flight', headers: new Headers(), body: null })
 
@@ -136,7 +122,6 @@ describe('startAgentSetup', () => {
         expect(ensureSessionRow).not.toHaveBeenCalled()
     })
 
-    // Two entries for one agent would start two runs on it and ask the user the same thing twice.
     it('starts one setup per agent however many times it is listed', async () => {
         engineChat.mockResolvedValue(accepted('engine-session-4'))
 
@@ -151,9 +136,6 @@ describe('startAgentSetup', () => {
         expect(ensureSessionRow).toHaveBeenCalledTimes(1)
     })
 
-    // The plan caps how many agents run at once, not how many exist, so a team built past that cap
-    // ends on agents that cannot be addressed at all. Sending them to the engine anyway turns an
-    // upsell into "half your team could not be reached" on the last screen of the onboarding.
     it('never reaches for an agent the plan has no slot for', async () => {
         engineChat.mockResolvedValue(accepted('engine-session-1'))
         selectMany.mockResolvedValue({ data: [{ id: 'agent-1', disabled_at: null }, { id: 'agent-2', disabled_at: '2026-09-22T10:00:00Z' }] })
@@ -169,7 +151,6 @@ describe('startAgentSetup', () => {
         expect(result.agents[1]).toMatchObject({ agentId: 'agent-2', started: false, inactive: true })
         expect(result.agents[1].error).toBeUndefined()
 
-        // The engine is only ever asked about the one that can actually work.
         expect(resolveAgentTarget).toHaveBeenCalledTimes(1)
         expect(resolveAgentTarget).toHaveBeenCalledWith('agent-1', { kind: 'workspace', workspaceId: 7 })
 
@@ -178,8 +159,6 @@ describe('startAgentSetup', () => {
         expect(result.next).not.toContain('could not be reached')
     })
 
-    // A real breakage and a missing slot both come back with started false. Counting them together
-    // would report the upsell as an outage, which is the exact sentence this split exists to avoid.
     it('keeps an unreachable agent apart from one waiting on a slot', async () => {
         selectMany.mockResolvedValue({ data: [{ id: 'agent-1', disabled_at: null }, { id: 'agent-2', disabled_at: '2026-09-22T10:00:00Z' }] })
         engineChat.mockRejectedValue(new Error('engine down'))

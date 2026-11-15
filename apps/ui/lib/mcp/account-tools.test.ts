@@ -15,10 +15,6 @@ vi.mock('@/app/api/_services/chat.service', () => ({ ensureSessionRow: vi.fn(), 
 vi.mock('@/app/api/_services/services.service', () => ({ allocateServiceInstance: vi.fn(), listCatalogServices: vi.fn(), listInstalledServices: vi.fn(), loadManifest: vi.fn(), searchCatalogServices: vi.fn(), toAuthMethodSummaries: vi.fn(() => []), uninstallService: vi.fn() }))
 vi.mock('@/app/api/_services/mcp-shares.service', () => ({ dispatchShareTool: vi.fn() }))
 
-// The server advertises one static list and dispatches through three chained switches. Nothing
-// else ties them together, so a tool declared with no case answers "Unknown tool" to a model that
-// trusted tools/list, and a name declared twice silently shadows a handler.
-
 const advertisedNames: string[] = ACCOUNT_TOOL_NAMES
 
 const handledNames = ['mcp-account.service.ts', 'mcp-shares.service.ts', 'mcp-templates.service.ts'].flatMap(file =>
@@ -42,8 +38,6 @@ describe('account tool defs', () => {
         expect(ACCOUNT_TOOL_DEFS.filter(tool => tool.description.length < 40)).toEqual([])
     })
 
-    // A handler asking for an agreement the schema never mentions is a call that can only fail
-    // once, be read as a refusal, and be abandoned.
     it('advertises the confirm flag on every tool that asks for one', () => {
         const gated = [
             'delete_agent',

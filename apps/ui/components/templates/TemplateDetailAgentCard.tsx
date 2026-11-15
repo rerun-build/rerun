@@ -14,12 +14,8 @@ const MAX_SKILLS = 4
 const MAX_SCHEDULES = 3
 const MAX_TRIGGERS = 3
 
-// A row the caller writes itself, for what the card cannot read off the agent: a shared copy carries
-// memories, files and keys that exist nowhere in TemplateAgent.
 export type AgentCardEntry = { key: string; icon: LucideIcon; title: string; subtitle?: string }
 
-// A fact that only holds on one surface, and only about one section, so it sits under that section's
-// own title rather than in a paragraph further down repeating which section it meant.
 export type AgentCardNotes = { connectors?: string; triggers?: string }
 
 export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }: { agent: TemplateAgent; connectors: TemplateConnector[]; comesWith?: AgentCardEntry[]; notes?: AgentCardNotes }) {
@@ -43,9 +39,6 @@ export function TemplateDetailAgentCard({ agent, connectors, comesWith, notes }:
                 {agent.description && <p className="relative line-clamp-2 text-xs text-muted-foreground">{agent.description}</p>}
             </header>
 
-            {/* First, and above what the agent is made of: someone opening a shared copy is deciding
-                whether to take it, and what travels with it is the part of that decision the rest of
-                the card cannot answer. */}
             {comesWith && comesWith.length > 0 && (
                 <CardSection title={t('comesWith')}>
                     {comesWith.map(entry => (

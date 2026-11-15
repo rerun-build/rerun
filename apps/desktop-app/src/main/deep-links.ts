@@ -1,9 +1,6 @@
 import { DESKTOP_AUTH_CALLBACK_HOST, DESKTOP_AUTH_CALLBACK_PATH, DESKTOP_OAUTH_RETURN_HOST, DESKTOP_OPEN_HOST, isDesktopOpenPath, type DesktopOAuthReturn } from '@rerun/contracts'
 import { parseUrl } from './url-policy'
 
-// A link to the app's URL scheme comes from anywhere (a web page, another app, a terminal): it is
-// read as hostile. Only the shapes below are accepted, and what they carry is checked again by
-// whoever uses it: a one-time code is spent against the verifier, a path stays a path of the server.
 export type DeepLink = { kind: 'auth-callback'; code: string; state: string } | { kind: 'oauth-return'; result: DesktopOAuthReturn } | { kind: 'open'; path: string }
 
 const TOKEN = /^[A-Za-z0-9_-]{16,128}$/
@@ -33,7 +30,6 @@ export function parseDeepLink(raw: string, scheme: string): DeepLink | null {
     return null
 }
 
-// Windows and Linux hand a link over as a command line argument, among Chromium's own.
 export function deepLinkInArgv(argv: readonly string[], scheme: string): string | null {
     return argv.find((argument) => argument.toLowerCase().startsWith(`${scheme}://`)) ?? null
 }

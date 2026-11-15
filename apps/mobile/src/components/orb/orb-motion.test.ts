@@ -3,7 +3,6 @@ import { advance, facePose, restPose, restingPose, startClock } from '@/componen
 describe('orb motion', () => {
     it('rests the face where the web puts it', () => {
         const rest = restPose('left')
-        // packages/ui foremanFacePose at rest: translate(41 41) matrix(1 0.2 0 1 0 0) scale(1 1)
         const { matrix, shown } = facePose(rest.yaw, rest.pitch)
         expect(shown).toBe(true)
         expect(matrix.map(value => Number(value.toFixed(3)))).toEqual([1, 0.2, 0, 1, 41, 41])

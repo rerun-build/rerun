@@ -1,21 +1,15 @@
 import { z } from 'zod'
 
-// A card is a snapshot frozen at the moment the agent sent it, carried in the tool output so it
-// survives a reload. These bounds keep that payload small: it is replayed into the model context on
-// every later turn of the conversation.
 export const CARD_DEFAULT_ROWS = 5
 export const CARD_MAX_ROWS = 20
 export const CARD_MAX_COLUMNS = 8
 export const CARD_MAX_CELL_CHARS = 120
-// An image or a link cut short is a broken one, so those cells get a wider bound, and a value past it
-// is dropped rather than truncated.
 export const CARD_MAX_MEDIA_CHARS = 2048
 export const CARD_MAX_GROUPS = 6
 
 export const CARD_LAYOUTS = ['table', 'list', 'gallery', 'board'] as const
 export type CardLayout = (typeof CARD_LAYOUTS)[number]
 
-/** The badge tones an agent can name, a subset of the UI's BadgeTone that contracts cannot import. */
 export const CARD_TONES = ['brand', 'neutral', 'green', 'red', 'orange', 'cyan', 'yellow'] as const
 export type CardTone = (typeof CARD_TONES)[number]
 
@@ -49,9 +43,6 @@ export const cardDisplaySchema = z.object({
     arrangement: z.enum(CARD_GALLERY_ARRANGEMENTS).optional(),
 })
 
-// Everything past `columnsTruncated` is optional and forgiving: a card sent before layouts existed
-// still parses, and a layout, tone or display a newer engine sends falls back instead of failing the
-// whole card.
 export const tableCardSchema = z.object({
     kind: z.literal('table'),
     scope: z.enum(['agent', 'shared']),
@@ -62,15 +53,11 @@ export const tableCardSchema = z.object({
     columnsTruncated: z.boolean(),
     layout: z.enum(CARD_LAYOUTS).optional().catch(undefined),
     fields: cardFieldsSchema.optional(),
-    /** Column name to format. The renderer draws a format it does not know as plain text. */
     formats: z.record(z.string(), z.string()).optional(),
-    /** Badge value to tone. */
     tones: cardTonesSchema.optional(),
     groupBy: z.string().optional(),
-    /** One entry per board column, counted over the whole table, not over the rows in the card. */
     groups: z.array(z.object({ value: z.string(), total: z.number(), sum: z.number().optional() })).optional(),
     display: cardDisplaySchema.optional().catch(undefined),
-    /** The saved view the card was drawn from, so opening the database lands on it. */
     view: z.string().optional(),
 })
 export type TableCard = z.infer<typeof tableCardSchema>
@@ -82,12 +69,10 @@ export const fileCardEntrySchema = z.object({
     path: z.string(),
     name: z.string(),
     size: z.number(),
-    // A path is relative to the root it was resolved in: the agent's workspace or the shared space.
     scope: z.enum(['agent', 'shared']).default('agent'),
 })
 export type FileCardEntry = z.infer<typeof fileCardEntrySchema>
 
-// A card sent before one card could carry several files holds its single file at the top level.
 const withLegacySingleFile = (value: unknown) =>
     value && typeof value === 'object' && !('files' in value) && 'path' in value ? { kind: 'file', files: [value] } : value
 
@@ -100,15 +85,12 @@ export const fileCardSchema = z.preprocess(
 )
 export type FileCard = z.infer<typeof fileCardSchema>
 
-// How a card cell reads as text, shared by the web card and the app's.
 export function cellText(value: unknown): string {
     if (value === null || value === undefined) return ''
     if (typeof value === 'object') return JSON.stringify(value)
     return String(value)
 }
 
-// Fixed locale and UTC: cards are also server-rendered on the landing, and a date formatted in the
-// reader's zone would not hydrate.
 export function formatText(value: unknown, format?: string): string {
     if (value === null || value === undefined || value === '') return ''
     if (format?.startsWith('currency:')) {
@@ -156,7 +138,6 @@ export function isNumericFormat(format?: string) {
     return format === 'number' || format === 'percent' || !!format?.startsWith('currency:')
 }
 
-// SQLite has no boolean type: an agent stores 0/1, and sometimes the strings 'true' / 'false'.
 export function isTruthyCell(value: unknown) {
     if (typeof value === 'string') return !['', '0', 'false', 'no'].includes(value.trim().toLowerCase())
     return !!value

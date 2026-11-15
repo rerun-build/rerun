@@ -4,7 +4,6 @@ import { type ClipboardEvent, type KeyboardEvent, type SyntheticEvent, type UIEv
 
 import { collapseLinks, type ComposerLinks, type ComposerMention, type ComposerSegment, expandLinks, type TextRange, tokenizeComposer, tokenRanges, urlBeforeCaret } from '@/lib/chat/composer-links'
 
-// execCommand is the only way to edit a textarea that keeps the browser's undo stack.
 function replaceRange(el: HTMLTextAreaElement, { start, end }: TextRange, text: string) {
     el.focus()
     el.setSelectionRange(start, end)
@@ -30,13 +29,6 @@ function widen({ start, end }: TextRange, ranges: TextRange[]): TextRange {
 const NO_MENTIONS: ComposerMention[] = []
 const NO_LINKS: ComposerLinks = new Map()
 
-/**
- * URLs in the composer are swapped for a short label, pasted or typed (on the space that ends
- * them), and a mirror over the textarea draws each label as a chip, and each known `@agent` or
- * `/skill` as a token. Both behave as one character: the caret skips over them, and a deletion
- * or a selection that touches one takes it whole. `expand` puts the full URLs back, for anything
- * that leaves the composer; a mention leaves as it was typed.
- */
 export function useComposerLinks(mentions: ComposerMention[] = NO_MENTIONS) {
     const linksRef = useRef<ComposerLinks>(new Map())
     const mentionsRef = useRef(mentions)
@@ -48,7 +40,6 @@ export function useComposerLinks(mentions: ComposerMention[] = NO_MENTIONS) {
         mentionsRef.current = mentions
     })
 
-    // Split at render rather than on input: the skills arrive after the text when the `/` menu fetches them.
     const segments = useMemo(() => linkSegments.flatMap(segment => (segment.kind === 'text' ? tokenizeComposer(segment.text, NO_LINKS, mentions) : [segment])), [linkSegments, mentions])
 
     const refresh = useCallback((text: string) => setLinkSegments(tokenizeComposer(text, linksRef.current)), [])
@@ -121,7 +112,6 @@ export function useComposerLinks(mentions: ComposerMention[] = NO_MENTIONS) {
     const onCopy = useCallback((e: ClipboardEvent<HTMLTextAreaElement>) => copySelection(e, false), [copySelection])
     const onCut = useCallback((e: ClipboardEvent<HTMLTextAreaElement>) => copySelection(e, true), [copySelection])
 
-    // A caret that lands inside a label jumps to the edge it was heading for, so arrows cross a chip in one step.
     const onSelect = useCallback((e: SyntheticEvent<HTMLTextAreaElement>) => {
         const el = e.currentTarget
         const caret = el.selectionStart
@@ -140,13 +130,11 @@ export function useComposerLinks(mentions: ComposerMention[] = NO_MENTIONS) {
         if (mirrorElRef.current) mirrorElRef.current.scrollTop = e.currentTarget.scrollTop
     }, [])
 
-    // The mirror only mounts once a token shows up, possibly under a textarea that has already scrolled.
     const attachMirror = useCallback((node: HTMLDivElement | null, textarea: HTMLTextAreaElement | null) => {
         mirrorElRef.current = node
         if (node && textarea) node.scrollTop = textarea.scrollTop
     }, [])
 
-    /** Puts the full URL back as plain text, the way it was typed: one undo brings the chip back. */
     const unlink = useCallback((el: HTMLTextAreaElement | null, range: TextRange, url: string) => {
         if (el) replaceRange(el, range, url)
     }, [])

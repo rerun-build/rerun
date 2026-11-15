@@ -8,10 +8,6 @@ import { MAX_STARTER_PICKS } from '@/lib/onboarding/starter-packs'
 import { StarterPackCard } from './StarterPackCard'
 import type { StarterPicks } from './useStarterPicks'
 
-// The cards on a rail: one on screen, the next one peeking to say it is there, an arrow on each edge
-// that still hides a card. A pick scrolls on to the next card still free, so the whole pack is read
-// without reaching for the arrows.
-
 const SNAP = { behavior: 'smooth', block: 'nearest', inline: 'center' } as const
 
 export function StarterPackRail({ cards, picks }: { cards: Card[]; picks: StarterPicks }) {
@@ -19,10 +15,8 @@ export function StarterPackRail({ cards, picks }: { cards: Card[]; picks: Starte
 
     const toggle = (card: Card, index: number) => {
         const wasPicked = picks.isPicked(card.slug)
-        // Read before the toggle lands: a pick that takes the last place has nothing left to move to.
         const fillsTrial = picks.picked.length + 1 >= MAX_STARTER_PICKS
         picks.toggle(card.slug)
-        // Dropping a card leaves the eye where it is, and a refused one stays put to show why.
         if (wasPicked || fillsTrial) return
         const next = cards.slice(index + 1).find(other => !picks.isPicked(other.slug))
         if (next) rail.current?.querySelector(`[data-slug="${next.slug}"]`)?.scrollIntoView(SNAP)

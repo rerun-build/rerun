@@ -18,7 +18,6 @@ export function WorkspaceTile({ brand }: { brand: GateBrand }) {
     )
 }
 
-// The tile a link that no longer exists shows: no workspace is left to name it, so Rerun does.
 export function RerunTile() {
     return (
         <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-lg bg-primary/5 text-foreground">
@@ -46,8 +45,6 @@ function MadeWithRerun({ className }: { className?: string }) {
     )
 }
 
-// The lock a visitor meets: whose page it is on the left, what opens it on the right, the dots
-// between them saying the two are being linked. No pixel of the page leaks here.
 export function GateScreen({ brand, lock, mark, title, subtitle, children }: { brand: GateBrand; lock: ReactNode | null; mark?: ReactNode; title: string; subtitle: ReactNode; children?: ReactNode }) {
     const t = useTranslations('published.gate')
     const markerProps = { [PUBLISHED_PAGE_MARKER]: '' }

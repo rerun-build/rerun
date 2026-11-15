@@ -36,12 +36,9 @@ import { toast } from 'sonner'
 
 type DataBrowserProps = {
     source: DataSource
-    /** Table, and view, a card in chat asked to land on. Captured at mount and honoured once. */
     initial?: DataFocus | null
     onInitialConsumed?: () => void
-    /** Opens the same table and view somewhere larger. */
     onExpand?: (focus: DataFocus) => void
-    /** Shows this one table, with no picker: the caller lists the tables itself. */
     table?: string
     onTableDropped?: () => void
 }
@@ -77,18 +74,12 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
     const [actionError, setActionError] = useState<string | null>(null)
     const [views, setViews] = useState<TableView[]>([])
     const [viewsError, setViewsError] = useState<string | null>(null)
-    // Null until the views of the selected table are in: the rows wait for them, since the view
-    // picks their order.
     const [activeId, setActiveId] = useState<string | null>(null)
     const [viewDialog, setViewDialog] = useState<ViewDialog>({ open: false })
     const [addingView, setAddingView] = useState(false)
-    // The kind of each column is read from the first page of a table and view, then kept, so a
-    // column does not change looks from one page to the next.
     const [kindSample, setKindSample] = useState<{ key: string; rows: DbRow[] } | null>(null)
     const [openRow, setOpenRow] = useState<DbRow | null>(null)
 
-    // Kept out of loadTables' deps: callers pass this callback inline, and a fresh identity on every
-    // render would make the effect below refetch forever.
     const consumeRequestedRef = useRef(onInitialConsumed)
     const tableNotFoundRef = useRef(t('tableNotFound'))
     useEffect(() => {
@@ -103,8 +94,6 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
             .listTables()
             .then(result => {
                 setTables(result)
-                // Consumed here rather than in a setState updater: React double-invokes updaters in
-                // development, and this fires a toast and a callback.
                 const requestedTable = requestedTableRef.current
                 if (requestedTable) {
                     requestedTableRef.current = null
@@ -113,8 +102,6 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
                         setSelected(requestedTable)
                         return
                     }
-                    // Only worth saying when another table opens in its place: an empty database
-                    // already shows its own empty state.
                     if (result.length > 0) toast.error(tableNotFoundRef.current, { description: requestedTable })
                 }
                 setSelected(prev => pinnedTable ?? (prev && result.some(table => table.name === prev) ? prev : (result[0]?.name ?? null)))
@@ -164,12 +151,10 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
     const activeView = activeId && activeId !== ALL_ROWS ? views.find(view => view.id === activeId) : undefined
     const boardView = activeView?.layout === 'board' && activeView.groupBy ? (activeView as TableView & { groupBy: string }) : undefined
 
-    // A view brings its own order; a click on a header overrides it until the view changes.
     useEffect(() => {
         setPageIndex(0)
         setSelectedRowIds(new Set())
         setSorting(activeView?.sort ? [{ id: activeView.sort.column, desc: activeView.sort.dir === 'desc' }] : [])
-        // A switch of view, or a save that changes its sort, resets the order; a save that keeps it does not.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeId, activeView?.sort?.column, activeView?.sort?.dir])
 
@@ -212,7 +197,6 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
     const shownColumns = useMemo(() => {
         if (viewOrder) return viewOrder
         const ordered = gridColumns(friendly).map(column => column.key)
-        // A column the engine returns but the schema we hold does not know yet still shows.
         return returned ? [...ordered.filter(key => returned.includes(key)), ...returned.filter(key => !friendlyByKey.has(key))] : ordered
     }, [viewOrder, friendly, friendlyByKey, returned])
 
@@ -237,12 +221,10 @@ export function DataBrowser({ source, initial, onInitialConsumed, onExpand, tabl
     const cellContext: CellContext = { tones: activeView?.tones, fileUrl: source.fileUrl }
 
     const { sourcesOf, pending: sourcesPending } = useTableSources(source, selected, rows)
-    // A row opened from the board is not on the page the table read, so it is asked about alone.
     const openRowOffPage = openRow !== null && !rows.includes(openRow)
     const openRowAlone = useMemo(() => (openRow && openRowOffPage ? [openRow] : NO_ROWS), [openRow, openRowOffPage])
     const { sourcesOf: sourcesOfOpenRow } = useTableSources(source, selected, openRowAlone)
     const sourcesShown = showsSourcesColumn(rows, sourcesOf)
-    // While the next page is being traced, the column stays put rather than blinking out and back.
     const [sourcesColumn, setSourcesColumn] = useState({ table: selected, shown: false })
     if (!sourcesPending && (sourcesColumn.table !== selected || sourcesColumn.shown !== sourcesShown)) setSourcesColumn({ table: selected, shown: sourcesShown })
     const showSources = sourcesShown || (sourcesPending && sourcesColumn.table === selected && sourcesColumn.shown)

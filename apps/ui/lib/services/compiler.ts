@@ -8,9 +8,6 @@ import { defaultInstanceEnvVar, instanceEnvVar, instanceServerName, ordinalInsta
 import { appTarget, composioTarget, getMethod, managedTarget, oauthServer } from './manifest'
 import { type RegistryEntry, readRegistry, registryFootprint, upsertRegistryEntry } from './registry'
 
-// Substitution context shared by every template string in a compile pass. Non-secret
-// inputs are inlined; secret inputs are NOT — their value goes to the engine .env and
-// the compiled config keeps only a ${VAR} reference, resolved engine-side at connect time.
 type SubstituteContext = {
     values: Record<string, string>
     inputMap: Map<string, InputDef>
@@ -20,8 +17,6 @@ type SubstituteContext = {
     engineAgentId: string
 }
 
-// `${basic:input.A:input.B}` becomes HTTP Basic credentials, base64("A:B"). The engine only
-// resolves plain ${VAR} references, so the encoding happens here and lands in its own secret.
 const BASIC_PLACEHOLDER = /\$\{basic:input\.([A-Za-z0-9_]+):input\.([A-Za-z0-9_]+)\}/g
 
 function substituteBasic(value: string, ctx: SubstituteContext): string {
@@ -35,9 +30,6 @@ function substituteBasic(value: string, ctx: SubstituteContext): string {
     })
 }
 
-// ${agent.id} is resolved here (the engine's ${VAR} resolver can't — it disallows the dot),
-// so a managed proxy server can carry the agent id in a header. ${RERUN_API_KEY} /
-// ${RERUN_HUB_BASE_URL} are left intact for the engine to resolve from its own env.
 function substitute(value: string, ctx: SubstituteContext): string {
     return substituteBasic(value, ctx).replaceAll('${agent.id}', ctx.engineAgentId).replace(/\$\{input\.([A-Za-z0-9_]+)\}/g, (_, key) => {
         if (ctx.inputMap.get(key)?.secret) {
@@ -54,8 +46,6 @@ function substituteRecord(rec: Record<string, string>, ctx: SubstituteContext): 
     return out
 }
 
-// Turn an mcpServer template into a concrete engine server config. Secret values are kept
-// out of config.json (only ${VAR} refs remain) — never in Supabase, never in cleartext.
 function compileMcpServer(tpl: McpServerTemplate, ctx: SubstituteContext, name: string): EngineMcpServer {
     return {
         name,
@@ -68,8 +58,6 @@ function compileMcpServer(tpl: McpServerTemplate, ctx: SubstituteContext, name: 
     }
 }
 
-// Create the skill, or update it in place if a skill with the same name already exists
-// (re-install must be idempotent). Returns the engine slug so uninstall can delete it.
 async function upsertSkill(conn: EngineConnection, engineAgentId: string, skill: ServiceSkill): Promise<string | null> {
     try {
         const created = await createSkill(conn, engineAgentId, { name: skill.name, description: skill.description, body: skill.body })
@@ -93,13 +81,8 @@ export type CompileResult = {
     app: { appSlug: string; serverName: string } | null
 }
 
-// An extra account of an app: its registry key (`gmail@k3x9ab`) and the id that suffixes its
-// server names and env vars, so it never overwrites the base account's.
 export type ServiceInstanceTarget = { key: string; instanceId: string }
 
-// Compile a service into engine primitives, using the selected auth method (falls back to
-// the default). Assumes all REQUIRED inputs of that method are present in `values` (the
-// caller — installService — guards this). Idempotent: safe to re-run.
 export async function compileService(
     agentId: string,
     manifest: ServiceManifest,
@@ -122,18 +105,13 @@ export async function compileService(
     const ctx: SubstituteContext = { values, inputMap, varNameFor, referencedSecrets: new Set(), derivedSecrets: {}, engineAgentId }
     const serverNameFor = (templateName: string) => (instanceId ? instanceServerName(templateName, instanceId) : templateName)
 
-    // Compile first so `referencedSecrets` is populated before we assemble the .env set.
     const compiled = method.mcpServers.map(t => {
         const server = compileMcpServer(t, ctx, serverNameFor(t.name))
-        // The Composio proxy derives the instance's own Composio user from this header.
         if (instanceId && method.kind === 'composio') server.headers = { ...server.headers, 'x-rerun-instance': instanceId }
         return server
     })
     const compiledSkills = manifest.skills.map(s => ({ ...s, body: substitute(s.body, ctx) }))
 
-    // 1. Secrets → engine .env (never Supabase, never cleartext in config.json). Union of
-    //    the method's explicit envKeys, any secret input referenced by an mcp template, and
-    //    the Basic credentials derived from them.
     const envSet: Record<string, string> = {}
     for (const mapping of method.envKeys) {
         const v = values[mapping.fromInput]
@@ -148,29 +126,22 @@ export async function compileService(
         await updateAgentKeys(conn, engineAgentId, { set: envSet })
     }
 
-    // 2. MCP servers → engine merges by name atomically (never send the whole array).
     if (compiled.length > 0) {
         await patchMcpServers(conn, engineAgentId, { upsert: compiled })
     }
 
-    // 3. Behavioural instructions → skills (shared across methods; collect slugs for clean uninstall).
     const skillSlugs: string[] = []
     for (const skill of compiledSkills) {
         const slug = await upsertSkill(conn, engineAgentId, skill)
         if (slug) skillSlugs.push(slug)
     }
 
-    // 4. Record installed-state in the agent's OWN registry on the engine (LAST — if it
-    //    fails the agent still has working tools). Only non-secret config is stored,
-    //    plus the footprint (mcpServers/envKeys/skills) so uninstall can reverse it.
     const nonSecretConfig: Record<string, string> = {}
     for (const input of method.inputs) {
         if (!input.secret && values[input.key] !== undefined) nonSecretConfig[input.key] = values[input.key]
     }
     const mcpServerNames = compiled.map(s => s.name)
 
-    // An OAuth / managed service is only usable once the user signs in — the sign-in writes
-    // the token to the engine token store and the connect action flips this to 'active'.
     const authServer = oauthServer(method)
     const oauth = authServer ? { serverName: serverNameFor(authServer.name), url: substitute(authServer.url ?? '', ctx) } : null
     const renamed = <T extends { serverName: string }>(target: T | null): T | null => (target ? { ...target, serverName: serverNameFor(target.serverName) } : null)
@@ -179,7 +150,6 @@ export async function compileService(
     const app = renamed(appTarget(method))
 
     const registryKey = instance?.key ?? manifest.slug
-    // A recompile of an existing account keeps the label it already has (an email, or its ordinal).
     const instanceFields = instance ? await instanceRegistryFields(conn, engineAgentId, manifest, instance) : {}
 
     await upsertRegistryEntry(conn, engineAgentId, registryKey, {
@@ -206,37 +176,27 @@ async function instanceRegistryFields(conn: EngineConnection, engineAgentId: str
     return { instanceId: instance.instanceId, label }
 }
 
-// Reverse of compileService: strip exactly what the install added (recorded in the
-// registry entry), preserving the Hub and every other installed service.
-// `keepSkills` lists the skills another account of the same app still relies on.
 export async function decompileService(conn: EngineConnection, engineAgentId: string, entry: RegistryEntry, opts?: { keepSkills?: Set<string> }): Promise<void> {
     const { envKeys, mcpServers, skills } = registryFootprint(entry)
 
-    // 1. Remove the engine .env keys this service set.
     if (envKeys.length > 0) {
         await updateAgentKeys(conn, engineAgentId, { remove: envKeys })
     }
 
-    // 2. Remove the service's MCP servers (engine removes by name — keeps rerun_hub + others).
     if (mcpServers.length > 0) {
         await patchMcpServers(conn, engineAgentId, { remove: mcpServers })
     }
 
-    // 3. Delete the skills this service created (ignore if already gone).
     for (const slug of skills) {
         if (opts?.keepSkills?.has(slug)) continue
         await deleteSkill(conn, engineAgentId, slug).catch(() => {})
     }
 
-    // 4. Clear the OAuth token from the engine token store, for an OAuth or managed service.
     const tokenServer = entry.oauth?.serverName ?? entry.managed?.serverName
     if (tokenServer) {
         await deleteMcpToken(conn, engineAgentId, tokenServer).catch(() => {})
     }
 
-    // 5. A Composio service has no engine token: revoking means deleting the connected
-    //    account at Composio. Best-effort — the engine teardown above must not be undone by
-    //    a Composio outage; a residual account is removable from the Composio dashboard.
     if (entry.composio?.connectedAccountId) {
         await deleteConnectedAccount(entry.composio.connectedAccountId).catch(err => {
             console.warn(`[composio] could not delete connected account ${entry.composio?.connectedAccountId}:`, err instanceof Error ? err.message : err)

@@ -98,7 +98,6 @@ function RunRow({ run, onOpen }: { run: Run; onOpen: () => void }) {
         >
             <Icon size="sm" icon={meta.icon} className={meta.tint} />
             <div className="flex min-w-0 flex-1 flex-col">
-                {/* The visitor's own clock, which the server rendering this row cannot know. */}
                 <span suppressHydrationWarning className="truncate text-[13px] font-medium text-foreground">
                     {run.startedAt ? formatDate(run.startedAt, locale) : run.id}
                 </span>

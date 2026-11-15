@@ -87,10 +87,6 @@ function hrefFor(item: PaidItem, field: string): string | undefined {
     return item.href
 }
 
-// A row is tied to an item by a value only that item has (an email, a phone, a website), or by two of
-// its names together (a person and their company, a place and its own name). Every other cell of the
-// row is then traced only to a field of an item the row is tied to, so a shared city or job title
-// never points anywhere on its own.
 export async function readPaidSources(clients: Client[], rows: TableSourcesRequest['rows']): Promise<TableSourcesResult> {
     const rowCells: Cell[][] = rows.map(row => Object.entries(row).map(([column, value]) => ({ column, value, ...cellKeys(column, value) })))
     const keys = [...new Set(rowCells.flatMap(cells => cells.flatMap(cell => (cell.weak ? [...cell.strong, cell.weak] : cell.strong))))].slice(0, MAX_LOOKUP_KEYS)

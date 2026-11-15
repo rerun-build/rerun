@@ -59,8 +59,6 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
         refresh()
     }, [open, refresh])
 
-    // The one key shown in clear goes away with the dialog: leaving it on screen for the next
-    // opening would mean holding a live secret in memory for no reason.
     const handleOpenChange = (next: boolean) => {
         if (!next) setCreatedKey(null)
         onOpenChange(next)
@@ -82,8 +80,6 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
         refresh()
     }
 
-    // Revoking breaks whatever runs on that key, so it goes through a confirmation rather than
-    // straight off the row.
     const revoke = async () => {
         const key = revoking
         if (!key || busy) return
@@ -98,9 +94,6 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            {/* The desktop dialog has no height of its own, and the snippets plus the key list run
-                past a short viewport. The bounds are sm: only: the mobile sheet already caps itself
-                against the cookie bar inset, and overriding that would push it off screen. */}
             <DialogContent className="flex flex-col sm:max-h-[85dvh] sm:max-w-lg sm:overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>{t('title')}</DialogTitle>
@@ -115,8 +108,6 @@ export function ApiKeysDialog({ open, onOpenChange }: { open: boolean; onOpenCha
                             <>
                                 <section className="min-w-0 space-y-2">
                                     <SectionTitle>{t('connectSection')}</SectionTitle>
-                                    {/* The fresh key takes the snippets' place rather than sitting under the fold:
-                                        it is the one thing on screen that cannot be recovered by reopening the dialog. */}
                                     {createdKey ? <CreatedApiKey value={createdKey} mcpUrl={mcpUrl} onDismiss={() => setCreatedKey(null)} /> : <McpSnippets mcpUrl={mcpUrl} />}
                                 </section>
 

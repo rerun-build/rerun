@@ -15,7 +15,6 @@ const job = (issue: number, over: Partial<FactoryJob> = {}): FactoryJob => ({
     issue, title: `Task ${issue}`, state: 'waiting', enteredAt: new Date().toISOString(), pr: null, round: null,
     coworker: null, copy: null, steps: null, tokensIn: null, tokensOut: null, parent: 1, dependsOn: [], reason: null, ...over,
 })
-// Four tasks under one epic: one running, one waiting, one blocked, one merged today.
 const snapshot = (): FactorySnapshot => ({
     ...sample(),
     epics: [{ issue: 1, title: 'Epic one', kind: 'feature' }],

@@ -4,8 +4,6 @@ import { useEffect, useRef, type RefObject } from 'react'
 
 const TAP_MAX_DISTANCE = 10
 const TAP_MAX_DURATION = 300
-// Un doigt posé sur le board le fait glisser : seul un appui tenu immobile peut prendre un objet
-// sans voler le pan.
 const HOLD_TO_GRAB_MS = 450
 
 type TouchGestureCallbacks = {
@@ -14,13 +12,10 @@ type TouchGestureCallbacks = {
     onPanEnd?: () => void
     onZoom?: (scaleFactor: number, centerX: number, centerY: number) => void
     onTap?: (clientX: number, clientY: number) => void
-    // Vrai si un appui tenu à ce point peut prendre un objet.
     grabAt?: (clientX: number, clientY: number) => boolean
     onGrabHold?: (clientX: number, clientY: number) => void
     onGrabStart?: (clientX: number, clientY: number) => void
     onGrabMove?: (clientX: number, clientY: number) => void
-    // Fin d'une prise ou d'un appui abandonné avant d'avoir pris : `committed` faux sur un second
-    // doigt, un touchcancel, ou un doigt qui a bougé avant la fin de l'appui.
     onGrabEnd?: (committed: boolean) => void
 }
 
@@ -144,7 +139,6 @@ export function useTouchGestures(ref: RefObject<HTMLDivElement | null>, callback
                     cbRef.current.onZoom?.(scaleFactor, center.x, center.y)
                 }
 
-                // Déplacement du centre des 2 doigts → pan (en plus du zoom)
                 const dx = center.x - state.lastPanPoint.x
                 const dy = center.y - state.lastPanPoint.y
                 cbRef.current.onPan?.(dx, dy)

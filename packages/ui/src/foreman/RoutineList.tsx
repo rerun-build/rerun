@@ -22,12 +22,9 @@ export type RoutineEntry = {
     name: string
     agentId: string
     enabled: boolean
-    /** The rule in words ("Every day at 8:15 AM"), resolved by the caller: this package reads no cron. */
     frequency: string
-    /** Already resolved against `now`: the list sorts and groups on it, it does not read a cron. */
     nextRunAt: string | null
     runningSince: string | null
-    /** The coworker's install is still running, so its routines cannot be switched on yet. */
     setupPending?: boolean
 }
 
@@ -36,14 +33,12 @@ export type RoutineListProps<T extends RoutineEntry> = {
     now: number
     agentNameOf: (agentId: string) => string
     onOpen: (routine: T) => void
-    /** Left out, the switch only shows the state: the landing demo has nothing to save it to. */
     onToggle?: (routine: T, enabled: boolean) => void
     isSaving?: (routine: T) => boolean
     renderMenu?: (routine: T) => ReactNode
     renamingKey?: string | null
     onRename?: (routine: T, name: string) => void
     onCancelRename?: () => void
-    /** Docked in dark mode the column sits on the frame colour, and the sticky headings have to match it. */
     docked?: boolean
     className?: string
 }
@@ -192,7 +187,6 @@ function statusOf(routine: RoutineEntry, now: number, t: KitTranslator): Routine
     return null
 }
 
-// A live status takes the line; hovering it (or focusing the row) brings the rule back in its place.
 function StatusSubline({ routine, now, rule }: { routine: RoutineEntry; now: number; rule: string }) {
     const t = useKitTranslations()
     const ruleText = <span className="truncate text-muted-foreground">{rule}</span>
@@ -225,13 +219,11 @@ function LiveDot({ tone }: { tone: RoutineStatus['tone'] }) {
     )
 }
 
-// Mounted only while renaming, so the current name is the initial state.
 function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (name: string) => void; onCancel: () => void }) {
     const t = useKitTranslations()
     const [value, setValue] = useState(name)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // A menu item starts the rename: its focus restore would steal the focus from an immediate call.
     useEffect(() => {
         const timer = setTimeout(() => {
             inputRef.current?.focus()
@@ -240,8 +232,6 @@ function RenameField({ name, onSubmit, onCancel }: { name: string; onSubmit: (na
         return () => clearTimeout(timer)
     }, [])
 
-    // Unmounting the field fires its blur in Chrome, so an Escape (or an Enter) would be followed by
-    // a second submit carrying the edited value.
     const settled = useRef(false)
     const settle = (fn: () => void) => {
         if (settled.current) return

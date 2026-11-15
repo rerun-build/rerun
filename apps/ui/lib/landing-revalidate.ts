@@ -10,6 +10,5 @@ export async function revalidateLanding(paths: string[]) {
             body: JSON.stringify({ paths }),
         })
     } catch {
-        // best-effort: never block the write on public revalidation
     }
 }

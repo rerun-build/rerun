@@ -29,7 +29,6 @@ import { BLUR_ABOVE_FOOTER, ConversationPane, type ChatCoworker } from './Conver
 import { ConversationSkeleton } from './ConversationSkeleton'
 import { useOpenChats } from './useOpenChats'
 
-// Opens the last conversation with the Foreman, as the web column does.
 export const LAST_CONVERSATION = 'last'
 
 const FOREMAN: Omit<ChatCoworker, 'role'> = { id: FOREMAN_AGENT_ID, kind: 'foreman', name: FOREMAN_DISPLAY_NAME, status: 'idle' }
@@ -41,8 +40,6 @@ type SurfaceState = ForemanSurface | 'loading' | 'error'
 
 const noop = () => {}
 
-// Where the pane's transcript rests above its composer, so the conversation that replaces this
-// skeleton lands where it already stood.
 const COMPOSER_AREA = CONTROL + spacing.sm * 3 + BLUR_ABOVE_FOOTER
 
 function LoadingConversation() {
@@ -73,10 +70,6 @@ function Notice({ title, body, onRetry }: { title: string; body: string; onRetry
     )
 }
 
-// The Foreman of the workspace, the one running on its machine, on a page of its own like a coworker.
-// The onboarding's lives on the web: a workspace still in it is sent there. `sessionId` is null for a
-// new conversation, or `last` for the one the web column would show. A new one may open on the text
-// the search left for it.
 export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.foreman')
@@ -85,7 +78,6 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const { session, me } = useAuth()
     const [ask] = useState(() => (sessionId === null ? takePendingAsk() : undefined))
     const [wantsLast] = useState(sessionId === LAST_CONVERSATION)
-    // Where the last visit found the Foreman, and its last conversation: the page opens on them.
     const [kept] = useState(() => (me ? cachedForeman(me.workspace.id).read() : null))
     const keptLast = kept?.surface === 'engine' ? kept.last : null
     const initialId = wantsLast ? (keptLast?.sessionId ?? null) : sessionId
@@ -97,15 +89,12 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const [activeId, setActiveId] = useState(initialId)
     const [models, setModels] = useState<AgentModels | null>(null)
     const [filesOnEngine, setFilesOnEngine] = useState(false)
-    // Read by the pages' endpoints at upload time, long after the render that built them.
     const filesOnEngineRef = useRef(false)
     const [openIds, openChat] = useOpenChats(FOREMAN_AGENT_ID, initialId)
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
     const signedIn = Boolean(accessToken)
 
-    // A refreshed token is not a new request: following it would remount the conversation and lose
-    // its draft.
     const latestToken = useRef(accessToken)
     useEffect(() => {
         latestToken.current = accessToken
@@ -125,8 +114,6 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         router.setParams({ id: 'new' })
     }, [])
 
-    // The hub only tells the last conversation, with its title: null when there is none yet,
-    // undefined when it could not be read.
     const readLastTitle = useCallback(
         (caller: { accessToken: string; workspaceId: number }): Promise<ForemanConversation | null | undefined> =>
             fetchForemanConversation(caller)
@@ -154,13 +141,10 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
                     } else if (last === null && keptLast) showDraft()
                     else if (!keptLast) router.setParams({ id: 'new' })
                 }
-                // A last conversation that could not be read keeps the one the phone knew; the hub
-                // answering that there is none forgets it.
                 const remembered = last === undefined ? (kept?.last ?? null) : last?.sessionId ? { sessionId: last.sessionId, title: last.title ?? null } : null
                 cachedForeman(workspaceId).save({ surface: next, last: remembered })
                 setSurface(next)
             })
-            // Offline, the page stays on what the phone knew.
             .catch(() => {
                 if (!cancelled) setSurface(current => (kept && current !== 'loading' ? current : 'error'))
             })
@@ -169,7 +153,6 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         }
     }, [signedIn, workspaceId, wantsLast, attempt, readLastTitle, open, showDraft, kept, keptLast])
 
-    // Read again when the model sheet closes on a new pick, as a coworker's page does.
     useFocusEffect(
         useCallback(() => {
             const token = latestToken.current
@@ -208,8 +191,6 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         showDraft()
     }
 
-    // Born from its first send: the page stays and becomes a tab, and a fresh draft ends the row. The
-    // hub titles it from its first message, a moment after it answers the send.
     const onSessionCreated = useCallback(
         (id: string) => {
             setBornKeys(known => ({ ...known, [id]: draftKey }))

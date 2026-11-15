@@ -41,7 +41,6 @@ export type RunBucket = 'running' | 'failed' | 'done'
 const TABS: RunBucket[] = ['running', 'done', 'failed']
 type SnapshotJobs = FactorySnapshot['jobs']
 
-// Elapsed time of a running run: 12s, 1m 30s, 1h 05m.
 export function elapsed(ms: number): string {
     const total = Math.max(0, Math.floor(ms / 1000))
     if (total < 60) return `${total}s`
@@ -62,7 +61,6 @@ function matchesQuery(run: EngineRun, q: string): boolean {
     return fields.some(f => f && f.toLowerCase().includes(q))
 }
 
-// What a run was: the factory job it served, else its job reference, goal, trigger or start time.
 function rowTitle(run: EngineRun, jobs: SnapshotJobs, fmt: { row: (stage: string, n: number, title: string) => string; goal: (prefix: string) => string }, locale: string): string {
     if (run.jobRef) {
         const m = /#(\d+)$/.exec(run.jobRef)

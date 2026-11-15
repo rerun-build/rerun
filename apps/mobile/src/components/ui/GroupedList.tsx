@@ -40,7 +40,6 @@ export function Section({ title, children }: { title?: string; children: ReactNo
 type SettingsRowProps = {
     label: string
     value?: string
-    // The value is still on its way: a placeholder holds its place.
     loading?: boolean
     icon?: IconName
     accessory?: 'external' | 'chevron'
@@ -52,7 +51,6 @@ type SettingsRowProps = {
 
 const ROW_STYLE = { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm } as const
 
-// The inset that lines a separator up with the label of a row that has an icon.
 export const ICON_ROW_INSET = spacing.lg + 24 + spacing.md
 
 export function SettingsRow({ label, value, loading, icon, accessory, tone = 'default', disabled, onPress, testID }: SettingsRowProps) {
@@ -111,7 +109,6 @@ type CheckRowProps = {
     label: string
     detail?: string
     icon?: IconName
-    // Drawn after the label, a « Recommended » badge for one.
     badge?: ReactNode
     checked: boolean
     disabled?: boolean
@@ -119,7 +116,6 @@ type CheckRowProps = {
     testID?: string
 }
 
-// One answer of a single-choice list, the iOS Settings way: the chosen one carries the checkmark.
 export function CheckRow({ label, detail, icon, badge, checked, disabled, onPress, testID }: CheckRowProps) {
     const theme = useTheme()
     return (

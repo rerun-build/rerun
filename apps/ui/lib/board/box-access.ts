@@ -1,6 +1,3 @@
-// The board's copy of the access rule (the server holds the same in app/api/_auth/access.ts, the
-// database in visible_space_ids()). It only decides which buttons are open: every write is checked
-// again on the server and by RLS.
 export type BoxAccess = 'none' | 'use' | 'manage'
 export type SpaceGrant = { space_id: string; user_id: string; access: string }
 

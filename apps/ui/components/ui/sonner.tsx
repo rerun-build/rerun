@@ -11,16 +11,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
-      // The bottom of a phone belongs to the cookie bar, the bottom sheets and the chat composer,
-      // so a toast landing there covers exactly what the user is about to tap. It comes down from
-      // the top instead, where nothing is anchored. Sonner derives the swipe direction from the
-      // position, so this also turns the dismiss gesture into a swipe up.
       position={isMobile ? "top-center" : "bottom-left"}
       mobileOffset={{ top: "calc(env(safe-area-inset-top) + 12px)" }}
       gap={isMobile ? 8 : 14}
       className="toaster group"
-      // Sonner skips its own close button on `toast.custom` and on loading toasts, so
-      // NotificationToast carries its own. This flag covers everything else.
       closeButton
       icons={{
         close: (

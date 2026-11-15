@@ -11,13 +11,11 @@ def iso(t):
 
 
 def run_shape(rid, steps, started, status="running", tokens=120000):
-    """What get_run returns (apps/ui/lib/mcp/run-projection.ts)."""
     return {"runId": rid, "status": status, "steps": steps, "startedAt": iso(started), "finishedAt": None, "error": None,
             "totalTokens": tokens, "goal": {"lastLineForms": [{"prefix": "PR:", "rest": "pull-url"}, {"prefix": "BLOCKED:", "rest": "sentence"}],
                                            "turnLimit": 3, "state": "running", "verdicts": []}}
 
 def ready(extra="", deps="none"):
-    """An issue body the cut-shape gate reads: one dependency line, one file, the test file."""
     return "%s\n**Depends on**: %s\n**Worker**: coder\n**Files**\n- `a/b.py`\n- `a/test_b.py`\n**Test file**: `a/test_b.py`\n" % (extra, deps)
 
 
@@ -25,8 +23,6 @@ PR_LINE = "Done.\nPR: https://github.com/o/r/pull/42"
 
 
 class World:
-    """Fake account server and gh. A coworker run stays running until the test finishes it."""
-
     def __init__(self, issues=None):
         self.issues = issues if issues is not None else [{"number": 5, "title": "Fix x", "body": ready(), "comments": []}]
         self.sends, self.runs, self.order = [], {}, []
@@ -36,13 +32,12 @@ class World:
         self.mergeable, self.unlabelled = "MERGEABLE", set()
         self.open_numbers = {7, 129}
         self.open_prs = []
-        self.ledger = None  # path of the ledger, set by Base; send_message checks the intent row there
+        self.ledger = None
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
 
     @staticmethod
     def goal_ok(goal):
-        """The check the real account tool makes (runGoalSchema, strict): one object, forms 1 to 4, turn limit 1 to 10."""
         if not isinstance(goal, dict) or set(goal) != {"lastLineForms", "turnLimit"}:
             return False
         forms, limit = goal["lastLineForms"], goal["turnLimit"]
@@ -80,7 +75,6 @@ class World:
         return dict(self.runs[args["runId"]], runId=args["runId"])
 
     def rows(self, sql, *args):
-        """A read of the ledger over its own connection (the Dispatcher holds the writer lock)."""
         db = sqlite3.connect("file:%s?mode=ro" % self.ledger, uri=True)
         try:
             return db.execute(sql, args).fetchall()
@@ -160,7 +154,6 @@ class Base(unittest.TestCase):
         return D.Dispatcher(self.cfg, self.w.account, self.w.gh, now=lambda: self.w.clock)
 
     def tick(self, n=1, fresh=False):
-        """n passes; fresh builds a new dispatcher from the state file before every pass, as after a restart."""
         d = getattr(self, "d", None)
         for _ in range(n):
             if fresh or d is None:
@@ -190,7 +183,7 @@ class Checks(Base):
     def setUp(self):
         super().setUp()
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dispatch.json")) as f:
-            self.cfg["checks_timeout_s"] = json.load(f)["checks_timeout_s"]  # the shipped limit, not a test value
+            self.cfg["checks_timeout_s"] = json.load(f)["checks_timeout_s"]
 
     def test_a_check_running_at_45_minutes_keeps_waiting(self):
         self.to_checks()
@@ -352,7 +345,7 @@ class OneBuilder(Base):
     def test_two_jobs_never_share_a_coworker(self):
         self.w.issues.append({"number": 6, "title": "Fix y", "body": ready(), "comments": []})
         self.tick(3)
-        self.assertEqual([s[0] for s in self.w.sends], ["b1"])  # job 6 waits while b1 builds job 5
+        self.assertEqual([s[0] for s in self.w.sends], ["b1"])
         self.assertEqual(self.state(6), "queued")
         self.w.finish("b1", PR_LINE)
         self.tick()
@@ -361,12 +354,12 @@ class OneBuilder(Base):
 
     def test_fix_waits_for_its_builder(self):
         self.w.issues.append({"number": 6, "title": "Fix y", "body": ready(), "comments": []})
-        self.to_review()  # b1 is now building job 6
+        self.to_review()
         self.w.finish("r1", "VERDICT: REJECT @abcdef1: wrong")
         self.tick(2)
         self.assertEqual(self.state(), "fix_wait")
         self.assertEqual(len([s for s in self.w.sends if s[0] == "b1"]), 2)
-        self.w.finish("b1", "BLOCKED: no")  # job 6 ends, b1 is free on the next pass
+        self.w.finish("b1", "BLOCKED: no")
         self.tick(2)
         self.assertEqual(self.state(), "fixing")
         self.assertIn("One fix round", self.w.sends[-1][1])
@@ -379,7 +372,7 @@ class Flow(Base):
         self.assertEqual(agent, "r1")
         self.assertIn("pull request #42 of rerun, for job #5", msg)
         self.assertIn("at commit abcdef1.", msg)
-        self.assertIn("Do not wait for them", msg)  # the checks are the dispatcher's gate, not the reviewer's
+        self.assertIn("Do not wait for them", msg)
         self.assertEqual(self.state(), "reviewing")
 
     def test_no_pr_line_blocks_with_the_last_line(self):
@@ -392,7 +385,7 @@ class Flow(Base):
     def test_accept_then_green_runs_merge_once_at_that_commit(self):
         self.to_checks()
         self.tick()
-        self.assertEqual(self.w.merges, [])  # no runs yet: wait
+        self.assertEqual(self.w.merges, [])
         self.w.workflows[HEAD] = [wf("ci", None, "in_progress")]
         self.tick()
         self.assertEqual(self.w.merges, [])
@@ -416,7 +409,7 @@ class Flow(Base):
         self.w.finish("b1", "PUSHED: 1234567")
         self.tick(2)
         self.w.finish("r1", "VERDICT: ACCEPT @abcdef1")
-        self.tick(2)  # the fake head is unchanged, so its checks fail a second time
+        self.tick(2)
         self.assertEqual(self.w.merges, [])
         self.assertEqual(self.state(), "failed")
         self.assertIn("e2e", self.w.issue(5)["comments"][-1])
@@ -504,8 +497,6 @@ class Clocks(Base):
         self.tick()
         self.assertEqual(self.w.cancels, [("b1", "run1")])
 
-    # The step count moves live with every tool call (seen 2026-11-14: 3 to 7 steps in one minute of a build).
-    # A healthy run's count moves at least every ~14 min (one shell call is capped at 600 s, one ci-wait at 450 s).
     def test_a_long_build_whose_step_count_keeps_moving_is_not_cancelled_with_the_shipped_settings(self):
         self.cfg["clocks"] = D.settings()["clocks"]
         self.w.clock = T0
@@ -610,7 +601,7 @@ class Clocks(Base):
 
 
 class Cut(BaseException):
-    """Ends a pass in the middle of a send; once() does not catch it."""
+    pass
 
 
 class Restart(Base):
@@ -666,7 +657,7 @@ class Restart(Base):
         self.tick(4, fresh=True)
         self.assertEqual([s[0] for s in self.w.sends], ["b1", "r1", "b1", "r1"])
         self.assertEqual(len(self.w.merges), 1)
-        self.assertEqual(len(self.w.issue(5)["comments"]), 2)  # plan line and the end comment
+        self.assertEqual(len(self.w.issue(5)["comments"]), 2)
         self.assertEqual(len(self.w.edits(5)), 1)
 
     def test_send_cut_off_after_it_went_out_is_found_in_the_run_list_and_never_sent_again(self):
@@ -692,7 +683,7 @@ class Restart(Base):
     def test_merge_done_before_a_restart_is_not_repeated(self):
         self.to_checks()
         self.w.workflows[HEAD] = [wf("ci", "success")]
-        self.w.pr_state = "MERGED"  # merged, but the state file was not written
+        self.w.pr_state = "MERGED"
         gh = self.w.gh
         def merge_fails(args):
             if list(args[:2]) == ["pr", "merge"]:
@@ -740,7 +731,7 @@ class Secrets(Base):
             seen.append(dict(req.header_items()))
             args = json.loads(req.data)["params"]["arguments"]
             if args.get("agentId") == "b2":
-                raise ValueError("Invalid header value %r" % self.KEY)  # what http.client says of a bad header
+                raise ValueError("Invalid header value %r" % self.KEY)
             if args.get("agentId") == "b1":
                 raise urllib.error.HTTPError(req.full_url, 500, "echo " + self.KEY, {}, io.BytesIO(self.KEY.encode()))
             fake = self.w.account(json.loads(req.data)["params"]["name"], args)
@@ -760,14 +751,14 @@ class Secrets(Base):
                 return Proc(1, "")
             return Proc(0, self.w.gh(argv[1:]))
 
-        self.cfg["builders"].reverse()  # job 5 goes to b2 (a ValueError), job 6 to b1 (HTTP 500)
+        self.cfg["builders"].reverse()
         self.w.issues.append({"number": 6, "title": "Fix y", "body": ready("SMALL FIX"), "comments": []})
         err = io.StringIO()
         d = D.Dispatcher(self.cfg, D.make_account("https://acct.example/mcp", self.KEY, opener), D.make_gh(self.TOKEN, run))
         with contextlib.redirect_stdout(self.out), contextlib.redirect_stderr(err):
             for _ in range(3):
                 d.once()
-            gc.collect()  # Python's warning about an unclosed HTTP error repeats its text, whenever it is collected
+            gc.collect()
         printed = self.out.getvalue() + err.getvalue()
         self.assertIn("ValueError", printed)
         self.assertIn("HTTP 500", printed)
@@ -857,7 +848,6 @@ class Hardening(Base):
         self.assertEqual(self.state(), "failed")
 
 
-# The shape the engine's run read returns (runGoalRecordSchema in packages/contracts/src/run-goal.ts).
 _MISS = 'last line "Tools: shell 4 calls" matches none of PR:, BLOCKED:'
 NOT_MET = {"lastLineForms": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"}], "turnLimit": 3,
            "state": "not_met", "verdicts": [{"turn": n, "met": False, "reason": _MISS} for n in (1, 2, 3)]}
@@ -992,8 +982,6 @@ class Final(Base):
         self.w.finish("b1", out)
         self.tick()
 
-    # The engine joins the text pieces of one answer with spaces: a builder whose last message is only its final
-    # line (as the Final state block asks) gives an output where that line ends a longer line.
     def test_pr_line_at_the_end_of_a_joined_line_goes_to_review(self):
         self.build_out("Test first. Now the change. Commit and open PR. PR: https://github.com/o/r/pull/9")
         self.assertIn(self.state(), ("review_wait", "reviewing"))

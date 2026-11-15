@@ -8,11 +8,6 @@ import { cn } from '@/lib/utils'
 
 export const SURFACE_EASE = [0.22, 1, 0.36, 1] as const
 
-/**
- * Under what floats over the thread: it stays readable, but clearly behind, so a pill is never mistaken for a message.
- * `tall` reaches below the row of open conversations, so a tab never sits on a message either. It overlaps the top of the
- * thread, so it only shows once the conversation has scrolled: at rest the first message stays sharp.
- */
 export function TopVeil({ tall = false }: { tall?: boolean }) {
     return (
         <div
@@ -42,7 +37,6 @@ export function Scrim({ onClose }: { onClose: () => void }) {
     )
 }
 
-/** Lands under the pill that opened it and leaves the way it came. `receded` leaves it in place, behind what it opened. */
 export function FloatingSurface({ receded = false, className, children }: { receded?: boolean; className?: string; children: ReactNode }) {
     return (
         <motion.div

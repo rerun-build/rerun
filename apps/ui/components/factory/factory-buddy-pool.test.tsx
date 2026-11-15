@@ -7,7 +7,6 @@ const html = (buddy: Record<string, unknown>, extra: Record<string, unknown> = {
     renderToStaticMarkup(
         createElement(TileBuddy, { id: 'code', style: { color: '#444', buddy, label: 'code' }, width: 120, height: 120, floorOffset: 0, ...extra } as never),
     )
-// The floor glow is the first div, before the shadow and the svg.
 const pool = (s: string) => s.slice(0, s.indexOf('<svg'))
 const poolPercent = (s: string) => Number(/color-mix\(in srgb, [^ ]+ (\d+)%/.exec(pool(s))?.[1])
 

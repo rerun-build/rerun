@@ -16,8 +16,6 @@ function callerIp(req: Request): string | null {
     return forwarded || req.headers.get('x-real-ip')?.trim() || null
 }
 
-// Called by a server started with a pairing token: it posts the key it generated for itself, and
-// leaves attached to the workspace that created the token once the app has reached it with that key.
 export async function POST(req: Request): Promise<Response> {
     if (!SERVERS_ENABLED) return Response.json({ error: 'Not found' }, { status: 404 })
 

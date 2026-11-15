@@ -9,17 +9,10 @@ import { useForemanStore } from '@/stores/foreman.store'
 
 type Point = { x: number; y: number }
 
-/** Sous ce déplacement, un appui sur l'en-tête n'est qu'un clic : la colonne ne décolle pas. */
 const LIFT_DISTANCE = 6
-/** Ce qu'on garde de la fenêtre de part et d'autre du pointeur quand on la décroche d'un dock. */
 const GRAB_MARGIN = 24
 const LANDING_DURATION_S = 0.22
 
-/**
- * Tenir la colonne par son en-tête. Une fois décollée elle suit le pointeur en `fixed` sous sa
- * taille flottante, le store publie la place qu'elle viserait (le fantôme la dessine) et le lâcher
- * l'y pose. La position ne passe jamais par React : un `transform` écrit sur le nœud à chaque move.
- */
 export function useForemanDrag({ panelRef, placement }: { panelRef: RefObject<HTMLDivElement | null>; placement: ForemanPlacement }) {
     const reduceMotion = useReducedMotion()
     const [dragOrigin, setDragOrigin] = useState<Point | null>(null)
@@ -81,8 +74,6 @@ export function useForemanDrag({ panelRef, placement }: { panelRef: RefObject<HT
                 teardown()
                 if (!lifted) return
                 const landingPlacement = cancelled ? origin : target
-                // Seule une fenêtre qui atterrit dans un coin glisse jusqu'à sa place ; un dock
-                // s'ouvre par sa piste de grille, la même entrée que depuis l'orbe.
                 if (landingPlacement.mode === 'float') {
                     landingFromRef.current = panel.getBoundingClientRect()
                     setLanding(count => count + 1)
@@ -98,7 +89,6 @@ export function useForemanDrag({ panelRef, placement }: { panelRef: RefObject<HT
             const cancel = (cancelEvent: PointerEvent) => {
                 if (cancelEvent.pointerId === pointerId) finish(true)
             }
-            // En capture, pour passer avant l'Escape de la colonne, qui la refermerait.
             const keydown = (keyEvent: KeyboardEvent) => {
                 if (keyEvent.key !== 'Escape' || !lifted) return
                 keyEvent.preventDefault()

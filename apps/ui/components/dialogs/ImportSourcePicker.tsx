@@ -14,8 +14,6 @@ const SOURCE_MARKS: Record<ImportSourceId, ReactNode> = {
     other: null,
 }
 
-// The sibling of McpClientPicker, so the two connect panels read the same: a wrapping row of
-// chips that survives the mobile bottom sheet.
 export function ImportSourcePicker({ value, onChange, className }: { value: ImportSourceId | null; onChange: (source: ImportSourceId) => void; className?: string }) {
     const t = useTranslations('dialogs.importAgent')
     return (

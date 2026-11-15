@@ -21,7 +21,6 @@ function signInRoute(): string {
     return `${window.location.pathname}${window.location.search}`
 }
 
-// Signed out: straight to the provider the app's button named, or to the sign-in page, and back here.
 function useSignInFirst(signedIn: boolean, provider: DesktopSignInProvider | null) {
     useEffect(() => {
         if (signedIn) return
@@ -60,7 +59,6 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
         }
         setCode(approval.code)
         setStatus('done')
-        // This browser now offers to open Rerun's pages in the app (OpenInDesktopPrompt).
         document.cookie = `${DESKTOP_APP_COOKIE}=${channel}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
         const link = new URL(`${desktopShellScheme(channel)}://${DESKTOP_AUTH_CALLBACK_HOST}${DESKTOP_AUTH_CALLBACK_PATH}`)
         link.searchParams.set('code', approval.code)

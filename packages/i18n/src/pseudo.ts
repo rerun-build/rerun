@@ -5,12 +5,10 @@ const ACCENTED: Record<string, string> = {
     N: 'Ñ', O: 'Ó', P: 'Þ', Q: 'Ǫ', R: 'Ŕ', S: 'Š', T: 'Ţ', U: 'Ú', V: 'Ṽ', W: 'Ŵ', X: 'Ẋ', Y: 'Ý', Z: 'Ž',
 }
 
-// About what German or French add to an English string.
 const STRETCH = 0.35
 
 type Output = { parts: string[]; letters: number }
 
-// Text outside any argument, or inside a plural/select branch: every letter is swapped.
 function walkText(message: string, start: number, out: Output): number {
     let index = start
     while (index < message.length) {
@@ -20,7 +18,6 @@ function walkText(message: string, start: number, out: Output): number {
             index = copyArgument(message, index, out)
             continue
         }
-        // A rich text tag (`<link>`, `</b>`) is a name the component maps, never words.
         const tagEnd = char === '<' ? message.indexOf('>', index) : -1
         if (tagEnd > index) {
             out.parts.push(message.slice(index, tagEnd + 1))
@@ -35,8 +32,6 @@ function walkText(message: string, start: number, out: Output): number {
     return index
 }
 
-// An argument keeps its name, its type and its branch keywords (`{count, plural, one {...} other {...}}`);
-// only the text of its branches goes back through walkText.
 function copyArgument(message: string, start: number, out: Output): number {
     out.parts.push('{')
     let index = start + 1

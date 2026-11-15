@@ -6,11 +6,8 @@ import { TextareaMirror } from '@/components/ui/textarea-mirror'
 import type { AgentVariables } from '@/hooks/useAgentVariables'
 import { useId, useMemo } from 'react'
 
-// Same shape the engine's resolver substitutes at connect time (see engine mcp-resolve.ts).
 const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
 
-// Typography and box metrics have to be byte-identical between the textarea and the mirror layered
-// on top of it, otherwise the highlights drift away from the characters they mark.
 const METRICS = 'px-2.5 py-2 font-mono text-xs leading-5 whitespace-pre-wrap break-words'
 
 type Segment = { kind: 'text'; text: string } | { kind: 'var'; name: string }
@@ -40,8 +37,6 @@ type McpVarTextareaProps = {
     disabled?: boolean
 }
 
-// A URL field stays a textarea that wraps rather than an input that scrolls horizontally: the
-// mirror is pinned to the box, so a scrolled input would slide its highlights off the characters.
 export function McpVarTextarea({ label, helperText, warning, value, onChange, placeholder, vars, minHeightClassName = 'min-h-16', singleLine, disabled }: McpVarTextareaProps) {
     const id = useId()
     const segments = useMemo(() => tokenize(value), [value])

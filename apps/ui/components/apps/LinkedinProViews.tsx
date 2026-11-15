@@ -22,8 +22,6 @@ export const CODE_LENGTH = 6
 
 export type LinkedinCredentials = { country: string } & ({ email: string; password: string } | { loginToken: string })
 
-// While the LinkedIn app approval is pending: checked on its own every few seconds, then handed
-// back to the person once it has waited long enough to be worth a look at the phone.
 export type ApprovalWait = 'polling' | 'slow'
 
 export function LinkedinIcon(props: { size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' }) {
@@ -39,7 +37,6 @@ export const LINKEDIN_PRESENTATION: AppPresentation = {
     ],
 }
 
-// Linkup says UK where a flag needs GB.
 function countryOptions(locale: string) {
     return LINKUP_COUNTRIES.map(country => ({
         value: country.code,

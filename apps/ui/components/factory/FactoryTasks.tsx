@@ -36,8 +36,6 @@ export function formatEndedAt(iso: string, now: number): string {
     return isLocalToday(iso, now) ? hm : `${WEEKDAYS[d.getDay()]} ${hm}`
 }
 
-// `sample`: there is no snapshot yet and the floor plays the sample loop, so the column says that
-// instead of reporting an idle line next to a floor full of moving tasks.
 export function FactoryTasks({ jobs, repo, endedToday, selected, onSelect, sample = false }: { jobs: FactoryJob[]; repo: string; endedToday: FactorySnapshot['endedToday']; selected: number | null; onSelect: (issue: number) => void; sample?: boolean }) {
     const [now, setNow] = useState(() => Date.now())
     const [filter, setFilter] = useState<Shown | null>(null)

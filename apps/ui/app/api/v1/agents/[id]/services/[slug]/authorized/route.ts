@@ -6,9 +6,6 @@ import { signInClaimSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// The callback ran in a browser with no session, so it parked what the provider handed over. The app,
-// as the member who started the sign-in, claims it here: the token lands on the engine and the entry
-// flips to active, nothing before.
 export const POST = apiRoute({ auth: 'member', body: signInClaimSchema }, async ({ ctx, params, body }) => {
     const key = serviceKeyParam(params)
     const actor = actorFromContext(ctx)

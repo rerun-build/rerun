@@ -1,8 +1,5 @@
 import { asStringArray } from '@/lib/mcp/args'
 
-// What `show_templates` sends and what it is answered with. Apart from the widget so the card and
-// the row can both read them without importing each other.
-
 export type TemplateChoice = { answered: true; chosen: string } | { answered: true; custom: true } | { answered: false }
 
 export type ShownTemplate = { slug: string; title: string; why: string; agents?: number; connectors: string[] }

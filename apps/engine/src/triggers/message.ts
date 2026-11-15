@@ -1,8 +1,6 @@
 import type { TriggerFireInput } from '@rerun/contracts'
 import type { Trigger } from './loader.js'
 
-// The payload is persisted with the run transcript and sent to the model on every step, so a
-// multi-megabyte body would blow up both the context and the SQLite row.
 export const MAX_PAYLOAD_BYTES = 65_536
 
 function attr(value: string): string {
@@ -37,8 +35,6 @@ export function buildTriggerMessage(trigger: Trigger, fire: TriggerFireInput, re
     const raw = fire.body.trim()
     if (!raw) return `${trigger.body.trim()}\n\n<trigger_payload ${attrs.join(' ')}>(no payload)</trigger_payload>`
 
-    // A payload that contains the closing tag would otherwise let a caller end the block early
-    // and have the rest of its body read as instructions.
     const escaped = pretty(raw, fire.contentType).replaceAll('</trigger_payload>', '<\\/trigger_payload>')
     const { text, truncated } = truncate(escaped, fire.bodyBytes)
     if (truncated) attrs.push('truncated="true"')

@@ -12,7 +12,6 @@ export const SHARED_HIDDEN_TABLES = [META_TABLE, VIEWS_TABLE]
 
 const META_DDL = `CREATE TABLE IF NOT EXISTS ${META_TABLE} (table_name TEXT PRIMARY KEY, created_by TEXT NOT NULL, created_at TEXT NOT NULL)`
 
-// A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SHARED_DB_MIGRATIONS: SqliteMigration[] = [
     {
         version: 1,
@@ -66,9 +65,6 @@ function matches(re: RegExp, sql: string): string[][] {
     return [...sql.matchAll(re)].map(m => m.slice(1).map(unquote))
 }
 
-// Several agents write to the same file, so who created a table is the one thing none of them can
-// work out on their own. Tracking it never blocks a statement: a statement we fail to parse simply
-// leaves its table without an owner.
 export async function recordTableOwnership(client: Client, statements: string[], agentName: string): Promise<void> {
     try {
         const now = new Date().toISOString()

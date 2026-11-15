@@ -36,8 +36,6 @@ function BoxRow({ box, selected, onPress, divided }: { box: Box; selected: boole
     )
 }
 
-// A new coworker in one of the Boxes the caller manages. What it should do is also its first message,
-// so it starts working as soon as it exists, as on the web. `box` preselects a Box.
 export default function NewCoworker() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
@@ -83,7 +81,6 @@ export default function NewCoworker() {
         }
     }
 
-    // A form sheet lays out its scroll view itself: wrapped in a view, it is laid out at no height.
     return (
         <>
             <ScrollView style={{ backgroundColor: theme.background }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ padding: spacing.lg, paddingTop: spacing.xl, paddingBottom: insets.bottom + spacing.xl, gap: spacing.xl }}>

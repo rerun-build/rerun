@@ -1,5 +1,3 @@
-"""runner_loop tests with a fake engine: end recorded in one tick, long run cancelled, one refire on error,
-restart mid-job without a double fire."""
 import os, sys, tempfile, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runner_loop as R, limits as L
@@ -88,7 +86,7 @@ class TestRunner(unittest.TestCase):
         self.assertEqual(self.eng.cancelled, ["run1"])
         self.assertEqual(self.fires()[0]["status"], "cancelled")
         self.tick()
-        self.assertEqual(len(self.eng.fires), 1)  # a cancel is not refired
+        self.assertEqual(len(self.eng.fires), 1)
 
     def test_error_refired_exactly_once(self):
         self.runner.st.enqueue("60", "challenge")
@@ -113,7 +111,7 @@ class TestRunner(unittest.TestCase):
         self.runner.st.enqueue("60", "challenge")
         self.tick()
         self.runner.st.close()
-        self.runner = self.make()  # new process: tokens from file, store from disk
+        self.runner = self.make()
         self.tick()
         self.assertEqual(len(self.eng.fires), 1)
         self.eng.runs["run1"].update(status="done")
@@ -128,7 +126,7 @@ class TestRunner(unittest.TestCase):
         orig = self.eng.fire_trigger
 
         def lost(*a):
-            orig(*a)  # the engine started the run, the answer was lost
+            orig(*a)
             raise R.E.EngineError("timeout")
         self.eng.fire_trigger = lost
         self.tick()
@@ -143,7 +141,7 @@ class TestRunner(unittest.TestCase):
     def test_enqueue_writes_inbox_file_only_and_loop_ingests_it(self):
         inbox = R.inbox_path(self.cfg)
         self.assertEqual(os.path.dirname(inbox), self.d.name)
-        R.enqueue(inbox, "61", "challenge", "C1")  # the loop holds the store lock: enqueue never opens the store
+        R.enqueue(inbox, "61", "challenge", "C1")
         self.assertEqual(len(os.listdir(inbox)), 1)
         self.assertEqual(self.runner.st.queued(), [])
         self.tick()
@@ -177,13 +175,13 @@ class TestRunner(unittest.TestCase):
         self.assertEqual(len(self.eng.fires), 1)
         self.tick(90)
         self.assertEqual(self.eng.cancelled, [])
-        self.tick(30)  # 120 s after the start, still no step
+        self.tick(30)
         self.assertEqual(self.eng.cancelled, ["run1"])
         self.assertIn("stalled", self.fires()[0]["error"])
 
     def test_r2_challenge_hold_is_cancelled_before_the_stub_would_finish(self):
         import trigger as T
-        STUB_HOLD = 1800  # deploy/vps/stub-model.yml default
+        STUB_HOLD = 1800
         shipped = {e["stage"]: e for e in T.load_config()["triggers"]}["challenge-hold"]
         self.assertLess(shipped["run_limit_s"] * 5, STUB_HOLD)
         cfg = dict(self.cfg, run_limit_s=2700, stall_s=600)
@@ -193,7 +191,7 @@ class TestRunner(unittest.TestCase):
         self.runner.st.enqueue("r2", "challenge-hold")
         self.tick(0)
         elapsed = 0
-        while not self.eng.cancelled and elapsed < STUB_HOLD:  # the stub run stays running the whole time
+        while not self.eng.cancelled and elapsed < STUB_HOLD:
             self.tick(30)
             elapsed += 30
         self.assertEqual(self.eng.cancelled, ["run1"])
@@ -205,7 +203,6 @@ class TestRunner(unittest.TestCase):
 
 
 class SetupEngine:
-    """In-memory dev engine for `setup`: counts every create."""
     def __init__(self):
         self.conns, self.agents, self.default, self.posts, self.triggers = [], [], None, [], {}
     def _call(self, method, path, query=None, payload=None):
@@ -275,7 +272,7 @@ class TestSetup(unittest.TestCase):
         R.setup(SetupEngine(), self.cfg)
         rt = R.load_runtime(self.cfg)
         self.assertEqual([e["agent"] for e in rt["triggers"]], ["ag-challenge", "ag-challenge-hold"])
-        self.assertNotIn("agent", self.cfg["triggers"][0])  # the template is not changed
+        self.assertNotIn("agent", self.cfg["triggers"][0])
     def test_store_path_default_is_the_data_dir_and_state_sits_beside_it(self):
         os.environ["FACTORY_DATA_DIR"] = "/vol"
         try:

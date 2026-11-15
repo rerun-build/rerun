@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 
 const MAX_SHOWN = 4
 
-// Bare logos rather than the boxed Icon: on a card footer four boxes read as buttons.
 export function TemplateConnectorLogos({ connectors, className }: { connectors: TemplateConnector[]; className?: string }) {
     const t = useTranslations('templates.connectors')
     if (connectors.length === 0) return <span className={cn('shrink-0 text-xs text-muted-foreground', className)}>{t('none')}</span>

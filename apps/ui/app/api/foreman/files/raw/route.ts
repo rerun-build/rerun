@@ -26,8 +26,6 @@ async function read(req: Request) {
         if (range === 'unsatisfiable') return new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${blob.size}`, 'Accept-Ranges': 'bytes' } })
 
         const headers = {
-            // Our own mapping wins over the bucket's: a webm recording is stored as octet-stream,
-            // which no browser will play back, and a `.html` must not render on this origin.
             ...rawFileHeaders(path),
             'Cache-Control': 'private, max-age=60',
             'Accept-Ranges': 'bytes',

@@ -90,7 +90,7 @@ class TestRoster(unittest.TestCase):
         with self.assertRaises(ValueError):
             roster.load(json.dumps(d))
         d = data()
-        d["areas"][0]["builder"] = "linus"   # reviewer, not writer
+        d["areas"][0]["builder"] = "linus"
         with self.assertRaises(ValueError):
             roster.load(json.dumps(d))
         d = data()

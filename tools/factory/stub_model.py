@@ -1,5 +1,3 @@
-"""OpenAI-chat stub for the factory dev network. stub-fast answers at once; stub-hold streams one chunk, then holds
-up to STUB_HOLD_SECONDS before finishing. GET /stats counts requests per run (header x-run-id, else x-rerun-agent)."""
 import json, os, sys, threading, time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 

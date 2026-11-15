@@ -151,8 +151,6 @@ export function CaptureAgentReviewSection({
                     value={setup}
                     onChange={next => {
                         onSetupChange(next)
-                        // Changing the answer changes what this agent ships. Rewording the
-                        // instructions does not, so it leaves a sign-off alone.
                         if (next.required !== setup.required) onApprove(false)
                     }}
                 />
@@ -171,8 +169,6 @@ export function CaptureAgentReviewSection({
                             excluded={excluded}
                             onToggle={(paths, keep) => {
                                 onToggleFiles(paths, keep)
-                                // Putting a flagged file back in changes what was signed off, so the
-                                // review has to be given again.
                                 if (keep && paths.some(path => flagged.has(path))) onApprove(false)
                             }}
                         />

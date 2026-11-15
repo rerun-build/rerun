@@ -19,10 +19,8 @@ export type PhoneCountry = { code: CountryCode; name: string; callingCode: strin
 
 const FALLBACK_COUNTRY: CountryCode = 'US'
 
-// Hermes has no Intl.DisplayNames, so the names come from a table rather than from the platform.
 export const flagOf = (code: string) => String.fromCodePoint(...[...code.toUpperCase()].map(letter => 0x1f1e6 + letter.charCodeAt(0) - 65))
 
-// Calling regions of their own that the ISO table does not list as countries.
 const MISSING_NAMES: Record<Locale, Partial<Record<CountryCode, string>>> = {
     en: { AC: 'Ascension Island', TA: 'Tristan da Cunha' },
     fr: { AC: 'Île de l’Ascension', TA: 'Tristan da Cunha' },
@@ -31,7 +29,6 @@ const MISSING_NAMES: Record<Locale, Partial<Record<CountryCode, string>>> = {
     de: { AC: 'Ascension', TA: 'Tristan da Cunha' },
 }
 
-// i18n-iso-countries only has European Portuguese: these are the names Brazil writes differently.
 const REGIONAL_NAMES: Partial<Record<Locale, Partial<Record<CountryCode, string>>>> = {
     pt: {
         AM: 'Armênia',
@@ -83,7 +80,6 @@ function countryName(code: CountryCode, locale: Locale): string {
     return REGIONAL_NAMES[locale]?.[code] ?? countries.getName(code, locale) ?? MISSING_NAMES[locale][code] ?? countries.getName(code, 'en') ?? code
 }
 
-// The countries named in the app's language, in that language's alphabetical order.
 export function phoneCountries(locale: Locale = DEFAULT_LOCALE): PhoneCountry[] {
     let list = countriesByLocale.get(locale)
     if (!list) {
@@ -111,8 +107,6 @@ export const formatAsTyped = (input: string, country: CountryCode) => new AsYouT
 
 export const examplePlaceholder = (country: CountryCode) => getExampleNumber(country, mobileExamples)?.formatNational() ?? ''
 
-// Possible, not valid: the hub has the last word, and a number a carrier added last month must not be
-// stopped by the copy of the metadata this build carries.
 export const isPossibleNumber = (input: string, country: CountryCode) => parsePhoneNumberFromString(input, country)?.isPossible() ?? false
 
 export const internationalNumber = (input: string, country: CountryCode) => parsePhoneNumberFromString(input, country)?.formatInternational() ?? input

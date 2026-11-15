@@ -4,20 +4,14 @@ import { Button } from "./Button";
 import { theme, text } from "../theme";
 
 export interface NewsletterSectionImage {
-  /** Built with newsletterMediaUrl(slug, file). A GIF plays in every client but Outlook desktop,
-   *  which freezes it on its first frame, so that frame has to read on its own. */
   src: string;
   width: number;
-  /** Left out on purpose in most cases: a stated height keeps the whole box reserved in a client
-   *  that blocks remote images, which leaves a hole where the picture should be. */
   height?: number;
   alt: string;
-  /** Makes the picture itself the link. The CTA below usually leads to the same place. */
   href?: string;
 }
 
 export interface NewsletterSectionProps {
-  /** Short kicker above the title. */
   label?: string;
   title: string;
   body: React.ReactNode;
@@ -25,7 +19,6 @@ export interface NewsletterSectionProps {
   cta?: { href: string; label: string };
 }
 
-/** One item of an issue: a kicker, a title, a paragraph, and optionally a picture and a link. */
 export function NewsletterSection({
   label,
   title,
@@ -106,15 +99,12 @@ const title_: React.CSSProperties = {
 };
 
 const artLink: React.CSSProperties = {
-  // Stated rather than left to react-email, whose `Link` defaults to its own blue: without it the
-  // alt text of a blocked image is painted in a colour the theme never declares.
   color: theme.text.strong,
   display: "block",
   textDecoration: "none",
 };
 
 const art: React.CSSProperties = {
-  // Explicit, because a linked image draws a blue frame in the older Outlooks without it.
   border: 0,
   borderRadius: theme.radius.inner,
   display: "block",

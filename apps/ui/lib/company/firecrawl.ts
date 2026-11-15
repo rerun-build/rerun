@@ -2,18 +2,10 @@ import { normalizeDomain } from '@/lib/services/brand-icon'
 
 const FIRECRAWL_BASE_URL = process.env.RERUN_FIRECRAWL_BASE_URL ?? 'https://api.firecrawl.dev'
 const SCRAPE_TIMEOUT_MS = 20_000
-// A landing page's main content is well under this; the cap is there so a documentation-heavy
-// home page cannot push a 200k prompt into the analysis model.
 const MAX_MARKDOWN = 15_000
 
-// Hosts a scrape must never be pointed at. Firecrawl runs the request from its own network, so
-// this is not an SSRF guard for us — it is what keeps someone's `localhost:3000` from being sent
-// to a third party and billed as a page.
 const PRIVATE_HOST = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[?::1\]?$)/i
 
-// The onboarding field takes whatever people type: "acme.com", "www.acme.com/fr", a full URL.
-// Returns null when there is nothing that could be a public site, which is the signal to skip the
-// analysis entirely rather than spend a scrape on it.
 export function companySiteUrl(input: string): string | null {
     const domain = normalizeDomain(input)
     if (!domain.includes('.') || PRIVATE_HOST.test(domain)) return null
@@ -21,7 +13,6 @@ export function companySiteUrl(input: string): string | null {
     return `https://${domain}`
 }
 
-// What a coworker's web_fetch may hand to the scraper: any public http(s) page, path included.
 export function isPublicUrl(url: string): boolean {
     try {
         const { protocol, hostname } = new URL(url)
@@ -31,14 +22,8 @@ export function isPublicUrl(url: string): boolean {
     }
 }
 
-// The plan's ceiling is a per-minute request count, and its reset is on the order of a second, so
-// one wait is the difference between a signup spike degrading to the generic connector list and it
-// simply being served a moment later. One retry only: past that the person is waiting on a screen.
 const RATE_LIMIT_RETRY_MS = 1500
 
-// Reads a company's home page as markdown. Never throws: every failure (no key, timeout, quota,
-// a site that blocks crawlers) degrades to null, and the caller falls back to the generic
-// connector list rather than showing an error in the middle of the onboarding.
 export async function scrapeCompanySite(url: string): Promise<string | null> {
     if (!process.env.FIRECRAWL_API_KEY) return null
 
@@ -51,8 +36,6 @@ export async function scrapeCompanySite(url: string): Promise<string | null> {
     }
 }
 
-// Raw Firecrawl call for the callers that want to know why it failed (the company explorers show
-// the error next to the source). Same single retry on a rate limit as the onboarding scrape.
 export async function firecrawl<T>(path: string, body: Record<string, unknown>, timeoutMs = SCRAPE_TIMEOUT_MS): Promise<T> {
     const apiKey = process.env.FIRECRAWL_API_KEY
     if (!apiKey) throw new Error('FIRECRAWL_API_KEY is not configured')
@@ -64,14 +47,8 @@ export async function firecrawl<T>(path: string, body: Record<string, unknown>, 
 
 const PAGE_TIMEOUT_MS = 45_000
 
-// `status` is Firecrawl's own answer, null when it could not be reached. `pageStatus` is what the
-// site answered to Firecrawl: a block page it rendered faithfully is still a failed read. `rawHtml` is
-// the page after its JavaScript ran, head included, which the markdown leaves out.
 export type PageScrape = { status: number | null; ok: boolean; markdown: string; rawHtml: string; pageStatus: number | null }
 
-// Reads any public page as markdown, for a coworker whose own fetch was refused. Returns null when
-// no key is configured. `proxy: 'auto'` only reaches for the stealth proxy (5 credits instead of 1)
-// after the basic one failed.
 export async function scrapePage(url: string): Promise<PageScrape | null> {
     const apiKey = process.env.FIRECRAWL_API_KEY
     if (!apiKey) return null

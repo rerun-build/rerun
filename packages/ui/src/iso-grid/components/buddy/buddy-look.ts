@@ -6,12 +6,9 @@ export type { BuddyMood }
 
 export const BUDDY_EYES: BuddyEyes[] = ['pill', 'round', 'happy', 'googly', 'visor', 'sleepy', 'wink', 'pixel', 'star', 'heart', 'dot', 'brows', 'cyclops', 'shades', 'glasses', 'sparkle', 'line']
 
-// Most buddies have no mouth: the eyes carry the face, and a board full of smiles gets loud.
 export const BUDDY_MOUTHS: BuddyMouth[] = ['none', 'smile', 'open', 'cat', 'flat']
 const MOUTH_ODDS: BuddyMouth[] = ['none', 'none', 'none', 'smile', 'open', 'cat', 'flat']
 
-// The body keeps the tile preset's state colours, so the board reads the way it does today: amber
-// at work, red when broken, cyan when it waits for you. The two resting bodies follow the theme.
 export const BUDDY_STATE_COLOR: Record<BuddyMood, string> = {
     idle: 'var(--iso-buddy-body)',
     working: '#f59e0b',
@@ -20,8 +17,6 @@ export const BUDDY_STATE_COLOR: Record<BuddyMood, string> = {
     asleep: 'var(--iso-buddy-asleep)',
 }
 
-// The colour of a resting agent's top. Amber, red and cyan are left out: on the board they already
-// mean working, broken and waiting for you.
 const IDENTITY = ['#0f52ff', '#4fb800', '#f0127f', '#7a2cf5', '#e935c1', '#3b32e8', '#00b862', '#a81fe0']
 
 export function buddyLook(style: TileStyle): BuddyLook {
@@ -52,13 +47,10 @@ export function buddyMood(style: TileStyle): BuddyMood {
 
 const STATUS_MOOD: Record<AgentStatus, BuddyMood> = { idle: 'idle', working: 'working', error: 'error', waiting_human: 'waiting', offline: 'asleep' }
 
-// The mood the board gives an agent, for a buddy drawn away from it.
 export function buddyMoodOfStatus(status: AgentStatus, disabled = false): BuddyMood {
     return disabled ? 'asleep' : STATUS_MOOD[status]
 }
 
-// Lightens (amount > 0, towards white) or darkens (amount < 0, towards black) any CSS colour, a
-// theme variable included, so a shaded colour can be shaded again.
 export function shade(color: string, amount: number) {
     const share = Math.round(Math.min(1, Math.abs(amount)) * 100)
     return `color-mix(in srgb, ${color}, ${amount >= 0 ? 'white' : 'black'} ${share}%)`

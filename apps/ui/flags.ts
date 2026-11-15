@@ -12,9 +12,6 @@ export const identify = dedupe(async (): Promise<Entities> => {
     return { user: email ? { email: email.toLowerCase() } : undefined }
 })
 
-// Une feature pas encore lancée n'existe que pour les admins et les domaines email en accès anticipé.
-// Le jour du lancement, la constante de lib/features passe à `true` et le flag s'ouvre à tout le monde
-// sans toucher aux points d'appel.
 export const releasedOrEarlyAccess =
     (released: boolean, earlyAccessDomains: readonly string[] = []) =>
     ({ entities }: { entities?: Entities }) => {
@@ -45,8 +42,6 @@ export const publishedAccessFlag = flag<boolean, Entities>({
     decide: releasedOrEarlyAccess(PUBLISHED_ACCESS_RELEASED),
 })
 
-// `rerun.local` is the domain of the throwaway accounts `pnpm verify:ui` signs in with on the local
-// stack, so a pack can be looked at before it ships. No inbox answers there.
 export const i18nFlag = flag<boolean, Entities>({
     key: 'i18n',
     defaultValue: false,

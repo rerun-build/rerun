@@ -11,10 +11,6 @@ export type SkillProposalDockProps = {
     onDecide?: (proposalId: string, decision: 'accept' | 'dismiss') => void
 }
 
-/**
- * The proposals waiting on the user, pinned above the composer instead of scrolling away in the
- * transcript. Each card animates on its own key so one settling never drags the others.
- */
 export function SkillProposalDock({ agentId, proposals, pendingId, onDecide }: SkillProposalDockProps) {
     return (
         <div className="max-h-[34vh] overflow-y-auto">

@@ -10,8 +10,6 @@ import { chunkPage, pageSections, textHash } from './chunks.js'
 import { parseLinks } from './links.js'
 import { scheduleBrainEmbedding } from './embedding.js'
 
-// The headings of the sections nobody at the company confirmed yet: what the seed imported from
-// the public web and no person wrote, accepted or confirmed since.
 export type BrainPageFile = BrainPageSummary & { content: string; sources: string[]; unconfirmed: string[] }
 
 export const SEED_AUTHOR = 'seed'
@@ -20,15 +18,10 @@ export type PageInput = { title: string; type: BrainPageType; content: string; s
 
 export type WritePageInput = PageInput & {
     author: string
-    // Null when creating. Ignored with `force`, which is how an accepted proposal or a revert lands
-    // on a page that moved since: the person deciding saw the current version.
     baseHash: string | null
     force?: boolean
     proposalId?: string | null
-    // Set by a revert to a version the seed wrote: the web's version comes back unconfirmed.
     unconfirmed?: string[]
-    // A tool's write is one discrete gesture, not a keystroke: it gets its own revision instead of
-    // folding into the author's previous one, so the chat card can undo just this write.
     separateRevision?: boolean
 }
 
@@ -38,12 +31,8 @@ export const pageHash = (page: { title: string; type: string; content: string })
 
 const sectionHeadings = (content: string) => [...new Set(pageSections(content).map(section => section.heading))]
 
-// A page still belongs to the seed while nobody edited it, accepted a proposal on it, nor confirmed
-// one of its sections.
 export const seedOwnsPage = (page: BrainPageFile) => page.updatedBy === SEED_AUTHOR && page.unconfirmed.length === sectionHeadings(page.content).length
 
-// The editor rewrites the markdown of sections nobody touched (list markers, escapes), so a section
-// counts as changed only when its words do.
 const sectionWords = (body: string) => body.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
 
 function unconfirmedAfterWrite(current: BrainPageFile | null, content: string, author: string): string[] {
@@ -56,13 +45,10 @@ function unconfirmedAfterWrite(current: BrainPageFile | null, content: string, a
 
 function asString(value: unknown): string | null {
     if (typeof value === 'string') return value
-    // A hand-written ISO date without quotes comes back from YAML as a Date.
     if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString()
     return null
 }
 
-// Pages can also be dropped in by hand (an Obsidian vault copied over), so anything missing from
-// the frontmatter falls back to something usable rather than hiding the file.
 function parsePage(slug: string, raw: string): BrainPageFile {
     const parsed = matter(raw)
     const data = parsed.data as Record<string, unknown>
@@ -70,7 +56,6 @@ function parsePage(slug: string, raw: string): BrainPageFile {
     const content = parsed.content.trim()
     const updatedBy = asString(data.updatedBy) ?? 'user'
     const headings = sectionHeadings(content)
-    // A page seeded before the engine tracked confirmations has no list: all of it came from the web.
     const unconfirmed = Array.isArray(data.unconfirmed) ? data.unconfirmed.map(String).filter(heading => headings.includes(heading)) : updatedBy === SEED_AUTHOR ? headings : []
     const page = {
         slug,
@@ -118,8 +103,6 @@ async function writePageFile(page: BrainPageFile): Promise<void> {
 
 const locks = new Map<string, Promise<unknown>>()
 
-// Two accepts on the same page in the same second would otherwise both pass the hash check before
-// either writes.
 async function withPageLock<T>(slug: string, fn: () => Promise<T>): Promise<T> {
     const previous = locks.get(slug) ?? Promise.resolve()
     const run = previous.catch(() => {}).then(fn)
@@ -141,7 +124,6 @@ export async function indexPage(page: BrainPageFile): Promise<void> {
         reusable.set(hash, [...(reusable.get(hash) ?? []), String(row.id)])
     }
 
-    // An unchanged section keeps its row, and with it an embedding already paid for.
     const statements: { sql: string; args: (string | number)[] }[] = []
     for (const chunk of chunks) {
         const kept = reusable.get(chunk.textHash)?.shift()
@@ -188,9 +170,6 @@ export async function unindexPage(slug: string): Promise<void> {
 
 const REVISION_MERGE_WINDOW_MS = 10 * 60_000
 
-// An editor that autosaves writes every second it is typed in. A person's own edits within a few
-// minutes of each other fold into one revision; a proposal, a revert or another author always
-// starts a new one.
 async function recordRevision(page: BrainPageFile, proposalId: string | null, force: boolean): Promise<void> {
     const client = await getBrainDb()
     if (!force && !proposalId) {
@@ -235,8 +214,6 @@ export async function writePage(slug: string, input: WritePageInput): Promise<Br
     })
 }
 
-// Only the list moves: the content, its hash and the history stay, so an editor open on the page
-// does not see a conflict.
 export async function confirmSections(slug: string, headings: string[] | null): Promise<BrainPageFile> {
     return withPageLock(slug, async () => {
         const current = await readPageFile(slug)
@@ -249,8 +226,6 @@ export async function confirmSections(slug: string, headings: string[] | null): 
     })
 }
 
-// A renamed agent keeps the pages it last wrote. Only the author moves: the hash and the revisions
-// stay, so nobody sees a conflict and the history still says who wrote what at the time.
 export async function reattributePages(fromAuthor: string, toAuthor: string): Promise<void> {
     for (const { slug } of (await listPageFiles()).filter(page => page.updatedBy === fromAuthor)) {
         await withPageLock(slug, async () => {
@@ -273,7 +248,6 @@ export async function deletePage(slug: string): Promise<void> {
 
 const CARD_ORDER = new Map<string, number>(BRAIN_CARD_TYPES.map((t, i) => [t, i]))
 
-// The identity card first, in its fixed order, then every other page by title.
 export function sortPages<T extends { type: string; title: string }>(pages: T[]): T[] {
     return [...pages].sort((a, b) => {
         const ca = CARD_ORDER.get(a.type) ?? CARD_ORDER.size
@@ -341,8 +315,6 @@ export async function getRevision(slug: string, id: string): Promise<{ revision:
     return { revision: toRevision(row), content: String(row.content) }
 }
 
-// With expectedHash, the revert only lands on that version of the page and conflicts otherwise:
-// the chat card undoing a write must not erase what a person typed since.
 export async function revertPage(slug: string, revisionId: string, author: string, expectedHash?: string): Promise<BrainPageFile> {
     const found = await getRevision(slug, revisionId)
     if (!found) throw notFound('revision')

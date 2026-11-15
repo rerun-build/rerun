@@ -17,14 +17,12 @@ type MarkdownIt = {
 const WIKILINK_AT_START = /^\[\[([^\]|\n]+)(?:\|([^\]\n]*))?\]\]/
 const WIKILINK_TYPED = /\[\[([^\]|\n]+)(?:\|([^\]\n]*))?\]\]$/
 
-// `[[slug#heading]]` still points at the page `slug`, as the engine reads it.
 export const wikilinkSlug = (target: string) => target.split('#')[0].trim().toLowerCase()
 
 export const wikilinkMarkdown = ({ target, label }: WikilinkAttrs) => `[[${target}${label ? `|${label}` : ''}]]`
 
 const escapeAttribute = (value: string) => value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')
 
-// tiptap-markdown runs every setup on each parse, against the same markdown-it instance.
 const installed = new WeakSet<object>()
 
 function installWikilinkRule(md: MarkdownIt) {
@@ -44,8 +42,6 @@ function installWikilinkRule(md: MarkdownIt) {
     }
 }
 
-// Obsidian's [[slug]] / [[slug|label]], kept as one atom: as plain text the markdown serializer
-// would escape the brackets and the engine would no longer see a link.
 export const Wikilink = Node.create<WikilinkOptions>({
     name: 'wikilink',
     group: 'inline',

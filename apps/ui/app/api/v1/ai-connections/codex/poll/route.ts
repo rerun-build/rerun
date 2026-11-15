@@ -6,8 +6,6 @@ import { codexSignInPollInputSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// The app polls this until the user has typed the code on OpenAI's page; the approval is stored the
-// moment it lands, so the tokens never reach the phone.
 export const POST = apiRoute({ auth: 'admin', body: codexSignInPollInputSchema }, async ({ ctx, body }) => {
     const keys = await signInStep(async () => {
         const { deviceAuthId, userCode } = openCodexSignIn(body.ticket, ctx.userId)

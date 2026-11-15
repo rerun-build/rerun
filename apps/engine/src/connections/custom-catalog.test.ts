@@ -115,8 +115,6 @@ describe('probeCustomEndpoint', () => {
 
     it('calls a closed port unreachable and names why', async () => {
         await new Promise<void>(done => server.close(() => done()))
-        // The probe goes on to host.docker.internal, which resolves on some CI machines to a host that
-        // never answers; it stands here for the plain PC, where that name does not exist.
         const realFetch = globalThis.fetch
         const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation((input, init) =>
             new URL(String(input)).hostname === 'host.docker.internal'

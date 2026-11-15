@@ -4,7 +4,6 @@ import { selectMany } from '@/supabase/supabase-helpers'
 
 const OG_ENTRY_COLUMNS = ['slug', 'title', 'image_url', 'image_dark_url', 'published_at', 'updated_at'] as const
 
-// Three rows fit the card in full, the fourth fades out at the bottom edge.
 const OG_ENTRY_COUNT = 4
 
 export type ChangelogOgEntry = {
@@ -37,8 +36,6 @@ export async function getLatestChangelogEntries(): Promise<ChangelogOgEntry[]> {
     )
 }
 
-// Publishing, editing or unpublishing an entry all change what the card shows, and none of them
-// changes its URL: the slugs and their `updated_at` are what tells one capture from the next.
 export function changelogOgVersion(entries: ChangelogOgEntry[]): string {
     return [OG_VERSION, ...entries.map(entry => `${entry.slug}@${entry.updatedAt}`)].join('.')
 }

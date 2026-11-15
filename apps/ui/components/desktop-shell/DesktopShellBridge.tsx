@@ -9,8 +9,6 @@ import { desktopShell } from '@/lib/desktop-shell/client'
 const UPDATE_TOAST_ID = 'desktop-update'
 const DESKTOP_FULLSCREEN_ATTRIBUTE = 'data-desktop-fullscreen'
 
-// What the desktop app tells the page and the page shows in its own toasts: an app update ready to
-// install, a file it downloaded. Renders nothing, and does nothing in a browser.
 export function DesktopShellBridge() {
     const t = useTranslations('desktopShell')
     const locale = useLocale()
@@ -42,7 +40,6 @@ export function DesktopShellBridge() {
         })
     }, [t])
 
-    // Native full screen hides the window's buttons: the strip folds away with them.
     useEffect(() => {
         const shell = desktopShell('window')
         if (!shell) return
@@ -51,9 +48,6 @@ export function DesktopShellBridge() {
         return shell.window.onState(apply)
     }, [])
 
-    // Windows and Linux draw their caption buttons over the strip: transparent, so the strip shows
-    // through, with symbols that read on the page's theme. The shell's own pages (find bar, offline)
-    // take the same theme.
     useEffect(() => {
         const shell = desktopShell('window')
         if (!shell) return
@@ -65,8 +59,6 @@ export function DesktopShellBridge() {
         return () => observer.disconnect()
     }, [])
 
-    // ⌘F that nothing on the page took (the second one, past the Control Center) is the browser's
-    // find in page, which the desktop app draws itself.
     useEffect(() => {
         const shell = desktopShell('find')
         if (!shell) return
@@ -80,7 +72,6 @@ export function DesktopShellBridge() {
         return () => window.removeEventListener('keydown', onKey)
     }, [])
 
-    // The app's menus and tray speak the language the person reads Rerun in.
     useEffect(() => {
         desktopShell('locale')?.locale.set(locale)
     }, [locale])

@@ -17,12 +17,6 @@ const NAMING_MODEL = process.env.RERUN_STARTER_NAMING_MODEL ?? 'anthropic/claude
 const NAMING_TIMEOUT_MS = 8000
 const MAX_ROLE = 90
 
-/**
- * The starter pack of their industry, as the card draws it. Only what installs on the trial alone
- * makes it onto the rail: a template not published yet, one with no captured coworker, or a paid one
- * would be a card that breaks the build it promises. `null` when nothing is left, and the model
- * designs their coworker instead.
- */
 export async function loadStarterPack(ctx: WorkspaceContext, state: ForemanState): Promise<StarterPackInput | null> {
     const cards = starterPack(state.answers.industry)
     const { data } = await selectMany(ctx.supabase, 'templates', LIBRARY_COLUMNS, { slug: cards.map(card => card.template), status: 'published' })
@@ -64,7 +58,6 @@ function fallbackName(asked: string): { name: string; role: string } {
     return { name: 'Coworker', role: line.length > MAX_ROLE ? `${line.slice(0, MAX_ROLE - 1).trimEnd()}…` : line }
 }
 
-/** A name and a role for the one coworker they described in their own words instead of picking. */
 export async function nameCustomCoworker(asked: string): Promise<{ name: string; role: string }> {
     if (!hasOpenRouterKey()) return fallbackName(asked)
     try {

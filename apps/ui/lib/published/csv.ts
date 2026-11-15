@@ -2,8 +2,6 @@ export type CsvDelimiter = ',' | ';' | '\t'
 
 const CANDIDATES: readonly CsvDelimiter[] = [',', ';', '\t']
 
-// The delimiter that splits the first line into the most cells, quotes respected. A European export
-// separates with `;`, a spreadsheet copy with tabs; a comma wins every tie.
 export function sniffDelimiter(text: string): CsvDelimiter {
     const firstLine = firstRecord(text)
     let best: CsvDelimiter = ','
@@ -35,8 +33,6 @@ function firstRecord(text: string): string {
 
 export type ParsedCsv = { rows: string[][]; truncated: boolean }
 
-// RFC 4180: a quoted field may hold the delimiter, line breaks and doubled quotes; records end at
-// LF, CRLF or a lone CR. Parsing stops once `maxRows` records are read, header included.
 export function parseCsv(input: string, { delimiter, maxRows = Infinity }: { delimiter?: CsvDelimiter; maxRows?: number } = {}): ParsedCsv {
     const text = input.charCodeAt(0) === 0xfeff ? input.slice(1) : input
     const sep = delimiter ?? sniffDelimiter(text)
@@ -94,7 +90,6 @@ export function isNumericCell(cell: string): boolean {
     return value !== '' && NUMERIC.test(value)
 }
 
-// A column reads as numeric when every non-empty cell under the header does.
 export function numericColumns(rows: readonly (readonly string[])[]): boolean[] {
     const width = Math.max(0, ...rows.map(row => row.length))
     return Array.from({ length: width }, (_, column) => {

@@ -5,8 +5,6 @@ import { fetchBoardAgents } from '@/api/board'
 import { useAuth } from '@/auth/AuthProvider'
 import { cachedBoard } from '@/data/local-cache'
 
-// The coworkers of the workspace, for a screen that names or draws them outside the Home: served from
-// the board the Home kept while a fresh read lands. Null until either answers.
 export function useWorkspaceAgents(): BoardAgent[] | null {
     const { session, me } = useAuth()
     const accessToken = session?.access_token

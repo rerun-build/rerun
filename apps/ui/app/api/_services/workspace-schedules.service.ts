@@ -5,9 +5,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle, selectMany } from '@/supabase/supabase-helpers'
 import { findWorkspaceEngine } from './workspace-engine.service'
 
-// The engine only lists schedules per agent, so this fans out over the workspace's agents on its one
-// machine. An agent whose call fails drops out rather than emptying the whole board. Only the agents
-// in the Boxes the caller reaches.
 export async function listWorkspaceSchedules(actor: Actor): Promise<AgentSchedule[]> {
     const { workspaceId } = actor
     const supabase = createServiceRoleClient()

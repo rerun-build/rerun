@@ -8,16 +8,11 @@ import { translatorFor } from '@/i18n/translator'
 
 type Directory = Map<string, AuthorProfile>
 
-// Someone who joined after the directory was read is missing from it, and so is someone who left:
-// only a fresh read tells them apart, and it is not worth more than one a minute.
 const REFRESH_AFTER_MS = 60_000
 
 const inFlight = new Map<number, Promise<Directory | null>>()
-// The copy kept from an earlier launch opens the thread signed, then is read again once: a name or a
-// photo changed since would otherwise never show while every author is already known.
 const readThisLaunch = new Set<number>()
 
-// A launch again, for the tests.
 export function forgetMemberReads() {
     readThisLaunch.clear()
 }
@@ -34,8 +29,6 @@ function keptDirectory(workspaceId: number): { directory: Directory; readAt: num
     return kept ? { directory: directoryOf(kept.members), readAt: kept.readAt } : null
 }
 
-// Null when the directory cannot be read at all (a hub older than the route, no network): the
-// thread then goes unsigned rather than calling everyone a former member.
 function readDirectory(caller: Caller): Promise<Directory | null> {
     const pending = inFlight.get(caller.workspaceId)
     if (pending) return pending
@@ -58,11 +51,6 @@ function directoryFor(caller: Caller, authorIds: string[]): Promise<Directory | 
     return complete || Date.now() - cached.readAt < REFRESH_AFTER_MS ? Promise.resolve(cached.directory) : readDirectory(caller)
 }
 
-/**
- * The web's `useMemberProfiles`: resolves the author of a message to a name and a photo. Nothing is
- * read until `authorIds` holds someone. An id the workspace no longer knows is a former member, and
- * nobody is known (`null`) until the directory has been read. `undefined`: it could not be read.
- */
 export function useMemberProfiles(authorIds: readonly string[]): (authorId: string) => AuthorProfile | null | undefined {
     const { session, me } = useAuth()
     const accessToken = session?.access_token

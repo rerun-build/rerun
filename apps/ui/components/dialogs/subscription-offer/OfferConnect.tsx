@@ -9,11 +9,6 @@ import { useTranslations } from 'next-intl'
 
 import { KeyLogos } from './offer-plans'
 
-// Each plan sits in a frame of its own, and the only filled surface of the column is the Connect
-// button inside it. The API key is not a third plan: it hangs under a divider, in outline.
-//
-// OpenCode joins as a third plan only where it can run (`onOpencode`). Two columns stay two on a
-// phone: the third tile then takes a row of its own rather than squeezing the other two.
 export function OfferConnect({ onPick, onKey, onOpencode }: { onPick: (provider: SubscriptionProvider) => void; onKey: () => void; onOpencode?: () => void }) {
     const t = useTranslations('dialogs.subscriptionOffer')
     return (
@@ -49,7 +44,6 @@ function PlanTile({ provider, plan, onConnect, className }: { provider: string; 
     )
 }
 
-// Same divider as AuthMethods, for the same reason: what follows is the other road, not the next item.
 function OrDivider() {
     const t = useTranslations('dialogs.subscriptionOffer')
     return (

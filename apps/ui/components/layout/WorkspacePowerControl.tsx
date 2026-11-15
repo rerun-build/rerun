@@ -13,9 +13,6 @@ import { useIsAdmin } from '@/hooks/useIsAdmin'
 
 export type PowerAction = 'restart'
 
-// The menu half. It only arms the confirmation: an AlertDialog rendered inside DropdownMenuContent
-// is unmounted with the menu, so it would never get to open. The caller gates it on useIsAdmin too:
-// a section that renders nothing still gets a separator from the menu that lays it out.
 export function WorkspacePowerMenuItems({ onPick }: { onPick: (action: PowerAction) => void }) {
     const t = useTranslations('layout.power')
     const isAdmin = useIsAdmin()

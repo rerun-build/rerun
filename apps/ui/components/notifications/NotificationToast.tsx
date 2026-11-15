@@ -33,8 +33,6 @@ export function NotificationToast({ title, message, agentId, Icon, iconColor, be
     }, [message])
 
     return (
-        // `select-none` : sonner abandonne le geste de swipe dès qu'une sélection de texte existe,
-        // et un drag sur le markdown en démarre une, ce qui rendait ce toast impossible à balayer.
         <div className="group relative flex w-full select-none items-start gap-3 overflow-hidden rounded-[var(--radius)] border border-border bg-popover px-4 py-3 shadow-lg max-sm:gap-2.5 max-sm:px-3 max-sm:py-2">
             <BorderBeam animated pattern="arcs" tone={beamTone} glow width={1} duration={7} />
             <button

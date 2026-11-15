@@ -3,9 +3,6 @@ import { describe, expect, it } from 'vitest'
 import { TOUR_AGENT_IDS } from '@rerun/ui/tour/board'
 import { TOUR_LIFE_BEATS, TOUR_LIFE_START, TOUR_LIFE_STILL, type TourLifeStatus, tourLifeAt } from '@rerun/ui/tour/life'
 
-// What the score has to hold for the board to read as calm. None of it is visible by rereading the
-// beats: it is all about how they stack up over the cycle.
-
 const MIN_HOLD_MS: Record<TourLifeStatus, number> = {
     idle: 3_000,
     working: 5_000,
@@ -51,8 +48,6 @@ describe('TOUR_LIFE_BEATS', () => {
         }
 
         for (const [agent, events] of changes) {
-            // The wrap counts too: the last change of an agent runs into its first one of the next
-            // turn, and a score that closes tight would blink exactly once a cycle.
             events.forEach((event, index) => {
                 const next = index + 1 < events.length ? events[index + 1].at : events[0].at + period
                 expect(next - event.at, `${agent} ${event.status}`).toBeGreaterThanOrEqual(MIN_HOLD_MS[event.status])

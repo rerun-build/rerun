@@ -5,7 +5,6 @@ import { useTranslations } from 'next-intl'
 import { SearchIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-// `/` reaches the field from anywhere in the library, except from another field.
 export function TemplateLibrarySearch({ value, onChange, className }: { value: string; onChange: (value: string) => void; className?: string }) {
     const t = useTranslations('templates.library.search')
     const inputRef = useRef<HTMLInputElement>(null)

@@ -1,7 +1,6 @@
 import type { LibraryCreator } from '@/lib/templates/library'
 import { cn } from '@/lib/utils'
 
-// A null creator is the Rerun team, drawn with the app's own mark rather than initials.
 export function TemplateCreatorAvatar({ creator, size, className }: { creator: LibraryCreator | null; size: number; className?: string }) {
     const style = { width: size, height: size }
     if (!creator) {

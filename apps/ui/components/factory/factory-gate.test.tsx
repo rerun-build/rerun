@@ -35,8 +35,6 @@ describe('a review is a diamond gate', () => {
     })
 
     it('lights the exit the verdict names', () => {
-        // Find each verdict's first moment from the scene alone (cheap), then render only those two frames:
-        // rendering all 336 frames of the loop took over 5 s on a loaded CI machine.
         const seen: Record<string, string | undefined> = {}
         for (const v of ['pass', 'fail'] as const) {
             let at = -1

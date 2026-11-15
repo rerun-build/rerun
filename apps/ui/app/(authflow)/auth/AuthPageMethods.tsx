@@ -20,7 +20,6 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlo
     const searchParams = useSearchParams()
     const next = internalPath(searchParams.get('next'), routes.home)
     const router = useRouter()
-    // A link that carries an address was written for the email form.
     const initialMethod = searchParams.get('email') || !PHONE_ENABLED ? 'email' : 'phone'
     const passwordOnly = searchParams.get('method') === 'password'
     const funnel = useSignupFunnel({ surface: 'auth_page', active: !passwordOnly, initialStep: initialMethod })

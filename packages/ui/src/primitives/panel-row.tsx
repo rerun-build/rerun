@@ -40,7 +40,6 @@ export function PanelRow({ title, description, footer, leading, meta, actions, o
 
     if (!onClick) return <div className={rootClassName}>{content}</div>
 
-    // A row carrying its own buttons cannot be a <button>: nested buttons are invalid HTML.
     if (actions) {
         const activate = (e: KeyboardEvent<HTMLDivElement>) => {
             if (disabled || (e.key !== 'Enter' && e.key !== ' ')) return

@@ -30,8 +30,6 @@ describe('box default storage', () => {
         expect(await readBoxDefault()).toBeNull()
     })
 
-    // A file we cannot read is not a reason to take every box-default agent down: the resolution
-    // ladder falls through exactly as it does on a box that never set one.
     it('reads a corrupt file as no default at all', async () => {
         await mkdir(connectionsDir(), { recursive: true })
         await writeFile(boxDefaultPath(), '{ not json', 'utf8')

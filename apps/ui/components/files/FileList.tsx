@@ -15,7 +15,6 @@ import { useEffect, useRef, useState, type DragEvent } from 'react'
 
 type FileListProps = {
     title: string
-    // Undefined while the folder is still being listed.
     entries: FileEntry[] | undefined
     onOpen: (entry: FileEntry) => void
     onRename: (name: string, next: string) => void
@@ -81,8 +80,6 @@ function ListSkeleton() {
     )
 }
 
-// A folder of the shared folder as Notion lists a database: the folder name as the page title, one
-// line per entry, actions on hover, and the whole page as a drop zone.
 export function FileList({ title, entries, onOpen, onRename, onDelete, onDownload, onUpload }: FileListProps) {
     const locale = useLocale()
     const t = useTranslations('files')

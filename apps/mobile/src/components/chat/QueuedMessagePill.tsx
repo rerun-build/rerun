@@ -11,7 +11,6 @@ import { brand, radius, spacing, withAlpha } from '@/theme/tokens'
 
 import { GLASS_SHADOW, GLASS_TINT_ALPHA } from './glass'
 
-// Borderless: the strip is glass already, a glass button on it would be glass on glass.
 function StripButton({ symbol, label, disabled, onPress }: { symbol: 'arrow-up' | 'x'; label: string; disabled: boolean; onPress: () => void }) {
     const theme = useTheme()
     return (
@@ -29,10 +28,6 @@ function StripButton({ symbol, label, disabled, onPress }: { symbol: 'arrow-up' 
     )
 }
 
-/**
- * The web's `QueuedMessagePill`: the message waiting behind the run in flight, on a strip over the
- * composer. It leaves on its own once the run ends; « Send now » stops the run first, ✕ drops it.
- */
 export function QueuedMessagePill({ text, busy, pending, onSendNow, onDiscard }: { text: string; busy: boolean; pending: boolean; onSendNow: () => void; onDiscard: () => void }) {
     const theme = useTheme()
     const glass = useGlassStyle()

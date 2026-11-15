@@ -15,20 +15,15 @@ const RESULT_TYPES = ['composio-oauth-success', 'composio-oauth-error'] as const
 
 type ComposioConnectProps = {
     agentId: string
-    // The registry key of the account being connected: the slug, or `slug@id` for another account.
     instanceKey: string
     name: string
     onAuthorized: (accountLabel?: string) => void
-    // Starts the sign-in at mount, in the window the caller opened inside its click handler.
     autoStart?: boolean
     pendingPopup?: Window | null
 }
 
 type ConnectState = 'idle' | 'authorizing' | 'authorized' | 'error'
 
-// Connect a Composio service: the popup runs Composio's hosted sign-in, the callback verifies
-// the connected account server-side, and here we only drive the popup and react to its result
-// over a same-origin BroadcastChannel (survives COOP-severed openers).
 export function ComposioConnect({ agentId, instanceKey, name, onAuthorized, autoStart, pendingPopup }: ComposioConnectProps) {
     const t = useTranslations('services.connect')
     const [state, setState] = useState<ConnectState>('idle')

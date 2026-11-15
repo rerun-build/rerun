@@ -20,7 +20,6 @@ import { useBoardStore } from '@/stores/board.store'
 
 type IconType = ComponentType<{ className?: string }>
 
-// The look of the button a destination sits on: the screen grows out of it and folds back into it.
 export type CardDestinationShape = 'tile' | 'row' | 'button'
 
 export type CardDestination = Extract<AgentViewTab, 'services' | 'skills' | 'memories' | 'scheduled' | 'files' | 'data' | 'monitoring' | 'settings'>
@@ -57,14 +56,9 @@ type AgentCardProps = {
     computerEnabled: boolean
     working: boolean
     servicesNeedConfig: boolean
-    // Why what needs the machine is out of reach: the workspace is paused or has none yet.
     needsMachineReason: string | null
 }
 
-/**
- * Who the coworker is, what it has at hand and the screen it is looking at. A glance, never a full
- * screen: a destination picked here grows out of its button to fill the panel, the card waiting behind.
- */
 export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenComputer, computerEnabled, working, servicesNeedConfig, needsMachineReason }: AgentCardProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
@@ -121,7 +115,6 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
     )
 }
 
-/** The name is the field that renames it: one click, Enter or a click away keeps it, Escape drops it. */
 function CardIdentity({ agent, canRename, onClose, onShare, shareDisabledReason }: { agent: IsoAgent; canRename: boolean; onClose: () => void; onShare: () => void; shareDisabledReason: string | null }) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentCard')
@@ -210,7 +203,6 @@ function DestinationRow({ tab, onClick }: { tab: CardDestination; onClick: (even
     )
 }
 
-/** The button as it sat on the card, drawn over the surface while it leaves its place. */
 export function CardDestinationGhost({ tab, shape }: { tab: CardDestination; shape: CardDestinationShape }) {
     const { label, icon: Glyph } = useDestination(tab)
 

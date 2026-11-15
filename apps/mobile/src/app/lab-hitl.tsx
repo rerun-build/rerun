@@ -12,9 +12,6 @@ import { AppText } from '@/components/ui/AppText'
 import { ThemeScope, useColorSchemeName } from '@/theme/theme'
 import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
-// Dev only: every HITL widget and its receipts on the chat background, without the lab's animated
-// buddies. `rerun://lab-hitl?scheme=dark` forces a theme.
-
 const noop = () => {}
 
 const QUESTION = { questions: [{ question: 'Which list should I start with?', options: ['Q4 prospects', 'Q1 renewals', 'Both'] }] }

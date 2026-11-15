@@ -1,5 +1,3 @@
-// `@rerun/cloud-mobile/*` resolves in jest.resolver.js, module by module, like the `paths` of tsconfig.json.
-// Every test runs as iOS and as Android: a control with a `.android.tsx` twin is tested on both sides.
 const shared = {
     "resolver": "./jest.resolver.js",
     "setupFiles": [

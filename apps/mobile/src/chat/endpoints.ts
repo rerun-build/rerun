@@ -8,9 +8,6 @@ import { fetchForemanActiveRun, fetchForemanMessages, stopForeman } from '@/api/
 
 type Caller = { accessToken: string; workspaceId: number }
 
-// Where one conversation is sent, read back and stopped. A coworker talks through /api/chat and the
-// hub names a new conversation in a header; the Foreman has its own route and is handed the id of
-// the conversation by the app.
 export type ChatEndpoints = {
     agentId: string
     sendPath: string
@@ -19,11 +16,9 @@ export type ChatEndpoints = {
     messages: (caller: Caller, sessionId: string) => Promise<UIMessage[]>
     activeRun: (caller: Caller, sessionId: string) => Promise<string | null>
     stop: (caller: Caller, sessionId: string, runId: string | null) => Promise<void>
-    // Where the conversation's uploads go, before its first send included.
     fileOwner: (sessionId: string | null) => FileOwner
 }
 
-// `general`: the first send opens the coworker's General, or continues it if another device just did.
 export function coworkerEndpoints(agentId: string, { general = false }: { general?: boolean } = {}): ChatEndpoints {
     return {
         agentId,
@@ -37,8 +32,6 @@ export function coworkerEndpoints(agentId: string, { general = false }: { genera
     }
 }
 
-// Its files live in its own workspace on the machine once the machine takes them, in the hub's
-// bucket before: the web column switches the same way.
 export function foremanEndpoints(filesOnEngine: () => boolean): ChatEndpoints {
     const draftId = randomUUID()
     return {

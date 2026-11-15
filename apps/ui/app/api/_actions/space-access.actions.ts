@@ -19,8 +19,6 @@ export type SpaceAccessMember = { userId: string; email: string | null; role: Wo
 export type SpaceAccessCoworker = { id: string; name: string }
 export type SpaceAccessView = { spaceId: string; name: string | null; visibility: SpaceVisibility; coworkers: SpaceAccessCoworker[]; people: SpaceAccessPerson[]; members: SpaceAccessMember[] }
 
-// Where a person's level on a Box comes from: being an admin, a row naming them, the Box being open
-// to a person whose scope is `all`, or nothing.
 export type MemberBoxSource = 'admin' | 'assigned' | 'workspace' | 'none'
 export type MemberBoxAccess = { spaceId: string; name: string | null; agentCount: number; visibility: SpaceVisibility; access: BoxAccess; source: MemberBoxSource }
 export type MemberAccessView = { userId: string; role: WorkspaceRole; boxScope: BoxScope; boxes: MemberBoxAccess[] }
@@ -93,7 +91,6 @@ export async function grantSpaceAccessAction(spaceId: string, userIds: string[],
         if (targets.some(id => !roleOf.has(id))) return failure('userNotMember')
         if (targets.some(id => roleOf.get(id) === 'admin')) return failure('adminsAlwaysReachBoxes')
 
-        // A level changed on an existing row keeps who granted it, so the creator of the Box stays known.
         const grantedBy = new Map((existingRows ?? []).map(row => [row.user_id, row.granted_by]))
         const rows: Database['public']['Tables']['space_members']['Insert'][] = targets.map(id => ({
             space_id: spaceId,
@@ -129,8 +126,6 @@ function sourceOf(role: WorkspaceRole, grant: AccessLevel | null, access: BoxAcc
     return access === 'use' ? 'workspace' : 'none'
 }
 
-// Every Box of the workspace seen from one person. A member reads only themselves, and only the
-// Boxes they reach: the others do not exist for them.
 export async function listMemberAccessAction(targetUserId: string): Promise<ActionResult<MemberAccessView>> {
     try {
         const ctx = await requireWorkspaceContext()

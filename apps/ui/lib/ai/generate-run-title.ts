@@ -12,8 +12,6 @@ const schema = z.object({
 
 export type RunTitle = { title: string; nothingToReport: boolean }
 
-// `report` is the run's final answer, or the error that ended it. Null when no title could be made:
-// the session then keeps its routine's name.
 export async function generateRunTitle(routineName: string, report: string, failed: boolean): Promise<RunTitle | null> {
     if (!hasOpenRouterKey()) return null
     try {

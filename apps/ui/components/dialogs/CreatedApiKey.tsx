@@ -7,9 +7,6 @@ import { Button } from '@/components/ui/button'
 import { CircleCheckIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 
-// The only moment the full key exists on the client: the database keeps its hash and nothing else.
-// So the snippets here carry the real key rather than the placeholder, and the block takes the
-// success Alert with its green beam — nothing else in the dialog moves.
 export function CreatedApiKey({ value, mcpUrl, onDismiss }: { value: string; mcpUrl: string; onDismiss: () => void }) {
     const t = useTranslations('dialogs.apiKeys.created')
     return (

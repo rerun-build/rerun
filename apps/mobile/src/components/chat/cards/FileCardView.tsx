@@ -16,8 +16,6 @@ import { sizeParts } from './cards'
 const MAX_ALBUM_TILES = 4
 const NATURAL_MAX_HEIGHT = 288
 
-// The web's `MediaAlbum`: one photo at its own size, more in a two-column grid of at most four tiles,
-// the last one saying how many are left.
 function Album({ items }: { items: ViewerItem[] }) {
     const t = useTranslations('mobileCards.file')
     const theme = useTheme()
@@ -46,8 +44,6 @@ function Album({ items }: { items: ViewerItem[] }) {
     )
 }
 
-// The files a coworker hands over: photos as an album, anything else as a list. A tap opens the
-// full-screen viewer, which pages through the card and shares a file on.
 export function useFileSize(): (size: number) => string {
     const t = useTranslations('mobileCards.file')
     const locale = useLocale()

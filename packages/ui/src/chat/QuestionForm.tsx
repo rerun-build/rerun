@@ -14,49 +14,37 @@ import { useKitTranslations } from '../locale'
 
 export type { QuestionItem }
 
-// The form only collects the picked files: transferring them and rendering their chips belongs to
-// the host, which is why the landing previews can render the form without any upload behind it.
 export type QuestionAttachments = {
     onPick: (questionIndex: number, files: File[]) => void
     onClear: (questionIndex: number) => void
     count: (questionIndex: number) => number
-    // Rendered inline, between the answer input and the attach button.
     render: (questionIndex: number) => ReactNode
     accept?: string
 }
 
 export type QuestionVoiceStatus = 'idle' | 'starting' | 'recording' | 'transcribing'
 
-// Same split as the attachments: the host owns the microphone and the transcription, the form owns
-// where the button sits and what the transcript does to the answer.
 export type QuestionVoice = {
     status: QuestionVoiceStatus
-    // The form hands over where the words go. The host writes there when the user validates the
-    // recording, and on its own when the recording hits the length cap the recorder stops at.
     start: (deliver: (transcript: string) => void) => void
     finish: () => void
     discard: () => void
-    // Drawn in place of the answer field while recording: the live waveform and its timer.
     render: () => ReactNode
 }
 
 export type QuestionFormHandle = {
-    // Re-reads the answer after the host wrote into the textarea directly (picking a mention does).
     sync: (text: string) => void
 }
 
 export type QuestionFormProps = {
     ref?: Ref<QuestionFormHandle>
     questions: QuestionItem[]
-    // A rejected promise reopens the form, so a failed attachment can be fixed before answering again.
     onSubmit: (answers: { question: string; answers: string[] }[]) => void | Promise<void>
     onCancel?: () => void
     disabled?: boolean
     renderText?: (text: string) => ReactNode
     attachments?: QuestionAttachments
     voice?: QuestionVoice
-    // Rendered in the conversation's own scroll rather than pinned above the composer: no dock
-    // margin, and no autofocus, which would yank the thread down to the block.
     inline?: boolean
     className?: string
     textareaRef?: RefObject<HTMLTextAreaElement | null>
@@ -76,9 +64,6 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
     const [current, setCurrent] = useState(0)
     const [dragging, setDragging] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
-    // The state above only drives the disabled styling. Answering the agent twice starts two runs
-    // on the same conversation, so the latch that guards it has to be a ref: two callbacks fired
-    // from the same render both read the same stale `submitted`.
     const submittedRef = useRef(false)
     const claimSubmit = () => {
         if (submittedRef.current) return false
@@ -107,8 +92,6 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
 
     const isMultiple = (i: number) => questions[i].multiple === true && questions[i].options.length > 0
 
-    // While the microphone is on, the answer field is the recording bar: moving to another question or
-    // picking an option would leave the words with nowhere to land.
     const recording = voice !== undefined && voice.status !== 'idle'
 
     const chooseOption = (i: number, opt: string) => {
@@ -147,7 +130,6 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
         if (locked || !voice || recording) return
         if (questions[i].options.length > 0) openCustom(i)
         voice.start(transcript => {
-            // Read back at delivery time: the answer can have been typed into while the microphone was on.
             const typed = answerAt(i, form.getValues()).custom.trim()
             setCustom(i, typed ? `${typed} ${transcript}` : transcript)
         })
@@ -191,9 +173,6 @@ export function QuestionForm({ ref, questions, onSubmit, onCancel, disabled, ren
     const freeText = q.options.length === 0
     const multi = isMultiple(current)
 
-    // Both buttons live in the footer rather than in the answer field: on a question with options the
-    // field only exists once "Something else" is open, which is exactly when a coworker asking for a
-    // file would have left the answer no way to carry one.
     const attachButton = attachments && (
         <Button
             size="icon-sm"

@@ -36,7 +36,6 @@ function SiteField({ value, onChangeText, onSubmit, disabled }: { value: string;
     return <TextInput value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} editable={!disabled} autoFocus autoCapitalize="none" autoCorrect={false} keyboardType="url" textContentType="URL" returnKeyType="next" placeholder={t('intake.website.placeholder')} placeholderTextColor={theme.mutedForeground} accessibilityLabel={t('intake.website.label')} testID="intake-site" onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={{ height: controlSize.lg.height, paddingHorizontal: spacing.lg, borderRadius: radius.md, borderCurve: 'continuous', ...fieldOutline(theme, { focused }), backgroundColor: theme.card, color: theme.foreground, fontFamily: fonts.regular, fontSize: 17 }} />
 }
 
-// A list of answers with a free one under it, the web card's: picking answers the step on the spot.
 function Choices({ options, value, typed, placeholder, onPick, onType, onSubmit }: { options: string[]; value: string | null; typed: string; placeholder: string; onPick: (option: string) => void; onType: (text: string) => void; onSubmit: () => void }) {
     const [open, setOpen] = useState(typed.length > 0)
     return (
@@ -51,8 +50,6 @@ function Choices({ options, value, typed, placeholder, onPick, onType, onSubmit 
     )
 }
 
-// The rows of the role question while its industry is still being guessed: the same rows, so nothing
-// moves once they arrive.
 function ChoicesSkeleton() {
     return (
         <View style={{ gap: spacing.sm }}>
@@ -63,8 +60,6 @@ function ChoicesSkeleton() {
     )
 }
 
-// The welcome card, asked by the app itself before the assistant says anything, as on the web: a
-// question, the line that says why, and the answers under it.
 export function IntakeView({ intake }: { intake: IntakeController }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()

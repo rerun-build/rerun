@@ -15,9 +15,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 type RequestConnectorDialogProps = {
-    // The trigger (usually a Button) rendered via DialogTrigger asChild.
     children: React.ReactNode
-    // Optional context: which agent the user was browsing when they asked.
     agentId?: string
 }
 
@@ -27,8 +25,6 @@ function requestSchema(required: string) {
 
 type FormValues = z.infer<ReturnType<typeof requestSchema>>
 
-// Lets a user ask us to add a connector that the library does not have yet. The ask is
-// persisted server-side via requestConnectorAction. Generic by design: no search term.
 export function RequestConnectorDialog({ children, agentId }: RequestConnectorDialogProps) {
     const t = useTranslations('services.requestApp')
     const errorText = useErrorText()

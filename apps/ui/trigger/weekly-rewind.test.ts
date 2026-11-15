@@ -12,7 +12,6 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/rewind/build', () => ({ buildWorkspaceRewind: vi.fn() }))
 vi.mock('@/lib/features', () => features)
 
-// Monday 21 September 2026: the last completed week starts on the 14th.
 const NOW = new Date('2026-09-21T05:00:00.000Z')
 
 type Run = (payload: unknown, params: unknown) => Promise<unknown>

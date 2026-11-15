@@ -16,8 +16,6 @@ export function TemplateScratchCard({ selected, onSelect, className }: { selecte
             className={cn('group relative flex flex-col overflow-hidden rounded-lg border text-left transition-colors', selected ? 'border-primary/40 bg-primary/5' : 'border-border bg-card hover:bg-muted/50', className)}
         >
             {selected && <BorderBeam animated pattern="arcs" tone="white" glow />}
-            {/* Faded like its neighbours in the grid: one card meeting its body on a hard edge while
-                the rest dissolve would read as a mistake. */}
             <div className="relative flex aspect-[1200/630] items-center justify-center overflow-hidden bg-muted/40 mask-b-from-80%">
                 <Stripes />
                 <Icon icon={PlusIcon} size="md" className="relative" />

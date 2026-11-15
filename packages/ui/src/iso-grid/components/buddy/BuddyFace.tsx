@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import type { BuddyEyes, BuddyMouth } from '../../types'
 import type { BuddyMood } from './buddy-look'
 
-// Drawn in the front-left wall's plane: the face is centred on x = 21, the eyes 10 units apart.
 const CENTER = 21
 export const BUDDY_FACE_CENTER = CENTER
 const GAP = 5
@@ -18,9 +17,6 @@ function blinking(y: number) {
     return { className: 'iso-buddy-eyes', style: { transformOrigin: `${CENTER}px ${y}px` } }
 }
 
-// Les paupières d'un œil qui ne cligne que pour un buddy `alive`. Elles portent leur propre classe
-// plutôt que celle ci-dessus : sur un board, un œil globuleux reste fixe, et c'est seul dans une
-// page qu'il prend vie.
 function lids(y: number) {
     return { className: 'iso-buddy-lids', style: { transformOrigin: `${CENTER}px ${y}px` } }
 }
@@ -45,9 +41,6 @@ function star(x: number, y: number, r: number) {
 type Paints = { ink: string; white: string; pupil: string; glass: string; lens: string; light: string; heart: string }
 type Paint = (own: string) => string
 
-// One eye shape, set into the wall like a lit screen: a light lip under a dark socket, then the eye
-// itself with a halo. `paint` turns the shape's own colour into the colour of the pass being drawn;
-// `backing` is true for the two passes that sit behind the eye. Unlit, the shape is painted flat.
 function Solid({ uid, lit, children }: { uid: string; lit: boolean; children: (paint: Paint, backing: boolean) => ReactNode }) {
     const eye = children(own => own, false)
     if (!lit) return <>{eye}</>
@@ -69,8 +62,6 @@ const SHADES: ReadonlySet<EyePaint> = new Set(['glass'])
 const GLASSES: ReadonlySet<EyePaint> = new Set(['ink', 'lens'])
 const HEARTS: ReadonlySet<EyePaint> = new Set(['heart'])
 
-// The gradients one face actually paints with, following the branches of `Eyes`. A page draws a
-// buddy dozens of times, and writing all seven gradients into each one cost a few hundred nodes.
 function eyePaints(style: BuddyEyes, mood: BuddyMood): ReadonlySet<EyePaint> {
     const keepsFrame = style === 'visor' || style === 'shades' || style === 'glasses'
     if (mood === 'asleep' || (mood === 'error' && !keepsFrame)) return INK_ONLY
@@ -128,7 +119,6 @@ function EyeDefs({ uid, y, tint, light, paints }: { uid: string; y: number; tint
                 <stop offset="50%" stopColor={HEART} />
                 <stop offset="100%" stopColor="#e0366f" />
             </linearGradient>}
-            {/* In user space: a pair of flat lines has a bounding box with no height to size the region from. */}
             <filter id={`${uid}-eye-glow`} filterUnits="userSpaceOnUse" x={CENTER - 18} y={y - 12} width={36} height={24}>
                 <feGaussianBlur stdDeviation="1.1" result="blur" />
                 <feComponentTransfer in="blur" result="halo">
@@ -154,7 +144,6 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
     const glint = (x: number, y: number, r = 0.62) => (lit ? <ellipse cx={x - 0.55} cy={y} rx={r} ry={r * 1.15} fill="#fff" fillOpacity={0.95} /> : null)
 
     if (mood === 'asleep') return solid(paint => <Pair y={baseY}>{({ x, y }) => closed(x, y, paint(P.ink))}</Pair>)
-    // Glasses and visors keep their frame when broken; everything else shows the crossed eyes.
     if (mood === 'error' && style !== 'visor' && style !== 'shades' && style !== 'glasses') return solid(paint => <Pair y={baseY}>{({ x, y }) => cross(x, y, paint(P.ink))}</Pair>)
 
     const lookX = mood === 'working' ? 1 : 0
@@ -187,8 +176,6 @@ function Eyes({ style, mood, y: baseY, light, uid, lit }: EyesProps) {
             return (
                 <g {...lids(y)}>
                     {solid(paint => <Pair y={y}>{e => <circle cx={e.x} cy={e.y} r={3.6} fill={paint(P.white)} />}</Pair>)}
-                    {/* La pupille glisse dans le blanc de l'œil quand le buddy est `alive`. Elle a
-                        1,9 unité de jeu avant d'en toucher le bord, et le regard en prend 1,1. */}
                     <g className="iso-buddy-pupils">
                         <Pair y={y}>
                             {e => (
@@ -346,9 +333,7 @@ type BuddyFaceProps = {
     mood: BuddyMood
     depth: number
     light: string
-    // False on a placement ghost, whose face is painted flat.
     lit: boolean
-    // The colour the eyes pick up towards their lower edge.
     tint: string
 }
 

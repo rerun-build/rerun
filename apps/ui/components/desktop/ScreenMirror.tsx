@@ -4,8 +4,6 @@ import { useEffect, useRef } from 'react'
 
 const FRAME_MS = 1000 / 15
 
-// A second view of a screen already on the page, copied from its canvas: a second connection to the
-// machine would cost a socket, and a loader each time it appears.
 export function ScreenMirror({ source }: { source: HTMLCanvasElement }) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
 

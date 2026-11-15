@@ -20,9 +20,6 @@ function raiseExisting(windowClass: string, env: NodeJS.ProcessEnv): Promise<boo
     })
 }
 
-// The apps open in the agent's own folder, but they run as the engine's user like everything else
-// on the box: the screens are separate, the files are not. The browser is the agent's own profile,
-// which only ever opens behind its lock.
 export async function openDesktopApp(agentId: string, app: DesktopApp): Promise<void> {
     const { display } = await ensureDesktop(agentId)
     const env = desktopEnv(display)

@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# Frees the given TCP ports before a cloud action starts its server on them.
-#
-# A cloud workspace has no CONDUCTOR_PORT, so every action listens on a fixed port. A server left
-# behind by an earlier run, by "everything", or by `pnpm verify:ui` holds the port and the action dies
-# on EADDRINUSE. The VM serves this single workspace, so whatever listens there is ours to stop.
-#
-# `engine` stands for the RERUN_PORT of apps/engine/.env, which differs from one checkout to another.
 set -uo pipefail
 
 cd "$(dirname "$0")/.."

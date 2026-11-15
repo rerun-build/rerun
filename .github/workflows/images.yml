@@ -1,18 +1,8 @@
 name: Images
 
-# The images a machine running this fork pulls instead of building them itself:
-#   ghcr.io/special-place-ai-heaven/rerun-app and ghcr.io/special-place-ai-heaven/rerun-engine,
-# tagged with the branch (dev) and the short commit (sha-<7 chars>). docker-compose.yml names them.
-#
-# GitHub-hosted runners: Docker builds need a Docker daemon, which the org's self-hosted pool (runners
-# inside a container) does not offer. The app bakes its browser-visible settings in at build time;
-# they come from the repository variables below. The secret key never goes into an image.
 on:
   push:
     branches: [dev]
-    # Neither Dockerfile builds anything from these folders, so a push that touches only them changes no
-    # image: it gets no sha tag, and dev stays on the last commit that did. On 2026-11-13 that was 32 of
-    # 71 pushes to dev, and each new push cancels the build still running for the one before.
     paths-ignore: ['docs/**', 'tools/factory/**', 'deploy/vps/**']
   workflow_dispatch:
 
@@ -60,8 +50,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # Read by apps/ui/Dockerfile only; the engine image takes none. The images are public, so no
-          # admin email goes in: the server reads ADMIN_EMAILS from .env when it runs.
           build-args: |
             NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
             NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}

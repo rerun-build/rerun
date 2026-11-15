@@ -6,9 +6,6 @@ import { useStartPendingTemplate } from '@/lib/onboarding/useStartPendingTemplat
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useCallback } from 'react'
 
-// One terminus for whatever the workspace is waiting on. The callers (checkout return, invitation
-// code, post-conversion replay) do not care whether it is a drafted agent, a shared template or a
-// shared agent.
 export function useStartPending() {
     const startPendingAgent = useStartPendingAgent()
     const startPendingTemplate = useStartPendingTemplate()

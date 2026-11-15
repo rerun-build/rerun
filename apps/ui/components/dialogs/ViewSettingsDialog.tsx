@@ -30,11 +30,8 @@ type ViewSettingsDialogProps = {
     source: DataSource
     table: string
     columns: string[]
-    /** The rows already on screen, drawn in the preview. */
     sample: { rows: Record<string, unknown>[]; total: number }
-    /** Absent when adding a view. */
     view?: TableView
-    /** The layout picked before the dialog opened, when adding a view. */
     initialLayout?: CardLayout
     onSaved: (view: TableView) => void
 }
@@ -281,8 +278,6 @@ function ColumnSelect({ control, name, label, columns, required, noneLabel }: Co
     )
 }
 
-// The distinct values of the column that gets colors, read over the whole table rather than the
-// rows on screen, so a status not on this page can still be given its color.
 function useToneValues(source: DataSource, table: string, column: string | undefined): string[] {
     const [values, setValues] = useState<{ column: string; values: string[] } | null>(null)
 

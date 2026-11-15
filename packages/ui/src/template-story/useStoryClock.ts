@@ -4,19 +4,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type StoryPosition = {
     index: number
-    // Bumped on every move, including a click on the step already playing, so whatever animates the
-    // step (the stepper's fill) can restart on it rather than on the index alone.
     run: number
 }
 
-// Walks the steps on their own durations, looping. A pause keeps what is left of the current step
-// instead of starting it over: a visitor who hovers the board to read the card, then leaves, should
-// not sit through the whole step again.
 export function useStoryClock(durations: readonly number[], running: boolean) {
     const [position, setPosition] = useState<StoryPosition>({ index: 0, run: 0 })
     const remaining = useRef({ run: -1, ms: 0 })
     const count = durations.length
-    // Clamped rather than trusted: the admin preview edits the steps under a running clock.
     const index = count > 0 ? Math.min(position.index, count - 1) : 0
     const duration = durations[index] ?? 0
 

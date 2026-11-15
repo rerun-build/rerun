@@ -36,8 +36,6 @@ const eslintConfig = defineConfig([
       ],
     },
   },
-  // The React Compiler rules of eslint-plugin-react-hooks 6 flag patterns the app relies on without the
-  // compiler, and the vendored hairline kernel is checked by its own upstream. Reported, not blocking.
   {
     rules: {
       'react-hooks/set-state-in-effect': 'warn',
@@ -49,9 +47,7 @@ const eslintConfig = defineConfig([
     },
   },
   globalIgnores(['lib/hairline/*.js']),
-  // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
     "build/**",

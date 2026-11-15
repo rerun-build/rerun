@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""HTTP client of the development engine (rerun#60 chunk C3a). Reads run rows and cancels runs over the engine's routes:
-GET /agents/:id/runs, GET .../runs/:rid, GET .../runs/:rid/steps, POST .../runs/:rid/cancel.
-The key is read from one env var and sent only as a Bearer header to the base URL. No code path prints, logs or raises
-the key, and an error carries the HTTP status or the error class only, never the answer body."""
 import json, os, urllib.error, urllib.parse, urllib.request
 
 KEY_ENV, URL_ENV = "RERUN_DEV_ENGINE_KEY", "RERUN_DEV_ENGINE_URL"
@@ -10,14 +6,13 @@ TIMEOUT_S = 30
 
 
 class EngineError(Exception):
-    """Its message never holds the key or an answer body."""
+    pass
 
 
 def _q(s):
     return urllib.parse.quote(s, safe="")
 
 def _scrub(path):
-    """A fire path holds no token (it goes in the body), but keep any path short and free of a query."""
     return path.split("?", 1)[0]
 
 
@@ -46,7 +41,7 @@ class Engine:
             with self._urlopen(req, timeout=self._timeout) as r:
                 code, raw = r.status, r.read()
         except urllib.error.HTTPError as e:
-            e.close()  # left open, Python's clean-up warning repeats the server's status text
+            e.close()
             raise EngineError("engine answered HTTP %d for %s %s" % (e.code, method, _scrub(path))) from None
         except Exception as e:
             raise EngineError("engine call failed (%s) for %s %s" % (type(e).__name__, method, _scrub(path))) from None
@@ -73,7 +68,6 @@ class Engine:
         return runs
 
     def get_run(self, agent_id, run_id):
-        """The run row, or None when the engine does not know it (404)."""
         try:
             return self._call("GET", self._run_path(agent_id, run_id))
         except EngineError as e:
@@ -88,18 +82,15 @@ class Engine:
         return steps
 
     def cancel(self, agent_id, run_id):
-        """Cancel one run; True when the engine answered ok. Not retried by this client."""
         return self._call("POST", self._run_path(agent_id, run_id) + "/cancel").get("ok") is True
 
     def list_triggers(self, agent_id):
-        """The triggers of one coworker (each row carries its token: never print it)."""
         rows = self._call("GET", "/agents/%s/triggers" % _q(agent_id)).get("triggers")
         if not isinstance(rows, list):
             raise EngineError("engine answered without a triggers list")
         return rows
 
     def create_trigger(self, agent_id, name, body, model=None, provider=None, methods=None, description=""):
-        """Create one trigger (the engine derives the slug from the name); the created row. Not retried."""
         payload = {"name": name, "description": description, "body": body, "provider": provider, "model": model}
         if methods:
             payload["methods"] = list(methods)
@@ -109,12 +100,9 @@ class Engine:
         return row
 
     def set_trigger_model(self, agent_id, slug, model):
-        """Set the model of one trigger by the update route; the updated row."""
         return self._call("PATCH", "/agents/%s/triggers/%s" % (_q(agent_id), _q(slug)), payload={"model": model})
 
     def fire_trigger(self, agent_id, slug, token, payload):
-        """Fire a webhook trigger once: Bearer key plus the trigger token in the body, the payload as a JSON string.
-        (runId, sessionId) from the 202 answer. NEVER retried: a timeout may still have started a run."""
         fire = {"token": token, "method": "POST", "contentType": "application/json",
                 "body": json.dumps(payload, separators=(",", ":"))}
         out = self._call("POST", "/agents/%s/triggers/%s/fire" % (_q(agent_id), _q(slug)), payload=fire)

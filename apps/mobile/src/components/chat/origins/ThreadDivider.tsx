@@ -19,9 +19,6 @@ function wavePath(width: number): string {
     return path
 }
 
-// The web's `ThreadDividerLine` (packages/ui/src/chat/ThreadDividerLine.tsx): a wave fading toward
-// the edge on each side of the label. While the run it marks is still going, both halves flow toward
-// the label.
 function WaveLine({ side, flowing }: { side: 'left' | 'right'; flowing: boolean }) {
     const theme = useTheme()
     const gradientId = `wave${useId().replace(/[^a-zA-Z0-9]/g, '')}`
@@ -58,7 +55,6 @@ function WaveLine({ side, flowing }: { side: 'left' | 'right'; flowing: boolean 
     )
 }
 
-// What the divider reads, in the web's order: what happened, then names and links one dot apart.
 export type DividerPiece = { kind: 'text'; text: string } | { kind: 'name'; text: string } | { kind: 'link'; text: string; onPress: () => void }
 
 export function ThreadDivider({ symbol, symbolTint, flowing = false, pieces, accessory }: { symbol: IconName; symbolTint?: string; flowing?: boolean; pieces: DividerPiece[]; accessory?: ReactNode }) {

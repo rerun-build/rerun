@@ -3,7 +3,6 @@ import { BUDDY_HEIGHT_RATIO } from './look'
 export type Point = { x: number; y: number }
 
 export type BoxGeometry = {
-    // Centre of the bottom diamond, the point that sits on the floor.
     base: Point
     halfW: number
     halfH: number
@@ -18,8 +17,6 @@ function lerp(a: Point, b: Point, t: number): Point {
     return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }
 }
 
-// A diamond whose four corners are rounded by quadratic curves. `sideInset` is how far its widest
-// point stands inside the sharp corner, which is where the rounded side walls start.
 export function roundedDiamond(center: Point, halfW: number, halfH: number, radius: number) {
     const corners = [
         { x: center.x, y: center.y - halfH },
@@ -41,8 +38,6 @@ export function roundedDiamond(center: Point, halfW: number, halfH: number, radi
 const fmt = (p: Point) => `${p.x.toFixed(2)} ${p.y.toFixed(2)}`
 const mid = (a: Point, b: Point): Point => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 })
 
-// The block seen from the front, top excluded: its walls down to the floor. One outline with no
-// overlap, since react-native-svg clips with evenodd whatever the rule says.
 export function wallsOutline({ base, halfW, halfH, depth, radius }: BoxGeometry) {
     const corners = [
         { x: base.x + halfW, y: base.y },
@@ -70,8 +65,6 @@ export function boxTop(geometry: BoxGeometry): Point {
     return { x: geometry.base.x, y: geometry.base.y - geometry.depth }
 }
 
-// The front-left wall's own plane: x runs along its bottom edge (0…halfW), y down from its top
-// edge (0…depth). Anything drawn inside reads as painted on that wall.
 export function leftWallPlane({ base, halfW, halfH, depth }: BoxGeometry) {
     return `translate(${base.x - halfW} ${base.y - depth}) matrix(1 ${halfH / halfW} 0 1 0 0)`
 }

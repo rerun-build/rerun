@@ -21,9 +21,6 @@ import type { TeamStartState } from './widgets/TeamCards'
 
 export type LeadStarted = { agentId: string; conversationId: string }
 
-// The onboarding of a new workspace, the web's walked in the app: the welcome card, then the hub's
-// conversation from the starter team to the built team. Nothing is sold here: the confirmed plan starts
-// the workspace without a card, and the build follows on its own.
 export function Onboarding({ state, onLeadStarted }: { state: ForemanStateResponse; onLeadStarted: (lead: LeadStarted) => void }) {
     const { session, me } = useAuth()
     const caller = useMemo(() => (session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null), [session, me])
@@ -51,8 +48,6 @@ export function Onboarding({ state, onLeadStarted }: { state: ForemanStateRespon
         },
     })
 
-    // A conversation reopened on a step the hub runs itself is sent once, as the web's kickoff does:
-    // it puts the trial card back up, or builds.
     const opened = useRef(false)
     const { history, messages, busy, kickoff } = chat
     useEffect(() => {
@@ -62,7 +57,6 @@ export function Onboarding({ state, onLeadStarted }: { state: ForemanStateRespon
         if (messages.length === 0 || ((state.phase === 'trial' || state.phase === 'build') && !asked)) void kickoff()
     }, [welcomed, history, busy, messages, state.phase, kickoff])
 
-    // The trial card answers itself: the workspace starts without a card the moment the plan is confirmed.
     const trialCall = pendingWidget(messages)?.widget === 'open_checkout' ? pendingWidget(messages)?.toolCallId : null
     const { answer } = chat
     useEffect(() => {

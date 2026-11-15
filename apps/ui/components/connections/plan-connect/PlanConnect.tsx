@@ -12,7 +12,6 @@ import type { TrackStep } from './ForemanTrack'
 
 type PlanConnectProps = {
     provider: SubscriptionProvider
-    // Where the token lands: a new connection, or an existing one signed in again.
     onKeys: (keys: Record<string, string>) => Promise<{ success: boolean; error?: string }>
     surface: AiConnectionSurface
     lastStep: (linked: boolean) => TrackStep

@@ -9,8 +9,6 @@ import { readFirstName } from '@/lib/naming/first-name'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// Null until the board is hydrated: an empty agent list before that would flash the "no coworkers
-// yet" screen at someone who has a team.
 export function useForemanTeamEmptyState(): { model: TeamEmptyStateModel; now: number } | null {
     const hydrated = useBoardStore(state => state.hydrated)
     const agents = useBoardStore(state => state.agents)

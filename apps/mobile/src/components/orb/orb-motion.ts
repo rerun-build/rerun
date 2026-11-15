@@ -1,7 +1,3 @@
-// The web Foreman's idle life (packages/ui/src/foreman/Orb.tsx, orb-tuning.ts, foreman-face.tsx),
-// as worklets: the eyes drift, the whole ball turns as if looking around, a band of light crosses
-// the glass and, while it thinks, the ball spins on itself now and then.
-
 export const ORB_RADIUS = 40
 export const ORB_CENTER = { x: 50, y: 44 }
 const FACE_AT = { x: ORB_CENTER.x - 9, y: ORB_CENTER.y - 3 }
@@ -18,12 +14,8 @@ export function restPose(facing: OrbFacing) {
     return { yaw: facing === 'left' ? REST_YAW : -REST_YAW, pitch: REST_PITCH }
 }
 
-// A `matrix` prop for react-native-svg, [a b c d e f] as in SVG's matrix().
 export type Matrix = [number, number, number, number, number, number]
 
-// The face carried by a ball turned by `yaw` (to the right) and `pitch` (upwards): it slides over the
-// sphere, flattens as it nears the rim and is gone once it has turned to the far side. The web's
-// translate(x y) matrix(1 lean 0 1 0 0) scale(sx sy), folded into one matrix.
 export function facePose(yaw: number, pitch: number): { matrix: Matrix; shown: boolean } {
     'worklet'
     const towards = Math.cos(yaw)
@@ -47,7 +39,6 @@ const WANDER = 0.5
 const DEGREES = Math.PI / 180
 const SPIN_SECONDS = 0.7
 const SPIN_EVERY = 5
-// How far the band of light travels, and the share of its period spent crossing; it rests the rest.
 export const SHEEN_TRAVEL = 170
 const SHEEN_CROSSING = 0.55
 
@@ -79,12 +70,10 @@ function easeInOut(progress: number) {
     return progress < 0.5 ? 2 * progress * progress : 1 - (-2 * progress + 2) ** 2 / 2
 }
 
-// Moves `clock` on by `dt` seconds, in place, and returns where everything is drawn.
 export function advance(clock: OrbClock, dt: number, thinking: boolean, facing: OrbFacing): OrbPose {
     'worklet'
     const target = thinking ? TUNING.thinking : TUNING.idle
     const tuning = clock.tuning
-    // A change of state never jumps: the ball speeds up or calms down over a second or so.
     const k = 1 - Math.exp(-dt * 2.6)
     tuning.gaze += (target.gaze - tuning.gaze) * k
     tuning.gazeRate += (target.gazeRate - tuning.gazeRate) * k
@@ -92,7 +81,6 @@ export function advance(clock: OrbClock, dt: number, thinking: boolean, facing: 
     tuning.turnRate += (target.turnRate - tuning.turnRate) * k
     tuning.sheenPeriod += (target.sheenPeriod - tuning.sheenPeriod) * k
 
-    // Two sines at unrelated rates: a single one would swing like a metronome and read as a loop.
     clock.gaze += dt * tuning.gazeRate
     const wander = (Math.sin(clock.gaze * 1.7) * 0.6 + Math.sin(clock.gaze * 4.3 + 1.1) * 0.4) * WANDER * tuning.gaze
     const lift = (Math.sin(clock.gaze * 1.1 + 2.3) * 0.5 + Math.sin(clock.gaze * 3.1) * 0.3) * WANDER * tuning.gaze * 0.55

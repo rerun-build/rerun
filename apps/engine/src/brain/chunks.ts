@@ -35,8 +35,6 @@ function splitLong(body: string): string[] {
             buffer = ''
         }
         buffer = buffer ? `${buffer}\n\n${paragraph}` : paragraph
-        // A single paragraph longer than the budget is cut on its own, at the closest line break
-        // or space, rather than being sent whole.
         while (buffer.length > MAX_CHUNK_CHARS) {
             const window = buffer.slice(0, MAX_CHUNK_CHARS)
             const cut = Math.max(window.lastIndexOf('\n'), window.lastIndexOf(' '))
@@ -49,8 +47,6 @@ function splitLong(body: string): string[] {
     return parts
 }
 
-// A section of two lines embeds as noise; it rides along with the next one instead, under both
-// headings so a search on either still lands on it.
 function mergeShort(list: Section[]): Section[] {
     const out: Section[] = []
     let pending: Section | null = null
@@ -71,8 +67,6 @@ export const chunkText = (title: string, type: string, heading: string, content:
 
 export const textHash = (text: string) => createHash('sha256').update(text).digest('hex').slice(0, 32)
 
-// The page title and type go into the embedded text: a "Pricing" section alone does not say whose
-// pricing it is, and the search has to rank it against every other page's sections.
 export function chunkPage(page: { title: string; type: string; content: string }): Chunk[] {
     const chunks: Chunk[] = []
     for (const section of mergeShort(pageSections(page.content))) {

@@ -8,7 +8,6 @@ const STATUS_TONES: Record<string, BadgeTone> = {
     unlisted: 'cyan',
 }
 
-// The `templates.status` catalog.
 export type TemplateStatusCopy = (key: TemplateStatus) => string
 
 export function templateStatusTone(status: string): BadgeTone {

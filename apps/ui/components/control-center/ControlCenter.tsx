@@ -128,17 +128,9 @@ export function ControlCenter() {
     const searchesConversations = open && (page.kind === 'agent' || (page.kind === 'root' && scope === 'all' && text.length >= MIN_CONVERSATION_QUERY))
     const conversations = useConversationSearch(text, page.kind === 'agent' ? page.agentId : null, searchesConversations)
 
-    // ⌘F on a Mac, Ctrl+F elsewhere: Ctrl+F on a Mac moves the caret in a text field. Pressed while
-    // the center is open it only closes it, and the browser goes on to open its own search.
-    // ⌘K goes to the assistant's composer, the pill of the parked one or the column's, except where
-    // it already means something: an open agent panel (new conversation) and the Brain (its search).
-    // Without an assistant to write to (a phone, the onboarding) it toggles the center as ⌘F does.
-    // The chats of closed panels stay mounted and listen for ⌘K on the document, hence the
-    // stopPropagation.
     useEffect(() => {
         if (!available) return
         const onKey = (event: KeyboardEvent) => {
-            // Chrome autofill fires keydown events without a key.
             const key = event.key?.toLowerCase()
             if ((key !== 'f' && key !== 'k') || event.shiftKey || event.altKey) return
             const mac = isMacPlatform()
@@ -257,7 +249,6 @@ export function ControlCenter() {
             ...command,
             label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`),
         }))
-        // "Ask the assistant" with a query is the last row of the list, not an action among others.
         const listed = text ? commands.filter(command => command.id !== 'ask_assistant') : commands
         const commandSections: ControlSection[] = [
             { id: 'actions', heading: t('headings.actions'), rows: searchItems(listed.filter(command => command.group === 'actions'), text).map(commandRow) },
@@ -305,7 +296,6 @@ export function ControlCenter() {
 
     function agentSections(agent: IsoAgent): ControlSection[] {
         const board = useBoardStore.getState()
-        // Same gate as the panel's rail: the agent's own status ranks `working` above what waits on a human.
         const hasToHandle = sessions.some(session => session.agentId === agent.id && ATTENTION_STATUSES.has(session.status))
         const tabs = agentTabs.filter(tab => (tab.id !== 'actions' || hasToHandle) && (tab.id !== 'setup' || isTemplateAuthor))
         const tabRows = searchItems(tabs, text).map((tab): ControlRow => ({ id: `tab-${tab.id}`, label: tab.label, detail: tab.description, leading: { kind: 'icon', icon: tab.icon }, onSelect: run(() => board.focusAgentOnBoard(agent.id, tab.id)) }))

@@ -21,7 +21,6 @@ const DEFAULT_CODE_LIFETIME_S = 180
 type CheckpointResult = Awaited<ReturnType<typeof submitAppCheckpointAction>>
 type LinkRequest = WhatsappConnectInput & { reconnect: { id: string; label: string | null } | null }
 
-// On a phone the QR code would be on the very screen that has to scan it.
 function preferredMethod(): WhatsappLinkMethod {
     return typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches ? 'code' : 'qr'
 }
@@ -41,7 +40,6 @@ export function WhatsappProDialog() {
     const [error, setError] = useState<string | null>(null)
     const [defaultMethod, setDefaultMethod] = useState<WhatsappLinkMethod>('qr')
     const [defaultCountry] = useState(() => countryFromLocale(typeof navigator === 'undefined' ? undefined : navigator.language))
-    // What the link screen was opened with, to ask for a new code or switch method with the same.
     const lastRequest = useRef<LinkRequest | null>(null)
 
     const load = useCallback(async () => {
@@ -51,8 +49,6 @@ export function WhatsappProDialog() {
         return result.ok ? result.value : null
     }, [errorText])
 
-    // One checkpoint call at a time: two answers of "connected" landing together would finish the
-    // connection twice, and the second one deletes the account.
     const inFlight = useRef<Promise<CheckpointResult> | null>(null)
     const check = useCallback((connectionId: string) => {
         if (inFlight.current) return inFlight.current
@@ -67,9 +63,6 @@ export function WhatsappProDialog() {
     const linkingId = linking?.connectionId ?? null
     const lifetimeMs = (linking?.link?.expiresInSeconds ?? DEFAULT_CODE_LIFETIME_S) * 1000
 
-    // The phone links in its own time and only Linkup sees it: asked every few seconds, which also
-    // brings the QR code WhatsApp renews while it waits. A failed poll stays silent until the code
-    // runs out.
     useEffect(() => {
         if (!linkingId) return
         let active = true
@@ -126,7 +119,6 @@ export function WhatsappProDialog() {
         if (screen.kind === 'link') void cancelAppConnectAction(SLUG, screen.connectionId)
     }
 
-    // Everything a closed dialog leaves behind is reset here, so the next opening starts clean.
     const close = (next: boolean) => {
         if (next) return
         abandonLink()
@@ -155,7 +147,6 @@ export function WhatsappProDialog() {
     const requestLink = async (request: LinkRequest) => {
         setPending('connect')
         setError(null)
-        // A new code is a new sign-in at Linkup: the one still waiting is dropped first.
         if (screen.kind === 'link') await cancelAppConnectAction(SLUG, screen.connectionId)
         lastRequest.current = request
         const result = await connectWhatsappAction({ phoneNumber: request.phoneNumber, pairingCode: request.method === 'code', ...(request.reconnect ? { connectionId: request.reconnect.id } : {}) })
@@ -201,7 +192,6 @@ export function WhatsappProDialog() {
         setPending(null)
         if (!result.ok) return setError(errorText(result))
         toast.success(result.value.trialSlot ? t('paidApp.slotAddedTrial', { price: formatNumber(0, locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }) : t('paidApp.slotAdded'))
-        // The webhook moves the slot count, a moment after Stripe answers.
         setTimeout(() => void load(), 1500)
         await load()
     }

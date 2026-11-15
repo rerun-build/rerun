@@ -16,8 +16,6 @@ describe('sealPendingWidgets', () => {
         expect(sealed[0].parts[0]).toMatchObject({ output: { answered: false, reason: 'dismissed' } })
     })
 
-    // The checkout reads any output it finds as a settled result, so a generic seal left a reloaded
-    // conversation showing "Still waiting on Stripe" forever.
     it('closes an abandoned checkout in the shape the checkout speaks', () => {
         const sealed = sealPendingWidgets([message([{ type: 'tool-open_checkout', toolCallId: 'c1', state: 'input-available', input: {} }])])
         expect(sealed[0].parts[0]).toMatchObject({ state: 'output-available', output: { ok: false, reason: 'dismissed' } })

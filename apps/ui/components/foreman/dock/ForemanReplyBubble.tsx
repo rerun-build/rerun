@@ -11,13 +11,11 @@ import { ForemanDockBubble } from './ForemanDockBubble'
 type ForemanReplyBubbleProps = {
     corner: ForemanCorner
     text: string
-    /** The turn ended on an error: the column has what went wrong. */
     failed?: boolean
     onOpen: () => void
     onDismiss: () => void
 }
 
-/** The end of a turn run from the pill. The whole of it is one click away, in the column. */
 export function ForemanReplyBubble({ corner, text, failed = false, onOpen, onDismiss }: ForemanReplyBubbleProps) {
     const t = useTranslations('foreman.reply')
     return (

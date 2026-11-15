@@ -30,8 +30,6 @@ function safeParse(json: string | null | undefined): unknown {
     }
 }
 
-// A user row holds the words typed and, after them, the context the engine added for the model: the
-// memories it recalled and the time of the turn. Only the words are shown.
 function extractText(content: unknown): string {
     if (content && typeof content === 'object' && !Array.isArray(content) && typeof (content as { text?: unknown }).text === 'string') {
         return (content as { text: string }).text
@@ -39,8 +37,6 @@ function extractText(content: unknown): string {
     return visibleText(content, '')
 }
 
-// rerun-engine persists AI-SDK message content as JSON in `contentJson`
-// (and tool calls in `toolCallsJson`). Re-hydrate to UI message parts.
 export function transformEngineMessages(messages: EngineMessage[]): HistoryMessage[] {
     const toolResults = new Map<string, unknown>()
     const recordResult = (part: unknown) => {
@@ -72,8 +68,6 @@ export function transformEngineMessages(messages: EngineMessage[]): HistoryMessa
             continue
         }
 
-        // The row holds the turn in the order it was streamed: a text written after a tool call is
-        // its own block, after that call, as the live transcript showed it.
         const parts: UIMessagePart[] = []
         const seen = new Set<string>()
         const pushCall = (call: unknown) => {
@@ -100,9 +94,6 @@ export function transformEngineMessages(messages: EngineMessage[]): HistoryMessa
         if (Array.isArray(tcParsed)) for (const call of tcParsed) pushCall(call)
 
         if (parts.length === 0) continue
-        // The message written for a card that went out bare lands in its own row, after the tool
-        // row. Live, the AI SDK keeps the whole turn in one message, and both the pinned card and
-        // the reply receipt look for the call in the last assistant message: fold it back in.
         const previous = result[result.length - 1]
         if (seen.size === 0 && previous && endsOnHitlCall(previous)) {
             previous.parts.push(...parts)
@@ -114,7 +105,6 @@ export function transformEngineMessages(messages: EngineMessage[]): HistoryMessa
     return result
 }
 
-// A failed call is stored the way the AI SDK hands it back to the model, as an error envelope.
 function storedToolError(output: unknown): string | null {
     const envelope = output as { type?: unknown; value?: unknown } | null
     if (envelope?.type !== 'error-json' && envelope?.type !== 'error-text') return null
@@ -132,8 +122,6 @@ function toolPartOf(call: unknown, toolResults: Map<string, unknown>): ToolInvoc
     const output = toolResults.get(toolCallId)
     const errorText = storedToolError(output)
     if (errorText !== null) return { type: `tool-${toolName}`, toolCallId, toolName, state: 'output-error', input, errorText }
-    // An unresolved tool call (no matching tool-result) is still awaiting input, e.g. a paused
-    // ask_user / request_approval. Keep it 'input-available' so the pinned block re-renders on reload.
     if (output !== undefined) return { type: `tool-${toolName}`, toolCallId, toolName, state: 'output-available', input, output }
     return { type: `tool-${toolName}`, toolCallId, toolName, state: 'input-available', input }
 }
@@ -143,11 +131,8 @@ function endsOnHitlCall(message: HistoryMessage): boolean {
     return message.role === 'assistant' && last?.type !== 'text' && !!hitlKindOf(last?.toolName)
 }
 
-// The engine has no pagination, so a long research session comes back whole. Past this size a tool
-// output is replaced by a preview: the app shows tool outputs collapsed and never needs them entire.
 export const MAX_TOOL_OUTPUT_CHARS = 16_000
 
-// Cards are what the app renders as the answer itself, so they always travel whole.
 const UNTRIMMED_TOOLS = /(^|__)card_[a-z_]+$/
 
 function trimOutput(toolName: string, input: unknown, output: unknown): unknown {
@@ -155,7 +140,6 @@ function trimOutput(toolName: string, input: unknown, output: unknown): unknown 
     const serialized = typeof output === 'string' ? output : JSON.stringify(output)
     if (serialized === undefined || serialized.length <= MAX_TOOL_OUTPUT_CHARS) return output
     const preview = { truncated: true, preview: serialized.slice(0, MAX_TOOL_OUTPUT_CHARS) }
-    // A paid call's receipt adds up what it billed and where it bought it, so both outlive the trim.
     const bareName = stripBridgePrefix(toolName)
     if (isPaidDataTool(bareName)) {
         const capability = capabilityOfCall(bareName, input)
@@ -184,9 +168,6 @@ function attachmentOf(path: string): ConversationAttachment {
     return { name: attachmentDisplayName(path), path, mediaType: MEDIA_TYPES[extension] ?? 'application/octet-stream' }
 }
 
-// The web parses the voice and attachment markers while rendering. The app gets them already
-// lifted into metadata, so no client has to know the marker formats. An install and a scheduled run
-// keep their bare guide or prompt as text, for an app older than their metadata.
 function userMessageForApi(message: HistoryMessage): ConversationMessage {
     const text = message.parts.map(part => (part.type === 'text' ? part.text : '')).join('')
     const createdAt = message.metadata?.createdAt
@@ -197,7 +178,6 @@ function userMessageForApi(message: HistoryMessage): ConversationMessage {
     if (scheduledRun) return { id: message.id, role: 'user', parts: [{ type: 'text', text: scheduledRun.prompt }], metadata: { ...dated, scheduledRun: { slug: scheduledRun.slug, name: scheduledRun.name } } }
 
     const authorId = message.metadata?.authorId
-    // A voice message sent with files carries the attachments marker after its voice marker.
     const attachments = parseAttachments(text)
     const voice = parseVoiceMessage(attachments?.text ?? text)
     if (!attachments && !voice) return { id: message.id, role: 'user', parts: message.parts, ...((authorId || createdAt) && { metadata: { ...dated, ...(authorId && { authorId }) } }) }

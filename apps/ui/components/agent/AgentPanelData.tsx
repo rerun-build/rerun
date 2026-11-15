@@ -53,8 +53,6 @@ export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPan
     return (
         <>
             <DataBrowser source={source} initial={initial} onInitialConsumed={onInitialConsumed} onExpand={setExpanded} />
-            {/* The panel is too narrow for a board or a gallery: the same table and view open here
-                at full size, as a second browser that reads the same database. */}
             <Dialog open={expanded !== null} onOpenChange={open => !open && setExpanded(null)}>
                 <PanelDialogContent className="sm:h-[92dvh] sm:max-w-[min(100rem,95vw)]">
                     <DialogHeader className="border-b px-4 py-3">

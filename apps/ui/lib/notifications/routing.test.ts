@@ -10,7 +10,6 @@ type Seen = 'sound' | 'toast' | 'inbox' | 'email' | 'none'
 
 const MEMBERS: Member[] = ['you', 'maya', 'tom', 'sarah']
 
-// Each member follows the coworkers whose scheduled tasks they wrote: Tom the weekly report, Maya the blog.
 const PREFS: Record<Member, NotificationPrefs> = {
     you: DEFAULT_NOTIFICATION_PREFS,
     maya: { ...DEFAULT_NOTIFICATION_PREFS, coworkers: { 'blog-writer': { mode: 'default', follow: true } } },
@@ -20,7 +19,6 @@ const PREFS: Record<Member, NotificationPrefs> = {
 
 type DayEvent = { id: string; coworker: string; kind: NotificationKind; startedBy: Member | 'schedule'; sharedWith?: Member[]; away?: Member[] }
 
-// The day the lab's team scene plays, and what each of the four received in its « after » column.
 const DAY: [DayEvent, Record<Member, Seen>][] = [
     [{ id: 'e1', coworker: 'weekly-report', kind: 'error', startedBy: 'schedule', away: MEMBERS }, { you: 'none', maya: 'none', tom: 'email', sarah: 'none' }],
     [{ id: 'e11', coworker: 'blog-writer', kind: 'done', startedBy: 'schedule' }, { you: 'none', maya: 'toast', tom: 'none', sarah: 'none' }],

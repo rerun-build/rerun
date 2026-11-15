@@ -7,8 +7,6 @@ import { WORKSPACE_HEADER } from '@/lib/workspace/workspace-header'
 
 const BEARER_PREFIX = 'Bearer '
 
-// The mobile app authenticates with the user's Supabase access token instead of cookies. Outside a
-// request scope (build time, scripts) `headers()` throws, which reads as "no token".
 export async function getRequestAccessToken(): Promise<string | null> {
     try {
         const authorization = (await headers()).get('authorization') ?? ''
@@ -19,9 +17,6 @@ export async function getRequestAccessToken(): Promise<string | null> {
     }
 }
 
-// Each device, and each browser tab, keeps its own active workspace and names it on every request
-// instead of moving `users.workspace_id` under the others. A request naming none (a page load, an
-// OAuth callback) follows the stored column. NaN stands for a header that is present but not an id.
 export async function getRequestWorkspaceId(): Promise<number | null> {
     try {
         const raw = (await headers()).get(WORKSPACE_HEADER) ?? readQueryWorkspace()
@@ -32,8 +27,6 @@ export async function getRequestWorkspaceId(): Promise<number | null> {
     }
 }
 
-// For a route that signs someone in from the app: there is no cookie to read or write, and the session
-// it opens goes back in the response instead of being kept.
 export function createSessionlessClient() {
     return createTokenClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
         auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
@@ -60,9 +53,6 @@ export async function createClient() {
                 try {
                     cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
                 } catch {
-                    // The `setAll` method was called from a Server Component.
-                    // This can be ignored if you have middleware refreshing
-                    // user sessions.
                 }
             },
         },

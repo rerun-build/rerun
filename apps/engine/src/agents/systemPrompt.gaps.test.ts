@@ -56,7 +56,6 @@ const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, recallMemo
 const recallContext = async (agent: Parameters<typeof recallMemories>[0], userText: string, history?: ModelMessage[]) => recallSection(await recallMemories(agent, userText), history)
 const { contextTextPart } = await import('@rerun/contracts')
 
-// The tests read the prompt as the model does, both blocks joined.
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))
 const { getSharedDb } = await import('../db/sharedDb.js')
 const { workspaceDir, sharedDir } = await import('../config/paths.js')
@@ -105,8 +104,6 @@ describe('buildSystemPrompt state sections', () => {
         expect(prompt).not.toContain('You have no skill yet')
     })
 
-    // What moves between two turns goes last, in its own block, so a memory written or a table
-    // created rewrites that block alone in the provider's cache and not the rules after it.
     it('keeps the indexes, the schemas and the day in the volatile block, after every rule', async () => {
         sources.text = { schedules: '- daily-digest', memory: '- (fact) x', agentDb: 'leads(id)', mcp: '- notion' }
 
@@ -123,8 +120,6 @@ describe('buildSystemPrompt state sections', () => {
         expect(systemPromptText({ stable, volatile })).toBe(`${stable}\n\n${volatile}`)
     })
 
-    // One broken store (a corrupt skill folder, a locked database) must not take down every run of
-    // the agent: its section just goes missing.
     it('still builds the prompt when every index fails', async () => {
         sources.failing = new Set<Source>(['skills', 'schedules', 'triggers', 'memory', 'agentDb', 'sharedDb', 'mcp'])
 
@@ -155,8 +150,6 @@ describe('buildSystemPrompt guided setup', () => {
         expect(prompt).toContain('call install_complete')
     })
 
-    // Published INSTALL.md files still say "connect everything first": the setup note is what puts
-    // a first result ahead of the connection cards for them.
     it('puts a first result ahead of the connections, over the order the instructions list', async () => {
         const pending = agentWith({ setup: { required: true, completedAt: null } }, { install: '1. Connect Gmail.' })
         const prompt = await buildSystemPrompt(pending)
@@ -243,7 +236,6 @@ describe('buildSystemPrompt unattended runs', () => {
 })
 
 describe('buildSystemPrompt shared schema', () => {
-    // The shared schema is paid on every run of every agent in the workspace, so it is capped.
     it('caps the shared schema and points at shared_db_schema for the rest', async () => {
         const client = await getSharedDb()
         for (let i = 0; i < 45; i++) await client.execute(`CREATE TABLE IF NOT EXISTS t${String(i).padStart(2, '0')} (id INTEGER PRIMARY KEY)`)
@@ -332,8 +324,6 @@ describe('recallContext', () => {
         expect(await recallContext(agentWith({ tools: { memory: true } }), 'hello')).toBe('')
     })
 
-    // The turn is stored as sent, so a memory injected earlier in the conversation is already in
-    // front of the model: sending it again would only grow the history.
     it('leaves out a memory the conversation already holds', async () => {
         sources.memories = [
             { id: 'm1', content: 'Prefers bullet points', kind: 'preference', tags: [], createdAt: '', strength: 1 },
@@ -349,7 +339,6 @@ describe('recallContext', () => {
         expect(await recallContext(agentWith({ tools: { memory: true } }), 'write the weekly report', history)).toBe('')
     })
 
-    // Seen means the same line was sent, not that the words appear somewhere in a longer memory.
     it('still sends a memory that is only a prefix of one the conversation holds', async () => {
         sources.memories = [{ id: 'm1', content: 'Works for Acme', kind: 'fact', tags: [], createdAt: '', strength: 1 }]
         const history: ModelMessage[] = [{ role: 'user', content: [{ type: 'text', text: 'earlier' }, contextTextPart('<relevant_memories>\n- (fact) Works for Acme Corp since 2020\n</relevant_memories>')] }]

@@ -18,8 +18,6 @@ export function useChannelLabel(): (channel: PhoneChannel) => string {
 
 const REASON_KEYS = { network: 'errors.offline', session: 'errors.session', apple: 'errors.apple', google: 'errors.google' } as const
 
-// The sentence of a failed sign-in in the app's language. A refusal of the hub the app has no sentence
-// for yet keeps the hub's own words.
 export function useSignInErrorText(): (failure: unknown) => string {
     const t = useTranslations('mobileAuth')
     return failure => {
@@ -33,7 +31,6 @@ export function useSignInErrorText(): (failure: unknown) => string {
 
 const looksLikeEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 
-// The phone number leads: it signs into the account that holds it, or creates one.
 export function usePhoneCode() {
     const { country, phone, goTo, setThinking } = useSignInFlow()
     const t = useTranslations('mobileAuth')
@@ -52,7 +49,6 @@ export function usePhoneCode() {
             const sentBy = await sendPhoneCode({ phone, country, channel })
             goTo({ name: 'code', method: 'phone', channel: sentBy })
         } catch (failure) {
-            // Back from the code step within the minute: the code already sent is still the one to type.
             if (failure instanceof SignInError && failure.reason === 'too_soon') {
                 goTo({ name: 'code', method: 'phone', channel, resendIn: failure.retryAfterSeconds ?? 0 })
                 return
@@ -94,7 +90,6 @@ export function useEmailCode() {
     return { send, sending, error, clearError: () => setError(null) }
 }
 
-// Once the session opens, the root layout swaps the sign-in screens for the app on its own.
 export function useOAuthSignIn() {
     const { setThinking } = useSignInFlow()
     const errorText = useSignInErrorText()

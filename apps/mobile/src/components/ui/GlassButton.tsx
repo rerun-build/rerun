@@ -7,11 +7,8 @@ import { Icon, type IconName } from '@/components/ui/Icon'
 import { useTheme } from '@/theme/theme'
 
 export const GLASS_BUTTON_SIZE = 44
-// What `.buttonStyle(.glass)` pads around its label, on each side: a label framed `size - 2 × inset` gives a button of `size`.
 export const GLASS_INSET = 7
 
-// Glass does not render under a parent faded below full opacity: a layer that fades in and out
-// switches it off while hidden and lets it come back natively.
 export const GlassShown = createContext(true)
 
 export function useGlassStyle() {
@@ -25,11 +22,9 @@ type GlassButtonProps = {
     onPress: () => void
     disabled?: boolean
     size?: number
-    // Forces the glass's scheme over a backdrop that ignores the theme, like the black of the viewer.
     scheme?: 'light' | 'dark'
 }
 
-// The system's own glass button (SwiftUI `.buttonStyle(.glass)`), round, around the app's `Icon`.
 export function GlassButton({ symbol, label, onPress, disabled = false, size = GLASS_BUTTON_SIZE, scheme }: GlassButtonProps) {
     const theme = useTheme()
     const colorScheme = scheme ?? theme.scheme

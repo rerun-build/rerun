@@ -47,8 +47,6 @@ export function AgentPanelSetup({ agentId }: { agentId: string }) {
     const save = async () => {
         setError(null)
         setSaving(true)
-        // The author never installs their own agent, so it is marked done here and now. Only the
-        // copy an import creates starts pending, which is what puts the button in front of a buyer.
         const result = await updateAgentConfigAction(agentId, {
             setup: { required: draft.required, completedAt: new Date().toISOString() },
             install: draft.required ? draft.prompt : '',

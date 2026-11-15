@@ -65,7 +65,6 @@ export function AnswerInput({ value, onChangeText, onSubmit, placeholder, last, 
     return <TextInput value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} submitBehavior="submit" returnKeyType={last ? 'send' : 'next'} multiline autoFocus={autoFocus} placeholder={placeholder} placeholderTextColor={theme.mutedForeground} accessibilityLabel={t('yourAnswer')} testID="hitl-answer" onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} style={{ flex: 1, minHeight: 48, maxHeight: 160, paddingHorizontal: spacing.md, paddingTop: spacing.md, paddingBottom: spacing.md, borderRadius: radius.md, borderCurve: 'continuous', ...fieldOutline(theme, { focused }), backgroundColor: theme.background, color: theme.foreground, fontFamily: fonts.regular, fontSize: 16 }} />
 }
 
-// The web's "Something else" row: a pencil and a label until it is tapped, then the field itself.
 export function CustomOptionRow({ open, onOpen, children }: { open: boolean; onOpen: () => void; children: ReactNode }) {
     const t = useTranslations('mobileHitl.question')
     const theme = useTheme()
@@ -82,11 +81,6 @@ export function CustomOptionRow({ open, onOpen, children }: { open: boolean; onO
     )
 }
 
-// The questions a coworker stopped on, one at a time, answered inside the card as on the web: the
-// composer steps aside while they wait, so the card carries its own paperclip and microphone. A
-// single-choice option answers at once; "Something else" and a question without options take a typed
-// answer. Every answer leaves in one message once the last question is passed, written as the web
-// writes it, the files uploaded first so the message only names their paths.
 export function QuestionWidget({ pending, onAnswer, onDismiss, upload, transcribe }: HitlWidgetProps) {
     const t = useTranslations('mobileHitl')
     const questions = pendingQuestions(pending.input)
@@ -95,7 +89,6 @@ export function QuestionWidget({ pending, onAnswer, onDismiss, upload, transcrib
     const [customOpen, setCustomOpen] = useState<boolean[]>(() => questions.map(() => false))
     const [sending, setSending] = useState(false)
     const sent = useRef(false)
-    // The recorder is the card's, the words go to the question that opened it.
     const recordingAt = useRef(0)
     const question = questions[index]
     const last = index === questions.length - 1
@@ -109,7 +102,6 @@ export function QuestionWidget({ pending, onAnswer, onDismiss, upload, transcrib
     const voice: VoiceSender | undefined = transcribe
         ? {
               transcribe,
-              // Read at delivery time: the answer can have been typed into while the microphone was on.
               send: async transcript => {
                   const at = recordingAt.current
                   setAnswers(current => {

@@ -10,7 +10,6 @@ import { RewindHeadline, RewindReveal, RewindSlideFrame } from '../RewindSlideFr
 import { useLocalHourly } from '../useLocalHourly'
 import type { RewindSlideProps } from './types'
 
-// 2024-01-01 is a Monday, the first day of the week the grid starts on.
 const DAYS = Array.from({ length: 7 }, (_, day) => day)
 const dayInitial = (day: number, locale: string) => formatDate(Date.UTC(2024, 0, 1 + day), locale, { weekday: 'narrow', timeZone: 'UTC' })
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour)

@@ -22,17 +22,11 @@ type VoiceUserMessageProps = {
     agentId?: string
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
-    /** Files sent along with the recording, drawn above the bubble. */
     attachmentPaths?: string[]
     createdAt?: string
     defaultTranscriptOpen?: boolean
 }
 
-/**
- * A voice message the user sent: the player in the bubble, and under it the actions that slide open
- * what the agent read from it. The actions come up on hover like the agent's, and stay on a touch
- * screen.
- */
 export function VoiceUserMessage({ voice, agentId, rawUrlFor, readFile, attachmentPaths, createdAt, defaultTranscriptOpen = false }: VoiceUserMessageProps) {
     const t = useTranslations('chat.voice')
     const playback = useVoicePlayback({ agentId, rawUrlFor, src: voice.src, durationMs: voice.durationMs })

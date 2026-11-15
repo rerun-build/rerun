@@ -32,9 +32,6 @@ function PreparedSkeleton() {
     )
 }
 
-// Each source pick mints its own import key: one key per attempt, so a prompt pasted in the wrong
-// agent never shares a coworker with the right one. Closing the dialog drops the key from memory;
-// it still expires on its own a day later.
 export function ImportAgentDialog({ open, onOpenChange, spaceId = null }: { open: boolean; onOpenChange: (open: boolean) => void; spaceId?: string | null }) {
     const t = useTranslations('dialogs.importAgent')
     const errorText = useErrorText()

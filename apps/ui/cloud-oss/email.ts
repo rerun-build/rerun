@@ -9,10 +9,6 @@ export { sendIncidentResolvedEmail, sendNotificationEmail, sendPublishedAccessCo
 export { BANNER_WARM_BACKGROUND_MS, BANNER_WARM_INLINE_MS, emailBoardBanner } from '@/lib/email/board-banner'
 export { buildUnsubscribeUrl, verifyUnsubscribeToken } from '@/lib/email/unsubscribeToken'
 
-// A self-hosted install sends its emails through its own mailbox (SMTP_HOST, SMTP_FROM) or its own
-// Resend account (RESEND_API_KEY, RESEND_FROM).
-// Without one nothing is sent: an invitation hands its link to the person who sent it, and a
-// published page cannot invite by code.
 export const EMAIL_DELIVERY = Boolean(process.env.SMTP_HOST || process.env.RESEND_API_KEY)
 
 export type PushContext = {
@@ -26,5 +22,4 @@ export type PushContext = {
     members: RoutedMember[]
 }
 
-// The mobile app talks to Rerun Cloud only, so a self-hosted hub has no device to push to.
 export async function pushNotification(_supabase: SupabaseClient<Database>, _context: PushContext): Promise<void> {}

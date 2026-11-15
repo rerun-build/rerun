@@ -1,4 +1,3 @@
-"""#301: a stray file in the worktree root is passed over and listed, never run as a worktree."""
 import os, unittest
 
 import test_factory as T

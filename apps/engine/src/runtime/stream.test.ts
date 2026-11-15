@@ -17,8 +17,6 @@ async function readAll(stream: ReadableStream<Uint8Array>): Promise<string> {
 const settle = () => new Promise(r => setTimeout(r, 20))
 
 describe('registerRun', () => {
-    // A schedule / trigger / call_agent run has no HTTP consumer: the hub has to drain it on its
-    // own, or the run would stall waiting for a reader that never comes.
     it('runs to completion with nobody attached, then replays in full', async () => {
         registerRun('headless-1', async writer => {
             writer.write({ type: 'data-step', id: '1', data: { n: 1 } })

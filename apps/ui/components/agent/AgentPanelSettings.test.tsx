@@ -3,9 +3,6 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-// The thinking level is saved through the same PATCH as the soul and the verbosity. "Not set" must send
-// null (it clears the stored level); a provider with no thinking option shows the control disabled.
-
 const mocks = vi.hoisted(() => ({ getAgentDetailAction: vi.fn(), updateAgentConfigAction: vi.fn() }))
 
 vi.mock('@/app/api/_actions/agent.actions', () => ({ getAgentDetailAction: mocks.getAgentDetailAction, updateAgentConfigAction: mocks.updateAgentConfigAction }))

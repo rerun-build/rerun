@@ -24,19 +24,15 @@ type AgentViewProps = {
     onBack: () => void
     onClose: () => void
     onOpenSession: (sessionId: string, title: string, runId: string | null) => void
-    // Covers the screen's body and leaves its header, whose back button is the way out.
     overlay?: ReactNode
 }
 
-/** A screen of the coworker, in place of the thread. Its header is a breadcrumb, coworker / screen, whose first step goes back to the card. */
 export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSession, overlay }: AgentViewProps) {
     const t = useTranslations('agent.agentView')
     const isTemplateAuthor = useIsTemplateAuthor()
     const mood = useAgentBuddyMood(agent.id)
     const servicesNeedConfig = useConnectorServices(agent.id).needsConfig
     const publishedAccess = usePublishedAccessEnabled()
-    // The install editor is the template author's, and the Published tab waits for its launch:
-    // anyone else sent there lands on the screen's first tab.
     const hidden = (id: AgentViewTab) => (id === 'setup' && !isTemplateAuthor) || (id === 'published' && !publishedAccess)
     const shown: AgentViewTab = hidden(tab) ? AGENT_SHEET_VIEWS[agentSheetViewOf(tab)][0] : tab
     const view = agentSheetViewOf(shown)

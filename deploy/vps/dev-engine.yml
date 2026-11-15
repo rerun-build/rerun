@@ -1,20 +1,3 @@
-# A second, separate Rerun engine for factory work, beside the live one. Own project name, own
-# volume, own network: it never joins the live `rerun` network and has no route to the live app.
-#
-# From the clone on the server:
-#   sudo docker compose -f deploy/vps/dev-engine.yml up -d
-#   sudo sh deploy/vps/dev-engine-status.sh
-# To remove everything it made (container, network, data):
-#   sudo docker compose -f deploy/vps/dev-engine.yml down -v
-#
-# The engine key: RERUN_DEV_ENGINE_KEY, read from deploy/vps/.env (git-ignored, mode 600, never printed):
-#   [ -e deploy/vps/.env ] || (umask 077; printf 'RERUN_DEV_ENGINE_KEY=%s\n' "$(openssl rand -hex 32)" > deploy/vps/.env)
-# Compose refuses to start without it. It is the dev engine's own key; the live engine key is never used here.
-#
-# Deliberately absent: published ports, env_file, the live engine key, any hub or pairing variable, a
-# model connection, GitHub access, privileged mode, added capabilities, the docker socket and host
-# paths. The image is the one images.yml already builds; pick another tag with RERUN_DEV_IMAGE_TAG.
-# A real model is added only on purpose and at run time, never here: deploy/vps/dev-engine-claude.sh.
 name: rerun-dev
 
 services:

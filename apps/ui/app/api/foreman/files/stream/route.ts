@@ -10,9 +10,6 @@ export const runtime = 'nodejs'
 
 const MB = 1024 * 1024
 
-// The foreman's counterpart of /api/files/stream. Same contract on the wire, a different store
-// behind it: there is no Box under the foreman, so its attachments and voice notes go to a private
-// bucket keyed by workspace, member and conversation.
 async function upload(req: Request) {
     let ctx: Awaited<ReturnType<typeof requireWorkspaceContext>>
     try {

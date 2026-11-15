@@ -64,7 +64,6 @@ const VERIFICATION_SIGNATURES: [RegExp, string][] = [
     [/^have-i-been-pwned-verification=/i, 'Have I Been Pwned'],
 ]
 
-// Read off `include:` in the SPF record: every service allowed to send mail as the domain.
 const SPF_SENDERS: [RegExp, string][] = [
     [/_spf\.google\.com$/i, 'Google Workspace'],
     [/protection\.outlook\.com$/i, 'Microsoft 365'],
@@ -117,7 +116,6 @@ export function readDnsRecords({ mx, txt, dmarc }: DnsRecords): DnsFindings {
             add(known, 'TXT')
             continue
         }
-        // An unknown `<vendor>-domain-verification=` still names its vendor.
         const vendor = record.match(/^([a-z0-9]+(?:[-_][a-z0-9]+)*?)[-_](?:site|domain)[-_]verification/i)?.[1]
         if (vendor) add(vendor, 'TXT')
     }

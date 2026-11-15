@@ -35,8 +35,6 @@ export const BLOB_ILLUSTRATIONS: readonly BlobIllustration[] = ILLUSTRATION_ENTR
     url: blobUrl(entry.file),
 }))
 
-// Whether the workspace still carries an icon nobody chose. Seeding one from a company favicon must
-// never overwrite a mark picked by hand.
 export function isBlobUrl(url: string | null | undefined): boolean {
     return !!url && url.includes(`/${BLOB_BUCKET}/`)
 }

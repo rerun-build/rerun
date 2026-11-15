@@ -3,11 +3,6 @@ import { logger } from '../lib/logger.js'
 
 const PLACEHOLDER = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g
 
-// Only the agent's own env answers a placeholder. The engine's process env holds RERUN_API_KEY, and
-// a server config travels inside template archives: `${RERUN_API_KEY}` in a header pointed at the
-// author's domain would hand them the key of every box that installs the template. The hub base
-// URL is the one engine value a catalog entry references, and it is public; the hub key itself is
-// put back on hub servers by withHubHeaders, from the engine env, never from the config.
 const ENGINE_ENV_PLACEHOLDERS = new Set(['RERUN_HUB_BASE_URL'])
 
 function resolveValue(value: string, env: Record<string, string>, serverName: string): string {

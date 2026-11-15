@@ -1,6 +1,3 @@
-// webgate: answers Rerun the way Firecrawl (/v2/scrape, /v2/map, /v2/search) and Brave Search
-// (GET /res/v1/web/search) would, and does the work with a self-hosted crawl4ai (pages) and SearXNG
-// (search). Node 22, no dependencies. Only the fields Rerun's callers read are returned.
 import { createHash, timingSafeEqual } from 'node:crypto'
 import { createServer } from 'node:http'
 import { pathToFileURL } from 'node:url'
@@ -10,17 +7,13 @@ const KEY = process.env.WEBGATE_KEY ?? ''
 const CRAWL4AI_URL = (process.env.CRAWL4AI_URL || 'https://crawl4ai.robagentic.tech').replace(/\/+$/, '')
 const CRAWL4AI_TOKEN = process.env.CRAWL4AI_TOKEN ?? ''
 const SEARXNG_URL = (process.env.SEARXNG_URL || 'http://searxng:8080').replace(/\/+$/, '')
-// Under Rerun's own 20 s onboarding and 45 s page timeouts would be nicer, but a cold page render
-// can take longer; Rerun aborts first and falls back, which is what it does with Firecrawl too.
 const CRAWL_TIMEOUT_MS = 50_000
-// Under Brave's 10 s client timeout, so Rerun sees a status instead of a dropped request.
 const SEARCH_TIMEOUT_MS = 8_000
 const MAX_BODY = 1_000_000
 const MAX_MAP_LINKS = 5_000
 const BRAVE_MAX_COUNT = 20
 const FORMATS = ['markdown', 'rawHtml', 'links']
 
-// The pruning filter gives Firecrawl's onlyMainContent (fit_markdown); raw_markdown is the whole page.
 const CRAWLER_CONFIG = {
     type: 'CrawlerRunConfig',
     params: {
@@ -30,9 +23,6 @@ const CRAWLER_CONFIG = {
     },
 }
 
-// Same idea as isPublicUrl in apps/ui/lib/company/firecrawl.ts, plus link-local (cloud metadata),
-// carrier-grade NAT and internal-only name suffixes. IPv6 literals never contain a dot once the URL
-// parser has normalised them, so the dot test already refuses them.
 const PRIVATE_HOST = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.|169\.254\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|\[?::1\]?$)|\.(internal|local|localhost)\.?$/i
 
 export function isPublicUrl(url) {
@@ -53,7 +43,6 @@ class Failure extends Error {
 
 const digest = value => createHash('sha256').update(value).digest()
 
-// Fails closed: with no WEBGATE_KEY configured nothing is accepted.
 function authorized(req) {
     if (!KEY) return false
     const auth = req.headers.authorization ?? ''
@@ -109,19 +98,16 @@ async function searx(query, limit) {
     }
     if (!res.ok) throw new Failure(502, `SearXNG answered ${res.status}`)
     const body = await res.json().catch(() => null)
-    // shortcut: one SearXNG page (its engines together usually give 10-30 results); fetch pageno=2 if callers come up short.
     return (body?.results ?? []).filter(r => typeof r.url === 'string' && r.url).slice(0, limit).map(r => ({ url: r.url, title: r.title ?? '', description: r.content ?? '' }))
 }
 
 const hrefs = list => (Array.isArray(list) ? list.map(link => link?.href).filter(href => typeof href === 'string' && /^https?:/i.test(href)) : [])
 const siteOf = hostname => hostname.toLowerCase().replace(/^www\./, '')
 
-// Firecrawl's credits do not exist here; 0 keeps Rerun's cost display honest.
 async function scrape(body) {
     const url = publicTarget(body.url)
     const asked = Array.isArray(body.formats) ? body.formats.filter(format => typeof format === 'string') : ['markdown']
     const formats = asked.filter(format => FORMATS.includes(format))
-    // Branding, screenshots, json and the rest are not available: answering without a crawl lets the caller's fallback run at once.
     if (formats.length === 0) throw new Failure(400, `Unsupported formats: ${asked.join(', ') || 'none'}`)
 
     const page = await crawl(url)
@@ -135,7 +121,6 @@ async function scrape(body) {
     return { success: true, data }
 }
 
-// The start page's own links, same site, without fragments, deduplicated, capped by `limit`.
 async function map(body) {
     const url = publicTarget(body.url)
     const limit = Number.isInteger(body.limit) && body.limit > 0 ? Math.min(body.limit, MAX_MAP_LINKS) : MAX_MAP_LINKS
@@ -194,7 +179,6 @@ export async function handle(req, res) {
     }
     res.writeHead(status, { 'content-type': 'application/json' })
     res.end(JSON.stringify(payload))
-    // Method, path, status and time only: no query strings, keys or page bodies.
     console.log(`${req.method} ${url.pathname} ${status} ${Date.now() - started}ms${note ? ` ${note}` : ''}`)
 }
 
@@ -205,6 +189,5 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     }
     if (!CRAWL4AI_TOKEN) console.error('CRAWL4AI_TOKEN is not set; crawl4ai will refuse page reads.')
     createServer(handle).listen(PORT, () => console.log(`webgate on :${PORT}, crawl4ai ${CRAWL4AI_URL}, SearXNG ${SEARXNG_URL}`))
-    // As PID 1 in a container Node ignores SIGTERM unless told otherwise.
     process.on('SIGTERM', () => process.exit(0))
 }

@@ -1,4 +1,3 @@
-"""Runner token (rerun#71 Z19): read once at start from the key file, never printed."""
 import os, sys, tempfile, unittest, unittest.mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runner_loop as R

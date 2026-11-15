@@ -14,9 +14,6 @@ function toConnector({ slug, name, category, icon }: CatalogApp): IdeaConnector 
     return { slug, name, category, icon }
 }
 
-// The model's word is checked against what exists: a citation that points at nothing, an app the
-// catalog does not have. Nothing here is rewritten into something plausible, it is dropped or
-// reported missing.
 export function groundCandidates(candidates: AgentCandidate[], dossier: Pick<CompanyDossier, 'evidence' | 'existingAgents'>, catalog: CatalogApp[]): GroundResult {
     const evidenceById = new Map(dossier.evidence.map(item => [item.id, item]))
     const bySlug = new Map(catalog.map(app => [key(app.slug), app]))

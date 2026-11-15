@@ -19,7 +19,6 @@ import { SuggestionMenu, suggestionMenu, type MenuState } from './suggestion-men
 export type BrainEditorHandle = { focus: (position?: 'start' | 'end') => void }
 
 type BrainEditorProps = {
-    // Read once at mount: the caller remounts the editor (a new `key`) to load another version.
     content: string
     editable?: boolean
     pages?: BrainPageSummary[]
@@ -31,8 +30,6 @@ type BrainEditorProps = {
     handleRef?: Ref<BrainEditorHandle>
     onOpenPage?: (slug: string) => void
     onOpenFile?: (path: string) => void
-    // Only ever called for an edit the person made. Opening a page never calls it, even though
-    // TipTap normalises the markdown it was given.
     onChange?: (markdown: string) => void
     onBlur?: () => void
 }
@@ -45,15 +42,12 @@ const PAGE_PICKER = new PluginKey('brainPagePicker')
 const MENU_HEIGHT = 320
 const MENU_WIDTH = 288
 
-// The page body as Notion edits it: no toolbar, `/` for blocks, `[[` to link a page or a file,
-// formatting on the selection. Reads and writes the same markdown agents read.
 export function BrainEditor({ content, editable = true, pages = [], titles, files = [], currentSlug = null, placeholder, className, handleRef, onOpenPage, onOpenFile, onChange, onBlur }: BrainEditorProps) {
     const t = useTranslations('brain.editor')
     const containerRef = useRef<HTMLDivElement>(null)
     const [menu, setMenu] = useState<OpenMenu | null>(null)
     const [menuIndex, setMenuIndex] = useState(0)
 
-    // The extensions are built once; everything they read that changes over time goes through here.
     const live = useRef({ t, pages, titles, files, currentSlug, onOpenPage, onOpenFile, onChange, onBlur, menu, menuIndex, pickerMode: 'pages' as PickerMode })
     useEffect(() => {
         Object.assign(live.current, { t, pages, titles, files, currentSlug, onOpenPage, onOpenFile, onChange, onBlur, menu, menuIndex })
@@ -89,8 +83,6 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
         setMenu({ kind, mode: live.current.pickerMode, state, position })
     }, [])
 
-    // The callbacks below only read `live` when ProseMirror calls them, on a keystroke or a click,
-    // never while rendering: the rule cannot tell a ref handed to a closure from one read in render.
     /* eslint-disable react-hooks/refs */
     const extensions = useMemo(
         () => [
@@ -127,8 +119,6 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
     )
     /* eslint-enable react-hooks/refs */
 
-    // TipTap reformats markdown it did not write itself. The first serialisation is the untouched
-    // baseline: matching it again hands back the original text rather than the reformatted one.
     const baseline = useRef<string | null>(null)
     const emitted = useRef(content)
 
@@ -159,13 +149,11 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
         },
         onUpdate: ({ editor: updated }) => {
             const markdown = editorMarkdown(updated)
-            // TipTap can report an update before onCreate: nobody has typed yet, it is the baseline.
             if (baseline.current === null) {
                 baseline.current = markdown
                 return
             }
             const next = markdown === baseline.current ? content : markdown
-            // TipTap also reports the transactions it appends on its own once the page is open.
             if (next === emitted.current) return
             emitted.current = next
             live.current.onChange?.(next)
@@ -177,9 +165,6 @@ export function BrainEditor({ content, editable = true, pages = [], titles, file
         editor?.setEditable(editable)
     }, [editor, editable])
 
-    // Radix closes the dialog on Escape from a capture listener on the document, before the editor
-    // sees the key. Escape inside the page closes its menu, then leaves the editor, and only a
-    // second one closes the dialog.
     useEffect(() => {
         if (!editor) return
         const onKey = (event: KeyboardEvent) => {

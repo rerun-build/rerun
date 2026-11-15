@@ -4,9 +4,6 @@ import { dataDir, lastUpdatePath } from '../config/paths.js'
 import { nowIso } from '../lib/ids.js'
 import { buildCommit, isBuildCommit } from './build-info.js'
 
-// What the last `rerun update` did, for `/health` to tell before the engine restarts (or fails to).
-// `restarting` is the updater's last word: it dies with the service it restarts, so the engine that
-// comes up on the new build turns it into `success` itself.
 export const lastUpdateSchema = z.object({
     status: z.enum(['running', 'error', 'restarting', 'success']),
     commit: z.string().nullable(),
@@ -35,8 +32,6 @@ export function writeLastUpdate(entry: Omit<LastUpdate, 'at'>): LastUpdate {
     return full
 }
 
-// Called once the new build serves: an update that reached its restart and came back on the commit
-// it installed is a success. One that came back on another commit is left as it is, for the hub to see.
 export function settleLastUpdateOnBoot(): LastUpdate | null {
     const last = readLastUpdate()
     if (!last || last.status !== 'restarting') return last

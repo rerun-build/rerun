@@ -21,9 +21,6 @@ type TemplateContentLockProps = {
     children: ReactNode
 }
 
-// The seal, as the user meets it: the filler the server sent, blurred, under a card that names the
-// one thing that opens it. The real content is not in the DOM to begin with, so the blur is the
-// appearance of the lock and never the lock itself.
 export function TemplateContentLock({ locked, subject, children }: TemplateContentLockProps) {
     const t = useTranslations('agent.templateContentLock')
     const openBilling = useBillingStore(s => s.openBilling)

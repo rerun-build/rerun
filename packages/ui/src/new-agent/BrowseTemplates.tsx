@@ -5,9 +5,6 @@ import { LayoutGridIcon } from '../icons'
 import { cn } from '../cn'
 import { useKitTranslations } from '../locale'
 
-// The other way in, under the picks: either one of the agents picked for you, or a ready-made team
-// from the library. A short "or" between two short rules says they are alternatives without drawing
-// one more line across the whole dialog.
 export function BrowseTemplates({ onBrowse, className }: { onBrowse: () => void; className?: string }) {
     const t = useKitTranslations()
     return (

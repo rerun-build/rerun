@@ -46,12 +46,9 @@ type FloatingScreenProps = {
     takeControlLabel: string
     children: ReactNode
     onTakeControl: () => void
-    // Where the edge it slides along sits, under the pills and tabs of the chat it floats over.
     className?: string
 }
 
-// The screen the thread scrolled away from, kept at the top of the chat under its pills and tabs. It slides
-// along that edge only: let go, it lands on the nearer side and stays there. Its inner bottom corner resizes it.
 export function FloatingScreen({ takeControlLabel, children, onTakeControl, className }: FloatingScreenProps) {
     const t = useTranslations('desktop.screen')
     const reducedMotion = useReducedMotion()
@@ -66,8 +63,6 @@ export function FloatingScreen({ takeControlLabel, children, onTakeControl, clas
 
     const restOf = (target: ScreenSide) => (target === 'left' ? 0 : Math.max(0, (trackRef.current?.clientWidth ?? width) - width))
 
-    // Set before paint, so the thumbnail never shows on the wrong side for a frame, and keeps its
-    // outer edge where it was while its width changes.
     useLayoutEffect(() => {
         const track = trackRef.current
         if (!track) return

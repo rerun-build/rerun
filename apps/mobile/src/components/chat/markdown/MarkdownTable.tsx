@@ -11,9 +11,6 @@ const CHAR_WIDTH = 7.5
 const MIN_COLUMN = 72
 const MAX_COLUMN = 240
 
-// A phone table cannot size its columns from their content the way a browser does, so each column
-// takes the width its longest cell asks for, within bounds, and the table scrolls sideways. A table
-// narrower than its frame stretches its columns to fill it, as the web's `width: 100%` does.
 function columnWidths(token: Tokens.Table, available: number): number[] {
     const wanted = token.header.map((cell, column) => {
         const longest = Math.max(cell.text.length, ...token.rows.map(row => row[column]?.text.length ?? 0))
@@ -25,8 +22,6 @@ function columnWidths(token: Tokens.Table, available: number): number[] {
 
 const ALIGN = { left: 'left', center: 'center', right: 'right' } as const
 
-// The web's table in a chat answer: a header row over a rule, hairlines between rows, in the
-// answer's muted frame.
 export function MarkdownTable({ token, renderCell }: { token: Tokens.Table; renderCell: (cell: Tokens.TableCell) => ReactNode }) {
     const theme = useTheme()
     const [available, setAvailable] = useState(0)

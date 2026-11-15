@@ -8,12 +8,7 @@ import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
 import { mcpToolSet, openMcpClient, prepareMcpServer, resolveTransport, type McpCallResult, type McpSpawn, type McpTool } from './mcp.js'
 
-// A CLI provider starts a new process for every message, and that process used to connect to every
-// MCP server of the agent before calling the model: up to several seconds per message. The engine
-// keeps the connections instead, so only the first message after a quiet spell pays for them.
 export const MCP_IDLE_MS = 10 * 60 * 1000
-// A server that has not answered by then is left out of this run rather than holding it up. Its
-// attempt is dropped too, so the next run dials it afresh instead of waiting on the same one.
 export const MCP_CONNECT_TIMEOUT_MS = 20_000
 
 type CallResult = McpCallResult
@@ -30,8 +25,6 @@ const entries = new Map<string, Entry>()
 
 const keyOf = (agentId: string, name: string) => `${agentId}\u0000${name}`
 
-// Anything that changes how the server is dialed: a refreshed OAuth bearer, an edited command, a
-// new agent key. The connection opened with the old values is dropped for a new one.
 function fingerprintOf(server: McpServer, spawn: McpSpawn): string {
     const dialed = [resolveTransport(server), server.command, server.args, server.env, server.url, server.headers, spawn.cwd, spawn.env]
     return createHash('sha256').update(JSON.stringify(dialed)).digest('hex')
@@ -44,8 +37,6 @@ function drop(key: string, entry: Entry): Promise<void> {
     return entry.opening.then(({ client }) => client.close()).catch(() => {})
 }
 
-// The idle clock only runs while no call is out: a tool that takes longer than the idle spell keeps
-// its connection until it answers.
 function arm(key: string, entry: Entry): void {
     clearTimeout(entry.timer)
     entry.timer = setTimeout(() => {
@@ -75,8 +66,6 @@ function entryFor(agentId: string, server: McpServer, spawn: McpSpawn): { key: s
 
 type Live = { key: string; entry: Entry; session: Session }
 
-// The connection the agent already has to this server, or a new one. A server that cannot be reached
-// answers null and is tried again on the next call, never kept as failed.
 async function connect(agentId: string, server: McpServer, spawn: McpSpawn): Promise<Live | null> {
     const { key, entry } = entryFor(agentId, server, spawn)
     let timer: NodeJS.Timeout | undefined
@@ -96,9 +85,6 @@ async function connect(agentId: string, server: McpServer, spawn: McpSpawn): Pro
     }
 }
 
-// A run holds the handle for as long as it lasts, which can outlive the connection it was given:
-// closed as idle between two of its calls, or dropped by the server. A call made on a connection
-// the pool no longer holds dials the server again rather than failing on the closed client.
 export async function acquireMcp(agentId: string, server: McpServer, spawn: McpSpawn): Promise<PooledMcp | null> {
     const first = await connect(agentId, server, spawn)
     if (!first) return null
@@ -119,15 +105,11 @@ export async function acquireMcp(agentId: string, server: McpServer, spawn: McpS
     }
 }
 
-// The environment a stdio server got when the CLI started it: what the engine inherits to any
-// agent process (PATH, HOME, locale…), the agent's keys, and its workspace as the working
-// directory. Never the engine's secrets, which a package fetched from npm has no business reading.
 export function agentMcpSpawn(agent: Pick<LoadedAgent, 'id' | 'env' | 'config'>): McpSpawn {
     const { cwd, env } = agentProcessEnv(agent)
     return { cwd, env: childProcessEnv(env) }
 }
 
-// For the providers the engine drives itself: the agent's MCP tools, served by the pooled connections.
 export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
     const spawn = agentMcpSpawn(agent)
     const prepared = await Promise.all(agent.config.mcpServers.map(server => prepareMcpServer(agent.id, server, agent.env, agent.hubAgentId)))
@@ -142,8 +124,6 @@ export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
     return tools
 }
 
-// The agent's connections are closed rather than left to idle out, all of them or those to the
-// servers it no longer declares.
 export function releaseAgentMcp(agentId: string, keep: string[] = []): void {
     const prefix = `${agentId}\u0000`
     for (const [key, entry] of entries) if (key.startsWith(prefix) && !keep.includes(key.slice(prefix.length))) drop(key, entry)

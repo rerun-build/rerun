@@ -8,10 +8,6 @@ import { useQuestionVoice } from '@/hooks/useQuestionVoice'
 import { asStringArray } from '@/lib/mcp/args'
 import { readQuestionOutput, type QuestionAnswer } from './question-answer'
 
-// ask_choice and ask_input are the same widget with and without buttons: QuestionForm already falls
-// back to a free field when it is given no option, and it is what the engine agents ask through, so
-// a question from the foreman reads exactly like a question from an agent.
-
 type ForemanQuestionWidgetProps = {
     input: unknown
     output?: unknown
@@ -28,8 +24,6 @@ function recapText(answer: QuestionAnswer, t: ReturnType<typeof useTranslations<
     return t('skipped')
 }
 
-// A reload rebuilds the widget from the transcript, where the answer already sits. Showing the form
-// again would invite a second answer nothing is waiting for.
 export function QuestionRecap({ question, answer }: { question: string; answer: QuestionAnswer }) {
     const t = useTranslations('foreman.question')
     const text = recapText(answer, t)
@@ -43,8 +37,6 @@ export function QuestionRecap({ question, answer }: { question: string; answer: 
 
 export function ForemanQuestionWidget({ input, output, onAnswer, onDismiss }: ForemanQuestionWidgetProps) {
     const t = useTranslations('foreman.question')
-    // The microphone, but no paperclip: this answer leaves as a tool result, and only a user message
-    // gets its files handed to the model (lib/foreman/inline-attachments.ts).
     const voice = useQuestionVoice()
     const args = input && typeof input === 'object' ? (input as Record<string, unknown>) : {}
     const question = typeof args.question === 'string' ? args.question : t('fallback')

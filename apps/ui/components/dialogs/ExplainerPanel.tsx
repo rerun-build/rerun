@@ -8,8 +8,6 @@ export type ExplainerPoint = {
     description: string
 }
 
-// Right-hand column shared by the create dialogs: a title and a list of checkpoints, instead of a
-// live preview.
 export function ExplainerPanel({ title, points }: { title: string; points: readonly ExplainerPoint[] }) {
     return (
         <div className="hidden flex-col justify-center border-l bg-muted/30 p-8 sm:flex">
@@ -29,7 +27,6 @@ export function ExplainerPanel({ title, points }: { title: string; points: reado
     )
 }
 
-// Same glass checkmark as the Pricing page (static, glowing BorderBeam ring), in the white variant.
 export function ExplainerCheck() {
     return (
         <span

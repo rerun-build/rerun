@@ -16,8 +16,6 @@ export function TemplateContentSection() {
     const t = useTranslations('templates.authoring.content')
     const { control, setValue } = useFormContext<TemplateFormValues>()
     const { actions } = useTemplateAuthoring()
-    // The editor ignores an incoming value while it holds focus, so a prefill would land in the
-    // form without repainting. Remounting it is the only way to force the new markdown in.
     const [editorKey, setEditorKey] = React.useState(0)
 
     return (

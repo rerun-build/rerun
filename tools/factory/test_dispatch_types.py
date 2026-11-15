@@ -6,7 +6,6 @@ from test_dispatch import World, PR_LINE, ready
 
 
 def run(extra):
-    """One labelled issue to its review; returns the agents of the sends in order."""
     with tempfile.TemporaryDirectory() as d:
         w = World()
         cfg = {"repo": "o/r", "label": "factory", "checks_timeout_s": 3600, "auto_plan_marker": True,
@@ -31,8 +30,6 @@ class Types(unittest.TestCase):
         for k in ("builders", "reviewers", "max_jobs"):
             self.assertNotIn(k, cfg)
         coder, rev = cfg["types"]["coder"], cfg["types"]["reviewer"]
-        # The fold of 2026-11-14 (#198): one main per type with several runs; the coworker behind it takes over
-        # while the main has an unresolved send (#292).
         self.assertEqual({c["name"]: c["runs"] for c in coder["coworkers"]}, {"code": 6, "LARRY": 1})
         self.assertEqual({c["name"]: c["runs"] for c in rev["coworkers"]}, {"LINUS": 3, "BRUCE": 1})
         self.assertEqual([c["name"] for c in coder["coworkers"]], ["code", "LARRY"])
@@ -106,7 +103,7 @@ class Types(unittest.TestCase):
         cfg = D.settings()
         self.assertEqual([c["name"] for c in cfg["types"]["researcher"]["coworkers"]], ["search"])
         self.assertEqual([c["name"] for c in cfg["types"]["designer"]["coworkers"]], ["DIETER"])
-        for t, runs in (("researcher", 3), ("designer", 1)):  # the fold of 2026-11-14 gives the researcher three runs
+        for t, runs in (("researcher", 3), ("designer", 1)):
             c = cfg["types"][t]["coworkers"][0]
             self.assertEqual(c["runs"], runs)
             self.assertNotIn("id", c)
@@ -139,7 +136,6 @@ class Types(unittest.TestCase):
         with self.assertRaises(Exception) as e:
             go(full[:1])
         self.assertIn("DIETER", str(e.exception))
-        # Every coworker carries an id: list_agents is not called.
         c = {"repo": "o/r", "label": "factory", "types": {"coder": {"max_jobs": 1, "coworkers": [{"id": "b1", "name": "B1"}]}}}
         asked = []
         with tempfile.TemporaryDirectory() as d:

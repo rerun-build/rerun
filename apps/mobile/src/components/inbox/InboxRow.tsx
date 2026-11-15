@@ -22,14 +22,11 @@ type InboxRowProps = {
     item: InboxItem
     onOpen: (item: InboxItem) => void
     onMarkRead: (item: InboxItem) => void
-    // The caller's rule for the row's coworker, null until read: only the settings link is offered then.
     rule: CoworkerRule | null
     onRule: (item: InboxItem, rule: CoworkerRule, done: string) => void
     onSettings: (item: InboxItem) => void
 }
 
-// One row of the web's inbox. The web's hover button is a swipe here, and a long press for whoever
-// does not swipe; the long press also holds the web's ⋯, which turns off why the row reached you.
 export function InboxRow({ item, onOpen, onMarkRead, rule, onRule, onSettings }: InboxRowProps) {
     const theme = useTheme()
     const swipeable = useRef<SwipeableMethods>(null)

@@ -19,7 +19,6 @@ export function validatePassword(password: string): string {
     return password
 }
 
-// `scrypt$N$r$p$salt$key`, so the cost can be raised later without breaking the hashes stored.
 export async function hashPassword(password: string): Promise<string> {
     const salt = randomBytes(16)
     const key = await derive(validatePassword(password), salt, { N: SCRYPT_COST, r: SCRYPT_BLOCK, p: SCRYPT_PARALLEL })

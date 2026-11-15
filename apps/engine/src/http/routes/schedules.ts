@@ -20,8 +20,6 @@ const createSchema = z
         timezone: z.string().optional(),
         enabled: z.boolean().optional(),
         connectionId: z.string().nullable().optional(),
-        // Null on both means "whatever the agent runs", which is itself the box default when the
-        // agent picked nothing. A routine only freezes a pair when someone chose one.
         provider: providerSchema.nullable().default(null),
         model: z.string().nullable().default(null),
     })
@@ -79,12 +77,7 @@ scheduleRoutes.post('/:slug/run', async c => {
     const slug = c.req.param('slug')
     if (!scheduleExists(agentId, slug)) return c.json({ error: 'schedule not found' }, 404)
     const schedule = await readSchedule(agentId, slug)
-    // A schedule still paused for the install would start in a fresh session carrying the install
-    // prompt and tools, and run a second install beside the real one. Skipping the setup switches
-    // the schedules on, which lifts this.
     if (hasPendingSetup(await getAgent(agentId)) && !schedule.enabled) throw setupPending()
-    // A manual run is a deliberate probe: it may clear a budget or subscription latch, or re-arm it
-    // and show the failure in the UI.
     const { runId, sessionId } = await fireSchedule(agentId, schedule, { markFired: false, manual: true })
     return c.json({ runId, sessionId }, 202)
 })

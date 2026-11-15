@@ -2,9 +2,6 @@ import { z } from 'zod'
 
 import { inputDefSchema } from './input.js'
 
-// A coworker can hold several accounts of one app. The first one keeps the bare catalog slug as its
-// registry key, every other one is `<slug>@<id>`, so an entry written before instances existed
-// still reads as the base instance.
 export const SERVICE_INSTANCE_ID_RE = /^[a-z0-9]{6}$/
 
 export function serviceRegistryKey(slug: string, instanceId?: string): string {
@@ -26,8 +23,6 @@ export function isServiceRegistryKey(key: string): boolean {
 export const agentServiceStatusSchema = z.enum(['active', 'needs_config', 'needs_auth', 'error'])
 export type AgentServiceStatus = z.infer<typeof agentServiceStatusSchema>
 
-// Which sign-in flow a service is waiting on, without the target itself: the hub reads the live
-// target from the agent's registry when it starts the flow, so no client ever holds one.
 export const pendingAuthSchema = z.enum(['oauth', 'managed', 'composio', 'app'])
 export type PendingAuth = z.infer<typeof pendingAuthSchema>
 
@@ -56,8 +51,6 @@ export const installedServiceSchema = z.object({
 })
 export type InstalledServiceView = z.infer<typeof installedServiceSchema>
 
-// One card of the app-setup block: the catalog metadata, the agent's own install status, and the
-// reason the agent gave for suggesting it. `notFound` is a slug the agent invented.
 export const resolvedServiceSchema = z.object({
     key: z.string().optional(),
     slug: z.string(),
@@ -99,16 +92,12 @@ export const resetConnectionSchema = z.union([
 ])
 export type ResetConnectionView = z.infer<typeof resetConnectionSchema>
 
-// Where to send the in-app browser, and the scheme URL that ends the session. The session ends on
-// `returnUrl?status=success&claim=…`: the claim is what the app finishes the sign-in with.
 export const connectTargetSchema = z.object({ url: z.string(), returnUrl: z.string() })
 export type ConnectTarget = z.infer<typeof connectTargetSchema>
 
 export const signInClaimSchema = z.object({ claim: z.string().min(1).max(64) })
 export type SignInClaim = z.infer<typeof signInClaimSchema>
 
-// A server registered outside the catalog, the agent's own `request_mcp_sign_in` names it. Only a
-// literal http(s) url can go through the browser sign-in.
 export const mcpServerViewSchema = z.object({
     name: z.string(),
     displayName: z.string(),
@@ -133,9 +122,6 @@ export const serviceSearchResultSchema = z.object({
 })
 export type ServiceSearchResultView = z.infer<typeof serviceSearchResultSchema>
 
-// Fixed set of catalog categories. Mirrored by the `services_category_check`
-// constraint in supabase/migrations/20260616000000_service_categories.sql.
-// 'other' is the neutral fallback default; no real service should use it.
 export const SERVICE_CATEGORIES = [
     'payments',
     'ecommerce',

@@ -17,7 +17,6 @@ describe('foremanErrorText', () => {
         expect(classifyChatError(foremanErrorText(apiError(529)))).toBe('overloaded')
     })
 
-    // The foreman runs on Rerun's key: a spent or refused key is neither the user's budget nor their connection.
     it('shows a refused Rerun key as neither the budget wall nor a signed-out connection', () => {
         expect(classifyChatError(foremanErrorText(apiError(402)))).toBe('generic')
         expect(classifyChatError(foremanErrorText(apiError(401)))).toBe('generic')

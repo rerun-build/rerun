@@ -5,8 +5,6 @@ import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-settle-'))
 
-// Captured instead of sent: the assertions are about what the hub is told, which is the only thing
-// that moves a conversation off "working".
 const { sent, stream, partial, proposal } = vi.hoisted(() => ({
     sent: [] as Array<Record<string, unknown>>,
     stream: { parts: [] as unknown[], hang: false },
@@ -44,8 +42,6 @@ vi.mock('../agents/providers.js', async importOriginal => {
                     stream: new ReadableStream({
                         start(controller) {
                             for (const part of stream.parts) controller.enqueue(part)
-                            // A provider that wedges never closes its stream: no finish part, no
-                            // error part, no callback of any kind.
                             if (!stream.hang) controller.close()
                         },
                     }),
@@ -102,8 +98,6 @@ describe('a run always reaches a terminal state', () => {
         proposal.push = false
     })
 
-    // A spent Codex subscription arrives as a plain finish, not as an error. Taken at face value it
-    // stores an empty turn as a success and the reason the agent said nothing is lost.
     it('fails a turn the provider finished on a usage limit', async () => {
         stream.parts = textTurn({ unified: 'length', raw: 'usage_limit_exceeded' })
 
@@ -128,9 +122,6 @@ describe('a run always reaches a terminal state', () => {
         expect((await getRun(id, run.runId))?.status).toBe('done')
     })
 
-    // An error part makes the SDK call onError *and then* onFinish. Both used to write the run, so
-    // the `done` arriving second overwrote the failure: a spent Claude subscription was stored as a
-    // successful empty turn and the session went back to idle with nothing to show for it.
     it('ends a turn the provider errored out on exactly once', async () => {
         stream.parts = [
             { type: 'stream-start', warnings: [] },
@@ -145,8 +136,6 @@ describe('a run always reaches a terminal state', () => {
         expect(sent.filter(n => n.event === 'agent.message.completed')).toHaveLength(1)
     })
 
-    // What the stream retry middleware ends a step on when the hub hung up and the step could not be
-    // replayed. It used to arrive as `other` with no usage and pass for a finished turn.
     it('fails a turn whose stream was cut, keeping what it already said', async () => {
         stream.parts = textTurn({ unified: 'error', raw: STREAM_CUT_RAW_REASON })
 
@@ -170,7 +159,6 @@ describe('a run always reaches a terminal state', () => {
         expect(claimSession(sessionId, 'next-run')).toBeNull()
     })
 
-    // Stop before the first step is the one path streamText answers with `onAbort` alone.
     it('cancels a hung run on demand and tells the hub the conversation is over', async () => {
         stream.hang = true
         stream.parts = [{ type: 'stream-start', warnings: [] }]
@@ -185,15 +173,11 @@ describe('a run always reaches a terminal state', () => {
         expect(outcome.kind).toBe('cancelled')
         expect((await getRun(id, run.runId))?.status).toBe('cancelled')
         const completion = sent.find(n => n.event === 'agent.message.completed')
-        // `done` is what puts the session back to idle on the hub; `cancelled` in the metadata is
-        // what keeps it out of the notification inbox.
         expect(completion?.kind).toBe('done')
         expect((completion?.metadata as Record<string, unknown>).status).toBe('cancelled')
         expect(sessionClaim(session.id)).toBeNull()
     })
 
-    // The order is the point: the hub puts the conversation back to idle on `done`, so a proposal
-    // announced first would be cleared by the run that made it.
     it('announces a skill proposal after the run is over', async () => {
         stream.parts = textTurn({ unified: 'stop' })
         proposal.push = true
@@ -201,7 +185,6 @@ describe('a run always reaches a terminal state', () => {
         const { outcome } = await runToSettlement('always end a post with a CTA')
 
         expect(outcome.kind).toBe('done')
-        // `settled` resolves before the hub is told anything.
         await vi.waitFor(() => expect(sent).toHaveLength(2))
         expect(sent.map(n => [n.event, n.kind])).toEqual([
             ['agent.message.completed', 'done'],

@@ -1,16 +1,3 @@
-# The factory runner: plain Python, no model of its own, beside the development engine in the same
-# project and network (rerun-dev). It reads run rows over the engine's HTTP routes and acts.
-#
-#   sudo docker compose -f deploy/vps/factory-runner.yml up -d --build
-# Needs RERUN_DEV_ENGINE_KEY in deploy/vps/.env (see dev-engine.yml). It gets that one variable and
-# nothing of the live setup. Its ledger and trigger tokens live in its own volume.
-#
-# The GitHub token is not in the environment: the host key file named by FACTORY_GH_TOKEN_FILE in
-# deploy/vps/.env is mounted read-only as the secret gh_token at /run/secrets/gh_token. On the host that
-# file is owned by the container's runner uid (10001), mode 0400, in a directory only that uid enters.
-#
-# Deliberately absent: published ports, the docker socket, privileged mode, added capabilities,
-# host paths other than the read-only tools/factory mount, the live engine key.
 name: rerun-dev
 
 services:

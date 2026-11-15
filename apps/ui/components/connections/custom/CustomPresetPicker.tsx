@@ -14,7 +14,6 @@ type CustomPresetPickerProps = {
     onPick: (preset: CustomPreset | null) => void
 }
 
-// Picking one fills in what it already knows: its name and its address.
 export function CustomPresetPicker({ id, presets, selected, onPick }: CustomPresetPickerProps) {
     const t = useTranslations('connections.custom')
     const pick = (value: string) => onPick(presets.find(preset => preset.id === value) ?? null)

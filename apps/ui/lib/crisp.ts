@@ -6,10 +6,6 @@ function crisp(): CrispCommand[] | undefined {
     return (window as Window & { $crisp?: CrispCommand[] }).$crisp
 }
 
-// Crisp only knows the visitor by what it is told: without the email, the team reads an anonymous
-// conversation it cannot match to an account nor answer once the tab is closed. An account born
-// from a phone is told by its number: Crisp refuses its placeholder address and shows the visitor
-// an "invalid email" alert.
 function identify(email: string | null | undefined, data: Record<string, string> = {}) {
     const address = realEmail(email)
     const phone = placeholderPhone(email)
@@ -25,8 +21,6 @@ export function openCrisp(email?: string | null) {
     crisp()?.push(['do', 'chat:open'])
 }
 
-// Sent rather than left in the composer: the team is told the moment they asked, whether or not
-// they stay on the chat that opens.
 export function sendToCrisp({ email, workspaceId, text }: { email: string | null | undefined; workspaceId: number | string | null | undefined; text: string }) {
     identify(email, workspaceId != null ? { workspace_id: String(workspaceId), source: 'foreman' } : { source: 'foreman' })
     crisp()?.push(['do', 'message:send', ['text', text]])

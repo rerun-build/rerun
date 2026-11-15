@@ -17,14 +17,11 @@ const streamdownPlugins = { cjk, code, math, mermaid }
 
 type InboxDetailCardProps = {
     entry: InboxEntry
-    /** The full markdown message, where the row only had room for its first line. */
     message: string
     total: number
     onClose: () => void
     onSeeAll: () => void
-    /** Left out when there is no agent to open a conversation with. */
     onOpenConversation?: () => void
-    /** Left out until the update has its row in the list. */
     onMarkRead?: () => void
 }
 

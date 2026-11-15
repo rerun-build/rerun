@@ -15,9 +15,6 @@ export type MenuActions = {
 
 const DOCS_URL = 'https://docs.rerun.build'
 
-// The native menus, in the language of the app. None of them takes a shortcut the web app answers
-// itself: ⌘K, ⌘F, ⌘S, ⌘Enter, ⌘Backspace stay with the page. Edit is what makes copy and paste
-// work at all on macOS.
 export function buildMenu(actions: MenuActions): Menu {
     const mac = process.platform === 'darwin'
     const name = PRODUCT_NAME
@@ -40,7 +37,6 @@ export function buildMenu(actions: MenuActions): Menu {
         label: t('menu.file.title'),
         submenu: [
             { id: 'new-window', label: t('menu.file.newWindow'), accelerator: 'CmdOrCtrl+Shift+N', click: actions.newWindow },
-            // The shortcut is global (registered by quick-ask.ts): the menu only shows it.
             { id: 'quick-ask', label: t('tray.quickAsk'), accelerator: QUICK_ASK_SHORTCUT, registerAccelerator: false, click: actions.quickAsk },
             { type: 'separator' },
             ...(mac ? [] : [{ label: t('menu.app.checkForUpdates'), click: actions.checkForUpdates }, { label: t('menu.app.changeServer'), click: actions.changeServer }, { type: 'separator' as const }]),

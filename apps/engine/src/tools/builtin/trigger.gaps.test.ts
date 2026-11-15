@@ -139,7 +139,6 @@ describe('trigger_edit', () => {
         await mkdir(triggersDir(id), { recursive: true })
         await writeFile(triggerFile(id, 'legacy'), '---\nname: New lead\ntoken: original-token\n---\nQualify the lead.\n')
         expect(await run('trigger_edit', { slug: 'legacy', oldString: 'Qualify', newString: 'Score', replaceAll: false })).toBe('Edited trigger legacy (1 replacement)')
-        // Looks wrong: the edited copy lands in new-lead.md with a fresh token, the original is untouched.
         expect(await readTrigger(id, 'legacy')).toMatchObject({ body: 'Qualify the lead.', token: 'original-token' })
         const copy = await readTrigger(id, 'new-lead')
         expect(copy.body).toBe('Score the lead.')

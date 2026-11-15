@@ -8,10 +8,6 @@ import type { CustomRendererProps } from 'streamdown'
 
 export const DRAFT_LANGUAGE = 'draft'
 
-/**
- * A ```draft fence: a text the user sends or pastes elsewhere (an email, a post, a message). It
- * reads as prose rather than code, and copies exactly as written. The fence's meta names it.
- */
 export function DraftBlock({ code, meta, isIncomplete }: CustomRendererProps) {
     const t = useTranslations('chat')
     const { copied, copy } = useCopy()

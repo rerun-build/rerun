@@ -9,7 +9,6 @@ type Point = { x: number; y: number };
 
 const HANDLES = ["top", "right", "bottom", "left"] as const;
 
-// Les deux pointes voisines de chaque pointe du losange (cycle top → right → bottom → left).
 const HANDLE_NEIGHBORS: Record<ContainerHandle, readonly [ContainerHandle, ContainerHandle]> = {
   top: ["left", "right"],
   right: ["top", "bottom"],
@@ -18,26 +17,11 @@ const HANDLE_NEIGHBORS: Record<ContainerHandle, readonly [ContainerHandle, Conta
 };
 
 const BRACKET_LEN = 13;
-// Sur un space 1x1, deux bras de longueur fixe couvriraient presque toute l'arête (31.3 unités) et le
-// coin se lirait comme un contour plein : on les borne pour garder un vide au milieu de chaque arête.
 const BRACKET_MAX_RATIO = 0.2;
-// Le contour du space sélectionné est déjà un trait blanc plein : un coin posé sur l'arête s'y
-// confondrait. On le rentre plutôt que de le laisser déborder. C'est un écart
-// PERPENDICULAIRE aux arêtes : les pointes du losange n'ayant pas le même angle (26.57° à gauche et à
-// droite, 63.43° en haut et en bas), un décalage constant le long de la bissectrice donnerait des
-// écarts deux fois plus grands en haut et en bas.
 const BRACKET_GAP = 4.5;
 
-// Le label est un panneau DEBOUT sur l'arête haut-gauche du losange : le plan vertical de la scène
-// iso. rotate(-26.565) skewX(-26.565) = matrix(0.894427, -0.447214, 0, 1.118034) : l'axe x du texte
-// suit l'arête (direction iso 2:-1) et son axe y reste strictement vertical à l'écran, donc les
-// jambages des lettres sont d'aplomb. Le cisaillement que cela induit ne se lit comme de la
-// perspective qu'au-dessus d'une certaine taille : sous ~16px il vire au faux italique, d'où
-// LABEL_FONT_SIZE qui n'est pas négociable à la baisse.
 const LABEL_STANDING_TRANSFORM = "rotate(-26.565) skewX(-26.565)";
 const LABEL_FONT_SIZE = 18;
-// `along` court le long de l'arête, `above` est une vraie hauteur écran (l'axe y du repère debout est
-// vertical), donc le mot décolle du sol de la même distance sur toute sa longueur.
 const LABEL_OFFSET = { along: 7, above: 10 };
 
 function bracketPath(corner: Point, a: Point, b: Point) {
@@ -52,7 +36,6 @@ function bracketPath(corner: Point, a: Point, b: Point) {
 
   const bisectorLen = Math.hypot(ua.x + ub.x, ua.y + ub.y);
   const bisector = { x: (ua.x + ub.x) / bisectorLen, y: (ua.y + ub.y) / bisectorLen };
-  // sin du demi-angle au sommet : la bissectrice et une arête sont toutes deux unitaires.
   const sinHalfAngle = Math.abs(bisector.x * ua.y - bisector.y * ua.x);
   const offset = BRACKET_GAP / sinHalfAngle;
   const tip = {
@@ -64,16 +47,11 @@ function bracketPath(corner: Point, a: Point, b: Point) {
   return { d: `M ${arm(ua)} L ${tip.x},${tip.y} L ${arm(ub)}`, tip };
 }
 
-// La pastille répond à son propre survol, en plus de celui de son hôte : c'est elle qu'on vise, et le
-// survol de la Box seule ne dit pas que le curseur est dessus. Le clic n'est pas retenu ici, il
-// remonte au board qui sélectionne la Box.
 function usePillHover() {
   const [over, setOver] = useState(false);
   return { over, bind: { "data-over": over ? "" : undefined, onPointerEnter: () => setOver(true), onPointerLeave: () => setOver(false) } };
 }
 
-// La pastille posée au centre du losange, dont chaque lettre bascule au survol de son hôte : le
-// fantôme d'onboarding, ou une vraie Box qui porte un `cta`.
 function CenterPill({ center, label, hot: hostHot, disabled = false }: { center: Point; label: string; hot?: boolean; disabled?: boolean }) {
   const { over, bind } = usePillHover();
   const hot = hostHot || over;
@@ -110,14 +88,9 @@ function CenterPill({ center, label, hot: hostHot, disabled = false }: { center:
   );
 }
 
-// Chaque pastille tire son propre délai à chaque tour : à période fixe, les Box vides d'un board
-// battraient la mesure ensemble.
 const CTA_ROLL_MIN_MS = 2400;
 const CTA_ROLL_SPREAD_MS = 3600;
 
-// La pastille d'une vraie Box qui a de quoi tenter : au repos elle fait défiler ses exemples, au
-// survol elle s'arrête sur l'action. `still` fige le défilement et retire les animations, que la
-// pause du board laisserait sinon bloquées sur une ligne invisible.
 function CtaTicker({ center, label, examples, hot: hostHot, still, disabled = false }: { center: Point; label: string; examples: string[]; hot: boolean; still: boolean; disabled?: boolean }) {
   const { over, bind } = usePillHover();
   const hot = hostHot || over;
@@ -184,20 +157,12 @@ type ContainerBlockProps = {
   container: Container;
   worldOffset: { left: number; top: number };
   selected: boolean;
-  // Mis en valeur pendant le placement d'une tile : indique le container que la tile survolée cible.
   highlighted?: boolean;
-  // Poignée de resize survolée ou en cours de drag.
   activeHandle?: ContainerHandle | null;
   resizing?: boolean;
-  // Le curseur est sur le container : sa pastille `cta` y répond, le wrapper étant transparent au pointeur.
   hovered?: boolean;
-  // Board en pause, hors écran ou en reduced motion : la pastille `cta` ne défile plus.
   still?: boolean;
-  // Activation clavier/clic du variant 'placeholder' (le rendre focusable et actionnable au clavier
-  // plutôt que de dépendre du hit-test pointeur de l'IsoGrid).
   onActivate?: () => void;
-  // Le container change de cellule sous la main de l'utilisateur, ou y revient : il glisse au même
-  // pas que ses tiles au lieu de sauter devant elles.
   glide?: boolean;
 };
 
@@ -218,10 +183,7 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
 
   const zIndex = Math.min(container.col_start, container.col_end) + Math.min(container.row_start, container.row_end) + 9000;
 
-  // Variant « placeholder » : container fantôme incitatif. La sélection (clic) est gérée par
-  // l'IsoGrid comme tout container ; l'app hôte intercepte l'id pour ouvrir son dialog de création.
   if (container.variant === "placeholder") {
-    // Le losange iso est symétrique : le centre de sa boîte englobante = son centre.
     const center = { x: bounds.width / 2, y: bounds.height / 2 };
     const placeholderLabel = container.placeholderLabel ?? "";
     return (
@@ -274,10 +236,6 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
     );
   }
 
-  // Variant « loading » : même fantôme que le placeholder, mais l'agent est en cours de création
-  // (le temps que l'espace réel soit inséré). Non cliquable (pointer-events none), spinner + label
-  // statique au centre. Réutilise les animations continues du placeholder (pointillés qui défilent,
-  // shine de la pilule).
   if (container.variant === "loading") {
     const center = { x: bounds.width / 2, y: bounds.height / 2 };
     const loadingLabel = container.placeholderLabel ?? "";
@@ -325,24 +283,14 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
     );
   }
 
-  // Space « neutre » : couleur par défaut (#fff dans les données). On la rend bien plus discrète (fond et contour
-  // atténués, proche de la douceur du placeholder d'onboarding) tout en gardant un trait plein —
-  // pour qu'elle se lise comme une space réelle/occupée, pas comme un fantôme pointillé.
   const isNeutral = container.color.toLowerCase() === "#ffffff" || container.color.toLowerCase() === "#fff";
-  // Le blanc « neutre » des données disparaîtrait sur un fond clair : on le remplace par l'encre du thème.
   const ink = isNeutral ? "var(--iso-outline-hot)" : container.color;
   const emphasized = selected || highlighted;
-  // Le contour plein passe la main au pointillé qui défile : c'est lui, et pas une opacité plus
-  // basse, qui dit que l'empreinte n'a pas encore été creusée. Les deux couches sont déjà montées,
-  // donc le passage se fait par une transition et non par un remplacement de nœud.
   const ghost = !!container.ghost && !emphasized;
 
   const dropDuration = container.dropDuration ?? 380;
   const drawing = !!container.justPlaced && container.dropStyle === "draw";
 
-  // Wrapper focusable : le visuel reste `pointer-events: none` (clic/resize passent par le hit-test
-  // racine de l'IsoGrid), mais l'élément est focusable au clavier et nommé pour les lecteurs d'écran.
-  // Actionnable seulement si l'hôte a fourni onActivate (sinon usage décoratif/read-only).
   return (
     <div
       role={onActivate ? "button" : undefined}
@@ -366,15 +314,8 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
         height: bounds.height,
         zIndex,
         pointerEvents: "none",
-        // Mise en retrait portée par le wrapper : elle emporte le losange, son remplissage et le
-        // label debout d'un coup, là où les poser un par un les ferait s'éteindre séparément.
         opacity: container.dimmed ? ISO_DIM_OPACITY : undefined,
-        // Pas pendant l'entrée : le keyframe pilote déjà l'opacité, et une transition posée dessus
-        // rejouerait un fondu au moment où il rend la main.
         transition: container.justPlaced ? undefined : `opacity ${ISO_DIM_MS}ms ease${glide ? ", left 150ms ease-out, top 150ms ease-out" : ""}`,
-        // `backwards` : sans lui le container est peint en entier pendant son délai, puis clignote au
-        // départ de l'animation. En style 'draw' le wrapper ne bouge pas : ce sont le contour et le
-        // label qui jouent, et un fade du bloc entier par-dessus écraserait le tracé.
         ...(container.justPlaced && !drawing
           ? {
               animation: `iso-container-in ${dropDuration}ms cubic-bezier(0.22, 1, 0.36, 1) ${container.dropDelay ?? 0}ms backwards`,
@@ -401,8 +342,6 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
       <path
         className={drawing ? "iso-space-shape iso-space-draw" : "iso-space-shape"}
         d={path}
-        // Normalise la longueur du losange à 1 : le dash se règle sur la forme sans mesure JS, donc
-        // sans ref ni effet, et le tracé reste correct quelle que soit la taille du container.
         pathLength={drawing ? 1 : undefined}
         style={{
           stroke: ink,
@@ -429,10 +368,6 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
       {container.label ? (
         <>
           <defs>
-            {/* La bbox d'un <text> SVG va de l'ascendante à la descendante, pas du haut au bas de
-                l'encre : une rampe étalée jusqu'à 1 dépense son dernier tiers dans le vide sous la
-                ligne de base et le fade ne se lit plus. Elle s'arrête donc à 0.72, au bas des
-                glyphes et non sous eux. */}
             <linearGradient id={labelGradientId} gradientUnits="objectBoundingBox" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor={ink} stopOpacity={1} />
               <stop offset="0.72" stopColor={ink} stopOpacity={0.2} />
@@ -455,8 +390,6 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
           </g>
         </>
       ) : null}
-      {/* Toujours monté : un démontage React ne s'anime pas, la sortie de sélection doit pouvoir
-          rejouer la transition à l'envers. */}
       <g className="iso-space-handles" data-selected={selected && !container.readOnly ? "" : undefined}>
         <path
           className="iso-space-dash"
@@ -476,8 +409,6 @@ export const ContainerBlock = memo(function ContainerBlock({ container, worldOff
               className="iso-resize-corner"
               style={{ transformOrigin, transitionDelay: `${i * 45}ms` }}
             >
-              {/* Groupe séparé pour le scale de survol : sur le même nœud il se disputerait
-                  `transform` avec l'entrée, et hériterait de son délai de cascade. */}
               <g
                 className="iso-resize-corner-hit"
                 data-handle={handle}

@@ -7,8 +7,6 @@ export const TEMPLATE_MEDIA_BUCKET = 'template-media'
 
 export type TemplateImageFolder = 'gallery' | 'og'
 
-// Covers are rendered in a plain <img>, so the stored file is exactly what the browser
-// downloads. 1200 covers a card at 2x and doubles as the OG base (1200x630).
 const TEMPLATE_IMAGE_OPTIONS: PublicImageOptions = { maxSize: 1200 }
 
 export async function uploadTemplateImageBytes(
@@ -23,9 +21,6 @@ export async function uploadTemplateImageBytes(
 const MAX_REMOTE_IMAGE_BYTES = 8 * 1024 * 1024
 const REMOTE_IMAGE_TIMEOUT_MS = 30_000
 
-// A URL is a source, not a destination: the bytes go through the same webp pipeline as an upload
-// and land in our own bucket. A generated image URL expires, and a hotlinked one can be swapped
-// for something else the day after the review.
 export async function storeTemplateImageFromUrl(
     supabase: SupabaseClient<Database>,
     imageUrl: string,

@@ -6,17 +6,11 @@ import { Switch } from '@/components/ui/switch'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-// Points an OpenRouter connection at a router of the user's own: same wire format, different host.
-// An empty value is the way back to openrouter.ai, so it is a legitimate value rather than a clear.
 export function BaseUrlField({ baseUrl, onCommit }: { baseUrl: string; onCommit: (value: string) => void }) {
-    // Its own state rather than `Boolean(baseUrl)`, which would snap the switch back off the moment
-    // the revealed field is emptied to be retyped.
     const t = useTranslations('connections.baseUrl')
     const [custom, setCustom] = useState(Boolean(baseUrl))
     const [value, setValue] = useState(baseUrl)
 
-    // A half-typed URL is not an error to report, it is an edit in progress: nothing is sent until
-    // the value could be valid.
     const commit = () => {
         const trimmed = value.trim()
         if (trimmed && !/^https?:\/\//i.test(trimmed)) return

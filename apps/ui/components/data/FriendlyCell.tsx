@@ -125,24 +125,18 @@ function ScoreBar({ value }: { value: number }) {
     )
 }
 
-// Table cells ignore max-width, so the cap lives on the content itself.
 const TEXT_CELL = 'block max-w-60 truncate'
 
 type FriendlyCellProps = {
     value: unknown
     column: FriendlyColumn
-    /** The ISO code the row gives its amounts, when it has one. */
     currency?: string
-    /** Tones an agent gave to values in the active view. */
     tones?: Record<string, BadgeTone>
-    /** How many tags fit before the rest folds into +N. */
     maxTags?: number
-    /** In the row sheet, text runs over several lines instead of being cut. */
     wrap?: boolean
     className?: string
 }
 
-/** One value, written the way a person would write it: no NULL, no ISO date, no raw JSON. */
 export function FriendlyCell({ value, column, currency, tones, maxTags = 2, wrap = false, className }: FriendlyCellProps) {
     const locale = useLocale()
     const t = useTranslations('data.cell')

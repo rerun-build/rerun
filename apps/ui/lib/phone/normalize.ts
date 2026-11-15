@@ -16,15 +16,11 @@ const KNOWN_COUNTRIES = new Set<string>(getCountries())
 
 export const isPhoneCountry = (value: string): value is CountryCode => KNOWN_COUNTRIES.has(value)
 
-// `fr-FR` names its region, `fr` alone does not: a bare language says nothing about where its
-// speaker lives, so it falls back rather than guess.
 export function countryFromLocale(locale: string | undefined): CountryCode {
     const region = locale?.split('-')[1]?.toUpperCase()
     return region && isPhoneCountry(region) ? region : FALLBACK_COUNTRY
 }
 
-// Null for anything a carrier could not route. A number typed with its own `+` prefix wins over
-// the selected country.
 export function toE164(input: string, country: CountryCode): string | null {
     const parsed = parsePhoneNumberFromString(input, country)
     return parsed?.isValid() ? parsed.number : null
@@ -32,8 +28,6 @@ export function toE164(input: string, country: CountryCode): string | null {
 
 export const countryOfE164 = (phone: string): CountryCode | undefined => parsePhoneNumberFromString(phone)?.country
 
-// The country the number itself names once it is complete, the selected one until then: a `+7`
-// number is Russian or Kazakh by its digits, not by the picker.
 export function countryOfTyped(input: string, country: CountryCode): CountryCode {
     const parsed = parsePhoneNumberFromString(input, country)
     return parsed?.isValid() && parsed.country ? parsed.country : country
@@ -45,8 +39,6 @@ export const countryFlag = (country: CountryCode) => String.fromCodePoint(...[..
 
 export const exampleNationalNumber = (country: CountryCode) => getExampleNumber(country, mobileExamples)?.formatNational() ?? ''
 
-// A national number typed without its trunk prefix (`6 12…` in France) is left unspaced by the
-// national formatter, so it borrows the spacing of its international form.
 export function formatAsTyped(input: string, country: CountryCode): string {
     const national = new AsYouType(country).input(input)
     if (/\D/.test(national)) return national
@@ -54,9 +46,6 @@ export function formatAsTyped(input: string, country: CountryCode): string {
     return new AsYouType().input(prefix + input).slice(prefix.length).trim()
 }
 
-// Calling codes are prefix-free, so a full match is the only one. Several countries share a code
-// (`+1`, `+44`, `+7`): the selected country is kept when it already dials it, otherwise the main
-// country of that code wins.
 export function countryDialling(callingCode: string, country: CountryCode): CountryCode | null {
     const countries: readonly string[] | undefined = metadata.country_calling_codes[callingCode]
     if (!countries) return null
@@ -73,7 +62,6 @@ export function readTypedPhone(input: string, country: CountryCode): { country: 
     return { country: dialled, phone: formatAsTyped(typer.getNumber()?.nationalNumber ?? '', dialled) }
 }
 
-// Digits search the calling codes, anything else the names, those starting with the query first.
 export function searchCountries(query: string): PhoneCountry[] {
     const needle = query.replace(/^\+/, '').trim().toLowerCase()
     if (!needle) return PHONE_COUNTRIES

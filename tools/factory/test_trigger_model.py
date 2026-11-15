@@ -4,7 +4,6 @@ import trigger as T
 
 
 class FakeEngine:
-    """Creates triggers without keeping the model (as the real create route does); PATCH keeps it."""
     def __init__(self, patch=True):
         self.patch, self.calls = patch, []
 

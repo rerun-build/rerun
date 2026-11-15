@@ -6,7 +6,6 @@ const ID_LENGTH = 12
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789'
 export const EXACT_READ_PROMPT = 'List every 12-character id on this page, one per line, nothing else.'
 
-// mulberry32: a small seeded generator, so a sheet can be rebuilt from its seed alone.
 function seeded(seed: number): () => number {
     let a = seed >>> 0
     return () => {

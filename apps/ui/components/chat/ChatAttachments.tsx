@@ -7,11 +7,6 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { PaperclipIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 
-/**
- * Paperclip button that opens the file dialog of the surrounding <PromptInput>.
- * Must be rendered as a child of <PromptInput>. `disabledReason` is for a composer whose
- * conversation cannot take a file at all: the button stays visible and says why.
- */
 export function AttachButton({ disabledReason }: { disabledReason?: string }) {
     const t = useTranslations('chat.attachments')
     const attachments = usePromptInputAttachments()
@@ -28,10 +23,6 @@ type ChatAttachmentsProps = {
     onRetry: (id: string) => void
 }
 
-/**
- * Renders the files attached to the composer as chips, each showing its own upload.
- * Must be rendered as a child of <PromptInput> (uses usePromptInputAttachments()).
- */
 export function ChatAttachments({ uploads, onRetry }: ChatAttachmentsProps) {
     const attachments = usePromptInputAttachments()
 

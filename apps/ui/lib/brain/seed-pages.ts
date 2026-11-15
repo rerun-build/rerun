@@ -16,16 +16,13 @@ export type SeedPagesInput = {
 const SLUG_MAX = 64
 const TITLE_MAX = 120
 const SOURCES_MAX = 50
-// What the engine's /brain/seed accepts in one call.
 const SEED_PAGES_MAX = 100
 
 const CARD_SLUGS = ['company', 'offering', 'market', 'team', 'voice', 'stack', 'priorities', 'open-questions'] as const
 type CardSlug = (typeof CARD_SLUGS)[number]
 
-// The model is told to leave a field empty, and still writes these now and then.
 const PLACEHOLDER = /^(unknown|n\/a|na|none|not specified|not available|not found|-)$/i
 
-// Only the collectors' tags count as sources, so a markdown link or a [[wikilink]] is never read as one.
 const SOURCE_TAG = /\[((?:dns|stack|site|search|registry|linkedin|google|catalog)(?::[\w.-]+)?(?:\s*[,;]\s*(?:dns|stack|site|search|registry|linkedin|google|catalog)(?::[\w.-]+)?)*)\](?!\()/g
 
 type BriefSection = 'overview' | 'offering' | 'market' | 'team' | 'presence' | 'tools' | 'questions'
@@ -82,8 +79,6 @@ export function sourceTags(text: string): string[] {
     return [...tags]
 }
 
-// Splits the brief on the level its known sections are written at, so a sub-heading inside one
-// stays with it.
 export function briefSections(brief: string): Partial<Record<BriefSection, string>> {
     const lines = brief.split('\n')
     const headings = lines.flatMap((line, index) => {
@@ -108,8 +103,6 @@ export function briefSections(brief: string): Partial<Record<BriefSection, strin
     return sections
 }
 
-// The sentences of the brief that name an entity, with their source tags, for the page of that
-// entity. A short name ("AI") would match everywhere, hence the word boundaries.
 function briefMentions(brief: string, name: string): string[] {
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const pattern = new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}($|[^\\p{L}\\p{N}])`, 'iu')
@@ -141,7 +134,6 @@ function researchNotes(text: string | undefined, heading = 'Research notes'): { 
     return { section: section(heading, text), sources: sourceTags(text) }
 }
 
-// Every name the card gave, linked when it got a page of its own.
 function entityList(names: readonly string[], kept: Entity[]): string {
     const slugs = new Map(kept.map(entity => [entity.name, entity.slug]))
     return bullets(cleanList(names).map(name => (slugs.has(name) ? `[[${slugs.get(name)}|${name}]]` : name)))
@@ -149,8 +141,6 @@ function entityList(names: readonly string[], kept: Entity[]): string {
 
 type Entity = { slug: string; name: string }
 
-// One page per name, in the order the card lists them. A name that slugs to an identity card page
-// or to an entity already kept is dropped: it would overwrite or shadow that page.
 function entities(names: readonly string[], taken: Set<string>): Entity[] {
     const kept: Entity[] = []
     for (const name of cleanList(names)) {
@@ -229,8 +219,6 @@ function priorityLines(foreman: ForemanProfile | null | undefined): { useCases: 
     return { useCases: cleanList(foremanUseCases(foreman)), needs: needs.length ? needs : legacyPains }
 }
 
-// What the seed is about to write, short enough for a card: the identity pages by name, the entity
-// pages by count.
 export function seedPagesOutline(pages: BrainSeedPage[]): { topics: string[]; products: number; competitors: number } {
     return {
         topics: pages.filter(page => page.type !== 'product' && page.type !== 'competitor').map(page => page.title),
@@ -239,16 +227,11 @@ export function seedPagesOutline(pages: BrainSeedPage[]): { topics: string[]; pr
     }
 }
 
-// The identity card the company brain starts from: one page per facet of the business card, the
-// matching part of the sourced brief appended where it says more, and one page per product and
-// competitor so agents can link to them.
 export function buildSeedPages({ card, brief, foreman, catalog }: SeedPagesInput): BrainSeedPage[] {
     const sections = briefSections(brief)
     const companyName = clean(card.company.name)
     const taken = new Set<string>(CARD_SLUGS)
     const catalogProducts = catalogEntities(catalog, taken)
-    // With the shop's own product sheets at hand, a stub page per name the synthesis gave would only
-    // compete with them.
     const products = catalogProducts.length ? [] : entities(card.offering.products, taken)
     const competitors = entities(card.market.competitors, taken)
 

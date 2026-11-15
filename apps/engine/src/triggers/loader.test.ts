@@ -12,8 +12,6 @@ const { isSafeSlug, listTriggers, markFired, readTrigger, rotateTriggerToken, se
 const agentId = 'triggeragent'
 
 describe('isSafeSlug', () => {
-    // The slug reaches the loader from a public URL, so anything that could climb out of the
-    // triggers directory has to be refused before it is turned into a path.
     it('rejects anything that is not a plain lowercase slug', () => {
         for (const slug of ['../secrets', '..', 'a/b', '/etc/passwd', 'Upper', '-leading', '', 'a'.repeat(65)]) {
             expect(isSafeSlug(slug), slug).toBe(false)
@@ -45,7 +43,6 @@ describe('trigger files', () => {
         expect(created.methods).toEqual(['POST'])
     })
 
-    // Rewriting a trigger must not hand out a new URL: every service already calling it would break.
     it('keeps the token across an update', async () => {
         const created = await writeTrigger(agentId, { name: 'Stable token', body: 'One.' })
         const updated = await writeTrigger(agentId, { name: 'Stable token', body: 'Two.' })
@@ -84,9 +81,6 @@ describe('trigger files', () => {
     })
 })
 
-// A webhook provider like Notion delivers a burst of events at once, and each fire marks the
-// trigger. Those writes used to interleave until one of them read an empty file and wrote back a
-// trigger with no token, no body and no createdAt: every later call answered 404.
 describe('concurrent writes', () => {
     it('keeps the token and the body through a burst of fires, and counts every one', async () => {
         const created = await writeTrigger(agentId, { name: 'Burst', body: 'Handle the event.' })
@@ -128,7 +122,6 @@ describe('concurrent writes', () => {
 })
 
 describe('setTriggerEnabled', () => {
-    // An archive ships a trigger off and without its token: switching it on must give it a URL.
     it('issues a token when it turns on a trigger that has none', async () => {
         await writeTrigger(agentId, { name: 'From archive', body: 'Run.', enabled: false })
         const raw = await readFile(triggerFile(agentId, 'from-archive'), 'utf8')

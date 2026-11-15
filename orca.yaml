@@ -1,8 +1,4 @@
 scripts:
-  # Same steps as paseo.json and .conductor/settings.toml: the private cloud/ when the clone works,
-  # the .env files of the main checkout, a block of 10 ports for this worktree, dependencies and
-  # @rerun/contracts. The dev servers are Quick Commands, they read their port from
-  # scripts/paseo/workspace-port.sh.
   setup: |
     #!/usr/bin/env bash
     set -eo pipefail

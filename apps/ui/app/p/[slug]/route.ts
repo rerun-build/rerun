@@ -5,10 +5,6 @@ import { createClient } from '@/supabase/server'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// The first links a coworker shared, before every link had its own host. Where a publish host is
-// configured they all lead there, which checks the access. Without one (staging, a self-hosted app
-// with no wildcard domain) there is no host to hold a gate's cookie: a public file opens through a
-// short signed URL, and any other only for a signed-in member of its workspace.
 export const dynamic = 'force-dynamic'
 
 const SIGNED_URL_TTL_SECONDS = 60

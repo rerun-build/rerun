@@ -6,15 +6,10 @@ import { foremanUseCases, type ForemanAnswers } from '@/lib/foreman/phase'
 import type { Evidence, EvidenceDraft } from './types'
 
 const TEXT_MAX = 420
-// A dossier past this size costs more to read than its tail is worth: the brain pages come first,
-// and they are where the substance is.
 const EVIDENCE_MAX = 160
 
-// Navigation between pages, not a fact about the company.
 const SKIPPED_HEADINGS = new Set(['related'])
 
-// What our own research could not find out. Read as facts, these turn "we do not know their pricing"
-// into "they have no pricing written down", and an agent gets built on our ignorance.
 const SKIPPED_PAGES = new Set(['open-questions'])
 
 function flatten(text: string): string {
@@ -26,7 +21,6 @@ function flatten(text: string): string {
         .slice(0, TEXT_MAX)
 }
 
-// A bullet is a fact of its own; a run of prose lines is one paragraph.
 function blocks(body: string): string[] {
     const found: string[] = []
     let paragraph: string[] = []
@@ -90,7 +84,6 @@ function findingText(finding: CompanyFinding): { topic: string; text: string } |
             return { topic: 'Google reviews', text: `Rated ${finding.rating} from ${finding.count} Google reviews` }
         case 'customers':
             return finding.items.length ? { topic: 'Notable customers', text: `Customers named: ${finding.items.join(', ')}` } : null
-        // The brain pages say all of these at greater length, and a colour palette is not work to hand over.
         case 'identity':
         case 'audience':
         case 'products':
@@ -108,8 +101,6 @@ export function findingsEvidence(row: CompanyFindingsRow | null): EvidenceDraft[
     })
 }
 
-// What the person told us themselves. `withProfile` is for a workspace without a brain, where the
-// quick read of the home page is all there is on what the company sells.
 export function answersEvidence(answers: ForemanAnswers, { withProfile }: { withProfile: boolean }): EvidenceDraft[] {
     const drafts: EvidenceDraft[] = []
     const add = (source: string, topic: string, text: string | undefined) => {
@@ -130,8 +121,6 @@ export function answersEvidence(answers: ForemanAnswers, { withProfile }: { with
     return drafts
 }
 
-// Sources are passed richest first: when two say the same thing the first keeps its place, and the
-// ids are only handed out once the list is final so they stay dense.
 export function buildEvidence(...sources: EvidenceDraft[][]): Evidence[] {
     const seen = new Set<string>()
     const kept: EvidenceDraft[] = []

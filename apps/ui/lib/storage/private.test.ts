@@ -4,8 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Database } from '@/app/api/database.types'
 import { downloadPrivateFile, STORAGE_BUSY_ERROR } from './private'
 
-// What Supabase Storage sends back while its own Postgres connection is refused, as seen in
-// production on 2026-11-02 at 22:30 UTC.
 const SLOW_DOWN = { statusCode: '429', error: 'too_many_connections', code: 'SlowDown', message: 'Too many connections issued to the database' }
 const NOT_FOUND = { statusCode: '404', error: 'not_found', message: 'Object not found' }
 

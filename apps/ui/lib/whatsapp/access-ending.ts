@@ -1,5 +1,3 @@
-// The message that goes out a day before a cancelled subscription, paid or still in trial, reaches
-// its end. No 'server-only', like the rest of this folder: a Trigger.dev task runs it.
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/app/api/database.types'
 import { selectCount, selectMany } from '@/supabase/supabase-helpers'
@@ -14,8 +12,6 @@ const DAY_MS = 24 * 60 * 60_000
 export const ACCESS_ENDING_LEAD_MS = DAY_MS
 const RECAP_WINDOW_MS = 30 * DAY_MS
 
-// Below this the recap reads as an accusation ("1 tasks completed"), and the message that offers a
-// first job is the honest one.
 const RECAP_MIN_TASKS = 2
 
 const BILLING_PATH = '?billing=1'
@@ -38,10 +34,6 @@ async function messageFor(supabase: SupabaseClient<Database>, workspaceId: numbe
     return accessEndsHelpMessage({ imageUrl: teamBoardUrl(team, 'offline'), path: HOME_PATH })
 }
 
-/**
- * One message per workspace and per end date, to its owner. `only` narrows the sweep to a few
- * workspaces, which is how it is tried by hand.
- */
 export async function sweepAccessEnding(supabase: SupabaseClient<Database>, now: Date, only?: number[]): Promise<AccessEndingReport> {
     const { data } = await selectMany(
         supabase,
@@ -63,8 +55,6 @@ export async function sweepAccessEnding(supabase: SupabaseClient<Database>, now:
                 continue
             }
 
-            // The end date is part of the key: a subscription cancelled again months later is owed
-            // its own message, and one resumed and cancelled within the same period is not.
             const result = await deliverWhatsApp(supabase, {
                 userId: owner.user_id,
                 workspaceId: workspace.id,

@@ -149,8 +149,6 @@ describe('prepareScript', () => {
             expect(prepared).toEqual({ script: { kind: 'offer_trial', template: CARD } })
         })
 
-        // Nobody has asked who they are yet: the mark written with the plan is what brings the
-        // welcome card back once the template is on the board.
         it('marks a workspace that installs before its profile is written', async () => {
             const state = stateAt('plan', { intent: TEMPLATE_INTENT, foreman: {} })
             await prepareScript(CTX, state, [KICKOFF])

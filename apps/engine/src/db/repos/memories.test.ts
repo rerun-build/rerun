@@ -127,7 +127,6 @@ describe('deleteMemoriesForAgent', () => {
         expect(await ftsRecall('wipe', 'note', 5)).toEqual([])
     })
 
-    // Looks wrong: the search index keeps orphan rows, only the join in ftsRecall hides them.
     it('leaves the search index rows behind', async () => {
         await indexMemory(memory('orphan', 'a', 'orphan text'), null)
         await deleteMemoriesForAgent('orphan')

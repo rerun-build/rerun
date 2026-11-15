@@ -8,9 +8,6 @@ type ContainerDrawPreviewProps = {
     end: { col: number; row: number }
     worldOffset: { left: number; top: number }
     color: string
-    // Contour qui défile, comme le bloc fantôme de l'onboarding : « emplacement en attente ».
-    // Réservé au fantôme d'un ajout par « + » : pendant un tracé à la main, c'est le pointeur qui
-    // porte déjà le mouvement.
     animated?: boolean
 }
 
@@ -20,8 +17,6 @@ export const ContainerDrawPreview = memo(function ContainerDrawPreview({ start, 
         [start.col, start.row, end.col, end.row, worldOffset]
     )
 
-    // Même traitement que le losange d'un container : le blanc « neutre » des données disparaîtrait
-    // sur un fond clair, on le remplace par l'encre du thème.
     const isNeutral = color.toLowerCase() === '#ffffff' || color.toLowerCase() === '#fff'
 
     if (bounds.width === 0 && bounds.height === 0) return null
@@ -45,7 +40,6 @@ export const ContainerDrawPreview = memo(function ContainerDrawPreview({ start, 
                 fill={isNeutral ? 'rgb(var(--iso-glint) / 0.06)' : color + '20'}
                 stroke={isNeutral ? 'var(--iso-outline-hot)' : color}
                 strokeWidth={2}
-                // 6 + 5 : une période du défilement de `iso-placeholder-dash`, qui court jusqu'à -22.
                 strokeDasharray="6 5"
                 strokeOpacity={0.8}
             />

@@ -46,70 +46,40 @@ import { EngineQuestionWidget } from './widgets/EngineQuestionWidget'
 import { planAgentShortcuts } from './widgets/agent-picks'
 import { renderForemanWidget, type AnswerWidget, type DismissWidget } from './widgets/renderForemanWidget'
 
-// De quoi laisser un message entier se dissoudre plutôt que d'en gommer la dernière ligne.
 const SCROLL_FADE = 56
 
 type ForemanChatLayerProps = {
     messages: UIMessage[]
     streaming?: boolean
-    /** Le tunnel d'onboarding, où c'est le Foreman qui parle le premier. */
     guided?: boolean
-    /**
-     * La carte d'accueil, quand elle tient le pied de la colonne. Elle possède alors tout le haut :
-     * l'orbe, la question et sa ligne sont au-dessus du cadre, et l'accueil habituel d'une
-     * conversation vide (la même orbe, le même genre de titre, quatre suggestions) raconterait la
-     * même chose une deuxième fois juste en dessous.
-     */
     intake?: ForemanIntakeController | null
-    /** Carte répondue par un anonyme : rien ne se prépare tant qu'il n'a pas de compte. */
     gated?: boolean
-    /** Ce avec quoi ils sont arrivés, nommé sur la carte d'accueil. Ne sert qu'avec `intake`. */
     arrival?: ForemanArrival | null
-    /** La conversation du serveur est arrivée. Avant, une pile vide ne veut encore rien dire. */
     restored: boolean
     error?: { kind: ChatErrorKind; message: string } | null
-    // What a widget answers with. Without it the widgets render read-only, which is what a
-    // transcript replayed outside the live column needs.
     onWidgetAnswer?: AnswerWidget
     onWidgetDismiss?: DismissWidget
-    // The widget the conversation is stopped on. An engine question is drawn after the last message;
-    // any other one is already in the stack, inside the message that called it.
     pending?: PendingWidget | null
-    /** Where a file joined to an engine question lands. Null when none could reach the foreman. */
     answerAttachments?: { target: UploadTarget; maxFileSize: number } | null
-    // What a finished build leaves to press, drawn after the last message the way an engine question is.
     nextSteps?: ForemanNextStep[]
     onSuggestion?: (text: string) => void
-    /** Writes into the composer without sending, for an empty-state action the user finishes typing. */
     onPrefill?: (text: string) => void
     onStop?: () => void
-    /** Stops one delegated task of the run being streamed. Absent, the task shows no stop. */
     onStopTask?: (taskId: string) => void
-    /** The row under an answer: copy, regenerate, thumbs. Only the foreman on the engine has it. */
     actions?: { onRegenerate: (messageId: string) => void; onRate: (messageId: string, rating: MessageFeedbackRating, messageText: string) => void; ratingOf: (messageId: string) => MessageFeedbackRating | null } | null
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     sharedFiles?: FileAccess
-    /** Ce qui porte la hauteur naturelle de la pile, que la sheet mobile mesure. */
     onStackElement?: (element: HTMLElement | null) => void
     className?: string
 }
 
-/**
- * La pile de messages du panneau. Aucun fond à elle : la colonne est posée sur la gouttière, hors de
- * la carte du board, donc un voile translucide n'a rien à laisser voir. Il éclaircissait seulement la
- * gouttière en un rectangle aux bords nets, décalé de l'en-tête et du composer qui, eux, n'en ont pas.
- * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
- * retour en bas.
- */
 export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onStopTask, actions, rawUrlFor, readFile, sharedFiles, onStackElement, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
     const priceArm = usePriceArm()
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
-    // `Conversation` possède son conteneur de défilement : on le récupère par son contexte, une
-    // fois monté, pour que le fondu sache ce qu'il reste au-dessus et en dessous.
     const conversationRef = useRef<ConversationHandle | null>(null)
     const [scroller, setScroller] = useState<HTMLElement | null>(null)
     useEffect(() => {
@@ -126,11 +96,6 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
         () => (engineHitl && engineHitlKind ? { key: engineHitl.toolCallId, summary: summarizePendingHitl(engineHitlKind, (engineHitl.input ?? {}) as Record<string, unknown>, tHitlCue), blockRef: pendingRef } : null),
         [engineHitl, engineHitlKind, pendingRef, tHitlCue]
     )
-    // `null` fait disparaître la part, `undefined` la rend à son étape d'outil normale : la question
-    // de l'engine se dessine après le dernier message et sort donc de la pile. Le littéral compte :
-    // un composant qui rend `null` laisserait, lui, un nœud vide dans la pile.
-    // Un widget du hub garde la même enveloppe qu'il attende ou non : celle qui n'apparaîtrait qu'à
-    // la fin du tour le remonterait, et la carte de plan rejouerait sa scène.
     const renderToolPart = onWidgetAnswer
         ? (part: Parameters<typeof renderForemanWidget>[0]) => {
               if (part.toolCallId === engineHitl?.toolCallId) return null
@@ -139,28 +104,15 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
               return <div ref={part.toolCallId === pending?.toolCallId ? pendingRef : undefined}>{widget}</div>
           }
         : undefined
-    // Le message qui lance l'onboarding n'a pas été écrit par l'utilisateur : il ouvre le tour côté
-    // modèle et n'a rien à faire dans la pile. Il porte pourtant parfois ce que l'utilisateur a
-    // tapé sur la landing, et ça, ça doit se lire : on retire le marqueur au lieu de jeter le
-    // message, et on ne jette que ce qu'il ne reste plus rien à afficher.
     const visible = messages.flatMap(message => {
         if (!message.parts.some(part => part.type === 'text' && isKickoffText((part as { text: string }).text))) return [message]
         const parts = message.parts.map(part => (part.type === 'text' ? { ...part, text: stripKickoff((part as { text: string }).text) } : part))
         const emptied = parts.every(part => part.type !== 'text' || !(part as { text: string }).text)
         return emptied ? [] : [{ ...message, parts } as UIMessage]
     })
-    // Toutes les lignes de raccourci d'un message tiennent dans une seule carte, posée au premier appel.
     const shortcuts = planAgentShortcuts(visible)
 
-    // Une pile vide veut dire deux choses opposées, et elles ne se rendent pas pareil. En tunnel,
-    // elle veut dire que le premier tour n'est pas encore revenu : proposer « What is running in my
-    // workspace? » à quelqu'un qui n'a pas de workspace, et le laisser cliquer par-dessus
-    // l'onboarding en cours, est un faux départ, donc c'est l'orbe qui tient l'écran. Ailleurs elle
-    // veut dire que la conversation du serveur est encore en vol, et ça se dit avec la forme de ce
-    // qui va arriver.
     const empty = visible.length === 0 && !error
-    // Pas pendant la carte : « Getting your workspace ready... » annonce un tour en vol, et là rien
-    // n'est parti. C'est l'en-tête de la carte qui tient l'écran.
     const greeting = empty && guided && !intake
     const restoring = empty && !guided && !restored
 
@@ -169,8 +121,6 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
         notice = (
             <Message from="assistant">
                 <MessageContent>
-                    {/* Pas de cellule « abonnement » : il n'y a pas de Box derrière le Foreman, donc
-                        nulle part où brancher un plan Claude ou ChatGPT. */}
                     {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} />}
                 </MessageContent>
             </Message>
@@ -179,8 +129,6 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
 
     return (
         <div className={cn('pointer-events-auto relative w-full', className)} style={{ contain: 'paint' }}>
-            {/* Posé par-dessus la pile plutôt que dedans : il la trouve vide, et en sortant il se
-                fond sur le premier message qui arrive au lieu de lui disputer la hauteur. */}
             <AnimatePresence>
                 {greeting &&
                     (gated ? (
@@ -192,19 +140,7 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
             </AnimatePresence>
 
             <Conversation className="relative z-10 h-full" contextRef={conversationRef}>
-                {/* Le fondu porte sur ce calque et pas sur la `Conversation` : le bouton de retour
-                    en bas est son frère, ancré au ras du bord où le fondu est le plus fort, et il
-                    doit rester net. Le calque ne défile pas, il couvre exactement la fenêtre du
-                    conteneur qui défile, donc le fondu reste collé aux bords du panneau. */}
                 <div className="h-full" style={{ maskImage: scrollMask, WebkitMaskImage: scrollMask }}>
-                    {/* `justify-end` et `min-h-full` : une conversation de deux messages reste collée
-                        au composer au lieu de flotter en haut du panneau. Sous `md` la sheet mesure
-                        cette pile pour prendre sa hauteur, un `min-h-full` l'empêcherait de jamais
-                        redescendre : c'est `mt-auto` qui la colle au composer, et il cède au
-                        défilement quand la pile déborde. L'accueil et l'en-tête de la carte sont
-                        posés en overlay, sans hauteur à eux : le plancher leur garde la place. Ce
-                        plancher explicite rend la pile compressible par le scroller, et la sheet
-                        qui la mesure rétrécirait d'un pixel à chaque tour : `shrink-0` l'en garde. */}
                     <ConversationContent
                         scrollClassName="max-md:flex max-md:flex-col md:[container-type:size]"
                         className={cn('justify-end gap-4 px-3 pb-5 max-md:mt-auto max-md:shrink-0 md:min-h-full', guided ? 'pt-12' : 'pt-24', intake || greeting ? 'max-md:min-h-72' : 'max-md:min-h-36')}
@@ -252,9 +188,6 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                                 <ForemanNextSteps steps={nextSteps} />
                             </motion.div>
                         )}
-                        {/* Pendant l'accueil, le premier tour n'est souvent pas encore parti (le
-                            workspace se prépare) : le loader se montre quand même, sinon l'écran a
-                            l'air figé jusqu'au premier token. */}
                         {(streaming || (greeting && !gated)) && <ChatActivityLoader message={visible.at(-1)} indicator={<ForemanActivityIndicator />} />}
                         {notice}
                     </ConversationContent>
@@ -265,12 +198,6 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
     )
 }
 
-/**
- * Ce qui tient la pile pendant qu'on va chercher la conversation sur le hub. Posé dans le flux et
- * non en overlay : la pile est collée au composer, donc les bulles fantômes occupent exactement la
- * place où le transcript va atterrir, et rien ne saute à son arrivée. Il se démonte d'un coup,
- * l'entrée en fondu de `FloatingMessage` porte le relais.
- */
 function ForemanChatSkeleton() {
     return (
         <div aria-hidden className="flex flex-col gap-4">

@@ -104,14 +104,10 @@ export async function readSchedule(agentId: string, slug: string): Promise<Sched
     return toSchedule(slug, await readFile(scheduleFile(agentId, slug), 'utf8'))
 }
 
-// Every read-modify-write of one schedule file goes through here, so the scheduler marking it fired
-// and the agent editing it can never read the file while the other is rewriting it.
 function withScheduleLock<T>(agentId: string, slug: string, fn: () => Promise<T>): Promise<T> {
     return withKeyedLock(`schedule:${agentId}:${slug}`, fn)
 }
 
-// A file with no front matter was not written by `serialize`: re-serializing it would turn it into
-// an enabled schedule with no cron and no body.
 async function readScheduleForUpdate(agentId: string, slug: string): Promise<Schedule> {
     const raw = await readFile(scheduleFile(agentId, slug), 'utf8')
     if (!matter.test(raw)) throw new Error(`schedule ${slug} has no front matter, refusing to rewrite it`)
@@ -131,8 +127,6 @@ export async function writeSchedule(agentId: string, input: ScheduleInput, autho
             runAt: input.runAt ?? existing?.runAt ?? null,
             timezone: input.timezone ?? existing?.timezone ?? null,
             lastRunAt: existing?.lastRunAt ?? null,
-            // `!== undefined` rather than `??`: null is a value here, the one that says "follow the
-            // agent", and coalescing would silently keep the pair the caller just cleared.
             connectionId: input.connectionId !== undefined ? input.connectionId : (existing?.connectionId ?? null),
             provider: input.provider !== undefined ? input.provider : (existing?.provider ?? null),
             model: input.model !== undefined ? input.model : (existing?.model ?? null),
@@ -143,17 +137,12 @@ export async function writeSchedule(agentId: string, input: ScheduleInput, autho
         await writeFileAtomic(scheduleFile(agentId, slug), serialize(next))
         return { schedule: next, created: !existing }
     })
-    // Every author lands here (the API, the Foreman, the agent's own tool), so this is the one place
-    // that can tell the hub a first schedule exists. Fire and forget, like every notification.
-    // `authorId` is the member whose chat message led the agent to create it, when there was one.
     if (created) void sendNotification({ event: 'agent.schedule.created', kind: 'info', agentId, message: schedule.name, metadata: { scheduleSlug: slug, ...authorMetadata(author) } })
     return schedule
 }
 
 export type SchedulePatch = Partial<Pick<Schedule, 'name' | 'description' | 'body' | 'cron' | 'runAt' | 'timezone' | 'enabled' | 'connectionId' | 'provider' | 'model'>>
 
-// Edits the file at its own slug. `name` is only the label: the slug, and with it the file, the run
-// history and the hub's references, stay what they were when the schedule was created.
 export async function updateScheduleAt(agentId: string, slug: string, patch: SchedulePatch): Promise<Schedule> {
     return withScheduleLock(agentId, slug, async () => {
         const current = await readScheduleForUpdate(agentId, slug)
@@ -189,8 +178,6 @@ export async function markFired(agentId: string, slug: string, firedAt: string):
     })
 }
 
-// Back to "runs whatever the agent runs". Written at the schedule's own slug for the same reason
-// as `updateScheduleAt`.
 export async function clearScheduleModel(agentId: string, slug: string): Promise<void> {
     if (!scheduleExists(agentId, slug)) return
     await withScheduleLock(agentId, slug, async () => {
@@ -202,9 +189,6 @@ export async function clearScheduleModel(agentId: string, slug: string): Promise
     })
 }
 
-// Written at the schedule's own slug for the same reason as `updateScheduleAt`: `writeSchedule`
-// re-derives the slug from the name, so a renamed schedule would land in a second file and the
-// original would stay behind, still enabled.
 export async function setScheduleEnabled(agentId: string, slug: string, enabled: boolean, baselineAt?: string): Promise<void> {
     if (!scheduleExists(agentId, slug)) return
     await withScheduleLock(agentId, slug, async () => {

@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { repairNullToolInput } from './tool-repair.js'
 
-// Stands for any tool schema with an optional field, which `.optional()` alone rejects a null for.
 const schema = z.object({ path: z.string(), encoding: z.string().optional() })
 
 describe('repairNullToolInput', () => {

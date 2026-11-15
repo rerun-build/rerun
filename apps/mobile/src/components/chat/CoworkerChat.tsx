@@ -32,8 +32,6 @@ function coworkerOf(agentId: string, view: AgentView | null): ChatCoworker {
 
 const tabOf = (conversation: Conversation): ChatTab | null => (conversation.id ? { id: conversation.id, title: conversation.title, running: conversation.status === 'working', empty: false, status: conversation.status, unseen: conversation.unseen, ask: conversation.ask, automationName: conversation.automationName, updatedAt: conversation.updatedAt, kind: conversation.kind } : null)
 
-// A coworker's conversations, on the hub. `sessionId` is null for a new one: the first send creates it,
-// and the page keeps its chat while the route learns the new id.
 function startedByOf(conversation: Conversation | undefined): StartedBy | null {
     return conversation?.originAgentName ? { agentId: conversation.originAgentId ?? null, name: conversation.originAgentName } : null
 }
@@ -42,7 +40,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
     const theme = useTheme()
     const back = useChatBack()
     const { session, me } = useAuth()
-    // The header opens on what the last visit read: name, tabs and model are there before the hub answers.
     const [kept] = useState(() => (me ? readCoworkerScreen(me.workspace.id, agentId) : null))
     const [view, setView] = useState<AgentView | null>(kept?.view ?? null)
     const [models, setModels] = useState<AgentModels | null>(kept?.models ?? null)
@@ -57,7 +54,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
 
-    // Read again when the model sheet closes on a new pick, or the details come back on a new name.
     useFocusEffect(
         useCallback(() => {
             if (!accessToken || !workspaceId) return
@@ -76,8 +72,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
         }, [accessToken, workspaceId, agentId])
     )
 
-    // On screen is read: a finished run leaves Unread once its conversation is the open one. Only an
-    // Unread one: the inbox's read also sends a waiting conversation back to idle.
     const readId = activeId === GENERAL_PAGE_ID ? generalId : activeId
     const activeUnseen = !!readId && conversations.some(conversation => conversation.id === readId && stateOf(conversation) === 'new')
     useEffect(() => {
@@ -98,7 +92,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
         router.setParams({ id: 'new' })
     }
 
-    // A pick in the header ticks on the tap; a swipe has already ticked as it crossed into the page.
     const select = (id: string) => {
         Haptics.selectionAsync()
         open(id)
@@ -109,7 +102,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
         showDraft()
     }
 
-    // Born from its first send: the page stays and becomes a tab, and a fresh draft ends the row.
     const onSessionCreated = useCallback(
         (id: string) => {
             setBornKeys(known => ({ ...known, [id]: draftKey }))
@@ -122,8 +114,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
         [draftKey, openChat, loadConversations]
     )
 
-    // General born on its own page: it keeps that page, and stays the active one under its own id
-    // once the list names it.
     const onGeneralCreated = useCallback(
         (id: string) => {
             setBornKeys(known => ({ ...known, [id]: GENERAL_DRAFT_KEY }))
@@ -148,7 +138,6 @@ export function CoworkerChat({ agentId, sessionId }: { agentId: string; sessionI
     }
 
     const byId = new Map(conversations.map(conversation => [conversation.id, conversation]))
-    // One chip per page, even before the hub names the conversation, so the strip lines up with the pager.
     const tabs = pages.slice(0, -1).map((page): ChatTab => {
         const conversation = page.sessionId ? byId.get(page.sessionId) : undefined
         const tab = conversation && tabOf(conversation)

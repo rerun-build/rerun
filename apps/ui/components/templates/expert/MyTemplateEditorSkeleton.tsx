@@ -3,9 +3,6 @@
 import { Card, CardAction, CardContent, CardHeader, CardTitle, ScrollFade } from '@rerun/ui/primitives'
 import { Skeleton } from '@/components/ui/skeleton'
 
-// The placeholder for MyTemplateEditor, built on the same Cards and the same scroll container as the
-// sections it stands in for: the geometry comes from the real components rather than from numbers
-// copied by hand, so nothing shifts when the document lands.
 export function MyTemplateEditorSkeleton() {
     return (
         <div className="flex min-h-0 flex-1 flex-col">

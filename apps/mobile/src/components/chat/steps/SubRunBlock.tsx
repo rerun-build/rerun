@@ -17,10 +17,6 @@ export function subRunStatus(progress: SubRunProgress, state: string | undefined
     return progress.tasks.every(task => task.status === 'error') || toolStatusOf(state) === 'error' ? 'error' : 'done'
 }
 
-/**
- * Coworkers working for this one: delegated tasks, a coworker called, a team being built. While they
- * run the block stands open on the tree of tasks; once settled it is one line among the steps.
- */
 export function SubRunBlock({ toolName, state, errorText, progress: reported, onStopTask }: SubRunBlockProps) {
     const tTools = useTranslations('tools')
     const tSubRuns = useTranslations('subRuns')

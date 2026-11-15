@@ -41,8 +41,6 @@ export function SkillProposalBlock({ agentId, proposal, pending, pinned, onDecid
     )
 }
 
-// The labs draw this card with no session behind it, where `useCanManageAgent` would throw: there
-// the decision stays open, as it was before access by Box.
 function useCanDecide(agentId: string | undefined): boolean {
     const session = useOptionalSession()
     const space = useBoardStore(state => {

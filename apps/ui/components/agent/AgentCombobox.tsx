@@ -35,7 +35,6 @@ export function AgentCombobox({ leadingGroup, exclude, ...props }: SingleProps |
 
     const groups = useMemo<ComboboxGroup[]>(() => {
         const bySpace = new Map<string, IsoAgent[]>()
-        // Un agent éteint ne peut être la cible de rien : le proposer ne mènerait qu'à un refus.
         for (const agent of agents.filter(a => !a.disabledAt && !exclude?.includes(a.id))) {
             const list = bySpace.get(agent.spaceId)
             if (list) list.push(agent)

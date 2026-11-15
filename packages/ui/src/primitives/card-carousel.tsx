@@ -11,10 +11,6 @@ const ARROW_CLASS =
     'absolute top-1/2 z-30 flex size-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-background text-foreground/70 shadow-[0_1px_2px_rgb(16_24_40/0.08),0_6px_16px_-6px_rgb(16_24_40/0.25)] ring-1 ring-foreground/10 transition hover:text-foreground hover:shadow-[0_1px_2px_rgb(16_24_40/0.1),0_10px_22px_-8px_rgb(16_24_40/0.35)]'
 const DEFAULT_ITEM_CLASS = 'w-[85%] shrink-0 snap-center sm:w-[calc((100%-1.5rem)/2)] lg:w-[calc((100%-3rem)/3)]'
 
-// Snapping row of cards with edge fades and round arrows that only show in the directions you can
-// still scroll. `fadeClassName` is the gradient start and must match the surface behind the row.
-// The scroller bleeds past the row (1rem on the sides, 2.5rem below where the shadows fall) so its
-// overflow does not clip the cards' shadows.
 export function CardCarousel({
     label,
     itemClassName = DEFAULT_ITEM_CLASS,
@@ -27,7 +23,6 @@ export function CardCarousel({
     itemClassName?: string
     fadeClassName?: string
     className?: string
-    /** Pagination dots under the row, one per card. */
     dots?: boolean
     children: ReactNode
 }) {
@@ -38,7 +33,6 @@ export function CardCarousel({
     const [active, setActive] = useState(0)
     const count = Children.count(children)
 
-    // One card plus the gap: the distance an arrow travels, and the unit the dots index on.
     function step(el: HTMLDivElement): number {
         const card = el.firstElementChild as HTMLElement | null
         const gap = parseFloat(getComputedStyle(el).columnGap) || 0
@@ -65,9 +59,6 @@ export function CardCarousel({
         el.scrollBy({ left: direction * step(el), behavior: 'smooth' })
     }
 
-    // Dots land on the snap point itself rather than on `index * step`: with centred items the two
-    // are a half-card apart, and the browser would smooth-scroll to the wrong place and then yank
-    // the row back when it re-snaps. Both ends stay clamped by the scroller, as snapping would.
     function scrollToCard(index: number) {
         const el = scrollerRef.current
         if (!el) return

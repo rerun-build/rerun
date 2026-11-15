@@ -20,8 +20,6 @@ export type ExploreInput = {
 
 export type CollectorCost = { firecrawlCredits?: number; usd?: number; inputTokens?: number; outputTokens?: number }
 
-// `highlights` is what a person reads in the lab; `data` is the raw material the synthesis and,
-// later, the brain get.
 export type CollectorOutput<T> = { data: T; highlights: string[]; cost?: CollectorCost }
 
 export type CollectorData = {
@@ -39,7 +37,6 @@ export type CollectorData = {
 
 export type CollectorContext = {
     input: ExploreInput
-    // Resolves to null when that collector was turned off, skipped or failed.
     need<K extends CollectorId>(id: K): Promise<CollectorData[K] | null>
 }
 
@@ -49,6 +46,4 @@ export type Collector<K extends CollectorId> = {
     run(ctx: CollectorContext): Promise<CollectorOutput<CollectorData[K]>>
 }
 
-// Thrown when a collector has nothing to work from (no name typed, no profile found): shown as
-// skipped with its reason rather than as a failure.
 export class CollectorSkipped extends Error {}

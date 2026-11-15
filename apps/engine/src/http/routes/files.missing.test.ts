@@ -21,8 +21,6 @@ beforeAll(async () => {
 })
 
 describe('reading a file that is not there', () => {
-    // The UI asks every agent for .rerun/services.json on load, and an agent with no connector
-    // installed simply has none. That has to read as "absent", not as a server fault.
     it('answers 404, not 500', async () => {
         const res = await app.request(`/agents/${id}/files/read?path=${encodeURIComponent('.rerun/services.json')}`)
         expect(res.status).toBe(404)

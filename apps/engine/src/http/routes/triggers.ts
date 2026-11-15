@@ -59,8 +59,6 @@ triggerRoutes.post('/:slug/rotate', async c => {
     return c.json(await rotateTriggerToken(agentId, slug))
 })
 
-// Reached from the public URL through the UI proxy. Every rejection that is not a method
-// mismatch answers 404, so an anonymous caller cannot probe which triggers exist.
 triggerRoutes.post('/:slug/fire', async c => {
     const agentId = c.req.param('id')!
     const slug = c.req.param('slug')

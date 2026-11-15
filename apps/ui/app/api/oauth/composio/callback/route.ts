@@ -16,8 +16,6 @@ const ACTIVE_POLL_DELAY_MS = 1000
 
 type CallbackResult = { ok: true; accountLabel?: string; claim?: string } | { ok: false; error: string }
 
-// `key` lets a page holding several Connect buttons of one app tell which account just finished.
-// It is absent when the context could not be read, so every listener still hears that failure.
 function htmlResult(result: CallbackResult, key?: string): NextResponse {
     const target = key ? { key } : {}
     return oauthPopupResponse({
@@ -27,10 +25,6 @@ function htmlResult(result: CallbackResult, key?: string): NextResponse {
     })
 }
 
-// Composio redirect target after the user completes the hosted sign-in. The query params are
-// NOT trusted for authorization: the account id comes from the /start cookie, and the server
-// re-fetches it from Composio to prove it belongs to the expected user_id + auth config and
-// is ACTIVE, before flipping the registry entry. No engine token — Composio holds it.
 export async function GET(req: Request) {
     const url = new URL(req.url)
     const state = url.searchParams.get('state')
@@ -39,9 +33,7 @@ export async function GET(req: Request) {
     const cookieName = COMPOSIO_COOKIE_PREFIX + state
     const raw = (await cookies()).get(cookieName)?.value
 
-    // Only known once the context is decoded, and `finish` is what every exit path goes through.
     let mobile = false
-    // The desktop app's channel, when it started the sign-in: where the browser goes back to.
     let desktop: DesktopShellChannel | undefined
     let key: string | undefined
 
@@ -53,7 +45,6 @@ export async function GET(req: Request) {
 
     if (!raw) return finish({ ok: false, error: 'Session expired, please retry' })
 
-    // Decoded before the status check below so a refused sign-in also lands back in the app.
     let ctx: ComposioOAuthContext
     try {
         ctx = decodeComposioContext(raw)
@@ -74,12 +65,10 @@ export async function GET(req: Request) {
         const grant = callbackGrant(ctx)
         desktop = grant?.desktop
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
-        // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
         const userId = composioUserId(ctx.agentId, parseServiceRegistryKey(ctx.key).instanceId)
         const method = (await loadManifest(ctx.key))?.authMethods.find(m => m.kind === 'composio' && m.composio)
         if (!method?.composio) return finish({ ok: false, error: `${ctx.key} has no Composio connection to set up.` })
-        // Not re-resolved here: another server instance could pick or create a different config.
         const authConfigId = method.composio.authConfigId || ctx.authConfigId
         let account = await getConnectedAccount(ctx.connectedAccountId)
         for (let attempt = 1; account.status !== 'ACTIVE' && account.status !== 'FAILED' && attempt < ACTIVE_POLL_ATTEMPTS; attempt++) {

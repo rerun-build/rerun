@@ -10,15 +10,11 @@ import { radius, spacing, withAlpha } from '@/theme/tokens'
 
 export type ErrorCardActions = {
     onRetry: () => void
-    // Sign in again on the connection the coworker runs on.
     onReconnect?: () => void
     onSwitchModel?: () => void
     onConnect?: (provider: 'claude' | 'codex') => void
 }
 
-// The web's ProviderErrorNotice and BudgetExhaustedNotice, without what the app cannot sell: a
-// refusal that repeats on every send is offered its fix instead of a retry. A fix the screen does not
-// offer falls back to Try again.
 export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConnect }: { message: string } & ErrorCardActions) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.error')
@@ -27,7 +23,6 @@ export function ErrorCard({ message, onRetry, onReconnect, onSwitchModel, onConn
     const budget = kind === 'budget' && onConnect
     const reconnect = kind === 'unauthorized' && onReconnect
     const switchable = (kind === 'usage_limit' || kind === 'provider_error' || kind === 'context_window' || kind === 'overloaded' || kind === 'generic') && onSwitchModel
-    // A conversation the coworker cannot reach answers every resend the same way.
     const retry = !budget && !reconnect && kind !== 'session_gone' && (kind === 'overloaded' || kind === 'generic' || kind === 'interrupted' || kind === 'run_in_flight' || kind === 'thinking_replay' || !switchable)
 
     return (

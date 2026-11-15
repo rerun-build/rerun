@@ -18,9 +18,7 @@ const LABEL_CLEARING = 'radial-gradient(ellipse 20rem 8rem at 50% 50%, transpare
 
 type DesktopScreenLoaderProps = {
     label?: string
-    // The corner preview is a few hundred pixels wide: smaller cells keep it a grid.
     compact?: boolean
-    // The screen has arrived and fades in over the loader, which fades out under it.
     fading?: boolean
     className?: string
 }
@@ -38,7 +36,6 @@ export function DesktopScreenLoader({ label, compact = false, fading = false, cl
 
         const cell = compact ? COMPACT_CELL : CELL
         const pitch = cell.size + cell.gap
-        // Live: it follows the theme without a listener.
         const style = getComputedStyle(canvas)
         let width = 0
         let height = 0
@@ -53,7 +50,6 @@ export function DesktopScreenLoader({ label, compact = false, fading = false, cl
                     steps[col * rows + row] = Math.round(sweepIntensity(col, row, seconds, cols, rows) * OPACITY_STEPS)
                 }
             }
-            // The grid is centred and bleeds past the edges, which cut the outer cells.
             const left = (width - (cols * pitch - cell.gap)) / 2
             const top = (height - (rows * pitch - cell.gap)) / 2
             context.clearRect(0, 0, width, height)

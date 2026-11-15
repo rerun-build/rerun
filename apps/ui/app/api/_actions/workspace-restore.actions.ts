@@ -10,8 +10,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { failure, type ActionFailure } from '@/lib/i18n/action-error'
 
-// `workspace_archives` is service-role only: the restoring banner learns its stage through here,
-// and never sees the archive row itself.
 export async function getWorkspaceRestoreStageAction(): Promise<RestoreStage | null> {
     const workspaceId = await requireWorkspaceId()
     const supabase = createServiceRoleClient()
@@ -27,16 +25,11 @@ export async function getWorkspaceRestoreStageAction(): Promise<RestoreStage | n
 
 const REQUEST_NOTE_MAX = 1000
 
-// `restoring`: approved, its archive on the way back to a machine. The other three are a sandbox
-// still locked: nothing asked yet, a request waiting on us, or one we declined.
 export type SandboxArchiveState = {
     status: 'none' | 'requested' | 'rejected' | 'restoring'
-    // Null once the archive has expired and been purged: the lock is all that is left.
     keptUntil: string | null
 }
 
-// The one window the client has on a sandbox's archive row. Null for anything that is not a
-// sandbox put away: a workspace, a live sandbox, a restore that has landed.
 export async function getSandboxArchiveStateAction(): Promise<SandboxArchiveState | null> {
     const workspaceId = await requireWorkspaceId()
     const supabase = createServiceRoleClient()

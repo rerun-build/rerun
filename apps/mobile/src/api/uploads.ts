@@ -20,8 +20,6 @@ async function postBytes(caller: Caller, path: string, body: Blob): Promise<unkn
     return payload
 }
 
-// A photo goes to the coworker's own folder on its machine, under chat-uploads like the web's, and the
-// message names its path.
 export async function uploadChatFile(caller: Caller, agentId: string, uri: string, fileName: string): Promise<string> {
     const blob = await bytesOf(uri)
     const name = uniqueAttachmentName(fileName, randomToken())
@@ -30,8 +28,6 @@ export async function uploadChatFile(caller: Caller, agentId: string, uri: strin
     return path
 }
 
-// A voice message's audio lands next to the conversation's other uploads, where the bubble plays it
-// back from, on the phone as on the web.
 export async function uploadVoiceRecording(caller: Caller, owner: FileOwner, uri: string): Promise<string> {
     const blob = await bytesOf(uri)
     const name = `${Date.now().toString(36)}-${randomToken()}-voice.m4a`
@@ -41,7 +37,6 @@ export async function uploadVoiceRecording(caller: Caller, owner: FileOwner, uri
     return path
 }
 
-// The hub's transcription, the one the web's voice messages use. iOS records AAC in an m4a file.
 export async function transcribeRecording(caller: Caller, uri: string): Promise<string> {
     const { text } = (await postBytes(caller, '/api/voice/transcribe?format=m4a', await bytesOf(uri))) as { text: string }
     return text

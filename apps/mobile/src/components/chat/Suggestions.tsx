@@ -8,7 +8,6 @@ import { spacing } from '@/theme/tokens'
 export function Suggestions({ items, onPick }: { items: string[]; onPick: (text: string) => void }) {
     const theme = useTheme()
     return (
-        // The glass shadow spreads far past the chips; a clipping scroll view cuts it into a hard-edged band.
         <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" style={{ overflow: 'visible' }} contentContainerStyle={{ gap: spacing.sm, paddingHorizontal: spacing.lg }}>
             {items.map(item => (
                 <Host key={item} matchContents colorScheme={theme.scheme}>

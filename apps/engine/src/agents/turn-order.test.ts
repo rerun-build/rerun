@@ -20,8 +20,6 @@ describe('the order of a turn', () => {
         expect(turnOrder(provider, model)).toBe('call-first')
     })
 
-    // A note a Claude writes right before a call comes back from the API as a thinking block the
-    // chat folds away: its message has to come after the card, as the text that ends the turn.
     it.each([
         ['claude', 'claude-opus-5-5'],
         ['anthropic', 'claude-sonnet-5'],

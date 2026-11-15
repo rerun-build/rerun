@@ -1,9 +1,3 @@
-// End-to-end check of the admin "Magic prefill" buttons: takes a real template row, builds the
-// same brief the form sends, and asserts the three generators return copy the editor and the
-// public page can actually render (markdown subset, length caps, no dashes, vision-grounded alt).
-//
-// Run: ../engine/node_modules/.bin/tsx --env-file=.env scripts/verify-template-prefill.mts [slug]
-
 import { TEMPLATE_CATEGORIES } from '@rerun/contracts'
 import { selectMany } from '@rerun/db/helpers'
 import { loadServiceCatalog } from '../lib/templates/catalog'
@@ -33,7 +27,6 @@ const supabase = createServiceRoleClient()
 const { data: rows, error } = await selectMany(supabase, 'templates', TEMPLATE_DOC_COLUMNS, slug ? { slug } : {}, { column: 'created_at', ascending: false }, 20)
 if (error) throw error
 const documents = (rows ?? []).map(row => rowToDocument(row as TemplateRow))
-// Prefer a template that carries both agents and an image, so the vision step is exercised.
 const document = documents.find(doc => doc.agents.length > 0 && doc.gallery.length > 0) ?? documents[0]
 if (!document) throw new Error('No template found to verify against.')
 const brief = toTemplateBrief(document)

@@ -1,9 +1,5 @@
 import { CONSENT_ATTRIBUTE, CONSENT_COOKIE, CONSENT_VERSION, EEA_UK_TIME_ZONES } from '@rerun/contracts'
 
-// An inline script run before the first paint. It writes nothing, it only puts `data-consent` on
-// <html> so the scripts that follow it in document order,
-// ExperimentBootstrap first, know whether they are allowed to write a cookie, without any of them
-// having to carry its own copy of the time zone list.
 const SCRIPT = `try{
 var c=${JSON.stringify(CONSENT_COOKIE)},v=${JSON.stringify(CONSENT_VERSION)},z=${JSON.stringify(EEA_UK_TIME_ZONES)},s='pending';
 var m=document.cookie.match(new RegExp('(?:^|; )'+c+'=([^;]*)'));

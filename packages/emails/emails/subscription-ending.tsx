@@ -9,27 +9,16 @@ import { text } from "../theme";
 
 export interface SubscriptionEndingProps {
   workspaceName: string | null;
-  /** "12 March", preformatted. */
   endsLabel: string;
   daysLeft: number;
-  /** Until when the paused workspace is saved, "10 June". Preformatted. */
   keptUntilLabel: string;
   billingUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
 }
 
-/**
- * One component for the whole countdown. Only the heading and the preview change with `daysLeft`:
- * the fact being reported is the same one three times, and rewriting it each time is how three
- * reminders end up contradicting each other.
- *
- * It says the workspace is paused rather than deleted, because that is exactly what happens: its
- * machine is archived and the archive kept until `keptUntilLabel`, which a new subscription restores.
- */
 export default function SubscriptionEnding({
   workspaceName,
   endsLabel,

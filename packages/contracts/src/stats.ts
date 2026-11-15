@@ -26,7 +26,6 @@ export type StatsTimeRange = z.infer<typeof statsTimeRangeSchema>
 export const statsRunStatusFilterSchema = z.enum(['all', 'done', 'error', 'cancelled', 'running'])
 export type StatsRunStatusFilter = z.infer<typeof statsRunStatusFilterSchema>
 
-// Fenêtre de l'agrégat d'usage (`/agents/:id/usage`), plus courte que celle des stats: pas de 90d.
 export const usageTimeRangeSchema = z.enum(['24h', '7d', '30d', 'all'])
 export type UsageTimeRange = z.infer<typeof usageTimeRangeSchema>
 

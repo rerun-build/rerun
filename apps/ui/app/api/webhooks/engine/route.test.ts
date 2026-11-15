@@ -23,11 +23,9 @@ vi.mock('@rerun/cloud/engines', () => ({ claimPoolEngine: vi.fn() }))
 const afterTasks = vi.hoisted(() => [] as Promise<unknown>[])
 vi.mock('next/server', async importOriginal => ({ ...(await importOriginal<typeof import('next/server')>()), after: (task: () => Promise<unknown>) => void afterTasks.push(task()) }))
 vi.mock('@/lib/ai/generate-run-title', () => ({ generateRunTitle: vi.fn() }))
-// The session is retitled after the response, so a test reads it once those tasks settled.
 const afterResponse = () => Promise.all(afterTasks.splice(0))
 vi.mock('@/app/api/_services/capacity.service', () => ({ assertEngineEntitlement: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ listConnections: vi.fn(), listSchedules: vi.fn() }))
-// Notification emails are paused in production; the incident tests describe what leaves once they resume.
 const emailFlags = vi.hoisted(() => ({ paused: false }))
 vi.mock('@/lib/notifications/prefs', async importOriginal => ({
     ...(await importOriginal<typeof import('@/lib/notifications/prefs')>()),
@@ -217,7 +215,6 @@ describe('POST /api/webhooks/engine', () => {
             expect(ensureSessionRow).toHaveBeenCalledWith('agent-own', 'engine-session', 'Scheduled run', expect.objectContaining({ originAgentId: null }))
         })
 
-        // A workspace of several members used to credit every run to its owner.
         it('credits a finished chat run to the member who sent the message', async () => {
             sandbox = false
             vi.mocked(resolveWorkspaceMemberEmail).mockResolvedValueOnce('member@rerun.test')

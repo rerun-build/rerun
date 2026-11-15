@@ -4,8 +4,6 @@ import { MODEL_LOGOS, type ModelLogoSlug } from './model-logos'
 
 type GlyphProps = { className?: string }
 
-// Built once at module load, never inside a render: a component created per render is a new type
-// every time, so React unmounts and remounts the glyph instead of keeping it.
 export const MODEL_ICONS = Object.fromEntries(
     Object.entries(MODEL_LOGOS).map(([slug, logo]) => [
         slug,

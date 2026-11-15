@@ -1,5 +1,3 @@
-"""publish.py: commit the worktree, push factory/job-<issue> to origin, open the pull request (rerun#71 C6e).
-open_pr(title, head, base, body) is passed in; this module reads no token and knows no GitHub."""
 import subprocess
 
 
@@ -14,7 +12,6 @@ def _outside(worktree, paths):
 
 
 def body(job_ref, receipts):
-    """PR body: `Job: repo#n, chunk cA, cB` and one receipt line per chunk from its testrun result ({chunk: result})."""
     ids = sorted(receipts)
     lines = ["Job: %s, chunk %s" % (job_ref, ", ".join(ids))]
     for c in ids:
@@ -24,8 +21,6 @@ def body(job_ref, receipts):
 
 
 def publish(worktree, issue, title, base, open_pr, paths, remote="origin", body=""):
-    """Commit only `paths` on factory/job-<issue>, push it, call open_pr. A changed or new file outside
-    `paths` raises ValueError before anything is committed or pushed. Returns the pushed commit sha."""
     head = "factory/job-%s" % issue
     extra = _outside(worktree, paths)
     if extra:

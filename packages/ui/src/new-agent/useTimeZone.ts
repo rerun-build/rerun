@@ -4,8 +4,6 @@ import { useSyncExternalStore } from 'react'
 
 const subscribe = () => () => {}
 
-// The browser's time zone, which every hour of the planner is told in. Null on the server, whose
-// own zone would say nothing about the user's.
 export function useTimeZone(): string | null {
     return useSyncExternalStore(
         subscribe,

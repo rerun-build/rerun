@@ -10,8 +10,6 @@ import { cn } from '@/lib/utils'
 import type { AgentSharePlan } from '@/lib/agents/share-create'
 import { useLocale, useTranslations } from 'next-intl'
 
-// Each switch is priced with what it would actually carry, so the decision is made on numbers
-// rather than on a word. A bucket that holds nothing says so and switches off.
 function bucketValues(bucket: ShareBucket, locale: string) {
     return { count: bucket.count, size: formatBytes(bucket.bytes, locale) }
 }
@@ -33,8 +31,6 @@ export function ShareAgentOptions({ plan, include, onChange, disabled }: { plan:
         {
             key: 'database' as const,
             label: t('database'),
-            // The one bucket nothing scanned: it is binary, so the secret patterns never ran on it.
-            // Saying it here is the only honest way to ask for the switch.
             helper: database.count === 0 ? t('databaseEmpty') : t('databaseSize', { size: formatBytes(database.bytes, locale) }),
             value: include.database,
         },

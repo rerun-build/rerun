@@ -23,7 +23,6 @@ function noise(x: number, y: number, z: number): number {
     return mix(slice(z0), slice(z0 + 1), tz)
 }
 
-// Neighbours never share a shade: a cluster reads as cells, not as one blob.
 const shade = (col: number, row: number) => 0.45 + 0.55 * hash(col, row, 7)
 
 const clusters = (col: number, row: number, seconds: number) => smoothstep(0.56, 0.8, noise(col / 4.5 + seconds * 0.12, row / 4.5 - seconds * 0.05, seconds * 0.2))
@@ -32,9 +31,6 @@ const SWEEP_PERIOD_SECONDS = 3.2
 const SWEEP_BAND = 0.14
 const CLUSTER_STRENGTH = 0.3
 
-// How lit a cell is, from 0 to 1: a diagonal wave crossing the grid, over faint drifting clusters.
-// A pure function of the cell and the clock, with no state of its own: the loader is unmounted and
-// mounted again between two phases of a connection, and has to come back on the very frame it left.
 export function sweepIntensity(col: number, row: number, seconds: number, cols: number, rows: number): number {
     const along = (col + row) / (cols + rows)
     const front = ((seconds / SWEEP_PERIOD_SECONDS) % 1) * (1 + 2 * SWEEP_BAND) - SWEEP_BAND

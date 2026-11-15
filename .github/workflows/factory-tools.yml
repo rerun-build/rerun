@@ -20,10 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # Pinned: a new ruff release must not turn this check red on its own. Rules: tools/factory/ruff.toml.
       - name: Lint
         run: pipx run ruff==0.17.5 check tools/factory
-      # -v prints one line per test, which is what the gate reads for a chunk's done-test.
       - name: Unit tests
         working-directory: tools/factory
         run: python3 -I -m unittest discover -s . -p "test_*.py" -v

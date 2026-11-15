@@ -9,24 +9,16 @@ import { emailTranslator, type EmailLocale } from "../i18n";
 import { text } from "../theme";
 
 export interface SandboxIdleProps {
-  /** When the sandbox was last opened, "4 September". Preformatted. */
   lastActiveLabel: string;
-  /** When it is archived if nobody opens it, "6 October". Preformatted. */
   archiveLabel: string;
   agentCount: number;
   sandboxUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
 }
 
-/**
- * The notice a sandbox gets before it is archived for inactivity. Opening the sandbox is enough to
- * cancel it, so the button does exactly that. It also says what an archive costs: coming back
- * afterwards goes through a request to us, not through a click.
- */
 export default function SandboxIdle({
   lastActiveLabel,
   archiveLabel,

@@ -10,8 +10,6 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-// Consumes the emailed sign-in token (verifyOtp) and sets the session cookies. Fired by an explicit
-// POST (the click), so the browser's prefetch of the link never spends the token.
 export async function confirmLogin(formData: FormData) {
     const tokenHash = formData.get('token_hash')?.toString()
     const type = formData.get('type')?.toString() as EmailOtpType | undefined

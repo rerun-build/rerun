@@ -7,12 +7,6 @@ import { analyzeCompanyProfile } from '@/lib/company/profile'
 import { takeIntakeCall } from '@/lib/onboarding/anonymous-intake-quota'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// What the onboarding board shows of the company while the welcome card is being filled. A route
-// rather than a server action: Next runs one action at a time per client, and the cards have to
-// land as each source answers.
-
-// The sources that cost nothing: the DNS and the raw home page. Everything paid waits for an account
-// and runs in the explore-company task.
 const LIVE_COLLECTORS = new Set(['dns', 'stack'] as const)
 
 async function workspaceContext(): Promise<WorkspaceContext | null> {
@@ -42,7 +36,6 @@ export async function POST(request: Request) {
                 if (request.signal.aborted) return
                 for (const event of events) controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`))
             }
-            // The translation is async (icons), so events are chained to leave in the order they came.
             let sending = Promise.resolve()
             const queue = (translate: () => Promise<DiscoveryEvent[]>) => {
                 sending = sending.then(translate).then(send, error => console.error('Onboarding discovery failed to translate', error))
@@ -50,7 +43,6 @@ export async function POST(request: Request) {
 
             send([{ type: 'pending', source: 'profile' }])
             await Promise.all([
-                // Also fills the cache saveForemanIntakeAction reads the profile from at submit.
                 analyzeCompanyProfile(url).then(
                     result => queue(() => translator.fromProfile(result.ok ? result.analysis.profile : null)),
                     () => queue(() => translator.fromProfile(null))
@@ -66,7 +58,6 @@ export async function POST(request: Request) {
     return new Response(stream, { headers: { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store' } })
 }
 
-// What the full exploration has written so far, read by the board every few seconds while it runs.
 export async function GET() {
     const ctx = await workspaceContext()
     if (!ctx) return Response.json({ error: 'Unauthorized' }, { status: 401 })

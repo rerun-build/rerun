@@ -20,8 +20,6 @@ export function messageChars(message: ModelMessage): number {
     return 0
 }
 
-// `extraChars` is what the request carries besides the transcript, the tool schemas above all: a
-// step pays them like any message, so the threshold has to see them.
 export function estimateTokens(messages: ModelMessage[], system?: string, extraChars = 0): number {
     const systemChars = system ? system.length : 0
     const messageChars_ = messages.reduce((sum, m) => sum + messageChars(m), 0)

@@ -11,9 +11,6 @@ import { useCoverBoard } from "@/stores/board-cover.store"
 import { Button } from "@/components/ui/button"
 import { XIcon } from '@/lib/icons'
 
-// Under sm every dialog renders as a vaul bottom sheet instead of a centered Radix modal, so the
-// callers keep one import and one markup for both. The context is what lets each part pick its
-// primitive without the caller passing anything down.
 const SheetModeContext = React.createContext({ isSheet: false, dismissible: true })
 
 function useSheetMode() {
@@ -35,9 +32,6 @@ function Dialog({
   const isOpen = open ?? uncontrolledOpen
   const resolvedIsMobile = useResolvedIsMobile()
 
-  // Rotating a phone crosses the 640px breakpoint, and swapping primitives under an open dialog
-  // would remount it and wipe the form. So the mode only follows the media query while closed —
-  // plus the very first client read, which a dialog mounted already open would otherwise miss.
   const modeRef = React.useRef<boolean | null>(null)
   if (resolvedIsMobile !== null && (!isOpen || modeRef.current === null)) modeRef.current = resolvedIsMobile
   const isSheet = asSheet && (modeRef.current ?? false)
@@ -55,11 +49,6 @@ function Dialog({
   return (
     <SheetModeContext.Provider value={mode}>
       {isSheet ? (
-        // repositionInputs off: vaul's keyboard handler writes `height` and `bottom` inline on the
-        // sheet, from the height it measured at the first focus, and never takes them back. A sheet
-        // that changes step after a field was typed in stays the size of that first step on iOS,
-        // and its lift stacks on top of Safari's own pan toward the focused field. Safari's pan alone
-        // keeps the field in view and leaves the layout to CSS.
         <DrawerPrimitive.Root
           open={isOpen}
           onOpenChange={handleOpenChange}
@@ -148,25 +137,11 @@ function DialogContent({
         <DrawerPrimitive.Content
           data-slot="dialog-content"
           className={cn(
-            // overflow-auto and not overflow-y-auto: it has to sit in the same tailwind-merge group
-            // as the `overflow-hidden` the panelled dialogs pass, so theirs wins cleanly.
-            // mx-auto keeps the sheet centered if a caller max-w applies, which happens while the
-            // window is resized past sm with the dialog open and the mode still latched.
-            // Note that a caller passing `p-0` drops the safe-area padding below along with the
-            // rest of `p-4` — those dialogs have to carry it on their own bottom-most row.
-            // The bottom is not always the bottom: the mobile cookie bar owns that strip while it
-            // is up, so the sheet sits on the inset it publishes instead of under it.
-            // touch-pan-y!: vaul injects `touch-action: none` on the drawer, and the drawer is the
-            // scroller here, so without it a finger cannot scroll a sheet taller than the screen.
-            // The `!` is required, vaul's rule is unlayered and beats a plain utility.
-            // after:hidden!: vaul hangs a 200% tall filler under the drawer, which a scrolling drawer
-            // counts as content, so the sheet would scroll two screens into the void.
             "fixed inset-x-0 bottom-[var(--consent-inset)] z-50 mx-auto flex max-h-[calc(96dvh_-_var(--consent-inset))] touch-pan-y! flex-col after:hidden! gap-4 overflow-auto overscroll-contain rounded-t-2xl bg-popover p-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-sm text-popover-foreground ring-1 ring-foreground/10 outline-none",
             className
           )}
           {...props}
         >
-          {/* A sheet you can swipe away needs no close button; one you cannot still does. */}
           {dismissible ? <SheetGrabber /> : null}
           {children}
           {showCloseButton && !dismissible && (

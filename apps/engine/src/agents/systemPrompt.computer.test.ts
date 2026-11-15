@@ -18,7 +18,6 @@ const { beforeEach, describe, expect, it } = await import('vitest')
 const { agentConfigSchema } = await import('@rerun/contracts')
 const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText } = await import('./systemPrompt.js')
 
-// The tests read the prompt as the model does, both blocks joined.
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))
 
 function agentWith(tools: Record<string, boolean>) {

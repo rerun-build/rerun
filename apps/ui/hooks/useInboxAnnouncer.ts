@@ -11,10 +11,6 @@ const subscribeToVisibility = (onChange: () => void) => {
     return () => document.removeEventListener('visibilitychange', onChange)
 }
 
-/**
- * Plays the arrivals one at a time above the hub's pill. A loud one stays up until the pointer has
- * been over it; nothing runs out while a card is open or the tab is hidden.
- */
 export function useInboxAnnouncer(arrivals: AnnouncedNotification[], paused: boolean) {
     const [state, setState] = useState<AnnouncerState>(() => ({ cursor: arrivals.length, bundled: 1 }))
     const [hovered, setHovered] = useState(false)
@@ -33,7 +29,6 @@ export function useInboxAnnouncer(arrivals: AnnouncedNotification[], paused: boo
 
     const dismiss = useCallback(() => {
         setSeen(false)
-        // The row unmounts under the pointer without a `pointerleave`.
         setHovered(false)
         setState(current => advance(current, total))
     }, [total])

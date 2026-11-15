@@ -40,17 +40,13 @@ export type ResolvedService = {
     composio?: ComposioTarget
     notFound: boolean
     alternatives: ServiceAlternative[]
-    // The app the agent asked for, once the user picked one of its alternatives instead.
     replaces?: { slug: string; name: string }
 }
 
 type ServiceSuggestionBlockProps = {
     agentId: string
     services: SuggestedService[]
-    // Called once the user is done (set up and/or skipped) — sends a summary chat message
-    // that resumes the run.
     onDone: (summary: string) => void
-    // Rendered in the thread rather than docked above the composer: no dock margin.
     inline?: boolean
 }
 
@@ -85,8 +81,6 @@ function buildSummary(resolved: ResolvedService[], statuses: Record<string, Card
 }
 
 export function ServiceSuggestionBlock({ agentId, services, onDone, inline }: ServiceSuggestionBlockProps) {
-    // The caller rebuilds this array on every one of its renders, so keying the load below on its
-    // identity would re-fetch and reset the cards each time. Key on the content instead.
     const servicesKey = services.map(s => `${s.slug}\0${s.reason ?? ''}`).join('\x01')
     const suggestedRef = useRef(services)
     suggestedRef.current = services
@@ -131,8 +125,6 @@ export function ServiceSuggestionLoading() {
     )
 }
 
-// Only an active connector is already done: a needs_auth / needs_config entry is exactly what
-// this card exists to finish.
 function initialStatuses(services: ResolvedService[]): Record<string, CardStatus> {
     return Object.fromEntries(services.map(c => [c.slug, c.notFound ? 'skipped' : c.installStatus === 'active' ? 'connected' : 'pending'] as const))
 }
@@ -147,7 +139,6 @@ type ServiceSuggestionCardProps = {
     services: ResolvedService[]
     onDone: (summary: string) => void
     inline?: boolean
-    // Mounts with the setup form already unfolded, for the lab that shows every state at once.
     defaultOpen?: boolean
 }
 
@@ -159,9 +150,6 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
     const [statuses, setStatuses] = useState(() => initialStatuses(services))
     const [current, setCurrent] = useState(() => firstPendingIndex(services))
     const [submitted, setSubmitted] = useState(false)
-    // The state above only drives the disabled styling. Two async callbacks fired within the
-    // same render — an OAuth result delivered twice, a double click resolving twice — both read
-    // the same stale `submitted`, so the latch that actually answers the agent has to be a ref.
     const submittedRef = useRef(false)
     const claimSubmit = () => {
         if (submittedRef.current) return false
@@ -172,8 +160,6 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
     const [resetting, setResetting] = useState<string | null>(null)
     const [resetError, setResetError] = useState<string | null>(null)
     const [resetSlugs, setResetSlugs] = useState<Set<string>>(() => new Set())
-    // Bumped on every reset so the config form remounts: it reads its initial step from props
-    // once, at mount, and never re-derives it.
     const [resetSeq, setResetSeq] = useState(0)
     const [swapping, setSwapping] = useState<string | null>(null)
     const [swapError, setSwapError] = useState<string | null>(null)
@@ -200,7 +186,6 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
     const connectable = status === 'pending' && !s.notFound
     const showForm = connectable && openSlugs.has(s.slug)
     const folded = connectable && !showForm
-    // An app already on another card would share its status with it, since statuses are keyed by slug.
     const otherSlugs = new Set(resolved.filter(r => r !== s).map(r => r.slug))
     const alternatives = s.alternatives.filter(a => !otherSlugs.has(a.slug))
     const authTarget = s.installStatus === 'needs_auth' && (s.oauth || s.managed || s.composio) ? { oauth: s.oauth, managed: s.managed, composio: s.composio } : undefined
@@ -227,9 +212,6 @@ export function ServiceSuggestionCard({ agentId, services, onDone, inline, defau
         else finish(nextStatuses)
     }
 
-    // The registry is the only source of truth for what reconnecting means here: a card connected
-    // during this very session still holds the details fetched BEFORE the install, with no
-    // sign-in target on it. So the mode and the target both come back from the server.
     const reconnect = async () => {
         if (locked || resetting) return
         setResetting(s.slug)

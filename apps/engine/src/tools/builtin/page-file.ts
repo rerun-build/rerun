@@ -3,14 +3,10 @@ import { mkdir, readdir, readFile, rmdir, stat, unlink, writeFile } from 'node:f
 import { dirname, join, relative } from 'node:path'
 import { resolveInWorkspace } from '../sandbox.js'
 
-// Every page a coworker reads is kept whole in its workspace, next to the other reads of the same
-// URL: what a tool result leaves out stays one grep away, and served and rendered HTML can be
-// diffed. Kept out of any capture or share of the agent, like the paid answers.
 export const PAGES_DIR = '.rerun/pages'
 const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000
 const MAX_TOTAL_BYTES = 200 * 1024 * 1024
 const MAX_SEGMENT_CHARS = 80
-// Pruning walks and stats the whole folder: once per process for an agent, then one read in twenty.
 const PRUNE_EVERY = 20
 
 const savesSincePrune = new Map<string, number>()
@@ -34,7 +30,6 @@ export type PageToSave = {
 const fileSafe = (text: string): string => text.replace(/[^\w.-]/g, '_')
 const shortHash = (text: string): string => createHash('sha256').update(text).digest('hex').slice(0, 8)
 
-// null for a body worth no grep (an image, a PDF): the download tool is there for those.
 export function textExtension(contentType: string | null): string | null {
     const type = (contentType ?? '').toLowerCase()
     if (!type) return 'txt'
@@ -47,9 +42,6 @@ export function textExtension(contentType: string | null): string | null {
     return null
 }
 
-// The path of the URL, mirrored: /blog/post lands in <host>/blog/post, / and /blog/ end in index.
-// A segment that cannot be kept as is, or a query, gets the hash of the whole URL so two URLs
-// never share a file.
 export function pageFileBase(url: string): string {
     const parsed = new URL(url)
     const segments = parsed.pathname.split('/').slice(1)
@@ -68,7 +60,6 @@ async function readMeta(path: string): Promise<PageMeta | null> {
     }
 }
 
-// Best effort: a full disk or an unwritable workspace leaves the page read, only unsaved.
 export async function savePage(agentId: string, page: PageToSave): Promise<string | null> {
     try {
         const root = await resolveInWorkspace(agentId, PAGES_DIR)

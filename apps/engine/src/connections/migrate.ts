@@ -14,14 +14,8 @@ import { listConnectionIds, loadConnectionFromDisk } from './loader.js'
 import { createConnection, ensureRerunConnection, patchConnection } from './store.js'
 import type { LoadedConnection } from './types.js'
 
-// The agent config as it was before connections existed: the two OpenRouter overrides moved onto
-// the connection, so the current schema no longer describes what is on disk here.
 type LegacyAgentConfig = { name: string; provider: Provider; openrouterBaseUrl?: string; openrouterModels?: string[] }
 
-// The providers and their key names as they stood when this step shipped. It is a step of the
-// data-dir ladder, so a data-dir restored long after must be folded exactly as it would have been
-// then: a provider added since (OpenCode) is neither folded into a connection nor stripped from an
-// agent's `.env`, where it can only be a shell variable of the user's.
 const FOLD_PROVIDERS = ['rerun', 'anthropic', 'claude', 'codex', 'openai', 'google', 'openrouter'] as const satisfies readonly Provider[]
 type FoldProvider = (typeof FOLD_PROVIDERS)[number]
 const foldProviderSchema = z.enum(FOLD_PROVIDERS)
@@ -53,8 +47,6 @@ const KEYED_PROVIDERS = FOLD_PROVIDERS.filter(p => !!FOLD_TOKEN_KEY[p])
 function credentialOf(env: Record<string, string>, provider: FoldProvider): string | null {
     const primary = env[FOLD_TOKEN_KEY[provider]]
     if (primary) return primary
-    // Google is the one provider the engine reads under two names, so a key stored only under the
-    // alias still describes a real connection.
     for (const alias of FOLD_SATELLITE_KEYS[provider]) {
         if (alias.endsWith('_API_KEY') && env[alias]) return env[alias]
     }
@@ -66,8 +58,6 @@ function keysFor(env: Record<string, string>, provider: FoldProvider): Record<st
     return Object.fromEntries(names.filter(name => env[name]).map(name => [name, env[name]]))
 }
 
-// Two agents holding the same token are two copies of one subscription, not two connections. The
-// credential value is the identity; the provider disambiguates the (unlikely) collision.
 function fingerprint(provider: Provider, credential: string): string {
     return `${provider}::${credential}`
 }
@@ -80,10 +70,6 @@ async function moveCodexHome(agentId: string, connectionId: string): Promise<voi
     await rename(from, to).catch(err => logger.warn({ agent: agentId, connection: connectionId, err: String(err) }, 'codex home move failed'))
 }
 
-// Rerun Balanced is an alias now, and the id it used to be stays written in the connection of every box
-// curated before it. Reading it under its current name is what keeps the model picker showing one
-// Max instead of two. Runs on every boot rather than as a ladder step: the fold is a one-off, a
-// rename is whatever the ids happen to be today.
 async function renameAliasedModels(): Promise<void> {
     const sameIds = (a: string[], b: string[]) => a.length === b.length && a.every((id, i) => id === b[i])
     for (const id of await listConnectionIds()) {
@@ -95,24 +81,16 @@ async function renameAliasedModels(): Promise<void> {
         logger.info({ connection: id, models }, 'renamed aliased model ids on connection')
     }
 
-    // The box default names a pair, and a default left on the old spelling no longer matches any
-    // row: every agent following the box would drop through the ladder instead of reading it.
     const boxDefault = await readBoxDefault()
     if (boxDefault && canonicalModelId(boxDefault.model) !== boxDefault.model) await writeBoxDefault({ ...boxDefault, model: canonicalModelId(boxDefault.model) })
 }
 
-// Brings the connections in line with today's code on every boot, after the migration ladder:
-// these are not steps in the data-dir's history but whatever the current ids and rules happen to be.
 export async function reconcileConnections(): Promise<void> {
     await mkdir(connectionsDir(), { recursive: true })
     await ensureRerunConnection()
     await renameAliasedModels()
 }
 
-// Folds every agent's provider credentials into box-level connections, once. Part of the data-dir
-// ladder's baseline step, and still gated by its own marker file so a box that folded before the
-// ladder existed does nothing; an engine that restarts mid-way is safe to resume only because each
-// step below is itself re-runnable.
 export async function foldAgentKeysIntoConnections(): Promise<void> {
     await mkdir(connectionsDir(), { recursive: true })
     if (existsSync(connectionsMigratedPath())) return

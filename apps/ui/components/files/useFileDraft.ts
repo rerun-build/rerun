@@ -33,7 +33,6 @@ export function useFileDraft({ initialContent, onSave, onSaved }: UseFileDraftPr
 
     const dirty = draft !== opened.text
 
-    // The browser only asks about a tab being closed; leaving the panel is guarded by the caller.
     useEffect(() => {
         if (!dirty) return
         const warn = (event: BeforeUnloadEvent) => event.preventDefault()

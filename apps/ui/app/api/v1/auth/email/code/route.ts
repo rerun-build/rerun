@@ -8,9 +8,6 @@ import { emailCodeRequestSchema } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
 
-// Same order as the web: a code still good is mailed again, since Supabase voids the previous one each
-// time it mints a new one. Otherwise the address gets its account, and the app asks Supabase for a code.
-// Whether the address was new stays here: said back, it would tell anyone who holds an account.
 export const POST = apiRoute({ auth: 'public', body: emailCodeRequestSchema }, async ({ req, body }) => {
     const ip = callerIp(req.headers)
     if (!(await claimEmailCodeAsk(ip))) return emailRefused('too_many')

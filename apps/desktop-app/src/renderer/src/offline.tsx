@@ -19,7 +19,6 @@ function OfflinePage() {
     const [retrying, setRetrying] = useState(false)
     const inFlight = useRef(false)
 
-    // The background attempts stay silent; only the button shows that it is trying.
     const retry = useCallback(async (shown: boolean) => {
         if (inFlight.current) return
         inFlight.current = true
@@ -58,7 +57,6 @@ function OfflinePage() {
     )
 }
 
-// The server no longer serves this version: the update is fetched at once, and installed on a click.
 function UpdateRequired({ host }: { host: string }) {
     const t = useTranslations('desktopApp')
     const [update, setUpdate] = useState<DesktopUpdateState>({ status: 'idle' })

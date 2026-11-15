@@ -1,32 +1,19 @@
 #!/usr/bin/env python3
-"""A real model for the development engine through a Claude subscription, and a one-run proof (rerun#71).
-Runs inside the runner container, which already holds the dev engine's address and key:
-    python3 /app/realmodel.py check            is the connection there; which connection is the default
-    python3 /app/realmodel.py connect          reads the subscription token from standard input, creates the connection
-    python3 /app/realmodel.py probe [model]    one short run on the real model: status, model, token counts, then
-                                               proof=PASS or proof=FAIL (exit 1) on its own last line
-    python3 /app/realmodel.py remove           deletes the connection
-The token (from `claude setup-token`) is read from standard input only, sent once to the dev engine in a request
-body, and kept nowhere else: no file, no command line, no output. Errors name the step and the HTTP status only."""
 import os, re, sys, time
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # own dir first, as the other factory tools do
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import engine as E
 
 NAME, PROBE, MODEL = "claude-plan", "real-model-probe", "claude-haiku-5-5"
-# What the connection offers. A connection that lists no model serves none, and a run started by a trigger then
-# falls back to the engine's default model without saying so (apps/engine/src/agents/availability.ts,
-# resolveAutomationModel): the first proof on the server answered from the stand-in for exactly this reason.
 MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"]
 TOKEN_KEY = "CLAUDE_CODE_OAUTH_TOKEN"
 TOKEN_OK = re.compile(r"[A-Za-z0-9_.~+/=-]{20,}")
-LONG = re.compile(r"[A-Za-z0-9_.~+/=-]{30,}")  # anything shaped like a credential is cut from an error text
+LONG = re.compile(r"[A-Za-z0-9_.~+/=-]{30,}")
 PROMPT = "Reply with the single word READY and nothing else. Use no tools."
 WAIT_S, STEP_S = 180, 3
 
 
 def find(eng):
-    """(the subscription connection or None, the id of the default connection or None)."""
     listing = eng._call("GET", "/connections")
     conn = next((c for c in listing.get("connections") or [] if c.get("name") == NAME and c.get("provider") == "claude"), None)
     return conn, (listing.get("default") or {}).get("connectionId")
@@ -42,7 +29,6 @@ def check(eng):
 
 
 def offer(eng, conn):
-    """Make the connection list the models the proof and the stages need. Needs no token."""
     have = list(conn.get("models") or [])
     missing = [m for m in MODELS if m not in have]
     if not missing:
@@ -64,8 +50,6 @@ def connect(eng, token):
 
 
 def probe(eng, model=MODEL, sleep=None):
-    """One coworker on the real model, one trigger, one run. The coworker is deleted again whatever happens.
-    The last line is the verdict: PASS only when the run finished and the subscription connection ran it."""
     sleep = sleep or time.sleep
     conn, _ = find(eng)
     if not conn:
@@ -87,7 +71,7 @@ def probe(eng, model=MODEL, sleep=None):
         try:
             eng._call("DELETE", gone)
         except E.EngineError:
-            pass  # the first error is the one worth reporting
+            pass
         raise
     eng._call("DELETE", gone)
     err = LONG.sub("<cut>", row.get("error") or "")[:160]

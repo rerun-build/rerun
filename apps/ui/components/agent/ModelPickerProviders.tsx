@@ -14,12 +14,8 @@ export type SubscriptionProvider = Extract<AddableProvider, 'claude' | 'codex'>
 
 export const SUBSCRIPTION_PROVIDERS: SubscriptionProvider[] = ['claude', 'codex']
 
-// Long enough for the pointer to cross the gap between the row and the submenu, short enough that
-// moving down to another row does not leave the submenu hanging over the list.
 const SUBMENU_CLOSE_DELAY_MS = 120
 
-// The section heading already says plan or API key, so a subscription's hint names the eligible
-// plans and an API key's hint names the models it unlocks.
 const ADDABLE: { provider: Extract<AddableProvider, 'claude' | 'codex' | 'anthropic' | 'openai' | 'google' | 'openrouter'>; label: string; section: 'subscription' | 'api' }[] = [
     { provider: 'claude', label: 'Claude', section: 'subscription' },
     { provider: 'codex', label: 'ChatGPT', section: 'subscription' },
@@ -31,8 +27,6 @@ const ADDABLE: { provider: Extract<AddableProvider, 'claude' | 'codex' | 'anthro
 
 type SubscriptionCallProps = { providers: SubscriptionProvider[]; onConnect: (provider: SubscriptionProvider) => void }
 
-// The full pitch, for a workspace that runs on Rerun alone: a group of its own rather than a line,
-// but dressed like every other group of the list.
 export function SubscriptionPitch({ providers, onConnect }: SubscriptionCallProps) {
     const t = useTranslations('agent.modelPickerProviders')
     return (
@@ -51,7 +45,6 @@ export function SubscriptionPitch({ providers, onConnect }: SubscriptionCallProp
     )
 }
 
-// Once a subscription is plugged in the principle is understood, so the other one is a single line.
 export function SubscriptionNudge({ providers, onConnect }: SubscriptionCallProps) {
     const t = useTranslations('agent.modelPickerProviders')
     return (
@@ -73,8 +66,6 @@ type AddProviderItemProps = {
     onManage: () => void
 }
 
-// A submenu opened by hovering, like a native menu's: the row and the submenu count as one surface,
-// so closing waits a beat after the pointer leaves either. Enter on the row opens it for keyboards.
 export function AddProviderItem({ connectedProviders, onConnect, onManage }: AddProviderItemProps) {
     const t = useTranslations('agent.modelPickerProviders')
     const [open, setOpen] = useState(false)

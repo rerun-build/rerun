@@ -46,7 +46,6 @@ export function ViewerTopBar({ icon: FormatIcon, name, meta, children }: { icon:
     )
 }
 
-// The same pill lib/published/badge.ts injects into a published HTML page, drawn as React here.
 export function MadeWithRerun({ slug, className }: { slug: string; className?: string }) {
     const t = useTranslations('published')
     const landing = `${LANDING_URL}/?utm_source=published&utm_medium=badge&utm_content=${slug}`

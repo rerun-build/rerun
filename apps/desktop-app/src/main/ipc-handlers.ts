@@ -62,7 +62,6 @@ export function registerIpcHandlers(): void {
     handle(IPC.localFind, ['local'], (_event, request: FindRequest) => find({ text: String(request?.text ?? '').slice(0, 500), forward: request?.forward !== false, findNext: !!request?.findNext }))
     handle(IPC.localFindClose, ['local'], () => closeFindBar())
 
-    // The offline page's "Try again", and its own polling.
     handle(IPC.localRetry, ['local'], async () => {
         const origin = currentServer()
         if (!origin) return false
@@ -86,7 +85,6 @@ export function registerIpcHandlers(): void {
         if (check.status === 'not-rerun') return { ok: false, reason: 'notRerun' }
         if (check.status === 'shell-too-old') return { ok: false, reason: 'tooOld', version: check.minShellVersion }
         setServerOrigin(origin)
-        // Answered before the window that asked is replaced.
         setTimeout(() => {
             resetQuickAsk()
             replaceMainWindow(origin)

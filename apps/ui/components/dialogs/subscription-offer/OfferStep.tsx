@@ -23,12 +23,6 @@ export function OfferStep({ onPick, onKey, onOpencode, onSkip }: { onPick: (prov
 
             <OfferConnect onPick={onPick} onKey={onKey} onOpencode={onOpencode} />
 
-            {/* The arguments are not a third way in: they sit on their own, centred in what the
-                buttons leave, well clear of the group above. The scroll is a guard, not a feature:
-                a longer list must not push the footer out of the frame. Centred by `my-auto` and
-                not `items-center`, which on a short window pushes the overflow up over the buttons
-                where no scroll reaches it. `[&>div]` reaches the wrapper ScrollFade puts around its
-                children, the only flex item the centring can act on. */}
             <ScrollFade className="-mx-1 flex min-h-0 flex-1 flex-col px-1 [&>div]:my-auto [&>div]:py-6">
                 <OfferArguments />
             </ScrollFade>

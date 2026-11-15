@@ -17,8 +17,6 @@ export function RevokeApiKeyDialog({ apiKey, pending, onOpenChange, onConfirm }:
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={pending}>{tCommon('cancel')}</AlertDialogCancel>
-                    {/* preventDefault keeps the confirm open with a spinner; the parent closes it once the
-                        action lands, which also avoids body pointer-events sticking on unmount. */}
                     <AlertDialogAction
                         variant="destructive"
                         disabled={pending}

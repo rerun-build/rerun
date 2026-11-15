@@ -10,12 +10,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 const HCAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY
-// Cloudflare answers in a second or two when it draws nothing. With a puzzle behind, the visitor is
-// handed it quickly instead of waiting on a spinning button; without one, the wait stays as long as
-// it was before the puzzle existed, since past it there is only an error.
 const TURNSTILE_SILENT_TIMEOUT_MS = HCAPTCHA_SITE_KEY ? 8_000 : 20_000
-// Only the loading of the puzzle's script is timed: past it there is only an error, so the wait is
-// the one of the dead end above.
 const HCAPTCHA_SCRIPT_TIMEOUT_MS = 20_000
 
 function appendSlot(container: HTMLElement): HTMLDivElement {
@@ -24,11 +19,6 @@ function appendSlot(container: HTMLElement): HTMLDivElement {
     return slot
 }
 
-// The robot check of every form that sends a code. Cloudflare's invisible check comes first; when
-// it fails or stays silent, the visitor is handed an hCaptcha puzzle instead of an error, and keeps
-// it for the next sends of this form, since Cloudflare would most likely turn them away again.
-// The puzzle's script is only fetched for those visitors. Without any site key, as on a local
-// stack, there is no check at all.
 export function useCaptcha() {
     const containerRef = useRef<HTMLDivElement>(null)
     const turnstile = useRef<{ widget: CaptchaWidget; slot: HTMLDivElement } | null>(null)
@@ -72,7 +62,6 @@ export function useCaptcha() {
             track('captcha_puzzle_solved', {})
             return token
         } finally {
-            // A newer send that took over this wait keeps the puzzle on screen.
             if (ask === puzzleAsk.current) {
                 slot.hidden = true
                 setPuzzleShown(false)
@@ -88,7 +77,6 @@ export function useCaptcha() {
                 return { provider: 'turnstile', token: await turnstile.current.widget.getToken() }
             } catch (error) {
                 if (!HCAPTCHA_SITE_KEY || !containerRef.current || (error instanceof CaptchaError && error.superseded)) throw error
-                // Cloudflare would keep retrying, and drawing its failure, beside the puzzle.
                 turnstileFailed.current = true
                 turnstile.current?.widget.remove()
                 turnstile.current?.slot.remove()

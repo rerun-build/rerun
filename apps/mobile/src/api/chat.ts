@@ -24,7 +24,6 @@ export async function stopConversation(caller: Caller, sessionId: string): Promi
     await api(`/api/v1/conversations/${encodeURIComponent(sessionId)}/stop`, { ...caller, method: 'POST' })
 }
 
-// The notification the conversation waited on was read: it goes back to idle.
 export async function acknowledgeAlert(caller: Caller, sessionId: string): Promise<void> {
     await api(`/api/v1/conversations/${encodeURIComponent(sessionId)}/acknowledge`, { ...caller, method: 'POST' })
 }
@@ -38,7 +37,6 @@ export async function decideSkillProposal(caller: Caller, sessionId: string, pro
     return skillProposalSchema.parse(proposal)
 }
 
-// The chat's Undo on a Brain change. A 409 means the page changed again since.
 export async function revertBrainPage(caller: Caller, slug: string, revisionId: string, expectedHash?: string): Promise<void> {
     await api(`/api/v1/brain/pages/${encodeURIComponent(slug)}/revert`, { ...caller, method: 'POST', body: { revisionId, expectedHash } })
 }

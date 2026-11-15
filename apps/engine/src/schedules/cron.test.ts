@@ -83,9 +83,6 @@ describe('isValidTimezone', () => {
     })
 })
 
-// A schedule whose timing can't be computed (a timezone or cron edited into the file by hand, or
-// written before both were checked) must not throw: the scheduler checks every schedule of every
-// agent in one tick, and a throw there ends the tick, and the process with it.
 describe('a schedule croner cannot compute', () => {
     const now = new Date('2026-06-02T10:00:00.000Z')
     it('is never due and has no next run, with an unknown timezone', () => {

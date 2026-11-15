@@ -24,12 +24,6 @@ import { templateSubmitBlockers } from './submit'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 import { createTemplate, uniqueTemplateSlug, updateTemplateBySlug, type TemplateReviewPatch } from './write'
 
-// Authoring a template is the same job whoever asks: a signed-in expert in the app, or an MCP key
-// resolved to that same expert. The caller's identity arrives as a `userId` and never as a session,
-// so this module is the single implementation of the sequence — ownership, editability, stored
-// document, write — and neither transport gets to reorder it. Failures throw: the server actions
-// catch into an ActionResult, and the MCP route turns a throw into a tool error the model reads.
-
 export type AuthorWrite = { slug: string; warnings: string[] }
 
 export async function listAuthorTemplates(userId: string): Promise<ExpertTemplate[]> {
@@ -76,9 +70,6 @@ export async function createAuthorTemplateDraft(userId: string, title: string): 
     return { id: created.id, slug: result.slug }
 }
 
-// Ownership, then editability, then the stored document: the three checks every write starts with.
-// The slug comes from the row and is never accepted from a caller — it addresses both the update
-// and the archive path.
 export async function loadEditableAuthorDocument(userId: string, id: string): Promise<{ id: string; slug: string; document: TemplateDocument }> {
     const owned = await assertTemplateOwnedBy(userId, id)
 
@@ -98,23 +89,14 @@ async function writeAuthorDocument(slug: string, document: TemplateDocument, rev
     return { slug: result.slug, warnings: result.warnings }
 }
 
-// `mergeAuthorDocument` spreads the stored document first, so a patch cannot reach status, slug,
-// creatorId, featured or the visibility flags; re-parsing the result is what enforces the
-// cross-field rules a picked schema cannot carry — a paid template with no price, a free one with
-// one. The panel validates against the same schema, so this only ever fires on a caller with no form.
 export async function updateAuthorTemplate(userId: string, id: string, patch: TemplateAuthorPatch): Promise<AuthorWrite> {
     const stored = await loadEditableAuthorDocument(userId, id)
     return writeAuthorDocument(stored.slug, templateDocumentSchema.parse(mergeAuthorDocument(stored.document, patch)))
 }
 
-// Handing the template over: the completeness gate is the same list the panel shows as a checklist,
-// and the secret scan turns blocking here rather than at publication, because this is the last
-// moment the author can still fix what they pasted.
 export async function submitAuthorTemplate(userId: string, id: string): Promise<AuthorWrite> {
     const stored = await loadEditableAuthorDocument(userId, id)
 
-    // Resolved here rather than trusted from the caller: the checklist is what a panel renders,
-    // this is what decides.
     const payoutsReady = await isPayoutReady(stored.document.creatorId)
     const missing = templateSubmitBlockers(stored.document, englishTranslator('templates.expert.footer'), { payoutsReady })
     if (missing.length > 0) throw new AppError('addBeforeSubmitting', { fields: missing.join(', ') })
@@ -150,9 +132,6 @@ export async function deleteAuthorTemplate(userId: string, id: string): Promise<
 export type AddAuthorImageInput = { imageUrl: string; alt?: string; cover?: boolean }
 export type AddedAuthorImage = AuthorWrite & { url: string; position: number; galleryCount: number }
 
-// Appending rather than replacing: the gallery is a single author field, so a caller writing it
-// through the document would have to resend every image it cannot see. The write still goes through
-// the same author boundary as any other field.
 export async function addAuthorTemplateImage(userId: string, id: string, input: AddAuthorImageInput): Promise<AddedAuthorImage> {
     const stored = await loadEditableAuthorDocument(userId, id)
     if (stored.document.gallery.length >= MAX_TEMPLATE_GALLERY_IMAGES) throw new AppError('galleryLimit', { max: MAX_TEMPLATE_GALLERY_IMAGES })

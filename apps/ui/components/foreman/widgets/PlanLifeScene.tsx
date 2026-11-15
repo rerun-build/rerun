@@ -19,8 +19,6 @@ const STAGE_LOOK: Record<Exclude<PlanLifeStage, 'rest'>, { icon: LucideIcon; cla
     delivered: { icon: CircleCheckIcon, className: 'text-emerald-500' },
 }
 
-// What the tile is doing, said under the board rather than in a bubble over it: at the card's zoom a
-// bubble is too small to read, and it stands on the Box's own name.
 function ActivityLine({ beat, tick }: { beat: PlanLifeBeat; tick: number }) {
     const t = useTranslations('foreman.plan')
     const look = beat.stage === 'rest' ? null : STAGE_LOOK[beat.stage]
@@ -50,9 +48,6 @@ function ActivityLine({ beat, tick }: { beat: PlanLifeBeat; tick: number }) {
     )
 }
 
-// The lone agent of a card playing its day in a loop. It waits for the whole call: a day still being
-// written would be read a letter at a time. An item with no day to play, a template or a shared
-// agent, simply stands there.
 export function PlanLifeScene({ group, script, waiting }: { group: PlanGroup; script: PlanBeats | null; waiting: boolean }) {
     const { beat, tick, animated } = usePlanLife(script, waiting)
     const scene = useMemo(() => planCardScene(group, { animated }), [group, animated])

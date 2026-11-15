@@ -3,12 +3,6 @@ import { withAnthropicCacheBreakpoints, type ChatBody } from '@rerun/contracts'
 
 type FetchFunction = NonNullable<NonNullable<Parameters<typeof createOpenAI>[0]>['fetch']>
 
-/**
- * `@ai-sdk/openai` sends the system prompt as plain strings and drops every `providerOptions` on
- * its way out, so the breakpoints an Anthropic model on OpenRouter needs are written into the body
- * here. The `rerun` provider never passes through this: the hub, which alone knows what model a
- * tier runs, does the same rewrite on its side.
- */
 export function cacheBreakpointsFetch(inner: FetchFunction): FetchFunction {
     return async (input, init) => {
         if (typeof init?.body !== 'string') return inner(input, init)

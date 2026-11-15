@@ -17,9 +17,6 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { getTranslations } from 'next-intl/server'
 
-// The root of a published host when the link is a single file a browser would only download or
-// show raw: a reader for it instead. Reached through the rewrite in proxy.ts, which already let the
-// visitor through; the host and the access are checked again here all the same.
 export const dynamic = 'force-dynamic'
 
 const MAX_TEXT_BYTES = 2 * 1024 * 1024

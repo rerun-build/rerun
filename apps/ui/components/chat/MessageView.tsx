@@ -64,8 +64,6 @@ type RenderStep =
     | { kind: 'under-text'; key: string; node: ReactNode }
     | null
 
-// One assistant turn as a caller's own layout receives it: the words, the traces of the work
-// (tool rows, reasoning, sub-runs) and the blocks the agent shows (cards, notices).
 export type AssistantStep =
     | { kind: 'text'; key: string; node: ReactNode; markdown: string; streaming: boolean }
     | { kind: 'trace'; key: string; node: ReactNode }
@@ -98,60 +96,37 @@ function FeedbackAction({ rating, current, onRate }: { rating: MessageFeedbackRa
 export type MessageViewProps = {
     message: { id: string; role: UIMessage['role']; parts: readonly MessagePartLike[] }
     isActive?: boolean
-    // Only the thread's last assistant message draws the coworker beside its steps.
     isLastAssistant?: boolean
     agentId?: string
     pendingHitlToolCallId?: string
-    // The custom MCP server a pending sign-in card is about: its Connect lives on that card.
     pendingMcpSignIn?: string
-    // On a user reply to a setup block: the call it answers, which fills in what the reply leaves out.
     hitlCall?: HitlCallPart
     pendingAlertToolCallId?: string
     activeRunId?: string | null
     onStopTask?: (taskId: string) => void
     onSendMessage?: (opts: { text: string }) => void
-    // Where a quick reply that still needs a value from the user goes to be finished. Without it,
-    // such a reply is not offered at all: sent as is, it would reach the coworker empty-handed.
     onDraftReply?: (text: string) => void
-    // The agent's suggested replies only stand while this is the last word of a finished turn.
     showQuickReplies?: boolean
     onRegenerate?: (messageId: string) => void
-    // Thumbs only show when this is passed, so read-only transcripts and the onboarding stay without them.
     onRateMessage?: (messageId: string, rating: MessageFeedbackRating, messageText: string) => void
     feedbackRating?: MessageFeedbackRating | null
-    // Skill proposals live in their own table, keyed by the tool call that raised them: the tool
-    // result is frozen at write time, and a widget has to survive a reload with a live status.
     skillProposals?: Map<string, EngineSkillProposal>
     decidingProposalId?: string | null
     onDecideProposal?: (proposalId: string, decision: 'accept' | 'dismiss') => void
-    // The proposals the dock above the composer is holding: they are decided there, not here.
     pinnedProposalIds?: ReadonlySet<string>
-    // Where attachments and recordings are read from when they are not a Box's. `agentId` says
-    // which Box owns a file; these two say the bytes are reachable at all.
     rawUrlFor?: RawUrlFor
     readFile?: ReadChatFile
     sharedFiles?: FileAccess
-    // A caller's own rendering for a tool step, tried before everything below. `undefined` falls
-    // through to the normal collapsed step, `null` hides it, a node replaces it. The foreman's
-    // widgets come in through here, so this file keeps knowing nothing about them.
     renderToolPart?: (part: ToolPartLike) => ReactNode | null | undefined
-    // The agent's guided install is still open, so its divider reads as started, not complete.
     installing?: boolean
-    // The `@agent` and `/skill` the composer drew as tokens, drawn the same in the user's bubble.
     mentions?: ComposerMention[]
-    // A caller's own arrangement of an assistant turn, in place of the stacked steps. Has to keep
-    // its identity between renders, or the memo below stops holding.
     assistantLayout?: (steps: AssistantStep[]) => ReactNode
-    // When the message was written, shown on hover of its bubble.
     createdAt?: string
-    // Where the paid data of the turn came from, on the turn's last assistant message only.
     paidSources?: PaidTurnSources
 }
 
 export type ToolPartLike = { toolName: string; toolCallId: string; state: string; input?: unknown; output?: unknown; errorText?: string }
 
-// Wraps what `renderToolPart` returns for a tool that runs before the model writes about it: the
-// call lands ahead of the text in the parts, yet it belongs under the text it illustrates.
 export function UnderText({ children }: { children: ReactNode }) {
     return children
 }
@@ -167,14 +142,12 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
     const scheduledRun = message.role === 'user' && !install && !hitlReply ? parseScheduledRun(messageText(message)) : null
     const triggerPayload = message.role === 'user' && !install && !hitlReply && !scheduledRun ? parseTriggerPayload(messageText(message)) : null
     const automated = !!scheduledRun || !!triggerPayload
-    // A voice message sent with files carries the attachments marker after its voice marker.
     const attachments = message.role === 'user' && !install && !hitlReply && !automated ? parseAttachments(messageText(message)) : null
     const voice = message.role === 'user' && !install && !hitlReply && !automated ? parseVoiceMessage(attachments?.text ?? messageText(message)) : null
     const subRuns = pairSubRuns(message.parts)
     const quickReplies = showQuickReplies && onSendMessage ? quickRepliesOf(message).filter(reply => onDraftReply || quickReplyDraft(reply) === null) : []
     const onStopTask = stopTaskOverride ?? (activeRunId && agentId ? (taskId: string) => void cancelSubRunAction(agentId, activeRunId, taskId) : undefined)
 
-    // Files sent without a word: the thumbnails are the whole message, an empty bubble under them would be noise.
     if (attachments && !attachments.text) {
         return (
             <Message from={message.role}>
@@ -208,7 +181,6 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 const toolName = SUB_RUN_TOOL_NAMES[orphan.kind]
                 const live = orphan.tasks.some(isSubRunLive)
                 const node = <SubRunBlock toolName={toolName} agentId={agentId} state={live ? 'input-available' : 'output-available'} progress={orphan} onStopTask={onStopTask} dense={!live} />
-                // A live sub-run opens itself and carries each task's stop button, so it stays out of the folded steps.
                 return live ? { kind: 'standalone', key: gkey, node, trace: true } : { kind: 'group-item', key: gkey, iconProps: toolDisplay(toolName).iconProps, node, status: 'done' }
             }
             if (part.type === 'data-compaction') {
@@ -219,20 +191,14 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
             }
             if (part.type.startsWith('tool-') || part.type === 'dynamic-tool') {
                 const toolPart = part as { toolCallId: string; state: string; toolName?: string; input?: unknown; inputText?: string; output?: unknown; errorText?: string; type: string; approval?: { id: string } }
-                // Claude reaches the builtins through the bridged `rerun` MCP server, which namespaces them.
                 const toolName = stripBridgePrefix(toolPart.toolName ?? toolPart.type.replace(/^tool-/, ''))
                 const key = toolPart.toolCallId
                 const custom = renderToolPart?.({ toolName, toolCallId: key, state: toolPart.state, input: toolPart.input, output: toolPart.output, errorText: toolPart.errorText })
                 if (custom === null) return null
                 if (isValidElement(custom) && custom.type === UnderText) return { kind: 'under-text', key, node: custom }
                 if (custom !== undefined) return { kind: 'standalone', key, node: custom }
-                // Drawn as chips under the whole message, wherever the call sits among the parts.
                 if (toolName === QUICK_REPLIES_TOOL) return null
-                // A setup block still waiting is pinned above the composer, and once answered the
-                // user's reply draws a receipt that says what was asked: the step adds nothing
-                // either way. A failed call keeps its step, which is where the error shows.
                 if (hitlKindOf(toolName) && (toolPart.toolCallId === pendingHitlToolCallId || toolPart.state === 'output-available')) return null
-                // Same idea for the alert still pinned above the composer.
                 if (toolPart.toolCallId === pendingAlertToolCallId) return null
                 if (toolName === 'notify_user' && toolPart.state === 'output-available') {
                     const message = (toolPart.input as { message?: unknown } | undefined)?.message
@@ -245,9 +211,6 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                         return { kind: 'standalone', key, node: <SetupCompleteCard agentId={agentId} summary={out.summary ?? ''} schedules={out.activated?.schedules ?? []} triggers={out.activated?.triggers ?? []} /> }
                     }
                 }
-                // Only an actual install gets rich UI. Browsing the catalog (search,
-                // list installed) stays a collapsed tool step: the agent often looks
-                // things up mid-task and a full service card is noise there.
                 if (toolName === 'rerun_hub_service_install' && toolPart.state === 'output-available') {
                     const out = parseHubOutput<InstallResult>(toolPart.output)
                     if (out?.status === 'installed') {
@@ -255,32 +218,22 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                     }
                     if (out?.status === 'needs_auth') return { kind: 'standalone', key, node: <NeedsAuthCard agentId={agentId} slug={out.slug} name={out.name} /> }
                 }
-                // What a coworker published, and who can open it, where it said so.
                 if (publishedAccess && toolName === 'rerun_hub_publish_file' && toolPart.state === 'output-available') {
                     const out = parseHubOutput<PublishResult>(toolPart.output)
                     if (out?.status === 'published' && out.slug) return { kind: 'standalone', key, node: <PublishedChatCard agentId={agentId} result={out} /> }
                 }
-                // A server registered outside the catalog: what the user sees in Apps, and the one
-                // place a sign-in it still owes can be made.
                 if ((toolName === 'mcp_register' || toolName === 'mcp_login') && toolPart.state === 'output-available') {
                     const card = mcpRegisterCardOf(toolName, toolPart.input, toolPart.output)
                     if (card) return { kind: 'standalone', key, node: <McpServerCard agentId={agentId} {...card} signInPending={card.name === pendingMcpSignIn} /> }
                 }
-                // A card is the agent showing something to the user, so it replaces the
-                // collapsed tool step entirely. A payload we cannot read falls back to it.
                 if (toolName === 'card_table' && toolPart.state === 'output-available') {
                     const card = tableCardSchema.safeParse(parseHubOutput(toolPart.output))
                     if (card.success) return { kind: 'standalone', key, node: <TableCard agentId={agentId} card={card.data} rawUrlFor={rawUrlFor} /> }
                 }
-                // A picture Codex generated on a ChatGPT plan comes back shaped like a file card.
                 if ((toolName === 'card_file' || toolName === 'image_generation') && toolPart.state === 'output-available') {
                     const card = fileCardSchema.safeParse(parseHubOutput(toolPart.output))
                     if (card.success) return { kind: 'standalone', key, node: <FileCard agentId={agentId} card={card.data} rawUrlFor={rawUrlFor} readFile={readFile} sharedFiles={sharedFiles} /> }
                 }
-                // The proposal row replaces the tool step entirely. A call that only joined the
-                // proposal already waiting shows nothing: that row is rendered where it was raised.
-                // While the dock above the composer holds it the spot stays empty, and the
-                // transcript takes the row back as a trace once the decision has landed.
                 if (toolName === 'brain_propose' && toolPart.state === 'output-available') {
                     const out = parseHubOutput<{ status?: string; title?: string }>(toolPart.output)
                     const input = toolPart.input as { baseHash?: string | null } | undefined
@@ -356,25 +309,19 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
         })
         flush()
         releaseUnderText()
-        // The coworker stands once in the thread, beside the last steps it took.
         if (isLastAssistant && lastGroupAt >= 0) rendered[lastGroupAt] = { ...rendered[lastGroupAt], node: <StepGroup items={lastGroupItems} agentId={agentId} /> }
         return rendered
     }
 
     const assistantSteps = message.role === 'assistant' ? renderAssistantSteps() : null
     const inkBubble = message.role === 'user'
-    // The SDK pushes the assistant message before its first token, so its empty shell would
-    // eat one of the conversation gaps and open a band above the loader.
     const showPaidSources = !!paidSources && !isActive
     if (assistantSteps && assistantSteps.length === 0 && sources.length === 0 && !showPaidSources) return null
 
-    // Not the user speaking, so no bubble: a divider across the thread marks where the install, the
-    // routine or the webhook began.
     if (install) return <AgentInstallBlock agentId={agentId} agentName={install.agentName} guide={install.guide} installing={installing} />
     if (scheduledRun) return <ScheduledRunBlock agentId={agentId} run={scheduledRun} />
     if (triggerPayload) return <WebhookRunBlock agentId={agentId} payload={triggerPayload} />
 
-    // A setup block answered: what the user decided, not the reply written for the agent.
     if (hitlReply) return <HitlReceipt reply={hitlReply} call={hitlCall} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} />
 
     return (
@@ -435,15 +382,4 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
     )
 }
 
-/**
- * Renders one conversation message: markdown text, reasoning, tool calls,
- * compaction, service UIs, and consecutive steps grouped into a StepGroup.
- * The single source of truth shared by the live chat and read-only transcripts
- * (e.g. scheduled-task run history). Interactive props are optional: omit them
- * to render a message read-only.
- *
- * Memoised: a conversation renders every message it holds, and the host re-renders on every
- * streamed chunk. Without this, one answer being written repaints the whole transcript, tool
- * blocks and all, at the rate the tokens land.
- */
 export const MessageView = memo(MessageViewInner)

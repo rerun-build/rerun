@@ -25,7 +25,6 @@ function Cell({ id, count, columns, cell, order, onDrop, children }: { id: strin
     const start = useSharedValue({ x: 0, y: 0 })
     const wiggle = useSharedValue(0)
 
-    // Each cell shakes on its own beat, as the home screen does in its edit mode.
     useEffect(() => {
         const beat = 110 + hashUnit(id, 3) * 40
         wiggle.value = withRepeat(withSequence(withTiming(WIGGLE_DEGREES, { duration: beat }), withTiming(-WIGGLE_DEGREES, { duration: beat })), -1, true)
@@ -79,10 +78,6 @@ function Cell({ id, count, columns, cell, order, onDrop, children }: { id: strin
     )
 }
 
-/**
- * Cells dragged into a new order on a grid, as icons on the iOS home screen in edit mode. Every cell
- * has the same size, its height measured on the first one; the order is handed back once a cell is dropped.
- */
 export function SortableGrid<T extends Item>({ items, columns, cellWidth, renderCell, onReorder }: { items: T[]; columns: number; cellWidth: number; renderCell: (item: T) => ReactNode; onReorder: (ids: string[]) => void }) {
     const [cellHeight, setCellHeight] = useState(0)
     const order = useSharedValue(items.map(item => item.id))

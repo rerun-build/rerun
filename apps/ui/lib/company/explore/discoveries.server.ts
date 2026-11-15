@@ -9,9 +9,6 @@ import type { CompanyFinding, DiscoveryEvent, DiscoverySource } from './findings
 import { SOCIAL_NETWORKS, type SocialNetwork, type SocialProfiles } from './social'
 import type { CollectorData } from './types'
 
-// The raw output of the explorers never reaches the browser: this turns it into the cards the board
-// shows, for the welcome card's live stream and for the full exploration alike.
-
 const SOCIAL_LABELS: Record<SocialNetwork, string> = {
     linkedin: 'LinkedIn',
     instagram: 'Instagram',
@@ -24,18 +21,14 @@ const SOCIAL_LABELS: Record<SocialNetwork, string> = {
     threads: 'Threads',
 }
 
-// How the site is built says nothing about what the company works with.
 const NOT_TOOLS = new Set(['Framework'])
 
-// A mail provider is a suite; the catalog files its icon under the inbox people know it by.
 const MAIL_ICON_NAMES: Record<string, string> = { 'Google Workspace': 'Gmail', 'Microsoft 365': 'Outlook' }
 
 const MAX_TOOLS = 12
 const MAX_ITEMS = 6
 const MAX_COLORS = 5
 
-// Everything several sources add to the same card: the name from one, the logo from another, tools
-// from the DNS and from the page. Each card is re-sent whole, the board replacing it by kind.
 export type DiscoveryDraft = {
     identity: { name: string | null; oneLiner: string | null; logoUrl: string | null }
     tools: string[]
@@ -103,7 +96,6 @@ function cards(draft: DiscoveryDraft, source: DiscoverySource, domain: string, c
     ]
 }
 
-// The quick read of the home page, live from the welcome card or as the profile it saved.
 export type SiteRead = { name?: string | null; description?: string | null; audience?: string | null }
 
 export function findingsForProfile(profile: SiteRead, draft: DiscoveryDraft, domain: string): CompanyFinding[] {
@@ -112,13 +104,10 @@ export function findingsForProfile(profile: SiteRead, draft: DiscoveryDraft, dom
     return [...cards(draft, 'profile', domain, { identity }), ...(audience ? [{ kind: 'audience' as const, source: 'profile' as const, text: audience }] : [])]
 }
 
-// What one explorer adds to the board. The ones that may have found a namesake only count when they
-// point back to the site, or when the person who signed up is among the officers.
 export function findingsForCollector<K extends CollectorId>(id: K, data: CollectorData[K], draft: DiscoveryDraft, domain: string): CompanyFinding[] {
     switch (id) {
         case 'dns': {
             const dns = data as CollectorData['dns']
-            // The mail provider has its own card.
             const tools = addTools(draft, dns.services.map(service => service.name).filter(name => name !== dns.mailProvider))
             const mail = dns.mailProvider ? [{ kind: 'mail' as const, source: id, provider: dns.mailProvider, iconUrl: null }] : []
             return [...mail, ...cards(draft, id, domain, { tools })]
@@ -191,8 +180,6 @@ export function findingsForCollector<K extends CollectorId>(id: K, data: Collect
 
 export type IconLookup = (names: string[]) => Promise<Map<string, string>>
 
-// The catalog is read whole, once per exploration, and matched by lowercased name in memory: a name
-// filter would be an exact `IN`, and what the synthesis calls "Hubspot" the catalog calls "HubSpot".
 export function serviceIconLookup(supabase: SupabaseClient<Database>): IconLookup {
     let catalog: Promise<Map<string, string>> | null = null
 
@@ -233,9 +220,6 @@ function withIcon(finding: CompanyFinding, icons: Map<string, string>): CompanyF
     return finding
 }
 
-// One per exploration: it holds what the sources have said so far, so a card several of them fill
-// is sent whole every time one adds to it. The caller closes the stream with its own `end`, once
-// every reader it started is done.
 export function createDiscoveryTranslator({ domain: host, icons }: { domain: string; icons: IconLookup }) {
     const domain = host.replace(/^www\./i, '')
     const draft = emptyDiscoveryDraft()
@@ -264,7 +248,6 @@ export function createDiscoveryTranslator({ domain: host, icons }: { domain: str
                 return [{ type: 'pending', source: event.id }]
             }
             if (event.type === 'done') return found(event.id, findingsForCollector(event.id, event.output.data as CollectorData[typeof event.id], draft, domain))
-            // A collector that was never turned on had no teaser to take back.
             if ((event.type === 'skipped' || event.type === 'error') && started.has(event.id)) return [{ type: 'dropped', source: event.id }]
             return []
         },

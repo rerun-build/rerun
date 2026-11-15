@@ -3,7 +3,6 @@
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { type ReactNode } from 'react'
 
-// What a thread divider keeps one click away: the guide or prompt the run was started with.
 export function ThreadDividerDialog({ open, onOpenChange, icon, title, aside, children }: { open: boolean; onOpenChange: (open: boolean) => void; icon: ReactNode; title: ReactNode; aside?: ReactNode; children: ReactNode }) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>

@@ -59,8 +59,6 @@ export function TemplateMediaSection() {
     )
 }
 
-// The gallery is ordered and the first image is the cover, so reordering is a real
-// editorial action rather than a nicety.
 function Gallery({ value, onChange }: { value: GalleryImage[]; onChange: (next: GalleryImage[]) => void }) {
     const t = useTranslations('templates.authoring.media')
     const errorText = useErrorText()

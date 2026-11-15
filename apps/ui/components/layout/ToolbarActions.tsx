@@ -67,7 +67,6 @@ export function HelpMenuItems({ onOpenGettingStarted }: { onOpenGettingStarted: 
     const openShortcuts = useShortcutsStore(s => s.openShortcuts)
     const { canInstall, promptInstall } = useInstallPrompt()
     const gettingStartedAvailable = useForemanStore(s => s.gettingStartedAvailable)
-    // Rerun Cloud publishes the desktop app; it is offered on a computer's browser, never inside it.
     const offerDesktopApp = useSyncExternalStore(noSubscription, () => RERUN_CLOUD && !isDesktopShell() && detectMobileOs(navigator.userAgent) === null, () => false)
 
     return (

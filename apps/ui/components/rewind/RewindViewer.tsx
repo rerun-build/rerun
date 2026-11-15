@@ -26,7 +26,6 @@ import type { RewindSlideProps } from './slides/types'
 import { useStoryPlayer } from './useStoryPlayer'
 
 const SLIDE_DURATION_MS = 6500
-// A press shorter than this is a tap and moves the story; anything longer was a hold to read.
 const TAP_MAX_MS = 250
 const PREV_ZONE_SHARE = 0.3
 
@@ -43,9 +42,7 @@ const SLIDES: Record<RewindSlideId, ComponentType<RewindSlideProps>> = {
     outro: OutroSlide,
 }
 
-// Slides lay themselves out from the card's shape through the `rewind-wide` variant.
 const STORY_CONTAINER: CSSProperties = { containerType: 'size', containerName: 'rewind' }
-// Same rule as the `rewind-wide` variant in globals.css (40rem, wider than tall).
 const WIDE_MIN_WIDTH_PX = 640
 
 function isWideStory(width: number, height: number) {
@@ -66,7 +63,6 @@ export function RewindViewer() {
     )
 }
 
-// `rewindId` is null for a story with no stored week behind it; it then has no history to pick from.
 export function RewindStory({ rewindId = null, payload, onClose, startAt = 0 }: { rewindId?: string | null; payload: RewindPayload; onClose: () => void; startAt?: number }) {
     useCoverBoard()
     const t = useTranslations('rewind.viewer')

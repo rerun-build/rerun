@@ -2,8 +2,6 @@ import { attachmentTool } from '@/lib/apps/attachment-tool'
 import type { AppTool } from '@/lib/apps/tools'
 import type { QuotaAction } from './quotas'
 
-// The LinkedIn tools a coworker gets: none of the enrichment actions Linkup bills by the credit.
-
 export type LinkedinTool = AppTool<QuotaAction>
 
 const profileUrl = { type: 'string', description: 'LinkedIn profile URL, e.g. https://www.linkedin.com/in/jane-doe' }

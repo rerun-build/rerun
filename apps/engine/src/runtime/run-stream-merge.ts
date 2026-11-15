@@ -5,10 +5,6 @@ import { canonicalHitlName, isHitlToolName } from '../tools/builtin/hitl.js'
 import type { QuickRepliesCapture } from '../agents/quick-replies-stream.js'
 import type { AgentRun, RunOutcome } from './loop.js'
 
-// A settled run whose provider stream never closes would otherwise keep the SSE response and the
-// replay buffer alive: the dashboard reconnects to a stream that will never emit again, and the
-// message the user types next is dropped as a duplicate. The grace period lets the last chunks of a
-// normal turn land before the cut.
 const CUT_GRACE_MS = 2_000
 
 const sum = (a: number | undefined, b: number | undefined): number | undefined =>
@@ -42,8 +38,6 @@ function normalizeHitlStream(stream: ReadableStream<UIMessageChunk>): ReadableSt
     )
 }
 
-// The replies the model closed its message with reach the chat as the call the old tool made, right
-// before the stream ends: by then the last text block went through the cut, so the capture is whole.
 export function withQuickReplies(stream: ReadableStream<UIMessageChunk>, read: (() => QuickRepliesCapture | undefined) | undefined): ReadableStream<UIMessageChunk> {
     if (!read) return stream
     return stream.pipeThrough(
@@ -74,12 +68,9 @@ export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled:
                 try {
                     controller.close()
                 } catch {
-                    // The consumer already went away.
                 }
                 void reader.cancel().catch(() => {})
             }
-            // A run that reached `done` produced its finish part, so its stream closes on its own:
-            // cutting it would truncate the tail of a perfectly good answer.
             void settled.then(outcome => {
                 if (outcome.kind === 'done' || closed) return
                 cutTimer = setTimeout(() => finish(outcome), CUT_GRACE_MS)
@@ -94,11 +85,8 @@ export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled:
                         controller.enqueue(value)
                     }
                 } catch {
-                    // Fall through: the run's own outcome is what the client needs, not this read error.
                 } finally {
                     if (cutTimer) clearTimeout(cutTimer)
-                    // Codex fails a turn by erroring its stream, not with an error part: closing here
-                    // would leave the chat on an empty answer with no reason given.
                     if (endedCleanly || closed) finish()
                     else void settled.then(finish)
                 }

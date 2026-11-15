@@ -9,7 +9,6 @@ export function searchCacheKey(query: string): string {
     return query.trim().toLowerCase().replace(/\s+/g, ' ')
 }
 
-// A cache that cannot be read is a miss: the search then goes to the provider as if nothing was kept.
 export async function readCachedSearch(key: string): Promise<WebSearchResult[] | null> {
     try {
         const since = new Date(Date.now() - SEARCH_CACHE_TTL_MS).toISOString()

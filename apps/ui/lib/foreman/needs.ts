@@ -1,8 +1,6 @@
 import { asString } from '@/lib/mcp/args'
 import type { ForemanNeed, ForemanPlanItem, ForemanProfile } from './phase'
 
-// A need without its job cannot be handed to an agent, and one without its pain is only the job
-// again: both are dropped rather than written half empty.
 export function readNeeds(raw: unknown): ForemanNeed[] {
     if (!Array.isArray(raw)) return []
     return raw.flatMap(entry => {
@@ -23,11 +21,6 @@ export type RevisedJob = Pick<ForemanProfile, 'useCases' | 'pain' | 'needs'>
 
 const sameWords = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase()
 
-// The plan card was sent back and confirmed on another job than the one the interview picked: the
-// coworker they agreed on becomes the job, or every later reader of the profile (the foreman on the
-// engine, the first SOUL, the brain, the agent ideas) goes back to the job they corrected away from.
-// A card that kept the interview's pain only had its name or a detail changed, and the interview's
-// own words stay the better ones.
 export function revisedJob(foreman: ForemanProfile, item: ForemanPlanItem | undefined): RevisedJob | null {
     if (item?.kind !== 'agent' || !item.asked) return null
     const need = item.need?.trim()

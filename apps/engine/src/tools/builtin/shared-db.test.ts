@@ -51,9 +51,6 @@ describe('shared database tools', () => {
         expect(await run(bob, 'shared_db_query', { sql: 'SELECT count(*) AS c FROM leads' })).toBe('1 row(s)\n[{"c":3}]')
     })
 
-    // Looks wrong: TABLE_IN_ERROR is greedy, so "table leads has no column named stage" captures
-    // the last letter ("e") instead of "leads". The hint only fires by accident, on a table named
-    // like that letter, and then describes the wrong table.
     it('takes the last letter of the error as the table name', async () => {
         const out = await run(bob, 'shared_db_execute', { sql: 'INSERT INTO leads (email, stage) VALUES (?, ?)', params: ['d@x.io', 'new'] })
         expect(out).toBe('Execution failed: SQLITE_ERROR: table leads has no column named stage')

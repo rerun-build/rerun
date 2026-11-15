@@ -2,9 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { renderBoardMap, type ForemanAgentRow, type ForemanSpaceRow } from './board-map'
 
-// This block is the last of the system prompt, so an empty board must say what the phase allows.
-// Offering create_boxes to a step that does not hold it is what had the foreman announcing a Box it
-// never claimed.
 describe('renderBoardMap', () => {
     it('offers a Box only to a phase that can create one', () => {
         expect(renderBoardMap([], [], { canCreateBox: true })).toContain('create_boxes')

@@ -1,10 +1,5 @@
 import type { CollectorId } from './catalog'
 
-// What the onboarding board shows of a company exploration while it runs: one card per thing we
-// learnt, and a teaser for every source still being read. Client-safe like the catalog, and the same
-// vocabulary for the live stream of the welcome card and for the rows the full exploration writes.
-
-// `profile` is the quick read of the home page the welcome card already runs, not a collector.
 export type DiscoverySource = CollectorId | 'profile'
 
 export type SpottedTool = { name: string; iconUrl: string | null }
@@ -23,7 +18,6 @@ export type CompanyFinding =
     | { kind: 'products'; source: DiscoverySource; items: string[] }
     | { kind: 'competitors'; source: DiscoverySource; items: string[] }
     | { kind: 'customers'; source: DiscoverySource; items: string[] }
-    // The outline is missing from the rows written before the card listed its pages.
     | { kind: 'brain'; source: DiscoverySource; pages: number; topics?: string[]; products?: number; competitors?: number }
 
 export type FindingKind = CompanyFinding['kind']
@@ -36,8 +30,6 @@ export type DiscoveryEvent =
 
 type Subject = { name: string; domain: string }
 
-// What a teaser says while its source is being read. Written to make someone want to see the card it
-// turns into, so it names what we are looking for rather than the tool doing it.
 export const DISCOVERY_TEASERS: Record<DiscoverySource, { line: (subject: Subject) => string }> = {
     profile: { line: ({ domain }) => `Reading ${domain}…` },
     stack: { line: ({ domain }) => `Peeking under the hood of ${domain}…` },
@@ -68,8 +60,6 @@ export const DISCOVERY_SOURCE_LABELS: Record<DiscoverySource, string> = {
 
 export type DiscoveryEntry =
     | { id: string; order: number; source: DiscoverySource; type: 'teaser' }
-    // `arrival` counts every landing, an update included, so the latest news can be told apart from
-    // the card standing highest in its column.
     | { id: string; order: number; source: DiscoverySource; type: 'finding'; finding: CompanyFinding; arrival: number }
 
 export type DiscoveriesState = { entries: DiscoveryEntry[]; nextOrder: number; arrivals: number; ended: boolean }
@@ -80,12 +70,8 @@ const teaserId = (source: DiscoverySource) => `teaser:${source}`
 
 export const findingId = (finding: CompanyFinding) => `finding:${finding.kind}`
 
-// Findings are plain JSON, built by the same code on every pass, so their serialisations compare.
 export const sameFinding = (a: CompanyFinding, b: CompanyFinding) => JSON.stringify(a) === JSON.stringify(b)
 
-// A finding takes the place of the teaser that announced it, so the card lands where the eye was
-// already waiting. A kind seen before is updated where it stands: the quick read of the site and the
-// full exploration describe the same company, and the second only sharpens the first.
 export function applyDiscoveryEvent(state: DiscoveriesState, event: DiscoveryEvent): DiscoveriesState {
     if (event.type === 'end') return { ...state, ended: true, entries: state.entries.filter(entry => entry.type !== 'teaser') }
 
@@ -104,7 +90,6 @@ export function applyDiscoveryEvent(state: DiscoveriesState, event: DiscoveryEve
         const id = findingId(finding)
         const existing = entries.findIndex(entry => entry.id === id)
         const current = entries[existing]
-        // The board re-reads the whole exploration every few seconds: a card it already shows is not news.
         if (current?.type === 'finding' && sameFinding(current.finding, finding)) return
         const arrival = arrivals++
         if (existing >= 0) {
@@ -117,8 +102,6 @@ export function applyDiscoveryEvent(state: DiscoveriesState, event: DiscoveryEve
     return { ...state, nextOrder, arrivals, entries }
 }
 
-// What the full exploration leaves in `workspace_onboarding.company_findings`: written as each source
-// lands, read back by the board every few seconds and after a reload.
 export type CompanyFindingsRow = { url: string; status: 'running' | 'done' | 'failed'; pending: DiscoverySource[]; findings: CompanyFinding[] }
 
 export function applyToRow(row: CompanyFindingsRow, event: DiscoveryEvent): CompanyFindingsRow {
@@ -131,14 +114,12 @@ export function applyToRow(row: CompanyFindingsRow, event: DiscoveryEvent): Comp
     return { ...row, pending, findings: [...row.findings.filter(finding => !kinds.has(finding.kind)), ...event.findings] }
 }
 
-// The events that bring the board from where it stands to the row, and nothing it already shows.
 export function rowToEvents(row: CompanyFindingsRow, state: DiscoveriesState): DiscoveryEvent[] {
     const shown = new Map(state.entries.flatMap(entry => (entry.type === 'finding' ? [[entry.id, entry.finding] as const] : [])))
     const fresh = row.findings.filter(finding => {
         const current = shown.get(findingId(finding))
         return !current || !sameFinding(current, finding)
     })
-    // The quick read of the home page belongs to the welcome card's own stream, which closes it.
     const teasing = state.entries.flatMap(entry => (entry.type === 'teaser' && entry.source !== 'profile' ? [entry.source] : []))
     const settled = row.status !== 'running'
 

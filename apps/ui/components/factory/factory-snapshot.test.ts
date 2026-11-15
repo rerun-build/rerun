@@ -3,8 +3,6 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { FACTORY_SNAPSHOT_MAX_BYTES, factoryDepartmentSchema, factoryEpicKindSchema, factoryJobStateSchema, factorySnapshotSchema } from '@rerun/contracts'
 
-// The picture the delegator pushes each beat. The sample in packages/contracts/fixtures is the one
-// the delegator's own report is to be tested against too.
 const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')
 const sample = () => JSON.parse(readFileSync(SAMPLE, 'utf8'))

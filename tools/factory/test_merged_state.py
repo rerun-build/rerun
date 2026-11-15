@@ -30,7 +30,7 @@ class MergedState(unittest.TestCase):
             self.r.st.set_ready_state("j", c, "running")
             self.r.st.set("j", "published:" + c, "1")
         self.r.st.add_ready("j", "C")
-        self.r.st.set_ready_state("j", "C", "running")  # not published: stays running
+        self.r.st.set_ready_state("j", "C", "running")
         self.r.see_merges()
         self.assertEqual([self.state(c) for c in "ABC"], ["merged", "merged", "running"])
         self.assertEqual(seen, ["factory/job-j"])

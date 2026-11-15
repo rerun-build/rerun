@@ -5,18 +5,8 @@ import { z } from 'zod'
 
 import { INDUSTRY_GUIDE } from './industry'
 
-// Reads a scraped home page and tells us who the company is. The one thing the onboarding needs
-// from it is `industry`, which decides the connectors put in front of the person and the category
-// the template library opens on; the rest is context we keep on the user row for later.
-//
-// Plain JSON rather than the AI SDK's structured output: the default model is Gemini through the
-// openai-compatible provider on OpenRouter, where response_format json_schema is not supported
-// (same constraint as lib/services/rerank.ts).
-
 const ANALYSIS_MODEL = process.env.RERUN_COMPANY_MODEL ?? 'google/gemini-2.5-flash-lite'
 
-// The site we read, plus what the model made of it. Lives here rather than beside the server action
-// so a client component can name it without importing a 'use server' module for a type.
 export type CompanyAnalysis = { url: string; profile: CompanyProfile }
 
 export type CompanyProfile = {

@@ -1,8 +1,6 @@
 import { siteDomain } from '@/lib/onboarding/site-favicon'
 import { findSiteIcon } from '@/lib/onboarding/site-icon.server'
 
-// GET /api/favicon?domain=acme.com: the site's own icon, what `faviconUrl` points every <img> at.
-// 404 when the site has none. Never a page: the response may not run or load anything.
 export async function GET(request: Request): Promise<Response> {
     const domain = siteDomain(new URL(request.url).searchParams.get('domain') ?? '')
     const icon = domain ? await findSiteIcon(domain) : null

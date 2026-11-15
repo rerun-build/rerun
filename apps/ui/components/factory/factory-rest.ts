@@ -1,8 +1,3 @@
-// Where the factory's spheres sit, in the world's px as FactoryOverlay draws them. A sphere being
-// worked rests on its line short of whoever works it, and walks back along the line until the sphere
-// and its tag clear every tile as drawn and every other resting sphere, so no two of them, and no
-// sphere and a block, ever sit on top of each other.
-
 import { GRID_SIZE, TILE_H, TILE_W, isoPosition, type AxisPoint, type Tile } from '@rerun/ui/iso-grid'
 
 import type { PodView } from './factory-scene'
@@ -10,8 +5,6 @@ import type { PodView } from './factory-scene'
 export type P = { x: number; y: number }
 type Shape = P[] // a convex polygon
 
-// The world's own frame, as TileLinks draws it: a tile's centre on the grid's two axes, and a point of
-// a route from routeTileLinks in px.
 const CENTER = isoPosition(GRID_SIZE / 2, GRID_SIZE / 2)
 export const centreOf = (t: Tile): AxisPoint => { const s = t.span ?? 2; return { u: t.position.col + s / 2, v: t.position.row + s / 2 } }
 export const toWorld = (p: AxisPoint): P => ({ x: (p.u - p.v) * (TILE_W / 2) + TILE_W / 2 - CENTER.left, y: (p.u + p.v) * (TILE_H / 2) - CENTER.top })
@@ -34,9 +27,6 @@ export const atDistance = (points: P[], px: number): P => {
     return along(points, total ? Math.min(1, px / total) : 0)
 }
 
-// A sphere's path over the tiles it passes, on the board's own routes. A leg ends on one face of a
-// tile and the next leaves from another, so both points are kept: the sphere crosses the tile between
-// them. A pair with no line (a blocked job parked at a coworker) goes straight from centre to centre.
 export function podPath(ids: string[], byId: Map<string, Tile>, routes: Map<string, AxisPoint[]>): P[] {
     const pts: P[] = []
     for (let i = 1; i < ids.length; i++) {
@@ -55,8 +45,6 @@ const STEP_PX = 4 // how far back it moves at a time when that place is taken
 const BLOCK_UP = 30 // how high a coworker's block stands above its floor
 const rect = (x0: number, y0: number, x1: number, y1: number): Shape => [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: y1 }, { x: x0, y: y1 }]
 
-// What a tile covers on screen: its floor diamond raised by its block, and for the reject bin and a
-// feature sphere what stands on it, with its label (cf. RejectBin and FeatureOrb).
 export function tileShapes(t: Tile): Shape[] {
     const { x, y } = toWorld(centreOf(t))
     const s = t.span ?? 2
@@ -67,14 +55,11 @@ export function tileShapes(t: Tile): Shape[] {
     return [block]
 }
 
-// What a sphere resting at `at` covers: the glass and its tag, or the whole gate when a scanner holds it
-// (cf. Orb and Scanner in FactoryOverlay).
 export function sphereShapes(at: P, scanner: boolean): Shape[] {
     const { x, y } = at
     return scanner ? [rect(x - 31, y - 62, x + 31, y + 16)] : [rect(x - 17, y - 36, x + 17, y), rect(x - 23, y + 1, x + 23, y + 13)]
 }
 
-// Two convex polygons overlap unless an edge of one separates them (separating axis test).
 function overlap(a: Shape, b: Shape) {
     for (const shape of [a, b]) {
         for (let i = 0; i < shape.length; i++) {
@@ -89,9 +74,6 @@ function overlap(a: Shape, b: Shape) {
 }
 const hits = (shapes: Shape[], others: Shape[]) => shapes.some(s => others.some(o => overlap(s, o)))
 
-// How far along its path each sphere being worked rests. Each takes the first place, walking back from
-// its best one, where it covers no tile and no sphere placed before it; a sphere with no such place on
-// its whole line keeps its best one.
 export function restDistances(pods: PodView[], tiles: Tile[], routes: Map<string, AxisPoint[]>): Map<string, number> {
     const byId = new Map(tiles.map(t => [t.id, t]))
     const taken = tiles.flatMap(tileShapes)
@@ -111,15 +93,11 @@ export function restDistances(pods: PodView[], tiles: Tile[], routes: Map<string
     return out
 }
 
-// Where a task being worked rests: one fixed spot straight in front of its holder, at the front corner
-// of the holder's floor diamond plus what a sphere stands above its position (36, or the gate's 62)
-// and 4 px of air. The same holder gives the same spot, whatever the task or the time.
 export function workSpot(holder: Tile, scanner: boolean): P {
     const c = toWorld(centreOf(holder))
     return { x: c.x, y: c.y + ((holder.span ?? 2) * TILE_H) / 2 + (scanner ? 66 : 40) }
 }
 
-// Tasks waiting on the belt line up from its start, the exit of the Loader; index 0 is nearest to it.
 export const QUEUE_START_PX = 22
 export const QUEUE_GAP_PX = 40
 export const lineUp = (points: P[], index: number): P => atDistance(points, QUEUE_START_PX + index * QUEUE_GAP_PX)

@@ -3,7 +3,6 @@ import { create } from 'zustand'
 
 import { markRewindViewedAction, readRewindAction, type RewindWeekEntry } from '@/app/api/_actions/rewind.actions'
 
-// `id` is null for a story that exists nowhere but on screen, like the admin preview.
 type ShownRewind = { id: string | null; payload: RewindPayload }
 
 type RewindState = {
@@ -28,7 +27,6 @@ export const useRewindStore = create<RewindState>((set, get) => ({
     openWeek: async id => {
         set({ loadingWeek: id })
         const payload = get().payloads[id] ?? (await readRewindAction(id).catch(() => null))
-        // A later pick, or a close, wins over a read that comes back late.
         if (get().loadingWeek !== id) return
         if (!payload) {
             set({ loadingWeek: null })

@@ -2,8 +2,6 @@ import type { Metadata } from 'next'
 
 import { AppAuthBoard } from '@/components/auth/AppAuthBoard'
 
-// Le décor de la connexion de l'app iOS, que l'app charge dans une WebView au-dessus de sa feuille.
-// Hors auth comme tout /render : l'écran qui le montre est justement celui où l'on n'a pas de session.
 export const metadata: Metadata = {
     title: 'Rerun',
     robots: { index: false, follow: false },

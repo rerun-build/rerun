@@ -1,9 +1,3 @@
-// Linkup, the gateway every paid app call goes through. One API key for Rerun, one account per
-// connected LinkedIn profile or WhatsApp number, selected by `account_id` in the body. No
-// 'server-only': the archive, expiry and reconciliation tasks delete accounts from Trigger.dev.
-//
-// Reference: https://docs.linkupapi.com (V2). Every answer is `{ success, data | error, metadata }`.
-
 const BASE_URL = 'https://api.linkupapi.com'
 const TIMEOUT_MS = 60_000
 
@@ -39,8 +33,6 @@ function apiKey(): string {
     return key
 }
 
-// LinkedIn ids such as an invitation_id are 19-digit integers, past what a JS number holds: they are
-// turned into strings before parsing, or a withdrawal would aim at a rounded, wrong invitation.
 const LONG_INTEGER = /([:\[,]\s*)(-?\d{16,})(?=\s*[,\]}])/g
 
 export function parseEnvelope<T>(text: string): Envelope<T> | null {
@@ -70,14 +62,10 @@ async function call<T>(method: 'GET' | 'POST' | 'DELETE', path: string, body?: u
     return envelope.data
 }
 
-// --- Accounts ---
-
 export type LinkupPlatform = 'linkedin' | 'whatsapp'
 
 export type LinkupCheckpointType = 'email' | 'sms' | 'authenticator_app' | 'app_approval' | 'code' | 'whatsapp_qr'
 
-// What WhatsApp hands back while its number is not linked yet: a QR code that renews every ~20 s,
-// or the code to type on the phone when the QR would be on the phone itself.
 export type LinkupLinkCode = { qrCodeImage: string | null; pairingCode: string | null; expiresInSeconds: number | null }
 
 export type LinkupLoginResult =
@@ -105,8 +93,6 @@ export async function login(platform: LinkupPlatform, body: Record<string, unkno
     return loginResult(await call<LoginData>('POST', '/v2/login', { platform, ...body }))
 }
 
-// Without a code, it asks whether an approval in the LinkedIn app went through, or hands the
-// current QR code of a WhatsApp number still waiting to be linked.
 export async function submitCheckpoint(accountId: string, code?: string): Promise<LinkupLoginResult> {
     return loginResult(await call<LoginData>('POST', '/v2/checkpoint', { account_id: accountId, ...(code ? { code } : {}) }))
 }
@@ -128,8 +114,6 @@ export async function listAccounts(): Promise<LinkupAccount[]> {
     }
 }
 
-// Deleting stops Linkup's billing for the account and drops its webhooks. An account already gone
-// is the outcome asked for, not a failure.
 export async function deleteAccount(accountId: string): Promise<void> {
     try {
         await call('DELETE', `/v2/accounts/${encodeURIComponent(accountId)}`)
@@ -143,15 +127,11 @@ export async function getMe<T>(accountId: string): Promise<T> {
     return call<T>('POST', '/v2/profiles', { account_id: accountId, action: 'get_me' })
 }
 
-// --- Webhooks ---
-
 export async function createWebhook(accountId: string, url: string, events: readonly string[]): Promise<{ webhookId: string; secret: string }> {
     const data = await call<{ webhook_id: string; secret?: string }>('POST', '/v2/webhooks', { account_id: accountId, url, events: [...events], retry: true, enable_signature: true })
     if (!data.secret) throw new LinkupError('INTERNAL_ERROR', 'Linkup created the webhook without a signing secret', 200)
     return { webhookId: data.webhook_id, secret: data.secret }
 }
-
-// --- Actions ---
 
 export type LinkupCategory = 'profiles' | 'network' | 'messages' | 'content'
 
@@ -159,10 +139,6 @@ export async function runAction<T = unknown>(accountId: string, category: Linkup
     return call<T>('POST', `/v2/${category}`, { account_id: accountId, action, params })
 }
 
-// --- Attachments ---
-
-// Which ids name an attachment depends on the channel: `message_id` on WhatsApp, `conversation_id`
-// with `asset_urn` on LinkedIn, `message_id` with `asset_urn` on a Recruiter seat.
 export const ATTACHMENT_REF_KEYS = ['message_id', 'conversation_id', 'asset_urn', 'attachment_id', 'filename'] as const
 
 export type AttachmentRef = Partial<Record<(typeof ATTACHMENT_REF_KEYS)[number], string>>
@@ -182,8 +158,6 @@ function filenameOf(disposition: string | null): string | null {
     return /filename="?([^";]+)"?/i.exec(disposition)?.[1]?.trim() ?? null
 }
 
-// The raw bytes, not the JSON envelope: only a failure answers with one. Each download costs a
-// Linkup credit, nothing is kept on their side.
 export async function downloadAttachment(accountId: string, ref: AttachmentRef, signal?: AbortSignal): Promise<LinkupAttachmentFile> {
     const query = new URLSearchParams({ account_id: accountId })
     for (const key of ATTACHMENT_REF_KEYS) if (ref[key]) query.set(key, ref[key])

@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest'
 
 import { hasCommand } from './exec.js'
 
-// The real shell, nothing mocked: the engine runs on Linux, where /bin/sh exists.
 describe.skipIf(process.platform === 'win32')('hasCommand', () => {
     it('finds a command on the PATH', () => {
         expect(hasCommand('sh')).toBe(true)

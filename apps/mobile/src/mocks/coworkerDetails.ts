@@ -1,7 +1,5 @@
 import type { CoworkerFile, CoworkerFiles, InstalledServiceView, RoutineView } from '@rerun/contracts'
 
-// Mock data for the coworker details, in the hub's shapes (`/agents/:id/services`, `/routines`).
-
 const app = (slug: string, name: string, status: InstalledServiceView['status'], label?: string): InstalledServiceView => ({ key: slug, slug, name, label, icon: null, category: 'productivity', status, toolNames: [], installedAt: '2026-10-01T09:00:00.000Z' })
 
 export const MOCK_APPS: InstalledServiceView[] = [app('gmail', 'Gmail', 'active', 'ada@acme.com'), app('hubspot', 'HubSpot', 'active'), app('linkedin', 'LinkedIn', 'active', 'Clément Janssens')]
@@ -34,5 +32,4 @@ export const MOCK_FILES: CoworkerFiles = {
     truncated: false,
 }
 
-// A stand-in picture per file, so the grid reads as one in the lab.
 export const mockFileUrl = (entry: CoworkerFile) => `https://picsum.photos/seed/${encodeURIComponent(entry.name)}/300`

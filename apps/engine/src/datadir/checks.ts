@@ -24,8 +24,6 @@ function failIf(problems: string[]): void {
     if (problems.length > 0) throw new Error(problems.join('; '))
 }
 
-// Its own short-lived client rather than the engine's pooled one, which would migrate the file on
-// open and hide exactly what this is here to see.
 async function fileVersion(path: string): Promise<number> {
     const client = createClient({ url: `file:${path}` })
     try {
@@ -35,10 +33,6 @@ async function fileVersion(path: string): Promise<number> {
     }
 }
 
-/**
- * Whether the data-dir is in a state this build can run on. Strictly read-only: a diagnosis that
- * migrated as it went would repair the very thing it is meant to report.
- */
 export async function runDataDirChecks(): Promise<EngineDoctor> {
     const dataVersion = readDataVersion()
     let agentIds: string[] = []

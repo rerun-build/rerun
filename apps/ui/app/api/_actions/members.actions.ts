@@ -34,8 +34,6 @@ async function resolveMemberEmails(supabase: ServiceClient, userIds: string[]): 
 
 export type WorkspaceMember = { userId: string; email: string | null; role: WorkspaceRole; boxScope: BoxScope }
 
-// Who signs a message in a conversation. Names and photos live in the auth records, which
-// no member can read from the browser.
 export async function listMemberProfilesAction(): Promise<MemberProfile[]> {
     return listMemberProfiles(await requireWorkspaceContext())
 }
@@ -59,8 +57,6 @@ export async function listWorkspaceMembersAction(): Promise<ActionResult<{ membe
     }
 }
 
-// `inviteUrl` comes back where no email leaves, for the person inviting to pass on. `boxScope` is
-// copied onto the membership when the invitation is accepted.
 export async function inviteToWorkspaceAction(rawEmail: string, rawBoxScope: BoxScope = 'all'): Promise<ActionResult<{ inviteUrl?: string }>> {
     try {
         const { userId, userEmail, workspace, supabase } = await requireAdminContext(MEMBERS_ADMIN_ONLY)
@@ -100,8 +96,6 @@ export async function inviteToWorkspaceAction(rawEmail: string, rawBoxScope: Box
             if (error) return { ok: false, error: error.message }
         }
 
-        // After the response: the invitation is saved, and the board the email opens on can take a
-        // cold capture without holding the dialog.
         const inviteUrl = `${APP_URL}/invite/${token}`
         after(async () => {
             const serviceRole = createServiceRoleClient()
@@ -175,8 +169,6 @@ export async function setMemberRoleAction(targetUserId: string, role: WorkspaceR
     }
 }
 
-// Whether a member uses every Box open to the workspace or only the ones named to them. An admin
-// reaches every Box whatever the scope, so theirs is not changed.
 export async function setMemberBoxScopeAction(targetUserId: string, boxScope: BoxScope): Promise<ActionResult> {
     try {
         const { workspace, supabase } = await requireAdminContext(MEMBERS_ADMIN_ONLY)
@@ -216,8 +208,6 @@ export async function loadInvitationAction(token: string): Promise<InvitationVie
     return { status: 'ok', email: invite.email, workspaceName: workspace?.name ?? 'a workspace' }
 }
 
-// The page is rendered again after the one that accepted (a refresh racing the sign-in navigation,
-// a reload): whoever it was meant for, already a member, is let in rather than told it was used.
 export async function joinedWorkspaceForInvitationAction(token: string): Promise<number | null> {
     const { user, session } = await getServerSession()
     if (!user?.id || !session?.email) return null
@@ -244,7 +234,6 @@ export async function acceptInvitationAction(token: string): Promise<ActionResul
         return failure('invitationForEmail', { email: invite.email })
     }
 
-    // Claimed before the seats are counted: only one tab can move it off `pending`, so only one gets to count and insert.
     const { data: claimed } = await supabase
         .from('workspace_invitations')
         .update<Database['public']['Tables']['workspace_invitations']['Update']>({ status: 'accepted', accepted_at: new Date().toISOString() })

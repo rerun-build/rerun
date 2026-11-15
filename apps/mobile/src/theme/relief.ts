@@ -1,7 +1,5 @@
 import type { ColorScheme } from '@/theme/tokens'
 
-// Port of the `--relief-*` family in packages/ui/src/theme.css. `pressed` takes the web `-hover`
-// value: on touch, pressing is the moment the button lights up.
 const shadows = (...layers: string[]) => layers.join(', ')
 
 type Relief = Record<ColorScheme, { rest: string; pressed: string }>

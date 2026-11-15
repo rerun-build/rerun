@@ -7,7 +7,6 @@ export async function recordPaidSources(agentId: string, record: PaidSourceRecor
     await writePaidSources(client, record)
 }
 
-// An agent that never ran has no system.db: it is skipped rather than created by a read.
 export async function lookupPaidSources(agentIds: string[], rows: TableSourcesRequest['rows']): Promise<TableSourcesResult> {
     const clients = await Promise.all(agentIds.filter(systemDbExists).map(async id => (await getSystemDb(id)).client))
     return readPaidSources(clients, rows)

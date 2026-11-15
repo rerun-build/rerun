@@ -73,8 +73,6 @@ describe('migrateSqlite', () => {
     })
 })
 
-// The registries are append-only: a shipped step is never removed nor renamed, because a file
-// archived before it still needs it. Updating one of these snapshots is the change to look at twice.
 describe('sqlite ladders', () => {
     it.each([
         ['system.db', SYSTEM_DB_MIGRATIONS],
@@ -136,8 +134,6 @@ describe('sqlite ladders', () => {
         `)
     })
 
-    // Editing a shipped step changes what a fresh file gets and not what a file already past it has:
-    // the two drift apart without an error. Pinning the schema each version produces catches it.
     it.each(SYSTEM_DB_MIGRATIONS.map(s => s.version))('system.db v%i produces the schema it shipped with', async version => {
         const client = freshFile(`schema-v${version}`)
         await migrateSqlite(
@@ -239,7 +235,6 @@ describe('system.db v3 to v4', () => {
         const marker = await client.execute("SELECT value FROM system_meta WHERE key = 'paid_backfill'")
         expect(marker.rows).toHaveLength(1)
 
-        // A second pass finds the marker and reads nothing: a call written since would stay out of it.
         await client.execute("DELETE FROM paid_keys WHERE key = 'n:boulangerie dupont'")
         await backfillPaidSources(client)
         expect((await client.execute("SELECT count(*) AS n FROM paid_keys WHERE key = 'n:boulangerie dupont'")).rows[0].n).toBe(0)

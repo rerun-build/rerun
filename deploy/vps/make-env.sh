@@ -1,11 +1,4 @@
 #!/bin/sh
-# Writes .env for Rerun on the server, next to docker-compose.yml. Run from the clone, once:
-#   sh deploy/vps/make-env.sh
-#
-# Supabase's address, keys and mail settings come from the self-hosted Supabase's own .env
-# (SUPABASE_ENV, /docker/supabase-rerun/.env by default). The rest comes as one pasted bundle: the
-# base64 of KEY=VALUE lines made on the machine Rerun ran on before, so the engine keeps its pairing.
-# Nothing it reads is printed.
 set -eu
 cd "$(dirname "$0")/../.."
 
@@ -17,12 +10,8 @@ BUNDLE_KEYS='OPENROUTER_API_KEY RERUN_EMBED_API_KEY RERUN_ENGINE_API_KEY FOREMAN
 [ -f .env ] && { echo ".env exists already. Move it away first: mv .env .env.old"; exit 1; }
 [ -r "$SUPABASE_ENV" ] || { echo "Cannot read $SUPABASE_ENV (run with sudo, or set SUPABASE_ENV)"; exit 1; }
 
-# The last value of KEY in a file, without surrounding quotes.
 value_in() { sed -n "s/^$2=//p" "$1" | tail -n 1 | sed "s/^'\(.*\)'\$/\1/; s/^\"\(.*\)\"\$/\1/"; }
 
-# Sets KEY to VALUE in .env, replacing its line or adding one. The value goes in single quotes, so
-# docker compose takes it literally; awk reads it from the environment, so nothing is unescaped.
-# A value holding a single quote cannot be written that way and stops the script.
 put() {
     case "$2" in *"'"*) echo "The value of $1 contains a single quote, which .env cannot hold. Change it and run again."; rm -f .env; exit 1 ;; esac
     K="$1" V="$2" awk 'BEGIN { k = ENVIRON["K"]; line = k "=\047" ENVIRON["V"] "\047" }
@@ -58,7 +47,6 @@ put RERUN_ENGINE_HOST "$ENGINE_HOST"
 put NEXT_PUBLIC_APP_URL "https://$APP_HOST"
 put RERUN_ENGINE_BROWSER_URL "https://$ENGINE_HOST"
 
-# webgate and searxng in docker-compose.vps.yml. CRAWL4AI_TOKEN is asked for by deploy/vps/add-web.sh.
 hex() { if command -v openssl >/dev/null 2>&1; then openssl rand -hex "$1"; else od -An -N"$1" -tx1 /dev/urandom | tr -d ' \n'; fi; }
 put WEBGATE_KEY "$(hex 32)"
 put SEARXNG_SECRET "$(hex 32)"

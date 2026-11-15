@@ -34,7 +34,6 @@ function ChangelogSteps() {
     const entry = shown[index]
     const next = shown[index + 1]
 
-    // Sans ça, « Next » ouvre sur un cadre vide le temps que l'image arrive.
     useEffect(() => {
         for (const url of [next?.imageUrl, next?.imageDarkUrl]) {
             if (url) new Image().src = url
@@ -43,8 +42,6 @@ function ChangelogSteps() {
 
     if (!entry) return null
     return (
-        // Plus petite que le cadre maison : une annonce se lit, elle ne se remplit pas. La hauteur suit
-        // la largeur pour que la colonne de droite garde le 5:6 du visuel.
         <SplitDialogContent
             aside={<ChangelogEntryVisual entry={entry} direction={direction} />}
             className="sm:max-w-[min(64rem,100%_-_4rem)]"

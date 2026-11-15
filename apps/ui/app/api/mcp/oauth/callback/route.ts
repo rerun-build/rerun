@@ -12,9 +12,6 @@ import type { DesktopShellChannel } from '@rerun/contracts'
 
 type CallbackResult = { ok: true; claim?: string } | { ok: false; error: string }
 
-// `serverName` lets a page holding several Connect buttons tell which server just finished, the
-// page then flips the registry entry it holds for it. It is absent when the context could not be
-// read, so every listener still hears that failure.
 function htmlResult(result: CallbackResult, serverName?: string): NextResponse {
     const target = serverName ? { serverName } : {}
     return oauthPopupResponse({
@@ -24,19 +21,13 @@ function htmlResult(result: CallbackResult, serverName?: string): NextResponse {
     })
 }
 
-// OAuth redirect target on our own domain. Exchanges the code for tokens, writes the bundle
-// to the engine token store (never Supabase), then messages the opener popup and closes. For the
-// app, which has no session here, the bundle is parked instead, for the app to claim with its bearer.
-// A pre-registered client's secret is never parked: the claim reads it from the environment again.
 export async function GET(req: Request) {
     const url = new URL(req.url)
     const code = url.searchParams.get('code')
     const state = url.searchParams.get('state')
     const providerError = url.searchParams.get('error')
 
-    // Only known once the context is decoded, and `finish` is what every exit path goes through.
     let mobile = false
-    // The desktop app's channel, when it started the sign-in: where the browser goes back to.
     let desktop: DesktopShellChannel | undefined
     let serverName: string | undefined
 
@@ -60,7 +51,6 @@ export async function GET(req: Request) {
         const grant = callbackGrant(ctx)
         desktop = grant?.desktop
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
-        // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
         const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, actor, 'manage')
         const token = await exchangeCode(ctx, code)

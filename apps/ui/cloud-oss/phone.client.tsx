@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react'
 
-// Never rendered: every caller checks PHONE_ENABLED first. Kept so the callers type-check.
 export function PhoneChangeForm(_props: { onChanged: () => Promise<void> }) {
     return null
 }

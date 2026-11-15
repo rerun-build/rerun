@@ -33,13 +33,8 @@ const loadHcaptcha = scriptLoader({
     readyCallback: READY_CALLBACK,
 })
 
-// The 303px box is wider than the room some phones leave beside the form padding.
 const COMPACT_BELOW_PX = 360
 
-// The puzzle a visitor is handed when Cloudflare could not vouch for them: a box to tick, then
-// images to pick if hCaptcha is unsure too. Only the loading of its script is timed, for
-// `scriptTimeoutMs`: a visitor solving the puzzle takes the time they need, and closing the puzzle
-// leaves the box to tick again. A script that failed to load is fetched again on the next ask.
 export function mountHcaptcha(container: HTMLElement, siteKey: string, theme: HcaptchaOptions['theme'], scriptTimeoutMs: number): CaptchaWidget {
     let waiter: Waiter | null = null
     let timeout: ReturnType<typeof setTimeout> | null = null

@@ -4,9 +4,6 @@ import type { EngineTriggerMethod } from '@/lib/engine/types'
 import { isPassiveVisit } from '@/lib/triggers/passive-visit'
 import { MAX_TRIGGER_BODY_BYTES, readBodyCapped } from '@/lib/triggers/webhook'
 
-// Public webhook endpoint. It is the front door of a trigger: it resolves the agent, forwards the
-// caller's payload to the space's engine, and answers immediately with the run id. The engine owns
-// the trigger definition and is what actually verifies the token, so nothing here is authoritative.
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
@@ -69,8 +66,6 @@ export const PUT = handle
 export const PATCH = handle
 export const DELETE = handle
 
-// Link scanners and preflight clients probe a URL before calling it. Answering them must never
-// start a run, whatever methods the trigger accepts.
 export function HEAD(): Response {
     return new Response(null, { status: 200 })
 }

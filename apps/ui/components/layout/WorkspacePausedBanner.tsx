@@ -21,15 +21,12 @@ import { useCallback, useState } from 'react'
 const RESTORE_STEPS: readonly Exclude<RestoreStage, 'waiting' | 'failed'>[] = ['machine', 'data', 'agents']
 
 const STAGE_POLL_MS = 4000
-// An approval is a human's doing: nothing here changes by the second.
 const SANDBOX_ARCHIVE_POLL_MS = 15_000
 
 export function formatKeptUntil(date: Date, locale: string): string {
     return formatDate(date, locale, { month: 'short', day: 'numeric' })
 }
 
-// The board of a workspace whose machine was archived when its plan ended, and of one coming back
-// after a payment. The agents stay drawn, locked: this is the one place that says why and how out.
 export function WorkspacePausedBanner() {
     const { access, keptUntil, paymentFailed, sandboxArchived } = useWorkspaceAccess()
     const { workspace } = useSession()
@@ -63,8 +60,6 @@ export function PausedContent({ keptUntil, paymentFailed = false }: { keptUntil:
     )
 }
 
-// Keeps the store in step with the server for as long as the banner shows: an approval turns the
-// sandbox to restoring, and a restore that landed clears the store once the session has caught up.
 function SandboxArchiveSync({ workspaceId }: { workspaceId: number }) {
     const refresh = useCallback(() => {
         getSandboxArchiveStateAction()
@@ -75,7 +70,6 @@ function SandboxArchiveSync({ workspaceId }: { workspaceId: number }) {
     return null
 }
 
-// The connected half: reads what the server said, and owns the request dialog.
 function SandboxArchivedBanner({ keptUntil }: { keptUntil: Date | null }) {
     const { workspace } = useSession()
     const stored = useSandboxArchiveStore(s => (workspace && s.workspaceId === workspace.id ? s.archive : null))
@@ -119,8 +113,6 @@ export function SandboxArchivedContent({ keptUntil, status, onRequest }: { keptU
     )
 }
 
-// `approved`: a sandbox coming back on an approval rather than a payment, which changes what the
-// two stalled states have to say.
 function RestoringContent({ approved = false }: { approved?: boolean }) {
     const t = useTranslations('layout.restoring')
     const [stage, setStage] = useState<RestoreStage>('machine')
@@ -142,7 +134,6 @@ function RestoringContent({ approved = false }: { approved?: boolean }) {
         )
     }
 
-    // The teardown refuses this one every tick and never retries it: no "within minutes" here.
     if (stage === 'failed') {
         return (
             <div className="relative flex min-w-0 items-center gap-2 pr-3">

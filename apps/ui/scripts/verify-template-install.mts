@@ -1,11 +1,3 @@
-// End-to-end check of the template install path against the real database and a local engine.
-// Imports a captured template twice into the `dev` space, asserts the agents landed with unique
-// handles and a complete folder, then deletes everything it created.
-//
-// Start an engine first:
-//   RERUN_DATA_DIR=/tmp/rerun-install-verify RERUN_PORT=3000 pnpm -C ../engine exec tsx src/cli/bin.ts run
-// Then run: ../engine/node_modules/.bin/tsx --env-file=.env scripts/verify-template-install.mts
-
 import { getSpaceConnection } from '../app/api/_services/space.service'
 import { deleteAgent as engineDeleteAgent, getAgent as engineGetAgent, listSkills, listTriggers } from '../lib/engine/client'
 import { installTemplate } from '../lib/templates/install'
@@ -13,8 +5,6 @@ import { workspaceActor } from '../app/api/_auth/access'
 import { createServiceRoleClient } from '../supabase/serviceRole'
 import { selectMany } from '@rerun/db/helpers'
 
-// Defaults to the local `dev` space, whose engine_host is 127.0.0.1, so the run stays on the
-// engine started above rather than on someone's real box.
 const SLUG = process.env.VERIFY_TEMPLATE_SLUG ?? 'dfs'
 const SPACE_ID = process.env.VERIFY_SPACE_ID ?? '644a7ff0-ba92-4830-aadf-a2465eb8ed3e'
 const WORKSPACE_ID = Number(process.env.VERIFY_WORKSPACE_ID ?? 13)
@@ -74,9 +64,6 @@ try {
         console.log(`        ${agent.handle}: ${skills.length} skill(s), ${triggers.length} webhook(s), ${detail.config.mcpServers.length} mcp server(s)`)
     }
 
-    // Nothing to compare when the template ships no webhook, and the archives predating the
-    // trigger capture are exactly that case. Two installs sharing a token would mean the copy
-    // answers to a URL somebody else holds.
     if (triggerTokens.length > 0) {
         check('every webhook was issued a token of its own', new Set(triggerTokens).size === triggerTokens.length, `${triggerTokens.length} webhook(s), ${new Set(triggerTokens).size} distinct token(s)`)
         check('no webhook arrived without a token', triggerTokens.every(token => token.length > 0))

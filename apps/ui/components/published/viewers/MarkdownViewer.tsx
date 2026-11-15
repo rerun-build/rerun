@@ -4,7 +4,6 @@ import { FileTextIcon } from '@/lib/icons'
 import { Markdown } from '@rerun/ui/markdown'
 import { ViewerPage, ViewerTopBar } from './ViewerChrome'
 
-// The chat's rich text, opened up for a full document: a page title, tables and images.
 export const DOCUMENT_CLASS = [
     'text-[15px] leading-7',
     '[&_h1]:mb-4 [&_h1]:text-3xl [&_h1]:leading-tight [&_h1]:font-semibold [&_h1]:tracking-tight [&_h1]:text-balance max-md:[&_h1]:text-2xl',
@@ -15,7 +14,6 @@ export const DOCUMENT_CLASS = [
     '[&_pre]:bg-muted/60',
 ].join(' ')
 
-// "Updated yesterday", "Updated 5 min ago", but "Updated Oct 28".
 function updatedLabel(updatedAt: string, locale: string): string {
     const when = relativeDate(updatedAt, locale)
     return /^[A-Z][a-z]{2} \d/.test(when) ? when : when.charAt(0).toLowerCase() + when.slice(1)

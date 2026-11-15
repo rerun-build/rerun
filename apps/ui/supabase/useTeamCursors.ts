@@ -40,17 +40,11 @@ export function useTeamCursors(workspaceId: number | undefined) {
         let attempt = 0
         let reconnectTimer: ReturnType<typeof setTimeout> | null = null
 
-        // Le topic est une room broadcast partagée, donc il ne peut pas être rendu unique. Le
-        // client browser étant un singleton, un remontage rapide peut retomber sur le canal
-        // précédent encore joint (removeChannel est asynchrone) et ses `.on()` throwent : on
-        // attend la fin du teardown du canal homonyme avant d'en créer un neuf.
         const setup = async () => {
             const stale = supabase.getChannels().find(c => c.topic === `realtime:${channelKey}`)
             if (stale) await supabase.removeChannel(stale)
             if (disposed) return
 
-            // Private: Realtime checks the policies on `realtime.messages` with the user's JWT, so
-            // only a member of the workspace joins or sends on it.
             const created = supabase.channel(channelKey, {
                 config: { private: true, broadcast: { self: false }, presence: { key: userId } },
             })
@@ -70,8 +64,6 @@ export function useTeamCursors(workspaceId: number | undefined) {
             created.on('presence', { event: 'leave' }, ({ key }) => drop(key))
 
             let alive = true
-            // Un canal fermé par le serveur (token expiré, onglet réveillé) n'est jamais rejoint par
-            // realtime-js : sans reconnexion, les curseurs restent morts jusqu'au reload.
             created.subscribe(status => {
                 if (!alive || disposed) return
                 if (status === 'SUBSCRIBED') {
@@ -117,8 +109,6 @@ export function useTeamCursors(workspaceId: number | undefined) {
     const onPointerWorldMove = useCallback(
         (world: { x: number; y: number } | null) => {
             const channel = channelRef.current
-            // Hors d'un canal joint, realtime-js retombe sur un POST HTTP à chaque appel, soit jusqu'à
-            // 20 requêtes par seconde pendant un pan. Un curseur perdu n'a aucune importance.
             if (!channel || channel.state !== REALTIME_CHANNEL_STATES.joined || !userId) return
 
             if (!world) {

@@ -1,24 +1,16 @@
-"""Run clocks and retry class (rerun#207, phase A of #198). Pure: no network, no ledger write. It decides nothing that
-limits.run_outcome decides: it builds that function's inputs and maps its answer to a retry class."""
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import limits as L
 
 RETRY_BACKOFF_S = (60, 120, 240)
 _ERR = ("provider_overloaded", "429", "rate limit", "sign-in renewed during the run", "403 attention required")
-# The three patterns below are copied from packages/contracts/src/chat-error.ts at 719a14d (test_clocks checks them).
-# PROVIDER_OVERLOADED of that file: no room at the provider.
 _OVERLOADED = re.compile(r"overloaded|rate.?limit|too many requests|at capacity|high demand|service unavailable", re.I)
-# SUBSCRIPTION_LIMIT of that file: a spent plan.
 _SPENT = re.compile(r"hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached", re.I)
-# MODEL_NOT_IN_PLAN of that file: a model the plan lacks; waiting for a reset does not bring it back, so no hold.
 _NOT_IN_PLAN = re.compile(r"not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found", re.I)
 _ROOM = ("builders are already active", "GB free, floor is", "of memory available, floor is", "/data/work is over")
 
 
 def seen_after(run, prev, now_iso):
-    """Last sighting of a run's step count: `at` moves only when run["steps"] differs from prev; the first sighting
-    uses run["startedAt"] (get_run carries no time of the last step)."""
     steps = run["steps"]
     if prev is None:
         return {"steps": steps, "at": run["startedAt"]}
@@ -28,7 +20,6 @@ def seen_after(run, prev, now_iso):
 
 
 def outcome(run, seen, now, cfg=None):
-    """limits.run_outcome for a get_run record; now is epoch seconds. run None gives MISSING."""
     if run is None:
         return L.run_outcome(None, now, None, cfg)
     if cfg is None:
@@ -40,7 +31,6 @@ def outcome(run, seen, now, cfg=None):
 
 
 def klass(kind, run=None, blocked=None):
-    """transient, cancel, work, plan, plan_limit, or None (DONE/RUNNING)."""
     if kind in ("DONE", "RUNNING"):
         return None
     if kind in ("RESTARTED", "MISSING"):
@@ -68,5 +58,4 @@ def klass(kind, run=None, blocked=None):
 
 
 def backoff(n):
-    """Seconds before the n-th transient retry (1-based); None from the 4th."""
     return RETRY_BACKOFF_S[n - 1] if 1 <= n <= len(RETRY_BACKOFF_S) else None

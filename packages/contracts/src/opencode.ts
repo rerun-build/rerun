@@ -1,18 +1,12 @@
 import { z } from 'zod'
 
-// OpenCode sells one API key that reaches two catalogs: Go, a subscription whose models are paid by
-// the plan, and Console, paid per token from the account's credits. A model listed on both sides is
-// two distinct picks, so the plan is part of the Rerun id: `go/<id>` and `console/<id>`.
 export const OPENCODE_PLANS = ['go', 'console'] as const
 export type OpencodePlan = (typeof OPENCODE_PLANS)[number]
 
-// The wire format each model is served on, one per model: OpenCode proxies every vendor on its own
-// API (`messages`, `responses`, `chat-completions`, `generate-content`).
 export type OpencodeWire = 'anthropic' | 'responses' | 'chat' | 'google'
 
 export type OpencodeModel = {
     id: string
-    // The id OpenCode knows the model by: the only one that leaves the box.
     upstreamId: string
     plan: OpencodePlan
     label: string
@@ -22,24 +16,18 @@ export type OpencodeModel = {
     outputLimit: number
     images: boolean
     reasoning: boolean
-    // USD per million tokens.
     price: { input: number; output: number; cacheRead: number | null }
 }
 
-// Both catalogs are public: they answer without a key.
 export const OPENCODE_CATALOG_URL: Record<OpencodePlan, string> = {
     go: 'https://opencode.ai/inference/go/v1/models',
     console: 'https://opencode.ai/inference/v1/models',
 }
 
-// The only endpoint that checks a key, and the one that reports the Go plan's windows.
 export const OPENCODE_USAGE_URL = 'https://opencode.ai/zen/go/v1/usage'
 
-// Every request is refused (400 `MissingSessionID`) without it.
 export const OPENCODE_SESSION_HEADER = 'x-opencode-session'
 
-// The key goes to whatever base URL the catalog names, so a catalog entry pointing anywhere else is
-// dropped rather than trusted.
 const OPENCODE_ORIGIN = 'https://opencode.ai/'
 
 const WIRE_OF_STYLE: Record<string, OpencodeWire> = {
@@ -80,15 +68,11 @@ export function opencodePlanOf(id: string): OpencodePlan | null {
     return OPENCODE_PLANS.find(plan => id.startsWith(`${plan}/`)) ?? null
 }
 
-// The id without its plan, for a caller that has nothing but the Rerun id (a GPT has to be told
-// apart from a Claude whichever plan serves it).
 export function opencodeUpstreamId(id: string): string {
     const plan = opencodePlanOf(id)
     return plan ? id.slice(plan.length + 1) : id
 }
 
-// A model OpenCode serves for nothing (`beam-free`, `longcat-2.5-free`, `big-pickle`). Takes a
-// price, so it reads a catalog entry and a `ProviderModel` from a box alike.
 export function isFreeOpencodeModel(price: Pick<OpencodeModel['price'], 'input' | 'output'>): boolean {
     return price.input === 0 && price.output === 0
 }
@@ -96,8 +80,6 @@ export function isFreeOpencodeModel(price: Pick<OpencodeModel['price'], 'input' 
 function entryToModel(entry: z.infer<typeof catalogEntrySchema>, plan: OpencodePlan): OpencodeModel | null {
     if (entry.type !== 'chat' || !entry.capabilities.tools.supported) return null
     const { input, output } = entry.cost.text
-    // A free model is served to a Go subscription ("Free models work in OpenCode; subscribe to
-    // OpenCode Go" is what Console answers one, with a 429), so only Console drops them.
     if (plan === 'console' && isFreeOpencodeModel({ input: input.price, output: output.price })) return null
     const styles = Object.entries(entry.api).filter(([style]) => WIRE_OF_STYLE[style])
     if (styles.length !== 1) return null
@@ -118,8 +100,6 @@ function entryToModel(entry: z.infer<typeof catalogEntrySchema>, plan: OpencodeP
     }
 }
 
-// One invalid entry is skipped, never the whole catalog: OpenCode publishes models faster than this
-// parser learns their quirks. Sorted by id so a regenerated snapshot only moves where the catalog did.
 export function parseOpencodeCatalog(json: unknown, plan: OpencodePlan): OpencodeModel[] {
     const data = (json as { data?: unknown } | null)?.data
     if (!Array.isArray(data)) return []
@@ -136,8 +116,6 @@ export function parseOpencodeCatalog(json: unknown, plan: OpencodePlan): Opencod
     return models.sort((a, b) => a.id.localeCompare(b.id))
 }
 
-// What a box tells the hub about the models its OpenCode connection reaches, read from the live
-// catalog: the hub has only the snapshot it was built with.
 export const providerModelSchema = z.object({
     id: z.string(),
     label: z.string(),
@@ -152,10 +130,8 @@ export function toProviderModel({ id, label, plan, contextWindow, images, price 
     return { id, label, plan, contextWindow, images, price }
 }
 
-// The pick a fresh OpenCode connection runs: an open model the Go plan includes, good with tools.
 export const OPENCODE_DEFAULT_MODEL = 'go/deepseek-v4-pro'
 
-// What a Go subscription reports at `/usage`, for the whole account.
 const usageWindowSchema = z.object({ status: z.string(), percent: z.number(), resetsAt: z.string().nullable().optional() })
 export const opencodeUsageSchema = z.object({
     usage: z.object({ rolling: usageWindowSchema.optional(), weekly: usageWindowSchema.optional(), monthly: usageWindowSchema.optional() }),

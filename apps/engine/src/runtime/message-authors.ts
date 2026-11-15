@@ -3,8 +3,6 @@ import type { ModelMessage } from 'ai'
 
 type AuthoredRow = { role: string; authorId: string | null; authorName: string | null }
 
-// One person talking needs no signature, and leaving their messages untouched keeps the cached
-// prompt prefix of every solo conversation exactly as it was.
 export function isSharedConversation(authorIds: Iterable<string>): boolean {
     return new Set(authorIds).size > 1
 }
@@ -17,8 +15,6 @@ export function signText(text: string, author: Pick<MessageAuthor, 'name'> | nul
     return author?.name ? `${senderTag(author.name)}\n${text}` : text
 }
 
-// The signature goes on the words the person typed, the first text part: the context the engine
-// appended after them is not theirs.
 export function signHistoryMessage(message: ModelMessage, row: AuthoredRow): ModelMessage {
     if (row.role !== 'user' || message.role !== 'user' || !row.authorName) return message
     const author = { name: row.authorName }

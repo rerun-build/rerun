@@ -6,11 +6,6 @@ import { KitControlsProvider } from './KitControls'
 import { KitToc, type KitTocEntry } from './KitToc'
 import { KitToolbar } from './KitToolbar'
 
-/**
- * The shell every gallery page shares. It carries the capture controls, so it has to be a client
- * component, but its children stay server-rendered wherever they can: only the parts that read the
- * controls need to opt into the client.
- */
 export function KitPage({
     title,
     description,

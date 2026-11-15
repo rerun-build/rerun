@@ -1,7 +1,6 @@
 import { RERUN_MODEL, type Provider } from './agent.js'
 import { OPENCODE_SNAPSHOT } from './opencode-snapshot.js'
 
-// What each model accepts when reached through its own API.
 export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
     'claude-fable-5-2': 1_000_000,
     'claude-fable-5-1': 1_000_000,
@@ -16,8 +15,6 @@ export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
     'claude-haiku-5-5': 1_000_000,
     'claude-haiku-4-5': 200_000,
     'claude-haiku-4-5-20251001': 200_000,
-    // Claude Code's `[1m]` variants, and the aliases it accepted before the catalog named models
-    // outright. Both still appear on connections curated by an older build.
     'claude-opus-4-8[1m]': 1_000_000,
     'claude-opus-4-7[1m]': 1_000_000,
     'claude-opus-4-6[1m]': 1_000_000,
@@ -76,41 +73,23 @@ export const MODEL_CONTEXT_WINDOW: Record<string, number> = {
     'minimax/minimax-m3': 1_000_000,
     'deepseek/deepseek-v4-pro': 1_000_000,
     'deepseek/deepseek-v4-flash': 1_000_000,
-    // A Rerun tier's window has to stay at or under the window of the model the hub resolves it to
-    // (`RERUN_UPSTREAM_MODELS` in apps/ui): the hub can swap that model without the boxes knowing.
     'rerun-fast': 922_000,
     'rerun-max': 922_000,
     'rerun-smart': 922_000,
     'qwen/qwen3.8-flash': 1_000_000,
-    // What the boxes provisioned before the `rerun-max` alias still name. Dropping it would not
-    // fail loudly: an id absent from here leaves compaction without a threshold, so it never runs.
     'qwen/qwen3.7-max': 1_000_000,
     'qwen/qwen3.7-plus': 1_000_000,
     'moonshotai/kimi-k3.1-pro': 1_000_000,
     'moonshotai/kimi-k3': 1_000_000,
     'moonshotai/kimi-k2.6': 256_000,
-    // `go/…` and `console/…` collide with no other id. A model OpenCode publishes after this snapshot
-    // is read off the engine's live catalog instead.
     ...Object.fromEntries(OPENCODE_SNAPSHOT.map(model => [model.id, model.contextWindow])),
 }
 
-// A CLI provider does not serve the model's own window: it serves whatever its client allows on
-// the signed-in plan, which is far smaller. Codex caps every model it serves at 272k and fills
-// only 95% of it, whatever the model's API limit. Read from `context_window` in its own
-// models_cache.json (client 0.147.0, fetched 2026-08-24). Getting this wrong is not cosmetic: the
-// gap is what decides whether compaction runs, and a window declared 4x too large means it never
-// does, so a session grows until the CLI stops answering with no error to show for it.
-//
-// Claude serves 200k on a subscription whatever the model's API window, and 1M only on the ids
-// that ask for it. The engine switches the CLI's own compaction off (one compaction, Rerun's), so
-// this budget is the only thing that keeps a session inside the window.
 const CLI_CONTEXT_WINDOW: Partial<Record<Provider, (id: string) => number>> = {
     codex: () => 272_000,
     claude: id => (id.endsWith('[1m]') ? 1_000_000 : 200_000),
 }
 
-// `provider` is widened to string because the chat gauge reads it back off message metadata,
-// where it survives as a plain string.
 export function modelContextWindow(id: string | null | undefined, provider?: string | null): number | undefined {
     if (!id) return undefined
     const cli = provider ? CLI_CONTEXT_WINDOW[provider as Provider]?.(id) : undefined
@@ -119,16 +98,10 @@ export function modelContextWindow(id: string | null | undefined, provider?: str
     return api === undefined ? cli : Math.min(cli, api)
 }
 
-// How a model id is written for a human. It lives here rather than in the UI catalog because the
-// iOS app names the same models and cannot import from `apps/ui`; the catalog builds its labels
-// from this map, so there is one spelling of "GPT-5.6 Sol" in the repo. Ids absent from here are
-// custom models a user typed on an OpenRouter connection: they show as they were entered.
 export const MODEL_LABEL: Record<string, string> = {
     'rerun-fast': 'Fast',
     'rerun-max': 'Rerun',
     'rerun-smart': 'Smart',
-    // What the boxes provisioned before the `rerun-max` alias still name: without this line their
-    // model picker reads the raw OpenRouter id.
     'qwen/qwen3.7-max': 'Rerun',
     'claude-fable-5-2': 'Fable 5.2',
     'claude-fable-5-1': 'Fable 5.1',
@@ -142,8 +115,6 @@ export const MODEL_LABEL: Record<string, string> = {
     'claude-haiku-5-5': 'Haiku 5.5',
     'claude-haiku-4-5': 'Haiku 4.5',
     'claude-haiku-4-5-20251001': 'Haiku 4.5',
-    // The `[1m]` variants are a distinct pick in Claude Code's own list, so they keep the marker:
-    // dropping it would put two identically named rows in the same section.
     'claude-opus-4-8[1m]': 'Opus 4.8 1M',
     'claude-opus-4-7[1m]': 'Opus 4.7 1M',
     'claude-opus-4-6[1m]': 'Opus 4.6 1M',
@@ -193,14 +164,10 @@ export const MODEL_LABEL: Record<string, string> = {
     ...Object.fromEntries(OPENCODE_SNAPSHOT.map(model => [model.id, model.label])),
 }
 
-// Friendly label for a model id; falls back to the raw id for custom/unknown models.
 export function modelLabel(id: string): string {
     return MODEL_LABEL[id] ?? id
 }
 
-// The id a model was curated under before it was renamed. A box whose connection was written by an
-// older build still carries the old spelling, which would list right next to the current one under
-// the same label: two "Rerun" rows, one of them a stranger to the catalog.
 export const MODEL_ALIAS: Record<string, string> = {
     'qwen/qwen3.7-max': RERUN_MODEL,
 }
@@ -209,8 +176,6 @@ export function canonicalModelId(id: string): string {
     return MODEL_ALIAS[id] ?? id
 }
 
-// A stored model list read under today's ids. Deduplicated: a list carrying both spellings of the
-// same model collapses to one entry.
 export function canonicalModelIds(ids: string[]): string[] {
     return [...new Set(ids.map(canonicalModelId))]
 }

@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""test_realmodel (rerun#71): the subscription connection and the one-run proof against a fake engine object.
-The token must reach the engine in one request body and appear nowhere else; a run that fell back to the
-engine's default model must count as a failed proof."""
 import contextlib, io, os, sys, unittest
 from unittest import mock
 
@@ -11,7 +8,7 @@ import realmodel as R
 
 TOKEN = "sk-ant-oat01-" + "Ab3_" * 12
 CONN = {"id": "c1", "name": "claude-plan", "provider": "claude", "models": list(R.MODELS), "connected": True}
-BARE = {"id": "c1", "name": "claude-plan", "provider": "claude", "models": [], "connected": True}  # as the first version made it
+BARE = {"id": "c1", "name": "claude-plan", "provider": "claude", "models": [], "connected": True}
 STUB = {"id": "s1", "name": "stub", "provider": "custom", "models": ["stub-fast"], "connected": True}
 DONE = {"status": "done", "provider": "claude", "model": "claude-haiku-5-5", "inputTokens": 9100, "outputTokens": 4}
 FELL_BACK = {"status": "done", "provider": "custom", "model": "stub-fast", "inputTokens": 1, "outputTokens": 1}

@@ -11,9 +11,6 @@ import { palette, spacing, type ColorScheme } from '@/theme/tokens'
 
 import { WIDE_TABLE } from './lab-markdown'
 
-// Dev only: a thread spread over two weeks, to judge the day and time separators and the time a tap
-// brings up under a bubble.   /lab-message-times?scheme=dark
-
 const at = (daysAgo: number, hour: number, minute = 0) => {
     const date = new Date()
     date.setDate(date.getDate() - daysAgo)

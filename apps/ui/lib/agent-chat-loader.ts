@@ -1,13 +1,11 @@
 import { isToolPart, toolNameOf } from '@rerun/contracts'
 import { countSubRuns, isSubRunLive, pairSubRuns, subRunTroubleLabel, titledSubRun, type SubRunCopy } from '@/lib/chat/sub-run-progress'
 
-// The `chat.activity` namespace, in the reader's language.
 export type ActivityCopy = (
     key: 'thinking' | 'processing' | 'crafting' | 'writing' | 'runningTool' | 'waitingOn' | 'building' | 'buildingCoworkers' | 'waitingOnSubCoworkers',
     values?: Record<string, string | number>
 ) => string
 
-// What the loader rotates through while the run has said nothing yet.
 export const LOADING_ACTIVITIES = ['thinking', 'processing', 'crafting'] as const
 
 export type LiveActivityCopy = { t: ActivityCopy; subRuns: SubRunCopy; toolLabel: (toolName: string, input?: unknown) => string }
@@ -20,10 +18,6 @@ type MessageLike = { role: string; parts: readonly PartLike[] }
 
 const isRunningTool = (part: PartLike) => isToolPart(part) && !TERMINAL_TOOL_STATES.has(part.state ?? '')
 
-/**
- * True while the message ends on a live step of its step group, which already shows the coworker
- * and what it is doing: the loader under the thread would only repeat it.
- */
 export function stepGroupShowsActivity(message: MessageLike | undefined): boolean {
     if (!message || message.role !== 'assistant') return false
     const last = message.parts.findLast(part => !part.type.startsWith('data-'))
@@ -36,10 +30,6 @@ export function stepGroupShowsActivity(message: MessageLike | undefined): boolea
     return !progress
 }
 
-/**
- * What the run is doing right now, read off the streaming message. Null when the message says nothing
- * yet, which leaves the caller on its generic rotation.
- */
 export function liveActivityLabel(message: MessageLike | undefined, { t, subRuns: tSubRuns, toolLabel }: LiveActivityCopy): string | null {
     if (!message || message.role !== 'assistant') return null
 
@@ -53,7 +43,6 @@ export function liveActivityLabel(message: MessageLike | undefined, { t, subRuns
         const trouble = subRunTroubleLabel(counts, tSubRuns)
         const done = counts.done + counts.failed
         if (progress.kind === 'call-agent') return `${t('waitingOn', { name: progress.tasks[0].title })}${trouble}`
-        // The onboarding's build reports on a delegation's block, and it builds agents rather than waiting on them.
         if (part.type === 'tool-build_team') return counts.total === 1 ? t('building', { name: progress.tasks[0].title }) : `${t('buildingCoworkers', { count: counts.total, done })}${trouble}`
         return `${t('waitingOnSubCoworkers', { count: counts.total, done })}${trouble}`
     }

@@ -5,8 +5,6 @@ import { useEffect } from 'react'
 
 const POLL_MS = 2 * 60 * 1000
 
-// The engine cannot push to the browser, so the count of agent changes waiting for review is read
-// on mount, every couple of minutes while the tab is visible, and whenever the tab comes back.
 export function useBrainProposalCount(enabled: boolean): number {
     const openProposals = useBrainStore(s => s.openProposals)
     const refresh = useBrainStore(s => s.refreshProposalCount)

@@ -1,20 +1,10 @@
 import { OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
 import { modelLabel } from './models.js'
 
-// The Rerun proxy returns 402 { error: 'rerun_budget_exhausted' } when a workspace
-// has spent its monthly demo budget; the engine surfaces that marker in its run
-// error. Runs after `unwrapChatError`, never before.
 export function isBudgetExhausted(message: string): boolean {
     return classifyChatError(message) === 'budget'
 }
 
-// Which plan ran out, and over which window. Read from the text because that is all there is: the
-// run carries no error code, and codex throws its server's message away and keeps only
-// `usage_limit_exceeded` as a raw finish reason — which is precisely what identifies it, since
-// claude-code's own raw reasons are `error_max_turns` and `error_during_execution`.
-//
-// `not_in_plan` is a model the plan does not include at all ("Fable 5.1 requires usage credits"),
-// `credits` the paid overage spent, `spend` an organization's monthly cap.
 export type SubscriptionLimit = {
     plan: 'claude' | 'chatgpt' | 'opencode' | null
     scope: 'session' | 'weekly' | 'monthly' | 'model' | 'not_in_plan' | 'credits' | 'spend'
@@ -22,7 +12,6 @@ export type SubscriptionLimit = {
     resetsAt?: string
 }
 
-// Claude appends " · resets 6:50pm (UTC)", Codex ends on "or try again at 4:44 PM.".
 function resetTimeOf(message: string): string | undefined {
     const time = /· resets ([^·]+)/i.exec(message)?.[1] ?? /try again at (.+?)\.?$/i.exec(message)?.[1]
     return time?.trim() || undefined
@@ -33,8 +22,6 @@ function withReset(limit: SubscriptionLimit, message: string): SubscriptionLimit
     return resetsAt ? { ...limit, resetsAt } : limit
 }
 
-// Claude names the model by its label ("Fable 5.1 requires usage credits"), Codex by its id
-// ("The 'gpt-6-astra' model is not supported", "The model `gpt-5.5` does not exist").
 function modelNotInPlan(message: string): string | undefined {
     const label = /([\w.\- ]+?) requires usage credits/i.exec(message)?.[1]
     if (label) return label.trim()
@@ -42,8 +29,6 @@ function modelNotInPlan(message: string): string | undefined {
     return id ? modelLabel(id) : undefined
 }
 
-// The engine rewrites what OpenCode answers into these two sentences (see `opencodeFetch`): its own
-// wording names neither the plan nor the window.
 function opencodeLimit(message: string, m: string): SubscriptionLimit | null {
     if (m.includes(OPENCODE_CREDITS_USED_UP.toLowerCase())) return { plan: 'opencode', scope: 'credits' }
     if (!m.includes(OPENCODE_GO_LIMIT.toLowerCase())) return null
@@ -54,7 +39,6 @@ function opencodeLimit(message: string, m: string): SubscriptionLimit | null {
 export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
     const message = stripErrorPrefix(raw)
     const m = message.toLowerCase()
-    // Before the Claude rules: a Console model is often a Claude, and its 402 names it.
     const opencode = opencodeLimit(message, m)
     if (opencode) return opencode
     const codex = m.includes('codex') || m.includes('chatgpt')
@@ -82,7 +66,6 @@ const EXPLAINED_KINDS: readonly ExplainedKind[] = ['budget', 'unauthorized', 'ov
 type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeWindow' | 'opencode'
 type LimitMessageKey = 'opencodeCredits' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
 
-// The `chatErrors` namespace: next-intl's, use-intl's or the server's `t` of it fits as is.
 export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
 
 function opencodeLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
@@ -96,8 +79,6 @@ function opencodeLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string 
     return t('limits.titles.opencode')
 }
 
-// The one line the notice puts under its title. It names the plan the user pays for rather than
-// "the provider", because a Box can hold both and only one of them is out.
 export function subscriptionLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.plan === 'opencode') return opencodeLimitMessage(limit, t)
     if (limit.scope === 'not_in_plan') {
@@ -132,13 +113,10 @@ export function subscriptionLimitTitle(limit: SubscriptionLimit, t: ChatErrorCop
     return limit.plan === 'claude' ? t('limits.titles.claudeSession', { plan }) : t('limits.titles.usage', { plan })
 }
 
-// Codex's wording when one model has no room while the provider itself is fine: the notice names
-// the model rather than the provider, and points at the other models as much as at a retry.
 function isModelAtCapacity(kind: ChatErrorKind, message: string): boolean {
     return kind === 'overloaded' && /at capacity/i.test(message)
 }
 
-// A generic error has no headline worth more than its own text, so it gets none.
 export function chatErrorTitle(kind: ChatErrorKind, message: string, t: ChatErrorCopy): string | null {
     if (kind === 'generic') return null
     if (kind === 'usage_limit') return subscriptionLimitTitle(describeSubscriptionLimit(message), t)
@@ -148,7 +126,6 @@ export function chatErrorTitle(kind: ChatErrorKind, message: string, t: ChatErro
 
 const isExplainedKind = (kind: ChatErrorKind): kind is ExplainedKind => (EXPLAINED_KINDS as readonly ChatErrorKind[]).includes(kind)
 
-// An error no kind explains reads as the provider wrote it, untranslated: it is all there is to say.
 export function friendlyError(message: string, t: ChatErrorCopy): string {
     if (!message) return t('generic')
     const kind = classifyChatError(message)
@@ -158,10 +135,6 @@ export function friendlyError(message: string, t: ChatErrorCopy): string {
     return stripErrorPrefix(message) || t('generic')
 }
 
-/**
- * The run a teammate holds the conversation with, when that is why a send was refused. Read from
- * the raw response body, before `unwrapChatError` reduces it to its `error` field.
- */
 export function teammateRunOf(rawMessage: string): { runId: string | null } | null {
     try {
         const body = JSON.parse(rawMessage) as { heldByTeammate?: unknown; runId?: unknown }
@@ -172,8 +145,6 @@ export function teammateRunOf(rawMessage: string): { runId: string | null } | nu
     }
 }
 
-// The send started the agent's install while another conversation already runs it: the chat
-// answers with that conversation, for the tab to open instead of a second install.
 export function installInFlightOf(rawMessage: string): { sessionId: string } | null {
     try {
         const body = JSON.parse(rawMessage) as { error?: unknown; sessionId?: unknown }

@@ -17,14 +17,12 @@ type SectionHeaderProps = {
     action?: { label: string; onPress: () => void }
 }
 
-// A group drawn as its label alone, its chevron right after it. The count is only read aloud.
 export function SectionHeader({ label, count, collapsed, onToggle, action }: SectionHeaderProps) {
     const theme = useTheme()
     const t = useTranslations('mobileHome')
     const chevron = useAnimatedStyle(() => ({ transform: [{ rotate: withTiming(collapsed ? '-90deg' : '0deg', { duration: MOTION.fast, easing: EASE_OUT }) }] }))
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: HOME_GUTTER }}>
-            {/* The action sits beside the toggle, not inside it, so VoiceOver reaches both. */}
             <View style={{ flex: 1, flexDirection: 'row' }}>
                 <Pressable onPress={onToggle} accessibilityRole="button" accessibilityState={{ expanded: !collapsed }} accessibilityLabel={t('section.label', { label, count })} hitSlop={6} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', flexShrink: 1, gap: spacing.sm, paddingTop: 18, paddingBottom: spacing.sm, opacity: pressed ? 0.6 : 1 })}>
                     <AppText variant="callout" tone="muted" numberOfLines={1} maxFontSizeMultiplier={1.4} style={[ROW_LINE, { flexShrink: 1 }]}>

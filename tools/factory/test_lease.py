@@ -15,7 +15,7 @@ class Lease(unittest.TestCase):
         self.assertEqual(self.s.open_leases()[0]["paths"], ["x.py"])
         self.s.close_lease(a, "result", at="2026-01-01T00:05:00Z")
         self.assertEqual(self.s.open_leases(), [])
-        self.s.close_lease(a, "cancel")  # a closed lease stays closed with its first reason
+        self.s.close_lease(a, "cancel")
         self.assertEqual(self.s.get_lease(a)["reason"], "result")
 
     def test_expiry_closes_lease(self):

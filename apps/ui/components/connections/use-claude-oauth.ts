@@ -15,18 +15,13 @@ export type ClaudeOAuth = {
     error: string | null
     opening: boolean
     start: () => Promise<void>
-    // A code Claude showed (exchanged against the armed flow) or a `claude setup-token` token.
     submit: (text: string) => Promise<boolean>
 }
 
 type KeysHandler = (keys: Record<string, string>) => Promise<{ success: boolean } & Refusal>
 
-// A second click re-arms the flow and opens a second Claude tab: the code pasted from the first one
-// is then refused, and Safari iOS can cut the request short.
 const OPEN_LOCK_MS = 5000
 
-// "Open Claude" arms a PKCE flow and opens Claude's authorization page in a new tab; the code Claude
-// shows comes back through `submit`. A token pasted by hand skips the exchange.
 export function useClaudeOAuth(onKeys: KeysHandler, surface: AiConnectionSurface): ClaudeOAuth {
     const t = useTranslations('connections.errors')
     const tCommon = useTranslations('common')
@@ -86,10 +81,6 @@ export function useClaudeOAuth(onKeys: KeysHandler, surface: AiConnectionSurface
             setError(null)
             setConnected(false)
 
-            // A token pasted by hand carries no refresh material, so any left over from an earlier
-            // OAuth connect has to go with it — otherwise the engine keeps refreshing against the
-            // old lineage. The code Claude shows can only be exchanged by the flow that asked for
-            // it: with none armed (a reload, a closed dialog) it falls here too, and is refused.
             if (text.startsWith('sk-ant') || !pkce) {
                 const issue = claudeTokenIssue(text)
                 if (issue) {

@@ -59,7 +59,6 @@ export async function buildWorkspaceRewind(supabase: Client, workspaceId: number
 
     const reported = agents.filter((agent): agent is ReportedAgent => agent.report !== null)
     if (reported.length === 0) return { status: 'skipped', reason: 'no Box reachable' }
-    // A quiet week gets no story: opening one by itself to say "nothing happened" is noise.
     if (reported.every(agent => agent.report.runs.total === 0)) return { status: 'skipped', reason: 'no runs' }
 
     const language = await coworkerLanguageFor(supabase, workspaceId)

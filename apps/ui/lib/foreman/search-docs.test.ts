@@ -2,8 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { parseDocsSections, rankDocsSections } from './search-docs'
 
-// The shape docs.rerun.build serves at /llms-full.txt: every page behind a `# Title` / `Source:`
-// pair, one after the other in a single file.
 const CORPUS = `# Automations
 Source: https://docs.rerun.build/agents/automations
 

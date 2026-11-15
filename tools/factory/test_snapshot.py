@@ -13,7 +13,6 @@ def kinds(v):
 
 
 def full(v):
-    """A sample job the producer would print: it always carries history and runs, empty when the sample leaves them out."""
     return {"history": [], "runs": [], **{k: x for k, x in v.items() if k not in ("department", "departments")}}
 
 
@@ -41,7 +40,7 @@ class Snapshot(unittest.TestCase):
         self.put(7, "merged", pr=11, round=2)
         snap = self.build({"kind": "sign-in renewal", "until": NOW + 60})
         self.assertEqual(set(snap), set(sample))
-        self.assertEqual(kinds(snap["jobs"][0]), kinds(full(sample["jobs"][0])))  # sample job 0 is a running one
+        self.assertEqual(kinds(snap["jobs"][0]), kinds(full(sample["jobs"][0])))
         self.assertEqual(kinds(snap["jobs"][2]), {**kinds(full(sample["jobs"][5])), "pr": "int", "round": "int"})
         self.assertEqual(kinds(snap["jobs"][1]), kinds(full(sample["jobs"][2])))
         self.assertEqual(set(snap["holds"][0]), set(sample["holds"][0]))

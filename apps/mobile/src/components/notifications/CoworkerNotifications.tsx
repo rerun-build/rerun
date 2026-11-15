@@ -22,7 +22,6 @@ type CoworkerNotificationsProps = {
     agentId: string
     name: string
     prefs: NotificationPrefs | null
-    // Null while on their way, or when the Box could not list them (`routinesFailed`).
     routines: RoutineView[] | null
     routinesFailed: boolean
     onRule: (rule: CoworkerRule) => void
@@ -49,8 +48,6 @@ function TaskRow({ routine, value, disabled, onChange }: { routine: RoutineView;
     )
 }
 
-// The web's bell on a coworker, as a page: whose runs of it reach you, and which of its scheduled
-// tasks do.
 export function CoworkerNotifications({ agentId, name, prefs, routines, routinesFailed, onRule, onTask }: CoworkerNotificationsProps) {
     const t = useTranslations('mobileSettings.notifications')
     if (!prefs) {

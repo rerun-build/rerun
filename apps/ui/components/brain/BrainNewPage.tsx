@@ -22,9 +22,6 @@ type BrainNewPageProps = {
     onCreated: (detail: BrainPageDetail) => void
 }
 
-// Nothing is written while the title is empty. The first time it is left with something in it, the
-// page is created under the slug its title gives, and that slug stays: renaming later only changes
-// the title, so the [[links]] other pages hold keep working.
 export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onCreated }: BrainNewPageProps) {
     const t = useTranslations('brain')
     const errorText = useErrorText()
@@ -33,8 +30,6 @@ export function BrainNewPage({ pages, titles, files, onOpenPage, onOpenFile, onC
     const [error, setError] = useState<string | null>(null)
     const [creating, setCreating] = useState(false)
     const content = useRef('')
-    // Enter commits the title, then moves the focus to the body, which blurs the title and commits
-    // it a second time in the same tick: the state alone would not see the first one yet.
     const started = useRef(false)
     const editorHandle = useRef<BrainEditorHandle>(null)
 

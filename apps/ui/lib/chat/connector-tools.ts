@@ -1,19 +1,14 @@
 import { stripBridgePrefix } from '@/lib/chat/bridge-name'
 import type { CustomMcpServer, InstalledService } from '@/lib/services/types'
 
-// `custom`: a server registered outside the catalog, whose tools keep its name in their label.
-// `label` tells two accounts of one app apart (an email, or "Gmail 2").
 export type ConnectorService = { slug: string; name: string; label?: string; icon: string | null; category: string; custom?: true }
 
 export type ConnectorMap = ReadonlyMap<string, ConnectorService>
 
 const MCP_PREFIX = 'mcp__'
 const SEPARATOR = '__'
-// The engine's own providers name a tool <server>_<tool>, the CLI providers <server>__<tool>.
 const NATIVE_SEPARATOR = '_'
 
-// A connector can expose several mcp servers, and its auth target names a server the footprint
-// does not always list. Same flatten as AgentPanelMcp.
 function serverNamesOf(service: InstalledService): string[] {
     return [...(service.toolNames ?? []), service.oauth?.serverName, service.managed?.serverName, service.composio?.serverName].filter(
         (name): name is string => !!name,
@@ -33,9 +28,6 @@ export function buildConnectorMap(services: InstalledService[], custom: CustomMc
     return map
 }
 
-// A server name may itself contain `__` (MCP_SERVER_NAME_RE allows it), so splitting on the first
-// separator can cut in the wrong place: only the installed server names decide where the cut is,
-// longest match first.
 function splitOnKnownServer(name: string, knownServers: Iterable<string>, separator: string): { server: string; tool: string } | null {
     let best: { server: string; tool: string } | null = null
     for (const server of knownServers) {
@@ -46,10 +38,6 @@ function splitOnKnownServer(name: string, knownServers: Iterable<string>, separa
     return best
 }
 
-// Codex only prefixes `mcp__` when `prefix_mcp_tool_names` is on, so an older session can hold the
-// bare `<server>__<tool>` form; both are accepted, and so is the engine's own `<server>_<tool>`. A
-// bridged builtin is never a connector tool, nor is a builtin whose name happens to start like a
-// server (`memory_write` beside a server named `memory`).
 export function parseMcpToolName(raw: string, knownServers: Iterable<string>, isBuiltin: (name: string) => boolean = () => false): { server: string; tool: string } | null {
     if (stripBridgePrefix(raw) !== raw) return null
     const servers = [...knownServers]
@@ -65,8 +53,6 @@ export function humanizeToolSegment(segment: string): string {
         .replace(/\b\w/g, c => c.toUpperCase())
 }
 
-// Null means "not a connector tool": the caller falls back to getToolMeta, so anything unmapped
-// keeps today's rendering untouched.
 export function resolveConnectorTool(raw: string, map: ConnectorMap, isBuiltin?: (name: string) => boolean): { label: string; service: ConnectorService } | null {
     const parsed = parseMcpToolName(raw, map.keys(), isBuiltin)
     if (!parsed) return null

@@ -5,7 +5,6 @@ import { sendPhoneChangeCodeAction, verifyPhoneChangeCodeAction } from '@/app/ap
 import { PhoneCodeForm, type PhoneCodeRequest } from '@/components/auth/PhoneCodeForm'
 import { sendPhoneCode } from '@/components/auth/phone-send'
 
-// Adds or replaces the number of the signed-in account, from the account dialog.
 export function PhoneChangeForm({ onChanged }: { onChanged: () => Promise<void> }) {
     const errorText = useErrorText()
     const sendNewPhoneCode = (request: PhoneCodeRequest) => sendPhoneCode('settings', request, () => sendPhoneChangeCodeAction(request))

@@ -1,20 +1,12 @@
 import { AGENT_CAPABILITIES } from './capabilities'
 import { CRITERIA, type CompanyDossier, type Criterion, type CriterionScore, type GroundedCandidate, type JudgedCandidate } from './types'
 
-// The judge is a decision model, not the model that wrote the candidates: it returns a typed score
-// with calibrated probabilities rather than prose, so two runs and two companies compare, and it
-// has no draft of its own to defend.
-//
-// OpenRouter serves it through its alpha decisions endpoint rather than /chat/completions, hence
-// the hand-written fetch (see lib/company/decide-industry.ts).
 const DECISIONS_URL = 'https://openrouter.ai/api/alpha/decisions'
 const DECISION_MODEL = process.env.RERUN_DECISION_MODEL ?? 'typesafe/jev-1.13'
 const MAX_ATTEMPTS = 3
 const TIMEOUT_MS = 30_000
 const PARALLEL = 5
 
-// Levels read worst to best. The text of a level is also what the lab shows as the reason an idea
-// was turned down, so each one has to stand as a sentence on its own.
 export const CRITERION_RUBRIC: Record<Criterion, { question: string; levels: [string, string, string] }> = {
     specificity: {
         question: 'How particular to `company` is this coworker? Judge the job itself, not the names dropped into its description.',
@@ -41,8 +33,6 @@ export const CRITERION_RUBRIC: Record<Criterion, { question: string; levels: [st
 type ScoreAnswer = { score?: unknown; probabilities?: unknown; confidence?: unknown }
 type DecisionsResponse = { answers?: Record<string, ScoreAnswer>; usage?: { input_tokens?: number; cost?: number } }
 
-// The expected level under the model's own probabilities, brought to 0..1, rather than its
-// headline score: the scale of that one is the endpoint's business and it is in alpha.
 export function readScore(answer: ScoreAnswer | undefined, levels: number): CriterionScore | null {
     const probabilities = answer?.probabilities
     if (!probabilities || typeof probabilities !== 'object') return null
@@ -81,9 +71,6 @@ async function decide(state: unknown, questions: Record<string, unknown>, attemp
 
 const QUESTIONS = Object.fromEntries(CRITERIA.map(criterion => [criterion, { type: 'score', instructions: CRITERION_RUBRIC[criterion].question, criteria: CRITERION_RUBRIC[criterion].levels }]))
 
-// The judge sees one candidate and the facts it cites, never the whole dossier. Novelty is judged
-// against the proposals listed before this one only: compared both ways, two twins would each be
-// called a duplicate and both would go.
 function stateFor(candidate: GroundedCandidate, earlier: GroundedCandidate[], dossier: CompanyDossier) {
     return {
         company: dossier.companyName,

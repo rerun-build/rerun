@@ -1,7 +1,3 @@
-"""Counters and limits of the factory runner (rerun#53 chunk 3, Settled 3). Pure functions: plain counters and
-timestamps in, an (action, reason) pair out. The runner keeps the counters in the ledger and acts on the action:
-FIX (fire a fix build or fix round, counter +1), PLAN (back to Plan with the reason, plan_round +1), BLOCKED,
-NEEDS_BOSS (BLOCKED plus label needs-boss), BUILD, FIRE, REFIRE, RUN, WAIT, FAILED (one failed attempt), OK."""
 import datetime, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ledger as L
@@ -15,8 +11,6 @@ RESTARTED = "interrupted: engine restarted"
 
 
 def ts(iso):
-    """Epoch seconds of an ISO time. The engine writes '...11.123Z', GitHub and the ledger '...11Z': as text '.' sorts
-    before 'Z', so compare these only through ts()."""
     return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).timestamp()
 
 
@@ -27,15 +21,12 @@ def replan(plan_round, reason):
 
 
 def fix_or_replan(used, cap, plan_round, reason):
-    """After a failure: a fix while used < cap (chunk fix builds, job CI fixes, review rounds: cap 2 each), else re-plan.
-    The first build is not a fix: with cap 2 the third failure re-plans."""
     if used < cap:
         return "FIX", reason
     return replan(plan_round, "failed after %d/%d fixes: %s" % (used, cap, reason))
 
 
 def challenge(verdict, rejects_in_row, plan_round, text):
-    """verdict READY or REJECT; rejects_in_row counts the PLAN REJECTs right before this one."""
     if verdict == "READY":
         return "BUILD", None
     if rejects_in_row >= 1:
@@ -44,7 +35,6 @@ def challenge(verdict, rejects_in_row, plan_round, text):
 
 
 def may_fire(fired_total):
-    """Checked before the pre-fire intent is written: a job never fires more than FIRED_CAP runs."""
     if fired_total >= FIRED_CAP:
         return "BLOCKED", "fired %d/%d runs for this job, the safety cap" % (fired_total, FIRED_CAP)
     return "FIRE", None
@@ -58,13 +48,11 @@ def _pos(v):
 
 
 def chunk_cap(cfg=None, entry=None, lane=None):
-    """Per-chunk token cap: the strictest of the standard chunk, the global, the entry and the lane value."""
     vals = [_pos(v) for v in (STANDARD_CHUNK_CAP, (cfg or {}).get("token_cap"), (entry or {}).get("token_cap"), lane)]
     return min(v for v in vals if v is not None)
 
 
 def batch_cap(cfg, chunks, entry=None, lane=None):
-    """A batch run's cap: chunks x the per-chunk cap."""
     return chunks * chunk_cap(cfg, entry, lane)
 
 
@@ -75,19 +63,14 @@ def _runner_cfg():
 
 
 def capacity(cfg=None):
-    """Builder capacity (runner.json builder_capacity, default 3); cfg None reads runner.json."""
     return _pos((_runner_cfg() if cfg is None else cfg).get("builder_capacity")) or BUILDER_CAPACITY
 
 
 def per_job_cap(cfg=None):
-    """Chunks of one job running at once (runner.json per_job_cap, default 2)."""
     return _pos((_runner_cfg() if cfg is None else cfg).get("per_job_cap")) or PER_JOB_CAP
 
 
 def stage_cfg(cfg, entry=None):
-    """cfg with the per-stage overrides of a runner.json trigger entry (keys run_limit_s, stall_s, token_cap) laid over
-    the global ones. token_cap is the strictest of the two: an entry cannot raise the global. A stage that must end
-    fast (the R2 proof stage) carries its own short run_limit_s."""
     out = dict(cfg or {})
     for k in ("run_limit_s", "stall_s", "token_cap"):
         if entry and k in entry:
@@ -97,8 +80,6 @@ def stage_cfg(cfg, entry=None):
 
 
 def run_limits(cfg=None):
-    """Run limits from the runner.json keys run_limit_s, stall_s, token_cap (seconds, seconds, tokens), with defaults.
-    A missing, null or non-positive stall_s or token_cap switches that rule off."""
     cfg = cfg or {}
     def num(key, default):
         v = cfg.get(key, default)
@@ -106,10 +87,6 @@ def run_limits(cfg=None):
     return {"run_limit_s": num("run_limit_s", RUN_LIMIT_S) or RUN_LIMIT_S, "stall_s": num("stall_s", STALL_S), "token_cap": num("token_cap", None)}
 
 def run_outcome(row, now, steps=None, cfg=None):
-    """A runs row (trigger.read_run) -> RUNNING, CANCEL (a running run over its wall time, stalled or over its token
-    cap: the caller cancels it through engine.py), DONE, RESTARTED, REFIRE_ONCE (error row: fired again once, the store
-    counts refires), FAILED or MISSING. steps is {"last_step_at": ISO or None, "tokens": int} (optional), cfg the
-    runner.json dict (optional). now is epoch seconds. Pure: no I/O."""
     if not row or not row.get("status"):
         return "MISSING", "run not found in system.db"
     st, rid = row["status"], row.get("id")
@@ -135,20 +112,16 @@ def run_outcome(row, now, steps=None, cfg=None):
 
 
 def restart(refires):
-    """A run that ended with an engine restart is fired again once per stage, not counted as a fix."""
     if refires < RESTART_REFIRES:
         return "REFIRE", None
     return "FAILED", "run interrupted by an engine restart again after %d refire" % refires
 
 
 def ci_overdue(dispatched, now):
-    """A CI run not started CI_START_LIMIT_S after its dispatch (ISO) makes the job BLOCKED."""
     return now - ts(dispatched) > CI_START_LIMIT_S
 
 
 def resolve_pending(firing, slug, rows, now, tick_seconds):
-    """A firing written before its POST but with no run id: the earliest runs row with this trigger_slug started at or
-    after the firing is its run. None after PENDING_TICKS ticks: FAILED, one attempt. Never fired again."""
     f = ts(firing)
     mine = sorted((ts(r["started_at"]), r["id"]) for r in rows if r.get("trigger_slug") == slug and r.get("started_at") and ts(r["started_at"]) >= f)
     if mine:
@@ -159,7 +132,6 @@ def resolve_pending(firing, slug, rows, now, tick_seconds):
 
 
 def keeps_merged(old_text, new_text, merged):
-    """A re-plan keeps every MERGED chunk: same id, same line (the checkbox aside). old_text is the accepted plan."""
     def by_id(text):
         return {L.chunk(l)["id"]: l.strip()[6:].strip() for l in L.chunk_lines(text)}
     old, new = by_id(old_text), by_id(new_text)
@@ -172,8 +144,6 @@ STAGE_TIER = {**dict.fromkeys(("checks", "ci", "gate", "risk"), "small"), **dict
 
 
 def model_for(stage, cfg=None):
-    """Model by stage rule: small for checks/ci/gate/risk, mid for build/fix, large for plan/challenge/review/ruling/accept.
-    Returns runner.json model_tiers[tier] (cfg None reads runner.json); an unknown stage raises ValueError."""
     if stage not in STAGE_TIER:
         raise ValueError("unknown stage: %r" % (stage,))
     return (_runner_cfg() if cfg is None else cfg)["model_tiers"][STAGE_TIER[stage]]
@@ -183,7 +153,6 @@ PACKET_CAP = 4096
 
 
 def packet_oversize(text, cfg=None, lane=None):
-    """True when the UTF-8 byte length of a packet is above the strictest of PACKET_CAP, cfg packet_cap and lane."""
     cap = min(v for v in (PACKET_CAP, _pos((cfg or {}).get("packet_cap")), _pos(lane)) if v is not None)
     return len(text.encode("utf-8")) > cap
 
@@ -192,8 +161,6 @@ RETRIES = 1
 
 
 def failure(attempts, cfg=None, tail=""):
-    """A failed chunk attempt: RETRY (with the failure tail in the next packet) while attempts < settings retries
-    (runner.json, default 1), else NEEDS_BOSS. attempts is the ledger counter, so a restart keeps the count."""
     n = (_runner_cfg() if cfg is None else cfg).get("retries", RETRIES)
     if attempts < n:
         return "RETRY", tail
@@ -201,8 +168,6 @@ def failure(attempts, cfg=None, tail=""):
 
 
 def after_reject(owners):
-    """After a REJECT of a chunk. owners lists who built each rejected commit, oldest first. A second REJECT in a row of
-    the same owner returns ARBITER (the arbiter rules), not a third build; otherwise FIX."""
     if len(owners) >= 2 and owners[-1] == owners[-2]:
         return "ARBITER", "second REJECT in a row of %s's work" % owners[-1]
     return "FIX", None

@@ -8,7 +8,6 @@ import { AppText } from '@/components/ui/AppText'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// A page pushed from the coworker's details, full screen under the status bar.
 export function CoworkerPage({ title, onBack, children }: { title: string; onBack: () => void; children: ReactNode }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()

@@ -11,9 +11,6 @@ import { useBoardStore } from '@/stores/board.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// Adding a shared agent is two doors rather than the template's three: have a plan, place the
-// agent. There is nothing to buy, so nothing sits between them. Same ladder, same parking on the
-// way to Stripe, one rung shorter.
 export type ShareGate = 'plan' | 'place'
 
 export type ShareStep = { label: string; caption: string; icon: LucideIcon }
@@ -51,15 +48,11 @@ export function useAgentShareCta(token: string, preview: AgentSharePreview, onDo
         onDone()
     }
 
-    // The token is parked before starting the plan: it is the only trace that survives the round
-    // trip, and it is what brings the card back on the way in.
     const startTrial = () => {
         useOnboardingStore.getState().setPendingShareLink(token)
         startTransition(() => startPlan('agent_share'))
     }
 
-    // A workspace with no Space at all is still in onboarding: the drop on the placeholder is what
-    // triggers signup and the paywall, so gating here would only get in the way of that moment.
     const hasSpace = useBoardStore.getState().spaces.length > 0
     if (hasSpace && !isSubscriptionEntitled(workspace?.subscription_status)) {
         return {

@@ -9,10 +9,6 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-// The wall an account meets when the pool has no machine left for it. Same frame and same locks as
-// the welcome wall: nothing behind it is actionable, and there is nothing to click through, because
-// the only way out is a machine freeing up, which the next page load sees on its own. Signing out
-// stays possible so a wrong account is not trapped behind it.
 export function EngineWaitlistDialog({ open }: { open: boolean }) {
     const t = useTranslations('dialogs.engineWaitlist')
     const { session, signOut } = useSession()

@@ -12,11 +12,8 @@ type ServiceInstalledBlockProps = {
     agentId?: string
 }
 
-// Shown inline in chat when the agent's service_install returns status 'installed'.
 export function ServiceInstalledBlock({ name, toolNames, agentId }: ServiceInstalledBlockProps) {
     const t = useTranslations('services.installed')
-    // The registry just gained mcp servers: refresh the map so the tools of this connector show
-    // its logo from the next turn on.
     useEffect(() => {
         if (agentId) invalidateConnectorServices(agentId)
     }, [agentId])

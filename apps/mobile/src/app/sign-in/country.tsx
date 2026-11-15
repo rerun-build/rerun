@@ -29,8 +29,6 @@ export default function PickCountry() {
         router.back()
     }
 
-    // A form sheet lays out at most a header and a list: the header must not be flattened away, and
-    // nothing may wrap the two.
     return (
         <>
             <View collapsable={false} style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.xl, paddingBottom: spacing.md }}>

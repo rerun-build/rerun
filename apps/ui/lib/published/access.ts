@@ -8,8 +8,6 @@ export type PublishPolicy = (typeof PUBLISH_POLICIES)[number]
 
 export const DEFAULT_PUBLISH_POLICY: PublishPolicy = 'people'
 
-// Before the launch, a workspace that never picked a policy publishes like it always did: every
-// link public, whoever asks. Picking one in the settings (early access) opts the workspace in.
 export type EffectivePolicy = PublishPolicy | 'legacy'
 
 export function isPublishedAccess(value: unknown): value is PublishedAccess {
@@ -25,8 +23,6 @@ export function effectivePolicy(stored: string | null | undefined, released = PU
     return released ? DEFAULT_PUBLISH_POLICY : 'legacy'
 }
 
-// What the settings show: before the launch, a workspace that picked nothing lets its coworkers
-// make links public, so that is the choice ticked, and picking another one is a change to save.
 export function shownPolicy(stored: string | null | undefined, released = PUBLISHED_ACCESS_RELEASED): PublishPolicy {
     const policy = effectivePolicy(stored, released)
     return policy === 'legacy' ? 'anyone' : policy
@@ -40,9 +36,6 @@ type CoworkerRequest = {
     current?: { access: PublishedAccess; requestedAccess: 'public' | null }
 }
 
-// What a coworker gets when it publishes. A republish that names no access keeps the link as it is:
-// a coworker never takes back a public link a person gave. A public link asked under the default
-// policy goes live for the members only, and waits for a person to open it wider.
 export function resolveCoworkerAccess({ policy, requested, current }: CoworkerRequest): AccessResolution {
     if (!requested) {
         if (current) return current
@@ -72,8 +65,6 @@ function accessSentence(access: PublishedAccess, invited: readonly string[]): st
     }
 }
 
-// What the publish tool tells the coworker. A public link refused outright says so, or the coworker
-// makes up a way it could still go public.
 export function coworkerAccessMessage(requested: PublishedAccess | undefined, resolution: AccessResolution, invited: readonly string[]): string {
     if (resolution.requestedAccess === 'public') return 'Live for the workspace members only: its policy keeps a coworker from opening a link to everyone. The card of the link under your message asks the user, with a button that makes it public, which any member can click: no setting and no admin needed. Tell them to click it there. Nothing typed in the chat makes it public and publishing again changes nothing, so offer no quick reply and no approval card for it.'
     const sentence = accessSentence(resolution.access, invited)
@@ -85,8 +76,6 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const DOMAIN = /^@[a-z0-9-]+(\.[a-z0-9-]+)+$/
 export const MAX_INVITES = 50
 
-// Emails and whole domains (`@client.com`), trimmed, lowercased and deduplicated. A bare
-// `client.com` reads as the domain.
 export function normalizeInvites(entries: readonly string[]): string[] {
     const invites = new Set<string>()
     for (const raw of entries) {

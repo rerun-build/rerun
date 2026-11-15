@@ -9,15 +9,9 @@ import { BUDDY_GEOMETRY, boxTop, leftWallPlane, roundedDiamond, wallsOutline, ty
 import { buddyColor, buddyEyes, buddyMouth, hashUnit, shade, type BuddyEyes, type BuddyLook, type BuddyMood } from './look'
 import { BuddyMotionScope, GrowsFrom, RidesOnWalls, Sweep } from './motion'
 
-// Ported from packages/ui/src/iso-grid/components/buddy (AgentBuddy, BuddyArt, RoundedBox): an
-// agent's buddy away from the board, the same block, colour and eyes, drawn from the same id.
-
-// Below this width the board's block is too squat for its face to read: the buddy stands taller,
-// its face is painted flat and larger, and it loses its mouth.
 const SMALL_BELOW = 40
 const SMALL_GEOMETRY: BoxGeometry = { ...BUDDY_GEOMETRY, depth: 30 }
 const SMALL_FACE_SCALE = 1.6
-// Eyes whose thin strokes do not survive a few pixels are drawn as their closest solid shape.
 const SMALL_EYES: Partial<Record<BuddyEyes, BuddyEyes>> = { glasses: 'round', shades: 'visor', line: 'pill', dot: 'round' }
 const MARGIN = 2
 
@@ -31,11 +25,8 @@ function smallLook(agentId: string): BuddyLook {
 type AgentBuddyProps = {
     agentId: string
     mood?: BuddyMood
-    // Width in points of the square the block is centred in.
     size: number
-    // False holds it still, blink included: a long list of buddies should not twinkle.
     animated?: boolean
-    // A buddy looks at what it stands next to: right when its text follows it, left when alone.
     facing?: 'left' | 'right'
     style?: StyleProp<ViewStyle>
 }
@@ -106,8 +97,6 @@ type RoundedBoxProps = {
     working: boolean
 }
 
-// A thick, soft block: the rounded diamond swept down. The fold between the two visible walls is a
-// gradient, the way light turns around a rounded edge. Only the top moves; the walls stretch under it.
 function RoundedBox({ uid, geometry, color, top, topLight, rim, left, working }: RoundedBoxProps) {
     const { halfW, halfH, depth, radius } = geometry
     const topCenter = boxTop(geometry)

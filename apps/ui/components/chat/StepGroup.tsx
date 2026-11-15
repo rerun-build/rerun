@@ -18,7 +18,6 @@ export type StepGroupItem = { key: string; iconProps: ToolIconProps; node: React
 const MAX_STACKED = 4
 const EASE = [0.4, 0, 0.2, 1] as const
 
-// Distinct tools in order of first use, so a new one lands at the end of the stack instead of reshuffling it.
 function usedTools(items: StepGroupItem[]): ToolIconProps[] {
     const seen = new Map<unknown, ToolIconProps>()
     for (const item of items) {
@@ -66,10 +65,6 @@ function Activity({ label }: { label: string }) {
     )
 }
 
-/**
- * The run of steps between two pieces of text: the coworker and what it is doing while it works,
- * beside a pill with every tool used so far. The pill opens on the full list of steps.
- */
 export function StepGroup({ items, agentId }: { items: StepGroupItem[]; agentId?: string }) {
     const t = useTranslations('chat.steps')
     const [open, setOpen] = useState(false)

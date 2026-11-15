@@ -29,7 +29,6 @@ const EVERYONE = 'everyone'
 export type MemberBoxesViewProps = {
     member: WorkspaceMember
     profile: AuthorProfile | null
-    // Null while it loads.
     access: MemberAccessView | null
     viewerIsAdmin: boolean
     busy: boolean
@@ -39,14 +38,12 @@ export type MemberBoxesViewProps = {
     onRestrict: (box: MemberBoxAccess) => void
 }
 
-// Every Box seen from one person: the same rows as the Box access dialog, from the other side.
 export function MemberBoxesView({ member, profile, access, viewerIsAdmin, busy, onBack, onScopeChange, onLevelChange, onRestrict }: MemberBoxesViewProps) {
     const t = useTranslations('dialogs.members.boxes')
     const copy = useBoxAccessCopy()
     const { title } = personLabel(profile, member.email, copy.teammate)
     const readOnlyReason = viewerIsAdmin ? undefined : copy.adminOnly
     const targetIsAdmin = (access?.role ?? member.role) === 'admin'
-    // Opening every Box is free; closing them asks first.
     const [confirmingAssigned, setConfirmingAssigned] = useState(false)
 
     return (

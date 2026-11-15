@@ -1,19 +1,3 @@
-# The factory dispatcher (tools/factory/dispatch.py): plain Python, no model of its own. It takes open issues
-# labelled "factory" and carries them through build, review, one fix round, the checks and the merge on the
-# live coworkers, through the app's account tool server and the gh program. Its state file lives in its own volume.
-#
-#   sudo docker compose -f deploy/vps/factory-dispatcher.yml up -d --build
-# Needs three lines in deploy/vps/.env:
-#   FACTORY_ACCOUNT_URL       the account tool server's URL
-#   FACTORY_ACCOUNT_KEY_FILE  host file holding the account key
-#   FACTORY_GH_TOKEN_FILE     host file holding the GitHub token (the runner's, see factory-runner.yml)
-#
-# Neither key is in the environment: both host files are mounted read-only as the secrets account_key and
-# gh_token under /run/secrets. On the host each file is owned by the container's runner uid (10001), mode 0400,
-# in a directory only that uid enters.
-#
-# Deliberately absent: published ports, the docker socket, privileged mode, added capabilities, other networks,
-# host paths other than the read-only tools/factory mount, the engine key.
 name: rerun-factory
 
 services:

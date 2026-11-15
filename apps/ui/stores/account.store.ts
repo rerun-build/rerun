@@ -2,7 +2,6 @@ import { create } from 'zustand'
 
 export type AccountTab = 'profile' | 'sign-in' | 'language' | 'desktop' | 'delete'
 
-// The sign-in tab can open straight on its phone editor, for the getting-started step that asks for it.
 export type AccountSignInStart = 'list' | 'phone'
 
 type AccountState = {

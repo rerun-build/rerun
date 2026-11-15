@@ -81,7 +81,6 @@ function agentWith(servers: Server[], env: Record<string, string> = {}) {
     return { id: 'mcp-agent', env, config: { mcpServers: servers, tools: {} } } as any
 }
 
-// The pool closes asynchronously: the clients a test left open are closed before the next one counts.
 beforeEach(async () => {
     closeAllMcp()
     await new Promise(resolve => setTimeout(resolve, 0))
@@ -168,8 +167,6 @@ describe('pooledMcpTools', () => {
         expect(mcp.transports[0]).toMatchObject({ kind: 'http', target: 'https://lin.example/mcp', options: { requestInit: { headers: { Authorization: 'Bearer k1' } } } })
     })
 
-    // A stdio server runs as the CLI started it: the engine's bare essentials, the agent's keys and
-    // its workspace, never the engine's own secrets.
     it('builds each transport with its own options, a stdio server in the agent workspace', async () => {
         process.env.MCP_TEST_INHERITED = 'yes'
         await pooledMcpTools(
@@ -202,8 +199,6 @@ describe('pooledMcpTools', () => {
         expect(mcp.transports).toHaveLength(0)
     })
 
-    // RER-80: the hub resolves x-rerun-agent to a coworker of the workspace, and a delegate exists
-    // only on the engine, so under its own id every hub app (Gmail through Composio) refused it.
     it('dials a hub app as the coworker that delegated, not as the delegate', async () => {
         const gmail = server({ name: 'gmail', url: 'https://hub.example/api/mcp/composio/gmail' })
         await pooledMcpTools({ ...agentWith([gmail]), id: 'delegate-1', hubAgentId: 'boss' })
@@ -219,8 +214,6 @@ describe('pooledMcpTools', () => {
 const spawn = { cwd: '/agents/mcp-agent/workspace', env: { PATH: '/usr/bin', AGENT_KEY: 'a' } }
 
 describe('probeMcp', () => {
-    // A probe the agent asked for (mcp_register, mcp_status) spawns the command like a run would:
-    // the engine's own environment, and its API key, stay out of it.
     it('dials a stdio server in the agent workspace with the spawn env, never the engine one', async () => {
         process.env.MCP_TEST_INHERITED = 'yes'
         await probeMcp('mcp-agent', server({ name: 'local', command: 'node', args: ['srv.js'], env: { TOKEN: 't' } }), {}, { spawn })

@@ -6,11 +6,6 @@ import { SegmentedControl, SegmentedControlItem } from '@rerun/ui/primitives'
 import { ThemeToggle } from '@rerun/ui/theme'
 import { useState } from 'react'
 
-// The desktop app's window chrome without Electron: the app framed as each platform draws the
-// window, its pages rendered as the desktop app gets them (the strip, the insets). The native
-// buttons are drawn here the way the system draws them over the strip. The theme toggle switches
-// the framed app too: they share the page's preference.
-
 const PLATFORMS: { value: DesktopShellPlatform; label: string }[] = [
     { value: 'mac', label: 'macOS' },
     { value: 'win', label: 'Windows' },

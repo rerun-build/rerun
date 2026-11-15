@@ -1,10 +1,3 @@
-/* Keyframes utilisées par les blocs d'agents de l'isogrid.
-   Importées via @rerun/ui/styles.css (ne pas importer ce fichier directement). */
-
-/* Palette de la grille iso. `--iso-glint` est un triplet rgb (pas une couleur) : les couches de
-   lumière s'écrivent `rgb(var(--iso-glint) / .15)` et s'inversent d'un thème à l'autre sans que les
-   alphas ne bougent. Les ombres restent noires dans les deux thèmes, seul leur alpha est réduit en
-   clair. Les composants TSX lisent ces mêmes variables via var(). */
 :root,
 .light {
     --iso-glint: 0 0 0;
@@ -16,19 +9,10 @@
     --iso-outline-fill: rgba(0, 0, 0, 0.03);
     --iso-outline-hot: #000;
     --iso-tile-muted: #94a3b8;
-    /* Tuile d'un agent au repos. Neutre, et elle s'inverse : blanc cassé « chrome » sur un fond
-       clair, anthracite sur un fond sombre. `ink` et `shadow` sont des triplets rgb (pas des
-       couleurs), pour que les alphas du label, des arêtes et des rayures traversent les deux thèmes
-       sans bouger. Le `glow`, lui, ne suit pas la tuile mais le SOL : une lumière ne se voit que sur
-       un fond sombre, donc en clair il sert d'ombre de contact et pose le bloc au sol. */
     --iso-tile-idle: #e6e8ec;
     --iso-tile-idle-ink: 20 22 26;
     --iso-tile-idle-shadow: 255 255 255;
     --iso-tile-idle-glow: rgba(0, 0, 0, 0.3);
-    /* Reflet spéculaire de la face du dessus d'une tuile qui demande `sheen` : une bande étroite le
-       long de l'arête du losange, pas un voile. Statique — le balayage animé (`shimmer`) reste la
-       signature de « working ». Il s'inverse comme le reste : la lumière est douce sur une face
-       sombre, franche sur du chrome. */
     --iso-tile-sheen: linear-gradient(
         128deg,
         rgba(255, 255, 255, 0.55) 0%,
@@ -37,14 +21,7 @@
         rgba(255, 255, 255, 0.12) 58%,
         rgba(0, 0, 0, 0.16) 100%
     );
-    /* Couleur d'une tile mise en avant. Contrairement aux autres tokens de la grille c'est une
-       couleur entière, pas un triplet : en clair elle prend le violet de la marque, qu'aucun
-       triplet ne peut porter. Du blanc sur un fond clair ne se verrait pas, et l'encre neutre de
-       `--primary` peindrait une ombre plutôt qu'une lumière. */
     --iso-halo: var(--color-brand, #4d34f7);
-    /* A buddy at rest. Its body stays dark in both themes, a figurine standing on the board and not
-       a piece of the floor: that is what keeps its white face readable. What follows the floor is
-       what it does to it, the shadow under its base and the label's plate. */
     --iso-buddy-body: #4a4e5c;
     --iso-buddy-mascot-body: #4a4e5c;
     --iso-buddy-asleep: #94a3b8;
@@ -79,8 +56,6 @@
     );
     --iso-halo: #fff;
     --iso-buddy-body: #3a3d47;
-    /* Away from the board a buddy stands on a near-black surface with no floor light around it:
-       its body is lifted so the block still reads as a block. */
     --iso-buddy-mascot-body: #666c7e;
     --iso-buddy-asleep: #646876;
     --iso-buddy-shadow-alpha: 1;
@@ -90,14 +65,6 @@
     --iso-buddy-label-shadow: 0 2px 6px rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.08);
 }
 
-/* Les planches avant du halo d'une tile sont posées par-dessus la tuile. En thème sombre elles s'y
-   ajoutent en `screen` : rien n'est recouvert, la tuile s'allume derrière la vitre et son logo reste
-   net. En thème clair la couleur est le violet de la marque, que `screen` délaverait sur un fond
-   déjà clair : les planches avant y restent en peinture normale, où il tient tout seul. */
-/* Encre d'un bloc iso : ce qui est peint PAR-DESSUS ses faces (label, arêtes, rayures). Blanche par
-   défaut, comme elle l'a toujours été — les faces d'un statut sont saturées et sombres. Une tuile qui
-   demande `data-ink="theme"` la fait suivre le thème à la place : sinon un label blanc disparaîtrait
-   sur du blanc cassé. */
 .iso-tile {
     --iso-tile-ink: 255 255 255;
     --iso-tile-ink-shadow: 0 0 0;
@@ -116,7 +83,6 @@
     mix-blend-mode: screen;
 }
 
-/* Texte porté par la pilule du placeholder, qui s'inverse avec elle. */
 .iso-pill-text {
     color: color-mix(in oklab, var(--iso-pill-fg) 80%, transparent);
 }
@@ -125,7 +91,6 @@
     color: var(--iso-pill-fg);
 }
 
-/* Parcours de -12 à 0 largeurs de face sur une bande de 15 (voir ShimmerStrip dans TileBlock). */
 @keyframes agent-shimmer {
     0% { transform: translateX(-80%); }
     100% { transform: translateX(0); }
@@ -142,8 +107,6 @@
     100% { opacity: 0; transform: scale(1.6); }
 }
 
-/* Respiration d'une tile mise en avant. N'anime que l'opacité : la couche des murs porte un
-   mix-blend-mode, et un keyframe qui toucherait au transform l'isolerait de son fond. */
 @keyframes iso-tile-halo {
     0%, 100% { opacity: 0.55; }
     50% { opacity: 1; }
@@ -154,10 +117,6 @@
     50% { opacity: 1; }
 }
 
-/* Atterrissage d'une tile fraîchement placée : elle tombe du haut (fade + slide down) et se pose.
-   Le easing « ease-out » est encodé dans l'espacement des stops (timing linéaire à l'usage) pour
-   éviter le double-ralenti d'un keyframe à 3 arrêts. La matérialisation (opacité + flou + scale)
-   se termine à 50 %, la chute continue jusqu'à 100 %. */
 @keyframes agent-drop-in {
     0% { opacity: 0; transform: translateY(-100px) scale(0.92); filter: blur(6px); }
     10% { opacity: 0.3; transform: translateY(-50px) scale(0.94); filter: blur(4.5px); }
@@ -168,8 +127,6 @@
     100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
-/* The pool of colour a buddy casts on the floor. On a dark floor it is a light and adds itself to
-   it; on a light floor a light would not show, so it stains the floor instead. */
 .iso-buddy-pool {
     mix-blend-mode: multiply;
 }
@@ -178,16 +135,12 @@
     mix-blend-mode: screen;
 }
 
-/* A plate, not frosted glass: a backdrop blur under every name re-blurs the board each frame, and
-   150 of them cost three frames out of four. */
 .iso-buddy-label {
     background: var(--iso-buddy-label-bg);
     color: var(--iso-buddy-label-ink);
     box-shadow: 0 0 0 1px var(--iso-buddy-label-ring), var(--iso-buddy-label-shadow);
 }
 
-/* A buddy's label rolls upward: the row coming in rises from under the pill while the one leaving
-   exits through its top. */
 @keyframes iso-buddy-label-in {
     from { transform: translateY(100%); }
     to { transform: translateY(0); }
@@ -198,9 +151,6 @@
     to { transform: translateY(-100%); }
 }
 
-/* A buddy moves by its top only: the top face rises and sinks (iso-buddy-*-top, in shares of the
-   block's depth) while the walls and the face painted on them stretch under it by the same share
-   (iso-buddy-*-wall). The base never leaves its four cells, so the board keeps its perspective. */
 @keyframes iso-buddy-bob-top {
     0%, 100% { transform: translateY(0); }
     35% { transform: translateY(calc(var(--buddy-depth) * -0.2px)); }
@@ -240,8 +190,6 @@
     transition: translate 200ms ease-out;
 }
 
-/* A selected buddy stands taller. `translate` and `scale` rather than `transform`, so the stretch
-   adds to a bob or a shudder instead of being overridden by it. */
 [data-buddy-stretched] .iso-buddy-top {
     translate: 0 calc(var(--buddy-depth) * var(--buddy-stretch) * -1px);
 }
@@ -271,13 +219,11 @@
     animation: iso-buddy-shudder-wall 2.4s ease-in-out var(--buddy-delay, 0s) infinite;
 }
 
-/* The pool of light a buddy casts on the floor dims as its top rises, swells as it sinks back. */
 @keyframes iso-buddy-pool {
     0%, 62%, 100% { opacity: 1; transform: scale(1); }
     35% { opacity: 0.6; transform: scale(0.9); }
 }
 
-/* A band of light crossing the top while the agent works, like the shimmer on the flat tiles. */
 @keyframes iso-buddy-sweep {
     0% { transform: translateX(-60px); }
     100% { transform: translateX(100px); }
@@ -296,10 +242,6 @@
     animation: iso-buddy-blink 4.6s ease-in-out var(--buddy-blink-delay, 0s) infinite;
 }
 
-/* A buddy standing alone in a page looks around: its lids fall like every other buddy's, and its
-   pupils drift inside the whites of its eyes. Opt-in, because twenty buddies on a board glancing
-   at once is noise, not life. The glance runs on its own period, a prime-ish multiple away from the
-   blink, so the two never settle into a loop the eye can read. */
 @keyframes iso-buddy-glance {
     0%, 22% { transform: translate(0, 0); }
     30%, 48% { transform: translate(1.1px, -0.5px); }
@@ -331,21 +273,14 @@
     }
 }
 
-/* Sortie de la pastille de statut (TileStatusBubble) : le miroir d'agent-toast-in, qui la fait
-   monter depuis la tuile. Elle redescend donc vers elle au lieu de s'évaporer vers le haut. */
 @keyframes iso-status-out {
     0% { opacity: 1; transform: translateY(0) scale(1); }
     100% { opacity: 0; transform: translateY(4px) scale(0.94); }
 }
 
-/* Anneau de la ligne d'état posée sur la face d'une tuile (TileBlock). Déclaré ici plutôt que
-   repris d'`animate-spin` : Tailwind n'émet ses keyframes que pour les utilitaires qu'il voit
-   dans les sources, et celui-ci est appelé par son nom depuis un style inline. */
 @keyframes iso-status-spin {
     to { transform: rotate(360deg); }
 }
-
-/* ===== Bulles au-dessus des agents (TileToastBubble) ===== */
 
 @keyframes agent-toast-in {
     0% { opacity: 0; transform: translateY(6px) scale(0.92); }
@@ -357,33 +292,21 @@
     100% { opacity: 0; transform: translateY(-5px) scale(0.96); }
 }
 
-/* ===== Comète de courant des liens « cable » (TileLinks) ===== */
-
-/* Un seul élément par câble, déplacé le long de son chemin. offset-distance se résout en transform,
-   donc l'animation se compose sur le GPU sans jamais repeindre le tracé. La traînée est le dégradé
-   de l'élément lui-même, orienté par offset-rotate ; offset-anchor met la tête en avant. */
 @keyframes iso-cable-comet {
     from { offset-distance: 0%; }
     to { offset-distance: 100%; }
 }
 
-/* Éteint la comète pendant sa pause. Le moment de la coupure varie par câble : il est porté par
-   l'easing, pas par les keyframes, pour que tous partagent la même règle. */
 @keyframes iso-cable-comet-rest {
     from { opacity: 1; }
     to { opacity: 0; }
 }
 
-/* Branchement d'un câble : il se trace depuis l'agent jusqu'à son connecteur. La longueur du tracé
-   est portée par --iso-cable-length, posée en inline (elle dépend de la route du câble). */
 @keyframes iso-cable-draw {
     from { stroke-dashoffset: var(--iso-cable-length); }
     to { stroke-dashoffset: 0; }
 }
 
-/* Faisceau qui fait le tour d'une tile sélectionnée (BeamRing), et courant pointillé d'un lien
-   « beam » (TileLinks). En CSS plutôt qu'en SMIL <animate> : seule la cascade peut les mettre en
-   pause, via data-iso-paused ou prefers-reduced-motion. pathLength est normalisé à 1 côté BeamRing. */
 @keyframes iso-beam-run {
     from { stroke-dashoffset: 1; }
     to { stroke-dashoffset: 0; }
@@ -402,35 +325,22 @@
     animation: iso-link-current 1.2s linear infinite;
 }
 
-/* Board que personne ne voit (hors écran, couvert par un panel ou une dialog) : tout se fige sur sa
-   frame courante et repart de là. !important pour passer devant les `animation` inline des tiles. */
 [data-iso-paused] *,
 [data-iso-paused] *::before,
 [data-iso-paused] *::after {
     animation-play-state: paused !important;
 }
 
-/* Ouverture d'un voile. Sert au calque d'une comète, dont les animations internes portent déjà un
-   fill-mode : y empiler un délai la laisserait garée, allumée, au départ de son câble. */
 @keyframes iso-appear {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* Entrée d'un container. Une empreinte au sol ne tombe pas du ciel comme une tile : elle se dessine
-   sur place, en s'ouvrant depuis son centre. Le scale part de tout près de 1, sinon le losange
-   glisse sous les tiles qu'il contient déjà. */
 @keyframes iso-container-in {
     0% { opacity: 0; transform: scale(0.94); }
     100% { opacity: 1; transform: scale(1); }
 }
 
-/* Style d'entrée 'draw' : l'empreinte se trace, puis le sol se remplit et le nom se lève. Réservé aux
-   scènes scriptées, où la Box doit se donner à voir en train d'être créée ; sur le board réel une
-   Box qu'on vient de créer doit être là tout de suite, et c'est iso-container-in qui sert.
-
-   `pathLength` est normalisé à 1 sur le losange (cf. ContainerBlock), donc le dash se règle sur la
-   forme sans jamais la mesurer : dashoffset 1 = le gap couvre tout, 0 = le trait couvre tout. */
 .iso-space-draw {
     stroke-dasharray: 1;
     animation: iso-container-draw var(--iso-container-draw-duration, 380ms) cubic-bezier(0.22, 1, 0.36, 1) var(--iso-container-draw-delay, 0ms) backwards;
@@ -453,8 +363,6 @@
 }
 
 .iso-cable-comet {
-    /* Sans offset-path le sprite resterait figé dans un coin du calque : on ne l'affiche que si le
-       moteur sait le déplacer. Pas de JS, donc pas d'écart d'hydratation. */
     display: none;
     position: absolute;
     top: 0;
@@ -481,9 +389,6 @@
     .iso-cable-comet { display: block; }
 }
 
-/* ===== Links « trace » and « belt » (TileLinks) ===== */
-
-/* The lit line behind the head: a dash whose end moves from the start of the path to its end. */
 @keyframes iso-trace-run {
     from { stroke-dashoffset: var(--iso-trace-from); }
     to { stroke-dashoffset: var(--iso-trace-to); }
@@ -496,7 +401,6 @@
     animation-fill-mode: both;
 }
 
-/* A belt's slats run one slat period at a time, so the loop is seamless. */
 @keyframes iso-belt-run {
     from { stroke-dashoffset: 7.4; }
     to { stroke-dashoffset: 0; }
@@ -510,8 +414,6 @@
     .iso-belt-slats { animation: none; }
 }
 
-/* The head: a small bright point with a soft halo painted once (no per-frame filter), riding the
-   path through offset-distance like the cable comet. */
 .iso-trace-head {
     display: none;
     position: absolute;
@@ -539,14 +441,10 @@
     .iso-trace-head { display: none; }
 }
 
-/* ===== Onboarding : bloc « fantôme » incitatif (SpacePlaceholderBlock) ===== */
-
-/* Contour pointillés : défilement continu de la ligne pointillée */
 @keyframes iso-placeholder-dash {
     to { stroke-dashoffset: -22; }
 }
 
-/* Au hover, seule la path du contour s'agrandit et s'illumine — le reste (label) ne bouge pas. */
 .iso-placeholder-outline {
     fill: var(--iso-outline-fill);
     stroke: var(--iso-outline);
@@ -555,14 +453,12 @@
     transform-origin: center;
     transition: filter 280ms ease, stroke 280ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
-/* La bordure « s'illumine » : passe à la couleur pleine du thème avec un halo doux et grossit légèrement */
 .iso-placeholder:hover .iso-placeholder-outline {
     stroke: var(--iso-outline-hot);
     transform: scale(1.04);
     filter: drop-shadow(0 0 4px rgb(var(--iso-glint) / 0.8)) drop-shadow(0 0 14px rgb(var(--iso-glint) / 0.35));
 }
 
-/* Halo : invisible au repos, s'allume au hover (suit le scale de l'outline) */
 .iso-placeholder-glow {
     stroke: var(--iso-outline-hot);
     opacity: 0;
@@ -576,8 +472,6 @@
     transform: scale(1.04);
 }
 
-/* Label : pilule contrastée à bordure « shiny » animée (un trait qui parcourt le contour),
-   réalisée par un conic-gradient tournant en couche de fond sous le bloc intérieur. */
 @property --iso-shine-angle {
     syntax: '<angle>';
     initial-value: 0deg;
@@ -591,7 +485,6 @@
 .iso-placeholder-label {
     padding: 1px;
     border-radius: 9999px;
-    /* Double shiny : deux segments lumineux diamétralement opposés qui tournent ensemble */
     background: conic-gradient(
         from var(--iso-shine-angle),
         rgb(var(--iso-glint) / 0.12) 0deg,
@@ -608,12 +501,10 @@
         0 5px 14px rgb(0 0 0 / calc(0.55 * var(--iso-shadow-alpha))),
         0 12px 32px rgb(0 0 0 / calc(0.45 * var(--iso-shadow-alpha)));
     transition: background 280ms ease, box-shadow 280ms ease, scale 160ms ease;
-    /* Ses ancêtres laissent passer le pointeur : la pastille le reprend, sinon elle n'est jamais survolée. */
     pointer-events: auto;
     cursor: pointer;
 }
 
-/* Au hover du placeholder : le shine animé continue, mais plus contrasté + halo discret */
 .iso-placeholder:hover .iso-placeholder-label,
 .iso-placeholder-label[data-hot] {
     background: conic-gradient(
@@ -638,9 +529,6 @@
     background: var(--iso-pill-bg);
 }
 
-/* Le curseur est sur la pastille elle-même, pas seulement sur sa Box : elle grossit et s'éclaire, ce
-   que le liseré de `data-hot` ne suffit pas à dire. Son fond reste plein, sinon on voit la Box à
-   travers. */
 .iso-placeholder-label[data-over] {
     scale: 1.05;
     box-shadow:
@@ -650,7 +538,6 @@
         0 5px 14px rgb(0 0 0 / calc(0.55 * var(--iso-shadow-alpha)));
 }
 
-/* A pill closed to the viewer: it still says what the Box is for, without the light of an action. */
 .iso-placeholder-label[data-disabled] {
     background: rgb(var(--iso-glint) / 0.12);
     box-shadow: none;
@@ -662,9 +549,6 @@
     opacity: 0.6;
 }
 
-/* Letter-swap au hover : chaque lettre est doublée verticalement dans une fenêtre
-   masquée d'une ligne de haut ; au hover la colonne glisse d'un cran, en cascade
-   (transition-delay par lettre, posé inline dans SpaceBlock). */
 .iso-swap-letter {
     display: inline-block;
     height: 1em;
@@ -681,9 +565,6 @@
     transform: translateY(-50%);
 }
 
-/* Pastille d'une vraie Box : une fenêtre d'une ligne où l'exemple sortant monte pendant que le
-   suivant arrive par le bas. Les deux lignes partagent la même cellule, la largeur suit la ligne
-   courante (posée inline par CtaTicker). */
 .iso-cta-window {
     display: inline-grid;
     justify-items: start;
@@ -724,11 +605,6 @@
     transition: none;
 }
 
-/* ===== Sélection d'un space : losange, contours pointillés, coins iso =====
-
-   Toutes les couches restent montées en permanence : la sélection ne fait que basculer des
-   `data-*`, pour que la sortie rejoue la même transition que l'entrée. */
-
 .iso-space-shape {
     transition:
         fill 220ms ease,
@@ -740,8 +616,6 @@
     transition: fill-opacity 220ms ease;
 }
 
-/* Deux usages : le contour de survol pendant un placement (`data-on`) et le contour intérieur du
-   space sélectionné (allumé par le groupe parent). */
 .iso-space-dash {
     stroke: var(--iso-outline-hot);
     opacity: 0;
@@ -752,15 +626,11 @@
     opacity: 1;
 }
 
-/* Contour d'un container fantôme : le même pointillé, mais il défile. Un trait qui tourne sans fin
-   autour d'une empreinte vide est ce qui la distingue d'une région posée pour de bon (même bande
-   que le placeholder, donc les deux fantômes du board avancent au même pas). */
 .iso-space-dash-ghost {
     animation: iso-placeholder-dash 3.2s linear infinite;
 }
 
 .iso-resize-corner {
-    /* Origine posée sur la pointe du losange (inline) : le coin s'allonge sans en décoller. */
     transform-box: view-box;
     opacity: 0;
     transform: scale(0.35);
@@ -810,12 +680,6 @@
     opacity: 0.9;
 }
 
-/* Les deux filtres des coins ne sont posés que pendant que le container est pris, c'est-à-dire la
-   seule fois où un coin est visible : ailleurs ils dessinent du vide. Un board en porte quarante,
-   et un filtre, même sur un noeud transparent, reste une surface de rendu que le navigateur tient,
-   recompose et garde en mémoire — quatre-vingts par page sur la landing, toutes invisibles.
-   L'attribut tombe d'un coup à la désélection alors que le coin met 200 ms à s'effacer : `filter`
-   est dans ses transitions, l'ombre et le flou s'éteignent avec lui au lieu de sauter. */
 .iso-space-handles[data-selected] .iso-resize-corner-arm {
     filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / calc(0.6 * var(--iso-shadow-alpha))));
 }
@@ -823,11 +687,6 @@
 .iso-space-handles[data-selected] .iso-resize-corner-glow {
     filter: blur(3px);
 }
-
-/* ===== « + » sur les faces d'un container : ajouter un voisin de ce côté-là =====
-
-   Un simple glyphe posé au sol contre chaque face, monté seulement pendant le survol/la sélection du
-   container (l'animation d'entrée rejoue donc à chaque apparition). */
 
 @keyframes iso-add-mark-in {
     from { opacity: 0; }
@@ -867,14 +726,10 @@
     fill: rgb(var(--iso-glint) / 0.12);
 }
 
-/* Fantôme de la Box qui serait créée par un « + » : son contour défile, comme le bloc fantôme de
-   l'onboarding. Un emplacement en attente, pas une sélection. */
 .iso-draw-preview-dash {
     animation: iso-placeholder-dash 3.2s linear infinite;
 }
 
-/* Respect de prefers-reduced-motion : on coupe les animations continues pilotées par classe
-   (les animations inline des tiles sont, elles, gérées côté JS via usePrefersReducedMotion). */
 @media (prefers-reduced-motion: reduce) {
     .iso-placeholder-outline,
     .iso-placeholder-label,
@@ -886,8 +741,6 @@
     .iso-link-current {
         animation: none;
     }
-    /* Le dash reste posé sur la forme quand l'animation est coupée : sans offset il couvre le
-       losange entier, donc le contour est plein, mais autant ne rien laisser trainer. */
     .iso-space-draw {
         stroke-dasharray: none;
     }
@@ -910,8 +763,6 @@
     }
 }
 
-/* Appui tenu sur une prise tactile : l'anneau se referme sur le doigt pendant HOLD_TO_GRAB_MS.
-   Il n'apparaît qu'après un court délai, pour qu'un simple tap ne fasse pas clignoter un cercle. */
 .iso-hold-ring {
     width: 44px;
     height: 44px;

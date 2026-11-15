@@ -6,9 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-cxroutes-'))
 
 const { beforeEach, describe, expect, it, vi } = await import('vitest')
 
-// The Codex app-server session the connect waits for, answered from what the test posed.
 const codexCli = vi.hoisted(() => ({ models: [] as string[] }))
-// A plan-limits read a run's end left under way, as the test poses it, keyed by connection.
 const pendingReads = vi.hoisted(() => new Map<string, Promise<void>>())
 vi.mock('../../connections/codex-plan-limits.js', async () => {
     const { recordCliModels } = await import('../../connections/cli-models.js')
@@ -20,7 +18,6 @@ vi.mock('../../connections/codex-plan-limits.js', async () => {
         pendingCodexPlanLimits: (id: string) => pendingReads.get(id),
     }
 })
-// OpenCode's live catalog, as the test poses it: null until a reading lands, like on a fresh box.
 const opencodeLive = vi.hoisted(() => ({ models: null as string[] | null, refreshed: 0 }))
 vi.mock('../../connections/opencode-catalog.js', async importOriginal => {
     const actual = await importOriginal<typeof import('../../connections/opencode-catalog.js')>()
@@ -114,7 +111,6 @@ describe('connections API', () => {
         expect(updated.models).toEqual(['sonnet'])
     })
 
-    // Two connections of the same provider is the whole point: one Claude subscription per person.
     it('allows several connections of one provider', async () => {
         await createClaude('Claude Clement')
         await createClaude('Claude Theo')
@@ -122,8 +118,6 @@ describe('connections API', () => {
         expect(connections.filter(c => c.provider === 'claude')).toHaveLength(2)
     })
 
-    // Deleting a credential the user no longer has is not something to refuse: everything pointing
-    // at it goes back to `null`, which is what "follow the Box default" is spelled as on disk.
     it('releases the agents pointing at a deleted connection onto the box default', async () => {
         const created = await createClaude()
         await writeAgent('bound', { connectionId: created.id, provider: 'claude', model: 'opus' })
@@ -138,8 +132,6 @@ describe('connections API', () => {
     it('releases the automations of every agent, at their own slug', async () => {
         const created = await createClaude()
         await writeAgent('owner', { connectionId: null, provider: null, model: null })
-        // Renamed since its creation, so its file no longer sits at `slugify(name)`: writing through
-        // `writeSchedule` would leave this one behind, still pinned.
         await writeScheduleFile('owner', 'old-slug', { name: 'Renamed digest', connection: created.id, model: 'opus' })
 
         const res = await connectionRoutes.request(`/${created.id}`, { method: 'DELETE' })
@@ -151,8 +143,6 @@ describe('connections API', () => {
         expect(schedule.model).toBeNull()
     })
 
-    // The pointer changes nothing for an agent that named no model, but leaving it behind would
-    // dangle at an id no connection answers to.
     it('clears a stale connectionId sitting next to a null model without reporting it', async () => {
         const created = await createClaude()
         await writeAgent('leftover', { connectionId: created.id, provider: 'claude', model: null })
@@ -170,9 +160,6 @@ describe('connections API', () => {
         expect(connections.map(c => c.id)).not.toContain(created.id)
     })
 
-    // The keyless Rerun connection is the last-resort fallback for every agent on the box, so it is
-    // not something a user can rename away or remove. Routed through the full server: the refusal
-    // is an HttpError, and only the app-level handler turns it into a 400.
     it('protects the Rerun connection', async () => {
         const app = createServer()
         const json = { 'content-type': 'application/json' }
@@ -204,7 +191,6 @@ describe('box default model', () => {
         expect(body.default).toEqual({ connectionId: created.id, model: 'opus' })
     })
 
-    // `/default` is registered before `/:id`, so it must not be read as a connection id.
     it('does not fall through to the connection routes', async () => {
         expect((await put('/default', { connectionId: 'nope', model: 'opus' })).status).toBe(404)
     })
@@ -223,8 +209,6 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toBeNull()
     })
 
-    // Switching the model off in the Connections tab is the one write that can see the default go
-    // stale, so it repairs it rather than leaving every box-default agent to drop to Rerun.
     it('repairs the default when its model is switched off', async () => {
         const created = await createClaude()
         await put('/default', { connectionId: created.id, model: 'opus' })
@@ -232,15 +216,11 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'sonnet' })
     })
 
-    // Plugging the first credential is the whole setup: without this it would land on a box that
-    // keeps every agent on Rerun until someone finds the star.
     it('adopts the first connected connection', async () => {
         const created = await createClaude()
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'opus' })
     })
 
-    // The top model of a family is not in every plan: a box adopting it on connect failed its first
-    // run with "Fable 5.1 requires usage credits". A plugged subscription starts one step below.
     it.each([
         ['claude', 'claude-opus-5-5', { CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat-secret' }],
         ['codex', 'gpt-6-sol', { CODEX_OAUTH_TOKEN: 'codex-secret' }],
@@ -250,8 +230,6 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model })
     })
 
-    // The reading is taken against the credential that just arrived, before the default is written:
-    // a box must never adopt a model the account's Codex refuses.
     it("adopts the first model the account's Codex serves", async () => {
         codexCli.models = ['gpt-6-luna', 'gpt-5.6-sol']
         const res = await post('/', { name: 'codex', provider: 'codex', models: DEFAULT_CONNECTION_MODELS.codex, keys: { CODEX_OAUTH_TOKEN: 'codex-secret' } })
@@ -259,7 +237,6 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'gpt-6-luna' })
     })
 
-    // A star written before the box knew what the plan serves (every box connected before #1613).
     it('lists a default moved off a model the account refuses', async () => {
         codexCli.models = ['gpt-6-luna', 'gpt-5.6-terra']
         const created = (await (await post('/', { name: 'codex', provider: 'codex', models: DEFAULT_CONNECTION_MODELS.codex, keys: { CODEX_OAUTH_TOKEN: 'codex-secret' } })).json()) as Summary
@@ -269,7 +246,6 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'gpt-6-luna' })
     })
 
-    // Two lists repairing at once collide on the same temp file: the one that loses still lists.
     it('still lists when the repair of the default cannot write', async () => {
         codexCli.models = ['gpt-6-luna', 'gpt-5.6-terra']
         const created = (await (await post('/', { name: 'codex', provider: 'codex', models: DEFAULT_CONNECTION_MODELS.codex, keys: { CODEX_OAUTH_TOKEN: 'codex-secret' } })).json()) as Summary
@@ -291,7 +267,6 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'go/deepseek-v4-pro' })
     })
 
-    // A model OpenCode stopped publishing is never the one a box adopts.
     it('adopts the first model OpenCode still serves', async () => {
         opencodeLive.models = DEFAULT_CONNECTION_MODELS.opencode.filter(id => id !== 'go/deepseek-v4-pro')
         const res = await post('/', { name: 'OpenCode', provider: 'opencode', models: DEFAULT_CONNECTION_MODELS.opencode, keys: { OPENCODE_API_KEY: 'oc_sk_secret' } })
@@ -318,8 +293,6 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toBeNull()
     })
 
-    // Moving the default onto a connection plugged in next to a working one would move the bill
-    // without anyone asking, so the adoption only fires while nothing else is connected.
     it('does not adopt while another connection is already plugged in', async () => {
         await createClaude('Claude Clement')
         await connectionRoutes.request('/default', { method: 'DELETE' })
@@ -334,8 +307,6 @@ describe('box default model', () => {
         expect(await readBoxDefault()).toEqual({ connectionId: created.id, model: 'claude-opus-4-8' })
     })
 
-    // `defaultModelOf` falls back to the provider default here, which is a pair the connection does
-    // not serve: starring it would show nowhere.
     it('does not adopt a connection offering no model', async () => {
         await post('/', { name: 'Bare', provider: 'claude', models: [], keys: { CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat-secret' } })
         expect(await readBoxDefault()).toBeNull()
@@ -401,15 +372,12 @@ describe('plan limits on the list', () => {
     it('answers with the reading it has when that read hangs', async () => {
         const claude = await createClaude()
         pendingReads.set(claude.id, new Promise<void>(() => {}))
-        // Only the cap is faked: the list reads the data-dir on the way, which needs the real loop.
         vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
         try {
             let answered = false
             const listed = planLimitsOf(claude.id).finally(() => {
                 answered = true
             })
-            // Bounded by the real clock, not a tick count: on a slow runner the data-dir read takes
-            // more turns of the loop before the cap is even armed.
             const deadline = Date.now() + 4_000
             while (!answered && Date.now() < deadline) {
                 await new Promise<void>(resolve => setImmediate(resolve))

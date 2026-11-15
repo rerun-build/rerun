@@ -11,8 +11,6 @@ type Block = { type?: unknown; text?: unknown }
 
 const isText = (block: Block | null): block is { type: 'text'; text: string } => block?.type === 'text' && typeof block.text === 'string'
 
-// The provider reads a result made of text blocks back into what the tool returned, and leaves one
-// that also carries a picture as raw blocks. This finishes the job on the text and drops the rest.
 function textOf(result: unknown): string | null {
     if (!Array.isArray(result) || result.length === 0) return null
     const blocks = result as Array<Block | null>
@@ -31,8 +29,6 @@ function parsed(text: string): unknown {
     }
 }
 
-// A screenshot goes to the model inside the tool result. The CLI echoes that result into the
-// stream, where the picture would be shown, stored and replayed as a wall of base64.
 export function withoutPictures<Part extends StreamPart | GeneratePart>(part: Part): Part {
     const item = part as Part & { type: string; result?: unknown; providerMetadata?: Record<string, Record<string, unknown>> }
     if (item.type !== 'tool-result') return part

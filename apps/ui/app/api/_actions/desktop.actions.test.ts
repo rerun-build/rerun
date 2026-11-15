@@ -26,7 +26,6 @@ describe('openDesktopAction', () => {
         vi.mocked(desktopSocketUrl).mockReturnValue('wss://host.test/box/10/desktop/ws?ticket=t')
     })
 
-    // The web shows the message; the v1 route reads `denied` back into the 404 or 403 a thrown refusal gives.
     it('folds a refusal into the result with what the route turns back into a status', async () => {
         const { AuthorizationError } = await import('@/app/api/_auth/errors')
         const { AccessDeniedError } = await import('@/app/api/_auth/access')

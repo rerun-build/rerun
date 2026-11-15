@@ -1,6 +1,3 @@
-// `bare`: a code block, a table or a diagram already draws its own frame, so it sits in the stack
-// full width instead of inside a bubble. `media`: an image alone is its own frame too, at its own
-// width.
 export type BubbleFrame = 'bubble' | 'bare' | 'media'
 export type MessageBubble = { markdown: string; frame: BubbleFrame }
 
@@ -23,14 +20,6 @@ function kindOf(block: string): BlockKind {
     return 'text'
 }
 
-/**
- * Groups the markdown blocks of an assistant answer into the bubbles of a stack, one per beat of the
- * answer. The blocks come from a markdown block splitter (Streamdown's on the web, the same algorithm
- * on iOS), so a cut never lands inside a list, a table or a code fence. Two blocks share a bubble
- * when the first one announces the second: a heading, or a sentence ending on a colon, stays with
- * what it introduces. A horizontal rule only marks a break. Safe on a half-streamed answer: the last
- * bubble is the one still growing.
- */
 export function bubblesOfBlocks(blocks: string[]): MessageBubble[] {
     const bubbles: { blocks: string[]; frame: BubbleFrame; announces: boolean }[] = []
     for (const block of blocks) {

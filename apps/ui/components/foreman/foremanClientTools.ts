@@ -13,14 +13,8 @@ import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 
-// The other half of lib/foreman/tool-defs.ts: the tools the server declares but cannot run. Each
-// one is an action the user already has under the mouse, so they go through the board store rather
-// than a second write path.
-
 type ToolOutput = { ok: true; note?: string } | { ok: false; error: string }
 
-// What the workspace menu knows and a tool call does not: which of its sections exist here. The
-// session lives in a React context, so the caller reads it and hands it over.
 export type ForemanClientGates = { apiEntitled: boolean; isSandbox: boolean; isAdmin: boolean }
 
 function unknownTab(requested: string, labels: Record<string, string>, noun = 'tab'): string {

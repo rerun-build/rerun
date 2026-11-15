@@ -1,5 +1,3 @@
-"""Why a job waits, from a fixed list. Pure."""
-
 REASONS = ("dependency", "no free worker of its type", "back-off", "hold", "plan limit", "sign-in renewal")
 
 _QUEUE_STATES = ("queued", "review_wait", "fix_wait")

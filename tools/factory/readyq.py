@@ -1,13 +1,9 @@
-"""readyq.py: the one eligibility function for a ready chunk. Pure: the caller passes the facts in `state`
-{merged: ids, busy: [(job, chunk)] chunk builds running, stages: plain stages running, leases: open leases,
-fired: fires of the job, cfg: runner.json}. Returns (True, None) or (False, reason)."""
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import limits as L
 
 
 def overlap(a, b):
-    """True when two path lists share a file or one holds a directory of the other."""
     return any(x == y or x.startswith(y.rstrip("/") + "/") or y.startswith(x.rstrip("/") + "/") for x in a for y in b)
 
 

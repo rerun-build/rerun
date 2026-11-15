@@ -1,8 +1,5 @@
 import { mix } from '@/theme/tokens'
 
-// Ported from packages/ui/src/iso-grid (buddy-look.ts, iso.ts, types.ts): the same id has to give
-// the same buddy on the phone as on the board.
-
 export type BuddyEyes = 'pill' | 'round' | 'happy' | 'googly' | 'visor' | 'sleepy' | 'wink' | 'pixel' | 'star' | 'heart' | 'dot' | 'brows' | 'cyclops' | 'shades' | 'glasses' | 'sparkle' | 'line'
 export type BuddyMouth = 'none' | 'smile' | 'open' | 'cat' | 'flat'
 export type BuddyMood = 'idle' | 'working' | 'error' | 'waiting' | 'asleep'
@@ -11,11 +8,8 @@ export type BuddyLook = { eyes?: BuddyEyes; mouth?: BuddyMouth; color?: string }
 export const BUDDY_EYES: BuddyEyes[] = ['pill', 'round', 'happy', 'googly', 'visor', 'sleepy', 'wink', 'pixel', 'star', 'heart', 'dot', 'brows', 'cyclops', 'shades', 'glasses', 'sparkle', 'line']
 export const BUDDY_MOODS: BuddyMood[] = ['idle', 'working', 'waiting', 'error', 'asleep']
 
-// Most buddies have no mouth: the eyes carry the face.
 const MOUTH_ODDS: BuddyMouth[] = ['none', 'none', 'none', 'smile', 'open', 'cat', 'flat']
 
-// The colour of a resting agent's top. Amber, red and cyan are left out: they mean working, broken
-// and waiting for you.
 const IDENTITY = ['#0f52ff', '#4fb800', '#f0127f', '#7a2cf5', '#e935c1', '#3b32e8', '#00b862', '#a81fe0']
 
 export const BUDDY_HEIGHT_RATIO = 15 / 80
@@ -41,7 +35,6 @@ export function buddyColor(id: string, look: BuddyLook = {}) {
     return look.color ?? IDENTITY[Math.floor(hashUnit(id, 23) * IDENTITY.length)]
 }
 
-// Lightens (amount > 0, towards white) or darkens (amount < 0, towards black) a hex colour.
 export function shade(color: string, amount: number) {
     return mix(color, amount >= 0 ? '#ffffff' : '#000000', Math.min(1, Math.abs(amount)))
 }

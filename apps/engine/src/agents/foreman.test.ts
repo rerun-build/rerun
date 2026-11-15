@@ -114,8 +114,6 @@ describe('foreman', () => {
         for (const name of ['card_table', 'table_view_save', 'table_view_delete']) expect(names).not.toContain(name)
     })
 
-    // The CLI bridge only exposes a tool whose input schema is zod: a JSON Schema passed through as
-    // is would leave Claude and Codex with none of the foreman's tools.
     it('hands the CLI bridge zod schemas it can expose', async () => {
         const { tools, close } = await foremanToolSet()
         await close()
@@ -130,7 +128,6 @@ describe('foreman', () => {
         expect(hubCalls).toEqual([{ agentId: FOREMAN_AGENT_ID, tool: 'create_agent', args: { name: 'Scout' } }])
     })
 
-    // Sent transient so the browser applies it once and a reload never replays it.
     it('turns an intent tool into a transient board gesture without calling the hub', async () => {
         const writes: Written[] = []
         const { tools, close } = await foremanToolSet(writes)

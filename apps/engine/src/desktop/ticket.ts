@@ -9,10 +9,6 @@ function signedWith(key: string, payload: string, signature: string | undefined)
     return expected.length === given.length && timingSafeEqual(expected, given)
 }
 
-// A browser cannot put a bearer header on a WebSocket, and the box key must never reach one. The
-// hub signs a one-minute ticket with that key instead, and it rides in the query string. The ticket
-// names the one agent whose screen it opens and whether its holder drives it or only watches. An
-// engine that runs without a key skips the signature, like its HTTP API skips the bearer.
 export type DesktopTicket = { agentId: string; mode: DesktopViewMode }
 
 export function verifyDesktopTicket(raw: string | null | undefined, now: number = Date.now()): DesktopTicket | null {

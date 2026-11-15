@@ -1,9 +1,3 @@
-// What makes the app native, end to end on the local hub:
-//   pnpm verify:desktop --scenario apps/desktop-app/e2e/native.mjs
-//
-// The system draws notifications and the tray outside the window, where Playwright cannot click:
-// the notification's `show` is stubbed to record it and click it, everything else is the real thing.
-
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
@@ -28,8 +22,6 @@ export default async function nativeScenario({ app, page, step, base }) {
     const capabilities = await page.evaluate(() => [...window.rerunShell.capabilities])
     check(['notifications', 'badge', 'settings', 'locale'].every((name) => capabilities.includes(name)), `the shell offers the native capabilities (${capabilities.join(', ')})`)
 
-    // 1. A notification while the app is in the background: the system shows it, its click brings
-    // the window back and hands the page the id it stands for.
     await app.evaluate(({ Notification }) => {
         globalThis.__notifications = []
         Notification.prototype.show = function show() {
@@ -53,7 +45,6 @@ export default async function nativeScenario({ app, page, step, base }) {
     check(attention, 'the page sees the window visible again')
     void mainWindow
 
-    // 2. The count of what waits, on the Dock (macOS) or the taskbar.
     await page.evaluate(() => window.rerunShell.badge.set(3))
     if (process.platform === 'darwin') {
         await waitUntil(() => app.evaluate(({ app: electronApp }) => electronApp.getBadgeCount()), (count) => count === 3, 'the Dock shows 3')
@@ -61,7 +52,6 @@ export default async function nativeScenario({ app, page, step, base }) {
         await waitUntil(() => app.evaluate(({ app: electronApp }) => electronApp.getBadgeCount()), (count) => count === 0, 'the Dock badge clears')
     }
 
-    // 3. The desktop settings persist in the shell.
     const before = await page.evaluate(() => window.rerunShell.settings.get())
     check(before.closeToTray === true && before.openAtLogin === false, `the defaults: close to the tray, not at login (${JSON.stringify(before)})`)
     const after = await page.evaluate(() => window.rerunShell.settings.set({ closeToTray: false }))
@@ -70,14 +60,12 @@ export default async function nativeScenario({ app, page, step, base }) {
     check(reread.closeToTray === false, 'and reads back')
     await page.evaluate(() => window.rerunShell.settings.set({ closeToTray: true }))
 
-    // 4. The menus follow the language the page tells.
     await page.evaluate(() => window.rerunShell.locale.set('fr'))
     const french = await waitUntil(() => app.evaluate(({ Menu }) => Menu.getApplicationMenu().items.map((item) => item.label)), (labels) => labels.includes('Édition'), 'the menus switch to French')
     check(french.includes('Fenêtre'), `the menus read in French (${french.join(', ')})`)
     await page.evaluate(() => window.rerunShell.locale.set('en'))
     await waitUntil(() => app.evaluate(({ Menu }) => Menu.getApplicationMenu().items.map((item) => item.label)), (labels) => labels.includes('Edit'), 'and back to English')
 
-    // 5. The Desktop tab of the account, in the app only.
     await page.getByRole('button', { name: /workspace/i }).first().click()
     await page.getByRole('menuitem', { name: /account/i }).first().click()
     await page.getByRole('tab', { name: 'Desktop app' }).click()

@@ -25,12 +25,6 @@ import type { PublishResult, PublishedFile } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle, selectSingle } from '@/supabase/supabase-helpers'
 
-// File publishing. An agent publishes a file from its engine workspace; the bytes are copied
-// server-to-server (engine /raw → Supabase Storage), NEVER through the LLM context. A
-// `published_files` row records the mapping, the identity (slug) and who may open it. Everything
-// is served from <slug>.rerun.site (lib/published/host.ts), which checks that access before any
-// byte leaves the private bucket; /p/<slug> is the older link and redirects there.
-
 export const PUBLISHED_BUCKET = 'published'
 const MAX_PUBLISH_BYTES = 25 * 1024 * 1024 // 25 MB — keep well under Storage's per-object limit.
 const MAX_SITE_FILES = 300
@@ -51,9 +45,6 @@ type AgentContext = {
     conn: EngineConnection
 }
 
-// Resolve the calling agent (trusted: agentId comes from the Hub-authenticated x-rerun-agent
-// header) to its engine connection + the workspace/space ids used for keying and isolation.
-// Dedicated resolver on purpose: getAgentChatTarget doesn't expose workspace_id/space_id.
 async function resolveAgent(agentId: string): Promise<AgentContext> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id', 'workspace_id'] as const, { id: agentId })
@@ -67,9 +58,6 @@ export async function workspacePublishPolicy(workspaceId: number): Promise<Effec
     return effectivePolicy(data?.publish_policy)
 }
 
-// The bucket was public before links had an access: a raw Storage URL kept working for whoever
-// held it. Turned private here rather than in a migration, so it only happens once this code,
-// which never hands out a public Storage URL, is the one running.
 async function ensureBucket(supabase: ServiceClient): Promise<void> {
     const { error } = await supabase.storage.createBucket(PUBLISHED_BUCKET, { public: false })
     if (error) await supabase.storage.updateBucket(PUBLISHED_BUCKET, { public: false }).catch(() => {})
@@ -82,8 +70,6 @@ function fileNameOf(path: string): string {
 type PublishedKind = 'file' | 'site'
 type PublishedObjects = { kind: string; storage_key: string; files: string[] | null; thumbnail_key?: string | null }
 
-// Key bytes by workspace + slug + original filename, so re-publishing a different file under a
-// new slug never collides, and the browser sees a sensible filename.
 function storageKeyFor(workspaceId: number, slug: string, path: string): string {
     return `${workspaceId}/${slug}/${fileNameOf(path)}`
 }
@@ -96,8 +82,6 @@ export function shareUrlFor(slug: string): string {
     return publishedSiteOrigin(slug) ?? `${hubBaseUrl()}/p/${slug}`
 }
 
-// What a service that downloads the file itself fetches (Instagram taking an image by URL). Without a
-// publish host, /p/<slug> already leads to the bytes.
 function fileUrlFor(slug: string, kind: string, contentType: string): string | null {
     return rendersAsPage(kind, contentType) ? null : (publishedRawFileUrl(slug) ?? shareUrlFor(slug))
 }
@@ -117,9 +101,6 @@ async function generateFreeSlug(supabase: ServiceClient, customSlug?: string): P
     throw new Error('Could not generate a unique slug, please try again')
 }
 
-// The coworker may pass back the name it chose or the full slug it was given: either way, a
-// republish keeps its URL. Links published before the suffix existed keep theirs too. A full slug
-// given for a path with no row left (unpublished, or another file) is re-suffixed once, never twice.
 function isSameCustomSlug(existingSlug: string, customSlug: string): boolean {
     if (existingSlug === customSlug.trim().toLowerCase()) return true
     const prefix = slugPrefix(customSlug)
@@ -138,8 +119,6 @@ async function isDirectory(conn: EngineConnection, base: string, path: string): 
     return entries.some(entry => entry.name === path.slice(slash + 1) && entry.type === 'dir')
 }
 
-// Every file of a folder about to be published, as paths relative to it. Dotfiles, .git and
-// node_modules are a project's plumbing, never part of what a visitor should be able to fetch.
 async function listSiteFiles(conn: EngineConnection, base: string, root: string): Promise<string[]> {
     const files: string[] = []
     let totalBytes = 0
@@ -196,9 +175,6 @@ async function uploadFile(supabase: ServiceClient, conn: EngineConnection, base:
     return { kind: 'file', storageKey, files: null, contentType, size: bytes.byteLength, title }
 }
 
-// A folder goes under a fresh prefix on every publish, and each file under its index in the
-// manifest rather than its own name: the row only switches to the new prefix once every upload
-// landed, so a republish never serves half a site, and no file name can trip Storage's key rules.
 async function uploadSite(supabase: ServiceClient, conn: EngineConnection, base: string, root: string, prefix: string): Promise<UploadedObjects> {
     const files = await listSiteFiles(conn, base, root)
     const entryIndex = files.indexOf(SITE_ENTRY)
@@ -239,8 +215,6 @@ function currentAccess(row: AccessRow | null | undefined): AccessResolution | un
     return { access: row.access, requestedAccess: row.requested_access === 'public' ? 'public' : null }
 }
 
-// The columns a change of access writes. The version moves whenever someone who could open the link
-// before might no longer: another mode, another password, another list of invites.
 async function accessFields(next: AccessResolution, input: AccessInput, existing?: AccessRow | null): Promise<AccessFields> {
     const invited = input.invite ? normalizeInvites(input.invite) : (existing?.invited ?? [])
     const passwordHash = input.password ? await hashPassword(input.password) : (existing?.password_hash ?? null)
@@ -254,9 +228,6 @@ async function accessFields(next: AccessResolution, input: AccessInput, existing
 
 export type PublishOptions = AccessInput & { access?: PublishedAccess }
 
-// Publish a workspace file, or a folder with an index.html served as a site. Re-publishing the same
-// path upserts in place and keeps the existing slug/URL (unless a new slug is given), and the access
-// it had unless a new one is asked for.
 export async function publishFile(agentId: string, path: string, customSlug?: string, options: PublishOptions = {}): Promise<PublishResult> {
     const cleanPath = path.trim().replace(/(.)\/+$/, '$1')
     if (!cleanPath) throw new Error('Missing required argument: path')
@@ -265,7 +236,6 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
     const supabase = createServiceRoleClient()
     const base = `/agents/${engineAgentId}/files`
 
-    // Already published by this agent under this path? → republish in place (stable URL).
     const { data: existing } = await selectMaybeSingle(
         supabase,
         'published_files',
@@ -281,7 +251,6 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
     const slug = keepsExistingSlug ? existing.slug : await generateFreeSlug(supabase, customSlug)
     const url = shareUrlFor(slug)
 
-    // The bytes go engine → Storage server-to-server, never through the LLM context.
     await ensureBucket(supabase)
     const uploaded = (await isDirectory(conn, base, cleanPath))
         ? await uploadSite(supabase, conn, base, cleanPath, `${workspaceId}/${slug}/site-${Date.now()}`)
@@ -309,8 +278,6 @@ export async function publishFile(agentId: string, path: string, customSlug?: st
         .upsert<Database['public']['Tables']['published_files']['Insert']>(row, { onConflict: 'agent_id,source_path' })
     if (rowErr) throw new Error(`Failed to record published file: ${rowErr.message}`)
 
-    // Whatever the previous publish left behind and this one no longer points at, the old
-    // thumbnail included: it showed the previous bytes.
     if (existing) {
         const current = new Set(storageKeysOf({ kind: uploaded.kind, storage_key: uploaded.storageKey, files: uploaded.files }))
         const stale = storageKeysOf(existing).filter(key => !current.has(key))
@@ -341,9 +308,6 @@ async function removePublished(supabase: ServiceClient, row: PublishedObjects & 
 
 const REMOVAL_COLUMNS = ['id', 'slug', 'source_path', 'kind', 'storage_key', 'files', 'thumbnail_key'] as const
 
-// Remove a published file: delete the Storage objects first (tolerate already-gone), then the
-// row — so the link stops working immediately afterwards. Scoped to the agent: an agent can
-// only unpublish its own files.
 export async function unpublishFile(agentId: string, ident: { path?: string; slug?: string }): Promise<{ status: 'unpublished'; slug: string; path: string }> {
     const path = ident.path?.trim()
     const slug = ident.slug?.trim()
@@ -358,7 +322,6 @@ export async function unpublishFile(agentId: string, ident: { path?: string; slu
     return { status: 'unpublished', slug: rowData.slug, path: rowData.source_path }
 }
 
-// A person may take down any link of their workspace, whichever coworker published it.
 export async function unpublishInWorkspace(workspaceId: number, slug: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: rowData } = await selectMaybeSingle(supabase, 'published_files', REMOVAL_COLUMNS, { workspace_id: workspaceId, slug })
@@ -368,8 +331,6 @@ export async function unpublishInWorkspace(workspaceId: number, slug: string): P
 
 export type AccessChange = AccessInput & { access: PublishedAccess }
 
-// What a person sets from the share dialog. It answers a coworker's pending ask as well: whatever
-// they pick, the ask is settled.
 export async function updatePublishedAccess(workspaceId: number, slug: string, change: AccessChange): Promise<PublishedFile> {
     const supabase = createServiceRoleClient()
     const { data: row } = await selectMaybeSingle(supabase, 'published_files', ['id', ...ACCESS_COLUMNS] as const, { workspace_id: workspaceId, slug })
@@ -387,7 +348,6 @@ export async function updatePublishedAccess(workspaceId: number, slug: string, c
     return updated
 }
 
-// "Keep private" in the chat: the link stays as it is and the ask goes away.
 export async function dismissAccessRequest(workspaceId: number, slug: string): Promise<void> {
     const { error } = await createServiceRoleClient()
         .from('published_files')
@@ -397,8 +357,6 @@ export async function dismissAccessRequest(workspaceId: number, slug: string): P
     if (error) throw new Error(`Failed to update the link: ${error.message}`)
 }
 
-// Turning public links off for the workspace closes the ones already open: they go back to the
-// members, and every cookie a visitor held stops working.
 export async function closePublicLinks(workspaceId: number): Promise<number> {
     const supabase = createServiceRoleClient()
     const { data: rows } = await selectMany(supabase, 'published_files', ['id', 'access_version'] as const, { workspace_id: workspaceId, access: 'public' })
@@ -465,14 +423,12 @@ async function toPublishedFiles(supabase: ServiceClient, rows: readonly ListedRo
     }))
 }
 
-// List the files this agent currently has published.
 export async function listPublished(agentId: string): Promise<{ files: PublishedFile[] }> {
     const supabase = createServiceRoleClient()
     const { data } = await selectMany(supabase, 'published_files', LISTED_COLUMNS, { agent_id: agentId }, { column: 'updated_at', ascending: false })
     return { files: await toPublishedFiles(supabase, data ?? []) }
 }
 
-// `visibleAgents` narrows the list to the coworkers the caller reaches, before any thumbnail is signed.
 export async function listWorkspacePublished(workspaceId: number, visibleAgents: 'all' | Set<string> = 'all'): Promise<PublishedFile[]> {
     const supabase = createServiceRoleClient()
     const { data } = await selectMany(supabase, 'published_files', LISTED_COLUMNS, { workspace_id: workspaceId }, { column: 'updated_at', ascending: false })

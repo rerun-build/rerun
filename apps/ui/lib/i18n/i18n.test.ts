@@ -8,7 +8,6 @@ import { describe, expect, it } from 'vitest'
 const NOW = new Date('2026-11-09T12:00:00Z')
 const ago = (ms: number) => new Date(NOW.getTime() - ms).toISOString()
 const ahead = (ms: number) => new Date(NOW.getTime() + ms).toISOString()
-// ICU separates a number from its unit with a (narrow) no-break space.
 const plain = (text: string) => text.replace(/[\u00a0\u202f]/g, ' ')
 const MINUTE = 60_000
 const HOUR = 60 * MINUTE

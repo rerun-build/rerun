@@ -32,7 +32,6 @@ function session(agentId: string, id: string, updatedAt: string, status = 'idle'
     return { id, agent_id: agentId, title: `${id} title`, status, updated_at: updatedAt, created_at: updatedAt, engine_session_id: `engine-${id}`, source: 'dashboard', kind: 'thread' }
 }
 
-// selectMany is called three times in order: agents, the latest scan, then the pending count.
 function answers(agents: { id: string }[], recent: ReturnType<typeof session>[], pending: { agent_id: string }[]) {
     vi.mocked(selectMany)
         .mockResolvedValueOnce({ data: agents, error: null } as never)
@@ -105,8 +104,6 @@ describe('listWorkspaceConversationOverview', () => {
 describe('finalizeSession', () => {
     beforeEach(() => vi.clearAllMocks())
 
-    // RER-78: a stream reconnection that settles after the run ended on a question card used to write
-    // `idle` over the `awaiting_question` the hub had just written, and the card vanished.
     it.each(['idle', 'error'] as const)('a settled reconnection only moves a session still working, to %s', async status => {
         const db = fakeSupabase()
         vi.mocked(createServiceRoleClient).mockReturnValue(db.client)

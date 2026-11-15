@@ -1,6 +1,4 @@
-"""Retry packet: the first packet plus the tail of the failure, inside the packet cap."""
-
-PACKET_CAP = 4096  # bytes; wave 2's C3a reads the lane value from settings
+PACKET_CAP = 4096
 HEAD = "\n## Failure tail (last output of the previous attempt)\n"
 
 
@@ -9,7 +7,6 @@ def _fit(text, room):
 
 
 def retry_packet(base, failure, cap=PACKET_CAP):
-    """base + the END of failure, never more than cap bytes; the tail is cut at a line start when it can be."""
     head = base + HEAD
     room = cap - len(head.encode())
     if room <= 0:

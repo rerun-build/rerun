@@ -13,11 +13,6 @@ import { agentsFromRow, connectorsFromRow } from './document'
 import { archiveAgentNames, archivesFromRow } from './archives'
 import type { PurchaseAccess } from './entitlement'
 
-// What the in-app library shows of a template: the editorial lists, plus everything a card
-// needs. The long description is included so the detail panel does not need a second read.
-// `agent_archives` and `creator_id` are read for a derived boolean each, never handed to the
-// client: one holds the private bucket paths, the other the author's identity. Both sit outside
-// the anon grant, which is why the library reads through the service-role client.
 export const LIBRARY_COLUMNS = [
     'id',
     'slug',
@@ -68,8 +63,6 @@ export type LibraryRow = {
     card_image_light_url: string | null
 }
 
-// The public fiche that signs a template. Only a published expert profile signs: anything else,
-// and every template without an author, is credited to the Rerun team, which is what null says.
 export type LibraryCreator = {
     slug: string
     name: string
@@ -79,8 +72,6 @@ export type LibraryCreator = {
     location: string | null
     bio: string | null
     links: { x: string | null; linkedin: string | null; github: string | null; website: string | null }
-    // The person behind the fiche confirmed it themselves, rather than it being a profile we
-    // imported for them.
     verified: boolean
 }
 
@@ -99,32 +90,19 @@ export type LibraryTemplate = {
     agentCount: number
     agents: TemplateAgent[]
     connectors: TemplateConnector[]
-    // The captured agent folders, by display name, in install order. A template with none is
-    // editorial only and cannot be imported into a space yet. Names only: the bucket paths the
-    // archives also hold never leave the server.
     archiveAgentNames: string[]
-    // Whether the viewer authored it. That is what earns a non-published template a place in the
-    // list, so the card can show its status the way an admin's does.
     isMine: boolean
     creator: LibraryCreator | null
     pricing: TemplatePricing
-    // What the current workspace holds. `lapsed` is a recurring purchase that ended, which the
-    // library has to tell apart from never having bought it.
     access: PurchaseAccess
-    // The one question every surface asks: can this be placed on a board right now. A free
-    // template and one the viewer authored are owned too, so nobody has to re-derive that.
     owned: boolean
     publishedAt: string | null
-    // The stored board captures, one per theme. Written by the card renderer after a write, so a
-    // freshly saved template shows its previous pair for a few seconds.
     cardImageDarkUrl: string | null
     cardImageLightUrl: string | null
 }
 
 const galleryFromRow = z.array(templateImageSchema).catch([])
 
-// `creatorsByUser` is keyed on the account id, which is resolved here and dropped: only the fiche
-// it leads to reaches the client.
 export function toLibraryTemplates(rows: LibraryRow[], viewerId?: string | null, accessByTemplate?: Map<string, PurchaseAccess>, creatorsByUser?: Map<string, LibraryCreator>): LibraryTemplate[] {
     const templates = rows.map(row => {
         const agents = agentsFromRow.parse(row.agents)
@@ -162,11 +140,8 @@ export function toLibraryTemplates(rows: LibraryRow[], viewerId?: string | null,
     return templates.sort((a, b) => Number(b.featured) - Number(a.featured))
 }
 
-// Values inside a dimension widen the result, dimensions narrow each other.
 export type LibraryFilters = {
     connectorSlugs: string[]
-    // The admin-only dimension. Empty is not "no narrowing" here but "the public catalogue", which
-    // is what the library shows an admin until they ask for a status.
     statuses: TemplateStatus[]
 }
 
@@ -178,8 +153,6 @@ export function isInMyLibrary(template: LibraryTemplate): boolean {
 
 export function filterTemplates(templates: LibraryTemplate[], filters: LibraryFilters): LibraryTemplate[] {
     return templates.filter(t => {
-        // With no status asked for, an admin sees what a visitor sees: what is published, plus
-        // their own work. For everybody else the read returned nothing else in the first place.
         if (filters.statuses.length > 0) {
             if (!filters.statuses.includes(t.status as TemplateStatus)) return false
         } else if (t.status !== 'published' && !t.isMine) return false

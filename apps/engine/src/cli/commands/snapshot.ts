@@ -5,8 +5,6 @@ import { createClient } from '@libsql/client'
 import { listAgentIdsOnDisk } from '../../agents/loader.js'
 import { dataDir, systemDbPath } from '../../config/paths.js'
 
-// A snapshot folder is named by the UTC moment it was made, e.g. 20261113T173250Z. Only names of this
-// shape are ever removed by the keep rule.
 const STAMP = /^\d{8}T\d{6}Z$/
 const DEFAULT_KEEP = 2
 
@@ -23,13 +21,10 @@ function parseKeep(args: string[]): number {
 }
 
 async function copyOne(source: string, target: string): Promise<void> {
-    // Page-level copy: VACUUM INTO rebuilds the vector index shadow tables and breaks their integrity.
-    // node:sqlite is loaded here, not at the top, so the engine's own start never loads it or warns.
     const { DatabaseSync, backup } = process.getBuiltinModule('node:sqlite') as unknown as {
         DatabaseSync: new (path: string, options: { readOnly: boolean }) => { close(): void }
         backup: (source: { close(): void }, path: string) => Promise<number>
     }
-    // The source is opened directly, read-only, never through getSystemDb, so nothing is migrated.
     const src = new DatabaseSync(source, { readOnly: true })
     try {
         await backup(src, target)
@@ -48,9 +43,6 @@ async function checkOne(target: string): Promise<boolean> {
     }
 }
 
-// rerun snapshot [--keep N]: copy every coworker's system.db into <data dir>/backups/<UTC stamp>/,
-// check each copy, print one JSON line, exit 1 when any copy fails or the disk is too small. Older
-// snapshots are removed only after a fully successful run.
 export async function snapshotCommand(args: string[]): Promise<void> {
     const keep = parseKeep(args)
     const sources: { id: string; path: string }[] = []

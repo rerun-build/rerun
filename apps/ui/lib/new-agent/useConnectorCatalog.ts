@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react'
 import { listConnectorCatalogAction } from '@/app/api/_actions/template.actions'
 import type { ConnectorCatalog } from '@rerun/ui/new-agent'
 
-// One read per page load, shared by every opening of the dialog: the catalogue does not change
-// while someone is describing an agent.
 let loaded: ConnectorCatalog | null = null
 let loading: Promise<ConnectorCatalog> | null = null
 
@@ -23,9 +21,6 @@ function loadCatalog(): Promise<ConnectorCatalog> {
     return loading
 }
 
-// The whole connector catalogue, by slug: name and icon, enough to draw a logo and to search by
-// name. `null` until it lands, and it stays null if the read fails, which leaves the dialog usable
-// without its logos.
 export function useConnectorCatalog(enabled: boolean): ConnectorCatalog | null {
     const [catalog, setCatalog] = useState<ConnectorCatalog | null>(loaded)
 

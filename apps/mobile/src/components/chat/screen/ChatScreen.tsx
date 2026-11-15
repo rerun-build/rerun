@@ -16,8 +16,6 @@ type ChatScreenProps = Pick<AgentScreen, 'status' | 'uri' | 'onMessage'> & {
     onLayout?: (event: LayoutChangeEvent) => void
 }
 
-// The coworker's screen as the last block of the run that uses it, with the takeover it asks for.
-// The viewer page is watched, never touched: the thread keeps scrolling over it.
 export function ChatScreen({ status, uri, onMessage, attachWebView, site, takeover, onTakeControl, onLayout }: ChatScreenProps) {
     const live = status === 'live'
     return (

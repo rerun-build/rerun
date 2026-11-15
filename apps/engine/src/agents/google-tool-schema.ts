@@ -8,10 +8,6 @@ function isSchema(value: unknown): value is Schema {
     return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
-// Gemini turns down the whole request over a single enum value that is not a non-empty string:
-// Buffer's `thumbnailUrl` (`anyOf: [uri, const ""]`) or our own `z.literal(true)` both cost every
-// run on a Google key. Only the copy sent to Google loses the constraint: the AI SDK still validates
-// the model's arguments against the tool's own schema.
 export function geminiCompatibleSchema(schema: unknown): unknown {
     if (Array.isArray(schema)) return schema.map(geminiCompatibleSchema)
     if (!isSchema(schema)) return schema

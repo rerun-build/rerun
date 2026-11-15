@@ -1,14 +1,7 @@
-"""Fake `docker` for test_rotate_engine_key.py: only the invocations deploy/vps/rotate-engine-key.sh makes.
-Its world is a JSON file named by FAKE_DOCKER_STATE: engine_pool rows, the key the running engine holds, which
-services run, a call log, and switches (db_modes, engine_open, app_refuses, app_slow, swap_fails, swap_reply_lost,
-db_down_at_swap), plus the triggers and publications the info program reports. A key value in SQL text outside the
-COPY data line is recorded as a violation and fails the call. Output goes through the byte streams so Windows
-does not turn line ends into CR LF."""
 import json, os, re, sys
 
 
 def env_key():
-    """The key compose would read from .env in the current directory: last line wins, quotes removed."""
     try:
         with open(".env", encoding="utf-8") as f:
             lines = [l.rstrip("\r\n") for l in f]
@@ -31,7 +24,7 @@ def http(st, args, bearer):
     if url == "http://app:3000/api/hub":
         if "app" not in st["running"]:
             return "000"
-        if st.get("app_slow", 0) > 0:  # an app still starting: no answer for its first N calls
+        if st.get("app_slow", 0) > 0:
             st["app_slow"] -= 1
             return "000"
         if "-X" not in args or args[args.index("-X") + 1] != "POST":
@@ -102,7 +95,7 @@ def sql(st, text):
     st["calls"][-1]["sql"] = name
     if name == "ping":
         return 0, "1\n", ""
-    if name == "info":  # needs no key, so it may hold no COPY either
+    if name == "info":
         if any("copy" in l.lower() for l in lines):
             st["violations"].append("COPY in the info program")
             return 9, "", "fake: COPY in the info program\n"
@@ -110,27 +103,26 @@ def sql(st, text):
     old, new = data.split("\t")
     held = [r["engine_api_key"] for r in st["rows"]]
     o, n = held.count(old), held.count(new)
-    # Only the real change may end in commit: a count or a rehearsal that committed would be a change.
     last = [l for l in rest if l.strip()][-1]
     if last != ("commit;" if name == "swap" else "rollback;"):
         st["violations"].append("the %s program ends with %r" % (name, last))
         return 9, "", "fake: wrong ending\n"
     if name == "count":
         return 0, "%d|%d|%s\n" % (o, n, ",".join(st["tables"])), ""
-    if name == "rehearse":  # the same statements, rolled back: it answers and changes nothing
+    if name == "rehearse":
         if (o, n) in ((1, 0), (0, 1)):
             return 0, "swapped\n" if o == 1 else "already\n", ""
         return 3, "", "ERROR:  rows_old=%d rows_new=%d\n" % (o, n)
-    if st.get("db_down_at_swap"):  # the database goes away with the change: it is not made, and nothing answers after
+    if st.get("db_down_at_swap"):
         st["db_modes"] = []
         return 2, "", "psql: error: server closed the connection unexpectedly\n"
-    if st.get("swap_fails"):  # the database refusing the change after the rehearsal said it would work
+    if st.get("swap_fails"):
         return 3, "", "ERROR:  rows_old=%d rows_new=%d\n" % (o, n)
     if o == 1 and n == 0:
         for r in st["rows"]:
             if r["engine_api_key"] == old:
                 r["engine_api_key"], r["updated_at"] = new, "now"
-        if st.get("swap_reply_lost"):  # committed, but the answer never came back
+        if st.get("swap_reply_lost"):
             return 2, "", "psql: error: server closed the connection unexpectedly\n"
         return 0, "swapped\n", ""
     if o == 0 and n == 1:

@@ -1,7 +1,3 @@
-// What the factory bar shows. The run measures are Rerun's own (statsMetricSchema in
-// @rerun/contracts, the same the stats pages chart); the job counts come from the delegator's
-// ledger; plan and sign-in from the Claude connection. Each carries its definition for the hover.
-
 import type { FactorySnapshot } from '@rerun/contracts'
 
 export type MetricKey =
@@ -46,7 +42,6 @@ function sameLocalDay(a: number, b: number): boolean {
     return x.getFullYear() === y.getFullYear() && x.getMonth() === y.getMonth() && x.getDate() === y.getDate()
 }
 
-/** The numbers of the bar: the sample loop's when there is no snapshot, else the snapshot's own. */
 export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarCounts; held: boolean; now: number; start: number }): { sample: boolean; values: MetricValues } {
     const { snapshot, counts, held, now, start } = input
     if (!snapshot) {

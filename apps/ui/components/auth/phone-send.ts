@@ -7,8 +7,6 @@ import { track } from '@rerun/analytics/client'
 
 const MESSAGE_LIMIT = 200
 
-// A refusal from the server: `retryAfterSeconds` is how long it holds the next code back, `reason`
-// why it turned this one away.
 export class PhoneSendError extends Error {
     readonly retryAfterSeconds?: number
     readonly reason?: string
@@ -20,8 +18,6 @@ export class PhoneSendError extends Error {
     }
 }
 
-// Every "Send by…" ends in `phone_verification_sent` or `phone_verification_failed`, whether the
-// server refused, the robot check never answered, or the call itself broke.
 export async function sendPhoneCode(context: PhoneVerificationContext, request: PhoneCodeRequest, send: () => Promise<PhoneSendActionResult>): Promise<VerificationChannel> {
     const failed = (details: { reason: string; message?: string; captcha_provider?: CaptchaError['provider']; captcha_code?: string }) => track('phone_verification_failed', { channel: request.channel, context, country: request.country, ...details })
 

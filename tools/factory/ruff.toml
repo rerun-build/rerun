@@ -1,4 +1,2 @@
-# Lint for the factory tools: syntax errors and what pyflakes finds (undefined names, unused imports
-# and variables). No line-length rule and no formatting: the files keep their shape.
 [lint]
 select = ["E9", "F"]

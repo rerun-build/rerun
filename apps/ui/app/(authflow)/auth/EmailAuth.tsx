@@ -13,10 +13,6 @@ import { setSharedCookie } from '@rerun/analytics/client'
 import { useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
 
-// One flow for both sign-in and sign-up: the server opens the account first if the address is new,
-// then Supabase mails the code. The intent cookie is only set when the server did open it: an
-// existing account signing in on a new browser soon after its signup would otherwise be counted
-// twice. A code mailed again keeps the cookie the first one set.
 export default function EmailAuth({ beforeEmail, onStepChange, onSignedIn }: { beforeEmail?: ReactNode; onStepChange: (step: EmailCodeStep) => void; onSignedIn: () => void }) {
     const searchParams = useSearchParams()
     const errorText = useErrorText()

@@ -49,7 +49,6 @@ function update(body?: string) {
     return app.request('/update', { method: 'POST', headers: { 'content-type': 'application/json' }, body })
 }
 
-// The route keeps whether an update is running in module state, so these cases run in order.
 describe('POST /update', () => {
     it('refuses while a run is in flight', async () => {
         registerRunAbort('busy-run', 'agent-1')

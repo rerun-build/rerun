@@ -11,8 +11,6 @@ import { useTheme } from '@/theme/theme'
 
 export type { MenuBadge, MenuIcon } from '@/components/ui/menu-types'
 
-// A tap on `trigger` opens the system menu (UIMenu, in glass on iOS 26). Its rows are the
-// platform-neutral MenuItem, MenuToggle, MenuSection and SubMenu below; Android draws its own.
 export function NativeMenu({ trigger, children, glass, label }: NativeMenuProps) {
     const theme = useTheme()
     const modifiers = [...(glass ? [glassEffect({ glass: { variant: 'regular', interactive: true }, shape: glass })] : []), ...(label ? [accessibilityLabel(label)] : [])]
@@ -62,8 +60,6 @@ export function SubMenu({ label, icon, children }: SubMenuProps) {
     )
 }
 
-// A tap runs `onPress`, a long press opens the system's context menu. The cell is a SwiftUI button
-// around an inert RN view, so both gestures stay native.
 export function LongPressMenu({ onPress, label, items, children }: LongPressMenuProps) {
     const theme = useTheme()
     return (
@@ -80,7 +76,6 @@ export function LongPressMenu({ onPress, label, items, children }: LongPressMenu
     )
 }
 
-// What a round glass trigger holds: an icon, or an avatar cut to the circle.
 export function CircleTrigger({ symbol, children }: { symbol?: IconName; children?: ReactNode }) {
     const theme = useTheme()
     return (

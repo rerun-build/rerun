@@ -3,9 +3,6 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-// Each skill row carries an on/off switch ("offer this skill to the coworker"). A click flips the row
-// at once, saves, and puts the row back with an error toast when the save fails. It never opens the editor.
-
 const mocks = vi.hoisted(() => ({
     listSkillsAction: vi.fn(),
     importSkillAction: vi.fn(),
@@ -25,7 +22,6 @@ vi.mock('@/hooks/useAgentSkillSummaries', () => ({ setAgentSkillSummaries: vi.fn
 vi.mock('@/components/agent/skills/SkillEditor', () => ({ SkillEditor: () => createElement('div', { 'data-testid': 'editor' }) }))
 vi.mock('@/components/ui/tooltip', () => ({ TooltipDisabledReason: ({ children }: { children: unknown }) => children }))
 vi.mock('sonner', () => ({ toast: { error: mocks.toastError } }))
-// One stable function: the panel reloads its list when `t` changes identity.
 const translate = (key: string, values?: { name?: string }) => (key === 'offerSkill' ? `Offer ${values?.name} to this coworker` : key === 'offBadge' ? 'Off' : key)
 vi.mock('next-intl', () => ({ useTranslations: () => translate }))
 
@@ -50,7 +46,6 @@ async function mount() {
 }
 
 const sw = (name: string) => container!.querySelector<HTMLButtonElement>(`button[role="switch"][aria-label="Offer ${name} to this coworker"]`)!
-// The row is the closest ancestor of the switch that also holds the skill's description.
 const rowOf = (name: string) => {
     let el: HTMLElement = sw(name)
     while (!el.textContent?.includes(`${name} d`)) el = el.parentElement!

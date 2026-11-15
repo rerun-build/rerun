@@ -1,13 +1,3 @@
-// Renders the 3D-glass illustration behind each category tile of the template library, straight
-// into public/categories. The prompts follow the `rerun-image-glass` skill: the grammar below is
-// identical on every category so the ten tiles read as one family, and only the hero pictogram, the
-// satellites and the tilt change. Adding a category to TEMPLATE_CATEGORIES means adding a row here.
-//
-// Run: ../engine/node_modules/.bin/tsx --env-file=.env scripts/generate-category-art.mts [slug…]
-//
-//   no argument   renders only the categories that have no file yet
-//   slug…         re-renders exactly those, overwriting
-
 import { existsSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -17,20 +7,16 @@ import sharp from 'sharp'
 import { TEMPLATE_CATEGORIES, type TemplateCategory } from '@rerun/contracts'
 
 const MODEL = 'openai/gpt-image-2'
-// The tile is 208px wide, so 480 covers it at 2x. Anything larger is bytes nobody sees.
 const WIDTH = 480
 const OUT_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'public', 'categories')
 
 type Subject = {
-    // How the hero is referred to in the rest of the prompt, so the sentences stay grammatical.
     noun: string
     hero: string
     satellites: string
     tilt: string
     dense: string
     sparse: string
-    // Only Recruiting overrides it: its hero is a human glyph, and the blanket `no people` clause
-    // makes the model refuse to draw one.
     people?: string
 }
 
@@ -108,8 +94,6 @@ const SUBJECTS: Record<TemplateCategory, Subject> = {
         dense: 'lower right',
         sparse: 'upper left',
     },
-    // The one category whose meaning is the absence of one, so its satellites are the only ones
-    // allowed to be abstract solids rather than icons of the domain.
     other: {
         noun: 'glyph',
         hero: 'a horizontal ellipsis — three bold dots in a row, sitting inside a rounded square frame, reduced to their bare silhouette, no markings, no detail',

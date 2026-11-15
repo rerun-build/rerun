@@ -10,8 +10,6 @@ import { Stripes } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
-// What to paste for the client at hand. Without a key it falls back to the placeholder, so the
-// panel is readable before anyone has created one.
 export function McpSnippets({ mcpUrl, apiKey = KEY_PLACEHOLDER }: { mcpUrl: string; apiKey?: string }) {
     const t = useTranslations('dialogs.copy')
     const [client, setClient] = useState<McpClientId>('claude-code')

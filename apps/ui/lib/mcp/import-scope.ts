@@ -1,8 +1,5 @@
 import type { AuthenticatedApiKey } from './api-keys'
 
-// What an import key reaches: enough for an outside agent to rebuild itself as one coworker, and
-// nothing that reads or changes the rest of the account. No deletion, no messages, no database,
-// no listing of the other coworkers.
 export const IMPORT_TOOL_NAMES: ReadonlySet<string> = new Set([
     'create_agent',
     'get_agent',
@@ -31,7 +28,6 @@ export function importToolDefs<T extends { name: string }>(defs: readonly T[]): 
     return defs.filter(def => IMPORT_TOOL_NAMES.has(def.name))
 }
 
-// Throws the reason an import key may not make this call, in words the calling model can act on.
 export function assertImportCall(key: Pick<AuthenticatedApiKey, 'boundAgentId'>, name: string, args: Record<string, unknown>): void {
     if (!IMPORT_TOOL_NAMES.has(name)) throw new Error(`"${name}" is not available to an import key.`)
     if (name === 'create_agent') {

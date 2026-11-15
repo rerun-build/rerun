@@ -5,10 +5,6 @@ import { BoardColumnHeader, BoardItem } from './items'
 import { EmptyRows } from './TableCardFrame'
 import { useKitTranslations } from '../../locale'
 
-/**
- * A kanban over `groupBy`. The counts and sums on each column come from `groups`, counted over the
- * whole table: the cards under them are only the first few rows of each group.
- */
 export function BoardLayout({ card, context }: { card: TableCard; context: CellContext }) {
     const t = useKitTranslations()
     const { fields = {}, formats = {}, groupBy, groups = [] } = card

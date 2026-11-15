@@ -68,7 +68,6 @@ function buildEpic(issue: number | null, title: string, kind: FactoryEpicKind | 
     const unmet = (j: FactoryJob) => j.dependsOn.filter((d, i, a) => a.indexOf(d) === i && byNum.has(d) && byNum.get(d)!.state !== 'merged' && d !== j.issue).sort((a, b) => a - b)
     const needsOf = new Map(sorted.map((j) => [j.issue, unmet(j)]))
 
-    // layers: n = 1 + the highest layer among the unmet needs
     const layerOf = new Map<number, number>()
     let progress = true
     while (progress) {
@@ -83,7 +82,6 @@ function buildEpic(issue: number | null, title: string, kind: FactoryEpicKind | 
         }
     }
 
-    // cycle members: unlayered tasks that can reach themselves through unmet needs
     const unlayered = sorted.filter((j) => !layerOf.has(j.issue))
     const reaches = (from: number, target: number): boolean => {
         const seen = new Set<number>()
@@ -99,7 +97,6 @@ function buildEpic(issue: number | null, title: string, kind: FactoryEpicKind | 
     }
     const members = unlayered.filter((j) => reaches(j.issue, j.issue)).map((j) => j.issue)
 
-    // critical path over the layered tasks that are not merged
     const len = new Map<number, number>()
     const live = sorted.filter((j) => layerOf.has(j.issue) && j.state !== 'merged').sort((a, b) => layerOf.get(a.issue)! - layerOf.get(b.issue)! || a.issue - b.issue)
     for (const j of live) len.set(j.issue, 1 + Math.max(0, ...needsOf.get(j.issue)!.map((n) => len.get(n) ?? 0)))

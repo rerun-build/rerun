@@ -15,7 +15,6 @@ describe('applyCaching on OpenCode', () => {
         expect(applyCaching('opencode', { ...input, model: 'go/gemini-4-argon' })).toEqual(applyCaching('google', input))
     })
 
-    // The branches of the providers that were there before OpenCode do not move with it.
     it('leaves every other provider as it was', () => {
         for (const provider of ['anthropic', 'openai', 'openrouter', 'rerun', 'google', 'claude', 'codex'] as const) {
             expect(applyCaching(provider, { ...input, model: 'go/deepseek-v4-pro' }), provider).toEqual(applyCaching(provider, input))

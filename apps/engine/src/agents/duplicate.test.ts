@@ -16,7 +16,6 @@ const { agentDir } = await import('../config/paths.js')
 
 const SOURCE_ID = 'duplicatesource'
 const SOURCE_TRIGGER_TOKEN = 'tok-source-webhook-secret'
-// The pair the source runs on. Unlike a capture, it belongs to this box, so the copy keeps it.
 const SOURCE_CONNECTION_ID = 'cnxsource'
 const SOURCE_MODEL = 'claude-opus-4-8'
 const SOURCE_KEY_VALUE = 'fal-AAAAAAAAAAAAAAAAAAAA'
@@ -86,8 +85,6 @@ describe('duplicateAgent', () => {
         expect((await listAgentIndex()).some(row => row.id === result.id && row.name === 'source_2')).toBe(true)
     })
 
-    // The whole point of not going through the archive: the owner is the same person on the same
-    // box, so a copy that arrived with an emptied `.env` would be a downgrade, not a safeguard.
     it('keeps the env values, with the 0600 a fresh agent gets', async () => {
         const result = await duplicateAgent(SOURCE_ID, { name: 'source_env' })
 
@@ -95,8 +92,6 @@ describe('duplicateAgent', () => {
         expect((await stat(resolve(agentDir(result.id), '.env'))).mode & 0o777).toBe(0o600)
     })
 
-    // Same reason again, on the credential an archive can never carry at all: the copy is signed
-    // in to the same connectors, on the same accounts, and has nothing to reconnect.
     it('carries the MCP OAuth bundles an archive leaves behind', async () => {
         const result = await duplicateAgent(SOURCE_ID, { name: 'source_mcp' })
 
@@ -104,8 +99,6 @@ describe('duplicateAgent', () => {
         expect(JSON.parse(await readFile(resolve(agentDir(result.id), 'workspace/.rerun/services.json'), 'utf8')).services.fal.status).toBe('active')
     })
 
-    // The three fields the import clears on purpose, and that a copy staying here must not lose:
-    // the pair names this box, and the owner already ran the installation once.
     it('keeps the pair it runs on and the setup it already went through', async () => {
         const result = await duplicateAgent(SOURCE_ID, { name: 'source_pair' })
         const copied = agentConfigSchema.parse(JSON.parse(await readFile(resolve(agentDir(result.id), 'config.json'), 'utf8')))
@@ -118,7 +111,6 @@ describe('duplicateAgent', () => {
         expect(schedule).toContain(`model: ${SOURCE_MODEL}`)
     })
 
-    // Left alone the copy would sign every hub call as the agent it was made from.
     it('rebinds the source id its MCP headers carried', async () => {
         const result = await duplicateAgent(SOURCE_ID, { name: 'source_rebind' })
         const copied = agentConfigSchema.parse(JSON.parse(await readFile(resolve(agentDir(result.id), 'config.json'), 'utf8')))
@@ -127,7 +119,6 @@ describe('duplicateAgent', () => {
         expect(copied.mcpServers[0].env.FAL_KEY).toBe('${RERUN_SVC_FAL_FAL_KEY}')
     })
 
-    // The token is the capability and the lookup key at once, so two triggers may never share one.
     it('reissues a token for every webhook', async () => {
         const result = await duplicateAgent(SOURCE_ID, { name: 'source_hooks' })
         const trigger = await readFile(resolve(agentDir(result.id), 'triggers/inbound.md'), 'utf8')
@@ -137,21 +128,15 @@ describe('duplicateAgent', () => {
         expect(trigger).toContain('token: ')
     })
 
-    // `lastRunAt` is the scheduler's cron baseline: copied as it stands, the schedule is already
-    // overdue on arrival and fires within a tick.
     it('rebaselines the schedules it copies', async () => {
         const result = await duplicateAgent(SOURCE_ID, { name: 'source_cron' })
         const schedule = await readFile(resolve(agentDir(result.id), 'schedules/daily.md'), 'utf8')
 
-        // `onboard` has neither cron nor runAt: it is carried but never reported, because it does
-        // not fire on its own.
         expect(result.schedules).toEqual(['daily'])
         expect(await readFile(resolve(agentDir(result.id), 'schedules/onboard.md'), 'utf8')).toContain('Walk them through it.')
         expect(schedule).not.toContain('2026-01-01T00:00:00.000Z')
     })
 
-    // History is the source's, not the copy's, and the memory index lives inside it: the copy gets
-    // a `data/system.db` of its own, opened empty by the reindex pass, never the source's.
     it('leaves the transcripts behind and reindexes the memories', async () => {
         const result = await duplicateAgent(SOURCE_ID, { name: 'source_history' })
 

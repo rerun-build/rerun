@@ -84,7 +84,6 @@ describe('reading table rows', () => {
         expect(page.rows[0].name).toBe('item-599')
     })
 
-    // Looks wrong: an unknown table is the caller's mistake but answers as a server fault.
     it('answers 500 on a table that does not exist', async () => {
         expect((await app.request(`${base}/tables/nope/rows`)).status).toBe(500)
     })

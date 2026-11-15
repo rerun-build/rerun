@@ -6,17 +6,12 @@ export const QUICK_REPLIES_TOOL = 'suggest_replies'
 export const QUICK_REPLIES_MAX = 3
 export const QUICK_REPLY_MAX_LENGTH = 40
 
-// The replies close the coworker's message as a <quick_replies> block the engine cuts out of the
-// text; they reach the chat and the stored row as a call of this name, which is what the chat reads.
-// Loose on purpose: the limits are checked in `parseQuickReplies`.
 export const quickRepliesInputSchema = z.object({
     replies: z.array(z.string()).describe(`1 to ${QUICK_REPLIES_MAX} replies the user can send in one click, each under ${QUICK_REPLY_MAX_LENGTH} characters.`),
 })
 
 export type QuickRepliesResult = { ok: true; replies: string[] } | { ok: false; reason: string }
 
-// The engine keeps a block and the chat draws the chips through this one reading, so a list out of
-// bounds never shows up as buttons.
 export function parseQuickReplies(input: unknown): QuickRepliesResult {
     const parsed = quickRepliesInputSchema.safeParse(input)
     if (!parsed.success) return { ok: false, reason: 'replies must be a list of strings.' }
@@ -39,13 +34,8 @@ export function parseQuickReplies(input: unknown): QuickRepliesResult {
 }
 
 const AWAITS_VALUE_MARK = /\s*(?:…|\.{3}|:)$/
-// The prompt forbids a reply that announces a value without holding it, but a model can still slip
-// and the rows stored before the rule carry such replies. "Voilà" is left out, it mostly says that
-// something is done, and so is a reply with punctuation of its own ("Here you go, all set!").
 const ANNOUNCES_VALUE = /^(?:here(?:'s|’s| is| are)|voici|ci-joint)\s[^,;.!?]*$/i
 
-// A reply that announces a value without holding it ("Here is the repo URL") would reach the
-// coworker empty-handed: it goes to the composer for the user to finish, never out on its own.
 export function quickReplyDraft(reply: string): string | null {
     const trimmed = reply.trim()
     if (!AWAITS_VALUE_MARK.test(trimmed) && !ANNOUNCES_VALUE.test(trimmed)) return null
@@ -53,13 +43,8 @@ export function quickReplyDraft(reply: string): string | null {
     return lead ? `${lead}: ` : null
 }
 
-// A reply that only promises to send something later ("It's on GitHub, I'll send the URL") holds
-// nothing to send and nothing to finish: the chat leaves it out, whatever the prompt said. Pasting
-// or uploading always brings a value; sending, sharing or giving only when the reply names one
-// ("I'll send the URL"), never "I'll give it a try", "Je donne mon accord" or "I'll send it myself".
 const PROMISES_PASTE = /\b(?:i['’]ll|i will|i['’]m going to)\s+(?:\w+\s+)?(?:paste|upload)\b|\bje\s+(?:vous\s+|te\s+|t['’]\s*)?colle\b|\bje\s+vais\s+(?:vous\s+|te\s+|t['’]\s*)?coller\b/i
 const PROMISES_SEND = /\b(?:i['’]ll|i will|i['’]m going to)\s+(?:\w+\s+)?(?:send|share|give|add|grant|provide|drop|copy)\b|\bje\s+(?:vous\s+|te\s+|t['’]\s*)?(?:envoie|partage|donne|ajoute|transmets)\b|\bje\s+vais\s+(?:vous\s+|te\s+|t['’]\s*)?(?:envoyer|partager|donner|ajouter|transmettre)\b/i
-// \b does not see the edge of an accented word ("accès"), hence the letter classes of the u flag.
 const VALUE_NOUN = /(?:^|[^\p{L}])(?:urls?|links?|liens?|ids?|access|accès|files?|fichiers?|clones?|repos?|repository|dépôts?|keys?|clés?|tokens?|paths?|chemins?|e-?mails?|address(?:es)?|adresses?|credentials|identifiants|passwords?)(?![\p{L}])/iu
 const DONE_BY_USER = /(?:^|[^\p{L}])(?:myself|moi-même)(?![\p{L}])/iu
 
@@ -75,8 +60,6 @@ function isQuickRepliesPart(part: QuickRepliesPart): boolean {
     return stripBridgePrefix(name) === QUICK_REPLIES_TOOL
 }
 
-// The last valid call wins: a refused call the model corrected right after leaves its first try in
-// the parts. An input still streaming is not a set of replies yet.
 export function quickRepliesOf(message: { role: string; parts: readonly unknown[] }): string[] {
     if (message.role !== 'assistant') return []
     for (let i = message.parts.length - 1; i >= 0; i--) {

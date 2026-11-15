@@ -57,13 +57,10 @@ function ModelRow({ row, isDefault, lockReason, onToggle }: { row: OpencodeModel
 
 type OpencodeModelsProps = {
     connection: BoxConnection
-    // The workspace default when it sits on this connection, which can never be turned off.
     defaultModel: string | null
     onModelsChange: (models: string[]) => void
 }
 
-// OpenCode lists dozens of models over two catalogs, too many for the drag-and-drop zones: one
-// switch per model, the Go ones first, a search across both.
 export function OpencodeModels({ connection, defaultModel, onModelsChange }: OpencodeModelsProps) {
     const t = useTranslations('connections')
     const [query, setQuery] = useState('')

@@ -1,7 +1,5 @@
 import { z } from 'zod'
 
-// What a run must end with. The caller names fixed forms, never a pattern: the engine matches them
-// with anchored patterns of its own.
 export const goalLineFormSchema = z.object({ prefix: z.string().min(1).max(40), rest: z.enum(['pull-url', 'sha', 'sentence']) }).strict()
 export const runGoalSchema = z.object({ lastLineForms: z.array(goalLineFormSchema).min(1).max(4), turnLimit: z.number().int().min(1).max(10) }).strict()
 export const goalStateSchema = z.enum(['running', 'met', 'not_met', 'unchecked'])

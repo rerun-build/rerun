@@ -22,12 +22,9 @@ import { z } from 'zod'
 
 export type EmailCodeStep = 'email' | 'code'
 
-// `change` is the same two steps for an account that is already signed in and moves to a new
-// address: nothing of it is a signup, and the button its email would carry leads nowhere.
 export type EmailCodePurpose = 'sign-in' | 'change'
 
 export const SIGN_IN_CODE_LENGTH = 6
-// Supabase refuses a second code for the same address within a minute (auth.email.max_frequency).
 const RESEND_COOLDOWN_SECONDS = 60
 
 export type EmailSendOutcome = 'held' | void
@@ -49,11 +46,8 @@ function markVerificationCompleted() {
 
 const analyticsMessage = (error: unknown) => (error instanceof Error ? error.message : 'Something went wrong. Please try again.')
 
-// Supabase answers a wrong code and an expired one with the same error, so the copy covers both.
 const isInvalidCode = (error: unknown) => error instanceof Error && /expired|invalid/i.test(error.message)
 
-// Passwordless sign-in: an email, then the code mailed to it. The email also carries a button that
-// signs in on its own through /auth/confirm, so this form is only one of the two ways through.
 export function EmailCodeForm({
     defaultEmail = '',
     sendCode,
@@ -64,7 +58,6 @@ export function EmailCodeForm({
     initialSentTo,
 }: {
     defaultEmail?: string
-    // `held`: the last code left less than a minute ago, so none was mailed.
     sendCode: (email: string) => Promise<EmailSendOutcome>
     verifyCode: (email: string, code: string) => Promise<void>
     onStepChange?: (step: EmailCodeStep) => void

@@ -118,8 +118,6 @@ describe('a card and the message written after it', () => {
         expect(messages[0].metadata?.createdAt).toBe(at(1))
     })
 
-    // The reloaded transcript is what the iOS app reads: an older build has to see the v2 stamp
-    // there too, or it would draw option objects it cannot read.
     it('stamps v2 on a reloaded ask_user whose options carry a description', () => {
         const questions = [{ question: 'Which format?', header: 'Format', options: [{ label: 'One-pager', description: 'A single page' }, 'Deck'] }]
         const call = { type: 'tool-call', toolCallId: 'c1', toolName: 'ask_user', input: { questions } }
@@ -140,9 +138,6 @@ describe('a card and the message written after it', () => {
         expect(messages[0].parts.map(p => p.type)).toEqual(['text', 'tool-ask_user'])
     })
 
-    // A CLI turn is one row: a tool call, the message, the replies, and whatever the model wrote
-    // after them. Glued into one text put first, two blocks read as one and the tool call that
-    // preceded the message dropped under it.
     it('keeps the blocks of a turn in the order they were streamed', () => {
         const listPages = { type: 'tool-call', toolCallId: 'c1', toolName: 'facebook_list_pages', input: {} }
         const replies = { type: 'tool-call', toolCallId: 'c2', toolName: 'mcp__rerun__suggest_replies', input: { replies: ['Post it'] } }
@@ -167,8 +162,6 @@ describe('a card and the message written after it', () => {
         expect(message.parts[2]).toMatchObject({ input: { path: 'a' } })
     })
 
-    // The engine cuts the replies out of the text and keeps them beside the row, as the call the
-    // chat draws the buttons from.
     it('reads the replies the engine kept beside the row as the call the chat draws them from', () => {
         const row = { id: 'a1', sessionId: 's1', role: 'assistant' as const, contentJson: JSON.stringify([{ type: 'text', text: 'Here are your 100 leads.' }]), toolCallsJson: JSON.stringify([{ toolCallId: 'q1', toolName: 'suggest_replies', input: { replies: ['Find 100 more'] } }]), createdAt: at(1) }
         const [message] = transformEngineMessages([row])
@@ -189,8 +182,6 @@ describe('a user turn stored as parts', () => {
     const row = (content: unknown) => ({ id: 'm1', sessionId: 's1', role: 'user' as const, contentJson: JSON.stringify(content), toolCallsJson: null, createdAt: '2026-10-05T10:00:00Z' })
     const context = (text: string) => ({ type: 'text', text, providerOptions: { rerun: { context: true } } })
 
-    // The engine stores the turn as it sent it to the model, the memories it recalled and the time
-    // of the turn included: the chat shows the words typed and nothing else.
     it('shows the words typed and hides the context the engine appended', () => {
         const [message] = transformEngineMessages([row([{ type: 'text', text: 'Hello' }, context('<relevant_memories>\n- (fact) Works for Acme\n</relevant_memories>\n\n<now>\n2026-10-05T10:00:00Z\n</now>')])])
         expect(message.parts).toEqual([{ type: 'text', text: 'Hello' }])

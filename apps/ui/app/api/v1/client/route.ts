@@ -16,14 +16,11 @@ function minBuildOf(platform: ClientPlatform): number {
     return Number.isInteger(build) && build > 0 ? build : 0
 }
 
-// The Host header, not req.url: Next rebuilds req.url on the address it listens on.
 function hostnameReached(req: Request): string {
     const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host')
     return host ? new URL(`http://${host.split(',')[0].trim()}`).hostname : new URL(req.url).hostname
 }
 
-// A hub next to a local Supabase knows it as localhost, which on a phone is the phone itself: the
-// phone reaches that Supabase on the machine it reached the hub on, at the same port.
 function supabaseUrlSeenFrom(req: Request, supabaseUrl: string): string {
     const url = new URL(supabaseUrl)
     if (!LOOPBACK_HOSTS.has(url.hostname)) return supabaseUrl.replace(/\/+$/, '')

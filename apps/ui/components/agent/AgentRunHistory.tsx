@@ -14,8 +14,6 @@ import { useLocale, useTranslations } from 'next-intl'
 import { type ComponentType, useCallback, useState } from 'react'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 
-// The Supabase mirror row is normally created by the engine's session webhook; adopting is
-// idempotent, and the single retry absorbs the insert race right after a run fires.
 export async function adoptRunSession(agentId: string, engineSessionId: string, title: string): Promise<string> {
     return adoptEngineSessionAction(agentId, engineSessionId, title).catch(() => adoptEngineSessionAction(agentId, engineSessionId, title))
 }

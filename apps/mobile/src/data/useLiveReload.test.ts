@@ -78,7 +78,6 @@ describe('useLiveReload', () => {
         }
     })
 
-    // A refreshed token gives the screen a new `reload`: the channel keeps going, on the new one.
     it('reaches the latest reload from the channel it already has open', async () => {
         const first = jest.fn()
         const second = jest.fn()

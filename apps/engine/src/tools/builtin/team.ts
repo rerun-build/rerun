@@ -5,7 +5,6 @@ import { callHub } from '../../runtime/hub.js'
 
 const agentId = z.string().describe('The coworker id, as team_status returns it.')
 
-// Read-only by construction: the hub answers these names and nothing that writes.
 export function teamTools(ctx: RunContext): ToolSet {
     const call = (name: string, args: Record<string, unknown>) => callHub(ctx.agent, name, args)
     return {

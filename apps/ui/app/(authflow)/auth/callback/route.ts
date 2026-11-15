@@ -13,7 +13,6 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-// Behind the proxy the request's own origin is the internal one.
 function publicUrl(request: Request, destination: string): string {
     const { origin } = new URL(request.url)
     const forwardedHost = request.headers.get('x-forwarded-host')
@@ -21,15 +20,6 @@ function publicUrl(request: Request, destination: string): string {
     return `https://${forwardedHost}${destination}`
 }
 
-// Every provider click leaves the intent behind, and the app reads it back as the birth of an account
-// once `signed_up_at` shows up. An account that was already signed up before this sign-in, the one a
-// visitor returning through « Log in » is sent back to, was not born here: forgetting the intent is
-// what keeps it from being counted as a second signup.
-//
-// The presence of the stamp alone cannot tell: the middleware runs on this very request, ahead of
-// the handler, and stamps the account a visitor just upgraded from anonymous. A stamp that is only
-// seconds old is this sign-in's own, one older than any request could be belongs to an account that
-// existed before.
 const SIGNUP_STAMP_WINDOW_MS = 2 * 60 * 1000
 
 async function wasSignedUpBeforeThisSignIn(supabase: SupabaseClient<Database>, userId: string): Promise<boolean> {
@@ -43,13 +33,10 @@ function forgetSignupIntent(request: Request, response: NextResponse) {
     response.cookies.set(SIGNUP_INTENT_COOKIE, '', { path: '/', maxAge: 0, ...(domain && { domain }) })
 }
 
-// A cookie from another tab or an older version may hold anything: Google was the only provider then.
 function providerIn(value: string | undefined): OAuthProvider {
     return isOAuthProvider(value) ? value : 'google'
 }
 
-// Connecting a provider from the account settings ends here too, already signed in: it goes back to
-// the settings it left, with the reason when the provider or Supabase refused.
 function backToAccount(request: Request, linkError?: { code: string; provider: OAuthProvider }): NextResponse {
     const params = new URLSearchParams({
         [ACCOUNT_PARAM]: 'sign-in',
@@ -66,8 +53,6 @@ export async function GET(request: Request) {
     const cookieStore = await cookies()
     const linking = cookieStore.has(LINK_INTENT_COOKIE)
 
-    // Collecte les cookies posés par @supabase/ssr pour les reporter sur la réponse de redirect
-    // (au bon format, lisibles par le browser client).
     const sessionCookies: { name: string; value: string; options: CookieOptions }[] = []
 
     const supabase = createServerClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
@@ -99,8 +84,6 @@ export async function GET(request: Request) {
             }
             if (authReturn) response.cookies.delete(AUTH_RETURN_COOKIE)
 
-            // Only a provider the click left behind is worth remembering: the guess that restarts a
-            // sign-in would badge the wrong button for a year.
             const provider = cookieStore.get(OAUTH_PROVIDER_COOKIE)?.value
             if (!linking && isOAuthProvider(provider)) response.cookies.set(LAST_SIGN_IN_COOKIE, provider, { path: '/', maxAge: LAST_SIGN_IN_MAX_AGE_SECONDS, sameSite: 'lax' })
 
@@ -114,9 +97,6 @@ export async function GET(request: Request) {
 
     if (linking) return backToAccount(request, { code: errorCode ?? 'failed', provider: providerIn(cookieStore.get(LINK_INTENT_COOKIE)?.value) })
 
-    // An anonymous visitor who picked a provider is first linked to it, and Supabase only refuses
-    // here, on the way back, when that identity already has a Rerun account: sign into that one.
-    // Google already asked for consent on the way out, so the second trip skips it.
     if (errorCode === 'identity_already_exists') {
         const provider = providerIn(cookieStore.get(OAUTH_PROVIDER_COOKIE)?.value)
         const { data, error } = await supabase.auth.signInWithOAuth({

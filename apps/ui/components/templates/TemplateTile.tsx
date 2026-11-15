@@ -15,10 +15,6 @@ import { templateHeadline } from '@/lib/templates/library-view'
 import { templateStatusLabel, templateStatusTone } from '@/lib/templates/status'
 import { cn } from '@/lib/utils'
 
-// The library's card: the board is the surface, the words sit under it on the dialog itself rather
-// than in a second box, which is what lets a grid of them read as one calm sheet.
-// Without `onSelect` the tile is a plain block: the foreman and the email capture show a template
-// they do not let anyone pick.
 export function TemplateTile({ template, selected = false, showStatus = false, onSelect, className }: { template: LibraryTemplate; selected?: boolean; showStatus?: boolean; onSelect?: () => void; className?: string }) {
     const t = useTranslations('templates.creator')
     const tStatus = useTranslations('templates.status')
@@ -51,8 +47,6 @@ export function TemplateTile({ template, selected = false, showStatus = false, o
                 </span>
             </TemplateCardThumbnail>
 
-            {/* One line each, so every card is the same height and none leaves a hole: the
-                agent's name says the job in a few words, the title spells it out under it. */}
             <span className="mt-3 truncate px-0.5 text-base leading-tight font-semibold tracking-tight text-foreground">{headline}</span>
             <span className="mt-1 truncate px-0.5 text-[13px] text-muted-foreground">{subline}</span>
 

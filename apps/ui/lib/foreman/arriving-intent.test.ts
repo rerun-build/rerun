@@ -21,7 +21,6 @@ describe('readArrivingIntent', () => {
         expect(readArrivingIntent(query('prompt=Find+me+leads'), parked())).toEqual({ kind: 'prompt', text: 'Find me leads' })
     })
 
-    // The query string does not survive the signup: what was parked is what is left of it.
     it('reads the parked draft once the query string is gone', () => {
         expect(readArrivingIntent(query(''), parked({ pendingFirstAgent: DRAFT, firstAgentFromPrompt: true }))).toEqual({ kind: 'prompt', text: 'Find me leads every Monday', name: 'Lead Finder', apps: ['hubspot'] })
     })

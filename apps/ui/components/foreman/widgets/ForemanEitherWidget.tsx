@@ -9,9 +9,6 @@ import { cn } from '@/lib/utils'
 import { QuestionRecap } from './ForemanQuestionWidget'
 import { readQuestionOutput, type QuestionAnswer } from './question-answer'
 
-// The interview's question: two answers, one click. It answers in the same shape as ask_choice, so
-// everything that reads an answered question off the transcript reads this one too.
-
 type ForemanEitherWidgetProps = {
     input: unknown
     output?: unknown
@@ -41,8 +38,6 @@ export function ForemanEitherWidget({ input, output, onAnswer }: ForemanEitherWi
                     </Button>
                 ))}
             </div>
-            {/* The composer is gone while the card waits: without a way out, someone neither answer
-                fits has nothing left to click. */}
             <Button size="sm" variant="ghost" className="self-center text-muted-foreground" onClick={() => onAnswer({ answered: false, reason: 'neither' })}>
                 {t('neither')}
             </Button>

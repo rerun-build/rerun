@@ -10,15 +10,9 @@ const EASE_OUT = 'ease-[cubic-bezier(0.22,1,0.36,1)]'
 type VoiceTranscriptProps = {
     transcript: string
     open: boolean
-    /** 0 to 1 through the recording; null until it has been played. */
     heardUpTo: number | null
 }
 
-/**
- * What the agent read from a voice message, slid open under the bubble: italic and muted behind a
- * violet bar. While it plays, the words already heard darken. There are no word timestamps, so the
- * pace is spread by length and drifts on long pauses.
- */
 export function VoiceTranscript({ transcript, open, heardUpTo }: VoiceTranscriptProps) {
     const words = useMemo(() => transcriptWords(transcript), [transcript])
     return (

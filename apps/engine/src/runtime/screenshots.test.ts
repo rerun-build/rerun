@@ -134,7 +134,6 @@ describe('stepWithScreenshots', () => {
         expect(stepWithScreenshots(messages, store, 'opencode', model).messages!.at(-1)!.role).toBe(role)
     })
 
-    // OpenCode drops an image sent to a model that cannot see without a word.
     it('never attaches a picture for an OpenCode model without vision', () => {
         const store = createScreenshotStore()
         const messages = [toolResult('c1', { screenshotId: store.add(picture('screen')) })]

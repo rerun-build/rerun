@@ -6,8 +6,6 @@ const ROOT_COMBINATORS = ['oneOf', 'anyOf', 'allOf'] as const
 
 const requiredOf = (branch: JsonObject): string[] => (Array.isArray(branch.required) ? branch.required.filter((name): name is string => typeof name === 'string') : [])
 
-// A branch that only says which arguments must be present, the way MCP servers write "exactly one of
-// these" (`oneOf: [{ required: ['a'] }, { required: ['b'] }]`).
 const onlyRequires = (branch: JsonObject): boolean => Object.keys(branch).every(key => key === 'required') && requiredOf(branch).length > 0
 
 function constraintNote(kind: (typeof ROOT_COMBINATORS)[number], branches: JsonObject[]): string | null {
@@ -16,11 +14,6 @@ function constraintNote(kind: (typeof ROOT_COMBINATORS)[number], branches: JsonO
     return kind === 'oneOf' ? `Provide exactly one of: ${names}.` : `Provide at least one of: ${names}.`
 }
 
-// Anthropic refuses the whole request when one tool's input_schema has `oneOf`, `anyOf` or `allOf` at
-// its root, and an MCP server is free to send one: a single such tool failed every run of the agent
-// carrying it. The root union is lifted into plain properties, and the rule it carried goes to the
-// model as a sentence. Nothing is let through that the server would have taken: it still validates the
-// arguments it receives, and its refusal reaches the agent as the tool's result.
 export function toToolInputSchema(input: unknown): { schema: JsonObject; note: string | null } {
     if (!isRecord(input)) return { schema: { type: 'object' }, note: null }
     if (input.type === 'object' && ROOT_COMBINATORS.every(kind => !(kind in input))) return { schema: input, note: null }

@@ -22,7 +22,6 @@ type DeleteSpaceDialogProps = {
     onConfirm: () => void
     spaceName?: string
     agentCount: number
-    // The Box being deleted: the dialog does not open for one the caller does not manage.
     spaceId?: string
 }
 

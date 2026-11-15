@@ -13,7 +13,6 @@ export type CellContext = { tones?: Record<string, BadgeTone>; fileUrl?: FileUrl
 
 const HASHED_TONES: BadgeTone[] = ['brand', 'cyan', 'green', 'orange', 'yellow', 'neutral']
 
-/** The tone the agent gave a value, or a stable one hashed from the value so it never flickers. */
 export function toneOf(value: string, tones?: Record<string, BadgeTone>): BadgeTone {
     const explicit = tones?.[value]
     if (explicit) return explicit
@@ -60,7 +59,6 @@ export function Rating({ value, className }: { value: number; className?: string
     )
 }
 
-/** Takes a 0-1 ratio or a 0-100 percentage. */
 export function Progress({ value, className }: { value: number; className?: string }) {
     const percent = Math.max(0, Math.min(100, value <= 1 ? value * 100 : value))
     return (

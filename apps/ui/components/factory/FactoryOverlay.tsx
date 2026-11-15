@@ -1,11 +1,5 @@
 'use client'
 
-// The factory's moving parts, drawn in the board's world through IsoGrid's worldOverlay: task spheres
-// riding the belts (the same route TileLinks draws, so a sphere sits on its belt), the gates of
-// review, the reject bin and the feature tanks. The spheres move on the scene's clock with a short
-// transition between ticks; the slosh, shakes and glows are CSS. Under reduced motion the transitions
-// and loops stop and the spheres step from place to place.
-
 import { type AxisPoint, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 
 import { along, atDistance, centreOf, inScanner, lineUp, podPath, settles, workSpot, toWorld, type P } from './factory-rest'
@@ -15,11 +9,8 @@ import { FeatureTank, RejectTank, TANK_CSS } from './FactoryTank'
 import { Sphere, SPHERE_CSS } from './FactorySphere'
 import { type CabinetView, type PodView } from './factory-scene'
 
-// `routes` are the board's own, from routeTileLinks on the same tiles and links, so a sphere rides
-// the belt drawn under it.
 export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, holdLeftMs = 0, links = [], selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean; holdLeftMs?: number; links?: TileLink[]; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
-    // Waiting tasks line up per belt from its start, the one waiting longest first (factory-rest.ts).
     const lineIndex = new Map<string, number>()
     const belts = new Map<string, PodView[]>()
     for (const p of pods) if (p.state === 'queued' || p.state === 'held') {

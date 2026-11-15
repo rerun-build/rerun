@@ -12,12 +12,9 @@ export interface RunFailedProps {
   agentName: string;
   runId: string;
   errorMessage: string;
-  /** Why this recipient gets the email, e.g. "You started this run." */
   reason?: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
-  /** Opens the conversation the email is about. Without it the button opens the board. */
   conversationUrl?: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;

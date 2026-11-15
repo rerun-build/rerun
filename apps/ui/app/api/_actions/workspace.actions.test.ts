@@ -15,7 +15,6 @@ vi.mock('node:dns/promises', () => ({ lookup: mocks.lookup }))
 const findSiteIcon = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/onboarding/site-icon.server', () => ({ findSiteIcon }))
 vi.mock('@rerun/cloud/billing.server', () => ({ grantRerunTopup: mocks.grantRerunTopup }))
-// The public build stubs `@rerun/cloud/billing` with no signup allowance, so the test pins one of its own.
 const SIGNUP_ALLOWANCE_MICROS = vi.hoisted(() => 5_000_000)
 vi.mock('@rerun/cloud/billing', async (importOriginal) => ({ ...(await importOriginal<typeof import('@rerun/cloud/billing')>()), SIGNUP_BUDGET_MICROS: SIGNUP_ALLOWANCE_MICROS }))
 vi.mock('@rerun/cloud/illustrations', () => ({

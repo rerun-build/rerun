@@ -18,11 +18,9 @@ type DataBrowserToolbarProps = {
     onExport: (format: 'csv' | 'json') => void
     onPurgeTable: () => void
     onDropTable: () => void
-    /** Why this viewer cannot change the table: emptying it, deleting it, or deleting its rows. */
     tableActionsReason?: string
 }
 
-/** The right end of the tabs: a search that unfolds, the table menu, or what to do with the selected rows. */
 export function DataBrowserToolbar({ search, selectedCount, busy, onSearchChange, onClearSelection, onDeleteSelected, onExport, onPurgeTable, onDropTable, tableActionsReason }: DataBrowserToolbarProps) {
     const t = useTranslations('data.toolbar')
     const [searchOpen, setSearchOpen] = useState(false)

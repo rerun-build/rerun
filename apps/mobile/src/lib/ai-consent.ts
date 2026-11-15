@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from 'react'
 
 export type AiConsentState = 'loading' | 'needed' | 'granted'
 
-// Kept per account on this phone: signing out and back in does not ask again, another account does.
 const consentKey = (userId: string) => `rerun.ai-consent.${userId}`
 
 export async function hasAiConsent(userId: string): Promise<boolean> {

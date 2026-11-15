@@ -6,20 +6,13 @@ import { useForemanStore } from '@/stores/foreman.store'
 
 type NotificationsState = {
     open: boolean
-    // Agent the dialog should land on when it opens; null means the global "All agents" view.
     targetAgentId: string | null
     openNotifications: (agentId?: string) => void
     setOpen: (open: boolean) => void
-    // The one-shot dialog asking to turn on browser notifications. Held back for the whole onboarding
-    // funnel: it opens once the team is built, or on the first message sent by a workspace that was
-    // already past it. Never restored on load, unlike the flag below.
     permissionPromptOpen: boolean
-    // Set as soon as the dialog has been answered, whichever way: closing it counts as a refusal.
-    // Persisted so the question is asked once and never again.
     permissionAsked: boolean
     askPermission: () => void
     answerPermission: () => void
-    // What the hub announces above its pill, in arrival order. Never restored on load.
     arrivals: AnnouncedNotification[]
     announce: (notification: AnnouncedNotification) => void
 }

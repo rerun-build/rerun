@@ -17,7 +17,7 @@ class G_(unittest.TestCase):
         self.assertEqual(r[0][:3], ("nextest-it", "terminal_commander_daemon::bucket_wait::wake_on_match", False))
         self.assertTrue(G.test_hit("crates/daemon/tests/bucket_wait.rs", r[0][1], r[0][0]))
         self.assertFalse(G.test_hit("crates/daemon/tests/other.rs", r[0][1], r[0][0]))
-        self.assertFalse(G.test_hit("crates/core/tests/bucket.rs", r[1][1], r[1][0]))  # unit result is not an integration binary
+        self.assertFalse(G.test_hit("crates/core/tests/bucket.rs", r[1][1], r[1][0]))
         self.assertTrue(G.test_hit("crates/core/src/bucket.rs", r[1][1], r[1][0]))
         self.assertFalse(G.test_hit("crates/core/src/bucket.rs", r[0][1], r[0][0]))
     def test_cargo(self):
@@ -73,7 +73,6 @@ class PythonGate(unittest.TestCase):
 
 
 class ReviewSha(unittest.TestCase):
-    """G7: review --sha refuses to post when the PR head is not the commit the reviewer read."""
     HEAD = "abcdef0123456789" + "0" * 24
 
     def review(self, *extra):
@@ -121,7 +120,6 @@ S8 = H[:8]
 
 
 def _run_gate(files, comments, roster, builder="code"):
-    """Run G.gate on a fake PR (base branch job/78); returns the REVIEWS line."""
     import tempfile
     calls = []
 
@@ -154,7 +152,6 @@ def _real_roster(*a):
 
 class TestGateRoster(unittest.TestCase):
     def test_pr_editing_roster_judged_by_base(self):
-        # the head's roster could drop BRUCE; only dev's roster is read, never a ref of the PR
         line, calls = _run_gate(["tools/factory/roster.json"], ["LINUS"], _real_roster)
         self.assertTrue(line.startswith("REVIEWS FAIL"), line)
         self.assertIn("BRUCE", line)
@@ -209,7 +206,6 @@ class TestGateRoster(unittest.TestCase):
         got, seen = self._base([(0, text, "")])
         self.assertTrue(got["areas"])
         self.assertTrue(seen[0].endswith("roster.json?ref=dev"), seen)
-        # no dev roster: the default branch is read, still never a job or PR branch
         got, seen = self._base([(1, "", "HTTP 404 Not Found"), (0, "main\n", ""), (0, text, "")])
         self.assertTrue(got["areas"])
         self.assertTrue(seen[2].endswith("roster.json?ref=main"), seen)

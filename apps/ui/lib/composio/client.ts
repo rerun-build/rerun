@@ -1,16 +1,3 @@
-// Minimal Composio API client (v3.1). Composio brokers the third-party OAuth and holds the
-// tokens; Rerun executes tools scoped by user_id. The org-wide COMPOSIO_API_KEY can act for
-// ANY user_id, so this module is server-only and the key never reaches an engine or a manifest.
-//
-// user_id convention: `<namespace>_agent_<agents.id>` (the Supabase UUID — stable across box
-// migrations, unlike engine agent ids which are only unique per engine). Derived server-side
-// on every path, never accepted from a caller. The namespace matters because staging runs on
-// a clone of the prod database: the same agent id exists in both, and without the prefix a
-// staging agent would be handed a real customer's connection. Defaults to 'local' rather than
-// 'prod' so forgetting it can only isolate, never collide.
-// An extra account of an app (registry key `<slug>@<instanceId>`) gets its own user_id, suffixed
-// with the instance id, so Composio holds one connected account per instance.
-
 const COMPOSIO_API_BASE = 'https://backend.composio.dev/api/v3.1'
 
 const TOOLS_CACHE_TTL_MS = 10 * 60 * 1000
@@ -60,12 +47,8 @@ export async function initiateConnectedAccount(userId: string, authConfigId: str
 
 type ComposioAuthConfigRow = { id?: string; status?: string; toolkit?: { slug?: string } }
 
-// Keyed by toolkit. The promise itself is cached so two first connects at once create one config.
 const authConfigCache = new Map<string, Promise<string>>()
 
-// A self-hosted catalog ships without Rerun Cloud's auth config ids. An empty one is resolved in this
-// server's own Composio project: an enabled config for the toolkit is reused, otherwise one on
-// Composio-managed auth is created. An id set on the service always wins.
 export async function resolveAuthConfigId(composio: { toolkit: string; authConfigId: string }): Promise<string> {
     if (composio.authConfigId) return composio.authConfigId
     const { toolkit } = composio
@@ -79,7 +62,6 @@ export async function resolveAuthConfigId(composio: { toolkit: string; authConfi
 }
 
 async function findOrCreateAuthConfig(toolkit: string): Promise<string> {
-    // shortcut: reads only the first page (up to 200 configs of this toolkit), page on if a project ever holds more.
     const page = await composioFetch<{ items?: ComposioAuthConfigRow[] }>(`/auth_configs?${new URLSearchParams({ toolkit_slug: toolkit, limit: '200' }).toString()}`)
     const existing = page.items?.find(c => c.id && c.status === 'ENABLED' && c.toolkit?.slug?.toLowerCase() === toolkit.toLowerCase())
     if (existing?.id) return existing.id
@@ -91,7 +73,6 @@ async function findOrCreateAuthConfig(toolkit: string): Promise<string> {
             body: JSON.stringify({ toolkit: { slug: toolkit }, auth_config: { type: 'use_composio_managed_auth', name: `Rerun ${toolkit}` } }),
         })
     } catch (err) {
-        // A toolkit without a Composio-managed app is refused with a 400; a bad key or an outage is not that.
         if (err instanceof ComposioApiError && err.status === 400) {
             throw new ComposioApiError(400, `${toolkit} has no Composio-managed sign-in, so it needs its own OAuth app or credentials: create an auth config for ${toolkit} in Composio and set its id on the service. ${err.message}`)
         }
@@ -129,8 +110,6 @@ type ComposioToolRow = { slug?: string; name?: string; description?: string; inp
 
 const toolsCache = new Map<string, { tools: ComposioTool[]; fetchedAt: number }>()
 
-// A stale list is far better than an agent session with no tools at all, so an expired cache
-// entry is served when Composio itself is the thing failing.
 export async function listToolkitTools(toolkit: string): Promise<ComposioTool[]> {
     const cached = toolsCache.get(toolkit)
     if (cached && Date.now() - cached.fetchedAt < TOOLS_CACHE_TTL_MS) return cached.tools

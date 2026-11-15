@@ -32,7 +32,6 @@ export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me 
     }
 }
 
-// What the app shows its user, with the language their account picked so the iOS app follows it.
 export async function loadMe(ctx: WorkspaceContext): Promise<Me> {
     const { data } = await selectMaybeSingle(ctx.supabase, 'users', ['locale'] as const, { id: ctx.userId })
     return readMe(ctx, data?.locale ?? null)

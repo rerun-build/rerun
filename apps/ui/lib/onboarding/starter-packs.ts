@@ -1,17 +1,5 @@
 import { MAX_STARTER_PICKS, type TemplateCategory } from '@rerun/contracts'
 
-// What a new account is offered right after the welcome card, instead of an interview and a
-// coworker designed on the spot: the starter pack of the industry the card already settled.
-//
-// A card sells a use case and installs a library template. The promise is written per industry,
-// which is why it lives here and not on the template: the same Sales development rep is sold as
-// "Find your next clients" to an agency and "Book more meetings" to a sales team. `focus` is the
-// skill of that template the install starts on, the one thing the person picked the card for.
-// `line` only overrides the template's tagline when the promise moves it far enough.
-//
-// A template that is not published yet simply drops off the rail (scripted.ts), so a card can be
-// written here before its template exists.
-
 export type StarterCard = { template: string; promise: string; line?: string; focus?: string }
 
 export { MAX_STARTER_PICKS }

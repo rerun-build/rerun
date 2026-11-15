@@ -27,10 +27,6 @@ function StarterChip({ text, onPress }: { text: string; onPress: () => void }) {
     )
 }
 
-/**
- * The web's empty conversation with a coworker (AgentChat): its buddy, an invitation, and the four
- * starter questions, each sent on a tap. A coworker turned off says that a message wakes it.
- */
 export function CoworkerEmptyState({ agentId, mood, asleep, onSend }: { agentId: string; mood: BuddyMood; asleep: boolean; onSend: (text: string) => void }) {
     const t = useTranslations('mobileChat.empty')
     return (
@@ -85,8 +81,6 @@ function RowLeading({ row }: { row: TeamEmptyStateRow }) {
     )
 }
 
-// The Foreman's empty conversation (ForemanTeamEmptyState on the web): a greeting, the team at a
-// glance, and three things to ask, each sent or written into the composer.
 export function ForemanEmptyStateView({ model, onSend, onPrefill }: { model: TeamEmptyStateModel; onSend: (text: string) => void; onPrefill: (text: string) => void }) {
     const theme = useTheme()
     const run = (action: TeamEmptyStateAction) => (action.type === 'send' ? onSend : onPrefill)(action.text)
@@ -128,7 +122,6 @@ export function ForemanEmptyStateView({ model, onSend, onPrefill }: { model: Tea
     )
 }
 
-// Drawn after the view: the orb, a title line and three rows.
 function ForemanEmptyStateSkeleton() {
     const t = useTranslations('mobileChat.empty')
     return (
@@ -164,8 +157,6 @@ function useTeamEmptyStateCopy(): TeamEmptyStateCopy {
     )
 }
 
-// Null agents until the workspace is read: an empty list before that would greet someone who has a
-// team with the "no coworkers yet" screen.
 export function ForemanEmptyState({ onSend, onPrefill }: { onSend: (text: string) => void; onPrefill: (text: string) => void }) {
     const { me } = useAuth()
     const agents = useWorkspaceAgents()

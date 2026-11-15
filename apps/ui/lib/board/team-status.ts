@@ -11,15 +11,12 @@ export function isWaitingOnHuman(status: SessionStatus): boolean {
 type TeamMemberFacts = {
     switchedOff: boolean
     configured: boolean
-    // false when the machine is off, archived, or did not answer for this coworker.
     reachable: boolean
     runningCount: number
     waitingCount: number
     lastFinishedStatus: string | null
 }
 
-// A run in flight wins over a conversation waiting on someone: the coworker is busy either way, and
-// the waiting one is listed next to it. An error only counts while it is the last thing it did.
 export function teamMemberStatus(facts: TeamMemberFacts): TeamMemberStatus {
     if (facts.switchedOff) return 'switched_off'
     if (!facts.configured) return 'unconfigured'

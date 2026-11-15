@@ -43,7 +43,6 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (cfg.shared) Object.assign(tools, sharedTools(ctx))
     if (cfg.shell) Object.assign(tools, shellTools(ctx))
     if (cfg.web) Object.assign(tools, webTools(ctx))
-    // A CLI searches with its own tool, on the subscription; see CLAUDE_RUN_TOOLS.
     if (CLI_PROVIDERS.has(ctx.provider)) delete tools.web_search
     if (cfg.memory) Object.assign(tools, memoryTools(ctx))
     if (cfg.db) Object.assign(tools, dbTools(ctx))
@@ -72,17 +71,12 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (cfg.requestApproval) Object.assign(tools, requestApprovalTool(ctx))
     if (cfg.suggestService) Object.assign(tools, suggestServiceTool(ctx))
     if (cfg.requestSecret) Object.assign(tools, requestSecretTool(ctx))
-    // Only exists while there is an installation to close, so no other agent carries a tool it
-    // could never legitimately call.
     if (hasPendingSetup(ctx.agent)) Object.assign(tools, installTools(ctx))
 
-    // The connections are the pool's, kept across runs: the run's close leaves them open.
     if (!CLI_PROVIDERS.has(ctx.provider) && ctx.agent.config.mcpServers.length > 0) Object.assign(tools, await pooledMcpTools(ctx.agent))
 
     return {
         tools,
-        // The shared database is one handle for the whole process, so it is deliberately left
-        // open: closing it here would break a run another agent still has in flight.
         close: async () => {
             computer?.release()
             closeAgentDb(ctx.agent.id)

@@ -4,9 +4,6 @@ import { ModelNotEntitledError } from '@/app/api/_services/engine-plan.service'
 import { ApiError } from '@/app/api/v1/_lib/api-route'
 import { EngineRequestError } from '@/lib/engine/client'
 
-// What the AI providers routes owe the app beyond a bare 500: a credential refused for a reason the
-// user can act on, a model the plan does not include, a connection the machine does not have. The
-// app never shows a price, so a missing plan carries a reason rather than a pitch.
 export async function answeringConnectionErrors<T>(work: () => Promise<T>): Promise<T | Response> {
     try {
         return await work()
@@ -20,7 +17,6 @@ export async function answeringConnectionErrors<T>(work: () => Promise<T>): Prom
     }
 }
 
-// A sign-in step that fails speaks for the provider (an expired code, a code from another tab).
 export async function signInStep<T>(work: () => Promise<T>): Promise<T> {
     try {
         return await work()

@@ -3,11 +3,6 @@
 import { cn } from "../cn"
 import { useKitTranslations } from "../locale"
 
-/**
- * L'icône loader du pack Nucleo peint ses arcs avec un gradient `#000` codé en dur :
- * invisible sur fond sombre. On la remplace par la même silhouette (viewBox 18,
- * rayon 7.25, stroke 1.5) en `currentColor`.
- */
 function SpinnerIcon({ size = 18, strokeWidth = 1.5, className, ...props }: React.ComponentProps<"svg"> & { size?: number | string }) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" width={size} height={size} fill="none" className={className} {...props}>

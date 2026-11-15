@@ -15,7 +15,6 @@ type VoiceMessageBubbleProps = {
     peaks: number[]
 }
 
-/** The player drawn inside the user bubble: play, the waveform to seek on, the timer. */
 export function VoiceMessageBubble({ playback, durationMs, peaks }: VoiceMessageBubbleProps) {
     const t = useTranslations('chat.voice')
     const { available, loading, playing, elapsedMs, progress, toggle, seekAt, audioProps } = playback

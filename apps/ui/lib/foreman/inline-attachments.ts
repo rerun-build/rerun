@@ -13,8 +13,6 @@ import { FOREMAN_FILES_BUCKET, foremanFileKey } from './files'
 type FilesContext = Pick<WorkspaceContext, 'userId' | 'workspace' | 'supabase'>
 type Part = UIMessage['parts'][number]
 
-// The image types a vision model accepts. An svg is xml, so it is handed over as text; an ico, a bmp
-// or an avif is refused upstream, which would fail the whole turn.
 const IMAGE_MEDIA_TYPES: Record<string, string> = {
     png: 'image/png',
     jpg: 'image/jpeg',
@@ -23,11 +21,6 @@ const IMAGE_MEDIA_TYPES: Record<string, string> = {
     webp: 'image/webp',
 }
 
-/**
- * Hands the model the files a message carries, next to the marker that names them: an image or a pdf
- * as a file part the model reads itself, a text file as its contents. Anything else, an archive, a
- * video, a font, stays a name only. Only the copy sent to the model is touched, never the transcript.
- */
 export async function withInlineAttachments(messages: UIMessage[], ctx: FilesContext, sessionId: string): Promise<UIMessage[]> {
     return Promise.all(
         messages.map(async message => {
@@ -51,7 +44,6 @@ async function inlineAttachment(ctx: FilesContext, sessionId: string, path: stri
     const readsAsText = ext === 'svg' || filePreviewKind(path) === 'text'
     if (!mediaType && !readsAsText) return null
 
-    // A file that went missing costs the model its contents, not the user their turn.
     const blob = await downloadPrivateFile(ctx.supabase, FOREMAN_FILES_BUCKET, foremanFileKey(ctx, sessionId, path)).catch(() => null)
     if (!blob) return null
 
@@ -61,7 +53,6 @@ async function inlineAttachment(ctx: FilesContext, sessionId: string, path: stri
     }
 
     const text = await blob.text()
-    // filePreviewKind answers text for any extension it does not know, a docx or an xlsx included.
     if (text.includes('\u0000')) return null
     const truncated = text.length > TEXT_FILE_PAGE_CHARS
     return { type: 'text', text: `<file name="${name}"${truncated ? ' truncated="true"' : ''}>\n${text.slice(0, TEXT_FILE_PAGE_CHARS)}\n</file>` }

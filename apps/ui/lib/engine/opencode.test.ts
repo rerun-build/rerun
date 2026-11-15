@@ -28,7 +28,6 @@ const credit = { usedMicros: 0, budgetMicros: 0, resetAt: null, percent: 0 }
 const fresh: ProviderModel = { id: 'go/glm-6-preview', label: 'GLM-6 Preview', plan: 'go', contextWindow: 1_000_000, images: true, price: { input: 1, output: 3, cacheRead: null } }
 
 describe('connectMethod', () => {
-    // OpenCode is sold as a plan and connected with a key: the reconnect must not open Claude's sign-in.
     it('connects OpenCode with a key, like every provider but the two CLIs', () => {
         expect(connectMethod('claude')).toBe('oauth-claude')
         expect(connectMethod('codex')).toBe('device-codex')
@@ -45,8 +44,6 @@ describe('the OpenCode model list of a connection', () => {
         expect(rows.some(row => row.isNew)).toBe(false)
     })
 
-    // Free on the Go plan, so listed with the models it pays for, but switched off: a free endpoint
-    // can train on what it is sent, and the member says when to use one.
     it('lists the free Go models, switched off', () => {
         const rows = opencodeModelRows(opencode(), englishTranslator('connections'))
         expect(rows.find(row => row.id === 'go/beam-free')).toMatchObject({ free: true, enabled: false, plan: 'go' })
@@ -84,8 +81,6 @@ describe('the OpenCode model list of a connection', () => {
 describe('OpenCode in the model pickers', () => {
     const connection = opencode({ models: ['console/claude-sonnet-5-5', 'go/deepseek-v4-pro', 'console/gpt-6-sol', 'go/longcat-2.5-free', 'go/glm-5.3'] })
 
-    // One group for the connection, whatever its two catalogs: the iOS app keys the running model on it.
-    // A free Go model says so, as the connection dialog does, rather than "Included in Go".
     it('lists one group, Go before Console, with what each costs as its description', () => {
         const groups = connectionGroups([connection], true, englishTranslator('connections'))
         expect(groups).toHaveLength(1)

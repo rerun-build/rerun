@@ -40,7 +40,6 @@ function monthLabel(iso: string | null, now: Date, locale: string, t: FilesTrans
     return month.charAt(0).toLocaleUpperCase(locale) + month.slice(1)
 }
 
-// The files arrive newest first, so a month is a run of neighbours.
 function byMonth(files: CoworkerFile[], locale: string, t: FilesTranslator): { label: string; files: CoworkerFile[] }[] {
     const now = new Date()
     const groups: { label: string; files: CoworkerFile[] }[] = []
@@ -136,7 +135,6 @@ function FilesSkeleton({ kind, tile }: { kind: CoworkerFileKind; tile: number })
 
 type CoworkerFilesProps = {
     name: string
-    // Null while on its way.
     view: CoworkerFilesView | null
     urlOf: (file: CoworkerFile) => string
     onOpen: (file: CoworkerFile) => void
@@ -144,8 +142,6 @@ type CoworkerFilesProps = {
     onBack: () => void
 }
 
-// What the coworker made and keeps in its folder, newest first, the way a chat app shows what a
-// contact sent: pictures in a grid, everything else as a list.
 export function CoworkerFiles({ name, view, urlOf, onOpen, failed, onBack }: CoworkerFilesProps) {
     const { width } = usePaneSize()
     const [kind, setKind] = useState<CoworkerFileKind>('media')

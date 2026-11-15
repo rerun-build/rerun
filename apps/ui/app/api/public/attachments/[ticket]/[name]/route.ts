@@ -4,9 +4,6 @@ import { LinkupError, downloadAttachment } from '@/lib/apps/linkup/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// The public link to a file somebody sent to a connected account, minted by the download tool and
-// the wake payload. The ticket is the only key: signed, good for a day, and only while the account
-// is still connected. Nothing is stored, every request streams the file from Linkup again.
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 export const maxDuration = 90
@@ -33,8 +30,6 @@ async function resolve(ticketToken: string): Promise<{ ok: true; ticket: Ticket;
     return { ok: true, ticket, accountId: connection.provider_account_id }
 }
 
-// The type is the sender's: a `facture.html` mailed by a stranger renders inline only if the type is
-// one a browser shows without running anything, the rest downloads.
 function fileHeaders(contentType: string, name: string, exp: number, size: number | null): Headers {
     const headers = new Headers({
         ...fileResponseHeaders(contentType, name),
@@ -45,7 +40,6 @@ function fileHeaders(contentType: string, name: string, exp: number, size: numbe
     return headers
 }
 
-// Answered from the ticket alone: an API probing the link before fetching it must not cost a download.
 export async function HEAD(_req: Request, { params }: Params): Promise<Response> {
     const { ticket: token, name } = await params
     const resolved = await resolve(token)

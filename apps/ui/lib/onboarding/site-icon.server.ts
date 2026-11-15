@@ -3,10 +3,6 @@ import 'server-only'
 import { fetchPublic } from '@/lib/net/public-fetch'
 import { fetchLogoBytes, rasterizeVectorLogo } from '@/lib/workspace/fetch-logo'
 
-// A site's own icon, read from the site itself rather than from a third-party favicon service: the
-// icons its home page declares, largest first, then the two paths browsers and phones try on their
-// own. Null when the site has none, which is what lets a typo show nothing rather than a globe.
-
 export type SiteIcon = { bytes: Uint8Array; contentType: string }
 
 const HTML_LIMIT_BYTES = 256 * 1024
@@ -38,8 +34,6 @@ export function resetSiteIconsForTests(): void {
     found.clear()
 }
 
-// The <link rel="icon"> family of the page, the biggest first: an apple-touch-icon is 180px, a
-// declared `sizes` says itself, a vector draws at any size, and an icon that says nothing is a 16px tab icon.
 export function parseIconLinks(html: string, base: string): string[] {
     const icons = [...html.matchAll(/<link\b[^>]*>/gi)]
         .map(match => ({ rel: attribute(match[0], 'rel'), href: attribute(match[0], 'href'), sizes: attribute(match[0], 'sizes'), type: attribute(match[0], 'type') }))
@@ -70,7 +64,6 @@ async function declaredIcons(home: string): Promise<string[]> {
     }
 }
 
-// The head is all that is read, and it sits at the top of the page.
 async function readCapped(body: ReadableStream<Uint8Array>, limit: number): Promise<string> {
     const reader = body.getReader()
     const decoder = new TextDecoder()
@@ -85,8 +78,6 @@ async function readCapped(body: ReadableStream<Uint8Array>, limit: number): Prom
     return text
 }
 
-// Served from this app's own origin, so a vector is drawn to PNG first: an SVG opened on its own
-// runs its scripts with the app's cookies.
 async function servable(bytes: Uint8Array): Promise<SiteIcon | null> {
     const type = imageType(bytes)
     if (type === 'image/svg+xml') return { bytes: await rasterizeVectorLogo(bytes, ICON_PX), contentType: 'image/png' }

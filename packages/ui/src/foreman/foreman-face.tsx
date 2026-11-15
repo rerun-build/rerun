@@ -9,16 +9,13 @@ export type ForemanFacing = 'left' | 'right' | 'front'
 export const FOREMAN_VIEW_MARGIN = 2
 export const FOREMAN_VIEW_WIDTH = BUDDY_GEOMETRY.halfW * 2 + FOREMAN_VIEW_MARGIN * 2
 
-// Below this width the lit face's gradients and halos turn to mud: it is painted flat and larger.
 export const SMALL_BELOW = 40
 export const LISTENING_FACE_SCALE = 1.1
 const PLATE = { width: 27, height: 14, radius: 6 }
-// The share of a mouthless wall's depth where `BuddyFace` puts the eyes.
 export const FACE_EYE_SHARE = 0.45
 
 type Motion = { amp: number; period: number; sheenPeriod: number }
 
-// The four states never change the shape nor the material, only the rhythm.
 export const MOTION: Record<OrbActivity, Motion> = {
     idle: { amp: 0, period: 0, sheenPeriod: 6 },
     listening: { amp: 0.03, period: 2.8, sheenPeriod: 6 },
@@ -26,7 +23,6 @@ export const MOTION: Record<OrbActivity, Motion> = {
     speaking: { amp: 0.05, period: 0.45, sheenPeriod: 4 },
 }
 
-// The dark screen the eyes sit on, drawn in the face's own plane and centred on the eyes.
 export function ForemanFacePlate({ uid, y, colors }: { uid: string; y: number; colors: [upper: string, lower: string] }) {
     const x = BUDDY_FACE_CENTER - PLATE.width / 2
     const top = y - PLATE.height / 2

@@ -14,14 +14,10 @@ type CaptureStepPanelProps = {
     direction: number
     onStepChange: (step: CaptureStep) => void
     onClose: () => void
-    // Left out when the step has no explicit way back: the dialog close button is then the only exit.
     cancelLabel?: string
     doneLabel: string
 }
 
-// The left column of every capture wizard: the step body, then the footer. Only the two exit labels
-// differ between capturing into a fresh draft and capturing into a template that already exists, so
-// they are props rather than a second copy of this file.
 export function CaptureStepPanel({ flow, step, direction, onStepChange, onClose, cancelLabel, doneLabel }: CaptureStepPanelProps) {
     const t = useTranslations('templates.capture.panel')
     const selectedCount = flow.selectedIds.length

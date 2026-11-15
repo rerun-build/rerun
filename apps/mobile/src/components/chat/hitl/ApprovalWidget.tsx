@@ -13,8 +13,6 @@ import { HitlAction, HitlCard } from './HitlCard'
 import { HitlSteps } from './HitlSteps'
 import type { HitlWidgetProps } from './registry'
 
-// What a coworker asks leave to do, item by item. The reply leaves on its own once every item has an
-// answer, written as the web writes it.
 export function ApprovalWidget({ pending, onAnswer }: HitlWidgetProps) {
     const t = useTranslations('mobileHitl')
     const theme = useTheme()

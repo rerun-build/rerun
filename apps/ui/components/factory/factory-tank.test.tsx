@@ -11,13 +11,11 @@ const render = (t: number) => {
     const html = renderToStaticMarkup(<FactoryOverlay tiles={frame.tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} rejects={frame.rejects} held={false} />)
     return { frame, html }
 }
-// Each tank is the root div up to the end of its svg (there is no nested svg).
 const tanks = (html: string) => html.match(/<div class="fab-feature[^>]*data-tank="feature"[\s\S]*?<\/svg>/g) ?? []
 const num = (s: string, a: string) => Number(s.match(new RegExp(`${a}="([^"]+)"`))?.[1])
 const tag = (s: string, part: string) => s.match(new RegExp(`<[a-z]+[^>]*data-part="${part}"[^>]*>`))?.[0] ?? ''
 const sum = (c: CabinetView, state: string) => c.slots.filter(x => x.state === state).reduce((a, x) => a + x.arriving, 0)
 const scan = (pick: (c: CabinetView) => boolean) => {
-    // Search on the cheap scene only, render markup once for the frame found.
     for (let t = 0; t <= LOOP_MS; t += 250) {
         const i = factoryScene(t, 0).cabinets.findIndex(pick)
         if (i >= 0) return { ...render(t), i, t }

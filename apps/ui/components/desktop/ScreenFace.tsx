@@ -10,8 +10,6 @@ export type ScreenStatus = 'loading' | 'live' | 'error' | 'disconnected'
 
 const UNAVAILABLE_KEYS = { error: 'unavailable', disconnected: 'wentAway' } as const
 
-// What fills a 16:9 box, whatever its size: the block in the thread, the floating thumbnail. The live
-// screen is the caller's.
 export function ScreenFace({ status, children }: { status: ScreenStatus; children: ReactNode }) {
     const t = useTranslations('desktop.screen')
     if (status === 'loading') return <DesktopScreenLoader compact className="bg-muted/40" />

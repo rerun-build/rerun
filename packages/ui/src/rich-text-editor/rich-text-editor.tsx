@@ -23,8 +23,6 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, placeholder, id, contentClassName, autoFocus, onSubmitShortcut }: RichTextEditorProps) {
     const lastEmitted = React.useRef(value)
 
-    // StarterKit's HardBreak already claims Mod-Enter, so the shortcut has to outrank it from
-    // inside the editor. Read through a ref: the extension list is only built once.
     const submitRef = React.useRef(onSubmitShortcut)
     React.useEffect(() => {
         submitRef.current = onSubmitShortcut

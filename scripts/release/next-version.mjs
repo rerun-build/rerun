@@ -1,16 +1,4 @@
 #!/usr/bin/env node
-// The next open source version: the commits of the public master since the last version tag, the
-// number they call for, and the release notes a self-hoster reads before updating.
-//
-//   node scripts/release/next-version.mjs [--to origin/master] [--from <tag or sha>]
-//   node scripts/release/next-version.mjs --to <sha> --github-output   (the Version workflow)
-//
-// The number is a promise to the self-hoster:
-//   patch  v0.10.1  the default: fixes, features, database migrations, security
-//   minor  v0.11.0  the self-hoster edits something or cannot go back: docker-compose.yml, a required
-//                   variable, an engine data-dir step; or a milestone, features piling up 14 days
-//                   after the .0 of the series
-//   major  v1.0.0   never computed: the day an update is guaranteed to need no manual step
 
 import { execFileSync } from 'node:child_process'
 import { appendFileSync } from 'node:fs'

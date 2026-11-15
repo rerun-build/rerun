@@ -20,7 +20,6 @@ describe('factory snapshot store', () => {
         putFactorySnapshot(201, sample('2026-11-14T03:10:00Z', 500))
         expect(putFactorySnapshot(201, sample('2026-11-14T03:09:30Z', 501))).toBe(false)
         expect(getFactorySnapshot(201)?.snapshot.beat).toBe(500)
-        // After a restart the beat counts from 0 again; the time still decides.
         expect(putFactorySnapshot(201, sample('2026-11-14T03:11:00Z', 0))).toBe(true)
         expect(getFactorySnapshot(201)?.snapshot.beat).toBe(0)
     })

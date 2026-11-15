@@ -6,8 +6,6 @@ import { CARD_SCALE } from '@/lib/og/size'
 
 export const runtime = 'nodejs'
 
-// A picture of a board described by the request: a few coworkers, their apps, their state. Built
-// with `boardImageUrl`, which signs it.
 export async function GET(req: Request) {
     const request = readBoardImageRequest(new URL(req.url).searchParams)
     if (!request) return new Response('Invalid or unsigned board image URL', { status: 403 })

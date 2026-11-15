@@ -1,4 +1,3 @@
-// No paid apps in this build: a service the catalog marks as one never installs.
 export type AppSlug = string
 
 export const APP_SLUGS: readonly AppSlug[] = []

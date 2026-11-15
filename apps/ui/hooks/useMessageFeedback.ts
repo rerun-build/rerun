@@ -7,11 +7,8 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
-// The row id is a promise: the vote shows on the click, while the server is still copying the
-// transcript off the engine, and both the dialog and an undo have to wait for that row.
 type Vote = { rating: MessageFeedbackRating; feedbackId: Promise<string | null> }
 
-// Kept once closed so the dialog does not change title while it animates out.
 type FeedbackDialog = { open: boolean; rating: MessageFeedbackRating; feedbackId: Promise<string | null> }
 
 type SessionVotes = { sessionId: string | null; votes: ReadonlyMap<string, Vote> }
@@ -21,7 +18,6 @@ const NO_VOTES: ReadonlyMap<string, Vote> = new Map()
 export function useMessageFeedback(sessionId: string | null | undefined, scope: FeedbackScope = 'agent') {
     const t = useTranslations('chat.feedback')
     const key = sessionId ?? null
-    // Tagged with the session they belong to, so switching conversations shows none of the last one's.
     const [sessionVotes, setSessionVotes] = useState<SessionVotes>({ sessionId: null, votes: NO_VOTES })
     const votes = sessionVotes.sessionId === key ? sessionVotes.votes : NO_VOTES
     const [dialog, setDialog] = useState<FeedbackDialog | null>(null)
@@ -41,7 +37,6 @@ export function useMessageFeedback(sessionId: string | null | undefined, scope: 
         fetchSessionFeedbackAction(key, scope)
             .then(rows => {
                 if (cancelled) return
-                // A click that beat this read is newer than anything it returns.
                 updateVotes(current => new Map([...rows.map(row => [row.messageId, { rating: row.rating, feedbackId: Promise.resolve<string | null>(row.id) }] as const), ...current]))
             })
             .catch(() => {})

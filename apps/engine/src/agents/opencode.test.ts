@@ -3,7 +3,6 @@ import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-opencode-'))
-// A developer routing their own SDK calls through a gateway has these set: OpenCode must not follow.
 process.env.ANTHROPIC_BASE_URL = 'https://gateway.example.com/anthropic'
 process.env.OPENAI_BASE_URL = 'https://gateway.example.com/openai'
 
@@ -94,7 +93,6 @@ describe('resolveModel on OpenCode, one SDK per wire format', () => {
         expect(request.headers.get('x-api-key')).toBe('oc_sk_test')
         expect(request.headers.get('x-opencode-session')).toBe('session-7')
         expect(request.body.model).toBe('claude-haiku-5-5')
-        // The SDK would cap an id it does not know at 4096 tokens.
         expect(request.body.max_tokens).toBe(32_000)
         expect(result.text).toBe('Hello from Haiku.')
         expect(result.reasoning).toBe('A short answer will do.')
@@ -115,7 +113,6 @@ describe('resolveModel on OpenCode, one SDK per wire format', () => {
         expect(result.providerMetadata?.opencode).toEqual({ billingSource: 'go', cost: 0 })
     })
 
-    // Google puts the model id in the URL path: only the id without its plan may go there.
     it('speaks the Google format with the id in the path and the Google key header', async () => {
         streamWith(fixture('google-go.sse'))
         const result = await run(resolveModel(agentOn('go/gemini-4-argon'), undefined, undefined, undefined, { sessionId: 's' }).model)
@@ -137,7 +134,6 @@ describe('resolveModel on OpenCode, one SDK per wire format', () => {
 describe('modelFor on OpenCode', () => {
     const COMPLETION = { id: 'c', object: 'chat.completion', created: 1, model: 'm', choices: [{ index: 0, message: { role: 'assistant', content: 'summary' }, finish_reason: 'stop' }], usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } }
 
-    // OpenCode refuses any request without a session: a one-shot call names one of its own.
     it('never sends a request without a session', async () => {
         fetchMock.mockImplementation(async () => Response.json(COMPLETION))
         await generateText({ model: modelFor(agentOn('go/glm-5.3')), prompt: 'summarise' })
@@ -264,8 +260,6 @@ describe('how an OpenCode model behaves', () => {
         expect(opencodeVisionModel(null)).toBeNull()
     })
 
-    // A free Go model can train on what it is sent: switched on, it still never takes the images of
-    // a run that picked another model.
     it('never hands vision to a free Go model, even the only one that sees', () => {
         const connectionOn = (models: string[]) => agentOn('go/deepseek-v4-pro', undefined, models).resolved.connection
         expect(opencodeVisionModel(connectionOn(['go/deepseek-v4-pro', 'go/longcat-2.5-free']))).toBeNull()

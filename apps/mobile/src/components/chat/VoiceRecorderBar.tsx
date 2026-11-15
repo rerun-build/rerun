@@ -30,8 +30,6 @@ type VoiceRecorderBarProps = {
     getLiveState: () => VoiceLiveState
 }
 
-// Takes the text field's place while a voice message is recorded or sent. The timer is polled here
-// so the composer around it does not re-render twenty times a second.
 export function VoiceRecorderBar({ status, error, getLiveState }: VoiceRecorderBarProps) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.voice')

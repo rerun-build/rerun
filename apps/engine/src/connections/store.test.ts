@@ -79,8 +79,6 @@ describe('the Rerun connection', () => {
         expect((await patchConnection(RERUN_CONNECTION_ID, { models: [RERUN_MODEL] })).config.models).toEqual([RERUN_MODEL])
     })
 
-    // A box provisioned when Rerun had one model. Balanced stays first: it is what the connection
-    // runs when no model is named.
     it('gains the tiers that came after it at boot, once, behind the model it already had', async () => {
         await ensureRerunConnection()
         await patchConnection(RERUN_CONNECTION_ID, { models: [RERUN_MODEL] })

@@ -10,18 +10,15 @@ import { text } from "../theme";
 
 export interface RecommendedTemplate {
   title: string;
-  /** What this setup delivers for this company, written for them or taken from the tagline. */
   line: string;
   setupMinutes: number;
   url: string;
-  /** The captured library card. Absent falls the row back to text. */
   imageUrl?: string;
 }
 
 export interface AgentRecommendationsProps {
   companyName: string | null;
   websiteDomain: string | null;
-  /** Two or three, never one: the sender drops the email rather than pad the list. */
   templates: RecommendedTemplate[];
   browseUrl: string;
   appUrl: string;

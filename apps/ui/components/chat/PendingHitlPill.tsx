@@ -5,7 +5,6 @@ import { ArrowDownIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
-// The scroll-to-bottom arrow grown into what the coworker is waiting for, down the thread.
 export function PendingHitlPill({ summary, onJump }: { summary: PendingHitlSummary; onJump: () => void }) {
     const t = useTranslations('chat.pendingHitl')
     const KindIcon = summary.icon

@@ -2,9 +2,6 @@ import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.se
 import { BILLING_ENABLED } from '@rerun/cloud/billing'
 import { paidDataPriceMultiplier } from '@/lib/paid-data/pricing'
 
-// What the engine asks before it offers paid data. This install sells none, so the answer is always
-// "off"; the route must still answer 200 with a price, or the engine reads the silence as "on"
-// (apps/engine/src/paid-data/price.ts) and offers tools whose every call would fail.
 export const dynamic = 'force-dynamic'
 
 function bearerToken(req: Request): string {

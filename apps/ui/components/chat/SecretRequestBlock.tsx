@@ -9,12 +9,9 @@ import { useEffect, useState } from 'react'
 
 type SecretRequestBlockProps = {
     agentId: string
-    // The conversation that raised the request: answering it only takes the right to use the coworker.
     sessionId: string | null
     secrets: SecretRequestItem[]
     reason?: string
-    // Called once the credentials are stored on the engine, with the summary chat message that
-    // resumes the run. It only ever carries variable names, never a value.
     onDone: (summary: string) => void
     onSkip: () => void
     onDismiss: () => void

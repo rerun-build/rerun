@@ -31,8 +31,6 @@ const config = agentConfigSchema.parse({
     setup: { required: true, completedAt: '2026-01-01T00:00:00.000Z' },
     mcpServers: [
         srv('stripe', { STRIPE_KEY: 'sk_live_AAAAAAAAAAAAAAAAAAAAAAAA' }, { Authorization: 'Bearer abcdefghijklmnopqrstuvwxyz0123' }),
-        // The two shapes the UI compiler emits: a reference embedded in a larger string, and the
-        // source agent id carried in a header for the managed proxy.
         srv('fal', { FAL_KEY: '${RERUN_SVC_FAL_FAL_KEY}' }, { Authorization: 'Bearer ${RERUN_SVC_FAL_FAL_KEY}', 'x-rerun-agent': AGENT_ID }),
     ],
 })
@@ -138,8 +136,6 @@ describe('scrubConfig', () => {
         expect(strippedKeys).toEqual(['stripe.env.STRIPE_KEY', 'stripe.headers.Authorization'])
     })
 
-    // The shape the compiler emits and the shape the engine resolver expects. Rewriting it would
-    // lose the name of the variable the copy has to be given.
     it('leaves a reference untouched, embedded or not', () => {
         const { config: scrubbed, strippedKeys } = scrubConfig(config, AGENT_ID)
         expect(scrubbed.mcpServers[1].env.FAL_KEY).toBe('${RERUN_SVC_FAL_FAL_KEY}')
@@ -152,8 +148,6 @@ describe('scrubConfig', () => {
         expect(scrubbed.mcpServers[1].headers['x-rerun-agent']).toBe('${agent.id}')
     })
 
-    // A connection id names a credential on this box and nothing on the one receiving the copy.
-    // `provider` is what survives, and what the import resolves a local connection from.
     it('drops the connection and keeps the provider', () => {
         const attached = agentConfigSchema.parse({ ...config, connectionId: 'cnx-local', provider: 'anthropic' })
         const { config: scrubbed } = scrubConfig(attached, AGENT_ID)
@@ -163,8 +157,6 @@ describe('scrubConfig', () => {
 })
 
 describe('planArchive', () => {
-    // The capture is where a template gets its setup answer, so the plan has to state both the
-    // answer and whether instructions actually exist behind a "yes".
     it('reports the setup answer and that instructions travel with the folder', async () => {
         const plan = await planArchive(AGENT_ID)
         expect(plan.setup.required).toBe(true)
@@ -178,7 +170,6 @@ describe('planArchive', () => {
         expect(plan.files.find(f => f.path === 'workspace/brief.md')?.flagged).toEqual([])
     })
 
-    // A session cookie matches none of the content patterns: the path is the only tell.
     it('flags a secrets folder the content scan cannot see', async () => {
         const plan = await planArchive(AGENT_ID)
         const cookie = plan.files.find(f => f.path === 'workspace/.secrets/linkedin_cookie.json')
@@ -209,8 +200,6 @@ describe('planArchive', () => {
         ])
     })
 
-    // The on-disk config.json holds literal keys, but the archive carries the scrubbed one.
-    // Flagging the raw file would have the review unchecking a file that is already clean.
     it('scans the scrubbed config, not the file on disk', async () => {
         const plan = await planArchive(AGENT_ID)
         expect(plan.files.find(f => f.path === 'config.json')?.flagged).toEqual([])
@@ -232,8 +221,6 @@ describe('planArchive', () => {
         expect(plan.files.find(f => f.path === 'triggers/inbound.md')?.defaultExcluded).toBe(false)
     })
 
-    // The token goes on its own, but the instruction is free text the author wrote: a key pasted
-    // in there is the same problem as a key pasted in a workspace file.
     it('flags a webhook whose instruction carries a credential', async () => {
         const plan = await planArchive(AGENT_ID)
         const leaky = plan.files.find(f => f.path === 'triggers/leaky.md')

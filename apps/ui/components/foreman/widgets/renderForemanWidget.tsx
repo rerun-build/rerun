@@ -14,16 +14,11 @@ import { PlanCardWidget } from './PlanCardWidget'
 import { StarterPackWidget } from './starter-pack/StarterPackWidget'
 import { TemplateChoiceWidget } from './TemplateChoiceWidget'
 
-// The foreman's half of MessageView's `renderToolPart`. `undefined` means "not mine", so every
-// other tool keeps its normal collapsed step.
 export type AnswerWidget = (toolName: string, toolCallId: string, output: unknown) => void
 export type DismissWidget = (toolCallId: string) => void
-// From planAgentShortcuts: the rows a shortcut call draws once its message is folded, null when an
-// earlier call of the same message already draws them.
 export type AgentShortcutPlan = Map<string, AgentPick[] | null>
 
 export function renderForemanWidget(part: ToolPartLike, answer: AnswerWidget, dismiss?: DismissWidget, shortcuts?: AgentShortcutPlan): ReactNode | undefined {
-    // Not a widget: it asks nothing and never holds the conversation, it only leaves a shortcut.
     if (isAgentShortcutTool(part.toolName)) {
         if (part.state === 'output-error') return undefined
         const planned = shortcuts?.get(part.toolCallId)
@@ -36,7 +31,6 @@ export function renderForemanWidget(part: ToolPartLike, answer: AnswerWidget, di
         )
     }
     if (!isForemanWidgetTool(part.toolName)) return undefined
-    // A call that errored out server side has nothing to render and nothing to answer.
     if (part.state === 'output-error') return undefined
 
     const onAnswer = (output: unknown) => answer(part.toolName, part.toolCallId, output)

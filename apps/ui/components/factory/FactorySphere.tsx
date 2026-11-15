@@ -1,16 +1,11 @@
 'use client'
 
-// A task is a Petri-net token: a solid two-tone sphere. The filled part, in the task's state colour,
-// rises from the bottom to the task's progress; the rest is dark. Nothing in the body is see-through.
-// Only what says something moves: the shake on merged and rejected. A held sphere has a red rim.
-
 import { useState } from 'react'
 
 import { STATUS_COLOR, type PodView } from './factory-scene'
 import type { P } from './factory-rest'
 import { formatInState } from './FactoryTasks'
 
-// The overlay re-renders every 250 ms, so the time in stage ticks without a timer of its own.
 const clock = () => Date.now()
 const R = 15
 const DISC = '#1b2140'
@@ -35,7 +30,6 @@ export function Sphere({ pod, at, selected = false, onSelectJob }: { pod: PodVie
                     onPointerEnter={() => setHover(true)}
                     onPointerLeave={() => setHover(false)}
                     {...(onSelectJob ? {
-                        // Only the sphere takes the pointer; the rest of the overlay stays click-through.
                         style: { pointerEvents: 'auto' as const, cursor: 'pointer' },
                         onPointerDown: (e: React.PointerEvent) => e.stopPropagation(),
                         onClick: (e: React.MouseEvent) => { e.stopPropagation(); onSelectJob(pod.issue) },

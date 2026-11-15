@@ -7,8 +7,6 @@ const exchangeSchema = z.object({ code: z.string().max(128), verifier: z.string(
 
 const NO_STORE = { 'Cache-Control': 'no-store' }
 
-// The desktop app spends the code the browser handed it, with the PKCE verifier only it holds. The
-// session opens on this request's cookies, which are the app window's own.
 export async function POST(request: Request) {
     if (!parseDesktopShellUserAgent(request.headers.get('user-agent'))) return Response.json({ reason: 'invalid' }, { status: 403, headers: NO_STORE })
     const parsed = exchangeSchema.safeParse(await request.json().catch(() => null))

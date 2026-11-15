@@ -1,4 +1,3 @@
-"""factory.GH comes from FACTORY_GH (default /data/tools/bin/gh)."""
 import importlib, os, sys, unittest
 from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

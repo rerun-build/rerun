@@ -136,14 +136,12 @@ describe('emitRunTerminal', () => {
         expect('errorCode' in ok.metadata).toBe(false)
     })
 
-    // In a workspace of several members, the hub otherwise credits every run to the owner.
     it('names who sent the message of a chat run, and nobody for a schedule', async () => {
         expect((await emit({ trigger: { source: 'chat', author: { id: 'u2', name: 'Sam' } } })).metadata.authorId).toBe('u2')
         expect('authorId' in (await emit({})).metadata).toBe(false)
         expect('authorId' in (await emit({ trigger: schedule })).metadata).toBe(false)
     })
 
-    // The hub writes the notification in the reader's language from these, not from the English message.
     it('names the routine on its own, and nothing for a chat run', async () => {
         expect((await emit({ trigger: schedule, kind: 'error', error: 'boom' })).metadata).toMatchObject({ sourceName: schedule.name, error: 'boom' })
         expect('sourceName' in (await emit({})).metadata).toBe(false)

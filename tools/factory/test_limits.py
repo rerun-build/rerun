@@ -1,4 +1,3 @@
-"""limits.py tests: counters and limits are pure functions, so plain values in, (action, reason) out."""
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import limits as M
@@ -17,7 +16,7 @@ class TestLimits(unittest.TestCase):
         action, why = M.fix_or_replan(2, M.FIX_BUILDS, 1, "test red")
         self.assertEqual(action, "PLAN")
         self.assertIn("test red", why)
-        self.assertEqual(M.fix_or_replan(2, M.FIX_BUILDS, 3, "test red")[0], "BLOCKED")  # that re-plan would be round 4
+        self.assertEqual(M.fix_or_replan(2, M.FIX_BUILDS, 3, "test red")[0], "BLOCKED")
 
     def test_job_ci_and_review_caps(self):
         self.assertEqual((M.FIX_BUILDS, M.JOB_FIXES, M.REVIEW_ROUNDS, M.PLAN_ROUNDS, M.FIRED_CAP), (2, 2, 2, 3, 20))
@@ -48,7 +47,6 @@ class TestLimits(unittest.TestCase):
 
 class TestRuns(unittest.TestCase):
     def test_45_minutes(self):
-        # meaning changed: OVERDUE (blocked, stop it in the UI) is now CANCEL (the caller cancels through engine.py)
         start = "2026-11-12T08:00:00.123Z"
         self.assertEqual(M.run_outcome({"id": "r1", "status": "running", "started_at": start}, at(45 * 60)), ("RUNNING", None))
         action, why = M.run_outcome({"id": "r1", "status": "running", "started_at": start}, at(45 * 60 + 1))
@@ -59,7 +57,7 @@ class TestRuns(unittest.TestCase):
         row = {"id": "r2", "status": "running", "started_at": T0}
         self.assertEqual(M.run_outcome(row, at(90), cfg={"run_limit_s": 90}), ("RUNNING", None))
         self.assertEqual(M.run_outcome(row, at(91), cfg={"run_limit_s": 90})[0], "CANCEL")
-        self.assertEqual(M.run_outcome(row, at(91), cfg={"run_limit_s": None})[0], "RUNNING")  # bad value: default
+        self.assertEqual(M.run_outcome(row, at(91), cfg={"run_limit_s": None})[0], "RUNNING")
 
     def test_stall_cancels(self):
         row = {"id": "r3", "status": "running", "started_at": T0}
@@ -68,8 +66,8 @@ class TestRuns(unittest.TestCase):
         action, why = M.run_outcome(row, at(300 + 601), steps)
         self.assertEqual(action, "CANCEL")
         self.assertIn("stalled", why)
-        self.assertEqual(M.run_outcome(row, at(61), {"last_step_at": None}, {"stall_s": 60})[0], "CANCEL")  # no step yet: from start
-        self.assertEqual(M.run_outcome(row, at(900), steps, {"stall_s": 0})[0], "RUNNING")  # rule off
+        self.assertEqual(M.run_outcome(row, at(61), {"last_step_at": None}, {"stall_s": 60})[0], "CANCEL")
+        self.assertEqual(M.run_outcome(row, at(900), steps, {"stall_s": 0})[0], "RUNNING")
 
     def test_token_cap_cancels(self):
         row = {"id": "r4", "status": "running", "started_at": T0}
@@ -78,13 +76,13 @@ class TestRuns(unittest.TestCase):
         action, why = M.run_outcome(row, at(5), dict(steps, tokens=1001), {"token_cap": 1000})
         self.assertEqual(action, "CANCEL")
         self.assertIn("tokens", why)
-        self.assertEqual(M.run_outcome(row, at(5), dict(steps, tokens=10**9))[0], "RUNNING")  # no cap by default
+        self.assertEqual(M.run_outcome(row, at(5), dict(steps, tokens=10**9))[0], "RUNNING")
 
     def test_outcomes(self):
         now = at(60)
         self.assertEqual(M.run_outcome({"status": "done"}, now), ("DONE", None))
         self.assertEqual(M.run_outcome({"status": "error", "error": "interrupted: engine restarted"}, now), ("RESTARTED", None))
-        self.assertEqual(M.run_outcome({"status": "error", "error": "provider 529"}, now)[0], "REFIRE_ONCE")  # was FAILED
+        self.assertEqual(M.run_outcome({"status": "error", "error": "provider 529"}, now)[0], "REFIRE_ONCE")
         self.assertEqual(M.run_outcome({"status": "cancelled"}, now)[0], "FAILED")
         self.assertEqual(M.run_outcome(None, now)[0], "MISSING")
 
@@ -101,7 +99,7 @@ class TestRuns(unittest.TestCase):
         rows = [{"id": "old", "trigger_slug": "factory-build", "started_at": "2026-11-12T08:01:00.000Z"},
                 {"id": "other", "trigger_slug": "factory-plan", "started_at": "2026-11-12T08:02:12.000Z"},
                 {"id": "later", "trigger_slug": "factory-build", "started_at": "2026-11-12T08:05:00.000Z"},
-                {"id": "mine", "trigger_slug": "factory-build", "started_at": "2026-11-12T08:02:11.123Z"},  # same second: '.' sorts before 'Z' as text
+                {"id": "mine", "trigger_slug": "factory-build", "started_at": "2026-11-12T08:02:11.123Z"},
                 {"id": "noslug", "trigger_slug": None, "started_at": "2026-11-12T08:02:11.500Z"}]
         f = M.ts(firing)
         self.assertEqual(M.resolve_pending(firing, "factory-build", rows, f + 1, 120), ("RUN", "mine"))

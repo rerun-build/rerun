@@ -13,7 +13,6 @@ import { useLocalHourly } from '../useLocalHourly'
 import { useSettledValue } from '../useSettledValue'
 import type { RewindSlideProps } from './types'
 
-// 2024-01-01 is a Monday, the first day of the week the totals start on.
 const fullDayName = (day: number, locale: string) => formatDate(Date.UTC(2024, 0, 1 + day), locale, { weekday: 'long', timeZone: 'UTC' })
 
 function SuccessRing({ ratio }: { ratio: number }) {

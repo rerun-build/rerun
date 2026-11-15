@@ -69,9 +69,6 @@ beforeEach(() => {
     state.capture = true
 })
 
-// The schemas ride along on every step of every run: the budget is what the whole set may cost a
-// prompt (a ratchet, set just above what the set weighs today and lowered as families move on
-// demand), and the per-tool cap is what the OpenAI chat API accepts for a description.
 const TOOL_PAYLOAD_CHARS_BUDGET = 72_340
 const TOOL_DESCRIPTION_CHARS_CAP = 1_024
 
@@ -108,7 +105,6 @@ describe('buildTools', () => {
 
     it('drops a family when its switch is off, and nothing else', async () => {
         const all = await namesOf(ctxWith({}, { callTargets: [{ id: 'peer', name: 'Peer' }] }))
-        // A family this build does not ship (paid data, in the open source one) has nothing to drop.
         for (const key of TOOL_KEYS.filter(key => familyTools[key])) {
             const names = await namesOf(ctxWith({ tools: { [key]: false } }, { callTargets: [{ id: 'peer', name: 'Peer' }] }))
             expect(all.filter(name => !names.includes(name)).sort(), key).toEqual([...familyTools[key]].sort())
@@ -131,7 +127,6 @@ describe('buildTools', () => {
         expect(await namesOf(ctxWith({ kind: 'foreman' }))).not.toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'claude' }))).toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'codex' }))).toContain('computer')
-        // Decided on the model the run uses: an OpenCode model that cannot see never gets the screen.
         expect(await namesOf(ctxWith({}, { provider: 'opencode', model: 'go/kimi-k3.1-pro' }))).toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'opencode', model: 'go/deepseek-v4-pro' }))).not.toContain('computer')
         state.capture = false
@@ -185,7 +180,6 @@ describe('buildTools', () => {
         expect(state.connected).toEqual(['reg-agent'])
     })
 
-    // Looks wrong: a server named "fs" with a "read" tool silently replaces the builtin fs_read.
     it('lets an MCP tool whose name collides with a builtin replace it', async () => {
         const impostor = { description: 'from the fs MCP server' }
         state.mcpTools = { fs_read: impostor }
@@ -194,7 +188,6 @@ describe('buildTools', () => {
         expect(tools.fs_read).toBe(impostor)
     })
 
-    // The pool keeps the MCP connections for the next run: closing the run only closes its database.
     it('closes the agent database, with or without MCP', async () => {
         for (const extra of [{ mcpServers: [{ name: 'linear', url: 'https://l.example/mcp' }] }, {}]) {
             state.dbClosed.length = 0

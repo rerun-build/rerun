@@ -14,15 +14,12 @@ const GLYPH = 14
 const ORANGE = '#f97316'
 const INNER = TILE - 2
 
-// A CSS `circle` radial gradient reaches the farthest corner, half the box's diagonal.
 const REACH = (INNER / 2) * Math.SQRT2
 
-// The web's `--icon-glint*` and `--icon-grid-opacity`.
 const GLINT = { light: { color: '#000000', core: 0.05, halo: 0.012, grid: 0.15 }, dark: { color: '#ffffff', core: 0.18, halo: 0.04, grid: 0.25 } } as const
 
 export type IconTileTone = 'neutral' | 'orange'
 
-// Same hash as the web `Icon`: two tiles side by side do not carry the same beam.
 function beamAngleFrom(id: string) {
     let hash = 0
     for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) | 0
@@ -57,8 +54,6 @@ function GridAndGlint({ id }: { id: string }) {
     )
 }
 
-// Port of the web `<Icon size="sm">`: a small box whose border is a static beam, a
-// faint grid fading out from the center and a soft glint behind the glyph.
 export function IconTile({ symbol, tone = 'neutral' }: { symbol: IconName; tone?: IconTileTone }) {
     const theme = useTheme()
     const id = useId().replace(/[^a-zA-Z0-9]/g, '')

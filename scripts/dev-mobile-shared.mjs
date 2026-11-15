@@ -1,5 +1,3 @@
-// What the iOS and Android paths of `pnpm dev:mobile` share: the local API (Next) and Metro.
-
 import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline'
 
@@ -12,7 +10,6 @@ export function createLogger(tag) {
     return { log, fail }
 }
 
-// Any HTTP answer counts, a 401 included: it means Next is up and the route is compiled.
 export async function apiAnswers(port, timeoutMs) {
     try {
         await fetch(`http://localhost:${port}/api/v1/me`, { signal: AbortSignal.timeout(timeoutMs) })
@@ -22,8 +19,6 @@ export async function apiAnswers(port, timeoutMs) {
     }
 }
 
-// Detached so that stopping the script can take down the whole pnpm > next tree through its process
-// group. Its output is prefixed to stay readable next to Metro's.
 export function startApi({ port, cwd, log }) {
     log(`starting the API (Next) on port ${port}`)
     const api = spawn('pnpm', ['--filter', 'rerun', 'exec', 'next', 'dev', '-p', String(port)], {
@@ -51,7 +46,6 @@ export async function waitForApi(port) {
     return false
 }
 
-// A cold Metro, the first run of a workspace, takes over a minute before it answers.
 export async function waitForMetro(port) {
     for (let attempt = 0; attempt < 600; attempt++) {
         try {

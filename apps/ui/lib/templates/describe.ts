@@ -1,8 +1,6 @@
 import { z } from 'zod'
 import type { TemplateFormValues } from '@/lib/templates/edit-schema'
 
-// The brief comes from the form rather than the stored row so a draft that has never been
-// saved can still be described.
 const briefAgentSchema = z.object({
     name: z.string().default(''),
     role: z.string().default(''),
@@ -45,9 +43,6 @@ export function toTemplateBrief(values: TemplateFormValues): TemplateBrief {
     }
 }
 
-// A brief carries connector slugs because that is what the agents store, and `google-sheets`
-// is not what a title should say. The map comes from the services catalog, which the client
-// building the brief has no read on, so the swap happens on the way into the writer.
 export function withConnectorNames(brief: TemplateBrief, names: Map<string, string>): TemplateBrief {
     const named = (slugs: string[]) => slugs.map(slug => names.get(slug) ?? slug)
 
@@ -58,8 +53,6 @@ export function withConnectorNames(brief: TemplateBrief, names: Map<string, stri
     }
 }
 
-// The task lives in the skills and the schedules as much as in the tagline, so every writer
-// gets all of it: a title alone is what produced generic, interchangeable output.
 export function describeTemplate({
     title,
     tagline,

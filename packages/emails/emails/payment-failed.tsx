@@ -9,28 +9,17 @@ import { text } from "../theme";
 
 export interface PaymentFailedProps {
   workspaceName: string | null;
-  /** "$17.62", preformatted. Left out when the invoice carries no amount. */
   amountLabel?: string;
-  /** "5 October", preformatted. */
   declinedLabel: string;
-  /** When the workspace is paused if nothing is paid, "6 October, 06:10 UTC". Preformatted. */
   pausedLabel: string;
-  /** Until when the paused workspace is saved, "3 January". Preformatted. */
   keptUntilLabel: string;
-  /** The open invoice on Stripe's own page, where a 3-D Secure confirmation also happens. */
   billingUrl: string;
-  /** A capture of the workspace's board, signed by the sender. Without it the usual banner shows. */
   boardUrl?: string;
   appUrl: string;
   unsubscribeUrl?: string;
   locale?: EmailLocale;
 }
 
-/**
- * A renewal that was declined leaves the workspace a day before it is paused, so this is the email
- * that says when the agents stop. The subscription is still there: paying the invoice keeps
- * everything on the same plan, which is why the button goes to the invoice and not to a new checkout.
- */
 export default function PaymentFailed({
   workspaceName,
   amountLabel,

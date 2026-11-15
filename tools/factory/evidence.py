@@ -1,7 +1,3 @@
-"""Stage end checks of the factory runner (rerun#53 chunk 4, Settled 8): what on GitHub proves a stage ended, never the
-run's own text. Every reader takes the fetcher `get(path, paginate=False)` (the runner passes gate.gh_json) and returns
-(verdict, detail): OK / READY / REJECT / ACCEPT with a dict, or NONE with the reason. A failed read raises gate.NoAnswer:
-never an answer, never a failed attempt."""
 import fnmatch, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
@@ -17,7 +13,6 @@ def comments(get, full, n):
 
 
 def plan(get, full, issue, fired):
-    """The newest issue comment created after `fired` with a `## Chunks` section whose lines all pass ledger.shape()."""
     for c in reversed(comments(get, full, issue)):
         if ts(c["created_at"]) <= ts(fired) or "## Chunks" not in (c.get("body") or ""):
             continue
@@ -32,8 +27,6 @@ def plan(get, full, issue, fired):
 
 
 def challenge(get, full, issue, plan_comment):
-    """The first comment after the plan comment of the current round (by id) with a line starting PLAN READY or PLAN
-    REJECT; its last such line decides. Comments before that plan comment never count."""
     cs = comments(get, full, issue)
     p = next((c for c in cs if c["id"] == plan_comment), None)
     if p is None:
@@ -47,8 +40,6 @@ def challenge(get, full, issue, plan_comment):
 
 
 def build(get, full, issue, job_branch, ch, fired):
-    """compare job_branch...chunk/<issue>-<id>: a commit after `fired`, the test file in the diff, every file inside the
-    chunk's paths (fnmatch as gate.py). More lines than max_lines is a flag only."""
     branch = "chunk/%s-%s" % (issue, ch["id"])
     refs = get("repos/%s/git/matching-refs/heads/%s" % (full, branch))
     head = next((r["object"]["sha"] for r in refs if r.get("ref") == "refs/heads/" + branch), None)
@@ -69,7 +60,6 @@ def build(get, full, issue, job_branch, ch, fired):
 
 
 def review(get, full, pr, head, name, fired):
-    """The newest `gate.review` verdict by `name` on the job PR, bound to the head SHA and created after `fired`."""
     for c in reversed(comments(get, full, pr)):
         m = G.REVIEW_RE.match(c.get("body") or "")
         if m and m.group(2) == head[:8] and m.group(3).upper() == name.upper() and ts(c["created_at"]) > ts(fired):
@@ -78,8 +68,6 @@ def review(get, full, pr, head, name, fired):
 
 
 def ci_at_commit(get, full, branch):
-    """The pushed head of `branch` and the CI result at exactly that commit: OK (green), RED or WAITING with
-    {sha, ci}; NONE when the branch is not pushed or has no check yet. Checks of other commits never count."""
     refs = get("repos/%s/git/matching-refs/heads/%s" % (full, branch))
     sha = next((r["object"]["sha"] for r in refs if r.get("ref") == "refs/heads/" + branch), None)
     if not sha:
@@ -90,8 +78,6 @@ def ci_at_commit(get, full, branch):
 
 
 def verdict(get, full, pr, name, fired):
-    """`review` with the PR head read from GitHub now. A verdict by `name` that names an older commit is never taken:
-    NONE says which commit it names and which head was needed."""
     head = get("repos/%s/pulls/%s" % (full, pr))["head"]["sha"]
     v, d = review(get, full, pr, head, name, fired)
     if v != "NONE":
@@ -104,8 +90,6 @@ def verdict(get, full, pr, name, fired):
 
 
 def stage_check(get, f, kv, ready):
-    """(verdict, detail) for a build run `f` (a fires row): `build` on the job's chunk branch. The repo comes from kv repo_url,
-    the test file from kv test:<chunk> (suite, file) and the paths from the ready item. Other stages: ("OK", "")."""
     if f["stage"] != "build":
         return "OK", ""
     full = re.sub(r"(\.git)?/*$", "", kv["repo_url"]).split("github.com/")[-1]

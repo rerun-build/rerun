@@ -36,8 +36,6 @@ overrides:
 patchedDependencies:
     'ai-sdk-provider-codex-cli@1.6.0': 'apps/engine/patches/ai-sdk-provider-codex-cli@1.6.0.patch'
 
-# Dependencies whose install scripts may run. Every package with one must be listed, or the
-# install fails (strictDepBuilds). See docs/research/2026-11-14-pnpm-12/PLAN.md, section 1c.
 allowBuilds:
     'esbuild': true
     '@posthog/cli': true
@@ -49,9 +47,6 @@ allowBuilds:
     'cpu-features': false
     'electron-winstaller': false
 
-# pnpm 8 never installed before `pnpm run`/`exec`. Off until it is shown that its output stays off
-# the stdout that scripts parse (scripts/dev-mobile.mjs:135).
 verifyDepsBeforeRun: false
 
-# Drop stale minimumReleaseAge exclusions when the lockfile no longer needs them.
 minimumReleaseAgeExcludePrune: true

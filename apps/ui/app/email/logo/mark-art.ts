@@ -1,11 +1,5 @@
-// The `<Logo>` of @rerun/ui, flattened to a still: the framed R over its square grid, the centred
-// glint, and the shimmer ring that stands in for the border. None of what draws that ring in the
-// app survives an inbox (conic gradient, mask compositing, CSS variables), so every layer is
-// resolved here and baked into a PNG over the page background.
-
 import { R_PATH } from '@rerun/ui/logo'
 
-/** Rendered at 4x the size the header displays it at, for retina inboxes. */
 export const MARK_SIZE = 128
 export const MARK_DISPLAY = 32
 
@@ -17,7 +11,6 @@ const PRIMARY = '#e5e5e5'
 
 const RADIUS = 8 * SCALE
 const GRID_CELL = MARK_SIZE / 4
-// Half a cell of offset, so the R sits inside a cell instead of astride a rule.
 const GRID_OFFSET = GRID_CELL / 2
 const GRID_STROKE = 0.5 * SCALE
 const GRID_OPACITY = 0.35
@@ -26,12 +19,8 @@ const RING_STROKE = 1 * SCALE
 const R_SIZE = MARK_SIZE / 2
 const R_VIEWBOX = 512
 
-// The app's radial fades run to the farthest corner, which is where a CSS `circle` stops by
-// default; an SVG radius of 50% would stop at the edge instead.
 const CORNER = 0.707
 
-// The shimmer is a conic from 279deg with its two bright arcs at 10% and 60%, which land on the
-// top-left and bottom-right corners. On a square that reads as a diagonal, so it is drawn as one.
 const RING_STOPS = [
     [0, 0.65],
     [0.2, 0.12],

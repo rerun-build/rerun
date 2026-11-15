@@ -8,7 +8,6 @@ import { FilmIcon, Maximize2Icon, Play } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { formatVoiceDuration } from '@/lib/voice/duration'
 
-/** `natural` keeps the file's own proportions, the other two are cells of an album. */
 export type MediaTileShape = 'natural' | 'cell' | 'wide'
 
 export const MEDIA_CELL_ASPECT: Record<Exclude<MediaTileShape, 'natural'>, string> = { cell: 'aspect-[4/5]', wide: 'aspect-[2/1]' }
@@ -21,7 +20,6 @@ function readMeta(video: HTMLVideoElement): VideoMeta {
     return { width: video.videoWidth, height: video.videoHeight, duration: video.duration }
 }
 
-// A portrait clip grows in height and a landscape one in width, the way a lone photo does.
 function naturalBox(meta: VideoMeta | null) {
     if (!meta) return { className: 'h-60 aspect-[4/5]', style: undefined }
     const portrait = meta.height >= meta.width
@@ -51,10 +49,6 @@ type ChatVideoTileProps = {
     onOpen: () => void
 }
 
-/**
- * A video shown by its first frame. A click plays it in place with the sound, a second one pauses it,
- * and the corner button opens the lightbox. Starting one pauses any other playing in the chat.
- */
 export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) {
     const t = useTranslations('chat.video')
     const videoRef = useRef<HTMLVideoElement>(null)
@@ -63,7 +57,6 @@ export function ChatVideoTile({ src, name, shape, onOpen }: ChatVideoTileProps) 
     const [playback, setPlayback] = useState<'idle' | 'playing' | 'paused'>('idle')
     const [currentTime, setCurrentTime] = useState(0)
 
-    // The metadata can land before React attaches the element's handlers.
     useEffect(() => {
         const video = videoRef.current
         if (!video) return

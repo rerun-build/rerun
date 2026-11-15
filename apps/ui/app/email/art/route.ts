@@ -9,8 +9,6 @@ function isVariant(value: string | null): value is ArtVariant {
 export async function GET(req: Request) {
     const variant = new URL(req.url).searchParams.get('variant')
 
-    // A closed enumeration, no free text: this route can only ever produce the handful of banners
-    // the templates ask for, so it is not an open image generator sitting on our domain.
     if (!isVariant(variant)) return new Response('Unknown variant', { status: 400 })
 
     const { default: sharp } = await import('sharp')
@@ -22,7 +20,6 @@ export async function GET(req: Request) {
     return new Response(new Uint8Array(png), {
         headers: {
             'Content-Type': 'image/png',
-            // The URL carries a version, so a rendered banner never has to be revalidated.
             'Cache-Control': 'public, max-age=31536000, immutable',
         },
     })

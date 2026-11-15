@@ -15,7 +15,6 @@ import { spacing } from '@/theme/tokens'
 
 export const CONTROL = 36
 
-// `busy` keeps the button's shape and colour while its action is under way, the glyph a spinner.
 export function RoundButton({ symbol, label, onPress, tone = 'muted', disabled: disabledProp, busy = false }: { symbol: IconName; label: string; onPress: () => void; tone?: 'primary' | 'muted' | 'plain'; disabled?: boolean; busy?: boolean }) {
     const theme = useTheme()
     const disabled = disabledProp || busy
@@ -54,10 +53,7 @@ export function AttachMenu({ onPhotos, onCamera, onFiles, skills = [], onSkill, 
             <Icon name="plus" size={20} color={disabled ? theme.mutedForeground : theme.foreground} />
         </View>
     )
-    // The menu is a SwiftUI host with no disabled state of its own: the bare trigger is drawn instead.
     if (disabled) return trigger
-    // Sized here: Android's menu host is measured by Compose a frame late, and until then it stretched
-    // the composer's row to twice its height.
     return (
         <View style={{ width: CONTROL, height: CONTROL }}>
             <NativeMenu trigger={trigger}>
@@ -88,7 +84,6 @@ export function ModelChip({ model, onPress }: { model: Model; onPress: () => voi
     )
 }
 
-// Who a new chat goes to, picked before the first message like the repo of a Conductor workspace.
 export function TargetPicker({ target, choices, onPick }: { target: Coworker; choices: Coworker[]; onPick: (id: string) => void }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.composer')

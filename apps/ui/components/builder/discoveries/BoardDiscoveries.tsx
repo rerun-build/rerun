@@ -9,9 +9,6 @@ import { DiscoveryStack, type FindingEntry } from './DiscoveryStack'
 import { DiscoveryStatusPill } from './DiscoveryStatusPill'
 import { DiscoveryTeaser } from './DiscoveryTeaser'
 
-// Ce que la recherche sur l'entreprise trouve, posé par-dessus le board d'onboarding pendant qu'elle
-// tourne : un calque qui ne capte aucun clic, pour que le board reste à portée de main dessous.
-
 type Subject = { name: string; domain: string }
 
 const SPRING: Transition = { type: 'spring', stiffness: 260, damping: 24 }
@@ -30,8 +27,6 @@ function EntryView({ entry, subject, still }: { entry: DiscoveryEntry; subject: 
     return entry.type === 'teaser' ? <DiscoveryTeaser source={entry.source} subject={subject} /> : <DiscoveryCard finding={entry.finding} still={still} />
 }
 
-// Sous md il n'y a pas la place pour la pile : une seule carte, la dernière trouvaille, ou ce
-// qu'on est en train de chercher tant que rien n'est encore tombé.
 function Ticker({ entries, subject, still }: { entries: DiscoveryEntry[]; subject: Subject; still: boolean }) {
     const findings = entries.flatMap(entry => (entry.type === 'finding' ? [entry] : []))
     const latest = findings.length ? findings.reduce((last, entry) => (entry.arrival > last.arrival ? entry : last)) : entries.at(-1)

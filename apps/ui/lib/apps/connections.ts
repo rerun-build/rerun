@@ -12,8 +12,6 @@ export type AppConnectionRow = Database['public']['Tables']['app_connections']['
 
 export const RATE_LIMIT_PAUSE_MS = 24 * 60 * 60_000
 
-// Atomic and all-or-nothing across the windows: an invitation is refused without eating its day
-// when its week is full. See claim_app_quota.
 export async function claimQuota(supabase: Client, scope: string, action: string, periods: string[], maxes: number[], amount = 1): Promise<boolean> {
     const { data, error } = await supabase.rpc('claim_app_quota', { p_scope: scope, p_action: action, p_periods: periods, p_maxes: maxes, p_amount: amount })
     if (error) throw new Error(error.message)
@@ -40,9 +38,6 @@ export type AgentConnection =
     | { ok: true; connection: Pick<AppConnectionRow, (typeof APP_CONNECTION_COLUMNS)[number]>; appStatus: string }
     | { ok: false; reason: 'not_attached' | 'not_found' }
 
-// The account a coworker acts with, read fresh on every call: a coworker's binding, the app's
-// status and the account's are all moved by other paths (a freeze, a disconnect) and the proxy is
-// the one place that has to agree with them.
 export async function agentConnection(supabase: Client, agentId: string, slug: AppSlug): Promise<AgentConnection> {
     const { data: binding } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug })
     if (!binding) return { ok: false, reason: 'not_attached' }
@@ -52,8 +47,6 @@ export async function agentConnection(supabase: Client, agentId: string, slug: A
     return { ok: true, connection, appStatus: app?.status ?? 'uninstalled' }
 }
 
-// The provider itself said stop. The account rests a day, the workspace hears about it, and the pause
-// lifts by itself on the first call after it ends.
 export async function pauseForRateLimit(supabase: Client, connection: { id: string; workspace_id: number; label: string | null }, slug: AppSlug): Promise<void> {
     await updateConnection(supabase, connection.id, { status: 'paused', pause_reason: 'rate_limited', paused_until: new Date(Date.now() + RATE_LIMIT_PAUSE_MS).toISOString() })
     const app = appDefinition(slug)

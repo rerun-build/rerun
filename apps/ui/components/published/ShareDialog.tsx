@@ -27,7 +27,6 @@ type ShareDialogProps = {
     open: boolean
     onOpenChange: (open: boolean) => void
     slug: string | null
-    // What the caller already holds, shown while the live state loads.
     initial?: PublishedFile | null
     onChanged?: (file: PublishedFile) => void
     onUnpublished?: (slug: string) => void
@@ -49,7 +48,6 @@ function ShareDialogBody({ slug, initial, onChanged, onUnpublished, onClose }: {
     const workspaceName = useWorkspaceName()
     const [file, setFile] = useState<PublishedFile | null>(initial?.slug === slug ? initial : null)
     const [settings, setSettings] = useState<PublishSettings | null>(null)
-    // A mode that needs a password or an invite before it can be saved, picked but not saved yet.
     const [draftAccess, setDraftAccess] = useState<PublishedAccess | null>(null)
     const [saving, setSaving] = useState(false)
     const [confirmingUnpublish, setConfirmingUnpublish] = useState(false)
@@ -227,13 +225,9 @@ function AccessTrigger({
     )
 }
 
-// Never prefilled: only its hash is kept. A password already set reads as one, and typing a new one
-// replaces it.
 function PasswordField({ hasPassword, disabled, onSave }: { hasPassword: boolean; disabled: boolean; onSave: (password: string) => Promise<boolean> }) {
     const t = useTranslations('published.share')
     const [value, setValue] = useState('')
-    // Emptied before the save: Enter disables the field, which blurs it, and the blur must find
-    // nothing left to save.
     const commit = async () => {
         const password = value.trim()
         if (!password) return
@@ -281,8 +275,6 @@ function InviteDetail({ invited, disabled, onSave }: { invited: string[]; disabl
         void add()
     }
 
-    // The last invite stays: a link for invited people needs at least one, and taking it away would
-    // leave nobody able to open it. Picking another mode is how it closes.
     const removable = invited.length > 1
 
     return (

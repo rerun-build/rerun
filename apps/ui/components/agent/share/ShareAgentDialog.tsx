@@ -17,18 +17,9 @@ import { ShareAgentOptions, ShareAgentOptionsSkeleton } from './ShareAgentOption
 import { ShareAgentSafety } from './ShareAgentSafety'
 import { useShareAgentFlow, type ShareActions, type ShareFlow } from './useShareAgentFlow'
 
-// Send an agent to someone, outside the marketplace. Two steps in one frame: what the copy carries,
-// then the link. The archive is built when the link is created and never again, so what is agreed
-// to here is exactly what the recipient gets, whatever the agent does afterwards.
 export function ShareAgentDialog({ agentId, agentName, open, onOpenChange }: { agentId: string; agentName: string; open: boolean; onOpenChange: (open: boolean) => void }) {
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            {/* Same frame as the plan confirmation: the padding moves onto the rows so the striped
-                header can run edge to edge. `p-0` also drops the sheet's safe-area padding, which
-                the footer below puts back on its own.
-                The body is mounted only while the dialog is open: its inspection streams an archive
-                plan off the source box, and closing has to throw the answers away rather than leave
-                them staged for the next agent. */}
             <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-xl">{open && <ShareAgentBody agentId={agentId} agentName={agentName} onClose={() => onOpenChange(false)} />}</DialogContent>
         </Dialog>
     )
@@ -47,8 +38,6 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
 
     return (
         <>
-            {/* Stripes and the icon are painted behind the text, so both rows above it take
-                `relative` rather than the whole block taking a stacking context. */}
             <div className="relative flex flex-col items-center gap-3 px-6 pt-8 pb-6 text-center">
                 <Stripes />
                 <Icon icon={Link2} className="relative" />
@@ -102,8 +91,6 @@ function ShareAgentBody({ agentId, agentName, onClose }: { agentId: string; agen
     )
 }
 
-// Sending the agent alone needs no ceremony. Sending someone's memories, database or files out of
-// the workspace does, and the confirmation spells out what that means rather than asking twice.
 function CreateLinkButton({ flow, agentId, agentName }: { flow: ShareFlow; agentId: string; agentName: string }) {
     const locale = useLocale()
     const t = useTranslations('agent.shareAgentDialog')
@@ -123,7 +110,6 @@ function CreateLinkButton({ flow, agentId, agentName }: { flow: ShareFlow; agent
         flow.include.files && flow.plan.contents.files.count > 0 ? t('carried.files', { count: flow.plan.contents.files.count }) : null,
     ].filter((entry): entry is string => entry !== null)
 
-    // A switch turned on over an empty bucket carries nothing, so there is nothing to confirm.
     if (carried.length === 0) return button
 
     return (

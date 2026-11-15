@@ -40,7 +40,6 @@ function LanguageMenu() {
         }
     }
 
-    // On a phone the menu leaves no room on its right: the list slides back over it instead of off screen.
     const placeSubmenu = (open: boolean) => {
         const right = triggerRef.current?.getBoundingClientRect().right
         if (!open || right === undefined) return

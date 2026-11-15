@@ -1,35 +1,16 @@
-// Curated model catalog for the in-chat model selector.
-//
-// rerun-engine accepts any `${provider}:${model}` string (see engine providers.ts),
-// so this list is purely a UI convenience: it gives friendly labels and groups the
-// models a user is likely to pick. The `keyName` ties each provider group to the
-// per-agent API key that must be set for its models to be "available". Edit freely to
-// add/remove models.
-
 import { DEFAULT_CONNECTION_MODELS, MODEL_LABEL, OPENCODE_SNAPSHOT, isFreeOpencodeModel, modelLabel } from '@rerun/contracts'
 
 import { RERUN_DEMO_MODEL_IDS } from './constants'
 
 export { modelContextWindow, modelLabel } from '@rerun/contracts'
 
-// `power` is a 1-6 capability rating on a single global scale (comparable across
-// providers), surfaced as ascending signal-style bars in the model picker. Optional:
-// custom/unknown models have none and show no bars.
-// Model context windows are not stored here: the authoritative values live in
-// `@rerun/contracts` (MODEL_CONTEXT_WINDOW) so the engine can read them too. Use
-// `modelContextWindow(id)` for the in-chat context gauge.
 export type CatalogModel = { id: string; label: string; power?: number }
 
-// The spelling of every label lives in `@rerun/contracts` (MODEL_LABEL) so the iOS app, which
-// cannot import from here, names the same models the same way.
 const model = (id: string, power?: number): CatalogModel => ({ id, label: modelLabel(id), power })
 
 export type ProviderSection = 'free' | 'subscription' | 'api'
 export type CatalogProvider = { provider: string; label: string; keyName: string; section: ProviderSection; apiKeyUrl?: string; models: CatalogModel[] }
 
-// The `rerun` provider has no per-agent key (keyName: ''): requests are routed
-// through the hub which holds the shared OpenRouter key. Listed first so it is the
-// default a new user sees — try a model without any setup.
 const RERUN_DEMO_MODEL_POWER: Record<(typeof RERUN_DEMO_MODEL_IDS)[number], number> = {
     'rerun-max': 4,
     'rerun-fast': 2,
@@ -70,10 +51,6 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
         keyName: 'CLAUDE_CODE_OAUTH_TOKEN',
         section: 'subscription',
         apiKeyUrl: 'https://docs.claude.com/en/docs/claude-code/setup',
-        // Claude Code's own picker, id for id. `[1m]` is how the CLI names the 1M-context variant of
-        // a model whose default window is smaller; Fable, Opus 5/5.5, Sonnet 5.5 and Haiku 5.5 are 1M
-        // natively and take none. Fable 5.2 needs Claude Code 2.1.321: the binary is the one the Agent SDK
-        // ships inside the engine release.
         models: [
             model('claude-opus-5-5', 5),
             model('claude-fable-5-2', 6),
@@ -97,11 +74,6 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
         keyName: 'CODEX_OAUTH_TOKEN',
         section: 'subscription',
         apiKeyUrl: 'https://developers.openai.com/codex/cli',
-        // `gpt-6.1-sol` and `gpt-6.1-terra` need Codex CLI 0.159.1. A model the box's Codex does not
-        // list for the account is locked (`cliModels`), whether the binary or the plan lacks it.
-        // `gpt-5.5` left Codex for ChatGPT sign-ins on 2026-10-14. GPT-6.1 Sol is still rolling out
-        // plan by plan, so `gpt-6-sol` stays first: the backend can answer 400 "not supported when
-        // using Codex with a ChatGPT account" on a plan that does not have it yet.
         models: [
             model('gpt-6-sol', 5),
             model('gpt-6.1-sol', 5),
@@ -170,11 +142,6 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
         ],
     },
     {
-        // Read from the snapshot OpenCode published when this build was cut; a connection reads the
-        // box's live catalog instead (`providerModels`). The Go models first, the default leading,
-        // then the Console ones. The free Go models are in here though they start switched off: a
-        // picker still has to name one a member has switched on. No power bars: OpenCode lists
-        // dozens of models we never rated.
         provider: 'opencode',
         label: 'OpenCode',
         keyName: 'OPENCODE_API_KEY',
@@ -188,12 +155,8 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
     },
 ]
 
-// Flat lookup of model id -> provider display label (e.g. `rerun-max` -> `Rerun`), built once.
 const MODEL_PROVIDER_LABEL: Record<string, string> = Object.fromEntries(ENGINE_MODEL_CATALOG.flatMap(p => p.models.map(m => [m.id, p.label])))
 
-// Fully-qualified label for logs: provider + model (e.g. `OpenAI GPT-5.5`). Falls back to the
-// bare label, then the raw id, for custom/unknown models. A label that already is the provider's
-// name (`Rerun`) is not doubled.
 export function modelLogLabel(id: string | null | undefined): string {
     if (!id) return ''
     const label = MODEL_LABEL[id]
@@ -202,22 +165,16 @@ export function modelLogLabel(id: string | null | undefined): string {
     return provider && provider !== label ? `${provider} ${label}` : label
 }
 
-// Flat lookup of model id -> power rating, built once.
 const MODEL_POWER: Record<string, number> = Object.fromEntries(ENGINE_MODEL_CATALOG.flatMap(p => p.models.flatMap(m => (m.power ? [[m.id, m.power]] : []))))
 
-// Power rating (1-6) for a model id; undefined for custom/unknown models (no bars shown).
 export function modelPower(id: string | null | undefined): number | undefined {
     return id ? MODEL_POWER[id] : undefined
 }
 
-// Every model id known to the catalog.
 export const ALL_CATALOG_MODEL_IDS: string[] = ENGINE_MODEL_CATALOG.flatMap(p => p.models.map(m => m.id))
 
 const CATALOG_BY_PROVIDER: Record<string, CatalogProvider> = Object.fromEntries(ENGINE_MODEL_CATALOG.map(p => [p.provider, p]))
 
-// The display side of a provider: labels, power ratings, where to get a key. A provider the
-// catalog has never heard of still answers, with an empty model list, so a connection created
-// against a newer engine renders instead of crashing.
 export function catalogFor(provider: string): CatalogProvider {
     return CATALOG_BY_PROVIDER[provider] ?? { provider, label: provider, keyName: '', section: 'api', models: [] }
 }

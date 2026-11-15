@@ -8,8 +8,6 @@ import { fonts, radius, spacing } from '@/theme/tokens'
 
 import { HitlAction } from './HitlCard'
 
-// The step a refusal goes through so the coworker learns why, not only that the user said no. The
-// web's form, drawn in place of the card's actions.
 export function DeclineReasonForm({ note, onNoteChange, onBack, onConfirm, placeholder }: { note: string; onNoteChange: (note: string) => void; onBack: () => void; onConfirm: () => void; placeholder?: string }) {
     const t = useTranslations('mobileHitl')
     const theme = useTheme()

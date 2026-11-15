@@ -9,12 +9,6 @@ import { WELCOME_ORB_SIZE } from '@/components/foreman/constants'
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
-/**
- * Ce que voit un nouvel arrivant pendant que le premier tour part. La colonne s'ouvre toute seule
- * et le message qui la lance est retiré de la pile : sans ça, il n'y a rien à l'écran le temps de
- * trois allers-retours et du premier token. L'orbe porte l'attente, elle n'a pas besoin d'être
- * cliquable ici, celle du composer reste la seule cible.
- */
 export function ForemanWelcome({ thinking, title, subtitle }: { thinking?: boolean; title?: string; subtitle?: string }) {
     const t = useTranslations('foreman.welcome')
     const reducedMotion = useReducedMotion()
@@ -34,9 +28,6 @@ export function ForemanWelcome({ thinking, title, subtitle }: { thinking?: boole
                 <Orb size={WELCOME_ORB_SIZE} state={thinking ? 'thinking' : 'idle'} />
             </motion.div>
 
-            {/* La salutation ne s'adresse qu'au tunnel, et c'est le seul endroit d'où cet accueil
-                se rend désormais : quelqu'un qui revient attend sa conversation derrière un
-                skeleton, on ne lui souhaite pas la bienvenue chez lui. */}
             <motion.div className="space-y-1" {...enter(0.12)}>
                 <h3 className="font-medium text-sm">{title ?? t('title')}</h3>
                 {subtitle ? <p className="text-muted-foreground text-sm text-balance">{subtitle}</p> : <Shimmer className="text-sm">{t('preparing')}</Shimmer>}
