@@ -453,7 +453,7 @@ class Dispatcher:
                         line = "waits on " + ", ".join(("returned #%d" if d in ret else "#%d") % d for d in unmet)
                         data = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "waiting",
                                 "round": 1, "waiting": unmet, "worker": parsed["worker"], "paths": parsed["paths"],
-                                "test": parsed["test"]}
+                                "test": parsed["test"], "plan_dev": parsed["dev"]}
                         if ret:
                             data["waits_on_returned"] = ret
                         if take:
@@ -469,7 +469,7 @@ class Dispatcher:
                              "SMALL FIX: taken by the factory dispatcher on the owner's label."])
                     log(i["number"], "plan line posted")
             job = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "queued", "round": 1,
-                   "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"]}
+                   "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"], "plan_dev": parsed["dev"]}
             if take:
                 job["take"] = take
             if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":
