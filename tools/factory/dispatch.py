@@ -424,9 +424,38 @@ class Dispatcher:
             self.save(job, "queued")
             log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
 
+    def stop_lost(self):
+        live = [j for j in self.jobs() if j["state"] not in END]
+        if not live:
+            return
+        labelled = {i["number"] for i in json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", self.label, "--state", "open",
+                                                              "--json", "number", "--limit", "1000"]) or "[]")}
+        for j in sorted(live, key=lambda j: j["issue"]):
+            state = why = None
+            if j.get("pr"):
+                pr = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state")
+                if pr == "MERGED":
+                    state, why = "merged", "merged outside the delegator"
+                elif pr == "CLOSED":
+                    state, why = "blocked", "pull request #%s closed without merge" % j["pr"]
+            if state is None and j["issue"] not in labelled:
+                state, why = "returned", "issue closed or the %s label removed" % self.label
+            if state is None:
+                continue
+            if j["state"] in RUNNING and j.get("run") and not j.get("sending"):
+                try:
+                    self.account("cancel_run", {"agentId": j["agent"], "runId": j["run"]})
+                except Error as e:
+                    log(j["issue"], "cancel failed: %s" % e)
+                self.store.close_run(j["run"], "cancelled", error=why[:200])
+            j.update(relabelled=True, commented=True)
+            log(j["issue"], "stopped: %s" % why)
+            self.end(j, state, why)
+
     def reconcile(self):
         if self.beats % RECONCILE_BEATS:
             return
+        self.stop_lost()
         cands = [j for j in self.jobs() if j["state"] in ("blocked", "failed", "returned") and j.get("relabelled")
                  and "closed_seen" not in self.store.get_all(str(j["issue"]))]
         if not cands:
