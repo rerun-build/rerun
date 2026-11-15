@@ -20,8 +20,9 @@ class Reconcile(unittest.TestCase):
                 return "[]"
             if args[:2] == ["pr", "view"]:
                 return json.dumps({"state": self.prs.get(int(args[2]), "OPEN")})
-            if args[:2] == ["issue", "view"]:
-                return json.dumps({"closedByPullRequestsReferences": [{"number": n} for n in self.refs.get(int(args[2]), [])]})
+            if args[:2] == ["api", "graphql"]:
+                n = int(next(a for a in args if a.startswith("n="))[2:])
+                return json.dumps([{"number": r} for r in self.refs.get(n, [])])
             return "[]"
 
         cfg = {"repo": "o/r", "label": "factory", "max_jobs": 8, "auto_plan_marker": True,
@@ -145,9 +146,9 @@ class Reconcile(unittest.TestCase):
         self.once(10)
         self.assertEqual(self.job(5)["state"], "merged")
         self.assertEqual(self.job(6)["state"], "returned")
-        self.assertEqual(self.count("issue", "view"), 2)
+        self.assertEqual(self.count("api", "graphql"), 2)
         self.once(10)
-        self.assertEqual(self.count("issue", "view"), 2)
+        self.assertEqual(self.count("api", "graphql"), 2)
 
 
 if __name__ == "__main__":

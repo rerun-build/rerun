@@ -41,7 +41,7 @@ class Intake(Base):
         self.w.issues[0]["body"] = "PLAN READY (facts read on main)\n" + ready()
         self.tick(2)
         line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
-        self.assertTrue(line.endswith(" | unreadable 1"), line)
+        self.assertTrue(line.endswith(" | unreadable 1, dead waits 0"), line)
 
 
 if __name__ == "__main__":

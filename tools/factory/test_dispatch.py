@@ -31,6 +31,7 @@ class World:
         self.cut_off_next_send = False
         self.mergeable, self.unlabelled = "MERGEABLE", set()
         self.open_numbers = {7, 129}
+        self.close_reasons = {}
         self.open_prs = []
         self.ledger = None
         self.intent_seen = []
@@ -113,6 +114,9 @@ class World:
             return json.dumps(self.open_prs)
         if a[0] == "api" and "/timeline" in a[1]:
             return "[]"
+        if a[0] == "api" and "/issues/" in a[1]:
+            n = int(a[1].rsplit("/", 1)[1])
+            return json.dumps({"state": "open" if n in self.open_numbers else "closed", "state_reason": self.close_reasons.get(n, "completed")})
         if a[0] == "api":
             sha = a[1].split("head_sha=")[1].split("&")[0]
             return json.dumps({"workflow_runs": self.workflows.get(sha, [])})
@@ -990,8 +994,8 @@ class Heartbeat(Base):
         self.tick()
         line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
         self.assertEqual(line, "1970-01-01T00:16:40Z beat 2 | waiting 1, queued 0, building 1, review_wait 0, reviewing 0, "
-                               "fix_wait 0, fixing 0, checks 0, proof_wait 0, proving 0 | ended today: merged 1, blocked 0, failed 0, returned 0"
-                               " | unreadable 0")
+                               "fix_wait 0, fixing 0, checks 0, proof_wait 0, proving 0 | ended today: merged 1, blocked 0, failed 0, returned 0,"
+                               " rejected 0 | unreadable 0, dead waits 0")
         self.assertIn(line, self.out.getvalue().splitlines())
         
         self.assertFalse([f for f in os.listdir(self.dir.name) if f.startswith("heartbeat") and f != "heartbeat"])

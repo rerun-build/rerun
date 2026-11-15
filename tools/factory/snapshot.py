@@ -50,7 +50,7 @@ def _reason(j):
     if state in END:
         text = j.get("reason")
     elif state == "waiting":
-        text = "waits on " + ", ".join("#%d" % d for d in j["waiting"]) if j.get("waiting") else j.get("wait_reason")
+        text = j.get("wait_line") or ("waits on " + ", ".join("#%d" % d for d in j["waiting"]) if j.get("waiting") else j.get("wait_reason"))
     elif state in WAIT_STATES:
         text = j.get("wait_reason")
     else:
