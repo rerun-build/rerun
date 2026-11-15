@@ -5,14 +5,14 @@ Source: git grep for setTimeout(, setInterval(, waitForTimeout(, sleep(, delay( 
 
 ## Counts
 
-Total sites: 249. kept: 242. no real reason: 7.
+Total sites: 249. kept: 249. no real reason: 0.
 
 | Area | kept | no real reason | total |
 |---|---|---|---|
-| apps/desktop-app | 5 | 1 | 6 |
+| apps/desktop-app | 6 | 0 | 6 |
 | apps/engine | 38 | 0 | 38 |
-| apps/mobile | 42 | 2 | 44 |
-| apps/ui | 117 | 4 | 121 |
+| apps/mobile | 44 | 0 | 44 |
+| apps/ui | 121 | 0 | 121 |
 | packages/analytics | 1 | 0 | 1 |
 | packages/contracts | 3 | 0 | 3 |
 | packages/ui | 28 | 0 | 28 |
@@ -32,13 +32,20 @@ Helper names follow the Guards table in docs/research/2026-11-14-quality-pass/PL
 
 ## Method and limits
 
-Each site was read with 1 to 7 lines around it. The mark is verified where the code shows the reason, inference where the reason rests on a constant name or a guess. Rows that share a file and a pattern reuse one reason. Not checked: the PLAN.md Guards table text, the values of the constants, the CSS behind transition delays, whether any no real reason timer can go without breaking a test or a visual, and whether wider surroundings change a verdict. The 249 sites are the output of the command at 4296d1f; no .kt site matched.
+Each site was read with 1 to 7 lines around it. The mark is verified where the code or the old comment at 86d04999 shows the reason, inference where the reason rests on a constant name or a guess. The seven rows once marked no real reason were reread at 86d04999 on 2026-11-15 and all moved to kept; two of them stay inference (capture-store-shots.mjs:45, ForemanChat.tsx:199). Rows that share a file and a pattern reuse one reason. Not checked: the PLAN.md Guards table text, the values of the constants, the CSS behind transition delays, whether any no real reason timer can go without breaking a test or a visual, and whether wider surroundings change a verdict. The 249 sites are the output of the command at 4296d1f; no .kt site matched.
+
+## How to read a line's reason after #444
+
+- #444 removed the code comments; the reason a line had is in `git show 86d04999:<path>`.
+- 86d04999 is the commit before #444 landed on dev, from the #443 merge.
+- Find the line with `git show 86d04999:<path> | grep -n <pattern>`; line numbers differ from dev.
+- A verdict made without that read is `inference`.
 
 ## Table
 
 | Site | Waits for | Verdict | Reason | Check |
 |---|---|---|---|---|
-| `apps/desktop-app/src/main/ipc-handlers.ts:88` | nothing nameable (50 ms before replacing the main window) | no real reason | waits for no event or promise; looks like a leftover race guard | inference |
+| `apps/desktop-app/src/main/ipc-handlers.ts:88` | the reply reaching the window before it is replaced (50 ms) | kept | old comment at 86d04999: "Answered before the window that asked is replaced."; the 50 ms lets the answer leave before resetQuickAsk and replaceMainWindow run. Git log on the line gives only the feature commits d2c72e76 and c08ca6e9 (2026-11-12), no reason beyond the comment | verified |
 | `apps/desktop-app/src/main/main-window.ts:252` | the ready-to-show event | kept | deadline: shows the window after 3 s if ready-to-show never fires | verified |
 | `apps/desktop-app/src/main/updater.ts:61` | a poll of the update server | kept | first check after FIRST_CHECK_DELAY_MS then a poll every CHECK_EVERY_MS; no event exists for a new release | verified |
 | `apps/desktop-app/src/main/updater.ts:62` | a poll of the update server | kept | first check after FIRST_CHECK_DELAY_MS then a poll every CHECK_EVERY_MS; no event exists for a new release | verified |
@@ -82,7 +89,7 @@ Each site was read with 1 to 7 lines around it. The mark is verified where the c
 | `apps/engine/src/tools/mcp.ts:98` | an MCP probe | kept | deadline: bounds the wait (timeout or abort) | verified |
 | `apps/engine/src/tools/virtual-display.ts:35` | an unused virtual display | kept | idle timer that stops Xvfb after IDLE_STOP_MS | verified |
 | `apps/engine/src/tools/virtual-display.ts:64` | Xvfb start | kept | deadline: START_TIMEOUT_MS kills a start that never reports | verified |
-| `apps/mobile/scripts/capture-store-shots.mjs:45` | the app to render before a screenshot | no real reason | fixed waits (LAUNCH_MS, SETTLE_MS, 1500, 2000) before screenshots wait for no named event; a screenshot could wait for a selector or text | inference |
+| `apps/mobile/scripts/capture-store-shots.mjs:45` | a fresh app launch, a sheet or the Foreman overlay opening, the buddies settling | kept | a macOS hand script, unprovable. Old comments at 86d04999: LAUNCH_MS "A fresh launch per shot: a deep link pushes on top of the previous screen, sheets included."; SETTLE_MS "Long enough for a sheet or the Foreman overlay to finish opening and the buddies to settle." Line 45 on dev is the shared wait helper. Not run: needs a simulator. Git log gives only Snapshot fabbcac8 (2026-11-06) | inference |
 | `apps/mobile/src/app/_layout.tsx:58` | a route to settle before navigating | kept | delayed push of the lead chat, cleared on unmount | inference |
 | `apps/mobile/src/app/lab-consent.tsx:19` | a simulated answer or animation | kept | lab or mock screen: the delay simulates latency or an animation; there is no real call to wait on | verified |
 | `apps/mobile/src/app/lab-delegate.tsx:34` | a simulated answer or animation | kept | lab or mock screen: the delay simulates latency or an animation; there is no real call to wait on | verified |
@@ -102,7 +109,7 @@ Each site was read with 1 to 7 lines around it. The mark is verified where the c
 | `apps/mobile/src/chat/useSkillProposals.ts:87` | skill proposals | kept | poll with a stop: quick then relaxed interval, cleared on unmount; the third site is a dismissal timer | verified |
 | `apps/mobile/src/components/auth/useSecondsSince.ts:6` | a clock | kept | interval that re-renders a displayed clock or elapsed time; cleared on unmount | verified |
 | `apps/mobile/src/components/chat/AuthoredGroup.tsx:52` | a user pause | kept | resets the named highlight after NAMED_FOR_MS | verified |
-| `apps/mobile/src/components/chat/ForemanChat.tsx:199` | the server writing a title (TITLE_DELAY_MS 4000) | no real reason | reads the title once after a guessed delay; hides a race, a title event or a poll with a stop would name it | inference |
+| `apps/mobile/src/components/chat/ForemanChat.tsx:199` | the hub titling the session from its first message (TITLE_DELAY_MS 4000) | kept | old comment at 86d04999: "The hub titles it from its first message, a moment after it answers the send." readLastTitle (:117) calls fetchForemanConversation once, sets the title only if the last conversation has a session id and a title, and returns undefined on error; nothing re-reads if the title is not yet written, so a slow hub leaves the row untitled. In ForemanChat.tsx and a grep of apps/mobile/src no title event or poll with a stop exists; the hub API for one was not read. A poll with a stop would be the fix, not done here. Git log gives only Snapshot fabbcac8 (2026-11-06) | inference |
 | `apps/mobile/src/components/chat/VoiceRecorderBar.tsx:40` | a recording | kept | poll of recorder state while recording; cleared when it stops | verified |
 | `apps/mobile/src/components/chat/VoiceWaveform.tsx:72` | an animation frame | kept | frame timer for the waveform | verified |
 | `apps/mobile/src/components/chat/markdown/CodeBlock.tsx:22` | a user pause | kept | resets a copied or saved confirmation flag after a fixed display time | verified |
@@ -164,11 +171,11 @@ Each site was read with 1 to 7 lines around it. The mark is verified where the c
 | `apps/ui/components/deploy-update/DeployUpdateWatcher.tsx:77` | a new deploy | kept | poll every VERSION_CHECK_INTERVAL_MS plus a check on tab visibility | verified |
 | `apps/ui/components/dialogs/LinkedinProDialog.tsx:64` | a connection status | kept | poll every POLL_MS and a slow or expiry deadline; the 1500 ms reload is a separate row | verified |
 | `apps/ui/components/dialogs/LinkedinProDialog.tsx:73` | a connection status | kept | poll every POLL_MS and a slow or expiry deadline; the 1500 ms reload is a separate row | verified |
-| `apps/ui/components/dialogs/LinkedinProDialog.tsx:170` | nothing nameable (1500 ms before a second reload) | no real reason | reloads right away and again after 1.5 s to catch a server update with no event; a poll with a stop or an event would name it | inference |
+| `apps/ui/components/dialogs/LinkedinProDialog.tsx:170` | the Stripe webhook moving the slot count (1500 ms) | kept | belongs to the payments replacement; file left alone. Old comment at 86d04999: "The webhook moves the slot count, a moment after Stripe answers." Git log gives only Snapshot fabbcac8 (2026-11-06) | verified |
 | `apps/ui/components/dialogs/ServersDialog.tsx:173` | server status | kept | poll every POLL_MS, cleared on unmount | verified |
 | `apps/ui/components/dialogs/WhatsappProDialog.tsx:69` | a connection status | kept | poll every POLL_MS and a slow or expiry deadline; the 1500 ms reload is a separate row | verified |
 | `apps/ui/components/dialogs/WhatsappProDialog.tsx:92` | a connection status | kept | poll every POLL_MS and a slow or expiry deadline; the 1500 ms reload is a separate row | verified |
-| `apps/ui/components/dialogs/WhatsappProDialog.tsx:195` | nothing nameable (1500 ms before a second reload) | no real reason | same pattern as LinkedinProDialog.tsx:170 | inference |
+| `apps/ui/components/dialogs/WhatsappProDialog.tsx:195` | the Stripe webhook moving the slot count (1500 ms) | kept | same as LinkedinProDialog.tsx:170: belongs to the payments replacement; file left alone. Same old comment at 86d04999. Git log gives only Snapshot fabbcac8 (2026-11-06) | verified |
 | `apps/ui/components/dialogs/new-box/NamePlaceholder.tsx:38` | a typing animation | kept | animation timing | verified |
 | `apps/ui/components/dialogs/new-box/NamePlaceholder.tsx:80` | a typing animation | kept | animation timing | verified |
 | `apps/ui/components/factory/FactoryInspector.tsx:42` | a clock | kept | interval that re-renders a displayed clock or elapsed time; cleared on unmount | verified |
@@ -186,7 +193,7 @@ Each site was read with 1 to 7 lines around it. The mark is verified where the c
 | `apps/ui/components/foreman/getting-started/GettingStartedPopover.tsx:54` | pointer leaving | kept | debounce before closing the popover | verified |
 | `apps/ui/components/foreman/intake/useForemanIntake.ts:130` | typing pause | kept | debounce before analysing the text | verified |
 | `apps/ui/components/foreman/useForemanChat.ts:284` | chat history after a run | kept | poll with a stop: bounded reconcile loop, 600 ms apart | verified |
-| `apps/ui/components/foreman/useForemanScriptedSteps.ts:78` | a board render (RECENTER_DELAY_MS 400 ms) | no real reason | recentres the board after new cards render with a guessed delay; hides a race, a layout effect or store event would name it | inference |
+| `apps/ui/components/foreman/useForemanScriptedSteps.ts:78` | the Boxes the build inserted arriving over realtime (RECENTER_DELAY_MS 400 ms) | kept | old comment at 86d04999 lines 25-26: "Long enough for the Boxes the build inserted to arrive over realtime, which the framing is read from, short enough to land while the build block is still the last thing on screen." It has a reason; the 400 ms is a guess at that arrival, and #482 replaces it with the arrival of those Boxes. Git log gives only Snapshot 49a1cad2 (2026-10-29) | verified |
 | `apps/ui/components/foreman/useForemanTurnNotification.ts:43` | a turn notification | kept | delay before showing the browser notification | inference |
 | `apps/ui/components/layout/HomeContent.tsx:104` | a loader shown too briefly | kept | minimum display time MIN_LOADER_MS, avoids a flash | inference |
 | `apps/ui/components/layout/useSheetResize.ts:119` | the click that follows a drag release | kept | 0 ms: removes the click swallower after the browser click event | verified |
@@ -232,7 +239,7 @@ Each site was read with 1 to 7 lines around it. The mark is verified where the c
 | `apps/ui/lib/hairline/kernel.js:424` | pointer leave | kept | debounce before on.leave | verified |
 | `apps/ui/lib/notifications/browser.ts:81` | another tab claiming a notification | kept | CLAIM_HOLD_MS lock across tabs | verified |
 | `apps/ui/lib/notifications/browser.ts:89` | another tab claiming a notification | kept | CLAIM_SETTLE_MS then check the claim: cross-tab arbitration has no event | verified |
-| `apps/ui/lib/oauth/popup-result.ts:22` | the opener receiving a message | no real reason | closes the popup after 400 ms; postMessage is synchronous, so the close can follow immediately | inference |
+| `apps/ui/lib/oauth/popup-result.ts:22` | BroadcastChannel and opener messages leaving before the popup closes (400 ms) | kept | the 86d04999 page script posts to BroadcastChannel and to window.opener, then closes after 400 ms; the old code had no comment, the order shows the close follows the sends. Git log gives only the Snapshot commit 49a1cad2 (2026-10-29), so no history on why 400 ms | verified |
 | `apps/ui/lib/sandbox/useEnsureSandboxSpace.ts:47` | a failed ensure | kept | retry after RETRY_MS, cleared | verified |
 | `apps/ui/lib/storage/private.ts:34` | a failed download | kept | retry with jittered back-off, bounded by DOWNLOAD_RETRY_DELAYS_MS | verified |
 | `apps/ui/lib/use-copy.ts:21` | a user pause | kept | resets a copied or saved confirmation flag after a fixed display time | verified |
