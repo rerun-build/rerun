@@ -11,6 +11,7 @@ FINAL = re.compile(r"(?m)^(CUT|BLOCKED):[ \t]*(.*)$")
 LABEL = "factory-plan"
 READY = "factory"
 EVERY = 5
+RUN_LIMIT = 2700
 PARALLEL = 2
 GOAL = [{"prefix": "CUT:", "rest": "sentence"}, {"prefix": "BLOCKED:", "rest": "sentence"}]
 
@@ -140,8 +141,60 @@ class Station:
     def once(self, beat):
         if not self.pool or not self.auto:
             return
+        for n, row in sorted(self.live().items()):
+            self.poll(n, row)
         if (beat - 1) % EVERY == 0:
             self.start()
+
+    def poll(self, n, row):
+        if row.get("state") == "sending":
+            self.finish(n, "lost", "the send was cut off before a run id was kept")
+            return
+        agent, run = row["agent"], row["run"]
+        got = self.account("get_run", {"agentId": agent, "runId": run}) or {}
+        status = got.get("status")
+        if status == "running":
+            limit = self.cfg.get("clocks", {}).get("run_limit_s", RUN_LIMIT)
+            if self.now() - epoch(row["started"]) > limit:
+                self.account("cancel_run", {"agentId": agent, "runId": run})
+                self.finish(n, "blocked", "the plan run passed its limit of %s s" % limit)
+            return
+        if status != "done":
+            self.finish(n, "blocked", "the plan run ended %s" % status)
+            return
+        kind, rest = outcome(got.get("output"))
+        if kind == "CUT":
+            self.label(rest)
+            self.finish(n, "cut", ", ".join("#%d" % k for k in rest))
+            return
+        self.finish(n, "blocked", rest)
+        try:
+            self.gh(["issue", "comment", str(n), "-R", self.repo, "--body", "The factory planner stopped: %s" % rest])
+        except Exception:
+            pass
+
+    def finish(self, n, state, why):
+        job = "plan:%d" % n
+        self.store.set(job, "state", state)
+        self.store.set(job, "why", why)
+        try:
+            self.gh(["issue", "edit", str(n), "-R", self.repo, "--remove-label", LABEL])
+        except Exception:
+            pass
+
+    def label(self, numbers):
+        children = []
+        for k in numbers[:30]:
+            children.append(json.loads(self.gh(["issue", "view", str(k), "-R", self.repo, "--json",
+                                                "number,title,body,labels"])))
+        found = problems(children, self.gh, self.repo)
+        for child in children:
+            k = child["number"]
+            errors = found.get(k, [])
+            if errors:
+                self.gh(["issue", "comment", str(k), "-R", self.repo, "--body", comment(errors)])
+            elif READY not in names(child):
+                self.gh(["issue", "edit", str(k), "-R", self.repo, "--add-label", READY])
 
     def start(self):
         room = self.parallel - len(self.live())
