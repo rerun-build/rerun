@@ -29,6 +29,7 @@ const factoryRunSchema = z.object({
     endedAt: isoTime.nullable(),
     tokensIn: count,
     tokensOut: count,
+    cacheRead: count.optional(),
     runId: z.string().max(64).nullable(),
 }).strict()
 
