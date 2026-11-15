@@ -16,6 +16,7 @@ import { skillProposalRoutes } from './routes/skill-proposals.js'
 import { scheduleRoutes } from './routes/schedules.js'
 import { triggerRoutes } from './routes/triggers.js'
 import { runRoutes, usageRoutes } from './routes/runs.js'
+import { workspaceUsageRoutes } from './routes/workspace-usage.js'
 import { statsRoutes } from './routes/stats.js'
 import { rewindRoutes } from './routes/rewind.js'
 import { toolRoutes } from './routes/tools.js'
@@ -71,6 +72,7 @@ export function createServer(): Hono {
     api.route('/agents/:id/schedules', scheduleRoutes)
     api.route('/agents/:id/triggers', triggerRoutes)
     api.route('/agents/:id/runs', runRoutes)
+    api.route('/usage', workspaceUsageRoutes)
     api.route('/agents/:id/usage', usageRoutes)
     api.route('/agents/:id/stats', statsRoutes)
     api.route('/agents/:id/rewind', rewindRoutes)
