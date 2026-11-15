@@ -278,7 +278,9 @@
         "countWithFailures": "{count, plural, one {# step} other {# steps}}, {failed} failed",
         "failed": "{failed} failed",
         "thinking": "Thinking",
-        "compacting": "Compacting"
+        "compacting": "Compacting",
+        "mcpReconnected": "Reconnected {name}",
+        "mcpReconnectedNextMessage": "Reconnected {name}: takes effect on the next message"
     },
     "subRun": {
         "failuresInARow": "{count} failures in a row",
