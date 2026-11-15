@@ -15,6 +15,7 @@ import { NeedsAuthCard, NotificationCard, SetupCompleteCard } from '@/components
 import { McpServerCard } from '@/components/chat/McpServerCard'
 import { TableCard } from '@/components/chat/TableCard'
 import { CompactionStep, type CompactionData } from '@/components/chat/CompactionBlock'
+import { McpReconnectBlock } from '@/components/chat/McpReconnectBlock'
 import { ExpandableMessage } from '@/components/chat/ExpandableMessage'
 import { MessageBubbles } from '@/components/chat/MessageBubbles'
 import { MessageTimeTooltip } from '@/components/chat/MessageTimeTooltip'
@@ -51,9 +52,9 @@ import { parseTriggerPayload } from '@/lib/triggers/trigger-payload'
 import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { cn } from '@/lib/utils'
-import { QUICK_REPLIES_TOOL, fileCardSchema, messageText, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
+import { QUICK_REPLIES_TOOL, fileCardSchema, mcpReconnectEventSchema, messageText, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
-import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
+import { BrainIcon, FoldVerticalIcon, PlugIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { Fragment, isValidElement, memo, type ReactNode } from 'react'
 
@@ -188,6 +189,13 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 const key = cp.id ?? gkey
                 const node = <CompactionStep data={cp.data} />
                 return { kind: 'group-item', key, iconProps: { icon: FoldVerticalIcon }, node, status: cp.data.status, runningLabel: t('steps.compacting') }
+            }
+            if (part.type === 'data-mcp-reconnect') {
+                const rp = part as unknown as { id?: string; data: unknown }
+                const parsed = mcpReconnectEventSchema.safeParse(rp.data)
+                if (!parsed.success) return null
+                const node = <McpReconnectBlock data={parsed.data} />
+                return { kind: 'group-item', key: rp.id ?? gkey, iconProps: { icon: PlugIcon }, node, status: 'done' }
             }
             if (part.type.startsWith('tool-') || part.type === 'dynamic-tool') {
                 const toolPart = part as { toolCallId: string; state: string; toolName?: string; input?: unknown; inputText?: string; output?: unknown; errorText?: string; type: string; approval?: { id: string } }
