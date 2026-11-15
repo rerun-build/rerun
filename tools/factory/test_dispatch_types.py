@@ -31,7 +31,7 @@ class Types(unittest.TestCase):
             self.assertNotIn(k, cfg)
         coder, rev = cfg["types"]["coder"], cfg["types"]["reviewer"]
         self.assertEqual({c["name"]: c["runs"] for c in coder["coworkers"]}, {"code": 6, "LARRY": 1})
-        self.assertEqual({c["name"]: c["runs"] for c in rev["coworkers"]}, {"LINUS": 3, "BRUCE": 1})
+        self.assertEqual({c["name"]: c["runs"] for c in rev["coworkers"]}, {"LINUS": 3, "BRUCE": 3})
         self.assertEqual([c["name"] for c in coder["coworkers"]], ["code", "LARRY"])
         self.assertEqual([c["name"] for c in rev["coworkers"]], ["LINUS", "BRUCE"])
         ids = [c["id"] for c in coder["coworkers"] + rev["coworkers"]]
