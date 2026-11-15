@@ -74,7 +74,7 @@ P6=$(dcurl 10 -o /dev/null -w '%{http_code}' -X POST -H 'content-type: applicati
 say "P6 dev-cancel-missing-run http=${P6:-none}"
 DEVKEY=
 
-P8=$(docker exec -e RERUN_API_KEY= "$DEV" sh -c '
+P8=$(docker exec "$DEV" sh -c '
     me=$$; n=0
     for f in /proc/[0-9]*/environ; do
         pid=${f#/proc/}; pid=${pid%/environ}
