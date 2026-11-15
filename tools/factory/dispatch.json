@@ -61,6 +61,25 @@
           "runs": 1
         }
       ]
+    },
+    "planner": {
+      "coworkers": [
+        {
+          "id": "39311ebf-8324-42a4-8ab4-770acd1653f2",
+          "name": "Boss",
+          "runs": 1
+        },
+        {
+          "id": "1b325848-c3fd-4e6f-9ad7-43f3adac08b6",
+          "name": "Scope Shaper",
+          "runs": 1
+        },
+        {
+          "id": "50bd7e97-bd0b-4236-be49-25fbe3f8c71f",
+          "name": "IKE",
+          "runs": 1
+        }
+      ]
     }
   }
 }
