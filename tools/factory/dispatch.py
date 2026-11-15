@@ -395,16 +395,22 @@ class Dispatcher:
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", self.label, "--state", "open",
                                      "--json", "number,title,body", "--limit", "100"]))
         for i in issues:
-            body, fixed = sifter.sift(i.get("body"))
-            if not fixed:
+            old = self.store.get_job(str(i["number"]))
+            if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
+                continue
+            if not sifter.sift(i.get("body"))[1]:
                 continue
             try:
-                self.gh(["issue", "edit", str(i["number"]), "-R", self.repo, "--body", body])
+                fresh = json.loads(self.gh(["issue", "view", str(i["number"]), "-R", self.repo, "--json", "body"]))["body"]
+                body, fixed = sifter.sift(fresh)
+                if fixed:
+                    self.gh(["issue", "edit", str(i["number"]), "-R", self.repo, "--body", body])
             except Error as e:
                 log(i["number"], "sift not written: %s" % e)
                 continue
             i["body"] = body
-            log(i["number"], "sifted: " + ", ".join(fixed))
+            if fixed:
+                log(i["number"], "sifted: " + ", ".join(fixed))
         open_numbers = None
         shape = cutshape.check(issues)
         self.unreadable = sum(1 for e in shape.values() if e)
