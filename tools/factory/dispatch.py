@@ -77,7 +77,7 @@ def issue_run(body):
 
 
 def verdict_head(verdict):
-    m = re.search(r"@([0-9a-f]{7,40})\b", verdict)
+    m = re.search(r"(?:@| at )([0-9a-f]{7,40})\b", verdict)
     return m.group(1)[:7] if m else None
 
 
@@ -675,7 +675,11 @@ class Dispatcher:
             elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif stale:
-                self.end(j, "rejected", "verdict names %s, the head is %s: %s" % (named or "no commit", j["head"][:7], verdict[:100]))
+                why = "verdict names %s, the head is %s: asked again" % (named or "no commit", j["head"][:7])
+                if j.get("verdict_asked"):
+                    self.end(j, "blocked", why)
+                else:
+                    self.to(j, "review_wait", why, verdict_asked=1)
             else:
                 self.end(j, "rejected", verdict[:200] or last_line(out))
         elif st == "fix_wait":
