@@ -7,14 +7,17 @@ import holds
 import pools
 import renewal
 import snapshot
+import states
 import store as ledger_store
 import waits
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WAIT_S = 1
-RUNNING = ("building", "reviewing", "fixing")
-END = ("merged", "rejected", "blocked", "failed", "returned")
-BACK = {"building": "queued", "reviewing": "review_wait", "fixing": "fix_wait"}
+RUNNING = states.RUNNING
+END = states.END
+BACK = states.BACK
+GOALS = states.GOALS
+WAIT_STATES = states.WAIT_STATES
 LOST_BEATS = 3
 RECONCILE_BEATS = 10
 REPORT_QUIET_S = 90
@@ -55,11 +58,6 @@ def blocked_reason(out):
     return rest[-1][-200:] if rest else "no final line"
 
 
-GOALS = {
-    "building": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"}],
-    "fixing": [{"prefix": "PUSHED: ", "rest": "sha"}, {"prefix": "BLOCKED: ", "rest": "sentence"}],
-    "reviewing": [{"prefix": "VERDICT: ", "rest": "sentence"}],
-}
 
 
 def plain(body):
@@ -243,7 +241,6 @@ def checks_verdict(runs):
     return "OK", None
 
 
-WAIT_STATES = ("waiting", "queued", "review_wait", "fix_wait")
 
 
 class Dispatcher:
@@ -566,9 +563,9 @@ class Dispatcher:
         st = j["state"]
         if j.get("sending"):
             return self.lost_run(j)
-        if st in ("queued", "review_wait", "fix_wait") and holds.active(self.store, self.now()) is not None:
+        if st in states.QUEUE and holds.active(self.store, self.now()) is not None:
             return
-        if st in ("queued", "review_wait", "fix_wait") and j.get("not_before") and self.now() < j["not_before"]:
+        if st in states.QUEUE and j.get("not_before") and self.now() < j["not_before"]:
             return
         if st == "queued":
             got = self.free(j.get("worker", "coder"))
@@ -622,6 +619,8 @@ class Dispatcher:
             self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=2)
         elif st == "checks":
             self.checks(j)
+        elif st == "proof_wait" or st == "proving":
+            self.end(j, "blocked", "the proof step is not built yet")
 
     def blocked(self, j, out):
         why = self.not_met_reason(j, out)
@@ -707,7 +706,7 @@ class Dispatcher:
         for j in self.jobs():
             if j["state"] in ended and str(j.get("updated_at") or "").startswith(today):
                 ended[j["state"]] += 1
-        stages = ("waiting", "queued", "building", "review_wait", "reviewing", "fix_wait", "fixing", "checks")
+        stages = states.STAGES
         line = "%s beat %d | %s | ended today: %s" % (
             iso(self.now()), self.beats, ", ".join("%s %d" % (s, count.get(s, 0)) for s in stages),
             ", ".join("%s %d" % (s, n) for s, n in ended.items()))
