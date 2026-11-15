@@ -130,7 +130,10 @@ The engine runs in Docker, one container per workspace, next to the app or on a 
 ```bash
 docker build -f apps/engine/Dockerfile -t rerun-engine .   # from the repository root
 docker run -d -p 3000:3000 -v rerun-engine:/data --shm-size 2g -e RERUN_API_KEY=<key> -e RERUN_HUB_BASE_URL=<app url> rerun-engine
+docker run -d -p 3000:3000 -v rerun-engine:/data --shm-size 2g -v <key file>:/run/secrets/rerun_api_key:ro -e RERUN_API_KEY_FILE=/run/secrets/rerun_api_key -e RERUN_HUB_BASE_URL=<app url> rerun-engine
 ```
+
+With `RERUN_API_KEY_FILE` the key never enters the container environment.
 
 The app attaches it to a workspace: the first one gets the engine of `docker-compose.yml`, any
 other is paired from Servers, in the workspace menu (see https://docs.rerun.build/self-host/servers).
@@ -139,7 +142,7 @@ the data-dir migrates itself on start.
 
 ### Securing a public deployment
 
-- **API key.** Always set `RERUN_API_KEY` (a paired server generates its own): without it the API is open.
+- **API key.** Always set a key (a paired server generates its own): without it the API is open. Prefer a file: set `RERUN_API_KEY_FILE` to the path of a file holding the key, for example a Docker or Compose secret mounted at `/run/secrets/...`. `RERUN_API_KEY` stays as the fallback, but a variable set on the container is visible to every `docker exec` and to `docker inspect`.
 - **TLS.** Don't expose port 3000 in clear. Keep the engine bound locally (`RERUN_HOST=127.0.0.1`)
   and put a reverse proxy in front for HTTPS — with Caddy that's a single `reverse_proxy
   localhost:3000` block (automatic certificates).
@@ -155,5 +158,6 @@ Chromium, the desktop packages and the Codex CLI. Its data-dir is `/data`.
 | `RERUN_PORT` | `3000` | HTTP port |
 | `RERUN_HOST` | `0.0.0.0` | Bind address |
 | `RERUN_API_KEY` | _unset_ | Bearer token for the API (open if unset); also used to authenticate to the UI's `/api/embed` |
+| `RERUN_API_KEY_FILE` | _unset_ | Path of a file holding the key. Read once at start; wins over `RERUN_API_KEY`; a missing or empty file stops the start. The key never sits in the container environment |
 | `RERUN_HUB_BASE_URL` | _unset_ | Public UI base URL for embeddings and agent notifications |
 | `RERUN_LOG_LEVEL` | `info` | pino log level |
