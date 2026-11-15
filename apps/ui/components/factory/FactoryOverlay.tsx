@@ -7,9 +7,9 @@ import { Gate, GATE_CSS } from './FactoryGate'
 import { HOLD_CSS, HoldBarrier } from './FactoryHold'
 import { FeatureTank, RejectTank, TANK_CSS } from './FactoryTank'
 import { Sphere, SPHERE_CSS } from './FactorySphere'
-import { type CabinetView, type PodView } from './factory-scene'
+import { type CabinetView, type PlanView, type PodView } from './factory-scene'
 
-export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, holdLeftMs = 0, links = [], selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; rejects: number; held: boolean; holdLeftMs?: number; links?: TileLink[]; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
+export function FactoryOverlay({ tiles, routes, pods, cabinets, plans = [], rejects, held, holdLeftMs = 0, links = [], selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; plans?: PlanView[]; rejects: number; held: boolean; holdLeftMs?: number; links?: TileLink[]; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
     const lineIndex = new Map<string, number>()
     const belts = new Map<string, PodView[]>()
@@ -25,6 +25,12 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, rejects, held, h
             {cabinets.map(c => {
                 const t = byId.get(`cab-${c.issue}`)
                 return t ? <FeatureTank key={c.issue} cab={c} tile={t} /> : null
+            })}
+            {plans.map(p => {
+                const t = byId.get(`plan-${p.parent}`)
+                if (!t) return null
+                const slots = Array.from({ length: Math.max(p.children, 1) }, (_, i) => ({ issue: i, state: i < p.filed ? 'merged' as const : 'empty' as const, arriving: 1 }))
+                return <div key={`plan-${p.parent}`} className="absolute left-0 top-0" data-plan={p.parent} style={{ filter: 'hue-rotate(150deg)' }}><FeatureTank cab={{ issue: p.parent, title: p.title, tasks: [], at: t.position, slots }} tile={t} /></div>
             })}
             {held && links.filter(l => l.variant === 'belt' && l.source === 'Delegator').map(l => {
                 const key = `${l.source}->${l.target}`
