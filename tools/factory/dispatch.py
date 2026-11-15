@@ -314,6 +314,12 @@ class Dispatcher:
         return got[1] if got else None
 
     def to(self, j, state, msg, **kw):
+        if not states.allowed(j["state"], state):
+            why = "refused move %s -> %s: %s" % (j["state"], state, msg)
+            log(j["issue"], why)
+            if j["state"] in END:
+                return
+            state, msg, kw = "blocked", "blocked: " + why[:180], {"reason": why[:200], "sending": None}
         j.update(kw, state=state)
         self.save(j, msg, reset=True)
         log(j["issue"], msg)
