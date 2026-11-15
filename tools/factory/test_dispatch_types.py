@@ -30,7 +30,7 @@ class Types(unittest.TestCase):
         for k in ("builders", "reviewers", "max_jobs"):
             self.assertNotIn(k, cfg)
         coder, rev = cfg["types"]["coder"], cfg["types"]["reviewer"]
-        self.assertEqual({c["name"]: c["runs"] for c in coder["coworkers"]}, {"code": 6, "LARRY": 1})
+        self.assertEqual({c["name"]: c["runs"] for c in coder["coworkers"]}, {"code": 6, "LARRY": 2})
         self.assertEqual({c["name"]: c["runs"] for c in rev["coworkers"]}, {"LINUS": 3, "BRUCE": 3})
         self.assertEqual([c["name"] for c in coder["coworkers"]], ["code", "LARRY"])
         self.assertEqual([c["name"] for c in rev["coworkers"]], ["LINUS", "BRUCE"])
@@ -38,7 +38,7 @@ class Types(unittest.TestCase):
         self.assertTrue(all(ids))
         self.assertEqual(len(set(ids)), 4)
         self.assertEqual({c["name"]: c["runs"] for c in cfg["types"]["researcher"]["coworkers"]}, {"search": 3})
-        self.assertEqual({c["name"]: c["runs"] for c in cfg["types"]["designer"]["coworkers"]}, {"DIETER": 1})
+        self.assertEqual({c["name"]: c["runs"] for c in cfg["types"]["designer"]["coworkers"]}, {"DIETER": 3})
         self.assertEqual(coder["max_jobs"], 8)
 
     def test_a_types_map_sends_the_build_and_the_review_to_the_first_free_coworker_of_the_type(self):
@@ -103,7 +103,7 @@ class Types(unittest.TestCase):
         cfg = D.settings()
         self.assertEqual([c["name"] for c in cfg["types"]["researcher"]["coworkers"]], ["search"])
         self.assertEqual([c["name"] for c in cfg["types"]["designer"]["coworkers"]], ["DIETER"])
-        for t, runs in (("researcher", 3), ("designer", 1)):
+        for t, runs in (("researcher", 3), ("designer", 3)):
             c = cfg["types"][t]["coworkers"][0]
             self.assertEqual(c["runs"], runs)
             self.assertNotIn("id", c)

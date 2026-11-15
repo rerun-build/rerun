@@ -20,7 +20,7 @@ class PlannerPool(unittest.TestCase):
     def test_the_shipped_settings_carry_the_three_planners_and_no_job_limit(self):
         planner = D.settings()["types"]["planner"]
         self.assertEqual([(c["id"], c["name"], c["runs"]) for c in planner["coworkers"]],
-                         [(BOSS, "Boss", 1), (SHAPER, "Scope Shaper", 1), (IKE, "IKE", 1)])
+                         [(BOSS, "Boss", 2), (SHAPER, "Scope Shaper", 3), (IKE, "IKE", 3)])
         self.assertNotIn("max_jobs", planner)
         self.assertIsNone(pools.max_jobs({"types": {"planner": planner}}, "planner"))
 
