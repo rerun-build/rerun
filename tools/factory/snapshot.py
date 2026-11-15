@@ -164,7 +164,7 @@ def _job(store, cfg, names, j):
 def _plan(p):
     runs = [{"id": str(c["id"])[:64], "name": str(c["name"])[:64], "runId": str(c["runId"])[:64], "startedAt": c["startedAt"],
              "steps": None if c.get("steps") is None else max(0, int(c["steps"]))} for c in p["coworkers"][:MAX_RUNS]]
-    return {"parent": int(p["parent"]), "title": str(p["title"])[:256], "coworkers": runs,
+    return {"parent": None if p["parent"] is None else int(p["parent"]), "title": str(p["title"])[:256], "coworkers": runs,
             "children": max(0, int(p["children"])), "filed": max(0, int(p["filed"]))}
 
 

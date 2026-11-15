@@ -4,7 +4,7 @@ import re
 
 import pools
 
-EVERY = 5
+EVERY = 2
 LABEL = "factory-plan"
 MAX_PLANS = 5
 MAX_RUNS = 8
@@ -61,6 +61,8 @@ class Planners:
         runs = self.runs()
         parents = json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", LABEL, "--state", "open",
                                       "--json", "number,title", "--limit", str(MAX_PLANS)]))
+        if not parents and runs:
+            return [{"parent": None, "title": "", "coworkers": runs, "children": 0, "filed": 0}]
         since = min((moment(r["startedAt"]) for r in runs), default=None)
         out = []
         for p in sorted(parents, key=lambda p: p["number"])[:MAX_PLANS]:

@@ -37,6 +37,12 @@ class Planning(unittest.TestCase):
         self.assertEqual(set(snap["planning"][0]["coworkers"][0]), {"id", "name", "runId", "startedAt", "steps"})
         json.dumps(snap)
 
+    def test_an_entry_with_no_parent_is_carried_with_parent_none(self):
+        snap = self.build(planning=[plan(None, title="", children=0, filed=0)])
+        entry = snap["planning"][0]
+        self.assertEqual((entry["parent"], entry["title"], entry["children"], entry["filed"]), (None, "", 0, 0))
+        json.dumps(snap)
+
     def test_limits_follow_the_contract(self):
         runs = [dict(plan()["coworkers"][0], runId="r" * 80, id="i" * 80, name="n" * 80) for _ in range(9)]
         snap = self.build(planning=[plan(400 + n, title="t" * 300, coworkers=runs, children=-4, filed=-1) for n in range(6)])
