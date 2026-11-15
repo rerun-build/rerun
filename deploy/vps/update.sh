@@ -26,9 +26,11 @@ echo "== 3/4 database migrations"
 PW=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$SUPABASE_DIR/.env" | tail -n 1 | sed "s/^'\(.*\)'\$/\1/; s/^\"\(.*\)\"\$/\1/")
 [ -n "$PW" ] || { echo "No POSTGRES_PASSWORD in $SUPABASE_DIR/.env"; exit 1; }
 NET=$(docker inspect "$SUPABASE_DB_CONTAINER" -f '{{range $k,$v := .NetworkSettings.Networks}}{{$k}}{{end}}')
-docker run --rm --network "$NET" -v "$REPO/supabase:/work/supabase" -w /work --user "$OWNER" -e HOME=/tmp node:26 \
-    npx -y "$SUPABASE_CLI" db push --include-all --yes --db-url "postgresql://postgres:$PW@db:5432/postgres?sslmode=disable"
-unset PW
+SUPABASE_DB_URL="postgresql://postgres:$PW@db:5432/postgres?sslmode=disable"
+export SUPABASE_DB_URL
+docker run --rm --network "$NET" -v "$REPO/supabase:/work/supabase" -w /work --user "$OWNER" -e HOME=/tmp -e SUPABASE_DB_URL node:26 \
+    sh -c "npx -y $SUPABASE_CLI db push --include-all --yes --db-url \"\$SUPABASE_DB_URL\""
+unset PW SUPABASE_DB_URL
 
 echo "== 4/4 restart"
 docker compose up -d
