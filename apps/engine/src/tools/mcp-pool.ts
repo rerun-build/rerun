@@ -1,11 +1,13 @@
 import { createHash } from 'node:crypto'
 import type { ToolSet } from 'ai'
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { McpError } from '@modelcontextprotocol/sdk/types.js'
 import type { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
 import type { LoadedAgent, McpServer } from '../agents/types.js'
 import { agentProcessEnv } from '../agents/process-env.js'
 import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
+import { isAuthError } from './mcp-auth.js'
 import { mcpToolSet, openMcpClient, prepareMcpServer, resolveTransport, type McpCallResult, type McpSpawn, type McpTool } from './mcp.js'
 
 export const MCP_IDLE_MS = 10 * 60 * 1000
@@ -13,7 +15,7 @@ export const MCP_CONNECT_TIMEOUT_MS = 20_000
 
 type CallResult = McpCallResult
 type Session = { client: Client; tools: McpTool[] }
-type Entry = { fingerprint: string; opening: Promise<Session>; inFlight: number; timer?: NodeJS.Timeout }
+type Entry = { fingerprint: string; opening: Promise<Session>; inFlight: number; ready: boolean; timer?: NodeJS.Timeout }
 
 export type PooledMcp = {
     name: string
@@ -21,7 +23,20 @@ export type PooledMcp = {
     call: (name: string, args: Record<string, unknown>, options?: RequestOptions) => Promise<CallResult>
 }
 
+export type McpErrorClass = 'auth' | 'timeout' | 'unreachable' | 'closed' | 'other'
+
 const entries = new Map<string, Entry>()
+const failures = new Map<string, McpErrorClass>()
+
+export function errorClassOf(error: unknown): McpErrorClass {
+    const message = error instanceof Error ? error.message : String(error ?? '')
+    const code = (error as { code?: unknown } | null)?.code
+    if (isAuthError(message)) return 'auth'
+    if (message.startsWith('no answer within')) return 'timeout'
+    if (['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'].includes(code as string) || /^(ECONNREFUSED|ENOTFOUND|ETIMEDOUT)\b/.test(message) || message === 'fetch failed') return 'unreachable'
+    if ((error instanceof McpError && code === -32000) || code === 'EPIPE' || code === 'ECONNRESET') return 'closed'
+    return 'other'
+}
 
 const keyOf = (agentId: string, name: string) => `${agentId}\u0000${name}`
 
@@ -53,10 +68,11 @@ function entryFor(agentId: string, server: McpServer, spawn: McpSpawn): { key: s
     const current = entries.get(key)
     if (current?.fingerprint === fingerprint) return { key, entry: current }
     if (current) drop(key, current)
-    const entry: Entry = { fingerprint, opening: openMcpClient(server, spawn), inFlight: 0 }
+    const entry: Entry = { fingerprint, opening: openMcpClient(server, spawn), inFlight: 0, ready: false }
     entries.set(key, entry)
     entry.opening.then(
         ({ client }) => {
+            entry.ready = true
             client.onclose = () => drop(key, entry)
         },
         () => drop(key, entry)
@@ -74,9 +90,11 @@ async function connect(agentId: string, server: McpServer, spawn: McpSpawn): Pro
     })
     try {
         const session = await Promise.race([entry.opening, deadline])
+        failures.delete(key)
         arm(key, entry)
         return { key, entry, session }
     } catch (e) {
+        failures.set(key, errorClassOf(e))
         drop(key, entry)
         logger.warn({ server: server.name, transport: resolveTransport(server), err: (e as Error).message }, 'mcp connect failed')
         return null
@@ -127,12 +145,33 @@ export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
 export function releaseAgentMcp(agentId: string, keep: string[] = []): void {
     const prefix = `${agentId}\u0000`
     for (const [key, entry] of entries) if (key.startsWith(prefix) && !keep.includes(key.slice(prefix.length))) drop(key, entry)
+    for (const key of [...failures.keys()]) if (key.startsWith(prefix) && !keep.includes(key.slice(prefix.length))) failures.delete(key)
 }
 
 export async function closeAllMcp(): Promise<void> {
+    failures.clear()
     await Promise.all([...entries].map(([key, entry]) => drop(key, entry)))
 }
 
 export function pooledMcpCount(): number {
     return entries.size
+}
+
+export function reconnectMcp(agentId: string, name: string): boolean {
+    const key = keyOf(agentId, name)
+    const entry = entries.get(key)
+    if (!entry) {
+        failures.delete(key)
+        return false
+    }
+    void drop(key, entry)
+    return true
+}
+
+export function mcpSessionStates(agentId: string): { name: string; state: 'connected' | 'connecting' | 'failed'; errorClass?: McpErrorClass }[] {
+    const prefix = `${agentId}\u0000`
+    const states: { name: string; state: 'connected' | 'connecting' | 'failed'; errorClass?: McpErrorClass }[] = []
+    for (const [key, entry] of entries) if (key.startsWith(prefix)) states.push({ name: key.slice(prefix.length), state: entry.ready ? 'connected' : 'connecting' })
+    for (const [key, errorClass] of failures) if (key.startsWith(prefix) && !entries.has(key)) states.push({ name: key.slice(prefix.length), state: 'failed', errorClass })
+    return states.sort((a, b) => a.name.localeCompare(b.name))
 }
