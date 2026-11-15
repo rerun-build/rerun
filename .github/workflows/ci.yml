@@ -10,13 +10,50 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  route:
+    if: >-
+      github.repository == 'rerun-build/rerun' ||
+      (github.repository == 'special-place-ai-heaven/rerun' &&
+       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
+    name: Pick runners
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      light: ${{ steps.pick.outputs.light }}
+      heavy: ${{ steps.pick.outputs.heavy }}
+    steps:
+      - id: pick
+        env:
+          RUNNERS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          ORG: ${{ github.repository_owner }}
+          REPO: ${{ github.repository }}
+        run: |
+          hosted='"ubuntu-latest"'
+          light=$hosted
+          heavy=$hosted
+          runners=$(GH_TOKEN="$RUNNERS_TOKEN" gh api "orgs/$ORG/actions/runners?per_page=100" 2>/dev/null) || runners=''
+          if [ -n "$runners" ]; then
+            idle() { echo "$runners" | jq --arg c "$1" '[.runners[] | select(.status == "online" and (.busy | not) and any(.labels[]; (.name | ascii_downcase) == $c))] | length'; }
+            waiting=$(gh api "repos/$REPO/actions/runs?status=queued&per_page=20" --jq '[.workflow_runs[] | select((now - (.created_at | fromdate)) > 20)] | length' 2>/dev/null) || waiting=0
+            [ "$(idle light)" -gt 0 ] && light='{"group":"aap-crrr","labels":["self-hosted","linux","light"]}'
+            [ "${waiting:-0}" -gt 0 ] && [ "$(idle heavy)" -gt 0 ] && heavy='{"group":"aap-crrr","labels":["self-hosted","linux","heavy"]}'
+          else
+            echo "::warning::runner status not readable, every job runs GitHub-hosted"
+          fi
+          echo "light=$light" >> "$GITHUB_OUTPUT"
+          echo "heavy=$heavy" >> "$GITHUB_OUTPUT"
+          echo "light: $light | heavy: $heavy | queued over 20 s: ${waiting:-n/a}"
+
   check:
+    needs: route
     if: >-
       github.repository == 'rerun-build/rerun' ||
       (github.repository == 'special-place-ai-heaven/rerun' &&
        (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     name: Typecheck and lint
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON_LIGHT || vars.TP_RUNS_ON || '"ubuntu-latest"') }}
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON_LIGHT || needs.route.outputs.light || '"ubuntu-latest"') }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v6
@@ -32,6 +69,7 @@ jobs:
       - run: pnpm -r --if-present lint
 
   tests:
+    needs: route
     if: >-
       github.repository == 'rerun-build/rerun' ||
       (github.repository == 'special-place-ai-heaven/rerun' &&
@@ -43,7 +81,7 @@ jobs:
           - { name: App tests, filter: rerun }
           - { name: Engine tests, filter: rerun-engine }
     name: ${{ matrix.part.name }}
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON_HEAVY || vars.TP_RUNS_ON || '"ubuntu-latest"') }}
+    runs-on: ${{ fromJSON(vars.CI_RUNS_ON_HEAVY || needs.route.outputs.heavy || '"ubuntu-latest"') }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v6
