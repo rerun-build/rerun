@@ -143,6 +143,22 @@ class Start(unittest.TestCase):
         rec = r.store.get_all("plan:12")
         self.assertEqual((rec["state"], rec["run"]), ("running", "run1"))
 
+    def test_next_beat_adoption_records_run_and_label(self):
+        r = Rig()
+        r.cfg["planning"] = {"parallel": 1}
+        r.station = planning.Station(r.cfg, r.store, r.account, r.gh, lambda: 1000.0)
+        r.fail = [1]
+        r.station.once(1)
+        r.runs.append({"runId": "late1", "agentId": P2, "startedAt": STAMP})
+        r.runs.append({"runId": "late1", "agentId": P1, "startedAt": STAMP})
+        r.station.once(6)
+        rec = r.store.get_all("plan:12")
+        self.assertEqual((rec["state"], rec["run"]), ("running", "late1"))
+        self.assertIn("late1", r.store.known_run_ids())
+        self.assertEqual(len(r.sends), 0)
+        self.assertEqual([e for e in r.edits() if e[0] == "12"],
+                         [("12", "factory-plan"), ("12", "-factory-plan"), ("12", "factory-plan")])
+
 
 if __name__ == "__main__":
     unittest.main()

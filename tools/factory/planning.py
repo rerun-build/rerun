@@ -185,8 +185,16 @@ class Station:
             except Exception:
                 rid = None
             if rid:
+                names = pools.names(self.cfg)
+                fire = self.store.intent(job, "", "plan", coworker=names.get(old["agent"], old["agent"]), at=at)
+                self.store.fired(fire, rid)
+                self.store.set(job, "fire", fire)
                 self.store.set(job, "run", rid)
                 self.store.set(job, "state", "running")
+                try:
+                    self.gh(["issue", "edit", str(n), "-R", self.repo, "--add-label", LABEL])
+                except Exception:
+                    pass
                 return True
         names = pools.names(self.cfg)
         fire = self.store.intent(job, "", "plan", coworker=names.get(agent, agent), at=at)
