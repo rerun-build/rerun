@@ -47,6 +47,9 @@ def validate(block, bounds, base, last):
             bound = bounds.get(key, {}).get(name)
             if bound is None:
                 errors.append(f"{key}.{name}: no bound for it")
+                previous = (last or {}).get(key, {})
+                if name in previous:
+                    effective[key][name] = previous[name]
                 continue
             if not whole(n) or n < 0 or n > bound:
                 errors.append(f"{key}.{name}: {n!r} is not a whole number from 0 to {bound}")

@@ -77,6 +77,13 @@ class Validate(unittest.TestCase):
             ],
         )
 
+    def test_no_bound_falls_back_to_last(self):
+        effective, errors = control.validate(
+            {"copies": {"ghost": 1}}, BOUNDS, BASE, {"copies": {"ghost": 2}}
+        )
+        self.assertEqual(effective["copies"]["ghost"], 2)
+        self.assertEqual(errors, ["copies.ghost: no bound for it"])
+
     def test_value_not_an_object(self):
         effective, errors = self.run_block({"copies": 3})
         self.assertEqual(effective, BASE)
