@@ -14,6 +14,8 @@ PROOF_MIN = 4
 PROOF_RATE = 0.5
 BURN_WINDOW_S = 3600
 MAX_ANOMALIES = 50
+MEASURE_WINDOW_S = 86400
+BLOCK_STATES = ("blocked", "rejected", "failed", "returned")
 
 
 def stations(store, now):
@@ -97,3 +99,26 @@ def anomalies(store, cfg, now):
         if used > cap:
             out.append({"kind": "budget_burn", "issue": None, "detail": "%d tokens in the last hour, budget %s" % (used, cap)})
     return out[:MAX_ANOMALIES]
+
+
+def measures(store, now):
+    merged = []
+    blocks = {k: 0 for k in BLOCK_STATES}
+    for j in store.jobs():
+        rows = [t for t in store.transitions_of(str(j["issue"])) if t["from_state"] != t["to_state"]]
+        for t in rows:
+            if t["to_state"] in blocks and 0 <= now - L.ts(t["at"]) <= MEASURE_WINDOW_S:
+                blocks[t["to_state"]] += 1
+        into = [t for t in rows if t["to_state"] == "merged"]
+        if j["state"] == "merged" and into and 0 <= now - L.ts(into[-1]["at"]) <= MEASURE_WINDOW_S:
+            merged.append((str(j["issue"]), L.ts(into[-1]["at"]) - L.ts(rows[0]["at"]),
+                           sum(1 for t in rows if t["to_state"] == "fix_wait")))
+    n = len(merged)
+    tokens = 0
+    for job, _, _ in merged:
+        row = store.db.execute("SELECT COALESCE(SUM(tokens_in + tokens_out), 0) FROM fires WHERE job=?", (job,)).fetchone()
+        tokens += row[0]
+    return {"mergedPerHour": round(n / 24, 2), "leadTimeS": sum(m[1] for m in merged) / n if n else None,
+            "firstPassYield": sum(1 for m in merged if m[2] == 0) / n if n else None,
+            "fixRounds": sum(m[2] for m in merged) / n if n else None,
+            "blocks": blocks, "tokensPerMerged": tokens / n if n else None}
