@@ -1,10 +1,18 @@
+import datetime
 import json
 import re
 
 import cutshape
+import pools
 
 DEV = re.compile(r"(?m)^PLAN READY\b[^\n]*\bdev (?:at )?([0-9a-f]{7,40})\b")
 FINAL = re.compile(r"(?m)^(CUT|BLOCKED):[ \t]*(.*)$")
+
+LABEL = "factory-plan"
+READY = "factory"
+EVERY = 5
+PARALLEL = 2
+GOAL = [{"prefix": "CUT:", "rest": "sentence"}, {"prefix": "BLOCKED:", "rest": "sentence"}]
 
 WEIGHTS = {"P0": 8, "P1": 4, "P2": 2, "P3": 1}
 SKIP = frozenset(("factory", "factory-plan", "factory-done", "factory-blocked", "likely-fixed", "duplicate"))
@@ -94,3 +102,122 @@ def comment(errors):
     lines += ["- %s" % e for e in errors]
     lines.append("Fix the issue text and the planner labels it again.")
     return "\n".join(lines)
+
+
+def stamp(t):
+    return datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def epoch(text):
+    return datetime.datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
+
+
+class Station:
+    def __init__(self, cfg, store, account, gh, now):
+        self.cfg = cfg
+        self.store = store
+        self.account = account
+        self.gh = gh
+        self.now = now
+        self.repo = cfg["repo"]
+        self.auto = cfg.get("planning", {}).get("auto", True)
+        self.parallel = cfg.get("planning", {}).get("parallel", PARALLEL)
+        self.pool = pools.types(cfg).get("planner")
+
+    def records(self):
+        rows = self.store.db.execute("SELECT job FROM kv WHERE k='state' AND job LIKE 'plan:%'").fetchall()
+        return {int(r[0].split(":")[1]): self.store.get_all(r[0]) for r in rows}
+
+    def live(self):
+        return {n: r for n, r in self.records().items() if r.get("state") in ("sending", "running")}
+
+    def open_children(self, n):
+        found = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--search",
+                                    "Part of #%d in:body" % n, "--json", "number,body", "--limit", "100"]))
+        pattern = re.compile(r"Part of\W*#%d\b" % n)
+        return [i for i in found if pattern.search(i.get("body") or "")]
+
+    def once(self, beat):
+        if not self.pool or not self.auto:
+            return
+        if (beat - 1) % EVERY == 0:
+            self.start()
+
+    def start(self):
+        room = self.parallel - len(self.live())
+        if room <= 0:
+            return
+        issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json",
+                                     "number,title,labels,createdAt", "--limit", "100"]))
+        records = self.records()
+        for item in unplanned(issues):
+            if room <= 0:
+                break
+            n = item["number"]
+            if n in records and records[n].get("state") != "unsent":
+                continue
+            if self.open_children(n):
+                continue
+            running = [(r["agent"], int(r["copy"])) for r in self.live().values()]
+            got = pools.pick_copy(self.cfg, "planner", running)
+            if got is None:
+                break
+            self.send(item, got, records.get(n))
+            room -= 1
+
+    def adopt(self, n, agent, since):
+        got = self.account("list_runs", {"agentId": agent})
+        runs = got.get("runs", []) if isinstance(got, dict) else got or []
+        known = self.store.known_run_ids()
+        mine = sorted((r for r in runs if isinstance(r, dict) and (r.get("runId") or r.get("id")) not in known
+                       and r.get("startedAt") and epoch(r["startedAt"]) >= epoch(since)),
+                      key=lambda r: epoch(r["startedAt"]))
+        return (mine[0].get("runId") or mine[0].get("id")) if mine else None
+
+    def send(self, item, got, old=None):
+        n = item["number"]
+        agent, copy = got
+        job = "plan:%d" % n
+        at = stamp(self.now())
+        if old and old.get("intent") and old.get("agent"):
+            try:
+                rid = self.adopt(n, old["agent"], old["intent"])
+            except Exception:
+                rid = None
+            if rid:
+                self.store.set(job, "run", rid)
+                self.store.set(job, "state", "running")
+                return True
+        names = pools.names(self.cfg)
+        fire = self.store.intent(job, "", "plan", coworker=names.get(agent, agent), at=at)
+        for k, v in (("state", "sending"), ("agent", agent), ("copy", copy), ("started", at),
+                     ("title", item["title"]), ("run", ""), ("why", ""), ("intent", at), ("fire", fire)):
+            self.store.set(job, k, v)
+        try:
+            self.gh(["issue", "edit", str(n), "-R", self.repo, "--add-label", LABEL])
+            args = {"agentId": agent, "message": brief(item, self.repo), "waitSeconds": 1,
+                    "goal": {"lastLineForms": GOAL, "turnLimit": 3}}
+            result = self.account("send_message", args)
+        except Exception as e:
+            rid = None
+            try:
+                rid = self.adopt(n, agent, at)
+            except Exception:
+                pass
+            if rid:
+                self.store.fired(fire, rid)
+                self.store.set(job, "run", rid)
+                self.store.set(job, "state", "running")
+                return True
+            self.store.abandon(fire, str(e)[:200])
+            self.store.set(job, "state", "unsent")
+            self.store.set(job, "why", str(e)[:200])
+            try:
+                self.gh(["issue", "edit", str(n), "-R", self.repo, "--remove-label", LABEL])
+            except Exception:
+                pass
+            return False
+        self.store.fired(fire, result["runId"])
+        self.store.set(job, "run", result["runId"])
+        self.store.set(job, "state", "running")
+        return True
