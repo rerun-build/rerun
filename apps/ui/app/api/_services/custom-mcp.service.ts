@@ -1,7 +1,7 @@
 import type { Actor } from '@/app/api/_auth/access'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { installedFromRegistry } from '@/app/api/_services/services.service'
-import { deleteMcpToken, getAgent, getMcpServerStatuses, patchMcpServers } from '@/lib/engine/client'
+import { deleteMcpToken, getAgent, getMcpServerStatuses, getMcpSessionStates as fetchMcpSessionStates, patchMcpServers, reconnectMcpServer } from '@/lib/engine/client'
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
 import { brandLabel, mcpIconDomain, mcpServerHost, toCustomMcpServer, unclaimedMcpServers } from '@/lib/services/custom-mcp'
 import { verifiedFaviconUrl } from '@/lib/services/mcp-favicon.server'
@@ -54,6 +54,19 @@ export async function getCustomMcpStatuses(agentId: string, actor?: Actor): Prom
     const statuses = await getMcpServerStatuses(conn, engineAgentId, names)
     if (!statuses) return names.map(name => ({ name, status: 'unknown', toolCount: 0 }))
     return statuses.map(({ name, status, toolCount, error }) => ({ name, status, toolCount, ...(error ? { error } : {}) }))
+}
+
+export async function getMcpSessionStates(agentId: string, actor?: Actor): Promise<{ name: string; state: string; errorClass?: string }[]> {
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
+    const states = await fetchMcpSessionStates(conn, engineAgentId)
+    if (!states) return []
+    return states.map(({ name, state, errorClass }) => ({ name, state, ...(errorClass ? { errorClass } : {}) }))
+}
+
+export async function reconnectMcpSession(agentId: string, name: string, actor?: Actor): Promise<{ name: string; reconnected: boolean; effect: string; announced: number }> {
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'use')
+    const result = await reconnectMcpServer(conn, engineAgentId, name)
+    return { name: result.name, reconnected: result.reconnected, effect: result.effect, announced: result.announced }
 }
 
 export async function getCustomMcpServer(agentId: string, name: string, actor?: Actor): Promise<{ server: CustomMcpServer; status: CustomMcpLiveStatus } | null> {
