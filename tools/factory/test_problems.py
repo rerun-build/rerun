@@ -9,8 +9,20 @@ def job(n, state, **kw):
 
 
 class Find(unittest.TestCase):
-    def find(self, w, jobs=(), refused=None, open_issues=None, line="L", now=0.0, texts=()):
-        return w.find(list(jobs), refused or {}, open_issues, line, now, list(texts))
+    def find(self, w, jobs=(), refused=None, open_issues=None, line="L", now=0.0, texts=(), since="", held=False):
+        return w.find(list(jobs), refused or {}, open_issues, line, now, list(texts), since, held)
+
+    def test_only_a_job_that_ended_since_the_watch_began_is_a_problem(self):
+        jobs = [job(1, "blocked", reason="old", updated_at="2026-11-15T10:00:00Z"),
+                job(2, "failed", reason="new", updated_at="2026-11-15T12:00:00Z")]
+        got = self.find(problems.Watch(), jobs, open_issues={1, 2}, since="2026-11-15T11:00:00Z")
+        self.assertEqual(sorted(got), ["ended #2"])
+
+    def test_no_idle_line_while_a_hold_stops_all_sending(self):
+        w = problems.Watch()
+        for _ in range(12):
+            got = self.find(w, [job(5, "queued")], held=True)
+        self.assertEqual(got, {})
 
     def test_a_refused_issue_is_a_problem_with_its_cutshape_errors(self):
         got = self.find(problems.Watch(), refused={5: ["plan line: bad", "files: no **Files** heading"]})

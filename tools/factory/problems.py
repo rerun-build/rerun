@@ -6,11 +6,15 @@ REPEATS = 5
 WINDOW_S = 3600
 
 
+def ended(j, since):
+    return j["state"] in ENDED and str(j.get("updated_at") or "") >= since
+
+
 class Watch:
     def __init__(self):
         self.heard, self.idle, self.idle_line, self.repeats, self.repeat_line = [], 0, None, None, None
 
-    def find(self, jobs, refused, open_issues, line, now, texts):
+    def find(self, jobs, refused, open_issues, line, now, texts, since="", held=False):
         out = {"unreadable #%d" % n: "\n".join(e) for n, e in refused.items()}
         work, busy = bool(refused), False
         for j in jobs:
@@ -18,12 +22,12 @@ class Watch:
             if st == "waiting" and j.get("dead"):
                 out["dead #%d" % n] = j.get("wait_line") or "waits on dead dependencies"
                 work = True
-            elif st in ENDED and open_issues is not None and n in open_issues:
+            elif ended(j, since) and open_issues is not None and n in open_issues:
                 out["ended #%d" % n] = "job #%d ended %s: %s; pull request %s" % (
                     n, st, j.get("reason") or "-", "#%s" % j["pr"] if j.get("pr") else "none")
             work = work or st in states.QUEUE
             busy = busy or (st in states.RUNNING and bool(j.get("agent")))
-        self.idle = self.idle + 1 if work and not busy else 0
+        self.idle = self.idle + 1 if work and not busy and not held else 0
         if self.idle < IDLE_BEATS:
             self.idle_line = None
         elif self.idle_line is None:

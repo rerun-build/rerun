@@ -1,4 +1,4 @@
-import json, os, sys, unittest
+import json, os, sys, unittest, unittest.mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from test_dispatch import Base, ready, D
 
@@ -24,8 +24,36 @@ class Tickets(Problems):
         self.assertEqual(p["title"], "Factory problem: unreadable #6")
         self.assertEqual(p["labels"], ["factory-problem"])
         self.assertIn("Problem-Key: unreadable #6\n", p["body"])
-        self.assertIn("files: no **Files** heading", p["body"])
+        self.assertIn("```\nfiles: no **Files** heading", p["body"])
         self.assertEqual(self.records()["unreadable #6"]["issue"], p["number"])
+
+    def test_a_job_that_ended_before_the_first_watched_beat_is_no_problem(self):
+        self.w.open_numbers |= {5, 8}
+        self.d = self.new()
+        self.d.store.put_job("8", "blocked", {"issue": 8, "relabelled": True, "commented": True, "reason": "old"}, at="2020-01-01T00:00:00Z")
+        self.tick(3)
+        self.assertEqual(self.w.problems, [])
+
+    def test_the_idle_line_and_a_repeating_error_open_even_when_thirty_are_open(self):
+        self.w.issues = [self.bad(n) for n in range(10, 45)]
+        self.tick(3)
+        for _ in range(5):
+            D.log("-", "reconcile: gh issue view failed")
+        self.tick(7)
+        titles = [p["title"] for p in self.w.problems]
+        self.assertEqual(len(titles), 32)
+        rep = next(p for p in self.w.problems if p["title"] == "Factory problem: repeating error")
+        self.assertIn("reconcile: gh issue view failed (5 times in the last hour)", rep["body"])
+        idle = next(p for p in self.w.problems if p["title"] == "Factory problem: idle line")
+        self.assertIn(" beat 10 | ", idle["body"])
+
+    def test_a_resolver_that_raises_leaves_the_rest_of_the_beat_running(self):
+        def boom(*a):
+            raise TypeError("x")
+        with unittest.mock.patch.object(D.resolver.Resolver, "beat", boom):
+            self.tick()
+        self.assertEqual(self.w.sends[0][0], "b1")
+        self.assertIn("problems: TypeError", self.out.getvalue())
 
     def test_new_evidence_edits_the_body_once_and_the_same_evidence_does_not(self):
         self.w.issues.append(self.bad(6))
@@ -177,7 +205,7 @@ class Station(Resolving):
         self.tick(7)
         p = self.w.problems[0]
         self.assertIn("owner", p["labels"])
-        self.assertEqual(p["comments"], ["ESCALATE: the problem is still there after 2 attempts; the last one ended with: RESOLVED: second try"])
+        self.assertEqual(p["comments"], ["```\nESCALATE: the problem is still there after 2 attempts; the last one ended with: RESOLVED: second try\n```"])
         self.tick(3)
         self.assertEqual(len(self.house()), 2)
 
@@ -187,7 +215,7 @@ class Station(Resolving):
         self.tick(3)
         p = self.w.problems[0]
         self.assertEqual(p["labels"], ["factory-problem", "owner"])
-        self.assertEqual(p["comments"], ["ESCALATE: Rob runs `gh label create x`"])
+        self.assertEqual(p["comments"], ["```\nESCALATE: Rob runs `gh label create x`\n```"])
         self.assertEqual(len(self.house()), 1)
         line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
         self.assertTrue(line.endswith(" | problems 1 open, 1 owner"), line)
@@ -227,6 +255,90 @@ class Station(Resolving):
         self.d.store.put_job("77", "merged", {"issue": 77, "relabelled": True, "commented": True})
         self.tick(6)
         self.assertEqual(len(self.house()), 2)
+
+    def test_filed_holds_the_verify_clock_while_the_filed_issue_is_open(self):
+        self.tick(2)
+        self.w.finish("h1", "FILED: #77")
+        self.w.open_numbers |= {77}
+        self.tick(10)
+        self.assertEqual(len(self.house()), 1)
+        self.w.open_numbers -= {77}
+        self.tick(6)
+        self.assertEqual(len(self.house()), 2)
+
+    def test_a_failed_owner_label_is_tried_again_and_never_reads_as_rob_removing_it(self):
+        orig, fails = self.w.gh, [1]
+
+        def gh(args):
+            if "--add-label" in args and "owner" in args and fails:
+                fails.pop()
+                raise D.Error("gh issue edit failed: exit 1")
+            return orig(args)
+        self.w.gh = gh
+        self.tick(2)
+        self.w.finish("h1", "ESCALATE: Rob decides")
+        self.tick(4)
+        p = self.w.problems[0]
+        self.assertEqual(p["labels"], ["factory-problem", "owner"])
+        self.assertEqual(p["comments"], ["```\nESCALATE: Rob decides\n```"])
+        self.assertEqual(len(self.house()), 1)
+
+    def test_a_send_that_raised_keeps_the_copy_until_the_run_limit_then_sends_again(self):
+        self.cfg["clocks"] = {"run_limit_s": 100}
+        self.w.cut_off_next_send = True
+        self.tick(3)
+        self.assertEqual(len(self.house()), 1)
+        self.assertEqual((self.rec()["state"], self.rec()["run"]), ("resolving", None))
+        self.w.clock += 101
+        self.tick()
+        self.assertEqual(len(self.house()), 2)
+
+    def test_a_waiting_problem_whose_key_is_gone_is_not_sent(self):
+        self.d = self.new()
+        D.holds.arm(self.d.store, "plan limit", self.w.clock + 600)
+        self.tick()
+        self.w.issue(6)["body"] = ready()
+        D.holds.clear(self.d.store, "plan limit")
+        self.tick(2)
+        self.assertEqual(self.house(), [])
+
+    def test_a_plan_limit_error_arms_the_hold_and_is_not_a_missing_line(self):
+        self.tick(2)
+        self.w.runs["run1"] = {"status": "error", "error": "AI_APICallError: You've hit your session limit · resets 3pm"}
+        self.tick()
+        self.assertEqual(D.holds.active(self.d.store, self.w.clock)["kind"], "plan limit")
+        self.assertEqual((self.rec()["state"], self.rec().get("asked")), ("resolve_wait", None))
+
+    def test_a_transient_error_is_sent_again_without_counting_as_a_missing_line(self):
+        self.tick(2)
+        self.w.runs["run1"] = {"status": "error", "error": "provider_overloaded"}
+        self.tick()
+        self.assertEqual(len(self.house()), 2)
+        self.assertNotIn("ended without a final line", self.house()[1])
+
+    def test_a_get_run_that_keeps_failing_is_given_up_after_the_run_limit(self):
+        self.cfg["clocks"] = {"run_limit_s": 100}
+        orig = self.w.account
+
+        def account(tool, args):
+            if tool == "get_run" and args["agentId"] == "h1":
+                raise D.Error("account get_run failed: HTTP 404")
+            return orig(tool, args)
+        self.w.account = account
+        self.tick(3)
+        self.assertEqual(len(self.house()), 1)
+        self.w.clock += 101
+        self.tick()
+        self.assertEqual(len(self.house()), 2)
+
+    def test_switching_resolve_off_frees_house_and_lets_a_resolving_problem_close(self):
+        self.tick()
+        self.assertEqual(self.d.running(), [("h1", 1)])
+        self.cfg["resolver"]["resolve"] = False
+        self.assertEqual(self.d.running(), [])
+        self.w.issue(6)["body"] = ready()
+        self.tick(3)
+        self.assertEqual(self.w.problems[0]["state"], "CLOSED")
 
     def test_a_house_run_takes_one_of_the_slots(self):
         self.cfg["slots"] = 1
@@ -287,12 +399,22 @@ class Do(Resolving):
         self.assertEqual(self.results()[0].split("\n")[1:], ["- DO: rerun-ci #42 -> re-ran the failed jobs of run 11 at abcdef1",
                                                              "- not allowed: DO: rerun-ci #99"])
 
-    def test_wait_off_drops_the_wait_reason_of_a_job(self):
+    def test_requeue_refuses_a_job_already_taken_three_times(self):
         self.d = self.new()
-        self.d.store.put_job("8", "waiting", {"issue": 8, "title": "T8", "wait_reason": "dependency"})
+        self.d.store.put_job("7", "blocked", {"issue": 7, "title": "T7", "relabelled": True, "commented": True, "take": 3})
+        self.run_with("DO: requeue #7\nRESOLVED: no")
+        self.assertNotIn(["issue", "edit", "7", "-R", "o/r", "--add-label", "factory", "--remove-label", "factory-blocked"], self.w.gh_calls)
+        self.assertIn("- not allowed: DO: requeue #7 (taken 3 times; Rob decides)", self.results()[0])
+
+    def test_wait_off_drops_a_stale_back_off_so_the_job_starts_on_the_next_beat(self):
+        self.d = self.new()
+        self.d.store.put_job("8", "queued", {"issue": 8, "title": "T8", "body": ready(), "round": 1, "worker": "coder",
+                                             "not_before": self.w.clock + 3600, "wait_reason": "back-off"})
         self.run_with("DO: wait-off #8\nRESOLVED: dropped")
-        self.assertNotIn("wait_reason", self.d.store.get_job("8"))
-        self.assertIn("- DO: wait-off #8 -> wait reason of #8 dropped", self.results()[0])
+        self.assertIn("- DO: wait-off #8 -> back-off and wait reason of #8 dropped", self.results()[0])
+        self.assertEqual([a for a, _, _ in self.w.sends if a == "b1"], [])
+        self.tick()
+        self.assertEqual(self.state(8), "building")
 
     def test_any_other_line_is_refused_and_echoed_without_at_signs_or_backticks(self):
         self.run_with("Look: DO: requeue #7 inside a sentence\nDO: ping @someone `rm -rf /`\nRESOLVED: nothing")
