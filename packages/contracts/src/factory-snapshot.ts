@@ -67,6 +67,14 @@ export const factoryPoolSchema = z.object({
     coworkers: z.array(z.object({ name: z.string().max(64), id: z.string().max(64).optional(), runs: z.number().int().min(1).max(32), out: z.number().int().min(0).max(32) }).strict()).max(20),
 }).strict()
 
+export const factoryPlanningSchema = z.object({
+    parent: z.number().int().positive(),
+    title: z.string().max(256),
+    coworkers: z.array(z.object({ id: z.string().max(64), name: z.string().max(64), runId: z.string().max(64), startedAt: isoTime, steps: count.nullable() }).strict()).max(8),
+    children: count,
+    filed: count,
+}).strict()
+
 export const factorySnapshotSchema = z.object({
     version: z.literal(1),
     madeAt: isoTime,
@@ -74,6 +82,7 @@ export const factorySnapshotSchema = z.object({
     repo: z.string().max(200),
     jobs: z.array(factoryJobSchema).max(300),
     epics: z.array(factoryEpicSchema).max(50).optional(),
+    planning: z.array(factoryPlanningSchema).max(5).optional(),
     holds: z.array(factoryHoldSchema).max(10),
     pools: z.array(factoryPoolSchema).max(8),
     endedToday: z.object({ merged: count, rejected: count, blocked: count, failed: count, returned: count }).strict(),
@@ -87,6 +96,7 @@ export type FactoryDepartment = z.infer<typeof factoryDepartmentSchema>
 export type FactoryEpicKind = z.infer<typeof factoryEpicKindSchema>
 export type FactoryEpic = z.infer<typeof factoryEpicSchema>
 export type FactoryJob = z.infer<typeof factoryJobSchema>
+export type FactoryPlanning = z.infer<typeof factoryPlanningSchema>
 export type FactoryHold = z.infer<typeof factoryHoldSchema>
 export type FactoryPool = z.infer<typeof factoryPoolSchema>
 export type FactorySnapshot = z.infer<typeof factorySnapshotSchema>
