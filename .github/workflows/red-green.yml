@@ -1,0 +1,39 @@
+name: Done-test red before green
+
+on:
+  pull_request:
+
+concurrency:
+  group: red-green-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  prove:
+    if: >-
+      github.repository == 'special-place-ai-heaven/rerun' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.head_ref, 'chunk/')
+    name: Done-test red before green
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Prove
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.head_ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: python3 -I tools/factory/redgreen.py --prepare "pnpm --filter @rerun/contracts build"
+
