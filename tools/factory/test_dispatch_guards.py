@@ -107,6 +107,7 @@ class GhError(unittest.TestCase):
 
     def test_a_line_that_carries_the_token_is_held_back(self):
         self.assertEqual(self.fail_with("bad credentials " + self.TOKEN + "\n"), "gh issue view failed: exit 1")
+        self.assertEqual(self.fail_with("x" * 195 + self.TOKEN + "\n"), "gh issue view failed: exit 1")
         self.assertEqual(self.fail_with(""), "gh issue view failed: exit 1")
 
 

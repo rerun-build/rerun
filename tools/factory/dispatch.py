@@ -254,7 +254,7 @@ def make_gh(token, run=subprocess.run):
             raise Error("gh %s could not start: %s" % (args[0], type(e).__name__)) from None
         if p.returncode != 0:
             why = last_line(p.stderr)
-            why = "" if not why or token in why else ": " + why
+            why = "" if not why or token in (p.stderr or "") else ": " + why
             raise Error("gh %s %s failed: exit %d%s" % (args[0], args[1] if len(args) > 1 else "", p.returncode, why))
         return p.stdout
     return call
@@ -511,7 +511,7 @@ class Dispatcher:
                 return "live"
             reason = r.get("state_reason") or "completed"
             self.store.set(n, "close_reason", reason)
-        return "closed as not planned" if reason == "not_planned" else "met"
+        return "met" if reason == "completed" else "closed as " + reason.replace("_", " ")
 
     def stop_lost(self):
         live = [j for j in self.jobs() if j["state"] not in END]
