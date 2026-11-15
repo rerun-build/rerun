@@ -98,12 +98,12 @@ class Proof(ProofBase):
         self.assertEqual(self.state(), "merged")
         self.assertEqual(len(self.w.merges), 1)
 
-    def test_pass_naming_four_of_five_asks_goes_to_fix(self):
+    def test_pass_naming_four_of_five_asks_is_asked_again_not_sent_to_a_fix(self):
         self.to_proving()
         self.w.finish("r2", met(missing=(5,)) + "\nPROOF: PASS @abcdef1")
         self.tick()
-        self.assertEqual(self.state(), "fix_wait")
-        self.assertIn("PASS names 4 of the 5 asks", self.w.rows("SELECT data FROM jobs WHERE job='5'")[0][0])
+        self.assertEqual(self.state(), "proof_wait")
+        self.assertIn("proof lines name 4 of the 5 asks: asked again", self.reasons())
 
     def test_pass_with_an_ask_not_met_goes_to_fix(self):
         self.to_proving()
@@ -158,12 +158,12 @@ class Proof(ProofBase):
         self.assertEqual(self.state(), "merged")
         self.assertEqual(len(self.w.merges), 1)
 
-    def test_an_output_without_a_proof_line_ends_rejected(self):
+    def test_an_output_without_a_proof_line_is_asked_again(self):
         self.to_proving()
         self.w.finish("r2", "done, looks fine")
         self.tick()
-        self.assertEqual(self.state(), "rejected")
-        self.assertIn("no PROOF line", self.w.issue(5)["comments"][-1])
+        self.assertEqual(self.state(), "proof_wait")
+        self.assertIn("no PROOF line: asked again", self.reasons())
 
 
 class Deployed(unittest.TestCase):
