@@ -17,7 +17,7 @@ import { useSession } from '@/supabase/session/SessionProvider'
 
 type LoosePart = { type: string; toolCallId?: string; state?: string; output?: unknown }
 
-const RECENTER_DELAY_MS = 400
+const RECENTER_FALLBACK_MS = 2000
 
 function partsOf(messages: UIMessage[]): LoosePart[] {
     return messages.flatMap(message => message.parts as LoosePart[])
@@ -34,6 +34,14 @@ function funnelFinished(messages: UIMessage[]): boolean {
 function builtLead(messages: UIMessage[], toolCallIds: string[]): string | null {
     const build = partsOf(messages).find(part => part.type === 'tool-build_team' && part.state === 'output-available' && !!part.toolCallId && toolCallIds.includes(part.toolCallId))
     return (build?.output as { lead?: { agentId?: string } | null } | null)?.lead?.agentId ?? null
+}
+
+function builtBoxIds(messages: UIMessage[], toolCallIds: string[]): string[] {
+    return partsOf(messages).flatMap(part => {
+        if (part.type !== 'tool-build_team' || part.state !== 'output-available' || !part.toolCallId || !toolCallIds.includes(part.toolCallId)) return []
+        const boxes = (part.output as { boxes?: { boxId?: string }[] } | null)?.boxes ?? []
+        return boxes.flatMap(box => (box.boxId ? [box.boxId] : []))
+    })
 }
 
 function purchaseAwaitingBuild(messages: UIMessage[]): boolean {
@@ -64,6 +72,8 @@ export function useForemanScriptedSteps({ messages, status, guided, restoreDone,
 
     const framed = useRef<Set<string> | null>(null)
     const freshLead = useRef<string | null>(null)
+    const stopFraming = useRef<() => void>(() => {})
+    useEffect(() => () => stopFraming.current(), [])
     useEffect(() => {
         if (!restoreDone) return
         const built = builtTeamIds(messages)
@@ -75,7 +85,28 @@ export function useForemanScriptedSteps({ messages, status, guided, restoreDone,
         if (!fresh.length) return
         for (const id of fresh) framed.current.add(id)
         freshLead.current = builtLead(messages, fresh)
-        setTimeout(() => useBoardStore.getState().recenterBoard(), RECENTER_DELAY_MS)
+        stopFraming.current()
+        const boxIds = builtBoxIds(messages, fresh)
+        const onBoard = () => boxIds.every(id => useBoardStore.getState().spaces.some(space => space.id === id))
+        if (onBoard()) {
+            useBoardStore.getState().recenterBoard()
+            return
+        }
+        let unsubscribe: () => void = () => {}
+        const stop = () => {
+            unsubscribe()
+            clearTimeout(timer)
+            stopFraming.current = () => {}
+        }
+        const frame = () => {
+            stop()
+            useBoardStore.getState().recenterBoard()
+        }
+        const timer = setTimeout(frame, RECENTER_FALLBACK_MS)
+        unsubscribe = useBoardStore.subscribe(() => {
+            if (onBoard()) frame()
+        })
+        stopFraming.current = stop
     }, [messages, restoreDone])
 
     const finished = guided && funnelFinished(messages)
