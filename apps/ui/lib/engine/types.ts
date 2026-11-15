@@ -9,6 +9,10 @@ import {
     mcpServerSchema,
     mcpServerStatusListSchema,
     type McpServerStatus,
+    mcpSessionStateListSchema,
+    mcpReconnectResultSchema,
+    type McpSessionState,
+    type McpReconnectResult,
     agentConfigSchema,
     agentDetailSchema,
     activatedAutomationsSchema,
@@ -95,6 +99,8 @@ export const engineToolsListSchema = toolsListSchema
 export const engineSelfImprovementSchema = selfImprovementSchema
 export const engineMcpServerSchema = mcpServerSchema
 export const engineMcpServerStatusListSchema = mcpServerStatusListSchema
+export const engineMcpSessionStateListSchema = mcpSessionStateListSchema
+export const engineMcpReconnectResultSchema = mcpReconnectResultSchema
 export const engineAgentConfigSchema = agentConfigSchema
 export const engineAgentDetailSchema = agentDetailSchema
 export const engineActivatedAutomationsSchema = activatedAutomationsSchema
@@ -140,6 +146,8 @@ export type EngineToolFamily = ToolFamily
 export type EngineSelfImprovement = SelfImprovement
 export type EngineMcpServer = McpServer
 export type EngineMcpServerStatus = McpServerStatus
+export type EngineMcpSessionState = McpSessionState
+export type EngineMcpReconnectResult = McpReconnectResult
 export type EngineAgentConfig = AgentConfig
 export type EngineAgentConfigPatch = Partial<Omit<AgentConfig, 'tools' | 'selfImprovement' | 'setup'>> & {
     tools?: Record<string, boolean>
