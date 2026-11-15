@@ -28,6 +28,8 @@ REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
 MERGE_TRIES = 5
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
+CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
+             "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
 
 
 class Error(Exception):
@@ -250,7 +252,9 @@ def make_gh(token, run=subprocess.run):
         except OSError as e:
             raise Error("gh %s could not start: %s" % (args[0], type(e).__name__)) from None
         if p.returncode != 0:
-            raise Error("gh %s %s failed: exit %d" % (args[0], args[1] if len(args) > 1 else "", p.returncode))
+            why = last_line(p.stderr)
+            why = "" if not why or token in why else ": " + why
+            raise Error("gh %s %s failed: exit %d%s" % (args[0], args[1] if len(args) > 1 else "", p.returncode, why))
         return p.stdout
     return call
 
@@ -405,71 +409,74 @@ class Dispatcher:
                 continue
             i["body"] = body
             log(i["number"], "sifted: " + ", ".join(fixed))
-        open_numbers = None
         shape = cutshape.check(issues)
         self.unreadable = sum(1 for e in shape.values() if e)
+        open_numbers = None
+        if any(cutshape.parse(i)["deps"] for i in issues):
+            open_numbers = {o["number"] for o in json.loads(self.gh(
+                ["issue", "list", "-R", self.repo, "--state", "open", "--json", "number", "--limit", "1000"]))}
         for i in sorted(issues, key=lambda i: i["number"]):
             if all(r <= 0 for r in rooms.values()):
                 break
-            old = self.store.get_job(str(i["number"]))
-            if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
-                continue
-            take = (old.get("take") or 1) + 1 if old and old["state"] in END else (old or {}).get("take")
-            errors = shape.get(i["number"]) or []
-            if errors:
-                digest = hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
-                if self.store.get_all(str(i["number"])).get("cutshape") != digest:
-                    self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", cutshape.comment(errors)])
-                    self.store.set(str(i["number"]), "cutshape", digest)
-                    log(i["number"], "not started: the issue text is not readable (%d problem%s)" % (len(errors), "" if len(errors) == 1 else "s"))
-                continue
-            parsed = cutshape.parse(i)
-            if parsed["worker"] not in ("coder", "researcher", "designer") or parsed["worker"] not in pools.types(self.cfg):
-                t = parsed["worker"]
-                if self.store.get_all(str(i["number"])).get("worker_queue") != t:
-                    self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
-                             "worker type %s has no queue yet (phase B of #198)" % t])
-                    self.store.set(str(i["number"]), "worker_queue", t)
-                    log(i["number"], "not started: worker type %s has no queue yet" % t)
-                continue
-            if rooms.get(parsed["worker"], 0) <= 0:
-                continue
-            deps = parsed["deps"]
-            if deps:
-                if open_numbers is None:
-                    open_numbers = {o["number"] for o in json.loads(self.gh(
-                        ["issue", "list", "-R", self.repo, "--state", "open", "--json", "number", "--limit", "1000"]))}
-                unmet = [d for d in deps if d in open_numbers]
-                if unmet:
-                    ret = [d for d in unmet if (self.store.get_job(str(d)) or {}).get("state") == "returned"]
-                    if not old or old.get("waiting") != unmet or old.get("waits_on_returned", []) != ret:
-                        line = "waits on " + ", ".join(("returned #%d" if d in ret else "#%d") % d for d in unmet)
-                        data = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "waiting",
-                                "round": 1, "waiting": unmet, "worker": parsed["worker"], "paths": parsed["paths"],
-                                "test": parsed["test"]}
-                        if ret:
-                            data["waits_on_returned"] = ret
-                        if take:
-                            data["take"] = take
-                        self.save(data, line)
-                        log(i["number"], line)
+            try:
+                old = self.store.get_job(str(i["number"]))
+                if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
                     continue
-            if self.cfg.get("auto_plan_marker", True):
-                v = json.loads(self.gh(["issue", "view", str(i["number"]), "-R", self.repo, "--json", "body,comments"]))
-                texts = [v.get("body") or ""] + [c.get("body") or "" for c in v.get("comments") or []]
-                if not any(re.search(r"(?m)^(PLAN READY|SMALL FIX)", t) for t in texts):
-                    self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
-                             "SMALL FIX: taken by the factory dispatcher on the owner's label."])
-                    log(i["number"], "plan line posted")
-            job = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "queued", "round": 1,
-                   "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"]}
-            if take:
-                job["take"] = take
-            if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":
-                job.update(state="review_wait", pr=old["pr"], builder=old.get("builder"))
-            rooms[parsed["worker"]] -= 1
-            self.save(job, "queued")
-            log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
+                take = (old.get("take") or 1) + 1 if old and old["state"] in END else (old or {}).get("take")
+                errors = shape.get(i["number"]) or []
+                if errors:
+                    digest = hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
+                    if self.store.get_all(str(i["number"])).get("cutshape") != digest:
+                        self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", cutshape.comment(errors)])
+                        self.store.set(str(i["number"]), "cutshape", digest)
+                        log(i["number"], "not started: the issue text is not readable (%d problem%s)" % (len(errors), "" if len(errors) == 1 else "s"))
+                    continue
+                parsed = cutshape.parse(i)
+                if parsed["worker"] not in ("coder", "researcher", "designer") or parsed["worker"] not in pools.types(self.cfg):
+                    t = parsed["worker"]
+                    if self.store.get_all(str(i["number"])).get("worker_queue") != t:
+                        self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
+                                 "worker type %s has no queue yet (phase B of #198)" % t])
+                        self.store.set(str(i["number"]), "worker_queue", t)
+                        log(i["number"], "not started: worker type %s has no queue yet" % t)
+                    continue
+                if rooms.get(parsed["worker"], 0) <= 0:
+                    continue
+                deps = parsed["deps"]
+                if deps:
+                    unmet = [d for d in deps if d in open_numbers]
+                    if unmet:
+                        ret = [d for d in unmet if (self.store.get_job(str(d)) or {}).get("state") == "returned"]
+                        if not old or old.get("waiting") != unmet or old.get("waits_on_returned", []) != ret:
+                            line = "waits on " + ", ".join(("returned #%d" if d in ret else "#%d") % d for d in unmet)
+                            data = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "waiting",
+                                    "round": 1, "waiting": unmet, "worker": parsed["worker"], "paths": parsed["paths"],
+                                    "test": parsed["test"]}
+                            if ret:
+                                data["waits_on_returned"] = ret
+                            if take:
+                                data["take"] = take
+                            self.save(data, line)
+                            log(i["number"], line)
+                        continue
+                if self.cfg.get("auto_plan_marker", True):
+                    v = json.loads(self.gh(["issue", "view", str(i["number"]), "-R", self.repo, "--json", "body,comments"]))
+                    texts = [v.get("body") or ""] + [c.get("body") or "" for c in v.get("comments") or []]
+                    if not any(re.search(r"(?m)^(PLAN READY|SMALL FIX)", t) for t in texts):
+                        self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
+                                 "SMALL FIX: taken by the factory dispatcher on the owner's label."])
+                        log(i["number"], "plan line posted")
+                job = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "queued", "round": 1,
+                       "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"]}
+                if take:
+                    job["take"] = take
+                if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":
+                    job.update(state="review_wait", pr=old["pr"], builder=old.get("builder"))
+                rooms[parsed["worker"]] -= 1
+                self.save(job, "queued")
+                log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
+            except (Error, ValueError, KeyError) as e:
+                log(i["number"], "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
 
     def stop_lost(self):
         live = [j for j in self.jobs() if j["state"] not in END]
@@ -478,26 +485,29 @@ class Dispatcher:
         labelled = {i["number"] for i in json.loads(self.gh(["issue", "list", "-R", self.repo, "--label", self.label, "--state", "open",
                                                               "--json", "number", "--limit", "1000"]) or "[]")}
         for j in sorted(live, key=lambda j: j["issue"]):
-            state = why = None
-            if j.get("pr"):
-                pr = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state")
-                if pr == "MERGED":
-                    state, why = "merged", "merged outside the delegator"
-                elif pr == "CLOSED":
-                    state, why = "blocked", "pull request #%s closed without merge" % j["pr"]
-            if state is None and j["issue"] not in labelled:
-                state, why = "returned", "issue closed or the %s label removed" % self.label
-            if state is None:
-                continue
-            if j["state"] in RUNNING and j.get("run") and not j.get("sending"):
-                try:
-                    self.account("cancel_run", {"agentId": j["agent"], "runId": j["run"]})
-                except Error as e:
-                    log(j["issue"], "cancel failed: %s" % e)
-                self.store.close_run(j["run"], "cancelled", error=why[:200])
-            j.update(relabelled=True, commented=True)
-            log(j["issue"], "stopped: %s" % why)
-            self.end(j, state, why)
+            try:
+                state = why = None
+                if j.get("pr"):
+                    pr = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state")
+                    if pr == "MERGED":
+                        state, why = "merged", "merged outside the delegator"
+                    elif pr == "CLOSED":
+                        state, why = "blocked", "pull request #%s closed without merge" % j["pr"]
+                if state is None and j["issue"] not in labelled:
+                    state, why = "returned", "issue closed or the %s label removed" % self.label
+                if state is None:
+                    continue
+                if j["state"] in RUNNING and j.get("run") and not j.get("sending"):
+                    try:
+                        self.account("cancel_run", {"agentId": j["agent"], "runId": j["run"]})
+                    except Error as e:
+                        log(j["issue"], "cancel failed: %s" % e)
+                    self.store.close_run(j["run"], "cancelled", error=why[:200])
+                j.update(relabelled=True, commented=True)
+                log(j["issue"], "stopped: %s" % why)
+                self.end(j, state, why)
+            except (Error, ValueError, KeyError) as e:
+                log(j["issue"], "stop_lost: %s" % (e if isinstance(e, Error) else type(e).__name__))
 
     def reconcile(self):
         if self.beats % RECONCILE_BEATS:
@@ -511,23 +521,28 @@ class Dispatcher:
                                                            "--json", "number", "--limit", "1000"]) or "[]")}
         cands.sort(key=lambda j: j["issue"])
         for j in [j for j in cands if j["issue"] in closed][:RECONCILE_MAX]:
-            if j.get("pr") and json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "MERGED":
-                self.end(j, "merged", "merged outside the delegator")
-                continue
-            number = self.merged_closer(j)
-            if number:
-                j["pr"] = number
-                self.end(j, "merged", "merged outside the delegator (#%s)" % number)
-                continue
-            kv = self.store.get_all(str(j["issue"]))
-            self.store.set(str(j["issue"]), "closed_refs", self.now())
-            if "closed_seen" not in kv:
-                self.store.set(str(j["issue"]), "closed_seen", self.now())
-            log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+            try:
+                if j.get("pr") and json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "MERGED":
+                    self.end(j, "merged", "merged outside the delegator")
+                    continue
+                number = self.merged_closer(j)
+                if number:
+                    j["pr"] = number
+                    self.end(j, "merged", "merged outside the delegator (#%s)" % number)
+                    continue
+                kv = self.store.get_all(str(j["issue"]))
+                self.store.set(str(j["issue"]), "closed_refs", self.now())
+                if "closed_seen" not in kv:
+                    self.store.set(str(j["issue"]), "closed_seen", self.now())
+                log(j["issue"], "closed on GitHub, state kept: " + j["state"])
+            except (Error, ValueError, KeyError) as e:
+                log(j["issue"], "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
 
     def merged_closer(self, j):
-        out = json.loads(self.gh(["issue", "view", str(j["issue"]), "-R", self.repo, "--json", "closedByPullRequestsReferences"]) or "{}")
-        for ref in out.get("closedByPullRequestsReferences") or []:
+        owner, name = self.repo.split("/", 1)
+        refs = json.loads(self.gh(["api", "graphql", "-f", "query=" + CLOSED_BY, "-f", "owner=" + owner, "-f", "name=" + name,
+                                   "-F", "n=%d" % j["issue"], "--jq", ".data.repository.issue.closedByPullRequestsReferences.nodes"]) or "null")
+        for ref in refs or []:
             state = json.loads(self.gh(["pr", "view", str(ref["number"]), "-R", self.repo, "--json", "state"]) or "{}").get("state")
             if state == "MERGED":
                 return ref["number"]
