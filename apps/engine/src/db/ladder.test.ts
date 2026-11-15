@@ -110,6 +110,10 @@ describe('sqlite ladders', () => {
               6,
               "run-goal",
             ],
+            [
+              7,
+              "step-effort",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`

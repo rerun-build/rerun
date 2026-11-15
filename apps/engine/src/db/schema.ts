@@ -80,6 +80,7 @@ export const runSteps = sqliteTable('run_steps', {
     totalTokens: integer('total_tokens'),
     cacheWriteTokens: integer('cache_write_tokens'),
     costMicros: integer('cost_micros'),
+    effort: text('effort'),
     toolCallCount: integer('tool_call_count').notNull().default(0),
     textLength: integer('text_length').notNull().default(0),
     durationMs: integer('duration_ms'),

@@ -26,6 +26,7 @@ function step(id: string, runId: string, stepNumber: number): RunStepRow {
         totalTokens: 3,
         cacheWriteTokens: null,
         costMicros: null,
+        effort: null,
         toolCallCount: 0,
         textLength: 0,
         durationMs: 10,
@@ -60,6 +61,14 @@ describe('run telemetry', () => {
         const steps = await listRunSteps('agent', 'r1')
         expect(steps.map(row => row.id)).toEqual(['a', 'b', 'c'])
         expect(steps[0]).toEqual(step('a', 'r1', 0))
+    })
+
+    it('stores the effort of a step and reads it back', async () => {
+        await insertRunStep('agent', { ...step('hi', 'r3', 0), effort: 'high' })
+        await insertRunStep('agent', { ...step('none', 'r3', 1), effort: null })
+
+        const steps = await listRunSteps('agent', 'r3')
+        expect(steps.map(row => row.effort)).toEqual(['high', null])
     })
 
     it('lists the tool calls of one run by creation time', async () => {

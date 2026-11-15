@@ -116,6 +116,7 @@ const { armPlanLimitLatch, isPlanLimitLatched } = await import('../connections/p
 const id = 'pathsagent'
 const quietId = 'quietagent'
 const offId = 'offagent'
+const effortId = 'effortagent'
 
 const usage = { inputTokens: { total: 3, noCache: 3, cacheRead: 0, cacheWrite: 0 }, outputTokens: { total: 2, text: 2, reasoning: 0 } }
 
@@ -163,6 +164,8 @@ describe('run loop paths', () => {
         await writeAgentConfig(id, agentConfigSchema.parse({ name: 'paths' }))
         await mkdir(agentDir(quietId), { recursive: true })
         await writeAgentConfig(quietId, agentConfigSchema.parse({ name: 'quiet', selfImprovement: { enabled: false } }))
+        await mkdir(agentDir(effortId), { recursive: true })
+        await writeAgentConfig(effortId, agentConfigSchema.parse({ name: 'effort', thinkingLevel: 'high', selfImprovement: { enabled: false } }))
         await mkdir(agentDir(offId), { recursive: true })
         await writeAgentConfig(offId, agentConfigSchema.parse({ name: 'off', selfImprovement: { enabled: false }, tools: { quickReplies: false } }))
     })
@@ -266,6 +269,16 @@ describe('run loop paths', () => {
         const stored = JSON.parse((await listMessages(id, sessionId))[0].contentJson) as Array<{ type: string; text: string }>
         expect(stored[0].text).toBe('draft the emails')
         expect(stored[1].text).toMatch(/^<user>\nYassine: the person you are talking to/)
+    })
+
+    it('records the coworker thinking level on each step', async () => {
+        stream.parts = textTurn('Done.')
+        const withLevel = await run('hello', { agentId: effortId })
+        expect((await listRunSteps(effortId, withLevel.started.runId))[0].effort).toBe('high')
+
+        stream.parts = textTurn('Done.')
+        const without = await run('hello')
+        expect((await listRunSteps(id, without.started.runId))[0].effort).toBeNull()
     })
 
     it('starts the memory recall before the tools are even built', async () => {
