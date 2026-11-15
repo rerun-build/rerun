@@ -502,6 +502,16 @@ const AGENT_TOOL_DEFS = [
             required: ['agentId', 'runId'],
         },
     },
+    {
+        name: 'reconnect_mcp_server',
+        description:
+            'Reconnects one tool server of the coworker so its open session uses a fresh connection, for example after the server was updated or restarted. The conversation and the run continue. The answer says effect: next_call (the next tool call to that server dials again) or next_message (Codex: from the coworker\'s next message).',
+        inputSchema: {
+            type: 'object',
+            properties: { agentId: { type: 'string' }, name: { type: 'string', description: 'Name of the tool server to reconnect.' } },
+            required: ['agentId', 'name'],
+        },
+    },
 
     {
         name: 'list_tables',

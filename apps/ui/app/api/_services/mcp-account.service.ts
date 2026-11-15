@@ -33,6 +33,7 @@ import {
     patchAgent as enginePatchAgent,
     patchMcpServers as enginePatchMcpServers,
     queryDb as engineQueryDb,
+    reconnectMcpServer as engineReconnectMcpServer,
     rotateTriggerToken as engineRotateTriggerToken,
     runScheduleNow as engineRunScheduleNow,
     setBoxDefault as engineSetBoxDefault,
@@ -882,6 +883,13 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             await engineCancelRun(conn, engineAgentId, runId)
             const after = await engineGetRun(conn, engineAgentId, runId)
             return { ...projectRun(after), wasRunning: before.status === 'running' }
+        }
+
+        case 'reconnect_mcp_server': {
+            const agentId = requireString(args.agentId, 'agentId')
+            const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'use')
+            const result = await engineReconnectMcpServer(conn, engineAgentId, requireString(args.name, 'name'))
+            return { agentId, name: result.name, reconnected: result.reconnected, effect: result.effect, announced: result.announced }
         }
 
         case 'get_run': {
