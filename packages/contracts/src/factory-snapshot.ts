@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const factoryJobStateSchema = z.enum([
     'waiting', 'queued', 'building', 'review_wait', 'reviewing', 'fix_wait', 'fixing', 'checks', 'proof_wait', 'proving',
-    'merged', 'rejected', 'blocked', 'failed', 'returned',
+    'merged', 'rejected', 'blocked', 'failed', 'returned', 'superseded',
 ])
 
 export const factoryWorkerTypeSchema = z.enum(['coder', 'reviewer', 'researcher', 'designer'])
