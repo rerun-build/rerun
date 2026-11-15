@@ -90,12 +90,13 @@ class Reconcile(unittest.TestCase):
         self.assertEqual(self.job(5)["state"], "blocked")
         self.assertEqual(self.count("pr", "view"), 0)
 
-    def test_a_relabelled_job_is_untouched(self):
+    def test_a_live_job_on_a_closed_issue_with_a_merged_pull_request_ends_merged(self):
         self.make([5], {9: "MERGED"})
         self.seed(5, "queued", pr=9)
         self.once(10)
-        self.assertEqual(self.job(5)["state"], "queued")
-        self.assertEqual(self.count("pr", "view"), 0)
+        self.assertEqual(self.job(5)["state"], "merged")
+        self.assertEqual(self.d.store.transitions_of("5")[-1]["reason"], "merged: merged outside the delegator")
+        self.assertEqual(self.count("pr", "view"), 1)
 
     def test_the_pass_runs_only_every_10th_beat_with_one_closed_list(self):
         self.make([5])
