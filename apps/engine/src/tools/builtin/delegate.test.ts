@@ -14,11 +14,14 @@ const runs = vi.hoisted(() => ({
     script: (_prompt: string): Script => ({ text: 'done' }),
     active: 0,
     maxActive: 0,
+    fourth: Promise.resolve(),
+    onFourth: () => {},
 }))
 
 vi.mock('../../runtime/loop.js', () => ({
     runAgent: async (child: Child, sessionId: string, prompt: string) => {
         runs.started.push({ child, sessionId, prompt })
+        if (runs.started.length === 4) runs.onFourth()
         const script = runs.script(prompt)
         if (script.throws) throw new Error(script.throws)
         runs.active += 1
@@ -76,6 +79,7 @@ beforeEach(() => {
     runs.script = () => ({ text: 'done' })
     runs.active = 0
     runs.maxActive = 0
+    runs.fourth = new Promise<void>(resolve => (runs.onFourth = resolve))
 })
 
 describe('delegate_tasks', () => {
@@ -142,7 +146,11 @@ describe('delegate_tasks', () => {
         runs.script = () => ({ text: 'ok', gate })
         const { ctx } = ctxWith()
         const pending = delegate(ctx, Array.from({ length: 7 }, (_, i) => ({ task: `task ${i}` })))
-        await vi.waitFor(() => expect(runs.started).toHaveLength(4))
+        await Promise.race([
+            runs.fourth,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('fourth child never started')), 10_000).unref()),
+        ])
+        expect(runs.started).toHaveLength(4)
         expect(runs.active).toBe(4)
         release()
         await pending
