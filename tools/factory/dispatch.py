@@ -458,6 +458,8 @@ class Dispatcher:
                             data["waits_on_returned"] = ret
                         if take:
                             data["take"] = take
+                        if old and old.get("replans"):
+                            data["replans"] = old["replans"]
                         self.save(data, line)
                         log(i["number"], line)
                     continue
@@ -472,6 +474,8 @@ class Dispatcher:
                    "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"], "plan_dev": parsed["dev"]}
             if take:
                 job["take"] = take
+            if old and old.get("replans"):
+                job["replans"] = old["replans"]
             if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":
                 job.update(state="review_wait", pr=old["pr"], builder=old.get("builder"))
             rooms[parsed["worker"]] -= 1
