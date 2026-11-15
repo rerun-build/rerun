@@ -36,6 +36,7 @@ class World:
         self.ledger = None
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
+        self.problems, self.reruns = [], []
 
     @staticmethod
     def goal_ok(goal):
@@ -89,11 +90,44 @@ class World:
             self.runs[rid]["goal"] = goal
 
     def issue(self, n):
-        return next(i for i in self.issues if i["number"] == int(n))
+        return next(i for i in self.issues + self.problems if i["number"] == int(n))
+
+    def problem(self, a):
+        n = int(a[2]) if len(a) > 2 and a[2].isdigit() else None
+        return next((p for p in self.problems if p["number"] == n), None)
+
+    def problem_gh(self, a):
+        opt = lambda k: a[a.index(k) + 1] if k in a else None
+        if a[:2] == ["issue", "create"]:
+            n = 900 + len(self.problems)
+            self.problems.append({"number": n, "title": opt("--title"), "body": opt("--body"), "comments": [],
+                                  "labels": [opt("--label")], "state": "OPEN"})
+            return "https://github.com/o/r/issues/%d\n" % n
+        if a[:2] == ["issue", "list"]:
+            return json.dumps([{"number": p["number"], "labels": [{"name": x} for x in p["labels"]]}
+                               for p in self.problems if p["state"] == "OPEN"])
+        p = self.problem(a)
+        if a[:2] == ["issue", "edit"]:
+            p["body"] = opt("--body") or p["body"]
+            p["labels"] = [x for x in p["labels"] if x != opt("--remove-label")] + ([opt("--add-label")] if opt("--add-label") else [])
+        elif a[:2] == ["issue", "close"]:
+            p["state"] = "CLOSED"
+            p["comments"] += [opt("--comment")] if opt("--comment") else []
+        elif a[:2] == ["issue", "comment"]:
+            p["comments"].append(opt("--body"))
+        return ""
 
     def gh(self, args):
         a = list(args)
         self.gh_calls.append(a)
+        if a[:2] == ["issue", "create"] or "factory-problem" in a or (a[0] == "issue" and self.problem(a)):
+            return self.problem_gh(a)
+        if a[:2] == ["run", "rerun"]:
+            self.reruns.append(a)
+            return ""
+        if a[:2] == ["issue", "edit"] and "--add-label" in a and a[a.index("--add-label") + 1] == "factory":
+            self.unlabelled.discard(int(a[2]))
+            return ""
         if a[:2] == ["issue", "list"] and "--label" not in a:
             return json.dumps([{"number": n} for n in sorted(self.open_numbers)])
         if a[:2] == ["issue", "list"]:
@@ -995,7 +1029,7 @@ class Heartbeat(Base):
         line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
         self.assertEqual(line, "1970-01-01T00:16:40Z beat 2 | waiting 1, queued 0, building 1, review_wait 0, reviewing 0, "
                                "fix_wait 0, fixing 0, checks 0, proof_wait 0, proving 0 | ended today: merged 1, blocked 0, failed 0, returned 0,"
-                               " rejected 0 | unreadable 0, dead waits 0")
+                               " rejected 0 | unreadable 0, dead waits 0 | problems 0 open, 0 owner")
         self.assertIn(line, self.out.getvalue().splitlines())
         
         self.assertFalse([f for f in os.listdir(self.dir.name) if f.startswith("heartbeat") and f != "heartbeat"])

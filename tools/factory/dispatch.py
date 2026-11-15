@@ -9,6 +9,7 @@ import planners
 import pools
 import proof
 import renewal
+import resolver
 import sifter
 import slots
 import snapshot
@@ -34,6 +35,7 @@ OK_CONCLUSIONS = ("success", "skipped", "neutral")
 CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
              "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
 DEP_TEXT = {"live": "#%d", "not a factory job": "#%d (not a factory job)", "returned": "returned #%d"}
+HEARD = []
 
 
 class Error(Exception):
@@ -41,6 +43,8 @@ class Error(Exception):
 
 
 def log(n, msg):
+    if n == "-":
+        HEARD.append(str(msg))
     print("%s #%s %s" % (datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), n, msg), flush=True)
 
 
@@ -227,6 +231,18 @@ def fix_brief(j, pr, review):
     ])
 
 
+def problem_brief(repo, key, p):
+    return "\n".join([
+        briefs.resolver_brief(repo, key, p),
+        '',
+        NO_COMMENTS,
+        '',
+        'Your last line is exactly `RESOLVED: <one sentence of what changed>`, `FILED: #<n>` (the factory issue that fixes the cause) '
+        'or `ESCALATE: <the step only Rob can take and the exact command for him>`. Nothing may follow that line, not even a tools line.',
+        TAIL,
+    ])
+
+
 def make_account(url, key, opener=urllib.request.urlopen):
     def call(tool, args, timeout=30):
         body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": tool, "arguments": args}}).encode()
@@ -316,6 +332,10 @@ class Dispatcher:
         self.store.import_json(cfg["json_state_file"])
         self.beats = 0
         self.unreadable = 0
+        self.refused = {}
+        self.beat_line = ""
+        del HEARD[:]
+        self.resolver = resolver.Resolver(log, problem_brief)
         self.renewal_unreadable = False
         self.report_logged = set()
         self.started = now()
@@ -368,6 +388,8 @@ class Dispatcher:
             s = slots.station(j)
             if s:
                 waiting[s] = waiting.get(s, 0) + 1
+        if self.resolver.waiting(self):
+            waiting["resolve"] = self.resolver.waiting(self)
         return slots.quotas(waiting, len(self.running()), total)
 
     def take(self, j):
@@ -380,7 +402,7 @@ class Dispatcher:
         return True
 
     def running(self):
-        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")]
+        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")] + self.resolver.running(self)
 
     def unresolved(self):
         return {j["agent"] for j in self.jobs() if j["state"] not in END and j.get("agent") and j.get("sending") and not j.get("run")}
@@ -441,7 +463,8 @@ class Dispatcher:
             if fixed:
                 log(i["number"], "sifted: " + ", ".join(fixed))
         shape = cutshape.check(issues)
-        self.unreadable = sum(1 for e in shape.values() if e)
+        self.refused = {n: e for n, e in shape.items() if e}
+        self.unreadable = len(self.refused)
         labelled = {i["number"] for i in issues}
         open_numbers = None
         if any(cutshape.parse(i)["deps"] for i in issues):
@@ -979,9 +1002,10 @@ class Dispatcher:
             if j["state"] in ended and str(j.get("updated_at") or "").startswith(today):
                 ended[j["state"]] += 1
         stages = states.STAGES
-        line = "%s beat %d | %s | ended today: %s | unreadable %d, dead waits %d" % (
+        line = "%s beat %d | %s | ended today: %s | unreadable %d, dead waits %d | problems %d open, %d owner" % (
             iso(self.now()), self.beats, ", ".join("%s %d" % (s, count.get(s, 0)) for s in stages),
-            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable, dead)
+            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable, dead, *self.resolver.counts(self))
+        self.beat_line = line
         print(line, flush=True)
         path = self.cfg.get("heartbeat_file", "/state/heartbeat")
         tmp = "%s.%d.tmp" % (path, os.getpid())
@@ -1052,6 +1076,11 @@ class Dispatcher:
                 self.save(j, "pass failed")
                 if j["errors"] >= 20 and j["state"] not in END:
                     self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
+        heard, HEARD[:] = list(HEARD), []
+        try:
+            self.resolver.beat(self, heard, self.beat_line)
+        except Exception as e:
+            log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.report_line()
 
     def read_epic(self, n):

@@ -1,4 +1,4 @@
-WAITING = {"review_wait": "review", "fix_wait": "fix", "proof_wait": "proof"}
+WAITING = {"review_wait": "review", "fix_wait": "fix", "proof_wait": "proof", "resolve_wait": "resolve"}
 
 
 def station(job):
