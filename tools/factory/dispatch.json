@@ -9,6 +9,7 @@
     "token_cap": 3000000
   },
   "auto_plan_marker": true,
+  "proof": true,
   "ledger_file": "/state/ledger.db",
   "json_state_file": "/state/dispatch.json",
   "account_key_file": "/run/secrets/account_key",
