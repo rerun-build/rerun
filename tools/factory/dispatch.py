@@ -10,6 +10,7 @@ import digest
 import failures
 import followups
 import holds
+import inboxsort
 import planners
 import planning
 import pools
@@ -1239,6 +1240,7 @@ class Dispatcher:
             os.replace(tmp, path)
         except OSError as e:
             log("-", "heartbeat: %s" % type(e).__name__)
+        inboxsort.beat(self, log)
 
     def renewal_hold(self):
         try:

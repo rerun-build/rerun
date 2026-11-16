@@ -3,6 +3,7 @@ import re
 
 import clocks
 import holds
+import inboxsort
 import pools
 import problems
 import snapshot
@@ -111,6 +112,7 @@ class Resolver:
                 ["issue", "list", "-R", d.repo, "--state", "open", "--json", "number", "--limit", "1000"]) or "[]")}
         held = holds.active(d.store, d.now()) is not None
         self.found = self.watch.find(jobs, d.refused, self.open_issues, line, d.now(), heard, since, held)
+        self.found.update(inboxsort.alarm(d.store.get_all("-")))
         self.tickets(d, self.found, resolve)
         if resolve:
             self.station(d, self.found)
