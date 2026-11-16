@@ -38,7 +38,7 @@ class Client:
         return self.req("GET", path)
 
     def pages(self, path, per_page=100):
-        url = "%s/repos/%s%s?per_page=%d" % (self.base, self.repo, path, per_page)
+        url = "%s/repos/%s%s%sper_page=%d" % (self.base, self.repo, path, "&" if "?" in path else "?", per_page)
         while url:
             data, link = self._open("GET", url)
             yield from data
@@ -86,6 +86,20 @@ class Client:
 
     def branch_sha(self, branch):
         return self.get("/git/ref/heads/" + urllib.parse.quote(branch, safe="/"))["object"]["sha"]
+
+    def merged_prs(self, base, since):
+        out = []
+        for p in self.pages("/pulls?state=closed&sort=updated&direction=desc&base=" + urllib.parse.quote(base)):
+            if p["updated_at"] < since:
+                break
+            if p.get("merged_at") and p["merged_at"] >= since:
+                files = [f["filename"] for f in self.pages("/pulls/%d/files" % p["number"])]
+                out.append({"number": p["number"], "base": base, "sha": p["merge_commit_sha"], "files": files})
+        return out
+
+    def issues_since(self, since):
+        return [i for i in self.pages("/issues?state=open&since=" + urllib.parse.quote(since))
+                if i["created_at"] >= since]
 
     def create_issue(self, title, body=""):
         return self.req("POST", "/issues", {"title": title, "body": body})

@@ -4,9 +4,10 @@ from urllib.parse import urlparse, parse_qs
 
 
 class Fake:
-    def __init__(self, issues=None, comments=None, commits=None, statuses=None, checks=None, diffs=None):
+    def __init__(self, issues=None, comments=None, commits=None, statuses=None, checks=None, diffs=None, pulls=None, files=None):
         self.issues, self.comments, self.commits = dict(issues or {}), comments or {}, commits or {}
         self.diffs, self.statuses, self.checks, self.calls, self.next = dict(diffs or {}), statuses or {}, checks or {}, [], 72
+        self.pulls, self.files, self.queries = list(pulls or []), dict(files or {}), []
         fake = self
 
         class H(BaseHTTPRequestHandler):
@@ -18,6 +19,7 @@ class Fake:
                 n = int(self.headers.get("Content-Length") or 0)
                 body = json.loads(self.rfile.read(n)) if n else None
                 fake.calls.append((self.command, u.path, body, self.headers.get("Authorization")))
+                fake.queries.append(parse_qs(u.query))
                 code, out, link = fake.route(self.command, u.path.split("/")[4:], parse_qs(u.query))
                 data = out.encode() if isinstance(out, str) else json.dumps(out).encode()
                 self.send_response(code)
@@ -40,6 +42,12 @@ class Fake:
             b, _, h = "/".join(p[1:]).partition("...")
             d = self.diffs.get((b, h))
             return (200, d, None) if d is not None else (404, {"message": "Not Found"}, None)
+        if m == "GET" and p == ["issues"]:
+            return 200, list(self.issues.values()), None
+        if m == "GET" and p == ["pulls"] and "base" in q:
+            return 200, [x for x in self.pulls if x["base"]["ref"] == q["base"][0]], None
+        if m == "GET" and len(p) == 3 and p[0] == "pulls" and p[2] == "files":
+            return 200, [{"filename": f} for f in self.files.get(int(p[1]), [])], None
         i, sub = (p + ["", ""])[1], (p + ["", "", ""])[2]
         out = {("issues", ""): lambda: self.issues.get(int(i or 0)), ("commits", ""): lambda: self.commits.get(i),
                ("commits", "status"): lambda: self.statuses.get(i, []),
