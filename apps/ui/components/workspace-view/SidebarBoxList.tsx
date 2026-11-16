@@ -1,6 +1,6 @@
 'use client'
 
-import { closestCenter, DndContext, DragOverlay, KeyboardSensor, PointerSensor, pointerWithin, useDroppable, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragStartEvent } from '@dnd-kit/core'
+import { closestCenter, DndContext, DragOverlay, KeyboardSensor, PointerSensor, pointerWithin, useDroppable, useSensor, useSensors, type CollisionDetection, type DragEndEvent, type DragOverEvent, type DragStartEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
@@ -23,8 +23,8 @@ const dropId = (id: string) => `drop:${id}`
 const idOf = (dndId: string | number) => String(dndId).slice(String(dndId).indexOf(':') + 1)
 const kindOf = (dndId: string | number) => String(dndId).slice(0, String(dndId).indexOf(':'))
 
-// A Box only lands among Boxes. A coworker lands on another coworker, or in a section anywhere the
-// pointer is, before its nearest neighbour.
+// A Box only lands among Boxes. A coworker lands before the coworker under the pointer, or at the end
+// of the Box whose section the pointer is in.
 const collision: CollisionDetection = args => {
     const draggingBox = kindOf(args.active.id) === 'box'
     const droppableContainers = args.droppableContainers.filter(container => (kindOf(container.id) === 'box') === draggingBox)
@@ -58,12 +58,18 @@ export function SidebarBoxList({ sections, collapsed, onToggle, onDialog, render
     const viewer = useBoxViewer()
     const manageable = useManageableSpaceIds()
     const [active, setActive] = useState<string | null>(null)
+    const [overId, setOverId] = useState<string | null>(null)
     const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(OwnKeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }))
 
     const onDragStart = ({ active: started }: DragStartEvent) => setActive(String(started.id))
+    const onDragOver = ({ over }: DragOverEvent) => setOverId(over ? String(over.id) : null)
+    const endDrag = () => {
+        setActive(null)
+        setOverId(null)
+    }
 
     const onDragEnd = ({ active: dropped, over }: DragEndEvent) => {
-        setActive(null)
+        endDrag()
         if (!over) return
         const store = useBoardStore.getState()
         if (kindOf(dropped.id) === 'box') {
@@ -84,12 +90,13 @@ export function SidebarBoxList({ sections, collapsed, onToggle, onDialog, render
         const overIndex = kindOf(over.id) === 'agent' ? target.members.findIndex(member => member.id === idOf(over.id)) : target.members.length
 
         if (source.box.id === target.box.id) {
+            // Its own Box's name or the gap between two tiles is not a rank: it stays where it was.
+            if (kindOf(over.id) !== 'agent') return
             const from = source.members.findIndex(member => member.id === moved)
-            const to = Math.min(overIndex, source.members.length - 1)
-            if (from === to) return
-            const arranged = arrayMove(source.members, from, to)
+            if (from === overIndex) return
+            const arranged = arrayMove(source.members, from, overIndex)
             const others = arranged.filter(member => member.id !== moved).map(member => ({ id: member.id, order: member.sidebarOrder }))
-            store.orderAgents(sidebarOrderWrites(others, moved, to), viewer)
+            store.orderAgents(sidebarOrderWrites(others, moved, overIndex), viewer)
             return
         }
 
@@ -106,21 +113,28 @@ export function SidebarBoxList({ sections, collapsed, onToggle, onDialog, render
     const activeKind = active ? kindOf(active) : null
     const activeAgent = activeKind === 'agent' ? sections.flatMap(section => section.members).find(member => member.id === idOf(active as string)) : undefined
     const activeBox = activeKind === 'box' ? sections.find(section => section.box.id === idOf(active as string)) : undefined
+    // The order of the Boxes is the whole workspace's: moving one renumbers the others.
+    const managesEveryBox = sections.every(section => manageable.has(section.box.id))
+    // Where a coworker dragged out of its Box would land: that Box lights up, and the tile it would
+    // sit before shows a line, since dnd-kit only makes room inside the list the drag started in.
+    const overBoxId = !overId ? null : kindOf(overId) === 'agent' ? sections.find(section => section.members.some(member => member.id === idOf(overId)))?.box.id : idOf(overId)
+    const landingBoxId = activeAgent && overBoxId && overBoxId !== activeAgent.spaceId ? overBoxId : null
+    const landingBeforeId = landingBoxId && overId && kindOf(overId) === 'agent' ? idOf(overId) : null
 
     return (
-        <DndContext sensors={sensors} collisionDetection={collision} onDragStart={onDragStart} onDragEnd={onDragEnd} onDragCancel={() => setActive(null)}>
+        <DndContext sensors={sensors} collisionDetection={collision} onDragStart={onDragStart} onDragOver={onDragOver} onDragEnd={onDragEnd} onDragCancel={endDrag}>
             <SortableContext items={sections.map(section => boxId(section.box.id))} strategy={verticalListSortingStrategy}>
                 {sections.map(section => (
                     <SortableBox
                         key={section.box.id}
                         section={section}
-                        draggable={manageable.has(section.box.id)}
+                        draggable={managesEveryBox}
                         collapsed={collapsed.includes(section.box.id)}
-                        agentDragging={activeKind === 'agent'}
+                        landing={landingBoxId === section.box.id}
                         onToggle={() => onToggle(section.box.id)}
                         onDialog={kind => onDialog(kind, section.box.id)}
                         renderTile={agent => (
-                            <SortableTile key={agent.id} agent={agent} draggable={manageable.has(agent.spaceId)}>
+                            <SortableTile key={agent.id} agent={agent} draggable={manageable.has(agent.spaceId)} landingBefore={landingBeforeId === agent.id}>
                                 {renderTile(agent)}
                             </SortableTile>
                         )}
@@ -139,16 +153,16 @@ type SortableBoxProps = {
     section: SidebarSection<IsoAgent, SpacePublic>
     draggable: boolean
     collapsed: boolean
-    agentDragging: boolean
+    landing: boolean
     onToggle: () => void
     onDialog: (kind: BoxDialogKind) => void
     renderTile: (agent: IsoAgent) => ReactNode
 }
 
-function SortableBox({ section, draggable, collapsed, agentDragging, onToggle, onDialog, renderTile }: SortableBoxProps) {
+function SortableBox({ section, draggable, collapsed, landing, onToggle, onDialog, renderTile }: SortableBoxProps) {
     const { box, members } = section
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: boxId(box.id), disabled: !draggable, attributes: { role: 'group' } })
-    const { setNodeRef: setDropRef, isOver } = useDroppable({ id: dropId(box.id) })
+    const { setNodeRef: setDropRef } = useDroppable({ id: dropId(box.id) })
     const ref = (node: HTMLElement | null) => {
         setNodeRef(node)
         setDropRef(node)
@@ -162,16 +176,17 @@ function SortableBox({ section, draggable, collapsed, agentDragging, onToggle, o
                 onToggle={onToggle}
                 onDialog={onDialog}
                 renderTile={renderTile}
-                drag={{ ref, style: { transform: CSS.Translate.toString(transform), transition }, handle: { ...attributes, ...listeners }, dragging: isDragging, target: agentDragging && isOver }}
+                drag={{ ref, style: { transform: CSS.Translate.toString(transform), transition }, handle: { ...attributes, ...listeners }, dragging: isDragging, target: landing }}
             />
         </SortableContext>
     )
 }
 
-function SortableTile({ agent, draggable, children }: { agent: IsoAgent; draggable: boolean; children: ReactNode }) {
+function SortableTile({ agent, draggable, landingBefore, children }: { agent: IsoAgent; draggable: boolean; landingBefore: boolean; children: ReactNode }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: agentId(agent.id), disabled: !draggable, attributes: { role: 'group' } })
     return (
-        <div ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform), transition }} {...attributes} {...listeners} className={cn('rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/50', isDragging && 'opacity-40')}>
+        <div ref={setNodeRef} style={{ transform: CSS.Translate.toString(transform), transition }} {...attributes} {...listeners} className={cn('relative rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/50', isDragging && 'opacity-40')}>
+            {landingBefore && <span aria-hidden className="pointer-events-none absolute inset-x-2 -top-0.5 z-10 h-0.5 rounded-full bg-brand" />}
             {children}
         </div>
     )
