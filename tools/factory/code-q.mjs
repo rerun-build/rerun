@@ -4,8 +4,9 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const USAGE = 'usage: code-q <repo> <tool> [json] | <repo> --list | --status';
-const [repo, tool, json] = process.argv.slice(2);
-if (!repo || !tool) {
+const args = process.argv.slice(2);
+const [repo, tool, json] = args;
+if (!repo || !tool || args.length > 3 || (tool === '--list' && args.length !== 2)) {
   console.error(USAGE);
   process.exit(2);
 }

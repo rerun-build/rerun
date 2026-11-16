@@ -159,6 +159,12 @@ class CodeQ(unittest.TestCase):
         r = self.run_q({}, "r1")
         self.assertEqual(r.returncode, 2)
 
+    def test_extra_arguments_exit_2_with_usage(self):
+        for args in (("r1", "--list", "x"), ("r1", "t", "{}", "extra"), ("r1", "t", "{}", "a", "b")):
+            r = self.run_q({}, *args)
+            self.assertEqual(r.returncode, 2, args)
+            self.assertIn("usage:", r.stderr)
+
     def test_install_copies_code_q(self):
         if sys.platform == "win32" or shutil.which("sh") is None:
             self.skipTest("no sh")
