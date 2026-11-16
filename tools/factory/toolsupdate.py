@@ -1,4 +1,4 @@
-import json, os, shutil, subprocess, sys, tempfile
+import os, shutil, subprocess, sys, tempfile
 
 import factory as F
 import mirror as M

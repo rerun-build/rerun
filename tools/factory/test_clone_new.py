@@ -1,4 +1,4 @@
-import fcntl, json, os, re, subprocess, sys, textwrap, time, unittest
+import fcntl, json, os, re, subprocess, sys, textwrap, time
 from unittest import mock
 
 import test_factory as T

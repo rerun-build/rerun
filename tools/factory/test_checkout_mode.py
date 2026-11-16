@@ -1,8 +1,8 @@
-import json, os, unittest
+import os
 from unittest import mock
 
 import test_factory as T
-from test_clone_new import CloneCase, FULL
+from test_clone_new import CloneCase
 
 F = T.F
 HERE = os.path.dirname(os.path.abspath(__file__))

@@ -1,4 +1,4 @@
-import contextlib, os, subprocess, unittest
+import contextlib, os, subprocess
 from unittest import mock
 
 import test_factory as T

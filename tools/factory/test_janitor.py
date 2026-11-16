@@ -1,4 +1,4 @@
-import errno, fcntl, json, os, re, subprocess, sys, time, unittest
+import errno, fcntl, os, re, subprocess, time
 from unittest import mock
 
 import test_factory as T
