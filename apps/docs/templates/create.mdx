@@ -4,7 +4,7 @@ description: "Turn coworkers that already work into a listing other people insta
 ---
 
 <Note>
-  Publishing templates is open to accounts in the [Expert Program](/templates/expert-program). Experts get a free sandbox with no coworker limit, which is where templates are built.
+  Publishing templates is open to accounts in the [Expert Program](/templates/expert-program). Experts get a free sandbox with no coworker limit, which is where templates are built. The **Templates** entry of the workspace menu only shows while you are in your sandbox.
 </Note>
 
 The rule that shapes the whole workflow: a template is captured from coworkers that already run. You do not describe a coworker, you archive one.
@@ -16,83 +16,95 @@ The rule that shapes the whole workflow: a template is captured from coworkers t
     Make it actually work: the prompt, the skills, the schedule, the apps. Run it on real data until it is good.
   </Step>
   <Step title="Create a draft">
-    Board toolbar, **My templates**, then **New**. The title becomes the public URL and cannot be changed afterwards, so treat it as the product name.
-  </Step>
-  <Step title="Write the page">
-    Tagline, description, category, gallery, FAQ and search snippet. This is the page someone reads before installing.
+    Open the workspace menu, then **Templates** > **New template**. The title is limited to 50 characters, and the public address of the template (`/templates/<slug>`) is derived from it. The draft is saved as soon as you confirm the title, and the address stays fixed afterwards, so treat the title as the product name.
   </Step>
   <Step title="Capture the coworkers">
-    The capture wizard archives them into the template. Review what it will ship before you confirm.
+    The same dialog goes on: pick the Box, pick the coworkers, then go through the **Security review** of each one. Check what it carries, answer the install question, tick **I reviewed what this coworker carries**, then **Capture**.
   </Step>
-  <Step title="Answer the setup question">
-    Does this coworker need to be configured after install? A template cannot be submitted until you have answered.
+  <Step title="Write the page">
+    **Templates** > **My templates** lists your templates. Select one to edit its **Details**, **Pricing**, **Media**, **FAQ** and **Coworkers**, then **Save**. This is the page someone reads before installing.
   </Step>
-  <Step title="Submit">
-    The Rerun team reviews it and publishes it.
+  <Step title="Submit for review">
+    **Submit for review** hands it to the Rerun team, who review it and publish it.
   </Step>
 </Steps>
+
+To capture more coworkers into an existing draft later, open its **Coworkers** tab and use **Capture from your sandbox**.
 
 ## What the capture ships
 
 Captured by default:
 
-- the coworker prompt
+- the coworker prompt and its install instructions
 - its skills and their reference files
-- its scheduled tasks and webhook triggers
+- its scheduled tasks and webhook triggers, with the webhook tokens emptied
 - the apps it declares, as declarations only
 - its workspace files
 - its private database, tables and rows included
 
-Left behind by default:
+Left behind:
 
-- its memories
-- its credential folders and `.env` values
-- the sign-ins behind its MCP servers
+- its memories, unless you keep them on purpose
+- the values of its `.env` file: the keys stay, listed as values the installer has to provide again
+- the sign-ins behind its apps and MCP servers
+- its conversations, run history and telemetry
+- the files the secret scan flags, unless you keep them on purpose
+
+A capture refuses a single file over 25 MB and a coworker over 150 MB in total: exclude the heaviest folders to get under it.
 
 The private database travels because its tables are part of how the coworker works. Empty the test rows your trial runs left in it before capturing, or exclude `data/agent.db` from the capture.
 
-The wizard shows you every excluded path and lets you keep one on purpose. Do not keep a memory folder unless there is a reason: the archive ends up behind a public install button.
+The review shows you every file and lets you keep an excluded one on purpose. Do not keep a memory folder or a flagged file unless there is a reason: the archive ends up behind a public install button.
 
 Read the warnings that come back. They name literal credentials the engine had to strip out of the files, which usually means something was hardcoded that should not have been.
 
+The capture is a snapshot, not a link: what you change on the coworker afterwards stays in your sandbox until you capture it again.
+
 ## The install script
 
-Every template answers one question: **does this coworker need to be configured after install?**
+Every captured coworker answers one question: **Does this coworker need to be configured after install?** A coworker without an answer cannot be submitted.
 
 If it does, you write the install instructions. They are addressed to the coworker, not to the user: the coworker reads them and walks its new owner through the setup in the chat.
 
-A good install script tells the coworker to:
+Rerun starts you from a default script (**Use the default template**) that tells the coworker to:
 
-1. introduce itself in one line
-2. show a first result before anything is connected, checked, built from public data or a realistic example, asking along the way for the few values only the owner can give
+1. introduce itself in two or three lines
+2. show a first result before anything is connected, built from public data or a realistic example and checked before it is shown, asking along the way for the few values only the owner can give
 3. check which apps it already has, and say what each missing one would unlock on that result
 4. suggest the ones that are missing, rather than asking for keys in the chat
 5. write down what it learned
 6. run one small test on real data
 7. declare the install complete
 
-When the job cannot start without the owner's private data (their inbox, their CRM), the coworker asks for that app first and says what it will produce once it is connected.
+When the job cannot start without the owner's private data (their inbox, their CRM), write it into the script: the coworker should ask for that app first and say what it will produce once it is connected.
 
-Edit it in the coworker **Install** tab. Rerun starts you from a default script that does all of this.
+You answer the question and edit the script in the **Security review** of the capture, or later in the coworker's **Settings**, on the **Install** tab. That tab only shows to experts, in their sandbox.
 
 ## Writing the page
 
 | Field | What works |
 | --- | --- |
-| **Title** | The product name. It becomes the URL |
-| **Tagline** | One line, the card subtitle. What it does, for whom |
-| **Description** | Markdown, and it is the page. What it automates, what it needs, what it does not do |
+| **Title** | The product name, up to 50 characters. The public address is derived from it when the draft is created |
+| **Tagline** | One sentence, up to 160 characters, the card subtitle. What it does, for whom |
+| **Long description** | It is the page. What it automates, what it needs, what it does not do |
 | **Category** | The audience it is for, not the team that built it |
-| **Setup minutes** | Honest. It sets the expectation for the install |
-| **Gallery** | Cover first. It is the image on every card and in every social preview |
+| **Setup time (minutes)** | Honest. It sets the expectation for the install |
+| **Tags** | Comma separated, used for filtering on the public page |
+| **Meta title** | Up to 60 characters. Defaults to the title |
+| **Meta description** | The search snippet, 120 to 155 characters to submit |
+| **Gallery** | Optional, up to 8 images. The first one leads the page. Without images, the cards draw the board of the captured coworkers |
 | **FAQ** | Four to six questions, written the way someone types them into a search box |
+
+**Magic prefill** drafts a field from what the template and its captured coworkers carry, as a starting point to rewrite.
+
+On Rerun Cloud, the **Pricing** tab sets the price. See [Sell a template](/templates/selling).
 
 ## Submission
 
-Submitting freezes the template: still private, no longer editable. It checks for a title, a tagline, a description, a meta description of 120 to 155 characters, at least one captured coworker, an install answer for every coworker, and for a paid template a Stripe account that can receive payouts. No image is required: the cards draw the board of the captured coworkers, and a cover remains the better first impression. It tells you what is missing rather than half-submitting.
+The checklist under the editor shows what a template needs before it is reviewed: a title, a tagline, a description, a meta description of 120 to 155 characters, at least one captured coworker, an install answer for every coworker, and for a paid template a Stripe account that can receive payouts. **Submit for review** stays disabled until every line is met and your last edits are saved. No image is required.
 
-**Withdraw** takes it back to a draft while it is in review. Once published, the page is maintained by Rerun.
+Submitting freezes the template: still private, no longer editable while it is **In review**. **Withdraw** takes it back to a draft so you can keep editing. If the team sends it back, its note shows above the buttons. Once published, the template can no longer be edited from your side: reach out to the Rerun team to change it.
 
 ## Doing it from your editor
 
-The whole workflow is available over the [API](/api/tools/templates), from `create_template` to `submit_template`, including the capture dry run. It is the fastest way to iterate on the copy without leaving your editor.
+The whole workflow is available over the [API](/api/tools/templates), from `create_template` to `submit_template`, including the capture dry run (`plan_template_capture`). It needs an API key issued on your sandbox. It is the fastest way to iterate on the copy without leaving your editor.

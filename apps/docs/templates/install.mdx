@@ -3,21 +3,22 @@ title: "Install a template"
 description: "Start from a coworker that already works instead of a blank prompt."
 ---
 
-A template is a packaged coworker setup: its prompt, its skills, its scheduled tasks, the apps it needs and the files it works from. Installing one recreates all of that in your own workspace.
+A template is a packaged coworker setup: its prompt, its skills, its scheduled tasks and webhooks, the apps it needs, the files it works from and its own database. Installing one recreates all of that in your own workspace.
 
-Browse them on [rerun.build/templates](https://rerun.build/templates), or from the library inside the app.
+Browse them on [rerun.build/templates](https://rerun.build/templates), or in the **Template library** inside the app.
 
 ## What comes with a template
 
 | Included | Not included |
 | --- | --- |
-| The coworker prompt | Any credential or API key |
+| The coworker prompt | Any credential, API key or `.env` value |
 | Its skills and reference files | The author's memories |
-| Its scheduled tasks and webhook triggers | The author's data |
-| The list of apps it needs | The author's connections |
+| Its scheduled tasks and webhook triggers | The author's conversations and run history |
+| The list of apps it needs | The author's app connections and sign-ins |
 | Its workspace files | |
+| Its own database, tables and rows | |
 
-A template ships the shape of a working coworker, never the author's account. Everything personal is stripped on the way out.
+A template ships the shape of a working coworker, never the author's account. Credentials are stripped on the way out, and every webhook gets a new URL of its own in your workspace.
 
 ## Install one
 
@@ -25,39 +26,50 @@ A template ships the shape of a working coworker, never the author's account. Ev
   <Step title="Pick it">
     From the library in the app, or from the marketplace page. A template can carry several coworkers that work together.
   </Step>
+  <Step title="Get through the plan">
+    On Rerun Cloud, installing a template needs an active plan. Without one, the button starts your free trial first (**Start free trial & install**), or a subscription if your trial is used.
+  </Step>
   <Step title="Place the coworkers">
-    The board switches to placement mode. Tap a tile per coworker. If you have no Box yet, Rerun draws one for you.
+    The board switches to placement mode: tap a tile for each coworker. If you have no Box yet, Rerun draws one for you. The install runs once the last coworker is placed. In the simple view, the coworkers go straight into your Box, or into the one you pick if you manage several.
   </Step>
   <Step title="Run the guided setup">
-    Most templates need to be connected to your own accounts, so the chat opens on a **Start installation** button instead of a message box.
+    Most templates need to be connected to your own accounts, so the coworker's chat opens on a setup card instead of a message box.
   </Step>
 </Steps>
 
+The free trial lasts 5 days and runs 3 coworkers at once, with 350 credits. A template with more coworkers still installs in full: the ones past your plan's limit land switched off until a slot frees up.
+
+If the template's coworkers are already on your board, the button opens them instead. **Install again** adds a second copy.
+
+On a self-hosted install there is no plan to check and no paid template: every template in the library installs for free.
+
 ## The guided setup
 
-Click **Start installation** and the coworker runs its own install script. It:
+The card is titled **Set up** and the coworker's name. It shows how many apps the coworker needs and a rough setup time, and lets you pick the model the setup runs on. Click **Install** (followed by the coworker's name) and the coworker runs its own install script. With the default script, it:
 
-- introduces itself and says what it needs
-- takes stock of its apps and offers to set up the ones that are missing
-- asks you for the values only you can give, one card at a time
+- introduces itself and says what it will do for you
+- shows you a first result before anything is connected, asking only for the few values that shape it
+- takes stock of its apps and offers to connect the ones that are missing
 - writes down what it learned
-- runs one small end-to-end test on real data
-- tells you what you can now ask for, and when its automations next run
+- runs one small end-to-end test on your real data
+- declares the install complete
 
 You answer in the chat. When it needs a credential, it opens a masked form, so nothing sensitive goes into the conversation. See [Human in the loop](/agents/human-in-the-loop).
 
+If the setup already runs in another conversation, the card says the coworker is being set up, and **Continue setup** takes you there.
+
 <Note>
-  The scheduled tasks and webhooks a template carries arrive switched off. They switch on when the setup completes, with their timers reset so nothing fires the second you install.
+  Scheduled tasks and webhooks keep the on or off state the author captured them in. Their timers are moved to their next real slot, so nothing fires the second you install. The ones that arrive switched off turn on when the setup completes. A coworker with nothing to set up turns them on at install.
 </Note>
 
-You can **Skip** the setup and talk to the coworker right away. The automations then stay off until you switch them on yourself.
+**Skip for now** closes the card and lets you talk to the coworker right away. Skipping counts as the end of the setup: the coworker's scheduled tasks and webhooks turn on. A line above the chat then says **This coworker has not been set up yet**, and **Set it up** brings the card back.
 
 ## Paid templates
 
-A template can be free, a one-time purchase, or a monthly subscription. Paid ones show the price on the card and take you through checkout before installing.
+On Rerun Cloud, a template can be free, a one-time purchase, or a monthly subscription. Paid ones show the price on the card and take you through checkout before placing. The purchase belongs to the workspace, and it comes on top of your Rerun plan: it unlocks the template, nothing else.
 
-A monthly template can be cancelled. When it lapses, the coworkers it installed are switched off rather than deleted, exactly like [going over a plan limit](/billing#when-you-hit-a-limit).
+A monthly template can be cancelled. When the subscription ends, or a purchase is refunded in full, the coworkers it installed are switched off rather than deleted, and their schedules pause. **Resubscribe** turns the same coworkers back on.
 
 ## After the install
 
-The coworker is yours. Change its prompt, add skills, retune its schedule, switch its model. Nothing is locked, and updates to the original template do not overwrite what you changed.
+The coworker is yours. Read and change its prompt, its skills, its scheduled tasks and its reference files, retune its schedule, switch its model. Nothing is locked, a paid template included. An install is a copy: later changes to the template do not reach your coworkers.

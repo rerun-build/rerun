@@ -3,49 +3,66 @@ title: "Sell a template"
 description: "Pricing, payouts and what Rerun takes."
 ---
 
-A published template can be free, sold once, or sold monthly. You set the price and Rerun handles checkout, tax and the payout.
+On Rerun Cloud, a template can be free, sold once, or sold monthly. You set the price and Rerun handles checkout, tax and the payout. A self-hosted install has no marketplace: every template there is free.
 
 ## Pricing models
 
+Pick one on the **Pricing** tab of the template, in **My templates**.
+
 <CardGroup cols={3}>
   <Card title="Free" icon="gift">
-    Anyone installs it. Good for building a reputation and feeding the directory.
+    Anyone on a Rerun plan installs it. Good for building a reputation and feeding the directory.
   </Card>
-  <Card title="One time" icon="tag">
-    Charged once at install. The buyer keeps the coworkers forever.
+  <Card title="One-time purchase" icon="tag">
+    Charged once. The buyer keeps it for good.
   </Card>
-  <Card title="Recurring" icon="refresh-cw">
-    Charged monthly. The buyer can cancel, and the coworkers switch off when the subscription lapses.
+  <Card title="Monthly subscription" icon="refresh-cw">
+    Charged every month. Access ends when the buyer cancels, and the coworkers it installed switch off.
   </Card>
 </CardGroup>
 
-A paid template starts at **\$5** and goes up to **\$2,000**.
+A paid template starts at **\$5** and goes up to **\$2,000**. The price is in USD, excluding VAT: VAT is added on top at checkout and paid by the buyer, so it never comes out of your side.
+
+Buyers still need an active Rerun plan to install a template, so a purchase unlocks the template and nothing else.
 
 ## What Rerun takes
 
-**5% + \$0.30 per sale**, calculated on the amount net of tax. The rest is yours.
+**5% + \$0.30 per sale**, calculated on the amount net of tax. The rest is yours. The **Pricing** tab shows your price, the Rerun fee and what you earn before you save.
 
 For a \$20 sale with no tax, that is \$1.30 to Rerun and \$18.70 to you.
 
-Refunds reverse the split.
+A refund reverses the split: you give back your share, Rerun gives back its fee. A full refund also takes the template back from the buyer.
 
 ## Getting paid
 
-Payouts go through Stripe Connect. Open the board toolbar, **My templates**, then **Payouts**, and complete the Stripe onboarding once.
+Payouts go through Stripe Connect. Open the workspace menu, **Templates** > **My templates**, then **Payouts** under the list of your templates, and complete the Stripe onboarding once. Continuing means you accept the Marketplace Creator Terms.
+
+The **Payouts** row carries the state of your Stripe account:
+
+| State | What it means |
+| --- | --- |
+| **Not set up** | No Stripe account yet. **Set up payouts** starts the onboarding |
+| **Action needed** | Stripe still needs a few details. **Finish setup** takes you back |
+| **In review** | Stripe is verifying your details, usually a few minutes |
+| **Restricted** | Stripe restricted the account. Your published templates stay online, but nobody can buy them until it is resolved |
+| **Ready** | You can sell. **Open Stripe dashboard** opens your Stripe account |
+
+Payouts follow Stripe's standard schedule.
 
 <Warning>
-  You cannot submit a paid template until your Stripe account can actually receive payouts. The submission check verifies it, so do the onboarding first.
+  You cannot submit a paid template until your Stripe account can actually receive payouts. The submission checklist verifies it, so do the onboarding first. You can still save a price before that.
 </Warning>
 
 Payout onboarding needs a browser. It is the one part of the template workflow that is not available over the API.
 
 ## Tracking sales
 
-**My templates** has a **Revenue** pane: sales, refunds, and what is on its way to you. Each line ties back to the template that produced it.
+**Revenue**, under **Payouts**, shows your sales over 30 days, 12 months or all time: the number of sales, the gross amount, the Rerun fee and what you earned. Below, your Stripe balance (**Pending payout** and **Available now**), your active subscriptions and what they bring each month, and the recent sales, each tied to the template that produced it.
 
 ## Pricing advice
 
 - Price against the work it saves, not against the tokens it burns. The buyer pays for their own model usage on top.
-- Recurring fits a coworker that keeps earning its place: a monitor, a weekly report, an inbox triage. One time fits a setup that is done once.
-- Be honest about setup minutes. A template that takes an hour to connect and says five gets refunded.
+- A monthly subscription fits a coworker that keeps earning its place: a monitor, a weekly report, an inbox triage. A one-time purchase fits a setup that is done once.
+- Be honest about the setup time. A template that takes an hour to connect and says five gets refunded.
 - The install script is part of the product. A template that configures itself well is worth more than one that leaves the buyer guessing.
+- The price is set while the template is a draft. Once it is published, a price change goes through the Rerun team and only applies to new buyers.
