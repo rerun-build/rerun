@@ -257,7 +257,9 @@ def rebuild_missing(apply):
             info = F.api("repos/%s" % full) or {}
             try:
                 C.new(full, rec["issue"], rec["chunk"], rec.get("base"), rec.get("owner", "unknown"), info.get("default_branch", "main"), start=branch)
-            except SystemExit:
+            except SystemExit as e:
+                if e.code not in (2, 3):
+                    raise
                 print("NOT REBUILT %s/%s: `wt new` refused (the line above)" % (repo, d))
                 continue
         print("REBUILT %s/%s from the pushed branch %s" % (repo, d, branch))

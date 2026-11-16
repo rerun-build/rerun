@@ -233,6 +233,17 @@ class Janitor(JanitorCase):
         self.assertIn("REMOVE rerun/7-1", out)
         self.assertFalse(os.path.exists(a))
 
+    def test_a_sigterm_during_a_rebuild_still_ends_the_janitor(self):
+        b = self.job("2")
+        self.commit(b, "b.txt")
+        T.git(b, "push", "--quiet", "origin", "chunk/7-2")
+        import shutil
+        shutil.rmtree(b)
+        with mock.patch.object(self.J.C, "new", side_effect=SystemExit(143)):
+            code, out = self.run_j("janitor", "--apply")
+        self.assertEqual(code, 143, out)
+        self.assertNotIn("NOT REBUILT", out)
+
     def test_github_unreachable_keeps_everything_and_says_so_after_three_passes(self):
         p = self.job()
         self.prs = None
