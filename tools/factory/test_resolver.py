@@ -127,6 +127,32 @@ class Tickets(Problems):
         self.assertEqual(self.records()["unreadable #6"]["issue"], 950)
         self.assertIn("files: no **Files** heading", self.w.problems[0]["body"])
 
+    def test_a_deleted_problem_issue_is_forgotten_and_the_keys_after_it_still_move(self):
+        self.w.issues += [self.bad(6), self.bad(7)]
+        self.tick()
+        six, seven = (next(p for p in self.w.problems if p["title"] == "Factory problem: unreadable #%d" % n) for n in (6, 7))
+        self.w.delete(six["number"])
+        for n in (6, 7):
+            self.w.issue(n)["body"] = self.w.issue(n)["body"].replace("**Depends on**: none", "")
+        self.w.issues.append(self.bad(8))
+        self.tick()
+        self.assertIn("dependency line", seven["body"])
+        self.assertIn("Factory problem: unreadable #8", [p["title"] for p in self.w.problems])
+        self.assertNotEqual(self.records()["unreadable #6"]["issue"], six["number"])
+        self.tick()
+        self.assertEqual(len([p for p in self.w.problems if p["title"] == "Factory problem: unreadable #6"]), 1)
+        self.assertIn("its issue is gone, forgotten", self.out.getvalue())
+
+    def test_a_reopened_problem_starts_without_its_old_line_or_transient_count(self):
+        self.w.issues.append(self.bad(6))
+        self.tick()
+        r = self.records()["unreadable #6"]
+        r.update(state="closed", transient=3, line="RESOLVED: old", filed=77)
+        self.d.store.set("problems", "unreadable #6", json.dumps(r))
+        self.tick()
+        r = self.records()["unreadable #6"]
+        self.assertEqual((r["state"], r["transient"], r["line"], r["filed"]), ("resolve_wait", 0, None, None))
+
     def test_an_ending_records_when_the_job_ended(self):
         self.tick()
         self.w.finish("b1", "BLOCKED: the issue cannot be done as written")
@@ -332,6 +358,23 @@ class Station(Resolving):
         self.assertEqual(self.house(), [])
         self.assertIn("owner", self.w.problems[0]["labels"])
         self.assertIn("sent to HOUSE 6 times", self.w.problems[0]["comments"][0])
+
+    def test_robs_newest_removal_counts_on_an_issue_with_a_long_history(self):
+        self.tick(2)
+        self.w.finish("h1", "ESCALATE: Rob decides")
+        self.tick()
+        p = self.w.problems[0]
+        p["events"] = [{"label": {"name": "owner"}, "actor": {"login": "house-bot"}}] * 150
+        self.w.unlabel(p["number"], "owner", "special-place-administrator")
+        self.tick()
+        self.assertEqual(len(self.house()), 2)
+
+    def test_a_send_logged_without_a_run_id_does_not_raise(self):
+        orig = self.w.account
+        self.w.account = lambda tool, args: (orig(tool, args) and {"status": "running"}) if tool == "send_message" and args["agentId"] == "h1" else orig(tool, args)
+        self.tick()
+        self.assertNotIn("problems: KeyError", self.out.getvalue())
+        self.assertIn("(run None)", self.out.getvalue())
 
     def test_the_brief_keeps_house_off_the_labels_the_dispatcher_reads(self):
         self.tick()
@@ -547,6 +590,12 @@ class Do(Resolving):
         self.run_with("DO: wait-off #8\nDO: wait-off #8\n```\nDO: clear-hold plan limit\n```\nRESOLVED: x")
         self.assertEqual(self.results(), ["The dispatcher ran the DO lines of run run1:\n- DO: wait-off #8 -> back-off and wait reason of #8 dropped"])
 
+    def test_a_code_block_that_is_never_closed_hides_every_do_line_after_it(self):
+        self.d = self.new()
+        self.d.store.put_job("8", "waiting", {"issue": 8, "title": "T8", "wait_reason": "dependency"})
+        self.run_with("```\nDO: wait-off #8\nRESOLVED: x")
+        self.assertEqual(self.results(), [])
+
     def test_do_lines_run_only_from_a_finished_run_the_dispatcher_sent_and_at_most_four(self):
         self.tick()
         self.w.problems[0]["comments"].append("DO: clear-hold plan limit")
@@ -564,11 +613,20 @@ class TakeCap(Base):
     def test_intake_does_not_take_a_relabelled_job_a_fourth_time_and_says_so_once(self):
         self.w.issues.append({"number": 7, "title": "T7", "body": ready(), "comments": []})
         self.d = self.new()
-        self.d.store.put_job("7", "blocked", {"issue": 7, "title": "T7", "relabelled": True, "commented": True, "take": 3})
+        self.d.store.put_job("7", "blocked", {"issue": 7, "title": "T7", "body": ready(), "relabelled": True, "commented": True, "take": 3})
         self.tick(3)
         self.assertEqual(self.state(7), "blocked")
         self.assertEqual(len(self.w.issue(7)["comments"]), 1)
-        self.assertIn("taken 3 times", self.w.issue(7)["comments"][0])
+        self.assertIn("taken 3 times with this text", self.w.issue(7)["comments"][0])
+        self.assertIn("A change to the issue text resets the count", self.w.issue(7)["comments"][0])
+
+    def test_a_changed_issue_text_resets_the_take_count(self):
+        self.w.issues.append({"number": 7, "title": "T7", "body": ready("new plan"), "comments": []})
+        self.d = self.new()
+        self.d.store.put_job("7", "blocked", {"issue": 7, "title": "T7", "body": ready(), "relabelled": True, "commented": True, "take": 3})
+        self.tick()
+        self.assertNotEqual(self.state(7), "blocked")
+        self.assertEqual(self.d.store.get_job("7")["takes"], 1)
 
 
 class Shipped(unittest.TestCase):

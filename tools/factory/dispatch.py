@@ -501,13 +501,18 @@ class Dispatcher:
                 if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
                     continue
                 take = (old.get("take") or 1) + 1 if old and old["state"] in END else (old or {}).get("take")
-                if old and old["state"] in END and take > MAX_TAKES:
-                    if self.store.get_all(str(i["number"])).get("take_cap") != str(take - 1):
+                before = (old.get("takes") or old.get("take") or 1) if old else 0
+                if not old or (old.get("body") or "") != (i.get("body") or ""):
+                    takes = 1
+                else:
+                    takes = before + 1 if old["state"] in END else before
+                if old and old["state"] in END and takes > MAX_TAKES:
+                    if self.store.get_all(str(i["number"])).get("take_cap") != str(before):
                         self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
-                                 "The factory dispatcher does not take this issue again: it was taken %d times. "
-                                 "Rob decides: change the issue, or close it." % (take - 1)])
-                        self.store.set(str(i["number"]), "take_cap", str(take - 1))
-                        log(i["number"], "not started: taken %d times" % (take - 1))
+                                 "The factory dispatcher does not take this issue again: it was taken %d times with this text. "
+                                 "A change to the issue text resets the count; then put the factory label back. Or close the issue." % before])
+                        self.store.set(str(i["number"]), "take_cap", str(before))
+                        log(i["number"], "not started: taken %d times with this text" % before)
                     continue
                 errors = shape.get(i["number"]) or []
                 if errors:
@@ -546,6 +551,7 @@ class Dispatcher:
                                 data["dead"] = dead
                             if take:
                                 data["take"] = take
+                            data["takes"] = takes
                             if old and old.get("replans"):
                                 data["replans"] = old["replans"]
                             self.save(data, line)
@@ -581,6 +587,7 @@ class Dispatcher:
                        "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"], "plan_dev": parsed["dev"]}
                 if take:
                     job["take"] = take
+                job["takes"] = takes
                 if old and old.get("replans"):
                     job["replans"] = old["replans"]
                 if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":

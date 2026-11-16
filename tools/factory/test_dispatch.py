@@ -36,7 +36,7 @@ class World:
         self.ledger = None
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
-        self.problems, self.reruns = [], []
+        self.problems, self.reruns, self.deleted = [], [], set()
         self.commits, self.dev_runs = [], []
 
     @staticmethod
@@ -107,9 +107,11 @@ class World:
         if a[:2] == ["issue", "list"]:
             return json.dumps([{"number": p["number"], "body": p["body"], "labels": [{"name": x} for x in p["labels"]]}
                                for p in self.problems if p["state"] == "OPEN"])
-        if a[0] == "api":
-            n = int(a[1].split("/issues/")[1].split("/")[0])
-            return json.dumps(next(p for p in self.problems if p["number"] == n).get("events", []))
+        if a[:2] == ["api", "graphql"]:
+            n = int(next(x for x in a if x.startswith("n="))[2:])
+            return json.dumps(next(p for p in self.problems if p["number"] == n).get("events", [])[-20:])
+        if a[0] == "issue" and len(a) > 2 and a[2].isdigit() and int(a[2]) in self.deleted:
+            raise D.Error("gh %s %s failed: exit 1: GraphQL: Could not resolve to an issue or pull request with the number of %s." % (a[0], a[1], a[2]))
         p = self.problem(a)
         if a[:2] == ["issue", "edit"]:
             p["body"] = opt("--body") or p["body"]
@@ -126,13 +128,18 @@ class World:
     def unlabel(self, n, label, actor):
         p = next(p for p in self.problems if p["number"] == n)
         p["labels"].remove(label)
-        p.setdefault("events", []).append({"event": "unlabeled", "label": {"name": label}, "actor": {"login": actor}})
+        p.setdefault("events", []).append({"label": {"name": label}, "actor": {"login": actor}})
+
+    def delete(self, n):
+        self.problems = [p for p in self.problems if p["number"] != n]
+        self.deleted.add(n)
 
     def gh(self, args):
         a = list(args)
         self.gh_calls.append(a)
-        timeline = a[0] == "api" and "/timeline" in a[1] and any("/issues/%d/" % p["number"] in a[1] for p in self.problems)
-        if a[:2] == ["issue", "create"] or "factory-problem" in a or (a[0] == "issue" and self.problem(a)) or timeline:
+        timeline = a[:2] == ["api", "graphql"] and any("UNLABELED_EVENT" in x for x in a)
+        gone = a[0] == "issue" and len(a) > 2 and a[2].isdigit() and int(a[2]) in self.deleted
+        if a[:2] == ["issue", "create"] or "factory-problem" in a or (a[0] == "issue" and self.problem(a)) or timeline or gone:
             return self.problem_gh(a)
         if a[:2] == ["run", "rerun"]:
             self.reruns.append(a)

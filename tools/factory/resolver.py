@@ -30,7 +30,10 @@ FORMS = ({"prefix": "RESOLVED: ", "rest": "sentence"}, {"prefix": "FILED: ", "re
 FINAL = re.compile(r"(?m)^(?:RESOLVED|FILED|ESCALATE):[ \t]*\S[^\n]*")
 DO = re.compile(r"(?m)^DO: ([^\n]*)")
 DO_MAX = 4
-FENCE = re.compile(r"(?ms)^```.*?^```[^\n]*$")
+FENCE = re.compile(r"(?ms)^```.*?(?:^```[^\n]*$|\Z)")
+GONE = re.compile(r"Could not resolve to an issue|HTTP 40[4]\b|HTTP 410\b")
+UNLABELED = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name){issue(number:$n)"
+             "{timelineItems(last:20,itemTypes:[UNLABELED_EVENT]){nodes{... on UnlabeledEvent{label{name} actor{login}}}}}}}")
 KEY_LINE = re.compile(r"(?m)^Problem-Key: (.+?)\s*$")
 
 
@@ -112,53 +115,70 @@ class Resolver:
         if resolve:
             self.station(d, self.found)
 
+    def forget(self, d, key, r, e):
+        if not GONE.search(str(e)):
+            raise e
+        self.log(r.get("issue") or "-", "problem %s: its issue is gone, forgotten: %s" % (key, e))
+        r.update(state="closed", issue=None)
+        self.put(d, key, r)
+
     def tickets(self, d, found, resolve):
+        for key, r in sorted(self.records(d).items()):
+            try:
+                self.ticket(d, key, r, found, resolve)
+            except Exception as e:
+                self.forget(d, key, r, e)
         recs = self.records(d)
-        for key, r in sorted(recs.items()):
-            if key in found:
-                if found[key] != r["evidence"]:
-                    d.gh(["issue", "edit", str(r["issue"]), "-R", d.repo, "--body", body(key, found[key])])
-                if found[key] != r["evidence"] or r.get("absent"):
-                    r.update(evidence=found[key], absent=0)
-                    self.put(d, key, r)
-            elif not (resolve and r["state"] == "resolving") and not (key in SYSTEMIC and self.beats <= START_BEATS):
-                r["absent"] = r.get("absent", 0) + 1
-                if r["absent"] >= (SYSTEMIC_CLEAR_BEATS if key in SYSTEMIC else CLEAR_BEATS):
-                    line = r.get("line") if r["state"] == "verify" else None
-                    text = "cleared at %s" % snapshot.iso(d.now()) + (": " + line.replace("@", "") if line else "")
-                    d.gh(["issue", "close", str(r["issue"]), "-R", d.repo, "--comment", text])
-                    r["state"] = "closed"
-                    self.log(r["issue"], "problem closed: %s" % key)
-                self.put(d, key, r)
         new = sorted((k for k in found if k not in recs), key=rank)
-        room = max(0, OPEN_MAX - len(self.records(d)))
+        room = max(0, OPEN_MAX - len(recs))
         old, listed = self.records(d, closed=True), None
         for key in new[:min(NEW_MAX, room)]:
             fresh = {"evidence": found[key], "state": "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
-                     "agent": None, "copy": None, "run": None}
+                     "agent": None, "copy": None, "run": None, "transient": 0, "line": None, "filed": None}
             if old.get(key, {}).get("issue"):
                 n = old[key]["issue"]
-                d.gh(["issue", "reopen", str(n), "-R", d.repo])
-                d.gh(["issue", "edit", str(n), "-R", d.repo, "--body", body(key, found[key])])
+                try:
+                    d.gh(["issue", "reopen", str(n), "-R", d.repo])
+                    d.gh(["issue", "edit", str(n), "-R", d.repo, "--body", body(key, found[key])])
+                except Exception as e:
+                    self.forget(d, key, old[key], e)
+                    continue
                 self.put(d, key, dict(old[key], **fresh))
                 self.log(n, "problem reopened: %s" % key)
                 continue
             if listed is None:
                 listed = self.listed(d)
             if key in listed:
-                self.put(d, key, dict(fresh, issue=listed[key], evidence=""))
+                self.put(d, key, dict(old.get(key, {}), **dict(fresh, issue=listed[key], evidence="")))
                 self.log(listed[key], "problem adopted: %s" % key)
                 continue
             out = d.gh(["issue", "create", "-R", d.repo, "--title", "Factory problem: " + key, "--label", LABEL,
                         "--body", body(key, found[key])])
             n = int(re.search(r"/issues/(\d+)", out).group(1))
-            self.put(d, key, dict(fresh, issue=n))
+            self.put(d, key, dict(old.get(key, {}), **dict(fresh, issue=n)))
             self.log(n, "problem opened: %s" % key)
         left = len(new) - min(len(new), room)
         text = "problems capped: %d not opened, %d open" % (left, OPEN_MAX) if left else None
         if text and text != self.capped:
             self.log("problems", text)
         self.capped = text
+
+    def ticket(self, d, key, r, found, resolve):
+        if key in found:
+            if found[key] != r["evidence"]:
+                d.gh(["issue", "edit", str(r["issue"]), "-R", d.repo, "--body", body(key, found[key])])
+            if found[key] != r["evidence"] or r.get("absent"):
+                r.update(evidence=found[key], absent=0)
+                self.put(d, key, r)
+        elif not (resolve and r["state"] == "resolving") and not (key in SYSTEMIC and self.beats <= START_BEATS):
+            r["absent"] = r.get("absent", 0) + 1
+            if r["absent"] >= (SYSTEMIC_CLEAR_BEATS if key in SYSTEMIC else CLEAR_BEATS):
+                line = r.get("line") if r["state"] == "verify" else None
+                text = "cleared at %s" % snapshot.iso(d.now()) + (": " + line.replace("@", "") if line else "")
+                d.gh(["issue", "close", str(r["issue"]), "-R", d.repo, "--comment", text])
+                r["state"] = "closed"
+                self.log(r["issue"], "problem closed: %s" % key)
+            self.put(d, key, r)
 
     def listed(self, d):
         found = json.loads(d.gh(["issue", "list", "-R", d.repo, "--label", LABEL, "--state", "open",
@@ -210,7 +230,7 @@ class Resolver:
             return
         r["run"] = (run or {}).get("runId")
         self.put(d, key, r)
-        self.log(r["issue"], "problem %s -> %s (run %s)" % (key, name, run["runId"]))
+        self.log(r["issue"], "problem %s -> %s (run %s)" % (key, name, r["run"]))
 
     def back(self, d, key, r, why):
         r.update(state="resolve_wait", agent=None, copy=None, run=None)
@@ -282,8 +302,9 @@ class Resolver:
                 holds.clear(d.store, arg)
                 return "DO: %s -> hold %s cleared" % (text, arg)
             if verb == "requeue" and j and j["state"] in problems.ENDED:
-                if (j.get("take") or 1) >= REQUEUE_MAX:
-                    return "not allowed: DO: %s (taken %d times; Rob decides)" % (text, j.get("take") or 1)
+                takes = j.get("takes") or j.get("take") or 1
+                if takes >= REQUEUE_MAX:
+                    return "not allowed: DO: %s (taken %d times; Rob decides)" % (text, takes)
                 d.gh(["issue", "edit", str(n), "-R", d.repo, "--add-label", d.label, "--remove-label", "factory-blocked"])
                 return "DO: %s -> #%d labelled %s again; intake takes it on the next beat" % (text, n, d.label)
             if verb == "wait-off" and j and j["state"] in states.WAIT_STATES and (j.get("not_before") or j.get("wait_reason")):
@@ -337,8 +358,10 @@ class Resolver:
         for key, r in recs.items():
             if r["state"] != "owner" or r["issue"] not in labels or OWNER in labels[r["issue"]]:
                 continue
-            events = json.loads(d.gh(["api", "repos/%s/issues/%d/timeline?per_page=100" % (d.repo, r["issue"])]) or "[]")
-            off = [e for e in events if e.get("event") == "unlabeled" and (e.get("label") or {}).get("name") == OWNER]
+            owner, name = d.repo.split("/", 1)
+            events = json.loads(d.gh(["api", "graphql", "-f", "query=" + UNLABELED, "-f", "owner=" + owner, "-f", "name=" + name,
+                                      "-F", "n=%d" % r["issue"], "--jq", ".data.repository.issue.timelineItems.nodes"]) or "[]")
+            off = [e for e in events or [] if (e.get("label") or {}).get("name") == OWNER]
             who = (off[-1].get("actor") or {}).get("login") if off else None
             if who != ADMIN:
                 d.gh(["issue", "edit", str(r["issue"]), "-R", d.repo, "--add-label", OWNER])
