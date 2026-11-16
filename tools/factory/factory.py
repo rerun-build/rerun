@@ -750,11 +750,13 @@ TOKEN_SHAPE = re.compile(r"gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22
 def token_shapes(top, base):
     found = []
     cur = None
-    for line in run([GIT, "diff", "--unified=0", "--no-color", "origin/%s...HEAD" % base], cwd=top).stdout.splitlines():
+    for line in run([GIT, "log", "-p", "-U0", "--no-color", "--format=", "origin/%s..HEAD" % base], cwd=top).stdout.splitlines():
         if line.startswith("+++ b/"):
             cur = line[6:]
         elif line.startswith("+") and not line.startswith("+++") and TOKEN_SHAPE.search(line):
             found.append(cur or "?")
+    if TOKEN_SHAPE.search(run([GIT, "log", "--format=%B", "origin/%s..HEAD" % base], cwd=top).stdout):
+        found.append("a commit message")
     conf = run([GIT, "config", "--local", "--list"], cwd=top, check=False).stdout
     if TOKEN_SHAPE.search(conf) or "@github.com" in run([GIT, "remote", "-v"], cwd=top, check=False).stdout:
         found.append(".git/config")
@@ -787,7 +789,11 @@ def merge_base_in(top, branch, base):
         run([GIT, "merge", "--abort"], cwd=top, check=False)
         os.remove(mark)
         die("CONFLICT: %s moved and conflicts with this branch in %s. Merge origin/%s yourself, commit, then run pr-open again." % (base, ", ".join(files) or "?", base))
-    run([GIT, "commit", "--quiet", "--no-edit", "-m", "Merge origin/%s into %s" % (base, branch)], cwd=top)
+    r = run([GIT, "commit", "--quiet", "--no-edit", "-m", "Merge origin/%s into %s" % (base, branch)], cwd=top, check=False)
+    if r.returncode:
+        run([GIT, "merge", "--abort"], cwd=top, check=False)
+        os.remove(mark)
+        die("the automatic merge of origin/%s could not be committed: %s. Nothing pushed." % (base, (r.stderr or r.stdout).strip()[-300:]))
     os.remove(mark)
     print("MERGED origin/%s into %s first: the branch was behind" % (base, branch))
 
@@ -807,11 +813,11 @@ def cmd_pr_open(a):
     if run([GIT, "status", "--porcelain"], cwd=top).stdout.strip():
         die("uncommitted changes. Commit everything for this chunk first (one push per chunk).")
     run([GIT, "fetch", "--quiet", "origin", base], cwd=top)
-    if clone:
-        merge_base_in(top, branch, base)
     ahead = run([GIT, "rev-list", "--count", "origin/%s..HEAD" % base], cwd=top).stdout.strip()
     if ahead == "0":
         die("no commits ahead of origin/%s" % base)
+    if clone:
+        merge_base_in(top, branch, base)
     changed = run([GIT, "diff", "--name-only", "origin/%s...HEAD" % base], cwd=top).stdout.split()
     if any(re.match(WF, f) for f in changed):
         die("this chunk changes workflow files (.github/workflows or actions). They are Rob's. Return BLOCKED to @boss.")

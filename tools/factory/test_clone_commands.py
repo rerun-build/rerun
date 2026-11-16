@@ -122,6 +122,49 @@ class CloneCommands(CloneCase):
         self.assertIn("the shape of a GitHub token is in leak.txt", out)
         self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
 
+    def test_a_token_added_in_one_commit_and_removed_in_the_next_still_refuses_the_push(self):
+        p = self.ready_clone()
+        self.commit(p, "leak.txt", "key = " + "ghp" + "_" + "A" * 36 + "\n")
+        self.commit(p, "leak.txt", "key = from the environment\n")
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the shape of a GitHub token is in leak.txt", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
+    def test_a_token_in_a_commit_message_refuses_the_push(self):
+        p = self.ready_clone()
+        T.write(p, "a.txt", "a\n")
+        T.git(p, "add", "-A")
+        T.git(p, "commit", "--quiet", "-m", "use " + "ghp" + "_" + "B" * 36)
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the shape of a GitHub token is in a commit message", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
+    def test_a_refused_automatic_merge_commit_leaves_no_merge_behind(self):
+        p = self.ready_clone()
+        self.commit(p, "a.txt")
+        self.move_dev("b.txt", "dev moved\n")
+        hook = os.path.join(p, ".git", "hooks", "commit-msg")
+        T.write(os.path.dirname(hook), "commit-msg", "#!/bin/sh\necho refused by hook >&2\nexit 1\n")
+        os.chmod(hook, 0o755)
+        code, out = self.pr_open(p)
+        self.assertNotEqual(code, 0, out)
+        self.assertFalse(os.path.exists(os.path.join(p, ".git", "MERGE_HEAD")))
+        self.assertFalse(os.path.exists(os.path.join(p, ".git", "factory-merging")))
+        self.assertEqual(T.git(p, "status", "--porcelain"), "")
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
+    def test_a_branch_with_no_change_of_its_own_opens_no_pull_request(self):
+        p = self.ready_clone()
+        with open(os.path.join(p, ".git", "info", "exclude"), "a") as f:
+            f.write("node_modules/\n")
+        self.move_dev("b.txt", "dev moved\n")
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("no commits ahead of origin/dev", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
     def merge_dev(self, pr):
         def fake_api(path, *a, **k):
             return [] if path.endswith("/files?per_page=100") else {"default_branch": "main"} if path == "repos/" + FULL else pr
