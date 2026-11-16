@@ -142,6 +142,9 @@ def repo_full(name):
     full = name if "/" in name else OWNERS[0] + "/" + name
     if full.split("/")[0] not in OWNERS:
         die("repo owner not allowed: " + full)
+    parts = full.split("/")
+    if len(parts) != 2 or any(not re.fullmatch(r"[A-Za-z0-9._-]+", x) or x in (".", "..") for x in parts):
+        die("repo name not allowed: " + full)
     return full
 
 
@@ -621,12 +624,13 @@ def wt_new_clone_steps(a, full, issue, chunk):
     return clones.new(full, issue, chunk, base, owner, info["default_branch"])
 
 
-def install_deps(path):
+def install_deps(path, runner=None):
     if not os.path.isfile(os.path.join(path, "pnpm-lock.yaml")):
         return
+    cmd = ["pnpm", "install", "--frozen-lockfile", "--prefer-offline"]
     t0 = time.time()
     try:
-        r = run(["pnpm", "install", "--frozen-lockfile", "--prefer-offline"], cwd=path, check=False, timeout=300)
+        r = runner(cmd, path, 300) if runner else run(cmd, cwd=path, check=False, timeout=300)
         err = None if r.returncode == 0 else ((r.stderr or r.stdout or "").strip().splitlines() or ["exit %d" % r.returncode])[0]
     except (OSError, subprocess.SubprocessError) as e:
         err = (str(e).splitlines() or [type(e).__name__])[0]

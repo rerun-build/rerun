@@ -24,7 +24,16 @@ DRIVER = textwrap.dedent("""
         pass
     F.cmd_wt(["new", "rerun", os.environ["T_ISSUE"], os.environ["T_CHUNK"], "--clone"])
 """)
-PNPM = "#!/bin/sh\n[ -n \"$T_KILL_PNPM\" ] && kill -9 $PPID\nmkdir -p node_modules && echo ok > node_modules/.ok\n"
+PNPM = ("#!/bin/sh\n[ -n \"$T_KILL_PNPM\" ] && kill -9 $PPID\n"
+        "if [ -n \"$T_SLOW_PNPM\" ]; then\n"
+        "  mkdir \"$T_SLOW_PNPM/in\" 2>/dev/null || touch \"$T_SLOW_PNPM/overlap\"\n"
+        "  trap 'touch \"$T_SLOW_PNPM/term\"; kill $s; rmdir \"$T_SLOW_PNPM/in\"; exit 143' TERM\n"
+        "  touch \"$T_SLOW_PNPM/started\"\n"
+        "  sleep 2 & s=$!\n"
+        "  wait $s\n"
+        "  rmdir \"$T_SLOW_PNPM/in\" 2>/dev/null\n"
+        "fi\n"
+        "mkdir -p node_modules && echo ok > node_modules/.ok\n")
 
 
 class CloneCase(T.FactoryCase):
@@ -142,6 +151,25 @@ class CloneNew(CloneCase):
                     self.assertIsNone(TOKEN.search(fh.read()), f)
         self.assertIsNone(TOKEN.search(T.git(self.folder(), "remote", "-v")))
 
+    def test_a_credential_in_the_github_url_is_refused_and_lands_in_no_file(self):
+        tok = "ghp_" + "Q" * 36
+        code, out = self.new(FACTORY_GITHUB_URL="file://x-access-token:%s@localhost%s/github.com/" % (tok, self.tmp))
+        self.assertEqual(code, 2, out)
+        self.assertIn("REFUSED: ", out)
+        self.assertNotIn(tok, out)
+        for d, _, fs in os.walk(F.WORK):
+            for f in fs:
+                with open(os.path.join(d, f), "rb") as fh:
+                    self.assertNotIn(tok.encode(), fh.read(), os.path.join(d, f))
+
+    def test_a_failed_github_fetch_of_a_job_branch_base_is_transient(self):
+        self.call(lambda _: self.M.refresh(FULL), [])
+        T.git(self.origin, "update-ref", "-d", "refs/heads/dev")
+        code, out = self.new()
+        self.assertEqual(code, 3, out)
+        self.assertIn("TRANSIENT: ", out)
+        self.assertNotIn("Traceback", out)
+
     def test_a_second_run_on_a_ready_clone_says_exists(self):
         self.new()
         code, out = self.new()
@@ -185,6 +213,13 @@ class CloneNew(CloneCase):
 
 
 class KillAtEveryStep(CloneCase):
+    def wait_for(self, f):
+        for _ in range(200):
+            if os.path.exists(f):
+                return
+            time.sleep(0.05)
+        self.fail("never appeared: " + f)
+
     def check(self, **kill):
         code, out = self.new(**kill)
         self.assertIn(code, (137, -9), out)
@@ -209,6 +244,52 @@ class KillAtEveryStep(CloneCase):
         self.assertEqual(code, 137, out)
         self.assertFalse(os.path.exists(self.folder()))
 
+    def test_killed_before_the_rename_leaves_no_temporary_clone_once_the_job_is_made(self):
+        code, out = self.new(T_KILL="branched")
+        self.assertEqual(code, 137, out)
+        code, out = self.new()
+        self.assertEqual(code, 0, out)
+        self.assertEqual(os.listdir(self.C.tmp_root()), [])
+
+    def test_killed_after_the_clone_from_the_mirror(self):
+        self.call(lambda _: self.M.refresh(FULL), [])
+        self.check(T_KILL="cloned")
+
+    def test_killed_after_the_fetch_from_the_mirror(self):
+        self.call(lambda _: self.M.refresh(FULL), [])
+        self.check(T_KILL="fetched")
+
+    def test_a_hard_kill_while_pnpm_runs_never_gives_two_installs_at_once(self):
+        d = os.path.join(self.tmp, "pnpm")
+        os.makedirs(d)
+        p = self.spawn(T_SLOW_PNPM=d)
+        self.wait_for(os.path.join(d, "started"))
+        p.kill()
+        p.communicate(30)
+        for _ in range(40):
+            code, out = self.new(T_SLOW_PNPM=d)
+            if code != 3:
+                break
+            self.assertIn("owned by run", out)
+            time.sleep(0.25)
+        self.assertEqual(code, 0, out)
+        self.assertFalse(os.path.exists(os.path.join(d, "overlap")))
+        self.assert_ready(self.folder())
+
+    def test_sigterm_while_pnpm_runs_reaches_pnpm_and_is_waited_for(self):
+        d = os.path.join(self.tmp, "pnpm")
+        os.makedirs(d)
+        p = self.spawn(T_SLOW_PNPM=d)
+        self.wait_for(os.path.join(d, "started"))
+        p.terminate()
+        out = p.communicate(30)[0]
+        self.assertEqual(p.returncode, 143, out)
+        self.assertTrue(os.path.exists(os.path.join(d, "term")))
+        self.assertFalse(os.path.exists(os.path.join(d, "in")))
+        code, out = self.new()
+        self.assertEqual(code, 0, out)
+        self.assert_ready(self.folder())
+
     def test_killed_after_the_rename(self):
         self.check(T_KILL="renamed")
 
@@ -217,3 +298,13 @@ class KillAtEveryStep(CloneCase):
 
     def test_killed_after_the_install_before_the_stamp(self):
         self.check(T_KILL="installed")
+
+
+class RepoNames(T.FactoryCase):
+    def test_a_repository_name_that_leaves_the_work_folder_is_refused(self):
+        for name in ("special-place-ai-heaven/..", "special-place-ai-heaven/.", "..", "special-place-ai-heaven/a/b",
+                     "special-place-ai-heaven/", "special-place-ai-heaven/a b"):
+            code, out = self.call(F.repo_full, name)
+            self.assertEqual(code, 2, name + " " + out)
+        self.assertEqual(F.repo_full("rerun"), FULL)
+        self.assertEqual(F.repo_full("special-place-ai-heaven/re.run-x_1"), "special-place-ai-heaven/re.run-x_1")

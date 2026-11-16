@@ -186,12 +186,22 @@ class Doctor(JanitorCase):
         self.assertFalse(os.path.exists(p))
 
     def test_temporary_folders_of_dead_commands_are_removed_and_never_counted_as_jobs(self):
-        t = os.path.join(F.WORK, "tmp", "rerun-7-1-999999")
+        t = os.path.join(F.WORK, "tmp", "rerun-7-1")
         os.makedirs(t)
         self.assertEqual(F.wt_dirs(), [])
         code, out = self.run_j("doctor", "--apply")
-        self.assertIn("TMP rerun-7-1-999999 removed", out)
+        self.assertIn("TMP rerun-7-1 removed", out)
         self.assertFalse(os.path.exists(t))
+
+    def test_the_temporary_folder_of_a_live_job_is_kept(self):
+        t = os.path.join(F.WORK, "tmp", "rerun-7-1")
+        os.makedirs(t)
+        os.makedirs(os.path.join(F.STATE, "jobs"), exist_ok=True)
+        with open(os.path.join(F.STATE, "jobs", "rerun-7-1.lock"), "a") as lk:
+            fcntl.flock(lk, fcntl.LOCK_EX)
+            code, out = self.run_j("doctor", "--apply")
+        self.assertNotIn("TMP rerun-7-1", out)
+        self.assertTrue(os.path.exists(t))
 
     def test_a_fault_on_one_folder_is_reported_and_exits_1(self):
         self.job()

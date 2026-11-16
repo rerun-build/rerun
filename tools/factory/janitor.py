@@ -247,12 +247,17 @@ def rebuild_missing(apply):
 def old_tmp(apply):
     for e in sorted(os.listdir(C.tmp_root())) if os.path.isdir(C.tmp_root()) else []:
         p = os.path.join(C.tmp_root(), e)
-        pid = e.rsplit("-", 1)[-1]
-        alive = pid.isdigit() and os.path.exists("/proc/" + pid)
-        if not alive or time.time() - os.path.getmtime(p) > 3600:
+        m = re.fullmatch(r"(.+)-(\d+-[a-z0-9]{1,12})", e)
+        lk = C.try_lease(*m.groups()) if m else None
+        if lk is None and (m or time.time() - os.path.getmtime(p) <= 3600):
+            continue
+        try:
             if apply:
                 shutil.rmtree(p, ignore_errors=True)
             print("TMP %s removed%s" % (e, "" if apply else " (dry run)"))
+        finally:
+            if lk:
+                lk.close()
 
 
 def doctor(apply):

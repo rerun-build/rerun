@@ -63,11 +63,13 @@ def lease(repo, issue, chunk):
         lk.close()
         o = read_owner(name)
         transient("job %s is owned by run %s since %s; nothing changed" % (name, o.get("run", "unknown"), o.get("since", "unknown")))
+    M.HELD.append(lk.fileno())
     try:
         M.write(owner_path(name), json.dumps({"run": os.environ.get("FACTORY_RUN") or "unknown", "pid": os.getpid(),
                                               "since": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}))
         yield
     finally:
+        M.HELD.remove(lk.fileno())
         lk.close()
 
 
@@ -110,8 +112,9 @@ def prepare(path, branch, base):
 
 
 def make(full, repo, d, branch, base, default, start=None):
-    tmp = os.path.join(tmp_root(), "%s-%s-%d" % (repo, d, os.getpid()))
+    tmp = os.path.join(tmp_root(), "%s-%s" % (repo, d))
     os.makedirs(tmp_root(), exist_ok=True)
+    shutil.rmtree(tmp, ignore_errors=True)
     m = M.path(repo)
     src = m if os.path.isdir(m) and M.git(["for-each-ref", "--count=1", "refs/heads"], cwd=m).stdout.strip() else M.url(full)
     r = M.git(["clone", "--quiet", "--no-checkout", src, tmp], timeout=900)
@@ -135,7 +138,10 @@ def make(full, repo, d, branch, base, default, start=None):
     if not fetch_base(tmp, base):
         if src != m:
             transient("cannot fetch %s from GitHub after %d tries" % (base, FETCH_TRIES))
-        sha = must(M.git(["rev-parse", "--verify", "refs/remotes/origin/" + base], cwd=tmp), "base in the mirror")
+        r = M.git(["rev-parse", "--verify", "refs/remotes/origin/" + base], cwd=tmp)
+        if r.returncode:
+            transient("cannot fetch %s from GitHub after %d tries and the mirror lacks it" % (base, FETCH_TRIES))
+        sha = r.stdout.strip()
         print("base from the mirror at %s: the GitHub fetch failed %d times" % (sha[:8], FETCH_TRIES))
     if start and not fetch_base(tmp, start):
         transient("cannot fetch %s from GitHub after %d tries" % (start, FETCH_TRIES))
@@ -173,7 +179,7 @@ def new(full, issue, chunk, base, owner, default, start=None):
                                                  "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "owner": owner,
                                                  "run": os.environ.get("FACTORY_RUN") or "unknown", "checkout": "clone"}))
         step("installing")
-        err = F.install_deps(final)
+        err = F.install_deps(final, M.run)
         if err:
             transient("dependencies not installed in %s (%s); run the same `wt new` again" % (final, err[:200]))
         step("installed")

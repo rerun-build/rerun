@@ -1,4 +1,4 @@
-import fcntl, json, os, shutil, signal, subprocess, sys, time
+import fcntl, json, os, re, shutil, signal, subprocess, sys, time
 
 import factory as F
 
@@ -10,6 +10,8 @@ HELD = []
 
 
 def url(full):
+    if re.match(r"[^/]*//[^/]*@", GITHUB):
+        F.die("FACTORY_GITHUB_URL carries a credential; git takes it from its credential helper, never from a URL. Nothing done.")
     return GITHUB + full + ".git"
 
 
@@ -22,8 +24,12 @@ def path(repo):
 
 
 def git(args, cwd="/tmp", timeout=300):
+    return run([F.GIT] + args, cwd, timeout)
+
+
+def run(cmd, cwd="/tmp", timeout=300):
     env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
-    p = subprocess.Popen([F.GIT] + args, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, pass_fds=tuple(HELD))
+    p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, pass_fds=tuple(HELD))
     old = signal.getsignal(signal.SIGTERM)
 
     def on_term(*_):
