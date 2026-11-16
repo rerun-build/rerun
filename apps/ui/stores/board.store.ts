@@ -604,11 +604,13 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             return
         }
 
+        // In another Box its rank in the Simple view's list means nothing: it joins the end of the new one.
+        const changesBox = !!target && target !== previous?.spaceId
         set(state => ({
-            agents: state.agents.map(a => (a.id === id ? { ...a, position: pos, spaceId: target ?? a.spaceId } : a)),
+            agents: state.agents.map(a => (a.id === id ? { ...a, position: pos, spaceId: target ?? a.spaceId, ...(changesBox && { sidebarOrder: null }) } : a)),
         }))
 
-        const patch: Database['public']['Tables']['agents']['Update'] = target ? { col: pos.col, row: pos.row, space_id: target } : { col: pos.col, row: pos.row }
+        const patch: Database['public']['Tables']['agents']['Update'] = target ? { col: pos.col, row: pos.row, space_id: target, ...(changesBox && { sidebar_order: null }) } : { col: pos.col, row: pos.row }
         supabase
             .from('agents')
             .update<Database['public']['Tables']['agents']['Update']>(patch)
@@ -619,7 +621,7 @@ export const useBoardStore = create<BoardState>((set, get) => ({
                 // retour en arrière la tuile resterait garée dans une Box où elle n'est jamais
                 // arrivée. On ne rembobine que si rien n'a bougé depuis.
                 set(state => ({
-                    agents: state.agents.map(a => (a.id === id && a.position.col === pos.col && a.position.row === pos.row ? { ...a, position: previous.position, spaceId: previous.spaceId } : a)),
+                    agents: state.agents.map(a => (a.id === id && a.position.col === pos.col && a.position.row === pos.row ? { ...a, position: previous.position, spaceId: previous.spaceId, sidebarOrder: previous.sidebarOrder } : a)),
                 }))
                 toast.error(translated('builder.boardToasts.moveAgentFailed'))
             })

@@ -250,6 +250,13 @@ describe('the board writes for a member who only uses the Box', () => {
         expect(db.fake.writes('agents').map(w => w.payload)).toEqual([{ col: 12, row: 3, space_id: 'managed' }])
     })
 
+    it('drops the rank a coworker had in the list when the board moves it to another Box', () => {
+        useBoardStore.setState(state => ({ agents: state.agents.map(a => (a.id === 'scout' ? { ...a, sidebarOrder: 2 } : a)) }))
+        useBoardStore.getState().moveAgent('scout', { col: 11, row: 4 }, 'managed', ADMIN)
+        expect(useBoardStore.getState().agents.find(a => a.id === 'scout')).toMatchObject({ spaceId: 'managed', sidebarOrder: null })
+        expect(db.fake.writes('agents').map(w => w.payload)).toEqual([{ col: 11, row: 4, space_id: 'managed', sidebar_order: null }])
+    })
+
     it('does not resize, move, rename or delete a Box they only use', async () => {
         const { renameSpaceAction, deleteSpaceAction } = await import('@/app/api/_actions/space.actions')
         const store = useBoardStore.getState()
