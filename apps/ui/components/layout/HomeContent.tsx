@@ -1,7 +1,6 @@
 'use client'
 
 import { confirmTemplatePurchaseAction } from '@rerun/cloud/marketplace.client'
-import { AppLoader } from '@/components/layout/AppLoader'
 import { AuthDialog } from '@/components/dialogs/AuthDialog'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { BuilderView } from '@/components/builder/BuilderView'
@@ -32,6 +31,7 @@ import { useSpaceAccessSync } from '@/hooks/useSpaceAccessSync'
 import { useSpacesRealtime } from '@/hooks/useSpacesRealtime'
 import { useUnseenRunsSync } from '@/hooks/useUnseenRunsSync'
 import { useAccountStore } from '@/stores/account.store'
+import { useAppBootStore } from '@/stores/app-boot.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { useBoardStore } from '@/stores/board.store'
 import { useCreatorStore } from '@/stores/creator.store'
@@ -412,10 +412,12 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     // elsewhere shows neither those spaces nor an empty board in their place (the recruit
     // placeholder): it keeps the loader until the store holds its own.
     const serverBoardMatchesTab = initialWorkspaceId === workspace?.id
+    const boardLoading = loading || holdLoader || (!serverBoardMatchesTab && !hydrated)
+    useEffect(() => {
+        useAppBootStore.getState().setBoardReady(!boardLoading)
+    }, [boardLoading])
 
-    if (loading || holdLoader || (!serverBoardMatchesTab && !hydrated)) {
-        return <AppLoader />
-    }
+    if (boardLoading) return null
 
     return (
         <div className="flex flex-col h-full bg-background overflow-hidden">

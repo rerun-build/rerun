@@ -1,5 +1,4 @@
 import { HomeContent } from '@/components/layout/HomeContent'
-import { AppLoader } from '@/components/layout/AppLoader'
 import { hasPendingCreatorTerms } from '@/app/api/_auth/expert'
 import { resolveCreatorLandingWorkspace } from '@/app/api/_services/sandbox.service'
 import { createClient } from '@/supabase/server'
@@ -41,9 +40,7 @@ export default async function Home() {
     }
 
     return (
-        <Suspense
-            fallback={<AppLoader />}
-        >
+        <Suspense fallback={null}>
             <HomeContent initialSpaces={initialSpaces} initialWorkspaceId={initialWorkspaceId} />
         </Suspense>
     )
