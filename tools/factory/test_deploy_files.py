@@ -1,4 +1,4 @@
-import ast, os, re, unittest
+import ast, os, re, shutil, subprocess, sys, tempfile, unittest
 
 VPS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "deploy", "vps")
 
@@ -109,26 +109,17 @@ class FactoryM2Doc(unittest.TestCase):
         setup = self.t.index("runner_loop.py setup")
         self.assertLess(up, setup)
         self.assertLess(setup, self.t.index("runner_loop.py enqueue"))
-    def test_install_copies_what_the_runner_imports(self):
-        with open(os.path.join(VPS, "..", "..", "tools", "factory", "install.sh"), encoding="utf-8") as f:
-            s = f.read()
-        loop = re.search(r"for f in ([^;]+); do", s).group(1).split()
-        for need in ("trigger.py", "engine.py", "store.py", "limits.py", "runner_loop.py", "status_report.py", "runner.json"):
-            self.assertIn(need, loop)
-    def test_install_copies_every_module_its_files_import(self):
+    def test_install_copies_every_module_and_config_that_is_not_a_test(self):
+        if sys.platform == "win32" or shutil.which("sh") is None:
+            self.skipTest("no sh")
         here = os.path.join(VPS, "..", "..", "tools", "factory")
-        with open(os.path.join(here, "install.sh"), encoding="utf-8") as f:
-            loop = re.search(r"for f in ([^;]+); do", f.read()).group(1).split()
-        missing = set()
-        for name in (n for n in loop if n.endswith(".py")):
-            with open(os.path.join(here, name), encoding="utf-8") as f:
-                tree = ast.parse(f.read())
-            for node in ast.walk(tree):
-                mods = [a.name for a in node.names] if isinstance(node, ast.Import) else [node.module or ""] if isinstance(node, ast.ImportFrom) else []
-                for dep in (m.split(".")[0] + ".py" for m in mods):
-                    if dep not in loop and os.path.exists(os.path.join(here, dep)):
-                        missing.add("%s imports %s" % (name, dep))
-        self.assertEqual(sorted(missing), [])
+        want = sorted(n for n in os.listdir(here) if (n.endswith(".py") and not n.startswith("test_")) or n.endswith(".json"))
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(["sh", os.path.join(here, "install.sh"), "--prefix", tmp, "--jev-keyfile", "/x"], check=True, capture_output=True)
+            got = sorted(n for n in os.listdir(os.path.join(tmp, "factory")) if n != "triggers")
+            self.assertEqual(got, want)
+            with open(os.path.join(tmp, "factory", "runner_loop.py"), encoding="utf-8") as f:
+                self.assertNotIn("/data/tools/factory", f.read())
 
 
 WIDE = ("system prune", "volume prune", "container prune", "network prune", "--volumes", "image prune -a", "image prune --all")
