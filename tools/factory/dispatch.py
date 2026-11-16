@@ -1038,6 +1038,9 @@ class Dispatcher:
     def checks(self, j):
         if self.conflicts(j):
             return
+        now_head = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "headRefOid"])).get("headRefOid")
+        if now_head and now_head != j["head"]:
+            return self.to(j, "review_wait", "head moved from %s to %s after the review: reviewed again" % (j["head"][:7], now_head[:7]))
         data = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["head"])]))
         verdict, why = checks_verdict(data.get("workflow_runs") or [])
         if verdict == "FAIL":
