@@ -46,6 +46,8 @@ class Watch(unittest.TestCase):
 
 class Kinds(unittest.TestCase):
     def test_dev_red_is_a_kind_ranked_first_and_cleared_like_a_job_problem(self):
+        self.assertEqual(resolver.KINDS, ("dev red", "idle line", "repeating error", "dead", "unreadable", "ended",
+                                          "checkout failed", "no room"))
         self.assertEqual(resolver.KINDS[0], "dev red")
         self.assertEqual(resolver.SYSTEMIC, ("idle line", "repeating error"))
         self.assertEqual(resolver.rank("dev red")[0], 0)
