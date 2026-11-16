@@ -23,7 +23,10 @@ export const curationSchema = z.object({
     obsoleteIds: z.array(z.string()).describe('Ids of existing related memories now wrong or fully contradicted by this exchange, which should be deleted; return an empty array when none are obsolete'),
 })
 
-export function curatorPrompt({ userText, assistantText, existing, skills }: { userText: string; assistantText: string; existing: RecalledMemory[]; skills: SkillSummary[] }): string {
+// What the Chief of Staff keeps is about people: a fact about the company is the Brain's.
+const FOREMAN_CURATION = ' This assistant is the Chief of Staff of a workspace, and its memory is about people: who they are, what they do, how they like to work with it, and what they asked it not to propose again. A fact about the company, its offer, its customers or its tools is not a memory here: return null for it. Say in the memory who it comes from.'
+
+export function curatorPrompt({ userText, assistantText, existing, skills, speaker, foreman = false }: { userText: string; assistantText: string; existing: RecalledMemory[]; skills: SkillSummary[]; speaker?: string; foreman?: boolean }): string {
     const skillsBlock = skills.length
         ? `\n\nThese skills already govern how this coworker works, so anything belonging to one of them is not a memory:\n${skills.map(s => `- ${s.name} (slug: ${s.slug}): ${s.description}`).join('\n')}`
         : ''
@@ -31,12 +34,14 @@ export function curatorPrompt({ userText, assistantText, existing, skills }: { u
         ? `\n\nExisting related memories you already hold. You may UPDATE one in place by returning its id, or mark some obsolete to delete:\n${existing.map(m => `- [${m.id}] (${m.kind}) ${m.content}`).join('\n')}`
         : ''
 
-    return `Review this exchange and decide what is worth remembering for the future.\n\nUser: ${userText}\n\nAssistant: ${assistantText}\n\nReturn a durable memory if a lasting fact emerged, otherwise null. Anything that says how the work is done belongs in a skill, not in memory: a procedure, a checklist, a workflow, an output format, a calibre or length target, a naming or style convention, a rule for a recurring task, or a correction of what the assistant just produced. Return null for all of it, even when it is phrased as a preference, and never fold it into an existing memory through updateId. Memory is the fallback for what no skill governs: standalone facts and standing preferences. If the exchange corrects or refines one of the existing related memories shown to you, update it in place by returning its id rather than storing a duplicate.${skillsBlock}${existingBlock}`
+    return `Review this exchange and decide what is worth remembering for the future.\n\nUser${speaker ? ` (${speaker})` : ''}: ${userText}\n\nAssistant: ${assistantText}\n\nReturn a durable memory if a lasting fact emerged, otherwise null. Anything that says how the work is done belongs in a skill, not in memory: a procedure, a checklist, a workflow, an output format, a calibre or length target, a naming or style convention, a rule for a recurring task, or a correction of what the assistant just produced. Return null for all of it, even when it is phrased as a preference, and never fold it into an existing memory through updateId. Memory is the fallback for what no skill governs: standalone facts and standing preferences. If the exchange corrects or refines one of the existing related memories shown to you, update it in place by returning its id rather than storing a duplicate.${foreman ? FOREMAN_CURATION : ''}${skillsBlock}${existingBlock}`
 }
 
-export async function runCurator(agent: LoadedAgent, sessionId: string, userText: string, assistantText: string, override?: ModelOverride): Promise<void> {
-    const cfg = agent.config.selfImprovement
-    if (!cfg.autoMemory) return
+// The Chief of Staff's own sorting does not wait on self-improvement, which it never has: that would
+// also hand it its own SOUL to edit.
+export async function runCurator(agent: LoadedAgent, sessionId: string, userText: string, assistantText: string, override?: ModelOverride, speaker?: string): Promise<void> {
+    const foreman = agent.config.kind === 'foreman'
+    if (!agent.config.selfImprovement.autoMemory && !foreman) return
 
     const [existing, skills] = await Promise.all([
         recallMemory(agent, `${userText}\n\n${assistantText}`, 5, { reinforce: 'none', includeDormant: true }).catch(() => []),
@@ -48,7 +53,7 @@ export async function runCurator(agent: LoadedAgent, sessionId: string, userText
     const output = await generateStructured({
         model: modelFor(agent, override, undefined, undefined, { sessionId: `${agent.id}:curator` }),
         schema: curationSchema,
-        prompt: curatorPrompt({ userText, assistantText, existing, skills }),
+        prompt: curatorPrompt({ userText, assistantText, existing, skills, speaker, foreman }),
         abortSignal: AbortSignal.timeout(CURATOR_TIMEOUT_MS),
     }).finally(release)
 

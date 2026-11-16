@@ -60,6 +60,7 @@ export const WAKE_BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
     'ask_user',
     'request_approval',
     'notify_user',
+    'memory_recall',
     'schedule_wake',
     'cancel_wake',
 ])

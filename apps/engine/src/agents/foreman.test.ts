@@ -98,11 +98,12 @@ describe('foreman', () => {
         expect(names).not.toContain('brain_propose')
     })
 
-    it('keeps nothing of its own between conversations', async () => {
+    it('keeps a memory of its own, and none of the rest an agent keeps', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['memory_write', 'skill_create', 'schedule_create', 'trigger_create', 'db_query', 'suggest_service', 'request_secret', 'soul_update', 'install_complete']) expect(names).not.toContain(name)
+        expect(names).toEqual(expect.arrayContaining(['memory_write', 'memory_recall', 'memory_delete']))
+        for (const name of ['skill_create', 'schedule_create', 'trigger_create', 'db_query', 'suggest_service', 'request_secret', 'soul_update', 'install_complete']) expect(names).not.toContain(name)
         expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
     })
 
@@ -172,7 +173,8 @@ describe('foreman', () => {
         await close()
         const names = Object.keys(tools)
         expect(names).toEqual(expect.arrayContaining(['fs_read', 'shared_search', 'agent_files_read', 'shared_db_query', 'brain_read', 'request_approval', 'ask_user', 'card_file', 'create_agent', 'list_agents']))
-        for (const name of ['shell_exec', 'web_fetch', 'web_search', 'browser_navigate', 'delegate_tasks', 'call_agent', 'fs_write', 'fs_edit', 'shared_write', 'agent_files_write', 'agent_files_edit', 'shared_db_execute', 'brain_write', 'brain_delete', 'brain_decide', 'focus_agent']) expect(names).not.toContain(name)
+        expect(names).toContain('memory_recall')
+        for (const name of ['memory_write', 'memory_delete', 'shell_exec', 'web_fetch', 'web_search', 'browser_navigate', 'delegate_tasks', 'call_agent', 'fs_write', 'fs_edit', 'shared_write', 'agent_files_write', 'agent_files_edit', 'shared_db_execute', 'brain_write', 'brain_delete', 'brain_decide', 'focus_agent']) expect(names).not.toContain(name)
     })
 
     it('tells a wake it only reads, without the notes of a conversation', async () => {
@@ -231,7 +233,8 @@ describe('foreman', () => {
         expect(prompt).toContain('brain_write the complete new version')
         expect(prompt).not.toContain('You cannot write the brain.')
         expect(prompt).not.toContain('<skills>')
-        expect(prompt).not.toContain('<memory_index>')
+        expect(prompt).toContain('<memory>')
+        expect(prompt).toContain('goes to the Brain instead')
         expect(prompt).not.toContain('<verbosity>')
     })
 

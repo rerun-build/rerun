@@ -395,8 +395,11 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             if (outcome.kind === 'done' && proposed) await emitSkillProposalEvent(agent, sessionId, run.id, proposed, author)
         }
 
-        if (outcome.kind === 'done' && !pending && agent.config.selfImprovement.enabled && userText) {
-            void runCurator(agent, sessionId, userText, text ?? '', override).catch(e => logger.warn({ err: String(e) }, 'curator failed'))
+        // The Chief of Staff sorts what to remember after each conversation turn, never after a wake:
+        // the text a wake read is no one's word, and would be recalled into runs that act.
+        const curates = agent.config.kind === 'foreman' ? trigger.source === 'chat' : agent.config.selfImprovement.enabled
+        if (outcome.kind === 'done' && !pending && curates && userText) {
+            void runCurator(agent, sessionId, userText, text ?? '', override, author?.name).catch(e => logger.warn({ err: String(e) }, 'curator failed'))
         }
 
         return outcome

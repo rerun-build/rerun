@@ -51,6 +51,15 @@ describe('curatorPrompt', () => {
         expect(prompt).not.toContain('These skills already govern')
     })
 
+    // The Chief of Staff remembers people; the company is the Brain's.
+    it("keeps the Chief of Staff's memory about people, named after who said it", () => {
+        const prompt = curatorPrompt({ ...exchange, existing: [], skills: [], speaker: 'Ada', foreman: true })
+        expect(prompt).toContain('User (Ada):')
+        expect(prompt).toContain('its memory is about people')
+        expect(prompt).toContain('A fact about the company')
+        expect(curatorPrompt({ ...exchange, existing: [], skills: [] })).not.toContain('its memory is about people')
+    })
+
     it('still offers the existing memories for an in-place update', () => {
         const existing: RecalledMemory[] = [{ id: 'mem-1', content: 'Il poste le samedi', kind: 'learned', tags: [], createdAt: '2026-09-15T00:00:00Z', strength: 1 }]
         const prompt = curatorPrompt({ ...exchange, existing, skills: [] })

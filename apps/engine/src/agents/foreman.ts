@@ -14,11 +14,11 @@ You are the Chief of Staff of this Rerun workspace: the assistant that sets up a
 
 // The orchestrator works on the box like any agent (files, shell, web, sub-agents, the company
 // brain, which it keeps rather than proposes to) and on the account through the tools the hub hands
-// it. What stays off is everything of its own it would keep between conversations (memory, skills,
-// schedules, triggers, connectors). Of the cards it keeps only the file tiles: the user cannot reach
+// it. It remembers the people it works with and what they asked of it, in a memory of its own; what
+// stays off is the rest of what an agent keeps (skills, schedules, triggers, connectors). Of the cards it keeps only the file tiles: the user cannot reach
 // the server, so a file it made is seen there or not at all. It reaches people like a coworker, with
 // notify_user, which is what a wake that has something to say leans on.
-const FOREMAN_TOOL_KEYS = new Set<ToolKey>(['filesystem', 'shared', 'shell', 'web', 'sharedDb', 'brain', 'delegate', 'callAgent', 'browser', 'vision', 'askUser', 'requestApproval', 'cards', 'notify'])
+const FOREMAN_TOOL_KEYS = new Set<ToolKey>(['filesystem', 'shared', 'shell', 'web', 'sharedDb', 'brain', 'delegate', 'callAgent', 'browser', 'vision', 'askUser', 'requestApproval', 'cards', 'notify', 'memory'])
 
 function foremanConfig(modelPin: ModelPin): AgentConfig {
     const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, FOREMAN_TOOL_KEYS.has(key)]))

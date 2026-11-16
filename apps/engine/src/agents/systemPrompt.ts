@@ -265,6 +265,13 @@ function foremanOperatingNotes(wakes: boolean): string {
 const FOREMAN_WAKE_NOTES =
     "Nobody started this run, and in it you only read. On the box: your own files (fs_read, fs_list, fs_search), the shared space (shared_read, shared_list, shared_search), each coworker's files with the agent_files_ tools and its handle (read, list, search), the shared database (shared_db_query, shared_db_schema) and the company Brain (brain_search, brain_read, brain_proposals). There is no shell, no web, no sub-coworker and no write of any kind in this run: what needs one is proposed with request_approval and done in the turn that follows their answer."
 
+// One memory for the whole workspace: what it knows of the people it works with. A fact about the
+// company is the Brain's, where every coworker reads it.
+const FOREMAN_MEMORY_NOTE =
+    "Your memory is yours, shared by everyone in the workspace who talks to you: keep in it the people (who does what, how they like to work with you), their preferences, and what they asked you not to propose again, with memory_write, saying who each one comes from. Recall it with memory_recall before you assume anything about someone. A fact about the company, its offer, its customers or its tools goes to the Brain instead, where every coworker reads it."
+
+const FOREMAN_WAKE_MEMORY_NOTE = 'Your memory, what you know of the people you work with, is read-only in this run: memory_recall before you write to someone, never a write.'
+
 const FOREMAN_SHOWING_FILES_NOTE =
     "The user cannot reach this server: a path means nothing to them, and a link to one opens nothing. Every file they should see (an image, slides, a document, what a sub-coworker produced for you) goes in a card_file call, which draws it as tiles they open and download: scope 'agent' for your own workspace, 'shared' for the shared space. A file in a coworker's own workspace is shown by that coworker, so ask it with send_message. Never write a server path in your message, and never tell the user to open the server, a folder or an admin access to get a file."
 
@@ -275,9 +282,10 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
     const cfg = agent.config.tools
     const wake = trigger.source === 'wake'
     const wakes = briefNamesBuiltin(agent, 'schedule_wake')
-    const [sharedDbSchema, brain] = await Promise.all([
+    const [sharedDbSchema, brain, memoryIndex] = await Promise.all([
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
         cfg.brain && !wake ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
+        cfg.memory ? buildMemoryIndex(agent.id).catch(() => '') : Promise.resolve(''),
     ])
     const stable = [
         section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
@@ -295,6 +303,8 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
     if (brain) volatile.push(section('company_brain', brain))
     if (cfg.sharedDb && wake) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes. Read it with shared_db_query and shared_db_schema.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
     else if (cfg.sharedDb) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
+    if (cfg.memory) volatile.push(section('memory', wake ? FOREMAN_WAKE_MEMORY_NOTE : FOREMAN_MEMORY_NOTE))
+    if (memoryIndex) volatile.push(section('memory_index', memoryIndex))
     if (wakes) volatile.push(section('wakes', await buildWakesSection().catch(() => '')))
     volatile.push(section('current_time', currentTimeNote()))
     return { stable: joinSections(stable), volatile: joinSections(volatile) }
