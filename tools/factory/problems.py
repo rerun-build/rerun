@@ -7,7 +7,7 @@ WINDOW_S = 3600
 
 
 def ended(j, since):
-    return j["state"] in ENDED and str(j.get("updated_at") or "") >= since
+    return j["state"] in ENDED and str(j.get("ended_at") or "") >= since
 
 
 class Watch:
@@ -16,12 +16,11 @@ class Watch:
 
     def find(self, jobs, refused, open_issues, line, now, texts, since="", held=False):
         out = {"unreadable #%d" % n: "\n".join(e) for n, e in refused.items()}
-        work, busy = bool(refused), False
+        work, busy = False, False
         for j in jobs:
             n, st = j["issue"], j["state"]
             if st == "waiting" and j.get("dead"):
                 out["dead #%d" % n] = j.get("wait_line") or "waits on dead dependencies"
-                work = True
             elif ended(j, since) and open_issues is not None and n in open_issues:
                 out["ended #%d" % n] = "job #%d ended %s: %s; pull request %s" % (
                     n, st, j.get("reason") or "-", "#%s" % j["pr"] if j.get("pr") else "none")

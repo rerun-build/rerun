@@ -18,6 +18,10 @@ SYSTEMIC = KINDS[:2]
 NEW_MAX = 10
 OPEN_MAX = 30
 CLEAR_BEATS = 3
+SYSTEMIC_CLEAR_BEATS = 120
+START_BEATS = 10
+SEND_MAX = 6
+ADMIN = "special-place-administrator"
 VERIFY_BEATS = 6
 ATTEMPTS = 3
 TRANSIENT_MAX = 3
@@ -25,7 +29,9 @@ REQUEUE_MAX = 3
 FORMS = ({"prefix": "RESOLVED: ", "rest": "sentence"}, {"prefix": "FILED: ", "rest": "sentence"}, {"prefix": "ESCALATE: ", "rest": "sentence"})
 FINAL = re.compile(r"(?m)^(?:RESOLVED|FILED|ESCALATE):[ \t]*\S[^\n]*")
 DO = re.compile(r"(?m)^DO: ([^\n]*)")
-DO_MAX = 10
+DO_MAX = 4
+FENCE = re.compile(r"(?ms)^```.*?^```[^\n]*$")
+KEY_LINE = re.compile(r"(?m)^Problem-Key: (.+?)\s*$")
 
 
 def safe(text):
@@ -37,8 +43,8 @@ def fenced(text):
 
 
 def body(key, evidence):
-    return "Problem-Key: %s\n\n%s\n\nOpened by the factory dispatcher; it closes this issue once the problem is gone for %d beats." % (
-        key, fenced(evidence), CLEAR_BEATS)
+    return "%s\n\nOpened by the factory dispatcher; it closes this issue once the problem is gone for %d beats." % (
+        fenced("Problem-Key: %s\n\n%s" % (key, evidence)), SYSTEMIC_CLEAR_BEATS if key in SYSTEMIC else CLEAR_BEATS)
 
 
 def rank(key):
@@ -49,20 +55,20 @@ class Resolver:
     def __init__(self, log, brief):
         self.log, self.brief = log, brief
         self.watch = problems.Watch()
-        self.open_issues, self.found, self.capped = None, {}, None
+        self.open_issues, self.found, self.capped, self.beats = None, {}, None, 0
 
     def switches(self, d):
         s = d.cfg.get("resolver") or {}
         return bool(s.get("detect")), bool(s.get("detect") and s.get("resolve") and POOL in pools.types(d.cfg))
 
-    def records(self, d):
+    def records(self, d, closed=False):
         out = {}
         for k, v in d.store.get_all(KV).items():
             try:
                 r = json.loads(v)
             except ValueError:
                 continue
-            if r.get("state") != "closed":
+            if closed or r.get("state") != "closed":
                 out[k] = r
         return out
 
@@ -90,6 +96,7 @@ class Resolver:
         detect, resolve = self.switches(d)
         if not detect:
             return
+        self.beats += 1
         since = d.store.get_all("-").get("problems_since")
         if not since:
             since = ledger_store.now()
@@ -108,41 +115,59 @@ class Resolver:
     def tickets(self, d, found, resolve):
         recs = self.records(d)
         for key, r in sorted(recs.items()):
-            try:
-                if key in found:
-                    if found[key] != r["evidence"]:
-                        d.gh(["issue", "edit", str(r["issue"]), "-R", d.repo, "--body", body(key, found[key])])
-                    if found[key] != r["evidence"] or r.get("absent"):
-                        r.update(evidence=found[key], absent=0)
-                        self.put(d, key, r)
-                elif not (resolve and r["state"] == "resolving"):
-                    r["absent"] = r.get("absent", 0) + 1
-                    if r["absent"] >= CLEAR_BEATS:
-                        line = r.get("line") if r["state"] == "verify" else None
-                        text = "cleared at %s" % snapshot.iso(d.now()) + (": " + line.replace("@", "") if line else "")
-                        d.gh(["issue", "close", str(r["issue"]), "-R", d.repo, "--comment", text])
-                        r["state"] = "closed"
-                        self.log(r["issue"], "problem closed: %s" % key)
+            if key in found:
+                if found[key] != r["evidence"]:
+                    d.gh(["issue", "edit", str(r["issue"]), "-R", d.repo, "--body", body(key, found[key])])
+                if found[key] != r["evidence"] or r.get("absent"):
+                    r.update(evidence=found[key], absent=0)
                     self.put(d, key, r)
-            except Exception as e:
-                self.log(r["issue"], "problem %s: %s" % (key, e))
+            elif not (resolve and r["state"] == "resolving") and not (key in SYSTEMIC and self.beats <= START_BEATS):
+                r["absent"] = r.get("absent", 0) + 1
+                if r["absent"] >= (SYSTEMIC_CLEAR_BEATS if key in SYSTEMIC else CLEAR_BEATS):
+                    line = r.get("line") if r["state"] == "verify" else None
+                    text = "cleared at %s" % snapshot.iso(d.now()) + (": " + line.replace("@", "") if line else "")
+                    d.gh(["issue", "close", str(r["issue"]), "-R", d.repo, "--comment", text])
+                    r["state"] = "closed"
+                    self.log(r["issue"], "problem closed: %s" % key)
+                self.put(d, key, r)
         new = sorted((k for k in found if k not in recs), key=rank)
         room = max(0, OPEN_MAX - len(self.records(d)))
-        rest = [k for k in new if k not in SYSTEMIC]
-        for key in [k for k in new if k in SYSTEMIC] + rest[:min(NEW_MAX, room)]:
-            try:
-                out = d.gh(["issue", "create", "-R", d.repo, "--title", "Factory problem: " + key, "--label", LABEL,
-                            "--body", body(key, found[key])])
-                n = int(re.search(r"/issues/(\d+)", out).group(1))
-                self.put(d, key, {"issue": n, "evidence": found[key], "state": "resolve_wait", "absent": 0, "attempt": 1})
-                self.log(n, "problem opened: %s" % key)
-            except Exception as e:
-                self.log("-", "problem %s not opened: %s" % (key, e))
-        left = len(rest) - min(len(rest), room)
+        old, listed = self.records(d, closed=True), None
+        for key in new[:min(NEW_MAX, room)]:
+            fresh = {"evidence": found[key], "state": "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
+                     "agent": None, "copy": None, "run": None}
+            if old.get(key, {}).get("issue"):
+                n = old[key]["issue"]
+                d.gh(["issue", "reopen", str(n), "-R", d.repo])
+                d.gh(["issue", "edit", str(n), "-R", d.repo, "--body", body(key, found[key])])
+                self.put(d, key, dict(old[key], **fresh))
+                self.log(n, "problem reopened: %s" % key)
+                continue
+            if listed is None:
+                listed = self.listed(d)
+            if key in listed:
+                self.put(d, key, dict(fresh, issue=listed[key], evidence=""))
+                self.log(listed[key], "problem adopted: %s" % key)
+                continue
+            out = d.gh(["issue", "create", "-R", d.repo, "--title", "Factory problem: " + key, "--label", LABEL,
+                        "--body", body(key, found[key])])
+            n = int(re.search(r"/issues/(\d+)", out).group(1))
+            self.put(d, key, dict(fresh, issue=n))
+            self.log(n, "problem opened: %s" % key)
+        left = len(new) - min(len(new), room)
         text = "problems capped: %d not opened, %d open" % (left, OPEN_MAX) if left else None
         if text and text != self.capped:
             self.log("problems", text)
         self.capped = text
+
+    def listed(self, d):
+        found = json.loads(d.gh(["issue", "list", "-R", d.repo, "--label", LABEL, "--state", "open",
+                                 "--json", "number,body", "--limit", "100"]) or "[]")
+        out = {}
+        for i in found:
+            for k in KEY_LINE.findall(i.get("body") or ""):
+                out.setdefault(k, i["number"])
+        return out
 
     def station(self, d, found):
         recs = self.records(d)
@@ -161,6 +186,11 @@ class Resolver:
         for key, r in sorted(self.records(d).items(), key=lambda kr: rank(kr[0])):
             if r["state"] != "resolve_wait" or key not in found:
                 continue
+            if r.get("sends", 0) >= SEND_MAX:
+                self.escalate(d, r, "ESCALATE: sent to HOUSE %d times and still there; the last run ended with: %s" % (SEND_MAX, r.get("line") or "-"))
+                r["state"] = "owner"
+                self.put(d, key, r)
+                continue
             got = pools.pick_copy(d.cfg, POOL, d.running())
             if not got or not d.take({"state": "resolve_wait"}):
                 return
@@ -171,14 +201,14 @@ class Resolver:
         name = d.names.get(agent, agent[:8])
         args = {"agentId": agent, "message": self.brief(d.repo, key, r), "waitSeconds": 1,
                 "goal": {"lastLineForms": [dict(f) for f in FORMS], "turnLimit": 3}}
-        r.update(state="resolving", agent=agent, copy=copy, run=None, sent_at=d.now())
+        r.update(state="resolving", agent=agent, copy=copy, run=None, sent_at=d.now(), sends=r.get("sends", 0) + 1)
+        self.put(d, key, r)
         try:
             run = d.account("send_message", args)
         except Exception as e:
-            self.put(d, key, r)
             self.log(r["issue"], "problem %s: send to %s raised, its copy stays taken until the run limit: %s" % (key, name, e))
             return
-        r["run"] = run["runId"]
+        r["run"] = (run or {}).get("runId")
         self.put(d, key, r)
         self.log(r["issue"], "problem %s -> %s (run %s)" % (key, name, run["runId"]))
 
@@ -233,7 +263,7 @@ class Resolver:
             self.log(r["issue"], "problem %s: DO lines of run %s: %s" % (key, rid, e))
 
     def do_lines(self, d, r, rid, out):
-        lines = [x.strip() for x in DO.findall(out)]
+        lines = list(dict.fromkeys(x.strip() for x in DO.findall(FENCE.sub("", out))))
         if not lines:
             return
         done = ["- " + self.do(d, x) for x in lines[:DO_MAX]]
@@ -305,7 +335,15 @@ class Resolver:
                                   "--json", "number,labels", "--limit", "100"]) or "[]")
         labels = {i["number"]: {x.get("name") for x in i.get("labels") or []} for i in listed}
         for key, r in recs.items():
-            if r["state"] == "owner" and r["issue"] in labels and OWNER not in labels[r["issue"]]:
-                r.update(state="resolve_wait", attempt=1, asked=0, verify=0)
-                self.put(d, key, r)
-                self.log(r["issue"], "problem %s: the owner label was removed, sent again" % key)
+            if r["state"] != "owner" or r["issue"] not in labels or OWNER in labels[r["issue"]]:
+                continue
+            events = json.loads(d.gh(["api", "repos/%s/issues/%d/timeline?per_page=100" % (d.repo, r["issue"])]) or "[]")
+            off = [e for e in events if e.get("event") == "unlabeled" and (e.get("label") or {}).get("name") == OWNER]
+            who = (off[-1].get("actor") or {}).get("login") if off else None
+            if who != ADMIN:
+                d.gh(["issue", "edit", str(r["issue"]), "-R", d.repo, "--add-label", OWNER])
+                self.log(r["issue"], "problem %s: the owner label was removed by %s, put back" % (key, who or "unknown"))
+                continue
+            r.update(state="resolve_wait", attempt=1, asked=0, verify=0)
+            self.put(d, key, r)
+            self.log(r["issue"], "problem %s: Rob removed the owner label, sent again" % key)

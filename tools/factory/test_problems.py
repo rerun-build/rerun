@@ -13,8 +13,8 @@ class Find(unittest.TestCase):
         return w.find(list(jobs), refused or {}, open_issues, line, now, list(texts), since, held)
 
     def test_only_a_job_that_ended_since_the_watch_began_is_a_problem(self):
-        jobs = [job(1, "blocked", reason="old", updated_at="2026-11-15T10:00:00Z"),
-                job(2, "failed", reason="new", updated_at="2026-11-15T12:00:00Z")]
+        jobs = [job(1, "blocked", reason="old", ended_at="2026-11-15T10:00:00Z"),
+                job(2, "failed", reason="new", ended_at="2026-11-15T12:00:00Z")]
         got = self.find(problems.Watch(), jobs, open_issues={1, 2}, since="2026-11-15T11:00:00Z")
         self.assertEqual(sorted(got), ["ended #2"])
 
@@ -53,13 +53,14 @@ class Find(unittest.TestCase):
         for n in range(9):
             self.assertNotIn("idle line", self.find(w, queued, line="x"))
 
-    def test_unreadable_or_dead_work_counts_as_work_for_the_idle_line_and_an_empty_queue_does_not(self):
-        w, empty = problems.Watch(), problems.Watch()
-        for _ in range(10):
-            got = self.find(w, refused={5: ["e"]})
-            self.find(empty, [job(7, "merged")])
-        self.assertIn("idle line", got)
-        self.assertEqual(self.find(empty, [job(7, "merged")]), {})
+    def test_only_queued_work_counts_for_the_idle_line_not_unreadable_or_dead_ones(self):
+        w, queued = problems.Watch(), problems.Watch()
+        dead = job(6, "waiting", dead=[[532, "rejected"]], wait_line="waits on dead #532 (rejected)")
+        for _ in range(12):
+            got = self.find(w, [dead], refused={5: ["e"]})
+            idle = self.find(queued, [job(7, "queued")])
+        self.assertNotIn("idle line", got)
+        self.assertIn("idle line", idle)
 
     def test_the_same_pass_error_five_times_within_an_hour_is_a_problem_and_it_ages_out(self):
         w = problems.Watch()

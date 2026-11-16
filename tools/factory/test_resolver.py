@@ -23,8 +23,8 @@ class Tickets(Problems):
         p = self.w.problems[0]
         self.assertEqual(p["title"], "Factory problem: unreadable #6")
         self.assertEqual(p["labels"], ["factory-problem"])
-        self.assertIn("Problem-Key: unreadable #6\n", p["body"])
-        self.assertIn("```\nfiles: no **Files** heading", p["body"])
+        self.assertTrue(p["body"].startswith("```\nProblem-Key: unreadable #6\n"), p["body"])
+        self.assertIn("files: no **Files** heading", p["body"])
         self.assertEqual(self.records()["unreadable #6"]["issue"], p["number"])
 
     def test_a_job_that_ended_before_the_first_watched_beat_is_no_problem(self):
@@ -34,18 +34,104 @@ class Tickets(Problems):
         self.tick(3)
         self.assertEqual(self.w.problems, [])
 
-    def test_the_idle_line_and_a_repeating_error_open_even_when_thirty_are_open(self):
+    def test_a_repeating_error_ranks_first_among_new_keys(self):
+        self.w.issues = [self.bad(n) for n in range(10, 25)]
+        self.d = self.new()
+        for _ in range(5):
+            D.log("-", "reconcile: gh issue view failed")
+        self.tick()
+        self.assertEqual(len(self.w.problems), 10)
+        rep = next(p for p in self.w.problems if p["title"] == "Factory problem: repeating error")
+        self.assertIn("reconcile: gh issue view failed (5 times in the last hour)", rep["body"])
+
+    def test_the_system_wide_kinds_wait_under_the_open_cap_too(self):
         self.w.issues = [self.bad(n) for n in range(10, 45)]
         self.tick(3)
         for _ in range(5):
             D.log("-", "reconcile: gh issue view failed")
-        self.tick(7)
-        titles = [p["title"] for p in self.w.problems]
-        self.assertEqual(len(titles), 32)
-        rep = next(p for p in self.w.problems if p["title"] == "Factory problem: repeating error")
-        self.assertIn("reconcile: gh issue view failed (5 times in the last hour)", rep["body"])
+        self.tick()
+        self.assertEqual(len(self.w.problems), 30)
+        self.assertNotIn("Factory problem: repeating error", [p["title"] for p in self.w.problems])
+
+    def test_the_idle_line_counts_queued_work_and_carries_the_beat_line_of_its_tenth_beat(self):
+        self.w.issues = [{"number": 8, "title": "T8", "body": ready(), "comments": []}]
+        self.d = self.new()
+        self.d.store.put_job("8", "queued", {"issue": 8, "title": "T8", "body": ready(), "round": 1, "not_before": 1e12})
+        self.tick(10)
         idle = next(p for p in self.w.problems if p["title"] == "Factory problem: idle line")
         self.assertIn(" beat 10 | ", idle["body"])
+
+    def test_a_key_that_comes_back_reopens_its_old_issue_with_the_new_evidence(self):
+        self.w.issues.append(self.bad(6))
+        self.tick()
+        broken = self.w.issue(6)["body"]
+        self.w.issue(6)["body"] = ready()
+        self.tick(3)
+        self.assertEqual(self.w.problems[0]["state"], "CLOSED")
+        self.w.issue(6)["body"] = broken.replace("**Depends on**: none", "")
+        self.tick()
+        self.assertEqual(len(self.w.problems), 1)
+        self.assertEqual(self.w.problems[0]["state"], "OPEN")
+        self.assertIn("dependency line", self.w.problems[0]["body"])
+        self.assertIn(["issue", "reopen", str(self.w.problems[0]["number"]), "-R", "o/r"], self.w.gh_calls)
+
+    def test_a_system_wide_kind_closes_only_after_120_beats_gone(self):
+        self.tick(10)
+        for _ in range(5):
+            D.log("-", "reconcile: gh issue view failed")
+        self.tick()
+        rep = next(p for p in self.w.problems if p["title"] == "Factory problem: repeating error")
+        self.w.clock += 3601
+        self.tick(119)
+        self.assertEqual(rep["state"], "OPEN")
+        self.tick()
+        self.assertEqual(rep["state"], "CLOSED")
+
+    def test_a_system_wide_kind_is_not_closed_in_the_first_ten_beats_after_a_start(self):
+        self.d = self.new()
+        for _ in range(5):
+            D.log("-", "reconcile: gh issue view failed")
+        self.tick()
+        rep = next(p for p in self.w.problems if p["title"] == "Factory problem: repeating error")
+        r = self.records()["repeating error"]
+        r["absent"] = 119
+        self.d.store.set("problems", "repeating error", json.dumps(r))
+        self.tick(fresh=True)
+        self.tick(9)
+        self.assertEqual(rep["state"], "OPEN")
+        self.tick()
+        self.assertEqual(rep["state"], "CLOSED")
+
+    def test_the_first_gh_error_in_the_tickets_pass_stops_it_for_this_beat(self):
+        self.w.issues += [self.bad(n) for n in (6, 7, 8)]
+        orig, fails = self.w.gh, [1]
+
+        def gh(args):
+            if args[:2] == ["issue", "create"] and fails:
+                fails.pop()
+                raise D.Error("gh issue create failed: exit 1")
+            return orig(args)
+        self.w.gh = gh
+        self.tick()
+        self.assertEqual(self.w.problems, [])
+        self.assertIn("problems: gh issue create failed: exit 1", self.out.getvalue())
+        self.tick()
+        self.assertEqual(len(self.w.problems), 3)
+
+    def test_an_open_issue_with_the_same_problem_key_is_adopted_and_not_opened_twice(self):
+        self.w.problems.append({"number": 950, "title": "Factory problem: unreadable #6", "body": "```\nProblem-Key: unreadable #6\n```",
+                                "comments": [], "labels": ["factory-problem"], "state": "OPEN"})
+        self.w.issues.append(self.bad(6))
+        self.tick(2)
+        self.assertEqual(len(self.w.problems), 1)
+        self.assertEqual(self.records()["unreadable #6"]["issue"], 950)
+        self.assertIn("files: no **Files** heading", self.w.problems[0]["body"])
+
+    def test_an_ending_records_when_the_job_ended(self):
+        self.tick()
+        self.w.finish("b1", "BLOCKED: the issue cannot be done as written")
+        self.tick()
+        self.assertTrue(self.d.store.get_job("5").get("ended_at"))
 
     def test_a_resolver_that_raises_leaves_the_rest_of_the_beat_running(self):
         def boom(*a):
@@ -219,10 +305,44 @@ class Station(Resolving):
         self.assertEqual(len(self.house()), 1)
         line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
         self.assertTrue(line.endswith(" | problems 1 open, 1 owner"), line)
-        p["labels"].remove("owner")
+        self.w.unlabel(p["number"], "owner", "special-place-administrator")
         self.tick()
         self.assertEqual(len(self.house()), 2)
         self.assertEqual(self.rec()["state"], "resolving")
+
+    def test_an_owner_label_removed_by_anyone_but_rob_is_put_back_and_nothing_is_sent(self):
+        self.tick(2)
+        self.w.finish("h1", "ESCALATE: Rob decides")
+        self.tick()
+        p = self.w.problems[0]
+        self.w.unlabel(p["number"], "owner", "house-bot")
+        self.tick(2)
+        self.assertIn("owner", p["labels"])
+        self.assertEqual(len(self.house()), 1)
+
+    def test_a_problem_sent_six_times_goes_to_the_owner_instead_of_a_seventh_send(self):
+        self.d = self.new()
+        D.holds.arm(self.d.store, "plan limit", self.w.clock + 600)
+        self.tick()
+        r = self.rec()
+        r["sends"] = 6
+        self.d.store.set("problems", "unreadable #6", json.dumps(r))
+        D.holds.clear(self.d.store, "plan limit")
+        self.tick()
+        self.assertEqual(self.house(), [])
+        self.assertIn("owner", self.w.problems[0]["labels"])
+        self.assertIn("sent to HOUSE 6 times", self.w.problems[0]["comments"][0])
+
+    def test_the_brief_keeps_house_off_the_labels_the_dispatcher_reads(self):
+        self.tick()
+        self.assertIn("Never add or remove the labels `factory-problem`, `owner`, `factory` or `factory-blocked`", self.house()[0])
+
+    def test_a_send_answered_without_a_run_id_is_not_sent_again_every_beat(self):
+        orig = self.w.account
+        self.w.account = lambda tool, args: (orig(tool, args) and {}) if tool == "send_message" and args["agentId"] == "h1" else orig(tool, args)
+        self.tick(3)
+        self.assertEqual(len(self.house()), 1)
+        self.assertEqual((self.rec()["state"], self.rec()["run"]), ("resolving", None))
 
     def test_a_run_without_a_final_line_is_asked_once_again_then_escalated(self):
         self.tick(2)
@@ -307,7 +427,8 @@ class Station(Resolving):
         self.w.runs["run1"] = {"status": "error", "error": "AI_APICallError: You've hit your session limit · resets 3pm"}
         self.tick()
         self.assertEqual(D.holds.active(self.d.store, self.w.clock)["kind"], "plan limit")
-        self.assertEqual((self.rec()["state"], self.rec().get("asked")), ("resolve_wait", None))
+        self.assertEqual(self.rec()["state"], "resolve_wait")
+        self.assertFalse(self.rec().get("asked"))
 
     def test_a_transient_error_is_sent_again_without_counting_as_a_missing_line(self):
         self.tick(2)
@@ -420,7 +541,13 @@ class Do(Resolving):
         self.run_with("Look: DO: requeue #7 inside a sentence\nDO: ping @someone `rm -rf /`\nRESOLVED: nothing")
         self.assertEqual(self.results(), ["The dispatcher ran the DO lines of run run1:\n- not allowed: DO: ping someone 'rm -rf /'"])
 
-    def test_do_lines_run_only_from_a_finished_run_the_dispatcher_sent_and_at_most_ten(self):
+    def test_a_repeated_do_line_runs_once_and_one_inside_a_code_block_not_at_all(self):
+        self.d = self.new()
+        self.d.store.put_job("8", "waiting", {"issue": 8, "title": "T8", "wait_reason": "dependency"})
+        self.run_with("DO: wait-off #8\nDO: wait-off #8\n```\nDO: clear-hold plan limit\n```\nRESOLVED: x")
+        self.assertEqual(self.results(), ["The dispatcher ran the DO lines of run run1:\n- DO: wait-off #8 -> back-off and wait reason of #8 dropped"])
+
+    def test_do_lines_run_only_from_a_finished_run_the_dispatcher_sent_and_at_most_four(self):
         self.tick()
         self.w.problems[0]["comments"].append("DO: clear-hold plan limit")
         self.w.finish("h1", "DO: requeue #7\nRESOLVED: x", status="error")
@@ -429,8 +556,19 @@ class Do(Resolving):
         self.w.finish("h1", "\n".join(["DO: wait-off #%d" % n for n in range(12)] + ["RESOLVED: y"]))
         self.tick()
         lines = self.results()[0].split("\n")
-        self.assertEqual(len(lines), 12)
-        self.assertEqual(lines[-1], "- 2 more DO lines not run: at most 10 a run")
+        self.assertEqual(len(lines), 6)
+        self.assertEqual(lines[-1], "- 8 more DO lines not run: at most 4 a run")
+
+
+class TakeCap(Base):
+    def test_intake_does_not_take_a_relabelled_job_a_fourth_time_and_says_so_once(self):
+        self.w.issues.append({"number": 7, "title": "T7", "body": ready(), "comments": []})
+        self.d = self.new()
+        self.d.store.put_job("7", "blocked", {"issue": 7, "title": "T7", "relabelled": True, "commented": True, "take": 3})
+        self.tick(3)
+        self.assertEqual(self.state(7), "blocked")
+        self.assertEqual(len(self.w.issue(7)["comments"]), 1)
+        self.assertIn("taken 3 times", self.w.issue(7)["comments"][0])
 
 
 class Shipped(unittest.TestCase):

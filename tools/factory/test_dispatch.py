@@ -105,8 +105,11 @@ class World:
                                   "labels": [opt("--label")], "state": "OPEN"})
             return "https://github.com/o/r/issues/%d\n" % n
         if a[:2] == ["issue", "list"]:
-            return json.dumps([{"number": p["number"], "labels": [{"name": x} for x in p["labels"]]}
+            return json.dumps([{"number": p["number"], "body": p["body"], "labels": [{"name": x} for x in p["labels"]]}
                                for p in self.problems if p["state"] == "OPEN"])
+        if a[0] == "api":
+            n = int(a[1].split("/issues/")[1].split("/")[0])
+            return json.dumps(next(p for p in self.problems if p["number"] == n).get("events", []))
         p = self.problem(a)
         if a[:2] == ["issue", "edit"]:
             p["body"] = opt("--body") or p["body"]
@@ -114,14 +117,22 @@ class World:
         elif a[:2] == ["issue", "close"]:
             p["state"] = "CLOSED"
             p["comments"] += [opt("--comment")] if opt("--comment") else []
+        elif a[:2] == ["issue", "reopen"]:
+            p["state"] = "OPEN"
         elif a[:2] == ["issue", "comment"]:
             p["comments"].append(opt("--body"))
         return ""
 
+    def unlabel(self, n, label, actor):
+        p = next(p for p in self.problems if p["number"] == n)
+        p["labels"].remove(label)
+        p.setdefault("events", []).append({"event": "unlabeled", "label": {"name": label}, "actor": {"login": actor}})
+
     def gh(self, args):
         a = list(args)
         self.gh_calls.append(a)
-        if a[:2] == ["issue", "create"] or "factory-problem" in a or (a[0] == "issue" and self.problem(a)):
+        timeline = a[0] == "api" and "/timeline" in a[1] and any("/issues/%d/" % p["number"] in a[1] for p in self.problems)
+        if a[:2] == ["issue", "create"] or "factory-problem" in a or (a[0] == "issue" and self.problem(a)) or timeline:
             return self.problem_gh(a)
         if a[:2] == ["run", "rerun"]:
             self.reruns.append(a)

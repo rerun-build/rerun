@@ -34,6 +34,7 @@ RECONCILE_MAX = 20
 MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
 MERGE_TRIES = 5
+MAX_TAKES = 3
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
              "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
@@ -400,8 +401,8 @@ class Dispatcher:
             s = slots.station(j)
             if s:
                 waiting[s] = waiting.get(s, 0) + 1
-        if self.resolver.waiting(self):
-            waiting["resolve"] = self.resolver.waiting(self)
+        if n := self.resolver.waiting(self):
+            waiting["resolve"] = n
         return slots.quotas(waiting, len(self.running()), total)
 
     def take(self, j):
@@ -444,7 +445,7 @@ class Dispatcher:
             log(j["issue"], why)
             if j["state"] in END:
                 return
-            state, msg, kw = "blocked", "blocked: " + why[:180], {"reason": why[:200], "sending": None}
+            state, msg, kw = "blocked", "blocked: " + why[:180], {"reason": why[:200], "sending": None, "ended_at": ledger_store.now()}
         j.update(kw, state=state)
         self.save(j, msg, reset=True)
         log(j["issue"], msg)
@@ -490,6 +491,14 @@ class Dispatcher:
                 if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
                     continue
                 take = (old.get("take") or 1) + 1 if old and old["state"] in END else (old or {}).get("take")
+                if old and old["state"] in END and take > MAX_TAKES:
+                    if self.store.get_all(str(i["number"])).get("take_cap") != str(take - 1):
+                        self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
+                                 "The factory dispatcher does not take this issue again: it was taken %d times. "
+                                 "Rob decides: change the issue, or close it." % (take - 1)])
+                        self.store.set(str(i["number"]), "take_cap", str(take - 1))
+                        log(i["number"], "not started: taken %d times" % (take - 1))
+                    continue
                 errors = shape.get(i["number"]) or []
                 if errors:
                     digest = hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
@@ -996,7 +1005,7 @@ class Dispatcher:
         return hits[-1] if hits else None
 
     def end(self, j, state, reason):
-        self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None)
+        self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None, ended_at=ledger_store.now())
 
     def report(self, j):
         n = str(j["issue"])
