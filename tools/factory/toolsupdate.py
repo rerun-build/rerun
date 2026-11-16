@@ -66,6 +66,9 @@ def main(argv, gh=gh_cli):
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     out = ((r.stdout or "") + (r.stderr or "")).replace(key, "<keyfile>").strip()
+    if r.returncode == 3:
+        print("TRANSIENT: %s not installed now: %s" % (sha[:8], out[-300:]))
+        return 3
     if r.returncode:
         M.write(skip_path(), sha)
         print("INSTALL FAILED for %s; still on %s and %s is skipped until a newer green commit: %s" % (sha[:8], (cur or "none")[:8], sha[:8], out[-300:]))

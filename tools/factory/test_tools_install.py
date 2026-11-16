@@ -92,8 +92,8 @@ class Installs(unittest.TestCase):
             fcntl.flock(lk, fcntl.LOCK_EX)
             t = time.time()
             r = self.install(tree(os.path.join(self.tmp, "B")), B)
-        self.assertEqual(r.returncode, 0)
-        self.assertIn("another install is running", r.stdout)
+        self.assertEqual(r.returncode, 3)
+        self.assertIn("TRANSIENT: another install is running", r.stdout)
         self.assertLess(time.time() - t, 5)
         self.assertEqual(os.readlink(os.path.join(self.pre, "factory-current")), "factory-" + A)
 
@@ -111,6 +111,46 @@ class Installs(unittest.TestCase):
         r = self.wrapper("wt", T_BREAK="1")
         self.assertEqual(r.returncode, 1)
         self.assertNotIn("FALLBACK", r.stderr)
+
+    def test_ci_wait_and_risk_never_fall_back(self):
+        a = tree(os.path.join(self.tmp, "A"))
+        for n in ("ci-wait", "risk"):
+            shutil.copy(os.path.join(HERE, "bin", n), os.path.join(a, "bin", n))
+        self.assertEqual(self.install(a, A).returncode, 0)
+        for n in ("ci-wait", "risk"):
+            with open(os.path.join(self.pre, "bin", n)) as f:
+                self.assertNotIn("FALLBACK", f.read(), n)
+        with open(os.path.join(self.pre, "bin", "packet")) as f:
+            self.assertIn("FALLBACK", f.read())
+
+    def test_an_install_cut_off_after_the_switch_is_finished_by_the_rerun(self):
+        self.install(tree(os.path.join(self.tmp, "A")), A)
+        b = tree(os.path.join(self.tmp, "B"))
+        shutil.copy(os.path.join(HERE, "bin", "risk"), os.path.join(b, "bin", "risk"))
+        self.assertEqual(self.install(b, B).returncode, 0)
+        os.remove(os.path.join(self.pre, "bin", "risk"))
+        with open(os.path.join(self.pre, "factory-installed"), "w") as f:
+            f.write(A + " 2026-11-16T00:00:00Z\n")
+        r = self.install(b, B)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertNotIn("already the current copy", r.stdout)
+        self.assertTrue(os.path.isfile(os.path.join(self.pre, "bin", "risk")))
+        with open(os.path.join(self.pre, "factory-installed")) as f:
+            self.assertTrue(f.read().startswith(B + " "))
+        self.assertEqual(os.readlink(os.path.join(self.pre, "factory-current")), "factory-" + B)
+        self.assertEqual(os.readlink(os.path.join(self.pre, "factory-previous")), "factory-" + A)
+        r = self.install(b, B)
+        self.assertIn("already the current copy", r.stdout)
+
+    def test_reinstalling_the_previous_copy_keeps_its_folder(self):
+        a, b = self.two()
+        mark = os.path.join(self.pre, "factory-" + A, "in-use")
+        open(mark, "w").close()
+        r = self.install(a, A)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertTrue(os.path.exists(mark))
+        self.assertEqual(os.readlink(os.path.join(self.pre, "factory-current")), "factory-" + A)
+        self.assertEqual(os.readlink(os.path.join(self.pre, "factory-previous")), "factory-" + B)
 
     def test_the_keyfile_path_is_never_printed(self):
         a = tree(os.path.join(self.tmp, "A"))
@@ -169,6 +209,19 @@ class AutoInstall(T.FactoryCase):
         code, out = self.run_u()
         self.assertEqual(code, 0, out)
         self.assertIn("TOOLS current at", out)
+
+    def test_a_busy_install_lock_is_transient_and_skips_nothing(self):
+        os.makedirs(self.pre, exist_ok=True)
+        with open(os.path.join(self.pre, ".install.lock"), "a") as lk:
+            fcntl.flock(lk, fcntl.LOCK_EX)
+            code, out = self.run_u()
+        self.assertEqual(code, 3, out)
+        self.assertIn("TRANSIENT: ", out)
+        self.assertNotIn("TOOLS installed", out)
+        self.assertFalse(os.path.exists(self.U.skip_path()))
+        code, out = self.run_u()
+        self.assertEqual(code, 0, out)
+        self.assertIn("TOOLS installed %s" % self.good[:8], out)
 
     def test_github_unreachable_is_transient(self):
         def down(args):

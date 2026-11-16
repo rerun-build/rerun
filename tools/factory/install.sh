@@ -4,7 +4,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 PREFIX=
 KEYFILE=
 VERSION=
-READONLY="packet risk ci-wait repo-check job-cost"
+READONLY="packet repo-check job-cost"
 while [ $# -gt 0 ]; do
   case "$1" in
     --prefix) PREFIX=${2:-}; shift 2 ;;
@@ -39,9 +39,11 @@ case "$VERSION" in *[!0-9a-f]*) echo "REFUSED: --version takes a commit id" >&2;
 mkdir -p "$PREFIX/bin"
 PREFIX=$(cd "$PREFIX" && pwd)
 exec 9>"$PREFIX/.install.lock"
-flock -n 9 || { echo "another install is running; nothing done"; exit 0; }
+flock -n 9 || { echo "TRANSIENT: another install is running; nothing done"; exit 3; }
 DEST="$PREFIX/factory-$VERSION"
-if [ "$(readlink "$PREFIX/factory-current" 2>/dev/null || true)" = "factory-$VERSION" ]; then
+CUR=$(readlink "$PREFIX/factory-current" 2>/dev/null || true)
+PREV=$(readlink "$PREFIX/factory-previous" 2>/dev/null || true)
+if [ "$CUR" = "factory-$VERSION" ] && [ "$(cut -d' ' -f1 "$PREFIX/factory-installed" 2>/dev/null || true)" = "$VERSION" ]; then
   echo "factory-$VERSION is already the current copy"
   exit 0
 fi
@@ -86,11 +88,17 @@ for w in "$HERE"/bin/*; do
   } > "$STAGE/.bin/$n"
   chmod 755 "$STAGE/.bin/$n"
 done
-rm -rf "$DEST"
-mv "$STAGE" "$DEST"
+if { [ "$CUR" = "factory-$VERSION" ] || [ "$PREV" = "factory-$VERSION" ]; } && [ -d "$DEST" ]; then
+  rm -rf "$STAGE"
+else
+  rm -rf "$DEST"
+  mv "$STAGE" "$DEST"
+fi
 trap - EXIT
-OLD=$(readlink "$PREFIX/factory-current" 2>/dev/null || true)
-if [ -n "$OLD" ]; then
+OLD=$CUR
+if [ "$OLD" = "factory-$VERSION" ]; then
+  :
+elif [ -n "$OLD" ]; then
   ln -sfn "$OLD" "$PREFIX/.previous.tmp"
   mv -T "$PREFIX/.previous.tmp" "$PREFIX/factory-previous"
 elif [ -d "$PREFIX/factory" ]; then
@@ -106,4 +114,4 @@ for w in "$DEST"/.bin/*; do
 done
 echo "$VERSION $(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PREFIX/.installed.tmp"
 mv -f "$PREFIX/.installed.tmp" "$PREFIX/factory-installed"
-echo "installed factory-$VERSION as the current copy (previous: ${OLD:-none})"
+echo "installed factory-$VERSION as the current copy (previous: $(readlink "$PREFIX/factory-previous" 2>/dev/null || echo none))"
