@@ -15,7 +15,7 @@
   "slots": 15,
   "resolver": {
     "detect": true,
-    "resolve": false
+    "resolve": true
   },
   "ledger_file": "/state/ledger.db",
   "json_state_file": "/state/dispatch.json",
