@@ -7,7 +7,7 @@ _ERR = ("provider_overloaded", "429", "rate limit", "sign-in renewed during the 
 _OVERLOADED = re.compile(r"overloaded|rate.?limit|too many requests|at capacity|high demand|service unavailable", re.I)
 _SPENT = re.compile(r"hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached", re.I)
 _NOT_IN_PLAN = re.compile(r"not supported when using codex with a chatgpt account|does not exist or you do not have access|requires usage credits|model_not_found", re.I)
-_ROOM = ("builders are already active", "GB free, floor is", "of memory available, floor is", "/data/work is over")
+_ROOM = ("builders are already active", "GB free, floor is", "of memory available, floor is", "/data/work is over", "TRANSIENT: ")
 
 
 def seen_after(run, prev, now_iso):

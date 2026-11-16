@@ -42,6 +42,9 @@ REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
 MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
+ROOM_HOLDS = (("TRANSIENT: disk:", "disk", 15 * 60), ("TRANSIENT: memory:", "load", 5 * 60), ("TRANSIENT: load:", "load", 5 * 60))
+CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:.*\n)*?.*/tools/factory[^/\s]*/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
+CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 MAX_TAKES = 3
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
@@ -991,6 +994,8 @@ class Dispatcher:
                 if found:
                     j["pr"] = found
                 return self.blocked(j, out)
+            self.store.set("-", "checkout_failed_row", "0")
+            j.pop("checkout_failed", None)
             self.to(j, "review_wait", "pull request #%s" % m.group(1), pr=int(m.group(1)))
         elif st == "review_wait":
             if self.conflicts(j):
@@ -1068,8 +1073,22 @@ class Dispatcher:
 
     def blocked(self, j, out):
         why = self.not_met_reason(j, out)
+        text = out or ""
+        room = [(kind, hold_s) for mark, kind, hold_s in ROOM_HOLDS if mark in text]
+        for kind, hold_s in room:
+            holds.arm(self.store, kind, self.now() + hold_s)
+            log(j["issue"], "hold %s for %d s: the checkout reported it" % (kind, hold_s))
+        fault = CHECKOUT_FAULT.search(text) if j["state"] in ("building", "fixing") else None
+        if fault:
+            lines = [l for l in text.splitlines() if l.strip()][-12:]
+            j["checkout_failed"] = ("%s\nlast lines:\n%s" % (fault.group(0).strip()[:300], "\n".join(lines)))[:1500]
+            row = int(self.store.get_all("-").get("checkout_failed_row") or 0) + 1
+            self.store.set("-", "checkout_failed_row", str(row))
+            if row >= CHECKOUT_ROW:
+                holds.arm(self.store, "checkout", self.now() + CHECKOUT_HOLD_S)
+                log(j["issue"], "hold checkout: %d checkouts in a row failed" % row)
         k = clocks.klass("BLOCKED", blocked=why)
-        if k == "transient":
+        if k == "transient" or room or "TRANSIENT: " in text:
             return self.transient(j, why)
         self.end(j, "returned" if k == "plan" else "blocked", why)
 
@@ -1377,6 +1396,9 @@ def main(argv=None):
     ap.add_argument("cmd", choices=("run", "once"))
     a = ap.parse_args(argv)
     cfg = settings()
+    if not cfg.get("proof"):
+        print("dispatch: proof is off in dispatch.json; refusing to start", file=sys.stderr)
+        return 1
     url = os.environ.get("DISPATCH_ACCOUNT_URL")
     if not url:
         print("dispatch: DISPATCH_ACCOUNT_URL is not set", file=sys.stderr)

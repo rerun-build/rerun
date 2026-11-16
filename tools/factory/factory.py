@@ -7,6 +7,7 @@ OWNERS = ("special-place-ai-heaven", "special-place-administrator")
 WORK = os.environ.get("FACTORY_WORK", "/data/work")
 REPOS, WT, STATE = WORK + "/repos", WORK + "/wt", WORK + "/state"
 MIN_FREE_GB = 30
+LOAD_PER_CPU = 3.0
 MAX_BUILDERS = None
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cutshape
@@ -54,6 +55,29 @@ ISSUE_TEMPLATE = """## Goal
 ## Token estimate
 """
 REL_TEMPLATE = "\n".join(REL_HEADS) + "\n"
+
+
+def transient(msg):
+    print("TRANSIENT: " + msg)
+    sys.exit(3)
+
+
+def room_check():
+    st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
+    free = st.free / 2**30
+    if free < MIN_FREE_GB:
+        transient("disk: %s has %.0f GB free, floor is %d GB%s" % (WORK, free, MIN_FREE_GB, "; under half the floor" if free < MIN_FREE_GB / 2 else ""))
+    mem = avail_mem_gb()
+    if mem is not None and mem < MIN_FREE_MEM_GB:
+        transient("memory: %.1f GB available, floor is %d GB" % (mem, MIN_FREE_MEM_GB))
+    if not LOAD_PER_CPU:
+        return
+    try:
+        load, cpus = os.getloadavg()[0], os.cpu_count() or 1
+    except OSError:
+        return
+    if load > LOAD_PER_CPU * cpus:
+        transient("load: %.1f on %d cores, ceiling is %.1f" % (load, cpus, LOAD_PER_CPU * cpus))
 
 
 def die(msg, code=2):
@@ -468,8 +492,8 @@ def cmd_wt(a):
                                                                      "?" if h is None else "%dh" % h, "CI green, waits for merge" if g else "ACTIVE builder"))
         for p in wt_strays():
             print("stray, not a worktree: " + p)
-        st = shutil.disk_usage("/data")
-        print("active builders: %d of %d | /data/work %.1f GB | /data free %.0f GB (floor %d)" % (act, max_builders(), du_gb(WORK), st.free / 2**30, MIN_FREE_GB))
+        st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
+        print("active builders: %d of %d | %d job folders, %.1f GB | free %.0f GB (floor %d)" % (act, max_builders(), len(wt_dirs()), du_gb(WORK), st.free / 2**30, MIN_FREE_GB))
         return
     if len(a) < 4:
         die("usage: wt %s <repo> <issue> <chunk>" % a[0])
@@ -499,12 +523,7 @@ def cmd_wt(a):
     if "--clone" in a or checkout_mode() == "clone":
         return wt_new_clone(a, full, issue, chunk)
     existing = os.path.isdir(path)
-    st = shutil.disk_usage("/data")
-    if st.free / 2**30 < MIN_FREE_GB:
-        die("/data has %.0f GB free, floor is %d GB. Tell @boss." % (st.free / 2**30, MIN_FREE_GB))
-    mem = avail_mem_gb()
-    if mem is not None and mem < MIN_FREE_MEM_GB:
-        die("%.1f GB of memory available, floor is %d GB. Tell @boss." % (mem, MIN_FREE_MEM_GB))
+    room_check()
     os.makedirs(STATE, exist_ok=True)
     with builder_lock():
         if not existing and cap_check(quiet=True):
@@ -592,12 +611,7 @@ def wt_new_clone(a, full, issue, chunk):
 
 def wt_new_clone_steps(a, full, issue, chunk):
     import clones
-    st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
-    if st.free / 2**30 < MIN_FREE_GB:
-        clones.transient("disk: %s has %.0f GB free, floor is %d GB" % (WORK, st.free / 2**30, MIN_FREE_GB))
-    mem = avail_mem_gb()
-    if mem is not None and mem < MIN_FREE_MEM_GB:
-        clones.transient("memory: %.1f GB available, floor is %d GB" % (mem, MIN_FREE_MEM_GB))
+    room_check()
     plan_check(full, issue)
     info = api("repos/%s" % full)
     if not isinstance(info, dict) or "default_branch" not in info:

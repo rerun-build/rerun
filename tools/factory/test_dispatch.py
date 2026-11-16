@@ -858,7 +858,7 @@ class Secrets(Base):
         self.assertNotIn(self.TOKEN, str(d.store.jobs()))
 
     def test_start_line_for_once(self):
-        for name, fake in (("settings", lambda: self.cfg), ("make_account", lambda url, key: self.w.account),
+        for name, fake in (("settings", lambda: dict(self.cfg, proof=True)), ("make_account", lambda url, key: self.w.account),
                            ("make_gh", lambda tok: self.w.gh), ("read_secret", lambda path: "fake-key")):
             self.addCleanup(setattr, D, name, getattr(D, name))
             setattr(D, name, fake)

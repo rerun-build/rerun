@@ -19,6 +19,8 @@ class Watch:
         work, busy = False, False
         for j in jobs:
             n, st = j["issue"], j["state"]
+            if j.get("checkout_failed"):
+                out["checkout failed #%d" % n] = j["checkout_failed"]
             if st == "waiting" and j.get("dead"):
                 out["dead #%d" % n] = j.get("wait_line") or "waits on dead dependencies"
             elif ended(j, since) and open_issues is not None and n in open_issues:
