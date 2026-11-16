@@ -755,11 +755,11 @@ class WtNewSweepAndInstall(BuilderCap):
         self.prs["chunk/7-" + chunk] = [{"number": 9, "state": "MERGED", "headRefOid": sha}]
         return p
 
-    def test_below_the_cap_removes_a_merged_worktree(self):
+    def test_below_the_cap_keeps_a_merged_worktree(self):
         p = self.merged("1")
         code, out = self.new("3")
         self.assertEqual(code, 0, out)
-        self.assertFalse(os.path.isdir(p))
+        self.assertTrue(os.path.isdir(p))
         self.assertTrue(self.made("3"))
 
     def test_five_simultaneous_wt_new_at_the_limit_of_merged_worktrees_all_get_one(self):
