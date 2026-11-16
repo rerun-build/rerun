@@ -1,0 +1,2 @@
+#!/bin/sh
+exec node /data/tools/factory/code-q.mjs "$@"
