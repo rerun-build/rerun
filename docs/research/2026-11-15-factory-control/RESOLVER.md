@@ -17,7 +17,7 @@ Set in `tools/factory/dispatch.json` under `resolver`.
 | `resolver.detect` | Finding problems, opening, editing and closing their issues, and the `problems N open, M owner` count in the beat line. |
 | `resolver.resolve` | Sending problems to HOUSE and running its DO lines. Works only with `detect` on and a `resolver` pool in the config. |
 
-Shipped as detect on, resolve off. The operator turns resolve on after looking at how many problems the live ledger opens.
+Shipped as detect on, resolve on since 2026-11-16, after detection opened 0 problems on the live ledger. Setting `resolve` to false stops new sends; a run already out is not cancelled.
 
 ## 3. The kinds
 

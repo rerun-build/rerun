@@ -630,9 +630,9 @@ class TakeCap(Base):
 
 
 class Shipped(unittest.TestCase):
-    def test_the_shipped_settings_detect_problems_send_none_and_carry_house_with_two_copies(self):
+    def test_the_shipped_settings_detect_and_resolve_problems_with_house_and_two_copies(self):
         cfg = D.settings()
-        self.assertEqual(cfg["resolver"], {"detect": True, "resolve": False})
+        self.assertEqual(cfg["resolver"], {"detect": True, "resolve": True})
         self.assertEqual(cfg["types"]["resolver"], {"coworkers": [{"id": "a7ff1339-e891-4047-aea1-972c5ba2c5c3", "name": "HOUSE", "runs": 2}]})
 
 
