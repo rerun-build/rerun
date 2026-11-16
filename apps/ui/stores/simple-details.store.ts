@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 
 type SimpleDetailsState = {
-    // Null until the person opens or closes the card: it then follows the window's width.
-    wanted: boolean | null
-    setWanted: (wanted: boolean | null) => void
+    // Closed until the person opens it, whatever the window's width.
+    wanted: boolean
+    setWanted: (wanted: boolean) => void
 }
 
 /**
@@ -11,6 +11,6 @@ type SimpleDetailsState = {
  * toggles it and the column re-render alone: the chats mounted beside them never do.
  */
 export const useSimpleDetailsStore = create<SimpleDetailsState>(set => ({
-    wanted: null,
+    wanted: false,
     setWanted: wanted => set({ wanted }),
 }))

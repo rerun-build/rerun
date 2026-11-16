@@ -70,7 +70,7 @@ export function SimpleWorkspace() {
     const detailsOpen = useDetailsOpen()
     const setDetailsWanted = useSimpleDetailsStore(s => s.setWanted)
     const agent = agents.find(a => a.id === selectedAgentId)
-    useEffect(() => () => useSimpleDetailsStore.getState().setWanted(null), [])
+    useEffect(() => () => useSimpleDetailsStore.getState().setWanted(false), [])
 
     // A link, a notification or the search asks for a coworker on a precise place: a screen opens the
     // card's column on it, the list of what waits on the person floats over the chat.
