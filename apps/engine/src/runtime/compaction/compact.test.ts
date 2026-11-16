@@ -16,6 +16,16 @@ const state = vi.hoisted(() => ({
     summary: '  Condensed history.  ' as string | Error,
     prompts: [] as Array<Record<string, unknown>>,
     cliAuth: [] as Array<{ provider: string; beforeSummary: number }>,
+    handoff: 'HANDOFF TEXT' as string | Error,
+    handoffCalls: [] as string[][],
+}))
+
+vi.mock('../handoff.js', () => ({
+    buildHandoff: async (agentId: string, sessionId: string) => {
+        state.handoffCalls.push([agentId, sessionId])
+        if (state.handoff instanceof Error) throw state.handoff
+        return state.handoff
+    },
 }))
 
 vi.mock('../../agents/providers.js', async () => {
@@ -100,6 +110,9 @@ afterEach(() => {
     state.summary = '  Condensed history.  '
     state.prompts = []
     state.cliAuth = []
+    state.handoff = 'HANDOFF TEXT'
+    state.handoffCalls = []
+    delete process.env.RERUN_HANDOFF_AT_TOKENS
 })
 
 describe('prepareRunHistory', () => {
@@ -276,6 +289,64 @@ describe('prepareRunHistory', () => {
         const { ctx } = context('gpt-4o', { writer: undefined })
 
         expect(await prepareRunHistory(ctx, 'system')).toHaveLength(3)
+        expect(state.saved).toHaveLength(1)
+    })
+
+    it('continues from the handoff at the set size and calls no summary model', async () => {
+        process.env.RERUN_HANDOFF_AT_TOKENS = '1000'
+        state.rows = longHistory()
+        const { ctx, writes } = context()
+
+        const history = await prepareRunHistory(ctx, 'system')
+
+        expect(history[0]).toEqual({ role: 'user', content: 'HANDOFF TEXT' })
+        expect(state.handoffCalls).toEqual([['compact-agent', 'sess']])
+        expect(state.prompts).toHaveLength(0)
+        expect(state.saved).toHaveLength(1)
+        expect((state.saved[0] as { summaryMessage: unknown }).summaryMessage).toEqual({ role: 'user', content: 'HANDOFF TEXT' })
+        expect(writes.at(-1)?.data.status).toBe('done')
+    })
+
+    it('keeps the tail as today', async () => {
+        state.rows = longHistory()
+        const baseline = await prepareRunHistory(context().ctx, 'system')
+        state.saved = []
+        process.env.RERUN_HANDOFF_AT_TOKENS = '1000'
+
+        const history = await prepareRunHistory(context().ctx, 'system')
+
+        expect(history.slice(1)).toEqual(baseline.slice(1))
+        expect(history).toHaveLength(baseline.length)
+    })
+
+    it('is off at 0', async () => {
+        process.env.RERUN_HANDOFF_AT_TOKENS = '0'
+        state.rows = longHistory()
+
+        const history = await prepareRunHistory(context().ctx, 'system')
+
+        expect(state.handoffCalls).toHaveLength(0)
+        expect(state.prompts).toHaveLength(1)
+        expect(JSON.stringify(history[0])).toContain('Condensed history.')
+    })
+
+    it('is not used under the set size', async () => {
+        process.env.RERUN_HANDOFF_AT_TOKENS = '10000000'
+        state.rows = [row(0, 'user', 'hello'), row(1, 'assistant', 'hi')]
+
+        expect(await prepareRunHistory(context().ctx, 'system')).toHaveLength(2)
+        expect(state.handoffCalls).toHaveLength(0)
+    })
+
+    it('falls back to the summary when the handoff fails', async () => {
+        process.env.RERUN_HANDOFF_AT_TOKENS = '1000'
+        state.handoff = new Error('boom')
+        state.rows = longHistory()
+
+        const history = await prepareRunHistory(context().ctx, 'system')
+
+        expect(state.prompts).toHaveLength(1)
+        expect(JSON.stringify(history[0])).toContain('Condensed history.')
         expect(state.saved).toHaveLength(1)
     })
 })
