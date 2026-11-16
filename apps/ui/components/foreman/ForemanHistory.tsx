@@ -21,10 +21,12 @@ type ForemanHistoryProps = {
     onOpenGeneral: () => void
     onOpenThread: (sessionId: string) => void
     onNewTask: () => void
+    /** At the start of the bar over the chat, where a coworker keeps its conversations: their button, and the list opens under it. */
+    inBar?: boolean
 }
 
 /** Every conversation with the Chief of Staff, under its button in the header: General pinned on top, its threads by day. */
-export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThreadId, onOpenGeneral, onOpenThread, onNewTask }: ForemanHistoryProps) {
+export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThreadId, onOpenGeneral, onOpenThread, onNewTask, inBar = false }: ForemanHistoryProps) {
     const t = useTranslations('foreman.history')
     const tThreads = useTranslations('foreman.threads')
     const tHeader = useTranslations('foreman.header')
@@ -40,14 +42,23 @@ export function ForemanHistory({ open, onOpenChange, waiting, entries, activeThr
         <Popover open={open} onOpenChange={onOpenChange}>
             <TooltipLabeled label={tHeader('conversations')} side="bottom">
                 <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon-sm" aria-label={tHeader('conversations')} className="relative">
-                        <HistoryIcon className="size-3.5" />
-                        {waiting && <span aria-hidden className="absolute top-1 right-1 size-1.5 rounded-full bg-amber-400" />}
-                    </Button>
+                    {inBar ? (
+                        <Button variant="ghost" size="icon-sm" aria-label={tHeader('conversations')} className={cn(open && 'bg-accent')}>
+                            <span className="relative flex">
+                                <MessageCircle className="size-4" />
+                                {waiting && <span aria-hidden className="absolute -top-1 -right-1 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
+                            </span>
+                        </Button>
+                    ) : (
+                        <Button variant="ghost" size="icon-sm" aria-label={tHeader('conversations')} className="relative">
+                            <HistoryIcon className="size-3.5" />
+                            {waiting && <span aria-hidden className="absolute top-1 right-1 size-1.5 rounded-full bg-amber-400" />}
+                        </Button>
+                    )}
                 </PopoverTrigger>
             </TooltipLabeled>
             {/* A React child of the header, whose pointer down drags the column and resizes its sheet: a press in the list stops here. */}
-            <PopoverContent align="end" onPointerDown={event => event.stopPropagation()} className="max-h-[min(32rem,var(--radix-popover-content-available-height))] w-[min(360px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0">
+            <PopoverContent align={inBar ? 'start' : 'end'} onPointerDown={event => event.stopPropagation()} className="max-h-[min(32rem,var(--radix-popover-content-available-height))] w-[min(360px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0">
                 <div className="flex min-h-0 flex-col">
                     <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 pt-3 pb-1">
                         <span className="flex items-center gap-2 pl-1 text-sm font-semibold">

@@ -17,6 +17,7 @@ import { arrivalStepOf } from '@/components/foreman/arrival/flow'
 import { ForemanChatLayer } from '@/components/foreman/ForemanChatLayer'
 import { ForemanHeader } from '@/components/foreman/ForemanHeader'
 import { ForemanHistory } from '@/components/foreman/ForemanHistory'
+import { ForemanTopBar } from '@/components/foreman/ForemanTopBar'
 import { ForemanComposerSlot } from '@/components/foreman/ForemanComposerSlot'
 import { ForemanDockResizeHandle } from '@/components/foreman/ForemanDockResizeHandle'
 import { ForemanResizeHandle } from '@/components/foreman/ForemanResizeHandle'
@@ -70,7 +71,8 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const sessionId = useForemanStore(state => state.sessionId)
     const guided = useForemanStore(state => state.funnel === 'guided')
     // Le tunnel guidé n'affiche pas de tabs : un onglet resté ouvert avant ne doit pas y cacher le chat.
-    const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided
+    // In the Simple view's middle the routines are in the panel beside the chat, not in a tab over it.
+    const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided && !pinned
     const intakeOpen = useForemanStore(state => state.intake)
     const { isAnonymous, workspace, phoneStep } = useSession()
     const pendingIntake = useOnboardingStore(state => state.pendingIntake)
@@ -115,6 +117,10 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
         return { title: row?.title ?? tThreads('untitled'), status: row?.status ?? null }
     }, [inThread, threads, sessionId, tThreads])
     const [uploading, setUploading] = useState(false)
+    // Where a coworker's chat names who it is talking to, or the thread it answers in.
+    const tAgent = useTranslations('agent.agentSheetChat')
+    const tView = useTranslations('workspaceView.foreman')
+    const framedPlaceholder = !pinned ? undefined : threadOnScreen && threadOnScreen.title !== tThreads('untitled') ? tAgent('replyPlaceholder', { title: threadOnScreen.title }) : tAgent('messagePlaceholder', { name: tView('name') })
 
     // The kickoff marker goes through here too, and the store turns it away like every message of
     // the funnel: the browser notification permission is only asked once the onboarding is over.
@@ -454,22 +460,33 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                     'absolute inset-y-0 flex w-full flex-col bg-background pb-[var(--consent-inset)]',
                     floating
                         ? 'right-0 md:inset-x-0 md:overflow-hidden md:rounded-xl md:border md:border-border md:shadow-2xl'
-                        : cn(
-                              'md:w-[calc(var(--foreman-dock-track)-8px)] md:overflow-hidden md:rounded-3xl md:border md:border-border md:shadow',
-                              dockSide === 'left' ? 'left-0' : 'right-0'
-                          )
+                        : pinned
+                          ? // The rest of the card the list sits on, as a coworker's chat is: the list's edge is the line between them.
+                            'right-0 [--chat-column:48rem] md:w-(--foreman-dock-track) md:overflow-hidden md:rounded-r-3xl md:border md:border-l-0 md:border-border md:shadow'
+                          : cn(
+                                'md:w-[calc(var(--foreman-dock-track)-8px)] md:overflow-hidden md:rounded-3xl md:border md:border-border md:shadow',
+                                dockSide === 'left' ? 'left-0' : 'right-0'
+                            )
                 )}
             >
-                <ForemanHeader
-                    placement={placement}
-                    movable={!pinned}
-                    onDragPointerDown={handleHeaderPointerDown}
-                    onToggleSheetDetent={toggleDetent}
-                    onNewChat={startNewChat}
-                    thread={threadOnScreen}
-                    onBackToGeneral={backToGeneral}
-                    history={hasThreads && <ForemanHistory open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
-                />
+                {pinned ? (
+                    <ForemanTopBar
+                        thread={threadOnScreen && { id: sessionId, ...threadOnScreen }}
+                        onShowGeneral={backToGeneral}
+                        onNewTask={startNewChat}
+                        history={hasThreads && <ForemanHistory inBar open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
+                    />
+                ) : (
+                    <ForemanHeader
+                        placement={placement}
+                        onDragPointerDown={handleHeaderPointerDown}
+                        onToggleSheetDetent={toggleDetent}
+                        onNewChat={startNewChat}
+                        thread={threadOnScreen}
+                        onBackToGeneral={backToGeneral}
+                        history={hasThreads && <ForemanHistory open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
+                    />
+                )}
                 {/* Masqués et pas démontés hors de l'onglet Assistant : un aller-retour sur Routines
                     ne doit perdre ni le brouillon du composer ni la position dans la conversation. */}
                 {arrivalStep && arrivalPick && (
@@ -507,12 +524,15 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             threads={inThread || !hasThreads ? undefined : threads}
                             onOpenThread={openThread}
                             underCrumb={inThread}
+                            framed={pinned}
                             onStackElement={setStackEl}
                             className="min-h-0 flex-1"
                         />
                     </PanelSteps>
                     <ForemanComposerSlot
                         ref={setSlotEl}
+                        framed={pinned}
+                        placeholder={framedPlaceholder}
                         intake={intakeOpen ? intake : null}
                         gated={gated}
                         trialGate={trialGate}

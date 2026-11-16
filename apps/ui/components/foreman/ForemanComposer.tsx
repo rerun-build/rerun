@@ -31,11 +31,12 @@ export type ForemanComposerProps = {
      * reads as that way out, and takes no file, which the card would have nowhere to put.
      */
     ownEntry?: boolean
+    placeholder?: string
 } & ForemanComposerMentionProps
 
 export type ForemanComposerMentionProps = Pick<ComponentProps<typeof ChatComposer>, 'textareaRef' | 'textareaProps' | 'mentionTokens'>
 
-export function ForemanComposer({ sessionId, backend, status, busy, queue, onSend, onStop, onUploadingChange, composerRef, filesOnEngine, contextStats, ownEntry = false, textareaRef, textareaProps, mentionTokens }: ForemanComposerProps) {
+export function ForemanComposer({ sessionId, backend, status, busy, queue, onSend, onStop, onUploadingChange, composerRef, filesOnEngine, contextStats, ownEntry = false, placeholder, textareaRef, textareaProps, mentionTokens }: ForemanComposerProps) {
     // On the engine a file lands in the foreman's own workspace, where its tools can open the path
     // the message names. The hub foreman reads its files from the hub's bucket.
     const t = useTranslations('foreman')
@@ -60,7 +61,7 @@ export function ForemanComposer({ sessionId, backend, status, busy, queue, onSen
             // An engine that predates the foreman's file routes would be handed a path it cannot
             // open.
             attachmentsEnabled={!ownEntry && (backend === 'hub' || filesOnEngine)}
-            {...(ownEntry ? { placeholder: t('ownEntryPlaceholder') } : {})}
+            {...(ownEntry ? { placeholder: t('ownEntryPlaceholder') } : placeholder ? { placeholder } : {})}
             modelSlot={<ForemanModelPill backend={backend} />}
             contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />}
         />

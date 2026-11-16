@@ -101,6 +101,8 @@ type ForemanChatLayerProps = {
     onOpenThread?: (sessionId: string) => void
     /** A thread is on screen: the header carries the way back to General under its tabs. */
     underCrumb?: boolean
+    /** Under a bar of its own (the Simple view's middle) rather than a header laid over it: the column a coworker's chat has. */
+    framed?: boolean
     /** Ce qui porte la hauteur naturelle de la pile, que la sheet mobile mesure. */
     onStackElement?: (element: HTMLElement | null) => void
     className?: string
@@ -113,7 +115,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, onStackElement, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -222,7 +224,10 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                         qui la mesure rétrécirait d'un pixel à chaque tour : `shrink-0` l'en garde. */}
                     <ConversationContent
                         scrollClassName="max-md:flex max-md:flex-col md:[container-type:size]"
-                        className={cn('justify-end gap-4 px-3 pb-5 max-md:mt-auto max-md:shrink-0 md:min-h-full', guided ? 'pt-12' : underCrumb ? 'pt-[8.5rem]' : 'pt-24', intake || greeting ? 'max-md:min-h-72' : 'max-md:min-h-36')}
+                        className={cn(
+                            framed ? 'mx-auto w-full max-w-[var(--chat-column,none)]' : cn('justify-end gap-4 px-3 pb-5 max-md:mt-auto max-md:shrink-0 md:min-h-full', guided ? 'pt-12' : underCrumb ? 'pt-[8.5rem]' : 'pt-24'),
+                            intake || greeting ? 'max-md:min-h-72' : 'max-md:min-h-36'
+                        )}
                     >
                         {restoring && <ForemanChatSkeleton />}
                         {threadBranches(threadRows.leading)}

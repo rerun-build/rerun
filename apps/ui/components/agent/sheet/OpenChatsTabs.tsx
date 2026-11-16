@@ -31,6 +31,8 @@ type OpenChatsTabsProps = {
     onCreate: () => void
     // Without it the tabs are read-only: no rename by double-click, no menu on right-click.
     rename?: SessionRename
+    // Conversations that are not the board's sessions (the Chief of Staff's threads) say their own status.
+    statusOf?: (tab: SessionTab) => SessionStatus | undefined
 }
 
 /**
@@ -39,7 +41,7 @@ type OpenChatsTabsProps = {
  * Too many to fit, the row scrolls and only the edge still hiding a tab fades. A thread is renamed
  * where its title stands: the tab turns into a field, and a save that failed says so under the row.
  */
-export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate, rename }: OpenChatsTabsProps) {
+export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate, rename, statusOf }: OpenChatsTabsProps) {
     const t = useTranslations('agent.openChatsTabs')
     const tRename = useTranslations('agent.sessionRename')
     const [scroller, setScroller] = useState<HTMLDivElement | null>(null)
@@ -55,7 +57,7 @@ export function OpenChatsTabs({ tabs, activeIndex, onSelect, onClose, onCreate, 
     const offset = general ? 1 : 0
     const threads = tabs.slice(offset)
 
-    const stateOf = (tab: SessionTab): TabState => tabStateOf(tab.id ? statusById.get(tab.id) : undefined)
+    const stateOf = (tab: SessionTab): TabState => tabStateOf(statusOf ? statusOf(tab) : tab.id ? statusById.get(tab.id) : undefined)
 
     const renaming = rename?.rename
     const renameFailed = renaming?.status === 'error' && threads.some(tab => tab.id === renaming.id)

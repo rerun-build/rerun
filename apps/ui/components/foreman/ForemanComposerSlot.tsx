@@ -49,10 +49,12 @@ type ForemanComposerSlotProps = Omit<ForemanComposerProps, keyof ForemanComposer
     gated: boolean
     /** La carte d'essai est posée et l'essai ne tourne pas encore : plus rien ne part. */
     trialGate: TrialStep | null
+    /** Under a coworker's line and in its column, in the Simple view's middle. */
+    framed?: boolean
     ref?: Ref<HTMLDivElement>
 }
 
-export function ForemanComposerSlot({ aside, intake, gated, trialGate, ref, ownEntry = false, ...composer }: ForemanComposerSlotProps) {
+export function ForemanComposerSlot({ aside, intake, gated, trialGate, framed = false, ref, ownEntry = false, ...composer }: ForemanComposerSlotProps) {
     const { isAnonymous } = useSession()
     const bare = aside && !intake && !gated && !trialGate
 
@@ -82,7 +84,13 @@ export function ForemanComposerSlot({ aside, intake, gated, trialGate, ref, ownE
         // bannière cookies, quand elle est là, publie déjà un inset qui inclut la zone sûre, et le
         // panneau le porte, les deux ne s'additionnent donc pas.
         // Vide, il reste monté : c'est lui que la sheet mobile mesure, et il lui garde la zone sûre.
-        <div ref={ref} className={cn('relative z-10 px-3', bare ? 'pb-[env(safe-area-inset-bottom)] md:pb-0' : 'pb-[max(0.75rem,env(safe-area-inset-bottom))] md:pb-3')}>
+        <div
+            ref={ref}
+            className={cn(
+                'relative z-10',
+                framed ? cn('border-t border-border *:mx-auto *:max-w-[var(--chat-column,none)]', bare ? 'hidden' : 'p-3') : cn('px-3', bare ? 'pb-[env(safe-area-inset-bottom)] md:pb-0' : 'pb-[max(0.75rem,env(safe-area-inset-bottom))] md:pb-3')
+            )}
+        >
             <AnimatePresence initial={false} mode="popLayout">
                 {intake ? (
                     <motion.div key="intake" {...SLOT_MOTION} className="overflow-hidden">
