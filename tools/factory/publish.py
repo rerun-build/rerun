@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 
@@ -7,7 +8,7 @@ def _git(cwd, *a):
 
 def _outside(worktree, paths):
     ok = tuple(p.rstrip("/") for p in paths)
-    changed = [l.split(None, 1)[1] for l in _git(worktree, "status", "--porcelain", "-uall").splitlines()]
+    changed = [l.split(None, 1)[1] for l in _git(worktree, "status", "--porcelain", "--no-renames", "-uall").splitlines()]
     return [c for c in changed if not any(c == p or c.startswith(p + "/") for p in ok)]
 
 
@@ -25,8 +26,17 @@ def publish(worktree, issue, title, base, open_pr, paths, remote="origin", body=
     extra = _outside(worktree, paths)
     if extra:
         raise ValueError("files outside the chunk paths: %s" % ", ".join(extra))
+    missing, stage = [], []
+    for p in paths:
+        if os.path.exists(os.path.join(worktree, p)) or _git(worktree, "ls-files", "--", p):
+            stage.append(p)
+        elif subprocess.run(["git", "cat-file", "-e", "HEAD:%s" % p], cwd=worktree, capture_output=True).returncode != 0:
+            missing.append(p)
+    if missing:
+        raise ValueError("declared paths never created: %s" % ", ".join(missing))
     _git(worktree, "checkout", "-q", "-B", head)
-    _git(worktree, "add", "--", *paths)
+    if stage:
+        _git(worktree, "add", "--", *stage)
     if _git(worktree, "diff", "--cached", "--name-only"):
         _git(worktree, "commit", "-qm", title)
     _git(worktree, "push", "-q", remote, "%s:refs/heads/%s" % (head, head))
