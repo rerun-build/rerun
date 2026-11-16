@@ -14,8 +14,44 @@
       "slug": "factory-challenge-hold",
       "model": "stub-hold",
       "run_limit_s": 120
+    },
+    {
+      "stage": "wake-jez",
+      "coworker": "JEZ",
+      "agent_name": "wake-jez",
+      "slug": "factory-wake-jez",
+      "model": "stub-fast"
+    },
+    {
+      "stage": "wake-margaret",
+      "coworker": "MARGARET",
+      "agent_name": "wake-margaret",
+      "slug": "factory-wake-margaret",
+      "model": "stub-fast"
+    },
+    {
+      "stage": "wake-changelog",
+      "coworker": "CHANGELOG_WRITER",
+      "agent_name": "wake-changelog",
+      "slug": "factory-wake-changelog",
+      "model": "stub-fast"
+    },
+    {
+      "stage": "wake-dana",
+      "coworker": "DANA",
+      "agent_name": "wake-dana",
+      "slug": "factory-wake-dana",
+      "model": "stub-fast"
+    },
+    {
+      "stage": "wake-issue-triage",
+      "coworker": "ISSUE_TRIAGE",
+      "agent_name": "wake-issue-triage",
+      "slug": "factory-wake-issue-triage",
+      "model": "stub-fast"
     }
   ],
+  "repo_events": true,
   "poll_s": 30,
   "run_limit_s": 2700,
   "stall_s": 600,
