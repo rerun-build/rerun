@@ -16,6 +16,7 @@ export const chatRequestSchema = z.object({
     connectionId: z.string().optional(),
     provider: providerSchema.optional(),
     model: z.string().optional(),
+    thinkingLevel: z.enum(['low', 'medium', 'high']).optional(),
     source: sessionSourceSchema.optional(),
     foreman: foremanBriefSchema.optional(),
     author: messageAuthorSchema.optional(),
