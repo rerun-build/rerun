@@ -5,7 +5,7 @@ import { routeTileLinks, type AxisPoint, type Container, type ContainerCells, ty
 import { factorySnapshotSchema, type FactorySnapshot } from '@rerun/contracts'
 
 import { applyMoves, beltCells, copyTree, treeRoutes } from './factory-layout'
-import { hits, lineUp, podPath, sphereShapes, tileShapes, workSpot } from './factory-rest'
+import { hits, inScanner, lineUp, podPath, settles, sphereShapes, tileShapes, workSpot, type P } from './factory-rest'
 import { CODE, copySeat, factoryScene, LOOP_MS } from './factory-scene'
 import { sceneFromSnapshot } from './from-snapshot'
 
@@ -90,10 +90,59 @@ function holds(s: Scene, moves: Record<string, { col: number; row: number }> = {
         const cols = mine.map(c => c.position.col), rows = mine.map(c => c.position.row)
         const [short, long] = [Math.max(...cols) - Math.min(...cols), Math.max(...rows) - Math.min(...rows)].sort((a, b) => a - b)
         expect(short, `${who} bay depth`).toBeLessThanOrEqual(6)
-        expect(long, `${who} bay width`).toBeLessThanOrEqual(12)
+        expect(long, `${who} bay width`).toBeLessThanOrEqual(18)
     }
     return placed
 }
+
+const SLOTS: number = JSON.parse(readFileSync(path.join(ROOT, 'tools/factory/dispatch.json'), 'utf8')).slots
+const SNAP: FactorySnapshot = factorySnapshotSchema.parse(JSON.parse(readFileSync(SAMPLE, 'utf8')))
+const FIRST = 3000
+
+function shareOuts(total: number, who: string[]): Record<string, number>[] {
+    if (who.length === 1) return [{ [who[0]]: total }]
+    return Array.from({ length: total + 1 }, (_, n) => shareOuts(total - n, who.slice(1)).map(rest => ({ [who[0]]: n, ...rest }))).flat()
+}
+
+const marker = (at: P, scanner: boolean) => scanner
+    ? [[{ x: at.x - 34, y: at.y - 30 }, { x: at.x, y: at.y - 58 }, { x: at.x + 44, y: at.y - 30 }, { x: at.x, y: at.y + 8 }], ...sphereShapes({ x: at.x, y: at.y - 12 }, false)]
+    : sphereShapes(at, false)
+
+function busy(share: Record<string, number>) {
+    const job = (issue: number, over: Partial<FactorySnapshot['jobs'][number]>) => ({ ...SNAP.jobs[0], issue, parent: null, enteredAt: '2026-11-14T03:20:00Z', ...over })
+    const jobs = OWNERS.flatMap((who, i) => Array.from({ length: share[who] ?? 0 }, (_, c) => job(FIRST + 100 * i + c, { state: ROLE[who], coworker: who, copy: c + 1 })))
+    return sceneFromSnapshot({ ...SNAP, holds: [], jobs }, NOW)
+}
+
+function conflicts(share: Record<string, number>): string[] {
+    const name = OWNERS.filter(w => share[w]).map(w => `${w} ${share[w]}`).join(' + ')
+    const f = busy(share)
+    const placed = applyMoves(f.tiles, {}, f.containers, f.links)
+    const byId = new Map(placed.map(t => [t.id, t]))
+    const out: string[] = []
+    for (const t of f.tiles) if (t.id.includes('-copy') && BAYS.includes(ownerOf(t.id)) && !byId.has(t.id)) out.push(`${name}: ${t.id} not drawn`)
+    const jobs = f.pods.filter(p => p.issue >= FIRST && settles(p)).flatMap(p => {
+        const holder = byId.get(p.path[p.path.length - 1])
+        return holder ? [{ id: holder.id, shapes: marker(workSpot(holder, inScanner(p)), inScanner(p)) }] : []
+    })
+    jobs.forEach((j, i) => {
+        for (const t of placed) if (t.id !== j.id && hits(j.shapes, tileShapes(t))) out.push(`${name}: job of ${j.id} over ${t.id}`)
+        for (const o of jobs.slice(i + 1)) if (hits(j.shapes, o.shapes)) out.push(`${name}: job of ${j.id} over job of ${o.id}`)
+    })
+    return out
+}
+
+describe('the copy bay with every copy working', () => {
+    it(`every share-out of the ${SLOTS} pool copies over the stations, all working, draws every copy of a bay owner with every job clear of every tile and job; copy numbers are taken lowest first, so a smaller share-out without gaps seats a subset of one of these`, () => {
+        const all = shareOuts(SLOTS, OWNERS)
+        const bad = all.flatMap(conflicts)
+        expect(bad.slice(0, 25), `${bad.length} conflicts in ${new Set(bad.map(b => b.split(':')[0])).size} of ${all.length} share-outs`).toEqual([])
+    })
+
+    it('at the configured copy caps, all working, every copy of a bay owner is drawn and every job is clear of every tile and job', () => {
+        expect(conflicts(CAPS)).toEqual([])
+    })
+})
 
 describe('the copy bay', () => {
     for (const [name, scene] of [['sample', sample], ['live', live]] as const) {
@@ -115,7 +164,7 @@ describe('the copy bay', () => {
             for (const c of copies) {
                 const gate = REVIEWERS.includes(ownerOf(c.id))
                 const at = workSpot(c, gate)
-                const docked = gate ? [[{ x: at.x - 34, y: at.y - 30 }, { x: at.x, y: at.y - 58 }, { x: at.x + 44, y: at.y - 30 }, { x: at.x, y: at.y - 2 }]] : sphereShapes(at, false)
+                const docked = marker(at, gate)
                 for (const o of copies) if (o.id !== c.id && ownerOf(o.id) === ownerOf(c.id)) expect(hits(docked, tileShapes(o)), `${c.id} docks over ${o.id}`).toBe(false)
             }
         })

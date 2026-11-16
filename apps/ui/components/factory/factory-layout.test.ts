@@ -99,6 +99,11 @@ describe('factory layout', () => {
         for (const l of scene.links) expect(routes.get(`${l.source}->${l.target}`)?.length ?? 0).toBeGreaterThanOrEqual(2)
     })
 
+    it('still reads back a layout saved at the far edge of the rooms as they were before they grew', () => {
+        const saved = { rejects: { col: 45, row: 40 }, LARRY: { col: 44, row: 18 }, code: { col: 17, row: 0 } }
+        expect(readMoves(JSON.stringify(saved), tiles, containers)).toEqual(saved)
+    })
+
     it('keeps the place of an object that is not on the floor now', () => {
         expect(readMoves(JSON.stringify({ 'cab-999': { col: 3, row: 3 }, rejects: { col: 18, row: 29 } }), tiles, containers)).toEqual({ 'cab-999': { col: 3, row: 3 }, rejects: { col: 18, row: 29 } })
     })

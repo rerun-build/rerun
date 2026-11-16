@@ -35,9 +35,10 @@ const clearOf = (belts: Set<string>, c: Cell) => {
     for (let col = c.col - BELT_GAP; col < c.col + 2 + BELT_GAP; col++) for (let row = c.row - BELT_GAP; row < c.row + 2 + BELT_GAP; row++) if (belts.has(key(col, row))) return false
     return true
 }
+const JOB_REACH = 5
 const inFront = (a: Cell, b: Cell) => {
-    const ahead = b.col - a.col + b.row - a.row
-    return ahead > 0 && ahead < 12 && Math.abs(b.col - a.col - (b.row - a.row)) <= 2
+    const dc = b.col - a.col, dr = b.row - a.row
+    return dc + dr > 0 && Math.min(dc, dr) >= 0 && Math.max(dc, dr) <= JOB_REACH && Math.abs(dc - dr) <= 3
 }
 type Seat = { id: string; position: Cell; span: number }
 type Floor = { taken: Footprint[]; solid: Footprint[]; belts: Set<string>; tiles: Seat[]; lines: TileLink[]; traces: TileLink[] }
@@ -114,6 +115,7 @@ function placeBay(owner: Footprint, room: ContainerCells | undefined, floor: Flo
 }
 const reserve = (floor: Floor, id: string, bay: Cell[]) => {
     floor.taken.push(...bay.map(c => ({ id, ...c, span: 2 })))
+    floor.solid.push(...bay.map(c => ({ id, ...c, span: 2 })))
     floor.tiles.push(...seatsOf(id, bay))
     floor.traces.push(...tracesOf(id, bay))
 }
@@ -133,15 +135,30 @@ function ownersBays(solid: Tile[], footprints: Footprint[], lines: TileLink[], c
     const id = JSON.stringify([footprints, lines.map(l => [l.source, l.target]), containers?.map(c => [c.col_start, c.row_start, c.col_end, c.row_end])])
     const hit = memo.get(id)
     if (hit) return hit
-    const floor: Floor = { taken: [...footprints], solid: footprints, belts: lines.length ? beltCells(solid, lines) : new Set(), tiles: solid.map(t => ({ id: t.id, position: t.position, span: t.span ?? 2 })), lines, traces: [] }
-    const bays = new Map<string, Cell[] | null>()
-    for (const at of footprints.filter(f => OWNERS.includes(f.id))) {
-        const bay = placeBay(at, containers && boxOf(containers, at), floor)
-        bays.set(at.id, bay)
-        if (bay) reserve(floor, at.id, bay)
+    const belts = lines.length ? beltCells(solid, lines) : new Set<string>()
+    const seat = (order: Footprint[]) => {
+        const floor: Floor = { taken: [...footprints], solid: [...footprints], belts, tiles: solid.map(t => ({ id: t.id, position: t.position, span: t.span ?? 2 })), lines, traces: [] }
+        const bays = new Map<string, Cell[] | null>()
+        for (const at of order) {
+            const bay = placeBay(at, containers && boxOf(containers, at), floor)
+            bays.set(at.id, bay)
+            if (bay) reserve(floor, at.id, bay)
+        }
+        return bays
+    }
+    const lost = (bays: Map<string, Cell[] | null>) => [...bays.values()].filter(b => !b).length
+    let order = footprints.filter(f => OWNERS.includes(f.id))
+    let bays = seat(order)
+    let best = bays
+    for (let n = 0; n < order.length; n++) {
+        const failed = order.find(o => !bays.get(o.id))
+        if (!failed || failed === order[0]) break
+        order = [failed, ...order.filter(o => o !== failed)]
+        bays = seat(order)
+        if (lost(bays) < lost(best)) best = bays
     }
     if (memo.size >= MEMO_SIZE) memo.clear()
-    memo.set(id, { belts: floor.belts, bays })
+    memo.set(id, { belts, bays: best })
     return memo.get(id)!
 }
 

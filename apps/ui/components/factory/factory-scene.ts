@@ -12,22 +12,22 @@ const box = (id: string, label: string, col_start: number, row_start: number, co
     ({ id, label, color: '#ffffff', col_start, row_start, col_end, row_end })
 const BOXES: Container[] = [
     box('dispatch', 'Loader', 4, 6, 10, 11),
-    box('build', 'Build', 17, 0, 45, 19),
+    box('build', 'Build', 17, -6, 54, 20),
     box('stock', 'Stock', 0, 14, 10, 20),
-    box('review', 'Review', 17, 21, 46, 41),
+    box('review', 'Review', 17, 21, 50, 50),
     box('studio', 'Research & design', 0, 22, 10, 31),
     box('planning', 'Planning', 0, 0, 10, 5),
 ]
 
 export const LOADER: Cell = { col: 7, row: 9 }
 export const CODE: Cell = { col: 22, row: 9 }
-const LINE = [0, 3, 6, 9, 12]
-export const BAY: Cell[] = [...LINE.flatMap(col => [{ col, row: 0 }, { col, row: 6 }]), ...LINE.map(col => ({ col, row: 3 }))]
+const LINE = [0, 3, 6, 9, 12, 15, 18]
+export const BAY: Cell[] = LINE.flatMap(col => [{ col, row: 0 }, { col, row: 6 }])
 export const SEAT = 3
 export const copySeat = (owner: Cell, slot: number): Cell => ({ col: owner.col + SEAT + BAY[slot].col, row: owner.row + BAY[slot].row })
 const LARRY: Cell = { col: 26, row: 17 }
 export const LINUS: Cell = { col: 22, row: 23 }
-const BRUCE: Cell = { col: 26, row: 27 }
+const BRUCE: Cell = { col: 22, row: 42 }
 const REJECT_BIN: Cell = { col: 18, row: 27 }
 const SEARCH: Cell = { col: 2, row: 24 }
 const DIETER: Cell = { col: 2, row: 29 }
