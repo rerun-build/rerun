@@ -13,6 +13,14 @@ _TICK = re.compile(r"`([^`]*)`")
 _NUM = re.compile(r"#(\d+)")
 _PLAN = re.compile(r"^PLAN READY\b(.*)$")
 _DEV = re.compile(r"\bdev ([0-9a-f]{7,40})\b", re.I)
+_RUN = re.compile(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```")
+_CD = re.compile(r"^cd\s+\S+\s*&&\s*")
+UVX_ERROR = "run line: uvx is not on the CI runner; ruff runs in the Factory tools CI job, take the line out"
+
+
+def _run_lines(lines):
+    m = _RUN.search("\n".join(lines))
+    return [l.strip() for l in m.group(1).strip().split("\n") if l.strip()] if m else []
 
 
 def _bad_path(p):
@@ -121,6 +129,12 @@ def parse(issue):
             dev = found.group(1).lower()
         else:
             errors.append("plan line: the PLAN READY line must name the dev commit as 'dev <sha>' (7 to 40 hex)")
+
+    for l in _run_lines(lines):
+        words = _CD.sub("", l).split()
+        if words and words[0] == "uvx":
+            errors.append(UVX_ERROR)
+            break
 
     return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "through": through, "refactor": refactor, "parent": parent, "dev": dev, "errors": errors}
 
