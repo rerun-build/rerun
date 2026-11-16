@@ -184,6 +184,23 @@ describe('foreman', () => {
         expect(prompt).not.toContain('shared_db_execute')
     })
 
+    it('plans its wakes only where the hub serves them, and then knows it can come back', async () => {
+        const plain = await foremanToolSet()
+        expect(Object.keys(plain.tools)).not.toContain('schedule_wake')
+        await plain.close()
+        const plainPrompt = systemPromptText(await buildSystemPrompt(await foremanWithBrief(), { source: 'chat' }, 'claude'))
+        expect(plainPrompt).toContain('never tell the user you will come back')
+
+        const agent = { ...(await getAgent(FOREMAN_AGENT_ID)), brief: { ...brief, builtins: ['schedule_wake'] } }
+        const { tools, close } = await buildTools({ agent, sessionId: 's1', logger, provider: 'rerun', model: 'rerun-max' })
+        await close()
+        expect(Object.keys(tools)).toEqual(expect.arrayContaining(['schedule_wake', 'cancel_wake']))
+        const prompt = systemPromptText(await buildSystemPrompt(agent, { source: 'chat' }, 'claude'))
+        expect(prompt).toContain('<wakes>')
+        expect(prompt).toContain('Promise to come back to someone only once you planned it.')
+        expect(prompt).not.toContain('never tell the user you will come back')
+    })
+
     // An old hub names no builtin: the card would be called and drawn by no client.
     it('draws the app card only when the brief names it', async () => {
         const without = await foremanToolSet()

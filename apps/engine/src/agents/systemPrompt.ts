@@ -15,6 +15,7 @@ import { hasPendingSetup } from './setup.js'
 import { offersQuickReplies } from './quick-replies-stream.js'
 import { HITL_TOOL_NAMES, offersTakeover, type HitlToolName } from '../tools/builtin/hitl.js'
 import { briefNamesBuiltin } from '../tools/builtin/foreman.js'
+import { buildWakesSection } from '../foreman/wake-prompt.js'
 import { runOffersComputer } from '../tools/builtin/computer.js'
 import { CLI_PROVIDERS, type LoadedAgent } from './types.js'
 import { turnOrder, type TurnOrder } from './turn-order.js'
@@ -248,8 +249,16 @@ function turnOrderSection(order: TurnOrder, closers: TurnClosers): string {
 const foremanEnvironmentNote = (foremanId: string) =>
     `You run on the workspace's own server, the one every coworker of this workspace lives on. Your own workspace is ${workspaceDir(foremanId)}: it is the working directory of shell_exec and your fs_ tools are rooted there, so it is where your scratch work and your own deliverables go. Your shared_ tools are rooted in the shared space at ${sharedDir()}, which every coworker reads and writes. Each coworker's own files are reached with the agent_files_ tools, passing its handle: agent_files_list and agent_files_search to find a file, agent_files_read before you change anything, agent_files_edit for a surgical change and agent_files_write only for a new file or a full rewrite the user asked for. A coworker may be working in those files while you edit them, so change only what you were asked to. Never treat /opt/rerun or the engine source tree as anyone's workspace.`
 
-const FOREMAN_OPERATING_NOTES =
-    'Use tools to act. Discover sources with web_search, read static pages with web_fetch, and use browser_navigate for JavaScript-heavy pages (optionally saving a screenshot to inspect with vision_analyze). delegate_tasks hands self-contained subtasks to fresh sub-coworkers, several in one call to run them in parallel: they get your files, shell and web, but none of the account tools, so creating, changing or installing anything on the account stays with you. To put a question to one of the coworkers and wait for its answer inside this turn, use call_agent with wait set to true. Nothing keeps running once your turn ends: there is no background task and no later notification, so never tell the user you will come back when something finishes.'
+const FOREMAN_TOOLS_NOTE =
+    'Use tools to act. Discover sources with web_search, read static pages with web_fetch, and use browser_navigate for JavaScript-heavy pages (optionally saving a screenshot to inspect with vision_analyze). delegate_tasks hands self-contained subtasks to fresh sub-coworkers, several in one call to run them in parallel: they get your files, shell and web, but none of the account tools, so creating, changing or installing anything on the account stays with you. To put a question to one of the coworkers and wait for its answer inside this turn, use call_agent with wait set to true.'
+
+// A box whose hub serves wakes hands the foreman schedule_wake: it may then say it will come back,
+// once it planned the moment.
+function foremanOperatingNotes(wakes: boolean): string {
+    return wakes
+        ? `${FOREMAN_TOOLS_NOTE} Nothing keeps running once your turn ends, but you wake up on your own: at the moments you plan with schedule_wake, and once a day when you planned none. A wake reads the workspace and writes to the person only when something matters. Promise to come back to someone only once you planned it.`
+        : `${FOREMAN_TOOLS_NOTE} Nothing keeps running once your turn ends: there is no background task and no later notification, so never tell the user you will come back when something finishes.`
+}
 
 // A run nobody started keeps only what reads: the hub's charter of a wake says why and what to do
 // with it, this says what is on the box.
@@ -265,6 +274,7 @@ const FOREMAN_SHOWING_FILES_NOTE =
 async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provider: Provider, order: TurnOrder): Promise<SystemPrompt> {
     const cfg = agent.config.tools
     const wake = trigger.source === 'wake'
+    const wakes = briefNamesBuiltin(agent, 'schedule_wake')
     const [sharedDbSchema, brain] = await Promise.all([
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
         cfg.brain && !wake ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
@@ -274,7 +284,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         section('vocabulary', VOCABULARY_NOTE),
         section('environment', wake ? FOREMAN_WAKE_NOTES : foremanEnvironmentNote(agent.id)),
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web && !wake)) : '',
-        wake ? '' : section('operating_notes', FOREMAN_OPERATING_NOTES),
+        wake ? '' : section('operating_notes', foremanOperatingNotes(wakes)),
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
         section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
         turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config))),
@@ -285,6 +295,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
     if (brain) volatile.push(section('company_brain', brain))
     if (cfg.sharedDb && wake) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes. Read it with shared_db_query and shared_db_schema.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
     else if (cfg.sharedDb) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
+    if (wakes) volatile.push(section('wakes', await buildWakesSection().catch(() => '')))
     volatile.push(section('current_time', currentTimeNote()))
     return { stable: joinSections(stable), volatile: joinSections(volatile) }
 }

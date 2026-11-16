@@ -79,7 +79,7 @@ export async function foremanWakeBrief(workspaceId: number, request: ForemanWake
     const hubToken = mintForemanWakeToken(workspaceId, memberId, now)
     if (!hubToken) return skip('no_token_secret')
     return {
-        brief: { instructions: foremanWakeInstructions(state), tools: foremanWakeTools(), builtins: [], hubToken },
+        brief: { instructions: foremanWakeInstructions(state), tools: foremanWakeTools(), builtins: ['schedule_wake'], hubToken },
         memberId,
         timezone: user?.timezone ?? null,
     }

@@ -7,7 +7,7 @@ vi.mock('server-only', () => ({}))
 const { MOBILE_APP_BLOCK, foremanEngineInstructions, foremanSystemPrompt } = await import('./prompt')
 import type { ForemanPlan, ForemanState } from './phase'
 
-const OLD_BOX = { connectApp: false }
+const OLD_BOX = { connectApp: false, wakes: false }
 
 const ASKED = 'Je cherche un worker capable de trouver des décisionnaires capables de me recruter en alternance'
 

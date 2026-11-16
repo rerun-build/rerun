@@ -8,7 +8,7 @@ import { foremanEngineBrief, foremanWakeTools, FOREMAN_ENGINE_HUB_TOOL_NAMES, WA
 import type { ForemanState } from './phase'
 import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 
-const OLD_BOX = { connectApp: false }
+const OLD_BOX = { connectApp: false, wakes: false }
 
 const state = {
     phase: 'companion',
@@ -104,7 +104,7 @@ describe('foremanEngineBrief', () => {
     it('turns the connect card on only for a box that draws it', () => {
         expect(brief.builtins).toEqual([])
         expect(brief.instructions).not.toContain('call connect_app')
-        const connecting = foremanEngineBrief(state, { connectApp: true })
+        const connecting = foremanEngineBrief(state, { connectApp: true, wakes: false })
         expect(connecting.builtins).toEqual(['connect_app'])
         expect(connecting.instructions).toContain('call connect_app')
         expect(connecting.tools.map(tool => tool.name)).not.toContain('connect_app')
@@ -119,6 +119,12 @@ describe('foremanEngineBrief', () => {
         for (const name of WAKE_HUB_TOOL_NAMES) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(name), name).toBe(true)
         expect(foremanWakeTools().map(tool => tool.name).sort()).toEqual([...WAKE_HUB_TOOL_NAMES].sort())
         expect(() => foremanBriefSchema.parse({ instructions: 'x', tools: foremanWakeTools() })).not.toThrow()
+    })
+
+    // A hub that would name schedule_wake to a box that cannot wake would let it promise a visit.
+    it('hands it its alarm clock only where the box wakes it and the workspace is open to wakes', () => {
+        expect(brief.builtins).not.toContain('schedule_wake')
+        expect(foremanEngineBrief(state, { connectApp: false, wakes: true }).builtins).toEqual(['schedule_wake'])
     })
 
     it('never lets two creations overlap', () => {

@@ -49,7 +49,7 @@ describe('foremanWakeBrief', () => {
         expect(out.memberId).toBe('member-1')
         expect(out.timezone).toBe('Europe/Paris')
         expect(out.brief.instructions).toBe('Charter of a wake')
-        expect(out.brief.builtins).toEqual([])
+        expect(out.brief.builtins).toEqual(['schedule_wake'])
         expect(verifyForemanHubToken(out.brief.hubToken, WORKSPACE, NOW)).toMatchObject({ uid: 'member-1', scope: 'wake' })
         expect(memberWorkspaceContext).toHaveBeenCalledWith(WORKSPACE, 'member-1')
     })

@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { startForemanWake } from '../../foreman/wake-run.js'
+import { mandatoryWakeAt, readWakeState } from '../../foreman/wake-state.js'
 
 export const foremanWakeRoutes = new Hono()
 
@@ -14,4 +15,12 @@ foremanWakeRoutes.post('/now', async c => {
     if (outcome.status !== 'started') return c.json(outcome, outcome.status === 'deferred' ? 409 : 200)
     const { settled: _settled, ...started } = outcome
     return c.json(started, 202)
+})
+
+// What the app shows of it: the next check-in, why, and how the last ones went.
+foremanWakeRoutes.get('/', async c => {
+    const state = await readWakeState()
+    const now = new Date()
+    const next = [...state.planned.map(wake => ({ at: wake.at, reason: wake.reason, planned: true })), { at: mandatoryWakeAt(state, now).toISOString(), reason: null, planned: false }].sort((a, b) => Date.parse(a.at) - Date.parse(b.at))[0]
+    return c.json({ next, planned: state.planned, last: state.last, timezone: state.timezone, log: state.log })
 })

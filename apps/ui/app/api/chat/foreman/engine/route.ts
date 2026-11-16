@@ -7,9 +7,10 @@ import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
-import { cancelRun, reconnectRun, supportsForemanConnect } from '@/lib/engine/client'
+import { cancelRun, reconnectRun, supportsForemanConnect, supportsForemanWakes } from '@/lib/engine/client'
 import { cancelForemanSessionRuns, engineSessionOf, findForemanGeneral, ForemanGeneralAlreadyOpenError, loadForemanConversation, loadForemanConversationById, startEngineConversation, touchForemanConversation } from '@/lib/foreman/conversation'
 import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
+import { wakesOpenTo } from '@/lib/foreman/wake-brief'
 import { mintForemanHubToken } from '@/lib/foreman/hub-token'
 import { loadForemanState } from '@/lib/foreman/state'
 import { resolveForemanSurface } from '@/lib/foreman/surface.server'
@@ -93,7 +94,7 @@ export async function POST(req: Request): Promise<Response> {
         let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>
         try {
             conn = await getWorkspaceConnection(ctx.workspace.id)
-            const capabilities = { connectApp: clientDrawsConnectApp(req) && (await supportsForemanConnect(conn)) }
+            const capabilities = { connectApp: clientDrawsConnectApp(req) && (await supportsForemanConnect(conn)), wakes: wakesOpenTo(ctx.workspace.id) && (await supportsForemanWakes(conn)) }
             engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, capabilities), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
         } catch (err) {
             // The machine went away under a conversation that was already going: the browser hides the

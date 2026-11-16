@@ -97,13 +97,21 @@ describe('startForemanWake', () => {
         expect(state.started).toHaveLength(0)
     })
 
-    it('waits when the hub is unreachable or predates wakes', async () => {
+    it('waits when the hub is unreachable', async () => {
         state.hubStatus = 502
         expect(await startForemanWake({ reason: 'x' })).toEqual({ status: 'deferred', reason: 'hub_unreachable' })
         state.hubStatus = 200
-        state.hubAnswer = { error: 'Unknown foreman tool: foreman_brief' }
+        state.hubAnswer = { something: 'else' }
         expect(await startForemanWake({ reason: 'x' })).toEqual({ status: 'deferred', reason: 'hub_unreachable' })
         expect(state.started).toHaveLength(0)
+    })
+
+    // A hub from before wakes is a long no, not a hub to call back within the hour.
+    it('reads a hub from before wakes as a no', async () => {
+        state.hubAnswer = { error: 'Unknown foreman tool: foreman_brief' }
+        expect(await startForemanWake({ reason: 'x' })).toEqual({ status: 'skipped', reason: 'hub_too_old' })
+        state.hubStatus = 403
+        expect(await startForemanWake({ reason: 'x' })).toEqual({ status: 'skipped', reason: 'hub_refused' })
     })
 
     it('waits for a conversation in flight to end, and for a model it can run on', async () => {

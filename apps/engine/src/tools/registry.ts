@@ -28,6 +28,7 @@ import { askUserTool, connectAppTool, offersTakeover, requestApprovalTool, reque
 import { installTools } from './builtin/install.js'
 import { briefNamesBuiltin, foremanTools } from './builtin/foreman.js'
 import { agentFilesTools } from './builtin/agent-files.js'
+import { foremanWakeTools } from './builtin/foreman-wake.js'
 import { hasPendingSetup } from '../agents/setup.js'
 import { pooledMcpTools } from './mcp-pool.js'
 import { CLI_PROVIDERS } from '../agents/providers.js'
@@ -59,6 +60,8 @@ export const WAKE_BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
     'ask_user',
     'request_approval',
     'notify_user',
+    'schedule_wake',
+    'cancel_wake',
 ])
 
 function keepWakeTools(ctx: RunContext, tools: ToolSet): ToolSet {
@@ -102,6 +105,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (cfg.requestApproval) Object.assign(tools, requestApprovalTool(ctx))
     if (cfg.suggestService) Object.assign(tools, suggestServiceTool(ctx))
     if (ctx.agent.config.kind === 'foreman' && briefNamesBuiltin(ctx.agent, 'connect_app')) Object.assign(tools, connectAppTool(ctx))
+    if (ctx.agent.config.kind === 'foreman' && briefNamesBuiltin(ctx.agent, 'schedule_wake')) Object.assign(tools, foremanWakeTools())
     if (cfg.requestSecret) Object.assign(tools, requestSecretTool(ctx))
     // Only exists while there is an installation to close, so no other agent carries a tool it
     // could never legitimately call.

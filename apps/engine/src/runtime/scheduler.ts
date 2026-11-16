@@ -1,3 +1,4 @@
+import { wakeTick } from '../foreman/wake-runner.js'
 import { automationModel } from '../agents/availability.js'
 import { listAgentIdsOnDisk } from '../agents/loader.js'
 import { getAgent } from '../agents/registry.js'
@@ -102,6 +103,7 @@ async function tick(): Promise<void> {
     void sweepMemoriesIfDue(agentIds)
     void maintainBrainIfDue()
     void sweepCodexHomesIfDue()
+    void wakeTick(now)
     for (const agentId of agentIds) {
         // A switched-off agent normally has its schedules paused too, so this only catches the
         // case where the host could not reach the box at the time. Skipping here rather than

@@ -36,7 +36,7 @@ every boot. It is not in `GET /agents`. Under `/agents/foreman` only these route
 itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`, `/runs/:rid`,
 `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
 `/runs/:rid/tasks/:taskId/cancel`, `GET /files/read`, `GET|PUT|POST /files/raw`, `DELETE /files`,
-`POST /wake/now`, and a `PATCH` that only carries `connectionId`, `provider` and `model`. Anything
+`GET /wake`, `POST /wake/now`, and a `PATCH` that only carries `connectionId`, `provider` and `model`. Anything
 else answers `403 { "error": "The foreman is managed by the engine and cannot be changed" }`.
 
 #### Wakes
@@ -51,6 +51,18 @@ workspace, not opened to it, no plan, a Codex model, a workspace nobody opened f
 `request_approval`, `notify_user`, and the hub's read tools the brief names. No shell, no web, no
 browser, no sub-coworker. A wake never runs on Codex. Its first message opens with `[[foreman:wake]]`,
 and every event it sends carries `source: "wake"` and `metadata.memberId`.
+
+When it wakes: at the moments it planned with `schedule_wake` (at least 15 minutes ahead, at most a
+week, five planned at once, `cancel_wake` to drop one), and a day after its last wake when it planned
+none. Never between 20:00 and 08:00 in the time zone of the member it speaks to, twelve wakes a day at
+most, one catch-up after the box was down. A wake whose run fails to start is spent anyway. After a no
+from the hub it asks again six hours later; while the hub cannot be reached, after 5 minutes, then
+twice as long each time, up to an hour. Both tools exist only when the hub names `schedule_wake` in
+the brief. The state lives in the `system_meta` table of `agents/foreman/data/system.db`; `rerun
+restore-finalize` drops the planned wakes whose moment passed and counts the day from the restore.
+
+`GET /agents/foreman/wake` reads it: `{ next: { at, reason, planned }, planned, last, timezone, log }`,
+`log` holding the last 30 wakes and their outcome.
 
 `POST /agents/foreman/wake/now` (`{ memberId? }`) starts one now: `202 { status: "started",
 sessionId, runId, memberId, timezone }`, `200 { status: "skipped", reason }` when the hub says no,

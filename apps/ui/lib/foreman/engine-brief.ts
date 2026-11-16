@@ -67,12 +67,13 @@ export function foremanWakeTools(): ForemanToolSpec[] {
 }
 
 // What the box can draw, read from its /health: an engine tool named in the brief exists only there.
-export type ForemanBoxCapabilities = { connectApp: boolean }
+// `wakes`: the box wakes it on its own and the workspace is open to it, so it may plan when.
+export type ForemanBoxCapabilities = { connectApp: boolean; wakes: boolean }
 
 export function foremanEngineBrief(state: ForemanState, capabilities: ForemanBoxCapabilities): ForemanBrief {
     return {
         instructions: foremanEngineInstructions(state, capabilities),
-        builtins: capabilities.connectApp ? ['connect_app'] : [],
+        builtins: [...(capabilities.connectApp ? ['connect_app'] : []), ...(capabilities.wakes ? ['schedule_wake'] : [])],
         tools: [...HUB_TOOL_DEFS.map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name)).map(def => spec(def, 'intent'))],
     }
 }

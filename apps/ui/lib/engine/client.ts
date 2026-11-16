@@ -15,6 +15,7 @@ import {
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
     ENGINE_CAPABILITY_VAULT,
     ENGINE_CAPABILITY_FOREMAN_CONNECT,
+    ENGINE_CAPABILITY_FOREMAN_WAKES,
     engineDbGroupsSchema,
     engineRowUpdateResultSchema,
     engineTableViewSchema,
@@ -685,6 +686,11 @@ export async function supportsScheduleRename(conn: EngineConnection): Promise<bo
 // The box keeps the workspace's Vault. Without it, every connector stays in its coworker's folder.
 export async function supportsVault(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT)
+}
+
+// The box wakes the Chief of Staff on its own and serves its alarm clock.
+export async function supportsForemanWakes(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_WAKES)
 }
 
 // The foreman draws a card to connect an app to a coworker, into the Vault.

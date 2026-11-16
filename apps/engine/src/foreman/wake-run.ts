@@ -41,10 +41,16 @@ export async function requestWakeBrief(request: ForemanWakeRequest): Promise<For
     } catch (err) {
         throw new HubUnreachableError(err instanceof Error ? err.message : String(err))
     }
+    // A hub from before wakes either refuses the foreman without a token or does not know the tool:
+    // a no, not a hub to retry within the hour.
+    if (res.status === 401 || res.status === 403) return { skip: 'hub_refused' }
     if (!res.ok) throw new HubUnreachableError(`hub answered ${res.status}`)
-    const parsed = foremanWakeBriefSchema.safeParse(await res.json().catch(() => null))
-    if (!parsed.success) throw new HubUnreachableError('hub answered no brief')
-    return parsed.data
+    const body = (await res.json().catch(() => null)) as unknown
+    const parsed = foremanWakeBriefSchema.safeParse(body)
+    if (parsed.success) return parsed.data
+    const error = body && typeof body === 'object' && 'error' in body ? String((body as { error: unknown }).error) : ''
+    if (error.startsWith('Unknown foreman tool')) return { skip: 'hub_too_old' }
+    throw new HubUnreachableError('hub answered no brief')
 }
 
 // The first message of a wake, written by the box: why it is up, and what it found. Every client
