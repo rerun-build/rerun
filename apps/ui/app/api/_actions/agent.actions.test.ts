@@ -37,7 +37,7 @@ vi.mock('@/app/api/_services/notification-audience.service', () => ({ followCowo
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/lib/ai/parse-schedule', () => ({ parseSchedule: vi.fn() }))
-vi.mock('@/lib/services/registry', () => ({ connectorMcpServerNames: () => new Set(), connectorSkillOwners: vi.fn(), connectorSkillSlugs: vi.fn(), readRegistry: vi.fn() }))
+vi.mock('@/lib/services/registry', () => ({ connectorMcpServerNames: () => new Set(), connectorSkillOwners: () => new Map(), connectorSkillSlugs: vi.fn(), readRegistry: vi.fn() }))
 vi.mock('@/lib/chat/engine-history', () => ({ transformEngineMessages: (messages: unknown[]) => messages }))
 vi.mock('@/lib/engine/client', () => ({
     createSkill: vi.fn(async () => ({ slug: 'skill' })),
@@ -50,6 +50,9 @@ vi.mock('@/lib/engine/client', () => ({
     listSchedules: vi.fn(async () => [{ slug: 'daily', name: 'Daily', cron: '0 9 * * *', runAt: null, timezone: 'UTC', enabled: true, lastRunAt: null }]),
     listRuns: vi.fn(async () => []),
     getAgent: vi.fn(async () => null),
+    getSkill: vi.fn(async () => ({ slug: 'outreach', name: 'Outreach', description: 'd', body: 'Real procedure', files: [] })),
+    updateSkill: vi.fn(async () => ({ slug: 'outreach' })),
+    fetchSkillArchive: vi.fn(async () => new Uint8Array([1, 2, 3]).buffer),
     supportsScheduleRename: vi.fn(async () => true),
 }))
 
@@ -63,8 +66,8 @@ const AGENT = 'agent-1'
 
 beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1', contentLocked: false })
-    mocks.resolveRunTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1', contentLocked: false })
+    mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
+    mocks.resolveRunTarget.mockResolvedValue({ conn, engineAgentId: 'engine-1' })
     mocks.requireLightSessionActor.mockResolvedValue(MEMBER)
 })
 
@@ -126,6 +129,20 @@ describe('the level each action asks of the Box', () => {
 
         expect(mocks.moveAgentToBox).toHaveBeenCalledWith(agentId, spaceId, MEMBER)
         expect(mocks.duplicateAgent).toHaveBeenCalledWith(expect.objectContaining({ actor: MEMBER, agentRowId: agentId, workspaceId: 7, spaceId }))
+    })
+})
+
+describe('the content of a coworker installed from a template', () => {
+    it('reads, edits and downloads its skills and system prompt as written, whatever the plan', async () => {
+        await expect(actions.getSkillAction(AGENT, 'outreach')).resolves.toMatchObject({ body: 'Real procedure' })
+
+        await expect(actions.updateSkillAction(AGENT, 'outreach', { body: 'New procedure' })).resolves.toMatchObject({ success: true })
+        expect(engine.updateSkill).toHaveBeenCalledWith(conn, 'engine-1', 'outreach', { body: 'New procedure' })
+
+        await expect(actions.downloadSkillArchiveAction(AGENT, 'outreach')).resolves.toEqual({ success: true, base64: Buffer.from([1, 2, 3]).toString('base64') })
+
+        await actions.updateAgentConfigAction(AGENT, { soul: 'New soul' })
+        expect(engine.patchAgent).toHaveBeenCalledWith(conn, 'engine-1', { soul: 'New soul' })
     })
 })
 

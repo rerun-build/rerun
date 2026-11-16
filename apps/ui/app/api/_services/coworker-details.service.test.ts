@@ -48,7 +48,7 @@ const storedPrefs = (coworkers: Record<string, unknown>) => ({ version: 2, scope
 describe('coworker details', () => {
     beforeEach(() => {
         Object.values(mocks).forEach(mock => mock.mockReset())
-        mocks.resolveAgentTarget.mockResolvedValue({ conn: { host: 'box' }, engineAgentId: 'eng-1', contentLocked: false })
+        mocks.resolveAgentTarget.mockResolvedValue({ conn: { host: 'box' }, engineAgentId: 'eng-1' })
         mocks.recipientLocale.mockResolvedValue('en')
         rowsAre({})
     })

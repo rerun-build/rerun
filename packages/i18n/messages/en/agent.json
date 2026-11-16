@@ -73,7 +73,6 @@
         "skillFilesSection.add": "Button that confirms adding a file.",
         "taskOutcomeFooter.done": "Badge: the last run of the task finished successfully.",
         "taskOutcomeFooter.lastRun": "{time} is a short duration like 5m, 3h, 2d.",
-        "templateContentLock.title": "Over content of a coworker installed from a template, hidden until the workspace pays.",
         "threadBranch.opener.askedBy": "Stands in for the first message of a thread another coworker asked for. {name} is that coworker's name.",
         "threadBranch.opener.schedule": "Stands in for the first message of a thread a schedule started. {name} is the routine's name.",
         "threadBranch.opener.trigger": "Stands in for the first message of a thread a webhook started. {name} is the trigger's name.",
@@ -615,14 +614,7 @@
         "create": "Create skill",
         "saveFailed": "Failed to save",
         "downloadFailed": "Failed to download skill",
-        "deleteFailed": "Failed to delete",
-        "locks": {
-            "edit": "Editing this skill unlocks once your workspace is on a paid plan.",
-            "delete": "Deleting this skill unlocks once your workspace is on a paid plan.",
-            "download": "Downloading this skill unlocks once your workspace is on a paid plan.",
-            "addFile": "Adding a bundled file unlocks once your workspace is on a paid plan.",
-            "deleteFile": "Deleting a bundled file unlocks once your workspace is on a paid plan."
-        }
+        "deleteFailed": "Failed to delete"
     },
     "skillFileEditor": {
         "readFailed": "Could not read this file",
@@ -632,11 +624,7 @@
         "delete": "Delete file",
         "deleteTitle": "Delete {path}?",
         "deleteDescription": "The file is removed from the skill. This cannot be undone.",
-        "saveChanges": "Save changes",
-        "locks": {
-            "edit": "Editing this file unlocks once your workspace is on a paid plan.",
-            "delete": "Deleting this file unlocks once your workspace is on a paid plan."
-        }
+        "saveChanges": "Save changes"
     },
     "skillFilesSection": {
         "label": "Bundled files",
@@ -859,17 +847,6 @@
     "agentPanel": {
         "threads": "Threads",
         "coworkerCard": "Coworker card"
-    },
-    "templateContentLock": {
-        "title": "Locked while you are on the trial",
-        "description": {
-            "skills": "This coworker came from a template. Its skills unlocks once your workspace is on a paid plan.",
-            "systemPrompt": "This coworker came from a template. Its system prompt unlocks once your workspace is on a paid plan.",
-            "taskPrompts": "This coworker came from a template. Its task prompts unlocks once your workspace is on a paid plan.",
-            "triggerPrompts": "This coworker came from a template. Its trigger prompts unlocks once your workspace is on a paid plan.",
-            "referenceFiles": "This coworker came from a template. Its reference files unlocks once your workspace is on a paid plan."
-        },
-        "upgrade": "Upgrade to unlock"
     },
     "agentAccessRow": {
         "label": "Access",

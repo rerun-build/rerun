@@ -16,9 +16,7 @@ export async function listSkillProposalsAction(sessionId: string): Promise<Engin
     }
 }
 
-// Deciding writes, or turns down, a procedure of the coworker: `manage` on its Box, either way. A
-// sealed agent's procedures belong to the template it came from, so it does not get to rewrite
-// them from a chat row.
+// Deciding writes, or turns down, a procedure of the coworker: `manage` on its Box, either way.
 export async function decideSkillProposalAction(
     sessionId: string,
     proposalId: string,
@@ -27,8 +25,7 @@ export async function decideSkillProposalAction(
     try {
         const ctx = await getSessionEngineContext(sessionId)
         if (!ctx) return { success: false, ...refusal('coworkerNotReachable') }
-        const { contentLocked } = await getAgentChatTarget(ctx.agentId, 'manage')
-        if (decision === 'accept' && contentLocked) return { success: false, ...refusal('upgradeToEditContent') }
+        await getAgentChatTarget(ctx.agentId, 'manage')
         const proposal = await decideSkillProposal(ctx.conn, ctx.engineAgentId, proposalId, decision)
         await clearSkillProposalAttention(sessionId, ctx.agentId, ctx.engineSessionId).catch(() => {})
         return { success: true, proposal }

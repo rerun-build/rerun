@@ -2,7 +2,7 @@ import { workspaceActor } from '@/app/api/_auth/access'
 import { MAX_TEXT_WRITE_CHARS } from '@rerun/contracts'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { agentFilesBase, chat as engineChat, createMemory, createSchedule, createTrigger, getAgent, importSkill, listConnections, listSchedules, listSkills, listTriggers, patchAgent, updateSchedule, updateTrigger, uploadFile, writeFileText } from '@/lib/engine/client'
+import { agentFilesBase, chat as engineChat, createMemory, getAgent, importSkill, listConnections, listSchedules, listSkills, listTriggers, uploadFile, writeFileText } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 
@@ -10,7 +10,6 @@ import type { ServiceManifest } from '@/lib/services/manifest'
 import type { InstalledService } from '@/lib/services/types'
 
 import { changeAgentHandle, createAgent, deleteAgent, renameAgent } from './agent.service'
-import { LOCKED_WRITE_ERROR } from './agent-content.service'
 import { declareService } from './agent-setup.service'
 import { resolveAgentTarget } from './chat.service'
 import { dispatchAccountTool } from './mcp-account.service'
@@ -41,7 +40,6 @@ const ACTOR = { kind: 'workspace', workspaceId: WORKSPACE_ID }
 const AGENTS: Record<string, Record<string, unknown>> = {
     'agent-own': { workspace_id: WORKSPACE_ID, space_id: 'box-own' },
     'agent-foreign': { workspace_id: FOREIGN_WORKSPACE_ID, space_id: 'box-foreign' },
-    'agent-sealed': { workspace_id: WORKSPACE_ID, space_id: 'box-own' },
 }
 
 const SPACES = [
@@ -83,7 +81,7 @@ describe('dispatchAccountTool', () => {
         const member = { kind: 'user', userId: 'u-member', workspaceId: WORKSPACE_ID, role: 'member', boxScope: 'all' } as const
 
         beforeEach(() => {
-            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-own', contentLocked: false } as never)
+            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-own' } as never)
             vi.mocked(engineChat).mockResolvedValue(new Response('down', { status: 503 }))
         })
 
@@ -221,7 +219,7 @@ describe('dispatchAccountTool', () => {
         const conn = { url: 'https://engine.test', apiKey: 'key' }
 
         beforeEach(() => {
-            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn, engineAgentId: 'engine-own', contentLocked: false } as never)
+            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn, engineAgentId: 'engine-own' } as never)
         })
 
         it('lists the identity fields a rename wrote in updated', async () => {
@@ -289,66 +287,12 @@ describe('dispatchAccountTool', () => {
         })
     })
 
-    describe('template content lock', () => {
-        beforeEach(() => {
-            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: { url: 'https://engine.test', apiKey: 'key' }, engineAgentId: 'engine-sealed', contentLocked: true } as never)
-        })
-
-        it('refuses update_agent writing the soul of an agent whose template content is locked', async () => {
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'update_agent', { agentId: 'agent-sealed', soul: 'New soul', name: 'Renamed' })).rejects.toThrow(LOCKED_WRITE_ERROR)
-
-            expect(patchAgent).not.toHaveBeenCalled()
-            expect(renameAgent).not.toHaveBeenCalled()
-        })
-
-        it('lets update_agent change the rest of a locked agent', async () => {
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'update_agent', { agentId: 'agent-sealed', description: 'Finds leads' })).resolves.toMatchObject({ updated: ['description'] })
-
-            expect(patchAgent).toHaveBeenCalledWith(expect.anything(), 'engine-sealed', { description: 'Finds leads' })
-        })
-
-        it('refuses upsert_skill writing a skill on an agent whose template content is locked', async () => {
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_skill', { agentId: 'agent-sealed', name: 'Outreach', body: 'Rewritten' })).rejects.toThrow(LOCKED_WRITE_ERROR)
-
-            expect(importSkill).not.toHaveBeenCalled()
-        })
-
-        it('refuses upsert_schedule writing the body of a scheduled task on an agent whose template content is locked', async () => {
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_schedule', { agentId: 'agent-sealed', slug: 'daily', body: 'Rewritten' })).rejects.toThrow(LOCKED_WRITE_ERROR)
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_schedule', { agentId: 'agent-sealed', name: 'Daily', cron: '0 9 * * *', body: 'New' })).rejects.toThrow(LOCKED_WRITE_ERROR)
-
-            expect(updateSchedule).not.toHaveBeenCalled()
-            expect(createSchedule).not.toHaveBeenCalled()
-        })
-
-        it('lets upsert_schedule pause a scheduled task of a locked agent', async () => {
-            await dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_schedule', { agentId: 'agent-sealed', slug: 'daily', enabled: false })
-
-            expect(updateSchedule).toHaveBeenCalledWith(expect.anything(), 'engine-sealed', 'daily', expect.objectContaining({ enabled: false, body: undefined }))
-        })
-
-        it('refuses upsert_trigger writing the body of a trigger on an agent whose template content is locked', async () => {
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_trigger', { agentId: 'agent-sealed', slug: 'inbound', body: 'Rewritten' })).rejects.toThrow(LOCKED_WRITE_ERROR)
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_trigger', { agentId: 'agent-sealed', name: 'Inbound', body: 'New' })).rejects.toThrow(LOCKED_WRITE_ERROR)
-
-            expect(updateTrigger).not.toHaveBeenCalled()
-            expect(createTrigger).not.toHaveBeenCalled()
-        })
-
-        it('lets upsert_trigger disable a trigger of a locked agent', async () => {
-            vi.mocked(updateTrigger).mockResolvedValue({ slug: 'inbound', name: 'Inbound', enabled: false, token: null } as never)
-
-            await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'upsert_trigger', { agentId: 'agent-sealed', slug: 'inbound', enabled: false })).resolves.toMatchObject({ slug: 'inbound', enabled: false })
-
-            expect(updateTrigger).toHaveBeenCalledWith(expect.anything(), 'engine-sealed', 'inbound', expect.objectContaining({ enabled: false, body: undefined }))
-        })
-    })
     describe('write_memory and upload_workspace_file', () => {
         const CONN = { baseUrl: 'https://engine.test', apiKey: 'key' }
         const actor = workspaceActor(WORKSPACE_ID)
 
         beforeEach(() => {
-            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-own', contentLocked: false } as never)
+            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-own' } as never)
             vi.mocked(agentFilesBase).mockImplementation(id => `/agents/${id}/files`)
         })
 
@@ -408,15 +352,6 @@ describe('dispatchAccountTool', () => {
             await expect(dispatchAccountTool(actor, 'upload_workspace_file', { agentId: 'agent-own', path: 'big.md', content: text })).rejects.toThrow('over 5 MB')
 
             expect(uploadFile).not.toHaveBeenCalled()
-            expect(writeFileText).not.toHaveBeenCalled()
-        })
-
-        it('refuses both writes on a coworker whose content a template locks', async () => {
-            vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-sealed', contentLocked: true } as never)
-
-            await expect(dispatchAccountTool(actor, 'write_memory', { agentId: 'agent-sealed', memories: [{ content: 'x' }] })).rejects.toThrow(LOCKED_WRITE_ERROR)
-            await expect(dispatchAccountTool(actor, 'upload_workspace_file', { agentId: 'agent-sealed', path: 'a.md', content: 'x' })).rejects.toThrow(LOCKED_WRITE_ERROR)
-            expect(createMemory).not.toHaveBeenCalled()
             expect(writeFileText).not.toHaveBeenCalled()
         })
     })

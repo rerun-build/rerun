@@ -71,7 +71,8 @@ export const agentViewSchema = z.object({
     agent: boardAgentSchema,
     // Null for a switched-off agent: nothing on its Box answers for it.
     detail: agentDetailSchema.nullable(),
-    // A template agent the workspace has not paid for: its soul arrives masked.
+    // Always false since template content is no longer sealed; kept because shipped mobile builds
+    // parse it as a required field.
     locked: z.boolean(),
 })
 export type AgentView = z.infer<typeof agentViewSchema>

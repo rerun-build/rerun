@@ -6,7 +6,7 @@ vi.mock('server-only', () => ({}))
 const mocks = vi.hoisted(() => ({ getAgent: vi.fn(), listConnections: vi.fn(), patchAgent: vi.fn(), resolveAgentTarget: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', () => ({
     resolveAgentTarget: mocks.resolveAgentTarget,
-    resolveRunTarget: async (agentId: string) => ({ conn: { host: 'box' }, engineAgentId: agentId, contentLocked: false }),
+    resolveRunTarget: async (agentId: string) => ({ conn: { host: 'box' }, engineAgentId: agentId }),
 }))
 vi.mock('@/lib/engine/client', () => ({ getAgent: mocks.getAgent, listConnections: mocks.listConnections, patchAgent: mocks.patchAgent }))
 vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
@@ -20,7 +20,7 @@ const connection = (patch: object) => ({ id: 'claude', name: 'Claude', provider:
 describe('agent models', () => {
     beforeEach(() => {
         Object.values(mocks).forEach(mock => mock.mockReset())
-        mocks.resolveAgentTarget.mockResolvedValue({ conn: { host: 'box' }, engineAgentId: 'eng-1', contentLocked: false })
+        mocks.resolveAgentTarget.mockResolvedValue({ conn: { host: 'box' }, engineAgentId: 'eng-1' })
         mocks.listConnections.mockResolvedValue({ connections: [connection({}), connection({ id: 'rerun', name: 'Rerun', provider: 'openrouter', models: ['rerun-fast', 'rerun-max'] }), connection({ id: 'gone', connected: false })], default: null })
         mocks.getAgent.mockResolvedValue({ config: { connectionId: 'claude', model: 'claude-opus-5-5' }, resolvedConnectionId: 'claude', resolvedModel: 'claude-opus-5-5' })
     })

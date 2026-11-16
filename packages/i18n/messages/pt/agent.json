@@ -532,14 +532,7 @@
         "create": "Criar skill",
         "saveFailed": "Falha ao salvar",
         "downloadFailed": "Falha ao baixar a skill",
-        "deleteFailed": "Falha ao excluir",
-        "locks": {
-            "edit": "A edição desta skill é liberada quando seu workspace estiver em um plano pago.",
-            "delete": "A exclusão desta skill é liberada quando seu workspace estiver em um plano pago.",
-            "download": "O download desta skill é liberado quando seu workspace estiver em um plano pago.",
-            "addFile": "Adicionar um arquivo anexo é liberado quando seu workspace estiver em um plano pago.",
-            "deleteFile": "Excluir um arquivo anexo é liberado quando seu workspace estiver em um plano pago."
-        }
+        "deleteFailed": "Falha ao excluir"
     },
     "skillFileEditor": {
         "readFailed": "Não foi possível ler este arquivo",
@@ -549,11 +542,7 @@
         "delete": "Excluir arquivo",
         "deleteTitle": "Excluir {path}?",
         "deleteDescription": "O arquivo é removido da skill. Isso não pode ser desfeito.",
-        "saveChanges": "Salvar alterações",
-        "locks": {
-            "edit": "A edição deste arquivo é liberada quando seu workspace estiver em um plano pago.",
-            "delete": "A exclusão deste arquivo é liberada quando seu workspace estiver em um plano pago."
-        }
+        "saveChanges": "Salvar alterações"
     },
     "skillFilesSection": {
         "label": "Arquivos anexos",
@@ -776,17 +765,6 @@
     "agentPanel": {
         "threads": "Tópicos",
         "coworkerCard": "Cartão do coworker"
-    },
-    "templateContentLock": {
-        "title": "Bloqueado durante o teste",
-        "description": {
-            "skills": "Este coworker veio de um template. As skills dele são liberadas quando seu workspace estiver em um plano pago.",
-            "systemPrompt": "Este coworker veio de um template. O prompt de sistema dele é liberado quando seu workspace estiver em um plano pago.",
-            "taskPrompts": "Este coworker veio de um template. Os prompts das tarefas dele são liberados quando seu workspace estiver em um plano pago.",
-            "triggerPrompts": "Este coworker veio de um template. Os prompts dos gatilhos dele são liberados quando seu workspace estiver em um plano pago.",
-            "referenceFiles": "Este coworker veio de um template. Os arquivos de referência dele são liberados quando seu workspace estiver em um plano pago."
-        },
-        "upgrade": "Fazer upgrade para liberar"
     },
     "agentAccessRow": {
         "label": "Acesso",

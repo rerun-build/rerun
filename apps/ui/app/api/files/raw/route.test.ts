@@ -14,11 +14,10 @@ describe('GET /api/files/raw', () => {
         vi.mocked(resolveRunTarget).mockResolvedValue({
             engineAgentId: 'engine-agent',
             conn: { baseUrl: 'https://engine.test', apiKey: null },
-            contentLocked: true,
         })
     })
 
-    it('streams raw bytes for a template agent whose other content is locked', async () => {
+    it('streams the raw bytes of a file', async () => {
         const bytes = new Uint8Array([0, 127, 255])
         vi.mocked(engine.fetchRawFile).mockResolvedValue(new Response(bytes, {
             headers: { 'Content-Type': 'application/octet-stream' },

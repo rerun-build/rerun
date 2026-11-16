@@ -15,7 +15,7 @@ export type BillingHighlight = AddonKey | 'credit_pack'
 type BillingState = {
     open: boolean
     highlightAddon: BillingHighlight | null
-    // What surfaced the paywall (trial_pill, budget_exhausted, entitlement_gate, template_content, …), for `paywall_viewed`.
+    // What surfaced the paywall (trial_pill, budget_exhausted, entitlement_gate, …), for `paywall_viewed`.
     trigger: string | null
     upgrade: BillingUpgrade | null
     // Ouvre le dialog billing, optionnellement en mettant un add-on en avant (ex. depuis un feature gate).

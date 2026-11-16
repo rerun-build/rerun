@@ -1,11 +1,9 @@
 import { actorFromContext, assertAgentAccess, isAdminActor, spaceAccessMap, type Actor, type BoxAccess } from '@/app/api/_auth/access'
 import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/ownership'
-import { sealAgentDetail } from '@/app/api/_services/agent-content.service'
 import { findIdleSessions, resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { fetchLiveSessions, sweepZombieSessions } from '@/lib/board/live-sessions'
 import { agentFromRow, computeAgentStatus } from '@/lib/board/types'
 import { getAgent as engineGetAgent } from '@/lib/engine/client'
-import { isTemplateContentLocked } from '@/lib/templates/content-lock'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { AgentView, BoardAgent } from '@rerun/contracts'
 
@@ -49,9 +47,8 @@ export async function readAgentView(ctx: WorkspaceContext, agentId: string): Pro
     if (!row || row.workspace_id !== ctx.workspace.id || access === 'none') throw new AuthorizationError('coworkerNotFound')
 
     const agent: BoardAgent = { ...boardAgentFromRow(row), access }
-    const locked = isTemplateContentLocked(agent, ctx.workspace)
-    if (agent.disabledAt) return { agent, detail: null, locked }
+    if (agent.disabledAt) return { agent, detail: null, locked: false }
 
-    const { conn, engineAgentId, contentLocked } = await resolveAgentTarget(agentId, actor)
-    return { agent, detail: sealAgentDetail(await engineGetAgent(conn, engineAgentId), contentLocked), locked: contentLocked }
+    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
+    return { agent, detail: await engineGetAgent(conn, engineAgentId), locked: false }
 }

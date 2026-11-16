@@ -12,17 +12,15 @@ describe('readFileAction', () => {
         vi.mocked(resolveRunTarget).mockResolvedValue({
             engineAgentId: 'engine-agent',
             conn: { baseUrl: 'https://engine.test', apiKey: null },
-            contentLocked: true,
         })
     })
 
-    it('returns the real file content for a template agent whose other content is locked', async () => {
+    it('returns the file content', async () => {
         vi.mocked(engine.readFileText).mockResolvedValue({ path: 'notes.txt', content: 'real workspace file' })
 
         const result = await readFileAction('agent', 'notes.txt')
 
         expect(result).toEqual({ content: 'real workspace file', truncated: false })
-        expect(result).not.toHaveProperty('locked')
         expect(engine.readFileText).toHaveBeenCalledWith(
             { baseUrl: 'https://engine.test', apiKey: null },
             '/agents/engine-agent/files',

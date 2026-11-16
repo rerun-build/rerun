@@ -7,8 +7,6 @@ import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeade
 import { RunModelField, useRunModel } from '@/components/agent/RunModelField'
 import { TaskNotifyField } from '@/components/agent/TaskNotifyField'
 import { TaskOutcomeFooter } from '@/components/agent/TaskOutcomeFooter'
-import { TemplateContentLock } from '@/components/agent/TemplateContentLock'
-import { useTemplateContentLock } from '@/hooks/useTemplateContentLock'
 import { useAgentSetup } from '@/hooks/useAgentSetup'
 import { installSessionTitle } from '@/lib/chat/install-marker'
 import { TimezoneCombobox } from '@/components/agent/TimezoneCombobox'
@@ -259,8 +257,6 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
     const errorText = useErrorText()
     const isEdit = !!slug
     const { pick, setPick, availableGroups, providerFor, agentModel } = useRunModel(agentId)
-    // Only the prompt is sealed: pausing a task or moving its hour stays available.
-    const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
     const [loading, setLoading] = useState(isEdit)
@@ -410,9 +406,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
 
                 {slug && <TaskNotifyField agentId={agentId} source="schedule" slug={slug} />}
 
-                <TemplateContentLock locked={promptLocked} subject="task prompts">
-                    <MarkdownTextarea label={t('prompt')} dialogTitle={t('promptDialogTitle')} helperText={t('promptHelper')} value={body} onChange={setBody} disabled={promptLocked || !canManage} className="text-xs min-h-32 font-mono" placeholder={t('promptPlaceholder')} />
-                </TemplateContentLock>
+                <MarkdownTextarea label={t('prompt')} dialogTitle={t('promptDialogTitle')} helperText={t('promptHelper')} value={body} onChange={setBody} disabled={!canManage} className="text-xs min-h-32 font-mono" placeholder={t('promptPlaceholder')} />
 
                 {isEdit && waitingForSetup && (
                     <p className="text-xs text-muted-foreground">

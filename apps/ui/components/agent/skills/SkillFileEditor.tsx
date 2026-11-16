@@ -3,8 +3,6 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { deleteSkillFileAction, readSkillFileAction, writeSkillFileAction } from '@/app/api/_actions/agent.actions'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
-import { TemplateContentLock } from '@/components/agent/TemplateContentLock'
-import { useTemplateContentLock } from '@/hooks/useTemplateContentLock'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
@@ -25,11 +23,9 @@ export function SkillFileEditor({ agentId, slug, path, readOnly: readOnlyProp, o
     const t = useTranslations('agent.skillFileEditor')
     const errorText = useErrorText()
     const tShared = useTranslations('agent.modelsShared')
-    const locked = useTemplateContentLock(agentId)
     const canManage = useCanManageAgent(agentId)
-    const readOnly = readOnlyProp || locked || !canManage
-    const deleteReason = locked ? t('locks.delete') : canManage ? undefined : tShared('boxManageReason')
-    const saveReason = locked ? t('locks.edit') : canManage ? undefined : tShared('boxManageReason')
+    const readOnly = readOnlyProp || !canManage
+    const manageReason = canManage ? undefined : tShared('boxManageReason')
     const [loading, setLoading] = useState(true)
     const [content, setContent] = useState('')
     const [truncated, setTruncated] = useState(false)
@@ -78,25 +74,23 @@ export function SkillFileEditor({ agentId, slug, path, readOnly: readOnlyProp, o
                 {loading ? (
                     <SkeletonRows rows={8} />
                 ) : (
-                    <TemplateContentLock locked={locked} subject="reference files">
-                        <Textarea value={content} onChange={e => setContent(e.target.value)} disabled={readOnly || truncated} className="text-xs min-h-96 font-mono" />
-                    </TemplateContentLock>
+                    <Textarea value={content} onChange={e => setContent(e.target.value)} disabled={readOnly || truncated} className="text-xs min-h-96 font-mono" />
                 )}
             </PanelEditorBody>
             {!readOnlyProp && (
                 <PanelEditorFooter>
-                    <TooltipDisabledReason reason={deleteReason}>
+                    <TooltipDisabledReason reason={manageReason}>
                         <PanelDeleteButton
                             label={t('delete')}
                             busy={deleting}
-                            disabled={!!deleteReason}
+                            disabled={!!manageReason}
                             onClick={handleDelete}
                             confirmTitle={t('deleteTitle', { path })}
                             confirmDescription={t('deleteDescription')}
                         />
                     </TooltipDisabledReason>
-                    <TooltipDisabledReason reason={saveReason} className="flex-1">
-                        <Button size="sm" className="flex-1" loading={saving} onClick={handleSave} disabled={!!saveReason || loading || truncated}>
+                    <TooltipDisabledReason reason={manageReason} className="flex-1">
+                        <Button size="sm" className="flex-1" loading={saving} onClick={handleSave} disabled={!!manageReason || loading || truncated}>
                             {t('saveChanges')}
                         </Button>
                     </TooltipDisabledReason>

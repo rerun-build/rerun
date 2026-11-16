@@ -8,7 +8,7 @@ import { GET, HEAD, OPTIONS, POST } from './route'
 vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTargetForTrigger: vi.fn() }))
 vi.mock('@/lib/engine/client', () => ({ fireTrigger: vi.fn() }))
 
-const target = { engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: 'box-key' }, contentLocked: false }
+const target = { engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: 'box-key' } }
 
 function context(params: Partial<{ agentId: string; slug: string; token: string }> = {}) {
     return { params: Promise.resolve({ agentId: 'agent-1', slug: 'new-lead', token: 'secret-token', ...params }) }

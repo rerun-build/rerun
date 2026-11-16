@@ -532,14 +532,7 @@
         "create": "Créer le skill",
         "saveFailed": "Échec de l'enregistrement",
         "downloadFailed": "Échec du téléchargement du skill",
-        "deleteFailed": "Échec de la suppression",
-        "locks": {
-            "edit": "La modification de ce skill se débloque une fois votre workspace sur un plan payant.",
-            "delete": "La suppression de ce skill se débloque une fois votre workspace sur un plan payant.",
-            "download": "Le téléchargement de ce skill se débloque une fois votre workspace sur un plan payant.",
-            "addFile": "L'ajout d'un fichier joint se débloque une fois votre workspace sur un plan payant.",
-            "deleteFile": "La suppression d'un fichier joint se débloque une fois votre workspace sur un plan payant."
-        }
+        "deleteFailed": "Échec de la suppression"
     },
     "skillFileEditor": {
         "readFailed": "Impossible de lire ce fichier",
@@ -549,11 +542,7 @@
         "delete": "Supprimer le fichier",
         "deleteTitle": "Supprimer {path} ?",
         "deleteDescription": "Le fichier est retiré du skill. Cette action est irréversible.",
-        "saveChanges": "Enregistrer",
-        "locks": {
-            "edit": "La modification de ce fichier se débloque une fois votre workspace sur un plan payant.",
-            "delete": "La suppression de ce fichier se débloque une fois votre workspace sur un plan payant."
-        }
+        "saveChanges": "Enregistrer"
     },
     "skillFilesSection": {
         "label": "Fichiers joints",
@@ -776,17 +765,6 @@
     "agentPanel": {
         "threads": "Fils",
         "coworkerCard": "Fiche du coworker"
-    },
-    "templateContentLock": {
-        "title": "Verrouillé pendant l'essai",
-        "description": {
-            "skills": "Ce coworker vient d'un template. Ses skills se débloquent dès que votre workspace passe à un plan payant.",
-            "systemPrompt": "Ce coworker vient d'un template. Son prompt système se débloque dès que votre workspace passe à un plan payant.",
-            "taskPrompts": "Ce coworker vient d'un template. Les prompts de ses tâches se débloquent dès que votre workspace passe à un plan payant.",
-            "triggerPrompts": "Ce coworker vient d'un template. Les prompts de ses déclencheurs se débloquent dès que votre workspace passe à un plan payant.",
-            "referenceFiles": "Ce coworker vient d'un template. Ses fichiers de référence se débloquent dès que votre workspace passe à un plan payant."
-        },
-        "upgrade": "Passer au payant pour débloquer"
     },
     "agentAccessRow": {
         "label": "Accès",

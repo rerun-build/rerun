@@ -49,10 +49,8 @@ type AgentRow = {
     workspace_id: number
     space_id: string
     engine_agent_id: string | null
-    template_id: string | null
     disabled_at: string | null
     disabled_reason: string | null
-    workspaces: { subscription_status: string | null; is_sandbox: boolean } | null
     space: { visibility: string } | null
 }
 
@@ -62,7 +60,7 @@ const member = (boxScope: 'all' | 'assigned'): Actor => ({ kind: 'user', userId:
 let row: AgentRow | null
 
 beforeEach(() => {
-    row = { workspace_id: 1, space_id: 'box-1', engine_agent_id: 'e1', template_id: null, disabled_at: null, disabled_reason: null, workspaces: { subscription_status: 'active', is_sandbox: false }, space: { visibility: 'workspace' } }
+    row = { workspace_id: 1, space_id: 'box-1', engine_agent_id: 'e1', disabled_at: null, disabled_reason: null, space: { visibility: 'workspace' } }
     mocks.requireLightSessionActor.mockReset().mockResolvedValue(admin)
     mocks.selectMaybeSingle.mockReset().mockResolvedValue({ data: null, error: null })
     mocks.selectMaybeSingleWithJoins.mockReset().mockImplementation(async () => ({ data: row, error: null }))
@@ -71,7 +69,7 @@ beforeEach(() => {
 
 describe('resolveAgentTarget', () => {
     it('resolves the engine agent for the session caller', async () => {
-        await expect(resolveAgentTarget('a1')).resolves.toEqual({ engineAgentId: 'e1', conn, contentLocked: false })
+        await expect(resolveAgentTarget('a1')).resolves.toEqual({ engineAgentId: 'e1', conn })
         expect(mocks.selectMaybeSingleWithJoins.mock.calls[0][4]).toEqual({ id: 'a1' })
         expect(mocks.findWorkspaceEngine).toHaveBeenCalledWith(1)
     })
@@ -146,25 +144,12 @@ describe('resolveAgentTarget', () => {
         row = { ...row!, engine_agent_id: null }
         await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toThrow('Coworker not configured or not found')
     })
-
-    it('seals the content of a template agent on an unpaid workspace', async () => {
-        row = { ...row!, template_id: 't1', workspaces: { subscription_status: 'trialing', is_sandbox: false } }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).resolves.toMatchObject({ contentLocked: true })
-    })
-
-    it('leaves a template agent open on a paid workspace and in a sandbox', async () => {
-        row = { ...row!, template_id: 't1', workspaces: { subscription_status: 'active', is_sandbox: false } }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).resolves.toMatchObject({ contentLocked: false })
-
-        row = { ...row, workspaces: { subscription_status: null, is_sandbox: true } }
-        await expect(resolveAgentTarget('a1', workspaceActor(1))).resolves.toMatchObject({ contentLocked: false })
-    })
 })
 
 describe('resolveAgentTargetForTrigger', () => {
     it('resolves any agent without comparing workspaces, since the token is the authorization', async () => {
         row = { ...row!, workspace_id: 42 }
-        await expect(resolveAgentTargetForTrigger('a1')).resolves.toEqual({ engineAgentId: 'e1', conn, contentLocked: false })
+        await expect(resolveAgentTargetForTrigger('a1')).resolves.toEqual({ engineAgentId: 'e1', conn })
         expect(mocks.requireLightSessionActor).not.toHaveBeenCalled()
         expect(mocks.findWorkspaceEngine).toHaveBeenCalledWith(42)
     })

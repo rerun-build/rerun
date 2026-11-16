@@ -69,8 +69,7 @@ export type IsoAgent = {
     name: string
     handle: string | null
     description: string | null
-    // The template this agent was installed from, null when it was built by hand. Drives the
-    // content lock, which is why the board carries it.
+    // The template this agent was installed from, null when it was built by hand.
     templateId: string | null
     status: AgentStatus
     position: GridPosition

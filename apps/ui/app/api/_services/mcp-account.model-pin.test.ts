@@ -34,7 +34,7 @@ function detail(resolvedConnectionId: string, model: string | null): EngineAgent
 describe('dispatchAccountTool, what a coworker runs on', () => {
     beforeEach(() => {
         vi.clearAllMocks()
-        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-agent', contentLocked: false })
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-agent' })
         vi.mocked(getWorkspaceConnection).mockResolvedValue(CONN)
         vi.mocked(listConnections).mockResolvedValue({ connections: CONNECTIONS, default: { connectionId: 'claude-rerun', model: 'claude-opus-5-5' } })
     })

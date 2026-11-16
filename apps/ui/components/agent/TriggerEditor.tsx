@@ -4,8 +4,6 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { createTriggerAction, deleteTriggerAction, getTriggerAction, rotateTriggerTokenAction, updateTriggerAction } from '@/app/api/_actions/agent.actions'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { TaskNotifyField } from '@/components/agent/TaskNotifyField'
-import { TemplateContentLock } from '@/components/agent/TemplateContentLock'
-import { useTemplateContentLock } from '@/hooks/useTemplateContentLock'
 import { RunModelField, useRunModel } from '@/components/agent/RunModelField'
 import { TriggerUrlField } from '@/components/agent/TriggerUrlField'
 import { Button } from '@/components/ui/button'
@@ -40,8 +38,6 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
     const errorText = useErrorText()
     const isEdit = !!slug
     const { pick, setPick, availableGroups, providerFor, agentModel } = useRunModel(agentId)
-    // Only the prompt is sealed: the URL, the methods and the on/off switch stay available.
-    const promptLocked = useTemplateContentLock(agentId) && isEdit
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
     const [loading, setLoading] = useState(isEdit)
@@ -158,18 +154,16 @@ export function TriggerEditor({ agentId, slug, onDone, onBack, onShowHistory }: 
 
                 {slug && <TaskNotifyField agentId={agentId} source="trigger" slug={slug} />}
 
-                <TemplateContentLock locked={promptLocked} subject="trigger prompts">
-                    <MarkdownTextarea
-                        label={t('prompt')}
-                        dialogTitle={t('promptDialogTitle')}
-                        helperText={t('promptHelper')}
-                        value={body}
-                        onChange={setBody}
-                        disabled={promptLocked || !canManage}
-                        className="text-xs min-h-32 font-mono"
-                        placeholder={t('promptPlaceholder')}
-                    />
-                </TemplateContentLock>
+                <MarkdownTextarea
+                    label={t('prompt')}
+                    dialogTitle={t('promptDialogTitle')}
+                    helperText={t('promptHelper')}
+                    value={body}
+                    onChange={setBody}
+                    disabled={!canManage}
+                    className="text-xs min-h-32 font-mono"
+                    placeholder={t('promptPlaceholder')}
+                />
 
             </PanelEditorBody>
             <PanelEditorFooter>

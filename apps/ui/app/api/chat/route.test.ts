@@ -42,7 +42,7 @@ describe('POST /api/chat', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         vi.useFakeTimers()
-        vi.mocked(getAgentChatTarget).mockResolvedValue({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null }, contentLocked: false })
+        vi.mocked(getAgentChatTarget).mockResolvedValue({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null } })
         vi.mocked(getExistingSession).mockResolvedValue({ sessionId: 'session', agentId: 'agent', engineSessionId: 'engine-session' })
         vi.mocked(callableEngineAgentIds).mockResolvedValue(undefined)
     })

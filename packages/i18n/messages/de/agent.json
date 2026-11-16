@@ -532,14 +532,7 @@
         "create": "Skill erstellen",
         "saveFailed": "Speichern fehlgeschlagen",
         "downloadFailed": "Skill konnte nicht heruntergeladen werden",
-        "deleteFailed": "Löschen fehlgeschlagen",
-        "locks": {
-            "edit": "Das Bearbeiten dieses Skills ist verfügbar, sobald dein Workspace einen bezahlten Plan hat.",
-            "delete": "Das Löschen dieses Skills ist verfügbar, sobald dein Workspace einen bezahlten Plan hat.",
-            "download": "Das Herunterladen dieses Skills ist verfügbar, sobald dein Workspace einen bezahlten Plan hat.",
-            "addFile": "Das Hinzufügen einer mitgelieferten Datei ist verfügbar, sobald dein Workspace einen bezahlten Plan hat.",
-            "deleteFile": "Das Löschen einer mitgelieferten Datei ist verfügbar, sobald dein Workspace einen bezahlten Plan hat."
-        }
+        "deleteFailed": "Löschen fehlgeschlagen"
     },
     "skillFileEditor": {
         "readFailed": "Diese Datei konnte nicht gelesen werden",
@@ -549,11 +542,7 @@
         "delete": "Datei löschen",
         "deleteTitle": "{path} löschen?",
         "deleteDescription": "Die Datei wird aus dem Skill entfernt. Das lässt sich nicht rückgängig machen.",
-        "saveChanges": "Änderungen speichern",
-        "locks": {
-            "edit": "Das Bearbeiten dieser Datei ist verfügbar, sobald dein Workspace einen bezahlten Plan hat.",
-            "delete": "Das Löschen dieser Datei ist verfügbar, sobald dein Workspace einen bezahlten Plan hat."
-        }
+        "saveChanges": "Änderungen speichern"
     },
     "skillFilesSection": {
         "label": "Mitgelieferte Dateien",
@@ -776,17 +765,6 @@
     "agentPanel": {
         "threads": "Threads",
         "coworkerCard": "Coworker-Karte"
-    },
-    "templateContentLock": {
-        "title": "Gesperrt während der Testphase",
-        "description": {
-            "skills": "Dieser Coworker stammt aus einer Vorlage. Seine Skills werden freigeschaltet, sobald dein Workspace einen bezahlten Plan hat.",
-            "systemPrompt": "Dieser Coworker stammt aus einer Vorlage. Sein System-Prompt wird freigeschaltet, sobald dein Workspace einen bezahlten Plan hat.",
-            "taskPrompts": "Dieser Coworker stammt aus einer Vorlage. Seine Aufgaben-Prompts werden freigeschaltet, sobald dein Workspace einen bezahlten Plan hat.",
-            "triggerPrompts": "Dieser Coworker stammt aus einer Vorlage. Seine Auslöser-Prompts werden freigeschaltet, sobald dein Workspace einen bezahlten Plan hat.",
-            "referenceFiles": "Dieser Coworker stammt aus einer Vorlage. Seine Referenzdateien werden freigeschaltet, sobald dein Workspace einen bezahlten Plan hat."
-        },
-        "upgrade": "Upgrade zum Freischalten"
     },
     "agentAccessRow": {
         "label": "Zugriff",

@@ -13,7 +13,7 @@ const { AuthorizationError } = await import('@/app/api/_auth/ownership')
 const { EngineRequestError } = await import('@/lib/engine/client')
 const { listAgentTablesAction } = await import('./agent.actions')
 
-const target = { conn: { baseUrl: 'https://engine.test', apiKey: 'box-key' }, engineAgentId: 'cog1', contentLocked: false }
+const target = { conn: { baseUrl: 'https://engine.test', apiKey: 'box-key' }, engineAgentId: 'cog1' }
 const prospects = { name: 'prospects', columns: [{ name: 'id', type: 'INTEGER', pk: true, notnull: false }] }
 
 beforeEach(() => {

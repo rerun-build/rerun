@@ -5,8 +5,6 @@ import { getAgentDetailAction, updateAgentConfigAction } from '@/app/api/_action
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorShell } from '@/components/ui/panel-editor'
 import { AgentAccessRow } from '@/components/agent/AgentAccessRow'
 import { SharedLinksSection } from '@/components/agent/share/SharedLinksSection'
-import { TemplateContentLock } from '@/components/agent/TemplateContentLock'
-import { useTemplateContentLock } from '@/hooks/useTemplateContentLock'
 import { DeleteAgentDialog } from '@/components/dialogs/DeleteAgentDialog'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
@@ -45,7 +43,6 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
     const verbosityOptions = useMemo(() => VERBOSITY_LEVELS.map((value: EngineVerbosity) => ({ value, label: t(`verbosity.${value}`) })), [t])
     const renameAgent = useBoardStore(s => s.renameAgent)
     const openNotifications = useNotificationsStore(s => s.openNotifications)
-    const soulLocked = useTemplateContentLock(agent.id)
     const canManage = useCanManageAgent(agent.id)
     const manageReason = canManage ? undefined : boxManageReason
     const [name, setName] = useState(agent.name)
@@ -94,7 +91,6 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
         setError(null)
         // Note: provider/model are intentionally omitted here — they are owned by the
         // in-chat ModelSelector. Including them would overwrite the user's selection.
-        // A sealed soul is dropped server-side, so the rest of this form still saves.
         const result = await updateAgentConfigAction(agent.id, { soul, verbosity })
         if (result.success) {
             setSaved(true)
@@ -147,13 +143,11 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                             name="soul"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <TemplateContentLock locked={soulLocked} subject="system prompt">
-                                        <TooltipDisabledReason reason={manageReason} className="flex w-full flex-col">
-                                            <FormControl>
-                                                <MarkdownTextarea label={t('soul.label')} dialogTitle={t('soul.dialogTitle')} className="text-xs min-h-32 font-mono" placeholder={t('soul.placeholder')} {...field} disabled={soulLocked || !canManage} />
-                                            </FormControl>
-                                        </TooltipDisabledReason>
-                                    </TemplateContentLock>
+                                    <TooltipDisabledReason reason={manageReason} className="flex w-full flex-col">
+                                        <FormControl>
+                                            <MarkdownTextarea label={t('soul.label')} dialogTitle={t('soul.dialogTitle')} className="text-xs min-h-32 font-mono" placeholder={t('soul.placeholder')} {...field} disabled={!canManage} />
+                                        </FormControl>
+                                    </TooltipDisabledReason>
                                 </FormItem>
                             )}
                         />

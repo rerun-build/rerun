@@ -532,14 +532,7 @@
         "create": "Crear skill",
         "saveFailed": "No se pudo guardar",
         "downloadFailed": "No se pudo descargar la skill",
-        "deleteFailed": "No se pudo eliminar",
-        "locks": {
-            "edit": "Editar esta skill se desbloquea cuando tu workspace tenga un plan de pago.",
-            "delete": "Eliminar esta skill se desbloquea cuando tu workspace tenga un plan de pago.",
-            "download": "Descargar esta skill se desbloquea cuando tu workspace tenga un plan de pago.",
-            "addFile": "Añadir un archivo adjunto se desbloquea cuando tu workspace tenga un plan de pago.",
-            "deleteFile": "Eliminar un archivo adjunto se desbloquea cuando tu workspace tenga un plan de pago."
-        }
+        "deleteFailed": "No se pudo eliminar"
     },
     "skillFileEditor": {
         "readFailed": "No se pudo leer este archivo",
@@ -549,11 +542,7 @@
         "delete": "Eliminar archivo",
         "deleteTitle": "¿Eliminar {path}?",
         "deleteDescription": "El archivo se quita de la skill. Esto no se puede deshacer.",
-        "saveChanges": "Guardar cambios",
-        "locks": {
-            "edit": "Editar este archivo se desbloquea cuando tu workspace tenga un plan de pago.",
-            "delete": "Eliminar este archivo se desbloquea cuando tu workspace tenga un plan de pago."
-        }
+        "saveChanges": "Guardar cambios"
     },
     "skillFilesSection": {
         "label": "Archivos adjuntos",
@@ -776,17 +765,6 @@
     "agentPanel": {
         "threads": "Hilos",
         "coworkerCard": "Ficha del coworker"
-    },
-    "templateContentLock": {
-        "title": "Bloqueado durante la prueba",
-        "description": {
-            "skills": "Este coworker viene de un template. Sus skills se desbloquean cuando tu workspace tenga un plan de pago.",
-            "systemPrompt": "Este coworker viene de un template. Su prompt de sistema se desbloquea cuando tu workspace tenga un plan de pago.",
-            "taskPrompts": "Este coworker viene de un template. Los prompts de sus tareas se desbloquean cuando tu workspace tenga un plan de pago.",
-            "triggerPrompts": "Este coworker viene de un template. Los prompts de sus disparadores se desbloquean cuando tu workspace tenga un plan de pago.",
-            "referenceFiles": "Este coworker viene de un template. Sus archivos de referencia se desbloquean cuando tu workspace tenga un plan de pago."
-        },
-        "upgrade": "Mejora tu plan para desbloquear"
     },
     "agentAccessRow": {
         "label": "Acceso",
