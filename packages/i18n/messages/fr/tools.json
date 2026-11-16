@@ -110,6 +110,7 @@
         "attach_connector": "Ajouter une app",
         "detach_connector": "Retirer une app",
         "list_vault": "Lire le Vault",
+        "set_vault_link": "Prêter un compte du Vault",
         "send_message": "Écrire à un coworker",
         "create_boxes": "Créer des Boxes",
         "build_team": "Constituer l'équipe",

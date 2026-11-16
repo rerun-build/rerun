@@ -118,6 +118,20 @@ export const FOREMAN_VAULT_TOOL_DEFS = [
             "List the workspace's Vault: every app account, custom MCP server and secret the workspace signed in to or typed in once, with the account it is (an email, a workspace name), whether it works (active) or waits on someone (needs_auth: signed out or never signed in, needs_config: a setting is missing), and which coworkers it is lent to, or everyone. Never returns a value. Call it before adding an app to a coworker, to lend an account the workspace already has rather than connecting a second one, and when a coworker says it cannot reach an app. Coworkers the user cannot see are only counted.",
         inputSchema: { type: 'object', properties: {} },
     },
+    {
+        name: 'set_vault_link',
+        description:
+            "Lend an account of the Vault to a coworker (attached: true), or take it back (attached: false). The coworker gets or loses that app's tools at its next run; the account stays in the Vault either way. Take the ids from list_vault and the board map. It changes who can act with someone's account, so ask first: request_approval naming the account and the coworker, end your turn, and only once they approved call it. An entry shared with every coworker, and deleting one, are changed in the Vault panel (open_settings, vault), by an admin.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                itemId: { type: 'string', description: 'Id of the Vault entry, from list_vault.' },
+                agentId: { type: 'string', description: 'Id of the coworker.' },
+                attached: { type: 'boolean', description: 'true to lend the account, false to take it back.' },
+            },
+            required: ['itemId', 'agentId', 'attached'],
+        },
+    },
 ] as const
 
 // A Record rather than a list, so a tab added to the panel fails to compile here instead of reaching
@@ -147,6 +161,7 @@ const SETTINGS_PANEL_HINTS: Record<SettingsPanel, string> = {
     api_keys: 'the keys of the Rerun API and how to plug a client onto MCP, on an active subscription or trial',
     ai_providers: 'the AI subscriptions and API keys every coworker of the workspace runs on',
     knowledge_base: 'the company brain (the pages every coworker reads about the company, and the changes coworkers propose to them), plus the files and the tables the whole workspace shares',
+    vault: 'the app accounts, servers and secrets the workspace signed in to once, where one is reconnected, shared with every coworker or deleted',
     billing: 'the plan, the add-ons, the card and the invoices',
     notifications: 'what gets notified, coworker by coworker, and the account emails',
     shortcuts: 'the keyboard shortcuts of the board',
@@ -576,10 +591,24 @@ export function isForemanClientTool(name: string): name is ForemanClientToolName
     return (FOREMAN_CLIENT_TOOL_NAMES as readonly string[]).includes(name)
 }
 
-export function accountToolDef(name: string): ForemanToolDef {
+function accountToolDef(name: string): ForemanToolDef {
     const def = ACCOUNT_TOOL_DEFS.find(entry => entry.name === name)
     if (!def) throw new Error(`Unknown account tool: ${name}`)
     return def
+}
+
+// The foreman's attach_connector first looks in the Vault (foreman-hub.service.ts), which the account
+// tool of the public MCP server does not: an account the workspace already has is lent, not
+// connected twice.
+export function foremanAccountToolDef(name: string): ForemanToolDef {
+    const def = accountToolDef(name)
+    if (name !== 'attach_connector') return def
+    const schema = def.inputSchema as { type: 'object'; properties: Record<string, object>; required: readonly string[] }
+    return {
+        name: def.name,
+        description: `${def.description} When the Vault already holds an account of this app that the coworker does not have, nothing is declared: the answer lists those accounts, so you can lend one with set_vault_link once the user agreed. Call it again with newAccount: true only when they want another account instead.`,
+        inputSchema: { ...schema, properties: { ...schema.properties, newAccount: { type: 'boolean', description: 'Connect another account even though the Vault already holds one of this app.' } } },
+    }
 }
 
 // The hub foreman only walks the onboarding: getting to know them, the plan, the trial. Everything

@@ -21,7 +21,7 @@ type ToolOutput = { ok: true; note?: string } | { ok: false; error: string }
 
 // What the workspace menu knows and a tool call does not: which of its sections exist here. The
 // session lives in a React context, so the caller reads it and hands it over.
-export type ForemanClientGates = { apiEntitled: boolean; isSandbox: boolean; isAdmin: boolean }
+export type ForemanClientGates = { apiEntitled: boolean; isSandbox: boolean; isAdmin: boolean; vaultOpen: boolean }
 
 function unknownTab(requested: string, labels: Record<string, string>, noun = 'tab'): string {
     const choices = Object.entries(labels).map(([id, label]) => `${id} ("${label}")`)
@@ -71,6 +71,9 @@ export function runForemanClientTool(name: ForemanClientToolName, input: unknown
             if (panel === 'api_keys' && !gates.apiEntitled) {
                 return { ok: false, error: 'API keys and the MCP client need an active subscription, and this workspace has none. Say so, and offer to open the billing panel instead.' }
             }
+            if (panel === 'vault' && !gates.vaultOpen) {
+                return { ok: false, error: 'The Vault opens on an active plan, and this workspace has none. Say so, and offer to open the billing panel instead.' }
+            }
             if (gates.isSandbox && (panel === 'workspace' || panel === 'members' || panel === 'billing')) {
                 return { ok: false, error: 'This is the expert sandbox: it has no settings, no members and no billing of its own. Those belong to the real workspace.' }
             }
@@ -80,6 +83,7 @@ export function runForemanClientTool(name: ForemanClientToolName, input: unknown
                 case 'api_keys':
                 case 'ai_providers':
                 case 'knowledge_base':
+                case 'vault':
                     useWorkspaceSettingsStore.getState().openWorkspacePanel(panel)
                     break
                 case 'billing':

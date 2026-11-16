@@ -6,6 +6,7 @@ vi.mock('server-only', () => ({}))
 
 import { foremanEngineBrief, FOREMAN_ENGINE_HUB_TOOL_NAMES } from './engine-brief'
 import type { ForemanState } from './phase'
+import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 
 const state = {
     phase: 'companion',
@@ -76,9 +77,19 @@ describe('foremanEngineBrief', () => {
         expect(brief.tools.filter(tool => tool.name === 'list_templates')).toHaveLength(1)
     })
 
-    it('reads the Vault on the hub', () => {
-        expect(brief.tools.find(tool => tool.name === 'list_vault')?.kind).toBe('hub')
+    it('reads the Vault and lends its accounts on the hub', () => {
+        for (const name of ['list_vault', 'set_vault_link']) expect(brief.tools.find(tool => tool.name === name)?.kind).toBe('hub')
         expect(brief.instructions).toContain('list_vault')
+        expect(brief.instructions).toContain('set_vault_link')
+    })
+
+    // The public MCP server's attach_connector does not look in the Vault: only the foreman's knows
+    // newAccount.
+    it('lets the foreman ask for another account than the ones the Vault holds', () => {
+        const attach = brief.tools.find(tool => tool.name === 'attach_connector')!
+        expect((attach.inputSchema as { properties: Record<string, unknown> }).properties.newAccount).toBeDefined()
+        const publicAttach = ACCOUNT_TOOL_DEFS.find(def => def.name === 'attach_connector')!
+        expect((publicAttach.inputSchema as { properties: Record<string, unknown> }).properties).not.toHaveProperty('newAccount')
     })
 
     // The ceiling is compiled into every engine already deployed: past it, each message to the

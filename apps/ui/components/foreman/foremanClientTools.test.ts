@@ -12,7 +12,7 @@ vi.mock('@/stores/template-flow.store', () => ({ useTemplateFlowStore: { getStat
 
 const { runForemanClientTool } = await import('./foremanClientTools')
 
-const admin = { apiEntitled: true, isSandbox: false, isAdmin: true }
+const admin = { apiEntitled: true, isSandbox: false, isAdmin: true, vaultOpen: true }
 const member = { ...admin, isAdmin: false }
 
 describe('open_settings', () => {
@@ -34,5 +34,18 @@ describe('open_settings', () => {
         expect(runForemanClientTool('open_settings', { panel: 'ai_providers' }, member).ok).toBe(true)
         expect(runForemanClientTool('open_settings', { panel: 'api_keys' }, admin).ok).toBe(true)
         expect(mocks.openWorkspacePanel.mock.calls.map(call => call[0])).toEqual(['members', 'ai_providers', 'api_keys'])
+    })
+
+    it('opens the Vault to a member, by its id or by the name they read', () => {
+        expect(runForemanClientTool('open_settings', { panel: 'vault' }, member).ok).toBe(true)
+        expect(runForemanClientTool('open_settings', { panel: 'Vault' }, member).ok).toBe(true)
+        expect(mocks.openWorkspacePanel.mock.calls.map(call => call[0])).toEqual(['vault', 'vault'])
+    })
+
+    // The workspace menu greys the Vault without a plan.
+    it('keeps the Vault shut without a plan, and says why', () => {
+        const out = runForemanClientTool('open_settings', { panel: 'vault' }, { ...member, vaultOpen: false })
+        expect(out.ok ? '' : out.error).toContain('active plan')
+        expect(mocks.openWorkspacePanel).not.toHaveBeenCalled()
     })
 })

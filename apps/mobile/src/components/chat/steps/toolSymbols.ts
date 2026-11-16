@@ -119,6 +119,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     list_agent_connectors: 'link',
     attach_connector: 'link',
     list_vault: 'lock',
+    set_vault_link: 'lock',
     detach_connector: 'trash',
     send_message: 'send',
     create_boxes: 'package',

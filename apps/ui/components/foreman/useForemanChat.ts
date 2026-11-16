@@ -5,7 +5,9 @@ import { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, sleep, type ForemanIntent } from
 import { DefaultChatTransport, type UIMessage } from 'ai'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { useNeedsPlanToConnect } from '@/components/connections/NoPlanNotice'
 import type { OrbActivity } from '@/components/foreman/Orb'
+import { useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { isForemanClientTool, runForemanClientTool, type ForemanClientGates, type ForemanClientToolName } from '@/components/foreman/foremanClientTools'
 import { refreshForemanSurface } from '@/components/foreman/useForemanKickoff'
 import { getRunAction } from '@/app/api/_actions/agent.actions'
@@ -58,14 +60,16 @@ export function useForemanChat() {
     const engaged = useForemanStore(state => state.engaged)
     const { workspace, refreshPhoneStep } = useSession()
     const isAdmin = useIsWorkspaceAdmin()
+    const vaultEnabled = useVaultEnabled()
+    const needsPlan = useNeedsPlanToConnect()
 
     // A client tool that opens a locked panel has to know it is locked, and the session is a React
     // context. Kept in a ref rather than read in the closure below: useChat holds on to the options
     // it was given, and a workspace read there would be the one of the first render forever.
-    const gates = useRef<ForemanClientGates>({ apiEntitled: false, isSandbox: false, isAdmin: false })
+    const gates = useRef<ForemanClientGates>({ apiEntitled: false, isSandbox: false, isAdmin: false, vaultOpen: false })
     useEffect(() => {
-        gates.current = { apiEntitled: !!workspace && isWorkspaceApiEntitled(workspace), isSandbox: !!workspace?.is_sandbox, isAdmin }
-    }, [workspace, isAdmin])
+        gates.current = { apiEntitled: !!workspace && isWorkspaceApiEntitled(workspace), isSandbox: !!workspace?.is_sandbox, isAdmin, vaultOpen: vaultEnabled && !needsPlan }
+    }, [workspace, isAdmin, vaultEnabled, needsPlan])
 
     const transport = useMemo(
         () =>

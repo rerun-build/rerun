@@ -8,7 +8,7 @@ import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES } f
 import { dispatchWorkspaceOnboardingTool } from '@/lib/foreman/onboarding-tools'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { FOREMAN_BOX_TOOL_DEFS } from '@/lib/foreman/tool-defs'
-import { dispatchForemanVaultTool, FOREMAN_VAULT_TOOL_NAMES } from '@/lib/foreman/vault-tools'
+import { dispatchForemanVaultTool, FOREMAN_VAULT_TOOL_NAMES, vaultAccountsToLend } from '@/lib/foreman/vault-tools'
 import { requireString } from '@/lib/mcp/args'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
@@ -29,6 +29,11 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     const userId = actor.kind === 'user' ? actor.userId : await founderOf(workspaceId)
     if (BOX_TOOL_NAMES.has(tool)) return dispatchBoxTool({ workspaceId, userId, actor }, tool, args)
     if (FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES.has(tool)) return dispatchWorkspaceOnboardingTool({ supabase: createServiceRoleClient(), userId, workspace: { id: workspaceId }, actor }, tool, args)
+
+    if (tool === 'attach_connector') {
+        const toLend = await vaultAccountsToLend(actor, args)
+        if (toLend) return toLend
+    }
 
     return dispatchAccountTool(actor, tool, args, { actorUserId: actor.kind === 'user' ? actor.userId : null })
 }
