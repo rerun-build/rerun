@@ -69,6 +69,14 @@ describe('AgentPanelSettings thinking level', { timeout: 20_000 }, () => {
         expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('a1', expect.objectContaining({ thinkingLevel: 'high' }))
     })
 
+    it('offers xhigh and sends it in the PATCH', async () => {
+        mocks.getAgentDetailAction.mockResolvedValue(detail({}))
+        await mount()
+        await act(async () => button('thinking.xhigh').click())
+        await save()
+        expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('a1', expect.objectContaining({ thinkingLevel: 'xhigh' }))
+    })
+
     it('sends null for "Not set"', async () => {
         mocks.getAgentDetailAction.mockResolvedValue(detail({ thinkingLevel: 'low' }))
         await mount()

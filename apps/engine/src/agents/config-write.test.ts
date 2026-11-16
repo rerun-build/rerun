@@ -93,7 +93,7 @@ describe('writeAgentConfig', () => {
 
 describe('thinkingLevel', () => {
     it('accepts null and each level, rejects anything else', () => {
-        for (const level of [null, 'low', 'medium', 'high']) {
+        for (const level of [null, 'low', 'medium', 'high', 'xhigh']) {
             expect(agentConfigSchema.safeParse({ name: 't', thinkingLevel: level }).success).toBe(true)
         }
         expect(agentConfigSchema.safeParse({ name: 't', thinkingLevel: 'extreme' }).success).toBe(false)

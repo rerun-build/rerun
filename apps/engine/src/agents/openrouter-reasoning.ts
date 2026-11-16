@@ -21,7 +21,7 @@ export function closesReasoning(part: { type: string; delta?: unknown }): boolea
 }
 
 export function reasoningFetchFor(level?: string | null): FetchFunction {
-    const request = level ? { ...REASONING_REQUEST, effort: level } : REASONING_REQUEST
+    const request = level ? { ...REASONING_REQUEST, effort: level === 'xhigh' ? 'high' : level } : REASONING_REQUEST
     return (input, init) => withReasoning(request, input, init)
 }
 

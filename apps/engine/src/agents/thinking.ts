@@ -12,6 +12,10 @@ export type ThinkingSettings = {
     openrouterReasoning?: { enabled: boolean; effort?: ThinkingLevel }
 }
 
+export function withoutXhigh(level: ThinkingLevel): Exclude<ThinkingLevel, 'xhigh'> {
+    return level === 'xhigh' ? 'high' : level
+}
+
 export const CLAUDE_DEFAULT_THINKING = { type: 'adaptive', display: 'summarized' } as const
 
 export function thinkingSettingsFor(provider: Provider, model: string, level: ThinkingLevel | null | undefined): ThinkingSettings {
@@ -27,12 +31,12 @@ export function thinkingSettingsFor(provider: Provider, model: string, level: Th
         case 'anthropic':
             return { providerOptions: { anthropic: { thinking: CLAUDE_DEFAULT_THINKING, effort: level } } }
         case 'openai':
-            return { providerOptions: { openai: { reasoningSummary: 'auto', reasoningEffort: level } } }
+            return { providerOptions: { openai: { reasoningSummary: 'auto', reasoningEffort: withoutXhigh(level) } } }
         case 'google':
-            return { providerOptions: { google: { thinkingConfig: { includeThoughts: true, thinkingLevel: level } } } }
+            return { providerOptions: { google: { thinkingConfig: { includeThoughts: true, thinkingLevel: withoutXhigh(level) } } } }
         case 'rerun':
         case 'openrouter':
-            return { openrouterReasoning: { ...REASONING_REQUEST, effort: level } }
+            return { openrouterReasoning: { ...REASONING_REQUEST, effort: withoutXhigh(level) } }
         default:
             return base()
     }
