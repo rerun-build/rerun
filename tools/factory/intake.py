@@ -1,11 +1,25 @@
 import re
 
 import ledger
+import roster
 
 MARKER = re.compile(r"^PLAN READY\b", re.M)
 
 
-def parse_plan(text):
+def builder_why(ro, c, line):
+    if ro is None or ledger.fields(line).get("builder-why"):
+        return []
+    try:
+        want = roster.builder(ro, c["paths"])
+    except ValueError as e:
+        return ["%s; or add builder-why" % e]
+    got = (c["builder"] or "").lower()
+    if got == want:
+        return []
+    return ["builder %s, the map gives %s; use %s or add builder-why" % (got, want, want)]
+
+
+def parse_plan(text, ro=None):
     text = (text or "").replace("\r\n", "\n")
     if not MARKER.search(text):
         return [], ["no PLAN READY marker"]
@@ -15,7 +29,7 @@ def parse_plan(text):
     chunks, errors, seen = [], [], set()
     for line in lines:
         c = ledger.chunk(line)
-        why = ledger.shape(line)
+        why = ledger.shape(line) or builder_why(ro, c, line)
         if why:
             errors.append("%s: %s" % (c["id"], "; ".join(why)))
         elif c["id"] in seen:
@@ -26,8 +40,8 @@ def parse_plan(text):
     return chunks, errors
 
 
-def register(st, job, meta, text):
-    chunks, errors = parse_plan(text)
+def register(st, job, meta, text, ro=None):
+    chunks, errors = parse_plan(text, ro)
     if not chunks:
         return None, errors
     state = ledger.new(job)
