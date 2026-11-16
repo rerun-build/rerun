@@ -32,7 +32,7 @@ RUNNING = states.RUNNING
 END = states.END
 BACK = states.BACK
 GOALS = states.GOALS
-STATION_OF = {"building": "build", "fixing": "fix", "reviewing": "review", "proving": "proof"}
+STATION_OF = {"building": "build", "fixing": "fix", "reviewing": "review", "proving": "proof", "returned": "replan"}
 WAIT_STATES = states.WAIT_STATES
 LOST_BEATS = 3
 RECONCILE_BEATS = 10
@@ -767,13 +767,18 @@ class Dispatcher:
 
     def tier_job(self, j, state):
         j.pop("tier", None)
+        j.pop("run_model", None)
+        station = STATION_OF.get(state)
         try:
-            tier = tiers.tier_for(STATION_OF.get(state), tiers.size_of(j.get("body")), self.cfg.get("tiers"))
+            tier = tiers.tier_for(station, tiers.size_of(j.get("body")), self.cfg.get("tiers"))
+            run_model = tiers.model_for(station, tier, self.cfg.get("tier_models"))
         except ValueError as e:
             log(j["issue"], "no tier written: %s" % e)
             return
         if tier is not None:
             j["tier"] = tier
+        if run_model is not None:
+            j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
@@ -786,6 +791,9 @@ class Dispatcher:
         args = {"agentId": agent, "message": message, "waitSeconds": WAIT_S}
         if state in GOALS:
             args["goal"] = {"lastLineForms": GOALS[state], "turnLimit": 3}
+        if j.get("run_model"):
+            args["model"] = j["run_model"]["model"]
+            args["thinkingLevel"] = j["run_model"]["thinkingLevel"]
         try:
             r = self.account("send_message", args)
         except Error as e:
@@ -798,7 +806,8 @@ class Dispatcher:
         self.store.fired(j["fire_id"], r["runId"])
         j.update(run=r["runId"], sending=None)
         self.save(j, "sent " + step)
-        log(j["issue"], "%s -> %s (run %s)" % (step, self.names.get(agent, agent[:8]), r["runId"]))
+        log(j["issue"], "%s -> %s (run %s)%s" % (step, self.names.get(agent, agent[:8]), r["runId"],
+                                                  " " + args["model"] + "/" + args["thinkingLevel"] if "model" in args else ""))
 
     def message(self, j):
         if j["state"] == "building":
