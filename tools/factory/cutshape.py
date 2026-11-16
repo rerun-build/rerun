@@ -5,6 +5,7 @@ _DEP = re.compile(r"^\s*\*\*Depends on(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _PART = re.compile(r"^\s*\*\*Part of(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _WORKER = re.compile(r"^\s*\*\*Worker(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _TEST = re.compile(r"^\s*\*\*Test file(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
+_THROUGH = re.compile(r"^\s*\*\*Test through(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _FILES = re.compile(r"^\s*\*\*Files\*\*")
 _BULLET = re.compile(r"^\s*[-*+]\s+(.*)$")
 _TICK = re.compile(r"`([^`]*)`")
@@ -90,6 +91,16 @@ def parse(issue):
             if test not in paths:
                 errors.append("test file: '%s' is not one of the Files paths" % test)
 
+    through = None
+    thl = [m.group(1).strip() for m in (_THROUGH.match(l) for l in lines) if m]
+    if len(thl) > 1:
+        errors.append("test through: more than one Test through line")
+    elif thl:
+        if thl[0]:
+            through = thl[0]
+        else:
+            errors.append("test through: names no interface")
+
     dev = None
     plan = next((m for m in (_PLAN.match(ln) for ln in lines) if m), None)
     if plan:
@@ -99,7 +110,7 @@ def parse(issue):
         else:
             errors.append("plan line: the PLAN READY line must name the dev commit as 'dev <sha>' (7 to 40 hex)")
 
-    return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "parent": parent, "dev": dev, "errors": errors}
+    return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "through": through, "parent": parent, "dev": dev, "errors": errors}
 
 
 def cycles(parsed):

@@ -1,6 +1,7 @@
 import re
 
 HEADINGS = {"change": "change", "corrections": "change", "done-test": "done", "run": "run"}
+THROUGH = re.compile(r"^\s*\*\*Test through(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 ASK_LINE = re.compile(r"^ASK (\d+): (MET|NOT MET)[.:,;]? +\S.*$")
 PROOF_LINE = re.compile(r"^PROOF: (PASS|FAIL) (?:@|at )([0-9a-f]{7,40})(?:: (.*))?$")
 
@@ -27,6 +28,11 @@ def asks(body):
                 done = done or not fenced
             elif fenced and line.strip() and not done:
                 out.append(line.strip())
+    for line in plain(body).split("\n"):
+        m = THROUGH.match(line)
+        if m and m.group(1).strip():
+            out.append("Test through: the done-test calls only %s and mocks none of the module's own internals" % m.group(1).strip())
+            break
     return out
 
 
