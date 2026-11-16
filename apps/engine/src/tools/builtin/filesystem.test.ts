@@ -11,7 +11,7 @@ const { filesystemTools } = await import('./filesystem.js')
 const { workspaceDir } = await import('../../config/paths.js')
 
 const id = 'testagent'
-const ctx = { agent: { id } } as any
+const ctx = { agent: { id, config: { tools: { shell: false } } } } as any
 const tools = filesystemTools(ctx)
 const ws = workspaceDir(id)
 
