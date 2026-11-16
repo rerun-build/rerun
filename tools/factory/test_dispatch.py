@@ -151,6 +151,9 @@ class World:
         if a[:2] == ["issue", "edit"] and "--add-label" in a and a[a.index("--add-label") + 1] == "factory":
             self.unlabelled.discard(int(a[2]))
             return ""
+        if a[:2] == ["issue", "list"] and "--label" not in a and "--search" not in a and any(i.get("labels") for i in self.issues):
+            return json.dumps([{"number": i["number"], "title": i["title"], "labels": i["labels"], "createdAt": i.get("createdAt", "")}
+                               for i in self.issues if i.get("labels")])
         if a[:2] == ["issue", "list"] and "--label" not in a:
             return json.dumps([{"number": n} for n in sorted(self.open_numbers)])
         if a[:2] == ["issue", "list"]:
