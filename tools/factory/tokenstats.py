@@ -1,9 +1,32 @@
-def per_merged(fires, merged, key):
+def shared_plan_rows(fires, keep, parents):
+    children = {}
+    for change in keep:
+        parent = parents.get(change)
+        if parent is not None:
+            children.setdefault("plan:%s" % parent, []).append(change)
+    rows = []
+    for f in fires:
+        kids = children.get(f["job"]) if isinstance(f["job"], str) else None
+        if not kids:
+            continue
+        k = len(kids)
+        for job, chunk in sorted(kids, key=str):
+            row = dict(f, job=job, chunk=chunk)
+            for col in ("tokens_in", "tokens_out", "cache_read"):
+                if f.get(col) is not None:
+                    row[col] = f[col] / k
+            rows.append(row)
+    return rows
+
+
+def per_merged(fires, merged, key, parents=None):
     keep = set(map(tuple, merged))
     groups = {}
-    for f in fires:
-        if (f["job"], f["chunk"]) in keep:
-            groups.setdefault(f[key], []).append(f)
+    rows_in = [f for f in fires if (f["job"], f["chunk"]) in keep]
+    if parents:
+        rows_in += shared_plan_rows(fires, keep, {tuple(c): p for c, p in parents.items()})
+    for f in rows_in:
+        groups.setdefault(f[key], []).append(f)
     out = {}
     for name, rows in groups.items():
         changes = len({(f["job"], f["chunk"]) for f in rows})

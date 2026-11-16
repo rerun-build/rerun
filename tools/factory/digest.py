@@ -118,8 +118,16 @@ def measures(store, now):
                            sum(1 for t in rows if t["to_state"] == "fix_wait")))
     n = len(merged)
     tokens = 0
+    parents = set()
     for job, _, _ in merged:
         row = store.db.execute("SELECT COALESCE(SUM(tokens_in + tokens_out), 0) FROM fires WHERE job=?", (job,)).fetchone()
+        tokens += row[0]
+        found = store.get_job(job)
+        parent = cutshape.parse({"number": int(job), "body": found.get("body")})["parent"] if found and job.isdigit() else None
+        if parent is not None:
+            parents.add(parent)
+    for parent in sorted(parents):
+        row = store.db.execute("SELECT COALESCE(SUM(tokens_in + tokens_out), 0) FROM fires WHERE job=?", ("plan:%d" % parent,)).fetchone()
         tokens += row[0]
     return {"mergedPerHour": round(n / 24, 2), "leadTimeS": sum(m[1] for m in merged) / n if n else None,
             "firstPassYield": sum(1 for m in merged if m[2] == 0) / n if n else None,
