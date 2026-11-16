@@ -2,6 +2,7 @@ import datetime
 import json
 
 import cutshape
+import digest
 import pools
 import states
 import store as ledger_store
@@ -212,7 +213,8 @@ def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planni
     holds_list = [{"kind": holds_active["kind"][:40], "until": iso(holds_active["until"])}] if holds_active else []
     snap = {"version": 1, "madeAt": iso(now), "beat": beat, "repo": cfg["repo"],
             "jobs": [_job(store, cfg, names, j) for j in kept], "holds": holds_list, "pools": pool_list,
-            "endedToday": ended_today, "epics": _epics(store, kept, read_epic)}
+            "endedToday": ended_today, "epics": _epics(store, kept, read_epic),
+            "digest": digest.build(store, cfg, now)}
     if planning:
         snap["planning"] = [_plan(p) for p in planning[:MAX_PLANS]]
     return _fit(snap)

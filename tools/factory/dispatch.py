@@ -1,4 +1,4 @@
-import argparse, datetime, hashlib, json, os, re, subprocess, sys, tempfile, time, urllib.error, urllib.request
+import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
 import backlog
 import briefs
@@ -8,6 +8,7 @@ import holds
 import planners
 import pools
 import proof
+import refresh
 import renewal
 import resolver
 import sifter
@@ -26,6 +27,8 @@ GOALS = states.GOALS
 WAIT_STATES = states.WAIT_STATES
 LOST_BEATS = 3
 RECONCILE_BEATS = 10
+REFRESH_BEATS = 10
+REFRESH_EXIT = 75
 REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
 MAX_REPLANS = 2
@@ -350,6 +353,7 @@ class Dispatcher:
         self.names = pools.names(cfg)
         self.planners = planners.Planners(cfg, account, gh)
         self.quota = None
+        self.refresh_to, self.refresh_logged = None, set()
 
     def fill_ids(self):
         missing = [c for t in (self.cfg.get("types") or {}).values() for c in t.get("coworkers", []) if not c.get("id")]
@@ -853,7 +857,11 @@ class Dispatcher:
             out = self.finished_run(j)
             if out is None:
                 return
-            last = final_line(out, ("PR:", "BLOCKED:"))
+            last = final_line(out, ("PR:", "BLOCKED:", "DONE ELSEWHERE:"))
+            done = re.match(r"DONE ELSEWHERE:\s*(#\d+|[0-9a-f]{7,40})\s*$", last) if last else None
+            if done and j.get("stale"):
+                j["done_by"] = done.group(1)
+                return self.end(j, "superseded", "done elsewhere: %s" % done.group(1))
             m = re.match(r"PR:\s*\S*/pull/(\d+)\s*$", last) if last else None
             if not m:
                 found = self.find_pr(j, out)
@@ -998,13 +1006,18 @@ class Dispatcher:
                 text = "The factory dispatcher merged pull request %s at %s." % (pr, j["head"][:7])
             elif j["state"] == "returned":
                 text = "The factory dispatcher stopped this job: returned to the planner. Pull request: %s. Reason: %s" % (pr, j.get("reason") or "-")
+            elif j["state"] == "superseded":
+                text = "The factory dispatcher closed this issue: the Run lines pass on today's dev, so the work was already done by %s." % j.get("done_by")
             else:
                 text = "The factory dispatcher stopped this job: %s. Pull request: %s. Reason: %s" % (j["state"], pr, j.get("reason") or "-")
-            self.gh(["issue", "comment", n, "-R", self.repo, "--body", text])
+            if j["state"] == "superseded":
+                self.gh(["issue", "close", n, "-R", self.repo, "--comment", text])
+            else:
+                self.gh(["issue", "comment", n, "-R", self.repo, "--body", text])
             j["commented"] = True
             self.save(j, "commented")
         if not j.get("relabelled"):
-            done = "factory-done" if j["state"] == "merged" else "factory-blocked"
+            done = "factory-done" if j["state"] in ("merged", "superseded") else "factory-blocked"
             self.gh(["issue", "edit", n, "-R", self.repo, "--remove-label", self.label, "--add-label", done])
             j["relabelled"] = True
             self.save(j, "relabelled")
@@ -1063,19 +1076,23 @@ class Dispatcher:
     def once(self):
         self.heartbeat()
         self.renewal_hold()
+        clean = True
         try:
             self.intake()
         except (Error, ValueError, KeyError) as e:
+            clean = False
             log("-", "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
         try:
             self.reconcile()
         except (Error, ValueError, KeyError) as e:
+            clean = False
             log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
                     log(n, "closed: likely-fixed for %d days" % self.cfg["likely_fixed_days"])
             except (Error, ValueError, KeyError) as e:
+                clean = False
                 log("-", "backlog: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
         for j in self.jobs():
@@ -1091,6 +1108,7 @@ class Dispatcher:
                     j["errors"] = 0
                     self.save(j, "pass ok")
             except (Error, ValueError, KeyError) as e:
+                clean = False
                 log(j["issue"], "%s: %s" % (j["state"], e if isinstance(e, Error) else type(e).__name__))
                 j["errors"] = j.get("errors", 0) + 1
                 self.save(j, "pass failed")
@@ -1102,6 +1120,18 @@ class Dispatcher:
         except Exception as e:
             log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.report_line()
+        self.beat_end(clean)
+
+    def beat_end(self, clean):
+        if not os.environ.get("FACTORY_CODE_SHA"):
+            return
+        if clean:
+            try:
+                refresh.write(os.path.join(os.environ.get("FACTORY_DATA_DIR", "/state"), "beat-ok"), str(self.beats))
+            except OSError as e:
+                log("-", "beat-ok: %s" % type(e).__name__)
+        if not self.beats % REFRESH_BEATS:
+            self.refresh_to = ask_refresh(self.gh, self.repo, self.refresh_logged)
 
     def read_epic(self, n):
         return json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,labels"]))
@@ -1118,6 +1148,25 @@ class Dispatcher:
             if self.now() - self.started >= REPORT_QUIET_S and text not in self.report_logged:
                 self.report_logged.add(text)
                 log("-", "factory_report: %s" % text)
+
+
+def ask_refresh(gh, repo, logged):
+    code = os.environ.get("FACTORY_CODE_SHA")
+    if not code:
+        return None
+    try:
+        sha = refresh.target(gh, repo, code, os.environ.get("FACTORY_SKIP_SHA"))
+        if sha:
+            refresh.write(os.path.join(os.environ.get("FACTORY_DATA_DIR", "/state"), "refresh-to"), sha)
+            log("-", "refresh to %s" % sha[:7])
+        logged.clear()
+        return sha
+    except Exception as e:  # noqa: BLE001
+        text = str(e) if isinstance(e, (Error, refresh.NoTarget)) else type(e).__name__
+        if text not in logged:
+            logged.add(text)
+            log("-", "refresh check: %s" % text)
+        return None
 
 
 def read_secret(path):
@@ -1145,6 +1194,8 @@ def main(argv=None):
     except OSError as e:
         print("dispatch: cannot read a key file: %s" % type(e).__name__, file=sys.stderr)
         return 1
+    if os.environ.get("FACTORY_START_CHECK") != "0" and ask_refresh(gh, cfg["repo"], set()):
+        return REFRESH_EXIT
     d = Dispatcher(cfg, account, gh)
     log("-", "dispatcher started: %d builders, %d reviewers, label %s, repo %s" % (
         len(pools.types(cfg).get("coder", {}).get("coworkers", [])), len(pools.types(cfg).get("reviewer", {}).get("coworkers", [])), cfg.get("label", "factory"), cfg["repo"]))
@@ -1152,9 +1203,19 @@ def main(argv=None):
         d.once()
         d.close()
         return 0
-    while True:
+    stop = []
+    signal.signal(signal.SIGTERM, lambda *_: stop.append(True))
+    while not stop:
         d.once()
-        time.sleep(cfg.get("poll_s", 30))
+        if d.refresh_to:
+            d.close()
+            return REFRESH_EXIT
+        for _ in range(int(cfg.get("poll_s", 30))):
+            if stop:
+                break
+            time.sleep(1)
+    d.close()
+    return 0
 
 
 if __name__ == "__main__":

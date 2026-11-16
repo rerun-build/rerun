@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: factory-runner.Dockerfile
     working_dir: /app
-    command: ["python3", "-u", "/app/dispatch.py", "run"]
+    command: ["python3", "-u", "/app/launch.py"]
     environment:
       FACTORY_DATA_DIR: /state
       HOME: /tmp
@@ -21,7 +21,7 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
-    mem_limit: 256m
+    mem_limit: 512m
     cpus: 0.5
     logging:
       driver: json-file
@@ -29,6 +29,7 @@ services:
         max-size: 10m
         max-file: "3"
     restart: unless-stopped
+    stop_grace_period: 150s
     healthcheck:
       test: ["CMD", "python3", "-c", "import os,sys,time; sys.exit(0 if time.time() - os.path.getmtime('/state/heartbeat') < 120 else 1)"]
       interval: 30s

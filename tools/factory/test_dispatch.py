@@ -37,6 +37,7 @@ class World:
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
         self.problems, self.reruns = [], []
+        self.commits, self.dev_runs = [], []
 
     @staticmethod
     def goal_ok(goal):
@@ -153,6 +154,10 @@ class World:
         if a[0] == "api" and "/issues/" in a[1]:
             n = int(a[1].rsplit("/", 1)[1])
             return json.dumps({"state": "open" if n in self.open_numbers else "closed", "state_reason": self.close_reasons.get(n, "completed")})
+        if a[0] == "api" and "/commits?" in a[1]:
+            return json.dumps(self.commits)
+        if a[0] == "api" and "/actions/workflows/" in a[1]:
+            return json.dumps({"workflow_runs": self.dev_runs})
         if a[0] == "api":
             sha = a[1].split("head_sha=")[1].split("&")[0]
             return json.dumps({"workflow_runs": self.workflows.get(sha, [])})
@@ -927,7 +932,8 @@ class Goals(Base):
         self.w.finish("r1", "VERDICT: REJECT @abcdef1: no")
         self.tick(2)
         self.assertEqual(goals, [
-            {"lastLineForms": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"}], "turnLimit": 3},
+            {"lastLineForms": [{"prefix": "PR: ", "rest": "pull-url"}, {"prefix": "BLOCKED: ", "rest": "sentence"},
+                               {"prefix": "DONE ELSEWHERE: ", "rest": "sentence"}], "turnLimit": 3},
             {"lastLineForms": [{"prefix": "VERDICT: ", "rest": "sentence"}], "turnLimit": 3},
             {"lastLineForms": [{"prefix": "PUSHED: ", "rest": "sha"}, {"prefix": "BLOCKED: ", "rest": "sentence"}], "turnLimit": 3}])
 
