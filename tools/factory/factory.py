@@ -27,6 +27,7 @@ def max_builders():
 MIN_FREE_MEM_GB, MEMINFO = 4, "/proc/meminfo"
 LOCK_WAIT_S, LOCK_STALE_S = 180, 900
 WT_IDLE_HOURS = 48
+CLONE_SAFE = 1
 QUEUE_LIMIT_S, SLICE_S = 30 * 60, 450
 PR_HEADS = ["## Done", "## Evidence", "## Not changed", "## Unsure", "## Open", "## Next owner and their done-test"]
 WF = r"\.github/(workflows|actions)/|\.github/(CODEOWNERS|dependabot\.yml)$"
@@ -366,8 +367,19 @@ def follow_base(p):
     run([GIT, "checkout", "--quiet", "--detach", "origin/" + base], cwd=p, check=False)
 
 
+class Unprovable(Exception):
+    pass
+
+
+def is_clone(path):
+    return os.path.isdir(os.path.join(path, ".git"))
+
+
 def on_remote(p, sha):
-    return bool(run([GIT, "for-each-ref", "--contains", sha, "refs/remotes/origin"], cwd=p).stdout.strip())
+    r = run([GIT, "for-each-ref", "--contains", sha, "refs/remotes/origin"], cwd=p, check=False)
+    if r.returncode:
+        raise Unprovable(sha)
+    return bool(r.stdout.strip())
 
 
 SWEEP_FETCH = None
@@ -381,7 +393,10 @@ def unsaved(p, path, branch):
         return None
     tips = {run([GIT, "rev-parse", "--verify", "--quiet", ref], cwd=c, check=False).stdout.strip()
             for c, ref in ((path, "HEAD"), (p, "refs/heads/" + branch)) if os.path.isdir(c)} - {""}
-    return [sha for sha in sorted(tips) if not on_remote(p, sha)]
+    try:
+        return [sha for sha in sorted(tips) if not on_remote(p, sha)]
+    except Unprovable:
+        return None
 
 
 def wt_save(p, path, branch):
@@ -393,7 +408,11 @@ def wt_save(p, path, branch):
     for sha in left:
         rb = "rescue/%s-%s" % (branch, sha[:8])
         run([GIT, "push", "--quiet", "origin", "%s:refs/heads/%s" % (sha, rb)], cwd=p, check=False)
-        if not on_remote(p, sha):
+        try:
+            saved = on_remote(p, sha)
+        except Unprovable:
+            saved = False
+        if not saved:
             die("%s has commits on no remote branch (%s) and the push to %s failed. Nothing deleted." % (branch, sha[:8], rb))
         print("RESCUED unpushed commits of %s to origin/%s" % (branch, rb))
 
@@ -455,6 +474,8 @@ def cmd_wt(a):
     branch = "chunk/%s-%s" % (issue, chunk)
     if a[0] == "done":
         p = os.path.join(REPOS, repo)
+        if is_clone(path):
+            die("%s is a job clone, not a worktree of the shared clone. The janitor removes it. Nothing deleted." % path)
         wt_save(p, path, branch)
         if os.path.isdir(path):
             unlink_links(path)
@@ -558,6 +579,8 @@ def pr_lookup(full, branch):
 
 
 def sweep_verdict(full, r, d, path):
+    if is_clone(path):
+        return "KEEP", "a job clone, not a worktree of the shared clone", []
     if not re.fullmatch(r"\d+-[a-z0-9]{1,12}", d):
         return "KEEP", "not made by `wt new`", []
     branch = "chunk/" + d

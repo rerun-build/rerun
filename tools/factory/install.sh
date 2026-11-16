@@ -12,6 +12,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ -n "$PREFIX" ] && [ -n "$KEYFILE" ] || { echo "usage: install.sh --prefix DIR --jev-keyfile P" >&2; exit 2; }
+grep -qx 'CLONE_SAFE = 1' "$HERE/factory.py" || { echo "REFUSED: factory.py lacks the line CLONE_SAFE = 1, so this tree is older than the clone-tolerant code. Nothing written." >&2; exit 2; }
 mkdir -p "$PREFIX/bin" "$PREFIX/factory"
 PREFIX=$(cd "$PREFIX" && pwd)
 for src in "$HERE"/*.py "$HERE"/*.json "$HERE"/*.mjs; do
