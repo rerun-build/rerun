@@ -6,6 +6,7 @@ _PART = re.compile(r"^\s*\*\*Part of(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _WORKER = re.compile(r"^\s*\*\*Worker(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _TEST = re.compile(r"^\s*\*\*Test file(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _THROUGH = re.compile(r"^\s*\*\*Test through(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
+_REFACTOR = re.compile(r"^\s*\*\*Refactor(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _FILES = re.compile(r"^\s*\*\*Files\*\*")
 _BULLET = re.compile(r"^\s*[-*+]\s+(.*)$")
 _TICK = re.compile(r"`([^`]*)`")
@@ -101,6 +102,17 @@ def parse(issue):
         else:
             errors.append("test through: names no interface")
 
+    refactor = False
+    rl = [m.group(1).strip() for m in (_REFACTOR.match(l) for l in lines) if m]
+    if len(rl) > 1:
+        errors.append("refactor: more than one Refactor line")
+    elif rl:
+        v = rl[0].strip("` ").lower()
+        if v == "yes":
+            refactor = True
+        elif v != "no":
+            errors.append("refactor: expected yes or no")
+
     dev = None
     plan = next((m for m in (_PLAN.match(ln) for ln in lines) if m), None)
     if plan:
@@ -110,7 +122,7 @@ def parse(issue):
         else:
             errors.append("plan line: the PLAN READY line must name the dev commit as 'dev <sha>' (7 to 40 hex)")
 
-    return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "through": through, "parent": parent, "dev": dev, "errors": errors}
+    return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "through": through, "refactor": refactor, "parent": parent, "dev": dev, "errors": errors}
 
 
 def cycles(parsed):

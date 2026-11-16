@@ -134,6 +134,10 @@ describe('sqlite ladders', () => {
               2,
               "proposal-headline",
             ],
+            [
+              3,
+              "proposal-dismiss-reason",
+            ],
           ]
         `)
     })
@@ -270,9 +274,28 @@ describe('brain.db v1 to v2', () => {
         await migrateSqlite(client, BRAIN_DB_MIGRATIONS, 'v1-brain.db')
         await BRAIN_DB_MIGRATIONS[1].up(client)
 
-        expect(await sqliteVersion(client)).toBe(2)
+        expect(await sqliteVersion(client)).toBe(3)
         expect(await columns(client, 'brain_proposals')).toEqual(expect.arrayContaining(['headline', 'highlights_json']))
         const waiting = await client.execute("SELECT title, headline, highlights_json FROM brain_proposals WHERE id = 'p1'")
         expect(waiting.rows[0]).toMatchObject({ title: 'Pricing', headline: null, highlights_json: null })
+    })
+})
+
+describe('brain.db v2 to v3', () => {
+    it('adds the dismiss reason of a proposal, and leaves the ones already decided without it', async () => {
+        const client = freshFile('v2-brain')
+        await BRAIN_DB_MIGRATIONS[0].up(client)
+        await BRAIN_DB_MIGRATIONS[1].up(client)
+        await client.execute(
+            "INSERT INTO brain_proposals (id, agent_id, agent_name, session_id, slug, mode, title, type, content, reason, sources_json, fingerprint, created_at, status) VALUES ('p1', 'a1', 'Sales', 's1', 'pricing', 'create', 'Pricing', 'offering', 'Starter is 49.', 'New', '[]', 'f1', '2026-01-01', 'dismissed')"
+        )
+        expect(await columns(client, 'brain_proposals')).not.toContain('dismiss_reason')
+
+        await migrateSqlite(client, BRAIN_DB_MIGRATIONS, 'v2-brain.db')
+
+        expect(await sqliteVersion(client)).toBe(3)
+        expect(await columns(client, 'brain_proposals')).toContain('dismiss_reason')
+        const decided = await client.execute("SELECT status, dismiss_reason FROM brain_proposals WHERE id = 'p1'")
+        expect({ ...decided.rows[0] }).toEqual({ status: 'dismissed', dismiss_reason: null })
     })
 })

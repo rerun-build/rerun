@@ -113,7 +113,7 @@ class FactoryM2Doc(unittest.TestCase):
         if sys.platform == "win32" or shutil.which("sh") is None:
             self.skipTest("no sh")
         here = os.path.join(VPS, "..", "..", "tools", "factory")
-        want = sorted(n for n in os.listdir(here) if (n.endswith(".py") and not n.startswith("test_")) or n.endswith(".json"))
+        want = sorted(n for n in os.listdir(here) if (n.endswith(".py") and not n.startswith("test_")) or n.endswith(".json") or n.endswith(".mjs"))
         with tempfile.TemporaryDirectory() as tmp:
             subprocess.run(["sh", os.path.join(here, "install.sh"), "--prefix", tmp, "--jev-keyfile", "/x"], check=True, capture_output=True)
             got = sorted(n for n in os.listdir(os.path.join(tmp, "factory")) if n != "triggers")

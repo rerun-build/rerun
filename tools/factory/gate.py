@@ -274,6 +274,29 @@ def claims_line(ro, names, builder, others, verdict):
     return ok, "; ".join(lines) or "no shared area with %d open PRs or jobs" % len(others)
 
 
+def ledger_builders(full, jobrepo, jobn, ids, ref):
+    import ledger as L
+    if F.repo_full(jobrepo) != full:
+        return [], "PR body names %s#%s but branch is %s" % (jobrepo, jobn, ref)
+    mj = re.fullmatch(r"factory/job-(\d+)", ref)
+    if mj and mj.group(1) != str(jobn):
+        return [], "PR body names %s#%s but branch is %s" % (jobrepo, jobn, ref)
+    text = (gh_json("repos/%s/issues/%s" % (full, jobn)) or {}).get("body") or ""
+    chunks = {}
+    for ln in L.chunk_lines(text):
+        c = L.chunk(ln)
+        if c:
+            chunks.setdefault(c["id"].lower(), c)
+    out = []
+    for i in ids:
+        c = chunks.get(i.lower())
+        b = ((c or {}).get("builder") or "").strip().lower()
+        if not b:
+            return [], "chunk %s has no builder under ## Chunks of #%s" % (i, jobn)
+        out.append(b)
+    return out, None
+
+
 def gate(repo, n):
     full = F.repo_full(repo)
     pr = gh_json("repos/%s/pulls/%s" % (full, n))
@@ -368,6 +391,10 @@ def gate(repo, n):
 
     need, stop = {"LINUS"}, []
     builder = (fld.get("builder") or "").strip().lower() or None
+    builders, unbound = ([builder] if builder else []), None
+    if m and not mb:
+        builders, unbound = ledger_builders(full, jobrepo, jobn, ids, pr["head"]["ref"])
+        builder = builders[0] if builders else None
     roster_err, ro = None, None
     try:
         ro = F.base_roster(full)
@@ -391,13 +418,15 @@ def gate(repo, n):
     for cm in sorted(gh_json("repos/%s/issues/%s/comments?per_page=100" % (full, n), paginate=True), key=lambda c: c["created_at"]):
         mm = REVIEW_RE.match(cm.get("body") or "")
         if mm and mm.group(2) == s8:
-            if builder and mm.group(3).lower() == builder and mm.group(4) == "ACCEPT":
+            if mm.group(3).lower() in builders and mm.group(4) == "ACCEPT":
                 refused.append(mm.group(3).upper())
                 continue
             verdict[mm.group(3).upper()] = (mm.group(4), cm["html_url"], (cm.get("body") or "")[mm.end():])
     bad = sorted(w for w in need if verdict.get(w, ("", ""))[0] != "ACCEPT")
     if roster_err:
         put("REVIEWS", False, "roster unreadable, failing closed: " + roster_err)
+    elif unbound:
+        put("REVIEWS", False, "builder not bound: " + unbound)
     elif stop:
         put("REVIEWS", False, "STOP: workflow or GitHub settings file touched (Rob only): " + ", ".join(stop[:3]))
     else:

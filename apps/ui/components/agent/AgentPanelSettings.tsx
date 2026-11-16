@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Form, FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { SkeletonForm } from '@/components/ui/skeleton'
 import { Segmented } from '@/components/ui/segmented'
@@ -34,7 +35,7 @@ type AgentPanelSettingsProps = {
 }
 
 type ThinkingChoice = 'none' | 'low' | 'medium' | 'high'
-type ConfigValues = { soul: string; verbosity: EngineVerbosity; thinking: ThinkingChoice }
+type ConfigValues = { soul: string; verbosity: EngineVerbosity; thinking: ThinkingChoice; skim: boolean }
 
 const THINKING_CHOICES: ThinkingChoice[] = ['none', 'low', 'medium', 'high']
 const THINKING_UNSUPPORTED = new Set<string>(['codex', 'opencode', 'custom'])
@@ -59,7 +60,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
     const [saved, setSaved] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const form = useForm<ConfigValues>({ defaultValues: { soul: '', verbosity: 'normal', thinking: 'none' } })
+    const form = useForm<ConfigValues>({ defaultValues: { soul: '', verbosity: 'normal', thinking: 'none', skim: false } })
     const {
         formState: { isSubmitting },
     } = form
@@ -90,6 +91,7 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                     soul: detail.soul,
                     verbosity: c.verbosity,
                     thinking: c.thinkingLevel ?? 'none',
+                    skim: c.pages?.skim === true,
                 })
                 setProvider(c.provider)
             })
@@ -98,9 +100,14 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [agent.id])
 
-    const handleSave = form.handleSubmit(async ({ soul, verbosity, thinking }) => {
+    const handleSave = form.handleSubmit(async ({ soul, verbosity, thinking, skim }) => {
         setError(null)
-        const result = await updateAgentConfigAction(agent.id, { soul, verbosity, thinkingLevel: thinking === 'none' ? null : thinking })
+        const result = await updateAgentConfigAction(agent.id, {
+            soul,
+            verbosity,
+            thinkingLevel: thinking === 'none' ? null : thinking,
+            ...(form.formState.dirtyFields.skim ? { pages: { skim } } : {}),
+        })
         if (result.success) {
             setSaved(true)
             setTimeout(() => setSaved(false), 2000)
@@ -194,6 +201,31 @@ export function AgentPanelSettings({ agent }: AgentPanelSettingsProps) {
                                 </FormItem>
                             )}
                         />
+
+                        <Field label={t('pages.label')} helperText={t('pages.helper')}>
+                            <FormField
+                                control={form.control}
+                                name="skim"
+                                render={({ field }) => (
+                                    <FormItem className="flex items-start justify-between gap-3 space-y-0">
+                                        <div className="flex flex-col gap-0.5">
+                                            <span>{t('pages.skim.label')}</span>
+                                            <span>{t('pages.skim.helper')}</span>
+                                        </div>
+                                        <FormControl>
+                                            <Switch data-testid="pages-skim" checked={field.value} onCheckedChange={field.onChange} disabled={!canManage} className="shrink-0" />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="flex items-start justify-between gap-3">
+                                <div className="flex flex-col gap-0.5">
+                                    <span>{t('pages.standing.label')}</span>
+                                    <span>{t('pages.standing.locked')}</span>
+                                </div>
+                                <Switch data-testid="pages-standing" checked={false} disabled className="shrink-0" />
+                            </div>
+                        </Field>
                     </form>
                 </Form>
 

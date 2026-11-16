@@ -118,6 +118,8 @@ def final_state(j, forms):
 
 TAIL = "\n".join([
     '',
+    planning.GOAL_LINE,
+    '',
     'orchestrate this frugally between various models and their thinking efforts by giving them the correct tasks, use symforge for codebase inteligence and terminal commander for work with terminal',
     '',
     'The "Code tools" section of your own instructions decides which tools you have, and SymForge is off for everyone. Where the line above names a tool you do not have, your instructions win.',

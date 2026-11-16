@@ -16,18 +16,28 @@ type CustomMcpRowProps = {
     server: CustomMcpServer
     status: CustomMcpStatus | undefined
     statusLoading: boolean
+    checkedAt: number | null
     onConnect: () => void
     onEdit: () => void
     onRemove: () => void
     disabledReason?: string
 }
 
-export function CustomMcpRow({ server, status, statusLoading, onConnect, onEdit, onRemove, disabledReason }: CustomMcpRowProps) {
+export function CustomMcpRow({ server, status, statusLoading, checkedAt, onConnect, onEdit, onRemove, disabledReason }: CustomMcpRowProps) {
     const t = useTranslations('services.customMcp')
     const disabled = !!disabledReason
     const canSignIn = status?.status === 'needs_auth' && !!server.signInUrl
+    const checkedTime = typeof checkedAt === 'number' ? new Date(checkedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : null
+    const footer =
+        status?.status === 'error' ? (
+            <span className="text-xs text-destructive">
+                {status.error ?? t('status.noAnswer')}
+                {checkedTime !== null && ` · ${t('status.checkedAt', { time: checkedTime })}`}
+            </span>
+        ) : undefined
     return (
         <PanelRow
+            footer={footer}
             leading={<Icon {...serviceIconProps(server.icon, 'custom')} size="sm" />}
             title={
                 <span className="flex min-w-0 items-center gap-1.5">
