@@ -104,6 +104,15 @@ export const factoryDigestSchema = z.object({
         blocks: z.object({ blocked: count, rejected: count, failed: count, returned: count }),
         tokensPerMerged: z.number().min(0).nullable(),
     }),
+    planners: z.array(z.object({
+        planner: z.string().max(64),
+        cut: count,
+        merged: count,
+        firstPass: count,
+        firstPassYield: z.number().min(0).max(1).nullable(),
+        stopped: count,
+        replans: count,
+    })).max(20).optional(),
 })
 
 export const factoryRunStatsSchema = z.object({
