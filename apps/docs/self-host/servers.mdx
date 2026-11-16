@@ -16,27 +16,23 @@ You need a machine with Docker. It can be the same machine as the app, another c
     Open the workspace menu, the pill in the top left corner of the app, and click **Servers**. The dialog shows the workspace's server, or an **Add server** button when it has none.
   </Step>
   <Step title="Get the command">
-    Click **Add server**. Fill **Address the app reaches it at** if you know it, for example `http://100.101.102.103:3000` or `https://engine.example.com`. Then copy the command.
+    Click **Add server**. Fill **Address the app reaches it at (optional)** if you know it, for example `http://100.101.102.103:3000` or `https://engine.example.com`. Then click **Copy the command**.
 
     ```bash
     docker run -d --name rerun-engine --restart unless-stopped \
-      -p 3000:3000 -v rerun-engine:/data \
+      -p 3000:3000 -v rerun-engine:/data --shm-size 2g \
       -e RERUN_HUB_URL=https://rerun.example.com \
       -e RERUN_PAIR_TOKEN=rrn_pair_... \
       -e RERUN_PUBLIC_URL=https://engine.example.com \
       ghcr.io/rerun-build/rerun-engine:latest
     ```
 
-    The command works once, for 15 minutes, and only for this workspace.
+    The command works once, for 15 minutes, and only for this workspace. `RERUN_HUB_URL` is your `NEXT_PUBLIC_APP_URL`, and the `RERUN_PUBLIC_URL` line only appears when you filled the address. `--shm-size 2g` gives Chromium the shared memory it needs on heavy pages.
   </Step>
   <Step title="Run it on the server">
     Paste it in a terminal on the machine. The dialog waits, and shows the server as **Connected** as soon as it is attached.
   </Step>
 </Steps>
-
-<Tip>
-  Add `--shm-size 2g` to the command, before the image name. The engine started by docker compose has it: it keeps Chromium from crashing on heavy pages.
-</Tip>
 
 ### What happens behind the command
 
@@ -45,7 +41,9 @@ You need a machine with Docker. It can be the same machine as the app, another c
 3. The app checks it can reach the server: first `GET /health`, then a call that needs the key.
 4. Only then does the app attach the server to the workspace, and spend the token.
 
-The address the app uses is `RERUN_PUBLIC_URL` when you set it. Without it, the app takes the address the request came from, on port 3000. Set it whenever the server sits behind a proxy, a NAT or a tunnel.
+The address the app uses is `RERUN_PUBLIC_URL` when you set it. Without it, the app takes the IP address the pairing request came from, as `http://` on port 3000: right for a server on your network that publishes the engine on 3000, wrong behind a proxy, a NAT or a tunnel, and never `https://`. Set it in those cases.
+
+The server also learns the app's address from the pairing and keeps it, with its key, in its data-dir (`/data/hub.json` and `/data/engine.key`): later starts need neither the token nor `RERUN_HUB_URL`.
 
 ### When it does not connect
 
@@ -71,7 +69,20 @@ The server also needs to reach the app. `RERUN_HUB_URL` is your `NEXT_PUBLIC_APP
 
 ### Enter a server by hand
 
-For an engine you started yourself with your own `RERUN_API_KEY`, click **Enter address and key** instead of **Add server**. Fill the address and the key, and click **Connect**. The app runs the same two checks before attaching it.
+For an engine you start without a pairing token, click **Enter address and key** instead of **Add server**. Fill the address and the key, and click **Connect**. The app runs the same two checks before attaching it.
+
+Such an engine does not learn the app's address from a pairing, so start it with two variables of your own:
+
+- `RERUN_API_KEY`, a long random string, the key you enter in the dialog. An engine started with no key and no pairing token answers every call without asking for one.
+- `RERUN_HUB_BASE_URL`, the address the server reaches your app at. Without it, the engine cannot call the app back: no notifications, no Rerun models, no embeddings, no web search.
+
+```bash
+docker run -d --name rerun-engine --restart unless-stopped \
+  -p 3000:3000 -v rerun-engine:/data --shm-size 2g \
+  -e RERUN_API_KEY=<a long random string> \
+  -e RERUN_HUB_BASE_URL=https://rerun.example.com \
+  ghcr.io/rerun-build/rerun-engine:latest
+```
 
 ## Networking
 

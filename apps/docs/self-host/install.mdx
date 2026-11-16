@@ -17,11 +17,11 @@ This page takes about ten minutes, plus the time Docker needs to build the two i
 ## 1. Get the code
 
 ```bash
-git clone https://github.com/rerun-build/rerun.git && cd rerun
+git clone --branch master https://github.com/rerun-build/rerun.git && cd rerun
 cp .env.example .env
 ```
 
-Every command below runs from this folder.
+`master` is the released code: every version is cut from it, with its tag and its [release notes](https://github.com/rerun-build/rerun/releases). A plain `git clone` lands on `dev`, the working branch, which moves every day. Every command below runs from this folder.
 
 ## 2. Set up Supabase
 
@@ -42,22 +42,10 @@ Pick one. The first is simpler to keep running, the second is the full open sour
 
     4. In **Authentication > Sign In / Providers**, turn on **Allow anonymous sign-ins** and keep **Confirm email** on. A visitor lands on the board as an anonymous user, and signing up turns that user into an account.
     5. In **Authentication > Emails > SMTP Settings**, turn on **Custom SMTP** and enter your SMTP server. This step is required: on the Free plan, a project that keeps Supabase's own mailer cannot edit its email templates, so the email arrives without the code. That mailer also sends only 2 emails an hour, and only to the members of your Supabase organization.
-    6. Once SMTP is saved, in **Authentication > Email Templates**, paste the template below into **Magic Link**, **Confirm signup** and **Change Email Address**. Rerun signs people in with a 6-digit code, and Supabase's default templates only carry a link.
+    6. Once SMTP is saved, in **Authentication > Email Templates**, paste the content of `supabase/templates/magic_link.html` from your clone into **Magic Link**, **Confirm signup** and **Change Email Address**, with the subject `Your Rerun code`. Rerun signs people in with a 6-digit code, and Supabase's default templates only carry a link.
     7. In **Authentication > URL Configuration**, set the **Site URL** to the address people open, the same as `NEXT_PUBLIC_APP_URL` below.
 
-    ```html Email template
-    <!doctype html>
-    <html>
-      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #111; padding: 24px">
-        <p>Your Rerun code:</p>
-        <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
-        <p>It works for 15 minutes. Or open this link on the same device: <a href="{{ .ConfirmationURL }}">sign in to Rerun</a>.</p>
-        <p style="color: #666; font-size: 13px">If you did not ask for it, ignore this email.</p>
-      </body>
-    </html>
-    ```
-
-    The same file lives in your clone at `supabase/templates/magic_link.html`. The template says 15 minutes: set **Email OTP Expiration** to `900` seconds in the email provider settings to match, and keep **Email OTP Length** at 6.
+    The template carries the code (`{{ .Token }}`) and a sign-in link, in the language of the account: English, French, Spanish, Portuguese or German, read from the `locale` the app writes on the account, English otherwise. It says the code works for 15 minutes: set **Email OTP Expiration** to `900` seconds in the email provider settings to match, and keep **Email OTP Length** at 6.
 
     Fill `.env` with what you copied:
 
@@ -185,15 +173,18 @@ Pick one. The first is simpler to keep running, the second is the full open sour
 
 ## 3. Fill the rest of `.env`
 
-Three more lines:
+A few more lines:
 
 ```bash .env
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+RERUN_HUB_BASE_URL=http://localhost:3000
 OPENROUTER_API_KEY=sk-or-...
 ADMIN_EMAILS=you@example.com
 ```
 
-`NEXT_PUBLIC_APP_URL` is the address people type in their browser, without a trailing slash. Keep `http://localhost:3000` to try Rerun on this machine. For a team, use the address they will reach it at, for example `https://rerun.example.com`. `ADMIN_EMAILS` is baked in by the build, so set it now. Every other variable is optional: see [Configuration](/self-host/configuration).
+`NEXT_PUBLIC_APP_URL` is the address people type in their browser, without a trailing slash. Keep `http://localhost:3000` to try Rerun on this machine. For a team, use the address they will reach it at, for example `https://rerun.example.com`. Put the same address in `RERUN_HUB_BASE_URL`: the links to the files your coworkers publish start with it. `ADMIN_EMAILS` is baked in by the build, so set it now.
+
+Every other variable is optional: see [Configuration](/self-host/configuration). To have Rerun email invitations, add a [Resend](https://resend.com) key: see [Email](/self-host/configuration#email).
 
 ## 4. Run the check
 
@@ -202,6 +193,12 @@ node scripts/self-host-check.mjs
 ```
 
 It generates the three secrets left empty (`RERUN_ENGINE_API_KEY`, `FOREMAN_HUB_TOKEN_SECRET`, `BOARD_IMAGE_SECRET`), checks the required values, then asks Supabase whether the schema is in place and `SUPABASE_SECRET_KEY` is the secret key. It stops with a plain message on anything only you can fix, warns when `OPENROUTER_API_KEY` is empty, and prints the exact command to start.
+
+One secret is not generated by the check, and every app a coworker signs in to by OAuth needs it. Add it once:
+
+```bash
+node -e "console.log('MOBILE_OAUTH_TICKET_SECRET=' + require('crypto').randomBytes(32).toString('hex'))" >> .env
+```
 
 ## 5. Start Rerun
 
@@ -241,10 +238,11 @@ docker compose logs -f app engine
 
 On your own computer, skip this section. On a server, people reach Rerun over HTTPS and nothing else stays open.
 
-Set the engine's address in `.env`, before the build:
+Set the addresses in `.env`. `NEXT_PUBLIC_APP_URL` is baked in by the build, so set it before the first one. `RERUN_HUB_BASE_URL` and `RERUN_ENGINE_BROWSER_URL` are read when the app runs: a change only needs `docker compose up -d`.
 
 ```bash .env
 NEXT_PUBLIC_APP_URL=https://rerun.example.com
+RERUN_HUB_BASE_URL=https://rerun.example.com
 RERUN_ENGINE_BROWSER_URL=https://engine.example.com
 ```
 
@@ -304,6 +302,8 @@ From here, the coworker works exactly as on Rerun Cloud: see the [Quickstart](/q
 git pull
 docker compose up -d --build
 ```
+
+On `master`, `git pull` brings the latest version. Read the **Upgrade** section of its [release notes](https://github.com/rerun-build/rerun/releases) first: a patch (`v0.15.1`) only asks to pull, a minor (`v0.16.0`) lists what to change by hand.
 
 The engine migrates its data-dir on start. When a release adds database migrations, apply them too: `npx supabase db push` for a project on supabase.com, the same command with `--yes --db-url` and the address from [Install](#2-set-up-supabase) for open source Supabase, or `npx supabase migration up` for the local stack.
 

@@ -1,6 +1,6 @@
 ---
 title: "Services and apps"
-description: "The catalog that ships with Rerun, any MCP server you add, and Composio for Google, Microsoft and the rest."
+description: "The catalog that ships with Rerun, any MCP server you add, Composio for Google, Microsoft and the rest, and the OAuth apps an install brings itself."
 ---
 
 A coworker reaches your tools through apps: Stripe, Notion, Slack, GitHub and hundreds more. On your install, they come from three places: the catalog, any MCP server you register, and Composio if you turn it on.
@@ -16,22 +16,25 @@ Each service declares how it connects:
 | How | What you need on a self-hosted install |
 | --- | --- |
 | **API key** | Nothing. You paste the key in a masked form when you install it |
-| **OAuth** | Nothing. You sign in to the service in a browser window, and the token is stored on your server |
+| **OAuth** | `MOBILE_OAUTH_TICKET_SECRET` in `.env`, which every OAuth sign-in needs. You sign in to the service in a browser window, and the token is stored on your server. GitHub and Asana also need an OAuth app of yours: see [OAuth apps of your own](#oauth-apps-of-your-own) |
 | **Command** | Nothing. The engine runs the MCP command on your server |
 | **Composio** | A Composio key and an auth config per service. See [Composio](#composio) |
-| **Managed** | An OAuth app of your own with the service. See [Managed sign-in](#managed-sign-in) |
+| **Managed** | An OAuth app of your own with the service. See [OAuth apps of your own](#oauth-apps-of-your-own) |
 
 Search uses embeddings when `RERUN_EMBED_API_KEY` is set, and keywords otherwise. The catalog lives in the `services` table: an admin can turn a service off by setting `enabled` to false in Supabase Studio.
 
 ## Any MCP server
 
-When the catalog does not have what you need, register the service's MCP server on a coworker yourself. Switch on **Expert mode** at the bottom of the coworker panel, open the **MCP** tab, and add an HTTP, SSE or local command server, with its own headers, OAuth or environment variables.
+When the catalog does not have what you need, register the service's MCP server yourself:
 
-Reference a stored secret with `${VARIABLE_NAME}`: it resolves on your server at run time. Anything with an MCP server works with Rerun this way, catalog or not.
+- **For one coworker**: open its **Apps**, then the **MCP** tab, and add an HTTP, SSE or local command server, with its own headers, OAuth or environment variables.
+- **For the whole workspace**: in the [Vault](/vault#add-an-mcp-server), click **Add**, pick **MCP server**, give it an https address or the command the machine starts, then pick the coworkers that use it.
+
+Reference a stored secret with `${VARIABLE_NAME}`: it resolves on your server at run time. Anything with an MCP server works with Rerun this way, catalog or not. An MCP server that signs in by OAuth needs `MOBILE_OAUTH_TICKET_SECRET`, like the catalog's.
 
 ## Composio
 
-[Composio](https://composio.dev) connects 2,000+ apps by OAuth, and Rerun uses it for the services that are hard to sign in to otherwise. In the seeded catalog that is the Google family (Gmail, Calendar, Drive, Docs, Sheets, Slides, Meet, Tasks, Photos, Analytics, Search Console, BigQuery), the Microsoft family (Outlook, Teams, OneDrive, Excel, SharePoint), plus Canva, Instagram, LinkedIn, Reddit and YouTube.
+[Composio](https://composio.dev) connects apps by OAuth, and Rerun uses it for the services that are hard to sign in to otherwise. In the seeded catalog that is 23 services: the Google family (Gmail, Calendar, Drive, Docs, Sheets, Slides, Meet, Tasks, Photos, Analytics, Search Console, BigQuery), the Microsoft family (Outlook, Teams, OneDrive, Excel, SharePoint, Dynamics 365), plus Canva, Instagram, LinkedIn, Reddit and YouTube.
 
 Composio is optional. Without it, those services do not connect, and everything else works.
 
@@ -39,7 +42,7 @@ To turn it on:
 
 <Steps>
   <Step title="Set the key">
-    Create a Composio project, copy its API key into `COMPOSIO_API_KEY` in `.env`, and run `docker compose up -d`.
+    Create a Composio project, copy its API key into `COMPOSIO_API_KEY` in `.env`, and run `docker compose up -d`. `MOBILE_OAUTH_TICKET_SECRET` must be set too.
   </Step>
   <Step title="Create an auth config per service">
     The auth config ids in the seed are empty: the ones Rerun Cloud uses belong to its own Composio project. In your Composio dashboard, create an auth config for each toolkit you want, for example `gmail`, and copy its id (`ac_...`).
@@ -55,14 +58,25 @@ The service now connects like any other: the person signs in on Composio's page,
   Several Rerun installs can share one Composio project. Give each one its own `COMPOSIO_USER_NAMESPACE` (default `local`), so their connected accounts never mix.
 </Tip>
 
-## Managed sign-in
+## OAuth apps of your own
 
-Two services in the catalog, Facebook and Typeform, sign in through an OAuth app that Rerun itself holds. On your install, that OAuth app has to be yours:
+A few services sign in through an OAuth app that Rerun Cloud registered with the service. On your install, that OAuth app has to be yours:
 
-1. Create an OAuth app with the service, with the redirect URL `NEXT_PUBLIC_APP_URL/api/oauth/managed/facebook/callback` or `.../typeform/callback`.
-2. Put its credentials in `.env`: `RERUN_FACEBOOK_CLIENT_ID` and `RERUN_FACEBOOK_CLIENT_SECRET`, or `RERUN_TYPEFORM_CLIENT_ID` and `RERUN_TYPEFORM_CLIENT_SECRET`.
+| Service | Sign-in it serves | Redirect URL | Variables |
+| --- | --- | --- | --- |
+| GitHub | **Sign in with GitHub** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` | `RERUN_GITHUB_MCP_CLIENT_ID`, `RERUN_GITHUB_MCP_CLIENT_SECRET` |
+| Asana | **Sign in with Asana** | `NEXT_PUBLIC_APP_URL/api/mcp/oauth/callback` | `RERUN_ASANA_MCP_CLIENT_ID`, `RERUN_ASANA_MCP_CLIENT_SECRET` |
+| Facebook | **Connect with Facebook** | `NEXT_PUBLIC_APP_URL/api/oauth/managed/facebook/callback` | `RERUN_FACEBOOK_CLIENT_ID`, `RERUN_FACEBOOK_CLIENT_SECRET` |
+| Typeform | **Connect with Typeform** | `NEXT_PUBLIC_APP_URL/api/oauth/managed/typeform/callback` | `RERUN_TYPEFORM_CLIENT_ID`, `RERUN_TYPEFORM_CLIENT_SECRET` |
+
+1. Create the OAuth app with the service, with the redirect URL of the table.
+2. Put its client id and secret in `.env`.
 3. Run `docker compose up -d`.
+
+Without them, GitHub and Asana still connect with a personal access token, their other sign-in method. Facebook and Typeform have no other one, so they do not connect.
+
+The other OAuth services of the catalog register Rerun with the service on their own, at the first sign-in, and need nothing more than `MOBILE_OAUTH_TICKET_SECRET`.
 
 ## Paid apps
 
-LinkedIn Pro and WhatsApp Pro are paid apps of Rerun Cloud. They are in the catalog but switched off. For the same jobs, connect an MCP server or a Composio app. See [Open source and Cloud](/self-host/open-source-vs-cloud).
+LinkedIn Pro and WhatsApp Pro are paid apps of Rerun Cloud. Their rows come with the database migrations, switched off, and a paid app never installs on this build. For the same jobs, connect an MCP server or a Composio app. See [Open source and Cloud](/self-host/open-source-vs-cloud).

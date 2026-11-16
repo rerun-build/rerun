@@ -7,13 +7,14 @@ Bug reports, fixes and docs are welcome. This page is the short version of `CONT
 
 ## Run it from source
 
-You need Node 22, pnpm 8 (`corepack enable`), Docker for the local Supabase, and an OpenRouter key.
+You need Node 22, pnpm 8 (`corepack enable`), Docker for the local Supabase, and an OpenRouter key. Work from `dev`, the branch a plain `git clone` lands on.
 
 <Steps>
   <Step title="Install and start Supabase">
     ```bash
     pnpm install
     npx supabase start      # Postgres, auth, storage and Mailpit on ports 54420 to 54429
+    pnpm --filter @rerun/contracts build
     ```
   </Step>
   <Step title="Configure the app">
@@ -25,15 +26,15 @@ You need Node 22, pnpm 8 (`corepack enable`), Docker for the local Supabase, and
 
     ```bash
     node scripts/self-host-check.mjs
+    node -e "console.log('MOBILE_OAUTH_TICKET_SECRET='+require('crypto').randomBytes(32).toString('hex'))" >> .env
     cp .env apps/ui/.env
-    echo "RERUN_ENGINE_URL=http://localhost:3000" >> apps/ui/.env
+    printf 'RERUN_ENGINE_URL=http://localhost:3000\nRERUN_ENGINE_BROWSER_URL=http://localhost:3000\n' >> apps/ui/.env
     ```
 
-    `RERUN_ENGINE_URL` gives the engine below to the first workspace that needs one.
+    The check generates `RERUN_ENGINE_API_KEY`, `FOREMAN_HUB_TOKEN_SECRET` and `BOARD_IMAGE_SECRET`; ignore the `docker compose` command it prints. `MOBILE_OAUTH_TICKET_SECRET` is needed to sign in to any app by OAuth. `RERUN_ENGINE_URL` gives the engine below to the first workspace that needs one, and `RERUN_ENGINE_BROWSER_URL` is where your browser opens its screen.
   </Step>
   <Step title="Start the app">
     ```bash
-    pnpm --filter @rerun/contracts build
     pnpm dev:ui             # http://localhost:3050
     ```
   </Step>
@@ -63,9 +64,12 @@ pnpm -r --if-present ts-check
 pnpm --filter rerun lint
 pnpm --filter rerun test
 pnpm --filter rerun-engine test
+pnpm --filter rerun-mobile test
+pnpm --filter rerun-desktop test
+pnpm i18n:check
 ```
 
-CI runs the same, plus every migration on an empty database and a build of both Docker images.
+CI runs these, builds the desktop app, applies every migration and the seed to an empty database, builds both Docker images and the desktop installers, and tests the Android native modules. It runs on every push and pull request to `master` and `staging`. A pull request to `dev` does not start it, so run the checks yourself before you open one.
 
 ## The code
 
@@ -73,27 +77,33 @@ CI runs the same, plus every migration on an empty database and a build of both 
 |---|---|
 | `apps/ui` | The web app and its API (Next.js). Talks to Supabase and to the engine of each workspace |
 | `apps/engine` | The engine: runs the coworkers, their tools, their memory, their browser and screen |
+| `apps/mobile` | The mobile app (Expo) |
+| `apps/desktop-app` | The desktop app (Electron) |
 | `apps/docs` | This documentation (Mintlify) |
-| `packages/contracts` | Types and schemas shared by the app and the engine |
+| `packages/contracts` | Types and schemas shared by the app, the engine and the mobile app |
 | `packages/ui` | The design system and the board |
+| `packages/i18n` | The language packs: English is the source, the others are generated |
 | `supabase/migrations` | The database schema, one migration per change |
 
-`CLAUDE.md` holds the conventions of the codebase, and is what coding agents read. Three of them matter most:
+`CLAUDE.md` holds the conventions of the codebase, and is what coding agents read. Four of them matter most:
 
 - **Supabase access** goes through the typed helpers for reads, and every write states its payload type.
 - **Responsive** from the first version: every screen works on a phone, a tablet and a desktop.
+- **Language packs**: every string a person sees goes through `t()`, and `pnpm i18n:check` keeps the packs in step with the English source. Details in `packages/i18n/README.md`.
 - **Engine data-dir migrations**: anything that changes what the engine keeps on disk is a new numbered step at the end of its ladder, never an edit of a shipped one. Details in `apps/engine/README.md`.
 
 A schema change is a new migration: `pnpm db:new <name>` creates the file, and `pnpm db:reset` replays every migration and the seed on the local stack.
 
-`apps/ui/cloud/` is the seam where Rerun Cloud plugs in billing, paid apps, emails and its machine pool. In this repository it holds the self-hosted behaviour. Pull requests that change what it exports are unlikely to be merged.
+`apps/ui/cloud-oss/` is the self-hosted side of the seam where Rerun Cloud plugs in what it runs differently: billing, paid apps, its machine pool, push notifications. The code reaches it as `@rerun/cloud/<domain>`. Pull requests that change what it exports are unlikely to be merged.
 
 ## Pull requests
 
 1. Open an issue first for anything bigger than a fix, so you agree on the direction before writing code.
-2. Keep a pull request to one change, with tests where the code has them.
-3. Sign the CLA when the bot asks: once, for all your contributions.
+2. Branch from `dev` and open the pull request against `dev`.
+3. Keep a pull request to one change, with tests where the code has them, and fill the template.
 
-Rerun is developed in a private repository that Rerun Cloud deploys from, and this repository is published from it at each release. A merged pull request is applied there with its author kept, and comes back here with the next release, credited in the release notes.
+`dev` is the working branch. A release moves `master` to `dev`, publishes the version tag and its release notes, and is the code Rerun Cloud runs, so a merged pull request ships to both.
 
-What will not be merged: anything that touches `apps/ui/cloud/`, a dependency with a license incompatible with the AGPL, or a feature that only makes sense for one deployment.
+What will not be merged: anything that changes what `apps/ui/cloud-oss/` exports, a dependency with a license incompatible with the AGPL, or a feature that only makes sense for one deployment.
+
+A vulnerability never goes in a public issue or pull request: email help@rerun.build, as `SECURITY.md` says.

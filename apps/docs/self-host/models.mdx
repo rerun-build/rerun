@@ -7,15 +7,9 @@ Every coworker thinks with one model at a time. On a self-hosted Rerun you pay t
 
 ## The Rerun models
 
-A new coworker starts on **Rerun**, with three tiers to pick from:
+A new coworker starts on **Rerun**. The Rerun models come in three tiers, Fast, Balanced and Smart, and the model pickers only offer Balanced, shown as **Rerun**. A coworker set on Fast or Smart before keeps running on it, shown as **Rerun Fast** or **Rerun Smart**.
 
-| Tier | For |
-| --- | --- |
-| **Fast** | Quick, simple jobs |
-| **Balanced** | Everyday work. The default |
-| **Smart** | The hardest tasks |
-
-On your install, these run on your `OPENROUTER_API_KEY`. The engine asks the app, the app relays the call to OpenRouter with your key, and nothing is counted. All three tiers are open to every workspace.
+On your install, these run on your `OPENROUTER_API_KEY`. The engine asks the app, the app relays the call to OpenRouter with your key, and nothing is counted. The app relays all three tiers for every workspace.
 
 The app only relays for engines it knows, so your key never serves anybody else. The Chief of Staff's onboarding and its helpers run on the same key. Without the key, the Chief of Staff skips the onboarding and runs on the model you pick for it, like any coworker.
 
@@ -25,7 +19,7 @@ The app only relays for engines it knows, so your key never serves anybody else.
 
 Without `OPENROUTER_API_KEY`, a coworker on a Rerun model answers with an error asking you to set the key or connect another provider. Connect one below and pick it, and the coworker works again.
 
-The OpenRouter model behind each tier is set in `RERUN_UPSTREAM_MODELS`, in `apps/ui/lib/engine/constants.ts`. Change it and rebuild to run a tier on another model.
+The OpenRouter model behind each tier is set in `RERUN_UPSTREAM_MODELS`, in `apps/ui/lib/engine/constants.ts`. Change it and rebuild to run a tier on another model. The same key also transcribes voice messages: see [Configuration](/self-host/configuration#ai) for the models of the Chief of Staff and its helpers.
 
 ## Your own API keys
 
@@ -92,13 +86,17 @@ Paste an OpenCode key (it starts with `oc_sk_`, get one at [opencode.ai/auth](ht
 
 The Go catalog also carries models OpenCode serves for nothing, marked **Free**. They are listed but start switched off, because a free endpoint can train on what it is sent: switch on the ones you want your coworkers to use for rough work. One of them, Iceman Contributor Free, answers with an error until the OpenCode account allows endpoints that train on request data, in its own console. The free models of the Console catalog are not offered: OpenCode refuses them to an API key and answers "subscribe to OpenCode Go".
 
-A model sold on both sides appears twice, once per catalog. OpenCode runs inside the engine itself, with no command-line tool. Your app only offers it once `NEXT_PUBLIC_OPENCODE_ENABLED=1` is set and the engine is recent enough to run it.
+A model sold on both sides appears twice, once per catalog. OpenCode runs inside the engine itself, with no command-line tool.
+
+<Warning>
+  The app only offers OpenCode when it was built with `NEXT_PUBLIC_OPENCODE_ENABLED=1`, on a server whose engine is recent enough to run it. `docker-compose.yml` does not pass that variable to the build, so an install started with docker compose does not offer OpenCode yet.
+</Warning>
 
 ## Choose the model per coworker
 
-Click the model name above a coworker's message box. The picker lists the Rerun tiers, your plans and your keys, with a power rating and the context window of each model.
+Click the model name above a coworker's message box. The picker lists the Rerun model, your plans and your keys, with a power rating and the context window of each model.
 
-Picking a model in the chat changes it for that conversation. Click **Set as default** to change it for the coworker. See [Configure a coworker](/agents/configure#model-and-provider) for the details.
+Picking a model in the chat changes it for that conversation. The button beside a model, **Set as coworker default**, changes it for the coworker. See [Configure a coworker](/agents/configure#model-and-provider) for the details.
 
 ## Embeddings
 

@@ -15,14 +15,15 @@ description: "Run Rerun on a server managed by Dokploy, with a domain and HTTPS.
 ## 1. Create the service
 
 1. In a Dokploy project, add a **Compose** service, type **Docker Compose**.
-2. Point it at your clone of `https://github.com/rerun-build/rerun.git`, branch `main`, compose path `./docker-compose.yml`.
+2. Point it at your clone of `https://github.com/rerun-build/rerun.git`, branch `master`, compose path `./docker-compose.yml`. `master` is the released code; `dev`, the default branch of the repository, is the working one.
 
 ## 2. Set the environment
 
-Paste the content of your `.env` in the **Environment** tab. Start from `.env.example` and run `node scripts/self-host-check.mjs` on your machine to generate the secrets. Three values depend on your domains:
+Paste the content of your `.env` in the **Environment** tab. Start from `.env.example`, run `node scripts/self-host-check.mjs` on your machine to generate the secrets, and add `MOBILE_OAUTH_TICKET_SECRET` as in [Run the check](/self-host/install#4-run-the-check). Four values depend on your domains:
 
 ```bash .env
 NEXT_PUBLIC_APP_URL=https://rerun.example.com
+RERUN_HUB_BASE_URL=https://rerun.example.com
 NEXT_PUBLIC_SUPABASE_URL=<the address of your Supabase>
 RERUN_ENGINE_BROWSER_URL=https://engine.example.com
 ```
@@ -57,4 +58,4 @@ Then [sign in](/self-host/install#7-sign-in).
 
 ## Updating
 
-Pull the new version into your clone, then click **Deploy**. The engine keeps its data in the `engine-data` volume. When a release adds database migrations, apply them with `npx supabase db push`.
+Read the release notes first, as in [Updating](/self-host/install#updating). Bring the `master` branch of your clone up to the new version, then click **Deploy**: Dokploy fetches the branch before it builds. The engine keeps its data in the `engine-data` volume. When a release adds database migrations, apply them with `npx supabase db push`.

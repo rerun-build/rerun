@@ -3,7 +3,7 @@ title: "Open source and Rerun Cloud"
 description: "What the open source build leaves out, and how to get the same result on your install."
 ---
 
-Rerun Cloud is the same Rerun, hosted, plus what only a hosted service can offer: machines ready in seconds, included model credit, paid data, emails. The coworkers, the chat, the board and the Chief of Staff are the same code in both.
+Rerun Cloud is the same Rerun, hosted, plus what only a hosted service can offer: machines ready in seconds, included model credit, paid apps and paid data. The coworkers, the chat, the board and the Chief of Staff are the same code in both.
 
 ## Side by side
 
@@ -16,7 +16,8 @@ Rerun Cloud is the same Rerun, hosted, plus what only a hosted service can offer
 | AI models | Your keys or subscriptions | Included credit, or your keys |
 | LinkedIn Pro, WhatsApp Pro | | ✅ |
 | Paid data (leads, SEO, social) | | ✅ |
-| Email notifications and invitations | | ✅ |
+| Email invitations | With your own Resend key | ✅ |
+| Push notifications on the mobile app | | ✅ |
 | Updates | Each release | Continuous |
 | Support | Community | ✅ |
 
@@ -38,17 +39,17 @@ Two paid apps of Rerun Cloud that act on a LinkedIn or WhatsApp account for a co
 
 On Rerun Cloud, coworkers can buy data by the call: lead lists, SEO metrics, social profiles. Here, add those providers (Apollo, Semrush and the like) as services or MCP servers, with your own API keys.
 
-### Email notifications and invitations
+### Email invitations
 
-This build sends no email of its own. Notifications show in the app. An invitation is saved, and you hand its link to the person yourself: see [Invitations](/self-host/administration#invitations). Sign-in codes still go out, through Supabase.
+Rerun Cloud sends invitations for you. Your install sends them through your own [Resend](https://resend.com) account, once you set `RESEND_API_KEY`, `RESEND_FROM` and `UNSUBSCRIBE_SECRET`: see [Email](/self-host/configuration#email). Without them, an invitation gives you its link to send yourself: see [Invitations](/self-host/administration#invitations). Sign-in codes go out through Supabase either way. Coworker notification emails are paused in this version, on Rerun Cloud too: notifications show in the app.
 
 ### The template library and the creator program
 
 The template library is part of Rerun Cloud and does not ship with this build. There is no checkout, no payout and no creator program either. On your install, the library holds the templates you make: [create your own](/templates/create).
 
-### The iOS app
+### The mobile app
 
-The Rerun app for iPhone connects to your install too, with sign-in by email code and no push notifications: see [iPhone app](/self-host/mobile).
+The Rerun app for iPhone connects to your install too, with sign-in by email code and no push notifications: pushes go out through Rerun Cloud only. See [Mobile app](/self-host/mobile).
 
 ### Sign-in by phone, Google and Apple
 

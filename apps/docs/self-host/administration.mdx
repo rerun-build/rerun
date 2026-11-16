@@ -71,21 +71,25 @@ update services set enabled = false where slug = 'stripe';
 
 Members invite people from the workspace menu, as on Rerun Cloud. See [Teams](/teams).
 
-This build sends no invitation email. Send the link yourself: it is `NEXT_PUBLIC_APP_URL/invite/<token>`, with the `token` of the invitation in `workspace_invitations`. The person opens it and signs in with their email code.
+With `RESEND_API_KEY` set, the invitation goes out by email, as on Rerun Cloud. See [Email](/self-host/configuration#email).
 
-Sign-in codes are the one email Rerun relies on, and Supabase sends them. See [Set up Supabase](/self-host/install#2-set-up-supabase).
+Without it, the members dialog shows the link instead: "Send this link to ... It works for them only, once." Send it yourself. It is `NEXT_PUBLIC_APP_URL/invite/<token>`, with the `token` of the invitation in `workspace_invitations` if you need it again. The person opens it and signs in with their email code.
+
+Sign-in codes go out through Supabase either way. See [Set up Supabase](/self-host/install#2-set-up-supabase).
 
 ## Background jobs
 
-There is no job queue to run. The app runs its background work in its own process:
+There is no job queue to run. The app runs its background work in its own process (`apps/ui/cloud-oss/tasks.ts`):
 
-- researching the company and seeding the Brain during onboarding
+- researching the company during onboarding
+- seeding the Brain from that research
 - suggesting coworker ideas
 - switching a coworker off on its server once the app has turned it off
+- filling an application to the Rerun Experts program from the candidate's profile, which only Rerun Cloud uses
 - every night at 3:00, deleting anonymous visitors older than a day who never signed up
 - every night at 3:40, clearing the web search cache
 
-The times follow the clock of the app container, UTC unless you set `TZ`. A restart drops a job in flight. Each one is asked again by the screen or the flow that needs it.
+The two nightly jobs start the first time someone opens the app after it starts. Their times follow the clock of the app container, UTC unless you set `TZ`. A restart drops a job in flight. Each one is asked again by the screen or the flow that needs it.
 
 ## Logs
 
@@ -95,7 +99,7 @@ docker compose logs --since 1h app       # the last hour of the app
 docker logs -f rerun-engine              # a paired server
 ```
 
-The app tags its lines: `[task]` for background jobs, `[llm]` for the Rerun models, `[servers]` for pairing, `[email]` for the emails this build skips. For more detail from an engine, set `RERUN_LOG_LEVEL=debug` and run `docker compose up -d`.
+The app tags its lines: `[task]` for background jobs, `[llm]` for the Rerun models, `[servers]` for pairing, `[email]` for the emails it skips while `RESEND_API_KEY` is empty. For more detail from an engine, set `RERUN_LOG_LEVEL=debug` and run `docker compose up -d`.
 
 To check an engine's data-dir without changing it:
 

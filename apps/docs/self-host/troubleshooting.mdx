@@ -160,6 +160,18 @@ With `OPENROUTER_API_KEY` set, the Chief of Staff walks a new workspace through 
 
 Without the key, the Chief of Staff skips the onboarding and runs on the AI you connect. If it answers "Set OPENROUTER_API_KEY to run the Rerun models", connect a provider or your Claude or ChatGPT plan from its model picker and pick it.
 
+## "MOBILE_OAUTH_TICKET_SECRET is not configured on this server."
+
+You clicked to sign in to an app by OAuth: a catalog app, an MCP server, a Composio app, Facebook or Typeform. Every one of those sign-ins needs this secret, and `self-host-check.mjs` does not generate it. Add it, then run `docker compose up -d`:
+
+```bash
+node -e "console.log('MOBILE_OAUTH_TICKET_SECRET=' + require('crypto').randomBytes(32).toString('hex'))" >> .env
+```
+
+## Sign in with GitHub or Asana fails
+
+Those two sign-ins need an OAuth app of your own. Register one and set its id and secret, or connect with a personal access token instead. See [OAuth apps of your own](/self-host/services#oauth-apps-of-your-own).
+
 ## A Composio app does not connect
 
 **"Composio connections are not configured on this server"**: set `COMPOSIO_API_KEY` and run `docker compose up -d`.
@@ -170,10 +182,22 @@ Without the key, the Chief of Staff skips the onboarding and runs on the AI you 
 
 The browser opens a coworker's screen directly on the server's address, over `ws://` or `wss://`.
 
-- **The engine started by docker compose** needs `RERUN_ENGINE_BROWSER_URL`: its `https` domain on a server, as in [On a server](/self-host/install#on-a-server).
+- **The engine started by docker compose** needs `RERUN_ENGINE_BROWSER_URL`: its `https` domain on a server, as in [On a server](/self-host/install#on-a-server). A change only needs `docker compose up -d`.
 - **Your browser must reach the server.** On Tailscale, the person watching must be on the tailnet too.
 - **HTTPS on both sides.** When the app is on `https://`, the server must be too, or the browser blocks the connection. Put it behind [Caddy](/self-host/servers#networking).
 - **The screen was turned off** with `RERUN_DESKTOP=off` on the server.
+
+## No invitation email arrives
+
+- **No Resend key.** Without `RESEND_API_KEY`, nothing is emailed: the app logs `[email] RESEND_API_KEY missing` and the members dialog hands you the invitation link instead.
+- **The sender.** Until `RESEND_FROM` names an address on a domain you verified in Resend, emails leave from Resend's test sender, which only delivers to the address of your Resend account.
+- **Notification emails are paused.** In this version no coworker notification is emailed, on any install: they show in the app only.
+
+See [Email](/self-host/configuration#email). After changing `.env`, run `docker compose up -d`.
+
+## A link to a published file points at port 3050
+
+The share link starts with `RERUN_HUB_BASE_URL`, and docker compose does not set it for the app. Set it to your `NEXT_PUBLIC_APP_URL` and run `docker compose up -d`.
 
 ## Web search does not work
 

@@ -44,11 +44,12 @@ Help them install what is missing before going on. On macOS, Docker Desktop's me
 ## 3. Get the code
 
 ```bash
-git clone https://github.com/rerun-build/rerun.git && cd rerun
+git clone --branch master https://github.com/rerun-build/rerun.git && cd rerun
 cp .env.example .env
 ```
 
-Every command below runs from this folder.
+`master` is the released code. A plain `git clone` lands on `dev`, the working branch: do not install
+from it. Every command below runs from this folder.
 
 ## 4. Set up Supabase
 
@@ -89,23 +90,36 @@ one computer, never for a server reachable from the internet.
    to members of their Supabase organization.
 6. Once SMTP is saved, in **Authentication > Email Templates**, paste
    `supabase/templates/magic_link.html` into **Magic Link**, **Confirm signup** and **Change Email
-   Address**. Rerun signs in with a 6-digit code, and the default templates only carry a link. Set
-   **Email OTP Expiration** to `900`.
+   Address**, with the subject `Your Rerun code`. Rerun signs in with a 6-digit code, and the default
+   templates only carry a link. Set **Email OTP Expiration** to `900`.
 7. In **Authentication > URL Configuration**, set the **Site URL** to `NEXT_PUBLIC_APP_URL`.
 
 ## 5. Fill the rest of `.env`
 
 ```bash
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+RERUN_HUB_BASE_URL=http://localhost:3000
 OPENROUTER_API_KEY=sk-or-...
 ADMIN_EMAILS=<their email>
 ```
 
-On a server, `NEXT_PUBLIC_APP_URL` is the https address the team opens, and
-`RERUN_ENGINE_BROWSER_URL` the https address of the engine, on a second domain. Both are baked in
-by the build, so set them now. See "On a server" in the human guide for the reverse proxy and the
-firewall: Docker publishes ports past `ufw`, so they must close 3000, 3001, 5432, 6543 and 8000
-at their provider.
+`RERUN_HUB_BASE_URL` is the same address as `NEXT_PUBLIC_APP_URL`: the links to published files
+start with it. Then add the one secret the check below does not generate, which every app a
+coworker signs in to by OAuth needs:
+
+```bash
+node -e "console.log('MOBILE_OAUTH_TICKET_SECRET=' + require('crypto').randomBytes(32).toString('hex'))" >> .env
+```
+
+On a server, `NEXT_PUBLIC_APP_URL` and `RERUN_HUB_BASE_URL` are the https address the team opens,
+and `RERUN_ENGINE_BROWSER_URL` the https address of the engine, on a second domain.
+`NEXT_PUBLIC_APP_URL` is baked in by the build, so set it now; the other two are read when the app
+runs. See "On a server" in the human guide for the reverse proxy and the firewall: Docker publishes
+ports past `ufw`, so they must close 3000, 3001, 5432, 6543 and 8000 at their provider.
+
+If they want Rerun to email invitations, they add a Resend key (`RESEND_API_KEY`,
+`RESEND_FROM`, `UNSUBSCRIBE_SECRET`): see https://docs.rerun.build/self-host/configuration#email.
+Without it, nothing is emailed except the sign-in codes Supabase sends.
 
 ## 6. Check and start
 
@@ -142,7 +156,7 @@ hi to the Chief of Staff: it asks what they need done and builds the team. Their
 they connect in the app: an Anthropic, OpenAI, Gemini or OpenRouter key, or their Claude or ChatGPT
 subscription.
 
-To update later:
+To update later, from `master`:
 
 ```bash
 git pull && docker compose up -d --build
@@ -151,6 +165,8 @@ git pull && docker compose up -d --build
 and `npx supabase db push` (or `npx supabase migration up` for Supabase on this computer) when a
 release adds database migrations.
 
-Versions follow one rule: a patch (`v0.5.1`) only asks to pull, a minor (`v0.6.0`) has an
-`Upgrade` section in its [release notes](https://github.com/rerun-build/rerun/releases) to read
-first. The engine image `ghcr.io/rerun-build/rerun-engine:0.5` follows the patches of `0.5`.
+Versions follow one rule: a patch (`v0.15.1`) only asks to pull, a minor (`v0.16.0`) lists what
+to change by hand in the `Upgrade` section of its
+[release notes](https://github.com/rerun-build/rerun/releases), to read first. The engine image of a
+paired server is tagged with each version, with its series (`ghcr.io/rerun-build/rerun-engine:0.15`
+follows the patches of `v0.15`) and with `latest`.

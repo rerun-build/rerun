@@ -171,25 +171,28 @@ And everything else a colleague needs:
 Let an AI install it for you:
 
 <p align="center">
-  <a href="https://claude.ai/new?q=Install%20Rerun%2C%20the%20open%20source%20AI%20coworkers%20app%2C%20for%20me.%20Follow%20the%20guide%20written%20for%20AI%20assistants%3A%20https%3A%2F%2Fraw.githubusercontent.com%2Frerun-build%2Frerun%2Fmain%2FINSTALL.md"><img alt="Install with Claude" src=".github/assets/install-with-claude.svg" height="56"></a>
-  <a href="https://chatgpt.com/?q=Install%20Rerun%2C%20the%20open%20source%20AI%20coworkers%20app%2C%20for%20me.%20Follow%20the%20guide%20written%20for%20AI%20assistants%3A%20https%3A%2F%2Fraw.githubusercontent.com%2Frerun-build%2Frerun%2Fmain%2FINSTALL.md"><img alt="Install with ChatGPT" src=".github/assets/install-with-chatgpt.svg" height="56"></a>
+  <a href="https://claude.ai/new?q=Install%20Rerun%2C%20the%20open%20source%20AI%20coworkers%20app%2C%20for%20me.%20Follow%20the%20guide%20written%20for%20AI%20assistants%3A%20https%3A%2F%2Fraw.githubusercontent.com%2Frerun-build%2Frerun%2Fmaster%2FINSTALL.md"><img alt="Install with Claude" src=".github/assets/install-with-claude.svg" height="56"></a>
+  <a href="https://chatgpt.com/?q=Install%20Rerun%2C%20the%20open%20source%20AI%20coworkers%20app%2C%20for%20me.%20Follow%20the%20guide%20written%20for%20AI%20assistants%3A%20https%3A%2F%2Fraw.githubusercontent.com%2Frerun-build%2Frerun%2Fmaster%2FINSTALL.md"><img alt="Install with ChatGPT" src=".github/assets/install-with-chatgpt.svg" height="56"></a>
 </p>
 
 Or paste this into Claude Code, Codex or Cursor, which run the commands for you:
 
 ```text
-Install Rerun, the open source AI coworkers app, for me. Follow the guide written for AI assistants: https://raw.githubusercontent.com/rerun-build/rerun/main/INSTALL.md
+Install Rerun, the open source AI coworkers app, for me. Follow the guide written for AI assistants: https://raw.githubusercontent.com/rerun-build/rerun/master/INSTALL.md
 ```
 
 By hand, you need Docker, Node.js 22, and a Supabase project (a free one on [supabase.com](https://supabase.com) works).
 
 ```bash
-git clone https://github.com/rerun-build/rerun.git && cd rerun
+git clone --branch master https://github.com/rerun-build/rerun.git && cd rerun
 cp .env.example .env          # fill the Supabase URL and keys, and an OpenRouter key
 npx supabase link --project-ref <your-project-ref> && npx supabase db push --include-seed
-node scripts/self-host-check.mjs
+node scripts/self-host-check.mjs   # generates the engine key and the secrets
+node -e "console.log('MOBILE_OAUTH_TICKET_SECRET='+require('crypto').randomBytes(32).toString('hex'))" >> .env
 docker compose up -d --build  # then open http://localhost:3000
 ```
+
+`master` is the released code; a plain `git clone` lands on `dev`, where the work happens.
 
 That's it, say hi to the Chief of Staff. 🎉
 
@@ -207,7 +210,8 @@ Same product, same code. Rerun Cloud is this Rerun, hosted, plus what only a hos
 | Template library | Your own templates | ✅ |
 | A computer for each workspace | You host it, one command attaches it | Ready in 30 seconds |
 | AI models | Your keys or subscriptions | Included credit, or your keys |
-| Premium features (LinkedIn, WhatsApp, paid data, emails) | | ✅ |
+| Email invitations | With your own Resend key | ✅ |
+| Premium features (LinkedIn, WhatsApp, paid data) | | ✅ |
 | Updates | Each release | Continuous |
 | Support | Community | ✅ |
 | Price | Free forever | [See plans](https://rerun.build/pricing) |
@@ -280,7 +284,7 @@ in a pnpm monorepo.
 ## 🤝 Contributing
 
 Bug reports, fixes and docs are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first: it explains
-how to run Rerun from source and how pull requests flow back into Rerun Cloud.
+how to run Rerun from source and how a pull request gets in.
 
 Self-hosted installs get community support on GitHub: an issue without logs or steps to reproduce
 is closed with a link to the guide. Questions and show-and-tell go to [Discord](https://discord.gg/cJUUgdTg5p).
