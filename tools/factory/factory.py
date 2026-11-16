@@ -625,10 +625,20 @@ def wt_new_clone_steps(a, full, issue, chunk):
     return clones.new(full, issue, chunk, base, owner, info["default_branch"])
 
 
+INSTALLS = (("pnpm-lock.yaml", ["pnpm", "install", "--frozen-lockfile", "--prefer-offline"]),
+            ("package-lock.json", ["npm", "ci", "--prefer-offline"]),
+            ("yarn.lock", ["yarn", "install", "--frozen-lockfile"]),
+            ("uv.lock", ["uv", "sync", "--frozen"]))
+CI_ONLY = ("Cargo.lock",)
+
+
 def install_deps(path, runner=None):
-    if not os.path.isfile(os.path.join(path, "pnpm-lock.yaml")):
+    cmd = next((c for name, c in INSTALLS if os.path.isfile(os.path.join(path, name))), None)
+    if cmd is None:
+        only = [name for name in CI_ONLY if os.path.isfile(os.path.join(path, name))]
+        print("nothing installed here: %s" % ("%s is built by the checks only" % only[0] if only else
+                                                 "none of %s is here" % ", ".join(name for name, _ in INSTALLS)))
         return
-    cmd = ["pnpm", "install", "--frozen-lockfile", "--prefer-offline"]
     t0 = time.time()
     try:
         r = runner(cmd, path, 300) if runner else run(cmd, cwd=path, check=False, timeout=300)
