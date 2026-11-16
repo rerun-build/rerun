@@ -2,7 +2,7 @@ import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { decodeIntent } from '@/lib/foreman/kickoff-marker'
 import { installedArrival, type ForemanArrival } from '@/lib/foreman/phase'
 import { loadForemanState } from '@/lib/foreman/state'
-import { resolveForemanSurface } from '@/lib/foreman/surface.server'
+import { resolveForemanSurface, walksTheDialog } from '@/lib/foreman/surface.server'
 
 // Where the workspace stands, for the browser. The board needs it before the first message to know
 // whether the column opens as a guide, as the welcome card, as the foreman on the engine, or not at
@@ -33,5 +33,6 @@ export async function GET(req: Request): Promise<Response> {
     const linked: ForemanArrival | null = state.intent && state.intent.kind !== 'prompt' && state.intent.title ? { kind: state.intent.kind, title: state.intent.title, ...(state.intent.paid ? { paid: state.intent.paid } : {}), ...(state.intent.coworker ? { coworker: state.intent.coworker } : {}) } : null
     const arrival: ForemanArrival | null = planned && state.phase === 'discover' ? { ...planned, installed: true } : (linked ?? planned)
     const surface = await resolveForemanSurface(ctx.workspace.id, state, { canClaim: !ctx.authUser.is_anonymous })
-    return Response.json({ phase: state.phase, firstName: state.firstName, arrival, surface })
+    // `dialog`: the onboarding dialog walks this workspace, and the column leaves the funnel to it.
+    return Response.json({ phase: state.phase, firstName: state.firstName, arrival, surface, dialog: walksTheDialog(state) })
 }

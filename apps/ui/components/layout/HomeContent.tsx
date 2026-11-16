@@ -19,6 +19,8 @@ import { WorkspacePausedBanner } from '@/components/layout/WorkspacePausedBanner
 import { WorkspaceDialogs } from '@/components/layout/WorkspaceDialogs'
 import { WorkspaceSwitcher } from '@/components/layout/WorkspaceSwitcher'
 import { ChangelogDialog } from '@/components/changelog/ChangelogDialog'
+import { OnboardingDialog, onboardingDialogOpen } from '@/components/onboarding/OnboardingDialog'
+import { useOnboardingDialog } from '@/components/onboarding/useOnboardingDialog'
 import { ControlCenter } from '@/components/control-center/ControlCenter'
 import { useChangelogLauncher } from '@/components/changelog/useChangelogLauncher'
 import { useEnsureSandboxSpace } from '@/lib/sandbox/useEnsureSandboxSpace'
@@ -100,7 +102,11 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     const arrivalHoldsTheWall = foremanArrival ? foremanFunnel === 'guided' && !foremanArrival.installed && foremanOpen !== false : foremanFunnel === 'unknown' && readyMadeParked && !workspace?.onboarded_at
     const accountWallOpen = isAnonymous && !accountClaimed && !foremanHoldsTheWall && !arrivalHoldsTheWall
     const retryCopy = signInRetry ? oauthRetryCopy(signInRetry.code, signInRetry.provider ? OAUTH_PROVIDER_CONFIG[signInRetry.provider].label : null, tOAuthRetry) : null
-    const phoneWallOpen = phoneStep === 'pending' && !arrivalHoldsTheWall
+    // The onboarding dialog of a new workspace holds the screen until it is done, and asks for the
+    // phone number in its own turn. Until its first read the walls wait, so neither flashes up.
+    const onboarding = useOnboardingDialog()
+    const onboardingHoldsTheScreen = onboarding.state ? onboarding.state.dialog && onboarding.state.step !== 'done' : !onboarding.failed && !isAnonymous
+    const phoneWallOpen = phoneStep === 'pending' && !arrivalHoldsTheWall && !onboardingHoldsTheScreen
     const templateLinkSlug = useTemplateFlowStore(s => s.linkSlug)
     const shareLinkToken = useAgentShareStore(s => s.token)
     const purchase = useTemplateFlowStore(s => s.purchase)
@@ -394,7 +400,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     // Le changelog ne s'ouvre jamais par-dessus un parcours qui tient déjà l'écran (mur d'auth,
     // onboarding, deep link de template ou de partage). Une session restée anonyme passerait par
     // `accountWallOpen` seul, qui retombe dès que le mur est écarté.
-    const changelogReady = hydrated && !accountWallOpen && !phoneWallOpen && !isAnonymous && Boolean(workspace?.onboarded_at) && !templateLinkSlug && !shareLinkToken && !purchase
+    const changelogReady = hydrated && !accountWallOpen && !phoneWallOpen && !onboardingHoldsTheScreen && !isAnonymous && Boolean(workspace?.onboarded_at) && !templateLinkSlug && !shareLinkToken && !purchase
     useChangelogLauncher(user?.id, changelogReady)
 
     useEnsureSandboxSpace()
@@ -452,7 +458,8 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
             <PhoneVerificationDialog open={phoneWallOpen} />
             {/* Le mur de capacité : même mécanique, pour un compte créé alors que le pool d'engines
                 est vide. Il tombe tout seul au chargement suivant où une machine est disponible. */}
-            <EngineWaitlistDialog open={foremanWaitlisted && !isAnonymous} />
+            <EngineWaitlistDialog open={foremanWaitlisted && !isAnonymous && !onboardingHoldsTheScreen} />
+            {onboarding.state && onboardingDialogOpen(onboarding.state) && <OnboardingDialog state={onboarding.state} failed={onboarding.failed} reload={onboarding.reload} />}
             <PostPaymentDialog open={postPaymentOpen} onOpenChange={setPostPaymentOpen} />
             {purchase && <TemplatePurchaseSuccessDialog slug={purchase.slug} sessionId={purchase.sessionId} onOpenChange={open => !open && useTemplateFlowStore.getState().closePurchase()} />}
             {templateLinkSlug && <TemplateDeepLinkDialog slug={templateLinkSlug} />}

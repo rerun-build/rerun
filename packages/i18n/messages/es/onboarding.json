@@ -1,0 +1,21 @@
+{
+    "footer": {
+        "back": "Atrás",
+        "continue": "Continuar",
+        "skip": "Omitir",
+        "signOut": "Cerrar sesión"
+    },
+    "name": {
+        "title": "¿Tu nombre?",
+        "description": "Para no hablarle a un workspace."
+    },
+    "phone": {
+        "title": "Tu número de teléfono",
+        "description": "Para avisarte cuando un coworker te necesite."
+    },
+    "loadFailed": {
+        "title": "No pudimos cargar tu configuración",
+        "description": "Revisa tu conexión y vuelve a intentarlo.",
+        "retry": "Reintentar"
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "_context": {
+        "name.title": "Asked in the onboarding dialog when the sign-up did not carry a first name.",
+        "phone.description": "Under the phone number field of the onboarding dialog."
+    },
+    "footer": {
+        "back": "Back",
+        "continue": "Continue",
+        "skip": "Skip",
+        "signOut": "Sign out"
+    },
+    "name": {
+        "title": "Your first name?",
+        "description": "So we are not talking to a workspace."
+    },
+    "phone": {
+        "title": "Your phone number",
+        "description": "So we can reach you when a coworker needs you."
+    },
+    "loadFailed": {
+        "title": "We could not load your setup",
+        "description": "Check your connection, then try again.",
+        "retry": "Try again"
+    }
+}

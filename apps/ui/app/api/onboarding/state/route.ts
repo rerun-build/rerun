@@ -2,7 +2,7 @@ import type { OnboardingState } from '@rerun/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { loadOnboardingFacts, onboardingReleasedAt } from '@/lib/onboarding/facts'
-import { onboardingStep } from '@/lib/onboarding/step'
+import { isLegacyWorkspace, onboardingStep } from '@/lib/onboarding/step'
 import { readFirstName } from '@/lib/naming/first-name'
 
 // The step of the onboarding dialog, for the browser. Read again after every step it closes: the
@@ -16,9 +16,11 @@ export async function GET(): Promise<Response> {
     }
 
     const facts = await loadOnboardingFacts(ctx)
+    const releasedAt = onboardingReleasedAt()
     const arrival = facts.foreman.arrival
     const state: OnboardingState = {
-        step: onboardingStep(facts, onboardingReleasedAt()),
+        step: onboardingStep(facts, releasedAt),
+        dialog: !isLegacyWorkspace(facts, releasedAt),
         firstName: readFirstName(ctx.authUser.user_metadata) || null,
         arrival: arrival && arrival.kind !== 'prompt' ? { kind: arrival.kind, ref: arrival.ref } : null,
     }

@@ -33,7 +33,7 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // onboarding store and the account wall takes over. The phase is asked again once the session is a
 // real account, which is when the parked answers are written, to whichever workspace they signed
 // into, and the foreman is woken up.
-type ForemanStateAnswer = { phase: ForemanPhase; firstName?: string; arrival?: ForemanArrival | null; surface: ForemanSurface }
+type ForemanStateAnswer = { phase: ForemanPhase; firstName?: string; arrival?: ForemanArrival | null; surface: ForemanSurface; dialog?: boolean }
 
 async function fetchForemanState(query = ''): Promise<ForemanStateAnswer | null> {
     const res = await fetch(`/api/chat/foreman/state${query}`)
@@ -117,6 +117,11 @@ export function useForemanKickoff({ send, messageCount, restoreDone }: { send: (
             .then(async state => {
                 const store = useForemanStore.getState()
                 if (state) store.setSurface(state.surface)
+                // The onboarding dialog walks this workspace: where it stands is the dialog's to say.
+                if (state?.dialog) {
+                    store.setArrival(null)
+                    return
+                }
                 const onboarding = useOnboardingStore.getState()
                 const parked = onboarding.pendingIntake
                 // Tout ce qui n'est pas un tunnel rend la main à ce qui existait avant : la fiche

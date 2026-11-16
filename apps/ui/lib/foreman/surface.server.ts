@@ -11,7 +11,7 @@ type SurfaceState = Pick<ForemanState, 'phase'> & Partial<Pick<ForemanState, 'fo
 
 // A workspace of the onboarding dialog talks to the Chief of Staff on its box, once the dialog has
 // claimed one. The others keep the hub's onboarding.
-function walksTheDialog(state: SurfaceState): boolean {
+export function walksTheDialog(state: SurfaceState): boolean {
     if (!state.foreman) return false
     return !isLegacyWorkspace({ createdAt: state.workspaceCreatedAt ?? null, onboardedAt: state.onboardingCompletedAt ?? null, foreman: state.foreman }, onboardingReleasedAt())
 }

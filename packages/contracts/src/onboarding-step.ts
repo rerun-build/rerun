@@ -11,6 +11,9 @@ export type OnboardingStep = z.infer<typeof onboardingStepSchema>
 
 export const onboardingStateSchema = z.object({
     step: onboardingStepSchema,
+    // The workspace walks this dialog rather than the hub's onboarding, which it keeps when it is
+    // older than the release. Always `done` when false.
+    dialog: z.boolean(),
     // Known from the sign-up (Google carries it), so the questions skip asking it.
     firstName: z.string().nullable(),
     // Set when they came in on a template or a shared coworker: no questions, no invitation step.

@@ -1,0 +1,21 @@
+{
+    "footer": {
+        "back": "Zurück",
+        "continue": "Weiter",
+        "skip": "Überspringen",
+        "signOut": "Abmelden"
+    },
+    "name": {
+        "title": "Dein Vorname?",
+        "description": "Damit wir nicht mit einem Workspace reden."
+    },
+    "phone": {
+        "title": "Deine Telefonnummer",
+        "description": "Damit wir dich erreichen, wenn ein Coworker dich braucht."
+    },
+    "loadFailed": {
+        "title": "Deine Einrichtung konnte nicht geladen werden",
+        "description": "Prüfe deine Verbindung und versuche es erneut.",
+        "retry": "Erneut versuchen"
+    }
+}
