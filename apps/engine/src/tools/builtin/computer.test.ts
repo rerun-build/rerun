@@ -17,6 +17,17 @@ const state = vi.hoisted(() => ({
     drivingAfterTyped: null as number | null,
     drivingForPolls: 0,
     parkLongSleeps: false,
+    real: false,
+    xdotool: [] as string[],
+    png: Buffer.alloc(0),
+}))
+
+vi.mock('node:child_process', () => ({
+    execFile: (command: string, args: string[], _options: unknown, done: (err: Error | null, stdout: Buffer) => void) => {
+        if (command === 'xdotool') state.xdotool.push(args.join(' '))
+        queueMicrotask(() => done(null, command === 'maim' ? state.png : Buffer.from(args[0] === 'getdisplaygeometry' ? '1920 1080\n' : '')))
+        return { stdin: { end: () => {} } }
+    },
 }))
 
 vi.mock('node:timers/promises', () => ({
@@ -30,7 +41,8 @@ vi.mock('node:timers/promises', () => ({
     },
 }))
 
-vi.mock('../../desktop/control.js', () => {
+vi.mock('../../desktop/control.js', async () => {
+    const actual = await vi.importActual<typeof import('../../desktop/control.js')>('../../desktop/control.js')
     class ControlRefusal extends Error {}
     const record =
         (name: string) =>
@@ -38,11 +50,13 @@ vi.mock('../../desktop/control.js', () => {
             if (state.failure) throw state.failure
             state.calls.push([name, ...args])
         }
+    const pick = <F extends (...args: any[]) => any>(real: F, fake: F): F => ((...args: any[]) => (state.real ? real(...args) : fake(...args))) as F
     return {
+        ...actual,
         ControlRefusal,
-        controlScreen: async (agentId: string, signal?: AbortSignal) => ({ agentId, signal }),
-        captureScreen: async () => ({ image: Buffer.from(`shot-${++state.captures}`), mediaType: 'image/jpeg', width: 1280, height: 720 }),
-        click: record('click'),
+        controlScreen: pick(actual.controlScreen, (async (agentId: string, signal?: AbortSignal) => ({ agentId, signal })) as typeof actual.controlScreen),
+        captureScreen: pick(actual.captureScreen, (async () => ({ image: Buffer.from(`shot-${++state.captures}`), mediaType: 'image/jpeg', width: 1280, height: 720 })) as typeof actual.captureScreen),
+        click: pick(actual.click, record('click') as typeof actual.click),
         drag: record('drag'),
         movePointer: record('move'),
         pressKeys: record('key'),
@@ -54,6 +68,9 @@ vi.mock('../../desktop/control.js', () => {
 vi.mock('../../desktop/session.js', () => ({
     computerAvailable: () => state.available,
     humanDriving: () => state.driving || state.sleeps.filter(ms => ms === 500).length < state.drivingForPolls || (state.drivingAfterTyped !== null && state.calls.filter(([name]) => name === 'type').length >= state.drivingAfterTyped),
+    ensureDesktop: async () => ({ display: ':42', vncPort: 5942 }),
+    desktopEnv: (display: string) => ({ DISPLAY: display }),
+    SCREEN_CAPTURE_BINARY: 'maim',
     holdDesktop: () => {
         state.screenHolds++
         return () => {
@@ -119,6 +136,9 @@ beforeEach(() => {
     state.drivingForPolls = 0
     state.openBrowser = false
     state.parkLongSleeps = false
+    state.real = false
+    state.xdotool.length = 0
+    delete process.env.RERUN_SCREEN_PROFILE
 })
 
 afterEach(() => {
@@ -380,5 +400,44 @@ describe('computer_open_app', () => {
         expect(await settled(openApp(build(ctxWith('a1', { shell: false })), { app: 'terminal' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('shell tool is disabled') })
         expect(await settled(openApp(build(ctxWith('a2', { filesystem: false })), { app: 'files' }))).toMatchObject({ status: 'refused', reason: expect.stringContaining('filesystem tool is disabled') })
         expect(state.apps).toEqual([])
+    })
+})
+
+describe('screen profile', () => {
+    beforeEach(async () => {
+        const { default: sharp } = await import('sharp')
+        state.png = await sharp({ create: { width: 1920, height: 1080, channels: 3, background: '#336699' } }).png().toBuffer()
+        state.real = true
+    })
+
+    const shot = async (profile?: string) => {
+        if (profile) process.env.RERUN_SCREEN_PROFILE = profile
+        const built = build(ctxWith())
+        const result = await act(built, { action: 'screenshot' })
+        built.release()
+        return result
+    }
+
+    it('returns an 800x450 screen on a 1920x1080 fake with the small profile', async () => {
+        expect((await shot('small')).screen).toEqual([800, 450])
+    })
+
+    it('keeps 1280x720 by default', async () => {
+        expect((await shot()).screen).toEqual([1280, 720])
+        expect((await shot('bogus')).screen).toEqual([1280, 720])
+    })
+
+    it('maps a click back to the right real pixel in both profiles', async () => {
+        for (const [profile, expected] of [
+            ['standard', 'mousemove --sync 600 338'],
+            ['small', 'mousemove --sync 960 540'],
+        ] as const) {
+            state.xdotool.length = 0
+            process.env.RERUN_SCREEN_PROFILE = profile
+            const built = build(ctxWith())
+            await act(built, { action: 'left_click', coordinate: [400, 225] })
+            built.release()
+            expect(state.xdotool).toContain(expected)
+        }
     })
 })

@@ -10,7 +10,7 @@ import type { LoadedConnection } from '../../connections/types.js'
 import { CLI_PROVIDERS, type AgentConfig } from '../../agents/types.js'
 import type { Provider } from '@rerun/contracts'
 import { openDesktopApp } from '../../desktop/apps.js'
-import { ControlRefusal, captureScreen, click, controlScreen, drag, movePointer, pressKeys, scroll, typeText, type ScreenControl, type Screenshot } from '../../desktop/control.js'
+import { ControlRefusal, captureScreen, click, controlScreen, drag, movePointer, pressKeys, screenProfile, scroll, typeText, type ScreenControl, type Screenshot } from '../../desktop/control.js'
 import { computerAvailable, holdDesktop, humanDriving } from '../../desktop/session.js'
 import { holdBrowser, holdOpenBrowser } from '../../desktop/takeover.js'
 import { withKeyedLock } from '../../lib/lock.js'
@@ -196,7 +196,7 @@ export function computerTools(ctx: RunContext): { tools: ToolSet; release: () =>
         if (denied) return denied
         return withKeyedLock(`computer:${id}`, async () => {
             try {
-                const control = await controlScreen(id, signal)
+                const control = await controlScreen(id, signal, screenProfile())
                 await act(control, signal)
                 if (settleMs > 0) await sleep(settleMs, undefined, { signal })
                 const screenshot = await captureScreen(control)
