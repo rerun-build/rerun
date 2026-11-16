@@ -35,6 +35,7 @@ import { newId, nowIso } from '../lib/ids.js'
 import { buildTools } from '../tools/registry.js'
 import { callTargetsOf } from '../tools/builtin/call-agent.js'
 import { toolPayloadChars } from '../tools/payload.js'
+import { wrapToolsWithResultHandle } from '../tools/result-handle.js'
 import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
@@ -428,7 +429,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         const built = await toolsP
         closeTools = built.close
-        const { tools } = built
+        const tools = wrapToolsWithResultHandle(built.tools, { agentId: agent.id, runId: run.id })
         const history = repairToolPairs(await prepareRunHistory(ctx, systemText, override, shared, toolPayloadChars(tools)))
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
