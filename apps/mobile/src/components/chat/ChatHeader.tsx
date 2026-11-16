@@ -144,16 +144,17 @@ type ChatHeaderProps = {
     onSelect: (sessionId: string) => void
     onNewSession: () => void
     onOpenDetails?: () => void
+    onCall?: () => void
 }
 
-export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, onBack, onSelect, onNewSession, onOpenDetails }: ChatHeaderProps) {
+export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, onBack, onSelect, onNewSession, onOpenDetails, onCall }: ChatHeaderProps) {
     const theme = useTheme()
     const glass = useGlassStyle()
     const insets = useSafeAreaInsets()
     const pane = usePaneInsets()
     const t = useTranslations('mobileChat.header')
     const { width: paneWidth } = usePaneSize()
-    const chipWidth = Math.min(CHIP_MAX_WIDTH, paneWidth - 2 * (spacing.lg + GLASS_BUTTON_SIZE + spacing.sm))
+    const chipWidth = Math.min(CHIP_MAX_WIDTH, paneWidth - 2 * (spacing.lg + GLASS_BUTTON_SIZE + spacing.sm) - (onCall ? GLASS_BUTTON_SIZE + spacing.sm : 0))
     const titleWidth = chipWidth - AVATAR_SPACE
     const hasConversations = tabs.length > 0
     const general = tabs[0]?.kind === 'general' ? tabs[0] : null
@@ -202,6 +203,7 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
                         </View>
                     )}
                 </View>
+                {onCall && <GlassButton symbol="phone" label="Call" onPress={onCall} />}
                 {hasConversations ? (
                     <NativeMenu glass="circle" label={general ? t('threads') : t('conversations')} trigger={<CircleTrigger symbol="messages-square" />}>
                         <MenuItem label={untitled} icon="plus" onPress={onNewSession} disabled={!activeId} />

@@ -124,6 +124,7 @@ function App() {
                                         <Stack.Screen name="inbox" options={sheetOptions(scheme, [0.6, 1])} />
                                         <Stack.Screen name="model" options={sheetOptions(scheme, [0.6, 1])} />
                                         <Stack.Screen name="desktop" options={{ presentation: 'fullScreenModal' }} />
+                                        <Stack.Screen name="call/[id]" options={{ presentation: 'fullScreenModal' }} />
                                         <Stack.Screen name="settings" options={sheetOptions(scheme, [1])} />
                                         <Stack.Screen name="new-coworker" options={sheetOptions(scheme, [1])} />
                                         <Stack.Screen name="providers" options={sheetOptions(scheme, [1])} />
@@ -152,6 +153,7 @@ function App() {
                                         <Stack.Screen name="lab-consent" />
                                         <Stack.Screen name="lab-splash" options={{ animation: 'none', gestureEnabled: true }} />
                                         <Stack.Screen name="lab-coworker" />
+                                        <Stack.Screen name="lab-call" options={{ presentation: 'fullScreenModal' }} />
                                         <Stack.Screen name="lab-notifications" />
                                         <Stack.Screen name="lab-conversations" />
                                         <Stack.Screen name="lab-conversations-sheet" options={sheetOptions(scheme, [0.6, 1])} />

@@ -34,10 +34,15 @@ const sessionNotFound = () => Response.json({ error: SESSION_NOT_FOUND }, { stat
 export async function POST(request: Request) {
     // Reject unauthenticated callers up front. getAgentChatTarget below also
     // enforces that the agent belongs to this workspace (defense in depth).
+    // Call prototype: where the time of a send goes before the hub answers, in ms from its start.
+    const startedAt = performance.now()
+    const marks: string[] = [`at=${Date.now()}`]
+    const mark = (step: string) => marks.push(`${step}=${Math.round(performance.now() - startedAt)}`)
     let author: MessageAuthor
     let callablePromise: Promise<string[] | undefined>
     try {
         const ctx = await requireWorkspaceContext()
+        mark('auth')
         author = messageAuthorOf(ctx)
         // Read alongside the body and awaited inside the engine call's try: a failure fails the send
         // rather than letting it through with every coworker callable.
@@ -70,7 +75,11 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing message text' }, { status: 400 })
     }
 
+    // Call prototype: a conversation named by the caller is looked up while the coworker is, instead of after.
+    const knownSession = sessionId ? getExistingSession(sessionId) : null
+    knownSession?.catch(() => {})
     const target = await getAgentChatTarget(agentId).catch(() => null)
+    mark('target')
     if (!target) {
         return Response.json({ error: 'Coworker not configured or not found' }, { status: 400 })
     }
@@ -94,7 +103,7 @@ export async function POST(request: Request) {
     if (sessionId) {
         let existing: Awaited<ReturnType<typeof getExistingSession>>
         try {
-            existing = await getExistingSession(sessionId)
+            existing = await (knownSession ?? getExistingSession(sessionId))
         } catch {
             return Response.json({ error: 'Failed to resolve session' }, { status: 500 })
         }
@@ -105,7 +114,10 @@ export async function POST(request: Request) {
             return sessionNotFound()
         }
         engineSessionId = existing.engineSessionId ?? undefined
+        mark('session')
     }
+    await callablePromise.catch(() => undefined)
+    mark('callable')
 
     let engineRes!: Response
     let supabaseSessionId!: string
@@ -118,6 +130,7 @@ export async function POST(request: Request) {
         } catch (err) {
             return Response.json({ error: `Engine error: ${err instanceof Error ? err.message : 'Failed to start chat'}` }, { status: 502 })
         }
+        mark('engine')
 
         // The engine allows a single live run per conversation. A 409 means this send raced one that
         // is already under way — nearly always the same answer delivered twice by an interactive block.
@@ -209,8 +222,12 @@ export async function POST(request: Request) {
         break
     }
 
+    mark('row')
     await updateSessionStatus(supabaseSessionId, 'working')
+    mark('status')
     await Promise.all([recordSessionParticipant(supabaseSessionId, author.id), recordSessionRead(supabaseSessionId, author.id)])
+    mark('seen')
+    console.log(`[CHAT TIMING] ${marks.join(' ')}`)
 
     const headers = new Headers()
     headers.set('Content-Type', engineRes.headers.get('content-type') ?? 'text/event-stream')

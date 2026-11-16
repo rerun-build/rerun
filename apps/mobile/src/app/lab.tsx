@@ -97,6 +97,8 @@ const SCREENS: { label: string; href: Href }[] = [
     { label: 'Icons', href: '/lab-icons' },
     { label: 'Icons, dark', href: '/lab-icons?scheme=dark' },
     { label: 'Icons, 24 pt', href: '/lab-icons?size=24' },
+    { label: 'Call prototypes', href: '/lab-call' },
+    { label: 'Call prototypes, thinking', href: '/lab-call?phase=thinking' },
     { label: 'Controls: menus, picker, pills', href: '/lab-controls' },
     { label: 'Controls, dark', href: '/lab-controls?scheme=dark' },
     { label: 'Rerun on the Home', href: '/lab-foreman' },

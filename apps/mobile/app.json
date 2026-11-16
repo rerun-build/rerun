@@ -75,6 +75,13 @@
           "microphonePermission": "Rerun uses the microphone to record voice messages."
         }
       ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Rerun uses the microphone to record voice messages.",
+          "speechRecognitionPermission": "Rerun turns what you say into text when you call a coworker."
+        }
+      ],
       "./plugins/without-background-playback",
       "./plugins/with-home-launch-screen",
       [
