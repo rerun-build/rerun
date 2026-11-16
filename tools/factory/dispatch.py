@@ -206,7 +206,7 @@ def review_brief(j, pr, head):
         '',
         'The checks of this commit may still be running. Do not wait for them and do not block on them: the dispatcher merges only when every check of this exact commit is green. Your verdict is on the diff alone, also where your own rules say a review needs green checks.',
         '',
-        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block. Write each follow-up note in your final message as its own line `Follow-up: <one sentence>`; the dispatcher opens one issue per line.',
+        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block. A finding about this change belongs in your verdict, not in a follow-up. Write a finding that is not about this change in your final message as its own line `Follow-up: <one sentence>`; the dispatcher keeps each line in the follow-ups inbox for classification and opens no issue for it.',
         '',
         NO_COMMENTS_REVIEW,
         '',
