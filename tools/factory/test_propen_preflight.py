@@ -134,6 +134,13 @@ class PrOpenPreflight(FactoryCase):
         self.assertFalse(os.path.exists(self.uvx_args))
         self.assertTrue(self.pushed())
 
+    def test_a_linter_that_could_not_run_is_named_and_does_not_refuse(self):
+        self.fake_uvx(2, "error: failed to download ruff")
+        code, out = self.open_pr(commits=("tools/factory/x.py",))
+        self.assertEqual(code, 0, out)
+        self.assertIn("lint not run: ruff==0.17.5 did not run here (exit 2): error: failed to download ruff", out)
+        self.assertTrue(self.pushed())
+
     def test_without_uvx_on_the_server_the_lint_is_named_and_does_not_refuse(self):
         code, out = self.open_pr(commits=("tools/factory/x.py",))
         self.assertEqual(code, 0, out)
@@ -153,6 +160,7 @@ class ChecksAfterPush(Base):
         self.assertEqual(self.state(), "fix_wait")
         self.assertIn(("ci red after push", "build"), self.failures())
         self.assertNotIn(("lint red after push", "build"), self.failures())
+        self.assertEqual([tuple(r) for r in self.w.rows("SELECT coworker FROM failures WHERE kind='ci red after push'")], [("B1",)])
 
     def test_a_red_lint_step_is_its_own_failure_event(self):
         self.to_checks()

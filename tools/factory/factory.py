@@ -928,7 +928,7 @@ def cmd_pr_open(a):
         die("the handoff note lacks: %s. Template: pr-open --template" % ", ".join(miss))
     preflight_lines(top, plan)
     preflight_lint(top, changed)
-    body ="Job: %s#%s, chunk %s\n\n%s" % (full, issue, chunk, body)
+    body = "Job: %s#%s, chunk %s\n\n%s" % (full, issue, chunk, body)
     tmp = os.path.join(STATE, "prbody-%d.md" % os.getpid())
     open(tmp, "w").write(body)
     run([GIT, "push", "--quiet", "-u", "origin", branch], cwd=top)
