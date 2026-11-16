@@ -3,6 +3,7 @@ import re
 
 CLASSES = ("rule", "plan", "build", "advise", "gate", "watch")
 LEVELS = ("writer", "reviewer", "issues", "none")
+FIRERS = ("person", "coworker", "runner", "repository event", "schedule")
 EXEMPT = ("tests", "docs")
 STACK = "stack"
 GATE_SENSITIVE = "BRUCE"
@@ -44,7 +45,7 @@ def load(text):
     for h, row in cw.items():
         if not isinstance(row, dict) or h != h.lower():
             _bad("coworker %r: handle must be lowercase with a row" % h)
-        for f in ("class", "github", "wake"):
+        for f in ("class", "github", "wake", "fired_by"):
             if f not in row:
                 _bad("coworker %s: field %s missing" % (h, f))
         if row["class"] not in CLASSES:
@@ -55,6 +56,9 @@ def load(text):
             _bad("coworker %s: class %s may not have github writer" % (h, row["class"]))
         if not isinstance(row["wake"], list) or not all(isinstance(w, str) for w in row["wake"]):
             _bad("coworker %s: wake must be a list of strings" % h)
+        fb = row["fired_by"]
+        if not isinstance(fb, list) or len(fb) != len(row["wake"]) or not all(x in FIRERS for x in fb):
+            _bad("coworker %s: fired_by must name one of %s per wake line" % (h, ", ".join(FIRERS)))
 
     def owner_ok(who, where):
         if who not in cw or cw[who]["github"] not in ("writer", "reviewer"):
