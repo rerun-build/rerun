@@ -5,7 +5,7 @@ GH, GIT = os.environ.get("FACTORY_GH") or "/data/tools/bin/gh", "/data/tools/bin
 OWNERS = ("special-place-ai-heaven", "special-place-administrator")
 WORK = os.environ.get("FACTORY_WORK", "/data/work")
 REPOS, WT, STATE = WORK + "/repos", WORK + "/wt", WORK + "/state"
-MAX_WORK_GB, MIN_FREE_GB = 20, 30
+MIN_FREE_GB = 30
 MAX_BUILDERS = None
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cutshape
@@ -443,7 +443,7 @@ def cmd_wt(a):
         for p in wt_strays():
             print("stray, not a worktree: " + p)
         st = shutil.disk_usage("/data")
-        print("active builders: %d of %d | /data/work %.1f of %d GB | /data free %.0f GB (floor %d)" % (act, max_builders(), du_gb(WORK), MAX_WORK_GB, st.free / 2**30, MIN_FREE_GB))
+        print("active builders: %d of %d | /data/work %.1f GB | /data free %.0f GB (floor %d)" % (act, max_builders(), du_gb(WORK), st.free / 2**30, MIN_FREE_GB))
         return
     if len(a) < 4:
         die("usage: wt %s <repo> <issue> <chunk>" % a[0])
@@ -477,11 +477,9 @@ def cmd_wt(a):
         die("%.1f GB of memory available, floor is %d GB. Tell @boss." % (mem, MIN_FREE_MEM_GB))
     os.makedirs(STATE, exist_ok=True)
     with builder_lock():
-        if du_gb(WORK) > MAX_WORK_GB or (not existing and cap_check(quiet=True)):
+        if not existing and cap_check(quiet=True):
             summary, kept = wt_sweep(True, only="REMOVE", quiet=True)
-            if du_gb(WORK) > MAX_WORK_GB:
-                die("/data/work is over %d GB. Tell @boss; old worktrees need `wt done`.\n%s\n%s" % (MAX_WORK_GB, summary, "\n".join(kept)))
-            if not existing and cap_check(quiet=True):
+            if cap_check(quiet=True):
                 print("\n".join([summary] + kept))
                 cap_check()
     plan_check(full, issue)
