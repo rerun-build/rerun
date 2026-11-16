@@ -19,6 +19,7 @@ COPY --from=build --chown=rerun:rerun /out /app
 COPY --chmod=755 apps/engine/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 COPY --chmod=755 apps/engine/scripts/ /opt/entrypoint-selftest/
 RUN ["/usr/bin/env", "RERUN_API_KEY=dummy", "/usr/local/bin/docker-entrypoint.sh", "/opt/entrypoint-selftest/entrypoint-selftest.sh"]
+RUN ["/bin/sh", "-c", "printf 'dummy\\n' > /tmp/selftest-key && env -u RERUN_API_KEY RERUN_API_KEY_FILE=/tmp/selftest-key /usr/local/bin/docker-entrypoint.sh /opt/entrypoint-selftest/entrypoint-selftest.sh; s=$?; rm -f /tmp/selftest-key; exit $s"]
 RUN npx --yes patchright@1.63.0 install-deps chromium && rm -rf /var/lib/apt/lists/*
 RUN npm install -g "@openai/codex@0.166.0"
 USER rerun
