@@ -255,16 +255,17 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         if (provider === 'opencode') void refreshOpencodePlanLimits(connection)
     }
 
-    const closeSafely = async (): Promise<void> => {
+    const closeSafely = async (): Promise<boolean> => {
         let timer: ReturnType<typeof setTimeout> | undefined
-        const guard = new Promise<void>(resolve => {
+        const guard = new Promise<false>(resolve => {
             timer = setTimeout(() => {
                 logger.warn({ agent: agent.id, run: run.id, provider }, 'run teardown timed out')
-                resolve()
+                resolve(false)
             }, CLOSE_TIMEOUT_MS)
         })
-        await Promise.race([close().catch(() => {}), guard])
+        const closedInTime = await Promise.race([close().then(() => true, () => true), guard])
         if (timer) clearTimeout(timer)
+        return closedInTime
     }
 
     let settled = false
@@ -352,7 +353,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         // Codex only writes its rotated token to auth.json once the CLI has exited, so the next run
         // must not be able to start before this returns. Capped rather than awaited outright: a
         // teardown that hangs used to be enough to keep the whole conversation busy forever.
-        await closeSafely()
+        // An app-server still up holds its thread's writer lock: resuming it would be refused.
+        if (!(await closeSafely()) && provider === 'codex') forgetCodexThread(agent.id, sessionId)
         void cliAuthP?.then(release => release(), () => {})
         // Last, not first: freeing the session claim before the transcript is written and before
         // the provider is down let a second send in on a history missing this turn.

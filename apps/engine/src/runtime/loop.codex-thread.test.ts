@@ -7,7 +7,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-codex-thread-'
 
 const { calls, turn } = vi.hoisted(() => ({
     calls: [] as Array<Record<string, unknown> | undefined>,
-    turn: { threadId: 'thread-1', fail: false },
+    turn: { threadId: 'thread-1', fail: false, closeHangs: false },
 }))
 
 vi.mock('./notify.js', async importOriginal => ({ ...(await importOriginal<typeof import('./notify.js')>()), sendNotification: async () => ({ delivered: true }) }))
@@ -49,12 +49,12 @@ vi.mock('../agents/providers.js', async importOriginal => {
                     }
                 },
             }),
-            close: async () => {},
+            close: () => (turn.closeHangs ? new Promise<void>(() => {}) : Promise.resolve()),
         }),
     }
 })
 
-const { beforeAll, beforeEach, describe, expect, it } = await import('vitest')
+const { afterEach, beforeAll, beforeEach, describe, expect, it } = await import('vitest')
 const { mkdir } = await import('node:fs/promises')
 const { migrate } = await import('../db/migrate.js')
 const { agentConfigSchema } = await import('../agents/types.js')
@@ -84,7 +84,12 @@ describe('a Codex conversation keeps its thread', () => {
         calls.length = 0
         turn.threadId = 'thread-1'
         turn.fail = false
+        turn.closeHangs = false
         forgetCodexThreadsOf('codex-cnx')
+    })
+
+    afterEach(() => {
+        vi.useRealTimers()
     })
 
     it('starts a thread on the first message and resumes it on the next', async () => {
@@ -120,5 +125,24 @@ describe('a Codex conversation keeps its thread', () => {
         await send(second.id, 'two')
         await send(first.id, 'one again')
         expect(calls).toEqual([undefined, undefined, { threadId: 'thread-1' }])
+    })
+
+    // An app-server that did not go down in time still holds the thread's writer lock: resuming it
+    // would be refused with "already has an active writer" (RER-128).
+    it('starts a new thread after a turn whose teardown timed out', async () => {
+        const session = await createSession(id, 'hello')
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+        turn.closeHangs = true
+        let settled = false
+        void send(session.id, 'hello').then(() => (settled = true))
+        for (let tick = 0; tick < 300 && !settled; tick++) {
+            await new Promise(resolve => setImmediate(resolve))
+            await vi.advanceTimersByTimeAsync(100)
+        }
+        expect(settled).toBe(true)
+        vi.useRealTimers()
+        turn.closeHangs = false
+        await send(session.id, 'and then?')
+        expect(calls).toEqual([undefined, undefined])
     })
 })

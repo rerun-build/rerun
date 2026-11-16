@@ -1,5 +1,5 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 45ed4bd9287395a0a4e35f2f4a1f66da88341516..bfd497d4b52e8e73a1ef56fc3b38b1552a49509b 100644
+index 45ed4bd9287395a0a4e35f2f4a1f66da88341516..35b097cc8f901f9c2566275ff8ccd15b8572554a 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
 @@ -2346,9 +2346,15 @@ function mapTool(item) {
@@ -121,8 +121,54 @@ index 45ed4bd9287395a0a4e35f2f4a1f66da88341516..bfd497d4b52e8e73a1ef56fc3b38b155
  ]);
  var turnSchema = zod.z.object({
    id: zod.z.string(),
+@@ -4766,12 +4808,21 @@ var AppServerRpcClient = class extends events.EventEmitter {
+     this.activeRequestContextsByTurn.clear();
+     this.completedTurnIds.clear();
+     this.serverCapabilities = void 0;
++    const child = this.child;
+     if (this.child) {
+       this.expectedExitSignal = "SIGTERM";
++      // rerun patch: a refused signal (kill EACCES) leaves the app-server running with its thread writer lock;
++      // at EOF on stdin it exits on its own, so the next turn can resume the thread.
++      this.child.stdin?.end();
+       this.child.kill("SIGTERM");
+       this.child = void 0;
+     }
+     this.writeQueue = Promise.resolve();
++    // rerun patch: resolves once the app-server is gone. One still running holds its thread's writer lock, and the
++    // engine only resumes that thread when this returns in time.
++    if (child && child.exitCode === null && child.signalCode === null) {
++      await new Promise((resolve) => child.once("exit", resolve));
++    }
+   }
+   async dispose() {
+     await this.close();
+@@ -4931,6 +4982,7 @@ var AppServerRpcClient = class extends events.EventEmitter {
+     this.serverCapabilities = void 0;
+     if (this.child) {
+       this.expectedExitSignal = "SIGTERM";
++      this.child.stdin?.end();
+       this.child.kill("SIGTERM");
+       this.child = void 0;
+     }
+@@ -4944,6 +4996,7 @@ var AppServerRpcClient = class extends events.EventEmitter {
+     this.stdoutReader = void 0;
+     if (this.child) {
+       this.expectedExitSignal = "SIGTERM";
++      this.child.stdin?.end();
+       this.child.kill("SIGTERM");
+       this.child = void 0;
+     }
+@@ -5340,6 +5393,7 @@ var AppServerRpcClient = class extends events.EventEmitter {
+           `[codex-app-server] Closing idle app-server process after ${idleTimeoutMs}ms inactivity.`
+         );
+         this.expectedExitSignal = "SIGTERM";
++        this.child.stdin?.end();
+         this.child.kill("SIGTERM");
+         this.child = void 0;
+       }
 diff --git a/dist/index.js b/dist/index.js
-index 0e2c370883354cd782ab878f645170a87081c8a2..532e3cf401448c77c6af488325b198ddd2bc0432 100644
+index 0e2c370883354cd782ab878f645170a87081c8a2..79f8183741d371c69dc362dd4d7e35f7557986f8 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -2338,9 +2338,15 @@ function mapTool(item) {
@@ -244,3 +290,49 @@ index 0e2c370883354cd782ab878f645170a87081c8a2..532e3cf401448c77c6af488325b198dd
  ]);
  var turnSchema = z.object({
    id: z.string(),
+@@ -4758,12 +4800,21 @@ var AppServerRpcClient = class extends EventEmitter {
+     this.activeRequestContextsByTurn.clear();
+     this.completedTurnIds.clear();
+     this.serverCapabilities = void 0;
++    const child = this.child;
+     if (this.child) {
+       this.expectedExitSignal = "SIGTERM";
++      // rerun patch: a refused signal (kill EACCES) leaves the app-server running with its thread writer lock;
++      // at EOF on stdin it exits on its own, so the next turn can resume the thread.
++      this.child.stdin?.end();
+       this.child.kill("SIGTERM");
+       this.child = void 0;
+     }
+     this.writeQueue = Promise.resolve();
++    // rerun patch: resolves once the app-server is gone. One still running holds its thread's writer lock, and the
++    // engine only resumes that thread when this returns in time.
++    if (child && child.exitCode === null && child.signalCode === null) {
++      await new Promise((resolve) => child.once("exit", resolve));
++    }
+   }
+   async dispose() {
+     await this.close();
+@@ -4923,6 +4974,7 @@ var AppServerRpcClient = class extends EventEmitter {
+     this.serverCapabilities = void 0;
+     if (this.child) {
+       this.expectedExitSignal = "SIGTERM";
++      this.child.stdin?.end();
+       this.child.kill("SIGTERM");
+       this.child = void 0;
+     }
+@@ -4936,6 +4988,7 @@ var AppServerRpcClient = class extends EventEmitter {
+     this.stdoutReader = void 0;
+     if (this.child) {
+       this.expectedExitSignal = "SIGTERM";
++      this.child.stdin?.end();
+       this.child.kill("SIGTERM");
+       this.child = void 0;
+     }
+@@ -5332,6 +5385,7 @@ var AppServerRpcClient = class extends EventEmitter {
+           `[codex-app-server] Closing idle app-server process after ${idleTimeoutMs}ms inactivity.`
+         );
+         this.expectedExitSignal = "SIGTERM";
++        this.child.stdin?.end();
+         this.child.kill("SIGTERM");
+         this.child = void 0;
+       }
