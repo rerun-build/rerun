@@ -139,7 +139,7 @@ Before finishing any feature touching Supabase, grep your own diff for `.from('`
 
 # Engine data-dir migrations
 
-An engine data-dir can be archived and restored weeks later onto a newer engine. Anything that changes what the engine keeps on disk (a file, a folder, a SQLite schema) is a new numbered step at the end of its ladder: `DATA_DIR_MIGRATIONS` in `apps/engine/src/datadir/migrations.ts`, `SYSTEM_DB_MIGRATIONS` or `SHARED_DB_MIGRATIONS`.
+An engine data-dir can be archived and restored weeks later onto a newer engine. Anything that changes what the engine keeps on disk (a file, a folder, a SQLite schema) is a new numbered step at the end of its ladder: `DATA_DIR_MIGRATIONS` in `apps/engine/src/datadir/migrations.ts`, `SYSTEM_DB_MIGRATIONS`, `SHARED_DB_MIGRATIONS` or `BRAIN_DB_MIGRATIONS` (`apps/engine/src/db/`).
 
 - A shipped step is never edited nor removed, even once every live box has run it.
 - A step is re-runnable, and leaves the old engine still running beside it working: add first, remove in a later step.
