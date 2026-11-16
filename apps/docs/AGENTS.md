@@ -7,6 +7,8 @@
 - A page only appears on the site once it is listed in `docs.json` navigation
 - Preview locally with `pnpm dev:docs` from the repo root
 - For Mintlify product knowledge (components, configuration), use the docs MCP server `https://www.mintlify.com/docs/mcp`
+- Coworkers and the Chief of Staff answer customers out of the deployed site (`/llms-full.txt`), so a stale page is a wrong answer. Every change to the product updates its pages in the same pull request: follow the `update-docs` skill (`.claude/skills/update-docs/SKILL.md`)
+- Check with `pnpm check:docs` (validation and broken links)
 
 ## Terminology
 

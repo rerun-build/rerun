@@ -73,6 +73,20 @@ app. Tests and the typecheck are not enough. Follow the `verify-in-app` skill wi
 - the final message shows the captures, what was clicked, the errors found, and says plainly what
   could not be tested
 
+# Docs follow the code
+
+The coworkers and the Chief of Staff answer customers' questions about Rerun out of docs.rerun.build
+(`rerun_hub_search_docs`), so a stale page is a wrong answer given to a customer. A change is not done
+until the documentation says what the code now does. Follow the `update-docs` skill without being asked:
+
+- a change a user, an API client or a self-hoster can notice adds, edits or deletes the pages it affects
+  in the same pull request: the public site `apps/docs`, the READMEs, `apps/engine/docs`
+- a feature that goes away leaves the docs with it, a renamed label or screen is renamed in them
+- a link from the app into the docs (`docsUrl`, `DocsLink`, `MCP_CLIENTS[].docs`) still lands on a page
+  and a heading that exist
+- every number, default and limit written in a page is read from the code
+- the pull request description lists the pages it changed, or says why none needed to
+
 # i18n
 
 Rerun ships language packs (`packages/i18n`, see its README). The source is English; French and

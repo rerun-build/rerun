@@ -18,12 +18,12 @@ Search is disabled in local preview unless you run `npx mint login`. Everything 
 
 ## Structure
 
-- `docs.json` — site config: name, colors, navigation (three tabs), navbar, footer
-- `*.mdx` — pages, referenced by path (without extension) in `docs.json` navigation
-- `agents/` — building and configuring an agent
-- `templates/` — installing, authoring and selling templates
-- `api/` — the MCP server and the webhook endpoint, with `api/tools/` holding the tool reference
-- `snippets/` — reusable MDX fragments, imported with `import X from '/snippets/x.mdx'`
-- `images/` — screenshots, referenced from pages
-- `logo/`, `favicon.svg` — brand assets, copied from `branding/`
-- `AGENTS.md` — instructions for agents editing the docs
+- `docs.json`: site config: name, colors, navigation (four tabs: Documentation, Templates, Self-hosting, API), navbar, footer
+- `*.mdx`: pages, referenced by path (without extension) in `docs.json` navigation
+- `agents/`: building and configuring a coworker
+- `templates/`: installing, authoring and selling templates
+- `self-host/`: running Rerun on your own server
+- `api/`: the MCP server and the webhook endpoint, with `api/tools/` holding the tool reference
+- `snippets/`: reusable MDX fragments, imported with `import X from '/snippets/x.mdx'`
+- `logo/`, `favicon.svg`: brand assets
+- `AGENTS.md`: instructions for agents editing the docs, with the `update-docs` skill (`.claude/skills/update-docs`) for keeping pages in step with the code
