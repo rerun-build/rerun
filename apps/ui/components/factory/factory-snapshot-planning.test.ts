@@ -47,9 +47,9 @@ describe('the snapshot contract carries planning', () => {
         for (const bad of [{ startedAt: 'yesterday' }, { startedAt: 1794000000 }, { steps: -1 }, { steps: 1.5 }, { runId: null }]) expect(accepted([entry({ coworkers: [{ ...run, ...bad }] })]), JSON.stringify(bad)).toBe(false)
     })
 
-    it('refuses an unknown key in an entry or a coworker', () => {
-        expect(accepted([{ ...entry(), extra: 1 }])).toBe(false)
-        expect(accepted([entry({ coworkers: [{ ...run, extra: 1 }] })])).toBe(false)
+    it('drops an unknown key in an entry or a coworker', () => {
+        expect(accepted([{ ...entry(), extra: 1 }])).toBe(true)
+        expect(accepted([entry({ coworkers: [{ ...run, extra: 1 }] })])).toBe(true)
     })
 
     it('stays under the byte limit with five entries of eight coworkers', () => {
