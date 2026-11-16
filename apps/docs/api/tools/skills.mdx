@@ -15,7 +15,7 @@ Returns each skill with its `slug`, `name`, `description` and the list of refere
 
 ## get_skill
 
-Reads one skill in full: its `body`, plus every reference file it carries with its size in bytes. The content of those files is not included, since a skill can bundle a corpus: read one with [read_skill_file](#read-skill-file) when the body points at it.
+Reads one skill in full: its `body`, plus every reference file it carries with its size in bytes. The content of those files is not included, since a skill can bundle a corpus: read one with [read_skill_file](#read_skill_file) when the body points at it.
 
 <ParamField body="agentId" type="string" required />
 <ParamField body="slug" type="string" required />

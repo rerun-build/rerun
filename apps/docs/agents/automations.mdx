@@ -42,7 +42,7 @@ Once the task exists, its editor also shows **Enabled**, to pause it without del
 A one-off task fires once at its date, then switches itself off.
 
 <Tip>
-  Test the prompt before putting it live. **Test Run** fires the task right away, works on a disabled task, and does not touch its schedule. From the API that is [`run_schedule_now`](/api/tools/schedules#run-schedule-now).
+  Test the prompt before putting it live. **Test Run** fires the task right away, works on a disabled task, and does not touch its schedule. From the API that is [`run_schedule_now`](/api/tools/schedules#run_schedule_now).
 </Tip>
 
 While a coworker installed from a template has not finished its setup, its scheduled tasks stay off and **Test Run** stays locked: **Test Run unlocks once the setup is finished.** Finish or skip the setup in the chat first.
@@ -94,7 +94,7 @@ Rerun manages the trigger behind it (**LinkedIn events** or **WhatsApp messages*
 | Something when another service says so | A trigger |
 | Something once, at a date | A one-off scheduled task |
 | Something when a prospect replies on LinkedIn or WhatsApp | A wake event of the paid app |
-| Something on demand from your own script | A trigger, or [`send_message`](/api/tools/runs#send-message) |
+| Something on demand from your own script | A trigger, or [`send_message`](/api/tools/runs#send_message) |
 
 ## Unattended runs still pause for you
 
@@ -104,4 +104,4 @@ This is deliberate: a coworker should not skip an approval just because nobody i
 
 ## From the API
 
-[`upsert_schedule`](/api/tools/schedules#upsert-schedule) and [`upsert_trigger`](/api/tools/triggers#upsert-trigger) do everything on this page, which is how you keep an automation setup in version control.
+[`upsert_schedule`](/api/tools/schedules#upsert_schedule) and [`upsert_trigger`](/api/tools/triggers#upsert_trigger) do everything on this page, which is how you keep an automation setup in version control.

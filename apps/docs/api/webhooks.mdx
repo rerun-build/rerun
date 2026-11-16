@@ -9,14 +9,14 @@ A trigger gives a coworker a public URL. Call that URL and the coworker starts w
 https://app.rerun.build/api/t/{agentId}/{slug}/{token}
 ```
 
-Create a trigger in the app under the coworker **Triggers** tab, or with [`upsert_trigger`](/api/tools/triggers#upsert-trigger). Both give you the full URL.
+Create a trigger in the app under the coworker **Triggers** tab, or with [`upsert_trigger`](/api/tools/triggers#upsert_trigger). Both give you the full URL.
 
 ## The URL is the credential
 
 There is no signature, no secret header and no allowlist. Whoever holds the URL can fire the coworker, as many times as they want.
 
 <Warning>
-  Treat every trigger URL like a password. Do not paste it into a shared document, a ticket or a public repository. If one leaks, rotate it with [`rotate_trigger_token`](/api/tools/triggers#rotate-trigger-token) or from the **Triggers** tab, and update every service configured with it.
+  Treat every trigger URL like a password. Do not paste it into a shared document, a ticket or a public repository. If one leaks, rotate it with [`rotate_trigger_token`](/api/tools/triggers#rotate_trigger_token) or from the **Triggers** tab, and update every service configured with it.
 </Warning>
 
 Because the URL is the whole authentication, Rerun cannot validate a third-party signature header today. Caller headers are never forwarded to the coworker: they carry credentials and are trivially spoofed.
@@ -96,6 +96,6 @@ curl -i -X POST "https://app.rerun.build/api/t/AGENT_ID/SLUG/TOKEN" \
   -d '{"event":"test"}'
 ```
 
-Or use [`test_trigger`](/api/tools/triggers#test-trigger), which pre-checks the method and the enabled state so you get a readable error instead of a bare `404`. Either way it is a real fire: it counts towards the trigger fire count.
+Or use [`test_trigger`](/api/tools/triggers#test_trigger), which pre-checks the method and the enabled state so you get a readable error instead of a bare `404`. Either way it is a real fire: it counts towards the trigger fire count.
 
-Read the outcome with [`get_run`](/api/tools/runs#get-run), using the `runId` from the `202`.
+Read the outcome with [`get_run`](/api/tools/runs#get_run), using the `runId` from the `202`.

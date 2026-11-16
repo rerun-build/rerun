@@ -42,7 +42,7 @@ Creates a trigger, or updates it when `slug` is given.
 <ParamField body="enabled" type="boolean" />
 
 <ParamField body="connectionId" type="string">
-  Run this one on a given AI connection, by its id from [`list_ai_connections`](/api/tools/agents#list-ai-connections). Goes with `model`.
+  Run this one on a given AI connection, by its id from [`list_ai_connections`](/api/tools/agents#list_ai_connections). Goes with `model`.
 </ParamField>
 
 <ParamField body="model" type="string | null">
@@ -88,7 +88,7 @@ Fires a trigger yourself with a sample payload, to check the instruction before 
   This is a real fire, not a dry run. It counts towards the trigger fire count and updates its last-fired date. It also needs the trigger to be enabled: unlike `run_schedule_now`, firing a disabled trigger fails, because the engine answers a disabled trigger exactly like a missing one.
 </Warning>
 
-Returns the `slug`, the `method` used, `runId` and `sessionId`. Read the outcome with [`get_run`](/api/tools/runs#get-run).
+Returns the `slug`, the `method` used, `runId` and `sessionId`. Read the outcome with [`get_run`](/api/tools/runs#get_run).
 
 ## rotate_trigger_token
 

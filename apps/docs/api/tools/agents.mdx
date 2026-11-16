@@ -73,7 +73,7 @@ What each coworker is doing right now, read from the machine at the moment of th
 | `error` | The last run that ended failed |
 | `idle` | None of the above |
 
-`running` lists the runs in flight, up to 20 per coworker, with their [trigger](/api/tools/runs#list-runs), start and step count. `waitingOn` lists the conversations waiting on a person, and `reason` says on what: `waiting_human`, `awaiting_question`, `awaiting_approval`, `awaiting_connector` (an app to sign in to) or `awaiting_ack`. `lastRun` is the most recent run that ended, with its `error` when it failed, or `null`.
+`running` lists the runs in flight, up to 20 per coworker, with their [trigger](/api/tools/runs#list_runs), start and step count. `waitingOn` lists the conversations waiting on a person, and `reason` says on what: `waiting_human`, `awaiting_question`, `awaiting_approval`, `awaiting_connector` (an app to sign in to) or `awaiting_ack`. `lastRun` is the most recent run that ended, with its `error` when it failed, or `null`.
 
 Only the coworkers the key reaches are listed: an `agentId` outside them gives an empty `agents` list, not an error.
 
@@ -118,7 +118,7 @@ Creates a coworker and places it on the board. It is visible in the app immediat
 </ParamField>
 
 <ParamField body="connectionId" type="string">
-  The AI connection to run on, by its id from [`list_ai_connections`](#list-ai-connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
+  The AI connection to run on, by its id from [`list_ai_connections`](#list_ai_connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
 </ParamField>
 
 <ParamField body="provider" type="string">
@@ -160,7 +160,7 @@ Creates a coworker and places it on the board. It is visible in the app immediat
 }
 ```
 
-Each entry of `connectors` carries the `key` of the account it declared and, for a second account of the same app, its `label`. See [Apps](/api/tools/connectors#list-agent-connectors).
+Each entry of `connectors` carries the `key` of the account it declared and, for a second account of the same app, its `label`. See [Apps](/api/tools/connectors#list_agent_connectors).
 
 On Rerun Cloud, `active: false` means the creation succeeded but the plan has no free coworker slot, so the coworker will not run until one frees up. An `inactiveReason` explains it.
 
@@ -190,7 +190,7 @@ Updates a coworker. Every field is optional and only what you pass changes.
 
 <ParamField body="description" type="string" />
 <ParamField body="connectionId" type="string">
-  The AI connection to run on, by its id from [`list_ai_connections`](#list-ai-connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
+  The AI connection to run on, by its id from [`list_ai_connections`](#list_ai_connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
 </ParamField>
 
 <ParamField body="provider" type="string">

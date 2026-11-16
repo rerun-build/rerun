@@ -68,8 +68,10 @@ And for the links of the app into the docs, which must land on a page and a head
 rg -n "docsUrl\(|DocsLink|docs: '/" apps/ui --glob '!**/node_modules/**'
 ```
 
-A heading becomes its anchor in lower case with spaces as hyphens: renaming `## A Rerun agent` breaks every
-link to `#a-rerun-agent`.
+A heading becomes its anchor in lower case, spaces turned into hyphens, punctuation and backticks dropped,
+underscores kept: `## A Rerun agent` is `#a-rerun-agent`, ``## `get_run` `` is `#get_run`. Renaming a heading
+breaks every link to its old anchor, and `pnpm check:docs` does not catch it (it checks pages, not anchors):
+search for the old anchor yourself.
 
 ## 3. Write
 
