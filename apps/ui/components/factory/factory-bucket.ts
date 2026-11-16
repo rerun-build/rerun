@@ -15,9 +15,10 @@ export type BucketRow = { station: string | null; by: string | null; builder: st
 
 export function bucketRow(job: FactoryJob, names: Record<string, string>): BucketRow {
     const runs = [...(job.runs ?? [])].sort((a, b) => Date.parse(a.startedAt) - Date.parse(b.startedAt))
-    const who = (stages: string[]) => runs.findLast(r => stages.includes(r.stage))
+    const word = (stage: string) => stage.split(' ')[0]
+    const who = (stages: string[]) => runs.findLast(r => stages.includes(word(r.stage)))
     const judge = isRejected(job) ? who(JUDGES) : undefined
     const builder = who(BUILDERS)
     const name = (id: string) => names[id] ?? id
-    return { station: judge?.stage ?? null, by: judge ? name(judge.coworkerId) : null, builder: builder ? name(builder.coworkerId) : null }
+    return { station: judge ? word(judge.stage) : null, by: judge ? name(judge.coworkerId) : null, builder: builder ? name(builder.coworkerId) : null }
 }
