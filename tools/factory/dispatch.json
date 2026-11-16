@@ -93,6 +93,15 @@
         }
       ]
     },
+    "acceptor": {
+      "coworkers": [
+        {
+          "id": "b0e5b39f-74e3-4dfd-9d16-8cf53934ad05",
+          "name": "BARBARA",
+          "runs": 2
+        }
+      ]
+    },
     "resolver": {
       "coworkers": [
         {
