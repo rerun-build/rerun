@@ -40,7 +40,7 @@ Pick one. The first is simpler to keep running, the second is the full open sour
 
     The project ref is the part before `.supabase.co` in the project URL.
 
-    4. In **Authentication > Sign In / Providers**, turn on **Allow anonymous sign-ins** and keep **Confirm email** on. A visitor lands on the board as an anonymous user, and signing up turns that user into an account.
+    4. In **Authentication > Sign In / Providers**, keep **Confirm email** on and leave **Allow anonymous sign-ins** off. A visitor signs in before reaching the board.
     5. In **Authentication > Emails > SMTP Settings**, turn on **Custom SMTP** and enter your SMTP server. This step is required: on the Free plan, a project that keeps Supabase's own mailer cannot edit its email templates, so the email arrives without the code. That mailer also sends only 2 emails an hour, and only to the members of your Supabase organization.
     6. Once SMTP is saved, in **Authentication > Email Templates**, paste the content of `supabase/templates/magic_link.html` from your clone into **Magic Link**, **Confirm signup** and **Change Email Address**, with the subject `Your Rerun code`. Rerun signs people in with a 6-digit code, and Supabase's default templates only carry a link.
     7. In **Authentication > URL Configuration**, set the **Site URL** to the address people open, the same as `NEXT_PUBLIC_APP_URL` below.
@@ -85,7 +85,6 @@ Pick one. The first is simpler to keep running, the second is the full open sour
     ADDITIONAL_REDIRECT_URLS=https://rerun.example.com/**
     SUPABASE_PUBLIC_URL=https://api.example.com
     API_EXTERNAL_URL=https://api.example.com/auth/v1
-    ENABLE_ANONYMOUS_USERS=true
     SMTP_HOST=<your SMTP server>
     SMTP_PORT=587
     SMTP_USER=<your SMTP user>
@@ -147,7 +146,7 @@ Pick one. The first is simpler to keep running, the second is the full open sour
     npx supabase start
     ```
 
-    It takes ports 54420 to 54429, applies every migration and loads the seed. Sign-in, the code templates and anonymous sign-ins are already configured.
+    It takes ports 54420 to 54429, applies every migration and loads the seed. Sign-in and the code templates are already configured.
 
     | What | Where |
     | --- | --- |

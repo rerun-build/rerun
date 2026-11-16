@@ -1,5 +1,6 @@
 'use server'
 
+import { AUTH_RETURN_COOKIE, readAuthReturnCookie } from '@/lib/auth/auth-return'
 import { LAST_SIGN_IN_COOKIE, LAST_SIGN_IN_MAX_AGE_SECONDS } from '@/lib/auth/last-sign-in-cookie'
 import { internalPath } from '@/lib/auth/internal-path'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
@@ -34,5 +35,7 @@ export async function confirmLogin(formData: FormData) {
 
     const pendingInvite = cookieStore.get(PENDING_INVITE_COOKIE)?.value
     if (pendingInvite) cookieStore.delete(PENDING_INVITE_COOKIE)
-    redirect(internalPath(pendingInvite, routes.home))
+    const authReturn = readAuthReturnCookie(cookieStore.get(AUTH_RETURN_COOKIE)?.value)
+    if (authReturn) cookieStore.delete(AUTH_RETURN_COOKIE)
+    redirect(internalPath(pendingInvite ?? authReturn, routes.home))
 }

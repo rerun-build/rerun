@@ -40,9 +40,9 @@ docker compose logs app | grep email-sign-up
 
 If the code arrives but is refused, it may have expired (15 minutes with the Rerun settings), or **Email OTP Length** is not 6.
 
-## The sign-in dialog fails, or "Anonymous sign-in failed" in the logs
+## Opening the app always lands on the sign-in page
 
-A visitor starts as an anonymous user, and signing up turns that user into an account. On a project on supabase.com, turn on **Allow anonymous sign-ins** in **Authentication > Sign In / Providers**, and keep **Confirm email** on.
+That is the expected path: nobody reaches the board without an account. A link to a template, a shared coworker or a prompt waits through the sign-in and opens once you are in.
 
 ## "permission denied" from Postgres
 

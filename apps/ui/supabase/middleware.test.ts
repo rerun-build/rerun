@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
     setAll: null as ((cookies: CookieToSet[]) => void) | null,
     getUser: vi.fn(),
     signInAnonymously: vi.fn(),
+    signOut: vi.fn(),
     selectMaybeSingle: vi.fn(),
 }))
 
@@ -23,7 +24,7 @@ const getClaims = vi.fn(async () => {
 vi.mock('@supabase/ssr', () => ({
     createServerClient: (_url: string, _key: string, options: { cookies: { setAll: (cookies: CookieToSet[]) => void } }) => {
         mocks.setAll = options.cookies.setAll
-        return { auth: { getUser: mocks.getUser, getClaims, signInAnonymously: mocks.signInAnonymously } }
+        return { auth: { getUser: mocks.getUser, getClaims, signInAnonymously: mocks.signInAnonymously, signOut: mocks.signOut } }
     },
 }))
 
@@ -46,6 +47,7 @@ describe('updateSession', () => {
     beforeEach(() => {
         mocks.getUser.mockReset()
         mocks.signInAnonymously.mockReset()
+        mocks.signOut.mockReset().mockResolvedValue({ error: null })
         getClaims.mockClear()
         mocks.selectMaybeSingle.mockReset().mockResolvedValue({ data: { id: 'user-1', workspace_id: 'workspace-1', signed_up_at: '2026-01-01T00:00:00Z' }, error: null })
     })
@@ -204,69 +206,75 @@ describe('updateSession', () => {
         })
     })
 
-    describe('anonymous session', () => {
-        beforeEach(() => {
-            mocks.getUser.mockResolvedValue({ data: { user: null } })
-            mocks.signInAnonymously.mockResolvedValue({ data: { user: { id: 'anon-1', is_anonymous: true } }, error: null })
-        })
-
-        it('starts one for a top-level navigation to a page', async () => {
-            const response = await updateSession(new NextRequest('https://app.rerun.build/board', { headers: DOCUMENT }))
-
-            expect(mocks.signInAnonymously).toHaveBeenCalledTimes(1)
-            expect(response.headers.get('location')).toBeNull()
-        })
-
-        it('starts none for a prefetch, an RSC fetch or an asset', async () => {
-            await updateSession(new NextRequest('https://app.rerun.build/board'))
-            await updateSession(new NextRequest('https://app.rerun.build/board', { headers: { 'sec-fetch-dest': 'empty' } }))
-
-            expect(mocks.signInAnonymously).not.toHaveBeenCalled()
-        })
-
-        it('starts none for anything but a GET', async () => {
-            await updateSession(new NextRequest('https://app.rerun.build/board', { method: 'POST', headers: DOCUMENT }))
-
-            expect(mocks.signInAnonymously).not.toHaveBeenCalled()
-        })
-
-        it('starts none on the auth pages, where the visitor is about to sign in', async () => {
-            await updateSession(new NextRequest('https://app.rerun.build/auth', { headers: DOCUMENT }))
-            await updateSession(new NextRequest('https://app.rerun.build/auth/callback', { headers: DOCUMENT }))
-
-            expect(mocks.signInAnonymously).not.toHaveBeenCalled()
-        })
-
-        it('lets an anonymous visitor stay on /auth to sign in', async () => {
-            mocks.getUser.mockResolvedValue({ data: { user: { id: 'anon-1', is_anonymous: true } } })
-
-            const response = await updateSession(new NextRequest('https://app.rerun.build/auth'))
-
-            expect(response.headers.get('location')).toBeNull()
-        })
-    })
-
     describe('visitor without a session', () => {
         beforeEach(() => mocks.getUser.mockResolvedValue({ data: { user: null } }))
 
-        it('is sent to /auth from the home page when no anonymous session could be started', async () => {
-            mocks.signInAnonymously.mockResolvedValue({ data: { user: null }, error: { message: 'Anonymous sign-ins are disabled' } })
-            vi.spyOn(console, 'error').mockImplementation(() => {})
-
-            const response = await updateSession(new NextRequest('https://app.rerun.build/', { headers: { 'sec-fetch-dest': 'document' } }))
+        it('is sent to sign in from the home page, and never handed an anonymous session', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/', { headers: DOCUMENT }))
 
             expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
+            expect(mocks.signInAnonymously).not.toHaveBeenCalled()
         })
 
-        it('is sent to /auth from the home page on a request that may not start a session', async () => {
+        it('is sent to sign in on a request that is not a page load as well', async () => {
             const response = await updateSession(new NextRequest('https://app.rerun.build/'))
 
             expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
         })
 
-        it('is let through on any other page', async () => {
-            const response = await updateSession(new NextRequest('https://app.rerun.build/templates/crm'))
+        it.each([
+            ['/?template=crm-pipeline', '/?template=crm-pipeline'],
+            ['/?share=tok_123', '/?share=tok_123'],
+            ['/?prompt=Answer+my+leads&name=Scout&apps=gmail,hubspot', '/?prompt=Answer+my+leads&name=Scout&apps=gmail,hubspot'],
+        ])('carries %s to the sign-in page, to land back on it', async (path, next) => {
+            const response = await updateSession(new NextRequest(`https://app.rerun.build${path}`, { headers: DOCUMENT }))
 
+            const location = new URL(response.headers.get('location')!)
+            expect(location.pathname).toBe('/auth')
+            expect(location.searchParams.get('next')).toBe(next)
+        })
+
+        // Every page of the matcher but the board answers a visitor without an account: they sign in,
+        // accept an invitation, redeem a code or manage their emails from there.
+        it.each(['/auth', '/auth/callback?code=abc', '/auth/confirm?token_hash=x&type=email', '/auth/auth-code-error', '/auth/desktop', '/invite/abc', '/creator/join', '/creator/join/abc', '/redeem', '/unsubscribe?token=x', '/quick-ask', '/settings', '/published-gate/site'])(
+            'lets %s through',
+            async path => {
+                const response = await updateSession(new NextRequest(`https://app.rerun.build${path}`, { headers: DOCUMENT }))
+
+                expect(response.headers.get('location')).toBeNull()
+                expect(mocks.signInAnonymously).not.toHaveBeenCalled()
+            },
+        )
+    })
+
+    describe('anonymous session from before', () => {
+        beforeEach(() => mocks.getUser.mockResolvedValue({ data: { user: { id: 'anon-1', is_anonymous: true } } }))
+
+        it('is signed out on its next page load and sent to sign in, the cookies cleared on the redirect', async () => {
+            mocks.signOut.mockImplementation(async () => {
+                mocks.setAll?.([{ name: AUTH_COOKIE, value: '', options: { ...SET_OPTIONS, maxAge: 0 } }])
+                return { error: null }
+            })
+
+            const response = await updateSession(new NextRequest('https://app.rerun.build/?template=crm-pipeline', { headers: DOCUMENT }))
+
+            expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' })
+            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth?next=%2F%3Ftemplate%3Dcrm-pipeline')
+            expect(response.cookies.get(AUTH_COOKIE)?.maxAge).toBe(0)
+            expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+        })
+
+        it('is signed out on /auth too, and may sign in there', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/auth', { headers: DOCUMENT }))
+
+            expect(mocks.signOut).toHaveBeenCalledTimes(1)
+            expect(response.headers.get('location')).toBeNull()
+        })
+
+        it('is left alone on a server action, which the next page load catches', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/board', { method: 'POST', headers: { cookie: 'rerun-provisioned=anon-1.0' } }))
+
+            expect(mocks.signOut).not.toHaveBeenCalled()
             expect(response.headers.get('location')).toBeNull()
         })
     })

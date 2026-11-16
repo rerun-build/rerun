@@ -124,7 +124,8 @@ refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
 enable_signup = true
 # Allow/disallow anonymous sign-ins to your project.
-enable_anonymous_sign_ins = true
+# Off: a visitor signs in before reaching the board.
+enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 # Must stay on: the account settings connect Google to a signed-in account through linkIdentity.
 enable_manual_linking = true
