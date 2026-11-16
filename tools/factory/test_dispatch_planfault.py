@@ -3,7 +3,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import dispatch as D
 import proof
 import test_dispatch_proof as P
-from test_dispatch import PR_LINE
 
 HEAD = P.HEAD
 PLAN2 = "ASK 2: NOT MET (plan) the Run block lacks the test line"
