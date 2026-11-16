@@ -215,4 +215,50 @@ describe('factorySnapshotSchema', () => {
             expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
         }
     })
+
+    const runStats = () => ({ since: '2026-11-09T12:00:00Z', finished: 12, errors: 2, avgRunS: 161.5 })
+    const plan = () => ({ weekUsedPercent: 56, weekResetsAt: '2026-11-14T08:00:00Z', signInMinutes: 412 })
+    const ok = (s: unknown) => factorySnapshotSchema.safeParse(s).success
+
+    it('accepts the old shape: no runStats and no plan', () => {
+        const s = sample()
+        expect('runStats' in s).toBe(false)
+        expect('plan' in s).toBe(false)
+        expect(ok(s)).toBe(true)
+    })
+
+    it('accepts runStats and plan', () => {
+        const r = factorySnapshotSchema.safeParse({ ...sample(), runStats: runStats(), plan: plan() })
+        expect(r.success).toBe(true)
+        if (r.success) {
+            expect(r.data.runStats?.finished).toBe(12)
+            expect(r.data.plan?.signInMinutes).toBe(412)
+        }
+    })
+
+    it('accepts null avgRunS, weekUsedPercent, weekResetsAt and signInMinutes', () => {
+        const s = { ...sample(), runStats: { ...runStats(), avgRunS: null }, plan: { weekUsedPercent: null, weekResetsAt: null, signInMinutes: null } }
+        expect(ok(s)).toBe(true)
+    })
+
+    it('refuses one past each limit', () => {
+        const cases: Array<[string, string, number, number]> = [
+            ['runStats', 'finished', -1, 0],
+            ['runStats', 'errors', 1.5, 0],
+            ['runStats', 'avgRunS', -1, 0],
+            ['plan', 'weekUsedPercent', -1, 0],
+            ['plan', 'weekUsedPercent', 100.5, 100],
+            ['plan', 'signInMinutes', -1, 0],
+        ]
+        for (const [key, field, bad, good] of cases) {
+            const base = { runStats: runStats(), plan: plan() } as Record<string, Record<string, unknown>>
+            expect(ok({ ...sample(), ...base, [key]: { ...base[key], [field]: bad } })).toBe(false)
+            expect(ok({ ...sample(), ...base, [key]: { ...base[key], [field]: good } })).toBe(true)
+        }
+    })
+
+    it('refuses an unknown key inside runStats or plan', () => {
+        expect(ok({ ...sample(), runStats: { ...runStats(), extra: 1 } })).toBe(false)
+        expect(ok({ ...sample(), plan: { ...plan(), extra: 1 } })).toBe(false)
+    })
 })
