@@ -19,13 +19,19 @@ const run = (startedAt: Date, tokensIn: number, tokensOut: number, cacheRead?: n
     stage: 'build', coworkerId: 'code', status: 'ok', startedAt: startedAt.toISOString(), endedAt: null, tokensIn, tokensOut, runId: null,
     ...(cacheRead !== undefined ? { cacheRead } : {}),
 })
+const digestOf = () => ({
+    stations: [], threads: [], anomalies: [],
+    measures: { mergedPerHour: 0, leadTimeS: null, firstPassYield: null, fixRounds: null, blocks: { blocked: 0, rejected: 0, failed: 0, returned: 0 }, tokensPerMerged: null },
+})
 const bar = (snapshot: FactorySnapshot | null, held = false) => barModel({ snapshot, counts, held, now: NOW, start: START })
 
 describe('barModel', () => {
     it('without a snapshot keeps the sample numbers and the sample tag', () => {
         const m = bar(null)
         expect(m.sample).toBe(true)
-        expect(m.values.runs.text).toBe('123')
+        expect(m.values.solvedGreen.text).toBe('4')
+        expect(m.values.tokensPerIssue.text).toBe('0.8M')
+        expect(m.values.escaped.text).toBe('0')
         expect(m.values.cachedShare.text).toBe('87%')
         expect(m.values.signIn.text).toMatch(/min$/)
         expect(m.values.queued.text).toBe('3')
@@ -41,19 +47,16 @@ describe('barModel', () => {
         expect(m.values.building.text).toBe('2')
         expect(m.values.review.text).toBe('1')
         expect(m.values.checks.text).toBe('0')
-        expect(m.values.shipped.text).toBe(String(s.endedToday.merged))
+        expect(m.values.solvedGreen).toEqual({ text: '—', title: 'no data yet' })
     })
 
-    it('counts the runs started today and sums their tokens, and shows a dash when no job has runs', () => {
+    it('sums the tokens of the runs started today, and shows a dash when no job has runs', () => {
         const today = new Date(2026, 10, 14, 9, 0, 0)
         const yesterday = new Date(2026, 10, 13, 23, 0, 0)
         const m = bar(withRuns([run(today, 300000, 300000), run(today, 200000, 200000), run(yesterday, 5000, 5000)]))
-        expect(m.values.runs.text).toBe('2')
         expect(m.values.totalTokens.text).toBe('1.0M')
         const none = bar(withRuns(undefined))
-        expect(none.values.runs).toEqual({ text: '—', title: 'no data yet' })
         expect(none.values.totalTokens).toEqual({ text: '—', title: 'no data yet' })
-        expect(bar(withRuns([])).values.runs.text).toBe('0')
         expect(bar(withRuns([run(today, 1500, 0)])).values.totalTokens.text).toBe('2k')
         expect(bar(withRuns([run(today, 40, 2)])).values.totalTokens.text).toBe('42')
     })
@@ -65,8 +68,8 @@ describe('barModel', () => {
         }
     })
 
-    it('defines all twelve metrics, in the same order', () => {
-        expect(METRICS.map(m => m.key)).toEqual(['queued', 'building', 'review', 'checks', 'shipped', 'runs', 'totalTokens', 'cachedShare', 'avgDuration', 'errorRate', 'planWeek', 'signIn'])
+    it('defines all thirteen metrics, in the same order', () => {
+        expect(METRICS.map(m => m.key)).toEqual(['queued', 'building', 'review', 'checks', 'solvedGreen', 'tokensPerIssue', 'escaped', 'totalTokens', 'cachedShare', 'avgDuration', 'errorRate', 'planWeek', 'signIn'])
     })
 
     it('shows a dash for tokens when no run of today has a known count: none today, or all with tokensIn and tokensOut at 0', () => {
@@ -76,7 +79,6 @@ describe('barModel', () => {
         expect(bar(withRuns([run(today, 0, 0)])).values.totalTokens).toEqual(dash)
         expect(bar(withRuns([run(today, 0, 0), run(today, 0, 0)])).values.totalTokens).toEqual(dash)
         expect(bar(withRuns([run(yesterday, 900, 100)])).values.totalTokens).toEqual(dash)
-        expect(bar(withRuns([run(today, 0, 0)])).values.runs.text).toBe('1')
     })
 
     it('adds only the known runs: a 0/0 run next to a counted one changes nothing, and 0 in one field alone is a known count', () => {
@@ -99,5 +101,38 @@ describe('barModel', () => {
         expect(bar(withRuns([run(today, 1000, 0, 500), run(today, 9000, 0)])).values.cachedShare.text).toBe('50%')
         expect(bar(withRuns([run(today, 9000, 0)])).values.cachedShare).toEqual(dash)
         expect(bar(withRuns([])).values.cachedShare).toEqual(dash)
+    })
+
+    it('shows solved green, tokens per issue and escaped of the last day from the digest bar', () => {
+        const window = { solved: 3, solvedGreen: 3, tokensPerIssue: 812345.6, firstPassYield: null, escaped: 2 }
+        const withBar = (day: typeof window): FactorySnapshot => ({ ...sample(), digest: { ...digestOf(), bar: { day, week: day } } })
+        const m = bar(withBar(window))
+        expect(m.values.solvedGreen.text).toBe('3')
+        expect(m.values.tokensPerIssue.text).toBe('812k')
+        expect(m.values.escaped).toEqual({ text: '2', warn: true })
+        expect(bar(withBar({ ...window, escaped: 0 })).values.escaped).toEqual({ text: '0', warn: false })
+    })
+
+    it('shows a dash for the three when the snapshot has no bar, and for tokens per issue when nothing is solved green', () => {
+        const dash = { text: '—', title: 'no data yet' }
+        const m = bar(sample())
+        expect(m.values.solvedGreen).toEqual(dash)
+        expect(m.values.tokensPerIssue).toEqual(dash)
+        expect(m.values.escaped).toEqual(dash)
+        const window = { solved: 0, solvedGreen: 0, tokensPerIssue: null, firstPassYield: null, escaped: 0 }
+        const none = bar({ ...sample(), digest: { ...digestOf(), bar: { day: window, week: window } } })
+        expect(none.values.solvedGreen.text).toBe('0')
+        expect(none.values.tokensPerIssue).toEqual(dash)
+    })
+
+    it('does not show runs started or pull requests merged as speed', () => {
+        const keys: string[] = METRICS.map(m => m.key)
+        expect(keys).not.toContain('runs')
+        expect(keys).not.toContain('shipped')
+        for (const m of METRICS) {
+            expect(m.label).not.toMatch(/Runs|Shipped|Lanes|Pull requests/)
+            expect(m.definition).not.toMatch(/runs started|pull requests (opened|merged)|lanes busy/i)
+        }
+        expect(METRICS.slice(4, 7).map(m => m.label)).toEqual(['Solved green', 'Tokens per issue', 'Escaped'])
     })
 })

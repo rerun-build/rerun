@@ -9,6 +9,8 @@ def reason(job, now, hold=None, held=()):
     state = job.get("state")
     if state == "waiting":
         return "dependency"
+    if state == "checks":
+        return job.get("checks_why")
     if state not in _QUEUE_STATES:
         return None
     not_before = job.get("not_before")

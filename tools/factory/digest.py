@@ -153,9 +153,34 @@ def planners(store, now):
     return tokenstats.planners(jobs, fires, now)
 
 
+def bar(store, now):
+    jobs = []
+    for j in store.jobs():
+        if j["state"] != "merged":
+            continue
+        rows = [t for t in store.transitions_of(str(j["issue"])) if t["from_state"] != t["to_state"]]
+        into = [t for t in rows if t["to_state"] == "merged"]
+        if not into:
+            continue
+        jobs.append({"job": str(j["issue"]), "merged_at": L.ts(into[-1]["at"]), "dev_result": j.get("dev_result"),
+                     "fix_rounds": sum(1 for t in rows if t["to_state"] == "fix_wait"), "replans": j.get("replans") or 0})
+    fires = [{"at": L.ts(r[2]), "tokens": (r[0] or 0) + (r[1] or 0)}
+             for r in store.db.execute("SELECT tokens_in, tokens_out, intent_at FROM fires")]
+    escaped = []
+    for raw in store.get_all("escaped").values():
+        try:
+            rec = json.loads(raw)
+            at = rec["at"]
+            escaped.append({"job": str(rec["job"]), "at": at if isinstance(at, (int, float)) else L.ts(at)})
+        except Exception:
+            continue
+    return tokenstats.bar(jobs, fires, escaped, now)
+
+
 def build(store, cfg, now):
     return {"stations": stations(store, now), "threads": threads(store),
-            "anomalies": anomalies(store, cfg, now), "measures": measures(store, now), "planners": planners(store, now)}
+            "anomalies": anomalies(store, cfg, now), "measures": measures(store, now), "planners": planners(store, now),
+            "bar": bar(store, now)}
 
 
 def block(d):
