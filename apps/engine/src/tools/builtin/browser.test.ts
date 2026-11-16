@@ -110,6 +110,9 @@ vi.mock('patchright', () => ({
                 getByRole: () => consentButton,
                 screenshot: async (screenshotOptions: { path: string; fullPage: boolean }) => {
                     pw.screenshots.push(screenshotOptions)
+                    const { default: sharp } = await import('sharp')
+                    const size = screenshotOptions.fullPage ? { width: 3000, height: 5000 } : { width: 1280, height: 720 }
+                    writeFileSync(screenshotOptions.path, await sharp({ create: { ...size, channels: 3, background: '#fff' } }).png().toBuffer())
                 },
             }
             return {
@@ -427,6 +430,33 @@ describe('browser_navigate', () => {
         expect(out).toBe('[200] https://example.com/\n\nhi\n\n[screenshot saved to shots/home.png]')
         expect(pw.screenshots).toEqual([{ path: target, fullPage: true }])
         expect(existsSync(dirname(target))).toBe(true)
+    })
+
+    it('saves a screenshot no larger than maxEdge', async () => {
+        pw.page.views = showing('hi')
+        await navigate(ctxWith(), { url: 'https://example.com/', screenshotPath: 'shots/small.png', maxEdge: 640 })
+        const { default: sharp } = await import('sharp')
+        const { width = 0, height = 0 } = await sharp(resolve(workspaceDir(agentId), 'shots/small.png')).metadata()
+        expect(Math.max(width, height)).toBe(640)
+        expect(width).toBeLessThan(height)
+    })
+
+    it('saves the visible part when fullPage is false', async () => {
+        pw.page.views = showing('hi')
+        await navigate(ctxWith(), { url: 'https://example.com/', screenshotPath: 'shots/view.png', fullPage: false })
+        const target = resolve(workspaceDir(agentId), 'shots/view.png')
+        expect(pw.screenshots).toEqual([{ path: target, fullPage: false }])
+        const { default: sharp } = await import('sharp')
+        expect((await sharp(target).metadata()).height).toBe(720)
+    })
+
+    it('saves the full page by default', async () => {
+        pw.page.views = showing('hi')
+        await navigate(ctxWith(), { url: 'https://example.com/', screenshotPath: 'shots/full.png' })
+        const target = resolve(workspaceDir(agentId), 'shots/full.png')
+        expect(pw.screenshots).toEqual([{ path: target, fullPage: true }])
+        const { default: sharp } = await import('sharp')
+        expect((await sharp(target).metadata()).height).toBe(5000)
     })
 
     it('refuses a screenshot outside the workspace and still closes the browser', async () => {

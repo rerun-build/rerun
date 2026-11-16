@@ -1,4 +1,4 @@
-import { mkdir, rm } from 'node:fs/promises'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { chromium, type BrowserContext, type Page, type Response as PageResponse } from 'patchright'
 import { tool, type ToolSet } from 'ai'
@@ -125,7 +125,7 @@ async function settle(page: Page): Promise<void> {
     await page.waitForLoadState('networkidle', { timeout: RENDER_SETTLE_MS }).catch(() => {})
 }
 
-type Visit = { url: string; screenshotPath?: string; links?: boolean; timeoutMs: number }
+type Visit = { url: string; screenshotPath?: string; fullPage?: boolean; maxEdge?: number; links?: boolean; timeoutMs: number }
 
 async function readLinks(page: Page): Promise<string> {
     const anchors = await page.$$eval('a[href]', elements => elements.map(a => ({ href: (a as HTMLAnchorElement).href, text: (a as HTMLElement).innerText ?? '' })))
@@ -141,7 +141,7 @@ async function readLinks(page: Page): Promise<string> {
     return `\n\nLinks:\n${lines.length ? lines.join('\n') : 'none'}`
 }
 
-async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, links, timeoutMs }: Visit, { reload = true } = {}): Promise<HostAttempt> {
+async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, fullPage = true, maxEdge, links, timeoutMs }: Visit, { reload = true } = {}): Promise<HostAttempt> {
     let documentStatus: number | undefined
     const onResponse = (response: PageResponse) => {
         if (response.request().resourceType() === 'document' && response.frame() === page.mainFrame()) documentStatus = response.status()
@@ -165,7 +165,12 @@ async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, link
         if (screenshotPath) {
             const target = await resolveInWorkspace(ctx.agent.id, screenshotPath)
             await mkdir(dirname(target), { recursive: true })
-            await page.screenshot({ path: target, fullPage: true })
+            await page.screenshot({ path: target, fullPage })
+            if (maxEdge) {
+                const { default: sharp } = await import('sharp')
+                const resized = await sharp(await readFile(target)).resize(maxEdge, maxEdge, { fit: 'inside', withoutEnlargement: true }).toBuffer()
+                await writeFile(target, resized)
+            }
             note = `\n\n[screenshot saved to ${screenshotPath}]`
         }
         const savedLine = saved ? `\nSaved whole: ${saved} (the rendered HTML: read or grep it for anything this text leaves out)` : ''
@@ -202,6 +207,8 @@ export function browserTools(ctx: RunContext): ToolSet {
             inputSchema: z.object({
                 url: publicHttpUrl,
                 screenshotPath: z.string().optional().describe('Workspace-relative path to save a full-page PNG screenshot'),
+                fullPage: z.boolean().default(true).describe('With a screenshot: false saves only the visible part of the page'),
+                maxEdge: z.number().int().min(320).max(2048).optional().describe('With a screenshot: shrink it so its longest side is at most this many pixels'),
                 links: z.boolean().default(false).describe('Also list the links on the page (text and URL), e.g. to open the results of a search'),
                 timeoutMs: z.number().int().positive().max(120_000).default(30_000),
             }),

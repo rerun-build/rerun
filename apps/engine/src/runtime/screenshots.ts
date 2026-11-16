@@ -4,8 +4,13 @@ import type { Provider } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { newId } from '../lib/ids.js'
 
-const MAX_KEPT = 6
-const KEPT_AFTER_EVICTION = 3
+const DEFAULT_KEPT = 6
+
+function keptLimits(): { max: number; after: number } {
+    const configured = Number(process.env.RERUN_SCREENSHOTS_KEPT)
+    const max = Number.isInteger(configured) && configured >= 1 ? configured : DEFAULT_KEPT
+    return { max, after: Math.ceil(max / 2) }
+}
 
 export type StoredScreenshot = { image: Buffer; mediaType: string }
 
@@ -16,11 +21,12 @@ export type ScreenshotStore = {
 
 export function createScreenshotStore(): ScreenshotStore {
     const kept = new Map<string, StoredScreenshot>()
+    const { max, after } = keptLimits()
     return {
         add: screenshot => {
             const id = newId()
             kept.set(id, screenshot)
-            if (kept.size > MAX_KEPT) for (const stale of [...kept.keys()].slice(0, kept.size - KEPT_AFTER_EVICTION)) kept.delete(stale)
+            if (kept.size > max) for (const stale of [...kept.keys()].slice(0, kept.size - after)) kept.delete(stale)
             return id
         },
         get: id => kept.get(id),
