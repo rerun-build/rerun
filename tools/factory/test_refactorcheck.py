@@ -1,3 +1,5 @@
+import contextlib
+import io
 import os
 import subprocess
 import tempfile
@@ -55,7 +57,10 @@ class RefactorTest(unittest.TestCase):
             try:
                 self.assertEqual(refactorcheck.main(["--base", base]), 0)
                 commit("tests/test_a.py", "refactor: bad")
-                self.assertEqual(refactorcheck.main(["--base", base]), 1)
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+                    self.assertEqual(refactorcheck.main(["--base", base]), 1)
+                self.assertIn("tests/test_a.py", out.getvalue())
             finally:
                 os.chdir(cwd)
 
