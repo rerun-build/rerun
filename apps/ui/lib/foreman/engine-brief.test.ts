@@ -114,7 +114,7 @@ describe('foremanEngineBrief', () => {
     // A tool joins a wake only once someone decided it reads and nothing more: this list is that decision.
     it('lets a wake read, and nothing else', () => {
         expect([...WAKE_HUB_TOOL_NAMES].sort()).toEqual(
-            ['db_query', 'get_agent', 'get_run', 'get_skill', 'get_team_status', 'list_agent_connectors', 'list_agent_shares', 'list_agents', 'list_ai_connections', 'list_connectors', 'list_runs', 'list_schedules', 'list_skills', 'list_space_tables', 'list_spaces', 'list_tables', 'list_templates', 'list_triggers', 'list_vault', 'read_skill_file', 'search_connectors', 'search_docs', 'space_db_query'].sort(),
+            ['db_query', 'get_agent', 'get_run', 'get_skill', 'get_team_status', 'list_agent_connectors', 'list_agent_shares', 'list_agents', 'list_ai_connections', 'list_connectors', 'list_runs', 'list_schedules', 'list_skills', 'list_space_tables', 'list_spaces', 'list_tables', 'list_templates', 'list_triggers', 'list_vault', 'read_skill_file', 'search_connectors', 'search_docs', 'space_db_query', 'workspace_overview'].sort(),
         )
         for (const name of WAKE_HUB_TOOL_NAMES) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(name), name).toBe(true)
         expect(foremanWakeTools().map(tool => tool.name).sort()).toEqual([...WAKE_HUB_TOOL_NAMES].sort())

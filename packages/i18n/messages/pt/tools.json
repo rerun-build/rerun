@@ -112,6 +112,8 @@
         "list_vault": "Ler o Vault",
         "set_vault_link": "Emprestar uma conta do Vault",
         "set_assistant_name": "Adotar um nome",
+        "workspace_overview": "Olhar o workspace",
+        "invite_members": "Convidar membros",
         "send_message": "Mensagem ao coworker",
         "create_boxes": "Criar Boxes",
         "build_team": "Montar equipe",

@@ -112,6 +112,8 @@
         "list_vault": "Vault lesen",
         "set_vault_link": "Vault-Konto verleihen",
         "set_assistant_name": "Einen Namen annehmen",
+        "workspace_overview": "Workspace ansehen",
+        "invite_members": "Mitglieder einladen",
         "send_message": "Coworker schreiben",
         "create_boxes": "Boxes erstellen",
         "build_team": "Team aufbauen",

@@ -190,6 +190,8 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     list_vault: LockIcon,
     set_vault_link: LockIcon,
     set_assistant_name: PencilIcon,
+    workspace_overview: ActivityIcon,
+    invite_members: UsersIcon,
     send_message: SendIcon,
     create_boxes: BoxIcon,
     build_team: UsersIcon,

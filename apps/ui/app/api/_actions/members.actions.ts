@@ -3,36 +3,21 @@
 import { after } from 'next/server'
 import { requireAdminContext, requireWorkspaceContext, toBoxScope, type BoxScope, type WorkspaceRole } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
-import { demoteKeepingAnAdmin, isLastAdmin, LAST_ADMIN, listMemberProfiles, resolveMemberIdentities, setMemberRole } from '@/app/api/_services/members.service'
-import { BANNER_WARM_BACKGROUND_MS, EMAIL_DELIVERY, emailBoardBanner, sendWorkspaceInviteEmail } from '@rerun/cloud/email'
+import { demoteKeepingAnAdmin, isLastAdmin, LAST_ADMIN, listMemberProfiles, setMemberRole } from '@/app/api/_services/members.service'
+import { createWorkspaceInvite, resolveMemberEmails } from '@/app/api/_services/workspace-invite.service'
 import { ownsEmail } from '@/lib/auth/account-emails'
 import { readProfile } from '@/lib/auth/user-profile'
 import { sendForemanSignal } from '@/lib/foreman/signal'
-import { workspaceLocale } from '@/lib/i18n/recipient-locale'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { emailTranslator } from '@rerun/emails/i18n'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { selectAll, selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { MemberProfile } from '@rerun/contracts'
-import type { SupabaseClient } from '@supabase/supabase-js'
 
 import { failure, failureOf, type ErrorCode } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
-import { randomUuid } from '@/lib/random-uuid'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.rerun.build'
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const MEMBERS_ADMIN_ONLY = 'adminOnlyMembers' satisfies ErrorCode
 
-type ServiceClient = SupabaseClient<Database>
-
-async function resolveMemberEmails(supabase: ServiceClient, userIds: string[]): Promise<Map<string, string>> {
-    const identities = await resolveMemberIdentities(supabase, userIds)
-    const emails = new Map<string, string>()
-    for (const [id, identity] of identities) if (identity.email) emails.set(id, identity.email)
-    return emails
-}
 
 export type WorkspaceMember = { userId: string; email: string | null; role: WorkspaceRole; boxScope: BoxScope }
 
@@ -66,54 +51,9 @@ export async function listWorkspaceMembersAction(): Promise<ActionResult<{ membe
 export async function inviteToWorkspaceAction(rawEmail: string, rawBoxScope: BoxScope = 'all'): Promise<ActionResult<{ inviteUrl?: string }>> {
     try {
         const { userId, userEmail, workspace, supabase } = await requireAdminContext(MEMBERS_ADMIN_ONLY)
-        const boxScope = toBoxScope(rawBoxScope)
-
-        const email = rawEmail.trim().toLowerCase()
-        if (!EMAIL_RE.test(email)) return failure('invalidEmailShort')
-
-        const { data: memberRows } = await selectAll(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspace.id })
-        const memberIds = (memberRows ?? []).map(m => m.user_id)
-        const memberEmails = await resolveMemberEmails(supabase, memberIds)
-        if ([...memberEmails.values()].includes(email)) return failure('alreadyMember')
-
-        const { data: existingInvite } = await selectMaybeSingle(supabase, 'workspace_invitations', ['id', 'token', 'box_scope'] as const, { workspace_id: workspace.id, email, status: 'pending' })
-
-        let token = existingInvite?.token
-        if (!existingInvite) {
-            const { data: pendingCount } = await selectCount(supabase, 'workspace_invitations', { workspace_id: workspace.id, status: 'pending' })
-            const total = memberIds.length + (pendingCount ?? 0)
-            if (workspace.max_seats != null && total >= workspace.max_seats) {
-                return failure('seatLimit')
-            }
-
-            token = randomUuid()
-            const { error } = await supabase.from('workspace_invitations').insert<Database['public']['Tables']['workspace_invitations']['Insert']>({
-                workspace_id: workspace.id,
-                email,
-                token,
-                invited_by: userId,
-                status: 'pending',
-                box_scope: boxScope,
-                expires_at: new Date(Date.now() + INVITE_TTL_MS).toISOString(),
-            })
-            if (error) return { ok: false, error: error.message }
-        } else if (toBoxScope(existingInvite.box_scope) !== boxScope) {
-            const { error } = await supabase.from('workspace_invitations').update<Database['public']['Tables']['workspace_invitations']['Update']>({ box_scope: boxScope }).eq('id', existingInvite.id)
-            if (error) return { ok: false, error: error.message }
-        }
-
-        // After the response: the invitation is saved, and the board the email opens on can take a
-        // cold capture without holding the dialog.
-        const inviteUrl = `${APP_URL}/invite/${token}`
-        after(async () => {
-            const serviceRole = createServiceRoleClient()
-            const boardUrl = await emailBoardBanner(serviceRole, workspace.id, 'working', BANNER_WARM_BACKGROUND_MS)
-            const locale = await workspaceLocale(serviceRole, workspace.id)
-            const workspaceName = workspace.name ?? emailTranslator(locale)('common.yourWorkspace')
-            await sendWorkspaceInviteEmail({ to: email, workspaceName, inviteUrl, invitedByEmail: userEmail ?? undefined, boardUrl, locale })
-        })
-
-        return EMAIL_DELIVERY ? { ok: true } : { ok: true, inviteUrl }
+        const result = await createWorkspaceInvite({ supabase, workspace, inviterId: userId, inviterEmail: userEmail, email: rawEmail, boxScope: rawBoxScope })
+        if (!result.ok) return failure(result.code)
+        return result.inviteUrl ? { ok: true, inviteUrl: result.inviteUrl } : { ok: true }
     } catch (err) {
         return failureOf(err, 'sendInvitationFailed')
     }

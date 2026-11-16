@@ -134,6 +134,35 @@ export const FOREMAN_VAULT_TOOL_DEFS = [
     },
 ] as const
 
+// The workspace at a glance, in one read, so a wake does not spend a dozen calls to know whether
+// anything needs someone; and the one way it brings people in.
+export const WORKSPACE_OVERVIEW_SECTIONS = ['attention', 'usage', 'getting_started', 'members', 'invites'] as const
+
+export const FOREMAN_OVERVIEW_TOOL_DEFS = [
+    {
+        name: 'workspace_overview',
+        description:
+            "Read the workspace at a glance, the sections you ask for (all of them by default): attention (conversations of coworkers waiting on someone and since when, runs that failed in the last two days, coworkers paused, apps of the Vault signed out), usage (the Rerun credit left and when it renews, the trial's end), getting_started (which steps of the getting-started checklist are done), members (first name, role, when they last opened the app) and invites (pending invitations). It only shows what the person you speak for can see. Start a check-in with it.",
+        inputSchema: {
+            type: 'object',
+            properties: { sections: { type: 'array', items: { type: 'string', enum: [...WORKSPACE_OVERVIEW_SECTIONS] }, description: 'The sections to read. All of them when left out.' } },
+        },
+    },
+    {
+        name: 'invite_members',
+        description:
+            "Invite people to the workspace by email: each one gets an email with a link, or, where this install sends no email, the answer gives you the link to hand them. Only an admin can invite, and only once they told you who: never invite anyone they did not name. Ask with request_approval first, naming the addresses. A seat limit, an address already a member, or an address that is not one comes back per address.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                emails: { type: 'array', items: { type: 'string' }, description: 'Up to ten email addresses.' },
+                boxScope: { type: 'string', enum: ['all', 'assigned'], description: 'all (default): they see every Box open to the workspace. assigned: only the Boxes they are later added to.' },
+            },
+            required: ['emails'],
+        },
+    },
+] as const
+
 // Who it is to the workspace: the name its people give it.
 export const FOREMAN_IDENTITY_TOOL_DEFS = [
     {
