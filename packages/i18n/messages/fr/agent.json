@@ -883,6 +883,7 @@
         "stepCount": "{count, plural, one {# étape} other {# étapes}}",
         "step": "Étape {number}",
         "noSteps": "Aucune étape enregistrée pour cette exécution.",
+        "stepsLost": "{count, plural, one {L'enregistrement de # étape a été perdu à l'arrêt de l'exécution.} other {L'enregistrement de # étapes a été perdu à l'arrêt de l'exécution.}}",
         "input": "Entrée",
         "output": "Sortie",
         "filters": { "running": "En cours", "failed": "Échecs", "done": "Terminées" },

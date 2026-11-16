@@ -184,6 +184,8 @@ class World:
             return json.dumps({"state": "open" if n in self.open_numbers else "closed", "state_reason": self.close_reasons.get(n, "completed")})
         if a[0] == "api" and "/commits?" in a[1]:
             return json.dumps(self.commits)
+        if a[0] == "api" and "/actions/runs/" in a[1] and a[1].endswith("/jobs"):
+            return json.dumps({"jobs": getattr(self, "run_jobs", {}).get(a[1].split("/actions/runs/")[1].split("/")[0], [])})
         if a[0] == "api" and "/actions/workflows/" in a[1]:
             return json.dumps({"workflow_runs": self.dev_runs})
         if a[0] == "api":
