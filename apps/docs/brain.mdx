@@ -1,0 +1,97 @@
+---
+title: "Brain"
+description: "What every coworker of your workspace knows about your company, filled from your website and kept up to date with you."
+icon: "brain"
+---
+
+The Brain is the company knowledge of your workspace: what you sell, to whom, at what price, who works there, how you speak, the tools you use, your customers and your competitors. Every coworker reads it before it works, so you write a fact once instead of repeating it in every soul.
+
+It is also where the workspace keeps what its coworkers share: the shared folder, the shared database and the links they published.
+
+## Open the Brain
+
+Click the workspace pill in the top left corner, then **Brain**. A red count next to it says how many proposals wait for you. You can also open it from the [control center](/chief-of-staff#in-the-control-center) with **Company Brain**, or ask the Chief of Staff to show you a page.
+
+The Brain lives on your workspace's machine, which is set up with your first coworker: until then it says **Your Brain comes with your first coworker**. On Rerun Cloud, the entry stays disabled until your free trial starts.
+
+Every member of the workspace can open and edit the Brain.
+
+## What is inside
+
+The sidebar holds everything, with a search field on top (<kbd>⌘</kbd> <kbd>K</kbd>, or <kbd>Ctrl</kbd> <kbd>K</kbd> on Windows and Linux) that looks through pages, files and tables at once.
+
+| Section | What it holds |
+| --- | --- |
+| **Proposals** | The changes your coworkers want to make, waiting for you. See [Proposals](#proposals) |
+| **Published** | The links your coworkers published, and who can open each. See [Data and files](/agents/data) |
+| **Company** | The identity card of your company: one page each for **Company**, **Offering**, **Market**, **Team**, **Voice**, **Tools** and **Priorities** |
+| **Pages** | Every other page: **Customer**, **Competitor**, **Person**, **Product**, **Decision** and **Note** pages. Product pages fold into a **Products** group. Click **New page** to write one |
+| **Files** | The shared folder of the workspace. Upload a file or a folder from the section header |
+| **Database** | The shared database of the workspace, one row per table |
+
+The shared folder and the shared database belong to the whole workspace, whatever Box a coworker sits in. See [Data and files](/agents/data).
+
+## Fill it from your website
+
+The Chief of Staff fills the Brain from your website during onboarding. It reads your site and what is public about your company, and writes the Company pages, then pages for your products and competitors. Each page lists its **Sources**: your website pages, your LinkedIn page, your Google Business Profile, a web search, a company registry.
+
+If the Brain is empty, enter your website under **Your website** and click **Fill from my website**. **Rerun is reading your website** shows while it works, and the pages appear in a few minutes. Or click **Write a page yourself**.
+
+Reading your website again never overwrites a page a person edited, a proposal you accepted or a section you confirmed: those are yours from then on.
+
+<Note>
+  On a self-hosted install, reading a website needs `FIRECRAWL_API_KEY`. See [Configuration](/self-host/configuration).
+</Note>
+
+### Unconfirmed sections
+
+A section read from the public web is marked **Unconfirmed**: nobody at your company checked it yet. Coworkers take it as a starting point, not a fact, and say so when their work rests on it. Click **Confirm** once it is right.
+
+## Write and edit pages
+
+A page is a document you edit in place, and it saves as you type (**Saving…**, then **Saved**).
+
+- Type <kbd>/</kbd> for blocks: headings, lists, to-do lists, quotes, code, a divider.
+- Type `[[` to link another page. Coworkers link to a page as `[[slug]]`, shown under the title of a new page.
+- Pick **File** in the <kbd>/</kbd> menu, or drag a file from the sidebar, to cite a file of the shared folder.
+- Change the **Type** of the page from its properties, which also show its **Sources** and when it was **Last edited**, and by whom.
+
+From the **More** menu of a page: **Copy link**, **Version history** or **Delete**. Deleting a page means coworkers stop reading it, and the pages linking to it lose the link.
+
+If someone else changes a page while you edit it, the page says so: **Load their version** or **Keep mine**.
+
+### Version history
+
+Every change is kept. Open **Version history** from the **More** menu: each version shows who made it, a person, a coworker, the Chief of Staff, or **Rerun, from your website**. Your own edits made a few minutes apart count as one version.
+
+Pick a version and click **Restore this version**. The page goes back to what it said then, and the current version stays in the history.
+
+## Proposals
+
+When a coworker finds a fact on its own, on the web, in a file or in a tool result, it does not write it: it proposes it. Nothing changes until someone accepts.
+
+A proposal shows up three ways:
+
+- in the coworker's chat, as a card (**New Brain page** or **Change to the Brain**) with **Review**,
+- on the page it changes (**proposes a change to this page**, with **Review**),
+- under **Proposals** in the Brain, with the count in the workspace menu.
+
+Each proposal reads like a headline: who proposes it, the page, and the facts that move, before and after. Click **More details** for the reason and the sources, then **Accept** or **Dismiss**. A dismissed change is never proposed again. If the page changed while the proposal waited, it says so: check that nothing gets lost before you accept.
+
+When nothing waits, **Proposals** says **All caught up**.
+
+## How coworkers read it
+
+Every coworker starts each run with the Company card and an index of the pages. Before it writes about your company or one of your products, it searches the Brain and reads the page it needs. What a person wrote or confirmed wins over its own memory.
+
+How a page changes depends on where the fact comes from:
+
+| The fact comes from | What happens |
+| --- | --- |
+| **You, in a coworker's chat** | The coworker writes the page at once and shows **Brain updated** with **Undo**. Every coworker reads it from its next run |
+| **The coworker itself** | It sends a proposal for you to review |
+| **You, with the Chief of Staff** | The Chief of Staff writes the page, and asks you before deleting one |
+
+A fact about the company goes to the Brain, never to a coworker's own memory: memory is for its own work. See [Memory](/concepts#memory).
+
+To take the Brain away from a coworker, switch off **Use the company brain** in its **Capabilities** tab. See [Configure a coworker](/agents/configure).

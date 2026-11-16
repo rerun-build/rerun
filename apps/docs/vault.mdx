@@ -1,0 +1,125 @@
+---
+title: "Vault"
+description: "Sign in to an app once, keep your keys in one place, and pick the coworkers that use them."
+icon: "lock-keyhole"
+---
+
+The Vault is where your workspace keeps the accounts and keys its coworkers share: the apps you signed in to, the secrets you added and the MCP servers you registered. You sign in to an app once, then switch it on for the coworkers that need it, or for every coworker.
+
+Values never leave your workspace's machine and are never shown again once saved, in the Vault or anywhere else. See [Where credentials live](/agents/apps#where-credentials-live).
+
+## Open the Vault
+
+Click the workspace pill in the top left corner, then **Vault**. An orange dot next to it means an app of the Vault is signed out.
+
+The Vault lives on your workspace's machine. On Rerun Cloud, the entry stays disabled until your free trial starts.
+
+## What the Vault holds
+
+| Entry | What it is |
+| --- | --- |
+| **Apps** | Apps of the library you signed in to, shown as tiles with their logo, and the accounts of paid apps |
+| **MCP server** | A server of your own, by address or by command |
+| **Secret** | A key or a token your coworkers read as a variable |
+
+Each entry says who uses it: **Every coworker**, the names of the coworkers, or **No coworker yet**. From 8 entries on, a search field appears on top.
+
+### Statuses
+
+Most entries show no badge: they are connected and their coworkers use them. Two badges ask for you:
+
+| Badge | What it means |
+| --- | --- |
+| **Signed out** | Its coworkers can't use the app until someone signs in again. Open the entry and click **Reconnect** |
+| **Not set up** | The app is waiting for a credential. Open the entry and fill in its form |
+
+For some apps whose sign-in Rerun handles for you, the Vault cannot sign them in again itself: the entry says **Reconnect it from the Apps tab of a coworker that uses it**.
+
+## Add to the Vault
+
+<Steps>
+  <Step title="Open the add page">
+    Click **Add** at the top of the Vault. In an empty Vault, click one of the popular apps, or **Other app**, **MCP server** or **Secret**.
+  </Step>
+  <Step title="Pick what to add">
+    Under **Add to the Vault**, choose **Apps**, **MCP server** or **Secret**.
+  </Step>
+  <Step title="Sign in or fill the form">
+    For an app, search it with **Search apps**, then sign in or paste its key. See the forms below for a server or a secret.
+  </Step>
+  <Step title="Pick its coworkers">
+    The entry opens once it is added: switch it on for the coworkers that should use it. See [Share an entry](#share-an-entry).
+  </Step>
+</Steps>
+
+Some apps can only be connected from a coworker: the Vault then says **This app can't be added to the Vault yet. Connect it from a coworker's Apps tab.** It lands in the Vault anyway, see [From a coworker](#from-a-coworker).
+
+An app that takes several accounts can be added several times, one entry per account.
+
+### Add a secret
+
+| Field | What to enter |
+| --- | --- |
+| **Name** | What people read, like `Stripe live key` |
+| **Variable** | The name coworkers read it under, like `STRIPE_LIVE_KEY`. It is filled from the name as you type: letters, digits and underscores, not starting with a digit |
+| **Value** | The secret itself. It is never shown again |
+
+Click **Add secret**.
+
+### Add an MCP server
+
+| Field | What to enter |
+| --- | --- |
+| **Name** | What people read, like `Company docs` |
+| **Address or command** | An `https` address, or the command the machine starts |
+| **Header** and **Value** | Optional: a header the server needs, like `Authorization`, and its value. The value is kept as a variable of the entry |
+
+Click **Add server**. A remote server with no key offers to sign in from its entry.
+
+## Share an entry
+
+Open an entry to see its **Coworkers**:
+
+- Switch on **Every coworker** to give it to the whole workspace. Coworkers added later get it too.
+- Or switch it on coworker by coworker.
+
+A coworker cannot get the same variable or the same server name from two entries: the Vault refuses with **already gets {name} from another Vault entry**.
+
+The entry also lists the names of its **Variables**, never their values.
+
+### Delete an entry
+
+Click **Delete** at the bottom of an entry. The confirmation names the coworkers that lose it.
+
+## From a coworker
+
+Apps you install from a coworker's **Apps** tab go to the Vault too, switched on for that coworker only. Open the Vault to hand them to other coworkers.
+
+In a coworker's **Apps** tab:
+
+- An app, server or secret lent by the Vault carries a **Vault** badge. Removing it only takes it away from that coworker: it stays in the Vault, for the other coworkers and for later. An entry shared with every coworker cannot be removed there: **Every coworker gets it from the Vault. Change it there.**
+- **From the Vault** lists every entry the coworker does not have yet, each with **Add**.
+
+When a coworker suggests an app in the chat and the Vault already holds an account of it, the card offers **Use** that account in one click, or **New account**.
+
+A secret a coworker asks you for in the chat, and an MCP server it registers itself, stay with that coworker: they do not go to the Vault. The Chief of Staff holds no entry of the Vault.
+
+See [Apps](/agents/apps).
+
+## Paid apps
+
+The accounts of paid apps, like LinkedIn Pro and WhatsApp Pro, show in the Vault with a **Paid** badge, and **Paused** or **Connecting** while they are not ready. They are attached coworker by coworker: **Every coworker** stays off (**A paid app is attached coworker by coworker**). Their sign-in, slots and billing stay in the app's own window. See [Plans and billing](/billing).
+
+## Who can do what
+
+The Vault follows the roles and the Box access of [Teams and workspaces](/teams).
+
+| Action | Who |
+| --- | --- |
+| Open the Vault | Every member |
+| Add an entry | A member who manages at least one Box (**Manage a Box to add to the Vault**) |
+| Switch an entry on or off for a coworker | A member who manages that coworker's Box (**You don't manage this coworker's Box**) |
+| Change an entry other coworkers use | An admin, or a member who manages the Box of every coworker that uses it |
+| Switch on **Every coworker**, change an entry shared with every coworker, delete an entry | An admin (**Only an admin can do this**) |
+
+A member only sees the coworkers of the Boxes they can open. The coworkers of the other Boxes are counted, not named: an entry says **2 coworkers in Boxes you can't see**, and so does the confirmation before a delete.

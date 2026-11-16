@@ -44,6 +44,9 @@ Start from this map, then search: it is never complete.
 | `packages/contracts/src/chat-hitl.ts`, `apps/engine/src/runtime/notify.ts` | `agents/human-in-the-loop` |
 | `packages/contracts/src/template*.ts`, `apps/ui/lib/templates/**` | `templates/**`, `api/tools/templates`, `api/limits` |
 | `packages/contracts/src/onboarding-intake.ts`, `apps/ui/lib/foreman/**`, `apps/ui/lib/onboarding/**` | `quickstart`, `concepts` |
+| `apps/ui/lib/foreman/**`, `apps/ui/components/foreman/**`, `apps/ui/lib/onboarding/getting-started.ts`, `packages/i18n/messages/en/foreman.json` | `chief-of-staff`, `quickstart` |
+| `apps/engine/src/brain/**`, `apps/engine/src/tools/builtin/brain.ts`, `apps/ui/components/brain/**`, `KnowledgeBaseDialog.tsx`, `packages/contracts/src/brain.ts`, `packages/i18n/messages/en/brain.json` | `brain` |
+| `apps/engine/src/vault/**`, `apps/ui/components/vault/**`, `apps/ui/app/api/_services/vault*.service.ts`, `packages/contracts/src/vault.ts`, `packages/i18n/messages/en/vault.json` | `vault` |
 | members, roles, Box access (`members.actions.ts`, `contracts/board.ts`) | `teams` |
 | `process.env.*`, `.env.example`, `docker-compose.yml`, a Dockerfile | `self-host/configuration`, `self-host/install`, `INSTALL.md`, `README.md` |
 | `apps/ui/cloud-oss/*` (the self-hosted behaviour) | `self-host/open-source-vs-cloud` and the self-host page of that domain |

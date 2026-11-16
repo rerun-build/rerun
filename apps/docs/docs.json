@@ -37,6 +37,10 @@
             "pages": ["index", "quickstart", "concepts", "desktop-app", "iphone-app"]
           },
           {
+            "group": "Your workspace",
+            "pages": ["chief-of-staff", "brain", "vault", "teams", "billing"]
+          },
+          {
             "group": "Build a coworker",
             "pages": [
               "agents/configure",
@@ -46,10 +50,6 @@
               "agents/human-in-the-loop",
               "agents/data"
             ]
-          },
-          {
-            "group": "Your account",
-            "pages": ["billing", "teams"]
           }
         ]
       },

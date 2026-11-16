@@ -1,0 +1,113 @@
+---
+title: "Chief of Staff"
+description: "The assistant of your workspace: it builds your team with you, runs it for you and answers your questions about Rerun."
+icon: "compass"
+---
+
+The Chief of Staff is the assistant every workspace comes with. It is not one of your coworkers: it works on the whole workspace, builds coworkers, briefs them, follows their runs and answers your questions about Rerun itself.
+
+<Note>
+  The code and the API call the Chief of Staff the `foreman`. Same thing.
+</Note>
+
+## Where you meet it
+
+### During onboarding
+
+The Chief of Staff is the first thing you talk to. It asks for your company website, your line of work, your role and your first name, then offers a starter team for your kind of business. See [Quickstart](/quickstart) for the whole path.
+
+While it reads your website, it also fills the [Brain](/brain), the pages every coworker reads about your company.
+
+Until the first team is set up, its chat cannot be closed (**Finish the setup to close the chat**), and it always runs on the model shown on its pill, **Rerun Balanced**. If you switch to another tab meanwhile and allowed notifications, your browser tells you when it answers.
+
+<Note>
+  On a self-hosted install without `OPENROUTER_API_KEY`, the Chief of Staff skips the guided onboarding and runs on the AI you connect. See [Configuration](/self-host/configuration).
+</Note>
+
+### On the board
+
+Once your team is built, the Chief of Staff waits in a corner of the board as an orb. On a wide screen it sits in a pill that reads **Ask your Chief of Staff**.
+
+- Click the orb or the pill to open its chat.
+- Drag the orb to another corner to move it there.
+- Press <kbd>⌘</kbd> <kbd>K</kbd> (<kbd>Ctrl</kbd> <kbd>K</kbd> on Windows and Linux) to type to it straight away. Inside a coworker panel or the Brain, that shortcut keeps its own meaning.
+- Hold <kbd>Space</kbd> to talk to it, and release to send, when no field has the focus and nothing is open over the board.
+
+When it needs you while its chat is closed, the orb shows a card: **Needs your answer** or **Needs your approval**, with **Answer** or **Review** to open it and **Later** to put it aside.
+
+In the **Simple** view of the workspace, the Chief of Staff sits at the top of the list of coworkers, under the line **Ask anything**. On your phone, see [iPhone app](/iphone-app).
+
+### In the control center
+
+Press <kbd>⌘</kbd> <kbd>F</kbd> (<kbd>Ctrl</kbd> <kbd>F</kbd> on Windows and Linux) to open the **Control center**: jump to a coworker, a setting or a conversation, or type a question and pick **Ask your Chief of Staff**. Press the shortcut again to close it.
+
+## Its chat
+
+The chat opens as a column beside the board. From the **Move** menu of its header, pick **Dock left**, **Dock right** or **Float**, and drag its edge to resize it.
+
+It has two tabs:
+
+| Tab | What it shows |
+| --- | --- |
+| **Ask** | Your conversation with the Chief of Staff |
+| **Routines** | Every scheduled task of the workspace, grouped by when it runs next. From the menu of a routine, **Run now**, **Rename** or **Edit** it, or pause it with its switch |
+
+### General and threads
+
+Your main conversation is **General**. Click **New task** to open a thread for one job: it starts as **New task** until you write in it, and **Back to General** takes you back. The clock button, **Conversations**, lists General and every thread.
+
+Each member of the workspace has their own conversations with the Chief of Staff. It acts with your own rights: a member who cannot manage a Box cannot have it change that Box either. See [Teams and workspaces](/teams).
+
+### Its model
+
+After onboarding, you pick the Chief of Staff's model from its pill like for any coworker. See [Configure a coworker](/agents/configure).
+
+## What it can do for you
+
+Ask in plain words. The Chief of Staff does the work itself, then puts a row under its answer for each coworker it touched: click the row to open that coworker on the right tab.
+
+| Ask it to | What it does |
+| --- | --- |
+| **Build a coworker** | Writes its soul, its skills and its schedule, and places it in a Box. See [Configure a coworker](/agents/configure) |
+| **Propose a team** | Lays out your Boxes by team, client or project and proposes the coworkers for each |
+| **Install a template** | Installs a free template from the library into a Box. For a paid template, it opens the template card so you buy it yourself. See [Templates](/templates/install) |
+| **Set up apps** | Finds the app in the library and attaches it, then leaves you a row to sign in from the coworker's **Apps** tab. It never asks for a password or a key in the chat. See [Apps](/agents/apps) |
+| **Brief a coworker** | Sends it a task, follows the run and reports back |
+| **Schedule or trigger work** | Creates scheduled tasks and webhook triggers. See [Automations](/agents/automations) |
+| **Explain a run** | Reads the run history of a coworker and says why something failed |
+| **Keep the Brain** | Writes a page when you tell it a fact, accepts or dismisses what your coworkers proposed once you decide, and opens a page for you. See [Brain](/brain) |
+| **Open a setting** | Opens the right panel (billing, members, notifications, AI providers, API keys) for you to change it yourself |
+| **Answer a question about Rerun** | Searches these docs and answers with the link of the passage it used |
+
+It answers questions about Rerun from this documentation rather than from memory, so what you read here is what it tells you.
+
+### What it does not do
+
+- It changes nothing inside the settings panels it opens: you set those yourself. The exception is the model a coworker runs on, which it can set.
+- It holds no app of the [Vault](/vault): apps go to coworkers.
+- It never asks for a secret in the chat.
+
+## Getting started
+
+New workspaces get a **Getting started** checklist in the bottom-left corner of the board. It shows how many steps are done, and appears once the Chief of Staff has taken over from the onboarding.
+
+| Step | What ticks it |
+| --- | --- |
+| **Verify your phone number** | Only for an account whose signup asked for one |
+| **Create your first coworker** | A coworker is created in the workspace |
+| **Plug in your AI subscription** | Claude, ChatGPT, Gemini or your own API key is connected |
+| **Invite a teammate** | An invitation is sent, or a second member joins |
+| **Schedule a recurring task** | A coworker gets a scheduled task |
+| **Add a payment method** | A card is added. Nothing is charged today |
+
+Click a step to get it done: the phone opens your account, the payment method opens the card form, the AI subscription and the invitation open their settings panel, and the other steps send a request to the Chief of Staff, who walks you through.
+
+Click **Hide** to put the list away, and bring it back from **Getting started** in the **Help** menu.
+
+### The reward
+
+During the free trial, completing every step adds **3 days** to your trial: **Get 3 more free trial days** turns into **3 days added to your trial**. The days are only added to a trial that is still running. See [Plans and billing](/billing).
+
+<Note>
+  On a self-hosted install there is no phone step, no payment method step and no trial to extend: the checklist has the four other steps.
+</Note>
