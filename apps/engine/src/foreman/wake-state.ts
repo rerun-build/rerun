@@ -25,6 +25,22 @@ export type PlannedWake = { id: string; at: string; reason: string }
 
 export type WakeLogEntry = { at: string; reason: string; outcome: string; sessionId?: string }
 
+// Something that happened on the box and may deserve a look: a coworker's run that failed, a
+// conversation waiting on someone for hours, an app signed out. Grouped by `key` until `dueAt`.
+export type WakeSignal = {
+    id: string
+    key: string
+    kind: string
+    agentId?: string
+    sessionId?: string
+    itemId?: string
+    memberId?: string
+    summary: string
+    count: number
+    at: string
+    dueAt: string
+}
+
 export type WakeState = {
     planned: PlannedWake[]
     // The last wake that started, or was consumed by a run that failed to start.
@@ -36,9 +52,14 @@ export type WakeState = {
     retryAt: string | null
     backoffMs: number
     log: WakeLogEntry[]
+    signals: WakeSignal[]
+    // A wake for signals comes a quarter of an hour after the last one at the soonest.
+    lastSignalWakeAt: string | null
 }
 
-export const EMPTY_WAKE_STATE: WakeState = { planned: [], last: null, day: { date: '', count: 0 }, timezone: null, retryAt: null, backoffMs: 0, log: [] }
+export const EMPTY_WAKE_STATE: WakeState = { planned: [], last: null, day: { date: '', count: 0 }, timezone: null, retryAt: null, backoffMs: 0, log: [], signals: [], lastSignalWakeAt: null }
+
+export const SIGNAL_WAKE_GAP_MS = 15 * MINUTE_MS
 
 export async function readWakeState(): Promise<WakeState> {
     const { client } = await getSystemDb(FOREMAN_AGENT_ID)
@@ -132,13 +153,23 @@ export function mandatoryWakeAt(state: WakeState, now: Date): Date {
     return outOfQuietHours(new Date(Date.parse(state.last) + MANDATORY_AFTER_MS), state.timezone)
 }
 
-export type DueWake = { reason: string; plannedId?: string }
+// `signalIds`: the signals the wake reads, consumed with it.
+export type DueWake = { reason: string; plannedId?: string; signalIds: string[] }
 
-// What wakes it now, if anything: the earliest planned wake that came, else the mandatory one.
+export function maturedSignals(state: WakeState, now: Date): WakeSignal[] {
+    return state.signals.filter(signal => Date.parse(signal.dueAt) <= now.getTime())
+}
+
+// What wakes it now, if anything: the earliest planned wake that came, else signals that matured
+// (a quarter of an hour after the last wake they caused at the soonest), else the mandatory one. A
+// wake for any reason also reads the signals that matured.
 export function dueWake(state: WakeState, now: Date): DueWake | null {
+    const signalIds = maturedSignals(state, now).map(signal => signal.id)
     const planned = state.planned.filter(wake => Date.parse(wake.at) <= now.getTime()).sort((a, b) => Date.parse(a.at) - Date.parse(b.at))[0]
-    if (planned) return { reason: planned.reason, plannedId: planned.id }
-    if (mandatoryWakeAt(state, now).getTime() <= now.getTime()) return { reason: state.last ? 'Your daily check-in: you planned nothing since your last wake.' : 'Your first check-in on this workspace.' }
+    if (planned) return { reason: planned.reason, plannedId: planned.id, signalIds }
+    const signalGapOver = !state.lastSignalWakeAt || now.getTime() - Date.parse(state.lastSignalWakeAt) >= SIGNAL_WAKE_GAP_MS
+    if (signalIds.length && signalGapOver) return { reason: 'Something happened on the workspace: the signals below.', signalIds }
+    if (mandatoryWakeAt(state, now).getTime() <= now.getTime()) return { reason: state.last ? 'Your daily check-in: you planned nothing since your last wake.' : 'Your first check-in on this workspace.', signalIds }
     return null
 }
 
@@ -161,6 +192,11 @@ export function markWake(state: WakeState, due: DueWake, now: Date): void {
     const today = localDay(now, state.timezone)
     state.day = { date: today, count: (state.day.date === today ? state.day.count : 0) + 1 }
     if (due.plannedId) state.planned = state.planned.filter(wake => wake.id !== due.plannedId)
+    if (due.signalIds.length) {
+        const read = new Set(due.signalIds)
+        state.signals = state.signals.filter(signal => !read.has(signal.id))
+        state.lastSignalWakeAt = now.toISOString()
+    }
 }
 
 export function logWake(state: WakeState, entry: WakeLogEntry): void {
@@ -173,6 +209,8 @@ export function rebaseWakesAfterRestore(now: Date): Promise<{ dropped: number }>
     return updateWakeState(state => {
         const before = state.planned.length
         state.planned = state.planned.filter(wake => Date.parse(wake.at) > now.getTime())
+        // Weeks-old signals would wake it about things long settled.
+        state.signals = []
         state.last = now.toISOString()
         state.retryAt = null
         state.backoffMs = 0

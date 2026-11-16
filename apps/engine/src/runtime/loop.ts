@@ -44,6 +44,7 @@ import { runCurator } from './curator.js'
 import { repairToolCall } from './tool-repair.js'
 import { stepWithScreenshots } from './screenshots.js'
 import { authorMetadata, sendNotification, type NotificationKind } from './notify.js'
+import { clearAwaitingSignal } from '../foreman/signals.js'
 import { emitRunTerminal, wakeMetadata, wakeOrigin } from './run-events.js'
 import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
 import { armBudgetLatch, clearBudgetLatch, RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
@@ -227,6 +228,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
     const controller = registerRunAbort(run.id, baseAgent.id)
     const author = trigger.source === 'chat' ? trigger.author : undefined
+    // Someone is back in this conversation: what it was waiting on is no longer news for the Chief of Staff.
+    if (trigger.source === 'chat') void clearAwaitingSignal(baseAgent.id, sessionId).catch(() => {})
 
     let agent = baseAgent
     let { connection, provider, model } = baseAgent.resolved

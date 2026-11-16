@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
+import { recordSignal } from '../../foreman/signals.js'
 import { startForemanWake } from '../../foreman/wake-run.js'
 import { mandatoryWakeAt, readWakeState } from '../../foreman/wake-state.js'
 
@@ -23,4 +24,22 @@ foremanWakeRoutes.get('/', async c => {
     const now = new Date()
     const next = [...state.planned.map(wake => ({ at: wake.at, reason: wake.reason, planned: true })), { at: mandatoryWakeAt(state, now).toISOString(), reason: null, planned: false }].sort((a, b) => Date.parse(a.at) - Date.parse(b.at))[0]
     return c.json({ next, planned: state.planned, last: state.last, timezone: state.timezone, log: state.log })
+})
+
+const hubSignalSchema = z.object({
+    kind: z.string().regex(/^[a-z][a-z_.]{0,40}$/),
+    summary: z.string().min(1).max(300),
+    memberId: z.string().min(1).nullable().optional(),
+    itemId: z.string().min(1).max(120).nullable().optional(),
+    delayMinutes: z.number().int().min(0).max(24 * 60).optional(),
+})
+
+// What the hub knows and the box does not: an app connected in the Vault, a member who joined, the
+// onboarding that just ended. Queued like the box's own signals.
+foremanWakeRoutes.post('/signals', async c => {
+    const parsed = hubSignalSchema.safeParse(await c.req.json().catch(() => null))
+    if (!parsed.success) return c.json({ error: 'Invalid signal' }, 400)
+    const { kind, summary, memberId, itemId, delayMinutes } = parsed.data
+    await recordSignal({ kind: `hub.${kind}`, summary, memberId: memberId ?? undefined, itemId: itemId ?? undefined, delayMs: delayMinutes === undefined ? undefined : delayMinutes * 60_000 })
+    return c.json({ queued: true }, 202)
 })

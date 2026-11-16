@@ -1,3 +1,4 @@
+import { installForemanSignals } from '../../foreman/signals.js'
 import type { Server } from 'node:http'
 import { serve } from '@hono/node-server'
 import { createServer } from '../../http/server.js'
@@ -26,6 +27,7 @@ export async function runCommand(): Promise<void> {
     const lastUpdate = settleLastUpdateOnBoot()
     if (lastUpdate?.status === 'error') logger.warn({ error: lastUpdate.error, commit: lastUpdate.commit }, 'last update did not land')
     await ensureForeman()
+    installForemanSignals()
     // Here and not in prepareDataDir: the CLI commands that also prepare the folder run beside a live
     // engine, and the skills it writes take locks that only hold inside one process.
     await reconcileVault()

@@ -27,6 +27,7 @@ import {
 vi.mock('server-only', () => ({}))
 vi.mock('@/lib/vault/copies', () => ({ dropMigrationCopy: vi.fn(async () => {}) }))
 vi.mock('@/lib/vault/composio', () => ({ revokeVaultComposioAccount: vi.fn(async () => {}) }))
+vi.mock('@/lib/foreman/signal', () => ({ sendForemanSignal: vi.fn(async () => {}) }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/flags', () => ({ vaultFlag: vi.fn(async () => false) }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
@@ -276,6 +277,20 @@ describe('sign-in', () => {
         await markVaultEntryAuthorized('item-1', managerOfA, { label: 'ops@acme.test' })
         expect(patchVaultItem).toHaveBeenLastCalledWith(conn, 'item-1', { status: 'active', label: 'ops@acme.test' })
         await expect(markVaultEntryAuthorized('item-1', user)).rejects.toMatchObject({ code: 'vaultManageOnly' })
+    })
+
+    // The Chief of Staff hears of it: a coworker that was failing on this app may work again.
+    it('tells the Chief of Staff an app was connected, and only once it was', async () => {
+        const { sendForemanSignal } = await import('@/lib/foreman/signal')
+        vi.mocked(sendForemanSignal).mockClear()
+        vi.mocked(getVaultItem).mockResolvedValue(item({ status: 'needs_auth' }) as never)
+        await markVaultEntryAuthorized('item-1', managerOfA, { label: 'ops@acme.test' })
+        expect(sendForemanSignal).toHaveBeenCalledWith(WORKSPACE, { kind: 'vault_connected', itemId: 'item-1', memberId: 'manager-a', summary: 'Gmail (ops@acme.test) was connected in the Vault again, after it had been signed out.' })
+
+        vi.mocked(sendForemanSignal).mockClear()
+        vi.mocked(getVaultItem).mockResolvedValue(item({ tokens: [], oauth: { serverName: 'gmail', url: 'https://g.test' } }) as never)
+        await markVaultEntryAuthorized('item-1', admin)
+        expect(sendForemanSignal).not.toHaveBeenCalled()
     })
 
     it('names who would lose an entry, counting those the caller cannot see', async () => {

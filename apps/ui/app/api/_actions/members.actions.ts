@@ -6,6 +6,8 @@ import type { Database } from '@/app/api/database.types'
 import { demoteKeepingAnAdmin, isLastAdmin, LAST_ADMIN, listMemberProfiles, resolveMemberIdentities, setMemberRole } from '@/app/api/_services/members.service'
 import { BANNER_WARM_BACKGROUND_MS, EMAIL_DELIVERY, emailBoardBanner, sendWorkspaceInviteEmail } from '@rerun/cloud/email'
 import { ownsEmail } from '@/lib/auth/account-emails'
+import { readProfile } from '@/lib/auth/user-profile'
+import { sendForemanSignal } from '@/lib/foreman/signal'
 import { workspaceLocale } from '@/lib/i18n/recipient-locale'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { emailTranslator } from '@rerun/emails/i18n'
@@ -279,6 +281,7 @@ export async function acceptInvitationAction(token: string): Promise<ActionResul
     }
 
     await supabase.from('users').update<Database['public']['Tables']['users']['Update']>({ workspace_id: invite.workspace_id }).eq('id', user.id)
+    if (!existing) after(() => sendForemanSignal(invite.workspace_id, { kind: 'member_joined', itemId: user.id, summary: `${readProfile(session).name ?? 'Someone you invited'} joined the workspace as a member.` }))
 
     return { ok: true, workspaceId: invite.workspace_id }
 }

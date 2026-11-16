@@ -36,7 +36,7 @@ every boot. It is not in `GET /agents`. Under `/agents/foreman` only these route
 itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`, `/runs/:rid`,
 `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
 `/runs/:rid/tasks/:taskId/cancel`, `GET /files/read`, `GET|PUT|POST /files/raw`, `DELETE /files`,
-`GET /wake`, `POST /wake/now`, and a `PATCH` that only carries `connectionId`, `provider` and `model`. Anything
+`GET /wake`, `POST /wake/now`, `POST /wake/signals`, and a `PATCH` that only carries `connectionId`, `provider` and `model`. Anything
 else answers `403 { "error": "The foreman is managed by the engine and cannot be changed" }`.
 
 #### Wakes
@@ -60,6 +60,18 @@ from the hub it asks again six hours later; while the hub cannot be reached, aft
 twice as long each time, up to an hour. Both tools exist only when the hub names `schedule_wake` in
 the brief. The state lives in the `system_meta` table of `agents/foreman/data/system.db`; `rerun
 restore-finalize` drops the planned wakes whose moment passed and counts the day from the restore.
+
+It also wakes on signals, what happened on the box and may deserve a look: a coworker's run that
+failed, a conversation waiting on someone for four hours, an app signed out of the Vault, the
+workspace's own AI connected, a routine skipped for lack of credit or over a plan's limit (once a day
+per routine), runs a restart cut short. Its own events and those of a delegated sub-coworker are
+ignored. A signal waits two minutes for its siblings, the same thing happening again in the same
+conversation is counted on it, a reply in the conversation drops what it was waiting on, and at most
+50 are kept. A wake for signals comes a quarter of an hour after the last one at the soonest; any
+wake reads the signals that matured, quoted as data, and the coworkers whose setup nobody finished.
+
+`POST /agents/foreman/wake/signals` is the hub's way to add one: `{ kind, summary, memberId?, itemId?,
+delayMinutes? }`, queued as `hub.<kind>`, `202 { queued: true }`.
 
 `GET /agents/foreman/wake` reads it: `{ next: { at, reason, planned }, planned, last, timezone, log }`,
 `log` holding the last 30 wakes and their outcome.

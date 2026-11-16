@@ -1,3 +1,4 @@
+import { recordSignal } from '../foreman/signals.js'
 import { wakeTick } from '../foreman/wake-runner.js'
 import { automationModel } from '../agents/availability.js'
 import { listAgentIdsOnDisk } from '../agents/loader.js'
@@ -85,6 +86,9 @@ async function fire(agentId: string, schedule: Schedule): Promise<void> {
         const skipReason = err instanceof HttpError && err.code ? SKIP_REASONS[err.code] : undefined
         if (skipReason) {
             logger.debug({ agent: agentId, schedule: schedule.slug }, `scheduled run skipped: ${skipReason}`)
+            // Out of credit or over a plan's limit, a routine stops without anyone hearing of it: the
+            // Chief of Staff does, once a day per routine.
+            if (err instanceof HttpError && err.code !== 'coworker_busy') void recordSignal({ kind: 'routine_skipped', agentId, itemId: `${schedule.slug}:${new Date().toISOString().slice(0, 10)}`, summary: `The routine "${schedule.name}" of ${agentId} did not run: ${skipReason}.` }).catch(() => {})
             return
         }
         logger.error({ agent: agentId, schedule: schedule.slug, err: String(err) }, 'scheduled run failed')

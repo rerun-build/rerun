@@ -23,6 +23,7 @@ const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'DELETE', path: /^\/agents\/foreman\/files$/ },
     { method: 'GET', path: /^\/agents\/foreman\/wake$/ },
     { method: 'POST', path: /^\/agents\/foreman\/wake\/now$/ },
+    { method: 'POST', path: /^\/agents\/foreman\/wake\/signals$/ },
 ]
 
 // The only fields ensureForeman carries over a reboot, so the only ones worth accepting.

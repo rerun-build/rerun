@@ -13,6 +13,7 @@ import { revokeVaultComposioAccount } from '@/lib/vault/composio'
 import { dropMigrationCopy } from '@/lib/vault/copies'
 import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
 import { AppError } from '@/lib/i18n/action-error'
+import { sendForemanSignal } from '@/lib/foreman/signal'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll } from '@/supabase/supabase-helpers'
 import { findWorkspaceEngine, NoEngineError } from './workspace-engine.service'
@@ -244,7 +245,11 @@ export async function markVaultEntryAuthorized(itemId: string, actor?: Actor, ac
     const item = await readItem(ctx, itemId)
     // A sign-in that never wrote its token has nothing to flip: the entry stays signed out.
     if (item.oauth && !item.tokens.includes(item.oauth.serverName)) return item
-    return patchVaultItem(ctx.conn, itemId, { status: 'active', ...(account?.label ? { label: account.label } : {}) })
+    const connected = await patchVaultItem(ctx.conn, itemId, { status: 'active', ...(account?.label ? { label: account.label } : {}) })
+    const label = account?.label ?? item.label
+    const name = label ? `${item.name} (${label})` : item.name
+    void sendForemanSignal(ctx.actor.workspaceId, { kind: 'vault_connected', itemId, memberId: ctx.actor.kind === 'user' ? ctx.actor.userId : null, summary: `${name} was connected in the Vault${item.status === 'needs_auth' ? ' again, after it had been signed out' : ''}.` })
+    return connected
 }
 
 // How many entries wait on a sign-in, for the dot on the workspace menu. Nothing to say, rather

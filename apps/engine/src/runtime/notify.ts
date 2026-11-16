@@ -55,7 +55,25 @@ export function authorMetadata(author: MessageAuthor | undefined): { authorId?: 
 
 const TIMEOUT_MS = 5000
 
+type NotificationListener = (input: NotificationInput) => void
+
+const listeners = new Set<NotificationListener>()
+
+// Whatever happens on the box goes through here, which makes it the one place to listen from: the
+// Chief of Staff's signals do. A listener never holds the event up nor fails it.
+export function onNotification(listener: NotificationListener): () => void {
+    listeners.add(listener)
+    return () => listeners.delete(listener)
+}
+
 export async function sendNotification(input: NotificationInput): Promise<{ delivered: boolean; reason?: string }> {
+    for (const listener of listeners) {
+        try {
+            listener(input)
+        } catch (err) {
+            logger.warn({ err: String(err) }, 'notification listener failed')
+        }
+    }
     const { RERUN_HUB_BASE_URL: hub, RERUN_API_KEY: token } = env()
     if (!hub || !token) {
         logger.debug({ agent: input.agentId }, 'notification skipped: webhook not configured')

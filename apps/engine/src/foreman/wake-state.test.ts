@@ -54,13 +54,24 @@ describe('dueWake', () => {
 
     it('wakes for the earliest planned wake that came', () => {
         const s = state({ last: '2026-11-16T09:00:00Z', planned: [{ id: 'b', at: '2026-11-16T09:50:00Z', reason: 'later' }, { id: 'a', at: '2026-11-16T09:40:00Z', reason: 'first' }, { id: 'c', at: '2026-11-16T12:00:00Z', reason: 'not yet' }] })
-        expect(dueWake(s, now)).toEqual({ reason: 'first', plannedId: 'a' })
+        expect(dueWake(s, now)).toEqual({ reason: 'first', plannedId: 'a', signalIds: [] })
     })
 
     it('wakes a day after the last wake when nothing is planned, and only then', () => {
         expect(dueWake(state({ last: '2026-11-15T12:00:00Z' }), now)).toBeNull()
         expect(dueWake(state({ last: '2026-11-15T09:00:00Z' }), now)?.reason).toContain('daily check-in')
         expect(mandatoryWakeAt(state({ last: '2026-11-15T09:00:00Z' }), now).toISOString()).toBe('2026-11-16T09:00:00.000Z')
+    })
+
+    it('wakes for signals that matured, a quarter of an hour after the last such wake at the soonest', () => {
+        const signal = (id: string, dueAt: string) => ({ id, key: id, kind: 'run_failed', summary: 'x', count: 1, at: dueAt, dueAt })
+        const s = state({ last: '2026-11-16T09:00:00Z', signals: [signal('ripe', '2026-11-16T09:58:00Z'), signal('green', '2026-11-16T10:05:00Z')] })
+        expect(dueWake(s, now)).toEqual({ reason: expect.stringContaining('signals'), signalIds: ['ripe'] })
+        expect(dueWake({ ...s, lastSignalWakeAt: '2026-11-16T09:50:00Z' }, now)).toBeNull()
+        const due = dueWake(s, now)!
+        markWake(s, due, now)
+        expect(s.signals.map(signal => signal.id)).toEqual(['green'])
+        expect(s.lastSignalWakeAt).toBe(now.toISOString())
     })
 
     // A box asleep for three days owes one wake, not three.
@@ -76,7 +87,7 @@ describe('dueWake', () => {
 describe('the day', () => {
     it('counts the wakes of the day in the member calendar', () => {
         const s = state({ timezone: 'Europe/Paris' })
-        markWake(s, { reason: 'x' }, new Date('2026-11-16T22:30:00Z'))
+        markWake(s, { reason: 'x', signalIds: [] }, new Date('2026-11-16T22:30:00Z'))
         expect(wakesToday(s, new Date('2026-11-16T22:59:00Z'))).toBe(1)
         // Still the 16th in UTC, already the 17th in Paris: a new day for the member.
         expect(wakesToday(s, new Date('2026-11-16T23:01:00Z'))).toBe(0)
@@ -85,7 +96,7 @@ describe('the day', () => {
 
     it('spends a planned wake once it started', () => {
         const s = state({ planned: [{ id: 'a', at: '2026-11-16T09:00:00Z', reason: 'x' }] })
-        markWake(s, { reason: 'x', plannedId: 'a' }, new Date('2026-11-16T10:00:00Z'))
+        markWake(s, { reason: 'x', plannedId: 'a', signalIds: [] }, new Date('2026-11-16T10:00:00Z'))
         expect(s.planned).toEqual([])
     })
 })
