@@ -5,7 +5,7 @@ from test_dispatch import Base, HEAD
 
 PIN = "ruff==0.17.5"
 WORKFLOW = "name: Factory tools\njobs:\n  test:\n    steps:\n      - name: Lint\n        run: pipx run %s check tools/factory\n" % PIN
-RED_GREEN = 'name: Done-test red before green\njobs:\n  prove:\n    steps:\n      - run: python3 -I tools/factory/redgreen.py --prepare "touch prepared.flag"\n'
+RED_GREEN = 'name: Done-test red before green\njobs:\n  prove:\n    steps:\n      - run: python3 -I tools/factory/redgreen.py --prepare "%s"\n'
 
 
 def plan(lines):
@@ -16,14 +16,16 @@ def run(name, status="completed", conclusion=None):
     return {"name": name, "status": status, "conclusion": conclusion, "workflow_id": 1}
 
 
-class PrOpenPreflight(FactoryCase):
+class PrOpenBase(FactoryCase):
+    PREPARE = "touch prepared.flag"
+
     def setUp(self):
         super().setUp()
         dev = self.make_clone("dev-push")
         git(dev, "checkout", "--quiet", "dev")
         os.makedirs(os.path.join(dev, ".github/workflows"))
         write(dev, ".github/workflows/factory-tools.yml", WORKFLOW)
-        write(dev, ".github/workflows/red-green.yml", RED_GREEN)
+        write(dev, ".github/workflows/red-green.yml", RED_GREEN % self.PREPARE)
         git(dev, "add", "-A")
         git(dev, "commit", "--quiet", "-m", "workflow")
         git(dev, "push", "--quiet", "origin", "HEAD:refs/heads/dev")
@@ -70,6 +72,9 @@ class PrOpenPreflight(FactoryCase):
     def pushed(self):
         return self.remote_sha("refs/heads/chunk/7-1") != ""
 
+
+
+class PrOpenPreflight(PrOpenBase):
     def test_a_failing_run_line_refuses_before_the_push_with_its_last_lines(self):
         line = "echo first; for i in $(seq 1 30); do echo row$i; done; exit 3"
         code, out = self.open_pr(["echo fine", line])
@@ -187,6 +192,18 @@ class PrOpenPreflight(FactoryCase):
         code, out = self.open_pr(commits=("tools/factory/x.py",))
         self.assertEqual(code, 0, out)
         self.assertIn("lint not run: ", out)
+        self.assertTrue(self.pushed())
+
+
+class PrepareFails(PrOpenBase):
+    PREPARE = "echo no tsc here; exit 3"
+
+    def test_a_failed_prepare_step_is_named_as_such_and_the_run_lines_still_decide(self):
+        code, out = self.open_pr(["echo one"])
+        self.assertEqual(code, 0, out)
+        self.assertIn("the prepare step `echo no tsc here; exit 3` of red-green.yml did not run here (exit 3): no tsc here", out)
+        self.assertNotIn("the Run line `echo no tsc here", out)
+        self.assertIn("Run line passed: echo one", out)
         self.assertTrue(self.pushed())
 
 

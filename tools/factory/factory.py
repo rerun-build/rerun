@@ -835,13 +835,16 @@ def preflight_lines(top, body):
     lines = redgreen.run_lines(body)
     wf = os.path.join(top, ".github", "workflows", "red-green.yml")
     prepare = re.findall(r'--prepare "([^"]+)"', open(wf).read()) if lines and os.path.isfile(wf) else []
-    for line in prepare + lines:
+    for k, line in enumerate(prepare + lines):
         try:
             r = subprocess.run(["bash", "-c", line], cwd=top, capture_output=True, text=True, errors="replace", timeout=PREFLIGHT_LINE_S)
             code, out = r.returncode, r.stdout + r.stderr
         except subprocess.TimeoutExpired:
             code, out = 124, "timed out after %d s" % PREFLIGHT_LINE_S
-        if code == 127 and not_here(line, out):
+        if k < len(prepare):
+            if code:
+                print("the prepare step `%s` of red-green.yml did not run here (exit %d): %s" % (line, code, " ".join(out.split())[-300:]))
+        elif code == 127 and not_here(line, out):
             print("not run on this server: " + line)
         elif code:
             die("the Run line `%s` fails here (exit %d), nothing is pushed. Its last lines:\n%s" % (line, code, "\n".join(out.splitlines()[-20:])))
