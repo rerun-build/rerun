@@ -38,6 +38,7 @@ services:
       RERUN_API_KEY_FILE: /run/secrets/rerun_engine_key
       RERUN_HUB_BASE_URL: http://app:3000
       RERUN_LOG_LEVEL: ${RERUN_LOG_LEVEL:-info}
+      RERUN_FS_EXTRA_ROOTS: ${RERUN_FS_EXTRA_ROOTS:-/data/work/wt}
     ports:
       - "${RERUN_BIND_ADDRESS:-127.0.0.1}:${RERUN_ENGINE_PORT:-3001}:3000"
     secrets:
