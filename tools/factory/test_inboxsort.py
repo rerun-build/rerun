@@ -98,6 +98,16 @@ class Notes(unittest.TestCase):
                                comment("#9", "retry  the CALL 5 times at 9f8e7d6c")]), [])
         self.assertEqual([n["job"] for n in got], ["#5"])
 
+    def test_a_sentence_that_only_starts_like_an_open_issue_is_kept(self):
+        notes = S.notes([comment("#5", "rename x to y")])
+        self.assertEqual(S.fresh(notes, [{"number": 8, "title": "rename x to yaml in the loader", "body": ""}]), notes)
+        self.assertEqual(S.fresh(notes, [{"number": 8, "title": "Rename x to y.", "body": ""}]), [])
+
+    def test_the_text_of_a_note_cannot_mark_other_notes_handled(self):
+        key = S.notes([comment("#5", "add a retry test")])[0]["key"]
+        self.assertEqual(S.handled([comment("#6", "x"), comment("#7", "Covered elsewhere: " + key)]), set())
+        self.assertEqual(S.handled(["Covered elsewhere: " + key]), {key})
+
     def test_a_note_already_in_an_open_issue_is_dropped_by_key_or_by_sentence(self):
         notes = S.notes([comment("#5", "add a retry test", "log the sum at step 4")])
         issues = [{"number": 7, "title": "x", "body": "see <!-- followup:%s -->" % notes[0]["key"]},
@@ -146,7 +156,7 @@ class Mint(unittest.TestCase):
         [issue] = hub.minted()
         self.assertEqual(issue["labels"], ["P3"])
 
-    def test_two_a_day_largest_first_and_two_more_the_next_day(self):
+    def test_two_at_once_largest_first_and_no_more_while_one_is_open(self):
         hub = Hub([comment("#5", *factory(5)), comment("#6", *ui(4)), comment("#7", *engine(3))])
         d = D(hub)
         d.beat()
@@ -156,10 +166,11 @@ class Mint(unittest.TestCase):
         self.assertEqual(len(hub.minted()), 2)
         d.clock += DAY
         d.beat()
-        self.assertEqual([len(S.MARK.findall(i["body"])) for i in hub.minted()], [5, 4, 3])
-        d.clock += DAY
+        self.assertEqual(len(hub.minted()), 2)
+        hub.issues = []
+        d.clock += HOUR
         d.beat()
-        self.assertEqual(len(hub.minted()), 3)
+        self.assertEqual([len(S.MARK.findall(i["body"])) for i in hub.minted()], [3])
 
     def test_notes_named_in_a_minted_comment_are_never_minted_again(self):
         hub = Hub([comment("#5", *factory(3))])
@@ -233,9 +244,10 @@ class Mint(unittest.TestCase):
         hub = Hub([comment("#5", *factory(5)), comment("#6", *ui(4)), comment("#7", *engine(3))])
         d = D(hub, NOW - 2 * HOUR)
         d.beat()
+        hub.issues = []
         d.clock += 3 * HOUR
         d.beat()
-        self.assertEqual(len(hub.minted()), 2)
+        self.assertEqual(hub.minted(), [])
 
     def test_a_broken_stored_time_does_not_raise(self):
         d = D(Hub([]))

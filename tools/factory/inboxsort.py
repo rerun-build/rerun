@@ -15,6 +15,7 @@ FLOW_KEY = "issue_flow"
 ALARM = "backlog growing"
 DEFAULT_PRIORITY = "P3"
 MARK = followups.MARK
+TITLE = "Follow-ups for "
 NOTE = re.compile(r"(?m)^(.*)\n\nFrom the review of (\S+)\.\n\n<!-- followup:(\S+) -->")
 HANDLED = re.compile(r"(?m)^(?:Minted #\d+ from \d+ notes|Covered elsewhere): (.+)$")
 PARENT = re.compile(r"(?i)\bpart of(?=\W*#\d)")
@@ -34,7 +35,7 @@ def notes(comments):
 
 
 def handled(comments):
-    return {k for c in comments for m in HANDLED.finditer(c or "") for k in m.group(1).split(", ")}
+    return {k for c in comments if not MARK.search(c or "") for m in HANDLED.finditer(c or "") for k in m.group(1).split(", ")}
 
 
 def fresh(found, issues):
@@ -44,7 +45,7 @@ def fresh(found, issues):
     out = []
     for n in found:
         sentence = norm(n["text"])
-        if n["key"] in keys or sentence in seen or (sentence and sentence in known):
+        if n["key"] in keys or sentence in seen or (sentence and re.search(r"(?<!\w)%s(?!\w)" % re.escape(sentence), known)):
             continue
         keys.add(n["key"])
         seen.add(sentence)
@@ -106,9 +107,11 @@ def mint(d, inbox, now):
     covered = sorted({n["key"] for n in found} - {n["key"] for n in kept})
     if covered:
         d.gh(["issue", "comment", inbox, "-R", d.repo, "--body", "Covered elsewhere: " + ", ".join(covered)])
+    if any((i.get("title") or "").startswith(TITLE) for i in issues):
+        return []
     for where, group in pick(groups(kept, rules), made, now):
         group = fit(group)
-        title = "Follow-ups for %s: %d notes from the inbox" % (where, len(group))
+        title = "%s%s: %d notes from the inbox" % (TITLE, where, len(group))
         text = body(group)
         args = ["issue", "create", "-R", d.repo, "--title", title, "--body", text]
         for name in labels(where, rules):
