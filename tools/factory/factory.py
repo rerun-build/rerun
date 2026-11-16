@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import calendar, contextlib, json, os, re, signal, subprocess, sys, time, shutil, urllib.request
+import calendar, contextlib, fnmatch, json, os, re, signal, subprocess, sys, time, shutil, urllib.request
 
 GH, GIT = os.environ.get("FACTORY_GH") or "/data/tools/bin/gh", "/data/tools/bin/git"
 OWNERS = ("special-place-ai-heaven", "special-place-administrator")
@@ -8,6 +8,7 @@ REPOS, WT, STATE = WORK + "/repos", WORK + "/wt", WORK + "/state"
 MAX_WORK_GB, MIN_FREE_GB = 20, 30
 MAX_BUILDERS = None
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cutshape
 try:
     import limits
 except Exception:
@@ -639,6 +640,15 @@ def cmd_pr_open(a):
     msgs = run([GIT, "log", "--format=%B", "origin/%s..HEAD" % base], cwd=top).stdout
     if re.search(r"co-authored-by|generated with", msgs, re.I):
         die("a commit message has an AI trailer. Amend it before the push (nothing is pushed yet).")
+    got = api("repos/%s/issues/%s" % (full, issue))
+    if got is None:
+        die("could not read issue #%s to check the change against its **Files**. Try again." % issue)
+    if isinstance(got, dict) and "number" in got:
+        paths = cutshape.parse(got)["paths"]
+        if paths:
+            out = [f for f in changed if not any(f == p or f.startswith(p.rstrip("/") + "/") or fnmatch.fnmatchcase(f, p) for p in paths)]
+            if out:
+                die("files outside the **Files** of issue #%s: %s. Take them out of the change, or end with BLOCKED: plan: <why>." % (issue, ", ".join(out)))
     ex = json.loads(run([GH, "pr", "list", "-R", full, "--head", branch, "--state", "open", "--json", "number,url"]).stdout or "[]")
     if ex:
         if "--fix" not in a:
