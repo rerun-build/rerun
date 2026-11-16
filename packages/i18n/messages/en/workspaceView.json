@@ -57,7 +57,8 @@
     },
     "foreman": {
         "name": "Chief of Staff",
-        "line": "Ask anything"
+        "line": "Ask anything",
+        "card": "Chief of Staff card"
     },
     "details": {
         "label": "Card of {name}"

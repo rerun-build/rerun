@@ -7,17 +7,13 @@ import { AgentLockedOverlay } from '@/components/agent/AgentLockedOverlay'
 import { AgentPanelChat } from '@/components/agent/AgentPanelChat'
 import type { ChatsFilter } from '@/components/agent/sheet/AgentChatsList'
 import { WorkspacePausedBanner } from '@/components/layout/WorkspacePausedBanner'
-import { Button } from '@/components/ui/button'
 import { Skeleton, SkeletonChat } from '@/components/ui/skeleton'
-import { TooltipLabeled } from '@/components/ui/tooltip'
-import { useDetailsOpen } from '@/components/workspace-view/useDetailsOpen'
+import { DetailsToggle } from '@/components/workspace-view/DetailsToggle'
 import { useOpenedAgents } from '@/hooks/useOpenedAgents'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
-import { PanelRightIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
-import { useSimpleDetailsStore } from '@/stores/simple-details.store'
 
 type SimpleChatPaneProps = {
     chats: ChatsFilter | null
@@ -50,7 +46,7 @@ export const SimpleChatPane = memo(function SimpleChatPane({ chats, onChatsChang
     const locked = !!agent && (access !== 'live' || !!agent.disabledAt)
     const attentionCount = useMemo(() => sessions.filter(s => s.agentId === selectedAgentId && ATTENTION_STATUSES.has(s.status)).length, [sessions, selectedAgentId])
 
-    const headerEnd = <DetailsToggle />
+    const headerEnd = <DetailsToggle label={t('card')} />
 
     return (
         <section aria-label={agent?.name} className="relative flex h-full min-h-0 min-w-0 flex-1 flex-col bg-background">
@@ -83,18 +79,6 @@ export const SimpleChatPane = memo(function SimpleChatPane({ chats, onChatsChang
         </section>
     )
 })
-
-function DetailsToggle() {
-    const t = useTranslations('workspaceView.chat')
-    const open = useDetailsOpen()
-    return (
-        <TooltipLabeled label={t('card')}>
-            <Button variant="ghost" size="icon-sm" aria-label={t('card')} aria-pressed={open} onClick={() => useSimpleDetailsStore.getState().setWanted(!open)} className={cn(open && 'bg-accent')}>
-                <PanelRightIcon className="size-4" />
-            </Button>
-        </TooltipLabeled>
-    )
-}
 
 const TAB_WIDTHS = ['w-16', 'w-28']
 

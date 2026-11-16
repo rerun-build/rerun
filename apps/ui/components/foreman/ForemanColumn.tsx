@@ -18,6 +18,10 @@ import { ForemanChatLayer } from '@/components/foreman/ForemanChatLayer'
 import { ForemanHeader } from '@/components/foreman/ForemanHeader'
 import { ForemanHistory } from '@/components/foreman/ForemanHistory'
 import { ForemanTopBar } from '@/components/foreman/ForemanTopBar'
+import { ForemanDetails } from '@/components/foreman/ForemanDetails'
+import { DetailsColumn } from '@/components/workspace-view/DetailsColumn'
+import { DetailsToggle } from '@/components/workspace-view/DetailsToggle'
+import { useDetailsOpen } from '@/components/workspace-view/useDetailsOpen'
 import { ForemanComposerSlot } from '@/components/foreman/ForemanComposerSlot'
 import { ForemanDockResizeHandle } from '@/components/foreman/ForemanDockResizeHandle'
 import { ForemanResizeHandle } from '@/components/foreman/ForemanResizeHandle'
@@ -58,6 +62,7 @@ import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
+import { useSimpleDetailsStore } from '@/stores/simple-details.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
 
@@ -120,6 +125,11 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     // Where a coworker's chat names who it is talking to, or the thread it answers in.
     const tAgent = useTranslations('agent.agentSheetChat')
     const tView = useTranslations('workspaceView.foreman')
+    const tDetails = useTranslations('workspaceView.details')
+    const detailsShown = useDetailsOpen() && pinned && open === true
+    // Mounted the first time it opens, then kept: opening it again only slides it in.
+    const [details, setDetails] = useState({ mounted: false, slideIn: false })
+    if (detailsShown && !details.mounted) setDetails({ mounted: true, slideIn: restoreDone })
     const framedPlaceholder = !pinned ? undefined : threadOnScreen && threadOnScreen.title !== tThreads('untitled') ? tAgent('replyPlaceholder', { title: threadOnScreen.title }) : tAgent('messagePlaceholder', { name: tView('name') })
 
     // The kickoff marker goes through here too, and the store turns it away like every message of
@@ -458,6 +468,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
             <div
                 className={cn(
                     'absolute inset-y-0 flex w-full flex-col bg-background pb-[var(--consent-inset)]',
+                    pinned && 'md:flex-row',
                     floating
                         ? 'right-0 md:inset-x-0 md:overflow-hidden md:rounded-xl md:border md:border-border md:shadow-2xl'
                         : pinned
@@ -469,90 +480,99 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             )
                 )}
             >
-                {pinned ? (
-                    <ForemanTopBar
-                        thread={threadOnScreen && { id: sessionId, ...threadOnScreen }}
-                        onShowGeneral={backToGeneral}
-                        onNewTask={startNewChat}
-                        history={hasThreads && <ForemanHistory inBar open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
-                    />
-                ) : (
-                    <ForemanHeader
-                        placement={placement}
-                        onDragPointerDown={handleHeaderPointerDown}
-                        onToggleSheetDetent={toggleDetent}
-                        onNewChat={startNewChat}
-                        thread={threadOnScreen}
-                        onBackToGeneral={backToGeneral}
-                        history={hasThreads && <ForemanHistory open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
-                    />
-                )}
-                {/* Masqués et pas démontés hors de l'onglet Assistant : un aller-retour sur Routines
-                    ne doit perdre ni le brouillon du composer ni la position dans la conversation. */}
-                {arrivalStep && arrivalPick && (
-                    <div className={cn('flex flex-col gap-6 px-5 pt-14', arrivalWall ? 'min-h-0 flex-1 overflow-y-auto pb-5' : 'shrink-0')}>
-                        <ArrivalHeader pick={arrivalPick} step={arrivalStep} paid={!!arrival?.paid || arrivalStep === 'purchase'} />
-                        {arrivalWall && <ArrivalWall step={arrivalWall} />}
-                    </div>
-                )}
-                <div className={onRoutines || arrivalWall ? 'hidden' : 'contents'}>
-                    {/* General keeps one key whatever id it gets from the server: only a thread slides. */}
-                    <PanelSteps stepKey={inThread ? sessionId : 'general'} depth={inThread ? 1 : 0}>
-                        <ForemanChatLayer
-                            messages={messages}
-                            streaming={busy}
-                            guided={guided}
+                {/* In the Simple view's middle its column sits beside the chat, as a coworker's card does. */}
+                <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                    {pinned ? (
+                        <ForemanTopBar
+                            thread={threadOnScreen && { id: sessionId, ...threadOnScreen }}
+                            onShowGeneral={backToGeneral}
+                            onNewTask={startNewChat}
+                            end={<DetailsToggle label={tView('card')} />}
+                            history={hasThreads && <ForemanHistory inBar open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
+                        />
+                    ) : (
+                        <ForemanHeader
+                            placement={placement}
+                            onDragPointerDown={handleHeaderPointerDown}
+                            onToggleSheetDetent={toggleDetent}
+                            onNewChat={startNewChat}
+                            thread={threadOnScreen}
+                            onBackToGeneral={backToGeneral}
+                            history={hasThreads && <ForemanHistory open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
+                        />
+                    )}
+                    {/* Masqués et pas démontés hors de l'onglet Assistant : un aller-retour sur Routines
+                        ne doit perdre ni le brouillon du composer ni la position dans la conversation. */}
+                    {arrivalStep && arrivalPick && (
+                        <div className={cn('flex flex-col gap-6 px-5 pt-14', arrivalWall ? 'min-h-0 flex-1 overflow-y-auto pb-5' : 'shrink-0')}>
+                            <ArrivalHeader pick={arrivalPick} step={arrivalStep} paid={!!arrival?.paid || arrivalStep === 'purchase'} />
+                            {arrivalWall && <ArrivalWall step={arrivalWall} />}
+                        </div>
+                    )}
+                    <div className={onRoutines || arrivalWall ? 'hidden' : 'contents'}>
+                        {/* General keeps one key whatever id it gets from the server: only a thread slides. */}
+                        <PanelSteps stepKey={inThread ? sessionId : 'general'} depth={inThread ? 1 : 0}>
+                            <ForemanChatLayer
+                                messages={messages}
+                                streaming={busy}
+                                guided={guided}
+                                intake={intakeOpen ? intake : null}
+                                gated={gated}
+                                arrival={arrival}
+                                restored={restoreDone}
+                                error={noticeError}
+                                onWidgetAnswer={answerWidget}
+                                onWidgetDismiss={dismissWidget}
+                                pending={pendingWidget}
+                                answerAttachments={answerAttachments}
+                                nextSteps={nextSteps}
+                                onSuggestion={sendOrQueue}
+                                onPrefill={prefill}
+                                onStop={handleStop}
+                                onRetry={canRetry ? retryLastTurn : undefined}
+                                onStopTask={stopTask}
+                                actions={messageActions}
+                                rawUrlFor={rawUrlFor}
+                                readFile={readFile}
+                                sharedFiles={sharedFiles}
+                                threads={inThread || !hasThreads ? undefined : threads}
+                                onOpenThread={openThread}
+                                underCrumb={inThread}
+                                framed={pinned}
+                                onStackElement={setStackEl}
+                                className="min-h-0 flex-1"
+                            />
+                        </PanelSteps>
+                        <ForemanComposerSlot
+                            ref={setSlotEl}
+                            framed={pinned}
+                            placeholder={framedPlaceholder}
                             intake={intakeOpen ? intake : null}
                             gated={gated}
-                            arrival={arrival}
-                            restored={restoreDone}
-                            error={noticeError}
-                            onWidgetAnswer={answerWidget}
-                            onWidgetDismiss={dismissWidget}
-                            pending={pendingWidget}
-                            answerAttachments={answerAttachments}
-                            nextSteps={nextSteps}
-                            onSuggestion={sendOrQueue}
-                            onPrefill={prefill}
+                            trialGate={trialGate}
+                            aside={!!pendingWidget && !keepsComposer(pendingWidget)}
+                            ownEntry={ownEntry}
+                            composerRef={composerRef}
+                            sessionId={sessionId}
+                            backend={composerBackend}
+                            status={status}
+                            busy={busy}
+                            queue={queue}
+                            onSend={sendFromComposer}
                             onStop={handleStop}
-                            onRetry={canRetry ? retryLastTurn : undefined}
-                            onStopTask={stopTask}
-                            actions={messageActions}
-                            rawUrlFor={rawUrlFor}
-                            readFile={readFile}
-                            sharedFiles={sharedFiles}
-                            threads={inThread || !hasThreads ? undefined : threads}
-                            onOpenThread={openThread}
-                            underCrumb={inThread}
-                            framed={pinned}
-                            onStackElement={setStackEl}
-                            className="min-h-0 flex-1"
+                            onUploadingChange={setUploading}
+                            filesOnEngine={filesOnEngine}
+                            contextStats={contextStats}
                         />
-                    </PanelSteps>
-                    <ForemanComposerSlot
-                        ref={setSlotEl}
-                        framed={pinned}
-                        placeholder={framedPlaceholder}
-                        intake={intakeOpen ? intake : null}
-                        gated={gated}
-                        trialGate={trialGate}
-                        aside={!!pendingWidget && !keepsComposer(pendingWidget)}
-                        ownEntry={ownEntry}
-                        composerRef={composerRef}
-                        sessionId={sessionId}
-                        backend={composerBackend}
-                        status={status}
-                        busy={busy}
-                        queue={queue}
-                        onSend={sendFromComposer}
-                        onStop={handleStop}
-                        onUploadingChange={setUploading}
-                        filesOnEngine={filesOnEngine}
-                        contextStats={contextStats}
-                    />
+                    </div>
+                    <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />
+                    {onRoutines && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
                 </div>
-                <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />
-                {onRoutines && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
+                {pinned && details.mounted && (
+                    <DetailsColumn label={tDetails('label', { name: tView('name') })} open={detailsShown} slideIn={details.slideIn} onClose={() => useSimpleDetailsStore.getState().setWanted(false)}>
+                        <ForemanDetails onClose={() => useSimpleDetailsStore.getState().setWanted(false)} />
+                    </DetailsColumn>
+                )}
             </div>
             {placement.mode === 'float' && !dragging && open && !pinned && <ForemanResizeHandle panelRef={panelRef} placement={placement} />}
             {placement.mode === 'dock' && !dragging && open && !pinned && <ForemanDockResizeHandle panelRef={panelRef} placement={placement} />}
