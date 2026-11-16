@@ -5,6 +5,7 @@ import followups
 
 MIN_GROUP = 3
 DAY_MAX = 2
+BODY_MAX = 60000
 HOUR = 3600
 DAY = 86400
 WEEK = 7 * DAY
@@ -12,7 +13,6 @@ RUN_KEY = "inboxsort_at"
 MINTED_KEY = "inbox_minted"
 FLOW_KEY = "issue_flow"
 ALARM = "backlog growing"
-PROBLEM_LABEL = "factory-problem"
 DEFAULT_PRIORITY = "P3"
 MARK = followups.MARK
 NOTE = re.compile(r"(?m)^(.*)\n\nFrom the review of (\S+)\.\n\n<!-- followup:(\S+) -->")
@@ -79,6 +79,13 @@ def body(group):
     return "\n\n".join(parts) + "\n\n" + "\n".join("<!-- followup:%s -->" % n["key"] for n in group)
 
 
+def fit(group):
+    kept = list(group)
+    while len(kept) > MIN_GROUP and len(body(kept)) > BODY_MAX:
+        kept.pop()
+    return kept
+
+
 def labels(where, title, text, rules):
     area = next((a["label"] for a in rules["areas"] if a["name"] == where), None)
     ranked = classify.priority({"title": title, "body": text}, rules)
@@ -96,6 +103,7 @@ def mint(d, inbox, now):
     rules = classify.load()
     made, out = minted(d.store.get_all("-"), now), []
     for where, group in pick(groups(fresh(found, issues), rules), made, now):
+        group = fit(group)
         title = "Follow-ups for %s: %d notes from the inbox" % (where, len(group))
         text = body(group)
         args = ["issue", "create", "-R", d.repo, "--title", title, "--body", text]
@@ -110,25 +118,20 @@ def mint(d, inbox, now):
     return out
 
 
-def listed(d, query):
-    return json.loads(d.gh(["issue", "list", "-R", d.repo, "--state", "all", "--search", query,
-                            "--json", "number,labels", "--limit", "1000"]) or "[]")
+def total(d, query):
+    return int(d.gh(["api", "-X", "GET", "search/issues", "-f", "q=repo:%s is:issue %s" % (d.repo, query), "--jq", ".total_count"]).strip())
 
 
 def count(d, now):
-    ours = {m[0] for m in minted(d.store.get_all("-"), now) if now - m[1] < DAY}
-    opened = listed(d, "created:>=" + iso(now - DAY))
-    mine = sum(1 for i in opened if i["number"] in ours or PROBLEM_LABEL in classify.labels(i))
-    return {"opened_day": len(opened), "closed_day": len(listed(d, "closed:>=" + iso(now - DAY))),
-            "opened_week": len(listed(d, "created:>=" + iso(now - WEEK))),
-            "closed_week": len(listed(d, "closed:>=" + iso(now - WEEK))), "mine_day": mine}
+    return {"opened_day": total(d, "created:>=" + iso(now - DAY)), "closed_day": total(d, "closed:>=" + iso(now - DAY)),
+            "opened_week": total(d, "created:>=" + iso(now - WEEK)), "closed_week": total(d, "closed:>=" + iso(now - WEEK))}
 
 
 def alarm(kept):
     f = json.loads(kept.get(FLOW_KEY) or "{}")
-    if f.get("opened_day", 0) > f.get("closed_day", 0) and f.get("mine_day", 0) > 0:
-        return {ALARM: "opened %d, closed %d in the last 24 hours; the dispatcher opened %d of them" % (
-            f["opened_day"], f["closed_day"], f["mine_day"])}
+    if f.get("opened_day", 0) > f.get("closed_day", 0):
+        return {ALARM: "opened %d, closed %d in the last 24 hours; opened %d, closed %d in the last 7 days" % (
+            f["opened_day"], f["closed_day"], f.get("opened_week", 0), f.get("closed_week", 0))}
     return {}
 
 

@@ -1,4 +1,4 @@
-import calendar, json, os, sys, time, unittest
+import calendar, json, os, re, sys, time, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import followups as F
 import inboxsort as S
@@ -50,8 +50,8 @@ class Hub:
         opt = lambda k: a[a.index(k) + 1] if k in a else None
         if a[:2] == ["issue", "view"]:
             return json.dumps({"comments": [{"body": c} for c in self.inbox["comments"]]})
-        if a[:2] == ["issue", "list"] and "--search" in a:
-            return json.dumps(self.search.get(opt("--search").split(":")[0], []))
+        if a[:1] == ["api"] and "search/issues" in a:
+            return "%d\n" % self.search.get(re.search(r"(created|closed):>=", opt("-f")).group(1), 0)
         if a[:2] == ["issue", "list"]:
             return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"]} for i in [self.inbox] + self.issues])
         if a[:2] == ["issue", "create"]:
@@ -102,10 +102,9 @@ class Notes(unittest.TestCase):
         self.assertEqual(S.fresh(notes, issues), [])
 
 
-def flow_hub(opened, closed, mine=()):
+def flow_hub(opened, closed):
     hub = Hub([])
-    hub.search = {"created": [{"number": n, "labels": [{"name": "factory-problem"}] if n in mine else []} for n in range(opened)],
-                  "closed": [{"number": n} for n in range(closed)]}
+    hub.search = {"created": opened, "closed": closed}
     return hub
 
 
@@ -127,6 +126,16 @@ class Mint(unittest.TestCase):
         self.assertEqual(sorted(issue["labels"]), ["P1", "area:factory"])
         self.assertEqual(hub.inbox["comments"][-1], "Minted #%d from 3 notes: %s" % (issue["number"], ", ".join(keys)))
         self.assertEqual(len(hub.inbox["comments"]), 3)
+
+    def test_a_group_too_long_for_one_issue_mints_the_notes_that_fit_and_leaves_the_rest(self):
+        words = ("one", "two", "three", "four", "five", "six", "seven", "eight")
+        hub = Hub([comment("#5", *["the dispatcher logs step %s twice in tools/factory/dispatch.py %s" % (w, w * 3000) for w in words])])
+        D(hub).beat()
+        [issue] = hub.minted()
+        held = F.MARK.findall(issue["body"])
+        self.assertLessEqual(len(issue["body"]), S.BODY_MAX)
+        self.assertTrue(3 <= len(held) < 8, len(held))
+        self.assertEqual(hub.inbox["comments"][-1], "Minted #%d from %d notes: %s" % (issue["number"], len(held), ", ".join(held)))
 
     def test_a_group_with_no_rule_label_gets_p3_and_no_area_label(self):
         hub = Hub([comment("#6", *ui(3))])
@@ -172,37 +181,46 @@ class Mint(unittest.TestCase):
 
 
 class Flow(unittest.TestCase):
-    def test_opened_and_closed_for_a_day_and_a_week_are_kept_and_logged(self):
-        hub = flow_hub(5, 3, mine={1})
+    def test_opened_and_closed_for_a_day_and_a_week_are_the_totals_of_the_search(self):
+        hub = flow_hub(1500, 3)
         d = D(hub)
         d.beat()
-        lists = [c for c in hub.calls if "--search" in c]
-        self.assertEqual(len(lists), 4)
-        self.assertEqual({c[c.index("--state") + 1] for c in lists}, {"all"})
-        self.assertEqual(sorted(c[c.index("--search") + 1] for c in lists),
-                         ["closed:>=2026-11-09T01:00:00Z", "closed:>=2026-11-15T01:00:00Z",
-                          "created:>=2026-11-09T01:00:00Z", "created:>=2026-11-15T01:00:00Z"])
+        asked = sorted(c[c.index("-f") + 1] for c in hub.calls if c[:1] == ["api"])
+        self.assertEqual(asked, ["q=repo:o/r is:issue closed:>=2026-11-09T01:00:00Z", "q=repo:o/r is:issue closed:>=2026-11-15T01:00:00Z",
+                                 "q=repo:o/r is:issue created:>=2026-11-09T01:00:00Z", "q=repo:o/r is:issue created:>=2026-11-15T01:00:00Z"])
         flow = json.loads(d.store.get_all("-")["issue_flow"])
-        self.assertEqual(flow, {"opened_day": 5, "closed_day": 3, "opened_week": 5, "closed_week": 3, "mine_day": 1})
-        self.assertIn("issues opened 5, closed 3 in 24 hours; opened 5, closed 3 in 7 days", [m for _, m in d.lines])
+        self.assertEqual(flow, {"opened_day": 1500, "closed_day": 3, "opened_week": 1500, "closed_week": 3})
+        self.assertIn("issues opened 1500, closed 3 in 24 hours; opened 1500, closed 3 in 7 days", [m for _, m in d.lines])
 
-    def test_the_alarm_needs_more_opened_than_closed_and_one_of_them_ours(self):
+    def test_the_alarm_needs_more_opened_than_closed_in_a_day(self):
         self.assertEqual(S.alarm({}), {})
-        line = S.alarm({"issue_flow": json.dumps({"opened_day": 5, "closed_day": 3, "opened_week": 9, "closed_week": 9, "mine_day": 1})})
+        line = S.alarm({"issue_flow": json.dumps({"opened_day": 5, "closed_day": 3, "opened_week": 9, "closed_week": 9})})
         self.assertEqual(list(line), ["backlog growing"])
         self.assertIn("opened 5, closed 3", line["backlog growing"])
-        self.assertEqual(S.alarm({"issue_flow": json.dumps({"opened_day": 5, "closed_day": 3, "opened_week": 9, "closed_week": 9, "mine_day": 0})}), {})
-        self.assertEqual(S.alarm({"issue_flow": json.dumps({"opened_day": 3, "closed_day": 3, "opened_week": 9, "closed_week": 9, "mine_day": 2})}), {})
+        self.assertEqual(S.alarm({"issue_flow": json.dumps({"opened_day": 3, "closed_day": 3, "opened_week": 9, "closed_week": 2})}), {})
 
 
 class Alarm(Base):
     def setUp(self):
         super().setUp()
-        self.cfg["resolver"] = {"detect": True, "resolve": False}
+        cw = lambda ids: [{"id": i, "name": i.upper(), "runs": 1} for i in ids]
+        self.cfg["types"] = {"coder": {"max_jobs": 8, "coworkers": cw(["b1", "b2"])}, "reviewer": {"coworkers": cw(["r1", "r2"])},
+                             "resolver": {"coworkers": [{"id": "h1", "name": "HOUSE", "runs": 2}]}}
+        self.cfg["resolver"] = {"detect": True, "resolve": True}
 
     def flow(self, opened, closed):
         self.d.store.set("-", "issue_flow", json.dumps({"opened_day": opened, "closed_day": closed, "opened_week": opened,
-                                                        "closed_week": closed, "mine_day": 1}))
+                                                        "closed_week": closed}))
+
+    def test_the_backlog_alarm_is_a_ticket_and_never_a_run_of_the_repair_coworker(self):
+        self.d = self.new()
+        self.d.store.set("-", "inboxsort_at", self.w.clock + 10 * DAY)
+        self.flow(5, 3)
+        self.tick(4)
+        self.assertEqual(len([p for p in self.w.problems if p["title"] == "Factory problem: backlog growing"]), 1)
+        self.assertEqual(self.d.resolver.records(self.d)["backlog growing"]["state"], "notice")
+        self.assertEqual([a for a, _, _ in self.w.sends if a == "h1"], [])
+        self.assertEqual(self.d.resolver.waiting(self.d), 0)
 
     def test_the_backlog_alarm_opens_one_problem_and_clears_by_itself(self):
         self.d = self.new()

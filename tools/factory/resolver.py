@@ -16,6 +16,7 @@ OWNER = "owner"
 POOL = "resolver"
 KINDS = ("idle line", "repeating error", "dead", "unreadable", "ended")
 SYSTEMIC = KINDS[:2]
+NOTICE = (inboxsort.ALARM,)
 NEW_MAX = 10
 OPEN_MAX = 30
 CLEAR_BEATS = 3
@@ -135,7 +136,7 @@ class Resolver:
         room = max(0, OPEN_MAX - len(recs))
         old, listed = self.records(d, closed=True), None
         for key in new[:min(NEW_MAX, room)]:
-            fresh = {"evidence": found[key], "state": "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
+            fresh = {"evidence": found[key], "state": "notice" if key in NOTICE else "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
                      "agent": None, "copy": None, "run": None, "transient": 0, "line": None, "filed": None}
             if old.get(key, {}).get("issue"):
                 n = old[key]["issue"]
