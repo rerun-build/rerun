@@ -774,13 +774,15 @@ class Dispatcher:
     def record_tokens(self, j, r):
         ti, to = r.get("inputTokens"), r.get("outputTokens")
         if all(isinstance(x, int) and not isinstance(x, bool) and x >= 0 for x in (ti, to)):
-            self.store.db.execute("UPDATE fires SET tokens_in=?, tokens_out=? WHERE run_id=?", (ti, to, j["run"]))
+            cr = r.get("cachedInputTokens")
+            cr = cr if isinstance(cr, int) and not isinstance(cr, bool) and cr >= 0 else None
+            self.store.db.execute("UPDATE fires SET tokens_in=?, tokens_out=?, cache_read=? WHERE run_id=?", (ti, to, cr, j["run"]))
         else:
             log(j["issue"], "token counts of run %s unknown: left at 0" % j["run"])
 
     def kept_tokens(self, run_id):
-        row = self.store.db.execute("SELECT tokens_in, tokens_out FROM fires WHERE run_id=?", (run_id,)).fetchone()
-        return {"tokens_in": row[0], "tokens_out": row[1]} if row else {}
+        row = self.store.db.execute("SELECT tokens_in, tokens_out, cache_read FROM fires WHERE run_id=?", (run_id,)).fetchone()
+        return {"tokens_in": row[0], "tokens_out": row[1], "cache_read": row[2]} if row else {}
 
     def plan_limit(self, j, why, error):
         self.store.close_run(j["run"], "error", error=why[:200], **self.kept_tokens(j["run"]))
