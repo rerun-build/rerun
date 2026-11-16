@@ -12,6 +12,8 @@ GOAL_LINE = "The goal every factory job serves is the brain page `north-star-fac
 LABEL = "factory-plan"
 READY = "factory"
 EVERY = 5
+MAX_QUEUE = 20
+FIXED = re.compile(r"(?i)\balready\b.*\b(built|cut|merged|done|fixed)\b")
 RUN_LIMIT = 2700
 PARALLEL = 2
 GOAL = [{"prefix": "CUT:", "rest": "sentence"}, {"prefix": "BLOCKED:", "rest": "sentence"}]
@@ -175,6 +177,11 @@ class Station:
             self.finish(n, "cut", ", ".join("#%d" % k for k in rest))
             return
         self.finish(n, "blocked", rest)
+        if FIXED.search(rest):
+            try:
+                self.gh(["issue", "edit", str(n), "-R", self.repo, "--add-label", "likely-fixed"])
+            except Exception:
+                pass
         try:
             self.gh(["issue", "comment", str(n), "-R", self.repo, "--body", "The factory planner stopped: %s" % rest])
         except Exception:
@@ -206,6 +213,9 @@ class Station:
     def start(self):
         room = self.parallel - len(self.live())
         if room <= 0:
+            return
+        queued = sum(1 for j in self.store.jobs() if j.get("state") in ("waiting", "queued"))
+        if queued >= self.cfg.get("planning", {}).get("max_queue", MAX_QUEUE):
             return
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json",
                                      "number,title,labels,createdAt", "--limit", "100"]))
