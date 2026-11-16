@@ -134,7 +134,7 @@ def _job(store, cfg, names, j):
         row = store.db.execute("SELECT steps FROM fires WHERE id=?", (j["fire_id"],)).fetchone()
         steps = row[0] if row else None
     rnd = j.get("round")
-    history = [{"state": r["to_state"], "at": r["at"], "reason": _cut(r["reason"], 300), "runId": _cut(r["run_id"], 64)}
+    history = [{"state": states.APP_STATE.get(r["to_state"], r["to_state"]), "at": r["at"], "reason": _cut(r["reason"], 300), "runId": _cut(r["run_id"], 64)}
                for r in store.transitions_of(str(j["issue"])) if r["from_state"] != r["to_state"]][-30:]
     ids = {n: i for i, n in names.items()}
     rows = store.db.execute("SELECT stage, coworker, status, intent_at, ended_at, tokens_in, tokens_out, run_id, cache_read "
@@ -144,7 +144,7 @@ def _job(store, cfg, names, j):
              "runId": _cut(r[7], 64), **({"cacheRead": int(r[8])} if r[8] is not None else {})} for r in rows]
     main, others = _department(parsed.get("paths") or [])
     job = {
-        "issue": j["issue"], "title": str(j.get("title") or "")[:256], "state": j["state"],
+        "issue": j["issue"], "title": str(j.get("title") or "")[:256], "state": states.APP_STATE.get(j["state"], j["state"]),
         "enteredAt": _entered(store, j), "pr": j.get("pr"),
         "round": rnd if isinstance(rnd, int) and 1 <= rnd <= 9 else None,
         "coworker": names.get(j.get("agent")) if running else None,

@@ -184,6 +184,8 @@ class World:
             return json.dumps({"state": "open" if n in self.open_numbers else "closed", "state_reason": self.close_reasons.get(n, "completed")})
         if a[0] == "api" and "/commits?" in a[1]:
             return json.dumps(self.commits)
+        if a[0] == "api" and "/actions/runs/" in a[1] and a[1].endswith("/jobs"):
+            return json.dumps({"jobs": getattr(self, "run_jobs", {}).get(a[1].split("/actions/runs/")[1].split("/")[0], [])})
         if a[0] == "api" and "/actions/workflows/" in a[1]:
             return json.dumps({"workflow_runs": self.dev_runs})
         if a[0] == "api":
@@ -534,7 +536,7 @@ class Flow(Base):
         self.assertEqual(self.state(), "failed")
         self.assertIn("e2e cancelled", self.w.issue(5)["comments"][-1])
 
-    def test_reject_gives_one_fix_round_and_a_second_reject_ends_the_job(self):
+    def test_reject_gives_one_fix_round_and_a_second_reject_goes_to_the_senior_round(self):
         self.to_review()
         self.w.finish("r1", "bad\nVERDICT: REJECT @abcdef1: wrong sum")
         self.tick(2)
@@ -547,10 +549,11 @@ class Flow(Base):
         self.assertIn("One review", self.w.sends[-1][1])
         self.w.finish("r1", "VERDICT: REJECT @abcdef1: still wrong")
         self.tick(3)
-        self.assertEqual(self.state(), "rejected")
+        self.assertEqual(self.state(), "fixing")
         self.assertEqual(len([s for s in self.w.sends if "One fix round" in s[1]]), 1)
-        self.assertEqual(len(self.w.sends), 4)
-        self.assertIn("still wrong", self.w.issue(5)["comments"][-1])
+        self.assertEqual(len(self.w.sends), 5)
+        self.assertEqual(self.w.sends[-1][0], "b1")
+        self.assertIn("still wrong", self.w.sends[-1][1])
 
     def test_no_verdict_line_rejects(self):
         self.to_review()

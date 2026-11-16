@@ -35,7 +35,7 @@ class Rounds(Base):
         self.tick(2)
         self.assertEqual(self.round(), 2)
         self.reject()
-        self.assertEqual(self.state(), "rejected")
+        self.assertEqual(self.state(), "fix_wait")
         self.assertEqual(len(fix_briefs(self.w)), 2)
 
     def test_a_ci_fix_keeps_the_review_fix_round(self):

@@ -610,15 +610,15 @@ class Do(Resolving):
 
 
 class TakeCap(Base):
-    def test_intake_does_not_take_a_relabelled_job_a_fourth_time_and_says_so_once(self):
+    def test_intake_ends_a_relabelled_job_taken_a_fourth_time_unsolvable_and_says_so_once(self):
         self.w.issues.append({"number": 7, "title": "T7", "body": ready(), "comments": []})
         self.d = self.new()
         self.d.store.put_job("7", "blocked", {"issue": 7, "title": "T7", "body": ready(), "relabelled": True, "commented": True, "take": 3})
         self.tick(3)
-        self.assertEqual(self.state(7), "blocked")
+        self.assertEqual(self.state(7), "unsolvable")
         self.assertEqual(len(self.w.issue(7)["comments"]), 1)
         self.assertIn("taken 3 times with this text", self.w.issue(7)["comments"][0])
-        self.assertIn("A change to the issue text resets the count", self.w.issue(7)["comments"][0])
+        self.assertIn("It is not sent again unless the issue text changes", self.w.issue(7)["comments"][0])
 
     def test_a_changed_issue_text_resets_the_take_count(self):
         self.w.issues.append({"number": 7, "title": "T7", "body": ready("new plan"), "comments": []})

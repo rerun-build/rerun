@@ -103,13 +103,13 @@ class Flow(P.ProofBase):
         self.assertEqual(self.state(), "fix_wait")
         self.assertEqual(self.planner_sends(), [])
 
-    def test_after_two_re_plans_a_plan_result_stays_returned_without_a_send(self):
+    def test_after_two_re_plans_a_plan_result_ends_unsolvable_without_a_send(self):
         for _ in range(3):
             self.to_proving()
             self.w.finish("r2", lines(2) + "\nPROOF: FAIL @abcdef1: 2")
             self.tick(3)
             self.w.unlabelled.clear()
-        self.assertEqual(self.state(), "returned")
+        self.assertEqual(self.state(), "unsolvable")
         self.assertEqual(len(self.planner_sends()), 2)
         self.assertEqual(self.data()["replans"], 2)
         self.assertTrue(self.data()["reason"].startswith("plan: proof:"))

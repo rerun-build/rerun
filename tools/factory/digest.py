@@ -16,7 +16,8 @@ PROOF_RATE = 0.5
 BURN_WINDOW_S = 3600
 MAX_ANOMALIES = 50
 MEASURE_WINDOW_S = 86400
-BLOCK_STATES = ("blocked", "rejected", "failed", "returned")
+BLOCK_STATES = ("blocked", "rejected", "failed", "returned", "unsolvable")
+SENIOR = "senior round: "
 MARK = "<!-- factory-digest -->"
 POST_EVERY_S = 600
 CONTROL_TITLE = "factory control"
@@ -108,12 +109,17 @@ def anomalies(store, cfg, now):
 def measures(store, now):
     merged = []
     blocks = {k: 0 for k in BLOCK_STATES}
+    escalated = escalated_merged = 0
     for j in store.jobs():
         rows = [t for t in store.transitions_of(str(j["issue"])) if t["from_state"] != t["to_state"]]
         for t in rows:
             if t["to_state"] in blocks and 0 <= now - L.ts(t["at"]) <= MEASURE_WINDOW_S:
                 blocks[t["to_state"]] += 1
         into = [t for t in rows if t["to_state"] == "merged"]
+        up = [t for t in rows if str(t["reason"] or "").startswith(SENIOR) and 0 <= now - L.ts(t["at"]) <= MEASURE_WINDOW_S]
+        if up:
+            escalated += 1
+            escalated_merged += j["state"] == "merged" and bool(into) and L.ts(into[-1]["at"]) >= L.ts(up[-1]["at"])
         if j["state"] == "merged" and into and 0 <= now - L.ts(into[-1]["at"]) <= MEASURE_WINDOW_S:
             merged.append((str(j["issue"]), L.ts(into[-1]["at"]) - L.ts(rows[0]["at"]),
                            sum(1 for t in rows if t["to_state"] == "fix_wait")))
@@ -133,7 +139,8 @@ def measures(store, now):
     return {"mergedPerHour": round(n / 24, 2), "leadTimeS": sum(m[1] for m in merged) / n if n else None,
             "firstPassYield": sum(1 for m in merged if m[2] == 0) / n if n else None,
             "fixRounds": sum(m[2] for m in merged) / n if n else None,
-            "blocks": blocks, "tokensPerMerged": tokens / n if n else None}
+            "blocks": blocks, "tokensPerMerged": tokens / n if n else None,
+            "escalated": escalated, "escalatedMerged": escalated_merged}
 
 
 def planners(store, now):
