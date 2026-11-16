@@ -98,6 +98,56 @@ class Holds(unittest.TestCase):
         self.assertEqual(self.d.store.get_all("-").get("checkout_failed_row"), "1")
         self.assertNotEqual(self.hold(), "checkout")
 
+    def test_a_failing_test_traceback_from_a_job_folder_is_not_a_checkout_fault(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", "Traceback (most recent call last):\n  File \"/data/work/wt/rerun/5-1/tools/factory/test_x.py\", line 3, in test_y\n"
+                            "AssertionError: 1 != 2\nBLOCKED: tests fail")
+        self.d.once()
+        self.assertNotIn("checkout_failed", self.job(5))
+        self.assertIn(self.d.store.get_all("-").get("checkout_failed_row") or "0", ("0",))
+
+    def test_the_row_starts_again_once_the_hold_is_armed(self):
+        self.make([issue(5), issue(6), issue(7)])
+        self.d.once()
+        for b in ("b1", "b2", "b3"):
+            self.w.finish(b, TRACE)
+        self.d.once()
+        self.assertEqual(self.hold(), "checkout")
+        self.assertEqual(self.d.store.get_all("-").get("checkout_failed_row"), "0")
+
+    def test_a_job_that_ends_later_drops_its_checkout_failure(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", TRACE.replace("BLOCKED:", "TRANSIENT: cannot clone o/r: GitHub 502\nBLOCKED:"))
+        self.d.once()
+        self.assertEqual(self.job(5)["state"], "queued")
+        self.assertIn("clones.py", self.job(5)["checkout_failed"])
+        self.w.clock += 61
+        self.d.once()
+        self.w.finish(self.job(5)["agent"], "BLOCKED: plan: the plan names a file that is gone")
+        self.d.once()
+        self.assertEqual(self.job(5)["state"], "returned")
+        self.assertNotIn("checkout_failed", self.job(5))
+
+    def test_transient_inside_a_line_is_not_a_transient_refusal(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", "the test printed TRANSIENT: fake on purpose\nBLOCKED: tests fail")
+        self.d.once()
+        self.assertEqual(self.job(5)["state"], "blocked")
+
+    def test_room_refusals_never_end_the_job(self):
+        self.make([issue(5)])
+        self.d.once()
+        for i in range(5):
+            self.assertEqual(self.job(5)["state"], "building", i)
+            self.w.finish(self.job(5)["agent"], "TRANSIENT: load: 13.0 on 4 cores, ceiling is 12.0\nBLOCKED: no room")
+            self.d.once()
+            self.assertEqual(self.job(5)["state"], "queued", i)
+            self.w.clock += 16 * 60
+            self.d.once()
+
 
 class ProofStaysOn(unittest.TestCase):
     def test_the_dispatcher_refuses_to_start_with_proof_off(self):

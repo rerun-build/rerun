@@ -43,7 +43,7 @@ RECONCILE_MAX = 20
 MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
 ROOM_HOLDS = (("TRANSIENT: disk:", "disk", 15 * 60), ("TRANSIENT: memory:", "load", 5 * 60), ("TRANSIENT: load:", "load", 5 * 60))
-CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:.*\n)*?.*/tools/factory[^/\s]*/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
+CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:.*\n)*?.*/data/tools/(?:factory|factory-[0-9a-f]+)/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 MAX_TAKES = 3
@@ -915,8 +915,9 @@ class Dispatcher:
         self.strike(j, False)
         return self.failed_attempt(j, why, "cancel")
 
-    def transient(self, j, reason):
-        count = self.store.bump_retry(str(j["issue"]), "transient")
+    def transient(self, j, reason, room=False):
+        n = str(j["issue"])
+        count = (self.store.retries(n, "transient") or 1) if room else self.store.bump_retry(n, "transient")
         delay = clocks.backoff(count)
         if delay is None:
             return self.end(j, "blocked", "four refusals a second try did not clear: %s" % reason)
@@ -1083,14 +1084,17 @@ class Dispatcher:
             lines = [l for l in text.splitlines() if l.strip()][-12:]
             j["checkout_failed"] = ("%s\nlast lines:\n%s" % (fault.group(0).strip()[:300], "\n".join(lines)))[:1500]
             row = int(self.store.get_all("-").get("checkout_failed_row") or 0) + 1
-            self.store.set("-", "checkout_failed_row", str(row))
             if row >= CHECKOUT_ROW:
                 holds.arm(self.store, "checkout", self.now() + CHECKOUT_HOLD_S)
                 log(j["issue"], "hold checkout: %d checkouts in a row failed" % row)
+                row = 0
+            self.store.set("-", "checkout_failed_row", str(row))
         k = clocks.klass("BLOCKED", blocked=why)
-        if k == "transient" or room or "TRANSIENT: " in text:
+        if room:
+            return self.transient(j, why, room=True)
+        if k == "transient" or re.search(r"(?m)^TRANSIENT: ", text):
             return self.transient(j, why)
-        self.end(j, "returned" if k == "plan" else "blocked", why)
+        self.end(j, "returned" if k == "plan" else "blocked", why, **({"checkout_failed": j["checkout_failed"]} if fault else {}))
 
     def conflicts(self, j):
         if json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "mergeable"])).get("mergeable") != "CONFLICTING":
@@ -1183,6 +1187,7 @@ class Dispatcher:
         return hits[-1] if hits else None
 
     def end(self, j, state, reason, **extra):
+        j.pop("checkout_failed", None)
         self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None, ended_at=ledger_store.now(), **extra)
 
     def report(self, j):
