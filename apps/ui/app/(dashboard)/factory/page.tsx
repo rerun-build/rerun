@@ -1,14 +1,17 @@
 'use client'
 
+import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { readFactorySnapshotAction } from '@/app/api/_actions/factory.actions'
 import { AgentPanel } from '@/components/agent/AgentPanel'
+import { ControlCenter } from '@/components/control-center/ControlCenter'
 import { FactoryLoader } from '@/components/factory/FactoryLoader'
 import { FactoryTopBar } from '@/components/factory/FactoryTopBar'
 import { FactoryWorld } from '@/components/factory/FactoryWorld'
 import { LOADER_TILE } from '@/components/factory/factory-state'
 import { sceneFromSnapshot } from '@/components/factory/from-snapshot'
+import { WorkspaceSwitcher } from '@/components/layout/WorkspaceSwitcher'
 import { SIDE_PANEL_GAP, loadSidePanelWidth } from '@/lib/side-panel-width'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -20,6 +23,7 @@ const BREAKPOINT_PX = 768
 type Answer = Awaited<ReturnType<typeof readFactorySnapshotAction>>
 
 export default function FactoryPage() {
+    const { resolvedTheme } = useTheme()
     const [answer, setAnswer] = useState<Answer>(null)
 
     useEffect(() => {
@@ -95,9 +99,11 @@ export default function FactoryPage() {
                 {...(workspace ? { workspace: String(workspace.id) } : {})}
                 snapshot={snapshot ?? null}
                 rightInset={rightInset}
+                theme={resolvedTheme === 'light' ? 'light' : 'dark'}
                 topBar={<FactoryTopBar snapshot={snapshot ?? null} selected={selected} onSelect={setSelected} names={names} onOpenCoworker={openCoworker} />}
             />
-            <div className="absolute left-4 top-4">
+            <WorkspaceSwitcher />
+            <div className="absolute left-4 top-16 z-30">
                 <button type="button" disabled={!boss} title={boss ? 'Open the chat with Boss' : 'No coworker named boss in this workspace'}
                     onClick={() => { if (!boss) return; setLoaderOpen(false); useBoardStore.getState().focusAgentOnBoard(boss.id, 'chat') }}
                     className="rounded-lg border border-border/60 bg-background/75 px-3 py-1.5 text-sm backdrop-blur-xl enabled:hover:bg-accent disabled:opacity-50">
@@ -115,6 +121,7 @@ export default function FactoryPage() {
                 </aside>
             )}
             <AgentPanel />
+            <ControlCenter />
         </div>
     )
 }
