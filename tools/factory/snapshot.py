@@ -137,11 +137,11 @@ def _job(store, cfg, names, j):
     history = [{"state": r["to_state"], "at": r["at"], "reason": _cut(r["reason"], 300), "runId": _cut(r["run_id"], 64)}
                for r in store.transitions_of(str(j["issue"])) if r["from_state"] != r["to_state"]][-30:]
     ids = {n: i for i, n in names.items()}
-    rows = store.db.execute("SELECT stage, coworker, status, intent_at, ended_at, tokens_in, tokens_out, run_id "
+    rows = store.db.execute("SELECT stage, coworker, status, intent_at, ended_at, tokens_in, tokens_out, run_id, cache_read "
                             "FROM fires WHERE job=? ORDER BY id", (str(j["issue"]),)).fetchall()[-12:]
     runs = [{"stage": _cut(r[0], 20), "coworkerId": ids.get(r[1]) or _cut(r[1], 64), "status": _cut(r[2], 20),
              "startedAt": r[3], "endedAt": r[4], "tokensIn": int(r[5] or 0), "tokensOut": int(r[6] or 0),
-             "runId": _cut(r[7], 64)} for r in rows]
+             "runId": _cut(r[7], 64), **({"cacheRead": int(r[8])} if r[8] is not None else {})} for r in rows]
     main, others = _department(parsed.get("paths") or [])
     job = {
         "issue": j["issue"], "title": str(j.get("title") or "")[:256], "state": j["state"],
