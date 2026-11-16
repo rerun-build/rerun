@@ -14,8 +14,10 @@ class Watch:
     def __init__(self):
         self.heard, self.idle, self.idle_line, self.repeats, self.repeat_line = [], 0, None, None, None
 
-    def find(self, jobs, refused, open_issues, line, now, texts, since="", held=False):
+    def find(self, jobs, refused, open_issues, line, now, texts, since="", held=False, room=None):
         out = {"unreadable #%d" % n: "\n".join(e) for n, e in refused.items()}
+        if room:
+            out["no room"] = room
         work, busy = False, False
         dev = [j for j in jobs if j.get("dev_result") in ("green", "red") and j.get("dev_since") is not None]
         latest = max(dev, key=lambda j: j["dev_since"], default=None)
@@ -27,6 +29,9 @@ class Watch:
             ) % ((latest.get("merge_sha") or "-")[:7], latest.get("pr") or "-", latest["issue"], latest.get("dev_why") or "-")
         for j in jobs:
             n, st = j["issue"], j["state"]
+            if j.get("checkout_failed") and (st not in states.END or (
+                    str(j.get("ended_at") or "") >= since and open_issues is not None and n in open_issues)):
+                out["checkout failed #%d" % n] = j["checkout_failed"]
             if st == "waiting" and j.get("dead"):
                 out["dead #%d" % n] = j.get("wait_line") or "waits on dead dependencies"
             elif ended(j, since) and open_issues is not None and n in open_issues:

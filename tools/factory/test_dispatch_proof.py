@@ -112,7 +112,7 @@ class Proof(ProofBase):
         self.assertEqual(self.state(), "fix_wait")
         self.assertIn("PASS with asks not met: 5", self.w.rows("SELECT data FROM jobs WHERE job='5'")[0][0])
 
-    def test_a_second_failed_proof_ends_rejected(self):
+    def test_a_second_failed_proof_goes_to_the_senior_round(self):
         self.to_proving()
         self.w.finish("r2", "PROOF: FAIL @abcdef1: 4, 5")
         self.tick()
@@ -126,7 +126,7 @@ class Proof(ProofBase):
         self.tick()
         self.w.finish("r2", "PROOF: FAIL @abcdef1: 4")
         self.tick()
-        self.assertEqual(self.state(), "rejected")
+        self.assertEqual(self.state(), "fix_wait")
         self.assertEqual(self.w.merges, [])
 
     def test_a_proof_naming_another_commit_is_asked_again_then_blocks(self):

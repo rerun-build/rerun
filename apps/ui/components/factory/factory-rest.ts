@@ -72,7 +72,7 @@ function overlap(a: Shape, b: Shape) {
     }
     return true
 }
-const hits = (shapes: Shape[], others: Shape[]) => shapes.some(s => others.some(o => overlap(s, o)))
+export const hits = (shapes: Shape[], others: Shape[]) => shapes.some(s => others.some(o => overlap(s, o)))
 
 export function restDistances(pods: PodView[], tiles: Tile[], routes: Map<string, AxisPoint[]>): Map<string, number> {
     const byId = new Map(tiles.map(t => [t.id, t]))

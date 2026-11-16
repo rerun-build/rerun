@@ -21,6 +21,7 @@ export const JOB_STATE_VIEW: Record<FactoryJobState, { icon: LucideIcon; color: 
     failed: { icon: CircleX, color: GREY },
     returned: { icon: Undo2, color: GREY },
     superseded: { icon: CheckCheck, color: GREY, dim: true },
+    unsolvable: { icon: OctagonX, color: STATUS_COLOR.rejected },
 }
 
 export type JobGroup = 'active' | 'waiting' | 'ended'
@@ -28,7 +29,7 @@ export type JobGroup = 'active' | 'waiting' | 'ended'
 export const JOB_GROUPS: Record<JobGroup, FactoryJobState[]> = {
     active: ['building', 'review_wait', 'reviewing', 'fix_wait', 'fixing', 'checks', 'proof_wait', 'proving'],
     waiting: ['waiting', 'queued'],
-    ended: ['merged', 'rejected', 'blocked', 'failed', 'returned', 'superseded'],
+    ended: ['merged', 'rejected', 'blocked', 'failed', 'returned', 'superseded', 'unsolvable'],
 }
 
 export function groupOf(state: FactoryJobState): JobGroup {

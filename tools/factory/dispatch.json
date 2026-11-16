@@ -161,6 +161,10 @@
       "high": {
         "model": "claude-sonnet-5-5",
         "thinkingLevel": "high"
+      },
+      "senior": {
+        "model": "claude-opus-5-5",
+        "thinkingLevel": "high"
       }
     },
     "review": {

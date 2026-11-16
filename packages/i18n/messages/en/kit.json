@@ -363,7 +363,9 @@
             "cost": "Cost",
             "avgDurationMs": "Avg duration",
             "errorCount": "Errors",
-            "errorRate": "Error rate"
+            "errorRate": "Error rate",
+            "failureCount": "Failures",
+            "failureRate": "Failure rate"
         },
         "live": "Live",
         "runStatus": {

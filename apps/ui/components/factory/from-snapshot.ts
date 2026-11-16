@@ -1,6 +1,6 @@
 import { agentTileStyle, buddyColor, buddyEyes, buddyMouth, type BuddyLook, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 import type { FactoryJob, FactorySnapshot } from '@rerun/contracts'
-import { BOSS, BOSS_ID, type CabinetView, type Cell, COPY_CELLS, FEATURE_CELLS, type FactoryFrame, PLANNER_CELLS, PLAN_TANK, type PlanView, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
+import { BAY, BOSS, BOSS_ID, type CabinetView, copySeat, FEATURE_CELLS, type FactoryFrame, PLANNER_CELLS, PLAN_TANK, type PlanView, type PodView, type SlotView, STATUS_COLOR, factoryScene } from './factory-scene'
 
 export type SnapshotFrame = FactoryFrame & { blocked: { issue: number; reason: string }[]; cracked: number[]; notAnswering: boolean; lastBeatMs: number }
 
@@ -27,11 +27,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     const ids = new Map<string, string>()
     for (const pool of snapshot.pools) for (const c of pool.coworkers) if (c.id && !ids.has(c.name)) ids.set(c.name, c.id)
 
-    const copyCells: Record<string, { room: string; cells: Cell[] }> = {
-        code: { room: 'build', cells: COPY_CELLS.code },
-        LINUS: { room: 'review', cells: COPY_CELLS.LINUS },
-        search: { room: 'studio', cells: COPY_CELLS.search },
-    }
+    const copyColor: Record<string, string> = { code: STATUS_COLOR.build, LARRY: STATUS_COLOR.build, LINUS: STATUS_COLOR.review, BRUCE: STATUS_COLOR.review, search: '#f472b6' }
 
     const live = snapshot.holds.filter(h => Date.parse(h.until) > now)
     const held = live.length > 0
@@ -49,16 +45,15 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
     let rejects = 0
 
     const holderOf = (job: FactoryJob, who: string): string => {
-        const slots = copyCells[who]
-        const cell = slots && job.copy && job.copy >= 2 ? slots.cells[job.copy - 2] : undefined
-        if (!slots || !cell) return who
+        const slot = (job.copy ?? 0) - 2
+        if (!copyColor[who] || slot < 0 || slot >= BAY.length) return who
         const id = `${who}-copy-${job.issue}`
         const own = tileOf(who)
         copyTiles.push({
-            id, position: cell, span: 2, containerId: slots.room, selectable: false, draggable: false, justPlaced: true,
+            id, position: copySeat(own.position, slot), span: 2, containerId: own.containerId, selectable: false, draggable: false, justPlaced: true,
             style: { ...own.style, ...workStyle(who, ids.get(who) ?? who), opacity: 0.55 }, ariaLabel: `${who}, a copy`,
         })
-        copyLinks.push({ source: who, target: id, variant: 'trace', color: who === 'LINUS' ? STATUS_COLOR.review : who === 'code' ? STATUS_COLOR.build : '#f472b6' })
+        copyLinks.push({ source: who, target: id, variant: 'trace', color: copyColor[who] })
         return id
     }
 
@@ -80,7 +75,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
                 pod(
                     job.coworker === 'search' ? dedupe(['Delegator', holderOf(job, 'search')])
                         : job.coworker === 'DIETER' ? ['Delegator', 'DIETER']
-                            : dedupe(['Delegator', 'code', job.coworker === 'LARRY' ? 'LARRY' : holderOf(job, 'code')]),
+                            : dedupe(['Delegator', 'code', ...(job.coworker === 'LARRY' ? ['LARRY', holderOf(job, 'LARRY')] : [holderOf(job, 'code')])]),
                     clamp(since / 2_240), 'build', 'working', 0.4)
                 break
             case 'review_wait':
@@ -92,7 +87,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
             case 'proving':
                 counts.review++
                 counts.runs++
-                pod(dedupe(['code', 'LINUS', job.coworker === 'BRUCE' ? 'BRUCE' : holderOf(job, 'LINUS')]), clamp(since / 2_240), 'review', 'working', Math.min(0.7, 0.4 + 0.05 * steps), { scan: clamp(since / 3_000) % 1 })
+                pod(dedupe(['code', 'LINUS', ...(job.coworker === 'BRUCE' ? ['BRUCE', holderOf(job, 'BRUCE')] : [holderOf(job, 'LINUS')])]), clamp(since / 2_240), 'review', 'working', Math.min(0.7, 0.4 + 0.05 * steps), { scan: clamp(since / 3_000) % 1 })
                 break
             case 'fix_wait':
                 counts.building++
@@ -116,6 +111,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
                 counts.merged++
                 break
             case 'rejected':
+            case 'unsolvable':
                 rejects++
                 break
             case 'failed':

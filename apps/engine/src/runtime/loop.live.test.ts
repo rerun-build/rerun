@@ -6,7 +6,7 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-live-'))
 
 const { stream, seen } = vi.hoisted(() => ({
-    stream: { parts: [] as unknown[] },
+    stream: { parts: [] as unknown[], hang: false },
     seen: { beforeFinish: undefined as number | undefined },
 }))
 
@@ -25,7 +25,7 @@ vi.mock('../agents/providers.js', async importOriginal => {
                     stream: new ReadableStream({
                         start(controller) {
                             for (const part of stream.parts) controller.enqueue(part)
-                            controller.close()
+                            if (!stream.hang) controller.close()
                         },
                     }),
                 }),
@@ -34,6 +34,11 @@ vi.mock('../agents/providers.js', async importOriginal => {
         }),
     }
 })
+
+vi.mock('./notify.js', async importOriginal => ({
+    ...(await importOriginal<typeof import('./notify.js')>()),
+    sendNotification: async () => ({ delivered: true }),
+}))
 
 vi.mock('../db/repos/runs.js', async importOriginal => {
     const actual = await importOriginal<typeof import('../db/repos/runs.js')>()
@@ -55,7 +60,11 @@ const { agentDir } = await import('../config/paths.js')
 const { getAgent } = await import('../agents/registry.js')
 const { createSession } = await import('../db/repos/sessions.js')
 const { getRun } = await import('../db/repos/runs.js')
+const { insertAgentIndex } = await import('../db/repos/agents.js')
+const { listToolCalls } = await import('../db/repos/telemetry.js')
 const { runAgent } = await import('./loop.js')
+const { abortRun } = await import('./run-control.js')
+const { reconcileInterruptedRuns } = await import('./reconcile.js')
 
 const toolCall = (n: number): unknown => ({ type: 'tool-call', toolCallId: `c${n}`, toolName: 'Read', input: '{}', providerExecuted: true, dynamic: true })
 const toolResult = (n: number): unknown => ({ type: 'tool-result', toolCallId: `c${n}`, toolName: 'Read', result: 'ok', providerExecuted: true, dynamic: true })
@@ -85,6 +94,7 @@ describe('live step count of a CLI run', () => {
         for (const [id, provider] of [['liveclaude', 'claude'], ['liveapi', 'anthropic']] as const) {
             await mkdir(agentDir(id), { recursive: true })
             await writeAgentConfig(id, agentConfigSchema.parse({ name: id, provider }))
+            await insertAgentIndex(id, id)
         }
     })
 
@@ -92,11 +102,32 @@ describe('live step count of a CLI run', () => {
         const row = await run('liveclaude', 5, { provider: 'claude' })
         expect(seen.beforeFinish).toBe(5)
         expect(row?.stepCount).toBe(5)
+        expect(await listToolCalls('liveclaude', row?.id ?? '')).toHaveLength(5)
     })
 
     it('leaves a provider that reports real steps counting steps', async () => {
         const row = await run('liveapi', 5)
         expect(seen.beforeFinish).toBe(1)
         expect(row?.stepCount).toBe(1)
+    })
+})
+
+describe('a CLI run cut by an engine restart', () => {
+    it('keeps the tool calls it made before the cut', async () => {
+        stream.parts = turn(3).slice(0, 7)
+        stream.hang = true
+        const session = await createSession('liveclaude', 'cut')
+        const agent = await getAgent('liveclaude')
+        const started = await runAgent(agent, session.id, 'go', { provider: 'claude' }, undefined, undefined, { source: 'chat' })
+        await vi.waitFor(async () => expect((await getRun('liveclaude', started.runId))?.stepCount).toBe(3), { timeout: 5000 })
+
+        await reconcileInterruptedRuns()
+
+        const row = await getRun('liveclaude', started.runId)
+        expect(row?.error).toBe('interrupted: engine restarted')
+        const tools = await listToolCalls('liveclaude', started.runId)
+        expect(tools.map(tool => [tool.toolCallId, tool.resultJson, tool.isError])).toEqual([['c0', '"ok"', 0], ['c1', '"ok"', 0], ['c2', '"ok"', 0]])
+        stream.hang = false
+        abortRun(started.runId)
     })
 })

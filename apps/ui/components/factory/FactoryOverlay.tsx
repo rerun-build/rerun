@@ -6,10 +6,11 @@ import { along, atDistance, centreOf, inScanner, lineUp, podPath, settles, workS
 import { Gate, GATE_CSS } from './FactoryGate'
 import { HOLD_CSS, HoldBarrier } from './FactoryHold'
 import { FeatureTank, RejectTank, TANK_CSS } from './FactoryTank'
+import { type Bucket } from './factory-bucket'
 import { Sphere, SPHERE_CSS } from './FactorySphere'
 import { type CabinetView, type PlanView, type PodView } from './factory-scene'
 
-export function FactoryOverlay({ tiles, routes, pods, cabinets, plans = [], rejects, held, holdLeftMs = 0, links = [], selectedIssue = null, onSelectJob }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; plans?: PlanView[]; rejects: number; held: boolean; holdLeftMs?: number; links?: TileLink[]; selectedIssue?: number | null; onSelectJob?: (issue: number) => void }) {
+export function FactoryOverlay({ tiles, routes, pods, cabinets, plans = [], rejects, held, holdLeftMs = 0, links = [], selectedIssue = null, onSelectJob, onOpenBucket }: { tiles: Tile[]; routes: Map<string, AxisPoint[]>; pods: PodView[]; cabinets: CabinetView[]; plans?: PlanView[]; rejects: number; held: boolean; holdLeftMs?: number; links?: TileLink[]; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenBucket?: (bucket: Bucket) => void }) {
     const byId = new Map(tiles.map(t => [t.id, t]))
     const lineIndex = new Map<string, number>()
     const belts = new Map<string, PodView[]>()
@@ -21,10 +22,10 @@ export function FactoryOverlay({ tiles, routes, pods, cabinets, plans = [], reje
     return (
         <div className="fab-layer pointer-events-none absolute left-0 top-0" style={{ zIndex: 90_000 }} data-held={held || undefined}>
             <style>{FAB_CSS + SPHERE_CSS + GATE_CSS + TANK_CSS + HOLD_CSS}</style>
-            {byId.get('rejects') && <RejectTank tile={byId.get('rejects')!} count={rejects} />}
+            {byId.get('rejects') && <RejectTank tile={byId.get('rejects')!} count={rejects} {...(onOpenBucket ? { onOpen: () => onOpenBucket('rejects') } : {})} />}
             {cabinets.map(c => {
                 const t = byId.get(`cab-${c.issue}`)
-                return t ? <FeatureTank key={c.issue} cab={c} tile={t} /> : null
+                return t ? <FeatureTank key={c.issue} cab={c} tile={t} {...(onOpenBucket ? { onOpen: () => onOpenBucket(c.issue) } : {})} /> : null
             })}
             {plans.map(p => {
                 const t = byId.get(`plan-${p.parent}`)

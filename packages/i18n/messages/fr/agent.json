@@ -883,6 +883,7 @@
         "stepCount": "{count, plural, one {# étape} other {# étapes}}",
         "step": "Étape {number}",
         "noSteps": "Aucune étape enregistrée pour cette exécution.",
+        "stepsLost": "{count, plural, one {L'enregistrement de # étape a été perdu à l'arrêt de l'exécution.} other {L'enregistrement de # étapes a été perdu à l'arrêt de l'exécution.}}",
         "input": "Entrée",
         "output": "Sortie",
         "filters": { "running": "En cours", "failed": "Échecs", "done": "Terminées" },
@@ -929,12 +930,26 @@
             "kpiCost": "Coût total",
             "kpiTokens": "Tokens au total",
             "kpiErrorRate": "Taux d'erreur",
+            "kpiFailureRate": "Taux d'échec",
             "runsOverTime": "Exécutions dans le temps",
+            "failureOverTime": "Taux d'échec dans le temps",
             "costOverTime": "Coût dans le temps",
             "avgDuration": "Durée moyenne d'exécution",
             "runsByModel": "Exécutions par modèle",
             "topTools": "Outils les plus appelés",
             "toolErrors": "Erreurs d'outils"
+        },
+        "definitions": {
+            "about": "Ce que compte {title}",
+            "kpiErrorRate": "La part des exécutions arrêtées par une erreur, comme une panne du fournisseur ou d'un outil, une connexion coupée ou un redémarrage du moteur ; les exécutions en cours comptent dans le total.",
+            "kpiFailureRate": "La part des exécutions qui n'ont pas fait le travail : elles ont fini en erreur, ont été annulées, ont manqué leur objectif ou se sont terminées par une ligne BLOCKED: ou ESCALATE: ; les exécutions en cours comptent dans le total."
+        },
+        "noPrice": {
+            "label": "Aucun coût n'a été indiqué pour ces exécutions, les tokens sont donc affichés à la place.",
+            "fresh": "Entrée nouvelle",
+            "cached": "Entrée en cache",
+            "output": "Sortie",
+            "chartTitle": "Tokens par type"
         },
         "tokenUsage": {
             "title": "Consommation de tokens",

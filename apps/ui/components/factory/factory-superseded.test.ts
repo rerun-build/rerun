@@ -9,8 +9,8 @@ const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sam
 const sample = () => JSON.parse(readFileSync(SAMPLE, 'utf8'))
 
 describe('superseded', () => {
-    it('superseded is the last state of the contract and an ended state on screen', () => {
-        expect(factoryJobStateSchema.options.at(-1)).toBe('superseded')
+    it('superseded is a state of the contract and an ended state on screen', () => {
+        expect(factoryJobStateSchema.options).toContain('superseded')
         expect(groupOf('superseded')).toBe('ended')
         expect(JOB_GROUPS.ended).toContain('superseded')
         expect(JOB_STATE_VIEW.superseded.dim).toBe(true)
