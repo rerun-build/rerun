@@ -127,8 +127,18 @@ describe('the level each action asks of the Box', () => {
         await actions.moveAgentAction({ agentId, spaceId })
         await actions.duplicateAgentAction({ agentId, spaceId })
 
-        expect(mocks.moveAgentToBox).toHaveBeenCalledWith(agentId, spaceId, MEMBER)
+        expect(mocks.moveAgentToBox).toHaveBeenCalledWith(agentId, spaceId, MEMBER, undefined)
         expect(mocks.duplicateAgent).toHaveBeenCalledWith(expect.objectContaining({ actor: MEMBER, agentRowId: agentId, workspaceId: 7, spaceId }))
+    })
+
+    it('hands a move the rank the coworker was dropped at in the list', async () => {
+        const agentId = '11111111-1111-4111-8111-111111111111'
+        const spaceId = '22222222-2222-4222-8222-222222222222'
+        mocks.moveAgentToBox.mockResolvedValue({ ok: true, position: { col: 0, row: 0 } })
+
+        await actions.moveAgentAction({ agentId, spaceId, sidebarOrder: 2.5 })
+
+        expect(mocks.moveAgentToBox).toHaveBeenCalledWith(agentId, spaceId, MEMBER, 2.5)
     })
 })
 
