@@ -33,10 +33,13 @@ export const foremanToolSpecSchema = z.object({
 export type ForemanToolSpec = z.infer<typeof foremanToolSpecSchema>
 
 // What the hub hands the foreman on every turn: its instructions and its tools. Both live in the
-// hub so that changing either is a hub deploy, never a fleet update.
+// hub so that changing either is a hub deploy, never a fleet update. Engines before 128 cap `tools`
+// at 64 and reject the whole request past it, so the hub stays under that until the fleet moved on.
+// `builtins` turns on engine tools of the foreman's that need a client of the same age, by name.
 export const foremanBriefSchema = z.object({
     instructions: z.string().min(1),
-    tools: z.array(foremanToolSpecSchema).max(64).default([]),
+    tools: z.array(foremanToolSpecSchema).max(128).default([]),
+    builtins: z.array(z.string()).max(32).default([]),
     hubToken: z.string().min(1).optional(),
 })
 export type ForemanBrief = z.infer<typeof foremanBriefSchema>

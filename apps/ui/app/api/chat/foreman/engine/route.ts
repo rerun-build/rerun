@@ -1,12 +1,13 @@
 import { FOREMAN_AGENT_ID, type SessionKind } from '@rerun/contracts'
 
 import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access'
+import { clientDrawsConnectApp } from '@/app/api/v1/_lib/legacy-client'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
-import { cancelRun, reconnectRun } from '@/lib/engine/client'
+import { cancelRun, reconnectRun, supportsForemanConnect } from '@/lib/engine/client'
 import { cancelForemanSessionRuns, engineSessionOf, findForemanGeneral, ForemanGeneralAlreadyOpenError, loadForemanConversation, loadForemanConversationById, startEngineConversation, touchForemanConversation } from '@/lib/foreman/conversation'
 import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
 import { mintForemanHubToken } from '@/lib/foreman/hub-token'
@@ -92,7 +93,8 @@ export async function POST(req: Request): Promise<Response> {
         let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>
         try {
             conn = await getWorkspaceConnection(ctx.workspace.id)
-            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
+            const capabilities = { connectApp: clientDrawsConnectApp(req) && (await supportsForemanConnect(conn)) }
+            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, capabilities), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
         } catch (err) {
             // The machine went away under a conversation that was already going: the browser hides the
             // foreman, which only exists beside a machine.

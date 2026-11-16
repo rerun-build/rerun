@@ -68,9 +68,11 @@
     "nudge": {
         "approval": "Braucht deine Freigabe",
         "question": "Braucht deine Antwort",
+        "connect": "Eine App muss verbunden werden",
         "more": "+{count} weitere",
         "review": "Prüfen",
         "answer": "Antworten",
+        "connectAction": "Verbinden",
         "later": "Später"
     },
     "reply": {
@@ -417,5 +419,8 @@
             "title": "Einen neuen Coworker bauen",
             "description": "Für eine Aufgabe, die noch niemand im Team macht"
         }
+    },
+    "connectApp": {
+        "for": "Für {name}"
     }
 }

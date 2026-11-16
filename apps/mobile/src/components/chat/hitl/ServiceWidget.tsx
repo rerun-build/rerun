@@ -1,4 +1,4 @@
-import { HITL_CANCELLED, pendingServices, serializeServiceSetupResult, type AuthMethodSummary, type ResolvedService, type ServiceSetupOutcome } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, HITL_CANCELLED, pendingServices, serializeServiceSetupResult, type AuthMethodSummary, type ResolvedService, type ServiceSetupOutcome } from '@rerun/contracts'
 import { Image } from 'expo-image'
 import * as WebBrowser from 'expo-web-browser'
 import { useEffect, useRef, useState } from 'react'
@@ -54,7 +54,13 @@ function ServiceHeader({ service }: { service: ResolvedService }) {
 // The apps a coworker suggests connecting, one at a time. A sign-in opens in the in-app browser and
 // comes back to the app; a key is typed here and goes onto the Box. The reply leaves once every app
 // is connected or skipped.
-export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidgetProps) {
+// The Chief of Staff holds no app: its card (connect_app) names the coworker the apps are for.
+function targetAgentId(chatAgentId: string, input: Record<string, unknown>): string {
+    return chatAgentId === FOREMAN_AGENT_ID && typeof input.agentId === 'string' && input.agentId ? input.agentId : chatAgentId
+}
+
+export function ServiceWidget({ pending, agentId: chatAgentId, onAnswer, webUrl }: HitlWidgetProps) {
+    const agentId = targetAgentId(chatAgentId, pending.input)
     const t = useTranslations('mobileHitl')
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null

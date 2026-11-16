@@ -45,6 +45,7 @@ export const HITL_TOOL_NAMES = {
     request_approval: 'approval',
     request_secret: 'secret',
     suggest_service: 'service',
+    connect_app: 'service',
     request_mcp_sign_in: 'mcp',
     request_takeover: 'takeover',
     request_spend: 'spend',

@@ -57,4 +57,23 @@ describe('ServiceWidget', () => {
         await fireEvent.press(await screen.findByLabelText('Not now'))
         await waitFor(() => expect(services.onAnswer).toHaveBeenCalledWith('App setup result:\n- NOTION: skipped\n\nPlease continue.'))
     })
+    // The Chief of Staff holds no app: its card names the coworker the account goes to.
+    it("connects the Chief of Staff's card on the coworker it names", async () => {
+        jest.mocked(resolveServices).mockResolvedValue([service('notion')] as never)
+        jest.mocked(installService).mockResolvedValue({ status: 'needs_auth', slug: 'notion', name: 'NOTION', pendingAuth: 'oauth', connectUrl: '', message: '' })
+        jest.mocked(runConnect).mockResolvedValue({ status: 'connected' })
+        const card = { ...props('service', { agentId: 'scout', services: [{ slug: 'notion' }] }), agentId: 'foreman' }
+        await render(<ServiceWidget {...card} />)
+        await fireEvent.press(await screen.findByLabelText('Connect'))
+        await waitFor(() => expect(card.onAnswer).toHaveBeenCalled())
+        expect(resolveServices).toHaveBeenLastCalledWith({ accessToken: 't', workspaceId: 7 }, 'scout', [{ slug: 'notion', reason: undefined }])
+        expect(runConnect).toHaveBeenLastCalledWith({ accessToken: 't', workspaceId: 7 }, 'scout', 'notion')
+    })
+
+    it('never lets a coworker card point at another coworker', async () => {
+        jest.mocked(resolveServices).mockResolvedValue([service('notion')] as never)
+        await render(<ServiceWidget {...props('service', { agentId: 'scout', services: [{ slug: 'notion' }] })} />)
+        await screen.findByLabelText('Not now')
+        expect(resolveServices).toHaveBeenLastCalledWith({ accessToken: 't', workspaceId: 7 }, 'a1', [{ slug: 'notion', reason: undefined }])
+    })
 })

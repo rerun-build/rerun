@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import type { ModelMessage } from 'ai'
-import { HITL_ACK, HITL_ACK_CALL_FIRST, approvalSummary, askUserTool, findPendingHitl, hitlAck, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, lastStepHasHitlCall, mcpSignInTool, requestApprovalTool, requestSecretTool, requestTakeoverTool, secretSummary, suggestServiceTool, takeoverSummary } from './hitl.js'
+import { HITL_ACK, HITL_ACK_CALL_FIRST, approvalSummary, askUserTool, findPendingHitl, hitlAck, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, lastStepHasHitlCall, mcpSignInTool, requestApprovalTool, requestSecretTool, requestTakeoverTool, secretSummary, suggestServiceTool, connectAppTool, takeoverSummary } from './hitl.js'
 
 function askUserCall(toolCallId: string, toolName = 'ask_user'): ModelMessage {
     return { role: 'assistant', content: [{ type: 'tool-call', toolCallId, toolName, input: { questions: [{ question: 'Which domain?' }] } }] } as unknown as ModelMessage
@@ -186,6 +186,25 @@ describe('suggest_service input schema', () => {
     it('accepts a double-encoded JSON string for services', () => {
         const result = suggestServiceSchema().safeParse({ services: '[{"slug":"stripe"}]' })
         expect(result.success).toBe(true)
+    })
+})
+
+describe('connect_app input schema', () => {
+    const schema = () => (connectAppTool({} as any).connect_app as any).inputSchema
+
+    it('takes the coworker and the apps, the services possibly double-encoded', () => {
+        expect(schema().safeParse({ agentId: 'alice', services: [{ slug: 'gmail', reason: 'Send the drafts' }] }).success).toBe(true)
+        expect(schema().safeParse({ agentId: 'alice', services: '[{"slug":"gmail"}]' }).success).toBe(true)
+    })
+
+    it('refuses a card for no coworker or for no app', () => {
+        expect(schema().safeParse({ services: [{ slug: 'gmail' }] }).success).toBe(false)
+        expect(schema().safeParse({ agentId: 'alice', services: [] }).success).toBe(false)
+    })
+
+    it('is a card the turn ends on', () => {
+        expect(isHitlToolName('connect_app')).toBe(true)
+        expect(isHitlToolName('mcp__rerun__connect_app')).toBe(true)
     })
 })
 

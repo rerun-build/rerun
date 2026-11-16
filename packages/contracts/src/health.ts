@@ -50,6 +50,9 @@ export const ENGINE_CAPABILITY_CUSTOM = 'connections.custom'
 // attached to the coworkers that use it. A box without it keeps every connector per coworker.
 export const ENGINE_CAPABILITY_VAULT = 'vault'
 
+// The foreman draws a card to connect an app to a coworker (`connect_app`) when its brief names it.
+export const ENGINE_CAPABILITY_FOREMAN_CONNECT = 'foreman.connect'
+
 // What the last `rerun update` on a box did, as `/health` reports it.
 export const engineLastUpdateSchema = z.object({
     status: z.enum(['running', 'error', 'restarting', 'success']),

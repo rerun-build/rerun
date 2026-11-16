@@ -115,9 +115,11 @@
     "nudge": {
         "approval": "Needs your approval",
         "question": "Needs your answer",
+        "connect": "Needs an app connected",
         "more": "+{count} more",
         "review": "Review",
         "answer": "Answer",
+        "connectAction": "Connect",
         "later": "Later"
     },
     "reply": {
@@ -464,5 +466,8 @@
             "title": "Build a new coworker",
             "description": "For a job nobody on the team does yet"
         }
+    },
+    "connectApp": {
+        "for": "For {name}"
     }
 }

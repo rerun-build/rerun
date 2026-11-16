@@ -31,9 +31,13 @@ function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSp
     return { name: def.name, description: def.description, inputSchema: def.inputSchema as Record<string, unknown>, kind, serial: SERIAL_TOOL_NAMES.has(def.name) }
 }
 
-export function foremanEngineBrief(state: ForemanState): ForemanBrief {
+// What the box can draw, read from its /health: an engine tool named in the brief exists only there.
+export type ForemanBoxCapabilities = { connectApp: boolean }
+
+export function foremanEngineBrief(state: ForemanState, capabilities: ForemanBoxCapabilities): ForemanBrief {
     return {
-        instructions: foremanEngineInstructions(state),
+        instructions: foremanEngineInstructions(state, capabilities),
+        builtins: capabilities.connectApp ? ['connect_app'] : [],
         tools: [...HUB_TOOL_DEFS.map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name)).map(def => spec(def, 'intent'))],
     }
 }

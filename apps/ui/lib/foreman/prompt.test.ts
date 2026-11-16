@@ -7,6 +7,8 @@ vi.mock('server-only', () => ({}))
 const { MOBILE_APP_BLOCK, foremanEngineInstructions, foremanSystemPrompt } = await import('./prompt')
 import type { ForemanPlan, ForemanState } from './phase'
 
+const OLD_BOX = { connectApp: false }
+
 const ASKED = 'Je cherche un worker capable de trouver des décisionnaires capables de me recruter en alternance'
 
 const HIRING_LEADS = { kind: 'agent' as const, name: 'Hiring Leads', role: 'Finds potential apprenticeship hiring managers and delivers leads for review', need: ASKED, asked: ASKED, box: 'Sales' }
@@ -38,14 +40,14 @@ function stateWith(patch: Partial<ForemanState>): ForemanState {
 
 describe('foremanEngineInstructions', () => {
     it('knows that only a coworker on a ChatGPT connection can generate an image, and says who to hand it to', () => {
-        const prompt = foremanEngineInstructions(stateWith({}))
+        const prompt = foremanEngineInstructions(stateWith({}), OLD_BOX)
         expect(prompt).toContain('runs on a ChatGPT connection (provider codex) generates and edits images')
         expect(prompt).toContain('hand it the request with send_message')
         expect(prompt).toContain('Never tell the user that the ChatGPT plan only covers text')
     })
 
     it('carries the coworker they agreed on and their correction, over what the interview heard first', () => {
-        const instructions = foremanEngineInstructions(stateWith({ foreman: { ...stateWith({}).foreman, plan: PLAN } }))
+        const instructions = foremanEngineInstructions(stateWith({ foreman: { ...stateWith({}).foreman, plan: PLAN } }), OLD_BOX)
         expect(instructions).toContain('The first coworker they agreed on during onboarding: Hiring Leads, Finds potential apprenticeship hiring managers and delivers leads for review.')
         expect(instructions).toContain(`What they asked for when they changed it, in their own words: "${ASKED}"`)
         expect(instructions).toContain('Where this and what you know above disagree, this wins')
@@ -53,20 +55,20 @@ describe('foremanEngineInstructions', () => {
 
     it('cuts a long correction short, since it is read on every turn', () => {
         const long = 'a'.repeat(2000)
-        const instructions = foremanEngineInstructions(stateWith({ foreman: { plan: { ...PLAN, items: [{ ...HIRING_LEADS, asked: long }] } } }))
+        const instructions = foremanEngineInstructions(stateWith({ foreman: { plan: { ...PLAN, items: [{ ...HIRING_LEADS, asked: long }] } } }), OLD_BOX)
         expect(instructions).toContain(`"${'a'.repeat(600)}…"`)
         expect(instructions).not.toContain('a'.repeat(601))
     })
 
     it('names the coworker alone when the card came back confirmed as it was drawn', () => {
-        const instructions = foremanEngineInstructions(stateWith({ foreman: { plan: { ...PLAN, items: [{ kind: 'agent', name: 'Closer', role: 'Answers demo requests' }] } } }))
+        const instructions = foremanEngineInstructions(stateWith({ foreman: { plan: { ...PLAN, items: [{ kind: 'agent', name: 'Closer', role: 'Answers demo requests' }] } } }), OLD_BOX)
         expect(instructions).toContain('The first coworker they agreed on during onboarding: Closer, Answers demo requests.')
         expect(instructions).not.toContain('when they changed it')
     })
 
     it('says nothing of a plan for a workspace that never had one, or whose plan was a template', () => {
-        expect(foremanEngineInstructions(stateWith({}))).not.toContain('agreed on during onboarding')
-        expect(foremanEngineInstructions(stateWith({ foreman: { plan: { title: 'Team', items: [{ kind: 'template', slug: 'buyer-signals' }] } } }))).not.toContain('agreed on during onboarding')
+        expect(foremanEngineInstructions(stateWith({}), OLD_BOX)).not.toContain('agreed on during onboarding')
+        expect(foremanEngineInstructions(stateWith({ foreman: { plan: { title: 'Team', items: [{ kind: 'template', slug: 'buyer-signals' }] } } }), OLD_BOX)).not.toContain('agreed on during onboarding')
     })
 })
 

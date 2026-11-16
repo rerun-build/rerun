@@ -1,4 +1,4 @@
-import { type AgentModels, type AgentView, type AiConnectionsView, type Provider } from '@rerun/contracts'
+import { type AgentModels, type AgentView, type AiConnectionsView, type ClientPlatform, type Provider } from '@rerun/contracts'
 import { clientOf } from './client-platform'
 
 // The iOS builds already in people's hands parse `providerSchema` strictly: one provider they do not
@@ -59,4 +59,16 @@ export function agentViewForClient(req: Request, view: AgentView): AgentView {
     const config = unknownToLegacy(detail.config.provider) ? { ...detail.config, provider: null, model: null } : detail.config
     const resolved = unknownToLegacy(detail.resolvedProvider) ? { resolvedProvider: null, resolvedModel: null } : {}
     return { ...view, detail: { ...detail, config, ...resolved } }
+}
+
+// The foreman's connect_app card. The browser always draws it; a phone app only from the build each
+// platform's env var names, unset meaning none does yet. The app is the caller with a bearer token.
+const FIRST_CONNECT_APP_BUILD_ENV: Record<ClientPlatform, string> = { ios: 'MOBILE_IOS_CONNECT_APP_BUILD', android: 'MOBILE_ANDROID_CONNECT_APP_BUILD' }
+
+export function clientDrawsConnectApp(req: Request): boolean {
+    if (!req.headers.get('authorization')?.startsWith('Bearer ')) return true
+    const client = clientOf(req)
+    if (!client) return false
+    const firstBuild = Number.parseInt(process.env[FIRST_CONNECT_APP_BUILD_ENV[client.platform]] ?? '', 10)
+    return Number.isInteger(firstBuild) && firstBuild > 0 && client.build >= firstBuild
 }

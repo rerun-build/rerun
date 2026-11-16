@@ -68,9 +68,11 @@
     "nudge": {
         "approval": "Precisa da sua aprovação",
         "question": "Precisa da sua resposta",
+        "connect": "Falta conectar um app",
         "more": "+{count} outras",
         "review": "Revisar",
         "answer": "Responder",
+        "connectAction": "Conectar",
         "later": "Depois"
     },
     "reply": {
@@ -417,5 +419,8 @@
             "title": "Criar um novo coworker",
             "description": "Para um trabalho que ninguém da equipe faz ainda"
         }
+    },
+    "connectApp": {
+        "for": "Para {name}"
     }
 }

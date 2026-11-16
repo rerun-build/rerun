@@ -18,7 +18,7 @@ vi.mock('@rerun/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
 vi.mock('@/app/api/_services/me.service', () => ({ messageAuthorOf: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
 vi.mock('@/lib/chat/start-chat', () => ({ QUEUED_RETRY_DELAYS_MS: [], startChat: vi.fn() }))
-vi.mock('@/lib/engine/client', () => ({ cancelRun: vi.fn(), reconnectRun: vi.fn() }))
+vi.mock('@/lib/engine/client', () => ({ cancelRun: vi.fn(), reconnectRun: vi.fn(), supportsForemanConnect: vi.fn(async () => false) }))
 vi.mock('@/lib/foreman/conversation', () => ({
     cancelForemanSessionRuns: vi.fn(),
     engineSessionOf: vi.fn().mockResolvedValue(null),

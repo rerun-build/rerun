@@ -153,6 +153,7 @@
         "ask_user": "Asked the user",
         "request_approval": "Requested approval",
         "suggest_service": "Suggested an app",
+        "connect_app": "Asked to connect an app",
         "request_secret": "Requested a credential",
         "request_mcp_sign_in": "Asked you to sign in to an MCP server",
         "request_takeover": "Asked you to take over the browser",

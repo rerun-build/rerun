@@ -147,6 +147,7 @@
         "ask_user": "Te hizo una pregunta",
         "request_approval": "Pidió una aprobación",
         "suggest_service": "Sugirió una app",
+        "connect_app": "Propuso conectar una app",
         "request_secret": "Pidió una credencial",
         "request_mcp_sign_in": "Te pidió iniciar sesión en un servidor MCP",
         "request_takeover": "Te pidió tomar el control del navegador",

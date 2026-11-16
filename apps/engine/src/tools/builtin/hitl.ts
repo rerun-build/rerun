@@ -6,7 +6,7 @@ import type { AgentConfig } from '../../agents/types.js'
 import { desktopAvailable } from '../../desktop/session.js'
 import { publicHttpUrl } from '../url.js'
 
-export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend'] as const
+export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'connect_app', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend'] as const
 export type HitlToolName = (typeof HITL_TOOL_NAMES)[number]
 export const HITL_TOOL_SET = new Set<string>(HITL_TOOL_NAMES)
 
@@ -234,6 +234,31 @@ export function requestApprovalTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet
                         .min(1)
                         .max(20),
                 ).describe('Every approval currently needed, grouped into one relevant batch. Include no filler and do not split one action into artificial sub-actions.'),
+            }),
+        ),
+    }
+}
+
+// The foreman's suggest_service: it holds no app itself, so its card names the coworker the account
+// goes to, and the user signs in there, or lends that coworker an account of the Vault.
+export function connectAppTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
+    return {
+        connect_app: hitlTool(
+            ctx.turnOrder,
+            'Show the user a card to connect one or more catalog apps to a coworker, then END YOUR TURN. Each app gets a setup row where they lend an account the Vault already holds, sign in (OAuth) or enter a key; nothing is ever typed into the chat, and you never see a credential. Use it whenever an app of a coworker needs a sign-in or a key, rather than sending them to its Apps tab. Get exact slugs from search_connectors first. Their answer comes back as their next message, saying which apps they connected and which they skipped.',
+            z.object({
+                agentId: z.string().min(1).describe('Id of the coworker the apps are for, from the board map.'),
+                services: jsonTolerantArray(
+                    z
+                        .array(
+                            z.object({
+                                slug: z.string().min(1).describe('Exact catalog slug from search_connectors.'),
+                                reason: nullTolerantOptional(z.string().max(300)).describe('One short line telling the user what this app lets the coworker do. The card truncates it to a single line.'),
+                            }),
+                        )
+                        .min(1)
+                        .max(10),
+                ).describe('The apps to connect, each identified by its exact catalog slug.'),
             }),
         ),
     }

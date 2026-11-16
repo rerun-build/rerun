@@ -3,16 +3,16 @@ import { lastAssistantMessageIsCompleteWithToolCalls, type ChatStatus, type UIMe
 
 import { isForemanWidgetTool, type ForemanWidgetToolName } from './tool-defs'
 
-// The two questions the engine foreman can stop on. They are the engine's own ask_user and
-// request_approval, answered by a user message rather than a tool result.
-export type EngineHitlToolName = 'ask_user' | 'request_approval'
+// The cards the engine foreman can stop on: the engine's own ask_user, request_approval and
+// connect_app, answered by a user message rather than a tool result.
+export type EngineHitlToolName = 'ask_user' | 'request_approval' | 'connect_app'
 
 export type PendingWidget = { toolName: ForemanWidgetToolName | EngineHitlToolName; toolCallId: string; input: unknown }
 
 // An engine question is drawn after the last message, the way an agent's chat draws its own. Every
 // other widget waits where it streamed in, inside the message that called it.
 export function isEngineHitl(toolName: string): toolName is EngineHitlToolName {
-    return toolName === 'ask_user' || toolName === 'request_approval'
+    return toolName === 'ask_user' || toolName === 'request_approval' || toolName === 'connect_app'
 }
 
 // A pending widget is the only thing left to answer, so the composer steps aside for it. Two
@@ -80,10 +80,11 @@ export function findPendingEngineHitl(messages: UIMessage[], status: ChatStatus)
         const rawName = part.type === 'dynamic-tool' ? part.toolName : part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : null
         if (!rawName || !part.toolCallId) continue
         const kind = hitlKindOf(rawName)
-        if (kind !== 'question' && kind !== 'approval') continue
+        const toolName = stripBridgePrefix(rawName)
+        if (!kind || !isEngineHitl(toolName)) continue
         const input = (part.input ?? part.rawInput ?? {}) as Record<string, unknown>
         if (!hitlInputIsUsable(kind, input)) return null
-        return { toolName: stripBridgePrefix(rawName) as EngineHitlToolName, toolCallId: part.toolCallId, input }
+        return { toolName, toolCallId: part.toolCallId, input }
     }
     return null
 }

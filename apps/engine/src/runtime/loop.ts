@@ -113,13 +113,13 @@ function serviceSummary(input: Record<string, unknown> | undefined): string {
 function hitlKind(toolName: string): NotificationKind {
     if (toolName === 'ask_user') return 'question'
     // A secret request is a connector to finish setting up, from the user's point of view.
-    if (toolName === 'suggest_service' || toolName === 'request_secret' || toolName === 'request_mcp_sign_in') return 'connector'
+    if (toolName === 'suggest_service' || toolName === 'connect_app' || toolName === 'request_secret' || toolName === 'request_mcp_sign_in') return 'connector'
     return 'approval'
 }
 
 function hitlMessage(toolName: string, input: Record<string, unknown> | undefined): string {
     if (toolName === 'ask_user') return questionSummary(input)
-    if (toolName === 'suggest_service') return serviceSummary(input)
+    if (toolName === 'suggest_service' || toolName === 'connect_app') return serviceSummary(input)
     if (toolName === 'request_secret') return secretSummary(input)
     if (toolName === 'request_mcp_sign_in') return `Sign in to ${String(input?.name ?? 'an MCP server')}`
     if (toolName === 'request_takeover') return takeoverSummary(input)

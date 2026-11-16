@@ -55,7 +55,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "foreman.connect", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -70,8 +70,9 @@ version the folder is at against the one this build takes it to.
   connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
   routes), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
-  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, and `desktop`
-  only when the desktop packages are installed.
+  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `foreman.connect`
+  (the Chief of Staff draws `connect_app` when its brief names it), and `desktop` only when the desktop
+  packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,
   `monorepo` or `image`. `lastUpdate` is what the last `rerun update` did (`status` `running`,
   `restarting`, `success` or `error`, with `error` then), `null` before the first one.
@@ -653,7 +654,10 @@ Only `message` is required.
 - `install: true` on a new conversation starts the agent's guided setup there, and `userLanguage`
   tells it the language the user reads the app in.
 - `foreman` is read only on `/agents/foreman/chat`: the instructions and the tools the app hands the
-  Chief of Staff for this turn.
+  Chief of Staff for this turn (`tools`, at most 128; engines before `foreman.connect` take 64 and
+  refuse the request past it), and `builtins`, the engine tools of its own that need a client able to
+  draw them. Today only `connect_app`: a card that connects catalog apps to the coworker it names
+  (`{ agentId, services: [{ slug, reason? }] }`), which ends the turn like `suggest_service`.
 
 Returns an **SSE stream** (AI SDK UI message stream protocol). The session id is in the
 `x-session-id` response header and the run id in `x-run-id`. Event lines look like:

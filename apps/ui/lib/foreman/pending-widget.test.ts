@@ -88,6 +88,19 @@ describe('findPendingEngineHitl', () => {
         expect(findPendingEngineHitl([assistant(parts), user()], 'ready')).toBeNull()
     })
 
+    it('finds the app card the engine foreman stopped on', () => {
+        const input = { agentId: 'alice', services: [{ slug: 'gmail', reason: 'Send the drafts' }] }
+        const parts = [{ type: 'dynamic-tool', toolName: 'mcp__rerun__connect_app', toolCallId: 'h4', state: 'output-available', input }]
+        expect(findPendingEngineHitl([assistant(parts)], 'ready')).toEqual({ toolName: 'connect_app', toolCallId: 'h4', input })
+        expect(isEngineHitl('connect_app')).toBe(true)
+    })
+
+    // The foreman never holds suggest_service: a coworker's card is not one it stopped on.
+    it('leaves the coworkers card alone', () => {
+        const parts = [{ type: 'tool-suggest_service', toolCallId: 'h5', state: 'output-available', input: { services: [{ slug: 'gmail' }] } }]
+        expect(findPendingEngineHitl([assistant(parts)], 'ready')).toBeNull()
+    })
+
     it('ignores the hub widgets and a call with nothing to ask', () => {
         expect(findPendingEngineHitl([assistant(asking)], 'ready')).toBeNull()
         expect(findPendingEngineHitl([assistant([{ type: 'tool-ask_user', toolCallId: 'h3', state: 'output-available', input: {} }])], 'ready')).toBeNull()

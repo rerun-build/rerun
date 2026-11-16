@@ -51,6 +51,12 @@ function intentTool(spec: ForemanToolSpec, inputSchema: z.ZodType, ctx: RunConte
     })
 }
 
+// An engine tool of the foreman's that only a client of the same age can draw: the hub names it in
+// the brief once the box says it has it, so a hub that predates it never sees a card it cannot show.
+export function briefNamesBuiltin(agent: Pick<RunContext['agent'], 'brief'>, name: string): boolean {
+    return agent.brief?.builtins?.includes(name) ?? false
+}
+
 export function foremanTools(ctx: RunContext): ToolSet {
     const tools: ToolSet = {}
     for (const spec of ctx.agent.brief?.tools ?? []) {

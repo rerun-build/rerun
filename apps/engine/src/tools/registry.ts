@@ -24,9 +24,9 @@ import { hubTools } from './builtin/hub.js'
 import { paidDataTools } from './builtin/paid-data.js'
 import { paidDataOffered } from '../paid-data/price.js'
 import { cardTools, foremanCardTools } from './builtin/cards.js'
-import { askUserTool, offersTakeover, requestApprovalTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
+import { askUserTool, connectAppTool, offersTakeover, requestApprovalTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
 import { installTools } from './builtin/install.js'
-import { foremanTools } from './builtin/foreman.js'
+import { briefNamesBuiltin, foremanTools } from './builtin/foreman.js'
 import { agentFilesTools } from './builtin/agent-files.js'
 import { hasPendingSetup } from '../agents/setup.js'
 import { pooledMcpTools } from './mcp-pool.js'
@@ -70,6 +70,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (cfg.askUser) Object.assign(tools, askUserTool(ctx))
     if (cfg.requestApproval) Object.assign(tools, requestApprovalTool(ctx))
     if (cfg.suggestService) Object.assign(tools, suggestServiceTool(ctx))
+    if (ctx.agent.config.kind === 'foreman' && briefNamesBuiltin(ctx.agent, 'connect_app')) Object.assign(tools, connectAppTool(ctx))
     if (cfg.requestSecret) Object.assign(tools, requestSecretTool(ctx))
     // Only exists while there is an installation to close, so no other agent carries a tool it
     // could never legitimately call.

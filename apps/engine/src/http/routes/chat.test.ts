@@ -135,8 +135,8 @@ describe('POST /agents/:id/chat', () => {
     })
 
     it('hands the brief to a foreman agent only', async () => {
-        const brief = { instructions: 'Interview the user.', tools: [] }
-        await (await chat('boss', { message: 'hi', foreman: brief })).text()
+        const brief = { instructions: 'Interview the user.', tools: [], builtins: [] }
+        await (await chat('boss', { message: 'hi', foreman: { instructions: brief.instructions, tools: [] } })).text()
         expect(state.calls[0].agent.brief).toEqual(brief)
 
         await (await chat(id, { message: 'hi', foreman: brief })).text()

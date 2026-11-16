@@ -164,6 +164,21 @@ describe('foreman', () => {
         }
     })
 
+    // An old hub names no builtin: the card would be called and drawn by no client.
+    it('draws the app card only when the brief names it', async () => {
+        const without = await foremanToolSet()
+        const plain = Object.keys(without.tools)
+        await without.close()
+        expect(plain).not.toContain('connect_app')
+
+        const agent = { ...(await getAgent(FOREMAN_AGENT_ID)), brief: { ...brief, builtins: ['connect_app'] } }
+        const { tools, close } = await buildTools({ agent, sessionId: 's1', logger, provider: 'rerun', model: 'rerun-max' })
+        await close()
+        expect(Object.keys(tools)).toContain('connect_app')
+        const prompt = systemPromptText(await buildSystemPrompt(agent, { source: 'chat' }, 'claude'))
+        expect(prompt).toContain('connect_app')
+    })
+
     it('speaks from the brief, with the box around it and none of the agent sections', async () => {
         const prompt = systemPromptText(await buildSystemPrompt(await foremanWithBrief(), { source: 'chat' }, 'claude'))
         expect(prompt).toContain('Charter from the hub.')

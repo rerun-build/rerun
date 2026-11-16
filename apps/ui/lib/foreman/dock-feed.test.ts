@@ -66,4 +66,8 @@ describe('foremanNudge', () => {
     it('holds up the action waiting for approval', () => {
         expect(foremanNudge(approval)).toEqual({ id: 'c2', kind: 'approval', title: 'Pause Shop Radar', detail: 'Until the token is renewed', more: 0 })
     })
+    it('holds up the app to connect, by what it unlocks', () => {
+        const connect = { toolName: 'connect_app' as const, toolCallId: 'c3', input: { agentId: 'alice', services: [{ slug: 'gmail', reason: 'Send the drafts' }, { slug: 'notion' }] } }
+        expect(foremanNudge(connect)).toEqual({ id: 'c3', kind: 'connect', title: 'Send the drafts', detail: null, more: 1 })
+    })
 })

@@ -47,6 +47,7 @@ import { ForemanActivityIndicator } from './ForemanActivityIndicator'
 import { useForemanMentionAgents } from './useForemanMentionAgents'
 import { ForemanWelcome } from './ForemanWelcome'
 import { EngineQuestionWidget } from './widgets/EngineQuestionWidget'
+import { ForemanConnectApp } from './widgets/ForemanConnectApp'
 import { planAgentShortcuts } from './widgets/agent-picks'
 import { renderForemanWidget, type AnswerWidget, type DismissWidget } from './widgets/renderForemanWidget'
 
@@ -259,6 +260,8 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                                         onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)}
                                         onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))}
                                     />
+                                ) : engineHitl.toolName === 'connect_app' ? (
+                                    <ForemanConnectApp input={engineHitl.input} onDone={summary => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, summary)} />
                                 ) : (
                                     <ActionApprovalBlock inline approvals={pendingApprovals((engineHitl.input ?? {}) as Record<string, unknown>)} onSubmit={decisions => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, serializeApprovalDecisions(decisions))} />
                                 )}

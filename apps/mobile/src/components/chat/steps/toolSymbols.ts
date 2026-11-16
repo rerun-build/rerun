@@ -158,6 +158,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     ask_user: 'message-circle-question',
     request_approval: 'shield-alert',
     suggest_service: 'link',
+    connect_app: 'link',
     request_secret: 'lock',
     request_mcp_sign_in: 'link',
     request_takeover: 'monitor',

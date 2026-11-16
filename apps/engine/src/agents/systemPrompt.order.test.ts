@@ -126,7 +126,8 @@ describe('a sub-coworker', () => {
 describe('the cards that close a turn', () => {
     it('are all named in turn_order when the agent has them all', async () => {
         const note = sectionOf(await promptFor('rerun', 'full'), 'turn_order') ?? ''
-        for (const name of HITL_TOOL_NAMES) expect(note, name).toContain(name)
+        // connect_app is the Chief of Staff's own card, never a coworker's.
+        for (const name of HITL_TOOL_NAMES.filter(name => name !== 'connect_app')) expect(note, name).toContain(name)
     })
 
     it('are only the ones the agent can call', async () => {

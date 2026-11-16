@@ -226,6 +226,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     ask_user: MessageCircleQuestionIcon,
     request_approval: ShieldAlertIcon,
     suggest_service: LinkIcon,
+    connect_app: LinkIcon,
     request_secret: LockIcon,
     request_mcp_sign_in: PlugIcon,
     request_takeover: MonitorIcon,

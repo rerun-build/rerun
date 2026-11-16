@@ -1,4 +1,4 @@
-import { pendingApprovals, pendingQuestions } from '@rerun/contracts'
+import { pendingApprovals, pendingQuestions, pendingServices } from '@rerun/contracts'
 
 import { liveActivityLabel, type LiveActivityCopy } from '@/lib/agent-chat-loader'
 
@@ -52,11 +52,15 @@ export function foremanDockFeed({ messages, busy, pending, failed, copy }: FeedI
     return { busy: false, label: null, pending: question, reply: question || failed ? null : lastReply(messages), failed }
 }
 
-export type ForemanNudge = { id: string; kind: 'question' | 'approval'; title: string; detail: string | null; more: number }
+export type ForemanNudge = { id: string; kind: 'question' | 'approval' | 'connect'; title: string; detail: string | null; more: number }
 
 /** The one line of a pending question or approval the parked Foreman holds up. */
 export function foremanNudge(pending: PendingWidget): ForemanNudge {
     const input = (pending.input ?? {}) as Record<string, unknown>
+    if (pending.toolName === 'connect_app') {
+        const services = pendingServices(input)
+        return { id: pending.toolCallId, kind: 'connect', title: services[0]?.reason ?? services[0]?.slug ?? '', detail: null, more: Math.max(services.length - 1, 0) }
+    }
     if (pending.toolName === 'request_approval') {
         const approvals = pendingApprovals(input)
         return { id: pending.toolCallId, kind: 'approval', title: approvals[0].action, detail: approvals[0].detail ?? null, more: approvals.length - 1 }

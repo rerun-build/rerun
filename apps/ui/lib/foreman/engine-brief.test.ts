@@ -8,6 +8,8 @@ import { foremanEngineBrief, FOREMAN_ENGINE_HUB_TOOL_NAMES } from './engine-brie
 import type { ForemanState } from './phase'
 import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 
+const OLD_BOX = { connectApp: false }
+
 const state = {
     phase: 'companion',
     intent: null,
@@ -29,7 +31,7 @@ const state = {
 } as unknown as ForemanState
 
 describe('foremanEngineBrief', () => {
-    const brief = foremanEngineBrief(state)
+    const brief = foremanEngineBrief(state, OLD_BOX)
 
     it('is a brief the engine accepts', () => {
         expect(() => foremanBriefSchema.parse(brief)).not.toThrow()
@@ -98,6 +100,17 @@ describe('foremanEngineBrief', () => {
         expect(brief.tools.length).toBeLessThanOrEqual(64)
     })
 
+    // An engine tool is drawn by a client of its age: only a box that says it has the card gets it.
+    it('turns the connect card on only for a box that draws it', () => {
+        expect(brief.builtins).toEqual([])
+        expect(brief.instructions).not.toContain('call connect_app')
+        const connecting = foremanEngineBrief(state, { connectApp: true })
+        expect(connecting.builtins).toEqual(['connect_app'])
+        expect(connecting.instructions).toContain('call connect_app')
+        expect(connecting.tools.map(tool => tool.name)).not.toContain('connect_app')
+        expect(() => foremanBriefSchema.parse(connecting)).not.toThrow()
+    })
+
     it('never lets two creations overlap', () => {
         const serial = brief.tools.filter(tool => tool.serial).map(tool => tool.name)
         expect(serial.sort()).toEqual(['create_agent', 'create_boxes', 'install_shared_agent', 'install_template'])
@@ -120,16 +133,16 @@ describe('foremanEngineBrief', () => {
     // A workspace keeps its machine, and its foreman, for a while after its plan lapses.
     it('tells it when the workspace has no plan, and only then', () => {
         expect(brief.instructions).not.toContain('no active plan')
-        expect(foremanEngineBrief({ ...state, entitled: false }).instructions).toContain('no active plan')
+        expect(foremanEngineBrief({ ...state, entitled: false }, OLD_BOX).instructions).toContain('no active plan')
     })
 
     // Every turn on the engine starts from a message the user wrote, so the browser has nothing to
     // add, and repeating it there talks the model out of the language they write in.
     it('never passes the browser language on, only the one they settled on', () => {
-        const guessed = foremanEngineBrief({ ...state, language: 'German' }).instructions
+        const guessed = foremanEngineBrief({ ...state, language: 'German' }, OLD_BOX).instructions
         expect(guessed).not.toContain('browser is set')
         expect(guessed).not.toContain('German')
-        expect(foremanEngineBrief({ ...state, foreman: { language: 'French' } }).instructions).toContain('writing in French')
+        expect(foremanEngineBrief({ ...state, foreman: { language: 'French' } }, OLD_BOX).instructions).toContain('writing in French')
     })
 
     it('tells it to ask with ask_user and to get an approval before deleting', () => {

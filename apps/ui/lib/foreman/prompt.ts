@@ -142,10 +142,15 @@ export function foremanSystemPrompt(state: ForemanState): string {
     return blocks.join('\n\n')
 }
 
+// A box that draws connect_app takes the sign-in into the chat, and into the Vault, rather than
+// sending the user to a coworker's Apps tab.
+const CONNECT_APP_NOTE =
+    'Connecting apps: when an app of a coworker needs a sign-in or a key, call connect_app with that coworker and the app, rather than attach_connector and open_connector_setup. The card lets the user lend an account the Vault already holds, sign in or type the key, and the account lands in the Vault. attach_connector stays for an app that needs nothing to work.'
+
 // The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
 // the charter, who they are, and the board.
-export function foremanEngineInstructions(state: ForemanState): string {
-    const blocks = [ENGINE_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: false }), foremanProfileBlock(state), agreedPlanBlock(state), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+export function foremanEngineInstructions(state: ForemanState, capabilities: { connectApp: boolean }): string {
+    const blocks = [ENGINE_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, capabilities.connectApp ? CONNECT_APP_NOTE : null, languageBlock(state, { browserGuess: false }), foremanProfileBlock(state), agreedPlanBlock(state), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

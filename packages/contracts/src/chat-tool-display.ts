@@ -20,7 +20,7 @@ const LABELLED_TOOLS = [
     'rename_box', 'delete_box', 'focus_agent', 'show_agents', 'open_connector_setup', 'open_settings', 'recenter_board', 'open_brain_page',
     'read_attachment', 'search_docs', 'analyze_website', 'save_profile', 'save_needs', 'list_templates', 'propose_plan', 'install_template',
     'install_shared_agent', 'open_template_card', 'start_agent_setup', 'open_checkout', 'open_template_purchase', 'ask_choice', 'ask_either',
-    'ask_input', 'show_templates', 'show_plan', 'show_starter_pack', 'contact_team', 'ask_user', 'request_approval', 'suggest_service',
+    'ask_input', 'show_templates', 'show_plan', 'show_starter_pack', 'contact_team', 'ask_user', 'request_approval', 'suggest_service', 'connect_app',
     'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'notify_user', 'install_complete',
 ] as const
 

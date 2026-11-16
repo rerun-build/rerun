@@ -14,6 +14,7 @@ import { defaultSoul } from './soul.js'
 import { hasPendingSetup } from './setup.js'
 import { offersQuickReplies } from './quick-replies-stream.js'
 import { HITL_TOOL_NAMES, offersTakeover, type HitlToolName } from '../tools/builtin/hitl.js'
+import { briefNamesBuiltin } from '../tools/builtin/foreman.js'
 import { runOffersComputer } from '../tools/builtin/computer.js'
 import { CLI_PROVIDERS, type LoadedAgent } from './types.js'
 import { turnOrder, type TurnOrder } from './turn-order.js'
@@ -227,6 +228,7 @@ function turnClosers(agent: LoadedAgent, takeover: boolean): TurnClosers {
         ask_user: tools.askUser,
         request_approval: tools.requestApproval,
         suggest_service: tools.suggestService,
+        connect_app: agent.config.kind === 'foreman' && briefNamesBuiltin(agent, 'connect_app'),
         request_secret: tools.requestSecret,
         request_mcp_sign_in: selfImprovement.enabled,
         request_takeover: takeover,
