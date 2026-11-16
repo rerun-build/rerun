@@ -1,4 +1,4 @@
-import contextlib, io, os, sys, tempfile, types, unittest
+import io, os, sys, tempfile, types, unittest
 from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
@@ -34,7 +34,7 @@ class WtNewSweep(unittest.TestCase):
             wt = os.path.join(d, "wt")
             os.makedirs(os.path.join(wt, "rerun", "71-1"))
             with mock.patch.object(F, "WORK", d), mock.patch.object(F, "WT", wt), mock.patch.object(F, "STATE", os.path.join(d, "state")), \
-                    mock.patch.object(F, "MIN_FREE_GB", 0), mock.patch.object(F, "MIN_FREE_MEM_GB", 0), \
+                    mock.patch.object(F, "MIN_FREE_GB", 0), mock.patch.object(F.shutil, "disk_usage", return_value=types.SimpleNamespace(free=2**40)), mock.patch.object(F, "MIN_FREE_MEM_GB", 0), \
                     mock.patch.object(F, "MEMINFO", os.path.join(d, "none")), mock.patch.object(F, "run", fake_run), \
                     mock.patch.object(F, "wt_sweep", sweep), mock.patch.object(F, "api", side_effect=Stop), \
                     mock.patch.object(F.limits, "capacity", return_value=capacity), mock.patch("sys.stdout", out):
