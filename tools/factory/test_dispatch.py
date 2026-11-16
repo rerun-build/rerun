@@ -306,7 +306,7 @@ class Depends(Base):
         return {"number": n, "title": title or "t%d" % n, "body": ready("intro\nmore", line), "comments": []}
 
     def open_calls(self):
-        return [c for c in self.w.gh_calls if c[:2] == ["issue", "list"] and "--label" not in c]
+        return [c for c in self.w.gh_calls if c[:2] == ["issue", "list"] and "--label" not in c and "--search" not in c]
 
     def test_waits_while_dependency_is_open_then_is_taken(self):
         self.w.issues = [self.job(5, "#7")]

@@ -3,6 +3,7 @@ import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempf
 import backlog
 import briefs
 import clocks
+import control
 import cutshape
 import digest
 import holds
@@ -354,6 +355,7 @@ class Dispatcher:
         self.started = now()
         self.names = pools.names(cfg)
         self.planners = planners.Planners(cfg, account, gh)
+        self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
 
@@ -1116,6 +1118,7 @@ class Dispatcher:
     def once(self):
         self.heartbeat()
         self.renewal_hold()
+        self.control.tick(self.beats)
         clean = True
         try:
             self.intake()
