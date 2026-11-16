@@ -25,18 +25,22 @@ function useNow(intervalMs: number): number {
 }
 
 type UseRoutinesOptions = {
-    // Stable: a new function reloads the list.
-    load: () => Promise<WorkspaceRoutines>
+    // Stable: a new function reloads the list. Null when it could not be read: the list on screen stays.
+    load: () => Promise<WorkspaceRoutines | null>
     // Only this coworker's runs reload the list; left out, any coworker's do.
     agentId?: string
+    // False while the list is out of sight: nothing is read until it shows again.
+    enabled?: boolean
     onRunStarted: (routine: WorkspaceRoutine, sessionId: string, runId: string) => void
 }
+
+const NO_ROUTINES: WorkspaceRoutines = { routines: [], canRename: false }
 
 /**
  * A list of routines as `RoutineList` draws them, and what its rows do: pause or resume one, rename it,
  * run it now. The workspace's list (the Chief of Staff) and a coworker's own read and act the same way.
  */
-export function useRoutines({ load, agentId, onRunStarted }: UseRoutinesOptions) {
+export function useRoutines({ load, agentId, enabled = true, onRunStarted }: UseRoutinesOptions) {
     const locale = useLocale()
     const t = useTranslations('foreman.routines')
     const tAgent = useTranslations('agent')
@@ -56,21 +60,28 @@ export function useRoutines({ load, agentId, onRunStarted }: UseRoutinesOptions)
             .join(',')
     )
     const now = useNow(30_000)
-    const loaded = useRef(false)
+    const [reloadKey, setReloadKey] = useState(0)
+    const seenSessions = useRef(workingSessions)
+    const settledAt = useRef(0)
 
     useEffect(() => {
+        // Only a run that just started has to settle: a routine saved or deleted is read at once.
+        if (seenSessions.current !== workingSessions) {
+            seenSessions.current = workingSessions
+            settledAt.current = Date.now() + RUN_SETTLE_MS
+        }
+        if (!enabled) return
         let cancelled = false
         const fetchRoutines = () =>
             load()
-                .then(next => !cancelled && setData(next))
-                .catch(() => !cancelled && setData(current => current ?? { routines: [], canRename: false }))
-                .finally(() => (loaded.current = true))
-        const timer = setTimeout(fetchRoutines, loaded.current ? RUN_SETTLE_MS : 0)
+                .then(next => !cancelled && setData(current => next ?? current ?? NO_ROUTINES))
+                .catch(() => !cancelled && setData(current => current ?? NO_ROUTINES))
+        const timer = setTimeout(fetchRoutines, Math.max(0, settledAt.current - Date.now()))
         return () => {
             cancelled = true
             clearTimeout(timer)
         }
-    }, [load, workingSessions, schedulesRefreshKey])
+    }, [enabled, load, workingSessions, schedulesRefreshKey, reloadKey])
 
     const routines = useMemo(() => {
         if (!data) return null
@@ -139,5 +150,10 @@ export function useRoutines({ load, agentId, onRunStarted }: UseRoutinesOptions)
         toggle,
         rename,
         runNow,
+        // After a change the rows cannot show on their own (a routine created or deleted): back to the skeleton until it is read again.
+        reload: () => {
+            setData(null)
+            setReloadKey(key => key + 1)
+        },
     }
 }

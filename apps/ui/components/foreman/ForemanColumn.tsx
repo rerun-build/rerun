@@ -570,7 +570,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                 </div>
                 {pinned && details.mounted && (
                     <DetailsColumn label={tDetails('label', { name: tView('name') })} open={detailsShown} slideIn={details.slideIn} onClose={() => useSimpleDetailsStore.getState().setWanted(false)}>
-                        <ForemanDetails onClose={() => useSimpleDetailsStore.getState().setWanted(false)} />
+                        <ForemanDetails shown={detailsShown} onClose={() => useSimpleDetailsStore.getState().setWanted(false)} />
                     </DetailsColumn>
                 )}
             </div>

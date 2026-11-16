@@ -119,6 +119,12 @@ describe('the level each action asks of the Box', () => {
         expect(engine.createSkill).not.toHaveBeenCalled()
     })
 
+    it('says a coworker\'s routines could not be read, rather than that it has none', async () => {
+        mocks.getAgentChatTarget.mockRejectedValue(new Error('engine unreachable'))
+
+        await expect(actions.listAgentRoutinesAction(AGENT)).resolves.toBeNull()
+    })
+
     it('hands the session actor to a move and a duplicate, which check both Boxes', async () => {
         const agentId = '11111111-1111-4111-8111-111111111111'
         const spaceId = '22222222-2222-4222-8222-222222222222'

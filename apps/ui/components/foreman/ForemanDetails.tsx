@@ -12,7 +12,7 @@ import { foremanOrbState, selectForemanOpen, useForemanStore } from '@/stores/fo
  * The Chief of Staff's column beside its chat in the Simple view, the place a coworker's card has: who
  * it is, then every routine of the workspace.
  */
-export function ForemanDetails({ onClose }: { onClose: () => void }) {
+export function ForemanDetails({ shown, onClose }: { shown: boolean; onClose: () => void }) {
     const t = useTranslations('workspaceView.foreman')
     const tCard = useTranslations('agent.agentCard')
     const open = useForemanStore(selectForemanOpen)
@@ -31,7 +31,7 @@ export function ForemanDetails({ onClose }: { onClose: () => void }) {
                 <span className="text-xs text-muted-foreground">{t('line')}</span>
             </div>
             <h3 className="shrink-0 px-4 pt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">{tCard('destinations.scheduled')}</h3>
-            <ForemanRoutines docked={false} className="min-h-0 flex-1" />
+            <ForemanRoutines docked={false} active={shown} className="min-h-0 flex-1" />
         </div>
     )
 }

@@ -578,14 +578,15 @@ export async function listWorkspaceRoutinesAction(): Promise<WorkspaceRoutines> 
     return { routines: perAgent.flatMap(result => (result.status === 'fulfilled' ? result.value : [])).sort(byNextRun), canRename: await canRename }
 }
 
-// One coworker's routines, read the way the workspace's list reads them.
-export async function listAgentRoutinesAction(agentId: string): Promise<WorkspaceRoutines> {
+// One coworker's routines, read the way the workspace's list reads them. Null when they could not be
+// read, which is not a coworker without any: the list on screen stays.
+export async function listAgentRoutinesAction(agentId: string): Promise<WorkspaceRoutines | null> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId)
         const [routines, canRename] = await Promise.all([routinesOf(conn, agentId, engineAgentId, new Date()), supportsScheduleRename(conn)])
         return { routines: routines.sort(byNextRun), canRename }
     } catch {
-        return { routines: [], canRename: false }
+        return null
     }
 }
 

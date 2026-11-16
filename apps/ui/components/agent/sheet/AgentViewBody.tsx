@@ -60,6 +60,7 @@ export function AgentViewBody({ agent, tab, onOpenSession }: AgentViewBodyProps)
         case 'scheduled':
             return (
                 <AgentPanelScheduled
+                    key={agent.id}
                     agentId={agent.id}
                     agentName={agent.name}
                     onOpenSession={onOpenSession}

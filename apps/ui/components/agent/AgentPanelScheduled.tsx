@@ -83,11 +83,15 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     const stepKey = view.mode === 'edit' || view.mode === 'runs' ? `${view.mode}:${view.slug}` : view.mode
     const stepDepth = view.mode === 'list' ? 0 : view.mode === 'runs' ? 2 : 1
     const backToList = () => setView({ mode: 'list' })
+    const backToSavedList = () => {
+        list.reload()
+        backToList()
+    }
 
     if (view.mode === 'create') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <ScheduleEditor agentId={agentId} agentName={agentName} onDone={backToList} onBack={backToList} />
+                <ScheduleEditor agentId={agentId} agentName={agentName} onDone={backToSavedList} onBack={backToList} />
             </PanelSteps>
         )
     }
@@ -95,7 +99,7 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     if (view.mode === 'edit') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <ScheduleEditor agentId={agentId} agentName={agentName} slug={view.slug} onDone={backToList} onBack={backToList} onShowHistory={() => setView({ mode: 'runs', slug: view.slug })} onOpenSession={onOpenSession} />
+                <ScheduleEditor agentId={agentId} agentName={agentName} slug={view.slug} onDone={backToSavedList} onBack={backToList} onShowHistory={() => setView({ mode: 'runs', slug: view.slug })} onOpenSession={onOpenSession} />
             </PanelSteps>
         )
     }

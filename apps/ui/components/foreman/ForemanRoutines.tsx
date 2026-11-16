@@ -33,10 +33,11 @@ function openRun(routine: WorkspaceRoutine, sessionId: string, runId: string) {
     leaveForTheBoard()
 }
 
-export function ForemanRoutines({ docked, className }: { docked: boolean; className?: string }) {
+// `active`: false while the list is mounted out of sight, so it reads nothing until it shows again.
+export function ForemanRoutines({ docked, active = true, className }: { docked: boolean; active?: boolean; className?: string }) {
     const t = useTranslations('foreman.routines')
     const agents = useBoardStore(state => state.agents)
-    const list = useRoutines({ load: listWorkspaceRoutinesAction, onRunStarted: openRun })
+    const list = useRoutines({ load: listWorkspaceRoutinesAction, enabled: active, onRunStarted: openRun })
 
     if (!list.routines) {
         return <RoutinesSkeleton className={className} />

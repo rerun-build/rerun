@@ -37,7 +37,8 @@
     },
     "foreman": {
         "name": "Chief of Staff",
-        "line": "Pergunte qualquer coisa"
+        "line": "Pergunte qualquer coisa",
+        "card": "Ficha do Chief of Staff"
     },
     "details": {
         "label": "Ficha de {name}"

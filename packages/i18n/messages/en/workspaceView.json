@@ -13,6 +13,7 @@
         "line.asleepAbout": "Status line under a coworker's name: its machine is off, {about} is its description.",
         "line.waiting": "Line under a coworker's name in the list, when it waits on the person and its conversation has no title.",
         "foreman.line": "Line under the Chief of Staff's name at the top of the list of coworkers: it invites the person to ask it anything.",
+        "foreman.card": "Tooltip and accessible name of the button at the end of the Chief of Staff's chat bar that opens the column beside it (its name and the workspace's routines). The same button opens a coworker's card: keep the wording of chat.card.",
         "line.you": "Line under a coworker's name: the last message of its latest conversation, written by the person reading. {message} is that message, cut to one line.",
         "details.close": "Accessible name of the veil behind the coworker's card when it lies over the chat on a narrow window: clicking it closes the card.",
         "details.label": "Accessible name of the column showing a coworker's card. {name} is the coworker's name.",
