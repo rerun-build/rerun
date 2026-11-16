@@ -295,8 +295,10 @@
     37.5% { transform: scaleY(0.08); }
 }
 
-.iso-buddy-eyes[data-blink] {
-    animation: iso-buddy-blink 0.368s ease-in-out;
+@media (prefers-reduced-motion: no-preference) {
+    .iso-buddy-eyes[data-blink] {
+        animation: iso-buddy-blink 0.368s ease-in-out;
+    }
 }
 
 /* A buddy standing alone in a page looks around: its lids fall like every other buddy's, and its
@@ -310,8 +312,10 @@
     82%, 100% { transform: translate(0, 0); }
 }
 
-[data-buddy-alive] .iso-buddy-lids[data-blink] {
-    animation: iso-buddy-blink 0.368s ease-in-out;
+@media (prefers-reduced-motion: no-preference) {
+    [data-buddy-alive] .iso-buddy-lids[data-blink] {
+        animation: iso-buddy-blink 0.368s ease-in-out;
+    }
 }
 
 [data-buddy-alive] .iso-buddy-pupils {

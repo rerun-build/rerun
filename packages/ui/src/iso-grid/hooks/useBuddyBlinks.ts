@@ -24,8 +24,17 @@ const mod = (value: number, by: number) => ((value % by) + by) % by
 // How long until the blink of a face whose cycle is shifted by `delayMs` (negative, like the CSS
 // animation-delay it replaces) starts, from `now`. 0 when it should be blinking right now.
 export function msUntilBlink(now: number, delayMs: number): number {
-    const sinceBlinkStart = mod(now - delayMs - BLINK_START_MS, BLINK_PERIOD_MS)
-    return sinceBlinkStart < LATE_MS ? 0 : BLINK_PERIOD_MS - sinceBlinkStart
+    return msSinceBlinkStart(now, delayMs) < LATE_MS ? 0 : msUntilNextBlink(now, delayMs)
+}
+
+// How long until that face's next blink starts, even while one is under way: never 0. The timer aims
+// at it, so a tick that fired late does not push the following one later still.
+export function msUntilNextBlink(now: number, delayMs: number): number {
+    return BLINK_PERIOD_MS - msSinceBlinkStart(now, delayMs)
+}
+
+function msSinceBlinkStart(now: number, delayMs: number): number {
+    return mod(now - delayMs - BLINK_START_MS, BLINK_PERIOD_MS)
 }
 
 function delayOf(face: Element): number {
@@ -50,12 +59,9 @@ function tick() {
     const unattended = document.documentElement.hasAttribute(PAGE_UNATTENDED_ATTRIBUTE)
     let next = BLINK_PERIOD_MS
     for (const face of document.querySelectorAll(FACES)) {
-        const wait = msUntilBlink(now, delayOf(face))
-        if (wait === 0) {
-            if (!unattended && !face.closest(SKIPPED)) blink(face)
-            continue
-        }
-        next = Math.min(next, wait)
+        const delayMs = delayOf(face)
+        if (msUntilBlink(now, delayMs) === 0 && !unattended && !face.closest(SKIPPED)) blink(face)
+        next = Math.min(next, msUntilNextBlink(now, delayMs))
     }
     timer = setTimeout(tick, Math.max(next, 16))
 }

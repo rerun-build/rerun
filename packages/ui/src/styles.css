@@ -42,8 +42,10 @@
 /* Page que personne ne regarde (fenêtre sans le focus, cachée, réduite, onglet en arrière-plan,
    voir PAGE_UNATTENDED_ATTRIBUTE) : toute animation se fige sur sa frame courante et repart de là.
    Sans ça, une seule animation infinie fait produire au navigateur une image par rafraîchissement
-   d'écran, même fenêtre cachée dans l'app desktop. */
-html[data-unattended] *,
+   d'écran, même fenêtre cachée dans l'app desktop. Les entrées et sorties (animate-in, animate-out)
+   continuent : figées, un dialog ouvert sans le focus resterait invisible et un élément fermé resterait
+   monté. */
+html[data-unattended] *:not([class*="animate-in"]):not([class*="animate-out"]),
 html[data-unattended] *::before,
 html[data-unattended] *::after {
     animation-play-state: paused !important;
@@ -161,6 +163,9 @@ html:not(.dark) .badge-beam--yellow { --badge-fg: #a16207; --badge-soft: color-m
 .border-beam--spin {
     background: none;
     container-type: size;
+    /* Le carré qui tourne déborde de la boîte : sans ça il agrandit la zone défilable du conteneur
+       autour (`container-type` ne contient plus le layout depuis Chrome 129). */
+    contain: layout;
 }
 
 .border-beam--spin::before {
