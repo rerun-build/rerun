@@ -72,19 +72,21 @@ class States(unittest.TestCase):
         text = read("packages", "contracts", "src", "factory-snapshot.ts")
         block = re.search(r"factoryJobStateSchema = z\.enum\(\[([\s\S]*?)\]\)", text)
         self.assertIsNotNone(block)
-        self.assertEqual(list(states.NAMES), re.findall(r"'([a-z_]+)'", block.group(1)))
+        known = re.findall(r"'([a-z_]+)'", block.group(1))
+        self.assertEqual([n for n in states.NAMES if n not in states.APP_STATE], known)
+        self.assertTrue(set(states.APP_STATE.values()) <= set(known))
 
     def test_every_state_has_a_screen_entry(self):
         text = read("apps", "ui", "components", "factory", "factory-state.ts")
         block = re.search(r"JOB_STATE_VIEW[^=]*=\s*\{([\s\S]*?)\n\}", text)
         self.assertIsNotNone(block)
         keys = re.findall(r"^    ([a-z_]+): \{", block.group(1), re.M)
-        self.assertEqual(sorted(keys), sorted(states.NAMES))
+        self.assertEqual(sorted(keys), sorted(n for n in states.NAMES if n not in states.APP_STATE))
 
     def test_derived_lists(self):
         self.assertEqual(states.RUNNING, ("building", "reviewing", "fixing", "proving"))
-        self.assertEqual(states.END, ("merged", "rejected", "blocked", "failed", "returned", "superseded"))
-        self.assertEqual(states.PROBLEM, ("rejected", "blocked", "failed", "returned"))
+        self.assertEqual(states.END, ("merged", "rejected", "blocked", "failed", "returned", "superseded", "unsolvable"))
+        self.assertEqual(states.PROBLEM, ("rejected", "blocked", "failed", "returned", "unsolvable"))
 
 
 if __name__ == "__main__":

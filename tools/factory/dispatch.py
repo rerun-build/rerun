@@ -13,6 +13,7 @@ import holds
 import planners
 import planning
 import pools
+import problems
 import proof
 import refresh
 import renewal
@@ -260,6 +261,28 @@ def fix_brief(j, pr, review):
     ])
 
 
+def senior_brief(j, pr, review):
+    return "\n".join([
+        'The senior fix round, sent by the dispatcher and not by Boss: pull request #%s of rerun (job #%s). This job failed twice with another builder, and this round is its last. You work alone: call no other coworker and send no question to Rob.' % (pr, j["issue"]),
+        '',
+        'What each station found so far, oldest first:',
+        *['- ' + f for f in j.get("found") or []],
+        '',
+        'The end of the last report:',
+        '',
+        str(review)[-1500:],
+        '',
+        'In your open worktree for this job, first run the Run lines of the issue (%s) and read what fails. Then fix all of the findings above in one change: add or adjust the tests, run the test files you touched and the Run lines again, commit and push to the same branch. No second pull request.' % issue_run(j.get("body")),
+        NO_COMMENTS,
+        'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
+        '',
+        'If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>.',
+        '',
+        final_state(j, '`PUSHED: <first 7 characters of the new commit>` or `BLOCKED: <one sentence>`'),
+        TAIL,
+    ])
+
+
 def problem_brief(repo, key, p):
     return "\n".join([
         briefs.resolver_brief(repo, key, p),
@@ -334,7 +357,7 @@ def dead_comment(dead):
 
 
 failures.SOURCES.update(building=(first_brief, build_brief, final_state), reviewing=(review_brief, final_state),
-                        proving=(proof_brief, final_state), fixing=(fix_brief, final_state), returned=(replan_brief,))
+                        proving=(proof_brief, final_state), fixing=(fix_brief, senior_brief, final_state), returned=(replan_brief,))
 
 
 def checks_verdict(runs):
@@ -585,13 +608,10 @@ class Dispatcher:
                     takes = 1
                 else:
                     takes = before + 1 if old["state"] in END else before
+                if old and old["state"] == "unsolvable" and (old.get("body") or "") == (i.get("body") or ""):
+                    continue
                 if old and old["state"] in END and takes > MAX_TAKES:
-                    if self.store.get_all(str(i["number"])).get("take_cap") != str(before):
-                        self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
-                                 "The factory dispatcher does not take this issue again: it was taken %d times with this text. "
-                                 "A change to the issue text resets the count; then put the factory label back. Or close the issue." % before])
-                        self.store.set(str(i["number"]), "take_cap", str(before))
-                        log(i["number"], "not started: taken %d times with this text" % before)
+                    self.unsolvable(old, "taken %d times with this text" % before)
                     continue
                 errors = shape.get(i["number"]) or []
                 if errors:
@@ -796,14 +816,14 @@ class Dispatcher:
         j.pop("run_model", None)
         station = STATION_OF.get(state)
         try:
-            tier = tiers.tier_for(station, tiers.size_of(j.get("body")), self.cfg.get("tiers"))
+            tier = "senior" if station == "fix" and j.get("level") else tiers.tier_for(station, tiers.size_of(j.get("body")), self.cfg.get("tiers"))
             run_model = tiers.model_for(station, tier, self.cfg.get("tier_models"))
         except ValueError as e:
             log(j["issue"], "no tier written: %s" % e)
             return
         if tier is not None:
             j["tier"] = tier
-        if run_model is not None and not self.tiers_off:
+        if run_model is not None and (not self.tiers_off or tier == "senior"):
             j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
@@ -842,7 +862,7 @@ class Dispatcher:
             return review_brief(j, j["pr"], j["head"])
         if j["state"] == "proving":
             return proof_brief(j, j["pr"], j["head"], j["asks"])
-        return fix_brief(j, j["pr"], j["review"])
+        return (senior_brief if j.get("level") and not j.get("same_round") else fix_brief)(j, j["pr"], j["review"])
 
     def finished_run(self, j):
         r = self.account("get_run", {"agentId": j["agent"], "runId": j["run"]})
@@ -1037,7 +1057,9 @@ class Dispatcher:
             if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
             elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
-                self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False)
+                self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + verdict[:300]])
+            elif re.match(r"VERDICT:\s*REJECT", verdict) and not j.get("level"):
+                self.senior(j, "review rejected: " + verdict[:300], out[-1500:])
             elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif stale:
@@ -1077,7 +1099,7 @@ class Dispatcher:
                 self.to(j, "checks", "proved at %s" % j["head"][:7], proved=j["head"], checks_since=self.now())
             elif kind == "fail" and j["round"] == 1:
                 self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]),
-                        same_round=False)
+                        same_round=False, found=j.get("found", []) + ["proof failed: " + why[:300]])
             elif kind == "none" and j.get("not_met") and not final_line(out, ("PROOF:",)):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif kind == "none":
@@ -1086,6 +1108,8 @@ class Dispatcher:
                     self.end(j, "blocked", again)
                 else:
                     self.to(j, "proof_wait", again, proof_asked=1)
+            elif kind == "fail" and not j.get("level"):
+                self.senior(j, "proof failed: " + why[:300], "The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
             else:
                 self.end(j, "rejected", "proof: " + why[:190])
 
@@ -1187,7 +1211,31 @@ class Dispatcher:
         return hits[-1] if hits else None
 
     def end(self, j, state, reason, **extra):
+        if state == "returned" and j.get("replans", 0) >= MAX_REPLANS and clocks.klass("BLOCKED", blocked=reason) == "plan":
+            state = "unsolvable"
+            extra.update(commented=False, relabelled=False)
         self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None, ended_at=ledger_store.now(), **extra)
+
+    def senior(self, j, line, review):
+        self.to(j, "fix_wait", digest.SENIOR + line[:160], level=1, round=1, review=review, same_round=False,
+                found=j.get("found", []) + [line])
+
+    def unsolvable(self, j, why):
+        self.end(j, "unsolvable", why, commented=False, relabelled=False)
+
+    def verdict(self, j):
+        n = str(j["issue"])
+        moves = [t["to_state"] for t in self.store.transitions_of(n) if t["from_state"] != t["to_state"]]
+        last = dict(self.store.db.execute("SELECT station, reason FROM failures WHERE job=? ORDER BY id", (n,)).fetchall())
+        return "\n".join([
+            "The factory dispatcher ended this job as unsolvable: %s." % (j.get("reason") or "-"),
+            "It had %d builds, %d fix rounds, %d reviews, %d proofs, %d takes and %d re-plans." % (
+                moves.count("building"), moves.count("fixing"), moves.count("reviewing"), moves.count("proving"),
+                j.get("take") or 1, j.get("replans", 0)),
+            *(["The last reason of each station that stopped it:"] + ["- %s: %s" % (s or "-", r) for s, r in last.items()] if last else []),
+            "",
+            "The factory could not resolve this. It is not sent again unless the issue text changes and the factory label is put back.",
+        ])
 
     def report(self, j):
         n = str(j["issue"])
@@ -1199,6 +1247,8 @@ class Dispatcher:
                 text = "The factory dispatcher stopped this job: returned to the planner. Pull request: %s. Reason: %s" % (pr, j.get("reason") or "-")
             elif j["state"] == "superseded":
                 text = "The factory dispatcher closed this issue: the Run lines pass on today's dev, so the work was already done by %s." % j.get("done_by")
+            elif j["state"] == "unsolvable":
+                text = self.verdict(j)
             else:
                 text = "The factory dispatcher stopped this job: %s. Pull request: %s. Reason: %s" % (j["state"], pr, j.get("reason") or "-")
             if j["state"] == "superseded":
@@ -1208,8 +1258,9 @@ class Dispatcher:
             j["commented"] = True
             self.save(j, "commented")
         if not j.get("relabelled"):
-            done = "factory-done" if j["state"] in ("merged", "superseded") else "factory-blocked"
-            self.gh(["issue", "edit", n, "-R", self.repo, "--remove-label", self.label, "--add-label", done])
+            done = "factory-done" if j["state"] in ("merged", "superseded") else "factory-unsolvable" if j["state"] == "unsolvable" else "factory-blocked"
+            off = ["--remove-label", "factory-blocked"] if done == "factory-unsolvable" else []
+            self.gh(["issue", "edit", n, "-R", self.repo, "--remove-label", self.label, *off, "--add-label", done])
             j["relabelled"] = True
             self.save(j, "relabelled")
             log(n, "reported, labelled " + done)
@@ -1338,11 +1389,19 @@ class Dispatcher:
         known = set(self.resolver.records(self, closed=True))
         try:
             self.resolver.beat(self, heard, self.beat_line)
+            self.spent()
         except Exception as e:
             log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.note_problems(known)
         self.report_line()
         self.beat_end(clean)
+
+    def spent(self):
+        for key, r in self.resolver.records(self).items():
+            m = re.fullmatch(r"ended #(\d+)", key)
+            j = self.store.get_job(m.group(1)) if m and r.get("state") == resolver.OWNER else None
+            if j and j["state"] in problems.ENDED:
+                self.unsolvable(j, "the resolver's attempts on problem %s are spent: %s" % (key, r.get("line") or "-"))
 
     def note_problems(self, known):
         try:
