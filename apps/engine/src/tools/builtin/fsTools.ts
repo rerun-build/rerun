@@ -15,11 +15,24 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
     const rootOf = async (input: Record<string, unknown>) => (typeof rootDir === 'string' ? rootDir : rootDir(input))
     return {
         [`${prefix}_read`]: tool({
-            description: `Read a UTF-8 file from the ${label}.`,
-            inputSchema: z.object({ ...scope, path: z.string().describe('Path relative to the root') }),
+            description: `Read a UTF-8 file from the ${label}. Pass startLine and endLine (1-based, inclusive) to read an exact line range.`,
+            inputSchema: z.object({
+                ...scope,
+                path: z.string().describe('Path relative to the root'),
+                startLine: z.number().int().min(1).optional().describe('First line to return, 1-based'),
+                endLine: z.number().int().min(1).optional().describe('Last line to return, inclusive'),
+            }),
             execute: async input => {
                 const content = await store.readText(await rootOf(input), input.path)
-                return content.slice(0, 100_000)
+                if (input.startLine === undefined && input.endLine === undefined) return content.slice(0, 100_000)
+                const lines = content.split('\n')
+                if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop()
+                const total = lines.length
+                const start = input.startLine ?? 1
+                if (start > total) return `startLine ${start} is past the end of ${input.path} (${total} lines)`
+                const end = Math.min(input.endLine ?? total, total)
+                if (end < start) return `endLine ${end} is before startLine ${start}`
+                return [`lines ${start}-${end} of ${total}`, ...lines.slice(start - 1, end)].join('\n')
             },
         }),
         [`${prefix}_write`]: tool({
