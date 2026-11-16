@@ -162,6 +162,8 @@ RETRIES = 1
 
 def failure(attempts, cfg=None, tail=""):
     n = (_runner_cfg() if cfg is None else cfg).get("retries", RETRIES)
+    if not isinstance(n, int) or isinstance(n, bool) or n < 0:
+        n = RETRIES
     if attempts < n:
         return "RETRY", tail
     return "NEEDS_BOSS", "failed after %d attempt(s), retries %d: %s" % (attempts + 1, n, (tail or "-")[-200:])
