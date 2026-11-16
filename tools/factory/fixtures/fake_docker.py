@@ -17,8 +17,10 @@ def env_key():
 def http(st, args, bearer):
     url = next((a for a in args if a.startswith("http://")), "")
     if url == "http://localhost:3000/health":
-        return "200"
+        return "000" if st.get("engine_silent") else "200"
     if url == "http://localhost:3000/agents":
+        if st.get("engine_silent"):
+            return "000"
         open_ = st["engine_open"] or not st["engine_key"]
         return "200" if open_ or bearer == st["engine_key"] else "401"
     if url == "http://app:3000/api/hub":
