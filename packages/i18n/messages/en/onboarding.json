@@ -23,6 +23,27 @@
         "hint": "Up to {max} addresses. You can invite more from Members later.",
         "failed": "We could not save that. Try again."
     },
+    "trial": {
+        "title": "Start your trial",
+        "description": "Your team works on a machine of its own, which the trial opens."
+    },
+    "claiming": {
+        "title": "Setting up your workspace",
+        "description": "Your machine is starting.",
+        "waitTitle": "Your machine is on its way",
+        "waitDescription": "Every machine is taken right now. Your plan is on, and this moves on by itself as soon as one frees up.",
+        "noServer": "This workspace has no server of its own yet. Add one from Servers, then come back.",
+        "openServers": "Open Servers"
+    },
+    "installing": {
+        "title": "Installing what you opened",
+        "description": "It lands on your board in a moment.",
+        "purchaseTitle": "Get {title}",
+        "purchaseDescription": "This template is paid. Buy it once and it installs on your board.",
+        "buy": "Buy and install",
+        "failed": "The install did not go through: {error}",
+        "retry": "Try again"
+    },
     "loadFailed": {
         "title": "We could not load your setup",
         "description": "Check your connection, then try again.",

@@ -19,6 +19,27 @@
         "hint": "Bis zu {max} Adressen. Weitere kannst du später unter Mitglieder einladen.",
         "failed": "Das konnte nicht gespeichert werden. Versuche es erneut."
     },
+    "trial": {
+        "title": "Starte deine Testphase",
+        "description": "Dein Team arbeitet auf einer eigenen Maschine, die die Testphase freischaltet."
+    },
+    "claiming": {
+        "title": "Dein Workspace wird eingerichtet",
+        "description": "Deine Maschine startet.",
+        "waitTitle": "Deine Maschine ist unterwegs",
+        "waitDescription": "Gerade sind alle Maschinen belegt. Dein Plan ist aktiv, und es geht von selbst weiter, sobald eine frei wird.",
+        "noServer": "Dieser Workspace hat noch keinen eigenen Server. Füge unter Server einen hinzu und komm dann zurück.",
+        "openServers": "Server öffnen"
+    },
+    "installing": {
+        "title": "Was du geöffnet hast, wird installiert",
+        "description": "Es landet gleich auf deinem Board.",
+        "purchaseTitle": "{title} holen",
+        "purchaseDescription": "Dieses Template ist kostenpflichtig. Kauf es einmal, dann wird es auf deinem Board installiert.",
+        "buy": "Kaufen und installieren",
+        "failed": "Die Installation hat nicht geklappt: {error}",
+        "retry": "Erneut versuchen"
+    },
     "loadFailed": {
         "title": "Deine Einrichtung konnte nicht geladen werden",
         "description": "Prüfe deine Verbindung und versuche es erneut.",

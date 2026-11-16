@@ -1,6 +1,10 @@
 'use server'
 
 import { actorFromContext, isAdminActor } from '@/app/api/_auth/access'
+import { ensureWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
+import { installArrival, type InstallArrivalOutcome } from '@/lib/onboarding/install-arrival'
+import { isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { mergeForeman, readAnswers } from '@/lib/foreman/profile'
 import { onboardingReleasedAt } from '@/lib/onboarding/facts'
@@ -43,4 +47,28 @@ export async function saveOnboardingInvitesAction(emails: string[]): Promise<{ o
     const pendingInvites = kept.filter(email => email !== own).map(email => ({ email, invitedBy: ctx.userId }))
     await mergeForeman(ctx, { pendingInvites, inviteAt: new Date().toISOString() })
     return { ok: true }
+}
+
+export type ClaimOutcome = { status: 'claimed' } | { status: 'no_machine' } | { status: 'no_server' } | { status: 'refused' }
+
+/**
+ * Takes the workspace's box once its plan is on: from the pool on Rerun Cloud, the compose engine on
+ * a self-hosted install. An empty pool is waited out, asked again by the step; a second self-hosted
+ * workspace has no engine of its own to take.
+ */
+export async function claimOnboardingEngineAction(): Promise<ClaimOutcome> {
+    const ctx = await requireWorkspaceContext()
+    if (!isAdminActor(actorFromContext(ctx)) || !isSubscriptionEntitled(ctx.workspace.subscription_status)) return { status: 'refused' }
+    const claimed = await ensureWorkspaceEngine(ctx.workspace.id).catch(err => ({ ok: false as const, error: err instanceof Error ? err.message : String(err) }))
+    if (claimed.ok) return { status: 'claimed' }
+    if (!RERUN_CLOUD) return { status: 'no_server' }
+    console.error(`[onboarding] no machine for workspace ${ctx.workspace.id}, which is on its plan:`, claimed.error)
+    return { status: 'no_machine' }
+}
+
+/** Installs the template or the shared coworker the workspace arrived on, once its box is there. */
+export async function installOnboardingArrivalAction(): Promise<InstallArrivalOutcome> {
+    const ctx = await requireWorkspaceContext()
+    if (!isAdminActor(actorFromContext(ctx))) return { status: 'failed', error: 'Only an admin can install.' }
+    return installArrival(ctx)
 }

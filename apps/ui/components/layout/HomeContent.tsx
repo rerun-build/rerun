@@ -459,8 +459,8 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
             {/* Le mur de capacité : même mécanique, pour un compte créé alors que le pool d'engines
                 est vide. Il tombe tout seul au chargement suivant où une machine est disponible. */}
             <EngineWaitlistDialog open={foremanWaitlisted && !isAnonymous && !onboardingHoldsTheScreen} />
-            {onboarding.state && onboardingDialogOpen(onboarding.state) && <OnboardingDialog state={onboarding.state} failed={onboarding.failed} reload={onboarding.reload} />}
-            <PostPaymentDialog open={postPaymentOpen} onOpenChange={setPostPaymentOpen} />
+            {onboarding.state && onboardingDialogOpen(onboarding.state, onboarding.checkoutOpen) && <OnboardingDialog state={onboarding.state} failed={onboarding.failed} reload={onboarding.reload} />}
+            <PostPaymentDialog open={postPaymentOpen && !onboardingHoldsTheScreen} onOpenChange={setPostPaymentOpen} />
             {purchase && <TemplatePurchaseSuccessDialog slug={purchase.slug} sessionId={purchase.sessionId} onOpenChange={open => !open && useTemplateFlowStore.getState().closePurchase()} />}
             {templateLinkSlug && <TemplateDeepLinkDialog slug={templateLinkSlug} />}
             {shareLinkToken && <AgentShareDeepLinkDialog token={shareLinkToken} />}

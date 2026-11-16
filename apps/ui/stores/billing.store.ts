@@ -5,6 +5,10 @@ import type { AddonKey } from '@rerun/cloud/billing'
 // value is the one `paywall_viewed` has always carried for this gate, so its series stays whole.
 export const AGENT_LIMIT_TRIGGER = 'entitlement_gate'
 
+// The trial step of the onboarding dialog: once it starts, the checkout gets out of the way, its
+// success screen has nothing to offer that the onboarding does not do next.
+export const ONBOARDING_TRIGGER = 'onboarding'
+
 // A paywall opened from a coworker that stopped: the checkout names it, and `onPaid` lets the chat
 // pick the stopped task back up once the plan is paid.
 export type BillingUpgrade = { coworker?: string; onPaid?: () => void }

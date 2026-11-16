@@ -71,16 +71,13 @@ function chosenTemplatePlan(message: UIMessage): ReturnType<typeof templateCardP
 }
 
 // The plan a ready-made link is written down as, and for a template the card it is shown on.
-type ArrivedPlan = { shown: { items: unknown[]; boxes: { name: string }[] }; template?: TemplateCard }
+export type ArrivedPlan = { shown: { items: unknown[]; boxes: { name: string }[] }; template?: TemplateCard }
 
-// Someone who arrived on a template or on a shared coworker already chose it by clicking the link,
-// and its own setup asks the rest once it is installed: asking them to pick it again was one more
-// card and one more model turn before the trial. It lands in the first Box of their board, the one
-// the board centres on. A link that no longer resolves has no title and is left to the model.
-function arrivedReadyMadePlan(state: ForemanState, messages: UIMessage[]): ArrivedPlan | null {
-    const last = messages.at(-1)
+// A template or a shared coworker the server could name, laid in the first Box of their board, the
+// one the board centres on. A link that no longer resolves has no title, and no plan.
+export function readyMadePlanOf(state: ForemanState): ArrivedPlan | null {
     const intent = state.intent
-    if (state.phase !== 'plan' || !intent || !isNamedReadyMade(intent) || !last || !isKickoff(last)) return null
+    if (!intent || !isNamedReadyMade(intent)) return null
     const pinned = pinnedPlanBoxes(state)
     const boxes = pinned.map(name => ({ name }))
     if (intent.kind === 'share') return { shown: { items: [{ kind: 'share', token: intent.token, name: intent.title, box: pinned[0] }], boxes } }
@@ -88,6 +85,15 @@ function arrivedReadyMadePlan(state: ForemanState, messages: UIMessage[]): Arriv
     const template: TemplateCard = { templates: [{ slug: intent.slug, title: intent.title, why: '' }], box: pinned[0], boxes }
     const shown = templateCardPlan(template)
     return shown ? { shown, template } : null
+}
+
+// Someone who arrived on a template or on a shared coworker already chose it by clicking the link,
+// and its own setup asks the rest once it is installed: asking them to pick it again was one more
+// card and one more model turn before the trial. A link that no longer resolves is left to the model.
+function arrivedReadyMadePlan(state: ForemanState, messages: UIMessage[]): ArrivedPlan | null {
+    const last = messages.at(-1)
+    if (state.phase !== 'plan' || !last || !isKickoff(last)) return null
+    return readyMadePlanOf(state)
 }
 
 // What the starter pack step does with this request. Someone who came in with nothing in hand is

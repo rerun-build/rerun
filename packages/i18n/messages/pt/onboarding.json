@@ -19,6 +19,27 @@
         "hint": "Até {max} endereços. Você pode convidar mais pessoas em Membros.",
         "failed": "Não foi possível salvar. Tente de novo."
     },
+    "trial": {
+        "title": "Comece seu teste",
+        "description": "Sua equipe trabalha em uma máquina própria, que o teste libera."
+    },
+    "claiming": {
+        "title": "Preparando seu workspace",
+        "description": "Sua máquina está iniciando.",
+        "waitTitle": "Sua máquina está a caminho",
+        "waitDescription": "Todas as máquinas estão ocupadas agora. Seu plano está ativo, e isto continua sozinho assim que uma for liberada.",
+        "noServer": "Este workspace ainda não tem um servidor próprio. Adicione um em Servidores e volte.",
+        "openServers": "Abrir Servidores"
+    },
+    "installing": {
+        "title": "Instalando o que você abriu",
+        "description": "Ele chega ao seu board em instantes.",
+        "purchaseTitle": "Obter {title}",
+        "purchaseDescription": "Este template é pago. Compre uma vez e ele é instalado no seu board.",
+        "buy": "Comprar e instalar",
+        "failed": "A instalação não foi concluída: {error}",
+        "retry": "Tentar de novo"
+    },
     "loadFailed": {
         "title": "Não foi possível carregar sua configuração",
         "description": "Verifique sua conexão e tente de novo.",

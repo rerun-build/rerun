@@ -6,7 +6,9 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react'
 
 import { decideIndustryAction, saveForemanIntakeAction } from '@/app/api/_actions/foreman-intake.actions'
-import { saveOnboardingInvitesAction } from '@/app/api/_actions/onboarding-dialog.actions'
+import { claimOnboardingEngineAction, installOnboardingArrivalAction, saveOnboardingInvitesAction, type ClaimOutcome } from '@/app/api/_actions/onboarding-dialog.actions'
+import { ServersDialog } from '@/components/dialogs/ServersDialog'
+import { Progress } from '@/components/ui/progress'
 import { InviteEmailsField } from '@/components/dialogs/InviteEmailsField'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
@@ -19,18 +21,24 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { accountLabel } from '@/lib/auth/placeholder-email'
-import { ClockIcon, GlobeIcon, LayersIcon, PhoneIcon, UsersIcon } from '@/lib/icons'
+import { ClockIcon, CreditCardIcon, DownloadIcon, GlobeIcon, LayersIcon, PhoneIcon, ServerIcon, UsersIcon } from '@/lib/icons'
 import { intakePreviewPlan, rolesForIndustry, type ForemanIntake } from '@/lib/onboarding/intake'
+import { ONBOARDING_TRIGGER, useBillingStore } from '@/stores/billing.store'
 import { useForemanStore } from '@/stores/foreman.store'
+import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { startTemplateCheckoutAction } from '@rerun/cloud/marketplace.client'
 import { PhoneVerificationStep } from '@rerun/cloud/phone.client'
+import { SERVERS_ENABLED } from '@rerun/cloud/servers'
 import { StepSwap } from './StepSwap'
 
 // The steps this dialog draws. The others close it until the pull request that brings them.
-const DRAWN_STEPS: ReadonlySet<OnboardingStep> = new Set(['profile', 'phone', 'invite', 'waitlist'])
+const DRAWN_STEPS: ReadonlySet<OnboardingStep> = new Set(['profile', 'phone', 'invite', 'waitlist', 'trial', 'claiming', 'installing'])
 
-export function onboardingDialogOpen(state: OnboardingState | null): boolean {
-    return !!state?.dialog && DRAWN_STEPS.has(state.step)
+// The trial is today's checkout, unchanged: the dialog gives way to it while it is open.
+export function onboardingDialogOpen(state: OnboardingState | null, checkoutOpen: boolean): boolean {
+    if (!state?.dialog || !DRAWN_STEPS.has(state.step)) return false
+    return !(state.step === 'trial' && checkoutOpen)
 }
 
 type IconGlyph = ComponentType<{ className?: string }>
@@ -161,6 +169,164 @@ function useInviteStep({ reload }: { reload: () => Promise<void> }): StepView {
     }
 }
 
+// Back from a trial checkout closed before the trial started: it opens again from here.
+function useTrialStep(): StepView {
+    const t = useTranslations('onboarding')
+    return {
+        key: 'trial',
+        icon: CreditCardIcon,
+        title: t('trial.title'),
+        description: t('trial.description'),
+        body: null,
+        footer: (
+            <DialogFooter>
+                <SignOutButton />
+                <Button type="button" onClick={() => useBillingStore.getState().openBilling(undefined, ONBOARDING_TRIGGER)} data-onboarding="continue">
+                    {t('footer.continue')}
+                </Button>
+            </DialogFooter>
+        ),
+    }
+}
+
+// An empty pool is asked again this often, and the step moves on by itself once a machine frees up.
+const CLAIM_RETRY_MS = 30_000
+
+function useClaimingStep(active: boolean, reload: () => Promise<void>): StepView {
+    const t = useTranslations('onboarding')
+    const [outcome, setOutcome] = useState<ClaimOutcome | null>(null)
+    const [serversOpen, setServersOpen] = useState(false)
+    const [attempt, setAttempt] = useState(0)
+
+    useEffect(() => {
+        if (!active) return
+        let cancelled = false
+        void claimOnboardingEngineAction()
+            .catch((): ClaimOutcome => ({ status: 'no_machine' }))
+            .then(async result => {
+                if (cancelled) return
+                setOutcome(result)
+                if (result.status === 'claimed' || result.status === 'refused') await reload()
+            })
+        return () => {
+            cancelled = true
+        }
+    }, [active, attempt, reload])
+
+    useEffect(() => {
+        if (!active || outcome?.status !== 'no_machine') return
+        const timer = setTimeout(() => setAttempt(count => count + 1), CLAIM_RETRY_MS)
+        return () => clearTimeout(timer)
+    }, [active, outcome])
+
+    if (outcome?.status === 'no_server') {
+        return {
+            key: 'claiming:no_server',
+            icon: ServerIcon,
+            title: t('claiming.title'),
+            description: t('claiming.noServer'),
+            body: SERVERS_ENABLED ? <ServersDialog open={serversOpen} onOpenChange={setServersOpen} /> : null,
+            footer: (
+                <DialogFooter>
+                    <SignOutButton />
+                    {SERVERS_ENABLED && (
+                        <Button type="button" variant="outline" onClick={() => setServersOpen(true)}>
+                            {t('claiming.openServers')}
+                        </Button>
+                    )}
+                    <Button type="button" onClick={() => setAttempt(count => count + 1)}>
+                        {t('installing.retry')}
+                    </Button>
+                </DialogFooter>
+            ),
+        }
+    }
+    if (outcome?.status === 'no_machine') return { key: 'claiming:wait', icon: ClockIcon, title: t('claiming.waitTitle'), description: t('claiming.waitDescription'), body: null }
+    return { key: 'claiming', icon: ServerIcon, title: t('claiming.title'), description: t('claiming.description'), body: <Progress size="sm" label={t('claiming.description')} /> }
+}
+
+type Install = { status: 'running' } | { status: 'purchase'; slug: string; title: string } | { status: 'failed'; error: string }
+
+function useInstallingStep(active: boolean, reload: () => Promise<void>): StepView {
+    const t = useTranslations('onboarding')
+    const [install, setInstall] = useState<Install>({ status: 'running' })
+    const [attempt, setAttempt] = useState(0)
+    const [buying, setBuying] = useState(false)
+    const retry = () => {
+        setInstall({ status: 'running' })
+        setAttempt(count => count + 1)
+    }
+
+    useEffect(() => {
+        if (!active) return
+        let cancelled = false
+        void installOnboardingArrivalAction()
+            .catch(err => ({ status: 'failed' as const, error: err instanceof Error ? err.message : String(err) }))
+            .then(async result => {
+                if (cancelled) return
+                if (result.status === 'purchase' || result.status === 'failed') return setInstall(result)
+                // Installed: the link has done its job, and must not open its card over the board later.
+                if (result.status === 'installed') {
+                    useOnboardingStore.getState().clearPendingTemplateLink()
+                    useOnboardingStore.getState().clearPendingShareLink()
+                    track('first_agent_created', { template: 'arrival' })
+                }
+                await reload()
+            })
+        return () => {
+            cancelled = true
+        }
+    }, [active, attempt, reload])
+
+    const buy = async (slug: string) => {
+        setBuying(true)
+        const started = await startTemplateCheckoutAction(slug).catch(() => null)
+        if (started?.ok && started.outcome.kind === 'checkout') {
+            window.location.href = started.outcome.url
+            return
+        }
+        setBuying(false)
+        // Owned or free since: the install goes on.
+        if (started?.ok) retry()
+        else setInstall({ status: 'failed', error: started?.error ?? '' })
+    }
+
+    if (install.status === 'purchase') {
+        return {
+            key: 'installing:purchase',
+            icon: DownloadIcon,
+            title: t('installing.purchaseTitle', { title: install.title }),
+            description: t('installing.purchaseDescription'),
+            body: null,
+            footer: (
+                <DialogFooter>
+                    <SignOutButton />
+                    <Button type="button" loading={buying} onClick={() => void buy(install.slug)}>
+                        {t('installing.buy')}
+                    </Button>
+                </DialogFooter>
+            ),
+        }
+    }
+    if (install.status === 'failed') {
+        return {
+            key: 'installing:failed',
+            icon: DownloadIcon,
+            title: t('installing.title'),
+            description: t('installing.failed', { error: install.error }),
+            body: null,
+            footer: (
+                <DialogFooter>
+                    <Button type="button" onClick={retry}>
+                        {t('installing.retry')}
+                    </Button>
+                </DialogFooter>
+            ),
+        }
+    }
+    return { key: 'installing', icon: DownloadIcon, title: t('installing.title'), description: t('installing.description'), body: <Progress size="sm" label={t('installing.description')} /> }
+}
+
 function PhoneBody() {
     return <PhoneVerificationStep active />
 }
@@ -198,9 +364,15 @@ function useStepView(state: OnboardingState, failed: boolean, reload: () => Prom
     const tWaitlist = useTranslations('dialogs.engineWaitlist')
     const profile = useProfileStep({ firstName: state.firstName, reload })
     const invite = useInviteStep({ reload })
+    const trial = useTrialStep()
+    const claiming = useClaimingStep(state.step === 'claiming' && !failed, reload)
+    const installing = useInstallingStep(state.step === 'installing' && !failed, reload)
     if (failed) return { key: 'failed', icon: LayersIcon, title: t('loadFailed.title'), description: t('loadFailed.description'), body: null, footer: <LoadFailedFooter reload={reload} /> }
     if (state.step === 'profile') return profile
     if (state.step === 'invite') return invite
+    if (state.step === 'trial') return trial
+    if (state.step === 'claiming') return claiming
+    if (state.step === 'installing') return installing
     if (state.step === 'phone') return { key: 'phone', icon: PhoneIcon, title: t('phone.title'), description: t('phone.description'), body: <PhoneBody /> }
     return {
         key: 'waitlist',

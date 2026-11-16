@@ -19,6 +19,27 @@
         "hint": "Jusqu'à {max} adresses. Vous pourrez en inviter d'autres depuis Membres.",
         "failed": "Impossible d'enregistrer. Réessayez."
     },
+    "trial": {
+        "title": "Démarrez votre essai",
+        "description": "Votre équipe travaille sur sa propre machine, que l'essai ouvre."
+    },
+    "claiming": {
+        "title": "Préparation de votre workspace",
+        "description": "Votre machine démarre.",
+        "waitTitle": "Votre machine arrive",
+        "waitDescription": "Toutes les machines sont prises pour le moment. Votre abonnement est actif, et la suite se fait toute seule dès qu'une machine se libère.",
+        "noServer": "Ce workspace n'a pas encore de serveur à lui. Ajoutez-en un depuis Serveurs, puis revenez.",
+        "openServers": "Ouvrir Serveurs"
+    },
+    "installing": {
+        "title": "Installation de ce que vous avez ouvert",
+        "description": "Il arrive sur votre board dans un instant.",
+        "purchaseTitle": "Obtenir {title}",
+        "purchaseDescription": "Ce template est payant. Achetez-le une fois et il s'installe sur votre board.",
+        "buy": "Acheter et installer",
+        "failed": "L'installation n'a pas abouti : {error}",
+        "retry": "Réessayer"
+    },
     "loadFailed": {
         "title": "Impossible de charger votre configuration",
         "description": "Vérifiez votre connexion, puis réessayez.",

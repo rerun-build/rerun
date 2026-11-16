@@ -29,7 +29,7 @@ import { BASE_PLAN_CREDITS, PLAN_PRICES_CENTS, TRIAL_ACTIVE_AGENTS, TRIAL_CREDIT
 import { usePriceArm } from '@/ee/lib/billing/usePriceArm'
 import { TRIAL_ENDING_LEAD_MS } from '@/ee/lib/lifecycle/sequences'
 import { useStartPending } from '@/lib/onboarding/useStartPending'
-import { AGENT_LIMIT_TRIGGER, useBillingStore, type BillingUpgrade } from '@/stores/billing.store'
+import { AGENT_LIMIT_TRIGGER, ONBOARDING_TRIGGER, useBillingStore, type BillingUpgrade } from '@/stores/billing.store'
 import { useForemanStore } from '@/stores/foreman.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -151,7 +151,7 @@ export function CheckoutDialog({
         onChanged()
         // Arrived on a template or a shared coworker: the column installs it the moment the plan is
         // on, so the dialog gets out of the way instead of asking for a click that starts nothing.
-        if (useForemanStore.getState().arrival) return onClose()
+        if (useForemanStore.getState().arrival || useBillingStore.getState().trigger === ONBOARDING_TRIGGER) return onClose()
         setDone(outcome)
     }
 
