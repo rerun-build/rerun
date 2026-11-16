@@ -1,73 +1,118 @@
 ---
 title: "Plans and billing"
-description: "One plan with unlimited coworkers, the add-ons, and the trial."
+description: "One plan, Pro, with unlimited coworkers, its paid apps, credit packs and the free trial."
 ---
 
-Rerun sells a single plan with unlimited coworkers. There are no tiers to compare and no feature held back for a higher one.
-
-## The base plan
-
-<Card title="Rerun" icon="box">
-  **Billed per month or per year**, at the price your workspace shows when you start the plan. Five day free trial.
-
-  Includes **unlimited coworkers**, **unlimited seats**, **your own private machine** and **Rerun credits every month**.
-</Card>
-
-Also included at every level:
-
-- **Bring your own AI.** Your API key, your Claude or ChatGPT subscription, or the credits above.
-- **Every app**, plus any MCP server and any API you wire yourself.
-- **Unlimited executions.** No run quotas and no per-task fee.
-- **The coworker and template library.**
-- **As many Boxes as you want.** They group your coworkers by team, client or project, and they cost nothing.
-
-## Add-ons
-
-Add-ons are quantities on the same subscription. Add and remove them whenever you want.
-
-| Add-on | What it grants | Price |
-| --- | --- | --- |
-| Rerun credits | More credits every month | \$10 |
-
-## The trial
-
-Your account comes with free credits, enough for the Chief of Staff to plan and build your team and for your coworkers to run their first tasks. The trial starts when you accept the plan the Chief of Staff draws up, and lasts 5 days. It runs on those same credits and adds none of its own. What is left of them carries over once your plan starts. The trial runs 3 coworkers at once: coworkers past the third are built and wait, switched off, for your plan to start.
-
-The trial has no seat limit: invite your team from day one.
-
-Starting the trial asks for a card: \$0 is charged today, and the card is charged the plan's monthly price on day 5, the date shown before you confirm. Cancel before from **Billing** in the workspace menu and you pay nothing.
-
-Subscribing during the trial ends it on the spot: the plan is billed that day, monthly unless you pick yearly. To pay nothing before day 5, keep the trial and let the plan start on its own.
-
-If the trial credits run out before day 5, the coworker that stopped offers to start the plan now. The amount and the next billing date are shown before you confirm, nothing is charged until you do, and a refused card leaves the trial as it was. Once paid, the coworker picks the task back up where it stopped.
+Rerun Cloud sells a single plan, **Pro**, with unlimited coworkers. There are no tiers to compare and no feature held back for a higher one.
 
 <Note>
-  The [Rerun API](/api/introduction) is not part of the trial. It requires a started subscription.
+  A self-hosted install sells nothing: every workspace gets everything, with no limit on coworkers or seats, and there is no **Billing** to manage. See [Open source vs Rerun Cloud](/self-host/open-source-vs-cloud).
 </Note>
+
+## The Pro plan
+
+<Card title="Pro" icon="box">
+  **Billed per month or per year**, at the price the plan dialog shows when you start it. 5 day free trial.
+
+  Includes **unlimited coworkers**, **unlimited seats**, **your own private machine** and **500 Rerun credits every month**.
+</Card>
+
+Also included:
+
+- **Bring your own AI.** Your API key, your Claude or ChatGPT subscription, or the Rerun models on the credits above.
+- **Every app of the library**, except the two [paid apps](#paid-apps), plus any MCP server and any API you wire yourself.
+- **Unlimited runs.** No run quotas and no per-task fee.
+- **The coworker and template library.** A template with a price of its own is billed apart from your plan.
+- **The [Rerun API](/api/introduction).**
+- **As many Boxes as you want.** They group your coworkers by team, client or project, and they cost nothing.
+
+## Paid apps
+
+Two apps are sold by the account, on the same invoice as your plan. Each connected account takes one slot.
+
+| App | What one slot gives your coworkers | Billed monthly | Billed yearly |
+| --- | --- | --- | --- |
+| **LinkedIn Pro** | One LinkedIn account they prospect from: messages, invitations, profile search. A reply or an accepted invitation wakes the coworker up | \$9/mo | \$108/yr |
+| **WhatsApp Pro** | One WhatsApp number they answer from, with text, files and voice notes. A new message wakes the coworker up | \$9/mo | \$108/yr |
+
+A slot follows the billing of your plan, and carries no yearly discount. Open the workspace pill, then the app under **Apps**, to connect an account, add a slot or see what each slot is used by. Only an admin can manage paid apps.
+
+- **During your trial**, one slot per app costs \$0 and is billed with your plan once Pro starts. Adding a second slot of the same app ends the trial, like [any change during the trial](#managing-the-subscription).
+- **On Pro**, the first slot of an app is free for 5 days, then \$9 a month.
+- **Adding a slot** bills today for what is left of the current period.
+- **Removing a slot** works once no account fills it: disconnect the account first. The slot stays on your plan until the next renewal.
+
+A paid app is attached coworker by coworker: pick the account in the **Apps** of each coworker that should use it.
 
 ## Rerun credits
 
-One dollar is 100 credits. Credits only apply to the models Rerun hosts and the paid data your coworkers look up. When a coworker runs on your own API key or on your Claude or ChatGPT subscription, it costs you nothing on the Rerun side.
+One dollar is 100 credits. Credits only pay for the Rerun models (Fast, Balanced and Smart) and the paid data your coworkers look up. When a coworker runs on your own API key or on your Claude or ChatGPT subscription, the model costs you nothing on the Rerun side.
 
-Every run records what its model cost, in dollars, so you can see where the credits go in the **Monitoring** tab.
+Pro includes 500 credits every month, yearly billing included. They reset each month: what is left does not carry over.
+
+### Credit packs
+
+When you need more, click **Add credits** on the **Rerun credits** card of **Billing**. Each pack adds 1,000 credits for \$10, paid once, and up to 100 packs go in one purchase. Packs never expire: your coworkers draw on them once the credits of the month are spent.
+
+During the trial the card offers **Start Pro now** instead.
+
+### Credit usage
+
+**Billing** shows what is left on the **Rerun credits** card. Click **See usage**, or **Credit usage**, for the detail: credits used per day, the pace you spend them at, the split between **AI models** and **Paid data**, the spend by coworker, and the latest charges.
+
+The **Allow spending** switch on the same card stops all spending of credits. While it is off, your coworkers cannot use the Rerun models or paid data. Coworkers on your own AI keep working.
+
+Every run also records what its model cost, in the **Monitoring** tab of the coworker's **Activity** screen.
+
+## The trial
+
+Your account comes with 350 free credits, once, enough for the Chief of Staff to build your team and for your coworkers to run their first tasks. The trial starts when you start it, from the [Chief of Staff](/chief-of-staff) right after you pick your starter team, or from **Billing**. It lasts 5 days and runs on those same credits, adding none of its own. They never expire, so what is left carries over once Pro starts.
+
+The trial runs 3 coworkers at once: coworkers past the third are built and wait, switched off, for Pro to start. It has no seat limit: invite your team from day one.
+
+Starting the trial from the web asks for a card: \$0 is charged today, and the card is charged the plan's price on day 5, the date shown before you confirm. We email you the day before. Cancel before from **Billing** (**Cancel trial**) and you pay nothing: your coworkers keep running until the trial ends. A trial started from the mobile app needs no card, and stops at its end unless you add one.
+
+Complete every step of the **Getting started** checklist while the trial runs and it gets 3 more days. See [Getting started](/chief-of-staff#getting-started).
+
+Starting Pro during the trial (**End trial & start Pro now**) ends the trial on the spot: the plan is billed that day. To pay nothing before day 5, keep the trial and let Pro start on its own.
+
+If the trial credits run out before day 5, the coworker that stopped offers to start Pro now. The amount and the next billing date are shown before you confirm, nothing is charged until you do, and a refused card leaves the trial as it was. Once paid, the coworker picks the task back up where it stopped.
+
+<Note>
+  The [Rerun API](/api/authentication) follows the subscription: it works during the trial and on Pro, and every key stops answering once the subscription is over.
+</Note>
 
 ## When you hit a limit
 
 Only the trial has a coworker limit. Going over it does not delete anything. The coworkers past the third are switched off and stay exactly as they were: their prompt, their skills, their memory and their data are untouched.
 
-Start your plan and the coworkers the trial had switched off come back on with it.
+Start Pro and the coworkers the trial had switched off come back on with it.
 
 The same applies through the API: [`create_agent`](/api/tools/agents#create-agent) succeeds and returns `active: false` with the reason, rather than failing halfway.
 
 ## Managing the subscription
 
-Open the workspace pill in the top left corner, then **Billing**. From there you change add-on quantities, switch between monthly and yearly, update your card and cancel.
+Open the workspace pill in the top left corner, then **Billing**. Only an admin can manage billing. From there you change your app slots, buy credits, switch between monthly and yearly, update your card, read your invoices, add your business details (VAT number or tax ID) for the invoices, and cancel.
 
-Adding an add-on takes effect immediately and is billed for the remainder of the current period. Removing one takes effect at the next renewal: you keep the limit you already paid for until then.
+- **Monthly to yearly** starts the year today, and the unused part of the month is credited.
+- **Yearly to monthly** waits for the end of the paid year.
+- **Any change during the trial** ends the trial and bills the new plan today.
 
-Adding an add-on during the trial ends the trial. Nothing is sold on top of a period nobody pays for, so the first full cycle is invoiced there and then.
+If a payment is declined, the workspace keeps running for a day, then pauses. **Update card and pay** brings it back as soon as the payment goes through.
+
+## Cancelling
+
+Click **Cancel plan** at the bottom of **Billing**. Your coworkers keep running until the end of the period you paid for. After that, schedules stop firing and the workspace pauses: its coworkers, their memories, their skills and their files are saved for 90 days.
+
+- Before the end of the period, **Resume Pro** keeps the plan as if nothing happened.
+- Once paused, **Restart Pro** in **Billing** brings the workspace back exactly as you left it. Your coworkers wake up in about a minute.
+- After 90 days, the saved workspace is deleted for good.
 
 To leave Rerun altogether, cancel the subscription first, then [delete your account](/teams#delete-your-account).
+
+## Lifetime plan
+
+A workspace on the **Lifetime plan** paid once and keeps it for good: unlimited coworkers and seats, running on your own AI. It comes with no Rerun credits, so connect your API key or your Claude or ChatGPT subscription from **Connect your AI**.
 
 ## Enterprise
 

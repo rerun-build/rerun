@@ -1,71 +1,89 @@
 ---
 title: "Quickstart"
-description: "From signing up to a working coworker."
+description: "From your company website to a team of coworkers at work."
 ---
 
 ## Before you start
 
-You need an account on [app.rerun.build](https://app.rerun.build). Rerun starts with a 5 day free trial.
+Open [app.rerun.build](https://app.rerun.build). Rerun starts with a 5 day free trial.
 
 Nothing to install. Everything happens in the browser.
 
-## 1. Sign up
+<Note>
+  This page follows Rerun Cloud. On a self-hosted install, see [Install](/self-host/install).
+</Note>
 
-Open [app.rerun.build](https://app.rerun.build). You land on the board, the isometric view where your Boxes and coworkers live, with a sign-in dialog on top.
+## 1. Tell the Chief of Staff who you are
 
-Right after signing up you answer three short questions about your sector, your team size and your role. They only decide which templates you get shown first.
+You land on the board, with the [Chief of Staff](/chief-of-staff) open beside it: the assistant of your workspace, which builds your team with you. It opens on a short card, one question at a time:
 
-## 2. Pick your first coworker
+1. **What is your company website?** Rerun reads it to learn what you sell and who you sell to. A LinkedIn page or another platform is not your site: enter your own, or click **Skip**.
+2. **What line of work are you in?** Only asked when you skipped the website, which answers it on its own.
+3. **And what do you do there?** It decides who gets built for you first.
+4. **Last one: your first name?** Only asked when Rerun does not know it yet, for example from a Google sign-in.
 
-The template library opens on its own, filtered on the sector you picked. Two ways forward:
+## 2. Create your account
 
-<Tabs>
-  <Tab title="Install a template">
-    A template is a setup that already works: a prompt, skills, scheduled tasks and the apps it needs. Pick one, and Rerun creates the coworkers it contains in your account.
-  </Tab>
-  <Tab title="Start from scratch">
-    Click **Start from scratch**, give the coworker a name, and describe what you want it to do in the chat. It writes its own prompt from your description.
-  </Tab>
-</Tabs>
+Once the card is answered, the Chief of Staff shows **Your team is ready to be built**. Click **Create my account**. Your answers are kept.
 
-## 3. Place it on the board
+## 3. Pick your starter team
 
-The toolbar switches to placement mode. Tap a tile and the coworker takes its spot.
+The Chief of Staff offers **Your starter team**: ready-made coworkers for your line of work, each sold on what it does for you, like "Book more meetings" or "Chase my unpaid invoices". Pick up to 3, the number of coworkers the trial runs, then click **Hire this one**, or **Hire these 3** when you picked several.
 
-Your first coworker needs a Box, and Rerun draws one for you. Behind it, your workspace claims its machine from a pool of ready ones: a private cloud computer, isolated from every other account, that hosts every coworker you place. It takes a few seconds.
+None of them fits? Type what you need in the composer instead, and the Chief of Staff designs that coworker.
 
-## 4. Run the guided setup
+## 4. Start your trial
 
-A coworker that came from a template usually needs to be connected to your own accounts. When it does, the chat opens on a **Start installation** button instead of a message box.
+The Chief of Staff shows the trial: what it includes, what is due today, and when the first charge comes. Click **Start my free trial**. See [The trial](/billing#the-trial) for the card and the dates.
 
-Click it and the coworker walks you through its own setup: it tells you what it needs, offers to install the apps it is missing, and asks you for the values only you can give. You answer in the chat, exactly like a conversation.
+The moment the trial is on, your workspace gets its machine, a private computer in the cloud, isolated from every other account, that hosts every coworker you build. Your team is built on the board, in Boxes named after your line of work.
+
+At the same time, Rerun reads your website into the [Brain](/brain): the pages about your company every coworker reads before it works, with what you sell, to whom, your team, your voice and your tools. It shows up within a few minutes.
+
+## 5. Set up each coworker
+
+A new coworker still has to be connected to your own accounts. Until it is, its chat opens on a card instead of a message box: **Set up** and the coworker's name, with the number of apps to connect and a time estimate.
+
+- **Install** and the coworker's name starts the setup.
+- **Continue setup** appears when the setup already runs in another conversation, and takes you there.
+- **Skip for now** gives you the message box. The coworker is not set up, so it may lack what it needs.
+
+For the first coworker you picked, the Chief of Staff also offers **Start installing** with its name. The others wait in their own chat, whenever you like.
+
+The setup is a conversation: the coworker tells you what it needs, offers to connect the apps it is missing, and asks you for the values only you can give.
 
 <Note>
   When it needs an API key, the coworker opens a masked form. The value goes straight to your machine and is never shown to the coworker or stored in the conversation. Never paste a secret into the chat itself.
 </Note>
 
-When the setup is done, the coworker switches on the scheduled tasks and webhooks it shipped with, and tells you what it can do and when it will next run.
+When the setup is done, the coworker switches on the routines and webhooks it shipped with, and tells you what it can do and when it will next run.
 
-## 5. Talk to it
+## 6. Talk to it
 
 You now have a normal message box. Ask it for something.
 
 While it works you see every step: the files it reads, the searches it runs, the tools it calls. If it needs a decision, it stops and asks you, right in the chat.
 
-## 6. Let it run without you
+## 7. Finish the Getting started checklist
+
+The **Getting started** checklist lists what makes a workspace run on its own: **Create your first coworker**, **Plug in your AI subscription**, **Invite a teammate**, **Schedule a recurring task** and **Add a payment method**, plus **Verify your phone number** when your sign-up asked for one. Click a step and the Chief of Staff walks you through it, or opens the right settings.
+
+Complete every step during the trial and it gets 3 more days. See [Getting started](/chief-of-staff#getting-started).
+
+## Let it run without you
 
 Two ways to make a coworker work while you are away.
 
 <CardGroup cols={2}>
-  <Card title="Scheduled tasks" icon="clock" href="/agents/automations#scheduled-tasks">
-    A cron and an instruction. Every Monday at 9, summarise last week and email it to me.
+  <Card title="Routines" icon="clock" href="/agents/automations">
+    A schedule and an instruction. Every Monday at 9, summarise last week and email it to me.
   </Card>
-  <Card title="Webhook triggers" icon="webhook" href="/agents/automations#webhook-triggers">
+  <Card title="Webhook triggers" icon="webhook" href="/api/webhooks">
     A public URL. When Stripe posts a refund, handle it.
   </Card>
 </CardGroup>
 
-You can add both from the coworker panel, or just ask the coworker to set them up for you.
+You can add both from the coworker's **Routines** screen, or just ask the coworker to set them up for you.
 
 ## Next steps
 

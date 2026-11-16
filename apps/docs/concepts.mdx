@@ -9,13 +9,21 @@ Your account. It holds your plan, your members, your Boxes and your coworkers, a
 
 An [API key](/api/authentication) is scoped to exactly one workspace.
 
+## Chief of Staff
+
+The assistant every workspace comes with. It is not one of your coworkers: it works on the whole workspace. It builds your first team with you, creates and briefs coworkers, follows their runs, keeps the Brain with you and answers your questions about Rerun. See [Chief of Staff](/chief-of-staff).
+
+<Note>
+  The code and the API call the Chief of Staff the `foreman`. Same thing.
+</Note>
+
 ## Box
 
 A room of your workspace: on the board it is the rectangle your coworkers sit on. It groups them by team, by client or by project.
 
-A Box is instant and free, and you make as many as the work needs. It arranges coworkers, it does not separate them: every coworker of the workspace runs on the same machine, and the **shared folder** and the **shared database** are common to all of them, whichever Box they sit in.
+A Box is instant and free, and you make as many as the work needs. It arranges coworkers, it does not separate them: every coworker of the workspace runs on the same machine, and the **shared folder** and the **shared database** are common to all of them, whichever Box they sit in. What a Box does decide is who reaches its coworkers: see [Access by Box](/teams#access-by-box).
 
-Because a Box holds nothing of its own, moving a coworker from one to another costs nothing: right-click it on the board and pick **Move to Box**, or ask the Rerun coworker to do it. It keeps its files, its handle, its skills and its whole history.
+Because a Box holds nothing of its own, moving a coworker from one to another costs nothing: right-click it on the board and pick **Move to Box**, or ask the Chief of Staff to do it. It keeps its files, its handle, its skills and its whole history.
 
 <Note>
   The Rerun API calls a Box a `space`, in tool names like `list_spaces` and `space_db_query`. Same thing.
@@ -38,9 +46,24 @@ An AI worker inside a Box. It has:
 | **Capabilities** | Which families of tools it may use, from files to shell to browser |
 | **Memory, skills, files, a database** | All private to it |
 
+## Coworker panel
+
+Click a coworker to open its chat. Its card opens the screens below, each with the tabs that answer the same question:
+
+| Screen | Tabs |
+| --- | --- |
+| **Apps** | **Apps**, **MCP** |
+| **Skills** | **Skills** |
+| **Knowledge** | **Knowledge**, the coworker's memory |
+| **Files** | **Files**, **Published** |
+| **Database** | **Database** |
+| **Routines** | **Scheduled**, **Triggers** |
+| **Activity** | **Monitoring**, **Logs** |
+| **Settings** | **General**, **Capabilities**, **Install** |
+
 ## Soul
 
-The coworker system prompt, written in markdown. It is the single most important thing about a coworker. Edit it in the coworker **Settings** tab, or let the coworker rewrite it as it learns.
+The coworker system prompt, written in markdown. It is the single most important thing about a coworker. Edit it in the **General** tab of the coworker's **Settings**, or let the coworker rewrite it as it learns, which its **Edit own soul** capability allows.
 
 ## Skill
 
@@ -50,33 +73,43 @@ Skills keep a coworker sharp without bloating its prompt: only a one-line index 
 
 ## Memory
 
-Durable facts the coworker writes down and recalls later. Memories fade if nothing uses them, and each recall extends their life, so what matters stays and what does not quietly retires.
+Durable facts the coworker writes down and recalls later, listed in its **Knowledge** screen. Memories fade if nothing uses them, and each recall extends their life, so what matters stays and what does not quietly retires.
 
 Correct a coworker once and it remembers the correction.
 
+## Brain
+
+The pages about your company that every coworker reads before it works: what you sell, to whom, your team, your voice, your tools. Rerun fills it from your website, you edit it like a document, and coworkers propose changes that land in **Proposals** until you accept them. Open it from the workspace pill, then **Brain**. See [Brain](/brain).
+
 ## App
 
-A ready-made integration with an external service: Stripe, Gmail, Notion, Slack and hundreds more. Installing one on a coworker gives it that service tools plus a skill explaining how to use them.
+A ready-made integration with an external service: Stripe, Gmail, Notion, Slack and hundreds more. It gives a coworker that service's tools plus a skill explaining how to use them.
 
-An app is installed per coworker, not per Box. See [Apps](/agents/apps).
+## Vault
+
+Where the apps of the workspace live. You sign in to an app once, in the Vault, then pick the coworkers that use it, or **Every coworker**. It also holds MCP servers and secrets the coworkers read. Open it from the workspace pill, then **Vault**. See [Vault](/vault) and [Apps](/agents/apps).
+
+LinkedIn Pro and WhatsApp Pro are [paid apps](/billing#paid-apps), attached coworker by coworker.
 
 ## MCP server
 
-The open standard Rerun apps are built on. When the library does not have what you need, you can register any MCP server on a coworker yourself, with its own URL, headers or command.
+The open standard Rerun apps are built on. When the library does not have what you need, you can register any MCP server yourself, with its own URL, headers or command.
 
 ## Run
 
-One execution of a coworker. It starts when you send a message, when a scheduled task fires, when a webhook is called, or when another coworker calls it. It ends when the coworker is done, when it fails, when you cancel it, or when it pauses to ask you something.
+One execution of a coworker. It starts when you send a message, when a routine fires, when a webhook is called, or when another coworker calls it. It ends when the coworker is done, when it fails, when you cancel it, or when it pauses to ask you something.
 
-Every run records its steps, its tool calls, its tokens and its cost. Read them in the **Monitoring** and **Logs** tabs, or with [`get_run`](/api/tools/runs#get-run).
+Every run records its steps, its tool calls, its tokens and its cost. Read them in the **Monitoring** and **Logs** tabs of the coworker's **Activity** screen, or with [`get_run`](/api/tools/runs#get-run).
 
 ## Session
 
-A conversation thread with a coworker. A run belongs to a session. Scheduled tasks and webhooks each open their own session, so an automated run never pollutes your chat.
+A conversation with a coworker. A run belongs to a session.
 
-## Scheduled task
+Every coworker has one **General** conversation. Every other one is a thread: open one with **New thread**, and find them all in the coworker's **Threads**, filtered by **All**, **Chats**, **Automations** or **Needs you**. Scheduled and triggered runs each open their own thread, so an automated run never pollutes your chat.
 
-A recurring instruction, on a cron and in a timezone, or a one-off at a given date. When it fires, the coworker runs with no user message and follows the instruction. See [Automations](/agents/automations).
+## Routine
+
+A recurring instruction, on a schedule and in a timezone, or a one-off at a given date. When it fires, the coworker runs with no user message and follows the instruction. Routines live in the coworker's **Routines** screen. See [Automations](/agents/automations).
 
 ## Trigger
 
@@ -90,4 +123,8 @@ Templates can be free or paid. See [Templates](/templates/install).
 
 ## Board
 
-The isometric view that is the app itself. Boxes are drawn as rectangles, coworkers sit on them, and clicking a coworker opens its panel.
+The isometric 3D view of your workspace. Boxes are drawn as rectangles, coworkers sit on them, and clicking a coworker opens its panel.
+
+## Simple view
+
+The other way to see the workspace: the list of your coworkers on the left, with the Chief of Staff on top, the chat in the middle, and the coworker's card on the right. Switch between the two from the workspace pill, on the **View** row: **3D** or **Simple**. The board is the default, and the only view until your onboarding is done.

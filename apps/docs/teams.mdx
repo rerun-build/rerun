@@ -1,6 +1,6 @@
 ---
 title: "Teams and workspaces"
-description: "Invite people, and understand what a workspace boundary means."
+description: "Invite people, give them a role and the Boxes they reach, pick your language, and understand what a workspace boundary means."
 ---
 
 ## Workspaces
@@ -13,41 +13,64 @@ A workspace is a hard boundary. Nothing crosses it: not a coworker, not the shar
 
 ## Invite someone
 
+Only an admin can invite.
+
 <Steps>
-  <Step title="Open the workspace menu">
+  <Step title="Open the members">
     Click the workspace pill, then **Members**.
   </Step>
   <Step title="Enter an email address">
-    They get an invitation link.
+    Type it under **Invite by email**, then pick the **Boxes** they reach: **All Boxes**, every Box open to the workspace, or **None, assign later**, only the Boxes you give them afterwards. Click **Invite**.
   </Step>
   <Step title="They accept">
-    They join the workspace and see the same board you do.
+    The invitation link is valid for 7 days and works once, for that email only. They join as a **Member** and see the Boxes you gave them.
   </Step>
 </Steps>
 
-Pending invitations are listed under the members, and you can revoke one before it is accepted.
+On Rerun Cloud the invitation goes out by email. A self-hosted install that sends no email shows the link instead: click **Copy the invitation link** and pass it on yourself.
 
-Each member takes a seat. Neither the plan nor the free trial has a seat limit. See [Plans and billing](/billing).
+Pending invitations are listed under the members, and an admin can revoke one before it is accepted. Inviting the same address again keeps the same link.
+
+Each member takes a seat. Neither Pro nor the free trial limits seats. If a workspace was given a seat cap, **Members** says so and **Invite** stays disabled once it is reached. See [Plans and billing](/billing).
 
 ## Roles
 
 | Role | What it means |
 | --- | --- |
-| **Owner** | Full control, including billing, members and removing people. The workspace always has one and it cannot be removed |
-| **Builder** | Creates and edits Boxes, coworkers, apps and automations. This is what an invited member becomes |
-| **Viewer** | Read access |
+| **Admin** | Manages billing, members, Box access, the workspace settings, API keys, AI providers and paid apps. Reaches every Box |
+| **Member** | Uses the coworkers of the Boxes they reach. This is what an invited person becomes |
+
+An admin changes a role from the member's row in **Members**: **Make admin** or **Make member**. The workspace always keeps at least one admin, so the last one cannot be made a member.
+
+## Access by Box
+
+Every Box is open to the whole workspace until an admin restricts it. Right-click a Box on the board and pick **Manage access**:
+
+- **Who can use this Box**: **Everyone in the workspace**, or **Only selected people**.
+- **People**: the teammates named on the Box, each with a level. **Can use** chats with its coworkers and sees their work. **Can manage** also edits, moves and deletes them.
+
+Restricting a Box keeps the people already named on it and the admins. Admins always have access to every Box. The person who created a Box is named on it with **Can manage**.
+
+From **Members**, an admin also sees one person's Boxes and decides whether they use every Box open to everyone or only the Boxes named to them.
 
 ## What members share
 
-Everyone in a workspace sees the same board, the same Boxes and the same coworkers. That includes the conversations coworkers have had and the data they hold.
+Everyone in a workspace sees the same Boxes they reach and the same coworkers in them. That includes the conversations coworkers have had and the data they hold.
 
-Credentials are not readable by anyone, member or not: they live on the workspace machine and are never displayed back. But a coworker connected to your Gmail can be asked to act on it by any builder in the workspace, so invite accordingly.
+Credentials are not readable by anyone, member or not: they live on the workspace machine and are never displayed back. But a coworker connected to your Gmail can be asked to act on it by anyone who can use its Box, so give access accordingly.
 
 ## Leaving and removing
 
-An owner removes a member from the same **Members** dialog. Removing someone frees their seat immediately and takes away their access to everything in the workspace.
+An admin removes a member from the same **Members** dialog. Removing someone frees their seat immediately and takes away their access to everything in the workspace. You can invite them back later.
 
-The owner cannot be removed. If ownership has to move, write to [help@rerun.build](mailto:help@rerun.build).
+You cannot remove yourself, and the last admin cannot be removed. To hand the workspace over, make someone else an admin first.
+
+## Languages
+
+Rerun speaks English, Français, Español, Português and Deutsch.
+
+- **Your language.** Open the workspace pill, then **Account**, then the **Language** tab. **Automatic** follows your browser. It is the language Rerun uses with you, and it is yours alone.
+- **Coworkers' language.** Open the workspace pill, then **Settings**. It is what your coworkers write in when they work on their own, on a schedule or a trigger. Only an admin can change it.
 
 ## Delete your account
 

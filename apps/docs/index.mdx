@@ -17,20 +17,20 @@ Rerun turns AI into a workforce. You give a coworker a job, connect it to your t
 ## How it works
 
 <Steps>
-  <Step title="Pick a job, or describe one">
-    Install a template from the library, or start from scratch and let the coworker configure itself from your description.
+  <Step title="Tell the Chief of Staff about your company">
+    Give it your website. The [Chief of Staff](/chief-of-staff) reads it into the [Brain](/brain) and offers a starter team for your line of work. Or install a template from the library, or describe the job and let it build that coworker.
   </Step>
   <Step title="Connect your tools">
-    Gmail, Slack, Notion, Stripe and hundreds more, one click each. Or any MCP server, or any API.
+    Gmail, Slack, Notion, Stripe and hundreds more, signed in once in the [Vault](/vault) and shared with the coworkers that use them. Or any MCP server, or any API.
   </Step>
   <Step title="It runs while you sleep">
-    On a cron, on a webhook, or whenever you message it. It pauses to ask you when something needs your call.
+    On a schedule, on a webhook, on a reply on LinkedIn or a message on WhatsApp, or whenever you message it. It pauses to ask you when something needs your call.
   </Step>
 </Steps>
 
 ## The model
 
-Three words carry most of the product.
+Three words carry most of the product, and three places hold what they share.
 
 **A workspace** is your account. It holds your plan, your members, your Boxes and your coworkers, and it runs on one private computer in the cloud, isolated from every other account, that every coworker inside it shares. You can belong to several workspaces, personal or [shared with your team](/teams), and switch between them from the pill in the top left corner of the app. An [API key](/api/authentication) is scoped to exactly one workspace.
 
@@ -38,7 +38,9 @@ Three words carry most of the product.
 
 **A coworker** is an AI worker inside a Box. It has a name, a system prompt, a model, its own memory, its own skills, its own files and its own database. It talks to you in a chat, and it can call the other coworkers of the workspace by their handle.
 
-Everything else hangs off those two: [skills](/agents/skills) it loads on demand, [apps](/agents/apps) to your tools, [scheduled tasks and webhooks](/agents/automations) that make it run without you, and [templates](/templates/install) that package a working setup for someone else to install.
+**The Chief of Staff** is the assistant of the workspace. It builds your team with you, briefs and follows your coworkers, and answers your questions about Rerun. **The Brain** holds the pages about your company that every coworker reads before it works. **The Vault** holds the apps, MCP servers and secrets of the workspace, signed in once and handed to the coworkers that need them.
+
+Everything else hangs off a coworker: [skills](/agents/skills) it loads on demand, [apps](/agents/apps) to your tools, [scheduled tasks and webhooks](/agents/automations) that make it run without you, and [templates](/templates/install) that package a working setup for someone else to install.
 
 <Card title="Core concepts" icon="book-open" href="/concepts" horizontal>
   Every term in one page.
@@ -48,7 +50,7 @@ Everything else hangs off those two: [skills](/agents/skills) it loads on demand
 
 <Columns cols={2}>
   <Card title="Any tool on any model" icon="shuffle">
-    Bring your own API key, your Claude or ChatGPT subscription, or use the credit included in your plan. Swap the model without rewriting the coworker.
+    Bring your own key for Anthropic, OpenAI, Google or OpenRouter, your Claude or ChatGPT subscription, or your own OpenAI-compatible model. Or use the Rerun models (Fast, Balanced, Smart) on the credits included in your plan. Swap the model without rewriting the coworker.
   </Card>
   <Card title="You approve what matters" icon="hand">
     A coworker can pause mid-run to ask a question or request an approval, even at 3am on a scheduled run. It resumes from your answer.
