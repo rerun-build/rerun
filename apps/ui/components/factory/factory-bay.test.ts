@@ -104,9 +104,12 @@ function shareOuts(total: number, who: string[]): Record<string, number>[] {
     return Array.from({ length: total + 1 }, (_, n) => shareOuts(total - n, who.slice(1)).map(rest => ({ [who[0]]: n, ...rest }))).flat()
 }
 
+const TAG_HALF = 30
+const tag = (at: P) => [{ x: at.x - TAG_HALF, y: at.y + 1 }, { x: at.x + TAG_HALF, y: at.y + 1 }, { x: at.x + TAG_HALF, y: at.y + 13 }, { x: at.x - TAG_HALF, y: at.y + 13 }]
+const orb = (at: P) => [...sphereShapes(at, false), tag(at)]
 const marker = (at: P, scanner: boolean) => scanner
-    ? [[{ x: at.x - 34, y: at.y - 30 }, { x: at.x, y: at.y - 58 }, { x: at.x + 44, y: at.y - 30 }, { x: at.x, y: at.y + 8 }], ...sphereShapes({ x: at.x, y: at.y - 12 }, false)]
-    : sphereShapes(at, false)
+    ? [[{ x: at.x - 34, y: at.y - 30 }, { x: at.x, y: at.y - 58 }, { x: at.x + 44, y: at.y - 30 }, { x: at.x, y: at.y + 8 }], ...orb({ x: at.x, y: at.y - 12 })]
+    : orb(at)
 
 function busy(share: Record<string, number>) {
     const job = (issue: number, over: Partial<FactorySnapshot['jobs'][number]>) => ({ ...SNAP.jobs[0], issue, parent: null, enteredAt: '2026-11-14T03:20:00Z', ...over })
@@ -133,10 +136,14 @@ function conflicts(share: Record<string, number>): string[] {
 }
 
 describe('the copy bay with every copy working', () => {
-    it(`every share-out of the ${SLOTS} pool copies over the stations, all working, draws every copy of a bay owner with every job clear of every tile and job; copy numbers are taken lowest first, so a smaller share-out without gaps seats a subset of one of these`, () => {
+    it(`every share-out of the ${SLOTS} pool copies over the stations, all working, draws every copy of a bay owner with every job clear of every tile and job; copy numbers are taken lowest first, so a smaller share-out seats a subset of one of these`, () => {
         const all = shareOuts(SLOTS, OWNERS)
         const bad = all.flatMap(conflicts)
         expect(bad.slice(0, 25), `${bad.length} conflicts in ${new Set(bad.map(b => b.split(':')[0])).size} of ${all.length} share-outs`).toEqual([])
+    })
+
+    it('with every bay full at once, all working, every copy of a bay owner is drawn and every job is clear of every tile and job, so copy numbers with gaps are covered too', () => {
+        expect(conflicts({ code: 15, LARRY: 15, LINUS: 15, BRUCE: 15 })).toEqual([])
     })
 
     it('at the configured copy caps, all working, every copy of a bay owner is drawn and every job is clear of every tile and job', () => {

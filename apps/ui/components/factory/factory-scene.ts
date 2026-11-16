@@ -14,7 +14,7 @@ const BOXES: Container[] = [
     box('dispatch', 'Loader', 4, 6, 10, 11),
     box('build', 'Build', 17, -6, 54, 20),
     box('stock', 'Stock', 0, 14, 10, 20),
-    box('review', 'Review', 17, 21, 50, 50),
+    box('review', 'Review', 17, 21, 50, 52),
     box('studio', 'Research & design', 0, 22, 10, 31),
     box('planning', 'Planning', 0, 0, 10, 5),
 ]

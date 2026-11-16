@@ -36,6 +36,7 @@ const clearOf = (belts: Set<string>, c: Cell) => {
     return true
 }
 const JOB_REACH = 5
+const JOB_ROOM = 2
 const inFront = (a: Cell, b: Cell) => {
     const dc = b.col - a.col, dr = b.row - a.row
     return dc + dr > 0 && Math.min(dc, dr) >= 0 && Math.max(dc, dr) <= JOB_REACH && Math.abs(dc - dr) <= 3
@@ -107,7 +108,7 @@ function placeBay(owner: Footprint, room: ContainerCells | undefined, floor: Flo
     const fits: Cell[][] = []
     for (let r = SEAT; r <= MAX_RING; r++) for (const d of ring(r)) for (const shape of SHAPES) for (const [sx, sy] of FLIPS) {
         const bay = shape.map(b => ({ col: owner.col + d.col + sx * b.col, row: owner.row + d.row + sy * b.row }))
-        if (!bay.every(c => (!room || containerContainsTile(room, c, 2)) && seatFree(c, floor))) continue
+        if (!bay.every(c => (!room || containerContainsTile(room, c, 2 + JOB_ROOM)) && seatFree(c, floor))) continue
         if (corridorClear(owner, bay, floor.belts)) return bay
         fits.push(bay)
     }
