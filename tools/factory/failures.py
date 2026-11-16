@@ -3,7 +3,7 @@ import hashlib, inspect
 import cutshape
 
 SOURCES = {}
-ENDS = ("blocked", "rejected", "failed", "returned")
+ENDS = ("blocked", "rejected", "failed", "returned", "unsolvable")
 
 
 def kinds(old, new, msg):

@@ -287,7 +287,9 @@
             "cost": "Kosten",
             "avgDurationMs": "Ø Dauer",
             "errorCount": "Fehler",
-            "errorRate": "Fehlerquote"
+            "errorRate": "Fehlerquote",
+            "failureCount": "Fehlschläge",
+            "failureRate": "Fehlschlagquote"
         },
         "live": "Live",
         "runStatus": {

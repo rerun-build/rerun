@@ -4,17 +4,19 @@ import { readAgentMonitoringAction } from '@/app/api/_actions/agent.actions'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { StatsChartType, StatsDataset, StatsGroupBy, StatsMetric, StatsTimeRange, UsageTimeRange } from '@rerun/contracts'
 import type { EngineStatsPoint, EngineUsageBucket } from '@/lib/engine/types'
 import { StatsChart, TokenUsageChart, MonitorCard } from '@rerun/ui/monitoring'
-import { ActivityIcon, AlertTriangleIcon, BarChart3Icon, CircleDollarSignIcon, CoinsIcon, CpuIcon, GaugeIcon, HashIcon, Maximize2Icon, TimerIcon, WrenchIcon } from '@/lib/icons'
+import { ActivityIcon, AlertTriangleIcon, BarChart3Icon, CircleDollarSignIcon, CoinsIcon, CpuIcon, GaugeIcon, HashIcon, InfoIcon, Maximize2Icon, TimerIcon, WrenchIcon } from '@/lib/icons'
 import type { ComponentType, ReactNode } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { formatNumber } from '@rerun/i18n/format'
 import { useCallback, useState } from 'react'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 
 type StatSpec = {
-    key: 'kpiRuns' | 'kpiCost' | 'kpiTokens' | 'kpiErrorRate' | 'runsOverTime' | 'costOverTime' | 'avgDuration' | 'runsByModel' | 'topTools' | 'toolErrors'
+    key: 'kpiRuns' | 'kpiCost' | 'kpiTokens' | 'kpiErrorRate' | 'kpiFailureRate' | 'runsOverTime' | 'failureOverTime' | 'costOverTime' | 'avgDuration' | 'runsByModel' | 'topTools' | 'toolErrors'
     icon: ComponentType<{ className?: string }>
     dataset: StatsDataset
     metric: StatsMetric
@@ -25,12 +27,14 @@ type StatSpec = {
 const KPI_SPECS: StatSpec[] = [
     { key: 'kpiRuns', icon: HashIcon, dataset: 'runs', metric: 'count', groupBy: 'none', chartType: 'stat' },
     { key: 'kpiCost', icon: CircleDollarSignIcon, dataset: 'runs', metric: 'cost', groupBy: 'none', chartType: 'stat' },
-    { key: 'kpiTokens', icon: CoinsIcon, dataset: 'runs', metric: 'totalTokens', groupBy: 'none', chartType: 'stat' },
     { key: 'kpiErrorRate', icon: GaugeIcon, dataset: 'runs', metric: 'errorRate', groupBy: 'none', chartType: 'stat' },
+    { key: 'kpiFailureRate', icon: AlertTriangleIcon, dataset: 'runs', metric: 'failureRate', groupBy: 'none', chartType: 'stat' },
+    { key: 'kpiTokens', icon: CoinsIcon, dataset: 'runs', metric: 'totalTokens', groupBy: 'none', chartType: 'stat' },
 ]
 
 const CHART_SPECS: StatSpec[] = [
     { key: 'runsOverTime', icon: ActivityIcon, dataset: 'runs', metric: 'count', groupBy: 'status', chartType: 'bar' },
+    { key: 'failureOverTime', icon: AlertTriangleIcon, dataset: 'runs', metric: 'failureRate', groupBy: 'none', chartType: 'line' },
     { key: 'costOverTime', icon: CircleDollarSignIcon, dataset: 'runs', metric: 'cost', groupBy: 'none', chartType: 'area' },
     { key: 'avgDuration', icon: TimerIcon, dataset: 'runs', metric: 'avgDurationMs', groupBy: 'none', chartType: 'line' },
     { key: 'runsByModel', icon: CpuIcon, dataset: 'runs', metric: 'count', groupBy: 'model', chartType: 'donut' },
@@ -38,15 +42,35 @@ const CHART_SPECS: StatSpec[] = [
     { key: 'toolErrors', icon: AlertTriangleIcon, dataset: 'toolCalls', metric: 'errorCount', groupBy: 'toolName', chartType: 'bar' },
 ]
 
-const ALL_SPECS = [...KPI_SPECS, ...CHART_SPECS]
+const TOKEN_CLASS_SPECS: (Pick<StatSpec, 'dataset' | 'metric' | 'groupBy'> & { key: 'inputTokens' | 'cachedInputTokens' | 'outputTokens' })[] = [
+    { key: 'inputTokens', dataset: 'runs', metric: 'inputTokens', groupBy: 'none' },
+    { key: 'cachedInputTokens', dataset: 'runs', metric: 'cachedInputTokens', groupBy: 'none' },
+    { key: 'outputTokens', dataset: 'runs', metric: 'outputTokens', groupBy: 'none' },
+]
+
+const ALL_SPECS = [...KPI_SPECS, ...CHART_SPECS, ...TOKEN_CLASS_SPECS]
+
+const isDefinedKpi = (key: StatSpec['key']): key is 'kpiErrorRate' | 'kpiFailureRate' => key === 'kpiErrorRate' || key === 'kpiFailureRate'
 
 const RANGES = ['24h', '7d', '30d', '90d'] as const satisfies readonly StatsTimeRange[]
 const POLL_MS = 30000
 
 type StatsData = Record<string, EngineStatsPoint[] | null>
 
-export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
+const sumOf = (points: EngineStatsPoint[] | null | undefined) => (points ?? []).reduce((sum, point) => sum + point.value, 0)
+
+function tokenClassPoints(stats: StatsData, labels: { fresh: string; cached: string; output: string }): EngineStatsPoint[] {
+    const cachedByBucket = new Map((stats.cachedInputTokens ?? []).map(point => [point.bucket, point.value]))
+    return [
+        ...(stats.inputTokens ?? []).map(point => ({ ...point, group: labels.fresh, value: Math.max(0, point.value - (cachedByBucket.get(point.bucket) ?? 0)) })),
+        ...(stats.cachedInputTokens ?? []).map(point => ({ ...point, group: labels.cached })),
+        ...(stats.outputTokens ?? []).map(point => ({ ...point, group: labels.output })),
+    ]
+}
+
+export function AgentPanelMonitoring({ agentId, readMonitoring = readAgentMonitoringAction }: { agentId: string; readMonitoring?: typeof readAgentMonitoringAction }) {
     const t = useTranslations('agent.agentPanelMonitoring')
+    const locale = useLocale()
     const [range, setRange] = useState<StatsTimeRange>('7d')
     const [stats, setStats] = useState<StatsData>({})
     const [usage, setUsage] = useState<EngineUsageBucket[] | null>(null)
@@ -55,7 +79,7 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
 
     const load = useCallback(async () => {
         const usageRange: UsageTimeRange = range === '90d' ? 'all' : range
-        const { usage: usageResult, stats: statsResults } = await readAgentMonitoringAction(
+        const { usage: usageResult, stats: statsResults } = await readMonitoring(
             agentId,
             usageRange,
             ALL_SPECS.map(spec => ({ dataset: spec.dataset, metric: spec.metric, groupBy: spec.groupBy, range }))
@@ -67,20 +91,31 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
         setStats(next)
         setUsage(usageResult ?? [])
         setLoading(false)
-    }, [agentId, range])
+    }, [agentId, range, readMonitoring])
 
     useVisibleInterval(load, POLL_MS)
 
     const isEmpty = !loading && usage?.length === 0 && ALL_SPECS.every(spec => (stats[spec.key]?.length ?? 0) === 0)
 
+    const noPrice = sumOf(stats.kpiCost) <= 0 && sumOf(stats.kpiTokens) > 0
+    const classLabels = { fresh: t('noPrice.fresh'), cached: t('noPrice.cached'), output: t('noPrice.output') }
+    const classPoints = noPrice ? tokenClassPoints(stats, classLabels) : []
+    const classTotals = [classLabels.fresh, classLabels.cached, classLabels.output].map(label => ({ label, value: sumOf(classPoints.filter(point => point.group === label)) }))
+
     const chartPanels: { key: string; title: string; subtitle?: string; icon: ComponentType<{ className?: string }>; node: ReactNode }[] = [
         { key: 'tokenUsage', title: t('tokenUsage.title'), subtitle: t('tokenUsage.subtitle'), icon: CoinsIcon, node: <TokenUsageChart metric="tokens" breakdown="total" chartType="area" buckets={usage} /> },
-        ...CHART_SPECS.map(spec => ({
+        ...CHART_SPECS.map(spec => spec.key === 'costOverTime' && noPrice ? {
+            key: spec.key,
+            title: t('noPrice.chartTitle'),
+            subtitle: t('noPrice.label'),
+            icon: CoinsIcon,
+            node: <StatsChart dataset="runs" metric="inputTokens" groupBy="model" chartType="area" points={classPoints} />,
+        } : {
             key: spec.key,
             title: t(`charts.${spec.key}`),
             icon: spec.icon,
             node: <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />,
-        })),
+        }),
     ]
     const expanded = chartPanels.find(p => p.key === expandedKey) ?? null
 
@@ -110,13 +145,44 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
                 />
             ) : (
                 <div className="min-h-0 flex-1 overflow-y-auto p-3">
-                    <div className="grid grid-cols-2 gap-3">
-                        {KPI_SPECS.map(spec => (
-                            <MonitorCard key={spec.key} className="h-32" title={t(`charts.${spec.key}`)} icon={spec.icon}>
-                                <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />
-                            </MonitorCard>
-                        ))}
-                    </div>
+                    <TooltipProvider>
+                        <div className="grid grid-cols-2 gap-3">
+                            {KPI_SPECS.map(spec => (
+                                <MonitorCard
+                                    key={spec.key}
+                                    className="h-32 odd:last:col-span-2"
+                                    title={t(`charts.${spec.key}`)}
+                                    icon={spec.icon}
+                                    action={isDefinedKpi(spec.key) && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button type="button" aria-label={t('definitions.about', { title: t(`charts.${spec.key}`) })} className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent/50 hover:text-foreground">
+                                                    <InfoIcon className="size-3.5" />
+                                                </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent side="bottom" className="max-w-65">
+                                                <p className="text-xs">{t(`definitions.${spec.key}`)}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                >
+                                    {spec.key === 'kpiCost' && noPrice ? (
+                                        <div className="flex h-full flex-col justify-center gap-0.5 px-2 text-xs">
+                                            {classTotals.map(item => (
+                                                <div key={item.label} className="flex items-baseline justify-between gap-2">
+                                                    <span className="text-muted-foreground">{item.label}</span>
+                                                    <span className="font-semibold text-foreground">{formatNumber(item.value, locale, { notation: 'compact', maximumFractionDigits: 1 })}</span>
+                                                </div>
+                                            ))}
+                                            <div className="mt-1 text-[11px] text-muted-foreground">{t('noPrice.label')}</div>
+                                        </div>
+                                    ) : (
+                                        <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} lowerIsBetter={isDefinedKpi(spec.key)} />
+                                    )}
+                                </MonitorCard>
+                            ))}
+                        </div>
+                    </TooltipProvider>
 
                     <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
                         {chartPanels.map(panel => (
@@ -159,8 +225,8 @@ function MonitoringSkeleton() {
     return (
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
             <div className="grid grid-cols-2 gap-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                    <Skeleton key={i} className="h-32" />
+                {KPI_SPECS.map(spec => (
+                    <Skeleton key={spec.key} className="h-32 odd:last:col-span-2" />
                 ))}
             </div>
             <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">

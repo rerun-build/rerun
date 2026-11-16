@@ -60,9 +60,10 @@ export type StatsChartProps = {
     chartType?: StatsChartType
     points: StatsPoint[] | null
     className?: string
+    lowerIsBetter?: boolean
 }
 
-export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'area', points, className }: StatsChartProps) {
+export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'area', points, className, lowerIsBetter = false }: StatsChartProps) {
     const locale = useUiLocale()
     const t = useKitTranslations()
     const otherLabel = t('monitoring.chart.other')
@@ -158,7 +159,7 @@ export function StatsChart({ dataset, metric, groupBy = 'none', chartType = 'are
                         <span>{metricLabel}</span>
                         <span>·</span>
                         <span>{t(`monitoring.chart.rowCount.${dataset}`, { count: compact(stat.rowCount, locale) })}</span>
-                        {stat.delta !== null && <span className={stat.delta >= 0 ? 'text-emerald-500' : 'text-rose-500'}>{stat.delta >= 0 ? '▲' : '▼'} {Math.abs(stat.delta).toFixed(0)}%</span>}
+                        {stat.delta !== null && <span className={(lowerIsBetter ? stat.delta <= 0 : stat.delta >= 0) ? 'text-emerald-500' : 'text-rose-500'}>{stat.delta >= 0 ? '▲' : '▼'} {Math.abs(stat.delta).toFixed(0)}%</span>}
                     </div>
                     <ChartContainer config={{ v: { label: metricLabel, color: CHART_PALETTE[0] } }} className="mt-2 h-16 w-full aspect-auto">
                         <AreaChart data={stat.sparkRows} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
