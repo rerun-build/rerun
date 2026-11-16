@@ -45,8 +45,8 @@ function query(partial: Partial<StatsRepoQuery> & Pick<StatsRepoQuery, 'dataset'
     return { groupBy: 'none', sinceIso: null, bucket: 'day', ...partial }
 }
 
-async function valuesByDay(q: StatsRepoQuery): Promise<Record<string, number>> {
-    const points = await aggregateStats(AGENT, q)
+async function valuesByDay(q: StatsRepoQuery, agentId = AGENT): Promise<Record<string, number>> {
+    const points = await aggregateStats(agentId, q)
     return Object.fromEntries(points.map(point => [point.bucket, Number(point.value)]))
 }
 
@@ -121,6 +121,70 @@ describe('aggregateStats on runs', () => {
             '2026-09-01|schedule': 10,
             '2026-09-02|null': 5,
         })
+    })
+})
+
+describe('failure stats on runs', () => {
+    const FAIL = 'failures'
+    const GOAL = '{"lastLineForms":[{"prefix":"DONE: ","rest":"sentence"}],"turnLimit":1}'
+
+    beforeAll(async () => {
+        const { client } = await getSystemDb(FAIL)
+        await client.executeMultiple(`
+INSERT INTO runs (id, agent_id, session_id, status, started_at, finished_at, model, goal_json, goal_state) VALUES
+    ('f1', 'failures', 'sa', 'done', '2026-09-03T10:00:00.000Z', '2026-09-03T10:01:00.000Z', 'opus', NULL, NULL),
+    ('f2', 'failures', 'sb', 'done', '2026-09-03T11:00:00.000Z', '2026-09-03T11:01:00.000Z', 'opus', NULL, NULL),
+    ('f3', 'failures', 'sc', 'done', '2026-09-03T12:00:00.000Z', '2026-09-03T12:01:00.000Z', 'haiku', NULL, NULL),
+    ('f4', 'failures', 'sd', 'error', '2026-09-03T13:00:00.000Z', '2026-09-03T13:01:00.000Z', 'opus', NULL, NULL),
+    ('f5', 'failures', 'se', 'cancelled', '2026-09-03T14:00:00.000Z', '2026-09-03T14:01:00.000Z', 'opus', NULL, NULL),
+    ('f6', 'failures', 'sf', 'running', '2026-09-03T15:00:00.000Z', NULL, 'opus', NULL, NULL),
+    ('g1', 'failures', 'sg', 'done', '2026-09-04T09:00:00.000Z', '2026-09-04T09:01:00.000Z', 'opus', '${GOAL}', 'not_met'),
+    ('g2', 'failures', 'shared', 'done', '2026-09-04T10:00:00.000Z', '2026-09-04T10:01:00.000Z', 'opus', '${GOAL}', 'met'),
+    ('g3', 'failures', 'shared', 'done', '2026-09-04T11:00:00.000Z', '2026-09-04T11:01:00.000Z', 'opus', NULL, NULL),
+    ('g4', 'failures', 'sh', 'running', '2026-09-04T12:00:00.000Z', NULL, 'opus', '${GOAL}', 'running');
+`)
+        const said: [string, string, string, unknown][] = [
+            ['sa', 'assistant', '2026-09-03T10:00:10.000Z', 'BLOCKED: an early guess'],
+            ['sa', 'assistant', '2026-09-03T10:00:50.000Z', 'All good\nTools: read_file'],
+            ['sb', 'user', '2026-09-03T11:00:01.000Z', 'go'],
+            ['sb', 'assistant', '2026-09-03T11:00:50.000Z', 'Tried twice\nBLOCKED: no key for the store\n\nTools: web_search, read_file\n'],
+            ['sc', 'assistant', '2026-09-03T12:00:50.000Z', [{ type: 'reasoning', text: 'hmm' }, { type: 'text', text: 'Looked around' }, { type: 'text', text: 'ESCALATE: the spec contradicts itself' }]],
+            ['sg', 'assistant', '2026-09-04T09:00:50.000Z', 'DONE: but no'],
+            ['shared', 'assistant', '2026-09-04T10:00:50.000Z', 'BLOCKED: at first\nDONE: shipped it'],
+            ['shared', 'assistant', '2026-09-04T11:00:50.000Z', 'ESCALATE: stuck on the second job'],
+        ]
+        for (const [i, [sessionId, role, createdAt, content]] of said.entries()) {
+            await client.execute({ sql: 'INSERT INTO messages (id, session_id, role, content_json, created_at) VALUES (?, ?, ?, ?, ?)', args: [`m${i}`, sessionId, role, JSON.stringify(content), createdAt] })
+        }
+    })
+
+    it('counts errors, cancels, unmet goals and stop lines as failures, running runs in the base', async () => {
+        const points = await aggregateStats(FAIL, query({ dataset: 'runs', metric: 'failureCount' }))
+        expect(points.map(point => [point.bucket, Number(point.value), Number(point.count)])).toEqual([
+            ['2026-09-03', 4, 6],
+            ['2026-09-04', 2, 4],
+        ])
+        const rate = await valuesByDay(query({ dataset: 'runs', metric: 'failureRate' }), FAIL)
+        expect(rate['2026-09-03']).toBeCloseTo(4 / 6)
+        expect(rate['2026-09-04']).toBeCloseTo(2 / 4)
+    })
+
+    it('leaves the error rate as it was', async () => {
+        const points = await aggregateStats(FAIL, query({ dataset: 'runs', metric: 'errorRate' }))
+        expect(points.map(point => [point.bucket, Number(point.value)])).toEqual([
+            ['2026-09-03', 1 / 6],
+            ['2026-09-04', 0],
+        ])
+    })
+
+    it('groups failures and honours the status filter and sinceIso', async () => {
+        expect(byGroup(await aggregateStats(FAIL, query({ dataset: 'runs', metric: 'failureCount', groupBy: 'model' })))).toEqual({
+            '2026-09-03|opus': 3,
+            '2026-09-03|haiku': 1,
+            '2026-09-04|opus': 2,
+        })
+        expect(await valuesByDay(query({ dataset: 'runs', metric: 'failureCount', status: 'done' }), FAIL)).toEqual({ '2026-09-03': 2, '2026-09-04': 2 })
+        expect(await valuesByDay(query({ dataset: 'runs', metric: 'failureCount', sinceIso: '2026-09-04T10:00:00.000Z' }), FAIL)).toEqual({ '2026-09-04': 1 })
     })
 })
 

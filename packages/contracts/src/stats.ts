@@ -14,6 +14,8 @@ export const statsMetricSchema = z.enum([
     'avgDurationMs',
     'errorCount',
     'errorRate',
+    'failureCount',
+    'failureRate',
 ])
 export type StatsMetric = z.infer<typeof statsMetricSchema>
 
@@ -65,6 +67,8 @@ export const STATS_METRIC_META: Record<StatsMetric, { unit: StatsUnit; agg: Stat
     avgDurationMs: { unit: 'ms', agg: 'avg' },
     errorCount: { unit: 'count', agg: 'sum' },
     errorRate: { unit: 'ratio', agg: 'avg' },
+    failureCount: { unit: 'count', agg: 'sum' },
+    failureRate: { unit: 'ratio', agg: 'avg' },
 }
 
 export const STATS_DATASETS: Record<
@@ -76,7 +80,7 @@ export const STATS_DATASETS: Record<
     }
 > = {
     runs: {
-        metrics: ['count', 'totalTokens', 'inputTokens', 'outputTokens', 'cachedInputTokens', 'reasoningTokens', 'cost', 'avgDurationMs', 'errorCount', 'errorRate'],
+        metrics: ['count', 'totalTokens', 'inputTokens', 'outputTokens', 'cachedInputTokens', 'reasoningTokens', 'cost', 'avgDurationMs', 'errorCount', 'errorRate', 'failureCount', 'failureRate'],
         groupBys: ['model', 'status', 'triggerSource'],
         supportsStatusFilter: true,
     },
