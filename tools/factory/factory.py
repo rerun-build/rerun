@@ -110,6 +110,11 @@ class RosterError(Exception):
     pass
 
 
+def home():
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dispatch.json"), encoding="utf-8") as f:
+        return json.load(f)["repo"]
+
+
 def base_roster(full):
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import roster as R
@@ -1042,6 +1047,9 @@ def cmd_risk(a):
         ro = base_roster(full)
     except RosterError as e:
         die("risk: " + str(e), 1)
+    if ro is None and full != home():
+        import roster as R
+        need.setdefault(R.GATE_SENSITIVE, ["this project has no roster: every change needs the second reviewer", []])[1].extend(f["filename"] for f in files)
     if ro:
         import roster as R
         need = {k: v for k, v in need.items() if k == "STOP"}

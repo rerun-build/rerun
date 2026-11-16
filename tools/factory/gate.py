@@ -412,6 +412,9 @@ def gate(repo, n):
     if ro:
         import roster as R
         need = R.required(ro, [f["filename"] for f in files], builder)
+    elif not roster_err and full != F.home():
+        import roster as R
+        need.add(R.GATE_SENSITIVE)
     if len(files) > 25 or lines > 1200:
         need.add("ADA")
     verdict, refused = {}, []
