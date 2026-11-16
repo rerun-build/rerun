@@ -64,10 +64,6 @@ html[data-unattended] *::after {
     initial-value: 0deg;
 }
 
-@keyframes border-beam-spin {
-    to { --border-beam-angle: 360deg; }
-}
-
 .border-beam {
     position: absolute;
     /* `inset: 0` cale l'overlay sur la boîte de padding du parent : sur un parent bordé, l'anneau
@@ -88,16 +84,18 @@ html[data-unattended] *::after {
     mask-composite: exclude;
 }
 
-/* Forme du dégradé : anneau plein alterné vs deux arcs qui balaient. */
+/* Forme du dégradé : anneau plein alterné vs deux arcs qui balaient. Le dégradé passe par
+   --beam-gradient pour que la variante animée le porte sur son pseudo-élément qui tourne. */
 .border-beam--ring {
-    background: conic-gradient(
+    --beam-gradient: conic-gradient(
         from var(--border-beam-angle),
         var(--beam-2), var(--beam-1), var(--beam-2), var(--beam-1), var(--beam-2)
     );
+    background: var(--beam-gradient);
 }
 
 .border-beam--arcs {
-    background: conic-gradient(
+    --beam-gradient: conic-gradient(
         from var(--border-beam-angle),
         var(--beam-2) 0%,
         var(--beam-1) 10%,
@@ -107,6 +105,7 @@ html[data-unattended] *::after {
         var(--beam-2) 72%,
         var(--beam-2) 100%
     );
+    background: var(--beam-gradient);
 }
 
 /* Couleurs : --beam-1 = teinte claire (celle qui "glow"), --beam-2 = base.
@@ -150,9 +149,32 @@ html:not(.dark) .badge-beam--white { --badge-fg: #111; --badge-soft: rgba(0, 0, 
 .badge-beam--yellow { --badge-fg: #facc15; --badge-soft: color-mix(in oklab, #facc15 12%, transparent); }
 html:not(.dark) .badge-beam--yellow { --badge-fg: #a16207; --badge-soft: color-mix(in oklab, #eab308 14%, transparent); }
 
-/* Animation (rotation de l'angle du dégradé) et glow optionnel. */
+/* Animation et glow optionnel. Le dégradé tourne d'un bloc au lieu de voir son angle animé : un carré
+   centré, assez grand pour couvrir la boîte sous tous les angles, porte le conique et tourne en
+   `rotate`, que le compositeur anime seul. Animer --border-beam-angle recalculait le style et
+   repeignait l'anneau à chaque image. Même rendu : tourner un conique autour de son centre, c'est
+   tourner son angle de départ. */
+@keyframes border-beam-turn {
+    to { rotate: 360deg; }
+}
+
 .border-beam--spin {
-    animation: border-beam-spin var(--beam-dur, 6s) linear infinite;
+    background: none;
+    container-type: size;
+}
+
+.border-beam--spin::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: calc(hypot(100cqw, 100cqh) + 4 * var(--beam-w, 1px));
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    background: var(--beam-gradient);
+    animation: border-beam-turn var(--beam-dur, 6s) linear infinite;
+    /* Un appelant met le faisceau en pause par le style de l'élément (OpenChatsTabs). */
+    animation-play-state: inherit;
 }
 
 .border-beam--glow {

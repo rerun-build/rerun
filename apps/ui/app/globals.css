@@ -391,7 +391,7 @@ html:not(.dark) .progress-fill {
    is spread across the whole edge instead of a short arc, and dialed down so it stays
    subtle. Override only — the shared @rerun/ui arcs preset is untouched. */
 .beam-soft.border-beam--arcs {
-  background: conic-gradient(
+  --beam-gradient: conic-gradient(
     from var(--border-beam-angle),
     var(--beam-2) 0%,
     var(--beam-1) 25%,

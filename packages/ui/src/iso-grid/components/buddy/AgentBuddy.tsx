@@ -2,6 +2,7 @@
 
 import { useId, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../../../cn'
+import { useBuddyBlinks } from '../../hooks/useBuddyBlinks'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { hashUnit } from '../../iso'
 import type { BuddyEyes, BuddyLook } from '../../types'
@@ -49,6 +50,7 @@ type AgentBuddyProps = {
 export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, alive = false, facing = 'left', badge, className }: AgentBuddyProps) {
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
     const reducedMotion = usePrefersReducedMotion()
+    useBuddyBlinks()
     const small = size < SMALL_BELOW
     const geometry = small ? SMALL_GEOMETRY : BUDDY_GEOMETRY
     const moving = animated && !reducedMotion

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { HandIcon, TriangleAlertIcon } from '../../icons'
+import { useBuddyBlinks } from '../hooks/useBuddyBlinks'
 import { buddyFootprintShare, hashUnit } from '../iso'
 import type { TileStyle } from '../types'
 import { useKitTranslations } from '../../locale'
@@ -61,6 +62,7 @@ type TileBuddyProps = {
 }
 
 export function TileBuddy({ id, style, width, height, floorOffset, active, stretched, ghost, reducedMotion, paused }: TileBuddyProps) {
+    useBuddyBlinks()
     const t = useKitTranslations()
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
     const look = buddyLook(style)

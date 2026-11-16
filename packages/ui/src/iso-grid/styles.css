@@ -287,13 +287,16 @@
     animation: iso-buddy-sweep 2.6s ease-in-out infinite;
 }
 
+/* Un clignement, et rien d'autre : useBuddyBlinks pose data-blink sur le visage le temps de ces
+   0,368 s, toutes les 4,6 s (les 8 % de fin de l'ancien cycle infini, mêmes courbes). Une animation
+   infinie, même immobile, faisait produire une image au navigateur à chaque rafraîchissement. */
 @keyframes iso-buddy-blink {
-    0%, 92%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.08); }
+    0%, 100% { transform: scaleY(1); }
+    37.5% { transform: scaleY(0.08); }
 }
 
-.iso-buddy-eyes {
-    animation: iso-buddy-blink 4.6s ease-in-out var(--buddy-blink-delay, 0s) infinite;
+.iso-buddy-eyes[data-blink] {
+    animation: iso-buddy-blink 0.368s ease-in-out;
 }
 
 /* A buddy standing alone in a page looks around: its lids fall like every other buddy's, and its
@@ -307,8 +310,8 @@
     82%, 100% { transform: translate(0, 0); }
 }
 
-[data-buddy-alive] .iso-buddy-lids {
-    animation: iso-buddy-blink 4.6s ease-in-out var(--buddy-blink-delay, 0s) infinite;
+[data-buddy-alive] .iso-buddy-lids[data-blink] {
+    animation: iso-buddy-blink 0.368s ease-in-out;
 }
 
 [data-buddy-alive] .iso-buddy-pupils {

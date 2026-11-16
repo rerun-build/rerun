@@ -4,6 +4,7 @@ import { useId, type CSSProperties, type ReactNode, type RefObject } from 'react
 
 import { cn } from '../cn'
 import { BUDDY_FACE_CENTER, BuddyFace } from '../iso-grid/components/buddy/BuddyFace'
+import { useBuddyBlinks } from '../iso-grid/hooks/useBuddyBlinks'
 import type { BuddyEyes } from '../iso-grid/types'
 
 import type { OrbActivity } from './Orb'
@@ -123,6 +124,7 @@ type ForemanBallProps = {
 
 export function ForemanBall({ material: materialKey, scale, size, face = 'plate', eyes = 'pill', state = 'idle', animated = true, facing = 'left', eyesRef, faceRef, className }: ForemanBallProps) {
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
+    useBuddyBlinks()
     const material = FOREMAN_MATERIALS[materialKey]
     const paint = material.ball
     const width = size * scale

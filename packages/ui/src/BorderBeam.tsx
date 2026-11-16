@@ -69,8 +69,8 @@ export function BorderBeam({
                     '--beam-w': `${width}px`,
                     '--beam-outset': `${outset}px`,
                     '--beam-dur': `${duration}s`,
-                    // Static variants pin the gradient angle; animated ones let the
-                    // border-beam-spin keyframe drive --border-beam-angle instead.
+                    // Static variants pin the gradient angle; animated ones start at 0deg
+                    // and turn as a whole (`.border-beam--spin::before`).
                     ...(animated ? {} : { '--border-beam-angle': `${angle}deg` }),
                     ...style,
                 } as CSSProperties
