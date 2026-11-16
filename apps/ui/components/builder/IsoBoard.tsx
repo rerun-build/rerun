@@ -25,7 +25,7 @@ import { BoardDiscoveries } from '@/components/builder/discoveries/BoardDiscover
 import { useCompanyDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import { useDiscoveriesStore } from '@/stores/discoveries.store'
 import { useTeamCursors } from '@/supabase/useTeamCursors'
-import { useWindowFocused } from '@/hooks/useWindowFocused'
+import { usePageAttention } from '@/hooks/usePageAttention'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { useBoxViewer, useManageableSpaceIds } from '@/hooks/useBoxAccess'
 import { boxContainerFor, boxTileFor, emptyBoardOffersBox, placementNeedsBoxFirst } from '@/lib/board/box-controls'
@@ -87,7 +87,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     const foremanFunnel = useForemanStore(s => s.funnel)
     const belowMd = useIsMobile(PANEL_SHEET_QUERY)
     const dialogCoversBoard = useBoardCoverStore(s => s.covers > 0)
-    const windowFocused = useWindowFocused()
+    const windowFocused = usePageAttention() === 'focused'
     const placingAgentId = useBoardStore(s => s.placingAgentId)
     const placement = useBoardStore(s => s.placement)
     const startingFirstAgent = useBoardStore(s => s.startingFirstAgent)

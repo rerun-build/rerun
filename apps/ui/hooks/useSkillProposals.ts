@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { decideSkillProposalAction, listSkillProposalsAction } from '@/app/api/_actions/skill-proposal.actions'
 import { nextPinnedIds, RELEASE_DELAY_MS, settledPinnedIds } from '@rerun/contracts'
 import type { EngineSkillProposal } from '@/lib/engine/types'
+import { onPageShownOrHidden } from '@/lib/desktop-shell/attention'
 
 // The writing job is bounded on the engine (a timeout, and a sweep on restart), so the poll can
 // follow it to the end: quick at first, then relaxed for the minutes a CLI provider can take.
@@ -91,11 +92,9 @@ export function useSkillProposals(sessionId: string | null, runStatus: string) {
     // A tab that slept through the writing catches up the moment it is looked at again.
     useEffect(() => {
         if (!writing) return
-        const onVisible = () => {
-            if (document.visibilityState === 'visible') refresh().catch(() => {})
-        }
-        document.addEventListener('visibilitychange', onVisible)
-        return () => document.removeEventListener('visibilitychange', onVisible)
+        return onPageShownOrHidden(shown => {
+            if (shown) refresh().catch(() => {})
+        })
     }, [writing, refresh])
 
     // A dismissed row stays up long enough to report its outcome where the user is looking, then

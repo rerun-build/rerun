@@ -2,11 +2,15 @@
 
 import { type RefObject, useEffect, useState } from 'react'
 
-// Vrai tant que l'élément peut être vu : dans le viewport et onglet affiché. Vrai avant la première
-// mesure, pour ne jamais figer le premier paint d'un board qui est en fait à l'écran.
+import { usePageUnattended } from '../../primitives/use-page-unattended'
+
+// Vrai tant que l'élément peut être vu : dans le viewport, onglet affiché, et quelqu'un devant la
+// page. Vrai avant la première mesure, pour ne jamais figer le premier paint d'un board qui est en
+// fait à l'écran.
 export function useOnScreen(ref: RefObject<Element | null>): boolean {
     const [intersecting, setIntersecting] = useState(true)
     const [tabVisible, setTabVisible] = useState(true)
+    const unattended = usePageUnattended()
 
     useEffect(() => {
         const element = ref.current
@@ -23,5 +27,5 @@ export function useOnScreen(ref: RefObject<Element | null>): boolean {
         return () => document.removeEventListener('visibilitychange', sync)
     }, [])
 
-    return intersecting && tabVisible
+    return intersecting && tabVisible && !unattended
 }

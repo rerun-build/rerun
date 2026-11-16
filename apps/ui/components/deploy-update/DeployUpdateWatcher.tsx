@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
-import { pageAttention } from '@/lib/desktop-shell/attention'
+import { onPageShownOrHidden, pageAttention } from '@/lib/desktop-shell/attention'
 import { dismissUpdateAvailableToast, showUpdateAvailableToast } from './showUpdateAvailableToast'
 import { UpdateRequiredDialog } from './UpdateRequiredDialog'
 
@@ -64,8 +64,7 @@ export function DeployUpdateWatcher() {
         if (stale) {
             dismissUpdateAvailableToast()
             reloadIfUnattended()
-            document.addEventListener('visibilitychange', reloadIfUnattended)
-            return () => document.removeEventListener('visibilitychange', reloadIfUnattended)
+            return onPageShownOrHidden(reloadIfUnattended)
         }
 
         const checkVersion = async () => {
@@ -80,10 +79,10 @@ export function DeployUpdateWatcher() {
         }
 
         const interval = window.setInterval(checkVersion, VERSION_CHECK_INTERVAL_MS)
-        document.addEventListener('visibilitychange', checkVersion)
+        const stopWatching = onPageShownOrHidden(checkVersion)
         return () => {
             window.clearInterval(interval)
-            document.removeEventListener('visibilitychange', checkVersion)
+            stopWatching()
         }
     }, [stale, t])
 

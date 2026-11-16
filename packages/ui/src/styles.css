@@ -39,6 +39,16 @@
     --stripes-gutter-ink: rgb(255 255 255 / 0.075);
 }
 
+/* Page que personne ne regarde (fenêtre sans le focus, cachée, réduite, onglet en arrière-plan,
+   voir PAGE_UNATTENDED_ATTRIBUTE) : toute animation se fige sur sa frame courante et repart de là.
+   Sans ça, une seule animation infinie fait produire au navigateur une image par rafraîchissement
+   d'écran, même fenêtre cachée dans l'app desktop. */
+html[data-unattended] *,
+html[data-unattended] *::before,
+html[data-unattended] *::after {
+    animation-play-state: paused !important;
+}
+
 /* Balayage shimmer sur du texte (composant TextShimmer) */
 @keyframes text-shimmer {
     0% { background-position: 100% center; }

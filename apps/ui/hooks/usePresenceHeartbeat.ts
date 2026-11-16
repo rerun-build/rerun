@@ -1,12 +1,14 @@
 'use client'
 
+import { onPageShownOrHidden, pageAttention } from '@/lib/desktop-shell/attention'
 import { PRESENCE_HEARTBEAT_MS, shouldBeat } from '@/lib/notifications/presence'
 import { useEffect, useRef } from 'react'
 
 const INTERACTION_EVENTS = ['pointerdown', 'keydown', 'wheel', 'touchstart'] as const
 
 // Tells the hub this tab is in the foreground, which is what lets the notification fan-out skip the
-// email for someone who is already getting the toast.
+// email for someone who is already getting the toast. The desktop app hidden in the tray or minimized
+// counts as gone, although its `document.visibilityState` stays visible.
 export function usePresenceHeartbeat(enabled: boolean) {
     const lastInteraction = useRef(0)
 
@@ -20,10 +22,10 @@ export function usePresenceHeartbeat(enabled: boolean) {
             void fetch('/api/presence', { method, keepalive }).catch(() => {})
         }
         const beat = () => {
-            if (shouldBeat({ visible: document.visibilityState === 'visible', lastInteractionAt: lastInteraction.current, now: Date.now() })) send('POST')
+            if (shouldBeat({ visible: pageAttention() !== 'hidden', lastInteractionAt: lastInteraction.current, now: Date.now() })) send('POST')
         }
-        const onVisibility = () => {
-            if (document.visibilityState !== 'visible') return send('DELETE', true)
+        const onShownOrHidden = (shown: boolean) => {
+            if (!shown) return send('DELETE', true)
             bump()
             beat()
         }
@@ -33,13 +35,13 @@ export function usePresenceHeartbeat(enabled: boolean) {
         beat()
         const interval = setInterval(beat, PRESENCE_HEARTBEAT_MS)
         INTERACTION_EVENTS.forEach(event => window.addEventListener(event, bump, { passive: true }))
-        document.addEventListener('visibilitychange', onVisibility)
+        const stopWatching = onPageShownOrHidden(onShownOrHidden)
         window.addEventListener('pagehide', onPageHide)
 
         return () => {
             clearInterval(interval)
             INTERACTION_EVENTS.forEach(event => window.removeEventListener(event, bump))
-            document.removeEventListener('visibilitychange', onVisibility)
+            stopWatching()
             window.removeEventListener('pagehide', onPageHide)
         }
     }, [enabled])

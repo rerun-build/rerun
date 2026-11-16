@@ -6,6 +6,7 @@ import { useEffect, useMemo, type RefObject } from 'react'
 import { ChromeButton } from '@rerun/ui/chrome'
 
 import { Kbd } from '@/components/ui/kbd'
+import { usePageAttention } from '@/hooks/usePageAttention'
 import { MicIcon, SendIcon } from '@/lib/icons'
 
 import { useTypewriter } from './useTypewriter'
@@ -38,7 +39,8 @@ export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange,
     const t = useTranslations('foreman.pill')
     const reducedMotion = useReducedMotion()
     const prompts = useMemo(() => [t('prompts.lastNight'), t('prompts.failedRun'), t('prompts.newCoworker')], [t])
-    const suggestion = useTypewriter(prompts, { paused: !!reducedMotion || focused })
+    const unattended = usePageAttention() !== 'focused'
+    const suggestion = useTypewriter(prompts, { paused: !!reducedMotion || focused, frozen: unattended })
     const writing = focused || draft.length > 0
 
     useEffect(() => {
