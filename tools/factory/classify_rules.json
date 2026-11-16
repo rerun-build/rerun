@@ -1,0 +1,199 @@
+{
+  "areas": [
+    {
+      "name": "factory",
+      "paths": [
+        "tools/factory"
+      ],
+      "words": [
+        "dispatcher",
+        "planning station",
+        "resolver",
+        "merge-dev",
+        "job-open"
+      ],
+      "label": "area:factory"
+    },
+    {
+      "name": "engine",
+      "paths": [
+        "apps/engine"
+      ],
+      "words": [
+        "engine"
+      ],
+      "label": null
+    },
+    {
+      "name": "ui",
+      "paths": [
+        "apps/ui"
+      ],
+      "words": [
+        "screen",
+        "page"
+      ],
+      "label": null
+    },
+    {
+      "name": "contracts",
+      "paths": [
+        "packages/contracts"
+      ],
+      "words": [
+        "contract"
+      ],
+      "label": null
+    },
+    {
+      "name": "deploy",
+      "paths": [
+        "deploy"
+      ],
+      "words": [
+        "update.sh",
+        "compose"
+      ],
+      "label": null
+    },
+    {
+      "name": "docs",
+      "paths": [
+        "docs"
+      ],
+      "words": [],
+      "label": null
+    },
+    {
+      "name": "ci",
+      "paths": [
+        ".github"
+      ],
+      "words": [
+        "workflow"
+      ],
+      "label": "area:ci"
+    }
+  ],
+  "kinds": [
+    {
+      "name": "follow-up",
+      "words": [
+        "<!-- followup:",
+        "From the review of #",
+        "From the proof of #"
+      ]
+    },
+    {
+      "name": "operator",
+      "words": [
+        ".github/workflows/",
+        "secret",
+        "on the server",
+        "update.sh"
+      ]
+    },
+    {
+      "name": "plan",
+      "words": [
+        "PLAN READY",
+        "## Jobs"
+      ]
+    },
+    {
+      "name": "bug",
+      "words": [
+        "crash",
+        "fails",
+        "wrong",
+        "broken",
+        "error"
+      ]
+    }
+  ],
+  "follow_up_chars": 600,
+  "priorities": [
+    {
+      "name": "P0",
+      "words": [
+        "token",
+        "tokens",
+        "cache",
+        "planning",
+        "planner",
+        "plan quality",
+        "handoff"
+      ],
+      "paths": [
+        "tools/factory/planning.py",
+        "tools/factory/planners.py",
+        "tools/factory/tiers.py",
+        "tools/factory/tokenstats.py",
+        "tools/factory/cutshape.py"
+      ]
+    },
+    {
+      "name": "P1",
+      "words": [
+        "dispatcher",
+        "resolver",
+        "merge-dev",
+        "worktree",
+        "red before green",
+        "check"
+      ],
+      "paths": [
+        "tools/factory",
+        "tools/factory/bin",
+        ".github/workflows"
+      ]
+    },
+    {
+      "name": "P2",
+      "words": [
+        "digest",
+        "snapshot",
+        "factory page",
+        "visibility",
+        "report"
+      ],
+      "paths": [
+        "apps/ui/components/factory",
+        "docs"
+      ]
+    },
+    {
+      "name": "P3",
+      "words": [
+        "feature"
+      ],
+      "paths": [
+        "apps/engine",
+        "apps/ui",
+        "packages/contracts",
+        "deploy"
+      ]
+    }
+  ],
+  "similar_title": 0.6,
+  "stop_words": [
+    "the",
+    "and",
+    "for",
+    "with",
+    "from",
+    "that",
+    "this",
+    "into",
+    "when",
+    "not"
+  ],
+  "never_touch": [
+    "factory",
+    "factory-plan",
+    "factory-paused",
+    "factory-blocked",
+    "factory-problem",
+    "owner"
+  ]
+}
