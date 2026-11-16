@@ -9,6 +9,7 @@ import { ControlCenter } from '@/components/control-center/ControlCenter'
 import { FactoryLoader } from '@/components/factory/FactoryLoader'
 import { FactoryTopBar } from '@/components/factory/FactoryTopBar'
 import { FactoryWorld } from '@/components/factory/FactoryWorld'
+import { type Bucket } from '@/components/factory/factory-bucket'
 import { LOADER_TILE } from '@/components/factory/factory-state'
 import { sceneFromSnapshot } from '@/components/factory/from-snapshot'
 import { WorkspaceSwitcher } from '@/components/layout/WorkspaceSwitcher'
@@ -46,6 +47,7 @@ export default function FactoryPage() {
     const { workspace } = useSession()
 
     const [selected, setSelected] = useState<number | null>(null)
+    const [bucket, setBucket] = useState<Bucket | null>(null)
     const [loaderOpen, setLoaderOpen] = useState(false)
 
     const hydrated = useBoardStore(s => s.hydrated)
@@ -67,8 +69,9 @@ export default function FactoryPage() {
     }, [hydrated, workspace, hydrate])
 
     const onSelect = useCallback((issue: number) => setSelected(issue), [])
+    const onOpenBucket = useCallback((b: Bucket) => { setSelected(null); setBucket(b) }, [])
     useEffect(() => {
-        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSelected(null) }
+        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { setSelected(null); setBucket(null) } }
         window.addEventListener('keydown', onKey)
         return () => window.removeEventListener('keydown', onKey)
     }, [])
@@ -95,12 +98,12 @@ export default function FactoryPage() {
     return (
         <div className="relative">
             <FactoryWorld
-                {...(snapshot ? { scene, selectedIssue: selected, onSelectJob: onSelect, onOpenCoworker: openByName } : {})}
+                {...(snapshot ? { scene, selectedIssue: selected, onSelectJob: onSelect, onOpenBucket, onOpenCoworker: openByName } : {})}
                 {...(workspace ? { workspace: String(workspace.id) } : {})}
                 snapshot={snapshot ?? null}
                 rightInset={rightInset}
                 theme={resolvedTheme === 'light' ? 'light' : 'dark'}
-                topBar={<FactoryTopBar snapshot={snapshot ?? null} selected={selected} onSelect={setSelected} names={names} onOpenCoworker={openCoworker} />}
+                topBar={<FactoryTopBar snapshot={snapshot ?? null} selected={selected} onSelect={setSelected} names={names} onOpenCoworker={openCoworker} bucket={bucket} onBucket={setBucket} />}
             />
             <WorkspaceSwitcher />
             <div className="absolute left-4 top-16 z-30">

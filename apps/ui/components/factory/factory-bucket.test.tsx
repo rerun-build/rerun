@@ -58,7 +58,7 @@ afterEach(() => { act(() => root.unmount()); host.remove() })
 
 describe('the list behind a bucket', () => {
     const show = (over: Record<string, unknown> = {}) => act(() => {
-        root.render(createElement(FactoryBucket, { bucket: 'rejects', jobs: JOBS, repo: 'acme/app', names: NAMES, onSelect: () => {}, ...over } as never))
+        root.render(createElement(FactoryBucket, { bucket: 'rejects', jobs: JOBS, repo: 'acme/app', names: NAMES, now: Date.parse('2026-11-16T12:00:00Z'), onSelect: () => {}, ...over } as never))
     })
 
     it('lists each rejected job with its title, who rejected it where, the reason, the time, the builder and its links', () => {
