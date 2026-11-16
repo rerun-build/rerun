@@ -20,8 +20,14 @@ class CloneCase(T.FactoryCase):
         self.commit(path, "only-here.txt", "x\n")
         return path
 
+    def fake_gh(self):
+        path = os.path.join(self.tmp, "fake-gh")
+        write(self.tmp, "fake-gh", "#!/bin/sh\necho '[]'\n")
+        os.chmod(path, 0o755)
+        return path
+
     def sweep(self, *argv):
-        with mock.patch.object(F, "pr_lookup", lambda full, branch: []):
+        with mock.patch.object(F, "GH", self.fake_gh()):
             return self.call(F.cmd_wt, ["sweep"] + list(argv))
 
 
