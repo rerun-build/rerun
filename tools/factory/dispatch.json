@@ -13,6 +13,11 @@
   "proof": true,
   "one_file_one_job": true,
   "slots": 15,
+  "check_ratio": {
+    "review": 0.4,
+    "proof": 0.3,
+    "acceptance": 0.1
+  },
   "resolver": {
     "detect": true,
     "resolve": true

@@ -2,6 +2,7 @@ import hashlib
 import json
 import os
 import re
+from fractions import Fraction
 
 import pools
 
@@ -64,6 +65,50 @@ def validate(block, bounds, base, last):
     return effective, errors
 
 
+CHECKS = (("reviewer", ("review", "proof")), ("acceptor", ("acceptance",)))
+
+
+def names_of(types, kind):
+    group = (types or {}).get(kind) or {}
+    return [c["name"] for c in group.get("coworkers", [])]
+
+
+def follow(copies, types, bounds, ratio):
+    if not ratio:
+        return copies, []
+    out = dict(copies)
+    lines = []
+    builders = [n for n in names_of(types, "coder") if n in out]
+    for kind, keys in CHECKS:
+        names = [n for n in names_of(types, kind) if n in out]
+        if not names:
+            continue
+        per = sum((Fraction(str(ratio[k])) for k in keys if k in ratio), Fraction(0))
+        if per <= 0:
+            continue
+        build = sum(out[n] for n in builders)
+        need = -((-build * per.numerator) // per.denominator)
+        have = sum(out[n] for n in names)
+        for n in names:
+            if have >= need:
+                break
+            top = max(bounds.get(n, out[n]), out[n])
+            step = min(top - out[n], need - have)
+            out[n] += step
+            have += step
+        if have >= need:
+            continue
+        keep = have * per.denominator // per.numerator
+        extra = build - keep
+        for n in reversed(builders):
+            cut = min(out[n], extra)
+            out[n] -= cut
+            extra -= cut
+        lines.append(f"copies: builders held at {keep} of {build} asked: the {kind} copies can follow"
+                     f" only {keep} ({float(per):g} per build copy, at most {have})")
+    return out, lines
+
+
 class Control:
     def __init__(self, cfg, gh, store, bounds=None):
         self.cfg = cfg
@@ -96,6 +141,10 @@ class Control:
         self.seen = True
         block, parse_errors = parse(issue.get("body") if issue else None)
         effective, errors = validate(block or {}, self.bounds, self.base, self.effective)
+        if "copies" in effective:
+            effective["copies"], held = follow(effective["copies"], self.cfg.get("types") or {},
+                                               self.bounds.get("copies", {}), self.cfg.get("check_ratio"))
+            errors = errors + held
         self.record(effective)
         self.effective = effective
         self.apply()
