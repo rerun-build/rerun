@@ -37,6 +37,10 @@ CREATE TABLE IF NOT EXISTS transitions(
   from_state TEXT, to_state TEXT NOT NULL, reason TEXT, round INTEGER, run_id TEXT);
 CREATE INDEX IF NOT EXISTS transitions_job ON transitions(job, id);
 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, key TEXT NOT NULL, old TEXT, new TEXT);
+CREATE TABLE IF NOT EXISTS failures(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, kind TEXT NOT NULL, job TEXT NOT NULL,
+  station TEXT NOT NULL DEFAULT '', coworker TEXT NOT NULL DEFAULT '', model TEXT, tier TEXT,
+  reason TEXT NOT NULL DEFAULT '', plan_run TEXT, brief TEXT);
 """
 JOB_STATES = states.NAMES
 FIRE_COLUMNS = (("cache_read", "INTEGER"), ("cache_write", "INTEGER"), ("seconds", "INTEGER"),
@@ -290,6 +294,18 @@ class Store:
     def events(self):
         rows = self.db.execute("SELECT at, key, old, new FROM events ORDER BY id").fetchall()
         return [{"at": r[0], "key": r[1], "from": json.loads(r[2]), "to": json.loads(r[3])} for r in rows]
+
+    def add_failure(self, kind, job, station="", coworker="", model=None, tier=None, reason="", plan_run=None, brief=None, at=None):
+        with self.db:
+            cur = self.db.execute(
+                "INSERT INTO failures(at, kind, job, station, coworker, model, tier, reason, plan_run, brief) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (at or now(), kind, str(job), station, coworker, model, tier, (reason or "")[:300], plan_run, brief))
+        return cur.lastrowid
+
+    def failures(self, after=0):
+        cur = self.db.execute("SELECT * FROM failures WHERE id>? ORDER BY id", (after,))
+        names = [c[0] for c in cur.description]
+        return [dict(zip(names, r)) for r in cur.fetchall()]
 
     def steps_seen(self, fire_id, steps, at=None):
         self.db.execute("UPDATE fires SET steps=?, steps_at=? WHERE id=? AND steps IS NOT ?",

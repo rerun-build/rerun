@@ -6,6 +6,7 @@ import clocks
 import control
 import cutshape
 import digest
+import failures
 import followups
 import holds
 import planners
@@ -325,6 +326,10 @@ def dead_comment(dead):
             "or change the **Depends on** line." % ", ".join("#%d (%s)" % (d, why) for d, why in dead))
 
 
+failures.SOURCES.update(building=(first_brief, build_brief, final_state), reviewing=(review_brief, final_state),
+                        proving=(proof_brief, final_state), fixing=(fix_brief, final_state), returned=(replan_brief,))
+
+
 def checks_verdict(runs):
     if not runs:
         return "WAIT", "no workflow runs yet"
@@ -486,9 +491,17 @@ class Dispatcher:
             if j["state"] in END:
                 return
             state, msg, kw = "blocked", "blocked: " + why[:180], {"reason": why[:200], "sending": None, "ended_at": ledger_store.now()}
+        old = j["state"]
         j.update(kw, state=state)
         self.save(j, msg, reset=True)
         log(j["issue"], msg)
+        self.note_failures(j, failures.kinds(old, state, msg), old, msg)
+
+    def note_failures(self, j, kinds, old, msg):
+        for kind in kinds:
+            self.store.add_failure(kind, j["issue"], station=STATION_OF.get(old, old), coworker=self.names.get(j.get("agent"), j.get("agent") or ""),
+                                   model=(j.get("run_model") or {}).get("model"), tier=j.get("tier"), reason=msg,
+                                   plan_run=failures.plan_run(self.store, j), brief=j.get("brief_v"))
 
     def file_holder(self, issue, paths):
         for j in self.jobs():
@@ -749,6 +762,7 @@ class Dispatcher:
             j["replans"] = n
             j["replan_run"] = j["run"]
             self.save(j, "re-plan %d of %d sent" % (n, MAX_REPLANS))
+            self.note_failures(j, ["re-plan"], "returned", "re-plan %d of %d: %s" % (n, MAX_REPLANS, j.get("reason") or "-"))
 
     def tier_job(self, j, state):
         j.pop("tier", None)
@@ -763,6 +777,7 @@ class Dispatcher:
     def send(self, j, agent, step, message, state, copy=1):
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
         self.tier_job(j, state)
+        j["brief_v"] = failures.version(state)
         j["intent_at"] = iso(self.now())
         j["fire_id"] = self.store.intent(str(j["issue"]), "", step, coworker=self.names.get(agent, agent), at=j["intent_at"])
         self.save(j, step)
@@ -1220,12 +1235,25 @@ class Dispatcher:
                 if j["errors"] >= 20 and j["state"] not in END:
                     self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
         heard, HEARD[:] = list(HEARD), []
+        known = set(self.resolver.records(self, closed=True))
         try:
             self.resolver.beat(self, heard, self.beat_line)
         except Exception as e:
             log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        self.note_problems(known)
         self.report_line()
         self.beat_end(clean)
+
+    def note_problems(self, known):
+        try:
+            for key, r in self.resolver.records(self).items():
+                if key in known:
+                    continue
+                m = re.search(r"#(\d+)", key)
+                first = str(r.get("evidence") or "").split("\n")[0]
+                self.store.add_failure("problem", m.group(1) if m else "-", station="resolve", reason="%s: %s" % (key, first))
+        except Exception as e:
+            log("-", "failures: %s" % type(e).__name__)
 
     def beat_end(self, clean):
         if not os.environ.get("FACTORY_CODE_SHA"):
