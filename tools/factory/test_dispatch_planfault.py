@@ -105,28 +105,35 @@ class Flow(P.ProofBase):
         self.assertEqual(self.planner_sends(), [])
 
     def test_after_two_re_plans_a_plan_result_stays_returned_without_a_send(self):
-        self.to_proving()
-        self.w.finish("r2", lines(2) + "\nPROOF: FAIL @abcdef1: 2")
-        with unittest.mock.patch.object(D, "MAX_REPLANS", 0):
+        for _ in range(3):
+            self.to_proving()
+            self.w.finish("r2", lines(2) + "\nPROOF: FAIL @abcdef1: 2")
             self.tick(3)
+            self.w.unlabelled.clear()
         self.assertEqual(self.state(), "returned")
-        self.assertEqual(self.planner_sends(), [])
+        self.assertEqual(len(self.planner_sends()), 2)
+        self.assertEqual(self.data()["replans"], 2)
         self.assertTrue(self.data()["reason"].startswith("plan: proof:"))
+        self.tick(3)
+        self.assertEqual(len(self.planner_sends()), 2)
 
 
-class Briefs(unittest.TestCase):
     def test_the_proof_and_review_briefs_name_the_plan_form(self):
-        j = {"issue": 5, "title": "t", "body": ""}
-        self.assertIn("ASK <n>: NOT MET (plan) <", D.proof_brief(j, 42, HEAD, ["a"]))
-        self.assertIn("VERDICT: REJECT (plan) @<first 7 characters>: <one sentence>", D.review_brief(j, 42, HEAD))
+        self.to_proving()
+        self.assertIn("ASK <n>: NOT MET (plan) <", self.w.sends[-1][1])
+        self.w.finish("r2", "PROOF: FAIL @abcdef1: 4, 5")
+        self.tick(2)
+        self.w.finish("b1", "PUSHED: fix")
+        self.tick(2)
+        self.assertIn("VERDICT: REJECT (plan) @<first 7 characters>: <one sentence>", self.w.sends[-1][1])
 
     def test_the_re_plan_brief_carries_the_kept_lines(self):
-        j = {"issue": 5, "title": "t", "reason": "plan: proof: x", "pr": 42, "plan_lines": PLAN2}
-        text = D.replan_brief(j, "o/r", 1)
-        self.assertIn("Pull request #42 is open", text)
-        self.assertIn(PLAN2, text)
-        j.pop("plan_lines")
-        self.assertNotIn("is open", D.replan_brief(j, "o/r", 1))
+        self.to_proving()
+        self.w.finish("r2", lines(2) + "\nPROOF: FAIL @abcdef1: 2")
+        self.tick(2)
+        brief = self.planner_sends()[0][1]
+        self.assertIn("Pull request #42 is open", brief)
+        self.assertIn("ASK 2: NOT MET (plan) Files lacks a path", brief)
 
 
 if __name__ == "__main__":
