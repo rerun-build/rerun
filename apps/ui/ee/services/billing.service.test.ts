@@ -11,6 +11,7 @@ import {
     applySubscriptionToWorkspace,
     cancelSubscription,
     changePlan,
+    checkoutPaymentMethodId,
     completeCardSetupSession,
     createPlanCardSetupSession,
     createPlanCheckoutSession,
@@ -1579,12 +1580,15 @@ describe('syncStripeCustomerEmail', () => {
 })
 
 describe('completeCardSetupSession', () => {
-    it('pays the invoice a failed payment left open with the new card', async () => {
+    it('pays the invoice a failed payment left open with the new card, not the declined one', async () => {
         useDb({ row: { stripe_subscription_id: 'sub_1', subscription_status: 'past_due' } })
-        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(sub({ status: 'past_due', default_payment_method: 'pm_new' }) as never)
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(sub({ status: 'past_due', default_payment_method: 'pm_declined' }) as never)
+        vi.mocked(stripe.setupIntents.retrieve).mockResolvedValue({ payment_method: 'pm_new' } as never)
         vi.mocked(stripe.invoices.list).mockResolvedValue({ data: [{ id: 'in_open' }] } as never)
 
-        await completeCardSetupSession({ metadata: { subscription_id: 'sub_1' } } as never)
+        await completeCardSetupSession({ metadata: { subscription_id: 'sub_1' }, setup_intent: 'seti_1' } as never)
+        expect(stripe.subscriptions.update).toHaveBeenCalledWith('sub_1', { default_payment_method: 'pm_new' })
+        expect(stripe.customers.update).toHaveBeenCalledWith('cus_1', { invoice_settings: { default_payment_method: 'pm_new' } })
         expect(stripe.invoices.pay).toHaveBeenCalledWith('in_open', { payment_method: 'pm_new' })
     })
 
@@ -1595,6 +1599,18 @@ describe('completeCardSetupSession', () => {
         await completeCardSetupSession({ metadata: { subscription_id: 'sub_1' } } as never)
         expect(stripe.invoices.pay).not.toHaveBeenCalled()
         expect(vi.mocked(stripe.subscriptions.update).mock.calls.map(([, params]) => Object.keys(params ?? {}))).not.toContainEqual(expect.arrayContaining(['items']))
+    })
+})
+
+describe('checkoutPaymentMethodId', () => {
+    it('falls back on the subscription card without a session', async () => {
+        expect(await checkoutPaymentMethodId(undefined, sub({ default_payment_method: 'pm_sub' }))).toBe('pm_sub')
+        expect(stripe.setupIntents.retrieve).not.toHaveBeenCalled()
+    })
+
+    it('falls back on the subscription card when the setup intent carries none', async () => {
+        vi.mocked(stripe.setupIntents.retrieve).mockResolvedValue({ payment_method: null } as never)
+        expect(await checkoutPaymentMethodId({ setup_intent: 'seti_1' } as never, sub({ default_payment_method: 'pm_sub' }))).toBe('pm_sub')
     })
 })
 

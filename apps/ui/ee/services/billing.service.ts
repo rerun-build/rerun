@@ -1399,19 +1399,21 @@ export async function adoptCheckoutPaymentMethodAsDefault(session: Stripe.Checko
     }
 }
 
-// A trialing subscription is paid for by a SetupIntent, not a PaymentIntent, and the subscription
-// does not always carry the payment method by the time the session completes. The session is
-// optional because `customer.subscription.created` carries none: there, the subscription's own
-// default is all there is, and a null answer simply means "ask again on the checkout event".
+// The card the session's SetupIntent just collected comes first: on a past-due subscription the
+// subscription's own default is the card that was declined, and paying with it again only gets
+// `previously_declined_do_not_retry`. The subscription's default is the fallback for a session that
+// collected nothing (a subscription checkout without trial) and for `customer.subscription.created`,
+// which carries no session; a null answer there simply means "ask again on the checkout event".
 export async function checkoutPaymentMethodId(session: Stripe.Checkout.Session | undefined, subscription: Stripe.Subscription): Promise<string | null> {
-    const fromSubscription = subscription.default_payment_method
-    if (fromSubscription) return typeof fromSubscription === 'string' ? fromSubscription : fromSubscription.id
+    if (session?.setup_intent) {
+        const setupIntentId = typeof session.setup_intent === 'string' ? session.setup_intent : session.setup_intent.id
+        const setupIntent = await stripe.setupIntents.retrieve(setupIntentId)
+        if (setupIntent.payment_method) return typeof setupIntent.payment_method === 'string' ? setupIntent.payment_method : setupIntent.payment_method.id
+    }
 
-    if (!session?.setup_intent) return null
-    const setupIntentId = typeof session.setup_intent === 'string' ? session.setup_intent : session.setup_intent.id
-    const setupIntent = await stripe.setupIntents.retrieve(setupIntentId)
-    if (!setupIntent.payment_method) return null
-    return typeof setupIntent.payment_method === 'string' ? setupIntent.payment_method : setupIntent.payment_method.id
+    const fromSubscription = subscription.default_payment_method
+    if (!fromSubscription) return null
+    return typeof fromSubscription === 'string' ? fromSubscription : fromSubscription.id
 }
 
 // null = unlimited, so it wins any max.
