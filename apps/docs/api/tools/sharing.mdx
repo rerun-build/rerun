@@ -3,7 +3,7 @@ title: "Share links"
 description: "Hand one coworker to someone else by link, without going through the marketplace."
 ---
 
-A share link is a copy of one coworker, frozen at the moment you create it, reachable at a URL. Whoever opens it signs in and the copy lands on their own board, with its apps disconnected and its webhooks reissued. Unlike a [template](/api/tools/templates), it is a transfer to one person rather than a page anyone installs from, so it needs no expert account and no sandbox: any workspace can send a coworker it owns.
+A share link is a copy of one coworker, frozen at the moment you create it, reachable at a URL. Whoever opens it signs in and the copy lands on their own board, with its apps disconnected and its webhooks reissued. Unlike a [template](/api/tools/templates), it is a transfer to one person rather than a page anyone installs from, so it needs no expert account and no sandbox: any workspace can send a coworker it owns. Every tool here needs **Can manage** on the coworker's Box.
 
 <Warning>
   **A link is a bearer capability.** No expiry, no password, no list of allowed recipients. Anyone holding the URL can install the coworker until `revoke_agent_share` kills it. Hand it only to the person it is for, and do not paste it anywhere it outlives the conversation.
@@ -45,7 +45,7 @@ Dry run. Reads the coworker on its machine and prices what a link would carry, w
   From `list_agents`.
 </ParamField>
 
-Returns `contents` — the three buckets with a `count` and a `bytes` each — plus `envKeyCount` and `mcpAuthCount` (how many credentials the copy will have to be given again, counted, never named), `warnings`, and `includeDefaults`, which is what `create_agent_share` uses when you say nothing: all three buckets off.
+Returns `agentId`, `agentName`, `contents` (the three buckets with a `count` and a `bytes` each), plus `envKeyCount` and `mcpAuthCount` (how many credentials the copy will have to be given again, counted, never named), `warnings`, and `includeDefaults`, which is what `create_agent_share` uses when you say nothing: all three buckets off.
 
 Read it before creating a link. It is how you tell the account owner what turning a switch on would actually send.
 
@@ -67,17 +67,17 @@ Returns `shareId`, `url`, the `include` actually applied, `reused`, `warnings` a
 
 Three behaviours worth knowing before the first call:
 
-- **The confirmation is about data, not about sharing.** Sending a coworker needs no ceremony. Sending someone's memories, database or files out of the workspace does, so the second case comes back as a tool error until you call again with `confirm: true`. Ask the account owner first — that is the point of the gate.
+- **The confirmation is about data, not about sharing.** Sending a coworker needs no ceremony. Sending someone's memories, database or files out of the workspace does, so the second case comes back as a tool error until you call again with `confirm: true`. Ask the account owner first: that is the point of the gate.
 - **Calling it twice is free.** The same coworker with the same `include` and a link that is still alive hands back the existing link with `reused: true`, rather than taking a second snapshot.
 - **It is not instant.** The call streams the whole coworker folder off its machine and uploads it. Give it time rather than retrying.
 
 ## list_agent_shares
 
-The links this workspace currently has out. Takes no arguments.
+The links this workspace currently has out, for the coworkers the key manages. Takes no arguments.
 
 Each entry carries `shareId`, `url`, `agentId`, `agentName`, `createdAt`, `installCount` and `include`, alongside `activeCount`.
 
-This is the only way to get a URL back after `create_agent_share` returned it. Every link listed is live. Revoked links are not listed. `agentId` comes back `null` once the source coworker has been deleted: the link keeps working, because the snapshot never depended on it, and `agentName` is the name frozen at creation rather than the current one.
+This is the only way to get a URL back after `create_agent_share` returned it. Every link listed is live. Revoked links are not listed. `agentId` comes back `null` once the source coworker has been deleted: the link keeps working, because the snapshot never depended on it, and `agentName` is the name frozen at creation rather than the current one. Such a link is only listed, and only revocable, with an admin's key.
 
 ## revoke_agent_share
 

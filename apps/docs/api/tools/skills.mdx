@@ -45,7 +45,7 @@ Reads one 100,000-character page of a reference file bundled with a skill. One f
   Character offset to start at. Omit it for the first page, then pass the returned `nextOffset` to continue.
 </ParamField>
 
-Returns `{ slug, path, content, offset, nextOffset, totalChars, truncated }`. `truncated` is `true` and `nextOffset` is non-null when another page remains. `SKILL.md` is not readable this way: it is the body `get_skill` already returns.
+Returns `{ slug, path, content, offset, nextOffset, totalChars, truncated }`. `truncated` is `true` and `nextOffset` is non-null when another page remains. `SKILL.md` is not readable this way: it is the body `get_skill` already returns. Only text files are read, by extension: `md`, `markdown`, `txt`, `json`, `yaml`, `yml`, `csv`, `tsv`, `js`, `mjs`, `ts`, `py`, `rb`, `sh`, `sql`, `html`, `css`, `xml`, `toml`, `ini` and `env`. Any other file (an image, a PDF, an archive) is refused.
 
 Reach for it before rewriting a reference file, since `upsert_skill` replaces a file whole.
 

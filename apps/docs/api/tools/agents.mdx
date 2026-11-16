@@ -1,27 +1,27 @@
 ---
 title: "Coworkers"
-description: "List Boxes, read a coworker in full, create, update and delete coworkers."
+description: "List Boxes, see what every coworker is doing, read a coworker in full, create, update and delete coworkers."
 ---
 
 A coworker lives inside a Box. Start from `list_spaces` when you need a `spaceId`, and from `list_agents` when you need an `agentId`: every other tool on this page takes one of those two.
 
 ## list_spaces
 
-Lists the Boxes of the workspace with how many coworkers each one holds.
+Lists the Boxes the key reaches, with how many coworkers each one holds and the key's `access` to it: `use` or `manage`. A Box the key does not reach is left out.
 
 Takes no arguments.
 
 ```json Response
 {
   "spaces": [
-    { "id": "…", "name": "Main Box", "agentCount": 3, "createdAt": "2026-07-04T10:12:00.000Z" }
+    { "id": "…", "name": "Main Box", "agentCount": 3, "createdAt": "2026-07-04T10:12:00.000Z", "access": "manage" }
   ]
 }
 ```
 
 ## list_agents
 
-Lists the coworkers of the workspace, newest first.
+Lists the coworkers of the Boxes the key reaches, newest first.
 
 <ParamField body="spaceId" type="string">
   Restrict the list to one Box.
@@ -29,13 +29,61 @@ Lists the coworkers of the workspace, newest first.
 
 Each coworker carries `id`, `name` (the display name), `handle` (the mention and call key), `description`, `status`, `space_id` and `created_at`. The `id` is what every other tool takes as `agentId`.
 
+## get_team_status
+
+What each coworker is doing right now, read from the machine at the moment of the call. The `status` that `list_agents` carries can be stale: call this to answer who is working, what is blocked and who is in error.
+
+<ParamField body="spaceId" type="string">
+  Restrict to one Box.
+</ParamField>
+
+<ParamField body="agentId" type="string">
+  Restrict to one coworker.
+</ParamField>
+
+```json Response
+{
+  "checkedAt": "2026-08-15T09:12:30.000Z",
+  "agents": [
+    {
+      "id": "…",
+      "name": "Content Manager",
+      "handle": "content_manager",
+      "spaceId": "…",
+      "status": "working",
+      "running": [
+        { "runId": "…", "sessionId": "…", "trigger": "schedule:weekly-report", "startedAt": "2026-08-15T09:12:04.000Z", "steps": 3 }
+      ],
+      "waitingOn": [{ "sessionId": "…", "reason": "awaiting_approval" }],
+      "lastRun": { "runId": "…", "status": "done", "finishedAt": "2026-08-15T08:00:41.000Z", "error": null }
+    }
+  ]
+}
+```
+
+`status` is the first of these that holds:
+
+| Status | Meaning |
+| --- | --- |
+| `switched_off` | The coworker is switched off, for want of a plan slot or because the template subscription it came from ended |
+| `unconfigured` | The coworker has no counterpart on the machine yet |
+| `offline` | The machine is powered off or archived, or did not answer for this coworker |
+| `working` | At least one run is in flight |
+| `waiting_human` | A conversation waits on a person |
+| `error` | The last run that ended failed |
+| `idle` | None of the above |
+
+`running` lists the runs in flight, up to 20 per coworker, with their [trigger](/api/tools/runs#list-runs), start and step count. `waitingOn` lists the conversations waiting on a person, and `reason` says on what: `waiting_human`, `awaiting_question`, `awaiting_approval`, `awaiting_connector` (an app to sign in to) or `awaiting_ack`. `lastRun` is the most recent run that ended, with its `error` when it failed, or `null`.
+
+Only the coworkers the key reaches are listed: an `agentId` outside them gives an empty `agents` list, not an error.
+
 ## get_agent
 
 The full picture of one coworker in a single call. Read this before changing anything.
 
 <ParamField body="agentId" type="string" required />
 
-Returns the coworker identity (`handle`, `name`, `description`), its `soul` (the system prompt), its model settings (`provider`, `model`, `verbosity`, and `runsOn`: the connection it resolves to and whether it follows the workspace default), its enabled `tools` families, its `selfImprovement` flags, its `setup` answer with the install instructions behind it, its custom `mcpServers`, and summaries of its `skills`, `schedules`, `triggers` and `connectors` (the apps it declares).
+Returns the coworker identity (`id`, `handle`, `name`, `description`), its `soul` (the system prompt), its model settings (`provider`, `model`, `verbosity`, and `runsOn`: the connection it resolves to and whether it follows the workspace default), its enabled `tools` families, its `selfImprovement` flags, its `setup` answer with the install instructions behind it, its custom `mcpServers`, and summaries of its `skills`, `schedules`, `triggers` and `connectors` (the apps it declares).
 
 Skills and scheduled tasks are summarised here. Use [`get_skill`](/api/tools/skills) and [`list_schedules`](/api/tools/schedules) for their full text.
 
@@ -62,7 +110,7 @@ Creates a coworker and places it on the board. It is visible in the app immediat
 </ParamField>
 
 <ParamField body="spaceId" type="string">
-  Optional when the workspace has a single Box. With several Boxes, the call fails and lists them so you can pick.
+  The Box to create it in. The key needs **Can manage** on it. Optional when the key manages a single Box. With several, the call fails and lists them so you can pick.
 </ParamField>
 
 <ParamField body="connectors" type="string[]">
@@ -70,11 +118,11 @@ Creates a coworker and places it on the board. It is visible in the app immediat
 </ParamField>
 
 <ParamField body="connectionId" type="string">
-  The AI connection to run on, by its id from [`list_ai_connections`](#list_ai_connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
+  The AI connection to run on, by its id from [`list_ai_connections`](#list-ai-connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
 </ParamField>
 
 <ParamField body="provider" type="string">
-  One of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`, `opencode`. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider. With several, the call is refused and lists them.
+  One of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`, `opencode`, `custom`. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider. With several, the call is refused and lists them.
 </ParamField>
 
 <ParamField body="model" type="string | null">
@@ -108,11 +156,13 @@ Creates a coworker and places it on the board. It is visible in the app immediat
   "handle": "content_manager",
   "spaceId": "…",
   "active": true,
-  "connectors": [{ "slug": "notion", "name": "Notion", "status": "needs_auth" }]
+  "connectors": [{ "key": "notion", "slug": "notion", "name": "Notion", "status": "needs_auth" }]
 }
 ```
 
-`active: false` means the creation succeeded but the plan has no free coworker slot, so the coworker will not run until one frees up. An `inactiveReason` explains it.
+Each entry of `connectors` carries the `key` of the account it declared and, for a second account of the same app, its `label`. See [Apps](/api/tools/connectors#list-agent-connectors).
+
+On Rerun Cloud, `active: false` means the creation succeeded but the plan has no free coworker slot, so the coworker will not run until one frees up. An `inactiveReason` explains it.
 
 ## update_agent
 
@@ -140,11 +190,11 @@ Updates a coworker. Every field is optional and only what you pass changes.
 
 <ParamField body="description" type="string" />
 <ParamField body="connectionId" type="string">
-  The AI connection to run on, by its id from [`list_ai_connections`](#list_ai_connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
+  The AI connection to run on, by its id from [`list_ai_connections`](#list-ai-connections). This is how you pick one account among several of the same provider. An unknown id, a connection that is not signed in or a model it does not serve is refused, with what is available.
 </ParamField>
 
 <ParamField body="provider" type="string">
-  One of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`, `opencode`. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider. With several, the call is refused and lists them.
+  One of `rerun`, `anthropic`, `claude`, `codex`, `openai`, `google`, `openrouter`, `opencode`, `custom`. A shortcut for `connectionId` that only works while the workspace has a single connection of that provider. With several, the call is refused and lists them.
 </ParamField>
 
 <ParamField body="model" type="string | null">
@@ -163,7 +213,7 @@ Updates a coworker. Every field is optional and only what you pass changes.
 
 Renaming moves the handle. It is re-derived from the new `name`, and every `@oldhandle` written into the other coworkers (prompts, skills, scheduled tasks, webhook triggers, memories) is rewritten, so their calls keep resolving. Pass `handle` only to set a call key that differs from the name.
 
-The response lists the fields that were actually written in `updated`.
+The response lists the fields that were actually written in `updated`. A rename also returns the new `name` and `handle`, and a move returns the `spaceId` and the `position` the coworker landed on.
 
 When the call changed what the coworker runs on, the response also carries `runsOn`: the connection, provider and model it now resolves to, and whether it follows the workspace default. Report that rather than what you asked for.
 
@@ -171,13 +221,15 @@ When the call changed what the coworker runs on, the response also carries `runs
 
 Lists the AI connections of the workspace, which is what every coworker runs on: the subscriptions and API keys plugged into it, plus the keyless Rerun one. No parameter.
 
-Each entry carries its `id`, the `name` the user gave it, its `provider`, the `models` it serves, whether it is `connected` and whether it holds the workspace default (`isDefault`). `default` is the connection and model every coworker that picked nothing runs on.
+Each entry carries its `id`, the `name` the user gave it, its `provider`, the `models` it serves, whether it is `connected` and whether it holds the workspace default (`isDefault`). `default` is the connection and model every coworker that picked nothing runs on, as `{ connectionId, model, connectionName }`, or `null` when none is set.
 
 Read it before changing what a coworker runs on: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed in the app, under AI providers.
 
 ## set_default_model
 
 Sets the workspace default: the connection and model every coworker that picked no model of its own runs on, along with their scheduled tasks and triggers.
+
+Only an admin can call it. A key whose creator is no longer an admin is refused with "Only an admin can change the default model of the workspace."
 
 <ParamField body="connectionId" type="string" required>
   The id of the connection, from `list_ai_connections`.
@@ -187,8 +239,16 @@ Sets the workspace default: the connection and model every coworker that picked 
   A model that connection serves.
 </ParamField>
 
+The pair is checked the same way as on `update_agent`: an unknown connection, one that is not signed in, or a model it does not serve is refused with what is available.
+
+```json Response
+{
+  "default": { "connectionId": "…", "connectionName": "me@example.com", "provider": "claude", "model": "…" }
+}
+```
+
 <Warning>
-  It moves every coworker that follows the default at once, and with them which account is billed. A coworker pinned to a model of its own is not touched.
+  It moves every coworker that follows the default at once, and with them which account is billed. A coworker pinned to a model of its own is not touched: pass `model: null` to `update_agent` to put it back on the default.
 </Warning>
 
 ## delete_agent

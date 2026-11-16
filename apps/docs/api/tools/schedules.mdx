@@ -28,7 +28,7 @@ Creates a scheduled task, or updates it when `slug` is given.
 </ParamField>
 
 <ParamField body="body" type="string">
-  Required when creating. The instruction sent to the coworker when the task fires, written as if you were talking to it.
+  Required when creating. The instruction sent to the coworker when the task fires, written as if you were talking to it. On an update it replaces the whole instruction.
 </ParamField>
 
 <ParamField body="cron" type="string">
@@ -48,7 +48,7 @@ Creates a scheduled task, or updates it when `slug` is given.
 <ParamField body="enabled" type="boolean" />
 
 <ParamField body="connectionId" type="string">
-  Run this one on a given AI connection, by its id from [`list_ai_connections`](/api/tools/agents#list_ai_connections). Goes with `model`.
+  Run this one on a given AI connection, by its id from [`list_ai_connections`](/api/tools/agents#list-ai-connections). Goes with `model`.
 </ParamField>
 
 <ParamField body="model" type="string | null">
@@ -56,7 +56,7 @@ Creates a scheduled task, or updates it when `slug` is given.
 </ParamField>
 
 <Warning>
-  Two things to know. The slug is derived from the name and is what `run_schedule_now` and `delete_schedule` address, so read it back from the response. And an update can change a cron but cannot clear it, nor turn a recurring task into a one-off: delete and recreate for that.
+  Three things to know. Passing `body` on an update replaces the whole instruction, so read the current one with `list_schedules` and edit that text rather than writing a body from memory. The slug is derived from the name and is what `run_schedule_now` and `delete_schedule` address, so read it back from the response. And an update can change a cron but cannot clear it, nor turn a recurring task into a one-off: delete and recreate for that.
 </Warning>
 
 ## run_schedule_now

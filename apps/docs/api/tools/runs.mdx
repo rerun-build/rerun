@@ -18,10 +18,12 @@ Talks to a coworker and waits for its answer.
 </ParamField>
 
 <ParamField body="waitSeconds" type="number">
-  How long to wait for the answer. Default `120`, maximum `600`.
+  How long to wait for the answer, in seconds. Default `120`, between `1` and `600`.
 </ParamField>
 
 If the coworker is still working when the wait runs out, the call returns `status: "running"` with a `runId`, a `note`, and the run carries on in the background. Poll `get_run` for the result.
+
+The conversation shows up in the coworker chat in the app, like one you started there. A switched-off coworker refuses the message with the reason.
 
 ```json Response
 {
@@ -30,7 +32,7 @@ If the coworker is still working when the wait runs out, the call returns `statu
   "sessionId": "…",
   "provider": "anthropic",
   "model": "claude-sonnet-5",
-  "trigger": "api",
+  "trigger": "chat",
   "steps": 7,
   "inputTokens": 18422,
   "outputTokens": 913,
@@ -54,12 +56,20 @@ Recent executions of a coworker, newest first.
 <ParamField body="agentId" type="string" required />
 
 <ParamField body="limit" type="number">
-  Default `20`, maximum `200`.
+  Default `20`, between `1` and `200`.
 </ParamField>
 
 Each run carries the same fields as the response above, without `output`. Use it to see whether a scheduled task or a webhook actually did anything.
 
-The `trigger` field tells you where the run came from: `chat`, `api`, `schedule:<slug>` or `trigger:<slug>`.
+The `trigger` field tells you where the run came from:
+
+| Value | Where the run came from |
+| --- | --- |
+| `chat` | A message: from the app, from `send_message`, or from another coworker calling this one |
+| `schedule:<slug>` | The scheduled task with that slug, on its cron or from `run_schedule_now` |
+| `trigger:<slug>` | The webhook trigger with that slug, from its URL or from `test_trigger` |
+
+It is `null` for a run that has only just started and has not recorded where it came from yet.
 
 ## get_run
 

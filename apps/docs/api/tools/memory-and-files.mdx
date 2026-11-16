@@ -1,0 +1,76 @@
+---
+title: "Memory and files"
+description: "Give a coworker what it should know and the files it works from, before its first run."
+---
+
+A coworker keeps two things of its own besides its prompt and its skills: its **memory**, the facts it recalls when a task calls for them, and its **workspace folder**, the files it works from. These two tools write to them. They never read back: there is no tool that lists, reads or deletes a memory or a workspace file. The coworker reads them itself, and you read them in the app. See [Data and files](/agents/data).
+
+Both need **Can manage** on the coworker's Box. They are how you hand a coworker what it should know and the files it works from before its first run, instead of waiting for it to learn them.
+
+## write_memory
+
+Adds memories to a coworker: what it knows about its owner, their preferences, facts it learned. Each entry is one memory, indexed for recall.
+
+<ParamField body="agentId" type="string" required />
+
+<ParamField body="memories" type="object[]" required>
+  Between 1 and 100 entries per call. Split a long memory file into one entry per fact or section, and call again for more.
+</ParamField>
+
+<ParamField body="memories[].content" type="string" required>
+  The memory, in plain text or markdown. Not empty, 20,000 characters maximum.
+</ParamField>
+
+<ParamField body="memories[].kind" type="string">
+  `preference`, `fact`, `learned`, `note` or `task`. Defaults to `note`.
+</ParamField>
+
+<ParamField body="memories[].tags" type="string[]" />
+
+```json Request arguments
+{
+  "agentId": "…",
+  "memories": [
+    { "content": "Prefers the weekly report on Monday morning, in French.", "kind": "preference" },
+    { "content": "The sales team works out of the `deals` table of the shared database.", "kind": "fact", "tags": ["sales"] }
+  ]
+}
+```
+
+The entries are written one after another. An entry that fails does not stop the others: it is listed in `failed` with its position in `memories` and the reason, and the rest are kept.
+
+```json Response
+{
+  "written": 1,
+  "ids": ["…"],
+  "failed": [{ "index": 1, "error": "…" }]
+}
+```
+
+`failed` is absent when every entry was written. A call over 100 entries, an empty list, an empty `content` or a `content` over 20,000 characters is refused as a whole, before anything is written.
+
+## upload_workspace_file
+
+Writes one file into the coworker's own workspace folder, creating the folders on the way and replacing a file already at that path.
+
+<ParamField body="agentId" type="string" required />
+
+<ParamField body="path" type="string" required>
+  Relative to the workspace folder, for example `notes/clients.md` or `assets/logo.png`. A leading `/` is dropped. It must end on a file name.
+</ParamField>
+
+<ParamField body="content" type="string" required>
+  The file content: the text as is, or the bytes base64-encoded.
+</ParamField>
+
+<ParamField body="encoding" type="string">
+  `utf8` (the default) for text, `base64` for a binary file.
+</ParamField>
+
+Up to 5 MB, once decoded. One file per call.
+
+```json Response
+{ "path": "notes/clients.md", "bytes": 1240 }
+```
+
+`bytes` is the size written, after decoding.

@@ -28,7 +28,7 @@ A trigger declares which HTTP methods it accepts. The default is `POST` alone.
 `GET`, `POST`, `PUT`, `PATCH` and `DELETE` all reach the same handler. `HEAD` and `OPTIONS` never start a run.
 
 <Note>
-  Accepting `GET` means a link preview, a prefetch or a crawler could fire your coworker by touching the URL. Rerun filters the known ones, but keep `POST` unless the calling service cannot send it.
+  Accepting `GET` means a link preview, a prefetch or a crawler could fire your coworker by touching the URL. Rerun filters out [passive visits](#passive-visits), but keep `POST` unless the calling service cannot send it.
 </Note>
 
 ## What the coworker receives
@@ -46,7 +46,9 @@ Read the Stripe payload and add a row to the payments table.
 </trigger_payload>
 ```
 
-JSON is pretty-printed. The payload is truncated at 64 KB. Any closing tag inside the payload is escaped, so a caller cannot inject instructions by ending the block early.
+The opening tag also carries `query="…"` when the URL had a query string, and `truncated="true"` when the payload was cut. A call with an empty body hands over `(no payload)` inside the block.
+
+JSON is pretty-printed. The payload is truncated at 64 KB, with a closing line that gives its full size in bytes. Any closing tag inside the payload is escaped, so a caller cannot inject instructions by ending the block early.
 
 Each call opens a new session named `trigger: <slug>`. Two calls are always two runs: nothing is collapsed or debounced.
 
@@ -63,13 +65,17 @@ The call returns as soon as the run has started. It does not wait for the cowork
 | `413` | `{ "error": "Payload too large" }` | Body over 1 MB |
 | `404` | `{ "error": "Not found" }` | Everything else |
 
-That last row is deliberate. A malformed slug, a missing token, an unknown coworker, a wrong token, a disabled trigger and an engine that turned the call away all answer `404`, so nobody can probe which triggers exist on your account.
+That last row is deliberate. A malformed slug, a missing token, an unknown or switched-off coworker, a wrong token, a disabled trigger, a machine that did not acknowledge the call within 15 seconds and an engine that turned the call away all answer `404`, so nobody can probe which triggers exist on your account.
 
 ## Passive visits
 
-Link unfurlers, prefetchers and clipboard managers touch URLs without anyone clicking them. Rerun answers those with `204` and never starts a run. The filter covers Slack, Discord, Twitter, WhatsApp, Raycast and other known coworkers, plus any request carrying a prefetch or preview intent header.
+Link unfurlers, prefetchers, clipboard managers and browsers touch URLs without anyone meaning to call them. Rerun answers those with `204` and never starts a run, whatever the method, before it even reads the body. A request counts as a passive visit when:
 
-Pasting a trigger URL into a chat is still a leak, but it will not fire your coworker by itself.
+- its `User-Agent` is a bot or a link previewer: Slack, Discord, Twitter, Facebook, WhatsApp, Telegram, LinkedIn, Reddit, Skype, Bing, Embedly, iframely, Quick Look, Raycast, Paste, Maccy, or anything that calls itself a bot, a crawler, a spider, a preview or an unfurler
+- it carries a prefetch, prerender or preview intent in `Sec-Purpose`, `Purpose`, `X-Purpose` or `X-Moz`
+- it is a browser navigation: a `Sec-Fetch-Dest` header with any value other than `empty`, which is what opening the URL in a tab sends
+
+A server-to-server webhook sends none of these, so it goes through. Pasting a trigger URL into a chat or opening it in a browser is still a leak, but it will not fire your coworker by itself. A `fetch()` from a web page sends `Sec-Fetch-Dest: empty` and does fire it.
 
 ## Limits
 

@@ -118,6 +118,7 @@
             "pages": [
               "api/tools/agents",
               "api/tools/skills",
+              "api/tools/memory-and-files",
               "api/tools/schedules",
               "api/tools/triggers",
               "api/tools/runs",

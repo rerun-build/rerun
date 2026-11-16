@@ -43,7 +43,7 @@ export const MCP_CLIENTS: { id: McpClientId; label: string; docs: string }[] = [
     { id: 'claude-code', label: 'Claude Code', docs: '/api/connect#claude-code' },
     { id: 'chatgpt', label: 'ChatGPT', docs: '/api/connect#codex' },
     { id: 'cursor', label: 'Cursor', docs: '/api/connect#cursor' },
-    { id: 'rerun', label: 'Rerun', docs: '/api/connect#a-rerun-agent' },
+    { id: 'rerun', label: 'Rerun', docs: '/api/connect#a-rerun-coworker' },
     { id: 'other', label: 'Other', docs: '/api/connect#any-other-client' },
 ]
 

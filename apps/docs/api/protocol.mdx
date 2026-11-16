@@ -52,7 +52,7 @@ Returns the full tool list in one shot. There is no pagination cursor.
 { "jsonrpc": "2.0", "id": 2, "method": "tools/list" }
 ```
 
-The list is static: all 53 tools are advertised to every key, including the 12 template authoring tools. Calling a template tool without an expert sandbox account fails at call time with a readable message. See [Template tools](/api/tools/templates).
+The list is static: all 55 tools are advertised to every key, including the 12 template authoring tools. Calling a template tool without an expert sandbox account fails at call time with a readable message. See [Template tools](/api/tools/templates).
 
 ## tools/call
 
@@ -95,6 +95,7 @@ Returned for a malformed request. HTTP status is still `200`.
 | --- | --- |
 | `-32700` | The body is not valid JSON |
 | `-32601` | Unknown method |
+| `-32001` | On `tools/call`: the member who created the key has left the workspace. Create a new key |
 
 ```json
 { "jsonrpc": "2.0", "id": null, "error": { "code": -32700, "message": "Parse error" } }
@@ -109,19 +110,21 @@ A tool that throws does **not** produce a JSON-RPC error. It produces a normal r
   "jsonrpc": "2.0",
   "id": 3,
   "result": {
-    "content": [{ "type": "text", "text": "{\"error\":\"Agent not found\"}" }],
+    "content": [{ "type": "text", "text": "{\"error\":\"Coworker not found\"}" }],
     "isError": true
   }
 }
 ```
 
-Messages are written to be actionable: a missing required argument, a coworker that belongs to another workspace, a plan limit reached, an app slug that does not exist in the catalog.
+Messages are written to be actionable: a missing required argument, a coworker in a Box the key does not reach (`Coworker not found`), a change that needs **Can manage** on the Box, a plan limit reached, an app slug that does not exist in the catalog.
 
 If you write your own client, check `result.isError` on every call. A `200` response does not mean the tool succeeded.
 
+A result over 200,000 characters comes back the same way: refused with an `isError` message asking for a narrower request (fewer rows, a single item, or no `includeToolCalls`), never cut into invalid JSON.
+
 ### Authentication errors
 
-A missing or invalid key is the one case that is not JSON-RPC at all: `401 Unauthorized` with a plain text body, before any parsing happens.
+A key that does not authenticate is the one case that is not JSON-RPC at all: `401 Unauthorized` with a plain text body, before any parsing happens. That covers a missing header, a token that does not start with `rk_`, an unknown or revoked key, and a workspace whose subscription is over on Rerun Cloud. See [Authentication](/api/authentication#errors).
 
 ## Destructive tools
 

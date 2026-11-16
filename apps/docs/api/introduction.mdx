@@ -9,7 +9,7 @@ Rerun exposes two programmatic surfaces, and only two.
 
 <CardGroup cols={2}>
   <Card title="The MCP server" icon="plug" href="/api/protocol">
-    A single endpoint, `POST https://app.rerun.build/api/mcp/account`, that speaks the Model Context Protocol. It carries 53 tools covering coworkers, skills, scheduled tasks, webhook triggers, apps, databases, runs, share links and template authoring.
+    A single endpoint, `POST https://app.rerun.build/api/mcp/account`, that speaks the Model Context Protocol. It carries 55 tools covering coworkers, team status, skills, memory and files, scheduled tasks, webhook triggers, apps, databases, runs, share links and template authoring.
   </Card>
   <Card title="Webhook triggers" icon="bolt" href="/api/webhooks">
     A public URL per trigger. Anything that can send an HTTP request can start a coworker run, with no SDK and no key exchange.
@@ -20,7 +20,7 @@ Rerun exposes two programmatic surfaces, and only two.
 
 ## There is no REST API
 
-Every capability is reached through the MCP endpoint. There is no `/v1/agents`, no OpenAPI document, and no other route that accepts an API key. If you are writing a plain HTTP client rather than plugging in an AI coding assistant, you still call the MCP endpoint: it is ordinary JSON-RPC 2.0 over `POST`, so `curl` works fine. See [Protocol](/api/protocol).
+Every capability is reached through the MCP server. There is no OpenAPI document, and the routes the Rerun web, desktop and mobile apps call take a signed-in session, never an API key. If you are writing a plain HTTP client rather than plugging in an AI coding assistant, you still call the MCP endpoint: it is ordinary JSON-RPC 2.0 over `POST`, so `curl` works fine. See [Protocol](/api/protocol).
 
 ## Who this is for
 
@@ -34,16 +34,19 @@ Everything the API does is also available in the Rerun app. The API exists so yo
 
 ## What a key reaches
 
-An API key is scoped to **one workspace** and nothing finer. It reaches every Box, every coworker, every database and every run of that workspace, with full read and write. Treat it as a production credential.
+An API key belongs to one workspace and acts with the access of the member who created it. Only an admin creates one, so it reaches every Box, every coworker, every database and every run of the workspace, with full read and write. Treat it as a production credential. See [Authentication](/api/authentication).
 
 ## Tool index
 
 <Columns cols={2}>
   <Card title="Coworkers" icon="bot" href="/api/tools/agents">
-    `list_spaces` `list_agents` `get_agent` `create_agent` `update_agent` `delete_agent` `list_ai_connections` `set_default_model`
+    `list_spaces` `list_agents` `get_team_status` `get_agent` `create_agent` `update_agent` `delete_agent` `list_ai_connections` `set_default_model`
   </Card>
   <Card title="Skills" icon="book" href="/api/tools/skills">
     `list_skills` `get_skill` `read_skill_file` `upsert_skill` `delete_skill`
+  </Card>
+  <Card title="Memory and files" icon="brain" href="/api/tools/memory-and-files">
+    `write_memory` `upload_workspace_file`
   </Card>
   <Card title="Scheduled tasks" icon="clock" href="/api/tools/schedules">
     `list_schedules` `upsert_schedule` `run_schedule_now` `delete_schedule`
@@ -72,9 +75,10 @@ An API key is scoped to **one workspace** and nothing finer. It reaches every Bo
 
 Some things are deliberately left to the app, mostly because they involve a secret or a decision that should not be automated. See [Limits and guarantees](/api/limits) for the full list. The short version:
 
-- No credential ever goes through the API. `attach_connector` declares a connector, and the account owner finishes the sign-in in the app.
+- No credential ever goes through the API. `attach_connector` declares an app, and the account owner finishes the sign-in in the app.
 - No billing, no plan change, no member management, no Box creation.
 - No API key management. You cannot mint or revoke a key over MCP.
+- No reading of a coworker memory or workspace files. `write_memory` and `upload_workspace_file` add to them, nothing reads them back.
 - No template publication. You submit a draft, the Rerun team publishes it.
 
 ## Next steps

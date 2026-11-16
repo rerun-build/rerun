@@ -21,7 +21,7 @@ It is an HTTP MCP server. Every snippet below sends your key in an `Authorizatio
 claude mcp add --transport http rerun https://app.rerun.build/api/mcp/account --header "Authorization: Bearer rk_your_key"
 ```
 
-Then ask Claude Code what it can do with Rerun. It calls `tools/list` on its own and discovers the 53 tools.
+Then ask Claude Code what it can do with Rerun. It calls `tools/list` on its own and discovers the 55 tools.
 
 ## Codex
 
@@ -69,7 +69,7 @@ You can give one of your own coworkers the same reach over the workspace as an o
 ```
 
 <Warning>
-  This lets that coworker create, edit and delete every other coworker of the workspace, including itself. Do it on purpose, and prefer a dedicated coworker for it.
+  This lets that coworker create, edit and delete every other coworker the key reaches, including itself. Do it on purpose, and prefer a dedicated coworker for it.
 </Warning>
 
 ## Any other client
@@ -99,4 +99,4 @@ curl -s https://app.rerun.build/api/mcp/account \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
-A `401 Unauthorized` in plain text means the key is missing, malformed or revoked. Anything else comes back as JSON-RPC. See [Protocol](/api/protocol) for the full handshake.
+A `401 Unauthorized` in plain text means the key is missing, malformed or revoked, or that the workspace has no active subscription. See [Authentication](/api/authentication#errors) for the full list. Anything else comes back as JSON-RPC. See [Protocol](/api/protocol) for the full handshake.

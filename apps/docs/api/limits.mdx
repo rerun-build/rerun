@@ -12,23 +12,34 @@ description: "What the API caps, what it refuses, and what it promises."
 | API key expiry | None. Revocation only |
 | Share link expiry | None. Revocation only |
 | Rate limit on the MCP endpoint | None |
-| `send_message` wait | 120 seconds by default, 600 maximum |
-| `list_runs` | 20 runs by default, 200 maximum |
-| `db_query` and `space_db_query` | 100 rows by default, 1000 maximum |
-| `list_connectors` | 60 per page by default, 200 maximum |
+| `send_message` wait | 120 seconds by default, between 1 and 600 |
+| `list_runs` | 20 runs by default, between 1 and 200 |
+| `get_team_status` runs in flight | 20 per coworker |
+| `db_query` and `space_db_query` | 100 rows by default, between 1 and 1000 |
+| `list_connectors` | 60 per page by default, between 1 and 200 |
+| `write_memory` | 100 memories per call, 20,000 characters each |
+| `upload_workspace_file` | One file per call, 5 MB once decoded |
 | Reference files per skill | 200, 10 MB each, 50 MB per skill including `SKILL.md` |
-| `read_skill_file` | 100 000 characters per page |
+| `read_skill_file` | 100,000 characters per page |
 | `get_run` tool call `input` and `result` | 2,000 characters each, the rest replaced by a truncation marker |
 | One tool result | 200,000 characters. A larger one is refused with an error asking for a narrower request |
+| Template title | 50 characters |
+| Template meta description | 120 to 155 characters before it can be submitted |
+| Paid template price | \$5 minimum, \$2,000 maximum |
 | Webhook request body | 1 MB |
 | Payload handed to a coworker by a webhook | 64 KB |
-| Paid template price | \$5 minimum, \$2,000 maximum |
+| Time a webhook call waits for the machine to acknowledge | 15 seconds, then `404` |
 
-Plan quotas still apply. `create_agent` succeeds when the workspace has no free coworker slot, but the coworker comes back with `active: false` and does not run until a slot frees up. See [Plans and billing](/billing).
+On Rerun Cloud, plan quotas still apply. `create_agent` succeeds when the workspace has no free coworker slot, but the coworker comes back with `active: false` and does not run until a slot frees up. See [Plans and billing](/billing). A self-hosted install has no coworker limit.
 
 ## Scope
 
-A key reaches one workspace, entirely. Every tool resolves its target through the same ownership check the app uses, so an `agentId` or a `spaceId` from another workspace comes back as `Agent not found` or `Box not found`, never as a partial answer.
+A key reaches one workspace, with the access of the member who created it. Every tool resolves its target through the same ownership check the app uses, so an `agentId` or a `spaceId` from another workspace, or from a Box the key does not reach, comes back as `Coworker not found` or `Box not found`, never as a partial answer. `list_spaces`, `list_agents` and `get_team_status` only list what the key reaches.
+
+- Reading a coworker, talking to it, firing its scheduled tasks and testing its triggers need **Can use** on its Box.
+- Changing it (prompt, skills, memory, files, scheduled tasks, triggers, apps, private database, share links) needs **Can manage**. `create_agent` only places a coworker in a Box the key manages.
+- `set_default_model` is for admins only: "Only an admin can change the default model of the workspace."
+- The shared database belongs to the workspace, not to a Box: the `space_db_*` tools only check that the `spaceId` is one of the workspace.
 
 There is no read-only key, no per-coworker key and no per-tool permission. If you need a narrower blast radius, use a separate workspace.
 
@@ -36,7 +47,7 @@ There is no read-only key, no per-coworker key and no per-tool permission. If yo
 
 <AccordionGroup>
   <Accordion title="Accept a secret">
-    `attach_connector` declares a connector and stops there. API keys, OAuth sign-ins and passwords are entered by the account owner in the app, and they are stored on your machine, never in the Rerun database. `plan_template_capture` returns credential variable **names** only, never values.
+    `attach_connector` declares an app and stops there. API keys, OAuth sign-ins and passwords are entered by the account owner in the app, and they are stored on your machine, never in the Rerun database. `plan_template_capture` returns credential variable **names** only, never values.
   </Accordion>
   <Accordion title="Publish a template">
     `submit_template` moves a draft to review. Publishing is the Rerun team's decision. Payout onboarding needs a browser.
@@ -48,15 +59,15 @@ There is no read-only key, no per-coworker key and no per-tool permission. If yo
     You cannot mint or revoke a key over MCP. That would let a leaked key extend itself.
   </Accordion>
   <Accordion title="Read coworker memory or files">
-    The API covers prompts, skills, schedules, triggers, apps, databases and runs. Memory entries and workspace files are read by the coworker itself, or by you in the app.
+    The API writes to them and never reads them back. `write_memory` adds memories and `upload_workspace_file` writes one file into the coworker workspace folder, but no tool lists, reads or deletes a memory or a workspace file. The coworker reads them itself, and you read them in the app. See [Memory and files](/api/tools/memory-and-files).
 
-    `create_agent_share` is the one place they move at all, and it still never opens them: it can seal them into an archive behind a link, on an explicit `confirm: true`, and hands nothing back to the caller. See [Share link tools](/api/tools/sharing).
+    `create_agent_share` is the one place they leave the workspace, and it still never opens them: it can seal them into an archive behind a link, on an explicit `confirm: true`, and hands nothing back to the caller. See [Share link tools](/api/tools/sharing).
   </Accordion>
   <Accordion title="Install a shared coworker">
     The API issues share links, it does not consume them. Opening a link, reading the card and placing the copy on a board is a browser flow, and it needs an active plan on the receiving workspace.
   </Accordion>
-  <Accordion title="Upload a file or generate an image">
-    `add_template_image` takes a public https URL and re-hosts the bytes. Produce the image elsewhere.
+  <Accordion title="Generate an image">
+    There is no image generation. `upload_workspace_file` writes a file you already have into a coworker folder, and `add_template_image` takes a public https URL and re-hosts the bytes. Produce the image elsewhere.
   </Accordion>
 </AccordionGroup>
 
@@ -66,8 +77,9 @@ There is no read-only key, no per-coworker key and no per-tool permission. If yo
 - **Skills are written atomically.** `upsert_skill` stages the whole folder and swaps it in, so a failed call never leaves a half-written skill.
 - **Multi-statement SQL is transactional.** `db_execute` and `space_db_execute` with `statements` apply all of them or none.
 - **A tool error is readable.** Failures come back as `isError` results with a message written to be acted on, not as an opaque protocol error. See [Errors](/api/protocol#errors).
+- **A partial memory write says so.** `write_memory` keeps the entries that landed and lists the ones that failed, with the reason, in `failed`.
 - **Renaming is safe.** Changing a coworker `name` re-derives its `handle` and rewrites every `@handle` reference in the other coworkers, so their calls keep resolving.
 
 ## Availability
 
-The MCP endpoint and the webhook front door run on the Rerun app. The coworkers themselves run on your workspace machine. A machine that is shut down or restarting makes coworker-facing tools fail with a reachability error, while catalog tools like `list_connectors` keep working.
+The MCP endpoint and the webhook front door run on the Rerun app. The coworkers themselves run on your workspace machine. A machine that is shut down or restarting makes coworker-facing tools fail with a reachability error, while catalog tools like `list_connectors` keep working. `get_team_status` still answers then, and reports those coworkers as `offline`.

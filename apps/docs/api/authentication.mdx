@@ -18,22 +18,22 @@ Content-Type: application/json
 
 ## Create a key
 
+Only an admin of the workspace creates or revokes a key. For any other member the menu entry is greyed out, with the reason "Only an admin can manage API keys".
+
 <Steps>
   <Step title="Open the workspace menu">
     In [the Rerun app](https://app.rerun.build), click the workspace pill in the top left corner.
   </Step>
   <Step title="Choose API keys & MCP">
-    The dialog lists your active keys and the connection snippets for every supported client.
+    The **API keys** dialog lists your active keys and the connection snippets for every supported client. On Rerun Cloud, a workspace whose subscription is over sees a **PRO** badge on the entry, and clicking it opens the plan dialog instead.
   </Step>
   <Step title="Name the key and create it">
-    Name it after what will hold it, for example `claude-code-laptop` or `ci`. Names are limited to 60 characters.
+    Name it after what will hold it, for example `claude-code-laptop` or `ci`, then click **Create key**. Names are limited to 60 characters.
   </Step>
   <Step title="Copy it now">
     The full key is shown once and never again. Rerun stores only a SHA-256 hash of it, so nobody, including Rerun, can read it back. If you lose it, revoke it and create another.
   </Step>
 </Steps>
-
-Any member of the workspace can create a key. A key reaches exactly what the member who created it already reaches.
 
 ## Key format and lifecycle
 
@@ -41,29 +41,35 @@ Any member of the workspace can create a key. A key reaches exactly what the mem
 | --- | --- |
 | Prefix | `rk_` |
 | Length | 43 characters |
-| Scope | One workspace, full read and write |
+| Who creates it | An admin, in **API keys & MCP** |
+| Acts as | The member who created it |
+| Tools | All 55 |
 | Expiry | None. A key is valid until you revoke it |
 | Active keys per workspace | 20 |
 | Storage | SHA-256 hash. The first 12 characters are kept in clear so you can tell keys apart in the list |
 
-The key list shows each key by its prefix, plus when it was last used, so you can spot one that nothing calls anymore.
+The key list shows each key by its name, plus when it was last used, so you can spot one that nothing calls anymore.
 
 ## Revoke a key
 
-Open **API keys & MCP** again and click the revoke button on the row. Revocation takes effect immediately: the next request with that key gets a `401`.
+Open **API keys & MCP** again and click **Revoke this key** on the row. Revocation takes effect immediately: the next request with that key gets a `401`.
 
-Revoking is the only way to end a key. There is no expiry date and no rotation schedule, so rotate deliberately: create the replacement, update whatever holds the old key, then revoke.
+A key never expires, so rotate deliberately: create the replacement, update whatever holds the old key, then revoke.
 
 ## Scope
 
-A key is bound to a workspace, not to a user, a Box or a coworker. It can:
+A key belongs to one workspace and acts with the access of the member who created it: the Boxes that member reaches, at the level they reach them. Since only an admin creates a key, it normally reaches every Box. If its creator later loses the admin role, the key loses the Boxes they no longer reach. If its creator leaves the workspace, the key stops working: every tool call answers the JSON-RPC error `-32001`, "The member who created this key has left the workspace". A key made before Rerun recorded who created keys acts as the whole workspace.
 
-- read and modify every coworker of the workspace, including its system prompt and its skills
+Within that reach, a key can:
+
+- read and modify every coworker, including its system prompt and its skills, and add to its memory and its workspace files
 - read and write every coworker database and the shared database
 - create and delete scheduled tasks and webhook triggers, and read trigger URLs, which are themselves credentials
 - start runs and read their full transcript, including tool inputs and results
 
-There is no read-only mode and no per-coworker scoping. If you need a narrower blast radius, use a separate workspace.
+Reading a coworker and talking to it needs **Can use** on its Box. Changing it (its prompt, skills, memory, files, automations, apps or database) needs **Can manage**, which an admin always has. A refused change answers "Only an admin or a manager of this Box can do this", and a coworker in a Box the key does not reach answers "Coworker not found".
+
+There is no read-only key and no per-coworker key. If you need a narrower blast radius, use a separate workspace.
 
 <Warning>
   A Rerun API key is a production secret. Keep it in an environment variable or a secret manager, never in a repository, a shared document or a chat message. If a key leaks, revoke it from the app right away.
@@ -73,7 +79,9 @@ There is no read-only mode and no per-coworker scoping. If you need a narrower b
 
 | Condition | Response |
 | --- | --- |
-| Missing header, malformed key, unknown key, revoked key | `401 Unauthorized`, plain text body |
+| No `Authorization: Bearer` header, a token that does not start with `rk_`, an unknown key, a revoked key | `401 Unauthorized`, plain text body |
+| A workspace whose subscription is over (Rerun Cloud) | `401 Unauthorized`, plain text body |
+| The member who created the key has left the workspace | `200 OK` with a JSON-RPC error, code `-32001`, on every `tools/call` |
 | Valid key, failing tool call | `200 OK` with a JSON-RPC result carrying `isError: true`. See [Protocol](/api/protocol) |
 
-The `401` is intentionally undetailed. It does not tell you whether the key never existed or was revoked.
+The `401` is intentionally undetailed. It does not tell you which of these conditions failed.

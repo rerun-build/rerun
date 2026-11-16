@@ -7,7 +7,7 @@ A trigger gives a coworker a public URL. Whoever calls it starts a run. See [Web
 
 ## list_triggers
 
-Lists a coworker triggers in full: `slug`, `name`, `body`, accepted `methods`, `enabled`, the `connectionId` and `model` of its own when it has one, `fireCount`, `lastFiredAt`, and `url`, the public webhook address to paste into the other service.
+Lists a coworker triggers in full: `slug`, `name`, `description`, `body`, accepted `methods`, `enabled`, the `connectionId` and `model` of its own when it has one, `fireCount`, `lastFiredAt`, and `url`, the public webhook address to paste into the other service.
 
 <ParamField body="agentId" type="string" required />
 
@@ -30,7 +30,7 @@ Creates a trigger, or updates it when `slug` is given.
 </ParamField>
 
 <ParamField body="body" type="string">
-  Required when creating. The instruction sent to the coworker when the URL is called.
+  Required when creating. The instruction sent to the coworker when the URL is called. On an update it replaces the whole instruction, so read the current one with `list_triggers` and edit that text rather than writing a body from memory.
 </ParamField>
 
 <ParamField body="methods" type="string[]">
@@ -42,7 +42,7 @@ Creates a trigger, or updates it when `slug` is given.
 <ParamField body="enabled" type="boolean" />
 
 <ParamField body="connectionId" type="string">
-  Run this one on a given AI connection, by its id from [`list_ai_connections`](/api/tools/agents#list_ai_connections). Goes with `model`.
+  Run this one on a given AI connection, by its id from [`list_ai_connections`](/api/tools/agents#list-ai-connections). Goes with `model`.
 </ParamField>
 
 <ParamField body="model" type="string | null">
@@ -58,7 +58,7 @@ The response carries the full `url`, which is a secret: anyone holding it can fi
 </Warning>
 
 <Note>
-  Adding `GET` to `methods` means any link preview or prefetch of that URL could fire the coworker. Rerun filters known previewers, but `POST` alone is the safer default.
+  Adding `GET` to `methods` means any link preview or prefetch of that URL could fire the coworker. Rerun filters out [passive visits](/api/webhooks#passive-visits), but `POST` alone is the safer default.
 </Note>
 
 ## test_trigger
@@ -88,7 +88,7 @@ Fires a trigger yourself with a sample payload, to check the instruction before 
   This is a real fire, not a dry run. It counts towards the trigger fire count and updates its last-fired date. It also needs the trigger to be enabled: unlike `run_schedule_now`, firing a disabled trigger fails, because the engine answers a disabled trigger exactly like a missing one.
 </Warning>
 
-Returns `runId` and `sessionId`. Read the outcome with [`get_run`](/api/tools/runs#get-run).
+Returns the `slug`, the `method` used, `runId` and `sessionId`. Read the outcome with [`get_run`](/api/tools/runs#get-run).
 
 ## rotate_trigger_token
 

@@ -6,7 +6,7 @@ description: "Author a marketplace template from coworkers that already work, wi
 These twelve tools turn coworkers running in your sandbox into a marketplace listing other people install in one click. See [Create a template](/templates/create) for the same workflow in the app.
 
 <Warning>
-  **Expert accounts only.** Every tool on this page requires the key to belong to the sandbox of an expert account. The gate says so on the first call. All 53 tools are advertised to every key, so a client will offer these even when your account cannot use them. See [the Expert Program](/templates/expert-program).
+  **Expert accounts only.** Every tool on this page requires the key to belong to the sandbox of an expert account. The gate says so on the first call. All 55 tools are advertised to every key, so a client will offer these even when your account cannot use them. See [the Expert Program](/templates/expert-program).
 </Warning>
 
 Two rules every tool here shares. Publication is never the caller's decision: you write a draft and hand it over. And a template can only be built from sandbox coworkers, because capturing from a working workspace would publish a client's memory files.
@@ -121,7 +121,7 @@ It enforces the list `get_template` returns: a title, a tagline, a description, 
 Once it succeeds the template is frozen: still private, no longer editable. `withdraw_template` is the only way back to a draft.
 
 <Note>
-  Payout onboarding cannot happen from here. It needs a browser: in the Rerun app, board toolbar, **My templates**, **Payouts**.
+  Payout onboarding cannot happen from here. It needs a browser: in the Rerun app, open the workspace menu, then **Templates**, **My templates**, **Payouts**.
 </Note>
 
 ## withdraw_template
@@ -159,7 +159,24 @@ Dry run. Inspects what capturing these coworkers would ship, without writing any
   Coworker ids from `list_capture_sources`, in that Box.
 </ParamField>
 
-Returns, per coworker: its skills, scheduled tasks and declared apps, the `.env` key **names** a copy will have to be given again (names only, never values), the MCP servers whose sign-in stays behind, how many memory files it holds, what the engine will redact on the way out, and `excludedByDefault`, the paths considered too personal to publish.
+Returns `plans`, one entry per coworker:
+
+| Field | What it holds |
+| --- | --- |
+| `agentId`, `name`, `description`, `provider`, `model` | The coworker as it runs today |
+| `totalBytes` | The size of its folder |
+| `skills` | `name` and `description` of each skill |
+| `schedules` | `name` and `cron` of each scheduled task |
+| `triggers` | `name`, `description`, `methods` and `enabled` of each webhook trigger. Never its URL |
+| `connectorSlugs` | The apps it declares |
+| `envKeys` | The `.env` key **names** a copy will have to be given again. Names only, never values |
+| `mcpAuth` | The MCP servers whose sign-in stays behind |
+| `memoryCount` | How many memory files it holds |
+| `setup` | Its guided-setup answer, which a template cannot be submitted without |
+| `strippedConfigKeys` | The configuration entries whose literal value was replaced by a `${VAR}` reference |
+| `redactions` | What the archive rewrites on its way out, with the `path` and the `reason` |
+| `excludedByDefault` | The paths considered too personal to publish |
+| `flaggedFiles` | The files worth a look: `path`, `bytes`, what they were `flagged` for, a `note`, and whether they are `excludedByDefault` |
 
 <Note>
   Read this before capturing. It is the security review, and the archive ends up behind a public install button.
@@ -167,7 +184,9 @@ Returns, per coworker: its skills, scheduled tasks and declared apps, the `.env`
 
 ## capture_template_agents
 
-Captures coworkers from the sandbox into the template: prompt, skills, scheduled tasks, app declarations and workspace files are archived, and the template page is rewritten from what the folder actually contains.
+Captures coworkers from the sandbox into the template: prompt, skills, scheduled tasks, webhook triggers, app declarations and workspace files are archived, and the template page is rewritten from what the folder actually contains.
+
+A webhook trigger travels as its instruction and its methods, never as its URL. Every copy is issued a secret of its own at install time, so whoever installs the template has to point the calling service at their own URL.
 
 <ParamField body="templateId" type="string" required />
 <ParamField body="spaceId" type="string" required />
@@ -190,7 +209,9 @@ Captures coworkers from the sandbox into the template: prompt, skills, scheduled
 
 Paths marked excluded by default (memory, credential folders) are left out unless you name them in `keep`. Do not keep a memory folder without the account owner asking for it. The coworker database, `data/agent.db`, is not excluded by default: its tables ship with their rows, so clear the test rows first or name it in `exclude`.
 
-Re-capturing a coworker already in the template updates its entry in place, and the editorial copy written about it survives. Read the `warnings` that come back: they name literal credentials the engine had to strip.
+Re-capturing a coworker already in the template updates its entry in place, and the editorial copy written about it survives.
+
+The response carries `captured`, `excluded` (the paths left out for each coworker, defaults included) and `warnings`. Read the `warnings`: they name literal credentials the engine had to strip.
 
 ## remove_template_agent
 
