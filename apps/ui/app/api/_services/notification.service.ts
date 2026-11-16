@@ -23,6 +23,7 @@ import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { ensureSessionRow } from './chat.service'
+import { recordForemanWakeEvent } from './foreman-notification.service'
 import { recordAgentReply } from './session-preview.service'
 import { writeNotificationPrefs } from './notification-audience.service'
 import { loadPresence } from './presence.service'
@@ -47,11 +48,13 @@ export async function recordNotification(token: string, payload: NotificationPay
     const engine = await authenticateEngineToken(token)
     if (!engine) return { ok: false, status: 401, error: 'Unauthorized' }
 
-    // The foreman answers in the column the user is looking at: none of its runs is inbox news, an
-    // email, or the first agent run that counts as activation. Where a run stopped still shows, on
-    // its thread in General.
+    // The foreman answers in the column the user is looking at: none of its conversation runs is inbox
+    // news, an email, or the first agent run that counts as activation. Where a run stopped still
+    // shows, on its thread in General. A run it started on its own (`wake`) is the exception: nobody
+    // is watching, so what it has to say reaches the member it was written to, like a coworker's.
     if (payload.agentId === FOREMAN_AGENT_ID) {
-        await applyForemanStatus(engine.workspaceId, payload)
+        if (payload.source === 'wake') await recordForemanWakeEvent(engine, payload)
+        else await applyForemanStatus(engine.workspaceId, payload)
         return { ok: true }
     }
 

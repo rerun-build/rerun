@@ -1,5 +1,6 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { InboxSurface as SharedInboxSurface, type InboxAnnouncement, type InboxEntry, type InboxSurfaceProps, type RowMenuProps } from '@rerun/ui/inbox'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
@@ -8,14 +9,16 @@ import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { InboxDetailCard } from '@/components/notifications/InboxDetailCard'
 import { InboxPeekCard } from '@/components/notifications/InboxPeekCard'
 import { InboxRowMenu } from '@/components/notifications/InboxRowMenu'
+import { markForemanConversationReadAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { useAttentionSessions, type AttentionSession } from '@/hooks/useAttentionSessions'
+import { useForemanAttention } from '@/hooks/useForemanAttention'
 import { useInboxAnnouncer } from '@/hooks/useInboxAnnouncer'
 import { useInboxPeek, type InboxPeekTarget } from '@/hooks/useInboxPeek'
 import { useTabSignals } from '@/hooks/useTabSignals'
 import { useUnseenGroups } from '@/hooks/useUnseenGroups'
 import type { SessionStatus } from '@/lib/board/types'
 import type { AnnouncedNotification } from '@/lib/notifications/announcement'
-import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
+import { openConversationFromNotification, openForemanConversation } from '@/lib/notifications/open-conversation'
 import { reasonSentence } from '@/lib/notifications/reason-copy'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -28,7 +31,9 @@ import { useSession } from '@/supabase/session/SessionProvider'
 export type InboxItem = Omit<AttentionSession, 'status'> & { status: SessionStatus | 'done'; agentName: string; count?: number; sessionIds?: string[]; latestSessionId?: string }
 
 // Declared once, outside the inbox: a component reference the memoised rows can compare, where a render function would hand them a new element on every pass.
+// The Chief of Staff is no coworker of the board: nothing to mute or open from its row.
 function InboxItemMenu({ item, onOpenChange }: RowMenuProps<InboxItem>) {
+    if (item.agentId === FOREMAN_AGENT_ID) return null
     return <InboxRowMenu agentId={item.agentId} agentName={item.agentName} onOpenChange={onOpenChange} />
 }
 
@@ -43,6 +48,7 @@ type View = null | 'hub' | { notification: AnnouncedNotification } | { peek: Pee
 export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' }) {
     const t = useTranslations('notifications.inbox')
     const tReasons = useTranslations('notifications.inbox.reasons')
+    const foremanName = useTranslations('foreman.notification')('title')
     const { isAnonymous } = useSession()
     const onEngine = useForemanStore(state => state.surface === 'engine')
     const agents = useBoardStore(s => s.agents)
@@ -55,6 +61,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
 
     const unseen = useUnseenGroups()
     const liveSessions = useBoardStore(s => s.sessions)
+    const foremanWaiting = useForemanAttention(!isAnonymous && onEngine)
 
     const items = useMemo<InboxItem[]>(() => {
         const names = new Map(agents.map(a => [a.id, a.name]))
@@ -79,8 +86,9 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
                 latestSessionId: group.latestSessionId,
             }]
         })
-        return [...attention, ...done]
-    }, [sessions, agents, unseen])
+        const foreman = foremanWaiting.map(s => ({ ...s, agentName: foremanName }))
+        return [...foreman, ...attention, ...done]
+    }, [sessions, agents, unseen, foremanWaiting, foremanName])
 
     const shown = !isAnonymous && onEngine
     useTabSignals(shown ? items.reduce((sum, item) => sum + (item.count ?? 1), 0) : 0)
@@ -122,13 +130,13 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
         (notification: AnnouncedNotification): InboxEntry => ({
             id: notification.id,
             agentId: notification.agentId ?? '',
-            agentName: agents.find(a => a.id === notification.agentId)?.name ?? t('unknownCoworker'),
+            agentName: notification.agentId === FOREMAN_AGENT_ID ? foremanName : (agents.find(a => a.id === notification.agentId)?.name ?? t('unknownCoworker')),
             status: notification.status,
             title: rowOf(notification)?.title ?? '',
             message: notification.headline,
             updatedAt: notification.createdAt,
         }),
-        [agents, rowOf, t]
+        [agents, rowOf, t, foremanName]
     )
 
     const announcement = useMemo<InboxAnnouncement | null>(
@@ -139,6 +147,11 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
         if (!current) return
         const { notification } = current
         if (current.bundled > 1) return show('hub')
+        // What the Chief of Staff waits on is answered in its own column, with its own cards.
+        if (notification.agentId === FOREMAN_AGENT_ID) {
+            show(null)
+            return void openForemanConversation(notification.engineSessionId)
+        }
         if (notification.agentId && PEEK_STATUSES.has(notification.status)) {
             return show({ peek: { entry: entryOf(notification), target: { agentId: notification.agentId, sessionId: rowOf(notification)?.id ?? null, engineSessionId: notification.engineSessionId }, engineRunId: notification.engineRunId } })
         }
@@ -146,6 +159,10 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     }, [current, show, entryOf, rowOf])
 
     const openItem = useCallback((item: InboxItem) => {
+        if (item.agentId === FOREMAN_AGENT_ID) {
+            setView(null)
+            return void openForemanConversation(item.engineSessionId)
+        }
         if (PEEK_STATUSES.has(item.status) && !item.sessionIds) {
             setView({ peek: { entry: item, target: { agentId: item.agentId, sessionId: item.id, engineSessionId: item.engineSessionId }, engineRunId: null } })
             return
@@ -168,12 +185,14 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     const markRead = useCallback(
         (item: InboxItem) => {
             if (item.sessionIds) void useUnseenRunsStore.getState().markSeen(item.sessionIds)
+            else if (item.agentId === FOREMAN_AGENT_ID) void markForemanConversationReadAction(item.id).catch(() => {})
             else setSessionStatus(item.id, 'idle')
         },
         [setSessionStatus]
     )
     const markAllRead = useCallback(() => {
-        markSessionsHandled(items.filter(i => !i.sessionIds).map(i => i.id))
+        markSessionsHandled(items.filter(i => !i.sessionIds && i.agentId !== FOREMAN_AGENT_ID).map(i => i.id))
+        for (const item of items) if (item.agentId === FOREMAN_AGENT_ID) void markForemanConversationReadAction(item.id).catch(() => {})
         void useUnseenRunsStore.getState().markAllSeen()
     }, [markSessionsHandled, items])
     const openSettings = useCallback(() => {

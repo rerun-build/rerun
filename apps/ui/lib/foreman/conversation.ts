@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { FOREMAN_AGENT_ID, type Conversation, type SessionKind, type SessionStatus } from '@rerun/contracts'
+import { ATTENTION_STATUSES, FOREMAN_AGENT_ID, FOREMAN_WAKE_MARKER, type Conversation, type SessionKind, type SessionStatus } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
@@ -137,8 +137,15 @@ export async function listForemanConversations(ctx: WorkspaceContext): Promise<C
     return (data ?? []).map(foremanConversationOf)
 }
 
+// The message the box writes to start a wake is nobody's: dropped here, the one place every client,
+// the apps already installed included, reads a conversation of the foreman from.
+function isWakeMessage(message: UIMessage): boolean {
+    return message.role === 'user' && message.parts.some(part => part.type === 'text' && part.text.startsWith(FOREMAN_WAKE_MARKER))
+}
+
 async function readEngineTranscript(conn: EngineConnection, engineSessionId: string): Promise<UIMessage[]> {
-    return transformEngineMessages(await getSessionMessages(conn, FOREMAN_AGENT_ID, engineSessionId)) as UIMessage[]
+    const messages = transformEngineMessages(await getSessionMessages(conn, FOREMAN_AGENT_ID, engineSessionId)) as UIMessage[]
+    return messages.filter(message => !isWakeMessage(message))
 }
 
 async function readRunState(conn: EngineConnection, engineSessionId: string): Promise<ForemanRunState> {
@@ -226,6 +233,20 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
 export async function touchForemanConversation(sessionId: string): Promise<void> {
     const supabase = createServiceRoleClient()
     await supabase.from('foreman_conversations').update<ConversationUpdate>({ updated_at: new Date().toISOString(), status: 'working' }).eq('id', sessionId)
+}
+
+// « Mark as read »: the conversation leaves the caller's inbox, as a coworker's does. A card in it
+// still waits for its answer in the conversation itself.
+export async function markForemanConversationRead(ctx: WorkspaceContext, sessionId: string): Promise<void> {
+    const supabase = createServiceRoleClient()
+    const { error } = await supabase
+        .from('foreman_conversations')
+        .update<ConversationUpdate>({ status: 'idle' })
+        .eq('id', sessionId)
+        .eq('workspace_id', ctx.workspace.id)
+        .eq('user_id', ctx.userId)
+        .in('status', [...ATTENTION_STATUSES])
+    if (error) throw new Error(error.message)
 }
 
 // Where a run of the foreman stopped, as its thread shows it in General. The engine names the session

@@ -131,6 +131,8 @@ type ForemanState = {
     showGeneral: () => void
     /** Slides a thread of General in. */
     openThread: (sessionId: string) => void
+    /** Opens the column on one of its conversations, from outside it: a notification, the inbox. */
+    openConversation: (sessionId: string) => void
     /** General's id, once the server named it: the one it reopened, or the one a send landed in. */
     setGeneral: (sessionId: string, backend?: ForemanBackend) => void
     /** The onboarding is over under General: the engine's General takes its place. */
@@ -257,6 +259,14 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     },
     openThread: sessionId => {
         if (get().sessionId !== sessionId) set({ ...CONVERSATION_SWITCH, sessionId, backend: 'engine' })
+    },
+    // A gesture, as `toggle` is: the column opening becomes the preference.
+    openConversation: sessionId => {
+        applyOpen(set, true)
+        rememberForemanOpen(true)
+        set({ tab: 'assistant' })
+        if (sessionId === get().generalId) get().showGeneral()
+        else get().openThread(sessionId)
     },
     setGeneral: (sessionId, backend) => set({ generalId: sessionId, sessionId, backend: backend ?? null }),
     startEngineGeneral: () => {

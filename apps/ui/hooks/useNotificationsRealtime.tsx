@@ -1,5 +1,6 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
@@ -44,10 +45,11 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
     }, [tErrors])
     const t = useTranslations('notifications.toast')
     const tNotices = useTranslations('notifications.notices')
-    const copyRef = useRef({ t, tNotices })
+    const foremanName = useTranslations('foreman.notification')('title')
+    const copyRef = useRef({ t, tNotices, foremanName })
     useEffect(() => {
-        copyRef.current = { t, tNotices }
-    }, [t, tNotices])
+        copyRef.current = { t, tNotices, foremanName }
+    }, [t, tNotices, foremanName])
 
     useRealtimeSubscription('notifications', {
         channelId: `notifications-ws-${workspaceId}`,
@@ -57,9 +59,12 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             const kind = row.kind as NotificationKind
             const reason = recipientReason(row.recipients, userIdRef.current)
             if (!reason) return
+            // The Chief of Staff has no coworker row: its notifications name it by its engine id.
+            const foreman = !row.agent_id && row.engine_agent_id === FOREMAN_AGENT_ID
+            const agentId = foreman ? FOREMAN_AGENT_ID : row.agent_id
             if (kind === 'done' && reason !== 'legacy') void useUnseenRunsStore.getState().refresh()
             // A row stored by a hub that predates recipients names nobody: a quiet toast, never a sound.
-            const delivery = reason === 'legacy' ? 'toast' : deliveryFor(prefsRef.current, reason, kind, row.agent_id)
+            const delivery = reason === 'legacy' ? 'toast' : deliveryFor(prefsRef.current, reason, kind, agentId)
             if (delivery === 'none') return
             // A run finishing in the conversation panel the user is looking at is already on screen.
             // The panel is known per coworker, not per conversation: a run of the same coworker in
@@ -67,7 +72,7 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             if (kind === 'done' && isWatching(row.agent_id)) return
 
             const agent = row.agent_id ? useBoardStore.getState().agents.find(a => a.id === row.agent_id) : undefined
-            const agentName = agent?.name ?? copyRef.current.t('coworker')
+            const agentName = foreman ? copyRef.current.foremanName : (agent?.name ?? copyRef.current.t('coworker'))
             const scheduled = isScheduledSource(row.source)
             const title = scheduled ? copyRef.current.t('scheduledTask', { name: agentName }) : agentName
             const message = noticeText(row, copyRef.current.tNotices)
@@ -77,8 +82,8 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             const beamTone = scheduled ? 'brand' : KIND_BEAM[kind]
             const status = kind === 'done' ? FINISHED_STATUS : ANNOUNCED_STATUS[kind]
             const shown = normalizeNotificationPrefs(prefsRef.current).toast && !!status
-            const openConversation = row.agent_id
-                ? () => openConversationFromNotification({ agentId: row.agent_id, engineSessionId: row.engine_session_id, engineRunId: row.engine_run_id })
+            const openConversation = agentId
+                ? () => openConversationFromNotification({ agentId, engineSessionId: row.engine_session_id, engineRunId: row.engine_run_id })
                 : undefined
             if (shown && anonymousRef.current) {
                 toast.custom(id => (
@@ -99,7 +104,7 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             } else if (shown && status) {
                 useNotificationsStore.getState().announce({
                     id: row.id,
-                    agentId: row.agent_id,
+                    agentId,
                     status,
                     headline: kind === 'error' ? errorHeadline(row, tErrorsRef.current) : message,
                     message,

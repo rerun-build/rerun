@@ -1,7 +1,9 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { useId, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '../../../cn'
+import { ForemanBall } from '../../../foreman/ForemanBall'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { hashUnit } from '../../iso'
 import type { BuddyEyes, BuddyLook } from '../../types'
@@ -46,7 +48,22 @@ type AgentBuddyProps = {
     className?: string
 }
 
-export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, alive = false, facing = 'left', badge, className }: AgentBuddyProps) {
+export function AgentBuddy(props: AgentBuddyProps) {
+    // The Chief of Staff is no coworker: wherever a list names it beside them, it is its own ball.
+    if (props.agentId === FOREMAN_AGENT_ID) return <ForemanBuddy {...props} />
+    return <CoworkerBuddy {...props} />
+}
+
+function ForemanBuddy({ size, animated = true, facing = 'left', badge, className }: AgentBuddyProps) {
+    return (
+        <span aria-hidden className={cn('relative inline-flex shrink-0 items-end justify-center', className)} style={{ width: size, height: size }}>
+            <ForemanBall material="glass" face="plate" eyes="round" scale={1} size={size} animated={animated} facing={facing} />
+            {badge && <span className={cn('absolute -bottom-1 flex', facing === 'right' ? '-left-1' : '-right-1')}>{badge}</span>}
+        </span>
+    )
+}
+
+function CoworkerBuddy({ agentId, mood = 'idle', size, animated = true, alive = false, facing = 'left', badge, className }: AgentBuddyProps) {
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
     const reducedMotion = usePrefersReducedMotion()
     const small = size < SMALL_BELOW

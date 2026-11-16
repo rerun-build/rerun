@@ -87,7 +87,7 @@ describe('foreman', () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        expect(names).toEqual(expect.arrayContaining(['create_agent', 'list_agents', 'focus_agent', 'ask_user', 'request_approval', 'fs_read', 'shared_read', 'shell_exec', 'web_fetch', 'shared_db_query', 'delegate_tasks', 'agent_files_read', 'agent_files_edit']))
+        expect(names).toEqual(expect.arrayContaining(['create_agent', 'list_agents', 'focus_agent', 'ask_user', 'request_approval', 'notify_user', 'fs_read', 'shared_read', 'shell_exec', 'web_fetch', 'shared_db_query', 'delegate_tasks', 'agent_files_read', 'agent_files_edit']))
     })
 
     it('keeps the company brain rather than proposing to it', async () => {
@@ -102,7 +102,7 @@ describe('foreman', () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['memory_write', 'skill_create', 'schedule_create', 'trigger_create', 'db_query', 'notify_user', 'suggest_service', 'request_secret', 'soul_update', 'install_complete']) expect(names).not.toContain(name)
+        for (const name of ['memory_write', 'skill_create', 'schedule_create', 'trigger_create', 'db_query', 'suggest_service', 'request_secret', 'soul_update', 'install_complete']) expect(names).not.toContain(name)
         expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
     })
 
