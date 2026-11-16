@@ -35,7 +35,7 @@ afterEach(() => {
 })
 
 describe('FactoryTasks', () => {
-    it('maps every one of the 13 states to an icon and a colour', () => {
+    it('maps every state to an icon and a colour', () => {
         expect(Object.keys(JOB_STATE_VIEW).sort()).toEqual([...factoryJobStateSchema.options].sort())
         for (const v of Object.values(JOB_STATE_VIEW)) { expect(v.icon).toBeTruthy(); expect(v.color).toMatch(/^#/) }
         expect(JOB_STATE_VIEW.building.color).toBe(STATUS_COLOR.build)

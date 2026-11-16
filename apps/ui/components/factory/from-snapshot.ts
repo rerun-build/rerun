@@ -116,6 +116,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
                 counts.merged++
                 break
             case 'rejected':
+            case 'unsolvable':
                 rejects++
                 break
             case 'failed':
