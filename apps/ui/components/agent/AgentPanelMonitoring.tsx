@@ -177,7 +177,7 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
                                             <div className="mt-1 text-[11px] text-muted-foreground">{t('noPrice.label')}</div>
                                         </div>
                                     ) : (
-                                        <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />
+                                        <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} lowerIsBetter={isDefinedKpi(spec.key)} />
                                     )}
                                 </MonitorCard>
                             ))}

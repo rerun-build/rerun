@@ -29,8 +29,8 @@ vi.mock('@/components/ui/tooltip', () => {
 })
 
 vi.mock('@rerun/ui/monitoring', () => ({
-    StatsChart: (props: { metric: string; chartType: string; points: StatsPoint[] | null }) =>
-        createElement('div', { 'data-chart': `${props.metric}:${props.chartType}`, 'data-points': JSON.stringify(props.points) }),
+    StatsChart: (props: { metric: string; chartType: string; points: StatsPoint[] | null; lowerIsBetter?: boolean }) =>
+        createElement('div', { 'data-chart': `${props.metric}:${props.chartType}`, 'data-points': JSON.stringify(props.points), 'data-lower': props.lowerIsBetter ? 'yes' : 'no' }),
     TokenUsageChart: () => createElement('div'),
     MonitorCard: ({ title, subtitle, action, children }: { title: string; subtitle?: string; action?: ReactNode; children: ReactNode }) =>
         createElement('section', { 'data-card': title }, subtitle, action, children),
@@ -72,6 +72,9 @@ describe('AgentPanelMonitoring rates', () => {
         expect(card('Error rate')?.querySelector('[data-tooltip]')?.textContent).toMatch(/error/i)
         expect(card('Failure rate')?.querySelector('[data-tooltip]')?.textContent).toMatch(/BLOCKED:/)
         expect(card('Failure rate')?.querySelector('button')?.getAttribute('aria-label')).toBeTruthy()
+        expect(card('Error rate')?.querySelector('[data-chart]')?.getAttribute('data-lower')).toBe('yes')
+        expect(card('Failure rate')?.querySelector('[data-chart]')?.getAttribute('data-lower')).toBe('yes')
+        expect(card('Runs')?.querySelector('[data-chart]')?.getAttribute('data-lower')).toBe('no')
     })
 
     it('draws the failure rate over time as a line', async () => {
