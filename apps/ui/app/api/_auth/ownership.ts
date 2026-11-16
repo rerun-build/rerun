@@ -3,7 +3,7 @@ import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors
 import { realEmail } from '@/lib/auth/placeholder-email'
 import type { Database, Enums } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { getServerSession, getSessionWorkspace } from '@/supabase/session/getServerSession'
+import { getServerSession, getSessionWorkspace, SESSION_WORKSPACE_COLUMNS } from '@/supabase/session/getServerSession'
 import { selectMany, selectMaybeSingle, selectMaybeSingleWithJoins, selectSingle } from '@/supabase/supabase-helpers'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import type { ErrorCode } from '@/lib/i18n/action-error'
@@ -57,6 +57,19 @@ export async function requireWorkspaceContext(): Promise<WorkspaceContext> {
     if (!membership) throw new AuthorizationError(NOT_A_MEMBER)
 
     return { userId: user.id, userEmail: realEmail(session.email), authUser: session, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), supabase }
+}
+
+// The same context for a member nobody signed in as: what the box asks on its own, for the run of the
+// Chief of Staff it starts. Null when the member left the workspace.
+export async function memberWorkspaceContext(workspaceId: number, userId: string): Promise<WorkspaceContext | null> {
+    const supabase = createServiceRoleClient()
+    const [{ data: membership }, { data: workspace }, { data: auth }] = await Promise.all([
+        selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: userId, workspace_id: workspaceId }),
+        selectMaybeSingle(supabase, 'workspaces', SESSION_WORKSPACE_COLUMNS, { id: workspaceId }),
+        supabase.auth.admin.getUserById(userId),
+    ])
+    if (!membership || !workspace || !auth.user) return null
+    return { userId, userEmail: realEmail(auth.user.email), authUser: auth.user, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), supabase }
 }
 
 export const ADMIN_ONLY = 'adminOnly' satisfies ErrorCode

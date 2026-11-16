@@ -44,6 +44,30 @@ export const foremanBriefSchema = z.object({
 })
 export type ForemanBrief = z.infer<typeof foremanBriefSchema>
 
+// The brief of a run the Chief of Staff starts on its own, asked by the box on POST /api/hub with
+// its key alone. The hub decides whether it wakes at all (`skip`, a reason the box logs and waits on)
+// and for whom: the member the run speaks to, their time zone, and a token that only reads.
+export const FOREMAN_WAKE_BRIEF_TOOL = 'foreman_brief'
+
+export const foremanWakeRequestSchema = z.object({
+    reason: z.string().max(500),
+    // The member a signal concerns, or the last one who spoke to it. The hub checks it.
+    memberId: z.string().nullable().optional(),
+    provider: z.string().nullable().optional(),
+    lastWakeAt: z.string().nullable().optional(),
+})
+export type ForemanWakeRequest = z.infer<typeof foremanWakeRequestSchema>
+
+export const FOREMAN_WAKE_SKIP_REASONS = ['disabled', 'not_released', 'no_plan', 'sandbox', 'dormant', 'no_token_secret', 'provider', 'no_member'] as const
+export type ForemanWakeSkipReason = (typeof FOREMAN_WAKE_SKIP_REASONS)[number]
+
+// `skip` stays a string on the box's side: a newer hub may say no for a reason this engine never heard of.
+export const foremanWakeBriefSchema = z.union([
+    z.object({ skip: z.string().min(1) }),
+    z.object({ brief: foremanBriefSchema.extend({ hubToken: z.string().min(1) }), memberId: z.string().min(1), timezone: z.string().nullable() }),
+])
+export type ForemanWakeBrief = z.infer<typeof foremanWakeBriefSchema>
+
 // Which foreman the workspace talks to: the onboarding's on the hub, the everyday one on the engine, or
 // none at all for a workspace past its onboarding with no machine.
 export const foremanSurfaceSchema = z.enum(['onboarding', 'engine', 'none'])

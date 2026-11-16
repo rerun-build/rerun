@@ -6,7 +6,8 @@ import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
 import { dispatchHubTool } from '@/app/api/_services/services.service'
 import { dispatchTeamHubTool } from '@/app/api/_services/team-hub.service'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
-import { mintForemanHubToken } from '@/lib/foreman/hub-token'
+import { mintForemanHubToken, mintForemanWakeToken } from '@/lib/foreman/hub-token'
+import { foremanWakeBrief } from '@/lib/foreman/wake-brief'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 import { POST } from './route'
@@ -22,6 +23,7 @@ vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 vi.mock('@/lib/foreman/box-tools', () => ({ dispatchBoxTool: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn().mockReturnValue({}) }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: vi.fn() }))
+vi.mock('@/lib/foreman/wake-brief', () => ({ foremanWakeBrief: vi.fn().mockResolvedValue({ skip: 'not_released' }) }))
 
 const WORKSPACE_ID = 7
 
@@ -183,6 +185,40 @@ describe('POST /api/hub', () => {
         expect(vi.mocked(selectMaybeSingle).mock.calls[0][1]).toBe('workspace_members')
         expect(vi.mocked(selectMaybeSingle).mock.calls[0][3]).toEqual({ user_id: 'user-7', workspace_id: WORKSPACE_ID })
         expect(dispatchAccountTool).toHaveBeenCalledWith({ kind: 'user', userId: 'user-7', workspaceId: WORKSPACE_ID, role: 'member', boxScope: 'assigned' }, 'list_agents', {}, { actorUserId: 'user-7' })
+    })
+
+    // There is no token yet: the brief is what hands one out, and it only ever reads.
+    it('hands the box the brief of a wake on its key alone, even once the token is required', async () => {
+        vi.stubEnv('FOREMAN_HUB_TOKEN_REQUIRED', '')
+        const response = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, body: { tool: 'foreman_brief', args: { reason: 'scheduled', memberId: 'user-7', provider: 'claude' } } }))
+
+        expect(response.status).toBe(200)
+        expect(await response.json()).toEqual({ skip: 'not_released' })
+        expect(foremanWakeBrief).toHaveBeenCalledWith(WORKSPACE_ID, { reason: 'scheduled', memberId: 'user-7', provider: 'claude' })
+    })
+
+    it('refuses a wake brief asked by a coworker or without a reason', async () => {
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { id: 'agent-1' }, error: null })
+        await POST(hubRequest({ agent: 'scout', body: { tool: 'foreman_brief', args: { reason: 'x' } } }))
+        expect(foremanWakeBrief).not.toHaveBeenCalled()
+        const invalid = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, body: { tool: 'foreman_brief', args: {} } }))
+        expect(invalid.status).toBe(400)
+    })
+
+    // A wake reads and proposes. Whatever its model calls beyond that is refused by the hub too.
+    it('lets a wake token read and refuses it every other tool', async () => {
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { role: 'admin', box_scope: 'all' }, error: null })
+        const wakeToken = mintForemanWakeToken(WORKSPACE_ID, 'user-7')
+
+        const read = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: wakeToken, body: { tool: 'list_agents', args: {} } }))
+        expect(read.status).toBe(200)
+        expect(dispatchAccountTool).toHaveBeenCalledTimes(1)
+
+        for (const tool of ['create_agent', 'delete_agent', 'send_message', 'run_schedule_now', 'set_vault_link', 'db_execute']) {
+            const write = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: wakeToken, body: { tool, args: {} } }))
+            expect((await write.json()).error).toContain('out of reach in a run nobody started')
+        }
+        expect(dispatchAccountTool).toHaveBeenCalledTimes(1)
     })
 
     it('refuses the foreman of a member who has left the workspace since the turn started', async () => {

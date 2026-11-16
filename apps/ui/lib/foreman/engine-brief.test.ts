@@ -4,7 +4,7 @@ import { z } from 'zod'
 
 vi.mock('server-only', () => ({}))
 
-import { foremanEngineBrief, FOREMAN_ENGINE_HUB_TOOL_NAMES } from './engine-brief'
+import { foremanEngineBrief, foremanWakeTools, FOREMAN_ENGINE_HUB_TOOL_NAMES, WAKE_HUB_TOOL_NAMES } from './engine-brief'
 import type { ForemanState } from './phase'
 import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 
@@ -109,6 +109,16 @@ describe('foremanEngineBrief', () => {
         expect(connecting.instructions).toContain('call connect_app')
         expect(connecting.tools.map(tool => tool.name)).not.toContain('connect_app')
         expect(() => foremanBriefSchema.parse(connecting)).not.toThrow()
+    })
+
+    // A tool joins a wake only once someone decided it reads and nothing more: this list is that decision.
+    it('lets a wake read, and nothing else', () => {
+        expect([...WAKE_HUB_TOOL_NAMES].sort()).toEqual(
+            ['db_query', 'get_agent', 'get_run', 'get_skill', 'get_team_status', 'list_agent_connectors', 'list_agent_shares', 'list_agents', 'list_ai_connections', 'list_connectors', 'list_runs', 'list_schedules', 'list_skills', 'list_space_tables', 'list_spaces', 'list_tables', 'list_templates', 'list_triggers', 'list_vault', 'read_skill_file', 'search_connectors', 'search_docs', 'space_db_query'].sort(),
+        )
+        for (const name of WAKE_HUB_TOOL_NAMES) expect(FOREMAN_ENGINE_HUB_TOOL_NAMES.has(name), name).toBe(true)
+        expect(foremanWakeTools().map(tool => tool.name).sort()).toEqual([...WAKE_HUB_TOOL_NAMES].sort())
+        expect(() => foremanBriefSchema.parse({ instructions: 'x', tools: foremanWakeTools() })).not.toThrow()
     })
 
     it('never lets two creations overlap', () => {

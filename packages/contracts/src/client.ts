@@ -2,6 +2,9 @@ import { z } from 'zod'
 
 export const CLIENT_HEADER = 'x-rerun-client'
 
+// The IANA time zone the phone runs in, sent with every request of the app.
+export const TIME_ZONE_HEADER = 'x-rerun-timezone'
+
 export const CLIENT_PLATFORMS = ['ios', 'android'] as const
 export const clientPlatformSchema = z.enum(CLIENT_PLATFORMS)
 export type ClientPlatform = z.infer<typeof clientPlatformSchema>

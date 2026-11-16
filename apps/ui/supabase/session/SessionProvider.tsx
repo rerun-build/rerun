@@ -1,5 +1,6 @@
 'use client'
 
+import { reportActivityAction } from '@/app/api/_actions/account.actions'
 import { isAdminEmail } from '@/lib/auth/admin-emails'
 import { Database } from '@/app/api/database.types'
 import { routes } from '@/lib/routes'
@@ -204,6 +205,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
             cancelled = true
         }
     }, [memberId, workspaceId, roleReads])
+
+    const anonymous = session?.user?.is_anonymous ?? false
+    // Once per signed-in load: the browser's time zone and a sign of life, for the Chief of Staff's
+    // quiet hours and its pace in a workspace nobody opens.
+    useEffect(() => {
+        if (!memberId || anonymous) return
+        void reportActivityAction(Intl.DateTimeFormat().resolvedOptions().timeZone).catch(() => {})
+    }, [memberId, anonymous])
 
     // Keyed by workspace so a switch never shows the previous workspace's answers while the new ones load.
     const workspaceAnswers = loadedAnswers && loadedAnswers.workspaceId === workspaceId ? loadedAnswers.answers : null

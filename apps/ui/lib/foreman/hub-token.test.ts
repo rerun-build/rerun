@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { FOREMAN_HUB_TOKEN_TTL_MS, foremanHubTokenRequired, mintForemanHubToken, verifyForemanHubToken } from './hub-token'
+import { FOREMAN_HUB_TOKEN_TTL_MS, FOREMAN_WAKE_TOKEN_TTL_MS, foremanHubTokenRequired, mintForemanHubToken, mintForemanWakeToken, verifyForemanHubToken } from './hub-token'
 
 const WORKSPACE_ID = 42
 
@@ -21,6 +21,20 @@ afterEach(() => {
 })
 
 describe('foreman hub token', () => {
+    // A run nobody started reads and proposes: its token says so, for one hour.
+    it('carries the wake scope of a run nobody started, and dies after an hour', () => {
+        const token = mintForemanWakeToken(WORKSPACE_ID, 'member-1')!
+        expect(verifyForemanHubToken(token, WORKSPACE_ID)).toMatchObject({ uid: 'member-1', scope: 'wake' })
+        expect(verifyForemanHubToken(mintForemanHubToken(WORKSPACE_ID, 'member-1'), WORKSPACE_ID)).not.toHaveProperty('scope')
+        vi.advanceTimersByTime(FOREMAN_WAKE_TOKEN_TTL_MS + 1)
+        expect(verifyForemanHubToken(token, WORKSPACE_ID)).toBeNull()
+    })
+
+    it('cannot be widened by dropping its scope', () => {
+        const token = mintForemanWakeToken(WORKSPACE_ID, 'member-1')!
+        expect(verifyForemanHubToken(tamper(token, { scope: undefined }), WORKSPACE_ID)).toBeNull()
+    })
+
     it('round-trips for the workspace it was minted for', () => {
         expect(verifyForemanHubToken(mintForemanHubToken(WORKSPACE_ID), WORKSPACE_ID)).not.toBeNull()
     })

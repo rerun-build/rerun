@@ -6,6 +6,7 @@ import type { User } from '@supabase/supabase-js'
 
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { accountDeletionBlockers, anonymizeAccount } from '@/app/api/_services/account-deletion.service'
+import { stampActivity } from '@/app/api/_services/activity.service'
 import { syncStripeCustomerEmail } from '@rerun/cloud/billing.server'
 import { phoneOwnerId } from '@rerun/cloud/phone.server'
 import { DELETE_ACCOUNT_CONFIRMATION, type AccountDeletionBlocker } from '@/lib/auth/account-deletion'
@@ -214,4 +215,11 @@ export async function deleteMyAccountAction(params: { confirmation: string }): P
         console.error('[account] deletion failed', err instanceof Error ? err.message : err)
         return failureOf(err, 'deleteAccountFailed')
     }
+}
+
+// Once per load of the app: the time zone the browser runs in, and that a member was here.
+export async function reportActivityAction(timeZone: string | null): Promise<void> {
+    const { session, isAnonymous } = await getServerSession()
+    if (!session || isAnonymous) return
+    await stampActivity(session.id, timeZone)
 }

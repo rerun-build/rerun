@@ -31,6 +31,41 @@ function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSp
     return { name: def.name, description: def.description, inputSchema: def.inputSchema as Record<string, unknown>, kind, serial: SERIAL_TOOL_NAMES.has(def.name) }
 }
 
+// The hub tools a run nobody started may call. A written list rather than a rule: a tool joins it only
+// once someone decided it reads and nothing more, and a test holds it to this list. Left out on
+// purpose, although they look like reads: send_message (starts a coworker's run), run_schedule_now,
+// test_trigger, rotate_trigger_token, and analyze_website (reaches the web).
+export const WAKE_HUB_TOOL_NAMES: ReadonlySet<string> = new Set([
+    'list_spaces',
+    'list_agents',
+    'get_team_status',
+    'get_agent',
+    'list_ai_connections',
+    'list_skills',
+    'get_skill',
+    'read_skill_file',
+    'list_schedules',
+    'list_triggers',
+    'list_runs',
+    'get_run',
+    'list_tables',
+    'db_query',
+    'list_space_tables',
+    'space_db_query',
+    'search_connectors',
+    'list_connectors',
+    'list_agent_connectors',
+    'list_agent_shares',
+    'search_docs',
+    'list_templates',
+    'list_vault',
+])
+
+// No intent tool: nobody's browser is watching a run nobody started.
+export function foremanWakeTools(): ForemanToolSpec[] {
+    return HUB_TOOL_DEFS.filter(def => WAKE_HUB_TOOL_NAMES.has(def.name)).map(def => spec(def, 'hub'))
+}
+
 // What the box can draw, read from its /health: an engine tool named in the brief exists only there.
 export type ForemanBoxCapabilities = { connectApp: boolean }
 

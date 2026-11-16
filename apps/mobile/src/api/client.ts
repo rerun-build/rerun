@@ -1,4 +1,4 @@
-import { CLIENT_HEADER, formatClientHeader } from '@rerun/contracts'
+import { CLIENT_HEADER, formatClientHeader, TIME_ZONE_HEADER } from '@rerun/contracts'
 import * as Application from 'expo-application'
 
 import { environment } from '@/config/environment'
@@ -35,7 +35,7 @@ function errorMessageOf(payload: unknown): string | null {
 
 // What every call to the hub carries: the build, and once signed in the token and the workspace.
 export function hubHeaders(clientHeader: string, { accessToken, workspaceId }: Pick<ApiRequest, 'accessToken' | 'workspaceId'>): Record<string, string> {
-    const headers: Record<string, string> = { [CLIENT_HEADER]: clientHeader }
+    const headers: Record<string, string> = { [CLIENT_HEADER]: clientHeader, [TIME_ZONE_HEADER]: Intl.DateTimeFormat().resolvedOptions().timeZone }
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
     if (workspaceId != null) headers[WORKSPACE_HEADER] = String(workspaceId)
     return headers

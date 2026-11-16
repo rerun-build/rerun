@@ -3044,10 +3044,12 @@ export type Database = {
           email_notification_prefs: Json
           expert_profile_id: string | null
           id: string
+          last_active_at: string | null
           locale: string | null
           onboarding_answers: Json | null
           onboarding_completed_at: string | null
           signed_up_at: string | null
+          timezone: string | null
           verified: boolean
           workspace_id: number
         }
@@ -3059,10 +3061,12 @@ export type Database = {
           email_notification_prefs?: Json
           expert_profile_id?: string | null
           id: string
+          last_active_at?: string | null
           locale?: string | null
           onboarding_answers?: Json | null
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
+          timezone?: string | null
           verified?: boolean
           workspace_id: number
         }
@@ -3074,10 +3078,12 @@ export type Database = {
           email_notification_prefs?: Json
           expert_profile_id?: string | null
           id?: string
+          last_active_at?: string | null
           locale?: string | null
           onboarding_answers?: Json | null
           onboarding_completed_at?: string | null
           signed_up_at?: string | null
+          timezone?: string | null
           verified?: boolean
           workspace_id?: number
         }
@@ -3617,6 +3623,7 @@ export type Database = {
       }
       workspaces: {
         Row: {
+          assistant_proactive: boolean
           boxes_archived_at: string | null
           boxes_deleted_at: string | null
           boxes_disabled_at: string | null
@@ -3655,6 +3662,7 @@ export type Database = {
           waitlisted_at: string | null
         }
         Insert: {
+          assistant_proactive?: boolean
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -3693,6 +3701,7 @@ export type Database = {
           waitlisted_at?: string | null
         }
         Update: {
+          assistant_proactive?: boolean
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -3962,6 +3971,7 @@ export type Database = {
         | "delegate"
         | "api"
         | "trigger"
+        | "wake"
       session_status:
         | "idle"
         | "working"
@@ -4164,6 +4174,7 @@ export const Constants = {
         "delegate",
         "api",
         "trigger",
+        "wake",
       ],
       session_status: [
         "idle",
