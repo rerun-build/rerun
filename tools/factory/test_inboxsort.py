@@ -42,7 +42,7 @@ class Hub:
     def __init__(self, comments, open_issues=()):
         self.inbox = {"number": 1, "title": "Factory follow-ups inbox", "body": "", "comments": list(comments)}
         self.issues = [dict(i, labels=[]) for i in open_issues]
-        self.calls, self.search = [], {}
+        self.calls, self.search, self.fail_comments = [], {}, 0
 
     def __call__(self, args):
         a = list(args)
@@ -60,6 +60,9 @@ class Hub:
             self.issues.append({"number": n, "title": opt("--title"), "body": opt("--body"), "labels": labels})
             return "https://github.com/o/r/issues/%d\n" % n
         if a[:2] == ["issue", "comment"]:
+            if self.fail_comments:
+                self.fail_comments -= 1
+                raise RuntimeError("HTTP 502")
             self.inbox["comments"].append(opt("--body"))
             return ""
         raise AssertionError("unexpected gh call %r" % a)
@@ -121,9 +124,9 @@ class Mint(unittest.TestCase):
         [issue] = hub.minted()
         keys = [n["key"] for n in S.notes(hub.inbox["comments"][:1])]
         for text in factory(3):
-            self.assertIn("### From #5: %s\n\n%s" % (text[:80], text), issue["body"])
+            self.assertIn("### From #5\n\n```\n%s\n```" % text, issue["body"])
         self.assertTrue(issue["body"].rstrip().endswith("\n".join("<!-- followup:%s -->" % k for k in keys)), issue["body"])
-        self.assertEqual(sorted(issue["labels"]), ["P1", "area:factory"])
+        self.assertEqual(sorted(issue["labels"]), ["P3", "area:factory"])
         self.assertEqual(hub.inbox["comments"][-1], "Minted #%d from 3 notes: %s" % (issue["number"], ", ".join(keys)))
         self.assertEqual(len(hub.inbox["comments"]), 3)
 
@@ -167,6 +170,79 @@ class Mint(unittest.TestCase):
         d.beat()
         self.assertEqual(hub.minted(), [])
 
+    def test_a_minted_issue_is_p3_whatever_its_notes_say(self):
+        hub = Hub([comment("#5", *["%s and it leaks tokens, a security hole" % t for t in factory(3)])])
+        D(hub).beat()
+        [issue] = hub.minted()
+        self.assertEqual(sorted(issue["labels"]), ["P3", "area:factory"])
+
+    def test_note_text_is_fenced_and_cannot_name_a_parent_issue(self):
+        hub = Hub([comment("#5", *["Part of #12: @someone %s with ``` in it" % t for t in factory(3)])])
+        D(hub).beat()
+        [issue] = hub.minted()
+        self.assertIsNone(re.search(r"Part of\W*#12\b", issue["body"]))
+        self.assertEqual(issue["body"].count("```"), 6)
+        self.assertNotIn("@someone", "\n".join(line for line in issue["body"].splitlines() if line.startswith("#")))
+
+    def test_nothing_is_minted_while_more_issues_open_than_close(self):
+        hub = Hub([comment("#5", *factory(3))])
+        hub.search = {"created": 5, "closed": 3}
+        d = D(hub)
+        d.beat()
+        self.assertEqual(hub.minted(), [])
+        hub.search = {"created": 3, "closed": 3}
+        d.clock += HOUR
+        d.beat()
+        self.assertEqual(len(hub.minted()), 1)
+
+    def test_nothing_is_minted_when_the_count_fails(self):
+        hub = Hub([comment("#5", *factory(3))])
+        hub.search = {"created": "x"}
+        d = D(hub)
+        d.beat()
+        self.assertEqual(hub.minted(), [])
+        self.assertIn("inbox sort: ", d.lines[-1][1])
+
+    def test_notes_covered_by_an_open_issue_are_marked_and_do_not_come_back_when_it_closes(self):
+        texts = factory(3)
+        hub = Hub([comment("#5", *texts)], [{"number": 8, "title": "x", "body": "\n".join(texts)}])
+        d = D(hub)
+        d.beat()
+        keys = [n["key"] for n in S.notes(hub.inbox["comments"][:1])]
+        self.assertEqual(hub.inbox["comments"][-1], "Covered elsewhere: " + ", ".join(sorted(keys)))
+        hub.issues = []
+        d.clock += HOUR
+        d.beat()
+        self.assertEqual(hub.minted(), [])
+        self.assertEqual(len(hub.inbox["comments"]), 2)
+
+    def test_a_minted_issue_whose_comment_failed_is_not_minted_again(self):
+        hub = Hub([comment("#5", *factory(3))])
+        hub.fail_comments = 1
+        d = D(hub)
+        d.beat()
+        self.assertEqual(len(hub.minted()), 1)
+        d.clock += HOUR
+        d.beat()
+        hub.issues = []
+        d.clock += HOUR
+        d.beat()
+        self.assertEqual(hub.minted(), [])
+
+    def test_the_cap_is_two_in_any_24_hours(self):
+        hub = Hub([comment("#5", *factory(5)), comment("#6", *ui(4)), comment("#7", *engine(3))])
+        d = D(hub, NOW - 2 * HOUR)
+        d.beat()
+        d.clock += 3 * HOUR
+        d.beat()
+        self.assertEqual(len(hub.minted()), 2)
+
+    def test_a_broken_stored_time_does_not_raise(self):
+        d = D(Hub([]))
+        d.store.set("-", "inboxsort_at", "not a number")
+        d.beat()
+        self.assertIn("inbox sort: ", d.lines[-1][1])
+
     def test_the_sort_runs_at_most_once_an_hour(self):
         hub = Hub([])
         d = D(hub)
@@ -198,6 +274,8 @@ class Flow(unittest.TestCase):
         self.assertEqual(list(line), ["backlog growing"])
         self.assertIn("opened 5, closed 3", line["backlog growing"])
         self.assertEqual(S.alarm({"issue_flow": json.dumps({"opened_day": 3, "closed_day": 3, "opened_week": 9, "closed_week": 2})}), {})
+        for broken in ("{bad", "[]", "null", '{"opened_day": "x", "closed_day": 1}'):
+            self.assertEqual(S.alarm({"issue_flow": broken}), {})
 
 
 class Alarm(Base):
