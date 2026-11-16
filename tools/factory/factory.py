@@ -819,6 +819,9 @@ def has_heads(text, heads):
 PREFLIGHT_LINE_S = 900
 
 
+NOT_HERE = re.compile(r"^bash: (?:line \d+: )?.+: command not found$", re.M)
+
+
 def preflight_lines(top, body):
     import redgreen
     for line in redgreen.run_lines(body):
@@ -827,7 +830,7 @@ def preflight_lines(top, body):
             code, out = r.returncode, r.stdout + r.stderr
         except subprocess.TimeoutExpired:
             code, out = 124, "timed out after %d s" % PREFLIGHT_LINE_S
-        if code == 127:
+        if code == 127 and NOT_HERE.search(out):
             print("not run on this server: " + line)
         elif code:
             die("the Run line `%s` fails here (exit %d), nothing is pushed. Its last lines:\n%s" % (line, code, "\n".join(out.splitlines()[-20:])))
@@ -901,6 +904,8 @@ def cmd_pr_open(a):
             die("PR already open: %s. To push a fix for red CI use `pr-open --fix`." % ex[0]["url"])
         head = ex[0].get("headRefOid") or ""
         runs = api("repos/%s/actions/runs?head_sha=%s&per_page=100" % (full, head))
+        if not isinstance(runs, dict):
+            print("could not read the workflow runs of the head %s; the one-run-per-head check is skipped." % head[:7])
         pending = ciwait.unfinished((runs.get("workflow_runs") or []) if isinstance(runs, dict) else [])
         if pending:
             die("a workflow run of the pull request's head %s is not finished (%s). One CI run per head: wait for it with `ci-wait %s %s`, then push once."

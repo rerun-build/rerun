@@ -49,6 +49,8 @@ class PrOpenPreflight(FactoryCase):
                     self.pushes.append(cmd)
                 return real_run(cmd, *a, **k)
             if cmd[1] == "api" and "/actions/runs" in cmd[2]:
+                if runs is None:
+                    return subprocess.CompletedProcess(cmd, 1, "", "HTTP 502")
                 return subprocess.CompletedProcess(cmd, 0, json.dumps({"workflow_runs": list(runs)}), "")
             if cmd[1] == "api":
                 return subprocess.CompletedProcess(cmd, 0, json.dumps({"number": 7, "body": plan(lines)}), "")
@@ -88,6 +90,31 @@ class PrOpenPreflight(FactoryCase):
         code, out = self.open_pr(["no-such-tool-here --x"])
         self.assertEqual(code, 0, out)
         self.assertIn("not run on this server: no-such-tool-here --x", out)
+        self.assertTrue(self.pushed())
+
+    def refused_at_127(self, line):
+        code, out = self.open_pr([line])
+        self.assertEqual(code, 2, out)
+        self.assertIn("the Run line `%s` fails here (exit 127)" % line, out)
+        self.assertFalse(self.pushed())
+
+    def test_exit_127_from_inside_a_line_refuses(self):
+        self.refused_at_127("sh -c 'exit 127'")
+
+    def test_a_missing_tool_inside_a_script_refuses(self):
+        self.refused_at_127("sh -c no-such-tool-here")
+
+    def test_a_missing_tool_after_cd_or_an_assignment_is_named_and_does_not_refuse(self):
+        code, out = self.open_pr(["cd . && no-such-tool-here", "FOO=1 no-such-tool-here"])
+        self.assertEqual(code, 0, out)
+        self.assertIn("not run on this server: cd . && no-such-tool-here", out)
+        self.assertIn("not run on this server: FOO=1 no-such-tool-here", out)
+        self.assertTrue(self.pushed())
+
+    def test_a_fix_whose_runs_cannot_be_read_says_so_and_is_pushed(self):
+        code, out = self.open_pr(["true"], fix=True, runs=None)
+        self.assertEqual(code, 0, out)
+        self.assertIn("could not read the workflow runs of the head 1234567", out)
         self.assertTrue(self.pushed())
 
     def test_a_fix_runs_the_lines_too(self):
@@ -169,6 +196,19 @@ class ChecksAfterPush(Base):
         self.tick()
         self.assertIn(("ci red after push", "build"), self.failures())
         self.assertIn(("lint red after push", "build"), self.failures())
+
+    def test_a_second_red_result_on_the_same_head_is_not_counted_again(self):
+        self.to_checks()
+        self.w.workflows[HEAD] = [dict(run("CI", conclusion="failure"), id=11)]
+        self.w.run_jobs = {"11": [{"steps": [{"name": "Lint", "conclusion": "success"}]}]}
+        self.tick(2)
+        self.assertEqual(self.state(), "fixing")
+        self.w.finish("b1", "PUSHED: 1234567")
+        self.tick(2)
+        self.w.finish("r1", "VERDICT: ACCEPT @abcdef1")
+        self.tick(2)
+        self.assertEqual(self.state(), "failed")
+        self.assertEqual(self.failures().count(("ci red after push", "build")), 1)
 
 
 if __name__ == "__main__":

@@ -1181,8 +1181,10 @@ class Dispatcher:
         runs = data.get("workflow_runs") or []
         verdict, why = checks_verdict(runs)
         if verdict == "FAIL":
-            self.note_failures(dict(j, agent=j.get("builder") or j.get("agent"), run_model=None, tier=None, brief_v=None),
-                               ["ci red after push"] + (["lint red after push"] if self.lint_red(runs) else []), "building", why)
+            if j.get("red_head") != j["head"]:
+                self.note_failures(dict(j, agent=j.get("builder") or j.get("agent"), run_model=None, tier=None, brief_v=None),
+                                   ["ci red after push"] + (["lint red after push"] if self.lint_red(runs) else []), "building", why)
+                j["red_head"] = j["head"]
             if j.get("checks_fixed"):
                 return self.end(j, "failed", why)
             return self.to(j, "fix_wait", why + "; back to the builder once", checks_fixed=True, same_round=True,
