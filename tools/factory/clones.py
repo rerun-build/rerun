@@ -186,3 +186,91 @@ def new(full, issue, chunk, base, owner, default, start=None):
     print("WORKTREE %s\nbranch %s (from origin/%s, fresh)\nrepo %s | job issue #%s | chunk %s | checkout clone" % (final, branch, base, full, issue, chunk))
     print("build and test notes: %s" % (", ".join(notes) or "none in repo"))
     print("Next: edit here, quick checks only (lint, type check, named test files), commit, then `pr-open`.")
+
+
+MODES = ("worktree", "clone")
+WATCH_JOBS, FAULTS_BACK = 5, 3
+
+
+def mode_path():
+    return os.path.join(F.STATE, "checkout.json")
+
+
+def events_path():
+    return os.path.join(F.STATE, "checkout-events.log")
+
+
+def mode_record():
+    try:
+        with open(mode_path()) as f:
+            rec = json.load(f)
+        return rec if rec.get("checkout") in MODES else {"checkout": "worktree"}
+    except (OSError, ValueError, AttributeError):
+        return {"checkout": "worktree"}
+
+
+def mode():
+    return mode_record()["checkout"]
+
+
+def set_mode(value, why, watch=0):
+    os.makedirs(F.STATE, exist_ok=True)
+    M.write(mode_path(), json.dumps({"checkout": value, "why": why, "watch_from": events_count() if watch else None, "watch": watch,
+                                     "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}))
+
+
+def events():
+    try:
+        with open(events_path()) as f:
+            return [l.split() for l in f if l.strip()]
+    except OSError:
+        return []
+
+
+def events_count():
+    return len(events())
+
+
+def record(kind, job):
+    os.makedirs(F.STATE, exist_ok=True)
+    fd = os.open(events_path(), os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o644)
+    try:
+        os.write(fd, ("%s %s %d\n" % (kind, job, time.time())).encode())
+    finally:
+        os.close(fd)
+    rec = mode_record()
+    if rec["checkout"] != "clone" or kind != "fault":
+        return None
+    seen = events()
+    start = rec.get("watch_from")
+    watched = seen[start:start + rec.get("watch", 0)] if isinstance(start, int) else []
+    if any(e[0] == "fault" for e in watched):
+        set_mode("worktree", "a tool fault in %s during the watch of the first %d clone jobs" % (job, rec.get("watch", 0)))
+        return "SWITCHED BACK to checkout worktree: a tool fault during the watch of the first %d clone jobs" % rec.get("watch", 0)
+    tail = [e[0] for e in seen[-FAULTS_BACK:]]
+    if len(tail) == FAULTS_BACK and all(k == "fault" for k in tail):
+        set_mode("worktree", "%d tool faults in a row, the last in %s" % (FAULTS_BACK, job))
+        return "SWITCHED BACK to checkout worktree: %d tool faults in a row" % FAULTS_BACK
+    return None
+
+
+def canary_path():
+    return os.path.join(F.STATE, "canary.json")
+
+
+def cmd_mode(a):
+    if len(a) == 1:
+        rec = mode_record()
+        print("checkout %s%s" % (rec["checkout"], " (%s)" % rec["why"] if rec.get("why") else ""))
+        return
+    want = a[1]
+    if want not in MODES:
+        F.die("usage: wt mode [worktree | clone --canary <issue or PR url read by the operator>]")
+    if want == "clone":
+        if "--canary" not in a or a.index("--canary") + 1 >= len(a):
+            F.die("checkout clone needs the canary record: `wt mode clone --canary <url>` after the canary of CANARY.md passed")
+        M.write(canary_path(), json.dumps({"record": a[a.index("--canary") + 1], "at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}))
+        set_mode("clone", "canary " + a[a.index("--canary") + 1], watch=WATCH_JOBS)
+    else:
+        set_mode("worktree", "set by hand")
+    print("checkout %s" % want)

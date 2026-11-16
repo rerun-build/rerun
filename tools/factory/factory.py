@@ -446,6 +446,9 @@ def empty_on_old_base(p, path, branch):
 
 
 def cmd_wt(a):
+    if a and a[0] == "mode":
+        import clones
+        return clones.cmd_mode(a)
     if a and a[0] in ("janitor", "doctor", "restore"):
         import janitor
         return janitor.main(a)
@@ -493,7 +496,7 @@ def cmd_wt(a):
                 pass
         print("removed worktree %s and local branch %s" % (path, branch))
         return
-    if "--clone" in a:
+    if "--clone" in a or checkout_mode() == "clone":
         return wt_new_clone(a, full, issue, chunk)
     existing = os.path.isdir(path)
     st = shutil.disk_usage("/data")
@@ -561,7 +564,33 @@ def cmd_wt(a):
     print("Next: edit here, quick checks only (lint, type check, named test files), commit, then `pr-open`.")
 
 
+def checkout_mode():
+    try:
+        import clones
+        return clones.mode()
+    except Exception:
+        return "worktree"
+
+
 def wt_new_clone(a, full, issue, chunk):
+    import clones
+    job = "%s-%s-%s" % (short(full), issue, chunk)
+    try:
+        wt_new_clone_steps(a, full, issue, chunk)
+    except SystemExit as e:
+        if e.code in (None, 0):
+            clones.record("ok", job)
+        raise
+    except Exception:
+        line = clones.record("fault", job)
+        if line:
+            print(line)
+        raise
+    else:
+        clones.record("ok", job)
+
+
+def wt_new_clone_steps(a, full, issue, chunk):
     import clones
     st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
     if st.free / 2**30 < MIN_FREE_GB:
