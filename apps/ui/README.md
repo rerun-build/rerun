@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# rerun (apps/ui)
 
-## Getting Started
+The hub of Rerun: the web app and its API, in Next.js. It signs people in and keeps workspaces,
+coworkers, Boxes and billing in Supabase, and talks over HTTP to the engine of each workspace
+(`apps/engine`), which runs the coworkers. It also serves the desktop app (`app/api/desktop`), the
+mobile app (`app/api/v1`) and the MCP server that API keys reach (`app/api/mcp/account`).
 
-First, run the development server:
+## Run it
+
+From the root of the monorepo, with the local Supabase running (`pnpm db:start`) and
+`@rerun/contracts` built once (`pnpm build:contracts`):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev:ui        # the hub, on http://localhost:3050
+pnpm dev:engine    # an engine beside it, on http://localhost:3000
+pnpm dev:ui:full   # both in one terminal
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`CONTRIBUTING.md` at the root walks through a first run from a bare checkout.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The hub reads `apps/ui/.env`. Start from the `.env.example` at the root of the repository
+(`cp .env.example apps/ui/.env`) and fill the values `CONTRIBUTING.md` lists. Every variable, its
+default and what happens when it is empty: `apps/docs/self-host/configuration.mdx`.
 
-## Learn More
+## Open source and Rerun Cloud
 
-To learn more about Next.js, take a look at the following resources:
+What Rerun Cloud runs differently is imported from `@rerun/cloud/<domain>`. Without the private
+`cloud/` folder in the checkout, that resolves to `apps/ui/cloud-oss/<domain>`, the behaviour of a
+self-hosted install (`paths` in `tsconfig.json`, the alias in `vitest.config.ts`).
+`ee/` and `app/(ee)/` (billing and plans, the Rerun credit, the template marketplace) are under the
+commercial license of `ee/LICENSE`, and the open source build never switches them on.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run from `apps/ui`, or from the root with `pnpm --filter rerun <script>`:
 
-## Deploy on Vercel
+| Script | What it does |
+| --- | --- |
+| `dev` | `next dev` on port 3050 |
+| `build`, `start` | the production build, and serving it |
+| `test` | the unit tests (Vitest), `test:coverage` with coverage |
+| `lint` | ESLint |
+| `ts-check` | `tsc --noEmit` |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`ts-check` reads the route types Next generates under `.next/`: on a fresh checkout, run `next dev`
+once or `pnpm --filter rerun exec next typegen` first. The tests resolve `@rerun/cloud/*` like the
+app, so a test that checks Rerun Cloud's behaviour pins the module it reads with `vi.mock`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Read more
+
+- `AGENTS.md` in this folder: the conventions of the app.
+- The root `CLAUDE.md`: the rules for the whole codebase (typed Supabase helpers, i18n, dialogs,
+  responsive).
+- The root `CONTRIBUTING.md`: running from source, checks, pull requests.
