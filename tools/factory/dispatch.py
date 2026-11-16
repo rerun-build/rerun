@@ -20,6 +20,7 @@ import tiers
 import snapshot
 import states
 import store as ledger_store
+import strikes
 import waits
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -388,7 +389,8 @@ class Dispatcher:
         if j["state"] not in WAIT_STATES:
             return
         now = self.now()
-        why = waits.reason(j, now, holds.active(self.store, now))
+        why = waits.reason(j, now, holds.active(self.store, now), [
+            "%s (%s)" % (self.names.get(a, a[:8]), row["why"]) for a, row in sorted(strikes.held(self.store, now).items())])
         if why and why != j.get("wait_reason"):
             j["wait_reason"] = why
             self.save(j, "waits: " + why)
@@ -427,8 +429,23 @@ class Dispatcher:
     def unresolved(self):
         return {j["agent"] for j in self.jobs() if j["state"] not in END and j.get("agent") and j.get("sending") and not j.get("run")}
 
+    def held_ids(self):
+        return set(strikes.held(self.store, self.now()))
+
+    def strike(self, j, ran_ok):
+        agent = j.get("agent")
+        if not agent:
+            return
+        if ran_ok:
+            return strikes.ok(self.store, agent)
+        until = strikes.fail(self.store, agent, self.now(), self.cfg.get("strike_limit", strikes.LIMIT),
+                             self.cfg.get("strike_hold_s", strikes.HOLD_S))
+        if until is not None:
+            why = strikes.held(self.store, self.now()).get(agent, {}).get("why")
+            log(j["issue"], "coworker %s held until %s: %s" % (self.names.get(agent, agent[:8]), iso(until), why))
+
     def free(self, worker):
-        skip = self.unresolved()
+        skip = self.unresolved() | self.held_ids()
         t = pools.types(self.cfg).get(worker)
         if t is None:
             return None
@@ -436,7 +453,7 @@ class Dispatcher:
         return pools.pick_copy(cfg, worker, self.running())
 
     def free_prover(self, j):
-        skip = self.unresolved() | {j.get("builder"), j.get("reviewer")}
+        skip = self.unresolved() | self.held_ids() | {j.get("builder"), j.get("reviewer")}
         return pools.pick_copy({"types": {"reviewer": t}}, "reviewer", self.running(), exclude=skip) if (t := pools.types(self.cfg).get("reviewer")) is not None else None
 
     def free_copy_of(self, agent):
@@ -766,6 +783,7 @@ class Dispatcher:
             return self.clock_check(j, r)
         self.record_tokens(j, r)
         if r.get("status") == "done":
+            self.strike(j, True)
             j["attempt"] = 1
             g = r.get("goal")
             j["not_met"] = None
@@ -775,6 +793,7 @@ class Dispatcher:
                 j["not_met"] = "goal not met after %s answers: %s" % (len(verdicts) or "its", why)
             return r.get("output") or ""
         why = "run %s of %s ended %s: %s" % (j["run"], self.names.get(j["agent"], j["agent"][:8]), r.get("status"), str(r.get("error") or "-")[:120])
+        self.strike(j, False)
         row = dict(r, runId=r.get("runId") or j["run"], startedAt=r.get("startedAt") or "1970-01-01T00:00:00Z")
         kind, _ = clocks.outcome(row, None, self.now(), self.cfg.get("clocks"))
         if clocks.klass(kind, row) == "transient":
@@ -846,6 +865,7 @@ class Dispatcher:
         c = self.account("cancel_run", {"agentId": j["agent"], "runId": j["run"]})
         log(j["issue"], "%s; cancelled (wasRunning %s)" % (why, c.get("wasRunning")))
         self.store.close_run(j["run"], "cancelled", error=why[:200])
+        self.strike(j, False)
         return self.failed_attempt(j, why, "cancel")
 
     def transient(self, j, reason):

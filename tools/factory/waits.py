@@ -5,7 +5,7 @@ REASONS = ("dependency", "no free worker of its type", "back-off", "hold", "plan
 _QUEUE_STATES = states.QUEUE
 
 
-def reason(job, now, hold=None):
+def reason(job, now, hold=None, held=()):
     state = job.get("state")
     if state == "waiting":
         return "dependency"
@@ -17,4 +17,6 @@ def reason(job, now, hold=None):
     if hold:
         kind = hold.get("kind")
         return kind if kind in ("plan limit", "sign-in renewal") else "hold"
+    if held:
+        return "coworker held: " + ", ".join(held)
     return "no free worker of its type"
