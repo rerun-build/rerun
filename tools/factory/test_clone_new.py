@@ -253,7 +253,12 @@ class KillAtEveryStep(CloneCase):
 
     def test_killed_after_the_clone_from_the_mirror(self):
         self.call(lambda _: self.M.refresh(FULL), [])
-        self.check(T_KILL="cloned")
+        code, out = self.new(T_KILL="cloned")
+        self.assertEqual(code, 137, out)
+        self.assertEqual(T.git(os.path.join(self.C.tmp_root(), "rerun-7-1"), "remote", "get-url", "origin"), self.M.path("rerun"))
+        code, out = self.new()
+        self.assertEqual(code, 0, out)
+        self.assert_ready(self.folder())
 
     def test_killed_after_the_fetch_from_the_mirror(self):
         self.call(lambda _: self.M.refresh(FULL), [])
