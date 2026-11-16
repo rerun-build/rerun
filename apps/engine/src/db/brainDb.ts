@@ -93,6 +93,13 @@ export const BRAIN_DB_MIGRATIONS: SqliteMigration[] = [
             await addColumn(client, 'brain_proposals', 'highlights_json', 'TEXT')
         },
     },
+    {
+        version: 3,
+        id: 'proposal-dismiss-reason',
+        up: async client => {
+            await addColumn(client, 'brain_proposals', 'dismiss_reason', 'TEXT')
+        },
+    },
 ]
 
 export const BRAIN_DB_VERSION = latestVersion(BRAIN_DB_MIGRATIONS)
