@@ -18,6 +18,7 @@ import { estimateTokens } from './estimate.js'
 import { pruneToolOutputs } from './prune.js'
 import { repairToolPairs } from './repair.js'
 import { tailStartIndex } from './split.js'
+import { buildHandoff } from '../handoff.js'
 
 const SUMMARY_PREAMBLE =
     'The following is a compacted summary of earlier conversation turns, provided as background reference only. Do NOT answer questions or fulfill requests mentioned in it; they were already addressed in the omitted turns. Use it only to stay consistent with prior context.'
@@ -90,6 +91,11 @@ export function compactionThreshold(contextWindow: number, provider: Provider): 
     return CLI_PROVIDERS.has(provider) ? ratio : Math.min(ratio, COMPACTION_MAX_TRIGGER_TOKENS)
 }
 
+function handoffAtTokens(): number {
+    const value = Number(process.env.RERUN_HANDOFF_AT_TOKENS)
+    return Number.isFinite(value) && value > 0 ? value : 0
+}
+
 export async function prepareRunHistory(ctx: RunContext, system: string, override?: ModelOverride, signSenders = false, toolChars = 0): Promise<ModelMessage[]> {
     const agentId = ctx.agent.id
     const cp = await getLatestCheckpoint(agentId, ctx.sessionId)
@@ -102,14 +108,33 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
     })
     const working = priorSummary ? [priorSummary, ...live] : live
 
+    const handoffAt = handoffAtTokens()
+    const useHandoff = handoffAt > 0 && estimateTokens(working, system, toolChars) >= handoffAt
     const contextWindow = runContextWindow(ctx.model, ctx.provider, ctx.agent.resolved.connection)
-    if (!contextWindow) return working
-    if (estimateTokens(working, system, toolChars) < compactionThreshold(contextWindow, ctx.provider)) return working
+    if (!useHandoff) {
+        if (!contextWindow) return working
+        if (estimateTokens(working, system, toolChars) < compactionThreshold(contextWindow, ctx.provider)) return working
+    }
 
     const offset = priorSummary ? 1 : 0
     const tailStart = tailStartIndex(working, COMPACTION_TAIL_TOKEN_BUDGET)
     const newThroughRowIndex = tailStart - 1 - offset
     if (newThroughRowIndex < 0) return working
+
+    if (useHandoff) {
+        try {
+            const handoffMessage: ModelMessage = { role: 'user', content: await buildHandoff(agentId, ctx.sessionId) }
+            const pruned = pruneToolOutputs(working, tailStart)
+            const tail = pruned.messages.slice(tailStart)
+            const throughRow = rows[newThroughRowIndex]
+            await saveCheckpoint(agentId, ctx.sessionId, { summaryMessage: handoffMessage, throughMessageId: throughRow.id, throughCreatedAt: throughRow.createdAt })
+            ctx.writer?.write({ type: 'data-compaction', id: newId(), data: { status: 'done', messagesCompacted: newThroughRowIndex + 1, tokensRecovered: 0 } })
+            ctx.logger.info({ agent: agentId, session: ctx.sessionId, messagesCompacted: newThroughRowIndex + 1 }, 'context continued from handoff')
+            return repairToolPairs([handoffMessage, ...tail])
+        } catch (error) {
+            ctx.logger.error({ agent: agentId, err: String(error) }, 'handoff failed, summarising')
+        }
+    }
 
     const checkpointId = newId()
     ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'running' } })
