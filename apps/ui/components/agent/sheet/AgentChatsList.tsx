@@ -1,7 +1,7 @@
 'use client'
 
 import { InboxRow } from '@rerun/ui/inbox'
-import { Badge } from '@rerun/ui/primitives'
+import { Badge, ScrollFade } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -141,33 +141,35 @@ export function AgentChatsList({ agentId, agentName, activeSessionId, initialFil
                     </ConfirmDialog>
                 )}
             </div>
-            <div className="max-h-[420px] min-h-0 space-y-0.5 overflow-y-auto px-2 pb-2">
-                {(filter === 'all' || filter === 'needs') &&
-                    inboxItems.map(item => <InboxRow key={item.id} item={item} onOpen={() => onSelect(item.id, item.title)} onMarkRead={() => setSessionStatus(item.id, 'idle')} />)}
-                {filter === 'needs' && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('emptyNeeds')}</p>}
-                {listsHistory && history === null && <ChatsSkeleton />}
-                {listsHistory &&
-                    days.map(({ day, entries }) => (
-                        <div key={day} className="pb-1">
-                            <p className="px-2.5 pb-1 pt-2 text-[11px] font-medium text-muted-foreground">{day}</p>
-                            {entries.map(entry => (
-                                <ChatListRow
-                                    key={entry.engineSessionId}
-                                    entry={entry}
-                                    active={!!entry.id && entry.id === activeSessionId}
-                                    running={!!entry.id && runningIds.has(entry.id)}
-                                    adopting={adopting === entry.engineSessionId}
-                                    onOpen={() => void open(entry)}
-                                    rename={rename}
-                                />
-                            ))}
-                        </div>
-                    ))}
-                {filter === 'all' && history !== null && shown.length === 0 && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('emptyThreads')}</p>}
-                {(filter === 'chats' || filter === 'automations') && history !== null && shown.length === 0 && (
-                    <p className="px-3 py-6 text-center text-xs text-muted-foreground">{filter === 'chats' ? t('emptyThreads') : t('emptyAutomations')}</p>
-                )}
-            </div>
+            <ScrollFade className="max-h-[420px] min-h-0 px-2 pb-2">
+                <div className="space-y-0.5">
+                    {(filter === 'all' || filter === 'needs') &&
+                        inboxItems.map(item => <InboxRow key={item.id} item={item} onOpen={() => onSelect(item.id, item.title)} onMarkRead={() => setSessionStatus(item.id, 'idle')} />)}
+                    {filter === 'needs' && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('emptyNeeds')}</p>}
+                    {listsHistory && history === null && <ChatsSkeleton />}
+                    {listsHistory &&
+                        days.map(({ day, entries }) => (
+                            <div key={day} className="pb-1">
+                                <p className="px-2.5 pb-1 pt-2 text-[11px] font-medium text-muted-foreground">{day}</p>
+                                {entries.map(entry => (
+                                    <ChatListRow
+                                        key={entry.engineSessionId}
+                                        entry={entry}
+                                        active={!!entry.id && entry.id === activeSessionId}
+                                        running={!!entry.id && runningIds.has(entry.id)}
+                                        adopting={adopting === entry.engineSessionId}
+                                        onOpen={() => void open(entry)}
+                                        rename={rename}
+                                    />
+                                ))}
+                            </div>
+                        ))}
+                    {filter === 'all' && history !== null && shown.length === 0 && inboxItems.length === 0 && <p className="px-3 py-6 text-center text-xs text-muted-foreground">{t('emptyThreads')}</p>}
+                    {(filter === 'chats' || filter === 'automations') && history !== null && shown.length === 0 && (
+                        <p className="px-3 py-6 text-center text-xs text-muted-foreground">{filter === 'chats' ? t('emptyThreads') : t('emptyAutomations')}</p>
+                    )}
+                </div>
+            </ScrollFade>
         </div>
     )
 }
