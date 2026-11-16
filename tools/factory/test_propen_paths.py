@@ -1,6 +1,6 @@
 import json, os, subprocess, unittest
 from unittest import mock
-from test_factory import FactoryCase, FULL, F, write, git
+from test_factory import FactoryCase, FULL, F, write
 
 
 def issue_json(files, text=None):
