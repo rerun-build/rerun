@@ -114,12 +114,38 @@ class TestRoster(unittest.TestCase):
         d = data()
         self.assertEqual(sorted(d["coworkers"]), sorted(NAMES))
         for h, row in d["coworkers"].items():
-            self.assertEqual(sorted(row), ["class", "github", "wake"], h)
+            self.assertEqual(sorted(row), ["class", "fired_by", "github", "wake"], h)
             self.assertTrue(row["wake"], h)
         d2 = copy.deepcopy(d)
         del d2["coworkers"]["ike"]["wake"]
         with self.assertRaises(ValueError):
             roster.load(json.dumps(d2))
+
+    def test_fired_by_one_known_firer_per_wake_line(self):
+        d = data()
+        rows = d["coworkers"]
+        counts = {}
+        for row in rows.values():
+            for x in row["fired_by"]:
+                counts[x] = counts.get(x, 0) + 1
+        self.assertEqual(
+            counts,
+            {"runner": 36, "repository event": 10, "schedule": 4, "person": 3, "coworker": 1},
+        )
+        self.assertEqual(sum(len(r["wake"]) for r in rows.values()), 54)
+        for h in ("jez", "margaret", "issue_triage", "changelog_writer", "dana"):
+            self.assertIn("repository event", rows[h]["fired_by"], h)
+        for h in ("warden", "box_janitor", "agent_smith"):
+            self.assertEqual(rows[h]["fired_by"], ["schedule"], h)
+        for bad in (["runner", "runner", "runner"], ["timer", "runner"], "runner"):
+            d2 = copy.deepcopy(d)
+            d2["coworkers"]["advisor"]["fired_by"] = bad
+            with self.assertRaisesRegex(ValueError, "coworker advisor: fired_by"):
+                roster.load(json.dumps(d2))
+        d3 = copy.deepcopy(d)
+        del d3["coworkers"]["ike"]["fired_by"]
+        with self.assertRaisesRegex(ValueError, "coworker ike: field fired_by missing"):
+            roster.load(json.dumps(d3))
 
     def test_mixed_builders_raise_split(self):
         with self.assertRaises(ValueError) as cm:
