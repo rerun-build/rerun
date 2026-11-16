@@ -74,7 +74,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const { isAnonymous, workspace, phoneStep } = useSession()
     const pendingIntake = useOnboardingStore(state => state.pendingIntake)
     const gated = isAnonymous && pendingIntake !== null && !intakeOpen
-    const { messages, sendMessage, status, error, stop, stopping, regenerate, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
+    const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
 
     // Ce que le board dessine à gauche pendant tout le tunnel. L'organisation vit dans le transcript
@@ -242,6 +242,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
 
     const displayedError = runError || error ? unwrapChatError(runError ?? error?.message) : null
     const noticeError = useMemo(() => (displayedError === null ? null : { kind: classifyChatError(displayedError), message: displayedError }), [displayedError])
+    const canRetry = backend === 'engine' && !busy && messages.some(message => message.role === 'user')
     useForemanDockFeed({ messages, busy, open: open === true, pending: pendingWidget, failed: displayedError !== null })
 
     // ⌘K lands in whichever composer is on screen: this one once the column is open, the pill's
@@ -495,6 +496,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             onSuggestion={sendOrQueue}
                             onPrefill={prefill}
                             onStop={handleStop}
+                            onRetry={canRetry ? retryLastTurn : undefined}
                             onStopTask={stopTask}
                             actions={messageActions}
                             rawUrlFor={rawUrlFor}

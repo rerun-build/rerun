@@ -87,6 +87,8 @@ type ForemanChatLayerProps = {
     /** Writes into the composer without sending, for an empty-state action the user finishes typing. */
     onPrefill?: (text: string) => void
     onStop?: () => void
+    /** Sends the failed turn's message again, offered on a transient error. */
+    onRetry?: () => void
     /** Stops one delegated task of the run being streamed. Absent, the task shows no stop. */
     onStopTask?: (taskId: string) => void
     /** The row under an answer: copy, regenerate, thumbs. Only the foreman on the engine has it. */
@@ -111,7 +113,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, onStackElement, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, onStackElement, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -184,7 +186,7 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                 <MessageContent>
                     {/* Pas de cellule « abonnement » : il n'y a pas de Box derrière le Foreman, donc
                         nulle part où brancher un plan Claude ou ChatGPT. */}
-                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} />}
+                    {error.kind === 'budget' ? <BudgetExhaustedNotice preTrial={!entitled} trialing={workspace?.subscription_status === 'trialing'} paused={!!workspace?.rerun_credit_paused_at} lifetime={isLifetimePlan(workspace)} priceArm={priceArm} /> : <ProviderErrorNotice kind={error.kind} message={error.message} onStopRun={onStop} onRetry={onRetry} />}
                 </MessageContent>
             </Message>
         )

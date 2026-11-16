@@ -429,8 +429,15 @@ export function useForemanChat() {
         [regenerateEngine]
     )
 
+    // The failed turn's message is already in the conversation, on screen and on the engine:
+    // regenerating sends it again without a second bubble, dropping whatever partial answer followed.
+    const retryLastTurn = useCallback(() => {
+        setRunErrorOf(null)
+        void regenerateEngine()
+    }, [regenerateEngine])
+
     // A stream being chased is not a failure yet: the error only shows once the chase gave up.
     const error = onEngine && reconnecting ? undefined : chat.error
 
-    return { ...chat, error, stop, stopping, sendMessage: send, regenerate, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting: onEngine && reconnecting, activeRunId: onEngine ? activeRunId : null }
+    return { ...chat, error, stop, stopping, sendMessage: send, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting: onEngine && reconnecting, activeRunId: onEngine ? activeRunId : null }
 }
