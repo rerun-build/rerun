@@ -921,12 +921,26 @@
             "kpiCost": "Custo total",
             "kpiTokens": "Total de tokens",
             "kpiErrorRate": "Taxa de erro",
+            "kpiFailureRate": "Taxa de falha",
             "runsOverTime": "Execuções no tempo",
+            "failureOverTime": "Taxa de falha ao longo do tempo",
             "costOverTime": "Custo no tempo",
             "avgDuration": "Duração média",
             "runsByModel": "Execuções por modelo",
             "topTools": "Ferramentas mais chamadas",
             "toolErrors": "Erros de ferramentas"
+        },
+        "definitions": {
+            "about": "O que {title} conta",
+            "kpiErrorRate": "A parcela de execuções que pararam por um erro, como uma falha do provedor ou de uma ferramenta, uma conexão cortada ou um reinício do motor; execuções em andamento contam no total.",
+            "kpiFailureRate": "A parcela de execuções que não concluíram o trabalho: terminaram em erro, foram canceladas, não cumpriram a meta ou terminaram com uma linha BLOCKED: ou ESCALATE:; execuções em andamento contam no total."
+        },
+        "noPrice": {
+            "label": "Nenhum custo foi informado para estas execuções, então os tokens são mostrados no lugar.",
+            "fresh": "Entrada nova",
+            "cached": "Entrada em cache",
+            "output": "Saída",
+            "chartTitle": "Tokens por tipo"
         },
         "tokenUsage": {
             "title": "Uso de tokens",
