@@ -1,11 +1,11 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 import type { CustomMcpStatus } from '@/lib/services/types'
 
-export type McpServerStatuses = { statuses: ReadonlyMap<string, CustomMcpStatus>; loading: boolean }
+export type McpServerStatuses = { statuses: ReadonlyMap<string, CustomMcpStatus>; loading: boolean; checkedAt: number | null }
 
-const EMPTY: McpServerStatuses = { statuses: new Map(), loading: true }
+const EMPTY: McpServerStatuses = { statuses: new Map(), loading: true, checkedAt: null }
 
 const snapshots = new Map<string, McpServerStatuses>()
 const listeners = new Map<string, Set<() => void>>()
@@ -23,7 +23,7 @@ async function load(agentId: string) {
     }
     inflight.add(agentId)
     const previous = snapshots.get(agentId)
-    snapshots.set(agentId, { statuses: previous?.statuses ?? new Map(), loading: true })
+    snapshots.set(agentId, { statuses: previous?.statuses ?? new Map(), loading: true, checkedAt: previous?.checkedAt ?? null })
     emit(agentId)
     let servers: CustomMcpStatus[] = []
     try {
@@ -31,7 +31,7 @@ async function load(agentId: string) {
         if (res.ok) servers = ((await res.json()) as { servers: CustomMcpStatus[] }).servers
     } catch {}
     inflight.delete(agentId)
-    snapshots.set(agentId, { statuses: new Map(servers.map(s => [s.name, s])), loading: false })
+    snapshots.set(agentId, { statuses: new Map(servers.map(s => [s.name, s])), loading: false, checkedAt: Date.now() })
     emit(agentId)
     if (rerun.delete(agentId)) void load(agentId)
 }
@@ -43,7 +43,9 @@ function subscribe(agentId: string, listener: () => void) {
         listeners.set(agentId, set)
     }
     set.add(listener)
-    if (!snapshots.has(agentId)) void load(agentId)
+    const held = snapshots.get(agentId)
+    if (!held) void load(agentId)
+    else if (!held.loading && [...held.statuses.values()].some(s => s.status === 'error' || s.status === 'unknown')) void load(agentId)
     return () => {
         set.delete(listener)
     }
@@ -54,8 +56,9 @@ export function refreshMcpServerStatuses(agentId: string) {
 }
 
 export function useMcpServerStatuses(agentId?: string): McpServerStatuses {
+    const subscribeToAgent = useCallback((cb: () => void) => (agentId ? subscribe(agentId, cb) : () => {}), [agentId])
     return useSyncExternalStore(
-        cb => (agentId ? subscribe(agentId, cb) : () => {}),
+        subscribeToAgent,
         () => (agentId ? (snapshots.get(agentId) ?? EMPTY) : EMPTY),
         () => EMPTY,
     )
