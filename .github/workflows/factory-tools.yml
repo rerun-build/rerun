@@ -8,8 +8,8 @@ on:
     paths: ['tools/factory/**', 'deploy/vps/**', '.github/workflows/factory-tools.yml']
 
 concurrency:
-  group: factory-tools-${{ github.ref }}
-  cancel-in-progress: true
+  group: factory-tools-${{ github.ref }}-${{ github.event_name == 'pull_request' && 'pr' || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
