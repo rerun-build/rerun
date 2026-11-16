@@ -42,3 +42,27 @@ def per_merged(fires, merged, key, parents=None):
             "cache_share": cache_sum / cache_in if cached and cache_in else None,
         }
     return out
+
+
+PLANNER_STOPS = ("blocked", "rejected", "returned")
+MAX_PLANNERS = 20
+
+
+def planners(jobs, fires, now, window_s=7 * 86400):
+    groups = {}
+    for j in jobs:
+        if not 0 <= now - j["first"] <= window_s:
+            continue
+        before = [f for f in fires if f["parent"] == j["parent"] and f["at"] <= j["first"]]
+        name = max(before, key=lambda f: f["at"])["coworker"] if before and j["parent"] is not None else "-"
+        groups.setdefault(name, []).append(j)
+    out = []
+    for name in sorted(groups):
+        rows = groups[name]
+        merged = [j for j in rows if j["state"] == "merged"]
+        first = [j for j in merged if "fix_wait" not in j["states"] and not j["replans"]]
+        out.append({"planner": name, "cut": len(rows), "merged": len(merged), "firstPass": len(first),
+                    "firstPassYield": len(first) / len(merged) if merged else None,
+                    "stopped": sum(1 for j in rows if any(s in PLANNER_STOPS for s in j["states"])),
+                    "replans": sum(j["replans"] or 0 for j in rows)})
+    return out[:MAX_PLANNERS]
