@@ -84,6 +84,23 @@ export const factoryBarWindowSchema = z.object({
     escaped: count,
 })
 
+const factoryMachineReadingSchema = z.object({
+    name: z.string().max(64),
+    value: z.union([z.number(), z.string().max(64)]).nullable(),
+    reason: z.string().max(120).nullable(),
+    source: z.enum(['keeper', 'factory', 'dispatcher']),
+}).strict()
+
+const factoryMachineSchema = z.object({
+    fileMadeAt: isoTime.nullable(),
+    fileAgeS: z.number().min(0).nullable(),
+    fresh: z.boolean(),
+    engine: z.enum(['running', 'down', 'unknown']),
+    skippedTicks: count,
+    readings: z.array(factoryMachineReadingSchema).max(200),
+    housekeeping: z.array(z.object({ cmd: z.string().max(40), rc: z.number().int(), s: count }).strict()).max(10),
+}).strict()
+
 export const factoryDigestSchema = z.object({
     stations: z.array(z.object({
         station: z.string().max(20),
@@ -135,6 +152,7 @@ export const factoryDigestSchema = z.object({
         classifiedToday: count,
         joinedToday: count,
     }).strict().optional(),
+    machine: factoryMachineSchema.optional(),
     planners: z.array(z.object({
         planner: z.string().max(64),
         cut: count,
@@ -170,6 +188,7 @@ export const factorySnapshotSchema = z.object({
     digest: factoryDigestSchema.optional(),
     runStats: factoryRunStatsSchema.optional(),
     plan: factoryPlanSchema.optional(),
+    machine: factoryMachineSchema.optional(),
     holds: z.array(factoryHoldSchema).max(10),
     pools: z.array(factoryPoolSchema).max(8),
     endedToday: z.object({ merged: count, rejected: count, blocked: count, failed: count, returned: count }),
@@ -188,4 +207,6 @@ export type FactoryHold = z.infer<typeof factoryHoldSchema>
 export type FactoryPool = z.infer<typeof factoryPoolSchema>
 export type FactoryRunStats = z.infer<typeof factoryRunStatsSchema>
 export type FactoryPlan = z.infer<typeof factoryPlanSchema>
+export type FactoryMachineReading = z.infer<typeof factoryMachineReadingSchema>
+export type FactoryMachine = z.infer<typeof factoryMachineSchema>
 export type FactorySnapshot = z.infer<typeof factorySnapshotSchema>
