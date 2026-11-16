@@ -935,6 +935,13 @@
             "kpiErrorRate": "Der Anteil der Ausführungen, die mit einem Fehler endeten, etwa durch einen Anbieter- oder Werkzeugfehler, eine abgebrochene Verbindung oder einen Neustart der Engine; laufende Ausführungen zählen zur Gesamtzahl.",
             "kpiFailureRate": "Der Anteil der Ausführungen, die ihre Aufgabe nicht erledigt haben: Sie endeten mit einem Fehler, wurden abgebrochen, verfehlten ihr Ziel oder endeten mit einer Zeile BLOCKED: oder ESCALATE:; laufende Ausführungen zählen zur Gesamtzahl."
         },
+        "noPrice": {
+            "label": "Diese Verbindung meldet keinen Preis, daher werden stattdessen Tokens angezeigt.",
+            "fresh": "Neue Eingabe",
+            "cached": "Zwischengespeicherte Eingabe",
+            "output": "Ausgabe",
+            "chartTitle": "Tokens nach Art"
+        },
         "tokenUsage": {
             "title": "Token-Nutzung",
             "subtitle": "Tokens pro Tag"

@@ -944,6 +944,13 @@
             "kpiErrorRate": "La part des exécutions arrêtées par une erreur, comme une panne du fournisseur ou d'un outil, une connexion coupée ou un redémarrage du moteur ; les exécutions en cours comptent dans le total.",
             "kpiFailureRate": "La part des exécutions qui n'ont pas fait le travail : elles ont fini en erreur, ont été annulées, ont manqué leur objectif ou se sont terminées par une ligne BLOCKED: ou ESCALATE: ; les exécutions en cours comptent dans le total."
         },
+        "noPrice": {
+            "label": "Cette connexion n'indique aucun prix, les tokens sont donc affichés à la place.",
+            "fresh": "Entrée nouvelle",
+            "cached": "Entrée en cache",
+            "output": "Sortie",
+            "chartTitle": "Tokens par type"
+        },
         "tokenUsage": {
             "title": "Consommation de tokens",
             "subtitle": "Tokens par jour"

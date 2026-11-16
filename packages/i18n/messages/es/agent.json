@@ -944,6 +944,13 @@
             "kpiErrorRate": "La proporción de ejecuciones que se detuvieron por un error, como un fallo del proveedor o de una herramienta, una conexión cortada o un reinicio del motor; las ejecuciones en curso cuentan en el total.",
             "kpiFailureRate": "La proporción de ejecuciones que no completaron el trabajo: terminaron con un error, se cancelaron, no alcanzaron su objetivo o terminaron con una línea BLOCKED: o ESCALATE:; las ejecuciones en curso cuentan en el total."
         },
+        "noPrice": {
+            "label": "Esta conexión no informa ningún precio, así que se muestran los tokens.",
+            "fresh": "Entrada nueva",
+            "cached": "Entrada en caché",
+            "output": "Salida",
+            "chartTitle": "Tokens por tipo"
+        },
         "tokenUsage": {
             "title": "Uso de tokens",
             "subtitle": "Tokens por día"

@@ -10,7 +10,8 @@ import type { EngineStatsPoint, EngineUsageBucket } from '@/lib/engine/types'
 import { StatsChart, TokenUsageChart, MonitorCard } from '@rerun/ui/monitoring'
 import { ActivityIcon, AlertTriangleIcon, BarChart3Icon, CircleDollarSignIcon, CoinsIcon, CpuIcon, GaugeIcon, HashIcon, InfoIcon, Maximize2Icon, TimerIcon, WrenchIcon } from '@/lib/icons'
 import type { ComponentType, ReactNode } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
+import { formatNumber } from '@rerun/i18n/format'
 import { useCallback, useState } from 'react'
 import { useVisibleInterval } from '@/hooks/useVisibleInterval'
 
@@ -41,7 +42,13 @@ const CHART_SPECS: StatSpec[] = [
     { key: 'toolErrors', icon: AlertTriangleIcon, dataset: 'toolCalls', metric: 'errorCount', groupBy: 'toolName', chartType: 'bar' },
 ]
 
-const ALL_SPECS = [...KPI_SPECS, ...CHART_SPECS]
+const TOKEN_CLASS_SPECS: (Pick<StatSpec, 'dataset' | 'metric' | 'groupBy'> & { key: 'inputTokens' | 'cachedInputTokens' | 'outputTokens' })[] = [
+    { key: 'inputTokens', dataset: 'runs', metric: 'inputTokens', groupBy: 'none' },
+    { key: 'cachedInputTokens', dataset: 'runs', metric: 'cachedInputTokens', groupBy: 'none' },
+    { key: 'outputTokens', dataset: 'runs', metric: 'outputTokens', groupBy: 'none' },
+]
+
+const ALL_SPECS = [...KPI_SPECS, ...CHART_SPECS, ...TOKEN_CLASS_SPECS]
 
 const isDefinedKpi = (key: StatSpec['key']): key is 'kpiErrorRate' | 'kpiFailureRate' => key === 'kpiErrorRate' || key === 'kpiFailureRate'
 
@@ -50,8 +57,20 @@ const POLL_MS = 30000
 
 type StatsData = Record<string, EngineStatsPoint[] | null>
 
+const sumOf = (points: EngineStatsPoint[] | null | undefined) => (points ?? []).reduce((sum, point) => sum + point.value, 0)
+
+function tokenClassPoints(stats: StatsData, labels: { fresh: string; cached: string; output: string }): EngineStatsPoint[] {
+    const cachedByBucket = new Map((stats.cachedInputTokens ?? []).map(point => [point.bucket, point.value]))
+    return [
+        ...(stats.inputTokens ?? []).map(point => ({ ...point, group: labels.fresh, value: Math.max(0, point.value - (cachedByBucket.get(point.bucket) ?? 0)) })),
+        ...(stats.cachedInputTokens ?? []).map(point => ({ ...point, group: labels.cached })),
+        ...(stats.outputTokens ?? []).map(point => ({ ...point, group: labels.output })),
+    ]
+}
+
 export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
     const t = useTranslations('agent.agentPanelMonitoring')
+    const locale = useLocale()
     const [range, setRange] = useState<StatsTimeRange>('7d')
     const [stats, setStats] = useState<StatsData>({})
     const [usage, setUsage] = useState<EngineUsageBucket[] | null>(null)
@@ -78,14 +97,25 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
 
     const isEmpty = !loading && usage?.length === 0 && ALL_SPECS.every(spec => (stats[spec.key]?.length ?? 0) === 0)
 
+    const noPrice = sumOf(stats.kpiCost) <= 0 && sumOf(stats.kpiTokens) > 0
+    const classLabels = { fresh: t('noPrice.fresh'), cached: t('noPrice.cached'), output: t('noPrice.output') }
+    const classPoints = noPrice ? tokenClassPoints(stats, classLabels) : []
+    const classTotals = [classLabels.fresh, classLabels.cached, classLabels.output].map(label => ({ label, value: sumOf(classPoints.filter(point => point.group === label)) }))
+
     const chartPanels: { key: string; title: string; subtitle?: string; icon: ComponentType<{ className?: string }>; node: ReactNode }[] = [
         { key: 'tokenUsage', title: t('tokenUsage.title'), subtitle: t('tokenUsage.subtitle'), icon: CoinsIcon, node: <TokenUsageChart metric="tokens" breakdown="total" chartType="area" buckets={usage} /> },
-        ...CHART_SPECS.map(spec => ({
+        ...CHART_SPECS.map(spec => spec.key === 'costOverTime' && noPrice ? {
+            key: spec.key,
+            title: t('noPrice.chartTitle'),
+            subtitle: t('noPrice.label'),
+            icon: CoinsIcon,
+            node: <StatsChart dataset="runs" metric="inputTokens" groupBy="model" chartType="area" points={classPoints} />,
+        } : {
             key: spec.key,
             title: t(`charts.${spec.key}`),
             icon: spec.icon,
             node: <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />,
-        })),
+        }),
     ]
     const expanded = chartPanels.find(p => p.key === expandedKey) ?? null
 
@@ -136,7 +166,19 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
                                         </Tooltip>
                                     )}
                                 >
-                                    <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />
+                                    {spec.key === 'kpiCost' && noPrice ? (
+                                        <div className="flex h-full flex-col justify-center gap-0.5 px-2 text-xs">
+                                            {classTotals.map(item => (
+                                                <div key={item.label} className="flex items-baseline justify-between gap-2">
+                                                    <span className="text-muted-foreground">{item.label}</span>
+                                                    <span className="font-semibold text-foreground">{formatNumber(item.value, locale, { notation: 'compact', maximumFractionDigits: 1 })}</span>
+                                                </div>
+                                            ))}
+                                            <div className="mt-1 text-[11px] text-muted-foreground">{t('noPrice.label')}</div>
+                                        </div>
+                                    ) : (
+                                        <StatsChart dataset={spec.dataset} metric={spec.metric} groupBy={spec.groupBy} chartType={spec.chartType} points={stats[spec.key] ?? null} />
+                                    )}
                                 </MonitorCard>
                             ))}
                         </div>

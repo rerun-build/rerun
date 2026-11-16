@@ -80,3 +80,30 @@ describe('AgentPanelMonitoring rates', () => {
         expect(card('Failure rate over time')).not.toBeNull()
     })
 })
+
+describe('AgentPanelMonitoring cost', () => {
+    const tokens = { totalTokens: 1200, inputTokens: 1000, cachedInputTokens: 900, outputTokens: 200 }
+
+    it('shows tokens by class instead of a dollar figure when the connection reports no price', async () => {
+        await render({ ...tokens, cost: 0 })
+        const total = card('Total cost')
+        expect(total?.querySelector('[data-chart]')).toBeNull()
+        expect(total?.textContent).toContain('reports no price')
+        expect(total?.textContent).toMatch(/Fresh input\s*100/)
+        expect(total?.textContent).toMatch(/Cached input\s*900/)
+        expect(total?.textContent).toMatch(/Output\s*200/)
+        expect(charts()).not.toContain('cost:area')
+        expect(card('Cost over time')).toBeNull()
+        const split = card('Tokens by class')?.querySelector<HTMLElement>('[data-chart]')
+        const points = JSON.parse(split?.dataset.points ?? '[]') as StatsPoint[]
+        expect(Object.fromEntries(points.map(point => [point.group, point.value]))).toEqual({ 'Fresh input': 100, 'Cached input': 900, Output: 200 })
+    })
+
+    it('keeps the dollar figure when a real cost exists', async () => {
+        await render({ ...tokens, cost: 1500 })
+        expect(card('Total cost')?.querySelector('[data-chart]')?.getAttribute('data-chart')).toBe('cost:stat')
+        expect(card('Total cost')?.textContent).not.toContain('reports no price')
+        expect(charts()).toContain('cost:area')
+        expect(card('Tokens by class')).toBeNull()
+    })
+})
