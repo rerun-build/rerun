@@ -25,15 +25,13 @@ In `.env`, set these, then let the check generate the secrets and test Supabase:
 | `OPENROUTER_API_KEY` | your OpenRouter key |
 
 ```bash
-node scripts/self-host-check.mjs   # fills RERUN_ENGINE_API_KEY, FOREMAN_HUB_TOKEN_SECRET, BOARD_IMAGE_SECRET
-node -e "console.log('MOBILE_OAUTH_TICKET_SECRET='+require('crypto').randomBytes(32).toString('hex'))" >> .env
+node scripts/self-host-check.mjs   # fills the secrets left empty
 cp .env apps/ui/.env
 printf 'RERUN_ENGINE_URL=http://localhost:3000\nRERUN_ENGINE_BROWSER_URL=http://localhost:3000\n' >> apps/ui/.env
 cp apps/engine/.env.example apps/engine/.env
 ```
 
-Ignore the `docker compose` command the check prints. `MOBILE_OAUTH_TICKET_SECRET` is needed to sign
-in to any app by OAuth. `RERUN_ENGINE_URL` gives the engine below to the first workspace that needs
+Ignore the `docker compose` command the check prints. `RERUN_ENGINE_URL` gives the engine below to the first workspace that needs
 one, and `RERUN_ENGINE_BROWSER_URL` is where your browser opens its screen.
 
 Then fill `apps/engine/.env`:

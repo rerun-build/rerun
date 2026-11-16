@@ -188,7 +188,6 @@ git clone --branch master https://github.com/rerun-build/rerun.git && cd rerun
 cp .env.example .env          # fill the Supabase URL and keys, and an OpenRouter key
 npx supabase link --project-ref <your-project-ref> && npx supabase db push --include-seed
 node scripts/self-host-check.mjs   # generates the engine key and the secrets
-node -e "console.log('MOBILE_OAUTH_TICKET_SECRET='+require('crypto').randomBytes(32).toString('hex'))" >> .env
 docker compose up -d --build  # then open http://localhost:3000
 ```
 

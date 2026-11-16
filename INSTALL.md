@@ -104,12 +104,7 @@ ADMIN_EMAILS=<their email>
 ```
 
 `RERUN_HUB_BASE_URL` is the same address as `NEXT_PUBLIC_APP_URL`: the links to published files
-start with it. Then add the one secret the check below does not generate, which every app a
-coworker signs in to by OAuth needs:
-
-```bash
-node -e "console.log('MOBILE_OAUTH_TICKET_SECRET=' + require('crypto').randomBytes(32).toString('hex'))" >> .env
-```
+start with it.
 
 On a server, `NEXT_PUBLIC_APP_URL` and `RERUN_HUB_BASE_URL` are the https address the team opens,
 and `RERUN_ENGINE_BROWSER_URL` the https address of the engine, on a second domain.
@@ -118,7 +113,7 @@ runs. See "On a server" in the human guide for the reverse proxy and the firewal
 ports past `ufw`, so they must close 3000, 3001, 5432, 6543 and 8000 at their provider.
 
 If they want Rerun to email invitations, they add a Resend key (`RESEND_API_KEY`,
-`RESEND_FROM`, `UNSUBSCRIBE_SECRET`): see https://docs.rerun.build/self-host/configuration#email.
+`RESEND_FROM`): see https://docs.rerun.build/self-host/configuration#email.
 Without it, nothing is emailed except the sign-in codes Supabase sends.
 
 ## 6. Check and start

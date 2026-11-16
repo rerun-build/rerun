@@ -26,12 +26,11 @@ You need Node 22, pnpm 8 (`corepack enable`), Docker for the local Supabase, and
 
     ```bash
     node scripts/self-host-check.mjs
-    node -e "console.log('MOBILE_OAUTH_TICKET_SECRET='+require('crypto').randomBytes(32).toString('hex'))" >> .env
     cp .env apps/ui/.env
     printf 'RERUN_ENGINE_URL=http://localhost:3000\nRERUN_ENGINE_BROWSER_URL=http://localhost:3000\n' >> apps/ui/.env
     ```
 
-    The check generates `RERUN_ENGINE_API_KEY`, `FOREMAN_HUB_TOKEN_SECRET` and `BOARD_IMAGE_SECRET`; ignore the `docker compose` command it prints. `MOBILE_OAUTH_TICKET_SECRET` is needed to sign in to any app by OAuth. `RERUN_ENGINE_URL` gives the engine below to the first workspace that needs one, and `RERUN_ENGINE_BROWSER_URL` is where your browser opens its screen.
+    The check generates the secrets left empty; ignore the `docker compose` command it prints. `RERUN_ENGINE_URL` gives the engine below to the first workspace that needs one, and `RERUN_ENGINE_BROWSER_URL` is where your browser opens its screen.
   </Step>
   <Step title="Start the app">
     ```bash

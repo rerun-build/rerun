@@ -162,11 +162,7 @@ Without the key, the Chief of Staff skips the onboarding and runs on the AI you 
 
 ## "MOBILE_OAUTH_TICKET_SECRET is not configured on this server."
 
-You clicked to sign in to an app by OAuth: a catalog app, an MCP server, a Composio app, Facebook or Typeform. Every one of those sign-ins needs this secret, and `self-host-check.mjs` does not generate it. Add it, then run `docker compose up -d`:
-
-```bash
-node -e "console.log('MOBILE_OAUTH_TICKET_SECRET=' + require('crypto').randomBytes(32).toString('hex'))" >> .env
-```
+You clicked to sign in to an app by OAuth: a catalog app, an MCP server, a Composio app, Facebook or Typeform. Every one of those sign-ins needs this secret. Run `node scripts/self-host-check.mjs` again: it generates it when it is empty. Then run `docker compose up -d`.
 
 ## Sign in with GitHub or Asana fails
 
