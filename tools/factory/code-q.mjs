@@ -1,16 +1,17 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const USAGE = 'usage: code-q <repo> <tool> [json] | <repo> --list | --status';
 const args = process.argv.slice(2);
 const [repo, tool, json] = args;
-if (!repo || !tool || args.length > 3 || (tool === '--list' && args.length !== 2)) {
+const statusMode = args.length === 1 && repo === '--status';
+if (!statusMode && (!repo || !tool || args.length > 3 || (tool === '--list' && args.length !== 2))) {
   console.error(USAGE);
   process.exit(2);
 }
-if (tool === 'index_folder') {
+if (!statusMode && tool === 'index_folder') {
   console.error('code-q: index_folder is not allowed');
   process.exit(2);
 }
@@ -29,6 +30,55 @@ const retryMs = Number(process.env.CODE_Q_RETRY_MS || 2000);
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 const loading = text => /^Index is loading|indexing of this project is in progress/.test(text);
 const listing = tool === '--list';
+
+async function statusLine(name, url, key) {
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        accept: 'application/json, text/event-stream',
+        authorization: `Bearer ${key}`,
+      },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'health', arguments: {} } }),
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch {
+    return [`${name} down`, false];
+  }
+  if (res.status === 401) return [`${name} up key refused`, false];
+  let first = '';
+  try {
+    const raw = await res.text();
+    const data = (res.headers.get('content-type') || '').startsWith('text/event-stream')
+      ? raw.split('\n').filter(l => l.startsWith('data:')).pop().slice(5).trim()
+      : raw;
+    first = JSON.parse(data).result?.content?.[0]?.text || '';
+  } catch {
+    return [`${name} up loading`, false];
+  }
+  const files = /Files:\s+(\d+) indexed/.exec(first);
+  if (!/Status: Ready/.test(first) || !files) return [`${name} up loading`, false];
+  let age = 'never';
+  try {
+    const mtime = statSync(join(config.checkouts, name, '.git', 'FETCH_HEAD')).mtimeMs;
+    age = `${Math.floor(Math.max(0, Date.now() - mtime) / 3600000)}h ago`;
+  } catch {}
+  return [`${name} up ready ${files[1]} files fetched ${age}`, true];
+}
+
+if (statusMode) {
+  const names = Object.keys(config.servers);
+  if (!names.length) {
+    console.log('code-q: no servers configured');
+    process.exit(1);
+  }
+  const key = readFileSync(config.keyFile, 'utf8').trim();
+  const rows = await Promise.all(names.map(n => statusLine(n, config.servers[n], key)));
+  for (const [line] of rows) console.log(line);
+  process.exit(rows.every(([, ok]) => ok) ? 0 : 1);
+}
 
 function show(r) {
   if (listing) {
