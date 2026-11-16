@@ -50,6 +50,8 @@ import {
     supportsScheduleRename,
     getSkill as engineGetSkill,
     listAgentTools as engineListAgentTools,
+    listMcpServerTools as engineListMcpServerTools,
+    getAgentToolList as engineGetAgentToolList,
     agentDataBase,
     type ReadDbTableRowsParams,
     listDbTables as engineListDbTables,
@@ -76,7 +78,7 @@ import { type ParsedSchedule, parseSchedule } from '@/lib/ai/parse-schedule'
 import type { TableListResult } from '@/lib/data/source'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
 import { findPendingHitl, pendingSecrets } from '@/lib/chat-hitl'
-import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
+import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineToolList, EngineMcpServerToolList, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
 import type { StatsQuery, UsageTimeRange } from '@rerun/contracts'
 import { FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
 import { sealAgentDetail, sealSchedule, sealSkill, sealSkillFile, sealTrigger } from '@/app/api/_services/agent-content.service'
@@ -173,6 +175,24 @@ export async function updateAgentConfigAction(agentId: string, patch: EngineAgen
         return { success: true }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'updateCoworkerFailed') }
+    }
+}
+
+export async function listAgentMcpServerToolsAction(agentId: string, name: string): Promise<EngineMcpServerToolList | null> {
+    try {
+        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        return await engineListMcpServerTools(conn, engineAgentId, name)
+    } catch {
+        return null
+    }
+}
+
+export async function getAgentToolListAction(agentId: string): Promise<EngineToolList | null> {
+    try {
+        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        return await engineGetAgentToolList(conn, engineAgentId)
+    } catch {
+        return null
     }
 }
 

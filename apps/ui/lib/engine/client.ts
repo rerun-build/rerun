@@ -82,6 +82,9 @@ import {
     type EngineSkillFilePayload,
     type EngineSkillProposal,
     type EngineToolFamily,
+    type EngineToolList,
+    type EngineMcpServerToolList,
+    engineMcpServerToolListSchema,
     type EngineHealth,
     type EngineUpdateResult,
     type EngineDbTable,
@@ -308,8 +311,16 @@ export async function reconnectMcpServer(conn: EngineConnection, agentId: string
     return request(conn, `/agents/${encodeURIComponent(agentId)}/mcp-servers/${encodeURIComponent(name)}/reconnect`, { method: 'POST' }, d => engineMcpReconnectResultSchema.parse(d))
 }
 
+export async function listMcpServerTools(conn: EngineConnection, agentId: string, name: string): Promise<EngineMcpServerToolList> {
+    return request(conn, `/agents/${encodeURIComponent(agentId)}/mcp-servers/${encodeURIComponent(name)}/tools`, { method: 'GET' }, d => engineMcpServerToolListSchema.parse(d))
+}
+
 export async function listAgentTools(conn: EngineConnection, agentId: string): Promise<EngineToolFamily[]> {
     return request(conn, `/agents/${encodeURIComponent(agentId)}/tools`, { method: 'GET' }, d => engineToolsListSchema.parse(d).families)
+}
+
+export async function getAgentToolList(conn: EngineConnection, agentId: string): Promise<EngineToolList> {
+    return request(conn, `/agents/${encodeURIComponent(agentId)}/tools`, { method: 'GET' }, d => engineToolsListSchema.parse(d))
 }
 
 export const agentDataBase = (agentId: string) => `/agents/${encodeURIComponent(agentId)}/data`
