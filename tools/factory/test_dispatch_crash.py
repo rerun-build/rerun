@@ -1,7 +1,7 @@
 import os, sys, unittest, unittest.mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import dispatch as D
-from test_dispatch import Base, ready, World
+from test_dispatch import Base, ready
 
 
 class Crash(Base):
