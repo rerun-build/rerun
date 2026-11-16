@@ -6,6 +6,7 @@ import clocks
 import control
 import cutshape
 import digest
+import followups
 import holds
 import planners
 import planning
@@ -197,7 +198,7 @@ def review_brief(j, pr, head):
         '',
         'The checks of this commit may still be running. Do not wait for them and do not block on them: the dispatcher merges only when every check of this exact commit is green. Your verdict is on the diff alone, also where your own rules say a review needs green checks.',
         '',
-        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block.',
+        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block. Write each follow-up note in your final message as its own line `Follow-up: <one sentence>`; the dispatcher opens one issue per line.',
         '',
         NO_COMMENTS_REVIEW,
         '',
@@ -462,6 +463,19 @@ class Dispatcher:
             return None
         got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
         return got[1] if got else None
+
+    def follow_ups(self, j, out):
+        done = list(j.get("followups") or [])
+        for key, title, body in followups.notes(out, "#%s" % j["issue"]):
+            if key in done:
+                continue
+            try:
+                self.gh(["issue", "create", "-R", self.repo, "--title", title, "--body", body])
+            except Error as e:
+                log(j["issue"], "follow-up issue not opened: %s" % e)
+                continue
+            done.append(key)
+        j["followups"] = done
 
     def to(self, j, state, msg, **kw):
         if not states.allowed(j["state"], state):
@@ -962,6 +976,7 @@ class Dispatcher:
             if out is None:
                 return
             verdict = final_line(out, ("VERDICT:",)) or ""
+            self.follow_ups(j, out)
             named = verdict_head(verdict)
             stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
             if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale:

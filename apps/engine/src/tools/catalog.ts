@@ -1,4 +1,6 @@
 import type { ToolSet } from 'ai'
+import { toolPayloadChars } from './payload.js'
+import { COMPACTION_CHARS_PER_TOKEN } from '../runtime/compaction/config.js'
 import { filesystemTools } from './builtin/filesystem.js'
 import { sharedTools } from './builtin/shared.js'
 import { shellTools } from './builtin/shell.js'
@@ -72,21 +74,29 @@ const FAMILIES: FamilyDef[] = [
 
 const introspectionCtx = { agent: { id: '_catalog', env: {}, soul: '', config: agentConfigSchema.parse({ name: '_catalog' }) }, turnOrder: 'message-first' } as unknown as RunContext
 
-export type ToolInfo = { name: string; description: string }
-export type FamilyInfo = { family: CapabilityKey; description: string; tools: ToolInfo[] }
+export type ToolInfo = { name: string; description: string; tokens: number }
+export type FamilyInfo = { family: CapabilityKey; description: string; tokens: number; tools: ToolInfo[] }
 export type AgentFamilyInfo = FamilyInfo & { enabled: boolean }
 
 function toolsOf(def: FamilyDef): ToolInfo[] {
     const set = def.build(introspectionCtx)
-    return Object.entries(set).map(([name, t]) => ({ name, description: (t as { description?: string }).description ?? '' }))
+    return Object.entries(set).map(([name, t]) => ({ name, description: (t as { description?: string }).description ?? '', tokens: Math.ceil(toolPayloadChars({ [name]: t } as ToolSet) / COMPACTION_CHARS_PER_TOKEN) }))
 }
+
+const sumTokens = (tools: ToolInfo[]): number => tools.reduce((sum, t) => sum + t.tokens, 0)
 
 const shownFamilies = (): FamilyDef[] => FAMILIES.filter(def => !def.hidden?.())
 
 export function toolCatalog(): FamilyInfo[] {
-    return shownFamilies().map(def => ({ family: def.family, description: def.description, tools: toolsOf(def) }))
+    return shownFamilies().map(def => {
+        const tools = toolsOf(def)
+        return { family: def.family, description: def.description, tokens: sumTokens(tools), tools }
+    })
 }
 
 export function agentToolCatalog(config: AgentConfig): AgentFamilyInfo[] {
-    return shownFamilies().map(def => ({ family: def.family, description: def.description, enabled: def.enabled(config), tools: toolsOf(def) }))
+    return shownFamilies().map(def => {
+        const tools = toolsOf(def)
+        return { family: def.family, description: def.description, enabled: def.enabled(config), tokens: sumTokens(tools), tools }
+    })
 }

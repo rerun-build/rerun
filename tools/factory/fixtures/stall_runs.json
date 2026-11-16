@@ -1,0 +1,9 @@
+{
+  "now": "2026-11-16T13:00:00Z",
+  "agents": {"agt-coder": "coder", "agt-kent": "kent"},
+  "pushes": {"chunk/52-1": "2026-11-16T12:20:00Z"},
+  "runs": [
+    {"id": "run-50", "agentId": "agt-coder", "status": "running", "startedAt": "2026-11-16T12:10:00.000Z", "jobRef": "rerun#52", "branch": "chunk/52-1"},
+    {"id": "run-5", "agentId": "agt-kent", "status": "running", "startedAt": "2026-11-16T12:55:00.000Z", "jobRef": "rerun#52", "branch": "chunk/52-2"}
+  ]
+}
