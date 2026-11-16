@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import { ZodError } from 'zod'
 import { auth } from './auth.js'
+import { foremanWakeRoutes } from './routes/foreman-wake.js'
 import { foremanGuard } from './foreman-guard.js'
 import { healthRoutes } from './routes/health.js'
 import { agentRoutes } from './routes/agents.js'
@@ -45,6 +46,7 @@ export function createServer(): Hono {
     api.route('/tools', toolRoutes)
     api.route('/connections', connectionRoutes)
     api.route('/vault', vaultRoutes)
+    api.route('/agents/foreman/wake', foremanWakeRoutes)
     api.route('/agents', agentRoutes)
     api.route('/agents/:id/sessions', sessionRoutes)
     api.route('/agents/:id/memories', memoryRoutes)

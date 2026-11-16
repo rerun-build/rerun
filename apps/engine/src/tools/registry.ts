@@ -35,6 +35,37 @@ import { closeAgentDb } from '../db/agentDb.js'
 import type { RunContext } from '../runtime/context.js'
 import { agentMcpServers } from '../vault/runtime.js'
 
+// What the Chief of Staff keeps in a run nobody started: it reads the box and proposes, nothing else.
+// A written list rather than a rule over names, so a tool added to the box never reaches a wake
+// without someone deciding it only reads. The hub's own tools come from the brief, which the hub
+// already limited to reads, and the hub refuses its token anything else.
+export const WAKE_BUILTIN_TOOL_NAMES: ReadonlySet<string> = new Set([
+    'fs_read',
+    'fs_list',
+    'fs_search',
+    'shared_read',
+    'shared_list',
+    'shared_search',
+    'agent_files_read',
+    'agent_files_list',
+    'agent_files_search',
+    'shared_db_query',
+    'shared_db_schema',
+    'brain_search',
+    'brain_read',
+    'brain_proposals',
+    'vision_analyze',
+    'card_file',
+    'ask_user',
+    'request_approval',
+    'notify_user',
+])
+
+function keepWakeTools(ctx: RunContext, tools: ToolSet): ToolSet {
+    const hub = new Set((ctx.agent.brief?.tools ?? []).filter(spec => spec.kind === 'hub').map(spec => spec.name))
+    return Object.fromEntries(Object.entries(tools).filter(([name]) => WAKE_BUILTIN_TOOL_NAMES.has(name) || hub.has(name)))
+}
+
 export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; close: () => Promise<void> }> {
     const cfg = ctx.agent.config.tools
     const tools: ToolSet = {}
@@ -80,7 +111,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (!CLI_PROVIDERS.has(ctx.provider) && agentMcpServers(ctx.agent).length > 0) Object.assign(tools, await pooledMcpTools(ctx.agent))
 
     return {
-        tools,
+        tools: ctx.trigger?.source === 'wake' ? keepWakeTools(ctx, tools) : tools,
         // The shared database is one handle for the whole process, so it is deliberately left
         // open: closing it here would break a run another agent still has in flight.
         close: async () => {

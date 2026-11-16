@@ -251,24 +251,30 @@ const foremanEnvironmentNote = (foremanId: string) =>
 const FOREMAN_OPERATING_NOTES =
     'Use tools to act. Discover sources with web_search, read static pages with web_fetch, and use browser_navigate for JavaScript-heavy pages (optionally saving a screenshot to inspect with vision_analyze). delegate_tasks hands self-contained subtasks to fresh sub-coworkers, several in one call to run them in parallel: they get your files, shell and web, but none of the account tools, so creating, changing or installing anything on the account stays with you. To put a question to one of the coworkers and wait for its answer inside this turn, use call_agent with wait set to true. Nothing keeps running once your turn ends: there is no background task and no later notification, so never tell the user you will come back when something finishes.'
 
+// A run nobody started keeps only what reads: the hub's charter of a wake says why and what to do
+// with it, this says what is on the box.
+const FOREMAN_WAKE_NOTES =
+    "Nobody started this run, and in it you only read. On the box: your own files (fs_read, fs_list, fs_search), the shared space (shared_read, shared_list, shared_search), each coworker's files with the agent_files_ tools and its handle (read, list, search), the shared database (shared_db_query, shared_db_schema) and the company Brain (brain_search, brain_read, brain_proposals). There is no shell, no web, no sub-coworker and no write of any kind in this run: what needs one is proposed with request_approval and done in the turn that follows their answer."
+
 const FOREMAN_SHOWING_FILES_NOTE =
     "The user cannot reach this server: a path means nothing to them, and a link to one opens nothing. Every file they should see (an image, slides, a document, what a sub-coworker produced for you) goes in a card_file call, which draws it as tiles they open and download: scope 'agent' for your own workspace, 'shared' for the shared space. A file in a coworker's own workspace is shown by that coworker, so ask it with send_message. Never write a server path in your message, and never tell the user to open the server, a folder or an admin access to get a file."
 
 // The hub writes the foreman's charter and hands it the account tools; the engine adds what depends
 // on the box and the runtime it is on. None of the sections of an agent's own state apply: it keeps
 // no skills, no memory and no schedules of its own.
-async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order: TurnOrder): Promise<SystemPrompt> {
+async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provider: Provider, order: TurnOrder): Promise<SystemPrompt> {
     const cfg = agent.config.tools
+    const wake = trigger.source === 'wake'
     const [sharedDbSchema, brain] = await Promise.all([
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
-        cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
+        cfg.brain && !wake ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
     ])
     const stable = [
         section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
         section('vocabulary', VOCABULARY_NOTE),
-        section('environment', foremanEnvironmentNote(agent.id)),
-        CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
-        section('operating_notes', FOREMAN_OPERATING_NOTES),
+        section('environment', wake ? FOREMAN_WAKE_NOTES : foremanEnvironmentNote(agent.id)),
+        CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web && !wake)) : '',
+        wake ? '' : section('operating_notes', FOREMAN_OPERATING_NOTES),
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
         section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
         turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config))),
@@ -277,13 +283,14 @@ async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order:
 
     const volatile: string[] = []
     if (brain) volatile.push(section('company_brain', brain))
-    if (cfg.sharedDb) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
+    if (cfg.sharedDb && wake) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes. Read it with shared_db_query and shared_db_schema.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
+    else if (cfg.sharedDb) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
     volatile.push(section('current_time', currentTimeNote()))
     return { stable: joinSections(stable), volatile: joinSections(volatile) }
 }
 
 export async function buildSystemPrompt(agent: LoadedAgent, trigger: RunTrigger = { source: 'chat' }, provider: Provider = agent.resolved.provider, order: TurnOrder = turnOrder(provider, agent.resolved.model)): Promise<SystemPrompt> {
-    if (agent.config.kind === 'foreman') return await buildForemanPrompt(agent, provider, order)
+    if (agent.config.kind === 'foreman') return await buildForemanPrompt(agent, trigger, provider, order)
     const cfg = agent.config.tools
     const [skillIndex, scheduleIndex, triggerIndex, memoryIndex, dbSchema, sharedDbSchema, mcpIndex, brain] = await Promise.all([
         cfg.skills ? buildSkillIndex(agent.id).catch(() => '') : Promise.resolve(''),

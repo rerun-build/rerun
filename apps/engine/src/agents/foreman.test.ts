@@ -164,6 +164,26 @@ describe('foreman', () => {
         }
     })
 
+    // A run nobody started reads and proposes: everything that writes, runs a shell or reaches the
+    // web is absent, whatever the config holds.
+    it('keeps only reads and cards in a run nobody started', async () => {
+        const agent = await foremanWithBrief()
+        const { tools, close } = await buildTools({ agent, sessionId: 's1', trigger: { source: 'wake', reason: 'x', memberId: 'm1' }, logger, provider: 'rerun', model: 'rerun-max' })
+        await close()
+        const names = Object.keys(tools)
+        expect(names).toEqual(expect.arrayContaining(['fs_read', 'shared_search', 'agent_files_read', 'shared_db_query', 'brain_read', 'request_approval', 'ask_user', 'card_file', 'create_agent', 'list_agents']))
+        for (const name of ['shell_exec', 'web_fetch', 'web_search', 'browser_navigate', 'delegate_tasks', 'call_agent', 'fs_write', 'fs_edit', 'shared_write', 'agent_files_write', 'agent_files_edit', 'shared_db_execute', 'brain_write', 'brain_delete', 'brain_decide', 'focus_agent']) expect(names).not.toContain(name)
+    })
+
+    it('tells a wake it only reads, without the notes of a conversation', async () => {
+        const agent = await foremanWithBrief()
+        const prompt = systemPromptText(await buildSystemPrompt(agent, { source: 'wake', reason: 'x', memberId: 'm1' }, 'claude'))
+        expect(prompt).toContain('Nobody started this run, and in it you only read.')
+        expect(prompt).not.toContain('<operating_notes>')
+        expect(prompt).not.toContain('<company_brain>')
+        expect(prompt).not.toContain('shared_db_execute')
+    })
+
     // An old hub names no builtin: the card would be called and drawn by no client.
     it('draws the app card only when the brief names it', async () => {
         const without = await foremanToolSet()
@@ -218,6 +238,13 @@ describe('foreman routes', () => {
         ['GET', '/agents/foreman/files', undefined],
     ])('refuses %s %s', async (method, path, body) => {
         expect((await request(method, path, body)).status).toBe(403)
+    })
+
+    // No hub behind this test box: the check-in is asked, and waits for the hub rather than running.
+    it('lets the hub ask for a check-in now', async () => {
+        const res = await request('POST', '/agents/foreman/wake/now', {})
+        expect(res.status).not.toBe(403)
+        expect(((await res.json()) as { status: string }).status).not.toBe('started')
     })
 
     it('lets the hub read the conversations', async () => {

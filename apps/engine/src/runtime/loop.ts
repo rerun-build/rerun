@@ -44,7 +44,7 @@ import { runCurator } from './curator.js'
 import { repairToolCall } from './tool-repair.js'
 import { stepWithScreenshots } from './screenshots.js'
 import { authorMetadata, sendNotification, type NotificationKind } from './notify.js'
-import { emitRunTerminal } from './run-events.js'
+import { emitRunTerminal, wakeMetadata, wakeOrigin } from './run-events.js'
 import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
 import { armBudgetLatch, clearBudgetLatch, RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 import { agentMcpServers } from '../vault/runtime.js'
@@ -127,11 +127,11 @@ function hitlMessage(toolName: string, input: Record<string, unknown> | undefine
     return approvalSummary(input)
 }
 
-async function emitHitlEvent(agent: LoadedAgent, sessionId: string, runId: string, pending: PendingHitl, author: MessageAuthor | undefined): Promise<void> {
+async function emitHitlEvent(agent: LoadedAgent, sessionId: string, runId: string, pending: PendingHitl, author: MessageAuthor | undefined, trigger: RunTrigger): Promise<void> {
     const kind = hitlKind(pending.toolName)
     const input = pending.input as Record<string, unknown> | undefined
     const message = hitlMessage(pending.toolName, input)
-    await sendNotification({ event: 'agent.notification', kind, agentId: agent.id, sessionId, runId, message, metadata: { toolCallId: pending.toolCallId, toolName: pending.toolName, input: pending.input, ...authorMetadata(author) } }).catch(() => {})
+    await sendNotification({ event: 'agent.notification', kind, agentId: agent.id, sessionId, runId, message, ...wakeOrigin(trigger), metadata: { toolCallId: pending.toolCallId, toolName: pending.toolName, input: pending.input, ...authorMetadata(author), ...wakeMetadata(trigger) } }).catch(() => {})
 }
 
 // The proposal never pauses the run, so it is announced after the terminal event: sent first, the
@@ -363,7 +363,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         if (pending) {
             // A run waiting on a human stays "awaiting" only because no terminal event is sent.
-            await emitHitlEvent(agent, sessionId, run.id, pending, author)
+            await emitHitlEvent(agent, sessionId, run.id, pending, author, trigger)
         } else {
             await emitRunTerminal({
                 agentId: agent.id,
@@ -419,10 +419,12 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const t0 = Date.now()
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals }
+        const ctx: RunContext = { agent, sessionId, trigger, logger, provider, model, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals }
 
         ctx.runId = run.id
-        const triggerSlug = 'slug' in trigger ? trigger.slug : null
+        // A wake keeps the member it speaks to where a routine keeps its slug: a run the box reconciles
+        // after a restart is announced to the same person.
+        const triggerSlug = 'slug' in trigger ? trigger.slug : trigger.source === 'wake' ? trigger.memberId : null
         void setRunContext(agent.id, run.id, { provider, model, triggerSource: trigger.source, triggerSlug }).catch(() => {})
 
         const callTargetsP = agent.config.tools.callAgent ? listAgentIndex().then(idx => callTargetsOf(idx, agent.id, callableAgentIds)) : Promise.resolve([])

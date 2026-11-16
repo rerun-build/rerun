@@ -9,8 +9,9 @@ import { registerRun } from './stream.js'
 // UI message stream to the run hub, so the dashboard can attach to it later and replay it from
 // the start. The returned promise settles as soon as `runAgent` hands back, so callers keep the
 // error they used to get for a failed run preparation instead of losing it inside the stream.
-export async function startHeadlessRun(agent: LoadedAgent, sessionId: string, message: string, override: ModelOverride | undefined, trigger: RunTrigger): Promise<AgentRun> {
-    const run = await startRun(agent.id, sessionId)
+// `runId` is the caller's when it had to claim the session before the run existed.
+export async function startHeadlessRun(agent: LoadedAgent, sessionId: string, message: string, override: ModelOverride | undefined, trigger: RunTrigger, runId?: string): Promise<AgentRun> {
+    const run = await startRun(agent.id, sessionId, runId)
     const meta = { provider: override?.provider ?? agent.resolved.provider, model: override?.model ?? agent.resolved.model }
 
     let started!: (value: AgentRun) => void

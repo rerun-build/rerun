@@ -2,6 +2,7 @@ import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import type { RunContext } from '../../runtime/context.js'
 import { authorMetadata, sendNotification } from '../../runtime/notify.js'
+import { wakeMetadata, wakeOrigin } from '../../runtime/run-events.js'
 
 const MAX_MESSAGE_LENGTH = 16_000
 
@@ -22,7 +23,8 @@ export function notifyTools(ctx: RunContext): ToolSet {
                     sessionId: ctx.sessionId,
                     runId: ctx.runId ?? null,
                     message,
-                    metadata: metadata || ctx.author ? { ...metadata, ...authorMetadata(ctx.author) } : null,
+                    ...wakeOrigin(ctx.trigger),
+                    metadata: metadata || ctx.author || ctx.trigger?.source === 'wake' ? { ...metadata, ...authorMetadata(ctx.author), ...wakeMetadata(ctx.trigger) } : null,
                 })
                 if (!res.delivered) return `Notification not delivered (${res.reason ?? 'unknown'}). Continue without it.`
                 return 'Notification sent to the user.'

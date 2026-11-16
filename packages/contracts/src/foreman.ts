@@ -49,6 +49,10 @@ export type ForemanBrief = z.infer<typeof foremanBriefSchema>
 // and for whom: the member the run speaks to, their time zone, and a token that only reads.
 export const FOREMAN_WAKE_BRIEF_TOOL = 'foreman_brief'
 
+// Opens the message the box writes to start a wake: it is not a person writing, and every client
+// leaves it out of the conversation it shows.
+export const FOREMAN_WAKE_MARKER = '[[foreman:wake]]'
+
 export const foremanWakeRequestSchema = z.object({
     reason: z.string().max(500),
     // The member a signal concerns, or the last one who spoke to it. The hub checks it.

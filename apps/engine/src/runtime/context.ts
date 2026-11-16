@@ -7,7 +7,13 @@ import type { Logger } from '../lib/logger.js'
 import type { HostBreaker } from '../tools/host-breaker.js'
 import type { ScreenshotStore } from './screenshots.js'
 
-export type RunTrigger = { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: string } | { source: 'schedule'; slug: string; name: string } | { source: 'trigger'; slug: string; name: string }
+// `wake`: a run of the Chief of Staff nobody started, for `reason`, addressed to the member `memberId`
+// the hub chose. It only reads and proposes.
+export type RunTrigger =
+    | { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: string }
+    | { source: 'schedule'; slug: string; name: string }
+    | { source: 'trigger'; slug: string; name: string }
+    | { source: 'wake'; reason: string; memberId: string }
 
 export type PartialResult = { label: string; text: string }
 
@@ -16,6 +22,7 @@ export type SkillProposalNotice = { proposalId: string; mode: string; title: str
 export type RunContext = {
     agent: LoadedAgent
     sessionId: string
+    trigger?: RunTrigger
     runId?: string
     logger: Logger
     provider: Provider

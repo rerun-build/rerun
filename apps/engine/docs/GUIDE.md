@@ -131,7 +131,7 @@ curl localhost:3000/health
   "activeRuns": 0,
   "claimedSessions": 0,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "foreman.connect", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "foreman.wakes", "foreman.connect", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "monorepo",

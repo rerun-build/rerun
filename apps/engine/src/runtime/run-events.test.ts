@@ -51,6 +51,11 @@ describe('triggerFromRun', () => {
         expect(triggerFromRun({ triggerSource: 'trigger', triggerSlug: null })).toEqual({ source: 'trigger', slug: '', name: 'trigger' })
     })
 
+    // Reconciled after a restart, a wake is announced to the member it spoke to, never as a chat.
+    it('rebuilds a wake with the member it was written to', () => {
+        expect(triggerFromRun({ triggerSource: 'wake', triggerSlug: 'member-1' })).toEqual({ source: 'wake', reason: 'interrupted', memberId: 'member-1' })
+    })
+
     it('treats anything else as a chat run', () => {
         expect(triggerFromRun({ triggerSource: 'chat', triggerSlug: null })).toEqual({ source: 'chat' })
         expect(triggerFromRun({ triggerSource: null, triggerSlug: 'x' })).toEqual({ source: 'chat' })
@@ -58,6 +63,15 @@ describe('triggerFromRun', () => {
 })
 
 describe('emitRunTerminal', () => {
+    it('marks the end of a wake with its source and the member it was written to', async () => {
+        const event = await emit({ trigger: { source: 'wake', reason: 'mandatory', memberId: 'member-1' }, text: 'All quiet.' })
+        expect(event.event).toBe('agent.message.completed')
+        expect(event.source).toBe('wake')
+        expect(event.metadata).toMatchObject({ source: 'wake', memberId: 'member-1', wakeReason: 'mandatory', finalText: 'All quiet.' })
+        expect(event.metadata).not.toHaveProperty('authorId')
+        expect(event.metadata).not.toHaveProperty('sourceName')
+    })
+
     it('announces a finished schedule under its own event', async () => {
         const n = await emit({ trigger: schedule })
 

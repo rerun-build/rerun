@@ -36,8 +36,26 @@ every boot. It is not in `GET /agents`. Under `/agents/foreman` only these route
 itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`, `/runs/:rid`,
 `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
 `/runs/:rid/tasks/:taskId/cancel`, `GET /files/read`, `GET|PUT|POST /files/raw`, `DELETE /files`,
-and a `PATCH` that only carries `connectionId`, `provider` and `model`. Anything else answers
-`403 { "error": "The foreman is managed by the engine and cannot be changed" }`.
+`POST /wake/now`, and a `PATCH` that only carries `connectionId`, `provider` and `model`. Anything
+else answers `403 { "error": "The foreman is managed by the engine and cannot be changed" }`.
+
+#### Wakes
+
+The Chief of Staff also runs when nobody wrote to it: a wake. Before each one the engine asks the hub
+for its brief, `POST /api/hub` with `{ "tool": "foreman_brief", "args": { reason, memberId?, provider?,
+lastWakeAt? } }` on the box key alone. The hub answers `{ "skip": "<reason>" }` (switched off for the
+workspace, not opened to it, no plan, a Codex model, a workspace nobody opened for a week...) or
+`{ brief, memberId, timezone }`. The run then speaks to that member, in a session of its own whose
+`source` is `wake`, and keeps only reads: its own files, the shared space and each coworker's files
+(read, list, search), the shared database and the Brain read-only, `card_file`, `ask_user`,
+`request_approval`, `notify_user`, and the hub's read tools the brief names. No shell, no web, no
+browser, no sub-coworker. A wake never runs on Codex. Its first message opens with `[[foreman:wake]]`,
+and every event it sends carries `source: "wake"` and `metadata.memberId`.
+
+`POST /agents/foreman/wake/now` (`{ memberId? }`) starts one now: `202 { status: "started",
+sessionId, runId, memberId, timezone }`, `200 { status: "skipped", reason }` when the hub says no,
+`409 { status: "deferred", reason }` when it has to wait (`busy`, `budget`, `limit`, `credential`,
+`no_model`, `hub_unreachable`).
 
 ---
 
@@ -55,7 +73,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "foreman.connect", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "foreman.wakes", "foreman.connect", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -70,7 +88,7 @@ version the folder is at against the one this build takes it to.
   connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
   routes), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
-  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `foreman.connect`
+  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `foreman.wakes` (the Chief of Staff wakes on its own), `foreman.connect`
   (the Chief of Staff draws `connect_app` when its brief names it), and `desktop` only when the desktop
   packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,

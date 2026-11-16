@@ -50,6 +50,9 @@ export const ENGINE_CAPABILITY_CUSTOM = 'connections.custom'
 // attached to the coworkers that use it. A box without it keeps every connector per coworker.
 export const ENGINE_CAPABILITY_VAULT = 'vault'
 
+// The Chief of Staff wakes up on its own (`POST /agents/foreman/wake/now` starts one now).
+export const ENGINE_CAPABILITY_FOREMAN_WAKES = 'foreman.wakes'
+
 // The foreman draws a card to connect an app to a coworker (`connect_app`) when its brief names it.
 export const ENGINE_CAPABILITY_FOREMAN_CONNECT = 'foreman.connect'
 
