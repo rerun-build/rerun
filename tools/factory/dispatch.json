@@ -10,6 +10,9 @@
   },
   "auto_plan_marker": true,
   "likely_fixed_days": 7,
+  "planning": {
+    "max_queue": 20
+  },
   "proof": true,
   "one_file_one_job": true,
   "slots": 15,
