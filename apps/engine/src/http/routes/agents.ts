@@ -7,6 +7,7 @@ import { clearToken, saveToken } from '../../tools/mcp-auth.js'
 import { MCP_STATUS_TIMEOUT_MS, probeMcpStatuses } from '../../tools/mcp-status.js'
 import { McpProbeTimeoutError, modelReadyMcpTool, openMcpClient, prepareMcpServer } from '../../tools/mcp.js'
 import { COMPACTION_CHARS_PER_TOKEN } from '../../runtime/compaction/config.js'
+import { buildSystemPrompt, systemPromptText } from '../../agents/systemPrompt.js'
 import { agentMcpSpawn, errorClassOf, mcpSessionStates, reconnectMcp } from '../../tools/mcp-pool.js'
 import { announceToAgentRuns } from '../../runtime/run-control.js'
 import { createAgent } from '../../agents/factory.js'
@@ -66,7 +67,13 @@ agentRoutes.get('/:id', async c => {
 agentRoutes.get('/:id/tools', async c => {
     const id = c.req.param('id')
     if (!agentExists(id)) return c.json({ error: 'agent not found' }, 404)
-    return c.json({ families: agentToolCatalog(await readAgentConfig(id)) })
+    const families = agentToolCatalog(await readAgentConfig(id))
+    try {
+        const prompt = systemPromptText(await buildSystemPrompt(await loadAgentFromDisk(id)))
+        return c.json({ families, promptTokens: Math.ceil(prompt.length / COMPACTION_CHARS_PER_TOKEN) })
+    } catch {
+        return c.json({ families })
+    }
 })
 
 agentRoutes.post('/:id/automations/activate', async c => {
