@@ -1,15 +1,15 @@
 'use client'
 
 import { shortRelativeTime } from '@rerun/i18n/format'
-import { coworkerLine, type CoworkerLineTone } from '@rerun/contracts'
-import { AgentBuddy, buddyMoodOfStatus } from '@rerun/ui/iso-grid'
+import { coworkerLine } from '@rerun/contracts'
+import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useLocale, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuSub, ContextMenuSubContent, ContextMenuSubTrigger, ContextMenuTrigger } from '@/components/ui/context-menu'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { TooltipDisabledReason } from '@/components/ui/tooltip'
+import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useCanManageAgent, useManageableSpaceIds } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { IsoAgent } from '@/lib/board/types'
@@ -17,12 +17,6 @@ import { ArrowRightIcon, CopyPlusIcon, EllipsisIcon, MessageCircle, PanelRightIc
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import type { CoworkerPreview } from '@/stores/coworker-previews.store'
-
-const LINE_TONE: Record<CoworkerLineTone, string> = {
-    muted: 'text-muted-foreground',
-    waiting: 'text-orange-500 dark:text-orange-400',
-    destructive: 'text-destructive',
-}
 
 // What the tile's menus offer. The phone's list, where the chat and the card are the panel's, leaves
 // the first three out.
@@ -56,29 +50,56 @@ export function CoworkerTile({ agent, preview, viewerId, selected, unseen, onOpe
     const locale = useLocale()
     const paused = !!agent.disabledAt
     const lastMessage = preview?.lastMessage ? { text: preview.lastMessage.text, mine: preview.lastMessage.from === 'user' && preview.lastMessage.authorId === viewerId } : null
-    const line = coworkerLine({ status: agent.status, paused, description: agent.description, latest: preview ? { ...preview, lastMessage } : null }, t)
-    const waiting = !paused && agent.status === 'waiting_human'
+    // The line reads as it does at rest whatever the coworker is doing: the dot alone tells it.
+    const line = coworkerLine({ status: 'idle', paused: false, description: agent.description, latest: preview ? { ...preview, lastMessage } : null }, t)
     const large = size === 'large'
 
     return (
         <TileMenu agent={agent} actions={actions}>
             <div className={cn('group relative flex items-center rounded-lg transition-colors', selected ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/60')}>
                 <button type="button" onClick={onOpen} aria-current={selected ? 'true' : undefined} className={cn('flex min-w-0 flex-1 items-center text-left', large ? 'gap-4 py-[17px] pr-12 pl-5' : 'gap-2.5 py-2 pr-1 pl-2')}>
-                    <AgentBuddy agentId={agent.id} mood={buddyMoodOfStatus(agent.status, paused)} size={large ? 48 : 32} facing="right" className="shrink-0" />
+                    <AgentBuddy agentId={agent.id} mood={paused ? 'asleep' : 'idle'} size={large ? 48 : 32} facing="right" className="shrink-0" />
                     <span className={cn('min-w-0 flex-1', large && 'space-y-1')}>
                         <span className="flex items-baseline gap-2">
                             <span className={cn('min-w-0 flex-1 truncate', large ? 'text-[17px] leading-[22px] font-semibold' : 'text-sm font-medium')}>{agent.name}</span>
                             {preview && <span className={cn('shrink-0 tabular-nums group-hover:invisible group-focus-within:invisible', large ? 'text-[15px] text-muted-foreground/60' : 'text-[11px] text-muted-foreground [@media(hover:none)]:invisible')}>{shortRelativeTime(preview.updatedAt, locale)}</span>}
                         </span>
                         <span className="flex items-center gap-2">
-                            <span className={cn('min-w-0 flex-1 truncate', large ? 'text-[15px] leading-5' : 'text-xs', LINE_TONE[line.tone])}>{line.text || '\u00a0'}</span>
-                            {waiting ? <span className="size-2 shrink-0 rounded-full bg-orange-400" /> : unseen && <span className="size-2 shrink-0 rounded-full bg-brand" />}
+                            <span className={cn('min-w-0 flex-1 truncate text-muted-foreground', large ? 'text-[15px] leading-5' : 'text-xs')}>{line.text || '\u00a0'}</span>
+                            <StatusDot status={paused ? 'paused' : agent.status} unseen={unseen} />
                         </span>
                     </span>
                 </button>
                 <TileMoreMenu agent={agent} actions={actions} large={large} />
             </div>
         </TileMenu>
+    )
+}
+
+type DotStatus = IsoAgent['status'] | 'paused'
+
+const DOT: Record<DotStatus, { className: string; label: 'line.working' | 'line.waiting' | 'line.error' | 'line.asleep' | 'line.paused' } | null> = {
+    working: { className: 'bg-emerald-500', label: 'line.working' },
+    waiting_human: { className: 'bg-orange-400', label: 'line.waiting' },
+    error: { className: 'bg-destructive', label: 'line.error' },
+    offline: { className: 'bg-muted-foreground/40', label: 'line.asleep' },
+    paused: { className: 'bg-muted-foreground/40', label: 'line.paused' },
+    idle: null,
+}
+
+// Where the coworker stands, in a dot: at rest it shows only a run nobody has opened yet.
+function StatusDot({ status, unseen }: { status: DotStatus; unseen: boolean }) {
+    const t = useTranslations('workspaceView')
+    const dot = DOT[status]
+    if (!dot) return unseen ? <span className="size-2 shrink-0 rounded-full bg-brand" /> : null
+    const label = t(dot.label)
+    return (
+        <TooltipLabeled label={label}>
+            <span role="img" aria-label={label} className="relative flex size-2 shrink-0">
+                {status === 'working' && <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />}
+                <span className={cn('relative size-2 rounded-full', dot.className)} />
+            </span>
+        </TooltipLabeled>
     )
 }
 
