@@ -56,15 +56,47 @@ export function foremanFaceRest(facing: ForemanFacing) {
     return { yaw: FOREMAN_FACE_REST.yaw * REST_YAW_SIDE[facing], pitch: FOREMAN_FACE_REST.pitch }
 }
 
-// Scales and lifts its children from the point where the ball touches the floor.
-function FromFloor({ className, children }: { className: string; children: ReactNode }) {
+const VIEW_X = CENTER.x - FOREMAN_VIEW_WIDTH / 2
+const VIEW_Y = CENTER.y - RADIUS - MARGIN
+const VIEW_BOX = `${VIEW_X} ${VIEW_Y} ${FOREMAN_VIEW_WIDTH} ${VIEW_HEIGHT}`
+const share = (value: number, of: number) => `${(value / of) * 100}%`
+
+// The ball and its shadow bounce from the point where the ball touches the floor.
+const FLOOR_ORIGIN = `${share(CENTER.x - VIEW_X, FOREMAN_VIEW_WIDTH)} ${share(FLOOR - VIEW_Y, VIEW_HEIGHT)}`
+
+// The sheen is a 20-unit band left of the sphere, sheared by -18° about the drawing's origin and slid
+// across it. It is laid out in the sphere's own box, which clips it to the ball.
+const SPHERE_BOX = {
+    left: share(CENTER.x - RADIUS - VIEW_X, FOREMAN_VIEW_WIDTH),
+    top: share(CENTER.y - RADIUS - VIEW_Y, VIEW_HEIGHT),
+    width: share(RADIUS * 2, FOREMAN_VIEW_WIDTH),
+    height: share(RADIUS * 2, VIEW_HEIGHT),
+}
+const SHEEN = { x: CENTER.x - RADIUS - 24, y: CENTER.y - RADIUS, width: 20, height: RADIUS * 2 }
+const SHEEN_BOX = {
+    left: share(SHEEN.x - (CENTER.x - RADIUS), RADIUS * 2),
+    top: share(SHEEN.y - (CENTER.y - RADIUS), RADIUS * 2),
+    width: share(SHEEN.width, RADIUS * 2),
+    height: share(SHEEN.height, RADIUS * 2),
+    transformOrigin: `${share(-SHEEN.x, SHEEN.width)} ${share(-SHEEN.y, SHEEN.height)}`,
+}
+
+// Every layer is the same drawing box: absolutely placed over the whole ball, with the same viewBox.
+const LAYER = 'pointer-events-none absolute inset-0 block size-full'
+
+function Layer({ children }: { children: ReactNode }) {
     return (
-        <g transform={`translate(${CENTER.x} ${FLOOR})`}>
-            <g className={className}>
-                <g transform={`translate(${-CENTER.x} ${-FLOOR})`}>{children}</g>
-            </g>
-        </g>
+        <svg viewBox={VIEW_BOX} className={LAYER} style={{ overflow: 'visible' }}>
+            {children}
+        </svg>
     )
+}
+
+function hexAlpha(color: string, alpha: number) {
+    const hex = color.replace('#', '')
+    const full = hex.length === 3 ? [...hex].map(c => c + c).join('') : hex.slice(0, 6)
+    const [r, g, b] = [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16))
+    return `rgb(${r} ${g} ${b} / ${alpha})`
 }
 
 export function foremanBallHeight(size: number, scale: number) {
@@ -101,7 +133,6 @@ export function ForemanBall({ material: materialKey, scale, size, face = 'plate'
 
     const motion = MOTION[state]
     const moving = animated && motion.amp > 0
-    const viewBox = `${CENTER.x - FOREMAN_VIEW_WIDTH / 2} ${CENTER.y - RADIUS - MARGIN} ${FOREMAN_VIEW_WIDTH} ${VIEW_HEIGHT}`
     const outline = material.outline.length > 1 ? `url(#${uid}-outline)` : material.outline[0]
     const sphere = { cx: CENTER.x, cy: CENTER.y, r: RADIUS }
     const rest = foremanFaceRest(facing)
@@ -119,10 +150,14 @@ export function ForemanBall({ material: materialKey, scale, size, face = 'plate'
                     '--foreman-amp': motion.amp,
                     '--foreman-period': `${motion.period}s`,
                     '--foreman-sheen-period': `${motion.sheenPeriod}s`,
+                    // One unit of the drawing in CSS pixels: the bounce and the sheen are written in units.
+                    '--foreman-unit': `${width / FOREMAN_VIEW_WIDTH}px`,
                 } as CSSProperties
             }
         >
-            <svg viewBox={viewBox} width="100%" height="100%" style={{ overflow: 'visible' }}>
+            {/* Each moving part is an HTML layer of its own, not an SVG group: the compositor moves it
+                without the page restyling and repainting the ball on every frame. */}
+            <Layer>
                 <defs>
                     <radialGradient id={`${uid}-body`} cx={CENTER.x - 12} cy={CENTER.y - 16} r={RADIUS * 1.55} gradientUnits="userSpaceOnUse">
                         {paint.stops.map(([offset, color]) => (
@@ -146,11 +181,6 @@ export function ForemanBall({ material: materialKey, scale, size, face = 'plate'
                             <stop key={i} offset={i / Math.max(1, material.outline.length - 1)} stopColor={color} />
                         ))}
                     </linearGradient>
-                    <linearGradient id={`${uid}-sheen`} x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0%" stopColor={material.sheen} stopOpacity="0" />
-                        <stop offset="50%" stopColor={material.sheen} stopOpacity="0.55" />
-                        <stop offset="100%" stopColor={material.sheen} stopOpacity="0" />
-                    </linearGradient>
                     <radialGradient id={`${uid}-aura`}>
                         <stop offset="0%" stopColor={material.aura} stopOpacity="0.55" />
                         <stop offset="100%" stopColor={material.aura} stopOpacity="0" />
@@ -166,13 +196,17 @@ export function ForemanBall({ material: materialKey, scale, size, face = 'plate'
                         <feGaussianBlur stdDeviation="1.6" />
                     </filter>
                 </defs>
-
                 {material.aura && <ellipse cx={CENTER.x} cy={FLOOR - 2} rx={RADIUS * 1.2} ry={RADIUS * 0.34} fill={`url(#${uid}-aura)`} />}
-                <FromFloor className="foreman-ball-shadow">
-                    <ellipse cx={CENTER.x} cy={FLOOR} rx={RADIUS * 0.72} ry={BELOW_FLOOR - 1} fill={`url(#${uid}-shadow)`} />
-                </FromFloor>
+            </Layer>
 
-                <FromFloor className="foreman-ball-body">
+            <span className={cn(LAYER, 'foreman-ball-shadow')} style={{ transformOrigin: FLOOR_ORIGIN }}>
+                <Layer>
+                    <ellipse cx={CENTER.x} cy={FLOOR} rx={RADIUS * 0.72} ry={BELOW_FLOOR - 1} fill={`url(#${uid}-shadow)`} />
+                </Layer>
+            </span>
+
+            <span className={cn(LAYER, 'foreman-ball-body')} style={{ transformOrigin: FLOOR_ORIGIN }}>
+                <Layer>
                     <circle {...sphere} fill={`url(#${uid}-body)`} />
                     <g clipPath={`url(#${uid}-clip)`}>
                         {paint.horizon && (
@@ -182,11 +216,20 @@ export function ForemanBall({ material: materialKey, scale, size, face = 'plate'
                             />
                         )}
                         <circle {...sphere} fill={`url(#${uid}-bounce)`} />
-                        {animated && (
-                            <g transform="skewX(-18)">
-                                <rect className="foreman-buddy-sheen" x={CENTER.x - RADIUS - 24} y={CENTER.y - RADIUS} width={20} height={RADIUS * 2} fill={`url(#${uid}-sheen)`} />
-                            </g>
-                        )}
+                    </g>
+                </Layer>
+                {animated && (
+                    <span className="pointer-events-none absolute overflow-hidden rounded-full" style={SPHERE_BOX}>
+                        <span className="absolute block" style={{ ...SHEEN_BOX, transform: 'skewX(-18deg)' }}>
+                            <span
+                                className="foreman-buddy-sheen absolute inset-0 block"
+                                style={{ background: `linear-gradient(to right, ${hexAlpha(material.sheen, 0)}, ${hexAlpha(material.sheen, 0.55)}, ${hexAlpha(material.sheen, 0)})` }}
+                            />
+                        </span>
+                    </span>
+                )}
+                <Layer>
+                    <g clipPath={`url(#${uid}-clip)`}>
                         <g ref={faceRef} transform={foremanFacePose(rest.yaw, rest.pitch)}>
                             <g transform={`scale(${faceScale}) translate(${-BUDDY_FACE_CENTER} ${-EYE_Y})`}>
                                 {face === 'plate' && <ForemanFacePlate uid={uid} y={EYE_Y} colors={material.plate} />}
@@ -199,8 +242,8 @@ export function ForemanBall({ material: materialKey, scale, size, face = 'plate'
                     </g>
                     {material.neon && <circle {...sphere} fill="none" stroke={outline} strokeWidth={3} strokeOpacity={0.8} filter={`url(#${uid}-glow)`} />}
                     <circle {...sphere} fill="none" stroke={outline} strokeOpacity={material.neon ? 1 : 0.6} strokeWidth={material.neon ? 1.1 : 0.7} />
-                </FromFloor>
-            </svg>
+                </Layer>
+            </span>
         </span>
     )
 }

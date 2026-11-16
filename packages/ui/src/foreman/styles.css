@@ -1,10 +1,11 @@
 /* La boule du Foreman (`ForemanBall`). Importé via @rerun/ui/styles.css. */
 
 /* The glint that crosses the material: what makes it read as polished and not as painted. It rests
-   off the shape for the second half of its period. */
+   off the shape for the second half of its period. Distances are in units of the ball's drawing
+   (--foreman-unit): the moving parts are HTML layers the compositor animates, not SVG groups. */
 @keyframes foreman-buddy-sheen {
     0% { transform: translateX(0); }
-    55%, 100% { transform: translateX(170px); }
+    55%, 100% { transform: translateX(calc(170 * var(--foreman-unit, 1px))); }
 }
 
 .foreman-buddy-sheen {
@@ -19,7 +20,7 @@
         animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
     }
     50% {
-        transform: translateY(calc(var(--foreman-amp) * -170px)) scale(calc(1 - var(--foreman-amp) * 0.3), calc(1 + var(--foreman-amp) * 0.3));
+        transform: translateY(calc(var(--foreman-amp) * -170 * var(--foreman-unit, 1px))) scale(calc(1 - var(--foreman-amp) * 0.3), calc(1 + var(--foreman-amp) * 0.3));
         animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
     }
 }
