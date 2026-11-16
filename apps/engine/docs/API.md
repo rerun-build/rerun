@@ -70,6 +70,12 @@ conversation is counted on it, a reply in the conversation drops what it was wai
 50 are kept. A wake for signals comes a quarter of an hour after the last one at the soonest; any
 wake reads the signals that matured, quoted as data, and the coworkers whose setup nobody finished.
 
+Its `request_approval` takes a `topic` per action and a `title` per card. Each action is kept in the
+`foreman_proposals` table of its `system.db` (step 5 of `SYSTEM_DB_MIGRATIONS`, created empty in every
+agent's file): `open` when the turn ends on the card, then `accepted`, `declined` (with the reason) or
+`answered` (they wrote something else) when the next turn of that conversation starts, `expired` after
+two weeks unanswered. A wake reads the open ones and those decided in the last thirty days.
+
 `POST /agents/foreman/wake/signals` is the hub's way to add one: `{ kind, summary, memberId?, itemId?,
 delayMinutes? }`, queued as `hub.<kind>`, `202 { queued: true }`.
 

@@ -217,23 +217,30 @@ export function askUserTool(ctx: RunContext): ToolSet {
     }
 }
 
-export function requestApprovalTool(ctx: Pick<RunContext, 'turnOrder'>): ToolSet {
+const REQUEST_APPROVAL_DESCRIPTION =
+    'Request explicit approval before performing one or more consequential or irreversible actions, then END YOUR TURN until the user approves or declines each one. Group every approval you genuinely need right now into a single approvals array instead of asking one at a time, but never pad the batch with unnecessary actions or split one action artificially. Keep every card short: action is one concise line and detail holds only the concrete specifics — put any longer explanation in your message, not here. The user replies once with all decisions. Perform only approved actions. A standing go-ahead the user already gave for this kind of action ("join them all, no need to ask me") is that approval: do not call this tool for actions it covers. You must NOT perform a declined action or attempt any workaround to achieve the same result.'
+
+const approvalAction = {
+    action: z.string().min(1).describe('A clear description of one action you want to take, kept to one short line. Any longer reasoning goes in your message, not here.'),
+    detail: nullTolerantOptional(z.string()).describe('Optional extra detail shown for this action (e.g. a command, a diff, a target). Keep it to the concrete specifics, not a long explanation.'),
+}
+
+// The Chief of Staff's proposals are remembered, each action under a topic: a topic someone declined
+// is not proposed again unless something new happened.
+const proposalAction = {
+    ...approvalAction,
+    topic: nullTolerantOptional(z.string().max(80)).describe('A few words naming what this action is about, the same words every time you come back to it (e.g. "Scout Gmail sign-in", "weekly report routine"). It is how you remember what was already proposed and what they declined.'),
+}
+
+export function requestApprovalTool(ctx: Pick<RunContext, 'turnOrder'>, { proposals = false }: { proposals?: boolean } = {}): ToolSet {
+    const actions = proposals ? z.object(proposalAction) : z.object(approvalAction)
     return {
         request_approval: hitlTool(
             ctx.turnOrder,
-            'Request explicit approval before performing one or more consequential or irreversible actions, then END YOUR TURN until the user approves or declines each one. Group every approval you genuinely need right now into a single approvals array instead of asking one at a time, but never pad the batch with unnecessary actions or split one action artificially. Keep every card short: action is one concise line and detail holds only the concrete specifics — put any longer explanation in your message, not here. The user replies once with all decisions. Perform only approved actions. A standing go-ahead the user already gave for this kind of action ("join them all, no need to ask me") is that approval: do not call this tool for actions it covers. You must NOT perform a declined action or attempt any workaround to achieve the same result.',
+            REQUEST_APPROVAL_DESCRIPTION,
             z.object({
-                approvals: jsonTolerantArray(
-                    z
-                        .array(
-                            z.object({
-                                action: z.string().min(1).describe('A clear description of one action you want to take, kept to one short line. Any longer reasoning goes in your message, not here.'),
-                                detail: nullTolerantOptional(z.string()).describe('Optional extra detail shown for this action (e.g. a command, a diff, a target). Keep it to the concrete specifics, not a long explanation.'),
-                            }),
-                        )
-                        .min(1)
-                        .max(20),
-                ).describe('Every approval currently needed, grouped into one relevant batch. Include no filler and do not split one action into artificial sub-actions.'),
+                ...(proposals ? { title: nullTolerantOptional(z.string().max(80)).describe('Optional short title of the card, when it proposes something rather than asks before an action you were told to do.') } : {}),
+                approvals: jsonTolerantArray(z.array(actions).min(1).max(20)).describe('Every approval currently needed, grouped into one relevant batch. Include no filler and do not split one action into artificial sub-actions.'),
             }),
         ),
     }

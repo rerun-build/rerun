@@ -104,6 +104,10 @@ describe('sqlite ladders', () => {
               4,
               "paid-sources",
             ],
+            [
+              5,
+              "foreman-proposals",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -267,5 +271,21 @@ describe('brain.db v1 to v2', () => {
         expect(await columns(client, 'brain_proposals')).toEqual(expect.arrayContaining(['headline', 'highlights_json']))
         const waiting = await client.execute("SELECT title, headline, highlights_json FROM brain_proposals WHERE id = 'p1'")
         expect(waiting.rows[0]).toMatchObject({ title: 'Pricing', headline: null, highlights_json: null })
+    })
+})
+
+describe('system.db v4 to v5', () => {
+    it('adds the Chief of Staff proposals beside what the file already held, and runs twice', async () => {
+        const client = freshFile('v4-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 4), 'v4-system.db')
+        await client.execute("INSERT INTO system_meta (key, value) VALUES ('foreman.wakes', '{}')")
+
+        await migrateSystemDb(client, 'v4-system.db')
+        await SYSTEM_DB_MIGRATIONS[4].up(client)
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        expect((await client.execute("SELECT value FROM system_meta WHERE key = 'foreman.wakes'")).rows).toHaveLength(1)
+        await client.execute("INSERT INTO foreman_proposals (id, session_id, action, created_at) VALUES ('c1:0', 's1', 'Reconnect Gmail', '2026-11-16T10:00:00Z')")
+        const row = (await client.execute("SELECT status, from_wake FROM foreman_proposals WHERE id = 'c1:0'")).rows[0]
+        expect({ ...row }).toEqual({ status: 'open', from_wake: 0 })
     })
 })

@@ -102,7 +102,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (cfg.paidData && (await paidDataOffered())) Object.assign(tools, paidDataTools(ctx))
     if (cfg.cards) Object.assign(tools, ctx.agent.config.kind === 'foreman' ? foremanCardTools(ctx) : cardTools(ctx))
     if (cfg.askUser) Object.assign(tools, askUserTool(ctx))
-    if (cfg.requestApproval) Object.assign(tools, requestApprovalTool(ctx))
+    if (cfg.requestApproval) Object.assign(tools, requestApprovalTool(ctx, { proposals: ctx.agent.config.kind === 'foreman' }))
     if (cfg.suggestService) Object.assign(tools, suggestServiceTool(ctx))
     if (ctx.agent.config.kind === 'foreman' && briefNamesBuiltin(ctx.agent, 'connect_app')) Object.assign(tools, connectAppTool(ctx))
     if (ctx.agent.config.kind === 'foreman' && briefNamesBuiltin(ctx.agent, 'schedule_wake')) Object.assign(tools, foremanWakeTools())

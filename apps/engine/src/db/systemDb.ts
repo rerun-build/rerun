@@ -223,6 +223,27 @@ CREATE TABLE IF NOT EXISTS paid_keys (
 );
 `
 
+// The Chief of Staff's proposals, one row per action of a request_approval card, so a wake knows what it
+// already proposed and what was declined. Created in every agent's file, and empty but in its own.
+const FOREMAN_PROPOSALS_DDL = `
+CREATE TABLE IF NOT EXISTS foreman_proposals (
+    id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    run_id TEXT,
+    member_id TEXT,
+    topic TEXT,
+    title TEXT,
+    action TEXT NOT NULL,
+    detail TEXT,
+    status TEXT NOT NULL DEFAULT 'open',
+    note TEXT,
+    from_wake INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    decided_at TEXT
+);
+CREATE INDEX IF NOT EXISTS foreman_proposals_session_idx ON foreman_proposals(session_id, status);
+`
+
 // A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
@@ -255,6 +276,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'paid-sources',
         up: async client => {
             await client.executeMultiple(PAID_SOURCES_DDL)
+        },
+    },
+    {
+        version: 5,
+        id: 'foreman-proposals',
+        up: async client => {
+            await client.executeMultiple(FOREMAN_PROPOSALS_DDL)
         },
     },
 ]

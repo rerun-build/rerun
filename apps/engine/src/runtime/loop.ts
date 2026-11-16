@@ -44,6 +44,7 @@ import { runCurator } from './curator.js'
 import { repairToolCall } from './tool-repair.js'
 import { stepWithScreenshots } from './screenshots.js'
 import { authorMetadata, sendNotification, type NotificationKind } from './notify.js'
+import { decideProposals, recordProposals } from '../db/repos/proposals.js'
 import { clearAwaitingSignal } from '../foreman/signals.js'
 import { emitRunTerminal, wakeMetadata, wakeOrigin } from './run-events.js'
 import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, openAiCreditsError, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
@@ -230,6 +231,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     const author = trigger.source === 'chat' ? trigger.author : undefined
     // Someone is back in this conversation: what it was waiting on is no longer news for the Chief of Staff.
     if (trigger.source === 'chat') void clearAwaitingSignal(baseAgent.id, sessionId).catch(() => {})
+    // What they answered to the Chief of Staff's proposals, before the turn that acts on it.
+    if (trigger.source === 'chat' && baseAgent.config.kind === 'foreman') await decideProposals(sessionId, userText).catch(err => logger.warn({ err: String(err) }, 'foreman proposals not decided'))
 
     let agent = baseAgent
     let { connection, provider, model } = baseAgent.resolved
@@ -365,6 +368,10 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         resolveSettled(outcome)
 
         if (pending) {
+            if (agent.config.kind === 'foreman' && pending.toolName === 'request_approval') {
+                const memberId = trigger.source === 'wake' ? trigger.memberId : (author?.id ?? null)
+                await recordProposals({ toolCallId: pending.toolCallId, input: pending.input, sessionId, runId: run.id, memberId, fromWake: trigger.source === 'wake' }).catch(err => logger.warn({ err: String(err) }, 'foreman proposals not recorded'))
+            }
             // A run waiting on a human stays "awaiting" only because no terminal event is sent.
             await emitHitlEvent(agent, sessionId, run.id, pending, author, trigger)
         } else {
