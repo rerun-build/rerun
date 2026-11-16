@@ -2,7 +2,7 @@
 import { act, createElement, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { StatsMetric, StatsPoint, StatsQuery } from '@rerun/contracts'
+import type { StatsMetric, StatsPoint, StatsQuery, UsageTimeRange } from '@rerun/contracts'
 
 const values = vi.hoisted(() => ({ current: {} as Partial<Record<StatsMetric, number>> }))
 
@@ -108,5 +108,20 @@ describe('AgentPanelMonitoring cost', () => {
         expect(card('Total cost')?.textContent).not.toContain('No cost was reported')
         expect(charts()).toContain('cost:area')
         expect(card('Tokens by class')).toBeNull()
+    })
+})
+
+describe('AgentPanelMonitoring data source', () => {
+    it('reads its numbers through the given loader', async () => {
+        const read = vi.fn(async (_agentId: string, _range: UsageTimeRange, queries: StatsQuery[]) => ({
+            usage: [],
+            stats: queries.map((query): StatsPoint[] => [{ bucket: '2026-09-01', group: null, value: query.metric === 'failureRate' ? 0.77 : 1, count: 4 }]),
+        }))
+        await act(async () => {
+            root.render(createElement(AgentPanelMonitoring, { agentId: 'a2', readMonitoring: read }))
+        })
+        expect(read).toHaveBeenCalledWith('a2', '7d', expect.any(Array))
+        const points = JSON.parse(card('Failure rate')?.querySelector<HTMLElement>('[data-chart]')?.dataset.points ?? '[]') as StatsPoint[]
+        expect(points[0]?.value).toBe(0.77)
     })
 })

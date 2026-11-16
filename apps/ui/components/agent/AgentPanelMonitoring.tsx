@@ -68,7 +68,7 @@ function tokenClassPoints(stats: StatsData, labels: { fresh: string; cached: str
     ]
 }
 
-export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
+export function AgentPanelMonitoring({ agentId, readMonitoring = readAgentMonitoringAction }: { agentId: string; readMonitoring?: typeof readAgentMonitoringAction }) {
     const t = useTranslations('agent.agentPanelMonitoring')
     const locale = useLocale()
     const [range, setRange] = useState<StatsTimeRange>('7d')
@@ -79,7 +79,7 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
 
     const load = useCallback(async () => {
         const usageRange: UsageTimeRange = range === '90d' ? 'all' : range
-        const { usage: usageResult, stats: statsResults } = await readAgentMonitoringAction(
+        const { usage: usageResult, stats: statsResults } = await readMonitoring(
             agentId,
             usageRange,
             ALL_SPECS.map(spec => ({ dataset: spec.dataset, metric: spec.metric, groupBy: spec.groupBy, range }))
@@ -91,7 +91,7 @@ export function AgentPanelMonitoring({ agentId }: { agentId: string }) {
         setStats(next)
         setUsage(usageResult ?? [])
         setLoading(false)
-    }, [agentId, range])
+    }, [agentId, range, readMonitoring])
 
     useVisibleInterval(load, POLL_MS)
 
