@@ -1,4 +1,4 @@
-import { mkdir, rm } from 'node:fs/promises'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { chromium, type BrowserContext, type Page, type Response as PageResponse } from 'patchright'
 import { tool, type ToolSet } from 'ai'
@@ -125,7 +125,7 @@ async function settle(page: Page): Promise<void> {
     await page.waitForLoadState('networkidle', { timeout: RENDER_SETTLE_MS }).catch(() => {})
 }
 
-type Visit = { url: string; screenshotPath?: string; links?: boolean; timeoutMs: number }
+type Visit = { url: string; screenshotPath?: string; fullPage?: boolean; maxEdge?: number; links?: boolean; timeoutMs: number }
 
 async function readLinks(page: Page): Promise<string> {
     const anchors = await page.$$eval('a[href]', elements => elements.map(a => ({ href: (a as HTMLAnchorElement).href, text: (a as HTMLElement).innerText ?? '' })))
@@ -141,7 +141,7 @@ async function readLinks(page: Page): Promise<string> {
     return `\n\nLinks:\n${lines.length ? lines.join('\n') : 'none'}`
 }
 
-async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, links, timeoutMs }: Visit, { reload = true } = {}): Promise<HostAttempt> {
+async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, fullPage = true, maxEdge, links, timeoutMs }: Visit, { reload = true } = {}): Promise<HostAttempt> {
     let documentStatus: number | undefined
     const onResponse = (response: PageResponse) => {
         if (response.request().resourceType() === 'document' && response.frame() === page.mainFrame()) documentStatus = response.status()
@@ -165,7 +165,12 @@ async function readPage(ctx: RunContext, page: Page, { url, screenshotPath, link
         if (screenshotPath) {
             const target = await resolveInWorkspace(ctx.agent.id, screenshotPath)
             await mkdir(dirname(target), { recursive: true })
-            await page.screenshot({ path: target, fullPage: true })
+            await page.screenshot({ path: target, fullPage })
+            if (maxEdge) {
+                const { default: sharp } = await import('sharp')
+                const resized = await sharp(await readFile(target)).resize(maxEdge, maxEdge, { fit: 'inside', withoutEnlargement: true }).toBuffer()
+                await writeFile(target, resized)
+            }
             note = `\n\n[screenshot saved to ${screenshotPath}]`
         }
         const savedLine = saved ? `\nSaved whole: ${saved} (the rendered HTML: read or grep it for anything this text leaves out)` : ''
@@ -198,11 +203,13 @@ export function browserTools(ctx: RunContext): ToolSet {
     const breaker = ctx.hostBreaker ?? new HostBreaker()
     return {
         browser_navigate: tool({
-            description: 'Open a URL in a real Chromium browser, wait for it to render (including JavaScript and bot-protection challenges, cookie banners accepted), and return the visible text, plus the links on the page when you ask for them. Cookies persist between your calls. Use this instead of web_fetch for pages that need JS to load or that block simple requests. Optionally save a screenshot into your workspace to inspect later with vision_analyze.',
+            description: 'Open a URL in real Chromium, wait for it to render (JavaScript, bot-protection challenges, cookie banners), and return the visible text, plus links on request. Cookies persist between calls. Use this instead of web_fetch for pages that need JS or block simple requests. Optionally save a screenshot (fullPage false: visible part; maxEdge: longest side in px) into your workspace for vision_analyze.',
             inputSchema: z.object({
                 url: publicHttpUrl,
-                screenshotPath: z.string().optional().describe('Workspace-relative path to save a full-page PNG screenshot'),
-                links: z.boolean().default(false).describe('Also list the links on the page (text and URL), e.g. to open the results of a search'),
+                screenshotPath: z.string().optional().describe('Workspace path for a PNG screenshot'),
+                fullPage: z.boolean().default(true),
+                maxEdge: z.number().int().min(320).max(2048).optional(),
+                links: z.boolean().default(false).describe('Also list the page links (text and URL)'),
                 timeoutMs: z.number().int().positive().max(120_000).default(30_000),
             }),
             execute: async (visit: Visit) => {

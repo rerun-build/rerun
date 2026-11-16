@@ -1,5 +1,5 @@
 import type { ModelMessage } from 'ai'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createScreenshotStore, stepWithScreenshots, withScreenshots } from './screenshots.js'
 
 const picture = (label: string) => ({ image: Buffer.from(label), mediaType: 'image/jpeg' })
@@ -24,6 +24,34 @@ describe('screenshot store', () => {
         const seventh = store.add(picture('6'))
         expect(ids.slice(0, 4).some(id => store.get(id))).toBe(false)
         expect([...ids.slice(4), seventh].every(id => store.get(id))).toBe(true)
+    })
+})
+
+describe('screenshot store size', () => {
+    it('keeps the count RERUN_SCREENSHOTS_KEPT says', () => {
+        vi.stubEnv('RERUN_SCREENSHOTS_KEPT', '2')
+        try {
+            const store = createScreenshotStore()
+            const ids = Array.from({ length: 3 }, (_, index) => store.add(picture(String(index))))
+            expect(ids.map(id => Boolean(store.get(id)))).toEqual([false, false, true])
+            const fourth = store.add(picture('3'))
+            expect([ids[2], fourth].map(id => Boolean(store.get(id)))).toEqual([true, true])
+        } finally {
+            vi.unstubAllEnvs()
+        }
+    })
+
+    it('keeps 6 by default', () => {
+        vi.stubEnv('RERUN_SCREENSHOTS_KEPT', '')
+        try {
+            const store = createScreenshotStore()
+            const ids = Array.from({ length: 6 }, (_, index) => store.add(picture(String(index))))
+            expect(ids.every(id => store.get(id))).toBe(true)
+            store.add(picture('6'))
+            expect(store.get(ids[0]!)).toBeUndefined()
+        } finally {
+            vi.unstubAllEnvs()
+        }
     })
 })
 
