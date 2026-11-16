@@ -132,7 +132,9 @@
     },
     "review": "medium",
     "proof": "medium",
-    "replan": "medium"
+    "replan": "medium",
+    "plan": "high",
+    "resolve": "high"
   },
   "tier_models": {
     "build": {
@@ -183,6 +185,18 @@
       "medium": {
         "model": "claude-opus-5-5",
         "thinkingLevel": "medium"
+      }
+    },
+    "plan": {
+      "high": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "high"
+      }
+    },
+    "resolve": {
+      "high": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "high"
       }
     }
   }
