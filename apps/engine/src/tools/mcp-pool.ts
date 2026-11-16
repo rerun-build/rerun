@@ -15,7 +15,7 @@ export const MCP_CONNECT_TIMEOUT_MS = 20_000
 
 type CallResult = McpCallResult
 type Session = { client: Client; tools: McpTool[] }
-type Entry = { fingerprint: string; opening: Promise<Session>; inFlight: number; ready: boolean; timer?: NodeJS.Timeout }
+type Entry = { fingerprint: string; opening: Promise<Session>; inFlight: number; ready: boolean; toolCount?: number; timer?: NodeJS.Timeout }
 
 export type PooledMcp = {
     name: string
@@ -27,6 +27,7 @@ export type McpErrorClass = 'auth' | 'timeout' | 'unreachable' | 'closed' | 'oth
 
 const entries = new Map<string, Entry>()
 const failures = new Map<string, McpErrorClass>()
+const lastCounts = new Map<string, number>()
 
 export function errorClassOf(error: unknown): McpErrorClass {
     const message = error instanceof Error ? error.message : String(error ?? '')
@@ -71,8 +72,10 @@ function entryFor(agentId: string, server: McpServer, spawn: McpSpawn): { key: s
     const entry: Entry = { fingerprint, opening: openMcpClient(server, spawn), inFlight: 0, ready: false }
     entries.set(key, entry)
     entry.opening.then(
-        ({ client }) => {
+        ({ client, tools }) => {
             entry.ready = true
+            entry.toolCount = tools.length
+            lastCounts.set(key, tools.length)
             client.onclose = () => drop(key, entry)
         },
         () => drop(key, entry)
@@ -170,6 +173,7 @@ export function releaseAgentMcp(agentId: string, keep: string[] = []): void {
 
 export async function closeAllMcp(): Promise<void> {
     failures.clear()
+    lastCounts.clear()
     await Promise.all([...entries].map(([key, entry]) => drop(key, entry)))
 }
 
@@ -188,10 +192,23 @@ export function reconnectMcp(agentId: string, name: string): boolean {
     return true
 }
 
-export function mcpSessionStates(agentId: string): { name: string; state: 'connected' | 'connecting' | 'failed'; errorClass?: McpErrorClass }[] {
+type McpSessionState = { name: string; state: 'connected' | 'connecting' | 'failed'; errorClass?: McpErrorClass; toolCount?: number }
+
+export function mcpSessionStates(agentId: string): McpSessionState[] {
     const prefix = `${agentId}\u0000`
-    const states: { name: string; state: 'connected' | 'connecting' | 'failed'; errorClass?: McpErrorClass }[] = []
-    for (const [key, entry] of entries) if (key.startsWith(prefix)) states.push({ name: key.slice(prefix.length), state: entry.ready ? 'connected' : 'connecting' })
+    const states: McpSessionState[] = []
+    for (const [key, entry] of entries)
+        if (key.startsWith(prefix)) {
+            const name = key.slice(prefix.length)
+            states.push(entry.ready ? { name, state: 'connected', toolCount: entry.toolCount } : { name, state: 'connecting' })
+        }
     for (const [key, errorClass] of failures) if (key.startsWith(prefix) && !entries.has(key)) states.push({ name: key.slice(prefix.length), state: 'failed', errorClass })
     return states.sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export function mcpLastToolCounts(agentId: string): Map<string, number> {
+    const prefix = `${agentId}\u0000`
+    const counts = new Map<string, number>()
+    for (const [key, count] of lastCounts) if (key.startsWith(prefix)) counts.set(key.slice(prefix.length), count)
+    return counts
 }

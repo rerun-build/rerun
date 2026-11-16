@@ -64,7 +64,7 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
 const { McpError } = await import('@modelcontextprotocol/sdk/types.js')
-const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, acquireMcp, closeAllMcp, mcpSessionStates, pooledMcpCount, reconnectMcp, releaseAgentMcp } = await import('./mcp-pool.js')
+const { MCP_CONNECT_TIMEOUT_MS, MCP_IDLE_MS, acquireMcp, closeAllMcp, mcpLastToolCounts, mcpSessionStates, pooledMcpCount, reconnectMcp, releaseAgentMcp } = await import('./mcp-pool.js')
 
 type Server = Parameters<typeof acquireMcp>[1]
 
@@ -359,7 +359,7 @@ describe('reconnectMcp', () => {
 describe('mcpSessionStates', () => {
     it('mcpSessionStates lists a held server as connected', async () => {
         await acquireMcp('a1', server('gh'), spawn)
-        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected' }])
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected', toolCount: 1 }])
     })
 
     it('mcpSessionStates lists a server still opening as connecting', async () => {
@@ -380,7 +380,7 @@ describe('mcpSessionStates', () => {
         mcp.hanging.clear()
         vi.useRealTimers()
         expect(await acquireMcp('a1', server('slow'), spawn)).not.toBeNull()
-        expect(mcpSessionStates('a1')).toEqual([{ name: 'slow', state: 'connected' }])
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'slow', state: 'connected', toolCount: 1 }])
     })
 
     it('mcpSessionStates lists a refused server as failed with errorClass unreachable', async () => {
@@ -396,17 +396,57 @@ describe('mcpSessionStates', () => {
         const states = mcpSessionStates('a1')
         expect(states.map(s => s.name)).toEqual(['down', 'gh'])
         for (const state of states) {
-            expect(Object.keys(state).every(k => ['name', 'state', 'errorClass'].includes(k))).toBe(true)
+            expect(Object.keys(state).every(k => ['name', 'state', 'errorClass', 'toolCount'].includes(k))).toBe(true)
             expect(['connected', 'connecting', 'failed']).toContain(state.state)
             if (state.errorClass) expect(['auth', 'timeout', 'unreachable', 'closed', 'other']).toContain(state.errorClass)
         }
         expect(JSON.stringify(states)).not.toContain('ECONNREFUSED')
     })
 
+    it('mcpSessionStates carries the tool count the server reported, before picks', async () => {
+        mcp.listed = ['a', 'b', 'c']
+        await acquireMcp('a1', server('gh', { tools: ['a'] }), spawn)
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected', toolCount: 3 }])
+    })
+
+    it('mcpSessionStates refreshes the tool count after a reconnect', async () => {
+        const handle = await acquireMcp('a1', server('gh'), spawn)
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected', toolCount: 1 }])
+        reconnectMcp('a1', 'gh')
+        mcp.listed = ['a', 'b', 'c', 'd']
+        await handle!.call('search', {})
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected', toolCount: 4 }])
+    })
+
+    it('mcpLastToolCounts keeps the last count after releaseAgentMcp and forgets it on closeAllMcp', async () => {
+        const handle = await acquireMcp('a1', server('gh'), spawn)
+        reconnectMcp('a1', 'gh')
+        mcp.listed = ['a', 'b', 'c', 'd']
+        await handle!.call('search', {})
+        releaseAgentMcp('a1')
+        expect(mcpSessionStates('a1')).toEqual([])
+        expect(mcpLastToolCounts('a1').get('gh')).toBe(4)
+        expect(mcpLastToolCounts('a2').size).toBe(0)
+        await closeAllMcp()
+        expect(mcpLastToolCounts('a1').size).toBe(0)
+    })
+
+    it('mcpSessionStates gives no tool count to a connecting or failed server', async () => {
+        mcp.hanging.add('https://slow.example/mcp')
+        mcp.failing.add('https://down.example/mcp')
+        void acquireMcp('a1', server('slow'), spawn)
+        await acquireMcp('a1', server('down'), spawn)
+        await settle()
+        const states = mcpSessionStates('a1')
+        expect(states.map(s => s.state)).toEqual(['failed', 'connecting'])
+        for (const state of states) expect('toolCount' in state).toBe(false)
+        reconnectMcp('a1', 'slow')
+    })
+
     it('mcpSessionStates answers only the agent asked for', async () => {
         await acquireMcp('a1', server('gh'), spawn)
         await acquireMcp('a2', server('linear'), spawn)
-        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected' }])
+        expect(mcpSessionStates('a1')).toEqual([{ name: 'gh', state: 'connected', toolCount: 1 }])
         expect(mcpSessionStates('a3')).toEqual([])
     })
 })
