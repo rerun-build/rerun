@@ -33,6 +33,18 @@ class TestRoster(unittest.TestCase):
     def setUp(self):
         self.r = roster.load(TEXT)
 
+    def test_rule_or_watch_coworker_may_not_write(self):
+        for h in ("boss", "advisor", "warden", "issue_triage"):
+            d = copy.deepcopy(data())
+            d["coworkers"][h]["github"] = "writer"
+            with self.assertRaisesRegex(
+                ValueError, "coworker %s: class (rule|watch) may not have github writer" % h
+            ):
+                roster.load(json.dumps(d))
+        d = copy.deepcopy(data())
+        d["coworkers"]["brendan"]["github"] = "writer"
+        self.assertEqual(len(roster.load(json.dumps(d))["coworkers"]), 38)
+
     def test_pr73_files_map_to_areas(self):
         got = set(roster.areas(self.r, PR73))
         self.assertEqual(got, {"tests", "engine-start", "auth-secrets", "default"})

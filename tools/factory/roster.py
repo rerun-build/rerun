@@ -51,6 +51,8 @@ def load(text):
             _bad("coworker %s: unknown class %r" % (h, row["class"]))
         if row["github"] not in LEVELS:
             _bad("coworker %s: unknown github level %r" % (h, row["github"]))
+        if row["class"] in ("rule", "watch") and row["github"] == "writer":
+            _bad("coworker %s: class %s may not have github writer" % (h, row["class"]))
         if not isinstance(row["wake"], list) or not all(isinstance(w, str) for w in row["wake"]):
             _bad("coworker %s: wake must be a list of strings" % h)
 
