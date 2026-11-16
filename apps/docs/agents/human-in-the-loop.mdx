@@ -1,36 +1,49 @@
 ---
 title: "Human in the loop"
-description: "How a coworker asks you a question, requests an approval, or collects a credential."
+description: "How a coworker asks you a question, requests an approval, collects a credential, or hands you its screen."
 ---
 
-A coworker that never checks with you is a liability. Rerun gives every coworker four ways to hand a decision back, and one way to tell you something without stopping.
+A coworker that never checks with you is a liability. Rerun gives every coworker seven ways to hand a decision back, and one way to tell you something without stopping.
 
-## The four pauses
+## The pauses
 
-When a coworker uses any of these, it **stops its turn**. A card appears above the message box, you answer it, and the run continues from your reply.
+When a coworker uses any of these, it **stops its turn**. A card appears in the conversation, you answer it, and the run continues from your reply. The thread shows **Needs you** until then.
 
 <CardGroup cols={2}>
   <Card title="A question" icon="message-circle-question">
-    Several questions at once, each with suggested answers as buttons. A question can accept a single answer or let you tick every option that applies, long lists of options scroll inside the card, and you can always type something else instead.
+    Several questions at once, each with suggested answers as buttons. A question can accept a single answer or let you tick every option that applies (**Select all that apply**). You can always pick **Something else** and type, answer with your voice, or attach up to 10 files to your answer.
   </Card>
   <Card title="An approval" icon="hand">
-    A list of actions it wants to take, with the detail behind each one: the command, the target, the diff. Approve or decline per item.
+    **Approval required**: a list of actions it wants to take, with the detail behind each one, such as the command, the target or the diff. Click **Approve** or **Not now** per item, or **Explain** to decline with a reason the coworker reads.
   </Card>
   <Card title="An app" icon="link">
-    It found the integration it needs in the library and asks you to connect it. The card carries the setup form.
+    It found the integration it needs in the library and asks you to connect it. The card carries the setup form, and offers an account the [Vault](/vault) already holds.
   </Card>
   <Card title="A credential" icon="key">
-    A masked form for an API key that no app covers.
+    **Credential needed**: a masked form for an API key that no app covers. **Where to find it** links to the service's page when the coworker knows it.
+  </Card>
+  <Card title="An MCP sign-in" icon="log-in">
+    **Sign in to** an MCP server the coworker registered, so it can use its tools.
+  </Card>
+  <Card title="A browser takeover" icon="monitor">
+    **Your turn on the screen**: the coworker needs you in its browser, for a sign-in or a captcha. **Open browser** opens its browser on its computer for you to drive. Click **Done** when it can carry on, or **Skip**. What you sign in to stays in that coworker's browser.
+  </Card>
+  <Card title="A spend approval" icon="coins">
+    On Rerun Cloud, before it buys [leads, SEO or social data](/agents/configure#paid-data), the coworker shows the **Estimated total** in credits and what you have left. Click **Approve once**, **Always allow**, or **Not now**. **Add credits** shows when you are short.
   </Card>
 </CardGroup>
 
-A coworker asks one thing at a time, batching everything into a single card, so you are never facing three stacked questions.
+A coworker asks one thing at a time, batching everything into a single card, so you are never facing three stacked cards. Closing a card without answering tells the coworker you skipped it, and it carries on from there.
+
+**Always allow** on a spend approval switches on **Spend without asking** for that coworker: it stops asking before paid data, which lets its scheduled runs and delegated tasks spend while you are away. Turn it back off in **Settings** > **Capabilities**.
+
+Each pause comes from a [capability](/agents/configure#capabilities): **Ask you questions**, **Request approval**, **SuggestService**, **Ask for a credential**, **Improve itself** for the MCP sign-in, **Browser** for the takeover, and **Leads, SEO & social data** with **Request approval** for the spend. Turn the capability off and the coworker cannot pause that way.
 
 ## The secret guarantee
 
-When a coworker needs an API key, it never asks for it in the chat. It opens a masked form, and the value goes straight into the coworker's variables, on your machine.
+When a coworker needs an API key, it never asks for it in the chat. It opens a masked form, and the value goes straight into the coworker's variables, on your workspace's machine. It is never sent to the model.
 
-The coworker learns which variable name was filled and nothing else. It then references it as `${VARIABLE_NAME}` in an app config or a command, and the value resolves on your machine at run time.
+The coworker learns which variable name was filled and nothing else. It then references it as `${VARIABLE_NAME}` in an app config or a command, and the value resolves on the machine at run time.
 
 <Warning>
   Never paste a secret into the chat itself. The conversation is stored and sent to the model. A coworker that asks you to is doing it wrong: use the masked form.
@@ -40,17 +53,36 @@ The coworker learns which variable name was filled and nothing else. It then ref
 
 Separate from the pauses, a coworker can tell you something and keep working. Those arrive as notifications rather than cards.
 
-Kinds are `info`, `progress`, `done`, `error`, plus the `question`, `approval` and `connector` kinds raised by the pauses above.
+A notification is one of these kinds: `info`, something to look at, sent by the coworker's **Notify** capability; `done` and `error`, when a run finishes or fails; and `question`, `approval` and `connector`, raised by the pauses above.
 
-Everything waiting for you is collected in the coworker **To handle** tab, and in the workspace notifications panel.
+Everything waiting for you is collected in the coworker's **Threads**, under **Needs you**, and in the workspace inbox.
 
-## Delivery
+## Choose what reaches you
 
-Notifications reach you in the app and by email. Configure it from your profile menu, under **Notifications**: per kind, per channel, and separately for runs you started and runs that fired on their own.
+Open the workspace menu and click **Notifications**. The settings are yours, not the workspace's.
 
-Set the automated ones to email and leave your own conversations in-app, so a 3am approval actually finds you.
+**Notify me about** sets the rule for every coworker:
 
-Email has guardrails the app does not need. A failing schedule or webhook sends at most a few emails in real time (3 per source and 10 per recipient over 15 minutes), then folds into a single hourly digest until it recovers. When the workspace's Rerun AI budget runs out, automated runs on Rerun models pause and you get one notice, in-app plus at most one email per day, instead of one email per failure. Sandbox workspaces never receive notification emails at all; everything still arrives in-app.
+| Choice | What reaches you |
+| --- | --- |
+| **Everything** | Every run in the workspace, whoever started it |
+| **My runs and what I follow** | Runs you start, conversations you are in, coworkers you follow. Recommended, and the default |
+| **Only when I am needed** | Questions, approvals and errors in your runs. A finished run stays quiet |
+| **Nothing** | You check the inbox yourself |
+
+**Per coworker** overrides that rule for one coworker: **Default** follows your setting, **All activity** sends you every run of it, **Muted** sends nothing (the board still shows it). Set it here with **Add**, or from the bell on the coworker card, which also offers **Follow its scheduled tasks** so they reach you like your own runs. A single scheduled task or trigger has its own **Notify me** switch in its editor.
+
+**How** picks the channels:
+
+- **Toast in the app**: pops up above your inbox while Rerun is open.
+- **Sound**: only when a coworker needs you or something breaks.
+- **Email**: when a coworker needs you while you are away, one email per incident, never one per run. Coworker notification emails are paused for now: the setting is kept, and everything still arrives in the app.
+
+**Account emails** turns **Trial & billing** and **Product updates** on or off.
+
+The [desktop app](/desktop-app) shows notifications from your system, and the [iPhone app](/iphone-app) sends push notifications.
+
+When the workspace's Rerun credits for the month are used up, scheduled and triggered runs on Rerun models pause, and you get one notice instead of one per failure.
 
 ## While you are away
 
@@ -60,4 +92,4 @@ The run waits, the notification goes out, and the coworker resumes from your ans
 
 ## Reading it back
 
-A paused run shows up in [`list_runs`](/api/tools/runs#list-runs) like any other, and `output` carries the coworker last message. The card itself is answered in the app: there is no API tool for approving on someone's behalf.
+A paused run shows up in [`list_runs`](/api/tools/runs#list-runs) like any other, and `output` carries the coworker's last message. The card itself is answered in the app: there is no API tool for approving on someone's behalf.

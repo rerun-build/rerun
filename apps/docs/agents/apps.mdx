@@ -3,20 +3,27 @@ title: "Apps"
 description: "Give a coworker access to Gmail, Slack, Notion, Stripe and hundreds of other services."
 ---
 
-An app is a ready-made integration. Installing one on a coworker gives it that service tools, plus a skill explaining how to use them, plus wherever the credentials live.
+An app is a ready-made integration. Installing one on a coworker gives it that service's tools, plus a skill explaining how to use them, plus wherever the credentials live.
 
 That skill belongs to the app: it is read only, in the app as much as for the coworker and the API. See [Skills](/agents/skills#skills-an-app-installed).
 
-Apps are installed **per coworker**, not per Box and not per workspace. Two coworkers sitting side by side can each have their own Gmail connection.
+## Where apps live
+
+You sign in to an app once, in the workspace's [Vault](/vault), then pick the coworkers that use it. An app you install from a coworker goes to the Vault too, switched on for that coworker only, so the next coworker that needs it reuses the same account instead of signing in again.
+
+A coworker can hold several accounts of the same app, each with its own label (for example **Work**). A machine that runs a version of Rerun from before the Vault keeps every app per coworker.
 
 ## Install one
 
 <Tabs>
-  <Tab title="From the coworker panel">
-    Open the **Apps** tab, search the library, and click the app. Rerun tells you what it needs before you commit.
+  <Tab title="From the coworker">
+    Open the coworker card, then **Apps**. The screen lists what is **Installed**, what the Vault holds that the coworker does not have yet under **From the Vault**, each with **Add**, and the **Library**. Search with **Search apps…** or filter by category, then click an app. Rerun tells you what it needs before you commit.
   </Tab>
   <Tab title="Ask the coworker">
-    Name the service in the chat. The coworker searches the library itself and raises a setup card for you to finish. It never asks you to paste a key into the conversation.
+    Name the service in the chat. The coworker searches the library itself and raises a setup card for you to finish. When the Vault already holds an account of that app, the card offers to use it. The coworker never asks you to paste a key into the conversation.
+  </Tab>
+  <Tab title="From the Vault">
+    Open the workspace menu, then **Vault**, and add the app there. Then pick the coworkers that use it, or **Every coworker**. See [Vault](/vault#add-to-the-vault).
   </Tab>
   <Tab title="From the API">
     [`search_connectors`](/api/tools/connectors#search-connectors) then [`attach_connector`](/api/tools/connectors#attach-connector). The API declares the app; you finish the sign-in in the app.
@@ -27,13 +34,15 @@ Apps are installed **per coworker**, not per Box and not per workspace. Two cowo
 
 A service can offer several ways to connect, and you pick one at install time.
 
-| Method | What you do |
-| --- | --- |
-| **Managed** | Click sign in. Rerun brokers the OAuth and proxies the calls. Nothing to configure |
-| **OAuth** | Sign in to the service in a browser window. Rerun stores the token on your machine |
-| **API key** | Paste a key into a masked form. It goes straight to your machine |
-| **Command** | The app runs a local MCP command on your machine |
-| **None** | Nothing to connect. It works right away |
+| Method | On screen | What you do |
+| --- | --- | --- |
+| **OAuth** | **Sign in** | Sign in to the service in a secure popup. The token is stored on your workspace's machine |
+| **Managed** | **Connect** | Sign in with the service. Rerun handles the connection for you and proxies the calls. Nothing to configure |
+| **Composio** | **Connect** | Sign in through [Composio](https://composio.dev), which holds the service's token. Rerun proxies the calls |
+| **API key** | **API key** | Paste a key from the service into a masked form. It goes straight to your workspace's machine |
+| **Local command** | **Local** | The app runs a local MCP command on your workspace's machine |
+| **Workspace account** | **Workspace account** | Pick an account already connected to the workspace. This is how a [paid app](#paid-apps) is attached |
+| **None** | **Connect** | No credentials required. It works right away |
 
 ## Statuses
 
@@ -44,23 +53,44 @@ Every app on a coworker shows one of three states:
     Connected. Its tools are available to the coworker.
   </Card>
   <Card title="needs_auth" icon="circle-user">
-    Waiting for you to sign in.
+    Waiting for you to sign in. Click **Connect**.
   </Card>
   <Card title="needs_config" icon="circle-alert">
-    Waiting for a credential, or for you to pick between several ways to connect.
+    Waiting for a credential, or for you to pick between several ways to connect. Click **Configure**.
   </Card>
 </CardGroup>
 
-A coworker with an app in `needs_auth` or `needs_config` will tell you so rather than silently failing.
+A coworker with an app in `needs_auth` or `needs_config` tells you so rather than silently failing. An account the service signed out shows as **Signed out** in the Vault, where you reconnect it once for every coworker that uses it.
+
+An MCP server of your own shows a live status instead: **Connected** with its number of tools, **Sign-in needed**, or **Unreachable**.
+
+## Paid apps
+
+On Rerun Cloud, two apps are sold by the account rather than included:
+
+| App | What it does |
+| --- | --- |
+| **LinkedIn Pro** | Your coworkers prospect from your LinkedIn account. They search and read profiles, send messages and invitations and follow up, inside LinkedIn's daily limits. A reply or an accepted invitation wakes the coworker up |
+| **WhatsApp Pro** | Your coworkers answer from your WhatsApp number, with text, files and voice notes. A new message wakes the coworker up. It stays inside WhatsApp's daily limits and never writes to strangers |
+
+Each connected account takes one paid slot on your plan: see [Paid apps](/billing#paid-apps) for the price and the trial rules. Only an admin can manage paid apps.
+
+- **LinkedIn Pro** signs in with your LinkedIn email and password, or with the `li_at` session cookie for an account you open with Google or Apple. LinkedIn may ask you to approve the sign-in on your phone or to type a code. Rerun never stores your password or your cookie.
+- **WhatsApp Pro** joins your number as a linked device, the way WhatsApp Web does: scan a QR code with the phone, or type a code in WhatsApp. Your phone keeps working as usual.
+
+An account is connected once for the workspace. Once it is, its app shows under **Apps** in the workspace menu, where you add a slot, reconnect or disconnect it. A paid app is attached coworker by coworker: in the **Apps** of each coworker that should use it, open the app and pick the account under **Acts as**. Then choose under **Wake this coworker when** which events start a run: see [Automations](/agents/automations#wake-on-a-reply).
+
+A self-hosted install does not offer paid apps.
 
 ## Where credentials live
 
-Credentials go to your machine and stay there. Rerun's database keeps only a reference to the variable name, never the value.
+Credentials go to your workspace's machine and stay there. Rerun's database keeps only a reference to the variable name, never the value.
 
 That holds everywhere:
 
 - The [API](/api/tools/connectors) accepts no secret at all.
 - When a coworker needs a key, it opens a masked form. The value never enters the conversation, and the coworker only learns which variable name was filled.
+- A key you add to the [Vault](/vault#add-a-secret) as a **Secret** is read by its coworkers under its variable name, and never shown again.
 - Capturing a coworker into a [template](/templates/create) ships the variable names, never the values.
 
 <Warning>
@@ -71,8 +101,8 @@ That holds everywhere:
 
 Two ways forward.
 
-**Ask for it.** The **Apps** tab has a request form. Requests go to the Rerun team and the library grows from them.
+**Ask for it.** Under the library, click **Request an app**. Requests go to the Rerun team and the library grows from them.
 
-**Add the MCP server yourself.** Switch on expert mode, open the **MCP** tab, and register any Model Context Protocol server: HTTP, SSE or a local command, with its own headers, OAuth or environment variables. Anything with an MCP server works with Rerun today, app or not.
+**Add the MCP server yourself.** Open the coworker card, then **Apps**, then the **MCP** tab, and click **New**. Register any Model Context Protocol server: HTTP, SSE or a local command, with its own arguments, headers or environment variables. Its tools are merged as `<name>_<tool>`. To share a server between coworkers, add it to the [Vault](/vault#add-an-mcp-server) instead. Anything with an MCP server works with Rerun today, app or not.
 
-Reference a stored secret in an MCP config with `${VARIABLE_NAME}`. It resolves on your machine at run time.
+Reference a stored secret in an MCP config with `${VARIABLE_NAME}`. It resolves on your workspace's machine at run time. A secret typed straight into a field is detected, moved to the machine and replaced by a `${VARIABLE_NAME}` when you save.

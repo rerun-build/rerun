@@ -1,17 +1,28 @@
 ---
 title: "Configure a coworker"
-description: "Its prompt, its model, and what it is allowed to do."
+description: "Its prompt, its model, what it is allowed to do, and how to share or copy it."
 ---
 
-Open a coworker by clicking it on the board. The panel on the right is where everything about it lives. Most of what this page covers is in the **Settings** and **Capabilities** tabs.
+Click a coworker on the board. Its panel opens on the conversation. At the top of the panel, the pill with the coworker's name opens its **coworker card**, and the pill on the left opens its **Threads**.
 
-Some tabs only appear once you switch on **Expert mode** at the bottom of the panel rail. That is where **Capabilities**, **MCP**, **Memories** and **Logs** live.
+The card shows the coworker's name and Box, a thumbnail of its computer, and a door to each of its screens. **Share** and the bell sit at the top of the card, **Delete this coworker** at the bottom.
+
+| Screen | Tabs | What you find there |
+| --- | --- | --- |
+| **Apps** | **Apps**, **MCP** | Its [apps](/agents/apps) and its own MCP servers |
+| **Skills** | **Skills** | Its [skills](/agents/skills) |
+| **Knowledge** | **Knowledge** | What it remembers: search, add or delete a memory |
+| **Files** | **Files**, **Published** | Its [folder](/agents/data#files), and what it [published](/agents/data#publishing-a-file) |
+| **Database** | **Database** | Its [private database](/agents/data#databases) |
+| **Routines** | **Scheduled**, **Triggers** | Its [scheduled tasks and webhook triggers](/agents/automations) |
+| **Activity** | **Monitoring**, **Logs** | Runs, cost, tokens, errors and the detail of every tool call |
+| **Settings** | **General**, **Capabilities**, **Install** | Everything on this page. **Install** shows only to template authors, see [Create a template](/templates/create) |
 
 ## The soul
 
 The soul is the coworker system prompt. It is the single most important field: it defines who the coworker is, what it owns, how it works and what it must never do.
 
-Edit it in **Settings**, under **Soul (system prompt)**. It is markdown, so headings and lists are fine.
+Edit it in **Settings** > **General**, under **Soul (system prompt)**. It is markdown, so headings and lists are fine.
 
 A soul that works usually says:
 
@@ -22,81 +33,134 @@ A soul that works usually says:
 
 You do not have to write it yourself. A coworker created from a description writes its own, and you can ask it to rewrite it later.
 
+## General settings
+
+**Settings** > **General** holds:
+
+- **Name**: what you see on the board. See [Name and handle](#name-and-handle).
+- **Soul (system prompt)**: see [The soul](#the-soul).
+- **Verbosity**: how long its replies are, not how much work it does. Pick **Minimal**, **Concise**, **Normal** or **Detailed**. **Normal** is the default and adds no instruction to the prompt.
+- **Share links**: the links you created to [share the coworker](#share-a-coworker), with how many times each was used. Shown once there is one.
+- **Access**: who can use and manage the coworker, through its Box. **Manage access** changes it.
+- **Notifications**: **Choose what reaches you** opens your notification settings for this coworker. See [Human in the loop](/agents/human-in-the-loop#notifications).
+
+Click **Save changes** to save the name, the soul and the verbosity. **Delete coworker** removes it for good.
+
+A coworker your plan no longer covers stays on the board as inactive: it keeps everything, runs nothing, and its settings cannot be changed until the plan covers it again. There is no switch to turn a coworker off by hand.
+
 ## Model and provider
 
-Click the model name above the message box to change it. The picker has three sections.
+Click the model pill in the message box to change the model. The picker lists:
 
-<Tabs>
-  <Tab title="Free">
-    **Rerun** runs hosted models paid from the model credit included in your plan. No setup, no key. Pick one of three:
+- **Workspace default**, with the model it stands for. A star marks it when the coworker follows it.
+- One group per AI connection of the workspace, under its name, with what is left of its credit or of its plan beside it. Each model shows a power rating.
+- **Add a provider**, to connect a **Subscription** (**Claude Pro or Max**, **ChatGPT Plus or Pro**) or an **API key** (Anthropic, OpenAI, Google, OpenRouter, or a **Custom endpoint** for your own model), and **Manage connections**.
 
-    - **Fast** for quick, simple jobs. The cheapest on your credit.
-    - **Balanced** for everyday work. The default.
-    - **Smart** for your hardest tasks. It uses the most credit, and comes with a paid plan.
-  </Tab>
-  <Tab title="Subscription">
-    Connect the Claude or ChatGPT plan you already pay for, and your coworkers use it. Sign in once from the picker. On a ChatGPT plan, a coworker also generates and edits images with the image tool built into Codex.
-  </Tab>
-  <Tab title="API key">
-    Paste your own key for Anthropic, OpenAI, Google or OpenRouter. Or pick **Custom endpoint** to run coworkers on your own model (Ollama, LM Studio, vLLM) or any OpenAI-compatible provider. See [AI models](/self-host/models#your-own-model).
-  </Tab>
-</Tabs>
+Picking a model from the chat changes it for that conversation only. To change what the coworker runs by default, click the star next to a model (**Set as coworker default**), or pick **Workspace default** to make it follow the workspace again. Only an admin or a manager of the coworker's Box can change its default.
 
-Each model shows a power rating and its context window, so you can trade cost against capability without knowing the model names by heart.
+<Note>
+  Connecting your own subscription or API key needs an active plan or a running trial. The picker offers **Start free trial** or **Subscribe** until then.
+</Note>
 
-Picking a model from the chat changes it for that conversation only. Click **Set as default** to change it for the coworker.
+### The AI providers dialog
+
+Open the workspace menu and click **AI providers**. Only an admin can change it. The dialog lists:
+
+| Section | What it holds |
+| --- | --- |
+| **Default model** | What every coworker with no model of its own runs on. Click **Change** to pick another one |
+| **Included** | On Rerun Cloud, the **Rerun** model, paid from the monthly credit of your plan. No key, nothing to set up |
+| **Your subscriptions** | A Claude or ChatGPT plan you already pay for. Click **Add subscription** and sign in once |
+| **Your API keys** | Your own Anthropic, OpenAI, Google or OpenRouter key, or a custom endpoint. Click **Add API key** |
+
+Open a connection to rename it, sign in again or replace its key, and choose which of its models your coworkers can use. A fresh workspace has no default of its own and runs on Rerun. Removing a connection moves every coworker and automation that used it back to the workspace default.
+
+On a ChatGPT plan, a coworker also generates and edits images with the image tool built into Codex. On a self-hosted install, the models and providers are set up as described in [AI models](/self-host/models).
 
 ## Capabilities
 
-A coworker has families of tools, all switched on by default. Turn off what it has no business doing.
+**Settings** > **Capabilities** lists the families of tools the coworker can use, all switched on by default. Turn off what it has no business doing. Changes apply on the next run. Hover the info icon of a card to see the tools it includes.
 
-| Family | What it allows |
-| --- | --- |
-| `filesystem` | Read, write, edit and search files in its own workspace |
-| `shared` | The same, on the folder every coworker of the workspace shares |
-| `shell` | Run shell commands in its workspace, behind a denylist of destructive commands |
-| `web` | Fetch URLs, search the web, download files |
-| `memory` | Write durable facts and recall them later |
-| `db` | Its own private SQLite database |
-| `sharedDb` | The database shared by every coworker of the workspace |
-| `skills` | Create and edit its own skills, and read the ones an app installed |
-| `schedule` | Give itself recurring or one-off tasks |
-| `trigger` | Give itself public webhook URLs |
-| `delegate` | Spawn throwaway sub-coworkers for subtasks, up to four at once |
-| `callAgent` | Message another coworker of the workspace by its handle |
-| `browser` | Navigate JavaScript-heavy pages with a headless browser and take screenshots |
-| `vision` | Analyse images in its workspace |
-| `notify` | Ping you out of band without pausing |
-| `hub` | Search and install apps, publish files to public URLs, and search the Rerun documentation |
-| `askUser` | Ask you a question and pause until you answer |
-| `requestApproval` | Ask for your approval before a consequential action |
-| `suggestService` | Ask you to set up an app it needs |
-| `requestSecret` | Ask you for an API key through a masked form |
+| On screen | Key | What it allows |
+| --- | --- | --- |
+| **Read & write files** | `filesystem` | Read, write, edit and search files in its own folder |
+| **Shared** | `shared` | The same, on the folder every coworker of the workspace shares |
+| **Run commands** | `shell` | Run shell commands in its folder, behind a denylist of destructive commands |
+| **Browse the web** | `web` | Search the web, fetch pages, download files |
+| **Remember things** | `memory` | Write durable facts and recall them later |
+| **Access data** | `db` | Its own private SQLite database |
+| **Access shared data** | `sharedDb` | The database shared by every coworker of the workspace |
+| **Use the company brain** | `brain` | Search and read the [Brain](/brain), and propose changes you review before anything is saved |
+| **Use skills** | `skills` | Create, edit and use its skills, and propose a new one for you to approve |
+| **Schedule tasks** | `schedule` | Give itself recurring or one-off tasks |
+| **React to webhooks** | `trigger` | Give itself public webhook URLs |
+| **Delegate** | `delegate` | Hand self-contained subtasks to throwaway sub-coworkers, up to four running at a time |
+| **Work with other coworkers** | `callAgent` | Message another coworker of the workspace by its handle |
+| **See other coworkers** | `team` | Read the other coworkers' status, scheduled tasks, triggers and recent runs. It cannot change anything |
+| **See its AI providers** | `aiProviders` | See the provider and model it runs on, the other connections of the workspace, and what is left on each. It cannot change anything |
+| **Browser** | `browser` | Drive a real browser for JavaScript-heavy or bot-protected pages, take screenshots, and hand the browser to you for a sign-in or a captcha |
+| **Vision** | `vision` | Analyse images in its folder |
+| **Use its computer** | `computer` | See and drive its own screen: click, type and scroll in its browser, its files and its terminal. See [Its computer](#its-computer) |
+| **Notify** | `notify` | Ask you to look at something without pausing |
+| **Hub** | `hub` | Search and install apps, publish files to links, and search the Rerun documentation |
+| **Leads, SEO & social data** | `paidData` | Buy live data, paid from your Rerun credits. See below |
+| **Show cards in chat** | `cards` | Drop a preview of one of its tables or files in the conversation |
+| **Suggest replies** | `quickReplies` | End a message with up to three short replies you send in one click |
+| **Ask you questions** | `askUser` | Ask you a question and pause until you answer |
+| **Request approval** | `requestApproval` | Ask for your approval before a consequential action |
+| **SuggestService** | `suggestService` | Ask you to set up an app it needs |
+| **Ask for a credential** | `requestSecret` | Ask you for an API key through a masked form |
+| **Improve itself** | `self` | See [Self-improvement](#self-improvement) |
 
-See [Human in the loop](/agents/human-in-the-loop) for the last four.
+See [Human in the loop](/agents/human-in-the-loop) for the families that pause the run.
+
+### Paid data
+
+On Rerun Cloud, **Leads, SEO & social data** lets a coworker find prospects with their work emails, phone numbers and company data, check search volumes, keyword ideas and backlinks, read Google results and local businesses, and read public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit. Each call is paid from your [Rerun credits](/billing#rerun-credits). A self-hosted install does not sell paid data, so the card does not show there.
+
+Before it spends, the coworker asks you to approve an estimated cost. Switch on **Spend without asking** under the card, or click **Always allow** on a spend approval, to skip that step so scheduled runs and delegated tasks can use paid data while you are away.
 
 ## Self-improvement
 
-Separate from the capability list, and worth a deliberate decision.
+**Improve itself** is worth a deliberate decision. When it is on, three switches appear under it:
 
-| Flag | What it allows |
-| --- | --- |
-| `enabled` | The self-improvement family as a whole |
-| `allowSoulEdit` | The coworker may rewrite its own system prompt |
-| `allowToolInstall` | The coworker may install packages and register MCP servers |
-| `autoMemory` | After each conversation, the coworker reviews it and may store, update or delete a memory on its own |
+| Switch | Key | What it allows |
+| --- | --- | --- |
+| **Install tools & MCP** | `allowToolInstall` | The coworker may install packages and register MCP servers |
+| **Edit own soul** | `allowSoulEdit` | The coworker may rewrite its own system prompt |
+| **Auto-memory** | `autoMemory` | After each turn, the coworker reviews it and may store, update or delete a memory on its own |
 
-All of these are on by default. A coworker that must stay exactly as you wrote it needs `allowSoulEdit` and `allowToolInstall` off.
+All of these are on by default. A coworker that must stay exactly as you wrote it needs **Install tools & MCP** and **Edit own soul** off.
 
-## Other settings
+## Its computer
 
-**Enabled** switches the coworker off without deleting it. A switched-off coworker runs nothing and refuses calls from other coworkers.
+A coworker has a computer of its own, with a browser, a file manager and a terminal. The thumbnail on its card shows the screen, live while it works. Click it to open the desktop in a window: you can watch, or click **Take control** to drive it yourself. The coworker finds afterwards what you did there.
+
+When a coworker needs you on its screen (a sign-in, a captcha), it asks for a browser takeover: see [Human in the loop](/agents/human-in-the-loop#the-pauses).
 
 ## Name and handle
 
-The **name** is free text, the one you see. The **handle** is the key other coworkers use to call it with `@handle`.
+The **name** is free text, the one you see. The **handle** is the key other coworkers use to call it with `@handle`. Type `@` in the message box to pick a coworker.
 
-Renaming a coworker moves its handle too: the handle is re-derived from the new name, and every `@oldhandle` written into the other coworkers (prompts, skills, scheduled tasks, webhook triggers, memories) is rewritten to the new one. Set the handle on its own only when the call key should differ from the name.
+Renaming a coworker moves its handle too: the handle is re-derived from the new name, and every `@oldhandle` written into the other coworkers (souls, skills, scheduled tasks, webhook triggers, memories) is rewritten to the new one. Past conversations stay as they were. Set the handle on its own, from the API, only when the call key should differ from the name.
+
+## Duplicate a coworker
+
+Right-click a coworker on the board, or open its menu in the Simple view, and click **Duplicate**. The copy, named after the original with ` copy` at the end, lands in the same workspace. It carries everything the original has: its soul, settings and model, its skills, memories, database and files, its API keys and its connected apps, its scheduled tasks and its triggers. Its conversations stay with the original.
+
+Each trigger of the copy gets a URL of its own, and its scheduled tasks start counting from the moment of the copy. You need to manage the original's Box and be allowed to create in the target one.
+
+## Share a coworker
+
+Click **Share** on the coworker card, or in its menu on the board, to send a copy to someone outside the workspace. Pick what travels with it:
+
+- **Memories**
+- **Coworker database**, which is not scanned for secrets
+- **Workspace files**
+
+Its soul, settings, skills, scheduled tasks and triggers always travel. API keys, connected accounts and chat history never leave your workspace, whatever you pick. Files that look like they hold a credential are dropped, and apps arrive disconnected, for whoever opens the link to sign in with their own accounts. The shared database and the shared folder stay behind too: the copy starts with empty ones.
+
+Click **Create link** and send it. Anyone holding the link can add a copy of the coworker to their own board, even before they have an account, and each trigger of their copy gets a URL of its own. The link carries a snapshot taken when you created it. Revoke it from **Settings** > **General** > **Share links**: the copy it carries is deleted, and whoever already added the coworker keeps theirs.
 
 ## Doing it from the API
 

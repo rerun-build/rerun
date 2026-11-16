@@ -3,7 +3,15 @@ title: "Data and files"
 description: "Where a coworker keeps what it produces, and how you get it out."
 ---
 
-A coworker has four places to put things: its own database, the shared database, its own folder and the shared folder.
+A coworker has five places to put things: its own database, the shared database, its own folder, the shared folder, and the [Brain](/brain) of the workspace.
+
+| Place | Private to the coworker | Shared by every coworker |
+| --- | --- | --- |
+| Rows | Its database: the **Database** screen of its card | The shared database: **Brain** > **Database** |
+| Files | Its folder: the **Files** screen of its card | The shared folder: **Brain** > **Files** |
+| What the company knows | | The pages of the [Brain](/brain) |
+
+Open the Brain from the workspace menu, then **Brain**.
 
 ## Databases
 
@@ -18,9 +26,26 @@ Structured data goes in a database. It is plain SQLite, and it is the default ho
   </Card>
 </CardGroup>
 
-Browse either from the **Database** tab: the coworker panel for the private one, the **Knowledge base** dialog of the workspace menu for the shared one. You get the table list, the rows with paging, sorting and search, and a **Export** button for CSV or JSON.
+Pick a table to see its rows, with paging, sorting and **Search rows**. Select rows to delete them. The **Table actions** menu holds:
 
-You can also delete selected rows or drop a table from there.
+- **Export**, as **CSV** or **JSON**.
+- **Purge table**: removes every row and keeps the table.
+- **Delete table**: removes the table for good.
+
+Deleting rows, purging or deleting a table cannot be undone. On a coworker's database, **Purge table** and **Delete table** need an admin or a manager of its Box.
+
+### Views
+
+A table opens on **All rows**. Click **Add view** to save another way of reading it, with a **Name** and a **Layout**:
+
+| Layout | For |
+| --- | --- |
+| **Table** | Comparing values across columns |
+| **List** | Rows read by a name: people, companies, messages |
+| **Gallery** | Rows recognised by a picture: products, listings |
+| **Board** | Rows moving through statuses: a pipeline, tasks. **Group by** picks the column whose values become the board's columns |
+
+A view also picks its **Columns** (unchecked ones stay in the table, only hidden from the view), **Sort by**, and **Formats** and **Colors** for its values. Everyone who opens the table sees its views, and the coworker can draw one in the chat. Deleting a view leaves the rows untouched.
 
 ### Etiquette in the shared database
 
@@ -31,7 +56,7 @@ Every coworker of the workspace sees the same tables, so a few rules keep it usa
 - Name a table after the domain (`leads`, `invoices`), not after the coworker that made it.
 - A table has one home. Do not keep a copy in both databases.
 
-The schema view shows which coworker created each table, so ownership is never a guess.
+Rerun records which coworker created each table of the shared database, and the coworkers see it, so ownership is never a guess.
 
 ## Files
 
@@ -39,29 +64,56 @@ Files are for deliverables and scratch: a report, a chart, a PDF, an export, a p
 
 | | Reach |
 | --- | --- |
-| **The coworker workspace** | Private to one coworker. It is also the working directory of any shell command it runs |
+| **The coworker folder** | Private to one coworker. It is also the working directory of any shell command it runs |
 | **The shared folder** | Every coworker of the workspace reads and writes it. This is how coworkers hand files to each other |
 
-Browse and upload from the **Files** tab of the coworker panel, or the **Knowledge base** dialog of the workspace menu for the shared folder. Dropping a file into a coworker workspace is how you give it something to work on.
+Browse the coworker's folder on the **Files** tab of its **Files** screen, and the shared folder in **Brain** > **Files**. Drop files or folders there to upload them: dropping a file into a coworker's folder is how you give it something to work on. You can also attach files to a message, or record a voice message, from the message box.
 
 ## Publishing a file
 
-A coworker can publish any file from its workspace to a public URL.
+A coworker can publish a file from its folder, or a whole folder as a small site, to a link. You can publish one yourself from the **Files** tab with **Publish**. Ask the coworker to publish and it gives you the link: that is usually better than telling you a file is somewhere in its folder.
 
-The link looks like `https://app.rerun.build/p/<slug>` and is served to anyone who has it. Re-publishing the same file keeps the same URL, and unpublishing revokes it for real.
+Re-publishing the same file keeps the same link, and **Unpublish** stops it right away, for everyone who has it.
 
 Limits worth knowing:
 
 - 25 MB per file.
-- The file is served exactly as it is. Linked assets are not published, so an HTML page has to inline its CSS and its JavaScript.
+- A folder publishes as a site with its `index.html` as the entry page: up to 300 files and 50 MB in total.
 
-Ask the coworker to publish and it gives you the link. That is usually better than telling you a file is somewhere in its workspace.
+On Rerun Cloud, a published page is served from its own address under `rerun.site`, never from the app's.
+
+### Who can open a link
+
+Every link has an access, set in **Share settings** (**Share**: **Choose who can open this link.**):
+
+| Access | Who opens it |
+| --- | --- |
+| **Anyone with the link** | Anyone. No sign-in needed |
+| **Members** (shown with your workspace's name, such as **Acme members**) | Signed-in members of your workspace only |
+| **Anyone with the password** | Visitors type the password once |
+| **Only people you invite** | Visitors confirm their email. Invite emails or whole domains such as `@company.com` |
+
+A coworker publishes for your workspace's members unless the workspace policy lets it go further. A link that only invites people needs an install that sends email: a self-hosted server without email shows **This server sends no email**.
+
+Every link a coworker published is on the **Published** tab of its **Files** screen, and every link of the workspace in **Brain** > **Published**, with the coworker that shared it and a filter by access. From there, **Copy link**, **Share settings** or **Unpublish**.
+
+### The workspace policy
+
+An admin sets **Public links** in the workspace **Settings**:
+
+| Policy | What happens |
+| --- | --- |
+| **Only people can make a link public** | The default. Coworkers publish for the workspace's members and ask before going public: a card in the chat offers **Make public** or **Keep private** |
+| **Coworkers can make a link public** | They pick the access themselves |
+| **Nothing goes public** | Workspace, password and invited links only |
+
+Turning public links off switches every public link of the workspace to its members once you save.
 
 ## Getting data out
 
 <Columns cols={2}>
   <Card title="Export a table" icon="file-spreadsheet">
-    CSV or JSON, from the **Database** tab.
+    CSV or JSON, from the **Table actions** menu of a table.
   </Card>
   <Card title="Query it from the API" icon="code" href="/api/tools/databases">
     `db_query` and `space_db_query` return rows straight to your script.
@@ -70,4 +122,4 @@ Ask the coworker to publish and it gives you the link. That is usually better th
 
 ## Memory is not storage
 
-Memory holds facts about you and about how the work should be done, not the work itself. A preference, a name, a correction: memory. Two thousand rows of leads: the database.
+Memory holds facts about you and about how the work should be done, not the work itself. A preference, a name, a correction: memory, on the coworker's **Knowledge** screen. Two thousand rows of leads: the database. What the whole company should know: the [Brain](/brain).

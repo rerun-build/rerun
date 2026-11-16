@@ -50,19 +50,29 @@ That is why a skill can carry a long reference corpus without costing anything o
 
 <Tabs>
   <Tab title="In the app">
-    Open the coworker panel, go to the **Skills** tab, and click **New**. Write the name, the description and the body. Reference files are added from the same editor.
+    Open the coworker card, then **Skills**, and click **New**. Write the **Name**, the **Description** and the **Procedure**, then click **Create skill**. Open a skill to edit it, **Download skill**, or **Delete skill**.
+
+    To bring skills you already have, click **Upload** and pick a **Markdown file** or a **Skill folder**. Each file can be up to 10 MB; non-text files in a folder are skipped.
   </Tab>
   <Tab title="Ask the coworker">
-    Tell it what to do and to remember the procedure. It writes the skill itself, as long as the `skills` capability is on.
+    Tell it what to do and to remember the procedure. It writes the skill itself, as long as **Use skills** is on in its [capabilities](/agents/configure#capabilities).
   </Tab>
   <Tab title="From the API">
     [`upsert_skill`](/api/tools/skills#upsert-skill) writes the body and the reference files in one atomic call, and [`read_skill_file`](/api/tools/skills#read-skill-file) reads one back. This is how you version skills in a repository.
   </Tab>
 </Tabs>
 
+To run a skill on purpose, type `/` in the message box and pick it.
+
+## Skill proposals
+
+When you give a coworker a standing rule, or you finish building a flow together, it can offer to keep it as a skill. A row appears under its message with **Remember this?**: click **Remember** and the coworker writes the skill, or edits the one that already covers that ground, or click **No**. **Show details** shows what it would keep. Nothing is written until you accept.
+
+A coworker proposes the same thing once, and adds to the proposal already waiting in the conversation rather than raising a second one. Proposals need **Use skills** and **Improve itself** on.
+
 ## Skills an app installed
 
-Installing an [app](/agents/apps) puts a skill on the coworker explaining how to use that service tools. That skill belongs to the app, so it is read only everywhere: the editor opens it without a save button, the coworker's own skill tools refuse to touch it, and the API refuses too.
+Installing an [app](/agents/apps) puts a skill on the coworker explaining how to use that service's tools. That skill belongs to the app, so it carries an **App** badge and is read only everywhere: the editor opens it without a save button, the coworker's own skill tools refuse to touch it, and the API refuses too.
 
 Rewriting it would be lost at the next install, and deleting it would leave the app pointing at nothing. To change what the coworker does with a service, either reconfigure the app or write a skill of your own next to it. Uninstalling the app removes its skill with it.
 
@@ -75,7 +85,7 @@ Rewriting it would be lost at the next install, and deleting it would leave the 
 | A fact it should remember, like a preference or a name | [Memory](/concepts#memory) |
 | Reference material that is long and rarely needed | A reference file inside a skill |
 
-When you correct a coworker behaviour and the correction is a rule rather than a fact, fix the skill that governs it. A memory can be outvoted by a procedure, a procedure cannot.
+When you correct a coworker's behaviour and the correction is a rule rather than a fact, fix the skill that governs it. A memory can be outvoted by a procedure, a procedure cannot.
 
 ## Limits
 

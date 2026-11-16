@@ -3,43 +3,53 @@ title: "Automations"
 description: "Make a coworker run on a schedule, or on an event from another service."
 ---
 
-A coworker that only answers when you write to it is a chatbot. Two things make it a worker: scheduled tasks and webhook triggers.
+A coworker that only answers when you write to it is a chatbot. Two things make it a worker: scheduled tasks and webhook triggers. Both live on the coworker's **Routines** screen: open the coworker card, then **Routines**, and pick the **Scheduled** or the **Triggers** tab.
 
-Both open their own session, so an automated run never lands in the middle of your conversation, and both are fully recorded in **Monitoring** and **Logs**.
+Every automated run opens a thread of its own, so it never lands in the middle of your conversation. Open **Threads** from the pill at the top left of the coworker panel and filter on **Automations** to see them: a scheduled run opens with **Scheduled run** and the task's name (**Scheduled run · Daily digest**), a webhook run with **Webhook** and the trigger's name. Every run is also recorded on the **Activity** screen, in **Monitoring** and **Logs**.
 
 ## Scheduled tasks
 
-A scheduled task is a cron plus an instruction. When it fires, the coworker runs with no user message and follows that instruction.
+A scheduled task is a schedule plus an instruction. When it fires, the coworker runs with no user message and follows that instruction, in a fresh thread each time.
 
-Add one from the coworker **Scheduled runs** tab, or just ask the coworker to set it up.
+Click **New** on the **Scheduled** tab, or just ask the coworker to set it up.
 
 <ParamField path="Name" type="string">
-  Also decides the slug the task is addressed by.
+  Also decides the slug the task is addressed by, so it cannot be changed afterwards.
 </ParamField>
 
-<ParamField path="Instruction" type="string">
-  What the coworker does when it fires, written as if you were talking to it. This is the whole prompt for that run.
+<ParamField path="Description" type="string">
+  A short line shown in the list.
 </ParamField>
 
-<ParamField path="Cron" type="string">
-  A standard 5-field expression. `0 9 * * 1` is every Monday at 9.
+<ParamField path="When" type="schedule">
+  Click it and type in **Describe the schedule**, for example `every weekday at 8am` or `tomorrow at 3pm`, then **Update schedule**. Rerun turns it into a 5-field cron expression, or into a date for a one-off, in the timezone of your browser.
 </ParamField>
 
 <ParamField path="Timezone" type="string">
-  An IANA timezone, for example `Europe/Paris`. Set it, or the cron follows the timezone of your machine.
+  An IANA timezone, for example `Europe/Paris`. Left empty, the schedule follows the timezone of your workspace's machine.
 </ParamField>
 
-A task can also be a one-off: give it a date instead of a cron and it disables itself after it fires.
+<ParamField path="Model" type="string">
+  **Coworker default**, or a model of its own. Useful when a nightly job should run on something cheaper than your daily driver.
+</ParamField>
 
-Each task can carry its own model, which is useful when a nightly job should run on something cheaper than your daily driver. Without one, it uses the coworker default.
+<ParamField path="Task prompt" type="string">
+  What the coworker does when it fires, written as if you were talking to it. This is the whole prompt for that run.
+</ParamField>
+
+Once the task exists, its editor also shows **Enabled**, to pause it without deleting it, **Notify me**, to get a [notification](/agents/human-in-the-loop#notifications) each time it finishes, and **History**, the runs it produced.
+
+A one-off task fires once at its date, then switches itself off.
 
 <Tip>
-  Test the instruction before putting it live. **Run now** fires the task immediately, works on a disabled task, and does not touch its schedule. From the API that is [`run_schedule_now`](/api/tools/schedules#run-schedule-now).
+  Test the prompt before putting it live. **Test Run** fires the task right away, works on a disabled task, and does not touch its schedule. From the API that is [`run_schedule_now`](/api/tools/schedules#run-schedule-now).
 </Tip>
+
+While a coworker installed from a template has not finished its setup, its scheduled tasks stay off and **Test Run** stays locked: **Test Run unlocks once the setup is finished.** Finish or skip the setup in the chat first.
 
 ### Continuity between runs
 
-A scheduled run opens a fresh session every time. The coworker does not remember last Monday's conversation.
+A scheduled run opens a fresh thread every time. The coworker does not remember last Monday's conversation.
 
 What carries over is [memory](/concepts#memory) and the [database](/agents/data). If a task needs to know where it left off, tell it to write that down.
 
@@ -47,19 +57,34 @@ What carries over is [memory](/concepts#memory) and the [database](/agents/data)
 
 A trigger gives the coworker a public URL. Whoever calls it starts a run, with the caller payload attached.
 
-Add one from the **Triggers** tab. You get a URL to paste into the other service.
+Click **New** on the **Triggers** tab. Give it a **Name** (the URL is derived from it, so it cannot be changed afterwards), a **Description**, the **Accepted methods**, a **Model** and the **Trigger prompt**, then **Create trigger**. Open it again to copy the **Webhook URL** and paste it into the other service.
 
-Write the instruction as if the event had already happened:
+Write the **Trigger prompt** as if the event had already happened:
 
 > A Stripe refund event arrives. Record it in the `refunds` table and tell me if the amount is over 500.
 
-The payload lands right after your instruction, so the coworker does not have to fetch anything.
+The payload lands right after your prompt, so the coworker does not have to fetch anything.
+
+**Accepted methods** are `GET`, `POST`, `PUT`, `PATCH` and `DELETE`. A new trigger accepts `POST` only, which is what most services send. Turn on `GET` for a service that can only call a plain URL: link previews and browser visits are ignored.
 
 <Warning>
-  The URL is the credential. There is no signature and no secret header, so anyone holding it can fire your coworker. Do not paste it into a shared document or a public repository. Rotate it from the **Triggers** tab if it leaks.
+  The URL is the credential: it carries a secret, and anyone holding it can start a run. Do not paste it into a shared document or a public repository. Copying it, previewing it in a chat or opening it in a browser starts nothing. If it leaks, click **Rotate the secret**: the current URL stops working right away, and you paste the new one wherever the trigger is called from.
 </Warning>
 
-By default a trigger accepts `POST` only. See [Webhook triggers](/api/webhooks) for the full HTTP contract: methods, response codes, size limits and how link previews are filtered out.
+Like a scheduled task, a trigger has **Enabled**, **Notify me** and **History**, and its list shows how many calls it received. See [Webhook triggers](/api/webhooks) for the full HTTP contract: methods, response codes, size limits and how link previews are filtered out.
+
+### Wake on a reply
+
+On Rerun Cloud, a coworker that uses [LinkedIn Pro or WhatsApp Pro](/agents/apps#paid-apps) can start on its own when someone answers. Open the app in the coworker's **Apps** and choose under **Wake this coworker when**:
+
+| App | Event | When it fires |
+| --- | --- | --- |
+| **LinkedIn Pro** | **A message arrives** | Right away |
+| **LinkedIn Pro** | **An invitation is accepted** | Checked every few hours |
+| **LinkedIn Pro** | **An invitation is received** | Checked every few hours |
+| **WhatsApp Pro** | **A message arrives** | Right away |
+
+Rerun manages the trigger behind it (**LinkedIn events** or **WhatsApp messages**) on the **Triggers** tab. Turning every event off removes it.
 
 ### Which one to use
 
@@ -68,11 +93,12 @@ By default a trigger accepts `POST` only. See [Webhook triggers](/api/webhooks) 
 | Something every morning, every Monday, every hour | A scheduled task |
 | Something when another service says so | A trigger |
 | Something once, at a date | A one-off scheduled task |
+| Something when a prospect replies on LinkedIn or WhatsApp | A wake event of the paid app |
 | Something on demand from your own script | A trigger, or [`send_message`](/api/tools/runs#send-message) |
 
 ## Unattended runs still pause for you
 
-A coworker running at 3am can still stop and ask you a question or request an approval. The run pauses, you get notified, and it resumes from your answer whenever you give it.
+A coworker running at 3am can still stop and ask you a question or request an approval. The run pauses, you get notified, and it resumes from your answer whenever you give it. The thread shows **Needs you** until then.
 
 This is deliberate: a coworker should not skip an approval just because nobody is watching. See [Human in the loop](/agents/human-in-the-loop).
 
