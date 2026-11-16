@@ -38,6 +38,7 @@ class World:
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
         self.problems, self.reruns, self.deleted = [], [], set()
         self.commits, self.dev_runs = [], []
+        self.merge_sha = "feedface12345678"
 
     @staticmethod
     def goal_ok(goal):
@@ -165,7 +166,8 @@ class World:
                 self.unlabelled.add(int(a[2]))
             return ""
         if a[:2] == ["pr", "view"]:
-            return json.dumps({"headRefOid": HEAD, "state": self.pr_state, "mergeable": self.mergeable})
+            return json.dumps({"headRefOid": HEAD, "state": self.pr_state, "mergeable": self.mergeable,
+                               "mergeCommit": {"oid": self.merge_sha}})
         if a[:2] == ["pr", "list"]:
             return json.dumps(self.open_prs)
         if a[0] == "api" and "/compare/" in a[1]:
