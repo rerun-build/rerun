@@ -22,8 +22,10 @@ def busy(path):
             continue
         try:
             cwd = os.path.realpath(os.readlink("/proc/%s/cwd" % pid))
-        except OSError:
+        except (FileNotFoundError, PermissionError):
             continue
+        except OSError:
+            return int(pid)
         if cwd == root or cwd.startswith(root + os.sep):
             return int(pid)
     return None
@@ -63,9 +65,9 @@ def rescue(path, full, branch, left):
     return unpushed(path, full)
 
 
-def to_trash(path, repo, d):
+def to_trash(path, repo, d, prefix=""):
     os.makedirs(trash_root(), exist_ok=True)
-    dst = os.path.join(trash_root(), "%d-%s-%s" % (time.time(), repo, d))
+    dst = os.path.join(trash_root(), "%s%d-%s-%s" % (prefix, time.time(), repo, d))
     os.rename(path, dst)
     return dst
 
@@ -90,6 +92,13 @@ def github(full, issue, branch):
     return prs, it
 
 
+def settles(path, head, x):
+    sha = x.get("headRefOid")
+    if x.get("state", "").upper() not in ("MERGED", "CLOSED") or not head or not sha:
+        return False
+    return sha == head or C.M.git(["merge-base", "--is-ancestor", head, sha], cwd=path).returncode == 0
+
+
 def verdict(full, repo, d, path):
     issue, chunk = DIR.fullmatch(d).groups()
     branch = "chunk/" + d
@@ -99,7 +108,8 @@ def verdict(full, repo, d, path):
     if gh is None:
         return "UNREACHABLE", "cannot reach GitHub"
     prs, it = gh
-    settled = [x for x in prs if x.get("state", "").upper() in ("MERGED", "CLOSED")]
+    head = C.M.git(["rev-parse", "--verify", "--quiet", "HEAD"], cwd=path).stdout.strip()
+    settled = [x for x in prs if settles(path, head, x)]
     if any(x.get("state", "").upper() == "OPEN" for x in prs):
         return "KEEP", "pull request open"
     if not settled and it.get("state") != "closed":
@@ -107,7 +117,10 @@ def verdict(full, repo, d, path):
     h = age_h(path)
     if not settled and (h is None or h < MIN_AGE_H):
         return "KEEP", "younger than %d h without a closed pull request" % MIN_AGE_H
-    if C.M.git(["status", "--porcelain"], cwd=path).stdout.strip():
+    st = C.M.git(["status", "--porcelain"], cwd=path)
+    if st.returncode:
+        return "KEEP", "git status failed"
+    if st.stdout.strip():
         return "KEEP", "uncommitted changes"
     left = unpushed(path, full)
     if left is None:
@@ -131,6 +144,8 @@ def janitor(apply):
         try:
             full = F.reg_read(repo, d).get("repo") or F.repo_full(repo)
             v, why = verdict(full, repo, d, path)
+            if v == "REMOVE" and apply and busy(path):
+                v, why = "KEEP", "a process works inside"
             unreachable = unreachable or v == "UNREACHABLE"
             n[v] += 1
             if v == "REMOVE" and apply:
@@ -165,7 +180,7 @@ def empty_trash():
 
 def restore(name):
     src = os.path.join(trash_root(), name)
-    m = re.fullmatch(r"\d+-(.+)-(\d+-[a-z0-9]{1,12})", name)
+    m = re.fullmatch(r"(?:broken-)?\d+-(.+)-(\d+-[a-z0-9]{1,12})", name)
     if not m or not os.path.isdir(src):
         F.die("no trash entry %s" % name)
     dst = os.path.join(F.WT, m.group(1), m.group(2))
@@ -196,8 +211,8 @@ def check_one(full, repo, d, path, apply):
     branch = "chunk/" + d
     if C.M.git(["rev-parse", "--git-dir"], cwd=path).returncode or C.M.git(["rev-parse", "--verify", "--quiet", "HEAD"], cwd=path).returncode:
         if apply:
-            dst = to_trash(path, repo, d)
-            print("BROKEN %s/%s moved to %s" % (repo, d, os.path.basename(dst)))
+            dst = to_trash(path, repo, d, "broken-")
+            print("BROKEN %s/%s moved to %s; kept until a person removes it" % (repo, d, os.path.basename(dst)))
         else:
             print("BROKEN %s/%s" % (repo, d))
         return
@@ -240,7 +255,11 @@ def rebuild_missing(apply):
             continue
         if apply:
             info = F.api("repos/%s" % full) or {}
-            C.new(full, rec["issue"], rec["chunk"], rec.get("base"), rec.get("owner", "unknown"), info.get("default_branch", "main"), start=branch)
+            try:
+                C.new(full, rec["issue"], rec["chunk"], rec.get("base"), rec.get("owner", "unknown"), info.get("default_branch", "main"), start=branch)
+            except SystemExit:
+                print("NOT REBUILT %s/%s: `wt new` refused (the line above)" % (repo, d))
+                continue
         print("REBUILT %s/%s from the pushed branch %s" % (repo, d, branch))
 
 

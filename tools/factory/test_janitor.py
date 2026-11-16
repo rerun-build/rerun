@@ -1,4 +1,4 @@
-import fcntl, json, os, subprocess, sys, time, unittest
+import errno, fcntl, json, os, re, subprocess, sys, time, unittest
 from unittest import mock
 
 import test_factory as T
@@ -96,6 +96,7 @@ class Janitor(JanitorCase):
     def test_stash_other_branch_and_detached_head_are_rescued_to_github_first(self):
         p = self.job()
         self.merged(p)
+        self.issue = {"state": "closed"}
         T.write(p, "s.txt", "stashed\n")
         T.git(p, "add", "s.txt")
         T.git(p, "stash", "--quiet")
@@ -114,6 +115,7 @@ class Janitor(JanitorCase):
     def test_pushed_is_proved_against_github_not_the_configured_origin(self):
         p = self.job()
         self.merged(p)
+        self.issue = {"state": "closed"}
         other = os.path.join(self.tmp, "fake-origin.git")
         T.git(self.tmp, "clone", "--quiet", "--bare", self.origin, other)
         T.git(p, "remote", "set-url", "origin", other)
@@ -122,6 +124,114 @@ class Janitor(JanitorCase):
         code, out = self.run_j("janitor", "--apply")
         self.assertIn("RESCUED %s" % sha[:8], out)
         self.assertTrue(T.git(self.origin, "for-each-ref", "--contains", sha, "refs/heads/rescue/"))
+
+    def test_a_closed_pull_request_of_an_earlier_take_does_not_settle_a_folder_that_moved_on(self):
+        p = self.job()
+        take1 = self.commit(p, "take1.txt")
+        T.git(p, "push", "--quiet", "origin", "chunk/7-1")
+        self.prs = [{"number": 9, "state": "CLOSED", "headRefOid": take1}]
+        self.commit(p, "take2.txt")
+        code, out = self.run_j("janitor", "--apply")
+        self.assertIn("KEEP   rerun/7-1", out)
+        self.assertNotIn("RESCUED", out)
+        self.assertTrue(os.path.isdir(p))
+
+    def test_a_process_that_starts_inside_during_the_checks_keeps_it(self):
+        p = self.job()
+        self.merged(p)
+        real = self.J.unpushed
+
+        def arriving(path, full):
+            s = subprocess.Popen(["sleep", "30"], cwd=path)
+            self.addCleanup(s.wait)
+            self.addCleanup(s.kill)
+            return real(path, full)
+        with mock.patch.object(self.J, "unpushed", arriving):
+            code, out = self.run_j("janitor", "--apply")
+        self.assertIn("a process works inside", out)
+        self.assertTrue(os.path.isdir(p))
+
+    def test_a_process_whose_folder_cannot_be_read_counts_as_working_inside(self):
+        p = self.job()
+        self.merged(p)
+        real = os.readlink
+
+        def unreadable(q, *a, **k):
+            if q.startswith("/proc/%d/" % os.getpid()):
+                raise OSError(errno.EIO, "input/output error")
+            return real(q, *a, **k)
+        with mock.patch.object(self.J.os, "readlink", unreadable):
+            code, out = self.run_j("janitor", "--apply")
+        self.assertIn("a process works inside", out)
+        self.assertTrue(os.path.isdir(p))
+
+    def test_a_failed_git_status_keeps_it(self):
+        p = self.job()
+        self.merged(p)
+        fake = os.path.join(self.tmp, "gitstatus")
+        T.write(self.tmp, "gitstatus", "#!/bin/sh\nif [ \"$1\" = status ]; then echo 'fatal: index file corrupt' >&2; exit 128; fi\nexec git \"$@\"\n")
+        os.chmod(fake, 0o755)
+        with mock.patch.object(F, "GIT", fake):
+            code, out = self.run_j("janitor", "--apply")
+        self.assertIn("KEEP   rerun/7-1  git status failed", out)
+        self.assertTrue(os.path.isdir(p))
+
+    def unsaved_file_keeps_it(self, name):
+        p = self.job()
+        self.merged(p)
+        T.write(p, name, "unsaved\n")
+        code, out = self.run_j("janitor", "--apply")
+        self.assertIn("KEEP   rerun/7-1  uncommitted changes", out)
+        with open(os.path.join(p, name)) as f:
+            self.assertEqual(f.read(), "unsaved\n")
+
+    def test_an_uncommitted_change_keeps_it(self):
+        self.unsaved_file_keeps_it("README.md")
+
+    def test_an_untracked_file_keeps_it(self):
+        self.unsaved_file_keeps_it("new.txt")
+
+    def test_a_failed_rescue_push_keeps_it(self):
+        p = self.job()
+        self.merged(p)
+        self.issue = {"state": "closed"}
+        sha = self.commit(p, "late.txt")
+        T.write(os.path.join(self.origin, "hooks"), "pre-receive",
+                "#!/bin/sh\nwhile read o n r; do case \"$r\" in refs/heads/rescue/*) echo no >&2; exit 1;; esac; done\n")
+        os.chmod(os.path.join(self.origin, "hooks", "pre-receive"), 0o755)
+        code, out = self.run_j("janitor", "--apply")
+        self.assertIn("KEEP   rerun/7-1  commits on no GitHub branch and the rescue push failed", out)
+        self.assertTrue(os.path.isdir(p))
+        self.assertEqual(T.git(p, "rev-parse", "HEAD"), sha)
+
+    def test_a_fetch_refused_with_403_keeps_it(self):
+        p = self.job()
+        self.merged(p)
+        fake = os.path.join(self.tmp, "git403")
+        T.write(self.tmp, "git403", "#!/bin/sh\nif [ \"$1\" = fetch ]; then for a; do case \"$a\" in *github.com/*) "
+                "echo \"fatal: unable to access '$a': The requested URL returned error: 403\" >&2; exit 128;; esac; done; fi\nexec git \"$@\"\n")
+        os.chmod(fake, 0o755)
+        with mock.patch.object(F, "GIT", fake):
+            code, out = self.run_j("janitor", "--apply")
+        self.assertIn("KEEP   rerun/7-1  cannot fetch from GitHub", out)
+        self.assertTrue(os.path.isdir(p))
+
+    def test_a_refused_rebuild_does_not_stop_the_removals(self):
+        a = self.job("1")
+        self.merged(a)
+        b = self.job("2")
+        self.commit(b, "b.txt")
+        T.git(b, "push", "--quiet", "origin", "chunk/7-2")
+        import shutil
+        shutil.rmtree(b)
+        merged = self.prs
+        with mock.patch.object(F, "pr_lookup", lambda full, br: list(merged) if br == "chunk/7-1" else []), \
+                open(os.path.join(F.STATE, "jobs", "rerun-7-2.lock"), "a") as lk:
+            fcntl.flock(lk, fcntl.LOCK_EX)
+            code, out = self.run_j("janitor", "--apply")
+        self.assertIn("NOT REBUILT rerun/7-2", out)
+        self.assertIn("REMOVE rerun/7-1", out)
+        self.assertFalse(os.path.exists(a))
 
     def test_github_unreachable_keeps_everything_and_says_so_after_three_passes(self):
         p = self.job()
@@ -176,6 +286,22 @@ class Doctor(JanitorCase):
         self.assertIn("REBUILT rerun/7-1 from the pushed branch chunk/7-1", out)
         self.assertEqual(T.git(p, "rev-parse", "HEAD"), sha)
         self.assertEqual(len(self.trash()), 1)
+
+    def test_a_broken_folder_with_unpushed_work_stays_in_the_trash_until_a_person_removes_it(self):
+        p = self.job()
+        sha = self.commit(p, "unpushed.txt")
+        os.remove(os.path.join(p, ".git", "HEAD"))
+        code, out = self.run_j("doctor", "--apply")
+        self.assertIn("kept until a person removes it", out)
+        [entry] = self.trash()
+        old = re.sub(r"\d+", str(int(time.time() - 25 * 3600)), entry, count=1)
+        os.rename(os.path.join(self.J.trash_root(), entry), os.path.join(self.J.trash_root(), old))
+        self.run_j("janitor", "--apply")
+        self.assertEqual(self.trash(), [old])
+        code, out = self.run_j("restore", old)
+        self.assertEqual(code, 0, out)
+        T.write(os.path.join(p, ".git"), "HEAD", "ref: refs/heads/chunk/7-1\n")
+        self.assertEqual(T.git(p, "rev-parse", "HEAD"), sha)
 
     def test_a_merged_job_is_not_rebuilt(self):
         p = self.job()
