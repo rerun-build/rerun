@@ -36,3 +36,5 @@ echo "== 4/4 restart"
 docker compose up -d
 docker compose ps
 docker image prune -f
+echo "== keeper"
+sh deploy/vps/keeper.sh install || echo "keeper install failed: the copy installed before stays"
