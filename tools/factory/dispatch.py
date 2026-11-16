@@ -16,6 +16,7 @@ import renewal
 import resolver
 import sifter
 import slots
+import tiers
 import snapshot
 import states
 import store as ledger_store
@@ -27,6 +28,7 @@ RUNNING = states.RUNNING
 END = states.END
 BACK = states.BACK
 GOALS = states.GOALS
+STATION_OF = {"building": "build", "fixing": "fix", "reviewing": "review", "proving": "proof"}
 WAIT_STATES = states.WAIT_STATES
 LOST_BEATS = 3
 RECONCILE_BEATS = 10
@@ -715,8 +717,19 @@ class Dispatcher:
             j["replan_run"] = j["run"]
             self.save(j, "re-plan %d of %d sent" % (n, MAX_REPLANS))
 
+    def tier_job(self, j, state):
+        j.pop("tier", None)
+        try:
+            tier = tiers.tier_for(STATION_OF.get(state), tiers.size_of(j.get("body")), self.cfg.get("tiers"))
+        except ValueError as e:
+            log(j["issue"], "no tier written: %s" % e)
+            return
+        if tier is not None:
+            j["tier"] = tier
+
     def send(self, j, agent, step, message, state, copy=1):
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
+        self.tier_job(j, state)
         j["intent_at"] = iso(self.now())
         j["fire_id"] = self.store.intent(str(j["issue"]), "", step, coworker=self.names.get(agent, agent), at=j["intent_at"])
         self.save(j, step)
