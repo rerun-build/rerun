@@ -1158,6 +1158,18 @@ class Dispatcher:
                            "Merge dev into your branch (no rebase, no force push), resolve the conflicts, run the test files you touched, push.")
         return True
 
+    def lint_red(self, runs):
+        for r in runs:
+            if r.get("name") != "Factory tools" or r.get("conclusion") != "failure" or not r.get("id"):
+                continue
+            try:
+                jobs = json.loads(self.gh(["api", "repos/%s/actions/runs/%s/jobs" % (self.repo, r["id"])])).get("jobs") or []
+                if any(s.get("name") == "Lint" and s.get("conclusion") == "failure" for jb in jobs for s in jb.get("steps") or []):
+                    return True
+            except Exception:
+                continue
+        return False
+
     def checks(self, j):
         if self.conflicts(j):
             return
@@ -1168,6 +1180,7 @@ class Dispatcher:
         runs = data.get("workflow_runs") or []
         verdict, why = checks_verdict(runs)
         if verdict == "FAIL":
+            self.note_failures(j, ["ci red after push"] + (["lint red after push"] if self.lint_red(runs) else []), "building", why)
             if j.get("checks_fixed"):
                 return self.end(j, "failed", why)
             return self.to(j, "fix_wait", why + "; back to the builder once", checks_fixed=True, same_round=True,

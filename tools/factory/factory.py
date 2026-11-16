@@ -10,6 +10,7 @@ MIN_FREE_GB = 30
 LOAD_PER_CPU = 3.0
 MAX_BUILDERS = None
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import ciwait
 import cutshape
 try:
     import limits
@@ -809,6 +810,47 @@ def has_heads(text, heads):
     return [h for h in heads if h not in text]
 
 
+PREFLIGHT_LINE_S = 900
+
+
+def preflight_lines(top, body):
+    import redgreen
+    for line in redgreen.run_lines(body):
+        try:
+            r = subprocess.run(["bash", "-c", line], cwd=top, capture_output=True, text=True, errors="replace", timeout=PREFLIGHT_LINE_S)
+            code, out = r.returncode, r.stdout + r.stderr
+        except subprocess.TimeoutExpired:
+            code, out = 124, "timed out after %d s" % PREFLIGHT_LINE_S
+        if code == 127:
+            print("not run on this server: " + line)
+        elif code:
+            die("the Run line `%s` fails here (exit %d), nothing is pushed. Its last lines:\n%s" % (line, code, "\n".join(out.splitlines()[-20:])))
+        else:
+            print("Run line passed: " + line)
+
+
+def preflight_lint(top, changed):
+    if not any(f.startswith("tools/factory/") and f.endswith(".py") for f in changed):
+        return
+    wf = os.path.join(top, ".github", "workflows", "factory-tools.yml")
+    pin = re.search(r"ruff==([0-9][0-9.]*)", open(wf).read()) if os.path.isfile(wf) else None
+    uvx = os.environ.get("FACTORY_UVX") or "/data/tools/bin/uvx"
+    if not pin:
+        print("lint not run: no ruff==<version> in .github/workflows/factory-tools.yml")
+        return
+    if not shutil.which(uvx):
+        print("lint not run: %s is not on this server" % uvx)
+        return
+    try:
+        r = run([uvx, "ruff==" + pin.group(1), "check", "tools/factory"], cwd=top, check=False, timeout=PREFLIGHT_LINE_S)
+        code, out = r.returncode, r.stdout + r.stderr
+    except subprocess.TimeoutExpired:
+        code, out = 124, "timed out after %d s" % PREFLIGHT_LINE_S
+    if code:
+        die("ruff==%s check tools/factory finds this (exit %d), nothing is pushed. Its last lines:\n%s" % (pin.group(1), code, "\n".join(out.splitlines()[-40:])))
+    print("lint passed: ruff==%s check tools/factory" % pin.group(1))
+
+
 def cmd_pr_open(a):
     if "--template" in a:
         print(PR_TEMPLATE)
@@ -837,16 +879,25 @@ def cmd_pr_open(a):
     got = api("repos/%s/issues/%s" % (full, issue))
     if got is None:
         die("could not read issue #%s to check the change against its **Files**. Try again." % issue)
+    plan = (got.get("body") or "") if isinstance(got, dict) else ""
     if isinstance(got, dict) and "number" in got:
         paths = cutshape.parse(got)["paths"]
         if paths:
             out = [f for f in changed if not any(f == p or f.startswith(p.rstrip("/") + "/") or fnmatch.fnmatchcase(f, p) for p in paths)]
             if out:
                 die("files outside the **Files** of issue #%s: %s. Take them out of the change, or end with BLOCKED: plan: <why>." % (issue, ", ".join(out)))
-    ex = json.loads(run([GH, "pr", "list", "-R", full, "--head", branch, "--state", "open", "--json", "number,url"]).stdout or "[]")
+    ex = json.loads(run([GH, "pr", "list", "-R", full, "--head", branch, "--state", "open", "--json", "number,url,headRefOid"]).stdout or "[]")
     if ex:
         if "--fix" not in a:
             die("PR already open: %s. To push a fix for red CI use `pr-open --fix`." % ex[0]["url"])
+        head = ex[0].get("headRefOid") or ""
+        runs = api("repos/%s/actions/runs?head_sha=%s&per_page=100" % (full, head))
+        pending = ciwait.unfinished((runs.get("workflow_runs") or []) if isinstance(runs, dict) else [])
+        if pending:
+            die("a workflow run of the pull request's head %s is not finished (%s). One CI run per head: wait for it with `ci-wait %s %s`, then push once."
+                % (head[:7], ciwait.pending_text(pending), short(full), ex[0]["number"]))
+        preflight_lines(top, plan)
+        preflight_lint(top, changed)
         if clone:
             try:
                 os.remove(marker(short(full), branch))
@@ -869,7 +920,9 @@ def cmd_pr_open(a):
     miss = has_heads(body, PR_HEADS)
     if miss:
         die("the handoff note lacks: %s. Template: pr-open --template" % ", ".join(miss))
-    body = "Job: %s#%s, chunk %s\n\n%s" % (full, issue, chunk, body)
+    preflight_lines(top, plan)
+    preflight_lint(top, changed)
+    body ="Job: %s#%s, chunk %s\n\n%s" % (full, issue, chunk, body)
     tmp = os.path.join(STATE, "prbody-%d.md" % os.getpid())
     open(tmp, "w").write(body)
     run([GIT, "push", "--quiet", "-u", "origin", branch], cwd=top)
