@@ -105,6 +105,8 @@ type ForemanChatLayerProps = {
     framed?: boolean
     /** Ce qui porte la hauteur naturelle de la pile, que la sheet mobile mesure. */
     onStackElement?: (element: HTMLElement | null) => void
+    /** The column is folded away: the welcome orb is out of sight and stops moving. */
+    orbPaused?: boolean
     className?: string
 }
 
@@ -115,7 +117,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -201,9 +203,9 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
             <AnimatePresence>
                 {greeting &&
                     (gated ? (
-                        <ForemanWelcome key="gate" title={t('gateTitle')} subtitle={t('gateSubtitle')} />
+                        <ForemanWelcome key="gate" title={t('gateTitle')} subtitle={t('gateSubtitle')} orbPaused={orbPaused} />
                     ) : (
-                        <ForemanWelcome key="welcome" thinking={streaming} />
+                        <ForemanWelcome key="welcome" thinking={streaming} orbPaused={orbPaused} />
                     ))}
                 {intake && <ForemanIntakeHeader key="intake" intake={intake} arrival={arrival} />}
             </AnimatePresence>
@@ -232,7 +234,7 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                         {restoring && <ForemanChatSkeleton />}
                         {threadBranches(threadRows.leading)}
                         {empty && !greeting && !restoring && !intake ? (
-                            <ForemanTeamEmptyStateSlot onSend={onSuggestion} onPrefill={onPrefill} />
+                            <ForemanTeamEmptyStateSlot onSend={onSuggestion} onPrefill={onPrefill} orbPaused={orbPaused} />
                         ) : (
                             visible.flatMap((message, index) => [
                                 <FloatingMessage

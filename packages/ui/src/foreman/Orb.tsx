@@ -1,7 +1,7 @@
 'use client'
 
-import { useAnimationFrame, useReducedMotion } from 'motion/react'
-import { type RefObject, useMemo, useRef, useState } from 'react'
+import { useReducedMotion } from 'motion/react'
+import { type RefObject, useEffect, useMemo, useRef, useState } from 'react'
 
 import { cn } from '../cn'
 import { useOnScreen } from '../iso-grid/hooks/useOnScreen'
@@ -76,15 +76,7 @@ export function Orb({ state = 'idle', size, onClick, label, paused = false, gaze
     const still = reducedMotion || paused || !onScreen
 
     // Rien ne passe par un re-render : la boucle n'écrit qu'un `transform` sur les yeux et le visage.
-    useAnimationFrame((_, deltaMs) => {
-        if (still) {
-            // Une boule figée en plein tour resterait sans visage.
-            if (!clockRef.current.atRest) {
-                faceRef.current?.setAttribute('transform', foremanFacePose(rest.yaw, rest.pitch))
-                clockRef.current.atRest = true
-            }
-            return
-        }
+    const step = (deltaMs: number) => {
         const dt = Math.min(deltaMs / 1000, 0.05)
         const tuning = tuningRef.current
         const clock = clockRef.current
@@ -132,7 +124,38 @@ export function Orb({ state = 'idle', size, onClick, label, paused = false, gaze
         const pitch = clock.pitch + tilt * drift + Math.sin(clock.nod) * tuning.nod * DEGREES
         faceRef.current?.setAttribute('transform', foremanFacePose(yaw, pitch))
         clock.atRest = false
+    }
+    const stepRef = useRef(step)
+    const restRef = useRef(rest)
+    useEffect(() => {
+        stepRef.current = step
+        restRef.current = rest
     })
+
+    // Une boucle à soi plutôt que `useAnimationFrame` de motion : celle-ci reste inscrite tant que la
+    // boule est montée, et une boule figée, cachée ou hors écran faisait encore produire au navigateur
+    // une image par rafraîchissement d'écran. Celle-ci s'arrête vraiment. Même pas de temps que motion :
+    // 1/60 s à la première image, puis l'écart réel borné entre 1 et 40 ms.
+    useEffect(() => {
+        if (still) return
+        let frame = 0
+        let last: number | null = null
+        const loop = (time: number) => {
+            const deltaMs = last === null ? 1000 / 60 : Math.max(Math.min(time - last, 40), 1)
+            last = time
+            stepRef.current(deltaMs)
+            frame = requestAnimationFrame(loop)
+        }
+        frame = requestAnimationFrame(loop)
+        return () => {
+            cancelAnimationFrame(frame)
+            // Une boule figée en plein tour resterait sans visage.
+            if (clockRef.current.atRest) return
+            const rest = restRef.current
+            faceRef.current?.setAttribute('transform', foremanFacePose(rest.yaw, rest.pitch))
+            clockRef.current.atRest = true
+        }
+    }, [still])
 
     const Root = onClick ? 'button' : 'span'
     const inset = -size * FOREMAN_BALL_FRAME.inset

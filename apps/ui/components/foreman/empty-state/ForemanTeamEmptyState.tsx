@@ -30,16 +30,18 @@ type ForemanTeamEmptyStateProps = {
     now: number
     onSend?: (text: string) => void
     onPrefill?: (text: string) => void
+    /** The column is folded away: its orb is out of sight and stops moving. */
+    orbPaused?: boolean
     className?: string
 }
 
-export function ForemanTeamEmptyState({ model, now, onSend, onPrefill, className }: ForemanTeamEmptyStateProps) {
+export function ForemanTeamEmptyState({ model, now, onSend, onPrefill, orbPaused, className }: ForemanTeamEmptyStateProps) {
     const run = (action: TeamEmptyStateAction) => (action.type === 'send' ? onSend : onPrefill)?.(action.text)
 
     return (
         <div className={cn('my-auto flex flex-col items-center gap-4 p-4 text-center', SHORT_STACK, className)}>
             <div className={SHORT_HIDDEN}>
-                <Orb size={WELCOME_ORB_SIZE} />
+                <Orb size={WELCOME_ORB_SIZE} paused={orbPaused} />
             </div>
             <div className="space-y-1">
                 <h3 className="text-sm font-medium text-balance text-foreground">{model.title}</h3>

@@ -15,7 +15,8 @@ const EASE = [0.22, 1, 0.36, 1] as const
  * trois allers-retours et du premier token. L'orbe porte l'attente, elle n'a pas besoin d'être
  * cliquable ici, celle du composer reste la seule cible.
  */
-export function ForemanWelcome({ thinking, title, subtitle }: { thinking?: boolean; title?: string; subtitle?: string }) {
+// `orbPaused`: the column is folded away, its orb is out of sight and stops moving.
+export function ForemanWelcome({ thinking, title, subtitle, orbPaused }: { thinking?: boolean; title?: string; subtitle?: string; orbPaused?: boolean }) {
     const t = useTranslations('foreman.welcome')
     const reducedMotion = useReducedMotion()
     const enter = (delay: number) => ({
@@ -31,7 +32,7 @@ export function ForemanWelcome({ thinking, title, subtitle }: { thinking?: boole
             transition={reducedMotion ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' }}
         >
             <motion.div {...enter(0)}>
-                <Orb size={WELCOME_ORB_SIZE} state={thinking ? 'thinking' : 'idle'} />
+                <Orb size={WELCOME_ORB_SIZE} state={thinking ? 'thinking' : 'idle'} paused={orbPaused} />
             </motion.div>
 
             {/* La salutation ne s'adresse qu'au tunnel, et c'est le seul endroit d'où cet accueil

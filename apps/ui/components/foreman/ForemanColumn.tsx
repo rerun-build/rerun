@@ -513,6 +513,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                         {/* General keeps one key whatever id it gets from the server: only a thread slides. */}
                         <PanelSteps stepKey={inThread ? sessionId : 'general'} depth={inThread ? 1 : 0}>
                             <ForemanChatLayer
+                                orbPaused={!open}
                                 messages={messages}
                                 streaming={busy}
                                 guided={guided}
