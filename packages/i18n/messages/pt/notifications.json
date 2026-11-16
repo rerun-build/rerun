@@ -24,6 +24,17 @@
                 "waiting_human": "Aguardando"
             }
         },
+        "peek": {
+            "close": "Fechar",
+            "openConversation": "Abrir conversa",
+            "showMore": "Mostrar mais",
+            "showLess": "Mostrar menos",
+            "sent": "Enviado para {agent}",
+            "stale": "Este pedido já foi respondido.",
+            "openToAnswer": "Abra a conversa para responder.",
+            "busy": "{agent} ainda está trabalhando. Tente de novo em instantes.",
+            "failed": "Sua resposta não foi enviada. Tente de novo."
+        },
         "markAll": {
             "title": "Marcar tudo como lido?",
             "description": "{count, plural, one {# item vai sair} other {# itens vão sair}} desta lista. Pedidos ainda aguardando resposta também são removidos, sem resposta.",

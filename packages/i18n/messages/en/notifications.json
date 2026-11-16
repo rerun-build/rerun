@@ -42,6 +42,17 @@
                 "waiting_human": "Waiting"
             }
         },
+        "peek": {
+            "close": "Close",
+            "openConversation": "Open conversation",
+            "showMore": "Show more",
+            "showLess": "Show less",
+            "sent": "Sent to {agent}",
+            "stale": "This was already answered.",
+            "openToAnswer": "Open the conversation to answer.",
+            "busy": "{agent} is still working. Try again in a moment.",
+            "failed": "Your answer did not go through. Try again."
+        },
         "markAll": {
             "title": "Mark everything as read?",
             "description": "{count, plural, one {# item} other {# items}} will leave this list. Requests still waiting on an answer are cleared too, without being answered.",

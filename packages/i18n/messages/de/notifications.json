@@ -24,6 +24,17 @@
                 "waiting_human": "Wartet"
             }
         },
+        "peek": {
+            "close": "Schließen",
+            "openConversation": "Unterhaltung öffnen",
+            "showMore": "Mehr anzeigen",
+            "showLess": "Weniger anzeigen",
+            "sent": "An {agent} gesendet",
+            "stale": "Diese Anfrage wurde bereits beantwortet.",
+            "openToAnswer": "Öffne die Unterhaltung, um zu antworten.",
+            "busy": "{agent} arbeitet noch. Versuch es gleich noch einmal.",
+            "failed": "Deine Antwort wurde nicht gesendet. Versuch es noch einmal."
+        },
         "markAll": {
             "title": "Alles als gelesen markieren?",
             "description": "{count, plural, one {# Eintrag verlässt} other {# Einträge verlassen}} diese Liste. Anfragen, die noch auf eine Antwort warten, werden ebenfalls entfernt, ohne beantwortet zu werden.",

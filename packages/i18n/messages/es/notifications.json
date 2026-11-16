@@ -24,6 +24,17 @@
                 "waiting_human": "En espera"
             }
         },
+        "peek": {
+            "close": "Cerrar",
+            "openConversation": "Abrir conversación",
+            "showMore": "Mostrar más",
+            "showLess": "Mostrar menos",
+            "sent": "Enviado a {agent}",
+            "stale": "Esta solicitud ya tiene respuesta.",
+            "openToAnswer": "Abre la conversación para responder.",
+            "busy": "{agent} todavía está trabajando. Vuelve a intentarlo en un momento.",
+            "failed": "Tu respuesta no se envió. Vuelve a intentarlo."
+        },
         "markAll": {
             "title": "¿Marcar todo como leído?",
             "description": "{count, plural, one {# elemento saldrá} other {# elementos saldrán}} de esta lista. Las solicitudes que siguen esperando respuesta también se borran, sin responderse.",
