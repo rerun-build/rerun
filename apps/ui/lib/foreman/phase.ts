@@ -69,6 +69,15 @@ export type ForemanProfile = {
     // Where the trial was started. The app starts every trial without a card, whatever the arm of the
     // trial test, so the test's table leaves those workspaces out.
     trialStartedIn?: ForemanClient
+    // The onboarding dialog: the invitation step went by, sent or skipped.
+    inviteAt?: string
+    // The link they arrived on, written once at their first signed-in page. A template or a shared
+    // coworker skips the questions and is installed once the box is claimed; a prompt is carried to
+    // the handoff.
+    arrival?: { kind: 'template' | 'share' | 'prompt'; ref: string; at: string }
+    // The Chief of Staff on the box opened its first conversation. Once per workspace: a second admin
+    // gets no second welcome.
+    handoffAt?: string
 }
 
 // What this person asked to have taken off their hands, whichever era their profile was written in.
@@ -124,6 +133,10 @@ export function foremanPhase({ foreman, onboardingCompletedAt, entitled, trialin
     // Once the team is built the funnel is over for good. Without this the owner who deletes their
     // last agent would be walked through the build phase again.
     if (foreman.firstRunAt) return owesProfile ? 'discover' : 'companion'
+
+    // A workspace of the onboarding dialog writes its profile but no plan, and its first coworker may
+    // come from the board or the library rather than a build: an old app must not keep it in `plan`.
+    if (foreman.profileAt && !foreman.plan && entitled && agentCount > 0) return 'companion'
 
     // The pool is empty: whatever step they stand on, nothing past this point is worth a token
     // until a machine can be claimed. Before `discover` on purpose, so a brand-new account is

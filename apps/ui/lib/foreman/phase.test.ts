@@ -73,6 +73,14 @@ describe('foremanPhase', () => {
         expect(foremanPhase({ ...fresh, foreman: { ...planned, firstRunAt: 'now' }, entitled: true, agentCount: 2 })).toBe('companion')
     })
 
+    // A workspace of the onboarding dialog: a profile, a subscription, a coworker put down from the
+    // board instead of a build. An old app reading it must not keep it in `plan`.
+    it('lets a profiled, paying workspace with a coworker and no plan go to the companion', () => {
+        expect(foremanPhase({ ...fresh, foreman: profiled, entitled: true, agentCount: 1 })).toBe('companion')
+        expect(foremanPhase({ ...fresh, foreman: profiled, entitled: true })).toBe('plan')
+        expect(foremanPhase({ ...fresh, foreman: profiled, agentCount: 1 })).toBe('plan')
+    })
+
     // The funnel is for a first arrival. Everyone already running was, before this existed, talking
     // to the companion, and must keep talking to it.
     it('never pulls a working workspace into the funnel', () => {

@@ -1,4 +1,5 @@
 import { ENGINE_WAITLIST_MESSAGE, startCardlessTrial } from '@/ee/services/billing.service'
+import { countLegacyOnboardingCall } from '@/lib/onboarding/legacy-routes'
 import { ApiError, apiRoute } from '@/app/api/v1/_lib/api-route'
 import { appPlatformOf } from '@/app/api/v1/_lib/client-platform'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
@@ -12,6 +13,7 @@ export const dynamic = 'force-dynamic'
 // test, since the app sells nothing. The answer only says whether the workspace is now on; the build
 // itself is the next turn of the onboarding conversation.
 export const POST = apiRoute({ auth: 'admin' }, async ({ req, ctx }): Promise<ForemanTrialResult> => {
+    countLegacyOnboardingCall(req, 'v1_trial', ctx.userId)
     const platform = appPlatformOf(req)
     const alreadyOn = isSubscriptionEntitled(ctx.workspace.subscription_status)
     let entitled: boolean

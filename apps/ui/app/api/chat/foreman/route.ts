@@ -22,6 +22,7 @@ import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
 import { prepareScript, runScript } from '@/lib/foreman/scripted'
 import { foremanActiveTools, foremanTools } from '@/lib/foreman/tools'
 import { createForemanTurn } from '@/lib/foreman/turn'
+import { countLegacyOnboardingCall } from '@/lib/onboarding/legacy-routes'
 
 // The onboarding foreman. Unlike /api/chat, which only proxies a box engine's stream, the loop runs
 // here: there is no machine yet to run it on, since the build is what claims one. It walks the
@@ -65,6 +66,7 @@ export async function POST(req: Request): Promise<Response> {
     // Un anonyme n'a que la carte d'accueil, qui ne passe pas par ici : le Foreman ne parle qu'à un
     // compte.
     if (ctx.authUser.is_anonymous) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    countLegacyOnboardingCall(req, 'chat_foreman_post', ctx.userId)
     if (await isPhoneStepPending(ctx.supabase, ctx.userId)) return Response.json({ error: PHONE_REQUIRED_MESSAGE }, { status: 403 })
 
     const apiKey = foremanHubApiKey()
@@ -215,13 +217,14 @@ export async function POST(req: Request): Promise<Response> {
     return createUIMessageStreamResponse({ stream })
 }
 
-export async function GET(): Promise<Response> {
+export async function GET(req: Request): Promise<Response> {
     let ctx: Awaited<ReturnType<typeof requireWorkspaceContext>>
     try {
         ctx = await requireWorkspaceContext()
     } catch {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    countLegacyOnboardingCall(req, 'chat_foreman_get', ctx.userId)
 
     // A conversation that cannot be read is not an error the column can act on: it opens empty.
     const conversation = await loadForemanConversation(ctx, 'hub').catch(err => {

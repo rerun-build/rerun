@@ -6,6 +6,8 @@ vi.mock('@rerun/cloud/edition', () => ({
         return edition.cloud
     },
 }))
+const release = vi.hoisted(() => ({ at: null as string | null }))
+vi.mock('@/lib/onboarding/facts', () => ({ onboardingReleasedAt: () => release.at }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), ensureWorkspaceEngine: vi.fn() }))
 
 import { ensureWorkspaceEngine, findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
@@ -23,6 +25,34 @@ describe('resolveForemanSurface', () => {
 
     afterEach(() => {
         edition.cloud = true
+        release.at = null
+    })
+
+    describe('once the onboarding dialog is out', () => {
+        const dialog = { phase: 'plan' as const, foreman: { profileAt: '2026-12-02T10:00:00Z' }, onboardingCompletedAt: null, workspaceCreatedAt: '2026-12-02T09:00:00Z' }
+
+        beforeEach(() => {
+            release.at = '2026-12-01T00:00:00Z'
+        })
+
+        it('gives a workspace of the dialog nobody to talk to until its box is claimed', async () => {
+            expect(await resolveForemanSurface(7, dialog, signedIn)).toBe('none')
+        })
+
+        it('hands it to the Chief of Staff on its box, whatever the hub phase says', async () => {
+            vi.mocked(findWorkspaceEngine).mockResolvedValue({ instanceId: 'box-1' } as never)
+            expect(await resolveForemanSurface(7, dialog, signedIn)).toBe('engine')
+        })
+
+        it('never claims the compose engine for it: its claiming step does', async () => {
+            edition.cloud = false
+            expect(await resolveForemanSurface(7, { ...dialog, phase: 'companion' }, signedIn)).toBe('none')
+            expect(ensureWorkspaceEngine).not.toHaveBeenCalled()
+        })
+
+        it('keeps a workspace from before the release on the hub onboarding', async () => {
+            expect(await resolveForemanSurface(7, { ...dialog, foreman: {}, workspaceCreatedAt: '2026-11-20T00:00:00Z' }, signedIn)).toBe('onboarding')
+        })
     })
 
     it('keeps every step of the onboarding on the hub without asking the pool', async () => {

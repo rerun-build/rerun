@@ -256,6 +256,9 @@ export interface AnalyticsEventMap {
     // The build the app runs once the plan is confirmed. `error` is a build that threw before
     // returning anything; `failed` counts the agents that could not be created in a build that did.
     onboarding_team_built: { agents: number; failed: number; error: boolean }
+    // A call to a route of the hub's onboarding, which the onboarding dialog replaced. `mobile` carries
+    // a bearer token. Zero mobile calls for 14 days is one condition of removing them.
+    legacy_onboarding_route_called: { route: 'chat_foreman_post' | 'chat_foreman_get' | 'v1_intake' | 'v1_industry' | 'v1_trial' | 'v1_lead'; client: 'web' | 'mobile' }
     first_agent_created: { template: string }
     agent_run_started: { agent_id: string }
     // A chat run that ended, captured by the hub when the engine reports it, so it counts whether or

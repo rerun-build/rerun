@@ -1,13 +1,25 @@
 import 'server-only'
 
 import { ensureWorkspaceEngine, findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
+import { onboardingReleasedAt } from '@/lib/onboarding/facts'
+import { isLegacyWorkspace } from '@/lib/onboarding/step'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import type { ForemanState } from './phase'
 import { foremanSurface, type ForemanSurface } from './surface'
 
+type SurfaceState = Pick<ForemanState, 'phase'> & Partial<Pick<ForemanState, 'foreman' | 'onboardingCompletedAt' | 'workspaceCreatedAt'>>
+
+// A workspace of the onboarding dialog talks to the Chief of Staff on its box, once the dialog has
+// claimed one. The others keep the hub's onboarding.
+function walksTheDialog(state: SurfaceState): boolean {
+    if (!state.foreman) return false
+    return !isLegacyWorkspace({ createdAt: state.workspaceCreatedAt ?? null, onboardedAt: state.onboardingCompletedAt ?? null, foreman: state.foreman }, onboardingReleasedAt())
+}
+
 // `canClaim` is false for an anonymous visitor: their workspace is thrown away with them, so it must
 // never be the one the compose engine lands on.
-export async function resolveForemanSurface(workspaceId: number, state: Pick<ForemanState, 'phase'>, { canClaim }: { canClaim: boolean }): Promise<ForemanSurface> {
+export async function resolveForemanSurface(workspaceId: number, state: SurfaceState, { canClaim }: { canClaim: boolean }): Promise<ForemanSurface> {
+    if (walksTheDialog(state)) return (await findWorkspaceEngine(workspaceId)) ? 'engine' : 'none'
     if (state.phase !== 'companion') return 'onboarding'
     return foremanSurface(state.phase, await hasEngine(workspaceId, canClaim))
 }
