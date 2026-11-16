@@ -19,9 +19,11 @@ class Publish(unittest.TestCase):
         git(wt, "remote", "add", "origin", bare)
         for k, v in (("user.name", "t"), ("user.email", "t@x")):
             git(wt, "config", k, v)
-        open(os.path.join(wt, "a.txt"), "w").write("1")
+        with open(os.path.join(wt, "a.txt"), "w") as f:
+            f.write("1")
         git(wt, "add", "."); git(wt, "commit", "-qm", "base")
-        open(os.path.join(wt, "a.txt"), "w").write("2")
+        with open(os.path.join(wt, "a.txt"), "w") as f:
+            f.write("2")
         calls = []
         sha = publish.publish(wt, 71, "C6e: x", "dev", lambda *a: calls.append(a) or "url", ["a.txt"])
         self.assertEqual(git(bare, "rev-parse", "factory/job-71"), sha)
@@ -61,4 +63,37 @@ class Publish(unittest.TestCase):
         calls = []
         with self.assertRaises(ValueError):
             publish.publish(wt, 71, "t", "dev", lambda *a: calls.append(a), ["a.txt"])
+        self.assertEqual((calls, git(wt, "rev-list", "--count", "HEAD"), git(bare, "branch")), ([], "1", ""))
+
+    def _repo(self):
+        d = tempfile.mkdtemp()
+        bare, wt = os.path.join(d, "r.git"), os.path.join(d, "wt")
+        git(d, "init", "-q", "--bare", "-b", "dev", bare)
+        git(d, "init", "-q", "-b", "dev", wt)
+        git(wt, "remote", "add", "origin", bare)
+        for k, v in (("user.name", "t"), ("user.email", "t@x")):
+            git(wt, "config", k, v)
+        with open(os.path.join(wt, "a.txt"), "w") as f:
+            f.write("1")
+        git(wt, "add", "."); git(wt, "commit", "-qm", "base")
+        return bare, wt
+
+    def test_a_staged_rename_of_declared_paths_is_published(self):
+        bare, wt = self._repo()
+        git(wt, "mv", "a.txt", "b.txt")
+        calls = []
+        sha = publish.publish(wt, 71, "t", "dev", lambda *a: calls.append(a), ["a.txt", "b.txt"])
+        self.assertEqual(git(bare, "rev-parse", "factory/job-71"), sha)
+        self.assertEqual(git(bare, "ls-tree", "--name-only", "factory/job-71"), "b.txt")
+        self.assertEqual(len(calls), 1)
+
+    def test_a_declared_path_never_created_is_refused_before_anything(self):
+        bare, wt = self._repo()
+        with open(os.path.join(wt, "a.txt"), "w") as f:
+            f.write("2")
+        calls = []
+        with self.assertRaises(ValueError) as ctx:
+            publish.publish(wt, 71, "t", "dev", lambda *a: calls.append(a), ["a.txt", "nope.txt"])
+        self.assertIn("never created", str(ctx.exception))
+        self.assertIn("nope.txt", str(ctx.exception))
         self.assertEqual((calls, git(wt, "rev-list", "--count", "HEAD"), git(bare, "branch")), ([], "1", ""))
