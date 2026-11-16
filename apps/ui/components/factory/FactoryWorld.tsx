@@ -155,7 +155,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     )
 }
 
-const TONES: Partial<Record<MetricKey, string>> = { building: 'text-amber-500', review: 'text-emerald-500', checks: 'text-sky-500', shipped: 'text-green-500' }
+const TONES: Partial<Record<MetricKey, string>> = { building: 'text-amber-500', review: 'text-emerald-500', checks: 'text-sky-500', solvedGreen: 'text-green-500' }
 
 function Metric({ def, value }: { def: MetricDef; value: MetricValues[MetricKey] }) {
     return (
