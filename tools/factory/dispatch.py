@@ -163,7 +163,7 @@ def replan_brief(j, repo, n):
         '',
         'Do three things:',
         '1. Read the issue against today\'s dev in a throwaway checkout.',
-        '2. Add a `**Corrections**` block to the issue with `- ` bullets, and run each changed Run line once.',
+        '2. Add a `**Corrections**` block to the issue with `- ` bullets, and run each changed Run line once. A new or changed Run line is written inside the `**Run**` block itself, not only in Corrections: the red-before-green check reads only that block.',
         '3. Put the issue back in the queue: `/data/tools/bin/gh issue edit %s -R %s --add-label factory --remove-label factory-blocked`' % (j["issue"], repo),
         '',
         'If the reason is not true on today\'s dev, say so in a comment and relabel unchanged.',
