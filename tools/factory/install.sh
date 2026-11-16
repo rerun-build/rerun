@@ -31,6 +31,9 @@ if [ -z "$VERSION" ]; then
     sed "s#/data/tools/factory#$PREFIX/factory#g" "$w" > "$PREFIX/bin/$n"
     chmod 755 "$PREFIX/bin/$n"
   done
+  SHA=$(git -C "$HERE" rev-parse HEAD 2>/dev/null || echo unknown)
+  printf '%s %s\n' "$SHA" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > "$PREFIX/.factory-installed.tmp"
+  mv "$PREFIX/.factory-installed.tmp" "$PREFIX/factory-installed"
   echo "installed $(ls "$PREFIX/bin" | wc -l) wrappers into $PREFIX/bin"
   exit 0
 fi

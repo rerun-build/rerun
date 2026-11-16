@@ -47,6 +47,9 @@ CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:.*\n)*?.*
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 MAX_TAKES = 3
+INBOX = "Factory follow-ups inbox"
+INBOX_BODY = ("The factory dispatcher writes every reviewer follow-up note here as a comment, one comment per review, "
+              "instead of opening a new issue for each note. Read the comments, act on the notes worth doing, and keep this issue open.")
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
              "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
@@ -206,7 +209,7 @@ def review_brief(j, pr, head):
         '',
         'The checks of this commit may still be running. Do not wait for them and do not block on them: the dispatcher merges only when every check of this exact commit is green. Your verdict is on the diff alone, also where your own rules say a review needs green checks.',
         '',
-        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block. Write each follow-up note in your final message as its own line `Follow-up: <one sentence>`; the dispatcher opens one issue per line.',
+        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block. A finding about this change belongs in your verdict, not in a follow-up. Write a finding that is not about this change in your final message as its own line `Follow-up: <one sentence>`; the dispatcher keeps each line in the follow-ups inbox for classification and opens no issue for it.',
         '',
         NO_COMMENTS_REVIEW,
         '',
@@ -373,6 +376,7 @@ class Dispatcher:
         self.report_logged = set()
         self.started = now()
         self.names = pools.names(cfg)
+        self.tiers_off = False
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
         self.control = control.Control(cfg, gh, self.store)
@@ -478,18 +482,37 @@ class Dispatcher:
         got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
         return got[1] if got else None
 
+    def inbox(self):
+        rows = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--search", INBOX + " in:title",
+                                   "--json", "number,title", "--limit", "20"]))
+        n = next((r["number"] for r in rows if r.get("title") == INBOX), None)
+        if n is None:
+            n = int(self.gh(["issue", "create", "-R", self.repo, "--title", INBOX, "--body", INBOX_BODY]).strip().rsplit("/", 1)[1])
+        self.store.set("-", "inbox", n)
+        return str(n)
+
     def follow_ups(self, j, out):
         done = list(j.get("followups") or [])
-        for key, title, body in followups.notes(out, "#%s" % j["issue"]):
-            if key in done:
-                continue
-            try:
-                self.gh(["issue", "create", "-R", self.repo, "--title", title, "--body", body])
-            except Error as e:
-                log(j["issue"], "follow-up issue not opened: %s" % e)
-                continue
-            done.append(key)
         j["followups"] = done
+        new = {}
+        for key, title, body in followups.notes(out, "#%s" % j["issue"]):
+            if key not in done:
+                new.setdefault(key, "%s\n\n%s" % (title, body))
+        if not new:
+            return
+        text = "\n\n".join(["From #%s, pull request #%s:" % (j["issue"], j.get("pr"))] + list(new.values()))
+        kept = self.store.get_all("-").get("inbox")
+        try:
+            try:
+                self.gh(["issue", "comment", kept or self.inbox(), "-R", self.repo, "--body", text])
+            except Exception:
+                if not kept:
+                    raise
+                self.gh(["issue", "comment", self.inbox(), "-R", self.repo, "--body", text])
+        except Exception as e:
+            log(j["issue"], "follow-ups not written to the inbox: %s" % e)
+            return
+        done.extend(new)
 
     def to(self, j, state, msg, **kw):
         if not states.allowed(j["state"], state):
@@ -783,7 +806,7 @@ class Dispatcher:
             return
         if tier is not None:
             j["tier"] = tier
-        if run_model is not None:
+        if run_model is not None and not self.tiers_off:
             j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
@@ -1265,6 +1288,19 @@ class Dispatcher:
         elif kept:
             holds.clear(self.store, "sign-in renewal")
 
+    def tier_floor(self):
+        floor = self.cfg.get("tier_floor")
+        off = False
+        if floor:
+            m = digest.measures(self.store, self.now())
+            first = m["firstPassYield"]
+            off = first is not None and round(m["mergedPerHour"] * 24) >= floor["min_merged"] and first < floor["yield"]
+            if off and not self.tiers_off:
+                log("-", "tier models off: first-pass yield %.2f under %s" % (first, floor["yield"]))
+        if self.tiers_off and not off:
+            log("-", "tier models on")
+        self.tiers_off = off
+
     def once(self):
         self.heartbeat()
         self.renewal_hold()
@@ -1298,6 +1334,11 @@ class Dispatcher:
             clean = False
             log("-", "dev result: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
+        try:
+            self.tier_floor()
+        except Exception as e:
+            clean = False
+            log("-", "tier floor: %s" % (e if isinstance(e, Error) else type(e).__name__))
         for j in self.jobs():
             try:
                 if j["state"] not in END:

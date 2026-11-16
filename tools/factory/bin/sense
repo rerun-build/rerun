@@ -1,0 +1,2 @@
+#!/bin/sh
+FACTORY_CMD=sense exec python3 -I /data/tools/factory/sense.py "$@"

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { FACTORY_SNAPSHOT_MAX_BYTES, factoryDepartmentSchema, factoryEpicKindSchema, factoryJobStateSchema, factorySnapshotSchema } from '@rerun/contracts'
+import { FACTORY_SNAPSHOT_MAX_BYTES, factoryDepartmentSchema, factoryDigestSchema, factoryEpicKindSchema, factoryJobStateSchema, factorySnapshotSchema } from '@rerun/contracts'
 
 const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')
@@ -260,5 +260,73 @@ describe('factorySnapshotSchema', () => {
     it('refuses an unknown key inside runStats or plan', () => {
         expect(ok({ ...sample(), runStats: { ...runStats(), extra: 1 } })).toBe(false)
         expect(ok({ ...sample(), plan: { ...plan(), extra: 1 } })).toBe(false)
+    })
+})
+
+describe('factoryMachineSchema', () => {
+    const machine = () => ({
+        fileMadeAt: '2026-11-16T10:00:00Z',
+        fileAgeS: 42,
+        fresh: true,
+        engine: 'running',
+        skippedTicks: 0,
+        readings: [
+            { name: 'cpu', value: 12.5, reason: null, source: 'keeper' },
+            { name: 'disk', value: 'ok', reason: null, source: 'factory' },
+            { name: 'queue', value: null, reason: 'no reading', source: 'dispatcher' },
+        ],
+        housekeeping: [{ cmd: 'prune', rc: 0, s: 2 }],
+    })
+    const ok = (v: unknown) => factorySnapshotSchema.safeParse({ ...sample(), machine: v }).success
+
+    it('accepts a snapshot without machine, and one with machine in the snapshot and in the digest', () => {
+        expect(factorySnapshotSchema.safeParse(sample()).success).toBe(true)
+        const r = factorySnapshotSchema.safeParse({ ...sample(), machine: machine() })
+        expect(r.success).toBe(true)
+        if (!r.success) return
+        expect(r.data.machine?.readings).toHaveLength(3)
+        expect(r.data.machine?.readings.map(x => x.source)).toEqual(['keeper', 'factory', 'dispatcher'])
+        expect(r.data.machine?.readings[2].value).toBeNull()
+        expect(factoryDigestSchema.pick({ machine: true }).parse({ machine: machine() }).machine?.fileAgeS).toBe(42)
+    })
+
+    it('accepts a stale file whose every value is unknown', () => {
+        const stale = {
+            fileMadeAt: null,
+            fileAgeS: null,
+            fresh: false,
+            engine: 'unknown',
+            skippedTicks: 0,
+            readings: [{ name: 'cpu', value: null, reason: 'stale', source: 'keeper' }],
+            housekeeping: [],
+        }
+        const r = factorySnapshotSchema.safeParse({ ...sample(), machine: stale })
+        expect(r.success).toBe(true)
+        if (!r.success) return
+        expect(r.data.machine?.fresh).toBe(false)
+        expect(r.data.machine?.fileAgeS).toBeNull()
+        expect(r.data.machine?.engine).toBe('unknown')
+    })
+
+    it('refuses an unknown key, an unknown source and a long value at every level of machine', () => {
+        expect(ok({ ...machine(), extra: 1 })).toBe(false)
+        const m1 = machine(); Object.assign(m1.readings[0], { extra: 1 })
+        expect(ok(m1)).toBe(false)
+        const m2 = machine(); Object.assign(m2.housekeeping[0], { extra: 1 })
+        expect(ok(m2)).toBe(false)
+        const m3 = machine(); m3.readings[0].source = 'model'
+        expect(ok(m3)).toBe(false)
+        const m4 = machine(); m4.readings[0].value = 'x'.repeat(65)
+        expect(ok(m4)).toBe(false)
+        expect(ok(machine())).toBe(true)
+    })
+
+    it('caps readings at 200 and housekeeping at 10', () => {
+        const reading = machine().readings[0]
+        const hk = machine().housekeeping[0]
+        expect(ok({ ...machine(), readings: Array(200).fill(reading) })).toBe(true)
+        expect(ok({ ...machine(), readings: Array(201).fill(reading) })).toBe(false)
+        expect(ok({ ...machine(), housekeeping: Array(10).fill(hk) })).toBe(true)
+        expect(ok({ ...machine(), housekeeping: Array(11).fill(hk) })).toBe(false)
     })
 })

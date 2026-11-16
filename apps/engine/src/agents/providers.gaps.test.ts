@@ -299,6 +299,12 @@ describe('resolveModel on the claude subscription', () => {
         expect(resolved.contextUsage?.()).toBeUndefined()
     })
 
+    it('routes a bridged tool called by its bare name to the prefixed tool', () => {
+        const tools = { shell_exec: tool({ description: 'run', inputSchema: z.object({ command: z.string() }), execute: async () => 'ok' }) }
+        resolveModel(agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 't' }), undefined, tools)
+        expect(claudeCalls[0]!.defaultSettings.toolAliases).toEqual({ shell_exec: 'mcp__rerun__shell_exec' })
+    })
+
     it('opens no built-in at all for an agent without the web', () => {
         const agent = agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 't' })
         agent.config.tools.web = false
