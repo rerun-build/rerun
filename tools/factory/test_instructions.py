@@ -83,6 +83,7 @@ class InstructionsTests(unittest.TestCase):
         self.assertEqual(instructions.verdict(out), ("accept", "VERDICT: ACCEPT"))
         self.assertEqual(instructions.verdict("VERDICT: REJECT: too wide")[0], "reject")
         self.assertEqual(instructions.verdict("nothing")[0], None)
+        self.assertIsNone(instructions.verdict("VERDICT: ACCEPT\nVERDICT: maybe")[0])
 
 
 if __name__ == "__main__":

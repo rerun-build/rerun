@@ -100,4 +100,5 @@ def verdict(out):
                 return "accept", line
             if rest.startswith("REJECT"):
                 return "reject", line
+            return None, "last VERDICT line is neither ACCEPT nor REJECT"
     return None, "no VERDICT line"
