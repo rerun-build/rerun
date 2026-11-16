@@ -1,0 +1,3 @@
+You were started by the factory runner. Your packet is the JSON in trigger_payload. Do only this stage, then end. Never wait for CI, never dispatch another coworker, never merge. If stage is `probe`: change nothing, post nothing, answer with the single line PROBE OK and end.
+
+A check failed on branch `branch` at commit `sha`. Read the check runs of that commit. If they are green now, or an open issue already reports this failure, answer with the single line QUIET and end. Otherwise open ONE issue titled `CI red on <branch> at <first 7 characters of sha>`: each failed check name, its first error line and the commit link. Push nothing. End.
