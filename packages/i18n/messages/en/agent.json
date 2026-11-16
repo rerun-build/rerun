@@ -1038,12 +1038,19 @@
             "kpiCost": "Total cost",
             "kpiTokens": "Total tokens",
             "kpiErrorRate": "Error rate",
+            "kpiFailureRate": "Failure rate",
             "runsOverTime": "Runs over time",
+            "failureOverTime": "Failure rate over time",
             "costOverTime": "Cost over time",
             "avgDuration": "Avg run duration",
             "runsByModel": "Runs by model",
             "topTools": "Top tool calls",
             "toolErrors": "Tool errors"
+        },
+        "definitions": {
+            "about": "What {title} counts",
+            "kpiErrorRate": "The share of runs that stopped on an error, such as a provider or tool failure, a cut connection or an engine restart; runs still going count in the total.",
+            "kpiFailureRate": "The share of runs that did not get the job done: they ended in an error, were cancelled, missed their goal, or ended on a BLOCKED: or ESCALATE: line; runs still going count in the total."
         },
         "tokenUsage": {
             "title": "Token usage",

@@ -921,12 +921,19 @@
             "kpiCost": "Gesamtkosten",
             "kpiTokens": "Tokens gesamt",
             "kpiErrorRate": "Fehlerquote",
+            "kpiFailureRate": "Fehlschlagquote",
             "runsOverTime": "Ausführungen im Zeitverlauf",
+            "failureOverTime": "Fehlschlagquote im Zeitverlauf",
             "costOverTime": "Kosten im Zeitverlauf",
             "avgDuration": "Ø Ausführungsdauer",
             "runsByModel": "Ausführungen nach Modell",
             "topTools": "Häufigste Tool-Aufrufe",
             "toolErrors": "Tool-Fehler"
+        },
+        "definitions": {
+            "about": "Was {title} zählt",
+            "kpiErrorRate": "Der Anteil der Ausführungen, die mit einem Fehler endeten, etwa durch einen Anbieter- oder Werkzeugfehler, eine abgebrochene Verbindung oder einen Neustart der Engine; laufende Ausführungen zählen zur Gesamtzahl.",
+            "kpiFailureRate": "Der Anteil der Ausführungen, die ihre Aufgabe nicht erledigt haben: Sie endeten mit einem Fehler, wurden abgebrochen, verfehlten ihr Ziel oder endeten mit einer Zeile BLOCKED: oder ESCALATE:; laufende Ausführungen zählen zur Gesamtzahl."
         },
         "tokenUsage": {
             "title": "Token-Nutzung",
