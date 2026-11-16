@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import type { ReactNode } from 'react'
+import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu'
@@ -23,20 +23,22 @@ type SidebarBoxSectionProps = {
     onToggle: () => void
     onDialog: (kind: BoxDialogKind) => void
     renderTile: (agent: IsoAgent) => ReactNode
+    // Dragging the list: the section moves by its header, and lights up while a coworker hovers it.
+    drag?: { ref: Ref<HTMLElement>; style: CSSProperties; handle: HTMLAttributes<HTMLDivElement>; dragging: boolean; target: boolean }
 }
 
 /** One Box in the Simple view's list: its name, folded or not, then its coworkers. */
-export function SidebarBoxSection({ box, members, collapsed, onToggle, onDialog, renderTile }: SidebarBoxSectionProps) {
+export function SidebarBoxSection({ box, members, collapsed, onToggle, onDialog, renderTile, drag }: SidebarBoxSectionProps) {
     const t = useTranslations('workspaceView.list')
     const tMenu = useTranslations('builder.contextMenu')
     const label = box.name?.trim() || tMenu('untitledBox')
     const waiting = members.some(agent => !agent.disabledAt && agent.status === 'waiting_human')
 
     return (
-        <section aria-label={label}>
+        <section ref={drag?.ref} style={drag?.style} aria-label={label} className={cn('rounded-lg transition-colors', drag?.dragging && 'opacity-40', drag?.target && 'bg-accent/40 ring-1 ring-border')}>
             <ContextMenu>
                 <ContextMenuTrigger asChild>
-                    <div className="group relative flex h-8 items-center rounded-md transition-colors hover:bg-accent/60">
+                    <div {...drag?.handle} className="group relative flex h-8 items-center rounded-md transition-colors outline-none hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring/50">
                         <button type="button" aria-expanded={!collapsed} onClick={onToggle} className="flex h-full min-w-0 flex-1 items-center gap-1.5 pr-8 pl-2 text-left text-xs font-medium text-muted-foreground">
                             <ChevronDownIcon className={cn('size-3 shrink-0 transition-transform', collapsed && '-rotate-90')} />
                             <span className="truncate">{label}</span>

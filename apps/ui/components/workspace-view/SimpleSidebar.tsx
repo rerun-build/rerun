@@ -18,7 +18,8 @@ import { DeleteSpaceDialog } from '@/components/dialogs/DeleteSpaceDialog'
 import { RenameBoxDialog } from '@/components/dialogs/RenameBoxDialog'
 import { CoworkerTile, type CoworkerTileActions } from '@/components/workspace-view/CoworkerTile'
 import { ForemanTile } from '@/components/workspace-view/ForemanTile'
-import { type BoxDialogKind, SidebarBoxSection } from '@/components/workspace-view/SidebarBoxSection'
+import { SidebarBoxList } from '@/components/workspace-view/SidebarBoxList'
+import type { BoxDialogKind } from '@/components/workspace-view/SidebarBoxSection'
 import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { accountLabel } from '@/lib/auth/placeholder-email'
@@ -136,17 +137,13 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                             }
                         />
                     ) : (
-                        sections.map(({ box, members }) => (
-                            <SidebarBoxSection
-                                key={box.id}
-                                box={box}
-                                members={members}
-                                collapsed={collapsed.includes(box.id)}
-                                onToggle={() => toggleBox(box.id)}
-                                onDialog={kind => setBoxDialog({ kind, boxId: box.id })}
-                                renderTile={(agent: IsoAgent) => <CoworkerTile agent={agent} preview={previews[agent.id]} viewerId={user?.id ?? null} selected={agent.id === selectedAgentId} unseen={unseenAgents.has(agent.id)} onOpen={() => onOpenCoworker(agent.id)} actions={actionsFor(agent.id)} />}
-                            />
-                        ))
+                        <SidebarBoxList
+                            sections={sections}
+                            collapsed={collapsed}
+                            onToggle={toggleBox}
+                            onDialog={(kind, boxId) => setBoxDialog({ kind, boxId })}
+                            renderTile={(agent: IsoAgent) => <CoworkerTile agent={agent} preview={previews[agent.id]} viewerId={user?.id ?? null} selected={agent.id === selectedAgentId} unseen={unseenAgents.has(agent.id)} onOpen={() => onOpenCoworker(agent.id)} actions={actionsFor(agent.id)} />}
+                        />
                     )}
                 </div>
             </nav>
