@@ -1,8 +1,8 @@
 import type { FactorySnapshot } from '@rerun/contracts'
 
 export type MetricKey =
-    | 'queued' | 'building' | 'review' | 'checks' | 'shipped'
-    | 'runs' | 'totalTokens' | 'cachedShare' | 'avgDuration' | 'errorRate'
+    | 'queued' | 'building' | 'review' | 'checks' | 'solvedGreen'
+    | 'tokensPerIssue' | 'escaped' | 'totalTokens' | 'cachedShare' | 'avgDuration' | 'errorRate'
     | 'planWeek' | 'signIn'
 
 export type MetricGroup = 'jobs' | 'runs' | 'plan'
@@ -14,9 +14,10 @@ export const METRICS: MetricDef[] = [
     { key: 'building', group: 'jobs', label: 'Building', definition: 'Builds and fixes running now, every copy counted.', source: 'ledger: jobs building or fixing' },
     { key: 'review', group: 'jobs', label: 'Review', definition: 'Reviews running now.', source: 'ledger: jobs reviewing' },
     { key: 'checks', group: 'jobs', label: 'Checks', definition: 'Approved pull requests waiting for their workflow runs.', source: 'ledger: jobs in checks' },
-    { key: 'shipped', group: 'jobs', label: 'Shipped', definition: 'Pull requests merged into dev today.', source: 'ledger: merges since 00:00 UTC' },
-    { key: 'runs', group: 'runs', label: 'Runs', definition: 'Runs started today by the factory coworkers.', source: 'started today, from the ledger runs of the snapshot' },
-    { key: 'totalTokens', group: 'runs', label: 'Tokens', definition: 'Total tokens of the runs started today.', source: 'started today, from the ledger runs of the snapshot' },
+    { key: 'solvedGreen', group: 'jobs', label: 'Solved green', definition: 'Issues solved and committed green to main in the last 24 hours.', source: 'digest: bar.day.solvedGreen' },
+    { key: 'tokensPerIssue', group: 'jobs', label: 'Tokens per issue', definition: 'Tokens spent per issue solved green in the last 24 hours.', source: 'digest: bar.day.tokensPerIssue' },
+    { key: 'escaped', group: 'jobs', label: 'Escaped', definition: 'Issues that reached main and then failed in the last 24 hours.', source: 'digest: bar.day.escaped' },
+    { key: 'totalTokens', group: 'runs', label: 'Tokens', definition: 'Total tokens used by the factory coworkers today.', source: 'started today, from the ledger runs of the snapshot' },
     { key: 'cachedShare', group: 'runs', label: 'Cached', definition: 'Share of input tokens read from the cache.', source: 'stats: cachedInputTokens / inputTokens, 24h' },
     { key: 'avgDuration', group: 'runs', label: 'Avg run', definition: 'Average duration of a run.', source: 'stats: runs, avgDurationMs, 24h' },
     { key: 'errorRate', group: 'runs', label: 'Errors', definition: 'Share of runs that ended in error.', source: 'stats: runs, errorRate, 24h' },
@@ -59,8 +60,9 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
                 building: { text: String(counts.building) },
                 review: { text: String(counts.review) },
                 checks: { text: String(counts.checks) },
-                shipped: { text: String(counts.merged) },
-                runs: { text: String(runs) },
+                solvedGreen: { text: String(counts.merged) },
+                tokensPerIssue: { text: '0.8M' },
+                escaped: { text: '0' },
                 totalTokens: { text: `${(runs * 0.31).toFixed(1)}M` },
                 cachedShare: { text: '87%', fill: 87 },
                 avgDuration: { text: '2m 41s' },
@@ -70,19 +72,16 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
             },
         }
     }
+    const day = snapshot.digest?.bar?.day
     const inStates = (...states: string[]) => String(snapshot.jobs.filter(j => states.includes(j.state)).length)
-    let runCount = 0
     let tokens = 0
     let known = 0
     let cacheInput = 0
     let cacheHits = 0
-    let anyRuns = false
     for (const job of snapshot.jobs) {
         if (!job.runs) continue
-        anyRuns = true
         for (const r of job.runs) {
             if (!sameLocalDay(Date.parse(r.startedAt), now)) continue
-            runCount++
             if (r.cacheRead !== undefined) {
                 cacheInput += r.tokensIn
                 cacheHits += r.cacheRead
@@ -100,8 +99,9 @@ export function barModel(input: { snapshot: FactorySnapshot | null; counts: BarC
             building: { text: inStates('building', 'fix_wait', 'fixing') },
             review: { text: inStates('review_wait', 'reviewing', 'proof_wait', 'proving') },
             checks: { text: inStates('checks') },
-            shipped: { text: String(snapshot.endedToday.merged) },
-            runs: anyRuns ? { text: String(runCount) } : { ...NO_DATA },
+            solvedGreen: day ? { text: String(day.solvedGreen) } : { ...NO_DATA },
+            tokensPerIssue: day && day.tokensPerIssue !== null ? { text: tokenText(Math.round(day.tokensPerIssue)) } : { ...NO_DATA },
+            escaped: day ? { text: String(day.escaped), warn: day.escaped > 0 } : { ...NO_DATA },
             totalTokens: known > 0 ? { text: tokenText(tokens) } : { ...NO_DATA },
             cachedShare: cacheInput > 0 ? cachedShareValue(cacheHits, cacheInput) : { ...NO_DATA },
             avgDuration: { ...NO_DATA },
