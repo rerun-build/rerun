@@ -20,6 +20,7 @@ const { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, foremanBriefSchema } = await impo
 const { migrate } = await import('../db/migrate.js')
 const { ensureForeman } = await import('./foreman.js')
 const { getAgent } = await import('./registry.js')
+const { offersQuickReplies } = await import('./quick-replies-stream.js')
 const { createAgent } = await import('./factory.js')
 const { listAgentIndex } = await import('../db/repos/agents.js')
 const { buildTools } = await import('../tools/registry.js')
@@ -98,12 +99,26 @@ describe('foreman', () => {
         expect(names).not.toContain('brain_propose')
     })
 
-    it('keeps nothing of its own between conversations', async () => {
+    it('keeps its own memory, database, skills, schedules and triggers, and sees the team', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['memory_write', 'skill_create', 'schedule_create', 'trigger_create', 'db_query', 'notify_user', 'suggest_service', 'request_secret', 'soul_update', 'install_complete']) expect(names).not.toContain(name)
+        expect(names).toEqual(expect.arrayContaining(['memory_write', 'memory_recall', 'db_query', 'db_execute', 'skill_create', 'skill_read', 'schedule_create', 'trigger_create', 'team_status', 'notify_user']))
+    })
+
+    it('still has no paid data, computer, secrets, services, providers, hub tools or self-edit', async () => {
+        const { tools, close } = await foremanToolSet()
+        const names = Object.keys(tools)
+        await close()
+        for (const name of ['suggest_service', 'request_secret', 'soul_update', 'install_complete', 'ai_status', 'computer', 'tool_install', 'mcp_register']) expect(names).not.toContain(name)
         expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
+        const { tools: flags } = (await getAgent(FOREMAN_AGENT_ID)).config
+        expect(flags.paidData).toBe(false)
+        expect(flags.computer).toBe(false)
+    })
+
+    it('offers its answers as quick replies', async () => {
+        expect(offersQuickReplies((await getAgent(FOREMAN_AGENT_ID)).config)).toBe(true)
     })
 
     it('shows the files it made, without the table cards', async () => {

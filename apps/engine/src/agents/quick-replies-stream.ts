@@ -10,7 +10,7 @@ export type QuickRepliesCapture = { toolCallId: string; replies: string[] }
 export type QuickRepliesCaptureHandle = { middleware: LanguageModelMiddleware; read: () => QuickRepliesCapture | undefined }
 
 export function offersQuickReplies(config: AgentConfig): boolean {
-    return config.tools.quickReplies && !config.ephemeral && config.kind !== 'foreman'
+    return config.tools.quickReplies && !config.ephemeral
 }
 
 export function quickRepliesCall(capture: QuickRepliesCapture): { toolCallId: string; toolName: string; input: { replies: string[] } } {
