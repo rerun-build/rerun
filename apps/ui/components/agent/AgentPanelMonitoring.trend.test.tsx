@@ -43,4 +43,8 @@ describe('StatsChart trend colour', () => {
         expect(trend(points(0.1, 0.4), true)).toMatchObject({ text: expect.stringContaining('▲'), className: 'text-rose-500' })
         expect(trend(points(0.4, 0.1), true)).toMatchObject({ text: expect.stringContaining('▼'), className: 'text-emerald-500' })
     })
+
+    it('does not draw an unchanged rate red when lower is better', () => {
+        expect(trend(points(0.2, 0.2), true)).toMatchObject({ text: expect.stringContaining('0%'), className: 'text-emerald-500' })
+    })
 })
