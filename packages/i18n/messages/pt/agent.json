@@ -874,6 +874,7 @@
         "stepCount": "{count, plural, one {# passo} other {# passos}}",
         "step": "Passo {number}",
         "noSteps": "Nenhum passo registrado nesta execução.",
+        "stepsLost": "{count, plural, one {O registro de # passo se perdeu quando a execução parou.} other {O registro de # passos se perdeu quando a execução parou.}}",
         "input": "Entrada",
         "output": "Saída",
         "filters": { "running": "Em curso", "failed": "Falhadas", "done": "Concluídas" },
