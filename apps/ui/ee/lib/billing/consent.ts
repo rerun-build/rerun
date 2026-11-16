@@ -31,6 +31,14 @@ export const CREDIT_PURCHASE_CONSENT: Pick<Stripe.Checkout.SessionCreateParams, 
     custom_text: { terms_of_service_acceptance: { message: IMMEDIATE_CREDIT_NOTICE } },
 }
 
+const IMMEDIATE_LIFETIME_NOTICE =
+    'Your lifetime code is shown as soon as the payment succeeds. By continuing you ask for that immediate delivery and, if you are a consumer, you accept that your right of withdrawal ends with it.'
+
+export const LIFETIME_PURCHASE_CONSENT: Pick<Stripe.Checkout.SessionCreateParams, 'consent_collection' | 'custom_text'> = {
+    consent_collection: { terms_of_service: 'required' },
+    custom_text: { terms_of_service_acceptance: { message: IMMEDIATE_LIFETIME_NOTICE } },
+}
+
 // Selling carries obligations a buyer never signs up to (clawback on a refund, the cost of a
 // chargeback, tax duties), so the creator contract is accepted separately from the Terms. The date
 // is the version: bump it when /marketplace-terms changes materially, and every creator reaccepts on

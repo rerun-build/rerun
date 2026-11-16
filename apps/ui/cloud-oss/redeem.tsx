@@ -8,6 +8,6 @@ export function RedeemLayout({ children }: { children: React.ReactNode }) {
     return children
 }
 
-export function RedeemPage(_props: { searchParams: Promise<{ code?: string | string[] }> }): never {
+export function RedeemPage(_props: { searchParams: Promise<{ code?: string | string[]; session_id?: string | string[] }> }): never {
     notFound()
 }

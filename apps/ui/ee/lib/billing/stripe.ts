@@ -140,6 +140,12 @@ export function creditPackOncePriceId(): string {
     return id
 }
 
+export function lifetimePriceId(): string {
+    const id = process.env.STRIPE_PRICE_LIFETIME
+    if (!id) throw new Error('No Stripe price configured for the lifetime deal (set STRIPE_PRICE_LIFETIME)')
+    return id
+}
+
 export function idOf(value: string | { id: string } | null | undefined): string | null {
     if (!value) return null
     return typeof value === 'string' ? value : value.id

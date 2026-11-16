@@ -1,6 +1,6 @@
 import 'server-only'
 import * as React from 'react'
-import { AgentNotification, BudgetExhausted, IncidentResolved, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, renderEmail } from '@rerun/emails'
+import { AgentNotification, BudgetExhausted, IncidentResolved, LifetimeCode, PublishedAccessCode, RunFailed, SignInCode, WorkspaceInvite, renderEmail } from '@rerun/emails'
 import { emailTranslator, type EmailTranslator } from '@rerun/emails/i18n'
 import type { Locale } from '@rerun/i18n'
 import { APP_URL, IS_PRODUCTION_MAILER, REPLY_TO, TRANSACTIONAL_FROM as FROM, getResendClient as getClient, redirectDelivery, type SendEmailResult } from '@/lib/email/client'
@@ -213,6 +213,36 @@ export async function sendPublishedAccessCodeEmail(input: { to: string; code: st
     )
     if (error) {
         console.error('[email] failed to send published access code email', error)
+        return { ok: false, error: error.message }
+    }
+    return { ok: true, id: data?.id ?? null }
+}
+
+export async function sendLifetimeCodeEmail(input: { to: string; code: string; locale?: Locale }): Promise<SendEmailResult> {
+    const resend = getClient()
+    if (!resend) {
+        if (IS_PRODUCTION_MAILER) console.error('[email] RESEND_API_KEY missing, skipping lifetime code email')
+        else console.warn(`[email] RESEND_API_KEY missing, lifetime code for ${input.to}: ${input.code}`)
+        return { ok: true, id: null }
+    }
+
+    const redeemUrl = `${APP_URL}/redeem?code=${encodeURIComponent(input.code)}`
+    const element = React.createElement(LifetimeCode, { code: input.code, redeemUrl, appUrl: APP_URL, locale: input.locale })
+    const { html, text } = await renderEmail(element)
+    const delivery = redirectDelivery(input.to, emailTranslator(input.locale)('subjects.lifetimeCode', { code: input.code }))
+
+    const { data, error } = await sendThrottled(() =>
+        resend.emails.send({
+            from: FROM,
+            replyTo: REPLY_TO,
+            to: delivery.to,
+            subject: delivery.subject,
+            html,
+            text,
+        }),
+    )
+    if (error) {
+        console.error('[email] failed to send lifetime code email', error)
         return { ok: false, error: error.message }
     }
     return { ok: true, id: data?.id ?? null }

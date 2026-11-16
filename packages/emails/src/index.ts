@@ -21,6 +21,9 @@ export type { SignInCodeProps } from "../emails/sign-in-code";
 export { default as PublishedAccessCode } from "../emails/published-access-code";
 export type { PublishedAccessCodeProps } from "../emails/published-access-code";
 
+export { default as LifetimeCode } from "../emails/lifetime-code";
+export type { LifetimeCodeProps } from "../emails/lifetime-code";
+
 export { default as CreatorInvite } from "../emails/creator-invite";
 export type {
   CreatorInviteProps,

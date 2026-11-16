@@ -56,6 +56,7 @@
     "subjects": {
         "signInCode": "Your Rerun code: {code}",
         "publishedAccessCode": "Your code to open {pageTitle}: {code}",
+        "lifetimeCode": "Your Rerun lifetime code: {code}",
         "workspaceInvite": "You're invited to {workspaceName} on Rerun",
         "runFailed": "{agentName} ran into an error",
         "agentDone": "{agentName} finished a task",
@@ -106,6 +107,13 @@
         "body": "{workspaceName} shared this page with you. Enter this code on the page to open it.",
         "footnote": "The code expires in {minutes, plural, other {# minutes}} and works once. If you didn't ask for it, you can safely ignore this email.",
         "untitledPage": "a page"
+    },
+    "lifetimeCode": {
+        "preview": "Your Rerun lifetime code is {code}",
+        "heading": "Your lifetime access is ready",
+        "body": "Thanks for your purchase. Here is your code: redeem it on your Rerun workspace to switch it to the lifetime plan.",
+        "button": "Redeem my code",
+        "footnote": "The code works once, on one workspace. Keep this email: it is your proof of purchase. Questions? Reply to this email."
     },
     "workspaceInvite": {
         "preview": "You're invited to {workspaceName} on Rerun",

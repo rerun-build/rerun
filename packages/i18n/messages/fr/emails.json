@@ -40,6 +40,7 @@
     "subjects": {
         "signInCode": "Votre code Rerun : {code}",
         "publishedAccessCode": "Votre code pour ouvrir {pageTitle} : {code}",
+        "lifetimeCode": "Votre code Rerun à vie : {code}",
         "workspaceInvite": "Vous êtes invité à rejoindre {workspaceName} sur Rerun",
         "runFailed": "{agentName} a rencontré une erreur",
         "agentDone": "{agentName} a terminé une tâche",
@@ -90,6 +91,13 @@
         "body": "{workspaceName} a partagé cette page avec vous. Saisissez ce code sur la page pour l'ouvrir.",
         "footnote": "Le code expire dans {minutes, plural, one {# minute} other {# minutes}} et ne sert qu'une fois. Si vous ne l'avez pas demandé, vous pouvez ignorer cet e-mail.",
         "untitledPage": "une page"
+    },
+    "lifetimeCode": {
+        "preview": "Votre code Rerun à vie est {code}",
+        "heading": "Votre accès à vie est prêt",
+        "body": "Merci pour votre achat. Voici votre code : utilisez-le sur votre workspace Rerun pour le passer au plan à vie.",
+        "button": "Utiliser mon code",
+        "footnote": "Le code fonctionne une fois, sur un seul workspace. Gardez cet email : c'est votre preuve d'achat. Une question ? Répondez à cet email."
     },
     "workspaceInvite": {
         "preview": "Vous êtes invité à rejoindre {workspaceName} sur Rerun",

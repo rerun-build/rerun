@@ -205,5 +205,86 @@
                 "answer": "Yes. Dedicated or self-hosted infrastructure, SSO, an SLA and dedicated support, priced for your organization. Talk to us at help@rerun.build."
             }
         }
+    },
+    "lifetime": {
+        "seo": {
+            "title": "Rerun lifetime deal",
+            "description": "Pay {price} once and keep Rerun for life: unlimited coworkers and teammates on your own private machine, with your own AI."
+        },
+        "eyebrow": "Lifetime deal",
+        "headline": "Rerun for life, paid once",
+        "description": "Unlimited coworkers and teammates on your own private machine. One payment, no subscription.",
+        "price": {
+            "once": "one time",
+            "instead": "instead of <s>{monthly} a month</s>"
+        },
+        "cta": "Get lifetime access",
+        "tiers": {
+            "label": "Pricing",
+            "title": "Paid back in {months, plural, one {# month} other {# months}}",
+            "lede": "The monthly plan is {monthly} a month. The lifetime deal is {price}, once.",
+            "pro": {
+                "description": "Pay every month, as long as you use Rerun.",
+                "control": "That is {yearly} a year, and {threeYears} over 3 years.",
+                "featuresLabel": "Pro includes"
+            },
+            "lifetime": {
+                "name": "Lifetime",
+                "description": "Pay once and keep Rerun for good.",
+                "control": "Paid back in {months, plural, one {# month} other {# months}}. Nothing to renew.",
+                "featuresLabel": "Lifetime includes",
+                "features": {
+                    "coworkers": "<b>Unlimited Coworkers</b> working for you, side by side",
+                    "seats": "<b>Unlimited seats</b>, no per-user fees",
+                    "machine": "Your own <b>private machine</b>, running around the clock",
+                    "ownAi": "Your own AI: <b>an API key</b> or <b>your ChatGPT subscription</b>",
+                    "noCredits": "Rerun credit <b>not included</b>"
+                }
+            }
+        },
+        "plan": {
+            "label": "Included",
+            "title": "Your AI, your team, your schedule"
+        },
+        "steps": {
+            "label": "How it works",
+            "title": "Three steps, two minutes",
+            "pay": {
+                "title": "Pay once",
+                "body": "Check out on Stripe in under a minute."
+            },
+            "code": {
+                "title": "Get your code",
+                "body": "It shows right after the payment, and lands in your inbox."
+            },
+            "redeem": {
+                "title": "Redeem it",
+                "body": "Sign in, paste the code, and your workspace switches to the lifetime plan."
+            }
+        },
+        "faq": {
+            "label": "FAQ",
+            "title": "Questions",
+            "subscribed": {
+                "question": "I already pay for a monthly plan. Can I switch?",
+                "answer": "Yes. Write to help@rerun.build before you redeem your code, and we move your workspace to the lifetime plan."
+            },
+            "workspaces": {
+                "question": "Can one code unlock several workspaces?",
+                "answer": "One code switches one workspace. Buy one code for each workspace."
+            },
+            "ownAi": {
+                "question": "Which AI do my coworkers run on?",
+                "answer": "Your own: an API key from the provider you choose, or your ChatGPT subscription. Rerun credit is not part of the deal."
+            },
+            "notIncluded": {
+                "question": "What is not included?",
+                "answer": "Rerun credit, the AI we bill by usage. Your coworkers run on your own API key or ChatGPT subscription instead."
+            },
+            "updates": {
+                "question": "Do I get new features?",
+                "answer": "Yes. A lifetime workspace runs the same Rerun as every other workspace, updates included."
+            }
+        }
     }
 }

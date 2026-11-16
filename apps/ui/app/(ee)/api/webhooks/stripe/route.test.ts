@@ -13,6 +13,7 @@ import { markPaymentMethodAdded } from '@/app/api/_services/getting-started.serv
 import { enforceTrialCardClaim } from '@/ee/services/trial-card.service'
 import { applyTemplateSubscription, recordTemplatePurchase, recordTemplateRenewal, refundTemplatePurchase, revokeTemplateSubscription } from '@/ee/services/template-purchase.service'
 import { recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
+import { deliverLifetimeCheckout } from '@/ee/services/lifetime-deal.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { signedStripeRequest, TEST_WEBHOOK_SECRET } from '@/ee/test/stripe-fake'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent } from './idempotency'
@@ -48,6 +49,10 @@ vi.mock('@/ee/services/credit-purchase.service', async importOriginal => ({
     recordCreditCheckoutSession: vi.fn(),
     recordCreditInvoice: vi.fn(),
     refundCreditPurchase: vi.fn(),
+}))
+vi.mock('@/ee/services/lifetime-deal.service', async importOriginal => ({
+    isLifetimeCheckoutSession: (await importOriginal<typeof import('@/ee/services/lifetime-deal.service')>()).isLifetimeCheckoutSession,
+    deliverLifetimeCheckout: vi.fn(),
 }))
 vi.mock('./idempotency', async importOriginal => ({ ...(await importOriginal<typeof import('./idempotency')>()), claimStripeEvent: vi.fn(), markStripeEventProcessed: vi.fn(), releaseStripeEvent: vi.fn() }))
 
@@ -127,6 +132,24 @@ describe('checkout.session.completed', () => {
         await deliver('checkout.session.completed', session)
         expect(recordTemplatePurchase).toHaveBeenCalledWith(expect.objectContaining({ id: 'cs_1' }))
         expect(stripe.subscriptions.retrieve).not.toHaveBeenCalled()
+    })
+
+    it('delivers the code of a lifetime deal, and nothing else', async () => {
+        const session = { id: 'cs_1', mode: 'payment', payment_status: 'paid', metadata: { kind: 'lifetime_deal' } }
+        const res = await deliver('checkout.session.completed', session)
+        expect(res.status).toBe(200)
+        expect(deliverLifetimeCheckout).toHaveBeenCalledWith(expect.objectContaining({ id: 'cs_1' }))
+        expect(recordTemplatePurchase).not.toHaveBeenCalled()
+        expect(recordCreditCheckoutSession).not.toHaveBeenCalled()
+        expect(applySubscriptionToWorkspace).not.toHaveBeenCalled()
+    })
+
+    it('answers 500 when the lifetime code could not be emailed, so Stripe delivers the event again', async () => {
+        vi.mocked(deliverLifetimeCheckout).mockRejectedValue(new Error('resend down'))
+        const res = await deliver('checkout.session.completed', { id: 'cs_1', mode: 'payment', payment_status: 'paid', metadata: { kind: 'lifetime_deal' } })
+        expect(res.status).toBe(500)
+        expect(releaseStripeEvent).toHaveBeenCalledWith('evt_1')
+        expect(markStripeEventProcessed).not.toHaveBeenCalled()
     })
 
     it('refuses to grant a template purchase whose session payment_status is unpaid', async () => {

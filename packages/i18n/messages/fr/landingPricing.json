@@ -192,5 +192,86 @@
                 "answer": "Oui. Infrastructure dédiée ou auto-hébergée, SSO, SLA et support dédié, à un tarif adapté à votre organisation. Écrivez-nous à help@rerun.build."
             }
         }
+    },
+    "lifetime": {
+        "seo": {
+            "title": "Offre à vie Rerun",
+            "description": "Payez {price} une fois et gardez Rerun à vie : coworkers et coéquipiers illimités sur votre propre machine privée, avec votre propre IA."
+        },
+        "eyebrow": "Offre à vie",
+        "headline": "Rerun à vie, payé une fois",
+        "description": "Coworkers et coéquipiers illimités sur votre propre machine privée. Un seul paiement, sans abonnement.",
+        "price": {
+            "once": "une seule fois",
+            "instead": "au lieu de <s>{monthly} par mois</s>"
+        },
+        "cta": "Obtenir l'accès à vie",
+        "tiers": {
+            "label": "Tarifs",
+            "title": "Rentabilisé en {months, plural, one {# mois} other {# mois}}",
+            "lede": "Le plan mensuel coûte {monthly} par mois. L'offre à vie coûte {price}, une seule fois.",
+            "pro": {
+                "description": "Payez chaque mois, tant que vous utilisez Rerun.",
+                "control": "Soit {yearly} par an, et {threeYears} sur 3 ans.",
+                "featuresLabel": "Pro inclut"
+            },
+            "lifetime": {
+                "name": "À vie",
+                "description": "Payez une fois et gardez Rerun pour de bon.",
+                "control": "Rentabilisé en {months, plural, one {# mois} other {# mois}}. Rien à renouveler.",
+                "featuresLabel": "L'offre à vie inclut",
+                "features": {
+                    "coworkers": "<b>Coworkers illimités</b> qui travaillent pour vous, côte à côte",
+                    "seats": "<b>Sièges illimités</b>, sans frais par utilisateur",
+                    "machine": "Votre propre <b>machine privée</b>, active jour et nuit",
+                    "ownAi": "Votre propre IA : <b>une clé API</b> ou <b>votre abonnement ChatGPT</b>",
+                    "noCredits": "Crédit Rerun <b>non inclus</b>"
+                }
+            }
+        },
+        "plan": {
+            "label": "Inclus",
+            "title": "Votre IA, votre équipe, votre planning"
+        },
+        "steps": {
+            "label": "Comment ça marche",
+            "title": "Trois étapes, deux minutes",
+            "pay": {
+                "title": "Payez une fois",
+                "body": "Réglez sur Stripe en moins d'une minute."
+            },
+            "code": {
+                "title": "Recevez votre code",
+                "body": "Il s'affiche juste après le paiement et arrive dans votre boîte mail."
+            },
+            "redeem": {
+                "title": "Utilisez-le",
+                "body": "Connectez-vous, collez le code, et votre workspace passe au plan à vie."
+            }
+        },
+        "faq": {
+            "label": "FAQ",
+            "title": "Questions",
+            "subscribed": {
+                "question": "J'ai déjà un abonnement mensuel. Puis-je passer à l'offre à vie ?",
+                "answer": "Oui. Écrivez à help@rerun.build avant d'utiliser votre code, et nous passons votre workspace au plan à vie."
+            },
+            "workspaces": {
+                "question": "Un code peut-il débloquer plusieurs workspaces ?",
+                "answer": "Un code passe un seul workspace au plan à vie. Achetez un code par workspace."
+            },
+            "ownAi": {
+                "question": "Sur quelle IA tournent mes coworkers ?",
+                "answer": "La vôtre : une clé API du fournisseur de votre choix, ou votre abonnement ChatGPT. Le crédit Rerun ne fait pas partie de l'offre."
+            },
+            "notIncluded": {
+                "question": "Qu'est-ce qui n'est pas inclus ?",
+                "answer": "Le crédit Rerun, l'IA que nous facturons à l'usage. Vos coworkers tournent à la place sur votre propre clé API ou votre abonnement ChatGPT."
+            },
+            "updates": {
+                "question": "Est-ce que je reçois les nouveautés ?",
+                "answer": "Oui. Un workspace à vie fait tourner le même Rerun que tous les autres workspaces, mises à jour comprises."
+            }
+        }
     }
 }

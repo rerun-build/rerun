@@ -192,5 +192,86 @@
                 "answer": "Sim. Infraestrutura dedicada ou auto-hospedada, SSO, um SLA e suporte dedicado, com preço para a sua organização. Fale com a gente em help@rerun.build."
             }
         }
+    },
+    "lifetime": {
+        "seo": {
+            "title": "Oferta vitalícia do Rerun",
+            "description": "Pague {price} uma vez e fique com o Rerun para sempre: coworkers e colegas ilimitados na sua própria máquina privada, com a sua própria IA."
+        },
+        "eyebrow": "Oferta vitalícia",
+        "headline": "Rerun para sempre, pago uma vez",
+        "description": "Coworkers e colegas ilimitados na sua própria máquina privada. Um único pagamento, sem assinatura.",
+        "price": {
+            "once": "uma única vez",
+            "instead": "em vez de <s>{monthly} por mês</s>"
+        },
+        "cta": "Garantir acesso vitalício",
+        "tiers": {
+            "label": "Preços",
+            "title": "Pago em {months, plural, one {# mês} other {# meses}}",
+            "lede": "O plano mensal custa {monthly} por mês. A oferta vitalícia custa {price}, uma única vez.",
+            "pro": {
+                "description": "Pague todo mês, enquanto usar o Rerun.",
+                "control": "São {yearly} por ano, e {threeYears} em 3 anos.",
+                "featuresLabel": "O Pro inclui"
+            },
+            "lifetime": {
+                "name": "Vitalício",
+                "description": "Pague uma vez e fique com o Rerun para sempre.",
+                "control": "Pago em {months, plural, one {# mês} other {# meses}}. Nada a renovar.",
+                "featuresLabel": "A oferta vitalícia inclui",
+                "features": {
+                    "coworkers": "<b>Coworkers ilimitados</b> trabalhando para você, lado a lado",
+                    "seats": "<b>Assentos ilimitados</b>, sem taxa por usuário",
+                    "machine": "Sua própria <b>máquina privada</b>, rodando dia e noite",
+                    "ownAi": "Sua própria IA: <b>uma chave de API</b> ou <b>sua assinatura do ChatGPT</b>",
+                    "noCredits": "Crédito do Rerun <b>não incluído</b>"
+                }
+            }
+        },
+        "plan": {
+            "label": "Incluído",
+            "title": "Sua IA, sua equipe, sua agenda"
+        },
+        "steps": {
+            "label": "Como funciona",
+            "title": "Três passos, dois minutos",
+            "pay": {
+                "title": "Pague uma vez",
+                "body": "Finalize no Stripe em menos de um minuto."
+            },
+            "code": {
+                "title": "Receba seu código",
+                "body": "Ele aparece logo após o pagamento e chega no seu e-mail."
+            },
+            "redeem": {
+                "title": "Resgate",
+                "body": "Entre, cole o código e seu workspace passa para o plano vitalício."
+            }
+        },
+        "faq": {
+            "label": "FAQ",
+            "title": "Perguntas",
+            "subscribed": {
+                "question": "Já pago um plano mensal. Posso mudar?",
+                "answer": "Sim. Escreva para help@rerun.build antes de resgatar seu código, e passamos seu workspace para o plano vitalício."
+            },
+            "workspaces": {
+                "question": "Um código libera vários workspaces?",
+                "answer": "Um código muda um único workspace. Compre um código para cada workspace."
+            },
+            "ownAi": {
+                "question": "Com qual IA meus coworkers trabalham?",
+                "answer": "Com a sua: uma chave de API do provedor que você escolher, ou sua assinatura do ChatGPT. O crédito do Rerun não faz parte da oferta."
+            },
+            "notIncluded": {
+                "question": "O que não está incluído?",
+                "answer": "O crédito do Rerun, a IA que cobramos por uso. Seus coworkers rodam com sua própria chave de API ou sua assinatura do ChatGPT."
+            },
+            "updates": {
+                "question": "Eu recebo as novidades?",
+                "answer": "Sim. Um workspace vitalício roda o mesmo Rerun que todos os outros workspaces, atualizações incluídas."
+            }
+        }
     }
 }

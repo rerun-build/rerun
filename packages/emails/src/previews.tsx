@@ -10,6 +10,7 @@ import BudgetExhausted from "../emails/budget-exhausted";
 import CreatorInvite from "../emails/creator-invite";
 import CreatorPitch from "../emails/creator-pitch";
 import IncidentResolved from "../emails/incident-resolved";
+import LifetimeCode from "../emails/lifetime-code";
 import OnboardingResume from "../emails/onboarding-resume";
 import PaymentFailed from "../emails/payment-failed";
 import RenewalReminder from "../emails/renewal-reminder";
@@ -266,6 +267,18 @@ export const EMAIL_PREVIEWS: EmailPreview[] = [
         workspaceName="Acme"
         pageTitle="Q3 proposal for Northwind"
         expiresInMinutes={10}
+        appUrl={APP_URL}
+      />
+    ),
+  },
+  {
+    id: "lifetime-code/default",
+    group: "Lifetime code",
+    label: "Bought on rerun.build",
+    element: (
+      <LifetimeCode
+        code="RERUN-7KQ4-M2XW-9HTD"
+        redeemUrl={`${APP_URL}/redeem?code=RERUN-7KQ4-M2XW-9HTD`}
         appUrl={APP_URL}
       />
     ),

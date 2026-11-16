@@ -192,5 +192,86 @@
                 "answer": "Ja. Dedizierte oder selbst gehostete Infrastruktur, SSO, ein SLA und dedizierter Support, mit Preisen für deine Organisation. Schreib uns an help@rerun.build."
             }
         }
+    },
+    "lifetime": {
+        "seo": {
+            "title": "Rerun Lifetime-Deal",
+            "description": "Zahle einmal {price} und behalte Rerun für immer: unbegrenzt Coworker und Teammitglieder auf deiner eigenen privaten Maschine, mit deiner eigenen KI."
+        },
+        "eyebrow": "Lifetime-Deal",
+        "headline": "Rerun für immer, einmal bezahlt",
+        "description": "Unbegrenzt Coworker und Teammitglieder auf deiner eigenen privaten Maschine. Eine Zahlung, kein Abo.",
+        "price": {
+            "once": "einmalig",
+            "instead": "statt <s>{monthly} im Monat</s>"
+        },
+        "cta": "Lifetime-Zugang sichern",
+        "tiers": {
+            "label": "Preise",
+            "title": "Bezahlt sich in {months, plural, one {# Monat} other {# Monaten}}",
+            "lede": "Der Monatsplan kostet {monthly} im Monat. Der Lifetime-Deal kostet {price}, einmalig.",
+            "pro": {
+                "description": "Zahle jeden Monat, solange du Rerun nutzt.",
+                "control": "Das sind {yearly} im Jahr und {threeYears} in 3 Jahren.",
+                "featuresLabel": "Pro enthält"
+            },
+            "lifetime": {
+                "name": "Lifetime",
+                "description": "Einmal zahlen und Rerun für immer behalten.",
+                "control": "Bezahlt sich in {months, plural, one {# Monat} other {# Monaten}}. Nichts zu verlängern.",
+                "featuresLabel": "Lifetime enthält",
+                "features": {
+                    "coworkers": "<b>Unbegrenzt Coworker</b>, die Seite an Seite für dich arbeiten",
+                    "seats": "<b>Unbegrenzt Plätze</b>, keine Gebühren pro Nutzer",
+                    "machine": "Deine eigene <b>private Maschine</b>, rund um die Uhr",
+                    "ownAi": "Deine eigene KI: <b>ein API-Schlüssel</b> oder <b>dein ChatGPT-Abo</b>",
+                    "noCredits": "Rerun Credits <b>nicht enthalten</b>"
+                }
+            }
+        },
+        "plan": {
+            "label": "Inklusive",
+            "title": "Deine KI, dein Team, dein Zeitplan"
+        },
+        "steps": {
+            "label": "So funktioniert's",
+            "title": "Drei Schritte, zwei Minuten",
+            "pay": {
+                "title": "Einmal zahlen",
+                "body": "Bezahle in unter einer Minute über Stripe."
+            },
+            "code": {
+                "title": "Code erhalten",
+                "body": "Er erscheint direkt nach der Zahlung und landet in deinem Postfach."
+            },
+            "redeem": {
+                "title": "Einlösen",
+                "body": "Melde dich an, füge den Code ein, und dein Workspace wechselt in den Lifetime-Plan."
+            }
+        },
+        "faq": {
+            "label": "FAQ",
+            "title": "Fragen",
+            "subscribed": {
+                "question": "Ich zahle schon einen Monatsplan. Kann ich wechseln?",
+                "answer": "Ja. Schreib an help@rerun.build, bevor du deinen Code einlöst, und wir stellen deinen Workspace auf den Lifetime-Plan um."
+            },
+            "workspaces": {
+                "question": "Schaltet ein Code mehrere Workspaces frei?",
+                "answer": "Ein Code stellt einen einzigen Workspace um. Kaufe einen Code pro Workspace."
+            },
+            "ownAi": {
+                "question": "Mit welcher KI arbeiten meine Coworker?",
+                "answer": "Mit deiner eigenen: einem API-Schlüssel des Anbieters deiner Wahl oder deinem ChatGPT-Abo. Rerun Credits sind nicht Teil des Deals."
+            },
+            "notIncluded": {
+                "question": "Was ist nicht enthalten?",
+                "answer": "Rerun Credits, die KI, die wir nach Nutzung abrechnen. Deine Coworker laufen stattdessen mit deinem eigenen API-Schlüssel oder deinem ChatGPT-Abo."
+            },
+            "updates": {
+                "question": "Bekomme ich neue Funktionen?",
+                "answer": "Ja. Ein Lifetime-Workspace läuft auf demselben Rerun wie jeder andere Workspace, Updates inklusive."
+            }
+        }
     }
 }
