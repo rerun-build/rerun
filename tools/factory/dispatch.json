@@ -114,5 +114,68 @@
         }
       ]
     }
+  },
+  "tiers": {
+    "build": {
+      "small": "low",
+      "medium": "medium",
+      "large": "high"
+    },
+    "fix": {
+      "small": "low",
+      "medium": "medium",
+      "large": "high"
+    },
+    "review": "medium",
+    "proof": "medium",
+    "replan": "medium"
+  },
+  "tier_models": {
+    "build": {
+      "low": {
+        "model": "claude-haiku-5-5",
+        "thinkingLevel": "low"
+      },
+      "medium": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "medium"
+      },
+      "high": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "high"
+      }
+    },
+    "fix": {
+      "low": {
+        "model": "claude-haiku-5-5",
+        "thinkingLevel": "low"
+      },
+      "medium": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "medium"
+      },
+      "high": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "high"
+      }
+    },
+    "review": {
+      "medium": {
+        "model": "claude-opus-5-5",
+        "thinkingLevel": "medium"
+      }
+    },
+    "proof": {
+      "medium": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "medium"
+      }
+    },
+    "replan": {
+      "medium": {
+        "model": "claude-opus-5-5",
+        "thinkingLevel": "medium"
+      }
+    }
   }
 }

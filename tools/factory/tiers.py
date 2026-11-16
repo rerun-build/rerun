@@ -32,3 +32,21 @@ def tier_for(station, size, table):
     if entry not in TIERS:
         raise ValueError("unknown tier: " + str(entry))
     return entry
+
+
+EFFORTS = ("low", "medium", "high")
+
+
+def model_for(station, tier, table):
+    if not table or tier is None:
+        return None
+    if station not in table:
+        raise ValueError("station without a model: " + str(station))
+    if tier not in table[station]:
+        raise ValueError("no model for tier: " + str(tier))
+    entry = table[station][tier]
+    if not isinstance(entry, dict) or not entry.get("model") or not isinstance(entry["model"], str):
+        raise ValueError("empty model for tier: " + str(tier))
+    if entry.get("thinkingLevel") not in EFFORTS:
+        raise ValueError("unknown effort: " + str(entry.get("thinkingLevel")))
+    return {"model": entry["model"], "thinkingLevel": entry["thinkingLevel"]}
