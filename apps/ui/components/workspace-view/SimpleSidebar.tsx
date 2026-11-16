@@ -50,6 +50,7 @@ type SimpleSidebarProps = {
 export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actionsFor }: SimpleSidebarProps) {
     const t = useTranslations('workspaceView.list')
     const tBuilder = useTranslations('builder.toolbar')
+    const tAccess = useTranslations('workspace.access')
     const agents = useBoardStore(s => s.agents)
     const spaces = useBoardStore(s => s.spaces)
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
@@ -63,6 +64,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
     const { needsMachineReason } = useWorkspaceAccess()
     const { user, workspace } = useSession()
     const workspaceId = workspace?.id ?? null
+    const singleBoxReason = workspace?.is_sandbox ? tAccess('sandboxSingleBox') : undefined
 
     const sections = useMemo(() => sidebarSections(agents, spaces), [agents, spaces])
     const [collapsed, setCollapsed] = useState<string[]>([])
@@ -96,11 +98,13 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
             <div className="flex items-center gap-1 pt-2 pr-3 pb-1 pl-5">
                 <h2 className="text-xs font-medium text-muted-foreground">{t('label')}</h2>
                 <span className="flex-1" />
-                <TooltipLabeled label={t('newBox')}>
-                    <Button variant="ghost" size="icon-sm" aria-label={t('newBox')} onClick={() => setNewBoxOpen(true)}>
-                        <BoxIcon className="size-4" />
-                    </Button>
-                </TooltipLabeled>
+                <TooltipDisabledReason reason={singleBoxReason}>
+                    <TooltipLabeled label={t('newBox')}>
+                        <Button variant="ghost" size="icon-sm" aria-label={t('newBox')} disabled={!!singleBoxReason} onClick={() => setNewBoxOpen(true)}>
+                            <BoxIcon className="size-4" />
+                        </Button>
+                    </TooltipLabeled>
+                </TooltipDisabledReason>
                 <TooltipDisabledReason reason={needsMachineReason ?? undefined}>
                     <TooltipLabeled label={tBuilder('newCoworker')}>
                         <Button variant="ghost" size="icon-sm" aria-label={tBuilder('newCoworker')} disabled={!!needsMachineReason} onClick={openNewAgent}>
@@ -115,7 +119,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                     <ForemanTile />
                     {!previewsLoaded ? (
                         <TileSkeletons />
-                    ) : agents.length === 0 ? (
+                    ) : agents.length === 0 && sections.length <= 1 ? (
                         <EmptyState
                             icon={UsersIcon}
                             title={t('empty')}
