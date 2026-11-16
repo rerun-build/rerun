@@ -106,7 +106,7 @@ class Resolver:
             d.store.set("-", "problems_since", since)
         jobs = d.jobs()
         filed = any(r["state"] == "verify" and r.get("filed") for r in self.records(d).values())
-        if filed or any(problems.ended(j, since) for j in jobs):
+        if filed or any(problems.ended(j, since) or (j.get("checkout_failed") and j["state"] in states.END) for j in jobs):
             self.open_issues = {i["number"] for i in json.loads(d.gh(
                 ["issue", "list", "-R", d.repo, "--state", "open", "--json", "number", "--limit", "1000"]) or "[]")}
         held = holds.active(d.store, d.now()) is not None

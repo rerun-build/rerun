@@ -246,6 +246,39 @@ class Holds(unittest.TestCase):
         self.assertIn("checkout failed #5", find([j], {}, {5}, "", self.w.clock, [], "", False))
         self.assertNotIn("checkout failed #5", find([j], {}, {6}, "", self.w.clock, [], "", False))
 
+    def test_a_checkout_failure_of_a_job_returned_to_the_planner_follows_the_same_rule(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", TRACE.replace("BLOCKED: wt new failed", "BLOCKED: plan: wt new failed"))
+        self.d.once()
+        j = self.job(5)
+        self.assertEqual(j["state"], "returned")
+        find = self.d.resolver.watch.find
+        self.assertIn("checkout failed #5", find([j], {}, {5}, "", self.w.clock, [], "", False))
+        self.assertNotIn("checkout failed #5", find([j], {}, {6}, "", self.w.clock, [], "", False))
+        self.assertNotIn("checkout failed #5", find([j], {}, None, "", self.w.clock, [], "", False))
+
+    def test_a_pull_request_of_a_build_sent_before_the_hold_does_not_end_the_round(self):
+        self.make([issue(5), issue(6), issue(7)])
+        self.d.once()
+        self.w.finish("b1", LOAD)
+        self.w.finish("b2", LOAD)
+        self.w.finish("b3", PR_LINE)
+        self.d.once()
+        self.assertEqual(self.d.store.get_all("-").get("room_row"), "1")
+        self.w.clock += 5 * 60 + 1
+        self.d.once()
+        self.assertEqual(sorted(self.job(n)["state"] for n in (5, 6)), ["building", "queued"])
+
+    def test_a_room_line_quoted_far_into_a_long_blocked_line_still_holds(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", "BLOCKED: " + "the tool would not open the folder for this job and I tried it again; " * 4
+                      + "wt new said TRANSIENT: load: 13.0 on 4 cores, ceiling is 12.0")
+        self.d.once()
+        self.assertEqual(self.job(5)["state"], "queued")
+        self.assertEqual(self.hold(), "load")
+
     def test_a_resolver_run_that_ended_with_a_line_takes_the_checkout_failure_off_the_job(self):
         self.make([issue(5)])
         self.d.once()

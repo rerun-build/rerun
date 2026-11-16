@@ -1023,8 +1023,9 @@ class Dispatcher:
                     j["pr"] = found
                 return self.blocked(j, out)
             self.store.set("-", "checkout_failed_row", "0")
-            self.store.set("-", "room_row", "0")
-            self.store.set("-", "room_probe", "0")
+            if clocks.L.ts(j["intent_at"]) >= float(self.store.get_all("-").get("room_until") or 0):
+                self.store.set("-", "room_row", "0")
+                self.store.set("-", "room_probe", "0")
             j.pop("checkout_failed", None)
             self.to(j, "review_wait", "pull request #%s" % m.group(1), pr=int(m.group(1)))
         elif st == "review_wait":
@@ -1104,7 +1105,7 @@ class Dispatcher:
     def blocked(self, j, out):
         why = self.not_met_reason(j, out)
         text = out or ""
-        refused = clocks.tool_refusals(text, why)
+        refused = clocks.tool_refusals(text, final_line(text, ("BLOCKED:",)) or why)
         room = clocks.room(refused)
         if room:
             self.room_hold(j, room)

@@ -190,6 +190,32 @@ class SigtermReachesGit(unittest.TestCase):
             self.assertEqual(f.read().strip(), "got-term")
 
 
+class OtherSignalsReachGit(unittest.TestCase):
+    def test_an_interrupt_or_a_hangup_is_passed_to_git_as_a_stop(self):
+        import tempfile
+        for sig in (signal.SIGINT, signal.SIGHUP):
+            d = tempfile.mkdtemp(prefix="sig-")
+            fake = os.path.join(d, "git")
+            with open(fake, "w") as f:
+                f.write("#!/bin/sh\ntrap 'echo got-term > %s/term; exit 143' TERM\necho started > %s/started\nwhile :; do sleep 0.1; done\n" % (d, d))
+            os.chmod(fake, 0o755)
+            code = textwrap.dedent("""
+                import sys; sys.path.insert(0, %r)
+                import factory as F, mirror
+                F.GIT = %r
+                mirror.git(["fetch"], cwd=%r)
+            """) % (HERE, fake, d)
+            p = subprocess.Popen([sys.executable, "-I", "-c", code])
+            for _ in range(100):
+                if os.path.exists(os.path.join(d, "started")):
+                    break
+                time.sleep(0.05)
+            p.send_signal(sig)
+            self.assertEqual(p.wait(10), 128 + sig, sig)
+            with open(os.path.join(d, "term")) as f:
+                self.assertEqual(f.read().strip(), "got-term", sig)
+
+
 def ended(pid):
     try:
         with open("/proc/%d/stat" % pid) as f:

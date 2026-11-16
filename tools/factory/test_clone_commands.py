@@ -187,6 +187,32 @@ class CloneCommands(CloneCase):
         self.assertEqual(code, 0, out)
         self.assertTrue(self.remote_sha("refs/heads/chunk/7-1"))
 
+    def bad_git(self, script):
+        fake = os.path.join(self.tmp, "badgit")
+        with open(fake, "w") as f:
+            f.write("#!/bin/sh\nif [ \"$1\" = cat-file ] && [ \"$2\" = --batch ]; then %s; fi\nexec git \"$@\"\n" % script)
+        os.chmod(fake, 0o755)
+        return mock.patch.object(F, "GIT", fake)
+
+    def test_a_git_that_fails_while_the_new_files_are_read_refuses_the_push(self):
+        p = self.ready_clone()
+        self.commit(p, "leak.txt", "key = " + "ghp" + "_" + "A" * 36 + "\n")
+        with self.bad_git("exit 1"):
+            code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the new files could not be read for the token check", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
+    def test_a_git_cut_off_while_the_new_files_are_read_refuses_the_push(self):
+        p = self.ready_clone()
+        self.commit(p, "a.txt", "a\n")
+        self.commit(p, "leak.txt", "key = " + "ghp" + "_" + "A" * 36 + "\n")
+        with self.bad_git("git \"$@\" | head -c 60; exit 0"):
+            code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the new files could not be read for the token check", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
     def test_a_token_in_a_commit_message_refuses_the_push(self):
         p = self.ready_clone()
         T.write(p, "a.txt", "a\n")

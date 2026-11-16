@@ -752,17 +752,23 @@ TOKEN_BYTES = re.compile(TOKEN_SHAPE.pattern.encode())
 def token_shapes(top, base):
     rows = [r.split(" ", 1) for r in run([GIT, "rev-list", "--objects", "HEAD", "--not", "origin/%s" % base], cwd=top).stdout.splitlines()]
     names = {r[0]: r[1] for r in rows if len(r) == 2 and r[1]}
-    out = subprocess.run([GIT, "cat-file", "--batch"], input="".join(s + "\n" for s in names).encode(), capture_output=True, cwd=top, timeout=300).stdout
-    found, at = [], 0
-    while at < len(out):
-        end = out.index(b"\n", at)
-        sha, kind, size = out[at:end].decode().split()
+    r = subprocess.run([GIT, "cat-file", "--batch"], input="".join(s + "\n" for s in names).encode(), capture_output=True, cwd=top, timeout=300)
+    out, found, at, read = r.stdout, [], 0, 0
+    while at < len(out) and not r.returncode:
+        end = out.find(b"\n", at)
+        head = out[at:end].decode("ascii", "replace").split() if end >= 0 else []
+        if len(head) != 3 or not head[2].isdigit() or end + 1 + int(head[2]) >= len(out):
+            break
+        sha, kind, size = head
+        read += 1
         new = set(TOKEN_BYTES.findall(out[end + 1:end + 1 + int(size)])) if kind == "blob" else set()
         at = end + 2 + int(size)
         if new:
             held = subprocess.run([GIT, "cat-file", "blob", "origin/%s:%s" % (base, names[sha])], capture_output=True, cwd=top, timeout=300).stdout
             if new - set(TOKEN_BYTES.findall(held)):
                 found.append(names[sha])
+    if r.returncode or read != len(names):
+        die("the new files could not be read for the token check (git cat-file exit %s, %d of %d read). Nothing pushed. Try again." % (r.returncode, read, len(names)))
     if TOKEN_SHAPE.search(run([GIT, "log", "--format=%B", "origin/%s..HEAD" % base], cwd=top).stdout):
         found.append("a commit message")
     conf = run([GIT, "config", "--local", "--list"], cwd=top, check=False).stdout
