@@ -141,6 +141,9 @@ class World:
         gone = a[0] == "issue" and len(a) > 2 and a[2].isdigit() and int(a[2]) in self.deleted
         if a[:2] == ["issue", "create"] or "factory-problem" in a or (a[0] == "issue" and self.problem(a)) or timeline or gone:
             return self.problem_gh(a)
+        if a[0] == "api" and "POST" in a and a[-1].endswith("/rerun"):
+            self.reruns.append(a[-1])
+            return ""
         if a[:2] == ["run", "rerun"]:
             self.reruns.append(a)
             return ""

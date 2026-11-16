@@ -2,6 +2,7 @@ import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempf
 
 import backlog
 import briefs
+import ciwait
 import clocks
 import control
 import cutshape
@@ -333,9 +334,9 @@ failures.SOURCES.update(building=(first_brief, build_brief, final_state), review
 def checks_verdict(runs):
     if not runs:
         return "WAIT", "no workflow runs yet"
-    pending = [r["name"] for r in runs if r.get("status") != "completed"]
+    pending = ciwait.unfinished(runs)
     if pending:
-        return "WAIT", "running: " + ", ".join(pending)
+        return "WAIT", ciwait.pending_text(pending)
     bad = [r["name"] for r in runs if r.get("conclusion") in ("failure", "timed_out")]
     if bad:
         return "FAIL", "workflow run failed: " + ", ".join(bad)
@@ -1074,7 +1075,8 @@ class Dispatcher:
         if now_head and now_head != j["head"]:
             return self.to(j, "review_wait", "head moved from %s to %s after the review: reviewed again" % (j["head"][:7], now_head[:7]))
         data = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["head"])]))
-        verdict, why = checks_verdict(data.get("workflow_runs") or [])
+        runs = data.get("workflow_runs") or []
+        verdict, why = checks_verdict(runs)
         if verdict == "FAIL":
             if j.get("checks_fixed"):
                 return self.end(j, "failed", why)
@@ -1084,6 +1086,14 @@ class Dispatcher:
                                   "A test that pins shipped behaviour is not edited to fit: where the failure says the change itself is wrong, end with BLOCKED."
                                   % (j["head"][:7], why, j["head"]))
         if verdict == "WAIT":
+            j["checks_why"] = why[:200]
+            again = ciwait.cancelled_ids(runs)
+            if again and j.get("rerun_head") != j["head"]:
+                j["rerun_head"] = j["head"]
+                self.save(j, "cancelled run started again")
+                for rid in again:
+                    self.gh(["api", "-X", "POST", "repos/%s/actions/runs/%s/rerun" % (self.repo, rid)])
+                log(j["issue"], "cancelled run %s started again once" % ", ".join(str(i) for i in again))
             if self.now() - j["checks_since"] > self.cfg.get("checks_timeout_s", 3600):
                 self.end(j, "failed", "checks not passed after %d s: %s" % (self.cfg.get("checks_timeout_s", 3600), why))
             return

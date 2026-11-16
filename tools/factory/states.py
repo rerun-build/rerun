@@ -27,7 +27,7 @@ TABLE = {
     "reviewing": _row("running", ("checks", "fix_wait", "review_wait"), deadline="stall_clock", back="review_wait", goal=VERDICT),
     "fix_wait": _row("wait", ("fixing",), reason=True, queue=True),
     "fixing": _row("running", ("review_wait", "fix_wait"), deadline="stall_clock", back="fix_wait", goal=PUSHED_OR_BLOCKED),
-    "checks": _row("wait", ("fix_wait", "proof_wait", "review_wait"), deadline="checks_timeout_s"),
+    "checks": _row("wait", ("fix_wait", "proof_wait", "review_wait"), reason=True, deadline="checks_timeout_s"),
     "proof_wait": _row("wait", ("proving",), reason=True, queue=True),
     "proving": _row("running", ("checks", "fix_wait", "proof_wait"), deadline="stall_clock", back="proof_wait", goal=PROOF),
     "merged": _end(False),
