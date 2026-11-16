@@ -28,6 +28,7 @@ export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me 
             subscribed: ctx.workspace.is_sandbox || isSubscriptionEntitled(ctx.workspace.subscription_status),
             role: ctx.role,
             boxScope: ctx.boxScope,
+            assistantName: ctx.workspace.assistant_name,
         },
     }
 }

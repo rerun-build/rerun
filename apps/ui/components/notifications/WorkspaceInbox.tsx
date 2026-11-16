@@ -11,6 +11,7 @@ import { InboxPeekCard } from '@/components/notifications/InboxPeekCard'
 import { InboxRowMenu } from '@/components/notifications/InboxRowMenu'
 import { markForemanConversationReadAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { useAttentionSessions, type AttentionSession } from '@/hooks/useAttentionSessions'
+import { useAssistantName } from '@/hooks/useAssistantName'
 import { useForemanAttention } from '@/hooks/useForemanAttention'
 import { useInboxAnnouncer } from '@/hooks/useInboxAnnouncer'
 import { useInboxPeek, type InboxPeekTarget } from '@/hooks/useInboxPeek'
@@ -48,7 +49,9 @@ type View = null | 'hub' | { notification: AnnouncedNotification } | { peek: Pee
 export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' }) {
     const t = useTranslations('notifications.inbox')
     const tReasons = useTranslations('notifications.inbox.reasons')
-    const foremanName = useTranslations('foreman.notification')('title')
+    const assistantName = useAssistantName()
+    const tForeman = useTranslations('foreman.notification')
+    const foremanName = assistantName ?? tForeman('title')
     const { isAnonymous } = useSession()
     const onEngine = useForemanStore(state => state.surface === 'engine')
     const agents = useBoardStore(s => s.agents)

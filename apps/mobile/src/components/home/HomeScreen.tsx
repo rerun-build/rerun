@@ -36,6 +36,7 @@ import { setBadge } from '@/notifications/push'
 import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
+import { useAssistantName } from '@/components/home/useAssistantName'
 
 // A wide window draws the Home as a sidebar beside the conversation: a tap swaps the conversation
 // instead of stacking one more screen, and the row of the open one stays lit.
@@ -44,6 +45,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const insets = useSafeAreaInsets()
     const pane = usePaneInsets()
     const { session, me } = useAuth()
+    const assistantName = useAssistantName()
     const board = useBoard()
     const inbox = useInbox()
     const [group] = useGroupMode()
@@ -67,7 +69,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const cell = usePinnedCell()
     const [reordering, setReordering] = useState(false)
     const foremanPinned = pins.pinned.includes(FOREMAN_AGENT_ID)
-    const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned, board.state === 'ready' ? foremanOnBoard(foreman.running) : undefined)
+    const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned, board.state === 'ready' ? foremanOnBoard(foreman.running, assistantName) : undefined)
     const sections = board.state === 'ready' && group === 'box' ? sectionsByBox(others, board.boxes, t('untitledBox')) : []
     const recent = board.state === 'ready' && group === 'recent' ? recentCoworkers(others) : []
 

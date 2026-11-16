@@ -117,6 +117,7 @@
         "detach_connector": "Remove App",
         "list_vault": "Read the Vault",
         "set_vault_link": "Lend a Vault Account",
+        "set_assistant_name": "Take a Name",
         "send_message": "Message Coworker",
         "create_boxes": "Create Boxes",
         "build_team": "Build Team",

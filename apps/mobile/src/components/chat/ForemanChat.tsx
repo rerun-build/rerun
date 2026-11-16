@@ -80,9 +80,10 @@ function Notice({ title, body, onRetry }: { title: string; body: string; onRetry
 export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.foreman')
-    const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, role: t('role') }), [t])
     const back = useChatBack()
     const { session, me } = useAuth()
+    const name = me?.workspace.assistantName ?? FOREMAN_DISPLAY_NAME
+    const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, name, role: t('role') }), [t, name])
     const opensGeneral = sessionId === LAST_CONVERSATION || sessionId === GENERAL_PAGE_ID
     const [ask] = useState(() => (opensGeneral ? takePendingAsk() : undefined))
     // Where the last visit found the Foreman: the page opens on it.

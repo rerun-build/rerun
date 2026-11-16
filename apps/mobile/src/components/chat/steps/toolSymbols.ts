@@ -120,6 +120,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     attach_connector: 'link',
     list_vault: 'lock',
     set_vault_link: 'lock',
+    set_assistant_name: 'square-pen',
     detach_connector: 'trash',
     send_message: 'send',
     create_boxes: 'package',

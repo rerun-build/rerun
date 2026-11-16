@@ -63,6 +63,7 @@
     },
     "dock": {
         "tooltip": "Busca o pregunta a tu Chief of Staff <key>{shortcut}</key>",
+        "tooltipNamed": "Busca o pregunta a {name} <key>{shortcut}</key>",
         "failedReply": "Algo salió mal con esta."
     },
     "nudge": {
@@ -92,6 +93,7 @@
             "newCoworker": "Créame un nuevo coworker"
         },
         "ask": "Pregunta a tu Chief of Staff",
+        "askNamed": "Pregunta a {name}",
         "send": "Enviar"
     },
     "routines": {
@@ -383,6 +385,8 @@
     "teamEmptyState": {
         "greeting": "Hola, soy tu Chief of Staff",
         "greetingNamed": "Hola {firstName}, soy tu Chief of Staff",
+        "greetingAs": "Hola, soy {name}, tu Chief of Staff",
+        "greetingNamedAs": "Hola {firstName}, soy {name}, tu Chief of Staff",
         "greetingWithTeam": "{greeting}. Este es tu equipo.",
         "emptySubtitle": "Todavía no tienes coworkers. Cuéntame una tarea que quieras delegar y crearé el primero.",
         "buildPrompt": "Créame un coworker que ",

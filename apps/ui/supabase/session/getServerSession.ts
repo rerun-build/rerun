@@ -31,7 +31,7 @@ export const getSessionWorkspace = cache(async () => {
     return { supabase, user, workspaceRefused, membership }
 })
 
-export const SESSION_WORKSPACE_COLUMNS = ['id', 'name', 'icon_url', 'plan', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'is_sandbox', 'onboarded_at', 'price_arm', 'locale'] as const
+export const SESSION_WORKSPACE_COLUMNS = ['id', 'name', 'icon_url', 'plan', 'max_agents', 'max_seats', 'model_access', 'custom_integrations', 'subscription_status', 'current_period_end', 'trial_ends_at', 'is_sandbox', 'onboarded_at', 'price_arm', 'locale', 'assistant_name'] as const
 
 export const getServerSession = cache(async () => {
     const { supabase, user, workspaceRefused } = await getSessionWorkspace()

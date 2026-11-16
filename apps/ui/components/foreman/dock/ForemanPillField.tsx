@@ -9,6 +9,7 @@ import { Kbd } from '@/components/ui/kbd'
 import { MicIcon, SendIcon } from '@/lib/icons'
 
 import { useTypewriter } from './useTypewriter'
+import { useAssistantName } from '@/hooks/useAssistantName'
 
 const KEY = 'min-w-5 gap-1 px-1 py-0 text-[10px] font-normal text-muted-foreground shadow-none'
 
@@ -36,6 +37,7 @@ type ForemanPillFieldProps = {
 /** What is typed here is sent from here and answered above the ball. Only the ball opens the column. */
 export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange, onFocusChange, onEngage, onSubmit }: ForemanPillFieldProps) {
     const t = useTranslations('foreman.pill')
+    const assistantName = useAssistantName()
     const reducedMotion = useReducedMotion()
     const prompts = useMemo(() => [t('prompts.lastNight'), t('prompts.failedRun'), t('prompts.newCoworker')], [t])
     const suggestion = useTypewriter(prompts, { paused: !!reducedMotion || focused })
@@ -76,7 +78,7 @@ export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange,
                         if (event.key === 'Escape') event.currentTarget.blur()
                     }}
                     placeholder={suggestion}
-                    aria-label={t('ask')}
+                    aria-label={assistantName ? t('askNamed', { name: assistantName }) : t('ask')}
                     autoComplete="off"
                     className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 />

@@ -19,6 +19,9 @@ export const workspaceSummarySchema = z.object({
     // Whether a member uses every Box open to the workspace or only the ones named to them. Absent
     // from a server older than access by Box.
     boxScope: z.enum(['all', 'assigned']).optional(),
+    // The name the workspace gave its Chief of Staff, null for "Chief of Staff". Absent from a server
+    // older than names.
+    assistantName: z.string().nullable().optional(),
 })
 export type WorkspaceSummary = z.infer<typeof workspaceSummarySchema>
 

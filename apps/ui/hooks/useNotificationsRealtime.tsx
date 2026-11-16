@@ -15,6 +15,7 @@ import { KIND_BEAM, KIND_ICONS, KIND_ICON_COLORS } from '@/lib/notifications/kin
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
 import { isScheduledSource, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { deliveryFor, recipientReason } from '@/lib/notifications/routing'
+import { useAssistantName } from '@/hooks/useAssistantName'
 import { useBoardStore } from '@/stores/board.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
@@ -45,7 +46,9 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
     }, [tErrors])
     const t = useTranslations('notifications.toast')
     const tNotices = useTranslations('notifications.notices')
-    const foremanName = useTranslations('foreman.notification')('title')
+    const assistantName = useAssistantName()
+    const tForeman = useTranslations('foreman.notification')
+    const foremanName = assistantName ?? tForeman('title')
     const copyRef = useRef({ t, tNotices, foremanName })
     useEffect(() => {
         copyRef.current = { t, tNotices, foremanName }

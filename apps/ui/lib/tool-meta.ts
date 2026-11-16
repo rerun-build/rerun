@@ -189,6 +189,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     detach_connector: Trash2Icon,
     list_vault: LockIcon,
     set_vault_link: LockIcon,
+    set_assistant_name: PencilIcon,
     send_message: SendIcon,
     create_boxes: BoxIcon,
     build_team: UsersIcon,

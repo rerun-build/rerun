@@ -54,8 +54,8 @@ export function recentCoworkers(coworkers: HomeCoworker[]): HomeCoworker[] {
 }
 
 // The Foreman as a cell of the pinned grid: it can be pinned like a coworker, never listed among them.
-export function foremanOnBoard(running: boolean): HomeCoworker {
-    return { id: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0 }
+export function foremanOnBoard(running: boolean, name: string = FOREMAN_DISPLAY_NAME): HomeCoworker {
+    return { id: FOREMAN_AGENT_ID, name, handle: null, description: null, status: running ? 'working' : 'idle', paused: false, spaceId: '', latest: null, pending: 0 }
 }
 
 // The order after a pinned row was dragged from one place to another.

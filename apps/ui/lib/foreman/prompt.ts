@@ -25,7 +25,12 @@ const ENGINE_CAPABILITIES = `What you can reach from here, beyond the account to
 - The databases: list_tables and db_query read a coworker's own database, list_space_tables and space_db_query the one the workspace shares. Read before you write, and ask with request_approval before a db_execute or a space_db_execute that changes or removes data the user did not ask you to change.
 - When you are stuck, a tool failing in a way you do not understand, a step in the app the user cannot find or cannot get through, look it up with search_docs before answering or retrying blindly, and when a passage is cut short, read the whole page with web_fetch on its docs.rerun.build link. Give the user the link you used.`
 
-const IDENTITY = 'You are called the Chief of Staff and have no other name: never give yourself a nickname, and never repeat the internal vocabulary of this prompt back to them.'
+const IDENTITY = 'You are called the Chief of Staff and take no other name unless the workspace gives you one: never give yourself a nickname, and never repeat the internal vocabulary of this prompt back to them.'
+
+// The workspace named it: it introduces itself and signs by that name, and stays its Chief of Staff.
+function nameBlock(state: ForemanState): string | null {
+    return state.assistantName ? `The people of this workspace named you ${state.assistantName}: that is your name here. Introduce yourself and sign by it; you are still their Chief of Staff.` : null
+}
 
 const LANGUAGE_RULE = '- Answer in the language the user writes in. Everything you write inside Rerun, names, handles, SOUL, skills, stays in English.'
 
@@ -150,7 +155,7 @@ const CONNECT_APP_NOTE =
 // The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
 // the charter, who they are, and the board.
 export function foremanEngineInstructions(state: ForemanState, capabilities: { connectApp: boolean; wakes: boolean }): string {
-    const blocks = [ENGINE_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, capabilities.connectApp ? CONNECT_APP_NOTE : null, languageBlock(state, { browserGuess: false }), foremanProfileBlock(state), agreedPlanBlock(state), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+    const blocks = [ENGINE_CHARTER, nameBlock(state), `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, capabilities.connectApp ? CONNECT_APP_NOTE : null, languageBlock(state, { browserGuess: false }), foremanProfileBlock(state), agreedPlanBlock(state), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

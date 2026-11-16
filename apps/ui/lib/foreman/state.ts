@@ -107,6 +107,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         priceArm: parsePriceArm(ctx.workspace.price_arm),
         client,
         workspaceName: ctx.workspace.name ?? 'this workspace',
+        assistantName: ctx.workspace.assistant_name ?? null,
         workspacePlan: ctx.workspace.plan ?? 'none',
         userEmail: ctx.userEmail,
         spaces: visibleSpaces,

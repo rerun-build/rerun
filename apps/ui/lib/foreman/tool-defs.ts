@@ -134,6 +134,20 @@ export const FOREMAN_VAULT_TOOL_DEFS = [
     },
 ] as const
 
+// Who it is to the workspace: the name its people give it.
+export const FOREMAN_IDENTITY_TOOL_DEFS = [
+    {
+        name: 'set_assistant_name',
+        description:
+            'Take the name the people of this workspace give you, for everyone in it: you introduce yourself and sign by it, and the app shows it where it names you. Only when they ask you to take a name, never one you pick yourself. Only an admin of the workspace can change it; pass an empty name to go back to "Chief of Staff".',
+        inputSchema: {
+            type: 'object',
+            properties: { name: { type: 'string', description: 'The name, 1 to 40 characters. Empty to go back to "Chief of Staff".' } },
+            required: ['name'],
+        },
+    },
+] as const
+
 // A Record rather than a list, so a tab added to the panel fails to compile here instead of reaching
 // the model with no hint of what it shows.
 const AGENT_TAB_HINTS: Record<AgentFocusTab, string> = {

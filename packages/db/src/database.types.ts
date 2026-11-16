@@ -3623,6 +3623,7 @@ export type Database = {
       }
       workspaces: {
         Row: {
+          assistant_name: string | null
           assistant_proactive: boolean
           boxes_archived_at: string | null
           boxes_deleted_at: string | null
@@ -3662,6 +3663,7 @@ export type Database = {
           waitlisted_at: string | null
         }
         Insert: {
+          assistant_name?: string | null
           assistant_proactive?: boolean
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
@@ -3701,6 +3703,7 @@ export type Database = {
           waitlisted_at?: string | null
         }
         Update: {
+          assistant_name?: string | null
           assistant_proactive?: boolean
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null

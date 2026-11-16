@@ -80,7 +80,10 @@ export async function recordForemanWakeEvent(engine: { workspaceId: number; isSa
     const status = news.event === 'agent.notification' ? completionStatus(news) : 'awaiting_ack'
     if (status) await setForemanConversationStatus(engine.workspaceId, payload.sessionId, status)
 
-    const { data: prefsRow } = await selectMaybeSingle(supabase, 'users', ['email_notification_prefs'] as const, { id: memberId })
+    const [{ data: prefsRow }, { data: workspace }] = await Promise.all([
+        selectMaybeSingle(supabase, 'users', ['email_notification_prefs'] as const, { id: memberId }),
+        selectMaybeSingle(supabase, 'workspaces', ['assistant_name'] as const, { id: engine.workspaceId }),
+    ])
     const members = [{ id: memberId, prefs: prefsRow?.email_notification_prefs ?? null }]
     const event: RoutedEvent = { agentId: FOREMAN_AGENT_ID, kind: news.kind, source: 'wake', authorId: memberId, participantIds: [memberId] }
     const recipients = computeRecipients(event, members)
@@ -105,5 +108,5 @@ export async function recordForemanWakeEvent(engine: { workspaceId: number; isSa
         console.error('[foreman] failed to store the notification of a wake', error)
         return
     }
-    if (!engine.isSandbox) await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: FOREMAN_AGENT_ID, agentName: FOREMAN_DISPLAY_NAME, conversationId, sourceKey: `foreman:${payload.sessionId}`, notification: news, recipients, members })
+    if (!engine.isSandbox) await pushNotification(supabase, { workspaceId: engine.workspaceId, agentId: FOREMAN_AGENT_ID, agentName: workspace?.assistant_name ?? FOREMAN_DISPLAY_NAME, conversationId, sourceKey: `foreman:${payload.sessionId}`, notification: news, recipients, members })
 }

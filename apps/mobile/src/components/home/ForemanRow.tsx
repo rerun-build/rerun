@@ -1,8 +1,9 @@
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { Pressable, View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AVATAR, HOME_GUTTER, PinSwipe, ROW_LINE, ROW_LINE_GAP, ROW_PADDING, ROW_TITLE, type PinControl } from '@/components/home/CoworkerRow'
+import { useAssistantName } from '@/components/home/useAssistantName'
 import type { ForemanLast } from '@/components/home/useForemanLast'
 import { AppText } from '@/components/ui/AppText'
 import { CoworkerAvatar } from '@/components/ui/CoworkerAvatar'
@@ -14,14 +15,15 @@ export function ForemanRow({ last, selected = false, onPress, pin }: { last: For
     const theme = useTheme()
     const t = useTranslations('mobileHome')
     const line = last.title || t('foreman.askAnything')
+    const name = useAssistantName()
     const row = (
-        <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={t('row.label', { name: FOREMAN_DISPLAY_NAME, line })} accessibilityHint={t('row.opensConversation')} accessibilityState={{ selected }} accessibilityActions={pin ? [{ name: 'togglePin', label: pin.pinned ? t('row.unpin') : t('row.pinToTop') }] : undefined} onAccessibilityAction={event => event.nativeEvent.actionName === 'togglePin' && pin?.onToggle()} style={selected ? { backgroundColor: theme.muted } : pin ? { backgroundColor: theme.background } : undefined}>
+        <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={t('row.label', { name, line })} accessibilityHint={t('row.opensConversation')} accessibilityState={{ selected }} accessibilityActions={pin ? [{ name: 'togglePin', label: pin.pinned ? t('row.unpin') : t('row.pinToTop') }] : undefined} onAccessibilityAction={event => event.nativeEvent.actionName === 'togglePin' && pin?.onToggle()} style={selected ? { backgroundColor: theme.muted } : pin ? { backgroundColor: theme.background } : undefined}>
             {({ pressed }) => (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg, paddingVertical: ROW_PADDING, paddingHorizontal: HOME_GUTTER, opacity: pressed ? 0.6 : 1 }}>
                     <CoworkerAvatar coworker={{ id: FOREMAN_AGENT_ID, kind: 'foreman', status: last.running ? 'working' : 'idle' }} size={AVATAR} facing="right" />
                     <View style={{ flex: 1, gap: ROW_LINE_GAP }}>
                         <AppText variant="headline" numberOfLines={1} maxFontSizeMultiplier={1.4} style={ROW_TITLE}>
-                            {FOREMAN_DISPLAY_NAME}
+                            {name}
                         </AppText>
                         <AppText variant="callout" tone="muted" numberOfLines={1} maxFontSizeMultiplier={1.4} style={ROW_LINE}>
                             {line}

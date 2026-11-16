@@ -111,6 +111,7 @@
         "detach_connector": "Remover app",
         "list_vault": "Ler o Vault",
         "set_vault_link": "Emprestar uma conta do Vault",
+        "set_assistant_name": "Adotar um nome",
         "send_message": "Mensagem ao coworker",
         "create_boxes": "Criar Boxes",
         "build_team": "Montar equipe",

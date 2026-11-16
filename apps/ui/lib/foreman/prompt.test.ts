@@ -113,4 +113,10 @@ describe('foremanSystemPrompt in the app', () => {
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).toMatch(/\$49 a month/)
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).not.toContain('mobile app')
     })
+
+    // The workspace named it: it introduces itself by that name and stays their Chief of Staff.
+    it('takes the name the workspace gave it, and only then', () => {
+        expect(foremanEngineInstructions(stateWith({ assistantName: 'Max' }), OLD_BOX)).toContain('named you Max')
+        expect(foremanEngineInstructions(stateWith({}), OLD_BOX)).not.toContain('named you')
+    })
 })

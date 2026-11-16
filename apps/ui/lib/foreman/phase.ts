@@ -205,6 +205,8 @@ export type ForemanState = {
     client: ForemanClient
     workspaceName: string
     workspacePlan: string
+    // The name the workspace gave it, null for "Chief of Staff".
+    assistantName?: string | null
     userEmail: string | null
     spaces: ForemanSpaceRow[]
     agents: ForemanAgentRow[]
