@@ -489,6 +489,8 @@ def cmd_wt(a):
                 pass
         print("removed worktree %s and local branch %s" % (path, branch))
         return
+    if "--clone" in a:
+        return wt_new_clone(a, full, issue, chunk)
     existing = os.path.isdir(path)
     st = shutil.disk_usage("/data")
     if st.free / 2**30 < MIN_FREE_GB:
@@ -555,6 +557,23 @@ def cmd_wt(a):
     print("Next: edit here, quick checks only (lint, type check, named test files), commit, then `pr-open`.")
 
 
+def wt_new_clone(a, full, issue, chunk):
+    import clones
+    st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
+    if st.free / 2**30 < MIN_FREE_GB:
+        clones.transient("disk: %s has %.0f GB free, floor is %d GB" % (WORK, st.free / 2**30, MIN_FREE_GB))
+    mem = avail_mem_gb()
+    if mem is not None and mem < MIN_FREE_MEM_GB:
+        clones.transient("memory: %.1f GB available, floor is %d GB" % (mem, MIN_FREE_MEM_GB))
+    plan_check(full, issue)
+    info = api("repos/%s" % full)
+    if not isinstance(info, dict) or "default_branch" not in info:
+        clones.transient("cannot read %s on GitHub" % full)
+    base = a[a.index("--base") + 1] if "--base" in a else None
+    owner = a[a.index("--owner") + 1] if "--owner" in a else os.environ.get("FACTORY_OWNER") or "unknown"
+    return clones.new(full, issue, chunk, base, owner, info["default_branch"])
+
+
 def install_deps(path):
     if not os.path.isfile(os.path.join(path, "pnpm-lock.yaml")):
         return
@@ -568,6 +587,7 @@ def install_deps(path):
         print("dependencies installed in %d s" % (time.time() - t0))
     else:
         print("dependencies NOT installed: %s" % err[:200])
+    return err
 
 
 def pr_lookup(full, branch):
