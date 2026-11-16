@@ -5,6 +5,13 @@ import { ArrowDownIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
+export const CUE_MOTION = {
+    initial: { opacity: 0, y: 8, scale: 0.96 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: 8, scale: 0.96 },
+    transition: { duration: 0.22, ease: [0.4, 0, 0.2, 1] },
+} as const
+
 // The scroll-to-bottom arrow grown into what the coworker is waiting for, down the thread.
 export function PendingHitlPill({ summary, onJump }: { summary: PendingHitlSummary; onJump: () => void }) {
     const t = useTranslations('chat.pendingHitl')

@@ -3,24 +3,29 @@
 import { AttentionBuddy, type InboxEntry } from '@rerun/ui/inbox'
 import { Button, Skeleton, useScrollFade } from '@rerun/ui/primitives'
 import { shortRelativeTime } from '@rerun/ui/time'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useLocale, useTranslations } from 'next-intl'
-import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { MessageResponse } from '@/components/ai-elements/message'
 import { ActionApprovalBlock } from '@/components/chat/ActionApprovalBlock'
 import { HitlReceipt } from '@/components/chat/HitlReceipt'
+import { CUE_MOTION, PendingHitlPill } from '@/components/chat/PendingHitlPill'
 import { QuestionForm } from '@/components/chat/QuestionForm'
 import { SecretRequestBlock } from '@/components/chat/SecretRequestBlock'
 import type { InboxPeek, PeekAnswerOutcome } from '@/hooks/useInboxPeek'
+import { usePendingInView } from '@/hooks/usePendingInView'
 import { HITL_CANCELLED, parseHitlReply, pendingApprovals, pendingQuestions, pendingSecrets, serializeApprovalDecisions } from '@/lib/chat-hitl'
+import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
-import { ArrowRight, ChevronDown, XIcon } from '@/lib/icons'
+import { ArrowLeftIcon, ArrowRight, ChevronDown, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
 const RECEIPT_MS = 2600
 const MAX_HEIGHT = 576
 const EDGE_GAP = 12
+// Room left around the request once the pill has scrolled it in.
+const JUMP_GAP = 12
 
 const MARKDOWN = 'text-sm break-words [&_li]:my-0.5 [&_ol]:my-1 [&_p]:my-1 [&_pre]:my-1 [&_ul]:my-1 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0'
 
@@ -31,6 +36,8 @@ type InboxPeekCardProps = {
     peek: InboxPeek
     onAnswer: (text: string) => Promise<PeekAnswerOutcome>
     onClose: () => void
+    /** Back to the inbox's list. */
+    onBack?: () => void
     /** Left out when there is no coworker to open a conversation with. */
     onOpenConversation?: () => void
     /** The side the card is pinned by: it rises from the board's pill, or drops from a line of a list. */
@@ -40,7 +47,7 @@ type InboxPeekCardProps = {
 type Phase = { step: 'asking' } | { step: 'sending' } | { step: 'sent'; text: string } | { step: 'stale' }
 
 /** A question, an approval or a credential request, read and answered from the inbox without opening the conversation. */
-export function InboxPeekCard({ entry, peek, onAnswer, onClose, onOpenConversation, anchor = 'bottom' }: InboxPeekCardProps) {
+export function InboxPeekCard({ entry, peek, onAnswer, onClose, onBack, onOpenConversation, anchor = 'bottom' }: InboxPeekCardProps) {
     const t = useTranslations('notifications.inbox.peek')
     const locale = useLocale()
     const [phase, setPhase] = useState<Phase>({ step: 'asking' })
@@ -48,7 +55,15 @@ export function InboxPeekCard({ entry, peek, onAnswer, onClose, onOpenConversati
     // A widget latches once submitted: a failed send gives a fresh one back.
     const [attempt, setAttempt] = useState(0)
     const [bodyEl, setBodyEl] = useState<HTMLDivElement | null>(null)
+    const bodyRef = useRef<HTMLDivElement | null>(null)
+    const setBody = useCallback((element: HTMLDivElement | null) => {
+        bodyRef.current = element
+        setBodyEl(element)
+    }, [])
+    const widgetRef = useRef<HTMLDivElement>(null)
     const mask = useScrollFade(bodyEl)
+    const reducedMotion = useReducedMotion()
+    const tHitlCue = useTranslations('chat.hitlCue')
     const maxHeight = useRoomToGrow(anchor)
 
     useEffect(() => {
@@ -72,10 +87,30 @@ export function InboxPeekCard({ entry, peek, onAnswer, onClose, onOpenConversati
     const pending = peek.state === 'ready' ? peek.peek.pending : null
     const answerable = pending !== null && isAnswerable(pending)
     const sent = phase.step === 'sent'
+    const waiting = answerable && peek.state === 'ready' && phase.step === 'asking' ? pending : null
+    const widgetVisibility = usePendingInView(bodyRef, widgetRef, waiting?.toolCallId ?? null)
+    const cue = useMemo(() => (waiting ? summarizePendingHitl(waiting.kind, waiting.input, tHitlCue) : null), [waiting, tHitlCue])
+
+    // Scrolls just enough to show the whole request, its top first when it is taller than the card.
+    const jumpToWidget = () => {
+        const body = bodyRef.current
+        const widget = widgetRef.current
+        if (!body || !widget) return
+        const bodyRect = body.getBoundingClientRect()
+        const widgetRect = widget.getBoundingClientRect()
+        const bottomIn = widgetRect.bottom - bodyRect.bottom + JUMP_GAP
+        const topIn = widgetRect.top - bodyRect.top - JUMP_GAP
+        body.scrollTo({ top: body.scrollTop + Math.min(bottomIn, topIn), behavior: reducedMotion ? 'auto' : 'smooth' })
+    }
 
     return (
         <div ref={maxHeight.ref} style={{ maxHeight: maxHeight.value }} className="flex flex-col">
             <div className="flex shrink-0 items-start gap-2.5 p-3 pb-2">
+                {onBack && (
+                    <Button size="icon-sm" variant="ghost" aria-label={t('back')} onClick={onBack}>
+                        <ArrowLeftIcon className="size-3.5" />
+                    </Button>
+                )}
                 <AttentionBuddy agentId={entry.agentId} status={sent ? 'done' : entry.status} />
                 <div className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-sm font-medium text-foreground">{entry.agentName}</span>
@@ -96,13 +131,13 @@ export function InboxPeekCard({ entry, peek, onAnswer, onClose, onOpenConversati
                             <SentReceipt text={phase.text} pending={pending} agentId={entry.agentId} />
                         </motion.div>
                     ) : (
-                        <motion.div key="ask" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="flex min-h-0 flex-1 flex-col">
-                            <div ref={setBodyEl} style={{ maskImage: mask, WebkitMaskImage: mask }} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pb-3">
+                        <motion.div key="ask" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="relative flex min-h-0 flex-1 flex-col">
+                            <div ref={setBody} style={{ maskImage: mask, WebkitMaskImage: mask }} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pb-3">
                                 {peek.state === 'ready' && (peek.peek.before || peek.peek.ask) && <ThreadContext before={peek.peek.before} ask={peek.peek.ask} />}
                                 {phase.step === 'stale' || (peek.state === 'ready' && !pending) ? (
                                     <PeekNote>{t('stale')}</PeekNote>
                                 ) : answerable && peek.state === 'ready' ? (
-                                    <div className={cn(phase.step === 'sending' && 'pointer-events-none opacity-60')}>
+                                    <div ref={widgetRef} className={cn(phase.step === 'sending' && 'pointer-events-none opacity-60')}>
                                         <PeekWidget key={attempt} pending={pending} agentId={entry.agentId} sessionId={peek.sessionId} onSubmit={text => void submit(text)} onClose={onClose} />
                                     </div>
                                 ) : (
@@ -113,6 +148,15 @@ export function InboxPeekCard({ entry, peek, onAnswer, onClose, onOpenConversati
                                         {notice === 'busy' ? t('busy', { agent: entry.agentName }) : t('failed')}
                                     </p>
                                 )}
+                            </div>
+                            <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-3">
+                                <AnimatePresence initial={false}>
+                                    {cue && widgetVisibility === 'out-of-view' && (
+                                        <motion.div key="pending" {...CUE_MOTION} className="pointer-events-auto flex max-w-full justify-center">
+                                            <PendingHitlPill summary={cue} onJump={jumpToWidget} />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </motion.div>
                     )}

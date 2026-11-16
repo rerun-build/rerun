@@ -1,6 +1,6 @@
 "use client";
 
-import { PendingHitlPill } from "@/components/chat/PendingHitlPill";
+import { CUE_MOTION, PendingHitlPill } from "@/components/chat/PendingHitlPill";
 import { Button } from "@/components/ui/button";
 import { bringBlockIn } from "@/hooks/useArriveByTop";
 import { usePendingInView } from "@/hooks/usePendingInView";
@@ -91,13 +91,6 @@ export type PendingHitlCue = {
 export type ConversationScrollButtonProps = ComponentProps<typeof Button> & {
   pending?: PendingHitlCue | null;
 };
-
-const CUE_MOTION = {
-  initial: { opacity: 0, y: 8, scale: 0.96 },
-  animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: 8, scale: 0.96 },
-  transition: { duration: 0.22, ease: [0.4, 0, 0.2, 1] },
-} as const;
 
 export const ConversationScrollButton = ({
   className,

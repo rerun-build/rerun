@@ -1,6 +1,7 @@
 'use client'
 
 import { StepDots } from '@rerun/ui/chat'
+import { AnimatedSize } from '@rerun/ui/steps'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTranslations } from 'next-intl'
 
@@ -9,7 +10,6 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { ArrowRight } from '@/lib/icons'
 import { rolesForIndustry } from '@/lib/onboarding/intake'
 import { cn } from '@/lib/utils'
-import { AnimatedHeight } from './AnimatedHeight'
 import { IntakeChoiceStep } from './IntakeChoiceStep'
 import { IntakeCompanyStep } from './IntakeCompanyStep'
 import { IntakeIndustryStep } from './IntakeIndustryStep'
@@ -49,9 +49,11 @@ export function ForemanIntakeCard({ intake, autoFocus = true, className }: { int
     return (
         <div className={cn('relative mb-2 flex flex-col gap-3 overflow-hidden rounded-lg border border-border bg-muted/30 p-3', className)}>
             {/* `popLayout` et non `wait` : l'étape qui sort quitte le flux tout de suite, donc la
-                hauteur visée est celle de l'étape qui arrive, et AnimatedHeight a quelque chose à
-                viser dès la première image au lieu de passer par un cadre vide. */}
-            <AnimatedHeight>
+                hauteur visée est celle de l'étape qui arrive, et AnimatedSize a quelque chose à
+                viser dès la première image au lieu de passer par un cadre vide. Le clip déborde de
+                4px de chaque côté (marge négative rendue en padding) : sans ça le ring de focus d'un
+                champ pleine largeur et le hover d'une ligne en -mx-1 sont coupés net. */}
+            <AnimatedSize className="-m-1" innerClassName="p-1">
                 <AnimatePresence mode="popLayout" initial={false}>
                     <motion.div key={step} {...STEP_MOTION}>
                         {step === 'company' && <IntakeCompanyStep draft={draft} siteRead={siteRead} platform={platform} disabled={busy} autoFocus={autoFocus} onChange={set} onEnter={next} />}
@@ -60,7 +62,7 @@ export function ForemanIntakeCard({ intake, autoFocus = true, className }: { int
                         {step === 'name' && <IntakeTextStep label={t('name.label')} value={draft.firstName} placeholder={t('name.placeholder')} disabled={busy} onChange={firstName => set({ firstName })} onEnter={next} />}
                     </motion.div>
                 </AnimatePresence>
-            </AnimatedHeight>
+            </AnimatedSize>
 
             {error && <p className="px-1 text-xs text-destructive">{error}</p>}
 

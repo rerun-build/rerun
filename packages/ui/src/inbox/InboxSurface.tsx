@@ -12,6 +12,7 @@ import { BellIcon, CheckCheckIcon, InboxIcon, Loader2Icon } from '../icons'
 import { Button, Chip, EmptyState, useScrollFade } from '../primitives'
 import { useKitTranslations, useUiLocale } from '../locale'
 import type { KitTranslator } from '../kit-translator'
+import { AnimatedSize, StepTransition, useStepDirection } from '../steps'
 import { shortRelativeTime } from '../time'
 import { TooltipDisabledReason, TooltipLabeled } from '../Tooltip'
 import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
@@ -106,6 +107,8 @@ export type InboxSurfaceProps<T extends InboxEntry> = {
     onRowMenuOpenChange?: (open: boolean) => void
     /** When set, the card rises from the pill around this body instead of the list. */
     detail?: ReactNode
+    /** Names the detail shown: a new key slides the next one in. */
+    detailKey?: string
     detailClassName?: string
     /** `pill`: the board's corner, the pill grows into the card. `row`: a line of a list's header, the card drops under it. */
     trigger?: 'pill' | 'row'
@@ -138,6 +141,7 @@ export function InboxSurface<T extends InboxEntry>({
     RowMenu,
     onRowMenuOpenChange,
     detail = null,
+    detailKey = '',
     detailClassName = 'w-[calc(100vw-2rem)] sm:w-[340px]',
     trigger = 'pill',
 }: InboxSurfaceProps<T>) {
@@ -163,6 +167,26 @@ export function InboxSurface<T extends InboxEntry>({
     if (cardOpen && !cardMounted) setCardMounted(true)
     const dropAnchor = useDropAnchor(rootRef, trigger === 'row' && !cardOpen, cardOpen)
     const refocusPillRef = useRef(false)
+    // A card that closes keeps what it showed until it is gone: closing a detail clears it at once,
+    // and the list would otherwise slide back in and resize the card while it folds or fades out.
+    const lastShownRef = useRef({ detail, detailKey, detailClassName })
+    useLayoutEffect(() => {
+        if (cardOpen) lastShownRef.current = { detail, detailKey, detailClassName }
+    })
+    const shown = cardOpen ? { detail, detailKey, detailClassName } : lastShownRef.current
+    const showsDetail = shown.detail !== null && shown.detail !== undefined
+    const direction = useStepDirection(showsDetail ? 1 : 0)
+    const stepKey = showsDetail ? `detail:${shown.detailKey}` : 'list'
+    // Back from a detail, the list is where it was left; a card opened afresh starts at its top.
+    const listScrollRef = useRef(0)
+
+    useEffect(() => {
+        if (!cardOpen) listScrollRef.current = 0
+    }, [cardOpen])
+
+    useLayoutEffect(() => {
+        if (listEl) listEl.scrollTop = listScrollRef.current
+    }, [listEl])
 
     useEffect(() => {
         if (cardMounted || !refocusPillRef.current) return
@@ -220,6 +244,7 @@ export function InboxSurface<T extends InboxEntry>({
     useEffect(() => {
         if (!listEl) return
         const onScroll = () => {
+            listScrollRef.current = listEl.scrollTop
             const nodes = Array.from(listEl.querySelectorAll<HTMLElement>('[data-section]'))
             if (nodes.length === 0) return
             const atBottom = listEl.scrollTop > 0 && listEl.scrollTop + listEl.clientHeight >= listEl.scrollHeight - 4
@@ -290,10 +315,16 @@ export function InboxSurface<T extends InboxEntry>({
     const morph = reducedMotion ? { duration: 0 } : { type: 'spring' as const, stiffness: 520, damping: 40 }
     const fade = reducedMotion ? { duration: 0 } : { duration: 0.18 }
     const folded = { width: pillWidth || 'auto', height: CHROME_SIZE, borderRadius: CHROME_SIZE / 2 }
+    const resize = reducedMotion ? { duration: 0 } : undefined
+    const stepDirection = reducedMotion ? 0 : direction
+
+    // The content fades in CSS, not with motion: inside the step's presence, which skips its first
+    // animation, a motion fade would let the content pop in at full opacity while the card unfolds.
+    const contentFade = cn('motion-reduce:animate-none motion-reduce:transition-none', cardOpen ? 'animate-in duration-200 fade-in-0' : 'opacity-0 transition-opacity duration-200')
 
     // Its own compositor layer: rasterized once, then only moved and clipped while the card morphs around it.
     const listBody = (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={fade} className={cn('flex flex-col will-change-transform', trigger === 'pill' && 'border-b border-border')}>
+        <div className={cn('flex flex-col will-change-transform', trigger === 'pill' && 'border-b border-border', contentFade)}>
             {resizable && (
                 <button
                     type="button"
@@ -372,7 +403,7 @@ export function InboxSurface<T extends InboxEntry>({
                     )}
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 
     if (trigger === 'row') {
@@ -455,7 +486,11 @@ export function InboxSurface<T extends InboxEntry>({
                     }}
                     onEscapeKeyDown={event => keepOpen && event.preventDefault()}
                 >
-                    {hasDetail ? <div className={cn('relative', detailClassName)}>{detail}</div> : <div className={cn('relative flex flex-col', cardClassName, dragging && 'select-none')}>{listBody}</div>}
+                    <AnimatedSize axis="both" transition={resize}>
+                        <StepTransition stepKey={stepKey} direction={stepDirection}>
+                            {showsDetail ? <div className={cn('relative', shown.detailClassName)}>{shown.detail}</div> : <div className={cn('relative flex flex-col', cardClassName, dragging && 'select-none')}>{listBody}</div>}
+                        </StepTransition>
+                    </AnimatedSize>
                 </PopoverContent>
             </Popover>
         )
@@ -525,19 +560,21 @@ export function InboxSurface<T extends InboxEntry>({
                         <motion.span aria-hidden initial={{ opacity: 1 }} animate={{ opacity: 0 }} exit={{ opacity: 1 }} transition={fade} className="pointer-events-none absolute inset-0 rounded-[inherit]">
                             <BorderBeam pattern="arcs" tone="white" animated={false} glow angle={53} outset={1} className="opacity-30" />
                         </motion.span>
-                        {hasDetail ? (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={fade} className={cn('relative shrink-0', detailClassName)}>
-                                {detail}
-                            </motion.div>
-                        ) : (
-                        <div className={cn('relative flex shrink-0 flex-col', cardClassName, dragging && 'select-none')}>
-                            {listBody}
+                        <AnimatedSize axis="both" transition={resize} className="relative shrink-0">
+                            <StepTransition stepKey={stepKey} direction={stepDirection}>
+                                {showsDetail ? (
+                                    <div className={cn('relative', shown.detailClassName, contentFade)}>{shown.detail}</div>
+                                ) : (
+                                    <div className={cn('relative flex flex-col', cardClassName, dragging && 'select-none')}>
+                                        {listBody}
 
-                            <button type="button" aria-label={t('inbox.close')} onClick={closeToPill} className="flex h-[calc(var(--chrome-size)-2px)] shrink-0 items-center pr-[15px] pl-[11px] transition-colors hover:bg-accent">
-                                <InboxPillContent items={items} />
-                            </button>
-                        </div>
-                        )}
+                                        <button type="button" aria-label={t('inbox.close')} onClick={closeToPill} className="flex h-[calc(var(--chrome-size)-2px)] shrink-0 items-center pr-[15px] pl-[11px] transition-colors hover:bg-accent">
+                                            <InboxPillContent items={items} />
+                                        </button>
+                                    </div>
+                                )}
+                            </StepTransition>
+                        </AnimatedSize>
                     </motion.div>
                 )}
             </AnimatePresence>

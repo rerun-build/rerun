@@ -11,7 +11,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { Streamdown } from 'streamdown'
 
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
-import { ArrowRight, CheckCheckIcon, XIcon } from '@/lib/icons'
+import { ArrowLeftIcon, ArrowRight, CheckCheckIcon, XIcon } from '@/lib/icons'
 
 const streamdownPlugins = { cjk, code, math, mermaid }
 
@@ -21,6 +21,8 @@ type InboxDetailCardProps = {
     message: string
     total: number
     onClose: () => void
+    /** Back to the inbox's list. */
+    onBack?: () => void
     onSeeAll: () => void
     /** Left out when there is no agent to open a conversation with. */
     onOpenConversation?: () => void
@@ -28,7 +30,7 @@ type InboxDetailCardProps = {
     onMarkRead?: () => void
 }
 
-export function InboxDetailCard({ entry, message, total, onClose, onSeeAll, onOpenConversation, onMarkRead }: InboxDetailCardProps) {
+export function InboxDetailCard({ entry, message, total, onClose, onBack, onSeeAll, onOpenConversation, onMarkRead }: InboxDetailCardProps) {
     const t = useTranslations('notifications.inbox.detail')
     const locale = useLocale()
     const status = (Object.hasOwn(ATTENTION_STATUS_META, entry.status) ? entry.status : 'waiting_human') as 'error' | 'awaiting_question' | 'awaiting_approval' | 'awaiting_ack' | 'done' | 'waiting_human'
@@ -37,6 +39,11 @@ export function InboxDetailCard({ entry, message, total, onClose, onSeeAll, onOp
     return (
         <div className="flex flex-col gap-3 p-3">
             <div className="flex items-start gap-2.5">
+                {onBack && (
+                    <Button size="icon-sm" variant="ghost" aria-label={t('back')} onClick={onBack}>
+                        <ArrowLeftIcon className="size-3.5" />
+                    </Button>
+                )}
                 <AttentionBuddy agentId={entry.agentId} status={entry.status} />
                 <div className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate text-sm font-medium text-foreground">{entry.agentName}</span>

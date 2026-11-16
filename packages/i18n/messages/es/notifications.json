@@ -9,6 +9,7 @@
         "unknownCoworker": "Coworker",
         "detail": {
             "close": "Cerrar",
+            "back": "Atrás",
             "seeAll": "Ver todo",
             "seeAllCount": "Ver los {count}",
             "markRead": "Marcar como leído",
@@ -26,6 +27,7 @@
         },
         "peek": {
             "close": "Cerrar",
+            "back": "Atrás",
             "openConversation": "Abrir conversación",
             "showMore": "Mostrar más",
             "showLess": "Mostrar menos",

@@ -17,8 +17,11 @@ vi.mock('motion/react', async () => {
     const { createElement: h, forwardRef } = await import('react')
     const strip = ({ initial: _initial, animate: _animate, exit: _exit, transition: _transition, ...rest }: Record<string, unknown>) => rest
     const div = forwardRef<HTMLDivElement, Record<string, unknown>>((props, ref) => h('div', { ...strip(props), ref }))
-    return { AnimatePresence: ({ children }: { children: ReactNode }) => children, motion: { div } }
+    return { AnimatePresence: ({ children }: { children: ReactNode }) => children, motion: { div }, useReducedMotion: () => false }
 })
+
+const visibility = vi.hoisted(() => ({ current: 'in-view' as 'in-view' | 'out-of-view' | 'absent' }))
+vi.mock('@/hooks/usePendingInView', () => ({ usePendingInView: (_scroll: unknown, _block: unknown, key: string | null) => (key === null ? 'absent' : visibility.current) }))
 
 vi.mock('@/components/ai-elements/message', () => ({ MessageResponse: ({ children }: { children: string }) => createElement('div', null, children) }))
 vi.mock('@/components/chat/HitlReceipt', () => ({ HitlReceipt: ({ reply }: { reply: { kind: string } }) => createElement('div', { 'data-receipt': reply.kind }) }))
@@ -46,6 +49,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+    visibility.current = 'in-view'
     act(() => root.unmount())
     container.remove()
     vi.useRealTimers()
@@ -105,6 +109,46 @@ describe('InboxPeekCard', () => {
     it('offers only the conversation for a request the card cannot answer', () => {
         render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'service', toolCallId: 'call-3', input: { services: [{ slug: 'stripe' }] } }, ask: 'Connect Stripe so I can read invoices.', before: null } })
         expect(container.textContent).toContain('Open the conversation to answer.')
+    })
+
+    it('goes back to the list without closing the inbox', async () => {
+        const onBack = vi.fn()
+        const onClose = vi.fn()
+        act(() => root.render(createElement(InboxPeekCard, { entry: ENTRY, peek: approvalPeek(), onAnswer: async () => 'sent' as const, onClose, onBack })))
+        const back = container.querySelector<HTMLButtonElement>('button[aria-label="Back"]')
+        if (!back) throw new Error('no Back button on screen')
+        await act(async () => back.click())
+        expect(onBack).toHaveBeenCalledOnce()
+        expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('has no way back when opened on its own', () => {
+        render(approvalPeek())
+        expect(container.querySelector('button[aria-label="Back"]')).toBeNull()
+    })
+
+    it('points down to the request while it is out of sight, and scrolls to it', async () => {
+        visibility.current = 'out-of-view'
+        render(approvalPeek())
+        const pill = container.querySelector<HTMLButtonElement>('button[aria-label="Approval needed, go to it"]')
+        if (!pill) throw new Error('no pending pill on screen')
+        const body = pill.closest('.relative')?.querySelector<HTMLDivElement>('.overflow-y-auto')
+        if (!body) throw new Error('no scrolling body')
+        const scrollTo = vi.fn()
+        body.scrollTo = scrollTo as typeof body.scrollTo
+        await act(async () => pill.click())
+        expect(scrollTo).toHaveBeenCalledOnce()
+    })
+
+    it('leaves the pill out once the request is in sight', () => {
+        render(approvalPeek())
+        expect(container.querySelector('button[aria-label="Approval needed, go to it"]')).toBeNull()
+    })
+
+    it('has no pill for a request answered in the conversation only', () => {
+        visibility.current = 'out-of-view'
+        render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'service', toolCallId: 'call-3', input: { services: [{ slug: 'stripe' }] } }, ask: 'Connect Stripe.', before: null } })
+        expect(container.textContent).not.toContain('App to connect')
     })
 
     it('reads a conversation that waits on nothing anymore as answered', () => {
