@@ -18,8 +18,8 @@ const h = vi.hoisted(() => ({
 
 vi.mock('@/app/api/_actions/factory.actions', () => ({ readFactorySnapshotAction: () => Promise.resolve(h.answer) }))
 vi.mock('@/components/agent/AgentPanel', () => ({ AgentPanel: () => null }))
-vi.mock('@/components/layout/WorkspaceSwitcher', () => ({ WorkspaceSwitcher: () => null }))
-vi.mock('@/components/control-center/ControlCenter', () => ({ ControlCenter: () => null }))
+vi.mock('@/components/layout/WorkspaceSwitcher', () => ({ WorkspaceSwitcher: () => createElement('div', { 'data-workspace-switcher': '' }) }))
+vi.mock('@/components/control-center/ControlCenter', () => ({ ControlCenter: () => createElement('div', { 'data-control-center': '' }) }))
 vi.mock('@/supabase/session/SessionProvider', () => ({ useSession: () => ({ workspace: null }) }))
 vi.mock('@/components/factory/FactoryWorld', () => ({
     FactoryWorld: (p: { onOpenCoworker?: (n: string) => void }) => { h.open = p.onOpenCoworker ?? null; return null },
