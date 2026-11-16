@@ -51,6 +51,9 @@ def judge(out, count, head):
         a = ASK_LINE.match(l)
         if a:
             got[int(a.group(1))] = a.group(2) == "MET"
+    notmet = [l for l in lines if re.match(r"ASK \d+: NOT MET\b", l) and ASK_LINE.match(l)]
+    if notmet and all(re.match(r"ASK \d+: NOT MET \(plan\) \S", l) for l in notmet):
+        return "plan", "\n".join(notmet)[:1500]
     if m.group(1) == "FAIL":
         return "fail", (m.group(3) or "no ask numbers")[:200]
     if sorted(got) != list(range(1, count + 1)):
