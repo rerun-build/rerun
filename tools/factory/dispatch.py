@@ -44,6 +44,9 @@ MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
 MERGE_TRIES = 5
 MAX_TAKES = 3
+INBOX = "Factory follow-ups inbox"
+INBOX_BODY = ("The factory dispatcher writes every reviewer follow-up note here as a comment, one comment per review, "
+              "instead of opening a new issue for each note. Read the comments, act on the notes worth doing, and keep this issue open.")
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
              "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
@@ -476,18 +479,37 @@ class Dispatcher:
         got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
         return got[1] if got else None
 
+    def inbox(self):
+        rows = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--search", INBOX + " in:title",
+                                   "--json", "number,title", "--limit", "20"]))
+        n = next((r["number"] for r in rows if r.get("title") == INBOX), None)
+        if n is None:
+            n = int(self.gh(["issue", "create", "-R", self.repo, "--title", INBOX, "--body", INBOX_BODY]).strip().rsplit("/", 1)[1])
+        self.store.set("-", "inbox", n)
+        return str(n)
+
     def follow_ups(self, j, out):
         done = list(j.get("followups") or [])
-        for key, title, body in followups.notes(out, "#%s" % j["issue"]):
-            if key in done:
-                continue
-            try:
-                self.gh(["issue", "create", "-R", self.repo, "--title", title, "--body", body])
-            except Error as e:
-                log(j["issue"], "follow-up issue not opened: %s" % e)
-                continue
-            done.append(key)
         j["followups"] = done
+        new = {}
+        for key, title, body in followups.notes(out, "#%s" % j["issue"]):
+            if key not in done:
+                new.setdefault(key, "%s\n\n%s" % (title, body))
+        if not new:
+            return
+        text = "\n\n".join(["From #%s, pull request #%s:" % (j["issue"], j.get("pr"))] + list(new.values()))
+        kept = self.store.get_all("-").get("inbox")
+        try:
+            try:
+                self.gh(["issue", "comment", kept or self.inbox(), "-R", self.repo, "--body", text])
+            except Exception:
+                if not kept:
+                    raise
+                self.gh(["issue", "comment", self.inbox(), "-R", self.repo, "--body", text])
+        except Exception as e:
+            log(j["issue"], "follow-ups not written to the inbox: %s" % e)
+            return
+        done.extend(new)
 
     def to(self, j, state, msg, **kw):
         if not states.allowed(j["state"], state):
