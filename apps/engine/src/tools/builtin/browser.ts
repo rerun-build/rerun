@@ -203,13 +203,13 @@ export function browserTools(ctx: RunContext): ToolSet {
     const breaker = ctx.hostBreaker ?? new HostBreaker()
     return {
         browser_navigate: tool({
-            description: 'Open a URL in a real Chromium browser, wait for it to render (including JavaScript and bot-protection challenges, cookie banners accepted), and return the visible text, plus the links on the page when you ask for them. Cookies persist between your calls. Use this instead of web_fetch for pages that need JS to load or that block simple requests. Optionally save a screenshot into your workspace to inspect later with vision_analyze.',
+            description: 'Open a URL in real Chromium, wait for it to render (JavaScript, bot-protection challenges, cookie banners), and return the visible text, plus links on request. Cookies persist between calls. Use this instead of web_fetch for pages that need JS or block simple requests. Optionally save a screenshot (fullPage false: visible part; maxEdge: longest side in px) into your workspace for vision_analyze.',
             inputSchema: z.object({
                 url: publicHttpUrl,
-                screenshotPath: z.string().optional().describe('Workspace-relative path to save a full-page PNG screenshot'),
-                fullPage: z.boolean().default(true).describe('With a screenshot: false saves only the visible part of the page'),
-                maxEdge: z.number().int().min(320).max(2048).optional().describe('With a screenshot: shrink it so its longest side is at most this many pixels'),
-                links: z.boolean().default(false).describe('Also list the links on the page (text and URL), e.g. to open the results of a search'),
+                screenshotPath: z.string().optional().describe('Workspace path for a PNG screenshot'),
+                fullPage: z.boolean().default(true),
+                maxEdge: z.number().int().min(320).max(2048).optional(),
+                links: z.boolean().default(false).describe('Also list the page links (text and URL)'),
                 timeoutMs: z.number().int().positive().max(120_000).default(30_000),
             }),
             execute: async (visit: Visit) => {
