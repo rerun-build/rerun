@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { ATTENTION_STATUSES, FOREMAN_AGENT_ID, FOREMAN_WAKE_MARKER, type Conversation, type SessionKind, type SessionStatus } from '@rerun/contracts'
+import { ATTENTION_STATUSES, FOREMAN_AGENT_ID, FOREMAN_WAKE_MARKER, stripStarterPicks, type Conversation, type SessionKind, type SessionStatus } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
@@ -15,7 +15,7 @@ import type { EngineConnection } from '@/lib/engine/types'
 import type { ForemanBackend } from './phase'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
-import { isKickoffText } from '@/lib/foreman/kickoff-marker'
+import { isKickoffText, stripKickoff } from '@/lib/foreman/kickoff-marker'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -143,9 +143,22 @@ function isWakeMessage(message: UIMessage): boolean {
     return message.role === 'user' && message.parts.some(part => part.type === 'text' && part.text.startsWith(FOREMAN_WAKE_MARKER))
 }
 
+// The lines the app writes for the Chief of Staff to read (the start of a conversation, the cards
+// picked off the starter pack) are taken out of what people read, here for every client at once. A
+// message left with nothing to show goes with them.
+function withoutAppMarkers(message: UIMessage): UIMessage | null {
+    if (message.role !== 'user') return message
+    const parts = message.parts.flatMap((part): UIMessage['parts'] => {
+        if (part.type !== 'text') return [part]
+        const text = stripStarterPicks(stripKickoff(part.text)).trim()
+        return text ? [{ ...part, text }] : []
+    })
+    return parts.length ? { ...message, parts } : null
+}
+
 async function readEngineTranscript(conn: EngineConnection, engineSessionId: string): Promise<UIMessage[]> {
     const messages = transformEngineMessages(await getSessionMessages(conn, FOREMAN_AGENT_ID, engineSessionId)) as UIMessage[]
-    return messages.filter(message => !isWakeMessage(message))
+    return messages.filter(message => !isWakeMessage(message)).flatMap(message => withoutAppMarkers(message) ?? [])
 }
 
 async function readRunState(conn: EngineConnection, engineSessionId: string): Promise<ForemanRunState> {

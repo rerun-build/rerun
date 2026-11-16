@@ -1,7 +1,8 @@
 {
     "_context": {
         "name.title": "Asked in the onboarding dialog when the sign-up did not carry a first name.",
-        "phone.description": "Under the phone number field of the onboarding dialog."
+        "phone.description": "Under the phone number field of the onboarding dialog.",
+        "handoff.picked": "Sent as the person's message to the Chief of Staff once they picked coworkers off the starter pack cards. {names} is a list of coworker names already joined for the locale (\"Scout and Ledger\")."
     },
     "footer": {
         "back": "Back",
@@ -43,6 +44,9 @@
         "buy": "Buy and install",
         "failed": "The install did not go through: {error}",
         "retry": "Try again"
+    },
+    "handoff": {
+        "picked": "Set up {names}."
     },
     "loadFailed": {
         "title": "We could not load your setup",

@@ -90,6 +90,8 @@ type ForemanState = {
      * board). La colonne l'envoie elle-même, une fois la conversation restaurée et le tour fini.
      */
     pendingPrompt: string | null
+    /** The onboarding dialog handed the workspace over: its first team is chosen in this column. */
+    onboardingHandoff: boolean
     /** The lead whose install is known to have started, and the conversation it runs in. */
     startedLead: StartedLead | null
     /**
@@ -122,6 +124,7 @@ type ForemanState = {
     setTab: (tab: ForemanTab) => void
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
+    setOnboardingHandoff: (handoff: boolean) => void
     /** Entrer dans le tunnel : le mode, la carte d'accueil et l'ouverture, d'un seul coup. */
     startFunnel: (intake: boolean) => void
     setArrival: (arrival: ForemanArrival | null) => void
@@ -191,6 +194,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     arrival: null,
     intakePreview: null,
     pendingPrompt: null,
+    onboardingHandoff: false,
     startedLead: null,
     engaged: false,
     dock: IDLE_DOCK_FEED,
@@ -301,6 +305,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     setPillAvailable: pillAvailable => set({ pillAvailable }),
     requestComposerFocus: () => set(state => ({ composerFocusRequest: state.composerFocusRequest + 1 })),
     clearPendingPrompt: () => set({ pendingPrompt: null }),
+    setOnboardingHandoff: onboardingHandoff => set({ onboardingHandoff }),
     setStartedLead: startedLead => set({ startedLead }),
     setGettingStartedAvailable: gettingStartedAvailable => set({ gettingStartedAvailable }),
     openGettingStarted: () => set(state => ({ gettingStartedOpenRequest: state.gettingStartedOpenRequest + 1 })),
@@ -320,6 +325,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             arrival: null,
             intakePreview: null,
             pendingPrompt: null,
+            onboardingHandoff: false,
             startedLead: null,
             engaged: false,
             dock: IDLE_DOCK_FEED,

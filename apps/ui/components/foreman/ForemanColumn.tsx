@@ -59,6 +59,8 @@ import { useNotificationsStore } from '@/stores/notifications.store'
 import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
+import { HandoffStarterPack } from '@/components/onboarding/HandoffStarterPack'
+import { isKickoffText } from '@/lib/foreman/kickoff-marker'
 
 const TRANSITION_MS = 300
 
@@ -223,6 +225,11 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     useForemanFunnelAnalytics({ messages, guided, restoreDone, entitled })
     useForemanScriptedSteps({ messages, status, guided, restoreDone, send })
     useForemanTurnNotification({ messages, status, guided })
+    // Handed over by the onboarding dialog: the cards go up once the Chief of Staff has said hello.
+    const onboardingHandoff = useForemanStore(state => state.onboardingHandoff)
+    // They answered, by picking or by writing what they need: the cards have done their job.
+    const answeredHandoff = messages.some(message => message.role === 'user' && message.parts.some(part => part.type === 'text' && !isKickoffText(part.text)))
+    const handoffPack = onboardingHandoff && !answeredHandoff && messages.some(message => message.role === 'assistant')
     const tNextSteps = useTranslations('foreman.nextSteps')
     const nextSteps = useMemo(() => foremanNextSteps(messages, { entitled, t: tNextSteps }), [messages, entitled, tNextSteps])
     const trialGate = useMemo(() => (guided ? trialStep(messages, { entitled }) : null), [guided, messages, entitled])
@@ -495,6 +502,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             pending={pendingWidget}
                             answerAttachments={answerAttachments}
                             nextSteps={nextSteps}
+                            afterMessages={handoffPack ? <HandoffStarterPack send={sendOrQueue} /> : undefined}
                             onSuggestion={sendOrQueue}
                             onPrefill={prefill}
                             onStop={handleStop}

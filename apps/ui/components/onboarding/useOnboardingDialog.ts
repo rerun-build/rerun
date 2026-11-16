@@ -4,7 +4,10 @@ import { onboardingStateSchema, type OnboardingState } from '@rerun/contracts'
 import { useSearchParams, type ReadonlyURLSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { recordOnboardingArrivalAction } from '@/app/api/_actions/onboarding-dialog.actions'
+import { openOnboardingHandoffAction, recordOnboardingArrivalAction } from '@/app/api/_actions/onboarding-dialog.actions'
+import { refreshForemanSurface } from '@/components/foreman/useForemanKickoff'
+import { buildKickoffMarker } from '@/lib/foreman/kickoff-marker'
+import { useBoardStore } from '@/stores/board.store'
 import { readArrivingIntent } from '@/lib/foreman/arriving-intent'
 import { ONBOARDING_TRIGGER, useBillingStore } from '@/stores/billing.store'
 import { useForemanStore } from '@/stores/foreman.store'
@@ -97,12 +100,32 @@ export function useOnboardingDialog(): OnboardingDialogState {
         checkoutWasOpen.current = checkoutOpen
     }, [checkoutOpen, step, reload])
 
-    const dialog = state?.dialog ?? false
-    const done = state?.step === 'done'
+    // The board draws the onboarding's preview behind the dialog. Once it hands over, the column is
+    // the Chief of Staff's own, where the first team is chosen.
+    const handoff = dialogWorkspace && step === 'handoff'
+    const past = step === 'done' || step === 'handoff'
     useEffect(() => {
-        if (!dialog) return
-        useForemanStore.getState().setFunnel(done ? 'companion' : 'guided')
-    }, [dialog, done])
+        if (!dialogWorkspace) return
+        useForemanStore.getState().setFunnel(past ? 'companion' : 'guided')
+        useForemanStore.getState().setOnboardingHandoff(handoff)
+    }, [dialogWorkspace, past, handoff])
+
+    // Opened once per workspace: whoever takes it starts the conversation, the box now answers.
+    const opened = useRef(false)
+    useEffect(() => {
+        if (!handoff || opened.current) return
+        opened.current = true
+        void (async () => {
+            await refreshForemanSurface()
+            if (await openOnboardingHandoffAction().catch(() => false)) useForemanStore.getState().askForeman(buildKickoffMarker(null))
+        })()
+    }, [handoff])
+
+    // The team lands on the board: the handoff is over.
+    const agentCount = useBoardStore(s => s.agents.length)
+    useEffect(() => {
+        if (handoff && agentCount > 0) void Promise.resolve().then(reload)
+    }, [handoff, agentCount, reload])
 
     return { state, failed, reload, checkoutOpen }
 }

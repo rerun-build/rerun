@@ -3,6 +3,10 @@
 import { actorFromContext, isAdminActor } from '@/app/api/_auth/access'
 import { ensureWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
 import { installArrival, type InstallArrivalOutcome } from '@/lib/onboarding/install-arrival'
+import { claimOnboardingHandoff } from '@/lib/onboarding/handoff'
+import { loadForemanState } from '@/lib/foreman/state'
+import type { StarterPackInput } from '@/lib/foreman/starter-pack'
+import { loadStarterPack } from '@/lib/foreman/starter-pack-offer'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
@@ -71,4 +75,20 @@ export async function installOnboardingArrivalAction(): Promise<InstallArrivalOu
     const ctx = await requireWorkspaceContext()
     if (!isAdminActor(actorFromContext(ctx))) return { status: 'failed', error: 'Only an admin can install.' }
     return installArrival(ctx)
+}
+
+/** Opens the Chief of Staff's first conversation, once per workspace: `true` for the one who opens it. */
+export async function openOnboardingHandoffAction(): Promise<boolean> {
+    const ctx = await requireWorkspaceContext()
+    if (!isAdminActor(actorFromContext(ctx))) return false
+    return claimOnboardingHandoff(ctx)
+}
+
+/** The starter pack drawn under the Chief of Staff's first message, while the workspace has no team. */
+export async function loadOnboardingStarterPackAction(): Promise<StarterPackInput | null> {
+    const ctx = await requireWorkspaceContext()
+    if (!isAdminActor(actorFromContext(ctx))) return null
+    const state = await loadForemanState(ctx, null)
+    if (state.foreman.firstRunAt || state.agents.length > 0 || state.foreman.arrival?.kind === 'template' || state.foreman.arrival?.kind === 'share') return null
+    return loadStarterPack(ctx, state)
 }

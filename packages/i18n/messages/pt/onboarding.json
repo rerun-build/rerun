@@ -40,6 +40,9 @@
         "failed": "A instalação não foi concluída: {error}",
         "retry": "Tentar de novo"
     },
+    "handoff": {
+        "picked": "Configure {names}."
+    },
     "loadFailed": {
         "title": "Não foi possível carregar sua configuração",
         "description": "Verifique sua conexão e tente de novo.",

@@ -15,6 +15,7 @@ import { mintForemanHubToken } from '@/lib/foreman/hub-token'
 import { loadForemanState } from '@/lib/foreman/state'
 import { resolveForemanSurface } from '@/lib/foreman/surface.server'
 import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
+import { loadForemanHandoff } from '@/lib/onboarding/handoff'
 
 // The foreman of every workspace past its onboarding, running on the workspace's engine. The loop,
 // the model and the transcript are the engine's; the hub only hands it, on every turn, the
@@ -72,7 +73,8 @@ export async function POST(req: Request): Promise<Response> {
     let existing = await engineSessionOf(ctx, sessionId)
     if (existing?.backend === 'hub') return Response.json({ error: 'hub_conversation' }, { status: 409 })
 
-    const state = await loadForemanState(ctx, req.headers.get('accept-language'))
+    const loaded = await loadForemanState(ctx, req.headers.get('accept-language'))
+    const state = { ...loaded, handoff: await loadForemanHandoff(ctx, loaded, text).catch(() => null) }
     if (!existing && (await resolveForemanSurface(ctx.workspace.id, state, { canClaim: true })) !== 'engine') return Response.json({ error: 'foreman_unavailable' }, { status: 409 })
 
     // A new conversation is a thread unless the client opens General. A client older than threads

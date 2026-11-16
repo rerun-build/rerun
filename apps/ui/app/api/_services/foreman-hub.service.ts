@@ -1,10 +1,11 @@
 import 'server-only'
 
 import type { Actor } from '@/app/api/_auth/access'
-import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
+import { memberWorkspaceContext, workspaceFounderUserId } from '@/app/api/_auth/ownership'
 import { dispatchAccountTool } from '@/app/api/_services/mcp-account.service'
 import { dispatchBoxTool } from '@/lib/foreman/box-tools'
-import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES, WAKE_HUB_TOOL_NAMES } from '@/lib/foreman/engine-brief'
+import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES, FOREMAN_TEAM_TOOL_NAMES, WAKE_HUB_TOOL_NAMES } from '@/lib/foreman/engine-brief'
+import { setUpTeam } from '@/lib/onboarding/team'
 import { dispatchWorkspaceOnboardingTool } from '@/lib/foreman/onboarding-tools'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { FOREMAN_BOX_TOOL_DEFS } from '@/lib/foreman/tool-defs'
@@ -29,6 +30,11 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     if (FOREMAN_VAULT_TOOL_NAMES.has(tool)) return dispatchForemanVaultTool(actor, tool, args)
     if (FOREMAN_IDENTITY_TOOL_NAMES.has(tool)) return dispatchForemanIdentityTool(actor, tool, args)
     if (FOREMAN_OVERVIEW_TOOL_NAMES.has(tool)) return dispatchForemanOverviewTool(actor, tool, args, { wake })
+    if (FOREMAN_TEAM_TOOL_NAMES.has(tool)) {
+        const ctx = actor.kind === 'user' ? await memberWorkspaceContext(workspaceId, actor.userId) : null
+        if (!ctx) throw new Error('Only a member of the workspace can set up its team.')
+        return setUpTeam(ctx, args)
+    }
 
     // The turn speaks for the member who wrote it: a Box they create is theirs to manage, a coworker
     // lands only in a Box they manage, and only their Boxes are listed. A turn with nobody behind it

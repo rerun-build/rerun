@@ -163,6 +163,32 @@ export const FOREMAN_OVERVIEW_TOOL_DEFS = [
     },
 ] as const
 
+// The first team of a workspace that just finished the onboarding dialog. Only in its brief until a
+// team is on the board.
+export const FOREMAN_TEAM_TOOL_DEFS = [
+    {
+        name: 'set_up_team',
+        description:
+            "Build the first team of this workspace, once: the coworkers they picked off the starter pack cards the app drew under your first message (their message starts with a line `[[onboarding:picks]]` followed by the slugs: pass those slugs), or the one coworker you designed with them from what they wrote instead (confirm it with request_approval first, then pass it). The app lays the Boxes, installs or creates the coworkers and sends the invitations they typed during the onboarding; you write nothing yourself. It answers within a minute: `building` means it goes on, call it again a minute later to read the team. Called again once built, it returns the team already there. Never mix picks and a coworker.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                picks: { type: 'array', items: { type: 'string' }, description: 'The slugs of the starter pack cards they picked, as their message gave them. Three at most.' },
+                coworker: {
+                    type: 'object',
+                    description: 'The one coworker you designed with them, instead of picks.',
+                    properties: {
+                        name: { type: 'string', description: 'A first name for it, short.' },
+                        role: { type: 'string', description: 'What it does, in one sentence starting with a verb.' },
+                        need: { type: 'string', description: 'What they want off their plate, in their words.' },
+                    },
+                    required: ['name', 'role'],
+                },
+            },
+        },
+    },
+] as const
+
 // Who it is to the workspace: the name its people give it.
 export const FOREMAN_IDENTITY_TOOL_DEFS = [
     {

@@ -5,6 +5,7 @@ import type { PriceArm } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import type { ForemanAgentRow, ForemanSpaceRow } from './board-map'
 import type { KickoffIntent } from './kickoff-marker'
+import type { ForemanHandoff } from '@/lib/onboarding/handoff'
 
 // Where the workspace stands, and therefore which foreman it talks to. A first arrival is walked by
 // the hub from "who are you" to a built team; after that, `companion`, the hub is done and the
@@ -238,4 +239,6 @@ export type ForemanState = {
     // person is a member rather than an admin.
     hiddenBoxes?: number
     isMember?: boolean
+    // Taking over from the onboarding dialog (lib/onboarding/handoff.ts), on the turns it applies to.
+    handoff?: ForemanHandoff | null
 }

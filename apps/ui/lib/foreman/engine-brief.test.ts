@@ -147,6 +147,29 @@ describe('foremanEngineBrief', () => {
     })
 
     // A workspace keeps its machine, and its foreman, for a while after its plan lapses.
+    describe('handed over by the onboarding dialog', () => {
+        const handoff = { buildable: true, arrival: null, prompt: null, pack: ['Scout', 'Ledger'], pendingInvites: 2, inviteLinks: [] }
+
+        it('hands set_up_team only while the workspace has no team', () => {
+            expect(foremanEngineBrief({ ...state, handoff }, OLD_BOX).tools.find(tool => tool.name === 'set_up_team')).toMatchObject({ kind: 'hub', serial: true })
+            expect(foremanEngineBrief({ ...state, handoff: { ...handoff, buildable: false } }, OLD_BOX).tools.some(tool => tool.name === 'set_up_team')).toBe(false)
+            expect(foremanEngineBrief(state, OLD_BOX).tools.some(tool => tool.name === 'set_up_team')).toBe(false)
+        })
+
+        it('tells it to point to the cards rather than list coworkers, and the invitations waiting', () => {
+            const instructions = foremanEngineBrief({ ...state, handoff }, OLD_BOX).instructions
+            expect(instructions).toContain('Scout, Ledger')
+            expect(instructions).toContain('[[onboarding:picks]]')
+            expect(instructions).toContain('invited 2 people')
+        })
+
+        it('opens on what a link installed', () => {
+            const instructions = foremanEngineBrief({ ...state, handoff: { ...handoff, buildable: false, pack: [], arrival: { kind: 'template' as const, title: 'CRM pipeline' } } }, OLD_BOX).instructions
+            expect(instructions).toContain('the template "CRM pipeline"')
+            expect(instructions).not.toContain('[[onboarding:picks]]')
+        })
+    })
+
     it('tells it when the workspace has no plan, and only then', () => {
         expect(brief.instructions).not.toContain('no active plan')
         expect(foremanEngineBrief({ ...state, entitled: false }, OLD_BOX).instructions).toContain('no active plan')

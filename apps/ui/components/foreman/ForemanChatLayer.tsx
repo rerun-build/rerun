@@ -26,6 +26,7 @@ import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { hitlCallBefore } from '@/lib/chat/hitl-receipts'
 import { threadsByMessage } from '@/lib/chat/thread-rows'
 import type { MessageFeedbackRating } from '@rerun/contracts'
+import { readStarterPicks, stripStarterPicks } from '@rerun/contracts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
 import type { UploadTarget } from '@/lib/files/upload-url'
 import { isEngineHitl, type PendingWidget } from '@/lib/foreman/pending-widget'
@@ -84,6 +85,9 @@ type ForemanChatLayerProps = {
     answerAttachments?: { target: UploadTarget; maxFileSize: number } | null
     // What a finished build leaves to press, drawn after the last message the way an engine question is.
     nextSteps?: ForemanNextStep[]
+    // Drawn by the app under the last message once the turn is over: the starter pack of a workspace
+    // the onboarding dialog hands over.
+    afterMessages?: ReactNode
     onSuggestion?: (text: string) => void
     /** Writes into the composer without sending, for an empty-state action the user finishes typing. */
     onPrefill?: (text: string) => void
@@ -114,7 +118,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, onStackElement, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, afterMessages, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, onStackElement, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -155,9 +159,10 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
     // modèle et n'a rien à faire dans la pile. Il porte pourtant parfois ce que l'utilisateur a
     // tapé sur la landing, et ça, ça doit se lire : on retire le marqueur au lieu de jeter le
     // message, et on ne jette que ce qu'il ne reste plus rien à afficher.
+    // Les cartes choisies dans le starter pack arrivent pareil : une ligne pour le modèle, retirée ici.
     const visible = messages.flatMap(message => {
-        if (!message.parts.some(part => part.type === 'text' && isKickoffText((part as { text: string }).text))) return [message]
-        const parts = message.parts.map(part => (part.type === 'text' ? { ...part, text: stripKickoff((part as { text: string }).text) } : part))
+        if (!message.parts.some(part => part.type === 'text' && (isKickoffText((part as { text: string }).text) || readStarterPicks((part as { text: string }).text)))) return [message]
+        const parts = message.parts.map(part => (part.type === 'text' ? { ...part, text: stripStarterPicks(stripKickoff((part as { text: string }).text)) } : part))
         const emptied = parts.every(part => part.type !== 'text' || !(part as { text: string }).text)
         return emptied ? [] : [{ ...message, parts } as UIMessage]
     })
@@ -265,6 +270,11 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
                                 ) : (
                                     <ActionApprovalBlock inline approvals={pendingApprovals((engineHitl.input ?? {}) as Record<string, unknown>)} onSubmit={decisions => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, serializeApprovalDecisions(decisions))} />
                                 )}
+                            </motion.div>
+                        )}
+                        {afterMessages && !streaming && (
+                            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}>
+                                {afterMessages}
                             </motion.div>
                         )}
                         {nextSteps && nextSteps.length > 0 && !streaming && (

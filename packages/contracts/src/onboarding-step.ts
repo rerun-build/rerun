@@ -21,3 +21,26 @@ export const onboardingStateSchema = z.object({
 })
 
 export type OnboardingState = z.infer<typeof onboardingStateSchema>
+
+// The coworkers picked off the starter pack drawn under the Chief of Staff's first message, sent to
+// it as a message: a first line it reads (the template slugs), then the sentence the person sees.
+// Every reader of a transcript drops the first line (stripStarterPicks).
+export const STARTER_PICKS_MARKER = '[[onboarding:picks]]'
+
+export function serializeStarterPicks(slugs: string[], sentence: string): string {
+    return `${STARTER_PICKS_MARKER} ${slugs.join(',')}\n${sentence}`
+}
+
+export function readStarterPicks(text: string): string[] | null {
+    const first = text.split('\n', 1)[0]
+    if (!first.startsWith(STARTER_PICKS_MARKER)) return null
+    return first
+        .slice(STARTER_PICKS_MARKER.length)
+        .split(',')
+        .map(slug => slug.trim())
+        .filter(Boolean)
+}
+
+export function stripStarterPicks(text: string): string {
+    return text.startsWith(STARTER_PICKS_MARKER) ? text.slice(text.indexOf('\n') + 1 || text.length) : text
+}

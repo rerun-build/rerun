@@ -40,6 +40,9 @@
         "failed": "Die Installation hat nicht geklappt: {error}",
         "retry": "Erneut versuchen"
     },
+    "handoff": {
+        "picked": "Richte {names} ein."
+    },
     "loadFailed": {
         "title": "Deine Einrichtung konnte nicht geladen werden",
         "description": "Prüfe deine Verbindung und versuche es erneut.",

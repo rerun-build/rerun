@@ -32,7 +32,7 @@ export function StarterPackWidget({ input, output, onAnswer }: StarterPackWidget
     return <StarterPackPicker cards={cards} onAnswer={onAnswer} />
 }
 
-function StarterPackPicker({ cards, onAnswer }: { cards: StarterPackCard[]; onAnswer: (answer: StarterPackAnswer) => void }) {
+export function StarterPackPicker({ cards, onAnswer }: { cards: StarterPackCard[]; onAnswer: (answer: StarterPackAnswer) => void }) {
     const t = useTranslations('foreman.starterPack')
     const picks = useStarterPicks()
     const count = picks.picked.length
