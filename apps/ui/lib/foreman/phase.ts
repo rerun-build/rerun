@@ -207,6 +207,9 @@ export type ForemanState = {
     workspacePlan: string
     // The name the workspace gave it, null for "Chief of Staff".
     assistantName?: string | null
+    // When the workspace was created and when its trial ends: its first week is paced on them.
+    workspaceCreatedAt?: string | null
+    trialEndsAt?: string | null
     userEmail: string | null
     spaces: ForemanSpaceRow[]
     agents: ForemanAgentRow[]

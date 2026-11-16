@@ -4,6 +4,8 @@
         "coworkersLanguageHint": "En qué escriben tus coworkers cuando trabajan solos, con una programación o un disparador.",
         "fallbackName": "Workspace",
         "adminOnly": "Solo un admin puede cambiar los ajustes del workspace",
+        "proactive": "Sugerencias proactivas",
+        "proactiveHint": "Tu Chief of Staff se pasa por su cuenta y sugiere qué hacer después. Nunca actúa sin ti.",
         "nameRequired": "El nombre es obligatorio",
         "nameTooLong": "Usa menos de {max} caracteres",
         "title": "Ajustes del workspace",

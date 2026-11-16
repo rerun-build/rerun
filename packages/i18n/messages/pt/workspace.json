@@ -4,6 +4,8 @@
         "coworkersLanguageHint": "O idioma em que seus coworkers escrevem quando trabalham sozinhos, por agendamento ou gatilho.",
         "fallbackName": "Workspace",
         "adminOnly": "Só um admin pode alterar as configurações do workspace",
+        "proactive": "Sugestões proativas",
+        "proactiveHint": "Seu Chief of Staff aparece por conta própria e sugere os próximos passos. Ele nunca age sem você.",
         "nameRequired": "O nome é obrigatório",
         "nameTooLong": "Use menos de {max} caracteres",
         "title": "Configurações do workspace",

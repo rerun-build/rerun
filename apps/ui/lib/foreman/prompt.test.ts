@@ -4,7 +4,7 @@ import { BILLING_ENABLED } from '@rerun/cloud/billing'
 
 vi.mock('server-only', () => ({}))
 
-const { MOBILE_APP_BLOCK, foremanEngineInstructions, foremanSystemPrompt } = await import('./prompt')
+const { MOBILE_APP_BLOCK, firstWeekBlock, foremanEngineInstructions, foremanSystemPrompt } = await import('./prompt')
 import type { ForemanPlan, ForemanState } from './phase'
 
 const OLD_BOX = { connectApp: false, wakes: false }
@@ -118,5 +118,15 @@ describe('foremanSystemPrompt in the app', () => {
     it('takes the name the workspace gave it, and only then', () => {
         expect(foremanEngineInstructions(stateWith({ assistantName: 'Max' }), OLD_BOX)).toContain('named you Max')
         expect(foremanEngineInstructions(stateWith({}), OLD_BOX)).not.toContain('named you')
+    })
+
+    // Paced on the workspace's age: the moments to plan, and only during its first week.
+    it('plans the first week, and only that week, where it can wake', () => {
+        const now = Date.parse('2026-11-18T10:00:00Z')
+        const young = stateWith({ workspaceCreatedAt: '2026-11-16T09:00:00Z', trialEndsAt: '2026-11-30T09:00:00Z' })
+        expect(firstWeekBlock(young, now)).toContain('day 3 of its first week')
+        expect(firstWeekBlock(young, now)).toContain('2026-11-30')
+        expect(firstWeekBlock(stateWith({ workspaceCreatedAt: '2026-10-01T09:00:00Z' }), now)).toBeNull()
+        expect(foremanEngineInstructions(young, { connectApp: false, wakes: false })).not.toContain('first week')
     })
 })

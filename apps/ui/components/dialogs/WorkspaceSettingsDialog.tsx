@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import type { ActionResult } from '@/app/api/_actions/space.actions'
 import { updatePublishPolicyAction } from '@/app/api/_actions/publish.actions'
-import { updateWorkspaceAction } from '@/app/api/_actions/workspace.actions'
+import { setAssistantProactiveAction, updateWorkspaceAction } from '@/app/api/_actions/workspace.actions'
 import { useLanguagePacksEnabled, usePublishedAccessEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { PublishPolicyField, usePublishPolicyDraft } from '@/components/published/PublishPolicyField'
 import { Button } from '@/components/ui/button'
@@ -16,6 +16,7 @@ import { FileDropzone } from '@/components/ui/file-dropzone'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BLOB_ILLUSTRATIONS, getBlobByFile } from '@/lib/blobs/catalog'
 import { CheckIcon, GlobeIcon, Loader2Icon, UploadIcon, Settings2Icon } from '@/lib/icons'
@@ -45,7 +46,9 @@ export function WorkspaceSettingsDialog({ open, onOpenChange, fallbackIconUrl }:
     const publishedAccess = usePublishedAccessEnabled()
     const languagePacks = useLanguagePacksEnabled()
     const policy = usePublishPolicyDraft(open && publishedAccess && !!workspace && !workspace.is_sandbox)
+    const [proactive, setProactive] = useState<boolean | null>(null)
     if (!workspace) return null
+    const proactiveOn = proactive ?? workspace.assistant_proactive
 
     const save = async (formData: FormData): Promise<ActionResult> => {
         const result = await updateWorkspaceAction(formData)
@@ -54,17 +57,31 @@ export function WorkspaceSettingsDialog({ open, onOpenChange, fallbackIconUrl }:
             const saved = await updatePublishPolicyAction(policy.draft)
             if (!saved.ok) return saved
         }
+        if (proactive !== null && proactive !== workspace.assistant_proactive) {
+            const saved = await setAssistantProactiveAction(proactive)
+            if (!saved.ok) return saved
+        }
         await refreshWorkspace()
         onOpenChange(false)
         return result
     }
 
     const policyField = policy.settings ? <PublishPolicyField value={policy.draft} onChange={policy.setDraft} publicLinks={policy.settings.publicLinks} workspaceName={workspace.name || t('fallbackName')} /> : null
+    const proactiveField = workspace.is_sandbox ? null : (
+        <Field orientation="row" label={t('proactive')} helperText={t('proactiveHint')}>
+            <Switch checked={proactiveOn} disabled={!isAdmin} onCheckedChange={setProactive} aria-label={t('proactive')} />
+        </Field>
+    )
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="flex flex-col gap-0 overflow-hidden p-0 sm:max-w-lg">
-                {open && <WorkspaceSettingsForm workspace={workspace} fallbackIconUrl={fallbackIconUrl} onSave={save} onCancel={() => onOpenChange(false)} extra={policyField} showLanguage={languagePacks} disabledReason={isAdmin ? undefined : t('adminOnly')} />}
+                {open && <WorkspaceSettingsForm workspace={workspace} fallbackIconUrl={fallbackIconUrl} onSave={save} onCancel={() => onOpenChange(false)} extra={
+                            <>
+                                {proactiveField}
+                                {policyField}
+                            </>
+                        } showLanguage={languagePacks} disabledReason={isAdmin ? undefined : t('adminOnly')} />}
             </DialogContent>
         </Dialog>
     )

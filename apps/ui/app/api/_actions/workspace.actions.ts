@@ -18,7 +18,9 @@ import { selectSingle } from '@/supabase/supabase-helpers'
 
 import { applyCoworkerLanguage } from '@/app/api/_services/coworker-language.service'
 import { isStableLocale } from '@rerun/i18n'
-import { failure } from '@/lib/i18n/action-error'
+import { failure, failureOf } from '@/lib/i18n/action-error'
+import { sendForemanSignal } from '@/lib/foreman/signal'
+import { after } from 'next/server'
 import type { ActionResult } from './space.actions'
 
 async function requireUserId(): Promise<string> {
@@ -179,4 +181,18 @@ export async function enterSandboxAction(): Promise<ActionResult<{ workspaceId: 
 export async function ensureSandboxSpaceAction(): Promise<ActionResult | { ok: false; error: string; locked: true }> {
     const workspaceId = await requireSandboxWorkspaceId()
     return (await ensureSandboxSpace(workspaceId)) ?? { ok: true }
+}
+
+// « Proactive suggestions »: whether the Chief of Staff wakes up on its own. Back on, it hears of it
+// and looks at the workspace soon after.
+export async function setAssistantProactiveAction(on: boolean): Promise<ActionResult> {
+    try {
+        const { workspace } = await requireAdminContext()
+        const { error } = await createServiceRoleClient().from('workspaces').update<Database['public']['Tables']['workspaces']['Update']>({ assistant_proactive: on }).eq('id', workspace.id)
+        if (error) return { ok: false, error: error.message }
+        if (on) after(() => sendForemanSignal(workspace.id, { kind: 'proactive_on', summary: 'An admin switched your proactive suggestions back on.' }))
+        return { ok: true }
+    } catch (err) {
+        return failureOf(err)
+    }
 }

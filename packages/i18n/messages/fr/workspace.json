@@ -4,6 +4,8 @@
         "coworkersLanguageHint": "La langue de vos coworkers quand ils travaillent seuls, sur un planning ou un déclencheur.",
         "fallbackName": "Workspace",
         "adminOnly": "Seul un admin peut modifier les réglages du workspace",
+        "proactive": "Suggestions proactives",
+        "proactiveHint": "Votre Chief of Staff passe de lui-même et suggère la suite. Il n'agit jamais sans vous.",
         "nameRequired": "Le nom est obligatoire",
         "nameTooLong": "Restez sous {max} caractères",
         "title": "Réglages du workspace",

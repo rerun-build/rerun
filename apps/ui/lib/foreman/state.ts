@@ -108,6 +108,8 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         client,
         workspaceName: ctx.workspace.name ?? 'this workspace',
         assistantName: ctx.workspace.assistant_name ?? null,
+        workspaceCreatedAt: ctx.workspace.created_at ?? null,
+        trialEndsAt: trialing ? ctx.workspace.trial_ends_at : null,
         workspacePlan: ctx.workspace.plan ?? 'none',
         userEmail: ctx.userEmail,
         spaces: visibleSpaces,

@@ -11,6 +11,8 @@
         "coworkersLanguageHint": "What your coworkers write in when they work on their own, on a schedule or a trigger.",
         "fallbackName": "Workspace",
         "adminOnly": "Only an admin can change the workspace settings",
+        "proactive": "Proactive suggestions",
+        "proactiveHint": "Your Chief of Staff checks in on its own and suggests what to do next. It never acts without you.",
         "nameRequired": "Name is required",
         "nameTooLong": "Keep it under {max} characters",
         "title": "Workspace settings",
