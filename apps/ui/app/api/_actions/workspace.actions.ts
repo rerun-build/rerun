@@ -156,6 +156,12 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
     // "credits used up" on the first message, though none was ever used.
     await grantRerunTopup(workspaceId, SIGNUP_BUDGET_MICROS)
 
+    // Its creation dialog asked who to invite: the onboarding dialog does not ask again.
+    const { error: onboardingError } = await supabase
+        .from('workspace_onboarding')
+        .upsert<Database['public']['Tables']['workspace_onboarding']['Insert']>({ workspace_id: workspaceId, answers: { foreman: { inviteAt: new Date().toISOString() } }, updated_at: new Date().toISOString() }, { onConflict: 'workspace_id' })
+    if (onboardingError) console.error('[workspace] failed to note the invitations of a new workspace', onboardingError.message)
+
     const { error: switchError } = await supabase.from('users').update<Database['public']['Tables']['users']['Update']>({ workspace_id: workspaceId }).eq('id', userId)
     if (switchError) return { ok: false, error: switchError.message }
 

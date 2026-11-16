@@ -6,6 +6,8 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react'
 
 import { decideIndustryAction, saveForemanIntakeAction } from '@/app/api/_actions/foreman-intake.actions'
+import { saveOnboardingInvitesAction } from '@/app/api/_actions/onboarding-dialog.actions'
+import { InviteEmailsField } from '@/components/dialogs/InviteEmailsField'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { IntakeChoiceStep } from '@/components/foreman/intake/IntakeChoiceStep'
@@ -17,7 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { accountLabel } from '@/lib/auth/placeholder-email'
-import { ClockIcon, GlobeIcon, LayersIcon, PhoneIcon } from '@/lib/icons'
+import { ClockIcon, GlobeIcon, LayersIcon, PhoneIcon, UsersIcon } from '@/lib/icons'
 import { intakePreviewPlan, rolesForIndustry, type ForemanIntake } from '@/lib/onboarding/intake'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -25,7 +27,7 @@ import { PhoneVerificationStep } from '@rerun/cloud/phone.client'
 import { StepSwap } from './StepSwap'
 
 // The steps this dialog draws. The others close it until the pull request that brings them.
-const DRAWN_STEPS: ReadonlySet<OnboardingStep> = new Set(['profile', 'phone', 'waitlist'])
+const DRAWN_STEPS: ReadonlySet<OnboardingStep> = new Set(['profile', 'phone', 'invite', 'waitlist'])
 
 export function onboardingDialogOpen(state: OnboardingState | null): boolean {
     return !!state?.dialog && DRAWN_STEPS.has(state.step)
@@ -115,6 +117,50 @@ function useProfileStep({ firstName, reload }: { firstName: string | null; reloa
     return { key: `profile:${step}`, icon: step === 'company' ? GlobeIcon : LayersIcon, ...copy, body, footer }
 }
 
+// Who to invite, sent once the team is built. Skipped with an empty list.
+const INVITES_MAX = 10
+
+function useInviteStep({ reload }: { reload: () => Promise<void> }): StepView {
+    const t = useTranslations('onboarding')
+    const [emails, setEmails] = useState<string[]>([])
+    const [saving, setSaving] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+
+    const save = async () => {
+        setSaving(true)
+        setError(null)
+        const result = await saveOnboardingInvitesAction(emails).catch(() => ({ ok: false as const, error: '' }))
+        if (!result.ok) {
+            setError(t('invite.failed'))
+            setSaving(false)
+            return
+        }
+        track('onboarding_step_completed', { step: emails.length ? 'invite' : 'invite_skipped' })
+        await reload()
+        setSaving(false)
+    }
+
+    return {
+        key: 'invite',
+        icon: UsersIcon,
+        title: t('invite.title'),
+        description: t('invite.description'),
+        body: (
+            <div className="space-y-2">
+                <InviteEmailsField emails={emails} onChange={setEmails} max={INVITES_MAX} helperText={t('invite.hint', { max: INVITES_MAX })} autoFocus />
+                {error && <p className="text-xs text-destructive">{error}</p>}
+            </div>
+        ),
+        footer: (
+            <DialogFooter>
+                <Button type="button" loading={saving} onClick={() => void save()} data-onboarding={emails.length ? 'continue' : 'skip'}>
+                    {emails.length ? t('footer.continue') : t('footer.skip')}
+                </Button>
+            </DialogFooter>
+        ),
+    }
+}
+
 function PhoneBody() {
     return <PhoneVerificationStep active />
 }
@@ -151,8 +197,10 @@ function useStepView(state: OnboardingState, failed: boolean, reload: () => Prom
     const t = useTranslations('onboarding')
     const tWaitlist = useTranslations('dialogs.engineWaitlist')
     const profile = useProfileStep({ firstName: state.firstName, reload })
+    const invite = useInviteStep({ reload })
     if (failed) return { key: 'failed', icon: LayersIcon, title: t('loadFailed.title'), description: t('loadFailed.description'), body: null, footer: <LoadFailedFooter reload={reload} /> }
     if (state.step === 'profile') return profile
+    if (state.step === 'invite') return invite
     if (state.step === 'phone') return { key: 'phone', icon: PhoneIcon, title: t('phone.title'), description: t('phone.description'), body: <PhoneBody /> }
     return {
         key: 'waitlist',

@@ -4,6 +4,7 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { inviteToWorkspaceAction } from '@/app/api/_actions/members.actions'
 import { createWorkspaceAction } from '@/app/api/_actions/workspace.actions'
 import { CreateWorkspacePreview } from '@/components/dialogs/CreateWorkspacePreview'
+import { InviteEmailsField } from '@/components/dialogs/InviteEmailsField'
 import { SplitDialogContent } from '@/components/dialogs/SplitDialogContent'
 import { StepDialogHeader } from '@/components/dialogs/StepDialogHeader'
 import { Button } from '@/components/ui/button'
@@ -16,7 +17,7 @@ import { BLOB_ILLUSTRATIONS, getBlobByFile, randomBlob } from '@/lib/blobs/catal
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { CheckIcon, LayersIcon, Loader2Icon, XIcon } from '@/lib/icons'
+import { CheckIcon, LayersIcon, Loader2Icon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -26,11 +27,9 @@ type Step = 'Name' | 'Icon' | 'Team'
 
 const STEPS: readonly Step[] = BLOB_ILLUSTRATIONS.length > 0 ? ['Name', 'Icon', 'Team'] : ['Name', 'Team']
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+type FormValues = { name: string; iconFile: string; members: string[] }
 
-type FormValues = { name: string; iconFile: string; members: string[]; memberDraft: string }
-
-const defaultValues: FormValues = { name: '', iconFile: '', members: [], memberDraft: '' }
+const defaultValues: FormValues = { name: '', iconFile: '', members: [] }
 
 export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
     const t = useTranslations('dialogs.createWorkspace')
@@ -42,7 +41,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
     // invitations that failed, and closing it can only lead into the new workspace.
     const [created, setCreated] = useState(false)
 
-    const schema = useMemo(() => z.object({ name: z.string().trim().min(1, t('nameRequired')), iconFile: z.string(), members: z.array(z.string()), memberDraft: z.string() }), [t])
+    const schema = useMemo(() => z.object({ name: z.string().trim().min(1, t('nameRequired')), iconFile: z.string(), members: z.array(z.string()) }), [t])
     const form = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues })
     const {
         formState: { isSubmitting },
@@ -51,7 +50,6 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
     const name = form.watch('name')
     const iconFile = form.watch('iconFile')
     const members = form.watch('members')
-    const memberDraft = form.watch('memberDraft')
 
     useEffect(() => {
         const blob = open && !iconFile ? randomBlob() : undefined
@@ -65,20 +63,6 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
             resetStepper()
             form.reset(defaultValues)
         }
-    }
-
-    const addMember = () => {
-        const email = memberDraft.trim().toLowerCase()
-        if (!EMAIL_RE.test(email) || members.includes(email)) return
-        form.setValue('members', [...members, email])
-        form.setValue('memberDraft', '')
-    }
-
-    const removeMember = (email: string) => {
-        form.setValue(
-            'members',
-            members.filter(m => m !== email),
-        )
     }
 
     const onSubmit = form.handleSubmit(async ({ name, iconFile, members }) => {
@@ -163,43 +147,7 @@ export function CreateWorkspaceDialog({ open, onOpenChange }: { open: boolean; o
                                     </div>
                                 )}
 
-                                {current === 'Team' && (
-                                    <div className="space-y-4">
-                                        <div className="flex items-end gap-2">
-                                            <div className="flex-1">
-                                                <Input
-                                                    label={t('email')}
-                                                    type="email"
-                                                    placeholder={t('emailPlaceholder')}
-                                                    helperText={t('emailHint')}
-                                                    {...form.register('memberDraft')}
-                                                    onKeyDown={e => {
-                                                        if (e.key === 'Enter') {
-                                                            e.preventDefault()
-                                                            addMember()
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                            <Button type="button" variant="outline" onClick={addMember} disabled={!EMAIL_RE.test(memberDraft.trim().toLowerCase())}>
-                                                {t('add')}
-                                            </Button>
-                                        </div>
-
-                                        {members.length > 0 && (
-                                            <ul className="flex flex-col gap-2">
-                                                {members.map(email => (
-                                                    <li key={email} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
-                                                        <span className="min-w-0 flex-1 truncate text-sm">{email}</span>
-                                                        <button type="button" onClick={() => removeMember(email)} aria-label={t('removeMember', { email })} className="text-muted-foreground hover:text-foreground">
-                                                            <XIcon className="size-4" />
-                                                        </button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        )}
-                                    </div>
-                                )}
+                                {current === 'Team' && <InviteEmailsField emails={members} onChange={next => form.setValue('members', next)} helperText={t('emailHint')} />}
                             </StepTransition>
 
                             {form.formState.errors.root && <p className="mt-4 text-sm text-destructive">{form.formState.errors.root.message}</p>}

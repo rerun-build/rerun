@@ -13,6 +13,12 @@
         "title": "Deine Telefonnummer",
         "description": "Damit wir dich erreichen, wenn ein Coworker dich braucht."
     },
+    "invite": {
+        "title": "Lade dein Team ein",
+        "description": "Sie bekommen ihre Einladung, sobald dein Team steht.",
+        "hint": "Bis zu {max} Adressen. Weitere kannst du später unter Mitglieder einladen.",
+        "failed": "Das konnte nicht gespeichert werden. Versuche es erneut."
+    },
     "loadFailed": {
         "title": "Deine Einrichtung konnte nicht geladen werden",
         "description": "Prüfe deine Verbindung und versuche es erneut.",

@@ -13,6 +13,12 @@
         "title": "Seu número de telefone",
         "description": "Para avisar você quando um coworker precisar de você."
     },
+    "invite": {
+        "title": "Convide sua equipe",
+        "description": "Eles recebem o convite assim que sua equipe estiver pronta.",
+        "hint": "Até {max} endereços. Você pode convidar mais pessoas em Membros.",
+        "failed": "Não foi possível salvar. Tente de novo."
+    },
     "loadFailed": {
         "title": "Não foi possível carregar sua configuração",
         "description": "Verifique sua conexão e tente de novo.",

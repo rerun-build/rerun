@@ -281,6 +281,14 @@ describe('createWorkspaceAction', () => {
         expect(mocks.grantRerunTopup).toHaveBeenCalledWith(NEW_WORKSPACE_ID, SIGNUP_ALLOWANCE_MICROS)
     })
 
+    // Its creation dialog already asked who to invite.
+    it('marks the invitation step of the onboarding as done', async () => {
+        const db = creatableDatabase()
+
+        await createWorkspaceAction('Acme')
+        expect(db.writes('workspace_onboarding')[0].payload).toMatchObject({ workspace_id: NEW_WORKSPACE_ID, answers: { foreman: { inviteAt: expect.any(String) } } })
+    })
+
     it('grants nothing when the workspace could not be created', async () => {
         database(() => ({ data: null }))
 

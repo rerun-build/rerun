@@ -10,6 +10,7 @@ const freeAgentSlots = vi.fn()
 const installFromLibrary = vi.fn()
 const installFromShare = vi.fn()
 const mergeForeman = vi.fn(async () => ({}))
+const flushPendingInvites = vi.fn(async () => [])
 
 vi.mock('@/app/api/_services/agent.service', () => ({ createAgent, deriveUniqueHandles, findFreeCellsInSpace }))
 vi.mock('@/app/api/_services/box.service', () => ({ createBoxesBatch }))
@@ -17,6 +18,7 @@ vi.mock('@/app/api/_services/capacity.service', () => ({ freeAgentSlots }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
 vi.mock('./onboarding-tools', () => ({ installFromLibrary, installFromShare }))
 vi.mock('./profile', () => ({ mergeForeman }))
+vi.mock('@/lib/onboarding/invites', () => ({ flushPendingInvites }))
 vi.mock('./prompt', () => ({ foremanProfileBlock: () => 'Company: Retalk' }))
 
 const { buildTeam, onboardingInstall, onboardingSoul } = await import('./build-team')
@@ -128,6 +130,17 @@ describe('buildTeam', () => {
         expect(result.agents.find(agent => agent.name === 'Scout')?.lead).toBe(true)
         expect(result.agents.find(agent => agent.name === 'Ledger')).toMatchObject({ active: false })
         expect(mergeForeman).toHaveBeenCalledWith(CTX, { firstRunAt: expect.any(String) })
+        expect(flushPendingInvites).toHaveBeenCalledWith(CTX)
+    })
+
+    // A build finished by an old app sends them too.
+    it('sends the invitations typed in the onboarding dialog once the team is built, and is not undone by one that fails', async () => {
+        flushPendingInvites.mockRejectedValueOnce(new Error('mailer down'))
+        const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const result = await run(stateWith({ plan: TEAM }))
+        expect(result.lead).toEqual({ agentId: 'agent-Scout', name: 'Scout' })
+        expect(error).toHaveBeenCalledWith('[onboarding] failed to send the pending invitations', expect.any(Error))
+        error.mockRestore()
     })
 
     it('reports an agent that could not be created beside the ones that were', async () => {

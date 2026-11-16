@@ -12,6 +12,7 @@ import { getAgent as engineGetAgent, patchAgent } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { installFromLibrary, installFromShare } from './onboarding-tools'
 import type { ArrivingIntent, ForemanPlanItem, ForemanState } from './phase'
+import { flushPendingInvites } from '@/lib/onboarding/invites'
 import { mergeForeman } from './profile'
 import { installWithFocus } from './starter-pack'
 import { foremanProfileBlock } from './prompt'
@@ -249,6 +250,9 @@ export async function buildTeam({ ctx, state, emit, signal }: BuildTeamOptions):
             leader.lead = true
             lead = { agentId: leader.agentId, name: leader.name }
             await mergeForeman(ctx, { firstRunAt: new Date().toISOString() })
+            // From here, whatever app finished the build: the invitations typed in the onboarding
+            // dialog leave once the workspace has a team to show.
+            await flushPendingInvites(ctx).catch(err => console.error('[onboarding] failed to send the pending invitations', err))
         }
 
         return { boxes, agents, failed, lead }

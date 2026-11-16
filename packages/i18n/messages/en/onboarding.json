@@ -17,6 +17,12 @@
         "title": "Your phone number",
         "description": "So we can reach you when a coworker needs you."
     },
+    "invite": {
+        "title": "Invite your team",
+        "description": "They get their invite once your team is built.",
+        "hint": "Up to {max} addresses. You can invite more from Members later.",
+        "failed": "We could not save that. Try again."
+    },
     "loadFailed": {
         "title": "We could not load your setup",
         "description": "Check your connection, then try again.",

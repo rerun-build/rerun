@@ -71,6 +71,12 @@ export type ForemanProfile = {
     trialStartedIn?: ForemanClient
     // The onboarding dialog: the invitation step went by, sent or skipped.
     inviteAt?: string
+    // The addresses typed at that step, sent once the team is built so they land in a workspace
+    // that has something in it. `invitesSentAt` once they went.
+    pendingInvites?: PendingInvite[]
+    invitesSentAt?: string
+    // Where no email leaves (a self-hosted install without a mailer), the links to pass on by hand.
+    inviteLinks?: { email: string; link: string }[]
     // The link they arrived on, written once at their first signed-in page. A template or a shared
     // coworker skips the questions and is installed once the box is claimed; a prompt is carried to
     // the handoff.
@@ -87,6 +93,8 @@ export function foremanUseCases(foreman: ForemanProfile): string[] {
     if (foreman.useCases?.length) return foreman.useCases
     return foreman.pain ? [foreman.pain] : []
 }
+
+export type PendingInvite = { email: string; invitedBy: string }
 
 export type ForemanAnswers = OnboardingAnswers & { foreman?: ForemanProfile }
 
