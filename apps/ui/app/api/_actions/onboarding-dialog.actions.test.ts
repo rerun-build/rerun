@@ -5,8 +5,7 @@ const answers = vi.hoisted(() => ({ value: {} as Record<string, unknown> }))
 vi.mock('server-only', () => ({}))
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn(async () => ctx.value) }))
 vi.mock('@/lib/foreman/profile', () => ({ readAnswers: vi.fn(async () => answers.value), mergeForeman: vi.fn(async () => ({})) }))
-const release = vi.hoisted(() => ({ at: '2026-12-01T00:00:00Z' as string | null }))
-vi.mock('@/lib/onboarding/facts', () => ({ onboardingReleasedAt: () => release.at }))
+vi.mock('@/lib/onboarding/facts', () => ({ ONBOARDING_DIALOG_RELEASED_AT: '2026-12-01T00:00:00Z' }))
 const edition = vi.hoisted(() => ({ cloud: true, entitled: true }))
 vi.mock('@rerun/cloud/edition', () => ({
     get RERUN_CLOUD() {
@@ -29,7 +28,6 @@ beforeEach(() => {
     vi.clearAllMocks()
     ctx.value = ctxOf()
     answers.value = {}
-    release.at = '2026-12-01T00:00:00Z'
     edition.cloud = true
     edition.entitled = true
 })

@@ -12,11 +12,6 @@ import { mintForemanWakeToken } from './hub-token'
 import { foremanWakeInstructions } from './prompt'
 import { loadForemanState } from './state'
 
-// The switch for everyone, once the internal wave went well. Until then, the workspaces listed in
-// FOREMAN_WAKE_WORKSPACES (ids, comma separated) are the only ones that wake. A flag would not do:
-// flags are read from a browser's session, and nobody's browser is behind a box asking.
-const FOREMAN_WAKES_RELEASED = false
-
 // A CLI that brings tools of its own Rerun cannot switch off. Codex keeps `apply_patch` whatever the
 // run is given, so a wake on it could write; it stays asleep until its sandbox is proven on a box.
 const HELD_PROVIDERS = new Set(['codex'])
@@ -24,14 +19,6 @@ const HELD_PROVIDERS = new Set(['codex'])
 const DAY_MS = 24 * 60 * 60 * 1000
 // A workspace nobody opened for a week gets one wake a week, not one a day.
 const DORMANT_AFTER_MS = 7 * DAY_MS
-
-export function wakesOpenTo(workspaceId: number): boolean {
-    if (FOREMAN_WAKES_RELEASED) return true
-    return (process.env.FOREMAN_WAKE_WORKSPACES ?? '')
-        .split(',')
-        .map(id => id.trim())
-        .includes(String(workspaceId))
-}
 
 const skip = (reason: ForemanWakeSkipReason): ForemanWakeBrief => ({ skip: reason })
 
@@ -66,7 +53,6 @@ export async function foremanWakeBrief(workspaceId: number, request: ForemanWake
     const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['is_sandbox', 'subscription_status', 'assistant_proactive'] as const, { id: workspaceId })
     if (!workspace || workspace.is_sandbox) return skip('sandbox')
     if (!workspace.assistant_proactive) return skip('disabled')
-    if (!wakesOpenTo(workspaceId)) return skip('not_released')
     if (!isSubscriptionEntitled(workspace.subscription_status)) return skip('no_plan')
     if (request.provider && HELD_PROVIDERS.has(request.provider)) return skip('provider')
     if (isDormant(await lastHumanActivity(workspaceId), request.lastWakeAt, now)) return skip('dormant')

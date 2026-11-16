@@ -23,7 +23,7 @@ vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 vi.mock('@/lib/foreman/box-tools', () => ({ dispatchBoxTool: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn().mockReturnValue({}) }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: vi.fn() }))
-vi.mock('@/lib/foreman/wake-brief', () => ({ foremanWakeBrief: vi.fn().mockResolvedValue({ skip: 'not_released' }) }))
+vi.mock('@/lib/foreman/wake-brief', () => ({ foremanWakeBrief: vi.fn().mockResolvedValue({ skip: 'dormant' }) }))
 
 const WORKSPACE_ID = 7
 
@@ -193,7 +193,7 @@ describe('POST /api/hub', () => {
         const response = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, body: { tool: 'foreman_brief', args: { reason: 'scheduled', memberId: 'user-7', provider: 'claude' } } }))
 
         expect(response.status).toBe(200)
-        expect(await response.json()).toEqual({ skip: 'not_released' })
+        expect(await response.json()).toEqual({ skip: 'dormant' })
         expect(foremanWakeBrief).toHaveBeenCalledWith(WORKSPACE_ID, { reason: 'scheduled', memberId: 'user-7', provider: 'claude' })
     })
 

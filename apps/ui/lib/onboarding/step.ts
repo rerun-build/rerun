@@ -25,8 +25,7 @@ export type OnboardingFacts = {
 // surface as they were. One that already had its say (survey done, no profile since) or one that
 // never started (created before the release, nothing written) is not handed an unclosable dialog on
 // its next visit.
-export function isLegacyWorkspace(facts: Pick<OnboardingFacts, 'createdAt' | 'onboardedAt' | 'foreman'>, releasedAt: string | null): boolean {
-    if (!releasedAt) return true
+export function isLegacyWorkspace(facts: Pick<OnboardingFacts, 'createdAt' | 'onboardedAt' | 'foreman'>, releasedAt: string): boolean {
     const { profileAt, plan } = facts.foreman
     if (facts.onboardedAt && !profileAt) return true
     return !profileAt && !plan && (!facts.createdAt || facts.createdAt < releasedAt)
@@ -38,7 +37,7 @@ export function arrivedReadyMade(foreman: ForemanProfile): boolean {
     return foreman.arrival?.kind === 'template' || foreman.arrival?.kind === 'share' || !!foreman.installedFirst
 }
 
-export function onboardingStep(facts: OnboardingFacts, releasedAt: string | null): OnboardingStep {
+export function onboardingStep(facts: OnboardingFacts, releasedAt: string): OnboardingStep {
     const { foreman } = facts
     // Guards first: a workspace that runs never sees the dialog.
     if (!facts.admin || facts.sandbox) return 'done'

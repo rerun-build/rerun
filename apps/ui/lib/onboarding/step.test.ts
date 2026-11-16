@@ -22,7 +22,7 @@ const fresh: OnboardingFacts = {
     cloud: true,
 }
 
-const step = (facts: Partial<OnboardingFacts>, releasedAt: string | null = RELEASED) => onboardingStep({ ...fresh, ...facts }, releasedAt)
+const step = (facts: Partial<OnboardingFacts>, releasedAt: string = RELEASED) => onboardingStep({ ...fresh, ...facts }, releasedAt)
 const profiled = { profileAt: AT }
 const invited = { profileAt: AT, inviteAt: AT }
 
@@ -60,10 +60,6 @@ describe('onboardingStep', () => {
 
         it('leaves a workspace created before the release with nothing written alone', () => {
             expect(step({ createdAt: BEFORE })).toBe('done')
-        })
-
-        it('shows nothing before the release', () => {
-            expect(step({}, null)).toBe('done')
         })
 
         it('sends an archived workspace to its restore', () => {
@@ -120,8 +116,9 @@ describe('onboardingStep', () => {
 })
 
 describe('isLegacyWorkspace', () => {
-    it('is every workspace before the release', () => {
-        expect(isLegacyWorkspace({ createdAt: AFTER, onboardedAt: null, foreman: profiled }, null)).toBe(true)
+    it('is a workspace from before the release that never wrote anything', () => {
+        expect(isLegacyWorkspace({ createdAt: BEFORE, onboardedAt: null, foreman: {} }, RELEASED)).toBe(true)
+        expect(isLegacyWorkspace({ createdAt: AFTER, onboardedAt: null, foreman: {} }, RELEASED)).toBe(false)
     })
 
     it('is not a workspace that wrote a profile, whenever it was created', () => {

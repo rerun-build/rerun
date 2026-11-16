@@ -12,14 +12,9 @@ import { poolHasRoom } from '@rerun/cloud/engines'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import type { OnboardingFacts } from './step'
 
-// Set on the day the onboarding dialog ships: workspaces created before it keep the hub's
-// onboarding (step.ts, isLegacyWorkspace). `ONBOARDING_DIALOG_RELEASED_AT` opens it earlier on one
-// deployment, staging or a local stack.
-const ONBOARDING_DIALOG_RELEASED_AT: string | null = null
-
-export function onboardingReleasedAt(): string | null {
-    return process.env.ONBOARDING_DIALOG_RELEASED_AT || ONBOARDING_DIALOG_RELEASED_AT
-}
+// Workspaces created before the onboarding dialog shipped keep the hub's onboarding (step.ts,
+// isLegacyWorkspace).
+export const ONBOARDING_DIALOG_RELEASED_AT = '2026-11-16T00:00:00Z'
 
 function readAnswers(value: unknown): ForemanAnswers {
     return value && typeof value === 'object' && !Array.isArray(value) ? (value as ForemanAnswers) : {}

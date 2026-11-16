@@ -6,8 +6,7 @@ vi.mock('@rerun/cloud/edition', () => ({
         return edition.cloud
     },
 }))
-const release = vi.hoisted(() => ({ at: null as string | null }))
-vi.mock('@/lib/onboarding/facts', () => ({ onboardingReleasedAt: () => release.at }))
+vi.mock('@/lib/onboarding/facts', () => ({ ONBOARDING_DIALOG_RELEASED_AT: '2026-12-01T00:00:00Z' }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), ensureWorkspaceEngine: vi.fn() }))
 
 import { ensureWorkspaceEngine, findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
@@ -25,15 +24,10 @@ describe('resolveForemanSurface', () => {
 
     afterEach(() => {
         edition.cloud = true
-        release.at = null
     })
 
     describe('once the onboarding dialog is out', () => {
         const dialog = { phase: 'plan' as const, foreman: { profileAt: '2026-12-02T10:00:00Z' }, onboardingCompletedAt: null, workspaceCreatedAt: '2026-12-02T09:00:00Z' }
-
-        beforeEach(() => {
-            release.at = '2026-12-01T00:00:00Z'
-        })
 
         it('gives a workspace of the dialog nobody to talk to until its box is claimed', async () => {
             expect(await resolveForemanSurface(7, dialog, signedIn)).toBe('none')

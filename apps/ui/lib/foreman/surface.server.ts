@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { ensureWorkspaceEngine, findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
-import { onboardingReleasedAt } from '@/lib/onboarding/facts'
+import { ONBOARDING_DIALOG_RELEASED_AT } from '@/lib/onboarding/facts'
 import { isLegacyWorkspace } from '@/lib/onboarding/step'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import type { ForemanState } from './phase'
@@ -13,7 +13,7 @@ type SurfaceState = Pick<ForemanState, 'phase'> & Partial<Pick<ForemanState, 'fo
 // claimed one. The others keep the hub's onboarding.
 export function walksTheDialog(state: SurfaceState): boolean {
     if (!state.foreman) return false
-    return !isLegacyWorkspace({ createdAt: state.workspaceCreatedAt ?? null, onboardedAt: state.onboardingCompletedAt ?? null, foreman: state.foreman }, onboardingReleasedAt())
+    return !isLegacyWorkspace({ createdAt: state.workspaceCreatedAt ?? null, onboardedAt: state.onboardingCompletedAt ?? null, foreman: state.foreman }, ONBOARDING_DIALOG_RELEASED_AT)
 }
 
 // `canClaim` is false for an anonymous visitor: their workspace is thrown away with them, so it must

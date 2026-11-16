@@ -62,7 +62,7 @@ export const foremanWakeRequestSchema = z.object({
 })
 export type ForemanWakeRequest = z.infer<typeof foremanWakeRequestSchema>
 
-export const FOREMAN_WAKE_SKIP_REASONS = ['disabled', 'not_released', 'no_plan', 'sandbox', 'dormant', 'no_token_secret', 'provider', 'no_member'] as const
+export const FOREMAN_WAKE_SKIP_REASONS = ['disabled', 'no_plan', 'sandbox', 'dormant', 'no_token_secret', 'provider', 'no_member'] as const
 export type ForemanWakeSkipReason = (typeof FOREMAN_WAKE_SKIP_REASONS)[number]
 
 // `skip` stays a string on the box's side: a newer hub may say no for a reason this engine never heard of.

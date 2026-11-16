@@ -92,8 +92,8 @@ describe('startForemanWake', () => {
     })
 
     it('stays asleep for the reason the hub gives', async () => {
-        state.hubAnswer = { skip: 'not_released' }
-        expect(await startForemanWake({ reason: 'x' })).toEqual({ status: 'skipped', reason: 'not_released' })
+        state.hubAnswer = { skip: 'dormant' }
+        expect(await startForemanWake({ reason: 'x' })).toEqual({ status: 'skipped', reason: 'dormant' })
         expect(state.started).toHaveLength(0)
     })
 

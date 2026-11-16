@@ -34,7 +34,6 @@ vi.mock('@/lib/foreman/conversation', () => ({
     touchForemanConversation: vi.fn(),
 }))
 vi.mock('@/lib/foreman/engine-brief', () => ({ foremanEngineBrief: vi.fn() }))
-vi.mock('@/lib/foreman/wake-brief', () => ({ wakesOpenTo: vi.fn(() => false) }))
 vi.mock('@/lib/foreman/state', () => ({ loadForemanState: vi.fn() }))
 vi.mock('@/lib/foreman/surface.server', () => ({ resolveForemanSurface: vi.fn() }))
 

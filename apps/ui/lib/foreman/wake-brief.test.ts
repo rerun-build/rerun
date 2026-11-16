@@ -5,7 +5,7 @@ import { memberWorkspaceContext, workspaceFounderUserId } from '@/app/api/_auth/
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { verifyForemanHubToken } from './hub-token'
 import { loadForemanState } from './state'
-import { foremanWakeBrief, isDormant, wakesOpenTo } from './wake-brief'
+import { foremanWakeBrief, isDormant } from './wake-brief'
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/app/api/_auth/access', () => ({ memberActor: vi.fn(), visibleSpaceIds: vi.fn() }))
@@ -26,7 +26,6 @@ let lastActive: string | null
 beforeEach(() => {
     vi.clearAllMocks()
     vi.stubEnv('FOREMAN_HUB_TOKEN_SECRET', 'test-secret')
-    vi.stubEnv('FOREMAN_WAKE_WORKSPACES', '3, 7')
     workspaceRow = { is_sandbox: false, subscription_status: 'active', assistant_proactive: true }
     lastActive = new Date(NOW - DAY).toISOString()
     vi.mocked(selectMaybeSingle).mockImplementation(async (_client, table) => (table === 'workspaces' ? { data: workspaceRow } : { data: { timezone: 'Europe/Paris' } }) as never)
@@ -76,7 +75,6 @@ describe('foremanWakeBrief', () => {
         ['no_token_secret', () => vi.stubEnv('FOREMAN_HUB_TOKEN_SECRET', '')],
         ['sandbox', () => (workspaceRow = { ...workspaceRow, is_sandbox: true })],
         ['disabled', () => (workspaceRow = { ...workspaceRow, assistant_proactive: false })],
-        ['not_released', () => vi.stubEnv('FOREMAN_WAKE_WORKSPACES', '3')],
         ['no_plan', () => (workspaceRow = { ...workspaceRow, subscription_status: 'canceled' })],
         ['no_member', () => vi.mocked(workspaceFounderUserId).mockResolvedValue(null) && vi.mocked(memberActor).mockResolvedValue(null)],
     ])('stays asleep: %s', async (reason, arrange) => {
@@ -105,12 +103,5 @@ describe('isDormant', () => {
         expect(isDormant(null, new Date(NOW - DAY).toISOString(), NOW)).toBe(true)
         expect(isDormant(NOW - 8 * DAY, null, NOW)).toBe(false)
         expect(isDormant(NOW - 8 * DAY, new Date(NOW - 7 * DAY).toISOString(), NOW)).toBe(false)
-    })
-})
-
-describe('wakesOpenTo', () => {
-    it('opens the workspaces of the internal wave only', () => {
-        expect(wakesOpenTo(7)).toBe(true)
-        expect(wakesOpenTo(70)).toBe(false)
     })
 })

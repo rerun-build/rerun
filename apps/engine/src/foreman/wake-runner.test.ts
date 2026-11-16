@@ -64,7 +64,7 @@ describe('wakeTick', () => {
     })
 
     it('asks again in six hours after the hub said no', async () => {
-        runs.next = { status: 'skipped', reason: 'not_released' }
+        runs.next = { status: 'skipped', reason: 'dormant' }
         await wakeTick(MORNING)
         expect((await readWakeState()).retryAt).toBe('2026-11-16T16:00:00.000Z')
         await wakeTick(new Date('2026-11-16T15:00:00Z'))

@@ -11,7 +11,7 @@ import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { mergeForeman, readAnswers } from '@/lib/foreman/profile'
-import { onboardingReleasedAt } from '@/lib/onboarding/facts'
+import { ONBOARDING_DIALOG_RELEASED_AT } from '@/lib/onboarding/facts'
 import { ONBOARDING_INVITES_MAX } from '@/lib/onboarding/invites'
 import { isLegacyWorkspace } from '@/lib/onboarding/step'
 
@@ -32,7 +32,7 @@ export async function recordOnboardingArrivalAction(kind: ArrivalKind, ref: stri
     if (!isAdminActor(actorFromContext(ctx)) || ctx.workspace.onboarded_at || ctx.workspace.is_sandbox) return
     const { foreman = {} } = await readAnswers(ctx)
     if (foreman.arrival || foreman.profileAt || foreman.plan) return
-    if (isLegacyWorkspace({ createdAt: ctx.workspace.created_at ?? null, onboardedAt: null, foreman }, onboardingReleasedAt())) return
+    if (isLegacyWorkspace({ createdAt: ctx.workspace.created_at ?? null, onboardedAt: null, foreman }, ONBOARDING_DIALOG_RELEASED_AT)) return
     await mergeForeman(ctx, { arrival: { kind, ref: trimmed, at: new Date().toISOString() } })
 }
 

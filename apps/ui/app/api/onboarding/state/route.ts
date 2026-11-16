@@ -1,7 +1,7 @@
 import type { OnboardingState } from '@rerun/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
-import { loadOnboardingFacts, onboardingReleasedAt } from '@/lib/onboarding/facts'
+import { loadOnboardingFacts, ONBOARDING_DIALOG_RELEASED_AT } from '@/lib/onboarding/facts'
 import { isLegacyWorkspace, onboardingStep } from '@/lib/onboarding/step'
 import { readFirstName } from '@/lib/naming/first-name'
 
@@ -16,11 +16,10 @@ export async function GET(): Promise<Response> {
     }
 
     const facts = await loadOnboardingFacts(ctx)
-    const releasedAt = onboardingReleasedAt()
     const arrival = facts.foreman.arrival
     const state: OnboardingState = {
-        step: onboardingStep(facts, releasedAt),
-        dialog: !isLegacyWorkspace(facts, releasedAt),
+        step: onboardingStep(facts, ONBOARDING_DIALOG_RELEASED_AT),
+        dialog: !isLegacyWorkspace(facts, ONBOARDING_DIALOG_RELEASED_AT),
         firstName: readFirstName(ctx.authUser.user_metadata) || null,
         arrival: arrival && arrival.kind !== 'prompt' ? { kind: arrival.kind, ref: arrival.ref } : null,
     }
