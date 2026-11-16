@@ -37,6 +37,11 @@ describe('what a bucket holds', () => {
         expect(bucketRow(JOBS[1], NAMES)).toMatchObject({ station: 'proof', by: 'BRUCE', builder: 'code' })
     })
 
+    it('reads the station from the first word of a stage as the dispatcher writes it', () => {
+        const live = { ...JOBS[0], runs: [run('build', 'code-1', '2026-11-16T09:00:00Z'), run('review 1 of #1139 at', 'linus-1', '2026-11-16T09:10:00Z'), run('fix of #1139', 'larry-1', '2026-11-16T09:20:00Z'), run('proof of #1139 at 67', 'bruce-1', '2026-11-16T09:30:00Z')] }
+        expect(bucketRow(live, NAMES)).toMatchObject({ station: 'proof', by: 'BRUCE', builder: 'larry-1' })
+    })
+
     it('leaves station, coworker and builder empty for a job without runs, and the station empty for a job that was not rejected', () => {
         expect(bucketRow(JOBS[4], NAMES)).toMatchObject({ station: null, by: null, builder: null })
         expect(bucketRow({ ...JOBS[0], state: 'merged' }, NAMES)).toMatchObject({ station: null, by: null, builder: 'code' })
