@@ -99,7 +99,7 @@ describe('factory snapshot cost, rework and cost per issue', () => {
         expect(bad((d) => { d.cost.perIssue = -1 })).toBe(false)
         expect(bad((d) => { d.cost.byStation[0].units = -1 })).toBe(false)
         expect(bad((d) => { d.cost.calibration.state = 'guessed' as 'calibrated' })).toBe(false)
-        expect(bad((d) => { d.cost.calibration.unitsPerPlanPercent = -2 })).toBe(false)
+        expect(bad((d) => { (d.cost.calibration as { unitsPerPlanPercent: number | null }).unitsPerPlanPercent = -2 })).toBe(false)
         expect(bad((d) => { (d.cost as Record<string, unknown>).extra = 1 })).toBe(false)
         expect(bad((d) => { (d.cost.byStation[0] as Record<string, unknown>).extra = 1 })).toBe(false)
         expect(bad((d) => { d.anomalies[0].kind = 'reworks' as 'rework' })).toBe(false)
