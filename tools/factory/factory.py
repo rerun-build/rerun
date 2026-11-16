@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import calendar, contextlib, fnmatch, json, os, re, signal, subprocess, sys, time, shutil, urllib.request
 
+os.environ["GIT_TERMINAL_PROMPT"] = "0"
 GH, GIT = os.environ.get("FACTORY_GH") or "/data/tools/bin/gh", "/data/tools/bin/git"
 OWNERS = ("special-place-ai-heaven", "special-place-administrator")
 WORK = os.environ.get("FACTORY_WORK", "/data/work")
 REPOS, WT, STATE = WORK + "/repos", WORK + "/wt", WORK + "/state"
 MIN_FREE_GB = 30
+LOAD_PER_CPU = 3.0
 MAX_BUILDERS = None
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cutshape
@@ -53,6 +55,29 @@ ISSUE_TEMPLATE = """## Goal
 ## Token estimate
 """
 REL_TEMPLATE = "\n".join(REL_HEADS) + "\n"
+
+
+def transient(msg):
+    print("TRANSIENT: " + msg)
+    sys.exit(3)
+
+
+def room_check():
+    st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
+    free = st.free / 2**30
+    if free < MIN_FREE_GB:
+        transient("disk: %s has %.0f GB free, floor is %d GB%s" % (WORK, free, MIN_FREE_GB, "; under half the floor" if free < MIN_FREE_GB / 2 else ""))
+    mem = avail_mem_gb()
+    if mem is not None and mem < MIN_FREE_MEM_GB:
+        transient("memory: %.1f GB available, floor is %d GB" % (mem, MIN_FREE_MEM_GB))
+    if not LOAD_PER_CPU:
+        return
+    try:
+        load, cpus = os.getloadavg()[0], os.cpu_count() or 1
+    except OSError:
+        return
+    if load > LOAD_PER_CPU * cpus:
+        transient("load: %.1f on %d cores, ceiling is %.1f" % (load, cpus, LOAD_PER_CPU * cpus))
 
 
 def die(msg, code=2):
@@ -117,6 +142,9 @@ def repo_full(name):
     full = name if "/" in name else OWNERS[0] + "/" + name
     if full.split("/")[0] not in OWNERS:
         die("repo owner not allowed: " + full)
+    parts = full.split("/")
+    if len(parts) != 2 or any(not re.fullmatch(r"[A-Za-z0-9._-]+", x) or x in (".", "..") for x in parts):
+        die("repo name not allowed: " + full)
     return full
 
 
@@ -445,6 +473,12 @@ def empty_on_old_base(p, path, branch):
 
 
 def cmd_wt(a):
+    if a and a[0] == "mode":
+        import clones
+        return clones.cmd_mode(a)
+    if a and a[0] in ("janitor", "doctor", "restore"):
+        import janitor
+        return janitor.main(a)
     if not a or a[0] not in ("new", "done", "list", "sweep"):
         die("usage: wt new <repo> <issue> <chunk> [--base BRANCH] [--owner NAME] | wt done <repo> <issue> <chunk> | wt list | wt sweep [--apply]")
     if a[0] == "sweep":
@@ -461,8 +495,8 @@ def cmd_wt(a):
                                                                      "?" if h is None else "%dh" % h, "CI green, waits for merge" if g else "ACTIVE builder"))
         for p in wt_strays():
             print("stray, not a worktree: " + p)
-        st = shutil.disk_usage("/data")
-        print("active builders: %d of %d | /data/work %.1f GB | /data free %.0f GB (floor %d)" % (act, max_builders(), du_gb(WORK), st.free / 2**30, MIN_FREE_GB))
+        st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
+        print("active builders: %d of %d | %d job folders, %.1f GB | free %.0f GB (floor %d)" % (act, max_builders(), len(wt_dirs()), du_gb(WORK), st.free / 2**30, MIN_FREE_GB))
         return
     if len(a) < 4:
         die("usage: wt %s <repo> <issue> <chunk>" % a[0])
@@ -489,13 +523,10 @@ def cmd_wt(a):
                 pass
         print("removed worktree %s and local branch %s" % (path, branch))
         return
+    if "--clone" in a or checkout_mode() == "clone":
+        return wt_new_clone(a, full, issue, chunk)
     existing = os.path.isdir(path)
-    st = shutil.disk_usage("/data")
-    if st.free / 2**30 < MIN_FREE_GB:
-        die("/data has %.0f GB free, floor is %d GB. Tell @boss." % (st.free / 2**30, MIN_FREE_GB))
-    mem = avail_mem_gb()
-    if mem is not None and mem < MIN_FREE_MEM_GB:
-        die("%.1f GB of memory available, floor is %d GB. Tell @boss." % (mem, MIN_FREE_MEM_GB))
+    room_check()
     os.makedirs(STATE, exist_ok=True)
     with builder_lock():
         if not existing and cap_check(quiet=True):
@@ -555,12 +586,51 @@ def cmd_wt(a):
     print("Next: edit here, quick checks only (lint, type check, named test files), commit, then `pr-open`.")
 
 
-def install_deps(path):
+def checkout_mode():
+    try:
+        import clones
+        return clones.mode()
+    except Exception:
+        return "worktree"
+
+
+def wt_new_clone(a, full, issue, chunk):
+    import clones
+    job = "%s-%s-%s" % (short(full), issue, chunk)
+    try:
+        wt_new_clone_steps(a, full, issue, chunk)
+    except SystemExit as e:
+        if e.code in (None, 0):
+            clones.record("ok", job)
+        raise
+    except Exception:
+        line = clones.record("fault", job)
+        if line:
+            print(line)
+        raise
+    else:
+        clones.record("ok", job)
+
+
+def wt_new_clone_steps(a, full, issue, chunk):
+    import clones
+    room_check()
+    plan_check(full, issue)
+    info = api("repos/%s" % full)
+    if not isinstance(info, dict) or "default_branch" not in info:
+        clones.transient("cannot read %s on GitHub" % full)
+    base = a[a.index("--base") + 1] if "--base" in a else None
+    owner = a[a.index("--owner") + 1] if "--owner" in a else os.environ.get("FACTORY_OWNER") or "unknown"
+    return clones.new(full, issue, chunk, base, owner, info["default_branch"])
+
+
+def install_deps(path, runner=None):
     if not os.path.isfile(os.path.join(path, "pnpm-lock.yaml")):
         return
+    cmd = ["pnpm", "install", "--frozen-lockfile", "--prefer-offline"]
     t0 = time.time()
     try:
-        r = run(["pnpm", "install", "--frozen-lockfile", "--prefer-offline"], cwd=path, check=False, timeout=300)
+        r = runner(cmd, path, 300) if runner else run(cmd, cwd=path, check=False, timeout=300)
         err = None if r.returncode == 0 else ((r.stderr or r.stdout or "").strip().splitlines() or ["exit %d" % r.returncode])[0]
     except (OSError, subprocess.SubprocessError) as e:
         err = (str(e).splitlines() or [type(e).__name__])[0]
@@ -568,6 +638,7 @@ def install_deps(path):
         print("dependencies installed in %d s" % (time.time() - t0))
     else:
         print("dependencies NOT installed: %s" % err[:200])
+    return err
 
 
 def pr_lookup(full, branch):
@@ -667,8 +738,77 @@ def wt_context():
     if not m or not base:
         die("this worktree was not made by `wt new` (branch %s)" % branch)
     url = run([GIT, "remote", "get-url", "origin"], cwd=top).stdout.strip()
+    if "github.com/" not in url:
+        die("origin of this clone is %s, not a GitHub URL. Nothing pushed; tell @boss." % url)
     full = repo_full(re.sub(r"\.git$", "", url.split("github.com/")[1]))
     return top, full, branch, base, m.group(1), m.group(2)
+
+
+TOKEN_SHAPE = re.compile(r"gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,}")
+TOKEN_BYTES = re.compile(TOKEN_SHAPE.pattern.encode())
+
+
+def token_shapes(top, base):
+    rows = [r.split(" ", 1) for r in run([GIT, "rev-list", "--objects", "HEAD", "--not", "origin/%s" % base], cwd=top).stdout.splitlines()]
+    names = {r[0]: r[1] for r in rows if len(r) == 2 and r[1]}
+    r = subprocess.run([GIT, "cat-file", "--batch"], input="".join(s + "\n" for s in names).encode(), capture_output=True, cwd=top, timeout=300)
+    out, found, at, read = r.stdout, [], 0, 0
+    while at < len(out) and not r.returncode:
+        end = out.find(b"\n", at)
+        head = out[at:end].decode("ascii", "replace").split() if end >= 0 else []
+        if len(head) != 3 or not head[2].isdigit() or end + 1 + int(head[2]) >= len(out):
+            break
+        sha, kind, size = head
+        read += 1
+        new = set(TOKEN_BYTES.findall(out[end + 1:end + 1 + int(size)])) if kind == "blob" else set()
+        at = end + 2 + int(size)
+        if new:
+            held = subprocess.run([GIT, "cat-file", "blob", "origin/%s:%s" % (base, names[sha])], capture_output=True, cwd=top, timeout=300).stdout
+            if new - set(TOKEN_BYTES.findall(held)):
+                found.append(names[sha])
+    if r.returncode or read != len(names):
+        die("the new files could not be read for the token check (git cat-file exit %s, %d of %d read). Nothing pushed. Try again." % (r.returncode, read, len(names)))
+    if TOKEN_SHAPE.search(run([GIT, "log", "--format=%B", "origin/%s..HEAD" % base], cwd=top).stdout):
+        found.append("a commit message")
+    conf = run([GIT, "config", "--local", "--list"], cwd=top, check=False).stdout
+    if TOKEN_SHAPE.search(conf) or "@github.com" in run([GIT, "remote", "-v"], cwd=top, check=False).stdout:
+        found.append(".git/config")
+    return sorted(set(found))
+
+
+def clone_ready(top, full, branch, base):
+    import mirror
+    if not os.path.isfile(os.path.join(top, ".git", "factory-ready")):
+        i, c = branch.split("/", 1)[1].split("-", 1)
+        die("this clone was not finished. Run `wt new %s %s %s` again first; it finishes the steps and changes nothing else." % (short(full), i, c))
+    url = run([GIT, "remote", "get-url", "origin"], cwd=top).stdout.strip()
+    if url != mirror.url(full):
+        die("origin of this clone is %s, not %s. Nothing pushed; tell @boss." % (url, mirror.url(full)))
+    mark = os.path.join(top, ".git", "factory-merging")
+    if os.path.exists(mark):
+        run([GIT, "merge", "--abort"], cwd=top, check=False)
+        os.remove(mark)
+        print("cleared an automatic merge of %s that was cut off earlier" % base)
+
+
+def merge_base_in(top, branch, base):
+    if run([GIT, "merge-base", "--is-ancestor", "origin/" + base, "HEAD"], cwd=top, check=False).returncode == 0:
+        return
+    mark = os.path.join(top, ".git", "factory-merging")
+    open(mark, "w").close()
+    r = run([GIT, "merge", "--no-commit", "--no-ff", "origin/" + base], cwd=top, check=False)
+    if r.returncode:
+        files = run([GIT, "diff", "--name-only", "--diff-filter=U"], cwd=top, check=False).stdout.split()
+        run([GIT, "merge", "--abort"], cwd=top, check=False)
+        os.remove(mark)
+        die("CONFLICT: %s moved and conflicts with this branch in %s. Merge origin/%s yourself, commit, then run pr-open again." % (base, ", ".join(files) or "?", base))
+    r = run([GIT, "commit", "--quiet", "--no-edit", "-m", "Merge origin/%s into %s" % (base, branch)], cwd=top, check=False)
+    if r.returncode:
+        run([GIT, "merge", "--abort"], cwd=top, check=False)
+        os.remove(mark)
+        die("the automatic merge of origin/%s could not be committed: %s. Nothing pushed." % (base, (r.stderr or r.stdout).strip()[-300:]))
+    os.remove(mark)
+    print("MERGED origin/%s into %s first: the branch was behind" % (base, branch))
 
 
 def has_heads(text, heads):
@@ -680,18 +820,26 @@ def cmd_pr_open(a):
         print(PR_TEMPLATE)
         return
     top, full, branch, base, issue, chunk = wt_context()
+    clone = is_clone(top)
+    if clone:
+        clone_ready(top, full, branch, base)
     if run([GIT, "status", "--porcelain"], cwd=top).stdout.strip():
         die("uncommitted changes. Commit everything for this chunk first (one push per chunk).")
     run([GIT, "fetch", "--quiet", "origin", base], cwd=top)
     ahead = run([GIT, "rev-list", "--count", "origin/%s..HEAD" % base], cwd=top).stdout.strip()
     if ahead == "0":
         die("no commits ahead of origin/%s" % base)
+    if clone:
+        merge_base_in(top, branch, base)
     changed = run([GIT, "diff", "--name-only", "origin/%s...HEAD" % base], cwd=top).stdout.split()
     if any(re.match(WF, f) for f in changed):
         die("this chunk changes workflow files (.github/workflows or actions). They are Rob's. Return BLOCKED to @boss.")
     msgs = run([GIT, "log", "--format=%B", "origin/%s..HEAD" % base], cwd=top).stdout
     if re.search(r"co-authored-by|generated with", msgs, re.I):
         die("a commit message has an AI trailer. Amend it before the push (nothing is pushed yet).")
+    shapes = token_shapes(top, base)
+    if shapes:
+        die("the shape of a GitHub token is in %s. Nothing pushed. Take it out (a test builds its fake token from parts)." % ", ".join(shapes))
     got = api("repos/%s/issues/%s" % (full, issue))
     if got is None:
         die("could not read issue #%s to check the change against its **Files**. Try again." % issue)
@@ -705,7 +853,12 @@ def cmd_pr_open(a):
     if ex:
         if "--fix" not in a:
             die("PR already open: %s. To push a fix for red CI use `pr-open --fix`." % ex[0]["url"])
-        if os.path.exists(marker(short(full), branch)):
+        if clone:
+            try:
+                os.remove(marker(short(full), branch))
+            except OSError:
+                pass
+        elif os.path.exists(marker(short(full), branch)):
             with builder_lock():
                 cap_check()
                 try:
@@ -875,6 +1028,9 @@ def cmd_merge_dev(a):
         die("base is %s. Merging into main is Rob's step. Give your verdict to @boss instead." % base)
     if not (base == "dev" or base.startswith("job/")):
         die("base %s is neither dev nor a job branch" % base)
+    if pr.get("merged"):
+        print("MERGED earlier as %s: %s#%s into %s, nothing to do" % ((pr.get("merge_commit_sha") or "?")[:8], full, n, base))
+        return
     if pr["state"] != "open" or pr["draft"]:
         die("PR is %s%s" % (pr["state"], " (draft)" if pr["draft"] else ""))
     files = api("repos/%s/pulls/%s/files?per_page=100" % (full, n)) or []
@@ -897,10 +1053,7 @@ def cmd_merge_dev(a):
     print("MERGED %s#%s into %s as %s | head %s | remote branch %s deleted" % (full, n, base, (m.get("merge_commit_sha") or "?")[:8], pr["head"]["sha"][:8], head))
     mm = re.fullmatch(r"chunk/(\d+)-([a-z0-9]+)", head)
     if mm and os.path.isdir(os.path.join(WT, short(full), "%s-%s" % mm.groups())):
-        try:
-            cmd_wt(["done", full, mm.group(1), mm.group(2)])
-        except SystemExit:
-            print("KEPT worktree %s/%s-%s: the merge stands, clean the worktree up and run `wt done` again." % (short(full), mm.group(1), mm.group(2)))
+        print("folder %s/%s-%s stays; the janitor removes it" % (short(full), mm.group(1), mm.group(2)))
 
 
 def cmd_job_open(a):

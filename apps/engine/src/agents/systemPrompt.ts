@@ -15,13 +15,14 @@ import { hasPendingSetup } from './setup.js'
 import { offersQuickReplies } from './quick-replies-stream.js'
 import { HITL_TOOL_NAMES, offersTakeover, type HitlToolName } from '../tools/builtin/hitl.js'
 import { runOffersComputer } from '../tools/builtin/computer.js'
+import { fsExtraRoots } from '../tools/builtin/filesystem.js'
 import { CLI_PROVIDERS, type LoadedAgent } from './types.js'
 import { turnOrder, type TurnOrder } from './turn-order.js'
 import type { RunTrigger } from '../runtime/context.js'
 
-function environmentNote(agentId: string, sharedDb: boolean): string {
+function environmentNote(agentId: string, sharedDb: boolean, extraRoots: string[]): string {
     const sharedDbSentence = sharedDb ? ` The shared database of this space is at ${sharedDbPath()}, reachable from a script through the RERUN_SHARED_DB environment variable.` : ''
-    return `Your workspace is ${workspaceDir(agentId)}. It is the working directory of shell_exec (its pwd) and its absolute path is in the RERUN_WORKSPACE environment variable. Your fs_ tools are rooted there; your shared_ tools are rooted in the shared space at ${sharedDir()}, which every coworker in this space can read and write.${sharedDbSentence} This is where your files live and where the user drops files for you. Never treat install or system paths such as /opt/rerun or the engine source tree as your workspace — your files are never there. To find a file, prefer fs_list and fs_search over a raw shell find, and search the shared space with shared_list and shared_search.`
+    return `Your workspace is ${workspaceDir(agentId)}. It is the working directory of shell_exec (its pwd) and its absolute path is in the RERUN_WORKSPACE environment variable. Your fs_ tools are rooted there${extraRoots.length ? ` and also take an absolute path in a job folder under ${extraRoots.join(' or ')}` : ''}; your shared_ tools are rooted in the shared space at ${sharedDir()}, which every coworker in this space can read and write.${sharedDbSentence} This is where your files live and where the user drops files for you. Never treat install or system paths such as /opt/rerun or the engine source tree as your workspace — your files are never there. To find a file, prefer fs_list and fs_search over a raw shell find, and search the shared space with shared_list and shared_search.`
 }
 
 const SERVICE_CATALOG_LEAD =
@@ -275,7 +276,7 @@ export async function buildSystemPrompt(agent: LoadedAgent, trigger: RunTrigger 
     const stable = [
         section('identity', agent.soul.trim() || defaultSoul(agent.config)),
         section('vocabulary', VOCABULARY_NOTE),
-        section('environment', environmentNote(agent.id, cfg.sharedDb)),
+        section('environment', environmentNote(agent.id, cfg.sharedDb, cfg.filesystem ? fsExtraRoots(agent.config) : [])),
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
         section('operating_notes', operatingNotes(cfg.skills && agent.config.selfImprovement.enabled)),
         hasPendingSetup(agent) ? section('setup', setupNote(cfg.paidData)) : '',

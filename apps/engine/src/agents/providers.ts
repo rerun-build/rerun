@@ -148,7 +148,7 @@ export function claudeBridgeHandler(bridged: BridgedTool, screenshots?: Screensh
 
 export const OVERLAPPING_BRIDGED_TOOLS: ReadonlySet<string> = new Set(['call_agent'])
 
-export function claudeMcpConfig(tools?: ToolSet, mcpServers: RunMcpServer[] = [], screenshots?: ScreenshotLookup): { mcpServers: Record<string, McpServerConfig>; allowedTools: string[] } {
+export function claudeMcpConfig(tools?: ToolSet, mcpServers: RunMcpServer[] = [], screenshots?: ScreenshotLookup): { mcpServers: Record<string, McpServerConfig>; allowedTools: string[]; toolAliases: Record<string, string> } {
     const bridged = tools ? bridgeableTools(tools) : {}
     const names = Object.keys(bridged)
     const servers: Record<string, McpServerConfig> = {}
@@ -178,7 +178,7 @@ export function claudeMcpConfig(tools?: ToolSet, mcpServers: RunMcpServer[] = []
         if (!server.relay && picked.length) allowedTools.push(...picked.map(tool => `mcp__${server.name}__${tool}`))
         else allowedTools.push(`mcp__${server.name}`)
     }
-    return { mcpServers: servers, allowedTools }
+    return { mcpServers: servers, allowedTools, toolAliases: Object.fromEntries(names.map(n => [n, `mcp__${BRIDGE_SERVER_NAME}__${n}`])) }
 }
 
 function codexNativeMcpEntry(server: McpServer): CodexMcpServerConfig | null {
@@ -247,7 +247,7 @@ export function withGoalStop(hooks: ClaudeHooks | undefined, goal: GoalOption | 
 }
 
 function claudeProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers: RunMcpServer[] = [], capture?: ClaudeContextCapture, options: CliModelOptions = {}) {
-    const { mcpServers: servers, allowedTools } = claudeMcpConfig(tools, mcpServers, options.screenshots)
+    const { mcpServers: servers, allowedTools, toolAliases } = claudeMcpConfig(tools, mcpServers, options.screenshots)
     const { cwd, env: agentEnv } = agentProcessEnv(agent, options.labels)
     const thinking: NonNullable<ReturnType<typeof thinkingSettingsFor>['claudeThinking']> = thinkingSettingsFor('claude', '', agent.config.thinkingLevel).claudeThinking ?? CLAUDE_DEFAULT_THINKING
     return createClaudeCode({
@@ -270,6 +270,7 @@ function claudeProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers: RunMcpS
             },
             ...(options.system !== undefined ? { systemPrompt: options.system } : {}),
             ...(allowedTools.length ? { mcpServers: servers, allowedTools } : {}),
+            ...(Object.keys(toolAliases).length ? { toolAliases } : {}),
             ...(capture ? { ...capture.settings, hooks: withCardTagNudge(capture.settings.hooks) } : {}),
             ...(options.goal ? { hooks: withGoalStop(capture ? withCardTagNudge(capture.settings.hooks) : undefined, options.goal) } : {}),
         },

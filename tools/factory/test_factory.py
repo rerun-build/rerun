@@ -29,9 +29,9 @@ class FactoryCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="factory-test-")
         self.addCleanup(shutil.rmtree, self.tmp, **({"onexc": _writable} if sys.version_info >= (3, 12) else {"onerror": _writable}))
-        saved = {k: getattr(F, k) for k in ("GIT", "WORK", "REPOS", "WT", "STATE")}
+        saved = {k: getattr(F, k) for k in ("GIT", "WORK", "REPOS", "WT", "STATE", "LOAD_PER_CPU")}
         self.addCleanup(lambda: [setattr(F, k, v) for k, v in saved.items()])
-        F.GIT, F.WORK = "git", os.path.join(self.tmp, "work")
+        F.GIT, F.WORK, F.LOAD_PER_CPU = "git", os.path.join(self.tmp, "work"), None
         F.REPOS, F.WT, F.STATE = F.WORK + "/repos", F.WORK + "/wt", F.WORK + "/state"
         os.makedirs(F.STATE)
         self.origin = os.path.join(self.tmp, "origin.git")
@@ -190,7 +190,7 @@ class WtDoneCleans(FactoryCase):
         self.assertTrue(os.path.isfile(os.path.join(shared, "keep.txt")))
         self.assertTrue(os.path.isdir(os.path.join(shared, "pkg")))
 
-    def test_merge_dev_cleans_up_after_merge_and_remote_branch_delete(self):
+    def test_merge_dev_deletes_the_remote_branch_and_leaves_the_folder_to_the_janitor(self):
         p = self.wt()
         sha = self.commit(p)
         git(p, "push", "--quiet", "origin", "chunk/7-1")
@@ -198,7 +198,8 @@ class WtDoneCleans(FactoryCase):
         self.assertEqual(code, 0, out)
         self.assertIn("MERGED", out)
         self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
-        self.assert_gone(p, out)
+        self.assertIn("folder %s/7-1 stays; the janitor removes it" % REPO, out)
+        self.assertTrue(os.path.isdir(p))
 
     def test_merge_dev_keeps_a_dirty_worktree_and_still_reports_the_merge(self):
         p = self.wt()
@@ -208,7 +209,7 @@ class WtDoneCleans(FactoryCase):
         code, out = self.merge_dev(sha)
         self.assertEqual(code, 0, out)
         self.assertIn("MERGED", out)
-        self.assertIn("KEPT", out)
+        self.assertNotIn("KEPT", out)
         self.assertTrue(os.path.isfile(os.path.join(p, "left.txt")))
 
     def merge_dev(self, sha):
@@ -456,8 +457,8 @@ class BuilderCap(FactoryCase):
     def test_wt_new_refuses_below_the_memory_floor(self):
         self.meminfo(int((F.MIN_FREE_MEM_GB - 0.5) * 1048576))
         code, out = self.new("3")
-        self.assertEqual(code, 2, out)
-        self.assertIn("memory", out)
+        self.assertEqual(code, 3, out)
+        self.assertIn("TRANSIENT: memory: ", out)
         self.assertFalse(self.made("3"))
 
     def test_wt_new_above_the_memory_floor_and_without_meminfo_proceeds(self):
