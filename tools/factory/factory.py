@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import calendar, contextlib, fnmatch, json, os, re, signal, subprocess, sys, time, shutil, urllib.request
 
+os.environ["GIT_TERMINAL_PROMPT"] = "0"
 GH, GIT = os.environ.get("FACTORY_GH") or "/data/tools/bin/gh", "/data/tools/bin/git"
 OWNERS = ("special-place-ai-heaven", "special-place-administrator")
 WORK = os.environ.get("FACTORY_WORK", "/data/work")
@@ -445,6 +446,9 @@ def empty_on_old_base(p, path, branch):
 
 
 def cmd_wt(a):
+    if a and a[0] in ("janitor", "doctor", "restore"):
+        import janitor
+        return janitor.main(a)
     if not a or a[0] not in ("new", "done", "list", "sweep"):
         die("usage: wt new <repo> <issue> <chunk> [--base BRANCH] [--owner NAME] | wt done <repo> <issue> <chunk> | wt list | wt sweep [--apply]")
     if a[0] == "sweep":

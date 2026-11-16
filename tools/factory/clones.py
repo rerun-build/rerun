@@ -41,6 +41,17 @@ def read_owner(name):
         return {}
 
 
+def try_lease(repo, d):
+    os.makedirs(jobs_dir(), exist_ok=True)
+    lk = open(os.path.join(jobs_dir(), "%s-%s.lock" % (repo, d)), "a")
+    try:
+        fcntl.flock(lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        lk.close()
+        return None
+    return lk
+
+
 @contextlib.contextmanager
 def lease(repo, issue, chunk):
     name = job_name(repo, issue, chunk)
@@ -86,7 +97,10 @@ def prepare(path, branch, base):
     must(M.git(["config", "branch.%s.factorybase" % branch, base], cwd=path), "git config")
     ex = os.path.join(path, ".git", "info", "exclude")
     os.makedirs(os.path.dirname(ex), exist_ok=True)
-    seen = os.path.isfile(ex) and ".symforge" in open(ex).read()
+    seen = False
+    if os.path.isfile(ex):
+        with open(ex) as f:
+            seen = ".symforge" in f.read()
     if not seen:
         with open(ex, "a") as f:
             f.write("\n.symforge/\n.symforge-knowledge.toml\n")
@@ -95,7 +109,7 @@ def prepare(path, branch, base):
         M.write(stamp, str(int(time.time())))
 
 
-def make(full, repo, d, branch, base, default):
+def make(full, repo, d, branch, base, default, start=None):
     tmp = os.path.join(tmp_root(), "%s-%s-%d" % (repo, d, os.getpid()))
     os.makedirs(tmp_root(), exist_ok=True)
     m = M.path(repo)
@@ -123,14 +137,16 @@ def make(full, repo, d, branch, base, default):
             transient("cannot fetch %s from GitHub after %d tries" % (base, FETCH_TRIES))
         sha = must(M.git(["rev-parse", "--verify", "refs/remotes/origin/" + base], cwd=tmp), "base in the mirror")
         print("base from the mirror at %s: the GitHub fetch failed %d times" % (sha[:8], FETCH_TRIES))
+    if start and not fetch_base(tmp, start):
+        transient("cannot fetch %s from GitHub after %d tries" % (start, FETCH_TRIES))
     step("fetched")
-    must(M.git(["checkout", "--quiet", "-b", branch, "origin/" + base], cwd=tmp), "git checkout")
+    must(M.git(["checkout", "--quiet", "-b", branch, "origin/" + (start or base)], cwd=tmp), "git checkout")
     step("branched")
     prepare(tmp, branch, base)
     return tmp, base
 
 
-def new(full, issue, chunk, base, owner, default):
+def new(full, issue, chunk, base, owner, default, start=None):
     repo, d = F.short(full), "%s-%s" % (issue, chunk)
     final, branch = os.path.join(F.WT, repo, d), "chunk/%s-%s" % (issue, chunk)
     if not os.path.isdir(final) and len(F.wt_dirs()) >= CEILING:
@@ -140,7 +156,7 @@ def new(full, issue, chunk, base, owner, default):
             print("EXISTS %s (an old worktree, branch %s). Work there." % (final, branch))
             return
         if not os.path.isdir(final):
-            tmp, base = make(full, repo, d, branch, base, default)
+            tmp, base = make(full, repo, d, branch, base, default, start)
             os.makedirs(os.path.dirname(final), exist_ok=True)
             os.rename(tmp, final)
             step("renamed")
