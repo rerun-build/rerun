@@ -687,8 +687,58 @@ def wt_context():
     if not m or not base:
         die("this worktree was not made by `wt new` (branch %s)" % branch)
     url = run([GIT, "remote", "get-url", "origin"], cwd=top).stdout.strip()
+    if "github.com/" not in url:
+        die("origin of this clone is %s, not a GitHub URL. Nothing pushed; tell @boss." % url)
     full = repo_full(re.sub(r"\.git$", "", url.split("github.com/")[1]))
     return top, full, branch, base, m.group(1), m.group(2)
+
+
+TOKEN_SHAPE = re.compile(r"gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,}")
+
+
+def token_shapes(top, base):
+    found = []
+    cur = None
+    for line in run([GIT, "diff", "--unified=0", "--no-color", "origin/%s...HEAD" % base], cwd=top).stdout.splitlines():
+        if line.startswith("+++ b/"):
+            cur = line[6:]
+        elif line.startswith("+") and not line.startswith("+++") and TOKEN_SHAPE.search(line):
+            found.append(cur or "?")
+    conf = run([GIT, "config", "--local", "--list"], cwd=top, check=False).stdout
+    if TOKEN_SHAPE.search(conf) or "@github.com" in run([GIT, "remote", "-v"], cwd=top, check=False).stdout:
+        found.append(".git/config")
+    return sorted(set(found))
+
+
+def clone_ready(top, full, branch, base):
+    import mirror
+    if not os.path.isfile(os.path.join(top, ".git", "factory-ready")):
+        i, c = branch.split("/", 1)[1].split("-", 1)
+        die("this clone was not finished. Run `wt new %s %s %s` again first; it finishes the steps and changes nothing else." % (short(full), i, c))
+    url = run([GIT, "remote", "get-url", "origin"], cwd=top).stdout.strip()
+    if url != mirror.url(full):
+        die("origin of this clone is %s, not %s. Nothing pushed; tell @boss." % (url, mirror.url(full)))
+    mark = os.path.join(top, ".git", "factory-merging")
+    if os.path.exists(mark):
+        run([GIT, "merge", "--abort"], cwd=top, check=False)
+        os.remove(mark)
+        print("cleared an automatic merge of %s that was cut off earlier" % base)
+
+
+def merge_base_in(top, branch, base):
+    if run([GIT, "merge-base", "--is-ancestor", "origin/" + base, "HEAD"], cwd=top, check=False).returncode == 0:
+        return
+    mark = os.path.join(top, ".git", "factory-merging")
+    open(mark, "w").close()
+    r = run([GIT, "merge", "--no-commit", "--no-ff", "origin/" + base], cwd=top, check=False)
+    if r.returncode:
+        files = run([GIT, "diff", "--name-only", "--diff-filter=U"], cwd=top, check=False).stdout.split()
+        run([GIT, "merge", "--abort"], cwd=top, check=False)
+        os.remove(mark)
+        die("CONFLICT: %s moved and conflicts with this branch in %s. Merge origin/%s yourself, commit, then run pr-open again." % (base, ", ".join(files) or "?", base))
+    run([GIT, "commit", "--quiet", "--no-edit", "-m", "Merge origin/%s into %s" % (base, branch)], cwd=top)
+    os.remove(mark)
+    print("MERGED origin/%s into %s first: the branch was behind" % (base, branch))
 
 
 def has_heads(text, heads):
@@ -700,9 +750,14 @@ def cmd_pr_open(a):
         print(PR_TEMPLATE)
         return
     top, full, branch, base, issue, chunk = wt_context()
+    clone = is_clone(top)
+    if clone:
+        clone_ready(top, full, branch, base)
     if run([GIT, "status", "--porcelain"], cwd=top).stdout.strip():
         die("uncommitted changes. Commit everything for this chunk first (one push per chunk).")
     run([GIT, "fetch", "--quiet", "origin", base], cwd=top)
+    if clone:
+        merge_base_in(top, branch, base)
     ahead = run([GIT, "rev-list", "--count", "origin/%s..HEAD" % base], cwd=top).stdout.strip()
     if ahead == "0":
         die("no commits ahead of origin/%s" % base)
@@ -712,6 +767,9 @@ def cmd_pr_open(a):
     msgs = run([GIT, "log", "--format=%B", "origin/%s..HEAD" % base], cwd=top).stdout
     if re.search(r"co-authored-by|generated with", msgs, re.I):
         die("a commit message has an AI trailer. Amend it before the push (nothing is pushed yet).")
+    shapes = token_shapes(top, base)
+    if shapes:
+        die("the shape of a GitHub token is in %s. Nothing pushed. Take it out (a test builds its fake token from parts)." % ", ".join(shapes))
     got = api("repos/%s/issues/%s" % (full, issue))
     if got is None:
         die("could not read issue #%s to check the change against its **Files**. Try again." % issue)
@@ -725,7 +783,12 @@ def cmd_pr_open(a):
     if ex:
         if "--fix" not in a:
             die("PR already open: %s. To push a fix for red CI use `pr-open --fix`." % ex[0]["url"])
-        if os.path.exists(marker(short(full), branch)):
+        if clone:
+            try:
+                os.remove(marker(short(full), branch))
+            except OSError:
+                pass
+        elif os.path.exists(marker(short(full), branch)):
             with builder_lock():
                 cap_check()
                 try:
@@ -895,6 +958,9 @@ def cmd_merge_dev(a):
         die("base is %s. Merging into main is Rob's step. Give your verdict to @boss instead." % base)
     if not (base == "dev" or base.startswith("job/")):
         die("base %s is neither dev nor a job branch" % base)
+    if pr.get("merged"):
+        print("MERGED earlier as %s: %s#%s into %s, nothing to do" % ((pr.get("merge_commit_sha") or "?")[:8], full, n, base))
+        return
     if pr["state"] != "open" or pr["draft"]:
         die("PR is %s%s" % (pr["state"], " (draft)" if pr["draft"] else ""))
     files = api("repos/%s/pulls/%s/files?per_page=100" % (full, n)) or []
@@ -917,10 +983,7 @@ def cmd_merge_dev(a):
     print("MERGED %s#%s into %s as %s | head %s | remote branch %s deleted" % (full, n, base, (m.get("merge_commit_sha") or "?")[:8], pr["head"]["sha"][:8], head))
     mm = re.fullmatch(r"chunk/(\d+)-([a-z0-9]+)", head)
     if mm and os.path.isdir(os.path.join(WT, short(full), "%s-%s" % mm.groups())):
-        try:
-            cmd_wt(["done", full, mm.group(1), mm.group(2)])
-        except SystemExit:
-            print("KEPT worktree %s/%s-%s: the merge stands, clean the worktree up and run `wt done` again." % (short(full), mm.group(1), mm.group(2)))
+        print("folder %s/%s-%s stays; the janitor removes it" % (short(full), mm.group(1), mm.group(2)))
 
 
 def cmd_job_open(a):

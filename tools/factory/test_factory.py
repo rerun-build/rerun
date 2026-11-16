@@ -190,7 +190,7 @@ class WtDoneCleans(FactoryCase):
         self.assertTrue(os.path.isfile(os.path.join(shared, "keep.txt")))
         self.assertTrue(os.path.isdir(os.path.join(shared, "pkg")))
 
-    def test_merge_dev_cleans_up_after_merge_and_remote_branch_delete(self):
+    def test_merge_dev_deletes_the_remote_branch_and_leaves_the_folder_to_the_janitor(self):
         p = self.wt()
         sha = self.commit(p)
         git(p, "push", "--quiet", "origin", "chunk/7-1")
@@ -198,7 +198,8 @@ class WtDoneCleans(FactoryCase):
         self.assertEqual(code, 0, out)
         self.assertIn("MERGED", out)
         self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
-        self.assert_gone(p, out)
+        self.assertIn("folder %s/7-1 stays; the janitor removes it" % REPO, out)
+        self.assertTrue(os.path.isdir(p))
 
     def test_merge_dev_keeps_a_dirty_worktree_and_still_reports_the_merge(self):
         p = self.wt()
@@ -208,7 +209,7 @@ class WtDoneCleans(FactoryCase):
         code, out = self.merge_dev(sha)
         self.assertEqual(code, 0, out)
         self.assertIn("MERGED", out)
-        self.assertIn("KEPT", out)
+        self.assertNotIn("KEPT", out)
         self.assertTrue(os.path.isfile(os.path.join(p, "left.txt")))
 
     def merge_dev(self, sha):
