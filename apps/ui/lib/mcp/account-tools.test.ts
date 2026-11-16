@@ -14,6 +14,7 @@ vi.mock('@/app/api/_services/agent-setup.service', () => ({ declareService: vi.f
 vi.mock('@/app/api/_services/chat.service', () => ({ ensureSessionRow: vi.fn(), resolveAgentTarget: vi.fn() }))
 vi.mock('@/app/api/_services/services.service', () => ({ allocateServiceInstance: vi.fn(), listCatalogServices: vi.fn(), listInstalledServices: vi.fn(), loadManifest: vi.fn(), searchCatalogServices: vi.fn(), toAuthMethodSummaries: vi.fn(() => []), uninstallService: vi.fn() }))
 vi.mock('@/app/api/_services/mcp-shares.service', () => ({ dispatchShareTool: vi.fn() }))
+vi.mock('@/app/api/_services/engine-plan.service', () => ({ assertModelEntitled: vi.fn() }))
 
 const advertisedNames: string[] = ACCOUNT_TOOL_NAMES
 
@@ -107,5 +108,42 @@ describe('send_message goal', () => {
 
     it('advertises goal on send_message', () => {
         expect(ACCOUNT_TOOL_DEFS.find(tool => tool.name === 'send_message')?.inputSchema.properties).toHaveProperty('goal')
+    })
+})
+
+describe('send_message model and effort', () => {
+    const actor = { kind: 'workspace', workspaceId: 7 } as never
+
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: { baseUrl: 'https://engine.test', apiKey: null }, engineAgentId: 'engine-own', contentLocked: false } as never)
+        vi.mocked(engineChat).mockResolvedValue(new Response('down', { status: 503 }))
+    })
+
+    it('hands model and thinkingLevel to chat()', async () => {
+        await expect(dispatchAccountTool(actor, 'send_message', { agentId: 'a', message: 'hi', model: 'claude-opus-4.5', thinkingLevel: 'high' })).rejects.toThrow(/could not be reached/)
+        const body = vi.mocked(engineChat).mock.calls[0][2]
+        expect(body).toMatchObject({ model: 'claude-opus-4.5', thinkingLevel: 'high' })
+        expect(body).not.toHaveProperty('provider')
+        expect(body).not.toHaveProperty('connectionId')
+    })
+
+    it('sends neither when the caller names neither', async () => {
+        await expect(dispatchAccountTool(actor, 'send_message', { agentId: 'a', message: 'hi' })).rejects.toThrow(/could not be reached/)
+        const body = vi.mocked(engineChat).mock.calls[0][2]
+        expect(body).not.toHaveProperty('model')
+        expect(body).not.toHaveProperty('thinkingLevel')
+    })
+
+    it('refuses a thinking level outside the enum and a model of 101 characters with invalid_run_model', async () => {
+        await expect(dispatchAccountTool(actor, 'send_message', { agentId: 'a', message: 'hi', thinkingLevel: 'extreme' })).rejects.toThrow(/invalid_run_model: thinkingLevel/)
+        await expect(dispatchAccountTool(actor, 'send_message', { agentId: 'a', message: 'hi', model: 'a'.repeat(101) })).rejects.toThrow(/invalid_run_model: model/)
+        expect(engineChat).not.toHaveBeenCalled()
+    })
+
+    it('advertises model and thinkingLevel on send_message', () => {
+        const properties = ACCOUNT_TOOL_DEFS.find(tool => tool.name === 'send_message')?.inputSchema.properties
+        expect(properties).toHaveProperty('model')
+        expect(properties).toHaveProperty('thinkingLevel')
     })
 })

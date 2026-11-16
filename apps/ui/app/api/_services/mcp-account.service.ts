@@ -866,7 +866,20 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 goal = parsed.data
             }
 
-            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, ...(goal ? { goal } : {}) })
+            let model: string | undefined
+            if (args.model !== undefined) {
+                if (typeof args.model !== 'string' || args.model.length < 1 || args.model.length > 100 || !/^[a-z0-9][a-z0-9.-]*$/.test(args.model)) {
+                    throw new Error('invalid_run_model: model must be 1 to 100 characters of lowercase letters, digits, dots and hyphens, starting with a letter or digit')
+                }
+                model = args.model
+            }
+            let thinkingLevel: string | undefined
+            if (args.thinkingLevel !== undefined) {
+                if (args.thinkingLevel !== 'low' && args.thinkingLevel !== 'medium' && args.thinkingLevel !== 'high') throw new Error('invalid_run_model: thinkingLevel must be low, medium or high')
+                thinkingLevel = args.thinkingLevel
+            }
+
+            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, ...(goal ? { goal } : {}), ...(model ? { model } : {}), ...(thinkingLevel ? { thinkingLevel } : {}) })
             if (!res.ok) {
                 const body = await res.text().catch(() => '')
                 if (res.status === 400 && body.includes('invalid_goal')) throw new Error(`invalid_goal: the engine refused the goal. ${body}`.trim())
