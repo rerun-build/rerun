@@ -87,10 +87,11 @@ const DOT: Record<DotStatus, { className: string; label: 'line.working' | 'line.
     idle: null,
 }
 
-// Where the coworker stands, in a dot: at rest it shows only a run nobody has opened yet.
+// Where the coworker stands, in a dot. A run nobody has opened yet shows while it does nothing: at
+// rest, and in front of the grey of one asleep or paused.
 function StatusDot({ status, unseen }: { status: DotStatus; unseen: boolean }) {
     const t = useTranslations('workspaceView')
-    const dot = DOT[status]
+    const dot = unseen && (status === 'offline' || status === 'paused') ? null : DOT[status]
     if (!dot) return unseen ? <span className="size-2 shrink-0 rounded-full bg-brand" /> : null
     const label = t(dot.label)
     return (

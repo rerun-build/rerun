@@ -9,7 +9,7 @@ import type { CoworkerPreview } from '@/stores/coworker-previews.store'
 // The menu reads the Boxes from the board; the tile itself does not.
 vi.mock('@/stores/board.store', () => ({ useBoardStore: (select: (state: { spaces: never[] }) => unknown) => select({ spaces: [] }) }))
 vi.mock('@/hooks/useBoxAccess', () => ({ useCanManageAgent: () => true, useManageableSpaceIds: () => new Set() }))
-vi.mock('@rerun/ui/iso-grid', () => ({ AgentBuddy: ({ mood }: { mood: string }) => createElement('span', { 'data-mood': mood }), buddyMoodOfStatus: (status: string, paused: boolean) => (paused ? 'asleep' : status) }))
+vi.mock('@rerun/ui/iso-grid', () => ({ AgentBuddy: ({ mood }: { mood: string }) => createElement('span', { 'data-mood': mood }) }))
 
 const { CoworkerTile } = await import('@/components/workspace-view/CoworkerTile')
 
@@ -28,6 +28,7 @@ async function render(props: { agent?: IsoAgent; preview?: CoworkerPreview; sele
 const text = () => container.textContent ?? ''
 const lineOf = (content: string) => [...container.querySelectorAll('span')].findLast(span => span.textContent === content)
 const dots = () => container.querySelectorAll('.rounded-full.size-2')
+const statusDot = (label: string) => container.querySelector(`[role="img"][aria-label="${label}"] .size-2`)
 
 beforeEach(() => {
     container = document.createElement('div')
@@ -66,17 +67,18 @@ describe('CoworkerTile', () => {
         expect(text()).not.toMatch(/\d+m/)
     })
 
-    it('says a paused coworker is paused and draws it asleep', async () => {
+    it('keeps the line of a paused coworker as it reads at rest, draws it asleep and says it is paused in a grey dot', async () => {
         await render({ agent: agent({ disabledAt: '2026-11-01T00:00:00Z', status: 'waiting_human' }), preview: preview() })
-        expect(lineOf('Paused')).toBeDefined()
+        expect(lineOf('Q4 prospects')?.className).toContain('text-muted-foreground')
         expect(container.querySelector('[data-mood="asleep"]')).not.toBeNull()
-        expect(dots()).toHaveLength(0)
+        expect(dots()).toHaveLength(1)
+        expect(statusDot('Paused')?.className).toContain('bg-muted-foreground/40')
     })
 
-    it('colours what a waiting coworker waits on and marks it with an orange dot', async () => {
+    it('marks a waiting coworker with an orange dot, its line unchanged', async () => {
         await render({ agent: agent({ status: 'waiting_human' }), preview: preview({ title: 'Approve the renewal' }) })
-        expect(lineOf('Approve the renewal')?.className).toContain('text-orange')
-        expect(dots()[0]?.className).toContain('bg-orange-400')
+        expect(lineOf('Approve the renewal')?.className).toContain('text-muted-foreground')
+        expect(statusDot('Waiting for you')?.className).toContain('bg-orange-400')
     })
 
     it('marks an unseen result with the brand dot, and lets a waiting request win', async () => {
@@ -87,14 +89,28 @@ describe('CoworkerTile', () => {
         expect(dots()[0]?.className).toContain('bg-orange-400')
     })
 
-    it('says something went wrong, in red', async () => {
-        await render({ agent: agent({ status: 'error' }), preview: preview() })
-        expect(lineOf('Something went wrong')?.className).toContain('text-destructive')
+    it('shows an unseen result in front of the grey dot of a coworker asleep or paused', async () => {
+        await render({ agent: agent({ status: 'offline' }), preview: preview() })
+        expect(statusDot('Asleep')?.className).toContain('bg-muted-foreground/40')
+        await render({ agent: agent({ status: 'offline' }), preview: preview(), unseen: true })
+        expect(dots()).toHaveLength(1)
+        expect(dots()[0]?.className).toContain('bg-brand')
+        await render({ agent: agent({ disabledAt: '2026-11-01T00:00:00Z' }), preview: preview(), unseen: true })
+        expect(dots()).toHaveLength(1)
+        expect(dots()[0]?.className).toContain('bg-brand')
     })
 
-    it('says what a working coworker works on', async () => {
-        await render({ agent: agent({ status: 'working' }), preview: preview() })
-        expect(lineOf('Working · Q4 prospects')).toBeDefined()
+    it('says something went wrong in a red dot', async () => {
+        await render({ agent: agent({ status: 'error' }), preview: preview() })
+        expect(lineOf('Q4 prospects')).toBeDefined()
+        expect(statusDot('Something went wrong')?.className).toContain('bg-destructive')
+    })
+
+    it('says a coworker works in a green dot, an unseen result behind it', async () => {
+        await render({ agent: agent({ status: 'working' }), preview: preview(), unseen: true })
+        expect(lineOf('Q4 prospects')).toBeDefined()
+        expect(dots()).toHaveLength(1)
+        expect(statusDot('Working')?.className).toContain('bg-emerald-500')
     })
 
     it('opens the coworker on a click and says which one is open', async () => {
