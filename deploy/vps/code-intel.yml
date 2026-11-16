@@ -1,0 +1,131 @@
+name: rerun-code
+
+services:
+  code-rerun:
+    image: debian:stable-slim
+    user: "1001:1001"
+    environment:
+      SYMFORGE_NO_DAEMON: "1"
+      HOME: /tmp
+    entrypoint: ["/bin/sh", "-c"]
+    command: 'export CODE_INTEL_KEY="$$(cat /run/secrets/code_intel_key)"; exec /opt/symforge/symforge serve --listen 0.0.0.0:8787 --api-key-env CODE_INTEL_KEY --tools read,service --project rerun=/repo'
+    working_dir: /repo
+    volumes:
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/work/repos/rerun:/repo
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/tools/lib/node_modules/symforge/node_modules/symforge-linux-x64/bin:/opt/symforge:ro
+    secrets:
+      - code_intel_key
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 1
+    mem_limit: 1536m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: unless-stopped
+
+  code-testpilot:
+    image: debian:stable-slim
+    user: "1001:1001"
+    environment:
+      SYMFORGE_NO_DAEMON: "1"
+      HOME: /tmp
+    entrypoint: ["/bin/sh", "-c"]
+    command: 'export CODE_INTEL_KEY="$$(cat /run/secrets/code_intel_key)"; exec /opt/symforge/symforge serve --listen 0.0.0.0:8787 --api-key-env CODE_INTEL_KEY --tools read,service --project testpilot=/repo'
+    working_dir: /repo
+    volumes:
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/work/repos/testpilot:/repo
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/tools/lib/node_modules/symforge/node_modules/symforge-linux-x64/bin:/opt/symforge:ro
+    secrets:
+      - code_intel_key
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 1
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: unless-stopped
+
+  code-terminal-commander:
+    image: debian:stable-slim
+    user: "1001:1001"
+    environment:
+      SYMFORGE_NO_DAEMON: "1"
+      HOME: /tmp
+    entrypoint: ["/bin/sh", "-c"]
+    command: 'export CODE_INTEL_KEY="$$(cat /run/secrets/code_intel_key)"; exec /opt/symforge/symforge serve --listen 0.0.0.0:8787 --api-key-env CODE_INTEL_KEY --tools read,service --project terminal-commander=/repo'
+    working_dir: /repo
+    volumes:
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/work/repos/terminal-commander:/repo
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/tools/lib/node_modules/symforge/node_modules/symforge-linux-x64/bin:/opt/symforge:ro
+    secrets:
+      - code_intel_key
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 1
+    mem_limit: 768m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: unless-stopped
+
+  code-agent-army-professionals:
+    image: debian:stable-slim
+    user: "1001:1001"
+    environment:
+      SYMFORGE_NO_DAEMON: "1"
+      HOME: /tmp
+    entrypoint: ["/bin/sh", "-c"]
+    command: 'export CODE_INTEL_KEY="$$(cat /run/secrets/code_intel_key)"; exec /opt/symforge/symforge serve --listen 0.0.0.0:8787 --api-key-env CODE_INTEL_KEY --tools read,service --project Agent_Army_Professionals=/repo'
+    working_dir: /repo
+    volumes:
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/work/repos/Agent_Army_Professionals:/repo
+      - ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/tools/lib/node_modules/symforge/node_modules/symforge-linux-x64/bin:/opt/symforge:ro
+    secrets:
+      - code_intel_key
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 1
+    mem_limit: 2560m
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: unless-stopped
+
+secrets:
+  code_intel_key:
+    file: ${CODE_INTEL_DATA:?set CODE_INTEL_DATA in deploy/vps/.env}/tools/etc/code-intel.key
+
+networks:
+  default:
+    external: true
+    name: ${CODE_INTEL_NETWORK:?set CODE_INTEL_NETWORK in deploy/vps/.env}
