@@ -267,11 +267,19 @@ def avail_mem_gb():
 @contextlib.contextmanager
 def builder_lock():
     lk, end = os.path.join(STATE, "builders.lock"), time.time() + LOCK_WAIT_S
+    told = False
     while True:
         try:
             fd = os.open(lk, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
             break
         except FileExistsError:
+            if not told:
+                told = True
+                try:
+                    holder = open(lk).read().split()[0]
+                except (OSError, IndexError):
+                    holder = "unknown"
+                print("waiting for builders.lock (held by pid %s)" % holder, file=sys.stderr)
             bk = lk + ".break"
             try:
                 if time.time() - os.path.getmtime(lk) > LOCK_STALE_S:
@@ -469,12 +477,13 @@ def cmd_wt(a):
         die("%.1f GB of memory available, floor is %d GB. Tell @boss." % (mem, MIN_FREE_MEM_GB))
     os.makedirs(STATE, exist_ok=True)
     with builder_lock():
-        summary, kept = wt_sweep(True, only="REMOVE", quiet=True)
-        if du_gb(WORK) > MAX_WORK_GB:
-            die("/data/work is over %d GB. Tell @boss; old worktrees need `wt done`.\n%s\n%s" % (MAX_WORK_GB, summary, "\n".join(kept)))
-        if not existing and cap_check(quiet=True):
-            print("\n".join([summary] + kept))
-            cap_check()
+        if du_gb(WORK) > MAX_WORK_GB or (not existing and cap_check(quiet=True)):
+            summary, kept = wt_sweep(True, only="REMOVE", quiet=True)
+            if du_gb(WORK) > MAX_WORK_GB:
+                die("/data/work is over %d GB. Tell @boss; old worktrees need `wt done`.\n%s\n%s" % (MAX_WORK_GB, summary, "\n".join(kept)))
+            if not existing and cap_check(quiet=True):
+                print("\n".join([summary] + kept))
+                cap_check()
     plan_check(full, issue)
     p = ensure_clone(full)
     info = api("repos/%s" % full)
