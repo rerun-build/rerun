@@ -104,11 +104,12 @@ describe('the level each action asks of the Box', () => {
         ])
     })
 
-    it('takes use to read it and to run a routine now', async () => {
+    it('takes use to read it, to list its routines and to run one now', async () => {
         await actions.listSkillsAction(AGENT)
+        await actions.listAgentRoutinesAction(AGENT)
         await actions.testScheduleAction(AGENT, 'daily')
 
-        expect(mocks.getAgentChatTarget.mock.calls).toEqual([[AGENT], [AGENT]])
+        expect(mocks.getAgentChatTarget.mock.calls).toEqual([[AGENT], [AGENT], [AGENT]])
     })
 
     it('reports a member who only uses the Box, without reaching the engine', async () => {

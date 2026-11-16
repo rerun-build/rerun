@@ -38,6 +38,7 @@ export function DetailsColumn({ label, open, slideIn, onClose, children }: Detai
     if (open && !inFlow) setInFlow(true)
 
     if (!besideChat) {
+        // The page's colour, as beside the chat: the sticky headings of the lists inside are painted with it.
         return (
             <Sheet open={open} onOpenChange={next => !next && onClose()}>
                 <SheetContent
@@ -45,7 +46,7 @@ export function DetailsColumn({ label, open, slideIn, onClose, children }: Detai
                     showCloseButton={false}
                     aria-describedby={undefined}
                     onEscapeKeyDown={event => isTypingTarget(event.target) && event.preventDefault()}
-                    className="gap-0 p-0 data-[side=right]:w-[calc(100%-3rem)] data-[side=right]:sm:max-w-[400px]"
+                    className="gap-0 bg-background p-0 data-[side=right]:w-[calc(100%-3rem)] data-[side=right]:sm:max-w-[400px]"
                 >
                     <SheetTitle className="sr-only">{label}</SheetTitle>
                     {children}

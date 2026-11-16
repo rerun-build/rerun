@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { createScheduleAction, deleteScheduleAction, getScheduleAction, listScheduleRunsAction, listSchedulesAction, listTaskOutcomesAction, parseScheduleAction, testScheduleAction, updateScheduleAction } from '@/app/api/_actions/agent.actions'
+import { createScheduleAction, deleteScheduleAction, getScheduleAction, listAgentRoutinesAction, listScheduleRunsAction, listTaskOutcomesAction, parseScheduleAction, testScheduleAction, updateScheduleAction, type WorkspaceRoutine } from '@/app/api/_actions/agent.actions'
 import { adoptRunSession, RunHistoryList } from '@/components/agent/AgentRunHistory'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { RunModelField, useRunModel } from '@/components/agent/RunModelField'
@@ -20,16 +20,18 @@ import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineRun, EngineSchedule } from '@/lib/engine/types'
-import { humanCron, scheduleSummary } from '@/lib/schedules/cron'
+import { humanCron } from '@/lib/schedules/cron'
 import { outcomeKey, type TaskOutcome } from '@/lib/schedules/outcomes'
-import { CalendarClockIcon, HistoryIcon, PauseIcon, PencilIcon, PlusIcon } from '@/lib/icons'
+import { CalendarClockIcon, HistoryIcon, PencilIcon, PlusIcon } from '@/lib/icons'
 import { EmptyState } from '@/components/ui/empty-state'
-import { PanelList, PanelListHeader, PanelScroller } from '@/components/ui/panel-list'
-import { PanelRow } from '@/components/ui/panel-row'
+import { PanelListHeader } from '@/components/ui/panel-list'
+import { RoutineMenu } from '@/components/routines/RoutineMenu'
+import { RoutinesSkeleton } from '@/components/routines/RoutinesSkeleton'
+import { useRoutines } from '@/components/routines/useRoutines'
 import { PanelSteps } from '@/components/ui/panel-steps'
-import { SkeletonPanelRows, SkeletonRows } from '@/components/ui/skeleton'
+import { SkeletonRows } from '@/components/ui/skeleton'
 import { useBoardStore } from '@/stores/board.store'
-import { Badge } from '@rerun/ui/primitives'
+import { RoutineList } from '@rerun/ui/foreman'
 import { formatDate } from '@rerun/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -47,13 +49,12 @@ type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string
 export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSlug, onFocusConsumed }: AgentPanelScheduledProps) {
     const boxManageReason = useBoxManageReason()
     const t = useTranslations('agent.agentPanelScheduled')
-    const tAgent = useTranslations('agent')
-    const locale = useLocale()
-    const [schedules, setSchedules] = useState<EngineSchedule[]>([])
     const [outcomes, setOutcomes] = useState<Record<string, TaskOutcome>>({})
-    const [loading, setLoading] = useState(true)
     const [view, setView] = useState<View>({ mode: 'list' })
     const canManage = useCanManageAgent(agentId)
+    const loadRoutines = useCallback(() => listAgentRoutinesAction(agentId), [agentId])
+    const list = useRoutines({ load: loadRoutines, agentId, onRunStarted: (routine, sessionId, runId) => onOpenSession(sessionId, routine.name, runId) })
+    const schedulesRefreshKey = useBoardStore(s => s.schedulesRefreshKey)
 
     // A routine opened from elsewhere lands on its editor, on the render that carries the request.
     const requestedFocus = focusSlug ?? null
@@ -71,25 +72,22 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
         if (requestedFocus) consumeFocusRef.current?.()
     }, [requestedFocus])
 
-    const load = useCallback(async () => {
-        setLoading(true)
-        const [nextSchedules, nextOutcomes] = await Promise.all([listSchedulesAction(agentId), listTaskOutcomesAction(agentId)])
-        setSchedules(nextSchedules)
-        setOutcomes(nextOutcomes)
-        setLoading(false)
-    }, [agentId])
-
     useEffect(() => {
-        load()
-    }, [load])
+        let cancelled = false
+        void listTaskOutcomesAction(agentId).then(next => !cancelled && setOutcomes(next))
+        return () => {
+            cancelled = true
+        }
+    }, [agentId, schedulesRefreshKey])
 
     const stepKey = view.mode === 'edit' || view.mode === 'runs' ? `${view.mode}:${view.slug}` : view.mode
     const stepDepth = view.mode === 'list' ? 0 : view.mode === 'runs' ? 2 : 1
+    const backToList = () => setView({ mode: 'list' })
 
     if (view.mode === 'create') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <ScheduleEditor agentId={agentId} agentName={agentName} onDone={() => { setView({ mode: 'list' }); load() }} onBack={() => setView({ mode: 'list' })} />
+                <ScheduleEditor agentId={agentId} agentName={agentName} onDone={backToList} onBack={backToList} />
             </PanelSteps>
         )
     }
@@ -97,7 +95,7 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     if (view.mode === 'edit') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <ScheduleEditor agentId={agentId} agentName={agentName} slug={view.slug} onDone={() => { setView({ mode: 'list' }); load() }} onBack={() => setView({ mode: 'list' })} onShowHistory={() => setView({ mode: 'runs', slug: view.slug })} onOpenSession={onOpenSession} />
+                <ScheduleEditor agentId={agentId} agentName={agentName} slug={view.slug} onDone={backToList} onBack={backToList} onShowHistory={() => setView({ mode: 'runs', slug: view.slug })} onOpenSession={onOpenSession} />
             </PanelSteps>
         )
     }
@@ -105,19 +103,20 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     if (view.mode === 'runs') {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <ScheduleRuns agentId={agentId} schedule={schedules.find(s => s.slug === view.slug)} slug={view.slug} onBack={() => setView({ mode: 'edit', slug: view.slug })} onOpenSession={onOpenSession} />
+                <ScheduleRuns agentId={agentId} schedule={list.routines?.find(s => s.slug === view.slug)} slug={view.slug} onBack={() => setView({ mode: 'edit', slug: view.slug })} onOpenSession={onOpenSession} />
             </PanelSteps>
         )
     }
 
-    if (loading) {
+    if (!list.routines) {
         return (
             <PanelSteps stepKey={stepKey} depth={stepDepth}>
-                <SkeletonPanelRows rows={5} lines={3} badge />
+                <RoutinesSkeleton withAgent={false} className="h-full pt-[2.875rem]" />
             </PanelSteps>
         )
     }
 
+    const openEditor = (routine: WorkspaceRoutine) => setView({ mode: 'edit', slug: routine.slug })
     const newButton = (
         <TooltipDisabledReason reason={canManage ? undefined : boxManageReason}>
             <Button size="sm" variant="outline" disabled={!canManage} onClick={() => setView({ mode: 'create' })}>
@@ -129,11 +128,11 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
     return (
         <PanelSteps stepKey={stepKey} depth={stepDepth}>
             <div className="flex flex-col h-full">
-                <PanelListHeader count={schedules.length} noun="scheduled task">
+                <PanelListHeader count={list.routines.length} noun="scheduled task">
                     {newButton}
                 </PanelListHeader>
 
-                {schedules.length === 0 ? (
+                {list.routines.length === 0 ? (
                     <EmptyState
                         icon={CalendarClockIcon}
                         title={t('emptyTitle')}
@@ -141,26 +140,19 @@ export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSl
                         action={newButton}
                     />
                 ) : (
-                    <PanelScroller>
-                        <PanelList>
-                            {schedules.map(s => (
-                                <PanelRow
-                                    key={s.slug}
-                                    onClick={() => setView({ mode: 'edit', slug: s.slug })}
-                                    title={s.name}
-                                    description={scheduleSummary(s, tAgent, locale)}
-                                    footer={<TaskOutcomeFooter outcome={outcomes[outcomeKey('schedule', s.slug)]} lastStartedAt={s.lastRunAt} />}
-                                    meta={
-                                        !s.enabled && (
-                                            <Badge size="xs" tone="neutral" glow={false} leading={<PauseIcon className="size-3" />}>
-                                                {t('paused')}
-                                            </Badge>
-                                        )
-                                    }
-                                />
-                            ))}
-                        </PanelList>
-                    </PanelScroller>
+                    <RoutineList
+                        routines={list.routines}
+                        now={list.now}
+                        onOpen={openEditor}
+                        onToggle={canManage ? list.toggle : undefined}
+                        isSaving={list.isSaving}
+                        renamingKey={list.renamingKey}
+                        onRename={list.rename}
+                        onCancelRename={list.cancelRename}
+                        renderMenu={routine => <RoutineMenu routine={routine} canRename={list.canRename && canManage} onRename={() => list.startRename(routine)} onEdit={() => openEditor(routine)} onRunNow={() => list.runNow(routine)} />}
+                        renderFooter={routine => <TaskOutcomeFooter outcome={outcomes[outcomeKey('schedule', routine.slug)]} lastStartedAt={routine.lastRunAt} />}
+                        className="min-h-0 flex-1 pt-1"
+                    />
                 )}
             </div>
         </PanelSteps>
@@ -452,7 +444,7 @@ function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistor
 
 // --- Run history (per schedule) ---
 
-function ScheduleRuns({ agentId, schedule, slug, onBack, onOpenSession }: { agentId: string; schedule?: EngineSchedule; slug: string; onBack: () => void; onOpenSession: (sessionId: string, title: string, runId: string | null) => void }) {
+function ScheduleRuns({ agentId, schedule, slug, onBack, onOpenSession }: { agentId: string; schedule?: Pick<EngineSchedule, 'name'>; slug: string; onBack: () => void; onOpenSession: (sessionId: string, title: string, runId: string | null) => void }) {
     const t = useTranslations('agent.agentPanelScheduled')
     const loadRuns = useCallback(() => listScheduleRunsAction(agentId, slug), [agentId, slug])
     const title = schedule?.name ?? slug

@@ -549,15 +549,6 @@ export async function clearMemoriesAction(agentId: string): Promise<SuccessResul
 // history is read via the /runs endpoints (see listRunsAction /
 // listScheduleRunsAction below).
 
-export async function listSchedulesAction(agentId: string): Promise<EngineSchedule[]> {
-    try {
-        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
-        return await engineListSchedules(conn, engineAgentId)
-    } catch {
-        return []
-    }
-}
-
 export type WorkspaceRoutine = Pick<EngineSchedule, 'slug' | 'name' | 'cron' | 'runAt' | 'timezone' | 'enabled' | 'lastRunAt'> & {
     agentId: string
     nextRunAt: string | null
@@ -582,33 +573,43 @@ export async function listWorkspaceRoutinesAction(): Promise<WorkspaceRoutines> 
     const conn = await getWorkspaceConnection(workspaceId)
     const now = new Date()
     const canRename = supportsScheduleRename(conn)
-    const perAgent = await Promise.allSettled(
-        runnable.map(async agent => {
-            const engineAgentId = agent.engine_agent_id as string
-            const [schedules, runs, detail] = await Promise.all([
-                engineListSchedules(conn, engineAgentId),
-                engineListRuns(conn, engineAgentId, { status: 'running', limit: 20 }).catch(() => []),
-                engineGetAgent(conn, engineAgentId).catch(() => null),
-            ])
-            const scheduledRuns = runs.filter(run => run.status === 'running' && run.triggerSource === 'schedule')
-            const setupPending = detail ? detail.config.setup.required === true && detail.config.setup.completedAt === null && detail.install.trim().length > 0 : false
-            return schedules.map(schedule => ({
-                agentId: agent.id,
-                slug: schedule.slug,
-                name: schedule.name,
-                cron: schedule.cron,
-                runAt: schedule.runAt,
-                timezone: schedule.timezone,
-                enabled: schedule.enabled,
-                lastRunAt: schedule.lastRunAt,
-                nextRunAt: nextRunAt(schedule, now),
-                runningSince: scheduledRuns.find(run => run.triggerSlug === schedule.slug)?.startedAt ?? null,
-                setupPending,
-            }))
-        })
-    )
+    const perAgent = await Promise.allSettled(runnable.map(agent => routinesOf(conn, agent.id, agent.engine_agent_id as string, now)))
 
     return { routines: perAgent.flatMap(result => (result.status === 'fulfilled' ? result.value : [])).sort(byNextRun), canRename: await canRename }
+}
+
+// One coworker's routines, read the way the workspace's list reads them.
+export async function listAgentRoutinesAction(agentId: string): Promise<WorkspaceRoutines> {
+    try {
+        const { conn, engineAgentId } = await getAgentChatTarget(agentId)
+        const [routines, canRename] = await Promise.all([routinesOf(conn, agentId, engineAgentId, new Date()), supportsScheduleRename(conn)])
+        return { routines: routines.sort(byNextRun), canRename }
+    } catch {
+        return { routines: [], canRename: false }
+    }
+}
+
+async function routinesOf(conn: EngineConnection, agentId: string, engineAgentId: string, now: Date): Promise<WorkspaceRoutine[]> {
+    const [schedules, runs, detail] = await Promise.all([
+        engineListSchedules(conn, engineAgentId),
+        engineListRuns(conn, engineAgentId, { status: 'running', limit: 20 }).catch(() => []),
+        engineGetAgent(conn, engineAgentId).catch(() => null),
+    ])
+    const scheduledRuns = runs.filter(run => run.status === 'running' && run.triggerSource === 'schedule')
+    const setupPending = detail ? detail.config.setup.required === true && detail.config.setup.completedAt === null && detail.install.trim().length > 0 : false
+    return schedules.map(schedule => ({
+        agentId,
+        slug: schedule.slug,
+        name: schedule.name,
+        cron: schedule.cron,
+        runAt: schedule.runAt,
+        timezone: schedule.timezone,
+        enabled: schedule.enabled,
+        lastRunAt: schedule.lastRunAt,
+        nextRunAt: nextRunAt(schedule, now),
+        runningSince: scheduledRuns.find(run => run.triggerSlug === schedule.slug)?.startedAt ?? null,
+        setupPending,
+    }))
 }
 
 function byNextRun(a: WorkspaceRoutine, b: WorkspaceRoutine): number {
