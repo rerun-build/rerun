@@ -22,6 +22,8 @@ function savedPointerOf(output: ToolResultOutput): string {
     const value = output.value as { saved?: unknown } | string | undefined
     const page = typeof value === 'string' ? /Saved whole: (\.rerun\/pages\/\S+)/.exec(value)?.[1] : undefined
     if (page) return `; the whole page is saved at ${page}, read or grep it`
+    const handle = typeof value === 'string' ? /Saved whole: (\.rerun\/results\/[^\s,]+\.txt), lines 1-(\d+)/.exec(value) : null
+    if (handle) return `; the whole result is saved at ${handle[1]}, lines 1-${handle[2]}, read or grep it`
     const answer = typeof value === 'string' ? /"saved":"(\.rerun\/paid-data\/[^"]+)"/.exec(value)?.[1] : typeof value?.saved === 'string' ? value.saved : undefined
     return answer ? `; the whole answer is saved at ${answer}, read it with paid_data_read` : ''
 }

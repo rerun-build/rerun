@@ -93,6 +93,16 @@ describe('pruneToolOutputs', () => {
         expect((out[1].content as Array<{ output: { value: string } }>)[0].output.value).toContain(`the whole page is saved at ${saved}, read or grep it`)
     })
 
+    it('keeps the result handle as the pointer of a pruned result', () => {
+        const saved = '.rerun/results/abc123.txt'
+        const result = `${'z'.repeat(5000)}\nSaved whole: ${saved}, lines 1-120`
+        const messages = [assistantCall('a'), toolResult('a', result), userText('recent')]
+
+        const { messages: out } = pruneToolOutputs(messages, 2)
+
+        expect((out[1].content as Array<{ output: { value: string } }>)[0].output.value).toContain(saved)
+    })
+
     it('leaves small outputs untouched', () => {
         const messages = [assistantCall('a'), toolResult('a', 'ok'), userText('recent')]
         const { prunedCount } = pruneToolOutputs(messages, 3)
