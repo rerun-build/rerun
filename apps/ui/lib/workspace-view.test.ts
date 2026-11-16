@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { FOREMAN_OPENED, initialOpenOf, loadGrouping, loadPins, loadWorkspaceView, parseWorkspaceView, rememberWorkspaceView, resolveWorkspaceView, saveGrouping, savePins, togglePin, WORKSPACE_VIEW_COOKIE, WORKSPACE_VIEW_STORAGE_KEY, type WorkspaceViewContext } from './workspace-view'
+import { FOREMAN_OPENED, initialOpenOf, loadCollapsedBoxes, loadGrouping, loadPins, loadWorkspaceView, parseWorkspaceView, rememberWorkspaceView, resolveWorkspaceView, saveCollapsedBoxes, saveGrouping, savePins, sidebarSections, togglePin, WORKSPACE_VIEW_COOKIE, WORKSPACE_VIEW_STORAGE_KEY, type WorkspaceViewContext } from './workspace-view'
 
 function stubBrowser(stored?: string) {
     const storage = new Map<string, string>(stored === undefined ? [] : [[WORKSPACE_VIEW_STORAGE_KEY, stored]])
@@ -125,5 +125,26 @@ describe('initialOpenOf', () => {
         expect(initialOpenOf({ ...workspace, foremanVisible: false, remembered: null })).toEqual({ kind: 'coworker', agentId: 'writer' })
         expect(initialOpenOf({ ...workspace, foremanVisible: false, remembered: FOREMAN_OPENED })).toEqual({ kind: 'coworker', agentId: 'writer' })
         expect(initialOpenOf({ agentIds: [], foremanVisible: false, mostRecent: null, remembered: null })).toBeNull()
+    })
+})
+
+describe("the web list's Boxes", () => {
+    const box = (id: string, created_at: string) => ({ id, created_at })
+    const agent = (name: string, spaceId: string) => ({ name, spaceId })
+
+    it('lists every Box in the order it was made, an empty one too, its coworkers by name', () => {
+        const sections = sidebarSections([agent('Zoe', 'b'), agent('Ana', 'b'), agent('Max', 'a')], [box('b', '2026-11-02'), box('c', '2026-11-03'), box('a', '2026-11-01')])
+        expect(sections.map(section => [section.box.id, section.members.map(member => member.name)])).toEqual([
+            ['a', ['Max']],
+            ['b', ['Ana', 'Zoe']],
+            ['c', []],
+        ])
+    })
+
+    it('remembers the Boxes folded away, for each workspace', () => {
+        stubBrowser()
+        saveCollapsedBoxes(7, ['a'])
+        expect(loadCollapsedBoxes(7)).toEqual(['a'])
+        expect(loadCollapsedBoxes(8)).toEqual([])
     })
 })

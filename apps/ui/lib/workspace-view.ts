@@ -82,19 +82,27 @@ export type ListGrouping = 'recent' | 'box'
 const pinsKey = (workspaceId: number) => `rerun:simple-pins:${workspaceId}`
 const groupingKey = (workspaceId: number) => `rerun:simple-grouping:${workspaceId}`
 
-export function loadPins(workspaceId: number): string[] {
+function loadIds(key: string): string[] {
     try {
-        const parsed: unknown = JSON.parse(localStorage.getItem(pinsKey(workspaceId)) ?? '[]')
+        const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? '[]')
         return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string') : []
     } catch {
         return []
     }
 }
 
-export function savePins(workspaceId: number, ids: readonly string[]): void {
+function saveIds(key: string, ids: readonly string[]): void {
     try {
-        localStorage.setItem(pinsKey(workspaceId), JSON.stringify(ids))
+        localStorage.setItem(key, JSON.stringify(ids))
     } catch {}
+}
+
+export function loadPins(workspaceId: number): string[] {
+    return loadIds(pinsKey(workspaceId))
+}
+
+export function savePins(workspaceId: number, ids: readonly string[]): void {
+    saveIds(pinsKey(workspaceId), ids)
 }
 
 export function togglePin(ids: readonly string[], id: string): string[] {
@@ -113,4 +121,24 @@ export function saveGrouping(workspaceId: number, grouping: ListGrouping): void 
     try {
         localStorage.setItem(groupingKey(workspaceId), grouping)
     } catch {}
+}
+
+// The web list's Boxes folded away, kept in the browser for each workspace.
+const collapsedBoxesKey = (workspaceId: number) => `rerun:simple-collapsed-boxes:${workspaceId}`
+
+export function loadCollapsedBoxes(workspaceId: number): string[] {
+    return loadIds(collapsedBoxesKey(workspaceId))
+}
+
+export function saveCollapsedBoxes(workspaceId: number, ids: readonly string[]): void {
+    saveIds(collapsedBoxesKey(workspaceId), ids)
+}
+
+export type SidebarSection<A, B> = { box: B; members: A[] }
+
+// The web list, one section per Box, an empty one kept so a coworker can be moved into it. The Boxes
+// in the order they were made, their coworkers by name.
+export function sidebarSections<A extends { name: string; spaceId: string }, B extends { id: string; created_at: string | null }>(agents: readonly A[], boxes: readonly B[]): SidebarSection<A, B>[] {
+    const byName = [...agents].sort((a, b) => a.name.localeCompare(b.name))
+    return [...boxes].sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? '')).map(box => ({ box, members: byName.filter(agent => agent.spaceId === box.id) }))
 }

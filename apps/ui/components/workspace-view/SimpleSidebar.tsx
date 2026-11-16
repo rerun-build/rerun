@@ -1,11 +1,10 @@
 'use client'
 
-import { byRecency } from '@rerun/contracts'
 import { UpgradePill } from '@rerun/cloud/billing.client'
 import { CardAvatar } from '@rerun/ui/chat'
 import { EmptyState, useScrollFade } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { memo, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,12 +13,19 @@ import { GettingStartedPill } from '@/components/foreman/getting-started/Getting
 import { HelpButton } from '@/components/layout/HelpButton'
 import { WorkspaceInbox } from '@/components/notifications/WorkspaceInbox'
 import { WorkspaceSwitcher } from '@/components/layout/WorkspaceSwitcher'
+import { BoxAccessDialog } from '@/components/dialogs/BoxAccessDialog'
+import { DeleteSpaceDialog } from '@/components/dialogs/DeleteSpaceDialog'
+import { RenameBoxDialog } from '@/components/dialogs/RenameBoxDialog'
 import { CoworkerTile, type CoworkerTileActions } from '@/components/workspace-view/CoworkerTile'
 import { ForemanTile } from '@/components/workspace-view/ForemanTile'
+import { type BoxDialogKind, SidebarBoxSection } from '@/components/workspace-view/SidebarBoxSection'
+import { useBoxViewer } from '@/hooks/useBoxAccess'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { accountLabel } from '@/lib/auth/placeholder-email'
 import { readProfile } from '@/lib/auth/user-profile'
-import { CirclePlusIcon, GridIcon, PlusIcon, SearchIcon, SettingsIcon, UsersIcon } from '@/lib/icons'
+import type { IsoAgent } from '@/lib/board/types'
+import { loadCollapsedBoxes, saveCollapsedBoxes, sidebarSections } from '@/lib/workspace-view'
+import { BoxIcon, CirclePlusIcon, GridIcon, PlusIcon, SearchIcon, SettingsIcon, UsersIcon } from '@/lib/icons'
 import { useAccountStore } from '@/stores/account.store'
 import { useBoardStore } from '@/stores/board.store'
 import { useBuilderDialogsStore } from '@/stores/builder-dialogs.store'
@@ -37,13 +43,14 @@ type SimpleSidebarProps = {
 }
 
 /**
- * The left column of the Simple view: the workspace, search and what needs the person, then one tile
- * per coworker, the most recently active first, and the person at its foot.
+ * The left column of the Simple view: the workspace, search and what needs the person, then the Chief
+ * of Staff and the coworkers by Box, and the person at its foot.
  */
 export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actionsFor }: SimpleSidebarProps) {
     const t = useTranslations('workspaceView.list')
     const tBuilder = useTranslations('builder.toolbar')
     const agents = useBoardStore(s => s.agents)
+    const spaces = useBoardStore(s => s.spaces)
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
     const previews = useCoworkerPreviewsStore(s => s.byAgent)
     const previewsLoaded = useCoworkerPreviewsStore(s => s.loaded)
@@ -51,10 +58,21 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
     const openControlCenter = useControlCenterStore(s => s.openControlCenter)
     const openNewAgent = useBuilderDialogsStore(s => s.openNewAgent)
     const openLibrary = useBuilderDialogsStore(s => s.openLibrary)
+    const setNewBoxOpen = useBuilderDialogsStore(s => s.setNewBoxOpen)
     const { needsMachineReason } = useWorkspaceAccess()
-    const { user } = useSession()
+    const { user, workspace } = useSession()
+    const workspaceId = workspace?.id ?? null
 
-    const ordered = useMemo(() => [...agents].map(agent => ({ agent, latest: previews[agent.id] ?? null })).sort(byRecency), [agents, previews])
+    const sections = useMemo(() => sidebarSections(agents, spaces), [agents, spaces])
+    const [collapsed, setCollapsed] = useState<string[]>([])
+    useEffect(() => setCollapsed(workspaceId ? loadCollapsedBoxes(workspaceId) : []), [workspaceId])
+    const toggleBox = (boxId: string) => {
+        if (!workspaceId) return
+        const next = collapsed.includes(boxId) ? collapsed.filter(id => id !== boxId) : [...collapsed, boxId]
+        setCollapsed(next)
+        saveCollapsedBoxes(workspaceId, next)
+    }
+    const [boxDialog, setBoxDialog] = useState<{ kind: BoxDialogKind; boxId: string } | null>(null)
     const unseenAgents = useMemo(() => new Set(unseenRuns.map(run => run.agent_id)), [unseenRuns])
     const [listElement, setListElement] = useState<HTMLElement | null>(null)
     const listFade = useScrollFade(listElement)
@@ -74,8 +92,14 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                 <WorkspaceInbox trigger="row" />
             </div>
 
-            <div className="flex items-center justify-between gap-2 pt-2 pr-3 pb-1 pl-5">
+            <div className="flex items-center gap-1 pt-2 pr-3 pb-1 pl-5">
                 <h2 className="text-xs font-medium text-muted-foreground">{t('label')}</h2>
+                <span className="flex-1" />
+                <TooltipLabeled label={t('newBox')}>
+                    <Button variant="ghost" size="icon-sm" aria-label={t('newBox')} onClick={() => setNewBoxOpen(true)}>
+                        <BoxIcon className="size-4" />
+                    </Button>
+                </TooltipLabeled>
                 <TooltipDisabledReason reason={needsMachineReason ?? undefined}>
                     <TooltipLabeled label={tBuilder('newCoworker')}>
                         <Button variant="ghost" size="icon-sm" aria-label={tBuilder('newCoworker')} disabled={!!needsMachineReason} onClick={openNewAgent}>
@@ -90,7 +114,7 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                     <ForemanTile />
                     {!previewsLoaded ? (
                         <TileSkeletons />
-                    ) : ordered.length === 0 ? (
+                    ) : agents.length === 0 ? (
                         <EmptyState
                             icon={UsersIcon}
                             title={t('empty')}
@@ -112,21 +136,56 @@ export const SimpleSidebar = memo(function SimpleSidebar({ onOpenCoworker, actio
                             }
                         />
                     ) : (
-                        <ul className="space-y-0.5">
-                            {ordered.map(({ agent, latest }) => (
-                                <li key={agent.id}>
-                                    <CoworkerTile agent={agent} preview={latest ?? undefined} viewerId={user?.id ?? null} selected={agent.id === selectedAgentId} unseen={unseenAgents.has(agent.id)} onOpen={() => onOpenCoworker(agent.id)} actions={actionsFor(agent.id)} />
-                                </li>
-                            ))}
-                        </ul>
+                        sections.map(({ box, members }) => (
+                            <SidebarBoxSection
+                                key={box.id}
+                                box={box}
+                                members={members}
+                                collapsed={collapsed.includes(box.id)}
+                                onToggle={() => toggleBox(box.id)}
+                                onDialog={kind => setBoxDialog({ kind, boxId: box.id })}
+                                renderTile={(agent: IsoAgent) => <CoworkerTile agent={agent} preview={previews[agent.id]} viewerId={user?.id ?? null} selected={agent.id === selectedAgentId} unseen={unseenAgents.has(agent.id)} onOpen={() => onOpenCoworker(agent.id)} actions={actionsFor(agent.id)} />}
+                            />
+                        ))
                     )}
                 </div>
             </nav>
 
             <SidebarFoot />
+            <BoxDialogs dialog={boxDialog} onClose={() => setBoxDialog(null)} />
         </aside>
     )
 })
+
+// The Box menu's dialogs, the same as on the board.
+function BoxDialogs({ dialog, onClose }: { dialog: { kind: BoxDialogKind; boxId: string } | null; onClose: () => void }) {
+    const spaces = useBoardStore(s => s.spaces)
+    const agents = useBoardStore(s => s.agents)
+    const deleteSpace = useBoardStore(s => s.deleteSpace)
+    const viewer = useBoxViewer()
+    const box = dialog ? spaces.find(space => space.id === dialog.boxId) : undefined
+    const kind = box ? dialog?.kind : undefined
+    const closeOn = (open: boolean) => {
+        if (!open) onClose()
+    }
+    return (
+        <>
+            <RenameBoxDialog space={kind === 'rename' ? box : undefined} open={kind === 'rename'} onOpenChange={closeOn} />
+            <BoxAccessDialog spaceId={kind === 'access' && box ? box.id : null} boxName={box?.name} open={kind === 'access'} onOpenChange={closeOn} />
+            <DeleteSpaceDialog
+                open={kind === 'delete'}
+                spaceId={box?.id}
+                spaceName={box?.name ?? undefined}
+                agentCount={box ? agents.filter(agent => agent.spaceId === box.id).length : 0}
+                onOpenChange={closeOn}
+                onConfirm={() => {
+                    if (box) deleteSpace(box.id, viewer)
+                    onClose()
+                }}
+            />
+        </>
+    )
+}
 
 // Getting started and the offer while they show, then the person, help and the workspace's settings.
 function SidebarFoot() {

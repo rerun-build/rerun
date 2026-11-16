@@ -4,6 +4,9 @@
         "switch.board": "The isometric 3D board of the workspace. Keep it short, it labels an icon.",
         "switch.simple": "The Simple view of the workspace: a list of coworkers on the left, the chat in the middle. Keep it short, it labels an icon.",
         "list.label": "Accessible name of the list of the workspace's coworkers.",
+        "list.newBox": "Tooltip and accessible name of the button that creates a Box (a group of coworkers) from the list's header.",
+        "list.emptyBox": "Shown under a Box of the list that holds no coworker yet.",
+        "list.boxMore": "Accessible name of the '…' button on a Box's header in the list. {name} is the Box's name.",
         "tile.more": "Accessible name of the '…' button on a coworker's row. {name} is the coworker's name.",
         "chat.pick": "Shown in the middle of the Simple view when no coworker is open.",
         "line.workingOn": "Status line under a coworker's name: it is running, {detail} is the title of its conversation or its description.",
@@ -24,7 +27,10 @@
     "list": {
         "label": "Coworkers",
         "search": "Search",
-        "empty": "No coworkers yet"
+        "empty": "No coworkers yet",
+        "newBox": "New Box",
+        "emptyBox": "No coworkers",
+        "boxMore": "Actions for {name}"
     },
     "tile": {
         "more": "More for {name}",

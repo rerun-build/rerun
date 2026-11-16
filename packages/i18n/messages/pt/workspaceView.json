@@ -7,7 +7,10 @@
     "list": {
         "label": "Coworkers",
         "search": "Buscar",
-        "empty": "Nenhum coworker ainda"
+        "empty": "Nenhum coworker ainda",
+        "newBox": "Nova Box",
+        "emptyBox": "Nenhum coworker",
+        "boxMore": "Ações para {name}"
     },
     "tile": {
         "more": "Mais para {name}",
