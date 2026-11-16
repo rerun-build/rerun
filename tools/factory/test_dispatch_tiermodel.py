@@ -3,6 +3,7 @@ import os
 import unittest
 
 import test_dispatch as T
+import test_dispatch_proof as P
 import tiers
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -51,14 +52,11 @@ class TierModel(T.Base):
         self.tick()
         self.assertEqual((self.args[0]["model"], self.args[0]["thinkingLevel"]), ("claude-sonnet-5-5", "high"))
 
-    def test_review_opus_medium_proof_sonnet_medium(self):
+    def test_review_opus_medium(self):
         self.shipped()
         self.to_review()
         self.assertEqual(self.state(), "reviewing")
         self.assertEqual((self.args[-1]["model"], self.args[-1]["thinkingLevel"]), ("claude-opus-5-5", "medium"))
-        self.cfg["tier_models"] = {"proof": SHIPPED["tier_models"]["proof"]}
-        self.assertEqual(tiers.model_for("proof", "medium", SHIPPED["tier_models"]),
-                         {"model": "claude-sonnet-5-5", "thinkingLevel": "medium"})
 
     def test_fix_follows_the_build_size(self):
         self.shipped()
@@ -89,6 +87,24 @@ class TierModel(T.Base):
         self.assertEqual(self.state(), "building")
         self.assertNotIn("model", self.args[0])
         self.assertIn("no tier written", self.out.getvalue())
+
+
+class TierProof(P.ProofBase):
+    def test_proof_sends_sonnet_medium(self):
+        args = []
+        real = self.w.account
+
+        def spy(tool, a):
+            if tool == "send_message":
+                args.append(dict(a))
+            return real(tool, a)
+
+        self.w.account = spy
+        self.cfg["tiers"] = SHIPPED["tiers"]
+        self.cfg["tier_models"] = SHIPPED["tier_models"]
+        self.to_proving()
+        self.assertEqual(self.state(), "proving")
+        self.assertEqual((args[-1]["model"], args[-1]["thinkingLevel"]), ("claude-sonnet-5-5", "medium"))
 
 
 class ModelFor(unittest.TestCase):
