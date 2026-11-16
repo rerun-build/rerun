@@ -143,4 +143,71 @@ describe('factory snapshot digest', () => {
         expect(with_([{ ...plannerRow, firstPassYield: 1.1 }])).toBe(false)
         expect(with_([{ ...plannerRow, cut: -1 }])).toBe(false)
     })
+
+    const win = { solved: 4, solvedGreen: 3, tokensPerIssue: 1200.5, firstPassYield: 0.75, escaped: 1 }
+    const bar = { day: win, week: { ...win, solved: 20, solvedGreen: 18 } }
+
+    it('accepts a digest with the bar of a day and of a week, and keeps its numbers', () => {
+        const parsed = factorySnapshotSchema.parse(withDigest({ ...digest(), bar }))
+        expect(parsed.digest?.bar?.day).toEqual(win)
+        expect(parsed.digest?.bar?.week).toEqual(bar.week)
+    })
+
+    it('accepts a bar with nothing solved: no tokens per issue and no yield', () => {
+        const empty = { solved: 0, solvedGreen: 0, tokensPerIssue: null, firstPassYield: null, escaped: 0 }
+        expect(ok({ ...digest(), bar: { day: empty, week: empty } })).toBe(true)
+    })
+
+    it('refuses a bar with a negative count, a yield above 1 or a window missing', () => {
+        const with_ = (day: unknown) => ok({ ...digest(), bar: { day, week: win } })
+        expect(with_(win)).toBe(true)
+        expect(with_({ ...win, solvedGreen: -1 })).toBe(false)
+        expect(with_({ ...win, escaped: 1.5 })).toBe(false)
+        expect(with_({ ...win, firstPassYield: 1.1 })).toBe(false)
+        expect(with_({ ...win, tokensPerIssue: -1 })).toBe(false)
+        expect(ok({ ...digest(), bar: { day: win } })).toBe(false)
+    })
+
+    const groups = [
+        { group: 'proof', events: 5, rate: 0.5, state: 'open' },
+        { group: 'review', events: 3, rate: null, state: 'changed' },
+        { group: 'ci', events: 2, rate: 0.1, state: 'kept' },
+    ]
+    const changes = [
+        { issue: 300, group: 'proof', kind: 'repo', before: null, after: null, verdict: null, revert: null },
+        { issue: 310, group: 'review', kind: 'instructions', before: 0.4, after: 0.6, verdict: 'revert', revert: 310 },
+        { issue: 320, group: 'ci', kind: 'repo', before: 0.2, after: 0.1, verdict: 'kept', revert: null },
+        { issue: 330, group: 'ci', kind: 'repo', before: 0.2, after: 0.2, verdict: 'dropped', revert: null },
+    ]
+
+    it('accepts a digest with the open groups and the changes with their before and after', () => {
+        const parsed = factorySnapshotSchema.parse(withDigest({ ...digest(), causes: { groups, changes } }))
+        expect(parsed.digest?.causes?.groups).toEqual(groups)
+        expect(parsed.digest?.causes?.changes[1]).toEqual(changes[1])
+    })
+
+    it('accepts causes with nothing in them', () => {
+        expect(ok({ ...digest(), causes: { groups: [], changes: [] } })).toBe(true)
+    })
+
+    it('refuses a group state, a change kind or a verdict it does not know, and a negative rate', () => {
+        const g = (row: unknown) => ok({ ...digest(), causes: { groups: [row], changes: [] } })
+        const c = (row: unknown) => ok({ ...digest(), causes: { groups: [], changes: [row] } })
+        expect(g({ ...groups[0], state: 'closed' })).toBe(false)
+        expect(g({ ...groups[0], rate: -0.1 })).toBe(false)
+        expect(c({ ...changes[1], kind: 'config' })).toBe(false)
+        expect(c({ ...changes[1], verdict: 'merged' })).toBe(false)
+        expect(c({ ...changes[1], issue: 0 })).toBe(false)
+    })
+
+    it('refuses one past each causes limit and accepts each limit', () => {
+        const g = (rows: unknown[]) => ok({ ...digest(), causes: { groups: rows, changes: [] } })
+        const c = (rows: unknown[]) => ok({ ...digest(), causes: { groups: [], changes: rows } })
+        expect(g(Array(20).fill(groups[0]))).toBe(true)
+        expect(g(Array(21).fill(groups[0]))).toBe(false)
+        expect(c(Array(20).fill(changes[1]))).toBe(true)
+        expect(c(Array(21).fill(changes[1]))).toBe(false)
+        expect(g([{ ...groups[0], group: 'a'.repeat(80) }])).toBe(true)
+        expect(g([{ ...groups[0], group: 'a'.repeat(81) }])).toBe(false)
+    })
 })

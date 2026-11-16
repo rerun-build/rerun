@@ -76,6 +76,14 @@ export const factoryPlanningSchema = z.object({
     filed: count,
 })
 
+export const factoryBarWindowSchema = z.object({
+    solved: count,
+    solvedGreen: count,
+    tokensPerIssue: z.number().min(0).nullable(),
+    firstPassYield: z.number().min(0).max(1).nullable(),
+    escaped: count,
+})
+
 export const factoryDigestSchema = z.object({
     stations: z.array(z.object({
         station: z.string().max(20),
@@ -104,6 +112,24 @@ export const factoryDigestSchema = z.object({
         blocks: z.object({ blocked: count, rejected: count, failed: count, returned: count }),
         tokensPerMerged: z.number().min(0).nullable(),
     }),
+    bar: z.object({ day: factoryBarWindowSchema, week: factoryBarWindowSchema }).optional(),
+    causes: z.object({
+        groups: z.array(z.object({
+            group: z.string().max(80),
+            events: count,
+            rate: z.number().min(0).nullable(),
+            state: z.enum(['open', 'changed', 'kept']),
+        })).max(20),
+        changes: z.array(z.object({
+            issue: z.number().int().positive(),
+            group: z.string().max(80),
+            kind: z.enum(['repo', 'instructions']),
+            before: z.number().min(0).nullable(),
+            after: z.number().min(0).nullable(),
+            verdict: z.enum(['kept', 'revert', 'dropped']).nullable(),
+            revert: z.number().int().positive().nullable(),
+        })).max(20),
+    }).optional(),
     issues: z.object({
         open: z.object({ P0: count, P1: count, P2: count, P3: count, none: count }).strict(),
         classifiedToday: count,
