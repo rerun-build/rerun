@@ -74,7 +74,8 @@
             "connected": "Connected · {count, plural, one {# tool} other {# tools}}",
             "needsAuth": "Sign-in needed",
             "unreachable": "Unreachable",
-            "noAnswer": "The server did not answer."
+            "noAnswer": "The server did not answer.",
+            "checkedAt": "tested at {time}"
         }
     },
     "requestApp": {

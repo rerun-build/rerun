@@ -98,7 +98,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
     const [installed, setInstalled] = useState<InstalledService[]>([])
     const [custom, setCustom] = useState<CustomMcpServer[]>([])
     const [customStep, setCustomStep] = useState<CustomStep | null>(null)
-    const { statuses: customStatuses, loading: customStatusesLoading } = useMcpServerStatuses(agentId)
+    const { statuses: customStatuses, loading: customStatusesLoading, checkedAt: customCheckedAt } = useMcpServerStatuses(agentId)
     const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | null>(null)
     const [query, setQuery] = useState('')
     const [debouncedQuery, setDebouncedQuery] = useState('')
@@ -471,6 +471,7 @@ export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
                                                 server={server}
                                                 status={customStatuses.get(server.name)}
                                                 statusLoading={customStatusesLoading}
+                                                checkedAt={customCheckedAt}
                                                 onConnect={() => setCustomStep({ kind: 'connect', server, popup: openPendingSignInPopup(server.displayName, tServices('signInPopup.connecting', { name: server.displayName })) })}
                                                 onEdit={() => onEditCustom(server.name)}
                                                 onRemove={() => onRemoveCustom(server.name)}
