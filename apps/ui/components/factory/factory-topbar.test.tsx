@@ -103,6 +103,22 @@ describe('FactoryTopBar', () => {
         expect(onSelect).toHaveBeenCalledWith(null)
     })
 
+    it('an opened bucket drops the list of its jobs down, a row asks for the card, and a press outside or on a chip leaves the bucket', async () => {
+        const onSelect = vi.fn()
+        const onBucket = vi.fn()
+        const s = snapshot()
+        render({ bucket: 'rejects', onSelect, onBucket, snapshot: { ...s, jobs: [...s.jobs, job(15, { state: 'rejected', reason: 'tests missing' })] } })
+        expect(q('[data-bucket-row="15"]')!.textContent).toContain('tests missing')
+        expect(q('[data-task="11"]')).toBeNull()
+        await click(q('[data-bucket-open="15"]'))
+        expect(onSelect).toHaveBeenCalledWith(15)
+        await click(chip('running'))
+        expect(onBucket).toHaveBeenLastCalledWith(null)
+        onBucket.mockClear()
+        await act(async () => { document.body.dispatchEvent(new Event('pointerdown', { bubbles: true })) })
+        expect(onBucket).toHaveBeenCalledWith(null)
+    })
+
     it('with no snapshot says it is the sample and has no chips', () => {
         render({ snapshot: null })
         expect(host.textContent).toContain(SAMPLE_TEXT)

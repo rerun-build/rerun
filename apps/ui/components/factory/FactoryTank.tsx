@@ -6,10 +6,16 @@ import { centreOf, toWorld } from './factory-rest'
 import { type CabinetView } from './factory-scene'
 
 const W = 52
+const opens = (label: string, onOpen?: () => void) => (onOpen ? {
+    role: 'button', tabIndex: 0, 'aria-label': label, style: { pointerEvents: 'auto' as const, cursor: 'pointer' },
+    onPointerDown: (e: React.PointerEvent) => e.stopPropagation(),
+    onClick: (e: React.MouseEvent) => { e.stopPropagation(); onOpen() },
+    onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } },
+} : {})
 const H = 64
 const RY = 8
 
-export function FeatureTank({ cab, tile }: { cab: CabinetView; tile: Tile }) {
+export function FeatureTank({ cab, tile, onOpen }: { cab: CabinetView; tile: Tile; onOpen?: () => void }) {
     const c = toWorld(centreOf(tile))
     const n = cab.slots.length
     const merged = cab.slots.filter(x => x.state === 'merged').reduce((acc, x) => acc + x.arriving, 0)
@@ -20,8 +26,9 @@ export function FeatureTank({ cab, tile }: { cab: CabinetView; tile: Tile }) {
     const y = (share: number) => H - H * share
     const uid = `tank-${cab.issue}`
     const r = W / 2
+    const open = opens(`Open the tasks of feature #${cab.issue}`, onOpen)
     return (
-        <div className="fab-feature absolute" style={{ left: 0, top: 0, transform: `translate(${c.x}px, ${c.y - H - 4}px)` }}
+        <div className="fab-feature absolute" {...open} style={{ ...open.style, left: 0, top: 0, transform: `translate(${c.x}px, ${c.y - H - 4}px)` }}
             data-tank="feature" data-tasks={n} data-merged={merged} data-rejected={rejected} data-full={full || undefined}>
             <span className="fab-feature-glow" />
             <svg className="absolute overflow-visible" width={W + 4} height={H + 2 * RY + 4} viewBox={`${-r - 2} ${-RY - 2} ${W + 4} ${H + 2 * RY + 4}`} style={{ left: -r - 2, top: -RY - 2 }}>
@@ -57,11 +64,12 @@ export function FeatureTank({ cab, tile }: { cab: CabinetView; tile: Tile }) {
 
 const RH = 40
 
-export function RejectTank({ tile, count }: { tile: Tile; count: number }) {
+export function RejectTank({ tile, count, onOpen }: { tile: Tile; count: number; onOpen?: () => void }) {
     const c = toWorld(centreOf(tile))
     const r = W / 2
+    const open = opens('Open the rejected jobs', onOpen)
     return (
-        <div className="fab-reject absolute" style={{ left: 0, top: 0, transform: `translate(${c.x}px, ${c.y - RH}px)` }}
+        <div className="fab-reject absolute" {...open} style={{ ...open.style, left: 0, top: 0, transform: `translate(${c.x}px, ${c.y - RH}px)` }}
             data-tank="rejects" data-count={count} data-filled={count > 0 || undefined}>
             <svg className="absolute overflow-visible" width={W + 4} height={RH + 2 * RY + 4} viewBox={`${-r - 2} ${-RY - 2} ${W + 4} ${RH + 2 * RY + 4}`} style={{ left: -r - 2, top: -RY - 2 }}>
                 <ellipse data-part="bottom" cx={0} cy={RH} rx={r} ry={RY} fill="#7f1d1d" className="fab-reject-rim" />
