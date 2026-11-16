@@ -21,7 +21,7 @@ PLAN_GOAL = [{"prefix": "PLAN:", "rest": "sentence"}, {"prefix": "BLOCKED:", "re
 PLANNED = re.compile(r"(?m)^(PLAN|BLOCKED):[ \t]*(.*)$")
 
 WEIGHTS = {"P0": 8, "P1": 4, "P2": 2, "P3": 1}
-SKIP = frozenset(("factory", "factory-plan", "factory-done", "factory-blocked", "likely-fixed", "duplicate"))
+SKIP = frozenset(("factory", "factory-plan", "factory-done", "factory-blocked", "factory-unsolvable", "likely-fixed", "duplicate"))
 
 
 def names(issue):

@@ -39,13 +39,13 @@ class Replan(Base):
         self.assertEqual(self.state(), "blocked")
         self.assertEqual(self.planner_sends(), [])
 
-    def test_at_most_two_replans_then_it_stays_returned(self):
+    def test_at_most_two_replans_then_it_ends_unsolvable(self):
         self.block()
         self.w.unlabelled.clear()
         self.block()
         self.w.unlabelled.clear()
         self.block()
-        self.assertEqual(self.state(), "returned")
+        self.assertEqual(self.state(), "unsolvable")
         self.assertEqual(len(self.planner_sends("p1")), 2)
         self.assertEqual(self.planner_sends("p2"), [])
         self.assertEqual(self.data()["replans"], 2)
