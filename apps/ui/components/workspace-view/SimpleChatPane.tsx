@@ -98,17 +98,17 @@ function DetailsToggle() {
 
 const TAB_WIDTHS = ['w-16', 'w-28']
 
-// The docked chat's frame: its tabs and their two buttons, the conversation's column, the composer.
+// The docked chat's frame: the conversations button, the tabs, the card button, the conversation's column, the composer.
 function ChatPaneSkeleton() {
     return (
         <div aria-hidden className="flex h-full flex-col">
-            <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border pr-2">
+            <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border px-2">
+                <Skeleton className="size-8 rounded-md" />
                 <div className="flex min-w-0 flex-1 items-center gap-1 px-3">
                     {TAB_WIDTHS.map(width => (
                         <Skeleton key={width} className={cn('h-7 rounded-md', width)} />
                     ))}
                 </div>
-                <Skeleton className="size-8 rounded-md" />
                 <Skeleton className="size-8 rounded-md" />
             </div>
             <div className="min-h-0 flex-1 overflow-hidden">

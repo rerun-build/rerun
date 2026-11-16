@@ -266,8 +266,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     return (
         <div className={cn('flex flex-col h-full', docked && '[--chat-column:48rem]')}>
             {docked ? (
-                <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border pr-2">
-                    <div className="min-w-0 flex-1">{openChatsTabs}</div>
+                <div className="flex min-h-12 shrink-0 items-center gap-1 border-b border-border px-2">
                     <Popover open={chats !== null} onOpenChange={open => (open ? onOpenChats?.() : onCloseChats())}>
                         <TooltipLabeled label={tView('allConversations')}>
                             <PopoverTrigger asChild>
@@ -281,7 +280,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                         </TooltipLabeled>
                         {/* A menu item or a dialog that opens the list hands the focus back to where it came from: only a click outside or Escape closes it. A field keeps its own Escape. */}
                         <PopoverContent
-                            align="end"
+                            align="start"
                             onFocusOutside={event => event.preventDefault()}
                             onEscapeKeyDown={event => isTypingTarget(event.target) && event.preventDefault()}
                             className="max-h-[min(36rem,var(--radix-popover-content-available-height))] w-[min(340px,calc(100vw-1.5rem))] gap-0 overflow-hidden p-0"
@@ -289,6 +288,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
                             {chatsList}
                         </PopoverContent>
                     </Popover>
+                    <div className="min-w-0 flex-1">{openChatsTabs}</div>
                     {headerEnd}
                 </div>
             ) : (
