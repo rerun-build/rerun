@@ -3,7 +3,7 @@ import os
 import unittest
 
 import test_dispatch as T
-from test_dispatch import Base, ready, World
+from test_dispatch import Base, ready
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(HERE, "dispatch.json")) as f:
