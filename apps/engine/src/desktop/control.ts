@@ -2,9 +2,10 @@ import { execFile } from 'node:child_process'
 import { BAR_WINDOW_NAME, DOCK_WINDOW_NAME } from './panels.js'
 import { SCREEN_CAPTURE_BINARY, desktopEnv, ensureDesktop } from './session.js'
 
-const VIEW_MAX_WIDTH = 1280
-const VIEW_MAX_HEIGHT = 720
-const JPEG_QUALITY = 75
+const SCREEN_PROFILES = {
+    standard: { width: 1280, height: 720, quality: 75 },
+    small: { width: 800, height: 450, quality: 60 },
+} as const
 const CAPTURE_MAX_BYTES = 64 * 1024 * 1024
 const TYPE_DELAY_MS = '12'
 const DOUBLE_CLICK_DELAY_MS = '80'
@@ -55,7 +56,12 @@ export type MouseButton = keyof typeof BUTTONS
 export type ScrollDirection = keyof typeof SCROLL_BUTTONS
 export type Screenshot = { image: Buffer; mediaType: 'image/jpeg'; width: number; height: number }
 
-export type ScreenControl = { env: NodeJS.ProcessEnv; width: number; height: number; scale: number; signal?: AbortSignal }
+export type ScreenProfile = keyof typeof SCREEN_PROFILES
+export type ScreenControl = { env: NodeJS.ProcessEnv; width: number; height: number; scale: number; quality: number; signal?: AbortSignal }
+
+export function screenProfile(env: NodeJS.ProcessEnv = process.env): ScreenProfile {
+    return env.RERUN_SCREEN_PROFILE === 'small' ? 'small' : 'standard'
+}
 
 export class ControlRefusal extends Error {}
 
@@ -70,12 +76,13 @@ function run(command: string, args: string[], env: NodeJS.ProcessEnv, { signal, 
 
 const xdotool = (control: ScreenControl, args: string[], options: RunOptions = {}): Promise<Buffer> => run('xdotool', args, control.env, { signal: control.signal, ...options })
 
-export async function controlScreen(agentId: string, signal?: AbortSignal): Promise<ScreenControl> {
+export async function controlScreen(agentId: string, signal?: AbortSignal, profile: ScreenProfile = 'standard'): Promise<ScreenControl> {
     const { display } = await ensureDesktop(agentId)
     const env = desktopEnv(display)
     const [width = 0, height = 0] = (await run('xdotool', ['getdisplaygeometry'], env, { signal })).toString().trim().split(/\s+/).map(Number)
     if (!width || !height) throw new Error('The screen did not report its size.')
-    return { env, width, height, scale: Math.max(1, width / VIEW_MAX_WIDTH, height / VIEW_MAX_HEIGHT), signal }
+    const view = SCREEN_PROFILES[profile]
+    return { env, width, height, scale: Math.max(1, width / view.width, height / view.height), quality: view.quality, signal }
 }
 
 export async function captureScreen(control: ScreenControl): Promise<Screenshot> {
@@ -83,7 +90,7 @@ export async function captureScreen(control: ScreenControl): Promise<Screenshot>
     const { default: sharp } = await import('sharp')
     const width = Math.round(control.width / control.scale)
     const height = Math.round(control.height / control.scale)
-    const image = await sharp(png).resize(width, height, { fit: 'fill' }).jpeg({ quality: JPEG_QUALITY }).toBuffer()
+    const image = await sharp(png).resize(width, height, { fit: 'fill' }).jpeg({ quality: control.quality }).toBuffer()
     return { image, mediaType: 'image/jpeg', width, height }
 }
 
