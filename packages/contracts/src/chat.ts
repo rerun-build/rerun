@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { providerSchema } from './agent.js'
+import { providerSchema, thinkingLevelSchema } from './agent.js'
 import { sessionSourceSchema } from './session.js'
 import { foremanBriefSchema } from './foreman.js'
 import { runGoalSchema } from './run-goal.js'
@@ -16,7 +16,7 @@ export const chatRequestSchema = z.object({
     connectionId: z.string().optional(),
     provider: providerSchema.optional(),
     model: z.string().optional(),
-    thinkingLevel: z.enum(['low', 'medium', 'high']).optional(),
+    thinkingLevel: thinkingLevelSchema.optional(),
     source: sessionSourceSchema.optional(),
     foreman: foremanBriefSchema.optional(),
     author: messageAuthorSchema.optional(),

@@ -34,10 +34,10 @@ type AgentPanelSettingsProps = {
     agent: IsoAgent
 }
 
-type ThinkingChoice = 'none' | 'low' | 'medium' | 'high'
+type ThinkingChoice = 'none' | 'low' | 'medium' | 'high' | 'xhigh'
 type ConfigValues = { soul: string; verbosity: EngineVerbosity; thinking: ThinkingChoice; skim: boolean }
 
-const THINKING_CHOICES: ThinkingChoice[] = ['none', 'low', 'medium', 'high']
+const THINKING_CHOICES: ThinkingChoice[] = ['none', 'low', 'medium', 'high', 'xhigh']
 const THINKING_UNSUPPORTED = new Set<string>(['codex', 'opencode', 'custom'])
 
 const SETTINGS_FORM_ID = 'agent-settings-form'

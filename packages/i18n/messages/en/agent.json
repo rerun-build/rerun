@@ -958,7 +958,8 @@
             "none": "Not set",
             "low": "Low",
             "medium": "Medium",
-            "high": "High"
+            "high": "High",
+            "xhigh": "Extra high"
         },
         "pages": {
             "label": "Text as picture pages",
