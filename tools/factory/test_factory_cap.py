@@ -20,29 +20,43 @@ class FactoryCap(unittest.TestCase):
 
 
 class WtNewSweep(unittest.TestCase):
-    def run_new(self, capped):
+    def run_new(self, capacity):
         class Stop(Exception):
             pass
 
+        def fake_run(cmd, cwd="/tmp", check=True, timeout=300):
+            out = "1024\tx" if cmd[0] == "du" else "chunk/71-1"
+            return types.SimpleNamespace(stdout=out, returncode=0)
+
         sweep = mock.Mock(return_value=("sum", []))
-        lock = contextlib.nullcontext()
-        with mock.patch.object(F, "wt_sweep", sweep), mock.patch.object(F, "builder_lock", return_value=lock), \
-                mock.patch.object(F, "cap_check", return_value=capped), mock.patch.object(F, "du_gb", return_value=1), \
-                mock.patch.object(F, "avail_mem_gb", return_value=None), mock.patch.object(F, "plan_check", side_effect=Stop), \
-                mock.patch.object(F.shutil, "disk_usage", return_value=types.SimpleNamespace(free=2**50)), \
-                mock.patch.object(F.os.path, "isdir", return_value=False), mock.patch.object(F.os, "makedirs"), \
-                mock.patch.object(F, "die", side_effect=SystemExit("builders are already active")):
-            try:
-                F.cmd_wt(["new", "special-place-ai-heaven/rerun", "820", "main"])
-            except (Stop, SystemExit):
-                pass
-        return sweep
+        out = io.StringIO()
+        with tempfile.TemporaryDirectory() as d:
+            wt = os.path.join(d, "wt")
+            os.makedirs(os.path.join(wt, "rerun", "71-1"))
+            with mock.patch.object(F, "WORK", d), mock.patch.object(F, "WT", wt), mock.patch.object(F, "STATE", os.path.join(d, "state")), \
+                    mock.patch.object(F, "MIN_FREE_GB", 0), mock.patch.object(F, "MIN_FREE_MEM_GB", 0), \
+                    mock.patch.object(F, "MEMINFO", os.path.join(d, "none")), mock.patch.object(F, "run", fake_run), \
+                    mock.patch.object(F, "wt_sweep", sweep), mock.patch.object(F, "api", side_effect=Stop), \
+                    mock.patch.object(F.limits, "capacity", return_value=capacity), mock.patch("sys.stdout", out):
+                try:
+                    F.cmd_wt(["new", "special-place-ai-heaven/rerun", "820", "main"])
+                    outcome = "returned"
+                except Stop:
+                    outcome = "reached plan_check"
+                except SystemExit as e:
+                    outcome = "refused %s" % e.code
+        return sweep, outcome, out.getvalue()
 
     def test_room_does_not_sweep(self):
-        self.assertEqual(self.run_new(None).call_count, 0)
+        sweep, outcome, _ = self.run_new(2)
+        self.assertEqual(sweep.call_count, 0)
+        self.assertEqual(outcome, "reached plan_check")
 
-    def test_cap_sweeps_once(self):
-        self.assertEqual(self.run_new(True).call_count, 1)
+    def test_cap_sweeps_once_and_still_refuses(self):
+        sweep, outcome, out = self.run_new(1)
+        self.assertEqual(sweep.call_count, 1)
+        self.assertEqual(outcome, "refused 2")
+        self.assertIn("builders are already active", out)
 
 
 class LockMessage(unittest.TestCase):
@@ -51,7 +65,7 @@ class LockMessage(unittest.TestCase):
             open(os.path.join(d, "builders.lock"), "w").write("4242 1\n")
             err = io.StringIO()
             with mock.patch.object(F, "STATE", d), mock.patch.object(F, "LOCK_WAIT_S", 0), \
-                    mock.patch.object(F, "die", side_effect=SystemExit), mock.patch("sys.stderr", err):
+                    mock.patch("sys.stdout", io.StringIO()), mock.patch("sys.stderr", err):
                 with self.assertRaises(SystemExit), F.builder_lock():
                     pass
             self.assertIn("waiting for builders.lock (held by pid 4242)", err.getvalue())
