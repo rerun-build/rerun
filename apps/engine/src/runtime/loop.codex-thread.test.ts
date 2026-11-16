@@ -15,6 +15,8 @@ vi.mock('../tools/registry.js', () => ({ buildTools: async () => ({ tools: {}, c
 vi.mock('../connections/cli-auth.js', () => ({ ensureCliAuth: async () => () => {} }))
 vi.mock('../connections/codex-auth.js', () => ({ syncCodexAuth: async () => {} }))
 vi.mock('../connections/codex-plan-limits.js', () => ({ refreshCodexPlanLimits: async () => {} }))
+// The real curator spawns the Codex CLI after each turn and logs once the file is torn down.
+vi.mock('./curator.js', () => ({ runCurator: async () => {} }))
 vi.mock('../agents/availability.js', async importOriginal => ({
     ...(await importOriginal<typeof import('../agents/availability.js')>()),
     resolveRunModel: async () => ({ provider: 'codex', model: 'gpt-5.5', connection: { id: 'codex-cnx', provider: 'codex', env: {}, config: {} } }),
