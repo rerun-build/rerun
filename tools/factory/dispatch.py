@@ -1139,12 +1139,12 @@ class Dispatcher:
         clean = True
         try:
             self.intake()
-        except (Error, ValueError, KeyError) as e:
+        except Exception as e:
             clean = False
             log("-", "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
         try:
             self.reconcile()
-        except (Error, ValueError, KeyError) as e:
+        except Exception as e:
             clean = False
             log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
         try:
@@ -1156,7 +1156,7 @@ class Dispatcher:
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
                     log(n, "closed: likely-fixed for %d days" % self.cfg["likely_fixed_days"])
-            except (Error, ValueError, KeyError) as e:
+            except Exception as e:
                 clean = False
                 log("-", "backlog: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
@@ -1172,7 +1172,7 @@ class Dispatcher:
                 if j.get("errors"):
                     j["errors"] = 0
                     self.save(j, "pass ok")
-            except (Error, ValueError, KeyError) as e:
+            except Exception as e:
                 clean = False
                 log(j["issue"], "%s: %s" % (j["state"], e if isinstance(e, Error) else type(e).__name__))
                 j["errors"] = j.get("errors", 0) + 1

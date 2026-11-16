@@ -329,6 +329,25 @@ class RotateEngineKey(unittest.TestCase):
         self.assertIn("verify app-new-key http=401 FAIL", self.out)
         self.assertTrue(self.exists(".env.engine-key-rotation"))
 
+    def test_a_failed_chown_leaves_no_env_tmp(self):
+        self.write("bin/chown", "#!/bin/sh\nexit 1\n", 0o755)
+        self.assertEqual(self.rotate(), 1, self.out)
+        self.assertIn("env-key FAIL: .env did not take the new key", self.out)
+        self.assertFalse(self.exists(".env.tmp"))
+        self.assertEqual(self.env_value(), "'%s'" % OLD)
+        self.assertTrue(self.stopped())
+        self.assertEqual(self.read(".env.engine-key-rotation"), ("OLD=%s\nNEW=%s\n" % (OLD, NEW)).encode())
+
+    def test_an_engine_that_never_answers_is_stopped(self):
+        self.state["engine_silent"] = True
+        self.assertEqual(self.rotate(), 1, self.out)
+        self.assertIn("verify engine-no-key http=000 FAIL: the engine did not answer", self.out)
+        self.assertTrue(self.stopped())
+        self.assertNotIn("engine", self.state["running"])
+        self.assertNotIn("app", self.state["running"])
+        self.assertNotIn("verify engine-new-key", self.out)
+        self.assertEqual(self.read(".env.engine-key-rotation"), ("OLD=%s\nNEW=%s\n" % (OLD, NEW)).encode())
+
     def test_wrong_word_changes_nothing(self):
         before = self.read(".env")
         self.rotate("yes\n")

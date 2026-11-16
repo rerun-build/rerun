@@ -12,6 +12,7 @@ import { installBrowserCommand, installDesktop, installLayoutCommand, rollbackCo
 import { serviceCommand } from './commands/service.js'
 import { restoreFinalizeCommand } from './commands/restore-finalize.js'
 import { snapshotCommand } from './commands/snapshot.js'
+import { redactCommand } from './commands/redact.js'
 
 const HELP = `rerun-engine
 
@@ -23,6 +24,7 @@ Usage:
   rerun agent create --name <n>   Create an agent
   rerun agent list                List agents
   rerun agent delete <id>         Delete an agent
+  rerun redact <agentId>          Remove a value read from stdin from a coworker's run history
   rerun skill list <agentId>      List an agent's skills
   rerun schedule list <agentId>   List an agent's scheduled tasks
   rerun mcp login <id> <server>   Sign in to an OAuth MCP server
@@ -55,6 +57,8 @@ async function main() {
             return snapshotCommand(rest)
         case 'agent':
             return agentCommand(rest)
+        case 'redact':
+            return redactCommand(rest)
         case 'skill':
             return skillCommand(rest)
         case 'schedule':

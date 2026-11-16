@@ -7,6 +7,7 @@ const ROOT = path.resolve(import.meta.dirname, '../../../..')
 const SAMPLE = path.join(ROOT, 'packages/contracts/fixtures/factory-snapshot.sample.json')
 const sample = () => JSON.parse(readFileSync(SAMPLE, 'utf8'))
 type Sample = ReturnType<typeof sample>
+type Snap = ReturnType<typeof factorySnapshotSchema.parse>
 
 describe('factorySnapshotSchema', () => {
     it('accepts the shared sample and keeps it under the byte cap', () => {
@@ -27,19 +28,44 @@ describe('factorySnapshotSchema', () => {
         expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
     })
 
-    it('refuses fields it does not know, at every level', () => {
-        expect(factorySnapshotSchema.safeParse({ ...sample(), extra: 1 }).success).toBe(false)
-        for (const poke of [
-            (s: Sample) => { s.jobs[0].secret = 'x' },
-            (s: Sample) => { s.holds[0].x = 1 },
-            (s: Sample) => { s.pools[0].coworkers[0].x = 1 },
-            (s: Sample) => { s.jobs[0].history[0].x = 1 },
-            (s: Sample) => { s.jobs[0].runs[0].x = 1 },
-            (s: Sample) => { s.endedToday.x = 1 },
-        ]) {
+    it('drops an unknown key at the top and inside a job, and still refuses a known key with a wrong type', () => {
+        const s = sample()
+        s.future = { a: 1 }
+        s.jobs[0].future = 'x'
+        const r = factorySnapshotSchema.safeParse(s)
+        expect(r.success).toBe(true)
+        if (!r.success) return
+        expect('future' in r.data).toBe(false)
+        expect('future' in r.data.jobs[0]).toBe(false)
+        expect(r.data.jobs[0]).toEqual(factorySnapshotSchema.parse(sample()).jobs[0])
+        const wrongIssue = sample()
+        wrongIssue.jobs[0].issue = '330'
+        expect(factorySnapshotSchema.safeParse(wrongIssue).success).toBe(false)
+        const wrongBeat = sample()
+        wrongBeat.beat = -1
+        expect(factorySnapshotSchema.safeParse(wrongBeat).success).toBe(false)
+    })
+
+    it('drops fields it does not know, at every level', () => {
+        const top = factorySnapshotSchema.safeParse({ ...sample(), extra: 1 })
+        expect(top.success).toBe(true)
+        if (top.success) expect('extra' in top.data).toBe(false)
+        for (const [poke, read] of [
+            [(s: Sample) => { s.jobs[0].secret = 'x' }, (d: Snap) => d.jobs[0]],
+            [(s: Sample) => { s.holds[0].x = 1 }, (d: Snap) => d.holds[0]],
+            [(s: Sample) => { s.pools[0].coworkers[0].x = 1 }, (d: Snap) => d.pools[0].coworkers[0]],
+            [(s: Sample) => { s.jobs[0].history[0].x = 1 }, (d: Snap) => d.jobs[0]!.history![0]!],
+            [(s: Sample) => { s.jobs[0].runs[0].x = 1 }, (d: Snap) => d.jobs[0]!.runs![0]!],
+            [(s: Sample) => { s.endedToday.x = 1 }, (d: Snap) => d.endedToday],
+        ] as Array<[(s: Sample) => void, (d: Snap) => object]>) {
             const s = sample()
             poke(s)
-            expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
+            const r = factorySnapshotSchema.safeParse(s)
+            expect(r.success).toBe(true)
+            if (r.success) {
+                const node = read(r.data)
+                expect('x' in node || 'secret' in node).toBe(false)
+            }
         }
     })
 
@@ -109,13 +135,17 @@ describe('factorySnapshotSchema', () => {
         expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
     })
 
-    it('refuses an unknown key inside a history entry or a run', () => {
+    it('drops an unknown key inside a history entry or a run', () => {
         const a = sample()
         a.jobs[0].history[0].extra = 1
-        expect(factorySnapshotSchema.safeParse(a).success).toBe(false)
+        const ra = factorySnapshotSchema.safeParse(a)
+        expect(ra.success).toBe(true)
+        if (ra.success) expect('extra' in ra.data.jobs[0]!.history![0]!).toBe(false)
         const b = sample()
         b.jobs[0].runs[0].extra = 1
-        expect(factorySnapshotSchema.safeParse(b).success).toBe(false)
+        const rb = factorySnapshotSchema.safeParse(b)
+        expect(rb.success).toBe(true)
+        if (rb.success) expect('extra' in rb.data.jobs[0]!.runs![0]!).toBe(false)
     })
 
     it('accepts the old shape: no department, departments or epics', () => {
@@ -153,13 +183,20 @@ describe('factorySnapshotSchema', () => {
             (s: Sample) => { s.jobs[0].departments = ['kitchen'] },
             (s: Sample) => { s.jobs[0].departments = Array.from({ length: 7 }, () => 'docs') },
             (s: Sample) => { s.epics[0].kind = 'dream' },
-            (s: Sample) => { s.epics[0].extra = 1 },
             (s: Sample) => { s.epics[0].issue = 0 },
         ]) {
             const s = sample()
             poke(s)
             expect(factorySnapshotSchema.safeParse(s).success).toBe(false)
         }
+    })
+
+    it('drops an unknown key inside an epic', () => {
+        const s = sample()
+        s.epics[0].extra = 1
+        const r = factorySnapshotSchema.safeParse(s)
+        expect(r.success).toBe(true)
+        if (r.success) expect('extra' in r.data.epics![0]).toBe(false)
     })
 
     it('accepts closedOutside: true on a job and the old shape without it', () => {

@@ -5,7 +5,7 @@ cd "$(dirname "$0")/../.."
 [ "$#" -gt 0 ] || { echo "Name the keys to set, e.g.: sudo sh deploy/vps/set-env.sh RERUN_GITHUB_MCP_CLIENT_ID"; exit 1; }
 
 put() {
-    case "$2" in *"'"*) echo "The value of $1 contains a single quote, which .env cannot hold. Nothing changed for it."; return 0 ;; esac
+    case "$2" in *"'"*) echo "The value of $1 contains a single quote, which .env cannot hold. Nothing changed for it."; return 1 ;; esac
     K="$1" V="$2" awk 'BEGIN { k = ENVIRON["K"]; line = k "=\047" ENVIRON["V"] "\047" }
         $0 ~ "^" k "=" { if (!done) print line; done = 1; next } { print }
         END { if (!done) print line }' .env > .env.tmp && cat .env.tmp > .env && rm -f .env.tmp
@@ -20,7 +20,7 @@ for key in "$@"; do
     stty echo 2>/dev/null || true
     echo
     [ -n "$value" ] || continue
-    put "$key" "$value"
+    put "$key" "$value" || continue
     changed="$changed $key"
 done
 unset value

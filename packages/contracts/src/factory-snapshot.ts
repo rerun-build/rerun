@@ -19,7 +19,7 @@ const factoryHistoryEntrySchema = z.object({
     at: isoTime,
     reason: z.string().max(300).nullable(),
     runId: z.string().max(64).nullable(),
-}).strict()
+})
 
 const factoryRunSchema = z.object({
     stage: z.string().max(20),
@@ -31,7 +31,7 @@ const factoryRunSchema = z.object({
     tokensOut: count,
     cacheRead: count.optional(),
     runId: z.string().max(64).nullable(),
-}).strict()
+})
 
 export const factoryJobSchema = z.object({
     issue: z.number().int().positive(),
@@ -53,28 +53,28 @@ export const factoryJobSchema = z.object({
     runs: z.array(factoryRunSchema).max(12).optional(),
     department: factoryDepartmentSchema.optional(),
     departments: z.array(factoryDepartmentSchema).max(6).optional(),
-}).strict()
+})
 
 export const factoryEpicSchema = z.object({
     issue: z.number().int().positive(),
     title: z.string().max(256),
     kind: factoryEpicKindSchema,
-}).strict()
+})
 
-export const factoryHoldSchema = z.object({ kind: z.string().max(40), until: isoTime }).strict()
+export const factoryHoldSchema = z.object({ kind: z.string().max(40), until: isoTime })
 
 export const factoryPoolSchema = z.object({
     type: factoryWorkerTypeSchema,
-    coworkers: z.array(z.object({ name: z.string().max(64), id: z.string().max(64).optional(), runs: z.number().int().min(1).max(32), out: z.number().int().min(0).max(32) }).strict()).max(20),
-}).strict()
+    coworkers: z.array(z.object({ name: z.string().max(64), id: z.string().max(64).optional(), runs: z.number().int().min(1).max(32), out: z.number().int().min(0).max(32) })).max(20),
+})
 
 export const factoryPlanningSchema = z.object({
     parent: z.number().int().positive().nullable(),
     title: z.string().max(256),
-    coworkers: z.array(z.object({ id: z.string().max(64), name: z.string().max(64), runId: z.string().max(64), startedAt: isoTime, steps: count.nullable() }).strict()).max(8),
+    coworkers: z.array(z.object({ id: z.string().max(64), name: z.string().max(64), runId: z.string().max(64), startedAt: isoTime, steps: count.nullable() })).max(8),
     children: count,
     filed: count,
-}).strict()
+})
 
 export const factoryDigestSchema = z.object({
     stations: z.array(z.object({
@@ -83,28 +83,28 @@ export const factoryDigestSchema = z.object({
         oldestWaitS: count,
         serviceS: z.number().min(0).nullable(),
         inUse: count,
-    }).strict()).max(12),
+    })).max(12),
     threads: z.array(z.object({
         parent: z.number().int().positive(),
         done: count,
         total: count,
         chain: count,
         blockedBy: z.array(z.number().int().positive()).max(20),
-    }).strict()).max(50),
+    })).max(50),
     anomalies: z.array(z.object({
         kind: z.enum(['past_clock', 'repeat_block', 'proof_fail_rate', 'budget_burn']),
         issue: z.number().int().positive().nullable(),
         detail: z.string().max(200),
-    }).strict()).max(50),
+    })).max(50),
     measures: z.object({
         mergedPerHour: z.number().min(0),
         leadTimeS: z.number().min(0).nullable(),
         firstPassYield: z.number().min(0).max(1).nullable(),
         fixRounds: z.number().min(0).nullable(),
-        blocks: z.object({ blocked: count, rejected: count, failed: count, returned: count }).strict(),
+        blocks: z.object({ blocked: count, rejected: count, failed: count, returned: count }),
         tokensPerMerged: z.number().min(0).nullable(),
-    }).strict(),
-}).strict()
+    }),
+})
 
 export const factorySnapshotSchema = z.object({
     version: z.literal(1),
@@ -117,8 +117,8 @@ export const factorySnapshotSchema = z.object({
     digest: factoryDigestSchema.optional(),
     holds: z.array(factoryHoldSchema).max(10),
     pools: z.array(factoryPoolSchema).max(8),
-    endedToday: z.object({ merged: count, rejected: count, blocked: count, failed: count, returned: count }).strict(),
-}).strict()
+    endedToday: z.object({ merged: count, rejected: count, blocked: count, failed: count, returned: count }),
+})
 
 export const FACTORY_SNAPSHOT_MAX_BYTES = 256 * 1024
 
