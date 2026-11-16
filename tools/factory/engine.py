@@ -67,6 +67,12 @@ class Engine:
             raise EngineError("engine answered without a runs list")
         return runs
 
+    def list_agents(self):
+        agents = self._call("GET", "/agents").get("agents")
+        if not isinstance(agents, list):
+            raise EngineError("engine answered without an agents list")
+        return agents
+
     def get_run(self, agent_id, run_id):
         try:
             return self._call("GET", self._run_path(agent_id, run_id))
