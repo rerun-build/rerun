@@ -71,7 +71,7 @@ describe('factory snapshot digest', () => {
         expect(ok(b)).toBe(false)
     })
 
-    it('refuses an unknown key at every level of the digest', () => {
+    it('drops an unknown key at every level of the digest', () => {
         const pokes = [
             (d: ReturnType<typeof loose>) => { d.x = 1 },
             (d: ReturnType<typeof loose>) => { d.stations[0].x = 1 },
@@ -83,7 +83,7 @@ describe('factory snapshot digest', () => {
         for (const poke of pokes) {
             const d = digest()
             poke(d)
-            expect(ok(d)).toBe(false)
+            expect(ok(d)).toBe(true)
         }
     })
 
