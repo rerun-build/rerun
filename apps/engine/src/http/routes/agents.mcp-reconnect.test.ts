@@ -109,6 +109,7 @@ describe('POST /agents/:id/mcp-servers/:name/reconnect', () => {
 
     it('reconnect announces a data-mcp-reconnect part to the live runs and answers how many', async () => {
         mocks.live = 2
+        mocks.held.add('linear')
         const res = await post('linear')
         expect(mcpReconnectResultSchema.parse(await res.json()).announced).toBe(2)
         expect(mocks.announced).toHaveLength(1)
@@ -122,6 +123,25 @@ describe('POST /agents/:id/mcp-servers/:name/reconnect', () => {
         const res = await post('linear')
         expect(mcpReconnectResultSchema.parse(await res.json()).effect).toBe('next_message')
         expect((mocks.announced[0] as { data: { effect: string } }).data.effect).toBe('next_message')
+    })
+
+    it('reconnect answers effect next_message when the pool does not hold the server, on claude and on openrouter', async () => {
+        for (const provider of ['claude', 'openrouter']) {
+            mocks.provider = provider
+            mocks.announced.length = 0
+            const res = await post('notion')
+            expect(mcpReconnectResultSchema.parse(await res.json())).toEqual({ name: 'notion', reconnected: false, effect: 'next_message', announced: 0 })
+            expect((mocks.announced[0] as { data: unknown }).data).toEqual({ name: 'notion', effect: 'next_message' })
+        }
+    })
+
+    it('reconnect answers effect next_call for a held server on claude and on openrouter', async () => {
+        mocks.held.add('linear')
+        for (const provider of ['claude', 'openrouter']) {
+            mocks.provider = provider
+            const res = await post('linear')
+            expect(mcpReconnectResultSchema.parse(await res.json())).toMatchObject({ name: 'linear', reconnected: true, effect: 'next_call' })
+        }
     })
 
     it('answers 404 for an unknown agent and for an unknown server, 400 for rerun', async () => {

@@ -189,7 +189,7 @@ agentRoutes.post('/:id/mcp-servers/:name/reconnect', async c => {
     if (!config.mcpServers.some(server => server.name === name)) return c.json({ error: 'server not found' }, 404)
     if (name === BRIDGE_SERVER_NAME) return c.json({ error: 'the rerun server cannot be reconnected' }, 400)
     const reconnected = reconnectMcp(id, name)
-    const effect = (await loadAgentView(id)).resolved.provider === 'codex' ? 'next_message' : 'next_call'
+    const effect = (await loadAgentView(id)).resolved.provider === 'codex' || !reconnected ? 'next_message' : 'next_call'
     const announced = announceToAgentRuns(id, { type: 'data-mcp-reconnect', data: { name, effect } })
     return c.json({ name, reconnected, effect, announced })
 })
