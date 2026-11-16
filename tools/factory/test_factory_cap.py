@@ -20,12 +20,15 @@ class FactoryCap(unittest.TestCase):
 
 
 class WtNewSweep(unittest.TestCase):
-    def run_new(self, capacity):
+    def run_new(self, capacity, du_kb=1024):
         class Stop(Exception):
             pass
 
+        self.cmds = []
+
         def fake_run(cmd, cwd="/tmp", check=True, timeout=300):
-            out = "1024\tx" if cmd[0] == "du" else "chunk/71-1"
+            self.cmds.append(cmd[0])
+            out = "%d\tx" % du_kb if cmd[0] == "du" else "chunk/71-1"
             return types.SimpleNamespace(stdout=out, returncode=0)
 
         sweep = mock.Mock(return_value=("sum", []))
@@ -57,6 +60,12 @@ class WtNewSweep(unittest.TestCase):
         self.assertEqual(sweep.call_count, 1)
         self.assertEqual(outcome, "refused 2")
         self.assertIn("builders are already active", out)
+
+    def test_a_full_work_folder_is_not_measured_and_does_not_refuse(self):
+        sweep, outcome, _ = self.run_new(2, du_kb=30 * 1048576)
+        self.assertEqual(outcome, "reached plan_check")
+        self.assertEqual(sweep.call_count, 0)
+        self.assertNotIn("du", self.cmds)
 
 
 class LockMessage(unittest.TestCase):
