@@ -1226,7 +1226,7 @@ class Dispatcher:
     def verdict(self, j):
         n = str(j["issue"])
         moves = [t["to_state"] for t in self.store.transitions_of(n) if t["from_state"] != t["to_state"]]
-        last = dict(self.store.db.execute("SELECT station, reason FROM failures WHERE job=? ORDER BY id", (n,)).fetchall())
+        last = dict(self.store.db.execute("SELECT station, reason FROM failures WHERE job=? AND kind!='ended unsolvable' ORDER BY id", (n,)).fetchall())
         return "\n".join([
             "The factory dispatcher ended this job as unsolvable: %s." % (j.get("reason") or "-"),
             "It had %d builds, %d fix rounds, %d reviews, %d proofs, %d takes and %d re-plans." % (
@@ -1399,7 +1399,8 @@ class Dispatcher:
     def spent(self):
         for key, r in self.resolver.records(self).items():
             m = re.fullmatch(r"ended #(\d+)", key)
-            j = self.store.get_job(m.group(1)) if m and r.get("state") == resolver.OWNER else None
+            used = r.get("attempt", 1) >= resolver.ATTEMPTS or r.get("sends", 0) >= resolver.SEND_MAX
+            j = self.store.get_job(m.group(1)) if m and r.get("state") == resolver.OWNER and used else None
             if j and j["state"] in problems.ENDED:
                 self.unsolvable(j, "the resolver's attempts on problem %s are spent: %s" % (key, r.get("line") or "-"))
 

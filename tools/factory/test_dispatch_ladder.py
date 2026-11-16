@@ -1,6 +1,7 @@
-import json, os, re, sys, time, unittest
+import json, os, re, sys, time, unittest, unittest.mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import digest
+import dispatch as D
 import snapshot
 import store as ledger_store
 from test_dispatch import Base, ready, HEAD, wf
@@ -76,6 +77,15 @@ class Ladder(LadderBase):
         self.assertEqual(len(senior_briefs(self.w)), 1)
         self.no_refused_move()
 
+    def test_the_senior_fix_keeps_its_model_while_the_tier_floor_has_tier_models_off(self):
+        self.cfg["tiers"] = SHIPPED["tiers"]
+        self.cfg["tier_models"] = SHIPPED["tier_models"]
+        with unittest.mock.patch.object(D.Dispatcher, "tier_floor", lambda d: setattr(d, "tiers_off", True)):
+            self.two_rejects()
+            self.tick()
+        self.assertTrue(all("model" not in a for a in self.args[:-1]))
+        self.assertEqual((self.args[-1]["model"], self.args[-1]["thinkingLevel"]), ("claude-opus-5-5", "high"))
+
     def test_a_level_1_job_rejected_again_ends_rejected(self):
         self.two_rejects()
         self.tick()
@@ -126,11 +136,11 @@ class ProofLadder(ProofBase):
 
 
 class Unsolvable(LadderBase):
-    def capped(self, body=None, state="blocked"):
+    def capped(self, body=None, state="blocked", take=3):
         self.w.issues.append({"number": 7, "title": "T7", "body": body or ready(), "comments": []})
         self.d = self.new()
         self.d.store.put_job("7", state, {"issue": 7, "title": "T7", "body": ready(), "relabelled": True, "commented": True,
-                                          "take": 3, "reason": "VERDICT: REJECT @abc: wrong"})
+                                          "take": take, "reason": "VERDICT: REJECT @abc: wrong"})
 
     def test_the_take_limit_ends_unsolvable_with_one_verdict_and_the_unsolvable_label(self):
         self.capped()
@@ -148,10 +158,12 @@ class Unsolvable(LadderBase):
         self.no_refused_move()
 
     def test_an_unsolvable_job_with_the_same_text_is_not_taken_again(self):
-        self.capped(state="unsolvable")
+        self.capped(state="unsolvable", take=1)
         self.tick(2)
         self.assertEqual(self.state(7), "unsolvable")
         self.assertEqual(self.w.issue(7)["comments"], [])
+        self.assertEqual([s for s in self.w.sends if 'rerun #7, "T7"' in s[1]], [])
+        self.no_refused_move()
 
     def test_a_changed_issue_text_takes_an_unsolvable_job_again(self):
         self.capped(body=ready("new plan"), state="unsolvable")
@@ -202,17 +214,31 @@ class ResolverSpent(Base):
         self.w.unlabelled.add(8)
         self.w.open_numbers.add(8)
 
-    def test_a_job_whose_resolver_attempts_are_spent_ends_unsolvable(self):
+    def ended(self):
         self.tick()
         self.d.store.put_job("8", "blocked", {"issue": 8, "title": "T8", "body": ready(), "relabelled": True, "commented": True,
                                               "reason": "cannot", "ended_at": ledger_store.now()})
-        self.tick()
-        self.w.finish("h1", "ESCALATE: Rob runs a step")
         self.tick(2)
+
+    def test_a_job_whose_resolver_attempts_are_spent_ends_unsolvable(self):
+        self.ended()
+        self.w.finish("h1", "RESOLVED: first try")
+        self.tick(7)
+        self.w.finish("h1", "RESOLVED: second try")
+        self.tick(7)
         self.assertEqual(self.state(8), "unsolvable")
+        self.tick()
         verdicts = [c for c in self.w.issue(8)["comments"] if FINAL in c]
         self.assertEqual(len(verdicts), 1)
+        self.assertIn("RESOLVED: second try", verdicts[0])
         self.assertNotIn("refused move", self.out.getvalue())
+
+    def test_an_escalate_line_from_the_resolver_leaves_the_job_where_it_is(self):
+        self.ended()
+        self.w.finish("h1", "ESCALATE: Rob runs a step")
+        self.tick(3)
+        self.assertEqual(self.state(8), "blocked")
+        self.assertEqual([c for c in self.w.issue(8)["comments"] if FINAL in c], [])
 
 
 if __name__ == "__main__":
