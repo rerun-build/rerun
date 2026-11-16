@@ -106,6 +106,19 @@ export const factoryDigestSchema = z.object({
     }),
 })
 
+export const factoryRunStatsSchema = z.object({
+    since: isoTime,
+    finished: count,
+    errors: count,
+    avgRunS: z.number().min(0).nullable(),
+}).strict()
+
+export const factoryPlanSchema = z.object({
+    weekUsedPercent: z.number().min(0).max(100).nullable(),
+    weekResetsAt: isoTime.nullable(),
+    signInMinutes: z.number().min(0).nullable(),
+}).strict()
+
 export const factorySnapshotSchema = z.object({
     version: z.literal(1),
     madeAt: isoTime,
@@ -115,6 +128,8 @@ export const factorySnapshotSchema = z.object({
     epics: z.array(factoryEpicSchema).max(50).optional(),
     planning: z.array(factoryPlanningSchema).max(5).optional(),
     digest: factoryDigestSchema.optional(),
+    runStats: factoryRunStatsSchema.optional(),
+    plan: factoryPlanSchema.optional(),
     holds: z.array(factoryHoldSchema).max(10),
     pools: z.array(factoryPoolSchema).max(8),
     endedToday: z.object({ merged: count, rejected: count, blocked: count, failed: count, returned: count }),
@@ -131,4 +146,6 @@ export type FactoryJob = z.infer<typeof factoryJobSchema>
 export type FactoryPlanning = z.infer<typeof factoryPlanningSchema>
 export type FactoryHold = z.infer<typeof factoryHoldSchema>
 export type FactoryPool = z.infer<typeof factoryPoolSchema>
+export type FactoryRunStats = z.infer<typeof factoryRunStatsSchema>
+export type FactoryPlan = z.infer<typeof factoryPlanSchema>
 export type FactorySnapshot = z.infer<typeof factorySnapshotSchema>
