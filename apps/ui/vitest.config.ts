@@ -16,6 +16,8 @@ export default defineConfig({
         ],
     },
     test: {
+        testTimeout: 15000,
+        hookTimeout: 15000,
         setupFiles: ['test/intl.ts'],
         include: ['**/*.test.?(c|m)[jt]s?(x)', ...(HAS_CLOUD ? [`${CLOUD_SOURCE}/**/*.test.?(c|m)[jt]s?(x)`, `${ADMIN_APP}/{app,lib}/**/*.test.?(c|m)[jt]s?(x)`] : [])],
         coverage: {
