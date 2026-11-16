@@ -1108,7 +1108,35 @@ class Dispatcher:
                     j["merge_refused"] = tries
                     return self.save(j, "merge of #%s at %s refused (%d of %d), tried again next beat" % (j["pr"], j["head"][:7], tries, MERGE_TRIES))
                 return self.end(j, "failed", "merge of #%s at %s refused %d times" % (j["pr"], j["head"][:7], tries))
+        j["own_merge"] = True
         self.end(j, "merged", "#%s at %s" % (j["pr"], j["head"][:7]))
+
+    def dev_results(self):
+        for j in self.jobs():
+            if j["state"] != "merged" or not j.get("own_merge") or j.get("dev_result") in ("green", "unproved"):
+                continue
+            if not j.get("merge_sha"):
+                sha = (json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "mergeCommit"])).get("mergeCommit") or {}).get("oid")
+                if not sha:
+                    continue
+                j["merge_sha"], j["dev_since"] = sha, self.now()
+                self.save(j, "merge commit %s" % sha[:7])
+            runs = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["merge_sha"])])).get("workflow_runs") or []
+            verdict, why = checks_verdict(runs)
+            if verdict == "OK":
+                result = "green"
+            elif verdict == "FAIL":
+                result = "red"
+            elif j.get("dev_result") == "red":
+                continue
+            elif runs and all(r.get("status") == "completed" for r in runs) or self.now() - j["dev_since"] > self.cfg.get("checks_timeout_s", 3600):
+                result = "unproved"
+            else:
+                continue
+            if result != j.get("dev_result") or why != j.get("dev_why"):
+                j["dev_result"], j["dev_why"] = result, why
+                self.save(j, "dev %s at %s" % (result, j["merge_sha"][:7]))
+                log(j["issue"], "dev %s at %s: %s" % (result, j["merge_sha"][:7], why))
 
     def find_pr(self, j, out):
         urls = re.findall(r"https://github\.com/%s/pull/(\d+)" % re.escape(self.repo), str(out or ""))
@@ -1224,6 +1252,11 @@ class Dispatcher:
             except Exception as e:
                 clean = False
                 log("-", "backlog: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.dev_results()
+        except Exception as e:
+            clean = False
+            log("-", "dev result: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
         for j in self.jobs():
             try:
