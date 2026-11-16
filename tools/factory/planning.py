@@ -45,6 +45,8 @@ def brief(issue, repo):
         "",
         "Compute on dev, before filing, every number a done-test asserts. Two children name the same file only when one depends on the other. The done-test calls the feature only through that public interface (a function the module exports, an HTTP route or a CLI command) and mock nothing of the module's own internals; only a boundary the repository already fakes (the network, the clock, the model) may be faked. Each Change says: add no comments in code.",
         "",
+        "The first job of a feature crosses every layer the feature needs and ends in a visible result (an API answer, a screen or a CLI line); later jobs widen it. A docs-only child states the same rule where it writes the format.",
+        "",
         "Do not label a child `factory` and do not touch the label `factory-plan`: the dispatcher does both.",
         "",
         "Your last line is `CUT: #a, #b` naming the children you filed, or `BLOCKED: <one sentence>` when the issue cannot be cut.",
