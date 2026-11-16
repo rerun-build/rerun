@@ -1075,7 +1075,7 @@ class Dispatcher:
     def blocked(self, j, out):
         why = self.not_met_reason(j, out)
         text = out or ""
-        room = [(kind, hold_s) for mark, kind, hold_s in ROOM_HOLDS if mark in text]
+        room = [(kind, hold_s) for mark, kind, hold_s in ROOM_HOLDS if re.search("(?m)^" + re.escape(mark), text)]
         for kind, hold_s in room:
             holds.arm(self.store, kind, self.now() + hold_s)
             log(j["issue"], "hold %s for %d s: the checkout reported it" % (kind, hold_s))

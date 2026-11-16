@@ -137,6 +137,14 @@ class Holds(unittest.TestCase):
         self.d.once()
         self.assertEqual(self.job(5)["state"], "blocked")
 
+    def test_a_room_line_quoted_inside_other_output_arms_no_hold(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", "the log quoted TRANSIENT: load: 13.0 on 4 cores, ceiling is 12.0\nBLOCKED: tests fail")
+        self.d.once()
+        self.assertIsNone(self.hold())
+        self.assertEqual(self.job(5)["state"], "blocked")
+
     def test_room_refusals_never_end_the_job(self):
         self.make([issue(5)])
         self.d.once()
