@@ -41,11 +41,16 @@ CREATE TABLE IF NOT EXISTS failures(
   id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, kind TEXT NOT NULL, job TEXT NOT NULL,
   station TEXT NOT NULL DEFAULT '', coworker TEXT NOT NULL DEFAULT '', model TEXT, tier TEXT,
   reason TEXT NOT NULL DEFAULT '', plan_run TEXT, brief TEXT);
+CREATE TABLE IF NOT EXISTS changes(
+  id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, issue INTEGER NOT NULL, grp TEXT NOT NULL,
+  kind TEXT NOT NULL, before REAL, live_at REAL, after REAL, verdict TEXT, revert INTEGER,
+  told INTEGER NOT NULL DEFAULT 0);
 """
 JOB_STATES = states.NAMES
 FIRE_COLUMNS = (("cache_read", "INTEGER"), ("cache_write", "INTEGER"), ("seconds", "INTEGER"),
                 ("steps", "INTEGER"), ("steps_at", "TEXT"))
 OPEN = ("intent", "running")
+CHANGE_COLUMNS = {"live_at", "after", "verdict", "revert", "told"}
 
 
 def now():
@@ -306,6 +311,26 @@ class Store:
         cur = self.db.execute("SELECT * FROM failures WHERE id>? ORDER BY id", (after,))
         names = [c[0] for c in cur.description]
         return [dict(zip(names, r)) for r in cur.fetchall()]
+
+    def add_change(self, issue, group, kind, before, at=None):
+        with self.db:
+            cur = self.db.execute(
+                "INSERT INTO changes(at, issue, grp, kind, before) VALUES (?,?,?,?,?)",
+                (at or now(), issue, group, kind, before))
+        return cur.lastrowid
+
+    def set_change(self, change_id, **fields):
+        bad = set(fields) - CHANGE_COLUMNS
+        if bad:
+            raise ValueError(f"unknown change column: {', '.join(sorted(bad))}")
+        if not fields:
+            return
+        sets = ", ".join(f"{k}=?" for k in fields)
+        with self.db:
+            self.db.execute(f"UPDATE changes SET {sets} WHERE id=?", (*fields.values(), change_id))
+
+    def changes(self):
+        return [dict(r) for r in self.db.execute("SELECT * FROM changes ORDER BY id")]
 
     def steps_seen(self, fire_id, steps, at=None):
         self.db.execute("UPDATE fires SET steps=?, steps_at=? WHERE id=? AND steps IS NOT ?",
