@@ -1053,7 +1053,7 @@
             "kpiFailureRate": "The share of runs that did not get the job done: they ended in an error, were cancelled, missed their goal, or ended on a BLOCKED: or ESCALATE: line; runs still going count in the total."
         },
         "noPrice": {
-            "label": "This connection reports no price, so tokens are shown instead.",
+            "label": "No cost was reported for these runs, so tokens are shown instead.",
             "fresh": "Fresh input",
             "cached": "Cached input",
             "output": "Output",

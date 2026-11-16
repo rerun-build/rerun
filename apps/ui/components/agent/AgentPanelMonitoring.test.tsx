@@ -88,7 +88,7 @@ describe('AgentPanelMonitoring cost', () => {
         await render({ ...tokens, cost: 0 })
         const total = card('Total cost')
         expect(total?.querySelector('[data-chart]')).toBeNull()
-        expect(total?.textContent).toContain('reports no price')
+        expect(total?.textContent).toContain('No cost was reported')
         expect(total?.textContent).toMatch(/Fresh input\s*100/)
         expect(total?.textContent).toMatch(/Cached input\s*900/)
         expect(total?.textContent).toMatch(/Output\s*200/)
@@ -102,7 +102,7 @@ describe('AgentPanelMonitoring cost', () => {
     it('keeps the dollar figure when a real cost exists', async () => {
         await render({ ...tokens, cost: 1500 })
         expect(card('Total cost')?.querySelector('[data-chart]')?.getAttribute('data-chart')).toBe('cost:stat')
-        expect(card('Total cost')?.textContent).not.toContain('reports no price')
+        expect(card('Total cost')?.textContent).not.toContain('No cost was reported')
         expect(charts()).toContain('cost:area')
         expect(card('Tokens by class')).toBeNull()
     })

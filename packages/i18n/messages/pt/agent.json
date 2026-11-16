@@ -936,7 +936,7 @@
             "kpiFailureRate": "A parcela de execuções que não concluíram o trabalho: terminaram em erro, foram canceladas, não cumpriram a meta ou terminaram com uma linha BLOCKED: ou ESCALATE:; execuções em andamento contam no total."
         },
         "noPrice": {
-            "label": "Esta conexão não informa preço, então os tokens são mostrados no lugar.",
+            "label": "Nenhum custo foi informado para estas execuções, então os tokens são mostrados no lugar.",
             "fresh": "Entrada nova",
             "cached": "Entrada em cache",
             "output": "Saída",

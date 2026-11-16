@@ -936,7 +936,7 @@
             "kpiFailureRate": "Der Anteil der Ausführungen, die ihre Aufgabe nicht erledigt haben: Sie endeten mit einem Fehler, wurden abgebrochen, verfehlten ihr Ziel oder endeten mit einer Zeile BLOCKED: oder ESCALATE:; laufende Ausführungen zählen zur Gesamtzahl."
         },
         "noPrice": {
-            "label": "Diese Verbindung meldet keinen Preis, daher werden stattdessen Tokens angezeigt.",
+            "label": "Für diese Ausführungen wurden keine Kosten gemeldet, daher werden stattdessen Tokens angezeigt.",
             "fresh": "Neue Eingabe",
             "cached": "Zwischengespeicherte Eingabe",
             "output": "Ausgabe",
