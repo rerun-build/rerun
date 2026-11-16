@@ -82,7 +82,28 @@ export const factoryBarWindowSchema = z.object({
     tokensPerIssue: z.number().min(0).nullable(),
     firstPassYield: z.number().min(0).max(1).nullable(),
     escaped: count,
+    costPerIssue: z.number().min(0).nullable().optional(),
 })
+
+const factoryCostRowSchema = z.object({
+    name: z.string().max(64),
+    runs: count,
+    tokens: count,
+    units: z.number().min(0),
+    unitsPerIssue: z.number().min(0).nullable(),
+}).strict()
+
+const factoryCostSchema = z.object({
+    perIssue: z.number().min(0).nullable(),
+    byStation: z.array(factoryCostRowSchema).max(12),
+    byModel: z.array(factoryCostRowSchema).max(12),
+    byThinking: z.array(factoryCostRowSchema).max(6),
+    unweighed: z.array(z.string().max(64)).max(12),
+    calibration: z.object({
+        state: z.enum(['uncalibrated', 'calibrated']),
+        unitsPerPlanPercent: z.number().min(0).nullable(),
+    }).strict(),
+}).strict()
 
 const factoryMachineReadingSchema = z.object({
     name: z.string().max(64),
@@ -117,7 +138,7 @@ export const factoryDigestSchema = z.object({
         blockedBy: z.array(z.number().int().positive()).max(20),
     })).max(50),
     anomalies: z.array(z.object({
-        kind: z.enum(['past_clock', 'repeat_block', 'proof_fail_rate', 'budget_burn']),
+        kind: z.enum(['past_clock', 'repeat_block', 'proof_fail_rate', 'budget_burn', 'rework']),
         issue: z.number().int().positive().nullable(),
         detail: z.string().max(200),
     })).max(50),
@@ -128,8 +149,11 @@ export const factoryDigestSchema = z.object({
         fixRounds: z.number().min(0).nullable(),
         blocks: z.object({ blocked: count, rejected: count, failed: count, returned: count }),
         tokensPerMerged: z.number().min(0).nullable(),
+        reworkPerSolved: z.number().min(0).nullable().optional(),
+        reworkUnitsPerSolved: z.number().min(0).nullable().optional(),
     }),
     bar: z.object({ day: factoryBarWindowSchema, week: factoryBarWindowSchema }).optional(),
+    cost: factoryCostSchema.optional(),
     causes: z.object({
         groups: z.array(z.object({
             group: z.string().max(80),
