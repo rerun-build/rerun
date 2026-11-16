@@ -8,6 +8,7 @@ import cutshape
 import digest
 import holds
 import planners
+import planning
 import pools
 import proof
 import refresh
@@ -334,6 +335,7 @@ class Dispatcher:
         self.started = now()
         self.names = pools.names(cfg)
         self.planners = planners.Planners(cfg, account, gh)
+        self.station = planning.Station(cfg, self.store, account, gh, now)
         self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
@@ -1090,6 +1092,11 @@ class Dispatcher:
         except (Error, ValueError, KeyError) as e:
             clean = False
             log("-", "reconcile: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.station.once(self.beats)
+        except (Error, ValueError, KeyError) as e:
+            clean = False
+            log("-", "planning: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
