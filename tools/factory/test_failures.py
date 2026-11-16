@@ -2,7 +2,7 @@ import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import failures
 import store as ledger_store
-from test_dispatch import Base, PR_LINE, ready
+from test_dispatch import Base, ready
 
 
 class Kinds(unittest.TestCase):
