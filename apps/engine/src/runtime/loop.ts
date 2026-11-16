@@ -40,9 +40,10 @@ import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
 import { checkGoal } from './goal-check.js'
-import type { PartialResult, RunContext, RunLineage, RunTrigger, SkillProposalNotice } from './context.js'
+import type { DelegatedUsage, PartialResult, RunContext, RunLineage, RunTrigger, SkillProposalNotice } from './context.js'
 import { parseJobRef } from './job-ref.js'
 import { partialResultsNote } from './partial-results.js'
+import { plusDelegated } from './delegated-usage.js'
 import { registerRunAbort, setRunCancel, syncAgentStatus, unregisterRunAbort } from './run-control.js'
 import { runCurator } from './curator.js'
 import { repairToolCall } from './tool-repair.js'
@@ -236,6 +237,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     let live: LiveCounter | undefined
     const stepsToWrite = (): number => Math.max(steps, live?.snapshot().toolCalls ?? 0)
     const partialResults: PartialResult[] = []
+    const delegated: DelegatedUsage = { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0, reasoningTokens: 0, totalTokens: 0 }
     const skillProposals: SkillProposalNotice[] = []
 
     const close = async (): Promise<void> => {
@@ -299,7 +301,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                     goalChecked = verdict.met ? 'met' : 'not_met'
                 }
             }
-            await finishRun(agent.id, run.id, settlement.usage, stepsToWrite(), settlement.costMicros, contextUsage?.(), goalChecked).catch(() => {})
+            await finishRun(agent.id, run.id, plusDelegated(settlement.usage, delegated), stepsToWrite(), settlement.costMicros, contextUsage?.(), goalChecked).catch(() => {})
             await touchSession(agent.id, sessionId).catch(() => {})
             text = settlement.text
             usage = settlement.usage
@@ -390,7 +392,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const t0 = Date.now()
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
-        const ctx: RunContext = { agent, sessionId, logger, provider, model, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, skillProposals }
+        const ctx: RunContext = { agent, sessionId, logger, provider, model, turnOrder: order, author, writer, abortSignal: controller.signal, callTargets: [], callableAgentIds, hostBreaker: new HostBreaker(), partialResults, delegated, skillProposals }
 
         ctx.runId = run.id
         const triggerSlug = 'slug' in trigger ? trigger.slug : null

@@ -24,7 +24,7 @@ class SnapshotDigest(unittest.TestCase):
         self.put(2, "merged")
         snap = snapshot.build_snapshot(self.st, CFG, NOW, None, beat=1)
         self.assertEqual(snap["digest"], digest.build(self.st, CFG, NOW))
-        self.assertEqual(set(snap["digest"]), {"stations", "threads", "anomalies", "measures"})
+        self.assertEqual(set(snap["digest"]), {"stations", "threads", "anomalies", "measures", "planners"})
 
     def test_an_empty_store_digest_is_valid_and_serialisable(self):
         d = snapshot.build_snapshot(self.st, CFG, NOW, None, beat=1)["digest"]

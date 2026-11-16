@@ -13,6 +13,8 @@ export type RunTrigger = { source: 'chat'; author?: MessageAuthor; userLanguage?
 
 export type PartialResult = { label: string; text: string }
 
+export type DelegatedUsage = { inputTokens: number; outputTokens: number; cachedInputTokens: number; reasoningTokens: number; totalTokens: number }
+
 export type SkillProposalNotice = { proposalId: string; mode: string; title: string }
 
 export type RunContext = {
@@ -31,6 +33,7 @@ export type RunContext = {
     callableAgentIds?: string[]
     hostBreaker?: HostBreaker
     partialResults?: PartialResult[]
+    delegated?: DelegatedUsage
     skillProposals?: SkillProposalNotice[]
     screenshots?: ScreenshotStore
     userTurnStored?: Promise<unknown>
