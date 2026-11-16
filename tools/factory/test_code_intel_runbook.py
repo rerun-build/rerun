@@ -4,7 +4,8 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SCRIPT = ROOT / "deploy/vps/code-intel-status.sh"
+SCRIPT_NAME = "code-intel-status.sh"
+SCRIPT = ROOT / "deploy/vps" / SCRIPT_NAME
 RUNBOOK = ROOT / "deploy/vps/CODE-INTEL.md"
 COMPOSE = ROOT / "deploy/vps/code-intel.yml"
 
