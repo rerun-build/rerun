@@ -832,7 +832,10 @@ def not_here(line, out):
 
 def preflight_lines(top, body):
     import redgreen
-    for line in redgreen.run_lines(body):
+    lines = redgreen.run_lines(body)
+    wf = os.path.join(top, ".github", "workflows", "red-green.yml")
+    prepare = re.findall(r'--prepare "([^"]+)"', open(wf).read()) if lines and os.path.isfile(wf) else []
+    for line in prepare + lines:
         try:
             r = subprocess.run(["bash", "-c", line], cwd=top, capture_output=True, text=True, errors="replace", timeout=PREFLIGHT_LINE_S)
             code, out = r.returncode, r.stdout + r.stderr

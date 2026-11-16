@@ -5,6 +5,7 @@ from test_dispatch import Base, HEAD
 
 PIN = "ruff==0.17.5"
 WORKFLOW = "name: Factory tools\njobs:\n  test:\n    steps:\n      - name: Lint\n        run: pipx run %s check tools/factory\n" % PIN
+RED_GREEN = 'name: Done-test red before green\njobs:\n  prove:\n    steps:\n      - run: python3 -I tools/factory/redgreen.py --prepare "touch prepared.flag"\n'
 
 
 def plan(lines):
@@ -22,6 +23,7 @@ class PrOpenPreflight(FactoryCase):
         git(dev, "checkout", "--quiet", "dev")
         os.makedirs(os.path.join(dev, ".github/workflows"))
         write(dev, ".github/workflows/factory-tools.yml", WORKFLOW)
+        write(dev, ".github/workflows/red-green.yml", RED_GREEN)
         git(dev, "add", "-A")
         git(dev, "commit", "--quiet", "-m", "workflow")
         git(dev, "push", "--quiet", "origin", "HEAD:refs/heads/dev")
@@ -119,6 +121,16 @@ class PrOpenPreflight(FactoryCase):
         self.assertEqual(code, 0, out)
         self.assertIn("could not read the workflow runs of the head 1234567", out)
         self.assertTrue(self.pushed())
+
+    def test_the_prepare_step_of_the_ci_check_runs_before_the_lines(self):
+        code, out = self.open_pr(["test -f prepared.flag"])
+        self.assertEqual(code, 0, out)
+        self.assertIn("Run line passed: test -f prepared.flag", out)
+
+    def test_no_prepare_step_runs_for_an_issue_without_run_lines(self):
+        code, out = self.open_pr()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("prepared.flag", out)
 
     def test_a_fix_runs_the_lines_too(self):
         code, out = self.open_pr(["exit 4"], fix=True)
