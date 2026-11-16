@@ -17,6 +17,7 @@ writeFileSync(resolve(root, 'nested/a.txt'), 'alpha\n')
 writeFileSync(resolve(root, 'big.txt'), 'x'.repeat(150_000))
 writeFileSync(resolve(root, 'many.txt'), Array.from({ length: 10 }, (_, i) => `hit ${i}`).join('\n'))
 writeFileSync(resolve(root, 'same.txt'), 'keep me')
+writeFileSync(resolve(root, 'lines.txt'), Array.from({ length: 500 }, (_, i) => `line ${i + 1}`).join('\n') + '\n')
 
 const tools = makeFsTools({ prefix: 'box', label: 'test root', rootDir: root })
 
@@ -32,6 +33,29 @@ describe('makeFsTools', () => {
     })
 
     it('caps a read at 100k characters', async () => {
+        expect(await run('box_read', { path: 'big.txt' })).toHaveLength(100_000)
+    })
+
+    it('reads lines 400 to 420 exactly', async () => {
+        const out = await run('box_read', { path: 'lines.txt', startLine: 400, endLine: 420 })
+        const expected = ['lines 400-420 of 500', ...Array.from({ length: 21 }, (_, i) => `line ${400 + i}`)]
+        expect(out.split('\n')).toEqual(expected)
+    })
+
+    it('stops at the last line', async () => {
+        const out = await run('box_read', { path: 'lines.txt', startLine: 498, endLine: 900 })
+        expect(out).toBe('lines 498-500 of 500\nline 498\nline 499\nline 500')
+    })
+
+    it('answers an error past the end', async () => {
+        const out = await run('box_read', { path: 'lines.txt', startLine: 501 })
+        expect(out).toContain('501')
+        expect(out).toContain('500')
+        expect(out).not.toContain('line 500')
+    })
+
+    it('reads the whole file without a range, as today', async () => {
+        expect(await run('box_read', { path: 'same.txt' })).toBe('keep me')
         expect(await run('box_read', { path: 'big.txt' })).toHaveLength(100_000)
     })
 

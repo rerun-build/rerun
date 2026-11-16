@@ -15,11 +15,24 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
     const rootOf = async (input: Record<string, unknown>) => (typeof rootDir === 'string' ? rootDir : rootDir(input))
     return {
         [`${prefix}_read`]: tool({
-            description: `Read a UTF-8 file from the ${label}.`,
-            inputSchema: z.object({ ...scope, path: z.string().describe('Path relative to the root') }),
+            description: `Read a UTF-8 file from the ${label}. Optional 1-based startLine, endLine.`,
+            inputSchema: z.object({
+                ...scope,
+                path: z.string().describe('Path relative to the root'),
+                startLine: z.number().int().min(1).optional(),
+                endLine: z.number().int().min(1).optional(),
+            }),
             execute: async input => {
                 const content = await store.readText(await rootOf(input), input.path)
-                return content.slice(0, 100_000)
+                if (input.startLine === undefined && input.endLine === undefined) return content.slice(0, 100_000)
+                const lines = content.split('\n')
+                if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop()
+                const total = lines.length
+                const start = input.startLine ?? 1
+                if (start > total) return `startLine ${start} is past the end of ${input.path} (${total} lines)`
+                const end = Math.min(input.endLine ?? total, total)
+                if (end < start) return `endLine ${end} is before startLine ${start}`
+                return [`lines ${start}-${end} of ${total}`, ...lines.slice(start - 1, end)].join('\n')
             },
         }),
         [`${prefix}_write`]: tool({
@@ -40,13 +53,13 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
             },
         }),
         [`${prefix}_edit`]: tool({
-            description: `Make a surgical edit to a ${label} file by replacing an exact string. Prefer this over ${prefix}_write for changing part of an existing file. By default oldString must match exactly once.`,
+            description: `Replace an exact string in a ${label} file instead of rewriting it with ${prefix}_write; oldString must match once unless replaceAll.`,
             inputSchema: z.object({
                 ...scope,
                 path: z.string().describe('Path relative to the root'),
-                oldString: z.string().describe('The exact text to replace'),
-                newString: z.string().describe('The text to insert in its place'),
-                replaceAll: z.boolean().default(false).describe('Replace every occurrence instead of requiring a unique match'),
+                oldString: z.string(),
+                newString: z.string(),
+                replaceAll: z.boolean().default(false),
             }),
             execute: async input => {
                 const { path, oldString, newString, replaceAll } = input
@@ -63,7 +76,7 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
             },
         }),
         [`${prefix}_search`]: tool({
-            description: `Search ${label} file contents with a regular expression. Returns matching lines as path:line: content. Skips node_modules and .git.`,
+            description: `Regex search of ${label} file contents; returns path:line: content.`,
             inputSchema: z.object({
                 ...scope,
                 pattern: z.string().describe('JavaScript regular expression to match against each line'),
