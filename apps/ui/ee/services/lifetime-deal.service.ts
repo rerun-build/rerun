@@ -11,10 +11,12 @@ import { landingUrl } from '@/lib/site'
 import { affiliateReferralMetadata } from '@/ee/lib/billing/affiliate'
 import { LIFETIME_PURCHASE_CONSENT } from '@/ee/lib/billing/consent'
 import { LIFETIME_PLAN_SLUG } from '@/ee/lib/billing/plans'
-import { lifetimePriceId, stripe } from '@/ee/lib/billing/stripe'
+import { idOf, lifetimePriceId, stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
+import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 type CodeInsert = Database['public']['Tables']['invitation_codes']['Insert']
+type CodeUpdate = Database['public']['Tables']['invitation_codes']['Update']
 
 // The lifetime plan sold on rerun.build/lifetime, without AppSumo in between. The payment buys the
 // same one-use code AppSumo hands out, redeemed on the same /redeem page.
@@ -106,4 +108,24 @@ export async function deliverLifetimeCheckout(session: Stripe.Checkout.Session):
     const locale = session.metadata?.locale
     const sent = await sendLifetimeCodeEmail({ to: email, code, locale: isLocale(locale) ? locale : undefined })
     if (!sent.ok) throw new Error(`Could not email the lifetime code of ${session.id}: ${sent.error}`)
+}
+
+// `charge.refunded`: a deal refunded in full takes its code back. A workspace that already redeemed
+// it keeps the lifetime plan: taking a plan away from a customer is support's call, so it is only
+// logged. A partial refund is a gesture, and changes nothing.
+export async function refundLifetimePurchase(charge: Stripe.Charge): Promise<void> {
+    if (charge.metadata?.kind !== LIFETIME_DEAL_KIND || charge.amount_refunded < charge.amount) return
+    const intentId = idOf(charge.payment_intent)
+    if (!intentId) return
+    const [session] = (await stripe.checkout.sessions.list({ payment_intent: intentId, limit: 1 })).data
+    if (!session) return
+
+    const supabase = createServiceRoleClient()
+    const { data: revoked, error } = await supabase.from('invitation_codes').update<CodeUpdate>({ active: false }).eq('code', lifetimeCodeOf(session.id)).select('id, uses')
+    if (error) throw new Error(`Could not revoke the lifetime code refunded: ${error.message}`)
+
+    const code = revoked?.[0]
+    if (!code?.uses) return
+    const { data: redemption } = await selectMaybeSingle(supabase, 'invitation_redemptions', ['workspace_id'] as const, { code_id: code.id })
+    console.error('[lifetime deal] refunded after its code was redeemed, the workspace keeps the lifetime plan', { session: session.id, workspaceId: redemption?.workspace_id ?? null })
 }

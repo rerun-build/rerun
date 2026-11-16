@@ -1,10 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { sendLifetimeCodeEmail } from '@/app/api/_services/email.service'
 import { stripe } from '@/ee/lib/billing/stripe'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type FakeSupabase } from '@/test/supabase-fake'
-import { createLifetimeCheckoutUrl, deliverLifetimeCheckout, lifetimeCodeForCheckout, lifetimeCodeOf } from './lifetime-deal.service'
+import { createLifetimeCheckoutUrl, deliverLifetimeCheckout, lifetimeCodeForCheckout, lifetimeCodeOf, refundLifetimePurchase } from './lifetime-deal.service'
 
 vi.mock('@/ee/lib/billing/stripe', async importOriginal => ({ ...(await importOriginal<typeof import('@/ee/lib/billing/stripe')>()), stripe: (await import('@/ee/test/stripe-fake')).fakeStripe() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -109,5 +109,61 @@ describe('deliverLifetimeCheckout', () => {
         await deliverLifetimeCheckout({ ...SESSION, customer_details: null } as never)
         expect(db.writes('invitation_codes')).toEqual([expect.objectContaining({ payload: expect.objectContaining({ note: 'Bought on rerun.build (cs_test_1)' }) })])
         expect(sendLifetimeCodeEmail).not.toHaveBeenCalled()
+    })
+})
+
+describe('refundLifetimePurchase', () => {
+    const CHARGE = { id: 'ch_1', amount: 8000, amount_refunded: 8000, payment_intent: 'pi_1', metadata: { kind: 'lifetime_deal' } }
+    let revoked: { id: string; uses: number }[]
+
+    beforeEach(() => {
+        revoked = [{ id: 'code_1', uses: 0 }]
+        db = fakeSupabase(table => (table === 'invitation_codes' ? { data: revoked } : table === 'invitation_redemptions' ? { data: { workspace_id: 7 } } : undefined))
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+        vi.mocked(stripe.checkout.sessions.list).mockResolvedValue({ data: [SESSION] } as never)
+        vi.spyOn(console, 'error').mockImplementation(() => {})
+    })
+
+    afterEach(() => {
+        vi.restoreAllMocks()
+    })
+
+    it('switches off the code of a deal refunded in full', async () => {
+        await refundLifetimePurchase(CHARGE as never)
+        expect(stripe.checkout.sessions.list).toHaveBeenCalledWith({ payment_intent: 'pi_1', limit: 1 })
+        expect(db.writes('invitation_codes')).toEqual([
+            expect.objectContaining({ method: 'update', payload: { active: false }, filters: expect.arrayContaining([expect.objectContaining({ method: 'eq', args: ['code', lifetimeCodeOf('cs_test_1')] })]) }),
+        ])
+        expect(console.error).not.toHaveBeenCalled()
+    })
+
+    it('leaves the workspace on the lifetime plan when the code was already redeemed, and says which one', async () => {
+        revoked = [{ id: 'code_1', uses: 1 }]
+        await refundLifetimePurchase(CHARGE as never)
+        expect(db.writes('workspaces')).toEqual([])
+        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('refunded after its code was redeemed'), { session: 'cs_test_1', workspaceId: 7 })
+    })
+
+    it('changes nothing on a partial refund', async () => {
+        await refundLifetimePurchase({ ...CHARGE, amount_refunded: 2000 } as never)
+        expect(stripe.checkout.sessions.list).not.toHaveBeenCalled()
+        expect(db.writes('invitation_codes')).toEqual([])
+    })
+
+    it('ignores the refund of something else', async () => {
+        await refundLifetimePurchase({ ...CHARGE, metadata: { kind: 'credit_purchase' } } as never)
+        expect(stripe.checkout.sessions.list).not.toHaveBeenCalled()
+    })
+
+    it('ignores a payment no Checkout Session is found for', async () => {
+        vi.mocked(stripe.checkout.sessions.list).mockResolvedValue({ data: [] } as never)
+        await refundLifetimePurchase(CHARGE as never)
+        expect(db.writes('invitation_codes')).toEqual([])
+    })
+
+    it('throws when the code could not be switched off, so Stripe delivers the event again', async () => {
+        db = fakeSupabase(table => (table === 'invitation_codes' ? { error: { message: 'db down' } } : undefined))
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+        await expect(refundLifetimePurchase(CHARGE as never)).rejects.toThrow('db down')
     })
 })

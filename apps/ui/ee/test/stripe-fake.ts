@@ -20,7 +20,7 @@ export function fakeStripe() {
         customers: { create: vi.fn(), retrieve: vi.fn(), update: vi.fn(), createTaxId: vi.fn(), deleteTaxId: vi.fn() },
         subscriptions: { create: vi.fn(), retrieve: vi.fn(), update: vi.fn(), list: vi.fn(), cancel: vi.fn() },
         subscriptionSchedules: { create: vi.fn(), retrieve: vi.fn(), update: vi.fn(), release: vi.fn() },
-        checkout: { sessions: { create: vi.fn(), retrieve: vi.fn(), update: vi.fn() } },
+        checkout: { sessions: { create: vi.fn(), retrieve: vi.fn(), update: vi.fn(), list: vi.fn() } },
         setupIntents: { retrieve: vi.fn() },
         paymentMethods: { retrieve: vi.fn() },
         paymentIntents: { retrieve: vi.fn() },

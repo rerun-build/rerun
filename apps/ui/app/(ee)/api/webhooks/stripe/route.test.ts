@@ -13,7 +13,7 @@ import { markPaymentMethodAdded } from '@/app/api/_services/getting-started.serv
 import { enforceTrialCardClaim } from '@/ee/services/trial-card.service'
 import { applyTemplateSubscription, recordTemplatePurchase, recordTemplateRenewal, refundTemplatePurchase, revokeTemplateSubscription } from '@/ee/services/template-purchase.service'
 import { recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
-import { deliverLifetimeCheckout } from '@/ee/services/lifetime-deal.service'
+import { deliverLifetimeCheckout, refundLifetimePurchase } from '@/ee/services/lifetime-deal.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { signedStripeRequest, TEST_WEBHOOK_SECRET } from '@/ee/test/stripe-fake'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent } from './idempotency'
@@ -53,6 +53,7 @@ vi.mock('@/ee/services/credit-purchase.service', async importOriginal => ({
 vi.mock('@/ee/services/lifetime-deal.service', async importOriginal => ({
     isLifetimeCheckoutSession: (await importOriginal<typeof import('@/ee/services/lifetime-deal.service')>()).isLifetimeCheckoutSession,
     deliverLifetimeCheckout: vi.fn(),
+    refundLifetimePurchase: vi.fn(),
 }))
 vi.mock('./idempotency', async importOriginal => ({ ...(await importOriginal<typeof import('./idempotency')>()), claimStripeEvent: vi.fn(), markStripeEventProcessed: vi.fn(), releaseStripeEvent: vi.fn() }))
 
@@ -337,5 +338,10 @@ describe('charge.refunded', () => {
     it('takes back the Rerun credit of a refunded purchase', async () => {
         await deliver('charge.refunded', { id: 'ch_1' })
         expect(refundCreditPurchase).toHaveBeenCalledWith(expect.objectContaining({ id: 'ch_1' }))
+    })
+
+    it('takes back the code of a refunded lifetime deal', async () => {
+        await deliver('charge.refunded', { id: 'ch_1' })
+        expect(refundLifetimePurchase).toHaveBeenCalledWith(expect.objectContaining({ id: 'ch_1' }))
     })
 })

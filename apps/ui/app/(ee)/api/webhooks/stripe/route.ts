@@ -20,7 +20,7 @@ import {
 } from '@/ee/services/template-purchase.service'
 import { isTemplateCheckoutSession, isTemplateSubscription } from '@/ee/lib/billing/marketplace'
 import { isCreditCheckoutSession, recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
-import { deliverLifetimeCheckout, isLifetimeCheckoutSession } from '@/ee/services/lifetime-deal.service'
+import { deliverLifetimeCheckout, isLifetimeCheckoutSession, refundLifetimePurchase } from '@/ee/services/lifetime-deal.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import type Stripe from 'stripe'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent, unclaimedResponse } from './idempotency'
@@ -155,7 +155,7 @@ export async function POST(req: Request) {
                 break
             }
             case 'charge.refunded':
-                await runEach([() => refundTemplatePurchase(event.data.object), () => refundCreditPurchase(event.data.object)])
+                await runEach([() => refundTemplatePurchase(event.data.object), () => refundCreditPurchase(event.data.object), () => refundLifetimePurchase(event.data.object)])
                 break
         }
         await markStripeEventProcessed(event.id)
