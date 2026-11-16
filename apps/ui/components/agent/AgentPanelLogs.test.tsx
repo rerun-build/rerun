@@ -166,6 +166,20 @@ describe('AgentPanelLogs tabs', () => {
         expect(mocks.getRunStepsAction).toHaveBeenCalledTimes(1)
     })
 
+    it('a run cut by a restart shows the tool calls it kept, or says its steps were lost', async () => {
+        mocks.listRunsAction.mockResolvedValue([run('e1', 'error', { error: 'interrupted: engine restarted' }), run('e2', 'error', { error: 'interrupted: engine restarted' })])
+        mocks.getRunToolsAction.mockImplementation(async (_a: string, id: string) => (id === 'e1' ? [{ id: 't1', runId: 'e1', stepNumber: 1, toolName: 'Read', inputJson: null, resultJson: '"ok"', isError: 0, durationMs: null }] : []))
+        await mount()
+        await act(async () => { tab('Failed').click() })
+        const [e1, e2] = Array.from(rows()) as HTMLElement[]
+        await act(async () => { e1!.querySelector('button')!.click(); e2!.querySelector('button')!.click() })
+        await settle()
+        expect(e1!.textContent).toContain('Read')
+        expect(e1!.textContent).not.toContain('No steps recorded')
+        expect(e2!.textContent).toContain('The record of 3 steps was lost when the run stopped.')
+        expect(e2!.textContent).not.toContain('No steps recorded')
+    })
+
     it('keeps working when the snapshot read throws', async () => {
         mocks.readFactorySnapshotAction.mockRejectedValue(new Error('down'))
         mocks.listRunsAction.mockResolvedValue([run('r1', 'done', { jobRef: 'rerun#332' })])

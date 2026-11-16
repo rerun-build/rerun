@@ -12,6 +12,7 @@ const schema = z.object({
     RERUN_LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
     RERUN_CODEX_PATH: z.string().optional(),
     RERUN_DESKTOP: z.string().optional(),
+    RERUN_FS_EXTRA_ROOTS: z.string().optional(),
 })
 
 export type Env = z.infer<typeof schema>

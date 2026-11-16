@@ -151,6 +151,11 @@ class World:
         if a[:2] == ["issue", "edit"] and "--add-label" in a and a[a.index("--add-label") + 1] == "factory":
             self.unlabelled.discard(int(a[2]))
             return ""
+        if a[:2] == ["issue", "list"] and "Factory follow-ups inbox in:title" in a:
+            return json.dumps([{"number": p["number"], "title": p["title"]} for p in self.problems if p["state"] == "OPEN"])
+        if a[:2] == ["issue", "list"] and "--label" not in a and "--search" not in a and any(i.get("labels") for i in self.issues):
+            return json.dumps([{"number": i["number"], "title": i["title"], "labels": i["labels"], "createdAt": i.get("createdAt", "")}
+                               for i in self.issues if i.get("labels")])
         if a[:2] == ["issue", "list"] and "--label" not in a:
             return json.dumps([{"number": n} for n in sorted(self.open_numbers)])
         if a[:2] == ["issue", "list"]:
@@ -858,7 +863,7 @@ class Secrets(Base):
         self.assertNotIn(self.TOKEN, str(d.store.jobs()))
 
     def test_start_line_for_once(self):
-        for name, fake in (("settings", lambda: self.cfg), ("make_account", lambda url, key: self.w.account),
+        for name, fake in (("settings", lambda: dict(self.cfg, proof=True)), ("make_account", lambda url, key: self.w.account),
                            ("make_gh", lambda tok: self.w.gh), ("read_secret", lambda path: "fake-key")):
             self.addCleanup(setattr, D, name, getattr(D, name))
             setattr(D, name, fake)

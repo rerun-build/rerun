@@ -28,7 +28,7 @@ import { appendMessage, lastMessageId, listSessionAuthorIds, setMessageToolCalls
 import type { MessageRow } from '../db/schema.js'
 import { isSharedConversation, signText } from './message-authors.js'
 import { bumpRunStep, cancelRun, failRun, finishRun, recordGoalVerdict, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } from '../db/repos/runs.js'
-import { insertRunStep, insertToolCall } from '../db/repos/telemetry.js'
+import { insertRunStep, insertToolCall, updateToolCall } from '../db/repos/telemetry.js'
 import { touchSession } from '../db/repos/sessions.js'
 import { logger } from '../lib/logger.js'
 import { newId, nowIso } from '../lib/ids.js'
@@ -160,9 +160,22 @@ type StepLike = {
     providerMetadata?: unknown
     toolCalls?: Array<{ toolCallId?: string; toolName: string; input?: unknown }>
     toolResults?: Array<{ toolCallId?: string; output?: unknown }>
+    content?: Array<{ type: string; toolCallId?: string; error?: unknown }>
 }
 
-async function recordStepTelemetry(agentId: string, sessionId: string, runId: string, provider: string, model: string, stepNumber: number, durationMs: number, step: StepLike, costMicros: number | null, effort: string | null): Promise<void> {
+const TOOL_ERROR_CHARS = 2_000
+const NO_TOOL_RESULT = 'no result: the run ended'
+
+function toolErrorText(error: unknown, secrets: string[]): string {
+    const text = Array.isArray(error) ? error.map(block => (typeof block?.text === 'string' ? block.text : JSON.stringify(block))).join('\n') : typeof error === 'string' ? error : errorMessageOf(error)
+    return secrets.reduce((out, secret) => out.split(secret).join('[redacted]'), text).slice(0, TOOL_ERROR_CHARS)
+}
+
+function runSecrets(agent: LoadedAgent): string[] {
+    return [...Object.values(agent.env), ...Object.values(agent.resolved.connection?.env ?? {})].filter(value => value.length >= 8)
+}
+
+async function recordStepTelemetry(agentId: string, sessionId: string, runId: string, provider: string, model: string, stepNumber: number, durationMs: number, step: StepLike, costMicros: number | null, effort: string | null, secrets: string[], liveCalls: Map<string, string>): Promise<void> {
     const calls = step.toolCalls ?? []
     const results = step.toolResults ?? []
     await insertRunStep(agentId, {
@@ -189,6 +202,14 @@ async function recordStepTelemetry(agentId: string, sessionId: string, runId: st
     })
     for (const call of calls) {
         const result = results.find(r => r.toolCallId === call.toolCallId)
+        const failure = result ? undefined : step.content?.find(part => part.type === 'tool-error' && part.toolCallId === call.toolCallId)
+        const resultJson = result ? safeJson(result.output) : safeJson(failure ? toolErrorText(failure.error, secrets) : NO_TOOL_RESULT)
+        const isError = result ? 0 : 1
+        const liveId = call.toolCallId ? liveCalls.get(call.toolCallId) : undefined
+        if (liveId) {
+            await updateToolCall(agentId, liveId, { resultJson, isError })
+            continue
+        }
         await insertToolCall(agentId, {
             id: newId(),
             runId,
@@ -198,12 +219,26 @@ async function recordStepTelemetry(agentId: string, sessionId: string, runId: st
             toolCallId: call.toolCallId ?? null,
             toolName: call.toolName,
             inputJson: safeJson(call.input),
-            resultJson: result ? safeJson(result.output) : null,
-            isError: result ? 0 : 1,
+            resultJson,
+            isError,
             durationMs: null,
             createdAt: nowIso(),
         })
     }
+}
+
+type LiveToolChunk = { type: 'tool-call' | 'tool-result'; toolCallId: string; toolName: string; input?: unknown; output?: unknown }
+
+async function recordLiveToolCall(agentId: string, sessionId: string, runId: string, stepNumber: number, chunk: LiveToolChunk, liveCalls: Map<string, string>): Promise<void> {
+    const known = liveCalls.get(chunk.toolCallId)
+    if (chunk.type === 'tool-result') {
+        if (known) await updateToolCall(agentId, known, { resultJson: safeJson(chunk.output), isError: 0 })
+        return
+    }
+    if (known) return
+    const id = newId()
+    await insertToolCall(agentId, { id, runId, agentId, sessionId, stepNumber, toolCallId: chunk.toolCallId, toolName: chunk.toolName, inputJson: safeJson(chunk.input), resultJson: null, isError: 0, durationMs: null, createdAt: nowIso() })
+    liveCalls.set(chunk.toolCallId, id)
 }
 
 export async function runAgent(agent: LoadedAgent, sessionId: string, userText: string, override?: ModelOverride, writer?: UIMessageStreamWriter, runId?: string, trigger: RunTrigger = { source: 'chat' }): Promise<AgentRun> {
@@ -235,6 +270,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     let goalChecked: 'met' | 'not_met' | undefined
     const goalOf = trigger.source === 'chat' ? trigger.goal : undefined
     let live: LiveCounter | undefined
+    const liveCalls = new Map<string, string>()
     const stepsToWrite = (): number => Math.max(steps, live?.snapshot().toolCalls ?? 0)
     const partialResults: PartialResult[] = []
     const delegated: DelegatedUsage = { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0, reasoningTokens: 0, totalTokens: 0 }
@@ -478,8 +514,10 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                     ...(!CLI_PROVIDERS.has(provider) && hitlStepLacksMessage(steps) ? { toolChoice: 'none' as const } : {}),
                 }
             },
-            onChunk: ({ chunk }) => {
+            onChunk: async ({ chunk }) => {
                 if (chunk.type === 'tool-call') live?.addToolCall()
+                if (!live || (chunk.type !== 'tool-call' && chunk.type !== 'tool-result')) return
+                await recordLiveToolCall(agent.id, sessionId, run.id, steps + 1, chunk, liveCalls).catch(err => logger.warn({ err: String(err), agent: agent.id }, 'record live tool call failed'))
             },
             onStepFinish: async step => {
                 steps += 1
@@ -489,7 +527,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                 const stepCostMicros = costMicrosFrom(step.providerMetadata)
                 if (stepCostMicros !== null) runCostMicros = (runCostMicros ?? 0) + stepCostMicros
                 await bumpRunStep(agent.id, run.id, stepsToWrite()).catch(() => {})
-                await recordStepTelemetry(agent.id, sessionId, run.id, provider, model, steps, durationMs, step, stepCostMicros, agent.config.thinkingLevel ?? null).catch(err => logger.warn({ err: String(err), agent: agent.id }, 'record step telemetry failed'))
+                await recordStepTelemetry(agent.id, sessionId, run.id, provider, model, steps, durationMs, step, stepCostMicros, agent.config.thinkingLevel ?? null, runSecrets(agent), liveCalls).catch(err => logger.warn({ err: String(err), agent: agent.id }, 'record step telemetry failed'))
             },
             onError: async ({ error }) => {
                 if (controller.signal.aborted) {

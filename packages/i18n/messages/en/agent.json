@@ -991,6 +991,7 @@
         "stepCount": "{count, plural, one {# step} other {# steps}}",
         "step": "Step {number}",
         "noSteps": "No steps recorded for this run.",
+        "stepsLost": "{count, plural, one {The record of # step was lost when the run stopped.} other {The record of # steps was lost when the run stopped.}}",
         "input": "Input",
         "output": "Output",
         "filters": { "running": "Running", "failed": "Failed", "done": "Done" },
