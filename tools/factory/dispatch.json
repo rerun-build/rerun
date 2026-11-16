@@ -11,7 +11,9 @@
   "auto_plan_marker": true,
   "likely_fixed_days": 7,
   "planning": {
-    "max_queue": 20
+    "max_queue": 20,
+    "plan_by": ["Boss"],
+    "cut_by": ["Scope Shaper", "IKE"]
   },
   "proof": true,
   "one_file_one_job": true,

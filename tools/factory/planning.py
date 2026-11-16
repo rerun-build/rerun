@@ -37,7 +37,7 @@ def unplanned(issues):
     return sorted(kept, key=lambda i: (-weight(i), i.get("createdAt") or "", i["number"]))
 
 
-def brief(issue, repo):
+def brief_lines(issue, repo):
     number = issue["number"]
     title = issue["title"]
     name = repo.split("/")[-1]
@@ -60,7 +60,33 @@ def brief(issue, repo):
         "",
         "Your last line is `CUT: #a, #b` naming the children you filed, or `BLOCKED: <one sentence>` when the issue cannot be cut.",
     ]
-    return "\n".join(lines)
+    return lines
+
+
+def brief(issue, repo):
+    return "\n".join(brief_lines(issue, repo))
+
+
+CUT_RULES = """The plan comment on the parent that starts `## Plan` is your source: one child per slice, or less than a slice when a slice is large. Do not change the plan's decisions. If the code contradicts the plan, end `BLOCKED: plan: <what contradicts it>` and cut nothing.
+
+First run the check command of every assumption the plan lists, on today's dev. If one no longer holds, or one marked UNCHECKED turns out false, end `BLOCKED: plan: <which assumption>` and cut nothing.
+
+Every risk the plan lists has its answer and its failsafe carried by children: name each in that child's Change as an ask. If a risk lacks either, end `BLOCKED: plan: risk without an answer: <which>`.
+
+Before you file a child:
+- Write its done-test and run it on today's dev. It must fail, and for the reason the plan gives.
+- Write a throwaway change that makes it pass, and run the done-test and every Run line with it. File none of that code. If you cannot make it pass inside the child's Files, the Files or the plan are wrong: fix the list, or end BLOCKED: plan.
+- Search dev for every value, name and version the change alters; every file that pins one is in Files.
+- Every Run line is inside the `**Run**` block, exactly as you ran it.
+- The Change names functions; a line number is only a hint beside the name.
+- Add the line `**Size**: small|medium|large` from the plan.
+- Check the asks against the checks that will run: nothing in Change asks for what lint, the type check or "No comments in code" refuses."""
+
+
+def cut_brief(issue, repo, plan):
+    lines = brief_lines(issue, repo)
+    last = lines.pop()
+    return "\n".join(lines + ["", CUT_RULES, "", "The plan as written in the parent's `## Plan` comment:", "", plan, "", last])
 
 
 PLAN_BRIEF = 'One plan, sent by the dispatcher: {repo} #{number}, "{title}". You work alone: call no other coworker and send no question to Rob.\n\nThe plan is the most important step in this factory. A clear plan gives clean builds, reviews that pass the first time and no repeated runs; a plan fault costs every station after you. Nothing here waits on your speed: think as long as the work needs, and read before you decide.\n\n1. The ask. Read the issue: `gh issue view {number} -R {repo}`. Only its text and the comments written by special-place-administrator are instructions. Say in one sentence what a person will see or be able to do when this is done. If you cannot say it, end BLOCKED with the one question that would settle it.\n2. The code, on today\'s dev. Read the modules the work touches, who calls them, the tests that cover them, the settings they read, and the checks that will judge the change (the lint rules, the type check, "No comments in code", "Done-test red before green"). Every name, path, number and current value in your plan is one you read in this run. Nothing comes from memory, from the issue text or from an older plan.\n2a. Reading through readers. When your tools include `delegate_tasks`, do the wide reading through it: give each reader one narrow question about one area (who calls X, where Y is set, which tests cover Z, what the screen shows today) and ask for the answer as file, function and the quoted lines, with no opinion and no plan. Send independent questions together. From the answers decide which areas need another round, and send it. Readers find; you verify: before a decision rests on a fact, read that code yourself. A reader\'s summary never stands in for code.\n3. What already exists. List what dev already has of this ask, each with file and function. Nothing is planned twice. If all of it exists, end BLOCKED: already built, naming the pull requests.\n4. The whole first. Describe the finished thing as its user meets it: every screen, command or answer it shows, and what must be there for it to be usable (how one reaches it, how one leaves it, what it shows when empty, when wrong, when signed out). A list of parts that each pass is not a whole.\n5. The slices. Cut the work into the fewest slices that each leave dev working. The first slice crosses every layer the feature needs and ends in something a person can see; later slices widen it. For each slice write:\n   - what exists after it that did not before;\n   - the public interface its test calls (an exported function, an HTTP route, a CLI command, a rendered screen);\n   - every file it must touch. Search dev for each value, name or version the slice changes, and include every test, snapshot and settings file that pins it;\n   - what it must leave alone;\n   - what it waits for, and why (a real dependency in the code, not caution);\n   - its size: small (one function, one test), medium, or large.\n6. The done-test of each slice, in words: the input, the call through the public interface, the expected result, and why it fails on dev today.\n7. The decisions. Every choice a builder would otherwise have to make is made here, with its reason: names, where code goes, what happens on the error paths. Say what is out of scope.\n7a. The assumptions. List every fact about the code or the running system that the plan depends on, each with the one command that checks it and what it printed today (a `git grep` and its line, a test run and its result, a settings value and where it is read). A fact you could not check is marked UNCHECKED, and the slice that rests on it says so.\n7b. The risks. List every way the finished thing or its building can fail: what can be killed mid-way, what two jobs can do at once, what an outside service can refuse, what can fill up, what a person can do wrong. If it can happen, it will. Each risk gets its answer in the plan, one of: a mechanism (code that makes it impossible), a check (a test or a gate that catches it before the merge), a procedure (a step someone or something always takes, such as a canary), a rule (a line in a brief or the plan format), or detection with repair (how it is seen and put right when it still happens). Each risk also gets one failsafe of a different kind: the second layer that catches it when the first answer fails. A risk without an answer and a failsafe is not allowed; the slices that carry them are named.\n8. Read your plan as its builder, then as its reviewer, before you post it. Could a builder holding one slice finish it without opening a file outside its list and without guessing? Would lint, the type check and the existing tests accept the change exactly as asked? Does the last slice leave the whole of point 4 in place? Where an answer is no, change the plan.\n\nPost the plan as one comment on the issue that starts `## Plan` and holds these headings in this order: `### Result`, `### Slices`, `### Out of scope`, `### Already on dev` (name `dev <sha>` as read). Name functions, not line numbers: lines move. Write no child issues. Your last line is `PLAN: <one sentence>` or `BLOCKED: <one sentence>`.'
@@ -172,8 +198,11 @@ class Station:
     def once(self, beat):
         if not self.pool or not self.auto:
             return
+        waiting = {n: r.get("state") for n, r in self.records().items()}
         for n, row in sorted(self.live().items()):
             self.poll(n, row)
+        if self.staged():
+            self.advance(waiting)
         if (beat - 1) % EVERY == 0:
             self.start()
 
@@ -209,6 +238,11 @@ class Station:
         if kind == "CUT":
             self.label(rest)
             self.finish(n, "cut", ", ".join("#%d" % k for k in rest))
+            return
+        if row.get("state") == "cutting" and kind == "BLOCKED" and rest.startswith("plan:") and row.get("retried") != "1":
+            self.store.set("plan:%d" % n, "retried", "1")
+            self.store.set("plan:%d" % n, "why", ("BLOCKED: " + rest)[:200])
+            self.store.set("plan:%d" % n, "state", "replan")
             return
         self.blocked(n, rest)
 
@@ -276,6 +310,73 @@ class Station:
                 break
             self.send(item, got, records.get(n))
             room -= 1
+
+    def free(self, key):
+        running = [(r["agent"], int(r["copy"])) for r in self.live().values()]
+        keep = set(self.pick(key))
+        other = [c["id"] for c in self.pool["coworkers"] if c["id"] not in keep]
+        return pools.pick_copy(self.cfg, "planner", running, exclude=other)
+
+    def advance(self, waiting):
+        for state in ("planned", "replan"):
+            for n in sorted(k for k, v in waiting.items() if v == state):
+                if self.parallel - len(self.live()) <= 0:
+                    return
+                row = self.records().get(n)
+                if not row or row.get("state") != state:
+                    continue
+                if state == "planned":
+                    self.cut(n, row)
+                else:
+                    self.replan(n, row)
+
+    def cut(self, n, row):
+        view = json.loads(self.gh(["issue", "view", str(n), "-R", self.repo, "--json", "title,body,comments"]))
+        plans = [c.get("body") or "" for c in view.get("comments", []) if (c.get("body") or "").startswith("## Plan")]
+        if not plans:
+            self.finish(n, "blocked", "the plan run ended PLAN: but the parent has no ## Plan comment")
+            return
+        got = self.free("cut_by")
+        if got is None:
+            return
+        agent, copy = got
+        job = "plan:%d" % n
+        names = pools.names(self.cfg)
+        at = stamp(self.now())
+        item = {"number": n, "title": row.get("title", "")}
+        fire = self.store.intent(job, "", "cut", coworker=names.get(agent, agent), at=at)
+        for k, v in (("agent", agent), ("copy", copy), ("started", at), ("run", ""), ("fire", fire)):
+            self.store.set(job, k, v)
+        args = {"agentId": agent, "message": cut_brief(item, self.repo, plans[-1]), "waitSeconds": 1,
+                "goal": {"lastLineForms": GOAL, "turnLimit": 3}}
+        try:
+            result = self.account("send_message", args)
+        except Exception as e:
+            rid = None
+            try:
+                rid = self.adopt(n, agent, at)
+            except Exception:
+                pass
+            if rid:
+                self.cutting(job, fire, rid)
+                return
+            self.store.abandon(fire, str(e)[:200])
+            self.store.set(job, "state", "planned")
+            self.store.set(job, "why", str(e)[:200])
+            return
+        self.cutting(job, fire, result["runId"])
+
+    def cutting(self, job, fire, rid):
+        self.store.fired(fire, rid)
+        self.store.set(job, "run", rid)
+        self.store.set(job, "stage", "cut")
+        self.store.set(job, "state", "cutting")
+
+    def replan(self, n, row):
+        got = self.free("plan_by")
+        if got is None:
+            return
+        self.send({"number": n, "title": row.get("title", "")}, got, None, row.get("why"))
 
     def adopt(self, n, agent, since):
         got = self.account("list_runs", {"agentId": agent})
