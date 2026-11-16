@@ -222,15 +222,24 @@ class Resolver:
         args = {"agentId": agent, "message": self.brief(d.repo, key, r), "waitSeconds": 1,
                 "goal": {"lastLineForms": [dict(f) for f in FORMS], "turnLimit": 3}}
         r.update(state="resolving", agent=agent, copy=copy, run=None, sent_at=d.now(), sends=r.get("sends", 0) + 1)
+        r["fire"] = d.store.intent(str(r["issue"]), "", "resolve", coworker=name)
         self.put(d, key, r)
         try:
             run = d.account("send_message", args)
         except Exception as e:
+            d.store.abandon(r["fire"], str(e)[:200])
             self.log(r["issue"], "problem %s: send to %s raised, its copy stays taken until the run limit: %s" % (key, name, e))
             return
         r["run"] = (run or {}).get("runId")
+        d.store.fired(r["fire"], r["run"])
         self.put(d, key, r)
         self.log(r["issue"], "problem %s -> %s (run %s)" % (key, name, r["run"]))
+
+    def close_fire(self, d, r, run):
+        counts = [run.get(k) for k in ("inputTokens", "outputTokens", "cachedInputTokens")]
+        good = lambda x: isinstance(x, int) and not isinstance(x, bool) and x >= 0
+        ti, to, cr = counts[0] if good(counts[0]) else 0, counts[1] if good(counts[1]) else 0, counts[2] if good(counts[2]) else None
+        d.store.close_run(r["run"], "done" if run.get("status") == "done" else "error", tokens_in=ti, tokens_out=to, cache_read=cr)
 
     def back(self, d, key, r, why):
         r.update(state="resolve_wait", agent=None, copy=None, run=None)
@@ -254,6 +263,7 @@ class Resolver:
             d.account("cancel_run", {"agentId": r["agent"], "runId": r["run"]})
             self.log(r["issue"], "problem %s: run %s past %d s, cancelled" % (key, r["run"], limit))
             run = {"status": "cancelled"}
+        self.close_fire(d, r, run)
         if run.get("status") == "error":
             k = clocks.klass("ERROR", run)
             if k == "plan_limit":
