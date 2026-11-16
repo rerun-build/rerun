@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-import json, os, sqlite3, sys
-A = "/data/agents"
+import json, os, re, sqlite3, sys
+A = os.environ.get("JOBCOST_AGENTS", "/data/agents")
 if len(sys.argv) < 2 or "#" not in sys.argv[1]:
     print("usage: job-cost <repo>#<issue> [--steps]"); sys.exit(2)
 tag = "JOB " + sys.argv[1].split("/")[-1]
+RX = re.compile(r"JOB (?:[\w.-]+/)?%s(?!\d)" % re.escape(tag[4:]))
 rows = []
 for d in sorted(os.listdir(A)):
     db, cf = "%s/%s/data/system.db" % (A, d), "%s/%s/config.json" % (A, d)
@@ -12,15 +13,15 @@ for d in sorted(os.listdir(A)):
     name = json.load(open(cf)).get("displayName") or json.load(open(cf)).get("name")
     try:
         con = sqlite3.connect("file:%s?mode=ro" % db, uri=True, timeout=5)
-        like = "%" + tag + "%"
-        sess = {r[0] for r in con.execute("select distinct session_id from messages where role='user' and content_json like ?", (like,))}
-        runs = {r[0] for r in con.execute("select distinct run_id from tool_calls where input_json like ?", (like,))}
+        con.create_function("jobmatch", 1, lambda t: 1 if t and RX.search(t) else 0)
+        sess = {r[0] for r in con.execute("select distinct session_id from messages where role='user' and jobmatch(content_json)")}
+        runs = {r[0] for r in con.execute("select distinct run_id from tool_calls where jobmatch(input_json)")}
         q = "select id,session_id,status,model,started_at,finished_at,step_count,error from runs"
         for rid, sid, st, model, t0, t1, steps, err in con.execute(q):
             if rid not in runs and sid not in sess:
                 continue
             if sid in sess and rid not in runs:
-                first = con.execute("select min(created_at) from messages where session_id=? and role='user' and content_json like ?", (sid, like)).fetchone()[0]
+                first = con.execute("select min(created_at) from messages where session_id=? and role='user' and jobmatch(content_json)", (sid,)).fetchone()[0]
                 if t1 and first and t1 < first:
                     continue
             i, c, w, o, n = con.execute("select coalesce(sum(input_tokens),0),coalesce(sum(cached_input_tokens),0),coalesce(sum(cache_write_tokens),0),coalesce(sum(output_tokens),0),count(*) from run_steps where run_id=?", (rid,)).fetchone()
