@@ -1,4 +1,4 @@
-import { OPENAI_API_CREDITS, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
+import { ANTHROPIC_API_CREDITS, ANTHROPIC_KEY_NOT_SCOPED, OPENAI_API_CREDITS, OPENCODE_CREDITS_USED_UP, OPENCODE_GO_LIMIT, classifyChatError, stripErrorPrefix, type ChatErrorKind } from './chat-error.js'
 import { modelLabel } from './models.js'
 
 // The Rerun proxy returns 402 { error: 'rerun_budget_exhausted' } when a workspace
@@ -14,10 +14,10 @@ export function isBudgetExhausted(message: string): boolean {
 // claude-code's own raw reasons are `error_max_turns` and `error_during_execution`.
 //
 // `not_in_plan` is a model the plan does not include at all ("Fable 5.1 requires usage credits"),
-// `credits` the paid overage spent (or, on `openai`, the API account's prepaid credits), `spend` an
-// organization's monthly cap.
+// `credits` the paid overage spent (or, on `openai` and `anthropic`, the API account's prepaid
+// credits), `spend` an organization's monthly cap.
 export type SubscriptionLimit = {
-    plan: 'claude' | 'chatgpt' | 'opencode' | 'openai' | null
+    plan: 'claude' | 'chatgpt' | 'opencode' | 'openai' | 'anthropic' | null
     scope: 'session' | 'weekly' | 'monthly' | 'model' | 'not_in_plan' | 'credits' | 'spend'
     modelName?: string
     resetsAt?: string
@@ -59,6 +59,7 @@ export function describeSubscriptionLimit(raw: string): SubscriptionLimit {
     const opencode = opencodeLimit(message, m)
     if (opencode) return opencode
     if (OPENAI_API_CREDITS.test(message)) return { plan: 'openai', scope: 'credits' }
+    if (ANTHROPIC_API_CREDITS.test(message)) return { plan: 'anthropic', scope: 'credits' }
     const codex = m.includes('codex') || m.includes('chatgpt')
     if (m.includes('requires usage credits')) return { plan: 'claude', scope: 'not_in_plan', modelName: modelNotInPlan(message) }
     if (m.includes('not supported when using codex') || m.includes('does not exist or you do not have access')) return { plan: codex ? 'chatgpt' : null, scope: 'not_in_plan', modelName: modelNotInPlan(message) }
@@ -81,11 +82,11 @@ type ExplainedKind = Exclude<TitledKind, 'run_in_flight'>
 
 const EXPLAINED_KINDS: readonly ExplainedKind[] = ['budget', 'unauthorized', 'overloaded', 'context_window', 'provider_error', 'thinking_replay', 'interrupted', 'session_gone']
 
-type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeWindow' | 'opencode' | 'openaiCredits'
-type LimitMessageKey = 'openaiCredits' | 'opencodeCredits' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
+type LimitTitleKey = 'usageLimit' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'credits' | 'spend' | 'window' | 'model' | 'claudeSession' | 'usage' | 'opencodeCredits' | 'opencodeWindow' | 'opencode' | 'openaiCredits' | 'anthropicCredits'
+type LimitMessageKey = 'openaiCredits' | 'anthropicCredits' | 'opencodeCredits' | 'opencodeWindowResets' | 'opencodeWindow' | 'modelUnavailable' | 'anyModelUnavailable' | 'modelNotInPlan' | 'anyModelNotInPlan' | 'usageLimit' | 'credits' | 'spend' | 'weeklyResets' | 'weekly' | 'model' | 'sessionResets' | 'session'
 
 // The `chatErrors` namespace: next-intl's, use-intl's or the server's `t` of it fits as is.
-export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
+export type ChatErrorCopy = (key: 'generic' | 'modelAtCapacity.title' | 'modelAtCapacity.message' | 'anthropicKeyNotScoped.title' | 'anthropicKeyNotScoped.message' | `titles.${TitledKind}` | `messages.${ExplainedKind}` | `limits.titles.${LimitTitleKey}` | `limits.messages.${LimitMessageKey}`, values?: Record<string, string>) => string
 
 function opencodeLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.scope === 'credits') return t('limits.messages.opencodeCredits')
@@ -103,6 +104,7 @@ function opencodeLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string 
 export function subscriptionLimitMessage(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.plan === 'opencode') return opencodeLimitMessage(limit, t)
     if (limit.plan === 'openai') return t('limits.messages.openaiCredits')
+    if (limit.plan === 'anthropic') return t('limits.messages.anthropicCredits')
     if (limit.scope === 'not_in_plan') {
         const model = limit.modelName
         if (!limit.plan) return model ? t('limits.messages.modelUnavailable', { model }) : t('limits.messages.anyModelUnavailable')
@@ -121,6 +123,7 @@ export function subscriptionLimitMessage(limit: SubscriptionLimit, t: ChatErrorC
 export function subscriptionLimitTitle(limit: SubscriptionLimit, t: ChatErrorCopy): string {
     if (limit.plan === 'opencode') return opencodeLimitTitle(limit, t)
     if (limit.plan === 'openai') return t('limits.titles.openaiCredits')
+    if (limit.plan === 'anthropic') return t('limits.titles.anthropicCredits')
     if (limit.scope === 'not_in_plan') {
         const model = limit.modelName
         if (!limit.plan) return model ? t('limits.titles.modelUnavailable', { model }) : t('limits.titles.anyModelUnavailable')
@@ -142,11 +145,17 @@ function isModelAtCapacity(kind: ChatErrorKind, message: string): boolean {
     return kind === 'overloaded' && /at capacity/i.test(message)
 }
 
+// Reconnecting the same key fails the same way: the notice says which key to make instead.
+export function isAnthropicKeyNotScoped(kind: ChatErrorKind, message: string): boolean {
+    return kind === 'unauthorized' && ANTHROPIC_KEY_NOT_SCOPED.test(message)
+}
+
 // A generic error has no headline worth more than its own text, so it gets none.
 export function chatErrorTitle(kind: ChatErrorKind, message: string, t: ChatErrorCopy): string | null {
     if (kind === 'generic') return null
     if (kind === 'usage_limit') return subscriptionLimitTitle(describeSubscriptionLimit(message), t)
     if (isModelAtCapacity(kind, message)) return t('modelAtCapacity.title')
+    if (isAnthropicKeyNotScoped(kind, message)) return t('anthropicKeyNotScoped.title')
     return t(`titles.${kind}`)
 }
 
@@ -158,6 +167,7 @@ export function friendlyError(message: string, t: ChatErrorCopy): string {
     const kind = classifyChatError(message)
     if (kind === 'usage_limit') return subscriptionLimitMessage(describeSubscriptionLimit(message), t)
     if (isModelAtCapacity(kind, message)) return t('modelAtCapacity.message')
+    if (isAnthropicKeyNotScoped(kind, message)) return t('anthropicKeyNotScoped.message')
     if (isExplainedKind(kind)) return t(`messages.${kind}`)
     return stripErrorPrefix(message) || t('generic')
 }

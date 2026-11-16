@@ -4,6 +4,10 @@
         "title": "Modelo saturado",
         "message": "Este modelo no tiene capacidad ahora mismo. Inténtalo de nuevo en un momento o elige otro modelo."
     },
+    "anthropicKeyNotScoped": {
+        "title": "Clave de Anthropic sin workspace",
+        "message": "Esta clave vale para todos los workspaces de su organización de Anthropic. Crea una clave dentro de un solo workspace en la consola de Anthropic y vuelve a conectarla."
+    },
     "titles": {
         "budget": "Créditos de Rerun agotados",
         "unauthorized": "Hay que volver a conectar",
@@ -41,10 +45,12 @@
             "opencodeCredits": "Créditos de OpenCode agotados",
             "opencodeWindow": "Límite {window, select, weekly {semanal} other {mensual}} de OpenCode Go alcanzado",
             "opencode": "Límite de OpenCode Go alcanzado",
-            "openaiCredits": "Créditos de la API de OpenAI agotados"
+            "openaiCredits": "Créditos de la API de OpenAI agotados",
+            "anthropicCredits": "Créditos de la API de Anthropic agotados"
         },
         "messages": {
             "openaiCredits": "Tu cuenta de la API de OpenAI no tiene créditos. Añade créditos en platform.openai.com, o cambia este coworker a otro modelo.",
+            "anthropicCredits": "Tu cuenta de la API de Anthropic no tiene créditos. Añade créditos en la consola de Anthropic, en Billing, o cambia este coworker a otro modelo.",
             "opencodeCredits": "No te quedan créditos de Console. Añade créditos en opencode.ai, o elige un modelo Go para continuar.",
             "opencodeWindowResets": "Tu plan OpenCode Go alcanzó su límite {window, select, weekly {semanal} monthly {mensual} other {de 5 horas}}. Se reinicia: {resetsAt}. Hasta entonces, cambia a un modelo de Console o a otro proveedor.",
             "opencodeWindow": "Tu plan OpenCode Go alcanzó su límite {window, select, weekly {semanal} monthly {mensual} other {de 5 horas}}. Cambia a un modelo de Console o a otro proveedor hasta que se reinicie.",

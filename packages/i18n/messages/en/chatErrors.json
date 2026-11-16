@@ -11,12 +11,18 @@
         "limits.messages.weeklyResets": "{plan} is an AI subscription (Claude, ChatGPT). {resetsAt} is a time written by the provider in English, e.g. '6:50pm (UTC)'.",
         "limits.messages.sessionResets": "{plan} is an AI subscription (Claude, ChatGPT). {resetsAt} is a time written by the provider in English, e.g. '6:50pm (UTC)'.",
         "limits.messages.spend": "{plan} is an AI subscription (Claude). The organization is the company account at the AI provider.",
-        "limits.messages.openaiCredits": "The OpenAI API is a product name, billed apart from a ChatGPT subscription: its account is topped up with prepaid credits. Keep platform.openai.com as it is."
+        "limits.messages.openaiCredits": "The OpenAI API is a product name, billed apart from a ChatGPT subscription: its account is topped up with prepaid credits. Keep platform.openai.com as it is.",
+        "limits.messages.anthropicCredits": "The Anthropic API is billed apart from a Claude subscription: its account is topped up with prepaid credits. The Anthropic Console and Billing are names of Anthropic's site and its page.",
+        "anthropicKeyNotScoped.message": "An Anthropic API key belongs to an organization, which holds workspaces. The Anthropic Console is the name of Anthropic's site."
     },
     "generic": "Something went wrong. Try sending your message again.",
     "modelAtCapacity": {
         "title": "Model at capacity",
         "message": "This model has no room right now. Try again in a moment or pick another model."
+    },
+    "anthropicKeyNotScoped": {
+        "title": "Anthropic key not tied to a workspace",
+        "message": "This key works across every workspace of its Anthropic organization. Create a key inside one workspace in the Anthropic Console, then reconnect."
     },
     "titles": {
         "budget": "Rerun credits used up",
@@ -55,10 +61,12 @@
             "opencodeCredits": "OpenCode credits used up",
             "opencodeWindow": "OpenCode Go {window, select, weekly {weekly} other {monthly}} limit reached",
             "opencode": "OpenCode Go limit reached",
-            "openaiCredits": "OpenAI API credits used up"
+            "openaiCredits": "OpenAI API credits used up",
+            "anthropicCredits": "Anthropic API credits used up"
         },
         "messages": {
             "openaiCredits": "Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.",
+            "anthropicCredits": "Your Anthropic API account has no credits left. Add credits in the Anthropic Console under Billing, or switch this coworker to another model.",
             "opencodeCredits": "No Console credits left. Add credits on opencode.ai, or pick a Go model to keep going.",
             "opencodeWindowResets": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. It resets {resetsAt}; switch to a Console model or another provider until then.",
             "opencodeWindow": "Your OpenCode Go plan has reached its {window, select, weekly {weekly} monthly {monthly} other {5-hour}} limit. Switch to a Console model or another provider until it resets.",

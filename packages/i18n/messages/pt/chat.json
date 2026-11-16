@@ -365,7 +365,8 @@
         "reconnect": {
             "title": "Reconectar",
             "cta": "Reconectar",
-            "description": "Entre de novo na conexão que este coworker usa."
+            "description": "Entre de novo na conexão que este coworker usa.",
+            "descriptionReplaceKey": "Cole a nova chave na conexão que este coworker usa."
         }
     },
     "budget": {

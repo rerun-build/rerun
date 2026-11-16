@@ -5,13 +5,14 @@ import { Icon } from '@/components/ui/icon'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import { BorderBeam } from '@rerun/ui'
 import { AlertTriangleIcon, GaugeIcon, MessagePlusIcon, MessageSquareIcon, PlugIcon, RotateCwIcon, ScrollTextIcon, ServerIcon, SquareIcon, UnplugIcon } from '@/lib/icons'
-import { chatErrorTitle, describeSubscriptionLimit, friendlyError, type ChatErrorCopy, type ChatErrorKind } from '@/lib/chat-error'
+import { chatErrorTitle, describeSubscriptionLimit, friendlyError, isAnthropicKeyNotScoped, type ChatErrorCopy, type ChatErrorKind } from '@/lib/chat-error'
 import { useTranslations } from 'next-intl'
 import type { ComponentType } from 'react'
 
 type NoticeKind = Exclude<ChatErrorKind, 'budget'>
 
 const ClaudeGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="claude" className={className} />
+const AnthropicGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="anthropic" className={className} />
 const OpenAIGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="openai" className={className} />
 const OpencodeGlyph = ({ className }: { className?: string }) => <ProviderIcon provider="opencode" className={className} />
 
@@ -37,7 +38,7 @@ function header(kind: NoticeKind, message: string, fallbackTitle: string, tError
     if (kind !== 'usage_limit') return { title, icon: ICONS[kind] }
     const plan = describeSubscriptionLimit(message).plan
     if (!plan) return { title, icon: ICONS.usage_limit }
-    return { title, icon: plan === 'claude' ? ClaudeGlyph : plan === 'opencode' ? OpencodeGlyph : OpenAIGlyph }
+    return { title, icon: plan === 'claude' ? ClaudeGlyph : plan === 'anthropic' ? AnthropicGlyph : plan === 'opencode' ? OpencodeGlyph : OpenAIGlyph }
 }
 
 // The dead end this replaces: a raw provider stack, or "A run is already in flight on this
@@ -108,7 +109,7 @@ export function ProviderErrorNotice({ kind, message, onSwitchModel, onOpenConnec
             leading: <Icon icon={PlugIcon} size="sm" />,
             title: t('reconnect.title'),
             cta: t('reconnect.cta'),
-            description: t('reconnect.description'),
+            description: isAnthropicKeyNotScoped(kind, message) ? t('reconnect.descriptionReplaceKey') : t('reconnect.description'),
             onClick: onReconnect,
         })
     }

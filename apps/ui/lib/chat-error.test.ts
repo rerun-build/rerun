@@ -2,7 +2,7 @@ import { englishTranslator } from '@/lib/i18n/english-translator'
 import { loadMessages } from '@rerun/i18n/messages'
 import { createTranslator } from 'use-intl'
 import { describe, expect, it } from 'vitest'
-import { chatErrorTitle as titleIn, classifyChatError, describeSubscriptionLimit, friendlyError as friendlyIn, isBudgetExhausted, stripErrorPrefix, installInFlightOf, subscriptionLimitMessage, subscriptionLimitTitle, teammateRunOf, unwrapChatError, type ChatErrorKind, type SubscriptionLimit } from './chat-error'
+import { chatErrorTitle as titleIn, classifyChatError, describeSubscriptionLimit, friendlyError as friendlyIn, isBudgetExhausted, stripErrorPrefix, installInFlightOf, isAnthropicKeyNotScoped, subscriptionLimitMessage, subscriptionLimitTitle, teammateRunOf, unwrapChatError, type ChatErrorKind, type SubscriptionLimit } from './chat-error'
 
 const english = englishTranslator('chatErrors')
 const french = createTranslator({ locale: 'fr', messages: await loadMessages('fr'), namespace: 'chatErrors' })
@@ -222,6 +222,28 @@ describe('describeSubscriptionLimit', () => {
         expect(chatErrorTitle('usage_limit', stored)).toBe('OpenAI API credits used up')
     })
 
+    // What an Anthropic API key on an account with no credit stored as the run's error (RER-124),
+    // before and after the engine read it as a spent quota.
+    it('names an Anthropic API account out of credits', () => {
+        const noCredit = 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'
+        for (const stored of [`Message failed: ProviderRefusedError: Provider returned error: ${noCredit}`, `Message failed: AI_APICallError: ${noCredit}`]) {
+            expect(classifyChatError(stored)).toBe('usage_limit')
+            expect(describeSubscriptionLimit(stored)).toEqual({ plan: 'anthropic', scope: 'credits' })
+            expect(chatErrorTitle('usage_limit', stored)).toBe('Anthropic API credits used up')
+            expect(friendlyError(stored)).toBe('Your Anthropic API account has no credits left. Add credits in the Anthropic Console under Billing, or switch this coworker to another model.')
+        }
+    })
+
+    // An Anthropic key made for every workspace of its organization, which no run can use (RER-124).
+    it('says an Anthropic key scoped to no workspace has to be replaced', () => {
+        const stored = 'Message failed: ProviderRefusedError: Provider returned error: This API key is not scoped to a workspace, so this request must include the anthropic-workspace-id header with the ID of the workspace to use. Add the header, or use an API key that is scoped to a workspace.'
+        expect(classifyChatError(stored)).toBe('unauthorized')
+        expect(chatErrorTitle('unauthorized', stored)).toBe('Anthropic key not tied to a workspace')
+        expect(friendlyError(stored)).toBe('This key works across every workspace of its Anthropic organization. Create a key inside one workspace in the Anthropic Console, then reconnect.')
+        expect(isAnthropicKeyNotScoped('unauthorized', stored)).toBe(true)
+        expect(isAnthropicKeyNotScoped('unauthorized', 'AI_APICallError: invalid x-api-key')).toBe(false)
+    })
+
     it('does not send an OpenAI-compatible gateway out of credits to OpenAI', () => {
         for (const message of ['AI_APICallError: You have no credits remaining on this gateway.', 'Provider returned error: {"error":{"code":"insufficient_quota","message":"Quota used"}}']) {
             expect(classifyChatError(message)).toBe('usage_limit')
@@ -356,6 +378,7 @@ describe('the English copy of a spent subscription', () => {
         [{ plan: 'claude', scope: 'session', resetsAt: '3pm' }, 'Claude session limit reached', 'Your Claude plan has used up its current usage window. It refills at 3pm; switch this coworker to another model in the meantime.'],
         [{ plan: 'chatgpt', scope: 'session' }, 'ChatGPT usage limit reached', 'Your ChatGPT plan has used up its current usage window. It refills on its own; switch this coworker to another model in the meantime.'],
         [{ plan: 'openai', scope: 'credits' }, 'OpenAI API credits used up', 'Your OpenAI API account has no credits left. Add credits on platform.openai.com, or switch this coworker to another model.'],
+        [{ plan: 'anthropic', scope: 'credits' }, 'Anthropic API credits used up', 'Your Anthropic API account has no credits left. Add credits in the Anthropic Console under Billing, or switch this coworker to another model.'],
     ]
 
     it.each(cases)('%o', (limit, title, message) => {

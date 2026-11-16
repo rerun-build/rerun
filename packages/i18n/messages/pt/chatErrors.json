@@ -4,6 +4,10 @@
         "title": "Modelo sem capacidade",
         "message": "Este modelo está sem espaço agora. Tente de novo em instantes ou escolha outro modelo."
     },
+    "anthropicKeyNotScoped": {
+        "title": "Chave da Anthropic sem workspace",
+        "message": "Esta chave vale para todos os workspaces da sua organização na Anthropic. Crie uma chave dentro de um único workspace no console da Anthropic e conecte de novo."
+    },
     "titles": {
         "budget": "Créditos Rerun esgotados",
         "unauthorized": "Conexão desconectada",
@@ -41,10 +45,12 @@
             "opencodeCredits": "Créditos OpenCode esgotados",
             "opencodeWindow": "Limite {window, select, weekly {semanal} other {mensal}} do OpenCode Go atingido",
             "opencode": "Limite do OpenCode Go atingido",
-            "openaiCredits": "Créditos da API da OpenAI esgotados"
+            "openaiCredits": "Créditos da API da OpenAI esgotados",
+            "anthropicCredits": "Créditos da API da Anthropic esgotados"
         },
         "messages": {
             "openaiCredits": "Sua conta da API da OpenAI não tem mais créditos. Adicione créditos em platform.openai.com ou mude este coworker para outro modelo.",
+            "anthropicCredits": "Sua conta da API da Anthropic não tem mais créditos. Adicione créditos no console da Anthropic, em Billing, ou mude este coworker para outro modelo.",
             "opencodeCredits": "Não há mais créditos Console. Adicione créditos em opencode.ai ou escolha um modelo Go para continuar.",
             "opencodeWindowResets": "Seu plano OpenCode Go atingiu o limite {window, select, weekly {semanal} monthly {mensal} other {de 5 horas}}. Ele é renovado {resetsAt}; até lá, mude para um modelo Console ou outro provedor.",
             "opencodeWindow": "Seu plano OpenCode Go atingiu o limite {window, select, weekly {semanal} monthly {mensal} other {de 5 horas}}. Mude para um modelo Console ou outro provedor até a renovação.",

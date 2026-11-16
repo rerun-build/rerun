@@ -470,7 +470,8 @@
         "reconnect": {
             "title": "Reconnect",
             "cta": "Reconnect",
-            "description": "Sign in again on the connection this coworker runs on."
+            "description": "Sign in again on the connection this coworker runs on.",
+            "descriptionReplaceKey": "Paste the new key on the connection this coworker runs on."
         }
     },
     "budget": {

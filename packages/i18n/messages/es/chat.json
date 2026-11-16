@@ -365,7 +365,8 @@
         "reconnect": {
             "title": "Volver a conectar",
             "cta": "Reconectar",
-            "description": "Vuelve a iniciar sesión en la conexión que usa este coworker."
+            "description": "Vuelve a iniciar sesión en la conexión que usa este coworker.",
+            "descriptionReplaceKey": "Pega la nueva clave en la conexión que usa este coworker."
         }
     },
     "budget": {

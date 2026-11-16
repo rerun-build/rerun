@@ -27,6 +27,10 @@ const OPENAI_OLD_QUOTA = 'You exceeded your current quota, please check your pla
 const openAiQuotaBody = (message: string) => ({ error: { message, type: 'insufficient_quota', param: null, code: 'insufficient_quota' } })
 const afterRetries = (lastError: unknown) => new RetryError({ message: `Failed after 3 attempts. Last error: ${errorMessageOf(lastError)}`, reason: 'maxRetriesExceeded', errors: [lastError] })
 
+const ANTHROPIC_NO_CREDIT = 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'
+const ANTHROPIC_KEY_NOT_SCOPED = 'This API key is not scoped to a workspace, so this request must include the anthropic-workspace-id header with the ID of the workspace to use. Add the header, or use an API key that is scoped to a workspace.'
+const anthropic400 = (message: string) => apiError({ statusCode: 400, message, responseBody: JSON.stringify({ type: 'error', error: { type: 'invalid_request_error', message } }) })
+
 const SCHEMA_REFUSAL = 'tools.0.custom.input_schema: input_schema does not support oneOf, allOf, or anyOf at the top level'
 
 // What OpenRouter answers when the model provider turns a request down.
@@ -153,6 +157,16 @@ describe('classifyProviderError', () => {
         expect(classifyProviderError('openai', streamed)).toBe(RUN_ERROR_CODES.usageLimit)
         const refused = apiError({ statusCode: 429, message: OPENAI_NO_CREDITS, isRetryable: true, responseBody: JSON.stringify({ error: { type: 'insufficient_quota', code: 'insufficient_quota', message: OPENAI_NO_CREDITS } }) })
         expect(classifyProviderError('openai', refused)).toBe(RUN_ERROR_CODES.usageLimit)
+    })
+
+    // Both answered the first runs of an Anthropic key the connect check had let through (RER-124):
+    // stored as refusals, the chat told the user to switch models.
+    it('reads an Anthropic account with no credit as a spent quota', () => {
+        expect(classifyProviderError('anthropic', anthropic400(ANTHROPIC_NO_CREDIT))).toBe(RUN_ERROR_CODES.usageLimit)
+    })
+
+    it('reads an Anthropic key scoped to no workspace as a key to replace', () => {
+        expect(classifyProviderError('anthropic', anthropic400(ANTHROPIC_KEY_NOT_SCOPED))).toBe(RUN_ERROR_CODES.unauthorized)
     })
 
     // OpenAI's older wording for the same code reads like any rate limit: only the body's code tells.

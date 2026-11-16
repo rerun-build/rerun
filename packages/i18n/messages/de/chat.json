@@ -365,7 +365,8 @@
         "reconnect": {
             "title": "Neu verbinden",
             "cta": "Neu verbinden",
-            "description": "Melde dich erneut bei der Verbindung an, über die dieser Coworker läuft."
+            "description": "Melde dich erneut bei der Verbindung an, über die dieser Coworker läuft.",
+            "descriptionReplaceKey": "Füge den neuen Schlüssel in die Verbindung ein, über die dieser Coworker läuft."
         }
     },
     "budget": {

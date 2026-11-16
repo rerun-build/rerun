@@ -1,5 +1,5 @@
 import { APICallError, LoadAPIKeyError, RetryError } from 'ai'
-import { CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, OPENAI_API_CREDITS_USED_UP, PROVIDER_OVERLOADED, stripErrorPrefix, SUBSCRIPTION_LIMIT, type Provider } from '@rerun/contracts'
+import { ANTHROPIC_KEY_NOT_SCOPED, CONTEXT_WINDOW, MODEL_NOT_IN_PLAN, OPENAI_API_CREDITS_USED_UP, PROVIDER_OVERLOADED, stripErrorPrefix, SUBSCRIPTION_LIMIT, type Provider } from '@rerun/contracts'
 import { isRerunBudgetError, RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 
 export const RUN_ERROR_CODES = {
@@ -212,6 +212,7 @@ export function classifyProviderError(provider: Provider, error: unknown): RunEr
     // The AI SDK gives up on a retryable status after its own attempts and wraps the last one.
     const fromApiCall = apiCallErrorCode(RetryError.isInstance(error) ? error.lastError : error)
     if (fromApiCall) return fromApiCall
+    if (ANTHROPIC_KEY_NOT_SCOPED.test(text)) return RUN_ERROR_CODES.unauthorized
     if (/not logged in|please login|invalid api key|invalid x-api-key|unauthorized|authentication failed|failed to authenticate|authentication_error|invalid bearer token|oauth token has expired|been revoked|no auth credentials|\b401\b/i.test(text)) return RUN_ERROR_CODES.unauthorized
     if (PROVIDER_OVERLOADED.test(text)) return RUN_ERROR_CODES.overloaded
     if (CONTEXT_WINDOW.test(text)) return RUN_ERROR_CODES.contextWindow

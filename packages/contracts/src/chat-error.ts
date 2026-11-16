@@ -53,12 +53,21 @@ export const OPENAI_API_CREDITS_USED_UP = 'OpenAI API credits used up'
 // once they are spent), Codex "The 'gpt-6-astra' model is not supported when using Codex with a
 // ChatGPT account". Shared with the engine's `classifyProviderError`, so both ends agree.
 export const SUBSCRIPTION_LIMIT =
-    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|openai api credits used up|no credits remaining|insufficient_quota/i
+    /hit your (?:session|weekly|opus|sonnet|usage) limit|usage limit reached|usage_limit_exceeded|5-hour limit|quota exceeded|monthly spend limit|usage credits|not supported when using codex with a chatgpt account|does not exist or you do not have access|opencode console credits used up|opencode go limit reached|openai api credits used up|no credits remaining|insufficient_quota|credit balance is too low/i
 
 // The subset of `SUBSCRIPTION_LIMIT` that names OpenAI: the engine's sentence, or OpenAI's own one,
 // which points at platform.openai.com. An OpenAI-compatible gateway answering `insufficient_quota`
 // or "no credits remaining" is out of credits too, but OpenAI is not where the user tops it up.
 export const OPENAI_API_CREDITS = /openai api credits used up|no credits remaining.*platform\.openai\.com/i
+
+// Anthropic's own sentence for an API account with no credit, answered as a 400 rather than a 402,
+// so nothing but the text tells it from a malformed request.
+export const ANTHROPIC_API_CREDITS = /credit balance is too low to access the anthropic api/i
+
+// An Anthropic key created for every workspace of its organization: `/v1/models` lists the models
+// for it, then every message needs an `anthropic-workspace-id` header the engine does not send. The
+// key has to be replaced, so it reads as a connection to redo, not as a refusal.
+export const ANTHROPIC_KEY_NOT_SCOPED = /not scoped to a workspace/i
 
 // The subset of `SUBSCRIPTION_LIMIT` that names a model the plan does not include, rather than a
 // window that ran out. The chat words both the same way, but the engine reports it under its own
@@ -104,7 +113,7 @@ export function classifyChatError(message: string): ChatErrorKind {
     if (m.includes(SESSION_NOT_FOUND) || m.includes(ENGINE_SESSION_NOT_FOUND)) return 'session_gone'
     if (SUBSCRIPTION_LIMIT.test(m)) return 'usage_limit'
     if (m.includes('interrupted: engine restarted') || m.includes('interrupted: claude sign-in renewed') || m.includes('ended the turn without a result')) return 'interrupted'
-    if (PROVIDER_UNAUTHORIZED.test(m)) return 'unauthorized'
+    if (PROVIDER_UNAUTHORIZED.test(m) || ANTHROPIC_KEY_NOT_SCOPED.test(m)) return 'unauthorized'
     if (PROVIDER_OVERLOADED.test(m)) return 'overloaded'
     if (CONTEXT_WINDOW.test(m)) return 'context_window'
     // OpenRouter's own wording when the model provider behind it refuses the request. The refusal
