@@ -52,6 +52,18 @@ describe('PATCH /agents/:id', () => {
         expect(res.status).toBe(400)
     })
 
+    it('persists the skim page switch and keeps it on a later patch', async () => {
+        expect((await patchConfig({ pages: { skim: true } })).config.pages).toEqual({ skim: true })
+        expect((await patchConfig({ verbosity: 'concise' })).config.pages).toEqual({ skim: true })
+        expect((await patchConfig({ pages: { skim: false } })).config.pages).toEqual({ skim: false })
+    })
+
+    it('rejects standing instructions as pages turned on', async () => {
+        const app = createServer()
+        const res = await app.request(`/agents/${id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pages: { standingInstructions: true } }) })
+        expect(res.status).toBe(400)
+    })
+
     it('persists a valid thinking level', async () => {
         const { config } = await patchConfig({ thinkingLevel: 'high' })
         expect(config.thinkingLevel).toBe('high')

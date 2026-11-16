@@ -960,6 +960,18 @@
             "medium": "Medium",
             "high": "High"
         },
+        "pages": {
+            "label": "Text as picture pages",
+            "helper": "Off unless you turn it on. A page is good for an overview and can be wrong about one random value in four.",
+            "skim": {
+                "label": "Skim pages",
+                "helper": "Gives this coworker a tool that shows a file, folder, diff or log as pages, with the exact ids and numbers listed beside them."
+            },
+            "standing": {
+                "label": "Standing instructions as pages",
+                "locked": "Locked off for every Claude model we run today."
+            }
+        },
         "notifications": {
             "label": "Notifications",
             "choose": "Choose what reaches you"
