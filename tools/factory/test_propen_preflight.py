@@ -104,6 +104,9 @@ class PrOpenPreflight(FactoryCase):
     def test_a_missing_tool_inside_a_script_refuses(self):
         self.refused_at_127("sh -c no-such-tool-here")
 
+    def test_a_missing_tool_inside_a_nested_bash_refuses(self):
+        self.refused_at_127('bash -c "bash -c no-such-tool-here"')
+
     def test_a_missing_tool_after_cd_or_an_assignment_is_named_and_does_not_refuse(self):
         code, out = self.open_pr(["cd . && no-such-tool-here", "FOO=1 no-such-tool-here"])
         self.assertEqual(code, 0, out)

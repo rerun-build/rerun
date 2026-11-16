@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import calendar, contextlib, fnmatch, json, os, re, signal, subprocess, sys, time, shutil, urllib.request
+import calendar, contextlib, fnmatch, json, os, re, shlex, signal, subprocess, sys, time, shutil, urllib.request
 
 os.environ["GIT_TERMINAL_PROMPT"] = "0"
 GH, GIT = os.environ.get("FACTORY_GH") or "/data/tools/bin/gh", "/data/tools/bin/git"
@@ -819,7 +819,15 @@ def has_heads(text, heads):
 PREFLIGHT_LINE_S = 900
 
 
-NOT_HERE = re.compile(r"^bash: (?:line \d+: )?.+: command not found$", re.M)
+NOT_HERE = re.compile(r"^bash: (?:line \d+: )?(.+): command not found$", re.M)
+
+
+def not_here(line, out):
+    try:
+        words = shlex.split(line)
+    except ValueError:
+        return False
+    return any(name in words for name in NOT_HERE.findall(out))
 
 
 def preflight_lines(top, body):
@@ -830,7 +838,7 @@ def preflight_lines(top, body):
             code, out = r.returncode, r.stdout + r.stderr
         except subprocess.TimeoutExpired:
             code, out = 124, "timed out after %d s" % PREFLIGHT_LINE_S
-        if code == 127 and NOT_HERE.search(out):
+        if code == 127 and not_here(line, out):
             print("not run on this server: " + line)
         elif code:
             die("the Run line `%s` fails here (exit %d), nothing is pushed. Its last lines:\n%s" % (line, code, "\n".join(out.splitlines()[-20:])))
