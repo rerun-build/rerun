@@ -14,6 +14,7 @@ const mocks = vi.hoisted(() => ({
         focusAgentOnBoard: vi.fn(),
     },
     workspace: { id: 7 } as { id: number } | null,
+    theme: 'dark' as string | undefined,
 }))
 
 vi.mock('@/app/api/_actions/factory.actions', () => ({ readFactorySnapshotAction: () => Promise.resolve(mocks.answer) }))
@@ -24,6 +25,9 @@ vi.mock('@/components/factory/FactoryWorld', () => ({
     },
 }))
 vi.mock('@/components/agent/AgentPanel', () => ({ AgentPanel: () => createElement('div', { 'data-agent-panel': '' }) }))
+vi.mock('@/components/layout/WorkspaceSwitcher', () => ({ WorkspaceSwitcher: () => createElement('div', { 'data-workspace-switcher': '' }) }))
+vi.mock('@/components/control-center/ControlCenter', () => ({ ControlCenter: () => createElement('div', { 'data-control-center': '' }) }))
+vi.mock('next-themes', () => ({ useTheme: () => ({ resolvedTheme: mocks.theme }) }))
 vi.mock('@/stores/board.store', () => ({
     useBoardStore: Object.assign((select: (s: typeof mocks.board) => unknown) => select(mocks.board), { getState: () => mocks.board }),
 }))
@@ -63,6 +67,7 @@ beforeEach(() => {
     mocks.answer = null
     mocks.world.current = null
     mocks.workspace = { id: 7 }
+    mocks.theme = 'dark'
     Object.assign(mocks.board, { agents: [], hydrated: false, selectedAgentId: null })
     mocks.board.hydrate.mockReset()
     mocks.board.focusAgentOnBoard.mockReset()
@@ -154,6 +159,37 @@ describe('factory page', () => {
         await remount()
         await act(async () => { world().onOpenCoworker('code') })
         expect(mocks.board.focusAgentOnBoard).not.toHaveBeenCalled()
+    })
+
+    it('renders the corner menu and the Control Center', async () => {
+        await mount()
+        expect(host.querySelector('[data-workspace-switcher]')).not.toBeNull()
+        expect(host.querySelector('[data-control-center]')).not.toBeNull()
+    })
+
+    it('puts Talk to Boss below the corner menu, and it still opens the chat of boss', async () => {
+        mocks.board.agents = [{ id: 'b1', name: 'x', handle: 'Boss' }]
+        await mount()
+        const btn = byText('button', 'Talk to Boss') as HTMLButtonElement
+        const cls = btn.parentElement!.classList
+        expect(cls.contains('left-4')).toBe(true)
+        expect(cls.contains('top-16')).toBe(true)
+        expect(cls.contains('z-30')).toBe(true)
+        expect(cls.contains('top-4')).toBe(false)
+        await click(btn)
+        expect(mocks.board.focusAgentOnBoard).toHaveBeenCalledWith('b1', 'chat')
+    })
+
+    it('hands FactoryWorld the theme: light when the theme is light, dark otherwise', async () => {
+        mocks.theme = 'light'
+        await mount()
+        expect(mocks.world.current!.theme).toBe('light')
+        mocks.theme = 'dark'
+        await remount()
+        expect(mocks.world.current!.theme).toBe('dark')
+        mocks.theme = undefined
+        await remount()
+        expect(mocks.world.current!.theme).toBe('dark')
     })
 
     it('Talk to Boss opens the chat of the coworker named boss, and is disabled when there is none', async () => {
