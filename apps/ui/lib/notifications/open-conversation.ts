@@ -21,11 +21,17 @@ export async function openConversationFromNotification({ agentId, engineSessionI
 
     if (!engineSessionId) return
 
+    const sessionId = await resolveSessionId(agentId, engineSessionId)
+    if (!sessionId) return
+
+    useBoardStore.getState().setPendingOpenSession({ agentId, sessionId, runId: engineRunId })
+}
+
+// A notification names its conversation by the engine's id; the hub tracks it by its own row.
+export async function resolveSessionId(agentId: string, engineSessionId: string): Promise<string | null> {
     const { data } = await selectMaybeSingle(createClient(), 'sessions', ['id'] as const, {
         agent_id: agentId,
         engine_session_id: engineSessionId,
     })
-    if (!data) return
-
-    useBoardStore.getState().setPendingOpenSession({ agentId, sessionId: data.id, runId: engineRunId })
+    return data?.id ?? null
 }

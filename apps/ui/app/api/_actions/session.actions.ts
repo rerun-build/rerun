@@ -3,7 +3,8 @@
 import { assertAgentAccess, assertSessionInWorkspace } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { clearSessionAlert, findGeneralSession, findIdleSessions, findSessionActiveRun, type GeneralSession } from '@/app/api/_services/chat.service'
-import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentSessions, listAgentThreads, readSessionMessages, readSessionSnapshot, renameSession, searchWorkspaceConversations, type ConversationHit, type SessionHistoryEntry, type SessionSnapshot, type ThreadRow } from '@/app/api/_services/conversation.service'
+import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
+import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentSessions, listAgentThreads, readPendingRequest, readSessionMessages, readSessionSnapshot, renameSession, searchWorkspaceConversations, type ConversationHit, type SessionHistoryEntry, type SessionSnapshot, type ThreadRow } from '@/app/api/_services/conversation.service'
 
 export async function finalizeSessionAction(sessionId: string, status: 'idle' | 'error', options?: { onlyWhileWorking?: boolean }): Promise<void> {
     await finalizeSession(sessionId, status, options).catch(() => {})
@@ -47,6 +48,11 @@ export async function renameSessionAction(sessionId: string, title: string): Pro
 
 export async function fetchSessionMessages(sessionId: string) {
     return readSessionMessages(sessionId).catch(() => [])
+}
+
+// Null when the conversation cannot be read: the inbox then only offers to open it.
+export async function peekPendingRequestAction(sessionId: string): Promise<PendingRequestPeek | null> {
+    return readPendingRequest(sessionId).catch(() => null)
 }
 
 // What a reopened conversation needs in one call: transcript, context gauge, why the last run
