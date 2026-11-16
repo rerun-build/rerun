@@ -12,20 +12,19 @@ const box = (id: string, label: string, col_start: number, row_start: number, co
     ({ id, label, color: '#ffffff', col_start, row_start, col_end, row_end })
 const BOXES: Container[] = [
     box('dispatch', 'Loader', 4, 6, 10, 11),
-    box('build', 'Build', 17, 0, 37, 19),
+    box('build', 'Build', 17, 0, 45, 19),
     box('stock', 'Stock', 0, 14, 10, 20),
-    box('review', 'Review', 17, 21, 29, 30),
+    box('review', 'Review', 17, 21, 46, 41),
     box('studio', 'Research & design', 0, 22, 10, 31),
     box('planning', 'Planning', 0, 0, 10, 5),
 ]
 
 export const LOADER: Cell = { col: 7, row: 9 }
 export const CODE: Cell = { col: 22, row: 9 }
-export const COPY_CELLS = {
-    code: [{ col: 18, row: 5 }, { col: 22, row: 1 }, { col: 25, row: 4 }, { col: 30, row: 5 }, { col: 34, row: 9 }, { col: 26, row: 13 }],
-    LINUS: [{ col: 26, row: 23 }, { col: 22, row: 27 }],
-    search: [{ col: 7, row: 24 }],
-} satisfies Record<string, Cell[]>
+const LINE = [0, 3, 6, 9, 12]
+export const BAY: Cell[] = [...LINE.flatMap(col => [{ col, row: 0 }, { col, row: 6 }]), ...LINE.map(col => ({ col, row: 3 }))]
+export const SEAT = 3
+export const copySeat = (owner: Cell, slot: number): Cell => ({ col: owner.col + SEAT + BAY[slot].col, row: owner.row + BAY[slot].row })
 const LARRY: Cell = { col: 26, row: 17 }
 export const LINUS: Cell = { col: 22, row: 23 }
 const BRUCE: Cell = { col: 26, row: 27 }
@@ -55,9 +54,9 @@ const LOOKS: Record<string, BuddyLook> = {
     DIETER: { eyes: 'sparkle', mouth: 'cat', color: '#f59e0b' },
 }
 
-const CODE_COPIES = COPY_CELLS.code
-const LINUS_COPIES = COPY_CELLS.LINUS
-const SEARCH_COPY = COPY_CELLS.search[0]
+const CODE_COPIES = [0, 1, 2, 3, 4, 5].map(slot => copySeat(CODE, slot))
+const LINUS_COPIES = [0, 1].map(slot => copySeat(LINUS, slot))
+const SEARCH_COPY = copySeat(SEARCH, 0)
 
 export type Feature = { issue: number; title: string; tasks: number[]; at: Cell }
 export const FEATURES: Feature[] = [
