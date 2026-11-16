@@ -3,6 +3,7 @@
 import { Orb } from '@rerun/ui/foreman'
 import { useTranslations } from 'next-intl'
 
+import { WELCOME_ORB_SIZE } from '@/components/foreman/constants'
 import { ForemanRoutines } from '@/components/foreman/ForemanRoutines'
 import { Button } from '@/components/ui/button'
 import { XIcon } from '@/lib/icons'
@@ -26,7 +27,7 @@ export function ForemanDetails({ shown, onClose }: { shown: boolean; onClose: ()
                 </Button>
             </div>
             <div className="flex shrink-0 flex-col items-center px-4 pt-4 pb-3">
-                <Orb size={96} state={foremanOrbState({ open, activity })} />
+                <Orb size={WELCOME_ORB_SIZE} state={foremanOrbState({ open, activity })} />
                 <span className="mt-2 max-w-full truncate text-base leading-tight font-semibold">{t('name')}</span>
                 <span className="text-xs text-muted-foreground">{t('line')}</span>
             </div>
