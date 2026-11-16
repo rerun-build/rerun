@@ -115,6 +115,10 @@
       ]
     }
   },
+  "tier_floor": {
+    "yield": 0.7,
+    "min_merged": 5
+  },
   "tiers": {
     "build": {
       "small": "low",
