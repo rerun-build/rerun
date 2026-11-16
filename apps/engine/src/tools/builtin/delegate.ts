@@ -41,20 +41,20 @@ export function delegateTools(ctx: RunContext): ToolSet {
     return {
         delegate_tasks: tool({
             description:
-                'Delegate one or more self-contained subtasks to fresh ephemeral sub-coworkers. Pass several independent tasks to run them in parallel and finish faster; pass a single task when the work must stay sequential. Each sub-coworker inherits your tools, model and keys, runs its task to completion in its own workspace, and returns its final answer. Use this to decompose work without polluting your own context. Sub-agents cannot delegate further, and they cannot show anything to the user: the files they produce for you are in the shared space, at the paths their result lists, and it is up to you to show them with card_file and scope \'shared\' before you ask the user anything about them.',
+                'Delegate self-contained subtasks to fresh ephemeral sub-coworkers. Pass several independent tasks to run them in parallel and finish faster; pass a single task when the work must stay sequential. Each inherits your tools, model and keys, runs to completion in its own workspace, and returns its final answer. Sub-agents cannot delegate further, and they cannot show anything to the user: the files they produce for you are in the shared space, at the paths their result lists, and show them with card_file and scope \'shared\' before you ask the user about them.',
             inputSchema: z.object({
                 tasks: z
                     .array(
                         z.object({
-                            title: z.string().optional().describe('Short label shown in the UI'),
+                            title: z.string().optional().describe('Short UI label'),
                             task: z.string().describe('A clear, self-contained instruction for the sub-coworker'),
-                            context: z.string().optional().describe('Optional background the sub-coworker needs to do the task'),
-                            model: z.string().optional().describe('A model your own connection serves; the task then runs as a reader on that model'),
-                            thinkingLevel: z.enum(['low', 'medium', 'high']).optional().describe('The effort of the reader model'),
+                            context: z.string().optional().describe('Optional background'),
+                            model: z.string().optional().describe('A model your connection serves: runs the task as a reader'),
+                            thinkingLevel: z.enum(['low', 'medium', 'high']).optional().describe('Effort'),
                         }),
                     )
                     .min(1)
-                    .describe('Run one task, or several in parallel when they are independent'),
+                    .describe('One task, or several in parallel'),
             }),
             execute: async ({ tasks }, { toolCallId, abortSignal }) => {
                 const connection = ctx.agent.resolved.connection
