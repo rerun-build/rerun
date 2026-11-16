@@ -745,18 +745,23 @@ def wt_context():
 
 
 TOKEN_SHAPE = re.compile(r"gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22,}")
+TOKEN_BYTES = re.compile(TOKEN_SHAPE.pattern.encode())
 
 
 def token_shapes(top, base):
-    found = []
-    cur = None
-    diff = run([GIT, "diff", "--unified=0", "--no-color", "origin/%s...HEAD" % base], cwd=top).stdout
-    log = run([GIT, "log", "-p", "-U0", "--no-color", "--format=", "origin/%s..HEAD" % base], cwd=top).stdout
-    for line in (diff + "\n" + log).splitlines():
-        if line.startswith("+++ b/"):
-            cur = line[6:]
-        elif line.startswith("+") and not line.startswith("+++") and TOKEN_SHAPE.search(line):
-            found.append(cur or "?")
+    rows = [r.split(" ", 1) for r in run([GIT, "rev-list", "--objects", "HEAD", "--not", "origin/%s" % base], cwd=top).stdout.splitlines()]
+    names = {r[0]: r[1] for r in rows if len(r) == 2 and r[1]}
+    out = subprocess.run([GIT, "cat-file", "--batch"], input="".join(s + "\n" for s in names).encode(), capture_output=True, cwd=top, timeout=300).stdout
+    found, at = [], 0
+    while at < len(out):
+        end = out.index(b"\n", at)
+        sha, kind, size = out[at:end].decode().split()
+        new = set(TOKEN_BYTES.findall(out[end + 1:end + 1 + int(size)])) if kind == "blob" else set()
+        at = end + 2 + int(size)
+        if new:
+            held = subprocess.run([GIT, "cat-file", "blob", "origin/%s:%s" % (base, names[sha])], capture_output=True, cwd=top, timeout=300).stdout
+            if new - set(TOKEN_BYTES.findall(held)):
+                found.append(names[sha])
     if TOKEN_SHAPE.search(run([GIT, "log", "--format=%B", "origin/%s..HEAD" % base], cwd=top).stdout):
         found.append("a commit message")
     conf = run([GIT, "config", "--local", "--list"], cwd=top, check=False).stdout

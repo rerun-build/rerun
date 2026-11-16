@@ -1,4 +1,4 @@
-import errno, fcntl, os, re, subprocess, time
+import errno, fcntl, json, os, re, subprocess, time
 from unittest import mock
 
 import test_factory as T
@@ -274,6 +274,27 @@ class Doctor(JanitorCase):
         self.assertEqual(code, 0, out)
         self.assertFalse(os.path.exists(lock))
         self.assertEqual(T.git(p, "remote", "get-url", "origin"), self.github + FULL + ".git")
+
+    def held_since(self, hours):
+        jobs = os.path.join(F.STATE, "jobs")
+        with open(os.path.join(jobs, "rerun-7-1.owner"), "w") as f:
+            json.dump({"run": "r9", "pid": 1, "since": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - hours * 3600))}, f)
+        with open(os.path.join(jobs, "rerun-7-1.lock"), "a") as lk:
+            fcntl.flock(lk, fcntl.LOCK_EX)
+            return self.run_j("doctor")
+
+    def test_a_lease_held_for_over_an_hour_is_a_fault_the_doctor_names(self):
+        self.job()
+        code, out = self.held_since(2)
+        self.assertEqual(code, 1, out)
+        self.assertIn("DOCTOR FAULT rerun-7-1: its lease is held since ", out)
+        self.assertIn("by run r9", out)
+
+    def test_a_lease_held_for_minutes_is_no_fault(self):
+        self.job()
+        code, out = self.held_since(0.1)
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("DOCTOR FAULT", out)
 
     def test_a_live_folder_is_never_touched(self):
         p = self.job()

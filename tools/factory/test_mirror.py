@@ -188,3 +188,46 @@ class SigtermReachesGit(unittest.TestCase):
         self.assertEqual(p.wait(10), 143)
         with open(os.path.join(d, "term")) as f:
             self.assertEqual(f.read().strip(), "got-term")
+
+
+def ended(pid):
+    try:
+        with open("/proc/%d/stat" % pid) as f:
+            return f.read().rsplit(")", 1)[1].split()[0] == "Z"
+    except OSError:
+        return True
+
+
+class TimeoutEndsTheTree(unittest.TestCase):
+    def slow(self, child):
+        import tempfile
+        d = tempfile.mkdtemp(prefix="tree-")
+        fake = os.path.join(d, "slow")
+        with open(fake, "w") as f:
+            f.write("#!/bin/sh\nsh -c '%s echo $$ > %s/child.pid; i=0; while [ $i -lt 120 ]; do sleep 0.1; i=$((i+1)); done' &\nwait\n" % (child, d))
+        os.chmod(fake, 0o755)
+        return fake, os.path.join(d, "child.pid")
+
+    def past_its_time(self, child):
+        import mirror
+        fake, pid = self.slow(child)
+        t0 = time.time()
+        with mock.patch.object(mirror, "GRACE_S", 1):
+            r = mirror.run([fake], timeout=1)
+        took = time.time() - t0
+        with open(pid) as f:
+            left = int(f.read().strip())
+        self.addCleanup(lambda: subprocess.run(["kill", "-9", str(left)], capture_output=True))
+        self.assertLess(took, 8)
+        self.assertNotEqual(r.returncode, 0)
+        for _ in range(40):
+            if ended(left):
+                break
+            time.sleep(0.05)
+        self.assertTrue(ended(left), "the child of the command is still running")
+
+    def test_a_command_past_its_time_is_ended_with_its_children(self):
+        self.past_its_time("")
+
+    def test_a_child_that_ignores_the_first_signal_is_ended_by_the_second(self):
+        self.past_its_time("trap \"\" TERM;")

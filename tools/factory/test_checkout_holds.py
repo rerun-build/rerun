@@ -13,6 +13,9 @@ TRACE = ("wt new said:\nTraceback (most recent call last):\n  File \"/data/tools
          "RuntimeError: git checkout: fatal\nBLOCKED: wt new failed in /data/work/wt/rerun/5-1")
 
 
+LOAD = "TRANSIENT: load: 13.0 on 4 cores, ceiling is 12.0\nBLOCKED: no room"
+
+
 def issue(n):
     return {"number": n, "title": "Fix %d" % n, "body": ready(), "comments": []}
 
@@ -71,7 +74,7 @@ class Holds(unittest.TestCase):
         j = self.job(5)
         self.assertIn("clones.py", j["checkout_failed"])
         self.assertIn("/data/work/wt/rerun/5-1", j["checkout_failed"])
-        found = self.d.resolver.watch.find([j], {}, None, "", self.w.clock, [], "", False)
+        found = self.d.resolver.watch.find([j], {}, {5}, "", self.w.clock, [], "", False)
         self.assertIn("checkout failed #5", found)
         self.assertIn("checkout failed", resolver.KINDS)
 
@@ -150,11 +153,116 @@ class Holds(unittest.TestCase):
         self.d.once()
         for i in range(5):
             self.assertEqual(self.job(5)["state"], "building", i)
-            self.w.finish(self.job(5)["agent"], "TRANSIENT: load: 13.0 on 4 cores, ceiling is 12.0\nBLOCKED: no room")
+            self.w.finish(self.job(5)["agent"], LOAD)
             self.d.once()
             self.assertEqual(self.job(5)["state"], "queued", i)
-            self.w.clock += 16 * 60
+            self.w.clock += 61 * 60
             self.d.once()
+
+    def test_a_room_line_the_builder_quotes_in_its_blocked_line_holds_and_never_ends_the_job(self):
+        self.make([issue(5)])
+        self.d.once()
+        for i in range(5):
+            self.assertEqual(self.job(5)["state"], "building", i)
+            self.w.finish(self.job(5)["agent"], "BLOCKED: wt new said TRANSIENT: load: 13.0 on 4 cores, ceiling is 12.0")
+            self.d.once()
+            self.assertEqual(self.job(5)["state"], "queued", i)
+            self.assertEqual(self.hold(), "load", i)
+            self.w.clock += 61 * 60
+            self.d.once()
+
+    def test_another_refusal_the_builder_quotes_in_its_blocked_line_is_a_counted_second_try(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", "BLOCKED: wt new said TRANSIENT: cannot clone o/r: GitHub 502")
+        self.d.once()
+        self.assertEqual(self.job(5)["state"], "queued")
+        self.assertIsNone(self.hold())
+        self.assertEqual(self.d.store.retries("5", "transient"), 1)
+
+    def round(self, n=5):
+        self.w.finish(self.job(n)["agent"], LOAD)
+        self.d.once()
+        left = holds.active(self.d.store, self.w.clock)["until"] - self.w.clock
+        self.w.clock += left + 1
+        self.d.once()
+        return left
+
+    def test_refusals_in_one_beat_are_one_round_and_one_build_tests_the_room_before_the_rest(self):
+        self.make([issue(5), issue(6), issue(7)])
+        self.d.once()
+        for b in ("b1", "b2", "b3"):
+            self.w.finish(b, LOAD)
+        self.d.once()
+        self.assertEqual(self.d.store.get_all("-").get("room_row"), "1")
+        self.assertEqual(holds.active(self.d.store, self.w.clock)["until"] - self.w.clock, 5 * 60)
+        self.w.clock += 5 * 60 + 1
+        self.d.once()
+        self.assertEqual(sorted(self.job(n)["state"] for n in (5, 6, 7)), ["building", "queued", "queued"])
+        self.assertEqual(self.hold(), "load")
+        self.w.clock += D.ROOM_PROBE_S + 1
+        self.d.once()
+        self.assertEqual(sorted(self.job(n)["state"] for n in (5, 6, 7)), ["building", "building", "building"])
+
+    def test_each_round_without_room_doubles_the_hold_up_to_an_hour(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.assertEqual([self.round() for _ in range(6)], [300, 600, 1200, 2400, 3600, 3600])
+
+    def test_three_rounds_without_room_are_one_problem_and_a_pull_request_ends_it(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.round()
+        self.round()
+        self.assertIsNone(self.d.no_room())
+        self.round()
+        line = self.d.no_room()
+        self.assertIn("3 rounds", line)
+        self.assertIn("load: 13.0 on 4 cores", line)
+        found = self.d.resolver.watch.find([], {}, None, "", self.w.clock, [], "", False, line)
+        self.assertEqual(found.get("no room"), line)
+        self.assertIn("no room", resolver.KINDS)
+        self.w.finish(self.job(5)["agent"], PR_LINE)
+        self.d.once()
+        self.assertIsNone(self.d.no_room())
+        self.assertEqual(self.d.store.get_all("-").get("room_row"), "0")
+
+    def test_a_round_long_after_the_last_starts_the_row_again(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.round()
+        self.round()
+        self.w.clock += 3 * 3600
+        self.assertEqual(self.round(), 300)
+
+    def test_a_checkout_failure_of_an_ended_job_is_a_problem_only_while_its_issue_is_open(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", TRACE)
+        self.d.once()
+        j = self.job(5)
+        self.assertEqual(j["state"], "blocked")
+        find = self.d.resolver.watch.find
+        self.assertIn("checkout failed #5", find([j], {}, {5}, "", self.w.clock, [], "", False))
+        self.assertNotIn("checkout failed #5", find([j], {}, {6}, "", self.w.clock, [], "", False))
+
+    def test_a_resolver_run_that_ended_with_a_line_takes_the_checkout_failure_off_the_job(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", TRACE)
+        self.d.once()
+        self.d.resolver.handled(self.d, "checkout failed #5")
+        self.assertNotIn("checkout_failed", self.job(5))
+        self.d.resolver.handled(self.d, "ended #5")
+        self.d.resolver.handled(self.d, "idle line")
+
+    def test_a_test_traceback_followed_by_a_line_that_names_the_tools_is_not_a_checkout_fault(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", "Traceback (most recent call last):\n  File \"/data/work/wt/rerun/5-1/x.py\", line 3, in t\nAssertionError: 1 != 2\n"
+                            "I then read /data/tools/factory/factory.py to see why\nBLOCKED: tests fail")
+        self.d.once()
+        self.assertNotIn("checkout_failed", self.job(5))
 
 
 class ProofStaysOn(unittest.TestCase):

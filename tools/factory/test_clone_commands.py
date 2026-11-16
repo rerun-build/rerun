@@ -145,6 +145,48 @@ class CloneCommands(CloneCase):
         self.assertIn("the shape of a GitHub token is in same.txt", out)
         self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
 
+    def test_a_token_typed_into_a_merge_and_removed_in_the_next_commit_refuses_the_push(self):
+        p = self.ready_clone()
+        self.commit(p, "same.txt", "mine\n")
+        self.move_dev("same.txt", "theirs\n")
+        T.git(p, "fetch", "--quiet", "origin", "dev")
+        T.git(p, "merge", "--quiet", "origin/dev", check=False)
+        T.write(p, "same.txt", "key = " + "ghp" + "_" + "C" * 36 + "\n")
+        T.git(p, "add", "same.txt")
+        T.git(p, "commit", "--quiet", "--no-edit")
+        self.commit(p, "same.txt", "key = from the environment\n")
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the shape of a GitHub token is in same.txt", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
+    def test_a_token_in_a_binary_file_refuses_the_push(self):
+        p = self.ready_clone()
+        with open(os.path.join(p, "blob.bin"), "wb") as f:
+            f.write(b"\x00\xff\x00" + ("ghp" + "_" + "D" * 36).encode() + b"\x00\xfe")
+        T.git(p, "add", "-A")
+        T.git(p, "commit", "--quiet", "-m", "a binary file")
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the shape of a GitHub token is in blob.bin", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
+    def test_a_token_on_a_line_that_starts_with_two_plus_signs_refuses_the_push(self):
+        p = self.ready_clone()
+        self.commit(p, "notes.txt", "++ key = " + "ghp" + "_" + "E" * 36 + "\n")
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the shape of a GitHub token is in notes.txt", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
+    def test_a_token_shape_dev_already_holds_does_not_refuse_an_edit_of_that_file(self):
+        self.move_dev("fixture.txt", "first\nfake = " + "ghp" + "_" + "F" * 36 + "\n")
+        p = self.ready_clone()
+        self.commit(p, "fixture.txt", "second\nfake = " + "ghp" + "_" + "F" * 36 + "\n")
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self.remote_sha("refs/heads/chunk/7-1"))
+
     def test_a_token_in_a_commit_message_refuses_the_push(self):
         p = self.ready_clone()
         T.write(p, "a.txt", "a\n")

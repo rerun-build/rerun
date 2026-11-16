@@ -6,6 +6,7 @@ GITHUB = os.environ.get("FACTORY_GITHUB_URL", "https://github.com/")
 HOOK = "#!/bin/sh\necho 'REFUSED: this is the factory mirror, a read-only cache. Push to GitHub.' >&2\nexit 1\n"
 GIT_LOCKS = ("packed-refs.lock", "config.lock", "HEAD.lock", "shallow.lock", "index.lock")
 RETRIES, BACKOFF_S = 3, 2
+GRACE_S = 10
 HELD = []
 
 
@@ -27,17 +28,38 @@ def git(args, cwd="/tmp", timeout=300):
     return run([F.GIT] + args, cwd, timeout)
 
 
+def tell(p, sig):
+    try:
+        os.killpg(p.pid, sig)
+    except ProcessLookupError:
+        pass
+
+
+def end(p):
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        tell(p, sig)
+        try:
+            return p.communicate(timeout=GRACE_S)
+        except subprocess.TimeoutExpired:
+            continue
+    for f in (p.stdout, p.stderr):
+        f.close()
+    if p.poll() is None:
+        p.returncode = -signal.SIGKILL
+    return "", "the command and its children did not end %d s after SIGKILL" % GRACE_S
+
+
 def run(cmd, cwd="/tmp", timeout=300):
     env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
-    p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, pass_fds=tuple(HELD))
+    p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, pass_fds=tuple(HELD), start_new_session=True)
     old = signal.getsignal(signal.SIGTERM)
 
     def on_term(*_):
-        p.terminate()
+        tell(p, signal.SIGTERM)
         try:
             p.wait(60)
         except subprocess.TimeoutExpired:
-            p.kill()
+            tell(p, signal.SIGKILL)
             p.wait()
         signal.signal(signal.SIGTERM, old if callable(old) else signal.SIG_DFL)
         sys.exit(143)
@@ -45,8 +67,7 @@ def run(cmd, cwd="/tmp", timeout=300):
     try:
         out, err = p.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
-        p.terminate()
-        out, err = p.communicate()
+        out, err = end(p)
     finally:
         signal.signal(signal.SIGTERM, old if old is not None else signal.SIG_DFL)
     return subprocess.CompletedProcess(p.args, p.returncode, out, err)

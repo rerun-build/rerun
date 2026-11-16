@@ -14,12 +14,14 @@ class Watch:
     def __init__(self):
         self.heard, self.idle, self.idle_line, self.repeats, self.repeat_line = [], 0, None, None, None
 
-    def find(self, jobs, refused, open_issues, line, now, texts, since="", held=False):
+    def find(self, jobs, refused, open_issues, line, now, texts, since="", held=False, room=None):
         out = {"unreadable #%d" % n: "\n".join(e) for n, e in refused.items()}
+        if room:
+            out["no room"] = room
         work, busy = False, False
         for j in jobs:
             n, st = j["issue"], j["state"]
-            if j.get("checkout_failed"):
+            if j.get("checkout_failed") and (st not in ENDED or (ended(j, since) and open_issues is not None and n in open_issues)):
                 out["checkout failed #%d" % n] = j["checkout_failed"]
             if st == "waiting" and j.get("dead"):
                 out["dead #%d" % n] = j.get("wait_line") or "waits on dead dependencies"

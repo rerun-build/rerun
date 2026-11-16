@@ -1,4 +1,4 @@
-import json, os, re, shutil, sys, time
+import calendar, fcntl, json, os, re, shutil, sys, time
 
 import clones as C
 import factory as F
@@ -8,6 +8,7 @@ MIN_AGE_H = 1
 TRASH_KEEP_H = 24
 UNREACHABLE_PASSES = 3
 STALE_GIT_LOCK_H = 1
+LEASE_MAX_S = 3600
 DIR = re.compile(r"(\d+)-([a-z0-9]{1,12})")
 
 
@@ -281,8 +282,34 @@ def old_tmp(apply):
                 lk.close()
 
 
+def stuck_leases():
+    found = []
+    d = C.jobs_dir()
+    for f in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        if not f.endswith(".lock"):
+            continue
+        name = f[:-5]
+        o = C.read_owner(name)
+        try:
+            age = time.time() - calendar.timegm(time.strptime(o.get("since") or "", "%Y-%m-%dT%H:%M:%SZ"))
+        except ValueError:
+            continue
+        if age <= LEASE_MAX_S:
+            continue
+        with open(os.path.join(d, f), "a") as lk:
+            try:
+                fcntl.flock(lk, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except OSError:
+                found.append("%s: its lease is held since %s by run %s (pid %s), longer than %d min; a process that command left behind still holds it" % (
+                    name, o["since"], o.get("run", "unknown"), o.get("pid", "unknown"), LEASE_MAX_S // 60))
+    return found
+
+
 def doctor(apply):
     faults = 0
+    for line in stuck_leases():
+        faults += 1
+        print("DOCTOR FAULT " + line)
     for repo, d, path in clones():
         lk = C.try_lease(repo, d)
         if lk is None or busy(path):
