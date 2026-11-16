@@ -13,6 +13,10 @@
   "proof": true,
   "one_file_one_job": true,
   "slots": 15,
+  "resolver": {
+    "detect": true,
+    "resolve": false
+  },
   "ledger_file": "/state/ledger.db",
   "json_state_file": "/state/dispatch.json",
   "account_key_file": "/run/secrets/account_key",
@@ -81,6 +85,15 @@
           "id": "50bd7e97-bd0b-4236-be49-25fbe3f8c71f",
           "name": "IKE",
           "runs": 3
+        }
+      ]
+    },
+    "resolver": {
+      "coworkers": [
+        {
+          "id": "a7ff1339-e891-4047-aea1-972c5ba2c5c3",
+          "name": "HOUSE",
+          "runs": 2
         }
       ]
     }

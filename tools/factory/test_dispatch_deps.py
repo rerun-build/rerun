@@ -74,7 +74,7 @@ class DeadDeps(Base):
         self.tick(2)
         line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
         self.assertIn("| ended today: merged 0, blocked 0, failed 0, returned 0, rejected 1 |", line)
-        self.assertTrue(line.endswith(" | unreadable 0, dead waits 1"), line)
+        self.assertTrue(line.endswith(" | unreadable 0, dead waits 1 | problems 0 open, 0 owner"), line)
 
     def test_a_waiting_issue_given_its_label_back_waits_again(self):
         self.w.issues = [issue(5, "#7")]

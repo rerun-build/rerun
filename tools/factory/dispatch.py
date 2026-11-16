@@ -12,6 +12,7 @@ import pools
 import proof
 import refresh
 import renewal
+import resolver
 import sifter
 import slots
 import snapshot
@@ -35,10 +36,12 @@ RECONCILE_MAX = 20
 MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
 MERGE_TRIES = 5
+MAX_TAKES = 3
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
              "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
 DEP_TEXT = {"live": "#%d", "not a factory job": "#%d (not a factory job)", "returned": "returned #%d"}
+HEARD = []
 
 
 class Error(Exception):
@@ -46,6 +49,8 @@ class Error(Exception):
 
 
 def log(n, msg):
+    if n == "-":
+        HEARD.append(str(msg))
     print("%s #%s %s" % (datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), n, msg), flush=True)
 
 
@@ -240,6 +245,18 @@ def fix_brief(j, pr, review):
     ])
 
 
+def problem_brief(repo, key, p):
+    return "\n".join([
+        briefs.resolver_brief(repo, key, p),
+        '',
+        NO_COMMENTS,
+        '',
+        'Your last line is exactly `RESOLVED: <one sentence of what changed>`, `FILED: #<n>` (the factory issue that fixes the cause) '
+        'or `ESCALATE: <the step only Rob can take and the exact command for him>`. Nothing may follow that line, not even a tools line.',
+        TAIL,
+    ])
+
+
 def make_account(url, key, opener=urllib.request.urlopen):
     def call(tool, args, timeout=30):
         body = json.dumps({"jsonrpc": "2.0", "id": 1, "method": "tools/call", "params": {"name": tool, "arguments": args}}).encode()
@@ -329,6 +346,10 @@ class Dispatcher:
         self.store.import_json(cfg["json_state_file"])
         self.beats = 0
         self.unreadable = 0
+        self.refused = {}
+        self.beat_line = ""
+        del HEARD[:]
+        self.resolver = resolver.Resolver(log, problem_brief)
         self.renewal_unreadable = False
         self.report_logged = set()
         self.started = now()
@@ -383,6 +404,8 @@ class Dispatcher:
             s = slots.station(j)
             if s:
                 waiting[s] = waiting.get(s, 0) + 1
+        if n := self.resolver.waiting(self):
+            waiting["resolve"] = n
         return slots.quotas(waiting, len(self.running()), total)
 
     def take(self, j):
@@ -395,7 +418,7 @@ class Dispatcher:
         return True
 
     def running(self):
-        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")]
+        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")] + self.resolver.running(self)
 
     def unresolved(self):
         return {j["agent"] for j in self.jobs() if j["state"] not in END and j.get("agent") and j.get("sending") and not j.get("run")}
@@ -425,7 +448,7 @@ class Dispatcher:
             log(j["issue"], why)
             if j["state"] in END:
                 return
-            state, msg, kw = "blocked", "blocked: " + why[:180], {"reason": why[:200], "sending": None}
+            state, msg, kw = "blocked", "blocked: " + why[:180], {"reason": why[:200], "sending": None, "ended_at": ledger_store.now()}
         j.update(kw, state=state)
         self.save(j, msg, reset=True)
         log(j["issue"], msg)
@@ -465,7 +488,8 @@ class Dispatcher:
             if fixed:
                 log(i["number"], "sifted: " + ", ".join(fixed))
         shape = cutshape.check(issues)
-        self.unreadable = sum(1 for e in shape.values() if e)
+        self.refused = {n: e for n, e in shape.items() if e}
+        self.unreadable = len(self.refused)
         labelled = {i["number"] for i in issues}
         open_numbers = None
         if any(cutshape.parse(i)["deps"] for i in issues):
@@ -479,6 +503,19 @@ class Dispatcher:
                 if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
                     continue
                 take = (old.get("take") or 1) + 1 if old and old["state"] in END else (old or {}).get("take")
+                before = (old.get("takes") or old.get("take") or 1) if old else 0
+                if not old or (old.get("body") or "") != (i.get("body") or ""):
+                    takes = 1
+                else:
+                    takes = before + 1 if old["state"] in END else before
+                if old and old["state"] in END and takes > MAX_TAKES:
+                    if self.store.get_all(str(i["number"])).get("take_cap") != str(before):
+                        self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
+                                 "The factory dispatcher does not take this issue again: it was taken %d times with this text. "
+                                 "A change to the issue text resets the count; then put the factory label back. Or close the issue." % before])
+                        self.store.set(str(i["number"]), "take_cap", str(before))
+                        log(i["number"], "not started: taken %d times with this text" % before)
+                    continue
                 errors = shape.get(i["number"]) or []
                 if errors:
                     digest = hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
@@ -516,6 +553,7 @@ class Dispatcher:
                                 data["dead"] = dead
                             if take:
                                 data["take"] = take
+                            data["takes"] = takes
                             if old and old.get("replans"):
                                 data["replans"] = old["replans"]
                             self.save(data, line)
@@ -551,6 +589,7 @@ class Dispatcher:
                        "worker": parsed["worker"], "paths": parsed["paths"], "test": parsed["test"], "plan_dev": parsed["dev"]}
                 if take:
                     job["take"] = take
+                job["takes"] = takes
                 if old and old.get("replans"):
                     job["replans"] = old["replans"]
                 if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":
@@ -999,7 +1038,7 @@ class Dispatcher:
         return hits[-1] if hits else None
 
     def end(self, j, state, reason):
-        self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None)
+        self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None, ended_at=ledger_store.now())
 
     def report(self, j):
         n = str(j["issue"])
@@ -1038,9 +1077,10 @@ class Dispatcher:
             if j["state"] in ended and str(j.get("updated_at") or "").startswith(today):
                 ended[j["state"]] += 1
         stages = states.STAGES
-        line = "%s beat %d | %s | ended today: %s | unreadable %d, dead waits %d" % (
+        line = "%s beat %d | %s | ended today: %s | unreadable %d, dead waits %d | problems %d open, %d owner" % (
             iso(self.now()), self.beats, ", ".join("%s %d" % (s, count.get(s, 0)) for s in stages),
-            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable, dead)
+            ", ".join("%s %d" % (s, n) for s, n in ended.items()), self.unreadable, dead, *self.resolver.counts(self))
+        self.beat_line = line
         print(line, flush=True)
         path = self.cfg.get("heartbeat_file", "/state/heartbeat")
         tmp = "%s.%d.tmp" % (path, os.getpid())
@@ -1117,6 +1157,11 @@ class Dispatcher:
                 self.save(j, "pass failed")
                 if j["errors"] >= 20 and j["state"] not in END:
                     self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
+        heard, HEARD[:] = list(HEARD), []
+        try:
+            self.resolver.beat(self, heard, self.beat_line)
+        except Exception as e:
+            log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.report_line()
         self.beat_end(clean)
 
