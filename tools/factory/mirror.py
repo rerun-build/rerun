@@ -7,6 +7,7 @@ HOOK = "#!/bin/sh\necho 'REFUSED: this is the factory mirror, a read-only cache.
 GIT_LOCKS = ("packed-refs.lock", "config.lock", "HEAD.lock", "shallow.lock", "index.lock")
 RETRIES, BACKOFF_S = 3, 2
 GRACE_S = 10
+STOPS = (signal.SIGTERM, signal.SIGINT, signal.SIGHUP)
 HELD = []
 
 
@@ -52,24 +53,29 @@ def end(p):
 def run(cmd, cwd="/tmp", timeout=300):
     env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
     p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, pass_fds=tuple(HELD), start_new_session=True)
-    old = signal.getsignal(signal.SIGTERM)
+    old = {s: signal.getsignal(s) for s in STOPS}
 
-    def on_term(*_):
+    def restore():
+        for s, h in old.items():
+            signal.signal(s, h if h is not None else signal.SIG_DFL)
+
+    def on_stop(signum, _):
         tell(p, signal.SIGTERM)
         try:
             p.wait(60)
         except subprocess.TimeoutExpired:
             tell(p, signal.SIGKILL)
             p.wait()
-        signal.signal(signal.SIGTERM, old if callable(old) else signal.SIG_DFL)
-        sys.exit(143)
-    signal.signal(signal.SIGTERM, on_term)
+        restore()
+        sys.exit(128 + signum)
+    for s in STOPS:
+        signal.signal(s, on_stop)
     try:
         out, err = p.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
         out, err = end(p)
     finally:
-        signal.signal(signal.SIGTERM, old if old is not None else signal.SIG_DFL)
+        restore()
     return subprocess.CompletedProcess(p.args, p.returncode, out, err)
 
 
