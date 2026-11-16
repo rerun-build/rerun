@@ -65,7 +65,7 @@ class Digest(unittest.TestCase):
         self.make()
         self.once()
         snap = [c for c in self.calls if c[0] == "factory_report"][0][1]["snapshot"]
-        self.assertEqual(set(snap["digest"]), {"stations", "threads", "anomalies", "measures"})
+        self.assertEqual(set(snap["digest"]), {"stations", "threads", "anomalies", "measures", "planners"})
 
 
 if __name__ == "__main__":
