@@ -42,6 +42,9 @@ REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
 MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
+ROOM_HOLD_MAX_S, ROOM_PROBE_S, ROOM_PROBLEM_ROW = 60 * 60, 3 * 60, 3
+CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:[ \t]+.*\n)*?[ \t]+File \"/data/tools/(?:factory|factory-[0-9a-f]+)/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
+CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 MAX_TAKES = 3
 INBOX = "Factory follow-ups inbox"
@@ -807,6 +810,10 @@ class Dispatcher:
             j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
+        if state == "building" and self.store.get_all("-").get("room_probe") == "1":
+            holds.arm(self.store, self.store.get_all("-").get("room_kind") or "load", self.now() + ROOM_PROBE_S)
+            self.store.set("-", "room_probe", "sent")
+            log(j["issue"], "this build tests the room; other sends wait %d s" % ROOM_PROBE_S)
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
         self.tier_job(j, state)
         j["brief_v"] = failures.version(state)
@@ -935,8 +942,9 @@ class Dispatcher:
         self.strike(j, False)
         return self.failed_attempt(j, why, "cancel")
 
-    def transient(self, j, reason):
-        count = self.store.bump_retry(str(j["issue"]), "transient")
+    def transient(self, j, reason, room=False):
+        n = str(j["issue"])
+        count = (self.store.retries(n, "transient") or 1) if room else self.store.bump_retry(n, "transient")
         delay = clocks.backoff(count)
         if delay is None:
             return self.end(j, "blocked", "four refusals a second try did not clear: %s" % reason)
@@ -1014,6 +1022,11 @@ class Dispatcher:
                 if found:
                     j["pr"] = found
                 return self.blocked(j, out)
+            self.store.set("-", "checkout_failed_row", "0")
+            if clocks.L.ts(j["intent_at"]) >= float(self.store.get_all("-").get("room_until") or 0):
+                self.store.set("-", "room_row", "0")
+                self.store.set("-", "room_probe", "0")
+            j.pop("checkout_failed", None)
             self.to(j, "review_wait", "pull request #%s" % m.group(1), pr=int(m.group(1)))
         elif st == "review_wait":
             if self.conflicts(j):
@@ -1091,10 +1104,49 @@ class Dispatcher:
 
     def blocked(self, j, out):
         why = self.not_met_reason(j, out)
+        text = out or ""
+        refused = clocks.tool_refusals(text, final_line(text, ("BLOCKED:",)) or why)
+        room = clocks.room(refused)
+        if room:
+            self.room_hold(j, room)
+        fault = CHECKOUT_FAULT.search(text) if j["state"] in ("building", "fixing") else None
+        if fault:
+            lines = [l for l in text.splitlines() if l.strip()][-12:]
+            j["checkout_failed"] = ("%s\nlast lines:\n%s" % (fault.group(0).strip()[:300], "\n".join(lines)))[:1500]
+            row = int(self.store.get_all("-").get("checkout_failed_row") or 0) + 1
+            if row >= CHECKOUT_ROW:
+                holds.arm(self.store, "checkout", self.now() + CHECKOUT_HOLD_S)
+                log(j["issue"], "hold checkout: %d checkouts in a row failed" % row)
+                row = 0
+            self.store.set("-", "checkout_failed_row", str(row))
         k = clocks.klass("BLOCKED", blocked=why)
-        if k == "transient":
+        if room:
+            return self.transient(j, why, room=True)
+        if k == "transient" or refused:
             return self.transient(j, why)
-        self.end(j, "returned" if k == "plan" else "blocked", why)
+        self.end(j, "returned" if k == "plan" else "blocked", why, **({"checkout_failed": j["checkout_failed"]} if fault else {}))
+
+    def room_hold(self, j, room):
+        now, kv = self.now(), self.store.get_all("-")
+        row = int(kv.get("room_row") or 0)
+        if now > float(kv.get("room_until") or 0) + ROOM_HOLD_MAX_S:
+            row = 0
+        if row == 0 or kv.get("room_probe") != "1":
+            row += 1
+        hold_s = min(max(h for _, _, h in room) * 2 ** (row - 1), ROOM_HOLD_MAX_S)
+        kinds = sorted({k for _, k, _ in room})
+        for kind in kinds:
+            holds.arm(self.store, kind, now + hold_s)
+        line = "%d rounds of refusals without a build getting through; the last: %s" % (row, room[0][0][:200])
+        for k, v in (("room_row", row), ("room_until", now + hold_s), ("room_probe", "1"), ("room_kind", kinds[0]), ("room_line", line)):
+            self.store.set("-", k, str(v))
+        log(j["issue"], "hold %s for %d s, round %d: the checkout reported it" % (", ".join(kinds), hold_s, row))
+
+    def no_room(self):
+        kv = self.store.get_all("-")
+        if int(kv.get("room_row") or 0) < ROOM_PROBLEM_ROW or self.now() > float(kv.get("room_until") or 0) + ROOM_HOLD_MAX_S:
+            return None
+        return kv.get("room_line")
 
     def conflicts(self, j):
         if json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "mergeable"])).get("mergeable") != "CONFLICTING":
@@ -1187,6 +1239,7 @@ class Dispatcher:
         return hits[-1] if hits else None
 
     def end(self, j, state, reason, **extra):
+        j.pop("checkout_failed", None)
         self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None, ended_at=ledger_store.now(), **extra)
 
     def report(self, j):
@@ -1418,6 +1471,9 @@ def main(argv=None):
     ap.add_argument("cmd", choices=("run", "once"))
     a = ap.parse_args(argv)
     cfg = settings()
+    if not cfg.get("proof"):
+        print("dispatch: proof is off in dispatch.json; refusing to start", file=sys.stderr)
+        return 1
     url = os.environ.get("DISPATCH_ACCOUNT_URL")
     if not url:
         print("dispatch: DISPATCH_ACCOUNT_URL is not set", file=sys.stderr)

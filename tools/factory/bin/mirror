@@ -1,0 +1,2 @@
+#!/bin/sh
+FACTORY_CMD=mirror exec python3 -I /data/tools/factory/mirror.py "$@"
