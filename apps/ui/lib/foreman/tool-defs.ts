@@ -108,6 +108,18 @@ export const FOREMAN_DOCS_TOOL_DEFS = [
     },
 ] as const
 
+// The workspace's Vault, the accounts signed in once on the box and lent to the coworkers that use
+// them. Its own tools rather than account MCP tools: the public MCP server and the coworkers' team
+// reads share dispatchAccountTool, and none of them should reach the Vault through it.
+export const FOREMAN_VAULT_TOOL_DEFS = [
+    {
+        name: 'list_vault',
+        description:
+            "List the workspace's Vault: every app account, custom MCP server and secret the workspace signed in to or typed in once, with the account it is (an email, a workspace name), whether it works (active) or waits on someone (needs_auth: signed out or never signed in, needs_config: a setting is missing), and which coworkers it is lent to, or everyone. Never returns a value. Call it before adding an app to a coworker, to lend an account the workspace already has rather than connecting a second one, and when a coworker says it cannot reach an app. Coworkers the user cannot see are only counted.",
+        inputSchema: { type: 'object', properties: {} },
+    },
+] as const
+
 // A Record rather than a list, so a tab added to the panel fails to compile here instead of reaching
 // the model with no hint of what it shows.
 const AGENT_TAB_HINTS: Record<AgentFocusTab, string> = {

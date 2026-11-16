@@ -8,6 +8,7 @@ import { FOREMAN_ENGINE_HUB_TOOL_NAMES, FOREMAN_ENGINE_ONBOARDING_TOOL_NAMES } f
 import { dispatchWorkspaceOnboardingTool } from '@/lib/foreman/onboarding-tools'
 import { searchDocs } from '@/lib/foreman/search-docs'
 import { FOREMAN_BOX_TOOL_DEFS } from '@/lib/foreman/tool-defs'
+import { dispatchForemanVaultTool, FOREMAN_VAULT_TOOL_NAMES } from '@/lib/foreman/vault-tools'
 import { requireString } from '@/lib/mcp/args'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 
@@ -20,6 +21,7 @@ export async function dispatchForemanHubTool(actor: Actor, tool: string, args: R
     if (!FOREMAN_ENGINE_HUB_TOOL_NAMES.has(tool)) throw new Error(`Unknown foreman tool: ${tool}`)
 
     if (tool === 'search_docs') return searchDocs(requireString(args.query, 'query'))
+    if (FOREMAN_VAULT_TOOL_NAMES.has(tool)) return dispatchForemanVaultTool(actor, tool, args)
 
     // The turn speaks for the member who wrote it: a Box they create is theirs to manage, a coworker
     // lands only in a Box they manage, and only their Boxes are listed. A turn with nobody behind it

@@ -109,6 +109,7 @@
         "list_agent_connectors": "Apps auflisten",
         "attach_connector": "App hinzufügen",
         "detach_connector": "App entfernen",
+        "list_vault": "Vault lesen",
         "send_message": "Coworker schreiben",
         "create_boxes": "Boxes erstellen",
         "build_team": "Team aufbauen",

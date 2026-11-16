@@ -187,6 +187,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     list_agent_connectors: PlugIcon,
     attach_connector: PlugIcon,
     detach_connector: Trash2Icon,
+    list_vault: LockIcon,
     send_message: SendIcon,
     create_boxes: BoxIcon,
     build_team: UsersIcon,

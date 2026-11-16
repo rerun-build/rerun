@@ -76,6 +76,17 @@ describe('foremanEngineBrief', () => {
         expect(brief.tools.filter(tool => tool.name === 'list_templates')).toHaveLength(1)
     })
 
+    it('reads the Vault on the hub', () => {
+        expect(brief.tools.find(tool => tool.name === 'list_vault')?.kind).toBe('hub')
+        expect(brief.instructions).toContain('list_vault')
+    })
+
+    // The ceiling is compiled into every engine already deployed: past it, each message to the
+    // foreman is refused by the box.
+    it('stays within the 64 tools a deployed engine accepts', () => {
+        expect(brief.tools.length).toBeLessThanOrEqual(64)
+    })
+
     it('never lets two creations overlap', () => {
         const serial = brief.tools.filter(tool => tool.serial).map(tool => tool.name)
         expect(serial.sort()).toEqual(['create_agent', 'create_boxes', 'install_shared_agent', 'install_template'])

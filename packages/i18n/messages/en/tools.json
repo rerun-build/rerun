@@ -115,6 +115,7 @@
         "list_agent_connectors": "List Apps",
         "attach_connector": "Add App",
         "detach_connector": "Remove App",
+        "list_vault": "Read the Vault",
         "send_message": "Message Coworker",
         "create_boxes": "Create Boxes",
         "build_team": "Build Team",
