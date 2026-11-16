@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-import argparse, json, os, signal, subprocess, sys, tempfile, threading, time, uuid
+import argparse, base64, json, os, signal, subprocess, sys, tempfile, threading, time, uuid
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import applypatch as AP, batch as BT, checkout as CO, engine as E, evidence as EV, factory as F, ghclient as GH, intake as IN, limits as L, publish as PB, followups as FU, readyq as RQ, store as S, testrun as TR, trigger as T, wake
+import applypatch as AP, batch as BT, checkout as CO, engine as E, evidence as EV, factory as F, ghclient as GH, intake as IN, limits as L, roster, publish as PB, followups as FU, readyq as RQ, store as S, testrun as TR, trigger as T, wake
 from publish import body as pr_body
 
 POLL_S = 30
@@ -506,13 +506,22 @@ FACTORY_LOGIN = "special-place-administrator"
 def _trusted(item):
     return item.get("author_association") in TRUSTED_ASSOCIATIONS or (item.get("user") or {}).get("login") == FACTORY_LOGIN
 
+def dev_roster(gh):
+    try:
+        got = gh.get("/contents/tools/factory/roster.json?ref=dev")
+    except GH.GhError as e:
+        if e.status == 404:
+            return None
+        raise
+    return roster.load(base64.b64decode(got["content"]).decode("utf-8"))
+
 def intake_issue(st, gh, repo, n, base_branch="dev"):
     issue = gh.issue(n)
     parts = [issue.get("body") or ""] if _trusted(issue) else []
     text = "\n".join(parts + [c.get("body") or "" for c in gh.comments(n) if _trusted(c)])
     meta = {"repo_url": "https://github.com/" + repo, "title": issue["title"], "base_branch": base_branch}
     sha = gh.branch_sha(base_branch)
-    state, errors = IN.register(st, str(n), meta, text)
+    state, errors = IN.register(st, str(n), meta, text, dev_roster(gh))
     if state:
         st.set(str(n), "base", sha)
     return state, errors
