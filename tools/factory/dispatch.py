@@ -370,6 +370,7 @@ class Dispatcher:
         self.report_logged = set()
         self.started = now()
         self.names = pools.names(cfg)
+        self.tiers_off = False
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
         self.control = control.Control(cfg, gh, self.store)
@@ -780,7 +781,7 @@ class Dispatcher:
             return
         if tier is not None:
             j["tier"] = tier
-        if run_model is not None:
+        if run_model is not None and not self.tiers_off:
             j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
@@ -1241,6 +1242,19 @@ class Dispatcher:
         elif kept:
             holds.clear(self.store, "sign-in renewal")
 
+    def tier_floor(self):
+        floor = self.cfg.get("tier_floor")
+        off = False
+        if floor:
+            m = digest.measures(self.store, self.now())
+            first = m["firstPassYield"]
+            off = first is not None and round(m["mergedPerHour"] * 24) >= floor["min_merged"] and first < floor["yield"]
+            if off and not self.tiers_off:
+                log("-", "tier models off: first-pass yield %.2f under %s" % (first, floor["yield"]))
+        if self.tiers_off and not off:
+            log("-", "tier models on")
+        self.tiers_off = off
+
     def once(self):
         self.heartbeat()
         self.renewal_hold()
@@ -1274,6 +1288,11 @@ class Dispatcher:
             clean = False
             log("-", "dev result: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.quota = self.slot_quotas()
+        try:
+            self.tier_floor()
+        except Exception as e:
+            clean = False
+            log("-", "tier floor: %s" % (e if isinstance(e, Error) else type(e).__name__))
         for j in self.jobs():
             try:
                 if j["state"] not in END:
