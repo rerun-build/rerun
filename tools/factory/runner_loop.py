@@ -324,10 +324,6 @@ class Runner:
                     self.st.set_ready_state(job, c, "merged")
 
     def requeue(self, f):
-        payload = {"job": f["job"], "stage": f["stage"], "chunk": f["chunk"]}
-        st = self.st.get_all(f["job"]).get("payload:" + f["stage"])
-        if st:
-            payload = json.loads(st)
         if f["chunk"]:
             for l in self.st.open_leases():
                 if l["job"] == f["job"] and l["chunk"] == f["chunk"] and l.get("attempt", 0) == f["refire"]:
@@ -335,6 +331,10 @@ class Runner:
             self.st.bump_attempt(f["job"], f["chunk"])
             self.st.set_ready_state(f["job"], f["chunk"], "ready")
         else:
+            payload = {"job": f["job"], "stage": f["stage"], "chunk": f["chunk"]}
+            st = self.st.get_all(f["job"]).get("payload:" + f["stage"])
+            if st:
+                payload = json.loads(st)
             self.st.enqueue(f["job"], f["stage"], f["chunk"], payload)
 
     def start_queued(self):
@@ -394,6 +394,9 @@ class Runner:
             try:
                 for f in filter(mine, self.st.running(l["job"])):
                     row = T.read_run(self.eng, self._agent(f), f["run_id"])
+                    if row and row.get("status") == "done":
+                        self.st.close_run(f["run_id"], "done", at)
+                        continue
                     if row and row.get("status") == "running":
                         self.eng.cancel(self._agent(f), f["run_id"])
                     self.st.close_run(f["run_id"], "cancelled", at, error="lease expired")
