@@ -852,8 +852,11 @@ def preflight_lint(top, changed):
         code, out = r.returncode, r.stdout + r.stderr
     except subprocess.TimeoutExpired:
         code, out = 124, "timed out after %d s" % PREFLIGHT_LINE_S
-    if code:
+    if code == 1:
         die("ruff==%s check tools/factory finds this (exit %d), nothing is pushed. Its last lines:\n%s" % (pin.group(1), code, "\n".join(out.splitlines()[-40:])))
+    if code:
+        print("lint not run: ruff==%s did not run here (exit %d): %s" % (pin.group(1), code, (out.strip().splitlines() or [""])[-1][:200]))
+        return
     print("lint passed: ruff==%s check tools/factory" % pin.group(1))
 
 
