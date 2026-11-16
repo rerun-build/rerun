@@ -112,7 +112,7 @@ class Types(unittest.TestCase):
         def go(agents):
             calls = []
             with tempfile.TemporaryDirectory() as d:
-                w = World([{"number": n, "title": "T", "comments": [], "body": ready().replace("**Worker**: coder", "**Worker**: " + t)}
+                w = World([{"number": n, "title": "T", "comments": [], "body": ready().replace("**Worker**: coder", "**Worker**: " + t).replace("a/", "c/" if n == 6 else "a/")}
                            for n, t in ((5, "researcher"), (6, "designer"))])
                 c = copy.deepcopy(cfg)
                 c.update(ledger_file=os.path.join(d, "ledger.db"), json_state_file=os.path.join(d, "dispatch.json"),

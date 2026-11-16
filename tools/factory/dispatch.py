@@ -4,6 +4,7 @@ import backlog
 import briefs
 import clocks
 import cutshape
+import digest
 import holds
 import planners
 import pools
@@ -168,7 +169,7 @@ def replan_brief(j, repo, n):
         '',
         'Do three things:',
         '1. Read the issue against today\'s dev in a throwaway checkout.',
-        '2. Add a `**Corrections**` block to the issue with `- ` bullets, and run each changed Run line once.',
+        '2. Add a `**Corrections**` block to the issue with `- ` bullets, and run each changed Run line once. A new or changed Run line is written inside the `**Run**` block itself, not only in Corrections: the red-before-green check reads only that block.',
         '3. Put the issue back in the queue: `/data/tools/bin/gh issue edit %s -R %s --add-label factory --remove-label factory-blocked`' % (j["issue"], repo),
         '',
         'If the reason is not true on today\'s dev, say so in a comment and relabel unchanged.',
@@ -450,6 +451,15 @@ class Dispatcher:
         self.save(j, msg, reset=True)
         log(j["issue"], msg)
 
+    def file_holder(self, issue, paths):
+        for j in self.jobs():
+            if j["issue"] == issue or j["state"] in END + ("waiting",):
+                continue
+            shared = [p for p in paths if p in (j.get("paths") or [])]
+            if shared:
+                return (j["issue"], shared[0])
+        return None
+
     def intake(self):
         open_jobs = [j for j in self.jobs() if j["state"] not in END + ("waiting",)]
         rooms = {t: (v["max_jobs"] or 0) - len([j for j in open_jobs if j.get("worker", "coder") == t])
@@ -546,6 +556,20 @@ class Dispatcher:
                                 self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", dead_comment(dead)])
                             self.store.set(str(i["number"]), "dead_deps", digest)
                         continue
+                held = self.cfg.get("one_file_one_job") and self.file_holder(i["number"], parsed["paths"])
+                if held:
+                    if not old or old.get("file_wait") != list(held):
+                        line = "waits for #%d, same file %s" % held
+                        data = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "waiting",
+                                "round": 1, "waiting": [held[0]], "file_wait": list(held), "worker": parsed["worker"],
+                                "paths": parsed["paths"], "test": parsed["test"], "plan_dev": parsed["dev"]}
+                        if take:
+                            data["take"] = take
+                        if old and old.get("replans"):
+                            data["replans"] = old["replans"]
+                        self.save(data, line)
+                        log(i["number"], line)
+                    continue
                 if self.cfg.get("auto_plan_marker", True):
                     v = json.loads(self.gh(["issue", "view", str(i["number"]), "-R", self.repo, "--json", "body,comments"]))
                     texts = [v.get("body") or ""] + [c.get("body") or "" for c in v.get("comments") or []]
@@ -1151,6 +1175,7 @@ class Dispatcher:
             snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
                                            read_epic=self.read_epic, planning=self.planners.read(self.beats))
             self.account("factory_report", {"snapshot": snap}, timeout=10)
+            digest.post(self.gh, self.store, self.repo, snap.get("digest"), now)
             self.report_logged.clear()
         except Exception as e:  # noqa: BLE001 - the report only, never the beat
             text = str(e) if isinstance(e, Error) else type(e).__name__
