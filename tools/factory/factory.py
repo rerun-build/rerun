@@ -329,11 +329,33 @@ def ensure_clone(full):
     if not os.path.isdir(os.path.join(p, ".git")):
         run([GIT, "clone", "--quiet", "https://github.com/%s.git" % full, p], timeout=600)
     run([GIT, "fetch", "--quiet", "--prune", "origin"], cwd=p, timeout=300)
+    follow_base(p)
     return p
 
 
 def remote_has(p, br):
     return run([GIT, "rev-parse", "--verify", "--quiet", "refs/remotes/origin/" + br], cwd=p, check=False).returncode == 0
+
+
+def follow_base(p):
+    if remote_has(p, "dev"):
+        base = "dev"
+    else:
+        head = run([GIT, "symbolic-ref", "--quiet", "--short", "refs/remotes/origin/HEAD"], cwd=p, check=False).stdout.strip()
+        if head.startswith("origin/"):
+            head = head[len("origin/"):]
+        if head and remote_has(p, head):
+            base = head
+        elif remote_has(p, "main"):
+            base = "main"
+        else:
+            return
+    dirty = run([GIT, "status", "--porcelain", "--untracked-files=no"], cwd=p, check=False).stdout.strip()
+    if dirty:
+        cur = run([GIT, "rev-parse", "--short", "HEAD"], cwd=p, check=False).stdout.strip()
+        print("shared checkout %s has local changes; left at %s" % (p, cur), file=sys.stderr)
+        return
+    run([GIT, "checkout", "--quiet", "--detach", "origin/" + base], cwd=p, check=False)
 
 
 def on_remote(p, sha):
