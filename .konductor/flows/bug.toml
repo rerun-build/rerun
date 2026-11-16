@@ -1,4 +1,4 @@
-# Konductor flow for a Linear issue labeled Bug: move the card to In Progress, investigate, plan (approved by the flow), review, fix the review
+# Konductor flow for a Linear issue labeled Bug: move the card to In Progress, investigate, wait for your go, plan (approved by the flow), review, fix the review
 # (plan approved by you), summary on the issue, wait for the PR you open and merge, then close the card.
 # Format: https://github.com/ClementJanssens/konductor/blob/master/docs/flows.md
 name = "Bug"
@@ -22,7 +22,10 @@ dans PostHog ou dans Supabase. Fais une analyse complète et essaye de reproduir
 Si le bug est isolé (un seul client, cause hors de Rerun : son provider, son réseau, sa config) ou un peu wtf
 (incohérent, inexplicable, ou un correctif disproportionné pour l'impact), ouvre ton message par une alerte :
 explique ce qui le rend isolé ou bizarre, avec les preuves, et recommande de corriger, de clore ou de creuser.
-C'est moi qui décide si on continue.
+
+C'est moi qui décide si on continue. Après ton rapport, demande avec AskUserQuestion : « Corriger », « Creuser encore »
+ou « Clore ». Sur « Creuser encore », reprends l'enquête avec ce que je te dis, puis repose la question. Ne termine
+jamais ton tour sans cette question, sauf quand je choisis « Corriger » ou « Clore » : la fin de ton tour lance l'étape suivante.
 """
 
 [[steps]]
@@ -32,8 +35,8 @@ model = "opus-5-5-1m"
 plan = true
 approve = "auto"
 prompt = """
-Si ton investigation a levé une alerte « bug isolé ou wtf » et que je n'ai pas dit de continuer, ne planifie rien :
-rappelle l'alerte en deux lignes et arrête-toi sans plan, le flow attend ma décision.
+Si j'ai choisi « Clore » à la fin de l'investigation, ne planifie rien : rappelle en deux lignes pourquoi on clôt et
+arrête-toi sans plan, le flow attend que je l'annule.
 Sinon, planifie le fix à partir de ton investigation : la cause racine, le correctif au bon endroit, et le test qui
 reproduit le bug puis prouve le fix.
 """
