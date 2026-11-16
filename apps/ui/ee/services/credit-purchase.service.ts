@@ -25,7 +25,7 @@ export type CreditQuote = {
 
 export type CreditPurchaseResult = { kind: 'paid' } | { kind: 'confirm'; clientSecret: string; invoiceId: string } | { kind: 'checkout'; url: string }
 
-type PurchaseContext = { workspaceId: number; customerId: string | null; paymentMethod: Stripe.PaymentMethod | null }
+type PurchaseContext = { workspaceId: number; customerId: string | null; customer: Stripe.Customer | null; paymentMethod: Stripe.PaymentMethod | null }
 
 function assertPacks(packs: number): void {
     if (!Number.isInteger(packs) || packs < 1 || packs > MAX_CREDIT_PACKS_PER_PURCHASE) throw new AppError('invalidAddonQuantity')
@@ -42,22 +42,35 @@ async function loadPurchaseContext(): Promise<PurchaseContext> {
     const supabase = createServiceRoleClient()
     const { data: workspace } = await selectSingle(supabase, 'workspaces', ['stripe_customer_id', 'stripe_subscription_id'] as const, { id: workspaceId })
     const customerId = workspace?.stripe_customer_id ?? null
-    if (!customerId) return { workspaceId, customerId: null, paymentMethod: null }
+    if (!customerId) return { workspaceId, customerId: null, customer: null, paymentMethod: null }
 
-    const customer = await stripe.customers.retrieve(customerId, { expand: ['invoice_settings.default_payment_method'] })
-    if (customer.deleted) return { workspaceId, customerId: null, paymentMethod: null }
-    if (!customer.address?.country) return { workspaceId, customerId, paymentMethod: null }
+    const customer = await stripe.customers.retrieve(customerId, { expand: ['invoice_settings.default_payment_method', 'tax_ids'] })
+    if (customer.deleted) return { workspaceId, customerId: null, customer: null, paymentMethod: null }
+    if (!customer.address?.country) return { workspaceId, customerId, customer, paymentMethod: null }
 
     let paymentMethod = customer.invoice_settings?.default_payment_method ?? null
     if (!paymentMethod && workspace?.stripe_subscription_id) {
         const subscription = await stripe.subscriptions.retrieve(workspace.stripe_subscription_id, { expand: ['default_payment_method'] })
         paymentMethod = subscription.default_payment_method
     }
-    return { workspaceId, customerId, paymentMethod: paymentMethod && typeof paymentMethod === 'object' ? paymentMethod : null }
+    return { workspaceId, customerId, customer, paymentMethod: paymentMethod && typeof paymentMethod === 'object' ? paymentMethod : null }
 }
 
-function chargeable(context: PurchaseContext): context is PurchaseContext & { customerId: string; paymentMethod: Stripe.PaymentMethod } {
-    return !!context.customerId && !!context.paymentMethod
+function chargeable(context: PurchaseContext): context is PurchaseContext & { customerId: string; customer: Stripe.Customer; paymentMethod: Stripe.PaymentMethod } {
+    return !!context.customerId && !!context.customer && !!context.paymentMethod
+}
+
+// What Stripe taxes the customer on, handed to the preview in place of the customer itself: given
+// `customer`, the preview is the plan subscription's next invoice with the pack added to it.
+function taxedCustomerDetails(customer: Stripe.Customer): Stripe.InvoiceCreatePreviewParams.CustomerDetails {
+    const { line1, line2, city, state, postal_code, country } = customer.address ?? {}
+    return {
+        address: { line1: line1 ?? undefined, line2: line2 ?? undefined, city: city ?? undefined, state: state ?? undefined, postal_code: postal_code ?? undefined, country: country ?? undefined },
+        tax_exempt: customer.tax_exempt ?? undefined,
+        tax_ids: (customer.tax_ids?.data ?? [])
+            .filter(taxId => taxId.type !== 'unknown')
+            .map(taxId => ({ type: taxId.type as Stripe.InvoiceCreatePreviewParams.CustomerDetails.TaxId.Type, value: taxId.value })),
+    }
 }
 
 export async function quoteCreditPurchase(packs: number): Promise<CreditQuote> {
@@ -66,13 +79,15 @@ export async function quoteCreditPurchase(packs: number): Promise<CreditQuote> {
     if (!chargeable(context)) return { dueTodayCents: packs * CREDIT_PACK_PRICE_CENTS, taxCents: 0, taxIncluded: false, card: null }
 
     const preview = await stripe.invoices.createPreview({
-        customer: context.customerId,
+        customer_details: taxedCustomerDetails(context.customer),
         currency: PLAN_CURRENCY,
         invoice_items: [{ price: creditPackOncePriceId(), quantity: packs }],
         automatic_tax: { enabled: true },
     })
     const taxCents = (preview.total_taxes ?? []).reduce((sum, tax) => sum + tax.amount, 0)
-    return { dueTodayCents: preview.amount_due, taxCents, taxIncluded: true, card: savedCard(context.paymentMethod) }
+    // A credit balance on the customer pays its next invoice first, this one included.
+    const balanceCreditCents = Math.max(-context.customer.balance, 0)
+    return { dueTodayCents: Math.max(preview.total - balanceCreditCents, 0), taxCents, taxIncluded: true, card: savedCard(context.paymentMethod) }
 }
 
 export async function buyCredit(packs: number): Promise<CreditPurchaseResult> {

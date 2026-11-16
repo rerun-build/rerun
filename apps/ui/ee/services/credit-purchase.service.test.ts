@@ -26,7 +26,7 @@ let purchase: { micros: number } | null
 let db: FakeSupabase
 
 function customer(overrides: Record<string, unknown> = {}) {
-    return { id: 'cus_1', deleted: false, address: { country: 'FR' }, invoice_settings: { default_payment_method: CARD }, ...overrides }
+    return { id: 'cus_1', deleted: false, balance: 0, address: { country: 'FR' }, tax_exempt: 'none', tax_ids: { data: [] }, invoice_settings: { default_payment_method: CARD }, ...overrides }
 }
 
 function grants() {
@@ -53,9 +53,26 @@ beforeEach(() => {
 
 describe('quoteCreditPurchase', () => {
     it('quotes the invoice the card is about to pay, tax included', async () => {
-        vi.mocked(stripe.invoices.createPreview).mockResolvedValue({ amount_due: 2400, total_taxes: [{ amount: 400 }] } as never)
+        vi.mocked(stripe.invoices.createPreview).mockResolvedValue({ total: 2400, total_taxes: [{ amount: 400 }] } as never)
         await expect(quoteCreditPurchase(2)).resolves.toEqual({ dueTodayCents: 2400, taxCents: 400, taxIncluded: true, card: { brand: 'visa', last4: '4242', expMonth: 12, expYear: 2030 } })
-        expect(vi.mocked(stripe.invoices.createPreview).mock.calls[0][0]).toMatchObject({ customer: 'cus_1', invoice_items: [{ price: 'price_credit_once', quantity: 2 }], automatic_tax: { enabled: true } })
+        expect(vi.mocked(stripe.invoices.createPreview).mock.calls[0][0]).toMatchObject({ invoice_items: [{ price: 'price_credit_once', quantity: 2 }], automatic_tax: { enabled: true } })
+    })
+
+    it('previews the pack alone, not the next invoice of the plan subscription', async () => {
+        vi.mocked(stripe.customers.retrieve).mockResolvedValue(
+            customer({ address: { line1: '1 rue de Rivoli', city: 'Paris', postal_code: '75001', country: 'FR' }, tax_ids: { data: [{ type: 'eu_vat', value: 'FR12345678901' }] } }) as never,
+        )
+        vi.mocked(stripe.invoices.createPreview).mockResolvedValue({ total: 1000, total_taxes: [] } as never)
+        await quoteCreditPurchase(1)
+        const params = vi.mocked(stripe.invoices.createPreview).mock.calls[0][0]!
+        expect(params).not.toHaveProperty('customer')
+        expect(params.customer_details).toMatchObject({ address: { line1: '1 rue de Rivoli', city: 'Paris', postal_code: '75001', country: 'FR' }, tax_exempt: 'none', tax_ids: [{ type: 'eu_vat', value: 'FR12345678901' }] })
+    })
+
+    it('takes a credit balance off what the card pays', async () => {
+        vi.mocked(stripe.customers.retrieve).mockResolvedValue(customer({ balance: -500 }) as never)
+        vi.mocked(stripe.invoices.createPreview).mockResolvedValue({ total: 1200, total_taxes: [{ amount: 200 }] } as never)
+        await expect(quoteCreditPurchase(1)).resolves.toMatchObject({ dueTodayCents: 700, taxCents: 200 })
     })
 
     it('quotes the bare price for a workspace that will pay on Checkout', async () => {
