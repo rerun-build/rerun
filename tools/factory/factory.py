@@ -750,7 +750,9 @@ TOKEN_SHAPE = re.compile(r"gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{22
 def token_shapes(top, base):
     found = []
     cur = None
-    for line in run([GIT, "log", "-p", "-U0", "--no-color", "--format=", "origin/%s..HEAD" % base], cwd=top).stdout.splitlines():
+    diff = run([GIT, "diff", "--unified=0", "--no-color", "origin/%s...HEAD" % base], cwd=top).stdout
+    log = run([GIT, "log", "-p", "-U0", "--no-color", "--format=", "origin/%s..HEAD" % base], cwd=top).stdout
+    for line in (diff + "\n" + log).splitlines():
         if line.startswith("+++ b/"):
             cur = line[6:]
         elif line.startswith("+") and not line.startswith("+++") and TOKEN_SHAPE.search(line):

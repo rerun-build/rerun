@@ -131,6 +131,20 @@ class CloneCommands(CloneCase):
         self.assertIn("the shape of a GitHub token is in leak.txt", out)
         self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
 
+    def test_a_token_typed_into_a_hand_resolved_merge_refuses_the_push(self):
+        p = self.ready_clone()
+        self.commit(p, "same.txt", "mine\n")
+        self.move_dev("same.txt", "theirs\n")
+        T.git(p, "fetch", "--quiet", "origin", "dev")
+        T.git(p, "merge", "--quiet", "origin/dev", check=False)
+        T.write(p, "same.txt", "key = " + "ghp" + "_" + "C" * 36 + "\n")
+        T.git(p, "add", "same.txt")
+        T.git(p, "commit", "--quiet", "--no-edit")
+        code, out = self.pr_open(p)
+        self.assertEqual(code, 2, out)
+        self.assertIn("the shape of a GitHub token is in same.txt", out)
+        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
+
     def test_a_token_in_a_commit_message_refuses_the_push(self):
         p = self.ready_clone()
         T.write(p, "a.txt", "a\n")
