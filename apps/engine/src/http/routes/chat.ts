@@ -29,7 +29,8 @@ chatRoutes.post('/chat', async c => {
     const raw = await c.req.json()
     if (raw && typeof raw === 'object' && 'goal' in raw && !runGoalSchema.safeParse((raw as { goal: unknown }).goal).success) return c.json({ error: 'invalid_goal' }, 400)
     const body = chatRequestSchema.parse(raw)
-    const runAgentView = agent.config.kind === 'foreman' && body.foreman ? { ...agent, brief: body.foreman } : agent
+    const briefedAgent = agent.config.kind === 'foreman' && body.foreman ? { ...agent, brief: body.foreman } : agent
+    const runAgentView = body.thinkingLevel ? { ...briefedAgent, config: { ...briefedAgent.config, thinkingLevel: body.thinkingLevel } } : briefedAgent
     const source = body.source ?? 'dashboard'
     const claim = body.install && !body.sessionId ? await claimInstallSession(agentId, () => createSession(agentId, undefined, undefined, source)) : null
     if (claim && 'inFlight' in claim) return c.json({ error: 'the installation is already under way in another conversation', code: 'install_in_flight', sessionId: claim.inFlight }, 409)
