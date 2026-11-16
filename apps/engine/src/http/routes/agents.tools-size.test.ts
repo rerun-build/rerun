@@ -41,13 +41,13 @@ describe('GET /agents/:id/tools with sizes', () => {
         const shell = body.families.find(f => f.family === 'shell')!
         expect(shell.tools).toEqual([expect.objectContaining({ name: 'shell_exec', tokens: 162 })])
         const shared = body.families.find(f => f.family === 'shared')!
-        expect(shared.tools.map(t => [t.name, t.tokens])).toEqual([['shared_read', 82], ['shared_write', 91], ['shared_list', 70], ['shared_edit', 194], ['shared_search', 160]])
+        expect(shared.tools.map(t => [t.name, t.tokens])).toEqual([['shared_read', 126], ['shared_write', 91], ['shared_list', 70], ['shared_edit', 139], ['shared_search', 144]])
     })
 
     it('gives every family the sum of its tools', async () => {
         const body = await read()
         expect(body.families.find(f => f.family === 'shell')!.tokens).toBe(162)
-        expect(body.families.find(f => f.family === 'shared')!.tokens).toBe(597)
+        expect(body.families.find(f => f.family === 'shared')!.tokens).toBe(570)
         expect(body.families.find(f => f.family === 'quickReplies')!.tokens).toBe(0)
         for (const family of body.families) expect(family.tokens, family.family).toBe(family.tools.reduce((sum, t) => sum + (t.tokens ?? -1), 0))
     })
