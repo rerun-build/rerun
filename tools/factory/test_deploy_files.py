@@ -160,5 +160,90 @@ class ClaudeScript(unittest.TestCase):
         self.assertIn("-f deploy/vps/factory-runner.yml exec -T factory-runner python3 /app/realmodel.py", self.c)
 
 
+class EveryScript(unittest.TestCase):
+    def test_every_deploy_script_is_named_in_a_test(self):
+        here = os.path.dirname(os.path.abspath(__file__))
+        text = ""
+        for n in sorted(os.listdir(here)):
+            if n.startswith("test_") and n.endswith(".py"):
+                with open(os.path.join(here, n), encoding="utf-8") as f:
+                    text += f.read()
+        missing = [
+            n for n in sorted(os.listdir(VPS))
+            if n.endswith(".sh") and not re.search(r"[\"']%s[\"']" % re.escape(n), text)
+        ]
+        self.assertEqual(missing, [])
+
+
+@unittest.skipIf(shutil.which("sh") is None, "no sh")
+class RunnerScripts(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        os.makedirs(os.path.join(self.tmp, "deploy", "vps"))
+        os.makedirs(os.path.join(self.tmp, "bin"))
+        for n in ("factory-status.sh", "factory-m2-proof.sh"):
+            with open(os.path.join(VPS, n), encoding="utf-8") as f:
+                body = f.read()
+            with open(os.path.join(self.tmp, "deploy", "vps", n), "w", encoding="utf-8") as f:
+                f.write(body)
+        self.log = os.path.join(self.tmp, "docker.log")
+        self.fake("docker", 'echo "$*" >> "$DOCKER_LOG"')
+        self.fake("sleep", ":")
+        self.fake("openssl", "echo 00")
+
+    def fake(self, name, body):
+        path = os.path.join(self.tmp, "bin", name)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("#!/bin/sh\n" + body + "\n")
+        os.chmod(path, 0o755)
+
+    def run_script(self, name, *args):
+        env = dict(os.environ)
+        env["PATH"] = os.path.join(self.tmp, "bin") + os.pathsep + env.get("PATH", "")
+        env["DOCKER_LOG"] = self.log
+        r = subprocess.run(
+            ["sh", os.path.join("deploy", "vps", name), *args],
+            cwd=self.tmp, env=env, capture_output=True, text=True, timeout=60,
+        )
+        return r.returncode, r.stdout + r.stderr
+
+    def calls(self):
+        if not os.path.exists(self.log):
+            return []
+        with open(self.log, encoding="utf-8") as f:
+            return f.read().splitlines()
+
+    def test_status_hands_its_arguments_to_the_runner_report(self):
+        rc, out = self.run_script("factory-status.sh", "--json")
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(
+            self.calls(),
+            ["compose -f deploy/vps/factory-runner.yml exec -T factory-runner python3 -I /app/status_report.py --json"],
+        )
+
+    def test_proof_refuses_without_root_and_touches_nothing(self):
+        self.fake("id", "echo 1000")
+        rc, out = self.run_script("factory-m2-proof.sh")
+        self.assertEqual(rc, 1)
+        self.assertIn("Run it with sudo", out)
+        self.assertEqual(self.calls(), [])
+
+    def test_proof_runs_its_eight_steps_in_order(self):
+        self.fake("id", "echo 0")
+        rc, out = self.run_script("factory-m2-proof.sh")
+        self.assertEqual(rc, 0, out)
+        self.assertEqual(re.findall(r"(?m)^== (\d)/8 ", out), [str(i) for i in range(1, 9)])
+        self.assertNotIn("STEP FAILED", out)
+        calls = self.calls()
+        self.assertEqual(len(calls), 16)
+        enq = [c.split("runner_loop.py ", 1)[1] for c in calls if "runner_loop.py enqueue" in c]
+        self.assertEqual(
+            enq,
+            ["enqueue r1 challenge", "enqueue r2 challenge-hold", "enqueue r3 challenge-hold", "enqueue r4 challenge-hold"],
+        )
+        self.assertEqual(sum("/app/status_report.py" in c for c in calls), 4)
+
+
 if __name__ == "__main__":
     unittest.main()
