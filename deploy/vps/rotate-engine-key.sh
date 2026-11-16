@@ -23,7 +23,7 @@ put() {
     K="$1" V="$2" awk 'BEGIN { k = ENVIRON["K"]; line = k "=\047" ENVIRON["V"] "\047" }
         $0 ~ "^" k "=" { if (!done) print line; done = 1; next } { print }
         END { if (!done) print line }' .env > .env.tmp &&
-        chown --reference=.env .env.tmp && chmod --reference=.env .env.tmp && mv -f .env.tmp .env
+        chown --reference=.env .env.tmp && chmod --reference=.env .env.tmp && mv -f .env.tmp .env || { rm -f .env.tmp; return 1; }
 }
 
 recval() { sed -n "s/^$1=//p" "$REC" 2>/dev/null | tail -n 1; }
@@ -228,7 +228,16 @@ swap() {
     HEALTH=$(poll 200 '' http://localhost:3000/health)
     NOKEY=$(code '' http://localhost:3000/agents)
     case "$NOKEY" in
-        ''|000|401) ;;
+        401) ;;
+        ''|000)
+            if docker compose stop app engine </dev/null; then
+                say "verify engine-no-key http=${NOKEY:-none} FAIL: the engine did not answer. App and engine are STOPPED."
+            else
+                say "verify engine-no-key http=${NOKEY:-none} FAIL: the engine did not answer and did not stop: run 'docker compose stop app engine' now."
+            fi
+            say "The record file $REC is kept. Fix why the engine answers without a key before '$ME rotate', or undo with '$ME rollback'."
+            stopped_help
+            ;;
         *)
             if docker compose stop app engine </dev/null; then
                 say "verify engine-no-key http=$NOKEY FAIL: the engine answered without a key. App and engine are STOPPED."
