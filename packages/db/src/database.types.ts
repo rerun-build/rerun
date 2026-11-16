@@ -106,6 +106,7 @@ export type Database = {
           id: string
           name: string
           row: number
+          sidebar_order: number | null
           space_id: string
           status: Database["public"]["Enums"]["agent_status"]
           template_id: string | null
@@ -123,6 +124,7 @@ export type Database = {
           id?: string
           name: string
           row?: number
+          sidebar_order?: number | null
           space_id: string
           status?: Database["public"]["Enums"]["agent_status"]
           template_id?: string | null
@@ -140,6 +142,7 @@ export type Database = {
           id?: string
           name?: string
           row?: number
+          sidebar_order?: number | null
           space_id?: string
           status?: Database["public"]["Enums"]["agent_status"]
           template_id?: string | null
@@ -2528,6 +2531,7 @@ export type Database = {
           name: string | null
           row_end: number
           row_start: number
+          sidebar_order: number | null
           visibility: string
           workspace_id: number
         }
@@ -2539,6 +2543,7 @@ export type Database = {
           name?: string | null
           row_end: number
           row_start: number
+          sidebar_order?: number | null
           visibility?: string
           workspace_id: number
         }
@@ -2550,6 +2555,7 @@ export type Database = {
           name?: string | null
           row_end?: number
           row_start?: number
+          sidebar_order?: number | null
           visibility?: string
           workspace_id?: number
         }

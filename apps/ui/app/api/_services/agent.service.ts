@@ -86,8 +86,8 @@ export async function findFreeCellsInSpace(supabase: ReturnType<typeof createSer
 // anchor has to move with it: a tile is drawn at its own col/row whichever Box owns it, so keeping
 // the old one would park it in the rectangle it just left.
 // Moving changes who sees the coworker, so it takes `manage` on the Box it leaves and on the one it
-// joins.
-export async function moveAgentToBox(agentId: string, spaceId: string, actor: Actor): Promise<{ ok: true; position: GridPosition } | ActionFailure> {
+// joins. `sidebarOrder` places it in the new Box's list in the Simple view, at its end without it.
+export async function moveAgentToBox(agentId: string, spaceId: string, actor: Actor, sidebarOrder?: number): Promise<{ ok: true; position: GridPosition } | ActionFailure> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['space_id', 'workspace_id'] as const, { id: agentId })
     if (!agent || agent.workspace_id !== actor.workspaceId) return failure(COWORKER_NOT_FOUND)
@@ -102,7 +102,7 @@ export async function moveAgentToBox(agentId: string, spaceId: string, actor: Ac
     const position = await findFreeCellInSpace(supabase, spaceId)
     if (!position) return failure('boxFull')
 
-    const { error } = await supabase.from('agents').update<Database['public']['Tables']['agents']['Update']>({ space_id: spaceId, col: position.col, row: position.row }).eq('id', agentId)
+    const { error } = await supabase.from('agents').update<Database['public']['Tables']['agents']['Update']>({ space_id: spaceId, col: position.col, row: position.row, sidebar_order: sidebarOrder ?? null }).eq('id', agentId)
     if (error) return { ok: false, error: `Failed to move agent: ${error.message}` }
 
     return { ok: true, position }

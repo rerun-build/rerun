@@ -4,7 +4,7 @@ export type AgentRow = Database['public']['Tables']['agents']['Row']
 export type AgentInsert = Database['public']['Tables']['agents']['Insert']
 export type SessionRow = Database['public']['Tables']['sessions']['Row']
 export type SpaceRow = Database['public']['Tables']['spaces']['Row']
-export type SpacePublic = Pick<SpaceRow, 'id' | 'workspace_id' | 'name' | 'col_start' | 'row_start' | 'col_end' | 'row_end' | 'created_at'> & Partial<Pick<SpaceRow, 'visibility'>>
+export type SpacePublic = Pick<SpaceRow, 'id' | 'workspace_id' | 'name' | 'col_start' | 'row_start' | 'col_end' | 'row_end' | 'created_at'> & Partial<Pick<SpaceRow, 'visibility' | 'sidebar_order'>>
 export type SpaceInsert = Database['public']['Tables']['spaces']['Insert']
 export type SpaceUpdate = Database['public']['Tables']['spaces']['Update']
 export type SessionStatus = Database['public']['Enums']['session_status']
@@ -79,9 +79,12 @@ export type IsoAgent = {
     // describes what a live agent is doing right now.
     disabledAt: string | null
     disabledReason: string | null
+    // Where it sits in its Box in the Simple view's list, absent where the row was read without it.
+    createdAt?: string
+    sidebarOrder?: number | null
 }
 
-type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'space_id' | 'disabled_at' | 'disabled_reason'>
+type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'space_id' | 'disabled_at' | 'disabled_reason'> & Partial<Pick<AgentRow, 'created_at' | 'sidebar_order'>>
 
 export function agentFromRow(row: AgentRowFields): IsoAgent {
     return {
@@ -96,6 +99,8 @@ export function agentFromRow(row: AgentRowFields): IsoAgent {
         spaceId: row.space_id,
         disabledAt: row.disabled_at,
         disabledReason: row.disabled_reason,
+        ...(row.created_at !== undefined && { createdAt: row.created_at }),
+        ...(row.sidebar_order !== undefined && { sidebarOrder: row.sidebar_order }),
     }
 }
 

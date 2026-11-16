@@ -112,7 +112,7 @@ export async function duplicateAgentAction(input: unknown): Promise<DuplicateAge
     }
 }
 
-const moveInputSchema = z.object({ agentId: z.string().uuid(), spaceId: z.string().uuid() })
+const moveInputSchema = z.object({ agentId: z.string().uuid(), spaceId: z.string().uuid(), sidebarOrder: z.number().finite().optional() })
 
 export type MoveAgentResult = { ok: true; position: { col: number; row: number } } | ActionFailure
 
@@ -120,8 +120,8 @@ export type MoveAgentResult = { ok: true; position: { col: number; row: number }
 // Nothing moves on the engine, only the rectangle the agent is drawn in.
 export async function moveAgentAction(input: unknown): Promise<MoveAgentResult> {
     try {
-        const { agentId, spaceId } = moveInputSchema.parse(input)
-        return await moveAgentToBox(agentId, spaceId, await requireLightSessionActor())
+        const { agentId, spaceId, sidebarOrder } = moveInputSchema.parse(input)
+        return await moveAgentToBox(agentId, spaceId, await requireLightSessionActor(), sidebarOrder)
     } catch (err) {
         return failureOf(err, 'moveCoworkerFailed')
     }

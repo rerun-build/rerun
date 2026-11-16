@@ -136,9 +136,40 @@ export function saveCollapsedBoxes(workspaceId: number, ids: readonly string[]):
 
 export type SidebarSection<A, B> = { box: B; members: A[] }
 
-// The web list, one section per Box, an empty one kept so a coworker can be moved into it. The Boxes
-// in the order they were made, their coworkers by name.
-export function sidebarSections<A extends { name: string; spaceId: string }, B extends { id: string; created_at: string | null }>(agents: readonly A[], boxes: readonly B[]): SidebarSection<A, B>[] {
-    const byName = [...agents].sort((a, b) => a.name.localeCompare(b.name))
-    return [...boxes].sort((a, b) => (a.created_at ?? '').localeCompare(b.created_at ?? '')).map(box => ({ box, members: byName.filter(agent => agent.spaceId === box.id) }))
+// Where an item sits in the web list: the order someone arranged, shared by the workspace, before
+// the items nobody placed yet, which follow in the order they were made.
+function bySidebarOrder(a: { order: number | null | undefined; made: string | null | undefined }, b: { order: number | null | undefined; made: string | null | undefined }): number {
+    const placedA = typeof a.order === 'number'
+    const placedB = typeof b.order === 'number'
+    if (placedA && placedB) return (a.order as number) - (b.order as number)
+    if (placedA !== placedB) return placedA ? -1 : 1
+    return (a.made ?? '').localeCompare(b.made ?? '')
+}
+
+// The web list, one section per Box, an empty one kept so a coworker can be moved into it.
+export function sidebarSections<A extends { name: string; spaceId: string; createdAt?: string; sidebarOrder?: number | null }, B extends { id: string; created_at: string | null; sidebar_order?: number | null }>(agents: readonly A[], boxes: readonly B[]): SidebarSection<A, B>[] {
+    const agentRank = (agent: A) => ({ order: agent.sidebarOrder, made: agent.createdAt ?? agent.name })
+    const ordered = [...agents].sort((a, b) => bySidebarOrder(agentRank(a), agentRank(b)))
+    const boxRank = (box: B) => ({ order: box.sidebar_order, made: box.created_at })
+    return [...boxes].sort((a, b) => bySidebarOrder(boxRank(a), boxRank(b))).map(box => ({ box, members: ordered.filter(agent => agent.spaceId === box.id) }))
+}
+
+export type SidebarOrderWrite = { id: string; order: number }
+
+// What to write so `movedId` lands at `index` of `list`, the list as shown without it. One write
+// between two placed neighbours; the whole list numbered again the first time, while some of it was
+// never placed, or once the gap between two neighbours runs out.
+export function sidebarOrderWrites(list: readonly { id: string; order: number | null | undefined }[], movedId: string, index: number): SidebarOrderWrite[] {
+    const before = list[index - 1]?.order
+    const after = list[index]?.order
+    const hasBefore = index > 0
+    const hasAfter = index < list.length
+    if (!hasBefore && !hasAfter) return [{ id: movedId, order: 1 }]
+    if (hasBefore && hasAfter && typeof before === 'number' && typeof after === 'number' && after - before > 1e-6) return [{ id: movedId, order: (before + after) / 2 }]
+    if (hasBefore && !hasAfter && typeof before === 'number') return [{ id: movedId, order: before + 1 }]
+    if (!hasBefore && hasAfter && typeof after === 'number') return [{ id: movedId, order: after - 1 }]
+    const ids = list.map(item => item.id)
+    ids.splice(index, 0, movedId)
+    const current = new Map(list.map(item => [item.id, item.order]))
+    return ids.map((id, position) => ({ id, order: position + 1 })).filter(write => write.id === movedId || current.get(write.id) !== write.order)
 }

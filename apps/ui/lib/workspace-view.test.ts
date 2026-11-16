@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { FOREMAN_OPENED, initialOpenOf, loadCollapsedBoxes, loadGrouping, loadPins, loadWorkspaceView, parseWorkspaceView, rememberWorkspaceView, resolveWorkspaceView, saveCollapsedBoxes, saveGrouping, savePins, sidebarSections, togglePin, WORKSPACE_VIEW_COOKIE, WORKSPACE_VIEW_STORAGE_KEY, type WorkspaceViewContext } from './workspace-view'
+import { FOREMAN_OPENED, initialOpenOf, loadCollapsedBoxes, loadGrouping, loadPins, loadWorkspaceView, parseWorkspaceView, rememberWorkspaceView, resolveWorkspaceView, saveCollapsedBoxes, saveGrouping, savePins, sidebarOrderWrites, sidebarSections, togglePin, WORKSPACE_VIEW_COOKIE, WORKSPACE_VIEW_STORAGE_KEY, type WorkspaceViewContext } from './workspace-view'
 
 function stubBrowser(stored?: string) {
     const storage = new Map<string, string>(stored === undefined ? [] : [[WORKSPACE_VIEW_STORAGE_KEY, stored]])
@@ -129,15 +129,23 @@ describe('initialOpenOf', () => {
 })
 
 describe("the web list's Boxes", () => {
-    const box = (id: string, created_at: string) => ({ id, created_at })
-    const agent = (name: string, spaceId: string) => ({ name, spaceId })
+    const box = (id: string, created_at: string, sidebar_order: number | null = null) => ({ id, created_at, sidebar_order })
+    const agent = (name: string, spaceId: string, createdAt: string, sidebarOrder: number | null = null) => ({ name, spaceId, createdAt, sidebarOrder })
 
-    it('lists every Box in the order it was made, an empty one too, its coworkers by name', () => {
-        const sections = sidebarSections([agent('Zoe', 'b'), agent('Ana', 'b'), agent('Max', 'a')], [box('b', '2026-11-02'), box('c', '2026-11-03'), box('a', '2026-11-01')])
+    it('lists every Box in the order it was made, an empty one too, its coworkers in the order they were made', () => {
+        const sections = sidebarSections([agent('Zoe', 'b', '2026-11-05'), agent('Ana', 'b', '2026-11-06'), agent('Max', 'a', '2026-11-04')], [box('b', '2026-11-02'), box('c', '2026-11-03'), box('a', '2026-11-01')])
         expect(sections.map(section => [section.box.id, section.members.map(member => member.name)])).toEqual([
             ['a', ['Max']],
-            ['b', ['Ana', 'Zoe']],
+            ['b', ['Zoe', 'Ana']],
             ['c', []],
+        ])
+    })
+
+    it('puts what someone arranged first, in that order, then the rest as it was made', () => {
+        const sections = sidebarSections([agent('Zoe', 'b', '2026-11-05'), agent('Ana', 'b', '2026-11-06', 2), agent('Bob', 'b', '2026-11-07', 1)], [box('a', '2026-11-01'), box('b', '2026-11-02', 0.5)])
+        expect(sections.map(section => [section.box.id, section.members.map(member => member.name)])).toEqual([
+            ['b', ['Bob', 'Ana', 'Zoe']],
+            ['a', []],
         ])
     })
 
@@ -146,5 +154,34 @@ describe("the web list's Boxes", () => {
         saveCollapsedBoxes(7, ['a'])
         expect(loadCollapsedBoxes(7)).toEqual(['a'])
         expect(loadCollapsedBoxes(8)).toEqual([])
+    })
+})
+
+describe('sidebarOrderWrites', () => {
+    const placed = [
+        { id: 'a', order: 1 },
+        { id: 'b', order: 2 },
+    ]
+
+    it('writes the moved item alone between two placed neighbours, or past an end', () => {
+        expect(sidebarOrderWrites(placed, 'x', 1)).toEqual([{ id: 'x', order: 1.5 }])
+        expect(sidebarOrderWrites(placed, 'x', 0)).toEqual([{ id: 'x', order: 0 }])
+        expect(sidebarOrderWrites(placed, 'x', 2)).toEqual([{ id: 'x', order: 3 }])
+        expect(sidebarOrderWrites([], 'x', 0)).toEqual([{ id: 'x', order: 1 }])
+    })
+
+    it('numbers the list again while some of it was never placed', () => {
+        expect(sidebarOrderWrites([{ id: 'a', order: 1 }, { id: 'b', order: null }, { id: 'c', order: null }], 'x', 2)).toEqual([
+            { id: 'b', order: 2 },
+            { id: 'x', order: 3 },
+            { id: 'c', order: 4 },
+        ])
+    })
+
+    it('numbers the list again once two neighbours leave no room between them', () => {
+        expect(sidebarOrderWrites([{ id: 'a', order: 1 }, { id: 'b', order: 1 + 1e-9 }], 'x', 1)).toEqual([
+            { id: 'x', order: 2 },
+            { id: 'b', order: 3 },
+        ])
     })
 })

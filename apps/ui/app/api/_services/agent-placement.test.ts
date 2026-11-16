@@ -61,7 +61,12 @@ describe('moveAgentToBox', () => {
 
     it('moves the anchor along with the Box, so the tile is drawn where it now belongs', async () => {
         await expect(moveAgentToBox('agent', 'to', admin)).resolves.toEqual({ ok: true, position: { col: 10, row: 0 } })
-        expect(update).toHaveBeenCalledWith({ space_id: 'to', col: 10, row: 0 })
+        expect(update).toHaveBeenCalledWith({ space_id: 'to', col: 10, row: 0, sidebar_order: null })
+    })
+
+    it('places it in the new Box of the Simple view where it was dropped', async () => {
+        await moveAgentToBox('agent', 'to', admin, 2.5)
+        expect(update).toHaveBeenCalledWith({ space_id: 'to', col: 10, row: 0, sidebar_order: 2.5 })
     })
 
     it('refuses a full Box rather than leaving the agent unplaced', async () => {

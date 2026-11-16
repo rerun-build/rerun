@@ -22,6 +22,7 @@ import { createClient } from '@/supabase/client'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { create } from 'zustand'
 import type { AgentFocusTab, AgentLink, GridPosition, InteractionMode, IsoAgent, SessionEntry, SessionStatus, SpacePublic } from '../lib/board/types'
+import type { SidebarOrderWrite } from '../lib/workspace-view'
 import { agentFromRow, computeAgentStatus } from '../lib/board/types'
 import { AGENT_SPAN, isPlaced } from '@/lib/board/iso'
 import { fetchLiveSessions, sweepZombieSessions } from '@/lib/board/live-sessions'
@@ -147,7 +148,11 @@ type BoardState = {
     confirmPlacement: (pos: GridPosition, viewer: BoxViewer) => void
     cancelPlacement: () => void
     moveAgent: (id: string, pos: GridPosition, spaceId: string | undefined, viewer: BoxViewer) => void
-    moveAgentToBox: (id: string, spaceId: string, viewer: BoxViewer) => void
+    // `sidebarOrder`: where it lands in its new Box in the Simple view's list, at its end without it.
+    moveAgentToBox: (id: string, spaceId: string, viewer: BoxViewer, sidebarOrder?: number) => void
+    // The Simple view's list: the writes `sidebarOrderWrites` gives, for Boxes or for coworkers.
+    orderSpaces: (writes: SidebarOrderWrite[], viewer: BoxViewer) => void
+    orderAgents: (writes: SidebarOrderWrite[], viewer: BoxViewer) => void
     renameAgent: (id: string, name: string) => void
     removeAgent: (id: string) => void
     setSessionStatus: (sessionId: string, status: SessionStatus) => void
@@ -348,8 +353,8 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
     hydrate: async (workspaceId: number) => {
         const [agentsResult, spacesResult, grantsResult] = await Promise.all([
-            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason'] as const, { workspace_id: workspaceId }),
-            selectMany(supabase, 'spaces', ['id', 'workspace_id', 'name', 'col_start', 'row_start', 'col_end', 'row_end', 'created_at', 'visibility'] as const, { workspace_id: workspaceId }),
+            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason', 'sidebar_order'] as const, { workspace_id: workspaceId }),
+            selectMany(supabase, 'spaces', ['id', 'workspace_id', 'name', 'col_start', 'row_start', 'col_end', 'row_end', 'created_at', 'visibility', 'sidebar_order'] as const, { workspace_id: workspaceId }),
             selectMany(supabase, 'space_members', ['space_id', 'user_id', 'access'] as const, { workspace_id: workspaceId }),
         ])
 
@@ -620,19 +625,52 @@ export const useBoardStore = create<BoardState>((set, get) => ({
             })
     },
 
-    moveAgentToBox: (id, spaceId, viewer) => {
+    moveAgentToBox: (id, spaceId, viewer, sidebarOrder) => {
         if (!managesBoxes(get(), viewer, [get().agents.find(a => a.id === id)?.spaceId, spaceId])) {
             refuseUnmanagedBox()
             return
         }
         // Pas d'optimisme : c'est le serveur qui choisit la cellule libre, et l'annoncer avant de
         // la connaître ferait sauter la tuile deux fois.
-        moveAgentAction({ agentId: id, spaceId }).then(res => {
+        moveAgentAction({ agentId: id, spaceId, sidebarOrder }).then(res => {
             if (!res.ok) {
                 toast.error(translated('builder.boardToasts.moveAgentFailed'), { description: refusalText(res) })
                 return
             }
-            set(state => ({ agents: state.agents.map(a => (a.id === id ? { ...a, spaceId, position: res.position } : a)) }))
+            set(state => ({ agents: state.agents.map(a => (a.id === id ? { ...a, spaceId, position: res.position, sidebarOrder: sidebarOrder ?? null } : a)) }))
+        })
+    },
+
+    orderSpaces: (writes, viewer) => {
+        if (writes.length === 0) return
+        if (!managesBoxes(get(), viewer, writes.map(write => write.id))) {
+            refuseUnmanagedBox()
+            return
+        }
+        const previous = new Map(get().spaces.map(space => [space.id, space.sidebar_order ?? null]))
+        const next = new Map(writes.map(write => [write.id, write.order]))
+        set(state => ({ spaces: state.spaces.map(space => (next.has(space.id) ? { ...space, sidebar_order: next.get(space.id) } : space)) }))
+        Promise.all(writes.map(write => supabase.from('spaces').update<Database['public']['Tables']['spaces']['Update']>({ sidebar_order: write.order }).eq('id', write.id))).then(results => {
+            if (!results.some(result => result.error)) return
+            set(state => ({ spaces: state.spaces.map(space => (next.has(space.id) && space.sidebar_order === next.get(space.id) ? { ...space, sidebar_order: previous.get(space.id) ?? null } : space)) }))
+            toast.error(translated('builder.boardToasts.moveBoxFailed'))
+        })
+    },
+
+    orderAgents: (writes, viewer) => {
+        if (writes.length === 0) return
+        const agents = get().agents
+        if (!managesBoxes(get(), viewer, writes.map(write => agents.find(agent => agent.id === write.id)?.spaceId))) {
+            refuseUnmanagedBox()
+            return
+        }
+        const previous = new Map(agents.map(agent => [agent.id, agent.sidebarOrder ?? null]))
+        const next = new Map(writes.map(write => [write.id, write.order]))
+        set(state => ({ agents: state.agents.map(agent => (next.has(agent.id) ? { ...agent, sidebarOrder: next.get(agent.id) } : agent)) }))
+        Promise.all(writes.map(write => supabase.from('agents').update<Database['public']['Tables']['agents']['Update']>({ sidebar_order: write.order }).eq('id', write.id))).then(results => {
+            if (!results.some(result => result.error)) return
+            set(state => ({ agents: state.agents.map(agent => (next.has(agent.id) && agent.sidebarOrder === next.get(agent.id) ? { ...agent, sidebarOrder: previous.get(agent.id) ?? null } : agent)) }))
+            toast.error(translated('builder.boardToasts.moveAgentFailed'))
         })
     },
 
