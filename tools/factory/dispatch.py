@@ -1138,6 +1138,13 @@ class Dispatcher:
             return
         if self.cfg.get("proof") and j.get("proved") != j["head"]:
             return self.to(j, "proof_wait", "checks green at %s, waiting for a prover" % j["head"][:7])
+        n = self.dev_hold(j)
+        if n is not None:
+            if not j.get("dev_hold"):
+                j["dev_hold"] = True
+                self.save(j, "dev is red (problem #%s): no merge until it is green" % n)
+            return
+        j.pop("dev_hold", None)
         try:
             self.gh(["pr", "merge", str(j["pr"]), "-R", self.repo, "--merge", "--match-head-commit", j["head"], "--delete-branch"])
         except Error:
@@ -1149,6 +1156,12 @@ class Dispatcher:
                 return self.end(j, "failed", "merge of #%s at %s refused %d times" % (j["pr"], j["head"][:7], tries))
         j["own_merge"] = True
         self.end(j, "merged", "#%s at %s" % (j["pr"], j["head"][:7]))
+
+    def dev_hold(self, j):
+        r = self.resolver.records(self).get("dev red")
+        if r is None or r.get("filed") == j["issue"]:
+            return None
+        return r.get("issue")
 
     def dev_results(self):
         for j in self.jobs():

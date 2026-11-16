@@ -17,6 +17,14 @@ class Watch:
     def find(self, jobs, refused, open_issues, line, now, texts, since="", held=False):
         out = {"unreadable #%d" % n: "\n".join(e) for n, e in refused.items()}
         work, busy = False, False
+        dev = [j for j in jobs if j.get("dev_result") in ("green", "red") and j.get("dev_since") is not None]
+        latest = max(dev, key=lambda j: j["dev_since"], default=None)
+        if latest and latest["dev_result"] == "red":
+            out["dev red"] = (
+                "dev is red at %s after the merge of pull request #%s (job #%d): %s\n"
+                "The resolver re-runs the failed run (`gh run rerun <id> --failed`) when the failure is not from this change, "
+                "or files the fix as a factory issue and ends with FILED: #<n>. Only that issue is merged while dev is red."
+            ) % ((latest.get("merge_sha") or "-")[:7], latest.get("pr") or "-", latest["issue"], latest.get("dev_why") or "-")
         for j in jobs:
             n, st = j["issue"], j["state"]
             if st == "waiting" and j.get("dead"):
