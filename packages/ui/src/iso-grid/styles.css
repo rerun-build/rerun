@@ -613,6 +613,7 @@
 }
 
 .iso-space-label {
+    text-rendering: geometricPrecision;
     transition: fill-opacity 220ms ease;
 }
 
