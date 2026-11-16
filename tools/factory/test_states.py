@@ -73,7 +73,7 @@ class States(unittest.TestCase):
         block = re.search(r"factoryJobStateSchema = z\.enum\(\[([\s\S]*?)\]\)", text)
         self.assertIsNotNone(block)
         known = re.findall(r"'([a-z_]+)'", block.group(1))
-        self.assertEqual([n for n in states.NAMES if n not in states.APP_STATE], known)
+        self.assertEqual(list(states.NAMES), known)
         self.assertTrue(set(states.APP_STATE.values()) <= set(known))
 
     def test_every_state_has_a_screen_entry(self):
@@ -81,7 +81,7 @@ class States(unittest.TestCase):
         block = re.search(r"JOB_STATE_VIEW[^=]*=\s*\{([\s\S]*?)\n\}", text)
         self.assertIsNotNone(block)
         keys = re.findall(r"^    ([a-z_]+): \{", block.group(1), re.M)
-        self.assertEqual(sorted(keys), sorted(n for n in states.NAMES if n not in states.APP_STATE))
+        self.assertEqual(sorted(keys), sorted(states.NAMES))
 
     def test_derived_lists(self):
         self.assertEqual(states.RUNNING, ("building", "reviewing", "fixing", "proving"))
