@@ -3,6 +3,7 @@ import re
 
 import clocks
 import holds
+import inboxsort
 import pools
 import problems
 import snapshot
@@ -15,6 +16,7 @@ OWNER = "owner"
 POOL = "resolver"
 KINDS = ("idle line", "repeating error", "dead", "unreadable", "ended", "checkout failed", "no room")
 SYSTEMIC = KINDS[:2]
+NOTICE = (inboxsort.ALARM,)
 NEW_MAX = 10
 OPEN_MAX = 30
 CLEAR_BEATS = 3
@@ -111,6 +113,7 @@ class Resolver:
                 ["issue", "list", "-R", d.repo, "--state", "open", "--json", "number", "--limit", "1000"]) or "[]")}
         held = holds.active(d.store, d.now()) is not None
         self.found = self.watch.find(jobs, d.refused, self.open_issues, line, d.now(), heard, since, held, d.no_room())
+        self.found.update(inboxsort.alarm(d.store.get_all("-")))
         self.tickets(d, self.found, resolve)
         if resolve:
             self.station(d, self.found)
@@ -133,7 +136,7 @@ class Resolver:
         room = max(0, OPEN_MAX - len(recs))
         old, listed = self.records(d, closed=True), None
         for key in new[:min(NEW_MAX, room)]:
-            fresh = {"evidence": found[key], "state": "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
+            fresh = {"evidence": found[key], "state": "notice" if key in NOTICE else "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
                      "agent": None, "copy": None, "run": None, "transient": 0, "line": None, "filed": None}
             if old.get(key, {}).get("issue"):
                 n = old[key]["issue"]

@@ -36,7 +36,7 @@ class Digest(unittest.TestCase):
             self.d.once()
 
     def apis(self):
-        return [c for c in self.gh_calls if c[0] == "api"]
+        return [c for c in self.gh_calls if c[0] == "api" and "search/issues" not in c]
 
     def test_the_first_beat_writes_the_digest_into_the_control_issue_and_the_next_edits_it_ten_minutes_later(self):
         self.make()
