@@ -13,6 +13,9 @@ import { agentDir } from '../../config/paths.js'
 import { newId } from '../../lib/ids.js'
 import { runAgent } from '../../runtime/loop.js'
 import type { RunContext } from '../../runtime/context.js'
+import { USAGE_KEYS } from '../../runtime/delegated-usage.js'
+import { getRun } from '../../db/repos/runs.js'
+import { insertRunStep, listRunSteps } from '../../db/repos/telemetry.js'
 import {
     SUB_RUN_STOPPED_BY_USER,
     beginSubRun,
@@ -34,6 +37,19 @@ export const READER_SOUL = [
     'You give no opinion and no plan. You do not guess: when you did not find something, say so.',
     'Change nothing: do not write, edit, move or delete any file, and run only commands that read.',
 ].join('\n')
+
+async function keepChildUsage(ctx: RunContext, childId: string, runId: string): Promise<void> {
+    try {
+        const row = await getRun(childId, runId)
+        const steps = await listRunSteps(childId, runId)
+        if (ctx.delegated && row) for (const key of USAGE_KEYS) ctx.delegated[key] += row[key] ?? 0
+        for (const step of steps) {
+            await insertRunStep(ctx.agent.id, { ...step, id: newId(), runId: ctx.runId ?? runId, agentId: ctx.agent.id, sessionId: ctx.sessionId })
+        }
+    } catch (err) {
+        ctx.logger.warn({ err: String(err), child: childId, run: runId }, 'delegated usage not kept')
+    }
+}
 
 type SubProgress = SubRunProgress & { id: string; title: string }
 
@@ -101,10 +117,12 @@ export function delegateTools(ctx: RunContext): ToolSet {
                     const child = await createAgent({ config, soul: model ? READER_SOUL : ctx.agent.soul, keys: ctx.agent.env })
                     child.hubAgentId = ctx.agent.id
                     const taskSignal = registerSubRunStop(current.id)
+                    let started: Awaited<ReturnType<typeof runAgent>> | undefined
                     try {
                         const session = await createSession(child.id, `delegated: ${task.slice(0, 80)}`, undefined, 'delegate')
                         const prompt = context ? `${context}\n\n---\n\n${task}` : task
                         const run = await runAgent(child, session.id, prompt)
+                        started = run
                         const outcome = await followSubRun(run, current, { onChange: emit, parentSignal, taskSignal })
                         endSubRun(current, outcome.stopReason, outcome.stopReason === SUB_RUN_STOPPED_BY_USER ? 'stopped' : 'error')
                         emit()
@@ -113,6 +131,10 @@ export function delegateTools(ctx: RunContext): ToolSet {
                         return text
                     } finally {
                         unregisterSubRunStop(current.id)
+                        if (started) {
+                            await started.settled.catch(() => {})
+                            await keepChildUsage(ctx, child.id, started.runId)
+                        }
                         unloadAgent(child.id)
                         closeSystemDb(child.id)
                         closeAgentDb(child.id)
