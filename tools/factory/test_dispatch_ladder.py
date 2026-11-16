@@ -72,7 +72,7 @@ class Ladder(LadderBase):
         self.assertEqual(self.w.sends[-1][0], "b1")
         self.assertEqual((self.args[-1]["model"], self.args[-1]["thinkingLevel"]), ("claude-opus-5-5", "high"))
         brief = self.w.sends[-1][1]
-        for part in ("failed twice with another builder", "wrong sum", "still wrong", "Run lines", "in one change"):
+        for part in ("failed twice on another model", "wrong sum", "still wrong", "Run lines", "in one change"):
             self.assertIn(part, brief)
         self.assertEqual(len(senior_briefs(self.w)), 1)
         self.no_refused_move()
@@ -201,6 +201,14 @@ class Unsolvable(LadderBase):
         self.assertIn(job["state"], known)
         self.assertTrue(all(h["state"] in known for h in job["history"]))
         self.assertEqual(snap["digest"]["measures"]["blocks"]["unsolvable"], 1)
+
+
+class LeftAlone(unittest.TestCase):
+    def test_an_unsolvable_issue_is_not_planned_again_and_not_touched_by_the_classifier(self):
+        import classify, planning
+        issue = {"number": 9, "labels": [{"name": "P0"}, {"name": "factory-unsolvable"}]}
+        self.assertEqual(planning.unplanned([issue]), [])
+        self.assertIn("factory-unsolvable", classify.load()["never_touch"])
 
 
 class ResolverSpent(Base):

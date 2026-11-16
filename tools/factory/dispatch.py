@@ -266,7 +266,7 @@ def fix_brief(j, pr, review):
 
 def senior_brief(j, pr, review):
     return "\n".join([
-        'The senior fix round, sent by the dispatcher and not by Boss: pull request #%s of rerun (job #%s). This job failed twice with another builder, and this round is its last. You work alone: call no other coworker and send no question to Rob.' % (pr, j["issue"]),
+        'The senior fix round, sent by the dispatcher and not by Boss: pull request #%s of rerun (job #%s). This job failed twice on another model, and this round is its last. You work alone: call no other coworker and send no question to Rob.' % (pr, j["issue"]),
         '',
         'What each station found so far, oldest first:',
         *['- ' + f for f in j.get("found") or []],

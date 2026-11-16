@@ -193,6 +193,7 @@
     "factory-plan",
     "factory-paused",
     "factory-blocked",
+    "factory-unsolvable",
     "factory-problem",
     "owner"
   ]
