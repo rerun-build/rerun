@@ -7,14 +7,14 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-chat-'))
 process.env.RERUN_API_KEY = ''
 
 const state = vi.hoisted(() => ({
-    calls: [] as { agent: { id: string; brief?: unknown }; sessionId: string; message: string; override: unknown; runId: string; trigger?: { userLanguage?: string; callableAgentIds?: string[] } }[],
+    calls: [] as { agent: { id: string; brief?: unknown; config?: { thinkingLevel?: string | null } }; sessionId: string; message: string; override: unknown; runId: string; trigger?: { userLanguage?: string; callableAgentIds?: string[] } }[],
     runAgentError: null as Error | null,
     startRunError: null as Error | null,
 }))
 
 vi.mock('../../runtime/loop.js', async importOriginal => ({
     ...(await importOriginal<typeof import('../../runtime/loop.js')>()),
-    runAgent: async (agent: { id: string; brief?: unknown }, sessionId: string, message: string, override: unknown, _writer: unknown, runId: string, trigger?: { userLanguage?: string; callableAgentIds?: string[] }) => {
+    runAgent: async (agent: { id: string; brief?: unknown; config?: { thinkingLevel?: string | null } }, sessionId: string, message: string, override: unknown, _writer: unknown, runId: string, trigger?: { userLanguage?: string; callableAgentIds?: string[] }) => {
         state.calls.push({ agent, sessionId, message, override, runId, trigger })
         if (state.runAgentError) throw state.runAgentError
         const { releaseSession } = await import('../../runtime/run-control.js')
@@ -195,5 +195,27 @@ describe('POST /agents/:id/chat', () => {
         await (await chat(id, { message: 'again' })).text()
 
         expect(state.calls.map(call => call.trigger?.callableAgentIds)).toEqual([['agent-x'], undefined])
+    })
+
+    it('runs one turn at the thinking level the request names and leaves the stored agent alone', async () => {
+        await seed('thinker', { name: 'thinker', thinkingLevel: 'high' })
+
+        await (await chat('thinker', { message: 'hi', thinkingLevel: 'low' })).text()
+        await (await chat('thinker', { message: 'again' })).text()
+
+        expect(state.calls.map(call => call.agent.config?.thinkingLevel)).toEqual(['low', 'high'])
+    })
+
+    it('sends a model alone so the coworker connection and provider are kept', async () => {
+        await (await chat(id, { message: 'hi', model: 'claude-haiku-5-5' })).text()
+
+        expect(state.calls[0].override).toEqual({ connectionId: undefined, provider: undefined, model: 'claude-haiku-5-5' })
+    })
+
+    it('refuses a thinking level outside low, medium, high', async () => {
+        const res = await chat(id, { message: 'hi', thinkingLevel: 'extreme' })
+
+        expect(res.status).toBe(400)
+        expect(state.calls).toHaveLength(0)
     })
 })
