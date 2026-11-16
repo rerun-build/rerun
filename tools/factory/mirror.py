@@ -1,4 +1,4 @@
-import fcntl, json, os, signal, subprocess, sys, time
+import fcntl, json, os, shutil, signal, subprocess, sys, time
 
 import factory as F
 
@@ -6,6 +6,7 @@ GITHUB = os.environ.get("FACTORY_GITHUB_URL", "https://github.com/")
 HOOK = "#!/bin/sh\necho 'REFUSED: this is the factory mirror, a read-only cache. Push to GitHub.' >&2\nexit 1\n"
 GIT_LOCKS = ("packed-refs.lock", "config.lock", "HEAD.lock", "shallow.lock", "index.lock")
 RETRIES, BACKOFF_S = 3, 2
+HELD = []
 
 
 def url(full):
@@ -22,7 +23,7 @@ def path(repo):
 
 def git(args, cwd="/tmp", timeout=300):
     env = dict(os.environ, GIT_TERMINAL_PROMPT="0")
-    p = subprocess.Popen([F.GIT] + args, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    p = subprocess.Popen([F.GIT] + args, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, pass_fds=tuple(HELD))
     old = signal.getsignal(signal.SIGTERM)
 
     def on_term(*_):
@@ -69,8 +70,10 @@ def setup(m):
     git(["config", "receive.denyCurrentBranch", "refuse"], cwd=m)
     hook = os.path.join(m, "hooks", "pre-receive")
     os.makedirs(os.path.dirname(hook), exist_ok=True)
-    write(hook, HOOK)
-    os.chmod(hook, 0o755)
+    with open(hook + ".tmp", "w") as f:
+        f.write(HOOK)
+    os.chmod(hook + ".tmp", 0o755)
+    os.replace(hook + ".tmp", hook)
 
 
 def refresh(full):
@@ -83,14 +86,17 @@ def refresh(full):
         lk.close()
         print("MIRROR %s: another refresh is running, nothing to do" % repo)
         return 0
+    HELD.append(lk.fileno())
     try:
         m = path(repo)
         if not os.path.isdir(m):
-            tmp = "%s.%d.tmp" % (m, os.getpid())
+            tmp = m + ".tmp"
+            shutil.rmtree(tmp, ignore_errors=True)
             r = git(["clone", "--quiet", "--mirror", url(full), tmp], timeout=900)
             if r.returncode:
                 print("TRANSIENT: mirror %s could not be cloned: %s" % (repo, (r.stderr or "").strip()[-300:]))
                 return 3
+            setup(tmp)
             os.rename(tmp, m)
         for f in clear_git_locks(m):
             print("MIRROR %s: removed stale git lock %s" % (repo, f))
@@ -114,6 +120,7 @@ def refresh(full):
         print("MIRROR %s refreshed, dev %s" % (repo, dev[:8] or "none"))
         return 0
     finally:
+        HELD.remove(lk.fileno())
         lk.close()
 
 

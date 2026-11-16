@@ -100,6 +100,71 @@ class Mirror(MirrorCase):
         self.assertIn("TRANSIENT: ", out)
 
 
+DRIVER = textwrap.dedent("""
+    import os, sys
+    sys.path.insert(0, os.environ["T_HERE"])
+    import factory as F, mirror
+    F.GIT = os.environ.get("T_GIT") or "git"
+    F.ensure_clone = lambda full: None
+    mirror.BACKOFF_S = 0
+    real, kill = mirror.git, os.environ.get("T_KILL")
+    def git(args, cwd="/tmp", timeout=300):
+        if kill == "final" and cwd == mirror.path("rerun"):
+            os._exit(137)
+        r = real(args, cwd=cwd, timeout=timeout)
+        if kill == "cloned" and args[0] == "clone":
+            os._exit(137)
+        return r
+    mirror.git = git
+    sys.exit(mirror.refresh("special-place-ai-heaven/rerun"))
+""")
+
+
+class KilledRefresh(MirrorCase):
+    def drive(self, **extra):
+        env = dict(os.environ, T_HERE=HERE, FACTORY_WORK=F.WORK, FACTORY_GITHUB_URL=self.M.GITHUB, **extra)
+        return subprocess.Popen([sys.executable, "-I", "-c", DRIVER], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+    def test_a_first_refresh_killed_after_the_clone_leaves_no_temporary_mirror_behind(self):
+        p = self.drive(T_KILL="cloned")
+        self.assertEqual(p.wait(60), 137, p.stdout.read())
+        code, out = self.quiet(self.M.refresh, FULL)
+        self.assertEqual(code, 0, out)
+        self.assertEqual([e for e in os.listdir(self.M.root()) if e.endswith(".tmp")], [])
+
+    def test_a_first_refresh_killed_after_the_rename_leaves_a_mirror_that_refuses_pushes(self):
+        p = self.drive(T_KILL="final")
+        self.assertEqual(p.wait(60), 137, p.stdout.read())
+        self.assertTrue(os.path.isdir(self.M.path("rerun")))
+        c = self.make_clone("c")
+        T.git(c, "remote", "set-url", "origin", self.M.path("rerun"))
+        self.commit(c, "x.txt")
+        r = subprocess.run(["git", "push", "origin", "HEAD:refs/heads/chunk/9-1"], cwd=c, capture_output=True, text=True)
+        self.assertNotEqual(r.returncode, 0, r.stderr)
+        self.assertIn("read-only cache", r.stderr)
+
+    def test_a_git_left_running_by_a_killed_refresh_still_holds_the_lock(self):
+        self.quiet(self.M.refresh, FULL)
+        fake = os.path.join(self.tmp, "slowgit")
+        with open(fake, "w") as f:
+            f.write("#!/bin/sh\nif [ \"$1\" = fetch ]; then echo $$ > \"$T_DIR/fetch.pid\"; exec sleep 30; fi\nexec git \"$@\"\n")
+        os.chmod(fake, 0o755)
+        p = self.drive(T_GIT=fake, T_DIR=self.tmp)
+        pid = os.path.join(self.tmp, "fetch.pid")
+        for _ in range(200):
+            if os.path.exists(pid) and open(pid).read().strip():
+                break
+            time.sleep(0.05)
+        p.kill()
+        p.wait(10)
+        with open(pid) as f:
+            left = int(f.read().strip())
+        self.addCleanup(lambda: subprocess.run(["kill", "-9", str(left)], capture_output=True))
+        code, out = self.quiet(self.M.refresh, FULL)
+        self.assertEqual(code, 0, out)
+        self.assertIn("another refresh is running", out)
+
+
 class SigtermReachesGit(unittest.TestCase):
     def test_sigterm_is_passed_to_git_and_waited_for(self):
         import tempfile
