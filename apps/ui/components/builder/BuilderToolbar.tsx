@@ -85,7 +85,7 @@ export function BuilderToolbar() {
                                     </div>
                                     {/* On a phone or a narrow board the two labels crowd the corner: one "+" opens both choices. */}
                                     <div className="hidden shrink-0 max-sm:flex @max-4xl/board:flex">
-                                        <DropdownMenu>
+                                        <DropdownMenu modal={false}>
                                             <TooltipDisabledReason reason={needsMachineReason ?? undefined} side="top" className="rounded-full">
                                                 <DropdownMenuTrigger asChild>
                                                     <ChromeButton aria-label={t('create')} icon={PlusIcon} disabled={!!needsMachineReason} />

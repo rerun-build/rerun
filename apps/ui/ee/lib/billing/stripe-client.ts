@@ -1,4 +1,5 @@
-import { loadStripe, type Stripe } from '@stripe/stripe-js'
+import type { Stripe } from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js/pure'
 
 // The browser half of Stripe, kept away from lib/billing/stripe.ts, which holds the secret key and
 // is server-only. Loaded once per tab: `loadStripe` injects a script tag, and calling it per render

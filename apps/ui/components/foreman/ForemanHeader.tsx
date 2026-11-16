@@ -90,7 +90,7 @@ export function ForemanHeader({
             onToggleSheetDetent={onToggleSheetDetent}
             actions={
                 <>
-                    <DropdownMenu>
+                    <DropdownMenu modal={false}>
                         <TooltipLabeled label={t('move')} side="bottom">
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon-sm" aria-label={t('moveChat')} className="max-md:hidden">

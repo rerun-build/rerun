@@ -37,10 +37,10 @@ export function ForemanDockBubble({ corner, tone, children }: ForemanDockBubbleP
             animate={{ opacity: 1, y: 0 }}
             exit={away}
             transition={{ duration: reducedMotion ? 0 : 0.24, ease: 'easeOut' }}
-            className={cn('group/bubble pointer-events-auto absolute w-80 rounded-xl border border-border bg-card text-sm text-foreground shadow-2xl', PLACEMENT[corner])}
+            className={cn('group/bubble pointer-events-auto absolute w-80 rounded-xl border border-border bg-card text-sm text-foreground shadow-2xl has-[[data-bubble-surface]:hover]:[--bubble-tail:var(--color-accent)]', PLACEMENT[corner])}
         >
             {tone && <BorderBeam pattern="arcs" tone={tone} animated glow width={1} duration={4} />}
-            <span aria-hidden className={cn('absolute size-3 rotate-45 border-border bg-card transition-colors group-has-[[data-bubble-surface]:hover]/bubble:bg-accent', TAIL[corner])} />
+            <span aria-hidden className={cn('absolute size-3 rotate-45 border-border bg-[var(--bubble-tail,var(--color-card))] transition-colors', TAIL[corner])} />
             <div className="relative rounded-[inherit]">{children}</div>
         </motion.div>
     )

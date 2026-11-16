@@ -75,7 +75,7 @@ export function SidePanel({
                         <div className="max-md:hidden">{header}</div>
                         <div className="md:hidden">{mobileHeader}</div>
                     </div>
-                    <div data-side-panel-body className="flex-1 min-h-0 overflow-hidden relative">{children}</div>
+                    <div data-side-panel-body className="flex-1 min-h-0 overflow-hidden relative has-[>:not(.hidden)_[data-chat-scrolled]]:[--chat-veil:1]">{children}</div>
                 </div>
 
                 {rail && <div className="hidden flex-col items-center gap-1 border-l border-border bg-background px-1.5 py-4 md:flex">{rail}</div>}

@@ -19,7 +19,7 @@ export function TopVeil({ tall = false }: { tall?: boolean }) {
             className={cn(
                 'pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-background via-background/85 to-transparent backdrop-blur-[3px]',
                 tall
-                    ? 'h-40 opacity-0 transition-opacity duration-200 [mask-image:linear-gradient(to_bottom,black_60%,transparent)] [:not(.hidden):has([data-chat-scrolled])~&]:opacity-100'
+                    ? 'h-40 [opacity:var(--chat-veil,0)] transition-opacity duration-200 [mask-image:linear-gradient(to_bottom,black_60%,transparent)]'
                     : 'h-28 [mask-image:linear-gradient(to_bottom,black_55%,transparent)]'
             )}
         />

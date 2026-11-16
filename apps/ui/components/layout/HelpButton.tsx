@@ -21,7 +21,7 @@ export function HelpButton({ trigger = 'chrome' }: { trigger?: 'chrome' | 'icon'
     const openingGettingStarted = useRef(false)
 
     return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
             <TooltipLabeled label={t('label')} side="bottom">
                 <DropdownMenuTrigger asChild>
                     {trigger === 'icon' ? (

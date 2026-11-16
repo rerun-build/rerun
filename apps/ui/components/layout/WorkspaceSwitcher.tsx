@@ -445,6 +445,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
         // truncates rather than pushing the row under them.
         <div className={cn('flex items-center gap-2', placement === 'column' ? 'min-w-0' : 'absolute top-4 left-4 z-40 max-w-[calc(100%-2*var(--chrome-edge)-var(--chrome-size)-var(--chrome-gap))]')}>
             <DropdownMenu
+                modal={false}
                 onOpenChange={open => {
                     if (!open) return setSwitching(false)
                     void refreshBrainProposals()
