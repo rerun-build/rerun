@@ -2,6 +2,7 @@
   "repo": "special-place-ai-heaven/rerun",
   "label": "factory",
   "poll_s": 30,
+  "plan_week_hold_percent": 95,
   "checks_timeout_s": 3600,
   "clocks": {
     "run_limit_s": 2700,

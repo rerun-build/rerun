@@ -446,6 +446,7 @@ class Dispatcher:
         self.resolver = resolver.Resolver(log, problem_brief)
         self.renewal_unreadable = False
         self.connections = None
+        self.plan_week_full = False
         self.report_logged = set()
         self.started = now()
         self.names = pools.names(cfg)
@@ -1621,6 +1622,13 @@ class Dispatcher:
             return
         self.renewal_unreadable = False
         now = self.now()
+        used, mark = (renewal.plan(answer, now) or {}).get("weekUsedPercent"), self.cfg.get("plan_week_hold_percent")
+        full = mark is not None and used is not None and used >= mark
+        if full:
+            if not self.plan_week_full:
+                log("-", "plan week is %d %% used (hold mark %d %%): holding new sends until it resets or the mark is raised" % (used, mark))
+            holds.arm(self.store, "plan week", now + 2 * self.cfg.get("poll_s", 30))
+        self.plan_week_full = full
         try:
             until = json.loads(self.store.get_all("-").get("hold:sign-in renewal") or "{}").get("until", 0)
             was, kept = until > now, until > 0
