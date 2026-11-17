@@ -55,6 +55,7 @@ CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:[ \t]+.*\
 WT_NEW_FAULT = re.compile(r"(?is)(?=.*\bwt new\b)(?!.*\bplan marker\b).*\b(?:cannot|could not|crash\w*|fail\w*|refus\w*)\b")
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
+STALE_RUN_S, STALE_RUNS_A_BEAT = 2 * 3600, 15
 MAX_TAKES = 3
 INBOX = "Factory follow-ups inbox"
 INBOX_BODY = ("The factory dispatcher writes every reviewer follow-up note here as a comment, one comment per review, "
@@ -943,6 +944,9 @@ class Dispatcher:
             return self.clock_check(j, r)
         j.setdefault("warm", {})[j["agent"]] = [j["copy"], self.now()]
         self.record_tokens(j, r)
+        ended = r.get("finishedAt")
+        self.store.close_run(j["run"], {"done": "done", "cancelled": "cancelled"}.get(r.get("status"), "error"),
+                             at=ended if isinstance(ended, str) and ended else None, **self.kept_tokens(j["run"]))
         if r.get("status") == "done":
             self.strike(j, True)
             j["attempt"] = 1
@@ -963,6 +967,26 @@ class Dispatcher:
         if clocks.klass(kind, row) == "plan_limit":
             return self.plan_limit(j, why, str(r.get("error") or "-"))
         return self.failed_attempt(j, why, "ended")
+
+    def close_stale(self):
+        ids = {n: a for a, n in self.names.items()}
+        live = {j.get("run") for j in self.jobs()}
+        rows = self.store.db.execute("SELECT run_id, coworker FROM fires WHERE status='running' AND run_id IS NOT NULL AND job GLOB '[0-9]*' "
+                                     "AND intent_at < ? ORDER BY id LIMIT ?", (iso(self.now() - STALE_RUN_S), 4 * STALE_RUNS_A_BEAT)).fetchall()
+        skip = self.__dict__.setdefault("stale_skip", set())
+        for run, who in [r for r in rows if r[0] not in live and r[0] not in skip and r[1] in ids][:STALE_RUNS_A_BEAT]:
+            try:
+                r = self.account("get_run", {"agentId": ids[who], "runId": run}) or {}
+            except Error:
+                skip.add(run)
+                continue
+            if r.get("status") == "running":
+                skip.add(run)
+                continue
+            counts = planning.tokens(r) or {}
+            ended = r.get("finishedAt")
+            self.store.close_run(run, {"done": "done", "cancelled": "cancelled"}.get(r.get("status"), "error"),
+                                 at=ended if isinstance(ended, str) and ended else None, **counts)
 
     def close_replans(self):
         for j in self.jobs():
@@ -1550,6 +1574,10 @@ class Dispatcher:
         except (Error, ValueError, KeyError) as e:
             clean = False
             log("-", "planning: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.close_stale()
+        except Exception as e:
+            log("-", "stale runs: %s" % (e if isinstance(e, Error) else type(e).__name__))
         try:
             self.acceptance.once(self.beats, self.jobs())
         except Exception as e:
