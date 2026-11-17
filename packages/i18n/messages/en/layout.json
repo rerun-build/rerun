@@ -133,6 +133,7 @@
         "aiProviders": "AI providers",
         "vault": "Vault",
         "vaultSignedOut": "An app of the Vault is signed out",
+        "computers": "Computers",
         "servers": "Servers",
         "billing": "Billing",
         "newWorkspace": "New workspace",

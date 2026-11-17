@@ -1,5 +1,7 @@
 'use client'
 
+import { ThisComputerSection } from '@/components/computers/ThisComputer'
+import { useRemoteComputersEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { Button } from '@/components/ui/button'
 import { Field } from '@/components/ui/field'
 import { Switch } from '@/components/ui/switch'
@@ -16,6 +18,7 @@ export function DesktopAppPanel() {
     const shell = desktopShell('settings')
     const [settings, setSettings] = useState<DesktopSettings | null>(null)
     const [update, setUpdate] = useState<DesktopUpdateState>({ status: 'idle' })
+    const computersEnabled = useRemoteComputersEnabled()
 
     useEffect(() => {
         if (!shell) return
@@ -51,6 +54,7 @@ export function DesktopAppPanel() {
 
     return (
         <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5">
+            {computersEnabled && desktopShell('remoteComputer') && <ThisComputerSection />}
             {settings ? (
                 <>
                     <Field orientation="row" label={t('openAtLogin')} helperText={shell.platform === 'mac' ? t('openAtLoginMac') : t('openAtLoginOther')} htmlFor="desktop-open-at-login">

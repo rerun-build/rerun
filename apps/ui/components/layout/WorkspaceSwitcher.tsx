@@ -15,7 +15,8 @@ import { CreditMeter, UpgradePill } from '@rerun/cloud/billing.client'
 import { ExpertProfileDialog } from '@/components/dialogs/ExpertProfileDialog'
 import { KnowledgeBaseDialog } from '@/components/dialogs/KnowledgeBaseDialog'
 import { PaidAppDialogs, usePaidAppsStore, AppsMenuSection } from '@rerun/cloud/apps.client'
-import { useEnabledPaidApps, useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
+import { useEnabledPaidApps, useRemoteComputersEnabled, useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
+import { ComputersDialog } from '@/components/computers/ComputersDialog'
 import { VaultDialog } from '@/components/vault/VaultDialog'
 import { vaultSignedOutCountAction } from '@/app/api/_actions/vault.actions'
 import { WorkspaceMembersDialog } from '@/components/dialogs/WorkspaceMembersDialog'
@@ -43,7 +44,7 @@ import { useBrainStore } from '@/stores/brain.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
-import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, ChevronDownIcon, ChevronsUpDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
+import { BadgeCheck, BellIcon, BrainIcon, CheckIcon, ChevronDownIcon, ChevronsUpDownIcon, CreditCardIcon, FlaskConical, GaugeIcon, GridIcon, IdCardIcon, KeyIcon, LayersIcon, Loader2Icon, LockIcon, LockKeyholeIcon, LogOutIcon, MonitorIcon, PlusIcon, ServerIcon, SettingsIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { abortWorkspaceSwitch, beginWorkspaceSwitch, enterActiveWorkspace } from '@/lib/workspace/workspace-switch'
 import Link from 'next/link'
@@ -119,6 +120,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
     const brainProposals = useBrainProposalCount(Boolean(workspace))
     const vaultEnabled = useVaultEnabled()
+    const computersEnabled = useRemoteComputersEnabled()
     // Brain, AI providers and the Vault all live on the workspace's machine, and a workspace gets one
     // only once it is on a plan.
     const needsPlan = useNeedsPlanToConnect()
@@ -306,6 +308,14 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                         <LockIcon className="size-4" />
                         {t('vault')}
                         {vaultSignedOut > 0 && <span className="ml-auto size-2 rounded-full bg-orange-500" aria-label={t('vaultSignedOut')} />}
+                    </DropdownMenuItem>
+                </DisabledWithReason>
+            )}
+            {computersEnabled && (
+                <DisabledWithReason allowed={!needsPlan} reason={t('needsPlan')}>
+                    <DropdownMenuItem disabled={needsPlan} onSelect={() => openWorkspacePanel('computers')} className="gap-2 text-muted-foreground">
+                        <MonitorIcon className="size-4" />
+                        {t('computers')}
                     </DropdownMenuItem>
                 </DisabledWithReason>
             )}
@@ -502,6 +512,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
                     }}
                 />
             )}
+            {computersEnabled && <ComputersDialog open={panel === 'computers'} onOpenChange={open => setPanel(open ? 'computers' : null)} />}
             <KnowledgeBaseDialog open={panel === 'knowledge_base'} onOpenChange={open => setPanel(open ? 'knowledge_base' : null)} />
             <PaidAppDialogs apps={paidApps} />
             <WorkspacePowerDialog action={powerAction} onOpenChange={open => setPowerAction(open ? powerAction : null)} />

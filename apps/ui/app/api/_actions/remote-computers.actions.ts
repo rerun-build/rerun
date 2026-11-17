@@ -69,13 +69,13 @@ export type LinkThisComputerInput = { name: string; os: RemoteOs; arch: string; 
 
 // Called by the page inside the desktop app, which hands the token straight to the app: it is shown
 // to nothing else and never stored by the page.
-export async function linkThisComputerAction(input: LinkThisComputerInput): Promise<{ ok: true; computer: { id: string; name: string; handle: string }; token: string } | ActionFailure> {
+export async function linkThisComputerAction(input: LinkThisComputerInput): Promise<{ ok: true; computer: { id: string; name: string; handle: string }; token: string; workspace: { id: number; name: string } } | ActionFailure> {
     try {
         const ctx = await computersContext()
         const parsed = linkSchema.safeParse(input)
         if (!parsed.success) return failure('computerNameInvalid')
         const { computer, token } = await linkComputer({ workspaceId: ctx.workspace.id, userId: ctx.userId, ...parsed.data })
-        return { ok: true, computer: { id: computer.id, name: computer.name, handle: computer.handle }, token }
+        return { ok: true, computer: { id: computer.id, name: computer.name, handle: computer.handle }, token, workspace: { id: ctx.workspace.id, name: ctx.workspace.name ?? '' } }
     } catch (err) {
         return failureOf(err)
     }

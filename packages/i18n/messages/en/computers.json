@@ -1,0 +1,93 @@
+{
+    "_context": {
+        "title": "A linked computer is a person's own machine (laptop, desktop, workstation) where the workspace's AI coworkers can run commands and long jobs. Keep \"Computers\" short.",
+        "status.busy": "Badge on a computer currently running one or more long jobs started by a coworker.",
+        "modes.remember.label": "Approval mode: the first time a program runs the person is asked, and can say \"always allow\" for it.",
+        "linkDialog.handle": "{handle} is rendered as #handle, the word typed in the chat to name this computer (e.g. #studio-pc). Keep the tag around it.",
+        "thisComputer.inWorkspace": "Follows the #handle of the computer, e.g. \"#studio-pc in Acme\". {workspace} is the workspace name."
+    },
+    "title": "Computers",
+    "description": "Your own computers, where coworkers run commands and long jobs",
+    "thisComputer": {
+        "heading": "This computer",
+        "offer": "Let coworkers run commands and long jobs here",
+        "offerLong": "Coworkers can run commands and long jobs here, each new program with your approval",
+        "link": "Link",
+        "inWorkspace": "in {workspace}",
+        "pause": "Pause",
+        "pauseHint": "Nothing runs here until you resume",
+        "folder": "Working folder",
+        "changeFolder": "Change",
+        "unlink": "Unlink this computer",
+        "unlinkTitle": "Unlink this computer?",
+        "unlinkBody": "Coworkers of {workspace} will no longer run anything here. You can link it again later.",
+        "unlinkConfirm": "Unlink",
+        "noKeychain": "This system has no keychain: the link is kept in a file only your account can read."
+    },
+    "linked": "Linked",
+    "linkFromApp": "Link a computer from the desktop app.",
+    "getTheApp": "Get the app",
+    "lastSeen": "Last seen {when}",
+    "neverConnected": "Not connected yet",
+    "engineNeedsUpdate": "Computers arrive with the next update of this workspace's machine. They show offline until then.",
+    "engineUnreachable": "The workspace's machine is not answering: computers show offline for now.",
+    "managersOnly": "Only an admin or the person who linked it can change this",
+    "settingsNeedEngine": "Available once the workspace's machine answers",
+    "empty": {
+        "title": "No computer linked",
+        "body": "Coworkers run heavy work on your own machine: video, local models, your GPU.",
+        "getApp": "Get the desktop app"
+    },
+    "status": {
+        "online": "Online",
+        "busy": "{count, plural, one {Running a job} other {# jobs running}}",
+        "paused": "Paused",
+        "offline": "Offline"
+    },
+    "modes": {
+        "ask": { "label": "Ask every time", "description": "Every command waits for a yes" },
+        "remember": { "label": "Ask, then remember", "description": "Always allow a program once you trust it" },
+        "full": { "label": "Full access", "description": "Runs without asking, except sensitive folders" }
+    },
+    "detail": {
+        "back": "Back to computers",
+        "linkedBy": "Linked by {name}",
+        "offlineSince": "Offline since {when}. Coworkers say so instead of running anything.",
+        "neverConnected": "Not connected yet. It shows online once the Rerun app runs on it.",
+        "paused": "Paused from the computer itself. Nothing runs until it is resumed there.",
+        "approvals": "Approvals",
+        "commands": "Commands",
+        "modeLabel": "Approval mode",
+        "unattended": "Without anyone in the chat",
+        "unattendedHint": "Schedules, triggers and other coworkers can use it",
+        "alwaysAllowed": "Always allowed",
+        "nothingAllowed": "Nothing yet. Choose “Always allow” on an approval in the chat.",
+        "interpreterWarning": "Allowing an interpreter allows any code it runs",
+        "stopAllowing": "Stop allowing {label}",
+        "screen": "Screen",
+        "screenOn": "On. Coworkers can see and use the screen, one conversation at a time.",
+        "screenOff": "Off. It can only be turned on from the Rerun app on this computer.",
+        "machine": "Machine",
+        "system": "System",
+        "processor": "Processor",
+        "graphics": "Graphics",
+        "memory": "Memory",
+        "folder": "Folder",
+        "remove": "Remove computer",
+        "removeTitle": "Remove {name}?",
+        "removeBody": "Coworkers will no longer run anything on it. Its rules are forgotten, and it can be linked again from the desktop app.",
+        "removeConfirm": "Remove"
+    },
+    "linkDialog": {
+        "title": "Link this computer",
+        "description": "Coworkers of this workspace will be able to run commands here",
+        "name": "Name",
+        "handle": "In the chat: <handle></handle>",
+        "everyone": "Everyone in this workspace can use it through their coworkers",
+        "approval": "Each new program asks for your approval first",
+        "pauseAnyTime": "Pause or unlink any time from here or the tray",
+        "cancel": "Cancel",
+        "link": "Link",
+        "linked": "Linked. Coworkers reach it as #{handle}"
+    }
+}

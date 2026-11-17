@@ -1,0 +1,38 @@
+---
+title: "Computers"
+description: "Link your own computer so your coworkers can run commands and long jobs on it."
+---
+
+<Note>Computers is in early access. If you do not see **Computers** in the workspace menu yet, it is not open for your workspace.</Note>
+
+Your coworkers live on your workspace's machine in the cloud. A computer you link to the workspace becomes a pair of hands for them: they can run commands there, with your approval, for the work that belongs on your own machine: video editing, local models, your GPU, files you keep there.
+
+The coworker stays where it is. The computer only runs what it is asked, and only while the Rerun desktop app is running on it.
+
+## Link a computer
+
+1. Install the [desktop app](/desktop-app) on the computer and sign in.
+2. Open your account, then the **Desktop** tab.
+3. Under **This computer**, click **Link**, give the computer a name and click **Link**.
+
+The name gives the computer a handle, like `#studio-pc`, the word your coworkers know it by. The handle stays the same if you rename the computer later.
+
+Everyone in the workspace can use a linked computer through their coworkers. Each new program asks for your approval first.
+
+## See your computers
+
+Open the workspace menu and click **Computers**. Each computer says whether it is online, paused or offline, and when it was last seen. Click one to see its machine (system, processor or graphics card, memory, working folder, and the programs found on it) and its approval settings.
+
+An admin, or the person who linked a computer, can change its settings and remove it. Removing it stops everything at once: the computer can be linked again from the desktop app.
+
+## On the computer
+
+In the **Desktop** tab of the app, under **This computer**:
+
+- **Pause** stops everything the coworkers run there and refuses anything new until you resume. The tray icon (menu bar on a Mac) pauses and resumes too.
+- **Working folder** is where commands start and files land, `~/Rerun` unless you change it.
+- **Unlink this computer** removes it from the workspace, from the computer itself.
+
+While a computer is linked, the app keeps running when you close its window, so your coworkers can still reach it. Quit it from the tray icon.
+
+The link is stored in your system's keychain. On a Linux desktop without a keychain, it is kept in a file only your account can read, and the app says so.

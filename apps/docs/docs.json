@@ -34,7 +34,7 @@
         "groups": [
           {
             "group": "Get started",
-            "pages": ["index", "quickstart", "concepts", "desktop-app", "iphone-app"]
+            "pages": ["index", "quickstart", "concepts", "desktop-app", "computers", "iphone-app"]
           },
           {
             "group": "Your workspace",
