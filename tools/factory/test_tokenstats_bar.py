@@ -74,11 +74,15 @@ class DigestBar(unittest.TestCase):
         self.st.set("escaped", "2|reopened", json.dumps({"job": "2", "by": "reopened", "at": "2026-11-15T11:00:00Z"}))
         self.st.set("escaped", "3|bad", "not json")
         d = digest.build(self.st, {}, self.now)
-        self.assertEqual(d["bar"]["day"], {"solved": 2, "solvedGreen": 1, "tokensPerIssue": 2000,
-                                           "firstPassYield": 0.5, "escaped": 1})
+        self.assertEqual(d["bar"]["day"]["solved"], 2)
+        self.assertEqual(d["bar"]["day"]["solvedGreen"], 1)
+        self.assertEqual(d["bar"]["day"]["tokensPerIssue"], 2000)
+        self.assertAlmostEqual(d["bar"]["day"]["costPerIssue"], 0.0384)
+        self.assertEqual((d["bar"]["day"]["firstPassYield"], d["bar"]["day"]["escaped"]), (0.5, 1))
 
     def test_an_empty_store_gives_zeros_and_nulls(self):
-        empty = {"solved": 0, "solvedGreen": 0, "tokensPerIssue": None, "firstPassYield": None, "escaped": 0}
+        empty = {"solved": 0, "solvedGreen": 0, "tokensPerIssue": None, "costPerIssue": None,
+                 "firstPassYield": None, "escaped": 0}
         self.assertEqual(digest.bar(self.st, self.now), {"day": empty, "week": empty})
 
 
