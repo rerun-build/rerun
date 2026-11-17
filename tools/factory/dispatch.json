@@ -14,6 +14,10 @@
     "max_queue": 20
   },
   "proof": true,
+  "cache_life": {
+    "subscription": 3600,
+    "key": 300
+  },
   "one_file_one_job": true,
   "slots": 15,
   "check_ratio": {

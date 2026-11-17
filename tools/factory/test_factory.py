@@ -567,6 +567,19 @@ class WtSweep(FactoryCase):
         self.assertEqual(len(fetches), 1, fetches)
         self.assertEqual(out.count("REMOVE"), 7, out)
 
+    def test_missing_shared_clone_is_kept_and_sweep_continues(self):
+        p = self.wt()
+        self.pr("1", 9, "MERGED", self.commit(p))
+        git(p, "push", "--quiet", "origin", "chunk/7-1")
+        orphan = os.path.join(F.WT, "orphan", "r1183")
+        os.makedirs(orphan)
+        code, out = self.sweep("--apply")
+        self.assertEqual(code, 0, out)
+        self.assertEqual(self.verdicts(out), {REPO + "/7-1": "REMOVE", "orphan/r1183": "KEEP"}, out)
+        self.assertIn("no shared clone %s, cannot prove anything" % os.path.join(F.REPOS, "orphan"), out)
+        self.assertTrue(os.path.isdir(orphan))
+        self.assertFalse(os.path.exists(p))
+
     def behind_merged_head(self):
         p = self.wt(chunk="1")
         self.commit(p, "a.txt")

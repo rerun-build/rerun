@@ -661,6 +661,8 @@ def pr_lookup(full, branch):
 
 
 def sweep_verdict(full, r, d, path):
+    if not os.path.isdir(os.path.join(REPOS, r)):
+        return "KEEP", "no shared clone %s, cannot prove anything" % os.path.join(REPOS, r), []
     if is_clone(path):
         return "KEEP", "a job clone, not a worktree of the shared clone", []
     if not re.fullmatch(r"\d+-[a-z0-9]{1,12}", d):
@@ -701,6 +703,8 @@ def wt_sweep(apply, only=None, quiet=False):
     try:
         for r in sorted({r for r, _, _ in dirs}):
             p = os.path.join(REPOS, r)
+            if not os.path.isdir(p):
+                continue
             SWEEP_FETCH[p] = run([GIT, "fetch", "--quiet", "--prune", "origin"], cwd=p, check=False).returncode == 0
         return _sweep_each(dirs, apply, only, quiet, n, kept)
     finally:

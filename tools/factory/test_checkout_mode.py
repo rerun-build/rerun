@@ -12,7 +12,7 @@ class Mode(CloneCase):
     def wt_new(self, chunk, fault=None):
         def boom(*a, **k):
             raise RuntimeError("tool fault")
-        with mock.patch.object(F, "plan_check", lambda *a: None), mock.patch.object(F, "api", lambda *a, **k: {"default_branch": "main"}), \
+        with mock.patch.object(F, "plan_check", lambda *a: None), mock.patch.object(F, "api", lambda *a, **k: {"default_branch": "main", "login": "factory-bot"}), \
                 mock.patch.object(F, "MIN_FREE_GB", 0), mock.patch.object(F, "MIN_FREE_MEM_GB", 0), \
                 mock.patch.dict(os.environ, {"PATH": self.env["PATH"]}):
             if fault == "tool":

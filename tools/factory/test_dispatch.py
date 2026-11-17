@@ -39,6 +39,7 @@ class World:
         self.problems, self.reruns, self.deleted = [], [], set()
         self.commits, self.dev_runs = [], []
         self.merge_sha = "feedface12345678"
+        self.open_children, self.closed = [], []
 
     @staticmethod
     def goal_ok(goal):
@@ -151,6 +152,8 @@ class World:
         if a[:2] == ["issue", "edit"] and "--add-label" in a and a[a.index("--add-label") + 1] == "factory":
             self.unlabelled.discard(int(a[2]))
             return ""
+        if a[:2] == ["issue", "list"] and "--search" in a and any(x.startswith("Part of #") for x in a):
+            return json.dumps(self.open_children)
         if a[:2] == ["issue", "list"] and "Factory follow-ups inbox in:title" in a:
             return json.dumps([{"number": p["number"], "title": p["title"]} for p in self.problems if p["state"] == "OPEN"])
         if a[:2] == ["issue", "list"] and "--label" not in a and "--search" not in a and any(i.get("labels") for i in self.issues):
@@ -162,7 +165,11 @@ class World:
             return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"]} for i in self.issues if i["number"] not in self.unlabelled])
         if a[:2] == ["issue", "view"]:
             i = self.issue(a[2])
-            return json.dumps({"body": i["body"], "comments": [{"body": c} for c in i["comments"]]})
+            return json.dumps({"title": i.get("title", ""), "state": i.get("state", "OPEN"), "body": i["body"],
+                               "comments": [{"body": c} for c in i["comments"]]})
+        if a[:2] == ["issue", "close"]:
+            self.closed.append((int(a[2]), a[a.index("--comment") + 1]))
+            return ""
         if a[:2] == ["issue", "comment"]:
             self.issue(a[2])["comments"].append(a[a.index("--body") + 1])
             return ""

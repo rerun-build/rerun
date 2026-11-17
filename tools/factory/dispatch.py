@@ -1,5 +1,7 @@
 import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
+import acceptance
+import affinity
 import backlog
 import briefs
 import ciwait
@@ -7,10 +9,13 @@ import clocks
 import control
 import cutshape
 import digest
+import escapes
 import failures
 import followups
+import gatefiles
 import holds
 import inboxsort
+import plancheck
 import planners
 import planning
 import pools
@@ -403,6 +408,7 @@ class Dispatcher:
         self.tiers_off = False
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
+        self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
         self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
@@ -487,23 +493,51 @@ class Dispatcher:
             why = strikes.held(self.store, self.now()).get(agent, {}).get("why")
             log(j["issue"], "coworker %s held until %s: %s" % (self.names.get(agent, agent[:8]), iso(until), why))
 
-    def free(self, worker):
+    def free(self, worker, j=None):
         skip = self.unresolved() | self.held_ids()
         t = pools.types(self.cfg).get(worker)
         if t is None:
             return None
         cfg = {"types": {worker: dict(t, coworkers=[c for c in t["coworkers"] if c["id"] not in skip])}}
-        return pools.pick_copy(cfg, worker, self.running())
+        if j is None:
+            return pools.pick_copy(cfg, worker, self.running())
+        return self.warm_pick(j, pools.free_copies(cfg, worker, self.running()))
+
+    def cache_kind(self, agent):
+        for t in (self.cfg.get("types") or {}).values():
+            for c in t.get("coworkers", []):
+                if c.get("id") == agent:
+                    return c.get("cache", "subscription")
+        return "subscription"
+
+    def warm_pick(self, j, free):
+        if not free:
+            return None
+        ids = set(free)
+        warm = [(v[1], (c, v[0])) for c, v in (j.get("warm") or {}).items() if (c, v[0]) in ids]
+        last_end, last = max(warm) if warm else (None, None)
+        life = affinity.cache_life(self.cache_kind(last[0]) if last else "subscription", self.cfg.get("cache_life"))
+        return affinity.pick(free, last, last_end, self.now(), life)
 
     def free_prover(self, j):
         skip = self.unresolved() | self.held_ids() | {j.get("builder"), j.get("reviewer")}
-        return pools.pick_copy({"types": {"reviewer": t}}, "reviewer", self.running(), exclude=skip) if (t := pools.types(self.cfg).get("reviewer")) is not None else None
+        t = pools.types(self.cfg).get("reviewer")
+        if t is None:
+            return None
+        return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
 
-    def free_copy_of(self, agent):
+    def free_second(self, j, first):
+        skip = self.unresolved() | self.held_ids() | {first}
+        return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
+
+    def free_copy_of(self, agent, j=None):
         mine = [c for t in pools.types(self.cfg).values() for c in t["coworkers"] if c["id"] == agent]
         if not mine or agent in self.unresolved():
             return None
-        got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
+        if j is None:
+            got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
+            return got[1] if got else None
+        got = self.warm_pick(j, pools.free_copies({"types": {"x": {"coworkers": mine}}}, "x", self.running()))
         return got[1] if got else None
 
     def inbox(self):
@@ -595,6 +629,9 @@ class Dispatcher:
         self.refused = {n: e for n, e in shape.items() if e}
         self.unreadable = len(self.refused)
         labelled = {i["number"] for i in issues}
+        tree = None
+        if any(plancheck.needs(i) and not self.plan_settled(i) for i in issues):
+            tree = plancheck.tree(self.gh, self.repo)
         open_numbers = None
         if any(cutshape.parse(i)["deps"] for i in issues):
             open_numbers = {o["number"] for o in json.loads(self.gh(
@@ -624,6 +661,8 @@ class Dispatcher:
                         self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", cutshape.comment(errors)])
                         self.store.set(str(i["number"]), "cutshape", digest)
                         log(i["number"], "not started: the issue text is not readable (%d problem%s)" % (len(errors), "" if len(errors) == 1 else "s"))
+                    continue
+                if self.plan_check(i, tree) is None:
                     continue
                 parsed = cutshape.parse(i)
                 if parsed["worker"] not in ("coder", "researcher", "designer") or parsed["worker"] not in pools.types(self.cfg):
@@ -700,6 +739,28 @@ class Dispatcher:
                 log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
             except (Error, ValueError, KeyError) as e:
                 log(i["number"], "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
+
+    def plan_key(self, i):
+        return hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
+
+    def plan_settled(self, i):
+        return self.store.get_all(str(i["number"])).get("plancheck", "").startswith(self.plan_key(i) + ":")
+
+    def plan_check(self, i, tree):
+        kv = self.store.get_all(str(i["number"])).get("plancheck", "")
+        key = self.plan_key(i)
+        if kv == key + ":ok":
+            return []
+        if kv == key + ":bad":
+            return None
+        found = plancheck.faults(i, tree)
+        if found:
+            self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", plancheck.comment(found)])
+            log(i["number"], "not started: the plan check found %d fault%s" % (len(found), "" if len(found) == 1 else "s"))
+            self.store.set(str(i["number"]), "plancheck", key + ":bad")
+            return None
+        self.store.set(str(i["number"]), "plancheck", key + ":ok")
+        return []
 
     def dep_state(self, d, open_numbers, labelled):
         n = str(d)
@@ -876,6 +937,7 @@ class Dispatcher:
         r = self.account("get_run", {"agentId": j["agent"], "runId": j["run"]})
         if r.get("status") == "running":
             return self.clock_check(j, r)
+        j.setdefault("warm", {})[j["agent"]] = [j["copy"], self.now()]
         self.record_tokens(j, r)
         if r.get("status") == "done":
             self.strike(j, True)
@@ -897,6 +959,24 @@ class Dispatcher:
         if clocks.klass(kind, row) == "plan_limit":
             return self.plan_limit(j, why, str(r.get("error") or "-"))
         return self.failed_attempt(j, why, "ended")
+
+    def close_replans(self):
+        for j in self.jobs():
+            run = j.get("replan_run")
+            if not run:
+                continue
+            fire = self.store.db.execute("SELECT status FROM fires WHERE run_id=?", (run,)).fetchone()
+            if fire is None or fire[0] != "running":
+                continue
+            r = self.account("get_run", {"agentId": j["agent"], "runId": run}) or {}
+            status = r.get("status")
+            if status == "running":
+                continue
+            counts = planning.tokens(r)
+            if counts is None:
+                log(j["issue"], "token counts of run %s unknown: left at 0" % run)
+                counts = {}
+            self.store.close_run(run, "done" if status == "done" else "error", **counts)
 
     def record_tokens(self, j, r):
         ti, to = r.get("inputTokens"), r.get("outputTokens")
@@ -1052,7 +1132,8 @@ class Dispatcher:
         elif st == "review_wait":
             if self.conflicts(j):
                 return
-            got = self.free("reviewer")
+            first = (j.get("first_accept") or {}).get("by")
+            got = self.free_second(j, first) if first else self.free("reviewer", j)
             if not got or not self.take(j):
                 return
             r = got[0]
@@ -1068,7 +1149,14 @@ class Dispatcher:
             if re.match(r"VERDICT:\s*REJECT \(plan\)", verdict):
                 return self.end(j, "returned", "plan: review: " + verdict[:180], plan_lines=verdict)
             stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
-            if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale:
+            accept = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and not stale
+            first = j.get("first_accept") or {}
+            second = accept and first.get("head") == j["head"] and first.get("by") != j.get("reviewer")
+            if accept and not second and gatefiles.touched(j.get("paths"), gatefiles.load()):
+                name = self.names.get(j.get("reviewer"), j.get("reviewer"))
+                self.to(j, "review_wait", "accepted at %s by %s; Files name a gate file, so a second reviewer is asked" % (j["head"][:7], name),
+                        first_accept={"head": j["head"], "by": j.get("reviewer")})
+            elif accept:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
             elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
                 self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + verdict[:300]])
@@ -1085,7 +1173,7 @@ class Dispatcher:
             else:
                 self.end(j, "rejected", verdict[:200] or last_line(out))
         elif st == "fix_wait":
-            copy = self.free_copy_of(j["builder"])
+            copy = self.free_copy_of(j["builder"], j)
             if copy is not None and self.take(j):
                 self.start(j, j["builder"], "fix of #%s" % j["pr"], "fixing", copy=copy)
         elif st == "fixing":
@@ -1095,7 +1183,7 @@ class Dispatcher:
             last = final_line(out, ("PUSHED:", "BLOCKED:"))
             if not (last and last.startswith("PUSHED:")):
                 return self.blocked(j, out)
-            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=j["round"] if j.get("same_round") else 2)
+            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=j["round"] if j.get("same_round") else 2, first_accept=None)
         elif st == "checks":
             self.checks(j)
         elif st == "proof_wait":
@@ -1419,6 +1507,11 @@ class Dispatcher:
         except (Error, ValueError, KeyError) as e:
             clean = False
             log("-", "planning: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.acceptance.once(self.beats, self.jobs())
+        except Exception as e:
+            clean = False
+            log("-", "acceptance: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
@@ -1437,6 +1530,11 @@ class Dispatcher:
         except Exception as e:
             clean = False
             log("-", "tier floor: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.close_replans()
+        except Exception as e:
+            clean = False
+            log("-", "replans: %s" % (e if isinstance(e, Error) else type(e).__name__))
         for j in self.jobs():
             try:
                 if j["state"] not in END:
@@ -1464,8 +1562,31 @@ class Dispatcher:
         except Exception as e:
             log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.note_problems(known)
+        try:
+            self.escapes_pass()
+        except Exception as e:
+            clean = False
+            log("-", "escapes: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.report_line()
         self.beat_end(clean)
+
+    def escapes_pass(self):
+        if self.beats % escapes.EVERY:
+            return
+        now = self.now()
+        merged = []
+        for j in self.jobs():
+            if j["state"] == "merged" and j.get("merged_at") is None:
+                j["merged_at"] = escapes.merged_at(self.store, j)
+            if escapes.in_window(j, now):
+                merged.append(j)
+        if not merged:
+            return
+        open_numbers = {int(i["number"]) for i in json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json", "number", "--limit", "1000"]) or "[]")}
+        records = self.resolver.records(self)
+        for n, by in escapes.find(merged, open_numbers, records, now):
+            if escapes.record(self.store, n, by, now):
+                log(n, "escaped defect: %s" % by)
 
     def spent(self):
         for key, r in self.resolver.records(self).items():

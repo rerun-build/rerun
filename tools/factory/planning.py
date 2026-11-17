@@ -3,6 +3,7 @@ import json
 import re
 
 import cutshape
+import plancheck
 import pools
 import tiers
 
@@ -137,6 +138,23 @@ def epoch(text):
     return datetime.datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
 
 
+def log(run, msg):
+    print("%s run %s %s" % (stamp_now(), run, msg), flush=True)
+
+
+def stamp_now():
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def tokens(r):
+    ti, to = r.get("inputTokens"), r.get("outputTokens")
+    if all(isinstance(x, int) and not isinstance(x, bool) and x >= 0 for x in (ti, to)):
+        cr = r.get("cachedInputTokens")
+        cr = cr if isinstance(cr, int) and not isinstance(cr, bool) and cr >= 0 else None
+        return {"tokens_in": ti, "tokens_out": to, "cache_read": cr}
+    return None
+
+
 class Station:
     def __init__(self, cfg, store, account, gh, now):
         self.cfg = cfg
@@ -170,6 +188,18 @@ class Station:
         pattern = re.compile(r"Part of\W*#%d\b" % n)
         return [i for i in found if pattern.search(i.get("body") or "")]
 
+    def missing(self, child):
+        out = []
+        for d in cutshape.parse(child)["deps"]:
+            try:
+                self.gh(["api", "repos/%s/issues/%d" % (self.repo, d), "--jq", ".number"])
+            except Exception as e:
+                if re.search(r"HTTP 4(04|10)\b", str(e)):
+                    out.append(d)
+                else:
+                    raise
+        return out
+
     def once(self, beat):
         if not self.pool or not self.auto:
             return
@@ -189,11 +219,14 @@ class Station:
             limit = self.cfg.get("clocks", {}).get("run_limit_s", RUN_LIMIT)
             if self.now() - epoch(row["started"]) > limit:
                 self.account("cancel_run", {"agentId": agent, "runId": run})
+                self.close(run, "error", got, "the plan run passed its limit of %s s" % limit)
                 self.finish(n, "blocked", "the plan run passed its limit of %s s" % limit)
             return
         if status != "done":
+            self.close(run, "error", got, "the plan run ended %s" % status)
             self.finish(n, "blocked", "the plan run ended %s" % status)
             return
+        self.close(run, "done", got)
         if row.get("state") == "planning":
             found = PLANNED.findall(got.get("output") or "")
             if not found:
@@ -225,8 +258,18 @@ class Station:
         except Exception:
             pass
 
+    def close(self, run, status, got, why=None):
+        counts = tokens(got)
+        if counts is None:
+            log(run, "token counts unknown: left at 0")
+            counts = {}
+        self.store.close_run(run, status, error=None if why is None else why[:200], **counts)
+
     def finish(self, n, state, why):
         job = "plan:%d" % n
+        fire = self.store.get_all(job).get("fire")
+        if state == "lost" and fire:
+            self.store.abandon(int(fire), why)
         self.store.set(job, "state", state)
         self.store.set(job, "why", why)
         try:
@@ -240,6 +283,9 @@ class Station:
             children.append(json.loads(self.gh(["issue", "view", str(k), "-R", self.repo, "--json",
                                                 "number,title,body,labels"])))
         found = problems(children, self.gh, self.repo)
+        tree = plancheck.tree(self.gh, self.repo)
+        for child in children:
+            found.setdefault(child["number"], []).extend(plancheck.faults(child, tree, self.missing(child), own_tests=True))
         for child in children:
             k = child["number"]
             errors = found.get(k, [])
