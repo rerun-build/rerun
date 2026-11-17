@@ -33,6 +33,8 @@ WT_IDLE_HOURS = 48
 CLONE_SAFE = 1
 QUEUE_LIMIT_S, SLICE_S = 30 * 60, 450
 PR_HEADS = ["## Done", "## Evidence", "## Not changed", "## Unsure", "## Open", "## Next owner and their done-test"]
+ADAPTED_HEAD = "## Tests adapted"
+ADAPTABLE = re.compile(r"(^|/)(test_[^/]*\.py|[^/]*\.(test|spec)\.(js|ts|jsx|tsx))$")
 WF = r"\.github/(workflows|actions)/|\.github/(CODEOWNERS|dependabot\.yml)$"
 ISSUE_HEADS = ["## Goal", "## Done-test", "## Limits", "## Chunks"]
 REL_HEADS = ["## What changed", "## How it was tested", "## CI status", "## Migration or config changes", "## Deploy notes"]
@@ -930,7 +932,18 @@ def cmd_pr_open(a):
         if paths:
             out = [f for f in changed if not any(f == p or f.startswith(p.rstrip("/") + "/") or fnmatch.fnmatchcase(f, p) for p in paths)]
             if out:
-                die("files outside the **Files** of issue #%s: %s. Take them out of the change, or end with BLOCKED: plan: <why>." % (issue, ", ".join(out)))
+                if "--body-file" in a:
+                    note = open(a[a.index("--body-file") + 1]).read()
+                else:
+                    open_prs = json.loads(run([GH, "pr", "list", "-R", full, "--head", branch, "--state", "open", "--json", "body"]).stdout or "[]")
+                    note = (open_prs[0].get("body") or "") if open_prs else ""
+                listed = set(re.findall(r"(?m)^- `([^`]+)`: \S", note.split(ADAPTED_HEAD, 1)[1].split("\n## ", 1)[0])) if ADAPTED_HEAD in note else set()
+                out = [f for f in out if not (f in listed and ADAPTABLE.search(f)
+                                              and run([GIT, "cat-file", "-e", "origin/%s:%s" % (base, f)], cwd=top, check=False).returncode == 0)]
+            if out:
+                die("files outside the **Files** of issue #%s: %s. Take them out of the change, or end with BLOCKED: plan: <why>. "
+                    "An existing test that the change the issue specifies makes wrong may change when the handoff note lists it "
+                    "under `%s` as \"- `path`: why\"." % (issue, ", ".join(out), ADAPTED_HEAD))
     ex = json.loads(run([GH, "pr", "list", "-R", full, "--head", branch, "--state", "open", "--json", "number,url,headRefOid"]).stdout or "[]")
     if ex:
         if "--fix" not in a:
