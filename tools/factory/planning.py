@@ -3,6 +3,7 @@ import json
 import re
 
 import cutshape
+import plancheck
 import pools
 
 DEV = re.compile(r"(?m)^PLAN READY\b[^\n]*\bdev (?:at )?([0-9a-f]{7,40})\b")
@@ -186,6 +187,18 @@ class Station:
         pattern = re.compile(r"Part of\W*#%d\b" % n)
         return [i for i in found if pattern.search(i.get("body") or "")]
 
+    def missing(self, child):
+        out = []
+        for d in cutshape.parse(child)["deps"]:
+            try:
+                self.gh(["api", "repos/%s/issues/%d" % (self.repo, d), "--jq", ".number"])
+            except Exception as e:
+                if re.search(r"HTTP 4(04|10)\b", str(e)):
+                    out.append(d)
+                else:
+                    raise
+        return out
+
     def once(self, beat):
         if not self.pool or not self.auto:
             return
@@ -269,6 +282,9 @@ class Station:
             children.append(json.loads(self.gh(["issue", "view", str(k), "-R", self.repo, "--json",
                                                 "number,title,body,labels"])))
         found = problems(children, self.gh, self.repo)
+        tree = plancheck.tree(self.gh, self.repo)
+        for child in children:
+            found.setdefault(child["number"], []).extend(plancheck.faults(child, tree, self.missing(child), own_tests=True))
         for child in children:
             k = child["number"]
             errors = found.get(k, [])
