@@ -219,6 +219,8 @@ class World:
         if a[0] == "api":
             sha = a[1].split("head_sha=")[1].split("&")[0]
             return json.dumps({"workflow_runs": self.workflows.get(sha, [])})
+        if a[:2] == ["label", "create"]:
+            return ""
         if a[:2] == ["pr", "close"]:
             return ""
         if a[:2] == ["pr", "merge"]:
