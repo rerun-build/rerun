@@ -1,7 +1,7 @@
 import 'server-only'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { ensureWorkspaceEngine, findWorkspaceEngine, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { isLifetimePlan } from '@rerun/cloud/billing'
+import { isClaudePlanOffered } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
 import {
     KEY_PROVIDERS,
@@ -154,7 +154,7 @@ export async function isCustomOfferedTo(workspaceId: number): Promise<boolean> {
 async function assertClaudePlanOffered(workspaceId: number, provider: CreateBoxConnectionInput['provider']): Promise<void> {
     if (provider !== 'claude') return
     const { data: workspace } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['plan'] as const, { id: workspaceId })
-    if (isLifetimePlan(workspace)) throw new ConnectionInputError('claudePlanNotOffered')
+    if (!isClaudePlanOffered(workspace)) throw new ConnectionInputError('claudePlanNotOffered')
 }
 
 async function assertProviderOffered(provider: CreateBoxConnectionInput['provider'], conn: EngineConnection): Promise<void> {
@@ -309,7 +309,7 @@ export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiCo
         connections: pinFirst(list.connections, connection => connection.id === RERUN_CONNECTION_ID).map(source => connectionView(source, list, credit, t, locale)),
         default: { ...pick, label: modelName(pick.connectionId, pick.model) },
         credit: { percent: credit.percent, usedUp: isCreditUsedUp(credit), backOn: creditResetPhrase(credit, t, locale) },
-        addable: [...planProviders(await isOpencodeOffered(engine?.conn), { claude: !isLifetimePlan(ctx.workspace) }), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
+        addable: [...planProviders(await isOpencodeOffered(engine?.conn), { claude: isClaudePlanOffered(ctx.workspace) }), ...keyProviders(await isCustomOffered(engine?.conn))].map(provider => ({
             provider,
             kind: sourceKind(provider),
             ...providerPitch(provider, t),

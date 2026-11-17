@@ -16,6 +16,7 @@ export const isWorkspaceApiEntitled = (_workspace: WorkspacePlan): boolean => tr
 
 // A lifetime plan is sold through an AppSumo code, which only Rerun Cloud redeems.
 export const isLifetimePlan = (_workspace: { plan: string | null } | null | undefined): boolean => false
+export const isClaudePlanOffered = (_workspace: { plan: string | null } | null | undefined): boolean => true
 
 // null = unlimited. A number set by hand on the workspace row is still honoured.
 export const activeAgentLimitFor = (maxAgents: number | null, _status: string | null | undefined): number | null => maxAgents

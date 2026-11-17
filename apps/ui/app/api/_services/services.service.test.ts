@@ -47,7 +47,7 @@ vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 // The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
-// The lifetime plan only exists on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
+// The lifetime plans only exist on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
 vi.mock('@rerun/cloud/billing', async importOriginal => ({
     ...(await importOriginal<object>()),
     isLifetimePlan: (await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')).isLifetimePlan,
@@ -288,9 +288,9 @@ describe('searchServices', () => {
         expect(results.map(r => r.slug)).toContain('whatsapp-pro')
     })
 
-    it('leaves the paid apps out for a lifetime workspace, which cannot buy a slot', async () => {
+    it.each(['lifetime', 'lifetime_restricted'])('leaves the paid apps out for a workspace on the %s plan, which cannot buy a slot', async plan => {
         useRegistry({ services: {} })
-        workspacePlan = 'lifetime'
+        workspacePlan = plan
         const { results } = await searchServices('agent')
 
         expect(results.map(r => r.slug)).toEqual(['gmail', 'notion'])
@@ -298,9 +298,9 @@ describe('searchServices', () => {
 })
 
 describe('installService on a lifetime workspace', () => {
-    it('refuses a paid app', async () => {
+    it.each(['lifetime', 'lifetime_restricted'])('refuses a paid app on the %s plan', async plan => {
         useRegistry({ services: {} })
-        workspacePlan = 'lifetime'
+        workspacePlan = plan
 
         await expect(installService('agent', 'whatsapp-pro')).rejects.toThrow('WhatsApp Pro is not included in the lifetime plan.')
         expect(compileService).not.toHaveBeenCalled()

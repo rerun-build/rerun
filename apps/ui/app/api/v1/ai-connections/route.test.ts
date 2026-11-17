@@ -148,6 +148,20 @@ describe('GET /api/v1/ai-connections', () => {
         expect(view.addable[2].guide).toMatchObject({ title: 'How to get your Anthropic key' })
     })
 
+    it.each([
+        ['lifetime_restricted', ['codex', 'anthropic', 'openai', 'google', 'openrouter']],
+        ['lifetime', ['claude', 'codex', 'anthropic', 'openai', 'google', 'openrouter']],
+    ])('offers the Claude plan to a workspace on the %s plan only when it allows it', async (plan, providers) => {
+        const onPlan = workspace as typeof workspace & { plan?: string }
+        onPlan.plan = plan
+        try {
+            const view = await (await send(list.GET, 'GET')).json()
+            expect(view.addable.map((entry: { provider: string }) => entry.provider)).toEqual(providers)
+        } finally {
+            delete onPlan.plan
+        }
+    })
+
     it('asks a signed-in user to reconnect a credential its provider turned away', async () => {
         engine.listConnections.mockResolvedValue({ connections: [rerun, { ...claude, credentialRejected: true }], default: null })
         const view = await (await send(list.GET, 'GET')).json()

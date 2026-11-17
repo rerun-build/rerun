@@ -1119,8 +1119,8 @@ describe('createPlanCheckoutSession', () => {
         expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()
     })
 
-    it('turns away a workspace on the lifetime plan, before anything reaches Stripe', async () => {
-        useDb({ row: { ...FRESH_WORKSPACE, plan: 'lifetime', subscription_status: 'active', stripe_customer_id: null } })
+    it.each(['lifetime', 'lifetime_restricted'])('turns away a workspace on the %s plan, before anything reaches Stripe', async plan => {
+        useDb({ row: { ...FRESH_WORKSPACE, plan, subscription_status: 'active', stripe_customer_id: null } })
         await expect(createPlanCheckoutSession(BASE_SELECTION)).rejects.toThrow('This workspace is on the lifetime plan.')
         expect(stripe.customers.create).not.toHaveBeenCalled()
         expect(stripe.checkout.sessions.create).not.toHaveBeenCalled()

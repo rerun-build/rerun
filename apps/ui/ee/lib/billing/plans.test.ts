@@ -4,6 +4,7 @@ import {
     MICROS_PER_USD,
     baseLimitsToColumns,
     basePriceCents,
+    isClaudePlanOffered,
     isLifetimePlan,
     isModelAccess,
     parsePriceArm,
@@ -88,11 +89,22 @@ describe('isModelAccess', () => {
 })
 
 describe('isLifetimePlan', () => {
-    it('is true only for a workspace on the lifetime plan', () => {
+    it('is true for both lifetime plans, and only for them', () => {
         expect(isLifetimePlan({ plan: 'lifetime' })).toBe(true)
+        expect(isLifetimePlan({ plan: 'lifetime_restricted' })).toBe(true)
         expect(isLifetimePlan({ plan: BASE_PLAN_SLUG })).toBe(false)
         expect(isLifetimePlan({ plan: null })).toBe(false)
         expect(isLifetimePlan(null)).toBe(false)
+    })
+})
+
+describe('isClaudePlanOffered', () => {
+    it('leaves the Claude plan out of the restricted lifetime plan only', () => {
+        expect(isClaudePlanOffered({ plan: 'lifetime_restricted' })).toBe(false)
+        expect(isClaudePlanOffered({ plan: 'lifetime' })).toBe(true)
+        expect(isClaudePlanOffered({ plan: BASE_PLAN_SLUG })).toBe(true)
+        expect(isClaudePlanOffered({ plan: null })).toBe(true)
+        expect(isClaudePlanOffered(null)).toBe(true)
     })
 })
 

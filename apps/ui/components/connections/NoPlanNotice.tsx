@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useTransition } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { isLifetimePlan, isSubscriptionEntitled, trialOffer } from '@rerun/cloud/billing'
+import { isClaudePlanOffered, isSubscriptionEntitled, trialOffer } from '@rerun/cloud/billing'
 import { startPlan } from '@rerun/cloud/billing.client'
 import { cn } from '@/lib/utils'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -18,7 +18,7 @@ export function useNeedsPlanToConnect(): boolean {
 
 export function useClaudePlanOffered(): boolean {
     const { workspace } = useSession()
-    return !isLifetimePlan(workspace)
+    return isClaudePlanOffered(workspace)
 }
 
 export function NoPlanNotice({ className }: { className?: string }) {

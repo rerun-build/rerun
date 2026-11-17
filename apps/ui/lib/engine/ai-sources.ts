@@ -72,8 +72,8 @@ export function providerGuide(provider: GuidedProvider, t: SourceCopy): { title:
 export const PLAN_PROVIDERS: AddableProvider[] = ['claude', 'codex']
 
 // OpenCode joins the subscriptions only where it can run: behind its release flag, on a machine
-// whose engine says it knows the provider. A lifetime (AppSumo) workspace is not offered the Claude
-// plan: AppSumo will not list a deal that signs buyers in with their Claude subscription.
+// whose engine says it knows the provider. A workspace on the restricted lifetime plan is not offered
+// the Claude plan: AppSumo will not list a deal that signs buyers in with their Claude subscription.
 export function planProviders(opencodeOffered: boolean, { claude = true }: { claude?: boolean } = {}): AddableProvider[] {
     const providers = opencodeOffered ? [...PLAN_PROVIDERS, 'opencode' as const] : PLAN_PROVIDERS
     return claude ? providers : providers.filter(provider => provider !== 'claude')

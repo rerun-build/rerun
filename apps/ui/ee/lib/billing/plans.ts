@@ -108,10 +108,17 @@ export function baseLimitsToColumns(): WorkspaceLimitColumns {
     }
 }
 
+// Every lifetime code opens the restricted plan: AppSumo will not list a deal that signs buyers in
+// with their Claude subscription. Support moves a workspace to the full lifetime plan by hand.
 export const LIFETIME_PLAN_SLUG = 'lifetime'
+export const LIFETIME_RESTRICTED_PLAN_SLUG = 'lifetime_restricted'
 
 export function isLifetimePlan(workspace: { plan: string | null } | null | undefined): boolean {
-    return workspace?.plan === LIFETIME_PLAN_SLUG
+    return workspace?.plan === LIFETIME_PLAN_SLUG || workspace?.plan === LIFETIME_RESTRICTED_PLAN_SLUG
+}
+
+export function isClaudePlanOffered(workspace: { plan: string | null } | null | undefined): boolean {
+    return workspace?.plan !== LIFETIME_RESTRICTED_PLAN_SLUG
 }
 
 // What an AppSumo code buys for good: unlimited coworkers and seats on its machine, and no Rerun
