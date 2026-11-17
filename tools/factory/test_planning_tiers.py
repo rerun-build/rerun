@@ -80,6 +80,14 @@ class ResolveSend(Base):
         self.assertEqual(set(got[0]), {"agentId", "message", "waitSeconds", "goal"})
 
 
+class ShippedTiers(unittest.TestCase):
+    def test_plan_and_resolve_tier_at_high_with_their_models(self):
+        self.assertEqual(SHIPPED["tiers"]["plan"], "high")
+        self.assertEqual(SHIPPED["tiers"]["resolve"], "high")
+        self.assertEqual(SHIPPED["tier_models"]["plan"]["high"], FABLE_MEDIUM)
+        self.assertEqual(SHIPPED["tier_models"]["resolve"]["high"], OPUS_MEDIUM)
+
+
 class Brief(unittest.TestCase):
     def test_brief_asks_for_a_size_line(self):
         text = planning.brief({"number": 612, "title": "Floor: show the queue"}, "o/rerun")

@@ -133,8 +133,8 @@
     "review": "medium",
     "proof": "medium",
     "replan": "medium",
-    "plan": "medium",
-    "resolve": "medium"
+    "plan": "high",
+    "resolve": "high"
   },
   "tier_models": {
     "build": {
@@ -188,13 +188,13 @@
       }
     },
     "plan": {
-      "medium": {
+      "high": {
         "model": "claude-fable-5-2",
         "thinkingLevel": "medium"
       }
     },
     "resolve": {
-      "medium": {
+      "high": {
         "model": "claude-opus-5-5",
         "thinkingLevel": "medium"
       }
