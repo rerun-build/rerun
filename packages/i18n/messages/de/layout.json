@@ -119,7 +119,8 @@
         "adminPanel": "Admin-Bereich",
         "notifications": "Benachrichtigungen",
         "account": "Konto",
-        "signOut": "Abmelden"
+        "signOut": "Abmelden",
+        "computers": "Computer"
     },
     "update": {
         "reload": "Neu laden",

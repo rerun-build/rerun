@@ -37,8 +37,10 @@ export function ComputerStatusBadge({ status, jobs = 0 }: { status: ComputerStat
 }
 
 // `#studio-pc`, the way it is typed in the chat.
+export const COMPUTER_HANDLE_CLASS = 'font-mono text-emerald-700 dark:text-emerald-300'
+
 export function ComputerHandle({ handle, className }: { handle: string; className?: string }) {
-    return <span className={cn('font-mono text-emerald-700 dark:text-emerald-300', className)}>#{handle}</span>
+    return <span className={cn(COMPUTER_HANDLE_CLASS, className)}>#{handle}</span>
 }
 
 export function ComputerNote({ tone = 'orange', children }: { tone?: 'orange' | 'neutral'; children: ReactNode }) {

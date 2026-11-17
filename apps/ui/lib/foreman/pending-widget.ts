@@ -3,16 +3,19 @@ import { lastAssistantMessageIsCompleteWithToolCalls, type ChatStatus, type UIMe
 
 import { isForemanWidgetTool, type ForemanWidgetToolName } from './tool-defs'
 
-// The two questions the engine foreman can stop on. They are the engine's own ask_user and
-// request_approval, answered by a user message rather than a tool result.
-export type EngineHitlToolName = 'ask_user' | 'request_approval'
+// The questions the engine foreman can stop on. They are the engine's own ask_user,
+// request_approval and request_computer_access, answered by a user message rather than a tool result.
+export type EngineHitlToolName = 'ask_user' | 'request_approval' | 'request_computer_access'
 
-export type PendingWidget = { toolName: ForemanWidgetToolName | EngineHitlToolName; toolCallId: string; input: unknown }
+const ENGINE_HITL_TOOLS = new Set<string>(['ask_user', 'request_approval', 'request_computer_access'])
+
+/** `output` is what the engine added to the card it delivered (the computer card reads its rule from it). */
+export type PendingWidget = { toolName: ForemanWidgetToolName | EngineHitlToolName; toolCallId: string; input: unknown; output?: unknown }
 
 // An engine question is drawn after the last message, the way an agent's chat draws its own. Every
 // other widget waits where it streamed in, inside the message that called it.
 export function isEngineHitl(toolName: string): toolName is EngineHitlToolName {
-    return toolName === 'ask_user' || toolName === 'request_approval'
+    return ENGINE_HITL_TOOLS.has(toolName)
 }
 
 // A pending widget is the only thing left to answer, so the composer steps aside for it. Two
@@ -80,10 +83,10 @@ export function findPendingEngineHitl(messages: UIMessage[], status: ChatStatus)
         const rawName = part.type === 'dynamic-tool' ? part.toolName : part.type.startsWith('tool-') ? part.type.slice('tool-'.length) : null
         if (!rawName || !part.toolCallId) continue
         const kind = hitlKindOf(rawName)
-        if (kind !== 'question' && kind !== 'approval') continue
+        if (kind !== 'question' && kind !== 'approval' && kind !== 'computer') continue
         const input = (part.input ?? part.rawInput ?? {}) as Record<string, unknown>
         if (!hitlInputIsUsable(kind, input)) return null
-        return { toolName: stripBridgePrefix(rawName) as EngineHitlToolName, toolCallId: part.toolCallId, input }
+        return { toolName: stripBridgePrefix(rawName) as EngineHitlToolName, toolCallId: part.toolCallId, input, output: part.output }
     }
     return null
 }

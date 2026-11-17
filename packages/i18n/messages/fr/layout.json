@@ -119,7 +119,8 @@
         "adminPanel": "Panneau d'admin",
         "notifications": "Notifications",
         "account": "Compte",
-        "signOut": "Se déconnecter"
+        "signOut": "Se déconnecter",
+        "computers": "Ordinateurs"
     },
     "update": {
         "reload": "Recharger",

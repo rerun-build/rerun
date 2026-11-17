@@ -31,6 +31,7 @@ function localSettings(): WorkerLocalSettings {
 const host = new WorkerHost(
     () => ({ type: 'init', dataDir: join(app.getPath('userData'), 'computer'), appVersion: app.getVersion(), settings: localSettings(), links: workerLinks() }),
     message => receive(message),
+    join(app.getPath('userData'), 'computer', 'worker.log'),
 )
 
 function receive(message: WorkerToMain): void {

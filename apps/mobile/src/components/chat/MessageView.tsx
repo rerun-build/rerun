@@ -1,4 +1,4 @@
-import { hitlKindOf, isSubRunLive, pairSubRuns, parseHitlReply, parseInstallMessage, parseScheduledRun, parseTriggerPayload, QUICK_REPLIES_TOOL, isToolPart, messageText, skillProposalIdOf, SUB_RUN_TOOL_NAMES, toolActivityOf, toolLabelOf, toolNameOf, type ConversationMessageMetadata, type MessageFeedbackRating, type PaidTurnSources, type TriggerPayload } from '@rerun/contracts'
+import { hitlKindOf, isSubRunLive, pairSubRuns, parseHitlReply, parseInstallMessage, parseJobEnd, parseScheduledRun, parseTriggerPayload, QUICK_REPLIES_TOOL, isToolPart, messageText, skillProposalIdOf, SUB_RUN_TOOL_NAMES, toolActivityOf, toolLabelOf, toolNameOf, type ConversationMessageMetadata, type JobEnd, type MessageFeedbackRating, type PaidTurnSources, type TriggerPayload } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -19,7 +19,7 @@ import { FileCardView } from './cards/FileCardView'
 import { TableCardView } from './cards/TableCardView'
 import { ApprovalReceipt, CancelledReceipt, McpReceipt, QuestionReceipt, SecretReceipt, ServiceReceipt, SpendReceipt, TakeoverReceipt } from './hitl/Receipts'
 import { attachmentsOf, userTextOf, voiceOf } from './message-text'
-import { InstallDivider, ScheduledRunDivider, WebhookRunDivider } from './origins/RunOrigins'
+import { InstallDivider, JobEndDivider, ScheduledRunDivider, WebhookRunDivider } from './origins/RunOrigins'
 import { AssistantMessage, UserBubble } from './Messages'
 import { MessageTimeReveal, type MessageStamp } from './MessageTimeReveal'
 import { PaidSourcesPill } from './PaidSourcesPill'
@@ -42,7 +42,7 @@ function isStep(part: ToolPart): boolean {
     return !hitlKindOf(name) || part.state === 'output-error'
 }
 
-type Origin = { kind: 'install'; agentName: string; guide: string } | { kind: 'scheduled'; name: string; prompt: string } | { kind: 'webhook'; payload: TriggerPayload }
+type Origin = { kind: 'install'; agentName: string; guide: string } | { kind: 'scheduled'; name: string; prompt: string } | { kind: 'webhook'; payload: TriggerPayload } | { kind: 'jobEnd'; end: JobEnd }
 
 // A first message no one typed. The hub lifts the install and the routine into metadata and keeps
 // the bare guide or prompt as text; a message streamed before that still carries its raw marker.
@@ -56,7 +56,9 @@ function originOf(message: UIMessage): Origin | null {
     const scheduled = parseScheduledRun(text)
     if (scheduled) return { kind: 'scheduled', ...scheduled }
     const payload = parseTriggerPayload(text)
-    return payload ? { kind: 'webhook', payload } : null
+    if (payload) return { kind: 'webhook', payload }
+    const end = parseJobEnd(text)
+    return end ? { kind: 'jobEnd', end } : null
 }
 
 type MessageViewProps = {
@@ -93,6 +95,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
         if (origin?.kind === 'install') return <InstallDivider agentName={origin.agentName} guide={origin.guide} installing={running} owner={fileOwner} />
         if (origin?.kind === 'scheduled') return <ScheduledRunDivider run={origin} owner={fileOwner} />
         if (origin?.kind === 'webhook') return <WebhookRunDivider payload={origin.payload} owner={fileOwner} />
+        if (origin?.kind === 'jobEnd') return <JobEndDivider end={origin.end} owner={fileOwner} />
         const text = userTextOf(message)
         const reply = parseHitlReply(text)
         if (reply?.kind === 'question') return <QuestionReceipt answers={reply.answers} />

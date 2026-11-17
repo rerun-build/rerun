@@ -317,6 +317,11 @@
                 "blurb": "Voir et piloter son propre écran",
                 "help": "Permet au coworker de regarder son propre bureau et de cliquer, taper et défiler dans son navigateur, ses fichiers et son terminal, pour le travail qui doit se faire à la main dans une app ou un site. Vous pouvez le regarder en direct, et il se met en pause quand vous prenez l'écran."
             },
+            "remoteComputers": {
+                "label": "Utiliser les ordinateurs liés",
+                "blurb": "Travailler sur les PC liés",
+                "help": "Permet au coworker de lancer des commandes, de lire et d'écrire des fichiers et de démarrer des tâches longues sur les ordinateurs que les membres ont liés au workspace depuis l'app desktop Rerun, désignés avec #. Chaque commande et chaque dossier hors de ceux autorisés attend le oui de la personne dans le chat, sauf si le propriétaire de l'ordinateur en a décidé autrement."
+            },
             "paidData": {
                 "label": "Leads, SEO et données sociales",
                 "blurb": "Payé avec vos crédits Rerun",

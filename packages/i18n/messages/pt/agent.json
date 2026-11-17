@@ -317,6 +317,11 @@
                 "blurb": "Vê e controla a própria tela",
                 "help": "Permite que o coworker olhe o próprio desktop e clique, digite e role no navegador, nos arquivos e no terminal, para trabalhos que precisam ser feitos à mão em um app ou site. Você pode assistir ao vivo, e ele pausa enquanto você controla a tela."
             },
+            "remoteComputers": {
+                "label": "Usar computadores vinculados",
+                "blurb": "Trabalhar nos PCs vinculados",
+                "help": "Permite que o coworker execute comandos, leia e escreva arquivos e inicie tarefas longas nos computadores que as pessoas vincularam ao workspace pelo app desktop do Rerun, chamados com #. Cada comando e cada pasta fora das permitidas aguarda o sim da pessoa no chat, a menos que o dono do computador tenha decidido o contrário."
+            },
             "paidData": {
                 "label": "Leads, SEO e dados sociais",
                 "blurb": "Pago com seus créditos Rerun",

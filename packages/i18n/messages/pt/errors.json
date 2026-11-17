@@ -457,5 +457,12 @@
     "vaultConflictSomeone": "Um coworker já recebe {name} de outra entrada do Vault",
     "vaultMcpTarget": "Informe um endereço ou um comando para o servidor",
     "saveAnswerFailed": "Não conseguimos salvar isso. Tente de novo.",
-    "notYourCompanySite": "{domain} não é o site da sua empresa. Digite o seu, ou pule."
+    "notYourCompanySite": "{domain} não é o site da sua empresa. Digite o seu, ou pule.",
+    "computerNameInvalid": "Dê ao computador um nome de 1 a 100 caracteres.",
+    "computerHandleTaken": "Muitos computadores deste workspace já têm esse nome. Escolha outro.",
+    "computerNotFound": "Este computador não está mais vinculado ao workspace.",
+    "computersNeedMachine": "Este workspace ainda não tem máquina: os coworkers não podem usar um computador.",
+    "computersNeedEngineUpdate": "Os computadores chegam com a próxima atualização da máquina deste workspace. Tente de novo daqui a pouco.",
+    "computersOff": "Os computadores ainda não estão disponíveis neste workspace.",
+    "computersAdminOnly": "Só um admin pode alterar ou desvincular um computador que outra pessoa vinculou."
 }

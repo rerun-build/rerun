@@ -26,8 +26,15 @@ let takenHandles: Set<string>
 
 const filterOf = (calls: readonly SupabaseCall[], column: string) => calls.find(call => (call.method === 'eq' || call.method === 'is') && call.args[0] === column)?.args[1]
 
+// As PostgREST reads them: `eq` with null matches nothing (`eq.null`), only `is` matches a null.
 function matching(calls: readonly SupabaseCall[], rows: Row[]): Row[] {
-    return rows.filter(row => calls.every(call => (call.method !== 'eq' && call.method !== 'is') || row[call.args[0] as string] === call.args[1]))
+    return rows.filter(row =>
+        calls.every(call => {
+            if (call.method === 'is') return row[call.args[0] as string] === call.args[1]
+            if (call.method !== 'eq') return true
+            return call.args[1] !== null && row[call.args[0] as string] === call.args[1]
+        }),
+    )
 }
 
 beforeEach(() => {

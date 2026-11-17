@@ -119,7 +119,8 @@
         "adminPanel": "Painel de admin",
         "notifications": "Notificações",
         "account": "Conta",
-        "signOut": "Sair"
+        "signOut": "Sair",
+        "computers": "Computadores"
     },
     "update": {
         "reload": "Recarregar",

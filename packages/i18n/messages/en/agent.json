@@ -399,6 +399,11 @@
                 "blurb": "See and drive its own screen",
                 "help": "Lets the coworker look at its own desktop and click, type and scroll in its browser, its files and its terminal, for work that has to be done by hand in an app or a site. You can watch it live, and it pauses while you drive the screen yourself."
             },
+            "remoteComputers": {
+                "label": "Use linked computers",
+                "blurb": "Work on the PCs people linked",
+                "help": "Lets the coworker run commands, read and write files and start long jobs on the computers people linked to the workspace from the Rerun desktop app, named with #. Every command and every folder outside the allowed ones waits for the yes of the person in the chat, unless the computer's owner said otherwise."
+            },
             "paidData": {
                 "label": "Leads, SEO & social data",
                 "blurb": "Paid from your Rerun credits",

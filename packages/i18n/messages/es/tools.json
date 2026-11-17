@@ -151,7 +151,15 @@
         "request_takeover": "Te pidió tomar el control del navegador",
         "request_spend": "Pidió gastar créditos",
         "notify_user": "Te avisó",
-        "install_complete": "Terminó la configuración"
+        "install_complete": "Terminó la configuración",
+        "remote_computers": "Revisó las computadoras vinculadas",
+        "remote_exec": "{program, select, none {Ejecutó un comando} other {Ejecutó {program}}} en #{computer}",
+        "request_computer_access": "Pidió usar #{computer}",
+        "remote_job": "Revisó un trabajo en #{computer}",
+        "remote_file_list": "Listó archivos en #{computer}",
+        "remote_file_read": "Leyó un archivo en #{computer}",
+        "remote_file_write": "Escribió un archivo en #{computer}",
+        "remote_transfer": "Copió un archivo con #{computer}"
     },
     "activities": {
         "shell_exec": "Ejecutando un comando",
@@ -210,7 +218,9 @@
         "analyze_website": "Leyendo el sitio web",
         "list_templates": "Explorando templates",
         "propose_plan": "Redactando el plan",
-        "install_template": "Instalando un template"
+        "install_template": "Instalando un template",
+        "remote_computers": "Revisando las computadoras vinculadas",
+        "remote_exec": "{program, select, none {Ejecutando un comando} other {Ejecutando {program}}} en #{computer}"
     },
     "paidData": {
         "people": {

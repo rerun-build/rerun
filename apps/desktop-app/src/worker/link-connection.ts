@@ -90,6 +90,7 @@ export class LinkConnection {
 
     private setState(status: WorkerLinkState['status'], extra: { error?: string; retryAt?: string } = {}): void {
         this.state = { computerId: this.link.computerId, status, since: new Date().toISOString(), ...extra }
+        console.log(`[${this.state.since}] ${this.link.computerId} ${status}${extra.error ? `: ${extra.error}` : ''}`)
         this.deps.onState(this.state)
     }
 

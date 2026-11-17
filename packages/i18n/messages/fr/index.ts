@@ -11,6 +11,7 @@ import changelog from './changelog.json'
 import chat from './chat.json'
 import chatErrors from './chatErrors.json'
 import common from './common.json'
+import computers from './computers.json'
 import connections from './connections.json'
 import data from './data.json'
 import desktop from './desktop.json'
@@ -60,4 +61,4 @@ import vault from './vault.json'
 import workspace from './workspace.json'
 import workspaceView from './workspaceView.json'
 
-export default { account, agent, agentSuggestions, apps, auth, billing, brain, builder, changelog, chat, chatErrors, common, connections, data, desktop, desktopApp, desktopShell, dialogs, emails, errors, files, foreman, kit, landingAbout, landingCommon, landingCommunity, landingCompare, landingDownload, landingFeatures, landingHome, landingIndustries, landingPricing, landingResources, landingSections, landingTemplates, layout, mobileAuth, mobileCards, mobileChat, mobileCommon, mobileCoworker, mobileHitl, mobileHome, mobileOnboarding, mobileProviders, mobileSettings, mobileSteps, notifications, onboarding, publicPages, published, push, services, subRuns, templates, tools, ui, vault, workspace, workspaceView }
+export default { account, agent, agentSuggestions, apps, auth, billing, brain, builder, changelog, chat, chatErrors, common, computers, connections, data, desktop, desktopApp, desktopShell, dialogs, emails, errors, files, foreman, kit, landingAbout, landingCommon, landingCommunity, landingCompare, landingDownload, landingFeatures, landingHome, landingIndustries, landingPricing, landingResources, landingSections, landingTemplates, layout, mobileAuth, mobileCards, mobileChat, mobileCommon, mobileCoworker, mobileHitl, mobileHome, mobileOnboarding, mobileProviders, mobileSettings, mobileSteps, notifications, onboarding, publicPages, published, push, services, subRuns, templates, tools, ui, vault, workspace, workspaceView }

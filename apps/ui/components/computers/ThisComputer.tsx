@@ -7,7 +7,8 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
-import { linkThisComputerAction, listComputersAction } from '@/app/api/_actions/remote-computers.actions'
+import { linkThisComputerAction } from '@/app/api/_actions/remote-computers.actions'
+import { useSession } from '@/supabase/session/SessionProvider'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { Button } from '@/components/ui/button'
@@ -42,15 +43,6 @@ function useThisComputer(): DesktopRemoteComputerState | null {
     return state
 }
 
-// The ids of this workspace's computers: a link of this computer among them is the one of this workspace.
-function useWorkspaceComputerIds(refresh: number): Set<string> | null {
-    const [ids, setIds] = useState<Set<string> | null>(null)
-    useEffect(() => {
-        void listComputersAction().then(res => setIds(new Set(res.ok ? res.computers.map(computer => computer.id) : [])))
-    }, [refresh])
-    return ids
-}
-
 function statusOf(link: DesktopRemoteLink, state: DesktopRemoteComputerState): ComputerStatus {
     if (link.status !== 'online') return 'offline'
     if (state.paused) return 'paused'
@@ -62,10 +54,9 @@ function statusOf(link: DesktopRemoteLink, state: DesktopRemoteComputerState): C
 export function ThisComputerLinkRow({ onLinkedChange, onLinked }: { onLinkedChange: (linked: boolean) => void; onLinked: () => Promise<void> | void }) {
     const t = useTranslations('computers.thisComputer')
     const state = useThisComputer()
-    const [refresh, setRefresh] = useState(0)
-    const ids = useWorkspaceComputerIds(refresh)
+    const { workspace } = useSession()
     const [linking, setLinking] = useState(false)
-    const linked = state && ids ? state.links.some(link => ids.has(link.computerId)) : null
+    const linked = state && workspace ? state.links.some(link => link.workspaceId === workspace.id && link.status !== 'revoked') : null
 
     useEffect(() => {
         if (linked !== null) onLinkedChange(linked)
@@ -92,10 +83,7 @@ export function ThisComputerLinkRow({ onLinkedChange, onLinked }: { onLinkedChan
                 open={linking}
                 onOpenChange={setLinking}
                 state={state}
-                onLinked={async () => {
-                    setRefresh(value => value + 1)
-                    await onLinked()
-                }}
+                onLinked={onLinked}
             />
         </div>
     )
@@ -106,16 +94,16 @@ export function ThisComputerLinkRow({ onLinkedChange, onLinked }: { onLinkedChan
 export function ThisComputerSection() {
     const t = useTranslations('computers.thisComputer')
     const state = useThisComputer()
-    const [refresh, setRefresh] = useState(0)
-    const ids = useWorkspaceComputerIds(refresh)
+    const { workspace } = useSession()
     const [linking, setLinking] = useState(false)
     const [unlinking, setUnlinking] = useState<DesktopRemoteLink | null>(null)
     const [busy, setBusy] = useState(false)
     const shell = remoteComputerShell()
     if (!shell) return null
-    if (!state || !ids) return <Skeleton className="h-16 w-full" />
+    if (!state || !workspace) return <Skeleton className="h-16 w-full" />
 
-    const here = state.links.find(link => ids.has(link.computerId)) ?? null
+    // A link of this computer to the workspace open in the app: one per workspace at most.
+    const here = state.links.find(link => link.workspaceId === workspace.id && link.status !== 'revoked') ?? null
     const elsewhere = state.links.filter(link => link !== here && link.status !== 'revoked')
 
     const unlink = async () => {
@@ -124,7 +112,6 @@ export function ThisComputerSection() {
         try {
             await shell.unlink(unlinking.computerId)
             setUnlinking(null)
-            setRefresh(value => value + 1)
         } catch (err) {
             toast.error(err instanceof Error ? err.message : String(err))
         } finally {
@@ -181,7 +168,7 @@ export function ThisComputerSection() {
                 </>
             )}
 
-            <LinkComputerDialog open={linking} onOpenChange={setLinking} state={state} onLinked={() => setRefresh(value => value + 1)} />
+            <LinkComputerDialog open={linking} onOpenChange={setLinking} state={state} onLinked={() => {}} />
             <ConfirmDialog
                 open={unlinking !== null}
                 onOpenChange={open => !open && setUnlinking(null)}

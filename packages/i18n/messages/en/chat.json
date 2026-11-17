@@ -662,10 +662,17 @@
             "failed": "Failed",
             "stopped": "Stopped",
             "lost": "Lost",
-            "offline": "Computer offline"
+            "offline": "Computer offline",
+            "gone": "Unavailable"
         },
         "stop": "Stop",
         "offlineNote": "It keeps running there. The coworker hears back when the computer is back.",
-        "lostNote": "Rerun was closed on the computer while it ran."
+        "lostNote": "Rerun was closed on the computer while it ran.",
+        "goneNote": "This job can no longer be read: the computer was removed, or it no longer knows the job."
+    },
+    "jobEnd": {
+        "label": "Job ended on <computer>#{handle}</computer>",
+        "viewReport": "View report",
+        "reportTitle": "What #{computer} reported"
     }
 }

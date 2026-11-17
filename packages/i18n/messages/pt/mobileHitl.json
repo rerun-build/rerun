@@ -24,7 +24,8 @@
         "service": "{count, plural, =0 {App para conectar} one {App para conectar} other {# apps para conectar}}",
         "takeover": "Sua vez na tela",
         "jumpTo": "{label}, ir até lá",
-        "spend": "Gasto para aprovar"
+        "spend": "Gasto para aprovar",
+        "computer": "Comando para aprovar em #{computer}"
     },
     "alert": {
         "label": "Notificação",
@@ -137,5 +138,15 @@
         "approveOnce": "Aprovar desta vez",
         "addCredits": "Adicionar créditos",
         "alwaysAllowFailed": "Não foi possível ativar \"Gastar sem perguntar\". Esta aprovação continua valendo, até a estimativa."
+    },
+    "computer": {
+        "runOn": "Executar em #{computer}",
+        "filesOn": "Usar arquivos em #{computer}",
+        "deny": "Recusar",
+        "allow": "Permitir",
+        "alwaysProgram": "Sempre permitir {program}",
+        "alwaysFolder": "Sempre permitir esta pasta",
+        "interpreterWarning": "Sempre permitir {program} permite qualquer código que ele execute",
+        "alwaysFailed": "Não foi possível salvar a regra no computador: permitido só desta vez."
     }
 }

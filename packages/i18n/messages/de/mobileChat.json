@@ -18,7 +18,9 @@
         "tooLargeBody": "{files}: höchstens {megabytes} MB.",
         "tooLargeTitle": "{count, plural, one {Diese Datei ist zu groß} other {Diese Dateien sind zu groß}}",
         "tooManyBody": "Höchstens {max}: {files} weggelassen.",
-        "tooManyTitle": "Zu viele Dateien"
+        "tooManyTitle": "Zu viele Dateien",
+        "computers": "Computer",
+        "offline": "offline"
     },
     "desktop": {
         "connecting": "Verbinde mit dem Bildschirm…",
@@ -201,7 +203,10 @@
         "viewGuide": "Anleitung ansehen",
         "viewPayload": "Nutzdaten ansehen",
         "viewPrompt": "Prompt ansehen",
-        "webhookReceived": "Webhook empfangen"
+        "webhookReceived": "Webhook empfangen",
+        "jobEnded": "Job auf #{computer} beendet",
+        "viewReport": "Bericht ansehen",
+        "reportOf": "Was #{computer} gemeldet hat"
     },
     "paidSources": {
         "count": "{count, plural, one {# Quelle} other {# Quellen}}",

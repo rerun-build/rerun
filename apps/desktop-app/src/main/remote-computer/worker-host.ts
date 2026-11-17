@@ -1,8 +1,22 @@
 import { utilityProcess, type UtilityProcess } from 'electron'
-import { join } from 'node:path'
+import { appendFileSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import type { MainToWorker, WorkerToMain } from '../../shared/remote-worker'
 
 const MAX_RESTART_DELAY_MS = 30_000
+const LOG_LIMIT_BYTES = 1024 * 1024
+
+// What the worker prints, kept in a file of its own: the first place to look when a computer stays
+// offline on someone's machine.
+function appendLog(path: string, text: string): void {
+    try {
+        mkdirSync(dirname(path), { recursive: true })
+        if ((statSync(path, { throwIfNoEntry: false })?.size ?? 0) > LOG_LIMIT_BYTES) writeFileSync(path, '')
+        appendFileSync(path, text)
+    } catch {
+        // A log that cannot be written is not worth stopping the worker for.
+    }
+}
 
 // Keeps the computer's worker running: it is forked from the app's own files, restarted with a
 // growing delay when it dies, and handed its state again each time it starts.
@@ -15,6 +29,7 @@ export class WorkerHost {
     constructor(
         private readonly initMessage: () => MainToWorker,
         private readonly onMessage: (message: WorkerToMain) => void,
+        private readonly logPath: string,
     ) {}
 
     get running(): boolean {
@@ -24,8 +39,12 @@ export class WorkerHost {
     start(): void {
         if (this.child || this.restartTimer) return
         this.stopping = false
-        const child = utilityProcess.fork(join(import.meta.dirname, 'worker.js'), [], { serviceName: 'Rerun Computer', stdio: 'inherit' })
+        const child = utilityProcess.fork(join(import.meta.dirname, 'worker.js'), [], { serviceName: 'Rerun Computer', stdio: 'pipe' })
         this.child = child
+        const log = (chunk: Buffer) => appendLog(this.logPath, chunk.toString('utf8'))
+        child.stdout?.on('data', log)
+        child.stderr?.on('data', log)
+        appendLog(this.logPath, `[${new Date().toISOString()}] worker started\n`)
         const startedAt = Date.now()
         child.on('message', (message: WorkerToMain) => {
             if (message.type === 'ready') child.postMessage(this.initMessage())
@@ -36,7 +55,7 @@ export class WorkerHost {
             if (this.stopping) return
             if (Date.now() - startedAt > 60_000) this.restarts = 0
             const delay = Math.min(MAX_RESTART_DELAY_MS, 1_000 * 2 ** this.restarts++)
-            console.warn(`[computer] worker exited (${code}), restarting in ${delay} ms`)
+            appendLog(this.logPath, `[${new Date().toISOString()}] worker exited (${code}), restarting in ${delay} ms\n`)
             this.restartTimer = setTimeout(() => {
                 this.restartTimer = null
                 this.start()

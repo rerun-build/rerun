@@ -26,7 +26,8 @@
     },
     "mentions": {
         "coworkers": "Coworkers",
-        "skills": "Skills"
+        "skills": "Skills",
+        "computers": "Computadores"
     },
     "paidSources": {
         "count": "{count, plural, one {# fonte} other {# fontes}}",
@@ -135,7 +136,8 @@
         "mcp": "Login necessário",
         "service": "{count, plural, =0 {App para conectar} one {App para conectar} other {# apps para conectar}}",
         "takeover": "Sua vez na tela",
-        "spend": "Gasto para aprovar"
+        "spend": "Gasto para aprovar",
+        "computer": "Comando para aprovar em #{computer}"
     },
     "pendingHitl": {
         "goTo": "{label}, ir até lá"
@@ -488,6 +490,11 @@
             "secret": "Você recusou compartilhar as chaves",
             "mcp": "Você pulou o login",
             "takeover": "Você deixou o navegador com seu coworker"
+        },
+        "computer": {
+            "allowed": "Permitido em <computer></computer>",
+            "always": "{rule} sempre permitido em <computer></computer>",
+            "denied": "Recusado em <computer></computer>"
         }
     },
     "agentChat": {
@@ -526,5 +533,38 @@
             "notNow": "Agora não",
             "ofTotal": "/ {amount} {count, plural, one {crédito} other {créditos}}"
         }
+    },
+    "computerAccess": {
+        "titleCommand": "Executar um comando em <computer></computer>",
+        "titleCommands": "Executar {count} comandos em <computer></computer>",
+        "titleScreen": "Usar a tela de <computer></computer>",
+        "deny": "Recusar",
+        "allow": "Permitir",
+        "alwaysAllow": "Sempre permitir {program}",
+        "interpreterWarning": "Sempre permitir {program} permite qualquer código que ele execute",
+        "alwaysFailed": "Não foi possível salvar a regra no computador: permitido só desta vez.",
+        "titleFiles": "{count, plural, one {Usar um arquivo em <computer></computer>} other {Usar # arquivos em <computer></computer>}}",
+        "alwaysAllowFolder": "Sempre permitir esta pasta",
+        "folderNote": "\"Sempre\" permite todos os arquivos de {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "Em andamento",
+            "succeeded": "Concluído",
+            "failed": "Falhou",
+            "stopped": "Parado",
+            "lost": "Perdido",
+            "offline": "Computador offline",
+            "gone": "Indisponível"
+        },
+        "stop": "Parar",
+        "offlineNote": "Continua rodando lá. O coworker recebe notícias quando o computador voltar.",
+        "lostNote": "O Rerun foi fechado no computador enquanto ele rodava.",
+        "goneNote": "Esta tarefa não pode mais ser lida: o computador foi removido ou não a conhece mais."
+    },
+    "jobEnd": {
+        "label": "Tarefa concluída em <computer>#{handle}</computer>",
+        "viewReport": "Ver relatório",
+        "reportTitle": "O que #{computer} informou"
     }
 }

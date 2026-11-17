@@ -110,5 +110,19 @@
         "copyLink": "Copiar enlace",
         "copyImage": "Copiar imagen",
         "saveImage": "Guardar imagen"
+    },
+    "computer": {
+        "defaultName": "Mi computadora",
+        "chooseFolder": "Elige la carpeta donde trabajan los coworkers",
+        "trayOnline": "Esta computadora: en línea",
+        "trayOffline": "Esta computadora: sin conexión",
+        "trayPaused": "Esta computadora: en pausa",
+        "trayJobs": "{count, plural, one {Esta computadora: # trabajo en curso} other {Esta computadora: # trabajos en curso}}",
+        "pause": "Pausar los coworkers en esta computadora",
+        "resume": "Reanudar los coworkers en esta computadora",
+        "quitWithJobs": "{count, plural, one {Un trabajo de un coworker se está ejecutando en esta computadora} other {# trabajos de coworkers se están ejecutando en esta computadora}}",
+        "quitWithJobsDetail": "Salir de Rerun lo detiene. Cierra la ventana para que siga.",
+        "quitAnyway": "Salir de todos modos",
+        "keepRunning": "Seguir ejecutando"
     }
 }

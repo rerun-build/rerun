@@ -457,5 +457,12 @@
     "vaultConflictSomeone": "Un coworker reçoit déjà {name} d'une autre entrée du Vault",
     "vaultMcpTarget": "Donnez au serveur une adresse ou une commande",
     "saveAnswerFailed": "Impossible d'enregistrer cette réponse. Réessayez.",
-    "notYourCompanySite": "{domain} n'est pas le site de votre entreprise. Saisissez le vôtre, ou passez."
+    "notYourCompanySite": "{domain} n'est pas le site de votre entreprise. Saisissez le vôtre, ou passez.",
+    "computerNameInvalid": "Donnez à l'ordinateur un nom de 1 à 100 caractères.",
+    "computerHandleTaken": "Trop d’ordinateurs de ce workspace portent déjà ce nom. Choisissez-en un autre.",
+    "computerNotFound": "Cet ordinateur n'est plus lié au workspace.",
+    "computersNeedMachine": "Ce workspace n'a pas encore de machine : ses coworkers ne peuvent pas utiliser d'ordinateur.",
+    "computersNeedEngineUpdate": "Les ordinateurs arrivent avec la prochaine mise à jour de la machine de ce workspace. Réessayez dans un moment.",
+    "computersOff": "Les ordinateurs ne sont pas encore disponibles dans ce workspace.",
+    "computersAdminOnly": "Seul un admin peut modifier ou délier un ordinateur lié par quelqu'un d'autre."
 }

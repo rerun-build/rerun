@@ -1,4 +1,4 @@
-import { pendingApprovals, pendingQuestions } from '@rerun/contracts'
+import { pendingApprovals, pendingComputerAccess, pendingQuestions } from '@rerun/contracts'
 
 import { liveActivityLabel, type LiveActivityCopy } from '@/lib/agent-chat-loader'
 
@@ -57,6 +57,12 @@ export type ForemanNudge = { id: string; kind: 'question' | 'approval'; title: s
 /** The one line of a pending question or approval the parked Foreman holds up. */
 export function foremanNudge(pending: PendingWidget): ForemanNudge {
     const input = (pending.input ?? {}) as Record<string, unknown>
+    // What it would run or open on the computer is the thing to judge, the reason comes under it.
+    if (pending.toolName === 'request_computer_access') {
+        const request = pendingComputerAccess(input)
+        const items = [...request.commands, ...request.paths]
+        return { id: pending.toolCallId, kind: 'approval', title: items[0] ?? request.reason, detail: items.length ? request.reason || null : null, more: Math.max(items.length - 1, 0) }
+    }
     if (pending.toolName === 'request_approval') {
         const approvals = pendingApprovals(input)
         return { id: pending.toolCallId, kind: 'approval', title: approvals[0].action, detail: approvals[0].detail ?? null, more: approvals.length - 1 }

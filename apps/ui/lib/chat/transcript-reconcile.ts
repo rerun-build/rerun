@@ -7,7 +7,7 @@ type MessageLike = { role: string; parts: readonly PartLike[] }
 // left to wait for on it.
 const isQuickRepliesPart = (part: PartLike) => toolNameOf(part) === QUICK_REPLIES_TOOL
 
-const userTurns = (messages: readonly MessageLike[]) => messages.filter(message => message.role === 'user').length
+export const userTurns = (messages: readonly MessageLike[]) => messages.filter(message => message.role === 'user').length
 
 /**
  * Whether the persisted transcript holds everything the live one shows: every user turn (the engine

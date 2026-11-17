@@ -1,0 +1,96 @@
+{
+    "title": "Computer",
+    "description": "Deine eigenen Computer, auf denen Coworker Befehle und lange Jobs ausführen",
+    "thisComputer": {
+        "heading": "Dieser Computer",
+        "offer": "Lass Coworker hier Befehle und lange Jobs ausführen",
+        "offerLong": "Coworker können hier Befehle und lange Jobs ausführen, jedes neue Programm mit deiner Freigabe",
+        "link": "Verknüpfen",
+        "inWorkspace": "in {workspace}",
+        "pause": "Pause",
+        "pauseHint": "Hier läuft nichts, bis du fortsetzt",
+        "folder": "Arbeitsordner",
+        "changeFolder": "Ändern",
+        "unlink": "Diesen Computer trennen",
+        "unlinkTitle": "Diesen Computer trennen?",
+        "unlinkBody": "Die Coworker von {workspace} führen hier nichts mehr aus. Du kannst ihn später wieder verknüpfen.",
+        "unlinkConfirm": "Trennen",
+        "noKeychain": "Dieses System hat keinen Schlüsselbund: Die Verknüpfung liegt in einer Datei, die nur dein Konto lesen kann."
+    },
+    "linked": "Verknüpft",
+    "linkFromApp": "Verknüpfe einen Computer über die Desktop-App.",
+    "getTheApp": "App holen",
+    "lastSeen": "Zuletzt gesehen {when}",
+    "neverConnected": "Noch nicht verbunden",
+    "engineNeedsUpdate": "Computer kommen mit dem nächsten Update der Maschine dieses Workspace. Bis dahin erscheinen sie offline.",
+    "engineUnreachable": "Die Maschine des Workspace antwortet nicht: Computer erscheinen vorerst offline.",
+    "managersOnly": "Nur ein Admin oder die Person, die ihn verknüpft hat, kann das ändern",
+    "settingsNeedEngine": "Verfügbar, sobald die Maschine des Workspace antwortet",
+    "empty": {
+        "title": "Kein Computer verknüpft",
+        "body": "Coworker erledigen schwere Arbeit auf deinem eigenen Rechner: Video, lokale Modelle, deine GPU.",
+        "getApp": "Desktop-App holen"
+    },
+    "status": {
+        "online": "Online",
+        "busy": "{count, plural, one {Job läuft} other {# Jobs laufen}}",
+        "paused": "Pausiert",
+        "offline": "Offline"
+    },
+    "modes": {
+        "ask": {
+            "label": "Jedes Mal fragen",
+            "description": "Jeder Befehl wartet auf ein Ja"
+        },
+        "remember": {
+            "label": "Fragen, dann merken",
+            "description": "Erlaube ein Programm dauerhaft, sobald du ihm vertraust"
+        },
+        "full": {
+            "label": "Voller Zugriff",
+            "description": "Läuft ohne Rückfrage, außer in sensiblen Ordnern"
+        }
+    },
+    "detail": {
+        "back": "Zurück zu den Computern",
+        "linkedBy": "Verknüpft von {name}",
+        "offlineSince": "Offline seit {when}. Coworker sagen das, statt etwas auszuführen.",
+        "neverConnected": "Noch nicht verbunden. Er erscheint online, sobald die Rerun-App darauf läuft.",
+        "paused": "Am Computer selbst pausiert. Nichts läuft, bis er dort fortgesetzt wird.",
+        "approvals": "Freigaben",
+        "commands": "Befehle",
+        "modeLabel": "Freigabemodus",
+        "unattended": "Ohne jemanden im Chat",
+        "unattendedHint": "Zeitpläne, Trigger und andere Coworker können ihn nutzen",
+        "alwaysAllowed": "Immer erlaubt",
+        "nothingAllowed": "Noch nichts. Wähle „Immer erlauben“ bei einer Freigabe im Chat.",
+        "interpreterWarning": "Einen Interpreter zu erlauben erlaubt jeden Code, den er ausführt",
+        "stopAllowing": "{label} nicht mehr erlauben",
+        "screen": "Bildschirm",
+        "screenOn": "An. Coworker können den Bildschirm sehen und bedienen, jeweils in einer Unterhaltung.",
+        "screenOff": "Aus. Er lässt sich nur in der Rerun-App dieses Computers einschalten.",
+        "machine": "Gerät",
+        "system": "System",
+        "processor": "Prozessor",
+        "graphics": "Grafik",
+        "memory": "Arbeitsspeicher",
+        "folder": "Ordner",
+        "remove": "Computer entfernen",
+        "removeTitle": "{name} entfernen?",
+        "removeBody": "Coworker führen darauf nichts mehr aus. Seine Regeln werden vergessen, und er lässt sich über die Desktop-App wieder verknüpfen.",
+        "removeConfirm": "Entfernen",
+        "jobs": "Jobs"
+    },
+    "linkDialog": {
+        "title": "Diesen Computer verknüpfen",
+        "description": "Coworker dieses Workspace können hier Befehle ausführen",
+        "name": "Name",
+        "handle": "Im Chat: <handle></handle>",
+        "everyone": "Alle in diesem Workspace können ihn über ihre Coworker nutzen",
+        "approval": "Jedes neue Programm fragt zuerst nach deiner Freigabe",
+        "pauseAnyTime": "Jederzeit hier oder im Tray pausieren oder trennen",
+        "cancel": "Abbrechen",
+        "link": "Verknüpfen",
+        "linked": "Verknüpft. Coworker erreichen ihn als #{handle}"
+    }
+}

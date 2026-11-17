@@ -203,7 +203,10 @@
         "viewGuide": "View guide",
         "viewPayload": "View payload",
         "viewPrompt": "View prompt",
-        "webhookReceived": "Webhook received"
+        "webhookReceived": "Webhook received",
+        "jobEnded": "Job ended on #{computer}",
+        "viewReport": "View report",
+        "reportOf": "What #{computer} reported"
     },
     "paidSources": {
         "count": "{count, plural, one {# source} other {# sources}}",

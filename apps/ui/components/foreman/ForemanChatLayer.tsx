@@ -14,6 +14,7 @@ import { ActionApprovalBlock } from '@/components/chat/ActionApprovalBlock'
 import { mentionTokensOf } from '@/components/chat/MentionAutocomplete'
 import { BudgetExhaustedNotice, usePriceArm } from '@rerun/cloud/billing.client'
 import { ChatActivityLoader } from '@/components/chat/ChatActivityLoader'
+import { ComputerAccessBlock } from '@/components/chat/computer/ComputerAccessBlock'
 import { ProviderErrorNotice } from '@/components/chat/ProviderErrorNotice'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
@@ -250,6 +251,8 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
                                         onAnswer={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)}
                                         onDismiss={onWidgetDismiss && (() => onWidgetDismiss(engineHitl.toolCallId))}
                                     />
+                                ) : engineHitl.toolName === 'request_computer_access' ? (
+                                    <ComputerAccessBlock input={(engineHitl.input ?? {}) as Record<string, unknown>} output={engineHitl.output} onReply={text => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, text)} />
                                 ) : (
                                     <ActionApprovalBlock inline approvals={pendingApprovals((engineHitl.input ?? {}) as Record<string, unknown>)} onSubmit={decisions => onWidgetAnswer(engineHitl.toolName, engineHitl.toolCallId, serializeApprovalDecisions(decisions))} />
                                 )}

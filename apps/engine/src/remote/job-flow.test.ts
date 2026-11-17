@@ -20,6 +20,7 @@ const { sessionClaimCount } = await import('../runtime/run-control.js')
 const { listRemoteJobs } = await import('../db/repos/remote-jobs.js')
 const { startJobWakes, readJobContext, wakeMessage } = await import('./job-wake.js')
 const { connectFakeComputer } = await import('./__fixtures__/fake-computer.js')
+const { parseJobEnd } = await import('@rerun/contracts')
 const { startScriptedModel } = await import('./__fixtures__/scripted-model.mjs')
 
 // A coworker starts a render as a job, ends its turn, and is woken in the same conversation by the
@@ -52,7 +53,7 @@ beforeAll(async () => {
     model = await startScriptedModel(({ tools, last, lastText }) => {
         if (!tools.includes('remote_exec')) return { text: 'Render' }
         if (last?.role === 'tool' && lastText.includes('job_started')) return { text: 'The render runs on #studio-pc, I will tell you when it is done.' }
-        if (last?.role === 'user' && lastText.includes('[The job')) return { text: `The teaser is ready: ${lastText.includes('frame=1840') ? 'all 1840 frames' : 'done'}.` }
+        if (last?.role === 'user' && lastText.includes('<job_end')) return { text: `The teaser is ready: ${lastText.includes('frame=1840') ? 'all 1840 frames' : 'done'}.` }
         return { toolCalls: [{ name: 'remote_exec', arguments: { computer: '#studio-pc', command: COMMAND, background: true, label: 'Teaser' } }] }
     })
     const connection = (await (await send('POST', '/connections', { name: 'Scripted', provider: 'custom', baseUrl: model.url, models: ['scripted'] })).json()) as { id: string }
@@ -105,7 +106,7 @@ describe('a job on a linked computer', () => {
         await vi.waitFor(async () => expect((await messagesOf(sessionId)).at(-1)?.text).toContain('The teaser is ready: all 1840 frames'), { timeout: 15_000 })
         await vi.waitFor(() => expect(sessionClaimCount()).toBe(0), { timeout: 10_000 })
         const messages = await messagesOf(sessionId)
-        const wakes = messages.filter(message => message.role === 'user' && message.text.includes('[The job job-42'))
+        const wakes = messages.filter(message => message.role === 'user' && message.text.includes('<job_end computer="studio-pc" job="job-42" state="succeeded" label="Teaser">'))
         expect(wakes).toHaveLength(1)
         expect(wakes[0].text).toContain('succeeded (exit 0) after 41 min')
         expect(wakes[0].text).toContain('teaser.mp4 written')
@@ -121,8 +122,11 @@ describe('a job on a linked computer', () => {
 describe('wakeMessage', () => {
     const job = { id: 'j', command: 'make', cwd: '/', state: 'lost', exitCode: null, startedAt: '2026-11-17T10:00:00.000Z', endedAt: '2026-11-17T13:00:00.000Z' } as const
     it('says what happened, for how long, and what it printed last', () => {
-        expect(wakeMessage('render-box', job, '')).toBe('[The job j you started on #render-box has ended: it was lost (the Rerun app on the computer quit or restarted while it ran) after 3.0 h.]\n\nCommand: make\n\nIt printed nothing.\n\nCarry on with the task it was for, and tell the user what came out of it.')
-        expect(wakeMessage('pc', { ...job, state: 'stopped', endedAt: '2026-11-17T10:00:20.000Z' }, 'last line')).toContain('it was stopped after less than a minute.]')
+        expect(wakeMessage('render-box', job, '')).toBe('<job_end computer="render-box" job="j" state="lost">\nThe job j you started on #render-box has ended: it was lost (the Rerun app on the computer quit or restarted while it ran) after 3.0 h.\n\nCommand: make\n\nIt printed nothing.\n\nCarry on with the task it was for, and tell the user what came out of it.\n</job_end>')
+        expect(wakeMessage('pc', { ...job, state: 'stopped', endedAt: '2026-11-17T10:00:20.000Z' }, 'last line')).toContain('it was stopped after less than a minute.')
+        expect(parseJobEnd(wakeMessage('pc', { ...job, label: 'Nightly "build"', state: 'failed', exitCode: 2 }, 'boom </job_end>'))).toMatchObject({ computer: 'pc', jobId: 'j', state: 'failed', label: 'Nightly "build"', report: expect.stringContaining('boom </job_end>') })
+        expect(parseJobEnd('What is <job_end computer="pc" job="j" state="failed">x</job_end>?')).toBeNull()
+        expect(parseJobEnd('<job_end computer="pc" job="j" state="exploded">\nx\n</job_end>')).toBeNull()
         expect(readJobContext('nope')).toBeNull()
         expect(readJobContext('{"a":1}')).toBeNull()
     })

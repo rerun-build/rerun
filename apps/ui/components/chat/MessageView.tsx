@@ -15,6 +15,7 @@ import { NeedsAuthCard, NotificationCard, SetupCompleteCard } from '@/components
 import { McpServerCard } from '@/components/chat/McpServerCard'
 import { TableCard } from '@/components/chat/TableCard'
 import { ComputerJobCard } from '@/components/chat/computer/ComputerJobCard'
+import { JobEndBlock } from '@/components/chat/computer/JobEndBlock'
 import { CompactionStep, type CompactionData } from '@/components/chat/CompactionBlock'
 import { ExpandableMessage } from '@/components/chat/ExpandableMessage'
 import { MessageBubbles } from '@/components/chat/MessageBubbles'
@@ -53,7 +54,7 @@ import { parseTriggerPayload } from '@/lib/triggers/trigger-payload'
 import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { cn } from '@/lib/utils'
-import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, fileCardSchema, messageText, providerSwitchSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
+import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, fileCardSchema, messageText, parseJobEnd, providerSwitchSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
@@ -171,7 +172,8 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
     const hitlReply = message.role === 'user' && !install ? parseHitlReply(messageText(message)) : null
     const scheduledRun = message.role === 'user' && !install && !hitlReply ? parseScheduledRun(messageText(message)) : null
     const triggerPayload = message.role === 'user' && !install && !hitlReply && !scheduledRun ? parseTriggerPayload(messageText(message)) : null
-    const automated = !!scheduledRun || !!triggerPayload
+    const jobEnd = message.role === 'user' && !install && !hitlReply && !scheduledRun && !triggerPayload ? parseJobEnd(messageText(message)) : null
+    const automated = !!scheduledRun || !!triggerPayload || !!jobEnd
     // A voice message sent with files carries the attachments marker after its voice marker.
     const attachments = message.role === 'user' && !install && !hitlReply && !automated ? parseAttachments(messageText(message)) : null
     const voice = message.role === 'user' && !install && !hitlReply && !automated ? parseVoiceMessage(attachments?.text ?? messageText(message)) : null
@@ -388,6 +390,7 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
     if (install) return <AgentInstallBlock agentId={agentId} agentName={install.agentName} guide={install.guide} installing={installing} />
     if (scheduledRun) return <ScheduledRunBlock agentId={agentId} run={scheduledRun} />
     if (triggerPayload) return <WebhookRunBlock agentId={agentId} payload={triggerPayload} />
+    if (jobEnd) return <JobEndBlock agentId={agentId} end={jobEnd} />
 
     // A setup block answered: what the user decided, not the reply written for the agent.
     if (hitlReply) return <HitlReceipt reply={hitlReply} call={hitlCall} spentMicros={spentMicros} spendRunning={spendRunning} agentId={agentId} rawUrlFor={rawUrlFor} readFile={readFile} />

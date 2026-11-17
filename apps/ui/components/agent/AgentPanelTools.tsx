@@ -53,6 +53,7 @@ const CAPABILITY_ICONS = {
     cards: CardsIcon,
     quickReplies: QuickReplyIcon,
     computer: MonitorIcon,
+    remoteComputers: MonitorIcon,
     paidData: CoinsIcon,
     requestSecret: LockIcon,
 } satisfies Record<string, LucideIcon>

@@ -1,4 +1,4 @@
-import type { ScheduledRun, TriggerPayload } from '@rerun/contracts'
+import type { JobEnd, ScheduledRun, TriggerPayload } from '@rerun/contracts'
 import { fullDateTime } from '@rerun/i18n/format'
 import * as Clipboard from 'expo-clipboard'
 import { useState, type ReactNode } from 'react'
@@ -185,6 +185,27 @@ export function InstallDivider({ agentName, guide, installing, owner }: { agentN
             />
             <OriginSheet open={open} onClose={() => setOpen(false)} symbol="package" title={t('installGuideOf', { name: agentName })}>
                 <Markdown text={guide} owner={owner} />
+            </OriginSheet>
+        </>
+    )
+}
+
+// The end of a job woke the coworker: a divider marks it, what the computer reported a tap away.
+export function JobEndDivider({ end, owner }: { end: JobEnd; owner: FileOwner | null }) {
+    const t = useTranslations('mobileChat.origins')
+    const [open, setOpen] = useState(false)
+    return (
+        <>
+            <ThreadDivider
+                symbol="terminal"
+                pieces={[
+                    { kind: 'text', text: t('jobEnded', { computer: end.computer }) },
+                    ...(end.label ? [{ kind: 'name' as const, text: end.label }] : []),
+                    { kind: 'link', text: t('viewReport'), onPress: () => setOpen(true) },
+                ]}
+            />
+            <OriginSheet open={open} onClose={() => setOpen(false)} symbol="terminal" title={t('reportOf', { computer: end.computer })}>
+                <Markdown text={end.report} owner={owner} />
             </OriginSheet>
         </>
     )

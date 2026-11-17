@@ -110,5 +110,19 @@
         "copyLink": "Link kopieren",
         "copyImage": "Bild kopieren",
         "saveImage": "Bild sichern"
+    },
+    "computer": {
+        "defaultName": "Mein Computer",
+        "chooseFolder": "Wähle den Ordner, in dem Coworker arbeiten",
+        "trayOnline": "Dieser Computer: online",
+        "trayOffline": "Dieser Computer: offline",
+        "trayPaused": "Dieser Computer: pausiert",
+        "trayJobs": "{count, plural, one {Dieser Computer: # Job läuft} other {Dieser Computer: # Jobs laufen}}",
+        "pause": "Coworker auf diesem Computer pausieren",
+        "resume": "Coworker auf diesem Computer fortsetzen",
+        "quitWithJobs": "{count, plural, one {Ein Coworker-Job läuft auf diesem Computer} other {# Coworker-Jobs laufen auf diesem Computer}}",
+        "quitWithJobsDetail": "Rerun zu beenden stoppt ihn. Schließ lieber das Fenster, damit er weiterläuft.",
+        "quitAnyway": "Trotzdem beenden",
+        "keepRunning": "Weiterlaufen lassen"
     }
 }

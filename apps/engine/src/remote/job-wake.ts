@@ -1,5 +1,5 @@
 import type { ModelMessage } from 'ai'
-import type { RemoteJob } from '@rerun/contracts'
+import { buildJobEndMessage, type RemoteJob } from '@rerun/contracts'
 import { agentExists } from '../agents/loader.js'
 import { getAgent } from '../agents/registry.js'
 import { listMessages } from '../db/repos/messages.js'
@@ -51,14 +51,16 @@ const OUTCOME: Record<RemoteJob['state'], string> = {
     lost: 'was lost (the Rerun app on the computer quit or restarted while it ran)',
 }
 
+// Wrapped as a job end, so the chat draws a divider rather than a message the user seems to have typed.
 export function wakeMessage(handle: string, job: RemoteJob, tail: string): string {
     const exit = job.exitCode !== null ? ` (exit ${job.exitCode})` : ''
-    return [
-        `[The job ${job.id} you started on #${handle} has ended: it ${OUTCOME[job.state]}${exit}${duration(job)}.]`,
+    const report = [
+        `The job ${job.id} you started on #${handle} has ended: it ${OUTCOME[job.state]}${exit}${duration(job)}.`,
         `Command: ${job.command}`,
         tail.trim() ? `Last lines of its output:\n${tail.trim()}` : 'It printed nothing.',
         'Carry on with the task it was for, and tell the user what came out of it.',
     ].join('\n\n')
+    return buildJobEndMessage({ computer: handle, jobId: job.id, state: job.state, label: job.label ?? null, report })
 }
 
 async function conversationBusy(agentId: string, sessionId: string): Promise<boolean> {

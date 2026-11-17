@@ -1,6 +1,8 @@
-// The three ways a conversation starts without the user typing: a webhook, a routine, a guided
-// install. Each one is a marker in the run's first user message; every client draws a divider for it
-// instead of a bubble.
+import { remoteJobStateSchema, type RemoteJobState } from './remote-computer.js'
+
+// The ways a run starts without the user typing: a webhook, a routine, a guided install, the end of
+// a job on a linked computer. Each one is a marker in the run's user message; every client draws a
+// divider for it instead of a bubble.
 
 export type TriggerPayload = {
     prompt: string
@@ -90,5 +92,37 @@ export function parseInstallMessage(text: string): InstallMessage | null {
     return {
         agentName: match[1].replaceAll('&quot;', '"').replaceAll('&amp;', '&'),
         guide: match[2].replaceAll(ESCAPED_INSTALL_CLOSING_TAG, INSTALL_CLOSING_TAG),
+    }
+}
+
+export type JobEnd = { computer: string; jobId: string; state: RemoteJobState; label: string | null; report: string }
+
+// The end of a job a coworker started on a linked computer wakes it in the conversation it started
+// the job from. The message is the engine's, not the user's: every client draws a divider for it.
+// The block is the entire message, like a scheduled run's.
+const JOB_END_BLOCK = /^<job_end computer="([^"]*)" job="([^"]*)" state="([^"]*)"(?: label="([^"]*)")?>\n?([\s\S]*?)\n?<\/job_end>$/
+const JOB_END_CLOSING_TAG = '</job_end>'
+const ESCAPED_JOB_END_CLOSING_TAG = '<\\/job_end>'
+
+const escapeAttribute = (value: string) => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;')
+const unescapeAttribute = (value: string) => value.replaceAll('&quot;', '"').replaceAll('&amp;', '&')
+
+export function buildJobEndMessage({ computer, jobId, state, label, report }: JobEnd): string {
+    const labelAttribute = label ? ` label="${escapeAttribute(label)}"` : ''
+    const body = report.trim().replaceAll(JOB_END_CLOSING_TAG, ESCAPED_JOB_END_CLOSING_TAG)
+    return `<job_end computer="${escapeAttribute(computer)}" job="${escapeAttribute(jobId)}" state="${state}"${labelAttribute}>\n${body}\n${JOB_END_CLOSING_TAG}`
+}
+
+export function parseJobEnd(text: string): JobEnd | null {
+    const match = JOB_END_BLOCK.exec(text.trim())
+    if (!match) return null
+    const state = remoteJobStateSchema.safeParse(match[3])
+    if (!state.success) return null
+    return {
+        computer: unescapeAttribute(match[1]),
+        jobId: unescapeAttribute(match[2]),
+        state: state.data,
+        label: match[4] ? unescapeAttribute(match[4]) : null,
+        report: match[5].replaceAll(ESCAPED_JOB_END_CLOSING_TAG, JOB_END_CLOSING_TAG),
     }
 }

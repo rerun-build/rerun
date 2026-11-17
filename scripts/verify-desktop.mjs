@@ -225,6 +225,8 @@ try {
     log(`Report: ${join(outDir, 'report.json')}`)
 } finally {
     await app.close().catch(() => {})
-    if (!options.keep) for (const child of [server, engine]) if (child) process.kill(-child.pid)
+    // A child that already exited (the hub's port was taken) has no group left: the throw would skip
+    // the exit below and leave the run hanging on the engine.
+    if (!options.keep) for (const child of [server, engine]) if (child) try { process.kill(-child.pid) } catch {}
 }
 process.exit(failed ? 1 : 0)

@@ -119,7 +119,8 @@
         "adminPanel": "Panel de admin",
         "notifications": "Notificaciones",
         "account": "Cuenta",
-        "signOut": "Cerrar sesión"
+        "signOut": "Cerrar sesión",
+        "computers": "Computadoras"
     },
     "update": {
         "reload": "Recargar",

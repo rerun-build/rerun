@@ -74,7 +74,15 @@ describe('findPendingEngineHitl', () => {
 
     it('finds the question the engine foreman stopped on', () => {
         const parts = [{ type: 'tool-ask_user', toolCallId: 'h1', state: 'output-available', input: question, output: { status: 'delivered' } }]
-        expect(findPendingEngineHitl([assistant(parts)], 'ready')).toEqual({ toolName: 'ask_user', toolCallId: 'h1', input: question })
+        expect(findPendingEngineHitl([assistant(parts)], 'ready')).toEqual({ toolName: 'ask_user', toolCallId: 'h1', input: question, output: { status: 'delivered' } })
+    })
+
+    it('finds the computer card, with what the engine added to it', () => {
+        const input = { computer: '#studio-pc', reason: 'Render', commands: ['ffmpeg -i a.mov b.mp4'] }
+        const output = { status: 'delivered', card: { computerId: 'c1', always: { rule: 'program', value: 'ffmpeg', interpreter: false } } }
+        const parts = [{ type: 'tool-request_computer_access', toolCallId: 'h4', state: 'output-available', input, output }]
+        expect(findPendingEngineHitl([assistant(parts)], 'ready')).toEqual({ toolName: 'request_computer_access', toolCallId: 'h4', input, output })
+        expect(isEngineHitl('request_computer_access')).toBe(true)
     })
 
     // Claude reaches the builtins through the bridged MCP server, which namespaces their names.

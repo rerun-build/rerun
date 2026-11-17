@@ -1,0 +1,96 @@
+{
+    "title": "Ordinateurs",
+    "description": "Vos propres ordinateurs, où les coworkers lancent des commandes et des tâches longues",
+    "thisComputer": {
+        "heading": "Cet ordinateur",
+        "offer": "Laissez les coworkers lancer ici des commandes et des tâches longues",
+        "offerLong": "Les coworkers peuvent lancer ici des commandes et des tâches longues, chaque nouveau programme avec votre accord",
+        "link": "Lier",
+        "inWorkspace": "dans {workspace}",
+        "pause": "Pause",
+        "pauseHint": "Rien ne tourne ici jusqu'à la reprise",
+        "folder": "Dossier de travail",
+        "changeFolder": "Changer",
+        "unlink": "Délier cet ordinateur",
+        "unlinkTitle": "Délier cet ordinateur ?",
+        "unlinkBody": "Les coworkers de {workspace} ne lanceront plus rien ici. Vous pourrez le lier à nouveau plus tard.",
+        "unlinkConfirm": "Délier",
+        "noKeychain": "Ce système n'a pas de trousseau : le lien est gardé dans un fichier que seul votre compte peut lire."
+    },
+    "linked": "Liés",
+    "linkFromApp": "Liez un ordinateur depuis l'app de bureau.",
+    "getTheApp": "Obtenir l'app",
+    "lastSeen": "Vu {when}",
+    "neverConnected": "Pas encore connecté",
+    "engineNeedsUpdate": "Les ordinateurs arrivent avec la prochaine mise à jour de la machine de ce workspace. Ils apparaissent hors ligne jusque-là.",
+    "engineUnreachable": "La machine du workspace ne répond pas : les ordinateurs apparaissent hors ligne pour le moment.",
+    "managersOnly": "Seuls un admin ou la personne qui l'a lié peuvent modifier ceci",
+    "settingsNeedEngine": "Disponible quand la machine du workspace répond",
+    "empty": {
+        "title": "Aucun ordinateur lié",
+        "body": "Les coworkers lancent le travail lourd sur votre propre machine : vidéo, modèles locaux, votre GPU.",
+        "getApp": "Obtenir l'app de bureau"
+    },
+    "status": {
+        "online": "En ligne",
+        "busy": "{count, plural, one {Tâche en cours} other {# tâches en cours}}",
+        "paused": "En pause",
+        "offline": "Hors ligne"
+    },
+    "modes": {
+        "ask": {
+            "label": "Demander à chaque fois",
+            "description": "Chaque commande attend un oui"
+        },
+        "remember": {
+            "label": "Demander, puis retenir",
+            "description": "Autorisez un programme pour toujours une fois en confiance"
+        },
+        "full": {
+            "label": "Accès complet",
+            "description": "Tourne sans demander, sauf les dossiers sensibles"
+        }
+    },
+    "detail": {
+        "back": "Retour aux ordinateurs",
+        "linkedBy": "Lié par {name}",
+        "offlineSince": "Hors ligne depuis {when}. Les coworkers le disent au lieu de lancer quoi que ce soit.",
+        "neverConnected": "Pas encore connecté. Il apparaît en ligne dès que l'app Rerun tourne dessus.",
+        "paused": "Mis en pause depuis l'ordinateur lui-même. Rien ne tourne avant la reprise là-bas.",
+        "approvals": "Autorisations",
+        "commands": "Commandes",
+        "modeLabel": "Mode d'autorisation",
+        "unattended": "Sans personne dans le chat",
+        "unattendedHint": "Les planifications, les déclencheurs et les autres coworkers peuvent l'utiliser",
+        "alwaysAllowed": "Toujours autorisés",
+        "nothingAllowed": "Rien pour l’instant. Choisissez « Toujours autoriser » sur une demande dans le chat.",
+        "interpreterWarning": "Autoriser un interpréteur, c'est autoriser tout code qu'il exécute",
+        "stopAllowing": "Ne plus autoriser {label}",
+        "screen": "Écran",
+        "screenOn": "Activé. Les coworkers peuvent voir et utiliser l'écran, une conversation à la fois.",
+        "screenOff": "Désactivé. Il ne s'active que depuis l'app Rerun de cet ordinateur.",
+        "machine": "Machine",
+        "system": "Système",
+        "processor": "Processeur",
+        "graphics": "Carte graphique",
+        "memory": "Mémoire",
+        "folder": "Dossier",
+        "remove": "Retirer l'ordinateur",
+        "removeTitle": "Retirer {name} ?",
+        "removeBody": "Les coworkers ne lanceront plus rien dessus. Ses règles sont oubliées, et il peut être lié à nouveau depuis l'app de bureau.",
+        "removeConfirm": "Retirer",
+        "jobs": "Tâches"
+    },
+    "linkDialog": {
+        "title": "Lier cet ordinateur",
+        "description": "Les coworkers de ce workspace pourront lancer des commandes ici",
+        "name": "Nom",
+        "handle": "Dans le chat : <handle></handle>",
+        "everyone": "Tout le monde dans ce workspace peut l'utiliser via ses coworkers",
+        "approval": "Chaque nouveau programme demande d’abord votre accord",
+        "pauseAnyTime": "Mettez en pause ou déliez à tout moment, ici ou depuis la barre des menus",
+        "cancel": "Annuler",
+        "link": "Lier",
+        "linked": "Lié. Les coworkers le joignent avec #{handle}"
+    }
+}

@@ -26,7 +26,8 @@
     },
     "mentions": {
         "coworkers": "Coworkers",
-        "skills": "Skills"
+        "skills": "Skills",
+        "computers": "Ordinateurs"
     },
     "paidSources": {
         "count": "{count, plural, one {# source} other {# sources}}",
@@ -135,7 +136,8 @@
         "mcp": "Connexion requise",
         "service": "{count, plural, =0 {App à connecter} one {App à connecter} other {# apps à connecter}}",
         "takeover": "À vous de prendre l'écran",
-        "spend": "Dépense à valider"
+        "spend": "Dépense à valider",
+        "computer": "Commande à approuver sur #{computer}"
     },
     "pendingHitl": {
         "goTo": "{label}, y aller"
@@ -488,6 +490,11 @@
             "secret": "Vous avez refusé de partager les clés",
             "mcp": "Vous avez passé la connexion",
             "takeover": "Vous avez laissé le navigateur à votre coworker"
+        },
+        "computer": {
+            "allowed": "Autorisé sur <computer></computer>",
+            "always": "{rule} toujours autorisé sur <computer></computer>",
+            "denied": "Refusé sur <computer></computer>"
         }
     },
     "agentChat": {
@@ -526,5 +533,38 @@
             "notNow": "Pas maintenant",
             "ofTotal": "/ {amount} {count, plural, one {crédit} other {crédits}}"
         }
+    },
+    "computerAccess": {
+        "titleCommand": "Lancer une commande sur <computer></computer>",
+        "titleCommands": "Lancer {count} commandes sur <computer></computer>",
+        "titleScreen": "Utiliser l'écran de <computer></computer>",
+        "deny": "Refuser",
+        "allow": "Autoriser",
+        "alwaysAllow": "Toujours autoriser {program}",
+        "interpreterWarning": "Toujours autoriser {program}, c'est autoriser tout code qu'il exécute",
+        "alwaysFailed": "La règle n'a pas pu être enregistrée sur l'ordinateur : autorisé cette fois seulement.",
+        "titleFiles": "{count, plural, one {Utiliser un fichier sur <computer></computer>} other {Utiliser # fichiers sur <computer></computer>}}",
+        "alwaysAllowFolder": "Toujours autoriser ce dossier",
+        "folderNote": "« Toujours » autorise tous les fichiers de {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "En cours",
+            "succeeded": "Terminé",
+            "failed": "Échoué",
+            "stopped": "Arrêté",
+            "lost": "Perdu",
+            "offline": "Ordinateur hors ligne",
+            "gone": "Indisponible"
+        },
+        "stop": "Arrêter",
+        "offlineNote": "Il continue là-bas. Le coworker en aura des nouvelles quand l'ordinateur reviendra.",
+        "lostNote": "Rerun a été fermé sur l'ordinateur pendant qu'il tournait.",
+        "goneNote": "Cette tâche ne peut plus être lue : l'ordinateur a été retiré, ou il ne la connaît plus."
+    },
+    "jobEnd": {
+        "label": "Tâche terminée sur <computer>#{handle}</computer>",
+        "viewReport": "Voir le rapport",
+        "reportTitle": "Ce que #{computer} a renvoyé"
     }
 }

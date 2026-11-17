@@ -317,6 +317,11 @@
                 "blurb": "Ver y manejar su propia pantalla",
                 "help": "Permite al coworker mirar su propio escritorio y hacer clic, escribir y desplazarse en su navegador, sus archivos y su terminal, para el trabajo que hay que hacer a mano en una app o un sitio. Puedes verlo en directo, y se pausa mientras tú manejas la pantalla."
             },
+            "remoteComputers": {
+                "label": "Usar computadoras vinculadas",
+                "blurb": "Trabajar en las PC vinculadas",
+                "help": "Permite al coworker ejecutar comandos, leer y escribir archivos e iniciar trabajos largos en las computadoras que las personas vincularon al workspace desde la app de escritorio de Rerun, nombradas con #. Cada comando y cada carpeta fuera de las permitidas espera el sí de la persona en el chat, salvo que el propietario de la computadora haya decidido otra cosa."
+            },
             "paidData": {
                 "label": "Leads, SEO y datos sociales",
                 "blurb": "Se paga con tus créditos de Rerun",

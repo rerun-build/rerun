@@ -135,7 +135,7 @@ export async function connectComputer(token: string, appVersion: string | null):
 }
 
 async function liveRow(workspaceId: number, computerId: string): Promise<RemoteComputerRow> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'remote_computers', REMOTE_COMPUTER_COLUMNS, { id: computerId, workspace_id: workspaceId, revoked_at: null })
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'remote_computers', REMOTE_COMPUTER_COLUMNS, { id: computerId, workspace_id: workspaceId, revoked_at: { isNull: true } })
     if (!data) throw new AppError('computerNotFound')
     return data
 }
@@ -160,7 +160,7 @@ export async function unlinkByToken(token: string): Promise<boolean> {
 
 // A person who leaves the workspace leaves with the computers they linked.
 export async function revokeMemberComputers(workspaceId: number, userId: string): Promise<void> {
-    const { data } = await selectAll(createServiceRoleClient(), 'remote_computers', ['id'] as const, { workspace_id: workspaceId, linked_by: userId, revoked_at: null })
+    const { data } = await selectAll(createServiceRoleClient(), 'remote_computers', ['id'] as const, { workspace_id: workspaceId, linked_by: userId, revoked_at: { isNull: true } })
     for (const { id } of data ?? []) await revokeComputer(workspaceId, id)
 }
 
@@ -200,7 +200,7 @@ export type WorkspaceComputer = RemoteComputerRow & { view: RemoteComputerView |
 // What the hub knows, with what the engine says of each computer now. `engine` is false when the
 // box did not answer: every computer then reads offline rather than as it was last seen.
 export async function listWorkspaceComputers(workspaceId: number): Promise<{ computers: WorkspaceComputer[]; engine: 'ok' | 'unreachable' | 'needs-update' | 'none' }> {
-    const { data } = await selectAll(createServiceRoleClient(), 'remote_computers', REMOTE_COMPUTER_COLUMNS, { workspace_id: workspaceId, revoked_at: null })
+    const { data } = await selectAll(createServiceRoleClient(), 'remote_computers', REMOTE_COMPUTER_COLUMNS, { workspace_id: workspaceId, revoked_at: { isNull: true } })
     const rows = (data ?? []).sort((a, b) => a.created_at.localeCompare(b.created_at))
     const engine = await workspaceEngine(workspaceId)
     if (!engine) return { computers: rows.map(row => ({ ...row, view: null })), engine: 'none' }
@@ -222,7 +222,7 @@ export async function listWorkspaceComputers(workspaceId: number): Promise<{ com
 
 // A computer of the workspace named by its #handle, as the chat names it.
 async function liveRowByHandle(workspaceId: number, handle: string): Promise<RemoteComputerRow> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'remote_computers', REMOTE_COMPUTER_COLUMNS, { workspace_id: workspaceId, handle: computerHandleOf(handle), revoked_at: null })
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'remote_computers', REMOTE_COMPUTER_COLUMNS, { workspace_id: workspaceId, handle: computerHandleOf(handle), revoked_at: { isNull: true } })
     if (!data) throw new AppError('computerNotFound')
     return data
 }

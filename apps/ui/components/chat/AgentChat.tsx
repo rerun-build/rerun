@@ -47,11 +47,13 @@ import { useMessageFeedback } from '@/hooks/useMessageFeedback'
 import { useMessageTimes } from '@/hooks/useMessageTimes'
 import { useQueuedMessage } from '@/hooks/useQueuedMessage'
 import { useRunReconnect } from '@/hooks/useRunReconnect'
+import { useTranscriptCatchUp } from '@/hooks/useTranscriptCatchUp'
 import { invalidateAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
 import { useSkillProposals } from '@/hooks/useSkillProposals'
 import { useModelPickerStore } from '@/stores/model-picker.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
 import { stepGroupShowsActivity } from '@/lib/agent-chat-loader'
@@ -549,6 +551,15 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         resumeStream,
         setMessages: setMessages as (messages: never[]) => void,
         clearError,
+    })
+
+    const fetchOpenSession = useCallback(() => (sessionId ? fetchSessionMessages(sessionId) : Promise.resolve([])), [sessionId])
+    const catchUp = useTranscriptCatchUp({ idle: status === 'ready' && !reconnecting, messages, fetchMessages: fetchOpenSession, setMessages })
+    useRealtimeSubscription('sessions', {
+        channelId: `session-transcript-${uid}`,
+        enabled: active && !!sessionId,
+        filter: { column: 'id', value: sessionId ?? '' },
+        onUpdate: () => void catchUp(),
     })
 
     // Whether the conversation is busy at all, this tab's own stream included. It decides the

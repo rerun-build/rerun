@@ -1,0 +1,96 @@
+{
+    "title": "Computadores",
+    "description": "Seus próprios computadores, onde os coworkers executam comandos e tarefas longas",
+    "thisComputer": {
+        "heading": "Este computador",
+        "offer": "Deixe os coworkers executarem comandos e tarefas longas aqui",
+        "offerLong": "Os coworkers podem executar comandos e tarefas longas aqui, cada programa novo com a sua aprovação",
+        "link": "Vincular",
+        "inWorkspace": "em {workspace}",
+        "pause": "Pausa",
+        "pauseHint": "Nada roda aqui até você retomar",
+        "folder": "Pasta de trabalho",
+        "changeFolder": "Alterar",
+        "unlink": "Desvincular este computador",
+        "unlinkTitle": "Desvincular este computador?",
+        "unlinkBody": "Os coworkers de {workspace} não vão mais executar nada aqui. Você pode vinculá-lo de novo depois.",
+        "unlinkConfirm": "Desvincular",
+        "noKeychain": "Este sistema não tem chaveiro: o vínculo fica em um arquivo que só a sua conta pode ler."
+    },
+    "linked": "Vinculados",
+    "linkFromApp": "Vincule um computador pelo app para desktop.",
+    "getTheApp": "Baixar o app",
+    "lastSeen": "Visto {when}",
+    "neverConnected": "Ainda não conectado",
+    "engineNeedsUpdate": "Os computadores chegam com a próxima atualização da máquina deste workspace. Até lá aparecem offline.",
+    "engineUnreachable": "A máquina do workspace não está respondendo: por enquanto os computadores aparecem offline.",
+    "managersOnly": "Só um admin ou quem o vinculou pode alterar isto",
+    "settingsNeedEngine": "Disponível quando a máquina do workspace responder",
+    "empty": {
+        "title": "Nenhum computador vinculado",
+        "body": "Os coworkers rodam o trabalho pesado na sua própria máquina: vídeo, modelos locais, sua GPU.",
+        "getApp": "Baixar o app para desktop"
+    },
+    "status": {
+        "online": "Online",
+        "busy": "{count, plural, one {Tarefa em andamento} other {# tarefas em andamento}}",
+        "paused": "Em pausa",
+        "offline": "Offline"
+    },
+    "modes": {
+        "ask": {
+            "label": "Perguntar sempre",
+            "description": "Cada comando espera um sim"
+        },
+        "remember": {
+            "label": "Perguntar e lembrar",
+            "description": "Permita um programa para sempre quando confiar nele"
+        },
+        "full": {
+            "label": "Acesso total",
+            "description": "Roda sem perguntar, exceto pastas sensíveis"
+        }
+    },
+    "detail": {
+        "back": "Voltar aos computadores",
+        "linkedBy": "Vinculado por {name}",
+        "offlineSince": "Offline desde {when}. Os coworkers avisam em vez de executar algo.",
+        "neverConnected": "Ainda não conectado. Aparece online quando o app do Rerun roda nele.",
+        "paused": "Pausado no próprio computador. Nada roda até ser retomado lá.",
+        "approvals": "Aprovações",
+        "commands": "Comandos",
+        "modeLabel": "Modo de aprovação",
+        "unattended": "Sem ninguém no chat",
+        "unattendedHint": "Agendamentos, gatilhos e outros coworkers podem usá-lo",
+        "alwaysAllowed": "Sempre permitidos",
+        "nothingAllowed": "Nada por enquanto. Escolha \"Sempre permitir\" em uma aprovação no chat.",
+        "interpreterWarning": "Permitir um interpretador permite qualquer código que ele execute",
+        "stopAllowing": "Deixar de permitir {label}",
+        "screen": "Tela",
+        "screenOn": "Ativada. Os coworkers podem ver e usar a tela, uma conversa por vez.",
+        "screenOff": "Desativada. Só pode ser ativada pelo app do Rerun neste computador.",
+        "machine": "Máquina",
+        "system": "Sistema",
+        "processor": "Processador",
+        "graphics": "Placa de vídeo",
+        "memory": "Memória",
+        "folder": "Pasta",
+        "remove": "Remover computador",
+        "removeTitle": "Remover {name}?",
+        "removeBody": "Os coworkers não vão mais executar nada nele. As regras são esquecidas e ele pode ser vinculado de novo pelo app para desktop.",
+        "removeConfirm": "Remover",
+        "jobs": "Tarefas"
+    },
+    "linkDialog": {
+        "title": "Vincular este computador",
+        "description": "Os coworkers deste workspace poderão executar comandos aqui",
+        "name": "Nome",
+        "handle": "No chat: <handle></handle>",
+        "everyone": "Todos neste workspace podem usá-lo pelos seus coworkers",
+        "approval": "Cada programa novo pede a sua aprovação primeiro",
+        "pauseAnyTime": "Pause ou desvincule quando quiser, aqui ou pela bandeja",
+        "cancel": "Cancelar",
+        "link": "Vincular",
+        "linked": "Vinculado. Os coworkers o acessam como #{handle}"
+    }
+}

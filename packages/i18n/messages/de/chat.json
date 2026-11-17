@@ -26,7 +26,8 @@
     },
     "mentions": {
         "coworkers": "Coworker",
-        "skills": "Skills"
+        "skills": "Skills",
+        "computers": "Computer"
     },
     "paidSources": {
         "count": "{count, plural, one {# Quelle} other {# Quellen}}",
@@ -135,7 +136,8 @@
         "mcp": "Anmeldung nötig",
         "service": "{count, plural, =0 {App zu verbinden} one {App zu verbinden} other {# Apps zu verbinden}}",
         "takeover": "Du bist am Bildschirm dran",
-        "spend": "Ausgabe freizugeben"
+        "spend": "Ausgabe freizugeben",
+        "computer": "Befehl auf #{computer} freigeben"
     },
     "pendingHitl": {
         "goTo": "{label}, dorthin springen"
@@ -488,6 +490,11 @@
             "secret": "Du hast die Schlüssel nicht geteilt",
             "mcp": "Du hast die Anmeldung übersprungen",
             "takeover": "Du hast den Browser deinem Coworker überlassen"
+        },
+        "computer": {
+            "allowed": "Erlaubt auf <computer></computer>",
+            "always": "{rule} auf <computer></computer> immer erlaubt",
+            "denied": "Abgelehnt auf <computer></computer>"
         }
     },
     "agentChat": {
@@ -526,5 +533,38 @@
             "notNow": "Nicht jetzt",
             "ofTotal": "/ {amount} {count, plural, one {Credit} other {Credits}}"
         }
+    },
+    "computerAccess": {
+        "titleCommand": "Befehl auf <computer></computer> ausführen",
+        "titleCommands": "{count} Befehle auf <computer></computer> ausführen",
+        "titleScreen": "Bildschirm von <computer></computer> nutzen",
+        "deny": "Ablehnen",
+        "allow": "Erlauben",
+        "alwaysAllow": "{program} immer erlauben",
+        "interpreterWarning": "{program} immer zu erlauben erlaubt jeden Code, den es ausführt",
+        "alwaysFailed": "Die Regel konnte nicht auf dem Computer gespeichert werden: nur dieses Mal erlaubt.",
+        "titleFiles": "{count, plural, one {Eine Datei auf <computer></computer> nutzen} other {# Dateien auf <computer></computer> nutzen}}",
+        "alwaysAllowFolder": "Diesen Ordner immer erlauben",
+        "folderNote": "„Immer“ erlaubt alle Dateien in {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "Läuft",
+            "succeeded": "Fertig",
+            "failed": "Fehlgeschlagen",
+            "stopped": "Gestoppt",
+            "lost": "Verloren",
+            "offline": "Computer offline",
+            "gone": "Nicht verfügbar"
+        },
+        "stop": "Stoppen",
+        "offlineNote": "Er läuft dort weiter. Der Coworker erfährt mehr, sobald der Computer zurück ist.",
+        "lostNote": "Rerun wurde auf dem Computer geschlossen, während er lief.",
+        "goneNote": "Dieser Job kann nicht mehr gelesen werden: Der Computer wurde entfernt oder kennt ihn nicht mehr."
+    },
+    "jobEnd": {
+        "label": "Job auf <computer>#{handle}</computer> beendet",
+        "viewReport": "Bericht ansehen",
+        "reportTitle": "Was #{computer} gemeldet hat"
     }
 }

@@ -151,7 +151,15 @@
         "request_takeover": "Hat dich gebeten, den Browser zu übernehmen",
         "request_spend": "Hat gefragt, Guthaben auszugeben",
         "notify_user": "Hat dich benachrichtigt",
-        "install_complete": "Hat die Einrichtung abgeschlossen"
+        "install_complete": "Hat die Einrichtung abgeschlossen",
+        "remote_computers": "Verknüpfte Computer angesehen",
+        "remote_exec": "{program, select, none {Befehl ausgeführt} other {{program} ausgeführt}} auf #{computer}",
+        "request_computer_access": "Um Nutzung von #{computer} gebeten",
+        "remote_job": "Job auf #{computer} geprüft",
+        "remote_file_list": "Dateien auf #{computer} aufgelistet",
+        "remote_file_read": "Datei auf #{computer} gelesen",
+        "remote_file_write": "Datei auf #{computer} geschrieben",
+        "remote_transfer": "Datei mit #{computer} kopiert"
     },
     "activities": {
         "shell_exec": "Führt einen Befehl aus",
@@ -210,7 +218,9 @@
         "analyze_website": "Liest die Website",
         "list_templates": "Durchsucht Vorlagen",
         "propose_plan": "Schreibt den Plan",
-        "install_template": "Installiert eine Vorlage"
+        "install_template": "Installiert eine Vorlage",
+        "remote_computers": "Sieht sich verknüpfte Computer an",
+        "remote_exec": "{program, select, none {Führt einen Befehl aus} other {Führt {program} aus}} auf #{computer}"
     },
     "paidData": {
         "people": {

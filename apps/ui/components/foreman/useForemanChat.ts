@@ -12,6 +12,7 @@ import { getRunAction } from '@/app/api/_actions/agent.actions'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import { readAgentModel, useAgentModel } from '@/hooks/useAgentModel'
 import { useRunReconnect } from '@/hooks/useRunReconnect'
+import { useTranscriptCatchUp } from '@/hooks/useTranscriptCatchUp'
 import { refreshWorkspaceConnections } from '@/hooks/useWorkspaceConnections'
 import { contextStatsOf } from '@/lib/chat/context-stats'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
@@ -23,6 +24,7 @@ import type { ForemanBackend } from '@/lib/foreman/phase'
 import { sealPendingWidgets, withTypedAnswer } from '@/lib/foreman/seal-pending'
 import { selectForemanBackend, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
+import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 
 // The foreman's chat, on whichever loop serves the conversation.
 //
@@ -195,6 +197,15 @@ export function useForemanChat() {
         resumeStream: resumeEngineStream,
         setMessages: setEngineMessages as (messages: never[]) => void,
         clearError: clearEngineError,
+    })
+
+    const fetchOpenTranscript = useCallback(() => fetchEngineTranscript(sessionId), [sessionId])
+    const catchUp = useTranscriptCatchUp({ idle: onEngine && engineChat.status === 'ready' && !reconnecting, messages: engineChat.messages, fetchMessages: fetchOpenTranscript, setMessages: setEngineMessages })
+    useRealtimeSubscription('foreman_conversations', {
+        channelId: `foreman-transcript-${sessionId}`,
+        enabled: onEngine && !!sessionId,
+        filter: { column: 'id', value: sessionId },
+        onUpdate: () => void catchUp(),
     })
 
     // `streaming` couvre aussi bien un outil qui tourne qu'une réponse qui s'écrit : c'est le dernier

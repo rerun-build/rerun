@@ -317,6 +317,11 @@
                 "blurb": "Eigenen Bildschirm sehen und steuern",
                 "help": "Erlaubt dem Coworker, seinen eigenen Desktop zu sehen und in seinem Browser, seinen Dateien und seinem Terminal zu klicken, zu tippen und zu scrollen, für Arbeit, die in einer App oder auf einer Website von Hand erledigt werden muss. Du kannst live zusehen, und er pausiert, während du den Bildschirm selbst steuerst."
             },
+            "remoteComputers": {
+                "label": "Verknüpfte Computer nutzen",
+                "blurb": "Auf verknüpften PCs arbeiten",
+                "help": "Erlaubt dem Coworker, Befehle auszuführen, Dateien zu lesen und zu schreiben und lange Aufgaben auf den Computern zu starten, die Personen über die Rerun-Desktop-App mit dem Workspace verknüpft haben, benannt mit #. Jeder Befehl und jeder Ordner außerhalb der erlaubten wartet auf das Ja der Person im Chat, es sei denn, der Besitzer des Computers hat es anders festgelegt."
+            },
             "paidData": {
                 "label": "Leads-, SEO- & Social-Daten",
                 "blurb": "Bezahlt aus deinem Rerun-Guthaben",

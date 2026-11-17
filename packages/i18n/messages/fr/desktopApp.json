@@ -110,5 +110,19 @@
         "copyLink": "Copier le lien",
         "copyImage": "Copier l’image",
         "saveImage": "Enregistrer l’image"
+    },
+    "computer": {
+        "defaultName": "Mon ordinateur",
+        "chooseFolder": "Choisissez le dossier où travaillent les coworkers",
+        "trayOnline": "Cet ordinateur : en ligne",
+        "trayOffline": "Cet ordinateur : hors ligne",
+        "trayPaused": "Cet ordinateur : en pause",
+        "trayJobs": "{count, plural, one {Cet ordinateur : # tâche en cours} other {Cet ordinateur : # tâches en cours}}",
+        "pause": "Mettre les coworkers en pause sur cet ordinateur",
+        "resume": "Reprendre les coworkers sur cet ordinateur",
+        "quitWithJobs": "{count, plural, one {Une tâche d'un coworker tourne sur cet ordinateur} other {# tâches de coworkers tournent sur cet ordinateur}}",
+        "quitWithJobsDetail": "Quitter Rerun l'arrête. Fermez plutôt la fenêtre pour le laisser tourner.",
+        "quitAnyway": "Quitter quand même",
+        "keepRunning": "Laisser tourner"
     }
 }

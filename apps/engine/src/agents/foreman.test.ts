@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-foreman-'))
+process.env.RERUN_REMOTE_COMPUTERS = 'on'
 
 const { hubCalls } = vi.hoisted(() => ({ hubCalls: [] as Array<{ agentId: string; tool: string; args: Record<string, unknown> }> }))
 
@@ -27,6 +28,8 @@ const { buildTools } = await import('../tools/registry.js')
 const { buildSystemPrompt, systemPromptText } = await import('./systemPrompt.js')
 const { createServer } = await import('../http/server.js')
 const { logger } = await import('../lib/logger.js')
+const { upsertComputer } = await import('../remote/store.js')
+const { forgetComputer } = await import('../remote/registry.js')
 
 const brief = foremanBriefSchema.parse({
     instructions: 'You are the Foreman. Charter from the hub.',
@@ -112,6 +115,15 @@ describe('foreman', () => {
         await close()
         for (const name of ['soul_update', 'tool_install', 'mcp_register', 'request_mcp_sign_in', 'trigger_create', 'db_query', 'notify_user', 'suggest_service', 'request_secret', 'install_complete']) expect(names).not.toContain(name)
         expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
+    })
+
+    it('works on the computers people linked, as any coworker', async () => {
+        await upsertComputer({ id: 'c1', handle: 'studio-pc', name: 'Studio PC' })
+        const { tools, close } = await foremanToolSet()
+        const names = Object.keys(tools)
+        await close()
+        await forgetComputer('c1')
+        expect(names).toEqual(expect.arrayContaining(['remote_exec', 'remote_file_read', 'request_computer_access']))
     })
 
     it('shows the files it made, without the table cards', async () => {
