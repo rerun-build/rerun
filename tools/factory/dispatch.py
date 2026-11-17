@@ -961,6 +961,8 @@ class Dispatcher:
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
         self.tier_job(j, state)
         j["brief_v"] = failures.version(state)
+        if j["brief_v"] is not None:
+            self.store.keep_brief(j["brief_v"], state, message)
         j["intent_at"] = iso(self.now())
         j["fire_id"] = self.store.intent(str(j["issue"]), "", step, coworker=self.names.get(agent, agent), at=j["intent_at"],
                                          model=(j.get("run_model") or {}).get("model"), thinking=(j.get("run_model") or {}).get("thinkingLevel"))

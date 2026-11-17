@@ -12,7 +12,7 @@ G1 = "fix round @ review"
 
 
 def block(k, group, culprit="station brief", issue=301):
-    return "CAUSE %d\nGROUP: %s\nWHY: a quoted line: 'stopped'\nCULPRIT: %s\nCHANGE: #%d\n" % (k, group, culprit, issue)
+    return "CAUSE %d\nGROUP: %s\nWHY: a quoted line: `stopped line`\nCULPRIT: %s\nCHANGE: #%d\n" % (k, group, culprit, issue)
 
 
 class Causes(Base):

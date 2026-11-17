@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS failures(
   id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, kind TEXT NOT NULL, job TEXT NOT NULL,
   station TEXT NOT NULL DEFAULT '', coworker TEXT NOT NULL DEFAULT '', model TEXT, tier TEXT,
   reason TEXT NOT NULL DEFAULT '', plan_run TEXT, brief TEXT);
+CREATE TABLE IF NOT EXISTS briefs(hash TEXT PRIMARY KEY, state TEXT NOT NULL, text TEXT NOT NULL, at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS changes(
   id INTEGER PRIMARY KEY AUTOINCREMENT, at TEXT NOT NULL, issue INTEGER NOT NULL, grp TEXT NOT NULL,
   kind TEXT NOT NULL, before REAL, live_at REAL, after REAL, verdict TEXT, revert INTEGER,
@@ -317,6 +318,15 @@ class Store:
         cur = self.db.execute("SELECT * FROM failures WHERE id>? ORDER BY id", (after,))
         names = [c[0] for c in cur.description]
         return [dict(zip(names, r)) for r in cur.fetchall()]
+
+    def keep_brief(self, hash, state, text, at=None):
+        with self.db:
+            self.db.execute("INSERT OR IGNORE INTO briefs(hash, state, text, at) VALUES (?,?,?,?)",
+                            (hash, state, text, at or now()))
+
+    def brief_text(self, hash):
+        row = self.db.execute("SELECT hash, state, text FROM briefs WHERE hash=?", (hash,)).fetchone()
+        return dict(row) if row else None
 
     def add_change(self, issue, group, kind, before, at=None):
         with self.db:

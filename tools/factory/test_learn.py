@@ -42,7 +42,7 @@ class TestLearn(unittest.TestCase):
         self.assertEqual(rec["not_done"], 1)
         self.assertEqual(rec["tokens"], {"in": 1900, "out": 190, "cache_read": 500, "cache_write": 50})
         self.assertEqual(set(rec), {"job", "state", "pr", "review", "transitions", "transitions_total", "rounds",
-                                    "fires", "fires_total", "not_done", "tokens"})
+                                    "fires", "fires_total", "not_done", "tokens", "briefs"})
 
     def test_the_record_keeps_the_last_40_state_changes(self):
         self.s.put_job("7", "building", {})

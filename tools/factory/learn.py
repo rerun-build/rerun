@@ -1,6 +1,7 @@
 import json
 
 MAX_ITEMS = 3
+BRIEF_CUT = 6000
 
 
 def record(store, job):
@@ -10,7 +11,7 @@ def record(store, job):
             for t in rows[-40:]]
     cur = store.db.execute("SELECT * FROM fires WHERE job=? AND stage NOT LIKE 'learn%' ORDER BY id", (job,))
     all_fires = [dict(r) for r in cur]
-    fires = [{"stage": f["stage"], "coworker": f["coworker"], "status": f["status"],
+    fires = [{"run": f["run_id"], "stage": f["stage"], "coworker": f["coworker"], "status": f["status"],
               "tokens_in": f["tokens_in"], "tokens_out": f["tokens_out"], "cache_read": f["cache_read"],
               "cache_write": f["cache_write"], "seconds": f["seconds"], "error": (f["error"] or "")[:200]}
              for f in all_fires[-30:]]
@@ -18,13 +19,24 @@ def record(store, job):
     def total(key):
         return sum(f[key] or 0 for f in fires)
 
+    hashes = []
+    for r in store.db.execute("SELECT brief FROM failures WHERE job=? AND brief IS NOT NULL ORDER BY id", (job,)):
+        if r["brief"] not in hashes:
+            hashes.append(r["brief"])
+    briefs = []
+    for h in hashes:
+        kept_text = store.brief_text(h)
+        if kept_text:
+            briefs.append({"hash": h, "state": kept_text["state"], "text": kept_text["text"][:BRIEF_CUT]})
+
     return {"job": job, "state": j.get("state"), "pr": j.get("pr"), "review": (j.get("review") or "")[:1500],
             "transitions": kept, "transitions_total": len(rows),
             "rounds": sum(1 for t in kept if t["to"] == "fix_wait"),
             "fires": fires, "fires_total": len(all_fires),
             "not_done": sum(1 for f in fires if f["status"] != "done"),
             "tokens": {"in": total("tokens_in"), "out": total("tokens_out"),
-                       "cache_read": total("cache_read"), "cache_write": total("cache_write")}}
+                       "cache_read": total("cache_read"), "cache_write": total("cache_write")},
+            "briefs": briefs}
 
 
 def brief(record, repo, issue, max_items=MAX_ITEMS):
