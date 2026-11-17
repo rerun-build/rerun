@@ -12,11 +12,12 @@ import { SpendReceipt } from '@/components/chat/spend/SpendReceipt'
 import { Icon } from '@/components/ui/icon'
 import { useCatalogServices } from '@/hooks/useCatalogServices'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
-import { pendingApprovals, pendingQuestions, pendingSecrets, pendingServices, type HitlReply, type QuestionAnswer, type ServiceSetupEntry, type ServiceSetupOutcome } from '@/lib/chat-hitl'
+import { pendingApprovals, pendingComputerAccess, pendingQuestions, pendingSecrets, pendingServices, type HitlReply, type QuestionAnswer, type ServiceSetupEntry, type ServiceSetupOutcome } from '@/lib/chat-hitl'
 import { humanizeToolSegment } from '@/lib/chat/connector-tools'
 import { hitlCallInput, type HitlCallPart } from '@/lib/chat/hitl-receipts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
-import { CheckIcon, KeyIcon, LinkIcon, MessageCircleQuestionIcon, MonitorIcon, PlugIcon, ShieldCheckIcon, XIcon } from '@/lib/icons'
+import { CheckIcon, KeyIcon, LinkIcon, MessageCircleQuestionIcon, MonitorIcon, PlugIcon, ShieldAlertIcon, ShieldCheckIcon, XIcon } from '@/lib/icons'
+import { ComputerHandle } from '@/components/computers/ComputerBits'
 import { serviceIconProps } from '@/lib/services/icons'
 import { cn } from '@/lib/utils'
 
@@ -52,9 +53,26 @@ export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false
             return <TakeoverReceipt url={reply.url} />
         case 'spend':
             return <SpendReceipt decision={reply} totalMicros={readSpendQuote(call?.output)?.totalMicros ?? null} progress={{ spentMicros, running: spendRunning }} />
+        case 'computer':
+            return <ComputerAccessReceipt reply={reply} commands={call ? pendingComputerAccess(input).commands : []} />
         case 'cancelled':
             return <DismissedLine of={reply.of} />
     }
+}
+
+function ComputerAccessReceipt({ reply, commands }: { reply: Extract<HitlReply, { kind: 'computer' }>; commands: string[] }) {
+    const t = useTranslations('chat.receipt.computer')
+    const approved = reply.decision === 'approved'
+    const computer = () => <ComputerHandle handle={reply.computer} />
+    return (
+        <div className="ml-auto flex max-w-[85%] flex-col items-end gap-1 text-xs text-muted-foreground">
+            <p className="flex items-center gap-1.5">
+                {approved ? <CheckIcon className="size-3.5 shrink-0 text-green-500" /> : <ShieldAlertIcon className="size-3.5 shrink-0 text-red-500" />}
+                <span>{approved ? (reply.always ? t.rich('always', { rule: reply.always, computer }) : t.rich('allowed', { computer })) : t.rich('denied', { computer })}</span>
+            </p>
+            {commands.length > 0 && <p className={cn('max-w-full truncate font-mono text-[11px]', !approved && 'line-through decoration-muted-foreground/40')}>{commands.join(' · ')}</p>}
+        </div>
+    )
 }
 
 function ReceiptCard({ icon: Glyph, title, meta, children }: { icon: ComponentType<{ className?: string }>; title: string; meta?: string; children: ReactNode }) {

@@ -24,7 +24,8 @@
         "service": "{count, plural, =0 {App to connect} one {App to connect} other {# apps to connect}}",
         "takeover": "Your turn on the screen",
         "jumpTo": "{label}, go to it",
-        "spend": "Spend to approve"
+        "spend": "Spend to approve",
+        "computer": "Approve a command on #{computer}"
     },
     "alert": {
         "label": "Notification",

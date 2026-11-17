@@ -1,5 +1,5 @@
 import { streamText, wrapLanguageModel, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
-import { RERUN_CONNECTION_ID, contextTextPart, providerSwitchEntry, type ContextOccupancy, type MessageAuthor, type ProviderSwitch } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, contextTextPart, pendingComputerAccess, providerSwitchEntry, type ContextOccupancy, type MessageAuthor, type ProviderSwitch } from '@rerun/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
 import { prepareRunHistory } from './compaction/compact.js'
@@ -137,6 +137,14 @@ function serviceSummary(input: Record<string, unknown> | undefined): string {
     return 'Set up an app'
 }
 
+function computerAccessSummary(input: Record<string, unknown> | undefined): string {
+    const { computer, commands } = pendingComputerAccess(input ?? {})
+    const first = commands[0]
+    if (!first) return `Wants to use #${computer}`
+    const shown = first.length > 80 ? `${first.slice(0, 80)}…` : first
+    return commands.length > 1 ? `Run on #${computer}: ${shown} (+${commands.length - 1} more)` : `Run on #${computer}: ${shown}`
+}
+
 function hitlKind(toolName: string): NotificationKind {
     if (toolName === 'ask_user') return 'question'
     // A secret request is a connector to finish setting up, from the user's point of view.
@@ -151,6 +159,7 @@ function hitlMessage(toolName: string, input: Record<string, unknown> | undefine
     if (toolName === 'request_mcp_sign_in') return `Sign in to ${String(input?.name ?? 'an MCP server')}`
     if (toolName === 'request_takeover') return takeoverSummary(input)
     if (toolName === 'request_spend') return typeof input?.purpose === 'string' && input.purpose.trim() ? input.purpose : 'Approve a paid data spend'
+    if (toolName === 'request_computer_access') return computerAccessSummary(input)
     return approvalSummary(input)
 }
 

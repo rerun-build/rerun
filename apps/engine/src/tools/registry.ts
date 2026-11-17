@@ -36,6 +36,9 @@ import { CLI_PROVIDERS } from '../agents/providers.js'
 import { closeAgentDb } from '../db/agentDb.js'
 import type { RunContext } from '../runtime/context.js'
 import { agentMcpServers } from '../vault/runtime.js'
+import { remoteComputerTools } from './builtin/remote.js'
+import { remoteComputersEnabled } from '../config/env.js'
+import { readComputers } from '../remote/store.js'
 
 // `heldBackMcp` lists the MCP tools the model is not sent, when the agent's set is too heavy to be.
 export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; heldBackMcp?: McpCatalogEntry[]; close: () => Promise<void> }> {
@@ -66,6 +69,8 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     if (cfg.vision) Object.assign(tools, visionTools(ctx))
     const computer = runOffersComputer(ctx.agent.config, ctx.provider, ctx.model, ctx.agent.resolved.connection) ? computerTools(ctx) : null
     if (computer) Object.assign(tools, computer.tools)
+    // Only once a computer is linked: a coworker of a workspace without one carries none of these.
+    if (cfg.remoteComputers && remoteComputersEnabled() && (await readComputers()).length > 0) Object.assign(tools, remoteComputerTools(ctx))
     if (cfg.notify) Object.assign(tools, notifyTools(ctx))
     if (cfg.hub) Object.assign(tools, hubTools(ctx))
     if (cfg.paidData && (await paidDataOffered())) Object.assign(tools, paidDataTools(ctx))

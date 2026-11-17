@@ -6,9 +6,9 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-catalog-families-'))
 process.env.RERUN_API_KEY = ''
 
-const state = vi.hoisted(() => ({ desktop: true, paidData: true }))
+const state = vi.hoisted(() => ({ desktop: true, paidData: true, remote: true }))
 
-vi.mock('../config/env.js', async importOriginal => ({ ...(await importOriginal<typeof import('../config/env.js')>()), desktopEnabled: () => state.desktop }))
+vi.mock('../config/env.js', async importOriginal => ({ ...(await importOriginal<typeof import('../config/env.js')>()), desktopEnabled: () => state.desktop, remoteComputersEnabled: () => state.remote }))
 vi.mock('../paid-data/price.js', () => ({ paidDataOfferedSoFar: () => state.paidData }))
 
 const { beforeEach, describe, expect, it } = await import('vitest')
@@ -18,9 +18,17 @@ const { agentConfigSchema } = await import('../agents/types.js')
 beforeEach(() => {
     state.desktop = true
     state.paidData = true
+    state.remote = true
 })
 
 describe('toolCatalog', () => {
+    it('leaves the linked computers out of the settings on a box that does not take them', () => {
+        state.remote = false
+        expect(toolCatalog().map(f => f.family)).not.toContain('remoteComputers')
+        state.remote = true
+        expect(toolCatalog().find(f => f.family === 'remoteComputers')?.tools.map(t => t.name).sort()).toEqual(['remote_computers', 'remote_exec', 'request_computer_access'])
+    })
+
     it('leaves paid data out of the settings when the hub sells none', () => {
         state.paidData = false
         expect(toolCatalog().map(f => f.family)).not.toContain('paidData')

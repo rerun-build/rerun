@@ -3,7 +3,8 @@
         "labels": "Name of a step in the chat: the tool an AI coworker called. Short, like a menu item. Past-tense ones ('Asked the user') say what the coworker did.",
         "activities": "What an AI coworker is doing right now, shown animated beside it while a step runs.",
         "paidData": "What an AI coworker is doing while it buys data from a paid source, shown in its steps and under its reply.",
-        "errors.notFound": "A step failed because the AI called a tool that does not exist."
+        "errors.notFound": "A step failed because the AI called a tool that does not exist.",
+        "labels.remote_exec": "A coworker ran a command on a person's own computer linked to Rerun. {program} is the program (ffmpeg) or 'a command'; #{computer} is its handle, e.g. #studio-pc. Keep the # before it."
     },
     "labels": {
         "shell_exec": "Terminal",
@@ -157,7 +158,10 @@
         "request_takeover": "Asked you to take over the browser",
         "request_spend": "Asked to spend credits",
         "notify_user": "Notified you",
-        "install_complete": "Finished the setup"
+        "install_complete": "Finished the setup",
+        "remote_computers": "Looked at the linked computers",
+        "remote_exec": "{program, select, none {Ran a command} other {Ran {program}}} on #{computer}",
+        "request_computer_access": "Asked to use #{computer}"
     },
     "activities": {
         "shell_exec": "Running a command",
@@ -216,7 +220,9 @@
         "analyze_website": "Reading the website",
         "list_templates": "Browsing templates",
         "propose_plan": "Writing the plan",
-        "install_template": "Installing a template"
+        "install_template": "Installing a template",
+        "remote_computers": "Looking at the linked computers",
+        "remote_exec": "{program, select, none {Running a command} other {Running {program}}} on #{computer}"
     },
     "paidData": {
         "people": {

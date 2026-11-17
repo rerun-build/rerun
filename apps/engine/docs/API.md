@@ -257,6 +257,19 @@ acknowledged with `ack`, and `status` when the person pauses it). Both ends ping
 missed pings close the socket. Close codes: `4001` no hello, `4002` bad hello, `4003` no common
 protocol, `4004` replaced by a newer connection of the same computer, `4005` unlinked, `4006` unresponsive.
 
+### The coworker's tools
+
+A coworker gets the `remoteComputers` family (on by default, a switch per coworker) once a computer
+is linked: `remote_computers` lists them with what they said about themselves, `remote_exec` runs one
+command on one of them (`{ computer: "#studio-pc", command, cwd?, timeoutSeconds? }`, up to 600 s), and
+`request_computer_access` is the card that asks the person's yes. A command runs only once a yes in
+the conversation covers it, exactly as written: the yes of the latest card, for the run it starts and
+the cards that run raises, until the person's next free message. Privilege raising (`sudo`, `runas`,
+UAC) and the commands that wipe a disk or stop the machine never run, approved or not. The reply the
+card sends is `Computer access: **APPROVED** — #studio-pc` (or `DECLINED`), read by
+`parseComputerAccessDecision` of `@rerun/contracts`. The prompt lists the linked computers in a
+`linked_computers` section.
+
 ---
 
 ## Tools

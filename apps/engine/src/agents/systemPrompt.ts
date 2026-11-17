@@ -1,3 +1,4 @@
+import { remoteComputersNote } from './remote-computers-note.js'
 import { contextTexts, type Provider, type Verbosity } from '@rerun/contracts'
 import type { ModelMessage } from 'ai'
 import { buildSkillIndex } from '../skills/index.js'
@@ -234,7 +235,7 @@ function turnOrderNote(order: TurnOrder, { cards, skillPropose }: TurnClosers): 
     return `A turn ends in this order, your message first: ${numbered([message, ...calls])}. When the turn ends on one of these calls, make it in the same reply as your message, right after it: a reply that stops at the message never sends the card you meant to send. Nothing comes after the last of them: your message has already reached the user, and writing it again shows it twice.`
 }
 
-function turnClosers(agent: LoadedAgent, takeover: boolean): TurnClosers {
+function turnClosers(agent: LoadedAgent, takeover: boolean, computersLinked: boolean): TurnClosers {
     const { tools, selfImprovement, paidDataAlwaysAllow } = agent.config
     const offered: Record<HitlToolName, boolean> = {
         ask_user: tools.askUser,
@@ -244,6 +245,7 @@ function turnClosers(agent: LoadedAgent, takeover: boolean): TurnClosers {
         request_mcp_sign_in: selfImprovement.enabled && selfImprovement.allowToolInstall,
         request_takeover: takeover,
         request_spend: tools.paidData && tools.requestApproval && !paidDataAlwaysAllow,
+        request_computer_access: computersLinked,
     }
     return {
         cards: HITL_TOOL_NAMES.filter(name => offered[name]),
@@ -301,6 +303,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
     ])
     const operating = [FOREMAN_OPERATING_NOTES, cfg.skills && learns ? SKILL_PROPOSAL_REMINDER : '', cfg.skills && cfg.memory ? WHERE_IT_BELONGS_NOTE : ''].filter(Boolean).join(' ')
+    const foremanComputers = await remoteComputersNote(cfg.remoteComputers)
     const stable = [
         section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
         section('vocabulary', VOCABULARY_NOTE),
@@ -309,7 +312,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         section('operating_notes', operating),
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
         section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
-        turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config))),
+        turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config), foremanComputers !== null)),
         section('verbosity', verbosityNote(agent.config.verbosity, learns)),
         section('shared_conversation', SHARED_CONVERSATION_NOTE),
         unattendedSection(trigger, cfg),
@@ -320,6 +323,7 @@ async function buildForemanPrompt(agent: LoadedAgent, trigger: RunTrigger, provi
         own.schedules,
         own.triggers,
         section('company_brain', brain),
+        foremanComputers ? section('linked_computers', foremanComputers) : '',
         own.memory,
         cfg.sharedDb ? section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         own.services,
@@ -346,6 +350,7 @@ export async function buildSystemPrompt(
     ])
 
     const computer = runOffersComputer(agent.config, provider, agent.resolved.model, agent.resolved.connection)
+    const computers = await remoteComputersNote(cfg.remoteComputers)
     const takeover = offersTakeover(agent.config)
     const conversational = !agent.config.ephemeral
     const asks = cfg.askUser || cfg.requestApproval || cfg.suggestService || cfg.requestSecret
@@ -368,7 +373,7 @@ export async function buildSystemPrompt(
         cfg.cards ? section('chat_cards', cardsNote(cfg.sharedDb, cfg.db || cfg.sharedDb)) : '',
         asks ? section('asking_the_user', askingNote(cfg, computer)) : '',
         offersQuickReplies(agent.config) ? section('quick_replies', QUICK_REPLIES_NOTE) : '',
-        conversational ? turnOrderSection(order, turnClosers(agent, takeover)) : '',
+        conversational ? turnOrderSection(order, turnClosers(agent, takeover, computers !== null)) : '',
         conversational ? section('language', languageNote(agent.config.language)) : '',
         section('verbosity', verbosityNote(agent.config.verbosity, agent.config.selfImprovement.enabled)),
         conversational ? section('shared_conversation', SHARED_CONVERSATION_NOTE) : section('sub_agent_rules', SUB_AGENT_RULES),
@@ -384,6 +389,7 @@ export async function buildSystemPrompt(
         cfg.db ? section('database', `${databaseNote(cfg.sharedDb)}${dbSchema ? `\n\n${dbSchema}` : ''}`) : '',
         cfg.sharedDb ? section('shared_database', `${SHARED_DATABASE_NOTE}${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`) : '',
         own.services,
+        computers ? section('linked_computers', computers) : '',
         section('current_time', currentTimeNote()),
     ]
 

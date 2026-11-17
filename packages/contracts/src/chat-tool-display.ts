@@ -21,7 +21,8 @@ const LABELLED_TOOLS = [
     'read_attachment', 'search_docs', 'analyze_website', 'save_profile', 'save_needs', 'list_templates', 'propose_plan', 'install_template',
     'install_shared_agent', 'open_template_card', 'start_agent_setup', 'open_checkout', 'open_template_purchase', 'ask_choice', 'ask_either',
     'ask_input', 'show_templates', 'show_plan', 'show_starter_pack', 'contact_team', 'ask_user', 'request_approval', 'suggest_service',
-    'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'notify_user', 'install_complete',
+    'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'notify_user', 'install_complete', 'remote_computers', 'remote_exec',
+    'request_computer_access',
 ] as const
 
 // The tools that say what they are doing while they run (`activities.*`). A tool missing here falls
@@ -33,14 +34,27 @@ const ACTIVE_TOOLS = [
     'brain_search', 'brain_read', 'brain_propose', 'brain_write', 'vision_analyze', 'image_generation', 'delegate_tasks', 'call_agent', 'team_status', 'team_list_runs',
     'team_get_run', 'ai_status', 'skill_read', 'skill_read_file', 'skill_create', 'skill_edit', 'skill_update', 'mcp_search', 'rerun_hub_service_search',
     'rerun_hub_service_install', 'list_agents', 'create_agent', 'update_agent', 'send_message', 'build_team', 'search_docs', 'rerun_hub_search_docs', 'analyze_website',
-    'list_templates', 'propose_plan', 'install_template',
+    'list_templates', 'propose_plan', 'install_template', 'remote_computers', 'remote_exec',
 ] as const
 
 export type LabelledTool = (typeof LABELLED_TOOLS)[number]
 export type ActiveTool = (typeof ACTIVE_TOOLS)[number]
 
-// The `tools` namespace, in the reader's language.
-export type ToolCopy = (key: `labels.${LabelledTool}` | `activities.${ActiveTool}` | `paidData.${PaidDataCapability}`) => string
+// The `tools` namespace, in the reader's language. The tools of a linked computer name it, and the
+// program they ran.
+export type ToolCopy = (key: `labels.${LabelledTool}` | `activities.${ActiveTool}` | `paidData.${PaidDataCapability}`, values?: Record<string, string>) => string
+
+const REMOTE_TOOLS = new Set(['remote_exec', 'request_computer_access'])
+
+// `#studio-pc` and `ffmpeg` out of `{ computer: "#Studio-PC", command: "/usr/bin/ffmpeg -i …" }`, with
+// stand-ins while the call is still streaming its input.
+function remoteValues(input: unknown): Record<string, string> {
+    const { computer, command, commands } = (input ?? {}) as { computer?: unknown; command?: unknown; commands?: unknown }
+    const handle = typeof computer === 'string' ? computer.trim().replace(/^#/, '').toLowerCase() : ''
+    const first = typeof command === 'string' ? command : Array.isArray(commands) && typeof commands[0] === 'string' ? commands[0] : ''
+    const program = first.trim().split(/\s+/)[0]?.replace(/^["']|["']$/g, '').split(/[\\/]/).pop() ?? ''
+    return { computer: handle || 'computer', program: program || 'none' }
+}
 
 const labelledTools = new Set<string>(LABELLED_TOOLS)
 const activeTools = new Set<string>(ACTIVE_TOOLS)
@@ -51,7 +65,8 @@ const isActiveTool = (toolName: string): toolName is ActiveTool => activeTools.h
 export function toolActivityOf(toolName: string, input: unknown, t: ToolCopy): string | undefined {
     const capability = toolName === PAID_DATA_TOOL ? capabilityOfCall(toolName, input) : null
     if (capability) return t(`paidData.${capability}`)
-    return isActiveTool(toolName) ? t(`activities.${toolName}`) : undefined
+    if (!isActiveTool(toolName)) return undefined
+    return REMOTE_TOOLS.has(toolName) ? t(`activities.${toolName}`, remoteValues(input)) : t(`activities.${toolName}`)
 }
 
 export function isKnownTool(toolName: string): boolean {
@@ -69,7 +84,7 @@ export function formatToolName(name: string): string {
 export function toolLabelOf(toolName: string, input: unknown, t: ToolCopy): string {
     const capability = toolName === PAID_DATA_TOOL ? capabilityOfCall(toolName, input) : null
     if (capability) return t(`paidData.${capability}`)
-    if (isLabelledTool(toolName)) return t(`labels.${toolName}`)
+    if (isLabelledTool(toolName)) return REMOTE_TOOLS.has(toolName) ? t(`labels.${toolName}`, remoteValues(input)) : t(`labels.${toolName}`)
     const name = ranToolName(toolName, input)
     if (name.startsWith('mcp_')) return formatToolName(name.replace(/^mcp__?/, '').replace(/__/g, ' '))
     return formatToolName(name)

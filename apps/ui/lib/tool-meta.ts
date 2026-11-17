@@ -229,6 +229,9 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     request_mcp_sign_in: PlugIcon,
     request_takeover: MonitorIcon,
     request_spend: CoinsIcon,
+    request_computer_access: ShieldAlertIcon,
+    remote_exec: TerminalIcon,
+    remote_computers: MonitorIcon,
     notify_user: BellIcon,
     install_complete: CheckCircle2Icon,
 }

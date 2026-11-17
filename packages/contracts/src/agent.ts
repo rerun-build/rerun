@@ -47,6 +47,8 @@ export const toolsSchema = z.object({
     quickReplies: z.boolean().default(true),
     brain: z.boolean().default(true),
     computer: z.boolean().default(true),
+    // The computers people linked to the workspace: run commands, jobs and files there.
+    remoteComputers: z.boolean().default(true),
     paidData: z.boolean().default(true),
 })
 export type Tools = z.infer<typeof toolsSchema>

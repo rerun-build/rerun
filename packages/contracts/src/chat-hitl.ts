@@ -38,7 +38,14 @@ export type SpendRequest = { purpose: string; soFar?: string }
 
 export type SpendDecision = { purpose: string; decision: 'approved' | 'declined'; always?: boolean }
 
-export type HitlKind = 'question' | 'approval' | 'secret' | 'service' | 'mcp' | 'takeover' | 'spend'
+// The coworker asking to do something on a computer linked to the workspace (`#studio-pc`): run
+// commands, reach paths outside the working folder, or use the screen.
+export type ComputerAccessRequest = { computer: string; reason: string; commands: string[]; paths: string[]; screen: boolean }
+
+// `always` is the rule the person kept with their yes, already written to the computer's settings.
+export type ComputerAccessDecision = { computer: string; decision: 'approved' | 'declined'; always?: string }
+
+export type HitlKind = 'question' | 'approval' | 'secret' | 'service' | 'mcp' | 'takeover' | 'spend' | 'computer'
 
 export const HITL_TOOL_NAMES = {
     ask_user: 'question',
@@ -48,6 +55,7 @@ export const HITL_TOOL_NAMES = {
     request_mcp_sign_in: 'mcp',
     request_takeover: 'takeover',
     request_spend: 'spend',
+    request_computer_access: 'computer',
 } as const satisfies Record<string, HitlKind>
 
 export function hitlKindOf(toolName: string): HitlKind | null {
@@ -82,6 +90,7 @@ const HITL_INPUT_KEYS: Record<HitlKind, string[]> = {
     mcp: ['name'],
     takeover: ['url'],
     spend: ['purpose', 'calls'],
+    computer: ['computer'],
 }
 
 // A rejected tool call reaches the UI with its input stripped, and the forms below would then render
@@ -433,6 +442,43 @@ export function pendingSpend(input: Record<string, unknown>): SpendRequest {
     return typeof input.soFar === 'string' && input.soFar.trim() ? { purpose, soFar: input.soFar } : { purpose }
 }
 
+const stringList = (value: unknown): string[] => {
+    const list = coerceJsonArray(value)
+    return Array.isArray(list) ? list.filter((item): item is string => typeof item === 'string' && item.trim().length > 0) : []
+}
+
+// A handle as the coworker wrote it, `#studio-pc` or `studio-pc`, the way the card and the reply name it.
+export const computerHandleOf = (value: unknown): string => (typeof value === 'string' ? value.trim().replace(/^#/, '').toLowerCase() : '')
+
+export function pendingComputerAccess(input: Record<string, unknown>): ComputerAccessRequest {
+    return {
+        computer: computerHandleOf(input.computer) || 'computer',
+        reason: typeof input.reason === 'string' ? input.reason : '',
+        commands: stringList(input.commands),
+        paths: stringList(input.paths),
+        screen: input.screen === true,
+    }
+}
+
+const COMPUTER_APPROVED_NEXT = 'Go on: run exactly what you asked for, nothing else, and ask again for anything new.'
+const COMPUTER_DECLINED_NEXT = 'Do not run it, nor a variant of it, on this computer. Tell me what you would do instead, or ask what to change.'
+
+export function serializeComputerAccessDecision({ computer, decision, always }: ComputerAccessDecision): string {
+    const head = `Computer access: **${decision === 'approved' ? 'APPROVED' : 'DECLINED'}** — #${computerHandleOf(computer)}`
+    if (decision === 'declined') return `${head}\n\n${COMPUTER_DECLINED_NEXT}`
+    return `${head}${always ? `\nAlways allowed: ${always.replace(/\s*\n\s*/g, ' ')}` : ''}\n\n${COMPUTER_APPROVED_NEXT}`
+}
+
+const COMPUTER_RESULT = /^Computer access: \*\*(APPROVED|DECLINED)\*\* — #([a-z0-9-]+)(?:\nAlways allowed: ([^\n]+))?\n\n(?:Go on: run exactly|Do not run it)/
+
+export function parseComputerAccessDecision(text: string): ComputerAccessDecision | null {
+    const match = COMPUTER_RESULT.exec(text.trim())
+    if (!match) return null
+    const [, status, computer, always] = match
+    if (status === 'DECLINED') return { computer, decision: 'declined' }
+    return always ? { computer, decision: 'approved', always } : { computer, decision: 'approved' }
+}
+
 const SPEND_ALWAYS_LINE = 'Always allowed: paid data tools no longer ask for this coworker.'
 const SPEND_APPROVED_NEXT = 'Go on with the paid calls you planned, and stay close to the estimate.'
 const SPEND_DECLINED_NEXT = 'Do not call any paid data tool for this. Go on with the free tools if they can do part of it, or ask me what to change.'
@@ -497,6 +543,7 @@ export type HitlReply =
     | { kind: 'approval'; decisions: Omit<ApprovalDecision, 'detail'>[] }
     | { kind: 'takeover'; url: string | null }
     | ({ kind: 'spend' } & SpendDecision)
+    | ({ kind: 'computer' } & ComputerAccessDecision)
     | { kind: 'cancelled'; of: keyof typeof HITL_CANCELLED }
 
 export function parseHitlReply(text: string): HitlReply | null {
@@ -517,5 +564,7 @@ export function parseHitlReply(text: string): HitlReply | null {
     if (takeover) return { kind: 'takeover', url: takeover.url }
     const spend = parseSpendDecision(trimmed)
     if (spend) return { kind: 'spend', ...spend }
+    const computer = parseComputerAccessDecision(trimmed)
+    if (computer) return { kind: 'computer', ...computer }
     return null
 }

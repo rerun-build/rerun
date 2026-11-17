@@ -6,7 +6,7 @@ import type { AgentConfig } from '../../agents/types.js'
 import { desktopAvailable } from '../../desktop/session.js'
 import { publicHttpUrl } from '../url.js'
 
-export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend'] as const
+export const HITL_TOOL_NAMES = ['ask_user', 'request_approval', 'suggest_service', 'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'request_computer_access'] as const
 export type HitlToolName = (typeof HITL_TOOL_NAMES)[number]
 export const HITL_TOOL_SET = new Set<string>(HITL_TOOL_NAMES)
 
@@ -109,7 +109,7 @@ export function hitlAck(order: TurnOrder): typeof HITL_ACK | typeof HITL_ACK_CAL
     return order === 'call-first' ? HITL_ACK_CALL_FIRST : HITL_ACK
 }
 
-function hitlTool<S extends z.ZodTypeAny>(order: TurnOrder, description: string, inputSchema: S) {
+export function hitlTool<S extends z.ZodTypeAny>(order: TurnOrder, description: string, inputSchema: S) {
     return tool({ description: `${description} ${cardCallTiming(order)}`, inputSchema, execute: async () => hitlAck(order) })
 }
 

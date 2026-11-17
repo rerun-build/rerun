@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { REMOTE_MAX_TEXT_FRAME_BYTES, negotiateRemoteProtocol, parseRemoteFrame, remoteHandleFromName, remoteHelloSchema, REMOTE_HANDLE_PATTERN } from '@rerun/contracts'
+import { REMOTE_MAX_TEXT_FRAME_BYTES, negotiateRemoteProtocol, toolActivityOf, toolLabelOf, parseRemoteFrame, remoteHandleFromName, remoteHelloSchema, REMOTE_HANDLE_PATTERN } from '@rerun/contracts'
 
 describe('the remote computer protocol', () => {
     it('agrees on the highest version both ends speak, and on none when their ranges do not meet', () => {
@@ -29,5 +29,20 @@ describe('the remote computer protocol', () => {
         expect(long.length).toBeLessThanOrEqual(32)
         expect(long).toMatch(REMOTE_HANDLE_PATTERN)
         expect(remoteHandleFromName('abcdefghijklmnopqrstuvwxyz abcdef-ghi')).toMatch(REMOTE_HANDLE_PATTERN)
+    })
+})
+
+describe('the steps of a linked computer in the chat', () => {
+    const t = (key: string, values?: Record<string, string>) => `${key}${values ? ` ${JSON.stringify(values)}` : ''}`
+
+    it('names the program and the computer of a command', () => {
+        expect(toolLabelOf('remote_exec', { computer: '#Studio-PC', command: '"/usr/local/bin/ffmpeg" -i a.mov a.mp4' }, t)).toBe('labels.remote_exec {"computer":"studio-pc","program":"ffmpeg"}')
+        expect(toolActivityOf('remote_exec', { computer: 'laptop', command: 'C:\\Tools\\magick.exe convert a b' }, t)).toBe('activities.remote_exec {"computer":"laptop","program":"magick.exe"}')
+        expect(toolLabelOf('request_computer_access', { computer: '#studio-pc', commands: ['python3 x.py'] }, t)).toBe('labels.request_computer_access {"computer":"studio-pc","program":"python3"}')
+    })
+
+    it('stands in while the call is still streaming', () => {
+        expect(toolLabelOf('remote_exec', undefined, t)).toBe('labels.remote_exec {"computer":"computer","program":"none"}')
+        expect(toolLabelOf('remote_computers', {}, t)).toBe('labels.remote_computers')
     })
 })

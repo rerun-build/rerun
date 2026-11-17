@@ -5,6 +5,7 @@ import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-prompt-order-'))
 process.env.RERUN_API_KEY = ''
+process.env.RERUN_REMOTE_COMPUTERS = 'on'
 
 vi.mock('../tools/mcp-pool.js', async importOriginal => ({ ...(await importOriginal<typeof import('../tools/mcp-pool.js')>()), pooledMcpServers: async () => [] }))
 vi.mock('../desktop/session.js', async importOriginal => ({
@@ -20,6 +21,8 @@ const { buildSystemPrompt, systemPromptText } = await import('./systemPrompt.js'
 const { buildTools } = await import('../tools/registry.js')
 const { HITL_TOOL_NAMES, HITL_TOOL_SET } = await import('../tools/builtin/hitl.js')
 const { cardCallTiming, turnOrder } = await import('./turn-order.js')
+// A computer linked to the workspace, so request_computer_access is one of the cards it can end on.
+await (await import('../remote/store.js')).upsertComputer({ id: 'c1', handle: 'studio-pc', name: 'Studio PC' })
 
 // Every runtime reads the same rules, so the one place that orders a turn is the only text allowed
 // to say whether the message or a call comes first. A Rerun alias reaches here already resolved to

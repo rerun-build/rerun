@@ -27,7 +27,8 @@ import { cardTools } from './builtin/cards.js'
 import { askUserTool, requestApprovalTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
 import { agentConfigSchema, type AgentConfig } from '../agents/types.js'
 import type { RunContext } from '../runtime/context.js'
-import { desktopEnabled } from '../config/env.js'
+import { desktopEnabled, remoteComputersEnabled } from '../config/env.js'
+import { remoteComputerTools } from './builtin/remote.js'
 
 type CapabilityKey = keyof AgentConfig['tools'] | 'self'
 
@@ -59,6 +60,7 @@ const FAMILIES: FamilyDef[] = [
     { family: 'browser', description: 'Navigate JavaScript-heavy or bot-protected pages with a real Chromium browser, capture screenshots, and hand the browser to the user for a sign-in or a captcha.', build: ctx => ({ ...browserTools(ctx), ...(desktopEnabled() ? requestTakeoverTool(ctx) : {}) }), enabled: c => c.tools.browser },
     { family: 'vision', description: 'Analyze workspace images with the coworker multimodal model.', build: visionTools, enabled: c => c.tools.vision },
     { family: 'computer', description: 'See and drive its own computer screen: take screenshots, click, type and scroll in the browser, the file manager and the terminal, while the user watches.', build: ctx => computerTools(ctx).tools, enabled: c => c.tools.computer, hidden: () => !desktopEnabled() },
+    { family: 'remoteComputers', description: 'Run commands on the computers people linked to the workspace from the desktop app, each one with their approval.', build: remoteComputerTools, enabled: c => c.tools.remoteComputers, hidden: () => !remoteComputersEnabled() },
     { family: 'notify', description: 'Notify the user out-of-band (something to see, question, approval request, progress, or completion) without pausing the run.', build: notifyTools, enabled: c => c.tools.notify },
     { family: 'hub', description: 'Search, install and manage ready-made services from the Rerun catalog, publish files to public URLs, and search the Rerun documentation.', build: hubTools, enabled: c => c.tools.hub },
     { family: 'paidData', description: 'Buy live data from a catalog: leads and companies, SEO metrics, Google results and Maps, and public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, billed on the workspace Rerun credit once the user approves the spend.', build: paidDataTools, enabled: c => c.tools.paidData, hidden: () => !paidDataOfferedSoFar() },
