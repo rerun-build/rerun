@@ -1,0 +1,11 @@
+{
+  "source": "https://platform.claude.com/docs/en/about-claude/pricing",
+  "read": "2026-11-16",
+  "unit": "US dollars per million tokens, list price",
+  "models": {
+    "claude-fable-5-2": {"input": 8, "cache_read": 0.2, "cache_write": 10, "output": 40},
+    "claude-opus-5-5": {"input": 4, "cache_read": 0.2, "cache_write": 5, "output": 20},
+    "claude-sonnet-5-5": {"input": 2, "cache_read": 0.1, "cache_write": 2.5, "output": 10},
+    "claude-haiku-5-5": {"input": 0.1, "cache_read": 0.01, "cache_write": 0.125, "output": 0.5}
+  }
+}
