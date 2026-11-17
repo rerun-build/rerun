@@ -3,7 +3,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import renewal
 import snapshot
 import store as ledger_store
-from test_dispatch_renewal import Renewal, issue
+import test_dispatch_renewal as base
 
 NOW = 1794000000.0
 LATER = "2026-12-01T10:00:00.000Z"
@@ -38,6 +38,14 @@ class Plan(unittest.TestCase):
                     answer([], sign_in=None), {"connections": [{"id": "c1", "isDefault": True, "planLimits": None, "signIn": None}]}):
             self.assertIsNone(renewal.plan(bad, NOW), bad)
 
+    def test_an_answer_of_an_unexpected_shape_never_raises(self):
+        odd = {"connections": [{"id": "c1", "isDefault": True, "planLimits": "soon", "signIn": {"minutesLeft": float("inf")}}]}
+        self.assertIsNone(renewal.plan(odd, NOW))
+        odd["connections"][0].update(planLimits={"windows": "none"}, signIn={"minutesLeft": float("nan")})
+        self.assertIsNone(renewal.plan(odd, NOW))
+        odd["connections"][0].update(planLimits={"windows": [week(float("nan"), LATER)]}, signIn={"minutesLeft": 30})
+        self.assertEqual(renewal.plan(odd, NOW), {"weekUsedPercent": None, "weekResetsAt": None, "signInMinutes": 30})
+
     def test_the_snapshot_carries_the_plan_only_when_there_is_one(self):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
@@ -49,10 +57,10 @@ class Plan(unittest.TestCase):
 
 
 class Beat(unittest.TestCase):
-    beat, state = Renewal.beat, Renewal.state
+    beat, state = base.Renewal.beat, base.Renewal.state
 
     def make(self, issues):
-        Renewal.make(self, issues)
+        base.Renewal.make(self, issues)
         self.reports, inner = [], self.d.account
 
         def account(tool, args, timeout=30):
@@ -67,12 +75,12 @@ class Beat(unittest.TestCase):
         self.d.account = account
 
     def test_a_beat_hands_the_plan_to_the_snapshot(self):
-        self.make([issue(5)])
+        self.make([base.issue(5)])
         self.beat()
         self.assertEqual(self.reports[-1]["plan"], {"weekUsedPercent": 41, "weekResetsAt": "2099-01-01T00:00:00Z", "signInMinutes": 120})
 
     def test_a_beat_whose_connections_cannot_be_read_hands_no_plan_and_goes_on(self):
-        self.make([issue(5)])
+        self.make([base.issue(5)])
         self.w.broken = True
         self.beat()
         self.assertNotIn("plan", self.reports[-1])

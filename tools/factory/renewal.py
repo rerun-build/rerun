@@ -1,3 +1,4 @@
+import math
 import limits
 import snapshot
 
@@ -31,10 +32,12 @@ def plan(answer, now):
     c = next((c for c in connections if isinstance(c, dict) and c.get("isDefault") is True), None) if isinstance(connections, list) else None
     if c is None:
         return None
-    windows = (c.get("planLimits") or {}).get("windows") or []
+    limits_of = c.get("planLimits")
+    windows = limits_of.get("windows") if isinstance(limits_of, dict) else None
+    windows = windows if isinstance(windows, list) else []
     week = next((w for w in windows if isinstance(w, dict) and w.get("kind") == "weekly"), None)
     used = resets = None
-    if week and isinstance(week.get("usedPercent"), (int, float)):
+    if week and isinstance(week.get("usedPercent"), (int, float)) and math.isfinite(week["usedPercent"]):
         used = min(100, max(0, week["usedPercent"]))
         try:
             at = limits.ts(week["resetsAt"])
@@ -42,6 +45,7 @@ def plan(answer, now):
         except (AttributeError, KeyError, TypeError, ValueError):
             pass
     m = left(answer)
+    m = m if m is not None and math.isfinite(m) else None
     if used is None and m is None:
         return None
     return {"weekUsedPercent": used, "weekResetsAt": resets, "signInMinutes": None if m is None else max(0, int(m))}
