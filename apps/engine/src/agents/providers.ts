@@ -459,7 +459,7 @@ export function modelFor(agent: LoadedAgent, override?: ModelOverride, tools?: T
 // a claude run captured via its Stop hook — the cumulative usage the provider reports at finish
 // counts cache reads once per internal turn and says nothing about how full the window is.
 // `quickReplies` reads the block the model closed its message with, cut out of the text on its way.
-export type ResolvedModel = { model: LanguageModel; close: () => Promise<void>; contextUsage?: () => ContextOccupancy | undefined; quickReplies: () => QuickRepliesCapture | undefined }
+export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close: () => Promise<void>; contextUsage?: () => ContextOccupancy | undefined; quickReplies: () => QuickRepliesCapture | undefined }
 
 const noClose = async (): Promise<void> => {}
 

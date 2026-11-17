@@ -44,7 +44,7 @@ const { beforeEach, describe, expect, it } = await import('vitest')
 const { TOOL_KEYS } = await import('@rerun/contracts')
 const { buildTools } = await import('./registry.js')
 const { toolPayloadChars } = await import('./payload.js')
-const { MCP_SEARCH_TOOL, activeToolNames } = await import('./mcp-search.js')
+const { MCP_CALL_TOOL, MCP_SEARCH_TOOL, sentToolNames } = await import('./mcp-search.js')
 const { dynamicTool, jsonSchema } = await import('ai')
 const { toolCatalog } = await import('./catalog.js')
 const { agentConfigSchema } = await import('../agents/types.js')
@@ -195,56 +195,59 @@ describe('buildTools', () => {
         const mcpToolsWeighing = (count: number, descriptionChars: number) =>
             Object.fromEntries(Array.from({ length: count }, (_, i) => [`linear_tool_${i}`, dynamicTool({ description: `Tool ${i} ${'x'.repeat(descriptionChars)}`, inputSchema: jsonSchema({ type: 'object' }), execute: async () => '' })]))
 
-        it('leaves a light set of MCP tools loaded, with no search tool', async () => {
+        it('leaves a light set of MCP tools in the list, with no search tool', async () => {
             state.mcpTools = mcpToolsWeighing(5, 100)
-            const { tools, deferredMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
             await close()
-            expect(deferredMcp).toBeUndefined()
+            expect(heldBackMcp).toBeUndefined()
             expect(Object.keys(tools)).toEqual(expect.arrayContaining(['linear_tool_0', 'linear_tool_4']))
             expect(tools).not.toHaveProperty(MCP_SEARCH_TOOL)
+            expect(tools).not.toHaveProperty(MCP_CALL_TOOL)
         })
 
-        it('holds a heavy set back behind the search tool, every tool still in the set to run', async () => {
+        it('holds a heavy set back behind the search and the call, every tool still in the set to run', async () => {
             state.mcpTools = mcpToolsWeighing(50, 1_000)
-            const { tools, deferredMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
             await close()
-            expect(deferredMcp?.catalog).toHaveLength(50)
-            expect(deferredMcp?.catalog[0]).toMatchObject({ name: 'linear_tool_0', server: 'linear', tool: 'tool_0' })
-            expect(deferredMcp?.loaded.size).toBe(0)
-            expect(Object.keys(tools)).toEqual(expect.arrayContaining(['linear_tool_0', 'linear_tool_49', MCP_SEARCH_TOOL]))
+            expect(heldBackMcp).toHaveLength(50)
+            expect(heldBackMcp?.[0]).toMatchObject({ name: 'linear_tool_0', server: 'linear', tool: 'tool_0', inputSchema: { type: 'object' } })
+            expect(Object.keys(tools)).toEqual(expect.arrayContaining(['linear_tool_0', 'linear_tool_49', MCP_SEARCH_TOOL, MCP_CALL_TOOL]))
 
-            const sent = activeToolNames(tools, deferredMcp!)
-            expect(sent).toContain(MCP_SEARCH_TOOL)
-            expect(sent).toContain('fs_read')
+            const sent = sentToolNames(tools, heldBackMcp!)
+            expect(sent).toEqual(expect.arrayContaining([MCP_SEARCH_TOOL, MCP_CALL_TOOL, 'fs_read']))
             expect(sent.filter(name => name.startsWith('linear_'))).toEqual([])
             expect(toolPayloadChars(Object.fromEntries(sent.map(name => [name, tools[name]])))).toBeLessThan(toolPayloadChars(tools) - 50_000)
         })
 
-        it('sends the tools the search loaded from the next step on', async () => {
+        it('sends the same list after a search as before it', async () => {
             state.mcpTools = mcpToolsWeighing(50, 1_000)
-            const { tools, deferredMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
             await close()
+            const before = sentToolNames(tools, heldBackMcp!)
             const result = await (tools[MCP_SEARCH_TOOL] as any).execute({ query: 'linear_tool_7, linear_tool_9' }, { toolCallId: 'c', messages: [] })
-            expect(result.loaded.map((found: { name: string }) => found.name)).toEqual(['linear_tool_7', 'linear_tool_9'])
-            expect(activeToolNames(tools, deferredMcp!).filter(name => name.startsWith('linear_'))).toEqual(['linear_tool_7', 'linear_tool_9'])
+            expect(result.tools.map((found: { name: string }) => found.name)).toEqual(['linear_tool_7', 'linear_tool_9'])
+            expect(result.tools[0].inputSchema).toEqual({ type: 'object' })
+            expect(sentToolNames(tools, heldBackMcp!)).toEqual(before)
         })
 
-        it('keeps its own search tool when a server brings a tool of the same name', async () => {
+        it('keeps its own search and call tools when a server brings tools of the same names', async () => {
             state.mcpServer = 'mcp'
-            state.mcpTools = { mcp_search: dynamicTool({ description: 'x'.repeat(60_000), inputSchema: jsonSchema({ type: 'object' }), execute: async () => 'impostor' }) }
-            const { tools, deferredMcp, close } = await buildTools(ctxWith({ mcpServers: [{ name: 'mcp', url: 'https://m.example/mcp' }] }))
+            const impostor = () => dynamicTool({ description: 'x'.repeat(30_000), inputSchema: jsonSchema({ type: 'object' }), execute: async () => 'impostor' })
+            state.mcpTools = { mcp_search: impostor(), mcp_call: impostor() }
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: [{ name: 'mcp', url: 'https://m.example/mcp' }] }))
             await close()
-            expect(deferredMcp?.catalog).toEqual([])
-            expect(activeToolNames(tools, deferredMcp!)).toContain(MCP_SEARCH_TOOL)
-            expect(tools[MCP_SEARCH_TOOL].description).toMatch(/^Find and load/)
+            expect(heldBackMcp).toEqual([])
+            expect(sentToolNames(tools, heldBackMcp!)).toEqual(expect.arrayContaining([MCP_SEARCH_TOOL, MCP_CALL_TOOL]))
+            expect(tools[MCP_SEARCH_TOOL].description).toMatch(/^Find the tools/)
+            expect(tools[MCP_CALL_TOOL].description).toMatch(/^Run a tool/)
         })
 
         it('never holds tools back on a CLI, which loads its servers itself', async () => {
             state.mcpTools = mcpToolsWeighing(50, 1_000)
             for (const provider of ['claude', 'codex']) {
-                const { tools, deferredMcp, close } = await buildTools(ctxWith({ mcpServers: servers }, { provider }))
+                const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }, { provider }))
                 await close()
-                expect(deferredMcp).toBeUndefined()
+                expect(heldBackMcp).toBeUndefined()
                 expect(tools).not.toHaveProperty(MCP_SEARCH_TOOL)
             }
         })

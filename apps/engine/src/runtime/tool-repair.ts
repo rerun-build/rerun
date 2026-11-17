@@ -32,7 +32,7 @@ const CLI_MCP_TOOL_NAME = /^mcp__(.+?)__(.+)$/
 // A conversation that ran on Claude or Codex holds their names for the same tools
 // (`mcp__rerun__schedule_list`, `mcp__github__pull_request_read`), and a model taking over the
 // conversation in Rerun's own loop sometimes copies them.
-export function loopToolNameFor(toolName: string, tools: ToolSet): string | null {
+export function loopToolNameFor(toolName: string, tools: Record<string, unknown>): string | null {
     const bridged = canonicalBridgeName(toolName)
     const connector = CLI_MCP_TOOL_NAME.exec(toolName)
     const candidates = [bridged, connector ? `${connector[1]}_${connector[2]}` : null]

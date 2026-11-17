@@ -1,5 +1,5 @@
 import { mcpToolNameFor, resolveTransport } from './mcp.js'
-import { MCP_SEARCH_TOOL, mcpServerToolCounts, type McpCatalogEntry } from './mcp-search.js'
+import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpServerToolCounts, type McpCatalogEntry } from './mcp-search.js'
 import { tokenSlotFor } from './mcp-auth.js'
 import { connectorServerStates, type ConnectorServerState } from '../services/registry.js'
 import type { Provider } from '@rerun/contracts'
@@ -35,13 +35,13 @@ export async function agentConnectorStates(agent: Pick<LoadedAgent, 'id' | 'conf
     return new Map([...(await connectorServerStates(agent.id)), ...vaultServerStates(agent)])
 }
 
-// `deferred` is the catalog of a run that does not send its MCP tools up front: the model is told how
-// many each server holds and how to load them.
-export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, deferred?: McpCatalogEntry[]): Promise<string> {
+// `heldBack` is the catalog of a run that does not send its MCP tools to the model: it is told how
+// many each server holds, and how to find and run them.
+export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, heldBack?: McpCatalogEntry[]): Promise<string> {
     const servers = agentMcpServers(agent)
     if (servers.length === 0) return ''
     const states = await agentConnectorStates(agent)
-    const toolCounts = deferred ? mcpServerToolCounts(deferred) : null
+    const toolCounts = heldBack ? mcpServerToolCounts(heldBack) : null
     const lines = await Promise.all(
         servers.map(async server => {
             const transport = resolveTransport(server)
@@ -64,8 +64,8 @@ export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, def
         ? ` A server marked "not connected yet" or "not set up yet" belongs to an app the user has not connected: its tools are listed but every call fails, so do not call them and never tell the user that app is connected; ${connectStep}.`
         : ''
     const toolName = `\`${mcpToolNameFor(provider, '<name>', '<tool>')}\``
-    const loading = deferred
-        ? `Their tools are named ${toolName} and are not loaded up front: call ${MCP_SEARCH_TOOL} with a few words of what you need and the server's name, then call the tools it loaded. A tool you already called in this conversation stays loaded.`
+    const reaching = heldBack
+        ? `Their tools are named ${toolName} and are not in your tool list: call ${MCP_SEARCH_TOOL} with a few words of what you need and the server's name to get their names and input schemas, then run one with ${MCP_CALL_TOOL}. A schema you already got in this conversation still holds: search again only for a tool whose schema is no longer in it.`
         : `Their tools are loaded as ${toolName}.`
-    return `These MCP servers are already configured. ${loading} For a server marked connected or authenticated, do NOT claim you lack credentials or session info; just call the tools.${pendingNote} Check live status with mcp_status.\n\n${lines.join('\n')}`
+    return `These MCP servers are already configured. ${reaching} For a server marked connected or authenticated, do NOT claim you lack credentials or session info; just call the tools.${pendingNote} Check live status with mcp_status.\n\n${lines.join('\n')}`
 }

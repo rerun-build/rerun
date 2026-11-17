@@ -11,10 +11,6 @@ function isToolResultPart(part: unknown): part is ToolResultPart {
     return !!part && typeof part === 'object' && (part as { type?: unknown }).type === 'tool-result'
 }
 
-export function calledToolNames(messages: ModelMessage[]): string[] {
-    return messages.flatMap(message => (Array.isArray(message.content) ? (message.content as unknown[]).filter(isToolCallPart).map(call => call.toolName) : []))
-}
-
 function stubResult(call: ToolCallPart): ToolResultPart {
     return { type: 'tool-result', toolCallId: call.toolCallId, toolName: call.toolName, output: { type: 'text', value: '[tool result unavailable: omitted during context compaction]' } }
 }

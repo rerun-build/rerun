@@ -293,8 +293,8 @@ export async function buildSystemPrompt(
     trigger: RunTrigger = { source: 'chat' },
     provider: Provider = agent.resolved.provider,
     order: TurnOrder = turnOrder(provider, agent.resolved.model),
-    // The MCP tools this run holds back until the model loads them, known once its servers answered.
-    deferredMcp: Promise<McpCatalogEntry[] | undefined> = Promise.resolve(undefined),
+    // The MCP tools this run does not send to the model, known once its servers answered.
+    heldBackMcp: Promise<McpCatalogEntry[] | undefined> = Promise.resolve(undefined),
 ): Promise<SystemPrompt> {
     if (agent.config.kind === 'foreman') return await buildForemanPrompt(agent, provider, order)
     const cfg = agent.config.tools
@@ -305,7 +305,7 @@ export async function buildSystemPrompt(
         cfg.memory ? buildMemoryIndex(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.db ? readAgentDbSchema(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
-        deferredMcp.then(catalog => buildMcpIndex(agent, provider, catalog)).catch(() => ''),
+        heldBackMcp.then(catalog => buildMcpIndex(agent, provider, catalog)).catch(() => ''),
         cfg.brain ? buildBrainSection(trigger.source === 'chat' && trigger.calledBy !== undefined).catch(() => '') : Promise.resolve(''),
     ])
 
