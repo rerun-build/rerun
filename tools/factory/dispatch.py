@@ -927,6 +927,24 @@ class Dispatcher:
             return self.plan_limit(j, why, str(r.get("error") or "-"))
         return self.failed_attempt(j, why, "ended")
 
+    def close_replans(self):
+        for j in self.jobs():
+            run = j.get("replan_run")
+            if not run:
+                continue
+            fire = self.store.db.execute("SELECT status FROM fires WHERE run_id=?", (run,)).fetchone()
+            if fire is None or fire[0] != "running":
+                continue
+            r = self.account("get_run", {"agentId": j["agent"], "runId": run}) or {}
+            status = r.get("status")
+            if status == "running":
+                continue
+            counts = planning.tokens(r)
+            if counts is None:
+                log(j["issue"], "token counts of run %s unknown: left at 0" % run)
+                counts = {}
+            self.store.close_run(run, "done" if status == "done" else "error", **counts)
+
     def record_tokens(self, j, r):
         ti, to = r.get("inputTokens"), r.get("outputTokens")
         if all(isinstance(x, int) and not isinstance(x, bool) and x >= 0 for x in (ti, to)):
@@ -1471,6 +1489,11 @@ class Dispatcher:
         except Exception as e:
             clean = False
             log("-", "tier floor: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.close_replans()
+        except Exception as e:
+            clean = False
+            log("-", "replans: %s" % (e if isinstance(e, Error) else type(e).__name__))
         for j in self.jobs():
             try:
                 if j["state"] not in END:
