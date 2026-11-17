@@ -58,7 +58,8 @@ export function VaultPaidAccountDetail({ account, listing, onBack, onChanged }: 
                         <PanelRow title={t('detail.everyone')} description={t('detail.everyoneHint')} actions={<Switch checked={false} disabled aria-label={t('detail.everyone')} />} />
                     </TooltipDisabledReason>
                     {listing.coworkers.length === 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.noCoworkers')}</p>}
-                    {listing.coworkers.map(coworker => {
+                    {/* A paid app runs through its relay for a coworker of a Box, never for the Chief of Staff. */}
+                    {listing.coworkers.filter(coworker => coworker.spaceId !== null).map(coworker => {
                         const reason = !coworker.canManage ? t('reasons.manageBox') : undefined
                         return (
                             <TooltipDisabledReason key={coworker.id} reason={reason} className="flex w-full">

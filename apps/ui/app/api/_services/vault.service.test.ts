@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Actor } from '@/app/api/_auth/access'
 import { EngineRequestError, supportsVault } from '@/lib/engine/client'
@@ -30,7 +30,8 @@ vi.mock('@/lib/vault/composio', () => ({ revokeVaultComposioAccount: vi.fn(async
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/flags', () => ({ vaultFlag: vi.fn(async () => false) }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
-vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn() }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(), supportsForemanState: vi.fn(async () => false) }))
+vi.mock('@/lib/foreman/agent-row', () => ({ foremanAgentId: vi.fn(async () => 'chief') }))
 vi.mock('@/lib/engine/vault-client', () => ({
     listVaultItems: vi.fn(),
     getVaultItem: vi.fn(),
@@ -160,6 +161,53 @@ describe('listing', () => {
         expect(listing.coworkers.map(c => c.id)).toEqual(['alice', 'bob', 'carol'])
         expect(listing.entries.every(e => e.canChange)).toBe(true)
         expect(listing.isAdmin).toBe(true)
+    })
+})
+
+// The Chief of Staff holds entries like a coworker, on an engine that gives them to it: every member
+// sees it, only an admin gives it one or takes one back.
+describe('the Chief of Staff in the Vault', () => {
+    const CHIEF = { id: 'chief', engine_agent_id: 'foreman', name: 'Chief of Staff', space_id: null, kind: 'foreman' }
+
+    beforeEach(async () => {
+        const { supportsForemanState } = await import('@/lib/engine/client')
+        vi.mocked(supportsForemanState).mockResolvedValue(true)
+        AGENTS.push(CHIEF as never)
+    })
+
+    afterEach(() => {
+        AGENTS.splice(AGENTS.indexOf(CHIEF as never), 1)
+    })
+
+    it('comes first, seen by a member who reaches no Box, managed by an admin only', async () => {
+        expect((await listVault(user)).coworkers.map(c => [c.id, c.canManage])).toEqual([
+            ['chief', false],
+            ['bob', false],
+        ])
+        expect((await listVault(admin)).coworkers.map(c => [c.id, c.canManage])).toEqual([
+            ['chief', true],
+            ['alice', true],
+            ['bob', true],
+            ['carol', true],
+        ])
+    })
+
+    it('names it as the holder of an entry attached to it', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([item({ agentIds: ['foreman'] })] as never)
+        expect((await listVault(user)).entries[0].coworkers.map(c => c.id)).toEqual(['chief'])
+    })
+
+    it('lets an admin give it an entry, and refuses a manager of a Box with a reason', async () => {
+        await attachVaultEntry('item-1', 'chief', admin)
+        expect(attachVaultItem).toHaveBeenCalledWith(conn, 'item-1', 'foreman')
+        await expect(attachVaultEntry('item-1', 'chief', managerOfA)).rejects.toMatchObject({ name: 'AccessDeniedError' })
+    })
+
+    it('keeps an entry it holds to admins, even beside a coworker the manager manages', async () => {
+        const listing = await listVault(managerOfA)
+        vi.mocked(listVaultItems).mockResolvedValue([item({ agentIds: ['e-alice', 'foreman'] })] as never)
+        expect((await listVault(managerOfA)).entries[0].canChange).toBe(false)
+        expect(listing.canAdd).toBe(true)
     })
 })
 

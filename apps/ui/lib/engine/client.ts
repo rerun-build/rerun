@@ -13,6 +13,7 @@ import {
     ENGINE_CAPABILITY_FILES_STREAM,
     ENGINE_CAPABILITY_FOREMAN_FILES,
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
+    ENGINE_CAPABILITY_FOREMAN_STATE,
     ENGINE_CAPABILITY_VAULT,
     engineDbGroupsSchema,
     engineRowUpdateResultSchema,
@@ -684,6 +685,11 @@ export async function supportsScheduleRename(conn: EngineConnection): Promise<bo
 // The box keeps the workspace's Vault. Without it, every connector stays in its coworker's folder.
 export async function supportsVault(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT)
+}
+
+// The Chief of Staff keeps a memory, skills, a database and Vault entries like a coworker.
+export async function supportsForemanState(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_STATE)
 }
 
 // --- Desktop ---

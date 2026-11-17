@@ -51,7 +51,8 @@ export const ENGINE_CAPABILITY_CUSTOM = 'connections.custom'
 export const ENGINE_CAPABILITY_VAULT = 'vault'
 
 // The Chief of Staff keeps a memory, skills and a private database for the team, read and managed
-// through the coworker routes (`/agents/foreman/memories`, `/skills`, `/data`).
+// through the coworker routes (`/agents/foreman/memories`, `/skills`, `/data`), and draws on the Vault
+// entries attached to it.
 export const ENGINE_CAPABILITY_FOREMAN_STATE = 'foreman.state'
 
 // What the last `rerun update` on a box did, as `/health` reports it.

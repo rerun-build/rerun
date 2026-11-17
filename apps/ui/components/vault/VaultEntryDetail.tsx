@@ -28,6 +28,7 @@ type Props = { entry: VaultEntryView; listing: VaultListing; icon: ReactNode; on
 // One entry of the Vault: where its sign-in stands, who uses it, and the way out.
 export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Props) {
     const t = useTranslations('vault')
+    const tChief = useTranslations('workspaceView.foreman')
     const errorText = useErrorText()
     const [busy, setBusy] = useState<string | null>(null)
     const [signingIn, setSigningIn] = useState(false)
@@ -77,17 +78,20 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
                     </TooltipDisabledReason>
                     {listing.coworkers.length === 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.noCoworkers')}</p>}
                     {listing.coworkers.map(coworker => {
-                        const reason = !coworker.canManage ? t('reasons.manageBox') : undefined
+                        // The Chief of Staff, in no Box: whatever it holds, every member reaches through it.
+                        const chief = coworker.spaceId === null
+                        const reason = !coworker.canManage ? t(chief ? 'reasons.adminOnly' : 'reasons.manageBox') : undefined
                         const on = attached(coworker.engineAgentId)
+                        const name = chief ? tChief('name') : coworker.name
                         return (
                             <TooltipDisabledReason key={coworker.id} reason={reason} className="flex w-full">
                                 <PanelRow
-                                    title={coworker.name}
+                                    title={name}
                                     actions={
                                         <Switch
                                             checked={on}
                                             disabled={!!reason || entry.sharedWithAll || busy !== null}
-                                            aria-label={coworker.name}
+                                            aria-label={name}
                                             onCheckedChange={checked => void run(coworker.id, () => (checked ? attachVaultEntryAction(entry.id, coworker.id) : detachVaultEntryAction(entry.id, coworker.id)))}
                                         />
                                     }

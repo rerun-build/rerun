@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl'
 import type { VaultEntryView } from '@/app/api/_services/vault.service'
 import { cn } from '@/lib/utils'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
+import { Orb } from '@/components/foreman/Orb'
+import { useForemanStore } from '@/stores/foreman.store'
 import { Badge } from '@rerun/ui/primitives'
 import { coworkerFaces, usedBySummary, type UsedByText } from './vault-text'
 
@@ -29,6 +31,7 @@ export function VaultCoworkerFaces({ usage, size = 24, className }: { usage: Vau
     const t = useTranslations('vault')
     const summary = usedBySummary(usage, useUsedByText())
     const faces = coworkerFaces(usage, SHOWN_FACES)
+    const chiefId = useForemanStore(state => state.agentRowId)
     if (!faces.everyone && faces.ids.length === 0 && faces.more === 0) return null
 
     return (
@@ -39,9 +42,13 @@ export function VaultCoworkerFaces({ usage, size = 24, className }: { usage: Vau
                 </Badge>
             ) : (
                 <>
-                    {faces.ids.map((id, index) => (
-                        <AgentBuddy key={id} agentId={id} size={size} animated={false} facing="right" className={cn(index > 0 && '-ml-2')} />
-                    ))}
+                    {faces.ids.map((id, index) =>
+                        id === chiefId ? (
+                            <Orb key={id} size={size} paused facing="right" className={cn('shrink-0', index > 0 && '-ml-2')} />
+                        ) : (
+                            <AgentBuddy key={id} agentId={id} size={size} animated={false} facing="right" className={cn(index > 0 && '-ml-2')} />
+                        )
+                    )}
                     {faces.more > 0 && <span className="ml-1 text-xs text-muted-foreground tabular-nums">+{faces.more}</span>}
                 </>
             )}

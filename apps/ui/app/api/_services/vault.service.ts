@@ -5,7 +5,7 @@ import type { VaultConflict, VaultItemSummary } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentAccess, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { vaultFlag } from '@/flags'
-import { EngineRequestError, supportsVault } from '@/lib/engine/client'
+import { EngineRequestError, supportsForemanState, supportsVault } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { VAULT_RELEASED } from '@/lib/features'
@@ -15,6 +15,7 @@ import { isRegistryItem, vaultRegistryKey } from '@/lib/vault/registry-view'
 import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectAll } from '@/supabase/supabase-helpers'
+import { foremanAgentId } from '@/lib/foreman/agent-row'
 import { findWorkspaceEngine, NoEngineError } from './workspace-engine.service'
 
 // The workspace's Vault, seen from the hub: who may do what (plan, section 4.5) and the box's ids of
@@ -53,7 +54,21 @@ export class VaultConflictError extends AppError {
 }
 
 // A coworker as the Vault shows it: the hub's id, the box's id the engine knows it by, and its Box.
-export type VaultCoworker = { id: string; engineAgentId: string; name: string; spaceId: string }
+// `spaceId` null: the Chief of Staff, which sits in no Box. Every member sees it, only an admin gives
+// it an entry or takes one back, since every member reaches what it holds.
+export type VaultCoworker = { id: string; engineAgentId: string; name: string; spaceId: string | null }
+
+type SpaceIds = 'all' | Set<string>
+
+function seesHolder(visible: SpaceIds, holder: VaultCoworker): boolean {
+    return holder.spaceId === null || visible === 'all' || visible.has(holder.spaceId)
+}
+
+// Only an admin manages every Box, which is what `manageableSpaceIds` answers with `all`.
+function managesHolder(manageable: SpaceIds, holder: VaultCoworker): boolean {
+    if (holder.spaceId === null) return manageable === 'all'
+    return manageable === 'all' || manageable.has(holder.spaceId)
+}
 
 export type VaultContext = { actor: Actor; conn: EngineConnection; coworkers: VaultCoworker[]; byEngineId: Map<string, VaultCoworker> }
 
@@ -62,8 +77,12 @@ export async function vaultContext(actor?: Actor): Promise<VaultContext> {
     const engine = await findWorkspaceEngine(resolved.workspaceId)
     if (!engine) throw new NoEngineError()
     if (!(await supportsVault(engine.conn))) throw new VaultUnavailableError()
-    const { data } = await selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id'] as const, { workspace_id: resolved.workspaceId, kind: 'coworker' })
-    const coworkers = (data ?? []).flatMap(row => (row.engine_agent_id && row.space_id ? [{ id: row.id, engineAgentId: row.engine_agent_id, name: row.name, spaceId: row.space_id }] : []))
+    // The Chief of Staff holds entries only on an engine that gives them to it, and comes first.
+    const holdsForeman = await supportsForemanState(engine.conn)
+    if (holdsForeman) await foremanAgentId(resolved.workspaceId)
+    const { data } = await selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id', 'kind'] as const, { workspace_id: resolved.workspaceId, kind: holdsForeman ? ['foreman', 'coworker'] : 'coworker' })
+    const rows = (data ?? []).filter(row => row.engine_agent_id && (row.kind === 'foreman' || row.space_id)).sort((a, b) => Number(b.kind === 'foreman') - Number(a.kind === 'foreman'))
+    const coworkers = rows.map(row => ({ id: row.id, engineAgentId: row.engine_agent_id as string, name: row.name, spaceId: row.space_id }))
     return { actor: resolved, conn: engine.conn, coworkers, byEngineId: new Map(coworkers.map(c => [c.engineAgentId, c])) }
 }
 
@@ -87,10 +106,8 @@ export async function assertCanAdd(actor: Actor): Promise<void> {
 
 export async function assertManagesCoworker(actor: Actor, coworker: VaultCoworker | undefined): Promise<VaultCoworker> {
     if (!coworker) throw new AuthorizationError('coworkerNotFound')
-    const spaces = await manageableSpaceIds(actor)
-    if (spaces !== 'all' && !spaces.has(coworker.spaceId)) {
-        const visible = await visibleSpaceIds(actor)
-        if (visible === 'all' || visible.has(coworker.spaceId)) throw new AccessDeniedError()
+    if (!managesHolder(await manageableSpaceIds(actor), coworker)) {
+        if (seesHolder(await visibleSpaceIds(actor), coworker)) throw new AccessDeniedError()
         throw new AuthorizationError('coworkerNotFound')
     }
     return coworker
@@ -109,7 +126,7 @@ export async function canChangeItem(actor: Actor, item: VaultItemSummary, ctx: P
     if (item.agentIds.length === 0) return spaces.size > 0
     return item.agentIds.every(id => {
         const coworker = ctx.byEngineId.get(id)
-        return coworker !== undefined && spaces.has(coworker.spaceId)
+        return coworker !== undefined && managesHolder(spaces, coworker)
     })
 }
 
@@ -176,8 +193,8 @@ async function withCatalogNames(items: VaultItemSummary[]): Promise<VaultItemSum
 export async function listVault(actor?: Actor): Promise<VaultListing> {
     const ctx = await vaultContext(actor)
     const [items, visible, manageable] = await Promise.all([listVaultItems(ctx.conn).then(withCatalogNames), visibleSpaceIds(ctx.actor), manageableSpaceIds(ctx.actor)])
-    const sees = (c: VaultCoworker) => visible === 'all' || visible.has(c.spaceId)
-    const manages = (c: VaultCoworker) => manageable === 'all' || manageable.has(c.spaceId)
+    const sees = (c: VaultCoworker) => seesHolder(visible, c)
+    const manages = (c: VaultCoworker) => managesHolder(manageable, c)
     const entries = await Promise.all(
         items.map(async item => {
             const attached = item.agentIds.flatMap(id => ctx.byEngineId.get(id) ?? [])
@@ -223,7 +240,7 @@ export async function vaultEntryUsage(itemId: string, actor?: Actor): Promise<{ 
     await readItem(ctx, itemId)
     const visible = await visibleSpaceIds(ctx.actor)
     const usage = (await getVaultItemUsage(ctx.conn, itemId)).flatMap(id => ctx.byEngineId.get(id) ?? [])
-    const seen = usage.filter(c => visible === 'all' || visible.has(c.spaceId))
+    const seen = usage.filter(c => seesHolder(visible, c))
     return { coworkers: seen, hidden: usage.length - seen.length }
 }
 
