@@ -9,7 +9,7 @@ Rerun exposes two programmatic surfaces, and only two.
 
 <CardGroup cols={2}>
   <Card title="The MCP server" icon="plug" href="/api/protocol">
-    A single endpoint, `POST https://app.rerun.build/api/mcp/account`, that speaks the Model Context Protocol. It carries 56 tools covering coworkers, team status, skills, memory and files, scheduled tasks, webhook triggers, apps, the Vault, databases, runs, share links and template authoring.
+    A single endpoint, `POST https://app.rerun.build/api/mcp/account`, that speaks the Model Context Protocol. It carries 59 tools covering coworkers, team status, skills, memory and files, scheduled tasks, webhook triggers, apps, the Vault, databases, runs, share links and template authoring.
   </Card>
   <Card title="Webhook triggers" icon="bolt" href="/api/webhooks">
     A public URL per trigger. Anything that can send an HTTP request can start a coworker run, with no SDK and no key exchange.
@@ -64,7 +64,7 @@ An API key belongs to one workspace and acts with the access of the member who c
     `search_connectors` `list_connectors` `list_agent_connectors` `attach_connector` `detach_connector`
   </Card>
   <Card title="Vault" icon="vault" href="/api/tools/vault">
-    `list_vault`
+    `list_vault` `attach_vault_entry` `detach_vault_entry` `share_vault_entry`
   </Card>
   <Card title="Share links" icon="share-2" href="/api/tools/sharing">
     `plan_agent_share` `create_agent_share` `list_agent_shares` `revoke_agent_share`

@@ -1,9 +1,10 @@
 import 'server-only'
 
 import type { Actor } from '@/app/api/_auth/access'
+import { requireString } from '@/lib/mcp/args'
 import { dispatchShareTool } from './mcp-shares.service'
-import { vaultPaidAccounts, type VaultPaidAccount } from './vault-apps.service'
-import { listVault, VaultUnavailableError, type VaultCoworker, type VaultEntryView, type VaultListing } from './vault.service'
+import { attachVaultPaidAccount, detachVaultPaidAccount, vaultPaidAccounts, type VaultPaidAccount } from './vault-apps.service'
+import { attachVaultEntry, detachVaultEntry, listVault, shareVaultEntry, VaultUnavailableError, type VaultCoworker, type VaultEntryView, type VaultListing } from './vault.service'
 import { NoEngineError } from './workspace-engine.service'
 
 const UNAVAILABLE = {
@@ -45,7 +46,7 @@ function paidAccountView(account: VaultPaidAccount, names: Map<string, string>) 
 function listingView(listing: VaultListing, paid: VaultPaidAccount[]) {
     const names = new Map(listing.coworkers.map(coworker => [coworker.id, coworker.name]))
     return {
-        available: true,
+        available: true as const,
         entries: listing.entries.map(entryView),
         paidAccounts: paid.map(account => paidAccountView(account, names)),
         coworkers: listing.coworkers.map(coworker => ({ ...coworkerView(coworker), canManage: coworker.canManage })),
@@ -64,11 +65,61 @@ async function readVault(actor: Actor) {
     }
 }
 
+// An id from list_vault names either an entry of the box's Vault or a paid account, kept in Supabase.
+async function paidAccount(actor: Actor, entryId: string): Promise<VaultPaidAccount | undefined> {
+    return (await vaultPaidAccounts(actor)).find(account => account.connectionId === entryId)
+}
+
+// The entry once changed, as list_vault shows it.
+async function entryAfter(actor: Actor, entryId: string) {
+    const vault = await readVault(actor)
+    if (!vault.available) return vault
+    return vault.entries.find(entry => entry.id === entryId) ?? vault.paidAccounts.find(account => account.id === entryId) ?? null
+}
+
+async function attachEntry(actor: Actor, args: Record<string, unknown>) {
+    const entryId = requireString(args.entryId, 'entryId')
+    const agentId = requireString(args.agentId, 'agentId')
+    const paid = await paidAccount(actor, entryId)
+    if (paid) await attachVaultPaidAccount(paid.slug, paid.connectionId, agentId, actor)
+    else await attachVaultEntry(entryId, agentId, actor)
+    return entryAfter(actor, entryId)
+}
+
+async function detachEntry(actor: Actor, args: Record<string, unknown>) {
+    const entryId = requireString(args.entryId, 'entryId')
+    const agentId = requireString(args.agentId, 'agentId')
+    const paid = await paidAccount(actor, entryId)
+    if (paid) {
+        await detachVaultPaidAccount(paid.slug, paid.connectionId, agentId, actor)
+        return entryAfter(actor, entryId)
+    }
+    // The box would take the coworker off the selection and still hand it the entry.
+    const entry = (await listVault(actor)).entries.find(candidate => candidate.id === entryId)
+    if (entry?.sharedWithAll) throw new Error('Every coworker gets this entry. Switch sharedWithAll off with share_vault_entry first, then take it back from this coworker.')
+    await detachVaultEntry(entryId, agentId, actor)
+    return entryAfter(actor, entryId)
+}
+
+async function shareEntry(actor: Actor, args: Record<string, unknown>) {
+    const entryId = requireString(args.entryId, 'entryId')
+    if (typeof args.sharedWithAll !== 'boolean') throw new Error('sharedWithAll must be true or false.')
+    if (await paidAccount(actor, entryId)) throw new Error('A paid app account is lent coworker by coworker: use attach_vault_entry.')
+    await shareVaultEntry(entryId, args.sharedWithAll, actor)
+    return entryAfter(actor, entryId)
+}
+
 // Chained after the account tools and before sharing, whose own default hands over to the template tools.
 export async function dispatchVaultTool(actor: Actor, name: string, args: Record<string, unknown>): Promise<unknown> {
     switch (name) {
         case 'list_vault':
             return readVault(actor)
+        case 'attach_vault_entry':
+            return attachEntry(actor, args)
+        case 'detach_vault_entry':
+            return detachEntry(actor, args)
+        case 'share_vault_entry':
+            return shareEntry(actor, args)
         default:
             return await dispatchShareTool(actor, name, args)
     }

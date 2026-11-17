@@ -1,6 +1,6 @@
 ---
 title: "Vault"
-description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers."
+description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers, and lend them out."
 ---
 
 The [Vault](/vault) is where your workspace keeps the accounts and keys its coworkers share: the apps you signed in to, the secrets you added, the MCP servers you registered, and the accounts of paid apps. These tools act with the access of the member who created the key, the same rules as the app: see [Who can do what](/vault#who-can-do-what).
@@ -38,3 +38,41 @@ Each entry carries:
 | `canChange` | Whether the key's member may change it |
 
 A paid account carries its `id`, `slug`, `name`, `account`, `status` (`connected`, `connecting`, `needs_reconnect` or `paused`), `coworkers` and `hiddenCoworkers`.
+
+## attach_vault_entry
+
+Switches a Vault entry on for one coworker: an app account already signed in, an MCP server or a secret, so it never has to be connected twice. Works for a paid account too. Needs **Can manage** on the coworker's Box.
+
+<ParamField body="entryId" type="string" required>
+  The `id` of an entry or of a paid account, from `list_vault`.
+</ParamField>
+
+<ParamField body="agentId" type="string" required />
+
+A coworker cannot get the same variable or the same server name from two entries: the call is refused with **already gets {name} from another Vault entry**. Returns the entry as `list_vault` shows it.
+
+## detach_vault_entry
+
+Switches a Vault entry off for one coworker. The entry stays in the Vault, for the other coworkers and for later. Needs **Can manage** on the coworker's Box.
+
+<ParamField body="entryId" type="string" required>
+  The `id` of an entry or of a paid account, from `list_vault`.
+</ParamField>
+
+<ParamField body="agentId" type="string" required />
+
+An entry every coworker gets cannot be switched off for one of them: switch `sharedWithAll` off with `share_vault_entry` first. Returns the entry as `list_vault` shows it.
+
+## share_vault_entry
+
+Gives a Vault entry to every coworker, including the ones added later, or takes it back to the coworkers it was switched on for one by one. Admins only.
+
+<ParamField body="entryId" type="string" required>
+  The `id` of an entry, from `list_vault`.
+</ParamField>
+
+<ParamField body="sharedWithAll" type="boolean" required>
+  `true` for every coworker. `false` restores the selection the entry had before.
+</ParamField>
+
+A paid account is lent coworker by coworker and cannot be shared with every coworker. Returns the entry as `list_vault` shows it.

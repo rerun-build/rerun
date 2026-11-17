@@ -5,15 +5,30 @@ import type { Actor } from '@/app/api/_auth/access'
 
 const mocks = vi.hoisted(() => ({
     listVault: vi.fn(),
+    attachVaultEntry: vi.fn(),
+    detachVaultEntry: vi.fn(),
+    shareVaultEntry: vi.fn(),
     vaultPaidAccounts: vi.fn(),
+    attachVaultPaidAccount: vi.fn(),
+    detachVaultPaidAccount: vi.fn(),
     dispatchShareTool: vi.fn(),
 }))
 
 class VaultUnavailableError extends Error {}
 class NoEngineError extends Error {}
 
-vi.mock('./vault.service', () => ({ listVault: mocks.listVault, VaultUnavailableError }))
-vi.mock('./vault-apps.service', () => ({ vaultPaidAccounts: mocks.vaultPaidAccounts }))
+vi.mock('./vault.service', () => ({
+    listVault: mocks.listVault,
+    attachVaultEntry: mocks.attachVaultEntry,
+    detachVaultEntry: mocks.detachVaultEntry,
+    shareVaultEntry: mocks.shareVaultEntry,
+    VaultUnavailableError,
+}))
+vi.mock('./vault-apps.service', () => ({
+    vaultPaidAccounts: mocks.vaultPaidAccounts,
+    attachVaultPaidAccount: mocks.attachVaultPaidAccount,
+    detachVaultPaidAccount: mocks.detachVaultPaidAccount,
+}))
 vi.mock('./workspace-engine.service', () => ({ NoEngineError }))
 vi.mock('./mcp-shares.service', () => ({ dispatchShareTool: mocks.dispatchShareTool }))
 
@@ -95,6 +110,76 @@ describe('list_vault', () => {
     it('lets any other failure through', async () => {
         mocks.listVault.mockRejectedValueOnce(new Error('engine down'))
         await expect(dispatchVaultTool(ADMIN, 'list_vault', {})).rejects.toThrow('engine down')
+    })
+})
+
+function shareGmailWithEveryone() {
+    mocks.listVault.mockResolvedValue({ entries: [{ ...item({ sharedWithAll: true }), coworkers: [SCOUT], hiddenCoworkers: 0, canChange: true }], coworkers: [{ ...SCOUT, canManage: true }], canAdd: true, isAdmin: true })
+}
+
+describe('attach_vault_entry and detach_vault_entry', () => {
+    it('lend a Vault entry through the Vault and answer with the entry as list_vault shows it', async () => {
+        const out = await dispatchVaultTool(ADMIN, 'attach_vault_entry', { entryId: 'item-gmail', agentId: 'agent-closer' })
+
+        expect(mocks.attachVaultEntry).toHaveBeenCalledWith('item-gmail', 'agent-closer', ADMIN)
+        expect(mocks.attachVaultPaidAccount).not.toHaveBeenCalled()
+        expect(out).toMatchObject({ id: 'item-gmail', name: 'Gmail', coworkers: [{ id: 'agent-scout', name: 'Scout' }] })
+
+        await dispatchVaultTool(ADMIN, 'detach_vault_entry', { entryId: 'item-gmail', agentId: 'agent-scout' })
+        expect(mocks.detachVaultEntry).toHaveBeenCalledWith('item-gmail', 'agent-scout', ADMIN)
+    })
+
+    it('lend a paid account through the paid apps, by the id list_vault gave it', async () => {
+        const out = await dispatchVaultTool(ADMIN, 'attach_vault_entry', { entryId: 'conn-1', agentId: 'agent-scout' })
+
+        expect(mocks.attachVaultPaidAccount).toHaveBeenCalledWith('linkedin', 'conn-1', 'agent-scout', ADMIN)
+        expect(mocks.attachVaultEntry).not.toHaveBeenCalled()
+        expect(out).toMatchObject({ id: 'conn-1', slug: 'linkedin' })
+
+        await dispatchVaultTool(ADMIN, 'detach_vault_entry', { entryId: 'conn-1', agentId: 'agent-closer' })
+        expect(mocks.detachVaultPaidAccount).toHaveBeenCalledWith('linkedin', 'conn-1', 'agent-closer', ADMIN)
+        expect(mocks.detachVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('refuse to take back from one coworker an entry every coworker gets, which the box would keep handing it', async () => {
+        shareGmailWithEveryone()
+
+        await expect(dispatchVaultTool(ADMIN, 'detach_vault_entry', { entryId: 'item-gmail', agentId: 'agent-scout' })).rejects.toThrow('share_vault_entry')
+        expect(mocks.detachVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('let the refusals of the Vault through, a clash or a Box the key does not manage', async () => {
+        mocks.attachVaultEntry.mockRejectedValueOnce(new Error('Closer already gets GMAIL_TOKEN from another Vault entry'))
+
+        await expect(dispatchVaultTool(ADMIN, 'attach_vault_entry', { entryId: 'item-gmail', agentId: 'agent-closer' })).rejects.toThrow('another Vault entry')
+    })
+
+    it('ask for both ids', async () => {
+        await expect(dispatchVaultTool(ADMIN, 'attach_vault_entry', { entryId: 'item-gmail' })).rejects.toThrow('agentId')
+        await expect(dispatchVaultTool(ADMIN, 'detach_vault_entry', { agentId: 'agent-scout' })).rejects.toThrow('entryId')
+    })
+})
+
+describe('share_vault_entry', () => {
+    it('shares an entry with every coworker through the Vault', async () => {
+        shareGmailWithEveryone()
+
+        const out = await dispatchVaultTool(ADMIN, 'share_vault_entry', { entryId: 'item-gmail', sharedWithAll: true })
+
+        expect(mocks.shareVaultEntry).toHaveBeenCalledWith('item-gmail', true, ADMIN)
+        expect(out).toMatchObject({ id: 'item-gmail', sharedWithAll: true })
+    })
+
+    it('refuses a paid account, lent coworker by coworker, and a missing flag', async () => {
+        await expect(dispatchVaultTool(ADMIN, 'share_vault_entry', { entryId: 'conn-1', sharedWithAll: true })).rejects.toThrow('coworker by coworker')
+        await expect(dispatchVaultTool(ADMIN, 'share_vault_entry', { entryId: 'item-gmail' })).rejects.toThrow('sharedWithAll')
+        expect(mocks.shareVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('lets the admin-only refusal of the Vault through', async () => {
+        mocks.shareVaultEntry.mockRejectedValueOnce(new Error('Only an admin can do this'))
+
+        await expect(dispatchVaultTool(ADMIN, 'share_vault_entry', { entryId: 'item-gmail', sharedWithAll: true })).rejects.toThrow('Only an admin')
     })
 })
 
