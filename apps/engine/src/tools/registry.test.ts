@@ -115,7 +115,7 @@ describe('buildTools', () => {
         expect(await namesOf(ctxWith())).toEqual(expect.arrayContaining(['computer', 'computer_open_app']))
         expect(await namesOf(ctxWith({ tools: { computer: false } }))).not.toContain('computer')
         expect(await namesOf(ctxWith({ ephemeral: true }))).not.toContain('computer')
-        expect(await namesOf(ctxWith({ kind: 'foreman' }))).not.toContain('computer')
+        expect(await namesOf(ctxWith({ kind: 'foreman' }))).toEqual(expect.arrayContaining(['computer', 'computer_open_app']))
         expect(await namesOf(ctxWith({}, { provider: 'claude' }))).toContain('computer')
         expect(await namesOf(ctxWith({}, { provider: 'codex' }))).toContain('computer')
         // Decided on the model the run uses: an OpenCode model that cannot see never gets the screen.

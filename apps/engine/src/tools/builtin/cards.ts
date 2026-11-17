@@ -105,12 +105,6 @@ export function cardTools(ctx: RunContext): ToolSet {
     }
 }
 
-// The foreman shows the files it made, but has no table panel for card_table or a saved view to open.
-export function foremanCardTools(ctx: RunContext): ToolSet {
-    const { card_file } = cardTools(ctx)
-    return { card_file }
-}
-
 const inside = (root: string, path: string) => isAbsolute(path) && !relative(root, path).startsWith('..')
 
 // A path the model copied from a shared_ or fs_ listing is absolute and names its own root, whatever

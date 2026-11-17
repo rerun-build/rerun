@@ -52,6 +52,10 @@ describe('foremanGuard', () => {
         ['GET', '/agents/foreman/data/tables'],
         ['POST', '/agents/foreman/data/query'],
         ['DELETE', '/agents/foreman/data/tables/leads'],
+        ['POST', '/agents/foreman/desktop'],
+        ['POST', '/agents/foreman/desktop/apps'],
+        ['POST', '/agents/foreman/desktop/takeover'],
+        ['DELETE', '/agents/foreman/desktop/takeover'],
     ])('lets what it keeps for the team through: %s %s', async (method, path) => {
         expect((await call(method, path)).status).toBe(200)
     })
@@ -76,6 +80,7 @@ describe('foremanGuard', () => {
         ['POST', '/agents/foreman/files/move'],
         ['POST', '/agents/foreman/files/dir'],
         ['GET', '/agents/foreman/usage'],
+        ['GET', '/agents/foreman/desktopx'],
     ])('refuses %s %s with a 403', async (method, path) => {
         const res = await call(method, path)
         expect(res.status).toBe(403)
@@ -99,6 +104,11 @@ describe('foremanGuard', () => {
     it('allows a PATCH that only pins the model', async () => {
         expect((await call('PATCH', '/agents/foreman', JSON.stringify({ connectionId: 'c', provider: 'rerun', model: 'rerun-max' }))).status).toBe(200)
         expect((await call('PATCH', '/agents/foreman/', JSON.stringify({ model: 'rerun-max' }))).status).toBe(200)
+    })
+
+    it('allows a PATCH that lets it spend on paid data without asking', async () => {
+        expect((await call('PATCH', '/agents/foreman', JSON.stringify({ paidDataAlwaysAllow: true }))).status).toBe(200)
+        expect((await call('PATCH', '/agents/foreman', JSON.stringify({ paidDataAlwaysAllow: true, tools: { computer: false } }))).status).toBe(403)
     })
 
     it('refuses a model-only PATCH aimed at a sub-route', async () => {

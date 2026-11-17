@@ -16,18 +16,15 @@ You are the Chief of Staff of this Rerun workspace: the assistant that sets up a
 // - schedules and triggers: a run with nobody in front of it would act with nobody's rights;
 // - team and aiProviders: its account tools cover them, and two tools for one gesture lose the model;
 // - quick replies: it closes on its own next steps;
-// - notify: it only ever answers the member in front of it;
-// - the computer and paid data, until its chat shows their cards.
+// - notify: it only ever answers the member in front of it.
 // Its apps come from the Vault only: an MCP server written into its config would not survive the
 // next boot.
-// Of the cards it keeps only the file tiles: the user cannot reach the server, so a file it made is
-// seen there or not at all.
-const FOREMAN_TOOLS_OFF = new Set<ToolKey>(['schedule', 'trigger', 'team', 'aiProviders', 'quickReplies', 'notify', 'computer', 'paidData'])
+const FOREMAN_TOOLS_OFF = new Set<ToolKey>(['schedule', 'trigger', 'team', 'aiProviders', 'quickReplies', 'notify'])
 
-function foremanConfig(modelPin: ModelPin): AgentConfig {
+function foremanConfig(kept: Partial<KeptSettings>): AgentConfig {
     const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, !FOREMAN_TOOLS_OFF.has(key)]))
     return agentConfigSchema.parse({
-        ...modelPin,
+        ...kept,
         name: FOREMAN_AGENT_ID,
         kind: 'foreman',
         displayName: FOREMAN_DISPLAY_NAME,
@@ -39,16 +36,19 @@ function foremanConfig(modelPin: ModelPin): AgentConfig {
     })
 }
 
-type ModelPin = Pick<AgentConfig, 'connectionId' | 'provider' | 'model'>
+// What the user picks for the foreman, as for any agent: the model it runs on and whether it may
+// spend on paid data without asking. The only fields a reboot keeps, and the only ones the hub may
+// change.
+export const FOREMAN_KEPT_FIELDS = ['connectionId', 'provider', 'model', 'paidDataAlwaysAllow'] as const
 
-// The model is the one thing the user picks for the foreman, as for any agent, so it is the one
-// thing a reboot keeps.
-async function currentModelPin(): Promise<ModelPin> {
+type KeptSettings = Pick<AgentConfig, (typeof FOREMAN_KEPT_FIELDS)[number]>
+
+async function keptSettings(): Promise<Partial<KeptSettings>> {
     try {
-        const { connectionId, provider, model } = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
-        return { connectionId, provider, model }
+        const config = agentConfigSchema.parse(JSON.parse(await readFile(configPath(FOREMAN_AGENT_ID), 'utf8')))
+        return Object.fromEntries(FOREMAN_KEPT_FIELDS.map(field => [field, config[field]]))
     } catch {
-        return { connectionId: null, provider: null, model: null }
+        return {}
     }
 }
 
@@ -56,7 +56,7 @@ async function currentModelPin(): Promise<ModelPin> {
 // foreman it was built with. Deliberately never inserted in the agent index.
 export async function ensureForeman(): Promise<void> {
     await mkdir(workspaceDir(FOREMAN_AGENT_ID), { recursive: true })
-    await writeAgentConfig(FOREMAN_AGENT_ID, foremanConfig(await currentModelPin()))
+    await writeAgentConfig(FOREMAN_AGENT_ID, foremanConfig(await keptSettings()))
     await writeFile(soulPath(FOREMAN_AGENT_ID), FOREMAN_SOUL, 'utf8')
     unloadAgent(FOREMAN_AGENT_ID)
 }

@@ -172,3 +172,26 @@ describe('service catalog next to a computer', () => {
         expect(catalogOf(await buildSystemPrompt(agentWith({ computer: true }), { source: 'chat' }))).not.toContain('Unipile')
     })
 })
+
+describe('the foreman', () => {
+    const foreman = (tools: Record<string, boolean>, paidDataAlwaysAllow = false) => {
+        const agent = agentWith({ paidData: true, ...tools })
+        return { ...agent, config: { ...agent.config, kind: 'foreman', paidDataAlwaysAllow }, brief: { instructions: 'Charter from the hub.', tools: [] } }
+    }
+
+    it('works on its own screen like a coworker, and hands a sign-in to the member in front of it', async () => {
+        const prompt = await buildSystemPrompt(foreman({ computer: true }), { source: 'chat' })
+        expect(prompt).toContain('<computer>')
+        expect(prompt).toContain('request_takeover')
+        box.desktop = false
+        expect(await buildSystemPrompt(foreman({ computer: true }), { source: 'chat' })).not.toContain('<computer>')
+    })
+
+    it('buys paid data under the same rules, spending without asking only when the team allowed it', async () => {
+        const asks = await buildSystemPrompt(foreman({ requestApproval: true }), { source: 'chat' })
+        expect(asks).toContain('<paid_data>')
+        expect(asks).not.toContain('The user allowed you to use it without asking first')
+        expect(await buildSystemPrompt(foreman({ requestApproval: true }, true), { source: 'chat' })).toContain('The user allowed you to use it without asking first')
+        expect(await buildSystemPrompt(foreman({ paidData: false }), { source: 'chat' })).not.toContain('<paid_data>')
+    })
+})

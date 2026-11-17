@@ -110,7 +110,7 @@ describe('foreman', () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['schedule_create', 'trigger_create', 'notify_user', 'skill_propose', 'soul_update', 'install_complete', 'team_status', 'computer']) expect(names).not.toContain(name)
+        for (const name of ['schedule_create', 'trigger_create', 'notify_user', 'skill_propose', 'soul_update', 'install_complete', 'team_status']) expect(names).not.toContain(name)
     })
 
     it('sets up its own apps and keys the way a coworker does, through the hub and the Vault', async () => {
@@ -130,12 +130,25 @@ describe('foreman', () => {
         expect(foreman.config.selfImprovement).toEqual({ enabled: false, allowToolInstall: false, allowSoulEdit: false, autoMemory: false })
     })
 
-    it('shows the files it made, without the table cards', async () => {
+    // Its screen depends on the box, so registry.test.ts checks it where the desktop is mocked.
+    it('shows its files and its tables in cards, like a coworker', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        expect(names).toContain('card_file')
-        for (const name of ['card_table', 'table_view_save', 'table_view_delete']) expect(names).not.toContain(name)
+        expect(names).toEqual(expect.arrayContaining(['card_file', 'card_table', 'table_view_save', 'table_view_delete']))
+    })
+
+    it('keeps the model and the paid data go-ahead across a reboot, and nothing else', async () => {
+        const { writeAgentConfig } = await import('./config-write.js')
+        const before = await getAgent(FOREMAN_AGENT_ID)
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...before.config, model: 'rerun-max', provider: 'rerun', paidDataAlwaysAllow: true, displayName: 'Renamed', tools: { ...before.config.tools, computer: false } })
+        await ensureForeman()
+        const after = await getAgent(FOREMAN_AGENT_ID)
+        expect(after.config).toMatchObject({ model: 'rerun-max', provider: 'rerun', paidDataAlwaysAllow: true })
+        expect(after.config.displayName).not.toBe('Renamed')
+        expect(after.config.tools.computer).toBe(true)
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...after.config, model: null, provider: null, paidDataAlwaysAllow: false })
+        await ensureForeman()
     })
 
     // The CLI bridge only exposes a tool whose input schema is zod: a JSON Schema passed through as
@@ -206,6 +219,8 @@ describe('foreman', () => {
         expect(prompt).toContain('<database>')
         expect(prompt).toContain('<own_apps>')
         expect(prompt).toContain('attach_connector')
+        expect(prompt).toContain('<chat_cards>')
+        expect(prompt).toContain('card_table')
         expect(prompt).not.toContain('<verbosity>')
         expect(prompt).not.toContain('<scheduled_tasks>')
     })

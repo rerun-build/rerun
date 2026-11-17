@@ -271,6 +271,8 @@ async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order:
         buildMcpIndex(agent, provider).catch(() => ''),
         cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
     ])
+    const computer = runOffersComputer(agent.config, provider, agent.resolved.model, agent.resolved.connection)
+    const takeover = offersTakeover(agent.config)
     const stable = [
         section('identity', agent.brief?.instructions.trim() || agent.soul.trim()),
         section('vocabulary', VOCABULARY_NOTE),
@@ -280,8 +282,11 @@ async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order:
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
         cfg.memory || cfg.skills ? section('memory_and_skills', FOREMAN_MEMORY_AND_SKILLS_NOTE) : '',
         cfg.hub || cfg.suggestService || cfg.requestSecret ? section('own_apps', FOREMAN_OWN_APPS_NOTE) : '',
-        section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
-        turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config))),
+        cfg.paidData ? section('paid_data', paidDataNote(agent.config.paidDataAlwaysAllow, cfg.requestApproval)) : '',
+        computer ? section('computer', computerNote(takeover, provider === 'codex', cfg.paidData, cfg.hub, cfg.requestSecret)) : '',
+        cfg.cards ? section('chat_cards', cardsNote(cfg.sharedDb, cfg.db || cfg.sharedDb)) : '',
+        section('asking_the_user', `${askingNote(cfg, computer)} ${showBeforeAskingNote(cfg.cards)}`),
+        turnOrderSection(order, turnClosers(agent, takeover)),
         section('shared_conversation', SHARED_CONVERSATION_NOTE),
     ]
 
