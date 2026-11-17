@@ -17,13 +17,20 @@ async function readStarterTeams(): Promise<BoardTeams> {
     return starterTeams((data ?? []).map(row => ({ slug: row.slug, agents: agentsFromRow.parse(row.agents), connectors: connectorsFromRow.parse(row.connectors) })))
 }
 
+// An empty read is not kept: the templates of a fresh install land after its first page was drawn.
 export function loadStarterTeams(): Promise<BoardTeams> {
     if (cached && Date.now() - cached.at < TTL_MS) return cached.teams
-    const teams = readStarterTeams().catch(err => {
-        cached = null
-        console.error('Failed to read the onboarding board teams', err)
-        return starterTeams([])
-    })
+    const teams = readStarterTeams().then(
+        read => {
+            if (!read.showcase.agents.length) cached = null
+            return read
+        },
+        err => {
+            cached = null
+            console.error('Failed to read the onboarding board teams', err)
+            return starterTeams([])
+        }
+    )
     cached = { at: Date.now(), teams }
     return teams
 }

@@ -1,4 +1,6 @@
+import { OnboardingHeading } from '@/components/onboarding/OnboardingShell'
 import { detectInAppBrowser, detectMobileOs } from '@/lib/in-app-browser'
+import { getTranslations } from 'next-intl/server'
 import { headers } from 'next/headers'
 import { Suspense } from 'react'
 import { AuthPageMethods } from './AuthPageMethods'
@@ -9,9 +11,13 @@ export default async function AuthPage() {
     const userAgent = (await headers()).get('user-agent') ?? ''
     const phoneLeadsAlone = detectMobileOs(userAgent) !== null
     const showGoogle = !detectInAppBrowser(userAgent)
+    const t = await getTranslations('auth.page')
     return (
-        <Suspense fallback={null}>
-            <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} />
-        </Suspense>
+        <div className="flex flex-col gap-6">
+            <OnboardingHeading title={t('title')} subtitle={t('subtitle')} />
+            <Suspense fallback={null}>
+                <AuthPageMethods phoneLeadsAlone={phoneLeadsAlone} showGoogle={showGoogle} />
+            </Suspense>
+        </div>
     )
 }

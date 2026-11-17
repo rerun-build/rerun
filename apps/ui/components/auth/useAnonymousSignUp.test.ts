@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 // into a container once, when the hook that owns it mounts: the widget must therefore be owned by
 // something rendered inside the form, never by the dialog itself.
 
-vi.mock('@/app/(authflow)/auth/actions', () => ({
+vi.mock('@/app/(authflow)/(onboarding)/auth/actions', () => ({
     completeSignupAction: vi.fn(),
     prepareAnonymousEmailStep: vi.fn(),
     resendLiveSignInCode: vi.fn(),

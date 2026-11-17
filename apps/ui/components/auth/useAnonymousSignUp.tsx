@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { completeSignupAction, prepareAnonymousEmailStep, resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
+import { completeSignupAction, prepareAnonymousEmailStep, resendLiveSignInCode } from '@/app/(authflow)/(onboarding)/auth/actions'
 import { AuthMethods } from '@/components/auth/AuthMethods'
 import type { AuthMethod } from '@/lib/auth/auth-method'
 import { AnonymousEmailStep } from '@/components/auth/AnonymousEmailStep'

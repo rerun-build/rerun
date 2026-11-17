@@ -3,7 +3,7 @@
 import { DialogHeaderBar } from '@/components/dialogs/DialogHeaderBar'
 import { UserRoundIcon } from '@/lib/icons'
 import { useErrorText } from '@/hooks/useErrorText'
-import { resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
+import { resendLiveSignInCode } from '@/app/(authflow)/(onboarding)/auth/actions'
 import {
     deleteMyAccountAction,
     getAccountDeletionStatusAction,

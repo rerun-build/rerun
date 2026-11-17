@@ -1,7 +1,7 @@
 'use client'
 
 import { useErrorText } from '@/hooks/useErrorText'
-import { prepareEmailSignIn, resendLiveSignInCode } from '@/app/(authflow)/auth/actions'
+import { prepareEmailSignIn, resendLiveSignInCode } from '@/app/(authflow)/(onboarding)/auth/actions'
 import { EmailCodeForm, type EmailCodeStep } from '@/components/auth/EmailCodeForm'
 import { useCaptcha } from '@/components/auth/captcha/useCaptcha'
 import { EmailSendError, trackEmailSend } from '@/components/auth/email-send'
