@@ -305,6 +305,15 @@ describe('adoptEngineSession', () => {
         expect(createSessionRow).not.toHaveBeenCalled()
     })
 
+    it("never adopts one of the Chief of Staff's sessions: each is born owned, through its own route", async () => {
+        const chief = reached()
+        vi.mocked(assertAgentAccess).mockResolvedValueOnce({ ...chief, agent: { ...chief.agent, kind: 'foreman', space_id: null } } as never)
+
+        await expect(adoptEngineSession('chief-row', 'es-1', 'Title')).rejects.toThrow('Conversation not found')
+        expect(selectMaybeSingle).not.toHaveBeenCalled()
+        expect(createSessionRow).not.toHaveBeenCalled()
+    })
+
     it('refuses an agent from another workspace before any read', async () => {
         vi.mocked(assertAgentAccess).mockRejectedValueOnce(new Error('Agent not found'))
 

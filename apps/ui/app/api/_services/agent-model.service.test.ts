@@ -3,10 +3,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 
 vi.mock('server-only', () => ({}))
-const mocks = vi.hoisted(() => ({ getAgent: vi.fn(), listConnections: vi.fn(), patchAgent: vi.fn(), resolveAgentTarget: vi.fn() }))
+const mocks = vi.hoisted(() => ({ getAgent: vi.fn(), listConnections: vi.fn(), patchAgent: vi.fn(), resolveAgentTarget: vi.fn(), resolveRunTarget: vi.fn(async (agentId: string) => ({ conn: { host: 'box' }, engineAgentId: agentId })) }))
 vi.mock('@/app/api/_services/chat.service', () => ({
     resolveAgentTarget: mocks.resolveAgentTarget,
-    resolveRunTarget: async (agentId: string) => ({ conn: { host: 'box' }, engineAgentId: agentId }),
+    resolveRunTarget: mocks.resolveRunTarget,
 }))
 vi.mock('@/lib/engine/client', () => ({ getAgent: mocks.getAgent, listConnections: mocks.listConnections, patchAgent: mocks.patchAgent }))
 vi.mock('@/lib/i18n/recipient-locale', () => ({ recipientLocale: vi.fn(async () => 'en') }))
@@ -60,10 +60,13 @@ describe('agent models', () => {
         expect(mocks.patchAgent).toHaveBeenCalledWith({ host: 'box' }, 'eng-1', { connectionId: null, provider: null, model: null })
     })
 
-    it('reads and pins the foreman, which has no agent row', async () => {
+    // The alias older apps send: reading it takes `use`, pinning it `manage`, an admin's for the Chief of Staff.
+    it('reads and pins the foreman under its alias, with the rights its row asks', async () => {
         await readAgentModels(ctx, 'foreman')
+        expect(mocks.resolveRunTarget).toHaveBeenLastCalledWith('foreman', 'use')
         expect(mocks.getAgent).toHaveBeenCalledWith({ host: 'box' }, 'foreman')
         await setAgentModel(ctx, 'foreman', { connectionId: 'claude', model: 'claude-opus-5-5' })
+        expect(mocks.resolveRunTarget).toHaveBeenLastCalledWith('foreman', 'manage')
         expect(mocks.patchAgent).toHaveBeenCalledWith({ host: 'box' }, 'foreman', { connectionId: 'claude', provider: 'claude-code', model: 'claude-opus-5-5' })
     })
 })

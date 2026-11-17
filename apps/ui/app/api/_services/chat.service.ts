@@ -1,5 +1,5 @@
 import { COWORKER_NOT_FOUND, assertSessionInWorkspace, enforce, foremanAccessOf, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
-import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
+import { ADMIN_ONLY, AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
 import { seedSessionTitle } from '@/lib/chat/session-title'
@@ -42,11 +42,13 @@ export async function getAgentChatTarget(agentId: string, access: AccessLevel = 
 // engine under that id, and any signed-in member of the workspace may reach it. Only what reads or
 // stops a run, picks its model or carries the files of a chat message resolves through here. Talking
 // to it stays with its own route, which is where its brief is written. Its row of `agents` resolves
-// through resolveAgentTarget like a coworker's.
+// through resolveAgentTarget like a coworker's, and the alias holds the same rule: every member uses
+// it, an admin manages it.
 export async function resolveRunTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
     if (agentId !== FOREMAN_AGENT_ID) return getAgentChatTarget(agentId, access)
     const ctx = await requireWorkspaceContext()
     if (ctx.authUser.is_anonymous) throw new AuthorizationError('coworkerNotFound')
+    if (access === 'manage' && ctx.role !== 'admin') throw new AuthorizationError(ADMIN_ONLY)
     const engine = await findWorkspaceEngine(ctx.workspace.id)
     if (!engine) throw new NoEngineError()
     return { conn: engine.conn, engineAgentId: FOREMAN_AGENT_ID }

@@ -333,6 +333,9 @@ export async function renameSession(sessionId: string, title: string): Promise<b
 // opened and continued like a regular session. Idempotent per engine session.
 export async function adoptEngineSession(agentId: string, engineSessionId: string, title: string, actor?: Actor): Promise<string> {
     const { actor: caller, agent } = await assertAgentAccess(agentId, 'use', actor)
+    // Each conversation with the Chief of Staff is born owned, through its own route: adopting one of
+    // its engine sessions would hand a member a row that is nobody's, or someone else's.
+    if (agent.kind === 'foreman') throw new AuthorizationError('conversationNotFound')
     const workspaceId = agent.workspace_id
     const supabase = createServiceRoleClient()
 

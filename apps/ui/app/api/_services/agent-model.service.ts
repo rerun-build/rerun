@@ -9,9 +9,9 @@ import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { FOREMAN_AGENT_ID, type AgentModels, type ModelChoice, type SetAgentModelInput } from '@rerun/contracts'
 
-// The foreman has no agent row, so it resolves the way the web's picker resolves it, and stays every
-// member's own to set. A coworker's model is part of what it is: setting it takes `manage`.
-const targetOf = (ctx: WorkspaceContext, agentId: string, access: AccessLevel) => (agentId === FOREMAN_AGENT_ID ? resolveRunTarget(agentId) : resolveAgentTarget(agentId, actorFromContext(ctx), access))
+// A model is part of what an agent is: setting it takes `manage`, which for the Chief of Staff, under
+// its row or the alias older apps send, is an admin's.
+const targetOf = (ctx: WorkspaceContext, agentId: string, access: AccessLevel) => (agentId === FOREMAN_AGENT_ID ? resolveRunTarget(agentId, access) : resolveAgentTarget(agentId, actorFromContext(ctx), access))
 
 const choiceOf = (connectionId: string | null | undefined, model: string | null | undefined): ModelChoice | null => (connectionId && model ? { connectionId, model } : null)
 
