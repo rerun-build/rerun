@@ -10,6 +10,7 @@
   },
   "auto_plan_marker": true,
   "likely_fixed_days": 7,
+  "classify": {"on": false, "gh_calls": 30},
   "planning": {
     "max_queue": 20,
     "plan_by": ["Boss"],

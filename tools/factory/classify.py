@@ -119,6 +119,45 @@ def place(issue, rules):
     }
 
 
+class Pass:
+    def __init__(self, cfg, store, gh, now):
+        self.cfg, self.store, self.gh, self.now = cfg, store, gh, now
+
+    def once(self):
+        settings = self.cfg.get("classify", {})
+        if not settings.get("on"):
+            return
+        rules = load()
+        repo = self.cfg["repo"]
+        cap = settings.get("gh_calls", 30)
+        calls = 1
+        listed = json.loads(self.gh(["issue", "list", "-R", repo, "--state", "open", "--json", "number,title,body,labels", "--limit", "200"]))
+        for issue in listed:
+            if skipped(issue, rules) or kind(issue, rules) == "problem":
+                continue
+            job = "classify:%s" % issue["number"]
+            if self.store.get_all(job).get("hash") == digest(issue):
+                continue
+            where = place(issue, rules)
+            if where is None:
+                continue
+            if calls + 3 > cap:
+                return
+            n = str(issue["number"])
+            area_label = next((e["label"] for e in rules["areas"] if e["name"] == where["area"] and e["label"]), None)
+            add = where["priority"] + ("," + area_label if area_label else "")
+            self.gh(["issue", "edit", n, "-R", repo, "--add-label", add])
+            self.gh(["issue", "comment", n, "-R", repo, "--body",
+                     "Classified %s (%s, %s) by rules: %s." % (where["priority"], where["area"], where["kind"], where["reason"])])
+            calls += 2
+            self.store.set(job, "hash", digest(issue))
+            self.store.set(job, "area", where["area"])
+            self.store.set(job, "kind", where["kind"])
+            self.store.set(job, "priority", where["priority"])
+            self.store.set(job, "at", int(self.now()))
+            self.store.set(job, "how", "rules")
+
+
 def functions(body):
     found = []
     for pattern in (BACKTICK_RE, CALL_RE):
