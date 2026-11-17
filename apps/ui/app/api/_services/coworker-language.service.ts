@@ -18,7 +18,7 @@ export async function coworkerLanguageFor(supabase: SupabaseClient<Database>, wo
 // An admin picked the coworkers' language on purpose: every coworker of the workspace takes it,
 // English included. One that fails keeps its previous language and the others still change.
 export async function applyCoworkerLanguage(supabase: SupabaseClient<Database>, workspaceId: number, language: string): Promise<void> {
-    const { data: agents } = await selectMany(supabase, 'agents', ['engine_agent_id'] as const, { workspace_id: workspaceId })
+    const { data: agents } = await selectMany(supabase, 'agents', ['engine_agent_id'] as const, { workspace_id: workspaceId, kind: 'coworker' })
     const ids = (agents ?? []).map(agent => agent.engine_agent_id).filter((id): id is string => Boolean(id))
     if (!ids.length) return
     const conn = await getWorkspaceConnection(workspaceId)

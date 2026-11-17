@@ -104,10 +104,11 @@ export type Database = {
           engine_agent_id: string | null
           handle: string | null
           id: string
+          kind: Database["public"]["Enums"]["agent_kind"]
           name: string
           row: number
           sidebar_order: number | null
-          space_id: string
+          space_id: string | null
           status: Database["public"]["Enums"]["agent_status"]
           template_id: string | null
           workspace_id: number
@@ -122,10 +123,11 @@ export type Database = {
           engine_agent_id?: string | null
           handle?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["agent_kind"]
           name: string
           row?: number
           sidebar_order?: number | null
-          space_id: string
+          space_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           template_id?: string | null
           workspace_id: number
@@ -140,10 +142,11 @@ export type Database = {
           engine_agent_id?: string | null
           handle?: string | null
           id?: string
+          kind?: Database["public"]["Enums"]["agent_kind"]
           name?: string
           row?: number
           sidebar_order?: number | null
-          space_id?: string
+          space_id?: string | null
           status?: Database["public"]["Enums"]["agent_status"]
           template_id?: string | null
           workspace_id?: number
@@ -3921,6 +3924,7 @@ export type Database = {
     }
     Enums: {
       account_role: "member" | "expert"
+      agent_kind: "coworker" | "foreman"
       agent_service_status: "active" | "needs_config" | "error"
       agent_status: "idle" | "working" | "error" | "waiting_human" | "offline"
       cloud_provider: "incus"
@@ -4120,6 +4124,7 @@ export const Constants = {
   public: {
     Enums: {
       account_role: ["member", "expert"],
+      agent_kind: ["coworker", "foreman"],
       agent_service_status: ["active", "needs_config", "error"],
       agent_status: ["idle", "working", "error", "waiting_human", "offline"],
       cloud_provider: ["incus"],

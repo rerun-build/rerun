@@ -283,7 +283,7 @@ async function listWorkspaceAgents(workspaceId: number, spaceId?: string) {
         supabase,
         'agents',
         ['id', 'name', 'handle', 'description', 'status', 'space_id', 'created_at'] as const,
-        spaceId ? { workspace_id: workspaceId, space_id: spaceId } : { workspace_id: workspaceId },
+        spaceId ? { workspace_id: workspaceId, kind: 'coworker', space_id: spaceId } : { workspace_id: workspaceId, kind: 'coworker' },
         { column: 'created_at', ascending: false },
     )
     return data ?? []

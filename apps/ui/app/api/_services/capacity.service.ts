@@ -29,7 +29,7 @@ export async function activeAgentLimit(workspaceId: number): Promise<number | nu
 
 async function countActiveAgents(workspaceId: number): Promise<number> {
     const supabase = createServiceRoleClient()
-    const { data } = await selectCount(supabase, 'agents', { workspace_id: workspaceId, disabled_at: { isNull: true } })
+    const { data } = await selectCount(supabase, 'agents', { workspace_id: workspaceId, kind: 'coworker', disabled_at: { isNull: true } })
     return data ?? 0
 }
 

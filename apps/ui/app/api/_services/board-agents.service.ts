@@ -2,7 +2,7 @@ import { actorFromContext, assertAgentAccess, isAdminActor, spaceAccessMap, type
 import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { findIdleSessions, resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { fetchLiveSessions, sweepZombieSessions } from '@/lib/board/live-sessions'
-import { agentFromRow, computeAgentStatus } from '@/lib/board/types'
+import { agentFromRow, computeAgentStatus, isInABox } from '@/lib/board/types'
 import { getAgent as engineGetAgent } from '@/lib/engine/client'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { AgentView, BoardAgent } from '@rerun/contracts'
@@ -15,10 +15,10 @@ function boardAgentFromRow(row: Parameters<typeof agentFromRow>[0]): BoardAgent 
 }
 
 // The caller's level on each Box of the workspace. An admin manages them all without a read.
-async function boxAccessOfSpace(actor: Actor): Promise<(spaceId: string) => BoxAccess> {
-    if (isAdminActor(actor)) return () => 'manage'
+async function boxAccessOfSpace(actor: Actor): Promise<(spaceId: string | null) => BoxAccess> {
+    if (isAdminActor(actor)) return spaceId => (spaceId ? 'manage' : 'none')
     const map = await spaceAccessMap(actor)
-    return spaceId => map.get(spaceId) ?? 'none'
+    return spaceId => (spaceId ? (map.get(spaceId) ?? 'none') : 'none')
 }
 
 // The server side of the board's hydrate: every agent the caller reaches, in the Boxes it sees, with
@@ -26,9 +26,9 @@ async function boxAccessOfSpace(actor: Actor): Promise<(spaceId: string) => BoxA
 // here, it comes from the health poll, so a Box that does not answer never holds up the list.
 export async function listBoardAgents(ctx: WorkspaceContext): Promise<BoardAgent[]> {
     const actor = actorFromContext(ctx)
-    const [{ data, error }, accessOf] = await Promise.all([selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }), boxAccessOfSpace(actor)])
+    const [{ data, error }, accessOf] = await Promise.all([selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id, kind: 'coworker' }, { column: 'created_at' }), boxAccessOfSpace(actor)])
     if (error) throw error
-    const agents = (data ?? []).flatMap(row => {
+    const agents = (data ?? []).filter(isInABox).flatMap(row => {
         const access = accessOf(row.space_id)
         return access === 'none' ? [] : [{ ...boardAgentFromRow(row), access }]
     })
@@ -44,7 +44,7 @@ export async function readAgentView(ctx: WorkspaceContext, agentId: string): Pro
     const actor = actorFromContext(ctx)
     const [{ data: row, error }, { access }] = await Promise.all([selectMaybeSingle(ctx.supabase, 'agents', AGENT_COLUMNS, { id: agentId }), assertAgentAccess(agentId, 'use', actor)])
     if (error) throw error
-    if (!row || row.workspace_id !== ctx.workspace.id || access === 'none') throw new AuthorizationError('coworkerNotFound')
+    if (!row || !isInABox(row) || row.workspace_id !== ctx.workspace.id || access === 'none') throw new AuthorizationError('coworkerNotFound')
 
     const agent: BoardAgent = { ...boardAgentFromRow(row), access }
     if (agent.disabledAt) return { agent, detail: null, locked: false }

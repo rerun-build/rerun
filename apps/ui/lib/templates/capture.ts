@@ -30,11 +30,10 @@ const SOURCE_DESCRIPTION_LIMIT = 160
 // Only spaces that actually hold an agent are worth offering as a capture source. A `null` scope
 // means every workspace on the platform, which only the admin console is allowed to ask for.
 export async function listCaptureSources(supabase: SupabaseClient<Database>, workspaceId: number | null = null): Promise<CaptureSourceSpace[]> {
-    const agentScope: Filters<'agents'> = workspaceId === null ? {} : { workspace_id: workspaceId }
     const spaceScope: Filters<'spaces'> = workspaceId === null ? {} : { workspace_id: workspaceId }
 
     const agentColumns = ['id', 'name', 'handle', 'description', 'status', 'engine_agent_id', 'space_id'] as const
-    const { data: agents } = await selectAll(supabase, 'agents', agentColumns, agentScope, { column: 'name' })
+    const { data: agents } = await selectAll(supabase, 'agents', agentColumns, workspaceId === null ? { kind: 'coworker' } : { workspace_id: workspaceId, kind: 'coworker' }, { column: 'name' })
     const { data: spaces } = await selectAll(supabase, 'spaces', ['id', 'name'] as const, spaceScope, { column: 'name' })
 
     const bySpace = new Map<string, CaptureSourceAgent[]>()

@@ -23,7 +23,7 @@ import { selectMany } from '@/supabase/supabase-helpers'
 import { create } from 'zustand'
 import type { AgentFocusTab, AgentLink, GridPosition, InteractionMode, IsoAgent, SessionEntry, SessionStatus, SpacePublic } from '../lib/board/types'
 import type { SidebarOrderWrite } from '../lib/workspace-view'
-import { agentFromRow, computeAgentStatus } from '../lib/board/types'
+import { agentFromRow, computeAgentStatus, isInABox } from '../lib/board/types'
 import { AGENT_SPAN, isPlaced } from '@/lib/board/iso'
 import { fetchLiveSessions, sweepZombieSessions } from '@/lib/board/live-sessions'
 import type { AgentSchedule } from '@/lib/board/next-runs'
@@ -353,12 +353,12 @@ export const useBoardStore = create<BoardState>((set, get) => ({
 
     hydrate: async (workspaceId: number) => {
         const [agentsResult, spacesResult, grantsResult] = await Promise.all([
-            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason', 'sidebar_order'] as const, { workspace_id: workspaceId }),
+            selectMany(supabase, 'agents', ['id', 'name', 'handle', 'description', 'template_id', 'status', 'col', 'row', 'workspace_id', 'space_id', 'created_at', 'disabled_at', 'disabled_reason', 'sidebar_order'] as const, { workspace_id: workspaceId, kind: 'coworker' }),
             selectMany(supabase, 'spaces', ['id', 'workspace_id', 'name', 'col_start', 'row_start', 'col_end', 'row_end', 'created_at', 'visibility', 'sidebar_order'] as const, { workspace_id: workspaceId }),
             selectMany(supabase, 'space_members', ['space_id', 'user_id', 'access'] as const, { workspace_id: workspaceId }),
         ])
 
-        const dbAgents = agentsResult.data ? agentsResult.data.map(agentFromRow) : []
+        const dbAgents = agentsResult.data ? agentsResult.data.filter(isInABox).map(agentFromRow) : []
         const dbSpaces = spacesResult.data ?? []
 
         const agentIds = dbAgents.map(a => a.id)

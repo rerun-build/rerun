@@ -57,7 +57,7 @@ type AgentContext = {
 async function resolveAgent(agentId: string): Promise<AgentContext> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id', 'workspace_id'] as const, { id: agentId })
-    if (!agent?.engine_agent_id) throw new Error('Coworker not configured or not found')
+    if (!agent?.engine_agent_id || !agent.space_id) throw new Error('Coworker not configured or not found')
     const conn = await getSpaceConnection(agent.space_id)
     return { engineAgentId: agent.engine_agent_id, spaceId: agent.space_id, workspaceId: agent.workspace_id, conn }
 }

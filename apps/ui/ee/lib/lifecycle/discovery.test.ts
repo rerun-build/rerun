@@ -193,8 +193,9 @@ describe('loadLifecycleContext', () => {
     it('lists as idle only the young agents that never completed a run', async () => {
         const db = database({
             agents: [
-                { id: 'idle', workspace_id: 1, name: 'Idle', created_at: at(-30 * HOUR), disabled_at: null },
-                { id: 'busy', workspace_id: 1, name: 'Busy', created_at: at(-30 * HOUR), disabled_at: null },
+                { id: 'idle', workspace_id: 1, name: 'Idle', created_at: at(-30 * HOUR), disabled_at: null, kind: 'coworker' },
+                { id: 'busy', workspace_id: 1, name: 'Busy', created_at: at(-30 * HOUR), disabled_at: null, kind: 'coworker' },
+                { id: 'chief', workspace_id: 1, name: 'Chief of Staff', created_at: at(-30 * HOUR), disabled_at: null, kind: 'foreman' },
             ],
             notifications: [{ agent_id: 'busy', workspace_id: 1, event: 'agent.schedule.completed', kind: 'done', source: 'schedule', created_at: at(-HOUR) }],
             workspace_members: [member(1, 'owner', '2026-02-01T00:00:00.000Z')],
@@ -249,8 +250,8 @@ describe('loadLifecycleContext', () => {
         const run = (id: string, agentId: string) => ({ id, agent_id: agentId, workspace_id: 1, event: 'agent.message.completed', kind: 'done', source: null, created_at: at(-2 * DAY) })
         const db = database({
             agents: [
-                { id: 'busy', workspace_id: 1, name: 'Busy', created_at: at(-30 * HOUR), disabled_at: null },
-                { id: 'late', workspace_id: 1, name: 'Late', created_at: at(-30 * HOUR), disabled_at: null },
+                { id: 'busy', workspace_id: 1, name: 'Busy', created_at: at(-30 * HOUR), disabled_at: null, kind: 'coworker' },
+                { id: 'late', workspace_id: 1, name: 'Late', created_at: at(-30 * HOUR), disabled_at: null, kind: 'coworker' },
             ],
             notifications: [...Array.from({ length: 1200 }, (_, i) => run(`n-${String(i).padStart(4, '0')}`, 'busy')), run('n-9999', 'late')],
             workspace_members: [member(1, 'owner', '2026-02-01T00:00:00.000Z')],
@@ -266,7 +267,7 @@ describe('loadLifecycleContext', () => {
     it('counts every agent and member of a workspace past the first thousand rows', async () => {
         const db = database({
             workspaces: [workspace(1, { trial_ends_at: at(12 * HOUR), subscription_status: 'trialing', first_paid_at: null })],
-            agents: Array.from({ length: 1500 }, (_, i) => ({ id: `agent-${String(i).padStart(4, '0')}`, workspace_id: 1, name: `Agent ${i}`, created_at: '2026-02-01T00:00:00.000Z', disabled_at: null })),
+            agents: Array.from({ length: 1500 }, (_, i) => ({ id: `agent-${String(i).padStart(4, '0')}`, workspace_id: 1, name: `Agent ${i}`, created_at: '2026-02-01T00:00:00.000Z', disabled_at: null, kind: 'coworker' })),
             workspace_members: [member(1, 'founder', '2026-02-01T00:00:00.000Z'), ...Array.from({ length: 1100 }, (_, i) => member(1, `member-${i}`, `2026-03-01T00:00:00.${String(i).padStart(3, '0')}Z`))],
             users: [user('founder', 1)],
         })

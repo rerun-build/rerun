@@ -84,7 +84,13 @@ export type IsoAgent = {
     sidebarOrder?: number | null
 }
 
-type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'space_id' | 'disabled_at' | 'disabled_reason'> & Partial<Pick<AgentRow, 'created_at' | 'sidebar_order'>>
+type AgentRowFields = Pick<AgentRow, 'id' | 'name' | 'handle' | 'description' | 'template_id' | 'status' | 'col' | 'row' | 'workspace_id' | 'disabled_at' | 'disabled_reason'> & { space_id: string } & Partial<Pick<AgentRow, 'created_at' | 'sidebar_order'>>
+
+// A coworker sits in a Box. The Chief of Staff, the one row of `agents` without one, is never a
+// coworker of the board, the lists or the Box counts.
+export function isInABox<T extends { space_id: string | null }>(row: T): row is T & { space_id: string } {
+    return row.space_id !== null
+}
 
 export function agentFromRow(row: AgentRowFields): IsoAgent {
     return {

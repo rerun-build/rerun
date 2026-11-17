@@ -11,6 +11,7 @@ import { loadServiceCatalog } from '@/lib/templates/catalog'
 import { LIBRARY_COLUMNS, toLibraryTemplates, type LibraryRow } from '@/lib/templates/library'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { isInABox } from '@/lib/board/types'
 import { actorFromContext, isAdminActor, spaceAccessMap } from '@/app/api/_auth/access'
 import { AGENT_COLUMNS, SPACE_COLUMNS } from './board-map'
 import { foremanHubApiKey } from './hub-api-key'
@@ -59,14 +60,14 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
     const [onboarding, { data: spaces }, { data: agents }, reach] = await Promise.all([
         selectMaybeSingle(ctx.supabase, 'workspace_onboarding', ['answers'] as const, { workspace_id: ctx.workspace.id }),
         selectMany(ctx.supabase, 'spaces', SPACE_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }),
-        selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }),
+        selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id, kind: 'coworker' }, { column: 'created_at' }),
         isAdminActor(actor) ? Promise.resolve(null) : spaceAccessMap(actor),
     ])
     // A member's foreman sees the board through their Boxes. The phase still reads the whole
     // workspace: a member with nothing open to them is not a workspace to onboard.
     const visibleSpaces = reach ? (spaces ?? []).flatMap(space => (reach.get(space.id) ?? 'none') === 'none' ? [] : [{ ...space, access: reach.get(space.id) as 'use' | 'manage' }]) : (spaces ?? [])
     const visibleSpaceIds = new Set(visibleSpaces.map(space => space.id))
-    const visibleAgents = reach ? (agents ?? []).filter(agent => visibleSpaceIds.has(agent.space_id)) : (agents ?? [])
+    const visibleAgents = (agents ?? []).filter(isInABox).filter(agent => !reach || visibleSpaceIds.has(agent.space_id))
 
     const answers = readAnswers(onboarding.data?.answers)
     const foreman = answers.foreman ?? {}

@@ -40,12 +40,12 @@ export function boardStatusOfKind(kind: NotificationKind): BoardStatus {
  * past the eighth, for a message about a coworker hired late in a large team.
  */
 export async function loadTeam(supabase: SupabaseClient<Database>, workspaceId: number, mustInclude: string[] = []): Promise<TeamMember[]> {
-    const { data } = await selectMany(supabase, 'agents', ['id', 'name'] as const, { workspace_id: workspaceId, disabled_at: { isNull: true } }, { column: 'created_at', ascending: true }, TEAM_LIMIT)
+    const { data } = await selectMany(supabase, 'agents', ['id', 'name'] as const, { workspace_id: workspaceId, kind: 'coworker', disabled_at: { isNull: true } }, { column: 'created_at', ascending: true }, TEAM_LIMIT)
     const team = data ?? []
 
     const missing = mustInclude.filter(id => !team.some(agent => agent.id === id))
     if (missing.length) {
-        const { data: extra } = await selectMany(supabase, 'agents', ['id', 'name'] as const, { workspace_id: workspaceId, id: missing })
+        const { data: extra } = await selectMany(supabase, 'agents', ['id', 'name'] as const, { workspace_id: workspaceId, kind: 'coworker', id: missing })
         team.push(...(extra ?? []))
     }
 

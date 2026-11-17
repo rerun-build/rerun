@@ -566,7 +566,7 @@ export type WorkspaceRoutines = { routines: WorkspaceRoutine[]; canRename: boole
 export async function listWorkspaceRoutinesAction(): Promise<WorkspaceRoutines> {
     const actor = await requireLightSessionActor()
     const workspaceId = actor.workspaceId
-    const [{ data: agents }, visible] = await Promise.all([selectMany(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'disabled_at'] as const, { workspace_id: workspaceId }), visibleAgentIds(actor)])
+    const [{ data: agents }, visible] = await Promise.all([selectMany(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'disabled_at'] as const, { workspace_id: workspaceId, kind: 'coworker' }), visibleAgentIds(actor)])
     const runnable = keepVisible(agents ?? [], visible, agent => agent.id).filter(agent => agent.engine_agent_id && !agent.disabled_at)
     if (runnable.length === 0) return { routines: [], canRename: false }
 

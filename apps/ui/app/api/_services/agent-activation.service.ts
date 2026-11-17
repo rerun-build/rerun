@@ -26,7 +26,7 @@ export async function reconcileAgentActivation(workspaceId: number): Promise<str
     if (limit === null) return []
 
     const supabase = createServiceRoleClient()
-    const { data: active } = await selectAll(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, disabled_at: { isNull: true } }, { column: 'created_at', ascending: true })
+    const { data: active } = await selectAll(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, kind: 'coworker', disabled_at: { isNull: true } }, { column: 'created_at', ascending: true })
 
     const excess = (active ?? []).slice(limit).map(agent => agent.id)
     if (excess.length === 0) return []
@@ -49,8 +49,8 @@ export async function wakePlanLimitedAgents(workspaceId: number): Promise<{ woke
 
     const supabase = createServiceRoleClient()
     const [{ data: active }, { data: switchedOff }] = await Promise.all([
-        selectAll(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, disabled_at: { isNull: true } }),
-        selectAll(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, disabled_reason: PLAN_LIMIT_REASON }, { column: 'created_at', ascending: true }),
+        selectAll(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, kind: 'coworker', disabled_at: { isNull: true } }),
+        selectAll(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, kind: 'coworker', disabled_reason: PLAN_LIMIT_REASON }, { column: 'created_at', ascending: true }),
     ])
     const freeSlots = limit === null ? Infinity : Math.max(0, limit - (active ?? []).length)
     const woken = (switchedOff ?? []).slice(0, freeSlots).map(agent => agent.id)
@@ -122,7 +122,7 @@ async function attempt(what: string, run: () => Promise<void>): Promise<void> {
 export async function setEngineAgentEnabled(agentId: string, enabled: boolean): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { id: agentId })
-    if (!agent?.engine_agent_id) return
+    if (!agent?.engine_agent_id || !agent.space_id) return
 
     const conn = await getSpaceConnection(agent.space_id)
     await enginePatchAgent(conn, agent.engine_agent_id, { enabled })

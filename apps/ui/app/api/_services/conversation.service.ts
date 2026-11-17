@@ -56,7 +56,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor): Promise
 
     const byEngineId = new Map<string, { id: string; name: string }>()
     if (engineOriginIds.length > 0) {
-        const { data } = await selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'name'] as const, { engine_agent_id: { in: engineOriginIds } })
+        const { data } = await selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'name'] as const, { workspace_id: caller.workspaceId, engine_agent_id: { in: engineOriginIds } })
         for (const a of data ?? []) if (a.engine_agent_id) byEngineId.set(a.engine_agent_id, { id: a.id, name: a.name })
     }
 
@@ -174,7 +174,7 @@ export async function listAgentConversations(ctx: WorkspaceContext, agentId: str
 
 // The workspace's coworkers whose Box the caller reaches: every list of conversations stops there.
 async function reachableAgents(ctx: WorkspaceContext): Promise<{ id: string; name: string }[]> {
-    const [{ data, error }, spaces] = await Promise.all([selectMany(ctx.supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: ctx.workspace.id }), visibleSpaceIds(actorFromContext(ctx))])
+    const [{ data, error }, spaces] = await Promise.all([selectMany(ctx.supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: ctx.workspace.id, kind: 'coworker' }), visibleSpaceIds(actorFromContext(ctx))])
     if (error) throw error
     return keepVisible(data ?? [], spaces, agent => agent.space_id)
 }

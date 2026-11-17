@@ -90,7 +90,7 @@ export async function findFreeCellsInSpace(supabase: ReturnType<typeof createSer
 export async function moveAgentToBox(agentId: string, spaceId: string, actor: Actor, sidebarOrder?: number): Promise<{ ok: true; position: GridPosition } | ActionFailure> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['space_id', 'workspace_id'] as const, { id: agentId })
-    if (!agent || agent.workspace_id !== actor.workspaceId) return failure(COWORKER_NOT_FOUND)
+    if (!agent?.space_id || agent.workspace_id !== actor.workspaceId) return failure(COWORKER_NOT_FOUND)
     if (agent.space_id === spaceId) return failure('coworkerAlreadyInBox')
     const [from, to] = await Promise.all([readSpaceAccess(actor, agent.space_id), readSpaceAccess(actor, spaceId)])
     if (from === 'none') return failure(COWORKER_NOT_FOUND)
@@ -293,7 +293,7 @@ export async function duplicateAgent(params: DuplicateAgentParams): Promise<Dupl
 
     const supabase = createServiceRoleClient()
     const { data: source } = await selectSingle(supabase, 'agents', ['name', 'space_id', 'engine_agent_id', 'description', 'template_id', 'workspace_id'] as const, { id: agentRowId })
-    if (!source || source.workspace_id !== workspaceId || !source.engine_agent_id) throw new AppError(COWORKER_NOT_FOUND)
+    if (!source?.space_id || source.workspace_id !== workspaceId || !source.engine_agent_id) throw new AppError(COWORKER_NOT_FOUND)
     // A copy carries its source's whole setup, keys and connected services included, so both Boxes
     // have to be managed: the source like a share link, the copy's like any creation.
     enforce(await readSpaceAccess(params.actor, source.space_id), 'manage', COWORKER_NOT_FOUND)
@@ -360,7 +360,7 @@ export async function duplicateAgent(params: DuplicateAgentParams): Promise<Dupl
 export async function pauseAgentSchedules(id: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { id })
-    if (!agent?.engine_agent_id) return
+    if (!agent?.engine_agent_id || !agent.space_id) return
 
     const conn = await getSpaceConnection(agent.space_id)
     const schedules = await listSchedules(conn, agent.engine_agent_id)
@@ -377,7 +377,7 @@ export async function pauseAgentSchedules(id: string): Promise<void> {
 export async function resumeAgentSchedules(id: string): Promise<void> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id', 'disabled_schedule_slugs'] as const, { id })
-    if (!agent?.engine_agent_id || agent.disabled_schedule_slugs.length === 0) return
+    if (!agent?.engine_agent_id || !agent.space_id || agent.disabled_schedule_slugs.length === 0) return
 
     const conn = await getSpaceConnection(agent.space_id)
     for (const slug of agent.disabled_schedule_slugs) {
@@ -395,7 +395,7 @@ export async function resumeAgentSchedules(id: string): Promise<void> {
 export async function renameAgent(id: string, newName: string) {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id', 'handle'] as const, { id })
-    if (!agent) throw new AppError(COWORKER_NOT_FOUND)
+    if (!agent?.space_id) throw new AppError(COWORKER_NOT_FOUND)
 
     const handle = await deriveUniqueHandle(supabase, agent.workspace_id, newName, id)
     if (agent.engine_agent_id) {
@@ -414,7 +414,7 @@ export async function renameAgent(id: string, newName: string) {
 export async function changeAgentHandle(id: string, requestedHandle: string) {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id', 'name', 'handle'] as const, { id })
-    if (!agent) throw new AppError(COWORKER_NOT_FOUND)
+    if (!agent?.space_id) throw new AppError(COWORKER_NOT_FOUND)
 
     const handle = sanitizeIdentifier(requestedHandle).replace(/^_+|_+$/g, '')
     if (!handle) throw new AppError('handleUnusable', { handle: requestedHandle })
@@ -442,7 +442,7 @@ export async function deleteAgent(id: string) {
 
     const { data: agent } = await selectSingle(supabase, 'agents', ['engine_agent_id', 'space_id'] as const, { id })
 
-    if (!agent) {
+    if (!agent?.space_id) {
         throw new AppError(COWORKER_NOT_FOUND)
     }
 

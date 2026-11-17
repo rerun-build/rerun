@@ -35,7 +35,7 @@ async function readBrain(workspaceId: number): Promise<BrainRead> {
 }
 
 export async function loadCompanyDossier(supabase: SupabaseClient<Database>, workspaceId: number): Promise<CompanyDossier> {
-    const [workspace, onboarding, agents, brain] = await Promise.all([selectMaybeSingle(supabase, 'workspaces', ['id', 'name'] as const, { id: workspaceId }), selectMaybeSingle(supabase, 'workspace_onboarding', ['answers', 'company_findings'] as const, { workspace_id: workspaceId }), selectMany(supabase, 'agents', ['name', 'description'] as const, { workspace_id: workspaceId }, { column: 'created_at' }), readBrain(workspaceId)])
+    const [workspace, onboarding, agents, brain] = await Promise.all([selectMaybeSingle(supabase, 'workspaces', ['id', 'name'] as const, { id: workspaceId }), selectMaybeSingle(supabase, 'workspace_onboarding', ['answers', 'company_findings'] as const, { workspace_id: workspaceId }), selectMany(supabase, 'agents', ['name', 'description'] as const, { workspace_id: workspaceId, kind: 'coworker' }, { column: 'created_at' }), readBrain(workspaceId)])
     if (!workspace.data) throw new Error(`Workspace ${workspaceId} introuvable`)
 
     const answers = asObject<ForemanAnswers>(onboarding.data?.answers) ?? {}

@@ -79,7 +79,7 @@ describe('listWorkspaceConversationOverview', () => {
 
         await listWorkspaceConversationOverview(ctx)
 
-        expect(vi.mocked(selectMany).mock.calls[0][3]).toEqual({ workspace_id: 7 })
+        expect(vi.mocked(selectMany).mock.calls[0][3]).toEqual({ workspace_id: 7, kind: 'coworker' })
         expect(vi.mocked(selectMany).mock.calls[1][3]).toEqual({ agent_id: ['a'] })
     })
 
@@ -143,7 +143,7 @@ describe('markSessionsHandled', () => {
 
         await markSessionsHandled(ctx, ['own-session', 'foreign-session'])
 
-        expect(vi.mocked(selectMany).mock.calls[0][3]).toEqual({ workspace_id: 7 })
+        expect(vi.mocked(selectMany).mock.calls[0][3]).toEqual({ workspace_id: 7, kind: 'coworker' })
         const [write] = db.writes('sessions')
         expect(write.payload).toEqual({ status: 'idle' })
         expect(write.filters.map(call => call.args)).toEqual([

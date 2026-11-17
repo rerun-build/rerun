@@ -62,8 +62,8 @@ export async function vaultContext(actor?: Actor): Promise<VaultContext> {
     const engine = await findWorkspaceEngine(resolved.workspaceId)
     if (!engine) throw new NoEngineError()
     if (!(await supportsVault(engine.conn))) throw new VaultUnavailableError()
-    const { data } = await selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id'] as const, { workspace_id: resolved.workspaceId })
-    const coworkers = (data ?? []).flatMap(row => (row.engine_agent_id ? [{ id: row.id, engineAgentId: row.engine_agent_id, name: row.name, spaceId: row.space_id }] : []))
+    const { data } = await selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id'] as const, { workspace_id: resolved.workspaceId, kind: 'coworker' })
+    const coworkers = (data ?? []).flatMap(row => (row.engine_agent_id && row.space_id ? [{ id: row.id, engineAgentId: row.engine_agent_id, name: row.name, spaceId: row.space_id }] : []))
     return { actor: resolved, conn: engine.conn, coworkers, byEngineId: new Map(coworkers.map(c => [c.engineAgentId, c])) }
 }
 

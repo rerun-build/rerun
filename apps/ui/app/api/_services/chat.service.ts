@@ -27,7 +27,7 @@ export async function resolveAgentTarget(agentId: string, actor?: Actor, access:
     // all three are read at once. The machine read before the ownership check is the caller's own.
     const callerActor = actor ? Promise.resolve(actor) : requireLightSessionActor()
     const [resolvedActor, row, engine] = await Promise.all([callerActor, fetchAgentRow(agentId), callerActor.then(a => findWorkspaceEngine(a.workspaceId))])
-    if (!row || row.workspace_id !== resolvedActor.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    if (!row?.space_id || row.workspace_id !== resolvedActor.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
     enforce(await spaceAccessFor(resolvedActor, { id: row.space_id, workspace_id: row.workspace_id, visibility: row.space?.visibility ?? null }), access, COWORKER_NOT_FOUND)
     return buildTarget(row, engine)
 }
@@ -303,7 +303,7 @@ export async function findIdleSessions(sessionIds: string[], actor?: Actor): Pro
         callerActor.then(a => findWorkspaceEngine(a.workspaceId)),
     ])
     const visible = await visibleSpaceIds(resolvedActor)
-    const owned = (rows ?? []).filter(row => row.agent?.workspace_id === resolvedActor.workspaceId && (visible === 'all' || visible.has(row.agent.space_id)))
+    const owned = (rows ?? []).filter(row => row.agent?.workspace_id === resolvedActor.workspaceId && (visible === 'all' || (!!row.agent.space_id && visible.has(row.agent.space_id))))
     if (!engine) return owned.map(row => row.id)
 
     const idle: string[] = []

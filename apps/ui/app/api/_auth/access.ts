@@ -124,10 +124,10 @@ export async function assertAgentAccess(agentId: string, need: AccessLevel, acto
     const resolved = actor ?? (await requireLightSessionActor())
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id'] as const, { id: agentId })
-    if (!agent || agent.workspace_id !== resolved.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    if (!agent?.space_id || agent.workspace_id !== resolved.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
     const access = await readSpaceAccess(resolved, agent.space_id)
     enforce(access, need, COWORKER_NOT_FOUND)
-    return { actor: resolved, access, agent }
+    return { actor: resolved, access, agent: { ...agent, space_id: agent.space_id } }
 }
 
 // Every Box of the workspace with the actor's level on it, in two reads. The lists and the board use
@@ -210,7 +210,7 @@ type OwnedSession = { id: string; agent_id: string; engine_session_id: string | 
 // passed in by a caller that already started resolving it.
 export async function assertSessionInWorkspace(sessionId: string, actor?: Promise<Actor> | Actor): Promise<OwnedSession> {
     const [callerActor, session] = await Promise.all([actor ?? requireLightSessionActor(), readSessionWithAgent(sessionId)])
-    if (!session?.agent || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('sessionNotFound')
+    if (!session?.agent?.space_id || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('sessionNotFound')
     if (!hasAccess(await readSpaceAccess(callerActor, session.agent.space_id), 'use')) throw new AuthorizationError('sessionNotFound')
     return { id: session.id, agent_id: session.agent_id, engine_session_id: session.engine_session_id, engine_agent_id: session.agent.engine_agent_id }
 }

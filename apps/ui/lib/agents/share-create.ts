@@ -47,7 +47,7 @@ async function planFor(supabase: SupabaseClient<Database>, agentRowId: string, w
     // The engine id addresses a folder on a box, so it is resolved from the row rather than taken
     // from the caller: a forged one would archive an agent nothing here owns.
     const { data: agent } = await selectSingle(supabase, 'agents', ['name', 'space_id', 'engine_agent_id', 'workspace_id'] as const, { id: agentRowId })
-    if (!agent || agent.workspace_id !== workspaceId || !agent.engine_agent_id) throw new AppError('coworkerNotFound')
+    if (!agent?.space_id || agent.workspace_id !== workspaceId || !agent.engine_agent_id) throw new AppError('coworkerNotFound')
 
     const conn = await getSpaceConnection(agent.space_id)
     try {

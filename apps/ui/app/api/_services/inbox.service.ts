@@ -22,7 +22,7 @@ const ATTENTION_PAGE = 100
 // have not looked at yet, folded by scheduled task. Built from the same sources and the same rules as
 // `WorkspaceInbox`, so the two cannot disagree on what is news.
 export async function listWorkspaceInbox(ctx: WorkspaceContext): Promise<Inbox> {
-    const [{ data: agentRows, error: agentsError }, spaces] = await Promise.all([selectMany(ctx.supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: ctx.workspace.id }), visibleSpaceIds(actorFromContext(ctx))])
+    const [{ data: agentRows, error: agentsError }, spaces] = await Promise.all([selectMany(ctx.supabase, 'agents', ['id', 'name', 'space_id'] as const, { workspace_id: ctx.workspace.id, kind: 'coworker' }), visibleSpaceIds(actorFromContext(ctx))])
     if (agentsError) throw agentsError
 
     // A finished run of a coworker outside the caller's Boxes drops out below, its name not found.
