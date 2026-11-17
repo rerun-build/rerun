@@ -16,6 +16,11 @@ export function isAppSlug(value: string | null | undefined): value is AppSlug {
     return !!value && (APP_SLUGS as readonly string[]).includes(value)
 }
 
+// The way back from the Checkout of a lifetime workspace's first slot: `?app=<slug>` reopens the app,
+// `slots_session` is the session to settle without waiting for the webhook.
+export const PAID_APP_PARAM = 'app'
+export const SLOTS_CHECKOUT_PARAM = 'slots_session'
+
 // Every connection still bound to the workspace takes a slot, the ones waiting for a reconnect or
 // paused included: the slot is what they come back into.
 export const SLOT_HOLDING_STATUSES: readonly AppConnectionStatus[] = ['connecting', 'connected', 'needs_reconnect', 'paused']

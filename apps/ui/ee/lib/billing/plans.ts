@@ -121,6 +121,12 @@ export function isClaudePlanOffered(workspace: { plan: string | null } | null | 
     return workspace?.plan !== LIFETIME_RESTRICTED_PLAN_SLUG
 }
 
+// LinkedIn Pro and WhatsApp Pro: sold as slots on the plan, and to the full lifetime plan on a
+// subscription of their own. An AppSumo workspace stays without them.
+export function arePaidAppsOffered(workspace: { plan: string | null } | null | undefined): boolean {
+    return workspace?.plan !== LIFETIME_RESTRICTED_PLAN_SLUG
+}
+
 // What an AppSumo code buys for good: unlimited coworkers and seats on its machine, and no Rerun
 // credit, so its coworkers run on the buyer's own AI key or subscription.
 export function lifetimeLimitsToColumns(): WorkspaceLimitColumns {

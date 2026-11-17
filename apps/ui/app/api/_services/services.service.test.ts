@@ -47,11 +47,6 @@ vi.mock('@/lib/services/rerank', () => ({ rerankRelevant: vi.fn() }))
 vi.mock('@/lib/foreman/search-docs', () => ({ searchDocs: vi.fn() }))
 // The open source build resolves `@rerun/cloud` to `cloud-oss`, with no paid apps; the reset logic under test is the same in both.
 vi.mock('@rerun/cloud/apps', () => ({ isAppSlug: (value: unknown) => value === 'whatsapp' }))
-// The lifetime plans only exist on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
-vi.mock('@rerun/cloud/billing', async importOriginal => ({
-    ...(await importOriginal<object>()),
-    isLifetimePlan: (await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')).isLifetimePlan,
-}))
 
 const composioMethod = { id: 'composio', label: 'Connect', kind: 'composio', recommended: true, composio: { toolkit: 'gmail', authConfigId: 'ac', allowedTools: [] } }
 const appMethod = { id: 'app', label: 'Connect', kind: 'app', recommended: true, app: { appSlug: 'whatsapp' } }
@@ -280,17 +275,17 @@ describe('searchServices', () => {
         expect(results.find(r => r.slug === 'gmail')).toMatchObject({ installStatus: 'active', installed: true, multiInstance: true })
     })
 
-    it('lists the paid apps for a workspace on a plan', async () => {
+    it.each(['base', 'lifetime'])('lists the paid apps for a workspace on the %s plan', async plan => {
         useRegistry({ services: {} })
-        workspacePlan = 'base'
+        workspacePlan = plan
         const { results } = await searchServices('agent')
 
         expect(results.map(r => r.slug)).toContain('whatsapp-pro')
     })
 
-    it.each(['lifetime', 'lifetime_restricted'])('leaves the paid apps out for a workspace on the %s plan, which cannot buy a slot', async plan => {
+    it('leaves the paid apps out for an AppSumo workspace, which is not sold them', async () => {
         useRegistry({ services: {} })
-        workspacePlan = plan
+        workspacePlan = 'lifetime_restricted'
         const { results } = await searchServices('agent')
 
         expect(results.map(r => r.slug)).toEqual(['gmail', 'notion'])
@@ -298,17 +293,24 @@ describe('searchServices', () => {
 })
 
 describe('installService on a lifetime workspace', () => {
-    it.each(['lifetime', 'lifetime_restricted'])('refuses a paid app on the %s plan', async plan => {
+    it('refuses a paid app on the AppSumo plan', async () => {
         useRegistry({ services: {} })
-        workspacePlan = plan
+        workspacePlan = 'lifetime_restricted'
 
         await expect(installService('agent', 'whatsapp-pro')).rejects.toThrow('WhatsApp Pro is not included in the lifetime plan.')
         expect(compileService).not.toHaveBeenCalled()
     })
 
-    it('still installs any other service', async () => {
+    it('installs a paid app on the full lifetime plan, which buys its slots', async () => {
         useRegistry({ services: {} })
         workspacePlan = 'lifetime'
+
+        await expect(installService('agent', 'whatsapp-pro')).resolves.toMatchObject({ slug: 'whatsapp-pro' })
+    })
+
+    it('still installs any other service', async () => {
+        useRegistry({ services: {} })
+        workspacePlan = 'lifetime_restricted'
 
         await expect(installService('agent', 'gmail')).resolves.toMatchObject({ slug: 'gmail' })
     })

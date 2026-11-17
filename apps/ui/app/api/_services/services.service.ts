@@ -5,7 +5,7 @@ import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { unbindAgent } from '@rerun/cloud/apps.server'
 import { isAppSlug, type AppSlug } from '@rerun/cloud/apps'
-import { isLifetimePlan } from '@rerun/cloud/billing'
+import { arePaidAppsOffered } from '@/ee/lib/billing/plans'
 import { deleteConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem, patchVaultItem, createVaultItem, deleteVaultItem, detachVaultItem, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { deleteConnectorToken } from '@/lib/vault/tokens'
@@ -162,24 +162,23 @@ function toSearchResult(s: CatalogRow, installed: Map<string, AgentServiceStatus
 // service surfaces even with no shared keywords. Falls back to substring matching when
 // there's no query or no embedding key configured — nothing breaks before the backfill.
 export async function searchServices(agentId: string, query?: string, category?: string, actor?: Actor): Promise<{ results: ServiceSearchResult[] }> {
-    const [installed, lifetime] = await Promise.all([installedStatuses(agentId, actor), isLifetimeAgent(agentId)])
+    const [installed, paidApps] = await Promise.all([installedStatuses(agentId, actor), arePaidAppsOfferedTo(agentId)])
     const results = await searchCatalog(installed, query, category)
-    return { results: lifetime ? withoutPaidApps(results) : results }
+    return { results: paidApps ? results : withoutPaidApps(results) }
 }
 
-// The paid apps (LinkedIn Pro, WhatsApp Pro) are sold as slots on a plan, and a lifetime (AppSumo)
-// workspace has nothing to attach a slot to: they are left out of its catalog rather than shown
-// with a Connect button that can never work.
+// The paid apps (LinkedIn Pro, WhatsApp Pro) are not sold to an AppSumo workspace: they are left out
+// of its catalog rather than shown with a Connect button that can never work.
 export function withoutPaidApps(results: ServiceSearchResult[]): ServiceSearchResult[] {
     return results.filter(result => !result.paidApp)
 }
 
-async function isLifetimeAgent(agentId: string): Promise<boolean> {
+async function arePaidAppsOfferedTo(agentId: string): Promise<boolean> {
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })
-    if (!agent) return false
+    if (!agent) return true
     const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['plan'] as const, { id: agent.workspace_id })
-    return isLifetimePlan(workspace)
+    return arePaidAppsOffered(workspace)
 }
 
 // Vector shortlist shared by search and use-case suggestion: embed the query, let pgvector
@@ -435,7 +434,7 @@ export async function installService(
 ): Promise<InstallResult> {
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
-    if (manifest.authMethods.some(method => method.kind === 'app') && (await isLifetimeAgent(agentId))) throw new Error(`${manifest.name} is not included in the lifetime plan.`)
+    if (manifest.authMethods.some(method => method.kind === 'app') && !(await arePaidAppsOfferedTo(agentId))) throw new Error(`${manifest.name} is not included in the lifetime plan.`)
 
     const instance = await installTarget(agentId, manifest, slugOrKey, Boolean(opts?.newInstance), actor)
     const key = instance?.key ?? manifest.slug

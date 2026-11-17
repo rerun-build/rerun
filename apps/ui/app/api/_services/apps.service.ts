@@ -18,9 +18,18 @@ import { DAILY_LOGIN_ATTEMPT_LIMIT, dayKey } from '@/lib/apps/quotas'
 import { appDefinition } from '@/lib/apps/registry'
 import { canRemoveSlot, connectAllowance, type ConnectAllowance } from '@/lib/apps/slots'
 import { SLOT_PAUSE_REASONS, subscriberTrialOpen } from '@/lib/apps/slots-sync'
-import { addPaidSlot, addTrialSlot, slotQuantity } from '@/lib/apps/stripe-slots'
+import { SLOT_SUBSCRIPTION_COLUMNS, addPaidSlot, addTrialSlot, slotQuantity, slotSubscriptionId } from '@/lib/apps/stripe-slots'
 import { APP_CONNECTION_COLUMNS, SLOT_HOLDING_STATUSES, type AppConnectionStatus, type AppSlug } from '@/lib/apps/types'
-import { isMachineEntitled } from '@/ee/lib/billing/entitlement'
+import { isMachineEntitled, isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
+import { subscriptionPeriodEndIso } from '@/ee/lib/billing/marketplace'
+import { arePaidAppsOffered, isLifetimePlan } from '@/ee/lib/billing/plans'
+import {
+    adoptPendingLifetimeAddonsSubscription,
+    createLifetimeAddonsCheckout,
+    removeLifetimeAddonSlot,
+    resumeLifetimeAddons,
+    settleLifetimeAddonsCheckout,
+} from '@/ee/services/lifetime-addons.service'
 import { intervalOfItems, stripe } from '@/ee/lib/billing/stripe'
 import { createTrigger as engineCreateTrigger } from '@/lib/engine/client'
 import { site } from '@/lib/site'
@@ -65,6 +74,11 @@ export class AppActionError extends AppError {
 type SlotState = {
     workspaceId: number
     subscription: Stripe.Subscription | null
+    // May connect accounts at all: a plan that runs, or the full lifetime plan.
+    entitled: boolean
+    lifetime: boolean
+    // A lifetime workspace has never started a slots subscription: its first one comes with the trial.
+    lifetimeTrialAvailable: boolean
     stripeSlots: number
     workspaceTrialing: boolean
     app: { slots: number; status: string; trial_ends_at: string | null; trial_settled_at: string | null } | null
@@ -76,15 +90,23 @@ type SlotState = {
 
 async function readSlotState(supabase: Client, workspaceId: number, slug: AppSlug): Promise<SlotState> {
     const [{ data: workspace }, { data: app }, { data: holding }, { data: claim }] = await Promise.all([
-        selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id', 'subscription_status', 'boxes_archived_at'] as const, { id: workspaceId }),
+        selectMaybeSingle(supabase, 'workspaces', [...SLOT_SUBSCRIPTION_COLUMNS, 'subscription_status', 'boxes_archived_at'] as const, { id: workspaceId }),
         selectMaybeSingle(supabase, 'workspace_apps', ['slots', 'status', 'trial_ends_at', 'trial_settled_at'] as const, { workspace_id: workspaceId, app_slug: slug }),
         selectMany(supabase, 'app_connections', ['id', 'status', 'pause_reason'] as const, { workspace_id: workspaceId, app_slug: slug, status: [...SLOT_HOLDING_STATUSES] }),
         selectMaybeSingle(supabase, 'app_trial_claims', ['id'] as const, { workspace_id: workspaceId, app_slug: slug }),
     ])
-    const subscription = workspace?.stripe_subscription_id ? await stripe.subscriptions.retrieve(workspace.stripe_subscription_id) : null
+    const lifetime = isLifetimePlan(workspace)
+    const subscriptionId = workspace ? slotSubscriptionId(workspace) : null
+    const stored = subscriptionId ? await stripe.subscriptions.retrieve(subscriptionId) : null
+    // A lifetime workspace whose slots subscription is over starts a new one through Checkout.
+    const subscription = lifetime && stored && !isSubscriptionEntitled(stored.status) ? null : stored
+    const machineEntitled = isMachineEntitled(workspace?.subscription_status)
     return {
         workspaceId,
         subscription,
+        entitled: lifetime ? arePaidAppsOffered(workspace) && machineEntitled : !!subscription && machineEntitled,
+        lifetime,
+        lifetimeTrialAvailable: lifetime && !workspace?.stripe_addons_subscription_id,
         stripeSlots: subscription ? slotQuantity(subscription, appDefinition(slug).addonKey) : 0,
         workspaceTrialing: subscription?.status === 'trialing',
         app: app ?? null,
@@ -101,8 +123,16 @@ function allowanceOf(state: SlotState, excludeConnectionId?: string): ConnectAll
         stripeSlots: state.stripeSlots,
         liveConnections: state.holding.filter(connection => connection.id !== excludeConnectionId).length,
         subscriberTrialOpen: subscriberTrialOpen(state.app),
-        subscriberTrialAvailable: !state.trialClaimed && !state.app?.trial_ends_at,
+        // A lifetime workspace's free slot is the trial of its slots subscription, through Checkout.
+        subscriberTrialAvailable: !state.lifetime && !state.trialClaimed && !state.app?.trial_ends_at,
     })
+}
+
+// The accounts a paid slot holds: the subscriber trial's and the ones paused for want of a slot are
+// not on the bill, so they do not keep a slot from being given back.
+function slotsInUseOf(state: SlotState): number {
+    const occupying = state.holding.filter(connection => !(connection.status === 'paused' && (SLOT_PAUSE_REASONS as readonly string[]).includes(connection.pause_reason ?? ''))).length
+    return Math.max(0, occupying - (subscriberTrialOpen(state.app) ? 1 : 0))
 }
 
 export type AppConnectionView = {
@@ -124,6 +154,14 @@ export type AppsOverview = {
     interval: 'monthly' | 'yearly'
     workspaceTrialing: boolean
     subscribed: boolean
+    // A lifetime workspace with no slots subscription yet: its next slot is bought through Checkout,
+    // with `slotsCheckoutTrialDays` free when it is its first one.
+    slotsCheckout: boolean
+    slotsCheckoutTrialDays: number
+    // Lifetime: slots are given back from the app, and every one ends with the period once the last
+    // is given back.
+    lifetime: boolean
+    slotsEndAt: string | null
     paused: boolean
     subscriberTrialEndsAt: string | null
     allowance: ConnectAllowance
@@ -143,7 +181,7 @@ export async function getAppsOverview(slug: AppSlug): Promise<AppsOverview> {
     const { data: agents } = bindings?.length ? await selectMany(supabase, 'agents', ['id', 'name'] as const, { id: bindings.map(binding => binding.agent_id) }) : { data: [] }
     const nameOf = new Map((agents ?? []).map(agent => [agent.id, agent.name]))
     const interval = state.subscription ? intervalOfItems(state.subscription.items.data) : 'monthly'
-    const slotsInUse = Math.max(0, state.holding.filter(connection => !(connection.status === 'paused' && (SLOT_PAUSE_REASONS as readonly string[]).includes(connection.pause_reason ?? ''))).length - (subscriberTrialOpen(state.app) ? 1 : 0))
+    const slotsInUse = slotsInUseOf(state)
 
     return {
         slug,
@@ -153,7 +191,11 @@ export async function getAppsOverview(slug: AppSlug): Promise<AppsOverview> {
         slotPriceCents: PLAN_PRICES_CENTS[interval][appDefinition(slug).addonKey],
         interval,
         workspaceTrialing: state.workspaceTrialing,
-        subscribed: !!state.subscription && isMachineEntitled(state.subscriptionStatus),
+        subscribed: state.entitled,
+        slotsCheckout: state.lifetime && !state.subscription,
+        slotsCheckoutTrialDays: state.lifetimeTrialAvailable ? TRIAL_DAYS : 0,
+        lifetime: state.lifetime,
+        slotsEndAt: state.lifetime && state.subscription?.cancel_at_period_end ? subscriptionPeriodEndIso(state.subscription) : null,
         paused: state.boxesArchived || state.app?.status === 'frozen',
         subscriberTrialEndsAt: subscriberTrialOpen(state.app) ? state.app?.trial_ends_at ?? null : null,
         allowance: allowanceOf(state),
@@ -174,23 +216,57 @@ export async function getAppsOverview(slug: AppSlug): Promise<AppsOverview> {
 // --- Buying a slot ---
 
 // Through the same terms as the billing dialog: a paid workspace is charged the prorated slot now,
-// a workspace on its trial gets its one slot at $0, billed with the plan.
-export async function addAppSlot(slug: AppSlug, requestId: string): Promise<{ trialSlot: boolean }> {
+// a workspace on its trial gets its one slot at $0, billed with the plan. A lifetime workspace with
+// no slots subscription yet is sent to Checkout for it.
+export type AddSlotOutcome = { trialSlot: boolean; checkoutUrl: string | null }
+
+export async function addAppSlot(slug: AppSlug, requestId: string): Promise<AddSlotOutcome> {
+    const { workspace, supabase } = await requireWorkspaceContext()
+    let state = await readSlotState(supabase, workspace.id, slug)
+    const app = appDefinition(slug)
+    if (!state.entitled) throw new AppActionError('not_entitled', 'appSubscribeToAddSlot', { provider: app.providerLabel })
+    if (state.boxesArchived) throw new AppActionError('paused', 'workspacePaused')
+
+    // A Checkout already paid whose webhook has not landed holds the slot this click asks for.
+    if (state.lifetime && !state.subscription && (await adoptPendingLifetimeAddonsSubscription())) state = await readSlotState(supabase, workspace.id, slug)
+    if (!state.subscription) {
+        const checkoutUrl = await createLifetimeAddonsCheckout(slug, app.addonKey, requestId, { trial: state.lifetimeTrialAvailable })
+        await reportWorkspaceEvent(supabase, workspace.id, 'app_slot_checkout', { app: slug, trial: state.lifetimeTrialAvailable })
+        return { trialSlot: false, checkoutUrl }
+    }
+
+    let subscription = state.subscription
+    if (state.lifetime && subscription.cancel_at_period_end) {
+        subscription = await resumeLifetimeAddons(subscription)
+        // The slot given back is still on the bill until the renewal: keeping it is all this click asks.
+        if (slotQuantity(subscription, app.addonKey) > 0) return { trialSlot: false, checkoutUrl: null }
+    }
+
+    if (state.workspaceTrialing) {
+        if (state.stripeSlots > 0) throw new AppActionError('needs_slot', state.lifetime ? 'appSlotsTrialOneSlot' : 'appTrialOneSlot', { provider: app.providerLabel })
+        await addTrialSlot(subscription, app.addonKey, `trial-slot-${requestId}`)
+        await reportWorkspaceEvent(supabase, workspace.id, 'app_slot_added', { app: slug, trial_slot: true })
+        return { trialSlot: true, checkoutUrl: null }
+    }
+    await addPaidSlot(subscription, app.addonKey, `slot-${requestId}`)
+    await reportWorkspaceEvent(supabase, workspace.id, 'app_slot_added', { app: slug, trial_slot: false })
+    return { trialSlot: false, checkoutUrl: null }
+}
+
+// A lifetime workspace has no billing dialog to change its slots in: it gives one back from the app.
+// A plan's slots are changed with the plan.
+export async function removeAppSlot(slug: AppSlug): Promise<void> {
     const { workspace, supabase } = await requireWorkspaceContext()
     const state = await readSlotState(supabase, workspace.id, slug)
     const app = appDefinition(slug)
-    if (!state.subscription || !isMachineEntitled(state.subscriptionStatus)) throw new AppActionError('not_entitled', 'appSubscribeToAddSlot', { provider: app.providerLabel })
-    if (state.boxesArchived) throw new AppActionError('paused', 'workspacePaused')
+    if (!state.lifetime || !state.subscription) throw new AppActionError('not_entitled', 'appSubscribeToAddSlot', { provider: app.providerLabel })
+    if (!canRemoveSlot(state.stripeSlots, slotsInUseOf(state))) throw new AppActionError('needs_slot', 'appSlotInUse', { provider: app.providerLabel })
+    await removeLifetimeAddonSlot(state.subscription, app.addonKey)
+}
 
-    if (state.workspaceTrialing) {
-        if (state.stripeSlots > 0) throw new AppActionError('needs_slot', 'appTrialOneSlot', { provider: app.providerLabel })
-        await addTrialSlot(state.subscription, app.addonKey, `trial-slot-${requestId}`)
-        await reportWorkspaceEvent(supabase, workspace.id, 'app_slot_added', { app: slug, trial_slot: true })
-        return { trialSlot: true }
-    }
-    await addPaidSlot(state.subscription, app.addonKey, `slot-${requestId}`)
-    await reportWorkspaceEvent(supabase, workspace.id, 'app_slot_added', { app: slug, trial_slot: false })
-    return { trialSlot: false }
+// Back from the Checkout of a lifetime workspace's first slot.
+export async function settleSlotsCheckout(sessionId: string): Promise<void> {
+    await settleLifetimeAddonsCheckout(sessionId)
 }
 
 // --- Connecting an account ---
@@ -216,7 +292,7 @@ function refusal(slug: AppSlug, err: unknown): AppActionError {
 
 function assertCanConnect(state: SlotState, slug: AppSlug): void {
     const app = appDefinition(slug)
-    if (!state.subscription || !isMachineEntitled(state.subscriptionStatus)) throw new AppActionError('not_entitled', 'appSubscribeToConnect', { provider: app.providerLabel })
+    if (!state.entitled) throw new AppActionError('not_entitled', 'appSubscribeToConnect', { provider: app.providerLabel })
     if (state.boxesArchived || state.app?.status === 'frozen') throw new AppActionError('paused', 'workspacePaused')
 }
 
@@ -365,6 +441,8 @@ async function finishConnection(supabase: Client, slug: AppSlug, workspaceId: nu
     if (state) {
         if (allowance === 'subscriber_trial') trialEndsAt = await claimSubscriberTrial(supabase, slug, workspaceId, memberId)
         if (allowance === 'workspace_trial_slot' && state.subscription) await addTrialSlot(state.subscription, app.addonKey, `trial-slot-${connectionId}`)
+        // An account put into a slot of a lifetime workspace whose slots were set to end keeps them.
+        if (state.lifetime && state.subscription?.cancel_at_period_end) await resumeLifetimeAddons(state.subscription)
         await ensureWorkspaceApp(supabase, slug, workspaceId, trialEndsAt)
     }
     await updateConnection(supabase, connectionId, { status: 'connected', label, provider_member_id: memberId, connected_by: userId, pause_reason: null, paused_until: null })

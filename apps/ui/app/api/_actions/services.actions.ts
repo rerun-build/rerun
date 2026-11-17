@@ -4,7 +4,7 @@ import { assertAgentAccess, assertSpaceAccess } from '@/app/api/_auth/access'
 import { createAgentWithSetup } from '@/app/api/_services/agent-setup.service'
 import { getCatalogServicesBySlugs, getServiceAlternatives, getServiceDetails, installService, listCatalogServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService, withoutPaidApps } from '@/app/api/_services/services.service'
 import { getServerSession } from '@/supabase/session/getServerSession'
-import { isLifetimePlan } from '@rerun/cloud/billing'
+import { arePaidAppsOffered } from '@/ee/lib/billing/plans'
 import type { InstallResult, ResetConnectionResult, ServiceAlternative, ServiceChecklistItem, ServiceDetails, ServiceSearchResult } from '@/lib/services/types'
 import { failureOf, refusalOf, type ActionFailure, type SuccessResult } from '@/lib/i18n/action-error'
 
@@ -45,7 +45,7 @@ export async function searchServicesAction(agentId: string, query?: string, cate
 export async function listCatalogServicesAction(opts?: { category?: string; limit?: number; offset?: number }): Promise<ServiceSearchResult[]> {
     try {
         const [services, { workspace }] = await Promise.all([listCatalogServices(opts), getServerSession()])
-        return isLifetimePlan(workspace) ? withoutPaidApps(services) : services
+        return arePaidAppsOffered(workspace) ? services : withoutPaidApps(services)
     } catch {
         return []
     }

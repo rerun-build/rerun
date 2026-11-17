@@ -326,6 +326,8 @@ export interface AnalyticsEventMap {
     // workspace trial's, the subscriber's free week. `app_trial_converted` reads the end of that week.
     app_connected: { app: string; allowance: string; reconnect: boolean }
     app_slot_added: { app: string; trial_slot: boolean }
+    // A lifetime workspace sent to Checkout for its first slot.
+    app_slot_checkout: { app: string; trial: boolean }
     app_trial_started: { app: string }
     app_trial_converted: { app: string; outcome: 'charged' | 'declined' | 'nothing_to_charge' }
     // A coworker stopped by a daily limit: how often the caps bite, and on what.

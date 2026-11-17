@@ -1,7 +1,16 @@
 // No 'server-only': the subscriber trial sweep converts trials from Trigger.dev.
 import type Stripe from 'stripe'
 import type { AddonKey } from '@rerun/contracts'
+import { isLifetimePlan } from '@/ee/lib/billing/plans'
 import { addonForPriceId, intervalOfItems, priceIdForAddon, stripe } from '@/ee/lib/billing/stripe'
+
+export const SLOT_SUBSCRIPTION_COLUMNS = ['plan', 'stripe_subscription_id', 'stripe_addons_subscription_id'] as const
+
+// The subscription a workspace's slots are billed on: its plan's, or for a lifetime workspace, which
+// has no plan subscription, the one that carries nothing but its slots (see lifetime-addons.ts).
+export function slotSubscriptionId(workspace: { plan: string | null; stripe_subscription_id: string | null; stripe_addons_subscription_id: string | null }): string | null {
+    return isLifetimePlan(workspace) ? workspace.stripe_addons_subscription_id : workspace.stripe_subscription_id
+}
 
 export function slotItem(subscription: Stripe.Subscription, addonKey: AddonKey): Stripe.SubscriptionItem | undefined {
     return subscription.items.data.find(item => addonForPriceId(item.price?.id) === addonKey)

@@ -88,7 +88,7 @@ type WorkspaceUpdate = Database['public']['Tables']['workspaces']['Update']
 // there.
 export const PLAN_CARD_SETUP_KIND = 'plan_card_setup'
 
-const PLAN_PAYMENT_METHOD_TYPES: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = ['card', 'link']
+export const PLAN_PAYMENT_METHOD_TYPES: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = ['card', 'link']
 
 // The waitlist wall only lives in the browser, and a template or share sheet opened over it used to
 // start a trial on a workspace with no machine to give it. Every way onto the plan checks here.

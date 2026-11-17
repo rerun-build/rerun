@@ -6,7 +6,7 @@ import { linkupNamespace } from '@/lib/apps/linkup/namespace'
 import { LINKUP_ACCOUNT_MONTHLY_USD } from '@rerun/cloud/supplier-costs'
 import { CONNECTING_GRACE_MS, accountsToDelete } from '@/lib/apps/reconcile'
 import { appDefinition, linkupPlatforms } from '@/lib/apps/registry'
-import { slotQuantity } from '@/lib/apps/stripe-slots'
+import { SLOT_SUBSCRIPTION_COLUMNS, slotQuantity, slotSubscriptionId } from '@/lib/apps/stripe-slots'
 import { sweepSubscriberTrials } from '@/lib/apps/trials'
 import { APP_SLUGS, SLOT_HOLDING_STATUSES, isAppSlug } from '@/lib/apps/types'
 import { stripe } from '@/ee/lib/billing/stripe'
@@ -80,8 +80,8 @@ async function reconcile({ dryRun = false }: ReconcilePayload) {
         const addonKey = appDefinition(slug).addonKey
         const { data: apps } = await selectMany(supabase, 'workspace_apps', ['workspace_id', 'slots'] as const, { app_slug: slug, status: 'active' })
         for (const app of apps ?? []) {
-            const { data: workspace } = await selectMany(supabase, 'workspaces', ['stripe_subscription_id'] as const, { id: app.workspace_id }, undefined, 1)
-            const subscriptionId = workspace?.[0]?.stripe_subscription_id
+            const { data: workspace } = await selectMany(supabase, 'workspaces', SLOT_SUBSCRIPTION_COLUMNS, { id: app.workspace_id }, undefined, 1)
+            const subscriptionId = workspace?.[0] ? slotSubscriptionId(workspace[0]) : null
             const billed = subscriptionId ? slotQuantity(await stripe.subscriptions.retrieve(subscriptionId), addonKey) : 0
             if (billed > app.slots) drift.push(`workspace ${app.workspace_id}, ${slug}: Stripe bills ${billed}, app holds ${app.slots}`)
         }

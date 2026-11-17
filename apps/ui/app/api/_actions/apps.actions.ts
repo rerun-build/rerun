@@ -7,6 +7,8 @@ import { requireAdminContext } from '@/app/api/_auth/ownership'
 import {
     AppActionError,
     addAppSlot,
+    removeAppSlot,
+    settleSlotsCheckout,
     attachAgentToConnection,
     cancelAppConnect,
     connectLinkedin,
@@ -17,6 +19,7 @@ import {
     resendAppCode,
     setAgentWakeEvents,
     submitAppCheckpoint,
+    type AddSlotOutcome,
     type AgentAppBinding,
     type AppsOverview,
     type ConnectOutcome,
@@ -68,8 +71,18 @@ export async function getAppsOverviewAction(slug: AppSlug): Promise<Result<AppsO
 
 // `requestId` is minted by the button, once per click: a retry of the same click is folded into one
 // charge, a new click is a new slot.
-export async function addAppSlotAction(slug: AppSlug, requestId: string): Promise<Result<{ trialSlot: boolean }>> {
+export async function addAppSlotAction(slug: AppSlug, requestId: string): Promise<Result<AddSlotOutcome>> {
     return runAsAdmin(slug, 'addSlotFailed', () => addAppSlot(slug, id.parse(requestId)))
+}
+
+export async function removeAppSlotAction(slug: AppSlug): Promise<Result<void>> {
+    return runAsAdmin(slug, 'removeSlotFailed', () => removeAppSlot(slug))
+}
+
+const checkoutSessionId = z.string().regex(/^cs_[A-Za-z0-9_]+$/)
+
+export async function settleSlotsCheckoutAction(slug: AppSlug, sessionId: string): Promise<Result<void>> {
+    return runAsAdmin(slug, 'addSlotFailed', () => settleSlotsCheckout(checkoutSessionId.parse(sessionId)))
 }
 
 // The password goes to Linkup and nowhere else: it is neither stored nor logged here.

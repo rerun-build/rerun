@@ -7,7 +7,7 @@ import { reportWorkspaceEvent } from './analytics'
 import { updateConnection } from './connections'
 import { notifyWorkspace } from './notify'
 import { appDefinition } from './registry'
-import { addPaidSlot, slotQuantity } from './stripe-slots'
+import { SLOT_SUBSCRIPTION_COLUMNS, addPaidSlot, slotQuantity, slotSubscriptionId } from './stripe-slots'
 import { APP_CONNECTION_COLUMNS, SLOT_HOLDING_STATUSES, isAppSlug, type AppSlug } from './types'
 
 type Client = SupabaseClient<Database>
@@ -52,10 +52,11 @@ async function convert(supabase: Client, workspaceId: number, slug: AppSlug): Pr
     const app = appDefinition(slug)
     await settle(supabase, workspaceId, slug, { trial_settled_at: new Date().toISOString() })
 
-    const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', ['stripe_subscription_id'] as const, { id: workspaceId })
+    const { data: workspace } = await selectMaybeSingle(supabase, 'workspaces', SLOT_SUBSCRIPTION_COLUMNS, { id: workspaceId })
     const { data: connections } = await selectMany(supabase, 'app_connections', APP_CONNECTION_COLUMNS, { workspace_id: workspaceId, app_slug: slug, status: [...SLOT_HOLDING_STATUSES] })
     const holding = connections ?? []
-    const subscription = workspace?.stripe_subscription_id ? await stripe.subscriptions.retrieve(workspace.stripe_subscription_id) : null
+    const subscriptionId = workspace ? slotSubscriptionId(workspace) : null
+    const subscription = subscriptionId ? await stripe.subscriptions.retrieve(subscriptionId) : null
     const paidSlots = subscription ? slotQuantity(subscription, app.addonKey) : 0
     // Disconnected during the trial: the user said no, and nothing is charged.
     if (holding.length <= paidSlots) return 'nothing_to_charge'
