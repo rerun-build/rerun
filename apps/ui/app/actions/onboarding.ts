@@ -34,6 +34,8 @@ export type OnboardingAnswers = {
 
 export type WelcomeProgress = {
     siteSkipped?: boolean
+    // What the read of the site filed it under: the industry question opens on it.
+    siteIndustry?: TemplateCategory
     // What they typed under "Other", kept verbatim beside the bucket it was filed into.
     industryLabel?: string
     teamDone?: boolean

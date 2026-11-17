@@ -451,5 +451,7 @@
     "vaultMethodUnsupported": "Cette app ne peut pas encore être ajoutée au Vault. Connectez-la depuis l'onglet Apps d'un coworker.",
     "vaultConflictEveryone": "Chaque coworker reçoit déjà {name} d'une autre entrée du Vault partagée avec tous",
     "vaultConflictSomeone": "Un coworker reçoit déjà {name} d'une autre entrée du Vault",
-    "vaultMcpTarget": "Donnez au serveur une adresse ou une commande"
+    "vaultMcpTarget": "Donnez au serveur une adresse ou une commande",
+    "saveAnswerFailed": "Impossible d'enregistrer cette réponse. Réessayez.",
+    "notYourCompanySite": "{domain} n'est pas le site de votre entreprise. Saisissez le vôtre, ou passez."
 }

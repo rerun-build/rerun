@@ -217,8 +217,8 @@ export interface AnalyticsEventMap {
     onboarding_step_viewed: { step: string }
     // `via` is only on the plan step, which closes four ways: the plan card confirmed, a template
     // picked on its own card, coworkers hired off the starter pack, or the one coworker they
-    // described instead of picking.
-    onboarding_step_completed: { step: string; via?: 'plan_card' | 'template' | 'starter_pack' | 'custom' }
+    // described instead of picking. `skipped` on the welcome page's site and team steps.
+    onboarding_step_completed: { step: string; via?: 'plan_card' | 'template' | 'starter_pack' | 'custom'; skipped?: boolean }
     // The chips under a freshly built team: 'open_chat', 'billing', or the label of a request sent to the foreman.
     onboarding_next_step_clicked: { step: string }
     // The board's getting-started checklist. `completed` is server-side, the moment the thing exists;

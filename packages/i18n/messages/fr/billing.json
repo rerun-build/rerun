@@ -450,7 +450,7 @@
             "autopilot": "<b>Pilote automatique</b> pour votre activité",
             "trial": {
                 "agents": "<b>{count} coworkers</b> pendant l'essai, illimités sur Pro",
-                "teammates": "Invitez <b>votre équipe</b> dès que Pro démarre",
+                "teammates": "Invitez <b>votre équipe</b> dès le premier jour",
                 "credit": "<b>{credits, plural, one {# crédit} other {# crédits}} d'usage IA</b>, puis {monthly, number} par mois"
             },
             "pro": {

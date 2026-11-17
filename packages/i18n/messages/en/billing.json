@@ -545,7 +545,7 @@
             "autopilot": "<b>Autopilot</b> for your business",
             "trial": {
                 "agents": "<b>{count} coworkers</b> during the trial, unlimited on Pro",
-                "teammates": "Invite <b>your team</b> once Pro starts",
+                "teammates": "Invite <b>your team</b> from day one",
                 "credit": "<b>{credits, plural, one {# credit} other {# credits}} of AI usage</b>, then {monthly, number} a month"
             },
             "pro": {

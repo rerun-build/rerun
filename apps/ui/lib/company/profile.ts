@@ -19,6 +19,18 @@ export async function analyzeCompanyProfile(input: string): Promise<{ ok: true; 
     const hit = cache.get(url)
     if (hit && Date.now() - hit.at < CACHE_TTL_MS) return { ok: true, analysis: hit.analysis }
 
+    // The board starts the read while the site is being typed, and the welcome page waits on the
+    // same one when the answer is sent: the second caller joins the read under way.
+    const running = inflight.get(url)
+    if (running) return running
+    const read = readCompanyProfile(url).finally(() => inflight.delete(url))
+    inflight.set(url, read)
+    return read
+}
+
+const inflight = new Map<string, Promise<{ ok: true; analysis: CompanyAnalysis } | { ok: false; error: string }>>()
+
+async function readCompanyProfile(url: string): Promise<{ ok: true; analysis: CompanyAnalysis } | { ok: false; error: string }> {
     const markdown = await scrapeCompanySite(url)
     if (!markdown) return { ok: false, error: 'We could not read that website' }
 

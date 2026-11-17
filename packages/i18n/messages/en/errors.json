@@ -5,7 +5,8 @@
         "vaultConflict": "{name} is an environment variable name or an MCP server name, shown as is. {coworker} is a coworker name.",
         "vaultConflictEveryone": "{name} is an environment variable name or an MCP server name, shown as is.",
         "vaultConflictSomeone": "{name} is an environment variable name or an MCP server name, shown as is.",
-        "serviceKeyRejected": "{name} is the name of a third-party app (Buffer, Linear…), kept as is."
+        "serviceKeyRejected": "{name} is the name of a third-party app (Buffer, Linear…), kept as is.",
+        "notYourCompanySite": "Shown under the company website field when the person typed a social network or page host instead of their own site. {domain} is that platform's address (e.g. linkedin.com)."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -459,5 +460,7 @@
     "vaultMethodUnsupported": "This app can't be added to the Vault yet. Connect it from a coworker's Apps tab.",
     "vaultConflictEveryone": "Every coworker already gets {name} from another Vault entry shared with everyone",
     "vaultConflictSomeone": "A coworker already gets {name} from another Vault entry",
-    "vaultMcpTarget": "Give the server either an address or a command"
+    "vaultMcpTarget": "Give the server either an address or a command",
+    "saveAnswerFailed": "We could not save that. Try again.",
+    "notYourCompanySite": "{domain} is not your company's site. Enter yours, or skip."
 }

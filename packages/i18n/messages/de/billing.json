@@ -450,7 +450,7 @@
             "autopilot": "<b>Autopilot</b> für dein Business",
             "trial": {
                 "agents": "<b>{count} Coworker</b> in der Testphase, unbegrenzt mit Pro",
-                "teammates": "Lade <b>dein Team</b> ein, sobald Pro beginnt",
+                "teammates": "Lade <b>dein Team</b> vom ersten Tag an ein",
                 "credit": "<b>{credits, plural, one {# Credit} other {# Credits}} für KI-Nutzung</b>, danach {monthly, number} pro Monat"
             },
             "pro": {
