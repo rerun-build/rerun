@@ -1,6 +1,6 @@
 import type { BoardAgent } from '@rerun/contracts'
 
-import { insertAtCaret, insertMention, mentionAgentsOf, mentionItems, mentionQueryAt, type MentionAgent } from './mentions'
+import { insertAtCaret, insertMention, mentionAgentsOf, mentionItems, mentionQueryAt, mentionText, type MentionAgent } from './mentions'
 
 const agents: MentionAgent[] = [
     { id: 'b', name: 'Bob', handle: 'sales-bob' },
@@ -70,5 +70,31 @@ describe('mentionAgentsOf', () => {
             { id: 'mate', name: 'mate', handle: 'mate', hint: undefined, preferred: true },
             { id: 'far', name: 'far', handle: 'far', hint: 'Ops', preferred: false },
         ])
+    })
+})
+
+describe('# and the linked computers', () => {
+    const computers = [
+        { id: 'c1', name: 'Studio PC', handle: 'studio-pc', online: true },
+        { id: 'c2', name: 'Old laptop', handle: 'old-laptop', online: false },
+        { id: 'c3', name: 'Render box', handle: 'render-box', online: true },
+    ]
+
+    it('opens on # typed at the start of a word, and filters by name or handle, online first', () => {
+        const query = mentionQueryAt('Encode it on #', 14)!
+        expect(query).toEqual({ trigger: '#', query: '', start: 13 })
+        expect(mentionItems(query, [], [], computers).map(item => mentionText(item))).toEqual(['#render-box', '#studio-pc', '#old-laptop'])
+        expect(mentionItems(mentionQueryAt('on #stu', 7)!, [], [], computers).map(item => mentionText(item))).toEqual(['#studio-pc'])
+    })
+
+    it('stays closed for a hashtag that names no computer, and inside a word', () => {
+        expect(mentionItems(mentionQueryAt('Post with #marketing', 20)!, [], [], computers)).toEqual([])
+        expect(mentionQueryAt('issue#12', 8)).toBeNull()
+    })
+
+    it('writes #handle and a space in place of what was typed', () => {
+        const query = mentionQueryAt('Run on #ren please', 11)!
+        const [item] = mentionItems(query, [], [], computers)
+        expect(insertMention('Run on #ren please', 11, query, item)).toEqual({ text: 'Run on #render-box  please', caret: 19 })
     })
 })

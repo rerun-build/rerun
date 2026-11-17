@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 
 import { useMentionAutocomplete } from '@/components/chat/MentionAutocomplete'
+import { useMentionComputers } from '@/components/computers/useMentionComputers'
 import { ForemanComposer, type ForemanComposerMentionProps, type ForemanComposerProps } from '@/components/foreman/ForemanComposer'
 import { ForemanTrialGate } from '@rerun/cloud/billing.client'
 import { useForemanMentionAgents } from '@/components/foreman/useForemanMentionAgents'
@@ -51,7 +52,8 @@ export function ForemanComposerSlot({ aside, trialGate, framed = false, above, r
     const mentionAgents = useForemanMentionAgents()
     // Picking a mention writes `el.value` directly, which fires no React change event.
     const syncComposer = useCallback((text: string) => composerRef.current?.sync(text), [composerRef])
-    const { inputRef, menu: mentionMenu, tokens: mentionTokens, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, [], syncComposer)
+    const mentionComputers = useMentionComputers()
+    const { inputRef, menu: mentionMenu, tokens: mentionTokens, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, [], syncComposer, mentionComputers.computers, mentionComputers.refresh)
     const composerShown = !trialGate && !aside
 
     // The composer folds inside an `overflow-hidden` box that would clip the menu, so the menu is

@@ -161,7 +161,12 @@
         "install_complete": "Finished the setup",
         "remote_computers": "Looked at the linked computers",
         "remote_exec": "{program, select, none {Ran a command} other {Ran {program}}} on #{computer}",
-        "request_computer_access": "Asked to use #{computer}"
+        "request_computer_access": "Asked to use #{computer}",
+        "remote_job": "Checked a job on #{computer}",
+        "remote_file_list": "Listed files on #{computer}",
+        "remote_file_read": "Read a file on #{computer}",
+        "remote_file_write": "Wrote a file on #{computer}",
+        "remote_transfer": "Copied a file with #{computer}"
     },
     "activities": {
         "shell_exec": "Running a command",

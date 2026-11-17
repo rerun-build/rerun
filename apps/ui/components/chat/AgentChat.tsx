@@ -31,6 +31,7 @@ import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
 import { MessageView } from '@/components/chat/MessageView'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
 import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
+import { useMentionComputers } from '@/components/computers/useMentionComputers'
 import { ComputerAccessBlock } from '@/components/chat/computer/ComputerAccessBlock'
 import { SkeletonChat } from '@/components/ui/skeleton'
 
@@ -168,7 +169,8 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         composerRef.current?.sync(text)
         questionFormRef.current?.sync(text)
     }, [])
-    const { inputRef, menu: mentionMenu, tokens: mentionTokens, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, mentionSkills, syncMentionTarget)
+    const mentionComputers = useMentionComputers()
+    const { inputRef, menu: mentionMenu, tokens: mentionTokens, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, mentionSkills, syncMentionTarget, mentionComputers.computers, mentionComputers.refresh)
 
     // The field is the composer in the footer or a pending question's answer in the thread, so the
     // menu is placed against the whole chat and sits on the field wherever it is.

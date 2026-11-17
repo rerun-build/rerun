@@ -1,8 +1,8 @@
 /** Label shown in place of a URL, mapped back to the full URL when the text leaves the composer. */
 export type ComposerLinks = Map<string, string>
 
-/** An agent or a skill as the mention autocomplete writes it: `@handle` or `/slug`. It stays in the text as typed. */
-export type ComposerMention = { text: string; kind: 'agent' | 'skill' }
+/** An agent, a skill or a linked computer as the mention autocomplete writes it: `@handle`, `/slug` or `#handle`. It stays in the text as typed. */
+export type ComposerMention = { text: string; kind: 'agent' | 'skill' | 'computer' }
 
 export type ComposerSegment = { kind: 'text'; text: string } | { kind: 'link'; text: string; url: string } | { kind: 'mention'; text: string; mention: ComposerMention['kind'] }
 

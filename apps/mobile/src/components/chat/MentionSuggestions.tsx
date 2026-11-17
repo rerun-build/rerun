@@ -10,13 +10,13 @@ import { useTheme } from '@/theme/theme'
 import { radius, spacing, withAlpha } from '@/theme/tokens'
 
 import { GLASS_SHADOW, GLASS_TINT_ALPHA } from './glass'
-import { mentionText, type MentionItem } from './mentions'
+import { mentionText, type MentionItem, type MentionTrigger } from './mentions'
 
 const ROW = 48
 const MAX_ROWS = 5
 
 // The web composer's `@` and `/` menu, above the composer: a tap puts the token in the text.
-export function MentionSuggestions({ trigger, items, onPick }: { trigger: '@' | '/'; items: MentionItem[]; onPick: (item: MentionItem) => void }) {
+export function MentionSuggestions({ trigger, items, onPick }: { trigger: MentionTrigger; items: MentionItem[]; onPick: (item: MentionItem) => void }) {
     const theme = useTheme()
     const glass = useGlassStyle()
     const t = useTranslations('mobileChat.composer')
@@ -27,7 +27,7 @@ export function MentionSuggestions({ trigger, items, onPick }: { trigger: '@' | 
         <Animated.View entering={FadeInDown.duration(200)} exiting={FadeOutDown.duration(200)}>
             <GlassSurface key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} tintColor={withAlpha(theme.card, GLASS_TINT_ALPHA)} style={{ borderRadius: radius.lg, borderCurve: 'continuous', borderWidth: StyleSheet.hairlineWidth, borderColor: theme.border, boxShadow: GLASS_SHADOW[theme.scheme], overflow: 'hidden' }}>
                 <AppText variant="caption" tone="muted" medium style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.sm }}>
-                    {trigger === '/' ? t('skills') : t('coworkers')}
+                    {trigger === '/' ? t('skills') : trigger === '#' ? t('computers') : t('coworkers')}
                 </AppText>
                 <ScrollView style={{ maxHeight }} keyboardShouldPersistTaps="always" contentContainerStyle={{ paddingVertical: spacing.xs }}>
                     {items.map(item => (
@@ -37,7 +37,7 @@ export function MentionSuggestions({ trigger, items, onPick }: { trigger: '@' | 
                                     {item.name}
                                 </AppText>
                                 <AppText variant="footnote" tone="muted" numberOfLines={1} style={{ flexShrink: 2 }}>
-                                    {item.kind === 'agent' && item.hint ? `${mentionText(item)} · ${item.hint}` : mentionText(item)}
+                                    {item.kind === 'agent' && item.hint ? `${mentionText(item)} · ${item.hint}` : item.kind === 'computer' && !item.online ? `${mentionText(item)} · ${t('offline')}` : mentionText(item)}
                                 </AppText>
                             </View>
                         </Pressable>

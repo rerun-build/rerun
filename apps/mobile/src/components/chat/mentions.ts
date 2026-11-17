@@ -6,16 +6,25 @@ import type { BoardAgent, Box, SkillSummary } from '@rerun/contracts'
 // `hint` tells apart two coworkers of the same name, by the Box each lives in. `preferred` opens the
 // list: the coworkers sharing the Box of the conversation.
 export type MentionAgent = { id: string; name: string; handle: string | null; hint?: string; preferred?: boolean }
-export type MentionItem = ({ kind: 'agent' } & MentionAgent) | ({ kind: 'skill' } & SkillSummary)
-export type MentionQuery = { trigger: '@' | '/'; query: string; start: number }
+// A computer linked to the workspace, `#handle` in a message. Offline ones stay in the list, after the others.
+export type MentionComputer = { id: string; name: string; handle: string; online: boolean }
+export type MentionItem = ({ kind: 'agent' } & MentionAgent) | ({ kind: 'skill' } & SkillSummary) | ({ kind: 'computer' } & MentionComputer)
+export type MentionTrigger = '@' | '/' | '#'
+export type MentionQuery = { trigger: MentionTrigger; query: string; start: number }
 
 export function mentionQueryAt(text: string, caret: number): MentionQuery | null {
-    const match = text.slice(0, caret).match(/(^|\s)([@/])([\w-]*)$/)
-    return match ? { trigger: match[2] as '@' | '/', query: match[3], start: caret - match[3].length - 1 } : null
+    const match = text.slice(0, caret).match(/(^|\s)([@/#])([\w-]*)$/)
+    return match ? { trigger: match[2] as MentionTrigger, query: match[3], start: caret - match[3].length - 1 } : null
 }
 
-export function mentionItems(mention: MentionQuery, agents: MentionAgent[], skills: SkillSummary[]): MentionItem[] {
+// `#marketing` in a draft is not a computer: with no linked computer matching, the menu stays closed.
+export function mentionItems(mention: MentionQuery, agents: MentionAgent[], skills: SkillSummary[], computers: MentionComputer[] = []): MentionItem[] {
     const query = mention.query.toLowerCase()
+    if (mention.trigger === '#')
+        return computers
+            .filter(computer => computer.name.toLowerCase().includes(query) || computer.handle.includes(query))
+            .map(computer => ({ kind: 'computer' as const, ...computer }))
+            .sort((a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name))
     if (mention.trigger === '/')
         return skills
             .filter(skill => skill.name.toLowerCase().includes(query) || skill.slug.toLowerCase().includes(query))
@@ -28,6 +37,7 @@ export function mentionItems(mention: MentionQuery, agents: MentionAgent[], skil
 }
 
 export function mentionText(item: MentionItem): string {
+    if (item.kind === 'computer') return `#${item.handle}`
     return item.kind === 'skill' ? `/${item.slug}` : `@${item.handle || item.name}`
 }
 

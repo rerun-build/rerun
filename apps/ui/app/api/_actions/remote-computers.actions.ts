@@ -4,55 +4,24 @@ import { remoteComputerRuleSchema, remoteComputerSettingsPatchSchema, remoteOsSc
 import { z } from 'zod'
 
 import { requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
-import { resolveMemberIdentities } from '@/app/api/_services/members.service'
 import { addComputerRule, computerIdByHandle, computerJobLogs, computerJobs, linkComputer, listWorkspaceComputers, renameComputer, revokeComputer, stopComputerJob, updateComputerSettings, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
 import type { RemoteJob, RemoteJobLogs } from '@rerun/contracts'
-import type { ComputerItem, ComputersList, ComputerStatus } from '@/lib/computers/types'
+import type { ComputersList } from '@/lib/computers/types'
+import { assertComputersFor, canManageComputer, workspaceComputerItems } from '@/app/api/_services/remote-computer-items.service'
 import { AppError, failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { remoteComputersFlag } from '@/flags'
 
 async function computersContext(): Promise<WorkspaceContext> {
     const ctx = await requireWorkspaceContext()
-    if (ctx.authUser.is_anonymous || !(await remoteComputersFlag().catch(() => false))) throw new AppError('computersOff')
+    if (!(await remoteComputersFlag().catch(() => false))) throw new AppError('computersOff')
+    assertComputersFor(ctx)
     return ctx
-}
-
-const canManage = (ctx: WorkspaceContext, computer: Pick<WorkspaceComputer, 'linked_by'>) => ctx.role === 'admin' || computer.linked_by === ctx.userId
-
-function statusOf(computer: WorkspaceComputer): ComputerStatus {
-    const view = computer.view
-    if (!view?.online) return 'offline'
-    if (view.paused) return 'paused'
-    return view.runningJobs > 0 ? 'busy' : 'online'
-}
-
-async function toItems(ctx: WorkspaceContext, computers: WorkspaceComputer[]): Promise<ComputerItem[]> {
-    const people = await resolveMemberIdentities(ctx.supabase, [...new Set(computers.flatMap(computer => (computer.linked_by ? [computer.linked_by] : [])))])
-    return computers.map(computer => ({
-        id: computer.id,
-        name: computer.name,
-        handle: computer.handle,
-        os: remoteOsSchema.catch('linux').parse(computer.os),
-        arch: computer.arch,
-        hostname: computer.hostname,
-        appVersion: computer.view?.appVersion ?? computer.app_version,
-        linkedBy: computer.linked_by ? { id: computer.linked_by, name: people.get(computer.linked_by)?.name ?? people.get(computer.linked_by)?.email ?? '' } : null,
-        linkedAt: computer.created_at,
-        lastSeenAt: computer.view?.lastSeenAt ?? computer.last_seen_at,
-        status: statusOf(computer),
-        capabilities: computer.view?.capabilities ?? [],
-        facts: computer.view?.facts ?? null,
-        settings: computer.view?.settings ?? null,
-        runningJobs: computer.view?.runningJobs ?? 0,
-        canManage: canManage(ctx, computer),
-    }))
 }
 
 export async function listComputersAction(): Promise<({ ok: true } & ComputersList) | ActionFailure> {
     try {
         const ctx = await computersContext()
-        const { computers, engine } = await listWorkspaceComputers(ctx.workspace.id)
-        return { ok: true, computers: await toItems(ctx, computers), engine }
+        return { ok: true, ...(await workspaceComputerItems(ctx)) }
     } catch (err) {
         return failureOf(err)
     }
@@ -87,7 +56,7 @@ async function managedComputer(computerId: string): Promise<{ ctx: WorkspaceCont
     const { computers } = await listWorkspaceComputers(ctx.workspace.id)
     const computer = computers.find(item => item.id === computerId)
     if (!computer) throw new AppError('computerNotFound')
-    if (!canManage(ctx, computer)) throw new AppError('computersAdminOnly')
+    if (!canManageComputer(ctx, computer)) throw new AppError('computersAdminOnly')
     return { ctx, computer }
 }
 

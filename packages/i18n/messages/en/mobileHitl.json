@@ -155,5 +155,15 @@
         "approveOnce": "Approve once",
         "addCredits": "Add credits",
         "alwaysAllowFailed": "Could not switch on \"Spend without asking\". This approval still stands, up to its estimate."
+    },
+    "computer": {
+        "runOn": "Run on #{computer}",
+        "filesOn": "Use files on #{computer}",
+        "deny": "Deny",
+        "allow": "Allow",
+        "alwaysProgram": "Always allow {program}",
+        "alwaysFolder": "Always allow this folder",
+        "interpreterWarning": "Always allowing {program} allows any code it runs",
+        "alwaysFailed": "Could not keep the rule on the computer: allowed this once."
     }
 }

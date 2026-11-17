@@ -232,6 +232,11 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     request_computer_access: ShieldAlertIcon,
     remote_exec: TerminalIcon,
     remote_computers: MonitorIcon,
+    remote_job: TerminalIcon,
+    remote_file_list: FolderIcon,
+    remote_file_read: FileSearchIcon,
+    remote_file_write: FilePlusIcon,
+    remote_transfer: DownloadIcon,
     notify_user: BellIcon,
     install_complete: CheckCircle2Icon,
 }

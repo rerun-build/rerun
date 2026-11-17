@@ -153,3 +153,19 @@ describe('remarkMentions', () => {
         expect(link.children).toEqual([{ type: 'text', value: '@bob' }])
     })
 })
+
+describe('the #handle of a linked computer', () => {
+    const mentions = [
+        { text: '#studio-pc', kind: 'computer' as const },
+        { text: '@scout', kind: 'agent' as const },
+    ]
+
+    it('becomes a token when it names a linked computer, and stays text otherwise', () => {
+        expect(tokenizeComposer('Encode on #studio-pc, then post #marketing', new Map(), mentions)).toEqual([
+            { kind: 'text', text: 'Encode on ' },
+            { kind: 'mention', text: '#studio-pc', mention: 'computer' },
+            { kind: 'text', text: ', then post #marketing' },
+        ])
+        expect(tokenizeComposer('see #studio-pcs', new Map(), mentions)).toEqual([{ kind: 'text', text: 'see #studio-pcs' }])
+    })
+})

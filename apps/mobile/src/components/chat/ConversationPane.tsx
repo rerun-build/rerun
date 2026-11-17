@@ -22,6 +22,7 @@ import { useMessageFeedback } from '@/chat/useMessageFeedback'
 import { useQueuedMessage } from '@/chat/useQueuedMessage'
 import { useSkillProposals } from '@/chat/useSkillProposals'
 import { cachedBoard } from '@/data/local-cache'
+import { useMentionComputers } from '@/data/useMentionComputers'
 import { useCoworkerSkills } from '@/data/useCoworkerSkills'
 import { useMemberProfiles } from '@/data/useMemberProfiles'
 import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
@@ -339,6 +340,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
 
     const isForeman = coworker.kind === 'foreman'
     const skills = useCoworkerSkills(isForeman ? null : coworker.id)
+    const mentionComputers = useMentionComputers()
     const workspaceAgents = useWorkspaceAgents()
     const boxes = me ? (cachedBoard(me.workspace.id).read()?.boxes ?? []) : []
     const mentionAgents = workspaceAgents ? mentionAgentsOf(workspaceAgents, boxes, isForeman ? null : coworker.id) : []
@@ -512,7 +514,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                     <LayoutAnimationConfig skipEntering>
                         {!replacesComposer && (
                             <Animated.View entering={SlideInDown.duration(280)} exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                                <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} />
+                                <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} />
                             </Animated.View>
                         )}
                     </LayoutAnimationConfig>

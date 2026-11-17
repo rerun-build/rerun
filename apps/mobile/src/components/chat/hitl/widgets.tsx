@@ -1,4 +1,5 @@
 import { ApprovalWidget } from './ApprovalWidget'
+import { ComputerWidget } from './ComputerWidget'
 import { McpWidget } from './McpWidget'
 import { QuestionWidget } from './QuestionWidget'
 import type { HitlWidgets } from './registry'
@@ -17,4 +18,5 @@ export const HITL_WIDGETS: HitlWidgets = {
     takeover: { maxVersion: 1, render: props => <TakeoverWidget {...props} /> },
     mcp: { maxVersion: 1, render: props => <McpWidget {...props} /> },
     spend: { maxVersion: 1, render: props => <SpendWidget {...props} /> },
+    computer: { maxVersion: 1, render: props => <ComputerWidget {...props} /> },
 }

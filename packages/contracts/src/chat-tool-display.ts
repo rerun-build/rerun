@@ -22,7 +22,7 @@ const LABELLED_TOOLS = [
     'install_shared_agent', 'open_template_card', 'start_agent_setup', 'open_checkout', 'open_template_purchase', 'ask_choice', 'ask_either',
     'ask_input', 'show_templates', 'show_plan', 'show_starter_pack', 'contact_team', 'ask_user', 'request_approval', 'suggest_service',
     'request_secret', 'request_mcp_sign_in', 'request_takeover', 'request_spend', 'notify_user', 'install_complete', 'remote_computers', 'remote_exec',
-    'request_computer_access',
+    'request_computer_access', 'remote_job', 'remote_file_list', 'remote_file_read', 'remote_file_write', 'remote_transfer',
 ] as const
 
 // The tools that say what they are doing while they run (`activities.*`). A tool missing here falls
@@ -44,7 +44,7 @@ export type ActiveTool = (typeof ACTIVE_TOOLS)[number]
 // program they ran.
 export type ToolCopy = (key: `labels.${LabelledTool}` | `activities.${ActiveTool}` | `paidData.${PaidDataCapability}`, values?: Record<string, string>) => string
 
-const REMOTE_TOOLS = new Set(['remote_exec', 'request_computer_access'])
+const REMOTE_TOOLS = new Set(['remote_exec', 'request_computer_access', 'remote_job', 'remote_file_list', 'remote_file_read', 'remote_file_write', 'remote_transfer'])
 
 // `#studio-pc` and `ffmpeg` out of `{ computer: "#Studio-PC", command: "/usr/bin/ffmpeg -i …" }`, with
 // stand-ins while the call is still streaming its input.

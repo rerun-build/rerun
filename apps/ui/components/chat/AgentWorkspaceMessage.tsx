@@ -47,7 +47,7 @@ type MentionTokenProps = {
 }
 
 function MentionToken({ children, kind }: MentionTokenProps) {
-    return <span className={cn('font-medium', kind === 'agent' || kind === 'skill' ? MENTION_TOKEN_CLASSES[kind] : undefined)}>{children}</span>
+    return <span className={cn('font-medium', kind === 'agent' || kind === 'skill' || kind === 'computer' ? MENTION_TOKEN_CLASSES[kind] : undefined)}>{children}</span>
 }
 
 type LinkTokenProps = {

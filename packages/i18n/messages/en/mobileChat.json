@@ -18,7 +18,9 @@
         "tooLargeBody": "{files}: {megabytes} MB at most.",
         "tooLargeTitle": "{count, plural, one {This file is too large} other {These files are too large}}",
         "tooManyBody": "{max} at most: {files} left out.",
-        "tooManyTitle": "Too many files"
+        "tooManyTitle": "Too many files",
+        "computers": "Computers",
+        "offline": "offline"
     },
     "desktop": {
         "connecting": "Connecting to the screen…",

@@ -134,7 +134,8 @@
     },
     "mentions": {
         "coworkers": "Coworkers",
-        "skills": "Skills"
+        "skills": "Skills",
+        "computers": "Computers"
     },
     "paidSources": {
         "count": "{count, plural, one {# source} other {# sources}}",

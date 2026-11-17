@@ -16,7 +16,7 @@ import { AttachmentStrip } from './AttachmentStrip'
 import { imageAttachment, type ComposerAttachment } from './attachments'
 import { AttachMenu, CONTROL, ModelChip, RoundButton, TargetPicker } from './ComposerControls'
 import { MentionSuggestions } from './MentionSuggestions'
-import { insertAtCaret, insertMention, mentionItems, mentionQueryAt, type MentionAgent, type MentionItem } from './mentions'
+import { insertAtCaret, insertMention, mentionItems, mentionQueryAt, type MentionAgent, type MentionComputer, type MentionItem } from './mentions'
 import { useAttachmentPicker } from './useAttachmentPicker'
 import { useVoiceMessage, type VoiceSender } from './useVoiceMessage'
 import { VoiceRecorderBar } from './VoiceRecorderBar'
@@ -43,12 +43,13 @@ type ComposerProps = {
     // What `/` and `@` offer, as on the web: none of either leaves its menu shut.
     skills?: SkillSummary[]
     mentionAgents?: MentionAgent[]
+    mentionComputers?: MentionComputer[]
     autoFocus?: boolean
     ref?: Ref<ComposerHandle>
 }
 
 // A pill at rest, a card once in use (focused, holding text or attachments, or listening).
-export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], autoFocus, ref }: ComposerProps) {
+export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], mentionComputers = [], autoFocus, ref }: ComposerProps) {
     const theme = useTheme()
     const glass = useGlassStyle()
     const [focused, setFocused] = useState(Boolean(autoFocus))
@@ -68,7 +69,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     const inputText = { paddingHorizontal: expanded ? spacing.xs : canAttach ? 0 : spacing.sm, paddingVertical: (CONTROL - LINE_HEIGHT) / 2, fontFamily: fonts.regular, fontSize: 16, lineHeight: LINE_HEIGHT } as const
 
     const mention = focused && !recording ? mentionQueryAt(value, Math.min(caret, value.length)) : null
-    const suggestions = mention ? mentionItems(mention, mentionAgents, skills) : []
+    const suggestions = mention ? mentionItems(mention, mentionAgents, skills, mentionComputers) : []
 
     useEffect(() => {
         if (pendingCaret.current === null) return
