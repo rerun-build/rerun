@@ -15,6 +15,7 @@ import followups
 import gatefiles
 import holds
 import inboxsort
+import instructions
 import plancheck
 import planners
 import planning
@@ -51,6 +52,7 @@ MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
 ROOM_HOLD_MAX_S, ROOM_PROBE_S, ROOM_PROBLEM_ROW = 60 * 60, 3 * 60, 3
 CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:[ \t]+.*\n)*?[ \t]+File \"/data/tools/(?:factory|factory-[0-9a-f]+)/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
+WT_NEW_FAULT = re.compile(r"(?is)(?=.*\bwt new\b)(?!.*\bplan marker\b).*\b(?:cannot|could not|crash\w*|fail\w*|refus\w*)\b")
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 MAX_TAKES = 3
@@ -410,6 +412,7 @@ class Dispatcher:
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
         self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
+        self.instructions = instructions.Station(cfg, self.store, account, gh, now, log)
         self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
@@ -474,7 +477,7 @@ class Dispatcher:
         return True
 
     def running(self):
-        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")] + self.resolver.running(self)
+        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")] + self.resolver.running(self) + self.instructions.running()
 
     def unresolved(self):
         return {j["agent"] for j in self.jobs() if j["state"] not in END and j.get("agent") and j.get("sending") and not j.get("run")}
@@ -1223,7 +1226,7 @@ class Dispatcher:
         room = clocks.room(refused)
         if room:
             self.room_hold(j, room)
-        fault = CHECKOUT_FAULT.search(text) if j["state"] in ("building", "fixing") else None
+        fault = (CHECKOUT_FAULT.search(text) or WT_NEW_FAULT.search(why or "")) if j["state"] in ("building", "fixing") else None
         if fault:
             lines = [l for l in text.splitlines() if l.strip()][-12:]
             j["checkout_failed"] = ("%s\nlast lines:\n%s" % (fault.group(0).strip()[:300], "\n".join(lines)))[:1500]
@@ -1320,6 +1323,13 @@ class Dispatcher:
             return
         if self.cfg.get("proof") and j.get("proved") != j["head"]:
             return self.to(j, "proof_wait", "checks green at %s, waiting for a prover" % j["head"][:7])
+        n = self.dev_hold(j)
+        if n is not None:
+            if not j.get("dev_hold"):
+                j["dev_hold"] = True
+                self.save(j, "dev is red (problem #%s): no merge until it is green" % n)
+            return
+        j.pop("dev_hold", None)
         try:
             self.gh(["pr", "merge", str(j["pr"]), "-R", self.repo, "--merge", "--match-head-commit", j["head"], "--delete-branch"])
         except Error:
@@ -1331,6 +1341,12 @@ class Dispatcher:
                 return self.end(j, "failed", "merge of #%s at %s refused %d times" % (j["pr"], j["head"][:7], tries))
         j["own_merge"] = True
         self.end(j, "merged", "#%s at %s" % (j["pr"], j["head"][:7]))
+
+    def dev_hold(self, j):
+        r = self.resolver.records(self).get("dev red")
+        if r is None or r.get("filed") == j["issue"]:
+            return None
+        return r.get("issue")
 
     def dev_results(self):
         for j in self.jobs():
@@ -1513,6 +1529,11 @@ class Dispatcher:
         except Exception as e:
             clean = False
             log("-", "acceptance: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.instructions.once(self.beats, self.running())
+        except Exception as e:
+            clean = False
+            log("-", "instructions: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):

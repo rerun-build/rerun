@@ -40,6 +40,7 @@ class World:
         self.commits, self.dev_runs = [], []
         self.merge_sha = "feedface12345678"
         self.open_children, self.closed = [], []
+        self.souls, self.soul_updates = {}, []
 
     @staticmethod
     def goal_ok(goal):
@@ -77,6 +78,12 @@ class World:
         if tool == "list_runs":
             return [] if self.hide_runs else [{"runId": r, "status": "running", "startedAt": iso(self.sent_at[r])}
                                               for r, a in reversed(self.order) if a == args["agentId"]]
+        if tool == "get_agent":
+            return {"id": args["agentId"], "soul": self.souls.get(args["agentId"])}
+        if tool == "update_agent":
+            self.souls[args["agentId"]] = args["soul"]
+            self.soul_updates.append((args["agentId"], args["soul"]))
+            return {"id": args["agentId"], "soul": args["soul"]}
         return dict(self.runs[args["runId"]], runId=args["runId"])
 
     def rows(self, sql, *args):
@@ -156,6 +163,9 @@ class World:
             return json.dumps(self.open_children)
         if a[:2] == ["issue", "list"] and "Factory follow-ups inbox in:title" in a:
             return json.dumps([{"number": p["number"], "title": p["title"]} for p in self.problems if p["state"] == "OPEN"])
+        if a[:2] == ["issue", "list"] and "--label" in a and a[a.index("--label") + 1] == "instructions":
+            return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"]} for i in self.issues
+                               if "instructions" in i.get("labels", []) and i.get("state", "OPEN") == "OPEN"])
         if a[:2] == ["issue", "list"] and "--label" not in a and "--search" not in a and any(i.get("labels") for i in self.issues):
             return json.dumps([{"number": i["number"], "title": i["title"], "labels": i["labels"], "createdAt": i.get("createdAt", "")}
                                for i in self.issues if i.get("labels")])
@@ -169,6 +179,9 @@ class World:
                                "comments": [{"body": c} for c in i["comments"]]})
         if a[:2] == ["issue", "close"]:
             self.closed.append((int(a[2]), a[a.index("--comment") + 1]))
+            for i in self.issues:
+                if i["number"] == int(a[2]):
+                    i["state"] = "CLOSED"
             return ""
         if a[:2] == ["issue", "comment"]:
             self.issue(a[2])["comments"].append(a[a.index("--body") + 1])
