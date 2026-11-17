@@ -199,6 +199,13 @@ class AutoInstall(T.FactoryCase):
         code, out = self.run_u()
         self.assertIn("TOOLS current at %s" % self.good[:8], out)
 
+    def test_without_a_key_file_setting_the_tools_still_update(self):
+        with mock.patch.dict(os.environ):
+            del os.environ["FACTORY_JEV_KEYFILE"]
+            code, out = self.run_u()
+        self.assertEqual(code, 0, out)
+        self.assertIn("TOOLS installed %s" % self.good[:8], out)
+
     def test_a_commit_that_fails_to_install_is_skipped_and_the_current_copy_stays(self):
         self.run_u()
         self.green = self.bad
