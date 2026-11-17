@@ -23,6 +23,12 @@ Apps are installed **per coworker**, not per Box and not per workspace. Two cowo
   </Tab>
 </Tabs>
 
+## Tools load when the coworker needs them
+
+Every tool an app brings is described to the model on each step of a run, which costs tokens whether the coworker calls it or not. When a coworker's apps add up to a large set of tools, it stops carrying them all. It first looks for the tools the task needs, a step the chat shows as **Find Tools**, then calls them as usual. A tool it already used in a conversation stays at hand for the next message.
+
+This applies to a coworker running on the Rerun model or on an API key. On a Claude or ChatGPT subscription, the subscription's own client loads the apps' tools itself.
+
 ## How an app authenticates
 
 A service can offer several ways to connect, and you pick one at install time.
