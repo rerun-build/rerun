@@ -1,6 +1,7 @@
 import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
 import acceptance
+import affinity
 import backlog
 import briefs
 import ciwait
@@ -490,23 +491,47 @@ class Dispatcher:
             why = strikes.held(self.store, self.now()).get(agent, {}).get("why")
             log(j["issue"], "coworker %s held until %s: %s" % (self.names.get(agent, agent[:8]), iso(until), why))
 
-    def free(self, worker):
+    def free(self, worker, j=None):
         skip = self.unresolved() | self.held_ids()
         t = pools.types(self.cfg).get(worker)
         if t is None:
             return None
         cfg = {"types": {worker: dict(t, coworkers=[c for c in t["coworkers"] if c["id"] not in skip])}}
-        return pools.pick_copy(cfg, worker, self.running())
+        if j is None:
+            return pools.pick_copy(cfg, worker, self.running())
+        return self.warm_pick(j, pools.free_copies(cfg, worker, self.running()))
+
+    def cache_kind(self, agent):
+        for t in (self.cfg.get("types") or {}).values():
+            for c in t.get("coworkers", []):
+                if c.get("id") == agent:
+                    return c.get("cache", "subscription")
+        return "subscription"
+
+    def warm_pick(self, j, free):
+        if not free:
+            return None
+        ids = set(free)
+        warm = [(v[1], (c, v[0])) for c, v in (j.get("warm") or {}).items() if (c, v[0]) in ids]
+        last_end, last = max(warm) if warm else (None, None)
+        life = affinity.cache_life(self.cache_kind(last[0]) if last else "subscription", self.cfg.get("cache_life"))
+        return affinity.pick(free, last, last_end, self.now(), life)
 
     def free_prover(self, j):
         skip = self.unresolved() | self.held_ids() | {j.get("builder"), j.get("reviewer")}
-        return pools.pick_copy({"types": {"reviewer": t}}, "reviewer", self.running(), exclude=skip) if (t := pools.types(self.cfg).get("reviewer")) is not None else None
+        t = pools.types(self.cfg).get("reviewer")
+        if t is None:
+            return None
+        return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
 
-    def free_copy_of(self, agent):
+    def free_copy_of(self, agent, j=None):
         mine = [c for t in pools.types(self.cfg).values() for c in t["coworkers"] if c["id"] == agent]
         if not mine or agent in self.unresolved():
             return None
-        got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
+        if j is None:
+            got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
+            return got[1] if got else None
+        got = self.warm_pick(j, pools.free_copies({"types": {"x": {"coworkers": mine}}}, "x", self.running()))
         return got[1] if got else None
 
     def inbox(self):
@@ -879,6 +904,7 @@ class Dispatcher:
         r = self.account("get_run", {"agentId": j["agent"], "runId": j["run"]})
         if r.get("status") == "running":
             return self.clock_check(j, r)
+        j.setdefault("warm", {})[j["agent"]] = [j["copy"], self.now()]
         self.record_tokens(j, r)
         if r.get("status") == "done":
             self.strike(j, True)
@@ -1055,7 +1081,7 @@ class Dispatcher:
         elif st == "review_wait":
             if self.conflicts(j):
                 return
-            got = self.free("reviewer")
+            got = self.free("reviewer", j)
             if not got or not self.take(j):
                 return
             r = got[0]
@@ -1088,7 +1114,7 @@ class Dispatcher:
             else:
                 self.end(j, "rejected", verdict[:200] or last_line(out))
         elif st == "fix_wait":
-            copy = self.free_copy_of(j["builder"])
+            copy = self.free_copy_of(j["builder"], j)
             if copy is not None and self.take(j):
                 self.start(j, j["builder"], "fix of #%s" % j["pr"], "fixing", copy=copy)
         elif st == "fixing":
