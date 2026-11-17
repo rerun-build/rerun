@@ -1,5 +1,6 @@
 import os, shutil, subprocess, sys, tempfile
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
 import mirror as M
 import refresh

@@ -1,4 +1,4 @@
-import fcntl, os, signal, subprocess, sys, textwrap, time, unittest
+import fcntl, os, re, signal, subprocess, sys, textwrap, time, unittest
 from unittest import mock
 
 import test_factory as T
@@ -265,3 +265,18 @@ class LaunchedAsTheWrapperDoes(unittest.TestCase):
         r = subprocess.run([sys.executable, "-I", script], cwd="/", capture_output=True, text=True)
         self.assertNotIn("ModuleNotFoundError", r.stderr)
         self.assertEqual((r.returncode, r.stdout.strip()), (2, "usage: mirror refresh <repo> | mirror check <repo>"))
+
+    def test_every_wrapped_script_loads_from_any_folder_under_isolated_python(self):
+        here = os.path.dirname(os.path.abspath(__file__))
+        load = "import importlib.util, sys; s = importlib.util.spec_from_file_location('tool', sys.argv[1]); s.loader.exec_module(importlib.util.module_from_spec(s))"
+        scripts = set()
+        for name in sorted(os.listdir(os.path.join(here, "bin"))):
+            with open(os.path.join(here, "bin", name)) as f:
+                scripts.update(re.findall(r"/data/tools/factory/(\w+\.py)", f.read()))
+        self.assertIn("mirror.py", scripts)
+        failed = {}
+        for script in sorted(scripts):
+            r = subprocess.run([sys.executable, "-I", "-c", load, os.path.join(here, script)], cwd="/", capture_output=True, text=True)
+            if "ModuleNotFoundError" in r.stderr or "ImportError" in r.stderr:
+                failed[script] = r.stderr.strip().splitlines()[-1]
+        self.assertEqual(failed, {})
