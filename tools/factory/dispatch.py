@@ -553,11 +553,13 @@ class Dispatcher:
         return affinity.pick(free, last, last_end, self.now(), life)
 
     def free_prover(self, j):
-        skip = self.unresolved() | self.held_ids() | {j.get("builder"), j.get("reviewer")}
+        judged = {j.get("builder"), j.get("reviewer"), (j.get("first_accept") or {}).get("by")}
+        skip = self.unresolved() | self.held_ids() | judged
         t = pools.types(self.cfg).get("reviewer")
         if t is None:
             return None
-        return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
+        pool = "acceptor" if all(c["id"] in judged for c in t["coworkers"]) else "reviewer"
+        return self.warm_pick(j, pools.free_copies(self.cfg, pool, self.running(), exclude=skip))
 
     def free_second(self, j, first):
         skip = self.unresolved() | self.held_ids() | {first}
