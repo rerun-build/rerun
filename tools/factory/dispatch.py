@@ -7,6 +7,7 @@ import clocks
 import control
 import cutshape
 import digest
+import escapes
 import failures
 import followups
 import holds
@@ -1464,8 +1465,31 @@ class Dispatcher:
         except Exception as e:
             log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.note_problems(known)
+        try:
+            self.escapes_pass()
+        except Exception as e:
+            clean = False
+            log("-", "escapes: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.report_line()
         self.beat_end(clean)
+
+    def escapes_pass(self):
+        if self.beats % escapes.EVERY:
+            return
+        now = self.now()
+        merged = []
+        for j in self.jobs():
+            if j["state"] == "merged" and j.get("merged_at") is None:
+                j["merged_at"] = escapes.merged_at(self.store, j)
+            if escapes.in_window(j, now):
+                merged.append(j)
+        if not merged:
+            return
+        open_numbers = {int(i["number"]) for i in json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json", "number", "--limit", "1000"]) or "[]")}
+        records = self.resolver.records(self)
+        for n, by in escapes.find(merged, open_numbers, records, now):
+            if escapes.record(self.store, n, by, now):
+                log(n, "escaped defect: %s" % by)
 
     def spent(self):
         for key, r in self.resolver.records(self).items():
