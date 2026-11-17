@@ -161,7 +161,7 @@ async function reportChatRun(workspaceId: number, agentId: string, notification:
 async function mirrorSession(supabase: ServiceRoleClient, workspaceId: number, agentId: string, payload: NotificationPayload): Promise<void> {
     if (!payload.sessionId) return
     try {
-        const { data: origin } = payload.originAgentId ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, engine_agent_id: payload.originAgentId }) : { data: null }
+        const { data: origin } = payload.originAgentId ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, kind: 'coworker', engine_agent_id: payload.originAgentId }) : { data: null }
         await ensureSessionRow(agentId, payload.sessionId, payload.title ?? 'Scheduled run', { status: 'working', source: (payload.source ?? 'schedule') as SessionSource, originAgentId: origin?.id ?? null })
     } catch (err) {
         console.error('[notification] failed to create session', err)

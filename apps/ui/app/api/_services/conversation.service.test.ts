@@ -325,7 +325,7 @@ describe('adoptEngineSession', () => {
         expect(listSessions).not.toHaveBeenCalled()
 
         expect(vi.mocked(selectMaybeSingle).mock.calls[1][1]).toBe('agents')
-        expect(vi.mocked(selectMaybeSingle).mock.calls[1][3]).toEqual({ engine_agent_id: 'engine-origin', workspace_id: 7 })
+        expect(vi.mocked(selectMaybeSingle).mock.calls[1][3]).toEqual({ engine_agent_id: 'engine-origin', workspace_id: 7, kind: 'coworker' })
         expect(createSessionRow).toHaveBeenCalledWith('agent-1', 'es-1', 'Title', 'origin-agent', 'agent')
     })
 

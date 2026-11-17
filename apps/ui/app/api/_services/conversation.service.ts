@@ -56,7 +56,7 @@ export async function listAgentSessions(agentId: string, actor?: Actor): Promise
 
     const byEngineId = new Map<string, { id: string; name: string }>()
     if (engineOriginIds.length > 0) {
-        const { data } = await selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'name'] as const, { workspace_id: caller.workspaceId, engine_agent_id: { in: engineOriginIds } })
+        const { data } = await selectMany(supabase, 'agents', ['id', 'engine_agent_id', 'name'] as const, { workspace_id: caller.workspaceId, kind: 'coworker', engine_agent_id: { in: engineOriginIds } })
         for (const a of data ?? []) if (a.engine_agent_id) byEngineId.set(a.engine_agent_id, { id: a.id, name: a.name })
     }
 
@@ -341,7 +341,7 @@ export async function adoptEngineSession(agentId: string, engineSessionId: strin
 
     let originAgentId: string | null = null
     if (session?.originAgentId) {
-        const { data: origin } = await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: session.originAgentId, workspace_id: workspaceId })
+        const { data: origin } = await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: session.originAgentId, workspace_id: workspaceId, kind: 'coworker' })
         originAgentId = origin?.id ?? null
     }
 

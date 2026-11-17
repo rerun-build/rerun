@@ -72,10 +72,11 @@ export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; ent
         }
     }, [enabled])
 
-    useRealtimeSubscription('foreman_conversations', {
+    // Only this person's conversations with the Chief of Staff carry their id as owner.
+    useRealtimeSubscription('sessions', {
         channelId: `foreman-conversations-${user?.id ?? 'none'}`,
         enabled: enabled && !!user?.id,
-        filter: { column: 'user_id', value: user?.id ?? '' },
+        filter: { column: 'owner_id', value: user?.id ?? '' },
         onInsert: refresh,
         onUpdate: refresh,
         onResync: refresh,

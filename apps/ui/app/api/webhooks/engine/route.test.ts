@@ -85,6 +85,7 @@ function resolve(table: string, calls: readonly SupabaseCall[]) {
     }
     if (table === 'rpc:open_notification_incident') return { data: incidentOpens }
     if (table === 'rpc:resolve_notification_incidents') return { data: resolvedUsers }
+    if (table === 'rpc:ensure_foreman_agent') return { data: 'chief-of-staff' }
     if (table === 'workspace_getting_started') return { data: [] }
     return undefined
 }
@@ -413,13 +414,15 @@ describe('POST /api/webhooks/engine', () => {
             expect(sendIncidentResolvedEmail).not.toHaveBeenCalled()
         })
 
-        it('treats a foreman event as a no-op', async () => {
+        it('only moves where a conversation with the Chief of Staff stands, notifying nobody', async () => {
             const response = await POST(request(notification({ agentId: FOREMAN_AGENT_ID, event: 'agent.message.completed', kind: 'done' })))
 
             expect(response.status).toBe(202)
             expect(db.chainsOn('agents')).toHaveLength(0)
             expect(db.chainsOn('notifications')).toHaveLength(0)
-            expect(db.chainsOn('sessions')).toHaveLength(0)
+            const [write] = db.writes('sessions')
+            expect(write.payload).toEqual({ status: 'idle' })
+            expect(db.chainsOn('sessions')[0].map(call => [call.method, ...call.args])).toEqual(expect.arrayContaining([['eq', 'agent_id', 'chief-of-staff'], ['eq', 'engine_session_id', 'engine-session']]))
         })
     })
 })

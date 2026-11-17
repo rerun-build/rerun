@@ -70,7 +70,7 @@ export async function followAuthorOfCreatedTask(workspaceId: number, event: Engi
         const supabase = createServiceRoleClient()
         const [{ data: member }, { data: agent }] = await Promise.all([
             selectMaybeSingle(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId, user_id: authorId }),
-            selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, engine_agent_id: event.agentId }),
+            selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, kind: 'coworker', engine_agent_id: event.agentId }),
         ])
         if (member && agent) await followCoworker(member.user_id, agent.id)
     } catch (err) {

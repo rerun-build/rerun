@@ -2373,6 +2373,7 @@ export type Database = {
           last_message_from: string | null
           origin_agent_id: string | null
           outcome: Database["public"]["Enums"]["session_outcome"] | null
+          owner_id: string | null
           source: Database["public"]["Enums"]["session_source"]
           status: Database["public"]["Enums"]["session_status"]
           title: string
@@ -2392,6 +2393,7 @@ export type Database = {
           last_message_from?: string | null
           origin_agent_id?: string | null
           outcome?: Database["public"]["Enums"]["session_outcome"] | null
+          owner_id?: string | null
           source?: Database["public"]["Enums"]["session_source"]
           status?: Database["public"]["Enums"]["session_status"]
           title?: string
@@ -2411,6 +2413,7 @@ export type Database = {
           last_message_from?: string | null
           origin_agent_id?: string | null
           outcome?: Database["public"]["Enums"]["session_outcome"] | null
+          owner_id?: string | null
           source?: Database["public"]["Enums"]["session_source"]
           status?: Database["public"]["Enums"]["session_status"]
           title?: string
@@ -2436,6 +2439,13 @@ export type Database = {
             columns: ["origin_agent_id"]
             isOneToOne: false
             referencedRelation: "agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -3843,6 +3853,10 @@ export type Database = {
           points: Json
         }[]
       }
+      ensure_foreman_agent: {
+        Args: { p_workspace_id: number }
+        Returns: string
+      }
       grant_rerun_credit_purchase: {
         Args: {
           p_micros: number
@@ -3879,6 +3893,7 @@ export type Database = {
           summary: string
         }[]
       }
+      member_foreman_agent_ids: { Args: never; Returns: string[] }
       open_notification_incident: {
         Args: { p_source_key: string; p_user_id: string }
         Returns: boolean

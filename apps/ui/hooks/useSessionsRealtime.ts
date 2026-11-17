@@ -17,7 +17,10 @@ export function useSessionsRealtime(enabled: boolean) {
             void useBoardStore.getState().reconcileSessions()
             void useCoworkerPreviewsStore.getState().reload()
         },
+        // A conversation with the Chief of Staff has an owner and is not the board's: its column
+        // follows it on its own.
         onInsert: row => {
+            if (row.owner_id) return
             useCoworkerPreviewsStore.getState().applySession(row)
             _onSessionInsert({
                 id: row.id,
@@ -27,6 +30,7 @@ export function useSessionsRealtime(enabled: boolean) {
             })
         },
         onUpdate: row => {
+            if (row.owner_id) return
             useCoworkerPreviewsStore.getState().applySession(row)
             _onSessionUpdate({
                 id: row.id,

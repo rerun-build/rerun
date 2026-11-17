@@ -17,13 +17,17 @@ import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
 import { isKickoffText } from '@/lib/foreman/kickoff-marker'
 import { stripVoiceMarker } from '@/lib/voice/marker'
+import { foremanAgentId } from './agent-row'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
-// One row per conversation. A hub conversation is rewritten whole at the end of each turn: onFinish
-// hands back the updated UIMessage list, and replacing it is both simpler and more faithful than
-// diffing parts that the SDK may have merged. An engine conversation keeps its transcript on the
-// engine, and its row only says whose it is and where to read it.
+// An engine conversation is a row of `sessions`, like a coworker's, on the Chief of Staff's row of
+// `agents`, owned by the member who has it: everyone talks to the same Chief of Staff with their own
+// rights, so each keeps their own General and threads. Its transcript stays on the engine.
+//
+// A hub conversation, the onboarding's, stays in `foreman_conversations`: rewritten whole at the end
+// of each turn, since onFinish hands back the updated UIMessage list and replacing it is both simpler
+// and more faithful than diffing parts that the SDK may have merged.
 
 // What only an engine conversation has: its runs live on the engine, so the gauge, the failure of a
 // run that died without answering and the run still in flight are read back with the transcript.
@@ -33,12 +37,21 @@ export type ForemanConversation = { sessionId: string; title: string | null; bac
 
 const NO_RUN_STATE: ForemanRunState = { usage: null, lastError: null, activeRunId: null }
 
-const CONVERSATION_COLUMNS = ['id', 'title', 'messages', 'backend', 'engine_session_id', 'kind'] as const
+const HUB_CONVERSATION_COLUMNS = ['id', 'title', 'messages', 'kind'] as const
+const ENGINE_CONVERSATION_COLUMNS = ['id', 'title', 'engine_session_id', 'kind'] as const
 
-type ConversationRow = Pick<Database['public']['Tables']['foreman_conversations']['Row'], (typeof CONVERSATION_COLUMNS)[number]>
+type HubConversationRow = Pick<Database['public']['Tables']['foreman_conversations']['Row'], (typeof HUB_CONVERSATION_COLUMNS)[number]>
+type EngineConversationRow = Pick<Database['public']['Tables']['sessions']['Row'], (typeof ENGINE_CONVERSATION_COLUMNS)[number]>
 
 type ConversationUpdate = Database['public']['Tables']['foreman_conversations']['Update']
 type ConversationInsert = Database['public']['Tables']['foreman_conversations']['Insert']
+type SessionInsert = Database['public']['Tables']['sessions']['Insert']
+type SessionUpdate = Database['public']['Tables']['sessions']['Update']
+
+// The member's conversations with the Chief of Staff of their workspace.
+async function ownedBy(ctx: WorkspaceContext): Promise<{ agent_id: string; owner_id: string }> {
+    return { agent_id: await foremanAgentId(ctx.workspace.id), owner_id: ctx.userId }
+}
 
 const UNIQUE_VIOLATION = '23505'
 
@@ -74,32 +87,35 @@ function withMessageIds(sessionId: string, messages: UIMessage[]): UIMessage[] {
 // the session itself.
 export async function loadForemanConversation(ctx: WorkspaceContext, backend: ForemanBackend): Promise<ForemanConversation | null> {
     const supabase = createServiceRoleClient()
-    const owner = { workspace_id: ctx.workspace.id, user_id: ctx.userId, backend }
-    const data =
-        backend === 'engine'
-            ? (await selectMaybeSingle(supabase, 'foreman_conversations', CONVERSATION_COLUMNS, { ...owner, kind: 'general' })).data
-            : (await selectMany(supabase, 'foreman_conversations', CONVERSATION_COLUMNS, owner, { column: 'updated_at', ascending: false }, 1)).data?.[0]
-    return data ? readConversation(ctx, data) : null
+    if (backend === 'engine') {
+        const { data } = await selectMaybeSingle(supabase, 'sessions', ENGINE_CONVERSATION_COLUMNS, { ...(await ownedBy(ctx)), kind: 'general' })
+        return data ? readEngineConversation(ctx, data) : null
+    }
+    const { data } = await selectMany(supabase, 'foreman_conversations', HUB_CONVERSATION_COLUMNS, { workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'hub' }, { column: 'updated_at', ascending: false }, 1)
+    return data?.[0] ? readHubConversation(data[0]) : null
 }
 
 // One conversation of the caller, General or a thread, with what it takes to reopen it.
 export async function loadForemanConversationById(ctx: WorkspaceContext, sessionId: string): Promise<ForemanConversation | null> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'foreman_conversations', CONVERSATION_COLUMNS, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId })
-    return data ? readConversation(ctx, data) : null
+    const supabase = createServiceRoleClient()
+    const { data: session } = await selectMaybeSingle(supabase, 'sessions', ENGINE_CONVERSATION_COLUMNS, { id: sessionId, ...(await ownedBy(ctx)) })
+    if (session) return readEngineConversation(ctx, session)
+    const { data: hub } = await selectMaybeSingle(supabase, 'foreman_conversations', HUB_CONVERSATION_COLUMNS, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'hub' })
+    return hub ? readHubConversation(hub) : null
 }
 
-async function readConversation(ctx: WorkspaceContext, data: ConversationRow): Promise<ForemanConversation> {
-    const backend: ForemanBackend = data.backend === 'engine' ? 'engine' : 'hub'
-    const base = { sessionId: data.id, title: data.title, backend, kind: data.kind }
-    if (backend === 'engine') {
-        if (!data.engine_session_id) return { ...base, messages: [], ...NO_RUN_STATE }
-        const conn = await getWorkspaceConnection(ctx.workspace.id)
-        // Each part fails on its own: a transcript with no gauge beats no transcript at all, and an
-        // engine that predates the foreman's run routes answers 403 to the second read.
-        const [messages, runState] = await Promise.all([readEngineTranscript(conn, data.engine_session_id), readRunState(conn, data.engine_session_id).catch(() => NO_RUN_STATE)])
-        return { ...base, messages, ...runState }
-    }
-    return { ...base, messages: withMessageIds(data.id, dedupeMessagesById((data.messages ?? []) as unknown as UIMessage[])), ...NO_RUN_STATE }
+async function readEngineConversation(ctx: WorkspaceContext, data: EngineConversationRow): Promise<ForemanConversation> {
+    // General is named by the clients, which show their own words while it has no title of its own.
+    const base = { sessionId: data.id, title: data.kind === 'general' ? null : data.title, backend: 'engine' as const, kind: data.kind }
+    const conn = await getWorkspaceConnection(ctx.workspace.id)
+    // Each part fails on its own: a transcript with no gauge beats no transcript at all, and an
+    // engine that predates the foreman's run routes answers 403 to the second read.
+    const [messages, runState] = await Promise.all([readEngineTranscript(conn, data.engine_session_id), readRunState(conn, data.engine_session_id).catch(() => NO_RUN_STATE)])
+    return { ...base, messages, ...runState }
+}
+
+function readHubConversation(data: HubConversationRow): ForemanConversation {
+    return { sessionId: data.id, title: data.title, backend: 'hub', kind: data.kind, messages: withMessageIds(data.id, dedupeMessagesById((data.messages ?? []) as unknown as UIMessage[])), ...NO_RUN_STATE }
 }
 
 const LIST_COLUMNS = ['id', 'kind', 'title', 'status', 'first_message', 'engine_session_id', 'created_at', 'updated_at'] as const
@@ -107,7 +123,7 @@ const LIST_COLUMNS = ['id', 'kind', 'title', 'status', 'first_message', 'engine_
 // As many as a coworker's General shows.
 const CONVERSATION_LIST_LIMIT = 200
 
-type ListedRow = Pick<Database['public']['Tables']['foreman_conversations']['Row'], (typeof LIST_COLUMNS)[number]>
+type ListedRow = Pick<Database['public']['Tables']['sessions']['Row'], (typeof LIST_COLUMNS)[number]>
 
 // The same shape as a coworker's conversations, so General draws its threads with the same parts on
 // the web and in the app. Only what the column needs to tell them apart: no other agent opens a
@@ -116,8 +132,8 @@ export function foremanConversationOf(row: ListedRow): Conversation {
     return {
         id: row.id,
         agentId: FOREMAN_AGENT_ID,
-        engineSessionId: row.engine_session_id ?? '',
-        title: row.kind === 'general' ? GENERAL_SESSION_TITLE : row.title || seedSessionTitle(row.first_message),
+        engineSessionId: row.engine_session_id,
+        title: row.kind === 'general' ? GENERAL_SESSION_TITLE : row.title,
         status: row.status,
         source: 'dashboard',
         updatedAt: row.updated_at,
@@ -133,7 +149,7 @@ export function foremanConversationOf(row: ListedRow): Conversation {
 
 // General and its threads, the latest first: the onboarding's conversation, on the hub, is not one.
 export async function listForemanConversations(ctx: WorkspaceContext): Promise<Conversation[]> {
-    const { data } = await selectMany(createServiceRoleClient(), 'foreman_conversations', LIST_COLUMNS, { workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'engine' }, { column: 'updated_at', ascending: false }, CONVERSATION_LIST_LIMIT)
+    const { data } = await selectMany(createServiceRoleClient(), 'sessions', LIST_COLUMNS, await ownedBy(ctx), { column: 'updated_at', ascending: false }, CONVERSATION_LIST_LIMIT)
     return (data ?? []).map(foremanConversationOf)
 }
 
@@ -170,16 +186,17 @@ export async function cancelForemanSessionRuns(ctx: WorkspaceContext, sessionId:
 // exists on the hub side cannot be continued on the engine: it answers 'hub'.
 export async function engineSessionOf(ctx: WorkspaceContext, sessionId: string): Promise<{ backend: ForemanBackend; engineSessionId: string | null } | null> {
     const supabase = createServiceRoleClient()
-    const { data } = await selectMaybeSingle(supabase, 'foreman_conversations', ['backend', 'engine_session_id'] as const, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId })
-    if (!data) return null
-    return { backend: data.backend === 'engine' ? 'engine' : 'hub', engineSessionId: data.engine_session_id }
+    const { data: session } = await selectMaybeSingle(supabase, 'sessions', ['engine_session_id'] as const, { id: sessionId, ...(await ownedBy(ctx)) })
+    if (session) return { backend: 'engine', engineSessionId: session.engine_session_id }
+    const { data: hub } = await selectMaybeSingle(supabase, 'foreman_conversations', ['id'] as const, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'hub' })
+    return hub ? { backend: 'hub', engineSessionId: null } : null
 }
 
 type ForemanGeneral = { id: string; engineSessionId: string | null }
 
 // This person's General, once they have spoken in it.
 export async function findForemanGeneral(ctx: WorkspaceContext): Promise<ForemanGeneral | null> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'foreman_conversations', ['id', 'engine_session_id'] as const, { workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'engine', kind: 'general' })
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'sessions', ['id', 'engine_session_id'] as const, { ...(await ownedBy(ctx)), kind: 'general' })
     return data ? { id: data.id, engineSessionId: data.engine_session_id } : null
 }
 
@@ -194,14 +211,14 @@ export class ForemanGeneralAlreadyOpenError extends Error {
 export async function startEngineConversation(ctx: WorkspaceContext, sessionId: string, engineSessionId: string, firstText: string, kind: SessionKind): Promise<void> {
     const supabase = createServiceRoleClient()
     const seed = stripVoiceMarker(stripAttachmentsRef(firstText)).trim()
-    const { error } = await supabase.from('foreman_conversations').insert<ConversationInsert>({
+    const { error } = await supabase.from('sessions').insert<SessionInsert>({
         id: sessionId,
-        workspace_id: ctx.workspace.id,
-        user_id: ctx.userId,
-        backend: 'engine',
+        ...(await ownedBy(ctx)),
         engine_session_id: engineSessionId,
         kind,
         status: 'working',
+        source: 'dashboard',
+        title: kind === 'general' ? GENERAL_SESSION_TITLE : seedSessionTitle(seed),
         first_message: kind === 'general' ? null : seed.slice(0, FIRST_MESSAGE_MAX_CHARS) || null,
     })
     if (error) {
@@ -217,7 +234,7 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
     if (kind === 'general' || !seed) return
     void generateSessionTitle(seed)
         .then(async title => {
-            if (title) await supabase.from('foreman_conversations').update<ConversationUpdate>({ title }).eq('id', sessionId)
+            if (title) await supabase.from('sessions').update<SessionUpdate>({ title }).eq('id', sessionId)
         })
         .catch(() => {})
 }
@@ -225,14 +242,14 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
 // What the list of conversations sorts on, so it has to move on every turn.
 export async function touchForemanConversation(sessionId: string): Promise<void> {
     const supabase = createServiceRoleClient()
-    await supabase.from('foreman_conversations').update<ConversationUpdate>({ updated_at: new Date().toISOString(), status: 'working' }).eq('id', sessionId)
+    await supabase.from('sessions').update<SessionUpdate>({ updated_at: new Date().toISOString(), status: 'working' }).eq('id', sessionId).not('owner_id', 'is', null)
 }
 
 // Where a run of the foreman stopped, as its thread shows it in General. The engine names the session
 // and the workspace it reports for, not the member: an engine session belongs to one row only.
 export async function setForemanConversationStatus(workspaceId: number, engineSessionId: string, status: SessionStatus): Promise<void> {
     const supabase = createServiceRoleClient()
-    let query = supabase.from('foreman_conversations').update<ConversationUpdate>({ status }).eq('workspace_id', workspaceId).eq('engine_session_id', engineSessionId)
+    let query = supabase.from('sessions').update<SessionUpdate>({ status }).eq('agent_id', await foremanAgentId(workspaceId)).eq('engine_session_id', engineSessionId)
     // Same guard as a coworker's: the `done` that follows an `info` notification must not clear the
     // acknowledgement it asked for.
     if (status === 'idle') query = query.neq('status', 'awaiting_ack')
@@ -247,7 +264,7 @@ export async function setForemanConversationStatus(workspaceId: number, engineSe
 
 export async function saveForemanConversation(ctx: WorkspaceContext, sessionId: string, messages: UIMessage[]): Promise<void> {
     const supabase = createServiceRoleClient()
-    const { data: existing } = await selectMaybeSingle(supabase, 'foreman_conversations', ['id', 'title'] as const, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId })
+    const { data: existing } = await selectMaybeSingle(supabase, 'foreman_conversations', ['id', 'title'] as const, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'hub' })
 
     const payload = messages as unknown as ConversationUpdate['messages']
 

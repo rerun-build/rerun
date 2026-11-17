@@ -18,8 +18,8 @@ export type RateMessageResult = { ok: true; id: string } | ActionFailure
 export type MessageFeedbackResult = { ok: true } | ActionFailure
 export type SessionFeedbackEntry = { id: string; messageId: string; rating: MessageFeedbackRating }
 
-// Whose conversation the id names: an agent's session, or one of the foreman's on the engine, which
-// has no sessions row and is keyed on its own column.
+// Whose conversation the id names: a coworker's session, or one the caller owns with the Chief of
+// Staff, reached through its owner rather than through a Box.
 export type FeedbackScope = 'agent' | 'foreman'
 
 const rateSchema = z.object({
@@ -96,7 +96,9 @@ async function reachableFeedbackWorkspaceId(id: string): Promise<number> {
 async function foremanFeedbackOwner(ctx: WorkspaceContext, conversationId: string): Promise<FeedbackOwner | null> {
     if ((await engineSessionOf(ctx, conversationId))?.backend !== 'engine') return null
     const transcript = await readForemanEngineMessages(ctx, conversationId).catch(() => [])
-    return { keys: { foreman_conversation_id: conversationId }, onConflict: 'foreman_conversation_id,message_id', transcript }
+    // `foreman_conversation_id` too, while the table it points to is kept in step: the back office
+    // and a hub rolled back to the previous release read the vote there.
+    return { keys: { session_id: conversationId, foreman_conversation_id: conversationId }, onConflict: 'session_id,message_id', transcript }
 }
 
 export async function updateMessageFeedbackAction(input: z.input<typeof detailsSchema>): Promise<MessageFeedbackResult> {
@@ -133,6 +135,6 @@ export async function fetchSessionFeedbackAction(sessionId: string, scope: Feedb
     } catch {
         return []
     }
-    const { data } = await selectMany(createServiceRoleClient(), 'message_feedback', ['id', 'message_id', 'rating'] as const, scope === 'foreman' ? { foreman_conversation_id: sessionId } : { session_id: sessionId })
+    const { data } = await selectMany(createServiceRoleClient(), 'message_feedback', ['id', 'message_id', 'rating'] as const, { session_id: sessionId })
     return (data ?? []).map(row => ({ id: row.id, messageId: row.message_id, rating: row.rating as MessageFeedbackRating }))
 }
