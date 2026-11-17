@@ -14,6 +14,8 @@ TRACE = ("wt new said:\nTraceback (most recent call last):\n  File \"/data/tools
 
 
 LOAD = "TRANSIENT: load: 13.0 on 4 cores, ceiling is 12.0\nBLOCKED: no room"
+NIGHT = ("I could not start the job.\nBLOCKED: plan: `wt new` cannot open the worktree for #5. Every attempt crashes in the sweep step "
+         "because `/data/work/wt/house/r1183` belongs to a repo `house` whose clone `/data/work/repos/house` is missing.")
 
 
 def issue(n):
@@ -77,6 +79,34 @@ class Holds(unittest.TestCase):
         found = self.d.resolver.watch.find([j], {}, {5}, "", self.w.clock, [], "", False)
         self.assertIn("checkout failed #5", found)
         self.assertIn("checkout failed", resolver.KINDS)
+
+    def test_a_builder_that_blames_the_plan_for_a_wt_new_failure_ends_as_a_checkout_fault_not_as_a_returned_plan(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", NIGHT)
+        self.d.once()
+        j = self.job(5)
+        self.assertEqual(j["state"], "blocked")
+        self.assertIn("wt new", j["checkout_failed"])
+        found = self.d.resolver.watch.find([j], {}, {5}, "", self.w.clock, [], "", False)
+        self.assertIn("checkout failed #5", found)
+
+    def test_three_such_reports_in_a_row_hold_all_builds(self):
+        self.make([issue(5), issue(6), issue(7)])
+        self.d.once()
+        for b in ("b1", "b2", "b3"):
+            self.w.finish(b, NIGHT)
+        self.d.once()
+        self.assertEqual(self.hold(), "checkout")
+
+    def test_a_missing_plan_marker_that_wt_new_reports_stays_a_plan_fault(self):
+        self.make([issue(5)])
+        self.d.once()
+        self.w.finish("b1", "BLOCKED: plan: `wt new` refused, o/r#5 has no plan marker, so no worktree was made")
+        self.d.once()
+        j = self.job(5)
+        self.assertEqual(j["state"], "returned")
+        self.assertNotIn("checkout_failed", j)
 
     def test_three_checkout_failures_in_a_row_hold_all_builds(self):
         self.make([issue(5), issue(6), issue(7)])
