@@ -38,6 +38,14 @@ describe('sceneFromSnapshot', () => {
         expect(pod(f, 334)).toBeUndefined()
     })
 
+    it('names the hold that ends last, so the banner says why the line is held', () => {
+        const s = sample()
+        s.holds = [{ kind: 'sign-in renewal', until: '2026-11-14T03:34:40Z' }, { kind: 'checkout', until: '2026-11-14T03:50:00Z' }]
+        expect(sceneFromSnapshot(s, NOW).holdKind).toBe('checkout')
+        expect(sceneFromSnapshot(sample(), NOW).holdKind).toBe('sign-in renewal')
+        expect(sceneFromSnapshot(sample(), LATER).holdKind).toBeUndefined()
+    })
+
     it('holds sending while a hold runs: held, holdLeftMs, queued pods held', () => {
         const during = sceneFromSnapshot(sample(), NOW)
         expect(during.held).toBe(true)

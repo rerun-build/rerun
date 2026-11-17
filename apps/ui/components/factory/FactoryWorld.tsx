@@ -151,7 +151,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
             >
                 <div className="flex items-center gap-3 rounded-full border border-red-500/40 bg-red-500/15 px-4 py-1.5 text-sm text-red-600 shadow-[0_0_24px_rgba(239,68,68,0.35)] backdrop-blur-xl dark:text-red-300">
                     <span className="font-semibold">Line held</span>
-                    <span>sign-in renewal · {Math.ceil(frame.holdLeftMs / 1000)} s left · running builds finish</span>
+                    <span>{frame.holdKind ?? 'sign-in renewal'} · {Math.ceil(frame.holdLeftMs / 1000)} s left · running builds finish</span>
                 </div>
             </div>
         </div>

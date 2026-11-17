@@ -31,7 +31,8 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
 
     const live = snapshot.holds.filter(h => Date.parse(h.until) > now)
     const held = live.length > 0
-    const holdLeftMs = held ? Math.max(...live.map(h => Date.parse(h.until) - now)) : 0
+    const last = live.reduce<(typeof live)[number] | undefined>((a, h) => (!a || Date.parse(h.until) > Date.parse(a.until) ? h : a), undefined)
+    const holdLeftMs = last ? Date.parse(last.until) - now : 0
     const lastBeatMs = now - Date.parse(snapshot.madeAt)
     const notAnswering = lastBeatMs > 2 * BEAT_MS
 
@@ -188,7 +189,7 @@ export function sceneFromSnapshot(snapshot: FactorySnapshot, now: number): Snaps
         tiles: [...tiles, ...copyTiles, ...cabTiles, ...planTiles],
         links: [...belts, ...copyLinks],
         toasts: [],
-        pods, cabinets, plans, rejects, held, holdLeftMs, counts,
+        pods, cabinets, plans, rejects, held, holdLeftMs, ...(last ? { holdKind: last.kind } : {}), counts,
         blocked, cracked, notAnswering, lastBeatMs,
     }
 }
