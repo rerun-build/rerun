@@ -31,15 +31,19 @@ def max_jobs(cfg, worker):
     return None if t is None else t["max_jobs"]
 
 
-def pick_copy(cfg, worker, running, exclude=()):
+def free_copies(cfg, worker, running, exclude=()):
     t = types(cfg).get(worker)
     if t is None:
-        return None
+        return []
+    out = []
     for c in [c for c in t["coworkers"] if c["id"] not in exclude]:
         taken = {1 if k is None else k for i, k in running if i == c["id"]}
         if len([1 for i, _ in running if i == c["id"]]) >= c["runs"]:
             continue
-        copy = next((n for n in range(1, c["runs"] + 1) if n not in taken), None)
-        if copy is not None:
-            return c["id"], copy
-    return None
+        out += [(c["id"], n) for n in range(1, c["runs"] + 1) if n not in taken]
+    return out
+
+
+def pick_copy(cfg, worker, running, exclude=()):
+    got = free_copies(cfg, worker, running, exclude)
+    return got[0] if got else None
