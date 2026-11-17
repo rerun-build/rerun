@@ -189,7 +189,15 @@ def _fit(snap):
     return snap
 
 
-def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planning=None):
+def _run_stats(store, now):
+    since = iso(now - 86400)
+    rows = store.db.execute("SELECT status, seconds FROM fires WHERE status IN ('done','error') AND ended_at >= ?", (since,)).fetchall()
+    took = [r[1] for r in rows if r[1] is not None]
+    return {"since": since, "finished": len(rows), "errors": sum(1 for r in rows if r[0] == "error"),
+            "avgRunS": round(sum(took) / len(took), 1) if took else None}
+
+
+def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planning=None, plan=None):
     names = pools.names(cfg)
     all_jobs = store.jobs()
     live = [j for j in all_jobs if j["state"] not in END]
@@ -214,7 +222,9 @@ def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planni
     snap = {"version": 1, "madeAt": iso(now), "beat": beat, "repo": cfg["repo"],
             "jobs": [_job(store, cfg, names, j) for j in kept], "holds": holds_list, "pools": pool_list,
             "endedToday": ended_today, "epics": _epics(store, kept, read_epic),
-            "digest": digest.build(store, cfg, now)}
+            "digest": digest.build(store, cfg, now), "runStats": _run_stats(store, now)}
+    if plan:
+        snap["plan"] = plan
     if planning:
         snap["planning"] = [_plan(p) for p in planning[:MAX_PLANS]]
     return _fit(snap)

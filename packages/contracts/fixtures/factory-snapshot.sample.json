@@ -19,5 +19,7 @@
     { "type": "researcher", "coworkers": [ { "name": "search", "id": "search-1", "runs": 3, "out": 0 } ] },
     { "type": "designer", "coworkers": [ { "name": "DIETER", "id": "dieter-1", "runs": 1, "out": 0 } ] }
   ],
-  "endedToday": { "merged": 1, "rejected": 0, "blocked": 1, "failed": 0, "returned": 0 }
+  "endedToday": { "merged": 1, "rejected": 0, "blocked": 1, "failed": 0, "returned": 0 },
+  "runStats": { "since": "2026-11-13T03:24:30Z", "finished": 14, "errors": 1, "avgRunS": 161 },
+  "plan": { "weekUsedPercent": 56, "weekResetsAt": "2026-11-17T08:00:00Z", "signInMinutes": 412 }
 }
