@@ -41,6 +41,7 @@ class World:
         self.merge_sha = "feedface12345678"
         self.open_children, self.closed = [], []
         self.souls, self.soul_updates = {}, []
+        self.send_args = []
 
     @staticmethod
     def goal_ok(goal):
@@ -53,6 +54,7 @@ class World:
 
     def account(self, tool, args):
         if tool == "send_message":
+            self.send_args.append(dict(args))
             if "goal" in args and not self.goal_ok(args["goal"]):
                 self.sends.append((args["agentId"], args["message"], args["waitSeconds"]))
                 raise D.Error("account send_message failed: the tool reported an error invalid_goal")

@@ -4,6 +4,7 @@ import acceptance
 import affinity
 import backlog
 import briefs
+import causes
 import ciwait
 import clocks
 import control
@@ -414,6 +415,7 @@ class Dispatcher:
         self.station = planning.Station(cfg, self.store, account, gh, now)
         self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
         self.instructions = instructions.Station(cfg, self.store, account, gh, now, log)
+        self.causes = causes.Station(cfg, self.store, account, gh, now, log)
         self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
@@ -1643,6 +1645,11 @@ class Dispatcher:
         except Exception as e:
             clean = False
             log("-", "escapes: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.causes.once(self.beats, self.running() + [(r["agent"], int(r["copy"])) for r in self.station.live().values() if r.get("agent") and r.get("copy")])
+        except Exception as e:
+            clean = False
+            log("-", "causes: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.report_line()
         self.beat_end(clean)
 

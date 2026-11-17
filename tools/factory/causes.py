@@ -1,8 +1,21 @@
+import datetime
 import json
 import re
 
+import changelog
+import learn
+import pools
+import states
+import tiers
+
 NEW = 10
 DAY_S = 86400
+EVERY = 5
+ASKS = 2
+BOSS = "Boss"
+RECORDS = 2
+TOP = 3
+RUN_LIMIT = 2700
 CUT = 160
 CULPRITS = ("plan prompt", "station brief", "coworker instructions", "setting or clock", "tool", "check", "plan format")
 FORMS = ({"prefix": "CAUSES: ", "rest": "sentence"},)
@@ -140,3 +153,172 @@ def outcome(out, groups):
     if len({r["group"] for r in rows}) != len(rows):
         return bad("two blocks for one group")
     return ("changes", rows, line)
+
+
+JOB = "causes"
+
+
+def iso(t):
+    return datetime.datetime.fromtimestamp(t, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def count(x):
+    return x if isinstance(x, int) and not isinstance(x, bool) and x >= 0 else 0
+
+
+def ended_jobs(store):
+    out = []
+    for r in store.db.execute("SELECT job, state FROM jobs").fetchall():
+        if r["state"] not in states.END:
+            continue
+        rows = [t for t in store.transitions_of(r["job"]) if t["from_state"] != t["to_state"]]
+        if rows:
+            out.append({"job": r["job"], "started": rows[0]["at"], "ended": rows[-1]["at"]})
+    return out
+
+
+def grouped(store):
+    return [{"job": f["job"], "group": group(f)} for f in store.failures()]
+
+
+class Station:
+    def __init__(self, cfg, store, account, gh, now, log):
+        self.cfg = cfg
+        self.store = store
+        self.account = account
+        self.gh = gh
+        self.now = now
+        self.log = log
+        self.repo = cfg["repo"]
+        self.name = (cfg.get("causes") or {}).get("coworker", BOSS)
+        self.pool = pools.types(cfg).get("planner")
+
+    def row(self):
+        return self.store.get_all(JOB)
+
+    def put(self, k, v):
+        self.store.set(JOB, k, v)
+
+    def boss(self):
+        if not self.pool:
+            return None, []
+        mine = next((c for c in self.pool["coworkers"] if c["name"] == self.name), None)
+        others = [c["id"] for c in self.pool["coworkers"] if c["name"] != self.name]
+        return mine, others
+
+    def once(self, beat, running):
+        boss, _ = self.boss()
+        if boss is None:
+            return
+        if self.row().get("state") == "running":
+            return self.poll(self.row())
+        if (beat - 1) % EVERY == 0:
+            self.start(running)
+
+    def records(self, events):
+        found = {}
+        for g, rows in largest(events, TOP):
+            jobs = []
+            for e in reversed(rows):
+                if e["job"].isdigit() and e["job"] not in jobs:
+                    jobs.append(e["job"])
+                if len(jobs) == RECORDS:
+                    break
+            found[g] = [learn.record(self.store, j) for j in reversed(jobs)]
+        return found
+
+    def back(self):
+        out = []
+        for c in self.store.changes():
+            if c["revert"] == 1 and not c["told"]:
+                out.append({"issue": c["issue"], "group": c["grp"], "before": c["before"], "after": c["after"]})
+                self.store.set_change(c["id"], told=1)
+        return out
+
+    def start(self, running):
+        cur = self.row()
+        now = self.now()
+        if "last_at" not in cur:
+            self.put("last_at", now)
+            cur = self.row()
+        events = self.store.failures(after=int(cur.get("last_id") or 0))
+        if not due(len(events), float(cur["last_at"]), now, False):
+            return
+        _, others = self.boss()
+        got = pools.pick_copy(self.cfg, "planner", running, exclude=others)
+        if got is None:
+            return
+        agent, copy = got
+        text = brief(self.repo, events, self.records(events), self.back())
+        args = {"agentId": agent, "message": text, "waitSeconds": 1,
+                "goal": {"lastLineForms": [dict(f) for f in FORMS], "turnLimit": 3}}
+        try:
+            model = tiers.model_for("plan", tiers.tier_for("plan", "medium", self.cfg.get("tiers")), self.cfg.get("tier_models"))
+        except ValueError:
+            model = None
+        if model:
+            args.update(model)
+        fire = self.store.intent(JOB, "", JOB, coworker=self.name)
+        try:
+            res = self.account("send_message", args) or {}
+        except Exception as e:
+            self.store.abandon(fire, str(e)[:200])
+            return self.log("-", "causes: send to %s raised: %s" % (self.name, str(e)[:200]))
+        rid = res.get("runId")
+        if not rid:
+            self.store.abandon(fire, "no run id after send")
+            return self.log("-", "causes: no run id from %s" % self.name)
+        self.store.fired(fire, rid)
+        self.put("state", "running")
+        self.put("agent", agent)
+        self.put("copy", copy)
+        self.put("run", rid)
+        self.put("started", now)
+        self.put("fire", fire)
+        self.put("upto", max(e["id"] for e in events))
+        self.put("groups", json.dumps(sorted({group(e) for e in events})))
+        self.put("asks", int(cur.get("asks") or 0) + 1)
+        self.log("-", "causes: %d failure events sent to %s (run %s)" % (len(events), self.name, rid))
+
+    def poll(self, row):
+        run, agent = row.get("run"), row.get("agent")
+        if not run:
+            self.store.abandon(int(row["fire"]), "the send was cut off before a run id was kept")
+            return self.put("state", "idle")
+        got = self.account("get_run", {"agentId": agent, "runId": run}) or {}
+        status = got.get("status")
+        if status == "running":
+            limit = int((self.cfg.get("clocks") or {}).get("run_limit_s", RUN_LIMIT))
+            if self.now() - float(row["started"]) <= limit:
+                return
+            self.account("cancel_run", {"agentId": agent, "runId": run})
+            status = "cancelled"
+        self.store.close_run(run, status if status in ("done", "cancelled") else "error",
+                             tokens_in=count(got.get("inputTokens")), tokens_out=count(got.get("outputTokens")),
+                             cache_read=count(got.get("cachedInputTokens")))
+        if status != "done":
+            return self.bad(row, "the run ended %s" % status)
+        kind, rows, line = outcome(got.get("output"), json.loads(row.get("groups") or "[]"))
+        if kind == "bad":
+            return self.bad(row, line)
+        jobs = ended_jobs(self.store)
+        events = grouped(self.store)
+        at = iso(self.now())
+        for r in rows:
+            change_kind = "instructions" if r["culprit"] == "coworker instructions" else "repo"
+            before = changelog.rate(events, changelog.before(jobs, at), r["group"])
+            self.store.add_change(r["issue"], r["group"], change_kind, before)
+        self.close(row, line)
+
+    def bad(self, row, why):
+        if int(row.get("asks") or 0) < ASKS:
+            self.put("state", "idle")
+            return self.log("-", "causes: %s; asked again at the next start" % why)
+        self.close(row, "the batch is closed without a row: %s" % why)
+
+    def close(self, row, line):
+        self.put("last_id", row["upto"])
+        self.put("last_at", self.now())
+        self.put("asks", 0)
+        self.put("state", "idle")
+        self.log("-", "causes: %s" % line)
