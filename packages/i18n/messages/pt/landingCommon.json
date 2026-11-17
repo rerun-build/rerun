@@ -211,6 +211,7 @@
             "legal": "Jurídico"
         },
         "resources": {
+            "about": "Sobre",
             "docs": "Docs",
             "github": "GitHub",
             "pricing": "Preços",

@@ -1,0 +1,50 @@
+{
+    "metaTitle": "À propos de Rerun : l’entreprise derrière vos coworkers IA",
+    "metaDescription": "Rerun crée des coworkers IA qui tournent sur votre forfait ChatGPT ou Claude. Open source, auto-hébergeable, exploité par Reunit SA au Luxembourg.",
+    "eyebrow": "À propos",
+    "headline": "Nous créons les coworkers que nous voulions embaucher.",
+    "lede": "Rerun donne à une équipe des coworkers IA pour la vente, le support, le marketing et l’administratif. Ils travaillent dans vos propres apps, sur votre forfait ChatGPT ou Claude, les crédits inclus ou votre propre clé d’API.",
+    "mission": {
+        "label": "Pourquoi Rerun",
+        "title": "Confiez le travail, pas un workflow.",
+        "first": "La plupart des outils d’IA vous demandent de dessiner un organigramme ou de rester dans un chat. Un coworker prend un poste : il lit ce que votre équipe a écrit, ouvre vos apps sur son propre écran, travaille à l’heure prévue et s’arrête pour demander avant toute action qui engage.",
+        "second": "Une petite équipe devrait pouvoir embaucher cette aide en quelques minutes, inviter tout le monde sans surcoût, et la laisser tourner ordinateur fermé."
+    },
+    "principles": {
+        "label": "Comment c’est construit",
+        "title": "Trois choix que nous tenons.",
+        "items": {
+            "machine": {
+                "title": "Une machine par workspace",
+                "body": "Chaque workspace a sa propre machine, hébergée en Allemagne. Vos coworkers y tournent jour et nuit, à l’écart de tous les autres clients."
+            },
+            "openSource": {
+                "title": "Open source",
+                "body": "Rerun est open source sous licence AGPL-3.0. Lisez le code, suivez chaque changement ou hébergez-le sur votre propre serveur."
+            },
+            "yourModel": {
+                "title": "Votre modèle, votre forfait",
+                "body": "Les coworkers tournent sur le forfait ChatGPT ou Claude que vous payez déjà, sur les crédits inclus dans un forfait ou sur votre propre clé d’API."
+            }
+        }
+    },
+    "company": {
+        "label": "L’entreprise",
+        "title": "Exploité depuis le Luxembourg.",
+        "body": "Rerun est conçu et exploité par Reunit SA, société anonyme immatriculée au Luxembourg, 177 Rue de Luxembourg, L-8077 Bertrange.",
+        "founder": "Fondé par <link>Clément Janssens</link>."
+    },
+    "contact": {
+        "label": "Nous contacter",
+        "title": "Parlons-en.",
+        "email": "Questions, presse ou partenariats : <link>help@rerun.build</link>.",
+        "links": {
+            "docs": "Documentation",
+            "brandKit": "Kit de marque",
+            "github": "GitHub",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "discord": "Discord"
+        }
+    }
+}

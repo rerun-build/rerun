@@ -1,0 +1,50 @@
+{
+    "metaTitle": "Über Rerun: das Unternehmen hinter deinen KI-Coworkern",
+    "metaDescription": "Rerun baut KI-Coworker, die mit deinem ChatGPT- oder Claude-Abo laufen. Open Source, selbst hostbar, betrieben von Reunit SA in Luxemburg.",
+    "eyebrow": "Über uns",
+    "headline": "Wir bauen die Coworker, die wir selbst einstellen wollten.",
+    "lede": "Rerun gibt einem Team KI-Coworker für Vertrieb, Support, Marketing und Verwaltung. Sie arbeiten in deinen eigenen Apps, mit deinem ChatGPT- oder Claude-Abo, dem enthaltenen Guthaben oder deinem eigenen API-Schlüssel.",
+    "mission": {
+        "label": "Warum Rerun",
+        "title": "Gib die Arbeit ab, nicht einen Workflow.",
+        "first": "Die meisten KI-Tools verlangen ein Flussdiagramm oder dass du im Chat sitzen bleibst. Ein Coworker übernimmt stattdessen eine Aufgabe: Er liest, was dein Team aufgeschrieben hat, öffnet deine Apps auf seinem eigenen Bildschirm, arbeitet nach Plan und fragt nach, bevor er etwas tut, das Folgen hat.",
+        "second": "Ein kleines Team sollte diese Hilfe in Minuten einstellen, alle ohne Aufpreis einladen und sie bei zugeklapptem Laptop weiterlaufen lassen können."
+    },
+    "principles": {
+        "label": "Wie es gebaut ist",
+        "title": "Drei Entscheidungen, zu denen wir stehen.",
+        "items": {
+            "machine": {
+                "title": "Eine Maschine pro Workspace",
+                "body": "Jeder Workspace bekommt eine eigene Maschine in Deutschland. Deine Coworker laufen dort Tag und Nacht, getrennt von allen anderen Kunden."
+            },
+            "openSource": {
+                "title": "Open Source",
+                "body": "Rerun ist Open Source unter der AGPL-3.0-Lizenz. Lies den Code, verfolge jede Änderung oder hoste es auf deinem eigenen Server."
+            },
+            "yourModel": {
+                "title": "Dein Modell, dein Abo",
+                "body": "Coworker laufen mit dem ChatGPT- oder Claude-Abo, das du schon bezahlst, mit dem Guthaben eines Plans oder mit deinem eigenen API-Schlüssel."
+            }
+        }
+    },
+    "company": {
+        "label": "Das Unternehmen",
+        "title": "Betrieben aus Luxemburg.",
+        "body": "Rerun wird von Reunit SA entwickelt und betrieben, einer in Luxemburg eingetragenen société anonyme, 177 Rue de Luxembourg, L-8077 Bertrange.",
+        "founder": "Gegründet von <link>Clément Janssens</link>."
+    },
+    "contact": {
+        "label": "Kontakt",
+        "title": "Schreib uns.",
+        "email": "Fragen, Presse oder Partnerschaften: <link>help@rerun.build</link>.",
+        "links": {
+            "docs": "Doku",
+            "brandKit": "Brand Kit",
+            "github": "GitHub",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "discord": "Discord"
+        }
+    }
+}

@@ -1,0 +1,64 @@
+{
+    "_context": {
+        "metaTitle": "Title of the About page in search results and the browser tab.",
+        "headline": "Main heading of the About page, under the small \"About\" label.",
+        "lede": "\"ChatGPT\" and \"Claude\" are product names, keep them as is.",
+        "principles.items.yourModel.body": "\"ChatGPT\" and \"Claude\" are product names, keep them as is.",
+        "principles.items.openSource.body": "AGPL-3.0 is the name of a software license, keep it as is.",
+        "company.body": "Reunit SA is the legal name of the company; \"société anonyme\" is the Luxembourg legal form, keep it in French.",
+        "company.founder": "<link> wraps the founder's name, which opens his profile.",
+        "contact.email": "<link> wraps the email address, keep the address as is.",
+        "contact.links.github": "Name of the website, keep it as is.",
+        "contact.links.x": "Name of the social network formerly called Twitter, keep it as is.",
+        "contact.links.linkedin": "Name of the social network, keep it as is.",
+        "contact.links.discord": "Name of the chat app, keep it as is."
+    },
+    "metaTitle": "About Rerun: The Company Behind Your AI Coworkers",
+    "metaDescription": "Rerun builds AI Coworkers that run on your ChatGPT or Claude plan. Open source, self-hostable, operated by Reunit SA in Luxembourg.",
+    "eyebrow": "About",
+    "headline": "We build the coworkers we wanted to hire.",
+    "lede": "Rerun gives a team AI Coworkers for sales, support, marketing and admin. They work in your own apps, on your ChatGPT or Claude plan, included credits or your own API key.",
+    "mission": {
+        "label": "Why Rerun",
+        "title": "Hand over the work, not a workflow.",
+        "first": "Most AI tools ask you to draw a flow chart or to sit in a chat. A Coworker takes a job instead: it reads what your team wrote down, opens your apps on its own screen, works on schedule, and stops to ask before anything consequential.",
+        "second": "A small team should be able to hire that help in minutes, invite everyone at no extra cost, and keep it running while the laptop is shut."
+    },
+    "principles": {
+        "label": "How it is built",
+        "title": "Three choices we hold to.",
+        "items": {
+            "machine": {
+                "title": "A machine per workspace",
+                "body": "Each workspace gets a machine of its own, hosted in Germany. Your Coworkers run there day and night, apart from every other customer."
+            },
+            "openSource": {
+                "title": "Open source",
+                "body": "Rerun is open source under the AGPL-3.0 license. Read the code, follow every change, or host it on your own server."
+            },
+            "yourModel": {
+                "title": "Your model, your plan",
+                "body": "Coworkers run on the ChatGPT or Claude plan you already pay for, on the credits a plan includes, or on your own API key."
+            }
+        }
+    },
+    "company": {
+        "label": "The company",
+        "title": "Operated from Luxembourg.",
+        "body": "Rerun is built and operated by Reunit SA, a société anonyme registered in Luxembourg, at 177 Rue de Luxembourg, L-8077 Bertrange.",
+        "founder": "Founded by <link>Clément Janssens</link>."
+    },
+    "contact": {
+        "label": "Get in touch",
+        "title": "Talk to us.",
+        "email": "Questions, press or partnerships: <link>help@rerun.build</link>.",
+        "links": {
+            "docs": "Documentation",
+            "brandKit": "Brand kit",
+            "github": "GitHub",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "discord": "Discord"
+        }
+    }
+}

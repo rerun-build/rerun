@@ -1,0 +1,50 @@
+{
+    "metaTitle": "Sobre o Rerun: a empresa por trás dos seus coworkers de IA",
+    "metaDescription": "O Rerun cria coworkers de IA que rodam no seu plano do ChatGPT ou Claude. Open source, auto-hospedável, operado pela Reunit SA em Luxemburgo.",
+    "eyebrow": "Sobre",
+    "headline": "Criamos os coworkers que queríamos contratar.",
+    "lede": "O Rerun dá a uma equipe coworkers de IA para vendas, suporte, marketing e administrativo. Eles trabalham nos seus próprios apps, no seu plano do ChatGPT ou Claude, nos créditos incluídos ou na sua própria chave de API.",
+    "mission": {
+        "label": "Por que o Rerun",
+        "title": "Entregue o trabalho, não um workflow.",
+        "first": "A maioria das ferramentas de IA pede que você desenhe um fluxograma ou fique preso num chat. Um coworker assume uma função: lê o que sua equipe escreveu, abre seus apps na própria tela, trabalha na agenda e para para perguntar antes de qualquer ação importante.",
+        "second": "Uma equipe pequena deveria poder contratar essa ajuda em minutos, convidar todo mundo sem custo extra e deixá-la rodando com o notebook fechado."
+    },
+    "principles": {
+        "label": "Como é construído",
+        "title": "Três escolhas que mantemos.",
+        "items": {
+            "machine": {
+                "title": "Uma máquina por workspace",
+                "body": "Cada workspace tem sua própria máquina, hospedada na Alemanha. Seus coworkers rodam lá dia e noite, separados de todos os outros clientes."
+            },
+            "openSource": {
+                "title": "Open source",
+                "body": "O Rerun é open source sob a licença AGPL-3.0. Leia o código, acompanhe cada mudança ou hospede no seu próprio servidor."
+            },
+            "yourModel": {
+                "title": "Seu modelo, seu plano",
+                "body": "Os coworkers rodam no plano do ChatGPT ou Claude que você já paga, nos créditos que um plano inclui ou na sua própria chave de API."
+            }
+        }
+    },
+    "company": {
+        "label": "A empresa",
+        "title": "Operado a partir de Luxemburgo.",
+        "body": "O Rerun é desenvolvido e operado pela Reunit SA, uma société anonyme registrada em Luxemburgo, na 177 Rue de Luxembourg, L-8077 Bertrange.",
+        "founder": "Fundado por <link>Clément Janssens</link>."
+    },
+    "contact": {
+        "label": "Fale com a gente",
+        "title": "Vamos conversar.",
+        "email": "Dúvidas, imprensa ou parcerias: <link>help@rerun.build</link>.",
+        "links": {
+            "docs": "Documentação",
+            "brandKit": "Kit de marca",
+            "github": "GitHub",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "discord": "Discord"
+        }
+    }
+}
