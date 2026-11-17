@@ -211,6 +211,8 @@ class World:
         if a[0] == "api":
             sha = a[1].split("head_sha=")[1].split("&")[0]
             return json.dumps({"workflow_runs": self.workflows.get(sha, [])})
+        if a[:2] == ["pr", "close"]:
+            return ""
         if a[:2] == ["pr", "merge"]:
             self.merges.append(a)
             self.pr_state = "MERGED"
@@ -492,6 +494,16 @@ class Flow(Base):
         self.assertEqual(self.state(), "merged")
         self.assertIn("merged pull request #42", self.w.issue(5)["comments"][-1])
         self.assertEqual(self.w.edits(5), [["issue", "edit", "5", "-R", "o/r", "--remove-label", "factory", "--add-label", "factory-done"]])
+
+    def test_the_pull_request_of_an_earlier_take_is_closed_when_the_job_merges(self):
+        self.to_checks()
+        self.w.open_prs = [{"number": 30, "title": "an earlier take (#5)"}, {"number": 31, "title": "another job (#6)"}, {"number": 42, "title": "this take (#5)"}]
+        self.w.workflows[HEAD] = [wf("ci", "success")]
+        self.tick(3)
+        self.assertEqual(self.state(), "merged")
+        closed = [c for c in self.w.gh_calls if c[:2] == ["pr", "close"]]
+        self.assertEqual([c[2] for c in closed], ["30"])
+        self.assertIn("finished by pull request #42", closed[0][closed[0].index("--comment") + 1])
 
     def test_failed_workflow_run_blocks_the_merge_and_goes_back_to_the_builder_once(self):
         self.to_checks()
