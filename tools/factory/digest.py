@@ -221,9 +221,31 @@ def group_state(store, name):
     return "open"
 
 
+def issues(store, now):
+    zero = {"P0": 0, "P1": 0, "P2": 0, "P3": 0, "none": 0}
+    try:
+        kept = json.loads(store.get_all("-").get("issues_open") or "")
+        counts = {k: int(kept[k]) for k in zero}
+    except (ValueError, TypeError, KeyError, AttributeError):
+        counts = zero
+    start = now - now % 86400
+
+    def since(key):
+        n = 0
+        for r in store.db.execute("SELECT v FROM kv WHERE job LIKE 'classify:%' AND k=?", (key,)):
+            try:
+                n += int(r[0]) >= start
+            except ValueError:
+                pass
+        return n
+
+    return {"open": counts, "classifiedToday": since("at"), "joinedToday": since("joined")}
+
+
 def build(store, cfg, now):
     return {"stations": stations(store, now), "threads": threads(store),
             "anomalies": anomalies(store, cfg, now), "measures": measures(store, now), "planners": planners(store, now),
+            "issues": issues(store, now),
             "bar": bar(store, now), "causes": causes(store, now)}
 
 

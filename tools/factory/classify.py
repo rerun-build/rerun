@@ -243,6 +243,11 @@ class Pass:
         start = planning.stamp(self.now())
         modelled = bool(self.account and settings.get("agent"))
         listed = json.loads(self.gh(["issue", "list", "-R", repo, "--state", "open", "--json", "number,title,body,labels", "--limit", "200"]))
+        counts = {"P0": 0, "P1": 0, "P2": 0, "P3": 0, "none": 0}
+        for i in listed:
+            have = labels(i)
+            counts[next((p for p in ("P0", "P1", "P2", "P3") if p in have), "none")] += 1
+        self.store.set("-", "issues_open", json.dumps(counts))
         groups = {i["title"]: i["number"] for i in listed}
         joined = set()
         if modelled:
