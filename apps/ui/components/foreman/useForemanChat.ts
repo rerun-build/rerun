@@ -49,7 +49,11 @@ async function fetchEngineTranscript(sessionId: string): Promise<UIMessage[]> {
     return ((await res.json()) as { messages?: UIMessage[] }).messages ?? []
 }
 
-export function useForemanChat() {
+// `engineInAgentChat`: the column draws the engine's conversations with a coworker's chat, which
+// reads them, follows their runs and sends their messages itself. Left here, the hub's onboarding
+// and the hand-over to the engine; this hook's own engine path stays for a column that could not
+// learn the Chief of Staff's row.
+export function useForemanChat({ engineInAgentChat = false }: { engineInAgentChat?: boolean } = {}) {
     const sessionId = useForemanStore(state => state.sessionId)
     const backend = useForemanStore(selectForemanBackend)
     const surface = useForemanStore(state => state.surface)
@@ -337,8 +341,9 @@ export function useForemanChat() {
         // board load, and a transcript carries its tool outputs with it. The 300ms the panel takes to
         // slide in covers the fetch.
         if ((!open && !engaged) || readFor.current === sessionId || surface === 'unknown' || surface === 'none') return
-        readFor.current = sessionId
         const store = useForemanStore.getState()
+        if (engineInAgentChat && selectForemanBackend(store) === 'engine') return
+        readFor.current = sessionId
         if (store.draftId === sessionId) return
         const general = sessionId === store.generalId
         const url = !general ? `${ENGINE_ROUTE}?sessionId=${encodeURIComponent(sessionId)}` : surface === 'engine' ? ENGINE_ROUTE : '/api/chat/foreman'
@@ -359,7 +364,7 @@ export function useForemanChat() {
                 setRestoredTick(tick => tick + 1)
             })
             .catch(() => setReadDoneFor(sessionId))
-    }, [open, engaged, surface, sessionId])
+    }, [open, engaged, surface, sessionId, engineInAgentChat])
 
     const engineLive = useRef({ messages: engineChat.messages, status: engineChat.status })
     useEffect(() => {

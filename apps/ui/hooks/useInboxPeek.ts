@@ -9,6 +9,7 @@ import { useAgentModel } from '@/hooks/useAgentModel'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { sendForemanThreadMessage, sendSessionMessage } from '@/lib/chat/send-session-message'
 import { resolveSessionId } from '@/lib/notifications/open-conversation'
+import { useForemanStore } from '@/stores/foreman.store'
 
 export type InboxPeek = { state: 'loading' } | { state: 'unreadable' } | { state: 'ready'; sessionId: string; peek: PendingRequestPeek }
 
@@ -17,9 +18,10 @@ export type PeekAnswerOutcome = 'sent' | 'busy' | 'stale' | 'failed'
 /** The conversation an inbox entry stands for: a row knows its session, an announcement only the engine's id. */
 export type InboxPeekTarget = { agentId: string; sessionId: string | null; engineSessionId: string | null }
 
-// The Chief of Staff's conversations are not sessions of a coworker: they are read through an action of their own.
-function readPendingRequest(agentId: string, sessionId: string): Promise<PendingRequestPeek | null> {
-    return agentId === FOREMAN_AGENT_ID ? peekForemanPendingRequestAction(sessionId) : peekPendingRequestAction(sessionId)
+// The Chief of Staff's conversations are read and answered through its own route, whichever id names
+// it: the literal `foreman` of the lists, or its row of `agents` in its chat.
+function readPendingRequest(isForeman: boolean, sessionId: string): Promise<PendingRequestPeek | null> {
+    return isForeman ? peekForemanPendingRequestAction(sessionId) : peekPendingRequestAction(sessionId)
 }
 
 // Reads what a conversation waits on and answers it from the inbox, the way its chat would. Held off
@@ -27,7 +29,9 @@ function readPendingRequest(agentId: string, sessionId: string): Promise<Pending
 // General asks again, and its status alone may have gone there and back between two reads of the list.
 export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekTarget, enabled = true, revision?: string) {
     const [peek, setPeek] = useState<InboxPeek>({ state: 'loading' })
-    const { selection: model } = useAgentModel(agentId)
+    const foremanRowId = useForemanStore(state => state.agentRowId)
+    const isForeman = agentId === FOREMAN_AGENT_ID || (foremanRowId !== null && agentId === foremanRowId)
+    const { selection: model } = useAgentModel(isForeman ? (foremanRowId ?? FOREMAN_AGENT_ID) : agentId)
 
     useEffect(() => {
         if (!enabled) return
@@ -35,7 +39,7 @@ export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekT
         const load = async (): Promise<InboxPeek> => {
             const resolved = sessionId ?? (engineSessionId ? await resolveSessionId(agentId, engineSessionId) : null)
             if (!resolved) return { state: 'unreadable' }
-            const read = await readPendingRequest(agentId, resolved)
+            const read = await readPendingRequest(isForeman, resolved)
             return read ? { state: 'ready', sessionId: resolved, peek: read } : { state: 'unreadable' }
         }
         load()
@@ -46,19 +50,19 @@ export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekT
         return () => {
             cancelled = true
         }
-    }, [agentId, sessionId, engineSessionId, enabled, revision])
+    }, [agentId, isForeman, sessionId, engineSessionId, enabled, revision])
 
     // The card may have stayed open while the question was answered elsewhere: the chat, another tab, a
     // teammate. Read again right before sending, so an answer never lands on a request that is gone.
     const answer = useCallback(
         async (text: string): Promise<PeekAnswerOutcome> => {
             if (peek.state !== 'ready' || !peek.peek.pending) return 'stale'
-            const fresh = await readPendingRequest(agentId, peek.sessionId)
+            const fresh = await readPendingRequest(isForeman, peek.sessionId)
             if (fresh?.pending?.toolCallId !== peek.peek.pending.toolCallId) return 'stale'
-            if (agentId === FOREMAN_AGENT_ID) return sendForemanThreadMessage({ sessionId: peek.sessionId, text, model })
+            if (isForeman) return sendForemanThreadMessage({ sessionId: peek.sessionId, text, model })
             return sendSessionMessage({ agentId, sessionId: peek.sessionId, text, model })
         },
-        [agentId, model, peek]
+        [agentId, isForeman, model, peek]
     )
 
     return { peek, answer }

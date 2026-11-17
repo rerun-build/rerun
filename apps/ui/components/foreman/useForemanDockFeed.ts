@@ -9,13 +9,14 @@ import { foremanDockFeed } from '@/lib/foreman/dock-feed'
 import type { PendingWidget } from '@/lib/foreman/pending-widget'
 import { useForemanStore } from '@/stores/foreman.store'
 
-type Options = { messages: UIMessage[]; busy: boolean; open: boolean; pending: PendingWidget | null; failed: boolean }
+// `enabled` false: another chat of the column feeds the pill.
+type Options = { messages: UIMessage[]; busy: boolean; open: boolean; pending: PendingWidget | null; failed: boolean; enabled?: boolean }
 
 /**
  * Tells the parked Foreman what the conversation is doing while its column is closed. Derived in
  * the render and written on change only: `messages` moves at every token, the feed a few times a turn.
  */
-export function useForemanDockFeed({ messages, busy, open, pending, failed }: Options) {
+export function useForemanDockFeed({ messages, busy, open, pending, failed, enabled = true }: Options) {
     const t = useTranslations('chat.activity')
     const tSubRuns = useTranslations('subRuns')
     const toolDisplay = useToolDisplay()
@@ -28,6 +29,7 @@ export function useForemanDockFeed({ messages, busy, open, pending, failed }: Op
     // restored with its last answer, or one just read in the column, has nothing to announce.
     const ranWhileClosed = useRef(false)
     useEffect(() => {
+        if (!enabled) return
         if (open) ranWhileClosed.current = false
         else if (busy) ranWhileClosed.current = true
         const announced = ranWhileClosed.current
@@ -38,5 +40,5 @@ export function useForemanDockFeed({ messages, busy, open, pending, failed }: Op
             reply: announced && replyId !== null && replyText !== null ? { id: replyId, text: replyText } : null,
             failed: announced && failed,
         })
-    }, [open, busy, label, question, replyId, replyText, failed])
+    }, [enabled, open, busy, label, question, replyId, replyText, failed])
 }

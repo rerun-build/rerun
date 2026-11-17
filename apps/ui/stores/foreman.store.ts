@@ -51,6 +51,8 @@ type ForemanState = {
     generalId: string
     /** A thread "New task" just opened: the server has nothing of it yet, there is nothing to read. */
     draftId: string | null
+    /** Its row of `agents`, which its chat addresses it by once past the onboarding. */
+    agentRowId: string | null
     /**
      * Qui sert la conversation en cours. `null` tant qu'aucun message n'est parti : elle suit alors
      * `surface`, puis se fige au premier envoi et ne change plus.
@@ -133,6 +135,9 @@ type ForemanState = {
     openThread: (sessionId: string) => void
     /** General's id, once the server named it: the one it reopened, or the one a send landed in. */
     setGeneral: (sessionId: string, backend?: ForemanBackend) => void
+    setAgentRowId: (agentRowId: string | null) => void
+    /** The server has the conversation on screen now, under this id: a draft stops being one. */
+    adoptSession: (sessionId: string) => void
     /** The onboarding is over under General: the engine's General takes its place. */
     startEngineGeneral: () => void
     setActivity: (activity: OrbActivity) => void
@@ -182,6 +187,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     activity: 'idle',
     engineRunId: null,
     ...freshGeneral(),
+    agentRowId: null,
     backend: null,
     surface: 'unknown',
     planPreview: null,
@@ -259,6 +265,12 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         if (get().sessionId !== sessionId) set({ ...CONVERSATION_SWITCH, sessionId, backend: 'engine' })
     },
     setGeneral: (sessionId, backend) => set({ generalId: sessionId, sessionId, backend: backend ?? null }),
+    setAgentRowId: agentRowId => set({ agentRowId }),
+    adoptSession: sessionId => {
+        const state = get()
+        if (state.sessionId === state.generalId) set({ generalId: sessionId, sessionId, draftId: null })
+        else set({ sessionId, draftId: state.draftId === state.sessionId ? null : state.draftId })
+    },
     startEngineGeneral: () => {
         const sessionId = randomUuid()
         set({ ...CONVERSATION_SWITCH, sessionId, generalId: sessionId })
@@ -303,6 +315,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             activity: 'idle',
             engineRunId: null,
             ...freshGeneral(),
+            agentRowId: null,
             backend: null,
             surface: 'unknown',
             planPreview: null,

@@ -14,6 +14,7 @@ import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { ArrivalHeader, type ArrivalPick } from '@/components/foreman/arrival/ArrivalHeader'
 import { ArrivalWall } from '@/components/foreman/arrival/ArrivalWall'
 import { arrivalStepOf } from '@/components/foreman/arrival/flow'
+import { ForemanAgentChat } from '@/components/foreman/ForemanAgentChat'
 import { ForemanChatLayer } from '@/components/foreman/ForemanChatLayer'
 import { ForemanHeader } from '@/components/foreman/ForemanHeader'
 import { ForemanHistory } from '@/components/foreman/ForemanHistory'
@@ -57,7 +58,9 @@ import { browserPermission } from '@/lib/notifications/browser'
 import { intakePreviewPlan, type ForemanIntake } from '@/lib/onboarding/intake'
 import { useHoldAppBoot } from '@/stores/app-boot.store'
 import { useBoardCoverStore } from '@/stores/board-cover.store'
-import { selectForemanInThread, useForemanStore } from '@/stores/foreman.store'
+import { selectForemanBackend, selectForemanInThread, useForemanStore } from '@/stores/foreman.store'
+import { getForemanAgentIdAction } from '@/app/api/_actions/foreman-conversation.actions'
+import { carryAgentModel } from '@/hooks/useAgentModel'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
@@ -82,9 +85,31 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const { isAnonymous, workspace, phoneStep } = useSession()
     const pendingIntake = useOnboardingStore(state => state.pendingIntake)
     const gated = isAnonymous && pendingIntake !== null && !intakeOpen
-    const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
+
+    // Past its onboarding the Chief of Staff talks in a coworker's chat, addressed by its row of
+    // `agents`. Until that row is known, or on a hub conversation still on screen, the column's own
+    // chat stays.
+    const surface = useForemanStore(state => state.surface)
+    const agentRowId = useForemanStore(state => state.agentRowId)
+    useEffect(() => {
+        if (surface !== 'engine' || isAnonymous || agentRowId) return
+        let cancelled = false
+        void getForemanAgentIdAction().then(id => {
+            if (cancelled || !id) return
+            carryAgentModel(FOREMAN_AGENT_ID, id)
+            useForemanStore.getState().setAgentRowId(id)
+        })
+        return () => {
+            cancelled = true
+        }
+    }, [surface, isAnonymous, agentRowId])
+    const onEngineConversation = useForemanStore(state => selectForemanBackend(state) === 'engine')
+    const engineInAgentChat = !guided && surface === 'engine' && !!agentRowId
+    const agentChatRowId = engineInAgentChat && onEngineConversation ? agentRowId : null
+
+    const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat({ engineInAgentChat })
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
-    useHoldAppBoot(open !== false && !guided && !restoreDone)
+    useHoldAppBoot(open !== false && !guided && !agentChatRowId && !restoreDone)
 
     // Ce que le board dessine à gauche pendant tout le tunnel. L'organisation vit dans le transcript
     // et non dans un state à nous, donc elle survit à « Looks good », au checkout et au rechargement.
@@ -108,10 +133,11 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
 
     // General carries its threads as branches; a thread slides over it, and the crumb brings it back.
     const tThreads = useTranslations('foreman.threads')
-    const surface = useForemanStore(state => state.surface)
     const inThread = useForemanStore(selectForemanInThread) && !guided
     const hasThreads = surface === 'engine' && !guided
-    const { threads, entries: threadEntries } = useForemanThreads(open === true && hasThreads)
+    const engaged = useForemanStore(state => state.engaged)
+    const foremanThreads = useForemanThreads((open === true || (engaged && !!agentChatRowId)) && hasThreads)
+    const { threads, entries: threadEntries } = foremanThreads
     const threadWaiting = useMemo(() => threads.some(thread => threadStateOf(thread.status) === 'needs'), [threads])
     const [historyOpen, setHistoryOpen] = useState(false)
     const openThread = useCallback((id: string) => useForemanStore.getState().openThread(id), [])
@@ -250,9 +276,9 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const pendingPrompt = useForemanStore(state => state.pendingPrompt)
     const companion = useForemanStore(state => state.funnel === 'companion')
     useEffect(() => {
-        if (!pendingPrompt || !restoreDone || busy || !companion) return
+        if (!pendingPrompt || !restoreDone || busy || !companion || agentChatRowId) return
         if (send(pendingPrompt)) useForemanStore.getState().clearPendingPrompt()
-    }, [pendingPrompt, restoreDone, busy, companion, send])
+    }, [pendingPrompt, restoreDone, busy, companion, send, agentChatRowId])
 
     // Sur le hub, couper le flux suffit : la boucle meurt avec lui. Sur l'engine, `stop` annule aussi
     // le run là-bas.
@@ -261,7 +287,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const displayedError = runError || error ? unwrapChatError(runError ?? error?.message) : null
     const noticeError = useMemo(() => (displayedError === null ? null : { kind: classifyChatError(displayedError), message: displayedError }), [displayedError])
     const canRetry = backend === 'engine' && !busy && messages.some(message => message.role === 'user')
-    useForemanDockFeed({ messages, busy, open: open === true, pending: pendingWidget, failed: displayedError !== null })
+    useForemanDockFeed({ messages, busy, open: open === true, pending: pendingWidget, failed: displayedError !== null, enabled: !agentChatRowId })
 
     // ⌘K lands in whichever composer is on screen: this one once the column is open, the pill's
     // otherwise. A request made while the column was closed belongs to the pill and stays there.
@@ -270,8 +296,8 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     useEffect(() => {
         if (handledFocusRequest.current === focusRequest) return
         handledFocusRequest.current = focusRequest
-        if (open) composerRef.current?.focus()
-    }, [focusRequest, open])
+        if (open && !agentChatRowId) composerRef.current?.focus()
+    }, [focusRequest, open, agentChatRowId])
 
     // L'orbe en tête de colonne est décorative : Escape et le bouton de l'en-tête sont les deux
     // seules sorties, et le tunnel les condamne toutes les deux : la carte d'accueil vit ici. Ouvrir un agent ne fait que mettre la colonne en retrait (BoardChatSplit) :
@@ -379,7 +405,9 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const dockedSide = dockedForemanSide({ open, placement, dragging })
     const [stackEl, setStackEl] = useState<HTMLElement | null>(null)
     const [slotEl, setSlotEl] = useState<HTMLDivElement | null>(null)
-    useForemanSheetHeight({ panelRef, stackEl, slotEl })
+    // A coworker's chat fills whatever it is given rather than measuring its messages: under `md` it
+    // opens on a tall sheet, still dragged to a detent like the column's own.
+    useForemanSheetHeight({ panelRef, stackEl: agentChatRowId ? null : stackEl, slotEl: agentChatRowId ? null : slotEl })
     const { onPointerDown: onSheetPointerDown, toggleDetent } = useForemanSheetResize({ panelRef })
     const handleHeaderPointerDown = useCallback(
         (event: PointerEvent<HTMLElement>) => {
@@ -437,6 +465,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                 'max-md:h-[var(--foreman-sheet-drag-h,var(--foreman-sheet-detent-h,clamp(18rem,calc(var(--foreman-sheet-h,18rem)+var(--consent-inset,0px)),calc(96dvh-env(safe-area-inset-top)))))] max-md:max-h-[calc(96dvh-env(safe-area-inset-top))] max-md:min-h-[min(calc(var(--foreman-sheet-slot-h,0px)+4.5rem+var(--consent-inset,0px)),calc(96dvh-env(safe-area-inset-top)))] max-md:rounded-t-2xl max-md:border-t max-md:border-border max-md:shadow-2xl',
                 'max-md:transition-[translate,height] max-md:duration-500 max-md:ease-[cubic-bezier(0.32,0.72,0,1)] max-md:data-[sheet-dragging]:max-h-none max-md:data-[sheet-dragging]:transition-none',
                 !open && 'translate-y-full',
+                agentChatRowId && 'max-md:[--foreman-sheet-h:85dvh]',
                 floating
                     ? cn(
                           'md:fixed md:inset-auto md:z-50 md:overflow-visible',
@@ -509,7 +538,22 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             {arrivalWall && <ArrivalWall step={arrivalWall} />}
                         </div>
                     )}
-                    <div className={onRoutines || arrivalWall ? 'hidden' : 'contents'}>
+                    {agentChatRowId && (
+                        <div className={onRoutines ? 'hidden' : 'contents'}>
+                            {/* General keeps one key whatever id it gets from the server: only a thread slides. */}
+                            <PanelSteps stepKey={inThread ? sessionId : 'general'} depth={inThread ? 1 : 0}>
+                                <ForemanAgentChat
+                                    agentRowId={agentChatRowId}
+                                    threads={foremanThreads}
+                                    open={open === true}
+                                    orbPaused={!open}
+                                    header={!pinned && <div aria-hidden className={cn('shrink-0', inThread ? 'h-[8.5rem]' : 'h-24')} />}
+                                    composerPlaceholder={framedPlaceholder}
+                                />
+                            </PanelSteps>
+                        </div>
+                    )}
+                    <div className={onRoutines || arrivalWall || agentChatRowId ? 'hidden' : 'contents'}>
                         {/* General keeps one key whatever id it gets from the server: only a thread slides. */}
                         <PanelSteps stepKey={inThread ? sessionId : 'general'} depth={inThread ? 1 : 0}>
                             <ForemanChatLayer

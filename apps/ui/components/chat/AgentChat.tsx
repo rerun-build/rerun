@@ -28,7 +28,9 @@ import { useMentionAutocomplete } from '@/components/chat/MentionAutocomplete'
 import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { AuthoredGroup } from '@/components/chat/AuthoredGroup'
 import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
-import { MessageView } from '@/components/chat/MessageView'
+import { MessageView, type MessageViewProps } from '@/components/chat/MessageView'
+import type { FeedbackScope } from '@/app/api/_actions/message-feedback.actions'
+import type { PendingHitl } from '@rerun/contracts'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
 import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
 import { SkeletonChat } from '@/components/ui/skeleton'
@@ -77,10 +79,10 @@ import { useChat } from '@ai-sdk/react'
 import { COWORKER_STARTER_SUGGESTIONS, paidDataSourcesByTurn, RERUN_CONNECTION_ID, runUsesScreen, screenSite } from '@rerun/contracts'
 import { track } from '@rerun/analytics/client'
 import { AnimatePresence, motion } from 'motion/react'
-import { DefaultChatTransport } from 'ai'
+import { DefaultChatTransport, type DataUIPart, type UIDataTypes, type UIMessage } from 'ai'
 import { useTranslations } from 'next-intl'
-import type { ReactNode } from 'react'
-import { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { ReactNode, Ref } from 'react'
+import { Fragment, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { scrollFadeMask, useScrollEdges } from '@rerun/ui/primitives'
 import { toast } from 'sonner'
 
@@ -130,9 +132,25 @@ type AgentChatProps = {
     threads?: ThreadRow[]
     onOpenThread?: (sessionId: string, title: string) => void
     composerPlaceholder?: string
+    // A coworker whose turns go through a route of their own: the Chief of Staff's writes its brief.
+    api?: string
+    // A data part the chat does not draw itself, such as a gesture the run asks the page to make.
+    onData?: (part: DataUIPart<UIDataTypes>) => void
+    renderToolPart?: MessageViewProps['renderToolPart']
+    emptyState?: ReactNode
+    activityIndicator?: ReactNode
+    feedbackScope?: FeedbackScope
+    // What a host draws around the chat (an orb, a dock) follows from here.
+    onChatState?: (state: AgentChatState) => void
+    handleRef?: Ref<AgentChatHandle>
 }
 
-export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder }: AgentChatProps) {
+export type AgentChatState = { messages: UIMessage[]; busy: boolean; streaming: boolean; historyReady: boolean; pending: PendingHitl | null; error: string | null }
+
+// For a host whose own buttons write in the chat: a prompt sent from outside it, a draft to finish.
+export type AgentChatHandle = { send: (text: string) => boolean; prefill: (text: string) => void; focus: () => void }
+
+export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionPending = false, onSessionCreated, initialRunId, arrival = 0, mentionAgents = [], mentionSkills = [], sessionWorking = false, sessionIdle = false, alertPending = false, body, header, suppressEmptyState = false, setup, onSetupSkipped, onOpenInstall, onRunFinished, onSessionInserted, onSessionStatusChange, onMessageSent, onNewConversation, threads, onOpenThread, composerPlaceholder, api = '/api/chat', onData, renderToolPart, emptyState, activityIndicator, feedbackScope = 'agent', onChatState, handleRef }: AgentChatProps) {
     const t = useTranslations('chat.agentChat')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace, user } = useSession()
@@ -219,7 +237,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     const transport = useMemo(
         () =>
             new DefaultChatTransport({
-                api: '/api/chat',
+                api,
                 body: () => ({ agentId, sessionId: sessionIdRef.current, connectionId: modelSelectionRef.current.connectionId, model: modelSelectionRef.current.model, ...bodyRef.current }),
                 // Send the message being posted, never the transcript: the engine holds the
                 // conversation, and a research session's tool outputs alone blow past the 10MB
@@ -230,8 +248,11 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                     api: `/api/chat/resume?agentId=${encodeURIComponent(agentId)}&runId=${encodeURIComponent(activeRunIdRef.current ?? '')}`,
                 }),
             }),
-        [agentId, interceptFetch]
+        [agentId, api, interceptFetch]
     )
+
+    const onDataRef = useRef(onData)
+    onDataRef.current = onData
 
     const chatId = `chat-${uid}`
 
@@ -254,6 +275,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         // A chunk lands far more often than a frame: without this the whole transcript is
         // reconciled at the rate the tokens arrive, which a long conversation cannot keep up with.
         experimental_throttle: 80,
+        onData: part => onDataRef.current?.(part),
         onFinish: ({ isAbort, isDisconnect, isError }) => {
             if (!isAbort && !isDisconnect && !isError) {
                 completedRef.current = true
@@ -852,7 +874,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     // Inline, this arrow would be a new prop on every render and would defeat MessageView's memo
     // for every message of the conversation.
     const handleRegenerate = useCallback((messageId: string) => regenerate({ messageId }), [regenerate])
-    const messageFeedback = useMessageFeedback(sessionId)
+    const messageFeedback = useMessageFeedback(sessionId, feedbackScope)
     const continueInterruptedRun = useCallback(() => sendMessage({ text: t('continueWhereLeftOff') }), [sendMessage, t])
 
     // Paid from the trial's notice. The plan lands through Stripe's webhook, not the payment itself, so
@@ -964,7 +986,27 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     const runOnScreen = useMemo(() => runUsesScreen(messages), [messages])
     // The live screen stands in for the activity loader while the run works on it.
     const screenShown = (showLoader && runOnScreen) || !!takeoverAsk
-    const activityLoader = showLoader && !stepGroupShowsActivity(messages.at(-1)) ? <ChatActivityLoader agentId={agentId} message={messages.at(-1)} indicator={<AgentBuddy agentId={agentId} mood="working" size={24} facing="right" />} /> : null
+    const onChatStateRef = useRef(onChatState)
+    onChatStateRef.current = onChatState
+    const historyReady = !historyAwaited
+    useEffect(() => {
+        onChatStateRef.current?.({ messages, busy: showLoader, streaming: status === 'streaming' || status === 'submitted', historyReady, pending: pendingHitl, error: displayedError })
+    }, [messages, showLoader, status, historyReady, pendingHitl, displayedError])
+
+    useImperativeHandle(
+        handleRef,
+        () => ({
+            send: text => sendMessage({ text }),
+            prefill: text => {
+                composerRef.current?.restore(text)
+                composerRef.current?.focus()
+            },
+            focus: () => composerRef.current?.focus(),
+        }),
+        [sendMessage]
+    )
+
+    const activityLoader = showLoader && !stepGroupShowsActivity(messages.at(-1)) ? <ChatActivityLoader agentId={agentId} message={messages.at(-1)} indicator={activityIndicator ?? <AgentBuddy agentId={agentId} mood="working" size={24} facing="right" />} /> : null
 
     return (
         <div ref={chatRootRef} data-chat-scrolled={active && scrollEdges.top > 0 ? '' : undefined} className="relative flex flex-1 flex-col overflow-hidden">
@@ -976,7 +1018,8 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                     <ConversationContent className="mx-auto w-full max-w-[var(--chat-column,none)]">
                         {historyAwaited && <SkeletonChat className="py-2" />}
                         {threadRows.leading.length > 0 && !historyAwaited && <div className="flex flex-col gap-3">{threadBranches(threadRows.leading)}</div>}
-                        {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyAwaited && !showInstallGate && (
+                        {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyAwaited && !showInstallGate && emptyState}
+                        {messages.length === 0 && threadRows.leading.length === 0 && !suppressEmptyState && !historyAwaited && !showInstallGate && !emptyState && (
                             <ConversationEmptyState>
                                 <AgentBuddy agentId={agentId} mood={buddyMood} size={96} />
                                 <div className="space-y-1">
@@ -1025,6 +1068,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                         mentions={mentionTokens}
                                         createdAt={messageTimes[mi]}
                                         paidSources={paidSourcesByTurn.get(message.id)}
+                                        renderToolPart={renderToolPart}
                                     />
                                 )
                                 if (!branches?.length) return view

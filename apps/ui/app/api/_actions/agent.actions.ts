@@ -243,7 +243,7 @@ export async function getAgentContextAction(agentId: string): Promise<AgentConte
                 loaded: true,
             },
             setup:
-                agentId === FOREMAN_AGENT_ID
+                engineAgentId === FOREMAN_AGENT_ID
                     ? null
                     : {
                           required: detail.config.setup.required,

@@ -76,6 +76,13 @@ function subscribe(agentId: string, listener: () => void) {
     }
 }
 
+// A pick made under another id of the same agent (the Chief of Staff's literal `foreman`, before its
+// chat addressed it by its row) carries over once, unless one was already made under the new id.
+export function carryAgentModel(fromId: string, toId: string): void {
+    const previous = getSnapshot(fromId)
+    if (previous.connectionId && !getSnapshot(toId).connectionId) setSelection(toId, previous)
+}
+
 // For a transport building its body at send time, outside of any render.
 export function readAgentModel(agentId: string): ModelSelection {
     return getSnapshot(agentId)

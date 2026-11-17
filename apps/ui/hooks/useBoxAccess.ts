@@ -2,6 +2,7 @@
 
 import { boxAccessFor, type BoxAccess, type BoxViewer } from '@/lib/board/box-access'
 import { useBoardStore } from '@/stores/board.store'
+import { useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useMemo } from 'react'
 
@@ -20,10 +21,16 @@ export function useSpaceAccess(spaceId: string | null | undefined): BoxAccess {
     return boxAccessFor(viewer, space, grants)
 }
 
-// A coworker carries no access of its own: it is its Box's.
+// A coworker carries no access of its own: it is its Box's. The Chief of Staff sits in no Box: every
+// member uses it and an admin manages it, the rule the server holds in `foremanAccessOf`.
 export function useAgentAccess(agentId: string | null | undefined): BoxAccess {
     const spaceId = useBoardStore(state => (agentId ? state.agents.find(a => a.id === agentId)?.spaceId : undefined))
-    return useSpaceAccess(spaceId)
+    const isForeman = useForemanStore(state => agentId !== null && agentId !== undefined && state.agentRowId === agentId)
+    const { user, role } = useSession()
+    const boxAccess = useSpaceAccess(spaceId)
+    if (!isForeman) return boxAccess
+    if (!user) return 'none'
+    return role === 'admin' ? 'manage' : 'use'
 }
 
 export function useCanManageAgent(agentId: string | null | undefined): boolean {

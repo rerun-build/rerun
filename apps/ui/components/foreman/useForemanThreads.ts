@@ -1,6 +1,6 @@
 'use client'
 
-import type { Conversation } from '@rerun/contracts'
+import type { Conversation, SessionStatus } from '@rerun/contracts'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { listForemanConversationsAction } from '@/app/api/_actions/foreman-conversation.actions'
@@ -43,9 +43,21 @@ function historyEntryOf(conversation: Thread): SessionHistoryEntry {
  * every change of this person's conversations: a thread that opens, starts working, waits on an
  * answer or gets its title. Only the engine's foreman has threads.
  */
-export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; entries: SessionHistoryEntry[] } {
+export type ForemanThreads = {
+    threads: ThreadRow[]
+    entries: SessionHistoryEntry[]
+    // This person's General, once they have spoken in it.
+    general: Conversation | null
+    // Where each of their conversations stands, General included, as the server last said.
+    statusOf: (sessionId: string) => SessionStatus | null
+    // The first read has answered: no General then means none yet.
+    loaded: boolean
+}
+
+export function useForemanThreads(enabled: boolean): ForemanThreads {
     const { user } = useSession()
     const [conversations, setConversations] = useState<Conversation[]>([])
+    const [loaded, setLoaded] = useState(false)
     const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
     // A read the network drops is taken again at the next realtime event or resync; the rows in
@@ -64,7 +76,11 @@ export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; ent
         if (!enabled) return
         let alive = true
         listForemanConversationsAction()
-            .then(rows => alive && setConversations(rows))
+            .then(rows => {
+                if (!alive) return
+                setConversations(rows)
+                setLoaded(true)
+            })
             .catch(() => {})
         return () => {
             alive = false
@@ -84,6 +100,13 @@ export function useForemanThreads(enabled: boolean): { threads: ThreadRow[]; ent
 
     return useMemo(() => {
         const threads = conversations.filter(isThread)
-        return { threads: threads.map(threadRowOf), entries: threads.map(historyEntryOf) }
-    }, [conversations])
+        const statuses = new Map(conversations.map(conversation => [conversation.id, conversation.status]))
+        return {
+            threads: threads.map(threadRowOf),
+            entries: threads.map(historyEntryOf),
+            general: conversations.find(conversation => conversation.kind === 'general') ?? null,
+            statusOf: (sessionId: string) => statuses.get(sessionId) ?? null,
+            loaded,
+        }
+    }, [conversations, loaded])
 }

@@ -9,6 +9,7 @@ vi.mock('@/app/api/_actions/foreman-conversation.actions', () => ({ peekForemanP
 vi.mock('@/lib/chat/send-session-message', () => ({ sendSessionMessage: mocks.sendSessionMessage, sendForemanThreadMessage: mocks.sendForemanThreadMessage }))
 vi.mock('@/lib/notifications/open-conversation', () => ({ resolveSessionId: async () => null }))
 vi.mock('@/hooks/useAgentModel', () => ({ useAgentModel: () => ({ selection: {} }) }))
+vi.mock('@/stores/foreman.store', () => ({ useForemanStore: (select: (state: { agentRowId: string }) => unknown) => select({ agentRowId: 'chief-of-staff-row' }) }))
 
 const { FOREMAN_AGENT_ID } = await import('@rerun/contracts')
 const { useInboxPeek } = await import('./useInboxPeek')
@@ -46,6 +47,18 @@ describe('useInboxPeek', () => {
         await render('closer', false)
         expect(seen.peek.state).toBe('loading')
         expect(mocks.peekPendingRequestAction).not.toHaveBeenCalled()
+    })
+
+    it('takes the row of the Chief of Staff, which its chat names it by, for the Chief of Staff', async () => {
+        mocks.peekForemanPendingRequestAction.mockResolvedValue(approvalPeek())
+        mocks.sendForemanThreadMessage.mockResolvedValue('sent')
+        await render('chief-of-staff-row')
+        expect(mocks.peekForemanPendingRequestAction).toHaveBeenCalledWith('session-1')
+        await act(async () => {
+            await seen.answer('APPROVED')
+        })
+        expect(mocks.sendForemanThreadMessage).toHaveBeenCalled()
+        expect(mocks.sendSessionMessage).not.toHaveBeenCalled()
     })
 
     it('reads a Chief of Staff thread through its own action and answers it on its own route', async () => {
