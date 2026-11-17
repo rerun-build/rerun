@@ -137,6 +137,13 @@ export async function agentAccessFor(actor: Actor, agent: AgentAccessRow): Promi
     return agent.space_id ? readSpaceAccess(actor, agent.space_id) : 'none'
 }
 
+// Which of an agent's conversations a list may show the caller: all of a coworker's, only the
+// caller's own with the Chief of Staff, and none of those to the workspace acting without a person.
+export function ownedSessionsOf(actor: Actor, agent: { kind: AgentKind }): { owner_id?: string } | null {
+    if (agent.kind !== 'foreman') return {}
+    return actor.kind === 'user' ? { owner_id: actor.userId } : null
+}
+
 export async function assertAgentAccess(agentId: string, need: AccessLevel, actor?: Actor): Promise<{ actor: Actor; access: BoxAccess; agent: { workspace_id: number; space_id: string | null; engine_agent_id: string | null; kind: AgentKind } }> {
     const resolved = actor ?? (await requireLightSessionActor())
     const supabase = createServiceRoleClient()

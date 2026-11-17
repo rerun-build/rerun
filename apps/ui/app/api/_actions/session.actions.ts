@@ -1,6 +1,6 @@
 'use server'
 
-import { assertAgentAccess, assertSessionInWorkspace } from '@/app/api/_auth/access'
+import { assertAgentAccess, assertSessionInWorkspace, ownedSessionsOf } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { clearSessionAlert, findGeneralSession, findIdleSessions, findSessionActiveRun, type GeneralSession } from '@/app/api/_services/chat.service'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
@@ -26,8 +26,9 @@ export async function listAgentThreadsAction(agentId: string): Promise<ThreadRow
 // The coworker's General, null until someone has spoken in it. Read through the caller's own access
 // to the coworker, like every other read of its conversations.
 export async function getGeneralSessionAction(agentId: string): Promise<GeneralSession | null> {
-    await assertAgentAccess(agentId, 'use')
-    return findGeneralSession(agentId).catch(() => null)
+    const { actor, agent } = await assertAgentAccess(agentId, 'use')
+    const owned = ownedSessionsOf(actor, agent)
+    return owned ? findGeneralSession(agentId, owned).catch(() => null) : null
 }
 
 export async function searchConversationsAction(query: string, agentId?: string): Promise<ConversationHit[]> {

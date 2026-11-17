@@ -14,7 +14,7 @@ import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { ENGINE_SESSION_NOT_FOUND, SESSION_NOT_FOUND, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
+import { ENGINE_SESSION_NOT_FOUND, FOREMAN_AGENT_ID, SESSION_NOT_FOUND, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
 
 type ChatRequestBody = {
     agentId?: unknown
@@ -75,6 +75,11 @@ export async function POST(request: Request) {
     const target = await getAgentChatTarget(agentId).catch(() => null)
     if (!target) {
         return Response.json({ error: 'Coworker not configured or not found' }, { status: 400 })
+    }
+    // A turn of the Chief of Staff carries the brief its own route writes, and lands in the caller's
+    // conversations only: never one started here.
+    if (target.engineAgentId === FOREMAN_AGENT_ID) {
+        return Response.json({ error: 'foreman_route' }, { status: 409 })
     }
 
     // A voice message carries its audio as a marker appended to the transcript; the session title

@@ -151,8 +151,8 @@ export async function createSessionRow(agentId: string, engineSessionId: string,
 }
 
 // The coworker's main conversation, once someone has spoken in it.
-export async function findGeneralSession(agentId: string): Promise<GeneralSession | null> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'sessions', ['id', 'engine_session_id'] as const, { agent_id: agentId, kind: 'general' })
+export async function findGeneralSession(agentId: string, owned: { owner_id?: string } = {}): Promise<GeneralSession | null> {
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'sessions', ['id', 'engine_session_id'] as const, { agent_id: agentId, kind: 'general', ...owned })
     return data ? { id: data.id, engineSessionId: data.engine_session_id } : null
 }
 

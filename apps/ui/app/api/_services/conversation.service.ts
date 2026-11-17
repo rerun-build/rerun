@@ -1,4 +1,4 @@
-import { actorFromContext, assertAgentAccess, assertSessionInWorkspace, keepVisible, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
+import { actorFromContext, assertAgentAccess, assertSessionInWorkspace, keepVisible, ownedSessionsOf, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget, type SessionUsageSeed, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { type HistoryMessage, transformEngineMessages } from '@/lib/chat/engine-history'
@@ -36,17 +36,21 @@ export type SessionHistoryEntry = {
 // engine-only sessions that were initiated by another agent (call_agent),
 // so those show up in the history like regular ones until adopted.
 export async function listAgentSessions(agentId: string, actor?: Actor): Promise<SessionHistoryEntry[]> {
-    const { actor: caller } = await assertAgentAccess(agentId, 'use', actor)
+    const { actor: caller, agent } = await assertAgentAccess(agentId, 'use', actor)
+    const owned = ownedSessionsOf(caller, agent)
+    if (!owned) return []
 
     const supabase = createServiceRoleClient()
 
     const [{ data: rows }, target] = await Promise.all([
-        selectMany(supabase, 'sessions', ['id', 'title', 'status', 'updated_at', 'created_at', 'engine_session_id', 'origin_agent_id', 'source', 'automation_name', 'outcome', 'kind', 'first_message'] as const, { agent_id: agentId }),
+        selectMany(supabase, 'sessions', ['id', 'title', 'status', 'updated_at', 'created_at', 'engine_session_id', 'origin_agent_id', 'source', 'automation_name', 'outcome', 'kind', 'first_message'] as const, { agent_id: agentId, ...owned }),
         resolveAgentTarget(agentId, caller).catch(() => null),
     ])
     const supabaseRows = rows ?? []
 
-    const engineSessions = target ? await listSessions(target.conn, target.engineAgentId).catch(() => []) : []
+    // The engine lists every member's conversations with the Chief of Staff, and none was started by
+    // another agent: only the caller's own rows count.
+    const engineSessions = target && agent.kind !== 'foreman' ? await listSessions(target.conn, target.engineAgentId).catch(() => []) : []
 
     const mirrored = new Set(supabaseRows.map(r => r.engine_session_id))
     const unmirrored = engineSessions.filter(s => s.originAgentId && !mirrored.has(s.id))
@@ -131,8 +135,10 @@ export const THREAD_FEED_LIMIT = 200
 // mirrors every conversation it opens on its own (`agent.session.created`), and the live state
 // comes from the board store, so there is nothing to ask the Box for here.
 export async function listAgentThreads(agentId: string, actor?: Actor): Promise<ThreadRow[]> {
-    await assertAgentAccess(agentId, 'use', actor)
-    const { data, error } = await selectMany(createServiceRoleClient(), 'sessions', THREAD_COLUMNS, { agent_id: agentId, kind: 'thread' }, { column: 'created_at', ascending: false }, THREAD_FEED_LIMIT)
+    const { actor: caller, agent } = await assertAgentAccess(agentId, 'use', actor)
+    const owned = ownedSessionsOf(caller, agent)
+    if (!owned) return []
+    const { data, error } = await selectMany(createServiceRoleClient(), 'sessions', THREAD_COLUMNS, { agent_id: agentId, kind: 'thread', ...owned }, { column: 'created_at', ascending: false }, THREAD_FEED_LIMIT)
     if (error) throw error
     return (data ?? []).map(row => ({
         id: row.id,

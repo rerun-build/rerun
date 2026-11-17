@@ -492,6 +492,24 @@ describe('listAgentThreads', () => {
         vi.mocked(createServiceRoleClient).mockReturnValue({} as never)
     })
 
+    const chief = { workspace_id: 7, space_id: null, engine_agent_id: 'foreman', kind: 'foreman' as const }
+
+    it("lists only the caller's own threads with the Chief of Staff, an admin's included", async () => {
+        vi.mocked(assertAgentAccess).mockResolvedValue({ ...reached(chief) })
+        vi.mocked(selectMany).mockResolvedValueOnce({ data: [], error: null } as never)
+
+        await listAgentThreads('cos', adminActor)
+
+        expect(vi.mocked(selectMany).mock.calls[0][3]).toEqual({ agent_id: 'cos', kind: 'thread', owner_id: 'admin' })
+    })
+
+    it('lists none of them to the workspace acting without a person', async () => {
+        vi.mocked(assertAgentAccess).mockResolvedValue({ ...reached(chief), actor: { kind: 'workspace', workspaceId: 7 } })
+
+        await expect(listAgentThreads('cos', { kind: 'workspace', workspaceId: 7 })).resolves.toEqual([])
+        expect(selectMany).not.toHaveBeenCalled()
+    })
+
     it('reads the newest threads of the coworker from Supabase alone, General left out', async () => {
         vi.mocked(selectMany).mockResolvedValueOnce({ data: [{ ...session('a', 's2', '2026-11-08T10:00:00Z'), automation_name: 'Daily check', outcome: 'done', origin_agent_id: null, first_message: 'Check the funnel' }], error: null } as never)
 

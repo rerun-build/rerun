@@ -51,6 +51,17 @@ describe('POST /api/chat', () => {
         vi.useRealTimers()
     })
 
+    it('sends the Chief of Staff back to its own route, which writes its brief and keeps conversations per member', async () => {
+        vi.mocked(getAgentChatTarget).mockResolvedValue({ engineAgentId: 'foreman', conn: { baseUrl: 'https://engine.test', apiKey: null } })
+
+        const response = await settle(POST(request({})))
+
+        expect(response.status).toBe(409)
+        expect(await response.json()).toEqual({ error: 'foreman_route' })
+        expect(engine.chat).not.toHaveBeenCalled()
+        expect(findGeneralSession).not.toHaveBeenCalled()
+    })
+
     it('hands a queued message back rather than tailing the run holding the conversation', async () => {
         vi.mocked(engine.chat).mockImplementation(async () => busy())
 
