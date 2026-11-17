@@ -28,6 +28,7 @@ ROB = ('Rob, 2026-11-16: "we count failures as a signal for change. So boss need
 FINAL = re.compile(r"(?m)^CAUSES:[ \t]*(none|(\d+) changes?)[ \t]*$")
 HEAD = re.compile(r"(?m)^CAUSE[ \t]+\d+[ \t]*$")
 FIELD = re.compile(r"^(GROUP|WHY|CULPRIT|CHANGE):[ \t]*(.*)$")
+QUOTE = re.compile(r'"[^"\n]{8,}"|`[^`\n]{8,}`')
 ISSUE = re.compile(r"^#(\d+)$")
 REVERT = "revert"
 DROPPED = "dropped"
@@ -76,6 +77,16 @@ def brief(repo, events, records, back):
         ROB,
         "",
         "Below are the events since the last analysis, one row each. Find why they happen and name the culprit.",
+        "",
+        "You may read these sources, and all of them are read only:",
+        "- the run of a failure with its tool calls: the coworker tool team_get_run with includeToolCalls true, "
+        "for the `run` id of a run record;",
+        "- the issue of the job and its comments: /data/tools/bin/gh issue view <job> -R <repo> --comments;",
+        "- the pull request of the job and its comments: /data/tools/bin/gh pr view <pr> -R <repo> --comments;",
+        "- the ledger rows of the job (`transitions` and `fires` in the run records) and each run's tokens: "
+        "/data/tools/bin/job-cost <repo>#<job>;",
+        "- the text of the brief: `briefs` in the run records, under the hash of the brief column of the table.",
+        "A WHY without a quoted line from one of these sources is not accepted: quote the line in double quotes or backticks.",
         "",
         table(events),
         "",
@@ -132,6 +143,8 @@ def read_block(text, groups):
         return None, "GROUP %r is not a group of the table" % g
     if not got.get("WHY"):
         return None, "block for %s has no WHY" % g
+    if not QUOTE.search(got["WHY"]):
+        return None, "block for %s has a WHY without a quoted line" % g
     if got.get("CULPRIT") not in CULPRITS:
         return None, "block for %s has an unknown CULPRIT %r" % (g, got.get("CULPRIT"))
     m = ISSUE.match(got.get("CHANGE", ""))

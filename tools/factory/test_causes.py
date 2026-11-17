@@ -12,7 +12,7 @@ def ev(i=1, kind="ended blocked", station="build", **kw):
     return row
 
 
-def block(k, group, culprit="station brief", issue=301, why="a quoted line: 'x'"):
+def block(k, group, culprit="station brief", issue=301, why='a quoted line: "the dispatcher merges only when"'):
     return "CAUSE %d\nGROUP: %s\nWHY: %s\nCULPRIT: %s\nCHANGE: #%d\n" % (k, group, why, culprit, issue)
 
 
