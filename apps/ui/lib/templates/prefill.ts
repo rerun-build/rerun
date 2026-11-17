@@ -44,8 +44,8 @@ const metaSchema = z.object({
             [
                 `The name of the template in the catalogue, ${TITLE_LIMIT} characters maximum. Prefer the shortest natural title that still names the job and its essential service.`,
                 'Open with the verb of the work being done, name the concrete output, then name the services it runs on with "with", "via" or "from".',
-                'The shape to follow: "Track SEO keyword rankings with Bright Data and GPT-5 analysis", "Send multiple emails in Gmail directly from Google Sheets", "Draft and schedule LinkedIn posts from a Notion backlog with Claude".',
-                'Sentence case, only proper nouns capitalised. Never a trailing period, never the words "template", "AI coworker that", "automation that", never a brand suffix.',
+                'The shape to follow: "Track SEO Keyword Rankings with Bright Data and GPT-5 Analysis", "Send Multiple Emails in Gmail Directly from Google Sheets", "Draft and Schedule LinkedIn Posts from a Notion Backlog with Claude".',
+                'Title Case, like every page title of the site: each word capitalised except the short function words (a, and, for, from, of, to, with, via). Never a trailing period, never the words "template", "AI coworker that", "automation that", never a brand suffix.',
                 'Name only the services the brief actually lists.',
             ].join(' '),
         ),
@@ -69,7 +69,7 @@ const metaSchema = z.object({
     metaTitle: z
         .string()
         .describe(
-            `Search result title, ${META_TITLE_LIMIT} characters maximum. The short version of the title above, not a different name: same verb, same job, fewer services. No brand suffix.`,
+            `Search result title, ${META_TITLE_LIMIT} characters maximum, in Title Case. The short version of the title above, not a different name: same verb, same job, fewer services. No brand suffix.`,
         ),
     metaDescription: z
         .string()
