@@ -2,6 +2,10 @@ import { findPendingHitl, type PendingHitl } from '@/lib/chat-hitl'
 
 type PeekMessage = { role: string; parts: readonly unknown[] }
 
+// What a coworker waits on is answered where it shows, the inbox or its row in General; any other
+// status that needs someone still opens the conversation.
+export const PEEK_STATUSES: ReadonlySet<string> = new Set(['awaiting_question', 'awaiting_approval', 'awaiting_connector'])
+
 export type PendingRequestPeek = {
     pending: Pick<PendingHitl, 'kind' | 'toolCallId' | 'input'> | null
     /** What the agent wrote to ask: the paragraph right before its request, and any written after it. */

@@ -2,7 +2,7 @@
 
 import { Skeleton } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState, type ReactNode, type Ref } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 
 import { MessageResponse } from '@/components/ai-elements/message'
 import { ActionApprovalBlock } from '@/components/chat/ActionApprovalBlock'
@@ -34,7 +34,8 @@ export function isAnswerable(pending: PendingRequest): boolean {
 
 /**
  * Sends an answer to a peeked request, shows the receipt for a moment, then hands over to `onDone`.
- * A card that leaves keeps its receipt while it goes; one that stays calls `rearm` for the next request.
+ * A card that leaves keeps its receipt while it goes; one that stays calls `rearm` for the next request,
+ * and when the request it was showing is gone.
  */
 export function usePeekAnswer(onAnswer: (text: string) => Promise<PeekAnswerOutcome>, onDone: (rearm: () => void) => void) {
     const [phase, setPhase] = useState<PeekPhase>({ step: 'asking' })
@@ -47,15 +48,16 @@ export function usePeekAnswer(onAnswer: (text: string) => Promise<PeekAnswerOutc
         onDoneRef.current = onDone
     })
 
+    const rearm = useCallback(() => {
+        setNotice(null)
+        setPhase(current => (current.step === 'asking' ? current : { step: 'asking' }))
+    }, [])
+
     useEffect(() => {
         if (phase.step !== 'sent') return
-        const rearm = () => {
-            setNotice(null)
-            setPhase({ step: 'asking' })
-        }
         const timer = setTimeout(() => onDoneRef.current(rearm), RECEIPT_MS)
         return () => clearTimeout(timer)
-    }, [phase.step])
+    }, [phase.step, rearm])
 
     const submit = async (text: string) => {
         setNotice(null)
@@ -68,7 +70,7 @@ export function usePeekAnswer(onAnswer: (text: string) => Promise<PeekAnswerOutc
         setPhase({ step: 'asking' })
     }
 
-    return { phase, notice, attempt, submit }
+    return { phase, notice, attempt, submit, rearm }
 }
 
 type PeekRequestProps = {

@@ -14,6 +14,7 @@ import { useInboxPeek, type InboxPeekTarget } from '@/hooks/useInboxPeek'
 import { useTabSignals } from '@/hooks/useTabSignals'
 import { useUnseenGroups } from '@/hooks/useUnseenGroups'
 import type { SessionStatus } from '@/lib/board/types'
+import { PEEK_STATUSES } from '@/lib/chat/pending-request-peek'
 import type { AnnouncedNotification } from '@/lib/notifications/announcement'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
 import { reasonSentence } from '@/lib/notifications/reason-copy'
@@ -31,9 +32,6 @@ export type InboxItem = Omit<AttentionSession, 'status'> & { status: SessionStat
 function InboxItemMenu({ item, onOpenChange }: RowMenuProps<InboxItem>) {
     return <InboxRowMenu agentId={item.agentId} agentName={item.agentName} onOpenChange={onOpenChange} />
 }
-
-// What a coworker waits on is answered from the inbox; the rest still opens the conversation.
-const PEEK_STATUSES = new Set(['awaiting_question', 'awaiting_approval', 'awaiting_connector'])
 
 type Peek = { entry: InboxEntry; target: InboxPeekTarget; engineRunId: string | null }
 

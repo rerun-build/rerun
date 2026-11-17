@@ -3,9 +3,10 @@
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { useCallback, useEffect, useState } from 'react'
 
+import { peekForemanPendingRequestAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { peekPendingRequestAction } from '@/app/api/_actions/session.actions'
 import { useAgentModel } from '@/hooks/useAgentModel'
-import { pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
+import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { sendForemanThreadMessage, sendSessionMessage } from '@/lib/chat/send-session-message'
 import { resolveSessionId } from '@/lib/notifications/open-conversation'
 
@@ -16,18 +17,15 @@ export type PeekAnswerOutcome = 'sent' | 'busy' | 'stale' | 'failed'
 /** The conversation an inbox entry stands for: a row knows its session, an announcement only the engine's id. */
 export type InboxPeekTarget = { agentId: string; sessionId: string | null; engineSessionId: string | null }
 
-// The Chief of Staff's conversations are not sessions of a coworker: they are read through its own route.
-async function readPendingRequest(agentId: string, sessionId: string): Promise<PendingRequestPeek | null> {
-    if (agentId !== FOREMAN_AGENT_ID) return peekPendingRequestAction(sessionId)
-    const res = await fetch(`/api/chat/foreman/engine?sessionId=${encodeURIComponent(sessionId)}`)
-    if (!res.ok) return null
-    const conversation = (await res.json()) as { messages?: { role: string; parts: unknown[] }[] } | null
-    return conversation?.messages?.length ? pendingRequestPeek(conversation.messages) : null
+// The Chief of Staff's conversations are not sessions of a coworker: they are read through an action of their own.
+function readPendingRequest(agentId: string, sessionId: string): Promise<PendingRequestPeek | null> {
+    return agentId === FOREMAN_AGENT_ID ? peekForemanPendingRequestAction(sessionId) : peekPendingRequestAction(sessionId)
 }
 
 // Reads what a conversation waits on and answers it from the inbox, the way its chat would. Held off
-// while `enabled` is false, and read again each time it turns true: a thread of General asks again.
-export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekTarget, enabled = true) {
+// while `enabled` is false, and read again each time it turns true or `revision` changes: a thread of
+// General asks again, and its status alone may have gone there and back between two reads of the list.
+export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekTarget, enabled = true, revision?: string) {
     const [peek, setPeek] = useState<InboxPeek>({ state: 'loading' })
     const { selection: model } = useAgentModel(agentId)
 
@@ -48,7 +46,7 @@ export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekT
         return () => {
             cancelled = true
         }
-    }, [agentId, sessionId, engineSessionId, enabled])
+    }, [agentId, sessionId, engineSessionId, enabled, revision])
 
     // The card may have stayed open while the question was answered elsewhere: the chat, another tab, a
     // teammate. Read again right before sending, so an answer never lands on a request that is gone.

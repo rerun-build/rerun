@@ -30,10 +30,12 @@ const inbox = vi.hoisted(() => ({
     peek: { state: 'loading' } as InboxPeek,
     answer: (async () => 'sent') as (text: string) => Promise<PeekAnswerOutcome>,
     enabled: [] as boolean[],
+    revisions: [] as (string | undefined)[],
 }))
 vi.mock('@/hooks/useInboxPeek', () => ({
-    useInboxPeek: (_target: unknown, enabled: boolean) => {
+    useInboxPeek: (_target: unknown, enabled: boolean, revision?: string) => {
         inbox.enabled.push(enabled)
+        inbox.revisions.push(revision)
         return { peek: inbox.peek, answer: inbox.answer }
     },
 }))
@@ -42,33 +44,38 @@ const { ThreadBranch } = await import('./ThreadBranch')
 
 const OWNER = { agentId: 'closer', agentName: 'Closer' }
 
+const CREATED_AT = '2026-11-17T10:00:00.000Z'
+let updatedAt = CREATED_AT
+
 const thread = (status: ThreadRow['status']): ThreadRow => ({
     id: 'session-1',
     title: 'Pipeline follow-ups',
     status,
     source: 'schedule',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: CREATED_AT,
+    updatedAt,
     originAgentId: null,
     automationName: 'Pipeline follow-ups',
     outcome: null,
     firstMessage: null,
 })
 
-const APPROVAL: InboxPeek = {
+const approval = (toolCallId = 'call-1'): InboxPeek => ({
     state: 'ready',
     sessionId: 'session-1',
-    peek: { pending: { kind: 'approval', toolCallId: 'call-1', input: { approvals: [{ action: 'Send the follow-up to lena@northwind.io' }] } }, ask: 'I need your go before it leaves.', before: 'I drafted 23 follow-ups.' },
-}
+    peek: { pending: { kind: 'approval', toolCallId, input: { approvals: [{ action: 'Send the follow-up to lena@northwind.io' }] } }, ask: 'I need your go before it leaves.', before: 'I drafted 23 follow-ups.' },
+})
 
 let container: HTMLDivElement
 let root: Root
 
 beforeEach(() => {
     ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
-    inbox.peek = APPROVAL
+    inbox.peek = approval()
     inbox.answer = async () => 'sent'
     inbox.enabled = []
+    inbox.revisions = []
+    updatedAt = CREATED_AT
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)
@@ -104,7 +111,24 @@ describe('ThreadBranch in General', () => {
         await press(row())
         expect(onOpen).toHaveBeenCalledOnce()
         expect(row().getAttribute('aria-expanded')).toBeNull()
-        expect(inbox.enabled.every(enabled => !enabled)).toBe(true)
+        expect(inbox.enabled).toEqual([])
+    })
+
+    it('opens a thread that only wants to be read in its tab: there is nothing to answer', async () => {
+        const onOpen = vi.fn()
+        render('awaiting_ack', onOpen)
+        expect(row().textContent).toContain('Needs you')
+        await press(row())
+        expect(onOpen).toHaveBeenCalledOnce()
+        expect(inbox.enabled).toEqual([])
+    })
+
+    it('starts reading once a plain row comes to wait on an answer', async () => {
+        render('idle')
+        expect(inbox.enabled).toEqual([])
+        render('awaiting_approval')
+        expect(inbox.enabled.at(-1)).toBe(true)
+        expect(row().getAttribute('aria-expanded')).toBe('false')
     })
 
     it('reads the request as soon as the row needs us, and unfolds it on a click', async () => {
@@ -172,6 +196,62 @@ describe('ThreadBranch in General', () => {
         render('working')
         expect(row().getAttribute('aria-expanded')).toBeNull()
         expect(container.querySelector('[data-hitl="approve"]')).toBeNull()
+    })
+
+    it('starts folded on the next request after one was answered elsewhere', async () => {
+        render('awaiting_approval')
+        await press(row())
+        render('working')
+        inbox.peek = approval('call-2')
+        render('awaiting_approval')
+        expect(row().getAttribute('aria-expanded')).toBe('false')
+        expect(container.querySelector('[data-hitl="approve"]')).toBeNull()
+    })
+
+    it('gives the form back for the next request after an answer that came too late', async () => {
+        inbox.answer = async () => 'stale'
+        render('awaiting_approval')
+        await press(row())
+        await press(container.querySelector('[data-hitl="approve"]'))
+        expect(container.textContent).toContain('This was already answered.')
+
+        inbox.peek = approval('call-2')
+        render('awaiting_approval')
+        expect(container.textContent).not.toContain('This was already answered.')
+        expect(container.querySelector('[data-hitl="approve"]')).not.toBeNull()
+    })
+
+    it('keeps the card while the answer is on its way, even if the thread already runs again', async () => {
+        let settle: (outcome: PeekAnswerOutcome) => void = () => {}
+        inbox.answer = () => new Promise<PeekAnswerOutcome>(resolve => (settle = resolve))
+        render('awaiting_approval')
+        await press(row())
+        await press(container.querySelector('[data-hitl="approve"]'))
+        render('working')
+        expect(button('Open conversation')).not.toBeNull()
+
+        await act(async () => settle('sent'))
+        expect(container.textContent).toContain('Sent to Closer')
+    })
+
+    it('reads the request again when the thread has moved, but not under an answer on its way', async () => {
+        let settle: (outcome: PeekAnswerOutcome) => void = () => {}
+        inbox.answer = () => new Promise<PeekAnswerOutcome>(resolve => (settle = resolve))
+        render('awaiting_approval')
+        expect(inbox.revisions.at(-1)).toBe(CREATED_AT)
+
+        updatedAt = '2026-11-17T10:05:00.000Z'
+        render('awaiting_approval')
+        expect(inbox.revisions.at(-1)).toBe('2026-11-17T10:05:00.000Z')
+
+        await press(row())
+        await press(container.querySelector('[data-hitl="approve"]'))
+        updatedAt = '2026-11-17T10:06:00.000Z'
+        render('awaiting_approval')
+        expect(inbox.revisions.at(-1)).toBe('2026-11-17T10:05:00.000Z')
+
+        await act(async () => settle('busy'))
+        expect(inbox.revisions.at(-1)).toBe('2026-11-17T10:06:00.000Z')
     })
 
     it('stays a plain row without its coworker', async () => {

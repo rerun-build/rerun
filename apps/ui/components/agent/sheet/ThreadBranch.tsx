@@ -12,6 +12,7 @@ import { PeekRequest, PeekSent, PeekSkeleton, usePeekAnswer } from '@/components
 import { useInboxPeek } from '@/hooks/useInboxPeek'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { SessionStatus } from '@/lib/board/types'
+import { PEEK_STATUSES } from '@/lib/chat/pending-request-peek'
 import { ArrowRight, CalendarClock, ChevronRightIcon, WebhookIcon } from '@/lib/icons'
 import { shortRelativeTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
@@ -46,6 +47,8 @@ const ROW = 'group relative flex h-8 items-center gap-2 overflow-hidden px-2.5 t
 const EXPANDED_MAX_WIDTH = 560
 // The row's indent under the bubble, `pl-7`.
 const BRANCH_INDENT = 28
+// Stands for the request of a row that waits, until it is read.
+const REQUEST_UNREAD = ''
 
 // One curve for the whole morph. The width, the height and the content move together, both ways: the
 // body is revealed by its own growing height, never shown as an empty frame waiting for its content.
@@ -59,7 +62,7 @@ const INSTANT: Transition = { duration: 0 }
 
 const isAutomated = (thread: ThreadRow) => thread.source === 'schedule' || thread.source === 'trigger'
 
-/** The coworker whose thread it is: given, a thread that needs us unfolds into its request instead of opening its tab. */
+/** The coworker whose thread it is: given, a thread that waits on an answer unfolds into its request instead of opening its tab. */
 export type ThreadPeekOwner = { agentId: string; agentName: string }
 
 // What stands in for the opening message when the hub never saw one: a run the engine started, a
@@ -75,8 +78,8 @@ function genericOpener(thread: ThreadRow, originAgentName: string | null, t: Ret
  * A thread in General: the message it opened with, in a small bubble, and under it the thread's
  * row, joined by a curve that leaves the bubble's bottom like a delegation's branches in
  * `SubRunTree`. The row is hatched rather than filled, so it never reads as one more bubble, and a
- * click on it opens the thread in its tab. With its `owner`, a row that needs us grows into its
- * request instead, see `ThreadPeek`.
+ * click on it opens the thread in its tab. With its `owner`, a row that waits on an answer grows
+ * into its request instead, see `ThreadPeek`.
  */
 export function ThreadBranch({ thread, onOpen, owner }: { thread: ThreadRow; onOpen: () => void; owner?: ThreadPeekOwner }) {
     const tOpener = useTranslations('agent.threadBranch.opener')
@@ -84,14 +87,19 @@ export function ThreadBranch({ thread, onOpen, owner }: { thread: ThreadRow; onO
     const originAgentName = useBoardStore(s => (thread.originAgentId ? (s.agents.find(agent => agent.id === thread.originAgentId)?.name ?? null) : null))
     const opener = thread.firstMessage ?? genericOpener(thread, originAgentName, tOpener)
     const title = thread.automationName && thread.automationName !== thread.title ? thread.automationName : undefined
+    const peekable = owner !== undefined && PEEK_STATUSES.has(thread.status)
+    // Only a row that waits on an answer, or did, carries the card: General hangs up to 200 threads,
+    // and the others stay a plain button. Never taken back, so the receipt is not cut by a remount.
+    const [peeked, setPeeked] = useState(peekable)
+    if (peekable && !peeked) setPeeked(true)
     return (
         <div className="flex w-full flex-col gap-2" data-thread-row={thread.id}>
             {/* The clamp sits on an inner span: on the padded box itself, a third line would show through the bottom padding. Its right padding keeps the overhang of a last italic glyph. */}
             <div className={cn('w-fit max-w-full rounded-2xl rounded-bl-md bg-muted px-3 py-1.5 text-xs text-foreground/80', !thread.firstMessage && 'text-muted-foreground italic')}>
                 <span className="line-clamp-2 pr-0.5 break-words">{opener}</span>
             </div>
-            {owner ? (
-                <ThreadPeek thread={thread} state={state} owner={owner} title={title} onOpen={onOpen} />
+            {owner && peeked ? (
+                <ThreadPeek thread={thread} state={state} peekable={peekable} owner={owner} title={title} onOpen={onOpen} />
             ) : (
                 <div className="relative w-full pl-7">
                     <BranchCurve state={state} />
@@ -107,32 +115,55 @@ export function ThreadBranch({ thread, onOpen, owner }: { thread: ThreadRow; onO
 
 /**
  * The row and the request it waits on, as one element: the row stays on top as its header. A click
- * on a row that needs us unfolds the request under it, the row folds it back, the footer goes to the
- * conversation. Once answered, the receipt shows for a moment, then it folds back to a row without
- * its badge. The request is read as soon as the row needs us, so the click unfolds it in one movement.
+ * on a row that waits on an answer unfolds the request under it, the row folds it back, the footer
+ * goes to the conversation. Once answered, the receipt shows for a moment, then it folds back to a
+ * row without its badge. The request is read as soon as the row waits, so the click unfolds it in
+ * one movement.
  */
-function ThreadPeek({ thread, state, owner, title, onOpen }: { thread: ThreadRow; state: ThreadState; owner: ThreadPeekOwner; title: string | undefined; onOpen: () => void }) {
+function ThreadPeek({ thread, state, peekable, owner, title, onOpen }: { thread: ThreadRow; state: ThreadState; peekable: boolean; owner: ThreadPeekOwner; title: string | undefined; onOpen: () => void }) {
     const t = useTranslations('notifications.inbox.peek')
     const reducedMotion = useReducedMotion()
     const [expanded, setExpanded] = useState(false)
-    const { peek, answer } = useInboxPeek({ agentId: owner.agentId, sessionId: thread.id, engineSessionId: null }, state === 'needs')
+    // The thread moves when it is answered too: read again only once the answer and its receipt are
+    // over, so neither loses the request it is about.
+    const [readAt, setReadAt] = useState(thread.updatedAt)
+    const { peek, answer } = useInboxPeek({ agentId: owner.agentId, sessionId: thread.id, engineSessionId: null }, peekable, readAt)
     const fold = useCallback(() => setExpanded(false), [])
     // The body that folds away keeps the receipt it was showing: the row is ready for the next request at once.
-    const { phase, notice, attempt, submit } = usePeekAnswer(answer, rearm => {
+    const { phase, notice, attempt, submit, rearm } = usePeekAnswer(answer, rearmAfterReceipt => {
         fold()
-        rearm()
+        rearmAfterReceipt()
     })
     const [measureColumn, columnWidth] = useMeasuredWidth()
     const [measureRow, rowWidth] = useMeasuredWidth()
     const sent = phase.step === 'sent'
-    const open = expanded && (state === 'needs' || sent)
-    // Two px of border around the row's own width; the column's, minus the branch's indent, once open.
-    const collapsedWidth = rowWidth === null ? null : rowWidth + 2
-    const openWidth = columnWidth === null ? null : Math.min(EXPANDED_MAX_WIDTH, columnWidth - BRANCH_INDENT)
-    const width = open ? openWidth : collapsedWidth
+    const sending = phase.step === 'sending'
     const pending = peek.state === 'ready' ? peek.peek.pending : null
+    if (!sending && !sent && readAt !== thread.updatedAt) setReadAt(thread.updatedAt)
 
-    const toggle = () => (state === 'needs' || open ? setExpanded(!open) : onOpen())
+    // The row outlives its requests: the one it waits on now, null once it waits on none. What was
+    // left of the previous one (a card left open, an answer that came too late) goes with it, so the
+    // next request starts folded on a fresh form. An answer on its way keeps its card: the receipt folds it.
+    const request = peekable ? (pending?.toolCallId ?? REQUEST_UNREAD) : null
+    const [shownRequest, setShownRequest] = useState(request)
+    if (shownRequest !== request) {
+        setShownRequest(request)
+        if (!sending && !sent) {
+            if (shownRequest === null || request === null) setExpanded(false)
+            rearm()
+        }
+    }
+
+    // The status may say the coworker is working again before the answer's own request comes back.
+    const open = expanded && (peekable || sending || sent)
+    // The column's width, minus the branch's indent: what the card takes once open, and the most a
+    // row takes. Two px of border around the row's own width.
+    const room = columnWidth === null ? null : columnWidth - BRANCH_INDENT
+    const collapsedWidth = rowWidth === null ? null : Math.min(rowWidth + 2, room ?? Infinity)
+    const openWidth = room === null ? null : Math.min(EXPANDED_MAX_WIDTH, room)
+    const width = open ? openWidth : collapsedWidth
+
+    const toggle = () => (peekable || open ? setExpanded(!open) : onOpen())
     const openConversation = () => {
         fold()
         onOpen()
@@ -146,7 +177,7 @@ function ThreadPeek({ thread, state, owner, title, onOpen }: { thread: ThreadRow
                 <div ref={measureRow} aria-hidden className={cn(ROW, 'invisible absolute top-0 left-0 w-max whitespace-nowrap')}>
                     <ThreadRowContent thread={thread} state={state} badged={!sent} open={false} stretch />
                 </div>
-                <button type="button" aria-expanded={state === 'needs' ? open : undefined} onClick={toggle} title={title} className={cn(ROW, 'w-full')}>
+                <button type="button" aria-expanded={peekable ? open : undefined} onClick={toggle} title={title} className={cn(ROW, 'w-full')}>
                     <RowStripes />
                     <ThreadRowContent thread={thread} state={state} badged={!sent} open={open} stretch />
                 </button>
