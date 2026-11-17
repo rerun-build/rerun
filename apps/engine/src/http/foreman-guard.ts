@@ -3,10 +3,11 @@ import type { MiddlewareHandler } from 'hono'
 import { FOREMAN_KEPT_FIELDS } from '../agents/foreman.js'
 
 // The foreman's identity, soul and tools are rewritten from code at every boot, so none of them is
-// editable over HTTP: the hub may talk to it, read it, its conversations and its runs, stop a run or
-// one of its delegated tasks, hand it the files of a chat message, pin the model it runs on and let it
-// spend on paid data without asking. What it keeps for the team like a coworker keeps its own
-// (memories, skills, its private database) and its screen are reached through the coworker routes.
+// editable over HTTP: the hub may talk to it, read it, its tools, its conversations and its runs, stop
+// a run or one of its delegated tasks, pin the model it runs on and let it spend on paid data without
+// asking. What it keeps for the team like a coworker keeps its own (memories, skills, its private
+// database, the files of its workspace) and its screen are reached through the coworker routes: the
+// files router is rooted in its workspace, beside its config, never above it.
 const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'GET', path: /^\/agents\/foreman$/ },
     { method: 'POST', path: /^\/agents\/foreman\/chat$/ },
@@ -18,16 +19,13 @@ const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'GET', path: /^\/agents\/foreman\/runs\/[^/]+$/ },
     { method: 'GET', path: /^\/agents\/foreman\/runs\/[^/]+\/steps$/ },
     { method: 'POST', path: /^\/agents\/foreman\/runs\/[^/]+\/tasks\/[^/]+\/cancel$/ },
-    { method: 'GET', path: /^\/agents\/foreman\/files\/raw$/ },
-    { method: 'PUT', path: /^\/agents\/foreman\/files\/raw$/ },
-    { method: 'POST', path: /^\/agents\/foreman\/files\/raw$/ },
-    { method: 'GET', path: /^\/agents\/foreman\/files\/read$/ },
-    { method: 'DELETE', path: /^\/agents\/foreman\/files$/ },
     // Where its apps stand: they come from the Vault, which the hub changes through `/vault`.
     { method: 'GET', path: /^\/agents\/foreman\/mcp-servers\/status$/ },
+    // What it can do, shown in its panel: its tools are set by code, so they are read, never patched.
+    { method: 'GET', path: /^\/agents\/foreman\/tools$/ },
 ]
 
-const FOREMAN_OPEN_SUBTREES = ['memories', 'skills', 'data', 'desktop'].map(resource => `/agents/${FOREMAN_AGENT_ID}/${resource}`)
+const FOREMAN_OPEN_SUBTREES = ['memories', 'skills', 'data', 'desktop', 'files'].map(resource => `/agents/${FOREMAN_AGENT_ID}/${resource}`)
 
 const inOpenSubtree = (path: string) => FOREMAN_OPEN_SUBTREES.some(root => path === root || path.startsWith(`${root}/`))
 

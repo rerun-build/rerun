@@ -8,6 +8,7 @@ import type { ForemanArrival, ForemanBackend } from '@/lib/foreman/phase'
 import type { ForemanSurface } from '@/lib/foreman/surface'
 import { rememberForemanOpen } from '@/lib/foreman-open'
 import { useBoardStore } from '@/stores/board.store'
+import { useSimpleDetailsStore } from '@/stores/simple-details.store'
 import type { ForemanTab } from '@rerun/ui/foreman'
 import { randomUuid } from '@/lib/random-uuid'
 
@@ -16,6 +17,17 @@ export type ForemanFunnel = 'unknown' | 'guided' | 'companion'
 export type { ForemanTab }
 
 export type StartedLead = { agentId: string; conversationId: string }
+
+/**
+ * The screens its card opens, the coworker's that make sense for it (no triggers, no install, no
+ * activity), and the workspace's routines, which it oversees rather than owns.
+ */
+export type ForemanCardScreen = 'services' | 'skills' | 'memories' | 'routines' | 'files' | 'data' | 'tools'
+
+/** A table a card of its chat asked to open, read once by the database screen. */
+export type ForemanDataFocus = { table: string; view?: string }
+
+export type ForemanCard = { screen: ForemanCardScreen | null; dataFocus: ForemanDataFocus | null }
 
 type ForemanState = {
     /** `null` tant que le client n'a pas tranché : le premier rendu suit alors ce que dit le cookie. */
@@ -53,6 +65,11 @@ type ForemanState = {
     draftId: string | null
     /** Its row of `agents`, which its chat addresses it by once past the onboarding. */
     agentRowId: string | null
+    /**
+     * Its card, open over the chat on the board, and the screen picked on it. In the Simple view the
+     * card lives in the column beside the chat, so there only the screen is read.
+     */
+    card: ForemanCard | null
     /**
      * Qui sert la conversation en cours. `null` tant qu'aucun message n'est parti : elle suit alors
      * `surface`, puis se fige au premier envoi et ne change plus.
@@ -122,6 +139,10 @@ type ForemanState = {
     restorePlacement: (placement: ForemanPlacement) => void
     setDropTarget: (target: ForemanPlacement | null) => void
     setTab: (tab: ForemanTab) => void
+    openCard: (screen?: ForemanCardScreen | null, dataFocus?: ForemanDataFocus | null) => void
+    setCardScreen: (screen: ForemanCardScreen | null) => void
+    clearCardDataFocus: () => void
+    closeCard: () => void
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
     /** Entrer dans le tunnel : le mode, la carte d'accueil et l'ouverture, d'un seul coup. */
@@ -188,6 +209,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     engineRunId: null,
     ...freshGeneral(),
     agentRowId: null,
+    card: null,
     backend: null,
     surface: 'unknown',
     planPreview: null,
@@ -242,7 +264,18 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
         set({ placement })
     },
     setDropTarget: dropTarget => set({ dropTarget }),
-    setTab: tab => set({ tab }),
+    setTab: tab => set({ tab, card: null }),
+    // Opened from a card of its chat too: in the Simple view that is the column beside it, wanted again.
+    openCard: (screen = null, dataFocus = null) => {
+        set({ card: { screen, dataFocus } })
+        useSimpleDetailsStore.getState().setWanted(true)
+    },
+    setCardScreen: screen => set({ card: { screen, dataFocus: null } }),
+    clearCardDataFocus: () => {
+        const card = get().card
+        if (card?.dataFocus) set({ card: { ...card, dataFocus: null } })
+    },
+    closeCard: () => set({ card: null }),
     setFunnel: funnel => set({ funnel }),
     setWaitlisted: waitlisted => set({ waitlisted }),
     // En un seul `set` et pas trois : entre « le tunnel commence » et « la carte est là », le
@@ -316,6 +349,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             engineRunId: null,
             ...freshGeneral(),
             agentRowId: null,
+            card: null,
             backend: null,
             surface: 'unknown',
             planPreview: null,

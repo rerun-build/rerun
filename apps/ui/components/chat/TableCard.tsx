@@ -4,6 +4,7 @@ import type { TableCard as TableCardData } from '@rerun/contracts'
 import { TableCard as TableCardBase } from '@rerun/ui/chat'
 import { rawUrlResolver, type RawUrlFor } from '@/lib/files/raw-url'
 import { useBoardStore } from '@/stores/board.store'
+import { useForemanStore } from '@/stores/foreman.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useTranslations } from 'next-intl'
 
@@ -23,13 +24,16 @@ export function TableCard({ agentId, card, onOpen, rawUrlFor }: TableCardProps) 
     // itself rather than doing nothing.
     const t = useTranslations('chat.tableCard')
     const boxId = useBoardStore(state => state.agents.find(a => a.id === agentId)?.spaceId)
+    // The Chief of Staff is in no Box: its database opens on its own card, beside its chat.
+    const isForeman = useForemanStore(state => !!agentId && state.agentRowId === agentId)
     const openAgentData = useBoardStore(state => state.openAgentData)
     const openKnowledgeBase = useWorkspaceSettingsStore(state => state.openKnowledgeBase)
 
     function openTarget(): (() => void) | undefined {
         if (onOpen) return onOpen
-        if (!boxId) return undefined
+        if (!boxId && !isForeman) return undefined
         if (card.scope === 'shared') return () => openKnowledgeBase('database', card.table, card.view)
+        if (isForeman) return () => useForemanStore.getState().openCard('data', { table: card.table, view: card.view })
         return agentId ? () => openAgentData(agentId, card.table, card.view) : undefined
     }
 

@@ -63,7 +63,8 @@
         },
         "signIn": "Sign in",
         "newTask": "New task",
-        "conversations": "Conversations"
+        "conversations": "Conversations",
+        "card": "Chief of Staff card"
     },
     "threads": {
         "general": "General",

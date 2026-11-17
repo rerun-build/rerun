@@ -331,7 +331,8 @@
         "paidDataAlwaysAllow": {
             "label": "Dépenser sans demander",
             "description": "Passe la validation du coût, pour que les tâches planifiées et déléguées utilisent les données payantes en votre absence."
-        }
+        },
+        "foremanToolsFixed": "Rerun fixe ce que le Chief of Staff peut faire. Seules ses dépenses sont à vous de choisir."
     },
     "agentPanelTriggers": {
         "new": "Nouveau",

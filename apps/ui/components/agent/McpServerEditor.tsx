@@ -10,7 +10,7 @@ import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeade
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useAgentVariables } from '@/hooks/useAgentVariables'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { useBoxManageReason } from '@/hooks/useBoxManageReason'
+import { useAgentManageReason } from '@/hooks/useBoxManageReason'
 import { argsHaveSecret, externalizeArgs, externalizePairs, externalizeUrl, sanitize, urlHasSecret } from '@/lib/engine/mcp-secrets'
 import type { EngineMcpServer } from '@/lib/engine/types'
 import { MCP_SERVER_NAME_RE } from '@rerun/contracts'
@@ -49,7 +49,7 @@ export function McpServerEditor({
     onDone: () => void
     onBack: () => void
 }) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useAgentManageReason(agentId)
     const t = useTranslations('agent.mcpServerEditor')
     const errorText = useErrorText()
     const isEdit = !!server

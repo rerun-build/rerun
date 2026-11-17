@@ -331,7 +331,8 @@
         "paidDataAlwaysAllow": {
             "label": "Gastar sin preguntar",
             "description": "Omite la aprobación del costo, para que las tareas programadas y delegadas usen datos de pago mientras no estás."
-        }
+        },
+        "foremanToolsFixed": "Rerun fija lo que el Chief of Staff puede hacer. Solo sus gastos los eliges tú."
     },
     "agentPanelTriggers": {
         "new": "Nuevo",

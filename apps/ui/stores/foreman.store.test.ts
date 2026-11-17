@@ -218,3 +218,32 @@ describe('selectors', () => {
         expect(foremanOrbState({ open: false, activity: 'thinking' as never })).toBe('thinking')
     })
 })
+
+describe('its card', () => {
+    it('opens on a screen with a table to show, wanted beside the chat in the Simple view too', async () => {
+        const { useSimpleDetailsStore } = await import('@/stores/simple-details.store')
+        useSimpleDetailsStore.getState().setWanted(false)
+        useForemanStore.getState().openCard('data', { table: 'leads', view: 'Hot' })
+        expect(useForemanStore.getState().card).toEqual({ screen: 'data', dataFocus: { table: 'leads', view: 'Hot' } })
+        expect(useSimpleDetailsStore.getState().wanted).toBe(true)
+    })
+
+    it('reads the table once, and drops it when another screen is picked', () => {
+        const store = useForemanStore.getState()
+        store.openCard('data', { table: 'leads' })
+        store.clearCardDataFocus()
+        expect(useForemanStore.getState().card).toEqual({ screen: 'data', dataFocus: null })
+        store.openCard('data', { table: 'leads' })
+        store.setCardScreen('skills')
+        expect(useForemanStore.getState().card).toEqual({ screen: 'skills', dataFocus: null })
+    })
+
+    it('gives the column back to a tab picked over it, and goes with the account', () => {
+        useForemanStore.getState().openCard()
+        useForemanStore.getState().setTab('routines')
+        expect(useForemanStore.getState()).toMatchObject({ card: null, tab: 'routines' })
+        useForemanStore.getState().openCard('files')
+        useForemanStore.getState().reset()
+        expect(useForemanStore.getState().card).toBeNull()
+    })
+})

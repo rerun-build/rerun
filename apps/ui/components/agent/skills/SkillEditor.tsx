@@ -7,6 +7,7 @@ import { PanelSteps } from '@/components/ui/panel-steps'
 import { SkillFileEditor } from '@/components/agent/skills/SkillFileEditor'
 import { SkillFilesSection } from '@/components/agent/skills/SkillFilesSection'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
+import { useAgentManageReason } from '@/hooks/useBoxManageReason'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,10 +28,10 @@ type SkillEditorProps = {
 export function SkillEditor({ agentId, slug, readOnly: readOnlyProp, onDone, onBack }: SkillEditorProps) {
     const t = useTranslations('agent.skillEditor')
     const errorText = useErrorText()
-    const tShared = useTranslations('agent.modelsShared')
     const isEdit = !!slug
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : tShared('boxManageReason')
+    const agentManageReason = useAgentManageReason(agentId)
+    const manageReason = canManage ? undefined : agentManageReason
     const readOnly = readOnlyProp || !canManage
     const [loading, setLoading] = useState(isEdit)
     const [name, setName] = useState('')

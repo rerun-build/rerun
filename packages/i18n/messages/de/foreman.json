@@ -16,7 +16,8 @@
         },
         "signIn": "Anmelden",
         "newTask": "Neue Aufgabe",
-        "conversations": "Unterhaltungen"
+        "conversations": "Unterhaltungen",
+        "card": "Karte des Chief of Staff"
     },
     "threads": {
         "general": "Allgemein",

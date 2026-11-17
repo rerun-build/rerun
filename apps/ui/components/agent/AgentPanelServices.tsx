@@ -26,7 +26,7 @@ import { Icon } from '@/components/ui/icon'
 import { Input } from '@/components/ui/input'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { useBoxManageReason } from '@/hooks/useBoxManageReason'
+import { useAgentManageReason } from '@/hooks/useBoxManageReason'
 import { serviceIconProps } from '@/lib/services/icons'
 import { SERVICE_CATEGORIES, type ServiceCategory } from '@/lib/services/manifest'
 import { MAX_OFFERED_ALTERNATIVES } from '@/lib/services/alternatives'
@@ -100,7 +100,7 @@ const BROWSE_PAGE_SIZE = 60
 // Services tab: browse the library and manage installed services. Reuses the exact
 // same ServiceConfigForm shown inline in chat, so config is identical on both sides.
 export function AgentPanelServices({ agentId }: AgentPanelServicesProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useAgentManageReason(agentId)
     const t = useTranslations('agent.agentPanelServices')
     const tServices = useTranslations('services')
     const errorText = useErrorText()

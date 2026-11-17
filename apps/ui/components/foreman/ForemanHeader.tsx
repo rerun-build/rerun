@@ -11,7 +11,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenu
 import { TooltipLabeled } from '@/components/ui/tooltip'
 import type { SessionStatus } from '@/lib/board/types'
 import type { ForemanPlacement } from '@/lib/foreman-layout'
-import { LogInIcon, PanelLeftIcon, PanelRightIcon, PictureInPicture2Icon, PlusIcon } from '@/lib/icons'
+import { IdCardIcon, LogInIcon, PanelLeftIcon, PanelRightIcon, PictureInPicture2Icon, PlusIcon } from '@/lib/icons'
+import { cn } from '@/lib/utils'
 import { foremanOrbState, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { type ForemanAnchor, ForemanHeaderBar } from '@rerun/ui/foreman'
@@ -72,6 +73,11 @@ export function ForemanHeader({
     const guided = useForemanStore(state => state.funnel === 'guided')
     const intakeOpen = useForemanStore(state => state.intake)
     const onAssistant = useForemanStore(state => state.tab === 'assistant')
+    // Its card needs its row, which only a member past the onboarding has.
+    const cardAvailable = useForemanStore(state => !!state.agentRowId)
+    const cardOpen = useForemanStore(state => !!state.card)
+    const openCard = useForemanStore(state => state.openCard)
+    const closeCard = useForemanStore(state => state.closeCard)
     const { isAnonymous } = useSession()
     const [signInOpen, setSignInOpen] = useState(false)
     const choice = positionChoiceOf(placement)
@@ -120,6 +126,13 @@ export function ForemanHeader({
                         </>
                     )}
                     {history}
+                    {!guided && cardAvailable && (
+                        <TooltipLabeled label={t('card')} side="bottom">
+                            <Button variant="ghost" size="icon-sm" aria-label={t('card')} aria-pressed={cardOpen} onClick={() => (cardOpen ? closeCard() : openCard())} className={cn(cardOpen && 'bg-accent')}>
+                                <IdCardIcon className="size-3.5" />
+                            </Button>
+                        </TooltipLabeled>
+                    )}
                     {!guided && (
                         <Button size="sm" onClick={onNewChat}>
                             <PlusIcon />
@@ -133,7 +146,7 @@ export function ForemanHeader({
                 guided ? undefined : (
                     <>
                         <ForemanTabs />
-                        {thread && onAssistant && <ForemanThreadCrumb title={thread.title} status={thread.status} onBack={onBackToGeneral} />}
+                        {thread && onAssistant && !cardOpen && <ForemanThreadCrumb title={thread.title} status={thread.status} onBack={onBackToGeneral} />}
                     </>
                 )
             }

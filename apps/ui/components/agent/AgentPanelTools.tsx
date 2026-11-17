@@ -6,7 +6,8 @@ import { Icon } from '@/components/ui/icon'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip, TooltipContent, TooltipDisabledReason, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { useBoxManageReason } from '@/hooks/useBoxManageReason'
+import { useForemanStore } from '@/stores/foreman.store'
+import { useAgentManageReason } from '@/hooks/useBoxManageReason'
 import { ENGINE_SELF_IMPROVEMENT_KEYS } from '@/lib/engine/constants'
 import type { EngineSelfImprovement, EngineToolFamily } from '@/lib/engine/types'
 import { ActivityIcon, BrainIcon, CalendarClockIcon, CardsIcon, CircleCheckIcon, CoinsIcon, DatabaseIcon, FolderIcon, GaugeIcon, GlobeIcon, InfoIcon, LayersIcon, Loader2Icon, LockIcon, type LucideIcon, MessageCircleQuestionIcon, MonitorIcon, QuickReplyIcon, TerminalIcon, UsersIcon, WandSparklesIcon, WebhookIcon, WrenchIcon } from '@/lib/icons'
@@ -79,7 +80,7 @@ function metaFor(family: EngineToolFamily, capabilities: Record<string, Capabili
 }
 
 export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useAgentManageReason(agentId)
     const t = useTranslations('agent.agentPanelTools')
     const errorText = useErrorText()
     const capabilities = useCapabilityMeta()
@@ -91,6 +92,9 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
     const [error, setError] = useState<string | null>(null)
     const canManage = useCanManageAgent(agentId)
     const manageReason = canManage ? undefined : boxManageReason
+    // The Chief of Staff's tools are written by the engine at every boot: only its spending is the team's to set.
+    const isForeman = useForemanStore(state => state.agentRowId === agentId)
+    const familyReason = isForeman ? t('foremanToolsFixed') : manageReason
 
     useEffect(() => {
         setLoading(true)
@@ -186,7 +190,7 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
     return (
         <div className="flex flex-col h-full">
             <PanelListHeader>
-                <p className="text-xs text-muted-foreground">{t('intro')}</p>
+                <p className="text-xs text-muted-foreground">{isForeman ? t('foremanToolsFixed') : t('intro')}</p>
             </PanelListHeader>
             <TooltipProvider>
             <PanelScroller>
@@ -205,8 +209,8 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                                 {isPending ? (
                                     <Loader2Icon className="size-3.5 animate-spin text-muted-foreground shrink-0 mt-1" />
                                 ) : (
-                                    <TooltipDisabledReason reason={manageReason} className="shrink-0">
-                                        <Switch checked={checked} disabled={!canManage} onCheckedChange={value => handleToggle(family.family, value)} className="shrink-0 mt-0.5" />
+                                    <TooltipDisabledReason reason={familyReason} className="shrink-0">
+                                        <Switch checked={checked} disabled={!!familyReason} onCheckedChange={value => handleToggle(family.family, value)} className="shrink-0 mt-0.5" />
                                     </TooltipDisabledReason>
                                 )}
                             </div>
@@ -266,8 +270,8 @@ export function AgentPanelTools({ agentId }: AgentPanelToolsProps) {
                                             {pending.has(key) ? (
                                                 <Loader2Icon className="size-3.5 animate-spin text-muted-foreground shrink-0" />
                                             ) : (
-                                                <TooltipDisabledReason reason={manageReason} className="shrink-0">
-                                                    <Switch checked={!!selfImprovement[key]} disabled={!canManage} onCheckedChange={value => handleSelfImprovement(key, value)} className="shrink-0" />
+                                                <TooltipDisabledReason reason={familyReason} className="shrink-0">
+                                                    <Switch checked={!!selfImprovement[key]} disabled={!!familyReason} onCheckedChange={value => handleSelfImprovement(key, value)} className="shrink-0" />
                                                 </TooltipDisabledReason>
                                             )}
                                         </label>

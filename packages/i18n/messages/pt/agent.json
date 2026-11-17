@@ -331,7 +331,8 @@
         "paidDataAlwaysAllow": {
             "label": "Gastar sem perguntar",
             "description": "Pula a aprovação do custo, para que tarefas agendadas e delegadas usem dados pagos enquanto você está fora."
-        }
+        },
+        "foremanToolsFixed": "A Rerun define o que o Chief of Staff pode fazer. Só os gastos dele cabem a você escolher."
     },
     "agentPanelTriggers": {
         "new": "Novo",

@@ -331,7 +331,8 @@
         "paidDataAlwaysAllow": {
             "label": "Ohne Nachfrage ausgeben",
             "description": "Überspringt die Kostenfreigabe, damit geplante und delegierte Aufgaben kostenpflichtige Daten nutzen können, während du weg bist."
-        }
+        },
+        "foremanToolsFixed": "Rerun legt fest, was der Chief of Staff kann. Nur seine Ausgaben bestimmst du selbst."
     },
     "agentPanelTriggers": {
         "new": "Neu",

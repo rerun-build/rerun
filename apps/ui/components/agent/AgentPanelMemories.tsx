@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { useBoxManageReason } from '@/hooks/useBoxManageReason'
+import { useAgentManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineMemory } from '@/lib/engine/types'
 import { BrainIcon, PlusIcon, SearchIcon, Trash2Icon, XIcon } from '@/lib/icons'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -68,7 +68,7 @@ function MemoryRow({ memory, deleteDisabledReason, onDelete }: { memory: EngineM
 }
 
 export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useAgentManageReason(agentId)
     const t = useTranslations('agent.agentPanelMemories')
     const [memories, setMemories] = useState<EngineMemory[]>([])
     const [loading, setLoading] = useState(true)

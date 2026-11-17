@@ -30,6 +30,7 @@ describe('foremanGuard', () => {
         ['GET', '/agents/foreman/files/read'],
         ['DELETE', '/agents/foreman/files'],
         ['GET', '/agents/foreman/mcp-servers/status'],
+        ['GET', '/agents/foreman/tools'],
     ])('lets %s %s through', async (method, path) => {
         expect((await call(method, path)).status).toBe(200)
     })
@@ -52,6 +53,10 @@ describe('foremanGuard', () => {
         ['GET', '/agents/foreman/data/tables'],
         ['POST', '/agents/foreman/data/query'],
         ['DELETE', '/agents/foreman/data/tables/leads'],
+        ['GET', '/agents/foreman/files'],
+        ['PUT', '/agents/foreman/files'],
+        ['POST', '/agents/foreman/files/move'],
+        ['POST', '/agents/foreman/files/dir'],
         ['POST', '/agents/foreman/desktop'],
         ['POST', '/agents/foreman/desktop/apps'],
         ['POST', '/agents/foreman/desktop/takeover'],
@@ -75,11 +80,9 @@ describe('foremanGuard', () => {
         ['GET', '/agents/foreman/chat'],
         ['GET', '/agents/foreman/sessions/s1/messages/extra'],
         ['GET', '/agents/foreman/runs/r1/tools'],
-        ['GET', '/agents/foreman/files'],
-        ['PUT', '/agents/foreman/files'],
-        ['POST', '/agents/foreman/files/move'],
-        ['POST', '/agents/foreman/files/dir'],
         ['GET', '/agents/foreman/usage'],
+        ['PATCH', '/agents/foreman/tools'],
+        ['GET', '/agents/foreman/filesx'],
         ['GET', '/agents/foreman/desktopx'],
     ])('refuses %s %s with a 403', async (method, path) => {
         const res = await call(method, path)

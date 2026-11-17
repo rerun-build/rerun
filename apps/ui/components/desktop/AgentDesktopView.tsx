@@ -16,6 +16,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { MonitorIcon } from '@/lib/icons'
 import { useBoardStore } from '@/stores/board.store'
 import { useDesktopStore, type TakeoverTarget } from '@/stores/desktop.store'
+import { useForemanStore } from '@/stores/foreman.store'
 
 type Screen = { status: 'loading' } | { status: 'live'; socketUrl: string; dock: boolean } | { status: 'error'; refusal: Refusal } | { status: 'disconnected' }
 
@@ -31,18 +32,22 @@ async function connect(agentId: string, takeover: TakeoverTarget | null): Promis
 }
 
 // The screen of the agent whose sheet is open, in a dialog to drive it. Watching it happens in that
-// agent's chat. It follows the sheet: another agent, or no sheet at all, closes it.
+// agent's chat. It follows the sheet: another agent, or no sheet at all, closes it. The Chief of Staff
+// has no sheet of the board: its chat is the column, which stays open beside whatever is selected.
 export function AgentDesktopView() {
     const t = useTranslations('desktop.session')
+    const tForeman = useTranslations('workspaceView.foreman')
     const agentId = useDesktopStore(s => s.agentId)
     const takeover = useDesktopStore(s => s.takeover)
     const close = useDesktopStore(s => s.close)
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
-    const agentName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name)
+    const isForeman = useForemanStore(s => !!agentId && s.agentRowId === agentId)
+    const coworkerName = useBoardStore(s => s.agents.find(agent => agent.id === agentId)?.name)
+    const agentName = isForeman ? tForeman('name') : coworkerName
 
     useEffect(() => {
-        if (agentId && selectedAgentId !== agentId) close()
-    }, [agentId, selectedAgentId, close])
+        if (agentId && !isForeman && selectedAgentId !== agentId) close()
+    }, [agentId, isForeman, selectedAgentId, close])
 
     return (
         <DesktopDialog

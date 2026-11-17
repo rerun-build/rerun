@@ -16,7 +16,8 @@
         },
         "signIn": "Entrar",
         "newTask": "Nova tarefa",
-        "conversations": "Conversas"
+        "conversations": "Conversas",
+        "card": "Ficha do Chief of Staff"
     },
     "threads": {
         "general": "Geral",

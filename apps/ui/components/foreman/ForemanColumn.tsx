@@ -80,7 +80,9 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const guided = useForemanStore(state => state.funnel === 'guided')
     // Le tunnel guidé n'affiche pas de tabs : un onglet resté ouvert avant ne doit pas y cacher le chat.
     // In the Simple view's middle the routines are in the panel beside the chat, not in a tab over it.
-    const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided && !pinned
+    // Its card covers the chat on the board as the routines do; in the Simple view it is the column beside it.
+    const onCard = useForemanStore(state => !!state.card) && !guided && !pinned
+    const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided && !pinned && !onCard
     const intakeOpen = useForemanStore(state => state.intake)
     const { isAnonymous, workspace, phoneStep } = useSession()
     const pendingIntake = useOnboardingStore(state => state.pendingIntake)
@@ -153,6 +155,10 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const tView = useTranslations('workspaceView.foreman')
     const tDetails = useTranslations('workspaceView.details')
     const detailsShown = useDetailsOpen() && pinned && open === true
+    const closeSimpleDetails = useCallback(() => {
+        useSimpleDetailsStore.getState().setWanted(false)
+        useForemanStore.getState().closeCard()
+    }, [])
     // Mounted the first time it opens, then kept: opening it again only slides it in.
     const [details, setDetails] = useState({ mounted: false, slideIn: false })
     if (detailsShown && !details.mounted) setDetails({ mounted: true, slideIn: restoreDone })
@@ -539,7 +545,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                         </div>
                     )}
                     {agentChatRowId && (
-                        <div className={onRoutines ? 'hidden' : 'contents'}>
+                        <div className={onRoutines || onCard ? 'hidden' : 'contents'}>
                             {/* General keeps one key whatever id it gets from the server: only a thread slides. */}
                             <PanelSteps stepKey={inThread ? sessionId : 'general'} depth={inThread ? 1 : 0}>
                                 <ForemanAgentChat
@@ -553,7 +559,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             </PanelSteps>
                         </div>
                     )}
-                    <div className={onRoutines || arrivalWall || agentChatRowId ? 'hidden' : 'contents'}>
+                    <div className={onRoutines || onCard || arrivalWall || agentChatRowId ? 'hidden' : 'contents'}>
                         {/* General keeps one key whatever id it gets from the server: only a thread slides. */}
                         <PanelSteps stepKey={inThread ? sessionId : 'general'} depth={inThread ? 1 : 0}>
                             <ForemanChatLayer
@@ -612,10 +618,15 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                     </div>
                     <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />
                     {onRoutines && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
+                    {onCard && (
+                        <div className="flex min-h-0 flex-1 flex-col pt-24">
+                            <ForemanDetails overChat shown={open === true} onClose={() => useForemanStore.getState().closeCard()} />
+                        </div>
+                    )}
                 </div>
                 {pinned && details.mounted && (
-                    <DetailsColumn label={tDetails('label', { name: tView('name') })} open={detailsShown} slideIn={details.slideIn} onClose={() => useSimpleDetailsStore.getState().setWanted(false)}>
-                        <ForemanDetails shown={detailsShown} onClose={() => useSimpleDetailsStore.getState().setWanted(false)} />
+                    <DetailsColumn label={tDetails('label', { name: tView('name') })} open={detailsShown} slideIn={details.slideIn} onClose={closeSimpleDetails}>
+                        <ForemanDetails shown={detailsShown} onClose={closeSimpleDetails} />
                     </DetailsColumn>
                 )}
             </div>

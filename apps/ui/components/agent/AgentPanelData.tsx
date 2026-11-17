@@ -7,7 +7,7 @@ import { DataBrowser } from '@/components/data/DataBrowser'
 import { PanelDialogContent } from '@/components/dialogs/PanelDialogContent'
 import { Dialog } from '@/components/ui/dialog'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
-import { useBoxManageReason } from '@/hooks/useBoxManageReason'
+import { useAgentManageReason } from '@/hooks/useBoxManageReason'
 import { tablesOrThrow, viewActions, type DataFocus, type DataSource } from '@/lib/data/source'
 import { agentFileRawUrl } from '@/lib/files/raw-url'
 import { useTranslations } from 'next-intl'
@@ -21,7 +21,7 @@ type AgentPanelDataProps = {
 }
 
 export function AgentPanelData({ agentId, initial, onInitialConsumed }: AgentPanelDataProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useAgentManageReason(agentId)
     const t = useTranslations('agent.agentPanelData')
     const [expanded, setExpanded] = useState<DataFocus | null>(null)
     const canManage = useCanManageAgent(agentId)

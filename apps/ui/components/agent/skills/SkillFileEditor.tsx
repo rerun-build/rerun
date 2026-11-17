@@ -4,6 +4,7 @@ import { useErrorText } from '@/hooks/useErrorText'
 import { deleteSkillFileAction, readSkillFileAction, writeSkillFileAction } from '@/app/api/_actions/agent.actions'
 import { PanelDeleteButton, PanelEditorBody, PanelEditorFooter, PanelEditorHeader, PanelEditorShell } from '@/components/ui/panel-editor'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
+import { useAgentManageReason } from '@/hooks/useBoxManageReason'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -22,10 +23,10 @@ type SkillFileEditorProps = {
 export function SkillFileEditor({ agentId, slug, path, readOnly: readOnlyProp, onBack }: SkillFileEditorProps) {
     const t = useTranslations('agent.skillFileEditor')
     const errorText = useErrorText()
-    const tShared = useTranslations('agent.modelsShared')
     const canManage = useCanManageAgent(agentId)
     const readOnly = readOnlyProp || !canManage
-    const manageReason = canManage ? undefined : tShared('boxManageReason')
+    const agentManageReason = useAgentManageReason(agentId)
+    const manageReason = canManage ? undefined : agentManageReason
     const [loading, setLoading] = useState(true)
     const [content, setContent] = useState('')
     const [truncated, setTruncated] = useState(false)

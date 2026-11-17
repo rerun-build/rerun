@@ -413,7 +413,8 @@
         "paidDataAlwaysAllow": {
             "label": "Spend without asking",
             "description": "Skip the cost approval, so scheduled runs and delegated tasks can use paid data while you are away."
-        }
+        },
+        "foremanToolsFixed": "Rerun sets what the Chief of Staff can do. Only its spending is yours to choose."
     },
     "agentPanelTriggers": {
         "new": "New",
