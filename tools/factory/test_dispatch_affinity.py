@@ -1,6 +1,7 @@
 import unittest
 
-from test_dispatch import Base
+from test_dispatch import Base, HEAD, PR_LINE, World, ready, wf
+from test_dispatch_proof import BODY
 import pools
 
 
@@ -21,6 +22,10 @@ class FreeCopies(unittest.TestCase):
         self.assertIsNone(pools.pick_copy(self.cfg(order=(("r1", 1),)), "reviewer", [("r1", 1)]))
 
 
+def issue(n):
+    return {"number": n, "title": "Fix %d" % n, "body": ready(), "comments": []}
+
+
 class Warm(Base):
     builders = ["b1", "b2"]
 
@@ -29,33 +34,58 @@ class Warm(Base):
         self.cfg["reviewers"] = [{"id": "r1", "name": "R1", "runs": 2}, {"id": "r2", "name": "R2", "runs": 1}]
         self.cfg["builders"] = [{"id": "b1", "name": "B1", "runs": 2}, {"id": "b2", "name": "B2", "runs": 1}]
         self.cfg["cache_life"] = {"subscription": 3600, "key": 300}
-        self.free = [("r1", 1), ("r1", 2), ("r2", 1)]
+
+    def done(self, rid, out):
+        self.w.runs[rid] = {"status": "done", "output": out, "error": None}
+
+    def copy_of(self, n="5"):
+        return self.d.store.get_job(n)["copy"]
+
+    def round_two(self, wait):
+        self.w = World([issue(4), issue(5)])
+        self.w.ledger = self.cfg["ledger_file"]
+        self.tick()
+        self.done("run1", "PR: https://github.com/o/r/pull/41")
+        self.tick(2)
+        self.done("run2", PR_LINE)
+        self.tick(2)
+        self.done("run3", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.done("run4", "bad\nVERDICT: REJECT @abcdef1: wrong sum")
+        self.tick()
+        self.w.clock += wait
+        self.tick(2)
+        fix = self.copy_of()
+        self.w.finish("b1", "PUSHED: 1234567")
+        self.tick(2)
+        return fix, self.copy_of()
 
     def test_round_two_review_goes_to_the_warm_reviewer_copy(self):
-        d = self.new()
-        j = {"agent": "r1", "copy": 2, "warm": {"r1": [2, self.w.clock - 60]}}
-        self.assertEqual(d.warm_pick(j, self.free), ("r1", 2))
+        fix, review = self.round_two(60)
+        self.assertEqual(review, 2)
+        self.assertEqual(self.w.sends[-1][0], "r1")
 
     def test_past_cache_life_takes_the_first_free(self):
-        d = self.new()
-        j = {"agent": "r1", "copy": 2, "warm": {"r1": [2, self.w.clock - 3600]}}
-        self.assertEqual(d.warm_pick(j, self.free), ("r1", 1))
+        fix, review = self.round_two(3600)
+        self.assertEqual(review, 1)
 
     def test_fix_goes_to_the_builders_last_copy(self):
-        d = self.new()
-        j = {"builder": "b1", "warm": {"b1": [2, self.w.clock - 60]}}
-        self.assertEqual(d.free_copy_of("b1", j), 2)
-
-    def test_proof_never_goes_to_builder_or_reviewer_even_if_warm(self):
-        d = self.new()
-        j = {"builder": "b1", "reviewer": "r1", "warm": {"r1": [1, self.w.clock - 10], "b1": [1, self.w.clock - 5]}}
-        self.assertEqual(d.free_prover(j), ("r2", 1))
+        fix, review = self.round_two(60)
+        self.assertEqual(fix, 2)
 
     def test_no_cache_life_keeps_todays_pick(self):
         del self.cfg["cache_life"]
-        d = self.new()
-        j = {"agent": "r1", "copy": 2, "warm": {"r1": [2, self.w.clock - 1]}}
-        self.assertEqual(d.warm_pick(j, self.free), ("r1", 1))
+        fix, review = self.round_two(60)
+        self.assertEqual((fix, review), (1, 1))
+
+    def test_proof_never_goes_to_builder_or_reviewer_even_if_warm(self):
+        self.cfg["proof"] = True
+        self.w.issues[0]["body"] = BODY
+        self.w.workflows[HEAD] = [wf("ci", "success")]
+        self.to_review()
+        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.tick(3)
+        self.assertEqual(self.w.sends[-1][0], "r2")
+        self.assertEqual(self.copy_of(), 1)
 
     def test_the_second_review_is_sent_to_the_reviewer_of_the_first(self):
         self.to_review()
@@ -65,3 +95,7 @@ class Warm(Base):
         self.tick(2)
         self.assertEqual(self.w.sends[-1][0], "r1")
         self.assertIn("One review", self.w.sends[-1][1])
+
+
+if __name__ == "__main__":
+    unittest.main()
