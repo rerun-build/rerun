@@ -1,3 +1,4 @@
+import sqlite3
 import unittest
 
 from test_dispatch import Base, HEAD, World, ready, wf
@@ -110,6 +111,33 @@ class Acceptance(Base):
         self.assertEqual(self.w.rows("SELECT kind, job, reason FROM failures WHERE kind='escaped'"), [("escaped", "5", "gap #30")])
         self.tick(12)
         self.assertEqual(len(self.sent_to("a1")), 1)
+
+    def test_the_brief_asks_for_one_issue_per_parent_listing_every_gap(self):
+        self.merge_child()
+        self.tick_until(lambda: self.sent_to("a1"))
+        brief = self.sent_to("a1")[0][1]
+        self.assertIn("one issue for this parent", brief)
+        self.assertIn("lists every gap", brief)
+        self.assertIn("what is asked, what is there and how you saw it", brief)
+        self.assertIn("its own `**Repairs**: #<child>` line", brief)
+        self.assertIn("`**Part of**: #9`", brief)
+        self.assertNotIn("one issue per gap", brief)
+
+    def test_one_gap_issue_with_two_repairs_lines_escapes_both_children(self):
+        self.merge_child()
+        db = sqlite3.connect(self.cfg["ledger_file"])
+        cols = [r[1] for r in db.execute("PRAGMA table_info(jobs)")]
+        sel = ", ".join("'6'" if c == "job" else c for c in cols)
+        db.execute("INSERT INTO jobs (%s) SELECT %s FROM jobs WHERE job='5'" % (", ".join(cols), sel))
+        db.commit()
+        db.close()
+        self.w.issues.append(dict(gap(), body="**Part of**: #9\n**Repairs**: #5\n**Repairs**: #6\nTwo gaps.\n"))
+        self.w.unlabelled.add(30)
+        self.tick_until(lambda: self.sent_to("a1"))
+        self.w.open_children = [{"number": 30, "body": "**Part of**: #9\n"}]
+        self.w.finish("a1", "looked\nGAPS: #30")
+        self.tick()
+        self.assertEqual(sorted(self.w.rows("SELECT k FROM kv WHERE job='escaped'")), [("5|gap #30",), ("6|gap #30",)])
 
     def test_a_run_without_a_final_line_is_asked_once_more_then_left(self):
         self.merge_child()
