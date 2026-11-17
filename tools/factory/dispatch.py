@@ -52,6 +52,7 @@ MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
 ROOM_HOLD_MAX_S, ROOM_PROBE_S, ROOM_PROBLEM_ROW = 60 * 60, 3 * 60, 3
 CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:[ \t]+.*\n)*?[ \t]+File \"/data/tools/(?:factory|factory-[0-9a-f]+)/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
+WT_NEW_FAULT = re.compile(r"(?is)(?=.*\bwt new\b)(?!.*\bplan marker\b).*\b(?:cannot|could not|crash\w*|fail\w*|refus\w*)\b")
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 MAX_TAKES = 3
@@ -1225,7 +1226,7 @@ class Dispatcher:
         room = clocks.room(refused)
         if room:
             self.room_hold(j, room)
-        fault = CHECKOUT_FAULT.search(text) if j["state"] in ("building", "fixing") else None
+        fault = (CHECKOUT_FAULT.search(text) or WT_NEW_FAULT.search(why or "")) if j["state"] in ("building", "fixing") else None
         if fault:
             lines = [l for l in text.splitlines() if l.strip()][-12:]
             j["checkout_failed"] = ("%s\nlast lines:\n%s" % (fault.group(0).strip()[:300], "\n".join(lines)))[:1500]

@@ -80,13 +80,13 @@ class Holds(unittest.TestCase):
         self.assertIn("checkout failed #5", found)
         self.assertIn("checkout failed", resolver.KINDS)
 
-    def test_a_builder_that_blames_the_plan_for_a_wt_new_failure_ends_as_a_checkout_fault_not_as_a_returned_plan(self):
+    def test_a_builder_that_blames_the_plan_for_a_wt_new_failure_is_flagged_as_a_checkout_fault(self):
         self.make([issue(5)])
         self.d.once()
         self.w.finish("b1", NIGHT)
         self.d.once()
         j = self.job(5)
-        self.assertEqual(j["state"], "blocked")
+        self.assertEqual(j["state"], "returned")
         self.assertIn("wt new", j["checkout_failed"])
         found = self.d.resolver.watch.find([j], {}, {5}, "", self.w.clock, [], "", False)
         self.assertIn("checkout failed #5", found)
