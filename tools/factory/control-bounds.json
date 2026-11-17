@@ -17,5 +17,6 @@
     "building": 12,
     "review_wait": 8,
     "proof_wait": 6
-  }
+  },
+  "rework_threshold": 3
 }
