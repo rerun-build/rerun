@@ -54,6 +54,18 @@ describe('buildMcpIndex', () => {
         expect(await buildMcpIndex(agent, 'rerun')).toContain('Their tools are loaded as `<name>_<tool>`.')
     })
 
+    it('tells a run that holds its MCP tools back how to load them, with what each server holds', async () => {
+        const agent = agentWith('idx-deferred', [
+            { name: 'linear', url: 'https://l.example/mcp', headers: { Authorization: 'Bearer x' } },
+            { name: 'down', url: 'https://d.example/mcp', headers: { Authorization: 'Bearer x' } },
+        ])
+        const tool = (name: string) => ({ name: `linear_${name}`, server: 'linear', tool: name, description: '' })
+        const index = await buildMcpIndex(agent, 'rerun', [tool('list_issues'), tool('create_issue')])
+        expect(index).toContain('Their tools are named `<name>_<tool>` and are not loaded up front: call mcp_search')
+        expect(index).not.toContain('Their tools are loaded as')
+        expect(index.split('\n\n')[1].split('\n')).toEqual(['- linear (http): authenticated via request headers, 2 tools', '- down (http): authenticated via request headers, 0 tools'])
+    })
+
     it('treats an unreadable token or an unusable server name as not authenticated', async () => {
         await mkdir(mcpDir('idx-broken'), { recursive: true })
         await writeFile(mcpTokenPath('idx-broken', 'corrupt'), '{', 'utf8')

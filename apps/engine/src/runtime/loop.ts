@@ -3,7 +3,7 @@ import { RERUN_CONNECTION_ID, contextTextPart, type ContextOccupancy, type GoalV
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
 import { prepareRunHistory } from './compaction/compact.js'
-import { repairToolPairs } from './compaction/repair.js'
+import { calledToolNames, repairToolPairs } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { goalStopHook } from '../agents/claude-goal-hook.js'
 import { CLI_PROVIDERS, resolveModel, type GoalOption, type ModelOverride } from '../agents/providers.js'
@@ -36,6 +36,7 @@ import { buildTools } from '../tools/registry.js'
 import { callTargetsOf } from '../tools/builtin/call-agent.js'
 import { toolPayloadChars } from '../tools/payload.js'
 import { wrapToolsWithResultHandle } from '../tools/result-handle.js'
+import { activeToolNames } from '../tools/mcp-search.js'
 import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
@@ -459,7 +460,13 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         void syncAgentStatus(agent.id).catch(err => logger.warn({ err: String(err), agent: agent.id }, 'syncAgentStatus failed'))
 
-        const system = await buildSystemPrompt(agent, trigger, provider, order)
+        const system = await buildSystemPrompt(
+            agent,
+            trigger,
+            provider,
+            order,
+            toolsP.then(built => built.deferredMcp?.catalog),
+        )
         const systemText = systemPromptText(system)
 
         const pastAuthorIds = await listSessionAuthorIds(agent.id, sessionId).catch(() => [])
@@ -467,8 +474,11 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         const built = await toolsP
         closeTools = built.close
+        const { deferredMcp } = built
         const tools = wrapToolsWithResultHandle(built.tools, { agentId: agent.id, runId: run.id })
-        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, override, shared, toolPayloadChars(tools)))
+        const sentTools = deferredMcp ? Object.fromEntries(activeToolNames(tools, deferredMcp).map(name => [name, tools[name]])) : tools
+        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, override, shared, toolPayloadChars(sentTools)))
+        if (deferredMcp) for (const name of calledToolNames(history)) deferredMcp.loaded.add(name)
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)
@@ -508,8 +518,11 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             stopWhen: ({ steps }) => hitlTurnIsOver(steps, CLI_PROVIDERS.has(provider)),
             prepareStep: ({ messages, steps }) => {
                 const step = stepWithScreenshots(messages, ctx.screenshots, provider, model, connection)
+                // A held-back tool called by its name ran without its schema: the next step carries it.
+                if (deferredMcp) for (const call of steps.at(-1)?.toolCalls ?? []) deferredMcp.loaded.add(call.toolName)
                 return {
                     ...step,
+                    ...(deferredMcp ? { activeTools: activeToolNames(tools, deferredMcp) } : {}),
                     ...(behaviourOf(provider, model) === 'anthropic' ? { messages: withTailBreakpoint(step.messages ?? messages) } : {}),
                     ...(!CLI_PROVIDERS.has(provider) && hitlStepLacksMessage(steps) ? { toolChoice: 'none' as const } : {}),
                 }

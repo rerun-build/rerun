@@ -7,6 +7,7 @@ import { buildMemoryIndex } from '../memory/index.js'
 import { readAgentDbSchema } from '../db/agentDb.js'
 import { readSharedDbSchema } from '../db/sharedDb.js'
 import { buildMcpIndex } from '../tools/mcp-index.js'
+import type { McpCatalogEntry } from '../tools/mcp-search.js'
 import { buildBrainSection, buildForemanBrainSection } from '../brain/prompt.js'
 import { AUTO_RECALL_MIN_SIMILARITY, recallMemory, type RecalledMemory } from '../memory/store.js'
 import { workspaceDir, sharedDir, sharedDbPath } from '../config/paths.js'
@@ -260,7 +261,14 @@ async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order:
     return { stable: joinSections(stable), volatile: joinSections(volatile) }
 }
 
-export async function buildSystemPrompt(agent: LoadedAgent, trigger: RunTrigger = { source: 'chat' }, provider: Provider = agent.resolved.provider, order: TurnOrder = turnOrder(provider, agent.resolved.model)): Promise<SystemPrompt> {
+export async function buildSystemPrompt(
+    agent: LoadedAgent,
+    trigger: RunTrigger = { source: 'chat' },
+    provider: Provider = agent.resolved.provider,
+    order: TurnOrder = turnOrder(provider, agent.resolved.model),
+    // The MCP tools this run holds back until the model loads them, known once its servers answered.
+    deferredMcp: Promise<McpCatalogEntry[] | undefined> = Promise.resolve(undefined),
+): Promise<SystemPrompt> {
     if (agent.config.kind === 'foreman') return await buildForemanPrompt(agent, provider, order)
     const cfg = agent.config.tools
     const [skillIndex, scheduleIndex, triggerIndex, memoryIndex, dbSchema, sharedDbSchema, mcpIndex, brain] = await Promise.all([
@@ -270,7 +278,7 @@ export async function buildSystemPrompt(agent: LoadedAgent, trigger: RunTrigger 
         cfg.memory ? buildMemoryIndex(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.db ? readAgentDbSchema(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
-        buildMcpIndex(agent, provider).catch(() => ''),
+        deferredMcp.then(catalog => buildMcpIndex(agent, provider, catalog)).catch(() => ''),
         cfg.brain ? buildBrainSection(trigger.source === 'chat' && trigger.calledBy !== undefined).catch(() => '') : Promise.resolve(''),
     ])
 

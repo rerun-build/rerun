@@ -6,7 +6,7 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-prompt-order-'))
 process.env.RERUN_API_KEY = ''
 
-vi.mock('../tools/mcp-pool.js', async importOriginal => ({ ...(await importOriginal<typeof import('../tools/mcp-pool.js')>()), pooledMcpTools: async () => ({}) }))
+vi.mock('../tools/mcp-pool.js', async importOriginal => ({ ...(await importOriginal<typeof import('../tools/mcp-pool.js')>()), pooledMcpServers: async () => [] }))
 vi.mock('../desktop/session.js', async importOriginal => ({
     ...(await importOriginal<typeof import('../desktop/session.js')>()),
     desktopAvailable: () => true,
