@@ -192,7 +192,14 @@ describe('request_computer_access', () => {
         await connect()
         const result = (await run('request_computer_access', { computer: '#studio-pc', reason: 'Encode', commands: ['/usr/local/bin/ffmpeg -i a.mov a.mp4'] })) as { status: string; card: unknown }
         expect(result.status).toBe('delivered')
-        expect(result.card).toEqual({ computerId: 'c1', always: { program: 'ffmpeg', interpreter: false } })
+        expect(result.card).toEqual({ computerId: 'c1', always: { rule: 'program', value: 'ffmpeg', interpreter: false } })
+    })
+
+    it('offers to keep the folder of files outside the allowed ones, never a place where secrets live', async () => {
+        await connect()
+        expect(((await run('request_computer_access', { computer: '#studio-pc', reason: 'x', paths: ['/Volumes/Rushes/day2.mov', '/Volumes/Rushes/day3.mov'] })) as { card: unknown }).card).toEqual({ computerId: 'c1', always: { rule: 'folder', value: '/Volumes/Rushes', interpreter: false } })
+        expect(((await run('request_computer_access', { computer: '#studio-pc', reason: 'x', paths: ['~/.ssh/config'] })) as { card: unknown }).card).toEqual({ computerId: 'c1', always: null })
+        expect(((await run('request_computer_access', { computer: '#studio-pc', reason: 'x', paths: ['/a/x', '/b/y'] })) as { card: unknown }).card).toEqual({ computerId: 'c1', always: null })
     })
 
     it('offers no "always" where the owner keeps no rules, for an opaque command, or for an unknown computer', async () => {

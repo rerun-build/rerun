@@ -648,6 +648,9 @@
         "allow": "Allow",
         "alwaysAllow": "Always allow {program}",
         "interpreterWarning": "Always allowing {program} allows any code it runs",
-        "alwaysFailed": "Could not keep the rule on the computer: allowed this once."
+        "alwaysFailed": "Could not keep the rule on the computer: allowed this once.",
+        "titleFiles": "{count, plural, one {Use a file on <computer></computer>} other {Use # files on <computer></computer>}}",
+        "alwaysAllowFolder": "Always allow this folder",
+        "folderNote": "“Always” allows every file in {folder}"
     }
 }

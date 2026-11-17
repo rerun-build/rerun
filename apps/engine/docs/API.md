@@ -273,8 +273,14 @@ card sends is `Computer access: **APPROVED** — #studio-pc` (or `DECLINED`), re
 `parseComputerAccessDecision` of `@rerun/contracts`. The card's own result carries
 `card: { computerId, always }`, the program "Always allow" would keep. A computer whose `unattended`
 setting is off refuses runs nobody is in the chat for (schedules, triggers, calls between
-coworkers). The prompt lists the linked computers in a
-`linked_computers` section.
+coworkers). File tools: `remote_file_list`, `remote_file_read` (text up to 100 KB, a binary
+file is described), `remote_file_write` (text), and `remote_transfer` (one file of up to 100 MB between the
+computer and the coworker's workspace, in 1 MB pieces checked with a sha256, refused when the box's disk
+would be left with less than 200 MB). A path inside the computer's working folder or an allowed folder
+goes through; elsewhere it needs a yes (`request_computer_access` with `paths`), and where secrets live it
+always does. The engine sends the computer the folders it may reach (`roots`) and whether the person said
+yes to a secret (`sensitiveOk`); the computer checks them on the real path, links followed. The prompt
+lists the linked computers in a `linked_computers` section.
 
 ---
 

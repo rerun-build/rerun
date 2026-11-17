@@ -16,7 +16,7 @@ import { WorkerHost } from './worker-host'
 // process keeps the tokens and the person's settings, the worker (`src/worker/`) the sockets and the
 // commands. Linked, the app stays alive with its windows closed, on every system.
 
-const LOCAL_CAPABILITIES: RemoteCapability[] = ['shell']
+const LOCAL_CAPABILITIES: RemoteCapability[] = ['shell', 'files']
 
 let linkStates = new Map<string, WorkerLinkState>()
 let runningJobs = 0
@@ -61,8 +61,9 @@ function suggestedName(): string {
 
 export function remoteComputerState(): DesktopRemoteComputerState {
     const settings = localSettings()
+    const links = readLinks()
     return {
-        links: readLinks().map(link => {
+        links: links.map(link => {
             const live = linkStates.get(link.computerId)
             return {
                 computerId: link.computerId,
@@ -78,7 +79,8 @@ export function remoteComputerState(): DesktopRemoteComputerState {
         }),
         paused: settings.paused,
         workDir: settings.workDir,
-        secureStorage: readLinks().every(link => link.encrypted) && keychainAvailable(),
+        // The keychain is only asked about once a link needs it.
+        secureStorage: links.length === 0 || (links.every(link => link.encrypted) && keychainAvailable()),
         runningJobs,
         machine: { hostname: hostname(), os: shellPlatform(), arch: arch(), suggestedName: suggestedName() },
     }
@@ -192,8 +194,8 @@ export function stopRemoteComputer(): void {
 
 // The computer's lines in the tray menu: how it is doing, and the pause.
 export function remoteComputerTrayItems(): MenuItemConstructorOptions[] {
+    if (readLinks().length === 0) return []
     const state = remoteComputerState()
-    if (state.links.length === 0) return []
     const online = state.links.some(link => link.status === 'online')
     const status = state.paused ? t('computer.trayPaused') : state.runningJobs > 0 ? t('computer.trayJobs', { count: state.runningJobs }) : online ? t('computer.trayOnline') : t('computer.trayOffline')
     return [

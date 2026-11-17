@@ -248,7 +248,7 @@ function LinkComputerDialog({ open, onOpenChange, state, onLinked }: { open: boo
                         void submit()
                     }}
                 >
-                    <Input label={t('name')} value={name} maxLength={100} onChange={event => setName(event.target.value)} autoFocus />
+                    <Input id="link-computer-name" label={t('name')} value={name} maxLength={100} onChange={event => setName(event.target.value)} autoFocus />
                     <p className="-mt-2 text-xs text-muted-foreground">{t.rich('handle', { handle: () => <ComputerHandle handle={handle} /> })}</p>
                     <ul className="space-y-1.5 text-xs text-muted-foreground">
                         <Bullet>{t('everyone')}</Bullet>

@@ -1,12 +1,13 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { alwaysAllowFor, computerHandleOf, shellOfComputer, type RemoteComputerView } from '@rerun/contracts'
+import { alwaysAllowFor, isSensitiveRemotePath, remoteParentOf, resolveRemotePath, shellOfComputer, type ComputerAlways, type RemoteComputerView } from '@rerun/contracts'
 import { newId } from '../../lib/ids.js'
-import { RemoteCallError } from '../../remote/connection.js'
 import { commandGranted } from '../../remote/access.js'
 import { refusedCommand } from '../../remote/command-policy.js'
 import { commandVerdict } from '../../remote/policy.js'
 import { listComputerViews, liveConnection } from '../../remote/registry.js'
+import { callFailure, findComputer, unavailable, unknownComputer } from './remote-common.js'
+import { remoteFileTools } from './remote-files.js'
 import type { RunContext } from '../../runtime/context.js'
 import { cardCallTiming } from '../../agents/turn-order.js'
 import { hitlAck, jsonTolerantArray } from './hitl.js'
@@ -43,47 +44,26 @@ function summary(view: RemoteComputerView) {
     }
 }
 
-async function findComputer(handle: string): Promise<{ view: RemoteComputerView | null; known: RemoteComputerView[] }> {
-    const known = await listComputerViews()
-    const wanted = computerHandleOf(handle)
-    const view = known.find(computer => computer.handle === wanted) ?? known.find(computer => computer.name.toLowerCase() === handle.trim().toLowerCase()) ?? null
-    return { view, known }
-}
-
-const unknownComputer = (handle: string, known: RemoteComputerView[]) =>
-    known.length === 0 ? 'No computer is linked to this workspace. A person links one from the Rerun desktop app (account, Desktop tab).' : `No computer is called ${handle}. The linked ones: ${known.map(computer => `#${computer.handle}`).join(', ')}.`
-
-function unavailable(view: RemoteComputerView): string | null {
-    if (!view.online) return `#${view.handle} is offline${view.lastSeenAt ? ` (last seen ${view.lastSeenAt})` : ''}: the Rerun app is not running on it, or it is asleep. Nothing was run. Tell the user; do not retry in a loop.`
-    if (view.paused) return `#${view.handle} is paused by its owner. Nothing was run. Tell the user; it runs again once they resume it from the app.`
-    return null
-}
-
-function callFailure(view: RemoteComputerView, err: unknown): string {
-    if (!(err instanceof RemoteCallError)) throw err
-    const name = `#${view.handle}`
-    switch (err.code) {
-        case 'disconnected':
-            return `${name} went offline before it answered. The command may or may not have run: check before running it again.`
-        case 'paused':
-            return `${name} was paused by its owner: ${err.message}`
-        case 'capability_off':
-            return `${name} does not offer this: ${err.message}`
-        case 'timeout':
-            return `${name} did not answer in time. The command may still be running there.`
-        case 'cancelled':
-            return `The command on ${name} was stopped.`
-        case 'not_found':
-            return err.message
-        default:
-            return `${name} refused or failed: ${err.message}`
+function alwaysOffer(view: RemoteComputerView, commands: string[], paths: string[]): ComputerAlways | null {
+    if (view.settings.mode !== 'remember') return null
+    if (commands.length > 0) {
+        if (paths.length > 0) return null
+        const program = alwaysAllowFor(commands, shellOfComputer(view.facts?.shell))
+        return program ? { rule: 'program', value: program.program, interpreter: program.interpreter } : null
     }
+    const facts = view.facts
+    if (!facts) return null
+    const resolved = paths.map(path => resolveRemotePath(path, facts.workDir, facts.os, facts.homeDir))
+    if (resolved.some(path => isSensitiveRemotePath(path, facts.os, facts.homeDir))) return null
+    const folders = [...new Set(resolved.map(remoteParentOf))]
+    return folders.length === 1 ? { rule: 'folder', value: folders[0]!, interpreter: false } : null
 }
 
 export function remoteComputerTools(ctx: RunContext): ToolSet {
     const author = ctx.author?.name
 
     return {
+        ...remoteFileTools(ctx),
         remote_computers: tool({
             description:
                 'List the computers people linked to the workspace: their #handle, whether they are online, their system and shell, working folder, processor, graphics cards, memory and the programs found on them. They are not your machine: you reach them with remote_exec. Check here before choosing one.',
@@ -137,18 +117,20 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
         }),
 
         request_computer_access: tool({
-            description: `Ask the user's yes before running commands on a linked computer. Name the computer by its #handle, list the exact commands you will run (each one is approved as written), and say in a short reason what they are for. The user sees a card; a yes covers those commands for this task. ${cardCallTiming(ctx.turnOrder)}`,
-            inputSchema: z.object({
-                computer: z.string().min(1).max(100).describe('The #handle of the computer'),
-                reason: z.string().min(1).max(500).describe('What the commands are for, in a sentence'),
-                commands: jsonTolerantArray(z.array(z.string().min(1).max(20_000)).min(1).max(10)).describe('The exact commands you will run'),
-            }),
+            description: `Ask the user's yes before you run commands, or reach files outside the allowed folders, on a linked computer. Name the computer by its #handle, list the exact commands you will run (each one is approved as written) or the paths you will read or write, and say in a short reason what for. The user sees a card; a yes covers those for this task. ${cardCallTiming(ctx.turnOrder)}`,
+            inputSchema: z
+                .object({
+                    computer: z.string().min(1).max(100).describe('The #handle of the computer'),
+                    reason: z.string().min(1).max(500).describe('What it is for, in a sentence'),
+                    commands: jsonTolerantArray(z.array(z.string().min(1).max(20_000)).max(10)).optional().describe('The exact commands you will run'),
+                    paths: jsonTolerantArray(z.array(z.string().min(1).max(4096)).max(20)).optional().describe('The files or folders you will read or write'),
+                })
+                .refine(input => (input.commands?.length ?? 0) + (input.paths?.length ?? 0) > 0, 'Name the commands or the paths you ask for'),
             // The card reads what "Always allow" would keep from here: the program named the way this
-            // computer's shell names it, and only where the owner's rules are kept at all.
-            execute: async ({ computer, commands }) => {
+            // computer's shell names it, or the folder, and only where the owner's rules are kept at all.
+            execute: async ({ computer, commands = [], paths = [] }) => {
                 const { view } = await findComputer(computer)
-                const always = view && view.settings.mode === 'remember' ? alwaysAllowFor(commands, shellOfComputer(view.facts?.shell)) : null
-                return { ...hitlAck(ctx.turnOrder), card: { computerId: view?.id ?? null, always } }
+                return { ...hitlAck(ctx.turnOrder), card: { computerId: view?.id ?? null, always: view ? alwaysOffer(view, commands, paths) : null } }
             },
         }),
     }

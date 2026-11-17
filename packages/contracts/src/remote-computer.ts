@@ -138,6 +138,14 @@ export type RemoteFileEntry = z.infer<typeof remoteFileEntrySchema>
 const author = z.string().max(200).optional()
 const path = z.string().min(1).max(4096)
 
+// Where a file operation may land, decided by the engine from the computer's rules and the person's
+// yes, checked by the computer on the real path (links followed). Null: anywhere this account can
+// reach. `sensitiveOk` is the person's yes to a path where secrets live, which is refused otherwise.
+const fileScope = { roots: z.array(path).max(250).nullable().default(null), sensitiveOk: z.boolean().default(false) }
+
+// A file copied in pieces between the computer and the box, each request carrying one.
+export const REMOTE_TRANSFER_CHUNK_BYTES = 1024 * 1024
+
 export const remoteScreenActionSchema = z.discriminatedUnion('action', [
     z.object({ action: z.literal('click'), x: z.number().int().nonnegative(), y: z.number().int().nonnegative(), button: z.enum(['left', 'right', 'middle']).default('left'), double: z.boolean().default(false) }),
     z.object({ action: z.literal('move'), x: z.number().int().nonnegative(), y: z.number().int().nonnegative() }),
@@ -165,15 +173,26 @@ export const REMOTE_METHODS = {
     'job.logs': { params: z.object({ jobId: z.string().max(64), tailBytes: z.number().int().positive().max(200_000).default(8_000) }), result: z.object({ job: remoteJobSchema, output: z.string(), truncated: z.boolean() }) },
     'job.stop': { params: z.object({ jobId: z.string().max(64) }), result: z.object({ job: remoteJobSchema }) },
     'job.list': { params: z.object({}), result: z.object({ jobs: z.array(remoteJobSchema) }) },
-    'fs.list': { params: z.object({ path, author }), result: z.object({ path: z.string(), entries: z.array(remoteFileEntrySchema), truncated: z.boolean() }) },
-    'fs.stat': { params: z.object({ path, author }), result: z.object({ path: z.string(), entry: remoteFileEntrySchema }) },
+    'fs.list': { params: z.object({ path, author, ...fileScope }), result: z.object({ path: z.string(), entries: z.array(remoteFileEntrySchema), truncated: z.boolean() }) },
+    'fs.stat': { params: z.object({ path, author, ...fileScope }), result: z.object({ path: z.string(), entry: remoteFileEntrySchema }) },
     'fs.read': {
-        params: z.object({ path, maxBytes: z.number().int().positive().max(1_000_000).default(200_000), author }),
+        params: z.object({ path, maxBytes: z.number().int().positive().max(1_000_000).default(200_000), author, ...fileScope }),
         result: z.object({ path: z.string(), content: z.string(), encoding: z.enum(['utf8', 'base64']), size: z.number().nonnegative(), truncated: z.boolean() }),
     },
     'fs.write': {
-        params: z.object({ path, content: z.string().max(4_000_000), encoding: z.enum(['utf8', 'base64']).default('utf8'), author }),
+        params: z.object({ path, content: z.string().max(4_000_000), encoding: z.enum(['utf8', 'base64']).default('utf8'), author, ...fileScope }),
         result: z.object({ path: z.string(), size: z.number().nonnegative() }),
+    },
+    // One piece of a file going to the box. The last one says so and carries the sha256 of the whole.
+    'fs.pull': {
+        params: z.object({ path, offset: z.number().int().nonnegative(), author, ...fileScope }),
+        result: z.object({ path: z.string(), size: z.number().nonnegative(), data: z.string(), eof: z.boolean(), sha256: z.string().nullable() }),
+    },
+    // One piece of a file coming from the box, written to a `.part` file renamed into place once the
+    // last piece matches the sha256 it carries.
+    'fs.push': {
+        params: z.object({ path, offset: z.number().int().nonnegative(), data: z.string().max(2 * REMOTE_TRANSFER_CHUNK_BYTES), final: z.boolean(), sha256: z.string().max(64).optional(), overwrite: z.boolean().default(false), author, ...fileScope }),
+        result: z.object({ path: z.string(), size: z.number().nonnegative(), done: z.boolean() }),
     },
     'screen.capture': { params: z.object({ maxWidth: z.number().int().positive().max(4096).default(1440), author }), result: z.object({ jpegBase64: z.string(), width: z.number().int().positive(), height: z.number().int().positive(), scale: z.number().positive() }) },
     'screen.act': { params: z.object({ action: remoteScreenActionSchema, author }), result: z.object({ done: z.boolean() }) },
@@ -199,6 +218,8 @@ export const REMOTE_METHOD_CAPABILITY: Record<RemoteMethod, RemoteCapability | n
     'fs.stat': 'files',
     'fs.read': 'files',
     'fs.write': 'files',
+    'fs.pull': 'files',
+    'fs.push': 'files',
     'screen.capture': 'screen',
     'screen.act': 'screen',
 }

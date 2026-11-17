@@ -28,7 +28,9 @@ export function ComputerAccessCard({ request, always, warning, onSubmit }: Compu
     const [submitted, setSubmitted] = useState(false)
     // Answering twice starts two runs on the same conversation: the latch has to be a ref.
     const submittedRef = useRef(false)
-    const screen = request.screen && request.commands.length === 0
+    const screen = request.screen && request.commands.length === 0 && request.paths.length === 0
+    const lines = request.commands.length > 0 ? request.commands : request.paths
+    const title = screen ? 'titleScreen' : request.commands.length > 1 ? 'titleCommands' : request.commands.length === 1 ? 'titleCommand' : 'titleFiles'
 
     const decide = (decision: Omit<ComputerAccessDecision, 'computer'>) => {
         if (submittedRef.current) return
@@ -43,14 +45,14 @@ export function ComputerAccessCard({ request, always, warning, onSubmit }: Compu
             <div className="flex items-center gap-2.5 text-sm">
                 <Icon size="sm" tone="orange" icon={screen ? MousePointer2Icon : ShieldAlertIcon} className="bg-orange-500/10 text-foreground" />
                 <span className="min-w-0 flex-1 truncate font-medium text-foreground">
-                    {t.rich(screen ? 'titleScreen' : request.commands.length > 1 ? 'titleCommands' : 'titleCommand', { count: request.commands.length, computer: () => <ComputerHandle handle={request.computer} /> })}
+                    {t.rich(title, { count: lines.length, computer: () => <ComputerHandle handle={request.computer} /> })}
                 </span>
             </div>
             {request.reason && <p className="text-sm text-foreground">{request.reason}</p>}
-            {request.commands.length > 0 && (
+            {lines.length > 0 && (
                 <ScrollFade className="max-h-[22vh] rounded bg-background">
                     <div className="divide-y divide-border/60">
-                        {request.commands.map((command, index) => (
+                        {lines.map((command, index) => (
                             <code key={index} className="block px-2 py-1.5 font-mono text-xs break-all whitespace-pre-wrap text-foreground">
                                 {command}
                             </code>

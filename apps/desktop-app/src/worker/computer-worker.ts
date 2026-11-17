@@ -5,14 +5,15 @@ import { REMOTE_METHOD_CAPABILITY, REMOTE_METHODS, type RemoteCapability, type R
 import type { ActivityEntry, WorkerLink, WorkerLinkState, WorkerLocalSettings, WorkerToMain } from '../shared/remote-worker'
 import { ActivityLog } from './activity'
 import { RemoteFailure } from './failure'
-import { readFacts } from './facts'
+import { osOf, readFacts } from './facts'
+import { ComputerFiles, type FileScope } from './files'
 import { LinkConnection } from './link-connection'
 import { resolveLoginEnv } from './login-env'
 import { runCommand, shellFor, type ShellSpec } from './shell'
 
 // What this build of the worker can do. A capability the person switched off in the app is left out
 // of what the computer offers, and refused if the engine asks anyway.
-export const WORKER_CAPABILITIES: readonly RemoteCapability[] = ['shell']
+export const WORKER_CAPABILITIES: readonly RemoteCapability[] = ['shell', 'files']
 
 export type ComputerWorkerOptions = {
     dataDir: string
@@ -36,6 +37,7 @@ export class ComputerWorker {
     private readonly shell: Promise<ShellSpec>
     private settings: WorkerLocalSettings
     private facts: Promise<RemoteFacts> | null = null
+    private readonly files: ComputerFiles
 
     constructor(private readonly options: ComputerWorkerOptions) {
         this.platform = options.platform ?? process.platform
@@ -43,6 +45,7 @@ export class ComputerWorker {
         this.env = options.env ?? resolveLoginEnv(this.platform)
         this.shell = this.env.then(env => shellFor(this.platform, env))
         this.activity = new ActivityLog(join(options.dataDir, 'activity.jsonl'))
+        this.files = new ComputerFiles(osOf(this.platform), () => this.settings.workDir)
     }
 
     capabilities(): RemoteCapability[] {
@@ -150,7 +153,39 @@ export class ComputerWorker {
             return { cancelled: !!controller }
         }
         if (method === 'exec.run') return this.exec(params as { execId: string; command: string; cwd?: string; timeoutMs: number; author?: string }, link)
+        if (method.startsWith('fs.')) return this.file(method, params, link)
         throw new RemoteFailure('unsupported', `This computer does not run ${method} yet. Update Rerun on it.`)
+    }
+
+    private async file(method: RemoteMethod, params: Record<string, unknown>, link: WorkerLink): Promise<unknown> {
+        const scope: FileScope = { roots: (params.roots as string[] | null) ?? null, sensitiveOk: params.sensitiveOk === true }
+        const path = params.path as string
+        const record = (summary: string, outcome: ActivityEntry['outcome']) => this.record({ computerId: link.computerId, author: (params.author as string | undefined) ?? null, kind: 'file', summary, outcome })
+        try {
+            if (method === 'fs.list') return await this.files.list(path, scope)
+            if (method === 'fs.stat') return await this.files.stat(path, scope)
+            if (method === 'fs.read') {
+                const result = await this.files.read(path, params.maxBytes as number, scope)
+                record(`Read ${result.path}`, 'ok')
+                return result
+            }
+            if (method === 'fs.write') {
+                const result = await this.files.write(path, params.content as string, params.encoding as 'utf8' | 'base64', scope)
+                record(`Wrote ${result.path}`, 'ok')
+                return result
+            }
+            if (method === 'fs.pull') {
+                const result = await this.files.pull(path, params.offset as number, scope)
+                if (result.eof) record(`Copied ${result.path} to the workspace`, 'ok')
+                return result
+            }
+            const result = await this.files.push(params as Parameters<ComputerFiles['push']>[0], scope)
+            if (result.done) record(`Received ${result.path}`, 'ok')
+            return result
+        } catch (err) {
+            if (err instanceof RemoteFailure && (err.code === 'sensitive_path' || err.code === 'outside_workdir')) record(`${method} ${path}`, 'refused')
+            throw err
+        }
     }
 
     private async exec(params: { execId: string; command: string; cwd?: string; timeoutMs: number; author?: string }, link: WorkerLink) {

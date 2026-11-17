@@ -71,3 +71,8 @@ export async function commandGranted(ctx: RunContext, computer: string, command:
     const normalized = normalizeCommand(command)
     return (await runGrants(ctx)).some(grant => grant.computer === computer && grant.commands.has(normalized))
 }
+
+// The paths the person said yes to on this computer, for the run in progress.
+export async function grantedPaths(ctx: RunContext, computer: string): Promise<string[]> {
+    return (await runGrants(ctx)).filter(grant => grant.computer === computer).flatMap(grant => grant.paths)
+}

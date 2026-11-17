@@ -20,8 +20,8 @@ export function ComputerAccessBlock({ input, output, onReply }: ComputerAccessBl
 
     const submit = async (decision: Omit<ComputerAccessDecision, 'computer'>) => {
         let granted: ComputerAccessDecision = { computer: request.computer, ...decision }
-        if (decision.always && computerId) {
-            const result = await allowOnComputerAction(computerId, { kind: 'program', program: decision.always })
+        if (decision.always && computerId && always) {
+            const result = await allowOnComputerAction(computerId, always.rule === 'folder' ? { kind: 'folder', folder: always.value } : { kind: 'program', program: always.value })
             if (!result.ok) {
                 toast.error(t('alwaysFailed'))
                 granted = { computer: request.computer, decision: 'approved' }
@@ -33,7 +33,11 @@ export function ComputerAccessBlock({ input, output, onReply }: ComputerAccessBl
     return (
         <ComputerAccessCard
             request={request}
-            always={always && computerId ? { rule: always.program, label: t('alwaysAllow', { program: always.program }), warning: always.interpreter ? t('interpreterWarning', { program: always.program }) : undefined } : null}
+            always={
+                always && computerId
+                    ? { rule: always.value, label: always.rule === 'folder' ? t('alwaysAllowFolder') : t('alwaysAllow', { program: always.value }), warning: always.interpreter ? t('interpreterWarning', { program: always.value }) : always.rule === 'folder' ? t('folderNote', { folder: always.value }) : undefined }
+                    : null
+            }
             onSubmit={decision => void submit(decision)}
         />
     )

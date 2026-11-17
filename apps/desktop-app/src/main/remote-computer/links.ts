@@ -23,9 +23,12 @@ const FILE_NAME = 'remote-computers.json'
 
 const linksPath = () => join(app.getPath('userData'), FILE_NAME)
 
+let keychain: boolean | null = null
+
+// Asked once: on a Linux desktop without a keyring the question goes over D-Bus and can take seconds.
 export function keychainAvailable(): boolean {
-    if (!safeStorage.isEncryptionAvailable()) return false
-    return process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text'
+    keychain ??= safeStorage.isEncryptionAvailable() && (process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text')
+    return keychain
 }
 
 export function readLinks(): StoredLink[] {

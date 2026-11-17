@@ -39,6 +39,16 @@ Whatever the mode, a coworker never runs a command that asks for administrator r
 
 **Without anyone in the chat** lets schedules, triggers and other coworkers use the computer. When one of them needs your yes, it reaches you as a notification, and the work goes on once you answer. Turn it off and the computer only takes work while someone is in the chat.
 
+## Files
+
+Coworkers work on your files where they are: a 14 GB rush stays on your computer, and the coworker reads only what it needs (a log, a list, the first lines of a file). It can copy a file of up to 100 MB to its own workspace, to show it to you, publish it or attach it to a message, and copy one of its files to your computer.
+
+- Your **working folder** (`~/Rerun` unless you change it) and the folders you always allowed are open to the coworkers.
+- Anywhere else, the coworker asks first, with the path on the card. **Always allow this folder** keeps the yes for that folder.
+- Where secrets live (SSH keys, keychains, browser profiles, password managers, wallets, `.env` files) it always asks, even on a computer in full access.
+
+The computer checks every path itself, links followed, before it touches anything. Commands are not confined to a folder: a command you allowed can reach whatever your account can.
+
 ## See your computers
 
 Open the workspace menu and click **Computers**. Each computer says whether it is online, paused or offline, and when it was last seen. Click one to see its machine (system, processor or graphics card, memory, working folder, and the programs found on it) and its approval settings.
