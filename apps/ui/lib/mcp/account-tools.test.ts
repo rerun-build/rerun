@@ -43,6 +43,7 @@ describe('account tool defs', () => {
             'remove_template_agent',
             'create_agent_share',
             'revoke_agent_share',
+            'delete_vault_entry',
         ]
         const missing = gated.filter(name => {
             const tool = ACCOUNT_TOOL_DEFS.find(candidate => candidate.name === name) as { inputSchema: { properties: Record<string, { type?: string }> } } | undefined

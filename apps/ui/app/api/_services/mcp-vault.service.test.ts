@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
     attachVaultEntry: vi.fn(),
     detachVaultEntry: vi.fn(),
     shareVaultEntry: vi.fn(),
+    deleteVaultEntry: vi.fn(),
     vaultPaidAccounts: vi.fn(),
     attachVaultPaidAccount: vi.fn(),
     detachVaultPaidAccount: vi.fn(),
@@ -22,6 +23,7 @@ vi.mock('./vault.service', () => ({
     attachVaultEntry: mocks.attachVaultEntry,
     detachVaultEntry: mocks.detachVaultEntry,
     shareVaultEntry: mocks.shareVaultEntry,
+    deleteVaultEntry: mocks.deleteVaultEntry,
     VaultUnavailableError,
 }))
 vi.mock('./vault-apps.service', () => ({
@@ -180,6 +182,31 @@ describe('share_vault_entry', () => {
         mocks.shareVaultEntry.mockRejectedValueOnce(new Error('Only an admin can do this'))
 
         await expect(dispatchVaultTool(ADMIN, 'share_vault_entry', { entryId: 'item-gmail', sharedWithAll: true })).rejects.toThrow('Only an admin')
+    })
+})
+
+describe('delete_vault_entry', () => {
+    it('deletes an entry once confirmed and names the coworkers that lost it', async () => {
+        mocks.deleteVaultEntry.mockResolvedValue({ detached: [SCOUT] })
+
+        await expect(dispatchVaultTool(ADMIN, 'delete_vault_entry', { entryId: 'item-gmail', confirm: true })).resolves.toEqual({ deleted: true, detached: [{ id: 'agent-scout', name: 'Scout' }] })
+        expect(mocks.deleteVaultEntry).toHaveBeenCalledWith('item-gmail', ADMIN)
+    })
+
+    it('asks for confirm: true first', async () => {
+        await expect(dispatchVaultTool(ADMIN, 'delete_vault_entry', { entryId: 'item-gmail' })).rejects.toThrow('confirm: true')
+        expect(mocks.deleteVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('leaves a paid account, which has its own subscription, to the app', async () => {
+        await expect(dispatchVaultTool(ADMIN, 'delete_vault_entry', { entryId: 'conn-1', confirm: true })).rejects.toThrow('subscription')
+        expect(mocks.deleteVaultEntry).not.toHaveBeenCalled()
+    })
+
+    it('lets the admin-only refusal of the Vault through', async () => {
+        mocks.deleteVaultEntry.mockRejectedValueOnce(new Error('Only an admin can do this'))
+
+        await expect(dispatchVaultTool(ADMIN, 'delete_vault_entry', { entryId: 'item-gmail', confirm: true })).rejects.toThrow('Only an admin')
     })
 })
 

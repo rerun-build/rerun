@@ -49,4 +49,17 @@ export const VAULT_TOOL_DEFS = [
             required: ['entryId', 'sharedWithAll'],
         },
     },
+    {
+        name: 'delete_vault_entry',
+        description:
+            'Delete a Vault entry for good: every coworker that got it loses it, its credentials are erased and a Composio account behind it is disconnected. Read who loses it in list_vault first and tell the account owner. Admins only. A paid app account has its own subscription and is not deleted here: take it back from coworkers with detach_vault_entry, and end it in the Rerun app. Returns the coworkers that lost it. Requires confirm: true.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                entryId: { type: 'string', description: 'The id of an entry, from list_vault.' },
+                confirm: { type: 'boolean' },
+            },
+            required: ['entryId', 'confirm'],
+        },
+    },
 ] as const

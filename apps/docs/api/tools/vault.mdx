@@ -1,6 +1,6 @@
 ---
 title: "Vault"
-description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers, and lend them out."
+description: "Read the accounts, secrets and MCP servers your workspace keeps once for its coworkers, lend them out and delete them."
 ---
 
 The [Vault](/vault) is where your workspace keeps the accounts and keys its coworkers share: the apps you signed in to, the secrets you added, the MCP servers you registered, and the accounts of paid apps. These tools act with the access of the member who created the key, the same rules as the app: see [Who can do what](/vault#who-can-do-what).
@@ -76,3 +76,17 @@ Gives a Vault entry to every coworker, including the ones added later, or takes 
 </ParamField>
 
 A paid account is lent coworker by coworker and cannot be shared with every coworker. Returns the entry as `list_vault` shows it.
+
+## delete_vault_entry
+
+Deletes a Vault entry for good. Every coworker that got it loses it, its credentials are erased, and a Composio account behind it is disconnected. Admins only.
+
+<ParamField body="entryId" type="string" required>
+  The `id` of an entry, from `list_vault`.
+</ParamField>
+
+<ParamField body="confirm" type="boolean" required>
+  Must be `true`.
+</ParamField>
+
+Returns `detached`, the coworkers that lost it. A paid account has its own subscription and is not deleted here: switch it off with `detach_vault_entry`, and end it in the app.

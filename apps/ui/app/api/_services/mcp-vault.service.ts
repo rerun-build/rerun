@@ -1,10 +1,10 @@
 import 'server-only'
 
 import type { Actor } from '@/app/api/_auth/access'
-import { requireString } from '@/lib/mcp/args'
+import { requireConfirmation, requireString } from '@/lib/mcp/args'
 import { dispatchShareTool } from './mcp-shares.service'
 import { attachVaultPaidAccount, detachVaultPaidAccount, vaultPaidAccounts, type VaultPaidAccount } from './vault-apps.service'
-import { attachVaultEntry, detachVaultEntry, listVault, shareVaultEntry, VaultUnavailableError, type VaultCoworker, type VaultEntryView, type VaultListing } from './vault.service'
+import { attachVaultEntry, deleteVaultEntry, detachVaultEntry, listVault, shareVaultEntry, VaultUnavailableError, type VaultCoworker, type VaultEntryView, type VaultListing } from './vault.service'
 import { NoEngineError } from './workspace-engine.service'
 
 const UNAVAILABLE = {
@@ -109,6 +109,14 @@ async function shareEntry(actor: Actor, args: Record<string, unknown>) {
     return entryAfter(actor, entryId)
 }
 
+async function deleteEntry(actor: Actor, args: Record<string, unknown>) {
+    const entryId = requireString(args.entryId, 'entryId')
+    if (await paidAccount(actor, entryId)) throw new Error('A paid app account has its own subscription: take it back from its coworkers with detach_vault_entry, and end it in the Rerun app.')
+    requireConfirmation(args, 'this Vault entry and its credentials')
+    const { detached } = await deleteVaultEntry(entryId, actor)
+    return { deleted: true, detached: detached.map(coworkerView) }
+}
+
 // Chained after the account tools and before sharing, whose own default hands over to the template tools.
 export async function dispatchVaultTool(actor: Actor, name: string, args: Record<string, unknown>): Promise<unknown> {
     switch (name) {
@@ -120,6 +128,8 @@ export async function dispatchVaultTool(actor: Actor, name: string, args: Record
             return detachEntry(actor, args)
         case 'share_vault_entry':
             return shareEntry(actor, args)
+        case 'delete_vault_entry':
+            return deleteEntry(actor, args)
         default:
             return await dispatchShareTool(actor, name, args)
     }
