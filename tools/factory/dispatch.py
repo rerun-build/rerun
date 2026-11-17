@@ -1848,6 +1848,7 @@ class Dispatcher:
             snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
                                            read_epic=self.read_epic, planning=self.planners.read(self.beats),
                                            plan=renewal.plan(self.connections, now))
+            digest.alarm(self.store, snap.get("digest"), now)
             self.account("factory_report", {"snapshot": snap}, timeout=10)
             digest.post(self.gh, self.store, self.repo, snap.get("digest"), now)
             self.report_logged.clear()

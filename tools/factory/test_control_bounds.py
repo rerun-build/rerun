@@ -20,7 +20,7 @@ def runs_today():
 class ControlBoundsTest(unittest.TestCase):
     def test_the_control_block_may_set_copies_and_wip_only(self):
         bounds = load("control-bounds.json")
-        self.assertEqual(set(bounds), {"settable", "copies", "wip"})
+        self.assertEqual(set(bounds), {"settable", "copies", "wip", "rework_threshold"})
         self.assertEqual(bounds["settable"], ["copies", "wip"])
 
     def test_copies_are_bounded_for_exactly_the_coworkers_of_the_settings(self):

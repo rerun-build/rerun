@@ -19,6 +19,9 @@ PROOF_RATE = 0.5
 BURN_WINDOW_S = 3600
 MAX_ANOMALIES = 50
 MEASURE_WINDOW_S = 86400
+REWORK_LAST = 20
+REWORK_DEFAULT = 1.3
+CONTROL_BOUNDS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "control-bounds.json")
 BLOCK_STATES = ("blocked", "rejected", "failed", "returned", "unsolvable")
 WITHDRAWN = "issue closed or the "
 SENIOR = "senior round: "
@@ -78,6 +81,55 @@ def threads(store):
     return sorted(out, key=lambda t: t["parent"])[-MAX_THREADS:]
 
 
+def solved_green(store):
+    done = []
+    for j in store.jobs():
+        if j["state"] != "merged" or j.get("dev_result") != "green":
+            continue
+        into = [t for t in store.transitions_of(str(j["issue"])) if t["to_state"] == "merged"]
+        if into:
+            done.append((L.ts(into[-1]["at"]), str(j["issue"])))
+    return [job for _, job in sorted(done)[-REWORK_LAST:]]
+
+
+def rework(store, table):
+    jobs = solved_green(store)
+    if not jobs:
+        return None, None, []
+    runs = units = 0.0
+    extra = {}
+    for job in jobs:
+        rows = store.db.execute("SELECT stage, model, tokens_in, tokens_out, cache_read, cache_write FROM fires "
+                                "WHERE job=? AND (stage LIKE 'build%' OR stage LIKE 'fix%')", (job,)).fetchall()
+        runs += len(rows)
+        units += sum(weights.units(dict(r), table)[0] for r in rows)
+        parent = cutshape.parse({"number": int(job), "body": store.get_job(job).get("body") or ""})["parent"]
+        key = "plan:%d" % parent if parent is not None else "-"
+        extra[key] = extra.get(key, 0) + len(rows) - 1
+    top = sorted(((k, v) for k, v in extra.items() if v > 0), key=lambda kv: (-kv[1], kv[0]))[:3]
+    return runs / len(jobs), units / len(jobs), top
+
+
+def rework_threshold(cfg):
+    with open(CONTROL_BOUNDS, encoding="utf-8") as f:
+        bound = json.load(f)["rework_threshold"]
+    setting = cfg.get("rework_threshold")
+    if not isinstance(setting, (int, float)) or isinstance(setting, bool) or setting <= 0:
+        setting = REWORK_DEFAULT
+    return min(setting, bound)
+
+
+def alarm(store, d, now):
+    hit = [a for a in ((d or {}).get("anomalies") or []) if a.get("kind") == "rework"]
+    if not hit:
+        return
+    day = time.strftime("%Y-%m-%d", time.gmtime(now))
+    if store.get_all("-").get("rework_day") == day:
+        return
+    store.set("-", "rework_day", day)
+    store.add_failure("rework", "-", station="plan", reason=hit[0]["detail"])
+
+
 def anomalies(store, cfg, now):
     limit = L.run_limits(cfg.get("clocks"))["run_limit_s"]
     clock, repeat = [], []
@@ -104,6 +156,12 @@ def anomalies(store, cfg, now):
     total = failed + passed
     if total >= PROOF_MIN and failed / total >= PROOF_RATE:
         out.append({"kind": "proof_fail_rate", "issue": None, "detail": "%d of %d proofs failed in 24 h" % (failed, total)})
+    runs, units, top = rework(store, weights.load())
+    threshold = rework_threshold(cfg)
+    if runs is not None and runs > threshold:
+        most = ", ".join("%s +%d" % (k, v) for k, v in top) or "-"
+        out.append({"kind": "rework", "issue": None, "detail": ("%.1f build and fix runs (%.2f cost units) per issue solved green, "
+                                                              "last %d, threshold %s; most extra: %s" % (runs, units, REWORK_LAST, threshold, most))[:200]})
     cap = cfg.get("budget_tokens_per_hour")
     if isinstance(cap, (int, float)) and not isinstance(cap, bool) and cap > 0:
         used = sum((r[0] or 0) + (r[1] or 0) for r in store.db.execute("SELECT tokens_in, tokens_out, intent_at FROM fires")
@@ -113,7 +171,7 @@ def anomalies(store, cfg, now):
     return out[:MAX_ANOMALIES]
 
 
-def measures(store, now):
+def measures(store, now, table=None):
     merged = []
     blocks = {k: 0 for k in BLOCK_STATES}
     escalated = escalated_merged = 0
@@ -143,11 +201,14 @@ def measures(store, now):
     for parent in sorted(parents):
         row = store.db.execute("SELECT COALESCE(SUM(tokens_in + tokens_out), 0) FROM fires WHERE job=?", ("plan:%d" % parent,)).fetchone()
         tokens += row[0]
+    runs, units, _ = rework(store, weights.load() if table is None else table)
     return {"mergedPerHour": round(n / 24, 2), "leadTimeS": sum(m[1] for m in merged) / n if n else None,
             "firstPassYield": sum(1 for m in merged if m[2] == 0) / n if n else None,
             "fixRounds": sum(m[2] for m in merged) / n if n else None,
             "blocks": blocks, "tokensPerMerged": tokens / n if n else None,
-            "escalated": escalated, "escalatedMerged": escalated_merged}
+            "escalated": escalated, "escalatedMerged": escalated_merged,
+            "reworkPerSolved": None if runs is None else round(runs, 4),
+            "reworkUnitsPerSolved": None if units is None else round(units, 4)}
 
 
 def planners(store, now):
@@ -315,7 +376,7 @@ def issues(store, now):
 def build(store, cfg, now, plan=None):
     table = weights.load()
     return {"stations": stations(store, now), "threads": threads(store),
-            "anomalies": anomalies(store, cfg, now), "measures": measures(store, now), "planners": planners(store, now),
+            "anomalies": anomalies(store, cfg, now), "measures": measures(store, now, table), "planners": planners(store, now),
             "issues": issues(store, now),
             "bar": bar(store, now, table), "causes": causes(store, now), "cost": cost(store, now, table, plan)}
 

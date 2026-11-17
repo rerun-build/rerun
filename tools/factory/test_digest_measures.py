@@ -8,7 +8,7 @@ NOW = limits.ts("2026-11-15T12:00:00Z")
 BODY = "**Depends on**: none\n"
 EMPTY = {"mergedPerHour": 0.0, "leadTimeS": None, "firstPassYield": None, "fixRounds": None,
          "blocks": {"blocked": 0, "rejected": 0, "failed": 0, "returned": 0, "unsolvable": 0}, "tokensPerMerged": None,
-         "escalated": 0, "escalatedMerged": 0}
+         "escalated": 0, "escalatedMerged": 0, "reworkPerSolved": None, "reworkUnitsPerSolved": None}
 
 
 class Measures(unittest.TestCase):
@@ -49,7 +49,7 @@ class Measures(unittest.TestCase):
         self.assertEqual(digest.measures(self.st, NOW), {
             "mergedPerHour": 0.08, "leadTimeS": 5400.0, "firstPassYield": 0.5, "fixRounds": 0.5,
             "blocks": {"blocked": 1, "rejected": 0, "failed": 1, "returned": 0, "unsolvable": 0}, "tokensPerMerged": 2900.0,
-            "escalated": 0, "escalatedMerged": 0})
+            "escalated": 0, "escalatedMerged": 0, "reworkPerSolved": None, "reworkUnitsPerSolved": None})
 
 
 if __name__ == "__main__":
