@@ -12,6 +12,7 @@ import digest
 import escapes
 import failures
 import followups
+import gatefiles
 import holds
 import inboxsort
 import plancheck
@@ -523,6 +524,10 @@ class Dispatcher:
         t = pools.types(self.cfg).get("reviewer")
         if t is None:
             return None
+        return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
+
+    def free_second(self, j, first):
+        skip = self.unresolved() | self.held_ids() | {first}
         return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
 
     def free_copy_of(self, agent, j=None):
@@ -1127,7 +1132,8 @@ class Dispatcher:
         elif st == "review_wait":
             if self.conflicts(j):
                 return
-            got = self.free("reviewer", j)
+            first = (j.get("first_accept") or {}).get("by")
+            got = self.free_second(j, first) if first else self.free("reviewer", j)
             if not got or not self.take(j):
                 return
             r = got[0]
@@ -1143,7 +1149,14 @@ class Dispatcher:
             if re.match(r"VERDICT:\s*REJECT \(plan\)", verdict):
                 return self.end(j, "returned", "plan: review: " + verdict[:180], plan_lines=verdict)
             stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
-            if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale:
+            accept = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and not stale
+            first = j.get("first_accept") or {}
+            second = accept and first.get("head") == j["head"] and first.get("by") != j.get("reviewer")
+            if accept and not second and gatefiles.touched(j.get("paths"), gatefiles.load()):
+                name = self.names.get(j.get("reviewer"), j.get("reviewer"))
+                self.to(j, "review_wait", "accepted at %s by %s; Files name a gate file, so a second reviewer is asked" % (j["head"][:7], name),
+                        first_accept={"head": j["head"], "by": j.get("reviewer")})
+            elif accept:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
             elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
                 self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + verdict[:300]])
@@ -1170,7 +1183,7 @@ class Dispatcher:
             last = final_line(out, ("PUSHED:", "BLOCKED:"))
             if not (last and last.startswith("PUSHED:")):
                 return self.blocked(j, out)
-            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=j["round"] if j.get("same_round") else 2)
+            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=j["round"] if j.get("same_round") else 2, first_accept=None)
         elif st == "checks":
             self.checks(j)
         elif st == "proof_wait":
