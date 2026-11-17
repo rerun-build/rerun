@@ -1,6 +1,6 @@
 // Background work, run in the process of the web app: there is no Trigger.dev here. A task is
-// started at most once per idempotency key while the process lives, and the nightly purges run on
-// a cron of their own. A restart drops what was in flight, which every task here can afford: each
+// started at most once per idempotency key while the process lives, and the nightly purge runs on
+// a cron of its own. A restart drops what was in flight, which every task here can afford: each
 // is asked again by the screen or the flow that needs it.
 import type { AnyTask, TaskOutput } from '@trigger.dev/sdk/v3'
 import { Cron } from 'croner'
@@ -67,7 +67,6 @@ export async function globalIdempotencyKey(key: string): Promise<string> {
 }
 
 const SCHEDULES: { pattern: string; run: () => Promise<unknown> }[] = [
-    { pattern: '0 3 * * *', run: async () => (await import('@/trigger/purge-anonymous-users')).purgeAnonymous({}) },
     { pattern: '40 3 * * *', run: async () => (await import('@/trigger/purge-web-search-cache')).purgeWebSearchCache() },
 ]
 

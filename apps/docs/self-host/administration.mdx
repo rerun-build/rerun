@@ -86,10 +86,9 @@ There is no job queue to run. The app runs its background work in its own proces
 - suggesting coworker ideas
 - switching a coworker off on its server once the app has turned it off
 - filling an application to the Rerun Experts program from the candidate's profile, which only Rerun Cloud uses
-- every night at 3:00, deleting anonymous visitors older than a day who never signed up
 - every night at 3:40, clearing the web search cache
 
-The two nightly jobs start the first time someone opens the app after it starts. Their times follow the clock of the app container, UTC unless you set `TZ`. A restart drops a job in flight. Each one is asked again by the screen or the flow that needs it.
+The nightly job starts the first time someone opens the app after it starts. Its time follows the clock of the app container, UTC unless you set `TZ`. A restart drops a job in flight. Each one is asked again by the screen or the flow that needs it.
 
 ## Logs
 
