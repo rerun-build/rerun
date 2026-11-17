@@ -391,6 +391,17 @@ def checks_verdict(runs):
     return "OK", None
 
 
+def fast_verdict(check_runs, names):
+    fast = [r for r in check_runs if r.get("name") in names]
+    if not fast:
+        return "NONE", "no fast check yet"
+    bad = [r["name"] for r in fast if r.get("conclusion") in ("failure", "timed_out", "cancelled")]
+    if bad:
+        return "FAIL", "fast check failed: " + ", ".join(bad)
+    pending = [r["name"] for r in fast if r.get("status") != "completed"]
+    if pending:
+        return "WAIT", "fast check not done: " + ", ".join(pending)
+    return "OK", None
 
 
 class Dispatcher:
@@ -1163,12 +1174,14 @@ class Dispatcher:
         elif st == "review_wait":
             if self.conflicts(j):
                 return
+            head = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "headRefOid"]))["headRefOid"]
+            if self.cfg.get("fast_checks") and not self.fast_checks_ready(j, head):
+                return
             first = (j.get("first_accept") or {}).get("by")
             got = self.free_second(j, first) if first else self.free("reviewer", j)
             if not got or not self.take(j):
                 return
             r = got[0]
-            head = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "headRefOid"]))["headRefOid"]
             self.start(j, r, "review %d of #%s at %s" % (j["round"], j["pr"], head[:7]), "reviewing", copy=got[1], reviewer=r, head=head)
         elif st == "reviewing":
             out = self.finished_run(j)
@@ -1326,6 +1339,31 @@ class Dispatcher:
                     return True
             except Exception:
                 continue
+        return False
+
+    def fast_checks_ready(self, j, head):
+        setting = self.cfg["fast_checks"]
+        if j.get("fast_head") != head:
+            j["fast_head"], j["fast_since"] = head, self.now()
+            self.save(j, "fast checks: looking at %s" % head[:7])
+        runs = json.loads(self.gh(["api", "repos/%s/commits/%s/check-runs?per_page=100" % (self.repo, head)])).get("check_runs") or []
+        verdict, why = fast_verdict(runs, setting["names"])
+        waited = self.now() - j["fast_since"]
+        if verdict == "OK":
+            return True
+        if verdict == "FAIL":
+            fixed = j.get("fast_fixed", 0)
+            if fixed >= setting["fixes"]:
+                self.end(j, "failed", why)
+                return False
+            self.to(j, "fix_wait", why + "; back to the builder before review", same_round=True, fast_fixed=fixed + 1,
+                    review="Not a review: %s on commit %s. Read `gh run view <id> --log-failed`, fix the cause, push." % (why, head[:7]))
+            return False
+        if verdict == "WAIT" and waited > setting["wait_s"]:
+            log(j["issue"], "fast checks not done after %d s, reviewed anyway: %s" % (waited, why))
+            return True
+        if verdict == "NONE" and waited > setting["start_s"]:
+            return True
         return False
 
     def checks(self, j):

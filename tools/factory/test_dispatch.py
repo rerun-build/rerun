@@ -208,6 +208,8 @@ class World:
             return json.dumps(self.commits)
         if a[0] == "api" and "/actions/runs/" in a[1] and a[1].endswith("/jobs"):
             return json.dumps({"jobs": getattr(self, "run_jobs", {}).get(a[1].split("/actions/runs/")[1].split("/")[0], [])})
+        if a[0] == "api" and "/check-runs" in a[1]:
+            return json.dumps({"check_runs": self.check_runs})
         if a[0] == "api" and "/actions/workflows/" in a[1]:
             return json.dumps({"workflow_runs": self.dev_runs})
         if a[0] == "api":

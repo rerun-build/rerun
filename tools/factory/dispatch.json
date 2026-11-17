@@ -18,6 +18,7 @@
     "reader_judgment": {"model": "claude-sonnet-5-5", "thinkingLevel": "medium"}
   },
   "proof": true,
+  "fast_checks": {"names": ["Typecheck and lint", "No comments in code", "Factory tools tests"], "start_s": 120, "wait_s": 900, "fixes": 2},
   "cache_life": {
     "subscription": 3600,
     "key": 300
