@@ -24,6 +24,8 @@ class StoreRead(unittest.TestCase):
             rid = "rev-%d" % n
             st.fired(st.intent("5", "", "review %d of #9 at abc1234" % n, coworker="LINUS", at=storeread.iso(NOW - 4000)), rid)
             st.close_run(rid, "done", at=storeread.iso(NOW - 3900))
+        st.fired(st.intent("5", "", "proof of #9 at abc1234", coworker="BARBARA", at=storeread.iso(NOW - 5000)), "open-1")
+        st.intent("5", "", "proof of #9 at abc1234", coworker="BARBARA", at=storeread.iso(NOW - 4500))
         st.set("escaped", "5|reopened", '{"job": "5"}')
         st.db.close()
 
@@ -45,6 +47,8 @@ class StoreRead(unittest.TestCase):
         self.assertIn("build | 1 | 0 | 1 |", text)
         self.assertIn("review | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 100", text)
         self.assertIn("  1 x build: interrupted: engine restarted", text)
+        self.assertIn("proof | BARBARA | running | yes | 1 | %s | %s" % (storeread.iso(NOW - 5000), storeread.iso(NOW - 5000)), text)
+        self.assertIn("proof | BARBARA | intent | no | 1 |", text)
         self.assertIn("5|reopened", text)
 
     def test_the_store_is_opened_read_only(self):

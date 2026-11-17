@@ -67,6 +67,15 @@ def report(db, now):
     for name, v in sorted(stages.items(), key=lambda kv: -kv[1][0]):
         out.append(" | ".join([name] + [str(x) for x in v[:8]] + [str(round(v[8] / v[9])) if v[9] else "-"]))
 
+    out += ["", "## runs still open: stage | coworker | status | has run id | runs | oldest | newest"]
+    held = {}
+    for stage, who, status, has_id, at in rows(db, "SELECT stage, coworker, status, run_id IS NOT NULL, intent_at FROM fires "
+                                                   "WHERE status IN ('intent','running')"):
+        v = held.setdefault((stage_name(stage), who or "-", status, "yes" if has_id else "no"), [0, at, at])
+        v[0], v[1], v[2] = v[0] + 1, min(v[1], at), max(v[2], at)
+    for key, v in sorted(held.items(), key=lambda kv: -kv[1][0])[:30]:
+        out.append(" | ".join(list(key) + [str(x) for x in v]))
+
     out += ["", "## run errors, last 7 days (numbers folded)"]
     counts = {}
     for stage, error in rows(db, "SELECT stage, error FROM fires WHERE intent_at >= ? AND status IN ('error','lost','cancelled') AND error IS NOT NULL", (week,)):
