@@ -74,6 +74,20 @@ describe('getSystemDb on a legacy file', () => {
     })
 })
 
+describe('final message index migration', () => {
+    it('lets the read of the final message of a run seek by session, role and time on an existing db', async () => {
+        await seedLegacy('finalmsg')
+        const db = await getSystemDb('finalmsg')
+        const plan = await db.client.execute({
+            sql: "EXPLAIN QUERY PLAN SELECT content_json FROM messages WHERE session_id = ? AND role = 'assistant' AND created_at >= ? AND created_at <= ? ORDER BY created_at DESC, rowid DESC LIMIT 1",
+            args: ['s1', '2026-01-01', '2026-01-02'],
+        })
+        const detail = plan.rows.map(row => String(row.detail)).join(' | ')
+        expect(detail).toContain('messages_session_role_created_idx')
+        expect(detail).not.toContain('TEMP B-TREE')
+    })
+})
+
 describe('run lineage migration', () => {
     const LINEAGE = ['initiator_agent_id', 'initiator_run_id', 'initiator_session_id', 'initiator_user_id', 'job_ref', 'branch', 'copy_index']
 
@@ -100,13 +114,13 @@ describe('run lineage migration', () => {
         expect(columns).toEqual(expect.arrayContaining(LINEAGE))
         const indexSql = "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'runs_agent_job_started_idx'"
         expect((await first.client.execute(indexSql)).rows).toHaveLength(1)
-        expect(await sqliteVersion(first.client)).toBe(7)
+        expect(await sqliteVersion(first.client)).toBe(8)
         closeSystemDb('v4')
 
         const second = await getSystemDb('v4')
         expect(await columnsOf('v4', 'runs')).toEqual(columns)
         expect((await second.client.execute(indexSql)).rows).toHaveLength(1)
-        expect(await sqliteVersion(second.client)).toBe(7)
+        expect(await sqliteVersion(second.client)).toBe(8)
     })
 })
 
@@ -126,7 +140,7 @@ describe('run goal migration', () => {
         const row = (await first.client.execute("SELECT goal_json, goal_state, goal_turns, goal_verdicts_json FROM runs WHERE id = 'r1'")).rows[0]
         expect([row.goal_json, row.goal_state, row.goal_turns, row.goal_verdicts_json]).toEqual([null, null, null, null])
         await expect(first.client.execute("UPDATE runs SET goal_state = 'bogus' WHERE id = 'r1'")).rejects.toThrow()
-        expect(await sqliteVersion(first.client)).toBe(7)
+        expect(await sqliteVersion(first.client)).toBe(8)
         expect(SYSTEM_DB_MIGRATIONS.find(step => step.version === 6)).toMatchObject({ version: 6, id: 'run-goal' })
         closeSystemDb('v5goal')
         expect(await columnsOf('v5goal', 'runs')).toEqual(columns)
