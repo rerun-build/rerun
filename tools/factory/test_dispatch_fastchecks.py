@@ -1,6 +1,6 @@
 import json, os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from test_dispatch import Base, HEAD, PR_LINE
+from test_dispatch import Base, PR_LINE
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FAST_NAMES = ("Typecheck and lint", "No comments in code", "Factory tools tests")
