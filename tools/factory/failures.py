@@ -6,6 +6,9 @@ SOURCES = {}
 ENDS = ("blocked", "rejected", "failed", "returned", "unsolvable")
 
 
+WITHDRAWN = "issue closed or the "
+
+
 def kinds(old, new, msg):
     msg = msg or ""
     out = []
@@ -13,7 +16,7 @@ def kinds(old, new, msg):
         out.append("asked again")
     if old == "proving" and (msg.startswith("proof failed") or "proof:" in msg):
         out.append("proof fail")
-    if new in ENDS:
+    if new in ENDS and WITHDRAWN not in msg:
         out.append("ended %s" % new)
     elif new == "fix_wait":
         out.append("fix round")

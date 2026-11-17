@@ -16,6 +16,10 @@ def shape(reason):
     return text if len(text) <= REASON_CHARS else text[:100].rstrip() + " ... " + text[-45:].lstrip()
 
 
+def stage_name(stage):
+    return re.split(r" (?:\d+ )?of #", str(stage or "-"), maxsplit=1)[0]
+
+
 def rows(db, sql, args=()):
     return db.execute(sql, args).fetchall()
 
@@ -53,15 +57,20 @@ def report(db, now):
         out.append("%s | %d | %d | %d | %d" % (state, n, n7 or 0, n1 or 0, jobs))
 
     out += ["", "## runs by stage, last 7 days: stage | runs | done | error | cancelled | lost | still open | tokens in | tokens out | avg seconds"]
+    stages = {}
     for r in rows(db, "SELECT stage, COUNT(*), SUM(status='done'), SUM(status='error'), SUM(status='cancelled'), SUM(status='lost'), "
-                      "SUM(status IN ('intent','running')), SUM(tokens_in), SUM(tokens_out), AVG(seconds) FROM fires WHERE intent_at >= ? "
-                      "GROUP BY stage ORDER BY COUNT(*) DESC", (week,)):
-        out.append(" | ".join(str(int(v)) if isinstance(v, float) else str(v or 0) for v in r))
+                      "SUM(status IN ('intent','running')), SUM(tokens_in), SUM(tokens_out), SUM(seconds), SUM(seconds IS NOT NULL) FROM fires "
+                      "WHERE intent_at >= ? GROUP BY stage", (week,)):
+        held = stages.setdefault(stage_name(r[0]), [0] * 10)
+        for i, v in enumerate(r[1:]):
+            held[i] += v or 0
+    for name, v in sorted(stages.items(), key=lambda kv: -kv[1][0]):
+        out.append(" | ".join([name] + [str(x) for x in v[:8]] + [str(round(v[8] / v[9])) if v[9] else "-"]))
 
     out += ["", "## run errors, last 7 days (numbers folded)"]
     counts = {}
     for stage, error in rows(db, "SELECT stage, error FROM fires WHERE intent_at >= ? AND status IN ('error','lost','cancelled') AND error IS NOT NULL", (week,)):
-        key = "%s: %s" % (stage, shape(error))
+        key = "%s: %s" % (stage_name(stage), shape(re.sub(r"run \S+ of", "run of", error)))
         counts[key] = counts.get(key, 0) + 1
     for text, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[:12]:
         out.append("  %d x %s" % (n, text))

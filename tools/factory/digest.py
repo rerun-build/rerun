@@ -19,6 +19,7 @@ BURN_WINDOW_S = 3600
 MAX_ANOMALIES = 50
 MEASURE_WINDOW_S = 86400
 BLOCK_STATES = ("blocked", "rejected", "failed", "returned", "unsolvable")
+WITHDRAWN = "issue closed or the "
 SENIOR = "senior round: "
 MARK = "<!-- factory-digest -->"
 POST_EVERY_S = 600
@@ -118,7 +119,7 @@ def measures(store, now):
     for j in store.jobs():
         rows = [t for t in store.transitions_of(str(j["issue"])) if t["from_state"] != t["to_state"]]
         for t in rows:
-            if t["to_state"] in blocks and 0 <= now - L.ts(t["at"]) <= MEASURE_WINDOW_S:
+            if t["to_state"] in blocks and WITHDRAWN not in str(t["reason"] or "") and 0 <= now - L.ts(t["at"]) <= MEASURE_WINDOW_S:
                 blocks[t["to_state"]] += 1
         into = [t for t in rows if t["to_state"] == "merged"]
         up = [t for t in rows if str(t["reason"] or "").startswith(SENIOR) and 0 <= now - L.ts(t["at"]) <= MEASURE_WINDOW_S]

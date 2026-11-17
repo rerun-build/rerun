@@ -67,7 +67,7 @@ def judge(out, count, head):
     if notmet and all(re.match(r"ASK \d+: NOT MET \(plan\) \S", l) for l in notmet):
         return "plan", gist("\n".join(notmet), 1500)
     if m.group(1) == "FAIL":
-        return "fail", gist(m.group(3) or "no ask numbers", 200)
+        return "fail", gist(" | ".join([m.group(3) or "no ask numbers"] + [l for l in lines if re.match(r"ASK \d+: NOT MET\b", l)]), 300)
     if sorted(got) != list(range(1, count + 1)):
         return "none", "proof lines name %d of the %d asks" % (len(got), count)
     missed = [str(n) for n in sorted(got) if not got[n]]
