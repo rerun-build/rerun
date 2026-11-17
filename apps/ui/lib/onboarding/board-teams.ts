@@ -58,3 +58,15 @@ export function shownTeam(teams: BoardTeams, industry: TemplateCategory | null, 
     for (const team of [focus, industry ? teams[industry] : null, teams.showcase]) if (team?.agents.length) return team
     return null
 }
+
+export type BoardArrival = { kind: 'template'; slug: string } | { kind: 'share'; token: string }
+
+// What a link carried through the sign-in, read off the `next` it is folded into.
+export function arrivalOf(next: string | null | undefined): BoardArrival | null {
+    if (!next?.startsWith('/')) return null
+    const query = new URL(next, 'http://next.invalid').searchParams
+    const slug = query.get('template')?.trim()
+    if (slug) return { kind: 'template', slug }
+    const token = query.get('share')?.trim()
+    return token ? { kind: 'share', token } : null
+}

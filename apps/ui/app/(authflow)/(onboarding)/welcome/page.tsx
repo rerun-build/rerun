@@ -4,7 +4,9 @@ import { redirect } from 'next/navigation'
 
 import { requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
+import { BoardFocus } from '@/components/onboarding/BoardFocus'
 import { internalPath } from '@/lib/auth/internal-path'
+import { loadArrivalTeam } from '@/lib/onboarding/board-teams.server'
 import { siteDomain } from '@/lib/onboarding/site-favicon'
 import { readWelcomeState } from '@/lib/onboarding/welcome.server'
 import { routes } from '@/lib/routes'
@@ -36,10 +38,11 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
     const state = await readWelcomeState(ctx)
     if (!state.needed) redirect(next)
 
-    const [{ data: pending }, phonePending, waitlisted] = await Promise.all([
+    const [{ data: pending }, phonePending, waitlisted, arrivalTeam] = await Promise.all([
         selectMany(ctx.supabase, 'workspace_invitations', ['email'] as const, { workspace_id: ctx.workspace.id, status: 'pending' }),
         isPhoneStepPending(ctx.supabase, ctx.userId),
         resolveEngineWaitlist(ctx.workspace.id),
+        loadArrivalTeam(next),
     ])
     const { answers } = state
     const siteIndustry = answers.onboarding?.siteIndustry
@@ -47,6 +50,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
 
     return (
         <SessionProvider>
+            <BoardFocus team={arrivalTeam} />
             <WelcomeFlow
                 initialStep={state.step}
                 afterQuestions={BILLING_ENABLED && !isSubscriptionEntitled(ctx.workspace.subscription_status) ? 'trial' : 'engine'}

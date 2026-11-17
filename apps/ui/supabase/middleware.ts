@@ -2,33 +2,43 @@ import type { Database } from '@/app/api/database.types'
 import { provisionUser } from '@/app/api/_services/user-provisioning.service'
 import { PENDING_INVITE_COOKIE } from '@/lib/auth/pending-invite'
 import { drawPriceArm } from '@rerun/cloud/billing'
+import { internalPath } from '@/lib/auth/internal-path'
 import { routes } from '@/lib/routes'
 import { EXPERIMENT_COOKIE } from '@rerun/analytics/experiments'
-import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseDesktopShellUserAgent, parseSessionHintCookie } from '@rerun/contracts'
+import { CONSENT_COOKIE, DESKTOP_AUTH_PATH, SESSION_HINT_COOKIE, SESSION_HINT_MAX_AGE, SESSION_HINT_VALUE, parseSessionHintCookie } from '@rerun/contracts'
 import { createServerClient } from '@supabase/ssr'
 import type { User } from '@supabase/supabase-js'
 import { LOCALE_COOKIE, resolveLocale } from '@rerun/i18n'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// A visitor with no session gets an anonymous Supabase user so they can explore the app without
-// signing up. We only mint one for real top-level navigations (a document GET outside /auth), never
-// for prefetches, RSC fetches, assets or API calls, to avoid spawning throwaway users on every hit.
-// The desktop app never gets one: it opens on the sign-in page, and an anonymous workspace minted
-// for its window would be one nobody can reach again from the browser.
-function shouldStartAnonymousSession(request: NextRequest): boolean {
-    if (request.method !== 'GET') return false
-    if (request.headers.get('sec-fetch-dest') !== 'document') return false
-    if (request.nextUrl.pathname.startsWith(routes.auth)) return false
-    if (parseDesktopShellUserAgent(request.headers.get('user-agent'))) return false
-    return true
+// Every page of the app needs an account. These are the ones a visitor without a session may open:
+// the sign-in itself, and the doors that bring someone to it with something to join (a workspace
+// invitation, a creator invite, an AppSumo code) or to leave (an unsubscribe link). Everything outside
+// the matcher of proxy.ts (published pages, the OG renders, the public and mobile APIs) never gets here.
+const PUBLIC_PATHS = [routes.auth, '/invite', '/redeem', '/creator/join', '/unsubscribe']
+
+export function isPublicPath(pathname: string): boolean {
+    return PUBLIC_PATHS.some(path => pathname === path || pathname.startsWith(`${path}/`))
+}
+
+// Sends a visitor to the sign-in with where they were going, query included: `/?template=x` comes
+// back as `/?template=x` once they have an account and have gone through the onboarding.
+function redirectToSignIn(request: NextRequest, sessionResponse: NextResponse): NextResponse {
+    const back = `${request.nextUrl.pathname}${request.nextUrl.search}`
+    const url = request.nextUrl.clone()
+    url.pathname = routes.auth
+    url.search = ''
+    if (back !== routes.home) url.searchParams.set('next', back)
+    const response = NextResponse.redirect(url)
+    sessionResponse.cookies.getAll().forEach(cookie => response.cookies.set(cookie))
+    return response
 }
 
 // A redirect response is built from scratch, so it does not inherit the refreshed session cookies
 // `setAll` wrote on `supabaseResponse`. Leaving them behind hands the browser back a refresh token
 // the server has already rotated away, and the next request logs the user out.
-function redirectKeepingSession(request: NextRequest, pathname: string, sessionResponse: NextResponse): NextResponse {
-    const url = request.nextUrl.clone()
-    url.pathname = pathname
+function redirectKeepingSession(request: NextRequest, target: string, sessionResponse: NextResponse): NextResponse {
+    const url = new URL(target, request.nextUrl)
     const response = NextResponse.redirect(url)
     sessionResponse.cookies.getAll().forEach((cookie) => response.cookies.set(cookie))
     return response
@@ -64,7 +74,7 @@ function applySessionHint(request: NextRequest, response: NextResponse, signedIn
 }
 
 // Who the request comes from, as far as the middleware needs to know.
-type Identity = { id: string; isAnonymous: boolean }
+type Identity = { id: string }
 
 // A page load is where a revoked session gets caught, so it asks the auth server. Everything else a
 // page sends (a server action, an RSC fetch, an API call) verifies the JWT locally against the
@@ -92,11 +102,7 @@ const PROVISIONED_MAX_AGE = 30 * 24 * 60 * 60
 // spares the read: a forged or stale one skips provisioning for its own holder and nobody else.
 export function provisioningNeeded(cookie: string | undefined, identity: Identity): boolean {
     const [id, stamped] = (cookie ?? '').split('.')
-    if (id !== identity.id) return true
-    // An anonymous visitor has nothing left to stamp; the conversion to an account flips the JWT
-    // and brings the provisioning back for the one request that stamps it.
-    if (identity.isAnonymous) return false
-    return stamped !== '1'
+    return id !== identity.id || stamped !== '1'
 }
 
 function applyProvisionedCookie(request: NextRequest, response: NextResponse, identity: Identity, signedUp: boolean): void {
@@ -137,18 +143,18 @@ export async function updateSession(request: NextRequest) {
     let identity: Identity | null = null
     if (isPageLoad(request)) {
         user = (await supabase.auth.getUser()).data.user
+        // Visitors used to get an anonymous session; one still valid is closed on its next page
+        // load, and they sign in like everyone else.
+        if (user?.is_anonymous) {
+            await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+            user = null
+        }
     } else {
         const { data } = await supabase.auth.getClaims()
-        if (data?.claims.sub) identity = { id: data.claims.sub, isAnonymous: data.claims.is_anonymous === true }
+        if (data?.claims.sub && data.claims.is_anonymous !== true) identity = { id: data.claims.sub }
     }
 
-    if (!user && !identity && shouldStartAnonymousSession(request)) {
-        const { data, error } = await supabase.auth.signInAnonymously()
-        if (error) console.error('Anonymous sign-in failed', error.message)
-        user = data.user
-    }
-
-    identity ??= user ? { id: user.id, isAnonymous: !!user.is_anonymous } : null
+    identity ??= user ? { id: user.id } : null
 
     let provisioned: { signedUp: boolean } | null = null
     if (identity && provisioningNeeded(request.cookies.get(PROVISIONED_COOKIE)?.value, identity)) {
@@ -169,22 +175,20 @@ export async function updateSession(request: NextRequest) {
     // After every auth call, never before: `setAll` rebuilds `supabaseResponse` from scratch on a
     // token refresh, and a cookie written earlier would go down with the old object. Both early
     // returns below carry them over through `redirectKeepingSession`.
-    applySessionHint(request, supabaseResponse, !!identity && !identity.isAnonymous)
+    applySessionHint(request, supabaseResponse, !!identity)
     if (identity && provisioned) applyProvisionedCookie(request, supabaseResponse, identity, provisioned.signedUp)
 
+    const { pathname } = request.nextUrl
     if (identity) {
-        // Only real (converted) users are bounced away from /auth. Anonymous users must keep access
-        // to /auth so they can sign in or upgrade their account.
-        // The callback is let through: connecting Google from the account settings comes back to it
-        // signed in, and the code it carries is only exchanged there.
-        // So is the desktop app's hand-off, which a signed-in browser opens to sign the app in.
-        if (!identity.isAnonymous && request.nextUrl.pathname.startsWith(routes.auth) && request.nextUrl.pathname !== routes.authCallback && request.nextUrl.pathname !== DESKTOP_AUTH_PATH) {
-            return redirectKeepingSession(request, routes.home, supabaseResponse)
+        // A signed-in visit to the sign-in goes where it was headed. The callback is let through:
+        // connecting Google from the account settings comes back to it signed in, and the code it
+        // carries is only exchanged there. So is the desktop app's hand-off, which a signed-in
+        // browser opens to sign the app in.
+        if (pathname.startsWith(routes.auth) && pathname !== routes.authCallback && pathname !== DESKTOP_AUTH_PATH) {
+            return redirectKeepingSession(request, internalPath(request.nextUrl.searchParams.get('next'), routes.home), supabaseResponse)
         }
-    } else if (request.nextUrl.pathname === routes.home) {
-        // Fallback when no anonymous session could be minted (anonymous sign-ins disabled or failed):
-        // keep the previous behaviour and send visitors to the auth page.
-        return redirectKeepingSession(request, routes.auth, supabaseResponse)
+    } else if (isPageLoad(request) && request.method === 'GET' && !isPublicPath(pathname)) {
+        return redirectToSignIn(request, supabaseResponse)
     }
 
     // IMPORTANT: You *must* return the supabaseResponse object as it is.

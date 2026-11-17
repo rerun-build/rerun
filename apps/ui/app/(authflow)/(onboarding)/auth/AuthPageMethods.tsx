@@ -8,6 +8,7 @@ import { PhoneSignIn } from '@rerun/cloud/phone.client'
 import { useSignupFunnel } from '@/components/auth/useSignupFunnel'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { signupStep } from '@/lib/auth/signup-abandon'
+import { writeAuthReturnCookie } from '@/lib/auth/auth-return'
 import { internalPath } from '@/lib/auth/internal-path'
 import { routes } from '@/lib/routes'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -25,6 +26,12 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlo
     const passwordOnly = searchParams.get('method') === 'password'
     const funnel = useSignupFunnel({ surface: 'auth_page', active: !passwordOnly, initialStep: initialMethod })
     const waitingForBrowser = useDesktopSignInWaiting()
+
+    // Google and Apple come back through /auth/callback, which only knows where to go from this cookie.
+    const leaveForProvider = () => {
+        funnel.markConverted()
+        writeAuthReturnCookie(next)
+    }
 
     const enter = () => {
         funnel.markConverted()
@@ -44,8 +51,8 @@ export function AuthPageMethods({ phoneLeadsAlone, showGoogle }: { phoneLeadsAlo
                 oauth={
                     ENABLED_OAUTH_PROVIDERS.length > 0 && (
                         <>
-                            {showGoogle && ENABLED_OAUTH_PROVIDERS.includes('google') && <OAuthSignInButton provider="google" verb="Sign in with" onLeave={funnel.markConverted} />}
-                            {ENABLED_OAUTH_PROVIDERS.includes('apple') && <OAuthSignInButton provider="apple" verb="Sign in with" onLeave={funnel.markConverted} />}
+                            {showGoogle && ENABLED_OAUTH_PROVIDERS.includes('google') && <OAuthSignInButton provider="google" verb="Sign in with" onLeave={leaveForProvider} />}
+                            {ENABLED_OAUTH_PROVIDERS.includes('apple') && <OAuthSignInButton provider="apple" verb="Sign in with" onLeave={leaveForProvider} />}
                         </>
                     )
                 }

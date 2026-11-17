@@ -124,7 +124,8 @@ refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
 enable_signup = true
 # Allow/disallow anonymous sign-ins to your project.
-enable_anonymous_sign_ins = true
+# Off: every page of the app needs an account (apps/ui/supabase/middleware.ts).
+enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 # Must stay on: the account settings connect Google to a signed-in account through linkIdentity.
 enable_manual_linking = true
@@ -140,8 +141,6 @@ password_requirements = ""
 email_sent = 100
 # Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
 sms_sent = 30
-# Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
-anonymous_users = 30
 # Number of sessions that can be refreshed in a 5 minute interval per IP address.
 token_refresh = 150
 # Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
@@ -164,8 +163,8 @@ enable_signup = true
 # mailbox, so a code sent there could never be typed back and the account could never add an email.
 double_confirm_changes = false
 # If enabled, users need to confirm their email address before signing in.
-# Must stay on: when off, updateUser({ email }) confirms an anonymous user's new email on the spot,
-# so AuthDialog's sign-up never sends a code.
+# Must stay on: when off, updateUser({ email }) confirms a new email on the spot, without the code
+# the account settings send to the address being added.
 enable_confirmations = true
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false

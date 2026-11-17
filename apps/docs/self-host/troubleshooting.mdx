@@ -40,9 +40,9 @@ docker compose logs app | grep email-sign-up
 
 If the code arrives but is refused, it may have expired (15 minutes with the Rerun settings), or **Email OTP Length** is not 6.
 
-## The sign-in dialog fails, or "Anonymous sign-in failed" in the logs
+## Every page sends me back to the sign-in
 
-A visitor starts as an anonymous user, and signing up turns that user into an account. On a project on supabase.com, turn on **Allow anonymous sign-ins** in **Authentication > Sign In / Providers**, and keep **Confirm email** on.
+Every page of Rerun asks for an account, so a visitor without a session is sent to `/auth` first. If you are sent back there right after signing in, the session cookie did not stick: check that the **Site URL** in **Authentication > URL Configuration** is the address you open, the same as `NEXT_PUBLIC_APP_URL`, and that you open it over HTTPS outside localhost. Keep **Confirm email** on in **Authentication > Sign In / Providers**.
 
 ## "permission denied" from Postgres
 

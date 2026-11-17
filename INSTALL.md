@@ -83,7 +83,8 @@ one computer, never for a server reachable from the internet.
    npx supabase db push --include-seed
    ```
 
-4. In **Authentication > Sign In / Providers**, turn on **Allow anonymous sign-ins**.
+4. In **Authentication > Sign In / Providers**, leave **Allow anonymous sign-ins** off and keep
+   **Confirm email** on. Every page of Rerun asks for an account.
 5. In **Authentication > Emails > SMTP Settings**, turn on **Custom SMTP** with their SMTP server.
    Do not skip it: on the Free plan, a project that keeps Supabase's own mailer cannot edit its
    templates, so the email arrives without the code, and that mailer sends 2 emails an hour, only

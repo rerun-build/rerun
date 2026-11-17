@@ -1,7 +1,7 @@
 import type { TemplateAgent, TemplateConnector } from '@rerun/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { BOARD_TEMPLATE_SLUGS, shownTeam, starterTeams, templateTeam, type BoardTemplate } from './board-teams'
+import { arrivalOf, BOARD_TEMPLATE_SLUGS, shownTeam, starterTeams, templateTeam, type BoardTemplate } from './board-teams'
 import { STARTER_PACKS } from './starter-packs'
 
 const connector = (slug: string): TemplateConnector => ({ slug, name: slug, icon: null })
@@ -67,5 +67,20 @@ describe('shownTeam', () => {
         const thin = starterTeams([template('sales-development-rep', [agent('rep', [])])])
         expect(shownTeam(thin, 'legal', null)?.id).toBe('showcase')
         expect(shownTeam(starterTeams([]), 'legal', null)).toBeNull()
+    })
+})
+
+describe('arrivalOf', () => {
+    it('reads the template or the shared coworker a link carried through the sign-in', () => {
+        expect(arrivalOf('/?template=crm-closer')).toEqual({ kind: 'template', slug: 'crm-closer' })
+        expect(arrivalOf('/?template=crm-closer&purchase=1')).toEqual({ kind: 'template', slug: 'crm-closer' })
+        expect(arrivalOf('/?share=abc123')).toEqual({ kind: 'share', token: 'abc123' })
+    })
+
+    it('reads nothing off a plain arrival, a prompt, or what is not a path of the app', () => {
+        expect(arrivalOf('/')).toBeNull()
+        expect(arrivalOf(null)).toBeNull()
+        expect(arrivalOf('/?prompt=find%20leads')).toBeNull()
+        expect(arrivalOf('https://evil.example/?template=x')).toBeNull()
     })
 })

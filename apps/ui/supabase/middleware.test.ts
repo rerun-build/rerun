@@ -10,7 +10,7 @@ const SET_OPTIONS = { path: '/', sameSite: 'lax' as const, httpOnly: false, maxA
 const mocks = vi.hoisted(() => ({
     setAll: null as ((cookies: CookieToSet[]) => void) | null,
     getUser: vi.fn(),
-    signInAnonymously: vi.fn(),
+    signOut: vi.fn(),
     selectMaybeSingle: vi.fn(),
 }))
 
@@ -23,7 +23,7 @@ const getClaims = vi.fn(async () => {
 vi.mock('@supabase/ssr', () => ({
     createServerClient: (_url: string, _key: string, options: { cookies: { setAll: (cookies: CookieToSet[]) => void } }) => {
         mocks.setAll = options.cookies.setAll
-        return { auth: { getUser: mocks.getUser, getClaims, signInAnonymously: mocks.signInAnonymously } }
+        return { auth: { getUser: mocks.getUser, getClaims, signOut: mocks.signOut } }
     },
 }))
 
@@ -31,7 +31,7 @@ vi.mock('./serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => 
 
 vi.mock('./supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle }))
 
-const { arrivesByInvite, provisioningNeeded, updateSession } = await import('./middleware')
+const { arrivesByInvite, isPublicPath, provisioningNeeded, updateSession } = await import('./middleware')
 
 const DOCUMENT = { 'sec-fetch-dest': 'document' }
 
@@ -45,7 +45,7 @@ function signedInUserRefreshing(cookies: CookieToSet[]) {
 describe('updateSession', () => {
     beforeEach(() => {
         mocks.getUser.mockReset()
-        mocks.signInAnonymously.mockReset()
+        mocks.signOut.mockReset().mockResolvedValue({ error: null })
         getClaims.mockClear()
         mocks.selectMaybeSingle.mockReset().mockResolvedValue({ data: { id: 'user-1', workspace_id: 'workspace-1', signed_up_at: '2026-01-01T00:00:00Z' }, error: null })
     })
@@ -138,7 +138,7 @@ describe('updateSession', () => {
             expect(response.cookies.get(SESSION_HINT_COOKIE)?.maxAge).toBe(SESSION_HINT_MAX_AGE)
         })
 
-        it('says nothing about an anonymous visitor, who never signed up', async () => {
+        it('says nothing about a leftover anonymous session, which never signed up', async () => {
             mocks.getUser.mockResolvedValue({ data: { user: { id: 'user-1', is_anonymous: true } } })
 
             const response = await updateSession(new NextRequest('https://app.rerun.build/board', { headers: DOCUMENT }))
@@ -204,89 +204,105 @@ describe('updateSession', () => {
         })
     })
 
-    describe('anonymous session', () => {
-        beforeEach(() => {
-            mocks.getUser.mockResolvedValue({ data: { user: null } })
-            mocks.signInAnonymously.mockResolvedValue({ data: { user: { id: 'anon-1', is_anonymous: true } }, error: null })
+    describe('leftover anonymous session', () => {
+        beforeEach(() => mocks.getUser.mockResolvedValue({ data: { user: { id: 'anon-1', is_anonymous: true } } }))
+
+        it('is closed on its next page load, which goes to the sign-in like any visitor', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/', { headers: DOCUMENT }))
+
+            expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' })
+            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
+            expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
         })
 
-        it('starts one for a top-level navigation to a page', async () => {
-            const response = await updateSession(new NextRequest('https://app.rerun.build/board', { headers: DOCUMENT }))
+        it('is let onto the sign-in, signed out', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/auth', { headers: DOCUMENT }))
 
-            expect(mocks.signInAnonymously).toHaveBeenCalledTimes(1)
+            expect(mocks.signOut).toHaveBeenCalledOnce()
             expect(response.headers.get('location')).toBeNull()
         })
 
-        it('starts none for a prefetch, an RSC fetch or an asset', async () => {
-            await updateSession(new NextRequest('https://app.rerun.build/board'))
-            await updateSession(new NextRequest('https://app.rerun.build/board', { headers: { 'sec-fetch-dest': 'empty' } }))
+        it('is never provisioned from a JWT read locally', async () => {
+            await updateSession(new NextRequest('https://app.rerun.build/', { method: 'POST', headers: { 'next-action': 'abc123' } }))
 
-            expect(mocks.signInAnonymously).not.toHaveBeenCalled()
-        })
-
-        it('starts none for anything but a GET', async () => {
-            await updateSession(new NextRequest('https://app.rerun.build/board', { method: 'POST', headers: DOCUMENT }))
-
-            expect(mocks.signInAnonymously).not.toHaveBeenCalled()
-        })
-
-        it('starts none on the auth pages, where the visitor is about to sign in', async () => {
-            await updateSession(new NextRequest('https://app.rerun.build/auth', { headers: DOCUMENT }))
-            await updateSession(new NextRequest('https://app.rerun.build/auth/callback', { headers: DOCUMENT }))
-
-            expect(mocks.signInAnonymously).not.toHaveBeenCalled()
-        })
-
-        it('lets an anonymous visitor stay on /auth to sign in', async () => {
-            mocks.getUser.mockResolvedValue({ data: { user: { id: 'anon-1', is_anonymous: true } } })
-
-            const response = await updateSession(new NextRequest('https://app.rerun.build/auth'))
-
-            expect(response.headers.get('location')).toBeNull()
+            expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+            expect(mocks.signOut).not.toHaveBeenCalled()
         })
     })
 
     describe('visitor without a session', () => {
         beforeEach(() => mocks.getUser.mockResolvedValue({ data: { user: null } }))
 
-        it('is sent to /auth from the home page when no anonymous session could be started', async () => {
-            mocks.signInAnonymously.mockResolvedValue({ data: { user: null }, error: { message: 'Anonymous sign-ins are disabled' } })
-            vi.spyOn(console, 'error').mockImplementation(() => {})
-
-            const response = await updateSession(new NextRequest('https://app.rerun.build/', { headers: { 'sec-fetch-dest': 'document' } }))
+        it('is sent to the sign-in from the home page', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/', { headers: DOCUMENT }))
 
             expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
         })
 
-        it('is sent to /auth from the home page on a request that may not start a session', async () => {
-            const response = await updateSession(new NextRequest('https://app.rerun.build/'))
+        it('is sent to the sign-in from any page of the app, with where it was going', async () => {
+            const settings = await updateSession(new NextRequest('https://app.rerun.build/settings', { headers: DOCUMENT }))
+            const welcome = await updateSession(new NextRequest('https://app.rerun.build/welcome', { headers: DOCUMENT }))
 
-            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
+            expect(settings.headers.get('location')).toBe('https://app.rerun.build/auth?next=%2Fsettings')
+            expect(welcome.headers.get('location')).toBe('https://app.rerun.build/auth?next=%2Fwelcome')
         })
 
-        it('is let through on any other page', async () => {
-            const response = await updateSession(new NextRequest('https://app.rerun.build/templates/crm'))
+        it('keeps what a link carried, a template, a share or a prompt, through the sign-in', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/?template=crm&purchase=1', { headers: DOCUMENT }))
 
-            expect(response.headers.get('location')).toBeNull()
+            const location = new URL(response.headers.get('location') ?? '')
+            expect(location.pathname).toBe('/auth')
+            expect(location.searchParams.get('next')).toBe('/?template=crm&purchase=1')
         })
+
+        it('opens the pages that bring someone to the sign-in, or let them leave', async () => {
+            for (const path of ['/auth', '/auth/confirm?token_hash=x', '/invite/abc', '/creator/join', '/creator/join/abc', '/redeem', '/unsubscribe?token=x']) {
+                const response = await updateSession(new NextRequest(`https://app.rerun.build${path}`, { headers: DOCUMENT }))
+                expect(response.headers.get('location'), path).toBeNull()
+            }
+        })
+
+        it('is never redirected off a server action, an RSC fetch or an API call, which answer for themselves', async () => {
+            const action = await updateSession(new NextRequest('https://app.rerun.build/', { method: 'POST', headers: { 'next-action': 'abc123' } }))
+            const rsc = await updateSession(new NextRequest('https://app.rerun.build/settings', { headers: { 'sec-fetch-dest': 'empty' } }))
+
+            expect(action.headers.get('location')).toBeNull()
+            expect(rsc.headers.get('location')).toBeNull()
+        })
+    })
+
+    it('sends a signed-in visit to the sign-in where it was headed, never to another site', async () => {
+        mocks.getUser.mockImplementation(signedInUserRefreshing([]))
+
+        const back = await updateSession(new NextRequest('https://app.rerun.build/auth?next=%2F%3Ftemplate%3Dcrm', { headers: DOCUMENT }))
+        const away = await updateSession(new NextRequest('https://app.rerun.build/auth?next=%2F%2Fevil.example', { headers: DOCUMENT }))
+
+        expect(back.headers.get('location')).toBe('https://app.rerun.build/?template=crm')
+        expect(away.headers.get('location')).toBe('https://app.rerun.build/')
+    })
+})
+
+describe('isPublicPath', () => {
+    it('opens the sign-in and the doors to it, and nothing that merely starts like them', () => {
+        expect(isPublicPath('/auth')).toBe(true)
+        expect(isPublicPath('/auth/callback')).toBe(true)
+        expect(isPublicPath('/invite/abc')).toBe(true)
+        expect(isPublicPath('/')).toBe(false)
+        expect(isPublicPath('/welcome')).toBe(false)
+        expect(isPublicPath('/authors')).toBe(false)
+        expect(isPublicPath('/redeemed')).toBe(false)
     })
 })
 
 describe('provisioningNeeded', () => {
-    const account = { id: 'user-1', isAnonymous: false }
-    const visitor = { id: 'user-1', isAnonymous: true }
+    const account = { id: 'user-1' }
 
     it('provisions whoever the cookie does not name', () => {
         expect(provisioningNeeded(undefined, account)).toBe(true)
         expect(provisioningNeeded('user-2.1', account)).toBe(true)
-        expect(provisioningNeeded('user-2.0', visitor)).toBe(true)
     })
 
-    it('leaves an anonymous visitor alone once provisioned', () => {
-        expect(provisioningNeeded('user-1.0', visitor)).toBe(false)
-    })
-
-    it('runs again for an account whose signup is not stamped yet, the anonymous visitor who just signed up', () => {
+    it('runs again for an account whose signup is not stamped yet', () => {
         expect(provisioningNeeded('user-1.0', account)).toBe(true)
         expect(provisioningNeeded('user-1.1', account)).toBe(false)
     })
