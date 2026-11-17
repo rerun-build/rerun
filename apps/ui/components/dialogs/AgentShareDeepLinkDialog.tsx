@@ -16,11 +16,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAgentShareCta } from '@/lib/agents/useAgentShareCta'
 import { useAgentShareStore } from '@/stores/agent-share.store'
-import { useSession } from '@/supabase/session/SessionProvider'
 
 // The landing page of a share link, in the app. Same shape as TemplateDeepLinkDialog: one card,
-// one decision. It is deliberately also what an anonymous visitor sees, ahead of the account wall,
-// because a share link has no public page of its own to preview from.
+// one decision.
 export function AgentShareDeepLinkDialog({ token }: { token: string }) {
     const t = useTranslations('dialogs.agentShare')
     const preview = useAgentShareStore(s => s.preview)
@@ -62,11 +60,9 @@ export function AgentShareDeepLinkDialog({ token }: { token: string }) {
 
 function SharedAgentPanel({ token, preview, onDone }: { token: string; preview: AgentSharePreview; onDone: () => void }) {
     const t = useTranslations('dialogs.agentShare')
-    const { isAnonymous } = useSession()
-
     useEffect(() => {
-        track('agent_share_opened', { has_account: !isAnonymous })
-    }, [isAnonymous])
+        track('agent_share_opened', {})
+    }, [])
 
     const { comesWith, notes } = sharedAgentCardProps(preview)
 
@@ -86,7 +82,7 @@ function SharedAgentPanel({ token, preview, onDone }: { token: string; preview: 
                     <TemplateDetailAgentCard agent={preview.agent} connectors={preview.connectors} comesWith={comesWith} notes={notes} />
                 </div>
             </ScrollFade>
-            {isAnonymous ? <SignUpFooter /> : <InstallFooter token={token} preview={preview} onDone={onDone} />}
+            <InstallFooter token={token} preview={preview} onDone={onDone} />
         </div>
     )
 }
@@ -100,22 +96,6 @@ function InstallFooter({ token, preview, onDone }: { token: string; preview: Age
                 {cta.label}
             </Button>
             {cta.note && <p className="text-center text-xs text-muted-foreground">{cta.note}</p>}
-        </div>
-    )
-}
-
-// An anonymous visitor sees the card first and the wall second: the link is the only place this
-// agent is described, so asking to sign up before showing it would be asking blind. Closing the
-// card hands the screen back to the account wall, which is already mounted underneath.
-function SignUpFooter() {
-    const t = useTranslations('dialogs.agentShare')
-    const closeLink = useAgentShareStore(s => s.closeLink)
-    return (
-        <div className="flex flex-col gap-3 border-t bg-muted/50 px-5 py-4 max-sm:pb-[calc(1rem+env(safe-area-inset-bottom))]">
-            <Button className="w-full" onClick={closeLink}>
-                {t('signUp')}
-            </Button>
-            <p className="text-center text-xs text-muted-foreground">{t('waiting')}</p>
         </div>
     )
 }

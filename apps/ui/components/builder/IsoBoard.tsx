@@ -70,7 +70,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     const t = useTranslations('builder.isoBoard')
     const tKit = useKitTranslations()
     const tErrors = useTranslations('errors')
-    const { workspace, isAnonymous } = useSession()
+    const { workspace } = useSession()
     const { access: workspaceAccess, needsMachineReason } = useWorkspaceAccess()
     const { cursors, onPointerWorldMove } = useTeamCursors(workspace?.id)
     const agents = useBoardStore(s => s.agents)
@@ -163,8 +163,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     // et le compte créé : avant, c'est le flux de la carte qui alimente les mêmes cartes.
     const discoveries = useDiscoveriesStore(s => s.state)
     const discoveriesDomain = useDiscoveriesStore(s => s.domain)
-    const intakeOpen = useForemanStore(s => s.intake)
-    useCompanyDiscoveries(emptyOnboardingBoard && !isAnonymous && !intakeOpen)
+    useCompanyDiscoveries(emptyOnboardingBoard)
     const showDiscoveries = emptyOnboardingBoard && !!discoveriesDomain && discoveries.entries.length > 0
     const builtRects = useMemo(() => realSpaces.map(space => ({ col_start: space.col_start, row_start: space.row_start, col_end: space.col_end, row_end: space.row_end })), [realSpaces])
     const planPreview = usePlanPreviewScene(emptyOnboardingBoard, builtRects)
@@ -177,7 +176,7 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     const agentIdeas = useAgentIdeas()
     const industry = useOnboardingIndustry()
     const tSuggestions = useTranslations('agentSuggestions')
-    const invitesAgents = hydrated && !!workspace && !isSandbox && !isAnonymous && !needsMachineReason && !guidedByForeman && !startingFirstAgent && !placement && !placingAgentId && !previewing && mode !== 'space'
+    const invitesAgents = hydrated && !!workspace && !isSandbox && !needsMachineReason && !guidedByForeman && !startingFirstAgent && !placement && !placingAgentId && !previewing && mode !== 'space'
     const boxInvites = useMemo(() => {
         const invites = new Map<string, Pick<Container, 'cta' | 'ctaExamples'>>()
         if (!invitesAgents) return invites
@@ -308,10 +307,9 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
                 markFirstAgentFromPrompt()
                 return
             }
-            if (isAnonymous) return
             void resumePendingStart()
         })()
-    }, [searchParams, workspace, showPlaceholder, isAnonymous, router, resumePendingStart, setPendingFirstAgent, markFirstAgentFromPrompt])
+    }, [searchParams, workspace, showPlaceholder, router, resumePendingStart, setPendingFirstAgent, markFirstAgentFromPrompt])
 
     // IsoGrid n'appelle onConfirmPlacement que sur un drop valide (dans un space, non occupé). Le
     // plan ne bloque plus rien ici : un agent posé sans slot libre est créé quand même, éteint, et

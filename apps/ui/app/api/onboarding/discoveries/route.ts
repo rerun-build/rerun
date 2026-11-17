@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const body = (await request.json().catch(() => null)) as { url?: unknown } | null
     const url = typeof body?.url === 'string' ? companySiteUrl(body.url) : null
     if (!url) return Response.json({ error: 'That does not look like a website address' }, { status: 400 })
-    if (!takeIntakeCall(ctx.workspace.id, 'explore')) return Response.json({ error: ctx.authUser.is_anonymous ? 'Create your account to keep going.' : 'The site was read enough times for now.' }, { status: 429 })
+    if (!takeIntakeCall(ctx.workspace.id, 'explore')) return Response.json({ error: 'The site was read enough times for now.' }, { status: 429 })
 
     const domain = new URL(url).hostname
     const translator = createDiscoveryTranslator({ domain, icons: serviceIconLookup(ctx.supabase) })
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
             send([{ type: 'pending', source: 'profile' }])
             await Promise.all([
-                // Also fills the cache saveForemanIntakeAction reads the profile from at submit.
+                // Also fills the cache the welcome page and saveForemanIntakeAction read the profile from.
                 analyzeCompanyProfile(url).then(
                     result => queue(() => translator.fromProfile(result.ok ? result.analysis.profile : null)),
                     () => queue(() => translator.fromProfile(null))

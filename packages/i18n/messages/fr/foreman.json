@@ -1,9 +1,7 @@
 {
     "welcome": {
         "title": "Prêt à confier votre première tâche ?",
-        "preparing": "Préparation de votre workspace...",
-        "gateTitle": "Votre équipe est prête à être créée",
-        "gateSubtitle": "Créez votre compte et le Chief of Staff commence à la monter tout de suite."
+        "preparing": "Préparation de votre workspace..."
     },
     "header": {
         "closeDisabled": "Terminez la configuration pour fermer le chat",
@@ -14,7 +12,6 @@
             "dockRight": "Ancrer à droite",
             "float": "Flottant"
         },
-        "signIn": "Se connecter",
         "newTask": "Nouvelle tâche",
         "conversations": "Conversations"
     },
@@ -31,19 +28,6 @@
     "resize": "Redimensionner le chat",
     "modelPill": {
         "hubReason": "Ce chat tourne toujours sur Rerun Balanced"
-    },
-    "signupGate": {
-        "teamAt": "Votre équipe chez {domain}",
-        "team": "Votre équipe",
-        "perks": {
-            "trial": "Essai gratuit de {days} jours",
-            "cancel": "Résiliable à tout moment",
-            "kept": "Vos réponses sont conservées"
-        },
-        "createAccount": "Créer mon compte"
-    },
-    "signInLink": {
-        "prompt": "Vous avez déjà un compte ? <link>Se connecter</link>"
     },
     "nextSteps": {
         "turnOn": "Activer mon coworker",
@@ -108,60 +92,6 @@
     },
     "ownEntry": "Je sais ce qu'il me faut",
     "ownEntryPlaceholder": "Je sais ce qu'il me faut…",
-    "intake": {
-        "steps": {
-            "company": {
-                "title": "Quel est le site de votre entreprise ?",
-                "description": "Nous le lisons pour savoir ce que vous vendez et à qui."
-            },
-            "industry": {
-                "title": "Dans quel secteur travaillez-vous ?",
-                "description": "Il décide des équipes que nous dessinons sur votre board."
-            },
-            "role": {
-                "title": "Et quel est votre rôle ?",
-                "description": "Il décide de qui est créé en premier pour vous."
-            },
-            "name": {
-                "title": "Dernière question : votre prénom ?",
-                "description": "Pour ne pas parler à un workspace."
-            }
-        },
-        "settingUp": "Configuration de <highlight>{title}</highlight>",
-        "website": {
-            "label": "Site de l'entreprise",
-            "platform": "{domain} n'est pas le site de votre entreprise. Saisissez le vôtre, ou passez."
-        },
-        "industry": {
-            "label": "Secteur",
-            "other": "Autre",
-            "placeholder": "Boulangerie, cabinet dentaire, salle de sport…"
-        },
-        "industries": {
-            "agencies": "Agences",
-            "ecommerce": "E-commerce",
-            "saas": "SaaS",
-            "sales": "Ventes",
-            "recruiting": "Recrutement",
-            "real-estate": "Immobilier",
-            "legal": "Juridique et conformité",
-            "creators": "Créateurs",
-            "productivity": "Productivité",
-            "other": "Autre"
-        },
-        "role": {
-            "label": "Votre rôle",
-            "placeholder": "Responsable croissance"
-        },
-        "name": {
-            "label": "Prénom",
-            "placeholder": "Jean"
-        },
-        "skip": "Passer",
-        "next": "Suivant",
-        "answerToContinue": "Répondez à cette étape pour continuer",
-        "saveFailed": "Impossible d'enregistrer. Réessayez."
-    },
     "gettingStarted": {
         "title": "Premiers pas",
         "hide": "Masquer",

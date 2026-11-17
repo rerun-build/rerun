@@ -14,8 +14,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => servic
 
 const { provisionUser } = await import('./user-provisioning.service')
 
-const account = { id: 'user-1', is_anonymous: false } as User
-const visitor = { id: 'user-1', is_anonymous: true } as User
+const account = { id: 'user-1' } as User
 
 // The request client only reads the users row; the service role answers the stamp with the row it wrote.
 const existing = (signedUpAt: string | null) => fakeSupabase(table => (table === 'users' ? { data: { id: 'user-1', workspace_id: 7, signed_up_at: signedUpAt } } : undefined))
@@ -29,7 +28,7 @@ beforeEach(() => {
 })
 
 describe('provisionUser and the phone step', () => {
-    it('requires a phone number from an anonymous visitor who just became an account', async () => {
+    it('stamps a row left without its signup, with the phone step and the allowance, once', async () => {
         expect(await provisionUser(existing(null).client, account, { phoneStep: true, priceArm: null })).toEqual({ signedUp: true })
 
         expect(payloads(service)).toEqual([{ user_id: 'user-1' }])
@@ -42,20 +41,21 @@ describe('provisionUser and the phone step', () => {
         expect(payloads(service)).toEqual([])
     })
 
-    it('never asks an account that already signed up, nor a visitor still anonymous', async () => {
+    it('never asks an account that already signed up', async () => {
         await provisionUser(existing('2026-09-01T00:00:00Z').client, account, { phoneStep: true, priceArm: null })
-        await provisionUser(existing(null).client, visitor, { phoneStep: true, priceArm: null })
 
         expect(payloads(service)).toEqual([])
     })
 
-    it('requires it from an account created already signed in', async () => {
+    it('requires it from a new account, stamped and credited as it is born', async () => {
         service = fakeSupabase(table => (table === 'workspaces' ? { data: { id: 7 } } : undefined))
         const request = fakeSupabase()
 
         expect(await provisionUser(request.client, account, { phoneStep: true, priceArm: null })).toEqual({ signedUp: true })
 
         expect(payloads(service)).toEqual([{ user_id: 'user-1' }])
+        expect(service.writes('users').map(write => write.payload)).toEqual([expect.objectContaining({ signed_up_at: expect.any(String) })])
+        expect(grantRerunTopup).toHaveBeenCalledWith(7, expect.any(Number))
     })
 
     it('writes the users row with the service role, never through the request client', async () => {

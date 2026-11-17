@@ -173,20 +173,6 @@
             }
         }
     },
-    "auth": {
-        "welcome": {
-            "title": "Boas-vindas ao Rerun",
-            "subtitle": "Crie sua conta para começar a montar sua equipe de coworkers."
-        },
-        "build": {
-            "title": "Sua equipe está pronta para ser montada",
-            "subtitle": "Crie sua conta e o Chief of Staff começa a montá-la na hora."
-        },
-        "signin": {
-            "title": "Boas-vindas",
-            "subtitle": "Entre ou crie sua conta para começar."
-        }
-    },
     "phoneVerification": {
         "title": "Uma última etapa",
         "subtitle": "Adicione seu número de telefone."
@@ -341,9 +327,7 @@
         "title": "Adicionar este coworker",
         "description": "Veja o que este coworker faz e depois coloque-o no seu quadro.",
         "sentBy": "{name} enviou para você uma cópia deste coworker. Ele vai rodar na sua própria Box.",
-        "sentBySomeone": "Alguém enviou para você uma cópia deste coworker. Ele vai rodar na sua própria Box.",
-        "signUp": "Cadastre-se para adicionar este coworker",
-        "waiting": "Ele vai estar esperando por você logo em seguida."
+        "sentBySomeone": "Alguém enviou para você uma cópia deste coworker. Ele vai rodar na sua própria Box."
     },
     "templateDeepLink": {
         "unavailable": "Este link de template não está mais disponível",

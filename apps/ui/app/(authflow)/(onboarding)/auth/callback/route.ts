@@ -27,7 +27,7 @@ function publicUrl(request: Request, destination: string): string {
 // what keeps it from being counted as a second signup.
 //
 // The presence of the stamp alone cannot tell: the middleware runs on this very request, ahead of
-// the handler, and stamps the account a visitor just upgraded from anonymous. A stamp that is only
+// the handler, and stamps the account this sign-in just created. A stamp that is only
 // seconds old is this sign-in's own, one older than any request could be belongs to an account that
 // existed before.
 const SIGNUP_STAMP_WINDOW_MS = 2 * 60 * 1000
@@ -113,18 +113,6 @@ export async function GET(request: Request) {
     const errorCode = searchParams.get('error_code')
 
     if (linking) return backToAccount(request, { code: errorCode ?? 'failed', provider: providerIn(cookieStore.get(LINK_INTENT_COOKIE)?.value) })
-
-    // An anonymous visitor who picked a provider is first linked to it, and Supabase only refuses
-    // here, on the way back, when that identity already has a Rerun account: sign into that one.
-    // Google already asked for consent on the way out, so the second trip skips it.
-    if (errorCode === 'identity_already_exists') {
-        const provider = providerIn(cookieStore.get(OAUTH_PROVIDER_COOKIE)?.value)
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider,
-            options: { redirectTo: publicUrl(request, routes.authCallback), ...(provider === 'google' && { queryParams: { access_type: 'offline' } }) },
-        })
-        if (!error && data.url) return withSessionCookies(NextResponse.redirect(data.url))
-    }
 
     return NextResponse.redirect(publicUrl(request, routes.authCodeError))
 }

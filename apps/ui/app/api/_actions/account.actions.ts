@@ -27,8 +27,8 @@ const AVATAR_MAX_SIZE = 512
 const AVATAR_MAX_BYTES = 8 * 1024 * 1024
 
 async function requireAccount(): Promise<User> {
-    const { session, isAnonymous } = await getServerSession()
-    if (!session || isAnonymous) throw new AuthorizationError('signInToEditAccount')
+    const { session } = await getServerSession()
+    if (!session || session.is_anonymous) throw new AuthorizationError('signInToEditAccount')
     return session
 }
 

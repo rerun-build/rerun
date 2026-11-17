@@ -7,9 +7,10 @@ export const SIGNUP_INTENT_COOKIE = 'rr_signup_intent'
 export function sharedCookieDomain(hostname: string): string | undefined {
     return hostname.endsWith('rerun.build') ? '.rerun.build' : undefined
 }
-// Where the account form was shown. The wall is the one every anonymous visitor meets on arrival, so
-// it dwarfs the other two: the funnel is only readable when they are counted apart.
-export type SignupSurface = 'welcome_wall' | 'foreman_intake' | 'signin_dialog' | 'auth_page' | 'ready_made_arrival'
+// Where the account form was shown. Every account is born on the sign-in page since 17/11/2026: the
+// other surfaces (`welcome_wall`, `foreman_intake`, `signin_dialog`, `ready_made_arrival`) only remain
+// in the events sent before.
+export type SignupSurface = 'auth_page'
 // Before 2026-10-13 the phone form reported no step at all, so its abandons read 'email', and the
 // email code step read 'code'.
 export type SignupStep = 'phone' | 'phone_code' | 'email' | 'email_code'
@@ -145,10 +146,6 @@ export interface AnalyticsEventMap {
     retention_offer_declined: { phase: CancelFlowPhase; reason: string; offer: string }
     invoice_paid: SubscriptionLifecycleProps & { invoice_id: string; amount_paid: number; billing_reason?: string }
 
-    // The account gate that replaces the foreman's composer once an anonymous visitor has answered
-    // the welcome card. Shown is not clicked: the gap with `signup_started` is the whole drop between
-    // a filled card and an account.
-    signup_gate_viewed: { surface: SignupSurface }
     signup_started: { surface?: SignupSurface; in_app_browser?: string }
     signup_method_selected: { method: SignupMethod; in_app_browser?: string }
     // A provider sign-in that came back failed. Supabase sends these returns to `/`, not to
@@ -203,7 +200,7 @@ export interface AnalyticsEventMap {
     // Sending an agent to someone by link. `carries_*` is what will say, in a month, whether the
     // safe defaults held or whether everybody turns everything on.
     agent_share_created: { carries_memories: boolean; carries_database: boolean; carries_files: boolean }
-    agent_share_opened: { has_account: boolean }
+    agent_share_opened: Record<string, never>
     agent_share_installed: { inactive: boolean }
 
     // Copying an agent inside its own Box. The two counts say what the copy carries that now runs

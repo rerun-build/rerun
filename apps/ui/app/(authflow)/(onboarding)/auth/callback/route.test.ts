@@ -100,37 +100,10 @@ describe('GET /auth/callback', () => {
         expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/auth-code-error')
     })
 
-    it('signs a visitor into the account their Google identity already belongs to', async () => {
+    it('sends an identity Google says is taken to the expired link page, with no second trip', async () => {
         const response = await callback('?error=server_error&error_code=identity_already_exists')
 
-        expect(signInWithOAuth).toHaveBeenCalledWith({
-            provider: 'google',
-            options: { redirectTo: 'https://app.rerun.build/auth/callback', queryParams: { access_type: 'offline' } },
-        })
-        expect(response.headers.get('location')).toBe('https://project.supabase.co/auth/v1/authorize?provider=google')
-    })
-
-    it('signs a visitor into the account their Apple identity already belongs to', async () => {
-        requestCookies.set('rr_oauth_provider', 'apple')
-
-        await callback('?error=server_error&error_code=identity_already_exists')
-
-        expect(signInWithOAuth).toHaveBeenCalledWith({ provider: 'apple', options: { redirectTo: 'https://app.rerun.build/auth/callback' } })
-    })
-
-    it('restarts Google when the provider cookie holds something unknown', async () => {
-        requestCookies.set('rr_oauth_provider', 'facebook')
-
-        await callback('?error=server_error&error_code=identity_already_exists')
-
-        expect(signInWithOAuth).toHaveBeenCalledWith(expect.objectContaining({ provider: 'google' }))
-    })
-
-    it('sends a sign-in that could not be restarted to the expired link page', async () => {
-        signInWithOAuth.mockResolvedValue({ data: { url: null }, error: { message: 'nope' } })
-
-        const response = await callback('?error=server_error&error_code=identity_already_exists')
-
+        expect(signInWithOAuth).not.toHaveBeenCalled()
         expect(response.headers.get('location')).toBe('https://app.rerun.build/auth/auth-code-error')
     })
 
@@ -190,7 +163,7 @@ describe('GET /auth/callback', () => {
         expect(response.cookies.get('rr_signup_intent')?.value).toBe('')
     })
 
-    it('keeps the signup intent of a visitor whose Google identity was just linked, stamped by the middleware ahead of the handler', async () => {
+    it('keeps the signup intent of a Google account the middleware stamped on this very request, ahead of the handler', async () => {
         selectMaybeSingle.mockResolvedValue({ data: { signed_up_at: '2026-10-16T10:29:59.700Z' }, error: null })
 
         const response = await callback('?code=abc')

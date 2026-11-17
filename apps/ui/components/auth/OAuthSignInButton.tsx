@@ -16,13 +16,11 @@ import { desktopBrowserSignInAvailable, startDesktopBrowserSignIn } from '@/comp
 export function OAuthSignInButton({
     provider,
     verb,
-    linkAnonymous = false,
     onLeave,
     lastUsed,
 }: {
     provider: OAuthProvider
     verb: 'Sign in with' | 'Continue with'
-    linkAnonymous?: boolean
     onLeave?: () => void
     // Forced by the lab; read from this browser everywhere else.
     lastUsed?: LastSignInMethod | null
@@ -39,7 +37,7 @@ export function OAuthSignInButton({
         // The desktop app's window is a web view Google refuses: the sign-in happens in the browser.
         if (desktopBrowserSignInAvailable()) return startDesktopBrowserSignIn(provider)
         onLeave?.()
-        await startOAuthSignIn(provider, { linkAnonymous })
+        await startOAuthSignIn(provider)
     }
 
     return (

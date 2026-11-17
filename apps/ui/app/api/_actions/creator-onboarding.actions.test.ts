@@ -36,7 +36,7 @@ function expert(overrides: Row = {}): Row {
 
 beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'jane@studio.test' }, isAnonymous: false })
+    mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'jane@studio.test' } })
     mocks.enterSandbox.mockResolvedValue({ ok: true, workspaceId: 50 })
 })
 
@@ -101,7 +101,7 @@ describe('claimCreatorSandboxAction', () => {
     })
 
     it('refuses a forwarded link opened by an account with another email', async () => {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'someone@else.test' }, isAnonymous: false })
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'someone@else.test' } })
         const db = database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
         await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'This invitation is for another email. Sign in with the invited address.', code: 'invitationOtherEmail' })
@@ -118,7 +118,7 @@ describe('claimCreatorSandboxAction', () => {
     })
 
     it('matches the invited email whatever its case', async () => {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'Jane@Studio.TEST' }, isAnonymous: false })
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'Jane@Studio.TEST' } })
         const db = database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
         await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: true, workspaceId: 50 })
@@ -126,7 +126,7 @@ describe('claimCreatorSandboxAction', () => {
     })
 
     it('refuses an anonymous session without reading the invitation', async () => {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'jane@studio.test', is_anonymous: true }, isAnonymous: true })
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: 'jane@studio.test', is_anonymous: true } })
         const db = database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
         await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'Sign in with the invited email to claim your creator profile.', code: 'signInToClaimCreator' })
@@ -135,7 +135,7 @@ describe('claimCreatorSandboxAction', () => {
     })
 
     it('refuses a session without an email', async () => {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: undefined }, isAnonymous: false })
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME }, session: { email: undefined } })
         database({ experts: [expert()], users: [{ id: ME, expert_profile_id: null }] })
 
         await expect(claimCreatorSandboxAction('tok')).resolves.toEqual({ ok: false, error: 'Sign in with the invited email to claim your creator profile.', code: 'signInToClaimCreator' })

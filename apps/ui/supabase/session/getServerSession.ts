@@ -41,5 +41,5 @@ export const getServerSession = cache(async () => {
         getRequestAccessToken().then(token => supabase.auth.getUser(token ?? undefined)),
     ])
 
-    return { user, workspace, workspaceRefused, session: authUser?.user, isAnonymous: authUser?.user?.is_anonymous ?? false }
+    return { user, workspace, workspaceRefused, session: authUser?.user }
 })

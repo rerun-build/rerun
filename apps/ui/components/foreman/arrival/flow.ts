@@ -1,8 +1,8 @@
 import type { UIMessage } from 'ai'
 
 // Someone who arrived on a template or on a shared coworker goes through the column instead of the
-// welcome card: an account, a phone number, the trial, the template's own price when it has one, then
-// the install, which asks nothing of them.
+// welcome card: an account (made on the sign-in page, so always behind them here), a phone number, the
+// trial, the template's own price when it has one, then the install, which asks nothing of them.
 
 export const ARRIVAL_STEPS = ['account', 'phone', 'trial', 'purchase', 'installing'] as const
 export type ArrivalStep = (typeof ARRIVAL_STEPS)[number]
@@ -25,8 +25,7 @@ export function gestureIndex(step: ArrivalStep, paid: boolean): number {
 type LoosePart = { type: string }
 
 /** Read off the session and the conversation, so a reload or the way back from Google lands on the right step. */
-export function arrivalStepOf({ isAnonymous, phonePending, messages }: { isAnonymous: boolean; phonePending: boolean; messages: UIMessage[] }): ArrivalStep {
-    if (isAnonymous) return 'account'
+export function arrivalStepOf({ phonePending, messages }: { phonePending: boolean; messages: UIMessage[] }): ArrivalStep {
     if (phonePending) return 'phone'
     const parts = messages.flatMap(message => message.parts as LoosePart[])
     if (parts.some(part => part.type === 'tool-build_team')) return 'installing'

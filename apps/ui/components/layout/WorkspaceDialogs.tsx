@@ -9,7 +9,6 @@ import { MyTemplatesDialog } from '@/components/templates/expert/MyTemplatesDial
 import { useIsTemplateAuthor } from '@/hooks/useIsTemplateAuthor'
 import { useLibraryViewerSignals } from '@/lib/templates/useLibraryViewerSignals'
 import { useBuilderDialogsStore } from '@/stores/builder-dialogs.store'
-import { useSession } from '@/supabase/session/SessionProvider'
 
 /**
  * The dialogs any view of the workspace opens through a store (billing, notifications, shortcuts, a new
@@ -17,12 +16,9 @@ import { useSession } from '@/supabase/session/SessionProvider'
  * whichever it is. Radix portals them, so where they sit in the tree changes nothing on screen.
  */
 export function WorkspaceDialogs() {
-    const { isAnonymous } = useSession()
     const { libraryOpen, newAgentOpen, librarySlug, newBoxOpen, openLibrary, openNewAgent, setLibraryOpen, setNewAgentOpen, setNewBoxOpen } = useBuilderDialogsStore()
     const isTemplateAuthor = useIsTemplateAuthor()
     const viewerSignals = useLibraryViewerSignals()
-
-    if (isAnonymous) return <ToolbarDialogs />
 
     return (
         <>

@@ -60,9 +60,9 @@ describe('opening', () => {
         expect(rememberForemanOpen).not.toHaveBeenCalled()
     })
 
-    it('starts the funnel with its intake card in one go', () => {
-        useForemanStore.getState().startFunnel(true)
-        expect(useForemanStore.getState()).toMatchObject({ funnel: 'guided', intake: true, open: true })
+    it('starts the funnel open on the assistant in one go', () => {
+        useForemanStore.getState().startFunnel()
+        expect(useForemanStore.getState()).toMatchObject({ funnel: 'guided', open: true, tab: 'assistant' })
     })
 
     it('opens and parks a prompt when asked from outside the column', () => {
@@ -137,7 +137,7 @@ describe('backend', () => {
         store.pinBackend()
         store.setPlanPreview({} as never)
         store.newChat()
-        expect(useForemanStore.getState()).toMatchObject({ backend: null, planPreview: null, intakePreview: null, intake: false })
+        expect(useForemanStore.getState()).toMatchObject({ backend: null, planPreview: null, intakePreview: null })
         expect(useForemanStore.getState().sessionId).not.toBe(before)
     })
 })
@@ -200,10 +200,10 @@ describe('reset', () => {
         const store = useForemanStore.getState()
         store.restoreOpen(true)
         store.restorePlacement(DOCK)
-        store.startFunnel(true)
+        store.startFunnel()
         store.askForeman('hi')
         store.reset()
-        expect(useForemanStore.getState()).toMatchObject({ open: true, placement: DOCK, funnel: 'unknown', intake: false, pendingPrompt: null, accountSwitches: 1 })
+        expect(useForemanStore.getState()).toMatchObject({ open: true, placement: DOCK, funnel: 'unknown', pendingPrompt: null, accountSwitches: 1 })
     })
 })
 

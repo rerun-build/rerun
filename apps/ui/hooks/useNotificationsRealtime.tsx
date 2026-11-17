@@ -2,15 +2,11 @@
 
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
-import { toast } from 'sonner'
 import type { NotificationKind } from '@/lib/engine/types'
-import { CalendarClock } from '@/lib/icons'
-import { NotificationToast } from '@/components/notifications/NotificationToast'
 import { errorHeadline } from '@/lib/notifications/attention-details'
 import { noticeText } from '@/lib/notifications/notice-copy'
 import { ANNOUNCED_STATUS, FINISHED_STATUS } from '@/lib/notifications/announcement'
 import { playNotificationSoundOnce, showBrowserNotification } from '@/lib/notifications/browser'
-import { KIND_BEAM, KIND_ICONS, KIND_ICON_COLORS } from '@/lib/notifications/kind-visuals'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
 import { isScheduledSource, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { deliveryFor, recipientReason } from '@/lib/notifications/routing'
@@ -22,13 +18,9 @@ import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 
 // Turns incoming `notifications` rows into a hub announcement, an optional sound, and (when the tab
 // is hidden) an OS notification. The hub already decided who a row reaches and why; this only picks
-// how loud, from the user's channels. An anonymous user has no hub to announce in: they keep the toast.
+// how loud, from the user's channels.
 export function useNotificationsRealtime(workspaceId: number | undefined) {
-    const { user, isAnonymous } = useSession()
-    const anonymousRef = useRef(isAnonymous)
-    useEffect(() => {
-        anonymousRef.current = isAnonymous
-    }, [isAnonymous])
+    const { user } = useSession()
     const prefsRef = useRef(user?.email_notification_prefs)
     useEffect(() => {
         prefsRef.current = user?.email_notification_prefs
@@ -72,31 +64,12 @@ export function useNotificationsRealtime(workspaceId: number | undefined) {
             const title = scheduled ? copyRef.current.t('scheduledTask', { name: agentName }) : agentName
             const message = noticeText(row, copyRef.current.tNotices)
 
-            const Icon = scheduled ? CalendarClock : KIND_ICONS[kind]
-            const iconColor = scheduled ? 'text-violet-400' : KIND_ICON_COLORS[kind]
-            const beamTone = scheduled ? 'brand' : KIND_BEAM[kind]
             const status = kind === 'done' ? FINISHED_STATUS : ANNOUNCED_STATUS[kind]
             const shown = normalizeNotificationPrefs(prefsRef.current).toast && !!status
             const openConversation = row.agent_id
                 ? () => openConversationFromNotification({ agentId: row.agent_id, engineSessionId: row.engine_session_id, engineRunId: row.engine_run_id })
                 : undefined
-            if (shown && anonymousRef.current) {
-                toast.custom(id => (
-                    <NotificationToast
-                        title={title}
-                        message={message}
-                        agentId={row.agent_id}
-                        Icon={Icon}
-                        iconColor={iconColor}
-                        beamTone={beamTone}
-                        onDismiss={() => toast.dismiss(id)}
-                        onOpen={openConversation && (() => {
-                            toast.dismiss(id)
-                            void openConversation()
-                        })}
-                    />
-                ))
-            } else if (shown && status) {
+            if (shown && status) {
                 useNotificationsStore.getState().announce({
                     id: row.id,
                     agentId: row.agent_id,

@@ -4,8 +4,6 @@
         "header.newTask": "Button that starts a new conversation with the Chief of Staff.",
         "header.position.float": "Menu option: the chat floats in a corner of the screen instead of being docked.",
         "modelPill.hubReason": "Tooltip on the disabled model picker. Rerun Balanced is the name of a model, keep it as is.",
-        "signupGate.perks.trial": "{days} is the length of the free trial in days.",
-        "signInLink.prompt": "<link> wraps the clickable part that opens the sign-in dialog.",
         "dock.tooltip": "Tooltip of the Chief of Staff orb. <key> wraps the keyboard shortcut, {shortcut} is that shortcut (e.g. ⌘F).",
         "nudge.more": "Count of other questions waiting besides the one shown.",
         "nudge.answer": "Button: go and answer the question.",
@@ -14,11 +12,6 @@
         "pill.prompts.lastNight": "Example question typed in the placeholder of the ask field.",
         "routines.options": "Accessible label of the menu button of a routine. {name} is the routine's name.",
         "routines.started": "{name} is the routine's name.",
-        "intake.settingUp": "{title} is the name of the template or coworker the person picked before signing up. <highlight> wraps it.",
-        "intake.role.placeholder": "Example job title in an empty field.",
-        "intake.name.placeholder": "Example first name in an empty field.",
-        "intake.skip": "Button: skip the company website question.",
-        "intake.website.platform": "Shown under the company website field when the person typed a social network or page host instead of their own site. {domain} is that platform's address (e.g. linkedin.com).",
         "ownEntry": "The way out of the onboarding cards: the person already knows which coworker they want and writes it themselves.",
         "gettingStarted.pillLabel": "Accessible label of the checklist pill.",
         "gettingStarted.reward.lockedDescription": "{total} is the number of steps of the checklist, {remaining} how many are left.",
@@ -48,9 +41,7 @@
     },
     "welcome": {
         "title": "Hey, ready to hand off your first task?",
-        "preparing": "Getting your workspace ready...",
-        "gateTitle": "Your team is ready to be built",
-        "gateSubtitle": "Create your account and the Chief of Staff starts building it right away."
+        "preparing": "Getting your workspace ready..."
     },
     "header": {
         "closeDisabled": "Finish the setup to close the chat",
@@ -61,7 +52,6 @@
             "dockRight": "Dock right",
             "float": "Float"
         },
-        "signIn": "Sign in",
         "newTask": "New task",
         "conversations": "Conversations"
     },
@@ -78,19 +68,6 @@
     "resize": "Resize chat",
     "modelPill": {
         "hubReason": "This chat always runs on Rerun Balanced"
-    },
-    "signupGate": {
-        "teamAt": "Your team at {domain}",
-        "team": "Your team",
-        "perks": {
-            "trial": "{days}-day free trial",
-            "cancel": "Cancel anytime",
-            "kept": "Your answers are kept"
-        },
-        "createAccount": "Create my account"
-    },
-    "signInLink": {
-        "prompt": "Already have an account? <link>Sign in</link>"
     },
     "nextSteps": {
         "turnOn": "Turn on my coworker",
@@ -155,60 +132,6 @@
     },
     "ownEntry": "I know what I need",
     "ownEntryPlaceholder": "I know what I need…",
-    "intake": {
-        "steps": {
-            "company": {
-                "title": "What is your company website?",
-                "description": "We read it to learn what you sell and who you sell to."
-            },
-            "industry": {
-                "title": "What line of work are you in?",
-                "description": "It decides which teams we draw on your board."
-            },
-            "role": {
-                "title": "And what do you do there?",
-                "description": "It decides who gets built for you first."
-            },
-            "name": {
-                "title": "Last one: your first name?",
-                "description": "So we are not talking to a workspace."
-            }
-        },
-        "settingUp": "Setting up <highlight>{title}</highlight>",
-        "website": {
-            "label": "Company website",
-            "platform": "{domain} is not your company's site. Enter yours, or skip."
-        },
-        "industry": {
-            "label": "Industry",
-            "other": "Other",
-            "placeholder": "Bakery, dental practice, gym…"
-        },
-        "industries": {
-            "agencies": "Agencies",
-            "ecommerce": "E-commerce",
-            "saas": "SaaS",
-            "sales": "Sales",
-            "recruiting": "Recruiting",
-            "real-estate": "Real estate",
-            "legal": "Legal & compliance",
-            "creators": "Creators",
-            "productivity": "Productivity",
-            "other": "Other"
-        },
-        "role": {
-            "label": "Your role",
-            "placeholder": "Head of Growth"
-        },
-        "name": {
-            "label": "First name",
-            "placeholder": "John"
-        },
-        "skip": "Skip",
-        "next": "Next",
-        "answerToContinue": "Answer this step to continue",
-        "saveFailed": "We could not save that. Try again."
-    },
     "gettingStarted": {
         "title": "Getting started",
         "hide": "Hide",

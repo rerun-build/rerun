@@ -94,7 +94,7 @@ export function ControlCenter() {
     const hydrated = useBoardStore(s => s.hydrated)
     const selectedAgentId = useBoardStore(s => s.selectedAgentId)
     const sessions = useBoardStore(s => s.sessions)
-    const { workspace, session, isAnonymous } = useSession()
+    const { workspace, session } = useSession()
     const workspaceAdmin = useIsWorkspaceAdmin()
     const { needsMachineReason } = useWorkspaceAccess()
     const desktopEnabled = useComputerEnabled()
@@ -115,7 +115,7 @@ export function ControlCenter() {
         }
     }
 
-    const available = !!workspace && !isAnonymous && hydrated
+    const available = !!workspace && hydrated
     const page = pages[pages.length - 1]
     const { scope, text } = parseQuery(query)
     const pageAgent = page.kind === 'agent' || page.kind === 'move' ? agents.find(agent => agent.id === page.agentId) : undefined

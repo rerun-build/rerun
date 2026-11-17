@@ -35,9 +35,8 @@ export type WorkspaceViewContext = {
     // The Simple view is released to this account.
     enabled: boolean
     preference: WorkspaceView | null
-    // A visitor without an account, a workspace still in its onboarding, or one waiting for a machine:
-    // the onboarding draws on the board, and a waitlist has nothing to list.
-    anonymous: boolean
+    // A workspace still in its onboarding, or one waiting for a machine: the onboarding draws on the
+    // board, and a waitlist has nothing to list.
     onboarding: boolean
     waitlisted: boolean
     // A coworker or a template is being dropped on the grid, or the workspace has no Box to list from.
@@ -49,7 +48,7 @@ export type WorkspaceViewContext = {
 // own once the grid is no longer needed.
 export function resolveWorkspaceView(context: WorkspaceViewContext): WorkspaceView {
     if (!context.enabled) return 'board'
-    if (context.anonymous || context.onboarding || context.waitlisted) return 'board'
+    if (context.onboarding || context.waitlisted) return 'board'
     if (context.placing || context.boxless) return 'board'
     return context.preference ?? 'board'
 }

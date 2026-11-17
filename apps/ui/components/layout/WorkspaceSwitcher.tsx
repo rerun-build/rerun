@@ -20,7 +20,6 @@ import { VaultDialog } from '@/components/vault/VaultDialog'
 import { vaultSignedOutCountAction } from '@/app/api/_actions/vault.actions'
 import { WorkspaceMembersDialog } from '@/components/dialogs/WorkspaceMembersDialog'
 import { WorkspaceSettingsDialog } from '@/components/dialogs/WorkspaceSettingsDialog'
-import { SignInPillButton } from '@/components/layout/SignInPill'
 import { ThemeMenuRow } from '@/components/layout/ThemeMenuRow'
 import { ViewMenuRow } from '@/components/workspace-view/ViewMenuRow'
 import { LanguageMenuRow } from '@/components/layout/LanguageMenuRow'
@@ -41,7 +40,6 @@ import { useAccountStore } from '@/stores/account.store'
 import { useBillingStore } from '@/stores/billing.store'
 import { useCreatorStore } from '@/stores/creator.store'
 import { useBrainStore } from '@/stores/brain.store'
-import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
@@ -84,7 +82,7 @@ function workspaceSummary(workspace: SessionWorkspace, t: WorkspaceMenuTranslato
 export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corner' | 'column' }) {
     const t = useTranslations('layout.workspaceMenu')
     const errorText = useErrorText()
-    const { user, workspace, workspaces, session, isAnonymous, signOut } = useSession()
+    const { user, workspace, workspaces, session, signOut } = useSession()
     const openBilling = useBillingStore(s => s.openBilling)
     const paidApps = useEnabledPaidApps()
     const openApp = usePaidAppsStore(s => s.openApp)
@@ -119,7 +117,7 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     // ever opens.
     const [powerAction, setPowerAction] = useState<PowerAction | null>(null)
     const refreshBrainProposals = useBrainStore(s => s.refreshProposalCount)
-    const brainProposals = useBrainProposalCount(Boolean(workspace) && !isAnonymous)
+    const brainProposals = useBrainProposalCount(Boolean(workspace))
     const vaultEnabled = useVaultEnabled()
     // Brain, AI providers and the Vault all live on the workspace's machine, and a workspace gets one
     // only once it is on a plan.
@@ -127,10 +125,9 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     // Entries of the Vault waiting on a sign-in: read on mount and each time the menu opens.
     const [vaultSignedOut, setVaultSignedOut] = useState(0)
     const refreshVaultSignedOut = useCallback(() => {
-        if (vaultEnabled && !isAnonymous) void vaultSignedOutCountAction().then(setVaultSignedOut)
-    }, [vaultEnabled, isAnonymous])
+        if (vaultEnabled) void vaultSignedOutCountAction().then(setVaultSignedOut)
+    }, [vaultEnabled])
     useEffect(refreshVaultSignedOut, [refreshVaultSignedOut])
-    const guided = useForemanStore(state => state.funnel === 'guided')
     const credit = useRerunCredit()
     // A list beside the menu has no room on a phone: there the header unfolds it in place instead.
     const isMobile = useIsMobile()
@@ -146,17 +143,6 @@ export function WorkspaceSwitcher({ placement = 'corner' }: { placement?: 'corne
     const appsInMenu = paidApps.filter(slug => (appAccounts[slug] ?? 0) > 0)
 
     if (!workspace) return null
-
-    // A returning user on a fresh browser lands here anonymous: an empty board under "My workspace"
-    // reads as a lost account, so this corner is where the way back in sits. On a phone the funnel's
-    // sheet cannot be closed and carries its own sign-in, so the pill would only crowd the board.
-    if (isAnonymous) {
-        return (
-            <div className={cn('absolute top-4 left-4 z-40', guided && 'max-md:hidden')}>
-                <SignInPillButton />
-            </div>
-        )
-    }
 
     const isExpert = user?.account_role === 'expert'
     const apiEntitled = isWorkspaceApiEntitled(workspace)

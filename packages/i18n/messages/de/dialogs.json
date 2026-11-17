@@ -173,20 +173,6 @@
             }
         }
     },
-    "auth": {
-        "welcome": {
-            "title": "Willkommen bei Rerun",
-            "subtitle": "Erstelle dein Konto und bau dein Team aus Coworkern auf."
-        },
-        "build": {
-            "title": "Dein Team kann gebaut werden",
-            "subtitle": "Erstelle dein Konto und der Chief of Staff beginnt sofort mit dem Aufbau."
-        },
-        "signin": {
-            "title": "Willkommen",
-            "subtitle": "Melde dich an oder erstelle ein Konto, um loszulegen."
-        }
-    },
     "phoneVerification": {
         "title": "Ein letzter Schritt",
         "subtitle": "Gib deine Telefonnummer an."
@@ -341,9 +327,7 @@
         "title": "Diesen Coworker hinzufügen",
         "description": "Sieh dir an, was dieser Coworker macht, und platziere ihn dann auf deinem Board.",
         "sentBy": "{name} hat dir eine Kopie dieses Coworkers geschickt. Er läuft auf deiner eigenen Box.",
-        "sentBySomeone": "Jemand hat dir eine Kopie dieses Coworkers geschickt. Er läuft auf deiner eigenen Box.",
-        "signUp": "Registrieren und Coworker hinzufügen",
-        "waiting": "Er wartet direkt danach auf dich."
+        "sentBySomeone": "Jemand hat dir eine Kopie dieses Coworkers geschickt. Er läuft auf deiner eigenen Box."
     },
     "templateDeepLink": {
         "unavailable": "Dieser Vorlagenlink ist nicht mehr verfügbar",

@@ -48,9 +48,10 @@ export async function getWorkspaceConnection(workspaceId: number): Promise<Engin
     return engine.conn
 }
 
-// Claims the workspace's machine, once. Not called when the workspace row is created: a
-// workspace is minted for every anonymous visitor, and claiming there would drain the pool on bot
-// traffic. It is called the first time the workspace needs a machine to put an agent on.
+// Claims the workspace's machine, once. Not called when the workspace row is created: a workspace
+// is minted for every new account, and claiming there would drain the pool on accounts that never
+// start a trial. It is called at the end of the onboarding, or the first time the workspace needs a
+// machine to put an agent on.
 //
 // An archived workspace only ever gets its machine back through the restore (`forRestore`): a box
 // claimed by anything else would come up empty, and the restore would then set aside whatever had

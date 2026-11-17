@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { ForemanIntake } from '@/lib/onboarding/intake'
 
 const STORAGE_KEY = 'rerun:pending-first-agent'
 
@@ -28,11 +27,10 @@ afterEach(() => {
 
 const NOW = Date.parse('2026-10-16T12:00:00Z')
 const HOUR = 60 * 60 * 1000
-const FRESH = { pendingFirstAgent: NOW, pendingTemplate: NOW, pendingTemplateLink: NOW, pendingShareLink: NOW, pendingIntake: NOW, resumeRequested: NOW }
+const FRESH = { pendingFirstAgent: NOW, pendingTemplate: NOW, pendingTemplateLink: NOW, pendingShareLink: NOW }
 
 const DRAFT = { name: 'Scout', serviceSlugs: ['hubspot'], kickoff: 'Find leads', offset: { col: 1, row: 2 } }
 const TEMPLATE = { slug: 'crm-kit', title: 'CRM kit', agentCount: 3 }
-const INTAKE: ForemanIntake = { companyUrl: 'https://acme.com', industry: 'saas', decidedIndustry: null, industryLabel: null, position: 'CEO', firstName: 'Jane' }
 
 describe('onboarding store rehydration', () => {
     beforeEach(() => {
@@ -41,8 +39,8 @@ describe('onboarding store rehydration', () => {
     })
 
     it('restores every valid parked entry', async () => {
-        const { useOnboardingStore } = await loadStore({ pendingFirstAgent: DRAFT, pendingTemplateLink: 'kit', pendingShareLink: 'tok', pendingIntake: INTAKE, resumeRequested: true, firstAgentFromPrompt: true, parkedAt: FRESH })
-        expect(useOnboardingStore.getState()).toMatchObject({ pendingFirstAgent: DRAFT, pendingTemplateLink: 'kit', pendingShareLink: 'tok', pendingIntake: INTAKE, resumeRequested: true, firstAgentFromPrompt: true })
+        const { useOnboardingStore } = await loadStore({ pendingFirstAgent: DRAFT, pendingTemplateLink: 'kit', pendingShareLink: 'tok', firstAgentFromPrompt: true, parkedAt: FRESH })
+        expect(useOnboardingStore.getState()).toMatchObject({ pendingFirstAgent: DRAFT, pendingTemplateLink: 'kit', pendingShareLink: 'tok', firstAgentFromPrompt: true })
     })
 
     it('drops a corrupted entry without taking the others down', async () => {
@@ -50,10 +48,9 @@ describe('onboarding store rehydration', () => {
             pendingFirstAgent: { name: '', serviceSlugs: [] },
             pendingTemplate: TEMPLATE,
             pendingTemplateLink: 42,
-            pendingIntake: { ...INTAKE, industry: 'mining' },
             parkedAt: FRESH,
         })
-        expect(useOnboardingStore.getState()).toMatchObject({ pendingFirstAgent: null, pendingTemplate: TEMPLATE, pendingTemplateLink: null, pendingIntake: null })
+        expect(useOnboardingStore.getState()).toMatchObject({ pendingFirstAgent: null, pendingTemplate: TEMPLATE, pendingTemplateLink: null })
     })
 
     it('rejects an offset that is not a whole cell', async () => {
@@ -66,17 +63,9 @@ describe('onboarding store rehydration', () => {
         expect(useOnboardingStore.getState().firstAgentFromPrompt).toBe(false)
     })
 
-    it('keeps the line written under the welcome card only beside the answers it cut short', async () => {
-        const kept = await loadStore({ pendingIntake: INTAKE, pendingOwnAsk: ' Chase my invoices ', parkedAt: FRESH })
-        expect(kept.useOnboardingStore.getState()).toMatchObject({ pendingIntake: INTAKE, pendingOwnAsk: 'Chase my invoices' })
-        const orphan = await loadStore({ pendingIntake: { ...INTAKE, industry: 'mining' }, pendingOwnAsk: 'Chase my invoices', parkedAt: FRESH })
-        expect(orphan.useOnboardingStore.getState().pendingOwnAsk).toBeNull()
-    })
-
     it('drops an entry parked without a date', async () => {
-        const { useOnboardingStore, hasPendingStart } = await loadStore({ pendingFirstAgent: DRAFT, resumeRequested: true })
+        const { useOnboardingStore, hasPendingStart } = await loadStore({ pendingFirstAgent: DRAFT })
         expect(hasPendingStart(useOnboardingStore.getState())).toBe(false)
-        expect(useOnboardingStore.getState().resumeRequested).toBe(false)
     })
 
     it('drops an entry parked more than a day ago and keeps a fresh one beside it', async () => {
@@ -93,7 +82,6 @@ describe('onboarding store rehydration', () => {
     it('starts empty with nothing stored', async () => {
         const { useOnboardingStore, hasPendingStart } = await loadStore()
         expect(hasPendingStart(useOnboardingStore.getState())).toBe(false)
-        expect(useOnboardingStore.getState().resumeRequested).toBe(false)
     })
 })
 
@@ -107,8 +95,6 @@ describe('onboarding store actions', () => {
         store.setPendingTemplate(TEMPLATE)
         store.setPendingTemplateLink('kit')
         store.setPendingShareLink('tok')
-        store.setPendingIntake(INTAKE)
-        store.markResume()
         expect(useOnboardingStore.getState().parkedAt).toEqual(FRESH)
     })
 
@@ -123,27 +109,10 @@ describe('onboarding store actions', () => {
         expect(useOnboardingStore.getState()).toMatchObject({ pendingFirstAgent: null, pendingTemplate: TEMPLATE, firstAgentFromPrompt: false })
     })
 
-    it('clears the line written under the welcome card with the answers', async () => {
-        const { useOnboardingStore } = await loadStore({})
-        useOnboardingStore.getState().setPendingIntake(INTAKE, 'Chase my invoices')
-        expect(useOnboardingStore.getState().pendingOwnAsk).toBe('Chase my invoices')
-        useOnboardingStore.getState().clearPendingIntake()
-        expect(useOnboardingStore.getState()).toMatchObject({ pendingIntake: null, pendingOwnAsk: null })
-    })
-
     it('clears the prompt marker with the draft', async () => {
         const { useOnboardingStore } = await loadStore({ pendingFirstAgent: DRAFT, firstAgentFromPrompt: true })
         useOnboardingStore.getState().clearPendingFirstAgent()
         expect(useOnboardingStore.getState()).toMatchObject({ pendingFirstAgent: null, firstAgentFromPrompt: false })
-    })
-
-    it('consumes the resume flag exactly once', async () => {
-        const { useOnboardingStore } = await loadStore()
-        const store = useOnboardingStore.getState()
-        expect(store.consumeResume()).toBe(false)
-        store.markResume()
-        expect(store.consumeResume()).toBe(true)
-        expect(store.consumeResume()).toBe(false)
     })
 
     it('counts a parked share link as a pending start', async () => {
@@ -157,6 +126,6 @@ describe('onboarding store actions', () => {
         useOnboardingStore.getState().setPendingTemplateLink('kit')
         const saved = JSON.parse(storage.read(STORAGE_KEY)!).state
         expect(saved.pendingTemplateLink).toBe('kit')
-        expect(Object.keys(saved).sort()).toEqual(['firstAgentFromPrompt', 'parkedAt', 'pendingFirstAgent', 'pendingIntake', 'pendingOwnAsk', 'pendingShareLink', 'pendingTemplate', 'pendingTemplateLink', 'resumeRequested'])
+        expect(Object.keys(saved).sort()).toEqual(['firstAgentFromPrompt', 'parkedAt', 'pendingFirstAgent', 'pendingShareLink', 'pendingTemplate', 'pendingTemplateLink'])
     })
 })

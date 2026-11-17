@@ -8,7 +8,6 @@ import { isPlaced } from '@/lib/board/iso'
 import { placementLabel, useBoardStore } from '@/stores/board.store'
 import { useBuilderDialogsStore } from '@/stores/builder-dialogs.store'
 import { useControlCenterStore } from '@/stores/control-center.store'
-import { useSession } from '@/supabase/session/SessionProvider'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { CirclePlusIcon, GridIcon, PlusIcon, SearchIcon } from '@/lib/icons'
@@ -26,7 +25,6 @@ export function BuilderToolbar() {
     const openLibrary = useBuilderDialogsStore(s => s.openLibrary)
     const openNewAgent = useBuilderDialogsStore(s => s.openNewAgent)
     const openControlCenter = useControlCenterStore(s => s.openControlCenter)
-    const { isAnonymous } = useSession()
     const { needsMachineReason } = useWorkspaceAccess()
 
     const unplacedAgents = agents.filter(a => !isPlaced(a.position))
@@ -42,10 +40,6 @@ export function BuilderToolbar() {
     // Pendant l'onboarding « recrute ton premier agent » (placeholder sur la grille), on masque les deux
     // boutons pour forcer le passage par le bloc fantôme ; le logout reste dans le switcher.
     const recruitingFirstAgent = hydrated && spaces.length === 0
-
-    // Nothing in the bar is for an anonymous visitor: the sign-in pill in the top corner is their
-    // only way in.
-    if (isAnonymous) return null
 
     if (!placing && recruitingFirstAgent && unplacedAgents.length === 0) return null
 

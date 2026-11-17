@@ -112,8 +112,8 @@ export async function loadOwnCreatorInviteAction(): Promise<LoadCreatorInviteRes
 // from end to end: `enterSandbox` is get-or-create, so someone who already has a sandbox reuses it
 // instead of collecting a second engine.
 export async function claimCreatorSandboxAction(token?: string): Promise<ActionResult<{ workspaceId: number }>> {
-    const { user, session, isAnonymous } = await getServerSession()
-    if (!user?.id || isAnonymous || !session?.email) return failure('signInToClaimCreator')
+    const { user, session } = await getServerSession()
+    if (!user?.id || session?.is_anonymous || !session?.email) return failure('signInToClaimCreator')
     const userId = user.id
     const supabase = createServiceRoleClient()
 

@@ -1,13 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { TEMPLATE_CATEGORIES } from '@rerun/contracts'
 import { z } from 'zod'
-import type { ForemanIntake } from '@/lib/onboarding/intake'
 import type { PendingAgentDraft } from './board.store'
 
 // The first-agent draft captured during onboarding, persisted (store + localStorage) so it survives
-// the "Create your account" dialog being cancelled, and a full page reload. It is replayed once the
-// user converts / pays, then the real agent is created inside a claimed Space. Cleared only after
+// the paywall being closed and a full page reload. It is replayed once the workspace is entitled,
+// then the real agent is created inside a claimed Space. Cleared only after
 // that real placement — never at the placeholder drop.
 // Where the user dropped the agent, as an offset from the corner of the space it was dropped on.
 // Absolute grid coordinates would not survive the trip: the drop happens on the onboarding
@@ -26,7 +24,7 @@ const pendingFirstAgentSchema = z.object({
 export type PendingFirstAgent = PendingAgentDraft & { offset?: SpaceOffset }
 
 // A shared template link parked under the same contract as the first-agent draft: it survives the
-// account dialog being cancelled, a reload and the Stripe round-trip, and is replayed once the
+// paywall being closed, a reload and the Stripe round-trip, and is replayed once the
 // workspace is entitled. The payload is a slug because the install re-reads the template server
 // side; the title and count are only here for the copy.
 const pendingTemplateSchema = z.object({
@@ -42,17 +40,6 @@ const pendingTemplateSchema = z.object({
 
 export type PendingTemplate = z.infer<typeof pendingTemplateSchema>
 
-const templateCategorySchema = z.enum(TEMPLATE_CATEGORIES)
-
-const pendingIntakeSchema = z.object({
-    companyUrl: z.string().nullable(),
-    industry: templateCategorySchema.nullable(),
-    decidedIndustry: templateCategorySchema.nullable(),
-    industryLabel: z.string().nullable(),
-    position: z.string().nullable(),
-    firstName: z.string().nullable(),
-}) satisfies z.ZodType<ForemanIntake>
-
 const pendingTemplateLinkSchema = z.string().min(1)
 const pendingShareLinkSchema = z.string().min(1)
 
@@ -61,31 +48,19 @@ const pendingShareLinkSchema = z.string().min(1)
 // stored without a date is treated as one of those.
 const PARKED_TTL_MS = 24 * 60 * 60 * 1000
 
-type ParkedEntry = 'pendingFirstAgent' | 'pendingTemplate' | 'pendingTemplateLink' | 'pendingShareLink' | 'pendingIntake' | 'resumeRequested'
+type ParkedEntry = 'pendingFirstAgent' | 'pendingTemplate' | 'pendingTemplateLink' | 'pendingShareLink'
 type ParkedAt = Partial<Record<ParkedEntry, number>>
 
 export type OnboardingState = {
     pendingFirstAgent: PendingFirstAgent | null
     pendingTemplate: PendingTemplate | null
-    // A shared template link met before the account wall. Only the slug, and deliberately outside
-    // the pair above: nothing is confirmed yet, it is a dialog waiting to be opened once the visitor
-    // has an account. Persisted because the Google round-trip drops the query string.
+    // A shared template link met before the workspace could open it (onboarding not done, no machine
+    // free). Only the slug, and deliberately outside the pair above: nothing is confirmed yet, it is a
+    // dialog waiting to be opened. Persisted so it survives a reload.
     pendingTemplateLink: string | null
-    // The same, for a shared agent link met before the account wall. Only the token: the card it
-    // opens is fetched fresh, and nothing is confirmed until the agent is dropped on the board.
+    // The same, for a shared agent link. Only the token: the card it opens is fetched fresh, and
+    // nothing is confirmed until the agent is dropped on the board.
     pendingShareLink: string | null
-    // The welcome card answered by an anonymous visitor. Nothing is written for an anonymous row: the
-    // answers wait here, through the account wall and the Google round-trip, and are saved on
-    // whichever workspace the visitor ends up signed into.
-    pendingIntake: ForemanIntake | null
-    // The line they wrote in the composer under the welcome card instead of finishing it. Parked with
-    // the answers it cut short and dropped with them: it is what the foreman opens on once the
-    // account exists.
-    pendingOwnAsk: string | null
-    // One-shot flag set right before an anonymous user converts (email link, existing account, or
-    // Google). It survives the account switch / OAuth redirect so the board can replay the parked
-    // draft once the real session is in place.
-    resumeRequested: boolean
     // Un brouillon posé par le composer de la landing (`?prompt=`) chez quelqu'un qui n'a jamais vu
     // Rerun : c'est avec ça que le Foreman ouvre la conversation, au lieu de le créer dans son dos.
     // Marqueur explicite plutôt que déduit du couple (brouillon parké, ligne user pas encore
@@ -102,16 +77,12 @@ export type OnboardingState = {
     clearPendingTemplateLink: () => void
     setPendingShareLink: (token: string) => void
     clearPendingShareLink: () => void
-    setPendingIntake: (intake: ForemanIntake, ownAsk?: string | null) => void
-    clearPendingIntake: () => void
-    markResume: () => void
-    consumeResume: () => boolean
     markFirstAgentFromPrompt: () => void
 }
 
 type PersistedOnboarding = Pick<
     OnboardingState,
-    'pendingFirstAgent' | 'pendingTemplate' | 'pendingTemplateLink' | 'pendingShareLink' | 'pendingIntake' | 'pendingOwnAsk' | 'resumeRequested' | 'firstAgentFromPrompt' | 'parkedAt'
+    'pendingFirstAgent' | 'pendingTemplate' | 'pendingTemplateLink' | 'pendingShareLink' | 'firstAgentFromPrompt' | 'parkedAt'
 >
 
 // Validate each entry on its own, dropping a corrupted one rather than tripping on it or taking the
@@ -130,16 +101,11 @@ export function parsePersistedOnboarding(raw: unknown, now = Date.now()): Persis
         return parsed.data
     }
     const pendingFirstAgent = fresh('pendingFirstAgent', pendingFirstAgentSchema)
-    const pendingIntake = fresh('pendingIntake', pendingIntakeSchema)
-    const ownAsk = typeof p.pendingOwnAsk === 'string' ? p.pendingOwnAsk.trim() : ''
     return {
         pendingFirstAgent,
         pendingTemplate: fresh('pendingTemplate', pendingTemplateSchema),
         pendingTemplateLink: fresh('pendingTemplateLink', pendingTemplateLinkSchema),
         pendingShareLink: fresh('pendingShareLink', pendingShareLinkSchema),
-        pendingIntake,
-        pendingOwnAsk: pendingIntake && ownAsk ? ownAsk : null,
-        resumeRequested: fresh('resumeRequested', z.literal(true)) === true,
         // Adossé au brouillon qu'il qualifie : un brouillon tombé au parse laisserait sinon un
         // marqueur qui ne désigne plus rien.
         firstAgentFromPrompt: pendingFirstAgent !== null && p.firstAgentFromPrompt === true,
@@ -156,14 +122,11 @@ export function hasPendingStart(state: Pick<OnboardingState, 'pendingFirstAgent'
 
 export const useOnboardingStore = create<OnboardingState>()(
     persist(
-        (set, get) => ({
+        set => ({
             pendingFirstAgent: null,
             pendingTemplate: null,
             pendingTemplateLink: null,
             pendingShareLink: null,
-            pendingIntake: null,
-            pendingOwnAsk: null,
-            resumeRequested: false,
             firstAgentFromPrompt: false,
             parkedAt: {},
             // Only one thing can be waiting to land: the chain claims a Space for whatever is
@@ -177,14 +140,6 @@ export const useOnboardingStore = create<OnboardingState>()(
             clearPendingTemplateLink: () => set({ pendingTemplateLink: null }),
             setPendingShareLink: token => set(s => ({ pendingShareLink: token, parkedAt: { ...s.parkedAt, pendingShareLink: Date.now() } })),
             clearPendingShareLink: () => set({ pendingShareLink: null }),
-            setPendingIntake: (intake, ownAsk = null) => set(s => ({ pendingIntake: intake, pendingOwnAsk: ownAsk?.trim() || null, parkedAt: { ...s.parkedAt, pendingIntake: Date.now() } })),
-            clearPendingIntake: () => set({ pendingIntake: null, pendingOwnAsk: null }),
-            markResume: () => set(s => ({ resumeRequested: true, parkedAt: { ...s.parkedAt, resumeRequested: Date.now() } })),
-            consumeResume: () => {
-                if (!get().resumeRequested) return false
-                set({ resumeRequested: false })
-                return true
-            },
             markFirstAgentFromPrompt: () => set({ firstAgentFromPrompt: true }),
         }),
         {
@@ -194,9 +149,6 @@ export const useOnboardingStore = create<OnboardingState>()(
                 pendingTemplate: state.pendingTemplate,
                 pendingTemplateLink: state.pendingTemplateLink,
                 pendingShareLink: state.pendingShareLink,
-                pendingIntake: state.pendingIntake,
-                pendingOwnAsk: state.pendingOwnAsk,
-                resumeRequested: state.resumeRequested,
                 firstAgentFromPrompt: state.firstAgentFromPrompt,
                 parkedAt: state.parkedAt,
             }),

@@ -71,19 +71,14 @@ type ForemanState = {
      */
     planPreview: ShownPlan | null
     /**
-     * La carte d'accueil, qui pose les quatre questions du tunnel avant que le Foreman ne réfléchisse
-     * à quoi que ce soit. Tant qu'elle est là, aucun message n'est parti.
-     */
-    intake: boolean
-    /**
      * La template ou le coworker partagé sur lequel le visiteur est arrivé. Tant qu'il n'est pas
-     * installé la colonne porte son tunnel (compte, téléphone, trial, install) à la place de la
-     * carte d'accueil, qui ne vient qu'après. `null` pour toute autre arrivée.
+     * installé la colonne porte son tunnel (téléphone, trial, install). `null` pour toute autre
+     * arrivée.
      */
     arrival: ForemanArrival | null
     /**
-     * Les divisions que la carte dessine dès qu'elle connaît l'industrie. Champ à part de
-     * `planPreview` et pas le même : la colonne réécrit `planPreview` à chaque message, `null`
+     * Ce que le board dessine avant que rien ne soit construit (le lien sur lequel ils sont arrivés).
+     * Champ à part de `planPreview` et pas le même : la colonne réécrit `planPreview` à chaque message, `null`
      * compris, et effacerait cet aperçu-là au premier mot du Foreman.
      */
     intakePreview: ShownPlan | null
@@ -125,8 +120,8 @@ type ForemanState = {
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
     setGreetPending: (pending: boolean) => void
-    /** Entrer dans le tunnel : le mode, la carte d'accueil et l'ouverture, d'un seul coup. */
-    startFunnel: (intake: boolean) => void
+    /** Entrer dans le tunnel : le mode et l'ouverture, d'un seul coup. */
+    startFunnel: () => void
     setArrival: (arrival: ForemanArrival | null) => void
     /** « New task »: a thread of its own beside General, on the engine. */
     newChat: () => void
@@ -144,7 +139,6 @@ type ForemanState = {
     /** Fige le backend d'une conversation qui n'a encore rien envoyé. */
     pinBackend: () => void
     setPlanPreview: (plan: ShownPlan | null) => void
-    closeIntake: () => void
     setIntakePreview: (plan: ShownPlan | null) => void
     /** Ouvrir la colonne et lui confier un message, comme si on l'avait tapé. */
     askForeman: (text: string) => void
@@ -189,7 +183,6 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     backend: null,
     surface: 'unknown',
     planPreview: null,
-    intake: false,
     arrival: null,
     intakePreview: null,
     pendingPrompt: null,
@@ -244,18 +237,15 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     setFunnel: funnel => set({ funnel }),
     setWaitlisted: waitlisted => set({ waitlisted }),
     setGreetPending: greetPending => set({ greetPending }),
-    // En un seul `set` et pas trois : entre « le tunnel commence » et « la carte est là », le
-    // kickoff verrait une découverte sans carte devant elle et enverrait son marqueur, ce que toute
-    // cette carte existe pour éviter.
-    startFunnel: intake => {
+    startFunnel: () => {
         useBoardStore.getState().selectAgent(null)
         useBoardStore.getState().selectSpace(null)
-        set({ funnel: 'guided', intake, open: true, yieldedToSheet: false, tab: 'assistant' })
+        set({ funnel: 'guided', open: true, yieldedToSheet: false, tab: 'assistant' })
     },
     setArrival: arrival => set({ arrival }),
     newChat: () => {
         const sessionId = randomUuid()
-        set({ ...CONVERSATION_SWITCH, sessionId, draftId: sessionId, intake: false, intakePreview: null })
+        set({ ...CONVERSATION_SWITCH, sessionId, draftId: sessionId, intakePreview: null })
     },
     showGeneral: () => {
         if (get().sessionId !== get().generalId) set({ ...CONVERSATION_SWITCH, sessionId: get().generalId })
@@ -277,7 +267,6 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     setPlanPreview: planPreview => set({ planPreview }),
     // L'aperçu de la carte survit à sa fermeture : les Box restent dessinées pendant que le Foreman
     // réfléchit, jusqu'à ce que son propre plan les remplace.
-    closeIntake: () => set({ intake: false }),
     setIntakePreview: intakePreview => set({ intakePreview }),
     // Un geste, comme `toggle` : l'ouverture devient la préférence.
     // What is asked from outside the column goes to General, whatever thread is on screen.
@@ -312,7 +301,6 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             backend: null,
             surface: 'unknown',
             planPreview: null,
-            intake: false,
             arrival: null,
             intakePreview: null,
             pendingPrompt: null,

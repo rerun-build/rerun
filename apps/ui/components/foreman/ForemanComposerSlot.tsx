@@ -5,15 +5,10 @@ import { useCallback, useLayoutEffect, useRef, useState, type Ref } from 'react'
 
 import { useMentionAutocomplete } from '@/components/chat/MentionAutocomplete'
 import { ForemanComposer, type ForemanComposerMentionProps, type ForemanComposerProps } from '@/components/foreman/ForemanComposer'
-import { ForemanSignInLink } from '@/components/foreman/ForemanSignInLink'
-import { ForemanSignupGate } from '@/components/foreman/ForemanSignupGate'
 import { ForemanTrialGate } from '@rerun/cloud/billing.client'
 import { useForemanMentionAgents } from '@/components/foreman/useForemanMentionAgents'
-import { ForemanIntakeCard } from '@/components/foreman/intake/ForemanIntakeCard'
-import type { ForemanIntakeController } from '@/components/foreman/intake/useForemanIntake'
 import type { TrialStep } from '@/lib/foreman/next-steps'
 import { cn } from '@/lib/utils'
-import { useSession } from '@/supabase/session/SessionProvider'
 
 /**
  * Le pied de la colonne. Une question du Foreman attend dans la conversation, comme l'`ask_user`
@@ -24,11 +19,8 @@ import { useSession } from '@/supabase/session/SessionProvider'
  * Une fois la carte d'essai posée, le composer ne revient plus jusqu'à ce que l'essai tourne : un
  * pied le remplace (`ForemanTrialGate`), sinon le Foreman, gratuit, répondrait à tout ce qui s'écrit.
  *
- * La carte d'accueil tient le pied, et devant tout le reste : elle se joue avant qu'aucun message
- * n'ait été envoyé, donc il ne peut rien y avoir d'autre en attente derrière elle.
- *
- * `ownEntry` : le composer reste sous la carte d'accueil, et sous le starter pack, pour qui sait déjà
- * ce qu'il veut. Ce qui s'y écrit répond à la carte (ForemanColumn choisit où ça part).
+ * `ownEntry` : le composer reste sous le starter pack, pour qui sait déjà ce qu'il veut. Ce qui s'y
+ * écrit répond à la carte (ForemanColumn choisit où ça part).
  */
 
 // Le repli de hauteur de l'agent sheet, au chiffre près : les deux pieds de panneau doivent se lire
@@ -43,10 +35,6 @@ const SLOT_MOTION = {
 type ForemanComposerSlotProps = Omit<ForemanComposerProps, keyof ForemanComposerMentionProps> & {
     /** Une question attend dans la conversation : le pied ne porte plus rien. */
     aside: boolean
-    /** `null` hors du tunnel, et dès que la carte a rendu ses réponses. */
-    intake: ForemanIntakeController | null
-    /** Carte répondue par un anonyme : plus rien ne part sans compte. */
-    gated: boolean
     /** La carte d'essai est posée et l'essai ne tourne pas encore : plus rien ne part. */
     trialGate: TrialStep | null
     /** Under a coworker's line and in its column, in the Simple view's middle. */
@@ -54,16 +42,15 @@ type ForemanComposerSlotProps = Omit<ForemanComposerProps, keyof ForemanComposer
     ref?: Ref<HTMLDivElement>
 }
 
-export function ForemanComposerSlot({ aside, intake, gated, trialGate, framed = false, ref, ownEntry = false, ...composer }: ForemanComposerSlotProps) {
-    const { isAnonymous } = useSession()
-    const bare = aside && !intake && !gated && !trialGate
+export function ForemanComposerSlot({ aside, trialGate, framed = false, ref, ownEntry = false, ...composer }: ForemanComposerSlotProps) {
+    const bare = aside && !trialGate
 
     const { composerRef } = composer
     const mentionAgents = useForemanMentionAgents()
     // Picking a mention writes `el.value` directly, which fires no React change event.
     const syncComposer = useCallback((text: string) => composerRef.current?.sync(text), [composerRef])
     const { inputRef, menu: mentionMenu, tokens: mentionTokens, textareaProps: mentionTextareaProps } = useMentionAutocomplete(mentionAgents, [], syncComposer)
-    const composerShown = intake ? ownEntry : !gated && !trialGate && !aside
+    const composerShown = !trialGate && !aside
 
     // The composer folds inside an `overflow-hidden` box that would clip the menu, so the menu is
     // placed against the slot itself and sits on the field.
@@ -92,23 +79,7 @@ export function ForemanComposerSlot({ aside, intake, gated, trialGate, framed = 
             )}
         >
             <AnimatePresence initial={false} mode="popLayout">
-                {intake ? (
-                    <motion.div key="intake" {...SLOT_MOTION} className="overflow-hidden">
-                        {/* Le composer dessous garde sa place : seule la carte défile sur un écran court. */}
-                        <div className={cn('overflow-y-auto overscroll-contain', composerShown ? 'max-h-[calc(70svh-7.5rem)]' : 'max-h-[70svh]')}>
-                            <ForemanIntakeCard intake={intake} />
-                            {isAnonymous && (
-                                <div className="pb-2">
-                                    <ForemanSignInLink />
-                                </div>
-                            )}
-                        </div>
-                    </motion.div>
-                ) : gated ? (
-                    <motion.div key="gate" {...SLOT_MOTION} className="overflow-hidden">
-                        <ForemanSignupGate />
-                    </motion.div>
-                ) : trialGate ? (
+                {trialGate ? (
                     <motion.div key="trial-gate" {...SLOT_MOTION} className="overflow-hidden">
                         <ForemanTrialGate step={trialGate} />
                     </motion.div>

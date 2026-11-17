@@ -1,9 +1,7 @@
 {
     "welcome": {
         "title": "Hey, bereit, deine erste Aufgabe abzugeben?",
-        "preparing": "Dein Workspace wird vorbereitet...",
-        "gateTitle": "Dein Team kann gebaut werden",
-        "gateSubtitle": "Erstelle dein Konto und der Chief of Staff beginnt sofort mit dem Aufbau."
+        "preparing": "Dein Workspace wird vorbereitet..."
     },
     "header": {
         "closeDisabled": "Erst die Einrichtung abschließen",
@@ -14,7 +12,6 @@
             "dockRight": "Rechts andocken",
             "float": "Schwebend"
         },
-        "signIn": "Anmelden",
         "newTask": "Neue Aufgabe",
         "conversations": "Unterhaltungen"
     },
@@ -31,19 +28,6 @@
     "resize": "Chatgröße ändern",
     "modelPill": {
         "hubReason": "Dieser Chat läuft immer mit Rerun Balanced"
-    },
-    "signupGate": {
-        "teamAt": "Dein Team bei {domain}",
-        "team": "Dein Team",
-        "perks": {
-            "trial": "{days} Tage kostenlos testen",
-            "cancel": "Jederzeit kündbar",
-            "kept": "Deine Antworten bleiben erhalten"
-        },
-        "createAccount": "Mein Konto erstellen"
-    },
-    "signInLink": {
-        "prompt": "Du hast schon ein Konto? <link>Anmelden</link>"
     },
     "nextSteps": {
         "turnOn": "Meinen Coworker einschalten",
@@ -108,60 +92,6 @@
     },
     "ownEntry": "Ich weiß, was ich brauche",
     "ownEntryPlaceholder": "Ich weiß, was ich brauche…",
-    "intake": {
-        "steps": {
-            "company": {
-                "title": "Wie heißt die Website deiner Firma?",
-                "description": "Wir lesen sie, um zu verstehen, was du verkaufst und an wen."
-            },
-            "industry": {
-                "title": "In welcher Branche arbeitest du?",
-                "description": "Davon hängt ab, welche Teams wir auf dein Board setzen."
-            },
-            "role": {
-                "title": "Und was machst du dort?",
-                "description": "Davon hängt ab, wen wir zuerst für dich bauen."
-            },
-            "name": {
-                "title": "Zum Schluss: dein Vorname?",
-                "description": "Damit wir nicht mit einem Workspace reden."
-            }
-        },
-        "settingUp": "<highlight>{title}</highlight> wird eingerichtet",
-        "website": {
-            "label": "Website der Firma",
-            "platform": "{domain} ist nicht die Website deiner Firma. Gib deine ein oder überspringe."
-        },
-        "industry": {
-            "label": "Branche",
-            "other": "Sonstiges",
-            "placeholder": "Bäckerei, Zahnarztpraxis, Fitnessstudio…"
-        },
-        "industries": {
-            "agencies": "Agenturen",
-            "ecommerce": "E-Commerce",
-            "saas": "SaaS",
-            "sales": "Vertrieb",
-            "recruiting": "Recruiting",
-            "real-estate": "Immobilien",
-            "legal": "Recht & Compliance",
-            "creators": "Creator",
-            "productivity": "Produktivität",
-            "other": "Sonstiges"
-        },
-        "role": {
-            "label": "Deine Rolle",
-            "placeholder": "Head of Growth"
-        },
-        "name": {
-            "label": "Vorname",
-            "placeholder": "Max"
-        },
-        "skip": "Überspringen",
-        "next": "Weiter",
-        "answerToContinue": "Beantworte diesen Schritt zuerst",
-        "saveFailed": "Speichern fehlgeschlagen. Versuch es noch mal."
-    },
     "gettingStarted": {
         "title": "Erste Schritte",
         "hide": "Ausblenden",

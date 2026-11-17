@@ -36,12 +36,12 @@ describe('oauthRetryCopy', () => {
     it('says the provider took too long when the state expired', () => {
         expect(oauthRetryCopy('bad_oauth_state', 'Google', t)).toEqual({
             title: "Let's try that again",
-            subtitle: 'Google took more than 5 minutes to send you back, so it expired. Your answers are kept.',
+            subtitle: 'Google took more than 5 minutes to send you back, so it expired.',
         })
     })
 
     it('falls back on a neutral subject when the provider is unknown', () => {
-        expect(oauthRetryCopy('bad_oauth_state', null, t).subtitle).toBe('Signing in took more than 5 minutes, so it expired. Your answers are kept.')
+        expect(oauthRetryCopy('bad_oauth_state', null, t).subtitle).toBe('Signing in took more than 5 minutes, so it expired.')
     })
 
     it('tells a cancel from a failure', () => {

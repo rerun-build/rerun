@@ -7,8 +7,6 @@ import { cancelSubRunAction } from '@/app/api/_actions/agent.actions'
 import { readFileAction } from '@/app/api/_actions/file.actions'
 import { readWorkspaceFileAction } from '@/app/api/_actions/workspace-file.actions'
 import { foremanEngineFilesAction, readForemanFileAction } from '@/app/api/_actions/foreman-file.actions'
-import { decideIndustryAction, saveForemanIntakeAction } from '@/app/api/_actions/foreman-intake.actions'
-import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import type { ChatComposerHandle } from '@/components/chat/ChatComposer'
 import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { ArrivalHeader, type ArrivalPick } from '@/components/foreman/arrival/ArrivalHeader'
@@ -32,7 +30,6 @@ import { FLOAT_CORNER_CLASSES, FLOAT_SIZE_CLASSES, floatSizeStyle } from '@/comp
 import { useForemanDrag } from '@/components/foreman/useForemanDrag'
 import { useForemanChat } from '@/components/foreman/useForemanChat'
 import { useForemanDockFeed } from '@/components/foreman/useForemanDockFeed'
-import { useForemanIntake } from '@/components/foreman/intake/useForemanIntake'
 import { readPlan } from '@/components/foreman/widgets/plan-card'
 import { useForemanFunnelAnalytics } from '@/components/foreman/useForemanFunnelAnalytics'
 import { useForemanKickoff } from '@/components/foreman/useForemanKickoff'
@@ -55,14 +52,12 @@ import { lastShownPlan, lastShownStarterPlan, lastShownTemplatePlan } from '@/li
 import { agentFileRawUrl, foremanFileRawUrl, sharedFileRawUrl } from '@/lib/files/raw-url'
 import { type ForemanPlacement, dockedForemanSide } from '@/lib/foreman-layout'
 import { browserPermission } from '@/lib/notifications/browser'
-import { intakePreviewPlan, type ForemanIntake } from '@/lib/onboarding/intake'
 import { useHoldAppBoot } from '@/stores/app-boot.store'
 import { useBoardCoverStore } from '@/stores/board-cover.store'
 import { selectForemanInThread, useForemanStore } from '@/stores/foreman.store'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
-import { useOnboardingStore } from '@/stores/onboarding.store'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 import { useTranslations } from 'next-intl'
@@ -79,10 +74,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     // Le tunnel guidé n'affiche pas de tabs : un onglet resté ouvert avant ne doit pas y cacher le chat.
     // In the Simple view's middle the routines are in the panel beside the chat, not in a tab over it.
     const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided && !pinned
-    const intakeOpen = useForemanStore(state => state.intake)
-    const { isAnonymous, workspace, phoneStep } = useSession()
-    const pendingIntake = useOnboardingStore(state => state.pendingIntake)
-    const gated = isAnonymous && pendingIntake !== null && !intakeOpen
+    const { workspace, phoneStep } = useSession()
     const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
     useHoldAppBoot(open !== false && !guided && !restoreDone)
@@ -161,73 +153,26 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
         composerRef.current?.restore(text)
         composerRef.current?.focus()
     }, [])
-    // Un nouvel arrivant n'a rien à taper : le Foreman ouvre sa colonne et parle le premier. Sauf en
-    // découverte, où c'est la carte d'accueil qui tient l'écran et `start` qui attend qu'elle ait
-    // fini.
-    const { start, firstName, arrival, prompted } = useForemanKickoff({ send, messageCount: messages.length, restoreDone })
+    // Un nouvel arrivant n'a rien à taper : le Foreman ouvre sa colonne et parle le premier.
+    const { arrival } = useForemanKickoff({ send, messageCount: messages.length, restoreDone })
 
-    // La carte écrit le profil elle-même, donc quand elle rend la main la phase est déjà `plan` : le
-    // kickoff fait monter le starter pack de leur industrie, sans un tour de modèle. Arrivé sur un
-    // template ou un partage, c'est la carte du lien qui monte à sa place.
-    //
-    // Un anonyme n'écrit rien : ses réponses sont parquées, la carte se ferme et c'est un bouton de
-    // création de compte qui prend la place du composer. Le kickoff les écrit une fois le compte créé.
-    const intakeHandlers = useMemo(
-        () => ({
-            onDecideIndustry: (input: string) => decideIndustryAction(input),
-            onAnalyzeSite: (url: string) => void streamLiveDiscoveries(url).then(ok => track('onboarding_company_analyzed', { ok })),
-            onSubmit: async (intake: ForemanIntake, ownAsk?: string) => {
-                const industry = intake.industry ?? intake.decidedIndustry
-                track('onboarding_website_submitted', industry ? { provided: !!intake.companyUrl, industry } : { provided: !!intake.companyUrl })
-                track('onboarding_step_completed', { step: 'discover' })
-                if (isAnonymous) {
-                    useOnboardingStore.getState().setPendingIntake(intake, ownAsk)
-                    useForemanStore.getState().closeIntake()
-                    return
-                }
-                // The full read of the site can file them under another industry than the one the
-                // board has been drawing, and the plan lays out the Boxes of the stored one.
-                const saved = await saveForemanIntakeAction(intake).catch(err => {
-                    // The composer already let go of the line: it goes back where they wrote it.
-                    if (ownAsk) composerRef.current?.restore(ownAsk)
-                    throw err
-                })
-                useForemanStore.getState().setIntakePreview(intakePreviewPlan(saved.industry))
-                useForemanStore.getState().closeIntake()
-                track('onboarding_step_viewed', { step: 'plan' })
-                // A line written under the card is the plan: the funnel counts it off the kickoff that
-                // carries it (useForemanFunnelAnalytics), as it counts a line written over the pack.
-                start(ownAsk)
-            },
-        }),
-        [isAnonymous, start]
-    )
-    const intake = useForemanIntake({ firstName, handlers: intakeHandlers })
-
-    // Le composer reste sous la carte d'accueil et sous le starter pack : ce qui s'y écrit est le
-    // coworker qu'ils veulent. Sous la carte il coupe court aux questions, sous le pack il y répond
-    // comme une carte choisie. Pas sous la carte d'un lien : ils sont venus pour ce qu'il installe.
-    // Ni sous celle d'un prompt écrit sur la landing : ils l'ont déjà dit, la ligne l'écraserait.
+    // Le composer reste sous le starter pack : ce qui s'y écrit est le coworker qu'ils veulent, et il
+    // y répond comme une carte choisie.
     const packPending = pendingWidget?.toolName === SHOW_STARTER_PACK_TOOL ? pendingWidget : null
-    const ownEntry = (intakeOpen && !arrival && !prompted) || !!packPending
+    const ownEntry = !!packPending
     const sendFromComposer = useCallback(
         (text: string) => {
-            if (intakeOpen) {
-                // The field is already empty when a line is refused (a first one still saving).
-                if (!intake.sendOwn(text)) composerRef.current?.restore(text)
-                return
-            }
             if (packPending) return answerWidget(packPending.toolName, packPending.toolCallId, { answered: true, custom: text.trim() })
             sendOrQueue(text)
         },
-        [intakeOpen, intake, packPending, answerWidget, sendOrQueue]
+        [packPending, answerWidget, sendOrQueue]
     )
 
     // Arrived on a template or a shared coworker: until it is installed the column is its tunnel.
     // The account and the phone code take the whole of it, the rest is the conversation itself,
     // where the trial, the purchase and the build already live.
-    const arrivalStep = guided && arrival && !arrival.installed ? arrivalStepOf({ isAnonymous, phonePending: phoneStep === 'pending', messages }) : null
-    const arrivalWall = arrivalStep === 'account' || arrivalStep === 'phone' ? arrivalStep : null
+    const arrivalStep = guided && arrival && !arrival.installed ? arrivalStepOf({ phonePending: phoneStep === 'pending', messages }) : null
+    const arrivalWall = arrivalStep === 'phone'
     const linkTemplate = useTemplateFlowStore(state => state.linkTemplate)
     const arrivalPick = useMemo<ArrivalPick | null>(() => {
         if (!arrival) return null
@@ -515,7 +460,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                     {arrivalStep && arrivalPick && (
                         <div className={cn('flex flex-col gap-6 px-5 pt-14', arrivalWall ? 'min-h-0 flex-1 overflow-y-auto pb-5' : 'shrink-0')}>
                             <ArrivalHeader pick={arrivalPick} step={arrivalStep} paid={!!arrival?.paid || arrivalStep === 'purchase'} />
-                            {arrivalWall && <ArrivalWall step={arrivalWall} />}
+                            {arrivalWall && <ArrivalWall />}
                         </div>
                     )}
                     <div className={onRoutines || arrivalWall ? 'hidden' : 'contents'}>
@@ -526,9 +471,6 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                                 messages={messages}
                                 streaming={busy}
                                 guided={guided}
-                                intake={intakeOpen ? intake : null}
-                                gated={gated}
-                                arrival={arrival}
                                 restored={restoreDone}
                                 error={noticeError}
                                 onWidgetAnswer={answerWidget}
@@ -557,8 +499,6 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             ref={setSlotEl}
                             framed={pinned}
                             placeholder={framedPlaceholder}
-                            intake={intakeOpen ? intake : null}
-                            gated={gated}
                             trialGate={trialGate}
                             aside={!!pendingWidget && !keepsComposer(pendingWidget)}
                             ownEntry={ownEntry}

@@ -43,8 +43,8 @@ export function PhoneSignIn({
         if (!result.ok) throw new Error(errorText(result))
         track('phone_verification_completed', { channel: request.channel, context: 'sign_in' })
         // The server opened the session in the cookies, but an in-app browser may not show them to
-        // the page yet: reading them back found the anonymous visitor and wrote it over the account.
-        // The tokens handed back are stored as they are, and announced to everything listening.
+        // the page yet: the tokens handed back are stored as they are, and announced to everything
+        // listening.
         const { error } = await createClient().auth.setSession({ access_token: result.session.accessToken, refresh_token: result.session.refreshToken })
         if (error) throw new Error(t('errors.sessionFailed'))
         // SessionProvider reads it back to emit account_created, as it does for the other methods.

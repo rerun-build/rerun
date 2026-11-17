@@ -82,7 +82,6 @@ export type SessionContextValue = {
     boxScope: BoxScope | null
     workspaces: Workspace[]
     session: Session | null
-    isAnonymous: boolean
     phoneStep: PhoneStep
     // `null` until it is read, like `unknown` for the wall.
     phoneStatus: PhoneStatus | null
@@ -123,13 +122,10 @@ export function SessionProvider({ children }: PropsWithChildren) {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((event, session) => {
-            // Signing into an existing account swaps the account under the app: the `users` row and
-            // the workspace still in hand belong to the anonymous visitor being left behind, and the
-            // fetch that replaces them is asynchronous. Dropping them here, loading flags included,
-            // is what keeps everything reading the session from deciding on that stale identity in
-            // between: an empty workspace whose onboarding was never completed, which is what
-            // replayed the survey to someone who had done it long ago. An in-place upgrade (email
-            // sign-up, Google identity linking) keeps the same id and is left untouched.
+            // Signing into another account swaps the account under the app: the `users` row and the
+            // workspace still in hand belong to the one being left behind, and the fetch that
+            // replaces them is asynchronous. Dropping them here, loading flags included, is what
+            // keeps everything reading the session from deciding on that stale identity in between.
             const nextUserId = session?.user?.id ?? null
             const switchedAccount = event !== 'INITIAL_SESSION' && event !== 'SIGNED_OUT' && nextUserId !== sessionUserId.current
             sessionUserId.current = nextUserId
@@ -282,12 +278,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
     // The intent cookie says an account is about to be born: every sign-in path that can land on an
     // account already signed up leaves it out, or has it cleared (`/auth/callback` for Google). It is
-    // emitted once `signed_up_at` reaches this row through realtime, the server stamping it the moment
-    // an account stops being anonymous. The freshness window only guards against a forgotten cookie.
+    // emitted once `signed_up_at` reaches this row, the server stamping it the moment the account is
+    // provisioned. The freshness window only guards against a forgotten cookie.
     const signedUpAt = user?.id === session?.user?.id ? user?.signed_up_at : null
     useEffect(() => {
         const authUser = session?.user
-        if (!authUser || authUser.is_anonymous || !signedUpAt) return
+        if (!authUser || !signedUpAt) return
         if (getCookie('rr_signup_at')) return
         const method = getCookie(SIGNUP_INTENT_COOKIE) as SignupMethod | undefined
         if (!method) return
@@ -301,14 +297,13 @@ export function SessionProvider({ children }: PropsWithChildren) {
         reportAffiliateSignup({ email: authUser.email, externalUserId: authUser.id })
         setSharedCookie('rr_signup_at', String(Date.now()))
         deleteSharedCookie(SIGNUP_INTENT_COOKIE)
-    }, [session?.user?.id, session?.user?.is_anonymous, signedUpAt])
+    }, [session?.user?.id, signedUpAt])
 
-    const accountId = session?.user && !session.user.is_anonymous ? session.user.id : null
+    const accountId = session?.user?.id ?? null
 
-    // An anonymous visitor who just signed up keeps their id: the row in hand is theirs, read before
-    // the server stamped it. The stamp normally comes back through realtime, or through the signup
-    // form's own refresh; this keeps asking in case neither arrives, which a mobile webview whose
-    // socket had just reconnected once managed, leaving the tab without a wall nor a foreman.
+    // A row read before the server stamped the signup keeps being asked for the stamp: it normally
+    // comes back through realtime, and this covers a socket that missed it, which a mobile webview
+    // that had just reconnected once managed, leaving the tab without a wall nor a foreman.
     useEffect(() => {
         if (!accountId || user?.id !== accountId || user.signed_up_at) return
         const controller = new AbortController()
@@ -396,8 +391,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
         setUserLoading(false)
     }
 
-    // The tab's pin stands only while the account still belongs to it: one left behind by an
-    // anonymous visit or a removal falls back on the stored workspace. Checked on the membership,
+    // The tab's pin stands only while the account still belongs to it: one left behind by another
+    // account in this browser or a removal falls back on the stored workspace. Checked on the membership,
     // since every workspace row is readable. A workspace named in the URL comes first: it is the
     // landing of a flow that just moved the account (an accepted invitation, a creator's sandbox).
     async function resolveTabWorkspace(row: User): Promise<number> {
@@ -432,14 +427,14 @@ export function SessionProvider({ children }: PropsWithChildren) {
         setWorkspaces(data ?? [])
     }
 
-    usePresenceHeartbeat(!!user?.id && !session?.user?.is_anonymous)
+    usePresenceHeartbeat(!!user?.id)
 
     const signOut = async () => {
         await supabase.auth.signOut()
         router.push(routes.auth)
     }
 
-    return <SessionContext.Provider value={{ user, workspace, workspaceAnswers, role, boxScope, workspaces, session, isAnonymous: session?.user?.is_anonymous ?? false, phoneStep, phoneStatus, refreshPhoneStep, loading: userLoading || workspaceLoading, signOut, refreshWorkspace: fetchWorkspace, refreshUser: fetchUser }}>{children}</SessionContext.Provider>
+    return <SessionContext.Provider value={{ user, workspace, workspaceAnswers, role, boxScope, workspaces, session, phoneStep, phoneStatus, refreshPhoneStep, loading: userLoading || workspaceLoading, signOut, refreshWorkspace: fetchWorkspace, refreshUser: fetchUser }}>{children}</SessionContext.Provider>
 }
 
 // For the render labs, which draw session-bound components with no signed-in user behind them.

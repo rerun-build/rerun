@@ -250,20 +250,6 @@
             }
         }
     },
-    "auth": {
-        "welcome": {
-            "title": "Welcome to Rerun",
-            "subtitle": "Create your account to start building your coworker team."
-        },
-        "build": {
-            "title": "Your team is ready to be built",
-            "subtitle": "Create your account and the Chief of Staff starts building it right away."
-        },
-        "signin": {
-            "title": "Welcome",
-            "subtitle": "Sign in or create your account to get started."
-        }
-    },
     "phoneVerification": {
         "title": "One last step",
         "subtitle": "Add your phone number."
@@ -418,9 +404,7 @@
         "title": "Add this coworker",
         "description": "Review what this coworker does, then place it on your board.",
         "sentBy": "{name} sent you a copy of this coworker. It will run on your own Box.",
-        "sentBySomeone": "Someone sent you a copy of this coworker. It will run on your own Box.",
-        "signUp": "Sign up to add this coworker",
-        "waiting": "It will be waiting for you right after."
+        "sentBySomeone": "Someone sent you a copy of this coworker. It will run on your own Box."
     },
     "templateDeepLink": {
         "unavailable": "This template link is no longer available",

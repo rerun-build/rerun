@@ -1,25 +1,20 @@
 'use client'
 
-import { AuthDialog } from '@/components/dialogs/AuthDialog'
 import { ChromePill } from '@rerun/ui/chrome'
 import { LogInIcon } from '@/lib/icons'
+import { routes } from '@/lib/routes'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
-// Sign-in entry for an anonymous visitor: on the board, in place of the workspace pill, and on the
-// pages that sit outside the app shell. The caller places it.
+// The way to the sign-in from a page a visitor may open without an account (an unsubscribe link).
 export function SignInPillButton() {
     const t = useTranslations('layout')
-    const [open, setOpen] = useState(false)
+    const router = useRouter()
 
     return (
-        <>
-            <ChromePill start="icon" onClick={() => setOpen(true)}>
-                <LogInIcon className="size-4 text-muted-foreground shrink-0" />
-                {t('signIn')}
-            </ChromePill>
-
-            <AuthDialog variant="signin" open={open} onOpenChange={setOpen} />
-        </>
+        <ChromePill start="icon" onClick={() => router.push(routes.auth)}>
+            <LogInIcon className="size-4 text-muted-foreground shrink-0" />
+            {t('signIn')}
+        </ChromePill>
     )
 }

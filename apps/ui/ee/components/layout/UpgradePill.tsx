@@ -24,7 +24,7 @@ function trialDaysLeftLabel(t: ReturnType<typeof useTranslations<'billing'>>, tr
  */
 export function UpgradePill() {
     const t = useTranslations('billing')
-    const { workspace, isAnonymous } = useSession()
+    const { workspace } = useSession()
     const status = workspace?.subscription_status ?? null
     const trialEndsAt = status === 'trialing' ? (workspace?.trial_ends_at ?? null) : null
     const [now, setNow] = useState(() => Date.now())
@@ -35,7 +35,7 @@ export function UpgradePill() {
         return () => clearInterval(id)
     }, [trialEndsAt])
 
-    if (!workspace || isAnonymous || workspace.is_sandbox || status === 'active') return null
+    if (!workspace || workspace.is_sandbox || status === 'active') return null
 
     const pastDue = status === 'past_due'
     const daysLeft = trialEndsAt ? trialDaysLeftLabel(t, trialEndsAt, now) : null

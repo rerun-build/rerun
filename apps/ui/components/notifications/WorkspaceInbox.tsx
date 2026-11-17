@@ -22,7 +22,6 @@ import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
-import { useSession } from '@/supabase/session/SessionProvider'
 
 // A `done` row is one finished conversation, or every unseen run of one scheduled task, so it
 // carries the sessions it stands for.
@@ -41,7 +40,6 @@ type View = null | 'hub' | { notification: AnnouncedNotification } | { peek: Pee
 export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' }) {
     const t = useTranslations('notifications.inbox')
     const tReasons = useTranslations('notifications.inbox.reasons')
-    const { isAnonymous } = useSession()
     const onEngine = useForemanStore(state => state.surface === 'engine')
     const agents = useBoardStore(s => s.agents)
     const hydrated = useBoardStore(s => s.hydrated)
@@ -80,7 +78,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
         return [...attention, ...done]
     }, [sessions, agents, unseen])
 
-    const shown = !isAnonymous && onEngine
+    const shown = onEngine
     useTabSignals(shown ? items.reduce((sum, item) => sum + (item.count ?? 1), 0) : 0)
 
     const running = useMemo(() => {

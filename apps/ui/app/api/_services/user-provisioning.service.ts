@@ -8,7 +8,7 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { DEFAULT_LOCALE, type Locale } from '@rerun/i18n'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 
-// Just-in-time provisioning: the first time an authenticated user (real or anonymous) is seen, seed
+// Just-in-time provisioning: the first time an authenticated user is seen, seed
 // their workspace, user row and owner membership. The request client only reads the users row;
 // every write goes through the service role, so the browser holds no write on public.users at all
 // (an INSERT it could make would let it plant its row on any workspace before this ran). The `id`
@@ -74,7 +74,7 @@ export async function provisionUser(
         id: user.id,
         workspace_id: workspace.id,
         email_notification_prefs: DEFAULT_NOTIFICATION_PREFS as unknown as Json,
-        signed_up_at: user.is_anonymous ? null : new Date().toISOString(),
+        signed_up_at: new Date().toISOString(),
     })
 
     // The workspace is worthless without the user it was seeded for, and a failure that repeats on
@@ -92,13 +92,10 @@ export async function provisionUser(
     })
     if (membershipError) console.error('Error creating membership', membershipError)
 
-    // An account created already signed in, a Google sign-up rather than an anonymous visit that
-    // was upgraded, never passes through stampSignup: its allowance is granted here.
-    if (!user.is_anonymous) {
-        await grantRerunTopup(workspace.id, SIGNUP_BUDGET_MICROS)
-        if (phoneStep) await requirePhone(user.id)
-    }
-    return { signedUp: !user.is_anonymous }
+    // An account is born signed up: its allowance and its phone step come with it.
+    await grantRerunTopup(workspace.id, SIGNUP_BUDGET_MICROS)
+    if (phoneStep) await requirePhone(user.id)
+    return { signedUp: true }
 }
 
 // Only ever called at the birth of an account, so an older one never gets a row and is never asked.
@@ -110,15 +107,12 @@ async function requirePhone(userId: string) {
     if (error) console.error('Error requiring the phone step', error)
 }
 
-// An anonymous visitor is provisioned a users row on their first page view and the account dialog
-// then upgrades that same auth user in place, so `created_at` says when they first landed, not when
-// they signed up. This is the one place both facts are in hand at once, on a query the middleware
-// keeps running until the stamp is down: the write happens once in an account's life, and a missed
-// one is picked up on the next request. Written with the service role so the column, which decides
+// A row left without its stamp, by an account that was an anonymous visitor once and signed up in
+// place (the app made those until 17/11/2026), is stamped on its next request: the write happens once
+// in an account's life, and a missed one is picked up on the next request. Written with the service role so the column, which decides
 // who gets a lifecycle email and when, stays out of reach of the browser. Answers whether the column
 // is set once it is done.
 async function stampSignup(user: User, signedUpAt: string | null, workspaceId: number, phoneStep: boolean): Promise<boolean> {
-    if (user.is_anonymous) return false
     if (signedUpAt) return true
     // Before the stamp, not after: the browser reads the phone row the moment the stamp reaches it
     // through realtime, and a row written later would be missed. Harmless to repeat.
@@ -134,8 +128,7 @@ async function stampSignup(user: User, signedUpAt: string | null, workspaceId: n
         .select('id')
     if (error) return false
     if (!stamped?.length) return true
-    // Same write, same one-shot guard: the allowance is granted exactly when an account stops being
-    // anonymous, which is also when the foreman starts talking to it.
+    // Same write, same one-shot guard: the allowance is granted exactly once.
     await grantRerunTopup(workspaceId, SIGNUP_BUDGET_MICROS)
     return true
 }

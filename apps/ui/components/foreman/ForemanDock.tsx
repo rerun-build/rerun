@@ -62,7 +62,7 @@ export function ForemanDock() {
     const [dragging, setDragging] = useState(false)
     const assistantReady = useForemanStore(state => selectForemanVisible(state) && state.funnel === 'companion')
     const centerOpen = useControlCenterStore(state => state.open)
-    const { workspace, isAnonymous } = useSession()
+    const { workspace } = useSession()
     const mod = useModKeyLabel()
     const t = useTranslations('foreman.dock')
 
@@ -112,7 +112,7 @@ export function ForemanDock() {
     // The pill is the Foreman's composer while its column is closed: what is typed or said in it
     // leaves from here, the run shows in it and the answer above it. The control center anchors to
     // the ball and a drag carries it away, so the pill steps aside for both without going away.
-    const pillAvailable = isMobile === false && tooNarrow === false && assistantReady && !!workspace && !isAnonymous && !open
+    const pillAvailable = isMobile === false && tooNarrow === false && assistantReady && !!workspace && !open
     const pillVisible = pillAvailable && !centerOpen && !dragging
     const setPillAvailable = useForemanStore(state => state.setPillAvailable)
     useEffect(() => {
@@ -185,7 +185,7 @@ export function ForemanDock() {
 
     // What the control center itself asks for before it anchors to the orb, minus the phone, which
     // has no ⌘F to announce.
-    const announcesShortcut = !isMobile && assistantReady && !!workspace && !isAnonymous && !open && !centerOpen && !dragging
+    const announcesShortcut = !isMobile && assistantReady && !!workspace && !open && !centerOpen && !dragging
 
     const handleDragEnd = (_event: PointerEvent | MouseEvent | TouchEvent, info: { point: { x: number; y: number } }) => {
         setDragging(false)

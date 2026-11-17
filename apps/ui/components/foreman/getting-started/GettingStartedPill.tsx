@@ -20,9 +20,9 @@ import { useSession } from '@/supabase/session/SessionProvider'
  */
 export function GettingStartedPill() {
     const t = useTranslations('foreman.gettingStarted.prompts')
-    const { isAnonymous, workspace } = useSession()
+    const { workspace } = useSession()
     const companion = useForemanStore(state => state.funnel === 'companion' && state.surface === 'engine')
-    const enabled = companion && !isAnonymous && !workspace?.is_sandbox
+    const enabled = companion && !workspace?.is_sandbox
 
     const [open, setOpen] = useState(false)
     const [pulse, setPulse] = useState(0)

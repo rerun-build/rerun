@@ -129,7 +129,7 @@ function sub(fields: Record<string, unknown> & { items?: ItemSpec[] } = {}): Str
 beforeEach(() => {
     vi.resetAllMocks()
     m.requireWorkspaceId.mockResolvedValue(WORKSPACE_ID)
-    m.getServerSession.mockResolvedValue({ session: { email: 'a@b.co' }, isAnonymous: false })
+    m.getServerSession.mockResolvedValue({ session: { email: 'a@b.co' } })
     m.getAppOrigin.mockResolvedValue('https://app.test')
     m.affiliateReferralMetadata.mockResolvedValue({})
     m.resolveEngineWaitlist.mockResolvedValue(false)
@@ -504,7 +504,7 @@ describe('startCardlessTrial', () => {
     })
 
     it('refuses an anonymous session without reading the workspace', async () => {
-        m.getServerSession.mockResolvedValue({ session: { email: null }, isAnonymous: true })
+        m.getServerSession.mockResolvedValue({ session: { email: null, is_anonymous: true } })
         await expect(startCardlessTrial()).resolves.toBe(false)
         expect(m.requireWorkspaceId).not.toHaveBeenCalled()
     })
@@ -1128,7 +1128,7 @@ describe('createPlanCheckoutSession', () => {
 
     it('lends the placeholder of a phone account to a customer without an email', async () => {
         useDb({ row: FRESH_WORKSPACE })
-        m.getServerSession.mockResolvedValue({ session: { email: '393480000000@phone.rerun.build' }, isAnonymous: false })
+        m.getServerSession.mockResolvedValue({ session: { email: '393480000000@phone.rerun.build' } })
         vi.mocked(stripe.customers.retrieve).mockResolvedValue({ email: null } as never)
         await createPlanCheckoutSession(BASE_SELECTION)
         expect(stripe.customers.update).toHaveBeenCalledWith('cus_1', { email: '393480000000@phone.rerun.build' })
@@ -1545,7 +1545,7 @@ describe('createPlanCardSetupSession', () => {
 describe('createPlanCardSetupSession for a phone account', () => {
     it('lends its placeholder to a customer without an email', async () => {
         useDb({ row: { stripe_subscription_id: 'sub_1', subscription_status: 'trialing' } })
-        m.getServerSession.mockResolvedValue({ session: { email: '393480000000@phone.rerun.build' }, isAnonymous: false })
+        m.getServerSession.mockResolvedValue({ session: { email: '393480000000@phone.rerun.build' } })
         vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(sub({ status: 'trialing' }) as never)
         vi.mocked(stripe.checkout.sessions.create).mockResolvedValue({ id: 'cs_s', client_secret: 'secret_s' } as never)
         vi.mocked(stripe.customers.retrieve).mockResolvedValue({ email: null } as never)

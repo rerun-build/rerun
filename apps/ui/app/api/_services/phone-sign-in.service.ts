@@ -111,15 +111,10 @@ async function accountEmailFor(admin: SupabaseClient<Database>, phone: string): 
 
 type CreatedAccount = { email: string; adopted: boolean }
 
-// A number no account holds yet becomes one. The anonymous visitor who typed it keeps their id, so
-// the workspace and the draft they built stay theirs; with no visitor behind the request the
-// account is created outright. Either way it is filed under the number's placeholder address.
-async function createAccount(admin: SupabaseClient<Database>, session: SupabaseClient<Database>, phone: string): Promise<CreatedAccount | null> {
+// A number no account holds yet becomes one, filed under the number's placeholder address.
+async function createAccount(admin: SupabaseClient<Database>, phone: string): Promise<CreatedAccount | null> {
     const email = placeholderEmailFor(phone)
-    const { data: current } = await session.auth.getUser()
-    const visitor = current.user?.is_anonymous ? current.user : null
-
-    const { data, error } = visitor ? await admin.auth.admin.updateUserById(visitor.id, { email, email_confirm: true }) : await admin.auth.admin.createUser({ email, email_confirm: true })
+    const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true })
     // The address is the number's own, so one that is taken is this number's account: left without
     // its phone row by an earlier attempt that failed halfway, or planted through the public signup
     // by someone who guessed the address. The number was just proved, so it is adopted either way.
@@ -164,8 +159,7 @@ async function writeVerifiedPhone(admin: SupabaseClient<Database>, userId: strin
 }
 
 // The token is spent by the request's own client, which sets the session cookies. Its tokens are
-// handed back as well: a browser that cannot read those cookies yet (an in-app browser) would
-// otherwise put its anonymous session back on top of them.
+// handed back as well, for a browser that cannot read those cookies yet (an in-app browser).
 async function openSession(session: SupabaseClient<Database>, tokenHash: string): Promise<SessionTokens | null> {
     const { data, error } = await session.auth.verifyOtp({ token_hash: tokenHash, type: 'magiclink' })
     if (error || !data.session) {
@@ -202,7 +196,7 @@ async function signInWithNumber(session: SupabaseClient<Database>, phone: string
     const account = await accountEmailFor(admin, phone)
     if (!account) return refused('unavailable')
 
-    const created = account.email ? null : await createAccount(admin, session, phone)
+    const created = account.email ? null : await createAccount(admin, phone)
     const email = account.email ?? created?.email ?? null
     const token = email ? await mintSignInToken(admin, email) : null
     if (!token) return refused('unavailable')

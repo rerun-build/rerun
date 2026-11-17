@@ -227,8 +227,8 @@ async function basePlanCheckoutParams(): Promise<{ params: Omit<Stripe.Checkout.
 // throwing: the caller falls back on the card checkout, which knows how to bill a spent trial.
 // The app sells nothing and has no card checkout to fall back on, so a trial it starts skips the arm.
 export async function startCardlessTrial(client: ForemanClient = 'web'): Promise<boolean> {
-    const { session, isAnonymous } = await getServerSession()
-    if (!session || isAnonymous) return false
+    const { session } = await getServerSession()
+    if (!session || session.is_anonymous) return false
 
     const workspaceId = await requireWorkspaceId()
     const supabase = createServiceRoleClient()

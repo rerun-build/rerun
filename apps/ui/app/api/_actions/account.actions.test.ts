@@ -12,14 +12,14 @@ const ACCOUNT = { id: 'user-1', email: 'ada@rerun.build' }
 
 beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getServerSession.mockResolvedValue({ session: ACCOUNT, isAnonymous: false })
+    mocks.getServerSession.mockResolvedValue({ session: ACCOUNT })
     mocks.anonymizeAccount.mockResolvedValue({ ok: true })
     mocks.accountDeletionBlockers.mockResolvedValue([])
 })
 
 describe('deleteMyAccountAction', () => {
     it('refuses an anonymous visitor', async () => {
-        mocks.getServerSession.mockResolvedValue({ session: { id: 'anon' }, isAnonymous: true })
+        mocks.getServerSession.mockResolvedValue({ session: { id: 'anon', is_anonymous: true } })
 
         await expect(deleteMyAccountAction({ confirmation: 'DELETE' })).resolves.toMatchObject({ ok: false })
         expect(mocks.anonymizeAccount).not.toHaveBeenCalled()

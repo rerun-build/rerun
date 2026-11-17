@@ -206,19 +206,6 @@ describe('completePhoneSignIn', () => {
         expect(admin.generateLink).toHaveBeenCalledWith({ type: 'magiclink', email: PLACEHOLDER })
     })
 
-    it('upgrades the anonymous visitor in place, so their workspace stays theirs', async () => {
-        stored({})
-        getUser.mockResolvedValue({ data: { user: { id: 'visitor-1', is_anonymous: true } } })
-        admin.updateUserById.mockResolvedValue({ data: { user: { id: 'visitor-1' } }, error: null })
-        admin.generateLink.mockResolvedValue(linkFor('visitor-1'))
-
-        expect(await completePhoneSignIn(session, PHONE, '123456', 'sms')).toEqual({ ok: true, created: true, session: TOKENS })
-
-        expect(admin.updateUserById).toHaveBeenCalledWith('visitor-1', { email: PLACEHOLDER, email_confirm: true })
-        expect(admin.createUser).not.toHaveBeenCalled()
-        expect(supabase.writes('user_phones')[0].payload).toMatchObject({ user_id: 'visitor-1', phone: PHONE })
-    })
-
     it('signs into an account left without its phone row by an attempt that failed halfway', async () => {
         stored({})
         admin.createUser.mockResolvedValue({ data: { user: null }, error: { code: 'email_exists', message: 'taken' } })

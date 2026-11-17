@@ -23,8 +23,7 @@ function Divider({ children }: { children: ReactNode }) {
 export type PhoneSurroundings = { beforePhone?: ReactNode; afterPhone?: ReactNode; phoneLastUsed?: boolean }
 
 // The ways into an account, one form at a time with the others a tap away. The forms belong to the
-// caller, which knows whether it signs in or upgrades an anonymous visitor: each is handed the
-// other ways in to draw beside its own field. The number leads everywhere: alone at the top on a
+// caller: each is handed the other ways in to draw beside its own field. The number leads everywhere: alone at the top on a
 // phone, where an in-app browser refuses Google, and under the providers on a computer.
 export function AuthMethods({
     initialMethod = 'phone',
