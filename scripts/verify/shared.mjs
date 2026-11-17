@@ -3,7 +3,7 @@
 // page is watched and judged settled.
 
 import { execFileSync, spawn } from 'node:child_process'
-import { createWriteStream, existsSync, readFileSync } from 'node:fs'
+import { createWriteStream, existsSync, readFileSync, readlinkSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -66,11 +66,16 @@ export function listeningPid(port) {
     try {
         return execFileSync('lsof', ['-nP', '-t', `-iTCP:${port}`, '-sTCP:LISTEN'], { encoding: 'utf8' }).trim().split('\n')[0] || null
     } catch {
-        return null
+        try {
+            return execFileSync('ss', ['-ltnpH', `sport = :${port}`], { encoding: 'utf8' }).match(/pid=(\d+)/)?.[1] ?? null
+        } catch {
+            return null
+        }
     }
 }
 
 export function processCwd(pid) {
+    if (existsSync(`/proc/${pid}/cwd`)) return readlinkSync(`/proc/${pid}/cwd`)
     const out = execFileSync('lsof', ['-a', '-p', pid, '-d', 'cwd', '-Fn'], { encoding: 'utf8' })
     return out.split('\n').find((line) => line.startsWith('n'))?.slice(1) ?? ''
 }
