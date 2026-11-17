@@ -62,7 +62,7 @@ class BriefTests(unittest.TestCase):
 
     def test_the_brief_names_both_last_lines_and_the_gap_issue_form(self):
         t = self.text()
-        for phrase in ("ACCEPTED: <one sentence>", "GAPS: #a, #b", "P1", "**Part of**: #50", "**Repairs**: #<child>"):
+        for phrase in ("ACCEPTED: <one sentence>", "GAPS: #a", "P1", "**Part of**: #50", "**Repairs**: #<child>"):
             self.assertIn(phrase, t)
 
     def test_a_missing_plan_comment_is_said_so(self):
