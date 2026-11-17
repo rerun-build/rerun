@@ -128,18 +128,22 @@ export function agentMcpSpawn(agent: Pick<LoadedAgent, 'id' | 'env' | 'config' |
     return { cwd, env: childProcessEnv(env) }
 }
 
-// For the providers the engine drives itself: the agent's MCP tools, served by the pooled connections.
-export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
+// The agent's MCP servers that answered, on the pooled connections, in the order it declares them.
+export async function pooledMcpServers(agent: LoadedAgent): Promise<PooledMcp[]> {
     const spawn = agentMcpSpawn(agent)
     const prepared = await Promise.all(agentMcpServers(agent).map(server => prepareMcpServer(agent.id, server, agent.env, agent.hubAgentId)))
     const pooled = await Promise.all(prepared.map(server => acquireMcp(agent.id, server, spawn)))
+    return pooled.filter(server => server !== null)
+}
+
+// For the providers the engine drives itself: the agent's MCP tools, served by the pooled connections.
+export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
     const tools: ToolSet = {}
-    for (const server of pooled)
-        if (server)
-            Object.assign(
-                tools,
-                mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args))
-            )
+    for (const server of await pooledMcpServers(agent))
+        Object.assign(
+            tools,
+            mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args))
+        )
     return tools
 }
 
