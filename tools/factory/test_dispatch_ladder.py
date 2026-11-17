@@ -4,7 +4,7 @@ import digest
 import dispatch as D
 import snapshot
 import store as ledger_store
-from test_dispatch import Base, ready, HEAD, wf
+from test_dispatch import ACCEPT, Base, ready, HEAD, wf
 from test_dispatch_proof import ProofBase
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -104,7 +104,7 @@ class Ladder(LadderBase):
         self.tick()
         self.w.finish("b1", "PUSHED: 2345678")
         self.tick(2)
-        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.w.finish("r1", ACCEPT)
         self.w.workflows[HEAD] = [wf("ci", "success")]
         self.tick(3)
         self.assertEqual(self.state(), "merged")
@@ -120,7 +120,7 @@ class ProofLadder(ProofBase):
         self.tick()
         self.w.finish("b1", "PUSHED: fix")
         self.tick(2)
-        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.w.finish("r1", ACCEPT)
         self.tick(2)
         self.tick()
         self.w.finish("r2", "PROOF: FAIL @abcdef1: 4")
