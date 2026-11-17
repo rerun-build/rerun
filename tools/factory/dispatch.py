@@ -15,6 +15,7 @@ import followups
 import gatefiles
 import holds
 import inboxsort
+import instructions
 import plancheck
 import planners
 import planning
@@ -409,6 +410,7 @@ class Dispatcher:
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
         self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
+        self.instructions = instructions.Station(cfg, self.store, account, gh, now, log)
         self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
@@ -473,7 +475,7 @@ class Dispatcher:
         return True
 
     def running(self):
-        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")] + self.resolver.running(self)
+        return [(j["agent"], j.get("copy")) for j in self.jobs() if j["state"] in RUNNING and j.get("agent")] + self.resolver.running(self) + self.instructions.running()
 
     def unresolved(self):
         return {j["agent"] for j in self.jobs() if j["state"] not in END and j.get("agent") and j.get("sending") and not j.get("run")}
@@ -1512,6 +1514,11 @@ class Dispatcher:
         except Exception as e:
             clean = False
             log("-", "acceptance: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.instructions.once(self.beats, self.running())
+        except Exception as e:
+            clean = False
+            log("-", "instructions: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
