@@ -1,4 +1,5 @@
 import json
+from gist import gist
 import re
 
 import clocks
@@ -41,7 +42,7 @@ KEY_LINE = re.compile(r"(?m)^Problem-Key: (.+?)\s*$")
 
 
 def safe(text):
-    return str(text).replace("@", "").replace("`", "'")[:200]
+    return gist(str(text).replace("@", "").replace("`", "'"), 200)
 
 
 def fenced(text):

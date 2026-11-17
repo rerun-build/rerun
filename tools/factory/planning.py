@@ -1,4 +1,5 @@
 import datetime
+from gist import gist
 import json
 import re
 
@@ -125,7 +126,7 @@ def outcome(out):
         return (None, "no CUT: or BLOCKED: last line")
     kind, rest = found[-1]
     if kind == "BLOCKED":
-        return ("BLOCKED", rest[:200])
+        return ("BLOCKED", gist(rest, 200))
     numbers = [int(n) for n in re.findall(r"\d+", rest)]
     if not numbers:
         return (None, "CUT: names no issue")
@@ -280,9 +281,9 @@ class Station:
             kind, rest = found[-1]
             if kind == "PLAN":
                 self.store.set("plan:%d" % n, "state", "planned")
-                self.store.set("plan:%d" % n, "why", rest[:200])
+                self.store.set("plan:%d" % n, "why", gist(rest, 200))
                 return
-            self.blocked(n, rest[:200])
+            self.blocked(n, gist(rest, 200))
             return
         kind, rest = outcome(got.get("output"))
         if kind == "CUT":
@@ -291,7 +292,7 @@ class Station:
             return
         if row.get("state") == "cutting" and kind == "BLOCKED" and rest.startswith("plan:") and row.get("retried") != "1":
             self.store.set("plan:%d" % n, "retried", "1")
-            self.store.set("plan:%d" % n, "why", ("BLOCKED: " + rest)[:200])
+            self.store.set("plan:%d" % n, "why", gist("BLOCKED: " + rest, 200))
             self.store.set("plan:%d" % n, "state", "replan")
             return
         self.blocked(n, rest)

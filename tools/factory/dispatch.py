@@ -13,6 +13,7 @@ import cutshape
 import digest
 import escapes
 import failures
+from gist import gist
 import followups
 import gatefiles
 import holds
@@ -84,7 +85,7 @@ def iso(t, ms=False):
 
 
 def last_line(text):
-    return ((str(text or "").strip().split("\n") or [""])[-1])[:200]
+    return gist((str(text or "").strip().split("\n") or [""])[-1], 200)
 
 
 def final_line(out, prefixes):
@@ -99,7 +100,7 @@ def final_line(out, prefixes):
 def blocked_reason(out):
     line = final_line(out, ("BLOCKED:",))
     if line:
-        return line[:200]
+        return gist(line, 200)
     rest = [l.strip() for l in str(out or "").split("\n") if l.strip() and not l.strip().startswith("Tools:")]
     return rest[-1][-200:] if rest else "no final line"
 
@@ -599,7 +600,7 @@ class Dispatcher:
             log(j["issue"], why)
             if j["state"] in END:
                 return
-            state, msg, kw = "blocked", "blocked: " + why[:180], {"reason": why[:200], "sending": None, "ended_at": ledger_store.now()}
+            state, msg, kw = "blocked", "blocked: " + gist(why, 180), {"reason": gist(why, 200), "sending": None, "ended_at": ledger_store.now()}
         old = j["state"]
         j.update(kw, state=state)
         self.save(j, msg, reset=True)
@@ -1121,7 +1122,7 @@ class Dispatcher:
 
     def not_met_reason(self, j, out):
         if j.get("not_met") and not final_line(out, ("BLOCKED:",)):
-            return j["not_met"][:200]
+            return gist(j["not_met"], 200)
         return blocked_reason(out)
 
     def start(self, j, agent, step, state, copy=1, **kw):
@@ -1205,9 +1206,9 @@ class Dispatcher:
             elif accept:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
             elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
-                self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + verdict[:300]])
+                self.to(j, "fix_wait", gist(verdict, 160), review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + gist(verdict, 300)])
             elif re.match(r"VERDICT:\s*REJECT", verdict) and not j.get("level"):
-                self.senior(j, "review rejected: " + verdict[:300], out[-1500:])
+                self.senior(j, "review rejected: " + gist(verdict, 300), out[-1500:])
             elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif stale:
@@ -1217,7 +1218,7 @@ class Dispatcher:
                 else:
                     self.to(j, "review_wait", why, verdict_asked=1)
             else:
-                self.end(j, "rejected", verdict[:200] or last_line(out))
+                self.end(j, "rejected", gist(verdict, 200) or last_line(out))
         elif st == "fix_wait":
             copy = self.free_copy_of(j["builder"], j)
             if copy is not None and self.take(j):
@@ -1249,7 +1250,7 @@ class Dispatcher:
                 self.to(j, "checks", "proved at %s" % j["head"][:7], proved=j["head"], checks_since=self.now())
             elif kind == "fail" and j["round"] == 1:
                 self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]),
-                        same_round=False, found=j.get("found", []) + ["proof failed: " + why[:300]])
+                        same_round=False, found=j.get("found", []) + ["proof failed: " + gist(why, 300)])
             elif kind == "none" and j.get("not_met") and not final_line(out, ("PROOF:",)):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif kind == "none":
@@ -1259,7 +1260,7 @@ class Dispatcher:
                 else:
                     self.to(j, "proof_wait", again, proof_asked=1, proof_why=why, proof_why_head=j["head"])
             elif kind == "fail" and not j.get("level"):
-                self.senior(j, "proof failed: " + why[:300], "The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
+                self.senior(j, "proof failed: " + gist(why, 300), "The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
             else:
                 self.end(j, "rejected", "proof: " + why[:190])
 
@@ -1390,7 +1391,7 @@ class Dispatcher:
                                   "A test that pins shipped behaviour is not edited to fit: where the failure says the change itself is wrong, end with BLOCKED."
                                   % (j["head"][:7], why, j["head"]))
         if verdict == "WAIT":
-            j["checks_why"] = why[:200]
+            j["checks_why"] = gist(why, 200)
             again = ciwait.cancelled_ids(runs)
             if again and j.get("rerun_head") != j["head"]:
                 j["rerun_head"] = j["head"]
