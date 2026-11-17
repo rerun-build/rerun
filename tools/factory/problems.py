@@ -32,7 +32,7 @@ class Watch:
             if j.get("checkout_failed") and (st not in states.END or (
                     str(j.get("ended_at") or "") >= since and open_issues is not None and n in open_issues)):
                 out["checkout failed #%d" % n] = j["checkout_failed"]
-            if st == "waiting" and j.get("dead"):
+            if st == "waiting" and any(d[1] not in states.PROBLEM for d in j.get("dead") or []):
                 out["dead #%d" % n] = j.get("wait_line") or "waits on dead dependencies"
             elif ended(j, since) and open_issues is not None and n in open_issues:
                 out["ended #%d" % n] = "job #%d ended %s: %s; pull request %s" % (

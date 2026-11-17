@@ -37,10 +37,8 @@ def gh_cli(args):
 
 
 def main(argv, gh=gh_cli):
-    pre, key = prefix(), os.environ.get("FACTORY_JEV_KEYFILE", "")
-    if not key:
-        print("REFUSED: FACTORY_JEV_KEYFILE is not set; nothing installed")
-        return 2
+    pre = prefix()
+    key = os.environ.get("FACTORY_JEV_KEYFILE") or os.path.join(pre, "jev.env")
     cur = current(pre)
     try:
         sha = refresh.target(gh, FULL, cur, read(skip_path()))

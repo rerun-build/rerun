@@ -29,8 +29,15 @@ class Find(unittest.TestCase):
         self.assertEqual(got, {"unreadable #5": "plan line: bad\nfiles: no **Files** heading"})
 
     def test_a_waiting_job_with_dead_dependencies_is_a_problem_with_its_wait_line(self):
-        jobs = [job(6, "waiting", dead=[[532, "rejected"]], wait_line="waits on dead #532 (rejected)"), job(7, "waiting")]
-        self.assertEqual(self.find(problems.Watch(), jobs), {"dead #6": "waits on dead #532 (rejected)"})
+        jobs = [job(6, "waiting", dead=[[532, "closed as not planned"]], wait_line="waits on dead #532 (closed as not planned)"), job(7, "waiting")]
+        self.assertEqual(self.find(problems.Watch(), jobs), {"dead #6": "waits on dead #532 (closed as not planned)"})
+
+    def test_a_job_that_waits_on_a_job_the_factory_ended_is_no_problem_of_its_own(self):
+        for state in ("rejected", "blocked", "returned", "failed", "unsolvable"):
+            jobs = [job(6, "waiting", dead=[[532, state]], wait_line="waits on dead #532 (%s)" % state)]
+            self.assertEqual(self.find(problems.Watch(), jobs), {}, state)
+        mixed = [job(6, "waiting", dead=[[532, "blocked"], [533, "not found"]], wait_line="waits on two")]
+        self.assertEqual(self.find(problems.Watch(), mixed), {"dead #6": "waits on two"})
 
     def test_a_job_that_ended_blocked_failed_or_rejected_on_an_open_issue_is_a_problem(self):
         jobs = [job(1, "blocked", reason="BLOCKED: plan: x", pr=40), job(2, "failed", reason="merge refused"),
