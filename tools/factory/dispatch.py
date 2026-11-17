@@ -6,6 +6,7 @@ import backlog
 import briefs
 import causes
 import ciwait
+import classify
 import clocks
 import control
 import cutshape
@@ -425,6 +426,7 @@ class Dispatcher:
         self.tiers_off = False
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
+        self.classifier = classify.Pass(cfg, self.store, gh, now)
         self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
         self.instructions = instructions.Station(cfg, self.store, account, gh, now, log)
         self.causes = causes.Station(cfg, self.store, account, gh, now, log)
@@ -1616,6 +1618,11 @@ class Dispatcher:
         except (Error, ValueError, KeyError) as e:
             clean = False
             log("-", "planning: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.classifier.once()
+        except Exception as e:
+            clean = False
+            log("-", "classify: %s" % (e if isinstance(e, Error) else type(e).__name__))
         try:
             self.close_stale()
         except Exception as e:

@@ -127,7 +127,7 @@ class World:
         p = self.problem(a)
         if a[:2] == ["issue", "edit"]:
             p["body"] = opt("--body") or p["body"]
-            p["labels"] = [x for x in p["labels"] if x != opt("--remove-label")] + ([opt("--add-label")] if opt("--add-label") else [])
+            p["labels"] = [x for x in p["labels"] if x != opt("--remove-label")] + (opt("--add-label").split(",") if opt("--add-label") else [])
         elif a[:2] == ["issue", "close"]:
             p["state"] = "CLOSED"
             p["comments"] += [opt("--comment")] if opt("--comment") else []
@@ -169,6 +169,9 @@ class World:
         if a[:2] == ["issue", "list"] and "--label" in a and a[a.index("--label") + 1] == "instructions":
             return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"]} for i in self.issues
                                if "instructions" in i.get("labels", []) and i.get("state", "OPEN") == "OPEN"])
+        if a[:2] == ["issue", "list"] and "number,title,body,labels" in a:
+            return json.dumps([{"number": p["number"], "title": p["title"], "body": p["body"], "labels": [{"name": x} for x in p["labels"]]}
+                               for p in self.problems if p["state"] == "OPEN"])
         if a[:2] == ["issue", "list"] and "--label" not in a and "--search" not in a and any(i.get("labels") for i in self.issues):
             return json.dumps([{"number": i["number"], "title": i["title"], "labels": i["labels"], "createdAt": i.get("createdAt", "")}
                                for i in self.issues if i.get("labels")])
