@@ -72,11 +72,12 @@ export async function emitRunTerminal(terminal: RunTerminal): Promise<void> {
     if (trigger.source === 'trigger') metadata.triggerSlug = trigger.slug
     // The routine's display name on its own, so the hub writes the notification in the reader's
     // language instead of parsing the English `message`, which stays for the hubs that still do.
-    if (trigger.source !== 'chat') metadata.sourceName = trigger.name
+    const routine = trigger.source === 'schedule' || trigger.source === 'trigger'
+    if (routine) metadata.sourceName = trigger.name
     // The hub titles an automated session after what its run did, from this answer: the routine's
     // name alone makes every run of it look the same in the list.
     const finalText = terminal.text?.trim()
-    if (trigger.source !== 'chat' && finalText) metadata.finalText = finalText.slice(0, FINAL_TEXT_MAX)
+    if (routine && finalText) metadata.finalText = finalText.slice(0, FINAL_TEXT_MAX)
     // Who sent the message, so the hub credits the run to that member rather than to the owner.
     if (trigger.source === 'chat' && trigger.author) metadata.authorId = trigger.author.id
     if (terminal.error) metadata.error = terminal.error
@@ -86,6 +87,7 @@ export async function emitRunTerminal(terminal: RunTerminal): Promise<void> {
     // preference silenced nothing and the errors arrived under the wrong switch. `chat` is not a
     // `session_source` on the hub side, and sending it would fail validation of the whole payload,
     // so an interactive run stays null.
-    const source = trigger.source === 'chat' ? null : trigger.source
+    // A run woken by the end of a job on a computer goes on a conversation someone had: it reads as one.
+    const source = routine ? trigger.source : null
     await sendNotification({ event, kind: terminal.kind, agentId: terminal.agentId, sessionId: terminal.sessionId, runId: terminal.runId, message, source, metadata }).catch(() => {})
 }

@@ -104,7 +104,8 @@
         "spend.notNow": "Button: decline this spend, without giving a reason.",
         "spend.receipt.ofTotal": "After a live counter of credits spent so far, e.g. \"37 / 141 credits\". {amount} is the approved estimate, already formatted.",
         "computerAccess.titleCommand": "Card where a coworker asks the person's approval before running a command on one of their own computers linked to Rerun. <computer> renders as #handle (e.g. #studio-pc); keep the tag.",
-        "receipt.computer.always": "{rule} is a program name (ffmpeg) or a folder path, kept as allowed from now on. <computer> renders as #handle."
+        "receipt.computer.always": "{rule} is a program name (ffmpeg) or a folder path, kept as allowed from now on. <computer> renders as #handle.",
+        "computerJob.state.lost": "A long job on the person's computer ended because the Rerun app quit or restarted while it ran."
     },
     "actions": {
         "copy": "Copy",
@@ -652,5 +653,18 @@
         "titleFiles": "{count, plural, one {Use a file on <computer></computer>} other {Use # files on <computer></computer>}}",
         "alwaysAllowFolder": "Always allow this folder",
         "folderNote": "“Always” allows every file in {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "Running",
+            "succeeded": "Done",
+            "failed": "Failed",
+            "stopped": "Stopped",
+            "lost": "Lost",
+            "offline": "Computer offline"
+        },
+        "stop": "Stop",
+        "offlineNote": "It keeps running there. The coworker hears back when the computer is back.",
+        "lostNote": "Rerun was closed on the computer while it ran."
     }
 }

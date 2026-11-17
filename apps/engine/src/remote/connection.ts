@@ -40,6 +40,7 @@ export type RemoteConnectionInfo = {
     capabilities: RemoteCapability[]
     facts: RemoteFacts
     paused: boolean
+    runningJobs?: number
 }
 
 export type CallOptions = { timeoutMs?: number; signal?: AbortSignal }
@@ -57,6 +58,7 @@ export class RemoteConnection {
     capabilities: Set<RemoteCapability>
     facts: RemoteFacts
     paused: boolean
+    runningJobs: number
     lastSeenAt: Date
     private readonly pending = new Map<string, Pending>()
     private readonly eventListeners = new Set<(event: RemoteEventFrame) => void>()
@@ -76,6 +78,7 @@ export class RemoteConnection {
         this.capabilities = new Set(info.capabilities)
         this.facts = info.facts
         this.paused = info.paused
+        this.runningJobs = info.runningJobs ?? 0
         this.connectedAt = new Date()
         this.lastSeenAt = new Date()
         ws.on('message', (data, isBinary) => {
@@ -165,6 +168,7 @@ export class RemoteConnection {
             if (frame.event === 'status') {
                 this.paused = frame.paused
                 if (frame.capabilities) this.capabilities = new Set(frame.capabilities)
+                if (frame.runningJobs !== undefined) this.runningJobs = frame.runningJobs
             }
             for (const listener of this.eventListeners) listener(frame)
             return

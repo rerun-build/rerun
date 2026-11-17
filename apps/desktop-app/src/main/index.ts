@@ -16,7 +16,7 @@ import { checkServer } from './server-check'
 import { checkForUpdates, startUpdater } from './updater'
 import { createTray, desktopSettings, refreshTray, startedAtLogin } from './native'
 import { onQuickAskShortcutChange, restoreQuickAskShortcuts, toggleQuickAsk, voiceQuickAsk } from './quick-ask'
-import { hasLinkedComputers, onRemoteComputerChange, remoteComputerTrayItems, startRemoteComputer, stopRemoteComputer } from './remote-computer'
+import { confirmQuitWithJobs, hasLinkedComputers, onRemoteComputerChange, remoteComputerTrayItems, startRemoteComputer, stopRemoteComputer } from './remote-computer'
 
 // Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
@@ -85,6 +85,12 @@ app.on('web-contents-created', (_event, contents) => {
 app.on('activate', () => {
     if (getMainWindow()) showMainWindow()
     else createMainWindow(serverOrigin())
+})
+
+// An update installs through a quit too: with a job running, the person can keep it running and the
+// update waits for the next quit.
+app.on('before-quit', event => {
+    if (!confirmQuitWithJobs()) event.preventDefault()
 })
 
 app.on('will-quit', () => {

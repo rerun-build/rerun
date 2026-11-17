@@ -16,7 +16,7 @@ import {
 import type { WorkerLink, WorkerLinkState } from '../shared/remote-worker'
 import { RemoteFailure } from './failure'
 
-export type HelloParts = { appVersion: string; capabilities: RemoteCapability[]; facts: RemoteFacts; paused: boolean }
+export type HelloParts = { appVersion: string; capabilities: RemoteCapability[]; facts: RemoteFacts; paused: boolean; runningJobs?: number }
 
 export type LinkDeps = {
     hello: () => Promise<HelloParts>
@@ -156,7 +156,7 @@ export class LinkConnection {
         ws.on('open', async () => {
             try {
                 const hello = await this.deps.hello()
-                ws.send(JSON.stringify({ type: 'hello', protocol: { min: REMOTE_PROTOCOL_MIN, max: REMOTE_PROTOCOL_MAX }, app: { version: hello.appVersion }, capabilities: hello.capabilities, facts: hello.facts, paused: hello.paused }))
+                ws.send(JSON.stringify({ type: 'hello', protocol: { min: REMOTE_PROTOCOL_MIN, max: REMOTE_PROTOCOL_MAX }, app: { version: hello.appVersion }, capabilities: hello.capabilities, facts: hello.facts, paused: hello.paused, runningJobs: hello.runningJobs ?? 0 }))
             } catch {
                 ws.close(1011, 'no hello')
             }

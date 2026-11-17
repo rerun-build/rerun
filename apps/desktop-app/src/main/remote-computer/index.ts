@@ -16,7 +16,7 @@ import { WorkerHost } from './worker-host'
 // process keeps the tokens and the person's settings, the worker (`src/worker/`) the sockets and the
 // commands. Linked, the app stays alive with its windows closed, on every system.
 
-const LOCAL_CAPABILITIES: RemoteCapability[] = ['shell', 'files']
+const LOCAL_CAPABILITIES: RemoteCapability[] = ['shell', 'files', 'jobs']
 
 let linkStates = new Map<string, WorkerLinkState>()
 let runningJobs = 0
@@ -185,6 +185,24 @@ export function registerRemoteComputerHandlers(): void {
 
 export function startRemoteComputer(): void {
     syncWorker()
+}
+
+let quitConfirmed = false
+
+// Quitting stops the jobs this computer runs for the coworkers: the person is asked first. Closing
+// the window does not quit, so it never asks.
+export function confirmQuitWithJobs(): boolean {
+    if (quitConfirmed || runningJobs === 0) return true
+    const answer = dialog.showMessageBoxSync({
+        type: 'warning',
+        buttons: [t('computer.quitAnyway'), t('computer.keepRunning')],
+        defaultId: 1,
+        cancelId: 1,
+        message: t('computer.quitWithJobs', { count: runningJobs }),
+        detail: t('computer.quitWithJobsDetail'),
+    })
+    quitConfirmed = answer === 0
+    return quitConfirmed
 }
 
 export function stopRemoteComputer(): void {

@@ -104,6 +104,10 @@ describe('sqlite ladders', () => {
               4,
               "paid-sources",
             ],
+            [
+              5,
+              "remote-jobs",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`
@@ -247,6 +251,20 @@ describe('system.db v3 to v4', () => {
             { key: 'e:jane@acme.com', call_id: 'call-1', verdict: 'valid' },
             { key: 'n:boulangerie dupont', call_id: 'call-2', verdict: null },
         ])
+    })
+})
+
+describe('system.db v4 to v5', () => {
+    it('adds the jobs started on linked computers, keeps the paid sources, and replays without harm', async () => {
+        const client = freshFile('v4-system')
+        await migrateSqlite(client, SYSTEM_DB_MIGRATIONS.slice(0, 4), 'v4-system.db')
+        await client.execute("INSERT INTO paid_calls (call_id, at, capability, served_by) VALUES ('call-1', '2026-11-01T00:00:00.000Z', 'people.email.find', 'hunter')")
+        await migrateSystemDb(client, 'v4-system.db')
+        expect(await sqliteVersion(client)).toBe(SYSTEM_DB_VERSION)
+        await SYSTEM_DB_MIGRATIONS[4].up(client)
+        await client.execute("INSERT INTO remote_jobs (id, computer_id, session_id, command, state, started_at) VALUES ('j1', 'c1', 's1', 'ffmpeg', 'running', '2026-11-17T00:00:00.000Z')")
+        expect((await client.execute('SELECT id, woke_at FROM remote_jobs')).rows.map(row => ({ ...row }))).toEqual([{ id: 'j1', woke_at: null }])
+        expect((await client.execute('SELECT count(*) AS n FROM paid_calls')).rows[0].n).toBe(1)
     })
 })
 

@@ -22,7 +22,7 @@ export function acceptComputer(ws: WebSocket, identity: RemoteComputerIdentity, 
             logger.warn({ computerId: identity.id, offered: hello.protocol, app: hello.app.version }, 'remote computer speaks no protocol this engine does')
             return ws.close(REMOTE_CLOSE.protocol, 'protocol')
         }
-        const connection = new RemoteConnection(ws, { computerId: identity.id, protocol, appVersion: hello.app.version, capabilities: hello.capabilities, facts: hello.facts, paused: hello.paused }, { pingIntervalMs })
+        const connection = new RemoteConnection(ws, { computerId: identity.id, protocol, appVersion: hello.app.version, capabilities: hello.capabilities, facts: hello.facts, paused: hello.paused, runningJobs: hello.runningJobs }, { pingIntervalMs })
         // Welcomed once it is on record: a computer that believes itself online is listed as such.
         registerConnection(identity, connection)
             .catch(err => logger.warn({ err: String(err), computerId: identity.id }, 'remote computer not recorded'))

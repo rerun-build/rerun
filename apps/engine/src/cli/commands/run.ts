@@ -5,6 +5,7 @@ import { DESKTOP_WS_PATH, REMOTE_WS_PATH } from '@rerun/contracts'
 import { desktopUpgradeHandler } from '../../desktop/bridge.js'
 import { attachUpgradeRouter } from '../../http/upgrade.js'
 import { remoteUpgradeHandler } from '../../remote/socket.js'
+import { startJobWakes } from '../../remote/job-wake.js'
 import { prepareDataDir } from '../../datadir/ladder.js'
 import { reconcileVault } from '../../vault/apply.js'
 import { ensureForeman } from '../../agents/foreman.js'
@@ -47,6 +48,7 @@ export async function runCommand(): Promise<void> {
         })
         .catch(err => logger.warn({ err: String(err) }, 'plan limits boot read skipped'))
     const stopScheduler = startScheduler()
+    if (remoteComputersEnabled()) startJobWakes()
     logger.info('scheduler started')
     const { RERUN_PORT, RERUN_HOST, RERUN_API_KEY } = env()
     // Node closes any request that takes more than 5 minutes, which a 100 MB upload on a slow link

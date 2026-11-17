@@ -5,7 +5,8 @@ import { z } from 'zod'
 
 import { requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { resolveMemberIdentities } from '@/app/api/_services/members.service'
-import { addComputerRule, linkComputer, listWorkspaceComputers, renameComputer, revokeComputer, updateComputerSettings, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
+import { addComputerRule, computerIdByHandle, computerJobLogs, computerJobs, linkComputer, listWorkspaceComputers, renameComputer, revokeComputer, stopComputerJob, updateComputerSettings, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
+import type { RemoteJob, RemoteJobLogs } from '@rerun/contracts'
 import type { ComputerItem, ComputersList, ComputerStatus } from '@/lib/computers/types'
 import { AppError, failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { remoteComputersFlag } from '@/flags'
@@ -131,6 +132,37 @@ export async function allowOnComputerAction(computerId: string, rule: RemoteComp
         const ctx = await computersContext()
         await addComputerRule(ctx.workspace.id, computerId, parsed.data)
         return { ok: true }
+    } catch (err) {
+        return failureOf(err)
+    }
+}
+
+// The jobs a computer runs, for its detail. `jobs` is null while the computer is offline.
+export async function computerJobsAction(computerId: string): Promise<{ ok: true; jobs: RemoteJob[] | null } | ActionFailure> {
+    try {
+        const ctx = await computersContext()
+        return { ok: true, jobs: await computerJobs(ctx.workspace.id, computerId) }
+    } catch (err) {
+        return failureOf(err)
+    }
+}
+
+// One job as the chat card shows it, read from the computer named by its #handle.
+export async function computerJobAction(handle: string, jobId: string): Promise<{ ok: true; logs: RemoteJobLogs | null } | ActionFailure> {
+    try {
+        const ctx = await computersContext()
+        return { ok: true, logs: await computerJobLogs(ctx.workspace.id, handle, jobId) }
+    } catch (err) {
+        return failureOf(err)
+    }
+}
+
+// Any member may stop a job: any member may start one through their coworkers.
+export async function stopComputerJobAction(computer: { id?: string; handle?: string }, jobId: string): Promise<{ ok: true; job: RemoteJob | null } | ActionFailure> {
+    try {
+        const ctx = await computersContext()
+        const computerId = computer.id ?? (await computerIdByHandle(ctx.workspace.id, computer.handle ?? ''))
+        return { ok: true, job: await stopComputerJob(ctx.workspace.id, computerId, jobId) }
     } catch (err) {
         return failureOf(err)
     }

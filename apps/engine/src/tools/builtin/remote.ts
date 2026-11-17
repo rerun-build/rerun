@@ -8,6 +8,9 @@ import { commandVerdict } from '../../remote/policy.js'
 import { listComputerViews, liveConnection } from '../../remote/registry.js'
 import { callFailure, findComputer, unavailable, unknownComputer } from './remote-common.js'
 import { remoteFileTools } from './remote-files.js'
+import { jobContext } from '../../remote/job-wake.js'
+import { recordRemoteJob } from '../../db/repos/remote-jobs.js'
+import type { RemoteConnection } from '../../remote/connection.js'
 import type { RunContext } from '../../runtime/context.js'
 import { cardCallTiming } from '../../agents/turn-order.js'
 import { hitlAck, jsonTolerantArray } from './hitl.js'
@@ -62,8 +65,52 @@ function alwaysOffer(view: RemoteComputerView, commands: string[], paths: string
 export function remoteComputerTools(ctx: RunContext): ToolSet {
     const author = ctx.author?.name
 
+    async function startJob(connection: RemoteConnection, view: RemoteComputerView, command: string, cwd: string | undefined, label: string | undefined): Promise<unknown> {
+        if (!connection.offers('jobs')) return `#${view.handle} does not run jobs: update Rerun on it, or run the command without background.`
+        try {
+            const { job } = await connection.call('job.start', { command, cwd, label, author, context: jobContext({ agentId: ctx.agent.id, sessionId: ctx.sessionId }) })
+            await recordRemoteJob(ctx.agent.id, ctx.sessionId, view.id, job)
+            return {
+                status: 'job_started',
+                job: job.id,
+                computer: `#${view.handle}`,
+                instruction: `Job ${job.id} runs on #${view.handle}. It keeps running after your turn, and its end wakes you in this conversation with its result. Tell the user it is running and end your turn now: do not wait for it nor check it in a loop. Use remote_job only if the user asks how it is going.`,
+            }
+        } catch (err) {
+            return callFailure(view, err)
+        }
+    }
+
     return {
         ...remoteFileTools(ctx),
+
+        remote_job: tool({
+            description: 'Look at the jobs you started on a linked computer, or stop one: "list" the jobs of that computer, "status" and "logs" (the last lines it printed) of one job, "stop" one with everything it started.',
+            inputSchema: z.object({
+                computer: z.string().min(1).max(100),
+                action: z.enum(['list', 'status', 'logs', 'stop']),
+                job: z.string().max(64).optional().describe('The job id, for status, logs and stop'),
+            }),
+            execute: async ({ computer, action, job }) => {
+                const { view, known } = await findComputer(computer)
+                if (!view) return unknownComputer(computer, known)
+                const connection = liveConnection(view.id)
+                if (!connection) return unavailable({ ...view, online: false })
+                try {
+                    if (action === 'list') return { jobs: (await connection.call('job.list', {})).jobs.slice(0, 20).map(({ context: _context, ...rest }) => rest) }
+                    if (!job) return 'Name the job (its id) for this action.'
+                    if (action === 'logs') {
+                        const logs = await connection.call('job.logs', { jobId: job, tailBytes: 8_000 })
+                        return `Job ${job} on #${view.handle}: ${logs.job.state}${logs.job.exitCode !== null ? ` (exit ${logs.job.exitCode})` : ''}${logs.truncated ? ' · last lines' : ''}\n${logs.output || '(nothing printed yet)'}`
+                    }
+                    const { job: state } = await connection.call(action === 'stop' ? 'job.stop' : 'job.status', { jobId: job })
+                    const { context: _context, ...rest } = state
+                    return rest
+                } catch (err) {
+                    return callFailure(view, err)
+                }
+            },
+        }),
         remote_computers: tool({
             description:
                 'List the computers people linked to the workspace: their #handle, whether they are online, their system and shell, working folder, processor, graphics cards, memory and the programs found on them. They are not your machine: you reach them with remote_exec. Check here before choosing one.',
@@ -79,8 +126,10 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
                 command: z.string().min(1).max(20_000).describe('The command, written for the shell of that computer'),
                 cwd: z.string().max(4096).optional().describe('Folder to run in: absolute, or relative to the working folder. Defaults to the working folder'),
                 timeoutSeconds: z.number().int().min(1).max(600).default(120),
+                background: z.boolean().default(false).describe('Run it as a job: for anything that takes more than a few minutes (a render, a training, a big download). It keeps running after your turn, and its end wakes you in this conversation'),
+                label: z.string().max(200).optional().describe('A short name for the job, shown to the user'),
             }),
-            execute: async ({ computer, command, cwd, timeoutSeconds }) => {
+            execute: async ({ computer, command, cwd, timeoutSeconds, background, label }) => {
                 const { view, known } = await findComputer(computer)
                 if (!view) return unknownComputer(computer, known)
                 const refused = refusedCommand(command)
@@ -98,6 +147,7 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
                 }
                 const connection = liveConnection(view.id)
                 if (!connection) return unavailable({ ...view, online: false }) as string
+                if (background) return startJob(connection, view, command, cwd, label)
                 const execId = newId()
                 const timeoutMs = timeoutSeconds * 1000
                 const onAbort = () => void connection.call('exec.cancel', { execId }).catch(() => {})

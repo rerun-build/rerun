@@ -25,6 +25,7 @@ import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
 
 import { ComputerHandle, ComputerNote, ComputerStatusBadge, OsTile, osLabel } from './ComputerBits'
+import { ComputerJobs } from './ComputerJobs'
 import { ThisComputerLinkRow } from './ThisComputer'
 
 const MODES: RemoteAccessMode[] = ['ask', 'remember', 'full']
@@ -256,6 +257,8 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
             <PanelScroller className="space-y-6 p-4">
                 {computer.status === 'offline' && <ComputerNote tone="neutral">{computer.lastSeenAt ? tDetail('offlineSince', { when: shortRelativeTime(computer.lastSeenAt, locale) }) : tDetail('neverConnected')}</ComputerNote>}
                 {computer.status === 'paused' && <ComputerNote>{tDetail('paused')}</ComputerNote>}
+
+                <ComputerJobs computerId={computer.id} online={computer.status !== 'offline'} />
 
                 <DetailBlock title={tDetail('approvals')}>
                     <div className="space-y-4">

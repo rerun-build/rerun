@@ -45,9 +45,18 @@
         "offline": "Offline"
     },
     "modes": {
-        "ask": { "label": "Ask every time", "description": "Every command waits for a yes" },
-        "remember": { "label": "Ask, then remember", "description": "Always allow a program once you trust it" },
-        "full": { "label": "Full access", "description": "Runs without asking, except sensitive folders" }
+        "ask": {
+            "label": "Ask every time",
+            "description": "Every command waits for a yes"
+        },
+        "remember": {
+            "label": "Ask, then remember",
+            "description": "Always allow a program once you trust it"
+        },
+        "full": {
+            "label": "Full access",
+            "description": "Runs without asking, except sensitive folders"
+        }
     },
     "detail": {
         "back": "Back to computers",
@@ -76,7 +85,8 @@
         "remove": "Remove computer",
         "removeTitle": "Remove {name}?",
         "removeBody": "Coworkers will no longer run anything on it. Its rules are forgotten, and it can be linked again from the desktop app.",
-        "removeConfirm": "Remove"
+        "removeConfirm": "Remove",
+        "jobs": "Jobs"
     },
     "linkDialog": {
         "title": "Link this computer",

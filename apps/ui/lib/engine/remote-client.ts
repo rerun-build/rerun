@@ -1,4 +1,5 @@
-import { remoteComputersListSchema, remoteComputerViewSchema, type RemoteComputerRule, type RemoteComputerUpsert, type RemoteComputerView } from '@rerun/contracts'
+import { remoteComputersListSchema, remoteComputerViewSchema, remoteJobLogsSchema, remoteJobSchema, remoteJobsListSchema, type RemoteComputerRule, type RemoteComputerUpsert, type RemoteComputerView, type RemoteJob, type RemoteJobLogs } from '@rerun/contracts'
+import { z } from 'zod'
 
 import { request } from './client'
 import type { EngineConnection } from './types'
@@ -24,4 +25,17 @@ export async function addRemoteComputerRule(conn: EngineConnection, id: string, 
 
 export async function deleteRemoteComputer(conn: EngineConnection, id: string): Promise<void> {
     await request(conn, computerPath(id), { method: 'DELETE' }, () => undefined)
+}
+
+// A computer's jobs are read from the computer itself, through its socket: an offline one answers 409.
+export async function listRemoteJobs(conn: EngineConnection, id: string): Promise<RemoteJob[]> {
+    return request(conn, `${computerPath(id)}/jobs`, { method: 'GET', signal: AbortSignal.timeout(8_000) }, d => remoteJobsListSchema.parse(d).jobs)
+}
+
+export async function getRemoteJobLogs(conn: EngineConnection, id: string, jobId: string): Promise<RemoteJobLogs> {
+    return request(conn, `${computerPath(id)}/jobs/${encodeURIComponent(jobId)}`, { method: 'GET', signal: AbortSignal.timeout(8_000) }, d => remoteJobLogsSchema.parse(d))
+}
+
+export async function stopRemoteJob(conn: EngineConnection, id: string, jobId: string): Promise<RemoteJob> {
+    return request(conn, `${computerPath(id)}/jobs/${encodeURIComponent(jobId)}/stop`, { method: 'POST' }, d => z.object({ job: remoteJobSchema }).parse(d).job)
 }

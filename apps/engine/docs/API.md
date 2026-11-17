@@ -273,7 +273,14 @@ card sends is `Computer access: **APPROVED** — #studio-pc` (or `DECLINED`), re
 `parseComputerAccessDecision` of `@rerun/contracts`. The card's own result carries
 `card: { computerId, always }`, the program "Always allow" would keep. A computer whose `unattended`
 setting is off refuses runs nobody is in the chat for (schedules, triggers, calls between
-coworkers). File tools: `remote_file_list`, `remote_file_read` (text up to 100 KB, a binary
+coworkers). `remote_exec` with `background: true` starts a job (`job.start`, four at most per computer) that
+outlives the run; `remote_job` lists, reads, and stops them. The engine keeps them in the coworker's
+`system.db` (`remote_jobs`, step 5) and hands the computer an opaque context naming the conversation.
+The computer tells the end (`job.finished`) until it is acknowledged; the engine records it, then wakes
+the conversation once (`woke_at`) with a headless run whose trigger is `{ source: 'job' }`, after any
+run in flight and any card waiting for the person. `GET /remote/computers/:id/jobs`,
+`GET /remote/computers/:id/jobs/:jobId` (the last 4 KB of output) and `POST …/:jobId/stop` read and
+stop them from the hub; they answer `409` while the computer is offline. File tools: `remote_file_list`, `remote_file_read` (text up to 100 KB, a binary
 file is described), `remote_file_write` (text), and `remote_transfer` (one file of up to 100 MB between the
 computer and the coworker's workspace, in 1 MB pieces checked with a sha256, refused when the box's disk
 would be left with less than 200 MB). A path inside the computer's working folder or an allowed folder

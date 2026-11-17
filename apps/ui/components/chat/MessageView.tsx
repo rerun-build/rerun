@@ -14,6 +14,7 @@ import { HitlReceipt } from '@/components/chat/HitlReceipt'
 import { NeedsAuthCard, NotificationCard, SetupCompleteCard } from '@/components/chat/SetupEventCards'
 import { McpServerCard } from '@/components/chat/McpServerCard'
 import { TableCard } from '@/components/chat/TableCard'
+import { ComputerJobCard } from '@/components/chat/computer/ComputerJobCard'
 import { CompactionStep, type CompactionData } from '@/components/chat/CompactionBlock'
 import { ExpandableMessage } from '@/components/chat/ExpandableMessage'
 import { MessageBubbles } from '@/components/chat/MessageBubbles'
@@ -273,6 +274,12 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 if ((toolName === 'mcp_register' || toolName === 'mcp_login') && toolPart.state === 'output-available') {
                     const card = mcpRegisterCardOf(toolName, toolPart.input, toolPart.output)
                     if (card) return { kind: 'standalone', key, node: <McpServerCard agentId={agentId} {...card} signInPending={card.name === pendingMcpSignIn} /> }
+                }
+                // A job on a computer outlives the turn: its card says how it is doing, live.
+                if (toolName === 'remote_exec' && toolPart.state === 'output-available') {
+                    const out = parseHubOutput<{ status?: string; job?: string; computer?: string }>(toolPart.output)
+                    const input = toolPart.input as { command?: string; label?: string } | undefined
+                    if (out?.status === 'job_started' && out.job && out.computer) return { kind: 'standalone', key, node: <ComputerJobCard computer={out.computer.replace(/^#/, '')} jobId={out.job} command={input?.command ?? ''} label={input?.label} /> }
                 }
                 // A card is the agent showing something to the user, so it replaces the
                 // collapsed tool step entirely. A payload we cannot read falls back to it.

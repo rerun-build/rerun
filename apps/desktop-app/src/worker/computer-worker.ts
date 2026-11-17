@@ -7,13 +7,15 @@ import { ActivityLog } from './activity'
 import { RemoteFailure } from './failure'
 import { osOf, readFacts } from './facts'
 import { ComputerFiles, type FileScope } from './files'
+import { Jobs } from './jobs'
+import { randomBytes } from 'node:crypto'
 import { LinkConnection } from './link-connection'
 import { resolveLoginEnv } from './login-env'
 import { runCommand, shellFor, type ShellSpec } from './shell'
 
 // What this build of the worker can do. A capability the person switched off in the app is left out
 // of what the computer offers, and refused if the engine asks anyway.
-export const WORKER_CAPABILITIES: readonly RemoteCapability[] = ['shell', 'files']
+export const WORKER_CAPABILITIES: readonly RemoteCapability[] = ['shell', 'files', 'jobs']
 
 export type ComputerWorkerOptions = {
     dataDir: string
@@ -38,6 +40,8 @@ export class ComputerWorker {
     private settings: WorkerLocalSettings
     private facts: Promise<RemoteFacts> | null = null
     private readonly files: ComputerFiles
+    private readonly jobs: Jobs
+    private readonly resendTimers = new Map<string, NodeJS.Timeout>()
 
     constructor(private readonly options: ComputerWorkerOptions) {
         this.platform = options.platform ?? process.platform
@@ -46,6 +50,45 @@ export class ComputerWorker {
         this.shell = this.env.then(env => shellFor(this.platform, env))
         this.activity = new ActivityLog(join(options.dataDir, 'activity.jsonl'))
         this.files = new ComputerFiles(osOf(this.platform), () => this.settings.workDir)
+        this.jobs = new Jobs({
+            dir: join(options.dataDir, 'jobs'),
+            shell: () => this.shell,
+            env: () => this.env,
+            platform: this.platform,
+            onFinished: job => this.tellJobFinished(job.computerId, job.id),
+            onCountChange: running => this.jobCountChanged(running),
+        })
+        void this.jobs.load().then(() => this.jobCountChanged(this.jobs.count()))
+    }
+
+    private jobCountChanged(running: number): void {
+        this.options.send({ type: 'busy', runningJobs: running })
+        for (const connection of this.links.values()) connection.send({ type: 'event', event: 'status', paused: this.settings.paused, capabilities: this.capabilities(), runningJobs: running })
+    }
+
+    // The end of a job goes to the engine of the link that started it, and again until it says it
+    // heard: when the link comes back, and every half minute while it stays quiet.
+    private tellJobFinished(computerId: string, jobId: string): void {
+        const connection = this.links.get(computerId)
+        const job = this.jobs.unacknowledged(computerId).find(item => item.id === jobId)
+        if (!connection || !job) return
+        connection.send({ type: 'event', event: 'job.finished', job })
+        clearTimeout(this.resendTimers.get(jobId))
+        const timer = setTimeout(() => this.tellJobFinished(computerId, jobId), 30_000)
+        timer.unref()
+        this.resendTimers.set(jobId, timer)
+    }
+
+    private resendJobs(computerId: string): void {
+        void this.jobs.load().then(() => {
+            for (const job of this.jobs.unacknowledged(computerId)) this.tellJobFinished(computerId, job.id)
+        })
+    }
+
+    private acknowledged(jobId: string): void {
+        clearTimeout(this.resendTimers.get(jobId))
+        this.resendTimers.delete(jobId)
+        void this.jobs.acknowledge(jobId)
     }
 
     capabilities(): RemoteCapability[] {
@@ -66,6 +109,8 @@ export class ComputerWorker {
                 hello: () => this.hello(),
                 handle: (request, from) => this.handle(request, from),
                 onState: state => this.linkChanged(state),
+                onWelcome: () => this.resendJobs(link.computerId),
+                onAck: jobId => this.acknowledged(jobId),
                 fetch: this.options.fetch,
                 pingIntervalMs: this.options.pingIntervalMs,
             })
@@ -85,11 +130,16 @@ export class ComputerWorker {
         }
         if (before.paused === settings.paused && before.capabilities.join() === settings.capabilities.join()) return
         for (const connection of this.links.values()) connection.send({ type: 'event', event: 'status', paused: settings.paused, capabilities: this.capabilities() })
-        if (settings.paused) for (const controller of this.running.values()) controller.abort()
+        if (settings.paused) {
+            for (const controller of this.running.values()) controller.abort()
+            void this.jobs.stopAll()
+        }
     }
 
     shutdown(): void {
         for (const controller of this.running.values()) controller.abort()
+        void this.jobs.stopAll()
+        for (const timer of this.resendTimers.values()) clearTimeout(timer)
         for (const connection of this.links.values()) connection.stop()
         this.links.clear()
     }
@@ -116,7 +166,7 @@ export class ComputerWorker {
     }
 
     private async hello() {
-        return { appVersion: this.options.appVersion, capabilities: this.capabilities(), facts: await this.readFactsOnce(), paused: this.settings.paused }
+        return { appVersion: this.options.appVersion, capabilities: this.capabilities(), facts: await this.readFactsOnce(), paused: this.settings.paused, runningJobs: this.jobs.count() }
     }
 
     private record(entry: Omit<ActivityEntry, 'at'>): void {
@@ -154,6 +204,7 @@ export class ComputerWorker {
         }
         if (method === 'exec.run') return this.exec(params as { execId: string; command: string; cwd?: string; timeoutMs: number; author?: string }, link)
         if (method.startsWith('fs.')) return this.file(method, params, link)
+        if (method.startsWith('job.')) return this.job(method, params, link)
         throw new RemoteFailure('unsupported', `This computer does not run ${method} yet. Update Rerun on it.`)
     }
 
@@ -184,6 +235,29 @@ export class ComputerWorker {
             return result
         } catch (err) {
             if (err instanceof RemoteFailure && (err.code === 'sensitive_path' || err.code === 'outside_workdir')) record(`${method} ${path}`, 'refused')
+            throw err
+        }
+    }
+
+    private async job(method: RemoteMethod, params: Record<string, unknown>, link: WorkerLink): Promise<unknown> {
+        await this.jobs.load()
+        if (method === 'job.list') return { jobs: this.jobs.list(link.computerId) }
+        if (method === 'job.status') return { job: this.jobs.list(link.computerId).find(job => job.id === params.jobId) ?? this.jobs.get(link.computerId, params.jobId as string) }
+        if (method === 'job.logs') return this.jobs.logs(link.computerId, params.jobId as string, params.tailBytes as number)
+        if (method === 'job.stop') {
+            const job = await this.jobs.stop(link.computerId, params.jobId as string)
+            this.record({ computerId: link.computerId, author: null, kind: 'job', summary: `Stopped ${summarize(job.command)}`, outcome: 'ok' })
+            return { job }
+        }
+        const command = params.command as string
+        const base = { computerId: link.computerId, author: (params.author as string | undefined) ?? null, kind: 'job' as const, summary: summarize(command) }
+        try {
+            const cwd = await this.resolveCwd(params.cwd as string | undefined)
+            const job = await this.jobs.start({ command, cwd, label: params.label as string | undefined, author: params.author as string | undefined, context: params.context as string | undefined }, link.computerId, randomBytes(8).toString('hex'))
+            this.record({ ...base, outcome: 'ok' })
+            return { job }
+        } catch (err) {
+            this.record({ ...base, outcome: 'failed' })
             throw err
         }
     }

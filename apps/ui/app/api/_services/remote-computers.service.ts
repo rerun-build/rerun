@@ -1,14 +1,15 @@
 import 'server-only'
 import { createHash, randomBytes } from 'node:crypto'
 
-import { REMOTE_COMPUTER_TOKEN_PREFIX, REMOTE_WS_PATH, remoteHandleFromName, type RemoteComputerIdentity, type RemoteComputerRule, type RemoteComputerSettingsPatch, type RemoteComputerView, type RemoteOs } from '@rerun/contracts'
+import { REMOTE_COMPUTER_TOKEN_PREFIX, REMOTE_WS_PATH, computerHandleOf, remoteHandleFromName, type RemoteComputerIdentity, type RemoteComputerRule, type RemoteComputerSettingsPatch, type RemoteComputerView, type RemoteJob, type RemoteJobLogs, type RemoteOs } from '@rerun/contracts'
 
 import type { Database } from '@/app/api/database.types'
 import { engineSocketUrl } from '@/app/api/_services/engine-socket.service'
 import { buildBaseUrl } from '@/lib/engine/base-url'
 import { supportsRemoteComputers } from '@/lib/engine/client'
 import { mintRemoteTicket } from '@/lib/engine/engine-ticket'
-import { addRemoteComputerRule, deleteRemoteComputer, listRemoteComputers, upsertRemoteComputer } from '@/lib/engine/remote-client'
+import { addRemoteComputerRule, deleteRemoteComputer, getRemoteJobLogs, listRemoteComputers, listRemoteJobs, stopRemoteJob, upsertRemoteComputer } from '@/lib/engine/remote-client'
+import { EngineRequestError } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -217,4 +218,43 @@ export async function listWorkspaceComputers(workspaceId: number): Promise<{ com
         if (view) byId.set(row.id, view)
     }
     return { computers: rows.map(row => ({ ...row, view: byId.get(row.id) ?? null })), engine: 'ok' }
+}
+
+// A computer of the workspace named by its #handle, as the chat names it.
+async function liveRowByHandle(workspaceId: number, handle: string): Promise<RemoteComputerRow> {
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'remote_computers', REMOTE_COMPUTER_COLUMNS, { workspace_id: workspaceId, handle: computerHandleOf(handle), revoked_at: null })
+    if (!data) throw new AppError('computerNotFound')
+    return data
+}
+
+// Null when the computer is offline: its jobs live on it, and it answers for them once back.
+async function offlineAsNull<T>(call: () => Promise<T>): Promise<T | null> {
+    try {
+        return await call()
+    } catch (err) {
+        if (err instanceof EngineRequestError && err.status === 409) return null
+        throw err
+    }
+}
+
+export async function computerJobs(workspaceId: number, computerId: string): Promise<RemoteJob[] | null> {
+    const row = await liveRow(workspaceId, computerId)
+    const conn = await requireComputersEngine(workspaceId)
+    return offlineAsNull(() => listRemoteJobs(conn, row.id))
+}
+
+export async function computerJobLogs(workspaceId: number, handle: string, jobId: string): Promise<RemoteJobLogs | null> {
+    const row = await liveRowByHandle(workspaceId, handle)
+    const conn = await requireComputersEngine(workspaceId)
+    return offlineAsNull(() => getRemoteJobLogs(conn, row.id, jobId))
+}
+
+export async function stopComputerJob(workspaceId: number, computerId: string, jobId: string): Promise<RemoteJob | null> {
+    const row = await liveRow(workspaceId, computerId)
+    const conn = await requireComputersEngine(workspaceId)
+    return offlineAsNull(() => stopRemoteJob(conn, row.id, jobId))
+}
+
+export async function computerIdByHandle(workspaceId: number, handle: string): Promise<string> {
+    return (await liveRowByHandle(workspaceId, handle)).id
 }

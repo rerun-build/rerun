@@ -91,6 +91,7 @@ export const remoteHelloSchema = z.object({
     capabilities: z.array(remoteCapabilitySchema).max(REMOTE_CAPABILITIES.length),
     facts: remoteFactsSchema,
     paused: z.boolean().default(false),
+    runningJobs: z.number().int().nonnegative().default(0),
 })
 export type RemoteHello = z.infer<typeof remoteHelloSchema>
 
@@ -124,6 +125,8 @@ export const remoteJobSchema = z.object({
     endedAt: z.string().nullable(),
     // Who started it, as the coworker's run named them, for the activity log of the computer.
     author: z.string().max(200).optional(),
+    // What the engine needs back when it ends (the conversation to wake), opaque to the computer.
+    context: z.string().max(500).optional(),
 })
 export type RemoteJob = z.infer<typeof remoteJobSchema>
 
@@ -166,7 +169,7 @@ export const REMOTE_METHODS = {
     },
     'exec.cancel': { params: z.object({ execId: z.string().max(64) }), result: z.object({ cancelled: z.boolean() }) },
     'job.start': {
-        params: z.object({ command: z.string().min(1).max(20_000), cwd: path.optional(), label: z.string().max(200).optional(), author }),
+        params: z.object({ command: z.string().min(1).max(20_000), cwd: path.optional(), label: z.string().max(200).optional(), author, context: z.string().max(500).optional() }),
         result: z.object({ job: remoteJobSchema }),
     },
     'job.status': { params: z.object({ jobId: z.string().max(64) }), result: z.object({ job: remoteJobSchema }) },
@@ -237,7 +240,7 @@ export type RemoteResponseFrame = z.infer<typeof remoteResponseFrameSchema>
 // person paused or resumed the computer.
 export const remoteEventFrameSchema = z.discriminatedUnion('event', [
     z.object({ type: z.literal('event'), event: z.literal('job.finished'), job: remoteJobSchema }),
-    z.object({ type: z.literal('event'), event: z.literal('status'), paused: z.boolean(), capabilities: z.array(remoteCapabilitySchema).max(REMOTE_CAPABILITIES.length).optional() }),
+    z.object({ type: z.literal('event'), event: z.literal('status'), paused: z.boolean(), capabilities: z.array(remoteCapabilitySchema).max(REMOTE_CAPABILITIES.length).optional(), runningJobs: z.number().int().nonnegative().optional() }),
 ])
 export type RemoteEventFrame = z.infer<typeof remoteEventFrameSchema>
 
@@ -318,3 +321,8 @@ export const remoteComputerRuleSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('screen') }),
 ])
 export type RemoteComputerRule = z.infer<typeof remoteComputerRuleSchema>
+
+// What the hub reads of the jobs of a computer, `GET /remote/computers/:id/jobs[/:jobId]`.
+export const remoteJobsListSchema = z.object({ jobs: z.array(remoteJobSchema) })
+export const remoteJobLogsSchema = z.object({ job: remoteJobSchema, output: z.string(), truncated: z.boolean() })
+export type RemoteJobLogs = z.infer<typeof remoteJobLogsSchema>

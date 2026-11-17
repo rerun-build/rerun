@@ -148,6 +148,10 @@
         "trayPaused": "This computer: paused",
         "trayJobs": "{count, plural, one {This computer: # job running} other {This computer: # jobs running}}",
         "pause": "Pause Coworkers on This Computer",
-        "resume": "Resume Coworkers on This Computer"
+        "resume": "Resume Coworkers on This Computer",
+        "quitWithJobs": "{count, plural, one {A coworker job is running on this computer} other {# coworker jobs are running on this computer}}",
+        "quitWithJobsDetail": "Quitting Rerun stops it. Close the window instead to keep it running.",
+        "quitAnyway": "Quit Anyway",
+        "keepRunning": "Keep Running"
     }
 }

@@ -223,6 +223,24 @@ CREATE TABLE IF NOT EXISTS paid_keys (
 );
 `
 
+// The jobs this coworker started on a linked computer: the conversation their end wakes, once.
+const REMOTE_JOBS_DDL = `
+CREATE TABLE IF NOT EXISTS remote_jobs (
+    id TEXT PRIMARY KEY,
+    computer_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    command TEXT NOT NULL,
+    label TEXT,
+    author TEXT,
+    state TEXT NOT NULL,
+    exit_code INTEGER,
+    started_at TEXT NOT NULL,
+    ended_at TEXT,
+    woke_at TEXT
+);
+CREATE INDEX IF NOT EXISTS remote_jobs_session_idx ON remote_jobs(session_id);
+`
+
 // A schema change is a new step at the end, never an edit to a shipped one: see `db/ladder.ts`.
 export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
     {
@@ -255,6 +273,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'paid-sources',
         up: async client => {
             await client.executeMultiple(PAID_SOURCES_DDL)
+        },
+    },
+    {
+        version: 5,
+        id: 'remote-jobs',
+        up: async client => {
+            await client.executeMultiple(REMOTE_JOBS_DDL)
         },
     },
 ]

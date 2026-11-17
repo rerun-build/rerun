@@ -289,7 +289,7 @@ async function ownStateSections(agent: LoadedAgent, provider: Provider, heldBack
 }
 
 const unattendedSection = (trigger: RunTrigger, cfg: LoadedAgent['config']['tools']) =>
-    trigger.source !== 'chat' && (cfg.askUser || cfg.requestApproval) ? section('unattended_run', unattendedRunNote(trigger.source === 'schedule' ? 'a scheduled routine' : 'an incoming webhook call')) : ''
+    (trigger.source === 'schedule' || trigger.source === 'trigger') && (cfg.askUser || cfg.requestApproval) ? section('unattended_run', unattendedRunNote(trigger.source === 'schedule' ? 'a scheduled routine' : 'an incoming webhook call')) : ''
 
 // The hub writes the foreman's charter and hands it the account tools; the engine adds what depends
 // on the box and the runtime it is on, then what it keeps of its own like any coworker: its skills,
