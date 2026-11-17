@@ -1,4 +1,4 @@
-import { parseServiceRegistryKey, serviceRegistryKey, type VaultItemSummary } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, parseServiceRegistryKey, serviceRegistryKey, type VaultItemSummary } from '@rerun/contracts'
 
 import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
@@ -517,6 +517,15 @@ type VaultInstallTarget = { conn: EngineConnection; engineAgentId: string; itemI
 // in its own folder (it is reconfigured where it is) or its sign-in is one the Vault does not hold yet.
 async function vaultInstallTarget(agentId: string, key: string, methodKind: string, actor?: Actor): Promise<VaultInstallTarget | null> {
     const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+    // The Chief of Staff's config is rewritten at every boot: an app compiled into it would be gone at
+    // the next one, so the Vault is the only place it can hold one.
+    if (engineAgentId === FOREMAN_AGENT_ID) {
+        if (!VAULT_METHOD_KINDS.has(methodKind) || !(await supportsVault(conn))) throw new AccessDeniedError('foremanAppNeedsVault')
+        const [ctx, registry] = await Promise.all([vaultContext(actor), readRegistry(conn, engineAgentId)])
+        const itemId = registry.services[key]?.vaultItemId ?? null
+        if (itemId) await assertCanChangeItem(ctx.actor, await getVaultItem(conn, itemId), ctx, engineAgentId)
+        return { conn, engineAgentId, itemId, createdBy: ctx.actor.kind === 'user' ? ctx.actor.userId : null, ctx }
+    }
     // A box without a Vault takes the path it always took, with no read more than the capability.
     if (!(await supportsVault(conn))) return null
     const entry = (await readRegistry(conn, engineAgentId)).services[key]
@@ -741,11 +750,16 @@ function asStringRecord(v: unknown): Record<string, string> {
     return out
 }
 
+// What a coworker calls through `rerun_hub_*`. The Chief of Staff carries the same tools, beside the
+// account tools of its brief.
+export const COWORKER_HUB_TOOLS = new Set(['service_search', 'service_details', 'service_install', 'service_list_installed', 'service_uninstall', 'publish_file', 'unpublish_file', 'list_published', 'trigger_url', 'search_docs'])
+
 // The caller is the engine, authenticated by its Box key, so there is no browser session to
 // resolve a workspace from: the route hands over the one it authenticated. Without it every
 // registry read below fails authorization and the agent is told its live connectors are absent.
-export async function dispatchHubTool(agentId: string, name: string, args: Record<string, unknown>, workspaceId: number): Promise<unknown> {
-    const actor = workspaceActor(workspaceId)
+// A coworker acts as the workspace; the Chief of Staff as the member it is talking to, so a member
+// cannot give it an app only an admin may.
+export async function dispatchHubTool(agentId: string, name: string, args: Record<string, unknown>, workspaceId: number, actor: Actor = workspaceActor(workspaceId)): Promise<unknown> {
     switch (name) {
         case 'service_search':
             return searchServices(agentId, asString(args.query), asString(args.category), actor)

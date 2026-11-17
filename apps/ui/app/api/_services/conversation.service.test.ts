@@ -26,7 +26,7 @@ vi.mock('@/lib/chat/engine-history', () => ({ transformEngineMessages: vi.fn() }
 const ctx = { userId: 'admin', role: 'admin', boxScope: 'all', supabase: {}, workspace: { id: 7 } } as unknown as WorkspaceContext
 const memberCtx = { ...ctx, userId: 'member', role: 'member' } as WorkspaceContext
 const adminActor: Actor = { kind: 'user', userId: 'admin', workspaceId: 7, role: 'admin', boxScope: 'all' }
-const reached = (agent = { workspace_id: 7, space_id: 'space-1', engine_agent_id: 'engine-agent' }) => ({ actor: adminActor, access: 'manage' as const, agent })
+const reached = (agent: { workspace_id: number; space_id: string | null; engine_agent_id: string | null; kind: 'coworker' | 'foreman' } = { workspace_id: 7, space_id: 'space-1', engine_agent_id: 'engine-agent', kind: 'coworker' }) => ({ actor: adminActor, access: 'manage' as const, agent })
 
 function session(agentId: string, id: string, updatedAt: string, status = 'idle') {
     return { id, agent_id: agentId, title: `${id} title`, status, updated_at: updatedAt, created_at: updatedAt, engine_session_id: `engine-${id}`, source: 'dashboard', kind: 'thread' }

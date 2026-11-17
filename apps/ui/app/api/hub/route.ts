@@ -3,7 +3,8 @@ import { FOREMAN_AGENT_ID, FOREMAN_HUB_TOKEN_HEADER } from '@rerun/contracts'
 
 import { isAiStatusHubTool, readRerunCredit } from '@/app/api/_services/ai-status-hub.service'
 import { dispatchForemanHubTool } from '@/app/api/_services/foreman-hub.service'
-import { dispatchHubTool } from '@/app/api/_services/services.service'
+import { COWORKER_HUB_TOOLS, dispatchHubTool } from '@/app/api/_services/services.service'
+import { foremanAgentId } from '@/lib/foreman/agent-row'
 import { dispatchTeamHubTool, isTeamHubTool } from '@/app/api/_services/team-hub.service'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
 import { foremanHubTokenRequired, verifyForemanHubToken } from '@/lib/foreman/hub-token'
@@ -29,7 +30,7 @@ export async function POST(req: Request): Promise<Response> {
     const engineAgentId = req.headers.get('x-rerun-agent') ?? ''
     if (!engineAgentId) return new Response('Missing x-rerun-agent header', { status: 400 })
 
-    // The foreman has no agent row: it speaks for the whole workspace the engine key names.
+    // The foreman speaks for the member its signed token names, or the whole workspace without one.
     const isForeman = engineAgentId === FOREMAN_AGENT_ID
     // The person the foreman's turn speaks for, from its signed token: their access, not the
     // workspace's. A token without one (minted before, or no token at all) acts as the workspace.
@@ -66,8 +67,12 @@ export async function POST(req: Request): Promise<Response> {
     if (!tool) return new Response('Missing tool', { status: 400 })
 
     try {
+        // The account tools of its brief stay the foreman's own; the tools it shares with every
+        // coworker run on its row of `agents`, under the rights of the member it talks to.
         const out = !agent
-            ? await dispatchForemanHubTool(foremanActor, tool, args)
+            ? isForeman && COWORKER_HUB_TOOLS.has(tool) && tool !== 'search_docs'
+                ? await dispatchHubTool(await foremanAgentId(engine.workspaceId), tool, args, engine.workspaceId, foremanActor)
+                : await dispatchForemanHubTool(foremanActor, tool, args)
             : isTeamHubTool(tool)
               ? await dispatchTeamHubTool(agent.id, engine.workspaceId, tool, args)
               : isAiStatusHubTool(tool)

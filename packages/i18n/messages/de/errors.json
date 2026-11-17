@@ -449,6 +449,7 @@
     "vaultSharedItem": "Diese App kommt aus dem Vault und andere Coworker nutzen sie. Ändere sie im Vault.",
     "vaultPaidAppEveryone": "Eine kostenpflichtige App wird Coworker für Coworker verbunden",
     "vaultMethodUnsupported": "Diese App kann noch nicht zum Vault hinzugefügt werden. Verbinde sie über den Tab Apps eines Coworkers.",
+    "foremanAppNeedsVault": "Der Chief of Staff bewahrt seine Apps im Vault auf, und diese App kann dort noch nicht hinzugefügt werden. Gib sie stattdessen einem Coworker.",
     "vaultConflictEveryone": "Jeder Coworker bekommt {name} schon aus einem anderen Vault-Eintrag, der mit allen geteilt ist",
     "vaultConflictSomeone": "Ein Coworker bekommt {name} schon aus einem anderen Vault-Eintrag",
     "vaultMcpTarget": "Gib dem Server eine Adresse oder einen Befehl"

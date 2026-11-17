@@ -125,6 +125,26 @@ describe('assertAgentAccess', () => {
         expect(mocks.selectMaybeSingle).toHaveBeenCalledTimes(1)
     })
 
+    const chief = { workspace_id: 1, space_id: null, engine_agent_id: 'foreman', kind: 'foreman' }
+
+    it('lets every member use the Chief of Staff, without a Box to read', async () => {
+        readsAnswering({ agents: chief })
+        await expect(assertAgentAccess('cos', 'use', member('assigned'))).resolves.toMatchObject({ access: 'use', agent: chief })
+        expect(mocks.selectMaybeSingle).toHaveBeenCalledTimes(1)
+    })
+
+    it('keeps managing the Chief of Staff to admins, since every member reaches what it is given', async () => {
+        readsAnswering({ agents: chief })
+        await expect(assertAgentAccess('cos', 'manage', member('all'))).rejects.toBeInstanceOf(AccessDeniedError)
+        await expect(assertAgentAccess('cos', 'manage', admin)).resolves.toMatchObject({ access: 'manage' })
+        await expect(assertAgentAccess('cos', 'manage', workspaceActor(1))).resolves.toMatchObject({ access: 'manage' })
+    })
+
+    it("refuses another workspace's Chief of Staff as missing", async () => {
+        readsAnswering({ agents: { ...chief, workspace_id: 2 } })
+        await expect(assertAgentAccess('cos', 'use', admin)).rejects.toThrow('Coworker not found')
+    })
+
     it('reads the caller from the session when no actor is passed', async () => {
         mocks.getSessionWorkspace.mockResolvedValue({ user: { id: 'u-member', workspace_id: 1 }, workspaceRefused: false, membership: { role: 'member', box_scope: 'assigned' } })
         readsAnswering({ agents: agent, spaces: { id: 'box-1', ...openBox } })
@@ -156,6 +176,17 @@ describe('assertSessionInWorkspace', () => {
         mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: row(1), error: null })
         readsAnswering({ spaces: { id: 'box-1', ...restrictedBox } })
         await expect(assertSessionInWorkspace('se1', member('all'))).rejects.toThrow('Session not found')
+    })
+
+    const chiefSession = (ownerId: string) => ({ id: 'se2', agent_id: 'cos', engine_session_id: 'es2', owner_id: ownerId, agent: { workspace_id: 1, space_id: null, engine_agent_id: 'foreman', kind: 'foreman' } })
+
+    it("opens a conversation with the Chief of Staff to its owner only, an admin included", async () => {
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: chiefSession('u-member'), error: null })
+        await expect(assertSessionInWorkspace('se2', member('assigned'))).resolves.toEqual({ id: 'se2', agent_id: 'cos', engine_session_id: 'es2', engine_agent_id: 'foreman' })
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: chiefSession('u-member'), error: null })
+        await expect(assertSessionInWorkspace('se2', admin)).rejects.toThrow('Session not found')
+        mocks.selectMaybeSingleWithJoins.mockResolvedValueOnce({ data: chiefSession('u-member'), error: null })
+        await expect(assertSessionInWorkspace('se2', workspaceActor(1))).rejects.toThrow('Session not found')
     })
 
     it('refuses a session whose agent belongs to another workspace, or is missing', async () => {

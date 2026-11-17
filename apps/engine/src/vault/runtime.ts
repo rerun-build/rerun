@@ -9,10 +9,10 @@ export type AgentMcpServer = McpServer & { vaultItemId?: string }
 
 type VaultHolder = Pick<LoadedAgent, 'id' | 'config'> & { hubAgentId?: string }
 
-// The coworker whose Vault a run draws on: itself, or the coworker a delegate works for. The
-// foreman installs connectors for others and holds none of them.
+// The coworker whose Vault a run draws on: itself, or the coworker a delegate works for. The Chief
+// of Staff holds entries too: its config is rewritten at every boot, so the Vault is the one place
+// its apps can live.
 export function vaultAgentId(agent: VaultHolder): string | null {
-    if (agent.config.kind === 'foreman') return null
     return agent.hubAgentId ?? agent.id
 }
 

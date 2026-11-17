@@ -457,6 +457,7 @@
     "vaultSharedItem": "This app comes from the Vault and other coworkers use it. Change it from the Vault.",
     "vaultPaidAppEveryone": "A paid app is attached coworker by coworker",
     "vaultMethodUnsupported": "This app can't be added to the Vault yet. Connect it from a coworker's Apps tab.",
+    "foremanAppNeedsVault": "The Chief of Staff keeps its apps in the Vault, and this app can't be added there yet. Give it to a coworker instead.",
     "vaultConflictEveryone": "Every coworker already gets {name} from another Vault entry shared with everyone",
     "vaultConflictSomeone": "A coworker already gets {name} from another Vault entry",
     "vaultMcpTarget": "Give the server either an address or a command"

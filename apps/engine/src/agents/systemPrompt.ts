@@ -260,11 +260,12 @@ const FOREMAN_MEMORY_AND_SKILLS_NOTE =
 // own: skills, memory and a private database. It keeps no schedules.
 async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order: TurnOrder): Promise<SystemPrompt> {
     const cfg = agent.config.tools
-    const [skillIndex, memoryIndex, dbSchema, sharedDbSchema, brain] = await Promise.all([
+    const [skillIndex, memoryIndex, dbSchema, sharedDbSchema, mcpIndex, brain] = await Promise.all([
         cfg.skills ? buildSkillIndex(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.memory ? buildMemoryIndex(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.db ? readAgentDbSchema(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
+        buildMcpIndex(agent, provider).catch(() => ''),
         cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
     ])
     const stable = [
@@ -285,6 +286,7 @@ async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order:
     if (brain) volatile.push(section('company_brain', brain))
     if (memoryIndex) volatile.push(section('memory_index', memoryIndex))
     if (cfg.db) volatile.push(section('database', `${databaseNote(cfg.sharedDb)}${dbSchema ? `\n\n${dbSchema}` : ''}`))
+    if (mcpIndex) volatile.push(section('connected_services', mcpIndex))
     if (cfg.sharedDb) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
     volatile.push(section('current_time', currentTimeNote()))
     return { stable: joinSections(stable), volatile: joinSections(volatile) }

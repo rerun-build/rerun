@@ -29,6 +29,7 @@ describe('foremanGuard', () => {
         ['POST', '/agents/foreman/files/raw'],
         ['GET', '/agents/foreman/files/read'],
         ['DELETE', '/agents/foreman/files'],
+        ['GET', '/agents/foreman/mcp-servers/status'],
     ])('lets %s %s through', async (method, path) => {
         expect((await call(method, path)).status).toBe(200)
     })
@@ -59,6 +60,9 @@ describe('foremanGuard', () => {
         ['GET', '/agents/foreman/memoriesx'],
         ['GET', '/agents/foreman/skill-proposals'],
         ['GET', '/agents/foreman/datasets'],
+        ['PATCH', '/agents/foreman/mcp-servers'],
+        ['PUT', '/agents/foreman/mcp/notion/token'],
+        ['PATCH', '/agents/foreman/keys'],
         ['GET', '/agents/foreman/triggers'],
         ['POST', '/agents/foreman/schedules'],
         ['DELETE', '/agents/foreman'],

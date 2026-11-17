@@ -75,8 +75,9 @@ import type { TableListResult } from '@/lib/data/source'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
 import { findPendingHitl, pendingSecrets } from '@/lib/chat-hitl'
 import type { EngineConnection, EngineAgentConfigPatch, EngineAgentDetail, EngineMcpServer, EngineDbRows, EngineMemory, EngineRun, EngineRunDetail, EngineRunStep, EngineSchedule, EngineTrigger, EngineSkill, EngineSkillFilePayload, EngineSkillSummary, EngineSkillWithSource, EngineToolCall, EngineToolFamily, EngineUsageBucket, EngineStatsPoint } from '@/lib/engine/types'
-import type { StatsQuery, UsageTimeRange } from '@rerun/contracts'
-import { FOREMAN_AGENT_ID, statsQuerySchema } from '@rerun/contracts'
+import type { StatsQuery, UsageTimeRange, VaultItemSummary } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, statsQuerySchema } from '@rerun/contracts'
+import { createVaultItem, listVaultItems, updateVaultItemEnv } from '@/lib/engine/vault-client'
 import { connectorMcpServerNames, connectorSkillOwners, connectorSkillSlugs, readRegistry } from '@/lib/services/registry'
 import { TEXT_FILE_PAGE_CHARS } from '@rerun/contracts'
 import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal, type ErrorCode, type SuccessResult } from '@/lib/i18n/action-error'
@@ -204,6 +205,7 @@ export async function patchAgentMcpServersAction(agentId: string, body: { upsert
 export async function getAgentKeysAction(agentId: string): Promise<{ keys: string[]; engineKeys: string[] }> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        if (engineAgentId === FOREMAN_AGENT_ID) return { keys: (await foremanSecretItems(conn)).flatMap(item => item.envKeys), engineKeys: [] }
         return await engineGetAgentKeys(conn, engineAgentId)
     } catch {
         return { keys: [], engineKeys: [] }
@@ -255,9 +257,35 @@ export async function getAgentContextAction(agentId: string): Promise<AgentConte
     }
 }
 
+// The Chief of Staff's config, `.env` beside it included, is its engine's to rewrite: what it is
+// given to use lives in the Vault, in a secret attached to it.
+async function foremanSecretItems(conn: EngineConnection): Promise<VaultItemSummary[]> {
+    return (await listVaultItems(conn, FOREMAN_AGENT_ID)).filter(item => item.kind === 'secret' && !item.sharedWithAll && item.agentIds.includes(FOREMAN_AGENT_ID))
+}
+
+async function callerUserId(): Promise<string | null> {
+    const actor = await requireLightSessionActor()
+    return actor.kind === 'user' ? actor.userId : null
+}
+
+async function storeForemanSecrets(conn: EngineConnection, values: Record<string, string>, createdBy: string | null): Promise<void> {
+    const keys = Object.keys(values)
+    const holding = (await foremanSecretItems(conn)).find(item => item.envKeys.some(key => keys.includes(key)))
+    if (holding) {
+        await updateVaultItemEnv(conn, holding.id, { set: values })
+        return
+    }
+    await createVaultItem(conn, { kind: 'secret', name: `${FOREMAN_DISPLAY_NAME}: ${keys.join(', ')}`.slice(0, 120), env: values, agentIds: [FOREMAN_AGENT_ID], createdBy })
+}
+
 export async function updateAgentKeysAction(agentId: string, body: { set?: Record<string, string>; remove?: string[] }): Promise<SuccessResult> {
     try {
         const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage')
+        if (engineAgentId === FOREMAN_AGENT_ID) {
+            if (body.remove?.length) throw new AccessDeniedError('foremanAppNeedsVault')
+            if (body.set && Object.keys(body.set).length) await storeForemanSecrets(conn, body.set, await callerUserId())
+            return { success: true }
+        }
         await engineUpdateAgentKeys(conn, engineAgentId, body)
         return { success: true }
     } catch (err) {
@@ -278,7 +306,8 @@ export async function answerSecretRequestAction(sessionId: string, values: Recor
         const requested = new Set(pending?.kind === 'secret' ? pendingSecrets(pending.input).map(secret => secret.key) : [])
         const keys = Object.keys(values)
         if (keys.length === 0 || keys.some(key => !requested.has(key))) throw new AccessDeniedError('secretNotRequested')
-        await engineUpdateAgentKeys(conn, engineAgentId, { set: values })
+        if (engineAgentId === FOREMAN_AGENT_ID) await storeForemanSecrets(conn, values, await callerUserId())
+        else await engineUpdateAgentKeys(conn, engineAgentId, { set: values })
         return { success: true }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'saveCredentialsFailed') }

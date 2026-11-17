@@ -22,6 +22,8 @@ const FOREMAN_OPEN_ROUTES: Array<{ method: string; path: RegExp }> = [
     { method: 'POST', path: /^\/agents\/foreman\/files\/raw$/ },
     { method: 'GET', path: /^\/agents\/foreman\/files\/read$/ },
     { method: 'DELETE', path: /^\/agents\/foreman\/files$/ },
+    // Where its apps stand: they come from the Vault, which the hub changes through `/vault`.
+    { method: 'GET', path: /^\/agents\/foreman\/mcp-servers\/status$/ },
 ]
 
 const FOREMAN_OPEN_SUBTREES = ['memories', 'skills', 'data'].map(resource => `/agents/${FOREMAN_AGENT_ID}/${resource}`)

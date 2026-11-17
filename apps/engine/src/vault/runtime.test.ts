@@ -110,14 +110,14 @@ describe('what a coworker draws on', () => {
         expect(agentProcessEnv(await loaded(c)).env.LINEAR_EXTRA).toBeUndefined()
     })
 
-    it('gives an item shared with everyone to every coworker, the foreman excepted', async () => {
+    it('gives an item shared with everyone to every coworker and to the Chief of Staff', async () => {
         const a = await createAgent('Everyone A')
         const b = await createAgent('Everyone B')
         await createItem({ kind: 'secret', name: 'Shared', env: { SHARED_ALL: 'x' }, sharedWithAll: true })
         expect(vaultEnvFor(await loaded(a))).toEqual({ SHARED_ALL: 'x' })
         expect(vaultEnvFor(await loaded(b))).toEqual({ SHARED_ALL: 'x' })
-        expect(vaultAgentId({ id: 'f', config: { kind: 'foreman' } as never })).toBeNull()
-        expect(vaultEnvFor({ id: 'f', config: { kind: 'foreman', mcpServers: [] } as never })).toEqual({})
+        expect(vaultAgentId({ id: 'foreman', config: { kind: 'foreman' } as never })).toBe('foreman')
+        expect(vaultEnvFor({ id: 'foreman', config: { kind: 'foreman', mcpServers: [] } as never })).toEqual({ SHARED_ALL: 'x' })
     })
 
     it('lets a delegate draw on the Vault of the coworker it works for', async () => {

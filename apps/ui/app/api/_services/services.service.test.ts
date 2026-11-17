@@ -415,3 +415,47 @@ describe('search_docs', () => {
         expect(searchDocs).not.toHaveBeenCalled()
     })
 })
+
+// The Chief of Staff's config is rewritten at every boot: an app it holds has to be in the Vault.
+describe('installService on the Chief of Staff', () => {
+    const compiledBuffer = { toolNames: ['buffer'], oauth: null, managed: null, composio: null, app: null }
+
+    beforeEach(() => {
+        useRegistry({ services: {} })
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: {}, engineAgentId: 'foreman' } as never)
+        vi.mocked(compileService).mockClear()
+        vi.mocked(compileIntoVault).mockReset()
+    })
+
+    afterEach(() => {
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: {}, engineAgentId: 'engine-agent' } as never)
+        vi.mocked(supportsVault).mockResolvedValue(false)
+        vi.mocked(vaultWritesEnabled).mockResolvedValue(false)
+    })
+
+    it('puts the account in the Vault, attached to the Chief of Staff, never in its config', async () => {
+        vi.mocked(supportsVault).mockResolvedValue(true)
+        vi.mocked(compileIntoVault).mockResolvedValue({ ...compiledBuffer, item: { id: 'item-1', envKeys: [] } } as never)
+
+        await installService('cos', 'public-mcp')
+
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ engineAgentId: 'foreman', itemId: null }))
+        expect(compileService).not.toHaveBeenCalled()
+        expect(resolveAgentTarget).toHaveBeenCalledWith('cos', undefined, 'manage')
+    })
+
+    it('refuses an app the Vault cannot hold yet, rather than one gone at the next boot', async () => {
+        vi.mocked(supportsVault).mockResolvedValue(true)
+
+        await expect(installService('cos', 'whatsapp-pro')).rejects.toMatchObject({ code: 'foremanAppNeedsVault' })
+        expect(compileService).not.toHaveBeenCalled()
+        expect(compileIntoVault).not.toHaveBeenCalled()
+    })
+
+    it('refuses any app on a box without a Vault', async () => {
+        vi.mocked(supportsVault).mockResolvedValue(false)
+
+        await expect(installService('cos', 'public-mcp')).rejects.toMatchObject({ code: 'foremanAppNeedsVault' })
+        expect(compileService).not.toHaveBeenCalled()
+    })
+})

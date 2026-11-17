@@ -23,6 +23,7 @@ const { getAgent } = await import('./registry.js')
 const { createAgent } = await import('./factory.js')
 const { listAgentIndex } = await import('../db/repos/agents.js')
 const { buildTools } = await import('../tools/registry.js')
+const { vaultAgentId } = await import('../vault/runtime.js')
 const { buildSystemPrompt, systemPromptText } = await import('./systemPrompt.js')
 const { createServer } = await import('../http/server.js')
 const { logger } = await import('../lib/logger.js')
@@ -109,8 +110,13 @@ describe('foreman', () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['schedule_create', 'trigger_create', 'notify_user', 'skill_propose', 'soul_update', 'install_complete', 'suggest_service', 'request_secret']) expect(names).not.toContain(name)
+        for (const name of ['schedule_create', 'trigger_create', 'notify_user', 'skill_propose', 'soul_update', 'install_complete', 'team_status', 'computer', 'suggest_service', 'request_secret']) expect(names).not.toContain(name)
         expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
+    })
+
+    it('draws on the Vault entries attached to it, the only place its apps can live', async () => {
+        const foreman = await getAgent(FOREMAN_AGENT_ID)
+        expect(vaultAgentId(foreman)).toBe(FOREMAN_AGENT_ID)
     })
 
     it('is never curated: its memory is written when a member asks', async () => {

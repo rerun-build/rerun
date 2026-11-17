@@ -1,4 +1,4 @@
-import { COWORKER_NOT_FOUND, assertSessionInWorkspace, enforce, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
+import { COWORKER_NOT_FOUND, assertSessionInWorkspace, enforce, foremanAccessOf, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
@@ -27,8 +27,10 @@ export async function resolveAgentTarget(agentId: string, actor?: Actor, access:
     // all three are read at once. The machine read before the ownership check is the caller's own.
     const callerActor = actor ? Promise.resolve(actor) : requireLightSessionActor()
     const [resolvedActor, row, engine] = await Promise.all([callerActor, fetchAgentRow(agentId), callerActor.then(a => findWorkspaceEngine(a.workspaceId))])
-    if (!row?.space_id || row.workspace_id !== resolvedActor.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    enforce(await spaceAccessFor(resolvedActor, { id: row.space_id, workspace_id: row.workspace_id, visibility: row.space?.visibility ?? null }), access, COWORKER_NOT_FOUND)
+    if (!row || row.workspace_id !== resolvedActor.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    if (row.kind === 'foreman') enforce(foremanAccessOf(resolvedActor), access, COWORKER_NOT_FOUND)
+    else if (row.space_id) enforce(await spaceAccessFor(resolvedActor, { id: row.space_id, workspace_id: row.workspace_id, visibility: row.space?.visibility ?? null }), access, COWORKER_NOT_FOUND)
+    else throw new AuthorizationError(COWORKER_NOT_FOUND)
     return buildTarget(row, engine)
 }
 
@@ -36,10 +38,11 @@ export async function getAgentChatTarget(agentId: string, access: AccessLevel = 
     return resolveAgentTarget(agentId, undefined, access)
 }
 
-// The foreman has no agent row: it lives on the workspace's engine under a fixed id, and any signed-in
-// member of the workspace may reach it. Only what reads or stops a run, picks its model or carries
-// the files of a chat message resolves through here. Talking to it stays with its own route, which
-// is where its brief is written.
+// The literal id `foreman`, which the clients send for the Chief of Staff: it lives on the workspace's
+// engine under that id, and any signed-in member of the workspace may reach it. Only what reads or
+// stops a run, picks its model or carries the files of a chat message resolves through here. Talking
+// to it stays with its own route, which is where its brief is written. Its row of `agents` resolves
+// through resolveAgentTarget like a coworker's.
 export async function resolveRunTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
     if (agentId !== FOREMAN_AGENT_ID) return getAgentChatTarget(agentId, access)
     const ctx = await requireWorkspaceContext()
@@ -53,7 +56,7 @@ async function fetchAgentRow(agentId: string) {
     const { data } = await selectMaybeSingleWithJoins(
         createServiceRoleClient(),
         'agents',
-        ['workspace_id', 'space_id', 'engine_agent_id', 'disabled_at', 'disabled_reason'] as const,
+        ['workspace_id', 'space_id', 'engine_agent_id', 'disabled_at', 'disabled_reason', 'kind'] as const,
         {
             space: { table: 'spaces', foreignKey: 'spaces', columns: ['visibility'] },
         } as const,

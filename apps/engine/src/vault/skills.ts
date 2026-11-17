@@ -48,12 +48,12 @@ async function ownConnectorSkills(agentId: string): Promise<Set<string>> {
 // Brings the coworker's folder in line with the Vault: every skill of an attached item written as
 // the item holds it, every skill of an item it no longer holds removed. Skills are copied rather
 // than read from the Vault at run time, so everything that lists, reads or archives a coworker's
-// skills keeps working on its own folder. A foreman and a delegate hold no Vault skills.
+// skills keeps working on its own folder. A delegate holds no Vault skills: it reads its coworker's.
 export function syncVaultSkills(agentId: string): Promise<void> {
     return withKeyedLock(`vault-skills:${agentId}`, async () => {
         if (!agentExists(agentId)) return
         const config = await readAgentConfig(agentId)
-        if (config.kind === 'foreman' || config.ephemeral) return
+        if (config.ephemeral) return
 
         const wanted = new Map<string, { itemId: string; name: string; description: string; body: string }>()
         for (const item of vaultItemsForAgent(agentId)) {

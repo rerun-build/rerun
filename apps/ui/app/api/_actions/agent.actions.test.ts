@@ -56,7 +56,10 @@ vi.mock('@/lib/engine/client', () => ({
     supportsScheduleRename: vi.fn(async () => true),
 }))
 
+vi.mock('@/lib/engine/vault-client', () => ({ listVaultItems: vi.fn(async () => []), createVaultItem: vi.fn(), updateVaultItemEnv: vi.fn() }))
+
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
+const vault = await import('@/lib/engine/vault-client')
 const engine = await import('@/lib/engine/client')
 const actions = await import('./agent.actions')
 
@@ -194,6 +197,30 @@ describe('answerSecretRequestAction', () => {
         await expect(actions.answerSecretRequestAction('session-1', { API_KEY: 'secret' })).resolves.toEqual({ success: true })
         expect(mocks.getAgentChatTarget).toHaveBeenCalledWith(AGENT)
         expect(engine.updateAgentKeys).toHaveBeenCalledWith(conn, 'engine-1', { set: { API_KEY: 'secret' } })
+    })
+
+    it("keeps a key the Chief of Staff asked for in the Vault, attached to it, never in its config", async () => {
+        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'foreman' })
+        mocks.requireLightSessionActor.mockResolvedValue(MEMBER)
+
+        await expect(actions.answerSecretRequestAction('session-1', { API_KEY: 'secret' })).resolves.toEqual({ success: true })
+
+        expect(engine.updateAgentKeys).not.toHaveBeenCalled()
+        expect(vault.createVaultItem).toHaveBeenCalledWith(conn, { kind: 'secret', name: 'Chief of Staff: API_KEY', env: { API_KEY: 'secret' }, agentIds: ['foreman'], createdBy: 'user-2' })
+    })
+
+    it('updates the Vault secret of the Chief of Staff that already holds the key, rather than a second one', async () => {
+        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'foreman' })
+        mocks.requireLightSessionActor.mockResolvedValue(MEMBER)
+        vi.mocked(vault.listVaultItems).mockResolvedValueOnce([
+            { id: 'shared', kind: 'secret', sharedWithAll: true, agentIds: [], envKeys: ['API_KEY'] },
+            { id: 'own', kind: 'secret', sharedWithAll: false, agentIds: ['foreman'], envKeys: ['API_KEY'] },
+        ] as never)
+
+        await expect(actions.answerSecretRequestAction('session-1', { API_KEY: 'rotated' })).resolves.toEqual({ success: true })
+
+        expect(vault.updateVaultItemEnv).toHaveBeenCalledWith(conn, 'own', { set: { API_KEY: 'rotated' } })
+        expect(vault.createVaultItem).not.toHaveBeenCalled()
     })
 
     it('refuses a key the request does not name', async () => {

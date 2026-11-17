@@ -1,4 +1,5 @@
 import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors'
+import type { Database } from '@/app/api/database.types'
 import type { ErrorCode } from '@/lib/i18n/action-error'
 import { toBoxScope, type BoxScope } from '@/app/api/_auth/box-scope'
 import type { WorkspaceContext, WorkspaceRole } from '@/app/api/_auth/ownership'
@@ -19,6 +20,7 @@ import { selectAll, selectMany, selectMaybeSingle, selectMaybeSingleWithJoins } 
 export type BoxAccess = 'none' | 'use' | 'manage'
 export type AccessLevel = 'use' | 'manage'
 export type SpaceVisibility = 'workspace' | 'restricted'
+type AgentKind = Database['public']['Enums']['agent_kind']
 
 // Who is asking. A person signed in, or the workspace itself: an API key, the onboarding, a foreman
 // turn with no person behind it. The workspace stands for its admins, so it reaches every Box.
@@ -120,14 +122,29 @@ export async function assertSpaceAccess(spaceId: string, need: AccessLevel, acto
     return { actor: resolved, access }
 }
 
-export async function assertAgentAccess(agentId: string, need: AccessLevel, actor?: Actor): Promise<{ actor: Actor; access: BoxAccess; agent: { workspace_id: number; space_id: string; engine_agent_id: string | null } }> {
+type AgentAccessRow = { workspace_id: number; space_id: string | null; kind: AgentKind }
+
+// The Chief of Staff sits in no Box: every member of its workspace uses it, and only an admin manages
+// it (its apps, its skills, its memory, its model), since whatever it is given, every member reaches
+// through it.
+export function foremanAccessOf(actor: Actor): BoxAccess {
+    return isAdminActor(actor) ? 'manage' : 'use'
+}
+
+export async function agentAccessFor(actor: Actor, agent: AgentAccessRow): Promise<BoxAccess> {
+    if (agent.workspace_id !== actor.workspaceId) return 'none'
+    if (agent.kind === 'foreman') return foremanAccessOf(actor)
+    return agent.space_id ? readSpaceAccess(actor, agent.space_id) : 'none'
+}
+
+export async function assertAgentAccess(agentId: string, need: AccessLevel, actor?: Actor): Promise<{ actor: Actor; access: BoxAccess; agent: { workspace_id: number; space_id: string | null; engine_agent_id: string | null; kind: AgentKind } }> {
     const resolved = actor ?? (await requireLightSessionActor())
     const supabase = createServiceRoleClient()
-    const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id'] as const, { id: agentId })
-    if (!agent?.space_id || agent.workspace_id !== resolved.workspaceId) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    const access = await readSpaceAccess(resolved, agent.space_id)
+    const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id', 'space_id', 'engine_agent_id', 'kind'] as const, { id: agentId })
+    if (!agent) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    const access = await agentAccessFor(resolved, agent)
     enforce(access, need, COWORKER_NOT_FOUND)
-    return { actor: resolved, access, agent: { ...agent, space_id: agent.space_id } }
+    return { actor: resolved, access, agent }
 }
 
 // Every Box of the workspace with the actor's level on it, in two reads. The lists and the board use
@@ -184,7 +201,7 @@ export function keepVisible<T>(rows: T[], visible: 'all' | Set<string>, idOf: (r
 
 // Asserts the caller reaches the agent at the level asked. Returns the row so callers don't fetch it
 // twice. Replaces the workspace-only check: reaching the workspace no longer means reaching the Box.
-export async function assertAgentInWorkspace(agentId: string, need: AccessLevel = 'use', actor?: Actor): Promise<{ workspace_id: number; space_id: string; engine_agent_id: string | null }> {
+export async function assertAgentInWorkspace(agentId: string, need: AccessLevel = 'use', actor?: Actor): Promise<{ workspace_id: number; space_id: string | null; engine_agent_id: string | null; kind: AgentKind }> {
     return (await assertAgentAccess(agentId, need, actor)).agent
 }
 
@@ -207,11 +224,13 @@ type OwnedSession = { id: string; agent_id: string; engine_session_id: string | 
 
 // Asserts a session belongs to an agent the caller can use (session -> agent -> Box), mirroring the
 // RLS policy on sessions. The session, its agent and its Box come back in one read. `actor` is
-// passed in by a caller that already started resolving it.
+// passed in by a caller that already started resolving it. A conversation with the Chief of Staff is
+// its owner's alone.
 export async function assertSessionInWorkspace(sessionId: string, actor?: Promise<Actor> | Actor): Promise<OwnedSession> {
     const [callerActor, session] = await Promise.all([actor ?? requireLightSessionActor(), readSessionWithAgent(sessionId)])
-    if (!session?.agent?.space_id || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('sessionNotFound')
-    if (!hasAccess(await readSpaceAccess(callerActor, session.agent.space_id), 'use')) throw new AuthorizationError('sessionNotFound')
+    if (!session?.agent || session.agent.workspace_id !== callerActor.workspaceId) throw new AuthorizationError('sessionNotFound')
+    if (session.agent.kind === 'foreman' && (callerActor.kind !== 'user' || session.owner_id !== callerActor.userId)) throw new AuthorizationError('sessionNotFound')
+    if (!hasAccess(await agentAccessFor(callerActor, session.agent), 'use')) throw new AuthorizationError('sessionNotFound')
     return { id: session.id, agent_id: session.agent_id, engine_session_id: session.engine_session_id, engine_agent_id: session.agent.engine_agent_id }
 }
 
@@ -219,9 +238,9 @@ async function readSessionWithAgent(sessionId: string) {
     const { data } = await selectMaybeSingleWithJoins(
         createServiceRoleClient(),
         'sessions',
-        ['id', 'agent_id', 'engine_session_id'] as const,
+        ['id', 'agent_id', 'engine_session_id', 'owner_id'] as const,
         // Named, because origin_agent_id points at agents too.
-        { agent: { table: 'agents', foreignKey: 'agents!sessions_agent_id_fkey', columns: ['workspace_id', 'space_id', 'engine_agent_id'] } } as const,
+        { agent: { table: 'agents', foreignKey: 'agents!sessions_agent_id_fkey', columns: ['workspace_id', 'space_id', 'engine_agent_id', 'kind'] } } as const,
         { id: sessionId },
     )
     return data

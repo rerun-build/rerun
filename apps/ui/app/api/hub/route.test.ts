@@ -12,7 +12,8 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { POST } from './route'
 
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn() }))
-vi.mock('@/app/api/_services/services.service', () => ({ dispatchHubTool: vi.fn() }))
+vi.mock('@/app/api/_services/services.service', () => ({ dispatchHubTool: vi.fn(), COWORKER_HUB_TOOLS: new Set(['service_search', 'service_install', 'publish_file', 'search_docs']) }))
+vi.mock('@/lib/foreman/agent-row', () => ({ foremanAgentId: vi.fn().mockResolvedValue('chief-of-staff-row') }))
 vi.mock('@/app/api/_services/team-hub.service', async () => ({ dispatchTeamHubTool: vi.fn(), isTeamHubTool: (name: string) => name.startsWith('team_') }))
 vi.mock('@/app/api/_services/ai-status-hub.service', () => ({ readRerunCredit: vi.fn(), isAiStatusHubTool: (name: string) => name === 'rerun_credit' }))
 vi.mock('@/app/api/_services/mcp-account.service', () => ({ dispatchAccountTool: vi.fn() }))
@@ -183,6 +184,23 @@ describe('POST /api/hub', () => {
         expect(vi.mocked(selectMaybeSingle).mock.calls[0][1]).toBe('workspace_members')
         expect(vi.mocked(selectMaybeSingle).mock.calls[0][3]).toEqual({ user_id: 'user-7', workspace_id: WORKSPACE_ID })
         expect(dispatchAccountTool).toHaveBeenCalledWith({ kind: 'user', userId: 'user-7', workspaceId: WORKSPACE_ID, role: 'member', boxScope: 'assigned' }, 'list_agents', {}, { actorUserId: 'user-7' })
+    })
+
+    it('runs a tool the foreman shares with every coworker on its own row, with the rights of the member it talks to', async () => {
+        vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { role: 'member', box_scope: 'all' }, error: null })
+
+        const response = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: mintForemanHubToken(WORKSPACE_ID, 'user-7'), body: { tool: 'service_install', args: { slug: 'notion' } } }))
+
+        expect(response.status).toBe(200)
+        expect(dispatchHubTool).toHaveBeenCalledWith('chief-of-staff-row', 'service_install', { slug: 'notion' }, WORKSPACE_ID, { kind: 'user', userId: 'user-7', workspaceId: WORKSPACE_ID, role: 'member', boxScope: 'all' })
+        expect(dispatchAccountTool).not.toHaveBeenCalled()
+    })
+
+    it('keeps the docs search of its brief its own', async () => {
+        const response = await POST(hubRequest({ agent: FOREMAN_AGENT_ID, foremanToken: mintForemanHubToken(WORKSPACE_ID), body: { tool: 'search_docs', args: { query: 'vault' } } }))
+
+        expect(response.status).toBe(200)
+        expect(dispatchHubTool).not.toHaveBeenCalled()
     })
 
     it('refuses the foreman of a member who has left the workspace since the turn started', async () => {
