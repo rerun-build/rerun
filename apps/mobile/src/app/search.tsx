@@ -105,6 +105,7 @@ export default function Search() {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const pane = usePaneInsets()
+    const topBar = usePaneInsets({ clearWindowControls: true })
     const team = useTeam()
     const t = useTranslations('mobileHome')
     const [query, setQuery] = useState('')
@@ -128,7 +129,7 @@ export default function Search() {
 
     return (
         <View style={{ flex: 1, backgroundColor: theme.background, paddingTop: insets.top + spacing.sm, paddingLeft: pane.left, paddingRight: pane.right }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.md }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.md, marginLeft: topBar.left - pane.left, marginRight: topBar.right - pane.right }}>
                 <GlassButton symbol="chevron-left" label={t('search.back')} onPress={() => router.back()} />
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 44, paddingHorizontal: spacing.md, borderRadius: radius.pill, backgroundColor: theme.muted }}>
                     <Icon name="search" size={15} color={theme.mutedForeground} />

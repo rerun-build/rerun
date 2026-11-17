@@ -72,11 +72,12 @@ export function CoworkerDetails({ coworker, files, apps, routines, notifications
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const pane = usePaneInsets()
+    const topBar = usePaneInsets({ clearWindowControls: true })
     const t = useTranslations('mobileCoworker.details')
     const tAccess = useTranslations('mobileCoworker.access')
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: insets.top + spacing.xs, paddingBottom: insets.bottom + spacing.xl, paddingLeft: spacing.lg + pane.left, paddingRight: spacing.lg + pane.right, gap: spacing.xl }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginLeft: topBar.left - pane.left, marginRight: topBar.right - pane.right }}>
                 <GlassButton symbol="chevron-left" label={t('back')} onPress={onBack} />
                 <NativeMenu glass="circle" label={t('more')} trigger={<CircleTrigger symbol="ellipsis" />}>
                     <MenuItem label={t('delete')} icon="trash" destructive onPress={onDelete} disabled={!canDelete || lock.locked} />

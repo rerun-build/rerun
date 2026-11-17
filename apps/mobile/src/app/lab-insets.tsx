@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router'
 import { StyleSheet, useWindowDimensions, View } from 'react-native'
-import { SafeAreaInsetsContext } from 'react-native-safe-area-context'
+import { SafeAreaCornerAdaptedInsetsContext, SafeAreaInsetsContext } from 'react-native-safe-area-context'
 
 import { NoPlan } from '@/components/home/NoPlan'
 import { PaneSizeProvider } from '@/components/layout/PaneSize'
@@ -57,9 +57,12 @@ export default function InsetsLab() {
     const scheme = params.scheme === 'dark' || params.scheme === 'light' ? params.scheme : system
     const screen = params.screen ?? 'home'
     const inset = Number(params.inset ?? 44)
+    const insets = { top: 47, bottom: 34, left: inset, right: inset }
     return (
         <ThemeScope scheme={scheme}>
-            <SafeAreaInsetsContext.Provider value={{ top: 47, bottom: 34, left: inset, right: inset }}>{params.split === '1' ? <SplitLab screen={screen} /> : <Screen screen={screen} />}</SafeAreaInsetsContext.Provider>
+            <SafeAreaInsetsContext.Provider value={insets}>
+                <SafeAreaCornerAdaptedInsetsContext.Provider value={{ horizontal: insets, vertical: insets }}>{params.split === '1' ? <SplitLab screen={screen} /> : <Screen screen={screen} />}</SafeAreaCornerAdaptedInsetsContext.Provider>
+            </SafeAreaInsetsContext.Provider>
         </ThemeScope>
     )
 }

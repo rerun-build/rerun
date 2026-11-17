@@ -3,6 +3,7 @@ import { ScrollView, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
+import { usePaneInsets } from '@/components/layout/PaneSize'
 import { SheetHeader } from '@/components/providers/bits'
 import { AppText } from '@/components/ui/AppText'
 import { useTheme } from '@/theme/theme'
@@ -12,9 +13,12 @@ import { spacing } from '@/theme/tokens'
 export function CoworkerPage({ title, onBack, children }: { title: string; onBack: () => void; children: ReactNode }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
+    const topBar = usePaneInsets({ clearWindowControls: true })
     return (
         <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={{ paddingTop: insets.top + spacing.xs, paddingBottom: insets.bottom + spacing.xl, paddingHorizontal: spacing.lg, gap: spacing.xl }}>
-            <SheetHeader title={title} onBack={onBack} />
+            <View style={{ paddingLeft: topBar.left, paddingRight: topBar.right }}>
+                <SheetHeader title={title} onBack={onBack} />
+            </View>
             {children}
         </ScrollView>
     )

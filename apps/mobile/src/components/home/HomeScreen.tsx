@@ -43,6 +43,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const pane = usePaneInsets()
+    const topBar = usePaneInsets({ clearWindowControls: true })
     const { session, me } = useAuth()
     const board = useBoard()
     const inbox = useInbox()
@@ -168,7 +169,7 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
 
             <EdgeFade edge="top" height={headerHeight + spacing.xl} />
             <EdgeFade edge="bottom" height={insets.bottom + 90} />
-            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: pane.left, right: pane.right }}>
+            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: topBar.left, right: topBar.right }}>
                 <HomeHeader inboxCount={inbox.state === 'ready' ? inboxCount(inbox.items) : 0} onInbox={() => router.push('/inbox')} onNewCoworker={() => router.push('/new-coworker')} />
             </Animated.View>
             <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: bottomBarInset(insets.bottom) }}>

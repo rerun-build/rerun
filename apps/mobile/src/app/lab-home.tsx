@@ -45,6 +45,7 @@ export function MockHome({ pinCount, foremanPinned = false }: { pinCount: number
     const theme = useTheme()
     const insets = useSafeAreaInsets()
     const pane = usePaneInsets()
+    const topBar = usePaneInsets({ clearWindowControls: true })
     const cell = usePinnedCell()
     const [pinnedIds, setPinnedIds] = useState(() => [...(foremanPinned ? [FOREMAN_AGENT_ID] : []), ...TEAM.slice(0, pinCount).map(coworker => coworker.id)])
     const [reordering, setReordering] = useState(false)
@@ -86,7 +87,7 @@ export function MockHome({ pinCount, foremanPinned = false }: { pinCount: number
             </ScrollView>
             <EdgeFade edge="top" height={headerHeight + spacing.xl} />
             <EdgeFade edge="bottom" height={insets.bottom + 90} />
-            <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: pane.left, right: pane.right }}>
+            <View pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: topBar.left, right: topBar.right }}>
                 <HomeHeader inboxCount={4} onInbox={noop} onNewCoworker={() => router.push('/new-coworker')} />
             </View>
             <View pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: insets.bottom + spacing.sm }}>

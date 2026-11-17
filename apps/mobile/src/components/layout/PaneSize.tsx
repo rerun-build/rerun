@@ -25,8 +25,17 @@ export function useIsSplit(): boolean {
 
 // The horizontal safe-area insets a screen owes to the window edges it actually touches: the sidebar
 // never touches the right edge, the detail column beside it never touches the left one.
-export function usePaneInsets(): { left: number; right: number } {
-    const { left, right } = useSafeAreaInsets()
+// A top bar asks to `clearWindowControls`: iPadOS 26 counts the controls of a windowed app only in the
+// corner-adapted insets, never in the regular ones. Those insets also carry the screen's rounded corners on
+// both sides (18 on an iPhone, 9.5 on a full-screen iPad), so they are read only while the controls are
+// there, which is when the vertical one grows past the top.
+export function usePaneInsets({ clearWindowControls = false }: { clearWindowControls?: boolean } = {}): { left: number; right: number } {
+    const regular = useSafeAreaInsets()
+    const besideControls = useSafeAreaInsets({ cornerAdaptation: 'horizontal' })
+    const belowControls = useSafeAreaInsets({ cornerAdaptation: 'vertical' })
+    const windowControlsShown = belowControls.top > regular.top
+    const left = clearWindowControls && windowControlsShown ? besideControls.left : regular.left
+    const right = regular.right
     const side = useContext(PaneSideContext)
     const split = useIsSplit()
     if (side === 'sidebar') return { left, right: 0 }
