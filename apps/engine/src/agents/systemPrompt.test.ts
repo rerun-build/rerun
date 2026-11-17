@@ -6,6 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-system-prompt-
 
 const { afterEach, describe, expect, it, vi } = await import('vitest')
 const { agentConfigSchema } = await import('@rerun/contracts')
+const { SKILL_STYLE } = await import('../skills/style.js')
 const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, currentTimeNote, nowBlock, userBlock, userLanguageBlock } = await import('./systemPrompt.js')
 
 // The tests read the prompt as the model does, both blocks joined.
@@ -150,6 +151,7 @@ describe('skills section', () => {
         expect(prompt).toContain('<skills>')
         expect(prompt).toContain('You have no skill yet')
         expect(prompt).toContain('Never write a skill on your own initiative')
+        expect(prompt).toContain(SKILL_STYLE)
     })
 
     it('sends the capture through the inline proposal, never through a question', async () => {

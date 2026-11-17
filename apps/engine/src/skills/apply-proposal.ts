@@ -9,6 +9,7 @@ import { connectorSkillOwners } from '../services/registry.js'
 import { listSkillSummaries, readSkill, skillExists, writeSkillFolder, type SkillSummary } from './loader.js'
 import { transitionSkillProposal } from '../db/repos/skill-proposals.js'
 import { slugify } from '../lib/ids.js'
+import { SKILL_BODY_MAX_WORDS, SKILL_DESCRIPTION_MAX_CHARS, SKILL_STYLE } from './style.js'
 import { logger } from '../lib/logger.js'
 import type { LoadedAgent } from '../agents/types.js'
 import type { SkillProposalRow } from '../db/schema.js'
@@ -18,8 +19,8 @@ const APPLY_TIMEOUT_MS = 10 * 60 * 1000
 
 const draftSchema = z.object({
     name: z.string().describe('The skill name, kept as it is when editing an existing skill'),
-    description: z.string().describe('One line saying when this skill applies'),
-    body: z.string().describe('The complete SKILL.md body in Markdown, the full revised procedure rather than a diff'),
+    description: z.string().describe(`One line under ${SKILL_DESCRIPTION_MAX_CHARS} characters saying when this skill applies`),
+    body: z.string().describe(`The complete SKILL.md body in Markdown, the full revised procedure rather than a diff, under ${SKILL_BODY_MAX_WORDS} words for a new skill`),
 })
 
 export function applyProposalPrompt(input: {
@@ -31,11 +32,11 @@ export function applyProposalPrompt(input: {
     const rules = input.instructions.map(r => `- ${r}`).join('\n')
 
     if (input.current) {
-        return `The user approved folding these rules into an existing skill.\n\nRules:\n${rules}\n\nCurrent skill "${input.current.name}" (${input.current.description}):\n\n${input.current.body}\n\nReturn the complete revised skill. Change only what the rules touch and keep every other line exactly as it is. Keep the name unchanged. Write it as instructions to the coworker's future self: the steps in order, the exact tool calls, the decisions and their criteria, and how to tell the work is done. No preamble, no mention of this conversation.`
+        return `The user approved folding these rules into an existing skill.\n\nRules:\n${rules}\n\nCurrent skill "${input.current.name}" (${input.current.description}):\n\n${input.current.body}\n\nReturn the complete revised skill. Change only what the rules touch and keep every other line exactly as it is. Keep the name unchanged. Write what you add or change as instructions to the coworker's future self, with no mention of this conversation. ${SKILL_STYLE}`
     }
 
     const neighbours = input.others.length ? `\n\nSkills this coworker already has, so stay off their ground:\n${input.others.map(s => `- ${s.name}: ${s.description}`).join('\n')}` : ''
-    return `The user approved capturing these rules as a new skill named "${input.title}".\n\nRules:\n${rules}${neighbours}\n\nWrite the skill. Keep it short and actionable, written as instructions to the coworker's future self: the steps in order, the exact tool calls, the decisions and their criteria, and how to tell the work is done. No preamble, no mention of this conversation.`
+    return `The user approved capturing these rules as a new skill named "${input.title}".\n\nRules:\n${rules}${neighbours}\n\nWrite the skill as instructions to the coworker's future self, with no mention of this conversation. ${SKILL_STYLE}`
 }
 
 async function draft(agent: LoadedAgent, row: SkillProposalRow, abortSignal: AbortSignal): Promise<{ name: string; description: string; body: string; slug: string }> {

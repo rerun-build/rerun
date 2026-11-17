@@ -43,6 +43,7 @@ vi.mock('../connections/codex-auth.js', () => ({
 const { describe, expect, it, beforeEach } = await import('vitest')
 const { applySkillProposal, applyProposalPrompt } = await import('./apply-proposal.js')
 const { writeSkillFolder } = await import('./loader.js')
+const { SKILL_STYLE } = await import('./style.js')
 const { insertSkillProposal, getSkillProposal, transitionSkillProposal } = await import('../db/repos/skill-proposals.js')
 const { skillsDir, skillDir, connectionsDir } = await import('../config/paths.js')
 const { rm } = await import('node:fs/promises')
@@ -233,5 +234,13 @@ describe('applyProposalPrompt', () => {
         })
         expect(prompt).toContain('- Publishing: How posts go out')
         expect(prompt).not.toContain('Keep the name unchanged')
+    })
+
+    it('asks for a terse skill when creating and when editing', () => {
+        const rules = { title: 'Weekly report', instructions: ['Send it on Friday.'], others: [] }
+        const creating = applyProposalPrompt({ ...rules, current: null })
+        const editing = applyProposalPrompt({ ...rules, current: { name: 'Weekly report', description: 'The Friday report', body: 'Draft, send.' } })
+        for (const prompt of [creating, editing]) expect(prompt).toContain(SKILL_STYLE)
+        expect(editing).toContain('keep every other line exactly as it is')
     })
 })
