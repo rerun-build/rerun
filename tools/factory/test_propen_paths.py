@@ -95,6 +95,22 @@ class PrOpenPaths(FactoryCase):
         self.assertIn("other.txt", out)
         self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), "")
 
+    def test_a_listed_test_may_not_be_deleted_and_a_heading_inside_a_line_does_not_count(self):
+        self.on_dev("a/test_old.py")
+        p = self.wt(issue="7", chunk="1")
+        git(p, "rm", "--quiet", "a/test_old.py")
+        git(p, "commit", "--quiet", "-m", "drop the test")
+        with mock.patch.object(self, "wt", lambda **k: p):
+            code, out = self.open_pr(["work.txt"], commits=("work.txt",), note=self.adapted("a/test_old.py"))
+        self.assertEqual(code, 2, out)
+        self.assertIn("a/test_old.py", out)
+
+    def test_a_heading_that_only_contains_the_words_lists_nothing(self):
+        self.on_dev("a/test_old.py")
+        note = "see ## Tests adapted" + chr(10) + "- `a/test_old.py`: no" + chr(10)
+        code, out = self.open_pr(["work.txt"], commits=("work.txt", "a/test_old.py"), note=note)
+        self.assertEqual(code, 2, out)
+
     def test_an_issue_without_files_puts_no_rule(self):
         code, out = self.open_pr([], issue_body="SMALL FIX", commits=("other.txt",))
         self.assertEqual(code, 0, out)

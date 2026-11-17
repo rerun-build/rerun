@@ -165,7 +165,8 @@ def stale_paragraph(j):
 TESTS_ADAPTED = ('One exception to the files the issue names: when the change the issue specifies makes an existing test outside its Files fail, '
                  'change that test only as far as the specified change requires, never to let a wrong behaviour pass, and list each such test file '
                  'in the pull request body under the heading `## Tests adapted`, one line each: "- `path`: why the specified change makes it wrong". '
-                 'pr-open lets an existing test file listed there through; a new file or a file that is not a test still has to be in Files.')
+                 'pr-open lets an existing test file listed there through; a new file, a deleted test or a file that is not a test still has to be in Files. '
+                 'A fix round reads the list from the pull request as it stands and cannot add to it.')
 
 
 def build_brief(j):
