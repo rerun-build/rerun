@@ -1,9 +1,9 @@
-import contextlib, io, json, os, sys, tempfile, unittest
+import os, sys, tempfile, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import dispatch as D
 import digest
 import limits
 import store as ledger_store
+from test_dispatch import Base
 
 NOW = limits.ts("2026-11-17T12:00:00Z")
 TABLE = {"models": {"m": {"input": 1, "cache_read": 0, "cache_write": 0, "output": 1}}}
@@ -128,27 +128,13 @@ class Rework(unittest.TestCase):
         self.assertEqual(len([f for f in self.st.failures() if f["kind"] == "rework"]), 2)
 
 
-class Beat(unittest.TestCase):
+class Beat(Base):
     def setUp(self):
-        tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(tmp.cleanup)
-        self.t = NOW
+        super().setUp()
+        self.w.clock = NOW
+        self.w.issues = []
+        self.d = self.new()
         self.n = 0
-
-        def account(tool, args, timeout=30):
-            return {}
-
-        def gh(args):
-            if args[0] == "issue":
-                return json.dumps([{"number": 700, "title": "Factory control"}])
-            return "[]"
-
-        cfg = {"repo": "o/r", "label": "factory", "max_jobs": 8, "auto_plan_marker": True,
-               "ledger_file": os.path.join(tmp.name, "ledger.db"), "json_state_file": os.path.join(tmp.name, "d.json"),
-               "heartbeat_file": os.path.join(tmp.name, "hb"),
-               "builders": [{"id": "b1", "name": "B1"}], "reviewers": [{"id": "r1", "name": "R1"}]}
-        self.d = D.Dispatcher(cfg, account, gh, now=lambda: self.t)
-        self.addCleanup(self.d.close)
 
     def job(self, n, parent=None):
         self.d.store.put_job(str(n), "merged", {"issue": n, "title": "T", "body": body(parent), "dev_result": "green"}, None,
@@ -161,10 +147,6 @@ class Beat(unittest.TestCase):
         self.d.store.fired(fid, run)
         self.d.store.close_run(run, "done", at="2026-11-16T10:00:00Z", tokens_in=1000000, tokens_out=0)
 
-    def beat(self):
-        with contextlib.redirect_stdout(io.StringIO()):
-            self.d.once()
-
     def rework_rows(self):
         return [f for f in self.d.store.failures() if f["kind"] == "rework"]
 
@@ -175,13 +157,14 @@ class Beat(unittest.TestCase):
         self.job(2, parent=10)
         for _ in range(4):
             self.fire(2, "build")
-        self.beat()
+        self.tick()
         rows = self.rework_rows()
         self.assertEqual(len(rows), 1)
         self.assertEqual((rows[0]["job"], rows[0]["station"]), ("-", "plan"))
         self.assertIn("4.5 build and fix runs", rows[0]["reason"])
-        self.t += 600
-        self.beat()
+        self.assertIn("threshold 1.3", rows[0]["reason"])
+        self.w.clock += 600
+        self.tick()
         self.assertEqual(len(self.rework_rows()), 1)
 
 
