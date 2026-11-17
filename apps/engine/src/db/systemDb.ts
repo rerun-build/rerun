@@ -288,6 +288,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
             await ensureColumns(client, 'run_steps', RUN_STEP_EFFORT_COLUMNS)
         },
     },
+    {
+        version: 8,
+        id: 'messages-session-role-created-index',
+        up: async client => {
+            await client.execute('CREATE INDEX IF NOT EXISTS messages_session_role_created_idx ON messages(session_id, role, created_at)')
+        },
+    },
 ]
 
 export const SYSTEM_DB_VERSION = latestVersion(SYSTEM_DB_MIGRATIONS)
