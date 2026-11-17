@@ -1141,7 +1141,7 @@ def cmd_merge_dev(a):
     if g.returncode:
         die("gate did not pass at %s (exit %s), not merging.\n%s" % (pr["head"]["sha"][:8], g.returncode, (g.stdout or g.stderr).strip()[-600:]), 1)
     if "--note" in a:
-        run([GH, "pr", "comment", n, "-R", full, "--body", "Review ACCEPT @%s: %s" % (pr["head"]["sha"][:8], a[a.index("--note") + 1][:1500])], check=False)
+        run([GH, "pr", "comment", n, "-R", full, "--body", "Review ACCEPT @%s: %s" % (pr["head"]["sha"][:8], a[a.index("--note") + 1][:60000])], check=False)
     r = run([GH, "pr", "merge", n, "-R", full, "--merge", "--match-head-commit", pr["head"]["sha"]], check=False)
     if r.returncode:
         die("merge failed: %s" % (r.stderr or r.stdout).strip()[-400:], 1)

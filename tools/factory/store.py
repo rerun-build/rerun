@@ -1,4 +1,5 @@
 import fcntl, json, os, sqlite3, time
+from gist import gist
 
 import states
 
@@ -304,7 +305,7 @@ class Store:
         with self.db:
             cur = self.db.execute(
                 "INSERT INTO failures(at, kind, job, station, coworker, model, tier, reason, plan_run, brief) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (at or now(), kind, str(job), station, coworker, model, tier, (reason or "")[:300], plan_run, brief))
+                (at or now(), kind, str(job), station, coworker, model, tier, gist(reason, 300), plan_run, brief))
         return cur.lastrowid
 
     def failures(self, after=0):
