@@ -81,6 +81,17 @@ class Proof(ProofBase):
         data = json.loads(self.w.rows("SELECT data FROM jobs WHERE job='5'")[0][0])
         self.assertEqual(data["prover"], "r2")
 
+    def test_a_job_two_reviewers_judged_is_proved_by_neither_of_them(self):
+        self.cfg["types"] = {"coder": {"coworkers": [{"id": "b1", "name": "B1"}]},
+                             "reviewer": {"coworkers": [{"id": "r1", "name": "R1"}, {"id": "r2", "name": "R2"}]},
+                             "acceptor": {"coworkers": [{"id": "a1", "name": "A1"}]}}
+        d = self.d = self.new()
+        j = {"builder": "b1", "reviewer": "r2", "first_accept": {"head": HEAD, "by": "r1"}}
+        self.assertEqual(d.free_prover(j)[0], "a1")
+        self.assertEqual(d.free_prover({**j, "first_accept": None})[0], "r1")
+        del d.cfg["types"]["acceptor"]
+        self.assertIsNone(d.free_prover(j))
+
     def test_without_a_free_prover_the_job_keeps_waiting(self):
         self.cfg["reviewers"] = [{"id": "r1", "name": "R1"}]
         self.to_proof_wait()
