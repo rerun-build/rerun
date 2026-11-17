@@ -14,6 +14,7 @@ import failures
 import followups
 import holds
 import inboxsort
+import plancheck
 import planners
 import planning
 import pools
@@ -623,6 +624,9 @@ class Dispatcher:
         self.refused = {n: e for n, e in shape.items() if e}
         self.unreadable = len(self.refused)
         labelled = {i["number"] for i in issues}
+        tree = None
+        if any(plancheck.needs(i) and not self.plan_settled(i) for i in issues):
+            tree = plancheck.tree(self.gh, self.repo)
         open_numbers = None
         if any(cutshape.parse(i)["deps"] for i in issues):
             open_numbers = {o["number"] for o in json.loads(self.gh(
@@ -652,6 +656,8 @@ class Dispatcher:
                         self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", cutshape.comment(errors)])
                         self.store.set(str(i["number"]), "cutshape", digest)
                         log(i["number"], "not started: the issue text is not readable (%d problem%s)" % (len(errors), "" if len(errors) == 1 else "s"))
+                    continue
+                if self.plan_check(i, tree) is None:
                     continue
                 parsed = cutshape.parse(i)
                 if parsed["worker"] not in ("coder", "researcher", "designer") or parsed["worker"] not in pools.types(self.cfg):
@@ -728,6 +734,28 @@ class Dispatcher:
                 log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
             except (Error, ValueError, KeyError) as e:
                 log(i["number"], "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
+
+    def plan_key(self, i):
+        return hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
+
+    def plan_settled(self, i):
+        return self.store.get_all(str(i["number"])).get("plancheck", "").startswith(self.plan_key(i) + ":")
+
+    def plan_check(self, i, tree):
+        kv = self.store.get_all(str(i["number"])).get("plancheck", "")
+        key = self.plan_key(i)
+        if kv == key + ":ok":
+            return []
+        if kv == key + ":bad":
+            return None
+        found = plancheck.faults(i, tree)
+        if found:
+            self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", plancheck.comment(found)])
+            log(i["number"], "not started: the plan check found %d fault%s" % (len(found), "" if len(found) == 1 else "s"))
+            self.store.set(str(i["number"]), "plancheck", key + ":bad")
+            return None
+        self.store.set(str(i["number"]), "plancheck", key + ":ok")
+        return []
 
     def dep_state(self, d, open_numbers, labelled):
         n = str(d)
