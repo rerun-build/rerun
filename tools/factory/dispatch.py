@@ -716,7 +716,7 @@ class Dispatcher:
                     unmet = [d for d in deps if got[d] != "met"]
                     if unmet:
                         ret = [d for d in unmet if got[d] == "returned"]
-                        dead = [[d, got[d]] for d in unmet if got[d] not in ("live", "not a factory job")]
+                        dead = [[d, got[d]] for d in unmet if got[d] not in ("live", "not a factory job") and not self.re_plannable(d, got[d])]
                         line = "waits on " + ", ".join(DEP_TEXT.get(got[d], "dead #%d (" + got[d] + ")") % d for d in unmet)
                         if not old or old["state"] != "waiting" or old.get("wait_line") != line:
                             data = {"issue": i["number"], "title": i["title"], "body": i.get("body") or "", "state": "waiting",
@@ -820,6 +820,14 @@ class Dispatcher:
             if reason == "completed":
                 self.store.set(n, "close_reason", reason)
         return "met" if reason == "completed" else "closed as " + reason.replace("_", " ")
+
+    def re_plannable(self, d, state):
+        if state != "returned":
+            return False
+        j = self.store.get_job(str(d))
+        if not j or clocks.klass("BLOCKED", blocked=j.get("reason")) != "plan" or j.get("replans", 0) >= MAX_REPLANS:
+            return False
+        return "closed_seen" not in self.store.get_all(str(d))
 
     def stop_lost(self):
         live = [j for j in self.jobs() if j["state"] not in END]
