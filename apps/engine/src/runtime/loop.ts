@@ -1,9 +1,9 @@
-import { streamText, ToolChoiceViolationError, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
+import { streamText, ToolChoiceViolationError, wrapLanguageModel, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
 import { RERUN_CONNECTION_ID, contextTextPart, type ContextOccupancy, type GoalVerdict, type MessageAuthor } from '@rerun/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
 import { prepareRunHistory } from './compaction/compact.js'
-import { calledToolNames, repairToolPairs } from './compaction/repair.js'
+import { repairToolPairs } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { goalStopHook } from '../agents/claude-goal-hook.js'
 import { CLI_PROVIDERS, resolveModel, type GoalOption, type ModelOverride } from '../agents/providers.js'
@@ -36,7 +36,8 @@ import { buildTools } from '../tools/registry.js'
 import { callTargetsOf } from '../tools/builtin/call-agent.js'
 import { toolPayloadChars } from '../tools/payload.js'
 import { wrapToolsWithResultHandle } from '../tools/result-handle.js'
-import { activeToolNames } from '../tools/mcp-search.js'
+import { sentToolNames } from '../tools/mcp-search.js'
+import { mcpWireMiddleware } from '../tools/mcp-wire.js'
 import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
@@ -465,7 +466,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             trigger,
             provider,
             order,
-            toolsP.then(built => built.deferredMcp?.catalog),
+            toolsP.then(built => built.heldBackMcp),
         )
         const systemText = systemPromptText(system)
 
@@ -474,11 +475,11 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         const built = await toolsP
         closeTools = built.close
-        const { deferredMcp } = built
+        const { heldBackMcp } = built
         const tools = wrapToolsWithResultHandle(built.tools, { agentId: agent.id, runId: run.id })
-        const sentTools = deferredMcp ? Object.fromEntries(activeToolNames(tools, deferredMcp).map(name => [name, tools[name]])) : tools
+        const sentNames = heldBackMcp ? sentToolNames(tools, heldBackMcp) : undefined
+        const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
         const history = repairToolPairs(await prepareRunHistory(ctx, systemText, override, shared, toolPayloadChars(sentTools)))
-        if (deferredMcp) for (const name of calledToolNames(history)) deferredMcp.loaded.add(name)
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)
@@ -502,7 +503,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         if (offersQuickReplies(agent.config)) quickReplies = resolvedModel.quickReplies
-        const languageModel = resolvedModel.model
+        const languageModel = heldBackMcp ? wrapLanguageModel({ model: resolvedModel.model, middleware: mcpWireMiddleware(heldBackMcp) }) : resolvedModel.model
 
         if (CLI_PROVIDERS.has(provider)) live = createLiveCounter({ flush: ({ toolCalls }) => updateRunLive(agent.id, run.id, { stepCount: toolCalls }) })
         let lastStepAt = Date.now()
@@ -513,16 +514,14 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             messages: cached.messages,
             providerOptions: mergeProviderOptions(mergeProviderOptions(cached.providerOptions, reasoningProviderOptions(provider, model, agent.config.thinkingLevel)), resumeThreadId ? { 'codex-app-server': { threadId: resumeThreadId } } : undefined),
             tools,
+            activeTools: sentNames,
             abortSignal: controller.signal,
             experimental_repairToolCall: repairToolCall,
             stopWhen: ({ steps }) => hitlTurnIsOver(steps, CLI_PROVIDERS.has(provider)),
             prepareStep: ({ messages, steps }) => {
                 const step = stepWithScreenshots(messages, ctx.screenshots, provider, model, connection)
-                // A held-back tool called by its name ran without its schema: the next step carries it.
-                if (deferredMcp) for (const call of steps.at(-1)?.toolCalls ?? []) deferredMcp.loaded.add(call.toolName)
                 return {
                     ...step,
-                    ...(deferredMcp ? { activeTools: activeToolNames(tools, deferredMcp) } : {}),
                     ...(behaviourOf(provider, model) === 'anthropic' ? { messages: withTailBreakpoint(step.messages ?? messages) } : {}),
                     ...(!CLI_PROVIDERS.has(provider) && hitlStepLacksMessage(steps) ? { toolChoice: 'none' as const } : {}),
                 }

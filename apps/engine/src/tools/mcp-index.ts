@@ -1,5 +1,5 @@
 import { mcpToolNameFor, resolveTransport } from './mcp.js'
-import { mcpServerToolCounts, type McpCatalogEntry } from './mcp-search.js'
+import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpServerToolCounts, type McpCatalogEntry } from './mcp-search.js'
 import { loadToken } from './mcp-auth.js'
 import { connectorServerStates, type ConnectorServerState } from '../services/registry.js'
 import type { Provider } from '@rerun/contracts'
@@ -24,10 +24,10 @@ function connectorAuth(state: ConnectorServerState, states: Map<string, Connecto
     return `connected (${app})`
 }
 
-export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, deferred?: McpCatalogEntry[]): Promise<string> {
+export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, heldBack?: McpCatalogEntry[]): Promise<string> {
     if (agent.config.mcpServers.length === 0) return ''
     const states = await connectorServerStates(agent.id)
-    const toolCounts = deferred ? mcpServerToolCounts(deferred) : null
+    const toolCounts = heldBack ? mcpServerToolCounts(heldBack) : null
     const lines = await Promise.all(
         agent.config.mcpServers.map(async server => {
             const transport = resolveTransport(server)
@@ -50,8 +50,8 @@ export async function buildMcpIndex(agent: LoadedAgent, provider?: Provider, def
         ? ` A server marked "not connected yet" or "not set up yet" belongs to an app the user has not connected: its tools are listed but every call fails, so do not call them and never tell the user that app is connected; ${connectStep}.`
         : ''
     const toolName = `\`${mcpToolNameFor(provider, '<name>', '<tool>')}\``
-    const loading = deferred
-        ? `Their tools are named ${toolName} and are not loaded up front: call ${MCP_SEARCH_TOOL} with a few words of what you need and the server's name, then call the tools it loaded. A tool you already called in this conversation stays loaded.`
+    const reaching = heldBack
+        ? `Their tools are named ${toolName} and are not in your tool list: call ${MCP_SEARCH_TOOL} with a few words of what you need and the server's name to get their names and input schemas, then run one with ${MCP_CALL_TOOL}. A schema you already got in this conversation still holds: search again only for a tool whose schema is no longer in it.`
         : `Their tools are loaded as ${toolName}.`
-    return `These MCP servers are already configured. ${loading} For a server marked connected or authenticated, do NOT claim you lack credentials or session info; just call the tools.${pendingNote} Check live status with mcp_status.\n\n${lines.join('\n')}`
+    return `These MCP servers are already configured. ${reaching} For a server marked connected or authenticated, do NOT claim you lack credentials or session info; just call the tools.${pendingNote} Check live status with mcp_status.\n\n${lines.join('\n')}`
 }

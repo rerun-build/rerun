@@ -1,22 +1,26 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { mcpToolNameFor, type McpTool } from './mcp.js'
+import { mcpToolNameFor, modelReadyMcpTool, type McpTool } from './mcp.js'
 import { toolPayloadChars } from './payload.js'
 
-// Above this, the schemas of an agent's MCP tools stop riding along on every step: the model is
-// told which servers it has and loads the tools it needs. About 10k tokens, so an agent with one
-// small server keeps its tools loaded and pays no search step.
+// Above this, an agent's MCP tools are no longer sent to the model: it is told which servers it has,
+// reads the schema of the tools it needs in the result of a search, and runs them through one
+// generic call. The list of tools it is sent then never changes, so a search costs no prompt cache.
+// About 10k tokens, so an agent with one small server keeps its tools in the list and pays no search step.
 export const MCP_EAGER_PAYLOAD_CHARS = 40_000
 export const MCP_SEARCH_DEFAULT_LIMIT = 8
 export const MCP_SEARCH_MAX_LIMIT = 20
 
 export const MCP_SEARCH_TOOL = 'mcp_search'
+// The one tool every held-back tool is run through, see `mcp-wire.ts`.
+export const MCP_CALL_TOOL = 'mcp_call'
 const SERVER_LISTING_CAP = 200
-const SUMMARY_CHARS = 200
+// A word this short is only looked for whole: `in` is not found in `linear`, nor `an` in `channel`.
+const PARTIAL_MATCH_MIN_CHARS = 4
+const FILLER_WORDS = new Set(['an', 'the', 'to', 'of', 'in', 'on', 'for', 'and', 'or', 'with', 'from', 'by', 'at', 'my', 'me', 'is', 'are', 'it', 'its', 'that', 'into', 'as', 'be', 'all', 'any', 'some'])
 
-export type McpCatalogEntry = { name: string; server: string; tool: string; description: string }
-// What a run holds back: the tools it does not send, and the ones it loaded since.
-export type DeferredMcpTools = { catalog: McpCatalogEntry[]; loaded: Set<string> }
+// `description` and `inputSchema` are the ones the model would get with the tool in its list.
+export type McpCatalogEntry = { name: string; server: string; tool: string; description: string; inputSchema: McpTool['inputSchema'] }
 export type McpSearch = { query?: string; server?: string; limit?: number }
 export type McpSearchResult = { matches: McpCatalogEntry[]; total: number }
 
@@ -35,7 +39,8 @@ export function mcpToolCatalog(servers: Array<{ name: string; tools: McpTool[] }
     for (const server of servers) {
         for (const tool of server.tools) {
             const name = mcpToolNameFor(undefined, server.name, tool.name)
-            byName.set(name, { name, server: server.name, tool: tool.name, description: tool.description ?? '' })
+            const ready = modelReadyMcpTool(server.name, tool)
+            byName.set(name, { name, server: server.name, tool: tool.name, description: ready.description ?? '', inputSchema: ready.inputSchema })
         }
     }
     return [...byName.values()]
@@ -56,11 +61,20 @@ function scoreOf(entry: McpCatalogEntry, queryWords: string[]): number {
     const descriptionWords = wordsOf(entry.description)
     let score = 0
     for (const word of queryWords) {
+        const carries = (candidate: string) => candidate === word || (word.length >= PARTIAL_MATCH_MIN_CHARS && candidate.includes(word))
         if (nameWords.includes(word)) score += NAME_WORD_SCORE
-        else if (nameWords.some(nameWord => nameWord.includes(word))) score += NAME_PART_SCORE
-        else if (descriptionWords.some(descriptionWord => descriptionWord.includes(word))) score += DESCRIPTION_SCORE
+        else if (nameWords.some(carries)) score += NAME_PART_SCORE
+        else if (descriptionWords.some(carries)) score += DESCRIPTION_SCORE
     }
     return score
+}
+
+// "create an issue in linear" is asked with `create`, `issue` and `linear`. A query made of filler
+// words only is kept as it is.
+function queryWordsOf(text: string): string[] {
+    const words = [...new Set(wordsOf(text))]
+    const meaningful = words.filter(word => !FILLER_WORDS.has(word))
+    return meaningful.length > 0 ? meaningful : words
 }
 
 function limitOf(limit: number | undefined): number {
@@ -76,17 +90,20 @@ export function mcpServerTools(catalog: McpCatalogEntry[], server: string): McpC
 // Full names give exactly those tools. Otherwise the tools are ranked by the words of the query they
 // carry, a word of the name weighing more than one of the description, the tool named like the query first.
 export function searchMcpTools(catalog: McpCatalogEntry[], { query = '', server, limit }: McpSearch): McpSearchResult {
-    const wanted = query.trim().toLowerCase()
-    if (!wanted) return { matches: [], total: 0 }
+    const asked = query.trim()
+    if (!asked) return { matches: [], total: 0 }
     const scoped = server?.trim() ? mcpServerTools(catalog, server) : catalog
-    const names = wanted.split(/[\s,]+/).filter(Boolean)
-    const named = scoped.filter(entry => names.includes(entry.name.toLowerCase()))
-    const words = names.filter(piece => !named.some(entry => entry.name.toLowerCase() === piece))
+    // The pieces keep their case: `getChannelMessages` is still three words once it is not a full name.
+    const pieces = asked.split(/[\s,]+/).filter(Boolean)
+    const askedNames = new Set(pieces.map(piece => piece.toLowerCase()))
+    const named = scoped.filter(entry => askedNames.has(entry.name.toLowerCase()))
+    const foundNames = new Set(named.map(entry => entry.name.toLowerCase()))
+    const words = pieces.filter(piece => !foundNames.has(piece.toLowerCase()))
     if (words.length === 0) return { matches: named.slice(0, limitOf(limit)), total: named.length }
-    const queryWords = [...new Set(wordsOf(words.join(' ')))]
+    const queryWords = queryWordsOf(words.join(' '))
     const ranked = scoped
         .map((entry, position) => {
-            const isNamed = named.includes(entry) || entry.tool.toLowerCase() === wanted
+            const isNamed = named.includes(entry) || entry.tool.toLowerCase() === asked.toLowerCase()
             return { entry, position, score: isNamed ? Number.POSITIVE_INFINITY : scoreOf(entry, queryWords) }
         })
         .filter(candidate => candidate.score > 0)
@@ -100,53 +117,44 @@ export function mcpServerToolCounts(catalog: McpCatalogEntry[]): Map<string, num
     return counts
 }
 
-// The tools a step is sent: everything but the MCP tools the run has not loaded. The others stay in
-// the set, so a tool called by its name without a search still runs.
-export function activeToolNames(tools: ToolSet, deferred: DeferredMcpTools): string[] {
-    const held = new Set(deferred.catalog.map(entry => entry.name))
-    return Object.keys(tools).filter(name => !held.has(name) || deferred.loaded.has(name))
-}
-
-function summaryOf(description: string): string {
-    const firstLine = description.trim().split('\n')[0] ?? ''
-    return firstLine.length > SUMMARY_CHARS ? `${firstLine.slice(0, SUMMARY_CHARS - 1)}…` : firstLine
+// The tools the model is sent, the same on every step of every run of the conversation: everything
+// but the MCP tools held back. Those stay in the set, so a call that names one still runs.
+export function sentToolNames(tools: ToolSet, catalog: McpCatalogEntry[]): string[] {
+    const held = new Set(catalog.map(entry => entry.name))
+    return Object.keys(tools).filter(name => !held.has(name))
 }
 
 function serversLine(catalog: McpCatalogEntry[]): string {
     return [...mcpServerToolCounts(catalog)].map(([server, count]) => `${server} (${count} tools)`).join(', ')
 }
 
-export function mcpSearchTool(deferred: DeferredMcpTools): ToolSet {
-    const { catalog, loaded } = deferred
+export function mcpSearchTool(catalog: McpCatalogEntry[]): ToolSet {
     return {
         [MCP_SEARCH_TOOL]: tool({
-            description:
-                'Find and load the tools of your connected MCP servers. Their schemas are not sent to you until you load them. Give a few words of what you need, or exact tool names, with the server name when you know it: the tools found are loaded and you call them by their name from your next step. Give a server alone to list the names of its tools.',
+            description: `Find the tools of your connected MCP servers. They are not in your tool list: give a few words of what you need, or exact tool names, with the server name when you know it, and you get the name, the description and the input schema of the tools found. Run one with ${MCP_CALL_TOOL}. Give a server alone to list the names of its tools.`,
             inputSchema: z.object({
                 query: z.string().optional().describe('Words for the action you need ("create issue", "list channel messages"), or exact tool names.'),
                 server: z.string().optional().describe('Name of a connected MCP server, to search or list only its tools.'),
-                limit: z.number().int().min(1).max(MCP_SEARCH_MAX_LIMIT).optional().describe(`How many tools to load at most, ${MCP_SEARCH_DEFAULT_LIMIT} by default.`),
+                limit: z.number().int().min(1).max(MCP_SEARCH_MAX_LIMIT).optional().describe(`How many tools to return at most, ${MCP_SEARCH_DEFAULT_LIMIT} by default.`),
             }),
             execute: async ({ query, server, limit }) => {
                 const scoped = server?.trim() ? mcpServerTools(catalog, server) : catalog
-                if (server?.trim() && scoped.length === 0) return { loaded: [], note: `No connected server is named "${server.trim()}". Your servers: ${serversLine(catalog)}.` }
+                if (server?.trim() && scoped.length === 0) return { tools: [], note: `No connected server is named "${server.trim()}". Your servers: ${serversLine(catalog)}.` }
                 if (!query?.trim()) {
-                    if (!server?.trim()) return { loaded: [], note: `Give a query, or a server to list its tools. Your servers: ${serversLine(catalog)}.` }
+                    if (!server?.trim()) return { tools: [], note: `Give a query, or a server to list its tools. Your servers: ${serversLine(catalog)}.` }
                     const names = scoped.map(entry => entry.name)
                     return {
-                        loaded: [],
-                        tools: names.slice(0, SERVER_LISTING_CAP),
+                        names: names.slice(0, SERVER_LISTING_CAP),
                         total: names.length,
-                        note: 'These tools are listed, not loaded: call mcp_search again with the names or the words of the ones you need.',
+                        note: `Names only: call ${MCP_SEARCH_TOOL} again with the names or the words of the ones you need to get their input schema.`,
                     }
                 }
                 const { matches, total } = searchMcpTools(catalog, { query, server, limit })
-                for (const match of matches) loaded.add(match.name)
-                if (matches.length === 0) return { loaded: [], note: `No tool matches these words. Try other words, or list a server's tools. Your servers: ${serversLine(catalog)}.` }
+                if (matches.length === 0) return { tools: [], note: `No tool matches these words. Try other words, or list a server's tools. Your servers: ${serversLine(catalog)}.` }
                 return {
-                    loaded: matches.map(match => ({ name: match.name, description: summaryOf(match.description) })),
+                    tools: matches.map(match => ({ name: match.name, description: match.description, inputSchema: match.inputSchema })),
                     total,
-                    ...(total > matches.length ? { note: `${total - matches.length} more match: narrow the query or raise the limit to load them.` } : {}),
+                    ...(total > matches.length ? { note: `${total - matches.length} more match: narrow the query or raise the limit to get them.` } : {}),
                 }
             },
         }),

@@ -31,12 +31,14 @@ import { foremanTools } from './builtin/foreman.js'
 import { agentFilesTools } from './builtin/agent-files.js'
 import { hasPendingSetup } from '../agents/setup.js'
 import { pooledMcpServers, pooledMcpToolSet } from './mcp-pool.js'
-import { MCP_SEARCH_TOOL, mcpSearchTool, mcpToolCatalog, mcpToolsAreDeferred, type DeferredMcpTools } from './mcp-search.js'
+import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpSearchTool, mcpToolCatalog, mcpToolsAreDeferred, type McpCatalogEntry } from './mcp-search.js'
+import { mcpCallTool } from './mcp-wire.js'
 import { CLI_PROVIDERS } from '../agents/providers.js'
 import { closeAgentDb } from '../db/agentDb.js'
 import type { RunContext } from '../runtime/context.js'
 
-export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; deferredMcp?: DeferredMcpTools; close: () => Promise<void> }> {
+// `heldBackMcp` lists the MCP tools the model is not sent, when the agent's set is too heavy to be.
+export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; heldBackMcp?: McpCatalogEntry[]; close: () => Promise<void> }> {
     const cfg = ctx.agent.config.tools
     const tools: ToolSet = {}
     if (ctx.agent.config.kind === 'foreman') Object.assign(tools, foremanTools(ctx), agentFilesTools())
@@ -74,20 +76,20 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; def
     if (cfg.requestSecret) Object.assign(tools, requestSecretTool(ctx))
     if (hasPendingSetup(ctx.agent)) Object.assign(tools, installTools(ctx))
 
-    let deferredMcp: DeferredMcpTools | undefined
+    let heldBackMcp: McpCatalogEntry[] | undefined
     if (!CLI_PROVIDERS.has(ctx.provider) && ctx.agent.config.mcpServers.length > 0) {
         const servers = await pooledMcpServers(ctx.agent)
         const mcpTools = pooledMcpToolSet(servers)
         Object.assign(tools, mcpTools)
         if (mcpToolsAreDeferred(mcpTools)) {
-            deferredMcp = { catalog: mcpToolCatalog(servers).filter(entry => entry.name !== MCP_SEARCH_TOOL), loaded: new Set() }
-            Object.assign(tools, mcpSearchTool(deferredMcp))
+            heldBackMcp = mcpToolCatalog(servers).filter(entry => entry.name !== MCP_SEARCH_TOOL && entry.name !== MCP_CALL_TOOL)
+            Object.assign(tools, mcpSearchTool(heldBackMcp), mcpCallTool())
         }
     }
 
     return {
         tools,
-        deferredMcp,
+        heldBackMcp,
         close: async () => {
             computer?.release()
             closeAgentDb(ctx.agent.id)
