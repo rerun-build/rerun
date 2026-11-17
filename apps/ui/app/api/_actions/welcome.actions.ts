@@ -89,17 +89,6 @@ export async function saveWelcomeSiteAction(site: string | null): Promise<Action
 }
 
 /**
- * What the board draws while the site is still being typed: the fast decision, under the same
- * quota as the onboarding chat's. `null` = no idea, and the board keeps its showcase.
- */
-export async function guessWelcomeIndustryAction(input: string): Promise<TemplateCategory | null> {
-    const ctx = await welcomeContext()
-    if (platformHost(input)) return null
-    if (!takeIntakeCall(ctx.workspace.id, 'decide')) return null
-    return (await decideIndustry(input))?.industry ?? null
-}
-
-/**
  * A tile, or what they typed under "Other": kept verbatim beside the bucket it is filed into, the
  * catch-all when nothing fits.
  */

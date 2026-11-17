@@ -1,7 +1,7 @@
 'use client'
 
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
-import { finishWelcomeTeamAction, guessWelcomeIndustryAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction } from '@/app/api/_actions/welcome.actions'
+import { finishWelcomeTeamAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction } from '@/app/api/_actions/welcome.actions'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
@@ -70,17 +70,8 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         track('onboarding_step_viewed', { step })
     }, [step])
 
-    // Only the latest address may repaint the board: a guess for one they have since changed is dropped.
-    const race = useRef(0)
-    const read = useCallback((typed: string) => {
-        const token = (race.current += 1)
-        void streamLiveDiscoveries(typed)
-        void guessWelcomeIndustryAction(typed)
-            .then(found => {
-                if (race.current === token && found) setGuess(found)
-            })
-            .catch(() => {})
-    }, [])
+    // Started while the site is still being typed: it fills the profile cache the answer reads when sent.
+    const read = useCallback((typed: string) => void streamLiveDiscoveries(typed), [])
 
     const go = (target: OnboardingStep) => {
         setError(null)

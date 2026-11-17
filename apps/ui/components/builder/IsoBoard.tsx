@@ -278,9 +278,8 @@ export function IsoBoard({ onRequestRecruitAgent, onRequestBoxAgent, initialSpac
     )
 
     // Le prompt tapé dans le composer du hero de la landing, `?prompt=<texte>` : il devient le premier
-    // message de l'agent, et il est parké AVANT le signup, derrière le mur d'auth, parce que c'est ce
-    // qui le fait survivre au retour de Google, qui perd la query string. Une fois le compte en place,
-    // HomeContent rejoue le brouillon (markResume/consumeResume). Le nom, lui, est demandé au serveur,
+    // message de l'agent. Il traverse la connexion et l'onboarding dans `next`, et c'est cet effet
+    // qui le parke puis rejoue le brouillon (resumePendingStart). Le nom, lui, est demandé au serveur,
     // parce qu'un agent baptisé avec les quatre premiers mots de la phrase se lit comme un bug ; le
     // composer du hero envoie celui qu'il a lu (`name`) et les apps avec (`apps`), et alors rien n'est
     // redemandé. Gardé

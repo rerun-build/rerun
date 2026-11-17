@@ -76,10 +76,6 @@ export function parseKickoff(text: string): { intent: KickoffIntent | null } | n
     return { intent: null }
 }
 
-export function buildOwnKickoff(asked: string): string {
-    return `${OPEN}${OWN_FIELD}${CLOSE}\n${asked.trim()}`
-}
-
 export function readOwnAsk(text: string): string | null {
     const [head, ...rest] = text.trim().split('\n')
     if (head.trim() !== `${OPEN}${OWN_FIELD}${CLOSE}`) return null

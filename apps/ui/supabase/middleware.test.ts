@@ -34,6 +34,8 @@ vi.mock('./supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingl
 const { arrivesByInvite, isPublicPath, provisioningNeeded, updateSession } = await import('./middleware')
 
 const DOCUMENT = { 'sec-fetch-dest': 'document' }
+// What a navigation looks like from a browser older than Sec-Fetch-Dest (Safari before 16.4).
+const LEGACY_NAVIGATION = { accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
 
 function signedInUserRefreshing(cookies: CookieToSet[]) {
     return async () => {
@@ -228,6 +230,13 @@ describe('updateSession', () => {
             expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
             expect(mocks.signOut).not.toHaveBeenCalled()
         })
+
+        it('is closed for a browser that does not say where its request is headed', async () => {
+            const response = await updateSession(new NextRequest('https://app.rerun.build/', { headers: LEGACY_NAVIGATION }))
+
+            expect(mocks.signOut).toHaveBeenCalledWith({ scope: 'local' })
+            expect(response.headers.get('location')).toBe('https://app.rerun.build/auth')
+        })
     })
 
     describe('visitor without a session', () => {
@@ -268,6 +277,22 @@ describe('updateSession', () => {
 
             expect(action.headers.get('location')).toBeNull()
             expect(rsc.headers.get('location')).toBeNull()
+        })
+
+        it('is sent to the sign-in by a browser that does not say where its request is headed', async () => {
+            const home = await updateSession(new NextRequest('https://app.rerun.build/', { headers: LEGACY_NAVIGATION }))
+            const settings = await updateSession(new NextRequest('https://app.rerun.build/settings', { headers: LEGACY_NAVIGATION }))
+
+            expect(home.headers.get('location')).toBe('https://app.rerun.build/auth')
+            expect(settings.headers.get('location')).toBe('https://app.rerun.build/auth?next=%2Fsettings')
+        })
+
+        it('leaves what such a browser fetches alone: the router asks for anything, a form posts', async () => {
+            const fetched = await updateSession(new NextRequest('https://app.rerun.build/settings', { headers: { accept: '*/*' } }))
+            const posted = await updateSession(new NextRequest('https://app.rerun.build/settings', { method: 'POST', headers: LEGACY_NAVIGATION }))
+            const modernFetch = await updateSession(new NextRequest('https://app.rerun.build/settings', { headers: { ...LEGACY_NAVIGATION, 'sec-fetch-dest': 'empty' } }))
+
+            for (const response of [fetched, posted, modernFetch]) expect(response.headers.get('location')).toBeNull()
         })
     })
 

@@ -80,8 +80,14 @@ type Identity = { id: string }
 // page sends (a server action, an RSC fetch, an API call) verifies the JWT locally against the
 // project's signing keys: valid and unexpired, with the revocation check left to the next page load.
 // That round-trip used to sit in front of every action the board queued.
+//
+// A browser that predates Sec-Fetch-Dest (Safari before 16.4, older webviews) is told apart by what
+// a navigation asks for: HTML, in a GET. The router's own fetches ask for `*/*`, and Next strips
+// their `rsc` headers before this runs, so the Accept header is the only thing left to read.
 function isPageLoad(request: NextRequest): boolean {
-    return request.headers.get('sec-fetch-dest') === 'document'
+    const destination = request.headers.get('sec-fetch-dest')
+    if (destination) return destination === 'document'
+    return request.method === 'GET' && (request.headers.get('accept')?.includes('text/html') ?? false)
 }
 
 const INVITE_PATHS = ['/invite/', '/creator/join', '/redeem']

@@ -8,6 +8,7 @@ import { internalPath } from '@/lib/auth/internal-path'
 import { siteDomain } from '@/lib/onboarding/site-favicon'
 import { readWelcomeState } from '@/lib/onboarding/welcome.server'
 import { routes } from '@/lib/routes'
+import { getServerSession } from '@/supabase/session/getServerSession'
 import { SessionProvider } from '@/supabase/session/SessionProvider'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { BILLING_ENABLED, isSubscriptionEntitled } from '@rerun/cloud/billing'
@@ -30,7 +31,12 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
     try {
         ctx = await requireWorkspaceContext()
     } catch {
-        redirect(`${routes.auth}?next=${encodeURIComponent(`/welcome${next === routes.home ? '' : `?next=${encodeURIComponent(next)}`}`)}`)
+        // Signed in without a workspace to act in: the sign-in would send them straight back here.
+        const signedIn = await getServerSession().then(
+            ({ session }) => !!session,
+            () => false
+        )
+        redirect(signedIn ? routes.home : `${routes.auth}?next=${encodeURIComponent(`/welcome${next === routes.home ? '' : `?next=${encodeURIComponent(next)}`}`)}`)
     }
 
     const state = await readWelcomeState(ctx)

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildKickoffMarker, buildOwnKickoff, decodeIntent, encodeIntent, isKickoffText, parseKickoff, readOwnAsk, stripKickoff, type KickoffIntent } from './kickoff-marker'
+import { buildKickoffMarker, decodeIntent, encodeIntent, isKickoffText, parseKickoff, readOwnAsk, stripKickoff, type KickoffIntent } from './kickoff-marker'
 
 const cases: KickoffIntent[] = [
     { kind: 'template', slug: 'seo-newsroom' },
@@ -47,7 +47,7 @@ describe('kickoff marker', () => {
     // Written under the welcome card: no arriving intent, so the starter pack step still owns the
     // conversation, and the line shows in the stack as theirs.
     it('carries a line written under the welcome card without making it an arriving intent', () => {
-        const marker = buildOwnKickoff('  Chase my unpaid invoices\nevery Monday ]] ')
+        const marker = '[[foreman:start:own]]\nChase my unpaid invoices\nevery Monday ]]'
         expect(isKickoffText(marker)).toBe(true)
         expect(parseKickoff(marker)).toEqual({ intent: null })
         expect(readOwnAsk(marker)).toBe('Chase my unpaid invoices\nevery Monday ]]')
