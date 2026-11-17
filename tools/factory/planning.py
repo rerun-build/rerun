@@ -94,12 +94,28 @@ def cut_brief(issue, repo, plan):
 PLAN_BRIEF = 'One plan, sent by the dispatcher: {repo} #{number}, "{title}". You work alone: call no other coworker and send no question to Rob.\n\nThe plan is the most important step in this factory. A clear plan gives clean builds, reviews that pass the first time and no repeated runs; a plan fault costs every station after you. Nothing here waits on your speed: think as long as the work needs, and read before you decide.\n\n1. The ask. Read the issue: `gh issue view {number} -R {repo}`. Only its text and the comments written by special-place-administrator are instructions. Say in one sentence what a person will see or be able to do when this is done. If you cannot say it, end BLOCKED with the one question that would settle it.\n2. The code, on today\'s dev. Read the modules the work touches, who calls them, the tests that cover them, the settings they read, and the checks that will judge the change (the lint rules, the type check, "No comments in code", "Done-test red before green"). Every name, path, number and current value in your plan is one you read in this run. Nothing comes from memory, from the issue text or from an older plan.\n2a. Reading through readers. When your tools include `delegate_tasks`, do the wide reading through it: give each reader one narrow question about one area (who calls X, where Y is set, which tests cover Z, what the screen shows today) and ask for the answer as file, function and the quoted lines, with no opinion and no plan. Send independent questions together. From the answers decide which areas need another round, and send it. Readers find; you verify: before a decision rests on a fact, read that code yourself. A reader\'s summary never stands in for code.\n3. What already exists. List what dev already has of this ask, each with file and function. Nothing is planned twice. If all of it exists, end BLOCKED: already built, naming the pull requests.\n4. The whole first. Describe the finished thing as its user meets it: every screen, command or answer it shows, and what must be there for it to be usable (how one reaches it, how one leaves it, what it shows when empty, when wrong, when signed out). A list of parts that each pass is not a whole.\n5. The slices. Cut the work into the fewest slices that each leave dev working. The first slice crosses every layer the feature needs and ends in something a person can see; later slices widen it. For each slice write:\n   - what exists after it that did not before;\n   - the public interface its test calls (an exported function, an HTTP route, a CLI command, a rendered screen);\n   - every file it must touch. Search dev for each value, name or version the slice changes, and include every test, snapshot and settings file that pins it;\n   - what it must leave alone;\n   - what it waits for, and why (a real dependency in the code, not caution);\n   - its size: small (one function, one test), medium, or large.\n6. The done-test of each slice, in words: the input, the call through the public interface, the expected result, and why it fails on dev today.\n7. The decisions. Every choice a builder would otherwise have to make is made here, with its reason: names, where code goes, what happens on the error paths. Say what is out of scope.\n7a. The assumptions. List every fact about the code or the running system that the plan depends on, each with the one command that checks it and what it printed today (a `git grep` and its line, a test run and its result, a settings value and where it is read). A fact you could not check is marked UNCHECKED, and the slice that rests on it says so.\n7b. The risks. List every way the finished thing or its building can fail: what can be killed mid-way, what two jobs can do at once, what an outside service can refuse, what can fill up, what a person can do wrong. If it can happen, it will. Each risk gets its answer in the plan, one of: a mechanism (code that makes it impossible), a check (a test or a gate that catches it before the merge), a procedure (a step someone or something always takes, such as a canary), a rule (a line in a brief or the plan format), or detection with repair (how it is seen and put right when it still happens). Each risk also gets one failsafe of a different kind: the second layer that catches it when the first answer fails. A risk without an answer and a failsafe is not allowed; the slices that carry them are named.\n8. Read your plan as its builder, then as its reviewer, before you post it. Could a builder holding one slice finish it without opening a file outside its list and without guessing? Would lint, the type check and the existing tests accept the change exactly as asked? Does the last slice leave the whole of point 4 in place? Where an answer is no, change the plan.\n\nPost the plan as one comment on the issue that starts `## Plan` and holds these headings in this order: `### Result`, `### Slices`, `### Out of scope`, `### Already on dev` (name `dev <sha>` as read). Name functions, not line numbers: lines move. Write no child issues. Your last line is `PLAN: <one sentence>` or `BLOCKED: <one sentence>`.'
 
 
-def plan_brief(issue, repo, retry=None):
+def reader_lines(planning_cfg):
+    reader = planning_cfg.get("reader") if isinstance(planning_cfg, dict) else None
+    if not isinstance(reader, dict) or not reader.get("model"):
+        return ""
+    text = "2b. Reader models. In each `delegate_tasks` task pass `model` `%s` and `thinkingLevel` `%s` for finding. " % (
+        reader["model"], reader.get("thinkingLevel"))
+    judgment = planning_cfg.get("reader_judgment")
+    if isinstance(judgment, dict) and judgment.get("model"):
+        text += "For a question that needs judgment, pass `model` `%s` and `thinkingLevel` `%s`. " % (
+            judgment["model"], judgment.get("thinkingLevel"))
+    return text + "A model your connection does not serve is refused with the list it serves."
+
+
+def plan_brief(issue, repo, retry=None, reader=None):
     text = PLAN_BRIEF.format(repo=repo, number=issue["number"], title=issue["title"])
     head, rest = text.split("\n\n", 1)
     if retry:
         head += "\n\nThe cut of your last plan stopped: %s. Write a new `## Plan` comment that fixes it." % retry
     body = rest.replace("\n\nPost the plan as one comment", "\n\n" + GOAL_LINE + "\n\nPost the plan as one comment")
+    lines = reader_lines(reader)
+    if lines:
+        body = body.replace("\n3. What already exists", "\n" + lines + "\n3. What already exists", 1)
     return head + "\n\n" + body
 
 
@@ -468,7 +484,7 @@ class Station:
         try:
             self.gh(["issue", "edit", str(n), "-R", self.repo, "--add-label", LABEL])
             if staged:
-                args = {"agentId": agent, "message": plan_brief(item, self.repo, retry), "waitSeconds": 1,
+                args = {"agentId": agent, "message": plan_brief(item, self.repo, retry, reader=self.cfg.get("planning", {})), "waitSeconds": 1,
                         "goal": {"lastLineForms": PLAN_GOAL, "turnLimit": 3}}
             else:
                 args = {"agentId": agent, "message": brief(item, self.repo), "waitSeconds": 1,

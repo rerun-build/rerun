@@ -13,7 +13,9 @@
   "planning": {
     "max_queue": 20,
     "plan_by": ["Boss"],
-    "cut_by": ["Scope Shaper", "IKE"]
+    "cut_by": ["Scope Shaper", "IKE"],
+    "reader": {"model": "claude-haiku-5-5", "thinkingLevel": "low"},
+    "reader_judgment": {"model": "claude-sonnet-5-5", "thinkingLevel": "medium"}
   },
   "proof": true,
   "cache_life": {
