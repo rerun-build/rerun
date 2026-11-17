@@ -105,6 +105,23 @@ class Proof(ProofBase):
         self.assertEqual(self.state(), "proof_wait")
         self.assertIn("proof lines name 4 of the 5 asks: asked again", self.reasons())
 
+    def test_the_brief_says_the_lines_go_into_the_answer_the_dispatcher_reads(self):
+        self.to_proving()
+        _, msg, _ = self.w.sends[-1]
+        self.assertIn("write the same lines in your answer", msg)
+        self.assertIn("the dispatcher reads your answer, not the pull request", msg)
+
+    def test_a_proof_asked_again_is_told_why_its_answer_could_not_be_read(self):
+        self.to_proving()
+        self.w.finish("r2", "All 5 asks are MET, I posted the lines on the pull request.
+PROOF: PASS @abcdef1")
+        self.tick()
+        self.assertEqual(self.state(), "proof_wait")
+        self.tick()
+        self.assertEqual(self.state(), "proving")
+        _, msg, _ = self.w.sends[-1]
+        self.assertIn("Your last answer could not be read: proof lines name 0 of the 5 asks.", msg)
+
     def test_pass_with_an_ask_not_met_goes_to_fix(self):
         self.to_proving()
         self.w.finish("r2", met(notmet=(5,)) + "\nPROOF: PASS @abcdef1")
