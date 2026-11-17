@@ -22,3 +22,19 @@ export async function sendSessionMessage({ agentId, sessionId, text, model }: Se
         return 'failed'
     }
 }
+
+// The same, to a thread of the Chief of Staff: its conversations run through a route of their own.
+export async function sendForemanThreadMessage({ sessionId, text, model }: Omit<SendSessionMessageArgs, 'agentId'>): Promise<SendSessionMessageResult> {
+    try {
+        const res = await fetch('/api/chat/foreman/engine', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, kind: 'thread', text, connectionId: model?.connectionId, model: model?.model, queued: true }),
+        })
+        await res.body?.cancel().catch(() => {})
+        if (res.ok) return 'sent'
+        return res.status === 409 ? 'busy' : 'failed'
+    } catch {
+        return 'failed'
+    }
+}

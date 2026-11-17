@@ -25,7 +25,7 @@ import { hitlKindOf, pendingApprovals, serializeApprovalDecisions } from '@/lib/
 import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { hitlCallBefore } from '@/lib/chat/hitl-receipts'
 import { threadsByMessage } from '@/lib/chat/thread-rows'
-import type { MessageFeedbackRating } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type MessageFeedbackRating } from '@rerun/contracts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
 import type { UploadTarget } from '@/lib/files/upload-url'
 import { isEngineHitl, type PendingWidget } from '@/lib/foreman/pending-widget'
@@ -119,6 +119,7 @@ type ForemanChatLayerProps = {
  */
 export function ForemanChatLayer({ messages, streaming, guided, intake, gated, arrival, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
     const t = useTranslations('foreman.welcome')
+    const tName = useTranslations('workspaceView.foreman')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
     const priceArm = usePriceArm()
@@ -168,7 +169,8 @@ export function ForemanChatLayer({ messages, streaming, guided, intake, gated, a
     const shortcuts = planAgentShortcuts(visible)
     const messageTimes = useMessageTimes(visible)
     const threadRows = useMemo(() => threadsByMessage(messageTimes, threads ?? []), [messageTimes, threads])
-    const threadBranches = (rows: ThreadRow[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} onOpen={() => onOpenThread?.(thread.id)} />)
+    const threadOwner = useMemo(() => ({ agentId: FOREMAN_AGENT_ID, agentName: tName('name') }), [tName])
+    const threadBranches = (rows: ThreadRow[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} owner={threadOwner} onOpen={() => onOpenThread?.(thread.id)} />)
 
     // Une pile vide veut dire deux choses opposées, et elles ne se rendent pas pareil. En tunnel,
     // elle veut dire que le premier tour n'est pas encore revenu : proposer « What is running in my
