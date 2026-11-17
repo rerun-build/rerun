@@ -221,9 +221,9 @@ describe('factorySnapshotSchema', () => {
     const ok = (s: unknown) => factorySnapshotSchema.safeParse(s).success
 
     it('accepts the old shape: no runStats and no plan', () => {
-        const s = sample()
-        expect('runStats' in s).toBe(false)
-        expect('plan' in s).toBe(false)
+        const s = sample() as Record<string, unknown>
+        delete s.runStats
+        delete s.plan
         expect(ok(s)).toBe(true)
     })
 

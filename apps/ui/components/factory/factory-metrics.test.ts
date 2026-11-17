@@ -61,11 +61,46 @@ describe('barModel', () => {
         expect(bar(withRuns([run(today, 40, 2)])).values.totalTokens.text).toBe('42')
     })
 
-    it('shows a dash with the title no data yet for avg run, errors, plan week and sign-in', () => {
-        const m = bar(sample())
+    it('shows a dash with the title no data yet for avg run, errors, plan week and sign-in when the snapshot has neither run statistics nor a plan', () => {
+        const rest = sample()
+        delete rest.runStats
+        delete rest.plan
+        const m = bar(rest)
         for (const k of ['avgDuration', 'errorRate', 'planWeek', 'signIn'] as const) {
             expect(m.values[k]).toEqual({ text: '—', title: 'no data yet' })
         }
+    })
+
+    it('shows the run statistics and the plan of the sample', () => {
+        const v = bar(sample()).values
+        expect([v.avgDuration.text, v.errorRate.text, v.planWeek.text, v.signIn.text]).toEqual(['2m 41s', '7.1%', '56%', '412 min'])
+        expect(v.errorRate.title).toBe('1 of 14 runs in 24 h')
+        expect(v.planWeek).toMatchObject({ fill: 56, title: 'resets 2026-11-17 08:00 UTC' })
+    })
+
+    it('writes the average run as seconds, minutes or hours', () => {
+        const avg = (avgRunS: number | null) => bar({ ...sample(), runStats: { since: '2026-11-13T03:24:30Z', finished: 3, errors: 0, avgRunS } }).values.avgDuration
+        expect([avg(161).text, avg(45).text, avg(3900).text]).toEqual(['2m 41s', '45s', '1h 05m'])
+        expect(avg(null)).toEqual({ text: '—', title: 'no data yet' })
+    })
+
+    it('warns on the share of runs in error from ten percent', () => {
+        const rate = (errors: number, finished: number) => bar({ ...sample(), runStats: { since: '2026-11-13T03:24:30Z', finished, errors, avgRunS: 10 } }).values.errorRate
+        expect(rate(0, 20)).toEqual({ text: '0%', title: '0 of 20 runs in 24 h', warn: false })
+        expect(rate(1, 60)).toMatchObject({ text: '1.7%', warn: false })
+        expect(rate(2, 20)).toMatchObject({ text: '10.0%', warn: true })
+        expect(rate(0, 0)).toEqual({ text: '—', title: 'no data yet' })
+    })
+
+    it('warns on the plan week from ninety percent and on the sign-in at fifty minutes', () => {
+        const plan = (weekUsedPercent: number | null, signInMinutes: number | null) => bar({ ...sample(), plan: { weekUsedPercent, weekResetsAt: null, signInMinutes } }).values
+        expect(plan(89.4, 51).planWeek).toEqual({ text: '89%', fill: 89, warn: false })
+        expect(plan(90, 51).planWeek).toMatchObject({ text: '90%', warn: true })
+        expect(plan(1, 51).signIn).toEqual({ text: '51 min', fill: (51 / 480) * 100, warn: false })
+        expect(plan(1, 50).signIn).toMatchObject({ text: '50 min', warn: true })
+        expect(plan(1, 900).signIn.fill).toBe(100)
+        const none = plan(null, null)
+        expect([none.planWeek, none.signIn]).toEqual([{ text: '—', title: 'no data yet' }, { text: '—', title: 'no data yet' }])
     })
 
     it('defines all thirteen metrics, in the same order', () => {

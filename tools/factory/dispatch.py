@@ -406,6 +406,7 @@ class Dispatcher:
         del HEARD[:]
         self.resolver = resolver.Resolver(log, problem_brief)
         self.renewal_unreadable = False
+        self.connections = None
         self.report_logged = set()
         self.started = now()
         self.names = pools.names(cfg)
@@ -1519,7 +1520,8 @@ class Dispatcher:
 
     def renewal_hold(self):
         try:
-            answer = self.account("list_ai_connections", {})
+            self.connections = None
+            answer = self.connections = self.account("list_ai_connections", {})
             limit = int((self.cfg.get("clocks") or {}).get("run_limit_s", 2700)) // 60 + 5
             is_due = renewal.due(answer, limit)
         except (Error, ValueError, KeyError, TypeError):
@@ -1701,7 +1703,8 @@ class Dispatcher:
         try:
             now = self.now()
             snap = snapshot.build_snapshot(self.store, self.cfg, now, holds.active(self.store, now), beat=self.beats,
-                                           read_epic=self.read_epic, planning=self.planners.read(self.beats))
+                                           read_epic=self.read_epic, planning=self.planners.read(self.beats),
+                                           plan=renewal.plan(self.connections, now))
             self.account("factory_report", {"snapshot": snap}, timeout=10)
             digest.post(self.gh, self.store, self.repo, snap.get("digest"), now)
             self.report_logged.clear()
