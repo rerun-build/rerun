@@ -80,6 +80,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     mcp_login: 'link',
     mcp_login_complete: 'link',
     mcp_status: 'link',
+    mcp_search: 'search',
 
     card_table: 'database',
     card_file: 'file',

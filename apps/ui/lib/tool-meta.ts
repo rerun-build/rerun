@@ -146,6 +146,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     mcp_login: PlugIcon,
     mcp_login_complete: PlugIcon,
     mcp_status: PlugIcon,
+    mcp_search: SearchIcon,
 
     card_table: DatabaseIcon,
     card_file: FileIcon,
