@@ -102,16 +102,18 @@ export async function openSkillProposalForSession(agentId: string, sessionId: st
 export async function appendSkillProposalInstruction(
     agentId: string,
     id: string,
-    input: SkillProposalModel & { instruction: string; summary: string; fingerprint: string }
+    input: SkillProposalModel & { instruction: string; title: string; summary: string; fingerprint: string }
 ): Promise<SkillProposalRow | undefined> {
     const current = await getSkillProposal(agentId, id)
     if (!current || current.status !== 'proposed') return undefined
     const instructions = [...(JSON.parse(current.instructionsJson) as string[]), input.instruction]
     const fingerprints = [...(JSON.parse(current.fingerprintsJson) as string[]), input.fingerprint]
-    // The latest rule's run wins: it is the model the user is on by the time they decide.
+    // The latest call wins: its title and summary name every rule so far, and its run is the model
+    // the user is on by the time they decide.
     const patch = {
         instructionsJson: JSON.stringify(instructions),
         fingerprintsJson: JSON.stringify(fingerprints),
+        title: input.title,
         summary: input.summary,
         connectionId: input.connectionId,
         provider: input.provider,

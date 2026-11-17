@@ -11,9 +11,9 @@ export type SkillProposalStatus = z.infer<typeof skillProposalStatusSchema>
 export const skillProposalInputSchema = z.object({
     mode: skillProposalModeSchema,
     slug: z.string().nullable(),
-    title: z.string().min(1).max(60),
-    summary: z.string().min(1).max(140),
-    instruction: z.string().min(10).max(4000),
+    title: z.string().min(1).max(40).describe('Skill name in 2 to 5 words, covering every rule, the ones already waiting included'),
+    summary: z.string().min(1).max(100).describe('One plain line on what you will do differently: the user decides from it'),
+    instruction: z.string().min(10).max(800).describe('One imperative sentence, or a whole flow as short numbered steps. No context, no why'),
 })
 export type SkillProposalInput = z.infer<typeof skillProposalInputSchema>
 

@@ -54,7 +54,7 @@ export function skillProposeTool(ctx: RunContext): ToolSet {
     return {
         skill_propose: tool({
             description:
-                'Propose capturing a settled way of working as a skill, so the user approves it from a small row in the chat: a single standing rule they just gave you, or a whole flow you built together once they have validated it, never a step of a flow still being shaped. This does NOT pause you and does NOT write anything: finish your turn normally and mention the proposal in one short sentence of your message. Give the rule itself, or the whole flow as it ended up, in instruction, in your own words, as an instruction to your future self. Do not draft the skill body: once the user accepts, the writing happens on its own, reading the skill as it is at that moment. Use mode "edit" with the slug of the skill that already covers that ground, and mode "create" only when nothing in your index does.',
+                'Propose keeping a settled way of working as a skill: a standing rule the user just gave, or a whole flow you built together once they validated it, never a step of a flow still being shaped. It shows a small row the user accepts or dismisses, does NOT pause you and writes nothing: finish your turn and mention it in one short sentence. Do not draft the skill body, it is written on accept. Use mode "edit" with the slug of the skill that already covers that ground, "create" only when none does.',
             inputSchema: skillProposalInputSchema,
             execute: async input => {
                 const refusal = await proposalGuard(agentId, input)
@@ -68,8 +68,8 @@ export function skillProposeTool(ctx: RunContext): ToolSet {
 
                     const open = await openSkillProposalForSession(agentId, ctx.sessionId)
                     if (open) {
-                        await appendSkillProposalInstruction(agentId, open.id, { ...billedBy, instruction: input.instruction, summary: input.summary, fingerprint })
-                        ctx.skillProposals?.push({ proposalId: open.id, mode: open.mode, title: open.title })
+                        await appendSkillProposalInstruction(agentId, open.id, { ...billedBy, instruction: input.instruction, title: input.title, summary: input.summary, fingerprint })
+                        ctx.skillProposals?.push({ proposalId: open.id, mode: open.mode, title: input.title })
                         return proposalResult('merged', open.id, MERGED)
                     }
 

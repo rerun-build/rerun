@@ -831,7 +831,9 @@ The proposals of one conversation. `session` is required (`400`).
 { "proposals": [ { "id": "...", "sessionId": "...", "toolCallId": "...", "mode": "create", "slug": null, "title": "Weekly report", "summary": "...", "instructions": ["..."], "status": "proposed", "appliedSlug": null, "error": null, "createdAt": "..." } ] }
 ```
 
-`mode` is `create` or `edit` (then `slug` names the skill to change).
+`mode` is `create` or `edit` (then `slug` names the skill to change). A rule the agent proposes
+later in the same conversation joins the proposal still `proposed` as one more entry of
+`instructions`, and its `title` and `summary` replace the previous ones, so they name every rule.
 
 ### `POST /agents/:id/skill-proposals/:pid/accept`
 

@@ -50,8 +50,19 @@ describe('the non-blocking contract', () => {
         expect(lastStepHasHitlCall([{ toolCalls: [{ toolName: 'skill_propose' }] }])).toBe(false)
     })
 
-    it('takes a whole flow in a single instruction', () => {
-        expect(skillProposalInputSchema.safeParse({ ...rule, instruction: 'x'.repeat(3000) }).success).toBe(true)
+    it('takes a whole flow in a single instruction, as short steps', () => {
+        expect(skillProposalInputSchema.safeParse({ ...rule, instruction: 'x'.repeat(800) }).success).toBe(true)
+        expect(skillProposalInputSchema.safeParse({ ...rule, instruction: 'x'.repeat(801) }).success).toBe(false)
+    })
+
+    it('keeps the title and the summary to what the row shows', () => {
+        expect(skillProposalInputSchema.safeParse({ ...rule, title: 'x'.repeat(41) }).success).toBe(false)
+        expect(skillProposalInputSchema.safeParse({ ...rule, summary: 'x'.repeat(101) }).success).toBe(false)
+    })
+
+    it('tells the model what each field holds', () => {
+        const schema = z.toJSONSchema(skillProposalInputSchema) as { properties: Record<string, { description?: string }> }
+        for (const key of ['title', 'summary', 'instruction']) expect(schema.properties[key].description).toBeTruthy()
     })
 
     it('requires every input key, as strict structured output needs', () => {
@@ -97,6 +108,16 @@ describe('skill_propose', () => {
         expect(rows[0]).toMatchObject({ connectionId: 'codex-sub', provider: 'codex', model: 'gpt-5.5' })
         expect(announced).toHaveLength(2)
         expect(announced[1].proposalId).toBe(rows[0].id)
+    })
+
+    it('renames the waiting proposal after the rule that joins it', async () => {
+        const session = runOn('session-renamed', 'claude-sub', 'claude', 'claude-opus-5-5', { skillProposals: [] })
+        await propose(session, { ...rule, title: 'Report opening', instruction: 'Every weekly report opens with revenue.' })
+        await propose(session, { ...rule, title: 'Weekly report', summary: 'Opens with revenue, ends with risks', instruction: 'Every weekly report ends with the open risks.' })
+
+        const rows = await listSessionSkillProposals(id, 'session-renamed')
+        expect(rows).toHaveLength(1)
+        expect(rows[0]).toMatchObject({ title: 'Weekly report', summary: 'Opens with revenue, ends with risks' })
     })
 
     it('refuses an edit aimed at a skill that does not exist', async () => {

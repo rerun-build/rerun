@@ -190,6 +190,13 @@ describe('skills section', () => {
         expect(prompt).toContain('never one call per step')
     })
 
+    it('keeps a proposal short and decidable from its title and summary', async () => {
+        const prompt = await buildSystemPrompt(agentWith({ skills: true }), { source: 'chat' })
+        expect(prompt).toContain('as short numbered steps')
+        expect(prompt).toContain('with no context and no why')
+        expect(prompt).toContain('The user decides from the title and the summary alone')
+    })
+
     it('says the same thing whether or not anyone is watching the run', async () => {
         const chat = await buildSystemPrompt(agentWith({ skills: true, askUser: true }), { source: 'chat' })
         const scheduled = await buildSystemPrompt(agentWith({ skills: true, askUser: true }), { source: 'schedule', slug: 'weekly', name: 'Weekly' })
