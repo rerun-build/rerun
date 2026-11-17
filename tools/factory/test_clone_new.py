@@ -13,7 +13,7 @@ DRIVER = textwrap.dedent("""
     import factory as F, clones, mirror
     F.GIT = "git"
     F.plan_check = lambda *a: None
-    F.api = lambda *a, **k: {"default_branch": "main"}
+    F.api = lambda *a, **k: {"default_branch": "main", "login": "factory-bot"}
     F.MIN_FREE_MEM_GB = 0
     F.MIN_FREE_GB = 0
     clones.BACKOFF_S = 0
@@ -101,6 +101,15 @@ class CloneNew(CloneCase):
         self.assertIn("checkout clone", out)
         self.assert_ready(self.folder())
         self.assertEqual(T.git(self.folder(), "rev-parse", "HEAD"), self.remote_sha("refs/heads/dev"))
+
+    def test_a_new_clone_commits_as_the_account_of_the_token_when_no_identity_is_set(self):
+        self.env["GIT_CONFIG_GLOBAL"] = os.devnull
+        code, out = self.new()
+        self.assertEqual(code, 0, out)
+        p = self.folder()
+        self.assertEqual((T.git(p, "config", "--local", "user.name"), T.git(p, "config", "--local", "user.email")),
+                         ("factory-bot", "factory-bot@users.noreply.github.com"))
+        self.commit(p, "first.txt")
 
     def test_clone_from_the_mirror_survives_the_mirror_being_pruned_and_removed(self):
         self.call(lambda _: self.M.refresh(FULL), [])

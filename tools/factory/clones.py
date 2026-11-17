@@ -95,8 +95,20 @@ def fetch_base(path, base):
     return False
 
 
+def identity(path):
+    if all(M.git(["config", k], cwd=path).stdout.strip() for k in ("user.name", "user.email")):
+        return
+    who = F.api("user")
+    login = who.get("login") if isinstance(who, dict) else None
+    if not login:
+        transient("cannot read the account of the token on GitHub, so %s has no name to commit under" % path)
+    must(M.git(["config", "user.name", login], cwd=path), "git config user.name")
+    must(M.git(["config", "user.email", "%s@users.noreply.github.com" % login], cwd=path), "git config user.email")
+
+
 def prepare(path, branch, base):
     must(M.git(["config", "branch.%s.factorybase" % branch, base], cwd=path), "git config")
+    identity(path)
     ex = os.path.join(path, ".git", "info", "exclude")
     os.makedirs(os.path.dirname(ex), exist_ok=True)
     seen = False

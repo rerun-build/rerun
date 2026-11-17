@@ -17,7 +17,7 @@ class JanitorCase(CloneCase):
         p.start()
         self.addCleanup(p.stop)
         for k, v in (("pr_lookup", lambda full, br: None if self.prs is None else list(self.prs)),
-                     ("api", lambda path, *a, **k: self.issue if "/issues/" in path else {"default_branch": "main"})):
+                     ("api", lambda path, *a, **k: self.issue if "/issues/" in path else {"default_branch": "main", "login": "factory-bot"})):
             p = mock.patch.object(F, k, v)
             p.start()
             self.addCleanup(p.stop)
