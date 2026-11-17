@@ -13,6 +13,7 @@ import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits
 import { refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
 import { refreshOpencodeCatalog } from '../../connections/opencode-catalog.js'
 import { refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
+import { restorePlanLimits } from '../../connections/plan-limits.js'
 import { env } from '../../config/env.js'
 import { logger } from '../../lib/logger.js'
 import { closeAllMcp } from '../../tools/mcp-pool.js'
@@ -31,6 +32,7 @@ export async function runCommand(): Promise<void> {
     const cliTools = updateCliToolsInBackground()
     if (cliTools === 'spawned') logger.info({ codex: CODEX_VERSION }, 'codex CLI off its pin: installing it in the background')
     if (cliTools === 'no-root') logger.warn({ codex: CODEX_VERSION }, 'codex CLI off its pin and the service user cannot sudo: run `sudo rerun update-cli-tools`')
+    await restorePlanLimits().catch(err => logger.warn({ err: String(err) }, 'saved plan limits not restored'))
     void listConnections()
         .then(connections => {
             refreshStaleCodexPlanLimits(connections)

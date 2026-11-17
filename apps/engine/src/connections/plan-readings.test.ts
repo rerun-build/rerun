@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-readings-'))
 
 const { describe, expect, it, vi } = await import('vitest')
 const { listReadings, saveReadings } = await import('./plan-readings.js')
-const { readPlanLimits, recordPlanLimits } = await import('./plan-limits.js')
+const { forgetPlanLimits, readPlanLimits, recordPlanLimits, restorePlanLimits } = await import('./plan-limits.js')
 
 describe('plan readings', () => {
     it('saves one row per window and lists them oldest first', async () => {
@@ -57,5 +57,26 @@ describe('plan readings', () => {
             expect(rows.some(r => r.connectionId === 'c3' && r.usedPercent === 7)).toBe(true)
         })
         expect(readPlanLimits('c3')?.windows[0]?.usedPercent).toBe(7)
+    })
+
+    it('restores the newest saved reading of each window after a restart, and leaves a fresher one alone', async () => {
+        const now = Date.parse('2026-11-12T00:00:00.000Z')
+        await saveReadings('c4', [{ kind: 'weekly', label: null, usedPercent: 50, resetsAt: '2026-11-17T00:00:00.000Z' }, { kind: 'session', label: null, usedPercent: 9, resetsAt: null }], '2026-11-11T08:00:00.000Z')
+        await saveReadings('c4', [{ kind: 'weekly', label: null, usedPercent: 50, resetsAt: '2026-11-17T00:00:00.000Z' }, { kind: 'session', label: null, usedPercent: 20, resetsAt: null }], '2026-11-11T09:00:00.000Z')
+        await saveReadings('c5', [{ kind: 'weekly', label: null, usedPercent: 80, resetsAt: null }], '2026-10-01T09:00:00.000Z')
+        recordPlanLimits('c3', [{ kind: 'weekly', label: null, usedPercent: 8, resetsAt: null }])
+        forgetPlanLimits('c4')
+
+        await restorePlanLimits(now)
+
+        expect(readPlanLimits('c4')).toEqual({
+            windows: [
+                { kind: 'session', label: null, usedPercent: 20, resetsAt: null },
+                { kind: 'weekly', label: null, usedPercent: 50, resetsAt: '2026-11-17T00:00:00.000Z' }
+            ],
+            capturedAt: '2026-11-11T09:00:00.000Z'
+        })
+        expect(readPlanLimits('c5')).toBeNull()
+        expect(readPlanLimits('c3')?.windows[0]?.usedPercent).toBe(8)
     })
 })
