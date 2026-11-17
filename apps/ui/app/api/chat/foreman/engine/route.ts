@@ -9,6 +9,8 @@ import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
 import { cancelRun, reconnectRun } from '@/lib/engine/client'
 import { cancelForemanSessionRuns, engineSessionOf, findForemanGeneral, ForemanGeneralAlreadyOpenError, loadForemanConversation, loadForemanConversationById, startEngineConversation, touchForemanConversation } from '@/lib/foreman/conversation'
 import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
+import { isKickoffText } from '@/lib/foreman/kickoff-marker'
+import { readAnswers, writeAnswers } from '@/lib/foreman/profile'
 import { mintForemanHubToken } from '@/lib/foreman/hub-token'
 import { loadForemanState } from '@/lib/foreman/state'
 import { resolveForemanSurface } from '@/lib/foreman/surface.server'
@@ -73,6 +75,11 @@ export async function POST(req: Request): Promise<Response> {
     const state = await loadForemanState(ctx, req.headers.get('accept-language'))
     if (!existing && (await resolveForemanSurface(ctx.workspace.id, state, { canClaim: true })) !== 'engine') return Response.json({ error: 'foreman_unavailable' }, { status: 409 })
 
+    // The first words the welcome page left owed: said once, and spent only once the engine took the
+    // turn, so a machine that was not answering yet leaves them owed for the next load.
+    const greeting = isKickoffText(text)
+    if (greeting && !state.answers.onboarding?.greetPending) return Response.json({ error: 'greeting_spent' }, { status: 409 })
+
     // A new conversation is a thread unless the client opens General. A client older than threads
     // names neither: its first conversation becomes General, every later one a thread. A General
     // someone already spoke in is continued, whatever id the client made up for it.
@@ -92,7 +99,7 @@ export async function POST(req: Request): Promise<Response> {
         let conn: Awaited<ReturnType<typeof getWorkspaceConnection>>
         try {
             conn = await getWorkspaceConnection(ctx.workspace.id)
-            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
+            engineRes = await startChat(conn, FOREMAN_AGENT_ID, { sessionId: existing?.engineSessionId ?? undefined, message: text, connectionId, model, source: 'dashboard', foreman: { ...foremanEngineBrief(state, { greeting }), hubToken: mintForemanHubToken(ctx.workspace.id, ctx.userId) ?? undefined }, author: messageAuthorOf(ctx), callableAgentIds: await callableEngineAgentIds(actorFromContext(ctx)) }, queued ? QUEUED_RETRY_DELAYS_MS : null)
         } catch (err) {
             // The machine went away under a conversation that was already going: the browser hides the
             // foreman, which only exists beside a machine.
@@ -114,6 +121,10 @@ export async function POST(req: Request): Promise<Response> {
         if (!engineRes.ok || !engineRes.body) {
             const errBody = await engineRes.text().catch(() => '')
             return Response.json({ error: `Engine error: ${engineRes.status} ${errBody}` }, { status: 502 })
+        }
+        if (greeting && attempt === 0) {
+            const answers = await readAnswers(ctx)
+            await writeAnswers(ctx, { ...answers, onboarding: { ...answers.onboarding, greetPending: false } }, false)
         }
 
         if (existing) {

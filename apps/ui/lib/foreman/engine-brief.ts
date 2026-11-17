@@ -31,9 +31,9 @@ function spec(def: ForemanToolDef, kind: ForemanToolSpec['kind']): ForemanToolSp
     return { name: def.name, description: def.description, inputSchema: def.inputSchema as Record<string, unknown>, kind, serial: SERIAL_TOOL_NAMES.has(def.name) }
 }
 
-export function foremanEngineBrief(state: ForemanState): ForemanBrief {
+export function foremanEngineBrief(state: ForemanState, options: { greeting?: boolean } = {}): ForemanBrief {
     return {
-        instructions: foremanEngineInstructions(state),
+        instructions: foremanEngineInstructions(state, options),
         tools: [...HUB_TOOL_DEFS.map(def => spec(def, 'hub')), ...FOREMAN_CLIENT_TOOL_DEFS.filter(def => ENGINE_INTENT_TOOL_NAMES.has(def.name)).map(def => spec(def, 'intent'))],
     }
 }

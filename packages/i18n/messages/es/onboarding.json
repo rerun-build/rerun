@@ -70,6 +70,27 @@
         "copied": "Copiado",
         "skip": "Omitir"
     },
+    "trial": {
+        "title": "Empieza tu prueba gratis",
+        "description": "Tus coworkers se ponen a trabajar en cuanto empieza.",
+        "start": "Empezar mi prueba gratis"
+    },
+    "engine": {
+        "title": "Preparando tu workspace",
+        "milestones": {
+            "trial": "Confirmando tu prueba…",
+            "machine": "Reservando tu máquina…",
+            "engine": "Despertando a tu Chief of Staff…"
+        },
+        "ready": "Armemos tu equipo juntos.",
+        "greeting": "Hola, soy tu Chief of Staff",
+        "greetingNamed": "Hola {name}, soy tu Chief of Staff",
+        "failed": "Tu máquina está tardando más de lo normal.",
+        "retry": "Reintentar",
+        "enterAnyway": "Entrar de todos modos",
+        "enter": "Vamos",
+        "wait": "Un momento"
+    },
     "industries": {
         "agencies": "Agencias",
         "ecommerce": "E-commerce",

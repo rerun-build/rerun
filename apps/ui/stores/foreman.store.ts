@@ -39,6 +39,8 @@ type ForemanState = {
      * le board et rien ne part vers le Foreman. Relu à chaque identité, comme la phase.
      */
     waitlisted: boolean
+    /** The onboarding just ended and the Chief of Staff of the engine owes them its first words. */
+    greetPending: boolean
     activity: OrbActivity
     /** The run the engine foreman is streaming or was reattached to, so it can be stopped or picked up again. */
     engineRunId: string | null
@@ -122,6 +124,7 @@ type ForemanState = {
     setTab: (tab: ForemanTab) => void
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
+    setGreetPending: (pending: boolean) => void
     /** Entrer dans le tunnel : le mode, la carte d'accueil et l'ouverture, d'un seul coup. */
     startFunnel: (intake: boolean) => void
     setArrival: (arrival: ForemanArrival | null) => void
@@ -179,6 +182,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     tab: 'assistant',
     funnel: 'unknown',
     waitlisted: false,
+    greetPending: false,
     activity: 'idle',
     engineRunId: null,
     ...freshGeneral(),
@@ -239,6 +243,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     setTab: tab => set({ tab }),
     setFunnel: funnel => set({ funnel }),
     setWaitlisted: waitlisted => set({ waitlisted }),
+    setGreetPending: greetPending => set({ greetPending }),
     // En un seul `set` et pas trois : entre « le tunnel commence » et « la carte est là », le
     // kickoff verrait une découverte sans carte devant elle et enverrait son marqueur, ce que toute
     // cette carte existe pour éviter.
@@ -300,6 +305,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             yieldedToSheet: false,
             funnel: 'unknown',
             waitlisted: false,
+            greetPending: false,
             activity: 'idle',
             engineRunId: null,
             ...freshGeneral(),

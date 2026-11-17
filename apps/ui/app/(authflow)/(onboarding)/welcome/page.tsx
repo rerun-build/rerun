@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 
 import { requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/ownership'
+import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { internalPath } from '@/lib/auth/internal-path'
 import { siteDomain } from '@/lib/onboarding/site-favicon'
 import { readWelcomeState } from '@/lib/onboarding/welcome.server'
@@ -10,6 +11,7 @@ import { routes } from '@/lib/routes'
 import { SessionProvider } from '@/supabase/session/SessionProvider'
 import { selectMany } from '@/supabase/supabase-helpers'
 import { BILLING_ENABLED, isSubscriptionEntitled } from '@rerun/cloud/billing'
+import { BillingDialog } from '@rerun/cloud/billing.client'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { isTemplateCategory } from '@rerun/contracts'
 import { WelcomeFlow } from './WelcomeFlow'
@@ -34,7 +36,11 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
     const state = await readWelcomeState(ctx)
     if (!state.needed) redirect(next)
 
-    const [{ data: pending }, phonePending] = await Promise.all([selectMany(ctx.supabase, 'workspace_invitations', ['email'] as const, { workspace_id: ctx.workspace.id, status: 'pending' }), isPhoneStepPending(ctx.supabase, ctx.userId)])
+    const [{ data: pending }, phonePending, waitlisted] = await Promise.all([
+        selectMany(ctx.supabase, 'workspace_invitations', ['email'] as const, { workspace_id: ctx.workspace.id, status: 'pending' }),
+        isPhoneStepPending(ctx.supabase, ctx.userId),
+        resolveEngineWaitlist(ctx.workspace.id),
+    ])
     const { answers } = state
     const siteIndustry = answers.onboarding?.siteIndustry
     const industry = answers.industry && isTemplateCategory(answers.industry) ? answers.industry : null
@@ -55,7 +61,9 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
                 firstName={state.firstName}
                 next={next}
                 phonePending={phonePending}
+                waitlisted={waitlisted}
             />
+            <BillingDialog />
         </SessionProvider>
     )
 }

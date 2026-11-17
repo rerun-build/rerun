@@ -48,6 +48,7 @@ import { classifyChatError, unwrapChatError } from '@/lib/chat-error'
 import { cn } from '@/lib/utils'
 import { shouldFlush } from '@/lib/chat/queued-message'
 import { foremanNextSteps, trialStep } from '@/lib/foreman/next-steps'
+import { KICKOFF_MARKER } from '@/lib/foreman/kickoff-marker'
 import { keepsComposer } from '@/lib/foreman/pending-widget'
 import { SHOW_STARTER_PACK_TOOL } from '@/lib/foreman/starter-pack'
 import { lastShownPlan, lastShownStarterPlan, lastShownTemplatePlan } from '@/lib/foreman/shown-plan'
@@ -253,6 +254,14 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
         if (!pendingPrompt || !restoreDone || busy || !companion) return
         if (send(pendingPrompt)) useForemanStore.getState().clearPendingPrompt()
     }, [pendingPrompt, restoreDone, busy, companion, send])
+
+    // The welcome page just handed over: the Chief of Staff of the engine speaks first, once. The
+    // engine route spends the turn it owes, so a second tab or a reload sends nothing more.
+    const greetPending = useForemanStore(state => state.greetPending)
+    useEffect(() => {
+        if (!greetPending || !companion || surface !== 'engine' || !restoreDone || busy || messages.length > 0) return
+        if (send(KICKOFF_MARKER)) useForemanStore.getState().setGreetPending(false)
+    }, [greetPending, companion, surface, restoreDone, busy, messages.length, send])
 
     // Sur le hub, couper le flux suffit : la boucle meurt avec lui. Sur l'engine, `stop` annule aussi
     // le run là-bas.

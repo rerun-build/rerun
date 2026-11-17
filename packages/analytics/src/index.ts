@@ -109,7 +109,7 @@ export interface AnalyticsEventMap {
     // The card form opening. The lifecycle events below come from the webhook, so this is the only
     // place an abandoned checkout leaves a trace. A trial started without a card never opens it,
     // and is not counted here.
-    checkout_started: { plan: string; source: 'template_cta' | 'billing_dialog' | 'agent_share' | 'foreman' | 'pay_now' | 'ai_providers' }
+    checkout_started: { plan: string; source: 'template_cta' | 'billing_dialog' | 'agent_share' | 'foreman' | 'pay_now' | 'ai_providers' | 'onboarding' }
     paywall_viewed: { trigger: string; addon_shown?: string; variant?: string }
     // `origin` is where the trial was started: the app's are all cardless, whatever the test's arm.
     trial_started: SubscriptionLifecycleProps & { trial_type: TrialType; origin?: 'web' | 'ios' | 'android' }
@@ -219,6 +219,9 @@ export interface AnalyticsEventMap {
     // picked on its own card, coworkers hired off the starter pack, or the one coworker they
     // described instead of picking. `skipped` on the welcome page's site and team steps.
     onboarding_step_completed: { step: string; via?: 'plan_card' | 'template' | 'starter_pack' | 'custom'; skipped?: boolean }
+    // The welcome page handed over to the Chief of Staff. `engine` is false when they went in while
+    // their machine had not answered yet.
+    onboarding_completed: { engine: boolean }
     // The chips under a freshly built team: 'open_chat', 'billing', or the label of a request sent to the foreman.
     onboarding_next_step_clicked: { step: string }
     // The board's getting-started checklist. `completed` is server-side, the moment the thing exists;

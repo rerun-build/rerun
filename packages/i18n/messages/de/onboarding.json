@@ -70,6 +70,27 @@
         "copied": "Kopiert",
         "skip": "Überspringen"
     },
+    "trial": {
+        "title": "Starte deine kostenlose Testphase",
+        "description": "Deine Coworker legen los, sobald sie beginnt.",
+        "start": "Meine kostenlose Testphase starten"
+    },
+    "engine": {
+        "title": "Dein Workspace wird eingerichtet",
+        "milestones": {
+            "trial": "Testphase wird bestätigt…",
+            "machine": "Deine Maschine wird reserviert…",
+            "engine": "Dein Chief of Staff wird geweckt…"
+        },
+        "ready": "Lass uns gemeinsam dein Team aufbauen.",
+        "greeting": "Hallo, ich bin dein Chief of Staff",
+        "greetingNamed": "Hallo {name}, ich bin dein Chief of Staff",
+        "failed": "Deine Maschine braucht länger als üblich.",
+        "retry": "Erneut versuchen",
+        "enterAnyway": "Trotzdem hineingehen",
+        "enter": "Los geht's",
+        "wait": "Einen Moment"
+    },
     "industries": {
         "agencies": "Agenturen",
         "ecommerce": "E-Commerce",

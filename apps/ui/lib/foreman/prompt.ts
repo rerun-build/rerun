@@ -1,6 +1,8 @@
 import 'server-only'
 
+import { starterPack } from '@/lib/onboarding/starter-packs'
 import { MEMBER_REACH_NOTE, renderBoardMap } from './board-map'
+import { KICKOFF_MARKER } from './kickoff-marker'
 import { describeNeed } from './needs'
 import { foremanUseCases, isMobileApp } from './phase'
 import type { ForemanState } from './phase'
@@ -141,10 +143,26 @@ export function foremanSystemPrompt(state: ForemanState): string {
     return blocks.join('\n\n')
 }
 
+// The one turn the welcome page leaves owed: the app sends the kickoff marker the moment the
+// onboarding ends, and the Chief of Staff speaks first, about them, with the starter pack of their
+// line of work to offer.
+function greetingBlock(state: ForemanState): string {
+    const pack = starterPack(state.answers.industry)
+        .map(card => `- ${card.promise} (template ${card.template})`)
+        .join('\n')
+    return [
+        `This turn was opened by the app, not by them: the message \`${KICKOFF_MARKER}\` means they have just finished signing up and see you for the first time. Speak first, in four short lines at most, no heading:`,
+        `- greet them${state.firstName ? ` as ${state.firstName}` : ''};`,
+        '- say in one sentence what you understood of their company, from what you already know about them above. If you know nothing about it, leave this line out. Never invent a fact about their company;',
+        `- offer the first coworkers you would hire for them, out of the starter templates of their line of work:\n${pack}`,
+        'Then call ask_user with the first three of those coworkers as options, so they pick one in a tap. Install nothing before they answer.',
+    ].join('\n')
+}
+
 // The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
-// the charter, who they are, and the board.
-export function foremanEngineInstructions(state: ForemanState): string {
-    const blocks = [ENGINE_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: false }), foremanProfileBlock(state), agreedPlanBlock(state), `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+// the charter, who they are, and the board. `greeting` is the turn the welcome page leaves owed.
+export function foremanEngineInstructions(state: ForemanState, { greeting = false }: { greeting?: boolean } = {}): string {
+    const blocks = [ENGINE_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

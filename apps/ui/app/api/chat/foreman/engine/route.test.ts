@@ -5,6 +5,8 @@ import { startChat } from '@/lib/chat/start-chat'
 import { cancelRun } from '@/lib/engine/client'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { cancelForemanSessionRuns, findForemanGeneral, ForemanGeneralAlreadyOpenError, loadForemanConversation, loadForemanConversationById, startEngineConversation, touchForemanConversation } from '@/lib/foreman/conversation'
+import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
+import { readAnswers, writeAnswers } from '@/lib/foreman/profile'
 import { loadForemanState } from '@/lib/foreman/state'
 import { resolveForemanSurface } from '@/lib/foreman/surface.server'
 import { PHONE_REQUIRED_MESSAGE } from '@rerun/cloud/phone'
@@ -34,6 +36,7 @@ vi.mock('@/lib/foreman/conversation', () => ({
     touchForemanConversation: vi.fn(),
 }))
 vi.mock('@/lib/foreman/engine-brief', () => ({ foremanEngineBrief: vi.fn() }))
+vi.mock('@/lib/foreman/profile', () => ({ readAnswers: vi.fn(), writeAnswers: vi.fn() }))
 vi.mock('@/lib/foreman/state', () => ({ loadForemanState: vi.fn() }))
 vi.mock('@/lib/foreman/surface.server', () => ({ resolveForemanSurface: vi.fn() }))
 
@@ -96,6 +99,57 @@ describe('/api/chat/foreman/engine', () => {
         await POST(post())
 
         expect(vi.mocked(startChat).mock.calls[0][2]).toMatchObject({ callableAgentIds: ['engine-open'] })
+    })
+
+    describe('the first words the welcome page leaves owed', () => {
+        const kickoff = () => post({ text: '[[foreman:start]]' })
+
+        it('speaks first once, spending the greeting once the engine took the turn', async () => {
+            onTheEngine()
+            vi.mocked(loadForemanState).mockResolvedValue({ phase: 'companion', answers: { onboarding: { greetPending: true } } } as never)
+            vi.mocked(readAnswers).mockResolvedValue({ industry: 'saas', onboarding: { teamDone: true, greetPending: true } })
+            vi.mocked(startChat).mockResolvedValue(engineStream('engine-1', 'run-1'))
+
+            const response = await POST(kickoff())
+
+            expect(response.status).toBe(200)
+            expect(writeAnswers).toHaveBeenCalledWith(expect.anything(), { industry: 'saas', onboarding: { teamDone: true, greetPending: false } }, false)
+            expect(foremanEngineBrief).toHaveBeenCalledWith(expect.anything(), { greeting: true })
+            expect(vi.mocked(startChat).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(writeAnswers).mock.invocationCallOrder[0])
+        })
+
+        it('keeps the greeting owed when the machine did not take the turn', async () => {
+            onTheEngine()
+            vi.mocked(loadForemanState).mockResolvedValue({ phase: 'companion', answers: { onboarding: { greetPending: true } } } as never)
+            vi.mocked(startChat).mockResolvedValue(new Response('down', { status: 502 }))
+
+            const response = await POST(kickoff())
+
+            expect(response.status).toBe(502)
+            expect(writeAnswers).not.toHaveBeenCalled()
+        })
+
+        it('turns a second greeting away, from another tab or a reload', async () => {
+            onTheEngine()
+            vi.mocked(loadForemanState).mockResolvedValue({ phase: 'companion', answers: { onboarding: { greetPending: false } } } as never)
+
+            const response = await POST(kickoff())
+
+            expect(response.status).toBe(409)
+            expect(await response.json()).toEqual({ error: 'greeting_spent' })
+            expect(startChat).not.toHaveBeenCalled()
+        })
+
+        it('briefs an ordinary message without the greeting', async () => {
+            onTheEngine()
+            vi.mocked(loadForemanState).mockResolvedValue({ phase: 'companion', answers: { onboarding: { greetPending: true } } } as never)
+            vi.mocked(startChat).mockResolvedValue(engineStream('engine-1', 'run-1'))
+
+            await POST(post())
+
+            expect(foremanEngineBrief).toHaveBeenCalledWith(expect.anything(), { greeting: false })
+            expect(writeAnswers).not.toHaveBeenCalled()
+        })
     })
 
     it('sweeps the session before stopping the run by name, so a message waiting behind it survives', async () => {

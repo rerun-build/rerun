@@ -33,5 +33,7 @@ export async function GET(req: Request): Promise<Response> {
     const linked: ForemanArrival | null = state.intent && state.intent.kind !== 'prompt' && state.intent.title ? { kind: state.intent.kind, title: state.intent.title, ...(state.intent.paid ? { paid: state.intent.paid } : {}), ...(state.intent.coworker ? { coworker: state.intent.coworker } : {}) } : null
     const arrival: ForemanArrival | null = planned && state.phase === 'discover' ? { ...planned, installed: true } : (linked ?? planned)
     const surface = await resolveForemanSurface(ctx.workspace.id, state, { canClaim: !ctx.authUser.is_anonymous })
-    return Response.json({ phase: state.phase, firstName: state.firstName, arrival, surface })
+    // The welcome page just handed over: the Chief of Staff on the engine owes them its first words.
+    const greet = surface === 'engine' && !!state.answers.onboarding?.greetPending
+    return Response.json({ phase: state.phase, firstName: state.firstName, arrival, surface, greet })
 }

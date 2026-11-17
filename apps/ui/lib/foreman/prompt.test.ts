@@ -70,6 +70,28 @@ describe('foremanEngineInstructions', () => {
     })
 })
 
+describe('foremanEngineInstructions on the turn the welcome page leaves owed', () => {
+    const welcomed = stateWith({ foreman: {}, answers: { company_name: 'Acme', company_url: 'https://acme.com', industry: 'saas', position: 'Founder / CEO' } })
+
+    it('has the Chief of Staff speak first, about them, offering the starter pack of their line of work', () => {
+        const instructions = foremanEngineInstructions(welcomed, { greeting: true })
+        expect(instructions).toContain('[[foreman:start]]')
+        expect(instructions).toContain('as Nico')
+        expect(instructions).toContain('template sales-development-rep')
+        expect(instructions).toContain('Company: Acme - https://acme.com')
+        expect(instructions).toContain('ask_user')
+    })
+
+    it('guesses their language from the browser for the words said before they wrote any', () => {
+        expect(foremanEngineInstructions({ ...welcomed, foreman: {} }, { greeting: true })).toContain('Their browser is set to fr')
+        expect(foremanEngineInstructions({ ...welcomed, foreman: {} })).not.toContain('Their browser is set to')
+    })
+
+    it('says nothing of a greeting on every other turn', () => {
+        expect(foremanEngineInstructions(welcomed)).not.toContain('[[foreman:start]]')
+    })
+})
+
 describe('foremanSystemPrompt', () => {
     it('leaves the agreed plan to the engine: on the hub the card is still being decided', () => {
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, foreman: { ...stateWith({}).foreman, plan: PLAN } }))).not.toContain('agreed on during onboarding')

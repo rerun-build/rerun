@@ -5,7 +5,9 @@
         "site.titleNamed": "{name} is the first name of the person signing up.",
         "site.skip": "Button: the person has no company website.",
         "team.description": "The AI coworkers of the workspace work for every person invited to it.",
-        "role.description": "The first AI coworker built for them will work for the person in that role."
+        "role.description": "The first AI coworker built for them will work for the person in that role.",
+        "engine.greetingNamed": "{name} is the first name of the person. Said by the Chief of Staff, the AI assistant of the workspace, when it wakes up at the end of the onboarding.",
+        "engine.milestones": "Each line names a step that really happened while the workspace's machine is set up."
     },
     "metaTitle": "Welcome",
     "back": "Back",
@@ -77,6 +79,27 @@
         "copy": "Copy",
         "copied": "Copied",
         "skip": "Skip"
+    },
+    "trial": {
+        "title": "Start your free trial",
+        "description": "Your coworkers start working the moment it begins.",
+        "start": "Start my free trial"
+    },
+    "engine": {
+        "title": "Setting up your workspace",
+        "milestones": {
+            "trial": "Confirming your trial…",
+            "machine": "Reserving your machine…",
+            "engine": "Waking up your Chief of Staff…"
+        },
+        "ready": "Let's build your team together.",
+        "greeting": "Hi, I'm your Chief of Staff",
+        "greetingNamed": "Hi {name}, I'm your Chief of Staff",
+        "failed": "Your machine is taking longer than usual.",
+        "retry": "Try again",
+        "enterAnyway": "Go in anyway",
+        "enter": "Let's go",
+        "wait": "One moment"
     },
     "industries": {
         "agencies": "Agencies",

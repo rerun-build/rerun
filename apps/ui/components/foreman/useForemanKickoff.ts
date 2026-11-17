@@ -33,7 +33,7 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // onboarding store and the account wall takes over. The phase is asked again once the session is a
 // real account, which is when the parked answers are written, to whichever workspace they signed
 // into, and the foreman is woken up.
-type ForemanStateAnswer = { phase: ForemanPhase; firstName?: string; arrival?: ForemanArrival | null; surface: ForemanSurface }
+type ForemanStateAnswer = { phase: ForemanPhase; firstName?: string; arrival?: ForemanArrival | null; surface: ForemanSurface; greet?: boolean }
 
 async function fetchForemanState(query = ''): Promise<ForemanStateAnswer | null> {
     const res = await fetch(`/api/chat/foreman/state${query}`)
@@ -125,6 +125,7 @@ export function useForemanKickoff({ send, messageCount, restoreDone }: { send: (
                 if (!state || state.phase === 'companion') {
                     if (!isAnonymous) onboarding.clearPendingIntake()
                     store.setArrival(null)
+                    store.setGreetPending(!!state?.greet)
                     store.setFunnel('companion')
                     return
                 }
