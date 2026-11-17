@@ -1,6 +1,6 @@
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from test_dispatch import Base, HEAD, PR_LINE, wf
+from test_dispatch import ACCEPT, Base, HEAD, PR_LINE, wf
 from test_dispatch_proof import ProofBase
 
 
@@ -60,7 +60,7 @@ class ProofRounds(ProofBase):
         self.w.workflows[HEAD] = [wf("ci", "success")]
         self.w.finish("b1", "PUSHED: 1234567")
         self.tick(2)
-        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.w.finish("r1", ACCEPT)
         self.tick(3)
         self.assertEqual(self.state(), "proving")
         self.w.finish("r2", "PROOF: FAIL @abcdef1: 4")

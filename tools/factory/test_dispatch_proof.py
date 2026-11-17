@@ -173,7 +173,7 @@ class Proof(ProofBase):
         self.tick()
         self.w.finish("b1", "PUSHED: fix")
         self.tick(2)
-        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.w.finish("r1", T.ACCEPT)
         self.tick(2)
         self.assertEqual(self.state(), "proof_wait")
         self.tick()

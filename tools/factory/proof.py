@@ -5,10 +5,34 @@ HEADINGS = {"change": "change", "corrections": "change", "done-test": "done", "r
 THROUGH = re.compile(r"^\s*\*\*Test through(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 ASK_LINE = re.compile(r"^ASK (\d+): (MET|NOT MET)[.:,;]? +\S.*$")
 PROOF_LINE = re.compile(r"^PROOF: (PASS|FAIL) (?:@|at )([0-9a-f]{7,40})(?:: (.*))?$")
+EVIDENCE_LINE = re.compile(r"^EVIDENCE (\d+): \S")
 
 
 def plain(body):
     return str(body or "").replace("\r\n", "\n")
+
+
+def change_asks(body):
+    out, kind, fenced = [], None, False
+    for line in plain(body).split("\n"):
+        m = re.match(r"^\*\*([A-Za-z-]+)\*\*", line)
+        if m and not fenced:
+            kind = HEADINGS.get(m.group(1).lower())
+            continue
+        if line.startswith("```"):
+            fenced = not fenced
+        elif kind == "change" and not fenced and re.match(r"^[-*] \S", line):
+            out.append(line[2:].strip())
+    return out
+
+
+def evidence(out, count):
+    got = set()
+    for line in plain(out).split("\n"):
+        m = EVIDENCE_LINE.match(line.strip())
+        if m and 1 <= int(m.group(1)) <= count:
+            got.add(int(m.group(1)))
+    return len(got)
 
 
 def asks(body):

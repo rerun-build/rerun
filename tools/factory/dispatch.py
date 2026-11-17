@@ -223,6 +223,17 @@ def first_brief(j):
     return build_brief(j)
 
 
+def evidence_brief(asks):
+    if not asks:
+        return []
+    return [
+        'The asks of the Change, in order:',
+        *["ASK %d: %s" % (n, a) for n, a in enumerate(asks, 1)],
+        'Above your verdict line write one line per ask: `EVIDENCE <n>: <what you ran or read and what it showed>` (a test name and its result, a file and line, a command and its last line). An ACCEPT with fewer EVIDENCE lines than asks is not an ACCEPT. A REJECT needs only its sentence.',
+        '',
+    ]
+
+
 def review_brief(j, pr, head):
     return "\n".join([
         'One review, sent by the dispatcher and not by Boss: pull request #%s of rerun, for job #%s ("%s"), at commit %s. You work alone: call no other coworker and send no question to Rob.' % (pr, j["issue"], j["title"], head[:7]),
@@ -237,6 +248,7 @@ def review_brief(j, pr, head):
         '',
         'When the pull request body has a `## Tests adapted` section, judge every test file listed there: it may change only what the change of the issue requires. An assertion weakened or removed without that need is wrong behaviour let through, and a REJECT.',
         '',
+        *evidence_brief(proof.change_asks(j.get("body"))),
         'When the diff is right and the issue is wrong (its text, its Files or its Run block), the last line is `VERDICT: REJECT (plan) @<first 7 characters>: <one sentence>`.',
         '',
         'On GitHub write coworker names without the at-sign.',
@@ -1235,6 +1247,13 @@ class Dispatcher:
             if re.match(r"VERDICT:\s*REJECT \(plan\)", verdict):
                 return self.end(j, "returned", "plan: review: " + verdict[:180], plan_lines=verdict)
             stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
+            asks = proof.change_asks(j.get("body"))
+            got = proof.evidence(out, len(asks))
+            if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale and got < len(asks):
+                why = "accept with %d of %d evidence lines" % (got, len(asks))
+                if j.get("evidence_asked"):
+                    return self.end(j, "blocked", "review without evidence twice: " + why)
+                return self.to(j, "review_wait", why + ": asked again", evidence_asked=1)
             accept = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and not stale
             first = j.get("first_accept") or {}
             second = accept and first.get("head") == j["head"] and first.get("by") != j.get("reviewer")

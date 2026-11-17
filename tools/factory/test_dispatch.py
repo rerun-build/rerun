@@ -20,6 +20,7 @@ def ready(extra="", deps="none"):
 
 
 PR_LINE = "Done.\nPR: https://github.com/o/r/pull/42"
+ACCEPT = "".join("EVIDENCE %d: shown\n" % n for n in range(1, 21)) + "VERDICT: ACCEPT @abcdef1"
 
 
 class World:
@@ -284,7 +285,7 @@ class Base(unittest.TestCase):
 
     def to_checks(self):
         self.to_review()
-        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.w.finish("r1", ACCEPT)
         self.tick()
 
 
