@@ -59,8 +59,10 @@ export function isMobileClient(client: ForemanClient | null | undefined): client
     return (CLIENT_PLATFORMS as readonly string[]).includes(client ?? '')
 }
 
-// GET /api/chat/foreman/state.
-export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string() })
+// GET /api/chat/foreman/state. `agentId` is the Chief of Staff's row of `agents`, which its cards, its
+// screen and its takeover address it by like a coworker; absent from a hub older than that row, and
+// null until the workspace runs it on its machine.
+export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string(), agentId: z.string().nullable().optional() })
 export type ForemanStateResponse = z.infer<typeof foremanStateSchema>
 
 // GET /api/chat/foreman/engine: the caller's General with the engine's foreman, null before they

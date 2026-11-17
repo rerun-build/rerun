@@ -51,9 +51,12 @@ describe('access', () => {
         expect(knownCoworkerAccess('a1', {})).toEqual(UNKNOWN_ACCESS)
     })
 
-    it('hands the Foreman to everyone without asking', () => {
+    it('lets every member use the Chief of Staff and an admin manage it, without asking', () => {
+        expect(knownCoworkerAccess(FOREMAN_AGENT_ID, { role: 'admin' })).toEqual({ known: true, access: 'manage' })
+        expect(knownCoworkerAccess(FOREMAN_AGENT_ID, { role: 'member' })).toEqual({ known: true, access: 'use' })
+        expect(knownCoworkerAccess(FOREMAN_AGENT_ID, { role: 'member', agents: [{ id: FOREMAN_AGENT_ID, access: 'manage' }] })).toEqual({ known: true, access: 'use' })
+        // A hub older than roles: every member managed it.
         expect(knownCoworkerAccess(FOREMAN_AGENT_ID, {})).toEqual({ known: true, access: 'manage' })
-        expect(knownCoworkerAccess(FOREMAN_AGENT_ID, { agents: [{ id: FOREMAN_AGENT_ID, access: 'use' }] })).toEqual({ known: true, access: 'manage' })
     })
 
     it('greys a control without a word while the level is unknown, with the reason for a Box only used', () => {

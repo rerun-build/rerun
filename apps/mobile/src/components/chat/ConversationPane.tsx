@@ -72,7 +72,9 @@ const AT_BOTTOM = 24
 // Under the fade at the top of the thread a block is not really seen, even when it is on screen.
 const SEEN_BAND = 24
 
-export type ChatCoworker = { id: string; kind: 'coworker' | 'foreman'; name: string; role: string; status: AgentView['agent']['status'] }
+// `agentRowId`: for the Chief of Staff, its row of `agents`, which every card, its screen and its
+// takeover address it by like a coworker; `id` stays the alias its own routes answer to.
+export type ChatCoworker = { id: string; kind: 'coworker' | 'foreman'; name: string; role: string; status: AgentView['agent']['status']; agentRowId?: string | null }
 
 type ConversationPaneProps = {
     coworker: ChatCoworker
@@ -189,8 +191,9 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const runOnScreen = useMemo(() => runUsesScreen(chat.messages), [chat.messages])
     const paidSourcesByTurn = useMemo(() => paidDataSourcesByTurn(chat.messages), [chat.messages])
     // The live screen stands in for the run's status while the run works on it.
-    const screenShown = coworker.kind === 'coworker' && chat.history === 'ready' && ((chat.busy && runOnScreen) || !!takeoverPending)
-    const screen = useAgentScreen(coworker.id, screenShown && onScreen && focused)
+    const rowId = coworker.kind === 'foreman' ? (coworker.agentRowId ?? null) : coworker.id
+    const screenShown = rowId !== null && chat.history === 'ready' && ((chat.busy && runOnScreen) || !!takeoverPending)
+    const screen = useAgentScreen(rowId ?? coworker.id, screenShown && onScreen && focused)
     const screenUnavailable = screen.status === 'error' || screen.status === 'disconnected'
     const screenInThread = screenShown && (!screenUnavailable || !!takeoverPending)
     const visibleTop = scrollTop + insets.top + CHAT_HEADER_HEIGHT + SEEN_BAND
@@ -229,11 +232,11 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
         return chat.send(text, files)
     }
 
-    const takeover = useTakeoverRequest(coworker.id, coworker.name, takeoverPending, text => send(text))
+    const takeover = useTakeoverRequest(rowId ?? coworker.id, coworker.name, takeoverPending, text => send(text))
     const takeControl = () => {
         if (takeover) return takeover.onOpen()
-        setPendingDesktopOpen({ agentId: coworker.id, name: coworker.name })
-        router.push({ pathname: '/desktop', params: { agent: coworker.id } })
+        setPendingDesktopOpen({ agentId: rowId ?? coworker.id, name: coworker.name })
+        router.push({ pathname: '/desktop', params: { agent: rowId ?? coworker.id } })
     }
 
     const canFlush = shouldFlush({ queued: queue.queued, busy: chat.busy || stopping, uploading, status: chat.status, hasError: !!chat.error })
@@ -338,7 +341,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const model = chip && !models?.pinned ? { ...chip, label: t('defaultModel', { model: chip.label }) } : chip
 
     const isForeman = coworker.kind === 'foreman'
-    const skills = useCoworkerSkills(isForeman ? null : coworker.id)
+    const skills = useCoworkerSkills(rowId)
     const workspaceAgents = useWorkspaceAgents()
     const boxes = me ? (cachedBoard(me.workspace.id).read()?.boxes ?? []) : []
     const mentionAgents = workspaceAgents ? mentionAgentsOf(workspaceAgents, boxes, isForeman ? null : coworker.id) : []
@@ -425,7 +428,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                                     authorOf={authorId => (isForeman ? undefined : profileOf(authorId))}
                                     renderMessage={(message, index, stamp) => (
                                         <Fragment key={message.id}>
-                                            <MessageView message={message} isLastAssistant={index === lastAssistant} running={chat.busy} agentId={isForeman ? null : coworker.id} fileOwner={endpoints.fileOwner(chat.sessionId)} coworkerName={coworker.name} hiddenCallId={alert?.toolCallId ?? null} skillProposals={skillProposals} onStopTask={stopTask} onRegenerate={pending ? undefined : () => void chat.regenerate()} feedback={feedback} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />
+                                            <MessageView message={message} isLastAssistant={index === lastAssistant} running={chat.busy} agentId={rowId} foreman={isForeman} fileOwner={endpoints.fileOwner(chat.sessionId)} coworkerName={coworker.name} hiddenCallId={alert?.toolCallId ?? null} skillProposals={skillProposals} onStopTask={stopTask} onRegenerate={pending ? undefined : () => void chat.regenerate()} feedback={feedback} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />
                                             {threadBranches(threadRows.after.get(index))}
                                         </Fragment>
                                     )}
@@ -434,7 +437,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                                     <Animated.View key={pending.toolCallId} entering={FadeInDown.duration(280)} onLayout={event => setBlockHeight(event.nativeEvent.layout.height)}>
                                         <HitlBlock
                                             pending={pending}
-                                            agentId={coworker.id}
+                                            agentId={rowId ?? coworker.id}
                                             coworkerName={coworker.name}
                                             webUrl={webUrl}
                                             upload={canAttach && caller ? attachment => uploadChatFile(caller, coworker.id, attachment.uri, attachment.name) : undefined}

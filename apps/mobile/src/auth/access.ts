@@ -43,12 +43,14 @@ export type CoworkerAccess = { access: BoxAccessLevel | undefined; known: boolea
 
 export const UNKNOWN_ACCESS: CoworkerAccess = { access: undefined, known: false }
 
-type AccessSources = { agents?: readonly Pick<BoardAgent, 'id' | 'access'>[] | null; views?: readonly ({ agent: Pick<BoardAgent, 'access'> } | null | undefined)[] }
+// `role`: the caller's in the workspace, which decides their level on the Chief of Staff.
+type AccessSources = { agents?: readonly Pick<BoardAgent, 'id' | 'access'>[] | null; views?: readonly ({ agent: Pick<BoardAgent, 'access'> } | null | undefined)[]; role?: WorkspaceRole }
 
 // What the phone already knows of the caller's level on a coworker, before the hub is asked: the board
-// first, then the copies of the coworker, in the order given. The Foreman is everyone's.
+// first, then the copies of the coworker, in the order given. Every member uses the Chief of Staff, an
+// admin manages it; a hub older than roles let every member manage it.
 export function knownCoworkerAccess(agentId: string, sources: AccessSources): CoworkerAccess {
-    if (agentId === FOREMAN_AGENT_ID) return { access: 'manage', known: true }
+    if (agentId === FOREMAN_AGENT_ID) return { access: isAdminRole(sources.role) ? 'manage' : 'use', known: true }
     const agent = sources.agents?.find(candidate => candidate.id === agentId)
     if (agent) return { access: agent.access, known: true }
     const view = sources.views?.find(candidate => !!candidate)

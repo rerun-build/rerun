@@ -13,10 +13,11 @@ export function useCoworkerAccess(agentId: string): CoworkerAccess {
     const { session, me } = useAuth()
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
+    const role = me?.workspace.role
     const foreman = agentId === FOREMAN_AGENT_ID
     const kept = useMemo(
-        () => (workspaceId ? knownCoworkerAccess(agentId, { agents: cachedBoard(workspaceId).read()?.agents, views: [readCoworkerScreen(workspaceId, agentId).view, readCoworkerDetails(workspaceId, agentId).view] }) : UNKNOWN_ACCESS),
-        [workspaceId, agentId]
+        () => (workspaceId ? knownCoworkerAccess(agentId, { agents: cachedBoard(workspaceId).read()?.agents, views: [readCoworkerScreen(workspaceId, agentId).view, readCoworkerDetails(workspaceId, agentId).view], role }) : UNKNOWN_ACCESS),
+        [workspaceId, agentId, role]
     )
     const askedFor = `${workspaceId}:${agentId}`
     const [fetched, setFetched] = useState<{ askedFor: string; access: BoxAccessLevel | undefined } | null>(null)

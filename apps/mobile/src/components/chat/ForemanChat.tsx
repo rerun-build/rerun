@@ -6,7 +6,7 @@ import { useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
-import { fetchForemanEngineFiles, fetchForemanSurface } from '@/api/foreman'
+import { fetchForemanEngineFiles, fetchForemanPresence } from '@/api/foreman'
 import { fetchAgentModels } from '@/api/models'
 import { useAuth } from '@/auth/AuthProvider'
 import { takePendingAsk } from '@/chat/pending-ask'
@@ -80,7 +80,10 @@ function Notice({ title, body, onRetry }: { title: string; body: string; onRetry
 export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.foreman')
-    const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, role: t('role') }), [t])
+    // Its row of `agents`, which its cards, its screen and its takeover address it by. Null until the
+    // hub names it, and on a hub older than that row: those cards then stay plain steps.
+    const [agentRowId, setAgentRowId] = useState<string | null>(null)
+    const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, role: t('role'), agentRowId }), [t, agentRowId])
     const back = useChatBack()
     const { session, me } = useAuth()
     const opensGeneral = sessionId === LAST_CONVERSATION || sessionId === GENERAL_PAGE_ID
@@ -126,11 +129,12 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         const token = latestToken.current
         if (!signedIn || !token || !workspaceId) return
         let cancelled = false
-        fetchForemanSurface({ accessToken: token, workspaceId })
+        fetchForemanPresence({ accessToken: token, workspaceId })
             .then(next => {
                 if (cancelled) return
-                cachedForeman(workspaceId).save({ surface: next, last: kept?.last ?? null })
-                setSurface(next)
+                cachedForeman(workspaceId).save({ surface: next.surface, last: kept?.last ?? null })
+                setSurface(next.surface)
+                setAgentRowId(next.agentId)
             })
             // Offline, the page stays on what the phone knew.
             .catch(() => {

@@ -1,4 +1,5 @@
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
+import { foremanAgentId } from '@/lib/foreman/agent-row'
 import { decodeIntent } from '@/lib/foreman/kickoff-marker'
 import { installedArrival, type ForemanArrival } from '@/lib/foreman/phase'
 import { loadForemanState } from '@/lib/foreman/state'
@@ -33,5 +34,6 @@ export async function GET(req: Request): Promise<Response> {
     const linked: ForemanArrival | null = state.intent && state.intent.kind !== 'prompt' && state.intent.title ? { kind: state.intent.kind, title: state.intent.title, ...(state.intent.paid ? { paid: state.intent.paid } : {}), ...(state.intent.coworker ? { coworker: state.intent.coworker } : {}) } : null
     const arrival: ForemanArrival | null = planned && state.phase === 'discover' ? { ...planned, installed: true } : (linked ?? planned)
     const surface = await resolveForemanSurface(ctx.workspace.id, state, { canClaim: !ctx.authUser.is_anonymous })
-    return Response.json({ phase: state.phase, firstName: state.firstName, arrival, surface })
+    const agentId = surface === 'engine' && !ctx.authUser.is_anonymous ? await foremanAgentId(ctx.workspace.id).catch(() => null) : null
+    return Response.json({ phase: state.phase, firstName: state.firstName, arrival, surface, agentId })
 }

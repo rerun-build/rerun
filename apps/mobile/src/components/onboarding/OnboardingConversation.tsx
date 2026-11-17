@@ -133,7 +133,7 @@ export function OnboardingConversation({ messages, busy, failed, onRetry, teamSt
                                             {render(segment.widget, message)}
                                         </Animated.View>
                                     ) : (
-                                        <MessageView key={`${message.id}-${at}`} message={{ ...message, id: `${message.id}-${at}`, parts: segment.parts }} isLastAssistant={index === shown.length - 1} running={busy} agentId={null} fileOwner={null} coworkerName={FOREMAN_DISPLAY_NAME} hiddenCallId={null} />
+                                        <MessageView key={`${message.id}-${at}`} message={{ ...message, id: `${message.id}-${at}`, parts: segment.parts }} isLastAssistant={index === shown.length - 1} running={busy} agentId={null} foreman fileOwner={null} coworkerName={FOREMAN_DISPLAY_NAME} hiddenCallId={null} />
                                     )
                                 )}
                             </View>

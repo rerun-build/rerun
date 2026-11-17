@@ -12,8 +12,10 @@ export async function fetchForemanState(caller: Caller): Promise<ForemanStateRes
     return foremanStateSchema.parse(await api('/api/chat/foreman/state', caller))
 }
 
-export async function fetchForemanSurface(caller: Caller): Promise<ForemanSurface> {
-    return (await fetchForemanState(caller)).surface
+// Where it runs and the row its cards address it by, from one read.
+export async function fetchForemanPresence(caller: Caller): Promise<{ surface: ForemanSurface; agentId: string | null }> {
+    const state = await fetchForemanState(caller)
+    return { surface: state.surface, agentId: state.agentId ?? null }
 }
 
 export async function fetchForemanEngineFiles(caller: Caller): Promise<boolean> {

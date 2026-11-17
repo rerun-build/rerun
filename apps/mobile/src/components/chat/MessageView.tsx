@@ -63,8 +63,11 @@ type MessageViewProps = {
     message: UIMessage
     isLastAssistant: boolean
     running: boolean
-    // The coworker whose files a card points at; the Foreman's live elsewhere, and its cards stay steps.
+    // The agent whose files a card points at: for the Chief of Staff its row of `agents`, null on a hub
+    // too old to name it, where its cards stay steps.
     agentId: string | null
+    // The Chief of Staff: its shortcuts to coworkers draw as picks, and no coworker stands beside its steps.
+    foreman?: boolean
     // Where the conversation's uploads sit, a voice message's recording among them.
     fileOwner: FileOwner | null
     coworkerName: string
@@ -85,7 +88,7 @@ type MessageViewProps = {
 
 type Block = { key: string; node: React.ReactNode }
 
-export function MessageView({ message, isLastAssistant, running, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, feedback, stamp, paidSources }: MessageViewProps) {
+export function MessageView({ message, isLastAssistant, running, agentId, foreman = false, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, feedback, stamp, paidSources }: MessageViewProps) {
     const t = useTranslations('mobileChat.messages')
     const tTools = useTranslations('tools')
     if (message.role === 'user') {
@@ -200,7 +203,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
             addBlock({ key: `c${index}`, node: card.kind === 'table' ? <TableCardView card={card.card} agentId={agentId} /> : <FileCardView card={card.card} agentId={agentId} /> }, index)
             return
         }
-        if (!agentId && FOREMAN_SHORTCUTS.has(toolName) && part.state !== 'output-error') {
+        if (foreman && FOREMAN_SHORTCUTS.has(toolName) && part.state !== 'output-error') {
             underText.push({ key: `p${index}`, node: <AgentPickerCard picks={readAgentPicks(toolName, part.input)} /> })
             return
         }
@@ -217,7 +220,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
     })
     flushSteps()
     // The coworker stands once in the thread, beside the last steps it took.
-    if (isLastAssistant && lastGroupAt >= 0) blocks[lastGroupAt] = { ...blocks[lastGroupAt], node: <StepGroup items={lastGroupItems} agentId={agentId} /> }
+    if (isLastAssistant && lastGroupAt >= 0) blocks[lastGroupAt] = { ...blocks[lastGroupAt], node: <StepGroup items={lastGroupItems} agentId={foreman ? null : agentId} /> }
     const closing = buffer
     buffer = ''
     const held = underText
