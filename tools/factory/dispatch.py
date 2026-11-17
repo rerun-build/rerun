@@ -60,6 +60,7 @@ WT_NEW_FAULT = re.compile(r"(?is)(?=.*\bwt new\b)(?!.*\bplan marker\b).*\b(?:can
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 STALE_RUN_S, STALE_RUNS_A_BEAT = 2 * 3600, 15
+DRAIN_MAX_S = 3 * 3600
 MAX_TAKES = 3
 INBOX = "Factory follow-ups inbox"
 INBOX_BODY = ("The factory dispatcher writes every reviewer follow-up note here as a comment, one comment per review, "
@@ -449,6 +450,7 @@ class Dispatcher:
         self.renewal_unreadable = False
         self.connections = None
         self.plan_week_full = False
+        self.draining = False
         self.report_logged = set()
         self.started = now()
         self.names = pools.names(cfg)
@@ -1026,11 +1028,16 @@ class Dispatcher:
 
     def close_stale(self):
         ids = {n: a for a, n in self.names.items()}
-        live = {j.get("run") for j in self.jobs()}
-        rows = self.store.db.execute("SELECT run_id, coworker FROM fires WHERE status='running' AND run_id IS NOT NULL AND job GLOB '[0-9]*' "
-                                     "AND intent_at < ? ORDER BY id", (iso(self.now() - STALE_RUN_S),)).fetchall()
+        live = {j.get("run") for j in self.jobs() if j["state"] in RUNNING} | {r.get("run") for r in self.station.live().values()}
+        rows = self.store.db.execute("SELECT run_id, coworker FROM fires WHERE status='running' AND run_id IS NOT NULL "
+                                     "AND (job GLOB '[0-9]*' OR job GLOB 'plan:*') AND intent_at < ? ORDER BY id",
+                                     (iso(self.now() - STALE_RUN_S),)).fetchall()
         skip = self.__dict__.setdefault("stale_skip", set())
-        for run, who in [r for r in rows if r[0] not in live and r[0] not in skip and r[1] in ids][:STALE_RUNS_A_BEAT]:
+        for run, who in [r for r in rows if r[0] not in live and r[0] not in skip][:STALE_RUNS_A_BEAT]:
+            if who not in ids:
+                self.store.db.execute("UPDATE fires SET status='lost', ended_at=?, error=? WHERE run_id=?",
+                                      (iso(self.now()), "coworker %s is not in the pools: the run cannot be read" % who, run))
+                continue
             try:
                 r = self.account("get_run", {"agentId": ids[who], "runId": run}) or {}
             except Error:
@@ -1088,7 +1095,7 @@ class Dispatcher:
         if j.get("attempt", 1) >= 2:
             self.end(j, "failed", why + (" (second time)" if how == "ended" else ""))
             return None
-        if holds.active(self.store, self.now()) is not None:
+        if self.cfg.get("held") or holds.active(self.store, self.now()) is not None:
             j.update(state=BACK[j["state"]], retry_attempt=2, sending=None)
             self.save(j, "failed attempt, held: %s" % why[:160])
             log(j["issue"], "failed attempt, back to %s; sending held: %s" % (j["state"], why[:160]))
@@ -1184,7 +1191,7 @@ class Dispatcher:
         st = j["state"]
         if j.get("sending"):
             return self.lost_run(j)
-        if st in states.QUEUE and holds.active(self.store, self.now()) is not None:
+        if st in states.QUEUE and (self.cfg.get("held") or holds.active(self.store, self.now()) is not None):
             return
         if st in states.QUEUE and j.get("not_before") and self.now() < j["not_before"]:
             return
@@ -1645,6 +1652,28 @@ class Dispatcher:
         elif kept:
             holds.clear(self.store, "sign-in renewal")
 
+    def drain_hold(self):
+        base = os.environ.get("FACTORY_DATA_DIR", "/state")
+        try:
+            age = self.now() - os.path.getmtime(os.path.join(base, "drain"))
+        except OSError:
+            self.draining = False
+            return
+        state = "old" if age > DRAIN_MAX_S else True
+        if state != self.draining:
+            log("-", "update asked: holding new sends until it is done; running work finishes" if state is True
+                else "the update mark is over %d h old: ignored" % (DRAIN_MAX_S // 3600))
+        self.draining = state
+        if state is not True:
+            return
+        holds.arm(self.store, "update", self.now() + 2 * self.cfg.get("poll_s", 30))
+        left = self.store.db.execute("SELECT COUNT(*) FROM fires WHERE status IN ('intent', 'running') AND intent_at >= ?",
+                                     (iso(self.now() - STALE_RUN_S),)).fetchone()[0]
+        try:
+            refresh.write(os.path.join(base, "drain-left"), str(left))
+        except OSError as e:
+            log("-", "drain count not written: %s" % type(e).__name__)
+
     def tier_floor(self):
         floor = self.cfg.get("tier_floor")
         off = False
@@ -1661,6 +1690,8 @@ class Dispatcher:
     def once(self):
         self.heartbeat()
         self.renewal_hold()
+        self.drain_hold()
+        self.cfg["held"] = holds.active(self.store, self.now()) is not None
         self.control.tick(self.beats)
         clean = True
         try:

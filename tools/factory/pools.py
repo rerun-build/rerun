@@ -33,7 +33,7 @@ def max_jobs(cfg, worker):
 
 def free_copies(cfg, worker, running, exclude=()):
     t = types(cfg).get(worker)
-    if t is None:
+    if t is None or cfg.get("held"):
         return []
     out = []
     for c in [c for c in t["coworkers"] if c["id"] not in exclude]:
