@@ -3,12 +3,17 @@ import json
 import re
 from pathlib import Path
 
+import planning
+
 RULES = Path(__file__).resolve().parent / "classify_rules.json"
 
 PATH_RE = re.compile(r"(?<![\w/.-])((?:\.github|tools|apps|packages|deploy|docs)/[\w./-]*\w)")
 BACKTICK_RE = re.compile(r"`([A-Za-z_][\w.]*)(?:\(\))?`")
 CALL_RE = re.compile(r"(?<![\w.])([A-Za-z_][\w.]*)\(")
 TITLE_WORD_RE = re.compile(r"[a-z0-9]{3,}")
+ANSWER_RE = re.compile(r"^CLASS:\s+(\S+)\s+(\S+)\s+(P[0-3])\s+(.+)$")
+KINDS = ("follow-up", "operator", "plan", "bug", "feature", "problem")
+BODY_CUT = 6000
 
 
 def load(path=RULES):
@@ -119,6 +124,35 @@ def place(issue, rules):
     }
 
 
+def brief(issue, rules):
+    names = [e["name"] for e in rules["areas"]]
+    lines = [
+        "You work alone and write nothing on GitHub. Place this issue.",
+        json.dumps({"areas": names, "kinds": rules["kinds"], "priorities": rules["priorities"]}),
+        "Issue #%s: %s" % (issue["number"], issue.get("title") or ""),
+        (issue.get("body") or "")[:BODY_CUT],
+        "Last line, exactly: `CLASS: <area> <kind> <P0|P1|P2|P3> <reason>` with area one of %s and kind one of %s."
+        % (", ".join(names), ", ".join(KINDS)),
+    ]
+    return "\n".join(lines)
+
+
+def answer(output, rules):
+    lines = [l.strip() for l in (output or "").strip().splitlines() if l.strip()]
+    if not lines:
+        return None
+    found = ANSWER_RE.match(lines[-1])
+    if not found:
+        return None
+    where, kind_name, ranked, reason = found.groups()
+    if where not in {e["name"] for e in rules["areas"]} or kind_name not in KINDS:
+        return None
+    reason = reason.replace("@", "").strip()[:200].rstrip(". ")
+    if not reason:
+        return None
+    return {"area": where, "kind": kind_name, "priority": ranked, "reason": reason}
+
+
 def group(gh, repo, area, priority, groups):
     title = "Follow-ups: %s, %s" % (area, priority)
     if title in groups:
@@ -130,8 +164,73 @@ def group(gh, repo, area, priority, groups):
 
 
 class Pass:
-    def __init__(self, cfg, store, gh, now):
-        self.cfg, self.store, self.gh, self.now = cfg, store, gh, now
+    def __init__(self, cfg, store, gh, now, account=None):
+        self.cfg, self.store, self.gh, self.now, self.account = cfg, store, gh, now, account
+
+    def sent_since(self, start):
+        return self.store.db.execute("SELECT COUNT(*) FROM fires WHERE stage='classify' AND intent_at>=?", (start,)).fetchone()[0]
+
+    def label_model(self, repo, rules, n, got):
+        area_label = next((e["label"] for e in rules["areas"] if e["name"] == got["area"] and e["label"]), None)
+        add = got["priority"] + ("," + area_label if area_label else "")
+        self.gh(["issue", "edit", str(n), "-R", repo, "--add-label", add])
+        self.gh(["issue", "comment", str(n), "-R", repo, "--body",
+                 "Classified %s (%s, %s) by model: %s." % (got["priority"], got["area"], got["kind"], got["reason"])])
+
+    def poll(self, repo, rules, listed, cap, calls):
+        settings = self.cfg.get("classify", {})
+        agent = settings.get("agent")
+        open_now = {i["number"]: i for i in listed}
+        for row in self.store.running():
+            if row["stage"] != "classify" or not row.get("run_id"):
+                continue
+            job, run = row["job"], row["run_id"]
+            got = self.account("get_run", {"agentId": agent, "runId": run}) or {}
+            status = got.get("status")
+            if status == "running":
+                continue
+            n = int(job.split(":", 1)[1])
+            placed = answer(got.get("output"), rules) if status == "done" else None
+            live = open_now.get(n)
+            apply = placed is not None and live is not None and not skipped(live, rules)
+            if apply and calls + 2 > cap:
+                continue
+            tokens_in, tokens_out = got.get("tokensIn"), got.get("tokensOut")
+            self.store.close_run(run, "done" if status == "done" else "failed",
+                                 tokens_in=tokens_in if isinstance(tokens_in, int) else 0,
+                                 tokens_out=tokens_out if isinstance(tokens_out, int) else 0)
+            self.store.set(job, "run", "")
+            if apply:
+                self.label_model(repo, rules, n, placed)
+                calls += 2
+                for k in ("area", "kind", "priority"):
+                    self.store.set(job, k, placed[k])
+                self.store.set(job, "at", int(self.now()))
+                self.store.set(job, "how", "model")
+        return calls
+
+    def send(self, issue, rules, settings):
+        job = "classify:%s" % issue["number"]
+        agent = settings["agent"]
+        fire = self.store.intent(job, "", "classify", coworker=settings.get("agent_name", ""), at=planning.stamp(self.now()))
+        args = {"agentId": agent, "message": brief(issue, rules), "waitSeconds": 1,
+                "goal": {"lastLineForms": [{"prefix": "CLASS:", "rest": "sentence"}], "turnLimit": 1}}
+        for key in ("model", "thinkingLevel"):
+            if settings.get(key):
+                args[key] = settings[key]
+        try:
+            result = self.account("send_message", args)
+            run = result["runId"]
+        except Exception as e:
+            self.store.abandon(fire, str(e)[:200])
+            return False
+        self.store.fired(fire, run)
+        self.store.set(job, "run", run)
+        self.store.set(job, "fire", fire)
+        self.store.set(job, "hash", digest(issue))
+        self.store.set(job, "issue", json.dumps({"number": issue["number"], "title": issue.get("title"),
+                                                  "body": issue.get("body"), "labels": labels(issue)}))
+        return True
 
     def once(self):
         settings = self.cfg.get("classify", {})
@@ -141,9 +240,14 @@ class Pass:
         repo = self.cfg["repo"]
         cap = settings.get("gh_calls", 30)
         calls = 1
+        start = planning.stamp(self.now())
+        modelled = bool(self.account and settings.get("agent"))
         listed = json.loads(self.gh(["issue", "list", "-R", repo, "--state", "open", "--json", "number,title,body,labels", "--limit", "200"]))
         groups = {i["title"]: i["number"] for i in listed}
         joined = set()
+        if modelled:
+            calls = self.poll(repo, rules, listed, cap, calls)
+            room = settings.get("model_runs", 5) - self.sent_since(start)
         for issue in listed:
             if skipped(issue, rules) or kind(issue, rules) == "problem":
                 continue
@@ -152,6 +256,10 @@ class Pass:
                 continue
             where = place(issue, rules)
             if where is None:
+                if modelled and room > 0 and self.send(issue, rules, settings):
+                    room -= 1
+                elif modelled and room > 0:
+                    room = 0
                 continue
             n = str(issue["number"])
             if where["kind"] == "follow-up" and len(issue.get("body") or "") < 60000:

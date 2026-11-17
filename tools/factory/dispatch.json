@@ -11,7 +11,7 @@
   },
   "auto_plan_marker": true,
   "likely_fixed_days": 7,
-  "classify": {"on": true, "gh_calls": 30},
+  "classify": {"on": true, "gh_calls": 30, "model_runs": 5, "agent": "bf9008a5-532d-47de-aa67-04c4bdde9a64", "agent_name": "Issue Triage"},
   "planning": {
     "max_queue": 20,
     "plan_by": ["Boss"],

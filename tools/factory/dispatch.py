@@ -453,7 +453,7 @@ class Dispatcher:
         self.tiers_off = False
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
-        self.classifier = classify.Pass(cfg, self.store, gh, now)
+        self.classifier = classify.Pass(cfg, self.store, gh, now, account)
         self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
         self.instructions = instructions.Station(cfg, self.store, account, gh, now, log)
         self.causes = causes.Station(cfg, self.store, account, gh, now, log)
