@@ -6,9 +6,42 @@ SUPABASE_DIR=${SUPABASE_DIR:-/docker/supabase-rerun}
 SUPABASE_DB_CONTAINER=${SUPABASE_DB_CONTAINER:-supabase-db}
 SUPABASE_CLI=${SUPABASE_CLI:-supabase@2.113.0}
 OWNER=$(stat -c '%u:%g' "$REPO")
+DISPATCHER=$(docker ps -qf name=factory-dispatcher | head -n 1)
+[ "${NO_DRAIN:-0}" != 1 ] || DISPATCHER=
+
+undrain() {
+    [ -z "$DISPATCHER" ] || docker exec "$DISPATCHER" rm -f /state/drain /state/drain-left || echo "The drain mark could not be removed: the factory starts again by itself within 3 hours."
+}
+
+wait_drained() {
+    [ -n "$DISPATCHER" ] || return 0
+    echo "== waiting for the factory's running work to finish (NO_DRAIN=1 skips the wait)"
+    waited=0
+    while :; do
+        left=$(docker exec "$DISPATCHER" cat /state/drain-left 2>/dev/null || echo "?")
+        [ "$left" != 0 ] || break
+        if [ "$left" = "?" ] && [ "$waited" -ge 180 ]; then
+            echo "The dispatcher gave no count in 3 min: going on."
+            break
+        fi
+        if [ "$waited" -ge 3600 ]; then
+            echo "Still $left running after 60 min: going on."
+            break
+        fi
+        echo "$left running, waited ${waited} s"
+        sleep 30
+        waited=$((waited + 30))
+    done
+}
 
 echo "== 1/4 code"
 su "$(stat -c '%U' "$REPO")" -s /bin/sh -c "git -C '$REPO' pull --ff-only"
+
+trap undrain EXIT
+trap 'exit 130' INT TERM HUP
+if [ -n "$DISPATCHER" ]; then
+    docker exec "$DISPATCHER" sh -c 'rm -f /state/drain-left; touch /state/drain' && echo "Factory: no new work starts until this update is done." || echo "Factory: the drain mark could not be set."
+fi
 
 echo "== snapshot of the coworker databases"
 if ! docker compose ps --status running --services 2>/dev/null | grep -qx engine; then
@@ -32,6 +65,7 @@ docker run --rm --network "$NET" -v "$REPO/supabase:/work/supabase" -w /work --u
     sh -c "npx -y $SUPABASE_CLI db push --include-all --yes --db-url \"\$SUPABASE_DB_URL\""
 unset PW SUPABASE_DB_URL
 
+wait_drained
 echo "== 4/4 restart"
 docker compose up -d
 docker compose ps
