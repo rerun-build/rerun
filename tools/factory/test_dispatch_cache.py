@@ -35,7 +35,7 @@ class RunCache(T.Base):
     def old_run(self, rid, job, status):
         st = self.d.store
         st.fired(st.intent(job, "", "build", coworker=self.d.names["b1"]), rid)
-        st.db.execute("UPDATE fires SET intent_at=? WHERE run_id=?", ("2026-01-01T00:00:00Z", rid))
+        st.db.execute("UPDATE fires SET intent_at=? WHERE run_id=?", ("1969-12-01T00:00:00Z", rid))
         st.db.commit()
         self.w.runs[rid] = {"status": status, "finishedAt": "2026-01-01T00:20:00Z", "inputTokens": 70, "outputTokens": 5, "cachedInputTokens": 40}
 
