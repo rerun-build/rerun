@@ -3,6 +3,8 @@ import json
 import re
 
 import changelog
+import escapes
+import instructions
 import learn
 import pools
 import states
@@ -27,6 +29,12 @@ FINAL = re.compile(r"(?m)^CAUSES:[ \t]*(none|(\d+) changes?)[ \t]*$")
 HEAD = re.compile(r"(?m)^CAUSE[ \t]+\d+[ \t]*$")
 FIELD = re.compile(r"^(GROUP|WHY|CULPRIT|CHANGE):[ \t]*(.*)$")
 ISSUE = re.compile(r"^#(\d+)$")
+REVERT = "revert"
+DROPPED = "dropped"
+INSTR_DROPPED = ("rejected", "refused", "unreadable")
+REVERT_TITLE = "Revert of #%d: it did not lower `%s`"
+REVERT_BODY = ("Put the text or the setting back as it was before %s. It did not lower `%s`: %s "
+               "(events per 20 jobs).\n\n**Repairs**: #%d\n")
 
 
 def due(new, last_at, now, out):
@@ -207,13 +215,71 @@ class Station:
         return mine, others
 
     def once(self, beat, running):
+        start_beat = (beat - 1) % EVERY == 0
+        if start_beat:
+            self.measure()
         boss, _ = self.boss()
         if boss is None:
             return
         if self.row().get("state") == "running":
             return self.poll(self.row())
-        if (beat - 1) % EVERY == 0:
+        if start_beat:
             self.start(running)
+
+    def live_at(self, c):
+        if c["kind"] == "instructions":
+            row = self.store.get_all("instr:%d" % c["issue"])
+            if row.get("state") in INSTR_DROPPED:
+                return DROPPED
+            return float(row["applied_at"]) if row.get("applied_at") else None
+        job = self.store.get_job(str(c["issue"]))
+        if job is None or job["state"] not in states.END:
+            return None
+        if job["state"] != "merged":
+            return DROPPED
+        return escapes.merged_at(self.store, {"issue": c["issue"]})
+
+    def measure(self):
+        now = self.now()
+        for c in self.store.changes():
+            if c["verdict"] is not None:
+                continue
+            live = self.live_at(c)
+            if live is None:
+                continue
+            if live == DROPPED:
+                self.store.set_change(c["id"], verdict=DROPPED)
+                self.log("-", "change dropped: `%s`, #%d never went live" % (c["grp"], c["issue"]))
+                continue
+            if c["live_at"] is None:
+                self.store.set_change(c["id"], live_at=live)
+                c["live_at"] = live
+            jobs = changelog.after(ended_jobs(self.store), iso(c["live_at"]), iso(now))
+            if jobs is None:
+                continue
+            after = changelog.rate(grouped(self.store), jobs, c["grp"])
+            verdict = changelog.verdict(c["before"], after)
+            fields = {"after": after, "verdict": verdict}
+            if verdict == REVERT:
+                fields["revert"] = self.file_revert(c, after)
+            self.store.set_change(c["id"], **fields)
+            self.log("-", "change measured: `%s` %s before, %s after: %s" % (c["grp"], c["before"], after, verdict))
+
+    def file_revert(self, c, after):
+        fact = "%s before, %s after" % (c["before"], after)
+        title = REVERT_TITLE % (c["issue"], c["grp"])
+        if c["kind"] == "instructions":
+            issue = json.loads(self.gh(["issue", "view", str(c["issue"]), "-R", self.repo, "--json", "title,body,state"]))
+            parsed = instructions.parse({"number": c["issue"], "body": issue.get("body") or ""})
+            args = ["issue", "create", "-R", self.repo, "--title", title, "--label", "instructions",
+                    "--body", instructions.revert_body(c["issue"], parsed, fact)]
+        else:
+            job = self.store.get_job(str(c["issue"])) or {}
+            pr = job.get("pr")
+            pr_text = "pull request #%s" % pr if pr else "the change"
+            args = ["issue", "create", "-R", self.repo, "--title", title, "--label", "P0",
+                    "--body", REVERT_BODY % (pr_text, c["grp"], fact, c["issue"])]
+        return int(self.gh(args).strip().rsplit("/", 1)[1])
 
     def records(self, events):
         found = {}
@@ -227,13 +293,8 @@ class Station:
             found[g] = [learn.record(self.store, j) for j in reversed(jobs)]
         return found
 
-    def back(self):
-        out = []
-        for c in self.store.changes():
-            if c["revert"] == 1 and not c["told"]:
-                out.append({"issue": c["issue"], "group": c["grp"], "before": c["before"], "after": c["after"]})
-                self.store.set_change(c["id"], told=1)
-        return out
+    def pending_back(self):
+        return [c for c in self.store.changes() if c["verdict"] == REVERT and not c["told"]]
 
     def start(self, running):
         cur = self.row()
@@ -242,14 +303,16 @@ class Station:
             self.put("last_at", now)
             cur = self.row()
         events = self.store.failures(after=int(cur.get("last_id") or 0))
-        if not due(len(events), float(cur["last_at"]), now, False):
+        pending = self.pending_back()
+        if not due(len(events), float(cur["last_at"]), now, False) and not pending:
             return
         _, others = self.boss()
         got = pools.pick_copy(self.cfg, "planner", running, exclude=others)
         if got is None:
             return
         agent, copy = got
-        text = brief(self.repo, events, self.records(events), self.back())
+        back = [{"issue": c["issue"], "group": c["grp"], "before": c["before"], "after": c["after"]} for c in pending]
+        text = brief(self.repo, events, self.records(events), back)
         args = {"agentId": agent, "message": text, "waitSeconds": 1,
                 "goal": {"lastLineForms": [dict(f) for f in FORMS], "turnLimit": 3}}
         try:
@@ -275,8 +338,10 @@ class Station:
         self.put("run", rid)
         self.put("started", now)
         self.put("fire", fire)
-        self.put("upto", max(e["id"] for e in events))
-        self.put("groups", json.dumps(sorted({group(e) for e in events})))
+        self.put("upto", max((e["id"] for e in events), default=int(cur.get("last_id") or 0)))
+        self.put("groups", json.dumps(sorted({group(e) for e in events} | {c["grp"] for c in pending})))
+        for c in pending:
+            self.store.set_change(c["id"], told=1)
         self.put("asks", int(cur.get("asks") or 0) + 1)
         self.log("-", "causes: %d failure events sent to %s (run %s)" % (len(events), self.name, rid))
 
