@@ -24,7 +24,9 @@
         "tray.stillRunning": "Windows balloon the first time the window is closed into the notification area. {name} is the app name.",
         "context.openLink": "Right-click menu on a link: opens it in the web browser.",
         "tray.quickAsk": "Tray menu item opening the small window where the person types a question for the Chief of Staff (the workspace assistant), from any app.",
-        "tray.quickAskVoice": "Menu item of the desktop app (File menu and the menu bar icon) that opens Quick ask listening to the person's voice. Quick ask is a small window to ask the workspace assistant from any app."
+        "tray.quickAskVoice": "Menu item of the desktop app (File menu and the menu bar icon) that opens Quick ask listening to the person's voice. Quick ask is a small window to ask the workspace assistant from any app.",
+        "computer.trayOnline": "A disabled line of the menu-bar / tray menu: the state of this computer, linked to Rerun so coworkers can run commands on it.",
+        "computer.pause": "Menu item, title case like the other menu items. Stops coworkers from using this computer until resumed."
     },
     "menu": {
         "app": {
@@ -137,5 +139,15 @@
         "copyLink": "Copy Link",
         "copyImage": "Copy Image",
         "saveImage": "Save Image"
+    },
+    "computer": {
+        "defaultName": "My computer",
+        "chooseFolder": "Choose the folder coworkers work in",
+        "trayOnline": "This computer: online",
+        "trayOffline": "This computer: offline",
+        "trayPaused": "This computer: paused",
+        "trayJobs": "{count, plural, one {This computer: # job running} other {This computer: # jobs running}}",
+        "pause": "Pause Coworkers on This Computer",
+        "resume": "Resume Coworkers on This Computer"
     }
 }

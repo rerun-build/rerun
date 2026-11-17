@@ -21,9 +21,13 @@ export default defineConfig(() => {
         main: {
             define,
             build: {
-                // `@rerun/contracts` is a workspace package: bundled, so the packaged app carries no
-                // node_modules beyond the updater.
-                externalizeDeps: { exclude: ['@rerun/contracts'] },
+                // `@rerun/contracts` is a workspace package and `ws` a pure JS library: bundled, so the
+                // packaged app carries no node_modules beyond the updater.
+                externalizeDeps: { exclude: ['@rerun/contracts', 'ws'] },
+                rolldownOptions: {
+                    // The computer's worker runs in a utilityProcess of its own (`out/main/worker.js`).
+                    input: { index: resolve(import.meta.dirname, 'src/main/index.ts'), worker: resolve(import.meta.dirname, 'src/worker/index.ts') },
+                },
             },
         },
         preload: {

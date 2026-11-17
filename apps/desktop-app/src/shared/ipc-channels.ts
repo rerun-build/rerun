@@ -33,6 +33,11 @@ export const IPC = {
     localServerCancel: 'rerun-shell:local:server-cancel',
     localFind: 'rerun-shell:local:find',
     localFindClose: 'rerun-shell:local:find-close',
+    remoteComputerGetState: 'rerun-shell:remote-computer:get-state',
+    remoteComputerLink: 'rerun-shell:remote-computer:link',
+    remoteComputerUnlink: 'rerun-shell:remote-computer:unlink',
+    remoteComputerSetPaused: 'rerun-shell:remote-computer:set-paused',
+    remoteComputerChooseWorkDir: 'rerun-shell:remote-computer:choose-work-dir',
 } as const
 
 export const IPC_EVENTS = {
@@ -46,6 +51,7 @@ export const IPC_EVENTS = {
     notificationClick: 'rerun-shell:event:notification-click',
     quickAskShortcut: 'rerun-shell:event:quick-ask-shortcut',
     quickAskHidden: 'rerun-shell:event:quick-ask-hidden',
+    remoteComputerState: 'rerun-shell:event:remote-computer-state',
 } as const
 
 export type AppBootstrap = {

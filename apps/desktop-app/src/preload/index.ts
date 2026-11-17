@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
-import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState, QuickAskShortcutKind, QuickAskShortcutResult } from '@rerun/contracts'
+import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopRemoteComputerState, DesktopRemoteLinkInput, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState, QuickAskShortcutKind, QuickAskShortcutResult } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
 // Runs before any script of the page, in an isolated world, in the main frame only. It asks the
@@ -86,6 +86,20 @@ if (bootstrap?.audience === 'app') {
                 return unsubscribe
             },
             onHidden: (callback) => subscribe<void>(IPC_EVENTS.quickAskHidden, () => callback()),
+        },
+        remoteComputer: {
+            getState: () => ipcRenderer.invoke(IPC.remoteComputerGetState) as Promise<DesktopRemoteComputerState>,
+            onState: (callback) => subscribe<DesktopRemoteComputerState>(IPC_EVENTS.remoteComputerState, callback),
+            link: (input: DesktopRemoteLinkInput) =>
+                ipcRenderer.invoke(IPC.remoteComputerLink, {
+                    token: String(input.token),
+                    computer: { id: String(input.computer.id), name: String(input.computer.name), handle: String(input.computer.handle) },
+                    workspaceId: Number(input.workspaceId),
+                    workspaceName: String(input.workspaceName),
+                }) as Promise<DesktopRemoteComputerState>,
+            unlink: (computerId) => ipcRenderer.invoke(IPC.remoteComputerUnlink, String(computerId)) as Promise<DesktopRemoteComputerState>,
+            setPaused: (paused) => ipcRenderer.invoke(IPC.remoteComputerSetPaused, paused === true) as Promise<DesktopRemoteComputerState>,
+            chooseWorkDir: () => ipcRenderer.invoke(IPC.remoteComputerChooseWorkDir) as Promise<DesktopRemoteComputerState>,
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)

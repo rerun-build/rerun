@@ -148,6 +148,15 @@ export async function revokeComputer(workspaceId: number, computerId: string): P
     await deleteRemoteComputer(engine.conn, computerId).catch(err => console.warn('[computers] engine not told of an unlinked computer', err))
 }
 
+// The computer unlinks itself: false for a token the hub never issued or already revoked.
+export async function unlinkByToken(token: string): Promise<boolean> {
+    if (!token.startsWith(REMOTE_COMPUTER_TOKEN_PREFIX)) return false
+    const { data: row } = await selectMaybeSingle(createServiceRoleClient(), 'remote_computers', ['id', 'workspace_id', 'revoked_at'] as const, { token_hash: hashToken(token) })
+    if (!row || row.revoked_at) return false
+    await revokeComputer(row.workspace_id, row.id)
+    return true
+}
+
 // A person who leaves the workspace leaves with the computers they linked.
 export async function revokeMemberComputers(workspaceId: number, userId: string): Promise<void> {
     const { data } = await selectAll(createServiceRoleClient(), 'remote_computers', ['id'] as const, { workspace_id: workspaceId, linked_by: userId, revoked_at: null })

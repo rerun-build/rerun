@@ -13,7 +13,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut', 'remoteComputer'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -127,6 +127,35 @@ export const QUICK_ASK_PATH = '/quick-ask'
 // shell shipped with; a person can now change it (`DesktopSettings.quickAskShortcut`).
 export const QUICK_ASK_SHORTCUT = 'CommandOrControl+Shift+Space'
 
+// This computer as the app sees it: the workspaces it is linked to and how each link is doing.
+export type DesktopRemoteLinkStatus = 'connecting' | 'online' | 'offline' | 'revoked'
+
+export type DesktopRemoteLink = {
+    computerId: string
+    name: string
+    handle: string
+    workspaceId: number
+    workspaceName: string
+    hubOrigin: string
+    linkedAt: string
+    status: DesktopRemoteLinkStatus
+    error?: string
+}
+
+export type DesktopRemoteComputerState = {
+    links: DesktopRemoteLink[]
+    paused: boolean
+    // Where commands start and files land unless a coworker names another folder.
+    workDir: string
+    // False when the system has no keychain (some Linux desktops): the tokens sit in a file only this
+    // account can read, and the app says so.
+    secureStorage: boolean
+    runningJobs: number
+    machine: { hostname: string; os: DesktopShellPlatform; arch: string; suggestedName: string }
+}
+
+export type DesktopRemoteLinkInput = { token: string; computer: { id: string; name: string; handle: string }; workspaceId: number; workspaceName: string }
+
 export type DesktopSignInProvider = 'google' | 'apple'
 
 export type DesktopSignInResult = { status: 'signed-in' } | { status: 'error'; reason: DesktopSignInError }
@@ -217,6 +246,18 @@ export type DesktopShellApi = {
         // (the text shortcut, the tray, a click elsewhere). A hidden page is not told otherwise: it
         // stops listening.
         onHidden(callback: () => void): Unsubscribe
+    }
+    // Only with the `remoteComputer` capability.
+    remoteComputer?: {
+        getState(): Promise<DesktopRemoteComputerState>
+        onState(callback: (state: DesktopRemoteComputerState) => void): Unsubscribe
+        // Keeps the token the hub gave for this computer, in the system's keychain, and connects.
+        link(input: DesktopRemoteLinkInput): Promise<DesktopRemoteComputerState>
+        // Unlinks it from the workspace (told to the hub) and forgets the token.
+        unlink(computerId: string): Promise<DesktopRemoteComputerState>
+        setPaused(paused: boolean): Promise<DesktopRemoteComputerState>
+        // Opens the system's folder picker; the state is unchanged when the person cancels.
+        chooseWorkDir(): Promise<DesktopRemoteComputerState>
     }
 }
 

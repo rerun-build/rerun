@@ -8,6 +8,7 @@ updates of its own.
 
 ```
 src/main/       the main process: window, navigation rules, permissions, IPC, deep links, updater
+src/worker/     the linked computer's worker, a utilityProcess: the sockets, the commands, the jobs
 src/preload/    exposes window.rerunShell (to the server's pages) and window.rerunShellLocal (to the
                 shell's own pages), nothing to any other origin
 src/renderer/   the shell's own pages, served from rerun-shell://app: offline, find bar, server picker
@@ -139,3 +140,32 @@ Linux (AppImage, deb), unsigned, and keeps them three days as artifacts of the r
 Playwright cannot click a system notification or a native menu, and under Playwright macOS does
 not draw the traffic lights in a capture: those are checked by hand. Windows and Linux are built in
 CI and need a real machine for the last look.
+
+## Linked computer
+
+A person links this computer to a workspace from the Desktop tab of their account (`remoteComputer`
+capability). The coworkers of that workspace then run commands, jobs and file operations on it: the
+coworker stays on the workspace's box, the computer only does what it is asked.
+
+- The hub gives the app a token for the link (`rrn_computer_…`), kept in `remote-computers.json`
+  of the data folder, encrypted with the system's keychain. A Linux desktop with no keychain keeps it
+  in that file (mode 600) and the app says so. One computer can be linked to several workspaces, one
+  token each.
+- The main process forks the worker (`out/main/worker.js`, `src/worker/`) and restarts it when it
+  dies. Before each connection the worker trades the token at `/api/remote-computers/connect` for the
+  socket of the workspace's box and a one-minute ticket, then speaks the protocol of
+  `packages/contracts/src/remote-computer.ts`. It pings every 25 s, hangs up after two missed pings
+  and comes back with a growing, jittered delay; only the hub saying the link is gone (401, or the
+  engine closing with `4005`) stops it.
+- Commands run in the person's own shell (PowerShell on Windows, output in UTF-8), with the
+  environment of their login shell, read once at start so an app opened from the Dock finds what
+  Homebrew installed. A command that runs past its limit or is cancelled is killed with every process
+  it started.
+- What the person sets here is enforced by the worker whatever the engine asks: a pause refuses
+  everything and stops what runs, a capability switched off is never offered nor run. Every request
+  is logged with who asked, in `computer/activity.jsonl`.
+- Linked, the app stays alive with its windows closed on every system; the tray says how the
+  computer is doing and pauses it. Unlinking from the app tells the hub first, then forgets the token
+  whatever the hub says.
+- `test/remote-link.test.ts` plays the worker against a fake hub and engine on real sockets;
+  `test/remote-bench.test.ts` against the real engine, through a kill and a restart of it.

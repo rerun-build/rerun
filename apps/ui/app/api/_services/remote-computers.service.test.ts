@@ -167,6 +167,18 @@ describe('connectComputer', () => {
     })
 })
 
+describe('unlinkByToken', () => {
+    it('lets a computer unlink itself with its own token, once', async () => {
+        const { token } = await link()
+        expect(await service.unlinkByToken(token)).toBe(true)
+        expect(computers[0].revoked_at).toEqual(expect.any(String))
+        expect(deleteRemoteComputer).toHaveBeenCalledWith(expect.anything(), 'c1')
+        expect(await service.unlinkByToken(token)).toBe(false)
+        expect(await service.unlinkByToken('rrn_computer_unknown')).toBe(false)
+        expect(await service.unlinkByToken('nope')).toBe(false)
+    })
+})
+
 describe('managing a computer', () => {
     it('renames it without touching its handle', async () => {
         const { computer } = await link()

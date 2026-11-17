@@ -122,7 +122,7 @@ export function changeQuickAskShortcut(kind: QuickAskShortcutKind, accelerator: 
 // --- tray ---------------------------------------------------------------------------------------------
 
 let tray: Tray | null = null
-let trayActions: { checkForUpdates: () => void; quit: () => void } | null = null
+let trayActions: { checkForUpdates: () => void; quit: () => void; extraItems?: () => MenuItemConstructorOptions[] } | null = null
 
 function trayImage(): Electron.NativeImage {
     if (process.platform !== 'darwin') return nativeImage.createFromPath(trayColor)
@@ -140,6 +140,7 @@ function trayMenu(): Menu {
         { label: t('tray.quickAskVoice'), accelerator: quickAskShortcut('voice') ?? undefined, enabled: quickAskShortcut('voice') !== null, click: () => voiceQuickAsk() },
         ...(waiting > 0 ? [{ label: t('tray.waiting', { count: waiting }), enabled: false }] : []),
         { type: 'separator' },
+        ...(trayActions?.extraItems?.() ?? []),
         {
             label: t('tray.openAtLogin'),
             type: 'checkbox',
@@ -161,7 +162,7 @@ export function refreshTray(): void {
     if (process.platform === 'darwin') tray.setTitle(waiting > 0 ? String(waiting > 99 ? '99+' : waiting) : '')
 }
 
-export function createTray(actions: { checkForUpdates: () => void; quit: () => void }): void {
+export function createTray(actions: { checkForUpdates: () => void; quit: () => void; extraItems?: () => MenuItemConstructorOptions[] }): void {
     trayActions = actions
     if (tray) return refreshTray()
     tray = new Tray(trayImage())

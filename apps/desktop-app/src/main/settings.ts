@@ -21,6 +21,8 @@ export type ShellSettings = {
     quickAskVoiceShortcut?: string | null
     // The balloon that says so was shown once.
     explainedTray?: boolean
+    // This computer, as the coworkers of the linked workspaces use it.
+    remoteComputer?: { paused?: boolean; workDir?: string }
 }
 
 const FILE_NAME = 'settings.json'

@@ -14,6 +14,7 @@ import { partitionFor, serverOrigin, setServerOrigin } from './server'
 import { checkServer } from './server-check'
 import { checkForUpdates, installUpdate, updatesEnabled, updateState } from './updater'
 import { normalizeServerUrl } from './url-policy'
+import { registerRemoteComputerHandlers } from './remote-computer'
 
 export function registerIpcHandlers(): void {
     ipcMain.on(IPC.bootstrap, (event) => {
@@ -104,4 +105,6 @@ export function registerIpcHandlers(): void {
     handle(IPC.localServerCancel, ['local'], () => {
         reloadApp()
     })
+
+    registerRemoteComputerHandlers()
 }

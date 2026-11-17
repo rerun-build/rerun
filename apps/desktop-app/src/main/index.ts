@@ -16,6 +16,7 @@ import { checkServer } from './server-check'
 import { checkForUpdates, startUpdater } from './updater'
 import { createTray, desktopSettings, refreshTray, startedAtLogin } from './native'
 import { onQuickAskShortcutChange, restoreQuickAskShortcuts, toggleQuickAsk, voiceQuickAsk } from './quick-ask'
+import { hasLinkedComputers, onRemoteComputerChange, remoteComputerTrayItems, startRemoteComputer, stopRemoteComputer } from './remote-computer'
 
 // Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
@@ -86,10 +87,15 @@ app.on('activate', () => {
     else createMainWindow(serverOrigin())
 })
 
-app.on('will-quit', () => globalShortcut.unregisterAll())
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
+    stopRemoteComputer()
+})
 
+// A linked computer stays reachable with its windows closed, on Linux without a tray too: the
+// person quits it from the tray or the menu.
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
+    if (process.platform !== 'darwin' && !hasLinkedComputers()) app.quit()
 })
 
 function menu(): void {
@@ -133,7 +139,9 @@ function start(): void {
     onQuickAskShortcutChange(menu)
     const origin = serverOrigin()
     createMainWindow(origin, { hidden: startedAtLogin() })
-    createTray({ checkForUpdates: () => void checkForUpdates(true), quit: () => app.quit() })
+    createTray({ checkForUpdates: () => void checkForUpdates(true), quit: () => app.quit(), extraItems: remoteComputerTrayItems })
+    onRemoteComputerChange(refreshTray)
+    startRemoteComputer()
     if (origin) void verifyServer(origin)
     startUpdater()
     registerScheme()
