@@ -1,5 +1,7 @@
-import json, os, sys
+import json, os, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import causes as failure_causes
+import changelog
 import cutshape
 import limits as L
 import states
@@ -21,6 +23,9 @@ SENIOR = "senior round: "
 MARK = "<!-- factory-digest -->"
 POST_EVERY_S = 600
 CONTROL_TITLE = "factory control"
+CAUSE_WINDOW_S = 7 * 86400
+MAX_GROUPS = 20
+MAX_CHANGES = 20
 
 
 def stations(store, now):
@@ -184,10 +189,41 @@ def bar(store, now):
     return tokenstats.bar(jobs, fires, escaped, now)
 
 
+def causes(store, now):
+    at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now))
+    ended = failure_causes.ended_jobs(store)
+    jobs = changelog.before(ended, at)
+    events = failure_causes.grouped(store)
+    recent = {}
+    for f in store.failures():
+        if 0 <= now - L.ts(f["at"]) <= CAUSE_WINDOW_S:
+            recent.setdefault(failure_causes.group(f), []).append(f)
+    ranked = sorted(recent.items(), key=lambda kv: (-len(kv[1]), kv[0]))[:MAX_GROUPS]
+    groups = []
+    for name, rows in ranked:
+        rate = changelog.rate(events, jobs, name)
+        groups.append({"group": name[:80], "events": len(rows), "rate": rate, "state": group_state(store, name)})
+    changes = [{"issue": c["issue"], "group": c["grp"][:80], "kind": c["kind"], "before": c["before"],
+                "after": c["after"], "verdict": c["verdict"], "revert": c["revert"]}
+               for c in store.changes()[-MAX_CHANGES:]]
+    return {"groups": groups, "changes": changes}
+
+
+def group_state(store, name):
+    rows = [c for c in store.changes() if c["grp"] == name]
+    if not rows or rows[-1]["verdict"] in ("revert", "dropped"):
+        return "open"
+    if rows[-1]["verdict"] is None:
+        return "changed"
+    if rows[-1]["verdict"] == "kept":
+        return "kept"
+    return "open"
+
+
 def build(store, cfg, now):
     return {"stations": stations(store, now), "threads": threads(store),
             "anomalies": anomalies(store, cfg, now), "measures": measures(store, now), "planners": planners(store, now),
-            "bar": bar(store, now)}
+            "bar": bar(store, now), "causes": causes(store, now)}
 
 
 def block(d):
