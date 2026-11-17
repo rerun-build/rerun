@@ -153,6 +153,7 @@ export type FactoryFrame = {
     rejects: number
     held: boolean
     holdLeftMs: number
+    holdKind?: string
     counts: { queued: number; building: number; review: number; checks: number; merged: number; runs: number }
 }
 
