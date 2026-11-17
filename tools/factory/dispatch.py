@@ -1,5 +1,6 @@
 import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
+import acceptance
 import backlog
 import briefs
 import ciwait
@@ -404,6 +405,7 @@ class Dispatcher:
         self.tiers_off = False
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
+        self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
         self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
@@ -1420,6 +1422,11 @@ class Dispatcher:
         except (Error, ValueError, KeyError) as e:
             clean = False
             log("-", "planning: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.acceptance.once(self.beats, self.jobs())
+        except Exception as e:
+            clean = False
+            log("-", "acceptance: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
