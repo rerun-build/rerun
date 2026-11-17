@@ -726,6 +726,8 @@ export type Database = {
           active_runs: number | null
           box_name: string
           cpu_cores: number | null
+          disk_total_mb: number | null
+          disk_used_mb: number | null
           engine_ok: boolean
           host_id: string
           rss_mb: number | null
@@ -736,6 +738,8 @@ export type Database = {
           active_runs?: number | null
           box_name: string
           cpu_cores?: number | null
+          disk_total_mb?: number | null
+          disk_used_mb?: number | null
           engine_ok: boolean
           host_id: string
           rss_mb?: number | null
@@ -746,6 +750,8 @@ export type Database = {
           active_runs?: number | null
           box_name?: string
           cpu_cores?: number | null
+          disk_total_mb?: number | null
+          disk_used_mb?: number | null
           engine_ok?: boolean
           host_id?: string
           rss_mb?: number | null
@@ -3821,6 +3827,16 @@ export type Database = {
       current_admin_workspace_ids: { Args: never; Returns: number[] }
       current_workspace_ids: { Args: never; Returns: number[] }
       email_domain_is_blocked: { Args: { p_email: string }; Returns: boolean }
+      engine_box_disk_latest: {
+        Args: never
+        Returns: {
+          box_name: string
+          disk_total_mb: number
+          disk_used_mb: number
+          host_id: string
+          sampled_at: string
+        }[]
+      }
       engine_box_metric_series: {
         Args: {
           p_bucket: string
