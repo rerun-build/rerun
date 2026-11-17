@@ -50,8 +50,28 @@ class RunCache(T.Base):
         self.assertEqual(got["old1"], ("done", "2026-01-01T00:20:00Z", 70, 40))
         self.assertEqual(got["old2"][0], "error")
         self.assertEqual(got["old3"][:2], ("running", None))
-        self.assertEqual(got["old4"][:2], ("running", None))
+        self.assertEqual(got["old4"][0], "done")
         self.assertEqual(self.w.rows("SELECT status FROM fires WHERE run_id=?", [r for r, a in self.w.order if a == "b1"][-1]), [("running",)])
+
+    def test_the_last_run_of_an_ended_job_is_closed_and_a_live_plan_run_is_left(self):
+        self.tick()
+        st = self.d.store
+        self.old_run("old1", "7", "done")
+        st.put_job("7", "merged", {"issue": 7, "title": "T", "body": "", "state": "merged", "run": "old1"}, "merged")
+        self.old_run("old2", "plan:3", "done")
+        for k, v in (("state", "planning"), ("run", "old2"), ("agent", "b1"), ("copy", "1")):
+            st.set("plan:3", k, v)
+        self.tick()
+        self.assertEqual(self.w.rows("SELECT status FROM fires WHERE run_id=?", "old1"), [("done",)])
+        self.assertEqual(self.w.rows("SELECT status FROM fires WHERE run_id=?", "old2"), [("running",)])
+
+    def test_an_old_run_of_a_coworker_no_longer_in_the_pools_is_closed_as_lost(self):
+        self.tick()
+        self.old_run("old1", "7", "done")
+        self.d.store.db.execute("UPDATE fires SET coworker='HOPPER' WHERE run_id='old1'")
+        self.tick()
+        self.assertEqual(self.w.rows("SELECT status, error FROM fires WHERE run_id=?", "old1"),
+                         [("lost", "coworker HOPPER is not in the pools: the run cannot be read")])
 
     def test_old_runs_that_cannot_be_read_do_not_keep_later_ones_from_being_closed(self):
         self.tick()
