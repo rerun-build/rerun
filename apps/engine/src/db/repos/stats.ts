@@ -1,8 +1,8 @@
 import { and, asc, eq, gte, isNotNull, sql, type SQL } from 'drizzle-orm'
 import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core'
-import type { StatsDataset, StatsGroupBy, StatsMetric, StatsPoint, StatsRunStatusFilter } from '@rerun/contracts'
+import { visibleText, type StatsDataset, type StatsGroupBy, type StatsMetric, type StatsPoint, type StatsRunStatusFilter } from '@rerun/contracts'
 import { getSystemDb } from '../systemDb.js'
-import { runs, runSteps, sessions, toolCalls } from '../schema.js'
+import { messages, runs, runSteps, sessions, toolCalls } from '../schema.js'
 
 type DatasetDef = {
     table: SQLiteTable
@@ -95,10 +95,39 @@ export type StatsRepoQuery = {
     status?: StatsRunStatusFilter
 }
 
+const FAILURE_METRICS: StatsMetric[] = ['failureCount', 'failureRate']
+const STOP_PREFIXES = ['BLOCKED:', 'ESCALATE:']
+
+const runStopped = sql<number>`case when ${runs.status} in ('error', 'cancelled') or (${runs.goalJson} is not null and ${runs.status} <> 'running' and ${runs.goalState} is not 'met') then 1 else 0 end`
+
+const runFinalContent = sql<string | null>`case when ${runs.status} = 'done' then (select ${messages.contentJson} from ${messages} where ${messages.sessionId} = ${runs.sessionId} and ${messages.role} = 'assistant' and ${messages.createdAt} >= ${runs.startedAt} and ${messages.createdAt} <= ${runs.finishedAt} order by ${messages.createdAt} desc, ${messages}.rowid desc limit 1) end`
+
+function endsOnStopLine(content: string): boolean {
+    const lines = visibleText(JSON.parse(content), '\n').split('\n').map(line => line.trim()).filter(Boolean)
+    if (lines.at(-1)?.startsWith('Tools:')) lines.pop()
+    const last = lines.at(-1) ?? ''
+    return STOP_PREFIXES.some(prefix => last.startsWith(prefix))
+}
+
+type RunFailureRow = { bucket: string; group: string | null; stopped: number; finalContent: string | null }
+
+function foldFailures(rows: RunFailureRow[], asRate: boolean): StatsPoint[] {
+    const points = new Map<string, StatsPoint>()
+    for (const row of rows) {
+        const key = JSON.stringify([row.bucket, row.group])
+        const point = points.get(key) ?? { bucket: row.bucket, group: row.group, value: 0, count: 0 }
+        point.count += 1
+        if (Number(row.stopped) === 1 || (row.finalContent !== null && endsOnStopLine(row.finalContent))) point.value += 1
+        points.set(key, point)
+    }
+    return [...points.values()].map(point => (asRate ? { ...point, value: point.value / point.count } : point))
+}
+
 export async function aggregateStats(agentId: string, query: StatsRepoQuery): Promise<StatsPoint[]> {
     const def = DATASETS[query.dataset]
     const metricSql = def.metrics[query.metric]
-    if (!metricSql) throw new Error(`unsupported metric ${query.metric} for dataset ${query.dataset}`)
+    const failure = query.dataset === 'runs' && FAILURE_METRICS.includes(query.metric)
+    if (!metricSql && !failure) throw new Error(`unsupported metric ${query.metric} for dataset ${query.dataset}`)
     const groupSql = query.groupBy === 'none' ? null : def.groups[query.groupBy]
     if (query.groupBy !== 'none' && !groupSql) throw new Error(`unsupported groupBy ${query.groupBy} for dataset ${query.dataset}`)
 
@@ -114,9 +143,14 @@ export async function aggregateStats(agentId: string, query: StatsRepoQuery): Pr
     if (extra) conditions.push(extra)
 
     const { db } = await getSystemDb(agentId)
+    const group = groupSql ?? sql<string | null>`null`
+    if (!metricSql) {
+        const rows = await db.select({ bucket, group, stopped: runStopped, finalContent: runFinalContent }).from(runs).where(and(...conditions)).orderBy(asc(bucket))
+        return foldFailures(rows, query.metric === 'failureRate')
+    }
     const selection = {
         bucket,
-        group: groupSql ?? sql<string | null>`null`,
+        group,
         value: metricSql,
         count: sql<number>`count(*)`,
     }

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { factorySnapshotSchema } from '@rerun/contracts'
 import { LINK_PITCH, TILE_H, TILE_W, routeTileLinks, type AxisPoint, type Tile, type TileLink } from '@rerun/ui/iso-grid'
 
+import { applyMoves, copyTree } from '@/components/factory/factory-layout'
 import { LOOP_MS, factoryScene } from '@/components/factory/factory-scene'
 import { sceneFromSnapshot } from '@/components/factory/from-snapshot'
 
@@ -179,9 +180,11 @@ describe('routeTileLinks', () => {
     it('lays out the factory sample with no shared stretch, no belt over an object, no crossing', () => {
         for (let t = 0; t < LOOP_MS; t += 1_500) {
             const frame = factoryScene(t, 0)
-            const { shared, hits, crossings, routes } = findConflicts(frame.tiles, frame.links)
+            const placed = applyMoves(frame.tiles, {}, frame.containers, frame.links.filter(l => l.variant === 'belt'))
+            const drawn = copyTree(placed, frame.links)
+            const { shared, hits, crossings, routes } = findConflicts(placed, drawn)
             expect({ t, shared, hits, crossings, steps: sidewaysSteps(routes) }).toEqual({ t, shared: [], hits: [], crossings: [], steps: [] })
-            for (const l of frame.links) {
+            for (const l of drawn) {
                 const points = routes.get(`${l.source}->${l.target}`)!
                 expect(points.length).toBeGreaterThanOrEqual(2)
             }

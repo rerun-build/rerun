@@ -287,7 +287,9 @@
             "cost": "Coût",
             "avgDurationMs": "Durée moyenne",
             "errorCount": "Erreurs",
-            "errorRate": "Taux d'erreur"
+            "errorRate": "Taux d'erreur",
+            "failureCount": "Échecs",
+            "failureRate": "Taux d'échec"
         },
         "live": "En direct",
         "runStatus": {

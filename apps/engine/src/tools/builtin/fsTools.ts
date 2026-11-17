@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs'
+import { isAbsolute, sep } from 'node:path'
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
 import { resolveWithin } from '../sandbox.js'
@@ -9,16 +10,30 @@ type FsToolsOptions = {
     label: string
     rootDir: string | ((input: Record<string, unknown>) => Promise<string>)
     scope?: z.ZodRawShape
+    extraRoots?: string[]
 }
 
-export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptions): ToolSet {
-    const rootOf = async (input: Record<string, unknown>) => (typeof rootDir === 'string' ? rootDir : rootDir(input))
+function isWithin(root: string, path: string): boolean {
+    try {
+        resolveWithin(root, path)
+        return true
+    } catch {
+        return false
+    }
+}
+
+export function makeFsTools({ prefix, label: baseLabel, rootDir, scope = {}, extraRoots = [] }: FsToolsOptions): ToolSet {
+    const extraRootOf = (path: unknown) => (typeof path === 'string' && isAbsolute(path) ? extraRoots.find(root => isWithin(root, path)) : undefined)
+    const rootOf = async (input: Record<string, unknown>) => extraRootOf(input.path) ?? (typeof rootDir === 'string' ? rootDir : rootDir(input))
+    const extra = extraRoots.join(' or ')
+    const label = extraRoots.length ? `${baseLabel} (or, by absolute path, a job folder under ${extra})` : baseLabel
+    const pathNote = extraRoots.length ? `Path relative to the workspace, or an absolute path under ${extra}` : 'Path relative to the root'
     return {
         [`${prefix}_read`]: tool({
             description: `Read a UTF-8 file from the ${label}. Optional 1-based startLine, endLine.`,
             inputSchema: z.object({
                 ...scope,
-                path: z.string().describe('Path relative to the root'),
+                path: z.string().describe(pathNote),
                 startLine: z.number().int().min(1).optional(),
                 endLine: z.number().int().min(1).optional(),
             }),
@@ -56,7 +71,7 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
             description: `Replace an exact string in a ${label} file instead of rewriting it with ${prefix}_write; oldString must match once unless replaceAll.`,
             inputSchema: z.object({
                 ...scope,
-                path: z.string().describe('Path relative to the root'),
+                path: z.string().describe(pathNote),
                 oldString: z.string(),
                 newString: z.string(),
                 replaceAll: z.boolean().default(false),
@@ -80,7 +95,7 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
             inputSchema: z.object({
                 ...scope,
                 pattern: z.string().describe('JavaScript regular expression to match against each line'),
-                path: z.string().default('.').describe('Directory to search, relative to the root'),
+                path: z.string().default('.').describe(extraRoots.length ? `Directory to search, relative to the workspace or absolute under ${extra}` : 'Directory to search, relative to the root'),
                 maxResults: z.number().int().positive().max(1000).default(200),
             }),
             execute: async input => {
@@ -92,7 +107,8 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
                 }
                 const rootDir = await rootOf(input)
                 if (!existsSync(resolveWithin(rootDir, path))) return `Path not found: ${path}`
-                const hits = await store.searchText(rootDir, path, pattern, maxResults)
+                const found = await store.searchText(rootDir, path, pattern, maxResults)
+                const hits = extraRootOf(path) ? found.map(hit => `${rootDir}${sep}${hit}`) : found
                 if (hits.length === 0) return 'No matches.'
                 const truncated = hits.length >= maxResults ? `\n(truncated at ${maxResults} results)` : ''
                 return hits.join('\n') + truncated

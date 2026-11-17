@@ -3,7 +3,7 @@
   "coworkers": {
     "advisor": {"class": "rule", "github": "reviewer", "wake": ["request from Rob", "second reject by one owner on a job"], "fired_by": ["person", "runner"]},
     "boss": {"class": "rule", "github": "issues", "wake": ["ready queue short", "plan marked ready"], "fired_by": ["runner", "runner"]},
-    "ike": {"class": "plan", "github": "none", "wake": ["new job"], "fired_by": ["runner"]},
+    "ike": {"class": "plan", "github": "issues", "wake": ["new job"], "fired_by": ["runner"]},
     "scope_shaper": {"class": "plan", "github": "issues", "wake": ["new job", "plan requested"], "fired_by": ["runner", "coworker"]},
     "idea_partner": {"class": "plan", "github": "none", "wake": ["message from Rob", "issue labelled idea"], "fired_by": ["person", "repository event"]},
     "ada": {"class": "plan", "github": "reviewer", "wake": ["change over 25 files or 1200 lines", "cross-area change"], "fired_by": ["runner", "runner"]},
@@ -48,6 +48,9 @@
       "**/*.md", "docs/**", "doc/**"]},
     {"name": "factory-roster", "owner": "linus", "builder": "code", "sensitive": true, "globs": [
       "tools/factory/roster.json", "tools/factory/roster.py"]},
+    {"name": "factory-checkout", "owner": "linus", "builder": "code", "sensitive": true, "globs": [
+      "tools/factory/factory.py", "tools/factory/clones.py", "tools/factory/mirror.py", "tools/factory/janitor.py",
+      "tools/factory/toolsupdate.py", "tools/factory/install.sh", "tools/factory/bin/**"]},
     {"name": "factory-tools", "owner": "linus", "builder": "code", "sensitive": false, "globs": [
       "tools/factory/**"]},
     {"name": "engine-start", "owner": "margaret", "builder": "margaret", "sensitive": true, "globs": [

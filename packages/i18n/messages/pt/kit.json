@@ -287,7 +287,9 @@
             "cost": "Custo",
             "avgDurationMs": "Duração média",
             "errorCount": "Erros",
-            "errorRate": "Taxa de erro"
+            "errorRate": "Taxa de erro",
+            "failureCount": "Falhas",
+            "failureRate": "Taxa de falha"
         },
         "live": "Ao vivo",
         "runStatus": {

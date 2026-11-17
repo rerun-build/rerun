@@ -283,11 +283,14 @@ function RunRow({ run, title, now, liveTool, detail, onOpen }: { run: EngineRun;
                             <SkeletonRows rows={3} />
                         </div>
                     ) : detail.steps.length === 0 && detail.tools.length === 0 ? (
-                        <p className="py-2 text-xs text-muted-foreground">{t('noSteps')}</p>
+                        <p className="py-2 text-xs text-muted-foreground">{run.status !== 'running' && run.stepCount > 0 ? t('stepsLost', { count: run.stepCount }) : t('noSteps')}</p>
                     ) : (
                         <div className="flex flex-col gap-2">
                             {detail.steps.map(step => (
                                 <StepRow key={step.id} step={step} tools={detail.tools.filter(tool => tool.stepNumber === step.stepNumber)} />
+                            ))}
+                            {detail.tools.filter(tool => !detail.steps.some(step => step.stepNumber === tool.stepNumber)).map(tool => (
+                                <ToolRow key={tool.id} tool={tool} />
                             ))}
                         </div>
                     )}
@@ -331,7 +334,7 @@ function ToolRow({ tool }: { tool: EngineToolCall }) {
                 <ChevronRightIcon className="size-3 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-90" />
                 {createElement(toolIconOf(tool.toolName), { className: 'size-3.5 shrink-0 text-muted-foreground' })}
                 <span className="truncate font-mono">{tool.toolName}</span>
-                {isError ? <XIcon className="size-3 shrink-0 text-destructive" /> : <CheckIcon className="size-3 shrink-0 text-emerald-500" />}
+                {isError ? <XIcon className="size-3 shrink-0 text-destructive" /> : tool.resultJson !== null && <CheckIcon className="size-3 shrink-0 text-emerald-500" />}
                 <span className="flex-1" />
                 {tool.durationMs != null && <span className="shrink-0 text-muted-foreground">{formatMs(tool.durationMs)}</span>}
             </CollapsibleTrigger>

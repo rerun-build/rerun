@@ -16,6 +16,10 @@
     "cut_by": ["Scope Shaper", "IKE"]
   },
   "proof": true,
+  "cache_life": {
+    "subscription": 3600,
+    "key": 300
+  },
   "one_file_one_job": true,
   "slots": 15,
   "check_ratio": {
@@ -162,6 +166,10 @@
       },
       "high": {
         "model": "claude-sonnet-5-5",
+        "thinkingLevel": "high"
+      },
+      "senior": {
+        "model": "claude-opus-5-5",
         "thinkingLevel": "high"
       }
     },

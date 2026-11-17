@@ -1,5 +1,7 @@
 import argparse, datetime, hashlib, json, os, re, signal, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
+import acceptance
+import affinity
 import backlog
 import briefs
 import ciwait
@@ -7,12 +9,17 @@ import clocks
 import control
 import cutshape
 import digest
+import escapes
 import failures
 import followups
+import gatefiles
 import holds
+import inboxsort
+import plancheck
 import planners
 import planning
 import pools
+import problems
 import proof
 import refresh
 import renewal
@@ -42,8 +49,14 @@ REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
 MAX_REPLANS = 2
 REPLAN_BY = ("Boss", "Scope Shaper")
+ROOM_HOLD_MAX_S, ROOM_PROBE_S, ROOM_PROBLEM_ROW = 60 * 60, 3 * 60, 3
+CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:[ \t]+.*\n)*?[ \t]+File \"/data/tools/(?:factory|factory-[0-9a-f]+)/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
+CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 MAX_TAKES = 3
+INBOX = "Factory follow-ups inbox"
+INBOX_BODY = ("The factory dispatcher writes every reviewer follow-up note here as a comment, one comment per review, "
+              "instead of opening a new issue for each note. Read the comments, act on the notes worth doing, and keep this issue open.")
 OK_CONCLUSIONS = ("success", "skipped", "neutral")
 CLOSED_BY = ("query($owner:String!,$name:String!,$n:Int!){repository(owner:$owner,name:$name)"
              "{issue(number:$n){closedByPullRequestsReferences(first:100){nodes{number}}}}}")
@@ -203,7 +216,7 @@ def review_brief(j, pr, head):
         '',
         'The checks of this commit may still be running. Do not wait for them and do not block on them: the dispatcher merges only when every check of this exact commit is green. Your verdict is on the diff alone, also where your own rules say a review needs green checks.',
         '',
-        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block. Write each follow-up note in your final message as its own line `Follow-up: <one sentence>`; the dispatcher opens one issue per line.',
+        'Sprint rule from Rob, 2026-11-13 ("skip any noncritical tests or validations, we can patch up after the fact"): reject only for wrong behaviour, for a hole that touches keys, sign-in or stored data, or for new logic that has no test at all. Everything else goes into your verdict as a follow-up note and does not block. A finding about this change belongs in your verdict, not in a follow-up. Write a finding that is not about this change in your final message as its own line `Follow-up: <one sentence>`; the dispatcher keeps each line in the follow-ups inbox for classification and opens no issue for it.',
         '',
         NO_COMMENTS_REVIEW,
         '',
@@ -247,6 +260,28 @@ def fix_brief(j, pr, review):
         str(review)[-1500:],
         '',
         'Fix exactly what blocks, in your open worktree for this job. Add or adjust the test, run only the test files you touched, commit and push to the same branch. No second pull request.',
+        NO_COMMENTS,
+        'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
+        '',
+        'If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>.',
+        '',
+        final_state(j, '`PUSHED: <first 7 characters of the new commit>` or `BLOCKED: <one sentence>`'),
+        TAIL,
+    ])
+
+
+def senior_brief(j, pr, review):
+    return "\n".join([
+        'The senior fix round, sent by the dispatcher and not by Boss: pull request #%s of rerun (job #%s). This job failed twice on another model, and this round is its last. You work alone: call no other coworker and send no question to Rob.' % (pr, j["issue"]),
+        '',
+        'What each station found so far, oldest first:',
+        *['- ' + f for f in j.get("found") or []],
+        '',
+        'The end of the last report:',
+        '',
+        str(review)[-1500:],
+        '',
+        'In your open worktree for this job, first run the Run lines of the issue (%s) and read what fails. Then fix all of the findings above in one change: add or adjust the tests, run the test files you touched and the Run lines again, commit and push to the same branch. No second pull request.' % issue_run(j.get("body")),
         NO_COMMENTS,
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
@@ -331,7 +366,7 @@ def dead_comment(dead):
 
 
 failures.SOURCES.update(building=(first_brief, build_brief, final_state), reviewing=(review_brief, final_state),
-                        proving=(proof_brief, final_state), fixing=(fix_brief, final_state), returned=(replan_brief,))
+                        proving=(proof_brief, final_state), fixing=(fix_brief, senior_brief, final_state), returned=(replan_brief,))
 
 
 def checks_verdict(runs):
@@ -373,6 +408,7 @@ class Dispatcher:
         self.tiers_off = False
         self.planners = planners.Planners(cfg, account, gh)
         self.station = planning.Station(cfg, self.store, account, gh, now)
+        self.acceptance = acceptance.Station(cfg, self.store, account, gh, now, log)
         self.control = control.Control(cfg, gh, self.store)
         self.quota = None
         self.refresh_to, self.refresh_logged = None, set()
@@ -457,37 +493,84 @@ class Dispatcher:
             why = strikes.held(self.store, self.now()).get(agent, {}).get("why")
             log(j["issue"], "coworker %s held until %s: %s" % (self.names.get(agent, agent[:8]), iso(until), why))
 
-    def free(self, worker):
+    def free(self, worker, j=None):
         skip = self.unresolved() | self.held_ids()
         t = pools.types(self.cfg).get(worker)
         if t is None:
             return None
         cfg = {"types": {worker: dict(t, coworkers=[c for c in t["coworkers"] if c["id"] not in skip])}}
-        return pools.pick_copy(cfg, worker, self.running())
+        if j is None:
+            return pools.pick_copy(cfg, worker, self.running())
+        return self.warm_pick(j, pools.free_copies(cfg, worker, self.running()))
+
+    def cache_kind(self, agent):
+        for t in (self.cfg.get("types") or {}).values():
+            for c in t.get("coworkers", []):
+                if c.get("id") == agent:
+                    return c.get("cache", "subscription")
+        return "subscription"
+
+    def warm_pick(self, j, free):
+        if not free:
+            return None
+        ids = set(free)
+        warm = [(v[1], (c, v[0])) for c, v in (j.get("warm") or {}).items() if (c, v[0]) in ids]
+        last_end, last = max(warm) if warm else (None, None)
+        life = affinity.cache_life(self.cache_kind(last[0]) if last else "subscription", self.cfg.get("cache_life"))
+        return affinity.pick(free, last, last_end, self.now(), life)
 
     def free_prover(self, j):
         skip = self.unresolved() | self.held_ids() | {j.get("builder"), j.get("reviewer")}
-        return pools.pick_copy({"types": {"reviewer": t}}, "reviewer", self.running(), exclude=skip) if (t := pools.types(self.cfg).get("reviewer")) is not None else None
+        t = pools.types(self.cfg).get("reviewer")
+        if t is None:
+            return None
+        return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
 
-    def free_copy_of(self, agent):
+    def free_second(self, j, first):
+        skip = self.unresolved() | self.held_ids() | {first}
+        return self.warm_pick(j, pools.free_copies(self.cfg, "reviewer", self.running(), exclude=skip))
+
+    def free_copy_of(self, agent, j=None):
         mine = [c for t in pools.types(self.cfg).values() for c in t["coworkers"] if c["id"] == agent]
         if not mine or agent in self.unresolved():
             return None
-        got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
+        if j is None:
+            got = pools.pick_copy({"types": {"x": {"coworkers": mine}}}, "x", self.running())
+            return got[1] if got else None
+        got = self.warm_pick(j, pools.free_copies({"types": {"x": {"coworkers": mine}}}, "x", self.running()))
         return got[1] if got else None
+
+    def inbox(self):
+        rows = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--search", INBOX + " in:title",
+                                   "--json", "number,title", "--limit", "20"]))
+        n = next((r["number"] for r in rows if r.get("title") == INBOX), None)
+        if n is None:
+            n = int(self.gh(["issue", "create", "-R", self.repo, "--title", INBOX, "--body", INBOX_BODY]).strip().rsplit("/", 1)[1])
+        self.store.set("-", "inbox", n)
+        return str(n)
 
     def follow_ups(self, j, out):
         done = list(j.get("followups") or [])
-        for key, title, body in followups.notes(out, "#%s" % j["issue"]):
-            if key in done:
-                continue
-            try:
-                self.gh(["issue", "create", "-R", self.repo, "--title", title, "--body", body])
-            except Error as e:
-                log(j["issue"], "follow-up issue not opened: %s" % e)
-                continue
-            done.append(key)
         j["followups"] = done
+        new = {}
+        for key, title, body in followups.notes(out, "#%s" % j["issue"]):
+            if key not in done:
+                new.setdefault(key, "%s\n\n%s" % (title, body))
+        if not new:
+            return
+        text = "\n\n".join(["From #%s, pull request #%s:" % (j["issue"], j.get("pr"))] + list(new.values()))
+        kept = self.store.get_all("-").get("inbox")
+        try:
+            try:
+                self.gh(["issue", "comment", kept or self.inbox(), "-R", self.repo, "--body", text])
+            except Exception:
+                if not kept:
+                    raise
+                self.gh(["issue", "comment", self.inbox(), "-R", self.repo, "--body", text])
+        except Exception as e:
+            log(j["issue"], "follow-ups not written to the inbox: %s" % e)
+            return
+        done.extend(new)
 
     def to(self, j, state, msg, **kw):
         if not states.allowed(j["state"], state):
@@ -546,6 +629,9 @@ class Dispatcher:
         self.refused = {n: e for n, e in shape.items() if e}
         self.unreadable = len(self.refused)
         labelled = {i["number"] for i in issues}
+        tree = None
+        if any(plancheck.needs(i) and not self.plan_settled(i) for i in issues):
+            tree = plancheck.tree(self.gh, self.repo)
         open_numbers = None
         if any(cutshape.parse(i)["deps"] for i in issues):
             open_numbers = {o["number"] for o in json.loads(self.gh(
@@ -563,13 +649,10 @@ class Dispatcher:
                     takes = 1
                 else:
                     takes = before + 1 if old["state"] in END else before
+                if old and old["state"] == "unsolvable" and (old.get("body") or "") == (i.get("body") or ""):
+                    continue
                 if old and old["state"] in END and takes > MAX_TAKES:
-                    if self.store.get_all(str(i["number"])).get("take_cap") != str(before):
-                        self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body",
-                                 "The factory dispatcher does not take this issue again: it was taken %d times with this text. "
-                                 "A change to the issue text resets the count; then put the factory label back. Or close the issue." % before])
-                        self.store.set(str(i["number"]), "take_cap", str(before))
-                        log(i["number"], "not started: taken %d times with this text" % before)
+                    self.unsolvable(old, "taken %d times with this text" % before)
                     continue
                 errors = shape.get(i["number"]) or []
                 if errors:
@@ -578,6 +661,8 @@ class Dispatcher:
                         self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", cutshape.comment(errors)])
                         self.store.set(str(i["number"]), "cutshape", digest)
                         log(i["number"], "not started: the issue text is not readable (%d problem%s)" % (len(errors), "" if len(errors) == 1 else "s"))
+                    continue
+                if self.plan_check(i, tree) is None:
                     continue
                 parsed = cutshape.parse(i)
                 if parsed["worker"] not in ("coder", "researcher", "designer") or parsed["worker"] not in pools.types(self.cfg):
@@ -654,6 +739,28 @@ class Dispatcher:
                 log(i["number"], ("back in at the review of #%s: " % job["pr"] if job.get("pr") else "queued: ") + i["title"][:120])
             except (Error, ValueError, KeyError) as e:
                 log(i["number"], "intake: %s" % (e if isinstance(e, Error) else type(e).__name__))
+
+    def plan_key(self, i):
+        return hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
+
+    def plan_settled(self, i):
+        return self.store.get_all(str(i["number"])).get("plancheck", "").startswith(self.plan_key(i) + ":")
+
+    def plan_check(self, i, tree):
+        kv = self.store.get_all(str(i["number"])).get("plancheck", "")
+        key = self.plan_key(i)
+        if kv == key + ":ok":
+            return []
+        if kv == key + ":bad":
+            return None
+        found = plancheck.faults(i, tree)
+        if found:
+            self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", plancheck.comment(found)])
+            log(i["number"], "not started: the plan check found %d fault%s" % (len(found), "" if len(found) == 1 else "s"))
+            self.store.set(str(i["number"]), "plancheck", key + ":bad")
+            return None
+        self.store.set(str(i["number"]), "plancheck", key + ":ok")
+        return []
 
     def dep_state(self, d, open_numbers, labelled):
         n = str(d)
@@ -774,17 +881,21 @@ class Dispatcher:
         j.pop("run_model", None)
         station = STATION_OF.get(state)
         try:
-            tier = tiers.tier_for(station, tiers.size_of(j.get("body")), self.cfg.get("tiers"))
+            tier = "senior" if station == "fix" and j.get("level") else tiers.tier_for(station, tiers.size_of(j.get("body")), self.cfg.get("tiers"))
             run_model = tiers.model_for(station, tier, self.cfg.get("tier_models"))
         except ValueError as e:
             log(j["issue"], "no tier written: %s" % e)
             return
         if tier is not None:
             j["tier"] = tier
-        if run_model is not None and not self.tiers_off:
+        if run_model is not None and (not self.tiers_off or tier == "senior"):
             j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
+        if state == "building" and self.store.get_all("-").get("room_probe") == "1":
+            holds.arm(self.store, self.store.get_all("-").get("room_kind") or "load", self.now() + ROOM_PROBE_S)
+            self.store.set("-", "room_probe", "sent")
+            log(j["issue"], "this build tests the room; other sends wait %d s" % ROOM_PROBE_S)
         j.update(agent=agent, copy=copy, run=None, sending=step, state=state, not_before=None, lost_beats=0)
         self.tier_job(j, state)
         j["brief_v"] = failures.version(state)
@@ -820,12 +931,13 @@ class Dispatcher:
             return review_brief(j, j["pr"], j["head"])
         if j["state"] == "proving":
             return proof_brief(j, j["pr"], j["head"], j["asks"])
-        return fix_brief(j, j["pr"], j["review"])
+        return (senior_brief if j.get("level") and not j.get("same_round") else fix_brief)(j, j["pr"], j["review"])
 
     def finished_run(self, j):
         r = self.account("get_run", {"agentId": j["agent"], "runId": j["run"]})
         if r.get("status") == "running":
             return self.clock_check(j, r)
+        j.setdefault("warm", {})[j["agent"]] = [j["copy"], self.now()]
         self.record_tokens(j, r)
         if r.get("status") == "done":
             self.strike(j, True)
@@ -847,6 +959,24 @@ class Dispatcher:
         if clocks.klass(kind, row) == "plan_limit":
             return self.plan_limit(j, why, str(r.get("error") or "-"))
         return self.failed_attempt(j, why, "ended")
+
+    def close_replans(self):
+        for j in self.jobs():
+            run = j.get("replan_run")
+            if not run:
+                continue
+            fire = self.store.db.execute("SELECT status FROM fires WHERE run_id=?", (run,)).fetchone()
+            if fire is None or fire[0] != "running":
+                continue
+            r = self.account("get_run", {"agentId": j["agent"], "runId": run}) or {}
+            status = r.get("status")
+            if status == "running":
+                continue
+            counts = planning.tokens(r)
+            if counts is None:
+                log(j["issue"], "token counts of run %s unknown: left at 0" % run)
+                counts = {}
+            self.store.close_run(run, "done" if status == "done" else "error", **counts)
 
     def record_tokens(self, j, r):
         ti, to = r.get("inputTokens"), r.get("outputTokens")
@@ -913,8 +1043,9 @@ class Dispatcher:
         self.strike(j, False)
         return self.failed_attempt(j, why, "cancel")
 
-    def transient(self, j, reason):
-        count = self.store.bump_retry(str(j["issue"]), "transient")
+    def transient(self, j, reason, room=False):
+        n = str(j["issue"])
+        count = (self.store.retries(n, "transient") or 1) if room else self.store.bump_retry(n, "transient")
         delay = clocks.backoff(count)
         if delay is None:
             return self.end(j, "blocked", "four refusals a second try did not clear: %s" % reason)
@@ -992,11 +1123,17 @@ class Dispatcher:
                 if found:
                     j["pr"] = found
                 return self.blocked(j, out)
+            self.store.set("-", "checkout_failed_row", "0")
+            if clocks.L.ts(j["intent_at"]) >= float(self.store.get_all("-").get("room_until") or 0):
+                self.store.set("-", "room_row", "0")
+                self.store.set("-", "room_probe", "0")
+            j.pop("checkout_failed", None)
             self.to(j, "review_wait", "pull request #%s" % m.group(1), pr=int(m.group(1)))
         elif st == "review_wait":
             if self.conflicts(j):
                 return
-            got = self.free("reviewer")
+            first = (j.get("first_accept") or {}).get("by")
+            got = self.free_second(j, first) if first else self.free("reviewer", j)
             if not got or not self.take(j):
                 return
             r = got[0]
@@ -1012,10 +1149,19 @@ class Dispatcher:
             if re.match(r"VERDICT:\s*REJECT \(plan\)", verdict):
                 return self.end(j, "returned", "plan: review: " + verdict[:180], plan_lines=verdict)
             stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
-            if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale:
+            accept = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and not stale
+            first = j.get("first_accept") or {}
+            second = accept and first.get("head") == j["head"] and first.get("by") != j.get("reviewer")
+            if accept and not second and gatefiles.touched(j.get("paths"), gatefiles.load()):
+                name = self.names.get(j.get("reviewer"), j.get("reviewer"))
+                self.to(j, "review_wait", "accepted at %s by %s; Files name a gate file, so a second reviewer is asked" % (j["head"][:7], name),
+                        first_accept={"head": j["head"], "by": j.get("reviewer")})
+            elif accept:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
             elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
-                self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False)
+                self.to(j, "fix_wait", verdict[:160], review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + verdict[:300]])
+            elif re.match(r"VERDICT:\s*REJECT", verdict) and not j.get("level"):
+                self.senior(j, "review rejected: " + verdict[:300], out[-1500:])
             elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif stale:
@@ -1027,7 +1173,7 @@ class Dispatcher:
             else:
                 self.end(j, "rejected", verdict[:200] or last_line(out))
         elif st == "fix_wait":
-            copy = self.free_copy_of(j["builder"])
+            copy = self.free_copy_of(j["builder"], j)
             if copy is not None and self.take(j):
                 self.start(j, j["builder"], "fix of #%s" % j["pr"], "fixing", copy=copy)
         elif st == "fixing":
@@ -1037,7 +1183,7 @@ class Dispatcher:
             last = final_line(out, ("PUSHED:", "BLOCKED:"))
             if not (last and last.startswith("PUSHED:")):
                 return self.blocked(j, out)
-            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=j["round"] if j.get("same_round") else 2)
+            self.to(j, "review_wait", "fix pushed: " + last_line(out)[:80], round=j["round"] if j.get("same_round") else 2, first_accept=None)
         elif st == "checks":
             self.checks(j)
         elif st == "proof_wait":
@@ -1055,7 +1201,7 @@ class Dispatcher:
                 self.to(j, "checks", "proved at %s" % j["head"][:7], proved=j["head"], checks_since=self.now())
             elif kind == "fail" and j["round"] == 1:
                 self.to(j, "fix_wait", "proof failed: " + why[:140], review="The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]),
-                        same_round=False)
+                        same_round=False, found=j.get("found", []) + ["proof failed: " + why[:300]])
             elif kind == "none" and j.get("not_met") and not final_line(out, ("PROOF:",)):
                 self.end(j, "blocked", self.not_met_reason(j, out))
             elif kind == "none":
@@ -1064,15 +1210,56 @@ class Dispatcher:
                     self.end(j, "blocked", again)
                 else:
                     self.to(j, "proof_wait", again, proof_asked=1)
+            elif kind == "fail" and not j.get("level"):
+                self.senior(j, "proof failed: " + why[:300], "The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
             else:
                 self.end(j, "rejected", "proof: " + why[:190])
 
     def blocked(self, j, out):
         why = self.not_met_reason(j, out)
+        text = out or ""
+        refused = clocks.tool_refusals(text, final_line(text, ("BLOCKED:",)) or why)
+        room = clocks.room(refused)
+        if room:
+            self.room_hold(j, room)
+        fault = CHECKOUT_FAULT.search(text) if j["state"] in ("building", "fixing") else None
+        if fault:
+            lines = [l for l in text.splitlines() if l.strip()][-12:]
+            j["checkout_failed"] = ("%s\nlast lines:\n%s" % (fault.group(0).strip()[:300], "\n".join(lines)))[:1500]
+            row = int(self.store.get_all("-").get("checkout_failed_row") or 0) + 1
+            if row >= CHECKOUT_ROW:
+                holds.arm(self.store, "checkout", self.now() + CHECKOUT_HOLD_S)
+                log(j["issue"], "hold checkout: %d checkouts in a row failed" % row)
+                row = 0
+            self.store.set("-", "checkout_failed_row", str(row))
         k = clocks.klass("BLOCKED", blocked=why)
-        if k == "transient":
+        if room:
+            return self.transient(j, why, room=True)
+        if k == "transient" or refused:
             return self.transient(j, why)
-        self.end(j, "returned" if k == "plan" else "blocked", why)
+        self.end(j, "returned" if k == "plan" else "blocked", why, **({"checkout_failed": j["checkout_failed"]} if fault else {}))
+
+    def room_hold(self, j, room):
+        now, kv = self.now(), self.store.get_all("-")
+        row = int(kv.get("room_row") or 0)
+        if now > float(kv.get("room_until") or 0) + ROOM_HOLD_MAX_S:
+            row = 0
+        if row == 0 or kv.get("room_probe") != "1":
+            row += 1
+        hold_s = min(max(h for _, _, h in room) * 2 ** (row - 1), ROOM_HOLD_MAX_S)
+        kinds = sorted({k for _, k, _ in room})
+        for kind in kinds:
+            holds.arm(self.store, kind, now + hold_s)
+        line = "%d rounds of refusals without a build getting through; the last: %s" % (row, room[0][0][:200])
+        for k, v in (("room_row", row), ("room_until", now + hold_s), ("room_probe", "1"), ("room_kind", kinds[0]), ("room_line", line)):
+            self.store.set("-", k, str(v))
+        log(j["issue"], "hold %s for %d s, round %d: the checkout reported it" % (", ".join(kinds), hold_s, row))
+
+    def no_room(self):
+        kv = self.store.get_all("-")
+        if int(kv.get("room_row") or 0) < ROOM_PROBLEM_ROW or self.now() > float(kv.get("room_until") or 0) + ROOM_HOLD_MAX_S:
+            return None
+        return kv.get("room_line")
 
     def conflicts(self, j):
         if json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "mergeable"])).get("mergeable") != "CONFLICTING":
@@ -1085,6 +1272,18 @@ class Dispatcher:
                            "Merge dev into your branch (no rebase, no force push), resolve the conflicts, run the test files you touched, push.")
         return True
 
+    def lint_red(self, runs):
+        for r in runs:
+            if r.get("name") != "Factory tools" or r.get("conclusion") != "failure" or not r.get("id"):
+                continue
+            try:
+                jobs = json.loads(self.gh(["api", "repos/%s/actions/runs/%s/jobs" % (self.repo, r["id"])])).get("jobs") or []
+                if any(s.get("name") == "Lint" and s.get("conclusion") == "failure" for jb in jobs for s in jb.get("steps") or []):
+                    return True
+            except Exception:
+                continue
+        return False
+
     def checks(self, j):
         if self.conflicts(j):
             return
@@ -1095,6 +1294,10 @@ class Dispatcher:
         runs = data.get("workflow_runs") or []
         verdict, why = checks_verdict(runs)
         if verdict == "FAIL":
+            if j.get("red_head") != j["head"]:
+                self.note_failures(dict(j, agent=j.get("builder") or j.get("agent"), run_model=None, tier=None, brief_v=None),
+                                   ["ci red after push"] + (["lint red after push"] if self.lint_red(runs) else []), "building", why)
+                j["red_head"] = j["head"]
             if j.get("checks_fixed"):
                 return self.end(j, "failed", why)
             return self.to(j, "fix_wait", why + "; back to the builder once", checks_fixed=True, same_round=True,
@@ -1165,7 +1368,32 @@ class Dispatcher:
         return hits[-1] if hits else None
 
     def end(self, j, state, reason, **extra):
+        j.pop("checkout_failed", None)
+        if state == "returned" and j.get("replans", 0) >= MAX_REPLANS and clocks.klass("BLOCKED", blocked=reason) == "plan":
+            state = "unsolvable"
+            extra.update(commented=False, relabelled=False)
         self.to(j, state, "%s: %s" % (state, reason), reason=reason, sending=None, ended_at=ledger_store.now(), **extra)
+
+    def senior(self, j, line, review):
+        self.to(j, "fix_wait", digest.SENIOR + line[:160], level=1, round=1, review=review, same_round=False,
+                found=j.get("found", []) + [line])
+
+    def unsolvable(self, j, why):
+        self.end(j, "unsolvable", why, commented=False, relabelled=False)
+
+    def verdict(self, j):
+        n = str(j["issue"])
+        moves = [t["to_state"] for t in self.store.transitions_of(n) if t["from_state"] != t["to_state"]]
+        last = dict(self.store.db.execute("SELECT station, reason FROM failures WHERE job=? AND kind!='ended unsolvable' ORDER BY id", (n,)).fetchall())
+        return "\n".join([
+            "The factory dispatcher ended this job as unsolvable: %s." % (j.get("reason") or "-"),
+            "It had %d builds, %d fix rounds, %d reviews, %d proofs, %d takes and %d re-plans." % (
+                moves.count("building"), moves.count("fixing"), moves.count("reviewing"), moves.count("proving"),
+                j.get("take") or 1, j.get("replans", 0)),
+            *(["The last reason of each station that stopped it:"] + ["- %s: %s" % (s or "-", r) for s, r in last.items()] if last else []),
+            "",
+            "The factory could not resolve this. It is not sent again unless the issue text changes and the factory label is put back.",
+        ])
 
     def report(self, j):
         n = str(j["issue"])
@@ -1177,6 +1405,8 @@ class Dispatcher:
                 text = "The factory dispatcher stopped this job: returned to the planner. Pull request: %s. Reason: %s" % (pr, j.get("reason") or "-")
             elif j["state"] == "superseded":
                 text = "The factory dispatcher closed this issue: the Run lines pass on today's dev, so the work was already done by %s." % j.get("done_by")
+            elif j["state"] == "unsolvable":
+                text = self.verdict(j)
             else:
                 text = "The factory dispatcher stopped this job: %s. Pull request: %s. Reason: %s" % (j["state"], pr, j.get("reason") or "-")
             if j["state"] == "superseded":
@@ -1186,8 +1416,9 @@ class Dispatcher:
             j["commented"] = True
             self.save(j, "commented")
         if not j.get("relabelled"):
-            done = "factory-done" if j["state"] in ("merged", "superseded") else "factory-blocked"
-            self.gh(["issue", "edit", n, "-R", self.repo, "--remove-label", self.label, "--add-label", done])
+            done = "factory-done" if j["state"] in ("merged", "superseded") else "factory-unsolvable" if j["state"] == "unsolvable" else "factory-blocked"
+            off = ["--remove-label", "factory-blocked"] if done == "factory-unsolvable" else []
+            self.gh(["issue", "edit", n, "-R", self.repo, "--remove-label", self.label, *off, "--add-label", done])
             j["relabelled"] = True
             self.save(j, "relabelled")
             log(n, "reported, labelled " + done)
@@ -1217,6 +1448,7 @@ class Dispatcher:
             os.replace(tmp, path)
         except OSError as e:
             log("-", "heartbeat: %s" % type(e).__name__)
+        inboxsort.beat(self, log)
 
     def renewal_hold(self):
         try:
@@ -1275,6 +1507,11 @@ class Dispatcher:
         except (Error, ValueError, KeyError) as e:
             clean = False
             log("-", "planning: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.acceptance.once(self.beats, self.jobs())
+        except Exception as e:
+            clean = False
+            log("-", "acceptance: %s" % (e if isinstance(e, Error) else type(e).__name__))
         if self.cfg.get("likely_fixed_days"):
             try:
                 for n in backlog.close_pass(self.gh, self.repo, self.store, self.now(), self.cfg["likely_fixed_days"]):
@@ -1293,6 +1530,11 @@ class Dispatcher:
         except Exception as e:
             clean = False
             log("-", "tier floor: %s" % (e if isinstance(e, Error) else type(e).__name__))
+        try:
+            self.close_replans()
+        except Exception as e:
+            clean = False
+            log("-", "replans: %s" % (e if isinstance(e, Error) else type(e).__name__))
         for j in self.jobs():
             try:
                 if j["state"] not in END:
@@ -1316,11 +1558,43 @@ class Dispatcher:
         known = set(self.resolver.records(self, closed=True))
         try:
             self.resolver.beat(self, heard, self.beat_line)
+            self.spent()
         except Exception as e:
             log("-", "problems: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.note_problems(known)
+        try:
+            self.escapes_pass()
+        except Exception as e:
+            clean = False
+            log("-", "escapes: %s" % (e if isinstance(e, Error) else type(e).__name__))
         self.report_line()
         self.beat_end(clean)
+
+    def escapes_pass(self):
+        if self.beats % escapes.EVERY:
+            return
+        now = self.now()
+        merged = []
+        for j in self.jobs():
+            if j["state"] == "merged" and j.get("merged_at") is None:
+                j["merged_at"] = escapes.merged_at(self.store, j)
+            if escapes.in_window(j, now):
+                merged.append(j)
+        if not merged:
+            return
+        open_numbers = {int(i["number"]) for i in json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json", "number", "--limit", "1000"]) or "[]")}
+        records = self.resolver.records(self)
+        for n, by in escapes.find(merged, open_numbers, records, now):
+            if escapes.record(self.store, n, by, now):
+                log(n, "escaped defect: %s" % by)
+
+    def spent(self):
+        for key, r in self.resolver.records(self).items():
+            m = re.fullmatch(r"ended #(\d+)", key)
+            used = r.get("attempt", 1) >= resolver.ATTEMPTS or r.get("sends", 0) >= resolver.SEND_MAX
+            j = self.store.get_job(m.group(1)) if m and r.get("state") == resolver.OWNER and used else None
+            if j and j["state"] in problems.ENDED:
+                self.unsolvable(j, "the resolver's attempts on problem %s are spent: %s" % (key, r.get("line") or "-"))
 
     def note_problems(self, known):
         try:
@@ -1396,6 +1670,9 @@ def main(argv=None):
     ap.add_argument("cmd", choices=("run", "once"))
     a = ap.parse_args(argv)
     cfg = settings()
+    if not cfg.get("proof"):
+        print("dispatch: proof is off in dispatch.json; refusing to start", file=sys.stderr)
+        return 1
     url = os.environ.get("DISPATCH_ACCOUNT_URL")
     if not url:
         print("dispatch: DISPATCH_ACCOUNT_URL is not set", file=sys.stderr)

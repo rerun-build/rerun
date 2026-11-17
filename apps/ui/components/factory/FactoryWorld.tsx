@@ -7,7 +7,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore
 import { fireRerunConfetti } from '@/lib/confetti'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { applyMoves, canMove, dropReason, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout } from './factory-layout'
+import { applyMoves, canMove, copyTree, dropReason, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout, treeRoutes } from './factory-layout'
+import { type Bucket } from './factory-bucket'
 import { METRICS, barModel, type MetricDef, type MetricKey, type MetricValues } from './factory-metrics'
 import { FactoryBarFrame } from './FactoryBarFrame'
 import { floorFrame } from './factory-camera'
@@ -30,17 +31,17 @@ function useStable<T>(value: T): T {
 
 type SceneFn = (t: number, now: number) => FactoryFrame
 
-function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob }: { start: number; tiles: Tile[]; routes: Map<string, AxisPoint[]>; scene: SceneFn; selectedIssue: number | null; onSelectJob: ((issue: number) => void) | undefined }) {
+function LiveOverlay({ start, tiles, routes, scene, selectedIssue, onSelectJob, onOpenBucket }: { start: number; tiles: Tile[]; routes: Map<string, AxisPoint[]>; scene: SceneFn; selectedIssue: number | null; onSelectJob: ((issue: number) => void) | undefined; onOpenBucket: ((bucket: Bucket) => void) | undefined }) {
     const [now, setNow] = useState(() => Date.now())
     useEffect(() => {
         const id = setInterval(() => setNow(Date.now()), TICK_MS)
         return () => clearInterval(id)
     }, [])
     const frame = scene((now - start) % LOOP_MS, now)
-    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} plans={frame.plans ?? []} rejects={frame.rejects} held={frame.held} holdLeftMs={frame.holdLeftMs} links={frame.links} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} />
+    return <FactoryOverlay tiles={tiles} routes={routes} pods={frame.pods} cabinets={frame.cabinets} plans={frame.plans ?? []} rejects={frame.rejects} held={frame.held} holdLeftMs={frame.holdLeftMs} links={frame.links} selectedIssue={selectedIssue} {...(onSelectJob ? { onSelectJob } : {})} {...(onOpenBucket ? { onOpenBucket } : {})} />
 }
 
-export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenCoworker, rightInset = 0, snapshot = null, topBar }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenCoworker?: (name: string) => void; rightInset?: number; snapshot?: FactorySnapshot | null; topBar?: ReactNode }) {
+export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace = 'sample', selectedIssue = null, onSelectJob, onOpenBucket, onOpenCoworker, rightInset = 0, snapshot = null, topBar }: { theme?: 'light' | 'dark'; scene?: SceneFn; workspace?: string; selectedIssue?: number | null; onSelectJob?: (issue: number) => void; onOpenBucket?: (bucket: Bucket) => void; onOpenCoworker?: (name: string) => void; rightInset?: number; snapshot?: FactorySnapshot | null; topBar?: ReactNode }) {
     const [clock, setClock] = useState(() => ({ start: Date.now(), now: Date.now() }))
     const [expired, setExpired] = useState<Set<string>>(() => new Set())
     useEffect(() => {
@@ -57,16 +58,18 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     const saved = useSyncExternalStore(subscribeLayout, () => loadLayout(storageKey), () => null)
     const boxes = frame.containers
     const moves = useMemo(() => readMoves(saved, sceneTiles, boxes), [saved, sceneTiles, boxes])
-    const tiles = useMemo(() => applyMoves(sceneTiles, moves, boxes), [sceneTiles, moves, boxes])
+    const belts = useStable(frame.links.filter(l => l.variant === 'belt').map(l => ({ source: l.source, target: l.target, variant: l.variant })))
+    const tiles = useMemo(() => applyMoves(sceneTiles, moves, boxes, belts), [sceneTiles, moves, boxes, belts])
     const onTileMove = useCallback((id: string, cell: Cell) => {
         if (canMove(sceneTiles, moves, id, cell, boxes)) saveLayout(storageKey, { ...moves, [id]: cell })
     }, [sceneTiles, moves, storageKey, boxes])
     const canDropTile = useCallback((id: string, cell: Cell) => dropReason(sceneTiles, moves, id, cell, boxes), [sceneTiles, moves, boxes])
     const moved = Object.keys(moves).length > 0
     const links = useStable(frame.links)
-    const routes = useMemo(() => routeTileLinks(tiles, links), [tiles, links])
+    const tree = useMemo(() => copyTree(tiles, links), [tiles, links])
+    const routes = useMemo(() => treeRoutes(routeTileLinks(tiles, tree), tree, links), [tiles, tree, links])
     const onToastExpire = useCallback((id: string) => setExpired(prev => new Set(prev).add(id)), [])
-    const worldOverlay = useCallback(() => <LiveOverlay start={clock.start} tiles={tiles} routes={routes} scene={scene} selectedIssue={selectedIssue} onSelectJob={onSelectJob} />, [clock.start, tiles, routes, scene, selectedIssue, onSelectJob])
+    const worldOverlay = useCallback(() => <LiveOverlay start={clock.start} tiles={tiles} routes={routes} scene={scene} selectedIssue={selectedIssue} onSelectJob={onSelectJob} onOpenBucket={onOpenBucket} />, [clock.start, tiles, routes, scene, selectedIssue, onSelectJob, onOpenBucket])
     const gridTiles = useMemo(() => (onOpenCoworker ? tiles.map(t => (t.style?.buddy ? { ...t, selectable: true } : t)) : tiles), [tiles, onOpenCoworker])
     const onTileSelect = useCallback((id: string | null) => { if (id && onOpenCoworker) onOpenCoworker(id) }, [onOpenCoworker])
 
@@ -102,7 +105,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
             <IsoGrid
                 tiles={gridTiles}
                 containers={frame.containers}
-                liveLinks={links}
+                liveLinks={tree}
                 toasts={toasts}
                 onToastExpire={onToastExpire}
                 camera={camera}

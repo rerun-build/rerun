@@ -30,13 +30,16 @@ TABLE = {
     "checks": _row("wait", ("fix_wait", "proof_wait", "review_wait"), reason=True, deadline="checks_timeout_s"),
     "proof_wait": _row("wait", ("proving",), reason=True, queue=True),
     "proving": _row("running", ("checks", "fix_wait", "proof_wait"), deadline="stall_clock", back="proof_wait", goal=PROOF),
-    "merged": _end(False),
-    "rejected": _end(True),
-    "blocked": _end(True, ("merged",)),
-    "failed": _end(True, ("merged",)),
-    "returned": _end(True, ("merged",)),
-    "superseded": _end(False),
+    "merged": _end(False, ("unsolvable",)),
+    "rejected": _end(True, ("unsolvable",)),
+    "blocked": _end(True, ("merged", "unsolvable")),
+    "failed": _end(True, ("merged", "unsolvable")),
+    "returned": _end(True, ("merged", "unsolvable")),
+    "superseded": _end(False, ("unsolvable",)),
+    "unsolvable": _end(True),
 }
+
+APP_STATE = {"unsolvable": "rejected"}
 
 NAMES = tuple(TABLE)
 RUNNING = tuple(s for s in NAMES if TABLE[s]["kind"] == "running")

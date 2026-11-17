@@ -39,6 +39,7 @@ class World:
         self.problems, self.reruns, self.deleted = [], [], set()
         self.commits, self.dev_runs = [], []
         self.merge_sha = "feedface12345678"
+        self.open_children, self.closed = [], []
 
     @staticmethod
     def goal_ok(goal):
@@ -151,6 +152,10 @@ class World:
         if a[:2] == ["issue", "edit"] and "--add-label" in a and a[a.index("--add-label") + 1] == "factory":
             self.unlabelled.discard(int(a[2]))
             return ""
+        if a[:2] == ["issue", "list"] and "--search" in a and any(x.startswith("Part of #") for x in a):
+            return json.dumps(self.open_children)
+        if a[:2] == ["issue", "list"] and "Factory follow-ups inbox in:title" in a:
+            return json.dumps([{"number": p["number"], "title": p["title"]} for p in self.problems if p["state"] == "OPEN"])
         if a[:2] == ["issue", "list"] and "--label" not in a and "--search" not in a and any(i.get("labels") for i in self.issues):
             return json.dumps([{"number": i["number"], "title": i["title"], "labels": i["labels"], "createdAt": i.get("createdAt", "")}
                                for i in self.issues if i.get("labels")])
@@ -160,7 +165,11 @@ class World:
             return json.dumps([{"number": i["number"], "title": i["title"], "body": i["body"]} for i in self.issues if i["number"] not in self.unlabelled])
         if a[:2] == ["issue", "view"]:
             i = self.issue(a[2])
-            return json.dumps({"body": i["body"], "comments": [{"body": c} for c in i["comments"]]})
+            return json.dumps({"title": i.get("title", ""), "state": i.get("state", "OPEN"), "body": i["body"],
+                               "comments": [{"body": c} for c in i["comments"]]})
+        if a[:2] == ["issue", "close"]:
+            self.closed.append((int(a[2]), a[a.index("--comment") + 1]))
+            return ""
         if a[:2] == ["issue", "comment"]:
             self.issue(a[2])["comments"].append(a[a.index("--body") + 1])
             return ""
@@ -182,6 +191,8 @@ class World:
             return json.dumps({"state": "open" if n in self.open_numbers else "closed", "state_reason": self.close_reasons.get(n, "completed")})
         if a[0] == "api" and "/commits?" in a[1]:
             return json.dumps(self.commits)
+        if a[0] == "api" and "/actions/runs/" in a[1] and a[1].endswith("/jobs"):
+            return json.dumps({"jobs": getattr(self, "run_jobs", {}).get(a[1].split("/actions/runs/")[1].split("/")[0], [])})
         if a[0] == "api" and "/actions/workflows/" in a[1]:
             return json.dumps({"workflow_runs": self.dev_runs})
         if a[0] == "api":
@@ -532,7 +543,7 @@ class Flow(Base):
         self.assertEqual(self.state(), "failed")
         self.assertIn("e2e cancelled", self.w.issue(5)["comments"][-1])
 
-    def test_reject_gives_one_fix_round_and_a_second_reject_ends_the_job(self):
+    def test_reject_gives_one_fix_round_and_a_second_reject_goes_to_the_senior_round(self):
         self.to_review()
         self.w.finish("r1", "bad\nVERDICT: REJECT @abcdef1: wrong sum")
         self.tick(2)
@@ -545,10 +556,11 @@ class Flow(Base):
         self.assertIn("One review", self.w.sends[-1][1])
         self.w.finish("r1", "VERDICT: REJECT @abcdef1: still wrong")
         self.tick(3)
-        self.assertEqual(self.state(), "rejected")
+        self.assertEqual(self.state(), "fixing")
         self.assertEqual(len([s for s in self.w.sends if "One fix round" in s[1]]), 1)
-        self.assertEqual(len(self.w.sends), 4)
-        self.assertIn("still wrong", self.w.issue(5)["comments"][-1])
+        self.assertEqual(len(self.w.sends), 5)
+        self.assertEqual(self.w.sends[-1][0], "b1")
+        self.assertIn("still wrong", self.w.sends[-1][1])
 
     def test_no_verdict_line_rejects(self):
         self.to_review()
@@ -861,7 +873,7 @@ class Secrets(Base):
         self.assertNotIn(self.TOKEN, str(d.store.jobs()))
 
     def test_start_line_for_once(self):
-        for name, fake in (("settings", lambda: self.cfg), ("make_account", lambda url, key: self.w.account),
+        for name, fake in (("settings", lambda: dict(self.cfg, proof=True)), ("make_account", lambda url, key: self.w.account),
                            ("make_gh", lambda tok: self.w.gh), ("read_secret", lambda path: "fake-key")):
             self.addCleanup(setattr, D, name, getattr(D, name))
             setattr(D, name, fake)

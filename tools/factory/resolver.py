@@ -3,6 +3,7 @@ import re
 
 import clocks
 import holds
+import inboxsort
 import pools
 import problems
 import snapshot
@@ -13,8 +14,9 @@ KV = "problems"
 LABEL = "factory-problem"
 OWNER = "owner"
 POOL = "resolver"
-KINDS = ("idle line", "repeating error", "dead", "unreadable", "ended")
+KINDS = ("idle line", "repeating error", "dead", "unreadable", "ended", "checkout failed", "no room")
 SYSTEMIC = KINDS[:2]
+NOTICE = (inboxsort.ALARM,)
 NEW_MAX = 10
 OPEN_MAX = 30
 CLEAR_BEATS = 3
@@ -106,11 +108,12 @@ class Resolver:
             d.store.set("-", "problems_since", since)
         jobs = d.jobs()
         filed = any(r["state"] == "verify" and r.get("filed") for r in self.records(d).values())
-        if filed or any(problems.ended(j, since) for j in jobs):
+        if filed or any(problems.ended(j, since) or (j.get("checkout_failed") and j["state"] in states.END) for j in jobs):
             self.open_issues = {i["number"] for i in json.loads(d.gh(
                 ["issue", "list", "-R", d.repo, "--state", "open", "--json", "number", "--limit", "1000"]) or "[]")}
         held = holds.active(d.store, d.now()) is not None
-        self.found = self.watch.find(jobs, d.refused, self.open_issues, line, d.now(), heard, since, held)
+        self.found = self.watch.find(jobs, d.refused, self.open_issues, line, d.now(), heard, since, held, d.no_room())
+        self.found.update(inboxsort.alarm(d.store.get_all("-")))
         self.tickets(d, self.found, resolve)
         if resolve:
             self.station(d, self.found)
@@ -133,7 +136,7 @@ class Resolver:
         room = max(0, OPEN_MAX - len(recs))
         old, listed = self.records(d, closed=True), None
         for key in new[:min(NEW_MAX, room)]:
-            fresh = {"evidence": found[key], "state": "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
+            fresh = {"evidence": found[key], "state": "notice" if key in NOTICE else "resolve_wait", "absent": 0, "attempt": 1, "asked": 0, "verify": 0,
                      "agent": None, "copy": None, "run": None, "transient": 0, "line": None, "filed": None}
             if old.get(key, {}).get("issue"):
                 n = old[key]["issue"]
@@ -280,6 +283,7 @@ class Resolver:
         if last and not last.startswith("ESCALATE:"):
             filed = re.match(r"FILED:\s*#(\d+)", last)
             r.update(state="verify", verify=0, line=last, filed=int(filed.group(1)) if filed else None)
+            self.handled(d, key)
         elif last or r.get("asked"):
             self.escalate(d, r, last or "ESCALATE: HOUSE ended twice without a final line (last run %s)" % rid)
             r["state"] = "owner"
@@ -291,6 +295,12 @@ class Resolver:
             self.do_lines(d, r, rid, out)
         except Exception as e:
             self.log(r["issue"], "problem %s: DO lines of run %s: %s" % (key, rid, e))
+
+    def handled(self, d, key):
+        m = re.fullmatch(r"checkout failed #(\d+)", key)
+        j = d.store.get_job(m.group(1)) if m else None
+        if j and j.pop("checkout_failed", None):
+            d.save(j, "checkout failure handed to a resolver run")
 
     def do_lines(self, d, r, rid, out):
         lines = list(dict.fromkeys(x.strip() for x in DO.findall(FENCE.sub("", out))))

@@ -883,6 +883,7 @@
         "stepCount": "{count, plural, one {# paso} other {# pasos}}",
         "step": "Paso {number}",
         "noSteps": "No hay pasos registrados para esta ejecución.",
+        "stepsLost": "{count, plural, one {El registro de # paso se perdió cuando la ejecución se detuvo.} other {El registro de # pasos se perdió cuando la ejecución se detuvo.}}",
         "input": "Entrada",
         "output": "Salida",
         "filters": { "running": "En curso", "failed": "Fallidas", "done": "Hechas" },
@@ -929,12 +930,26 @@
             "kpiCost": "Costo total",
             "kpiTokens": "Tokens totales",
             "kpiErrorRate": "Tasa de error",
+            "kpiFailureRate": "Tasa de fallos",
             "runsOverTime": "Ejecuciones en el tiempo",
+            "failureOverTime": "Tasa de fallos en el tiempo",
             "costOverTime": "Costo en el tiempo",
             "avgDuration": "Duración media",
             "runsByModel": "Ejecuciones por modelo",
             "topTools": "Herramientas más usadas",
             "toolErrors": "Errores de herramientas"
+        },
+        "definitions": {
+            "about": "Qué cuenta {title}",
+            "kpiErrorRate": "La proporción de ejecuciones que se detuvieron por un error, como un fallo del proveedor o de una herramienta, una conexión cortada o un reinicio del motor; las ejecuciones en curso cuentan en el total.",
+            "kpiFailureRate": "La proporción de ejecuciones que no completaron el trabajo: terminaron con un error, se cancelaron, no alcanzaron su objetivo o terminaron con una línea BLOCKED: o ESCALATE:; las ejecuciones en curso cuentan en el total."
+        },
+        "noPrice": {
+            "label": "No se informó ningún costo para estas ejecuciones, así que se muestran los tokens.",
+            "fresh": "Entrada nueva",
+            "cached": "Entrada en caché",
+            "output": "Salida",
+            "chartTitle": "Tokens por tipo"
         },
         "tokenUsage": {
             "title": "Uso de tokens",

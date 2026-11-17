@@ -3,9 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FactoryDepartment, FactorySnapshot } from '@rerun/contracts'
 import { cn } from '@/lib/utils'
+import { FactoryBucket } from './FactoryBucket'
 import { FactoryInspector } from './FactoryInspector'
 import { FactoryLedger } from './FactoryLedger'
 import { SAMPLE_TEXT } from './FactoryTasks'
+import { type Bucket } from './factory-bucket'
 import { DEPARTMENT_VIEW, buildLedger, chipCounts, filterLedger, type ChipCounts, type LedgerFilter } from './factory-ledger'
 
 const MAIN_CHIPS: { key: 'running' | 'waiting' | 'problems' | 'doneToday'; label: string }[] = [
@@ -35,12 +37,14 @@ function Chip({ name, label, count, filter, active, onPress, color }: {
     )
 }
 
-export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCoworker }: {
+export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCoworker, bucket = null, onBucket }: {
     snapshot: FactorySnapshot | null
     selected: number | null
     onSelect: (issue: number | null) => void
     names: Record<string, string>
     onOpenCoworker: (coworkerId: string) => void
+    bucket?: Bucket | null
+    onBucket?: (bucket: Bucket | null) => void
 }) {
     const [now, setNow] = useState(() => Date.now())
     useEffect(() => {
@@ -48,7 +52,7 @@ export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCowor
         return () => clearInterval(id)
     }, [])
     const [filter, setFilter] = useState<LedgerFilter | null>(null)
-    const open = snapshot !== null && (filter !== null || selected !== null)
+    const open = snapshot !== null && (filter !== null || selected !== null || bucket !== null)
     const rootRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -57,10 +61,11 @@ export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCowor
             if (rootRef.current && e.target instanceof Node && rootRef.current.contains(e.target)) return
             setFilter(null)
             onSelect(null)
+            onBucket?.(null)
         }
         document.addEventListener('pointerdown', onDown)
         return () => document.removeEventListener('pointerdown', onDown)
-    }, [open, onSelect])
+    }, [open, onSelect, onBucket])
 
     const [shown, setShown] = useState(false)
     useEffect(() => {
@@ -72,7 +77,10 @@ export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCowor
     const epics = useMemo(() => (snapshot ? buildLedger(snapshot) : []), [snapshot])
     const counts: ChipCounts = useMemo(() => chipCounts(epics, now), [epics, now])
     const shownEpics = useMemo(() => filterLedger(epics, filter, now), [epics, filter, now])
-    const press = (f: LedgerFilter) => setFilter(cur => (sameFilter(cur, f) ? null : f))
+    const press = (f: LedgerFilter) => {
+        onBucket?.(null)
+        setFilter(cur => (sameFilter(cur, f) ? null : f))
+    }
 
     if (!snapshot) return <div data-topbar className="relative w-full text-xs text-muted-foreground">{SAMPLE_TEXT}</div>
 
@@ -100,6 +108,8 @@ export function FactoryTopBar({ snapshot, selected, onSelect, names, onOpenCowor
                             <button type="button" onClick={() => onSelect(null)} className="self-start rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent">Back to the list</button>
                             <FactoryInspector job={job} jobs={snapshot.jobs} repo={snapshot.repo} names={names} onSelect={onSelect} onOpenCoworker={onOpenCoworker} />
                         </div>
+                    ) : bucket !== null ? (
+                        <FactoryBucket bucket={bucket} jobs={snapshot.jobs} repo={snapshot.repo} names={names} now={now} onSelect={onSelect} />
                     ) : (
                         <div className="flex flex-col gap-3">
                             <div className="flex flex-wrap items-center gap-2">
