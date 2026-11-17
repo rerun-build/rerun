@@ -193,7 +193,7 @@
     },
     "plan": {
       "high": {
-        "model": "claude-fable-5-2",
+        "model": "claude-opus-5-5",
         "thinkingLevel": "medium"
       }
     },

@@ -7,7 +7,7 @@ from test_planning_start import CFG, Rig
 HERE = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(HERE, "dispatch.json")) as f:
     SHIPPED = json.load(f)
-FABLE_MEDIUM = {"model": "claude-fable-5-2", "thinkingLevel": "medium"}
+OPUS_PLAN = {"model": "claude-opus-5-5", "thinkingLevel": "medium"}
 OPUS_MEDIUM = {"model": "claude-opus-5-5", "thinkingLevel": "medium"}
 
 
@@ -29,13 +29,13 @@ class PlanSend(unittest.TestCase):
             cfg["tier_models"] = copy.deepcopy(SHIPPED["tier_models"])
         return cfg
 
-    def test_plan_send_carries_fable_medium(self):
+    def test_plan_send_carries_opus_medium(self):
         r = Rig(cfg=self.cfg(True))
         got, r.station.account = captured(r.account)
         r.station.once(1)
         self.assertTrue(got)
-        self.assertEqual(got[0]["model"], FABLE_MEDIUM["model"])
-        self.assertEqual(got[0]["thinkingLevel"], FABLE_MEDIUM["thinkingLevel"])
+        self.assertEqual(got[0]["model"], OPUS_PLAN["model"])
+        self.assertEqual(got[0]["thinkingLevel"], OPUS_PLAN["thinkingLevel"])
 
     def test_no_tables_plan_args_unchanged(self):
         r = Rig(cfg=self.cfg(False))
@@ -84,7 +84,7 @@ class ShippedTiers(unittest.TestCase):
     def test_plan_and_resolve_tier_at_high_with_their_models(self):
         self.assertEqual(SHIPPED["tiers"]["plan"], "high")
         self.assertEqual(SHIPPED["tiers"]["resolve"], "high")
-        self.assertEqual(SHIPPED["tier_models"]["plan"]["high"], FABLE_MEDIUM)
+        self.assertEqual(SHIPPED["tier_models"]["plan"]["high"], OPUS_PLAN)
         self.assertEqual(SHIPPED["tier_models"]["resolve"]["high"], OPUS_MEDIUM)
 
 
