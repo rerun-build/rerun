@@ -42,6 +42,7 @@ class World:
         self.open_children, self.closed = [], []
         self.souls, self.soul_updates = {}, []
         self.send_args = []
+        self.check_runs = [{"name": n, "status": "completed", "conclusion": "success"} for n in ("Typecheck and lint", "No comments in code", "Factory tools tests")]
 
     @staticmethod
     def goal_ok(goal):
