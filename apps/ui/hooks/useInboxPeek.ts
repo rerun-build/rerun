@@ -15,12 +15,14 @@ export type PeekAnswerOutcome = 'sent' | 'busy' | 'stale' | 'failed'
 /** The conversation an inbox entry stands for: a row knows its session, an announcement only the engine's id. */
 export type InboxPeekTarget = { agentId: string; sessionId: string | null; engineSessionId: string | null }
 
-// Reads what a conversation waits on and answers it from the inbox, the way its chat would.
-export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekTarget) {
+// Reads what a conversation waits on and answers it from the inbox, the way its chat would. Held off
+// while `enabled` is false, and read again each time it turns true: a thread of General asks again.
+export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekTarget, enabled = true) {
     const [peek, setPeek] = useState<InboxPeek>({ state: 'loading' })
     const { selection: model } = useAgentModel(agentId)
 
     useEffect(() => {
+        if (!enabled) return
         let cancelled = false
         const load = async (): Promise<InboxPeek> => {
             const resolved = sessionId ?? (engineSessionId ? await resolveSessionId(agentId, engineSessionId) : null)
@@ -36,7 +38,7 @@ export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekT
         return () => {
             cancelled = true
         }
-    }, [agentId, sessionId, engineSessionId])
+    }, [agentId, sessionId, engineSessionId, enabled])
 
     // The card may have stayed open while the question was answered elsewhere: the chat, another tab, a
     // teammate. Read again right before sending, so an answer never lands on a request that is gone.
