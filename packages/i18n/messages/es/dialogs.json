@@ -570,7 +570,8 @@
     },
     "paidApp": {
         "slotAdded": "Espacio añadido a tu plan.",
-        "slotAddedTrial": "Espacio añadido, {price} durante tu prueba."
+        "slotAddedTrial": "Espacio añadido, {price} durante tu prueba.",
+        "slotRemoved": "Espacio devuelto. Sigue disponible hasta tu próxima renovación."
     },
     "linkedinPro": {
         "description": "Las cuentas de LinkedIn con las que actúan tus coworkers.",

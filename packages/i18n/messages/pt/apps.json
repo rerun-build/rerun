@@ -11,13 +11,17 @@
         "notSubscribed": "Assine o Rerun primeiro",
         "paused": "Seu workspace está pausado",
         "trialSlot": "Um teste inclui uma vaga {provider}. Mude de plano para adicionar mais.",
+        "lifetimeTrialSlot": "Seu teste grátis inclui uma vaga de {provider}. Adicione mais quando ele terminar.",
         "adminOnly": "Só um admin pode gerenciar apps pagos"
     },
     "slots": {
         "footer": "<b>{used} de {total, plural, one {# vaga usada} other {# vagas usadas}}</b>, {description}",
         "subscriberTrial": "a primeira grátis até {date}, depois {price}",
         "workspaceTrial": "US$ 0 durante o teste, cobrado com seu plano depois",
-        "paid": "{price} cada, cobrado com seu plano"
+        "paid": "{price} cada, cobrado com seu plano",
+        "lifetime": "{price} cada, cobrado mensalmente",
+        "lifetimeTrial": "grátis durante o teste, depois {price} cada",
+        "lifetimeEnding": "terminam em {date}"
     },
     "offer": {
         "subscriberTrial": {
@@ -28,13 +32,21 @@
             "headline": "US$ 0 durante o teste",
             "detail": "Depois {price} por conta, cobrado com seu plano"
         },
+        "lifetimeTrial": {
+            "detail": "Depois {price} por conta, cobrado mensalmente"
+        },
         "freeSlot": {
             "headline": "Uma vaga está esperando",
-            "detail": "Ela já está no seu plano"
+            "detail": "Ela já está no seu plano",
+            "detailLifetime": "Já incluída nas suas vagas mensais",
+            "detailLifetimeEnding": "Suas vagas terminam em {date}"
         },
         "buySlot": {
             "headline": "{price} por conta",
             "detail": "Adicionado ao seu plano, cobrado hoje pelo resto do período"
+        },
+        "lifetimeSlot": {
+            "detail": "Cobrado mensalmente, à parte do seu plano vitalício"
         }
     },
     "connectHint": {
@@ -46,8 +58,10 @@
     "addSlot": {
         "title": "Adicionar uma vaga {provider}?",
         "description": "{price} é adicionado ao seu plano. Você paga hoje pelo que resta do período atual.",
+        "descriptionLifetime": "{price} é adicionado às suas vagas mensais. Você paga hoje o que resta do mês atual.",
         "confirm": "Adicionar vaga",
-        "button": "Adicionar uma vaga"
+        "button": "Adicionar uma vaga",
+        "startTrial": "Começar o teste grátis"
     },
     "intro": {
         "connect": "Conectar {provider}"
@@ -94,6 +108,7 @@
         },
         "addAnother": "Adicionar outra conta",
         "addAnotherHint": "Adiciona uma vaga de {price} ao seu plano",
+        "addAnotherHintLifetime": "Adiciona uma vaga por {price}",
         "status": {
             "connected": "Pronta",
             "needsReconnect": "Entrar de novo",
@@ -114,8 +129,12 @@
         "disconnectLabel": "Desconectar {name}",
         "disconnectTitle": "Desconectar {name}?",
         "disconnectDescription": "Os coworkers dela perdem as ferramentas {provider} na hora. A vaga continua no seu plano até você removê-la em Cobrança.",
+        "disconnectDescriptionLifetime": "Os coworkers dela perdem as ferramentas {provider} na hora. A vaga continua sua até você devolvê-la aqui.",
         "disconnect": "Desconectar",
-        "disconnectTooltip": "Desconectar esta conta"
+        "disconnectTooltip": "Desconectar esta conta",
+        "giveBack": "Devolver",
+        "giveBackTitle": "Devolver esta vaga de {provider}?",
+        "giveBackDescription": "Ela deixa de ser cobrada a partir da sua próxima renovação e continua utilizável até lá."
     },
     "success": {
         "connectedIcon": "{provider} conectado",

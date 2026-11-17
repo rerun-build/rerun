@@ -41,6 +41,9 @@ import { useAgentShareStore } from '@/stores/agent-share.store'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
 import { clearSearchParams } from '@/lib/clear-search-params'
+import { settleSlotsCheckoutAction } from '@/app/api/_actions/apps.actions'
+import { PAID_APP_PARAM, SLOTS_CHECKOUT_PARAM, isAppSlug } from '@/lib/apps/types'
+import { usePaidAppsStore } from '@rerun/cloud/apps.client'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
 import { createClient } from '@/supabase/client'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -133,6 +136,16 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         if (loading) return
         clearSearchParams(WORKSPACE_PARAM)
     }, [loading])
+
+    // Back from the Checkout of a lifetime workspace's first slot, or from leaving it: the slot is
+    // settled without waiting for the webhook, then the app reopens where the purchase started.
+    useEffect(() => {
+        const slug = searchParams.get(PAID_APP_PARAM)
+        if (!isAppSlug(slug) || loading) return
+        const sessionId = searchParams.get(SLOTS_CHECKOUT_PARAM)
+        clearSearchParams(PAID_APP_PARAM, SLOTS_CHECKOUT_PARAM)
+        void (sessionId ? settleSlotsCheckoutAction(slug, sessionId) : Promise.resolve()).finally(() => usePaidAppsStore.getState().openApp(slug))
+    }, [searchParams, loading])
 
     // Every end-of-access email links here: open billing straight away, once the account is known.
     useEffect(() => {

@@ -1,6 +1,6 @@
 'use client'
 
-import type { ComponentProps, ComponentType, ReactNode } from 'react'
+import { cloneElement, type ComponentProps, type ComponentType, type ReactElement, type ReactNode } from 'react'
 import { TRIAL_DAYS, formatAmount } from '@rerun/contracts'
 import { formatDate } from '@rerun/i18n/format'
 import { useLocale, useTranslations } from 'next-intl'
@@ -62,22 +62,32 @@ function slotTotal(overview: AppsOverview): number {
 function blockedReason(t: AppsTranslator, overview: AppsOverview): string | undefined {
     if (!overview.subscribed) return t('blocked.notSubscribed')
     if (overview.paused) return t('blocked.paused')
-    if (overview.allowance === 'buy_slot' && overview.workspaceTrialing) return t('blocked.trialSlot', { provider: appInfo(overview.slug).providerLabel })
+    if (overview.allowance === 'buy_slot' && overview.workspaceTrialing) return t(overview.lifetime ? 'blocked.lifetimeTrialSlot' : 'blocked.trialSlot', { provider: appInfo(overview.slug).providerLabel })
     return undefined
 }
 
 function slotsDescription(t: AppsTranslator, overview: AppsOverview, locale: string): string {
+    if (overview.slotsEndAt) return t('slots.lifetimeEnding', { date: shortDate(overview.slotsEndAt, locale) })
+    if (overview.lifetime) return overview.workspaceTrialing ? t('slots.lifetimeTrial', { price: slotPriceLabel(t, overview) }) : t('slots.lifetime', { price: slotPriceLabel(t, overview) })
     if (overview.subscriberTrialEndsAt) return t('slots.subscriberTrial', { date: shortDate(overview.subscriberTrialEndsAt, locale), price: slotPriceLabel(t, overview) })
     if (overview.workspaceTrialing && overview.stripeSlots > 0) return t('slots.workspaceTrial')
     return t('slots.paid', { price: slotPriceLabel(t, overview) })
 }
 
-function offer(t: AppsTranslator, overview: AppsOverview): { headline: string; detail: string } {
+function offer(t: AppsTranslator, overview: AppsOverview, locale: string): { headline: string; detail: string } {
     const price = slotPriceLabel(t, overview)
+    if (overview.slotsCheckoutTrialDays > 0) return { headline: t('offer.subscriberTrial.headline', { days: overview.slotsCheckoutTrialDays }), detail: t('offer.lifetimeTrial.detail', { price }) }
+    if (overview.lifetime && overview.allowance === 'buy_slot') return { headline: t('offer.buySlot.headline', { price }), detail: t('offer.lifetimeSlot.detail') }
     if (overview.allowance === 'subscriber_trial') return { headline: t('offer.subscriberTrial.headline', { days: TRIAL_DAYS }), detail: t('offer.subscriberTrial.detail', { price }) }
     if (overview.allowance === 'workspace_trial_slot') return { headline: t('offer.workspaceTrial.headline'), detail: t('offer.workspaceTrial.detail', { price }) }
-    if (overview.allowance === 'free_slot') return { headline: t('offer.freeSlot.headline'), detail: t('offer.freeSlot.detail') }
+    if (overview.allowance === 'free_slot') return { headline: t('offer.freeSlot.headline'), detail: freeSlotDetail(t, overview, locale) }
     return { headline: t('offer.buySlot.headline', { price }), detail: t('offer.buySlot.detail') }
+}
+
+function freeSlotDetail(t: AppsTranslator, overview: AppsOverview, locale: string): string {
+    if (!overview.lifetime) return t('offer.freeSlot.detail')
+    if (overview.slotsEndAt) return t('offer.freeSlot.detailLifetimeEnding', { date: shortDate(overview.slotsEndAt, locale) })
+    return t('offer.freeSlot.detailLifetime')
 }
 
 // Returned as an element rather than a string so its callers, which only render it, get it in the
@@ -94,12 +104,14 @@ function ConnectHint({ overview, reconnectLabel }: { overview: AppsOverview | nu
     return t('connectHint.default')
 }
 
-function AddSlotConfirm({ overview, pending, onAddSlot, children }: { overview: AppsOverview; pending: boolean; onAddSlot: () => void; children: ReactNode }) {
+// A lifetime workspace's first slot needs no confirmation here: Stripe's Checkout page is one.
+function AddSlotConfirm({ overview, pending, onAddSlot, children }: { overview: AppsOverview; pending: boolean; onAddSlot: () => void; children: ReactElement<{ onClick?: () => void }> }) {
     const t = useTranslations('apps')
+    if (overview.slotsCheckout) return cloneElement(children, { onClick: onAddSlot })
     return (
         <ConfirmDialog
             title={t('addSlot.title', { provider: appInfo(overview.slug).providerLabel })}
-            description={t('addSlot.description', { price: slotPriceLabel(t, overview) })}
+            description={t(overview.lifetime ? 'addSlot.descriptionLifetime' : 'addSlot.description', { price: slotPriceLabel(t, overview) })}
             confirmLabel={t('addSlot.confirm')}
             confirmVariant="default"
             pending={pending}
@@ -116,6 +128,7 @@ type IntroScreenProps = {
     pending: string | null
     onConnectStart: () => void
     onAddSlot: () => void
+    onRemoveSlot: () => void
 }
 
 // Accounts and slots belong to the workspace and its bill: a member sees them, an admin changes them.
@@ -126,11 +139,12 @@ function useBlockedReason(overview: AppsOverview): { reason: string | undefined;
 }
 
 // What a workspace sees before its first account: what the app does, what it costs, one way in.
-export function IntroScreen({ presentation, overview, pending, onConnectStart, onAddSlot }: IntroScreenProps) {
+export function IntroScreen({ presentation, overview, pending, onConnectStart, onAddSlot, onRemoveSlot }: IntroScreenProps) {
     const t = useTranslations('apps')
     const { name, providerLabel } = appInfo(presentation.slug)
-    const { reason: blocked } = useBlockedReason(overview)
-    const { headline, detail } = offer(t, overview)
+    const { reason: blocked, adminOnly } = useBlockedReason(overview)
+    const locale = useLocale()
+    const { headline, detail } = offer(t, overview, locale)
 
     return (
         <>
@@ -162,16 +176,19 @@ export function IntroScreen({ presentation, overview, pending, onConnectStart, o
                 {overview.allowance === 'buy_slot' && !blocked ? (
                     <AddSlotConfirm overview={overview} pending={pending === 'slot'} onAddSlot={onAddSlot}>
                         <Button loading={pending === 'slot'} className="max-sm:w-full">
-                            {t('addSlot.button')}
+                            {overview.slotsCheckoutTrialDays > 0 ? t('addSlot.startTrial') : t('addSlot.button')}
                         </Button>
                     </AddSlotConfirm>
                 ) : (
-                    <TooltipDisabledReason reason={blocked} className="max-sm:flex max-sm:w-full">
-                        <Button disabled={!!blocked} onClick={onConnectStart} className="max-sm:w-full">
-                            {t('intro.connect', { provider: providerLabel })}
-                            <ArrowRightIcon />
-                        </Button>
-                    </TooltipDisabledReason>
+                    <div className="flex gap-2 max-sm:w-full max-sm:flex-col-reverse">
+                        {canGiveBack(overview, adminOnly) && <GiveBackSlot overview={overview} pending={pending === 'slot'} onConfirm={onRemoveSlot} />}
+                        <TooltipDisabledReason reason={blocked} className="max-sm:flex max-sm:w-full">
+                            <Button disabled={!!blocked} onClick={onConnectStart} className="max-sm:w-full">
+                                {t('intro.connect', { provider: providerLabel })}
+                                <ArrowRightIcon />
+                            </Button>
+                        </TooltipDisabledReason>
+                    </div>
                 )}
             </footer>
         </>
@@ -185,10 +202,12 @@ type AccountsScreenProps = {
     onReconnect: (connection: AppConnectionView) => void
     onDisconnect: (connection: AppConnectionView) => void
     onAddSlot: () => void
+    // A lifetime workspace gives a slot back from here, having no billing dialog to do it in.
+    onRemoveSlot: () => void
 }
 
 // Every account and every slot in one list: a slot is either an account or a dashed place for one.
-export function AccountsScreen({ overview, pending, onConnectStart, onReconnect, onDisconnect, onAddSlot }: AccountsScreenProps) {
+export function AccountsScreen({ overview, pending, onConnectStart, onReconnect, onDisconnect, onAddSlot, onRemoveSlot }: AccountsScreenProps) {
     const t = useTranslations('apps')
     const locale = useLocale()
     const { providerLabel } = appInfo(overview.slug)
@@ -208,10 +227,17 @@ export function AccountsScreen({ overview, pending, onConnectStart, onReconnect,
                 )}
                 <div className="space-y-1.5">
                     {overview.connections.map(connection => (
-                        <AccountRow key={connection.id} slug={overview.slug} connection={connection} busy={pending === connection.id} reconnectBlocked={overview.paused} adminOnly={adminOnly} onReconnect={onReconnect} onDisconnect={onDisconnect} />
+                        <AccountRow key={connection.id} slug={overview.slug} connection={connection} busy={pending === connection.id} reconnectBlocked={overview.paused} adminOnly={adminOnly} lifetime={overview.lifetime} onReconnect={onReconnect} onDisconnect={onDisconnect} />
                     ))}
                     {Array.from({ length: freeSlots }, (_, index) => (
-                        <OpenSlotRow key={index} title={t('accounts.freeSlot')} description={freeSlotHint(t, overview)} blocked={blocked} onClick={onConnectStart} />
+                        <OpenSlotRow
+                            key={index}
+                            title={t('accounts.freeSlot')}
+                            description={freeSlotHint(t, overview)}
+                            blocked={blocked}
+                            onClick={onConnectStart}
+                            giveBack={canGiveBack(overview, !!adminOnly) ? <GiveBackSlot overview={overview} pending={pending === 'slot'} onConfirm={onRemoveSlot} /> : null}
+                        />
                     ))}
                     {freeSlots === 0 && <AddSlotRow overview={overview} blocked={blocked} pending={pending === 'slot'} onAddSlot={onAddSlot} />}
                 </div>
@@ -251,18 +277,44 @@ function OpenSlotButton({ title, description, className, ...props }: ComponentPr
     )
 }
 
-function OpenSlotRow({ title, description, blocked, onClick }: { title: string; description: string; blocked?: string; onClick: () => void }) {
+function OpenSlotRow({ title, description, blocked, onClick, giveBack }: { title: string; description: string; blocked?: string; onClick: () => void; giveBack?: ReactNode }) {
     return (
-        <TooltipDisabledReason reason={blocked} className="flex w-full">
-            <OpenSlotButton title={title} description={description} disabled={!!blocked} onClick={onClick} />
-        </TooltipDisabledReason>
+        <div className="flex items-center gap-2">
+            <TooltipDisabledReason reason={blocked} className="flex min-w-0 flex-1">
+                <OpenSlotButton title={title} description={description} disabled={!!blocked} onClick={onClick} />
+            </TooltipDisabledReason>
+            {giveBack}
+        </div>
+    )
+}
+
+// A lifetime workspace has no billing dialog: an empty slot is given back where it shows.
+function canGiveBack(overview: AppsOverview, adminOnly: boolean): boolean {
+    return overview.lifetime && overview.canRemoveSlot && !overview.slotsEndAt && !adminOnly
+}
+
+// An empty slot of a lifetime workspace, given back from the next renewal.
+function GiveBackSlot({ overview, pending, onConfirm }: { overview: AppsOverview; pending: boolean; onConfirm: () => void }) {
+    const t = useTranslations('apps')
+    return (
+        <ConfirmDialog
+            title={t('accounts.giveBackTitle', { provider: appInfo(overview.slug).providerLabel })}
+            description={t('accounts.giveBackDescription')}
+            confirmLabel={t('accounts.giveBack')}
+            pending={pending}
+            onConfirm={onConfirm}
+        >
+            <Button size="sm" variant="ghost" className="shrink-0 text-muted-foreground" disabled={pending}>
+                {t('accounts.giveBack')}
+            </Button>
+        </ConfirmDialog>
     )
 }
 
 function AddSlotRow({ overview, blocked, pending, onAddSlot }: { overview: AppsOverview; blocked?: string; pending: boolean; onAddSlot: () => void }) {
     const t = useTranslations('apps')
     const title = t('accounts.addAnother')
-    const description = t('accounts.addAnotherHint', { price: slotPriceLabel(t, overview) })
+    const description = t(overview.lifetime ? 'accounts.addAnotherHintLifetime' : 'accounts.addAnotherHint', { price: slotPriceLabel(t, overview) })
     if (blocked) {
         return (
             <TooltipDisabledReason reason={blocked} className="flex w-full">
@@ -338,11 +390,13 @@ function AccountRow({
     busy,
     reconnectBlocked,
     adminOnly,
+    lifetime,
     onReconnect,
     onDisconnect,
 }: {
     slug: AppSlug
     connection: AppConnectionView
+    lifetime: boolean
     busy: boolean
     reconnectBlocked: boolean
     adminOnly?: string
@@ -378,7 +432,7 @@ function AccountRow({
                             <Tooltip>
                                 <ConfirmDialog
                                     title={t('accounts.disconnectTitle', { name })}
-                                    description={t('accounts.disconnectDescription', { provider: providerLabel })}
+                                    description={t(lifetime ? 'accounts.disconnectDescriptionLifetime' : 'accounts.disconnectDescription', { provider: providerLabel })}
                                     confirmLabel={t('accounts.disconnect')}
                                     pending={busy}
                                     onConfirm={() => onDisconnect(connection)}

@@ -570,7 +570,8 @@
     },
     "paidApp": {
         "slotAdded": "Platz zu deinem Tarif hinzugefügt.",
-        "slotAddedTrial": "Platz hinzugefügt, {price} während deiner Testphase."
+        "slotAddedTrial": "Platz hinzugefügt, {price} während deiner Testphase.",
+        "slotRemoved": "Platz zurückgegeben. Er bleibt bis zu deiner nächsten Verlängerung nutzbar."
     },
     "linkedinPro": {
         "description": "Die LinkedIn-Konten, mit denen deine Coworker handeln.",

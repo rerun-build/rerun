@@ -2,16 +2,13 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
-import { formatNumber } from '@rerun/i18n/format'
-import { useLocale, useTranslations } from 'next-intl'
-import { addAppSlotAction, cancelAppConnectAction, connectWhatsappAction, disconnectAppConnectionAction, getAppsOverviewAction, submitAppCheckpointAction } from '@/app/api/_actions/apps.actions'
+import { cancelAppConnectAction, connectWhatsappAction, disconnectAppConnectionAction, getAppsOverviewAction, submitAppCheckpointAction } from '@/app/api/_actions/apps.actions'
 import type { AppConnectionView, AppsOverview, ConnectOutcome } from '@/app/api/_services/apps.service'
 import type { WhatsappConnectInput, WhatsappLinkMethod } from '@/components/apps/WhatsappProViews'
 import { WhatsappProDialogView, type WhatsappProScreen } from '@/components/dialogs/WhatsappProDialogView'
 import { countryFromLocale } from '@/lib/phone/normalize'
 import { usePaidAppsStore } from '@/stores/paid-apps.store'
-import { randomUuid } from '@/lib/random-uuid'
+import { usePaidAppSlots } from '@/components/apps/usePaidAppSlots'
 
 const SLUG = 'whatsapp'
 const ACCOUNTS: WhatsappProScreen = { kind: 'accounts' }
@@ -27,9 +24,7 @@ function preferredMethod(): WhatsappLinkMethod {
 }
 
 export function WhatsappProDialog() {
-    const t = useTranslations('dialogs')
     const errorText = useErrorText()
-    const locale = useLocale()
     const open = usePaidAppsStore(s => s.openSlug === SLUG)
     const reconnectId = usePaidAppsStore(s => s.reconnectId)
     const closeApp = usePaidAppsStore(s => s.closeApp)
@@ -194,17 +189,7 @@ export function WhatsappProDialog() {
         await load()
     }
 
-    const addSlot = async () => {
-        setPending('slot')
-        setError(null)
-        const result = await addAppSlotAction(SLUG, randomUuid())
-        setPending(null)
-        if (!result.ok) return setError(errorText(result))
-        toast.success(result.value.trialSlot ? t('paidApp.slotAddedTrial', { price: formatNumber(0, locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }) : t('paidApp.slotAdded'))
-        // The webhook moves the slot count, a moment after Stripe answers.
-        setTimeout(() => void load(), 1500)
-        await load()
-    }
+    const { addSlot, removeSlot } = usePaidAppSlots(SLUG, { load, setPending, setError })
 
     const startConnect = (reconnect: { id: string; label: string | null } | null) => {
         setError(null)
@@ -226,6 +211,7 @@ export function WhatsappProDialog() {
             onReconnect={connection => startConnect({ id: connection.id, label: connection.label })}
             onDisconnect={disconnect}
             onAddSlot={addSlot}
+            onRemoveSlot={removeSlot}
             onBack={back}
             onSubmitNumber={submitNumber}
             onNewCode={newCode}

@@ -11,13 +11,17 @@
         "notSubscribed": "Abonniere zuerst Rerun",
         "paused": "Dein Workspace ist pausiert",
         "trialSlot": "Eine Testphase umfasst einen {provider}-Platz. Upgrade deinen Plan, um mehr hinzuzufügen.",
+        "lifetimeTrialSlot": "Dein kostenloser Test umfasst einen {provider}-Platz. Füge weitere hinzu, sobald er endet.",
         "adminOnly": "Nur ein Admin kann kostenpflichtige Apps verwalten"
     },
     "slots": {
         "footer": "<b>{used} von {total, plural, one {# Platz} other {# Plätzen}} belegt</b>, {description}",
         "subscriberTrial": "der erste kostenlos bis {date}, danach {price}",
         "workspaceTrial": "0 $ während deiner Testphase, danach mit deinem Plan abgerechnet",
-        "paid": "je {price}, mit deinem Plan abgerechnet"
+        "paid": "je {price}, mit deinem Plan abgerechnet",
+        "lifetime": "je {price}, monatlich abgerechnet",
+        "lifetimeTrial": "kostenlos während deines Tests, danach je {price}",
+        "lifetimeEnding": "sie enden am {date}"
     },
     "offer": {
         "subscriberTrial": {
@@ -28,13 +32,21 @@
             "headline": "0 $ während deiner Testphase",
             "detail": "Danach {price} pro Konto, mit deinem Plan abgerechnet"
         },
+        "lifetimeTrial": {
+            "detail": "Danach {price} pro Konto, monatlich abgerechnet"
+        },
         "freeSlot": {
             "headline": "Ein Platz ist frei",
-            "detail": "Er ist schon in deinem Plan enthalten"
+            "detail": "Er ist schon in deinem Plan enthalten",
+            "detailLifetime": "Schon in deinen monatlichen Plätzen enthalten",
+            "detailLifetimeEnding": "Deine Plätze enden am {date}"
         },
         "buySlot": {
             "headline": "{price} pro Konto",
             "detail": "Wird deinem Plan hinzugefügt, heute anteilig für den Rest des Zeitraums berechnet"
+        },
+        "lifetimeSlot": {
+            "detail": "Monatlich abgerechnet, getrennt von deinem Lifetime-Plan"
         }
     },
     "connectHint": {
@@ -46,8 +58,10 @@
     "addSlot": {
         "title": "{provider}-Platz hinzufügen?",
         "description": "{price} wird deinem Plan hinzugefügt. Heute wird dir der Rest des laufenden Zeitraums berechnet.",
+        "descriptionLifetime": "{price} kommt zu deinen monatlichen Plätzen hinzu. Heute zahlst du anteilig für den Rest des Monats.",
         "confirm": "Platz hinzufügen",
-        "button": "Platz hinzufügen"
+        "button": "Platz hinzufügen",
+        "startTrial": "Kostenlosen Test starten"
     },
     "intro": {
         "connect": "{provider} verbinden"
@@ -94,6 +108,7 @@
         },
         "addAnother": "Weiteres Konto hinzufügen",
         "addAnotherHint": "Fügt deinem Plan einen Platz für {price} hinzu",
+        "addAnotherHintLifetime": "Fügt einen Platz für {price} hinzu",
         "status": {
             "connected": "Bereit",
             "needsReconnect": "Erneut anmelden",
@@ -114,8 +129,12 @@
         "disconnectLabel": "{name} trennen",
         "disconnectTitle": "{name} trennen?",
         "disconnectDescription": "Seine Coworker verlieren sofort ihre {provider}-Tools. Der Platz bleibt in deinem Plan, bis du ihn unter Abrechnung entfernst.",
+        "disconnectDescriptionLifetime": "Seine Coworker verlieren sofort ihre {provider}-Tools. Der Platz bleibt dir, bis du ihn hier zurückgibst.",
         "disconnect": "Trennen",
-        "disconnectTooltip": "Dieses Konto trennen"
+        "disconnectTooltip": "Dieses Konto trennen",
+        "giveBack": "Zurückgeben",
+        "giveBackTitle": "Diesen {provider}-Platz zurückgeben?",
+        "giveBackDescription": "Ab deiner nächsten Verlängerung wird er nicht mehr berechnet und bleibt bis dahin nutzbar."
     },
     "success": {
         "connectedIcon": "{provider} verbunden",

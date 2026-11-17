@@ -19,6 +19,11 @@ import { isLifetimePlan } from '@/ee/lib/billing/plans'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
+import { usePaidAppsStore } from '@/stores/paid-apps.store'
+import { AppIcon } from '@/components/apps/PaidAppViews'
+import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
+import { appInfo } from '@/lib/apps/catalog'
+import type { AppSlug } from '@/lib/apps/types'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import { BillingDialogShell } from './billing/BillingDialogShell'
@@ -126,6 +131,10 @@ export function BillingDialog() {
                         close()
                         useWorkspaceSettingsStore.getState().openAiProviders()
                     }}
+                    onOpenApp={slug => {
+                        close()
+                        usePaidAppsStore.getState().openApp(slug)
+                    }}
                 />
             ) : resolved.kind === 'credit' ? (
                 <CreditPurchaseShell onClose={close} />
@@ -193,8 +202,10 @@ function CreditPurchaseShell({ onClose }: { onClose: () => void }) {
     )
 }
 
-function LifetimeShell({ onConnectAi }: { onConnectAi: () => void }) {
+// The paid apps are not part of the lifetime plan: they are bought apart, from their own dialog.
+function LifetimeShell({ onConnectAi, onOpenApp }: { onConnectAi: () => void; onOpenApp: (slug: AppSlug) => void }) {
     const t = useTranslations('billing.dialog')
+    const apps = useEnabledPaidApps()
     return (
         <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
             <DialogTitle className="sr-only">{t('title')}</DialogTitle>
@@ -203,9 +214,21 @@ function LifetimeShell({ onConnectAi }: { onConnectAi: () => void }) {
                 title={t('lifetime.title')}
                 description={t('lifetime.description')}
                 action={
-                    <Button size="sm" variant="outline" onClick={onConnectAi}>
-                        {t('lifetime.connectAi')}
-                    </Button>
+                    <div className="flex flex-col items-center gap-3">
+                        <Button size="sm" variant="outline" onClick={onConnectAi}>
+                            {t('lifetime.connectAi')}
+                        </Button>
+                        {apps.length > 0 && (
+                            <div className="flex flex-wrap justify-center gap-1">
+                                {apps.map(slug => (
+                                    <Button key={slug} size="sm" variant="ghost" onClick={() => onOpenApp(slug)}>
+                                        <AppIcon slug={slug} size="xs" />
+                                        {appInfo(slug).name}
+                                    </Button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 }
             />
         </DialogContent>

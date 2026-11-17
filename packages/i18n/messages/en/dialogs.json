@@ -647,7 +647,8 @@
     },
     "paidApp": {
         "slotAdded": "Slot added to your plan.",
-        "slotAddedTrial": "Slot added, {price} during your trial."
+        "slotAddedTrial": "Slot added, {price} during your trial.",
+        "slotRemoved": "Slot given back. It stays usable until your next renewal."
     },
     "linkedinPro": {
         "description": "The LinkedIn accounts your coworkers act with.",

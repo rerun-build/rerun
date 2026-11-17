@@ -570,7 +570,8 @@
     },
     "paidApp": {
         "slotAdded": "Emplacement ajouté à votre forfait.",
-        "slotAddedTrial": "Emplacement ajouté, {price} pendant votre essai."
+        "slotAddedTrial": "Emplacement ajouté, {price} pendant votre essai.",
+        "slotRemoved": "Emplacement rendu. Il reste utilisable jusqu’à votre prochain renouvellement."
     },
     "linkedinPro": {
         "description": "Les comptes LinkedIn avec lesquels vos coworkers agissent.",

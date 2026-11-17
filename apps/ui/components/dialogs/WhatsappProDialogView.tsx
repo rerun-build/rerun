@@ -32,6 +32,7 @@ export type WhatsappProDialogViewProps = {
     onReconnect: (connection: AppConnectionView) => void
     onDisconnect: (connection: AppConnectionView) => void
     onAddSlot: () => void
+    onRemoveSlot: () => void
     onBack: () => void
     onSubmitNumber: (input: WhatsappConnectInput) => void
     onNewCode: () => void
@@ -69,9 +70,9 @@ export function WhatsappProDialogView(props: WhatsappProDialogViewProps) {
                                 {!overview ? (
                                     <AccountsSkeleton />
                                 ) : intro ? (
-                                    <IntroScreen presentation={WHATSAPP_PRESENTATION} overview={overview} pending={pending} onConnectStart={props.onConnectStart} onAddSlot={props.onAddSlot} />
+                                    <IntroScreen presentation={WHATSAPP_PRESENTATION} overview={overview} pending={pending} onConnectStart={props.onConnectStart} onAddSlot={props.onAddSlot} onRemoveSlot={props.onRemoveSlot} />
                                 ) : (
-                                    <AccountsScreen overview={overview} pending={pending} onConnectStart={props.onConnectStart} onReconnect={props.onReconnect} onDisconnect={props.onDisconnect} onAddSlot={props.onAddSlot} />
+                                    <AccountsScreen overview={overview} pending={pending} onConnectStart={props.onConnectStart} onReconnect={props.onReconnect} onDisconnect={props.onDisconnect} onAddSlot={props.onAddSlot} onRemoveSlot={props.onRemoveSlot} />
                                 )}
                             </>
                         )}

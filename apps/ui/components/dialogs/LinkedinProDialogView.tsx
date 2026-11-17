@@ -32,6 +32,7 @@ export type LinkedinProDialogViewProps = {
     onReconnect: (connection: AppConnectionView) => void
     onDisconnect: (connection: AppConnectionView) => void
     onAddSlot: () => void
+    onRemoveSlot: () => void
     onBack: () => void
     onSubmitCredentials: (credentials: LinkedinCredentials) => void
     onSubmitCode: (code?: string) => void
@@ -64,9 +65,9 @@ export function LinkedinProDialogView(props: LinkedinProDialogViewProps) {
                                 {!overview ? (
                                     <AccountsSkeleton />
                                 ) : intro ? (
-                                    <IntroScreen presentation={LINKEDIN_PRESENTATION} overview={overview} pending={pending} onConnectStart={props.onConnectStart} onAddSlot={props.onAddSlot} />
+                                    <IntroScreen presentation={LINKEDIN_PRESENTATION} overview={overview} pending={pending} onConnectStart={props.onConnectStart} onAddSlot={props.onAddSlot} onRemoveSlot={props.onRemoveSlot} />
                                 ) : (
-                                    <AccountsScreen overview={overview} pending={pending} onConnectStart={props.onConnectStart} onReconnect={props.onReconnect} onDisconnect={props.onDisconnect} onAddSlot={props.onAddSlot} />
+                                    <AccountsScreen overview={overview} pending={pending} onConnectStart={props.onConnectStart} onReconnect={props.onReconnect} onDisconnect={props.onDisconnect} onAddSlot={props.onAddSlot} onRemoveSlot={props.onRemoveSlot} />
                                 )}
                             </>
                         )}

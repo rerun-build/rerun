@@ -570,7 +570,8 @@
     },
     "paidApp": {
         "slotAdded": "Vaga adicionada ao seu plano.",
-        "slotAddedTrial": "Vaga adicionada, {price} durante o seu teste."
+        "slotAddedTrial": "Vaga adicionada, {price} durante o seu teste.",
+        "slotRemoved": "Vaga devolvida. Ela continua utilizável até a sua próxima renovação."
     },
     "linkedinPro": {
         "description": "As contas do LinkedIn com que seus coworkers atuam.",

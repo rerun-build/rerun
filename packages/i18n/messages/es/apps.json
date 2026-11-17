@@ -11,13 +11,17 @@
         "notSubscribed": "Suscríbete primero a Rerun",
         "paused": "Tu workspace está en pausa",
         "trialSlot": "Una prueba incluye un solo espacio de {provider}. Mejora tu plan para añadir más.",
+        "lifetimeTrialSlot": "Tu prueba gratuita incluye un solo espacio de {provider}. Añade más cuando termine.",
         "adminOnly": "Solo un admin puede gestionar las apps de pago"
     },
     "slots": {
         "footer": "<b>{used} de {total, plural, one {# espacio usado} other {# espacios usados}}</b>, {description}",
         "subscriberTrial": "el primero gratis hasta el {date}, después {price}",
         "workspaceTrial": "0 $ durante tu prueba, facturado con tu plan después",
-        "paid": "{price} cada uno, facturado con tu plan"
+        "paid": "{price} cada uno, facturado con tu plan",
+        "lifetime": "{price} cada uno, facturado cada mes",
+        "lifetimeTrial": "gratis durante tu prueba, después {price} cada uno",
+        "lifetimeEnding": "terminan el {date}"
     },
     "offer": {
         "subscriberTrial": {
@@ -28,13 +32,21 @@
             "headline": "0 $ durante tu prueba",
             "detail": "Después {price} por cuenta, facturado con tu plan"
         },
+        "lifetimeTrial": {
+            "detail": "Después {price} por cuenta, facturado cada mes"
+        },
         "freeSlot": {
             "headline": "Tienes un espacio esperando",
-            "detail": "Ya está incluido en tu plan"
+            "detail": "Ya está incluido en tu plan",
+            "detailLifetime": "Ya incluido en tus espacios mensuales",
+            "detailLifetimeEnding": "Tus espacios terminan el {date}"
         },
         "buySlot": {
             "headline": "{price} por cuenta",
             "detail": "Se añade a tu plan, facturado hoy por el resto del periodo"
+        },
+        "lifetimeSlot": {
+            "detail": "Facturado cada mes, aparte de tu plan de por vida"
         }
     },
     "connectHint": {
@@ -46,8 +58,10 @@
     "addSlot": {
         "title": "¿Añadir un espacio de {provider}?",
         "description": "{price} se añade a tu plan. Se te cobra hoy lo que queda del periodo actual.",
+        "descriptionLifetime": "{price} se añade a tus espacios mensuales. Hoy pagas lo que queda del mes en curso.",
         "confirm": "Añadir",
-        "button": "Añadir un espacio"
+        "button": "Añadir un espacio",
+        "startTrial": "Empezar la prueba gratuita"
     },
     "intro": {
         "connect": "Conectar {provider}"
@@ -94,6 +108,7 @@
         },
         "addAnother": "Añadir otra cuenta",
         "addAnotherHint": "Añade un espacio de {price} a tu plan",
+        "addAnotherHintLifetime": "Añade un espacio por {price}",
         "status": {
             "connected": "Lista",
             "needsReconnect": "Inicia sesión de nuevo",
@@ -114,8 +129,12 @@
         "disconnectLabel": "Desconectar {name}",
         "disconnectTitle": "¿Desconectar {name}?",
         "disconnectDescription": "Sus coworkers pierden sus herramientas de {provider} al instante. El espacio sigue en tu plan hasta que lo quites en Facturación.",
+        "disconnectDescriptionLifetime": "Sus coworkers pierden sus herramientas de {provider} al instante. El espacio sigue siendo tuyo hasta que lo devuelvas aquí.",
         "disconnect": "Desconectar",
-        "disconnectTooltip": "Desconectar esta cuenta"
+        "disconnectTooltip": "Desconectar esta cuenta",
+        "giveBack": "Devolver",
+        "giveBackTitle": "¿Devolver este espacio de {provider}?",
+        "giveBackDescription": "Deja de facturarse a partir de tu próxima renovación y sigue disponible hasta entonces."
     },
     "success": {
         "connectedIcon": "{provider} conectado",

@@ -3,15 +3,14 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { formatNumber } from '@rerun/i18n/format'
-import { useLocale, useTranslations } from 'next-intl'
-import { addAppSlotAction, cancelAppConnectAction, connectLinkedinAction, disconnectAppConnectionAction, getAppsOverviewAction, resendAppCodeAction, submitAppCheckpointAction } from '@/app/api/_actions/apps.actions'
+import { useTranslations } from 'next-intl'
+import { cancelAppConnectAction, connectLinkedinAction, disconnectAppConnectionAction, getAppsOverviewAction, resendAppCodeAction, submitAppCheckpointAction } from '@/app/api/_actions/apps.actions'
 import type { AppConnectionView, AppsOverview, ConnectOutcome } from '@/app/api/_services/apps.service'
 import { countryFromLocale } from '@/components/apps/linkedin-countries'
 import type { ApprovalWait, LinkedinCredentials } from '@/components/apps/LinkedinProViews'
 import { LinkedinProDialogView, type LinkedinProScreen } from '@/components/dialogs/LinkedinProDialogView'
 import { usePaidAppsStore } from '@/stores/paid-apps.store'
-import { randomUuid } from '@/lib/random-uuid'
+import { usePaidAppSlots } from '@/components/apps/usePaidAppSlots'
 
 const ACCOUNTS: LinkedinProScreen = { kind: 'accounts' }
 const POLL_MS = 5_000
@@ -24,7 +23,6 @@ type CheckpointResult = Awaited<ReturnType<typeof submitAppCheckpointAction>>
 export function LinkedinProDialog() {
     const t = useTranslations('dialogs')
     const errorText = useErrorText()
-    const locale = useLocale()
     const open = usePaidAppsStore(s => s.openSlug === SLUG)
     const reconnectId = usePaidAppsStore(s => s.reconnectId)
     const closeApp = usePaidAppsStore(s => s.closeApp)
@@ -166,17 +164,7 @@ export function LinkedinProDialog() {
         await load()
     }
 
-    const addSlot = async () => {
-        setPending('slot')
-        setError(null)
-        const result = await addAppSlotAction(SLUG, randomUuid())
-        setPending(null)
-        if (!result.ok) return setError(errorText(result))
-        toast.success(result.value.trialSlot ? t('paidApp.slotAddedTrial', { price: formatNumber(0, locale, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }) }) : t('paidApp.slotAdded'))
-        // The webhook moves the slot count, a moment after Stripe answers.
-        setTimeout(() => void load(), 1500)
-        await load()
-    }
+    const { addSlot, removeSlot } = usePaidAppSlots(SLUG, { load, setPending, setError })
 
     return (
         <LinkedinProDialogView
@@ -198,6 +186,7 @@ export function LinkedinProDialog() {
             }}
             onDisconnect={disconnect}
             onAddSlot={addSlot}
+            onRemoveSlot={removeSlot}
             onBack={back}
             onSubmitCredentials={submitCredentials}
             onSubmitCode={submitCode}

@@ -29,13 +29,17 @@
         "notSubscribed": "Subscribe to Rerun first",
         "paused": "Your workspace is paused",
         "trialSlot": "A trial holds one {provider} slot. Upgrade your plan to add more.",
+        "lifetimeTrialSlot": "Your free trial holds one {provider} slot. Add more once it ends.",
         "adminOnly": "Only an admin can manage paid apps"
     },
     "slots": {
         "footer": "<b>{used} of {total, plural, one {# slot} other {# slots}} used</b>, {description}",
         "subscriberTrial": "first one free until {date}, then {price}",
         "workspaceTrial": "$0 during your trial, billed with your plan after",
-        "paid": "{price} each, billed with your plan"
+        "paid": "{price} each, billed with your plan",
+        "lifetime": "{price} each, billed monthly",
+        "lifetimeTrial": "free during your trial, then {price} each",
+        "lifetimeEnding": "they end on {date}"
     },
     "offer": {
         "subscriberTrial": {
@@ -46,13 +50,21 @@
             "headline": "$0 during your trial",
             "detail": "Then {price} per account, billed with your plan"
         },
+        "lifetimeTrial": {
+            "detail": "Then {price} per account, billed monthly"
+        },
         "freeSlot": {
             "headline": "A slot is waiting",
-            "detail": "It is already on your plan"
+            "detail": "It is already on your plan",
+            "detailLifetime": "Already in your monthly slots",
+            "detailLifetimeEnding": "Your slots end on {date}"
         },
         "buySlot": {
             "headline": "{price} per account",
             "detail": "Added to your plan, billed today for the rest of the period"
+        },
+        "lifetimeSlot": {
+            "detail": "Billed monthly, apart from your lifetime plan"
         }
     },
     "connectHint": {
@@ -64,8 +76,10 @@
     "addSlot": {
         "title": "Add a {provider} slot?",
         "description": "{price} is added to your plan. You are charged today for what is left of the current period.",
+        "descriptionLifetime": "{price} is added to your monthly slots. You are charged today for what is left of the month.",
         "confirm": "Add slot",
-        "button": "Add a slot"
+        "button": "Add a slot",
+        "startTrial": "Start free trial"
     },
     "intro": {
         "connect": "Connect {provider}"
@@ -112,6 +126,7 @@
         },
         "addAnother": "Add another account",
         "addAnotherHint": "Adds a slot at {price} to your plan",
+        "addAnotherHintLifetime": "Adds a slot at {price}",
         "status": {
             "connected": "Ready",
             "needsReconnect": "Sign in again",
@@ -132,8 +147,12 @@
         "disconnectLabel": "Disconnect {name}",
         "disconnectTitle": "Disconnect {name}?",
         "disconnectDescription": "Its coworkers lose their {provider} tools right away. The slot stays on your plan until you remove it from Billing.",
+        "disconnectDescriptionLifetime": "Its coworkers lose their {provider} tools right away. The slot stays yours until you give it back here.",
         "disconnect": "Disconnect",
-        "disconnectTooltip": "Disconnect this account"
+        "disconnectTooltip": "Disconnect this account",
+        "giveBack": "Give back",
+        "giveBackTitle": "Give back this {provider} slot?",
+        "giveBackDescription": "It is no longer billed from your next renewal, and stays usable until then."
     },
     "success": {
         "connectedIcon": "{provider} connected",

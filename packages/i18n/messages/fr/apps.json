@@ -11,13 +11,17 @@
         "notSubscribed": "Abonnez-vous d’abord à Rerun",
         "paused": "Votre workspace est en pause",
         "trialSlot": "Un essai comprend un seul emplacement {provider}. Passez à un plan supérieur pour en ajouter.",
+        "lifetimeTrialSlot": "Votre essai gratuit inclut un seul emplacement {provider}. Ajoutez-en d’autres une fois l’essai terminé.",
         "adminOnly": "Seul un admin peut gérer les apps payantes"
     },
     "slots": {
         "footer": "<b>{used} sur {total, plural, one {# emplacement utilisé} other {# emplacements utilisés}}</b>, {description}",
         "subscriberTrial": "le premier offert jusqu’au {date}, puis {price}",
         "workspaceTrial": "0 $ pendant votre essai, facturé avec votre plan ensuite",
-        "paid": "{price} chacun, facturé avec votre plan"
+        "paid": "{price} chacun, facturé avec votre plan",
+        "lifetime": "{price} chacun, facturé chaque mois",
+        "lifetimeTrial": "gratuits pendant votre essai, puis {price} chacun",
+        "lifetimeEnding": "ils prennent fin le {date}"
     },
     "offer": {
         "subscriberTrial": {
@@ -28,13 +32,21 @@
             "headline": "0 $ pendant votre essai",
             "detail": "Puis {price} par compte, facturé avec votre plan"
         },
+        "lifetimeTrial": {
+            "detail": "Puis {price} par compte, facturé chaque mois"
+        },
         "freeSlot": {
             "headline": "Un emplacement vous attend",
-            "detail": "Il est déjà inclus dans votre plan"
+            "detail": "Il est déjà inclus dans votre plan",
+            "detailLifetime": "Déjà inclus dans vos emplacements mensuels",
+            "detailLifetimeEnding": "Vos emplacements prennent fin le {date}"
         },
         "buySlot": {
             "headline": "{price} par compte",
             "detail": "Ajouté à votre plan, facturé aujourd’hui pour le reste de la période"
+        },
+        "lifetimeSlot": {
+            "detail": "Facturé chaque mois, à part de votre plan à vie"
         }
     },
     "connectHint": {
@@ -46,8 +58,10 @@
     "addSlot": {
         "title": "Ajouter un emplacement {provider} ?",
         "description": "{price} est ajouté à votre plan. Vous êtes facturé aujourd’hui pour le reste de la période en cours.",
+        "descriptionLifetime": "{price} s’ajoute à vos emplacements mensuels. Vous payez aujourd’hui ce qui reste du mois en cours.",
         "confirm": "Ajouter",
-        "button": "Ajouter un emplacement"
+        "button": "Ajouter un emplacement",
+        "startTrial": "Commencer l’essai gratuit"
     },
     "intro": {
         "connect": "Connecter {provider}"
@@ -94,6 +108,7 @@
         },
         "addAnother": "Ajouter un autre compte",
         "addAnotherHint": "Ajoute un emplacement à {price} à votre plan",
+        "addAnotherHintLifetime": "Ajoute un emplacement à {price}",
         "status": {
             "connected": "Prêt",
             "needsReconnect": "À reconnecter",
@@ -114,8 +129,12 @@
         "disconnectLabel": "Déconnecter {name}",
         "disconnectTitle": "Déconnecter {name} ?",
         "disconnectDescription": "Ses coworkers perdent leurs outils {provider} immédiatement. L’emplacement reste sur votre plan jusqu’à ce que vous le retiriez dans Facturation.",
+        "disconnectDescriptionLifetime": "Ses coworkers perdent aussitôt leurs outils {provider}. L’emplacement reste à vous jusqu’à ce que vous le rendiez ici.",
         "disconnect": "Déconnecter",
-        "disconnectTooltip": "Déconnecter ce compte"
+        "disconnectTooltip": "Déconnecter ce compte",
+        "giveBack": "Rendre",
+        "giveBackTitle": "Rendre cet emplacement {provider} ?",
+        "giveBackDescription": "Il n’est plus facturé à partir de votre prochain renouvellement et reste utilisable d’ici là."
     },
     "success": {
         "connectedIcon": "{provider} connecté",
