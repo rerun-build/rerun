@@ -413,6 +413,12 @@ class Station:
         args = {"agentId": agent, "message": cut_brief(item, self.repo, plans[-1]), "waitSeconds": 1,
                 "goal": {"lastLineForms": GOAL, "turnLimit": 3}}
         try:
+            model = tiers.model_for("cut", tiers.tier_for("cut", "medium", self.cfg.get("tiers")), self.cfg.get("tier_models"))
+        except ValueError:
+            model = None
+        if model:
+            args.update(model)
+        try:
             result = self.account("send_message", args)
         except Exception as e:
             rid = None

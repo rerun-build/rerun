@@ -142,6 +142,7 @@
     "proof": "medium",
     "replan": "medium",
     "plan": "high",
+    "cut": "medium",
     "resolve": "high"
   },
   "tier_models": {
@@ -197,6 +198,12 @@
     },
     "plan": {
       "high": {
+        "model": "claude-opus-5-5",
+        "thinkingLevel": "medium"
+      }
+    },
+    "cut": {
+      "medium": {
         "model": "claude-opus-5-5",
         "thinkingLevel": "medium"
       }

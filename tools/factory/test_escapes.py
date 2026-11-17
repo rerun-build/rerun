@@ -21,6 +21,13 @@ class Find(unittest.TestCase):
     def test_a_merged_issue_that_is_open_again_escaped(self):
         self.assertEqual(E.find([job(5)], {5}, {}, T0), [(5, "reopened")])
 
+    def test_a_repairs_line_that_says_none_names_no_job(self):
+        body = "**Repairs**: none, no child of #198 was cut for this ask (its only listed child, #721, is a different gate)"
+        self.assertEqual(E.repairs(body), [])
+
+    def test_a_number_in_the_explanation_after_the_job_is_not_a_repair(self):
+        self.assertEqual(E.repairs("**Repairs**: #727 (the chunk beside #728 carried nothing of it)"), [727])
+
     def test_a_later_job_that_names_it_on_a_repairs_line_escaped(self):
         jobs = [job(5), job(9, body="**Repairs**: #5")]
         self.assertEqual(E.find(jobs, set(), {}, T0), [(5, "repair #9")])
