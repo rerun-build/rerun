@@ -92,6 +92,20 @@ class ReviewSha(unittest.TestCase):
         self.assertEqual(bodies, ["Review ACCEPT @abcdef01: LINUS ACCEPT @abcdef01: looks fine"])
         self.assertTrue(G.REVIEW_RE.match(bodies[0]))
 
+    def test_a_proof_of_twenty_asks_is_posted_whole(self):
+        note = "\n".join("ASK %d: MET tools/factory/planning.py:%d test_number_%d shows it holds for the queue, the copy and the head" % (n, 300 + n, n) for n in range(1, 21))
+        posted, out = [], io.StringIO()
+
+        def fake_run(cmd, *a, **k):
+            posted.append(cmd)
+            return subprocess.CompletedProcess(cmd, 0, "https://github.com/o/r/pull/9#issuecomment-1\n", "")
+        with mock.patch.object(G, "gh_json", lambda path, **k: {"head": {"sha": self.HEAD}}), \
+                mock.patch.object(G.subprocess, "run", fake_run), contextlib.redirect_stdout(out):
+            code = G.review(["rerun", "9", "ACCEPT", "--as", "bruce", "--note", note])
+        self.assertEqual(code, 0, out.getvalue())
+        self.assertGreater(len(note), 1500)
+        self.assertTrue(posted[0][posted[0].index("--body") + 1].endswith(note))
+
     def test_matching_sha_posts(self):
         for sha in (self.HEAD, self.HEAD[:8], self.HEAD[:7].upper()):
             code, out, bodies = self.review("--sha", sha)

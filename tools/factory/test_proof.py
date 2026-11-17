@@ -52,6 +52,16 @@ class Judge(unittest.TestCase):
         out = "\n".join([met(1), "PROOF: PASS @" + HEAD])
         self.assertEqual(proof.judge(out, 1, HEAD), ("pass", None))
 
+    def test_the_lines_a_prover_posted_with_the_review_tool_are_found_for_the_head(self):
+        lines = "\n".join([met(1), met(2)])
+        bodies = ["Review ACCEPT @abcdef12: LINUS ACCEPT @abcdef12: the diff is right",
+                  "Review ACCEPT @1234567a: BRUCE ACCEPT @1234567a: " + met(1),
+                  "Review ACCEPT @abcdef12: BRUCE ACCEPT @abcdef12: " + lines,
+                  "a note with ASK 9: MET x that no review tool wrote", None]
+        self.assertEqual(proof.posted(bodies, HEAD), lines)
+        self.assertIsNone(proof.posted(bodies[:2] + bodies[3:], HEAD))
+        self.assertEqual(proof.judge(proof.posted(bodies, HEAD) + "\nPROOF: PASS @abcdef1", 2, HEAD), ("pass", None))
+
     def test_count_mismatch(self):
         two = "\n".join([met(1), met(2), "PROOF: PASS @abcdef1"])
         four = "\n".join([met(1), met(2), met(3), met(4), "PROOF: PASS @abcdef1"])

@@ -126,6 +126,27 @@ class Proof(ProofBase):
         self.assertIn("Your last answer could not be read", T.D.proof_brief(job, 9, "abcdef1234", ["x"]))
         self.assertNotIn("Your last answer could not be read", T.D.proof_brief(job, 9, "1234567890", ["x"]))
 
+    def test_lines_posted_on_the_pull_request_count_when_the_answer_has_only_the_last_line(self):
+        self.to_proving()
+        self.w.pr_comments = ["Review ACCEPT @abcdef12: BRUCE ACCEPT @abcdef12: " + MET]
+        self.w.finish("r2", "All 5 asks are MET, I posted the lines on the pull request.\nPROOF: PASS @abcdef1")
+        self.tick()
+        self.assertEqual(self.state(), "checks")
+
+    def test_posted_lines_of_another_commit_do_not_count(self):
+        self.to_proving()
+        self.w.pr_comments = ["Review ACCEPT @1234567a: BRUCE ACCEPT @1234567a: " + MET]
+        self.w.finish("r2", "I posted the lines.\nPROOF: PASS @abcdef1")
+        self.tick()
+        self.assertEqual(self.state(), "proof_wait")
+
+    def test_a_posted_ask_not_met_under_a_pass_line_goes_to_a_fix(self):
+        self.to_proving()
+        self.w.pr_comments = ["Review ACCEPT @abcdef12: BRUCE ACCEPT @abcdef12: " + met(notmet=(5,))]
+        self.w.finish("r2", "I posted the lines.\nPROOF: PASS @abcdef1")
+        self.tick()
+        self.assertEqual(self.state(), "fix_wait")
+
     def test_pass_with_an_ask_not_met_goes_to_fix(self):
         self.to_proving()
         self.w.finish("r2", met(notmet=(5,)) + "\nPROOF: PASS @abcdef1")
