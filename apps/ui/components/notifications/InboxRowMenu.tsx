@@ -20,6 +20,24 @@ type InboxRowMenuProps = {
 // Behind the ⋯ of an inbox row, the switch that turns off the reason it reached you, with an Undo.
 export function InboxRowMenu({ agentId, agentName, onOpenChange }: InboxRowMenuProps) {
     const t = useTranslations('notifications.inbox.rowMenu')
+
+    return (
+        <DropdownMenu onOpenChange={onOpenChange}>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon-sm" aria-label={t('options')} className="text-muted-foreground">
+                    <EllipsisIcon />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+                <InboxRowMenuItems agentId={agentId} agentName={agentName} />
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
+
+// Mounted only while the menu is open: every row of a long inbox reading the preferences slowed its opening.
+function InboxRowMenuItems({ agentId, agentName }: Omit<InboxRowMenuProps, 'onOpenChange'>) {
+    const t = useTranslations('notifications.inbox.rowMenu')
     const { ruleOf, setCoworkerRule } = useNotificationPrefs()
     const rule = ruleOf(agentId)
 
@@ -30,31 +48,24 @@ export function InboxRowMenu({ agentId, agentName, onOpenChange }: InboxRowMenuP
     }
 
     return (
-        <DropdownMenu onOpenChange={onOpenChange}>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon-sm" aria-label={t('options')} className="text-muted-foreground">
-                    <EllipsisIcon />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-                {rule.follow && (
-                    <DropdownMenuItem onSelect={() => apply({ ...rule, follow: false }, t('unfollowed', { name: agentName }))}>
-                        <CalendarClock />
-                        {t('unfollow')}
-                    </DropdownMenuItem>
-                )}
-                {rule.mode !== 'muted' && (
-                    <DropdownMenuItem onSelect={() => apply({ ...rule, mode: 'muted' }, t('muted', { name: agentName }))}>
-                        <BellOff />
-                        <span className="truncate">{t('mute', { name: agentName })}</span>
-                    </DropdownMenuItem>
-                )}
-                {(rule.follow || rule.mode !== 'muted') && <DropdownMenuSeparator />}
-                <DropdownMenuItem onSelect={() => useNotificationsStore.getState().openNotifications(agentId)}>
-                    <SettingsIcon />
-                    {t('settings')}
+        <>
+            {rule.follow && (
+                <DropdownMenuItem onSelect={() => apply({ ...rule, follow: false }, t('unfollowed', { name: agentName }))}>
+                    <CalendarClock />
+                    {t('unfollow')}
                 </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+            )}
+            {rule.mode !== 'muted' && (
+                <DropdownMenuItem onSelect={() => apply({ ...rule, mode: 'muted' }, t('muted', { name: agentName }))}>
+                    <BellOff />
+                    <span className="truncate">{t('mute', { name: agentName })}</span>
+                </DropdownMenuItem>
+            )}
+            {(rule.follow || rule.mode !== 'muted') && <DropdownMenuSeparator />}
+            <DropdownMenuItem onSelect={() => useNotificationsStore.getState().openNotifications(agentId)}>
+                <SettingsIcon />
+                {t('settings')}
+            </DropdownMenuItem>
+        </>
     )
 }

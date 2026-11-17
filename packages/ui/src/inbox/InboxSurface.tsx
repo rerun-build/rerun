@@ -65,6 +65,10 @@ const LIST_MIN_HEIGHT = 160
 const LIST_MAX_HEIGHT = 576
 // Header, chips and footer of the card, plus the corner row it rises from.
 const LIST_CHROME_HEIGHT = 224
+// More than the tallest list shows: the rest of the rows mount once the card is on screen.
+const FIRST_SCREEN_ROWS = 12
+// Past the row's drop and the pill's spring, the two ways the card opens.
+const REST_OF_ROWS_DELAY_MS = 300
 const DRAG_THRESHOLD = 3
 const KEYBOARD_RESIZE_STEP = 32
 
@@ -258,12 +262,19 @@ export function InboxSurface<T extends InboxEntry>({
 
     const shownSection = sections.some(section => section.key === activeSection) ? activeSection : (sections[0]?.key ?? null)
 
+    // A chip may name a section whose rows are not mounted yet: it mounts them all, then scrolls once the section is there.
+    const [pendingJump, setPendingJump] = useState<string | null>(null)
     const jumpToSection = (title: string) => {
-        const node = listEl?.querySelector<HTMLElement>(`[data-section="${title}"]`)
-        if (!listEl || !node) return
         setActiveSection(title)
-        listEl.scrollTo({ top: node.offsetTop, behavior: reducedMotion ? 'auto' : 'smooth' })
+        setPendingJump(title)
     }
+    useLayoutEffect(() => {
+        if (!pendingJump || !listEl) return
+        const node = listEl.querySelector<HTMLElement>(`[data-section="${pendingJump}"]`)
+        if (!node && sectionKey.split(',').includes(pendingJump)) return
+        setPendingJump(null)
+        if (node) listEl.scrollTo({ top: node.offsetTop, behavior: reducedMotion ? 'auto' : 'smooth' })
+    }, [pendingJump, listEl, reducedMotion, sectionKey])
 
     const clampListHeight = (height: number) => Math.min(Math.max(height, LIST_MIN_HEIGHT), Math.min(LIST_MAX_HEIGHT, window.innerHeight - LIST_CHROME_HEIGHT))
 
@@ -392,14 +403,13 @@ export function InboxSurface<T extends InboxEntry>({
                     {sections.length === 0 ? (
                         <EmptyState icon={InboxIcon} title={t('inbox.empty.title')} description={t('inbox.empty.description')} className="py-8" />
                     ) : (
-                        sections.map(section => (
-                            <section key={section.key} data-section={section.key} className="flex flex-col">
-                                <h3 className="px-2 pt-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{t(`inbox.sections.${section.key}`)}</h3>
-                                {section.items.map(item => (
-                                    <InboxRow key={item.id} item={item} onOpen={onOpenItem} onMarkRead={onMarkRead} reason={rowReason?.(item)} Menu={RowMenu} onMenuOpenChange={onRowMenuOpenChange} />
-                                ))}
-                            </section>
-                        ))
+                        <InboxSections
+                            sections={sections}
+                            // Back from a detail the list is scrolled where it was left: its rows are all needed at once.
+                            startWithAllRows={listScrollRef.current > 0}
+                            revealAll={pendingJump !== null}
+                            renderRow={item => <InboxRow key={item.id} item={item} onOpen={onOpenItem} onMarkRead={onMarkRead} reason={rowReason?.(item)} Menu={RowMenu} onMenuOpenChange={onRowMenuOpenChange} />}
+                        />
                     )}
                 </div>
             </div>
@@ -581,6 +591,35 @@ export function InboxSurface<T extends InboxEntry>({
 
         </div>
     )
+}
+
+type ShownSection<T extends InboxEntry> = InboxSection & { items: T[] }
+
+// Mounting every row of a long inbox at once froze the card's opening: the first screen comes with the
+// card, the rest in one go once it has finished opening, so they never cut into its animation.
+function InboxSections<T extends InboxEntry>({ sections, startWithAllRows, revealAll, renderRow }: { sections: ShownSection<T>[]; startWithAllRows: boolean; revealAll: boolean; renderRow: (item: T) => ReactNode }) {
+    const t = useKitTranslations()
+    const [allRows, setAllRows] = useState(startWithAllRows)
+    if (revealAll && !allRows) setAllRows(true)
+
+    useEffect(() => {
+        if (allRows) return
+        const timer = setTimeout(() => startTransition(() => setAllRows(true)), REST_OF_ROWS_DELAY_MS)
+        return () => clearTimeout(timer)
+    }, [allRows])
+
+    let budget = allRows ? Infinity : FIRST_SCREEN_ROWS
+    return sections.map(section => {
+        if (budget <= 0) return null
+        const rows = section.items.slice(0, budget)
+        budget -= rows.length
+        return (
+            <section key={section.key} data-section={section.key} className="flex flex-col">
+                <h3 className="px-2 pt-2 pb-1 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">{t(`inbox.sections.${section.key}`)}</h3>
+                {rows.map(renderRow)}
+            </section>
+        )
+    })
 }
 
 function AnnouncementLine({ announcement, animated }: { announcement: InboxAnnouncement; animated: boolean }) {
