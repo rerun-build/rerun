@@ -130,5 +130,38 @@ class Renewal(unittest.TestCase):
         self.assertEqual(self.out.getvalue().count("sign-in time not readable"), 2)
 
 
+class PlanWeek(unittest.TestCase):
+    beat, state, hold = Renewal.beat, Renewal.state, Renewal.hold
+
+    def make(self, used):
+        Renewal.make(self, [issue(5)])
+        self.w.sign_in = {"minutesLeft": 400, "renewalDue": False}
+        self.d.cfg["plan_week_hold_percent"] = 95
+        inner = self.d.account
+
+        def account(tool, args, timeout=30):
+            got = inner(tool, args)
+            if tool == "list_ai_connections":
+                got["connections"][0]["planLimits"] = {"windows": [{"kind": "weekly", "label": None, "usedPercent": used, "resetsAt": "2099-01-01T00:00:00.000Z"}]}
+            return got
+
+        self.d.account = account
+
+    def test_a_plan_week_at_the_hold_mark_stops_new_sends_and_says_so_once(self):
+        self.make(96)
+        self.beat()
+        self.w.clock += 30
+        self.beat()
+        self.assertEqual(len(self.w.sends), 0)
+        self.assertEqual(self.hold()["kind"], "plan week")
+        self.assertEqual(self.out.getvalue().count("plan week is 96 % used"), 1)
+
+    def test_a_plan_week_under_the_hold_mark_sends(self):
+        self.make(94)
+        self.beat()
+        self.assertEqual((self.state(5), len(self.w.sends)), ("building", 1))
+        self.assertIsNone(self.hold())
+
+
 if __name__ == "__main__":
     unittest.main()
