@@ -1028,11 +1028,16 @@ class Dispatcher:
 
     def close_stale(self):
         ids = {n: a for a, n in self.names.items()}
-        live = {j.get("run") for j in self.jobs()}
-        rows = self.store.db.execute("SELECT run_id, coworker FROM fires WHERE status='running' AND run_id IS NOT NULL AND job GLOB '[0-9]*' "
-                                     "AND intent_at < ? ORDER BY id", (iso(self.now() - STALE_RUN_S),)).fetchall()
+        live = {j.get("run") for j in self.jobs() if j["state"] in RUNNING} | {r.get("run") for r in self.station.live().values()}
+        rows = self.store.db.execute("SELECT run_id, coworker FROM fires WHERE status='running' AND run_id IS NOT NULL "
+                                     "AND (job GLOB '[0-9]*' OR job GLOB 'plan:*') AND intent_at < ? ORDER BY id",
+                                     (iso(self.now() - STALE_RUN_S),)).fetchall()
         skip = self.__dict__.setdefault("stale_skip", set())
-        for run, who in [r for r in rows if r[0] not in live and r[0] not in skip and r[1] in ids][:STALE_RUNS_A_BEAT]:
+        for run, who in [r for r in rows if r[0] not in live and r[0] not in skip][:STALE_RUNS_A_BEAT]:
+            if who not in ids:
+                self.store.db.execute("UPDATE fires SET status='lost', ended_at=?, error=? WHERE run_id=?",
+                                      (iso(self.now()), "coworker %s is not in the pools: the run cannot be read" % who, run))
+                continue
             try:
                 r = self.account("get_run", {"agentId": ids[who], "runId": run}) or {}
             except Error:
