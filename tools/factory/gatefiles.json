@@ -1,0 +1,14 @@
+{"files": [
+  "tools/factory/proof.py",
+  "tools/factory/redgreen.py",
+  "tools/factory/cutshape.py",
+  "tools/factory/plancheck.py",
+  "tools/factory/launch.py",
+  "tools/factory/refresh.py",
+  "tools/factory/control-bounds.json",
+  "tools/factory/dispatch.json",
+  "tools/factory/dispatch.py",
+  "tools/factory/reviewpacket.py",
+  "tools/factory/gatefiles.py",
+  "tools/factory/gatefiles.json"
+]}
