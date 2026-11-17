@@ -1,10 +1,11 @@
 'use client'
 
-import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type SkillProposal, type SkillProposalDecision } from '@rerun/contracts'
 import { useCallback, useEffect, useState } from 'react'
 
 import { peekForemanPendingRequestAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { peekPendingRequestAction } from '@/app/api/_actions/session.actions'
+import { decideSkillProposalAction } from '@/app/api/_actions/skill-proposal.actions'
 import { useAgentModel } from '@/hooks/useAgentModel'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { sendForemanThreadMessage, sendSessionMessage } from '@/lib/chat/send-session-message'
@@ -13,6 +14,9 @@ import { resolveSessionId } from '@/lib/notifications/open-conversation'
 export type InboxPeek = { state: 'loading' } | { state: 'unreadable' } | { state: 'ready'; sessionId: string; peek: PendingRequestPeek }
 
 export type PeekAnswerOutcome = 'sent' | 'busy' | 'stale' | 'failed'
+
+/** The proposal as the engine left it, which may be a decision taken elsewhere first. */
+export type PeekDecisionOutcome = { proposal: SkillProposal } | 'stale' | 'failed'
 
 /** The conversation an inbox entry stands for: a row knows its session, an announcement only the engine's id. */
 export type InboxPeekTarget = { agentId: string; sessionId: string | null; engineSessionId: string | null }
@@ -61,5 +65,15 @@ export function useInboxPeek({ agentId, sessionId, engineSessionId }: InboxPeekT
         [agentId, model, peek]
     )
 
-    return { peek, answer }
+    // No read first: the engine only moves a proposal still waiting, and answers with where it stands.
+    const decide = useCallback(
+        async (proposalId: string, decision: SkillProposalDecision): Promise<PeekDecisionOutcome> => {
+            if (peek.state !== 'ready' || peek.peek.proposal?.id !== proposalId) return 'stale'
+            const result = await decideSkillProposalAction(peek.sessionId, proposalId, decision)
+            return result.proposal ? { proposal: result.proposal } : 'failed'
+        },
+        [peek]
+    )
+
+    return { peek, answer, decide }
 }

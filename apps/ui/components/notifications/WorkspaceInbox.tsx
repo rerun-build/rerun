@@ -285,6 +285,6 @@ export function InboxSurface({ items, onMarkAllRead, keepOpen = false, ...props 
 }
 
 function InboxPeek({ peek, anchor, onClose, onBack, onOpenConversation }: { peek: Peek; anchor: 'bottom' | 'top'; onClose: () => void; onBack: () => void; onOpenConversation: () => void }) {
-    const { peek: state, answer } = useInboxPeek(peek.target)
-    return <InboxPeekCard entry={peek.entry} peek={state} anchor={anchor} onAnswer={answer} onClose={onClose} onBack={onBack} onOpenConversation={onOpenConversation} />
+    const { peek: state, answer, decide } = useInboxPeek(peek.target)
+    return <InboxPeekCard entry={peek.entry} peek={state} anchor={anchor} onAnswer={answer} onDecide={decide} onClose={onClose} onBack={onBack} onOpenConversation={onOpenConversation} />
 }

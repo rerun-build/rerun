@@ -2,7 +2,7 @@ import { actorFromContext, assertAgentAccess, assertSessionInWorkspace, keepVisi
 import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget, type SessionUsageSeed, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { type HistoryMessage, transformEngineMessages } from '@/lib/chat/engine-history'
-import { pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
+import { openSkillProposal, pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
 import { ATTENTION_NOTIFICATION_COLUMNS, attentionDetailsOf, attentionNotificationsFilter } from '@/lib/notifications/attention-details'
@@ -356,9 +356,14 @@ export async function readSessionMessages(sessionId: string): Promise<HistoryMes
     return transformEngineMessages(messages)
 }
 
-// What the conversation waits on, read the way the chat would read it when opened.
+// What the conversation waits on, read the way the chat would read it when opened. Without its
+// proposals, the request is still worth showing.
 export async function readPendingRequest(sessionId: string): Promise<PendingRequestPeek> {
-    return pendingRequestPeek(await readSessionMessages(sessionId))
+    const ctx = await getSessionEngineContext(sessionId)
+    if (!ctx || !ctx.engineSessionId) return pendingRequestPeek([])
+    const { conn, engineAgentId, engineSessionId } = ctx
+    const [messages, proposals] = await Promise.all([getSessionMessages(conn, engineAgentId, engineSessionId).then(transformEngineMessages), listSkillProposals(conn, engineAgentId, engineSessionId).catch(() => [])])
+    return pendingRequestPeek(messages, openSkillProposal(proposals))
 }
 
 export type SessionSnapshot = {

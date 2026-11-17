@@ -3,19 +3,20 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ peekPendingRequestAction: vi.fn(), peekForemanPendingRequestAction: vi.fn(), sendSessionMessage: vi.fn(), sendForemanThreadMessage: vi.fn() }))
+const mocks = vi.hoisted(() => ({ peekPendingRequestAction: vi.fn(), peekForemanPendingRequestAction: vi.fn(), sendSessionMessage: vi.fn(), sendForemanThreadMessage: vi.fn(), decideSkillProposalAction: vi.fn() }))
 vi.mock('@/app/api/_actions/session.actions', () => ({ peekPendingRequestAction: mocks.peekPendingRequestAction }))
 vi.mock('@/app/api/_actions/foreman-conversation.actions', () => ({ peekForemanPendingRequestAction: mocks.peekForemanPendingRequestAction }))
 vi.mock('@/lib/chat/send-session-message', () => ({ sendSessionMessage: mocks.sendSessionMessage, sendForemanThreadMessage: mocks.sendForemanThreadMessage }))
 vi.mock('@/lib/notifications/open-conversation', () => ({ resolveSessionId: async () => null }))
 vi.mock('@/hooks/useAgentModel', () => ({ useAgentModel: () => ({ selection: {} }) }))
+vi.mock('@/app/api/_actions/skill-proposal.actions', () => ({ decideSkillProposalAction: mocks.decideSkillProposalAction }))
 
 const { FOREMAN_AGENT_ID } = await import('@rerun/contracts')
 const { useInboxPeek } = await import('./useInboxPeek')
 
 type Hook = ReturnType<typeof useInboxPeek>
 
-const approvalPeek = (toolCallId = 'call-1') => ({ pending: { kind: 'approval', toolCallId, input: { approvals: [{ action: 'Send the weekly report' }] } }, ask: 'Ready to send.', before: null })
+const approvalPeek = (toolCallId = 'call-1') => ({ pending: { kind: 'approval', toolCallId, input: { approvals: [{ action: 'Send the weekly report' }] } }, ask: 'Ready to send.', before: null, proposal: null })
 
 let container: HTMLDivElement
 let root: Root
@@ -84,5 +85,41 @@ describe('useInboxPeek', () => {
         await render('closer', true, '2026-11-17T10:05:00Z')
         expect(mocks.peekPendingRequestAction).toHaveBeenCalledTimes(2)
         expect(seen.peek).toMatchObject({ peek: { pending: { toolCallId: 'call-2' } } })
+    })
+
+    it('decides the skill proposal the conversation waits on, and hands back where it stands', async () => {
+        const proposal = { id: 'proposal-1', status: 'proposed' }
+        mocks.peekPendingRequestAction.mockResolvedValue({ pending: null, ask: 'Keep it as a skill?', before: null, proposal })
+        mocks.decideSkillProposalAction.mockResolvedValue({ success: true, proposal: { ...proposal, status: 'dismissed' } })
+        await render('closer')
+
+        let outcome: unknown
+        await act(async () => {
+            outcome = await seen.decide('proposal-1', 'dismiss')
+        })
+        expect(mocks.decideSkillProposalAction).toHaveBeenCalledWith('session-1', 'proposal-1', 'dismiss')
+        expect(outcome).toEqual({ proposal: { id: 'proposal-1', status: 'dismissed' } })
+    })
+
+    it('sends no decision on a proposal the card is not showing', async () => {
+        mocks.peekPendingRequestAction.mockResolvedValue(approvalPeek())
+        await render('closer')
+        let outcome: unknown
+        await act(async () => {
+            outcome = await seen.decide('proposal-1', 'accept')
+        })
+        expect(outcome).toBe('stale')
+        expect(mocks.decideSkillProposalAction).not.toHaveBeenCalled()
+    })
+
+    it('reports a decision the engine refused', async () => {
+        mocks.peekPendingRequestAction.mockResolvedValue({ pending: null, ask: '', before: null, proposal: { id: 'proposal-1', status: 'proposed' } })
+        mocks.decideSkillProposalAction.mockResolvedValue({ success: false, error: 'updateProposalFailed' })
+        await render('closer')
+        let outcome: unknown
+        await act(async () => {
+            outcome = await seen.decide('proposal-1', 'accept')
+        })
+        expect(outcome).toBe('failed')
     })
 })

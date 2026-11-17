@@ -4,7 +4,9 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { InboxEntry } from '@rerun/ui/inbox'
 
-import type { InboxPeek, PeekAnswerOutcome } from '@/hooks/useInboxPeek'
+import type { SkillProposal } from '@rerun/contracts'
+
+import type { InboxPeek, PeekAnswerOutcome, PeekDecisionOutcome } from '@/hooks/useInboxPeek'
 
 vi.mock('next-intl', async () => {
     const { createTranslator } = await import('use-intl')
@@ -27,6 +29,10 @@ vi.mock('@/components/ai-elements/message', () => ({ MessageResponse: ({ childre
 vi.mock('@/components/chat/HitlReceipt', () => ({ HitlReceipt: ({ reply }: { reply: { kind: string } }) => createElement('div', { 'data-receipt': reply.kind }) }))
 vi.mock('@/components/chat/QuestionForm', () => ({ QuestionForm: ({ onSend }: { onSend: (text: string) => void }) => createElement('button', { 'data-hitl': 'answer', onClick: () => onSend('**How?**\nFriendly') }) }))
 vi.mock('@/components/chat/SecretRequestBlock', () => ({ SecretRequestBlock: () => createElement('div', { 'data-hitl': 'secret' }) }))
+vi.mock('@/components/chat/SkillProposalBlock', () => ({
+    SkillProposalBlock: ({ proposal, onDecide }: { proposal: SkillProposal; onDecide?: (id: string, decision: 'accept' | 'dismiss') => void }) =>
+        createElement('div', { 'data-proposal': proposal.status }, proposal.title, onDecide && createElement('button', { 'data-hitl': 'remember', onClick: () => onDecide(proposal.id, 'accept') })),
+}))
 
 const { InboxPeekCard } = await import('./InboxPeekCard')
 
@@ -35,8 +41,25 @@ const ENTRY: InboxEntry = { id: 'session-1', agentId: 'closer', agentName: 'Clos
 const approvalPeek = (before: string | null = 'I drafted 23 follow-ups.'): InboxPeek => ({
     state: 'ready',
     sessionId: 'session-1',
-    peek: { pending: { kind: 'approval', toolCallId: 'call-1', input: { approvals: [{ action: 'Send the follow-up to lena@northwind.io' }] } }, ask: 'I need your go before it leaves.', before },
+    peek: { pending: { kind: 'approval', toolCallId: 'call-1', input: { approvals: [{ action: 'Send the follow-up to lena@northwind.io' }] } }, ask: 'I need your go before it leaves.', before, proposal: null },
 })
+
+const PROPOSAL: SkillProposal = {
+    id: 'proposal-1',
+    sessionId: 'engine-session-1',
+    toolCallId: 'call-9',
+    mode: 'edit',
+    slug: 'order-handling',
+    title: 'Order notices',
+    summary: 'Leave out zero-value lines',
+    instructions: ['Leave out zero-value lines in a new-order notice'],
+    status: 'proposed',
+    appliedSlug: null,
+    error: null,
+    createdAt: '2026-11-17T16:20:00.000Z',
+}
+
+const proposalPeek = (): InboxPeek => ({ state: 'ready', sessionId: 'session-1', peek: { pending: null, ask: '', before: 'I suggest keeping it in the order-handling skill.', proposal: PROPOSAL } })
 
 let container: HTMLDivElement
 let root: Root
@@ -55,8 +78,8 @@ afterEach(() => {
     vi.useRealTimers()
 })
 
-function render(peek: InboxPeek, onAnswer: (text: string) => Promise<PeekAnswerOutcome> = async () => 'sent', onClose = () => {}) {
-    act(() => root.render(createElement(InboxPeekCard, { entry: ENTRY, peek, onAnswer, onClose, onOpenConversation: () => {} })))
+function render(peek: InboxPeek, onAnswer: (text: string) => Promise<PeekAnswerOutcome> = async () => 'sent', onClose = () => {}, onDecide: () => Promise<PeekDecisionOutcome> = async () => 'stale') {
+    act(() => root.render(createElement(InboxPeekCard, { entry: ENTRY, peek, onAnswer, onDecide, onClose, onOpenConversation: () => {} })))
 }
 
 async function click(hitl: string) {
@@ -85,7 +108,7 @@ describe('InboxPeekCard', () => {
     it('folds back on its own once the receipt has been read', async () => {
         vi.useFakeTimers()
         const onClose = vi.fn()
-        render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'question', toolCallId: 'call-2', input: { questions: [{ question: 'How?', options: ['Friendly'] }] } }, ask: 'One thing first.', before: null } }, async () => 'sent', onClose)
+        render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'question', toolCallId: 'call-2', input: { questions: [{ question: 'How?', options: ['Friendly'] }] } }, ask: 'One thing first.', before: null, proposal: null } }, async () => 'sent', onClose)
         await click('answer')
         expect(onClose).not.toHaveBeenCalled()
         act(() => vi.advanceTimersByTime(3000))
@@ -107,14 +130,14 @@ describe('InboxPeekCard', () => {
     })
 
     it('offers only the conversation for a request the card cannot answer', () => {
-        render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'service', toolCallId: 'call-3', input: { services: [{ slug: 'stripe' }] } }, ask: 'Connect Stripe so I can read invoices.', before: null } })
+        render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'service', toolCallId: 'call-3', input: { services: [{ slug: 'stripe' }] } }, ask: 'Connect Stripe so I can read invoices.', before: null, proposal: null } })
         expect(container.textContent).toContain('Open the conversation to answer.')
     })
 
     it('goes back to the list without closing the inbox', async () => {
         const onBack = vi.fn()
         const onClose = vi.fn()
-        act(() => root.render(createElement(InboxPeekCard, { entry: ENTRY, peek: approvalPeek(), onAnswer: async () => 'sent' as const, onClose, onBack })))
+        act(() => root.render(createElement(InboxPeekCard, { entry: ENTRY, peek: approvalPeek(), onAnswer: async () => 'sent' as const, onDecide: async () => 'stale' as const, onClose, onBack })))
         const back = container.querySelector<HTMLButtonElement>('button[aria-label="Back"]')
         if (!back) throw new Error('no Back button on screen')
         await act(async () => back.click())
@@ -147,12 +170,48 @@ describe('InboxPeekCard', () => {
 
     it('has no pill for a request answered in the conversation only', () => {
         visibility.current = 'out-of-view'
-        render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'service', toolCallId: 'call-3', input: { services: [{ slug: 'stripe' }] } }, ask: 'Connect Stripe.', before: null } })
+        render({ state: 'ready', sessionId: 'session-1', peek: { pending: { kind: 'service', toolCallId: 'call-3', input: { services: [{ slug: 'stripe' }] } }, ask: 'Connect Stripe.', before: null, proposal: null } })
         expect(container.textContent).not.toContain('App to connect')
     })
 
+    it('offers a skill proposal to decide on the spot instead of calling it answered', () => {
+        render(proposalPeek())
+        expect(container.textContent).toContain('Order notices')
+        expect(container.querySelector('[data-hitl="remember"]')).not.toBeNull()
+        expect(container.textContent).not.toContain('This was already answered.')
+    })
+
+    it('decides the proposal, shows where it stands, then folds back', async () => {
+        vi.useFakeTimers()
+        const onClose = vi.fn()
+        const onDecide = vi.fn(async (): Promise<PeekDecisionOutcome> => ({ proposal: { ...PROPOSAL, status: 'accepted' } }))
+        render(proposalPeek(), async () => 'sent', onClose, onDecide)
+        await click('remember')
+        expect(onDecide).toHaveBeenCalledWith('proposal-1', 'accept')
+        expect(container.querySelector('[data-proposal="accepted"]')).not.toBeNull()
+        expect(container.querySelector('[data-hitl="remember"]')).toBeNull()
+        expect(onClose).not.toHaveBeenCalled()
+        act(() => vi.advanceTimersByTime(3000))
+        expect(onClose).toHaveBeenCalled()
+    })
+
+    it('gives the proposal back when the decision did not go through', async () => {
+        render(proposalPeek(), async () => 'sent', () => {}, async () => 'failed')
+        await click('remember')
+        expect(container.textContent).toContain('Your answer did not go through.')
+        expect(container.querySelector('[data-hitl="remember"]')).not.toBeNull()
+    })
+
+    it('leaves a proposal to the chat while a request that pauses the run waits', () => {
+        const peek = approvalPeek()
+        if (peek.state !== 'ready') throw new Error('unexpected peek')
+        render({ ...peek, peek: { ...peek.peek, proposal: PROPOSAL } })
+        expect(container.querySelector('[data-hitl="approve"]')).not.toBeNull()
+        expect(container.querySelector('[data-proposal]')).toBeNull()
+    })
+
     it('reads a conversation that waits on nothing anymore as answered', () => {
-        render({ state: 'ready', sessionId: 'session-1', peek: { pending: null, ask: 'Done, all sent.', before: null } })
+        render({ state: 'ready', sessionId: 'session-1', peek: { pending: null, ask: 'Done, all sent.', before: null, proposal: null } })
         expect(container.textContent).toContain('This was already answered.')
     })
 })

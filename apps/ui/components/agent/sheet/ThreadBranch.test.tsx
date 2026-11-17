@@ -36,7 +36,7 @@ vi.mock('@/hooks/useInboxPeek', () => ({
     useInboxPeek: (_target: unknown, enabled: boolean, revision?: string) => {
         inbox.enabled.push(enabled)
         inbox.revisions.push(revision)
-        return { peek: inbox.peek, answer: inbox.answer }
+        return { peek: inbox.peek, answer: inbox.answer, decide: async () => 'stale' as const }
     },
 }))
 
@@ -63,7 +63,7 @@ const thread = (status: ThreadRow['status']): ThreadRow => ({
 const approval = (toolCallId = 'call-1'): InboxPeek => ({
     state: 'ready',
     sessionId: 'session-1',
-    peek: { pending: { kind: 'approval', toolCallId, input: { approvals: [{ action: 'Send the follow-up to lena@northwind.io' }] } }, ask: 'I need your go before it leaves.', before: 'I drafted 23 follow-ups.' },
+    peek: { pending: { kind: 'approval', toolCallId, input: { approvals: [{ action: 'Send the follow-up to lena@northwind.io' }] } }, ask: 'I need your go before it leaves.', before: 'I drafted 23 follow-ups.', proposal: null },
 })
 
 let container: HTMLDivElement

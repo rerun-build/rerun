@@ -1,5 +1,6 @@
 'use client'
 
+import type { SkillProposal, SkillProposalDecision } from '@rerun/contracts'
 import { Skeleton } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState, type ReactNode, type Ref } from 'react'
@@ -9,7 +10,8 @@ import { ActionApprovalBlock } from '@/components/chat/ActionApprovalBlock'
 import { HitlReceipt } from '@/components/chat/HitlReceipt'
 import { QuestionForm } from '@/components/chat/QuestionForm'
 import { SecretRequestBlock } from '@/components/chat/SecretRequestBlock'
-import type { InboxPeek, PeekAnswerOutcome } from '@/hooks/useInboxPeek'
+import { SkillProposalBlock } from '@/components/chat/SkillProposalBlock'
+import type { InboxPeek, PeekAnswerOutcome, PeekDecisionOutcome } from '@/hooks/useInboxPeek'
 import { HITL_CANCELLED, parseHitlReply, pendingApprovals, pendingQuestions, pendingSecrets, serializeApprovalDecisions } from '@/lib/chat-hitl'
 import type { PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { ChevronDown } from '@/lib/icons'
@@ -21,7 +23,14 @@ const MARKDOWN = 'text-sm break-words [&_li]:my-0.5 [&_ol]:my-1 [&_p]:my-1 [&_pr
 
 export type PendingRequest = NonNullable<PendingRequestPeek['pending']>
 
-export type PeekPhase = { step: 'asking' } | { step: 'sending' } | { step: 'sent'; text: string } | { step: 'stale' }
+export type PeekPhase = { step: 'asking' } | { step: 'sending' } | { step: 'sent'; text: string } | { step: 'decided'; proposal: SkillProposal } | { step: 'stale' }
+
+type PeekReceiptPhase = Extract<PeekPhase, { step: 'sent' } | { step: 'decided' }>
+
+type PeekActions = {
+    answer: (text: string) => Promise<PeekAnswerOutcome>
+    decide: (proposalId: string, decision: SkillProposalDecision) => Promise<PeekDecisionOutcome>
+}
 
 export type PeekNotice = 'busy' | 'failed'
 
@@ -33,11 +42,11 @@ export function isAnswerable(pending: PendingRequest): boolean {
 }
 
 /**
- * Sends an answer to a peeked request, shows the receipt for a moment, then hands over to `onDone`.
- * A card that leaves keeps its receipt while it goes; one that stays calls `rearm` for the next request,
- * and when the request it was showing is gone.
+ * Sends an answer to a peeked request, or a decision on a skill proposal, shows the receipt for a
+ * moment, then hands over to `onDone`. A card that leaves keeps its receipt while it goes; one that
+ * stays calls `rearm` for the next request, and when the request it was showing is gone.
  */
-export function usePeekAnswer(onAnswer: (text: string) => Promise<PeekAnswerOutcome>, onDone: (rearm: () => void) => void) {
+export function usePeekAnswer({ answer, decide }: PeekActions, onDone: (rearm: () => void) => void) {
     const [phase, setPhase] = useState<PeekPhase>({ step: 'asking' })
     const [notice, setNotice] = useState<PeekNotice | null>(null)
     // A widget latches once submitted: a failed send gives a fresh one back.
@@ -54,23 +63,36 @@ export function usePeekAnswer(onAnswer: (text: string) => Promise<PeekAnswerOutc
     }, [])
 
     useEffect(() => {
-        if (phase.step !== 'sent') return
+        if (phase.step !== 'sent' && phase.step !== 'decided') return
         const timer = setTimeout(() => onDoneRef.current(rearm), RECEIPT_MS)
         return () => clearTimeout(timer)
     }, [phase.step, rearm])
 
-    const submit = async (text: string) => {
-        setNotice(null)
-        setPhase({ step: 'sending' })
-        const outcome = await onAnswer(text)
-        if (outcome === 'sent') return setPhase({ step: 'sent', text })
-        if (outcome === 'stale') return setPhase({ step: 'stale' })
+    const fail = (outcome: PeekNotice) => {
         setNotice(outcome)
         setAttempt(value => value + 1)
         setPhase({ step: 'asking' })
     }
 
-    return { phase, notice, attempt, submit, rearm }
+    const submit = async (text: string) => {
+        setNotice(null)
+        setPhase({ step: 'sending' })
+        const outcome = await answer(text)
+        if (outcome === 'sent') return setPhase({ step: 'sent', text })
+        if (outcome === 'stale') return setPhase({ step: 'stale' })
+        fail(outcome)
+    }
+
+    const submitDecision = async (proposalId: string, decision: SkillProposalDecision) => {
+        setNotice(null)
+        setPhase({ step: 'sending' })
+        const outcome = await decide(proposalId, decision).catch((): PeekDecisionOutcome => 'failed')
+        if (outcome === 'stale') return setPhase({ step: 'stale' })
+        if (outcome === 'failed') return fail('failed')
+        setPhase({ step: 'decided', proposal: outcome.proposal })
+    }
+
+    return { phase, notice, attempt, submit, submitDecision, rearm }
 }
 
 type PeekRequestProps = {
@@ -82,23 +104,29 @@ type PeekRequestProps = {
     agentName: string
     widgetRef?: Ref<HTMLDivElement>
     onSubmit: (text: string) => void
+    onDecide: (proposalId: string, decision: SkillProposalDecision) => void
     /** The credential block's own close button: it only puts the request away. */
     onDismiss: () => void
 }
 
 /** What a conversation waits on, with the form that answers it: the context, the widget or why it cannot be answered here, and a failed send. */
-export function PeekRequest({ peek, phase, notice, attempt, agentId, agentName, widgetRef, onSubmit, onDismiss }: PeekRequestProps) {
+export function PeekRequest({ peek, phase, notice, attempt, agentId, agentName, widgetRef, onSubmit, onDecide, onDismiss }: PeekRequestProps) {
     const t = useTranslations('notifications.inbox.peek')
     const pending = peek.state === 'ready' ? peek.peek.pending : null
+    // A request that pauses the run comes first: the proposal still waits in the chat's dock.
+    const proposal = peek.state === 'ready' && !pending ? peek.peek.proposal : null
+    const sending = phase.step === 'sending'
     return (
         <>
             {peek.state === 'ready' && (peek.peek.before || peek.peek.ask) && <ThreadContext before={peek.peek.before} ask={peek.peek.ask} />}
-            {phase.step === 'stale' || (peek.state === 'ready' && !pending) ? (
+            {phase.step === 'stale' || (peek.state === 'ready' && !pending && !proposal) ? (
                 <PeekNote>{t('stale')}</PeekNote>
             ) : pending && isAnswerable(pending) && peek.state === 'ready' ? (
-                <div ref={widgetRef} className={cn(phase.step === 'sending' && 'pointer-events-none opacity-60')}>
+                <div ref={widgetRef} className={cn(sending && 'pointer-events-none opacity-60')}>
                     <PeekWidget key={attempt} pending={pending} agentId={agentId} sessionId={peek.sessionId} onSubmit={onSubmit} onDismiss={onDismiss} />
                 </div>
+            ) : proposal ? (
+                <SkillProposalBlock key={attempt} agentId={agentId} proposal={proposal} pinned pending={sending} onDecide={onDecide} />
             ) : (
                 <PeekNote>{t('openToAnswer')}</PeekNote>
             )}
@@ -111,10 +139,11 @@ export function PeekRequest({ peek, phase, notice, attempt, agentId, agentName, 
     )
 }
 
-/** What was sent to the coworker, in the words of the conversation's own receipt. */
-export function PeekSent({ text, pending, agentId, agentName }: { text: string; pending: PendingRequest | null; agentId: string; agentName: string }) {
+/** What was sent to the coworker, in the words of the conversation's own receipt, or the proposal as the decision left it. */
+export function PeekReceipt({ phase, pending, agentId, agentName }: { phase: PeekReceiptPhase; pending: PendingRequest | null; agentId: string; agentName: string }) {
     const t = useTranslations('notifications.inbox.peek')
-    const reply = parseHitlReply(text)
+    if (phase.step === 'decided') return <SkillProposalBlock agentId={agentId} proposal={phase.proposal} pinned />
+    const reply = parseHitlReply(phase.text)
     return (
         <>
             <p className="text-sm font-medium text-foreground">{t('sent', { agent: agentName })}</p>

@@ -8,7 +8,7 @@ import { useCallback, useLayoutEffect, useState } from 'react'
 
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { StateDot } from '@/components/agent/sheet/OpenChatsTabs'
-import { PeekRequest, PeekSent, PeekSkeleton, usePeekAnswer } from '@/components/notifications/PendingRequestPeekBody'
+import { PeekReceipt, PeekRequest, PeekSkeleton, usePeekAnswer } from '@/components/notifications/PendingRequestPeekBody'
 import { useInboxPeek } from '@/hooks/useInboxPeek'
 import { ATTENTION_STATUSES } from '@/lib/board/attention'
 import type { SessionStatus } from '@/lib/board/types'
@@ -127,24 +127,25 @@ function ThreadPeek({ thread, state, peekable, owner, title, onOpen }: { thread:
     // The thread moves when it is answered too: read again only once the answer and its receipt are
     // over, so neither loses the request it is about.
     const [readAt, setReadAt] = useState(thread.updatedAt)
-    const { peek, answer } = useInboxPeek({ agentId: owner.agentId, sessionId: thread.id, engineSessionId: null }, peekable, readAt)
+    const { peek, answer, decide } = useInboxPeek({ agentId: owner.agentId, sessionId: thread.id, engineSessionId: null }, peekable, readAt)
     const fold = useCallback(() => setExpanded(false), [])
     // The body that folds away keeps the receipt it was showing: the row is ready for the next request at once.
-    const { phase, notice, attempt, submit, rearm } = usePeekAnswer(answer, rearmAfterReceipt => {
+    const { phase, notice, attempt, submit, submitDecision, rearm } = usePeekAnswer({ answer, decide }, rearmAfterReceipt => {
         fold()
         rearmAfterReceipt()
     })
     const [measureColumn, columnWidth] = useMeasuredWidth()
     const [measureRow, rowWidth] = useMeasuredWidth()
-    const sent = phase.step === 'sent'
+    const sent = phase.step === 'sent' || phase.step === 'decided'
     const sending = phase.step === 'sending'
     const pending = peek.state === 'ready' ? peek.peek.pending : null
+    const proposalId = peek.state === 'ready' ? (peek.peek.proposal?.id ?? null) : null
     if (!sending && !sent && readAt !== thread.updatedAt) setReadAt(thread.updatedAt)
 
     // The row outlives its requests: the one it waits on now, null once it waits on none. What was
     // left of the previous one (a card left open, an answer that came too late) goes with it, so the
     // next request starts folded on a fresh form. An answer on its way keeps its card: the receipt folds it.
-    const request = peekable ? (pending?.toolCallId ?? REQUEST_UNREAD) : null
+    const request = peekable ? (pending?.toolCallId ?? proposalId ?? REQUEST_UNREAD) : null
     const [shownRequest, setShownRequest] = useState(request)
     if (shownRequest !== request) {
         setShownRequest(request)
@@ -193,10 +194,10 @@ function ThreadPeek({ thread, state, peekable, owner, title, onOpen }: { thread:
                                             <PeekSkeleton />
                                         ) : sent ? (
                                             <div className="flex flex-col gap-2">
-                                                <PeekSent text={phase.text} pending={pending} agentId={owner.agentId} agentName={owner.agentName} />
+                                                <PeekReceipt phase={phase} pending={pending} agentId={owner.agentId} agentName={owner.agentName} />
                                             </div>
                                         ) : (
-                                            <PeekRequest peek={peek} phase={phase} notice={notice} attempt={attempt} agentId={owner.agentId} agentName={owner.agentName} onSubmit={text => void submit(text)} onDismiss={fold} />
+                                            <PeekRequest peek={peek} phase={phase} notice={notice} attempt={attempt} agentId={owner.agentId} agentName={owner.agentName} onSubmit={text => void submit(text)} onDecide={(id, decision) => void submitDecision(id, decision)} onDismiss={fold} />
                                         )}
                                     </div>
                                 </AnimatedSize>

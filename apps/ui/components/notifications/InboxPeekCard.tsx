@@ -1,5 +1,6 @@
 'use client'
 
+import type { SkillProposalDecision } from '@rerun/contracts'
 import { AttentionBuddy, type InboxEntry } from '@rerun/ui/inbox'
 import { Button, useScrollFade } from '@rerun/ui/primitives'
 import { shortRelativeTime } from '@rerun/ui/time'
@@ -8,8 +9,8 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 
 import { CUE_MOTION, PendingHitlPill } from '@/components/chat/PendingHitlPill'
-import { isAnswerable, PeekRequest, PeekSent, PeekSkeleton, usePeekAnswer } from '@/components/notifications/PendingRequestPeekBody'
-import type { InboxPeek, PeekAnswerOutcome } from '@/hooks/useInboxPeek'
+import { isAnswerable, PeekReceipt, PeekRequest, PeekSkeleton, usePeekAnswer } from '@/components/notifications/PendingRequestPeekBody'
+import type { InboxPeek, PeekAnswerOutcome, PeekDecisionOutcome } from '@/hooks/useInboxPeek'
 import { usePendingInView } from '@/hooks/usePendingInView'
 import { summarizePendingHitl } from '@/lib/chat/hitl-cue'
 import { ArrowLeftIcon, ArrowRight, XIcon } from '@/lib/icons'
@@ -23,6 +24,7 @@ type InboxPeekCardProps = {
     entry: InboxEntry
     peek: InboxPeek
     onAnswer: (text: string) => Promise<PeekAnswerOutcome>
+    onDecide: (proposalId: string, decision: SkillProposalDecision) => Promise<PeekDecisionOutcome>
     onClose: () => void
     /** Back to the inbox's list. */
     onBack?: () => void
@@ -32,11 +34,11 @@ type InboxPeekCardProps = {
     anchor?: 'bottom' | 'top'
 }
 
-/** A question, an approval or a credential request, read and answered from the inbox without opening the conversation. */
-export function InboxPeekCard({ entry, peek, onAnswer, onClose, onBack, onOpenConversation, anchor = 'bottom' }: InboxPeekCardProps) {
+/** A question, an approval, a credential request or a skill proposal, read and answered from the inbox without opening the conversation. */
+export function InboxPeekCard({ entry, peek, onAnswer, onDecide, onClose, onBack, onOpenConversation, anchor = 'bottom' }: InboxPeekCardProps) {
     const t = useTranslations('notifications.inbox.peek')
     const locale = useLocale()
-    const { phase, notice, attempt, submit } = usePeekAnswer(onAnswer, onClose)
+    const { phase, notice, attempt, submit, submitDecision } = usePeekAnswer({ answer: onAnswer, decide: onDecide }, onClose)
     const [bodyEl, setBodyEl] = useState<HTMLDivElement | null>(null)
     const bodyRef = useRef<HTMLDivElement | null>(null)
     const setBody = useCallback((element: HTMLDivElement | null) => {
@@ -52,7 +54,7 @@ export function InboxPeekCard({ entry, peek, onAnswer, onClose, onBack, onOpenCo
     const subtitle = [entry.title, entry.updatedAt && shortRelativeTime(entry.updatedAt, locale)].filter(Boolean).join(' · ')
     const pending = peek.state === 'ready' ? peek.peek.pending : null
     const answerable = pending !== null && isAnswerable(pending)
-    const sent = phase.step === 'sent'
+    const sent = phase.step === 'sent' || phase.step === 'decided'
     const waiting = answerable && peek.state === 'ready' && phase.step === 'asking' ? pending : null
     const widgetVisibility = usePendingInView(bodyRef, widgetRef, waiting?.toolCallId ?? null)
     const cue = useMemo(() => (waiting ? summarizePendingHitl(waiting.kind, waiting.input, tHitlCue) : null), [waiting, tHitlCue])
@@ -93,12 +95,12 @@ export function InboxPeekCard({ entry, peek, onAnswer, onClose, onBack, onOpenCo
                 <AnimatePresence mode="wait" initial={false}>
                     {sent ? (
                         <motion.div key="sent" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="flex min-h-0 flex-col gap-2 overflow-y-auto px-3 pb-3">
-                            <PeekSent text={phase.text} pending={pending} agentId={entry.agentId} agentName={entry.agentName} />
+                            <PeekReceipt phase={phase} pending={pending} agentId={entry.agentId} agentName={entry.agentName} />
                         </motion.div>
                     ) : (
                         <motion.div key="ask" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="relative flex min-h-0 flex-1 flex-col">
                             <div ref={setBody} style={{ maskImage: mask, WebkitMaskImage: mask }} className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pb-3">
-                                <PeekRequest peek={peek} phase={phase} notice={notice} attempt={attempt} agentId={entry.agentId} agentName={entry.agentName} widgetRef={widgetRef} onSubmit={text => void submit(text)} onDismiss={onClose} />
+                                <PeekRequest peek={peek} phase={phase} notice={notice} attempt={attempt} agentId={entry.agentId} agentName={entry.agentName} widgetRef={widgetRef} onSubmit={text => void submit(text)} onDecide={(id, decision) => void submitDecision(id, decision)} onDismiss={onClose} />
                             </div>
                             <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-3">
                                 <AnimatePresence initial={false}>
