@@ -7,7 +7,8 @@ from test_planning_start import CFG, Rig
 HERE = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(HERE, "dispatch.json")) as f:
     SHIPPED = json.load(f)
-SONNET_HIGH = {"model": "claude-sonnet-5-5", "thinkingLevel": "high"}
+FABLE_MEDIUM = {"model": "claude-fable-5-2", "thinkingLevel": "medium"}
+OPUS_MEDIUM = {"model": "claude-opus-5-5", "thinkingLevel": "medium"}
 
 
 def captured(station_account):
@@ -28,13 +29,13 @@ class PlanSend(unittest.TestCase):
             cfg["tier_models"] = copy.deepcopy(SHIPPED["tier_models"])
         return cfg
 
-    def test_plan_send_carries_sonnet_high(self):
+    def test_plan_send_carries_fable_medium(self):
         r = Rig(cfg=self.cfg(True))
         got, r.station.account = captured(r.account)
         r.station.once(1)
         self.assertTrue(got)
-        self.assertEqual(got[0]["model"], SONNET_HIGH["model"])
-        self.assertEqual(got[0]["thinkingLevel"], SONNET_HIGH["thinkingLevel"])
+        self.assertEqual(got[0]["model"], FABLE_MEDIUM["model"])
+        self.assertEqual(got[0]["thinkingLevel"], FABLE_MEDIUM["thinkingLevel"])
 
     def test_no_tables_plan_args_unchanged(self):
         r = Rig(cfg=self.cfg(False))
@@ -65,13 +66,13 @@ class ResolveSend(Base):
         self.tick()
         return got
 
-    def test_resolve_send_carries_sonnet_high(self):
+    def test_resolve_send_carries_opus_medium(self):
         self.cfg["tiers"] = copy.deepcopy(SHIPPED["tiers"])
         self.cfg["tier_models"] = copy.deepcopy(SHIPPED["tier_models"])
         got = self.house_args()
         self.assertTrue(got)
-        self.assertEqual(got[0]["model"], SONNET_HIGH["model"])
-        self.assertEqual(got[0]["thinkingLevel"], SONNET_HIGH["thinkingLevel"])
+        self.assertEqual(got[0]["model"], OPUS_MEDIUM["model"])
+        self.assertEqual(got[0]["thinkingLevel"], OPUS_MEDIUM["thinkingLevel"])
 
     def test_no_tables_resolve_args_unchanged(self):
         got = self.house_args()
