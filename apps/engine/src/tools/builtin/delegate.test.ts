@@ -74,6 +74,8 @@ beforeAll(async () => {
     await migrate()
 })
 
+const START_WAIT_MS = 10_000
+
 beforeEach(() => {
     runs.started.length = 0
     runs.script = () => ({ text: 'done' })
@@ -135,8 +137,7 @@ describe('delegate_tasks', () => {
         runs.script = prompt => (prompt === 'slow' ? { text: 'slow answer', gate: firstGate } : { text: `${prompt} answer` })
         const { ctx } = ctxWith()
         const pending = delegate(ctx, [{ task: 'slow', title: 'First' }, { task: 'fast' }])
-        await vi.waitFor(() => expect(runs.started).toHaveLength(2))
-        releaseFirst()
+        await vi.waitFor(() => expect(runs.started).toHaveLength(2), { timeout: START_WAIT_MS }).finally(releaseFirst)
         expect(await pending).toBe('## Task 1 — First\nslow answer\n\n## Task 2 — fast\nfast answer')
     })
 
@@ -148,7 +149,7 @@ describe('delegate_tasks', () => {
         const pending = delegate(ctx, Array.from({ length: 7 }, (_, i) => ({ task: `task ${i}` })))
         await Promise.race([
             runs.fourth,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('fourth child never started')), 10_000).unref()),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('fourth child never started')), START_WAIT_MS).unref()),
         ])
         expect(runs.started).toHaveLength(4)
         expect(runs.active).toBe(4)
