@@ -20,7 +20,7 @@ def _run_gate(repo, files, comments, roster, builder="code"):
             return {"head": {"sha": H, "ref": "chunk/78-O2"}, "base": {"ref": "job/78"}, "body": "Job: special-place-ai-heaven/rerun#78, chunk O2"}
         if p.endswith("/pulls/5/files"):
             return [{"filename": f, "status": "modified", "additions": 1, "deletions": 0} for f in files]
-        if p.endswith("/pulls/5/commits"):
+        if p.endswith("/pulls/5/commits") or p.endswith("/check-runs"):
             return []
         if p.endswith("/issues/78"):
             return {"body": "- [ ] O2. x | builder: %s | done-test: t | max-lines: 300" % builder}
@@ -29,9 +29,8 @@ def _run_gate(repo, files, comments, roster, builder="code"):
         return {"sha": H}
 
     out = io.StringIO()
-    with tempfile.TemporaryDirectory() as td, mock.patch.object(G, "gh_json", fake), mock.patch.object(G, "head_checks", lambda *a: []), \
-            mock.patch.object(G.F, "STATE", td), mock.patch.object(G.F, "base_roster", roster), mock.patch.object(G.F, "home", lambda: HOME), \
-            contextlib.redirect_stdout(out):
+    with tempfile.TemporaryDirectory() as td, mock.patch.object(G, "gh_json", fake), \
+            mock.patch.object(G.F, "STATE", td), mock.patch.object(G.F, "base_roster", roster), contextlib.redirect_stdout(out):
         G.gate(repo, "5")
     return next(l for l in out.getvalue().splitlines() if l.startswith("REVIEWS ")), calls
 
