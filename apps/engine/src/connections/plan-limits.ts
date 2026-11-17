@@ -1,5 +1,5 @@
-import { opencodeUsageSchema, type PlanLimitWindow, type PlanLimits } from '@rerun/contracts'
-import { saveReadings } from './plan-readings.js'
+import { opencodeUsageSchema, planLimitWindowSchema, type PlanLimitWindow, type PlanLimits } from '@rerun/contracts'
+import { latestReadings, saveReadings } from './plan-readings.js'
 
 const readings = new Map<string, PlanLimits>()
 
@@ -12,6 +12,19 @@ export function recordPlanLimits(connectionId: string, windows: PlanLimitWindow[
 
 export function readPlanLimits(connectionId: string): PlanLimits | null {
     return readings.get(connectionId) ?? null
+}
+
+const RESTORE_WINDOW_MS = 7 * 24 * 60 * 60_000
+
+export async function restorePlanLimits(now = Date.now()): Promise<void> {
+    const saved = new Map<string, PlanLimits>()
+    for (const reading of await latestReadings(new Date(now - RESTORE_WINDOW_MS).toISOString())) {
+        const window = planLimitWindowSchema.safeParse({ kind: reading.kind, label: reading.label || null, usedPercent: reading.usedPercent, resetsAt: reading.resetsAt })
+        if (!window.success) continue
+        const held = saved.get(reading.connectionId) ?? { windows: [], capturedAt: reading.capturedAt }
+        saved.set(reading.connectionId, { windows: [...held.windows, window.data], capturedAt: reading.capturedAt > held.capturedAt ? reading.capturedAt : held.capturedAt })
+    }
+    for (const [connectionId, limits] of saved) if (!readings.has(connectionId)) readings.set(connectionId, limits)
 }
 
 export function forgetPlanLimits(connectionId: string): void {

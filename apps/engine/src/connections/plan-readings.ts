@@ -67,3 +67,21 @@ export async function listReadings(sinceIso: string | null, kind: string): Promi
         capturedAt: String(row.captured_at)
     }))
 }
+
+export async function latestReadings(sinceIso: string): Promise<PlanReading[]> {
+    await ensureTable()
+    const result = await raw().execute({
+        sql: `SELECT connection_id, kind, label, used_percent, resets_at, captured_at FROM plan_readings p
+WHERE captured_at >= ? AND id = (SELECT id FROM plan_readings q WHERE q.connection_id = p.connection_id AND q.kind = p.kind AND q.label = p.label ORDER BY captured_at DESC, id DESC LIMIT 1)
+ORDER BY connection_id, kind, label`,
+        args: [sinceIso]
+    })
+    return result.rows.map(row => ({
+        connectionId: String(row.connection_id),
+        kind: String(row.kind),
+        label: String(row.label),
+        usedPercent: Number(row.used_percent),
+        resetsAt: row.resets_at === null ? null : String(row.resets_at),
+        capturedAt: String(row.captured_at)
+    }))
+}
