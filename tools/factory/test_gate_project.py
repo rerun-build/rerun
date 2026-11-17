@@ -36,6 +36,21 @@ def _run_gate(repo, files, comments, roster, builder="code"):
     return next(l for l in out.getvalue().splitlines() if l.startswith("REVIEWS ")), calls
 
 
+def _run_risk(repo, files, roster):
+    pr = {"title": "t", "head": {"sha": H, "ref": "chunk/78-O2"}, "base": {"ref": "job/78"}, "body": ""}
+
+    def fake(path, *args, paginate=False):
+        if path.endswith("/files?per_page=100"):
+            return [{"filename": f, "status": "modified", "additions": 1, "deletions": 0} for f in files]
+        return pr
+
+    out = io.StringIO()
+    with mock.patch.object(F, "api", fake), mock.patch.object(F, "base_roster", roster), \
+            mock.patch.object(F, "home", lambda: HOME), contextlib.redirect_stdout(out):
+        F.cmd_risk([repo, "5"])
+    return out.getvalue()
+
+
 def _real_roster(*a):
     import roster as R
     return R.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "roster.json")).read())
@@ -70,6 +85,16 @@ class TestGateProject(unittest.TestCase):
         self.assertIn("MARGARET", line)
         line, _ = _run_gate(OTHER, ["apps/engine/src/config/env.ts"], ["MARGARET", "BRUCE"], _real_roster)
         self.assertTrue(line.startswith("REVIEWS PASS"), line)
+
+    def test_risk_of_a_project_without_a_roster_asks_for_the_second_reviewer(self):
+        out = _run_risk(OTHER, ["src/a.ts"], _no_roster)
+        self.assertIn("EXTRA REVIEWER BRUCE: this project has no roster", out)
+        self.assertIn("src/a.ts", out)
+        self.assertNotIn("EXTRA REVIEWERS: none", out)
+
+    def test_risk_of_the_home_without_a_roster_adds_no_reviewer(self):
+        out = _run_risk(HOME, ["src/a.ts"], _no_roster)
+        self.assertIn("EXTRA REVIEWERS: none. LINUS alone.", out)
 
     def test_a_roster_that_cannot_be_read_still_fails_closed(self):
         line, _ = _run_gate(OTHER, ["src/a.ts"], ["LINUS", "BRUCE"], _unreadable_roster)
