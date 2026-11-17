@@ -39,6 +39,7 @@ export function BudgetExhaustedNotice(_props: {
     paused?: boolean
     noCredit?: boolean
     lifetime?: boolean
+    claudePlanOffered?: boolean
     coworker?: string
     priceArm?: PriceArm
     onPaid?: () => void

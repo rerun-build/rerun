@@ -413,12 +413,14 @@
         "lifetime": {
             "ownConnection": "Dein Lifetime-Tarif läuft mit deiner eigenen KI, und dein {plan}-Abo ist verbunden.",
             "connectProvider": "Dein Lifetime-Tarif läuft mit deiner eigenen KI. Füge einen API-Schlüssel hinzu oder verbinde ChatGPT, damit deine Coworker weiterarbeiten.",
+            "connectProviderWithClaude": "Dein Lifetime-Tarif läuft mit deiner eigenen KI. Füge einen API-Schlüssel hinzu oder verbinde Claude oder ChatGPT, damit deine Coworker weiterarbeiten.",
             "apiKeyTitle": "API-Schlüssel verwenden",
             "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter oder ein eigener Endpoint.",
             "apiKeyCta": "Schlüssel hinzufügen",
             "body": "Dein Lifetime-Tarif läuft mit deiner eigenen KI.",
             "connectTitle": "Deine KI verbinden",
             "connectDescription": "Ein API-Schlüssel oder ChatGPT.",
+            "connectDescriptionWithClaude": "Ein API-Schlüssel, Claude oder ChatGPT.",
             "connectCta": "Verbinden"
         },
         "trial": {

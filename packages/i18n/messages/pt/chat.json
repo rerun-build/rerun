@@ -413,12 +413,14 @@
         "lifetime": {
             "ownConnection": "Seu plano vitalício roda na sua própria IA, e seu plano {plan} está conectado.",
             "connectProvider": "Seu plano vitalício roda na sua própria IA. Adicione uma chave de API, ou conecte o ChatGPT, para seus coworkers continuarem trabalhando.",
+            "connectProviderWithClaude": "Seu plano vitalício roda na sua própria IA. Adicione uma chave de API, ou conecte o Claude ou o ChatGPT, para seus coworkers continuarem trabalhando.",
             "apiKeyTitle": "Usar uma chave de API",
             "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter ou um endpoint personalizado.",
             "apiKeyCta": "Adicionar uma chave",
             "body": "Seu plano vitalício roda na sua própria IA.",
             "connectTitle": "Conectar sua IA",
             "connectDescription": "Uma chave de API ou o ChatGPT.",
+            "connectDescriptionWithClaude": "Uma chave de API, o Claude ou o ChatGPT.",
             "connectCta": "Conectar"
         },
         "trial": {
