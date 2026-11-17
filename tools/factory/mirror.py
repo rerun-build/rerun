@@ -1,5 +1,6 @@
 import fcntl, json, os, re, shutil, signal, subprocess, sys, time
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import factory as F
 
 GITHUB = os.environ.get("FACTORY_GITHUB_URL", "https://github.com/")
