@@ -53,7 +53,7 @@ export async function attachVaultPaidAccount(slug: AppSlug, connectionId: string
     const { actor: resolved } = await assertAgentAccess(agentId, 'manage', actor)
     const { serviceSlug } = appInfo(slug)
     await installService(agentId, serviceSlug, {}, undefined, resolved)
-    await attachAgentToConnection(slug, agentId, connectionId)
+    await attachAgentToConnection(slug, agentId, connectionId, resolved)
     const label = (await vaultPaidAccounts(resolved)).find(account => account.connectionId === connectionId)?.label ?? undefined
     await markAppAuthorized(agentId, serviceSlug, label, resolved)
 }

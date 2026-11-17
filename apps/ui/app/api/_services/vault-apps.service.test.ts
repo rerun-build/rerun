@@ -64,7 +64,7 @@ describe('attachVaultPaidAccount', () => {
         await attachVaultPaidAccount('linkedin', 'conn-a', 'bob', actor)
         expect(assertAgentAccess).toHaveBeenCalledWith('bob', 'manage', actor)
         expect(installService).toHaveBeenCalledWith('bob', 'linkedin-pro', {}, undefined, actor)
-        expect(attachAgentToConnection).toHaveBeenCalledWith('linkedin', 'bob', 'conn-a')
+        expect(attachAgentToConnection).toHaveBeenCalledWith('linkedin', 'bob', 'conn-a', actor)
         expect(markAppAuthorized).toHaveBeenCalledWith('bob', 'linkedin-pro', 'Ada', actor)
     })
 

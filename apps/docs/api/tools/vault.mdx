@@ -49,7 +49,7 @@ Switches a Vault entry on for one coworker: an app account already signed in, an
 
 <ParamField body="agentId" type="string" required />
 
-A coworker cannot get the same variable or the same server name from two entries: the call is refused with **already gets {name} from another Vault entry**. Returns the entry as `list_vault` shows it.
+A coworker cannot get the same variable or the same server name from two entries: the call is refused with **already gets {name} from another Vault entry**, followed by the name and the `id` of that entry. Returns the entry as `list_vault` shows it.
 
 ## detach_vault_entry
 

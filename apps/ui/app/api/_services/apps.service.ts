@@ -2,7 +2,7 @@ import 'server-only'
 import type Stripe from 'stripe'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { PLAN_PRICES_CENTS, TRIAL_DAYS } from '@rerun/contracts'
-import { assertAgentInWorkspace } from '@/app/api/_auth/access'
+import { assertAgentAccess, assertAgentInWorkspace, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
@@ -25,6 +25,7 @@ import { intervalOfItems, stripe } from '@/ee/lib/billing/stripe'
 import { createTrigger as engineCreateTrigger } from '@/lib/engine/client'
 import { site } from '@/lib/site'
 import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
+import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 type Client = SupabaseClient<Database>
@@ -429,10 +430,11 @@ export async function getAgentAppBinding(slug: AppSlug, agentId: string): Promis
     return { connectionId: binding.connection_id, label: connection.label, status: connection.status, wakeOnEvents: binding.wake_on_events.filter(event => isWakeEventOf(slug, event)) }
 }
 
-export async function attachAgentToConnection(slug: AppSlug, agentId: string, connectionId: string): Promise<void> {
-    await assertAgentInWorkspace(agentId, 'manage')
-    const { workspace, supabase } = await requireWorkspaceContext()
-    const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['status'] as const, { id: connectionId, workspace_id: workspace.id, app_slug: slug })
+// The actor comes in for a caller that holds an API key rather than a browser session.
+export async function attachAgentToConnection(slug: AppSlug, agentId: string, connectionId: string, actor?: Actor): Promise<void> {
+    const { actor: resolved } = await assertAgentAccess(agentId, 'manage', actor)
+    const supabase = createServiceRoleClient()
+    const { data: connection } = await selectMaybeSingle(supabase, 'app_connections', ['status'] as const, { id: connectionId, workspace_id: resolved.workspaceId, app_slug: slug })
     if (!connection || connection.status === 'deleted') throw new AuthorizationError('accountNotFound')
 
     const { data: existing } = await selectMaybeSingle(supabase, 'app_connection_agents', ['connection_id'] as const, { agent_id: agentId, app_slug: slug })

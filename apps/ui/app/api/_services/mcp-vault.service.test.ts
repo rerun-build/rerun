@@ -16,6 +16,14 @@ const mocks = vi.hoisted(() => ({
 }))
 
 class VaultUnavailableError extends Error {}
+class VaultConflictError extends Error {
+    constructor(
+        message: string,
+        readonly conflicts: Array<{ agentId: string; itemId: string; kind: string; name: string }>,
+    ) {
+        super(message)
+    }
+}
 class NoEngineError extends Error {}
 
 vi.mock('./vault.service', () => ({
@@ -24,6 +32,7 @@ vi.mock('./vault.service', () => ({
     detachVaultEntry: mocks.detachVaultEntry,
     shareVaultEntry: mocks.shareVaultEntry,
     deleteVaultEntry: mocks.deleteVaultEntry,
+    VaultConflictError,
     VaultUnavailableError,
 }))
 vi.mock('./vault-apps.service', () => ({
@@ -101,6 +110,14 @@ describe('list_vault', () => {
         for (const stored of ['GMAIL_TOKEN', 'ca_secret', 'composio-user', 'mcp.gmail.test', 'region', 'engine-scout', 'admin-1']) expect(text).not.toContain(stored)
     })
 
+    it('tells a key that acts as the workspace, an admin, that it may change every entry', async () => {
+        mocks.listVault.mockResolvedValue({ entries: [{ ...item(), coworkers: [SCOUT], hiddenCoworkers: 0, canChange: false }], coworkers: [{ ...SCOUT, canManage: true }], canAdd: true, isAdmin: true })
+
+        const out = (await dispatchVaultTool({ kind: 'workspace', workspaceId: 7 }, 'list_vault', {})) as { entries: Array<{ canChange: boolean }> }
+
+        expect(out.entries[0].canChange).toBe(true)
+    })
+
     it('answers that there is no Vault on a machine without one, or without a machine', async () => {
         mocks.listVault.mockRejectedValueOnce(new VaultUnavailableError())
         await expect(dispatchVaultTool(ADMIN, 'list_vault', {})).resolves.toMatchObject({ available: false })
@@ -154,6 +171,31 @@ describe('attach_vault_entry and detach_vault_entry', () => {
         mocks.attachVaultEntry.mockRejectedValueOnce(new Error('Closer already gets GMAIL_TOKEN from another Vault entry'))
 
         await expect(dispatchVaultTool(ADMIN, 'attach_vault_entry', { entryId: 'item-gmail', agentId: 'agent-closer' })).rejects.toThrow('another Vault entry')
+    })
+
+    it('name the entry a clash comes from, which the Vault only names by its variable', async () => {
+        mocks.listVault.mockResolvedValue({
+            entries: [
+                { ...item(), coworkers: [SCOUT], hiddenCoworkers: 0, canChange: true },
+                { ...item({ id: 'item-gmail-support', label: 'support@acme.test' }), name: 'Gmail support', coworkers: [CLOSER], hiddenCoworkers: 0, canChange: true },
+            ],
+            coworkers: [{ ...CLOSER, canManage: true }],
+            canAdd: true,
+            isAdmin: true,
+        })
+        const clash = () => new VaultConflictError('Closer already gets GMAIL_TOKEN from another Vault entry', [{ agentId: 'engine-closer', itemId: 'item-gmail-support', kind: 'env', name: 'GMAIL_TOKEN' }])
+
+        mocks.attachVaultEntry.mockRejectedValueOnce(clash())
+        await expect(dispatchVaultTool(ADMIN, 'attach_vault_entry', { entryId: 'item-gmail', agentId: 'agent-closer' })).rejects.toThrow('Closer already gets GMAIL_TOKEN from another Vault entry: "Gmail support" (entryId item-gmail-support).')
+
+        mocks.shareVaultEntry.mockRejectedValueOnce(clash())
+        await expect(dispatchVaultTool(ADMIN, 'share_vault_entry', { entryId: 'item-gmail', sharedWithAll: true })).rejects.toThrow('"Gmail support" (entryId item-gmail-support)')
+    })
+
+    it('leave the clash as the Vault words it when the key cannot see the entry it comes from', async () => {
+        mocks.attachVaultEntry.mockRejectedValueOnce(new VaultConflictError('A coworker already gets GMAIL_TOKEN from another Vault entry', [{ agentId: 'engine-other', itemId: 'item-unknown', kind: 'env', name: 'GMAIL_TOKEN' }]))
+
+        await expect(dispatchVaultTool(ADMIN, 'attach_vault_entry', { entryId: 'item-gmail', agentId: 'agent-closer' })).rejects.toThrow(/^A coworker already gets GMAIL_TOKEN from another Vault entry$/)
     })
 
     it('ask for both ids', async () => {
