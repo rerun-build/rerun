@@ -1,13 +1,16 @@
 #!/usr/bin/env node
-// `pnpm i18n:check`: every pack has every key of the English source, carries its placeholders, was
-// translated from the source as it reads today, and has no key the source dropped. No network: the
-// CI runs it, `pnpm i18n:translate` is what fixes what it reports.
+// `pnpm i18n:check`: the English page titles are in headline case, and every pack has every key of
+// the English source, carries its placeholders, was translated from the source as it reads today,
+// and has no key the source dropped. No network: the CI runs it, `pnpm i18n:translate` is what fixes
+// what it reports.
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import {
     flatten,
     hashOf,
+    headlineCaseProblems,
     indexFile,
+    isPageTitleKey,
     indexSource,
     MESSAGES_DIR,
     namespaces,
@@ -33,6 +36,8 @@ for (const locale of [SOURCE_LOCALE, ...targetLocales()]) {
 for (const ns of namespaces(SOURCE_LOCALE)) {
     for (const [key, source] of Object.entries(flatten(readNamespace(SOURCE_LOCALE, ns)))) {
         for (const problem of problemsOf({ key: `${ns}.${key}`, source, translation: source, locale: SOURCE_LOCALE, glossary }).filter(problem => problem.includes('dash'))) warnings.push(`${SOURCE_LOCALE}: ${problem} (kept: English copy is not rewritten by the check)`)
+        const lowercased = isPageTitleKey(`${ns}.${key}`) ? headlineCaseProblems(source) : []
+        if (lowercased.length) errors.push(`${SOURCE_LOCALE}: ${ns}.${key} is a page title, write it in headline case (${lowercased.join(', ')})`)
     }
 }
 

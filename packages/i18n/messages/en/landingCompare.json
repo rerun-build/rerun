@@ -1,6 +1,6 @@
 {
     "hub": {
-        "title": "Rerun vs Zapier, n8n, Lindy, Claude & more: comparisons",
+        "title": "Rerun vs Zapier, n8n, Lindy, Claude & More: Comparisons",
         "headline": "Rerun vs the tools you already know.",
         "description": "How Rerun compares with Zapier, Make, n8n, Lindy, Manus, Claude Cowork and seven more: ease of use, teamwork, flexibility and cost, side by side.",
         "eyebrow": "Compare",
@@ -955,7 +955,7 @@
     },
     "pages": {
         "claude-cowork": {
-            "metaTitle": "Rerun vs Claude Cowork: a team of agents (2026)",
+            "metaTitle": "Rerun vs Claude Cowork: A Team of Agents (2026)",
             "metaDescription": "Rerun vs Claude Cowork on models, scheduled work and price. Keep your Claude plan and run a team of agents on it, or on any other model.",
             "headline": "Rerun vs Claude Cowork",
             "intro": "Cowork, folded into the Claude app in September 2026, lets Claude take on tasks for you, on Claude models. Rerun runs a team of agents on an always-on machine, on any model, including the Claude plan you already pay for.",
@@ -1028,7 +1028,7 @@
             }
         },
         "manus": {
-            "metaTitle": "Rerun vs Manus: flat price for recurring work (2026)",
+            "metaTitle": "Rerun vs Manus: Flat Price for Recurring Work (2026)",
             "metaDescription": "Rerun vs Manus on credits, schedules and teams. Manus bills each task in credits and caps you at 20 scheduled tasks; Rerun is one flat plan with no cap.",
             "headline": "Rerun vs Manus",
             "intro": "Manus is a general AI agent that researches, builds and delivers, billed in credits per task. Rerun runs a team of agents on recurring business work, on a private machine, for one flat price.",
@@ -1101,7 +1101,7 @@
             }
         },
         "grok-bot": {
-            "metaTitle": "Rerun vs Grok Bot: any model, full view (2026)",
+            "metaTitle": "Rerun vs Grok Bot: Any Model, Full View (2026)",
             "metaDescription": "Rerun vs Grok Bot from xAI compared on access, models, visibility and cost. Both give agents a computer in the cloud. See which one fits your team.",
             "headline": "Rerun vs Grok Bot",
             "intro": "Grok Bot, from xAI, gives always-on AI teammates a computer they share in the cloud. Rerun does too, on the model you choose, with a board your whole team can read.",
@@ -1170,7 +1170,7 @@
             }
         },
         "paperclip": {
-            "metaTitle": "Rerun vs Paperclip: hosted agents or a self-hosted org chart? (2026)",
+            "metaTitle": "Rerun vs Paperclip: Hosted Agents or a Self-Hosted Org Chart? (2026)",
             "metaDescription": "Rerun vs Paperclip on hosting, agent runtimes, connectors and real cost: when the open-source org chart for agents fits, and when a hosted Paperclip alternative is simpler.",
             "headline": "Rerun vs Paperclip",
             "intro": "Paperclip is an open-source control plane you host: it gives the agents you already run an org chart, budgets and approval gates. Rerun gives you the agents themselves, already running on a private machine in the cloud.",
@@ -1248,7 +1248,7 @@
             }
         },
         "hermes": {
-            "metaTitle": "Rerun vs Hermes Agent: a hosted team of agents (2026)",
+            "metaTitle": "Rerun vs Hermes Agent: A Hosted Team of Agents (2026)",
             "metaDescription": "Rerun vs Hermes Agent (Nous Research) on hosting, cost and apps: when to run Hermes yourself or on Hermes Cloud, and when a hosted team is simpler.",
             "headline": "Rerun vs Hermes Agent",
             "intro": "Hermes Agent by Nous Research is an open-source agent that learns skills as it goes, run on your own machine across five sandboxes, or hosted on Hermes Cloud. Rerun gives your team agents that learn too, hosted together on one private machine, with the apps and the board around them.",
@@ -1321,7 +1321,7 @@
             }
         },
         "openclaw": {
-            "metaTitle": "Rerun vs OpenClaw: hosted AI agents (2026)",
+            "metaTitle": "Rerun vs OpenClaw: Hosted AI Agents (2026)",
             "metaDescription": "Rerun vs OpenClaw on setup, hosting, security and cost: when the open-source assistant fits, and when a hosted OpenClaw alternative is simpler.",
             "headline": "Rerun vs OpenClaw",
             "intro": "OpenClaw is an open-source personal AI assistant you install and run on your own machine or server. Rerun runs your agents for you, on a private, isolated machine in the cloud.",
@@ -1394,7 +1394,7 @@
             }
         },
         "zapier": {
-            "metaTitle": "Rerun vs Zapier: AI agents or Zaps? (2026)",
+            "metaTitle": "Rerun vs Zapier: AI Agents or Zaps? (2026)",
             "metaDescription": "Rerun vs Zapier on setup, maintenance and cost: when a step-by-step Zap is enough, and when an AI agent that adapts is the better Zapier alternative.",
             "headline": "Rerun vs Zapier",
             "intro": "Zapier connects apps with Zaps you build step by step. Rerun gives you AI agents that take a goal, pick the tools and adapt when something changes.",
@@ -1467,7 +1467,7 @@
             }
         },
         "make": {
-            "metaTitle": "Rerun vs Make: AI agents or scenarios? (2026)",
+            "metaTitle": "Rerun vs Make: AI Agents or Scenarios? (2026)",
             "metaDescription": "Rerun vs Make (Integromat) on setup, maintenance and cost: when a visual scenario is enough, and when an AI agent is the better Make alternative.",
             "headline": "Rerun vs Make",
             "intro": "Make builds automations as visual scenarios, one module at a time. Rerun gives you AI agents that take the goal and handle the steps themselves.",
@@ -1540,7 +1540,7 @@
             }
         },
         "n8n": {
-            "metaTitle": "Rerun vs n8n: AI agents or workflows? (2026)",
+            "metaTitle": "Rerun vs n8n: AI Agents or Workflows? (2026)",
             "metaDescription": "Rerun vs n8n on setup, hosting and cost: when an n8n workflow makes sense, and when a no-code AI agent is the better n8n alternative.",
             "headline": "Rerun vs n8n",
             "intro": "n8n is a workflow automation tool for technical teams, self-hosted or on their cloud. Rerun gives you AI agents that run on your own private machine, with no nodes to wire.",
@@ -1617,7 +1617,7 @@
             }
         },
         "lindy": {
-            "metaTitle": "Rerun vs Lindy: flat price, your own AI (2026)",
+            "metaTitle": "Rerun vs Lindy: Flat Price, Your Own AI (2026)",
             "metaDescription": "Rerun vs Lindy on price, credits and models. Lindy bills every active user and every task in credits; Rerun is one flat plan on the ChatGPT or Claude plan you already pay for.",
             "headline": "Rerun vs Lindy",
             "intro": "Lindy is an AI assistant your team reaches from Slack and its apps, billed per active user and in credits. Rerun gives your team agents that run on your own AI plan, on a private machine, for one flat price.",
@@ -1694,7 +1694,7 @@
             }
         },
         "twin": {
-            "metaTitle": "Rerun vs Twin: what each flat plan really includes (2026)",
+            "metaTitle": "Rerun vs Twin: What Each Flat Plan Really Includes (2026)",
             "metaDescription": "Rerun vs Twin (twin.so): both are flat-priced now. Compare what the entry plan includes, the browser agent at $149, teammates versus clients, and the model you run on.",
             "headline": "Rerun vs Twin",
             "intro": "Twin builds an agent from a chat and runs it on a flat plan, with no credits. Rerun does too, and gives every agent a private machine, your whole team and the model of your choice.",
@@ -1767,7 +1767,7 @@
             }
         },
         "dust": {
-            "metaTitle": "Rerun vs Dust: flat price, every app, free seats (2026)",
+            "metaTitle": "Rerun vs Dust: Flat Price, Every App, Free Seats (2026)",
             "metaDescription": "Rerun vs Dust on seats, credits and connectors. Dust prices every seat and meters automated use; Rerun is one flat plan with unlimited seats and every app included.",
             "headline": "Rerun vs Dust",
             "intro": "Dust gives each person agents that know your company’s documents, priced per seat and in credits. Rerun gives your team agents that run the work on their own, on a private machine, for one flat price.",
@@ -1840,7 +1840,7 @@
             }
         },
         "squad": {
-            "metaTitle": "Rerun vs Squad: one plan, AI included (2026)",
+            "metaTitle": "Rerun vs Squad: One Plan, AI Included (2026)",
             "metaDescription": "Rerun vs Squad (squad.so) on price and models. Squad is $99 a month on top of the AI plan you bring; Rerun costs less and includes model credit.",
             "headline": "Rerun vs Squad",
             "intro": "Squad rents you AI teammates and asks you to bring the AI. Rerun is the whole workspace they live in, model credit included: a library of agents ready to install, {connectors}+ apps, and a board where you watch the work happen.",

@@ -20,7 +20,7 @@
         "alternatives.windowsArm64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
         "alternatives.windowsX64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads."
     },
-    "title": "Download the Rerun desktop app",
+    "title": "Download the Rerun Desktop App",
     "eyebrow": "Desktop app",
     "headline": "Rerun on your desktop",
     "description": "Your coworkers in a window of their own, with notifications, an icon in the menu bar or the system tray, and Quick ask.",

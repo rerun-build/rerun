@@ -147,6 +147,46 @@ export function problemsOf({ key, source, translation, locale, glossary }) {
     return problems
 }
 
+// The keys that become a page's <title> on rerun.build. In English they are written in headline case,
+// as the home page always was; the other languages keep the sentence case of their own usage.
+const PAGE_TITLE_KEYS = [
+    /^landing[A-Za-z]+\.(.+\.)?metaTitle$/,
+    /^landing(Industries|Compare)\.hub\.title$/,
+    /^landingPricing\.(lifetime\.)?seo\.title$/,
+    /^landingDownload\.title$/,
+    /^landing(Community|Resources)\.metadata\.(.+\.)?title$/,
+    /^landingCommon\.site\.title$/,
+]
+
+export function isPageTitleKey(id) {
+    return PAGE_TITLE_KEYS.some(pattern => pattern.test(id))
+}
+
+// The short function words may stay lowercase ("Agents for Agencies", "Reports with AI"), unless
+// they open the title or follow a colon; a phrasal particle takes its capital ("Clean Up").
+const MINOR_WORDS = new Set(['a', 'an', 'the', 'and', 'but', 'or', 'nor', 'for', 'so', 'yet', 'as', 'at', 'by', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via', 'vs', 'with', 'from', 'into', 'onto', 'over', 'than'])
+const LOWERCASE_NAMES = new Set(['n8n', 'iOS', 'macOS'])
+
+// The words of an English page title left in sentence case, empty when it is in headline case. A
+// hyphenated word is judged by its first part, so "E-commerce" and "Step-by-Step" both pass.
+export function headlineCaseProblems(title) {
+    const words = title
+        .replace(/\{[^{}]*\}/g, ' ')
+        .split(/\s+/)
+        .filter(Boolean)
+    const problems = []
+    let opensClause = true
+    for (const raw of words) {
+        const word = raw.replace(/^[("'“]+|[)"'”.,:;!?]+$/g, '')
+        const startsClause = opensClause
+        opensClause = /[:?!]$/.test(raw)
+        if (!/^[a-z]/.test(word) || LOWERCASE_NAMES.has(word)) continue
+        const lead = word.split('-')[0]
+        if (startsClause || !MINOR_WORDS.has(lead)) problems.push(raw)
+    }
+    return problems
+}
+
 // A longer language may take more room, within reason: past this the layout is likely to break.
 export function tooLong(source, translation) {
     return translation.length > Math.max(source.length * 1.4, source.length + 12)

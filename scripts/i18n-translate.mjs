@@ -13,6 +13,7 @@ import {
     contextOf,
     flatten,
     hashOf,
+    isPageTitleKey,
     MESSAGES_DIR,
     namespaces,
     problemsOf,
@@ -99,8 +100,15 @@ function systemPrompt(locale) {
         .join('\n\n')
 }
 
+const PAGE_TITLE_NOTE = 'The title of a page in search results. The English is in headline case; write it with the capitalization titles take in the target language, not the English capitals.'
+
+function contextFor(job, key) {
+    const notes = [job.context[key], isPageTitleKey(`${job.ns}.${key}`) ? PAGE_TITLE_NOTE : null].filter(Boolean)
+    return notes.length ? { context: notes.join(' ') } : {}
+}
+
 function userPrompt(job, keys, feedback) {
-    const entries = keys.map(key => ({ key, english: job.source[key], ...(job.context[key] ? { context: job.context[key] } : {}) }))
+    const entries = keys.map(key => ({ key, english: job.source[key], ...contextFor(job, key) }))
     const lines = [`Namespace "${job.ns}". Translate each "english" value.`, JSON.stringify(entries, null, 2)]
     if (feedback.length) lines.push(`Your previous answer failed these checks, fix them:\n${feedback.map(problem => `- ${problem}`).join('\n')}`)
     return lines.join('\n\n')

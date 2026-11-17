@@ -24,6 +24,11 @@ Every string a person sees goes through `t()` (`useTranslations` in a client com
   the message, in ICU (`{count, plural, one {# file} other {# files}}`).
 - A string whose meaning is not obvious from its key gets a note under `_context` at the root of its
   namespace, keyed by its dotted path. The translator reads it; the app never ships it.
+- A page title of rerun.build (`metaTitle`, `seo.title`, `metadata.*.title`, the list is
+  `PAGE_TITLE_KEYS` in `scripts/i18n/catalog.mjs`) is written in headline case in English: "AI Agents
+  for Agencies: Prospecting, SEO, Client Reporting". The short function words (a, and, for, of, to,
+  with, vs…) may stay lowercase, unless they open the title or follow a colon. `i18n:check` refuses
+  one in sentence case. The other languages write their titles the way their own usage does.
 
 Then:
 

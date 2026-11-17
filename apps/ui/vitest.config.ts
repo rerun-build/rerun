@@ -9,6 +9,8 @@ const HAS_CLOUD = existsSync(CLOUD_SOURCE)
 // The back office of Rerun Cloud runs on this app's sources, and so do its tests.
 const ADMIN_APP = path.resolve(import.meta.dirname, '../../cloud/apps/admin')
 const CLOUD_IMPLEMENTATION = HAS_CLOUD ? CLOUD_SOURCE : path.resolve(import.meta.dirname, 'cloud-oss')
+// The checks behind `pnpm i18n:check` live in the repository's scripts and run with this suite.
+const I18N_SCRIPTS = path.resolve(import.meta.dirname, '../../scripts/i18n')
 
 // Vitest does not read the `@/*` paths from tsconfig, so a unit test importing any module that
 // resolves one fails at import time rather than on an assertion.
@@ -26,7 +28,7 @@ export default defineConfig({
     test: {
         setupFiles: ['test/setup-env.ts', 'test/intl.ts'],
         // The tests of Rerun Cloud's side run with the app's, against the same aliases and setup.
-        include: ['**/*.test.?(c|m)[jt]s?(x)', ...(HAS_CLOUD ? [`${CLOUD_SOURCE}/**/*.test.?(c|m)[jt]s?(x)`, `${ADMIN_APP}/{app,lib}/**/*.test.?(c|m)[jt]s?(x)`] : [])],
+        include: ['**/*.test.?(c|m)[jt]s?(x)', `${I18N_SCRIPTS}/**/*.test.mjs`, ...(HAS_CLOUD ? [`${CLOUD_SOURCE}/**/*.test.?(c|m)[jt]s?(x)`, `${ADMIN_APP}/{app,lib}/**/*.test.?(c|m)[jt]s?(x)`] : [])],
         coverage: {
             provider: 'v8',
             // React components are left out: the suite runs in a bare Node environment, so a `.tsx`
