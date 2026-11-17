@@ -11,6 +11,7 @@ import {
     deleteSkill as engineDeleteSkill,
     setSkillEnabled as engineSetSkillEnabled,
     deleteTrigger as engineDeleteTrigger,
+    EngineUnreachableError,
     SPACE_DATA_BASE,
     agentDataBase,
     agentFilesBase,
@@ -259,14 +260,18 @@ async function projectTrigger(agentId: string, trigger: EngineTrigger) {
     }
 }
 
-async function waitForRun(conn: EngineConnection, engineAgentId: string, runId: string, waitSeconds: number): Promise<EngineRunDetail> {
+async function waitForRun(conn: EngineConnection, engineAgentId: string, runId: string, waitSeconds: number): Promise<EngineRunDetail | null> {
     const deadline = Date.now() + waitSeconds * 1000
-    let run = await engineGetRun(conn, engineAgentId, runId)
-    while (run.status === 'running' && Date.now() < deadline) {
+    let run: EngineRunDetail | null = null
+    for (;;) {
+        try {
+            run = await engineGetRun(conn, engineAgentId, runId)
+        } catch (err) {
+            if (!(err instanceof EngineUnreachableError)) throw err
+        }
+        if ((run && run.status !== 'running') || Date.now() >= deadline) return run
         await sleep(RUN_POLL_INTERVAL_MS)
-        run = await engineGetRun(conn, engineAgentId, runId)
     }
-    return run
 }
 
 async function resolveSpaceId(actor: Actor, requested?: string): Promise<string> {
@@ -893,6 +898,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             if (sessionId) await recordSessionParticipant(await ensureSessionRow(agentId, sessionId, requireString(args.message, 'message'), { source: 'api', status: 'working' }), actorUserId)
 
             const run = await waitForRun(conn, engineAgentId, runId, waitSeconds)
+            if (!run) return { runId, sessionId, status: 'running', output: null, note: `The message was delivered, but the run could not be read for ${waitSeconds}s. Do not send it again; read the run later with get_run.` }
             return {
                 ...projectRun(run),
                 sessionId: sessionId ?? run.sessionId,
