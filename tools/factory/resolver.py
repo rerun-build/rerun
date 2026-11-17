@@ -9,6 +9,7 @@ import problems
 import snapshot
 import states
 import store as ledger_store
+import tiers
 
 KV = "problems"
 LABEL = "factory-problem"
@@ -228,6 +229,12 @@ class Resolver:
         r["fire"] = d.store.intent(str(r["issue"]), "", "resolve", coworker=name)
         self.put(d, key, r)
         try:
+            try:
+                model = tiers.model_for("resolve", tiers.tier_for("resolve", "medium", d.cfg.get("tiers")), d.cfg.get("tier_models"))
+            except ValueError:
+                model = None
+            if model:
+                args.update(model)
             run = d.account("send_message", args)
         except Exception as e:
             d.store.abandon(r["fire"], str(e)[:200])
