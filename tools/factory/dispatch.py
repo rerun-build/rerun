@@ -393,6 +393,17 @@ def checks_verdict(runs):
     return "OK", None
 
 
+def failed_ids(runs):
+    latest = {}
+    for r in runs:
+        if r.get("id") is None:
+            continue
+        wid = r.get("workflow_id")
+        if wid not in latest or r["id"] > latest[wid]["id"]:
+            latest[wid] = r
+    return sorted(r["id"] for r in latest.values() if r.get("conclusion") in ("failure", "timed_out"))
+
+
 def fast_verdict(check_runs, names):
     fast = [r for r in check_runs if r.get("name") in names]
     if not fast:
@@ -1378,6 +1389,19 @@ class Dispatcher:
         data = json.loads(self.gh(["api", "repos/%s/actions/runs?head_sha=%s&per_page=100" % (self.repo, j["head"])]))
         runs = data.get("workflow_runs") or []
         verdict, why = checks_verdict(runs)
+        if verdict == "FAIL" and j.get("checks_rerun") != j["head"] and failed_ids(runs):
+            ids = failed_ids(runs)
+            for rid in ids:
+                self.gh(["run", "rerun", str(rid), "-R", self.repo, "--failed"])
+            j.update(checks_rerun=j["head"], checks_rerun_why=why, checks_since=self.now())
+            self.save(j, "%s; its failed jobs run again once before the builder is asked" % why)
+            log(j["issue"], "failed jobs %s run again once" % ", ".join(str(i) for i in ids))
+            return
+        if verdict == "OK" and j.get("checks_rerun") == j["head"] and j.get("checks_rerun_why"):
+            self.note_failures(j, ["flaky check"], "checks",
+                               "passed on a second run at %s: %s" % (j["head"][:7], j["checks_rerun_why"]))
+            j.pop("checks_rerun_why")
+            self.save(j, "passed on a second run at %s" % j["head"][:7])
         if verdict == "FAIL":
             if j.get("red_head") != j["head"]:
                 self.note_failures(dict(j, agent=j.get("builder") or j.get("agent"), run_model=None, tier=None, brief_v=None),

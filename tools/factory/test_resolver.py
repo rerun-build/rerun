@@ -552,7 +552,7 @@ class Do(Resolving):
 
     def test_rerun_ci_reruns_the_failed_jobs_of_the_latest_failed_run_per_workflow_of_a_job_pr(self):
         self.d = self.new()
-        self.d.store.put_job("9", "checks", {"issue": 9, "pr": 42, "head": "abcdef1234567890", "checks_since": 1e12})
+        self.d.store.put_job("9", "checks", {"issue": 9, "pr": 42, "head": "abcdef1234567890", "checks_since": 1e12, "checks_rerun": "abcdef1234567890"})
         self.w.workflows["abcdef1234567890"] = [
             {"id": 11, "workflow_id": 1, "name": "ci", "status": "completed", "conclusion": "failure"},
             {"id": 10, "workflow_id": 1, "name": "ci", "status": "completed", "conclusion": "success"},

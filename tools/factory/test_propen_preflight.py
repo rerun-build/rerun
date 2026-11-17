@@ -211,8 +211,13 @@ class ChecksAfterPush(Base):
     def failures(self):
         return [tuple(r) for r in self.w.rows("SELECT kind, station FROM failures ORDER BY id")]
 
+    def mark_rerun_used(self):
+        job = self.d.store.get_job("5")
+        self.d.store.put_job("5", job["state"], dict(job, checks_rerun=HEAD))
+
     def test_a_red_workflow_run_on_a_pushed_head_is_a_failure_event_of_the_build(self):
         self.to_checks()
+        self.mark_rerun_used()
         self.w.workflows[HEAD] = [dict(run("CI", conclusion="failure"), id=11)]
         self.w.run_jobs = {"11": [{"steps": [{"name": "Lint", "conclusion": "success"}]}]}
         self.tick()
@@ -223,6 +228,7 @@ class ChecksAfterPush(Base):
 
     def test_a_red_lint_step_is_its_own_failure_event(self):
         self.to_checks()
+        self.mark_rerun_used()
         self.w.workflows[HEAD] = [dict(run("Factory tools", conclusion="failure"), id=12), run("Factory tools", conclusion="failure")]
         self.w.run_jobs = {"12": [{"steps": [{"name": "Checkout", "conclusion": "success"}, {"name": "Lint", "conclusion": "failure"}]}]}
         self.tick()
@@ -231,6 +237,7 @@ class ChecksAfterPush(Base):
 
     def test_a_second_red_result_on_the_same_head_is_not_counted_again(self):
         self.to_checks()
+        self.mark_rerun_used()
         self.w.workflows[HEAD] = [dict(run("CI", conclusion="failure"), id=11)]
         self.w.run_jobs = {"11": [{"steps": [{"name": "Lint", "conclusion": "success"}]}]}
         self.tick(2)
