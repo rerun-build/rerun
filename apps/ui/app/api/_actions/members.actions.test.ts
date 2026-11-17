@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 
-const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), sendWorkspaceInviteEmail: vi.fn(), afterTasks: [] as Promise<unknown>[], emailDelivery: true }))
+const mocks = vi.hoisted(() => ({ revokeMemberComputers: vi.fn(async () => {}), getServerSession: vi.fn(), sendWorkspaceInviteEmail: vi.fn(), afterTasks: [] as Promise<unknown>[], emailDelivery: true }))
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
+vi.mock('@/app/api/_services/remote-computers.service', () => ({ revokeMemberComputers: mocks.revokeMemberComputers }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({ get EMAIL_DELIVERY() { return mocks.emailDelivery }, sendWorkspaceInviteEmail: mocks.sendWorkspaceInviteEmail, BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => 'https://app.rerun.build/og/board?sig=x') }))
 vi.mock('next/server', () => ({ after: (task: () => Promise<unknown>) => void mocks.afterTasks.push(task()) }))
@@ -324,6 +325,7 @@ describe('removeMemberAction', () => {
         ])
         const writeOrder = db.chains.filter(chain => writeMethodOf(chain)).map(chain => chain[0].table)
         expect(writeOrder).toEqual(['users', 'workspace_members'])
+        expect(mocks.revokeMemberComputers).toHaveBeenCalledWith(WORKSPACE_ID, 'user-2')
     })
 
     it('leaves the active workspace alone when the member is elsewhere', async () => {

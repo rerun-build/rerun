@@ -1,18 +1,16 @@
 import { DESKTOP_WS_PATH, type DesktopViewMode } from '@rerun/contracts'
 
 import { NoEngineError } from '@/app/api/_services/workspace-engine.service'
-import { DESKTOP_DIRECT, desktopRelayBase } from '@rerun/cloud/engines'
+import { engineSocketUrl } from '@/app/api/_services/engine-socket.service'
 import { buildBaseUrl } from '@/lib/engine/base-url'
 import { supportsDesktop } from '@/lib/engine/client'
-import { mintDesktopTicket } from '@/lib/engine/desktop-ticket'
+import { mintDesktopTicket } from '@/lib/engine/engine-ticket'
 import type { EngineConnection } from '@/lib/engine/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { AppError, type ErrorCode } from '@/lib/i18n/action-error'
 
 const DESKTOP_ENGINE_COLUMNS = ['engine_host', 'engine_api_key', 'host_id', 'box_index'] as const
-
-const LOCAL_ENGINE = /^(localhost|127\.0\.0\.1)$/
 
 export class DesktopUnavailableError extends AppError {
     constructor(code: ErrorCode) {
@@ -23,16 +21,10 @@ export class DesktopUnavailableError extends AppError {
 
 export type WorkspaceDesktop = { conn: EngineConnection; socketBase: string }
 
-// Where a browser reaches the screens of the workspace's machine: an engine on this very machine
-// (local development) directly, a box on one of Rerun Cloud's hosts through that host's relay, and a
-// self-hosted engine on its own address.
 async function socketBaseOf(conn: EngineConnection, hostId: string | null, boxIndex: number | null): Promise<string> {
-    const engine = new URL(conn.baseUrl)
-    if (LOCAL_ENGINE.test(engine.hostname)) return `ws://${engine.host}${DESKTOP_WS_PATH}`
-    const relay = await desktopRelayBase(conn.baseUrl, hostId, boxIndex)
-    if (relay) return `${relay}${DESKTOP_WS_PATH}`
-    if (DESKTOP_DIRECT) return `${engine.protocol === 'https:' ? 'wss' : 'ws'}://${engine.host}${DESKTOP_WS_PATH}`
-    throw new DesktopUnavailableError('desktopNotHereYet')
+    const url = await engineSocketUrl(conn, hostId, boxIndex, DESKTOP_WS_PATH)
+    if (!url) throw new DesktopUnavailableError('desktopNotHereYet')
+    return url
 }
 
 export async function resolveWorkspaceDesktop(workspaceId: number): Promise<WorkspaceDesktop> {

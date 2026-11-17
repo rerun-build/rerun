@@ -1,6 +1,7 @@
 'use server'
 
 import { after } from 'next/server'
+import { revokeMemberComputers } from '@/app/api/_services/remote-computers.service'
 import { requireAdminContext, requireWorkspaceContext, toBoxScope, type BoxScope, type WorkspaceRole } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import { demoteKeepingAnAdmin, isLastAdmin, LAST_ADMIN, listMemberProfiles, resolveMemberIdentities, setMemberRole } from '@/app/api/_services/members.service'
@@ -152,6 +153,7 @@ export async function removeMemberAction(targetUserId: string): Promise<ActionRe
 
         const { error } = await supabase.from('workspace_members').delete().eq('user_id', targetUserId).eq('workspace_id', workspace.id)
         if (error) return { ok: false, error: error.message }
+        await revokeMemberComputers(workspace.id, targetUserId).catch(err => console.warn('[members] computers of a removed member left linked until they reconnect', err))
         return { ok: true }
     } catch (err) {
         return failureOf(err, 'removeMemberFailed')

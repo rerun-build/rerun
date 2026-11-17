@@ -2123,6 +2123,65 @@ export type Database = {
         }
         Relationships: []
       }
+      remote_computers: {
+        Row: {
+          app_version: string
+          arch: string
+          created_at: string
+          handle: string
+          hostname: string
+          id: string
+          last_seen_at: string | null
+          linked_by: string | null
+          name: string
+          os: string
+          revoked_at: string | null
+          token_hash: string
+          updated_at: string
+          workspace_id: number
+        }
+        Insert: {
+          app_version?: string
+          arch?: string
+          created_at?: string
+          handle: string
+          hostname?: string
+          id?: string
+          last_seen_at?: string | null
+          linked_by?: string | null
+          name: string
+          os: string
+          revoked_at?: string | null
+          token_hash: string
+          updated_at?: string
+          workspace_id: number
+        }
+        Update: {
+          app_version?: string
+          arch?: string
+          created_at?: string
+          handle?: string
+          hostname?: string
+          id?: string
+          last_seen_at?: string | null
+          linked_by?: string | null
+          name?: string
+          os?: string
+          revoked_at?: string | null
+          token_hash?: string
+          updated_at?: string
+          workspace_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remote_computers_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rerun_credit_purchases: {
         Row: {
           created_at: string

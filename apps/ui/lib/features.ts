@@ -26,3 +26,7 @@ export const VAULT_RELEASED = true
 // Gates the Simple view, the list of coworkers beside the chat offered next to the 3D board. Until it
 // flips, only the early access sees the switch; the board stays everyone's default either way.
 export const SIMPLE_VIEW_RELEASED = true
+// Gates Computers: linking a computer from the desktop app, the Computers dialog of the workspace
+// menu and `#handle` in the composer. A box offers the coworkers its `remote_*` tools only with the
+// engine's own release (RERUN_REMOTE_COMPUTERS).
+export const REMOTE_COMPUTERS_RELEASED = false

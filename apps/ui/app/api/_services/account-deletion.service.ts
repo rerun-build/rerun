@@ -2,6 +2,7 @@ import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/app/api/database.types'
+import { revokeMemberComputers } from '@/app/api/_services/remote-computers.service'
 import { stopWorkspaceCharges, subscriptionStillCharges, uninstallWorkspaceApps } from '@rerun/cloud/account'
 import type { AccountDeletionBlocker } from '@/lib/auth/account-deletion'
 import { deletedAccountEmailFor } from '@/lib/auth/placeholder-email'
@@ -69,6 +70,7 @@ async function leaveSharedWorkspace(admin: Client, userId: string, workspace: Ow
     }
     const { error } = await admin.from('workspace_members').delete().eq('workspace_id', workspace.id).eq('user_id', userId)
     if (error) throw new Error(error.message)
+    await revokeMemberComputers(workspace.id, userId).catch(err => console.warn('[account] computers of a departing member left linked until they reconnect', err))
 }
 
 // The workspace, its agents and its Boxes stay, with the membership that ties them to the

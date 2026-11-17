@@ -8,8 +8,10 @@ const mocks = vi.hoisted(() => ({
     uninstallWorkspaceApps: vi.fn(),
     listAvatars: vi.fn(),
     removeAvatars: vi.fn(),
+    revokeMemberComputers: vi.fn(async () => {}),
 }))
 
+vi.mock('@/app/api/_services/remote-computers.service', () => ({ revokeMemberComputers: mocks.revokeMemberComputers }))
 vi.mock('@rerun/cloud/account', () => ({ subscriptionStillCharges: mocks.subscriptionStillCharges, stopWorkspaceCharges: mocks.stopWorkspaceCharges, uninstallWorkspaceApps: mocks.uninstallWorkspaceApps }))
 
 const { accountDeletionBlockers, anonymizeAccount, ACCOUNT_DELETED_REASON } = await import('./account-deletion.service')
@@ -145,6 +147,7 @@ describe('anonymizeAccount', () => {
             ['user_id', TEAMMATE],
         ])
         expect(leave.method).toBe('delete')
+        expect(mocks.revokeMemberComputers).toHaveBeenCalledWith(SHARED.id, USER)
     })
 
     it('promotes no one when another admin stays', async () => {

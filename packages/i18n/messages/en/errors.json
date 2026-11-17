@@ -466,5 +466,12 @@
     "vaultConflictSomeone": "A coworker already gets {name} from another Vault entry",
     "vaultMcpTarget": "Give the server either an address or a command",
     "saveAnswerFailed": "We could not save that. Try again.",
-    "notYourCompanySite": "{domain} is not your company's site. Enter yours, or skip."
+    "notYourCompanySite": "{domain} is not your company's site. Enter yours, or skip.",
+    "computerNameInvalid": "Give the computer a name of 1 to 100 characters.",
+    "computerHandleTaken": "Too many computers of this workspace already have this name. Pick another one.",
+    "computerNotFound": "This computer is no longer linked to the workspace.",
+    "computersNeedMachine": "This workspace has no machine yet, so its coworkers cannot use a computer.",
+    "computersNeedEngineUpdate": "Computers arrive with the next update of this workspace's machine. Try again in a little while.",
+    "computersOff": "Computers are not available on this workspace yet.",
+    "computersAdminOnly": "Only an admin can change or unlink a computer someone else linked."
 }
