@@ -2,12 +2,17 @@
 //   pnpm verify:desktop --onboarded --scenario apps/desktop-app/e2e/quick-ask.mjs
 //
 // Playwright cannot press a global shortcut: the window is opened by the File menu's item, which
-// runs the same toggle, and the shortcut's registration is checked on its own.
+// runs the same toggle, and the shortcut's registration is checked on its own. The second half
+// changes the shortcut, from the page and from the recorder of the Desktop tab.
 
 function check(condition, message) {
     if (!condition) throw new Error(`Check failed: ${message}`)
     console.log(`[e2e] ok: ${message}`)
 }
+
+const isRegistered = (app, accelerator) => app.evaluate(({ globalShortcut }, keys) => globalShortcut.isRegistered(keys), accelerator)
+const menuAccelerator = (app) => app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').accelerator ?? null)
+const setShortcut = (page, accelerator) => page.evaluate((keys) => window.rerunShell.quickAsk.setShortcut('text', keys), accelerator)
 
 async function waitUntil(read, predicate, message, timeoutMs = 30_000) {
     const deadline = Date.now() + timeoutMs
@@ -25,7 +30,9 @@ const QUESTION = 'What did my coworkers finish today?'
 export default async function quickAskScenario({ app, page, step, base }) {
     await page.goto(base)
     await page.waitForSelector('[data-foreman-split]', { timeout: 60_000 })
-    check(await app.evaluate(({ globalShortcut }) => globalShortcut.isRegistered('CommandOrControl+Shift+Space')), 'the global shortcut is registered')
+    const initial = await page.evaluate(() => window.rerunShell.settings.get())
+    check(initial.quickAskShortcut === (process.platform === 'darwin' ? 'Shift+Command+Space' : 'Control+Shift+Space'), `the default shortcut is set (${initial.quickAskShortcut})`)
+    check(await isRegistered(app, initial.quickAskShortcut), 'the global shortcut is registered')
 
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].hide())
     await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').click())
@@ -57,4 +64,54 @@ export default async function quickAskScenario({ app, page, step, base }) {
     await quick.keyboard.press('Escape')
     await waitUntil(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((candidate) => candidate.webContents.getURL().endsWith('/quick-ask'))?.isVisible() ?? false), (visible) => !visible, 'Escape puts it away')
     check((await page.getByText('never sent').count()) === 0, 'nothing is sent on Escape')
+
+    // The shortcut changes: the new keys are registered, the old ones let go, the menu follows.
+    const moved = await setShortcut(page, 'Control+Alt+K')
+    check(moved.status === 'ok' && moved.settings.quickAskShortcut === 'Control+Alt+K' && moved.settings.quickAsk, 'a new shortcut is saved')
+    check((await isRegistered(app, 'Control+Alt+K')) && !(await isRegistered(app, initial.quickAskShortcut)), 'the new keys are registered, the old ones let go')
+    await waitUntil(() => menuAccelerator(app), (accelerator) => accelerator === 'Control+Alt+K', 'the File menu shows the new shortcut')
+
+    // Recording a new one holds the current one back, and gives it back.
+    await page.evaluate(() => window.rerunShell.quickAsk.pauseShortcuts(true))
+    await waitUntil(() => isRegistered(app, 'Control+Alt+K'), (registered) => !registered, 'the shortcut is held back while recording')
+    await page.evaluate(() => window.rerunShell.quickAsk.pauseShortcuts(false))
+    await waitUntil(() => isRegistered(app, 'Control+Alt+K'), Boolean, 'and comes back when recording ends')
+
+    // Keys the shell refuses, and keys someone else holds, leave the shortcut as it was.
+    const invalid = await setShortcut(page, 'Shift+K')
+    check(invalid.status === 'invalid' && invalid.settings.quickAskShortcut === 'Control+Alt+K', 'a shortcut without a modifier is refused')
+    await app.evaluate(({ globalShortcut }) => globalShortcut.register('Control+Alt+J', () => {}))
+    const taken = await setShortcut(page, 'Control+Alt+J')
+    check(taken.status === 'taken' && taken.settings.quickAskShortcut === 'Control+Alt+K' && (await isRegistered(app, 'Control+Alt+K')), `keys already held are refused, the previous shortcut stays (${taken.status})`)
+    await app.evaluate(({ globalShortcut }) => globalShortcut.unregister('Control+Alt+J'))
+
+    // No shortcut is Quick ask off; the switch of an older web app still turns it back on.
+    const off = await setShortcut(page, null)
+    check(off.status === 'ok' && off.settings.quickAskShortcut === null && !off.settings.quickAsk && !(await isRegistered(app, 'Control+Alt+K')), 'no shortcut turns Quick ask off')
+    const legacy = await page.evaluate(() => window.rerunShell.settings.set({ quickAsk: true }))
+    check(legacy.quickAskShortcut === initial.quickAskShortcut && (await isRegistered(app, initial.quickAskShortcut)), 'the old switch puts the default back')
+
+    // The recorder of the Desktop tab.
+    await page.getByRole('button', { name: /workspace/i }).first().click()
+    await page.getByRole('menuitem', { name: /account/i }).first().click()
+    await page.getByRole('tab', { name: 'Desktop app' }).click()
+    const recorder = page.locator('#desktop-quick-ask')
+    await recorder.waitFor()
+    await step('desktop tab with the shortcut')
+    await recorder.click()
+    await waitUntil(() => isRegistered(app, initial.quickAskShortcut), (registered) => !registered, 'clicking the recorder holds the shortcut back')
+    await page.keyboard.press('Meta+Space')
+    await page.getByText(/is used by Spotlight|is used by the system|is used by/).first().waitFor()
+    await step('a shortcut of the system is refused')
+    await page.keyboard.press('Control+Alt+L')
+    await waitUntil(() => page.evaluate(() => window.rerunShell.settings.get()), (settings) => settings.quickAskShortcut === 'Control+Alt+L', 'a shortcut typed in the recorder is saved')
+    check(await isRegistered(app, 'Control+Alt+L'), 'and registered')
+    await step('shortcut recorded')
+    await recorder.click()
+    await page.keyboard.press('Backspace')
+    await page.getByText('Off. Record a shortcut to turn it on.').waitFor()
+    check(!(await isRegistered(app, 'Control+Alt+L')), '⌫ in the recorder turns Quick ask off')
+    await step('quick ask off')
+    await setShortcut(page, null)
+    await page.evaluate(() => window.rerunShell.settings.set({ quickAsk: true }))
 }

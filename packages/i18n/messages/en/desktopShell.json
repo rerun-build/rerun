@@ -13,7 +13,15 @@
         "openInApp.title": "Toast in the web browser, offering to open the current page in the Rerun desktop app. {app} is the app name.",
         "quickAsk.placeholder": "Placeholder of the small floating window of the desktop app where the person types a question for the Chief of Staff (the workspace assistant).",
         "settings.quickAskHint": "{shortcut} is the keyboard shortcut, like ⌘⇧Space.",
-        "server.otherServer": "Discreet link on the sign-in page of the desktop app, for people whose company hosts Rerun itself."
+        "server.otherServer": "Discreet link on the sign-in page of the desktop app, for people whose company hosts Rerun itself.",
+        "settings.quickAskOff": "Helper under the Quick ask row of the desktop app settings when no keyboard shortcut is set. Quick ask is a small window to ask the Chief of Staff (the workspace assistant) from any app.",
+        "settings.shortcut.record": "Placeholder of an empty field that records a keyboard shortcut when clicked.",
+        "settings.shortcut.typing": "Shown in that field while it waits for the person to press the keys of the new shortcut.",
+        "settings.shortcut.recordingHint": "Under that field while recording. Esc and ⌫ are the keyboard keys Escape and Backspace.",
+        "settings.shortcut.change": "Accessible label of the field. {keys} is the current shortcut, like ⇧ ⌘ Space.",
+        "settings.shortcut.needsModifier": "Error under the field when the shortcut has no modifier key. {key} is ⌘ on a Mac, Ctrl elsewhere.",
+        "settings.shortcut.reserved": "Error under the field. {keys} is the shortcut, like ⌘ Space. {owner} names what already uses it on the computer.",
+        "settings.shortcut.taken": "Error under the field when another app already uses the shortcut. {keys} is like ⌃ ⌥ K."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -68,7 +76,19 @@
         "check": "Check for updates",
         "restart": "Restart to update to {version}",
         "quickAsk": "Quick ask",
-        "quickAskHint": "{shortcut} opens a field for your Chief of Staff from any app."
+        "quickAskHint": "{shortcut} opens a field for your Chief of Staff from any app.",
+        "quickAskOn": "Opens a field for your Chief of Staff from any app.",
+        "quickAskOff": "Off. Record a shortcut to turn it on.",
+        "shortcut": {
+            "record": "Record shortcut",
+            "typing": "Type a shortcut",
+            "tryAnother": "Try another",
+            "recordingHint": "Esc cancels, ⌫ turns it off",
+            "change": "Shortcut {keys}, click to change",
+            "needsModifier": "Add a modifier key, like {key}",
+            "reserved": "{keys} is used by {owner, select, spotlight {Spotlight} finder {Finder search} inputSources {input sources} appSwitcher {the app switcher} screenshot {screenshots} windowMenu {the window menu} system {the system} other {every app}}",
+            "taken": "{keys} is used by another app"
+        }
     },
     "openInApp": {
         "title": "Open this page in {app}?",

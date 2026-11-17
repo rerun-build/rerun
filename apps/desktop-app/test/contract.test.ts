@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { compareShellVersions, desktopShellScheme, desktopShellUserAgentToken, parseDesktopShellUserAgent } from '@rerun/contracts'
+import { compareShellVersions, defaultQuickAskAccelerator, desktopShellScheme, desktopShellUserAgentToken, formatAccelerator, parseAccelerator, parseDesktopShellUserAgent, quickAskAccelerator, shortcutNeedsModifier } from '@rerun/contracts'
 
 describe('the desktop User-Agent token', () => {
     it('round-trips through the server’s parser', () => {
@@ -29,5 +29,38 @@ describe('desktopShellScheme', () => {
         expect(desktopShellScheme('stable')).toBe('rerun-desktop')
         expect(desktopShellScheme('staging')).toBe('rerun-desktop-staging')
         expect(desktopShellScheme('dev')).toBe('rerun-desktop-dev')
+    })
+})
+
+describe('Quick ask accelerators', () => {
+    it('writes a shortcut in one canonical form', () => {
+        expect(quickAskAccelerator('cmd+shift+space')).toBe('Shift+Command+Space')
+        expect(quickAskAccelerator('Alt+Control+k')).toBe('Control+Alt+K')
+        expect(quickAskAccelerator('Shift+Command+.')).toBe('Shift+Command+.')
+        expect(formatAccelerator({ modifiers: ['Super', 'Alt'], key: 'F5' })).toBe('Alt+Super+F5')
+    })
+
+    it('refuses a shortcut that would fire while typing, or keys it does not know', () => {
+        expect(quickAskAccelerator('K')).toBeNull()
+        expect(quickAskAccelerator('Shift+K')).toBeNull()
+        expect(quickAskAccelerator('F5')).toBe('F5')
+        expect(quickAskAccelerator('Command+Shift')).toBeNull()
+        expect(quickAskAccelerator('Command+Command+K')).toBeNull()
+        expect(quickAskAccelerator('Command+MediaPlayPause')).toBeNull()
+        expect(quickAskAccelerator('CommandOrControl+Space')).toBeNull()
+        expect(quickAskAccelerator('Command++')).toBeNull()
+        expect(quickAskAccelerator(42)).toBeNull()
+        expect(quickAskAccelerator(`Command+${'K'.repeat(80)}`)).toBeNull()
+    })
+
+    it('parses back what it formats', () => {
+        const shortcut = parseAccelerator('Control+Alt+Shift+Command+Up')
+        expect(shortcut).toEqual({ modifiers: ['Control', 'Alt', 'Shift', 'Command'], key: 'Up' })
+        expect(shortcutNeedsModifier({ modifiers: ['Shift'], key: 'Space' })).toBe(true)
+    })
+
+    it('opens Quick ask with ⌘⇧Space on a Mac and Ctrl+Shift+Space elsewhere', () => {
+        expect(defaultQuickAskAccelerator('mac')).toBe('Shift+Command+Space')
+        expect(defaultQuickAskAccelerator('win')).toBe('Control+Shift+Space')
     })
 })

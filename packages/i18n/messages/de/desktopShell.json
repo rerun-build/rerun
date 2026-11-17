@@ -52,7 +52,19 @@
         "check": "Nach Updates suchen",
         "restart": "Neu starten für Version {version}",
         "quickAsk": "Schnellfrage",
-        "quickAskHint": "{shortcut} öffnet aus jeder App ein Feld für deinen Chief of Staff."
+        "quickAskHint": "{shortcut} öffnet aus jeder App ein Feld für deinen Chief of Staff.",
+        "quickAskOn": "Öffnet aus jeder App ein Feld für deinen Chief of Staff.",
+        "quickAskOff": "Aus. Nimm ein Tastenkürzel auf, um es einzuschalten.",
+        "shortcut": {
+            "record": "Tastenkürzel aufnehmen",
+            "typing": "Tastenkürzel drücken",
+            "tryAnother": "Ein anderes versuchen",
+            "recordingHint": "Esc bricht ab, ⌫ schaltet es aus",
+            "change": "Tastenkürzel {keys}, zum Ändern klicken",
+            "needsModifier": "Füge eine Sondertaste hinzu, etwa {key}",
+            "reserved": "{keys} wird verwendet von {owner, select, spotlight {Spotlight} finder {der Finder-Suche} inputSources {den Eingabequellen} appSwitcher {dem App-Umschalter} screenshot {den Bildschirmfotos} windowMenu {dem Fenstermenü} system {dem System} other {allen Apps}}",
+            "taken": "{keys} wird von einer anderen App verwendet"
+        }
     },
     "openInApp": {
         "title": "Diese Seite in {app} öffnen?",

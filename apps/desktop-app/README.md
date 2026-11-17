@@ -82,8 +82,11 @@ follows the server the window shows, not only the configured one.
 - A browser that signed the app in (cookie `rr_desktop_app`) offers once per tab to open the page in
   the app (`rerun-desktop://open?path=/…`, a path of the server and nothing else): the link of an
   email lands in the browser, the work happens in the app.
-- Quick ask: ⌘⇧Space (Ctrl+Shift+Space) from any app opens a small floating field for the Chief of
-  Staff (`/quick-ask`). The text goes to the main window through the origin's localStorage, never a
+- Quick ask: ⌘⇧Space (Ctrl+Shift+Space) by default, from any app, opens a small floating field for
+  the Chief of Staff (`/quick-ask`). The person records another shortcut, or none, in the Desktop tab
+  (`quickAsk.setShortcut`, capability `quickAskShortcut`); the shell checks it
+  (`quickAskAccelerator` of `@rerun/contracts`), keeps the previous one when the system refuses the
+  new keys, and holds it back while a new one is recorded (`quickAsk.pauseShortcuts`). The text goes to the main window through the origin's localStorage, never a
   URL a link could forge, and the main window asks it in a new conversation.
 - New Window (⌘⇧N): another window of the same session; each keeps its own workspace (the web
   holds it per tab).

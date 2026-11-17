@@ -1,3 +1,5 @@
+import type { QuickAskShortcutKind } from './desktop-shell-shortcut.js'
+
 // The contract between the Rerun desktop app (`apps/desktop-app`, an Electron shell that loads the web
 // app) and the web app it loads. The web is deployed continuously while old shells stay installed for
 // months, so the web never assumes a method exists: it checks `apiVersion` and the capability first.
@@ -11,7 +13,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -104,14 +106,23 @@ export type DesktopSettings = {
     openAtLogin: boolean
     // Windows and Linux: closing the window leaves the app in the tray. macOS always does.
     closeToTray: boolean
-    // The global shortcut that opens Quick ask, from any app.
+    // Quick ask has a shortcut. Kept for the web apps that predate `quickAskShortcut`: false clears
+    // the shortcut, true puts the default back.
     quickAsk: boolean
+    // The global shortcut that opens Quick ask from any app, as an accelerator, or null when off.
+    // Absent from the shells without the `quickAskShortcut` capability.
+    quickAskShortcut?: string | null
 }
+
+// `taken`: the system or another app holds the keys, the previous shortcut stays. `invalid`: not a
+// shortcut the shell accepts (see `quickAskAccelerator`).
+export type QuickAskShortcutResult = { status: 'ok' | 'taken' | 'invalid'; settings: DesktopSettings }
 
 // The page the Quick ask window shows: one field, sent to the Chief of Staff.
 export const QUICK_ASK_PATH = '/quick-ask'
 
-// Electron's accelerator syntax: ⌘⇧Space on macOS, Ctrl+Shift+Space elsewhere.
+// Electron's accelerator syntax: ⌘⇧Space on macOS, Ctrl+Shift+Space elsewhere. The shortcut every
+// shell shipped with; a person can now change it (`DesktopSettings.quickAskShortcut`).
 export const QUICK_ASK_SHORTCUT = 'CommandOrControl+Shift+Space'
 
 export type DesktopSignInProvider = 'google' | 'apple'
@@ -181,11 +192,17 @@ export type DesktopShellApi = {
         openPicker(): void
     }
     quickAsk: {
-        // The keys of the shortcut, as Electron writes them (`CommandOrControl+Shift+Space`).
+        // The default shortcut, as Electron writes it (`CommandOrControl+Shift+Space`). The one in use
+        // is `settings.get().quickAskShortcut` on a shell with the `quickAskShortcut` capability.
         shortcut: string
         close(): void
         // The message left: the main window opens on `path`.
         sent(path: string): void
+        // `quickAskShortcut` capability. Null turns Quick ask's shortcut off.
+        setShortcut(kind: QuickAskShortcutKind, accelerator: string | null): Promise<QuickAskShortcutResult>
+        // While a new shortcut is being recorded, the current one must not open Quick ask. The shell
+        // resumes by itself after 30 seconds, and as soon as `setShortcut` is called.
+        pauseShortcuts(paused: boolean): void
     }
 }
 

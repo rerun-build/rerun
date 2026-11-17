@@ -23,6 +23,8 @@ export const IPC = {
     serverOpenPicker: 'rerun-shell:server:open-picker',
     quickAskClose: 'rerun-shell:quick-ask:close',
     quickAskSent: 'rerun-shell:quick-ask:sent',
+    quickAskSetShortcut: 'rerun-shell:quick-ask:set-shortcut',
+    quickAskPauseShortcuts: 'rerun-shell:quick-ask:pause-shortcuts',
     localServerInfo: 'rerun-shell:local:server-info',
     localServerConnect: 'rerun-shell:local:server-connect',
     localServerCancel: 'rerun-shell:local:server-cancel',

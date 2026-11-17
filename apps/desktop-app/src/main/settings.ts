@@ -13,7 +13,10 @@ export type ShellSettings = {
     openAtLogin?: boolean
     // Windows and Linux: closing the window keeps the app in the tray.
     closeToTray?: boolean
+    // Written by the shells that predate `quickAskShortcut`, still read when that one is absent.
     quickAsk?: boolean
+    // An accelerator, or null when the person turned Quick ask off.
+    quickAskShortcut?: string | null
     // The balloon that says so was shown once.
     explainedTray?: boolean
 }

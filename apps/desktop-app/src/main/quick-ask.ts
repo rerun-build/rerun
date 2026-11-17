@@ -1,13 +1,11 @@
-import { app, BrowserWindow, globalShortcut, screen } from 'electron'
-import { QUICK_ASK_PATH, QUICK_ASK_SHORTCUT } from '@rerun/contracts'
+import { app, BrowserWindow, globalShortcut, screen, type WebContents } from 'electron'
+import { QUICK_ASK_PATH } from '@rerun/contracts'
 import { currentServer, getMainWindow, loadAppPath, openExternal, PRELOAD_PATH, showMainWindow } from './main-window'
 import { partitionFor } from './server'
 import { decideNavigation } from './url-policy'
 
 // A global shortcut opens a small window over whatever the person is doing, with one field: what to
 // ask the Chief of Staff. Sent, it closes and the main window opens on the conversation.
-
-export const QUICK_ASK_ACCELERATOR = QUICK_ASK_SHORTCUT
 
 const WIDTH = 640
 const HEIGHT = 180
@@ -16,7 +14,6 @@ let quickWindow: BrowserWindow | null = null
 let shownAt = 0
 // Showing the window from another app can blur it at once, before it ever had the keyboard.
 const BLUR_GRACE_MS = 500
-let registered = false
 
 function createQuickWindow(origin: string): BrowserWindow {
     const window = new BrowserWindow({
@@ -98,13 +95,79 @@ export function quickAskSent(path: string): void {
     if (getMainWindow()) loadAppPath(path)
 }
 
-export function setQuickAskShortcut(enabled: boolean): boolean {
-    if (registered) {
-        globalShortcut.unregister(QUICK_ASK_ACCELERATOR)
-        registered = false
+// --- the global shortcut ------------------------------------------------------------------------------
+
+// `wanted` is the person's shortcut; `registered` is what the system actually gave the app, null while
+// recording a new one or when another app holds the keys.
+let wanted: string | null = null
+let registered: string | null = null
+const PAUSE_LIMIT_MS = 30_000
+let pauseTimer: ReturnType<typeof setTimeout> | null = null
+const listeners = new Set<() => void>()
+const watchedRequesters = new WeakSet<WebContents>()
+
+function release(): void {
+    if (registered) globalShortcut.unregister(registered)
+    registered = null
+}
+
+function claim(accelerator: string | null): boolean {
+    if (!accelerator) return true
+    try {
+        if (!globalShortcut.register(accelerator, toggleQuickAsk)) return false
+    } catch {
+        return false
     }
-    if (enabled) registered = globalShortcut.register(QUICK_ASK_ACCELERATOR, toggleQuickAsk)
-    return registered
+    registered = accelerator
+    return true
+}
+
+function endPause(): void {
+    if (pauseTimer) clearTimeout(pauseTimer)
+    pauseTimer = null
+    if (!registered) claim(wanted)
+}
+
+export function quickAskShortcut(): string | null {
+    return wanted
+}
+
+export function onQuickAskShortcutChange(listener: () => void): void {
+    listeners.add(listener)
+}
+
+// At launch: the stored shortcut stays the person's even when another app holds it this time.
+export function restoreQuickAskShortcut(accelerator: string | null): void {
+    release()
+    wanted = accelerator
+    claim(accelerator)
+}
+
+// False when the keys are taken: the previous shortcut is registered again and stays the person's.
+export function setQuickAskShortcut(accelerator: string | null): boolean {
+    if (pauseTimer) clearTimeout(pauseTimer)
+    pauseTimer = null
+    release()
+    if (!claim(accelerator)) {
+        claim(wanted)
+        return false
+    }
+    const changed = wanted !== accelerator
+    wanted = accelerator
+    if (changed) for (const listener of listeners) listener()
+    return true
+}
+
+// While the page records a new shortcut, pressing the current one must reach the page, not open
+// Quick ask. A page that never says it is done (closed, crashed) does not keep it off for good.
+export function pauseQuickAskShortcut(paused: boolean, requester: WebContents): void {
+    if (!paused) return endPause()
+    release()
+    if (pauseTimer) clearTimeout(pauseTimer)
+    pauseTimer = setTimeout(endPause, PAUSE_LIMIT_MS)
+    if (watchedRequesters.has(requester)) return
+    watchedRequesters.add(requester)
+    requester.once('destroyed', endPause)
 }
 
 // A new server (the person switched) gets a new window in its own session.

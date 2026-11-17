@@ -52,7 +52,19 @@
         "check": "Buscar actualizaciones",
         "restart": "Reiniciar para actualizar a {version}",
         "quickAsk": "Pregunta rápida",
-        "quickAskHint": "{shortcut} abre un campo para tu Chief of Staff desde cualquier app."
+        "quickAskHint": "{shortcut} abre un campo para tu Chief of Staff desde cualquier app.",
+        "quickAskOn": "Abre un campo para tu Chief of Staff desde cualquier app.",
+        "quickAskOff": "Desactivado. Graba un atajo para activarlo.",
+        "shortcut": {
+            "record": "Grabar atajo",
+            "typing": "Escribe un atajo",
+            "tryAnother": "Prueba otro",
+            "recordingHint": "Esc cancela, ⌫ lo desactiva",
+            "change": "Atajo {keys}, haz clic para cambiarlo",
+            "needsModifier": "Añade una tecla modificadora, como {key}",
+            "reserved": "{keys} lo usa {owner, select, spotlight {Spotlight} finder {la búsqueda del Finder} inputSources {el cambio de fuente de entrada} appSwitcher {el selector de apps} screenshot {las capturas de pantalla} windowMenu {el menú de la ventana} system {el sistema} other {cualquier app}}",
+            "taken": "{keys} lo usa otra app"
+        }
     },
     "openInApp": {
         "title": "¿Abrir esta página en {app}?",

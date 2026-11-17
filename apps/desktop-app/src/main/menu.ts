@@ -1,7 +1,7 @@
 import { app, Menu, type MenuItemConstructorOptions } from 'electron'
-import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
 import { devToolsAllowed, PRODUCT_NAME } from './identity'
 import { t } from './messages'
+import { quickAskShortcut } from './quick-ask'
 
 export type MenuActions = {
     openExternal: (url: string) => void
@@ -41,7 +41,7 @@ export function buildMenu(actions: MenuActions): Menu {
         submenu: [
             { id: 'new-window', label: t('menu.file.newWindow'), accelerator: 'CmdOrCtrl+Shift+N', click: actions.newWindow },
             // The shortcut is global (registered by quick-ask.ts): the menu only shows it.
-            { id: 'quick-ask', label: t('tray.quickAsk'), accelerator: QUICK_ASK_SHORTCUT, registerAccelerator: false, click: actions.quickAsk },
+            { id: 'quick-ask', label: t('tray.quickAsk'), accelerator: quickAskShortcut() ?? undefined, registerAccelerator: false, click: actions.quickAsk },
             { type: 'separator' },
             ...(mac ? [] : [{ label: t('menu.app.checkForUpdates'), click: actions.checkForUpdates }, { label: t('menu.app.changeServer'), click: actions.changeServer }, { type: 'separator' as const }]),
             mac ? { role: 'close' as const, label: t('menu.file.closeWindow') } : { role: 'quit' as const, label: t('menu.app.quit', { name }) },

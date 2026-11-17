@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
-import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState } from '@rerun/contracts'
+import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState, QuickAskShortcutResult } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
 // Runs before any script of the page, in an isolated world, in the main frame only. It asks the
@@ -73,6 +73,8 @@ if (bootstrap?.audience === 'app') {
             shortcut: QUICK_ASK_SHORTCUT,
             close: () => void ipcRenderer.invoke(IPC.quickAskClose),
             sent: (path) => void ipcRenderer.invoke(IPC.quickAskSent, String(path)),
+            setShortcut: (kind, accelerator) => ipcRenderer.invoke(IPC.quickAskSetShortcut, { kind: String(kind), accelerator: accelerator === null ? null : String(accelerator) }) as Promise<QuickAskShortcutResult>,
+            pauseShortcuts: (paused) => void ipcRenderer.invoke(IPC.quickAskPauseShortcuts, paused === true),
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)
