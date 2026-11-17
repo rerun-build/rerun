@@ -28,4 +28,15 @@ export type OnboardingAnswers = {
     company_size?: string
     position?: string
     position_other?: string
+    // What the welcome page keeps besides the fields above, which every other reader already knows.
+    onboarding?: WelcomeProgress
+}
+
+export type WelcomeProgress = {
+    siteSkipped?: boolean
+    // What they typed under "Other", kept verbatim beside the bucket it was filed into.
+    industryLabel?: string
+    teamDone?: boolean
+    // Set when the onboarding hands over, cleared by the one turn in which the Chief of Staff speaks first.
+    greetPending?: boolean
 }

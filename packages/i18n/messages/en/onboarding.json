@@ -1,0 +1,17 @@
+{
+    "_context": {
+        "industries": "Lines of business shown as a badge on the onboarding board and as tiles of the industry question."
+    },
+    "industries": {
+        "agencies": "Agencies",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Sales",
+        "recruiting": "Recruiting",
+        "real-estate": "Real estate",
+        "legal": "Legal & compliance",
+        "creators": "Creators",
+        "productivity": "Productivity",
+        "other": "Other"
+    }
+}

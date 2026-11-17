@@ -1,0 +1,14 @@
+{
+    "industries": {
+        "agencies": "Agences",
+        "ecommerce": "E-commerce",
+        "saas": "SaaS",
+        "sales": "Ventes",
+        "recruiting": "Recrutement",
+        "real-estate": "Immobilier",
+        "legal": "Juridique et conformité",
+        "creators": "Créateurs",
+        "productivity": "Productivité",
+        "other": "Autre"
+    }
+}
