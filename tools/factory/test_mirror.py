@@ -257,3 +257,11 @@ class TimeoutEndsTheTree(unittest.TestCase):
 
     def test_a_child_that_ignores_the_first_signal_is_ended_by_the_second(self):
         self.past_its_time("trap \"\" TERM;")
+
+
+class LaunchedAsTheWrapperDoes(unittest.TestCase):
+    def test_the_script_finds_its_sibling_modules_from_any_folder_under_isolated_python(self):
+        script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mirror.py")
+        r = subprocess.run([sys.executable, "-I", script], cwd="/", capture_output=True, text=True)
+        self.assertNotIn("ModuleNotFoundError", r.stderr)
+        self.assertEqual((r.returncode, r.stdout.strip()), (2, "usage: mirror refresh <repo> | mirror check <repo>"))
