@@ -1,8 +1,8 @@
 import { workspaceActor } from '@/app/api/_auth/access'
 import { MAX_TEXT_WRITE_CHARS } from '@rerun/contracts'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { agentFilesBase, chat as engineChat, createMemory, createSchedule, createTrigger, getAgent, importSkill, listConnections, listSchedules, listSkills, listTriggers, patchAgent, updateSchedule, updateTrigger, uploadFile, writeFileText } from '@/lib/engine/client'
+import { EngineUnreachableError, agentFilesBase, chat as engineChat, createMemory, createSchedule, createTrigger, getAgent, getRun, importSkill, listConnections, listSchedules, listSkills, listTriggers, patchAgent, updateSchedule, updateTrigger, uploadFile, writeFileText } from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 
@@ -96,6 +96,46 @@ describe('dispatchAccountTool', () => {
             await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'agent-own', message: 'hi' })).rejects.toThrow(/could not be reached/)
 
             expect(vi.mocked(engineChat).mock.calls[0][2]).toMatchObject({ callableAgentIds: undefined })
+        })
+
+        describe('once the engine took the message', () => {
+            const done = { id: 'run-1', status: 'done', sessionId: 's-1', output: 'ok', costMicros: null } as never
+            const send = async (waitSeconds: number) => {
+                const answer = dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'send_message', { agentId: 'agent-own', message: 'hi', waitSeconds })
+                answer.catch(() => {})
+                await vi.advanceTimersByTimeAsync(waitSeconds * 1000 + 4000)
+                return answer
+            }
+
+            beforeEach(() => {
+                vi.useFakeTimers()
+                vi.mocked(engineChat).mockResolvedValue(new Response('', { status: 200, headers: { 'x-run-id': 'run-1' } }))
+            })
+
+            afterEach(() => {
+                vi.useRealTimers()
+            })
+
+            it('keeps reading the run when one read cannot reach the machine', async () => {
+                vi.mocked(getRun).mockRejectedValueOnce(new EngineUnreachableError('slow')).mockResolvedValue(done)
+
+                await expect(send(10)).resolves.toMatchObject({ runId: 'run-1', status: 'done', output: 'ok' })
+            })
+
+            it('reports the run as delivered and still running when no read reaches the machine', async () => {
+                vi.mocked(getRun).mockRejectedValue(new EngineUnreachableError('slow'))
+
+                const answer = (await send(1)) as Record<string, unknown>
+
+                expect(answer).toMatchObject({ runId: 'run-1', status: 'running', output: null })
+                expect(answer.note).toMatch(/delivered.*get_run/)
+            })
+
+            it('still fails on a read the engine refused', async () => {
+                vi.mocked(getRun).mockRejectedValue(new Error('Run not found'))
+
+                await expect(send(1)).rejects.toThrow('Run not found')
+            })
         })
     })
 
