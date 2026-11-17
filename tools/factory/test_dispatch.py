@@ -191,7 +191,7 @@ class World:
                 self.unlabelled.add(int(a[2]))
             return ""
         if a[:2] == ["pr", "view"]:
-            return json.dumps({"headRefOid": HEAD, "state": self.pr_state, "mergeable": self.mergeable,
+            return json.dumps({"headRefOid": HEAD, "state": self.pr_state, "mergeable": self.mergeable, "comments": [{"body": c} for c in getattr(self, "pr_comments", [])],
                                "mergeCommit": {"oid": self.merge_sha}})
         if a[:2] == ["pr", "list"]:
             return json.dumps(self.open_prs)
