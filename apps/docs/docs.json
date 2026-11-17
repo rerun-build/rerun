@@ -124,6 +124,7 @@
               "api/tools/runs",
               "api/tools/databases",
               "api/tools/connectors",
+              "api/tools/vault",
               "api/tools/sharing",
               "api/tools/templates"
             ]

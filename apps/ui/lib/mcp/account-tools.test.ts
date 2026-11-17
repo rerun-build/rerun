@@ -3,13 +3,13 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { ACCOUNT_TOOL_DEFS, ACCOUNT_TOOL_NAMES } from './account-tools'
 
-// The server advertises one static list and dispatches through three chained switches. Nothing
+// The server advertises one static list and dispatches through four chained switches. Nothing
 // else ties them together, so a tool declared with no case answers "Unknown tool" to a model that
 // trusted tools/list, and a name declared twice silently shadows a handler.
 
 const advertisedNames: string[] = ACCOUNT_TOOL_NAMES
 
-const handledNames = ['mcp-account.service.ts', 'mcp-shares.service.ts', 'mcp-templates.service.ts'].flatMap(file =>
+const handledNames = ['mcp-account.service.ts', 'mcp-vault.service.ts', 'mcp-shares.service.ts', 'mcp-templates.service.ts'].flatMap(file =>
     [...readFileSync(path.resolve(import.meta.dirname, '../../app/api/_services', file), 'utf8').matchAll(/case '([a-z_]+)':/g)].map(match => match[1]),
 )
 

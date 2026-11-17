@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { ACCOUNT_TOOL_DEFS, ACCOUNT_TOOL_NAMES } from './account-tools'
 import { IMPORT_TOOL_NAMES, importToolDefs } from './import-scope'
+import { VAULT_TOOL_DEFS } from './vault-tools'
 
 describe('the import scope', () => {
     it('names only tools the account server advertises', () => {
@@ -12,6 +13,10 @@ describe('the import scope', () => {
     it('reaches nothing that deletes, runs, messages or reads the rest of the account', () => {
         const forbidden = /^(delete_|detach_|send_message|run_|test_|rotate_|db_|space_db_|list_agents|list_spaces|list_runs|get_run|set_default_model)/
         expect([...IMPORT_TOOL_NAMES].filter(name => forbidden.test(name))).toEqual([])
+    })
+
+    it('reaches nothing of the Vault, which holds the whole workspace accounts', () => {
+        expect(VAULT_TOOL_DEFS.filter(tool => IMPORT_TOOL_NAMES.has(tool.name))).toEqual([])
     })
 
     // Outside agents (Grok, OpenAI-based ones) refuse a tool whose description runs past 1,024

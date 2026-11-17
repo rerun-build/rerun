@@ -22,7 +22,7 @@ vi.mock('@/app/api/_services/workspace-engine.service', () => ({
 vi.mock('@/app/api/_services/agent.service', () => ({ changeAgentHandle: vi.fn(), createAgent: vi.fn(), deleteAgent: vi.fn(), moveAgentToBox: vi.fn(), renameAgent: vi.fn() }))
 vi.mock('@/app/api/_services/agent-setup.service', () => ({ installServiceSlugs: vi.fn() }))
 vi.mock('@/app/api/_services/services.service', () => ({ listCatalogServices: vi.fn(), listInstalledServices: vi.fn(), searchCatalogServices: vi.fn(), uninstallService: vi.fn() }))
-vi.mock('@/app/api/_services/mcp-shares.service', () => ({ dispatchShareTool: vi.fn() }))
+vi.mock('@/app/api/_services/mcp-vault.service', () => ({ dispatchVaultTool: vi.fn() }))
 
 const WORKSPACE_ID = 7
 const FOREIGN_WORKSPACE_ID = 99

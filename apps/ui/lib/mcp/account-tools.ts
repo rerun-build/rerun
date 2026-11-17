@@ -1,5 +1,6 @@
 import { SHARE_TOOL_DEFS } from './share-tools'
 import { TEMPLATE_TOOL_DEFS } from './template-tools'
+import { VAULT_TOOL_DEFS } from './vault-tools'
 
 export const MAX_MEMORIES_PER_CALL = 100
 export const MAX_MEMORY_CHARS = 20_000
@@ -586,9 +587,8 @@ const AGENT_TOOL_DEFS = [
     },
 ] as const
 
-// The sharing and template halves are declared next door: same server, same key, and this file was
-// already long enough. Sharing sits between the two because it acts on the agents of any account,
-// where the template tools need an expert sandbox.
-export const ACCOUNT_TOOL_DEFS = [...AGENT_TOOL_DEFS, ...SHARE_TOOL_DEFS, ...TEMPLATE_TOOL_DEFS]
+// The Vault, sharing and template halves are declared next door: same server, same key, and this
+// file was already long enough. The template tools come last because they need an expert sandbox.
+export const ACCOUNT_TOOL_DEFS = [...AGENT_TOOL_DEFS, ...VAULT_TOOL_DEFS, ...SHARE_TOOL_DEFS, ...TEMPLATE_TOOL_DEFS]
 
 export const ACCOUNT_TOOL_NAMES = ACCOUNT_TOOL_DEFS.map(t => t.name)
