@@ -121,6 +121,11 @@ class Proof(ProofBase):
         _, msg, _ = self.w.sends[-1]
         self.assertIn("Your last answer could not be read: proof lines name 0 of the 5 asks.", msg)
 
+    def test_the_reason_of_an_unread_answer_is_not_repeated_for_a_later_commit(self):
+        job = {"issue": 5, "title": "t", "proof_why": "proof lines name 0 of the 5 asks", "proof_why_head": "abcdef1234"}
+        self.assertIn("Your last answer could not be read", T.D.proof_brief(job, 9, "abcdef1234", ["x"]))
+        self.assertNotIn("Your last answer could not be read", T.D.proof_brief(job, 9, "1234567890", ["x"]))
+
     def test_pass_with_an_ask_not_met_goes_to_fix(self):
         self.to_proving()
         self.w.finish("r2", met(notmet=(5,)) + "\nPROOF: PASS @abcdef1")
