@@ -62,6 +62,32 @@ class DeadDeps(Base):
         self.tick()
         self.assertEqual(self.state(), "building")
 
+    def returned(self, n, replans):
+        self.d = self.new()
+        self.d.store.put_job(str(n), "returned", {"issue": n, "title": "t%d" % n, "state": "returned", "relabelled": True,
+                                                  "commented": True, "reason": "BLOCKED: plan: a file outside its paths",
+                                                  "replans": replans})
+
+    def test_a_dependency_returned_for_a_re_plan_is_not_dead(self):
+        self.w.issues = [issue(5, "#7")]
+        self.returned(7, 0)
+        self.w.open_numbers.add(7)
+        self.tick(2)
+        self.assertEqual(self.state(), "waiting")
+        self.assertIn("waits on returned #7", self.out.getvalue())
+        self.assertNotIn("dead #7", self.out.getvalue())
+        self.assertNotIn("dead", self.data())
+        self.assertEqual(self.data()["waits_on_returned"], [7])
+        self.assertEqual(self.w.issue(5)["comments"], [])
+
+    def test_a_dependency_returned_after_its_last_re_plan_is_dead(self):
+        self.w.issues = [issue(5, "#7")]
+        self.returned(7, 2)
+        self.w.open_numbers.add(7)
+        self.tick(2)
+        self.assertEqual(self.data()["dead"], [[7, "returned"]])
+        self.assertEqual(len(self.w.issue(5)["comments"]), 1)
+
     def test_an_open_issue_without_a_job_or_the_label_is_named_and_not_commented(self):
         self.w.issues = [issue(5, "#7")]
         self.tick()
