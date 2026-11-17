@@ -169,6 +169,26 @@ INSERT INTO runs (id, agent_id, session_id, status, started_at, finished_at, mod
         expect(rate['2026-09-04']).toBeCloseTo(2 / 4)
     })
 
+    it('reads a run’s final message from its own session when another session speaks in the same minutes', async () => {
+        const OVERLAP = 'overlap'
+        const { client } = await getSystemDb(OVERLAP)
+        await client.executeMultiple(`
+INSERT INTO runs (id, agent_id, session_id, status, started_at, finished_at, model) VALUES
+    ('o1', 'overlap', 'so1', 'done', '2026-09-05T10:00:00.000Z', '2026-09-05T10:10:00.000Z', 'opus'),
+    ('o2', 'overlap', 'so2', 'done', '2026-09-05T10:02:00.000Z', '2026-09-05T10:12:00.000Z', 'opus');
+`)
+        const said: [string, string, string][] = [
+            ['so1', '2026-09-05T10:05:00.000Z', 'All good'],
+            ['so2', '2026-09-05T10:09:00.000Z', 'BLOCKED: a first guess'],
+            ['so2', '2026-09-05T10:11:00.000Z', 'Done after all'],
+        ]
+        for (const [i, [sessionId, createdAt, content]] of said.entries()) {
+            await client.execute({ sql: 'INSERT INTO messages (id, session_id, role, content_json, created_at) VALUES (?, ?, ?, ?, ?)', args: [`o${i}`, sessionId, 'assistant', JSON.stringify(content), createdAt] })
+        }
+        const points = await aggregateStats(OVERLAP, query({ dataset: 'runs', metric: 'failureCount' }))
+        expect(points.map(point => [point.bucket, Number(point.value), Number(point.count)])).toEqual([['2026-09-05', 0, 2]])
+    })
+
     it('leaves the error rate as it was', async () => {
         const points = await aggregateStats(FAIL, query({ dataset: 'runs', metric: 'errorRate' }))
         expect(points.map(point => [point.bucket, Number(point.value)])).toEqual([

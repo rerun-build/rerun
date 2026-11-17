@@ -2,7 +2,7 @@ import { and, asc, eq, gte, isNotNull, sql, type SQL } from 'drizzle-orm'
 import type { SQLiteColumn, SQLiteTable } from 'drizzle-orm/sqlite-core'
 import { visibleText, type StatsDataset, type StatsGroupBy, type StatsMetric, type StatsPoint, type StatsRunStatusFilter } from '@rerun/contracts'
 import { getSystemDb } from '../systemDb.js'
-import { messages, runs, runSteps, sessions, toolCalls } from '../schema.js'
+import { runs, runSteps, sessions, toolCalls } from '../schema.js'
 
 type DatasetDef = {
     table: SQLiteTable
@@ -100,7 +100,7 @@ const STOP_PREFIXES = ['BLOCKED:', 'ESCALATE:']
 
 const runStopped = sql<number>`case when ${runs.status} in ('error', 'cancelled') or (${runs.goalJson} is not null and ${runs.status} <> 'running' and ${runs.goalState} is not 'met') then 1 else 0 end`
 
-const runFinalContent = sql<string | null>`case when ${runs.status} = 'done' then (select ${messages.contentJson} from ${messages} where ${messages.sessionId} = ${runs.sessionId} and ${messages.role} = 'assistant' and ${messages.createdAt} >= ${runs.startedAt} and ${messages.createdAt} <= ${runs.finishedAt} order by ${messages.createdAt} desc, ${messages}.rowid desc limit 1) end`
+const runFinalContent = sql<string | null>`case when ${runs.status} = 'done' then (select m.content_json from messages m where m.session_id = runs.session_id and m.role = 'assistant' and m.created_at >= runs.started_at and m.created_at <= runs.finished_at order by m.created_at desc, m.rowid desc limit 1) end`
 
 function endsOnStopLine(content: string): boolean {
     const lines = visibleText(JSON.parse(content), '\n').split('\n').map(line => line.trim()).filter(Boolean)
