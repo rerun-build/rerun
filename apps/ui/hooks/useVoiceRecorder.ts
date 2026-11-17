@@ -47,8 +47,11 @@ export type VoiceRecorderStatus = 'idle' | 'starting' | 'recording'
 /** The recording bar's timer. Polled rather than pushed, so the chat around it does not re-render 20 times a second. */
 export type VoiceLiveState = { durationMs: number }
 
+/** Why there is no recording: `denied` is the person or the system refusing the microphone. */
+export type VoiceRecorderError = 'unsupported' | 'denied' | 'noMicrophone' | 'startFailed'
+
 type Options = {
-    onError: (message: string) => void
+    onError: (message: string, reason: VoiceRecorderError) => void
     /** Fired once when the recording hits MAX_RECORDING_MS, so the caller can finish it as if the user had. */
     onLimitReached: () => void
 }
@@ -132,7 +135,7 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
 
         const format = pickRecordingFormat()
         if (!format || typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-            onErrorRef.current(t('unsupported'))
+            onErrorRef.current(t('unsupported'), 'unsupported')
             return
         }
 
@@ -143,7 +146,7 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
         } catch (err) {
             if (session === sessionRef.current) setStatus('idle')
             const denied = err instanceof DOMException && (err.name === 'NotAllowedError' || err.name === 'SecurityError')
-            onErrorRef.current(denied ? t('microphoneBlocked') : t('noMicrophone'))
+            onErrorRef.current(denied ? t('microphoneBlocked') : t('noMicrophone'), denied ? 'denied' : 'noMicrophone')
             return
         }
 
@@ -179,7 +182,7 @@ export function useVoiceRecorder({ onError, onLimitReached }: Options) {
             for (const track of stream.getTracks()) track.stop()
             takesRef.current = []
             setStatus('idle')
-            onErrorRef.current(t('startFailed'))
+            onErrorRef.current(t('startFailed'), 'startFailed')
         }
     }, [sample, t])
 

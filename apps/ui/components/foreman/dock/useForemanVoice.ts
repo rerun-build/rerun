@@ -4,11 +4,20 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { usePushToTalk } from '@/hooks/usePushToTalk'
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder'
+import { shouldPushToTalk } from '@/lib/foreman/push-to-talk'
 import { transcribeVoiceRecording } from '@/lib/voice/client'
 import { useForemanStore } from '@/stores/foreman.store'
 
-import { usePushToTalk } from './usePushToTalk'
+const OVERLAYS = '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]'
+
+/** On the board, outside anything that would take the key: a field would type the space, a button would be pressed by it. */
+function holdOnBoard(event: KeyboardEvent): boolean {
+    const focused = document.activeElement
+    const focusHeld = focused !== null && focused !== document.body && focused !== document.documentElement
+    return shouldPushToTalk(event, { focusHeld, overlayOpen: document.querySelector(OVERLAYS) !== null })
+}
 
 export type ForemanVoiceStatus = 'idle' | 'listening' | 'transcribing'
 
@@ -67,7 +76,7 @@ export function useForemanVoice(enabled: boolean) {
         cancel()
     }, [cancel])
 
-    usePushToTalk({ enabled: enabled && !transcribing, onStart: begin, onRelease: () => void finish(), onAbort: abort })
+    usePushToTalk({ enabled: enabled && !transcribing, accepts: holdOnBoard, onStart: begin, onRelease: () => void finish(), onAbort: abort })
 
     const status: ForemanVoiceStatus = transcribing ? 'transcribing' : listening ? 'listening' : 'idle'
     return { status, stream: recorder.stream }

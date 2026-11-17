@@ -75,6 +75,8 @@ if (bootstrap?.audience === 'app') {
             sent: (path) => void ipcRenderer.invoke(IPC.quickAskSent, String(path)),
             setShortcut: (kind, accelerator) => ipcRenderer.invoke(IPC.quickAskSetShortcut, { kind: String(kind), accelerator: accelerator === null ? null : String(accelerator) }) as Promise<QuickAskShortcutResult>,
             pauseShortcuts: (paused) => void ipcRenderer.invoke(IPC.quickAskPauseShortcuts, paused === true),
+            hold: (busy) => void ipcRenderer.invoke(IPC.quickAskHold, busy === true),
+            openMicrophoneSettings: () => ipcRenderer.invoke(IPC.quickAskOpenMicrophoneSettings) as Promise<boolean>,
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)

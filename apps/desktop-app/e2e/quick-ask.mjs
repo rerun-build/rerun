@@ -114,4 +114,48 @@ export default async function quickAskScenario({ app, page, step, base }) {
     await step('quick ask off')
     await setShortcut(page, null)
     await page.evaluate(() => window.rerunShell.settings.set({ quickAsk: true }))
+
+    // Voice: Space held in the empty field records, letting go sends the transcript. The microphone
+    // is an oscillator and the transcription is answered in the page: neither exists on a test box.
+    const SPOKEN = 'What is on my calendar tomorrow?'
+    const quickWindowVisible = () => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((candidate) => candidate.webContents.getURL().endsWith('/quick-ask'))?.isVisible() ?? false)
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').click())
+    await waitUntil(quickWindowVisible, Boolean, 'the window opens for a spoken question')
+    await quick.evaluate((spoken) => {
+        navigator.mediaDevices.getUserMedia = async () => {
+            const context = new AudioContext()
+            const tone = context.createOscillator()
+            const destination = context.createMediaStreamDestination()
+            tone.connect(destination)
+            tone.start()
+            return destination.stream
+        }
+        const realFetch = window.fetch.bind(window)
+        window.fetch = (input, init) => (String(input).includes('/api/voice/transcribe') ? Promise.resolve(new Response(JSON.stringify({ text: spoken }), { headers: { 'Content-Type': 'application/json' } })) : realFetch(input, init))
+    }, SPOKEN)
+    await quick.waitForSelector('[data-quick-ask][data-step="text"] textarea')
+    // Escape kept the draft typed above: Space only talks in an empty field.
+    await quick.fill('[data-quick-ask] textarea', '')
+    await step('quick ask with the voice hint', { target: quick })
+    await quick.keyboard.down('Space')
+    await quick.waitForSelector('[data-quick-ask][data-step="listening"]')
+    await new Promise((done) => setTimeout(done, 1200))
+    await step('quick ask listening', { target: quick })
+    await quick.keyboard.up('Space')
+    await quick.waitForSelector('[data-quick-ask][data-step="sent"]', { timeout: 15_000 })
+    await step('quick ask sent', { target: quick })
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'the window goes once the question is sent')
+    await page.getByText(SPOKEN).first().waitFor({ timeout: 30_000 })
+    check(true, 'the spoken question reaches the Chief of Staff')
+
+    // While it listens, the window stays up when it loses the focus (the system's microphone prompt).
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').click())
+    await waitUntil(quickWindowVisible, Boolean, 'the window opens again')
+    await quick.evaluate(() => window.rerunShell.quickAsk.hold(true))
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].focus())
+    await new Promise((done) => setTimeout(done, 800))
+    check(await quickWindowVisible(), 'a held window stays up when it loses the focus')
+    await quick.evaluate(() => window.rerunShell.quickAsk.close())
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'closing it lets go of the hold')
 }
+

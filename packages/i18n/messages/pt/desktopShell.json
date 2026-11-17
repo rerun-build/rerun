@@ -73,7 +73,16 @@
     "quickAsk": {
         "placeholder": "Pergunte ao seu Chief of Staff…",
         "hint": "Enter para enviar, Esc para fechar",
-        "send": "Enviar"
+        "send": "Enviar",
+        "holdToTalk": "Segure <key>Espaço</key> para falar",
+        "releaseToSend": "Solte para enviar, Esc para cancelar",
+        "sent": "Enviado para o seu Chief of Staff",
+        "nothingHeard": "Nada foi ouvido. Segure Espaço e fale.",
+        "transcriptionFailed": "Não foi possível transformar em texto. Tente de novo ou digite.",
+        "micDeniedTitle": "O Rerun não consegue ouvir você",
+        "micDeniedBody": "Permita o microfone para o Rerun nas configurações do sistema.",
+        "openSettings": "Abrir configurações",
+        "typeInstead": "Digitar"
     },
     "server": {
         "otherServer": "Usar outro servidor Rerun"

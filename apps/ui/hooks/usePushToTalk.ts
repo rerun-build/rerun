@@ -2,27 +2,25 @@
 
 import { useEffect, useRef } from 'react'
 
-import { shouldPushToTalk } from '@/lib/foreman/push-to-talk'
-
-const OVERLAYS = '[role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"]'
-
 // A tap is not a hold: the microphone only opens once Space has stayed down this long, so a stray
 // press on the board never lights the capture indicator, let alone the permission prompt.
 const HOLD_MS = 200
 
 type Options = {
     enabled: boolean
+    /** Whether this Space going down is a hold to talk where the hook is used, and not Space meant for something else. */
+    accepts: (event: KeyboardEvent) => boolean
     onStart: () => void
     onRelease: () => void
     /** The hold was lost rather than let go: the window lost the keyboard, or Escape. Nothing is sent. */
     onAbort: () => void
 }
 
-/** Hold Space on the board, outside anything that would take the key, to talk; let go to send. */
-export function usePushToTalk({ enabled, onStart, onRelease, onAbort }: Options) {
-    const handlers = useRef({ onStart, onRelease, onAbort })
+/** Hold Space to talk, wherever `accepts` says Space means it; let go to send. */
+export function usePushToTalk({ enabled, accepts, onStart, onRelease, onAbort }: Options) {
+    const handlers = useRef({ accepts, onStart, onRelease, onAbort })
     useEffect(() => {
-        handlers.current = { onStart, onRelease, onAbort }
+        handlers.current = { accepts, onStart, onRelease, onAbort }
     })
 
     useEffect(() => {
@@ -49,9 +47,7 @@ export function usePushToTalk({ enabled, onStart, onRelease, onAbort }: Options)
                 else if (event.key === 'Escape') settle('abort')
                 return
             }
-            const focused = document.activeElement
-            const focusHeld = focused !== null && focused !== document.body && focused !== document.documentElement
-            if (!shouldPushToTalk(event, { focusHeld, overlayOpen: document.querySelector(OVERLAYS) !== null })) return
+            if (!handlers.current.accepts(event)) return
             event.preventDefault()
             held = true
             timer = setTimeout(() => {

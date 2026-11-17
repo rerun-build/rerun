@@ -21,7 +21,11 @@
         "settings.shortcut.change": "Accessible label of the field. {keys} is the current shortcut, like ⇧ ⌘ Space.",
         "settings.shortcut.needsModifier": "Error under the field when the shortcut has no modifier key. {key} is ⌘ on a Mac, Ctrl elsewhere.",
         "settings.shortcut.reserved": "Error under the field. {keys} is the shortcut, like ⌘ Space. {owner} names what already uses it on the computer.",
-        "settings.shortcut.taken": "Error under the field when another app already uses the shortcut. {keys} is like ⌃ ⌥ K."
+        "settings.shortcut.taken": "Error under the field when another app already uses the shortcut. {keys} is like ⌃ ⌥ K.",
+        "quickAsk.holdToTalk": "Hint in the Quick ask window, next to 'Enter to send, Esc to close'. <key>Space</key> is drawn as a keyboard key with a microphone.",
+        "quickAsk.releaseToSend": "Shown while the Quick ask window records the person's voice, with Space held down.",
+        "quickAsk.sent": "Badge shown for a second once the spoken question left for the Chief of Staff (the workspace assistant).",
+        "quickAsk.micDeniedBody": "The computer does not let Rerun use the microphone. A button next to it opens the system settings."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -97,7 +101,16 @@
     "quickAsk": {
         "placeholder": "Ask your Chief of Staff…",
         "hint": "Enter to send, Esc to close",
-        "send": "Send"
+        "send": "Send",
+        "holdToTalk": "Hold <key>Space</key> to talk",
+        "releaseToSend": "Release to send, Esc to cancel",
+        "sent": "Sent to your Chief of Staff",
+        "nothingHeard": "Nothing heard. Hold Space and talk.",
+        "transcriptionFailed": "Couldn’t turn that into text. Try again, or type.",
+        "micDeniedTitle": "Rerun can’t hear you",
+        "micDeniedBody": "Allow the microphone for Rerun in your system settings.",
+        "openSettings": "Open Settings",
+        "typeInstead": "Type instead"
     },
     "server": {
         "otherServer": "Use another Rerun server"

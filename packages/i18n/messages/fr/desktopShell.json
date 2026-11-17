@@ -73,7 +73,16 @@
     "quickAsk": {
         "placeholder": "Demandez à votre Chief of Staff…",
         "hint": "Entrée pour envoyer, Échap pour fermer",
-        "send": "Envoyer"
+        "send": "Envoyer",
+        "holdToTalk": "Maintenez <key>Espace</key> pour parler",
+        "releaseToSend": "Relâchez pour envoyer, Échap pour annuler",
+        "sent": "Envoyé à votre Chief of Staff",
+        "nothingHeard": "Rien entendu. Maintenez Espace et parlez.",
+        "transcriptionFailed": "Impossible de transcrire. Réessayez, ou tapez votre question.",
+        "micDeniedTitle": "Rerun ne vous entend pas",
+        "micDeniedBody": "Autorisez le micro pour Rerun dans les réglages du système.",
+        "openSettings": "Ouvrir les réglages",
+        "typeInstead": "Écrire plutôt"
     },
     "server": {
         "otherServer": "Utiliser un autre serveur Rerun"

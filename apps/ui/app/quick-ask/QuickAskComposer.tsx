@@ -1,32 +1,123 @@
 'use client'
 
+import { VoiceRecorderBar } from '@/components/chat/VoiceRecorderBar'
 import { Button } from '@/components/ui/button'
+import { Kbd } from '@/components/ui/kbd'
+import { usePushToTalk } from '@/hooks/usePushToTalk'
+import { useVoiceRecorder } from '@/hooks/useVoiceRecorder'
 import { desktopShell } from '@/lib/desktop-shell/client'
 import { handOverQuickAsk, QUICK_ASK_MAX_LENGTH } from '@/lib/desktop-shell/quick-ask'
+import { shouldPushToTalk } from '@/lib/foreman/push-to-talk'
+import { CheckIcon, MicIcon } from '@/lib/icons'
+import { transcribeVoiceRecording } from '@/lib/voice/client'
+import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react'
+
+type Step = 'text' | 'listening' | 'transcribing' | 'sent' | 'micDenied'
+
+// Long enough to read "Sent", short enough not to wait for it.
+const SENT_MS = 900
+
+// Keeps the window up while it listens: the system's microphone prompt takes the focus from it.
+function holdWindow(busy: boolean) {
+    desktopShell('quickAskVoice')?.quickAsk.hold(busy)
+}
 
 // One field for the Chief of Staff, over whatever the person is doing. Enter sends: the text is handed
-// to the main window, which opens a new conversation with it; Escape puts the window away.
+// to the main window, which opens a new conversation with it; Escape puts the window away. Space held
+// in the empty field records the question instead, and letting go sends its transcript.
 export function QuickAskComposer() {
     const t = useTranslations('desktopShell.quickAsk')
     const field = useRef<HTMLTextAreaElement>(null)
     const [text, setText] = useState('')
+    const [step, setStep] = useState<Step>('text')
+    const [notice, setNotice] = useState<string | null>(null)
+    const textRef = useRef(text)
+    useEffect(() => {
+        textRef.current = text
+    })
 
     useEffect(() => {
+        if (step !== 'text') return
         const focus = () => field.current?.focus()
         focus()
         window.addEventListener('focus', focus)
         return () => window.removeEventListener('focus', focus)
-    }, [])
+    }, [step])
 
-    const send = () => {
-        const message = text.trim()
+    const handOver = useCallback((message: string) => {
         const shell = desktopShell('quickAsk')
-        if (!message || !shell) return
+        if (!shell) return
         handOverQuickAsk(message)
         setText('')
         shell.quickAsk.sent('/')
+    }, [])
+
+    const finishRef = useRef<() => void>(() => {})
+    const recorder = useVoiceRecorder({
+        onError: (message, reason) => {
+            setStep(reason === 'denied' ? 'micDenied' : 'text')
+            if (reason !== 'denied') setNotice(message)
+        },
+        onLimitReached: () => finishRef.current(),
+    })
+    const { start, stop, cancel } = recorder
+
+    const listen = useCallback(() => {
+        setNotice(null)
+        setStep('listening')
+        holdWindow(true)
+        void start()
+    }, [start])
+
+    const finish = useCallback(async () => {
+        setStep('transcribing')
+        try {
+            // Null when Space was let go before the microphone came up: there is nothing to send.
+            const recording = await stop()
+            const transcript = recording ? await transcribeVoiceRecording(recording.blob, recording.format.transcriptionFormat) : ''
+            if (!transcript) {
+                setNotice(t('nothingHeard'))
+                setStep('text')
+                holdWindow(false)
+                return
+            }
+            setStep('sent')
+            setTimeout(() => {
+                handOver(transcript)
+                setStep('text')
+            }, SENT_MS)
+        } catch {
+            setNotice(t('transcriptionFailed'))
+            setStep('text')
+            holdWindow(false)
+        }
+    }, [stop, t, handOver])
+
+    useEffect(() => {
+        finishRef.current = () => void finish()
+    })
+
+    // Also reached when the hold ends because the step moved on (the microphone was refused): only
+    // a recording in progress goes back to the field.
+    const abort = useCallback(() => {
+        cancel()
+        setStep(current => (current === 'listening' ? 'text' : current))
+        holdWindow(false)
+    }, [cancel])
+
+    usePushToTalk({
+        enabled: step === 'text' || step === 'listening',
+        accepts: event => !textRef.current && shouldPushToTalk(event, { focusHeld: false, overlayOpen: false }),
+        onStart: listen,
+        onRelease: () => void finish(),
+        onAbort: abort,
+    })
+
+    const send = () => {
+        const message = text.trim()
+        if (message) handOver(message)
     }
 
     const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -40,25 +131,109 @@ export function QuickAskComposer() {
         }
     }
 
+    const microphoneSettings = desktopShell('quickAskVoice')
+    const canOpenSettings = microphoneSettings !== null && microphoneSettings.platform !== 'linux'
+
     return (
-        <main data-quick-ask className="flex h-dvh w-full items-stretch p-2">
+        <main data-quick-ask data-step={step} className="flex h-dvh w-full items-stretch p-2">
             <div className="flex w-full flex-col gap-2 rounded-2xl border bg-popover p-3 text-popover-foreground shadow-2xl">
-                <textarea
-                    ref={field}
-                    value={text}
-                    onChange={(event) => setText(event.target.value)}
-                    onKeyDown={onKeyDown}
-                    maxLength={QUICK_ASK_MAX_LENGTH}
-                    placeholder={t('placeholder')}
-                    aria-label={t('placeholder')}
-                    className="min-h-0 flex-1 resize-none bg-transparent text-base outline-none placeholder:text-muted-foreground"
-                />
-                <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-xs text-muted-foreground">{t('hint')}</span>
-                    <Button size="sm" onClick={send} disabled={!text.trim()}>
-                        {t('send')}
-                    </Button>
-                </div>
+                {step === 'text' && (
+                    <>
+                        <textarea
+                            ref={field}
+                            value={text}
+                            onChange={event => {
+                                setText(event.target.value)
+                                setNotice(null)
+                            }}
+                            onKeyDown={onKeyDown}
+                            maxLength={QUICK_ASK_MAX_LENGTH}
+                            placeholder={t('placeholder')}
+                            aria-label={t('placeholder')}
+                            className="min-h-0 flex-1 resize-none bg-transparent text-base outline-none placeholder:text-muted-foreground"
+                        />
+                        <div className="flex items-center justify-between gap-2">
+                            {notice ? (
+                                <span role="status" className="truncate text-xs text-muted-foreground">
+                                    {notice}
+                                </span>
+                            ) : (
+                                <span className="flex min-w-0 items-center gap-2 truncate text-xs text-muted-foreground">
+                                    <span className="truncate">{t('hint')}</span>
+                                    {!text && (
+                                        <span className="flex shrink-0 items-center gap-1">
+                                            {t.rich('holdToTalk', {
+                                                key: chunks => (
+                                                    <Kbd className="h-5 gap-1 px-1 font-sans text-[11px]">
+                                                        <MicIcon className="size-2.5" />
+                                                        {chunks}
+                                                    </Kbd>
+                                                ),
+                                            })}
+                                        </span>
+                                    )}
+                                </span>
+                            )}
+                            <Button size="sm" onClick={send} disabled={!text.trim()}>
+                                {t('send')}
+                            </Button>
+                        </div>
+                    </>
+                )}
+
+                {(step === 'listening' || step === 'transcribing') && (
+                    <>
+                        <div className="flex min-h-0 flex-1 items-center">
+                            <VoiceRecorderBar status={step === 'transcribing' ? 'transcribing' : recorder.status === 'recording' ? 'recording' : 'starting'} stream={recorder.stream} getLiveState={recorder.getLiveState} />
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                            <span className="truncate text-xs text-muted-foreground">{step === 'listening' ? t('releaseToSend') : ''}</span>
+                            <Button size="sm" disabled>
+                                {t('send')}
+                            </Button>
+                        </div>
+                    </>
+                )}
+
+                {step === 'sent' && (
+                    <div role="status" className="flex flex-1 items-center justify-center">
+                        <Badge tone="brand" size="md" leading={<CheckIcon className="size-4" />}>
+                            {t('sent')}
+                        </Badge>
+                    </div>
+                )}
+
+                {step === 'micDenied' && (
+                    <>
+                        <div className="flex min-h-0 flex-1 flex-col justify-center gap-1">
+                            <span className="text-sm font-medium">{t('micDeniedTitle')}</span>
+                            <span className="text-sm text-muted-foreground">{t('micDeniedBody')}</span>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-end gap-2">
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                    holdWindow(false)
+                                    setStep('text')
+                                }}
+                            >
+                                {t('typeInstead')}
+                            </Button>
+                            {canOpenSettings && (
+                                <Button
+                                    size="sm"
+                                    onClick={() => {
+                                        holdWindow(false)
+                                        void microphoneSettings?.quickAsk.openMicrophoneSettings()
+                                    }}
+                                >
+                                    {t('openSettings')}
+                                </Button>
+                            )}
+                        </div>
+                    </>
+                )}
             </div>
         </main>
     )

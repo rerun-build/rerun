@@ -13,7 +13,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -203,6 +203,11 @@ export type DesktopShellApi = {
         // While a new shortcut is being recorded, the current one must not open Quick ask. The shell
         // resumes by itself after 30 seconds, and as soon as `setShortcut` is called.
         pauseShortcuts(paused: boolean): void
+        // `quickAskVoice` capability. While true the window stays up when it loses the focus: the
+        // system asking for the microphone takes it. Hiding the window ends it.
+        hold(busy: boolean): void
+        // The microphone pane of the system settings. False where there is none to open (Linux).
+        openMicrophoneSettings(): Promise<boolean>
     }
 }
 

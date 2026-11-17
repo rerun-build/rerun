@@ -17,7 +17,7 @@ export const PRODUCT_NAME = CHANNEL_IDENTITIES[CHANNEL].productName
 
 export const APP_ID = CHANNEL_IDENTITIES[CHANNEL].appId
 
-export const BASE_CAPABILITIES: readonly DesktopShellCapability[] = ['window', 'find', 'links', 'downloads', 'auth', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut']
+export const BASE_CAPABILITIES: readonly DesktopShellCapability[] = ['window', 'find', 'links', 'downloads', 'auth', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice']
 
 export function shellPlatform(): DesktopShellPlatform {
     if (process.platform === 'darwin') return 'mac'

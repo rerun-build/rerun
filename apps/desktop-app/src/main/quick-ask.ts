@@ -1,4 +1,4 @@
-import { app, BrowserWindow, globalShortcut, screen, type WebContents } from 'electron'
+import { app, BrowserWindow, globalShortcut, screen, shell, type WebContents } from 'electron'
 import { QUICK_ASK_PATH } from '@rerun/contracts'
 import { currentServer, getMainWindow, loadAppPath, openExternal, PRELOAD_PATH, showMainWindow } from './main-window'
 import { partitionFor } from './server'
@@ -14,6 +14,8 @@ let quickWindow: BrowserWindow | null = null
 let shownAt = 0
 // Showing the window from another app can blur it at once, before it ever had the keyboard.
 const BLUR_GRACE_MS = 500
+// The page is listening: the system's microphone prompt takes the focus and must not put it away.
+let held = false
 
 function createQuickWindow(origin: string): BrowserWindow {
     const window = new BrowserWindow({
@@ -38,7 +40,7 @@ function createQuickWindow(origin: string): BrowserWindow {
     window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
     // Clicked away from, it goes, the way a launcher does.
     window.on('blur', () => {
-        if (Date.now() - shownAt > BLUR_GRACE_MS) window.hide()
+        if (!held && Date.now() - shownAt > BLUR_GRACE_MS) window.hide()
     })
     const contents = window.webContents
     contents.on('will-navigate', (event, url) => {
@@ -85,7 +87,28 @@ export function toggleQuickAsk(): void {
 }
 
 export function hideQuickAsk(): void {
+    held = false
     quickWindow?.hide()
+}
+
+export function holdQuickAsk(busy: boolean): void {
+    held = busy
+}
+
+const MICROPHONE_SETTINGS: Partial<Record<NodeJS.Platform, string>> = {
+    darwin: 'x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone',
+    win32: 'ms-settings:privacy-microphone',
+}
+
+export async function openMicrophoneSettings(): Promise<boolean> {
+    const url = MICROPHONE_SETTINGS[process.platform]
+    if (!url) return false
+    try {
+        await shell.openExternal(url)
+        return true
+    } catch {
+        return false
+    }
 }
 
 // The message left: the main window comes forward on what the page names.
