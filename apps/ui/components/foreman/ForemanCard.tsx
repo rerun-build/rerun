@@ -10,10 +10,11 @@ import { useComputerEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { Button } from '@/components/ui/button'
 import { useConnectorServices } from '@/hooks/useConnectorServices'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { BlocksIcon, BrainIcon, CalendarClockIcon, ChevronRightIcon, FolderIcon, Layers, SettingsIcon, TableIcon, XIcon } from '@/lib/icons'
+import { BlocksIcon, BrainIcon, CalendarClockIcon, ChevronRightIcon, FolderIcon, Layers, MessagesSquare, SettingsIcon, TableIcon, XIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useDesktopStore } from '@/stores/desktop.store'
 import { foremanOrbState, selectForemanOpen, useForemanStore, type ForemanCardScreen } from '@/stores/foreman.store'
+import { useIsWorkspaceAdmin } from '@/supabase/session/SessionProvider'
 
 type IconType = ComponentType<{ className?: string }>
 
@@ -46,6 +47,12 @@ export function ForemanCard({ onOpen, onClose, closeBar }: { onOpen: (screen: Fo
     const openDesktop = useDesktopStore(state => state.openDesktop)
     const { needsMachineReason } = useWorkspaceAccess()
     const tiles = agentRowId ? TILES : TILES.filter(tile => tile.screen === 'routines')
+    // What the other members asked it is read by an admin only, as the server holds it.
+    const isAdmin = useIsWorkspaceAdmin()
+    const rows = [
+        ...ROWS.map(row => ({ ...row, label: tCard(`destinations.${row.label}`) })),
+        ...(isAdmin ? [{ screen: 'team' as const, icon: MessagesSquare, label: t('team.title') }] : []),
+    ]
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
@@ -75,10 +82,10 @@ export function ForemanCard({ onOpen, onClose, closeBar }: { onOpen: (screen: Fo
                     <>
                         <div className="shrink-0 space-y-4 px-3 pb-3">
                             <div className="space-y-1.5">
-                                {ROWS.map(({ screen, icon: Glyph, label }) => (
+                                {rows.map(({ screen, icon: Glyph, label }) => (
                                     <button key={screen} type="button" onClick={() => onOpen(screen)} className="flex w-full items-center gap-3 rounded-lg bg-muted/60 px-3 py-2.5 text-left transition-colors hover:bg-muted">
                                         <Glyph className="size-4 shrink-0 text-muted-foreground" />
-                                        <span className="min-w-0 flex-1 truncate text-sm">{tCard(`destinations.${label}`)}</span>
+                                        <span className="min-w-0 flex-1 truncate text-sm">{label}</span>
                                         <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground/60" />
                                     </button>
                                 ))}

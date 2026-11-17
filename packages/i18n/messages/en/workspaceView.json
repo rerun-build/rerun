@@ -59,7 +59,17 @@
     "foreman": {
         "name": "Chief of Staff",
         "line": "Ask anything",
-        "card": "Chief of Staff card"
+        "card": "Chief of Staff card",
+        "team": {
+            "title": "Team conversations",
+            "back": "Back to the team conversations",
+            "unknownMember": "A member",
+            "emptyTitle": "No team conversations yet",
+            "emptyDescription": "What the other members ask the Chief of Staff shows here, for admins to read.",
+            "readOnly": "Read only: only {name} can continue this conversation.",
+            "unreadableTitle": "This conversation cannot be read",
+            "unreadableDescription": "It may have been deleted, or the machine is not reachable right now."
+        }
     },
     "details": {
         "label": "Card of {name}"

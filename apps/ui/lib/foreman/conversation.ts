@@ -19,7 +19,7 @@ import { isKickoffText } from '@/lib/foreman/kickoff-marker'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { foremanAgentId } from './agent-row'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectAll, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 // An engine conversation is a row of `sessions`, like a coworker's, on the Chief of Staff's row of
 // `agents`, owned by the member who has it: everyone talks to the same Chief of Staff with their own
@@ -120,6 +120,8 @@ function readHubConversation(data: HubConversationRow): ForemanConversation {
 
 const LIST_COLUMNS = ['id', 'kind', 'title', 'status', 'first_message', 'engine_session_id', 'created_at', 'updated_at'] as const
 
+const TEAM_LIST_COLUMNS = [...LIST_COLUMNS, 'owner_id'] as const
+
 // As many as a coworker's General shows.
 const CONVERSATION_LIST_LIMIT = 200
 
@@ -151,6 +153,27 @@ export function foremanConversationOf(row: ListedRow): Conversation {
 export async function listForemanConversations(ctx: WorkspaceContext): Promise<Conversation[]> {
     const { data } = await selectMany(createServiceRoleClient(), 'sessions', LIST_COLUMNS, await ownedBy(ctx), { column: 'updated_at', ascending: false }, CONVERSATION_LIST_LIMIT)
     return (data ?? []).map(foremanConversationOf)
+}
+
+export type TeamForemanConversation = Conversation & { ownerId: string }
+
+// What an admin reads of the other members' conversations with it, the members still in the
+// workspace: their owner alone continues one, an admin only reads it.
+export async function listTeamForemanConversations(ctx: WorkspaceContext): Promise<TeamForemanConversation[]> {
+    if (ctx.role !== 'admin') return []
+    const supabase = createServiceRoleClient()
+    const [agentId, { data: members }] = await Promise.all([foremanAgentId(ctx.workspace.id), selectAll(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: ctx.workspace.id })])
+    const others = (members ?? []).map(member => member.user_id).filter(id => id !== ctx.userId)
+    if (!others.length) return []
+    const { data } = await selectMany(supabase, 'sessions', TEAM_LIST_COLUMNS, { agent_id: agentId, owner_id: others }, { column: 'updated_at', ascending: false }, CONVERSATION_LIST_LIMIT)
+    return (data ?? []).flatMap(row => (row.owner_id ? [{ ...foremanConversationOf(row), ownerId: row.owner_id }] : []))
+}
+
+export async function readTeamForemanTranscript(ctx: WorkspaceContext, sessionId: string): Promise<UIMessage[] | null> {
+    const listed = await listTeamForemanConversations(ctx)
+    const session = listed.find(conversation => conversation.id === sessionId)
+    if (!session?.engineSessionId) return null
+    return readEngineTranscript(await getWorkspaceConnection(ctx.workspace.id), session.engineSessionId)
 }
 
 async function readEngineTranscript(conn: EngineConnection, engineSessionId: string): Promise<UIMessage[]> {

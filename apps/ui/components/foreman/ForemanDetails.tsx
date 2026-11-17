@@ -11,6 +11,7 @@ import { AgentPanelTools } from '@/components/agent/AgentPanelTools'
 import { AgentPanelSkills } from '@/components/agent/skills/AgentPanelSkills'
 import { ForemanCard } from '@/components/foreman/ForemanCard'
 import { ForemanRoutines } from '@/components/foreman/ForemanRoutines'
+import { ForemanTeamConversations } from '@/components/foreman/ForemanTeamConversations'
 import { Button } from '@/components/ui/button'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { ChevronLeftIcon, XIcon } from '@/lib/icons'
@@ -25,7 +26,7 @@ const SCREEN_VIEWS = {
     files: 'files',
     data: 'data',
     tools: 'settings',
-} as const satisfies Record<ForemanCardScreen, string>
+} as const satisfies Record<Exclude<ForemanCardScreen, 'team'>, string>
 
 /**
  * The Chief of Staff's card, and the screen picked on it sliding in over it: beside its chat in the
@@ -64,7 +65,7 @@ function ForemanScreen({ screen, agentRowId, shown, onBack, onClose }: { screen:
                     <span className="truncate text-muted-foreground">{t('name')}</span>
                 </Button>
                 <span className="text-muted-foreground/50">/</span>
-                <span className="shrink-0 px-1.5 text-sm font-semibold">{tView(`views.${SCREEN_VIEWS[screen]}`)}</span>
+                <span className="min-w-0 truncate px-1.5 text-sm font-semibold">{screen === 'team' ? t('team.title') : tView(`views.${SCREEN_VIEWS[screen]}`)}</span>
                 <Button aria-label={tView('closePanel')} variant="ghost" size="icon-sm" onClick={onClose} className="ml-auto">
                     <XIcon className="size-4" />
                 </Button>
@@ -91,6 +92,8 @@ function ForemanScreenBody({ screen, agentRowId }: { screen: Exclude<ForemanCard
             return <AgentPanelFiles agentId={agentRowId} />
         case 'data':
             return <AgentPanelData agentId={agentRowId} initial={dataFocus} onInitialConsumed={clearDataFocus} />
+        case 'team':
+            return <ForemanTeamConversations agentRowId={agentRowId} />
         case 'tools':
             return <AgentPanelTools agentId={agentRowId} />
     }

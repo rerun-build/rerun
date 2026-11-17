@@ -20,9 +20,10 @@ export type StartedLead = { agentId: string; conversationId: string }
 
 /**
  * The screens its card opens, the coworker's that make sense for it (no triggers, no install, no
- * activity), and the workspace's routines, which it oversees rather than owns.
+ * activity), the workspace's routines, which it oversees rather than owns, and for an admin what the
+ * other members asked it.
  */
-export type ForemanCardScreen = 'services' | 'skills' | 'memories' | 'routines' | 'files' | 'data' | 'tools'
+export type ForemanCardScreen = 'services' | 'skills' | 'memories' | 'routines' | 'files' | 'data' | 'team' | 'tools'
 
 /** A table a card of its chat asked to open, read once by the database screen. */
 export type ForemanDataFocus = { table: string; view?: string }

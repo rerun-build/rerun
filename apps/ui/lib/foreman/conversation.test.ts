@@ -6,9 +6,12 @@ import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } fro
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn() }))
 vi.mock('@/lib/ai/generate-title', () => ({ generateSessionTitle: vi.fn(async () => null) }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/engine/client')>()), getSessionMessages: vi.fn(async () => []) }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
-const { engineSessionOf, findForemanGeneral, foremanConversationOf, ForemanGeneralAlreadyOpenError, listForemanConversations, setForemanConversationStatus, startEngineConversation, touchForemanConversation } = await import('./conversation')
+const { engineSessionOf, findForemanGeneral, foremanConversationOf, ForemanGeneralAlreadyOpenError, listForemanConversations, listTeamForemanConversations, readTeamForemanTranscript, setForemanConversationStatus, startEngineConversation, touchForemanConversation } = await import('./conversation')
+const { getWorkspaceConnection } = await import('@/app/api/_services/workspace-engine.service')
+const { getSessionMessages } = await import('@/lib/engine/client')
 
 const CHIEF = 'chief-of-staff-row'
 const ctx = { userId: 'user-1', workspace: { id: 7 } } as unknown as WorkspaceContext
@@ -129,5 +132,61 @@ describe('the conversations of a member with the Chief of Staff', () => {
             ['eq', 'engine_session_id', 'engine-1'],
             ['neq', 'status', 'awaiting_ack'],
         ])
+    })
+})
+
+describe('what an admin reads of the other members\' conversations', () => {
+    const admin = { ...ctx, role: 'admin' } as unknown as WorkspaceContext
+    const member = { ...ctx, role: 'member' } as unknown as WorkspaceContext
+
+    // Reads filter with `eq` and `in`: the owners still in the workspace are an `in`.
+    function filtered(rows: Record<string, unknown>[], calls: readonly SupabaseCall[]) {
+        return rows.filter(found =>
+            calls.every(call => {
+                if (call.method === 'eq') return found[call.args[0] as string] === call.args[1]
+                if (call.method === 'in') return (call.args[1] as unknown[]).includes(found[call.args[0] as string])
+                return true
+            })
+        )
+    }
+
+    beforeEach(() => {
+        const sessions = [
+            { ...row, id: 'mine', agent_id: CHIEF, owner_id: 'user-1' },
+            { ...row, id: 'hers', agent_id: CHIEF, owner_id: 'user-2', engine_session_id: 'engine-hers' },
+            { ...row, id: 'gone', agent_id: CHIEF, owner_id: 'user-left' },
+            { ...row, id: 'coworker', agent_id: 'coworker-row', owner_id: null },
+        ]
+        const members = [
+            { user_id: 'user-1', workspace_id: 7 },
+            { user_id: 'user-2', workspace_id: 7 },
+        ]
+        const db = fakeSupabase((table, calls) => {
+            if (table === 'rpc:ensure_foreman_agent') return { data: CHIEF }
+            if (table === 'workspace_members') return { data: filtered(members, calls) }
+            if (table === 'sessions' && !writeMethodOf(calls)) return { data: filtered(sessions, calls) }
+            return undefined
+        })
+        vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
+        vi.mocked(getWorkspaceConnection).mockResolvedValue({ baseUrl: 'http://engine', apiKey: 'key' } as never)
+        vi.mocked(getSessionMessages).mockClear()
+    })
+
+    it("lists the other members' conversations to an admin, never their own nor a member who left", async () => {
+        const listed = await listTeamForemanConversations(admin)
+        expect(listed.map(conversation => [conversation.id, conversation.ownerId])).toEqual([['hers', 'user-2']])
+    })
+
+    it('shows a member nobody else\'s', async () => {
+        expect(await listTeamForemanConversations(member)).toEqual([])
+        expect(await readTeamForemanTranscript(member, 'hers')).toBeNull()
+    })
+
+    it('reads only a conversation that list holds', async () => {
+        expect(await readTeamForemanTranscript(admin, 'mine')).toBeNull()
+        expect(await readTeamForemanTranscript(admin, 'gone')).toBeNull()
+        expect(await readTeamForemanTranscript(admin, 'hers')).toEqual([])
+        expect(getSessionMessages).toHaveBeenCalledTimes(1)
+        expect(vi.mocked(getSessionMessages).mock.calls[0].slice(1)).toEqual(['foreman', 'engine-hers'])
     })
 })

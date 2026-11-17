@@ -38,7 +38,17 @@
     "foreman": {
         "name": "Chief of Staff",
         "line": "Frag mich alles",
-        "card": "Karte des Chief of Staff"
+        "card": "Karte des Chief of Staff",
+        "team": {
+            "title": "Gespräche im Team",
+            "back": "Zurück zu den Gesprächen im Team",
+            "unknownMember": "Ein Mitglied",
+            "emptyTitle": "Noch keine Gespräche im Team",
+            "emptyDescription": "Was die anderen Mitglieder den Chief of Staff fragen, erscheint hier, zum Lesen für Admins.",
+            "readOnly": "Nur lesen: Nur {name} kann dieses Gespräch fortsetzen.",
+            "unreadableTitle": "Dieses Gespräch lässt sich nicht lesen",
+            "unreadableDescription": "Es wurde vielleicht gelöscht, oder die Maschine antwortet gerade nicht."
+        }
     },
     "details": {
         "label": "Karte von {name}"

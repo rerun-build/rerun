@@ -38,7 +38,17 @@
     "foreman": {
         "name": "Chief of Staff",
         "line": "Demandez ce que vous voulez",
-        "card": "Fiche du Chief of Staff"
+        "card": "Fiche du Chief of Staff",
+        "team": {
+            "title": "Conversations de l’équipe",
+            "back": "Retour aux conversations de l’équipe",
+            "unknownMember": "Un membre",
+            "emptyTitle": "Aucune conversation de l’équipe pour l’instant",
+            "emptyDescription": "Ce que les autres membres demandent au Chief of Staff s’affiche ici, en lecture pour les admins.",
+            "readOnly": "Lecture seule : {name} est la seule personne à pouvoir poursuivre cette conversation.",
+            "unreadableTitle": "Impossible de lire cette conversation",
+            "unreadableDescription": "Elle a peut-être été supprimée, ou la machine ne répond pas pour le moment."
+        }
     },
     "details": {
         "label": "Fiche de {name}"

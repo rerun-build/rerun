@@ -33,8 +33,8 @@ function threadRowOf(conversation: Thread): ThreadRow {
 }
 
 // The same row as a coworker's list of conversations draws.
-function historyEntryOf(conversation: Thread): SessionHistoryEntry {
-    return { ...threadRowOf(conversation), agentId: conversation.agentId, engineSessionId: conversation.engineSessionId, originAgentName: null, kind: 'thread' }
+export function historyEntryOf(conversation: Thread): SessionHistoryEntry {
+    return { ...threadRowOf(conversation), agentId: conversation.agentId, engineSessionId: conversation.engineSessionId, originAgentName: null, kind: conversation.kind ?? 'thread' }
 }
 
 /**
