@@ -11,7 +11,10 @@ DEV_RED = "dev red"
 def repairs(body):
     found = set()
     for line in REPAIRS.findall(body or ""):
-        found.update(int(n) for n in re.findall(r"#(\d+)", line))
+        named = line.split("(")[0]
+        if named.strip().lower().startswith("none"):
+            continue
+        found.update(int(n) for n in re.findall(r"#(\d+)", named))
     return sorted(found)
 
 
