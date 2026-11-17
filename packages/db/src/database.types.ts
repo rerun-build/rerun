@@ -3623,6 +3623,7 @@ export type Database = {
       }
       workspaces: {
         Row: {
+          addons_current_period_end: string | null
           boxes_archived_at: string | null
           boxes_deleted_at: string | null
           boxes_disabled_at: string | null
@@ -3651,6 +3652,7 @@ export type Database = {
           rerun_period_anchor: string | null
           rerun_topup_micros: number
           rerun_used_micros: number
+          stripe_addons_subscription_id: string | null
           stripe_customer_id: string | null
           stripe_price_id: string | null
           stripe_subscription_id: string | null
@@ -3661,6 +3663,7 @@ export type Database = {
           waitlisted_at: string | null
         }
         Insert: {
+          addons_current_period_end?: string | null
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -3689,6 +3692,7 @@ export type Database = {
           rerun_period_anchor?: string | null
           rerun_topup_micros?: number
           rerun_used_micros?: number
+          stripe_addons_subscription_id?: string | null
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null
@@ -3699,6 +3703,7 @@ export type Database = {
           waitlisted_at?: string | null
         }
         Update: {
+          addons_current_period_end?: string | null
           boxes_archived_at?: string | null
           boxes_deleted_at?: string | null
           boxes_disabled_at?: string | null
@@ -3727,6 +3732,7 @@ export type Database = {
           rerun_period_anchor?: string | null
           rerun_topup_micros?: number
           rerun_used_micros?: number
+          stripe_addons_subscription_id?: string | null
           stripe_customer_id?: string | null
           stripe_price_id?: string | null
           stripe_subscription_id?: string | null

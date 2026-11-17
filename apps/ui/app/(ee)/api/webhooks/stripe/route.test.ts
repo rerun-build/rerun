@@ -14,6 +14,7 @@ import { enforceTrialCardClaim } from '@/ee/services/trial-card.service'
 import { applyTemplateSubscription, recordTemplatePurchase, recordTemplateRenewal, refundTemplatePurchase, revokeTemplateSubscription } from '@/ee/services/template-purchase.service'
 import { recordCreditCheckoutSession, recordCreditInvoice, refundCreditPurchase } from '@/ee/services/credit-purchase.service'
 import { deliverLifetimeCheckout, refundLifetimePurchase } from '@/ee/services/lifetime-deal.service'
+import { applyLifetimeAddonsSubscription } from '@/ee/services/lifetime-addons.service'
 import { stripe, subscriptionOfInvoice } from '@/ee/lib/billing/stripe'
 import { signedStripeRequest, TEST_WEBHOOK_SECRET } from '@/ee/test/stripe-fake'
 import { claimStripeEvent, markStripeEventProcessed, releaseStripeEvent } from './idempotency'
@@ -55,9 +56,11 @@ vi.mock('@/ee/services/lifetime-deal.service', async importOriginal => ({
     deliverLifetimeCheckout: vi.fn(),
     refundLifetimePurchase: vi.fn(),
 }))
+vi.mock('@/ee/services/lifetime-addons.service', () => ({ applyLifetimeAddonsSubscription: vi.fn() }))
 vi.mock('./idempotency', async importOriginal => ({ ...(await importOriginal<typeof import('./idempotency')>()), claimStripeEvent: vi.fn(), markStripeEventProcessed: vi.fn(), releaseStripeEvent: vi.fn() }))
 
 const planSubscription = { id: 'sub_plan', object: 'subscription', metadata: { plan: 'base', workspace_id: '7' }, items: { data: [{ price: { id: 'price_base' } }] }, cancel_at_period_end: false }
+const lifetimeAddonsSubscription = { id: 'sub_addons', object: 'subscription', status: 'trialing', metadata: { kind: 'lifetime_addons', workspace_id: '7' }, items: { data: [{ price: { id: 'price_linkedin_slot' } }] } }
 const templateSubscription = { id: 'sub_tpl', object: 'subscription', metadata: { kind: 'template_purchase' }, items: { data: [{ price: { id: 'price_template' } }] } }
 
 function deliver(type: string, object: object, extra: { previous_attributes?: object; account?: string } = {}) {
@@ -216,6 +219,35 @@ describe('checkout.session.completed', () => {
         expect(stripe.subscriptions.retrieve).toHaveBeenCalledWith('sub_plan')
         expect(applySubscriptionToWorkspace).not.toHaveBeenCalled()
         expect(adoptCheckoutPaymentMethodAsDefault).not.toHaveBeenCalled()
+    })
+})
+
+describe('lifetime add-ons subscription', () => {
+    it('applies the slots bought on a Checkout page, without the trial card check nor the plan sync', async () => {
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(lifetimeAddonsSubscription as never)
+        await deliver('checkout.session.completed', { id: 'cs_1', mode: 'subscription', subscription: 'sub_addons', metadata: { kind: 'lifetime_addons', workspace_id: '7' } })
+        expect(applyLifetimeAddonsSubscription).toHaveBeenCalledWith(lifetimeAddonsSubscription, { adopt: true })
+        expect(enforceTrialCardClaim).not.toHaveBeenCalled()
+        expect(applySubscriptionToWorkspace).not.toHaveBeenCalled()
+        expect(adoptCheckoutPaymentMethodAsDefault).not.toHaveBeenCalled()
+    })
+
+    it('adopts a created subscription, skipping the trial card check', async () => {
+        await deliver('customer.subscription.created', lifetimeAddonsSubscription)
+        expect(applyLifetimeAddonsSubscription).toHaveBeenCalledWith(expect.objectContaining({ id: 'sub_addons' }), { adopt: true })
+        expect(enforceTrialCardClaim).not.toHaveBeenCalled()
+    })
+
+    it('refreshes an updated subscription without letting it take over', async () => {
+        await deliver('customer.subscription.updated', lifetimeAddonsSubscription)
+        expect(applyLifetimeAddonsSubscription).toHaveBeenCalledWith(expect.objectContaining({ id: 'sub_addons' }), { adopt: false })
+        expect(applySubscriptionToWorkspace).not.toHaveBeenCalled()
+    })
+
+    it('gives the slots back when the subscription is deleted, and never cancels the lifetime plan', async () => {
+        await deliver('customer.subscription.deleted', { ...lifetimeAddonsSubscription, status: 'canceled' })
+        expect(applyLifetimeAddonsSubscription).toHaveBeenCalledWith(expect.objectContaining({ id: 'sub_addons', status: 'canceled' }), { adopt: false })
+        expect(markSubscriptionCanceled).not.toHaveBeenCalled()
     })
 })
 

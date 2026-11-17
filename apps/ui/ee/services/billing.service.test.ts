@@ -352,6 +352,14 @@ describe('markSubscriptionCanceled', () => {
         expect(db.calls).toEqual([])
     })
 
+    // A lifetime workspace has no plan subscription, which ownsWorkspacePlan reads as "anything is
+    // mine": giving back its slots must not cancel the plan that keeps its machine running.
+    it('ignores the subscription of a lifetime workspace slots', async () => {
+        const db = useDb({ row: { stripe_subscription_id: null } })
+        await markSubscriptionCanceled(sub({ metadata: { kind: 'lifetime_addons', workspace_id: String(WORKSPACE_ID) } }))
+        expect(db.calls).toEqual([])
+    })
+
     it('leaves the workspace alone when it is billed on another subscription', async () => {
         const db = useDb({ row: { stripe_subscription_id: 'sub_other' } })
         await markSubscriptionCanceled(sub())
@@ -378,6 +386,13 @@ describe('markSubscriptionCanceled', () => {
 
 describe('markSubscriptionPastDue', () => {
     const invoice = { id: 'in_1', attempt_count: 1, amount_due: 4900, currency: 'usd', hosted_invoice_url: 'https://pay.stripe.test/in_1' } as Stripe.Invoice
+
+    it('ignores the subscription of a lifetime workspace slots', async () => {
+        const db = useDb({ row: { stripe_subscription_id: null, subscription_status: 'active', first_paid_at: null } })
+        await markSubscriptionPastDue(sub({ metadata: { kind: 'lifetime_addons' } }), invoice)
+        expect(db.calls).toEqual([])
+        expect(m.sendPaymentFailedNotice).not.toHaveBeenCalled()
+    })
     const PAID_AT = '2026-08-01T00:00:00.000Z'
 
     it('tells a paying workspace its renewal was declined, on the first attempt', async () => {

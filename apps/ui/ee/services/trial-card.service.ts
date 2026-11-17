@@ -1,5 +1,6 @@
 import { Database } from '@/app/api/database.types'
 import { isTemplateSubscription } from '@/ee/lib/billing/marketplace'
+import { isLifetimeAddonsSubscription } from '@/ee/lib/billing/lifetime-addons'
 import { stripe } from '@/ee/lib/billing/stripe'
 import { isTrialCardReuseBlocked, ownsTrialClaim, TRIAL_BLOCKED_CARD_REUSE } from '@/ee/lib/billing/trial-card'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -42,7 +43,7 @@ const CLAIM_COLUMNS = ['id', 'workspace_id', 'created_at'] as const
 // cold afterwards.
 export async function enforceTrialCardClaim(subscription: Stripe.Subscription, session?: Stripe.Checkout.Session): Promise<Stripe.Subscription | null> {
     try {
-        if (subscription.status !== 'trialing' || isTemplateSubscription(subscription)) return subscription
+        if (subscription.status !== 'trialing' || isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return subscription
 
         const workspaceId = await findWorkspaceId(subscription)
         if (!workspaceId) return subscription

@@ -44,6 +44,7 @@ import { ARCHIVE_RETENTION_DAYS } from '@/lib/archive/retention'
 import { canEndTrialNow, isMachineEntitled, isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { BOX_DELETION_GRACE_MS } from '@/ee/lib/billing/grace'
 import { isTemplateSubscription, stripeTimestampIso, subscriptionPeriodEndIso } from '@/ee/lib/billing/marketplace'
+import { isLifetimeAddonsSubscription } from '@/ee/lib/billing/lifetime-addons'
 import { isSameSubscription, shouldAdoptSubscription } from '@/ee/lib/billing/ownership'
 import { hasPeriodAdvanced, rerunPeriodUpdate } from '@/ee/lib/billing/period'
 import { trialArm } from '@/ee/lib/billing/trial-experiment'
@@ -391,7 +392,7 @@ async function refuseSecondPlanSubscription(workspaceId: number, customerId: str
     }
 
     const { data: subscriptions } = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 100 })
-    if (subscriptions.some(subscription => !isTemplateSubscription(subscription) && LIVE_SUBSCRIPTION_STATUSES.has(subscription.status))) {
+    if (subscriptions.some(subscription => !isTemplateSubscription(subscription) && !isLifetimeAddonsSubscription(subscription) && LIVE_SUBSCRIPTION_STATUSES.has(subscription.status))) {
         throw new AppError('alreadySubscribed')
     }
 }
@@ -1232,7 +1233,7 @@ async function finishPlanChange(subscription: Stripe.Subscription, selection: Pl
 // subscription, so is the selection it was part of. The subscription is read again rather than
 // taken from the event, whose snapshot would hide a schedule or a clearing a first delivery did.
 export async function finishPendingPlanChange(subscription: Stripe.Subscription): Promise<void> {
-    if (isTemplateSubscription(subscription)) return
+    if (isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return
     const live = await stripe.subscriptions.retrieve(subscription.id)
     const selection = parsePlanSelection(live.metadata?.[PLAN_CHANGE_AFTER_PAYMENT_KEY])
     if (!selection) return
@@ -1448,7 +1449,7 @@ type ExistingWorkspaceRow = {
 // the lifecycle events of a subscription that merely shares the customer, which must never rewrite
 // the snapshot of the one being billed.
 export async function applySubscriptionToWorkspace(subscription: Stripe.Subscription, { adopt = true }: { adopt?: boolean } = {}): Promise<void> {
-    if (isTemplateSubscription(subscription)) return
+    if (isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return
 
     const workspaceId = await findWorkspaceId(subscription)
     if (!workspaceId) return
@@ -1549,7 +1550,7 @@ export async function stampFirstPlanPayment(invoice: Stripe.Invoice): Promise<vo
     if (!invoice.amount_paid || invoice.amount_paid <= 0) return
 
     const subscription = await subscriptionOfInvoice(invoice)
-    if (!subscription || isTemplateSubscription(subscription)) return
+    if (!subscription || isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return
 
     const workspaceId = await findWorkspaceId(subscription)
     if (!workspaceId) return
@@ -1578,7 +1579,7 @@ function mergeHeldLimits(existing: ExistingWorkspaceRow, derived: WorkspaceLimit
 // ends is the right to run, so every agent is switched off. Re-subscribing gives the slots back and
 // the user picks which agents fill them.
 export async function markSubscriptionCanceled(subscription: Stripe.Subscription): Promise<void> {
-    if (isTemplateSubscription(subscription)) return
+    if (isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return
     const workspaceId = await findWorkspaceId(subscription)
     if (!workspaceId) return
     if (!(await ownsWorkspacePlan(workspaceId, subscription))) return
@@ -1602,7 +1603,7 @@ function awaitsPendingUpdatePayment(subscription: Stripe.Subscription, invoice: 
 // the teardown counts from `payment_failed_at` (PAYMENT_FAILED_GRACE_MS), and the owner is told
 // here. Both happen on the first attempt only, so a retry neither restarts the day nor writes again.
 export async function markSubscriptionPastDue(subscription: Stripe.Subscription, invoice: Stripe.Invoice): Promise<void> {
-    if (isTemplateSubscription(subscription)) return
+    if (isTemplateSubscription(subscription) || isLifetimeAddonsSubscription(subscription)) return
     if (awaitsPendingUpdatePayment(subscription, invoice)) return
     const workspaceId = await findWorkspaceId(subscription)
     if (!workspaceId) return
