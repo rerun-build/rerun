@@ -560,6 +560,37 @@ Same endpoint shape as the workspace filesystem below (`GET /`, `/read`, `/raw`,
 
 ---
 
+## Skill proposals
+
+What an agent offers to save as a skill with `skill_propose`. The user decides on a card in the
+conversation; nothing is written before they accept. `status` is `proposed`, `accepted` (being
+written), `applied`, `failed` or `dismissed`.
+
+### `GET /agents/:id/skill-proposals?session=<sid>`
+
+The proposals of one conversation. `session` is required (`400`).
+
+```json
+{ "proposals": [ { "id": "...", "sessionId": "...", "toolCallId": "...", "mode": "create", "slug": null, "title": "Weekly report", "summary": "...", "instructions": ["..."], "status": "proposed", "appliedSlug": null, "error": null, "createdAt": "..." } ] }
+```
+
+`mode` is `create` or `edit` (then `slug` names the skill to change). A rule the agent proposes
+later in the same conversation joins the proposal still `proposed` as one more entry of
+`instructions`, and its `title` and `summary` replace the previous ones, so they name every rule.
+
+### `POST /agents/:id/skill-proposals/:pid/accept`
+
+Starts writing the skill in the background and answers at once, `202 { "proposal": { ... "status": "accepted" } }`.
+A proposal already past `proposed` or `failed` is returned as it is, `200`. The job opens no run and
+adds nothing to the conversation; the proposal ends `applied` (with `appliedSlug`) or `failed`
+(with `error`, and can be accepted again).
+
+### `POST /agents/:id/skill-proposals/:pid/dismiss`
+
+`{ "proposal": { ... "status": "dismissed" } }`. Both routes answer `404` for an unknown proposal.
+
+---
+
 ## Files
 
 Two filesystems, same endpoint shape:
