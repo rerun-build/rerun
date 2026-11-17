@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { migrate } from '../db/migrate.js'
 import { latestVersion } from '../db/ladder.js'
 import { foldAgentKeysIntoConnections, switchOnModels } from '../connections/migrate.js'
-import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir, vaultDir } from '../config/paths.js'
+import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir, remoteComputersPath, remoteDir, vaultDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
 import { adoptConnectors } from '../vault/adopt.js'
 
@@ -134,6 +134,20 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
                 openai: ['gpt-6.2-astra', 'gpt-6.2-sol'],
                 openrouter: ['openai/gpt-6.2-astra', 'openai/gpt-6.2-sol'],
             })
+        },
+    },
+    {
+        // The computers linked to the workspace and their rules, written empty. An engine from before
+        // this step never reads it; one after it fills it as computers connect.
+        version: 8,
+        id: 'remote-computers',
+        up: async () => {
+            await mkdir(remoteDir(), { recursive: true, mode: 0o700 })
+            await chmodRegular(remoteDir(), 0o700, 'dir')
+            if (existsSync(remoteComputersPath())) return
+            const tmp = `${remoteComputersPath()}.tmp`
+            await writeFile(tmp, `${JSON.stringify({ computers: [] }, null, 4)}\n`, { encoding: 'utf8', mode: 0o600 })
+            await rename(tmp, remoteComputersPath())
         },
     },
 ]

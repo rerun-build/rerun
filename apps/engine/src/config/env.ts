@@ -14,6 +14,8 @@ const schema = z.object({
     RERUN_CODEX_PATH: z.string().optional(),
     // `on` opens the desktop of the agents on this box ahead of the release, `off` keeps it shut after.
     RERUN_DESKTOP: z.string().optional(),
+    // `on` accepts linked computers on this box ahead of the release, `off` refuses them after.
+    RERUN_REMOTE_COMPUTERS: z.string().optional(),
 })
 
 export type Env = z.infer<typeof schema>
@@ -45,4 +47,13 @@ const DESKTOP_RELEASED = true
 export function desktopEnabled(): boolean {
     const flag = env().RERUN_DESKTOP
     return flag === 'on' || (DESKTOP_RELEASED && flag !== 'off')
+}
+
+// Until computers are released a box refuses their socket and offers no `remote_*` tool. Flipping
+// this opens them on every box at its next update.
+const REMOTE_COMPUTERS_RELEASED = false
+
+export function remoteComputersEnabled(): boolean {
+    const flag = env().RERUN_REMOTE_COMPUTERS
+    return flag === 'on' || (REMOTE_COMPUTERS_RELEASED && flag !== 'off')
 }

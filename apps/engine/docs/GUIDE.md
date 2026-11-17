@@ -26,7 +26,7 @@ It is built on the **Vercel AI SDK** (`ai` + `@ai-sdk/*`), and drives the Claude
 ```
 HTTP (Hono)
   └── /agents/:id/{chat,sessions,runs,memories,skills,schedules,triggers,files,data,...}
-      /connections  /vault  /shared/{files,data}  /brain  /desktop
+      /connections  /vault  /shared/{files,data}  /brain  /desktop  /remote
         │
         ▼
   Agent registry  ──reads──►  agents/<id>/   (files = source of truth)
@@ -516,6 +516,7 @@ curl -s $B/agents/$AID/skills
 | Agents | `src/agents/` (`types.ts`, `factory.ts`, `loader.ts`, `registry.ts`, `providers.ts`, `systemPrompt.ts`, `foreman.ts`, `archive.ts`, `import.ts`) |
 | Connections | `src/connections/` |
 | Vault | `src/vault/` |
+| Linked computers | `src/remote/` (`socket.ts`, `connection.ts`, `registry.ts`, `store.ts`, `ticket.ts`) |
 | Brain | `src/brain/` |
 | Run loop | `src/runtime/` (`loop.ts`, `stream.ts`, `curator.ts`, `context.ts`, `scheduler.ts`, `notify.ts`, `run-events.ts`) |
 | Tools | `src/tools/` (`catalog.ts`, `registry.ts`, `sandbox.ts`, `mcp.ts`, `mcp-pool.ts`, `mcp-search.ts`, `mcp-wire.ts`, `builtin/`) |

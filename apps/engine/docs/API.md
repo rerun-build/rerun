@@ -212,6 +212,51 @@ one agent never shows another. A `drive` connection keeps the agent's own `compu
 screen until it closes or sends no mouse or key event for two minutes; a `watch` connection does
 not. A ticket without a mode drives. A bad ticket answers `401`, any other upgrade path `404`.
 
+## Linked computers
+
+A person links a computer to the workspace from the desktop app; the coworkers then run commands,
+jobs and file operations on it. The computer is never an engine: it opens one WebSocket to this one
+and answers what it is asked. These routes answer `404` until linked computers are switched on
+(`RERUN_REMOTE_COMPUTERS=on`, or the release).
+
+### `GET /remote/computers`
+
+Every computer the hub registered, online or not, read from the live socket:
+
+```json
+{ "computers": [{ "id": "c1", "handle": "studio-pc", "name": "Studio PC", "online": true, "paused": false,
+  "connectedAt": "…", "lastSeenAt": "…", "appVersion": "0.2.0", "protocol": 1,
+  "capabilities": ["shell", "files", "jobs"], "facts": { "os": "mac", "shell": "zsh", "workDir": "/Users/claire/Rerun", "…": "…" },
+  "settings": { "mode": "remember", "unattended": true, "allowedPrograms": ["ffmpeg"], "allowedFolders": [], "screenAlways": false },
+  "runningJobs": 0 }] }
+```
+
+### `PUT /remote/computers/:id`
+
+Registers a computer the hub linked, or renames it: `{ "handle": "studio-pc", "name": "Studio PC", "settings"?: {…} }`.
+Only the settings sent change. Answers the computer as listed above.
+
+### `POST /remote/computers/:id/rules`
+
+An "always allow" answered on a card: `{ "kind": "program", "program": "ffmpeg" }`,
+`{ "kind": "folder", "folder": "/Volumes/Rushes" }` or `{ "kind": "screen" }`. `404` for a computer it does not know.
+
+### `DELETE /remote/computers/:id`
+
+Unlinks the computer: its socket closes with code `4005`, which tells the app not to reconnect.
+
+### `GET /remote/ws?ticket=…` (WebSocket)
+
+The socket of one computer. The ticket is signed like the screen's, with
+`{ "aud": "remote", "exp": <ms epoch>, "jti": "<single use>", "computer": { "id", "handle", "name" } }`:
+the computer is who the hub says, and a ticket opens one handshake only. The protocol is in
+`packages/contracts/src/remote-computer.ts`: the computer sends `hello` (protocol range, app version,
+capabilities, facts), the engine answers `welcome` with the highest version both speak, then sends
+`req` frames the computer answers with `res`, while the computer sends `event` frames (`job.finished`,
+acknowledged with `ack`, and `status` when the person pauses it). Both ends ping every 25 s; two
+missed pings close the socket. Close codes: `4001` no hello, `4002` bad hello, `4003` no common
+protocol, `4004` replaced by a newer connection of the same computer, `4005` unlinked, `4006` unresponsive.
+
 ---
 
 ## Tools

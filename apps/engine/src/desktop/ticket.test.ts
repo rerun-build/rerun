@@ -1,5 +1,7 @@
 import { createHmac } from 'node:crypto'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
+import { setEnv } from '../config/env.js'
+import { verifyDesktopTicket } from './ticket.js'
 
 const KEY = 'box-key'
 
@@ -8,13 +10,11 @@ function ticket(claims: Record<string, unknown>, key = KEY): string {
     return `${payload}.${createHmac('sha256', key).update(payload).digest('base64url')}`
 }
 
-async function verifierWith(key: string) {
-    vi.resetModules()
-    vi.stubEnv('RERUN_API_KEY', key)
-    return (await import('./ticket.js')).verifyDesktopTicket
+// One import for the whole file: the key is switched on the cached environment, not by reloading.
+function verifierWith(key: string) {
+    setEnv({ RERUN_API_KEY: key })
+    return verifyDesktopTicket
 }
-
-afterEach(() => vi.unstubAllEnvs())
 
 describe('verifyDesktopTicket', () => {
     it('resolves a ticket signed with the box key that has not expired to the agent it names', async () => {

@@ -44,6 +44,7 @@ connections/<id>/           an AI provider credential: connection.json, .env (06
 connections/default.json    the connection and model a coworker with no pin of its own runs on
 connections/backups.json    the models a run moves to, in order, when its subscription hits its limit
 vault/<id>/                 the Vault: item.json, .env (0600), tokens/<server>.json
+remote/computers.json       computers linked to the workspace, their settings and rules (0600)
 shared/                     files every coworker reads and writes (shared_* tools, /shared/files)
 shared-db/shared.db         SQL database every coworker shares (shared_db_* tools, /shared/data)
 brain/<slug>.md             pages of the company brain, the source of truth
@@ -175,6 +176,8 @@ data    /agents/:id/data   /shared/data
 GET    /brain/pages   GET|PUT|DELETE /brain/pages/:slug   ...   GET /brain/proposals   POST /brain/seed
 GET    /desktop   POST /agents/:id/desktop/session /apps /takeover   DELETE /agents/:id/desktop/takeover
 GET    /desktop/ws?ticket=…                  VNC WebSocket (ticket, no bearer)
+GET    /remote/computers   PUT|DELETE /remote/computers/:id   POST /remote/computers/:id/rules
+GET    /remote/ws?ticket=…                   a linked computer's socket (ticket, no bearer)
 ```
 
 Create a connection, then an agent that runs on it:
@@ -255,6 +258,7 @@ other is paired from Servers, in the workspace menu (see https://docs.rerun.buil
 | `RERUN_LOG_LEVEL` | `info` | pino log level (`fatal`, `error`, `warn`, `info`, `debug`, `trace`) |
 | `RERUN_CODEX_PATH` | _unset_ (`/usr/local/bin/codex` in the image) | Absolute path to the Codex CLI, when it is not on the service user's `PATH` |
 | `RERUN_DESKTOP` | _unset_ | `off` keeps the screen and the computer tools shut on this engine |
+| `RERUN_REMOTE_COMPUTERS` | _unset_ | `on` accepts linked computers (`/remote/*`) before their release |
 | `RERUN_PAIR_TOKEN` | _unset_ | One-time token from the Servers page: the engine pairs itself with the app at `RERUN_HUB_URL` |
 | `RERUN_HUB_URL` | _unset_ | Address of the app to pair with, together with `RERUN_PAIR_TOKEN` |
 | `RERUN_PUBLIC_URL` | _unset_ | Address the app should reach this engine at, sent when pairing |

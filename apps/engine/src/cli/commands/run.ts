@@ -1,7 +1,10 @@
 import type { Server } from 'node:http'
 import { serve } from '@hono/node-server'
 import { createServer } from '../../http/server.js'
-import { attachDesktopBridge } from '../../desktop/bridge.js'
+import { DESKTOP_WS_PATH, REMOTE_WS_PATH } from '@rerun/contracts'
+import { desktopUpgradeHandler } from '../../desktop/bridge.js'
+import { attachUpgradeRouter } from '../../http/upgrade.js'
+import { remoteUpgradeHandler } from '../../remote/socket.js'
 import { prepareDataDir } from '../../datadir/ladder.js'
 import { reconcileVault } from '../../vault/apply.js'
 import { ensureForeman } from '../../agents/foreman.js'
@@ -14,7 +17,7 @@ import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits
 import { refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
 import { refreshOpencodeCatalog } from '../../connections/opencode-catalog.js'
 import { refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
-import { env } from '../../config/env.js'
+import { env, remoteComputersEnabled } from '../../config/env.js'
 import { logger } from '../../lib/logger.js'
 import { closeAllMcp } from '../../tools/mcp-pool.js'
 import { loadPairingIdentity, pairWithHub } from '../../pairing/pairing.js'
@@ -53,7 +56,10 @@ export async function runCommand(): Promise<void> {
         logger.info({ port: info.port, host: RERUN_HOST, authenticated: Boolean(RERUN_API_KEY) }, 'rerun-engine listening')
         void pairWithHub()
     })
-    attachDesktopBridge(server as Server)
+    attachUpgradeRouter(server as Server, {
+        [DESKTOP_WS_PATH]: desktopUpgradeHandler(),
+        ...(remoteComputersEnabled() ? { [REMOTE_WS_PATH]: remoteUpgradeHandler() } : {}),
+    })
     // The pooled MCP servers are closed before the process goes, within a short grace: one that does
     // not answer its close is left to systemd, which stops the whole cgroup.
     const shutdown = () => {

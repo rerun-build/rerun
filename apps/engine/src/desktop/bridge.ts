@@ -1,16 +1,11 @@
-import type { IncomingMessage, Server } from 'node:http'
 import { connect } from 'node:net'
-import type { Duplex } from 'node:stream'
 import { WebSocketServer, type WebSocket } from 'ws'
-import { DESKTOP_WS_PATH, type DesktopViewMode } from '@rerun/contracts'
+import type { DesktopViewMode } from '@rerun/contracts'
 import { agentExists } from '../agents/loader.js'
 import { driverActed, driverJoined, driverLeft, ensureDesktop, viewerJoined, viewerLeft } from './session.js'
 import { verifyDesktopTicket } from './ticket.js'
 import { logger } from '../lib/logger.js'
-
-function refuse(socket: Duplex, status: string): void {
-    socket.end(`HTTP/1.1 ${status}\r\nConnection: close\r\n\r\n`)
-}
+import { refuseUpgrade, type UpgradeHandler } from '../http/upgrade.js'
 
 // KeyEvent, PointerEvent, and the extended key event noVNC prefers when the server offers it.
 const INPUT_MESSAGE_TYPES = new Set([4, 5, 255])
@@ -55,15 +50,13 @@ async function pipeToVnc(ws: WebSocket, agentId: string, mode: DesktopViewMode):
     ws.once('error', leave)
 }
 
-// The only route a browser reaches directly, so it accepts one path and nothing without a ticket.
-// The screen it opens is the one of the agent the ticket names, never one the caller picks.
-export function attachDesktopBridge(server: Server): void {
+// A browser reaches it directly, so nothing opens without a ticket. The screen it opens is the one of
+// the agent the ticket names, never one the caller picks.
+export function desktopUpgradeHandler(): UpgradeHandler {
     const wss = new WebSocketServer({ noServer: true })
-    server.on('upgrade', (request: IncomingMessage, socket: Duplex, head: Buffer) => {
-        const url = new URL(request.url ?? '/', 'http://engine')
-        if (url.pathname !== DESKTOP_WS_PATH) return refuse(socket, '404 Not Found')
+    return (request, socket, head, url) => {
         const ticket = verifyDesktopTicket(url.searchParams.get('ticket'))
-        if (!ticket || !agentExists(ticket.agentId)) return refuse(socket, '401 Unauthorized')
+        if (!ticket || !agentExists(ticket.agentId)) return refuseUpgrade(socket, '401 Unauthorized')
         wss.handleUpgrade(request, socket, head, ws => void pipeToVnc(ws, ticket.agentId, ticket.mode))
-    })
+    }
 }

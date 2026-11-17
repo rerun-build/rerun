@@ -60,6 +60,13 @@ export const connectionsMigratedPath = () => resolve(connectionsDir(), '.migrate
 // ever carries a piece of it.
 export const vaultDir = () => resolve(dataDir(), 'vault')
 
+// The computers linked to the workspace and what the coworkers may do on each: who they are and the
+// rules a person set or answered on a card. A sibling of `agents/`, so it lives on with the box
+// whatever happens to a coworker, and an archive of the box keeps it.
+export const remoteDir = () => resolve(dataDir(), 'remote')
+
+export const remoteComputersPath = () => resolve(remoteDir(), 'computers.json')
+
 export const vaultItemDir = (id: string) => resolve(vaultDir(), pathSegment(id, 'vault item id'))
 
 export const vaultItemPath = (id: string) => resolve(vaultItemDir(id), 'item.json')

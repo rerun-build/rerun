@@ -23,6 +23,7 @@ import { createFilesRouter } from './routes/files.js'
 import { brainRoutes } from './routes/brain.js'
 import { agentDesktopRoutes, desktopRoutes } from './routes/desktop.js'
 import { vaultRoutes } from './routes/vault.js'
+import { remoteRoutes } from './routes/remote.js'
 import { VaultConflictError } from '../vault/conflicts.js'
 import { HttpError, notFound } from '../lib/errors.js'
 import { agentExists, listAgentIdsOnDisk } from '../agents/loader.js'
@@ -45,6 +46,7 @@ export function createServer(): Hono {
     api.route('/tools', toolRoutes)
     api.route('/connections', connectionRoutes)
     api.route('/vault', vaultRoutes)
+    api.route('/remote', remoteRoutes)
     api.route('/agents', agentRoutes)
     api.route('/agents/:id/sessions', sessionRoutes)
     api.route('/agents/:id/memories', memoryRoutes)

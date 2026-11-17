@@ -37,7 +37,8 @@ vi.mock('../lib/logger.js', () => ({ logger: { info() {}, warn() {} } }))
 
 const { afterEach, beforeEach, describe, expect, it } = await import('vitest')
 const { WebSocket } = await import('ws')
-const { attachDesktopBridge } = await import('./bridge.js')
+const { desktopUpgradeHandler } = await import('./bridge.js')
+const { attachUpgradeRouter } = await import('../http/upgrade.js')
 
 let http: Server
 let vnc: ReturnType<typeof createTcpServer>
@@ -70,7 +71,7 @@ beforeEach(async () => {
     })
     state.vncPort = await listen(vnc)
     http = createHttpServer((_request, response) => response.end('http'))
-    attachDesktopBridge(http)
+    attachUpgradeRouter(http, { '/desktop/ws': desktopUpgradeHandler() })
     base = `ws://127.0.0.1:${await listen(http)}`
 })
 

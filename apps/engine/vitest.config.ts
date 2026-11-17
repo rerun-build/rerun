@@ -7,6 +7,7 @@ export default defineConfig({
             include: ['src/**/*.ts'],
             exclude: [
                 'src/**/*.test.ts',
+                'src/**/__fixtures__/**',
                 'src/cli/bin.ts',
                 'src/cli/commands/doctor.ts',
                 'src/cli/commands/migrate.ts',
