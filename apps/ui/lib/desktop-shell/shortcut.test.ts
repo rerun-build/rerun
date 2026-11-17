@@ -38,6 +38,7 @@ describe('shortcutProblem', () => {
     it('names what the system already uses the keys for', () => {
         expect(shortcutProblem({ modifiers: ['Command'], key: 'Space' }, 'mac')).toEqual({ problem: 'reserved', owner: 'spotlight' })
         expect(shortcutProblem({ modifiers: ['Alt'], key: 'Space' }, 'win')).toEqual({ problem: 'reserved', owner: 'windowMenu' })
+        expect(shortcutProblem({ modifiers: ['Shift', 'Alt'], key: 'Tab' }, 'win')).toEqual({ problem: 'reserved', owner: 'appSwitcher' })
         expect(shortcutProblem({ modifiers: ['Command'], key: 'C' }, 'mac')).toEqual({ problem: 'reserved', owner: 'everyApp' })
         expect(shortcutProblem({ modifiers: ['Control'], key: 'V' }, 'linux')).toEqual({ problem: 'reserved', owner: 'everyApp' })
     })

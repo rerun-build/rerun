@@ -46,6 +46,7 @@ function createQuickWindow(origin: string): BrowserWindow {
         if (!held && Date.now() - shownAt > BLUR_GRACE_MS) window.hide()
     })
     const contents = window.webContents
+    window.on('hide', () => contents.send(IPC_EVENTS.quickAskHidden))
     contents.on('will-navigate', (event, url) => {
         const decision = decideNavigation(url, origin)
         if (decision === 'stay') return

@@ -19,7 +19,7 @@ const DIGITS = '0123456789'.split('')
 const FUNCTION_KEYS = Array.from({ length: 24 }, (_, index) => `F${index + 1}`)
 const NAMED_KEYS = ['Space', 'Enter', 'Tab', 'Backspace', 'Delete', 'Up', 'Down', 'Left', 'Right', '.', ',', '/', '\\', ';', "'", '[', ']', '`', '-', '=']
 
-export const SHORTCUT_KEYS: ReadonlySet<string> = new Set([...LETTERS, ...DIGITS, ...FUNCTION_KEYS, ...NAMED_KEYS])
+const SHORTCUT_KEYS: ReadonlySet<string> = new Set([...LETTERS, ...DIGITS, ...FUNCTION_KEYS, ...NAMED_KEYS])
 
 const MODIFIER_ALIASES: Record<string, ShortcutModifier> = {
     control: 'Control',
@@ -33,7 +33,7 @@ const MODIFIER_ALIASES: Record<string, ShortcutModifier> = {
     meta: 'Super',
 }
 
-export function isFunctionKey(key: string): boolean {
+function isFunctionKey(key: string): boolean {
     return /^F([1-9]|1\d|2[0-4])$/.test(key)
 }
 

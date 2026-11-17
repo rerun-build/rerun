@@ -55,7 +55,6 @@ export function QuickAskComposer() {
         const shell = desktopShell('quickAsk')
         if (!shell) return
         handOverQuickAsk(message)
-        setText('')
         shell.quickAsk.sent('/')
     }, [])
 
@@ -64,6 +63,7 @@ export function QuickAskComposer() {
         onError: (message, reason) => {
             setStep(reason === 'denied' ? 'micDenied' : 'text')
             if (reason !== 'denied') setNotice(message)
+            holdWindow(false)
         },
         onLimitReached: () => finishRef.current(),
     })
@@ -77,12 +77,17 @@ export function QuickAskComposer() {
         void start()
     }, [start])
 
+    // Escape while a recording is written out moves this on: its transcript is no longer wanted.
+    const transcription = useRef(0)
+
     const finish = useCallback(async () => {
+        const wanted = ++transcription.current
         setStep('transcribing')
         try {
             // Null when Space was let go before the microphone came up: there is nothing to send.
             const recording = await stop()
             const transcript = recording ? await transcribeVoiceRecording(recording.blob, recording.format.transcriptionFormat) : ''
+            if (wanted !== transcription.current) return
             if (!transcript) {
                 setNotice(t('nothingHeard'))
                 setStep('text')
@@ -95,6 +100,7 @@ export function QuickAskComposer() {
                 setStep('text')
             }, SENT_MS)
         } catch {
+            if (wanted !== transcription.current) return
             setNotice(t('transcriptionFailed'))
             setStep('text')
             holdWindow(false)
@@ -124,11 +130,40 @@ export function QuickAskComposer() {
     const voiceShortcut = useRef<() => void>(() => {})
     useEffect(() => {
         voiceShortcut.current = () => {
-            if (step === 'text') listen('toggle')
+            if (step === 'text' || step === 'micDenied') listen('toggle')
             else if (step === 'listening' && mode === 'toggle') void finish()
         }
     })
     useEffect(() => desktopShell('quickAskVoiceShortcut')?.quickAsk.onShortcut(kind => kind === 'voice' && voiceShortcut.current()), [])
+
+    // The shell put the window away (the text shortcut, the tray, a click elsewhere): nothing keeps
+    // listening behind it, and it comes back on its field. The shell has to say so, a window it
+    // hides does not get `visibilitychange`.
+    const putAway = useRef<() => void>(() => {})
+    useEffect(() => {
+        putAway.current = () => {
+            if (step === 'listening') abort()
+            else if (step === 'micDenied') setStep('text')
+        }
+    })
+    useEffect(() => desktopShell('quickAskVoiceShortcut')?.quickAsk.onHidden(() => putAway.current()), [])
+
+    useEffect(() => {
+        if (step !== 'transcribing' && step !== 'micDenied') return
+        const onKeyDown = (event: globalThis.KeyboardEvent) => {
+            if (event.key !== 'Escape') return
+            event.preventDefault()
+            if (step === 'micDenied') {
+                desktopShell('quickAsk')?.quickAsk.close()
+                return
+            }
+            transcription.current++
+            setStep('text')
+            holdWindow(false)
+        }
+        window.addEventListener('keydown', onKeyDown)
+        return () => window.removeEventListener('keydown', onKeyDown)
+    }, [step])
 
     useEffect(() => {
         if (step !== 'listening' || mode !== 'toggle') return
@@ -148,7 +183,10 @@ export function QuickAskComposer() {
 
     const send = () => {
         const message = text.trim()
-        if (message) handOver(message)
+        if (!message || !desktopShell('quickAsk')) return
+        handOver(message)
+        // Only what was typed leaves the field: a draft outlives a question asked out loud.
+        setText('')
     }
 
     const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {

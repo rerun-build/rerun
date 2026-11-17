@@ -124,6 +124,9 @@ async function verifyServer(origin: string): Promise<void> {
 function start(): void {
     app.userAgentFallback = shellUserAgent(app.userAgentFallback)
     registerIpcHandlers()
+    // Before the menu and the tray: both print the shortcuts.
+    const settings = desktopSettings()
+    restoreQuickAskShortcuts({ text: settings.quickAskShortcut ?? null, voice: settings.quickAskVoiceShortcut ?? null })
     menu()
     onLocaleChange(menu)
     onLocaleChange(refreshTray)
@@ -131,8 +134,6 @@ function start(): void {
     const origin = serverOrigin()
     createMainWindow(origin, { hidden: startedAtLogin() })
     createTray({ checkForUpdates: () => void checkForUpdates(true), quit: () => app.quit() })
-    const settings = desktopSettings()
-    restoreQuickAskShortcuts({ text: settings.quickAskShortcut ?? null, voice: settings.quickAskVoiceShortcut ?? null })
     if (origin) void verifyServer(origin)
     startUpdater()
     registerScheme()

@@ -1,5 +1,6 @@
 // Quick ask: the floating field for the Chief of Staff, end to end on the local hub:
-//   pnpm verify:desktop --onboarded --scenario apps/desktop-app/e2e/quick-ask.mjs
+//   pnpm verify:desktop --onboarded --engine --scenario apps/desktop-app/e2e/quick-ask.mjs
+// (`--engine`: without an engine behind the workspace the question is refused and never shows.)
 //
 // Playwright cannot press a global shortcut: the window is opened by the File menu's item, which
 // runs the same toggle, and the shortcut's registration is checked on its own. The second half
@@ -33,11 +34,15 @@ export default async function quickAskScenario({ app, page, step, base }) {
     const initial = await page.evaluate(() => window.rerunShell.settings.get())
     check(initial.quickAskShortcut === (process.platform === 'darwin' ? 'Shift+Command+Space' : 'Control+Shift+Space'), `the default shortcut is set (${initial.quickAskShortcut})`)
     check(await isRegistered(app, initial.quickAskShortcut), 'the global shortcut is registered')
+    check((await menuAccelerator(app)) === initial.quickAskShortcut, 'the File menu shows the shortcut from the launch')
+    check((await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').accelerator ?? null)) === initial.quickAskVoiceShortcut, 'and the voice one')
 
     await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].hide())
     await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').click())
     const quick = await waitUntil(() => app.windows().find((candidate) => candidate.url().endsWith('/quick-ask')), Boolean, 'the Quick ask window opens')
     await quick.waitForSelector('[data-quick-ask] textarea')
+    // The shell shows the window once the page has finished loading, which can come after the field.
+    await waitUntil(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().find((candidate) => candidate.webContents.getURL().endsWith('/quick-ask'))?.isVisible() ?? false), Boolean, 'the Quick ask window shows')
     const box = await app.evaluate(({ BrowserWindow }) => {
         const window = BrowserWindow.getAllWindows().find((candidate) => candidate.webContents.getURL().endsWith('/quick-ask'))
         return { visible: window.isVisible(), onTop: window.isAlwaysOnTop(), bounds: window.getBounds() }
@@ -185,6 +190,65 @@ export default async function quickAskScenario({ app, page, step, base }) {
     await quick.waitForSelector('[data-quick-ask][data-step="text"]')
     check(true, 'Escape cancels a voice question')
     await quick.evaluate(() => window.rerunShell.quickAsk.close())
+
+    // Put away while it listens (the text shortcut toggles it), it stops listening and sends nothing.
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="listening"]')
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').click())
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'the text shortcut puts a listening window away')
+    await quick.waitForSelector('[data-quick-ask][data-step="text"]', { state: 'attached' })
+    check((await quick.evaluate(() => localStorage.getItem('rerun:quick-ask'))) === null, 'a window put away stops listening and sends nothing')
+
+    // A draft typed before a spoken question is still in the field after it.
+    const DRAFT = 'half a thought'
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask').click())
+    await waitUntil(quickWindowVisible, Boolean, 'the window opens on its field')
+    await quick.fill('[data-quick-ask] textarea', DRAFT)
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="listening"]')
+    await new Promise((done) => setTimeout(done, 1200))
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="sent"]', { timeout: 15_000 })
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'the spoken question leaves')
+    await quick.waitForSelector('[data-quick-ask][data-step="text"]', { state: 'attached' })
+    check((await quick.inputValue('[data-quick-ask] textarea')) === DRAFT, 'the draft outlives the spoken question')
+    await quick.fill('[data-quick-ask] textarea', '')
+
+    // Escape while the recording is written out drops it: the transcription here never answers.
+    await quick.evaluate(() => {
+        const realFetch = window.fetch.bind(window)
+        window.fetch = (input, init) => (String(input).includes('/api/voice/transcribe') ? new Promise(() => {}) : realFetch(input, init))
+    })
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="listening"]')
+    await new Promise((done) => setTimeout(done, 1200))
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="transcribing"]')
+    await quick.keyboard.press('Escape')
+    await quick.waitForSelector('[data-quick-ask][data-step="text"]')
+    check((await quickWindowVisible()) && (await quick.evaluate(() => localStorage.getItem('rerun:quick-ask'))) === null, 'Escape drops a question being written out, the window stays on its field')
+    await quick.evaluate(() => window.rerunShell.quickAsk.close())
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'the window closes')
+
+    // The microphone refused: Escape puts the window away, it comes back on its field, and it no
+    // longer stays up when it loses the focus.
+    await quick.evaluate(() => {
+        navigator.mediaDevices.getUserMedia = async () => {
+            throw new DOMException('Permission denied', 'NotAllowedError')
+        }
+    })
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="micDenied"]')
+    await step('quick ask without the microphone', { target: quick })
+    await quick.keyboard.press('Escape')
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'Escape puts the refused microphone screen away')
+    await quick.waitForSelector('[data-quick-ask][data-step="text"]', { state: 'attached' })
+    check(true, 'and the window comes back on its field')
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="micDenied"]')
+    await new Promise((done) => setTimeout(done, 800))
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[0].focus())
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'a refused microphone no longer holds the window up')
 
     // The two shortcuts cannot share keys.
     const clash = await page.evaluate((keys) => window.rerunShell.quickAsk.setShortcut('voice', keys), initial.quickAskShortcut)

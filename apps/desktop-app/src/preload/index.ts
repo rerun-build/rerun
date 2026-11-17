@@ -85,6 +85,7 @@ if (bootstrap?.audience === 'app') {
                 })
                 return unsubscribe
             },
+            onHidden: (callback) => subscribe<void>(IPC_EVENTS.quickAskHidden, () => callback()),
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)

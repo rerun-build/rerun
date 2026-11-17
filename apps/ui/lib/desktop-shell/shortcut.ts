@@ -27,7 +27,7 @@ const NAMED_CODES: Record<string, string> = {
     Equal: '=',
 }
 
-export function keyFromCode(code: string): string | null {
+function keyFromCode(code: string): string | null {
     if (/^Key[A-Z]$/.test(code)) return code.slice(3)
     if (/^Digit\d$/.test(code)) return code.slice(5)
     if (/^F([1-9]|1\d|2[0-4])$/.test(code)) return code
@@ -36,7 +36,7 @@ export function keyFromCode(code: string): string | null {
 
 type ModifierState = Pick<KeyboardEvent, 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey'>
 
-export function heldModifiers(event: ModifierState, platform: DesktopShellPlatform): ShortcutModifier[] {
+function heldModifiers(event: ModifierState, platform: DesktopShellPlatform): ShortcutModifier[] {
     const held: ShortcutModifier[] = []
     if (event.ctrlKey) held.push('Control')
     if (event.altKey) held.push('Alt')
@@ -75,7 +75,7 @@ const MAC_RESERVED: Record<string, ShortcutOwner> = {
 
 const OTHER_RESERVED: Record<string, ShortcutOwner> = {
     'Alt+Tab': 'appSwitcher',
-    'Shift+Alt+Tab': 'appSwitcher',
+    'Alt+Shift+Tab': 'appSwitcher',
     'Alt+Space': 'windowMenu',
     'Alt+F4': 'system',
     'Super+Space': 'inputSources',

@@ -213,6 +213,10 @@ export type DesktopShellApi = {
         // `quickAskVoiceShortcut` capability, in the Quick ask window: the voice shortcut was pressed.
         // The shell has already brought the window up; the page starts listening, or sends.
         onShortcut(callback: (kind: QuickAskShortcutKind) => void): Unsubscribe
+        // `quickAskVoiceShortcut` capability, in the Quick ask window: the shell put the window away
+        // (the text shortcut, the tray, a click elsewhere). A hidden page is not told otherwise: it
+        // stops listening.
+        onHidden(callback: () => void): Unsubscribe
     }
 }
 

@@ -45,6 +45,7 @@ export const IPC_EVENTS = {
     oauthReturn: 'rerun-shell:event:oauth-return',
     notificationClick: 'rerun-shell:event:notification-click',
     quickAskShortcut: 'rerun-shell:event:quick-ask-shortcut',
+    quickAskHidden: 'rerun-shell:event:quick-ask-hidden',
 } as const
 
 export type AppBootstrap = {
