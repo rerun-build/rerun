@@ -31,6 +31,7 @@ import resolver
 import sifter
 import slots
 import tiers
+import weights
 import snapshot
 import states
 import store as ledger_store
@@ -437,6 +438,7 @@ class Dispatcher:
         self.fill_ids()
         self.repo, self.label = cfg["repo"], cfg.get("label", "factory")
         self.store = ledger_store.Store(cfg["ledger_file"])
+        self.weights = weights.load()
         self.store.import_json(cfg["json_state_file"])
         self.beats = 0
         self.unreadable = 0
@@ -636,10 +638,11 @@ class Dispatcher:
         self.note_failures(j, failures.kinds(old, state, msg), old, msg)
 
     def note_failures(self, j, kinds, old, msg):
+        runs, cost = weights.job_cost(self.store, j["issue"], self.weights)
         for kind in kinds:
             self.store.add_failure(kind, j["issue"], station=STATION_OF.get(old, old), coworker=self.names.get(j.get("agent"), j.get("agent") or ""),
                                    model=(j.get("run_model") or {}).get("model"), tier=j.get("tier"), reason=msg,
-                                   plan_run=failures.plan_run(self.store, j), brief=j.get("brief_v"))
+                                   plan_run=failures.plan_run(self.store, j), brief=j.get("brief_v"), runs=runs, cost=cost)
 
     def file_holder(self, issue, paths):
         for j in self.jobs():
@@ -957,7 +960,8 @@ class Dispatcher:
         self.tier_job(j, state)
         j["brief_v"] = failures.version(state)
         j["intent_at"] = iso(self.now())
-        j["fire_id"] = self.store.intent(str(j["issue"]), "", step, coworker=self.names.get(agent, agent), at=j["intent_at"])
+        j["fire_id"] = self.store.intent(str(j["issue"]), "", step, coworker=self.names.get(agent, agent), at=j["intent_at"],
+                                         model=(j.get("run_model") or {}).get("model"), thinking=(j.get("run_model") or {}).get("thinkingLevel"))
         self.save(j, step)
         self.store.set(str(j["issue"]), "seen", "")
         args = {"agentId": agent, "message": message, "waitSeconds": WAIT_S}

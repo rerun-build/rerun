@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS changes(
 """
 JOB_STATES = states.NAMES
 FIRE_COLUMNS = (("cache_read", "INTEGER"), ("cache_write", "INTEGER"), ("seconds", "INTEGER"),
-                ("steps", "INTEGER"), ("steps_at", "TEXT"))
+                ("steps", "INTEGER"), ("steps_at", "TEXT"), ("model", "TEXT"), ("thinking", "TEXT"))
+FAILURE_COLUMNS = (("runs", "INTEGER"), ("cost", "REAL"))
 OPEN = ("intent", "running")
 CHANGE_COLUMNS = {"live_at", "after", "verdict", "revert", "told"}
 
@@ -76,17 +77,21 @@ class Store:
         for col, typ in FIRE_COLUMNS:
             if col not in have:
                 self.db.execute(f"ALTER TABLE fires ADD COLUMN {col} {typ}")
+        have = {r[1] for r in self.db.execute("PRAGMA table_info(failures)")}
+        for col, typ in FAILURE_COLUMNS:
+            if col not in have:
+                self.db.execute(f"ALTER TABLE failures ADD COLUMN {col} {typ}")
 
     def close(self):
         self.db.close()
         self._lock.close()
 
-    def intent(self, job, chunk, stage, coworker="", slug="", at=None):
+    def intent(self, job, chunk, stage, coworker="", slug="", at=None, model=None, thinking=None):
         n = self.db.execute("SELECT COUNT(*) FROM fires WHERE job=? AND chunk=? AND stage=?",
                             (job, chunk, stage)).fetchone()[0]
         cur = self.db.execute(
-            "INSERT INTO fires(job,chunk,stage,coworker,slug,intent_at,refire) VALUES(?,?,?,?,?,?,?)",
-            (job, chunk, stage, coworker, slug, at or now(), n))
+            "INSERT INTO fires(job,chunk,stage,coworker,slug,intent_at,refire,model,thinking) VALUES(?,?,?,?,?,?,?,?,?)",
+            (job, chunk, stage, coworker, slug, at or now(), n, model, thinking))
         self._seen(job, chunk)
         self.db.execute("UPDATE ready_chunks SET attempts=MAX(attempts,?) WHERE job=? AND chunk=?", (n, job, chunk))
         return cur.lastrowid
@@ -301,11 +306,11 @@ class Store:
         rows = self.db.execute("SELECT at, key, old, new FROM events ORDER BY id").fetchall()
         return [{"at": r[0], "key": r[1], "from": json.loads(r[2]), "to": json.loads(r[3])} for r in rows]
 
-    def add_failure(self, kind, job, station="", coworker="", model=None, tier=None, reason="", plan_run=None, brief=None, at=None):
+    def add_failure(self, kind, job, station="", coworker="", model=None, tier=None, reason="", plan_run=None, brief=None, at=None, runs=None, cost=None):
         with self.db:
             cur = self.db.execute(
-                "INSERT INTO failures(at, kind, job, station, coworker, model, tier, reason, plan_run, brief) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (at or now(), kind, str(job), station, coworker, model, tier, gist(reason, 300), plan_run, brief))
+                "INSERT INTO failures(at, kind, job, station, coworker, model, tier, reason, plan_run, brief, runs, cost) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                (at or now(), kind, str(job), station, coworker, model, tier, gist(reason, 300), plan_run, brief, runs, cost))
         return cur.lastrowid
 
     def failures(self, after=0):

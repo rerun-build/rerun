@@ -50,9 +50,9 @@ class Groups(unittest.TestCase):
 class Table(unittest.TestCase):
     def test_the_table_has_one_row_per_event_with_every_kept_field(self):
         lines = causes.table([ev(1), ev(2, model="a|b", reason="x  \n y " + "z" * 400)]).splitlines()
-        self.assertEqual(lines[0], "| id | at | group | job | coworker | model | tier | plan run | brief | reason |")
+        self.assertEqual(lines[0], "| id | at | group | job | coworker | model | tier | plan run | brief | runs | cost | reason |")
         self.assertEqual(len(lines), 4)
-        self.assertEqual(lines[2], "| 1 | 2026-11-16T10:00:00Z | ended blocked @ build | 5 | B1 | claude-x | high | pr1 | abc1234567 | stopped |")
+        self.assertEqual(lines[2], "| 1 | 2026-11-16T10:00:00Z | ended blocked @ build | 5 | B1 | claude-x | high | pr1 | abc1234567 | - | - | stopped |")
         self.assertIn("claude-x", lines[2])
         self.assertIn("a/b", lines[3])
         self.assertNotIn("a|b", lines[3])

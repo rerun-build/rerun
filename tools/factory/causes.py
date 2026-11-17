@@ -21,7 +21,7 @@ RUN_LIMIT = 2700
 CUT = 160
 CULPRITS = ("plan prompt", "station brief", "coworker instructions", "setting or clock", "tool", "check", "plan format")
 FORMS = ({"prefix": "CAUSES: ", "rest": "sentence"},)
-HEADER = ["id", "at", "group", "job", "coworker", "model", "tier", "plan run", "brief", "reason"]
+HEADER = ["id", "at", "group", "job", "coworker", "model", "tier", "plan run", "brief", "runs", "cost", "reason"]
 ROB = ('Rob, 2026-11-16: "we count failures as a signal for change. So boss needs to analyze WHY issues are happening, '
        'find the culprit and address it. That can be a simple planning prompt change, a timing correction, '
        'bot constitution rewrite... better instructions.."')
@@ -64,7 +64,7 @@ def table(events):
     lines = ["| " + " | ".join(HEADER) + " |", "|" + " --- |" * len(HEADER)]
     for e in events:
         vals = [e.get("id"), e.get("at"), group(e), e.get("job"), e.get("coworker"), e.get("model"),
-                e.get("tier"), e.get("plan_run"), e.get("brief"), e.get("reason")]
+                e.get("tier"), e.get("plan_run"), e.get("brief"), e.get("runs"), e.get("cost"), e.get("reason")]
         lines.append("| " + " | ".join(cell(v) for v in vals) + " |")
     return "\n".join(lines)
 
