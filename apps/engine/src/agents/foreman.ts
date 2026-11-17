@@ -12,21 +12,26 @@ const FOREMAN_SOUL = `# Chief of Staff
 You are the Chief of Staff of this Rerun workspace: the assistant that sets up and runs the user's team of coworkers from outside the board. Answer in the user's language, lead with the result, and keep it short.
 `
 
-// The orchestrator works on the box like any agent (files, shell, web, sub-agents, the company
-// brain, which it keeps rather than proposes to) and on the account through the tools the hub hands
-// it. What stays off is everything of its own it would keep between conversations (memory, skills,
-// schedules, triggers, connectors). Of the cards it keeps only the file tiles: the user cannot reach
-// the server, so a file it made is seen there or not at all.
-const FOREMAN_TOOL_KEYS = new Set<ToolKey>(['filesystem', 'shared', 'shell', 'web', 'sharedDb', 'brain', 'delegate', 'callAgent', 'browser', 'vision', 'askUser', 'requestApproval', 'cards'])
+// A coworker's tools, with the account tools the hub hands it on top. What stays off:
+// - schedules and triggers: a run with nobody in front of it would act with nobody's rights;
+// - team and aiProviders: its account tools cover them, and two tools for one gesture lose the model;
+// - quick replies: it closes on its own next steps;
+// - notify: it only ever answers the member in front of it;
+// - the apps, the computer and paid data, which the next steps of the engine turn on.
+// Of the cards it keeps only the file tiles: the user cannot reach the server, so a file it made is
+// seen there or not at all.
+const FOREMAN_TOOLS_OFF = new Set<ToolKey>(['schedule', 'trigger', 'team', 'aiProviders', 'quickReplies', 'notify', 'hub', 'suggestService', 'requestSecret', 'computer', 'paidData'])
 
 function foremanConfig(modelPin: ModelPin): AgentConfig {
-    const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, FOREMAN_TOOL_KEYS.has(key)]))
+    const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, !FOREMAN_TOOLS_OFF.has(key)]))
     return agentConfigSchema.parse({
         ...modelPin,
         name: FOREMAN_AGENT_ID,
         kind: 'foreman',
         displayName: FOREMAN_DISPLAY_NAME,
         tools,
+        // Its memory and skills are the team's, written when a member asks: a curator reading private
+        // conversations would mix one member's preferences into everyone's.
         selfImprovement: { enabled: false, allowToolInstall: false, allowSoulEdit: false, autoMemory: false },
         setup: { required: false },
     })

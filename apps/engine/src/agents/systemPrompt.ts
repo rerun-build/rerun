@@ -252,12 +252,18 @@ const FOREMAN_OPERATING_NOTES =
 const FOREMAN_SHOWING_FILES_NOTE =
     "The user cannot reach this server: a path means nothing to them, and a link to one opens nothing. Every file they should see (an image, slides, a document, what a sub-coworker produced for you) goes in a card_file call, which draws it as tiles they open and download: scope 'agent' for your own workspace, 'shared' for the shared space. A file in a coworker's own workspace is shown by that coworker, so ask it with send_message. Never write a server path in your message, and never tell the user to open the server, a folder or an admin access to get a file."
 
+const FOREMAN_MEMORY_AND_SKILLS_NOTE =
+    "Your memory, your skills and your private database belong to the whole team: every member who talks to you draws on them, while each conversation stays with the member who has it. A fact about the company (who does what, a date, a rule every coworker should follow) goes in the company brain, where every coworker reads it. A skill holds how the team wants you to do a recurring kind of work (a procedure, a format, a checklist): edit the one that covers it before creating another. memory_write is for how the team wants you yourself to work when no skill governs it (a standing preference, a tone, a habit), and the same rule never lives in two places. Write a skill or a memory only when the member asks you to, or agrees when you offer it, and never keep there what one member told you about themselves or in confidence. Before answering about the team, past decisions or what you were told, call memory_recall."
+
 // The hub writes the foreman's charter and hands it the account tools; the engine adds what depends
-// on the box and the runtime it is on. None of the sections of an agent's own state apply: it keeps
-// no skills, no memory and no schedules of its own.
+// on the box and the runtime it is on, and the state it keeps for the team like a coworker keeps its
+// own: skills, memory and a private database. It keeps no schedules.
 async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order: TurnOrder): Promise<SystemPrompt> {
     const cfg = agent.config.tools
-    const [sharedDbSchema, brain] = await Promise.all([
+    const [skillIndex, memoryIndex, dbSchema, sharedDbSchema, brain] = await Promise.all([
+        cfg.skills ? buildSkillIndex(agent.id).catch(() => '') : Promise.resolve(''),
+        cfg.memory ? buildMemoryIndex(agent.id).catch(() => '') : Promise.resolve(''),
+        cfg.db ? readAgentDbSchema(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
         cfg.brain ? buildForemanBrainSection().catch(() => '') : Promise.resolve(''),
     ])
@@ -268,13 +274,17 @@ async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order:
         CLI_PROVIDERS.has(provider) ? section('bridged_tools', cliBridgeNote(provider, cfg.web)) : '',
         section('operating_notes', FOREMAN_OPERATING_NOTES),
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
+        cfg.memory || cfg.skills ? section('memory_and_skills', FOREMAN_MEMORY_AND_SKILLS_NOTE) : '',
         section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
         turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config))),
         section('shared_conversation', SHARED_CONVERSATION_NOTE),
     ]
 
     const volatile: string[] = []
+    if (skillIndex) volatile.push(section('skills', skillIndex))
     if (brain) volatile.push(section('company_brain', brain))
+    if (memoryIndex) volatile.push(section('memory_index', memoryIndex))
+    if (cfg.db) volatile.push(section('database', `${databaseNote(cfg.sharedDb)}${dbSchema ? `\n\n${dbSchema}` : ''}`))
     if (cfg.sharedDb) volatile.push(section('shared_database', `The workspace has one shared SQL database that every coworker reads and writes, through shared_db_query, shared_db_execute and shared_db_schema. Read it freely to answer the user. Write to it only when the user asked for it, and never DROP or ALTER a table, nor DELETE rows, without their approval.${sharedDbSchema ? `\n\n${sharedDbSchema}` : ''}`))
     volatile.push(section('current_time', currentTimeNote()))
     return { stable: joinSections(stable), volatile: joinSections(volatile) }

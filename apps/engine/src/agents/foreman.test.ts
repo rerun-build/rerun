@@ -98,12 +98,24 @@ describe('foreman', () => {
         expect(names).not.toContain('brain_propose')
     })
 
-    it('keeps nothing of its own between conversations', async () => {
+    it('keeps a memory, skills and a database for the team, like a coworker keeps its own', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['memory_write', 'skill_create', 'schedule_create', 'trigger_create', 'db_query', 'notify_user', 'suggest_service', 'request_secret', 'soul_update', 'install_complete']) expect(names).not.toContain(name)
+        expect(names).toEqual(expect.arrayContaining(['memory_write', 'memory_recall', 'memory_delete', 'skill_list', 'skill_create', 'skill_edit', 'db_query', 'db_execute']))
+    })
+
+    it('runs nothing on its own and leaves the rest to its account tools', async () => {
+        const { tools, close } = await foremanToolSet()
+        const names = Object.keys(tools)
+        await close()
+        for (const name of ['schedule_create', 'trigger_create', 'notify_user', 'skill_propose', 'soul_update', 'install_complete', 'suggest_service', 'request_secret']) expect(names).not.toContain(name)
         expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
+    })
+
+    it('is never curated: its memory is written when a member asks', async () => {
+        const foreman = await getAgent(FOREMAN_AGENT_ID)
+        expect(foreman.config.selfImprovement).toEqual({ enabled: false, allowToolInstall: false, allowSoulEdit: false, autoMemory: false })
     })
 
     it('shows the files it made, without the table cards', async () => {
@@ -164,7 +176,7 @@ describe('foreman', () => {
         }
     })
 
-    it('speaks from the brief, with the box around it and none of the agent sections', async () => {
+    it('speaks from the brief, with the box around it and what it keeps for the team', async () => {
         const prompt = systemPromptText(await buildSystemPrompt(await foremanWithBrief(), { source: 'chat' }, 'claude'))
         expect(prompt).toContain('Charter from the hub.')
         expect(prompt).toContain('<bridged_tools>')
@@ -178,9 +190,10 @@ describe('foreman', () => {
         expect(prompt).toContain('<company_brain>')
         expect(prompt).toContain('brain_write the complete new version')
         expect(prompt).not.toContain('You cannot write the brain.')
-        expect(prompt).not.toContain('<skills>')
-        expect(prompt).not.toContain('<memory_index>')
+        expect(prompt).toContain('<memory_and_skills>')
+        expect(prompt).toContain('<database>')
         expect(prompt).not.toContain('<verbosity>')
+        expect(prompt).not.toContain('<scheduled_tasks>')
     })
 
     it('never lets an agent be created as a foreman', async () => {
@@ -199,7 +212,9 @@ describe('foreman routes', () => {
         ['PATCH', '/agents/foreman', { model: 'rerun-max', soul: 'hijacked' }],
         ['DELETE', '/agents/foreman', undefined],
         ['POST', '/agents/foreman/duplicate', { name: 'copy' }],
-        ['POST', '/agents/foreman/skills/import', {}],
+        ['POST', '/agents/foreman/schedules', { slug: 'weekly' }],
+        ['POST', '/agents/foreman/triggers', { slug: 'hook' }],
+        ['GET', '/agents/foreman/keys', undefined],
         ['GET', '/agents/foreman/files', undefined],
     ])('refuses %s %s', async (method, path, body) => {
         expect((await request(method, path, body)).status).toBe(403)
@@ -207,6 +222,21 @@ describe('foreman routes', () => {
 
     it('lets the hub read the conversations', async () => {
         expect((await request('GET', '/agents/foreman/sessions')).status).toBe(200)
+    })
+
+    it('manages what it keeps for the team through the coworker routes, and keeps it across a reboot', async () => {
+        const written = await request('POST', '/agents/foreman/memories', { content: 'The team ships on Thursdays.', kind: 'fact' })
+        expect(written.status).toBe(201)
+        const skill = await request('POST', '/agents/foreman/skills', { name: 'Onboard a client', description: 'How the team onboards a client.', body: '1. Send the welcome email.' })
+        expect(skill.status).toBe(201)
+        expect((await request('GET', '/agents/foreman/data/tables')).status).toBe(200)
+
+        await ensureForeman()
+
+        const memories = (await (await request('GET', '/agents/foreman/memories')).json()) as { memories: Array<{ content: string }> }
+        expect(memories.memories.map(memory => memory.content)).toContain('The team ships on Thursdays.')
+        const skills = (await (await request('GET', '/agents/foreman/skills')).json()) as { skills: Array<{ name: string }> }
+        expect(skills.skills.map(listed => listed.name)).toContain('Onboard a client')
     })
 
     it('lets the hub pin its model, and keeps the pin across a reboot', async () => {

@@ -41,8 +41,24 @@ describe('foremanGuard', () => {
     it.each([
         ['GET', '/agents/foreman/memories'],
         ['POST', '/agents/foreman/memories'],
+        ['POST', '/agents/foreman/memories/recall'],
+        ['DELETE', '/agents/foreman/memories/m1'],
         ['GET', '/agents/foreman/skills'],
+        ['POST', '/agents/foreman/skills'],
+        ['PATCH', '/agents/foreman/skills/onboarding'],
+        ['DELETE', '/agents/foreman/skills/onboarding'],
+        ['PUT', '/agents/foreman/skills/onboarding/files/raw'],
+        ['GET', '/agents/foreman/data/tables'],
         ['POST', '/agents/foreman/data/query'],
+        ['DELETE', '/agents/foreman/data/tables/leads'],
+    ])('lets what it keeps for the team through: %s %s', async (method, path) => {
+        expect((await call(method, path)).status).toBe(200)
+    })
+
+    it.each([
+        ['GET', '/agents/foreman/memoriesx'],
+        ['GET', '/agents/foreman/skill-proposals'],
+        ['GET', '/agents/foreman/datasets'],
         ['GET', '/agents/foreman/triggers'],
         ['POST', '/agents/foreman/schedules'],
         ['DELETE', '/agents/foreman'],

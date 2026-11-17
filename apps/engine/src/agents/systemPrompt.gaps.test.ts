@@ -272,9 +272,19 @@ describe('buildSystemPrompt for the foreman', () => {
         expect(prompt).toContain(sharedDir())
         expect(prompt).toContain('agent_files_')
         expect(prompt).toContain('<asking_the_user>')
-        expect(prompt).not.toContain('<skills>')
-        expect(prompt).not.toContain('<memory_index>')
-        expect(prompt).not.toContain('<database>')
+    })
+
+    it('keeps a memory, skills and a database for the team, and drops them when their tools are off', async () => {
+        const prompt = await buildSystemPrompt(foreman())
+        expect(prompt).toContain('<memory_and_skills>')
+        expect(prompt).toContain('belong to the whole team')
+        expect(prompt).toContain('<database>')
+
+        const without = await buildSystemPrompt(foreman({ tools: { memory: false, skills: false, db: false } }))
+        expect(without).not.toContain('<memory_and_skills>')
+        expect(without).not.toContain('<database>')
+        expect(without).not.toContain('<skills>')
+        expect(without).not.toContain('<memory_index>')
     })
 
     it('shows what it asks about in the turn that asks, without the chat-only draft block', async () => {

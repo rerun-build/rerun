@@ -50,6 +50,10 @@ export const ENGINE_CAPABILITY_CUSTOM = 'connections.custom'
 // attached to the coworkers that use it. A box without it keeps every connector per coworker.
 export const ENGINE_CAPABILITY_VAULT = 'vault'
 
+// The Chief of Staff keeps a memory, skills and a private database for the team, read and managed
+// through the coworker routes (`/agents/foreman/memories`, `/skills`, `/data`).
+export const ENGINE_CAPABILITY_FOREMAN_STATE = 'foreman.state'
+
 // What the last `rerun update` on a box did, as `/health` reports it.
 export const engineLastUpdateSchema = z.object({
     status: z.enum(['running', 'error', 'restarting', 'success']),
