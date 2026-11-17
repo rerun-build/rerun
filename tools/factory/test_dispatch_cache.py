@@ -53,6 +53,22 @@ class RunCache(T.Base):
         self.assertEqual(got["old4"][:2], ("running", None))
         self.assertEqual(self.w.rows("SELECT status FROM fires WHERE run_id=?", [r for r, a in self.w.order if a == "b1"][-1]), [("running",)])
 
+    def test_old_runs_that_cannot_be_read_do_not_keep_later_ones_from_being_closed(self):
+        self.tick()
+        inner = self.d.account
+
+        def account(tool, args, timeout=30):
+            if tool == "get_run" and args["runId"].startswith("gone"):
+                raise T.D.Error("account get_run failed: the tool reported an error")
+            return inner(tool, args)
+
+        self.d.account = account
+        for n in range(70):
+            self.old_run("gone%d" % n, str(100 + n), "done")
+        self.old_run("old1", "7", "done")
+        self.tick(6)
+        self.assertEqual(self.w.rows("SELECT status FROM fires WHERE run_id=?", "old1"), [("done",)])
+
     def test_an_errored_run_keeps_its_cached_input_tokens(self):
         self.tick()
         rid = self.finish_with("b1", "", 400, 9, 250, status="error")

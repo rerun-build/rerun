@@ -16,6 +16,7 @@ class Kinds(unittest.TestCase):
         self.assertEqual(k("checks", "merged", "merged"), [])
         self.assertEqual(k("reviewing", "checks", "accepted"), [])
         self.assertEqual(k("blocked", "returned", "returned: x"), ["ended returned"])
+        self.assertEqual(k("waiting", "returned", "returned: issue closed or the factory label removed"), [])
         self.assertEqual(k("building", "failed", "failed: x"), ["ended failed"])
 
     def test_version_is_ten_hex_characters_and_none_without_briefs(self):

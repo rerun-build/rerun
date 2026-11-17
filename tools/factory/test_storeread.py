@@ -20,6 +20,10 @@ class StoreRead(unittest.TestCase):
         fid = st.intent("5", "", "build", coworker="CODE", at=storeread.iso(NOW - 4000))
         st.fired(fid, "run-1")
         st.close_run("run-1", "error", at=at, error="interrupted: engine restarted")
+        for n in (1, 2):
+            rid = "rev-%d" % n
+            st.fired(st.intent("5", "", "review %d of #9 at abc1234" % n, coworker="LINUS", at=storeread.iso(NOW - 4000)), rid)
+            st.close_run(rid, "done", at=storeread.iso(NOW - 3900))
         st.set("escaped", "5|reopened", '{"job": "5"}')
         st.db.close()
 
@@ -39,6 +43,7 @@ class StoreRead(unittest.TestCase):
         text = self.read()
         self.assertIn("blocked | 1 | 1 | 1 | 1", text)
         self.assertIn("build | 1 | 0 | 1 |", text)
+        self.assertIn("review | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 100", text)
         self.assertIn("  1 x build: interrupted: engine restarted", text)
         self.assertIn("5|reopened", text)
 

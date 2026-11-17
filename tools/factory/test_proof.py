@@ -80,6 +80,8 @@ class Judge(unittest.TestCase):
         out = "\n".join([met(1), "ASK 2: NOT MET no test", met(3), "PROOF: PASS @abcdef1"])
         self.assertEqual(proof.judge(out, 3, HEAD), ("fail", "PASS with asks not met: 2"))
         self.assertEqual(proof.judge("PROOF: FAIL @abcdef1: 1, 3", 3, HEAD), ("fail", "1, 3"))
+        told = "ASK 1: NOT MET the test asserts nothing" + chr(10) + "ASK 2: MET a.py:1 t" + chr(10) + "ASK 3: MET a.py:2 t" + chr(10) + "PROOF: FAIL @abcdef1: 1"
+        self.assertEqual(proof.judge(told, 3, HEAD), ("fail", "1 | ASK 1: NOT MET the test asserts nothing"))
 
     def test_wrong_commit(self):
         self.assertEqual(

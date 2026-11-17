@@ -1023,7 +1023,7 @@ class Dispatcher:
         ids = {n: a for a, n in self.names.items()}
         live = {j.get("run") for j in self.jobs()}
         rows = self.store.db.execute("SELECT run_id, coworker FROM fires WHERE status='running' AND run_id IS NOT NULL AND job GLOB '[0-9]*' "
-                                     "AND intent_at < ? ORDER BY id LIMIT ?", (iso(self.now() - STALE_RUN_S), 4 * STALE_RUNS_A_BEAT)).fetchall()
+                                     "AND intent_at < ? ORDER BY id", (iso(self.now() - STALE_RUN_S),)).fetchall()
         skip = self.__dict__.setdefault("stale_skip", set())
         for run, who in [r for r in rows if r[0] not in live and r[0] not in skip and r[1] in ids][:STALE_RUNS_A_BEAT]:
             try:
