@@ -1353,7 +1353,20 @@ class Dispatcher:
                     return self.save(j, "merge of #%s at %s refused (%d of %d), tried again next beat" % (j["pr"], j["head"][:7], tries, MERGE_TRIES))
                 return self.end(j, "failed", "merge of #%s at %s refused %d times" % (j["pr"], j["head"][:7], tries))
         j["own_merge"] = True
+        self.close_earlier(j)
         self.end(j, "merged", "#%s at %s" % (j["pr"], j["head"][:7]))
+
+    def close_earlier(self, j):
+        try:
+            listed = json.loads(self.gh(["pr", "list", "-R", self.repo, "--state", "open", "--search",
+                                         "in:title (#%s)" % j["issue"], "--json", "number,title"]) or "[]")
+            for p in listed:
+                if p["number"] != j["pr"] and str(p.get("title", "")).rstrip().endswith("(#%s)" % j["issue"]):
+                    self.gh(["pr", "close", str(p["number"]), "-R", self.repo, "--comment",
+                             "Superseded: job #%s was finished by pull request #%s, which is merged. The branch is kept." % (j["issue"], j["pr"])])
+                    log(j["issue"], "closed the earlier pull request #%s" % p["number"])
+        except (Error, ValueError, KeyError, TypeError) as e:
+            log(j["issue"], "earlier pull requests not closed: %s" % (e if isinstance(e, Error) else type(e).__name__))
 
     def dev_hold(self, j):
         r = self.resolver.records(self).get("dev red")
