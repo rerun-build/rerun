@@ -460,6 +460,16 @@ export function pendingComputerAccess(input: Record<string, unknown>): ComputerA
     }
 }
 
+// What the engine adds to the card it delivered: the computer it named, and what "Always allow"
+// would keep there (null where the owner's rules are not kept, or the command hides what it runs).
+export type ComputerCardFacts = { computerId: string | null; always: { program: string; interpreter: boolean } | null }
+
+export function computerCardFacts(output: unknown): ComputerCardFacts {
+    const card = (output as { card?: { computerId?: unknown; always?: { program?: unknown; interpreter?: unknown } | null } } | null)?.card
+    const program = typeof card?.always?.program === 'string' && card.always.program ? card.always.program : null
+    return { computerId: typeof card?.computerId === 'string' ? card.computerId : null, always: program ? { program, interpreter: card?.always?.interpreter === true } : null }
+}
+
 const COMPUTER_APPROVED_NEXT = 'Go on: run exactly what you asked for, nothing else, and ask again for anything new.'
 const COMPUTER_DECLINED_NEXT = 'Do not run it, nor a variant of it, on this computer. Tell me what you would do instead, or ask what to change.'
 

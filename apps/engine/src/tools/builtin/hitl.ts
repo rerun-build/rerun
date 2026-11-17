@@ -109,7 +109,7 @@ export function hitlAck(order: TurnOrder): typeof HITL_ACK | typeof HITL_ACK_CAL
     return order === 'call-first' ? HITL_ACK_CALL_FIRST : HITL_ACK
 }
 
-export function hitlTool<S extends z.ZodTypeAny>(order: TurnOrder, description: string, inputSchema: S) {
+function hitlTool<S extends z.ZodTypeAny>(order: TurnOrder, description: string, inputSchema: S) {
     return tool({ description: `${description} ${cardCallTiming(order)}`, inputSchema, execute: async () => hitlAck(order) })
 }
 

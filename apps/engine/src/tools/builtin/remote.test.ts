@@ -27,10 +27,10 @@ const studio = { id: 'c1', handle: 'studio-pc', name: 'Studio PC' }
 let wss: InstanceType<typeof WebSocketServer>
 let fake: Fake | null = null
 
-const ctx = (abortSignal?: AbortSignal) => ({ agent: { id: 'a1' }, sessionId: 's1', author: { id: 'u1', name: 'Claire' }, turnOrder: 'message-first', abortSignal }) as never
+const ctx = (abortSignal?: AbortSignal, unattended = false) => ({ agent: { id: 'a1' }, sessionId: 's1', author: { id: 'u1', name: 'Claire' }, turnOrder: 'message-first', abortSignal, unattended }) as never
 
-async function run(name: string, input: Record<string, unknown>, abortSignal?: AbortSignal): Promise<unknown> {
-    const tools = remoteComputerTools(ctx(abortSignal))
+async function run(name: string, input: Record<string, unknown>, abortSignal?: AbortSignal, unattended = false): Promise<unknown> {
+    const tools = remoteComputerTools(ctx(abortSignal, unattended))
     const tool = tools[name] as { inputSchema: { parse: (v: unknown) => unknown }; execute: (input: unknown, options: unknown) => Promise<unknown> }
     return tool.execute((tool.inputSchema as unknown as { parse: (v: unknown) => unknown }).parse(input), { toolCallId: 'x', messages: [] })
 }
@@ -148,9 +148,58 @@ describe('remote_exec', () => {
     })
 })
 
+describe('the rules of the computer', () => {
+    const handlers = { 'exec.run': ({ command }: Record<string, unknown>) => ran(String(command)) }
+
+    it('runs a program the owner always allowed without a card, and asks for any other', async () => {
+        await upsertComputer(studio, { allowedPrograms: ['ffmpeg', 'ffprobe'] })
+        const computer = await connect({ handlers })
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'ffprobe a.mov | ffmpeg -i - b.mp4' })).toMatch(/^#studio-pc · exit 0/)
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'ffprobe a.mov | python3 x.py' })).toMatchObject({ status: 'needs_approval' })
+        expect(computer.requests).toHaveLength(1)
+    })
+
+    it('asks every time for a command that hides what it runs, and says why', async () => {
+        await upsertComputer(studio, { allowedPrograms: ['bash', 'ffmpeg'] })
+        await connect({ handlers })
+        const answer = (await run('remote_exec', { computer: '#studio-pc', command: 'bash -c "ffmpeg -i a b"' })) as { instruction: string }
+        expect(answer.instruction).toContain('asks every time')
+    })
+
+    it('asks for every command on "ask every time", and for none on "full access"', async () => {
+        await upsertComputer(studio, { mode: 'ask', allowedPrograms: ['ffmpeg'] })
+        const computer = await connect({ handlers })
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'ffmpeg -version' })).toMatchObject({ status: 'needs_approval' })
+        await upsertComputer(studio, { mode: 'full' })
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'bash -c "make"' })).toMatch(/^#studio-pc · exit 0/)
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'sudo make install' })).toMatch(/^Not run: it asks for administrator rights/)
+        expect(computer.requests).toHaveLength(1)
+    })
+
+    it('takes no work without someone in the chat when its owner said so', async () => {
+        await upsertComputer(studio, { allowedPrograms: ['ffmpeg'], unattended: false })
+        const computer = await connect({ handlers })
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'ffmpeg -version' }, undefined, true)).toMatch(/only takes work while someone is in the chat/)
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'ffmpeg -version' })).toMatch(/^#studio-pc · exit 0/)
+        await upsertComputer(studio, { unattended: true })
+        expect(await run('remote_exec', { computer: '#studio-pc', command: 'ffmpeg -version' }, undefined, true)).toMatch(/^#studio-pc · exit 0/)
+        expect(computer.requests).toHaveLength(2)
+    })
+})
+
 describe('request_computer_access', () => {
-    it('is a card: it hands back the delivery note and ends the turn', async () => {
-        const result = (await run('request_computer_access', { computer: '#studio-pc', reason: 'Encode', commands: ['ffmpeg -i a.mov a.mp4'] })) as { status: string }
+    it('is a card: it hands back the delivery note and what "Always allow" would keep there', async () => {
+        await connect()
+        const result = (await run('request_computer_access', { computer: '#studio-pc', reason: 'Encode', commands: ['/usr/local/bin/ffmpeg -i a.mov a.mp4'] })) as { status: string; card: unknown }
         expect(result.status).toBe('delivered')
+        expect(result.card).toEqual({ computerId: 'c1', always: { program: 'ffmpeg', interpreter: false } })
+    })
+
+    it('offers no "always" where the owner keeps no rules, for an opaque command, or for an unknown computer', async () => {
+        await upsertComputer(studio, { mode: 'ask' })
+        expect(((await run('request_computer_access', { computer: '#studio-pc', reason: 'x', commands: ['ffmpeg -version'] })) as { card: unknown }).card).toEqual({ computerId: 'c1', always: null })
+        await upsertComputer(studio, { mode: 'remember' })
+        expect(((await run('request_computer_access', { computer: '#studio-pc', reason: 'x', commands: ['sh -c ls'] })) as { card: unknown }).card).toEqual({ computerId: 'c1', always: null })
+        expect(((await run('request_computer_access', { computer: '#nope', reason: 'x', commands: ['ls'] })) as { card: unknown }).card).toEqual({ computerId: null, always: null })
     })
 })

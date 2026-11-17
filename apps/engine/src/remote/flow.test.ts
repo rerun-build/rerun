@@ -129,4 +129,12 @@ describe('a coworker running a command on a linked computer', () => {
         await chat(serializeComputerAccessDecision({ computer: 'studio-pc', decision: 'declined' }), sessionId)
         expect(computer.requests).toHaveLength(1)
     }, 30_000)
+
+    it('runs a program the person always allowed, without a card, in the next tasks', async () => {
+        expect((await send('POST', '/remote/computers/c1/rules', { kind: 'program', program: 'ffmpeg' })).status).toBe(200)
+        await chat(serializeComputerAccessDecision({ computer: 'studio-pc', decision: 'approved', always: 'ffmpeg' }), sessionId)
+        expect(computer.requests).toHaveLength(2)
+        await chat('And once more tomorrow', sessionId)
+        expect(computer.requests).toHaveLength(3)
+    }, 30_000)
 })

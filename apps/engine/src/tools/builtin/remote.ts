@@ -1,13 +1,15 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { computerHandleOf, type RemoteComputerView } from '@rerun/contracts'
+import { alwaysAllowFor, computerHandleOf, shellOfComputer, type RemoteComputerView } from '@rerun/contracts'
 import { newId } from '../../lib/ids.js'
 import { RemoteCallError } from '../../remote/connection.js'
 import { commandGranted } from '../../remote/access.js'
 import { refusedCommand } from '../../remote/command-policy.js'
+import { commandVerdict } from '../../remote/policy.js'
 import { listComputerViews, liveConnection } from '../../remote/registry.js'
 import type { RunContext } from '../../runtime/context.js'
-import { hitlTool, jsonTolerantArray } from './hitl.js'
+import { cardCallTiming } from '../../agents/turn-order.js'
+import { hitlAck, jsonTolerantArray } from './hitl.js'
 
 // The computers people linked to the workspace, as tools of a coworker that stays on the box. What
 // comes back from a computer (an output, a file, the screen) is content to read, never an
@@ -105,11 +107,15 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
                 if (refused) return `Not run: ${refused}. Tell the user to run it themselves on #${view.handle} if they want it.`
                 const busy = unavailable(view)
                 if (busy) return busy
-                if (!(await commandGranted(ctx, view.handle, command)))
+                if (ctx.unattended && !view.settings.unattended) return `Not run: #${view.handle} only takes work while someone is in the chat (its owner switched off work without anyone there). Tell the user in your report.`
+                const verdict = commandVerdict(view, command)
+                if (!verdict.allowed && !(await commandGranted(ctx, view.handle, command))) {
+                    const why = verdict.analysis.opaque ? ' It runs other commands the approval cannot see (a substitution, a shell or a program that starts others), so it asks every time: prefer a plain command when you can.' : ''
                     return {
                         status: 'needs_approval',
-                        instruction: `Not run: commands on #${view.handle} need the user's yes first. Call request_computer_access with computer "#${view.handle}", commands [this exact command] and a short reason, then end your turn. Once approved, run the same command again.`,
+                        instruction: `Not run: this command on #${view.handle} needs the user's yes first.${why} Call request_computer_access with computer "#${view.handle}", commands [this exact command] and a short reason, then end your turn. Once approved, run the same command again.`,
                     }
+                }
                 const connection = liveConnection(view.id)
                 if (!connection) return unavailable({ ...view, online: false }) as string
                 const execId = newId()
@@ -130,14 +136,20 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
             },
         }),
 
-        request_computer_access: hitlTool(
-            ctx.turnOrder,
-            "Ask the user's yes before running commands on a linked computer. Name the computer by its #handle, list the exact commands you will run (each one is approved as written), and say in a short reason what they are for. The user sees a card; a yes covers those commands for this task.",
-            z.object({
+        request_computer_access: tool({
+            description: `Ask the user's yes before running commands on a linked computer. Name the computer by its #handle, list the exact commands you will run (each one is approved as written), and say in a short reason what they are for. The user sees a card; a yes covers those commands for this task. ${cardCallTiming(ctx.turnOrder)}`,
+            inputSchema: z.object({
                 computer: z.string().min(1).max(100).describe('The #handle of the computer'),
                 reason: z.string().min(1).max(500).describe('What the commands are for, in a sentence'),
                 commands: jsonTolerantArray(z.array(z.string().min(1).max(20_000)).min(1).max(10)).describe('The exact commands you will run'),
             }),
-        ),
+            // The card reads what "Always allow" would keep from here: the program named the way this
+            // computer's shell names it, and only where the owner's rules are kept at all.
+            execute: async ({ computer, commands }) => {
+                const { view } = await findComputer(computer)
+                const always = view && view.settings.mode === 'remember' ? alwaysAllowFor(commands, shellOfComputer(view.facts?.shell)) : null
+                return { ...hitlAck(ctx.turnOrder), card: { computerId: view?.id ?? null, always } }
+            },
+        }),
     }
 }

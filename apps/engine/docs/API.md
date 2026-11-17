@@ -262,12 +262,18 @@ protocol, `4004` replaced by a newer connection of the same computer, `4005` unl
 A coworker gets the `remoteComputers` family (on by default, a switch per coworker) once a computer
 is linked: `remote_computers` lists them with what they said about themselves, `remote_exec` runs one
 command on one of them (`{ computer: "#studio-pc", command, cwd?, timeoutSeconds? }`, up to 600 s), and
-`request_computer_access` is the card that asks the person's yes. A command runs only once a yes in
-the conversation covers it, exactly as written: the yes of the latest card, for the run it starts and
+`request_computer_access` is the card that asks the person's yes. A command runs without a card when the
+computer's settings let it through (`full`, or `remember` and every program it starts is always
+allowed and it hides nothing it runs: no substitution, no shell or relay like `bash -c`, `xargs`,
+`env`, read by `analyzeCommand` of `@rerun/contracts` in the computer's own shell), and otherwise
+only once a yes in the conversation covers it, exactly as written: the yes of the latest card, for the run it starts and
 the cards that run raises, until the person's next free message. Privilege raising (`sudo`, `runas`,
 UAC) and the commands that wipe a disk or stop the machine never run, approved or not. The reply the
 card sends is `Computer access: **APPROVED** — #studio-pc` (or `DECLINED`), read by
-`parseComputerAccessDecision` of `@rerun/contracts`. The prompt lists the linked computers in a
+`parseComputerAccessDecision` of `@rerun/contracts`. The card's own result carries
+`card: { computerId, always }`, the program "Always allow" would keep. A computer whose `unattended`
+setting is off refuses runs nobody is in the chat for (schedules, triggers, calls between
+coworkers). The prompt lists the linked computers in a
 `linked_computers` section.
 
 ---

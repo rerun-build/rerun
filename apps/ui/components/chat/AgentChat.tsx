@@ -31,7 +31,7 @@ import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
 import { MessageView } from '@/components/chat/MessageView'
 import { ServiceSuggestionBlock } from '@/components/services/ServiceSuggestionBlock'
 import { SpendRequestBlock } from '@/components/chat/spend/SpendRequestBlock'
-import { ComputerAccessCard } from '@/components/chat/computer/ComputerAccessCard'
+import { ComputerAccessBlock } from '@/components/chat/computer/ComputerAccessBlock'
 import { SkeletonChat } from '@/components/ui/skeleton'
 
 import { cancelRunAction, getRunAction, updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
@@ -64,7 +64,7 @@ import { splitTurnsAtBreaks, timeBreaksOf } from '@/lib/chat/message-times'
 import { threadsByMessage } from '@/lib/chat/thread-rows'
 import { shouldFlush, shouldKeepQueued } from '@/lib/chat/queued-message'
 import { classifyChatError, installInFlightOf, teammateRunOf, unwrapChatError } from '@/lib/chat-error'
-import { findPendingAlert, findPendingHitl, HITL_CANCELLED, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingTakeover, pendingComputerAccess, serializeApprovalDecisions, serializeComputerAccessDecision, serializeSpendDecision, type SpendDecision } from '@/lib/chat-hitl'
+import { findPendingAlert, findPendingHitl, HITL_CANCELLED, pendingApprovals, pendingMcpSignIn, pendingQuestions, pendingSecrets, pendingTakeover, serializeApprovalDecisions, serializeSpendDecision, type SpendDecision } from '@/lib/chat-hitl'
 import { lastUserText } from '@/lib/chat-payload'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
 import { browserPermission } from '@/lib/notifications/browser'
@@ -1049,12 +1049,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                 {pendingHitl.kind === 'question' && <QuestionForm inline ref={questionFormRef} target={{ kind: 'agent', agentId }} questions={pendingQuestions(pendingHitl.input)} onSend={text => sendMessage({ text })} onCancel={() => dismissHitl(pendingHitl.toolCallId)} textareaRef={inputRef} textareaProps={mentionTextareaProps} />}
                                 {pendingHitl.kind === 'approval' && <ActionApprovalBlock inline approvals={pendingApprovals(pendingHitl.input)} onSubmit={decisions => sendMessage({ text: serializeApprovalDecisions(decisions) })} />}
                                 {pendingHitl.kind === 'secret' && agentId && <SecretRequestBlock inline agentId={agentId} sessionId={sessionId ?? null} secrets={pendingSecrets(pendingHitl.input)} reason={typeof pendingHitl.input.reason === 'string' ? pendingHitl.input.reason : undefined} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.secret })} onDismiss={() => dismissHitl(pendingHitl.toolCallId)} />}
-                                {pendingHitl.kind === 'computer' && (
-                                    <ComputerAccessCard
-                                        request={pendingComputerAccess(pendingHitl.input)}
-                                        onSubmit={decision => sendMessage({ text: serializeComputerAccessDecision({ computer: pendingComputerAccess(pendingHitl.input).computer, ...decision }) })}
-                                    />
-                                )}
+                                {pendingHitl.kind === 'computer' && <ComputerAccessBlock input={pendingHitl.input} output={pendingHitl.output} onReply={text => sendMessage({ text })} />}
                                 {pendingHitl.kind === 'spend' && <SpendRequestBlock input={pendingHitl.input} output={pendingHitl.output} onSubmit={decision => void submitSpend(decision)} />}
                                 {pendingHitl.kind === 'mcp' && agentId && <McpSignInBlock inline agentId={agentId} {...pendingMcpSignIn(pendingHitl.input)} onDone={summary => sendMessage({ text: summary })} onSkip={() => sendMessage({ text: HITL_CANCELLED.mcp })} />}
                                 {pendingHitl.kind === 'service' && agentId && <ServiceSuggestionBlock inline agentId={agentId} services={(Array.isArray(pendingHitl.input.services) ? pendingHitl.input.services : []) as { slug: string; reason?: string }[]} onDone={summary => sendMessage({ text: summary })} />}

@@ -645,6 +645,9 @@
         "titleCommands": "Run {count} commands on <computer></computer>",
         "titleScreen": "Use the screen of <computer></computer>",
         "deny": "Deny",
-        "allow": "Allow"
+        "allow": "Allow",
+        "alwaysAllow": "Always allow {program}",
+        "interpreterWarning": "Always allowing {program} allows any code it runs",
+        "alwaysFailed": "Could not keep the rule on the computer: allowed this once."
     }
 }

@@ -34,4 +34,6 @@ export type RunContext = {
     // The user's turn goes to the database without holding the run up: a tool that reads the
     // session history back waits on it first.
     userTurnStored?: Promise<unknown>
+    // No one is in the chat: a schedule, a trigger, or another coworker started the run.
+    unattended?: boolean
 }

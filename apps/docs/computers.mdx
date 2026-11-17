@@ -19,6 +19,26 @@ The name gives the computer a handle, like `#studio-pc`, the word your coworkers
 
 Everyone in the workspace can use a linked computer through their coworkers. Each new program asks for your approval first.
 
+## Approvals
+
+When a coworker wants to run a command on your computer, it shows the command in the chat and waits for your answer:
+
+- **Allow** runs exactly that command, for the task at hand. The next task asks again.
+- **Always allow ffmpeg** runs it, and every later command that only uses `ffmpeg` runs without asking. You see what is always allowed, and take it back, in **Computers**.
+- **Deny** runs nothing.
+
+Always allowing a program that runs any code you give it (`python`, `node`…) allows anything: the card says so. A command that runs other commands the card cannot show (a `$(...)`, `bash -c`, `xargs`, `find -exec`) asks every time.
+
+Each computer has an approval mode, set in **Computers**:
+
+- **Ask, then remember** (the default): new programs ask, the ones you always allowed do not.
+- **Ask every time**: every command waits for your yes.
+- **Full access**: commands run without asking.
+
+Whatever the mode, a coworker never runs a command that asks for administrator rights (`sudo`, `runas`, Windows' User Account Control) or that can wipe a disk or stop the computer.
+
+**Without anyone in the chat** lets schedules, triggers and other coworkers use the computer. When one of them needs your yes, it reaches you as a notification, and the work goes on once you answer. Turn it off and the computer only takes work while someone is in the chat.
+
 ## See your computers
 
 Open the workspace menu and click **Computers**. Each computer says whether it is online, paused or offline, and when it was last seen. Click one to see its machine (system, processor or graphics card, memory, working folder, and the programs found on it) and its approval settings.

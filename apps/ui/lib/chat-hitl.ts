@@ -6,6 +6,7 @@ export {
     parseHitlReply,
     pendingApprovals,
     pendingComputerAccess,
+    computerCardFacts,
     pendingMcpSignIn,
     pendingQuestions,
     pendingSecrets,
