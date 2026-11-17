@@ -121,6 +121,7 @@ class Acceptance(Base):
         self.assertIn("what is asked, what is there and how you saw it", brief)
         self.assertIn("its own `**Repairs**: #<child>` line", brief)
         self.assertIn("`**Part of**: #9`", brief)
+        self.assertIn("`Gaps of #9: Factory page`", brief)
         self.assertNotIn("one issue per gap", brief)
 
     def test_one_gap_issue_with_two_repairs_lines_escapes_both_children(self):
