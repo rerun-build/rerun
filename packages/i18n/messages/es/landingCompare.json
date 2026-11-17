@@ -2,7 +2,7 @@
     "hub": {
         "title": "Rerun vs Zapier, n8n, Lindy, Claude y más: comparativas",
         "headline": "Rerun frente a las herramientas que ya conoces.",
-        "description": "Cómo se compara Rerun con Zapier, Make, n8n, Lindy, Manus, Claude Cowork y siete más: facilidad de uso, trabajo en equipo, flexibilidad y coste, lado a lado.",
+        "description": "Cómo se compara Rerun con Zapier, Make, n8n, Lindy, Manus, Claude Cowork y siete más: facilidad de uso, trabajo en equipo, flexibilidad y costo.",
         "eyebrow": "Comparar",
         "faqLabel": "FAQ",
         "faqTitle": "Elegir entre Rerun y el resto.",
@@ -956,7 +956,7 @@
     "pages": {
         "claude-cowork": {
             "metaTitle": "Rerun vs Claude Cowork: un equipo de agentes (2026)",
-            "metaDescription": "Rerun vs Claude Cowork en modelos, trabajo programado y precio. Conserva tu plan de Claude y ejecuta en él un equipo de agentes, o en cualquier otro modelo.",
+            "metaDescription": "Rerun vs Claude Cowork en modelos, trabajo programado y precio. Conserva tu plan de Claude y ejecuta en él un equipo de agentes, o en otro modelo.",
             "headline": "Rerun vs Claude Cowork",
             "intro": "Cowork, integrado en la app de Claude en septiembre de 2026, permite que Claude se encargue de tareas por ti, con modelos de Claude. Rerun ejecuta un equipo de agentes en una máquina siempre encendida, con cualquier modelo, incluido el plan de Claude que ya pagas.",
             "verdict": "Elige Claude si quieres que Claude se encargue de tareas desde la app en la que ya chateas, con sus conectores, skills, programaciones en la nube y los Docs y Slides que ahora escribe en la conversación. Elige Rerun si quieres varios agentes, cada uno con su función, trabajando para todo el equipo desde una máquina siempre encendida, con el modelo que elijas. Los dos encajan: conecta un agente a tu plan de Claude y Rerun lo ejecuta con Claude.",
@@ -1028,8 +1028,8 @@
             }
         },
         "manus": {
-            "metaTitle": "Rerun vs Manus: precio fijo para el trabajo recurrente (2026)",
-            "metaDescription": "Rerun vs Manus en créditos, programaciones y equipos. Manus cobra cada tarea en créditos y te limita a 20 tareas programadas; Rerun es un plan fijo sin límite.",
+            "metaTitle": "Rerun vs Manus: precio fijo para trabajo recurrente (2026)",
+            "metaDescription": "Rerun vs Manus en créditos, horarios y equipos. Manus cobra cada tarea en créditos y limita a 20 tareas programadas; Rerun es un plan fijo sin tope.",
             "headline": "Rerun vs Manus",
             "intro": "Manus es un agente de IA generalista que investiga, crea y entrega, y cobra en créditos por tarea. Rerun pone a un equipo de agentes a cargo del trabajo recurrente de tu empresa, en una máquina privada, por un precio fijo.",
             "verdict": "Elige Manus para entregables puntuales, como una investigación a fondo, una presentación o un sitio web, para lo que está pensado su agente generalista, y para Wide Research en muchas fuentes a la vez. Elige Rerun para el trabajo que se repite: tantas programaciones y webhooks como necesite el trabajo en lugar de 20, agentes que comparten datos y responden a todo tu equipo, por {price} al mes en lugar de créditos por tarea.",
@@ -1102,7 +1102,7 @@
         },
         "grok-bot": {
             "metaTitle": "Rerun vs Grok Bot: cualquier modelo, visión completa (2026)",
-            "metaDescription": "Rerun vs Grok Bot de xAI comparados en acceso, modelos, visibilidad y costo. Ambos dan a los agentes una computadora en la nube. Descubre cuál encaja con tu equipo.",
+            "metaDescription": "Rerun vs Grok Bot de xAI en acceso, modelos, visibilidad y costo. Ambos dan a los agentes una computadora en la nube. Descubre cuál te conviene.",
             "headline": "Rerun vs Grok Bot",
             "intro": "Grok Bot, de xAI, da a compañeros de IA siempre activos una computadora que comparten en la nube. Rerun también, con el modelo que elijas y un tablero que todo tu equipo puede leer.",
             "verdict": "Ambos ponen agentes en una computadora en la nube, les permiten iniciar sesión en tus herramientas y trabajar día y noche, y en ambos un agente puede pasarle trabajo a otro. Elige Grok Bot si ya pagas SuperGrok o un plan de Cursor que lo incluye y te basta con una beta dentro de sus apps. Elige Rerun si quieres elegir el modelo, empezar con {templates}+ agentes listos para usar, dar a todo el equipo un tablero que leer y contratar agentes hoy con su propio plan de precio publicado.",
@@ -1170,8 +1170,8 @@
             }
         },
         "paperclip": {
-            "metaTitle": "Rerun vs Paperclip: agentes alojados u organigrama propio (2026)",
-            "metaDescription": "Rerun vs Paperclip en alojamiento, entornos de agentes, conectores y costo real: cuándo encaja el organigrama de código abierto para agentes y cuándo es más simple una alternativa alojada.",
+            "metaTitle": "Rerun vs Paperclip: ¿alojado o autoalojado? (2026)",
+            "metaDescription": "Rerun vs Paperclip en alojamiento, runtimes, conectores y costo: cuándo encaja el organigrama open source de agentes y cuándo conviene uno alojado.",
             "headline": "Rerun vs Paperclip",
             "intro": "Paperclip es un plano de control de código abierto que alojas tú: da a los agentes que ya ejecutas un organigrama, presupuestos y puntos de aprobación. Rerun te da los agentes en sí, ya funcionando en una máquina privada en la nube.",
             "verdict": "Elige Paperclip si ya ejecutas varios agentes de programación y quieres un organigrama, presupuestos por agente y puntos de aprobación sobre todos ellos, y no te importa alojar un servidor Node y su base de datos. Elige Rerun si quieres los agentes, no el lugar para gestionarlos: cada uno funciona en la máquina privada de tu workspace, con {connectors}+ apps en un clic y memoria entre ejecuciones, por un precio fijo de {price} al mes.",
@@ -1249,7 +1249,7 @@
         },
         "hermes": {
             "metaTitle": "Rerun vs Hermes Agent: un equipo de agentes alojado (2026)",
-            "metaDescription": "Rerun vs Hermes Agent (Nous Research) en alojamiento, costo y apps: cuándo ejecutar Hermes tú mismo o en Hermes Cloud, y cuándo es más simple un equipo alojado.",
+            "metaDescription": "Rerun vs Hermes Agent (Nous Research) en alojamiento, costo y apps: cuándo usar Hermes tú mismo o en Hermes Cloud y cuándo conviene un equipo alojado.",
             "headline": "Rerun vs Hermes Agent",
             "intro": "Hermes Agent, de Nous Research, es un agente de código abierto que aprende skills sobre la marcha y que ejecutas en tu propia máquina con cinco sandboxes a elegir, o alojado en Hermes Cloud. Rerun le da a tu equipo agentes que también aprenden, alojados juntos en una máquina privada, con las apps y el tablero a su alrededor.",
             "verdict": "Elige Hermes Agent si quieres código con licencia MIT, elegir entre cinco backends, de local a Modal, y control total del entorno de ejecución, o un agente en Hermes Cloud con el que hablas desde Telegram, Discord o WhatsApp. Elige Rerun si quieres varios agentes para un equipo en una sola máquina incluida en un plan fijo, {connectors}+ apps conectadas desde el navegador y agentes listos para usar como punto de partida.",
@@ -1322,7 +1322,7 @@
         },
         "openclaw": {
             "metaTitle": "Rerun vs OpenClaw: agentes de IA alojados (2026)",
-            "metaDescription": "Rerun vs OpenClaw en configuración, alojamiento, seguridad y costo: cuándo encaja el asistente de código abierto y cuándo es más simple una alternativa alojada a OpenClaw.",
+            "metaDescription": "Rerun vs OpenClaw en configuración, alojamiento, seguridad y costo: cuándo encaja el asistente open source y cuándo conviene una alternativa alojada.",
             "headline": "Rerun vs OpenClaw",
             "intro": "OpenClaw es un asistente personal de IA de código abierto que instalas y ejecutas en tu propia máquina o servidor. Rerun ejecuta tus agentes por ti, en una máquina privada y aislada en la nube.",
             "verdict": "Elige OpenClaw si quieres software gratuito con licencia MIT que puedas leer y modificar, modelos locales en tu propio hardware, y no te importa mantener una máquina encendida y protegerla: su fundación “no vende nada: ni plan de pago, ni servicio alojado, ni token”. Elige Rerun si quieres la misma autonomía sin alojar ni proteger nada, con aprobaciones, agentes listos para usar y un tablero que tu equipo puede leer.",
@@ -1395,7 +1395,7 @@
         },
         "zapier": {
             "metaTitle": "Rerun vs Zapier: ¿agentes de IA o Zaps? (2026)",
-            "metaDescription": "Rerun vs Zapier en configuración, mantenimiento y costo: cuándo basta un Zap paso a paso y cuándo un agente de IA que se adapta es la mejor alternativa a Zapier.",
+            "metaDescription": "Rerun vs Zapier en configuración, mantenimiento y costo: cuándo basta un Zap y cuándo un agente de IA adaptable es mejor alternativa a Zapier.",
             "headline": "Rerun vs Zapier",
             "intro": "Zapier conecta apps con Zaps que construyes paso a paso. Rerun te da agentes de IA que reciben un objetivo, eligen las herramientas y se adaptan cuando algo cambia.",
             "verdict": "Elige Zapier para disparadores fijos y de alto volumen entre apps, como copiar la respuesta de un formulario en una hoja de cálculo, o cuando necesitas una de sus 10,000+ integraciones. Elige Rerun cuando el trabajo requiere criterio: leer un correo, decidir qué hacer, hacer seguimiento, con los archivos y la memoria guardados en la propia máquina de tu workspace. Rerun cuesta una tarifa fija de {price} al mes con agentes ilimitados, y nunca cobra por tarea.",
@@ -1468,7 +1468,7 @@
         },
         "make": {
             "metaTitle": "Rerun vs Make: ¿agentes de IA o escenarios? (2026)",
-            "metaDescription": "Rerun vs Make (Integromat) en configuración, mantenimiento y costo: cuándo basta un escenario visual y cuándo un agente de IA es la mejor alternativa a Make.",
+            "metaDescription": "Rerun vs Make (Integromat) en configuración, mantenimiento y costo: si basta un escenario visual o si un agente de IA es mejor alternativa a Make.",
             "headline": "Rerun vs Make",
             "intro": "Make construye automatizaciones como escenarios visuales, un módulo a la vez. Rerun te da agentes de IA que reciben el objetivo y se encargan de los pasos por sí mismos.",
             "verdict": "Elige Make cuando quieres un control preciso de las bifurcaciones y del mapeo de datos en un lienzo, y un precio en créditos por acción difícil de superar a gran volumen. Elige Rerun cuando el trabajo requiere criterio y prefieres no reconstruir un escenario cada vez que cambia una entrada. Rerun cuesta una tarifa fija de {price} al mes, sin créditos gastados por módulo.",
@@ -1618,7 +1618,7 @@
         },
         "lindy": {
             "metaTitle": "Rerun vs Lindy: precio fijo, tu propia IA (2026)",
-            "metaDescription": "Rerun vs Lindy en precio, créditos y modelos. Lindy cobra cada usuario activo y cada tarea en créditos; Rerun es un solo plan fijo con el plan de ChatGPT o Claude que ya pagas.",
+            "metaDescription": "Rerun vs Lindy en precio, créditos y modelos. Lindy cobra por usuario y por tarea en créditos; Rerun es un plan fijo con tu plan de ChatGPT o Claude.",
             "headline": "Rerun vs Lindy",
             "intro": "Lindy es un asistente de IA al que tu equipo accede desde Slack y sus apps, facturado por usuario activo y en créditos. Rerun le da a tu equipo agentes que funcionan con tu propio plan de IA, en una máquina privada, por un precio fijo.",
             "verdict": "Elige Lindy si tu equipo vive en Slack y quiere un asistente al que todos puedan @mencionar, con 1,500+ integraciones, notas de reuniones integradas y HIPAA con BAA firmado en Enterprise. Elige Rerun si quieres agentes cuyo costo no sube con cada tarea ni con cada persona: un solo plan desde {price} al mes cubre agentes ilimitados, todo tu equipo sin costo extra, y la IA funciona con el plan de ChatGPT o Claude que ya pagas.",
@@ -1694,8 +1694,8 @@
             }
         },
         "twin": {
-            "metaTitle": "Rerun vs Twin: lo que incluye de verdad cada plan fijo (2026)",
-            "metaDescription": "Rerun vs Twin (twin.so): ahora ambos tienen precio fijo. Compara lo que incluye el plan de entrada, el agente de navegador a $149, compañeros frente a clientes y el modelo que usas.",
+            "metaTitle": "Rerun vs Twin: qué trae de verdad cada plan fijo (2026)",
+            "metaDescription": "Rerun vs Twin (twin.so): ambos con precio fijo. Compara el plan de entrada, el agente de navegador de $149, compañeros o clientes y el modelo que usas.",
             "headline": "Rerun vs Twin",
             "intro": "Twin crea un agente desde un chat y lo ejecuta con un plan fijo, sin créditos. Rerun también, y además da a cada agente una máquina privada, a todo tu equipo y el modelo que elijas.",
             "verdict": "Twin dejó los créditos, así que la pregunta ya no es cuánto cuesta una ejecución, sino qué incluye el plan. Twin cuesta $29 al mes por agentes, programaciones y conexiones con apps, y $149 por el agente de navegador, la prospección de leads y la investigación a fondo. Rerun cuesta {price} al mes con una máquina privada desde el primer plan, un navegador y un escritorio que el agente maneja como una persona, datos de pago por los que te pregunta antes de gastar, y a todo tu equipo invitado sin cargo adicional. Elige Twin si trabajas solo, atiendes a clientes y quieres su agente de navegador; su plan Store ajusta un agente para cada cliente.",
@@ -1767,8 +1767,8 @@
             }
         },
         "dust": {
-            "metaTitle": "Rerun vs Dust: precio fijo, todas las apps, puestos gratis (2026)",
-            "metaDescription": "Rerun vs Dust en puestos, créditos y conectores. Dust cobra cada puesto y mide el uso automatizado; Rerun es un solo plan fijo con puestos ilimitados y todas las apps incluidas.",
+            "metaTitle": "Rerun vs Dust: precio fijo, apps y puestos gratis (2026)",
+            "metaDescription": "Rerun vs Dust en puestos, créditos y conectores. Dust cobra por puesto y mide la automatización; Rerun es un plan fijo con puestos y apps ilimitados.",
             "headline": "Rerun vs Dust",
             "intro": "Dust da a cada persona agentes que conocen los documentos de tu empresa, con precio por puesto y en créditos. Rerun da a tu equipo agentes que hacen el trabajo por su cuenta, en una máquina privada, por un precio fijo.",
             "verdict": "Elige Dust cuando el trabajo consiste en responder con el conocimiento de la empresa en Notion, Drive y Slack, para un equipo grande que necesita SSO, SOC 2 Type II y alojamiento en la UE o en EE. UU. Elige Rerun cuando los agentes deben llevar las operaciones por su cuenta, según una programación o un webhook, en {connectors}+ apps, con cada ejecución visible para un equipo cuyos puestos son gratis, por {price} al mes en lugar de un puesto y una cuota de créditos por persona.",

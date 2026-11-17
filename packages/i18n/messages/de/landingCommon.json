@@ -1,7 +1,7 @@
 {
     "site": {
-        "title": "Rerun: KI-Mitarbeiter, die mit deinem ChatGPT- oder Claude-Abo laufen",
-        "description": "Stell KI-Mitarbeiter für Vertrieb, Support, Marketing und Verwaltung ein. Sie laufen mit deinem ChatGPT- oder Claude-Abo, inklusivem Guthaben oder deinem API-Schlüssel. {trialDays} Tage kostenlos testen."
+        "title": "Rerun: KI-Mitarbeiter mit deinem ChatGPT- oder Claude-Abo",
+        "description": "KI-Mitarbeiter für Vertrieb, Support, Marketing und Verwaltung, mit deinem ChatGPT- oder Claude-Abo, Guthaben oder API-Schlüssel. {trialDays} Tage gratis."
     },
     "nav": {
         "items": {

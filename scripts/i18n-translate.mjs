@@ -15,6 +15,7 @@ import {
     hashOf,
     isPageTitleKey,
     MESSAGES_DIR,
+    metaLengthNote,
     namespaces,
     problemsOf,
     readGlossary,
@@ -103,7 +104,8 @@ function systemPrompt(locale) {
 const PAGE_TITLE_NOTE = 'The title of a page in search results. The English is in headline case; write it with the capitalization titles take in the target language, not the English capitals.'
 
 function contextFor(job, key) {
-    const notes = [job.context[key], isPageTitleKey(`${job.ns}.${key}`) ? PAGE_TITLE_NOTE : null].filter(Boolean)
+    const id = `${job.ns}.${key}`
+    const notes = [job.context[key], isPageTitleKey(id) ? PAGE_TITLE_NOTE : null, metaLengthNote(id)].filter(Boolean)
     return notes.length ? { context: notes.join(' ') } : {}
 }
 
@@ -183,7 +185,7 @@ async function translateBatch(client, job, keys) {
         const text = response.content.find(block => block.type === 'text')?.text ?? ''
         const answer = JSON.parse(text)
         feedback = keys.flatMap(key => {
-            const problems = problemsOf({ key, source: job.source[key], translation: answer[key], locale: job.locale, glossary })
+            const problems = problemsOf({ key: `${job.ns}.${key}`, source: job.source[key], translation: answer[key], locale: job.locale, glossary })
             if (!problems.length && tooLong(job.source[key], answer[key])) problems.push(`${key}: too long (${answer[key].length} characters for ${job.source[key].length} in English), say it shorter`)
             return problems
         })

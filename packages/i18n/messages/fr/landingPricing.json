@@ -2,7 +2,7 @@
     "seo": {
         "title": "Tarifs",
         "headline": "Une offre. Tout compris.",
-        "description": "Une seule offre Rerun dès {price} par mois : agents illimités, sièges illimités, votre propre machine privée, toutes les apps et des exécutions illimitées. Essai gratuit de {trialDays} jours.",
+        "description": "Une offre Rerun dès {price}/mois : agents, sièges et exécutions illimités, votre machine privée et toutes les apps. Essai gratuit de {trialDays} jours.",
         "breadcrumbHome": "Accueil"
     },
     "hero": {

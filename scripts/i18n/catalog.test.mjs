@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { headlineCaseProblems, isPageTitleKey } from './catalog.mjs'
+import { headlineCaseProblems, isPageTitleKey, metaLengthProblem, renderedLength } from './catalog.mjs'
 
 describe('headlineCaseProblems', () => {
     it('accepts a headline-case title', () => {
@@ -29,6 +29,26 @@ describe('headlineCaseProblems', () => {
     it('skips ICU arguments, numbers and lowercase product names', () => {
         expect(headlineCaseProblems('{count, number}+ Tools and Integrations, Included in the Plan')).toEqual([])
         expect(headlineCaseProblems('AI Agents That Run 24/7 on Servers in Europe')).toEqual([])
+    })
+})
+
+describe('metaLengthProblem', () => {
+    it('lets a title and a description that fit in a search result through', () => {
+        expect(metaLengthProblem('landingCompare.pages.n8n.metaTitle', 'Rerun vs n8n: AI Agents or Workflows? (2026)')).toBeNull()
+        expect(metaLengthProblem('landingPricing.seo.description', 'x'.repeat(155))).toBeNull()
+    })
+
+    it('refuses a title over 60 characters and a description over 155', () => {
+        expect(metaLengthProblem('landingFeatures.items.tools.metaTitle', 'x'.repeat(61))).toBe('landingFeatures.items.tools.metaTitle: 61 characters, a page title takes 60 at most')
+        expect(metaLengthProblem('landingFeatures.items.tools.metaDescription', 'x'.repeat(156))).toContain('a meta description takes 155 at most')
+    })
+
+    it('counts an argument as the few characters its value takes', () => {
+        expect(renderedLength('From {price} a month, {trialDays}-day trial')).toBe('From XXXX a month, XXXX-day trial'.length)
+    })
+
+    it('leaves the strings shown on the page alone', () => {
+        expect(metaLengthProblem('landingFeatures.items.tools.body', 'x'.repeat(400))).toBeNull()
     })
 })
 

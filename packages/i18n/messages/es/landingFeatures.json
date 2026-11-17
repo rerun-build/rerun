@@ -3,7 +3,7 @@
         "name": "Funciones",
         "metaTitle": "Funciones: todo lo que trae un Coworker de IA",
         "headline": "Todo lo que trae un Coworker.",
-        "description": "Un Coworker llega a tus herramientas, trabaja en su propia pantalla, funciona 24/7 en Europa y pregunta antes de cualquier cosa importante. Una página para cada una de las diez.",
+        "description": "Un Coworker usa tus herramientas, trabaja en su pantalla, opera 24/7 en Europa y pregunta antes de lo importante. Una página para cada una de las diez.",
         "count": "{count, plural, one {# función} other {# funciones}}",
         "pickTitle": "Elige la que te trajo hasta aquí.",
         "pickLede": "Cada página la muestra funcionando, en el producto, no en un diagrama."
@@ -28,8 +28,8 @@
             "crumb": "Coworkers",
             "title": "Contrata un Coworker de IA, no escribas un prompt.",
             "lede": "Dale un puesto, las apps que necesita y una hora para trabajar. Hace el trabajo en tus propias herramientas y te informa. Sin diagramas de flujo que dibujar, sin prompts que pulir.",
-            "metaTitle": "Coworkers de IA: contrata un agente en vez de montar un workflow",
-            "metaDescription": "Un Coworker de Rerun recibe un puesto, tus apps y un horario, y luego hace el trabajo en tus propias herramientas y te informa. Sin diagramas de flujo ni prompts que pulir.",
+            "metaTitle": "Coworkers de IA: contrata un agente en vez de un workflow",
+            "metaDescription": "Un Coworker de Rerun recibe un puesto, tus apps y un horario, trabaja en tus herramientas y te informa. Sin diagramas de flujo ni prompts que pulir.",
             "stageCaption": "Dos Coworkers trabajando en la misma Box, contando lo que acaban de hacer.",
             "points": {
                 "first": {
@@ -65,8 +65,8 @@
             "crumb": "Mánager de Coworkers",
             "title": "Un mánager para todos los Coworkers que contrates.",
             "lede": "Rerun gestiona tu workspace: conoce a cada Coworker, contrata a los que te faltan y pasa cada petición a quien se encarga de ella. Háblale en voz alta o déjalo en piloto automático mientras no estás.",
-            "metaTitle": "Mánager de Coworkers: dirige tu equipo de IA por voz o en piloto automático",
-            "metaDescription": "Rerun gestiona tu workspace: contrata los Coworkers que necesitas, pasa cada petición al adecuado, te escucha cuando mantienes Espacio y funciona en piloto automático.",
+            "metaTitle": "Mánager de Coworkers: dirige tu equipo de IA por voz",
+            "metaDescription": "Rerun gestiona tu workspace: contrata los Coworkers necesarios, da cada petición al adecuado, te escucha si mantienes Espacio y va en piloto automático.",
             "stageCaption": "Mantén Espacio y di lo que necesitas: el mánager se lo pasa al Coworker que se encarga.",
             "points": {
                 "first": {
@@ -120,7 +120,7 @@
             "title": "Cada Coworker trabaja en su propia pantalla.",
             "lede": "Cuando una app no tiene API, tu Coworker la abre en su propia pantalla y hace clic en ella como lo haría una persona. Puedes verlo trabajar y recuperar el ratón cuando quieras.",
             "metaTitle": "Uso del ordenador: un agente de IA que hace clic en tus apps",
-            "metaDescription": "Tu Coworker abre un navegador real en su propia pantalla y hace clic en los portales que no tienen API. Míralo en directo y recupera el ratón cuando quieras.",
+            "metaDescription": "Tu Coworker abre un navegador real en su propia pantalla y hace clic en los portales sin API. Míralo en directo y retoma el control cuando quieras.",
             "stageCaption": "Un navegador real, en la pantalla del Coworker, con tu cuenta iniciada.",
             "points": {
                 "first": {
@@ -157,7 +157,7 @@
             "title": "Conectado de forma nativa a {count, number}+ herramientas.",
             "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify y cualquier servidor MCP que le indiques. Un clic para conectar, y tu Coworker lo usa en su siguiente ejecución. Sin proyecto de integración, sin factura extra.",
             "metaTitle": "{count, number}+ herramientas e integraciones, incluidas en el plan",
-            "metaDescription": "Tus Coworkers llegan a Gmail, Slack, Stripe, HubSpot, Shopify y {count, number}+ herramientas más, además de cualquier servidor MCP. Un clic para conectar, sin coste extra.",
+            "metaDescription": "Tus Coworkers llegan a Gmail, Slack, Stripe, HubSpot, Shopify y {count, number}+ herramientas más, y a cualquier servidor MCP. Conecta en un clic, sin costo extra.",
             "stageCaption": "Las apps que un Coworker puede abrir, y las {count, number}+ a las que llega más allá.",
             "points": {
                 "first": {
@@ -193,7 +193,7 @@
             "crumb": "Humano en el circuito",
             "title": "Autónomo, hasta que necesita un sí.",
             "lede": "Tu Coworker trabaja solo y se detiene antes de cualquier cosa importante: un pago, un envío, un borrado. Pregunta, espera, y cualquiera del equipo puede responder.",
-            "metaTitle": "Humano en el circuito: tu agente de IA pregunta antes de actuar",
+            "metaTitle": "Humano en el circuito: tu agente pregunta antes de actuar",
             "metaDescription": "Un Coworker de Rerun trabaja solo y se detiene antes de cualquier cosa importante. Pregunta, espera un sí, y cualquiera del equipo puede responder.",
             "stageCaption": "Un Coworker que se detiene a mitad de la ejecución, pregunta y espera a que alguien responda.",
             "points": {
@@ -231,7 +231,7 @@
             "title": "Activo 24/7, en servidores en Europa.",
             "lede": "Tu workspace tiene su propia máquina, alojada en Alemania. Nunca duerme, así que la ejecución de las 7:00 ocurre tengas el portátil abierto o no.",
             "metaTitle": "Agentes de IA que funcionan 24/7 en servidores en Europa",
-            "metaDescription": "Cada workspace de Rerun tiene su propia máquina, alojada en Alemania. Tus Coworkers trabajan según su horario por la noche, el fin de semana y en tus vacaciones, con el portátil cerrado.",
+            "metaDescription": "Cada workspace de Rerun tiene su máquina en Alemania. Tus Coworkers siguen su horario de noche, en fin de semana y en vacaciones, portátil cerrado.",
             "stageCaption": "El mismo workspace a las 7:00 y a las 3:00: la ejecución ocurre igual.",
             "points": {
                 "first": {
@@ -267,7 +267,7 @@
             "crumb": "Segundo cerebro",
             "title": "Un segundo cerebro para tu negocio.",
             "lede": "Tus Coworkers leen las mismas páginas: qué vendes, a quién se lo vendes y cómo escribes. Las mantienen al día, y cada ejecución parte de ellas.",
-            "metaTitle": "Un segundo cerebro que tus Coworkers de IA leen antes de cada ejecución",
+            "metaTitle": "Segundo cerebro: tus Coworkers lo leen antes de actuar",
             "metaDescription": "Tu oferta, tu mercado, tu tono y tus reglas, escritos una vez en páginas que lee cada Coworker. Las mantienen al día, así que dejas de pegar contexto.",
             "stageCaption": "Las páginas que leen tus Coworkers y las fuentes de las que las mantienen.",
             "points": {
@@ -342,7 +342,7 @@
             "title": "Invita a todo tu equipo, sin coste extra.",
             "lede": "Los puestos son gratis. Todos ven el mismo tablero, hablan con los mismos Coworkers y pueden responder cuando uno de ellos pide un sí.",
             "metaTitle": "Invita a todo tu equipo: puestos gratis en todos los planes",
-            "metaDescription": "Rerun no cobra por puesto. Invita a todos, trabajad en el mismo tablero, hablad con los mismos Coworkers y deja que quien esté disponible apruebe una ejecución.",
+            "metaDescription": "Rerun no cobra por puesto. Invita a todos: el mismo tablero, los mismos Coworkers, y quien esté disponible aprueba una ejecución.",
             "stageCaption": "El mismo tablero, los mismos Coworkers, varias personas a la vez.",
             "points": {
                 "first": {
@@ -379,7 +379,7 @@
             "title": "Tus Coworkers se pasan el trabajo.",
             "lede": "Uno encuentra los leads, el siguiente les escribe, un tercero los registra en tu CRM. Nadie copia nada entre ellos, y lees toda la cadena en un solo lugar.",
             "metaTitle": "Coworkers de IA que se pasan el trabajo",
-            "metaDescription": "Un Coworker encuentra los leads, el siguiente les escribe, un tercero los registra en tu CRM. Se pasan el trabajo directamente y dejan un solo hilo legible.",
+            "metaDescription": "Un Coworker encuentra los leads, otro les escribe, un tercero los registra en tu CRM. Se pasan el trabajo directamente y dejan un solo hilo legible.",
             "stageCaption": "Tres Coworkers pasándose el mismo trabajo, uno tras otro.",
             "points": {
                 "first": {

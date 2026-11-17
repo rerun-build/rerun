@@ -29,6 +29,9 @@ Every string a person sees goes through `t()` (`useTranslations` in a client com
   for Agencies: Prospecting, SEO, Client Reporting". The short function words (a, and, for, of, to,
   with, vs…) may stay lowercase, unless they open the title or follow a colon. `i18n:check` refuses
   one in sentence case. The other languages write their titles the way their own usage does.
+- A page title takes 60 characters at most and a meta description 155 (`META_DESCRIPTION_KEYS`), in
+  every language, an ICU argument counted as 4: that is what Google shows before it cuts. The
+  translator is told the limit, and `i18n:check` refuses a string over it.
 
 Then:
 

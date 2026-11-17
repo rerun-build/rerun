@@ -1170,8 +1170,8 @@
             }
         },
         "paperclip": {
-            "metaTitle": "Rerun vs Paperclip: Hosted Agents or a Self-Hosted Org Chart? (2026)",
-            "metaDescription": "Rerun vs Paperclip on hosting, agent runtimes, connectors and real cost: when the open-source org chart for agents fits, and when a hosted Paperclip alternative is simpler.",
+            "metaTitle": "Rerun vs Paperclip: Hosted Agents or Self-Hosted? (2026)",
+            "metaDescription": "Rerun vs Paperclip on hosting, runtimes, connectors and cost: when the open-source org chart for agents fits, and when a hosted alternative is simpler.",
             "headline": "Rerun vs Paperclip",
             "intro": "Paperclip is an open-source control plane you host: it gives the agents you already run an org chart, budgets and approval gates. Rerun gives you the agents themselves, already running on a private machine in the cloud.",
             "verdict": "Pick Paperclip if you already run several coding agents and want one org chart, per-agent budgets and approval gates over all of them, and you are happy to host a Node server and its database. Pick Rerun if you want the agents, not the place to manage them: each one runs on your workspace’s private machine, with {connectors}+ apps in one click and memory between runs, for a flat {price} a month.",
@@ -1618,7 +1618,7 @@
         },
         "lindy": {
             "metaTitle": "Rerun vs Lindy: Flat Price, Your Own AI (2026)",
-            "metaDescription": "Rerun vs Lindy on price, credits and models. Lindy bills every active user and every task in credits; Rerun is one flat plan on the ChatGPT or Claude plan you already pay for.",
+            "metaDescription": "Rerun vs Lindy on price, credits and models. Lindy bills every user and every task in credits; Rerun is one flat plan on your ChatGPT or Claude plan.",
             "headline": "Rerun vs Lindy",
             "intro": "Lindy is an AI assistant your team reaches from Slack and its apps, billed per active user and in credits. Rerun gives your team agents that run on your own AI plan, on a private machine, for one flat price.",
             "verdict": "Pick Lindy if your team lives in Slack and wants one assistant everyone can @mention, with 1,500+ integrations, meeting notes built in and HIPAA with a signed BAA on Enterprise. Pick Rerun if you want agents whose cost does not climb with every task or every person: one plan from {price} a month covers unlimited agents, your whole team at no extra cost, and the AI runs on the ChatGPT or Claude plan you already pay for.",
@@ -1695,7 +1695,7 @@
         },
         "twin": {
             "metaTitle": "Rerun vs Twin: What Each Flat Plan Really Includes (2026)",
-            "metaDescription": "Rerun vs Twin (twin.so): both are flat-priced now. Compare what the entry plan includes, the browser agent at $149, teammates versus clients, and the model you run on.",
+            "metaDescription": "Rerun vs Twin (twin.so): both are flat-priced. Compare the entry plan, the $149 browser agent, teammates versus clients, and the model you run on.",
             "headline": "Rerun vs Twin",
             "intro": "Twin builds an agent from a chat and runs it on a flat plan, with no credits. Rerun does too, and gives every agent a private machine, your whole team and the model of your choice.",
             "verdict": "Twin dropped credits, so the question is no longer what a run costs: it is what the plan includes. Twin is $29 a month for agents, schedules and app connections, and $149 for the browser agent, the lead prospecting and the deep research. Rerun is {price} a month with a private machine from the first plan, a browser and a desktop the agent drives like a person, paid data it asks before spending, and your whole team invited at no extra cost. Pick Twin if you work alone, serve clients and want its browser agent; its Store plan tunes one agent per customer.",
@@ -1768,7 +1768,7 @@
         },
         "dust": {
             "metaTitle": "Rerun vs Dust: Flat Price, Every App, Free Seats (2026)",
-            "metaDescription": "Rerun vs Dust on seats, credits and connectors. Dust prices every seat and meters automated use; Rerun is one flat plan with unlimited seats and every app included.",
+            "metaDescription": "Rerun vs Dust on seats, credits and connectors. Dust prices every seat and meters automation; Rerun is one flat plan with unlimited seats and every app.",
             "headline": "Rerun vs Dust",
             "intro": "Dust gives each person agents that know your company’s documents, priced per seat and in credits. Rerun gives your team agents that run the work on their own, on a private machine, for one flat price.",
             "verdict": "Pick Dust when the job is answering from company knowledge across Notion, Drive and Slack, for a large team that needs SSO, SOC 2 Type II and EU or US hosting. Pick Rerun when agents should run operations on their own, on a schedule or a webhook, across {connectors}+ apps, with every run visible to a team whose seats are free, for {price} a month instead of a seat and a credit allowance per person.",

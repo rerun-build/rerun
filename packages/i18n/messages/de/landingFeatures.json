@@ -3,7 +3,7 @@
         "name": "Funktionen",
         "metaTitle": "Funktionen: alles, was ein KI-Coworker mitbringt",
         "headline": "Alles, was ein Coworker mitbringt.",
-        "description": "Ein Coworker erreicht deine Tools, arbeitet auf seinem eigenen Bildschirm, läuft rund um die Uhr in Europa und fragt vor allem, was Folgen hat. Eine Seite für jede der zehn.",
+        "description": "Ein Coworker nutzt deine Tools, hat einen eigenen Bildschirm, läuft 24/7 in Europa und fragt, bevor es ernst wird. Eine Seite für jede der zehn.",
         "count": "{count, plural, one {# Funktion} other {# Funktionen}}",
         "pickTitle": "Wähl die, wegen der du hier bist.",
         "pickLede": "Jede Seite zeigt die Sache in Aktion, im Produkt, nicht in einem Diagramm."
@@ -28,8 +28,8 @@
             "crumb": "Coworker",
             "title": "Stell einen KI-Coworker ein, statt einen Prompt zu schreiben.",
             "lede": "Gib ihm eine Aufgabe, die Apps, die er braucht, und eine Uhrzeit. Er erledigt die Arbeit in deinen eigenen Tools und berichtet: kein Flussdiagramm zeichnen, kein Prompt Engineering.",
-            "metaTitle": "KI-Coworker: stell einen Agenten ein, statt einen Workflow zu bauen",
-            "metaDescription": "Ein Rerun-Coworker übernimmt eine Aufgabe, deine Apps und einen Zeitplan, erledigt die Arbeit in deinen eigenen Tools und berichtet. Kein Flussdiagramm, kein Prompt Engineering.",
+            "metaTitle": "KI-Coworker: Agent einstellen statt Workflow bauen",
+            "metaDescription": "Ein Rerun-Coworker bekommt Aufgabe, Apps und Zeitplan, erledigt die Arbeit in deinen Tools und berichtet. Kein Flussdiagramm, kein Prompt Engineering.",
             "stageCaption": "Zwei Coworker bei der Arbeit in derselben Box, die sagen, was sie gerade getan haben.",
             "points": {
                 "first": {
@@ -65,8 +65,8 @@
             "crumb": "Coworker-Manager",
             "title": "Ein Manager für jeden Coworker, den du einstellst.",
             "lede": "Rerun verwaltet deinen Workspace: Es kennt jeden Coworker, stellt die ein, die dir fehlen, und gibt jede Anfrage an den Zuständigen weiter. Sprich mit ihm per Stimme oder lass es im Autopilot laufen, während du weg bist.",
-            "metaTitle": "Coworker-Manager: führe dein KI-Team per Stimme oder im Autopilot",
-            "metaDescription": "Rerun verwaltet deinen Workspace: Es stellt die Coworker ein, die du brauchst, gibt jede Anfrage an den richtigen weiter, hört zu, wenn du die Leertaste hältst, und läuft im Autopilot.",
+            "metaTitle": "Coworker-Manager: KI-Team per Stimme oder Autopilot",
+            "metaDescription": "Rerun verwaltet deinen Workspace: stellt Coworker ein, leitet Anfragen an den richtigen, hört zu, wenn du die Leertaste hältst, und läuft im Autopilot.",
             "stageCaption": "Halte die Leertaste, sag, was du brauchst: Der Manager gibt es an den zuständigen Coworker weiter.",
             "points": {
                 "first": {
@@ -120,7 +120,7 @@
             "title": "Jeder Coworker arbeitet auf seinem eigenen Bildschirm.",
             "lede": "Hat eine App keine API, öffnet dein Coworker sie auf seinem eigenen Bildschirm und klickt sich durch, wie ein Mensch. Du kannst ihm zusehen und jederzeit die Maus zurücknehmen.",
             "metaTitle": "Computer Use: ein KI-Agent, der sich durch deine Apps klickt",
-            "metaDescription": "Dein Coworker öffnet einen echten Browser auf seinem eigenen Bildschirm und klickt sich durch Portale ohne API. Schau live zu und nimm jederzeit die Maus zurück.",
+            "metaDescription": "Dein Coworker öffnet einen echten Browser auf eigenem Bildschirm und klickt sich durch Portale ohne API. Schau live zu, übernimm jederzeit die Maus.",
             "stageCaption": "Ein echter Browser auf dem eigenen Bildschirm des Coworkers, in deinem Konto angemeldet.",
             "points": {
                 "first": {
@@ -231,7 +231,7 @@
             "title": "Läuft rund um die Uhr, auf Servern in Europa.",
             "lede": "Dein Workspace bekommt seine eigene Maschine, gehostet in Deutschland. Sie schläft nie, also läuft die Ausführung um 7 Uhr, ob dein Laptop offen ist oder nicht.",
             "metaTitle": "KI-Agenten, die rund um die Uhr auf Servern in Europa laufen",
-            "metaDescription": "Jeder Rerun-Workspace bekommt seine eigene Maschine, gehostet in Deutschland. Deine Coworker laufen nach Plan durch die Nacht, am Wochenende und im Urlaub, Laptop zu.",
+            "metaDescription": "Jeder Rerun-Workspace läuft auf einer eigenen Maschine in Deutschland. Deine Coworker arbeiten nach Plan nachts, am Wochenende und im Urlaub, Laptop zu.",
             "stageCaption": "Derselbe Workspace um 7 Uhr und um 3 Uhr: Die Ausführung läuft so oder so.",
             "points": {
                 "first": {
@@ -267,8 +267,8 @@
             "crumb": "Zweites Gehirn",
             "title": "Ein zweites Gehirn für dein Unternehmen.",
             "lede": "Deine Coworker lesen dieselben Seiten: was du verkaufst, an wen du verkaufst, wie du schreibst. Sie halten diese Seiten aktuell, und jede Ausführung startet von dort.",
-            "metaTitle": "Ein zweites Gehirn, das deine KI-Coworker vor jeder Ausführung lesen",
-            "metaDescription": "Dein Angebot, dein Markt, dein Ton und deine Regeln, einmal aufgeschrieben in Seiten, die jeder Coworker liest. Sie halten sie aktuell, damit du keinen Kontext mehr einfügen musst.",
+            "metaTitle": "Ein zweites Gehirn, das KI-Coworker immer zuerst lesen",
+            "metaDescription": "Angebot, Markt, Ton und Regeln, einmal in Seiten festgehalten, die jeder Coworker liest. Sie halten sie aktuell, du fügst keinen Kontext mehr ein.",
             "stageCaption": "Die Seiten, die deine Coworker lesen, und die Quellen, aus denen sie sie pflegen.",
             "points": {
                 "first": {
@@ -304,8 +304,8 @@
             "crumb": "Workspaces",
             "title": "Ein Konto, ein Workspace pro Unternehmen.",
             "lede": "Ein Kunde, eine Marke, ein Nebenprojekt: Jedes bekommt seinen eigenen Workspace, seine eigenen Coworker, seine eigenen verbundenen Apps und sein eigenes Gehirn. Wechsle über den Button in der Ecke.",
-            "metaTitle": "Workspaces: halte jedes Unternehmen, jeden Kunden, jede Marke getrennt",
-            "metaDescription": "Ein Rerun-Konto trägt so viele Workspaces, wie du brauchst: jeder mit eigenen Coworkern, eigenen Apps und eigenem Gehirn. Nichts geht zwischen ihnen hin und her.",
+            "metaTitle": "Workspaces: Firmen, Kunden und Marken sauber getrennt",
+            "metaDescription": "Ein Rerun-Konto hat so viele Workspaces, wie du brauchst, jeder mit eigenen Coworkern, Apps und eigenem Gehirn. Nichts geht zwischen ihnen hin und her.",
             "stageCaption": "Der Umschalter: jedes Unternehmen in einem Konto, keines vermischt.",
             "points": {
                 "first": {
@@ -379,7 +379,7 @@
             "title": "Deine Coworker übergeben sich gegenseitig Arbeit.",
             "lede": "Einer findet die Leads, der nächste schreibt sie an, ein dritter trägt sie in dein CRM ein. Niemand kopiert etwas zwischen ihnen, und du liest die ganze Kette an einem Ort.",
             "metaTitle": "KI-Coworker, die sich gegenseitig Arbeit übergeben",
-            "metaDescription": "Ein Coworker findet die Leads, der nächste schreibt sie an, ein dritter trägt sie in dein CRM ein. Sie geben Arbeit direkt weiter und hinterlassen einen lesbaren Thread.",
+            "metaDescription": "Ein Coworker findet Leads, der nächste schreibt sie an, ein dritter trägt sie ins CRM ein. Sie geben Arbeit direkt weiter, in einem lesbaren Verlauf.",
             "stageCaption": "Drei Coworker, die dieselbe Aufgabe weiterreichen.",
             "points": {
                 "first": {

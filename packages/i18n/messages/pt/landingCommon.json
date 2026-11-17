@@ -1,7 +1,7 @@
 {
     "site": {
-        "title": "Rerun: funcionários de IA que rodam no seu plano do ChatGPT ou Claude",
-        "description": "Contrate funcionários de IA para vendas, suporte, marketing e administração. Eles rodam no seu plano do ChatGPT ou Claude, com créditos incluídos ou sua chave de API. Teste grátis de {trialDays} dias."
+        "title": "Rerun: funcionários de IA no seu plano ChatGPT ou Claude",
+        "description": "Funcionários de IA para vendas, suporte, marketing e gestão, no seu plano ChatGPT ou Claude, créditos inclusos ou sua chave de API. {trialDays} dias grátis."
     },
     "nav": {
         "items": {
