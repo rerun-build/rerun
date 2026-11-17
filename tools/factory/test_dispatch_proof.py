@@ -113,8 +113,7 @@ class Proof(ProofBase):
 
     def test_a_proof_asked_again_is_told_why_its_answer_could_not_be_read(self):
         self.to_proving()
-        self.w.finish("r2", "All 5 asks are MET, I posted the lines on the pull request.
-PROOF: PASS @abcdef1")
+        self.w.finish("r2", "All 5 asks are MET, I posted the lines on the pull request.\nPROOF: PASS @abcdef1")
         self.tick()
         self.assertEqual(self.state(), "proof_wait")
         self.tick()
