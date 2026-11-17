@@ -62,6 +62,10 @@ def now():
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
+class Refused(RuntimeError):
+    pass
+
+
 class Store:
     def __init__(self, path):
         self.path = path
@@ -88,6 +92,16 @@ class Store:
     def close(self):
         self.db.close()
         self._lock.close()
+
+    def claim(self, project, home):
+        row = self.db.execute("SELECT v FROM kv WHERE job='-' AND k='project_of'").fetchone()
+        if row is not None and row[0] != project:
+            raise Refused("the ledger %s belongs to %s, not to %s" % (os.path.basename(self.path), row[0], project))
+        if row is None:
+            held = any(self.db.execute("SELECT 1 FROM %s LIMIT 1" % t).fetchone() for t in ("jobs", "fires", "transitions"))
+            if held and project != home:
+                raise Refused("the ledger %s holds rows and names no project" % os.path.basename(self.path))
+            self.set("-", "project_of", project)
 
     def intent(self, job, chunk, stage, coworker="", slug="", at=None, model=None, thinking=None):
         n = self.db.execute("SELECT COUNT(*) FROM fires WHERE job=? AND chunk=? AND stage=?",
