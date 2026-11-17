@@ -11,13 +11,13 @@ describe('the LinkedIn tool set', () => {
     it('never hands the coworker the account itself: no login, no checkpoint, no account deletion, no webhook', () => {
         for (const tool of LINKEDIN_TOOLS) {
             expect(tool.action).not.toMatch(/login|checkpoint|account|webhook/)
-            expect(['profiles', 'network', 'messages', 'content', 'recruiter']).toContain(tool.category)
+            expect(['profiles', 'network', 'messages', 'content', 'recruiter', 'jobs']).toContain(tool.category)
         }
         expect(new Set(LINKEDIN_TOOLS.map(tool => tool.name)).size).toBe(LINKEDIN_TOOLS.length)
     })
 
     it('meters every action LinkedIn could restrict the account for', () => {
-        for (const name of ['send_invitation', 'send_message', 'get_profile', 'search_people', 'comment_on_post', 'visit_profile', 'follow', 'answer_comment', 'repost', 'create_post']) {
+        for (const name of ['send_invitation', 'send_message', 'get_profile', 'search_people', 'comment_on_post', 'visit_profile', 'follow', 'answer_comment', 'repost', 'create_post', 'search_jobs', 'apply_to_job']) {
             expect(linkedinTool(name)?.quota).toBeDefined()
         }
     })
@@ -203,6 +203,37 @@ describe('Recruiter', () => {
     it('runs jobs and projects on the recruiter endpoint', () => {
         for (const name of ['recruiter_list_jobs', 'recruiter_create_job', 'recruiter_move_candidate']) expect(linkedinTool(name)?.category).toBe('recruiter')
         expect(missingRequired(linkedinTool('recruiter_create_job')!, { title: 'CTO' })).toEqual(['company_url', 'place', 'html_description'])
+    })
+})
+
+describe('LinkedIn jobs', () => {
+    it('reads job postings on the jobs endpoint, apart from the Recruiter postings', () => {
+        expect(['search_jobs', 'get_job', 'get_job_apply_form', 'apply_to_job'].map(name => [linkedinTool(name)?.category, linkedinTool(name)?.action, linkedinTool(name)?.scope])).toEqual([
+            ['jobs', 'search', 'jobs'],
+            ['jobs', 'get', 'jobs'],
+            ['jobs', 'get_apply_form', 'jobs'],
+            ['jobs', 'apply', 'jobs'],
+        ])
+    })
+
+    it('counts every job a search returns, a hundred at most per page', () => {
+        const search = linkedinTool('search_jobs')!
+        expect(toolParams(search, { keywords: 'account executive', location: 'Paris', count: 500 })).toEqual({ keywords: 'account executive', location: 'Paris', count: 100 })
+        expect(toolParams(search, { keywords: 'designer' })).toEqual({ keywords: 'designer', count: 10 })
+        expect(search.quota?.action).toBe('search_result')
+        expect(search.quota?.amount?.({ count: 40 })).toBe(40)
+    })
+
+    it('applies to one job at a time, against its own daily limit', () => {
+        const apply = linkedinTool('apply_to_job')!
+        expect(apply.quota?.action).toBe('job_application')
+        expect(missingRequired(apply, toolParams(apply, { answers: { q1: '5' } }))).toEqual(['job_id'])
+        expect(toolParams(apply, { job_id: '4178681638', answers: { q1: '5' }, account_id: 'someone-else' })).toEqual({ job_id: '4178681638', answers: { q1: '5' } })
+    })
+
+    it('reads a job and its form for free', () => {
+        expect(linkedinTool('get_job')?.quota).toBeUndefined()
+        expect(linkedinTool('get_job_apply_form')?.quota).toBeUndefined()
     })
 })
 

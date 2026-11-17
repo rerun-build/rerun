@@ -99,7 +99,7 @@ describe('running a tool by its name', () => {
 
     it('refuses a tool the app does not have, pointing at the directory', () => {
         expect(resolveRunTool(linkedin, { tool: 'delete_account' })).toEqual({
-            refusal: 'Unknown tool "delete_account". Nothing was run. Read a scope with linkedin_pro_list_tools for its tool names: profiles, network, posts, messages, company_pages, groups_events, sales_navigator, recruiter.',
+            refusal: 'Unknown tool "delete_account". Nothing was run. Read a scope with linkedin_pro_list_tools for its tool names: profiles, network, posts, messages, company_pages, groups_events, jobs, sales_navigator, recruiter.',
         })
         expect(resolveRunTool(linkedin, { tool: APP_RUN_TOOL })).toHaveProperty('refusal')
         expect(resolveRunTool(whatsapp, {})).toEqual({ refusal: 'No tool was named. Nothing was run. Read a scope with whatsapp_pro_list_tools for its tool names: messages, chats, groups.' })

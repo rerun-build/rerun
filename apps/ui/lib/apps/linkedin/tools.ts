@@ -14,6 +14,7 @@ export const LINKEDIN_SCOPES = {
     messages: { summary: 'reacting to a message, editing or unsending one' },
     company_pages: { summary: 'company search, a company page, posting as a page the user admins' },
     groups_events: { summary: 'group search, a group with its members and posts, an event and inviting connections to it' },
+    jobs: { summary: 'job search, a job with who posted it, the Easy Apply form and applying' },
     sales_navigator: { summary: 'lead and account search with every filter, lead and account lists, saved searches, InMail credits, unlocking a lead', requires: 'a Sales Navigator seat' },
     recruiter: { summary: 'talent search, candidates and their notes, projects and their pipeline, jobs and applicants, the Recruiter inbox and InMails', requires: 'a LinkedIn Recruiter seat' },
 } satisfies Record<string, AppScope>
@@ -30,6 +31,8 @@ const asPage = { type: 'string', description: 'Act as this company page instead 
 const groupUrl = { type: 'string', description: 'LinkedIn group URL or numeric id' }
 const dateField = { type: 'string', description: 'YYYY-MM or YYYY' }
 const eventUrl = { type: 'string', description: 'LinkedIn event URL, urn:li:fsd_professionalEvent:… or numeric id' }
+const jobId = { type: 'string', description: 'The linkedin_job_id from search_jobs' }
+const jobUrl = { type: 'string', description: 'LinkedIn job URL, e.g. https://www.linkedin.com/jobs/view/4178681638/' }
 
 const SALES_NAV = 'Needs a Sales Navigator seat.'
 const stringList = (description?: string) => ({ type: 'array', items: { type: 'string' }, ...(description ? { description } : {}) })
@@ -115,7 +118,7 @@ const SALES_NAV_COMPANY_FILTERS = {
 const RECRUITER = 'Needs a LinkedIn Recruiter seat.'
 const projectUrn = { type: 'string', description: 'From recruiter_list_projects' }
 const candidateUrn = { type: 'string', description: 'The hire_identity_urn of the candidate, from recruiter_search_people' }
-const jobId = { type: 'string', description: 'From recruiter_list_jobs' }
+const recruiterJobId = { type: 'string', description: 'From recruiter_list_jobs' }
 
 // The Recruiter variants of classic actions are the same Linkup action with `recruiter: true`, set
 // here rather than left to the coworker.
@@ -765,6 +768,74 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         quota: { action: 'post' },
     },
     {
+        name: 'search_jobs',
+        scope: 'jobs',
+        description:
+            "Search LinkedIn job postings with the filters of LinkedIn's Jobs tab. Give keywords or a location. Each job comes with its linkedin_job_id, company and whether it takes Easy Apply. LinkedIn returns the first 1,000 results.",
+        inputSchema: {
+            type: 'object',
+            properties: {
+                keywords: { type: 'string', description: 'Job title, skill or company' },
+                location: { type: 'string', description: 'City, region or country name' },
+                location_id: { type: 'string', description: 'Geo id from linkedin_pro_typeahead or a previous answer, instead of location' },
+                sort_by: { type: 'string', enum: ['recent', 'relevant'] },
+                date_posted: { type: 'string', enum: ['24h', 'week', 'month'] },
+                experience: { type: 'array', items: { type: 'string', enum: ['internship', 'entry', 'associate', 'mid_senior', 'director', 'executive'] } },
+                job_type: { type: 'array', items: { type: 'string', enum: ['full_time', 'part_time', 'contract', 'temporary', 'volunteer', 'internship', 'other'] } },
+                workplace: { type: 'array', items: { type: 'string', enum: ['on_site', 'remote', 'hybrid'] } },
+                company: stringList('Company ids from linkedin_pro_typeahead'),
+                industry: stringList('Industry ids from linkedin_pro_typeahead'),
+                function: stringList('Job function ids'),
+                title: stringList('Title ids from linkedin_pro_typeahead'),
+                easy_apply: { type: 'boolean', description: 'Only jobs that take Easy Apply' },
+                in_network: { type: 'boolean', description: 'Only jobs at companies where the user has connections' },
+                under_10_applicants: { type: 'boolean' },
+                verified: { type: 'boolean' },
+                count: count(100),
+                offset: { ...offset, description: 'pagination.next_offset from the previous answer' },
+            },
+        },
+        category: 'jobs',
+        action: 'search',
+        quota: { action: 'search_result', amount: args => Number(args.count) || 10 },
+        clamp: { count: { default: 10, max: 100 } },
+    },
+    {
+        name: 'get_job',
+        scope: 'jobs',
+        description:
+            'One LinkedIn job posting by job_id or job_url: its description, salary, workplace and state, how to apply (apply.type is easy_apply or external) and hiring_team, the people who posted it, with their profile URLs.',
+        inputSchema: { type: 'object', properties: { job_id: jobId, job_url: jobUrl } },
+        category: 'jobs',
+        action: 'get',
+    },
+    {
+        name: 'get_job_apply_form',
+        scope: 'jobs',
+        description:
+            'The Easy Apply form of a job, by job_id or job_url: each question with its question_id, label, the pattern an answer must match and the value LinkedIn pre-fills from the profile. can_apply is false when the form has a question that cannot be answered here, already_applied says the user applied before.',
+        inputSchema: { type: 'object', properties: { job_id: jobId, job_url: jobUrl } },
+        category: 'jobs',
+        action: 'get_apply_form',
+    },
+    {
+        name: 'apply_to_job',
+        scope: 'jobs',
+        description:
+            'Apply to an Easy Apply job as the user. Only when the user approved this job and every answer: read get_job_apply_form first, never apply twice. Pre-filled questions can be left out. Nothing is sent when an answer is missing or does not match its pattern.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                job_id: jobId,
+                answers: { type: 'object', additionalProperties: { type: 'string' }, description: 'The answer to each question, keyed by question_id' },
+            },
+            required: ['job_id'],
+        },
+        category: 'jobs',
+        action: 'apply',
+        quota: { action: 'job_application' },
+    },
+    {
         name: 'sales_nav_search_people',
         scope: 'sales_navigator',
         description: `${SALES_NAV} Lead search with every Sales Navigator filter. Values within one filter are OR, filters together are AND. Ids for the filters come from linkedin_pro_typeahead with category sales_nav. Page with offset, up to 2500.`,
@@ -1068,7 +1139,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: {
             type: 'object',
             properties: {
-                job_id: jobId,
+                job_id: recruiterJobId,
                 ratings: { type: 'string', description: 'Comma-separated: GOOD_FIT, MAYBE, UNRATED, NOT_A_FIT. All by default' },
                 sortType: { type: 'string', enum: ['RELEVANCE', 'APPLIED_DATE'] },
                 sortOrder: { type: 'string', enum: ['DESCENDING', 'ASCENDING'] },
@@ -1119,7 +1190,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         name: 'recruiter_publish_job',
         scope: 'recruiter',
         description: `${RECRUITER} Publish a draft job. Only when the user approved the posting.`,
-        inputSchema: { type: 'object', properties: { job_id: jobId }, required: ['job_id'] },
+        inputSchema: { type: 'object', properties: { job_id: recruiterJobId }, required: ['job_id'] },
         category: 'recruiter',
         action: 'publish_job',
     },
@@ -1127,7 +1198,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         name: 'recruiter_close_job',
         scope: 'recruiter',
         description: `${RECRUITER} Close an open job.`,
-        inputSchema: { type: 'object', properties: { job_id: jobId }, required: ['job_id'] },
+        inputSchema: { type: 'object', properties: { job_id: recruiterJobId }, required: ['job_id'] },
         category: 'recruiter',
         action: 'close_job',
     },

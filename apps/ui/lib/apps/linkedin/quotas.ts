@@ -6,7 +6,7 @@ export { isoWeekKey } from '@/lib/apps/quotas'
 // seasoned paid account: the account that gets restricted is the user's own, and most connected
 // accounts are neither paid nor warmed up.
 
-export type QuotaAction = 'invitation' | 'message' | 'profile_view' | 'search_result' | 'engagement' | 'post' | 'attachment_download'
+export type QuotaAction = 'invitation' | 'message' | 'profile_view' | 'search_result' | 'engagement' | 'post' | 'job_application' | 'attachment_download'
 
 const DEFAULT_QUOTAS: Record<QuotaAction, QuotaLimit[]> = {
     invitation: [
@@ -18,6 +18,7 @@ const DEFAULT_QUOTAS: Record<QuotaAction, QuotaLimit[]> = {
     search_result: [{ window: 'day', max: 1000 }],
     engagement: [{ window: 'day', max: 100 }],
     post: [{ window: 'day', max: 5 }],
+    job_application: [{ window: 'day', max: 15 }],
     attachment_download: [{ window: 'day', max: 200 }],
 }
 
@@ -28,6 +29,7 @@ const QUOTA_NOUNS: Record<QuotaAction, string> = {
     search_result: 'search result',
     engagement: 'reaction and comment',
     post: 'post',
+    job_application: 'job application',
     attachment_download: 'attachment download',
 }
 
