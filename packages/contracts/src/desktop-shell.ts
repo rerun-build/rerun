@@ -13,7 +13,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -112,6 +112,8 @@ export type DesktopSettings = {
     // The global shortcut that opens Quick ask from any app, as an accelerator, or null when off.
     // Absent from the shells without the `quickAskShortcut` capability.
     quickAskShortcut?: string | null
+    // The shortcut that opens Quick ask listening, or null when off. `quickAskVoiceShortcut` capability.
+    quickAskVoiceShortcut?: string | null
 }
 
 // `taken`: the system or another app holds the keys, the previous shortcut stays. `invalid`: not a
@@ -198,7 +200,7 @@ export type DesktopShellApi = {
         close(): void
         // The message left: the main window opens on `path`.
         sent(path: string): void
-        // `quickAskShortcut` capability. Null turns Quick ask's shortcut off.
+        // `quickAskShortcut` capability (`voice`: `quickAskVoiceShortcut`). Null turns that shortcut off.
         setShortcut(kind: QuickAskShortcutKind, accelerator: string | null): Promise<QuickAskShortcutResult>
         // While a new shortcut is being recorded, the current one must not open Quick ask. The shell
         // resumes by itself after 30 seconds, and as soon as `setShortcut` is called.
@@ -208,6 +210,9 @@ export type DesktopShellApi = {
         hold(busy: boolean): void
         // The microphone pane of the system settings. False where there is none to open (Linux).
         openMicrophoneSettings(): Promise<boolean>
+        // `quickAskVoiceShortcut` capability, in the Quick ask window: the voice shortcut was pressed.
+        // The shell has already brought the window up; the page starts listening, or sends.
+        onShortcut(callback: (kind: QuickAskShortcutKind) => void): Unsubscribe
     }
 }
 

@@ -25,7 +25,8 @@
         "quickAsk.holdToTalk": "Hint in the Quick ask window, next to 'Enter to send, Esc to close'. <key>Space</key> is drawn as a keyboard key with a microphone.",
         "quickAsk.releaseToSend": "Shown while the Quick ask window records the person's voice, with Space held down.",
         "quickAsk.sent": "Badge shown for a second once the spoken question left for the Chief of Staff (the workspace assistant).",
-        "quickAsk.micDeniedBody": "The computer does not let Rerun use the microphone. A button next to it opens the system settings."
+        "quickAsk.micDeniedBody": "The computer does not let Rerun use the microphone. A button next to it opens the system settings.",
+        "quickAsk.toggleHint": "Shown while the Quick ask window records the person's voice after the voice keyboard shortcut was pressed."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -92,7 +93,9 @@
             "needsModifier": "Add a modifier key, like {key}",
             "reserved": "{keys} is used by {owner, select, spotlight {Spotlight} finder {Finder search} inputSources {input sources} appSwitcher {the app switcher} screenshot {screenshots} windowMenu {the window menu} system {the system} other {every app}}",
             "taken": "{keys} is used by another app"
-        }
+        },
+        "quickAskVoice": "Voice quick ask",
+        "quickAskVoiceOn": "Talk to your Chief of Staff from any app."
     },
     "openInApp": {
         "title": "Open this page in {app}?",
@@ -110,7 +113,9 @@
         "micDeniedTitle": "Rerun can’t hear you",
         "micDeniedBody": "Allow the microphone for Rerun in your system settings.",
         "openSettings": "Open Settings",
-        "typeInstead": "Type instead"
+        "typeInstead": "Type instead",
+        "toggleHint": "Enter to send, Esc to cancel",
+        "cancel": "Cancel"
     },
     "server": {
         "otherServer": "Use another Rerun server"

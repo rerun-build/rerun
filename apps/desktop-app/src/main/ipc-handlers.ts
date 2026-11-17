@@ -9,7 +9,7 @@ import { audienceOf, handle } from './ipc'
 import { currentServer, getMainWindow, openExternal, reloadApp, replaceMainWindow, showServerPicker, setTitleBarColors, windowState } from './main-window'
 import { setShellLocale, shellLocale } from './messages'
 import { changeDesktopSettings, changeQuickAskShortcut, desktopSettings, setBadge, showNotification } from './native'
-import { hideQuickAsk, holdQuickAsk, openMicrophoneSettings, pauseQuickAskShortcut, quickAskSent, resetQuickAsk } from './quick-ask'
+import { hideQuickAsk, holdQuickAsk, openMicrophoneSettings, pauseQuickAskShortcut, quickAskSent, resetQuickAsk, takePendingQuickAsk } from './quick-ask'
 import { partitionFor, serverOrigin, setServerOrigin } from './server'
 import { checkServer } from './server-check'
 import { checkForUpdates, installUpdate, updatesEnabled, updateState } from './updater'
@@ -58,12 +58,13 @@ export function registerIpcHandlers(): void {
         quickAskSent(isDesktopOpenPath(target) ? target : '/')
     })
     handle(IPC.quickAskSetShortcut, ['app'], (_event, request: { kind?: unknown; accelerator?: unknown }) => {
-        if (request?.kind !== 'text') return { status: 'invalid', settings: desktopSettings() }
-        return changeQuickAskShortcut(typeof request.accelerator === 'string' ? request.accelerator : null)
+        if (request?.kind !== 'text' && request?.kind !== 'voice') return { status: 'invalid', settings: desktopSettings() }
+        return changeQuickAskShortcut(request.kind, typeof request.accelerator === 'string' ? request.accelerator : null)
     })
     handle(IPC.quickAskPauseShortcuts, ['app'], (event, paused: unknown) => pauseQuickAskShortcut(paused === true, event.sender))
     handle(IPC.quickAskHold, ['app'], (_event, busy: unknown) => holdQuickAsk(busy === true))
     handle(IPC.quickAskOpenMicrophoneSettings, ['app'], () => openMicrophoneSettings())
+    handle(IPC.quickAskTakePending, ['app'], () => takePendingQuickAsk())
     handle(IPC.localeSet, ['app'], (_event, locale: string) => setShellLocale(String(locale).slice(0, 16)))
 
     handle(IPC.localFind, ['local'], (_event, request: FindRequest) => find({ text: String(request?.text ?? '').slice(0, 500), forward: request?.forward !== false, findNext: !!request?.findNext }))

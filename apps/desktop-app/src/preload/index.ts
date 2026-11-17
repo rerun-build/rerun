@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
-import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState, QuickAskShortcutResult } from '@rerun/contracts'
+import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState, QuickAskShortcutKind, QuickAskShortcutResult } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
 // Runs before any script of the page, in an isolated world, in the main frame only. It asks the
@@ -77,6 +77,14 @@ if (bootstrap?.audience === 'app') {
             pauseShortcuts: (paused) => void ipcRenderer.invoke(IPC.quickAskPauseShortcuts, paused === true),
             hold: (busy) => void ipcRenderer.invoke(IPC.quickAskHold, busy === true),
             openMicrophoneSettings: () => ipcRenderer.invoke(IPC.quickAskOpenMicrophoneSettings) as Promise<boolean>,
+            onShortcut: (callback) => {
+                const unsubscribe = subscribe<QuickAskShortcutKind>(IPC_EVENTS.quickAskShortcut, callback)
+                // The shortcut that opened the window may have been pressed before the page could hear it.
+                void (ipcRenderer.invoke(IPC.quickAskTakePending) as Promise<QuickAskShortcutKind | null>).then((kind) => {
+                    if (kind) callback(kind)
+                })
+                return unsubscribe
+            },
         },
     }
     contextBridge.exposeInMainWorld('rerunShell', api)

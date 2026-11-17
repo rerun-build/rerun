@@ -5,7 +5,7 @@ import { Field } from '@/components/ui/field'
 import { Switch } from '@/components/ui/switch'
 import { ShortcutRecorder } from '@/components/account/ShortcutRecorder'
 import { desktopShell } from '@/lib/desktop-shell/client'
-import type { DesktopSettings, DesktopUpdateState } from '@rerun/contracts'
+import type { DesktopSettings, DesktopUpdateState, QuickAskShortcutKind } from '@rerun/contracts'
 import { Skeleton } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
@@ -35,7 +35,16 @@ export function DesktopAppPanel() {
 
     const shortcutLabel = shell.platform === 'mac' ? '⌘⇧Space' : 'Ctrl+Shift+Space'
     const shortcuts = desktopShell('quickAskShortcut')
+    const voiceShortcuts = desktopShell('quickAskVoiceShortcut')
     const quickAskShortcut = settings?.quickAskShortcut ?? null
+    const quickAskVoiceShortcut = settings?.quickAskVoiceShortcut ?? null
+
+    const changeShortcut = async (kind: QuickAskShortcutKind, accelerator: string | null) => {
+        if (!shortcuts) return 'invalid' as const
+        const result = await shortcuts.quickAsk.setShortcut(kind, accelerator)
+        setSettings(result.settings)
+        return result.status
+    }
     const updates = desktopShell('update')
     const updateLine =
         update.status === 'downloading' ? t('downloading', { percent: update.percent }) : update.status === 'checking' ? t('checking') : update.status === 'error' ? t('updateFailed') : t('version', { version: shell.version })
@@ -54,16 +63,23 @@ export function DesktopAppPanel() {
                                 value={quickAskShortcut}
                                 platform={shell.platform}
                                 onRecordingChange={(recording) => shortcuts.quickAsk.pauseShortcuts(recording)}
-                                onChange={async (accelerator) => {
-                                    const result = await shortcuts.quickAsk.setShortcut('text', accelerator)
-                                    setSettings(result.settings)
-                                    return result.status
-                                }}
+                                onChange={(accelerator) => changeShortcut('text', accelerator)}
                             />
                         </Field>
                     ) : (
                         <Field orientation="row" label={t('quickAsk')} helperText={t('quickAskHint', { shortcut: shortcutLabel })} htmlFor="desktop-quick-ask">
                             <Switch id="desktop-quick-ask" checked={settings.quickAsk} onCheckedChange={(quickAsk) => void change({ quickAsk })} />
+                        </Field>
+                    )}
+                    {voiceShortcuts && (
+                        <Field orientation="row" label={t('quickAskVoice')} helperText={quickAskVoiceShortcut ? t('quickAskVoiceOn') : t('quickAskOff')} htmlFor="desktop-quick-ask-voice">
+                            <ShortcutRecorder
+                                id="desktop-quick-ask-voice"
+                                value={quickAskVoiceShortcut}
+                                platform={shell.platform}
+                                onRecordingChange={(recording) => voiceShortcuts.quickAsk.pauseShortcuts(recording)}
+                                onChange={(accelerator) => changeShortcut('voice', accelerator)}
+                            />
                         </Field>
                     )}
                     {shell.platform !== 'mac' && (

@@ -8,13 +8,16 @@ import { useVoiceRecorder } from '@/hooks/useVoiceRecorder'
 import { desktopShell } from '@/lib/desktop-shell/client'
 import { handOverQuickAsk, QUICK_ASK_MAX_LENGTH } from '@/lib/desktop-shell/quick-ask'
 import { shouldPushToTalk } from '@/lib/foreman/push-to-talk'
-import { CheckIcon, MicIcon } from '@/lib/icons'
+import { CheckIcon, MicIcon, XIcon } from '@/lib/icons'
 import { transcribeVoiceRecording } from '@/lib/voice/client'
 import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from 'react'
 
 type Step = 'text' | 'listening' | 'transcribing' | 'sent' | 'micDenied'
+// `hold`: Space held in the field, letting go sends. `toggle`: the voice shortcut, pressed again (or
+// Enter) to send.
+type ListenMode = 'hold' | 'toggle'
 
 // Long enough to read "Sent", short enough not to wait for it.
 const SENT_MS = 900
@@ -26,13 +29,15 @@ function holdWindow(busy: boolean) {
 
 // One field for the Chief of Staff, over whatever the person is doing. Enter sends: the text is handed
 // to the main window, which opens a new conversation with it; Escape puts the window away. Space held
-// in the empty field records the question instead, and letting go sends its transcript.
+// in the empty field records the question instead, and letting go sends its transcript; the voice
+// shortcut opens the window listening, and a second press sends.
 export function QuickAskComposer() {
     const t = useTranslations('desktopShell.quickAsk')
     const field = useRef<HTMLTextAreaElement>(null)
     const [text, setText] = useState('')
     const [step, setStep] = useState<Step>('text')
     const [notice, setNotice] = useState<string | null>(null)
+    const [mode, setMode] = useState<ListenMode>('hold')
     const textRef = useRef(text)
     useEffect(() => {
         textRef.current = text
@@ -64,8 +69,9 @@ export function QuickAskComposer() {
     })
     const { start, stop, cancel } = recorder
 
-    const listen = useCallback(() => {
+    const listen = useCallback((how: ListenMode) => {
         setNotice(null)
+        setMode(how)
         setStep('listening')
         holdWindow(true)
         void start()
@@ -108,12 +114,37 @@ export function QuickAskComposer() {
     }, [cancel])
 
     usePushToTalk({
-        enabled: step === 'text' || step === 'listening',
+        enabled: step === 'text' || (step === 'listening' && mode === 'hold'),
         accepts: event => !textRef.current && shouldPushToTalk(event, { focusHeld: false, overlayOpen: false }),
-        onStart: listen,
+        onStart: () => listen('hold'),
         onRelease: () => void finish(),
         onAbort: abort,
     })
+
+    const voiceShortcut = useRef<() => void>(() => {})
+    useEffect(() => {
+        voiceShortcut.current = () => {
+            if (step === 'text') listen('toggle')
+            else if (step === 'listening' && mode === 'toggle') void finish()
+        }
+    })
+    useEffect(() => desktopShell('quickAskVoiceShortcut')?.quickAsk.onShortcut(kind => kind === 'voice' && voiceShortcut.current()), [])
+
+    useEffect(() => {
+        if (step !== 'listening' || mode !== 'toggle') return
+        const onKeyDown = (event: globalThis.KeyboardEvent) => {
+            if (event.key === 'Enter') {
+                event.preventDefault()
+                void finish()
+            }
+            if (event.key === 'Escape') {
+                event.preventDefault()
+                abort()
+            }
+        }
+        window.addEventListener('keydown', onKeyDown)
+        return () => window.removeEventListener('keydown', onKeyDown)
+    }, [step, mode, finish, abort])
 
     const send = () => {
         const message = text.trim()
@@ -187,10 +218,17 @@ export function QuickAskComposer() {
                             <VoiceRecorderBar status={step === 'transcribing' ? 'transcribing' : recorder.status === 'recording' ? 'recording' : 'starting'} stream={recorder.stream} getLiveState={recorder.getLiveState} />
                         </div>
                         <div className="flex items-center justify-between gap-2">
-                            <span className="truncate text-xs text-muted-foreground">{step === 'listening' ? t('releaseToSend') : ''}</span>
-                            <Button size="sm" disabled>
-                                {t('send')}
-                            </Button>
+                            <span className="truncate text-xs text-muted-foreground">{step === 'listening' ? (mode === 'toggle' ? t('toggleHint') : t('releaseToSend')) : ''}</span>
+                            <span className="flex shrink-0 items-center gap-1">
+                                {step === 'listening' && mode === 'toggle' && (
+                                    <Button size="icon-sm" variant="ghost" aria-label={t('cancel')} onClick={abort}>
+                                        <XIcon />
+                                    </Button>
+                                )}
+                                <Button size="sm" disabled={step !== 'listening' || mode !== 'toggle'} onClick={() => void finish()}>
+                                    {t('send')}
+                                </Button>
+                            </span>
                         </div>
                     </>
                 )}

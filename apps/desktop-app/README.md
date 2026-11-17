@@ -89,7 +89,10 @@ follows the server the window shows, not only the configured one.
   new keys, and holds it back while a new one is recorded (`quickAsk.pauseShortcuts`).
   Space held in the empty field records the question and sends its transcript (capability
   `quickAskVoice`: `quickAsk.hold` keeps the window up while the system asks for the microphone,
-  `quickAsk.openMicrophoneSettings` opens its pane when it was refused). The text goes to the main window through the origin's localStorage, never a
+  `quickAsk.openMicrophoneSettings` opens its pane when it was refused).
+  A second global shortcut, ⌥⇧Space (Alt+Shift+Space) by default, opens it listening (capability
+  `quickAskVoiceShortcut`, `setShortcut('voice', …)`): the page hears it through `quickAsk.onShortcut`,
+  and a second press sends instead of putting the window away. The text goes to the main window through the origin's localStorage, never a
   URL a link could forge, and the main window asks it in a new conversation.
 - New Window (⌘⇧N): another window of the same session; each keeps its own workspace (the web
   holds it per tab).

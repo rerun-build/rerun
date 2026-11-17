@@ -4,7 +4,8 @@ import type { DesktopShellPlatform } from './desktop-shell.js'
 // The web app records them, the shell registers them: both read and write them through these
 // functions, and the shell checks again whatever a page sends it.
 
-export const QUICK_ASK_SHORTCUT_KINDS = ['text'] as const
+// `text` opens Quick ask on its field, `voice` opens it listening.
+export const QUICK_ASK_SHORTCUT_KINDS = ['text', 'voice'] as const
 export type QuickAskShortcutKind = (typeof QUICK_ASK_SHORTCUT_KINDS)[number]
 
 // In the order a Mac menu prints them: ⌃ ⌥ ⇧ ⌘. `Super` is the Windows key, `Command` its Mac twin.
@@ -76,3 +77,6 @@ export function quickAskAccelerator(value: unknown): string | null {
 export function defaultQuickAskAccelerator(platform: DesktopShellPlatform): string {
     return platform === 'mac' ? 'Shift+Command+Space' : 'Control+Shift+Space'
 }
+
+// The same keys on every system: ⌥⇧Space on a Mac, Alt+Shift+Space elsewhere.
+export const DEFAULT_QUICK_ASK_VOICE_ACCELERATOR = 'Alt+Shift+Space'

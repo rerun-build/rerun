@@ -64,7 +64,9 @@
             "needsModifier": "Ajoutez une touche de modification, comme {key}",
             "reserved": "{keys} est utilisé par {owner, select, spotlight {Spotlight} finder {la recherche du Finder} inputSources {les sources de saisie} appSwitcher {le sélecteur d’apps} screenshot {les captures d’écran} windowMenu {le menu de la fenêtre} system {le système} other {toutes les apps}}",
             "taken": "{keys} est utilisé par une autre app"
-        }
+        },
+        "quickAskVoice": "Question rapide vocale",
+        "quickAskVoiceOn": "Parlez à votre Chief of Staff depuis n’importe quelle app."
     },
     "openInApp": {
         "title": "Ouvrir cette page dans {app} ?",
@@ -82,7 +84,9 @@
         "micDeniedTitle": "Rerun ne vous entend pas",
         "micDeniedBody": "Autorisez le micro pour Rerun dans les réglages du système.",
         "openSettings": "Ouvrir les réglages",
-        "typeInstead": "Écrire plutôt"
+        "typeInstead": "Écrire plutôt",
+        "toggleHint": "Entrée pour envoyer, Échap pour annuler",
+        "cancel": "Annuler"
     },
     "server": {
         "otherServer": "Utiliser un autre serveur Rerun"

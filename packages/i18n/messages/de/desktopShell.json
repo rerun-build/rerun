@@ -64,7 +64,9 @@
             "needsModifier": "Füge eine Sondertaste hinzu, etwa {key}",
             "reserved": "{keys} wird verwendet von {owner, select, spotlight {Spotlight} finder {der Finder-Suche} inputSources {den Eingabequellen} appSwitcher {dem App-Umschalter} screenshot {den Bildschirmfotos} windowMenu {dem Fenstermenü} system {dem System} other {allen Apps}}",
             "taken": "{keys} wird von einer anderen App verwendet"
-        }
+        },
+        "quickAskVoice": "Schnellfrage per Sprache",
+        "quickAskVoiceOn": "Sprich aus jeder App mit deinem Chief of Staff."
     },
     "openInApp": {
         "title": "Diese Seite in {app} öffnen?",
@@ -82,7 +84,9 @@
         "micDeniedTitle": "Rerun kann dich nicht hören",
         "micDeniedBody": "Erlaube Rerun das Mikrofon in den Systemeinstellungen.",
         "openSettings": "Einstellungen öffnen",
-        "typeInstead": "Lieber tippen"
+        "typeInstead": "Lieber tippen",
+        "toggleHint": "Enter zum Senden, Esc zum Abbrechen",
+        "cancel": "Abbrechen"
     },
     "server": {
         "otherServer": "Anderen Rerun-Server nutzen"

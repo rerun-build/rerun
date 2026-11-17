@@ -101,7 +101,8 @@
         "waiting": "{count, plural, one {# esperando por você} other {# esperando por você}}",
         "openAtLogin": "Abrir ao iniciar sessão",
         "stillRunning": "O {name} continua rodando aqui. Feche-o por este ícone.",
-        "quickAsk": "Pergunta rápida"
+        "quickAsk": "Pergunta rápida",
+        "quickAskVoice": "Pergunta rápida por voz"
     },
     "context": {
         "addToDictionary": "Adicionar ao dicionário",

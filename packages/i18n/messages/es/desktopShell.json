@@ -64,7 +64,9 @@
             "needsModifier": "Añade una tecla modificadora, como {key}",
             "reserved": "{keys} lo usa {owner, select, spotlight {Spotlight} finder {la búsqueda del Finder} inputSources {el cambio de fuente de entrada} appSwitcher {el selector de apps} screenshot {las capturas de pantalla} windowMenu {el menú de la ventana} system {el sistema} other {cualquier app}}",
             "taken": "{keys} lo usa otra app"
-        }
+        },
+        "quickAskVoice": "Pregunta rápida por voz",
+        "quickAskVoiceOn": "Habla con tu Chief of Staff desde cualquier app."
     },
     "openInApp": {
         "title": "¿Abrir esta página en {app}?",
@@ -82,7 +84,9 @@
         "micDeniedTitle": "Rerun no te oye",
         "micDeniedBody": "Permite el micrófono para Rerun en los ajustes del sistema.",
         "openSettings": "Abrir ajustes",
-        "typeInstead": "Escribir"
+        "typeInstead": "Escribir",
+        "toggleHint": "Intro para enviar, Esc para cancelar",
+        "cancel": "Cancelar"
     },
     "server": {
         "otherServer": "Usar otro servidor de Rerun"

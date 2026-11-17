@@ -15,7 +15,7 @@ import { partitionFor, serverOrigin } from './server'
 import { checkServer } from './server-check'
 import { checkForUpdates, startUpdater } from './updater'
 import { createTray, desktopSettings, refreshTray, startedAtLogin } from './native'
-import { onQuickAskShortcutChange, restoreQuickAskShortcut, toggleQuickAsk } from './quick-ask'
+import { onQuickAskShortcutChange, restoreQuickAskShortcuts, toggleQuickAsk, voiceQuickAsk } from './quick-ask'
 
 // Each channel keeps its own data: a staging or development app never reads the production session.
 app.setName(PRODUCT_NAME)
@@ -107,6 +107,7 @@ function menu(): void {
         },
         reload: () => reloadApp(),
         quickAsk: () => toggleQuickAsk(),
+        voiceQuickAsk: () => voiceQuickAsk(),
         newWindow: () => void openNewWindow(),
     })
 }
@@ -130,7 +131,8 @@ function start(): void {
     const origin = serverOrigin()
     createMainWindow(origin, { hidden: startedAtLogin() })
     createTray({ checkForUpdates: () => void checkForUpdates(true), quit: () => app.quit() })
-    restoreQuickAskShortcut(desktopSettings().quickAskShortcut ?? null)
+    const settings = desktopSettings()
+    restoreQuickAskShortcuts({ text: settings.quickAskShortcut ?? null, voice: settings.quickAskVoiceShortcut ?? null })
     if (origin) void verifyServer(origin)
     startUpdater()
     registerScheme()

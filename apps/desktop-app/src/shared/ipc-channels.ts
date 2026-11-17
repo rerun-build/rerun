@@ -27,6 +27,7 @@ export const IPC = {
     quickAskPauseShortcuts: 'rerun-shell:quick-ask:pause-shortcuts',
     quickAskHold: 'rerun-shell:quick-ask:hold',
     quickAskOpenMicrophoneSettings: 'rerun-shell:quick-ask:open-microphone-settings',
+    quickAskTakePending: 'rerun-shell:quick-ask:take-pending',
     localServerInfo: 'rerun-shell:local:server-info',
     localServerConnect: 'rerun-shell:local:server-connect',
     localServerCancel: 'rerun-shell:local:server-cancel',
@@ -43,6 +44,7 @@ export const IPC_EVENTS = {
     findFocus: 'rerun-shell:event:find-focus',
     oauthReturn: 'rerun-shell:event:oauth-return',
     notificationClick: 'rerun-shell:event:notification-click',
+    quickAskShortcut: 'rerun-shell:event:quick-ask-shortcut',
 } as const
 
 export type AppBootstrap = {

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, globalShortcut, screen, shell, type WebContents } from 'electron'
-import { QUICK_ASK_PATH } from '@rerun/contracts'
+import { QUICK_ASK_PATH, QUICK_ASK_SHORTCUT_KINDS, type QuickAskShortcutKind } from '@rerun/contracts'
+import { IPC_EVENTS } from '../shared/ipc-channels'
 import { currentServer, getMainWindow, loadAppPath, openExternal, PRELOAD_PATH, showMainWindow } from './main-window'
 import { partitionFor } from './server'
 import { decideNavigation } from './url-policy'
@@ -16,6 +17,8 @@ let shownAt = 0
 const BLUR_GRACE_MS = 500
 // The page is listening: the system's microphone prompt takes the focus and must not put it away.
 let held = false
+// The voice shortcut opened a window whose page is still loading: it starts listening once it asks.
+let pendingVoice = false
 
 function createQuickWindow(origin: string): BrowserWindow {
     const window = new BrowserWindow({
@@ -67,12 +70,10 @@ function place(window: BrowserWindow): void {
     window.setBounds({ x: Math.round(x + (width - WIDTH) / 2), y: Math.round(y + height / 4), width: WIDTH, height: HEIGHT })
 }
 
-export function toggleQuickAsk(): void {
-    const origin = currentServer()
-    if (!origin) return
-    if (quickWindow && quickWindow.isVisible()) return hideQuickAsk()
-    if (!quickWindow || quickWindow.isDestroyed()) quickWindow = createQuickWindow(origin)
-    const window = quickWindow
+function showQuickAsk(origin: string): BrowserWindow {
+    const fresh = !quickWindow || quickWindow.isDestroyed()
+    if (fresh) quickWindow = createQuickWindow(origin)
+    const window = quickWindow as BrowserWindow
     place(window)
     const reveal = () => {
         shownAt = Date.now()
@@ -84,6 +85,32 @@ export function toggleQuickAsk(): void {
     }
     if (window.webContents.isLoading()) window.webContents.once('did-finish-load', reveal)
     else reveal()
+    return window
+}
+
+export function toggleQuickAsk(): void {
+    const origin = currentServer()
+    if (!origin) return
+    if (quickWindow && quickWindow.isVisible()) return hideQuickAsk()
+    showQuickAsk(origin)
+}
+
+// Unlike the text shortcut, pressing it on an open window does not put it away: the page sends
+// what it is listening to.
+export function voiceQuickAsk(): void {
+    const origin = currentServer()
+    if (!origin) return
+    const loaded = quickWindow !== null && !quickWindow.isDestroyed() && !quickWindow.webContents.isLoading()
+    const window = quickWindow && quickWindow.isVisible() ? quickWindow : showQuickAsk(origin)
+    if (loaded) window.webContents.send(IPC_EVENTS.quickAskShortcut, 'voice')
+    else pendingVoice = true
+}
+
+// Asked by the page once it listens for the shortcut.
+export function takePendingQuickAsk(): QuickAskShortcutKind | null {
+    const pending = pendingVoice
+    pendingVoice = false
+    return pending ? 'voice' : null
 }
 
 export function hideQuickAsk(): void {
@@ -118,74 +145,83 @@ export function quickAskSent(path: string): void {
     if (getMainWindow()) loadAppPath(path)
 }
 
-// --- the global shortcut ------------------------------------------------------------------------------
+// --- the global shortcuts -----------------------------------------------------------------------------
 
-// `wanted` is the person's shortcut; `registered` is what the system actually gave the app, null while
-// recording a new one or when another app holds the keys.
-let wanted: string | null = null
-let registered: string | null = null
+// Per kind, `wanted` is the person's shortcut and `registered` what the system actually gave the app:
+// null while a new one is recorded, or when another app holds the keys.
+type Slot = { wanted: string | null; registered: string | null; press: () => void }
+const slots: Record<QuickAskShortcutKind, Slot> = {
+    text: { wanted: null, registered: null, press: () => toggleQuickAsk() },
+    voice: { wanted: null, registered: null, press: () => voiceQuickAsk() },
+}
 const PAUSE_LIMIT_MS = 30_000
 let pauseTimer: ReturnType<typeof setTimeout> | null = null
 const listeners = new Set<() => void>()
 const watchedRequesters = new WeakSet<WebContents>()
 
-function release(): void {
-    if (registered) globalShortcut.unregister(registered)
-    registered = null
+function release(slot: Slot): void {
+    if (slot.registered) globalShortcut.unregister(slot.registered)
+    slot.registered = null
 }
 
-function claim(accelerator: string | null): boolean {
+function claim(slot: Slot, accelerator: string | null): boolean {
     if (!accelerator) return true
     try {
-        if (!globalShortcut.register(accelerator, toggleQuickAsk)) return false
+        if (!globalShortcut.register(accelerator, slot.press)) return false
     } catch {
         return false
     }
-    registered = accelerator
+    slot.registered = accelerator
     return true
 }
 
 function endPause(): void {
     if (pauseTimer) clearTimeout(pauseTimer)
     pauseTimer = null
-    if (!registered) claim(wanted)
+    for (const slot of Object.values(slots)) if (!slot.registered) claim(slot, slot.wanted)
 }
 
-export function quickAskShortcut(): string | null {
-    return wanted
+export function quickAskShortcut(kind: QuickAskShortcutKind = 'text'): string | null {
+    return slots[kind].wanted
 }
 
 export function onQuickAskShortcutChange(listener: () => void): void {
     listeners.add(listener)
 }
 
-// At launch: the stored shortcut stays the person's even when another app holds it this time.
-export function restoreQuickAskShortcut(accelerator: string | null): void {
-    release()
-    wanted = accelerator
-    claim(accelerator)
+// At launch: the stored shortcuts stay the person's even when another app holds one this time.
+export function restoreQuickAskShortcuts(stored: Record<QuickAskShortcutKind, string | null>): void {
+    for (const kind of QUICK_ASK_SHORTCUT_KINDS) {
+        const slot = slots[kind]
+        release(slot)
+        slot.wanted = stored[kind]
+        claim(slot, slot.wanted)
+    }
 }
 
-// False when the keys are taken: the previous shortcut is registered again and stays the person's.
-export function setQuickAskShortcut(accelerator: string | null): boolean {
-    if (pauseTimer) clearTimeout(pauseTimer)
-    pauseTimer = null
-    release()
-    if (!claim(accelerator)) {
-        claim(wanted)
+// False when the keys are taken, by another app or by the other Quick ask shortcut: the previous
+// shortcut is registered again and stays the person's.
+export function setQuickAskShortcut(kind: QuickAskShortcutKind, accelerator: string | null): boolean {
+    const slot = slots[kind]
+    const other = slots[kind === 'text' ? 'voice' : 'text']
+    if (accelerator !== null && accelerator === other.wanted) return false
+    endPause()
+    release(slot)
+    if (!claim(slot, accelerator)) {
+        claim(slot, slot.wanted)
         return false
     }
-    const changed = wanted !== accelerator
-    wanted = accelerator
+    const changed = slot.wanted !== accelerator
+    slot.wanted = accelerator
     if (changed) for (const listener of listeners) listener()
     return true
 }
 
-// While the page records a new shortcut, pressing the current one must reach the page, not open
-// Quick ask. A page that never says it is done (closed, crashed) does not keep it off for good.
+// While the page records a new shortcut, pressing a current one must reach the page, not open
+// Quick ask. A page that never says it is done (closed, crashed) does not keep them off for good.
 export function pauseQuickAskShortcut(paused: boolean, requester: WebContents): void {
     if (!paused) return endPause()
-    release()
+    for (const slot of Object.values(slots)) release(slot)
     if (pauseTimer) clearTimeout(pauseTimer)
     pauseTimer = setTimeout(endPause, PAUSE_LIMIT_MS)
     if (watchedRequesters.has(requester)) return

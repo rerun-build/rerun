@@ -17,6 +17,8 @@ export type ShellSettings = {
     quickAsk?: boolean
     // An accelerator, or null when the person turned Quick ask off.
     quickAskShortcut?: string | null
+    // The one that opens Quick ask listening, or null when turned off.
+    quickAskVoiceShortcut?: string | null
     // The balloon that says so was shown once.
     explainedTray?: boolean
 }

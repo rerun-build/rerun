@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { storedQuickAskShortcut } from '../src/main/quick-ask-settings'
+import { storedQuickAskShortcut, storedQuickAskVoiceShortcut } from '../src/main/quick-ask-settings'
 
 describe('storedQuickAskShortcut', () => {
     it('gives a fresh install the default shortcut', () => {
@@ -19,5 +19,14 @@ describe('storedQuickAskShortcut', () => {
 
     it('falls back to the default when the stored shortcut is no longer accepted', () => {
         expect(storedQuickAskShortcut({ quickAskShortcut: 'K' }, 'mac')).toBe('Shift+Command+Space')
+    })
+})
+
+describe('storedQuickAskVoiceShortcut', () => {
+    it('gives every install ⌥⇧Space until the person changes it', () => {
+        expect(storedQuickAskVoiceShortcut({})).toBe('Alt+Shift+Space')
+        expect(storedQuickAskVoiceShortcut({ quickAskVoiceShortcut: 'Control+Alt+V' })).toBe('Control+Alt+V')
+        expect(storedQuickAskVoiceShortcut({ quickAskVoiceShortcut: null })).toBeNull()
+        expect(storedQuickAskVoiceShortcut({ quickAskVoiceShortcut: 'V' })).toBe('Alt+Shift+Space')
     })
 })

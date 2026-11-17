@@ -157,5 +157,40 @@ export default async function quickAskScenario({ app, page, step, base }) {
     check(await quickWindowVisible(), 'a held window stays up when it loses the focus')
     await quick.evaluate(() => window.rerunShell.quickAsk.close())
     await waitUntil(quickWindowVisible, (visible) => !visible, 'closing it lets go of the hold')
+
+    // The voice shortcut: Quick ask opens listening, a second press sends.
+    const settingsNow = await page.evaluate(() => window.rerunShell.settings.get())
+    check(settingsNow.quickAskVoiceShortcut === 'Alt+Shift+Space' && (await isRegistered(app, 'Alt+Shift+Space')), 'the voice shortcut is ⌥⇧Space and registered')
+    check((await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').accelerator)) === 'Alt+Shift+Space', 'the File menu shows it')
+    const VOICED = 'Draft the weekly update for the team'
+    await quick.evaluate((spoken) => {
+        const realFetch = window.fetch.bind(window)
+        window.fetch = (input, init) => (String(input).includes('/api/voice/transcribe') ? Promise.resolve(new Response(JSON.stringify({ text: spoken }), { headers: { 'Content-Type': 'application/json' } })) : realFetch(input, init))
+    }, VOICED)
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await waitUntil(quickWindowVisible, Boolean, 'the voice shortcut brings the window up')
+    await quick.waitForSelector('[data-quick-ask][data-step="listening"]')
+    await new Promise((done) => setTimeout(done, 1200))
+    await step('voice shortcut listening', { target: quick })
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="sent"]', { timeout: 15_000 })
+    await waitUntil(quickWindowVisible, (visible) => !visible, 'a second press sends, and the window goes')
+    await page.getByText(VOICED).first().waitFor({ timeout: 30_000 })
+    check(true, 'the question asked by the voice shortcut reaches the Chief of Staff')
+
+    // Escape throws it away.
+    await app.evaluate(({ Menu }) => Menu.getApplicationMenu().getMenuItemById('quick-ask-voice').click())
+    await quick.waitForSelector('[data-quick-ask][data-step="listening"]')
+    await quick.keyboard.press('Escape')
+    await quick.waitForSelector('[data-quick-ask][data-step="text"]')
+    check(true, 'Escape cancels a voice question')
+    await quick.evaluate(() => window.rerunShell.quickAsk.close())
+
+    // The two shortcuts cannot share keys.
+    const clash = await page.evaluate((keys) => window.rerunShell.quickAsk.setShortcut('voice', keys), initial.quickAskShortcut)
+    check(clash.status === 'taken' && clash.settings.quickAskVoiceShortcut === 'Alt+Shift+Space', 'the voice shortcut cannot take the text one’s keys')
+    const voiceOff = await page.evaluate(() => window.rerunShell.quickAsk.setShortcut('voice', null))
+    check(voiceOff.settings.quickAskVoiceShortcut === null && !(await isRegistered(app, 'Alt+Shift+Space')), 'the voice shortcut turns off on its own')
+    await page.evaluate(() => window.rerunShell.quickAsk.setShortcut('voice', 'Alt+Shift+Space'))
 }
 

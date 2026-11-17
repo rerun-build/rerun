@@ -2,7 +2,7 @@ import { app, clipboard, Menu, nativeImage, Notification, shell, Tray, type Menu
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { defaultQuickAskAccelerator, quickAskAccelerator, type DesktopNotification, type DesktopSettings, type QuickAskShortcutResult } from '@rerun/contracts'
+import { defaultQuickAskAccelerator, quickAskAccelerator, type DesktopNotification, type DesktopSettings, type QuickAskShortcutKind, type QuickAskShortcutResult } from '@rerun/contracts'
 import badgeDot from '../../resources/tray/badge.png?asset'
 import trayColor from '../../resources/tray/tray.png?asset'
 import trayTemplate from '../../resources/tray/trayTemplate.png?asset'
@@ -12,8 +12,8 @@ import { PRODUCT_NAME, shellPlatform } from './identity'
 import { getMainWindow, showMainWindow } from './main-window'
 import { t } from './messages'
 import { readSettings, updateSettings } from './settings'
-import { quickAskShortcut, setQuickAskShortcut, toggleQuickAsk } from './quick-ask'
-import { storedQuickAskShortcut } from './quick-ask-settings'
+import { quickAskShortcut, setQuickAskShortcut, toggleQuickAsk, voiceQuickAsk } from './quick-ask'
+import { storedQuickAskShortcut, storedQuickAskVoiceShortcut } from './quick-ask-settings'
 import { isExternalUrl } from './url-policy'
 
 // What makes the app feel installed rather than a tab: system notifications that bring back the
@@ -87,7 +87,13 @@ function applyOpenAtLogin(openAtLogin: boolean): void {
 export function desktopSettings(): DesktopSettings {
     const settings = readSettings()
     const shortcut = storedQuickAskShortcut(settings, shellPlatform())
-    return { openAtLogin: settings.openAtLogin ?? false, closeToTray: settings.closeToTray ?? true, quickAsk: shortcut !== null, quickAskShortcut: shortcut }
+    return {
+        openAtLogin: settings.openAtLogin ?? false,
+        closeToTray: settings.closeToTray ?? true,
+        quickAsk: shortcut !== null,
+        quickAskShortcut: shortcut,
+        quickAskVoiceShortcut: storedQuickAskVoiceShortcut(settings),
+    }
 }
 
 export function changeDesktopSettings(patch: Partial<DesktopSettings>): DesktopSettings {
@@ -99,16 +105,16 @@ export function changeDesktopSettings(patch: Partial<DesktopSettings>): DesktopS
     if (typeof patch.closeToTray === 'boolean') next.closeToTray = patch.closeToTray
     updateSettings({ openAtLogin: next.openAtLogin, closeToTray: next.closeToTray })
     // The switch of the web apps that predate the recorder: off clears the shortcut, on restores the default.
-    if (typeof patch.quickAsk === 'boolean' && patch.quickAsk !== next.quickAsk) return changeQuickAskShortcut(patch.quickAsk ? defaultQuickAskAccelerator(shellPlatform()) : null).settings
+    if (typeof patch.quickAsk === 'boolean' && patch.quickAsk !== next.quickAsk) return changeQuickAskShortcut('text', patch.quickAsk ? defaultQuickAskAccelerator(shellPlatform()) : null).settings
     refreshTray()
     return next
 }
 
-export function changeQuickAskShortcut(accelerator: string | null): QuickAskShortcutResult {
+export function changeQuickAskShortcut(kind: QuickAskShortcutKind, accelerator: string | null): QuickAskShortcutResult {
     const shortcut = accelerator === null ? null : quickAskAccelerator(accelerator)
     if (accelerator !== null && !shortcut) return { status: 'invalid', settings: desktopSettings() }
-    if (!setQuickAskShortcut(shortcut)) return { status: 'taken', settings: desktopSettings() }
-    updateSettings({ quickAskShortcut: shortcut, quickAsk: shortcut !== null })
+    if (!setQuickAskShortcut(kind, shortcut)) return { status: 'taken', settings: desktopSettings() }
+    updateSettings(kind === 'text' ? { quickAskShortcut: shortcut, quickAsk: shortcut !== null } : { quickAskVoiceShortcut: shortcut })
     refreshTray()
     return { status: 'ok', settings: desktopSettings() }
 }
@@ -130,7 +136,8 @@ function trayImage(): Electron.NativeImage {
 function trayMenu(): Menu {
     const items: MenuItemConstructorOptions[] = [
         { label: t('tray.open', { name: PRODUCT_NAME }), click: () => showMainWindow() },
-        { label: t('tray.quickAsk'), accelerator: quickAskShortcut() ?? undefined, enabled: quickAskShortcut() !== null, click: () => toggleQuickAsk() },
+        { label: t('tray.quickAsk'), accelerator: quickAskShortcut('text') ?? undefined, enabled: quickAskShortcut('text') !== null, click: () => toggleQuickAsk() },
+        { label: t('tray.quickAskVoice'), accelerator: quickAskShortcut('voice') ?? undefined, enabled: quickAskShortcut('voice') !== null, click: () => voiceQuickAsk() },
         ...(waiting > 0 ? [{ label: t('tray.waiting', { count: waiting }), enabled: false }] : []),
         { type: 'separator' },
         {
