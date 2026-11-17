@@ -5,7 +5,7 @@ import Animated from 'react-native-reanimated'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
-import { Badge, TONES } from '@/components/ui/Badge'
+import { TONES } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { IconTile } from '@/components/ui/IconTile'
@@ -20,13 +20,12 @@ type Copy = { headline: string; detail: string; accept?: string; dismiss?: strin
 type SkillTranslator = ReturnType<typeof useTranslations<'mobileCards.skill'>>
 
 // The web's copy (SkillProposalBlock), state by state.
-function copyFor({ title, summary, status, instructions, error }: SkillProposal, t: SkillTranslator): Copy {
-    const firstRule = instructions[0] || summary
-    if (status === 'accepted') return { headline: t('remembering'), detail: firstRule }
+function copyFor({ title, summary, status, error }: SkillProposal, t: SkillTranslator): Copy {
+    if (status === 'accepted') return { headline: t('remembering'), detail: title }
     if (status === 'applied') return { headline: t('remembered'), detail: title }
     if (status === 'failed') return { headline: t('failed'), detail: error || title, accept: t('retry'), dismiss: t('dismiss') }
     if (status === 'dismissed') return { headline: t('notRemembered'), detail: title }
-    return { headline: t('ask'), detail: firstRule, accept: t('remember'), dismiss: t('no') }
+    return { headline: title, detail: summary, accept: t('remember'), dismiss: t('no') }
 }
 
 type SkillProposalRowProps = {
@@ -65,8 +64,8 @@ export function SkillProposalRow({ proposal, pending, onDecide }: SkillProposalR
     )
 }
 
-// The same proposal pinned above the composer while it waits on a decision. Its second line unfolds
-// into the rules exactly as the coworker worded them, what accepting writes into the skill.
+// The same proposal pinned above the composer while it waits on a decision. Unfolding keeps the
+// summary and lists under it the rules exactly as the coworker worded them, what accepting writes.
 export function PinnedSkillProposal({ proposal, pending, onDecide }: SkillProposalRowProps) {
     const t = useTranslations('mobileCards.skill')
     const theme = useTheme()
@@ -87,24 +86,25 @@ export function PinnedSkillProposal({ proposal, pending, onDecide }: SkillPropos
                     </View>
                     {expanded ? (
                         <View style={{ gap: spacing.xs }}>
-                            {(failed || instructions.length === 0) && (
-                                <AppText variant="footnote" tone={failed ? 'destructive' : 'muted'}>
-                                    {copy.detail}
-                                </AppText>
-                            )}
-                            {instructions.map((instruction, index) => (
-                                <AppText key={index} variant="footnote" tone="muted">
-                                    {instruction}
-                                </AppText>
-                            ))}
-                        </View>
-                    ) : (
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-                            <AppText variant="footnote" tone={failed ? 'destructive' : 'muted'} numberOfLines={1} style={{ flexShrink: 1 }}>
+                            <AppText variant="footnote" tone={failed ? 'destructive' : 'muted'}>
                                 {copy.detail}
                             </AppText>
-                            {!failed && instructions.length > 1 && <Badge size="xs" label={`+${instructions.length - 1}`} />}
+                            {!failed &&
+                                instructions.map((instruction, index) => (
+                                    <View key={index} style={{ flexDirection: 'row', gap: spacing.xs }}>
+                                        <AppText variant="footnote" tone="muted">
+                                            •
+                                        </AppText>
+                                        <AppText variant="footnote" tone="muted" style={{ flex: 1 }}>
+                                            {instruction}
+                                        </AppText>
+                                    </View>
+                                ))}
                         </View>
+                    ) : (
+                        <AppText variant="footnote" tone={failed ? 'destructive' : 'muted'} numberOfLines={1}>
+                            {copy.detail}
+                        </AppText>
                     )}
                 </Pressable>
                 <Outcome status={proposal.status} />

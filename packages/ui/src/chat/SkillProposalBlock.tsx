@@ -3,7 +3,7 @@
 import { motion } from 'motion/react'
 import { useState } from 'react'
 
-import { Badge, Button, Icon, IconBadge, Stripes } from '../primitives'
+import { Button, Icon, IconBadge, Stripes } from '../primitives'
 import { cn } from '../cn'
 import { TooltipDisabledReason } from '../Tooltip'
 import { BrainIcon, CheckIcon, ChevronDownIcon, XIcon } from '../icons'
@@ -36,13 +36,13 @@ export type SkillProposalBlockProps = {
 
 type Copy = { headline: string; detail: string; accept?: string; dismiss?: string }
 
-function copyFor({ title, summary, state, instructions, error }: SkillProposalBlockProps, t: KitTranslator): Copy {
-    const firstRule = instructions?.[0] || summary
-    if (state === 'accepted') return { headline: t('chat.skillProposal.remembering'), detail: firstRule }
+// While it waits, the row is the skill itself: its name and what it changes. The rules stay behind Show details.
+function copyFor({ title, summary, state, error }: SkillProposalBlockProps, t: KitTranslator): Copy {
+    if (state === 'accepted') return { headline: t('chat.skillProposal.remembering'), detail: title }
     if (state === 'applied') return { headline: t('chat.skillProposal.remembered'), detail: title }
     if (state === 'failed') return { headline: t('chat.skillProposal.failed'), detail: error || title, accept: t('chat.skillProposal.retry'), dismiss: t('chat.skillProposal.dismiss') }
     if (state === 'dismissed') return { headline: t('chat.skillProposal.notRemembered'), detail: title }
-    return { headline: t('chat.skillProposal.question'), detail: firstRule, accept: t('chat.skillProposal.remember'), dismiss: t('chat.skillProposal.no') }
+    return { headline: title, detail: summary, accept: t('chat.skillProposal.remember'), dismiss: t('chat.skillProposal.no') }
 }
 
 /**
@@ -79,18 +79,18 @@ export function SkillProposalBlock(props: SkillProposalBlockProps) {
                         )}
                     </>
                 )}
-                {open && <DecisionButtons {...props} accept={accept} dismiss={dismiss} />}
+                {open && <DecisionButtons {...props} accept={accept} dismiss={dismiss} className={undefined} />}
             </div>
         </div>
     )
 }
 
-// One line of text-xs with room for the +N badge, in px: motion cannot tween between `auto` and a rem length.
+// One line of text-xs, in px: motion cannot tween between `auto` and a rem length.
 const COLLAPSED_DETAIL_HEIGHT = 18
 
 /**
  * The pinned card while it waits on a decision: the compact row of every other state, plus a
- * chevron. Unfolding turns its second line, in place, into the rules exactly as the agent worded them.
+ * chevron. Unfolding keeps the summary and lists under it the rules exactly as the agent worded them.
  */
 function PinnedDecision(props: SkillProposalBlockProps & Copy) {
     const { state, instructions = [], className, headline, detail } = props
@@ -107,7 +107,7 @@ function PinnedDecision(props: SkillProposalBlockProps & Copy) {
     return (
         <div className={cn('relative overflow-hidden rounded-lg border border-border bg-card p-3', className)}>
             <Stripes fade="bottom" />
-            <div className={cn('relative flex gap-3 text-sm', unfolded ? 'items-start' : 'items-center')}>
+            <div className={cn('relative flex flex-wrap gap-3 text-sm sm:flex-nowrap', unfolded ? 'items-start' : 'items-center')}>
                 <Icon size="sm" icon={BrainIcon} />
                 <button type="button" aria-expanded={expanded} aria-label={expanded ? t('chat.skillProposal.hideDetails') : t('chat.skillProposal.showDetails')} onClick={toggle} className="group min-w-0 flex-1 cursor-pointer text-left">
                     <span className={cn('flex gap-1', unfolded ? 'items-start' : 'items-center')}>
@@ -123,36 +123,34 @@ function PinnedDecision(props: SkillProposalBlockProps & Copy) {
                     >
                         {unfolded ? (
                             <span className="block space-y-1.5 break-words">
-                                {(failed || instructions.length === 0) && <span className={cn('block', failed && 'text-destructive')}>{detail}</span>}
-                                {instructions.map((instruction, index) => (
-                                    <span key={index} className="block">
-                                        {instruction}
-                                    </span>
-                                ))}
-                            </span>
-                        ) : (
-                            <span className="flex items-center gap-1.5">
-                                <span className={cn('min-w-0 truncate', failed && 'text-destructive')}>{detail}</span>
-                                {!failed && instructions.length > 1 && (
-                                    <Badge size="xs" tone="neutral" glow={false} className="shrink-0">
-                                        +{instructions.length - 1}
-                                    </Badge>
+                                <span className={cn('block', failed && 'text-destructive')}>{detail}</span>
+                                {!failed && instructions.length > 0 && (
+                                    <ul className="list-disc space-y-1 pl-4">
+                                        {instructions.map((instruction, index) => (
+                                            <li key={index} className="whitespace-pre-line">
+                                                {instruction}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 )}
                             </span>
+                        ) : (
+                            <span className={cn('block truncate', failed && 'text-destructive')}>{detail}</span>
                         )}
                     </motion.span>
                 </button>
-                <DecisionButtons {...props} />
+                {/* Under sm the text keeps the card's whole width and the decision drops below it. */}
+                <DecisionButtons {...props} className="max-sm:basis-full max-sm:justify-end" />
             </div>
         </div>
     )
 }
 
-function DecisionButtons({ pending, onAccept, onDismiss, decisionDisabledReason, accept, dismiss }: SkillProposalBlockProps & Pick<Copy, 'accept' | 'dismiss'>) {
+function DecisionButtons({ pending, onAccept, onDismiss, decisionDisabledReason, accept, dismiss, className }: SkillProposalBlockProps & Pick<Copy, 'accept' | 'dismiss'>) {
     const blocked = !!decisionDisabledReason
     return (
-        <TooltipDisabledReason reason={decisionDisabledReason} className="shrink-0">
-            <div className="flex shrink-0 items-center gap-1">
+        <TooltipDisabledReason reason={decisionDisabledReason} className={cn('shrink-0', className)}>
+            <div className={cn('flex shrink-0 items-center gap-1', className)}>
                 {onDismiss && dismiss && (
                     <Button size="xs" variant="ghost" disabled={pending || blocked} onClick={onDismiss}>
                         {dismiss}
