@@ -267,7 +267,7 @@ Lifecycle of a run:
 
 1. Load the session history and append the user message.
 2. Build the system prompt (soul + skills index + recalled memories).
-3. Build the tool set for this agent (enabled families + MCP servers).
+3. Build the tool set for this agent (enabled families + MCP servers). A heavy set of MCP tools is held back and loaded on demand, see [MCP](#mcp).
 4. Start a `runs` row (`running`), mark the agent `busy`, claim the session (one run per session at a time).
 5. Stream the model, executing tools each step and recording each step and tool call.
 6. On finish: persist the assistant + tool messages, mark `idle`, close the `runs` row (`done`), notify the app, and run the **curator**.
@@ -319,6 +319,15 @@ Tools are built per run and gated by `config.tools` (`src/tools/registry.ts`, th
 ### MCP
 
 Each agent can declare MCP servers in `config.mcpServers`, and draws on the servers of the Vault items it holds. On a run they are connected (stdio, SSE or streamable HTTP) via the official `@modelcontextprotocol/sdk` and kept in a pool across runs, and their tools are merged into the agent's tool set under `"<server>_<tool>"` names (`mcp__<server>__<tool>` on `claude` and `codex`, which connect to them themselves) (`src/tools/mcp.ts`, `src/tools/mcp-pool.ts`). `mcp_register` lets an agent add one to its own config at runtime.
+
+Every tool sent to the model costs its name, description and JSON schema on each step of the run. When the MCP tools of an agent weigh more than 40,000 characters (`MCP_EAGER_PAYLOAD_CHARS`, about 10,000 tokens), the engine's own loop stops sending them up front (`src/tools/mcp-search.ts`):
+
+- the system prompt lists each server with its number of tools, and the agent gets one more tool, `mcp_search`;
+- `mcp_search` takes a few words or exact tool names, and optionally a `server`. It loads up to 8 tools by default (20 at most) and returns their names and a one-line description. With a `server` alone it lists that server's tool names without loading them;
+- a loaded tool is sent from the next step until the end of the run. A tool the conversation already called is loaded again on the next message, and a held-back tool called directly by its name still runs, then gets loaded;
+- the compaction threshold counts the tools that are sent, not the ones held back.
+
+Below that weight nothing changes: every MCP tool is sent on every step and `mcp_search` does not exist. The `claude` and `codex` providers are not concerned, since the CLI lists and loads the servers' tools itself.
 
 A server that needs a credential never carries it inline: it references an agent variable as `${KEY}`, resolved from the agent `.env` at connect time (`src/tools/mcp-resolve.ts`); a Vault item's server resolves against that item's `.env` only. The agent gets that value into the `.env` by calling `request_secret`, which pauses the run and shows the user a masked form; the app writes the values through `PATCH /agents/:id/keys` and the agent is told only which variable names were filled. The secret never enters the conversation.
 
@@ -506,7 +515,7 @@ curl -s $B/agents/$AID/skills
 | Vault | `src/vault/` |
 | Brain | `src/brain/` |
 | Run loop | `src/runtime/` (`loop.ts`, `stream.ts`, `curator.ts`, `context.ts`, `scheduler.ts`, `notify.ts`, `run-events.ts`) |
-| Tools | `src/tools/` (`catalog.ts`, `registry.ts`, `sandbox.ts`, `mcp.ts`, `mcp-pool.ts`, `builtin/`) |
+| Tools | `src/tools/` (`catalog.ts`, `registry.ts`, `sandbox.ts`, `mcp.ts`, `mcp-pool.ts`, `mcp-search.ts`, `builtin/`) |
 | Files store | `src/files/store.ts` (root-scoped fs ops shared by tools and HTTP) |
 | Skills | `src/skills/` |
 | Schedules / triggers | `src/schedules/`, `src/triggers/` |

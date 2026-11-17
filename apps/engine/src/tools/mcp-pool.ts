@@ -136,10 +136,10 @@ export async function pooledMcpServers(agent: LoadedAgent): Promise<PooledMcp[]>
     return pooled.filter(server => server !== null)
 }
 
-// For the providers the engine drives itself: the agent's MCP tools, served by the pooled connections.
-export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
+// For the providers the engine drives itself: the servers' tools, served by the pooled connections.
+export function pooledMcpToolSet(servers: PooledMcp[]): ToolSet {
     const tools: ToolSet = {}
-    for (const server of await pooledMcpServers(agent))
+    for (const server of servers)
         Object.assign(
             tools,
             mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args))

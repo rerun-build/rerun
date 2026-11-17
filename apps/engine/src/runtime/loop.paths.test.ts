@@ -12,7 +12,15 @@ const { sent, stream, prep, curator, recalls } = vi.hoisted(() => ({
     // `turns` plays one entry per step and `parts` is what every step past the queue gets; `calls`
     // keeps what each step asked of the model.
     stream: { parts: [] as unknown[], turns: [] as unknown[][], calls: [] as Array<Record<string, unknown>>, beforeStream: null as (() => void) | null },
-    prep: { toolsError: null as Error | null, modelError: null as Error | null, toolsGate: null as Promise<void> | null, closeError: null as Error | null, callTargets: [] as string[] },
+    prep: {
+        toolsError: null as Error | null,
+        modelError: null as Error | null,
+        toolsGate: null as Promise<void> | null,
+        closeError: null as Error | null,
+        callTargets: [] as string[],
+        // The MCP tools of the run and, when it holds them back, what `buildTools` hands the loop for it.
+        mcp: null as { tools: Record<string, unknown>; deferredMcp?: unknown } | null,
+    },
     curator: { calls: [] as unknown[][] },
     recalls: [] as string[],
 }))
@@ -52,7 +60,8 @@ vi.mock('../tools/registry.js', async () => {
             if (prep.toolsGate) await prep.toolsGate
             if (prep.toolsError) throw prep.toolsError
             return {
-                tools: { ask_user: hitl(), request_approval: hitl(), suggest_service: hitl(), request_secret: hitl(), mcp__rerun__ask_user: hitl() },
+                tools: { ask_user: hitl(), request_approval: hitl(), suggest_service: hitl(), request_secret: hitl(), mcp__rerun__ask_user: hitl(), ...prep.mcp?.tools },
+                deferredMcp: prep.mcp?.deferredMcp,
                 close: async () => {},
             }
         },
@@ -115,6 +124,8 @@ const { insertAgentIndex } = await import('../db/repos/agents.js')
 const { createConnection } = await import('../connections/store.js')
 const { isCredentialRejected, recordCredentialRejected } = await import('../connections/credential-rejections.js')
 const { armPlanLimitLatch, isPlanLimitLatched } = await import('../connections/plan-limits.js')
+const { dynamicTool, jsonSchema } = await import('ai')
+const { MCP_SEARCH_TOOL, mcpSearchTool, mcpToolCatalog } = await import('../tools/mcp-search.js')
 
 const id = 'pathsagent'
 const quietId = 'quietagent'
@@ -181,9 +192,93 @@ describe('run loop paths', () => {
         prep.modelError = null
         prep.toolsGate = null
         prep.closeError = null
+        prep.mcp = null
         curator.calls = []
         recalls.length = 0
         clearBudgetLatch()
+    })
+
+    describe('MCP tools held back', () => {
+        const ran: string[] = []
+        const sentTools = (call: Record<string, unknown>) => (call.tools as Array<{ name: string }>).map(t => t.name)
+        const mcpSent = (call: Record<string, unknown>) => sentTools(call).filter(name => name.startsWith('linear_'))
+
+        function holdBackLinear() {
+            const names = ['list_issues', 'create_issue', 'list_teams']
+            const deferredMcp = { catalog: mcpToolCatalog([{ name: 'linear', tools: names.map(name => ({ name, description: `Linear ${name}`, inputSchema: { type: 'object' as const } })) }]), loaded: new Set<string>() }
+            const mcpTools = Object.fromEntries(
+                names.map(name => [
+                    `linear_${name}`,
+                    dynamicTool({
+                        description: `Linear ${name}`,
+                        inputSchema: jsonSchema({ type: 'object' }),
+                        execute: async () => {
+                            ran.push(name)
+                            return 'ok'
+                        },
+                    }),
+                ]),
+            )
+            prep.mcp = { tools: { ...mcpTools, ...mcpSearchTool(deferredMcp) }, deferredMcp }
+        }
+
+        afterEach(() => {
+            ran.length = 0
+        })
+
+        it('sends every tool when the run holds none back', async () => {
+            prep.mcp = { tools: { linear_list_issues: dynamicTool({ description: 'x', inputSchema: jsonSchema({ type: 'object' }), execute: async () => 'ok' }) } }
+            stream.turns = [textTurn('Nothing to do.')]
+            await run('hello')
+            expect(mcpSent(stream.calls[0])).toEqual(['linear_list_issues'])
+        })
+
+        it('sends none of them first, then the ones the search loaded', async () => {
+            holdBackLinear()
+            stream.turns = [toolTurn(MCP_SEARCH_TOOL, { query: 'issue', server: 'linear', limit: 2 }), toolTurn('linear_list_issues', {}, 'Reading the issues.', 'call-2'), textTurn('There are no new issues.')]
+            const { outcome } = await run('any new issue?')
+
+            expect(outcome).toEqual({ kind: 'done' })
+            expect(stream.calls).toHaveLength(3)
+            expect(mcpSent(stream.calls[0])).toEqual([])
+            expect(sentTools(stream.calls[0])).toEqual(expect.arrayContaining([MCP_SEARCH_TOOL, 'ask_user']))
+            expect(mcpSent(stream.calls[1])).toEqual(['linear_list_issues', 'linear_create_issue'])
+            expect(mcpSent(stream.calls[2])).toEqual(['linear_list_issues', 'linear_create_issue'])
+            expect(ran).toEqual(['list_issues'])
+        })
+
+        it('runs a held-back tool called by its name and sends its schema from the next step on', async () => {
+            holdBackLinear()
+            stream.turns = [toolTurn('linear_list_teams', {}), textTurn('Two teams.')]
+            await run('which teams?')
+
+            expect(ran).toEqual(['list_teams'])
+            expect(mcpSent(stream.calls[0])).toEqual([])
+            expect(mcpSent(stream.calls[1])).toEqual(['linear_list_teams'])
+        })
+
+        it('runs a held-back tool called under the name a CLI gave it, then sends it', async () => {
+            holdBackLinear()
+            stream.turns = [toolTurn('mcp__linear__list_teams', {}), textTurn('Two teams.')]
+            await run('which teams?')
+
+            expect(ran).toEqual(['list_teams'])
+            expect(mcpSent(stream.calls[1])).toEqual(['linear_list_teams'])
+        })
+
+        it('keeps a tool the conversation already used loaded on the next message', async () => {
+            holdBackLinear()
+            stream.turns = [toolTurn(MCP_SEARCH_TOOL, { query: 'linear_create_issue' }), toolTurn('linear_create_issue', {}, 'Creating it.', 'call-2'), textTurn('Created.')]
+            const first = await run('create an issue')
+
+            holdBackLinear()
+            stream.calls = []
+            stream.turns = [textTurn('Anything else?')]
+            const second = await runAgent(await getAgent(id), first.sessionId, 'thanks')
+            await second.settled
+
+            expect(mcpSent(stream.calls[0])).toEqual(['linear_create_issue'])
+        })
     })
 
     describe('when preparation fails', () => {

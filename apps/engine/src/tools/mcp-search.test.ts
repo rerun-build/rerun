@@ -1,6 +1,18 @@
 import { dynamicTool, jsonSchema } from 'ai'
 import { describe, expect, it } from 'vitest'
-import { MCP_EAGER_PAYLOAD_CHARS, MCP_SEARCH_DEFAULT_LIMIT, MCP_SEARCH_MAX_LIMIT, mcpServerTools, mcpToolCatalog, mcpToolsAreDeferred, searchMcpTools } from './mcp-search.js'
+import {
+    MCP_EAGER_PAYLOAD_CHARS,
+    MCP_SEARCH_DEFAULT_LIMIT,
+    MCP_SEARCH_MAX_LIMIT,
+    MCP_SEARCH_TOOL,
+    activeToolNames,
+    mcpSearchTool,
+    mcpServerToolCounts,
+    mcpServerTools,
+    mcpToolCatalog,
+    mcpToolsAreDeferred,
+    searchMcpTools,
+} from './mcp-search.js'
 
 const tool = (name: string, description?: string) => ({ name, description, inputSchema: { type: 'object' as const } })
 
@@ -60,13 +72,14 @@ describe('searchMcpTools', () => {
         expect(namesOf({ query: 'channel message' })).toEqual(['discord_getChannelMessages', 'discord_send_message'])
     })
 
-    it('puts a tool asked for by its name first, with or without its server prefix', () => {
-        expect(namesOf({ query: 'linear_list_teams' })[0]).toBe('linear_list_teams')
-        expect(namesOf({ query: 'LIST_TEAMS' })[0]).toBe('linear_list_teams')
+    it('gives exactly the tools asked for by their full names', () => {
+        expect(namesOf({ query: 'linear_list_teams' })).toEqual(['linear_list_teams'])
+        expect(namesOf({ query: 'discord_send_message, LINEAR_SAVE_COMMENT' })).toEqual(['linear_save_comment', 'discord_send_message'])
     })
 
-    it('takes several names in one query', () => {
-        expect(namesOf({ query: 'discord_send_message, linear_save_comment' }).slice(0, 2)).toEqual(['linear_save_comment', 'discord_send_message'])
+    it('puts a tool named like the query first, then the ones carrying its words', () => {
+        expect(namesOf({ query: 'LIST_TEAMS' })).toEqual(['linear_list_teams', 'linear_list_issues', 'discord_list_guilds', 'linear_create_issue'])
+        expect(namesOf({ query: 'linear_list_teams comment' }).slice(0, 2)).toEqual(['linear_list_teams', 'linear_save_comment'])
     })
 
     it('keeps the search inside a server, whatever its case', () => {
@@ -108,5 +121,72 @@ describe('mcpToolsAreDeferred', () => {
         expect(mcpToolsAreDeferred({})).toBe(false)
         expect(mcpToolsAreDeferred(toolsWeighing(1_000))).toBe(false)
         expect(mcpToolsAreDeferred(toolsWeighing(MCP_EAGER_PAYLOAD_CHARS))).toBe(true)
+    })
+})
+
+describe('mcpServerToolCounts', () => {
+    it('counts the tools of each server', () => {
+        expect([...mcpServerToolCounts(catalog)]).toEqual([
+            ['linear', 4],
+            ['discord', 3],
+        ])
+    })
+})
+
+describe('mcp_search', () => {
+    function searchWith(entries = catalog) {
+        const deferred = { catalog: entries, loaded: new Set<string>() }
+        const search = mcpSearchTool(deferred)[MCP_SEARCH_TOOL] as unknown as { execute: (input: Record<string, unknown>, options: unknown) => Promise<Record<string, unknown>> }
+        return { deferred, run: (input: Record<string, unknown>) => search.execute(input, { toolCallId: 'c', messages: [] }) }
+    }
+
+    it('loads the tools it finds and says what each one does', async () => {
+        const { deferred, run } = searchWith()
+        expect(await run({ query: 'send message', server: 'discord', limit: 1 })).toEqual({
+            loaded: [{ name: 'discord_send_message', description: 'Send a message to a channel.' }],
+            total: 2,
+            note: '1 more match: narrow the query or raise the limit to load them.',
+        })
+        expect([...deferred.loaded]).toEqual(['discord_send_message'])
+    })
+
+    it('keeps what earlier searches loaded', async () => {
+        const { deferred, run } = searchWith()
+        await run({ query: 'linear_list_teams' })
+        await run({ query: 'discord_list_guilds' })
+        expect([...deferred.loaded]).toEqual(['linear_list_teams', 'discord_list_guilds'])
+    })
+
+    it('lists the names of a server without loading them', async () => {
+        const { deferred, run } = searchWith()
+        expect(await run({ server: 'Discord' })).toMatchObject({ loaded: [], tools: ['discord_getChannelMessages', 'discord_send_message', 'discord_list_guilds'], total: 3 })
+        expect(deferred.loaded.size).toBe(0)
+    })
+
+    it('names the servers when it is given nothing, an unknown server or words no tool carries', async () => {
+        const { deferred, run } = searchWith()
+        const servers = 'Your servers: linear (4 tools), discord (3 tools).'
+        expect(await run({})).toEqual({ loaded: [], note: `Give a query, or a server to list its tools. ${servers}` })
+        expect(await run({ query: 'list', server: 'slack' })).toEqual({ loaded: [], note: `No connected server is named "slack". ${servers}` })
+        expect(await run({ query: 'invoice refund' })).toEqual({ loaded: [], note: `No tool matches these words. Try other words, or list a server's tools. ${servers}` })
+        expect(deferred.loaded.size).toBe(0)
+    })
+
+    it('keeps the first line of a long description, cut short', async () => {
+        const { run } = searchWith(mcpToolCatalog([{ name: 'big', tools: [tool('export', `${'a'.repeat(300)}\nSecond line.`)] }]))
+        const { loaded } = (await run({ query: 'export' })) as { loaded: Array<{ description: string }> }
+        expect(loaded[0].description).toHaveLength(200)
+        expect(loaded[0].description.endsWith('…')).toBe(true)
+    })
+})
+
+describe('activeToolNames', () => {
+    const noop = dynamicTool({ description: 'x', inputSchema: jsonSchema({ type: 'object' }), execute: async () => '' })
+    const tools = { fs_read: noop, linear_list_issues: noop, linear_create_issue: noop, [MCP_SEARCH_TOOL]: noop }
+
+    it('leaves out the held-back tools the run has not loaded, in the order of the set', () => {
+        const held = catalog.filter(entry => entry.server === 'linear')
+        expect(activeToolNames(tools, { catalog: held, loaded: new Set() })).toEqual(['fs_read', MCP_SEARCH_TOOL])
+        expect(activeToolNames(tools, { catalog: held, loaded: new Set(['linear_create_issue', 'not_a_tool']) })).toEqual(['fs_read', 'linear_create_issue', MCP_SEARCH_TOOL])
     })
 })

@@ -29,13 +29,14 @@ import { installTools } from './builtin/install.js'
 import { foremanTools } from './builtin/foreman.js'
 import { agentFilesTools } from './builtin/agent-files.js'
 import { hasPendingSetup } from '../agents/setup.js'
-import { pooledMcpTools } from './mcp-pool.js'
+import { pooledMcpServers, pooledMcpToolSet } from './mcp-pool.js'
+import { MCP_SEARCH_TOOL, mcpSearchTool, mcpToolCatalog, mcpToolsAreDeferred, type DeferredMcpTools } from './mcp-search.js'
 import { CLI_PROVIDERS } from '../agents/providers.js'
 import { closeAgentDb } from '../db/agentDb.js'
 import type { RunContext } from '../runtime/context.js'
 import { agentMcpServers } from '../vault/runtime.js'
 
-export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; close: () => Promise<void> }> {
+export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; deferredMcp?: DeferredMcpTools; close: () => Promise<void> }> {
     const cfg = ctx.agent.config.tools
     const tools: ToolSet = {}
     if (ctx.agent.config.kind === 'foreman') Object.assign(tools, foremanTools(ctx), agentFilesTools())
@@ -76,10 +77,21 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; clo
     if (hasPendingSetup(ctx.agent)) Object.assign(tools, installTools(ctx))
 
     // The connections are the pool's, kept across runs: the run's close leaves them open.
-    if (!CLI_PROVIDERS.has(ctx.provider) && agentMcpServers(ctx.agent).length > 0) Object.assign(tools, await pooledMcpTools(ctx.agent))
+    let deferredMcp: DeferredMcpTools | undefined
+    if (!CLI_PROVIDERS.has(ctx.provider) && agentMcpServers(ctx.agent).length > 0) {
+        const servers = await pooledMcpServers(ctx.agent)
+        const mcpTools = pooledMcpToolSet(servers)
+        Object.assign(tools, mcpTools)
+        // Too heavy to ride along on every step: the run sends the ones the model loads.
+        if (mcpToolsAreDeferred(mcpTools)) {
+            deferredMcp = { catalog: mcpToolCatalog(servers).filter(entry => entry.name !== MCP_SEARCH_TOOL), loaded: new Set() }
+            Object.assign(tools, mcpSearchTool(deferredMcp))
+        }
+    }
 
     return {
         tools,
+        deferredMcp,
         // The shared database is one handle for the whole process, so it is deliberately left
         // open: closing it here would break a run another agent still has in flight.
         close: async () => {
