@@ -93,7 +93,7 @@ class ReviewSha(unittest.TestCase):
         self.assertTrue(G.REVIEW_RE.match(bodies[0]))
 
     def test_a_proof_of_twenty_asks_is_posted_whole(self):
-        note = "\n".join("ASK %d: MET tools/factory/planning.py:%d test_number_%d shows it holds" % (n, 300 + n, n) for n in range(1, 21))
+        note = "\n".join("ASK %d: MET tools/factory/planning.py:%d test_number_%d shows it holds for the queue, the copy and the head" % (n, 300 + n, n) for n in range(1, 21))
         posted, out = [], io.StringIO()
 
         def fake_run(cmd, *a, **k):

@@ -496,13 +496,16 @@ def post_status(code, post=_post):
         print("status not posted: %s" % e, file=sys.stderr)
 
 
+NOTE_MAX = 60000
+
+
 def review(a):
     if len(a) < 3 or a[2] not in ("ACCEPT", "REJECT") or "--as" not in a or "--note" not in a:
         print("usage: review <repo> <PR> ACCEPT|REJECT --as <NAME> --note '<text>' [--sha <head commit you read>]")
         return 2
     full, n = F.repo_full(a[0]), a[1].lstrip("#")
     name = a[a.index("--as") + 1].upper()
-    note = a[a.index("--note") + 1][:1500]
+    note = a[a.index("--note") + 1][:NOTE_MAX]
     if not re.fullmatch(r"[A-Z][A-Z0-9_-]*", name):
         print("--as must be a name like LINUS, BRUCE")
         return 2

@@ -1199,6 +1199,8 @@ class Dispatcher:
             if out is None:
                 return
             kind, why = proof.judge(out, len(j["asks"]), j["head"])
+            if kind == "none" and final_line(out, ("PROOF:",)):
+                kind, why = self.posted_proof(j, out, kind, why)
             if kind == "plan":
                 return self.end(j, "returned", "plan: proof: " + why[:180], plan_lines=why)
             if kind == "pass":
@@ -1218,6 +1220,17 @@ class Dispatcher:
                 self.senior(j, "proof failed: " + why[:300], "The proof of this pull request failed: %s.\n%s" % (why, str(out)[-1300:]))
             else:
                 self.end(j, "rejected", "proof: " + why[:190])
+
+    def posted_proof(self, j, out, kind, why):
+        try:
+            comments = json.loads(self.gh(["pr", "view", str(j["pr"]), "-R", self.repo, "--json", "comments"])).get("comments") or []
+        except (Error, ValueError):
+            return kind, why
+        lines = proof.posted([c.get("body") for c in comments], j["head"])
+        if not lines:
+            return kind, why
+        got = proof.judge("%s\n%s" % (lines, final_line(out, ("PROOF:",))), len(j["asks"]), j["head"])
+        return got if got[0] != "none" else (kind, why)
 
     def blocked(self, j, out):
         why = self.not_met_reason(j, out)

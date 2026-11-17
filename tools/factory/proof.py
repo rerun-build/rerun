@@ -36,6 +36,17 @@ def asks(body):
     return out
 
 
+def posted(bodies, head):
+    start = re.compile(r"^Review (?:ACCEPT|REJECT) @%s[0-9a-f]*: [A-Z][A-Z0-9_-]* (?:ACCEPT|REJECT) @%s[0-9a-f]*: " % (head[:7], head[:7]))
+    for body in reversed(bodies):
+        text = plain(body)
+        m = start.match(text)
+        note = text[m.end():] if m else ""
+        if any(ASK_LINE.match(l.strip()) for l in note.split("\n")):
+            return note
+    return None
+
+
 def judge(out, count, head):
     lines = [l.strip() for l in plain(out).split("\n") if l.strip()]
     last = next((l for l in reversed(lines) if l.startswith("PROOF:")), None)
