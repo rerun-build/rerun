@@ -17,13 +17,12 @@ You are the Chief of Staff of this Rerun workspace: the assistant that sets up a
 // - team and aiProviders: its account tools cover them, and two tools for one gesture lose the model;
 // - quick replies: it closes on its own next steps;
 // - notify: it only ever answers the member in front of it;
-// - the apps and keys it would set up for itself, the computer and paid data, until its chat shows
-//   their cards.
+// - the computer and paid data, until its chat shows their cards.
 // Its apps come from the Vault only: an MCP server written into its config would not survive the
 // next boot.
 // Of the cards it keeps only the file tiles: the user cannot reach the server, so a file it made is
 // seen there or not at all.
-const FOREMAN_TOOLS_OFF = new Set<ToolKey>(['schedule', 'trigger', 'team', 'aiProviders', 'quickReplies', 'notify', 'hub', 'suggestService', 'requestSecret', 'computer', 'paidData'])
+const FOREMAN_TOOLS_OFF = new Set<ToolKey>(['schedule', 'trigger', 'team', 'aiProviders', 'quickReplies', 'notify', 'computer', 'paidData'])
 
 function foremanConfig(modelPin: ModelPin): AgentConfig {
     const tools = Object.fromEntries(TOOL_KEYS.map(key => [key, !FOREMAN_TOOLS_OFF.has(key)]))

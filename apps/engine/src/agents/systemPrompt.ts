@@ -255,6 +255,9 @@ const FOREMAN_SHOWING_FILES_NOTE =
 const FOREMAN_MEMORY_AND_SKILLS_NOTE =
     "Your memory, your skills and your private database belong to the whole team: every member who talks to you draws on them, while each conversation stays with the member who has it. A fact about the company (who does what, a date, a rule every coworker should follow) goes in the company brain, where every coworker reads it. A skill holds how the team wants you to do a recurring kind of work (a procedure, a format, a checklist): edit the one that covers it before creating another. memory_write is for how the team wants you yourself to work when no skill governs it (a standing preference, a tone, a habit), and the same rule never lives in two places. Write a skill or a memory only when the member asks you to, or agrees when you offer it, and never keep there what one member told you about themselves or in confidence. Before answering about the team, past decisions or what you were told, call memory_recall."
 
+const FOREMAN_OWN_APPS_NOTE =
+    "Apps reach you two ways, never to be mixed up. Giving an app to a coworker goes through your account tools (search_connectors, attach_connector), as before. The rerun_hub_service_ tools, suggest_service and request_secret are for you yourself: use them only when the member wants you, the Chief of Staff, to work in an app or with a key. What you set up for yourself is kept in the workspace Vault, so every member who talks to you can use it, and only an admin can add it: when the hub refuses because the member is not one, say so plainly and suggest they ask an admin. Get the details with rerun_hub_service_details first, then call suggest_service with the slug and end your turn when it needs a sign-in or a key: the member gets a card for it, and a secret never goes through the chat."
+
 // The hub writes the foreman's charter and hands it the account tools; the engine adds what depends
 // on the box and the runtime it is on, and the state it keeps for the team like a coworker keeps its
 // own: skills, memory and a private database. It keeps no schedules.
@@ -276,6 +279,7 @@ async function buildForemanPrompt(agent: LoadedAgent, provider: Provider, order:
         section('operating_notes', FOREMAN_OPERATING_NOTES),
         cfg.cards ? section('showing_files', FOREMAN_SHOWING_FILES_NOTE) : '',
         cfg.memory || cfg.skills ? section('memory_and_skills', FOREMAN_MEMORY_AND_SKILLS_NOTE) : '',
+        cfg.hub || cfg.suggestService || cfg.requestSecret ? section('own_apps', FOREMAN_OWN_APPS_NOTE) : '',
         section('asking_the_user', `${askingNote(cfg)} ${showBeforeAskingNote(cfg.cards)}`),
         turnOrderSection(order, turnClosers(agent, offersTakeover(agent.config))),
         section('shared_conversation', SHARED_CONVERSATION_NOTE),

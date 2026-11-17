@@ -110,8 +110,14 @@ describe('foreman', () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['schedule_create', 'trigger_create', 'notify_user', 'skill_propose', 'soul_update', 'install_complete', 'team_status', 'computer', 'suggest_service', 'request_secret']) expect(names).not.toContain(name)
-        expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
+        for (const name of ['schedule_create', 'trigger_create', 'notify_user', 'skill_propose', 'soul_update', 'install_complete', 'team_status', 'computer']) expect(names).not.toContain(name)
+    })
+
+    it('sets up its own apps and keys the way a coworker does, through the hub and the Vault', async () => {
+        const { tools, close } = await foremanToolSet()
+        const names = Object.keys(tools)
+        await close()
+        expect(names).toEqual(expect.arrayContaining(['rerun_hub_service_search', 'rerun_hub_service_details', 'rerun_hub_service_install', 'suggest_service', 'request_secret']))
     })
 
     it('draws on the Vault entries attached to it, the only place its apps can live', async () => {
@@ -198,6 +204,8 @@ describe('foreman', () => {
         expect(prompt).not.toContain('You cannot write the brain.')
         expect(prompt).toContain('<memory_and_skills>')
         expect(prompt).toContain('<database>')
+        expect(prompt).toContain('<own_apps>')
+        expect(prompt).toContain('attach_connector')
         expect(prompt).not.toContain('<verbosity>')
         expect(prompt).not.toContain('<scheduled_tasks>')
     })
