@@ -222,7 +222,7 @@ def build_snapshot(store, cfg, now, holds_active, beat=0, read_epic=None, planni
     snap = {"version": 1, "madeAt": iso(now), "beat": beat, "repo": cfg["repo"],
             "jobs": [_job(store, cfg, names, j) for j in kept], "holds": holds_list, "pools": pool_list,
             "endedToday": ended_today, "epics": _epics(store, kept, read_epic),
-            "digest": digest.build(store, cfg, now), "runStats": _run_stats(store, now)}
+            "digest": digest.build(store, cfg, now, plan=plan), "runStats": _run_stats(store, now)}
     if plan:
         snap["plan"] = plan
     if planning:

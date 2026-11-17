@@ -6,6 +6,7 @@ import cutshape
 import limits as L
 import states
 import tokenstats
+import weights
 
 STATIONS = (("build", "queued", "building"), ("review", "review_wait", "reviewing"),
             ("fix", "fix_wait", "fixing"), ("proof", "proof_wait", "proving"))
@@ -166,7 +167,21 @@ def planners(store, now):
     return tokenstats.planners(jobs, fires, now)
 
 
-def bar(store, now):
+def fire_rows(store):
+    return [dict(r) for r in store.db.execute(
+        "SELECT stage, model, thinking, tokens_in, tokens_out, cache_read, cache_write, intent_at FROM fires")]
+
+
+def priced_fires(store, table):
+    out = []
+    for r in fire_rows(store):
+        units, _ = weights.units(r, table)
+        out.append({"at": L.ts(r["intent_at"]), "tokens": (r["tokens_in"] or 0) + (r["tokens_out"] or 0), "units": units,
+                    "stage": r["stage"], "model": r["model"], "thinking": r["thinking"]})
+    return out
+
+
+def bar(store, now, table=None):
     jobs = []
     for j in store.jobs():
         if j["state"] != "merged":
@@ -177,8 +192,7 @@ def bar(store, now):
             continue
         jobs.append({"job": str(j["issue"]), "merged_at": L.ts(into[-1]["at"]), "dev_result": j.get("dev_result"),
                      "fix_rounds": sum(1 for t in rows if t["to_state"] == "fix_wait"), "replans": j.get("replans") or 0})
-    fires = [{"at": L.ts(r[2]), "tokens": (r[0] or 0) + (r[1] or 0)}
-             for r in store.db.execute("SELECT tokens_in, tokens_out, intent_at FROM fires")]
+    fires = priced_fires(store, table)
     escaped = []
     for raw in store.get_all("escaped").values():
         try:
@@ -188,6 +202,62 @@ def bar(store, now):
         except Exception:
             continue
     return tokenstats.bar(jobs, fires, escaped, now)
+
+
+def station(stage):
+    words = (stage or "").split()
+    return words[0] if words else "unknown"
+
+
+def split_rows(fires, name_of, solved, cut):
+    groups = {}
+    for f in fires:
+        g = groups.setdefault(name_of(f), [0, 0, 0.0])
+        g[0] += 1
+        g[1] += f["tokens"]
+        g[2] += f["units"]
+    return [{"name": name, "runs": runs, "tokens": tokens, "units": round(units, 4),
+             "unitsPerIssue": round(units / solved, 4) if solved else None}
+            for name, (runs, tokens, units) in sorted(groups.items())][:cut]
+
+
+def read_plan_reading(store):
+    try:
+        kept = json.loads(store.get_all("-").get("plan_reading") or "null")
+    except ValueError:
+        return None
+    ok = isinstance(kept, dict) and isinstance(kept.get("day"), str) and isinstance(kept.get("at"), (int, float)) \
+        and isinstance(kept.get("pct"), (int, float))
+    return kept if ok else None
+
+
+def calibration(store, now, plan, fires):
+    uncalibrated = {"state": "uncalibrated", "unitsPerPlanPercent": None}
+    pct = plan.get("weekUsedPercent") if isinstance(plan, dict) else None
+    if not isinstance(pct, (int, float)) or isinstance(pct, bool):
+        return uncalibrated
+    today = time.strftime("%Y-%m-%d", time.gmtime(now))
+    kept = read_plan_reading(store)
+    if kept is None or kept["day"] != today or pct < kept["pct"]:
+        store.set("-", "plan_reading", json.dumps({"day": today, "at": now, "pct": pct}))
+        return uncalibrated
+    if pct <= kept["pct"]:
+        return uncalibrated
+    units = sum(f["units"] for f in fires if f["at"] >= kept["at"])
+    return {"state": "calibrated", "unitsPerPlanPercent": round(units / (pct - kept["pct"]), 4)}
+
+
+def cost(store, now, table, plan):
+    fires = [f for f in priced_fires(store, table) if 0 <= now - f["at"] <= MEASURE_WINDOW_S]
+    solved = bar(store, now, table)["day"]["solvedGreen"]
+    total = sum(f["units"] for f in fires)
+    models = (table or {}).get("models") or {}
+    return {"perIssue": round(total / solved, 4) if solved else None,
+            "byStation": split_rows(fires, lambda f: station(f["stage"]), solved, 12),
+            "byModel": split_rows(fires, lambda f: f["model"] or "unknown", solved, 12),
+            "byThinking": split_rows(fires, lambda f: f["thinking"] or "none", solved, 6),
+            "unweighed": sorted({f["model"] or "unknown" for f in fires} - set(models))[:12],
+            "calibration": calibration(store, now, plan, fires)}
 
 
 def causes(store, now):
@@ -242,11 +312,12 @@ def issues(store, now):
     return {"open": counts, "classifiedToday": since("at"), "joinedToday": since("joined")}
 
 
-def build(store, cfg, now):
+def build(store, cfg, now, plan=None):
+    table = weights.load()
     return {"stations": stations(store, now), "threads": threads(store),
             "anomalies": anomalies(store, cfg, now), "measures": measures(store, now), "planners": planners(store, now),
             "issues": issues(store, now),
-            "bar": bar(store, now), "causes": causes(store, now)}
+            "bar": bar(store, now, table), "causes": causes(store, now), "cost": cost(store, now, table, plan)}
 
 
 def block(d):
