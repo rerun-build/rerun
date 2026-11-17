@@ -731,9 +731,12 @@ class Clocks(Base):
 
     def test_build_and_fix_briefs_name_the_plan_line(self):
         j = {"issue": 5, "title": "T", "pr": 1, "review": "r"}
-        line = "If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>."
-        self.assertIn(line, D.build_brief(j))
-        self.assertIn(line, D.fix_brief(j, 1, "r"))
+        line = "If the plan itself is wrong (a file outside its paths that is not such a test, a test it cannot write), end with BLOCKED: plan: <why>."
+        for brief in (D.build_brief(j), D.fix_brief(j, 1, "r"), D.senior_brief(j, 1, "r")):
+            self.assertIn(line, brief)
+            self.assertIn("## Tests adapted", brief)
+        self.assertIn("## Tests adapted", D.review_brief(j, 1, "abcdef1234"))
+        self.assertIn("## Tests adapted", D.proof_brief(j, 1, "abcdef1234", ["x"]))
 
 
 class Cut(BaseException):

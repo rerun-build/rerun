@@ -162,6 +162,13 @@ def stale_paragraph(j):
     ]
 
 
+TESTS_ADAPTED = ('One exception to the files the issue names: when the change the issue specifies makes an existing test outside its Files fail, '
+                 'change that test only as far as the specified change requires, never to let a wrong behaviour pass, and list each such test file '
+                 'in the pull request body under the heading `## Tests adapted`, one line each: "- `path`: why the specified change makes it wrong". '
+                 'pr-open lets an existing test file listed there through; a new file, a deleted test or a file that is not a test still has to be in Files. '
+                 'A fix round reads the list from the pull request as it stands and cannot add to it.')
+
+
 def build_brief(j):
     return "\n".join([
         'One job, sent by the dispatcher and not by Boss: rerun #%s, "%s". You work alone on it: call no other coworker, not Boss either, and send no question to Rob.' % (j["issue"], j["title"]),
@@ -179,7 +186,8 @@ def build_brief(j):
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
         *(stale_paragraph(j) if j.get("stale") else []),
-        'If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>.',
+        TESTS_ADAPTED,
+        'If the plan itself is wrong (a file outside its paths that is not such a test, a test it cannot write), end with BLOCKED: plan: <why>.',
         '',
         'If the issue text is wrong or cannot be done as written, do not improvise: end with BLOCKED and the reason. Never merge, never deploy, never touch the live server, and print nothing from a key file. On GitHub write coworker names without the at-sign.',
         '',
@@ -226,6 +234,8 @@ def review_brief(j, pr, head):
         '',
         NO_COMMENTS_REVIEW,
         '',
+        'When the pull request body has a `## Tests adapted` section, judge every test file listed there: it may change only what the change of the issue requires. An assertion weakened or removed without that need is wrong behaviour let through, and a REJECT.',
+        '',
         'When the diff is right and the issue is wrong (its text, its Files or its Run block), the last line is `VERDICT: REJECT (plan) @<first 7 characters>: <one sentence>`.',
         '',
         'On GitHub write coworker names without the at-sign.',
@@ -247,6 +257,8 @@ def proof_brief(j, pr, head, asks):
         *["ASK %d: %s" % (n, a) for n, a in enumerate(asks, 1)],
         '',
         'For each ask write one line: `ASK <n>: MET <evidence>` (the file and the line in the diff and the test that shows it, or the check of this commit that shows it) or `ASK <n>: NOT MET <why>`; every ask number gets exactly one line, and only an ask you found not met is NOT MET. When the diff is right and the issue is wrong (an ask the checks refuse, a file the change must touch that is not in Files, a Run line that is not in the Run block), write that ask as `ASK <n>: NOT MET (plan) <what is wrong in the issue text, its Files or its Run block>`; the job then goes back to the planner, not to the builder. A Run line is MET when the check "Done-test red before green" passed at this commit: that check ran every Run line of the issue at this commit and passes only when each one passes there and the done-test fails on dev\'s code; name the test file and line the Run line runs. When the issue carries `**Red before green**: not applicable`, that check runs the Run lines at this commit only, without the run on dev\'s code: a Run line is MET when the check reports that the Run lines pass at the head (name the check and the line).',
+        '',
+        'When the pull request body has a `## Tests adapted` section, read every test file listed there: it must still assert what the issue asks for. An ask whose test was weakened to pass is NOT MET.',
         '',
         'Post those lines on the pull request with your review tool, and write the same lines in your answer, above your last line: the dispatcher reads your answer, not the pull request.',
         *(['', 'Your last answer could not be read: %s. Write every ASK line in the answer itself.' % j["proof_why"]] if j.get("proof_why") and j.get("proof_why_head") == head else []),
@@ -270,7 +282,8 @@ def fix_brief(j, pr, review):
         NO_COMMENTS,
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
-        'If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>.',
+        TESTS_ADAPTED,
+        'If the plan itself is wrong (a file outside its paths that is not such a test, a test it cannot write), end with BLOCKED: plan: <why>.',
         '',
         final_state(j, '`PUSHED: <first 7 characters of the new commit>` or `BLOCKED: <one sentence>`'),
         TAIL,
@@ -292,7 +305,8 @@ def senior_brief(j, pr, review):
         NO_COMMENTS,
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
-        'If the plan itself is wrong (a file outside its paths, a test it cannot write), end with BLOCKED: plan: <why>.',
+        TESTS_ADAPTED,
+        'If the plan itself is wrong (a file outside its paths that is not such a test, a test it cannot write), end with BLOCKED: plan: <why>.',
         '',
         final_state(j, '`PUSHED: <first 7 characters of the new commit>` or `BLOCKED: <one sentence>`'),
         TAIL,
