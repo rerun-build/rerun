@@ -1,6 +1,6 @@
 'use client'
 
-import { OnboardingHeading } from '@/components/onboarding/OnboardingShell'
+import { OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
 import { Button } from '@/components/ui/button'
 import { ArrowLeftIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
@@ -8,17 +8,16 @@ import type { ReactNode } from 'react'
 
 export type StepAction = { label: string; onClick: () => void; disabled?: boolean; loading?: boolean }
 
-// One step of the welcome page: what it asks, read first in a large title, then the answer, then the
-// way forward. The column of the onboarding page is the whole surface, so there is no card around it.
+// One step of the onboarding dialog: what it asks, read first in a large title, then the answer, then
+// the way forward. The way back sits in the dialog's top left corner.
 export function StepFrame({ title, description, onBack, primary, secondary, error, children }: { title: ReactNode; description?: ReactNode; onBack?: () => void; primary?: StepAction; secondary?: StepAction; error?: string | null; children?: ReactNode }) {
     const t = useTranslations('onboarding')
     return (
         <div className="flex flex-col gap-6">
             {onBack && (
-                <button type="button" onClick={onBack} className="-ml-1 flex w-fit items-center gap-1 rounded-md px-1 text-sm text-muted-foreground transition-colors hover:text-foreground">
-                    <ArrowLeftIcon className="size-4" />
-                    {t('back')}
-                </button>
+                <Button variant="ghost" size="icon-sm" className="absolute top-3 left-3" onClick={onBack} aria-label={t('back')}>
+                    <ArrowLeftIcon />
+                </Button>
             )}
             <OnboardingHeading title={title} subtitle={description} />
             {children && <div className="min-w-0">{children}</div>}

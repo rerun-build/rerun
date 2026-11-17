@@ -3,7 +3,7 @@
 import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersAction } from '@/app/api/_actions/welcome-engine.actions'
 import { finishWelcomeTeamAction, guessWelcomeIndustryAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction } from '@/app/api/_actions/welcome.actions'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
-import { StepSwap } from '@/components/onboarding/StepSwap'
+import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
 import { IndustryStep, type IndustryAnswer } from '@/components/onboarding/welcome/IndustryStep'
@@ -14,11 +14,8 @@ import { TrialStep } from '@/components/onboarding/welcome/TrialStep'
 import { useErrorText } from '@/hooks/useErrorText'
 import type { ActionFailure } from '@/lib/i18n/action-error'
 import { rolesForIndustry } from '@/lib/onboarding/intake'
-import { siteDomain } from '@/lib/onboarding/site-favicon'
 import type { OnboardingStep } from '@/lib/onboarding/step'
 import { useBillingStore } from '@/stores/billing.store'
-import { useDiscoveriesStore } from '@/stores/discoveries.store'
-import { useOnboardingSceneStore } from '@/stores/onboarding-scene.store'
 import { track } from '@rerun/analytics/client'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import type { TemplateCategory } from '@rerun/contracts'
@@ -44,19 +41,19 @@ const QUESTIONS: QuestionStep[] = ['site', 'industry', 'role', 'team']
 const ENGINE_PATIENCE_MS = 90_000
 const ENGINE_POLL_MS = 2_000
 
-// The four questions, one at a time: each answer is saved as it is given and moves to the next, the
-// board staffing itself beside them. A number still owed after a Google sign-up is asked first. Then
-// the trial, through today's checkout, and the machine, whose milestones the Chief of Staff's orb
-// reads out before it hands them over to the app. `afterQuestions` is the step the server resolved
-// for the end of the questions: the trial, or the machine where the workspace is already entitled or
-// nothing is sold. With no machine left in the pool, the waitlist wall stands before the trial.
+// The four questions, one at a time in the onboarding dialog: each answer is saved as it is given and
+// moves to the next. A number still owed after a Google sign-up is asked first. Then the trial,
+// through today's checkout, and the machine, whose milestones the Chief of Staff's orb reads out
+// before it hands them over to the app. `afterQuestions` is the step the server resolved for the end
+// of the questions: the trial, or the machine where the workspace is already entitled or nothing is
+// sold. With no machine left in the pool, the waitlist wall stands before the trial. The billing
+// dialog and the waitlist wall each take the onboarding dialog's place, never open on top of it.
 export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, next, phonePending, waitlisted }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean }) {
     const errorText = useErrorText()
     const router = useRouter()
     const { phoneStep, workspace } = useSession()
     const askPhone = phonePending && phoneStep !== 'clear'
     const entitled = isSubscriptionEntitled(workspace?.subscription_status)
-    const patchScene = useOnboardingSceneStore(state => state.patch)
     const [step, setStep] = useState<OnboardingStep>(initialStep)
     const [site, setSite] = useState(initial.site)
     const [guess, setGuess] = useState<TemplateCategory | null>(initial.siteIndustry)
@@ -65,17 +62,6 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     const [invites, setInvites] = useState<SentInvite[]>(initial.invites)
     const [saving, setSaving] = useState<'site' | 'skip' | 'answer' | null>(null)
     const [error, setError] = useState<string | null>(null)
-
-    const domain = siteDomain(site)
-    const discoveries = useDiscoveriesStore(state => state.state)
-    const discoveredFor = useDiscoveriesStore(state => state.domain)
-    const companyName = discoveredFor === domain ? (discoveries.entries.flatMap(entry => (entry.type === 'finding' && entry.finding.kind === 'identity' ? [entry.finding.name] : []))[0] ?? null) : null
-
-    // The industry the board draws: the one picked, else what the site was read as.
-    const shownIndustry = industry.other ? null : (industry.industry ?? guess)
-    useEffect(() => {
-        patchScene({ company: domain ? { domain, name: companyName ?? null } : null, industry: shownIndustry, role: role.role, invites: invites.map(sent => sent.email) })
-    }, [domain, companyName, shownIndustry, role.role, invites, patchScene])
 
     const viewed = useRef<OnboardingStep | null>(null)
     useEffect(() => {
@@ -147,6 +133,17 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
         setError(null)
         saved(await finishWelcomeTeamAction(), 'team', afterQuestions, invites.length === 0)
     }
+
+    const billingOpen = useBillingStore(state => state.open)
+    const startTrial = useCallback(() => {
+        track('checkout_started', { plan: 'base', source: 'onboarding' })
+        useBillingStore.getState().openBilling(undefined, 'onboarding')
+    }, [])
+
+    // Once on arrival at the trial: a checkout they closed stays closed until they ask for it again.
+    useEffect(() => {
+        if (step === 'trial' && !waitlisted && !entitled) startTrial()
+    }, [step, waitlisted, entitled, startTrial])
 
     // The webhook writes the trial onto the workspace, which the session follows in realtime: the
     // dialog over the page is closed for them and the machine starts.
@@ -225,16 +222,19 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     ) : step === 'team' ? (
         <TeamStep invites={invites} onInvited={sent => setInvites(current => [...current, sent])} onDone={() => void finishTeam()} onBack={back} saving={answering} error={error} />
     ) : step === 'trial' ? (
-        // The waitlist wall stands over the page: the checkout would refuse the trial anyway.
-        waitlisted ? null : <TrialStep onBack={() => go('team')} />
+        <TrialStep onBack={() => go('team')} onStart={startTrial} />
     ) : (
         <EngineStep firstName={firstName} progress={engine} error={error} onRetry={() => void startEngine()} onEnter={() => void enter()} entering={entering} />
     )
 
+    const waitlistUp = waitlisted && (step === 'trial' || step === 'engine')
+
     return (
         <>
-            <StepSwap stepKey={askPhone ? 'phone' : step}>{content}</StepSwap>
-            <EngineWaitlistDialog open={waitlisted && (step === 'trial' || step === 'engine')} />
+            <OnboardingDialog open={!waitlistUp && !(step === 'trial' && billingOpen)} stepKey={askPhone ? 'phone' : step}>
+                {content}
+            </OnboardingDialog>
+            <EngineWaitlistDialog open={waitlistUp} />
         </>
     )
 }

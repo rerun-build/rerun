@@ -1,8 +1,9 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
 import { CopyLine } from '@/components/dialogs/CopyLine'
+import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
+import { DialogTitle } from '@/components/ui/dialog'
 import { writeAuthReturnCookie } from '@/lib/auth/auth-return'
 import { ENABLED_OAUTH_PROVIDERS } from '@/lib/auth/oauth-providers'
 import { startOAuthSignIn } from '@/lib/auth/oauth-sign-in'
@@ -42,11 +43,15 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
 
     if (account === null) {
         return (
-            <Card className="space-y-3 p-8">
-                <Skeleton className="h-6 w-2/3" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-10 w-full" />
-            </Card>
+            <OnboardingDialog stepKey="signed-out">
+                <div className="flex flex-col items-center gap-4">
+                    <DialogTitle className="sr-only">{t('title', { app })}</DialogTitle>
+                    <Skeleton className="size-12 rounded-xl" />
+                    <Skeleton className="h-9 w-2/3" />
+                    <Skeleton className="h-5 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                </div>
+            </OnboardingDialog>
         )
     }
 
@@ -76,34 +81,32 @@ export function DesktopHandoff({ challenge, state, channel, provider, account }:
 
     if (status === 'done' && code) {
         return (
-            <Card className="space-y-4 p-8">
-                <div className="space-y-2">
-                    <h2 className="text-xl font-semibold tracking-tight">{t('doneTitle', { app })}</h2>
-                    <p className="text-sm text-muted-foreground">{t('doneBody', { app })}</p>
+            <OnboardingDialog stepKey="done">
+                <div className="flex flex-col gap-6">
+                    <OnboardingHeading title={t('doneTitle', { app })} subtitle={t('doneBody', { app })} />
+                    <div className="space-y-1.5">
+                        <p className="text-xs font-medium text-muted-foreground">{t('codeHint', { app })}</p>
+                        <CopyLine value={code} label={t('copyCode')} />
+                    </div>
                 </div>
-                <div className="space-y-1.5">
-                    <p className="text-xs font-medium text-muted-foreground">{t('codeHint', { app })}</p>
-                    <CopyLine value={code} label={t('copyCode')} />
-                </div>
-            </Card>
+            </OnboardingDialog>
         )
     }
 
     return (
-        <Card className="space-y-6 p-8">
-            <div className="space-y-2">
-                <h2 className="text-xl font-semibold tracking-tight">{t('title', { app })}</h2>
-                <p className="text-sm text-muted-foreground break-words">{t('body', { app, account })}</p>
-                {status === 'failed' && <p className="text-sm text-destructive">{t('failed')}</p>}
+        <OnboardingDialog stepKey="confirm">
+            <div className="flex flex-col gap-6">
+                <OnboardingHeading title={t('title', { app })} subtitle={<span className="break-words">{t('body', { app, account })}</span>} />
+                {status === 'failed' && <p className="text-center text-sm text-destructive">{t('failed')}</p>}
+                <div className="flex flex-col gap-1">
+                    <Button size="lg" className="w-full" onClick={() => void approve()} loading={status === 'approving'}>
+                        {t('continue')}
+                    </Button>
+                    <Button variant="ghost" className="w-full text-muted-foreground" onClick={() => void switchAccount()} loading={switching}>
+                        {t('switchAccount')}
+                    </Button>
+                </div>
             </div>
-            <div className="flex flex-col gap-2">
-                <Button className="w-full" onClick={() => void approve()} loading={status === 'approving'}>
-                    {t('continue')}
-                </Button>
-                <Button variant="ghost" className="w-full" onClick={() => void switchAccount()} loading={switching}>
-                    {t('switchAccount')}
-                </Button>
-            </div>
-        </Card>
+        </OnboardingDialog>
     )
 }

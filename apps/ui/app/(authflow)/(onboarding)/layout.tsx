@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import { OnboardingShell } from '@/components/onboarding/OnboardingShell'
-import { loadStarterTeams } from '@/lib/onboarding/board-teams.server'
+import { AppBackdrop } from '@/components/onboarding/AppBackdrop'
 import { getTranslations } from 'next-intl/server'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -8,6 +7,12 @@ export async function generateMetadata(): Promise<Metadata> {
     return { title: t('metaTitle'), description: t('metaDescription') }
 }
 
-export default async function OnboardingLayout({ children }: { children: React.ReactNode }) {
-    return <OnboardingShell teams={await loadStarterTeams()}>{children}</OnboardingShell>
+// The app stays behind while the page's dialog signs them in and asks its questions.
+export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="h-dvh w-full overflow-hidden bg-background text-foreground selection:bg-primary/20">
+            <AppBackdrop />
+            {children}
+        </div>
+    )
 }

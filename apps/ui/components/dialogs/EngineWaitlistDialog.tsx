@@ -26,7 +26,7 @@ export function EngineWaitlistDialog({ open }: { open: boolean }) {
 
     return (
         <Dialog open={open} dismissible={false}>
-            <DialogContent className="gap-0 overflow-hidden bg-background p-0 sm:h-[min(42rem,90dvh)] sm:w-[min(92vw,34rem)] sm:max-w-none sm:rounded-2xl" showCloseButton={false} onEscapeKeyDown={e => e.preventDefault()} onPointerDownOutside={e => e.preventDefault()} onInteractOutside={e => e.preventDefault()}>
+            <DialogContent className="gap-0 overflow-hidden bg-background p-0 sm:w-[min(92vw,34rem)] sm:max-w-none sm:rounded-2xl" showCloseButton={false} onEscapeKeyDown={e => e.preventDefault()} onPointerDownOutside={e => e.preventDefault()} onInteractOutside={e => e.preventDefault()}>
                 <AuthShell title={t('title')} subtitle={t('subtitle')} titleAs={DialogTitle} variant="dialog">
                     <div className="space-y-4 text-center">
                         {email && (

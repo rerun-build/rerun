@@ -1,5 +1,5 @@
 import { isPkceChallenge } from '@/app/api/_services/desktop-auth.service'
-import { Card } from '@/components/ui/card'
+import { OnboardingDialog, OnboardingHeading } from '@/components/onboarding/OnboardingDialog'
 import { createClient } from '@/supabase/server'
 import { isDesktopShellChannel, type DesktopSignInProvider } from '@rerun/contracts'
 import { getTranslations } from 'next-intl/server'
@@ -16,10 +16,9 @@ export default async function DesktopAuthPage({ searchParams }: { searchParams: 
     const t = await getTranslations('desktopShell.handoff')
     if (!isPkceChallenge(challenge) || !state || !STATE_PATTERN.test(state) || !isDesktopShellChannel(channel)) {
         return (
-            <Card className="space-y-2 p-8">
-                <h2 className="text-xl font-semibold tracking-tight">{t('invalidTitle')}</h2>
-                <p className="text-sm text-muted-foreground">{t('invalidBody')}</p>
-            </Card>
+            <OnboardingDialog stepKey="invalid">
+                <OnboardingHeading title={t('invalidTitle')} subtitle={t('invalidBody')} />
+            </OnboardingDialog>
         )
     }
     const { data } = await (await createClient()).auth.getUser()
