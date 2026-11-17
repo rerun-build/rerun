@@ -219,6 +219,33 @@ class Intake(Base):
         self.assertFalse(any("git/trees" in " ".join(c) for c in self.w.gh_calls))
         self.assertIn("5", self.job_ids())
 
+    def needs_dep_file(self):
+        return BODY.replace('-p "test_x.py"', '-p "test_dep.py"')
+
+    def with_tree(self, paths):
+        real = plancheck.tree
+        self.addCleanup(setattr, plancheck, "tree", real)
+        self.tree = set(paths)
+        plancheck.tree = lambda gh, repo: self.tree
+
+    def test_a_refused_issue_is_taken_once_dev_has_the_file_it_named(self):
+        self.with_tree(["tools/factory/x.py"])
+        self.w.issues = [{"number": 5, "title": "Fix x", "body": self.needs_dep_file(), "comments": []}]
+        self.tick(2)
+        self.assertEqual(len(self.plan_comments()), 1)
+        self.assertNotIn("5", self.job_ids())
+        self.tree.add("tools/factory/test_dep.py")
+        self.tick()
+        self.assertIn("5", self.job_ids())
+        self.assertEqual(len(self.plan_comments()), 1)
+
+    def test_an_issue_that_waits_on_another_is_not_judged_before_that_one_is_done(self):
+        self.with_tree(["tools/factory/x.py"])
+        self.w.issues = [{"number": 5, "title": "Fix x", "body": self.needs_dep_file().replace("**Depends on**: none", "**Depends on**: #7"), "comments": []}]
+        self.tick()
+        self.assertEqual(self.plan_comments(), [])
+        self.assertEqual(self.d.store.get_job("5")["state"], "waiting")
+
     def test_a_changed_text_is_checked_again(self):
         self.w.issues = [{"number": 5, "title": "Fix x", "body": self.bad_body(), "comments": []}]
         self.tick()

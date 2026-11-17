@@ -697,8 +697,6 @@ class Dispatcher:
                         self.store.set(str(i["number"]), "cutshape", digest)
                         log(i["number"], "not started: the issue text is not readable (%d problem%s)" % (len(errors), "" if len(errors) == 1 else "s"))
                     continue
-                if self.plan_check(i, tree) is None:
-                    continue
                 parsed = cutshape.parse(i)
                 if parsed["worker"] not in ("coder", "researcher", "designer") or parsed["worker"] not in pools.types(self.cfg):
                     t = parsed["worker"]
@@ -739,6 +737,8 @@ class Dispatcher:
                                 self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", dead_comment(dead)])
                             self.store.set(str(i["number"]), "dead_deps", digest)
                         continue
+                if self.plan_check(i, tree) is None:
+                    continue
                 held = self.cfg.get("one_file_one_job") and self.file_holder(i["number"], parsed["paths"])
                 if held:
                     if not old or old.get("file_wait") != list(held):
@@ -779,20 +779,19 @@ class Dispatcher:
         return hashlib.sha256((i.get("body") or "").encode()).hexdigest()[:16]
 
     def plan_settled(self, i):
-        return self.store.get_all(str(i["number"])).get("plancheck", "").startswith(self.plan_key(i) + ":")
+        return self.store.get_all(str(i["number"])).get("plancheck", "") == self.plan_key(i) + ":ok"
 
     def plan_check(self, i, tree):
         kv = self.store.get_all(str(i["number"])).get("plancheck", "")
         key = self.plan_key(i)
         if kv == key + ":ok":
             return []
-        if kv == key + ":bad":
-            return None
         found = plancheck.faults(i, tree)
         if found:
-            self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", plancheck.comment(found)])
-            log(i["number"], "not started: the plan check found %d fault%s" % (len(found), "" if len(found) == 1 else "s"))
-            self.store.set(str(i["number"]), "plancheck", key + ":bad")
+            if kv != key + ":bad":
+                self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", plancheck.comment(found)])
+                log(i["number"], "not started: the plan check found %d fault%s" % (len(found), "" if len(found) == 1 else "s"))
+                self.store.set(str(i["number"]), "plancheck", key + ":bad")
             return None
         self.store.set(str(i["number"]), "plancheck", key + ":ok")
         return []
