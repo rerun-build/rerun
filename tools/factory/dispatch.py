@@ -943,6 +943,9 @@ class Dispatcher:
             return self.clock_check(j, r)
         j.setdefault("warm", {})[j["agent"]] = [j["copy"], self.now()]
         self.record_tokens(j, r)
+        ended = r.get("finishedAt")
+        self.store.close_run(j["run"], {"done": "done", "cancelled": "cancelled"}.get(r.get("status"), "error"),
+                             at=ended if isinstance(ended, str) and ended else None, **self.kept_tokens(j["run"]))
         if r.get("status") == "done":
             self.strike(j, True)
             j["attempt"] = 1
