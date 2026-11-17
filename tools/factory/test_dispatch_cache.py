@@ -18,6 +18,20 @@ class RunCache(T.Base):
         self.tick()
         self.assertEqual(self.w.rows(COUNTS, rid), [(1200, 300, 900)])
 
+    def test_a_done_run_is_closed_in_the_ledger_with_the_time_it_ended(self):
+        self.tick()
+        rid = self.finish_with("b1", T.PR_LINE, 1200, 300, 900)
+        self.w.runs[rid]["finishedAt"] = "2026-11-17T10:00:00.250Z"
+        self.tick()
+        self.assertEqual(self.w.rows("SELECT status, ended_at, tokens_in, tokens_out, cache_read FROM fires WHERE run_id=?", rid),
+                         [("done", "2026-11-17T10:00:00.250Z", 1200, 300, 900)])
+
+    def test_an_errored_run_is_closed_as_an_error_and_keeps_its_counts(self):
+        self.tick()
+        rid = self.finish_with("b1", "", 400, 9, 250, status="error")
+        self.tick()
+        self.assertEqual(self.w.rows("SELECT status, ended_at IS NOT NULL, tokens_in FROM fires WHERE run_id=?", rid), [("error", 1, 400)])
+
     def test_an_errored_run_keeps_its_cached_input_tokens(self):
         self.tick()
         rid = self.finish_with("b1", "", 400, 9, 250, status="error")
