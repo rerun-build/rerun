@@ -983,6 +983,9 @@ class Dispatcher:
             j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
+        note = j.pop("handover", None)
+        if j.get("agent") != agent:
+            note = None
         if state == "building" and self.store.get_all("-").get("room_probe") == "1":
             holds.arm(self.store, self.store.get_all("-").get("room_kind") or "load", self.now() + ROOM_PROBE_S)
             self.store.set("-", "room_probe", "sent")
@@ -992,6 +995,8 @@ class Dispatcher:
         j["brief_v"] = failures.version(state)
         if j["brief_v"] is not None:
             self.store.keep_brief(j["brief_v"], state, message)
+        if note:
+            message = "Continue from your handover note: %s. Read it first; do not redo what it marks done.\n\n%s" % (note, message)
         j["intent_at"] = iso(self.now())
         j["fire_id"] = self.store.intent(str(j["issue"]), "", step, coworker=self.names.get(agent, agent), at=j["intent_at"],
                                          model=(j.get("run_model") or {}).get("model"), thinking=(j.get("run_model") or {}).get("thinkingLevel"))
@@ -1032,6 +1037,7 @@ class Dispatcher:
         if r.get("status") == "running":
             return self.clock_check(j, r)
         j.setdefault("warm", {})[j["agent"]] = [j["copy"], self.now()]
+        j["handover"] = None if r.get("status") == "done" else r.get("handoverPath")
         self.record_tokens(j, r)
         ended = r.get("finishedAt")
         self.store.close_run(j["run"], {"done": "done", "cancelled": "cancelled"}.get(r.get("status"), "error"),
@@ -1163,6 +1169,7 @@ class Dispatcher:
         log(j["issue"], "%s; cancelled (wasRunning %s)" % (why, c.get("wasRunning")))
         self.store.close_run(j["run"], "cancelled", error=why[:200])
         self.strike(j, False)
+        j["handover"] = r.get("handoverPath")
         return self.failed_attempt(j, why, "cancel")
 
     def transient(self, j, reason, room=False):

@@ -204,6 +204,7 @@ const RUN_GOAL_COLUMNS = [
     'goal_verdicts_json TEXT',
 ]
 const RUN_COMPACTION_COLUMNS = ['compactions INTEGER', 'compact_summary_chars INTEGER', 'compact_at_tokens INTEGER']
+const RUN_HANDOVER_COLUMNS = ['handover_path TEXT']
 const RUN_STEP_CACHE_COST_COLUMNS = ['cache_write_tokens INTEGER', 'cost_micros INTEGER']
 const RUN_STEP_EFFORT_COLUMNS = ['effort TEXT']
 
@@ -301,6 +302,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'run-compactions',
         up: async client => {
             await ensureColumns(client, 'runs', RUN_COMPACTION_COLUMNS)
+        },
+    },
+    {
+        version: 10,
+        id: 'run-handover',
+        up: async client => {
+            await ensureColumns(client, 'runs', RUN_HANDOVER_COLUMNS)
         },
     },
 ]

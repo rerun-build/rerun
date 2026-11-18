@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Query } from 'ai-sdk-provider-claude-code'
-import { claudeContextCapture } from './claude-context.js'
+import { claudeContextCapture, handoverNote } from './claude-context.js'
 import { forgetPlanLimits, readPlanLimits } from '../connections/plan-limits.js'
 
 function fakeQuery(getContextUsage: () => Promise<unknown>): Query {
@@ -117,8 +117,45 @@ describe('claudeContextCapture compaction hook', () => {
         ])
     })
 
+    it('has no PreCompact hook and no summary in the event without a handover', async () => {
+        const seen: unknown[] = []
+        const capture = claudeContextCapture(undefined, e => seen.push(e))
+        expect(capture.settings.hooks!.PreCompact).toBeUndefined()
+        await capture.settings.hooks!.PostCompact![0]!.hooks[0]!({ trigger: 'auto', compact_summary: 'abc' })
+        expect(seen).toEqual([{ trigger: 'auto', summaryChars: 3 }])
+    })
+
     it('works without a listener', async () => {
         const hook = claudeContextCapture().settings.hooks!.PostCompact![0]!.hooks[0]!
         await expect(hook({ trigger: 'auto', compact_summary: 'x' })).resolves.toEqual({ continue: true })
+    })
+})
+
+describe('handoverNote', () => {
+    it('names the agent, the run and the compaction, and lists the sections in order', () => {
+        const note = handoverNote('Boss', 'run42', 3)
+        expect(note.split('\n')).toContain('HANDOVER Boss run42 3')
+        const sections = ['Task:', 'Done:', 'Left:', 'Decisions:', 'Open questions:', 'Files:'].map(s => note.indexOf(s))
+        expect(sections.every(i => i > 0)).toBe(true)
+        expect([...sections].sort((a, b) => a - b)).toEqual(sections)
+    })
+})
+
+describe('claudeContextCapture handover', () => {
+    const handover = { agentName: 'Boss', runId: 'run42' }
+
+    it('steers each compaction with the note, numbering them from 1', async () => {
+        const capture = claudeContextCapture(undefined, undefined, handover)
+        const pre = capture.settings.hooks!.PreCompact![0]!.hooks[0]!
+        await expect(pre({ hook_event_name: 'PreCompact', trigger: 'auto' })).resolves.toEqual({ systemMessage: handoverNote('Boss', 'run42', 1) })
+        await expect(pre({ hook_event_name: 'PreCompact', trigger: 'auto' })).resolves.toEqual({ systemMessage: handoverNote('Boss', 'run42', 2) })
+    })
+
+    it('hands the summary and the compaction number to the listener', async () => {
+        const seen: unknown[] = []
+        const capture = claudeContextCapture(undefined, e => seen.push(e), handover)
+        await capture.settings.hooks!.PreCompact![0]!.hooks[0]!({ trigger: 'auto' })
+        await capture.settings.hooks!.PostCompact![0]!.hooks[0]!({ trigger: 'auto', compact_summary: 'the note' })
+        expect(seen).toEqual([{ trigger: 'auto', summaryChars: 8, summary: 'the note', handoverN: 1 }])
     })
 })

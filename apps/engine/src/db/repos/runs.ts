@@ -97,6 +97,7 @@ export async function startRun(agentId: string, sessionId: string, id: string = 
         compactions: null,
         compactSummaryChars: null,
         compactAtTokens: null,
+        handoverPath: null,
     }
     const { db } = await getSystemDb(agentId)
     await db.insert(runs).values(row)
@@ -139,7 +140,12 @@ export async function recordRunCompaction(agentId: string, id: string, summaryCh
         .where(eq(runs.id, id))
 }
 
-export type GoalVerdict = { turn: number; met: boolean; reason: string }
+export async function setRunHandover(agentId: string, id: string, handoverPath: string): Promise<void> {
+    const { db } = await getSystemDb(agentId)
+    await db.update(runs).set({ handoverPath }).where(eq(runs.id, id))
+}
+
+export type GoalVerdict ={ turn: number; met: boolean; reason: string }
 
 export async function recordGoalVerdict(agentId: string, id: string, verdict: GoalVerdict): Promise<void> {
     const { db } = await getSystemDb(agentId)
