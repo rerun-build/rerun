@@ -128,7 +128,7 @@ def make(full, repo, d, branch, base, default, start=None):
     os.makedirs(tmp_root(), exist_ok=True)
     shutil.rmtree(tmp, ignore_errors=True)
     m = M.path(repo)
-    src = m if os.path.isdir(m) and M.git(["for-each-ref", "--count=1", "refs/heads"], cwd=m).stdout.strip() else M.url(full)
+    src = m if mode() == "clone" and os.path.isdir(m) and M.git(["for-each-ref", "--count=1", "refs/heads"], cwd=m).stdout.strip() else M.url(full)
     r = M.git(["clone", "--quiet", "--no-checkout", src, tmp], timeout=900)
     if r.returncode and src == m:
         shutil.rmtree(tmp, ignore_errors=True)

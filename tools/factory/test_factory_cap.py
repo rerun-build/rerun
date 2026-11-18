@@ -19,55 +19,6 @@ class FactoryCap(unittest.TestCase):
             self.assertEqual(F.max_builders(), 3)
 
 
-class WtNewSweep(unittest.TestCase):
-    def run_new(self, capacity, du_kb=1024):
-        class Stop(Exception):
-            pass
-
-        self.cmds = []
-
-        def fake_run(cmd, cwd="/tmp", check=True, timeout=300):
-            self.cmds.append(cmd[0])
-            out = "%d\tx" % du_kb if cmd[0] == "du" else "chunk/71-1"
-            return types.SimpleNamespace(stdout=out, returncode=0)
-
-        sweep = mock.Mock(return_value=("sum", []))
-        out = io.StringIO()
-        with tempfile.TemporaryDirectory() as d:
-            wt = os.path.join(d, "wt")
-            os.makedirs(os.path.join(wt, "rerun", "71-1"))
-            with mock.patch.object(F, "WORK", d), mock.patch.object(F, "WT", wt), mock.patch.object(F, "STATE", os.path.join(d, "state")), \
-                    mock.patch.object(F, "MIN_FREE_GB", 0), mock.patch.object(F.shutil, "disk_usage", return_value=types.SimpleNamespace(free=2**40)), mock.patch.object(F, "MIN_FREE_MEM_GB", 0), \
-                    mock.patch.object(F, "MEMINFO", os.path.join(d, "none")), mock.patch.object(F, "run", fake_run), \
-                    mock.patch.object(F, "wt_sweep", sweep), mock.patch.object(F, "api", side_effect=Stop), \
-                    mock.patch.object(F.limits, "capacity", return_value=capacity), mock.patch("sys.stdout", out):
-                try:
-                    F.cmd_wt(["new", "special-place-ai-heaven/rerun", "820", "main"])
-                    outcome = "returned"
-                except Stop:
-                    outcome = "reached plan_check"
-                except SystemExit as e:
-                    outcome = "refused %s" % e.code
-        return sweep, outcome, out.getvalue()
-
-    def test_room_does_not_sweep(self):
-        sweep, outcome, _ = self.run_new(2)
-        self.assertEqual(sweep.call_count, 0)
-        self.assertEqual(outcome, "reached plan_check")
-
-    def test_cap_sweeps_once_and_still_refuses(self):
-        sweep, outcome, out = self.run_new(1)
-        self.assertEqual(sweep.call_count, 1)
-        self.assertEqual(outcome, "refused 2")
-        self.assertIn("builders are already active", out)
-
-    def test_a_full_work_folder_is_not_measured_and_does_not_refuse(self):
-        sweep, outcome, _ = self.run_new(2, du_kb=30 * 1048576)
-        self.assertEqual(outcome, "reached plan_check")
-        self.assertEqual(sweep.call_count, 0)
-        self.assertNotIn("du", self.cmds)
-
-
 class LockMessage(unittest.TestCase):
     def test_waiting_line_on_stderr(self):
         with tempfile.TemporaryDirectory() as d:

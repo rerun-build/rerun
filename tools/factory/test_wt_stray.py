@@ -6,8 +6,6 @@ F = T.F
 
 
 class Stray(T.FactoryCase):
-    wt_new_fakes = T.BuilderCap.wt_new_fakes
-
     def strays(self):
         wt = self.wt(chunk="1")
         a = os.path.join(F.WT, "rerun", "pr-289.md")
@@ -24,7 +22,7 @@ class Stray(T.FactoryCase):
 
     def test_wt_list_and_wt_new_run_with_a_stray_file_and_list_names_it(self):
         wt, a, b = self.strays()
-        with self.wt_new_fakes():
+        with T.clone_fakes(self):
             code, out = self.call(F.cmd_wt, ["list"])
             self.assertEqual(code, 0, out)
             self.assertIn("stray, not a worktree: " + a, out.splitlines())

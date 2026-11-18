@@ -468,22 +468,6 @@ def unlink_links(d):
             unlink_links(e.path)
 
 
-def empty_on_old_base(p, path, branch):
-    base = run([GIT, "config", "branch.%s.factorybase" % branch], cwd=p, check=False).stdout.strip()
-    if not base or run([GIT, "fetch", "--quiet", "origin", base], cwd=p, check=False).returncode:
-        return None
-    ref = "refs/remotes/origin/" + base
-    head = run([GIT, "rev-parse", "HEAD"], cwd=path, check=False)
-    new = run([GIT, "rev-parse", "--verify", "--quiet", ref], cwd=p, check=False)
-    ahead = run([GIT, "rev-list", "--count", "%s..HEAD" % ref], cwd=path, check=False)
-    dirty = run([GIT, "status", "--porcelain"], cwd=path, check=False)
-    if 0 != head.returncode + new.returncode + ahead.returncode + dirty.returncode:
-        return None
-    if ahead.stdout.strip() != "0" or dirty.stdout.strip() or head.stdout.strip() == new.stdout.strip():
-        return None
-    return head.stdout.strip()[:7], new.stdout.strip()[:7], base
-
-
 def cmd_wt(a):
     if a and a[0] == "mode":
         import clones
@@ -535,75 +519,7 @@ def cmd_wt(a):
                 pass
         print("removed worktree %s and local branch %s" % (path, branch))
         return
-    if "--clone" in a or checkout_mode() == "clone":
-        return wt_new_clone(a, full, issue, chunk)
-    existing = os.path.isdir(path)
-    room_check()
-    os.makedirs(STATE, exist_ok=True)
-    with builder_lock():
-        if not existing and cap_check(quiet=True):
-            summary, kept = wt_sweep(True, only="REMOVE", quiet=True)
-            if cap_check(quiet=True):
-                print("\n".join([summary] + kept))
-                cap_check()
-    plan_check(full, issue)
-    p = ensure_clone(full)
-    info = api("repos/%s" % full)
-    default = info["default_branch"]
-    base = a[a.index("--base") + 1] if "--base" in a else ("dev" if remote_has(p, "dev") else "job/" + issue)
-    owner = a[a.index("--owner") + 1] if "--owner" in a else os.environ.get("FACTORY_OWNER") or "unknown"
-    if not remote_has(p, base):
-        if base != "job/" + issue:
-            die("base branch %s does not exist on origin" % base)
-        run([GIT, "push", "--quiet", "origin", "refs/remotes/origin/%s:refs/heads/%s" % (default, base)], cwd=p)
-        run([GIT, "fetch", "--quiet", "origin"], cwd=p)
-        print("created job branch %s from %s" % (base, default))
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with builder_lock():
-        replaced = None
-        if os.path.isdir(path):
-            replaced = empty_on_old_base(p, path, branch)
-            if not replaced:
-                print("EXISTS %s (branch %s). Work there, or `wt done` first." % (path, branch))
-                return
-            base = replaced[2]
-            unlink_links(path)
-            run([GIT, "worktree", "remove", "--force", path], cwd=p)
-            run([GIT, "worktree", "prune"], cwd=p, check=False)
-            run([GIT, "branch", "-D", branch], cwd=p, check=False)
-            for f in (marker(repo, branch), reg_path(repo, "%s-%s" % (issue, chunk))):
-                try:
-                    os.remove(f)
-                except OSError:
-                    pass
-        cap_check()
-        run([GIT, "worktree", "add", "--quiet", "-b", branch, path, "origin/" + base], cwd=p)
-        if replaced:
-            print("REPLACED empty worktree %s (was at %s, base now %s)" % (path, replaced[0], replaced[1]))
-    run([GIT, "config", "branch.%s.factorybase" % branch, base], cwd=p)
-    with open(reg_path(repo, "%s-%s" % (issue, chunk)), "w") as f:
-        json.dump({"repo": full, "issue": issue, "chunk": chunk, "branch": branch, "base": base,
-                   "created": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "owner": owner,
-                   "run": os.environ.get("FACTORY_RUN") or "unknown"}, f)
-    install_deps(path)
-    ex = os.path.join(p, ".git", "info", "exclude")
-    with open(ex) as f:
-        seen = ".symforge" in f.read()
-    if not seen:
-        with open(ex, "a") as f:
-            f.write("\n.symforge/\n.symforge-knowledge.toml\n")
-    notes = [f for f in ("AGENTS.md", "CLAUDE.md") if os.path.isfile(os.path.join(path, f))]
-    print("WORKTREE %s\nbranch %s (from origin/%s, fresh)\nrepo %s | job issue #%s | chunk %s" % (path, branch, base, full, issue, chunk))
-    print("build and test notes: %s" % (", ".join(notes) or "none in repo"))
-    print("Next: edit here, quick checks only (lint, type check, named test files), commit, then `pr-open`.")
-
-
-def checkout_mode():
-    try:
-        import clones
-        return clones.mode()
-    except Exception:
-        return "worktree"
+    return wt_new_clone(a, full, issue, chunk)
 
 
 def wt_new_clone(a, full, issue, chunk):
