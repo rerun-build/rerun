@@ -19,6 +19,7 @@
         "dev:mobile": "node scripts/dev-mobile.mjs",
         "verify:ui": "node scripts/verify-ui.mjs",
         "verify:desktop": "node scripts/verify-desktop.mjs",
+        "docs:media": "node scripts/docs-media.mjs",
         "dev:desktop": "pnpm --filter @rerun/contracts build && pnpm --filter rerun-desktop dev",
         "i18n:check": "node scripts/i18n-check.mjs",
         "i18n:index": "node scripts/i18n-index.mjs",

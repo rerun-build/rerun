@@ -25,6 +25,6 @@ Search is disabled in local preview unless you run `npx mint login`. Everything 
 - `self-host/`: running Rerun on your own server
 - `api/`: the MCP server and the webhook endpoint, with `api/tools/` holding the tool reference
 - `snippets/`: reusable MDX fragments, imported with `import X from '/snippets/x.mdx'`, and `media.jsx`, the `<Shot>` and `<Loop>` components every screenshot and video goes through (see `AGENTS.md`)
-- `images/<page>/`: the screenshots (`.webp`) and loops (`.mp4`) of each page, in light and dark
+- `images/<page>/`: the screenshots (`.webp`) and loops (`.mp4`) of each page, in light and dark, taken from the real app by `pnpm docs:media` (`scripts/docs-media.mjs`, one scene per page in `scripts/docs-media/scenes/`). Never edit them by hand: change the scene and run it again
 - `logo/`, `favicon.svg`: brand assets
 - `AGENTS.md`: instructions for agents editing the docs, with the `update-docs` skill (`.claude/skills/update-docs`) for keeping pages in step with the code

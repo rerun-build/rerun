@@ -4,6 +4,8 @@ description: "Sign in to an app once, keep your keys in one place, and pick the 
 icon: "lock-keyhole"
 ---
 
+import { Shot, Loop } from '/snippets/media.jsx'
+
 The Vault is where your workspace keeps the accounts and keys its coworkers share: the apps you signed in to, the secrets you added and the MCP servers you registered. You sign in to an app once, then switch it on for the coworkers that need it, or for every coworker.
 
 Values never leave your workspace's machine and are never shown again once saved, in the Vault or anywhere else. See [Where credentials live](/agents/apps#where-credentials-live).
@@ -23,6 +25,8 @@ The Vault lives on your workspace's machine. On Rerun Cloud, the entry stays dis
 | **Secret** | A key or a token your coworkers read as a variable |
 
 Each entry says who uses it: **Every coworker**, the names of the coworkers, or **No coworker yet**. From 8 entries on, a search field appears on top.
+
+<Shot src="/images/vault/vault-list" alt="The Vault with three apps, Gmail, HubSpot and Stripe, and a secret, each tile showing the coworkers that use it" />
 
 ### Statuses
 
@@ -79,6 +83,8 @@ Click **Add server**. A remote server with no key offers to sign in from its ent
 ## Share an entry
 
 Open an entry to see its **Coworkers**:
+
+<Loop src="/images/vault/vault-share-entry" alt="The Gmail entry of the Vault, where switching on Invoice Chaser gives it the app" />
 
 - Switch on **Every coworker** to give it to the whole workspace. Coworkers added later get it too.
 - Or switch it on coworker by coworker.

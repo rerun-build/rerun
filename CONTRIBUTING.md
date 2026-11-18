@@ -49,7 +49,8 @@ pnpm dev:ui        # http://localhost:3050
 ```
 
 Sign-in codes land in Mailpit, at http://localhost:54424. To work on the docs, run `pnpm dev:docs`
-and open http://localhost:3333.
+and open http://localhost:3333. The screenshots and loops of the docs come from the real app on a demo
+workspace: `pnpm docs:media` takes them again on the local stack (see `scripts/docs-media.mjs`).
 
 ## Checks
 
