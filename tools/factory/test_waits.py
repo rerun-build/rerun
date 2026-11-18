@@ -19,7 +19,7 @@ class Waits(unittest.TestCase):
             self.assertEqual(r({"state": s}, now), "no free worker of its type")
         for s in ("building", "checks", "merged"):
             self.assertIsNone(r({"state": s}, now))
-        self.assertEqual(waits.REASONS, ("dependency", "no free worker of its type", "back-off", "hold", "plan limit", "sign-in renewal"))
+        self.assertEqual(waits.REASONS, ("dependency", "fact recheck", "no free worker of its type", "back-off", "hold", "plan limit", "sign-in renewal"))
 
 
 if __name__ == "__main__":

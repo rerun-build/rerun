@@ -12,7 +12,7 @@ ALLOWED = (
     ("proving", "checks"), ("proving", "fix_wait"), ("proving", "proof_wait"), ("checks", "merged"),
     ("building", "blocked"), ("queued", "failed"), ("blocked", "merged"), ("failed", "merged"),
     ("returned", "merged"), ("merged", "queued"), ("rejected", "waiting"),
-    ("checks", "review_wait"),
+    ("checks", "review_wait"), ("queued", "waiting"),
 )
 REFUSED = (
     ("queued", "checks"), ("merged", "blocked"), ("queued", "nowhere"), ("nowhere", "queued"), ("merged", "merged"),
@@ -51,7 +51,7 @@ class States(unittest.TestCase):
         self.assertEqual(quiet, ["fix_wait", "proof_wait", "queued", "review_wait", "waiting"])
 
     def test_allowed_moves(self):
-        self.assertEqual(len(ALLOWED), 28)
+        self.assertEqual(len(ALLOWED), 29)
         self.assertEqual(len(REFUSED), 10)
         for old, new in ALLOWED:
             self.assertTrue(states.allowed(old, new), (old, new))

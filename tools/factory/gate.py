@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import fnmatch, json, os, re, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cutshape
 import factory as F
 
 GH = F.GH
-TESTF = r"\.spec\.[jt]sx?$|\.test\.[jt]sx?$|(^|/)tests?/.*\.(ts|tsx|js|jsx|rs|py)$|__tests__/.*\.(ts|tsx|js|jsx)$|_test\.(py|go)$|(^|/)test_[^/]*\.py$"
+TESTF = cutshape.TESTF
 REVIEW_RE = re.compile(r"^\s*Review (ACCEPT|REJECT) @([0-9a-f]{8}): ([A-Za-z][A-Za-z0-9_-]*) (ACCEPT|REJECT)\b")
 ANSI = re.compile(r"(?:\x1b|\^\[)\[[0-9;]*m")
 
