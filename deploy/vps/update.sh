@@ -36,6 +36,7 @@ wait_drained() {
 
 echo "== 1/4 code"
 su "$(stat -c '%U' "$REPO")" -s /bin/sh -c "git -C '$REPO' pull --ff-only"
+[ "${UPDATE_PULLED:-0}" = 1 ] || UPDATE_PULLED=1 exec sh "$REPO/deploy/vps/update.sh"
 docker compose config -q || { echo "The compose files do not resolve: set the values named above (factory ones in deploy/vps/.env), then run this again."; exit 1; }
 
 trap undrain EXIT
