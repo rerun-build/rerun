@@ -69,6 +69,17 @@ describe('shell paths', () => {
         expect(md).not.toContain('done/ok')
         expect(md).not.toContain('v1.2')
     })
+
+    it('skips a token that escapes the workspace instead of failing the handoff', async () => {
+        writeWorkspaceFile('ho3', 'Makefile', 'all:\n')
+        await appendMessage('ho3', 's5', { role: 'user', content: 'job' })
+        await appendMessage('ho3', 's5', { role: 'assistant', content: [call('e1', 'shell_exec', { command: 'cat ../x Makefile' })] })
+        await appendMessage('ho3', 's5', result('e1', 'shell_exec', 'out'))
+        await appendMessage('ho3', 's5', { role: 'assistant', content: [{ type: 'text', text: 'next' }] })
+        const md = await buildHandoff('ho3', 's5')
+        expect(md).toContain('- Makefile')
+        expect(md).not.toContain('../x')
+    })
 })
 
 describe('saveHandoff', () => {

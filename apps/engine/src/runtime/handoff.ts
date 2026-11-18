@@ -20,15 +20,15 @@ function parts(contentJson: string): Part[] {
 function existsIn(root: string, token: string, seen: Map<string, boolean>): boolean {
     const known = seen.get(token)
     if (known !== undefined) return known
-    const target = isAbsolute(token) ? token : resolveWithin(root, token)
     let found = false
-    if (target !== root) {
-        try {
+    try {
+        const target = isAbsolute(token) ? token : resolveWithin(root, token)
+        if (target !== root) {
             const stat = statSync(target)
             found = stat.isFile() || stat.isDirectory()
-        } catch {
-            found = false
         }
+    } catch {
+        found = false
     }
     seen.set(token, found)
     return found
