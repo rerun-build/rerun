@@ -200,8 +200,10 @@ export async function request<T>(conn: EngineConnection, path: string, init: Req
 // The AI provider credentials a box holds. Values are never returned by any of these: the engine
 // answers with key names and a `connected` flag, so a credential only ever travels inbound.
 
-export async function listConnections(conn: EngineConnection, init: RequestInit = {}): Promise<BoxConnectionsList> {
-    return request(conn, '/connections', { ...init, method: 'GET' }, d => boxConnectionsListSchema.parse(d))
+// `fresh` waits (5 s at most) for the plan usage readings the list starts, for the screen that
+// shows them. An engine that predates it ignores it and answers with what it holds.
+export async function listConnections(conn: EngineConnection, init: RequestInit = {}, { fresh = false }: { fresh?: boolean } = {}): Promise<BoxConnectionsList> {
+    return request(conn, fresh ? '/connections?fresh=1' : '/connections', { ...init, method: 'GET' }, d => boxConnectionsListSchema.parse(d))
 }
 
 // The pair every agent that picked no model of its own runs on. `null` clears it.

@@ -409,6 +409,30 @@ describe('plan limits on the list', () => {
         }
     })
 
+    it('shows the fresh Claude reading on the first list when the panel asks for it', async () => {
+        const { recordPlanLimits } = await import('../../connections/plan-limits.js')
+        const res = await post('/', {
+            name: 'Claude panel',
+            provider: 'claude',
+            models: ['opus'],
+            keys: { CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat-panel', CLAUDE_CODE_OAUTH_REFRESH_TOKEN: 'sk-ant-ort-panel', CLAUDE_CODE_OAUTH_EXPIRES_AT: String(Date.now() + 24 * 3_600_000) },
+        })
+        const claude = (await res.json()) as Summary
+        vi.useFakeTimers({ now: Date.now() - 20 * 60_000, toFake: ['Date'] })
+        recordPlanLimits(claude.id, [{ kind: 'session', label: null, usedPercent: 40, resetsAt: null }])
+        vi.useRealTimers()
+
+        const realFetch = globalThis.fetch
+        globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) =>
+            String(input) === 'https://api.anthropic.com/api/oauth/usage' ? new Response(JSON.stringify({ five_hour: { utilization: 66, resets_at: null } })) : realFetch(input, init)) as typeof fetch
+        try {
+            const listed = (await (await connectionRoutes.request('/?fresh=1')).json()) as { connections: (Summary & { planLimits: unknown })[] }
+            expect(listed.connections.find(c => c.id === claude.id)?.planLimits).toMatchObject({ windows: [{ kind: 'session', usedPercent: 66 }] })
+        } finally {
+            globalThis.fetch = realFetch
+        }
+    })
+
     it('waits for the read a run left under way, so the list carries it', async () => {
         const { recordPlanLimits } = await import('../../connections/plan-limits.js')
         const claude = await createClaude()

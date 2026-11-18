@@ -34,10 +34,14 @@ connectionRoutes.get('/', async c => {
     for (const connection of connections) {
         await repairBoxDefault(connection).catch(err => logger.warn({ err: String(err), connection: connection.id }, 'box default repair failed'))
     }
-    await awaitPendingPlanLimits(connections)
+    // `fresh` is the AI providers panel opening: it waits (capped) for the readings it starts, so the
+    // usage it shows is today's. A model picker never asks for it, and only waits on a run's read.
+    const fresh = c.req.query('fresh') === '1'
+    if (!fresh) await awaitPendingPlanLimits(connections)
     refreshStaleClaudePlanLimits(connections)
     refreshStaleCodexPlanLimits(connections)
     refreshStaleOpencodePlanLimits(connections)
+    if (fresh) await awaitPendingPlanLimits(connections)
     if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()
     refreshStaleCustomCatalogs(connections)
     return c.json({ connections: connections.map(toSummary), default: await readBoxDefault(), backups: await readBoxBackups() })

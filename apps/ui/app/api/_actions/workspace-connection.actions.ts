@@ -55,15 +55,15 @@ type CreateResult = { success: true; connection: BoxConnection } | (Refusal & { 
 // runs it. `customOffered`: whether its engine runs custom endpoints.
 type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
 
-async function readAiConnections(): Promise<AiConnectionsList> {
+async function readAiConnections({ fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
     const workspaceId = await requireWorkspaceId()
-    const [list, opencodeOffered, customOffered] = await Promise.all([listAiConnections(workspaceId), isOpencodeOfferedTo(workspaceId).catch(() => false), isCustomOfferedTo(workspaceId).catch(() => false)])
+    const [list, opencodeOffered, customOffered] = await Promise.all([listAiConnections(workspaceId, { fresh }), isOpencodeOfferedTo(workspaceId).catch(() => false), isCustomOfferedTo(workspaceId).catch(() => false)])
     return { ...list, opencodeOffered, customOffered }
 }
 
-export async function listAiConnectionsAction(): Promise<AiConnectionsList> {
+export async function listAiConnectionsAction({ fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
     try {
-        return await readAiConnections()
+        return await readAiConnections({ fresh })
     } catch {
         return { connections: [], default: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false }
     }

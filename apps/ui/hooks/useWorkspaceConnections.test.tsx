@@ -181,3 +181,56 @@ describe('setBackups', () => {
         expect(hook!.backups).toEqual({ backups: [], rerunCreditLastResort: false })
     })
 })
+
+describe('the AI providers panel opening', () => {
+    beforeEach(() => {
+        vi.resetModules()
+        mocks.listAiConnectionsAction.mockReset()
+    })
+    afterEach(() => {
+        act(() => root?.unmount())
+        root = null
+        container?.remove()
+    })
+
+    async function mountWith(options: { revalidate?: boolean }) {
+        const { useWorkspaceConnections } = await import('./useWorkspaceConnections')
+        function Probe() {
+            seen = useWorkspaceConnections(options).connections
+            return null
+        }
+        container = document.createElement('div')
+        document.body.appendChild(container)
+        root = createRoot(container)
+        await act(async () => root!.render(createElement(Probe)))
+        await act(async () => {})
+    }
+
+    it('asks for fresh plan usage, where a model picker does not', async () => {
+        mocks.listAiConnectionsAction.mockResolvedValue(list([connection('c1', 40)]))
+        await mountWith({})
+        expect(mocks.listAiConnectionsAction).toHaveBeenLastCalledWith({ fresh: false })
+
+        await act(async () => root!.unmount())
+        await mountWith({ revalidate: true })
+        expect(mocks.listAiConnectionsAction).toHaveBeenLastCalledWith({ fresh: true })
+    })
+
+    it('keeps the fresh reading when a plain list sent before it answers last', async () => {
+        let answerPlain: (value: unknown) => void = () => {}
+        mocks.listAiConnectionsAction.mockImplementation(({ fresh }: { fresh: boolean }) => (fresh ? Promise.resolve(list([connection('c1', 66)])) : new Promise(resolve => (answerPlain = resolve))))
+        const { useWorkspaceConnections } = await import('./useWorkspaceConnections')
+        function Probe() {
+            useWorkspaceConnections()
+            seen = useWorkspaceConnections({ revalidate: true }).connections
+            return null
+        }
+        container = document.createElement('div')
+        document.body.appendChild(container)
+        root = createRoot(container)
+        await act(async () => root!.render(createElement(Probe)))
+        await act(async () => {})
+        await act(async () => answerPlain(list([connection('c1', 40)])))
+        expect(seen.map(c => c.planLimits?.windows[0]?.usedPercent)).toEqual([66])
+    })
+})

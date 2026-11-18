@@ -101,9 +101,9 @@ async function renameAliasedModels(conn: EngineConnection, list: BoxConnectionsL
     }
 }
 
-export async function listAiConnections(workspaceId: number): Promise<BoxConnectionsList> {
+export async function listAiConnections(workspaceId: number, { fresh = false }: { fresh?: boolean } = {}): Promise<BoxConnectionsList> {
     const conn = await getWorkspaceConnection(workspaceId)
-    return renameAliasedModels(conn, await engineListConnections(conn))
+    return renameAliasedModels(conn, await engineListConnections(conn, {}, { fresh }))
 }
 
 export async function setWorkspaceDefaultModel(workspaceId: number, pick: BoxDefault | null): Promise<void> {

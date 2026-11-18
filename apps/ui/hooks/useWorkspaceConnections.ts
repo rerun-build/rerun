@@ -41,16 +41,25 @@ function subscribe(listener: () => void) {
     }
 }
 
-// Deduped: every mounted picker asks on mount, and they must add up to one request.
-function fetchList(): Promise<void> {
-    if (inflight) return inflight
-    inflight = listAiConnectionsAction()
-        .then(list => setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true }))
+// Deduped: every mounted picker asks on mount, and they must add up to one request. A `fresh` ask
+// (the AI providers panel opening) is never folded into a plain one: it is the read that waits for
+// today's plan usage. Only the last list asked for lands, so a plain one sent first cannot answer
+// last with the older reading.
+let lastAsked = 0
+
+function fetchList({ fresh = false }: { fresh?: boolean } = {}): Promise<void> {
+    if (inflight && !fresh) return inflight
+    const asked = ++lastAsked
+    const task: Promise<void> = listAiConnectionsAction({ fresh })
+        .then(list => {
+            if (asked === lastAsked) setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
+        })
         .catch(() => {})
         .finally(() => {
-            inflight = null
+            if (inflight === task) inflight = null
         })
-    return inflight
+    inflight = task
+    return task
 }
 
 let refreshing: Promise<void> | null = null
@@ -87,7 +96,7 @@ export function useWorkspaceConnections({ revalidate = false }: { revalidate?: b
     )
 
     useEffect(() => {
-        if (revalidate || !snapshot.loaded) void fetchList()
+        if (revalidate || !snapshot.loaded) void fetchList({ fresh: revalidate })
     }, [revalidate])
 
     const refresh = useCallback(() => fetchList(), [])

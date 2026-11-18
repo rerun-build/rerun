@@ -355,6 +355,8 @@ Readings are kept in memory and taken:
 - `opencode`: see OpenCode connections below.
 
 The list answers with the reading it holds, after waiting at most 5 seconds for one already under way.
+With `?fresh=1` it starts the reads that are due first, then waits for them (5 seconds at most), so
+the answer carries them: the AI providers panel asks for it when it opens, a model picker never does.
 
 ### `PUT /connections/default`
 
