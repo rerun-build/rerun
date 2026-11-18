@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { CUSTOM_DEFAULT_CONTEXT_WINDOW, connectionConfigSchema } from '@rerun/contracts'
 import { candidateBaseUrls, customContextWindow, customDiscoveredModels, parseModelList, probeCustomEndpoint, refreshCustomCatalog, resetCustomCatalogForTests } from './custom-catalog.js'
 import { isConnected, toSummary } from './loader.js'
-import { runContextWindow } from '../runtime/compaction/compact.js'
+import { effectiveCompactAt, runContextWindow } from '../runtime/compaction/compact.js'
 
 type Handler = (req: IncomingMessage, body: string, res: ServerResponse) => void
 
@@ -143,6 +143,15 @@ describe('the live reading of a connection', () => {
         expect(toSummary(cnx).discoveredModels).toHaveLength(2)
         expect(runContextWindow('listed', 'custom', cnx)).toBe(40_000)
         expect(runContextWindow('silent', 'custom', cnx)).toBe(64_000)
+    })
+
+    it('sets the compaction point from the context_length the endpoint lists for the model', async () => {
+        handler = (_req, _body, res) => json(res, 200, { data: [{ id: 'big', context_length: 262_144 }] })
+        const cnx = connection({ models: ['big'], contextWindow: 1_000_000 })
+        await refreshCustomCatalog(cnx)
+        expect(runContextWindow('big', 'custom', cnx)).toBe(262_144)
+        expect(effectiveCompactAt('small', 'custom', 'big', cnx)).toBe(229_144)
+        expect(effectiveCompactAt('large', 'custom', 'big', cnx)).toBe(229_144)
     })
 
     it('keeps its last reading when the endpoint stops answering', async () => {

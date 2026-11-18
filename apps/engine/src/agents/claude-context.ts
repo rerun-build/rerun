@@ -11,6 +11,8 @@ export type ClaudeContextCapture = {
     settings: Pick<ClaudeCodeSettings, 'hooks' | 'onQueryCreated'>
 }
 
+export type CompactListener = (event: { trigger: string; summaryChars: number }) => void
+
 type PlanUsageReader = (options: { skipBehaviors: boolean }) => Promise<ClaudePlanUsage>
 
 function planUsageReaderOf(query: Query): PlanUsageReader | undefined {
@@ -34,7 +36,7 @@ async function withinTimeout<T>(task: Promise<T>): Promise<T | undefined> {
     }
 }
 
-export function claudeContextCapture(connectionId?: string): ClaudeContextCapture {
+export function claudeContextCapture(connectionId?: string, onCompact?: CompactListener): ClaudeContextCapture {
     let query: Query | undefined
     let snapshot: ContextOccupancy | undefined
 
@@ -67,6 +69,12 @@ export function claudeContextCapture(connectionId?: string): ClaudeContextCaptur
         return { continue: true }
     }
 
+    const compactHook = async (...args: unknown[]): Promise<{ continue: boolean }> => {
+        const input = (args[0] ?? {}) as { trigger?: string; compact_summary?: string }
+        onCompact?.({ trigger: input.trigger ?? 'unknown', summaryChars: input.compact_summary?.length ?? 0 })
+        return { continue: true }
+    }
+
     return {
         read: () => snapshot,
         settings: {
@@ -74,7 +82,7 @@ export function claudeContextCapture(connectionId?: string): ClaudeContextCaptur
                 query = q
                 void captureCliModels(q)
             },
-            hooks: { Stop: [{ hooks: [stopHook] }] },
+            hooks: { Stop: [{ hooks: [stopHook] }], PostCompact: [{ hooks: [compactHook] }] },
         },
     }
 }

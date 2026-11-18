@@ -203,6 +203,7 @@ const RUN_GOAL_COLUMNS = [
     'goal_turns INTEGER',
     'goal_verdicts_json TEXT',
 ]
+const RUN_COMPACTION_COLUMNS = ['compactions INTEGER', 'compact_summary_chars INTEGER', 'compact_at_tokens INTEGER']
 const RUN_STEP_CACHE_COST_COLUMNS = ['cache_write_tokens INTEGER', 'cost_micros INTEGER']
 const RUN_STEP_EFFORT_COLUMNS = ['effort TEXT']
 
@@ -293,6 +294,13 @@ export const SYSTEM_DB_MIGRATIONS: SqliteMigration[] = [
         id: 'messages-session-role-created-index',
         up: async client => {
             await client.execute('CREATE INDEX IF NOT EXISTS messages_session_role_created_idx ON messages(session_id, role, created_at)')
+        },
+    },
+    {
+        version: 9,
+        id: 'run-compactions',
+        up: async client => {
+            await ensureColumns(client, 'runs', RUN_COMPACTION_COLUMNS)
         },
     },
 ]

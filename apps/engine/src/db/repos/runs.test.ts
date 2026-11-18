@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-runs-'))
 process.env.RERUN_API_KEY = ''
 
 const { afterEach, describe, expect, it, vi } = await import('vitest')
-const { aggregateUsageByDay, bumpRunStep, cancelRun, failInterruptedRuns, failRun, finishRun, getRun, listRunsByAgent, recordGoalVerdict, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } = await import('./runs.js')
+const { aggregateUsageByDay, bumpRunStep, cancelRun, failInterruptedRuns, failRun, finishRun, getRun, listRunsByAgent, recordGoalVerdict, recordRunCompaction, setRunCompactAt, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } = await import('./runs.js')
 
 afterEach(() => {
     vi.useRealTimers()
@@ -282,5 +282,19 @@ describe('run goal', () => {
         await finishRun('goalend2', 'g8', null, 1, null, undefined, 'met')
         await failRun('goalend2', 'g8', 'late')
         expect((await getRun('goalend2', 'g8'))?.goalState).toBe('met')
+    })
+})
+
+describe('run compactions', () => {
+    it('starts with none, then counts each compaction and sums the summary sizes', async () => {
+        await startRun('comp', 's1', 'r-comp')
+        expect(await getRun('comp', 'r-comp')).toMatchObject({ compactions: null, compactSummaryChars: null, compactAtTokens: null })
+
+        await setRunCompactAt('comp', 'r-comp', 240000)
+        await recordRunCompaction('comp', 'r-comp', 900)
+        await recordRunCompaction('comp', 'r-comp', 0)
+        await Promise.all([recordRunCompaction('comp', 'r-comp', 100), recordRunCompaction('comp', 'r-comp', 5)])
+
+        expect(await getRun('comp', 'r-comp')).toMatchObject({ compactions: 4, compactSummaryChars: 1005, compactAtTokens: 240000 })
     })
 })

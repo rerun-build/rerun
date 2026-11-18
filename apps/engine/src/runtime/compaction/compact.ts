@@ -2,8 +2,9 @@ import { customContextWindow } from '../../connections/custom-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { opencodeModel } from '../../connections/opencode-catalog.js'
 import { generateText, type ModelMessage } from 'ai'
-import { isContextPart, modelContextWindow, type Provider } from '@rerun/contracts'
-import { modelFor, type ModelOverride } from '../../agents/providers.js'
+import { isContextPart, modelContextWindow, type ContextSize, type Provider } from '@rerun/contracts'
+import type { CompactListener } from '../../agents/claude-context.js'
+import { COMPACT_RESERVE_TOKENS, compactAtTokens, modelFor, type ModelOverride } from '../../agents/providers.js'
 import { withoutQuickRepliesCalls } from '../../agents/quick-replies-stream.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
@@ -86,6 +87,12 @@ export function runContextWindow(model: string, provider: Provider, connection?:
     return modelContextWindow(model, provider)
 }
 
+export function effectiveCompactAt(size: ContextSize | undefined, provider: Provider, model: string, connection?: LoadedConnection | null): number | null {
+    const at = compactAtTokens(size)
+    const window = at === null ? undefined : runContextWindow(model, provider, connection)
+    return at === null || window === undefined ? at : Math.min(at, window - COMPACT_RESERVE_TOKENS)
+}
+
 export function compactionThreshold(contextWindow: number, provider: Provider): number {
     const ratio = contextWindow * COMPACTION_TRIGGER_RATIO
     return CLI_PROVIDERS.has(provider) ? ratio : Math.min(ratio, COMPACTION_MAX_TRIGGER_TOKENS)
@@ -157,5 +164,35 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
         ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'error' } })
         ctx.logger.error({ agent: agentId, err: String(error) }, 'compaction failed')
         return working
+    }
+}
+
+export function stepContextGuard(ctx: RunContext, override: ModelOverride | undefined, system: string, toolChars: number, at: number, onCompact: CompactListener): (messages: ModelMessage[]) => Promise<ModelMessage[] | undefined> {
+    let summary: { message: ModelMessage; covers: number } | undefined
+    let pruning = false
+    return async messages => {
+        const base = summary ? [summary.message, ...messages.slice(summary.covers)] : messages
+        if (estimateTokens(base, system, toolChars) < at) return summary ? repairToolPairs(base) : undefined
+        const head = summary ? 1 : 0
+        const tailStart = tailStartIndex(base, COMPACTION_TAIL_TOKEN_BUDGET)
+        const pruned = pruneToolOutputs(base, tailStart).messages
+        if (estimateTokens(pruned, system, toolChars) < at || tailStart <= head) {
+            if (!pruning) onCompact({ trigger: 'prune', summaryChars: 0 })
+            pruning = true
+            return repairToolPairs(pruned)
+        }
+        try {
+            const text = await summarizeMiddle(ctx, override, pruned.slice(0, tailStart))
+            const message: ModelMessage = { role: 'user', content: `${SUMMARY_PREAMBLE}
+
+${text}` }
+            summary = { message, covers: (summary?.covers ?? 0) + tailStart - head }
+            pruning = false
+            onCompact({ trigger: 'summary', summaryChars: text.length })
+            return repairToolPairs([message, ...pruned.slice(tailStart)])
+        } catch (error) {
+            ctx.logger.error({ agent: ctx.agent.id, err: String(error) }, 'in-run compaction failed')
+            return repairToolPairs(pruned)
+        }
     }
 }

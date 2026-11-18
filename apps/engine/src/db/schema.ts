@@ -62,6 +62,9 @@ export const runs = sqliteTable('runs', {
     goalState: text('goal_state'),
     goalTurns: integer('goal_turns'),
     goalVerdictsJson: text('goal_verdicts_json'),
+    compactions: integer('compactions'),
+    compactSummaryChars: integer('compact_summary_chars'),
+    compactAtTokens: integer('compact_at_tokens'),
 })
 
 export const runSteps = sqliteTable('run_steps', {

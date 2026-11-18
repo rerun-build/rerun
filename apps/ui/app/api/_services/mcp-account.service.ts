@@ -887,7 +887,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             let contextSize: ContextSize | undefined
             if (args.contextSize !== undefined) {
                 const parsed = contextSizeSchema.safeParse(args.contextSize)
-                if (!parsed.success) throw new Error('invalid_run_model: contextSize must be small, medium or large')
+                if (!parsed.success) throw new Error('invalid_run_model: contextSize must be small, medium, large or off')
                 contextSize = parsed.data
             }
 

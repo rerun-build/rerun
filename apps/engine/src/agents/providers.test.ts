@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { tool, dynamicTool, jsonSchema, type ToolSet } from 'ai'
 import { z } from 'zod'
 import type { McpServer } from '@rerun/contracts'
@@ -122,18 +122,34 @@ describe('CLAUDE_HARNESS_ENV', () => {
 })
 
 describe('compactAtTokens', () => {
+    afterEach(() => {
+        for (const size of ['SMALL', 'MEDIUM', 'LARGE']) delete process.env[`RERUN_COMPACT_AT_${size}`]
+    })
+
     it('maps each size to its trigger point and defaults to small', () => {
         expect(compactAtTokens('small')).toBe(240000)
         expect(compactAtTokens('medium')).toBe(480000)
         expect(compactAtTokens('large')).toBe(940000)
         expect(compactAtTokens()).toBe(240000)
+        expect(compactAtTokens('off')).toBeNull()
+    })
+
+    it('takes a point from the environment when it is an integer from 67000 to 967000, and ignores anything else', () => {
+        process.env.RERUN_COMPACT_AT_SMALL = '300000'
+        process.env.RERUN_COMPACT_AT_MEDIUM = '67000'
+        process.env.RERUN_COMPACT_AT_LARGE = '967000'
+        expect([compactAtTokens('small'), compactAtTokens('medium'), compactAtTokens('large')]).toEqual([300000, 67000, 967000])
+        for (const bad of ['66999', '967001', '240000.5', 'abc', '', '-1']) {
+            process.env.RERUN_COMPACT_AT_SMALL = bad
+            expect(compactAtTokens('small')).toBe(240000)
+        }
     })
 
     it('sets the window so the CLI trigger (window minus 20000 output reserve minus 13000 buffer) lands on the point', () => {
-        expect(compactEnvFor('small')).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '273000' })
-        expect(compactEnvFor('medium')).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '513000' })
-        expect(compactEnvFor('large')).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '973000' })
-        expect(compactEnvFor()).toEqual(compactEnvFor('small'))
+        expect(compactEnvFor(240000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '273000' })
+        expect(compactEnvFor(480000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '513000' })
+        expect(compactEnvFor(940000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '973000' })
+        expect(compactEnvFor(null)).toEqual({ DISABLE_AUTO_COMPACT: '1' })
     })
 })
 

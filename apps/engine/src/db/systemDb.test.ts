@@ -114,13 +114,13 @@ describe('run lineage migration', () => {
         expect(columns).toEqual(expect.arrayContaining(LINEAGE))
         const indexSql = "SELECT name FROM sqlite_master WHERE type = 'index' AND name = 'runs_agent_job_started_idx'"
         expect((await first.client.execute(indexSql)).rows).toHaveLength(1)
-        expect(await sqliteVersion(first.client)).toBe(8)
+        expect(await sqliteVersion(first.client)).toBe(9)
         closeSystemDb('v4')
 
         const second = await getSystemDb('v4')
         expect(await columnsOf('v4', 'runs')).toEqual(columns)
         expect((await second.client.execute(indexSql)).rows).toHaveLength(1)
-        expect(await sqliteVersion(second.client)).toBe(8)
+        expect(await sqliteVersion(second.client)).toBe(9)
     })
 })
 
@@ -140,10 +140,30 @@ describe('run goal migration', () => {
         const row = (await first.client.execute("SELECT goal_json, goal_state, goal_turns, goal_verdicts_json FROM runs WHERE id = 'r1'")).rows[0]
         expect([row.goal_json, row.goal_state, row.goal_turns, row.goal_verdicts_json]).toEqual([null, null, null, null])
         await expect(first.client.execute("UPDATE runs SET goal_state = 'bogus' WHERE id = 'r1'")).rejects.toThrow()
-        expect(await sqliteVersion(first.client)).toBe(8)
+        expect(await sqliteVersion(first.client)).toBe(9)
         expect(SYSTEM_DB_MIGRATIONS.find(step => step.version === 6)).toMatchObject({ version: 6, id: 'run-goal' })
         closeSystemDb('v5goal')
         expect(await columnsOf('v5goal', 'runs')).toEqual(columns)
+    })
+})
+
+describe('run compactions migration', () => {
+    it('adds three nullable columns to a db at version 8, once', async () => {
+        mkdirSync(agentDataDir('v8c'), { recursive: true })
+        const old = createClient({ url: `file:${systemDbPath('v8c')}` })
+        await migrateSqlite(old, SYSTEM_DB_MIGRATIONS.filter(step => step.version <= 8), systemDbPath('v8c'))
+        await old.execute("INSERT INTO runs (id, agent_id, session_id, started_at) VALUES ('r1', 'v8c', 's', 'x')")
+        old.close()
+
+        const first = await getSystemDb('v8c')
+        const columns = await columnsOf('v8c', 'runs')
+        expect(columns).toEqual(expect.arrayContaining(['compactions', 'compact_summary_chars', 'compact_at_tokens']))
+        const row = (await first.client.execute('SELECT compactions, compact_summary_chars, compact_at_tokens FROM runs WHERE id = \'r1\'')).rows[0]
+        expect([row.compactions, row.compact_summary_chars, row.compact_at_tokens]).toEqual([null, null, null])
+        expect(await sqliteVersion(first.client)).toBe(9)
+        expect(SYSTEM_DB_MIGRATIONS.at(-1)).toMatchObject({ version: 9, id: 'run-compactions' })
+        closeSystemDb('v8c')
+        expect(await columnsOf('v8c', 'runs')).toEqual(columns)
     })
 })
 

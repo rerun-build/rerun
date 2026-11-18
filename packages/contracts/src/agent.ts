@@ -110,7 +110,7 @@ export function isSetupAnswered(setup: { required: boolean | null; prompt: strin
 export const thinkingLevelSchema = z.enum(['low', 'medium', 'high', 'xhigh'])
 export type ThinkingLevel = z.infer<typeof thinkingLevelSchema>
 
-export const contextSizeSchema = z.enum(['small', 'medium', 'large'])
+export const contextSizeSchema = z.enum(['small', 'medium', 'large', 'off'])
 export type ContextSize = z.infer<typeof contextSizeSchema>
 
 export const agentConfigSchema = z.object({

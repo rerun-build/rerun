@@ -26,7 +26,7 @@ import { childProcessEnv, envOverlay } from '../lib/child-env.js'
 import { newId } from '../lib/ids.js'
 import { resolveTransport } from '../tools/mcp.js'
 import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
-import { claudeContextCapture, type ClaudeContextCapture } from './claude-context.js'
+import { claudeContextCapture, type ClaudeContextCapture, type CompactListener } from './claude-context.js'
 import { claudeScreenshotMiddleware } from './claude-stream.js'
 import { codexMcpCompatibilityMiddleware } from './codex-stream.js'
 import { createCodexImageMiddleware } from './codex-images.js'
@@ -65,16 +65,24 @@ export const CLAUDE_HARNESS_ENV = {
     CLAUDE_CODE_DISABLE_CRON: '1',
 } as const
 
-const COMPACT_AT_TOKENS: Record<ContextSize, number> = { small: 240000, medium: 480000, large: 940000 }
+const COMPACT_AT_TOKENS: Record<Exclude<ContextSize, 'off'>, number> = { small: 240000, medium: 480000, large: 940000 }
 
-const COMPACT_RESERVE_TOKENS = 33000
+export const COMPACT_RESERVE_TOKENS = 33000
 
-export function compactAtTokens(size?: ContextSize): number {
-    return COMPACT_AT_TOKENS[size ?? 'small']
+const COMPACT_AT_MIN_TOKENS = 100000 - COMPACT_RESERVE_TOKENS
+
+const COMPACT_AT_MAX_TOKENS = 1000000 - COMPACT_RESERVE_TOKENS
+
+export function compactAtTokens(size?: ContextSize): number | null {
+    if (size === 'off') return null
+    const key = size ?? 'small'
+    const raw = process.env[`RERUN_COMPACT_AT_${key.toUpperCase()}`]
+    const value = Number(raw)
+    return raw !== undefined && Number.isInteger(value) && value >= COMPACT_AT_MIN_TOKENS && value <= COMPACT_AT_MAX_TOKENS ? value : COMPACT_AT_TOKENS[key]
 }
 
-export function compactEnvFor(size?: ContextSize): { CLAUDE_CODE_AUTO_COMPACT_WINDOW: string } {
-    return { CLAUDE_CODE_AUTO_COMPACT_WINDOW: String(compactAtTokens(size) + COMPACT_RESERVE_TOKENS) }
+export function compactEnvFor(at: number | null): { CLAUDE_CODE_AUTO_COMPACT_WINDOW: string } | { DISABLE_AUTO_COMPACT: '1' } {
+    return at === null ? { DISABLE_AUTO_COMPACT: '1' } : { CLAUDE_CODE_AUTO_COMPACT_WINDOW: String(at + COMPACT_RESERVE_TOKENS) }
 }
 
 export const CODEX_DISABLED_FEATURES = ['multi_agent', 'multi_agent_v2'] as const
@@ -225,9 +233,9 @@ export function codexMcpConfig(tools?: ToolSet, mcpServers: McpServer[] = []): R
 
 export type GoalOption = { goal: RunGoal; record: (v: GoalVerdict) => Promise<void>; hook?: ReturnType<typeof goalStopHook> }
 
-export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; contextSize?: ContextSize }
+export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: number | null }
 
-export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; contextSize?: ContextSize }
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: number | null; onCompact?: CompactListener }
 
 function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
     return options?.sessionId ?? `${agent.id}:one-shot`
@@ -278,7 +286,7 @@ function claudeProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers: RunMcpS
                 ...claudeAuthEnv(connectionEnv(agent)),
                 ANTHROPIC_API_KEY: undefined,
                 MCP_TOOL_TIMEOUT: String(BRIDGE_TOOL_TIMEOUT_SEC * 1000),
-                ...compactEnvFor(options.contextSize),
+                ...compactEnvFor(options.compactAt === undefined ? compactAtTokens(agent.config.contextSize) : options.compactAt),
             },
             ...(options.system !== undefined ? { systemPrompt: options.system } : {}),
             ...(allowedTools.length ? { mcpServers: servers, allowedTools } : {}),
@@ -399,7 +407,7 @@ export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close
 
 const noClose = async (): Promise<void> => {}
 
-export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, labels, goal, contextSize }: ResolveModelOptions = {}): ResolvedModel {
+export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, labels, goal, compactAt, onCompact }: ResolveModelOptions = {}): ResolvedModel {
     const { provider, model } = pairFor(agent, override)
     const replies = createQuickRepliesCapture()
     const cardTags = createCardTagGuard(agent.id, provider)
@@ -409,8 +417,8 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
         return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, createCodexImageMiddleware(agent.id), replies.middleware, cardTags, guard] }), close: () => codex.close(), quickReplies: replies.read }
     }
     if (provider === 'claude') {
-        const capture = claudeContextCapture(agent.resolved.connection?.id)
-        const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, labels, goal, contextSize: contextSize ?? agent.config.contextSize, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
+        const capture = claudeContextCapture(agent.resolved.connection?.id, onCompact)
+        const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, labels, goal, compactAt, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
         return { model: wrapLanguageModel({ model: claude, middleware: [claudeScreenshotMiddleware, replies.middleware, cardTags, guard] }), close: noClose, contextUsage: capture.read, quickReplies: replies.read }
     }
     if (provider === 'opencode') {
