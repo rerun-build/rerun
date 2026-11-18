@@ -258,7 +258,7 @@ other is paired from Servers, in the workspace menu (see https://docs.rerun.buil
 | `RERUN_LOG_LEVEL` | `info` | pino log level (`fatal`, `error`, `warn`, `info`, `debug`, `trace`) |
 | `RERUN_CODEX_PATH` | _unset_ (`/usr/local/bin/codex` in the image) | Absolute path to the Codex CLI, when it is not on the service user's `PATH` |
 | `RERUN_DESKTOP` | _unset_ | `off` keeps the screen and the computer tools shut on this engine |
-| `RERUN_REMOTE_COMPUTERS` | _unset_ | `on` accepts linked computers (`/remote/*`) before their release |
+| `RERUN_REMOTE_COMPUTERS` | _unset_ | `off` refuses linked computers on this engine: no `/remote/*`, no `remote_*` tools |
 | `RERUN_PAIR_TOKEN` | _unset_ | One-time token from the Servers page: the engine pairs itself with the app at `RERUN_HUB_URL` |
 | `RERUN_HUB_URL` | _unset_ | Address of the app to pair with, together with `RERUN_PAIR_TOKEN` |
 | `RERUN_PUBLIC_URL` | _unset_ | Address the app should reach this engine at, sent when pairing |

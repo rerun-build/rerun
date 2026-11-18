@@ -51,7 +51,7 @@ export function desktopEnabled(): boolean {
 
 // Until computers are released a box refuses their socket and offers no `remote_*` tool. Flipping
 // this opens them on every box at its next update.
-const REMOTE_COMPUTERS_RELEASED = false
+const REMOTE_COMPUTERS_RELEASED = true
 
 export function remoteComputersEnabled(): boolean {
     const flag = env().RERUN_REMOTE_COMPUTERS

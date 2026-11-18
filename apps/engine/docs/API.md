@@ -217,8 +217,8 @@ not. A ticket without a mode drives. A bad ticket answers `401`, any other upgra
 
 A person links a computer to the workspace from the desktop app; the coworkers then run commands,
 jobs and file operations on it. The computer is never an engine: it opens one WebSocket to this one
-and answers what it is asked. These routes answer `404` until linked computers are switched on
-(`RERUN_REMOTE_COMPUTERS=on`, or the release).
+and answers what it is asked. These routes answer `404` on an engine started with
+`RERUN_REMOTE_COMPUTERS=off`.
 
 ### `GET /remote/computers`
 

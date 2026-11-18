@@ -29,4 +29,4 @@ export const SIMPLE_VIEW_RELEASED = true
 // Gates Computers: linking a computer from the desktop app, the Computers dialog of the workspace
 // menu and `#handle` in the composer. A box offers the coworkers its `remote_*` tools only with the
 // engine's own release (RERUN_REMOTE_COMPUTERS).
-export const REMOTE_COMPUTERS_RELEASED = false
+export const REMOTE_COMPUTERS_RELEASED = true

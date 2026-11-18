@@ -6,6 +6,8 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-registry-'))
 process.env.RERUN_API_KEY = ''
 process.env.RERUN_DESKTOP = 'on'
+// Its tools only come with a linked computer, which this data-dir has none of: remote.test.ts covers them.
+process.env.RERUN_REMOTE_COMPUTERS = 'off'
 
 const state = vi.hoisted(() => ({
     connected: [] as string[],

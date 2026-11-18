@@ -41,14 +41,14 @@ describe('GET /health', () => {
         expect(Number.isNaN(Date.parse(body.startedAt))).toBe(false)
     })
 
-    it('offers linked computers only once they are switched on, and counts the ones connected', async () => {
-        expect((await health()).capabilities).not.toContain(ENGINE_CAPABILITY_REMOTE_COMPUTERS)
-        vi.resetModules()
-        vi.stubEnv('RERUN_REMOTE_COMPUTERS', 'on')
-        const { createServer: create } = await import('../server.js')
-        const body = (await (await create().request('/health')).json()) as Health & { remoteComputers: number }
+    it('offers linked computers unless they are switched off, and counts the ones connected', async () => {
+        const body = (await health()) as Health & { remoteComputers: number }
         expect(body.capabilities).toContain(ENGINE_CAPABILITY_REMOTE_COMPUTERS)
         expect(body.remoteComputers).toBe(0)
+        vi.resetModules()
+        vi.stubEnv('RERUN_REMOTE_COMPUTERS', 'off')
+        const { createServer: create } = await import('../server.js')
+        expect(((await (await create().request('/health')).json()) as Health).capabilities).not.toContain(ENGINE_CAPABILITY_REMOTE_COMPUTERS)
         vi.unstubAllEnvs()
     })
 
