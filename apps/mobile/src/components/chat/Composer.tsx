@@ -3,7 +3,7 @@ import { type Ref, useEffect, useEffectEvent, useImperativeHandle, useRef, useSt
 import { Text, TextInput, View, type TextInputInstance } from 'react-native'
 import { useTranslations } from 'use-intl'
 
-import { addPasteImagesListener } from '@/chat/composer-paste'
+import { addHardwareReturnListener, addPasteImagesListener } from '@/chat/composer-paste'
 import { useGlassStyle } from '@/components/ui/GlassButton'
 import { GlassSurface } from '@/components/ui/GlassSurface'
 import * as Haptics from '@/lib/haptics'
@@ -99,6 +99,15 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
         if (!focused || !canAttach) return
         return addPasteImagesListener(onPasted)
     }, [focused, canAttach])
+
+    const onHardwareReturn = useEffectEvent(() => {
+        if (mention && suggestions.length > 0) pickMention(suggestions[0])
+        else if (canSend) onSend()
+    })
+    useEffect(() => {
+        if (!focused) return
+        return addHardwareReturnListener(onHardwareReturn)
+    }, [focused])
 
     const startRecording = async () => {
         if (await recorder.start()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)

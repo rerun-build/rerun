@@ -1,3 +1,5 @@
+import { Platform } from 'react-native'
+
 type Listener = (event: { uris: string[] }) => void
 
 const mockNative = { module: null as null | { addListener: jest.Mock<{ remove: jest.Mock }, [string, Listener]> } }
@@ -44,6 +46,54 @@ describe('addPasteImagesListener', () => {
         const listener = jest.fn()
 
         const unsubscribe = loadListener()(listener)
+
+        expect(() => unsubscribe()).not.toThrow()
+        expect(listener).not.toHaveBeenCalled()
+    })
+})
+
+describe('addHardwareReturnListener', () => {
+    afterEach(() => {
+        mockNative.module = null
+    })
+
+    function loadReturnListener() {
+        let addHardwareReturnListener!: typeof import('./composer-paste').addHardwareReturnListener
+        jest.isolateModules(() => {
+            ;({ addHardwareReturnListener } = jest.requireActual<typeof import('./composer-paste')>('./composer-paste'))
+        })
+        return addHardwareReturnListener
+    }
+
+    it('calls the listener on Return on iOS only, and stops on unsubscribe', () => {
+        const remove = jest.fn()
+        let emit: Listener = () => {}
+        mockNative.module = {
+            addListener: jest.fn((_name: string, listener: Listener) => {
+                emit = listener
+                return { remove }
+            }),
+        }
+        const listener = jest.fn()
+
+        const unsubscribe = loadReturnListener()(listener)
+        emit({ uris: [] })
+        unsubscribe()
+
+        if (Platform.OS === 'ios') {
+            expect(mockNative.module.addListener).toHaveBeenCalledWith('onHardwareReturn', expect.any(Function))
+            expect(listener).toHaveBeenCalledTimes(1)
+            expect(remove).toHaveBeenCalledTimes(1)
+        } else {
+            expect(mockNative.module.addListener).not.toHaveBeenCalled()
+            expect(listener).not.toHaveBeenCalled()
+        }
+    })
+
+    it('does nothing in a binary built without the module', () => {
+        const listener = jest.fn()
+
+        const unsubscribe = loadReturnListener()(listener)
 
         expect(() => unsubscribe()).not.toThrow()
         expect(listener).not.toHaveBeenCalled()
