@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   image:
-    if: github.repository == 'special-place-ai-heaven/rerun'
+    if: github.repository_owner == 'special-place-ai-heaven'
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     strategy:

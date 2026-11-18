@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   check:
-    if: github.repository == 'special-place-ai-heaven/rerun'
+    if: github.repository_owner == 'special-place-ai-heaven'
     name: No comments in code
     runs-on: ubuntu-latest
     timeout-minutes: 15

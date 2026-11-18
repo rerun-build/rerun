@@ -13,7 +13,7 @@ jobs:
   route:
     if: >-
       github.repository == 'rerun-build/rerun' ||
-      (github.repository == 'special-place-ai-heaven/rerun' &&
+      (github.repository_owner == 'special-place-ai-heaven' &&
        (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     name: Pick runners
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
     needs: route
     if: >-
       github.repository == 'rerun-build/rerun' ||
-      (github.repository == 'special-place-ai-heaven/rerun' &&
+      (github.repository_owner == 'special-place-ai-heaven' &&
        (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     name: Typecheck and lint
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON_LIGHT || needs.route.outputs.light || '"ubuntu-latest"') }}
@@ -72,7 +72,7 @@ jobs:
     needs: route
     if: >-
       github.repository == 'rerun-build/rerun' ||
-      (github.repository == 'special-place-ai-heaven/rerun' &&
+      (github.repository_owner == 'special-place-ai-heaven' &&
        (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository))
     strategy:
       fail-fast: false
@@ -94,7 +94,7 @@ jobs:
       - run: pnpm --filter ${{ matrix.part.filter }} run test --maxWorkers=4
 
   migrations:
-    if: github.repository == 'rerun-build/rerun' || github.repository == 'special-place-ai-heaven/rerun'
+    if: github.repository == 'rerun-build/rerun' || github.repository_owner == 'special-place-ai-heaven'
     name: Migrations and seed on a fresh database
     runs-on: ubuntu-latest
     steps:
@@ -121,7 +121,7 @@ jobs:
           test "$(printf '%s\n' "select count(*) from public.engine_pool where engine_api_key = '$key';" | db)" = 1
 
   docker-inputs:
-    if: (github.repository == 'rerun-build/rerun' || github.repository == 'special-place-ai-heaven/rerun') && github.event_name == 'pull_request'
+    if: (github.repository == 'rerun-build/rerun' || github.repository_owner == 'special-place-ai-heaven') && github.event_name == 'pull_request'
     name: Docker inputs changed
     runs-on: ubuntu-latest
     outputs:
@@ -141,7 +141,7 @@ jobs:
   images:
     needs: docker-inputs
     if: >-
-      !cancelled() && (github.repository == 'rerun-build/rerun' || github.repository == 'special-place-ai-heaven/rerun') &&
+      !cancelled() && (github.repository == 'rerun-build/rerun' || github.repository_owner == 'special-place-ai-heaven') &&
       ((github.event_name == 'push' && github.ref != 'refs/heads/dev') || needs.docker-inputs.outputs.changed == 'true')
     name: Docker images build
     runs-on: ubuntu-latest
