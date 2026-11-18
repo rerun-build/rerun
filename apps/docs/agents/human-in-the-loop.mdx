@@ -3,7 +3,7 @@ title: "Human in the loop"
 description: "How a coworker asks you a question, requests an approval, collects a credential, or hands you its screen."
 ---
 
-A coworker that never checks with you is a liability. Rerun gives every coworker seven ways to hand a decision back, and one way to tell you something without stopping.
+A coworker that never checks with you is a liability. Rerun gives every coworker eight ways to hand a decision back, and one way to tell you something without stopping.
 
 ## The pauses
 
@@ -31,13 +31,16 @@ When a coworker uses any of these, it **stops its turn**. A card appears in the 
   <Card title="A spend approval" icon="coins">
     On Rerun Cloud, before it buys [leads, SEO or social data](/agents/configure#paid-data), the coworker shows the **Estimated total** in credits and what you have left. Click **Approve once**, **Always allow**, or **Not now**. **Add credits** shows when you are short.
   </Card>
+  <Card title="A computer access" icon="shield-alert">
+    Before it runs a command, or reaches a file outside the allowed folders, on a [computer you linked](/computers), the card names the computer (`#studio-pc`), each command as written and the folder it runs in, or the paths. Click **Allow**, **Deny**, or **Always allow** the program or the folder when the card offers it.
+  </Card>
 </CardGroup>
 
 A coworker asks one thing at a time, batching everything into a single card, so you are never facing three stacked cards. Closing a card without answering tells the coworker you skipped it, and it carries on from there.
 
 **Always allow** on a spend approval switches on **Spend without asking** for that coworker: it stops asking before paid data, which lets its scheduled runs and delegated tasks spend while you are away. Turn it back off in **Settings** > **Capabilities**.
 
-Each pause comes from a [capability](/agents/configure#capabilities): **Ask you questions**, **Request approval**, **SuggestService**, **Ask for a credential**, **Improve itself** for the MCP sign-in, **Browser** for the takeover, and **Leads, SEO & social data** with **Request approval** for the spend. Turn the capability off and the coworker cannot pause that way.
+Each pause comes from a [capability](/agents/configure#capabilities): **Ask you questions**, **Request approval**, **SuggestService**, **Ask for a credential**, **Improve itself** for the MCP sign-in, **Browser** for the takeover, **Use linked computers** for a computer access, and **Leads, SEO & social data** with **Request approval** for the spend. Turn the capability off and the coworker cannot pause that way.
 
 ## The secret guarantee
 

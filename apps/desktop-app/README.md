@@ -164,6 +164,10 @@ coworker stays on the workspace's box, the computer only does what it is asked.
 - What the person sets here is enforced by the worker whatever the engine asks: a pause refuses
   everything and stops what runs, a capability switched off is never offered nor run. Every request
   is logged with who asked, in `computer/activity.jsonl`.
+- A job outlives its socket, not the worker: quitting the app stops every job, and the next worker
+  marks a job it finds still running as lost. It stops what is left of it only when the process
+  holding the job's pid started when the job did (`processStartedAt` in `src/worker/process-tree.ts`):
+  after a reboot the system may have handed that pid to another program.
 - Linked, the app stays alive with its windows closed on every system; the tray says how the
   computer is doing and pauses it. Unlinking from the app tells the hub first, then forgets the token
   whatever the hub says.
