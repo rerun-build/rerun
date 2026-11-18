@@ -492,9 +492,12 @@
             "takeover": "Vous avez laissé le navigateur à votre coworker"
         },
         "computer": {
-            "allowed": "Autorisé sur <computer></computer>",
-            "always": "{rule} toujours autorisé sur <computer></computer>",
-            "denied": "Refusé sur <computer></computer>"
+            "status": {
+                "allowed": "Autorisé",
+                "always": "Toujours autorisé",
+                "denied": "Refusé"
+            },
+            "screen": "Écran, souris et clavier"
         }
     },
     "agentChat": {

@@ -492,9 +492,12 @@
             "takeover": "Dejaste el navegador a tu coworker"
         },
         "computer": {
-            "allowed": "Permitido en <computer></computer>",
-            "always": "{rule} siempre permitido en <computer></computer>",
-            "denied": "Rechazado en <computer></computer>"
+            "status": {
+                "allowed": "Permitido",
+                "always": "Siempre permitido",
+                "denied": "Denegado"
+            },
+            "screen": "Pantalla, ratón y teclado"
         }
     },
     "agentChat": {

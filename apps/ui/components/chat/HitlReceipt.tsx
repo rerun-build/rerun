@@ -1,9 +1,9 @@
 'use client'
 
-import { readSpendQuote } from '@rerun/contracts'
+import { readSpendQuote, type ComputerAccessRequest } from '@rerun/contracts'
 import { Badge, PANEL_CARD, type BadgeTone } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useEffect, useState, type ComponentType, type ReactNode } from 'react'
+import { Children, useEffect, useState, type ComponentType, type ReactNode } from 'react'
 
 import { getServiceAlternativesAction } from '@/app/api/_actions/services.actions'
 import type { ReadChatFile } from '@/components/chat/AttachmentLightbox'
@@ -16,7 +16,7 @@ import { pendingApprovals, pendingComputerAccess, pendingQuestions, pendingSecre
 import { humanizeToolSegment } from '@/lib/chat/connector-tools'
 import { hitlCallInput, type HitlCallPart } from '@/lib/chat/hitl-receipts'
 import type { RawUrlFor } from '@/lib/files/raw-url'
-import { CheckIcon, KeyIcon, LinkIcon, MessageCircleQuestionIcon, MonitorIcon, PlugIcon, ShieldAlertIcon, ShieldCheckIcon, XIcon } from '@/lib/icons'
+import { CheckIcon, FileIcon, KeyIcon, LinkIcon, MessageCircleQuestionIcon, MonitorIcon, MousePointer2Icon, PlugIcon, ShieldCheckIcon, TerminalIcon, XIcon } from '@/lib/icons'
 import { ComputerHandle } from '@/components/computers/ComputerBits'
 import { serviceIconProps } from '@/lib/services/icons'
 import { cn } from '@/lib/utils'
@@ -54,36 +54,66 @@ export function HitlReceipt({ reply, call, spentMicros = 0, spendRunning = false
         case 'spend':
             return <SpendReceipt decision={reply} totalMicros={readSpendQuote(call?.output)?.totalMicros ?? null} progress={{ spentMicros, running: spendRunning }} />
         case 'computer':
-            return <ComputerAccessReceipt reply={reply} commands={call ? pendingComputerAccess(input).commands : []} />
+            return <ComputerAccessReceipt reply={reply} request={call ? pendingComputerAccess(input) : null} />
         case 'cancelled':
             return <DismissedLine of={reply.of} />
     }
 }
 
-function ComputerAccessReceipt({ reply, commands }: { reply: Extract<HitlReply, { kind: 'computer' }>; commands: string[] }) {
-    const t = useTranslations('chat.receipt.computer')
-    const approved = reply.decision === 'approved'
-    const computer = () => <ComputerHandle handle={reply.computer} />
+const COMPUTER_STATUS_TONE = { allowed: 'green', always: 'green', denied: 'red' } as const satisfies Record<string, BadgeTone>
+
+// The start of a line the kept rule covers (the program `ffmpeg`, the folder `~/Documents/Factures`),
+// so "always" shows what it allows from now on. `ff` does not cover `ffmpeg`: the rule ends at a separator.
+function RuleHighlight({ line, rule, separator }: { line: string; rule?: string; separator: string }) {
+    const covered = rule && line.startsWith(rule) && (line.length === rule.length || line[rule.length] === separator || rule.endsWith(separator))
+    if (!covered) return <>{line}</>
     return (
-        <div className="ml-auto flex max-w-[85%] flex-col items-end gap-1 text-xs text-muted-foreground">
-            <p className="flex items-center gap-1.5">
-                {approved ? <CheckIcon className="size-3.5 shrink-0 text-green-500" /> : <ShieldAlertIcon className="size-3.5 shrink-0 text-red-500" />}
-                <span>{approved ? (reply.always ? t.rich('always', { rule: reply.always, computer }) : t.rich('allowed', { computer })) : t.rich('denied', { computer })}</span>
-            </p>
-            {commands.length > 0 && <p className={cn('max-w-full truncate font-mono text-[11px]', !approved && 'line-through decoration-muted-foreground/40')}>{commands.join(' · ')}</p>}
-        </div>
+        <>
+            <mark className="bg-transparent text-green-600 underline decoration-green-500/40 decoration-dotted underline-offset-2 dark:text-green-400">{rule}</mark>
+            {line.slice(rule.length)}
+        </>
     )
 }
 
-function ReceiptCard({ icon: Glyph, title, meta, children }: { icon: ComponentType<{ className?: string }>; title: string; meta?: string; children: ReactNode }) {
+function ComputerAccessReceipt({ reply, request }: { reply: Extract<HitlReply, { kind: 'computer' }>; request: ComputerAccessRequest | null }) {
+    const t = useTranslations('chat.receipt.computer')
+    const approved = reply.decision === 'approved'
+    const status = !approved ? 'denied' : reply.always ? 'always' : 'allowed'
+    const commands = request?.commands ?? []
+    const paths = commands.length > 0 ? [] : (request?.paths ?? [])
+    const screen = request?.screen === true && commands.length === 0 && paths.length === 0
+    const lines = commands.length > 0 ? commands : paths
+
+    return (
+        <ReceiptCard
+            icon={paths.length > 0 ? FileIcon : screen ? MousePointer2Icon : TerminalIcon}
+            title={<ComputerHandle handle={reply.computer} className="block truncate" />}
+            meta={
+                <Badge size="xs" tone={COMPUTER_STATUS_TONE[status]} glow={false}>
+                    {t(`status.${status}`)}
+                </Badge>
+            }
+        >
+            {screen ? <p className="px-3 py-2 text-sm text-foreground">{t('screen')}</p> : null}
+            {lines.map(line => (
+                <code key={line} className={cn('block px-3 py-1.5 font-mono text-xs whitespace-pre-wrap [overflow-wrap:anywhere]', approved ? 'text-foreground' : 'text-muted-foreground line-through decoration-muted-foreground/40')}>
+                    {approved ? <RuleHighlight line={line} rule={reply.always} separator={paths.length > 0 ? '/' : ' '} /> : line}
+                </code>
+            ))}
+        </ReceiptCard>
+    )
+}
+
+function ReceiptCard({ icon: Glyph, title, meta, children }: { icon: ComponentType<{ className?: string }>; title: ReactNode; meta?: ReactNode; children?: ReactNode }) {
+    const hasBody = Children.toArray(children).length > 0
     return (
         <div className={cn(PANEL_CARD, USER_SIDE, 'overflow-hidden')}>
-            <div className="flex items-center gap-2 border-b border-border px-3 py-2 text-xs">
-                <Glyph className="size-3.5 text-muted-foreground" />
-                <span className="font-medium text-foreground">{title}</span>
-                {meta && <span className="ml-auto text-muted-foreground">{meta}</span>}
+            <div className={cn('flex items-center gap-2 px-3 py-2 text-xs', hasBody && 'border-b border-border')}>
+                <Glyph className="size-3.5 shrink-0 text-muted-foreground" />
+                <span className="min-w-0 font-medium text-foreground">{title}</span>
+                {meta && <span className="ml-auto shrink-0 text-muted-foreground">{meta}</span>}
             </div>
-            <div className="divide-y divide-border">{children}</div>
+            {hasBody && <div className="divide-y divide-border">{children}</div>}
         </div>
     )
 }

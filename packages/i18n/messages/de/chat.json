@@ -492,9 +492,12 @@
             "takeover": "Du hast den Browser deinem Coworker überlassen"
         },
         "computer": {
-            "allowed": "Erlaubt auf <computer></computer>",
-            "always": "{rule} auf <computer></computer> immer erlaubt",
-            "denied": "Abgelehnt auf <computer></computer>"
+            "status": {
+                "allowed": "Erlaubt",
+                "always": "Immer erlaubt",
+                "denied": "Abgelehnt"
+            },
+            "screen": "Bildschirm, Maus und Tastatur"
         }
     },
     "agentChat": {

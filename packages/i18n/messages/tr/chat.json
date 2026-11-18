@@ -492,9 +492,12 @@
             "takeover": "Tarayıcıyı coworker'ınıza bıraktınız"
         },
         "computer": {
-            "allowed": "<computer></computer> üzerinde izin verildi",
-            "always": "<computer></computer> üzerinde {rule} için her zaman izin verildi",
-            "denied": "<computer></computer> üzerinde reddedildi"
+            "status": {
+                "allowed": "İzin verildi",
+                "always": "Her zaman izinli",
+                "denied": "Reddedildi"
+            },
+            "screen": "Ekran, fare ve klavye"
         }
     },
     "agentChat": {
