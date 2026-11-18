@@ -145,6 +145,18 @@ describe('stepContextGuard', () => {
         expect(state.prompts).toBe(1)
     })
 
+    it('turns prune-only after a summary that leaves the context at or over the point', async () => {
+        const events: unknown[] = []
+        const guard = stepContextGuard(ctx, undefined, 'system', 0, AT, 0, e => events.push(e))
+        const messages: Message[] = [text('user', 200_000, 'T'), text('assistant', 200_000), ...TAIL]
+        expect(await guard(messages)).toBeDefined()
+        expect(await guard([...messages, text('user', 50)])).toBeDefined()
+        expect(await guard([...messages, text('user', 50), text('user', 60)])).toBeDefined()
+        expect(state.prompts).toBe(1)
+        expect(events).toHaveLength(1)
+        expect(logs.filter(([, message]) => message === 'in-run summary did not get under the point')).toHaveLength(1)
+    })
+
     it('only prunes when the point cannot hold the prompt, the tail and a summary', async () => {
         const events: unknown[] = []
         const guard = stepContextGuard(ctx, undefined, 'system', 0, 24_576, 0, e => events.push(e))

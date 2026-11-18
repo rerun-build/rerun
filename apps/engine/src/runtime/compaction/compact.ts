@@ -198,7 +198,12 @@ export function stepContextGuard(ctx: RunContext, override: ModelOverride | unde
             summary = { message, kept, covers: (summary?.covers ?? 0) + tailStart - head }
             pruning = false
             onCompact({ trigger: 'summary', summaryChars: text.length })
-            return repairToolPairs([message, ...(kept ? [kept] : []), ...pruned.slice(tailStart)])
+            const next = repairToolPairs([message, ...(kept ? [kept] : []), ...pruned.slice(tailStart)])
+            if (estimateTokens(next, system, toolChars) >= at) {
+                summaryFailed = true
+                ctx.logger.info({ agent: ctx.agent.id, session: ctx.sessionId }, 'in-run summary did not get under the point')
+            }
+            return next
         } catch (error) {
             summaryFailed = true
             ctx.writer?.write({ type: 'data-compaction', id: newId(), data: { status: 'error' } })
