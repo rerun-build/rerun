@@ -95,6 +95,7 @@ export function runContextWindow(model: string, provider: Provider, connection?:
 export function effectiveCompactAt(size: ContextSize | undefined, provider: Provider, model: string, connection?: LoadedConnection | null): CompactPoint {
     const at = compactAtTokens(size)
     if (at === null) return 'off'
+    if (provider === 'claude') return at
     const window = provider === 'custom' ? customMeasuredContextWindow(connection, model) : runContextWindow(model, provider, connection)
     if (window === undefined) return 'default'
     return Math.min(at, CLI_PROVIDERS.has(provider) ? window - COMPACT_RESERVE_TOKENS : Math.floor(window * COMPACTION_TRIGGER_RATIO))

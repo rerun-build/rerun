@@ -70,7 +70,8 @@ describe('effectiveCompactAt', () => {
 
     it('leaves compaction to the provider when no window was measured, and does not take the invented default as one', () => {
         expect(effectiveCompactAt('large', 'openai', 'no-such-model')).toBe('default')
-        expect(effectiveCompactAt('large', 'claude', 'claude-opus-5-5')).toBe(167000)
+        expect(effectiveCompactAt('large', 'claude', 'claude-opus-5-5')).toBe(940000)
+        expect(effectiveCompactAt('small', 'claude', 'no-such-model')).toBe(240000)
         expect(effectiveCompactAt('large', 'custom', 'm', custom())).toBe('default')
         expect(effectiveCompactAt('large', 'custom', 'm', null)).toBe('default')
         expect(customContextWindow(custom(), 'm')).toBe(CUSTOM_DEFAULT_CONTEXT_WINDOW)
