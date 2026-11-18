@@ -16,7 +16,6 @@ const { sent, stream, prep, curator, recalls } = vi.hoisted(() => ({
         toolsGate: null as Promise<void> | null,
         closeError: null as Error | null,
         callTargets: [] as string[],
-        // The MCP tools of the run and, when it holds them back, the catalog `buildTools` hands the loop.
         mcp: null as { tools: Record<string, unknown>; heldBackMcp?: unknown } | null,
     },
     curator: { calls: [] as unknown[][] },
@@ -201,7 +200,6 @@ describe('run loop paths', () => {
         const ran: Array<{ tool: string; args: unknown }> = []
         const sentTools = (call: Record<string, unknown>) => (call.tools as Array<{ name: string }>).map(t => t.name)
         const isToolPart = (part: { type: string }) => part.type === 'tool-call' || part.type === 'tool-result'
-        // What the model is shown of the calls made so far.
         const shownCalls = (call: Record<string, unknown>) => (call.prompt as Array<{ content: unknown }>).flatMap(message => (Array.isArray(message.content) ? (message.content as ToolPart[]).filter(isToolPart) : []))
         const storedCalls = async (sessionId: string) =>
             (await listMessages(id, sessionId)).flatMap(row => {

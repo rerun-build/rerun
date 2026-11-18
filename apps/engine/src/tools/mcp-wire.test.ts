@@ -5,7 +5,6 @@ import { mcpCallTool, mcpWireMiddleware } from './mcp-wire.js'
 const tool = (name: string) => ({ name, inputSchema: { type: 'object' as const } })
 const wire = mcpWireMiddleware(mcpToolCatalog([{ name: 'linear', tools: [tool('list_issues'), tool('create_issue')] }]))
 
-// What the loop receives of the parts a model streamed.
 async function received(parts: unknown[]): Promise<unknown[]> {
     const doStream = async () => ({
         stream: new ReadableStream({
@@ -21,7 +20,6 @@ async function received(parts: unknown[]): Promise<unknown[]> {
     return out
 }
 
-// What the model is sent of a conversation.
 async function sent(prompt: unknown[]): Promise<unknown[]> {
     const transform = wire.transformParams as unknown as (options: { params: { prompt: unknown[] } }) => Promise<{ prompt: unknown[] }>
     return (await transform({ params: { prompt } })).prompt

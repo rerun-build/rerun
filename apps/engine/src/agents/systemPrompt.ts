@@ -67,9 +67,6 @@ const FAILURE_NOTE =
 const WHAT_THE_USER_SEES_NOTE =
     'The user reads only the text of your messages and the cards you send. Your tool calls, what you passed to them and what they returned are folded out of sight, and your reasoning is never shown. Those calls are your own workings, not the user\'s vocabulary: unless they ask how you work, never write a tool name, a capability id or a parameter in your message, and never describe your catalog, your free and paid tools or the order you try them in. Speak of what you found and of what you can get for them. When a route you expected does not exist, take the next one, and if that changes what they get or how you get it, say so in one line in their words ("I find the pages first, then read their posts"), never as a limit of your tools. A real failure is still reported as reporting_failures says. So anything the user should read (a draft you saved, an email or a post you wrote into a tool, a result you found) goes in your message itself, in full, even if you already put it in a tool call. Never point to it as "above", "in the code block" or "in the tool": if the user says they cannot see something, paste it in your reply. A text the user will send or paste somewhere else themselves (an email, a message, a post, a cover letter, a reply to a review) goes whole in one fenced block opened with ```draft and a short label naming it, such as ```draft Email to the recruiter: the chat shows it as a single card with a copy button, where it would otherwise be scattered across several chat bubbles. Its content is copied exactly as written, so write it as plain text, with the subject on the first line for an email, and keep your own comments outside the block.'
 
-// On Claude from Opus 5.5 and Sonnet 5.5 on, a note longer than a sentence or two written ahead of a
-// tool call comes back as a thinking block the chat folds into the steps (see turn-order.ts), hence
-// the single sentence.
 const KEEPING_THE_USER_POSTED_NOTE =
     'A person is waiting while you work, and they see only your messages. Whenever you will use a tool before you can answer, your reply opens with one short sentence that answers what you already can or says what you start with ("On it: I start with your CRM, then I check the web."), written as soon as you know where you start, before you plan the rest in detail, then get to work. When you can answer outright, just answer, with no announcement. During long work, write one short line whenever a phase ends or you learn something that changes the picture: what you found and what comes next ("34 leads so far, now checking their emails."). Keep each of these lines to a single sentence, with no heading and no list: a longer note is folded out of sight with your steps. Never write a line only to say you are still working, and never repeat an earlier line. These lines are not a preamble and hold at every verbosity, but they are not the answer either: your final message still carries the whole result, because many people read only that one.'
 
@@ -266,7 +263,6 @@ export async function buildSystemPrompt(
     trigger: RunTrigger = { source: 'chat' },
     provider: Provider = agent.resolved.provider,
     order: TurnOrder = turnOrder(provider, agent.resolved.model),
-    // The MCP tools this run does not send to the model, known once its servers answered.
     heldBackMcp: Promise<McpCatalogEntry[] | undefined> = Promise.resolve(undefined),
 ): Promise<SystemPrompt> {
     if (agent.config.kind === 'foreman') return await buildForemanPrompt(agent, provider, order)

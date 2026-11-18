@@ -37,7 +37,6 @@ import { CLI_PROVIDERS } from '../agents/providers.js'
 import { closeAgentDb } from '../db/agentDb.js'
 import type { RunContext } from '../runtime/context.js'
 
-// `heldBackMcp` lists the MCP tools the model is not sent, when the agent's set is too heavy to be.
 export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; heldBackMcp?: McpCatalogEntry[]; close: () => Promise<void> }> {
     const cfg = ctx.agent.config.tools
     const tools: ToolSet = {}

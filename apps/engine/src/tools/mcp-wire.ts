@@ -4,17 +4,10 @@ import { isRecord } from '@rerun/contracts'
 import { loopToolNameFor } from '../runtime/tool-repair.js'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, type McpCatalogEntry } from './mcp-search.js'
 
-// A run that holds its MCP tools back sends the model one fixed list of tools, so that nothing a
-// search finds moves the start of the prompt the provider caches. The model runs a held-back tool
-// through `mcp_call`, and this is the only place that knows it: on the way in the call is renamed
-// to the tool it names, so the loop, the stored conversation, the app and the statistics all see
-// `linear_list_issues`; on the way out the conversation is put back the way the model wrote it.
-
 type StreamPart = { type: string; id?: string; toolName?: string; input?: string }
 
 type HeldCall = { toolName: string; args: Record<string, unknown> }
 
-// Arguments come in the `arguments` object, sometimes as its JSON text, sometimes laid beside `tool`.
 function argumentsOf(call: Record<string, unknown>): Record<string, unknown> {
     const { tool: _tool, arguments: given, ...beside } = call
     if (isRecord(given)) return given
@@ -66,7 +59,6 @@ export function mcpWireMiddleware(catalog: McpCatalogEntry[]): LanguageModelMidd
         }),
         async wrapStream({ doStream }) {
             const result = await doStream()
-            // The tool a call runs is only known once its input is whole, so its input is not streamed.
             const unstreamed = new Set<string>()
             return {
                 ...result,
@@ -88,7 +80,6 @@ export function mcpWireMiddleware(catalog: McpCatalogEntry[]): LanguageModelMidd
     }
 }
 
-// Only reached by a call the middleware could not hand to a tool: the name is not one of the agent's.
 export function mcpCallTool(): ToolSet {
     return {
         [MCP_CALL_TOOL]: tool({

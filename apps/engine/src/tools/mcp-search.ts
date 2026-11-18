@@ -3,23 +3,16 @@ import { z } from 'zod'
 import { mcpToolNameFor, modelReadyMcpTool, type McpTool } from './mcp.js'
 import { toolPayloadChars } from './payload.js'
 
-// Above this, an agent's MCP tools are no longer sent to the model: it is told which servers it has,
-// reads the schema of the tools it needs in the result of a search, and runs them through one
-// generic call. The list of tools it is sent then never changes, so a search costs no prompt cache.
-// About 10k tokens, so an agent with one small server keeps its tools in the list and pays no search step.
 export const MCP_EAGER_PAYLOAD_CHARS = 40_000
 export const MCP_SEARCH_DEFAULT_LIMIT = 8
 export const MCP_SEARCH_MAX_LIMIT = 20
 
 export const MCP_SEARCH_TOOL = 'mcp_search'
-// The one tool every held-back tool is run through, see `mcp-wire.ts`.
 export const MCP_CALL_TOOL = 'mcp_call'
 const SERVER_LISTING_CAP = 200
-// A word this short is only looked for whole: `in` is not found in `linear`, nor `an` in `channel`.
 const PARTIAL_MATCH_MIN_CHARS = 4
 const FILLER_WORDS = new Set(['an', 'the', 'to', 'of', 'in', 'on', 'for', 'and', 'or', 'with', 'from', 'by', 'at', 'my', 'me', 'is', 'are', 'it', 'its', 'that', 'into', 'as', 'be', 'all', 'any', 'some'])
 
-// `description` and `inputSchema` are the ones the model would get with the tool in its list.
 export type McpCatalogEntry = { name: string; server: string; tool: string; description: string; inputSchema: McpTool['inputSchema'] }
 export type McpSearch = { query?: string; server?: string; limit?: number }
 export type McpSearchResult = { matches: McpCatalogEntry[]; total: number }
@@ -32,8 +25,6 @@ export function mcpToolsAreDeferred(mcpTools: ToolSet): boolean {
     return toolPayloadChars(mcpTools) > MCP_EAGER_PAYLOAD_CHARS
 }
 
-// One entry per tool under the name the loop registers it. Two servers whose tools end up with the
-// same name leave one entry, the last, as they leave one tool in the set.
 export function mcpToolCatalog(servers: Array<{ name: string; tools: McpTool[] }>): McpCatalogEntry[] {
     const byName = new Map<string, McpCatalogEntry>()
     for (const server of servers) {
@@ -46,7 +37,6 @@ export function mcpToolCatalog(servers: Array<{ name: string; tools: McpTool[] }
     return [...byName.values()]
 }
 
-// `listIssues` and `list_issues` are the same two words, and `issues` finds `issue`.
 function wordsOf(text: string): string[] {
     return text
         .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
@@ -69,8 +59,6 @@ function scoreOf(entry: McpCatalogEntry, queryWords: string[]): number {
     return score
 }
 
-// "create an issue in linear" is asked with `create`, `issue` and `linear`. A query made of filler
-// words only is kept as it is.
 function queryWordsOf(text: string): string[] {
     const words = [...new Set(wordsOf(text))]
     const meaningful = words.filter(word => !FILLER_WORDS.has(word))
@@ -87,13 +75,10 @@ export function mcpServerTools(catalog: McpCatalogEntry[], server: string): McpC
     return catalog.filter(entry => entry.server.toLowerCase() === wanted)
 }
 
-// Full names give exactly those tools. Otherwise the tools are ranked by the words of the query they
-// carry, a word of the name weighing more than one of the description, the tool named like the query first.
 export function searchMcpTools(catalog: McpCatalogEntry[], { query = '', server, limit }: McpSearch): McpSearchResult {
     const asked = query.trim()
     if (!asked) return { matches: [], total: 0 }
     const scoped = server?.trim() ? mcpServerTools(catalog, server) : catalog
-    // The pieces keep their case: `getChannelMessages` is still three words once it is not a full name.
     const pieces = asked.split(/[\s,]+/).filter(Boolean)
     const askedNames = new Set(pieces.map(piece => piece.toLowerCase()))
     const named = scoped.filter(entry => askedNames.has(entry.name.toLowerCase()))
@@ -117,8 +102,6 @@ export function mcpServerToolCounts(catalog: McpCatalogEntry[]): Map<string, num
     return counts
 }
 
-// The tools the model is sent, the same on every step of every run of the conversation: everything
-// but the MCP tools held back. Those stay in the set, so a call that names one still runs.
 export function sentToolNames(tools: ToolSet, catalog: McpCatalogEntry[]): string[] {
     const held = new Set(catalog.map(entry => entry.name))
     return Object.keys(tools).filter(name => !held.has(name))
