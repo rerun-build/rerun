@@ -19,17 +19,22 @@ import { useTranslations } from 'next-intl'
 // la page telle quelle, décor compris, et un `--popover` plus clair y trahirait la carte. Seules
 // les mentions diffèrent, la page devant rester au-dessus de la barre de consentement quand la
 // dialog la gère déjà elle-même (`bottom-[var(--consent-inset)]` en bottom sheet).
+//
+// `corner` sits in a row of its own above the centered block, on the scene, like the onboarding
+// dialog's.
 export function AuthShell({
     title,
     subtitle,
     titleAs: Title = 'h1',
     variant = 'page',
+    corner,
     children,
 }: {
     title: ReactNode
     subtitle: ReactNode
     titleAs?: ElementType
     variant?: 'page' | 'dialog'
+    corner?: ReactNode
     children: ReactNode
 }) {
     const isDialog = variant === 'dialog'
@@ -37,6 +42,7 @@ export function AuthShell({
     return (
         <div className="relative isolate flex h-full min-h-0 w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/20">
             <AuthScene variant={variant} />
+            {corner && <div className="relative z-10 flex min-w-0 shrink-0 px-4 pt-4">{corner}</div>}
 
             <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-6 py-6 sm:py-10">
                 <div className="mx-auto w-full max-w-sm space-y-6">

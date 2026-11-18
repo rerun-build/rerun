@@ -4,6 +4,7 @@ import { claimWelcomeEngineAction, finishWelcomeAction, welcomeEngineAnswersActi
 import { finishWelcomeTeamAction, saveWelcomeIndustryAction, saveWelcomeRoleAction, saveWelcomeSiteAction } from '@/app/api/_actions/welcome.actions'
 import { streamLiveDiscoveries } from '@/components/builder/discoveries/useCompanyDiscoveries'
 import { OnboardingDialog } from '@/components/onboarding/OnboardingDialog'
+import { WelcomeWorkspaceSwitcher } from '@/components/onboarding/WelcomeWorkspaceSwitcher'
 import { EngineWaitlistDialog } from '@/components/dialogs/EngineWaitlistDialog'
 import { EngineStep, type EngineProgress } from '@/components/onboarding/welcome/EngineStep'
 import { IndustryStep, type IndustryAnswer } from '@/components/onboarding/welcome/IndustryStep'
@@ -48,7 +49,7 @@ const ENGINE_POLL_MS = 2_000
 // of the questions: the trial, or the machine where the workspace is already entitled or nothing is
 // sold. With no machine left in the pool, the waitlist wall stands before the trial. The billing
 // dialog and the waitlist wall each take the onboarding dialog's place, never open on top of it.
-export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, next, phonePending, waitlisted }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean }) {
+export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, next, phonePending, waitlisted, canSwitchWorkspace }: { initialStep: OnboardingStep; afterQuestions: OnboardingStep; initial: WelcomeAnswers; firstName: string | null; next: string; phonePending: boolean; waitlisted: boolean; canSwitchWorkspace: boolean }) {
     const errorText = useErrorText()
     const router = useRouter()
     const { phoneStep, workspace } = useSession()
@@ -219,13 +220,15 @@ export function WelcomeFlow({ initialStep, afterQuestions, initial, firstName, n
     )
 
     const waitlistUp = waitlisted && (step === 'trial' || step === 'engine')
+    // Someone who created this workspace by mistake goes back to the one they were in, from any step.
+    const switcher = canSwitchWorkspace ? <WelcomeWorkspaceSwitcher /> : undefined
 
     return (
         <>
-            <OnboardingDialog open={!waitlistUp && !(step === 'trial' && billingOpen)} stepKey={askPhone ? 'phone' : step}>
+            <OnboardingDialog open={!waitlistUp && !(step === 'trial' && billingOpen)} stepKey={askPhone ? 'phone' : step} corner={switcher}>
                 {content}
             </OnboardingDialog>
-            <EngineWaitlistDialog open={waitlistUp} />
+            <EngineWaitlistDialog open={waitlistUp} corner={switcher} />
         </>
     )
 }

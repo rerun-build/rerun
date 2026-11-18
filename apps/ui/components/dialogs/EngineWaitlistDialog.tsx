@@ -2,7 +2,7 @@
 
 import { accountLabel } from '@/lib/auth/placeholder-email'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { AuthShell } from '@/components/auth/AuthShell'
 import { Button } from '@/components/ui/button'
@@ -12,8 +12,9 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // The wall an account meets when the pool has no machine left for it. Same frame and same locks as
 // the welcome wall: nothing behind it is actionable, and there is nothing to click through, because
 // the only way out is a machine freeing up, which the next page load sees on its own. Signing out
-// stays possible so a wrong account is not trapped behind it.
-export function EngineWaitlistDialog({ open }: { open: boolean }) {
+// stays possible so a wrong account is not trapped behind it, and `corner` can hold the workspace
+// pill so someone who has another workspace goes back to it.
+export function EngineWaitlistDialog({ open, corner }: { open: boolean; corner?: ReactNode }) {
     const t = useTranslations('dialogs.engineWaitlist')
     const { session, signOut } = useSession()
     const email = accountLabel(session?.user?.email)
@@ -27,7 +28,7 @@ export function EngineWaitlistDialog({ open }: { open: boolean }) {
     return (
         <Dialog open={open} dismissible={false}>
             <DialogContent className="gap-0 overflow-hidden bg-background p-0 sm:w-[min(92vw,34rem)] sm:max-w-none sm:rounded-2xl" showCloseButton={false} onEscapeKeyDown={e => e.preventDefault()} onPointerDownOutside={e => e.preventDefault()} onInteractOutside={e => e.preventDefault()}>
-                <AuthShell title={t('title')} subtitle={t('subtitle')} titleAs={DialogTitle} variant="dialog">
+                <AuthShell title={t('title')} subtitle={t('subtitle')} titleAs={DialogTitle} variant="dialog" corner={corner}>
                     <div className="space-y-4 text-center">
                         {email && (
                             <p className="text-sm text-muted-foreground">

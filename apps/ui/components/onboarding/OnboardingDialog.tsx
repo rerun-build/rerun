@@ -3,6 +3,7 @@
 import { AuthScene } from '@/components/auth/AuthScene'
 import { StepSwap } from '@/components/onboarding/StepSwap'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
 import { Logo } from '@rerun/ui/logo'
 import type { ReactNode } from 'react'
 
@@ -11,8 +12,9 @@ const keepOpen = (event: Event) => event.preventDefault()
 // The one dialog of the sign-in and of the questions after it, over the app's backdrop. Each change
 // of `stepKey` plays in three beats (fade out, resize, fade in). The page that renders it keeps its
 // state outside of it, so the dialog can step aside for the billing dialog or the waitlist wall and
-// come back without losing anything.
-export function OnboardingDialog({ open = true, stepKey, children }: { open?: boolean; stepKey: string; children: ReactNode }) {
+// come back without losing anything. `corner` sits in a row of its own above the steps, still while
+// they swap.
+export function OnboardingDialog({ open = true, stepKey, corner, children }: { open?: boolean; stepKey: string; corner?: ReactNode; children: ReactNode }) {
     return (
         <Dialog open={open} dismissible={false}>
             <DialogContent
@@ -29,7 +31,8 @@ export function OnboardingDialog({ open = true, stepKey, children }: { open?: bo
                     <div className="absolute inset-x-0 top-1/2 h-[48rem] -translate-y-1/2">
                         <AuthScene variant="dialog" />
                     </div>
-                    <StepSwap stepKey={stepKey} innerClassName="relative z-10 px-6 pt-10 pb-[max(2rem,env(safe-area-inset-bottom))]">
+                    {corner && <div className="relative z-10 flex min-w-0 px-4 pt-4">{corner}</div>}
+                    <StepSwap stepKey={stepKey} innerClassName={cn('relative z-10 px-6 pb-[max(2rem,env(safe-area-inset-bottom))]', corner ? 'pt-6' : 'pt-10')}>
                         <div className="mx-auto w-full max-w-sm">{children}</div>
                     </StepSwap>
                 </div>

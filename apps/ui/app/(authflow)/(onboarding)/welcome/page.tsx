@@ -10,7 +10,8 @@ import { readWelcomeState } from '@/lib/onboarding/welcome.server'
 import { routes } from '@/lib/routes'
 import { getServerSession } from '@/supabase/session/getServerSession'
 import { SessionProvider } from '@/supabase/session/SessionProvider'
-import { selectMany } from '@/supabase/supabase-helpers'
+import { WorkspaceSwitchLoader } from '@/components/layout/WorkspaceSwitchLoader'
+import { selectCount, selectMany } from '@/supabase/supabase-helpers'
 import { BILLING_ENABLED, isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { BillingDialog } from '@rerun/cloud/billing.client'
 import { isPhoneStepPending } from '@rerun/cloud/phone.server'
@@ -20,6 +21,16 @@ import { WelcomeFlow } from './WelcomeFlow'
 export async function generateMetadata(): Promise<Metadata> {
     const t = await getTranslations('onboarding')
     return { title: t('metaTitle'), robots: { index: false, follow: false } }
+}
+
+// Read on the server so the workspace pill holds its row from the first paint, the session's list
+// of workspaces only arriving after it. Sandboxes are left out, as in the pill's menu.
+async function hasAnotherWorkspace(ctx: WorkspaceContext): Promise<boolean> {
+    const { data: memberships } = await selectMany(ctx.supabase, 'workspace_members', ['workspace_id'] as const, { user_id: ctx.userId })
+    const ids = (memberships ?? []).map(m => m.workspace_id)
+    if (ids.length < 2) return false
+    const { data: count } = await selectCount(ctx.supabase, 'workspaces', { id: ids, is_sandbox: false })
+    return (count ?? 0) > 1
 }
 
 // The onboarding of a new workspace, in the dialog the sign-in opened over the app. Only its admin, and only
@@ -42,10 +53,11 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
     const state = await readWelcomeState(ctx)
     if (!state.needed) redirect(next)
 
-    const [{ data: pending }, phonePending, waitlisted] = await Promise.all([
+    const [{ data: pending }, phonePending, waitlisted, canSwitchWorkspace] = await Promise.all([
         selectMany(ctx.supabase, 'workspace_invitations', ['email'] as const, { workspace_id: ctx.workspace.id, status: 'pending' }),
         isPhoneStepPending(ctx.supabase, ctx.userId),
         resolveEngineWaitlist(ctx.workspace.id),
+        hasAnotherWorkspace(ctx),
     ])
     const { answers } = state
     const siteIndustry = answers.onboarding?.siteIndustry
@@ -68,8 +80,10 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
                 next={next}
                 phonePending={phonePending}
                 waitlisted={waitlisted}
+                canSwitchWorkspace={canSwitchWorkspace}
             />
             <BillingDialog />
+            <WorkspaceSwitchLoader />
         </SessionProvider>
     )
 }
