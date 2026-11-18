@@ -6,6 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-system-prompt-
 
 const { afterEach, describe, expect, it, vi } = await import('vitest')
 const { agentConfigSchema } = await import('@rerun/contracts')
+const { SKILL_STYLE } = await import('../skills/style.js')
 const { buildSystemPrompt: buildSystemPromptBlocks, systemPromptText, currentTimeNote, nowBlock, userBlock, userLanguageBlock } = await import('./systemPrompt.js')
 
 const buildSystemPrompt = async (...args: Parameters<typeof buildSystemPromptBlocks>) => systemPromptText(await buildSystemPromptBlocks(...args))
@@ -126,6 +127,7 @@ describe('skills section', () => {
         expect(prompt).toContain('<skills>')
         expect(prompt).toContain('You have no skill yet')
         expect(prompt).toContain('Never write a skill on your own initiative')
+        expect(prompt).toContain(SKILL_STYLE)
     })
 
     it('sends the capture through the inline proposal, never through a question', async () => {
@@ -164,6 +166,13 @@ describe('skills section', () => {
         expect(prompt).toContain('propose nothing and keep building')
         expect(prompt).toContain('one skill_propose call that carries the whole flow as it ended up')
         expect(prompt).toContain('never one call per step')
+    })
+
+    it('keeps a proposal short and decidable from its title and summary', async () => {
+        const prompt = await buildSystemPrompt(agentWith({ skills: true }), { source: 'chat' })
+        expect(prompt).toContain('as short numbered steps')
+        expect(prompt).toContain('with no context and no why')
+        expect(prompt).toContain('The user decides from the title and the summary alone')
     })
 
     it('says the same thing whether or not anyone is watching the run', async () => {
@@ -339,11 +348,29 @@ describe('buildSystemPrompt sub-agent rules', () => {
     })
 })
 
+describe('keeping the user posted', () => {
+    it('asks a coworker someone is chatting with for an opening line and short progress lines', async () => {
+        const prompt = await buildSystemPrompt(agent, { source: 'chat' })
+        const section = prompt.slice(prompt.indexOf('<keeping_the_user_posted>'), prompt.indexOf('</keeping_the_user_posted>'))
+        expect(section).toContain('Whenever you will use a tool before you can answer, your reply opens with one short sentence')
+        expect(section).toContain('whenever a phase ends')
+        expect(section).toContain('single sentence')
+        expect(section).toContain('your final message still carries the whole result')
+    })
+
+    it('leaves it out of a run nobody is waiting on', async () => {
+        expect(await buildSystemPrompt(agent, { source: 'schedule', slug: 'daily', name: 'daily' })).not.toContain('<keeping_the_user_posted>')
+        const delegate = { ...agent, config: agentConfigSchema.parse({ name: 'Prompt test delegate', provider: 'rerun', ephemeral: true, tools: { memory: false, db: false, schedule: false } }) }
+        expect(await buildSystemPrompt(delegate, { source: 'chat' })).not.toContain('<keeping_the_user_posted>')
+    })
+})
+
 describe('reporting failures', () => {
-    it('tells the agent to open its final message with what failed, and not to announce an action early', async () => {
+    it('tells the agent to open its final message with what failed, and never to claim an action done early', async () => {
         const prompt = await buildSystemPrompt(agent, { source: 'chat' })
         expect(prompt).toContain('<reporting_failures>')
         expect(prompt).toContain('your final message opens with that')
+        expect(prompt).toContain('Saying what you are about to do is fine')
         expect(prompt).toContain('before the tool call that does it has returned')
         expect(prompt).toContain('is still news to the reader')
     })

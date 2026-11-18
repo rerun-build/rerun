@@ -383,7 +383,7 @@ export function modelFor(agent: LoadedAgent, override?: ModelOverride, tools?: T
     return registryFor(agent, tools, mcpServers, options).languageModel(`${provider}:${model}`)
 }
 
-export type ResolvedModel = { model: LanguageModel; close: () => Promise<void>; contextUsage?: () => ContextOccupancy | undefined; quickReplies: () => QuickRepliesCapture | undefined }
+export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close: () => Promise<void>; contextUsage?: () => ContextOccupancy | undefined; quickReplies: () => QuickRepliesCapture | undefined }
 
 const noClose = async (): Promise<void> => {}
 

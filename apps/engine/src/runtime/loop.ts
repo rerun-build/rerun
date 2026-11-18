@@ -1,4 +1,4 @@
-import { streamText, ToolChoiceViolationError, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
+import { streamText, ToolChoiceViolationError, wrapLanguageModel, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
 import { RERUN_CONNECTION_ID, contextTextPart, type ContextOccupancy, type GoalVerdict, type MessageAuthor } from '@rerun/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
@@ -36,6 +36,8 @@ import { buildTools } from '../tools/registry.js'
 import { callTargetsOf } from '../tools/builtin/call-agent.js'
 import { toolPayloadChars } from '../tools/payload.js'
 import { wrapToolsWithResultHandle } from '../tools/result-handle.js'
+import { sentToolNames } from '../tools/mcp-search.js'
+import { mcpWireMiddleware } from '../tools/mcp-wire.js'
 import { prepareMcpServer } from '../tools/mcp.js'
 import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
@@ -459,7 +461,13 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         void syncAgentStatus(agent.id).catch(err => logger.warn({ err: String(err), agent: agent.id }, 'syncAgentStatus failed'))
 
-        const system = await buildSystemPrompt(agent, trigger, provider, order)
+        const system = await buildSystemPrompt(
+            agent,
+            trigger,
+            provider,
+            order,
+            toolsP.then(built => built.heldBackMcp),
+        )
         const systemText = systemPromptText(system)
 
         const pastAuthorIds = await listSessionAuthorIds(agent.id, sessionId).catch(() => [])
@@ -467,8 +475,11 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         const built = await toolsP
         closeTools = built.close
+        const { heldBackMcp } = built
         const tools = wrapToolsWithResultHandle(built.tools, { agentId: agent.id, runId: run.id })
-        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, override, shared, toolPayloadChars(tools)))
+        const sentNames = heldBackMcp ? sentToolNames(tools, heldBackMcp) : undefined
+        const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
+        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, override, shared, toolPayloadChars(sentTools)))
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)
@@ -492,7 +503,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         if (offersQuickReplies(agent.config)) quickReplies = resolvedModel.quickReplies
-        const languageModel = resolvedModel.model
+        const languageModel = heldBackMcp ? wrapLanguageModel({ model: resolvedModel.model, middleware: mcpWireMiddleware(heldBackMcp) }) : resolvedModel.model
 
         if (CLI_PROVIDERS.has(provider)) live = createLiveCounter({ flush: ({ toolCalls }) => updateRunLive(agent.id, run.id, { stepCount: toolCalls }) })
         let lastStepAt = Date.now()

@@ -10,16 +10,19 @@ process.env.RERUN_DESKTOP = 'on'
 const state = vi.hoisted(() => ({
     connected: [] as string[],
     mcpTools: {} as Record<string, unknown>,
+    mcpServer: 'linear',
     dbClosed: [] as string[],
     desktop: true,
     capture: true,
 }))
 
 vi.mock('./mcp-pool.js', () => ({
-    pooledMcpTools: async (agent: { id: string }) => {
+    pooledMcpServers: async (agent: { id: string }) => {
         state.connected.push(agent.id)
-        return state.mcpTools
+        const prefix = `${state.mcpServer}_`
+        return [{ name: state.mcpServer, tools: Object.entries(state.mcpTools).map(([name, t]) => ({ name: name.slice(prefix.length), description: (t as { description?: string }).description, inputSchema: { type: 'object' } })), call: async () => ({ content: [] }) }]
     },
+    pooledMcpToolSet: () => state.mcpTools,
 }))
 
 vi.mock('../db/agentDb.js', async importOriginal => ({
@@ -42,6 +45,8 @@ const { beforeEach, describe, expect, it } = await import('vitest')
 const { TOOL_KEYS } = await import('@rerun/contracts')
 const { buildTools } = await import('./registry.js')
 const { toolPayloadChars } = await import('./payload.js')
+const { MCP_CALL_TOOL, MCP_SEARCH_TOOL, sentToolNames } = await import('./mcp-search.js')
+const { dynamicTool, jsonSchema } = await import('ai')
 const { toolCatalog } = await import('./catalog.js')
 const { agentConfigSchema } = await import('../agents/types.js')
 
@@ -64,6 +69,7 @@ async function namesOf(ctx: ReturnType<typeof ctxWith>): Promise<string[]> {
 beforeEach(() => {
     state.connected.length = 0
     state.mcpTools = {}
+    state.mcpServer = 'linear'
     state.dbClosed.length = 0
     state.desktop = true
     state.capture = true
@@ -182,10 +188,74 @@ describe('buildTools', () => {
 
     it('lets an MCP tool whose name collides with a builtin replace it', async () => {
         const impostor = { description: 'from the fs MCP server' }
+        state.mcpServer = 'fs'
         state.mcpTools = { fs_read: impostor }
         const { tools, close } = await buildTools(ctxWith({ mcpServers: [{ name: 'fs', url: 'https://fs.example/mcp' }] }))
         await close()
         expect(tools.fs_read).toBe(impostor)
+    })
+
+    describe('MCP tools on demand', () => {
+        const servers = [{ name: 'linear', url: 'https://l.example/mcp' }]
+        const mcpToolsWeighing = (count: number, descriptionChars: number) =>
+            Object.fromEntries(Array.from({ length: count }, (_, i) => [`linear_tool_${i}`, dynamicTool({ description: `Tool ${i} ${'x'.repeat(descriptionChars)}`, inputSchema: jsonSchema({ type: 'object' }), execute: async () => '' })]))
+
+        it('leaves a light set of MCP tools in the list, with no search tool', async () => {
+            state.mcpTools = mcpToolsWeighing(5, 100)
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
+            await close()
+            expect(heldBackMcp).toBeUndefined()
+            expect(Object.keys(tools)).toEqual(expect.arrayContaining(['linear_tool_0', 'linear_tool_4']))
+            expect(tools).not.toHaveProperty(MCP_SEARCH_TOOL)
+            expect(tools).not.toHaveProperty(MCP_CALL_TOOL)
+        })
+
+        it('holds a heavy set back behind the search and the call, every tool still in the set to run', async () => {
+            state.mcpTools = mcpToolsWeighing(50, 1_000)
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
+            await close()
+            expect(heldBackMcp).toHaveLength(50)
+            expect(heldBackMcp?.[0]).toMatchObject({ name: 'linear_tool_0', server: 'linear', tool: 'tool_0', inputSchema: { type: 'object' } })
+            expect(Object.keys(tools)).toEqual(expect.arrayContaining(['linear_tool_0', 'linear_tool_49', MCP_SEARCH_TOOL, MCP_CALL_TOOL]))
+
+            const sent = sentToolNames(tools, heldBackMcp!)
+            expect(sent).toEqual(expect.arrayContaining([MCP_SEARCH_TOOL, MCP_CALL_TOOL, 'fs_read']))
+            expect(sent.filter(name => name.startsWith('linear_'))).toEqual([])
+            expect(toolPayloadChars(Object.fromEntries(sent.map(name => [name, tools[name]])))).toBeLessThan(toolPayloadChars(tools) - 50_000)
+        })
+
+        it('sends the same list after a search as before it', async () => {
+            state.mcpTools = mcpToolsWeighing(50, 1_000)
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }))
+            await close()
+            const before = sentToolNames(tools, heldBackMcp!)
+            const result = await (tools[MCP_SEARCH_TOOL] as any).execute({ query: 'linear_tool_7, linear_tool_9' }, { toolCallId: 'c', messages: [] })
+            expect(result.tools.map((found: { name: string }) => found.name)).toEqual(['linear_tool_7', 'linear_tool_9'])
+            expect(result.tools[0].inputSchema).toEqual({ type: 'object' })
+            expect(sentToolNames(tools, heldBackMcp!)).toEqual(before)
+        })
+
+        it('keeps its own search and call tools when a server brings tools of the same names', async () => {
+            state.mcpServer = 'mcp'
+            const impostor = () => dynamicTool({ description: 'x'.repeat(30_000), inputSchema: jsonSchema({ type: 'object' }), execute: async () => 'impostor' })
+            state.mcpTools = { mcp_search: impostor(), mcp_call: impostor() }
+            const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: [{ name: 'mcp', url: 'https://m.example/mcp' }] }))
+            await close()
+            expect(heldBackMcp).toEqual([])
+            expect(sentToolNames(tools, heldBackMcp!)).toEqual(expect.arrayContaining([MCP_SEARCH_TOOL, MCP_CALL_TOOL]))
+            expect(tools[MCP_SEARCH_TOOL].description).toMatch(/^Find the tools/)
+            expect(tools[MCP_CALL_TOOL].description).toMatch(/^Run a tool/)
+        })
+
+        it('never holds tools back on a CLI, which loads its servers itself', async () => {
+            state.mcpTools = mcpToolsWeighing(50, 1_000)
+            for (const provider of ['claude', 'codex']) {
+                const { tools, heldBackMcp, close } = await buildTools(ctxWith({ mcpServers: servers }, { provider }))
+                await close()
+                expect(heldBackMcp).toBeUndefined()
+                expect(tools).not.toHaveProperty(MCP_SEARCH_TOOL)
+            }
+        })
     })
 
     it('closes the agent database, with or without MCP', async () => {

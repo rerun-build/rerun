@@ -205,7 +205,7 @@ Lifecycle of a run:
 
 1. Load the session history and append the user message.
 2. Build the system prompt (soul + skills index + recalled memories).
-3. Build the tool set for this agent (enabled builtins + MCP).
+3. Build the tool set for this agent (enabled families + MCP servers). A heavy set of MCP tools is held back and reached on demand, see [MCP](#mcp).
 4. Start a `runs` audit row, mark the agent `busy`.
 5. Stream the model, executing tools each step.
 6. On finish: persist the assistant + tool messages, close MCP, mark `idle`, finish the audit row, and run the **curator**.
@@ -243,6 +243,20 @@ A few tools sit outside those families because they answer to a state rather tha
 Each agent can declare MCP servers in `config.mcpServers`. On a run they are connected (stdio or SSE) via the official `@modelcontextprotocol/sdk`, and their tools are merged into the agent's tool set under `"<server>_<tool>"` names (`src/tools/mcp.ts`). `mcp_register` lets an agent add one to its own config at runtime.
 
 A server that needs a credential never carries it inline: it references an agent variable as `${KEY}`, resolved from the agent `.env` at connect time (`src/tools/mcp-resolve.ts`). The agent gets that value into the `.env` by calling `request_secret`, which pauses the run and shows the user a masked form; the UI writes the values through `PATCH /agents/:id/keys` and the agent is told only which variable names were filled. The secret never enters the conversation.
+
+Every tool sent to the model costs its name, description and JSON schema on each step of the run. When the MCP tools of an agent weigh more than 40,000 characters (`MCP_EAGER_PAYLOAD_CHARS`, about 10,000 tokens), the engine's own loop stops sending them (`src/tools/mcp-search.ts`, `src/tools/mcp-wire.ts`):
+
+- the system prompt lists each server with its number of tools, and the agent gets two more tools, `mcp_search` and `mcp_call`;
+- `mcp_search` takes a few words or exact tool names, and optionally a `server`. It returns the name, the description and the input schema of up to 8 tools by default (20 at most). With a `server` alone it lists that server's tool names;
+- `mcp_call` takes a `tool` name and its `arguments`, and runs that tool;
+- the list of tools sent to the model is the same on every step and every message of the conversation. A list that changed would change the start of the prompt, and the provider would read the whole conversation again outside its prompt cache. The schemas travel in the result of `mcp_search` instead, which is a message of the conversation and is cached like the others;
+- `mcp_call` only exists between the engine and the model. A middleware renames the call to the tool it names before the loop sees it, and writes it back as `mcp_call` in the conversation sent to the model, so the stored messages, the `tool_calls` table, the statistics and the app all show `"<server>_<tool>"`;
+- a held-back tool called directly by its name still runs;
+- the compaction threshold counts the tools that are sent, not the ones held back. Once a compaction has summarised the result of a search, the agent searches again.
+
+Below that weight nothing changes: every MCP tool is sent on every step, and `mcp_search` and `mcp_call` do not exist. The `claude` and `codex` providers are not concerned, since the CLI lists and loads the servers' tools itself.
+
+A server that needs a credential never carries it inline: it references an agent variable as `${KEY}`, resolved from the agent `.env` at connect time (`src/tools/mcp-resolve.ts`); a Vault item's server resolves against that item's `.env` only. The agent gets that value into the `.env` by calling `request_secret`, which pauses the run and shows the user a masked form; the app writes the values through `PATCH /agents/:id/keys` and the agent is told only which variable names were filled. The secret never enters the conversation.
 
 ---
 
@@ -415,6 +429,15 @@ curl -s $B/agents/$AID/skills
 | Agents | `src/agents/` (`types.ts`, `factory.ts`, `loader.ts`, `registry.ts`, `providers.ts`, `systemPrompt.ts`) |
 | Run loop | `src/runtime/` (`loop.ts`, `stream.ts`, `curator.ts`, `context.ts`, `scheduler.ts`) |
 | Tools | `src/tools/` (`registry.ts`, `sandbox.ts`, `mcp.ts`, `builtin/` incl. `fsTools.ts`, `filesystem.ts`, `shared.ts`) |
+
+| Data-dir ladder and checks | `src/datadir/` (`migrations.ts`, `ladder.ts`, `checks.ts`) |
+| Databases | `src/db/` (`client.ts` for `rerun.db`, `systemDb.ts`, `agentDb.ts`, `sharedDb.ts`, `brainDb.ts`, `ladder.ts`, `repos/`) |
+| Agents | `src/agents/` (`types.ts`, `factory.ts`, `loader.ts`, `registry.ts`, `providers.ts`, `systemPrompt.ts`, `foreman.ts`, `archive.ts`, `import.ts`) |
+| Connections | `src/connections/` |
+| Vault | `src/vault/` |
+| Brain | `src/brain/` |
+| Run loop | `src/runtime/` (`loop.ts`, `stream.ts`, `curator.ts`, `context.ts`, `scheduler.ts`, `notify.ts`, `run-events.ts`) |
+| Tools | `src/tools/` (`catalog.ts`, `registry.ts`, `sandbox.ts`, `mcp.ts`, `mcp-pool.ts`, `mcp-search.ts`, `mcp-wire.ts`, `builtin/`) |
 | Files store | `src/files/store.ts` (root-scoped fs ops shared by tools and HTTP) |
 | Skills | `src/skills/` (`loader.ts`, `index.ts`) |
 | Schedules | `src/schedules/` (`loader.ts`, `cron.ts`, `index.ts`) |

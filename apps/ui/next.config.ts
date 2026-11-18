@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: { bodySizeLimit: "64mb" },
+    agentUpgrade: "security",
   },
   async redirects() {
     const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL;

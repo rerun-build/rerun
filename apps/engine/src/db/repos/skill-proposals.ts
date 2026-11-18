@@ -97,7 +97,7 @@ export async function openSkillProposalForSession(agentId: string, sessionId: st
 export async function appendSkillProposalInstruction(
     agentId: string,
     id: string,
-    input: SkillProposalModel & { instruction: string; summary: string; fingerprint: string }
+    input: SkillProposalModel & { instruction: string; title: string; summary: string; fingerprint: string }
 ): Promise<SkillProposalRow | undefined> {
     const current = await getSkillProposal(agentId, id)
     if (!current || current.status !== 'proposed') return undefined
@@ -106,6 +106,7 @@ export async function appendSkillProposalInstruction(
     const patch = {
         instructionsJson: JSON.stringify(instructions),
         fingerprintsJson: JSON.stringify(fingerprints),
+        title: input.title,
         summary: input.summary,
         connectionId: input.connectionId,
         provider: input.provider,

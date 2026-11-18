@@ -151,17 +151,20 @@ export function agentMcpSpawn(agent: Pick<LoadedAgent, 'id' | 'env' | 'config'>)
     return { cwd, env: childProcessEnv(env) }
 }
 
-export async function pooledMcpTools(agent: LoadedAgent): Promise<ToolSet> {
+export async function pooledMcpServers(agent: LoadedAgent): Promise<PooledMcp[]> {
     const spawn = agentMcpSpawn(agent)
     const prepared = await Promise.all(agent.config.mcpServers.map(server => prepareMcpServer(agent.id, server, agent.env, agent.hubAgentId)))
     const pooled = await Promise.all(prepared.map(server => acquireMcp(agent.id, server, spawn)))
+    return pooled.filter(server => server !== null)
+}
+
+export function pooledMcpToolSet(servers: PooledMcp[]): ToolSet {
     const tools: ToolSet = {}
-    for (const server of pooled)
-        if (server)
-            Object.assign(
-                tools,
-                mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args))
-            )
+    for (const server of servers)
+        Object.assign(
+            tools,
+            mcpToolSet(server.name, server.tools, (name, args) => server.call(name, args))
+        )
     return tools
 }
 
