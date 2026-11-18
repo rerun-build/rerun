@@ -529,6 +529,8 @@ class Dispatcher:
     def save(self, j, reason=None, reset=False):
         if j["state"] not in WAIT_STATES:
             j.pop("wait_reason", None)
+        if j["state"] != "checks":
+            j.pop("checks_why", None)
         if self.repo != self.home:
             j["repo"] = self.repo
         self.store.put_job(str(j["issue"]), j["state"], j, reason, j.get("run"), reset_retries=reset)
@@ -695,11 +697,14 @@ class Dispatcher:
         self.note_failures(j, failures.kinds(old, state, msg), old, msg)
 
     def note_failures(self, j, kinds, old, msg):
-        runs, cost = weights.job_cost(self.store, j["issue"], self.weights)
-        for kind in kinds:
-            self.store.add_failure(kind, j["issue"], station=STATION_OF.get(old, old), coworker=self.names.get(j.get("agent"), j.get("agent") or ""),
-                                   model=(j.get("run_model") or {}).get("model"), tier=j.get("tier"), reason=msg,
-                                   plan_run=failures.plan_run(self.store, j), brief=j.get("brief_v"), runs=runs, cost=cost)
+        try:
+            runs, cost = weights.job_cost(self.store, j["issue"], self.weights)
+            for kind in kinds:
+                self.store.add_failure(kind, j["issue"], station=STATION_OF.get(old, old), coworker=self.names.get(j.get("agent"), j.get("agent") or ""),
+                                       model=(j.get("run_model") or {}).get("model"), tier=j.get("tier"), reason=msg,
+                                       plan_run=failures.plan_run(self.store, j), brief=j.get("brief_v"), runs=runs, cost=cost)
+        except Exception as e:
+            log(j["issue"], "failures: %s" % type(e).__name__)
 
     def file_holder(self, issue, paths):
         for j in self.jobs():
@@ -1354,9 +1359,10 @@ class Dispatcher:
             verdict = final_line(out, ("VERDICT:",)) or ""
             self.follow_ups(j, out)
             named = verdict_head(verdict)
-            if re.match(r"VERDICT:\s*REJECT \(plan\)", verdict):
+            plan = bool(re.match(r"VERDICT:\s*REJECT \(plan\)", verdict))
+            if plan and named == j["head"][:7]:
                 return self.end(j, "returned", "plan: review: " + verdict[:180], plan_lines=verdict)
-            stale = bool(re.match(r"VERDICT:\s*ACCEPT", verdict)) and named != j["head"][:7]
+            stale = (plan or bool(re.match(r"VERDICT:\s*ACCEPT", verdict))) and named != j["head"][:7]
             asks = proof.change_asks(j.get("body"))
             got = proof.evidence(out, len(asks))
             if re.match(r"VERDICT:\s*ACCEPT", verdict) and not stale and got < len(asks):
@@ -1373,9 +1379,9 @@ class Dispatcher:
                         first_accept={"head": j["head"], "by": j.get("reviewer")})
             elif accept:
                 self.to(j, "checks", "accepted at %s" % j["head"][:7], checks_since=self.now())
-            elif re.match(r"VERDICT:\s*REJECT", verdict) and j["round"] == 1:
+            elif re.match(r"VERDICT:\s*REJECT", verdict) and not plan and j["round"] == 1:
                 self.to(j, "fix_wait", gist(verdict, 160), review=out[-1500:], same_round=False, found=j.get("found", []) + ["review rejected: " + gist(verdict, 300)])
-            elif re.match(r"VERDICT:\s*REJECT", verdict) and not j.get("level"):
+            elif re.match(r"VERDICT:\s*REJECT", verdict) and not plan and not j.get("level"):
                 self.senior(j, "review rejected: " + gist(verdict, 300), out[-1500:])
             elif j.get("not_met") and (not verdict or stale):
                 self.end(j, "blocked", self.not_met_reason(j, out))

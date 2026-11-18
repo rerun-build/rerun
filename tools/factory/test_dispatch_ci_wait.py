@@ -60,6 +60,15 @@ class CiWait(Base):
       self.assertEqual(self.state(), "merged")
       self.assertNotIn("wait_reason", self.d.store.get_job("5"))
 
+  def test_the_ci_reason_leaves_with_the_checks_state(self):
+      self.to_checks()
+      self.w.workflows[HEAD] = [run("image", None, status="queued")]
+      self.tick()
+      self.w.workflows[HEAD] = [run("image", "success")]
+      self.tick()
+      self.assertEqual(self.state(), "merged")
+      self.assertNotIn("checks_why", self.d.store.get_job("5"))
+
 
 if __name__ == "__main__":
   unittest.main()
