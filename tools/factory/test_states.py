@@ -51,7 +51,7 @@ class States(unittest.TestCase):
         self.assertEqual(quiet, ["fix_wait", "proof_wait", "queued", "review_wait", "waiting"])
 
     def test_allowed_moves(self):
-        self.assertEqual(len(ALLOWED), 28)
+        self.assertEqual(len(ALLOWED), 29)
         self.assertEqual(len(REFUSED), 10)
         for old, new in ALLOWED:
             self.assertTrue(states.allowed(old, new), (old, new))
