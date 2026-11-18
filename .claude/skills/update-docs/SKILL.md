@@ -1,6 +1,6 @@
 ---
 name: update-docs
-description: Keep the Rerun documentation in step with the code. From the diff of the branch, find every page a change makes wrong, missing or obsolete (the public site apps/docs, the READMEs, apps/engine/docs), then add, edit or delete them in the same pull request, with numbers read from the code. Use before calling any change done or opening a pull request when it touches apps/ui, apps/engine, packages/contracts, the English strings of packages/i18n, apps/mobile, apps/desktop-app, docker-compose.yml, .env.example or supabase/migrations, and when the user says "update the docs", "is the doc up to date", « mets à jour la doc », « la doc est à jour ? ».
+description: Keep the Rerun documentation in step with the code. From the diff of the branch, find every page a change makes wrong, missing or obsolete (the public site apps/docs, the READMEs, apps/engine/docs), then add, edit or delete them in the same pull request, with numbers read from the code, and take again the screenshots and loops of the screens it changed (pnpm docs:media). Use before calling any change done or opening a pull request when it touches apps/ui, apps/engine, packages/contracts, the English strings of packages/i18n, apps/mobile, apps/desktop-app, docker-compose.yml, .env.example or supabase/migrations, and when the user says "update the docs", "is the doc up to date", « mets à jour la doc », « la doc est à jour ? ».
 ---
 
 # Docs follow the code
@@ -88,16 +88,42 @@ person, sentence case headings, **bold** for UI elements, no em dash) and its co
 - Self-hosted and Rerun Cloud behave differently through `@rerun/cloud/<domain>`: say which one a sentence
   is about when they differ.
 
-## 4. Check
+## 4. Media
+
+The screenshots and loops of `apps/docs/images/` come from the real app, through `pnpm docs:media`
+(`scripts/docs-media.mjs`): a scene per docs page in `scripts/docs-media/scenes/`, captured on the
+Acme Studio demo workspace (`scripts/docs-media/demo-workspace.mjs`), in light and dark. A screen
+that changes leaves its pictures wrong, the same way it leaves the text wrong.
 
 ```sh
-pnpm check:docs     # mint validate + mint broken-links, from apps/docs
+pnpm docs:media --list       # the scenes and the files each one watches
+pnpm docs:media --changed    # the scenes whose watched files this branch changed
+pnpm docs:media --only vault # one page, when the diff changes a screen no scene watches yet
+```
+
+Ask where to run it first (the `tests-distants` rule): it needs the local stack (`pnpm db:start`, then
+`pnpm cloud env:local`), like `pnpm verify:ui`.
+
+- Look at every picture it wrote before committing it: the element is framed, nothing is cut, no
+  loading state, no error toast, light and dark both right.
+- A screen the diff removes takes its media, its `<Shot>` / `<Loop>` and its scene with it.
+- A new screen that a reader would want to see (a dialog, a card, a gesture) gets a scene and a
+  `<Shot>` in its page, following the **Media** section of `apps/docs/AGENTS.md`. Not every screen
+  needs one.
+- A renamed component or i18n file: update the `watches` of the scenes that pointed at it.
+- Never edit a picture by hand: change the scene or the demo workspace and run it again.
+
+## 5. Check
+
+```sh
+pnpm check:docs     # media files and budgets, then mint validate + mint broken-links
 ```
 
 Ask where to run it first, like every other check (the `tests-distants` rule). For a visible page, preview it
 with `pnpm dev:docs` (http://localhost:3333) and look at it at mobile and desktop widths.
 
-## 5. Report
+## 6. Report
 
-In the pull request description, a **Docs** line: the pages added, edited or deleted, or why none needed to
-change. In the final message, the same list.
+In the pull request description, a **Docs** line: the pages added, edited or deleted, and the media taken
+again, added or deleted, or why none needed to change. In the final message, the same list, with the new
+pictures shown.
