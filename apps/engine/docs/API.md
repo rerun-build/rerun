@@ -1173,15 +1173,20 @@ slug is lowercase kebab-case, at most 64 characters (`400` otherwise). `type` is
 `offering`, `market`, `team`, `voice`, `stack`, `priorities` (the identity card, one page each) or
 `customer`, `competitor`, `person`, `product`, `decision`, `note`.
 
+Every page and every file of the shared folder can be filed: free `tags` (lowercase, `#` and spaces
+dropped, at most 20), the `spaceId` of the Box it belongs to (`null` for the whole workspace) and
+`createdBy`, who first put it in the Brain, which later edits never change. A page a coworker
+creates is filed under that coworker's Box, as the app last sent it (`PUT /brain/agent-boxes`).
+
 ### `GET /brain/pages`
 
-`{ "pages": [ { "slug", "title", "type", "hash", "updatedAt", "updatedBy" } ] }`
+`{ "pages": [ { "slug", "title", "type", "hash", "updatedAt", "updatedBy", "tags", "createdBy", "spaceId" } ] }`
 
 ### `GET /brain/pages/:slug`
 
 ```json
 {
-  "page": { "slug": "pricing", "title": "Pricing", "type": "offering", "hash": "...", "updatedAt": "...", "updatedBy": "user:...", "content": "...", "sources": [], "unconfirmed": [], "links": ["acme"], "backlinks": [{ "slug": "company", "title": "Company" }] },
+  "page": { "slug": "pricing", "title": "Pricing", "type": "offering", "hash": "...", "updatedAt": "...", "updatedBy": "user:...", "tags": ["pricing"], "createdBy": "agent:scout", "spaceId": null, "content": "...", "sources": [], "unconfirmed": [], "links": ["acme"], "backlinks": [{ "slug": "company", "title": "Company" }] },
   "revisions": [ { "id": "...", "slug": "pricing", "title": "Pricing", "hash": "...", "author": "user:...", "proposalId": null, "createdAt": "..." } ]
 }
 ```
@@ -1199,6 +1204,32 @@ otherwise: `409` when the page moved since, or no longer exists.
 ```
 
 Answers the page, as `GET`. `content` is at most 60,000 characters.
+
+### `PATCH /brain/pages/:slug/meta`
+
+`{ "tags": ["acme"], "spaceId": "<box id>" }` files the page: what is sent replaces what it had, what
+is left out stays. Moves neither the hash nor the history. Answers the page, `404` for an unknown page.
+
+### `GET /brain/files/meta` · `PUT /brain/files/meta`
+
+How the files and folders of the shared folder are filed, by path:
+`{ "files": [ { "path": "brand-kit/logo.svg", "kind": "file", "tags": ["brand"], "createdBy": "user:...", "spaceId": "...", "createdAt": "..." } ] }`,
+`kind` being `file` or `dir`. A path whose file is not there is left out, and forgotten after a day.
+A path outside the shared folder is ignored.
+
+`PUT` files up to 1,000 paths at once, the batch of an import, and answers the same list:
+
+```json
+{ "paths": ["brand-kit", "brand-kit/logo.svg"], "tags": ["brand"], "spaceId": "<box id>", "author": "user:..." }
+```
+
+`tags` and `spaceId` replace what a path had when they are sent; `author` becomes the creator of the
+paths not filed yet. Moving or deleting a file through `/shared/files` carries its filing along.
+
+### `PUT /brain/agent-boxes`
+
+`{ "boxes": { "<agent id>": "<box id>" } }`: the Box each coworker sits in, sent whole by the app.
+A coworker left out sits in no Box. `{ "ok": true }`.
 
 ### `DELETE /brain/pages/:slug`
 

@@ -97,6 +97,39 @@ export const BRAIN_DB_MIGRATIONS: SqliteMigration[] = [
             await addColumn(client, 'brain_proposals', 'highlights_json', 'TEXT')
         },
     },
+    {
+        // Tags, first author and Box of each page and file. The pages' own copy lives in their
+        // frontmatter; a page written before keeps the author of its oldest revision as its creator.
+        // brain_agent_boxes is the hub's copy of which Box each coworker sits in.
+        version: 3,
+        id: 'item-tags-and-box',
+        up: async client => {
+            await addColumn(client, 'brain_pages', 'tags_json', 'TEXT')
+            await addColumn(client, 'brain_pages', 'created_by', 'TEXT')
+            await addColumn(client, 'brain_pages', 'space_id', 'TEXT')
+            await client.execute(`
+                UPDATE brain_pages SET created_by = COALESCE(
+                    (SELECT r.author FROM brain_revisions r WHERE r.slug = brain_pages.slug ORDER BY r.created_at ASC, r.rowid ASC LIMIT 1),
+                    updated_by
+                ) WHERE created_by IS NULL`)
+            await addColumn(client, 'brain_proposals', 'tags_json', 'TEXT')
+            await addColumn(client, 'brain_proposals', 'space_id', 'TEXT')
+            await client.executeMultiple(`
+                CREATE TABLE IF NOT EXISTS brain_files (
+                    path TEXT PRIMARY KEY,
+                    tags_json TEXT NOT NULL DEFAULT '[]',
+                    created_by TEXT,
+                    space_id TEXT,
+                    created_at TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS brain_files_space_idx ON brain_files(space_id);
+                CREATE TABLE IF NOT EXISTS brain_agent_boxes (
+                    agent_id TEXT PRIMARY KEY,
+                    space_id TEXT
+                );
+            `)
+        },
+    },
 ]
 
 export const BRAIN_DB_VERSION = latestVersion(BRAIN_DB_MIGRATIONS)

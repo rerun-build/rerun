@@ -20,6 +20,7 @@ import { toolRoutes } from './routes/tools.js'
 import { updateRoutes } from './routes/update.js'
 import { doctorRoutes } from './routes/doctor.js'
 import { createFilesRouter } from './routes/files.js'
+import { sharedFileMetaHooks } from '../brain/files.js'
 import { brainRoutes } from './routes/brain.js'
 import { agentDesktopRoutes, desktopRoutes } from './routes/desktop.js'
 import { vaultRoutes } from './routes/vault.js'
@@ -82,7 +83,7 @@ export function createServer(): Hono {
             return workspaceDir(id)
         })
     )
-    api.route('/shared/files', createFilesRouter(() => sharedDir()))
+    api.route('/shared/files', createFilesRouter(() => sharedDir(), sharedFileMetaHooks))
     api.route('/shared/data', createDataRouter(() => getSharedDb(), SHARED_HIDDEN_TABLES, () => listAgentIdsOnDisk()))
     api.route('/brain', brainRoutes)
     api.route('/desktop', desktopRoutes)

@@ -57,7 +57,13 @@ function requirePath(c: Context, key = 'path'): string {
     return path
 }
 
-export function createFilesRouter(getRoot: (c: Context) => string): Hono {
+// What else has to follow a file that moves or goes away: the Brain's filing of the shared folder.
+export type FileChangeHooks = {
+    moved: (from: string, to: string) => Promise<void>
+    removed: (path: string) => Promise<void>
+}
+
+export function createFilesRouter(getRoot: (c: Context) => string, hooks?: FileChangeHooks): Hono {
     const router = new Hono()
 
     // Asking for a file that is not there is an answer, not a failure: an agent that installed no
@@ -143,6 +149,7 @@ export function createFilesRouter(getRoot: (c: Context) => string): Hono {
     router.post('/move', async c => {
         const body = z.object({ from: z.string().min(1), to: z.string().min(1) }).parse(await c.req.json())
         await store.move(getRoot(c), body.from, body.to)
+        await hooks?.moved(body.from, body.to)
         return c.json({ from: body.from, to: body.to })
     })
 
@@ -155,6 +162,7 @@ export function createFilesRouter(getRoot: (c: Context) => string): Hono {
     router.delete('/', async c => {
         const path = requirePath(c)
         await store.remove(getRoot(c), path)
+        await hooks?.removed(path)
         return c.json({ path })
     })
 

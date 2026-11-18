@@ -1,8 +1,8 @@
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import matter from 'gray-matter'
-import { BRAIN_CARD_TYPES, BRAIN_SLUG_RE, brainPageTypeSchema, type BrainPage, type BrainPageRef, type BrainPageSummary, type BrainPageType, type BrainRevision } from '@rerun/contracts'
-import { brainDir, brainPagePath } from '../config/paths.js'
+import { BRAIN_CARD_TYPES, BRAIN_SLUG_RE, brainPageTypeSchema, normalizeBrainTags, type BrainItemMetaPatch, type BrainPage, type BrainPageRef, type BrainPageSummary, type BrainPageType, type BrainRevision } from '@rerun/contracts'
+import { brainDbPath, brainDir, brainPagePath } from '../config/paths.js'
 import { getBrainDb } from '../db/brainDb.js'
 import { badRequest, HttpError, notFound } from '../lib/errors.js'
 import { newId, nowIso } from '../lib/ids.js'
@@ -30,6 +30,11 @@ export type WritePageInput = PageInput & {
     // A tool's write is one discrete gesture, not a keystroke: it gets its own revision instead of
     // folding into the author's previous one, so the chat card can undo just this write.
     separateRevision?: boolean
+    // Added to the page's tags, never replacing them: an author tags what it writes, untagging is
+    // done on the page itself (setPageMeta).
+    tags?: string[]
+    // The Box a new page is filed under, the writing coworker's. An existing page keeps its own.
+    spaceId?: string | null
 }
 
 export const brainConflict = (message: string) => new HttpError(409, message)
@@ -81,6 +86,9 @@ function parsePage(slug: string, raw: string): BrainPageFile {
         updatedAt: asString(data.updatedAt) ?? '',
         updatedBy,
         unconfirmed,
+        tags: Array.isArray(data.tags) ? normalizeBrainTags(data.tags.map(String)) : [],
+        createdBy: asString(data.createdBy),
+        spaceId: asString(data.spaceId),
     }
     return { ...page, hash: pageHash(page) }
 }
@@ -111,6 +119,9 @@ async function writePageFile(page: BrainPageFile): Promise<void> {
         updatedBy: page.updatedBy,
         sources: page.sources,
         unconfirmed: page.unconfirmed,
+        tags: page.tags,
+        createdBy: page.createdBy,
+        spaceId: page.spaceId,
     })
     await writeFile(tmp, body, 'utf8')
     await rename(tmp, path)
@@ -142,7 +153,7 @@ export async function indexPage(page: BrainPageFile): Promise<void> {
     }
 
     // An unchanged section keeps its row, and with it an embedding already paid for.
-    const statements: { sql: string; args: (string | number)[] }[] = []
+    const statements: { sql: string; args: (string | number | null)[] }[] = []
     for (const chunk of chunks) {
         const kept = reusable.get(chunk.textHash)?.shift()
         if (kept) {
@@ -165,12 +176,38 @@ export async function indexPage(page: BrainPageFile): Promise<void> {
     for (const target of parseLinks(page.content, page.slug)) {
         statements.push({ sql: 'INSERT OR IGNORE INTO brain_links(from_slug, to_slug) VALUES (?, ?)', args: [page.slug, target] })
     }
-    statements.push({
-        sql: `INSERT INTO brain_pages(slug, title, type, hash, updated_at, updated_by) VALUES (?, ?, ?, ?, ?, ?)
-              ON CONFLICT(slug) DO UPDATE SET title = excluded.title, type = excluded.type, hash = excluded.hash, updated_at = excluded.updated_at, updated_by = excluded.updated_by`,
-        args: [page.slug, page.title, page.type, page.hash, page.updatedAt, page.updatedBy],
-    })
+    statements.push(pageRowStatement(page))
     await client.batch(statements, 'write')
+}
+
+// A page written before pages were filed has no creator in its frontmatter: the row keeps the one
+// the migration read off its oldest revision.
+function pageRowStatement(page: BrainPageFile): { sql: string; args: (string | null)[] } {
+    return {
+        sql: `INSERT INTO brain_pages(slug, title, type, hash, updated_at, updated_by, tags_json, created_by, space_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT(slug) DO UPDATE SET title = excluded.title, type = excluded.type, hash = excluded.hash, updated_at = excluded.updated_at, updated_by = excluded.updated_by,
+                  tags_json = excluded.tags_json, created_by = COALESCE(excluded.created_by, brain_pages.created_by), space_id = excluded.space_id`,
+        args: [page.slug, page.title, page.type, page.hash, page.updatedAt, page.updatedBy, JSON.stringify(page.tags), page.createdBy, page.spaceId],
+    }
+}
+
+// The row comes first: the migration filled it and a renamed coworker is followed there, while the
+// oldest revision keeps the name it was written under. The revision is for a row rebuilt from disk.
+async function indexedCreator(slug: string): Promise<string | null> {
+    const client = await getBrainDb()
+    const rs = await client.execute({
+        sql: `SELECT COALESCE(
+                  (SELECT created_by FROM brain_pages WHERE slug = ?),
+                  (SELECT author FROM brain_revisions WHERE slug = ? ORDER BY created_at ASC, rowid ASC LIMIT 1)
+              ) AS author`,
+        args: [slug, slug],
+    })
+    const author = rs.rows[0]?.author
+    return author == null ? null : String(author)
+}
+
+async function creatorOf(current: BrainPageFile): Promise<string> {
+    return current.createdBy ?? (await indexedCreator(current.slug)) ?? current.updatedBy
 }
 
 export async function unindexPage(slug: string): Promise<void> {
@@ -224,9 +261,23 @@ export async function writePage(slug: string, input: WritePageInput): Promise<Br
         }
         const fields = { title: input.title.trim(), type: input.type, content: input.content.trim(), sources: input.sources }
         const hash = pageHash(fields)
-        if (current && current.hash === hash && current.sources.join('\n') === fields.sources.join('\n')) return current
+        const tags = normalizeBrainTags([...(current?.tags ?? []), ...(input.tags ?? [])])
+        const tagsChanged = current !== null && current.tags.join('\n') !== tags.join('\n')
+        if (current && current.hash === hash && current.sources.join('\n') === fields.sources.join('\n')) {
+            return tagsChanged ? fileAway(current, { tags }) : current
+        }
 
-        const page: BrainPageFile = { slug, ...fields, hash, updatedAt: nowIso(), updatedBy: input.author, unconfirmed: input.unconfirmed ?? unconfirmedAfterWrite(current, fields.content, input.author) }
+        const page: BrainPageFile = {
+            slug,
+            ...fields,
+            hash,
+            updatedAt: nowIso(),
+            updatedBy: input.author,
+            unconfirmed: input.unconfirmed ?? unconfirmedAfterWrite(current, fields.content, input.author),
+            tags,
+            createdBy: current ? await creatorOf(current) : input.author,
+            spaceId: current ? current.spaceId : (input.spaceId ?? null),
+        }
         await writePageFile(page)
         await indexPage(page)
         await recordRevision(page, input.proposalId ?? null, (input.force ?? false) || (input.separateRevision ?? false))
@@ -249,18 +300,47 @@ export async function confirmSections(slug: string, headings: string[] | null): 
     })
 }
 
+// Tags and Box are not part of the page's text: filing it moves neither its hash nor its history.
+async function fileAway(current: BrainPageFile, patch: BrainItemMetaPatch): Promise<BrainPageFile> {
+    const page: BrainPageFile = {
+        ...current,
+        tags: patch.tags === undefined ? current.tags : normalizeBrainTags(patch.tags),
+        spaceId: patch.spaceId === undefined ? current.spaceId : patch.spaceId,
+        createdBy: await creatorOf(current),
+    }
+    await writePageFile(page)
+    const client = await getBrainDb()
+    await client.execute({
+        sql: 'UPDATE brain_pages SET tags_json = ?, space_id = ?, created_by = ? WHERE slug = ?',
+        args: [JSON.stringify(page.tags), page.spaceId, page.createdBy, page.slug],
+    })
+    return page
+}
+
+export async function setPageMeta(slug: string, patch: BrainItemMetaPatch): Promise<BrainPageFile> {
+    return withPageLock(slug, async () => {
+        const current = await readPageFile(slug)
+        if (!current) throw notFound('page')
+        return fileAway(current, patch)
+    })
+}
+
 // A renamed agent keeps the pages it last wrote. Only the author moves: the hash and the revisions
 // stay, so nobody sees a conflict and the history still says who wrote what at the time.
 export async function reattributePages(fromAuthor: string, toAuthor: string): Promise<void> {
-    for (const { slug } of (await listPageFiles()).filter(page => page.updatedBy === fromAuthor)) {
+    const touched = (await listPageFiles()).filter(page => page.updatedBy === fromAuthor || page.createdBy === fromAuthor)
+    if (!touched.length && !existsSync(brainDbPath())) return
+    const client = await getBrainDb()
+    for (const { slug } of touched) {
         await withPageLock(slug, async () => {
             const current = await readPageFile(slug)
-            if (!current || current.updatedBy !== fromAuthor) return
-            await writePageFile({ ...current, updatedBy: toAuthor })
-            const client = await getBrainDb()
-            await client.execute({ sql: 'UPDATE brain_pages SET updated_by = ? WHERE slug = ?', args: [toAuthor, slug] })
+            if (!current) return
+            const rename = (author: string | null) => (author === fromAuthor ? toAuthor : author)
+            await writePageFile({ ...current, updatedBy: rename(current.updatedBy) ?? current.updatedBy, createdBy: rename(current.createdBy) })
+            await client.execute({ sql: 'UPDATE brain_pages SET updated_by = ? WHERE slug = ? AND updated_by = ?', args: [toAuthor, slug, fromAuthor] })
         })
     }
+    await client.execute({ sql: 'UPDATE brain_pages SET created_by = ? WHERE created_by = ?', args: [toAuthor, fromAuthor] })
 }
 
 export async function deletePage(slug: string): Promise<void> {
@@ -284,7 +364,7 @@ export function sortPages<T extends { type: string; title: string }>(pages: T[])
 
 export async function listPages(): Promise<BrainPageSummary[]> {
     const client = await getBrainDb()
-    const rs = await client.execute('SELECT slug, title, type, hash, updated_at, updated_by FROM brain_pages')
+    const rs = await client.execute('SELECT slug, title, type, hash, updated_at, updated_by, tags_json, created_by, space_id FROM brain_pages')
     return sortPages(
         rs.rows.map(r => ({
             slug: String(r.slug),
@@ -293,8 +373,21 @@ export async function listPages(): Promise<BrainPageSummary[]> {
             hash: String(r.hash),
             updatedAt: String(r.updated_at),
             updatedBy: String(r.updated_by),
+            tags: parseTags(r.tags_json),
+            createdBy: r.created_by == null ? null : String(r.created_by),
+            spaceId: r.space_id == null ? null : String(r.space_id),
         }))
     )
+}
+
+export function parseTags(json: unknown): string[] {
+    if (typeof json !== 'string') return []
+    try {
+        const parsed: unknown = JSON.parse(json)
+        return Array.isArray(parsed) ? parsed.map(String) : []
+    } catch {
+        return []
+    }
 }
 
 export async function backlinks(slug: string): Promise<BrainPageRef[]> {
@@ -309,7 +402,7 @@ export async function backlinks(slug: string): Promise<BrainPageRef[]> {
 export async function getPage(slug: string): Promise<BrainPage | null> {
     const file = await readPageFile(slug)
     if (!file) return null
-    return { ...file, links: parseLinks(file.content, slug), backlinks: await backlinks(slug) }
+    return { ...file, createdBy: await creatorOf(file), links: parseLinks(file.content, slug), backlinks: await backlinks(slug) }
 }
 
 function toRevision(r: Record<string, unknown>): BrainRevision {

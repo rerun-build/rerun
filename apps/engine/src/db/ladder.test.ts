@@ -128,6 +128,10 @@ describe('sqlite ladders', () => {
               2,
               "proposal-headline",
             ],
+            [
+              3,
+              "item-tags-and-box",
+            ],
           ]
         `)
     })
@@ -278,12 +282,38 @@ describe('brain.db v1 to v2', () => {
             "INSERT INTO brain_proposals (id, agent_id, agent_name, session_id, slug, mode, title, type, content, reason, sources_json, fingerprint, created_at) VALUES ('p1', 'a1', 'Sales', 's1', 'pricing', 'create', 'Pricing', 'offering', 'Starter is 49.', 'New', '[]', 'f1', '2026-01-01')"
         )
 
-        await migrateSqlite(client, BRAIN_DB_MIGRATIONS, 'v1-brain.db')
+        await migrateSqlite(client, BRAIN_DB_MIGRATIONS.slice(0, 2), 'v1-brain.db')
         await BRAIN_DB_MIGRATIONS[1].up(client)
 
         expect(await sqliteVersion(client)).toBe(2)
         expect(await columns(client, 'brain_proposals')).toEqual(expect.arrayContaining(['headline', 'highlights_json']))
         const waiting = await client.execute("SELECT title, headline, highlights_json FROM brain_proposals WHERE id = 'p1'")
         expect(waiting.rows[0]).toMatchObject({ title: 'Pricing', headline: null, highlights_json: null })
+    })
+})
+
+describe('brain.db v2 to v3', () => {
+    it('files pages and files, keeps the first author of a page written before, and replays', async () => {
+        const client = freshFile('v2-brain')
+        await migrateSqlite(client, BRAIN_DB_MIGRATIONS.slice(0, 2), 'v2-brain.db')
+        expect(await sqliteVersion(client)).toBe(2)
+        await client.execute("INSERT INTO brain_pages (slug, title, type, hash, updated_at, updated_by) VALUES ('pricing', 'Pricing', 'offering', 'h2', '2026-02-01', 'user:alice')")
+        await client.execute("INSERT INTO brain_pages (slug, title, type, hash, updated_at, updated_by) VALUES ('team', 'Team', 'team', 'h3', '2026-02-01', 'seed')")
+        await client.execute("INSERT INTO brain_revisions (id, slug, title, content, hash, author, created_at) VALUES ('r1', 'pricing', 'Pricing', 'v1', 'h1', 'agent:scout', '2026-01-01')")
+        await client.execute("INSERT INTO brain_revisions (id, slug, title, content, hash, author, created_at) VALUES ('r2', 'pricing', 'Pricing', 'v2', 'h2', 'user:alice', '2026-02-01')")
+
+        await migrateSqlite(client, BRAIN_DB_MIGRATIONS, 'v2-brain.db')
+        await BRAIN_DB_MIGRATIONS[2].up(client)
+
+        expect(await sqliteVersion(client)).toBe(3)
+        expect(await columns(client, 'brain_pages')).toEqual(expect.arrayContaining(['tags_json', 'created_by', 'space_id']))
+        expect(await columns(client, 'brain_proposals')).toEqual(expect.arrayContaining(['tags_json', 'space_id']))
+        expect(await columns(client, 'brain_files')).toEqual(['path', 'tags_json', 'created_by', 'space_id', 'created_at'])
+        expect(await columns(client, 'brain_agent_boxes')).toEqual(['agent_id', 'space_id'])
+        const rows = await client.execute('SELECT slug, created_by, space_id, tags_json FROM brain_pages ORDER BY slug')
+        expect(rows.rows.map(row => ({ ...row }))).toEqual([
+            { slug: 'pricing', created_by: 'agent:scout', space_id: null, tags_json: null },
+            { slug: 'team', created_by: 'seed', space_id: null, tags_json: null },
+        ])
     })
 })

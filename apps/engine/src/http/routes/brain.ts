@@ -1,6 +1,8 @@
 import { Hono } from 'hono'
-import { brainConfirmSectionsSchema, brainRevertSchema, brainPageWriteSchema, brainProposalAcceptSchema, brainProposalDismissSchema, brainProposalStatusSchema, brainSeedInputSchema } from '@rerun/contracts'
-import { confirmSections, deletePage, getPage, getRevision, listPages, listRevisions, revertPage, writePage } from '../../brain/pages.js'
+import { brainAgentBoxesSchema, brainConfirmSectionsSchema, brainFilesMetaWriteSchema, brainItemMetaPatchSchema, brainRevertSchema, brainPageWriteSchema, brainProposalAcceptSchema, brainProposalDismissSchema, brainProposalStatusSchema, brainSeedInputSchema } from '@rerun/contracts'
+import { confirmSections, deletePage, getPage, getRevision, listPages, listRevisions, revertPage, setPageMeta, writePage } from '../../brain/pages.js'
+import { listFileMeta, setFileMeta } from '../../brain/files.js'
+import { setAgentBoxes } from '../../brain/boxes.js'
 import { acceptProposal, countOpenProposals, dismissProposal, listProposals } from '../../brain/proposals.js'
 import { seedBrain } from '../../brain/seed.js'
 import { notFound } from '../../lib/errors.js'
@@ -24,6 +26,25 @@ brainRoutes.put('/pages/:slug', async c => {
     const body = brainPageWriteSchema.parse(await c.req.json())
     await writePage(slug, body)
     return c.json(await pageResponse(slug))
+})
+
+brainRoutes.patch('/pages/:slug/meta', async c => {
+    const slug = c.req.param('slug')
+    await setPageMeta(slug, brainItemMetaPatchSchema.parse(await c.req.json()))
+    return c.json(await pageResponse(slug))
+})
+
+brainRoutes.get('/files/meta', async c => c.json({ files: await listFileMeta() }))
+
+brainRoutes.put('/files/meta', async c => {
+    await setFileMeta(brainFilesMetaWriteSchema.parse(await c.req.json()))
+    return c.json({ files: await listFileMeta() })
+})
+
+brainRoutes.put('/agent-boxes', async c => {
+    const { boxes } = brainAgentBoxesSchema.parse(await c.req.json())
+    await setAgentBoxes(boxes)
+    return c.json({ ok: true })
 })
 
 brainRoutes.delete('/pages/:slug', async c => {

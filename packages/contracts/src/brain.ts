@@ -15,6 +15,29 @@ export type BrainPageType = z.infer<typeof brainPageTypeSchema>
 // `seed`, `user:<hub user id>` or `agent:<agent name>`: who the last write came from.
 export const brainAuthorSchema = z.string().min(1).max(120)
 
+const BRAIN_TAG_MAX_LENGTH = 32
+export const BRAIN_TAGS_MAX = 20
+
+// A tag reads the same whoever typed it: "#Acme Corp" and "acme-corp" are one tag.
+export function normalizeBrainTag(raw: string): string {
+    return raw
+        .trim()
+        .toLowerCase()
+        .replace(/^#+/, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^\p{L}\p{N}_-]/gu, '')
+        .slice(0, BRAIN_TAG_MAX_LENGTH)
+}
+
+export function normalizeBrainTags(raw: readonly string[]): string[] {
+    return [...new Set(raw.map(normalizeBrainTag).filter(Boolean))].slice(0, BRAIN_TAGS_MAX)
+}
+
+const brainTagListSchema = z.array(z.string().min(1).max(64)).max(BRAIN_TAGS_MAX)
+
+// The Box (hub `spaces.id`) an item is filed under; null files it for the whole workspace.
+const brainSpaceIdSchema = z.string().min(1).max(64).nullable()
+
 export const brainPageSummarySchema = z.object({
     slug: z.string(),
     title: z.string(),
@@ -22,6 +45,11 @@ export const brainPageSummarySchema = z.object({
     hash: z.string(),
     updatedAt: z.string(),
     updatedBy: z.string(),
+    // Defaults keep a page listed by an engine that does not file pages yet readable.
+    tags: z.array(z.string()).default([]),
+    // Who first put the page in the Brain; `updatedBy` only says who touched it last.
+    createdBy: z.string().nullable().default(null),
+    spaceId: z.string().nullable().default(null),
 })
 export type BrainPageSummary = z.infer<typeof brainPageSummarySchema>
 
@@ -188,3 +216,37 @@ export function brainChangeHeadline({ status, title, mode, agentName }: BrainCha
 }
 
 export const brainRevertRequestSchema = z.object({ revisionId: z.string().min(1), expectedHash: z.string().optional() })
+
+// Filing an item away: what is sent replaces what it had, what is left out stays.
+export const brainItemMetaPatchSchema = z.object({
+    tags: brainTagListSchema.optional(),
+    spaceId: brainSpaceIdSchema.optional(),
+})
+export type BrainItemMetaPatch = z.infer<typeof brainItemMetaPatchSchema>
+
+// A file or a folder of the shared folder, as the Brain files it. Path relative to the folder.
+export const brainFileMetaSchema = z.object({
+    path: z.string(),
+    kind: z.enum(['file', 'dir']),
+    tags: z.array(z.string()),
+    createdBy: z.string().nullable(),
+    spaceId: z.string().nullable(),
+    createdAt: z.string(),
+})
+export type BrainFileMeta = z.infer<typeof brainFileMetaSchema>
+
+export const brainFilesMetaListSchema = z.object({ files: z.array(brainFileMetaSchema) })
+
+export const BRAIN_FILES_META_BATCH_MAX = 1000
+
+// An import files a whole batch at once; `author` becomes the creator of the paths not filed yet.
+export const brainFilesMetaWriteSchema = brainItemMetaPatchSchema.extend({
+    paths: z.array(z.string().min(1).max(1024)).min(1).max(BRAIN_FILES_META_BATCH_MAX),
+    author: brainAuthorSchema.optional(),
+})
+export type BrainFilesMetaWrite = z.infer<typeof brainFilesMetaWriteSchema>
+
+// Which Box each coworker sits in, by engine agent id, as the hub knows it. Sent whole each time:
+// a coworker left out is in no Box.
+export const brainAgentBoxesSchema = z.object({ boxes: z.record(z.string().min(1), z.string().min(1).max(64).nullable()) })
+export type BrainAgentBoxes = z.infer<typeof brainAgentBoxesSchema>

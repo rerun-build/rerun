@@ -6,6 +6,7 @@ import { rewriteMemoryText } from '../db/repos/memories.js'
 import { getSharedDb, renameTableOwner, sharedDbExists } from '../db/sharedDb.js'
 import { systemDbExists } from '../db/systemDb.js'
 import { reattributePages } from '../brain/pages.js'
+import { reattributeFiles } from '../brain/files.js'
 import { renameProposalAuthor } from '../brain/proposals.js'
 import { rewriteScheduleText } from '../schedules/loader.js'
 import { rewriteTriggerText } from '../triggers/loader.js'
@@ -95,5 +96,6 @@ export async function rewriteRenamedAgentReferences(agentId: string, fromHandle:
     for (const id of await listAgentIdsOnDisk()) await rewriteAgentMentions(id, fromHandle, rewrite)
     await attempt({ part: 'brain pages' }, () => reattributePages(`agent:${fromHandle}`, `agent:${toHandle}`))
     if (existsSync(brainDbPath())) await attempt({ part: 'brain proposals' }, () => renameProposalAuthor(agentId, toHandle))
+    if (existsSync(brainDbPath())) await attempt({ part: 'brain files' }, () => reattributeFiles(`agent:${fromHandle}`, `agent:${toHandle}`))
     if (sharedDbExists()) await attempt({ part: 'shared db' }, async () => renameTableOwner(await getSharedDb(), fromHandle, toHandle))
 }

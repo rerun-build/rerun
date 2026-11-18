@@ -339,3 +339,62 @@ describe('unconfirmed sections', () => {
         expect((await pages.readPageFile('brand'))!.unconfirmed).toEqual([])
     })
 })
+
+describe('filing a page', () => {
+    const write = (slug: string, author: string, extra: Partial<Parameters<typeof pages.writePage>[1]> = {}, baseHash: string | null = null) =>
+        pages.writePage(slug, { title: 'Acme Corp', type: 'customer', content: `## Who\n${long('acme')}`, sources: [], baseHash, author, ...extra })
+
+    it('files a new page under the Box of the coworker that wrote it, with its tags, in the frontmatter and the list', async () => {
+        await write('acme-filed', 'agent:lead-finder', { tags: ['#Acme', 'pipeline', 'acme'], spaceId: 'box-sales' })
+        const raw = await readFile(brainPagePath('acme-filed'), 'utf8')
+        expect(raw).toContain("createdBy: 'agent:lead-finder'")
+        expect(raw).toContain('spaceId: box-sales')
+        expect((await pages.readPageFile('acme-filed'))!.tags).toEqual(['acme', 'pipeline'])
+        expect((await pages.listPages()).find(page => page.slug === 'acme-filed')).toMatchObject({ tags: ['acme', 'pipeline'], createdBy: 'agent:lead-finder', spaceId: 'box-sales' })
+    })
+
+    it('keeps the first author and the Box when someone else edits, and adds the tags it brings', async () => {
+        const current = (await pages.readPageFile('acme-filed'))!
+        await write('acme-filed', 'user:theo', { content: `## Who\n${long('acme stores')}`, tags: ['pilot'], spaceId: 'box-support' }, current.hash)
+        expect(await pages.getPage('acme-filed')).toMatchObject({ updatedBy: 'user:theo', createdBy: 'agent:lead-finder', spaceId: 'box-sales', tags: ['acme', 'pipeline', 'pilot'] })
+    })
+
+    it('adds tags to an unchanged page without a new revision', async () => {
+        const before = (await pages.listRevisions('acme-filed')).length
+        const current = (await pages.readPageFile('acme-filed'))!
+        await write('acme-filed', 'agent:outreach', { content: current.content, tags: ['q4'] }, current.hash)
+        expect((await pages.readPageFile('acme-filed'))!.tags).toEqual(['acme', 'pipeline', 'pilot', 'q4'])
+        expect((await pages.listRevisions('acme-filed')).length).toBe(before)
+    })
+
+    it('moves the Box and replaces the tags by hand, leaving the hash and the history alone', async () => {
+        const before = (await pages.readPageFile('acme-filed'))!
+        const revisions = (await pages.listRevisions('acme-filed')).length
+        const filed = await pages.setPageMeta('acme-filed', { tags: ['acme'], spaceId: null })
+        expect(filed).toMatchObject({ hash: before.hash, tags: ['acme'], spaceId: null, createdBy: 'agent:lead-finder' })
+        expect((await pages.listPages()).find(page => page.slug === 'acme-filed')).toMatchObject({ tags: ['acme'], spaceId: null })
+        expect((await pages.listRevisions('acme-filed')).length).toBe(revisions)
+    })
+
+    it('reads a page from before filing as added by the author of its oldest revision', async () => {
+        await write('legacy', 'agent:scout')
+        const current = (await pages.readPageFile('legacy'))!
+        await write('legacy', 'user:alice', { content: `## Who\n${long('legacy two')}` }, current.hash)
+        const raw = await readFile(brainPagePath('legacy'), 'utf8')
+        await writeFile(brainPagePath('legacy'), raw.replace(/^createdBy: .*\n/m, '').replace(/^spaceId: .*\n/m, ''))
+        expect((await pages.readPageFile('legacy'))!.createdBy).toBeNull()
+        expect((await pages.getPage('legacy'))!.createdBy).toBe('agent:scout')
+    })
+
+    it('follows a renamed coworker as the first author of a page from before filing', async () => {
+        await pages.reattributePages('agent:scout', 'agent:scout-renamed')
+        expect((await pages.readPageFile('legacy'))!.createdBy).toBeNull()
+        expect((await pages.getPage('legacy'))!.createdBy).toBe('agent:scout-renamed')
+    })
+
+    it('follows a renamed coworker as the first author', async () => {
+        await pages.reattributePages('agent:lead-finder', 'agent:prospector')
+        expect((await pages.getPage('acme-filed'))!.createdBy).toBe('agent:prospector')
+        expect((await pages.listPages()).find(page => page.slug === 'acme-filed')!.createdBy).toBe('agent:prospector')
+    })
+})
