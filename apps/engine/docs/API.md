@@ -131,6 +131,15 @@ session is asked for, and an agent's window manager and VNC server stop five min
 viewer left, unless a takeover is still open. The screens are separate, the files are not: every
 app runs as the engine's user.
 
+The display is an Xvfb at 1920x1080 on the first free number (`-displayfd`), shared by the agent's
+Chromium and its desktop, and stopped a minute after nothing holds it. Display `:N` is served by
+x11vnc on `127.0.0.1:5900+N`. An engine started with `DISPLAY` set starts no Xvfb: every agent then
+shares that display. `shell_exec` does not get the agent's display, so a program with a window
+started from it shows on no screen; the terminal of the desktop does.
+
+Every agent's processes run as that one user in one process namespace, so a command that stops
+programs by name (`pkill -f`, `killall`) stops them for every agent of the engine.
+
 Where `tint2` and `hsetroot` are installed too, the screen is a small computer: a wallpaper, a top
 bar with the agent's name and the time, and a dock that opens the browser, the files and the
 terminal. A screen reports it as `dock: true`; without it the caller draws its own launcher.

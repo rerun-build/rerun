@@ -138,6 +138,39 @@ A coworker has a computer of its own, with a browser, a file manager and a termi
 
 When a coworker needs you on its screen (a sign-in, a captcha), it asks for a browser takeover: see [Human in the loop](/agents/human-in-the-loop#the-pauses).
 
+### What is its own, what is shared
+
+Every coworker of a workspace runs on the [same machine](/concepts#workspace). Each one gets a screen of its own on it, but they all run as the same system user, side by side:
+
+| Its own | Shared by every coworker of the workspace |
+| --- | --- |
+| Its screen, and the windows open on it | The machine: its processor, its memory and its disk |
+| Its browser, with the sites it is signed in to | The system user every program runs as |
+| Its [folder](/agents/data#files), where its terminal opens | Every running program, whichever coworker started it |
+| Its [database](/agents/data#databases) | The packages and tools installed on the machine |
+| | The network ports |
+| | The [shared folder](/agents/data#files) and the [shared database](/agents/data#databases) |
+
+The file tools stay inside the coworker's folder. Its terminal does not: a command sees the whole machine, the other coworkers' programs included.
+
+### Skills that start or stop programs
+
+Because every coworker sees every running program, a command that stops programs by name stops them for the whole workspace. A skill that runs `pkill -f xfreerdp` or `killall xfreerdp` before starting its own session also closes the session another coworker has open.
+
+Stop only what the skill started: keep the process ID in a file of the coworker's own folder, and stop that one.
+
+```bash
+# start
+nohup python3 worker.py > worker.log 2>&1 &
+echo $! > worker.pid
+
+# stop
+[ -f worker.pid ] && kill "$(cat worker.pid)" 2>/dev/null; rm -f worker.pid
+```
+
+- **A port is taken for everyone.** A program a coworker starts on a fixed port blocks the same port for the others: pick a free one, or a port per coworker.
+- **A window belongs on its screen.** A command from the coworker's shell has no screen, so a program with a window started there shows nowhere. Launch it from the terminal of its desktop: open its computer, or let it open the terminal with its computer tools, and the window lands on its own screen.
+
 ## Name and handle
 
 The **name** is free text, the one you see. The **handle** is the key other coworkers use to call it with `@handle`. Type `@` in the message box to pick a coworker.
