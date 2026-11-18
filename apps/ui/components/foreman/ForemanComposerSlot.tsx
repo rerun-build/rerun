@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useLayoutEffect, useRef, useState, type Ref } from 'react'
+import { useCallback, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 
 import { useMentionAutocomplete } from '@/components/chat/MentionAutocomplete'
 import { ForemanComposer, type ForemanComposerMentionProps, type ForemanComposerProps } from '@/components/foreman/ForemanComposer'
@@ -39,10 +39,12 @@ type ForemanComposerSlotProps = Omit<ForemanComposerProps, keyof ForemanComposer
     trialGate: TrialStep | null
     /** Under a coworker's line and in its column, in the Simple view's middle. */
     framed?: boolean
+    /** What waits on the user above the field, as a coworker's chat pins its skill proposals. */
+    above?: ReactNode
     ref?: Ref<HTMLDivElement>
 }
 
-export function ForemanComposerSlot({ aside, trialGate, framed = false, ref, ownEntry = false, ...composer }: ForemanComposerSlotProps) {
+export function ForemanComposerSlot({ aside, trialGate, framed = false, above, ref, ownEntry = false, ...composer }: ForemanComposerSlotProps) {
     const bare = aside && !trialGate
 
     const { composerRef } = composer
@@ -88,6 +90,7 @@ export function ForemanComposerSlot({ aside, trialGate, framed = false, ref, own
             {/* Une seule instance, hors de la bascule ci-dessus : passer de la carte d'accueil au chat
                 ne la remonte pas. Deux composers montés le temps d'une sortie se disputaient la ref du
                 champ, et celui qui partait la remettait à null sous celui qui arrivait. */}
+            {composerShown && above}
             <AnimatePresence initial={false} mode="popLayout">
                 {composerShown && (
                     <motion.div key="composer" {...SLOT_MOTION} className="overflow-hidden pb-px">

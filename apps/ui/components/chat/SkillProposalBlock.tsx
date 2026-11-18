@@ -1,5 +1,7 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+
 import { SkillProposalBlock as SkillProposalBlockBase } from '@rerun/ui/chat'
 import { boxAccessFor } from '@/lib/board/box-access'
 import { useBoxManageReason } from '@/hooks/useBoxManageReason'
@@ -51,5 +53,7 @@ function useCanDecide(agentId: string | undefined): boolean {
     })
     const grants = useBoardStore(state => state.spaceGrants)
     if (!session) return true
+    // The Chief of Staff sits in no Box: what it keeps is a workspace admin's to change.
+    if (agentId === FOREMAN_AGENT_ID) return session.role === 'admin'
     return boxAccessFor({ userId: session.user?.id ?? null, role: session.role, boxScope: session.boxScope }, space, grants) === 'manage'
 }

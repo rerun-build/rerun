@@ -9,6 +9,7 @@ import { readWorkspaceFileAction } from '@/app/api/_actions/workspace-file.actio
 import { foremanCoworkerAction, foremanEngineFilesAction, readForemanFileAction } from '@/app/api/_actions/foreman-file.actions'
 import type { ChatComposerHandle } from '@/components/chat/ChatComposer'
 import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
+import { SkillProposalDock } from '@/components/chat/SkillProposalDock'
 import { ArrivalHeader, type ArrivalPick } from '@/components/foreman/arrival/ArrivalHeader'
 import { ArrivalWall } from '@/components/foreman/arrival/ArrivalWall'
 import { arrivalStepOf } from '@/components/foreman/arrival/flow'
@@ -40,6 +41,7 @@ import { useForemanSheetResize } from '@/components/foreman/useForemanSheetResiz
 import { useForemanTurnNotification } from '@/components/foreman/useForemanTurnNotification'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { useMessageFeedback } from '@/hooks/useMessageFeedback'
+import { useSkillProposals } from '@/hooks/useSkillProposals'
 import { useQueuedMessage } from '@/hooks/useQueuedMessage'
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import { classifyChatError, unwrapChatError } from '@/lib/chat-error'
@@ -79,6 +81,13 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const { workspace, phoneStep } = useSession()
     const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
+    // Its skill proposals, as a coworker's chat reads them, once its engine keeps skills of its own.
+    const skillProposals = useSkillProposals(hasCard && backend === 'engine' ? sessionId : null, status)
+    // A coworker's chat is handed its waiting proposals with the session it opens; the column reads them itself.
+    const refreshProposals = skillProposals.refresh
+    useEffect(() => {
+        void refreshProposals().catch(() => {})
+    }, [refreshProposals])
     useHoldAppBoot(open !== false && !guided && !restoreDone)
 
     // Ce que le board dessine à gauche pendant tout le tunnel. L'organisation vit dans le transcript
@@ -518,6 +527,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             onUploadingChange={setUploading}
                             filesOnEngine={filesOnEngine}
                             contextStats={contextStats}
+                            above={skillProposals.pinned.length > 0 && <SkillProposalDock agentId={FOREMAN_AGENT_ID} proposals={skillProposals.pinned} pendingId={skillProposals.pendingId} onDecide={skillProposals.decide} />}
                         />
                     </div>
                     <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />

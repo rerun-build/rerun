@@ -258,6 +258,14 @@ export async function openForemanRoutineThread(workspaceId: number, engineSessio
     }
 }
 
+// One of the caller's conversations with the foreman, as the engine knows it: what a coworker's
+// session hands the skill proposals of its chat.
+export async function foremanSessionEngineContext(ctx: WorkspaceContext, sessionId: string): Promise<{ conn: EngineConnection; engineSessionId: string | null } | null> {
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'foreman_conversations', ['engine_session_id'] as const, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'engine' })
+    if (!data) return null
+    return { conn: await getWorkspaceConnection(ctx.workspace.id), engineSessionId: data.engine_session_id }
+}
+
 // The caller's thread holding an engine conversation, when it is theirs to read.
 export async function findForemanThreadId(ctx: WorkspaceContext, engineSessionId: string): Promise<string | null> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'foreman_conversations', ['id'] as const, { workspace_id: ctx.workspace.id, user_id: ctx.userId, engine_session_id: engineSessionId })
