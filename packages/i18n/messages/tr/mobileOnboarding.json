@@ -51,46 +51,9 @@
         "saveFailed": "Bunu kaydedemedik. Tekrar deneyin."
     },
     "setup": {
-        "loadFailed": "Kurulumunuzu yükleyemedik.",
-        "retry": "Tekrar dene"
-    },
-    "conversation": {
-        "foremanRole": "Chief of Staff'ınız",
-        "failed": "Bu gönderilemedi.",
-        "tryAgain": "Tekrar dene",
-        "composerPlaceholder": "Chief of Staff'ınıza yanıt verin"
-    },
-    "starter": {
-        "title": "Başlangıç ekibiniz",
-        "full": "Başlangıçta en fazla {max}. Bunu almak için birini çıkarın.",
-        "pickUpTo": "En fazla {max} seçin. Her biri kurulumunu sizinle yapar.",
-        "hire": "{count, plural, =0 {En az birini seçin} one {Bunu işe al} other {# coworker'ı işe al}}",
-        "custom": "Hiçbiri değil, ne istediğimi anlatayım",
-        "customPlaceholder": "Coworker'ınız ne yapmalı?",
-        "back": "Geri",
-        "send": "Gönder"
-    },
-    "plan": {
-        "defaultTitle": "İlk coworker'ınız",
-        "confirmed": "Onaylandı",
-        "changesAsked": "Değişiklik istendi",
-        "skipped": "Atlandı",
-        "build": "Coworker'ımı oluştur",
-        "change": "Bir şeyi değiştir"
-    },
-    "question": {
-        "skip": "Bu soruyu atla",
-        "selectAll": "Uygun olanların hepsini seçin",
-        "typeAnswer": "Yanıtınızı yazın…",
-        "somethingElse": "Başka bir şey",
-        "send": "Gönder",
-        "neither": "Hiçbiri"
-    },
-    "team": {
-        "ready": "Çalışma alanı hazır",
         "starting": {
-            "title": "Çalışma alanınız hazırlanıyor",
-            "body": "Coworker'ınız hemen ardından oluşturulacak."
+            "title": "Çalışma alanınız kuruluyor",
+            "body": "Chief of Staff'ınız uyandırılıyor…"
         },
         "failed": {
             "title": "Bu gerçekleşmedi",
@@ -101,16 +64,6 @@
             "body": "Kurulumu şu adreste tamamlayın: {host}."
         },
         "tryAgain": "Tekrar dene"
-    },
-    "build": {
-        "building": "Ekibiniz oluşturuluyor",
-        "empty": "Ekibiniz oluşturulamadı",
-        "ready": "Ekibiniz hazır",
-        "nothingLost": "Hiçbir şey kaybolmadı. Birazdan tekrar deneyin.",
-        "oneFailed": "{name} henüz oluşturulamadı.",
-        "someFailed": "{count, plural, one {# coworker henüz oluşturulamadı.} other {# coworker henüz oluşturulamadı.}}",
-        "tryAgain": "Tekrar dene",
-        "startLead": "{name} kurulumunu başlat"
     },
     "waitlist": {
         "title": "Şu anda kapasitemiz dolu",
