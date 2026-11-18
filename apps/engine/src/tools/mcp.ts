@@ -3,7 +3,9 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
+import type { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js'
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
+import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 import type { Provider } from '@rerun/contracts'
 import { CLI_PROVIDERS, type LoadedAgent, type McpServer } from '../agents/types.js'
 import { workspaceDir } from '../config/paths.js'
@@ -64,6 +66,17 @@ export async function openMcpClient(server: McpServer, spawn: McpSpawn): Promise
         await client.close().catch(() => {})
         throw e
     }
+}
+
+// `client.callTool` checks `structuredContent` against the tool's outputSchema even on an error, so a
+// server whose error result breaks its own schema (Kie.ai answers `{ success: false, error }` where it
+// promises a task_id) read as "does not match the tool's output schema" and its reason was lost. The
+// error goes out without its structured part, which the CLI behind the relay would check again.
+export async function callMcpTool(client: Client, name: string, args: Record<string, unknown>, options?: RequestOptions): Promise<McpCallResult> {
+    const result = await client.request({ method: 'tools/call', params: { name, arguments: args } }, CallToolResultSchema, options)
+    if (!result.isError) return result
+    const { structuredContent: _structuredContent, ...error } = result
+    return error
 }
 
 // A tool as the model may be handed it, whichever provider carries it: a root union Anthropic would

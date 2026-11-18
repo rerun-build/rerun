@@ -54,9 +54,9 @@ vi.mock('@modelcontextprotocol/sdk/client/index.js', () => ({
         async listTools() {
             return { tools: mcp.behaviours.get(this.target)?.tools ?? [] }
         }
-        async callTool(request: { name: string; arguments: unknown }) {
-            mcp.calls.push({ target: this.target, ...request })
-            return { content: [{ type: 'text', text: `${request.name} ran` }] }
+        async request({ params }: { params: { name: string; arguments: unknown } }) {
+            mcp.calls.push({ target: this.target, ...params })
+            return { content: [{ type: 'text', text: `${params.name} ran` }] }
         }
         async close() {
             mcp.closed.push(this.target)

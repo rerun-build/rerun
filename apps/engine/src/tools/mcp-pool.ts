@@ -7,7 +7,7 @@ import { agentProcessEnv } from '../agents/process-env.js'
 import { agentMcpServers } from '../vault/runtime.js'
 import { childProcessEnv } from '../lib/child-env.js'
 import { logger } from '../lib/logger.js'
-import { mcpToolSet, openMcpClient, prepareMcpServer, resolveTransport, type McpCallResult, type McpSpawn, type McpTool } from './mcp.js'
+import { callMcpTool, mcpToolSet, openMcpClient, prepareMcpServer, resolveTransport, type McpCallResult, type McpSpawn, type McpTool } from './mcp.js'
 
 // A CLI provider starts a new process for every message, and that process used to connect to every
 // MCP server of the agent before calling the model: up to several seconds per message. The engine
@@ -111,7 +111,7 @@ export async function acquireMcp(agentId: string, server: McpServer, spawn: McpS
             if (!live) throw new Error(`server "${server.name}" unreachable`)
             live.entry.inFlight++
             try {
-                return await live.session.client.callTool({ name, arguments: args }, undefined, options)
+                return await callMcpTool(live.session.client, name, args, options)
             } finally {
                 live.entry.inFlight--
                 arm(live.key, live.entry)

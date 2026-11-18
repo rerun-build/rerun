@@ -320,6 +320,8 @@ Tools are built per run and gated by `config.tools` (`src/tools/registry.ts`, th
 
 Each agent can declare MCP servers in `config.mcpServers`, and draws on the servers of the Vault items it holds. On a run they are connected (stdio, SSE or streamable HTTP) via the official `@modelcontextprotocol/sdk` and kept in a pool across runs, and their tools are merged into the agent's tool set under `"<server>_<tool>"` names (`mcp__<server>__<tool>` on `claude` and `codex`, which connect to them themselves) (`src/tools/mcp.ts`, `src/tools/mcp-pool.ts`). `mcp_register` lets an agent add one to its own config at runtime.
 
+A tool that fails reaches the model with the server's own error text. The structured part of an error result is dropped rather than checked against the tool's output schema, so a server whose errors do not fit that schema still says why the call failed (`callMcpTool`, `src/tools/mcp.ts`).
+
 Every tool sent to the model costs its name, description and JSON schema on each step of the run. When the MCP tools of an agent weigh more than 40,000 characters (`MCP_EAGER_PAYLOAD_CHARS`, about 10,000 tokens), the engine's own loop stops sending them (`src/tools/mcp-search.ts`, `src/tools/mcp-wire.ts`):
 
 - the system prompt lists each server with its number of tools, and the agent gets two more tools, `mcp_search` and `mcp_call`;
