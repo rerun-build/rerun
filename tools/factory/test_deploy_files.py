@@ -144,6 +144,31 @@ class Leftovers(unittest.TestCase):
             self.assertIn(need, c)
 
 
+class Router(unittest.TestCase):
+    def setUp(self):
+        self.c = code(read("router.yml"))
+
+    def test_pinned_image_no_host_port_no_socket(self):
+        self.assertRegex(self.c, r"image: decolua/9router:[0-9.]+@sha256:[0-9a-f]{64}\n")
+        for bad in ("ports:", "docker.sock", "privileged", "network_mode", "HEADROOM", "CLOUD_URL", "PROXY"):
+            self.assertNotIn(bad, self.c)
+
+    def test_api_key_and_login_are_required_and_secrets_come_from_env(self):
+        for need in ('AUTH_COOKIE_SECURE: "true"', "TUNNEL_WORKER_URL: http://127.0.0.1:9", "BASE_URL: https://${ROUTER_HOST:?",
+                     "middlewares=rerun-router-admin", "ipallowlist.sourcerange=${ROUTER_ADMIN_CIDR:?",
+                     "read_only: true", "cap_drop:\n      - ALL", "pids_limit:", "INITIAL_PASSWORD: ${ROUTER_PASSWORD:?",
+                     "JWT_SECRET: ${ROUTER_JWT_SECRET:?", "API_KEY_SECRET: ${ROUTER_API_KEY_SECRET:?", "no-new-privileges:true"):
+            self.assertIn(need, self.c)
+
+    def test_data_keeps_its_name_whatever_the_project(self):
+        self.assertTrue(self.c.endswith("volumes:\n  router-data:\n    name: rerun_router-data"))
+
+    def test_off_until_added(self):
+        self.assertNotIn("router.yml", read("docker-compose.vps.yml"))
+        self.assertNotIn("router.yml", read("make-env.sh"))
+        self.assertIn("deploy/vps/router.yml", read("add-router.sh"))
+
+
 class OneDeploy(unittest.TestCase):
     def test_the_vps_project_carries_the_dispatcher(self):
         self.assertTrue(code(read("docker-compose.vps.yml")).startswith("include:\n  - deploy/vps/factory-dispatcher.yml\n"))

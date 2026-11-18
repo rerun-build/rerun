@@ -1,0 +1,51 @@
+services:
+  router:
+    image: decolua/9router:0.5.119@sha256:38e58865ff111599f409f44430084ad0016c2ba530757ef545848d4bbe0cf007
+    environment:
+      DATA_DIR: /app/data
+      PORT: "20128"
+      HOSTNAME: 0.0.0.0
+      NODE_ENV: production
+      BASE_URL: https://${ROUTER_HOST:?run sudo sh deploy/vps/add-router.sh}
+      JWT_SECRET: ${ROUTER_JWT_SECRET:?run sudo sh deploy/vps/add-router.sh}
+      API_KEY_SECRET: ${ROUTER_API_KEY_SECRET:?run sudo sh deploy/vps/add-router.sh}
+      INITIAL_PASSWORD: ${ROUTER_PASSWORD:?run sudo sh deploy/vps/add-router.sh}
+      AUTH_COOKIE_SECURE: "true"
+      ENABLE_REQUEST_LOGS: "false"
+      OBSERVABILITY_ENABLED: "false"
+      TUNNEL_WORKER_URL: http://127.0.0.1:9
+    volumes:
+      - router-data:/app/data
+    labels:
+      - traefik.enable=true
+      - "traefik.http.routers.rerun-router.rule=Host(`${ROUTER_HOST:?run sudo sh deploy/vps/add-router.sh}`)"
+      - traefik.http.routers.rerun-router.entrypoints=websecure
+      - traefik.http.routers.rerun-router.tls.certresolver=letsencrypt
+      - traefik.http.routers.rerun-router.middlewares=rerun-router-admin
+      - "traefik.http.middlewares.rerun-router-admin.ipallowlist.sourcerange=${ROUTER_ADMIN_CIDR:?run sudo sh deploy/vps/add-router.sh}"
+      - traefik.http.services.rerun-router.loadbalancer.server.port=20128
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/data-home
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    cpus: 1
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: unless-stopped
+
+volumes:
+  router-data:
+    name: rerun_router-data

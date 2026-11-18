@@ -13,7 +13,7 @@ class EnvScripts(unittest.TestCase):
         self.tmp = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmp, True)
         os.makedirs(os.path.join(self.tmp, "deploy", "vps"))
-        for name in ("set-env.sh", "add-web.sh", "make-env.sh"):
+        for name in ("set-env.sh", "add-web.sh", "add-router.sh", "make-env.sh"):
             shutil.copy(os.path.join(VPS, name), os.path.join(self.tmp, "deploy", "vps", name))
         os.makedirs(os.path.join(self.tmp, "bin"))
         self.write("bin/docker", '#!/bin/sh\necho "$*" >> "$DOCKER_LOG"\n', 0o755)
@@ -82,6 +82,37 @@ class EnvScripts(unittest.TestCase):
         self.assertEqual(self.run_script("add-web.sh", answer="\n"), 0)
         self.assertNotIn("CRAWL4AI_TOKEN=", self.read(".env"))
         self.assertIn("CRAWL4AI_TOKEN is still empty", self.out)
+
+    def test_add_router_fills_what_is_missing_hides_the_password_and_adds_its_file_once(self):
+        self.write(".env", "RERUN_APP_HOST='rerun.example.org'\nCOMPOSE_FILE='docker-compose.yml:deploy/vps/docker-compose.vps.yml'\n")
+        self.assertEqual(self.run_script("add-router.sh", answer="a-long-password-1\n198.51.100.4/32\n"), 0)
+        self.assertEqual(self.read(".env"),
+                         "RERUN_APP_HOST='rerun.example.org'\n"
+                         "COMPOSE_FILE='docker-compose.yml:deploy/vps/docker-compose.vps.yml:deploy/vps/router.yml'\n"
+                         "ROUTER_JWT_SECRET='%s'\nROUTER_API_KEY_SECRET='%s'\nROUTER_HOST='router.example.org'\n"
+                         "ROUTER_PASSWORD='a-long-password-1'\nROUTER_ADMIN_CIDR='198.51.100.4/32'\n" % (HEX, HEX))
+        self.assertNotIn("a-long-password-1", self.out)
+        self.assertNotIn(HEX, self.out)
+        self.assertIn("router.example.org", self.out)
+        self.assertEqual(self.mode(".env"), 0o600)
+        self.assertEqual([n for n in os.listdir(self.tmp) if n.startswith(".env.")], [])
+        before = self.read(".env")
+        self.assertEqual(self.run_script("add-router.sh"), 0)
+        self.assertEqual(self.read(".env"), before)
+        self.assertIn("Added or updated: nothing", self.out)
+
+    def test_add_router_refuses_a_short_password_and_sets_none(self):
+        self.write(".env", "RERUN_APP_HOST='rerun.example.org'\n")
+        self.assertEqual(self.run_script("add-router.sh", answer="short\n"), 1)
+        self.assertNotIn("ROUTER_PASSWORD", self.read(".env"))
+        self.assertNotIn("router.yml", self.read(".env"))
+        self.assertNotIn("short", self.out)
+
+    def test_add_router_refuses_a_range_that_is_not_one(self):
+        self.write(".env", "RERUN_APP_HOST='rerun.example.org'\n")
+        self.assertEqual(self.run_script("add-router.sh", answer="a-long-password-1\n1.2.3.4; echo x\n"), 1)
+        self.assertNotIn("ROUTER_ADMIN_CIDR", self.read(".env"))
+        self.assertNotIn("router.yml", self.read(".env"))
 
     def test_make_env_builds_the_file_from_supabase_and_the_bundle(self):
         self.write(".env.example", "EXAMPLE=1\n")
