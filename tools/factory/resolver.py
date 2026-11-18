@@ -239,6 +239,8 @@ class Resolver:
             run = d.account("send_message", args)
         except Exception as e:
             d.store.abandon(r["fire"], str(e)[:200])
+            r["fire"] = None
+            self.put(d, key, r)
             self.log(r["issue"], "problem %s: send to %s raised, its copy stays taken until the run limit: %s" % (key, name, e))
             return
         r["run"] = (run or {}).get("runId")
@@ -250,7 +252,9 @@ class Resolver:
         counts = [run.get(k) for k in ("inputTokens", "outputTokens", "cachedInputTokens")]
         good = lambda x: isinstance(x, int) and not isinstance(x, bool) and x >= 0
         ti, to, cr = counts[0] if good(counts[0]) else 0, counts[1] if good(counts[1]) else 0, counts[2] if good(counts[2]) else None
-        d.store.close_run(r["run"], "done" if run.get("status") == "done" else "error", tokens_in=ti, tokens_out=to, cache_read=cr)
+        status = run.get("status") if run.get("status") in ("done", "cancelled", "lost") else "error"
+        error = {"cancelled": "past the run limit, cancelled", "lost": "get_run failed past the run limit"}.get(status)
+        d.store.close_run(r["run"], status, tokens_in=ti, tokens_out=to, cache_read=cr, error=error)
 
     def back(self, d, key, r, why):
         r.update(state="resolve_wait", agent=None, copy=None, run=None)
@@ -261,7 +265,11 @@ class Resolver:
         limit = int((d.cfg.get("clocks") or {}).get("run_limit_s", 2700))
         late = d.now() - r["sent_at"] > limit
         if r["run"] is None:
-            return self.back(d, key, r, "no run id after the run limit, sent again") if late else None
+            if not late:
+                return
+            if r.get("fire"):
+                d.store.abandon(r["fire"], "no run id after the run limit")
+            return self.back(d, key, r, "no run id after the run limit, sent again")
         try:
             run = d.account("get_run", {"agentId": r["agent"], "runId": r["run"]})
         except Exception:
@@ -273,7 +281,11 @@ class Resolver:
                 return
             d.account("cancel_run", {"agentId": r["agent"], "runId": r["run"]})
             self.log(r["issue"], "problem %s: run %s past %d s, cancelled" % (key, r["run"], limit))
-            run = {"status": "cancelled"}
+            try:
+                after = d.account("get_run", {"agentId": r["agent"], "runId": r["run"]})
+            except Exception:
+                after = None
+            run = dict(after or run, status="cancelled")
         self.close_fire(d, r, run)
         if run.get("status") == "error":
             k = clocks.klass("ERROR", run)
