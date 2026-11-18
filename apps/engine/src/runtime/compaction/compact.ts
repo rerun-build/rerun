@@ -4,7 +4,7 @@ import { opencodeModel } from '../../connections/opencode-catalog.js'
 import { generateText, type ModelMessage } from 'ai'
 import { isContextPart, modelContextWindow, type ContextSize, type Provider } from '@rerun/contracts'
 import type { CompactListener } from '../../agents/claude-context.js'
-import { COMPACT_RESERVE_TOKENS, compactAtTokens, modelFor, type CompactPoint, type ModelOverride } from '../../agents/providers.js'
+import { compactAtTokens, modelFor, type CompactPoint, type ModelOverride } from '../../agents/providers.js'
 import { withoutQuickRepliesCalls } from '../../agents/quick-replies-stream.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
@@ -98,7 +98,7 @@ export function effectiveCompactAt(size: ContextSize | undefined, provider: Prov
     if (provider === 'claude') return at
     const window = provider === 'custom' ? customMeasuredContextWindow(connection, model) : runContextWindow(model, provider, connection)
     if (window === undefined) return 'default'
-    return Math.min(at, CLI_PROVIDERS.has(provider) ? window - COMPACT_RESERVE_TOKENS : Math.floor(window * COMPACTION_TRIGGER_RATIO))
+    return Math.min(at, Math.floor(window * COMPACTION_TRIGGER_RATIO))
 }
 
 export function compactionThreshold(contextWindow: number, provider: Provider): number {
