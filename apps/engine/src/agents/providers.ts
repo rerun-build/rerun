@@ -83,8 +83,11 @@ export function compactAtTokens(size?: ContextSize): number | null {
     return raw !== undefined && Number.isInteger(value) && value >= COMPACT_AT_MIN_TOKENS && value <= COMPACT_AT_MAX_TOKENS ? value : COMPACT_AT_TOKENS[key]
 }
 
-export function compactEnvFor(at: number | null): { CLAUDE_CODE_AUTO_COMPACT_WINDOW: string } | { DISABLE_AUTO_COMPACT: '1' } {
-    return at === null ? { DISABLE_AUTO_COMPACT: '1' } : { CLAUDE_CODE_AUTO_COMPACT_WINDOW: String(Math.max(CLAUDE_MIN_WINDOW_TOKENS, at + COMPACT_RESERVE_TOKENS)) }
+export type CompactPoint = number | 'off' | 'default'
+
+export function compactEnvFor(at: CompactPoint): { CLAUDE_CODE_AUTO_COMPACT_WINDOW: string } | { DISABLE_AUTO_COMPACT: '1' } | Record<string, never> {
+    if (at === 'default') return {}
+    return at === 'off' ? { DISABLE_AUTO_COMPACT: '1' } : { CLAUDE_CODE_AUTO_COMPACT_WINDOW: String(Math.max(CLAUDE_MIN_WINDOW_TOKENS, at + COMPACT_RESERVE_TOKENS)) }
 }
 
 export const CODEX_DISABLED_FEATURES = ['multi_agent', 'multi_agent_v2'] as const
@@ -235,9 +238,9 @@ export function codexMcpConfig(tools?: ToolSet, mcpServers: McpServer[] = []): R
 
 export type GoalOption = { goal: RunGoal; record: (v: GoalVerdict) => Promise<void>; hook?: ReturnType<typeof goalStopHook> }
 
-export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: number | null }
+export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: CompactPoint }
 
-export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: number | null; onCompact?: CompactListener }
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: CompactPoint; onCompact?: CompactListener }
 
 function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
     return options?.sessionId ?? `${agent.id}:one-shot`
@@ -288,7 +291,7 @@ function claudeProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers: RunMcpS
                 ...claudeAuthEnv(connectionEnv(agent)),
                 ANTHROPIC_API_KEY: undefined,
                 MCP_TOOL_TIMEOUT: String(BRIDGE_TOOL_TIMEOUT_SEC * 1000),
-                ...compactEnvFor(options.compactAt === undefined ? compactAtTokens(agent.config.contextSize) : options.compactAt),
+                ...compactEnvFor(options.compactAt ?? compactAtTokens(agent.config.contextSize) ?? 'off'),
             },
             ...(options.system !== undefined ? { systemPrompt: options.system } : {}),
             ...(allowedTools.length ? { mcpServers: servers, allowedTools } : {}),

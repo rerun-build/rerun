@@ -149,9 +149,13 @@ export function customDiscoveredModels(connectionId: string): DiscoveredModel[] 
     return readings.get(connectionId)?.models ?? null
 }
 
-export function customContextWindow(connection: LoadedConnection | null | undefined, model: string): number {
+export function customMeasuredContextWindow(connection: LoadedConnection | null | undefined, model: string): number | undefined {
     const listed = connection ? readings.get(connection.id)?.models.find(entry => entry.id === model)?.contextWindow : null
-    return listed ?? connection?.config.contextWindow ?? CUSTOM_DEFAULT_CONTEXT_WINDOW
+    return listed ?? connection?.config.contextWindow ?? undefined
+}
+
+export function customContextWindow(connection: LoadedConnection | null | undefined, model: string): number {
+    return customMeasuredContextWindow(connection, model) ?? CUSTOM_DEFAULT_CONTEXT_WINDOW
 }
 
 export function forgetCustomCatalog(connectionId: string): void {

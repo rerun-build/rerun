@@ -499,13 +499,13 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const cached = applyCaching(provider, { system, messages: turnMessages, sessionId, model })
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
-        const compactAt = provider === 'codex' ? null : effectiveCompactAt((trigger.source === 'chat' ? trigger.contextSize : undefined) ?? agent.config.contextSize, provider, model, connection)
-        if (compactAt !== null) void setRunCompactAt(agent.id, run.id, compactAt).catch(() => {})
+        const compactAt = provider === 'codex' ? 'default' : effectiveCompactAt((trigger.source === 'chat' ? trigger.contextSize : undefined) ?? agent.config.contextSize, provider, model, connection)
+        if (typeof compactAt === 'number') void setRunCompactAt(agent.id, run.id, compactAt).catch(() => {})
         const onCompact: CompactListener = ({ trigger: kind, summaryChars }) => {
             logger.info({ agent: agent.id, run: run.id, trigger: kind, summaryChars }, 'run context compacted')
             void recordRunCompaction(agent.id, run.id, summaryChars).catch(() => {})
         }
-        const stepGuard = compactAt !== null && !CLI_PROVIDERS.has(provider) ? stepContextGuard(ctx, override, systemText, toolPayloadChars(sentTools), compactAt, cached.messages.length - 1, onCompact) : undefined
+        const stepGuard = typeof compactAt === 'number' && !CLI_PROVIDERS.has(provider) ? stepContextGuard(ctx, override, systemText, toolPayloadChars(sentTools), compactAt, cached.messages.length - 1, onCompact) : undefined
 
         spawnToken = claudeTokenOf(connection)
         const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, compactAt, onCompact, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })

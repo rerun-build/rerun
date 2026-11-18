@@ -295,11 +295,14 @@ describe('resolveModel on the claude subscription', () => {
         resolveModel(agent)
         resolveModel(sized)
         resolveModel(sized, undefined, undefined, undefined, { compactAt: 150000 })
-        resolveModel(sized, undefined, undefined, undefined, { compactAt: null })
+        resolveModel(sized, undefined, undefined, undefined, { compactAt: 'off' })
+        resolveModel(sized, undefined, undefined, undefined, { compactAt: 'default' })
 
         const envs = claudeCalls.map(call => call.defaultSettings.env)
-        expect(envs.map(env => env.CLAUDE_CODE_AUTO_COMPACT_WINDOW)).toEqual(['273000', '513000', '183000', undefined])
+        expect(envs.map(env => env.CLAUDE_CODE_AUTO_COMPACT_WINDOW)).toEqual(['273000', '513000', '183000', undefined, undefined])
         expect(envs[3].DISABLE_AUTO_COMPACT).toBe('1')
+        expect(envs[4]).not.toHaveProperty('DISABLE_AUTO_COMPACT')
+        expect(envs[4]).not.toHaveProperty('CLAUDE_CODE_AUTO_COMPACT_WINDOW')
     })
 
     it('hands the compaction hook of the capture to the claude settings', async () => {

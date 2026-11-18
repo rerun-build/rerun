@@ -1,10 +1,10 @@
-import { customContextWindow } from '../../connections/custom-catalog.js'
+import { customContextWindow, customMeasuredContextWindow } from '../../connections/custom-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { opencodeModel } from '../../connections/opencode-catalog.js'
 import { generateText, type ModelMessage } from 'ai'
 import { isContextPart, modelContextWindow, type ContextSize, type Provider } from '@rerun/contracts'
 import type { CompactListener } from '../../agents/claude-context.js'
-import { COMPACT_RESERVE_TOKENS, compactAtTokens, modelFor, type ModelOverride } from '../../agents/providers.js'
+import { COMPACT_RESERVE_TOKENS, compactAtTokens, modelFor, type CompactPoint, type ModelOverride } from '../../agents/providers.js'
 import { withoutQuickRepliesCalls } from '../../agents/quick-replies-stream.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
@@ -92,10 +92,11 @@ export function runContextWindow(model: string, provider: Provider, connection?:
     return modelContextWindow(model, provider)
 }
 
-export function effectiveCompactAt(size: ContextSize | undefined, provider: Provider, model: string, connection?: LoadedConnection | null): number | null {
+export function effectiveCompactAt(size: ContextSize | undefined, provider: Provider, model: string, connection?: LoadedConnection | null): CompactPoint {
     const at = compactAtTokens(size)
-    const window = at === null ? undefined : runContextWindow(model, provider, connection)
-    if (at === null || window === undefined) return at
+    if (at === null) return 'off'
+    const window = provider === 'custom' ? customMeasuredContextWindow(connection, model) : runContextWindow(model, provider, connection)
+    if (window === undefined) return 'default'
     return Math.min(at, CLI_PROVIDERS.has(provider) ? window - COMPACT_RESERVE_TOKENS : Math.floor(window * COMPACTION_TRIGGER_RATIO))
 }
 

@@ -35,6 +35,7 @@ vi.mock('../../connections/cli-auth.js', () => ({ ensureCliAuth: async () => () 
 
 const { afterEach, describe, expect, it } = await import('vitest')
 const { CUSTOM_DEFAULT_CONTEXT_WINDOW } = await import('@rerun/contracts')
+const { customContextWindow } = await import('../../connections/custom-catalog.js')
 const { effectiveCompactAt, stepContextGuard } = await import('./compact.js')
 type Message = import('ai').ModelMessage
 
@@ -67,15 +68,19 @@ describe('effectiveCompactAt', () => {
         expect(effectiveCompactAt('small', 'custom', 'm', custom(65536))).toBe(49152)
     })
 
-    it('keeps the class point on a model whose window is unknown, and clamps a custom endpoint to its default window', () => {
-        expect(effectiveCompactAt('large', 'openai', 'no-such-model')).toBe(940000)
-        expect(effectiveCompactAt('large', 'custom', 'm', custom())).toBe(Math.min(940000, Math.floor(CUSTOM_DEFAULT_CONTEXT_WINDOW * 0.75)))
+    it('leaves compaction to the provider when no window was measured, and does not take the invented default as one', () => {
+        expect(effectiveCompactAt('large', 'openai', 'no-such-model')).toBe('default')
+        expect(effectiveCompactAt('large', 'claude', 'claude-opus-5-5')).toBe(167000)
+        expect(effectiveCompactAt('large', 'custom', 'm', custom())).toBe('default')
+        expect(effectiveCompactAt('large', 'custom', 'm', null)).toBe('default')
+        expect(customContextWindow(custom(), 'm')).toBe(CUSTOM_DEFAULT_CONTEXT_WINDOW)
     })
 
     it('stays off when the size is off and reads the class point from the environment', () => {
-        expect(effectiveCompactAt('off', 'custom', 'm', custom(262144))).toBeNull()
+        expect(effectiveCompactAt('off', 'custom', 'm', custom(262144))).toBe('off')
+        expect(effectiveCompactAt('off', 'custom', 'm')).toBe('off')
         process.env.RERUN_COMPACT_AT_SMALL = '150000'
-        expect(effectiveCompactAt(undefined, 'openai', 'no-such-model')).toBe(150000)
+        expect(effectiveCompactAt(undefined, 'custom', 'm', custom(1048576))).toBe(150000)
     })
 })
 

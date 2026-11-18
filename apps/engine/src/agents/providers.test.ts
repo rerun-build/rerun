@@ -149,7 +149,8 @@ describe('compactAtTokens', () => {
         expect(compactEnvFor(240000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '273000' })
         expect(compactEnvFor(480000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '513000' })
         expect(compactEnvFor(940000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '973000' })
-        expect(compactEnvFor(null)).toEqual({ DISABLE_AUTO_COMPACT: '1' })
+        expect(compactEnvFor('off')).toEqual({ DISABLE_AUTO_COMPACT: '1' })
+        expect(compactEnvFor('default')).toEqual({})
     })
 
     it('never states a window below the CLI minimum of 100000', () => {
