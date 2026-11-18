@@ -62,6 +62,21 @@ class Drain(unittest.TestCase):
         self.assertEqual(self.left(), "1")
         self.assertEqual(pools.free_copies(self.d.cfg, "reviewer", []), [])
 
+    def test_a_fire_left_open_for_a_run_that_ended_is_not_counted_as_running(self):
+        self.make([])
+        fid = self.d.store.intent("77", "", "build", coworker="B1", at=D.iso(self.w.clock - 600))
+        self.d.store.fired(fid, "gone-run")
+        self.mark()
+        self.beat()
+        self.assertEqual(self.left(), "0")
+
+    def test_a_send_in_its_first_minutes_is_still_counted(self):
+        self.make([])
+        self.d.store.intent("78", "", "build", coworker="B1", at=D.iso(self.w.clock - 60))
+        self.mark()
+        self.beat()
+        self.assertEqual(self.left(), "1")
+
     def test_without_the_mark_nothing_is_held_and_sending_goes_on(self):
         self.make([issue(5)])
         self.mark()

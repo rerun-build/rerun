@@ -65,6 +65,7 @@ WT_NEW_FAULT = re.compile(r"(?is)(?=.*\bwt new\b)(?!.*\bplan marker\b).*\b(?:can
 CHECKOUT_ROW, CHECKOUT_HOLD_S = 3, 60 * 60
 MERGE_TRIES = 5
 STALE_RUN_S, STALE_RUNS_A_BEAT = 2 * 3600, 15
+DRAIN_SEND_S = 300
 DRAIN_MAX_S = 3 * 3600
 MAX_TAKES = 3
 INBOX = "Factory follow-ups inbox"
@@ -1796,8 +1797,9 @@ class Dispatcher:
         if state is not True:
             return
         holds.arm(self.store, "update", self.now() + 2 * self.cfg.get("poll_s", 30))
-        left = self.store.db.execute("SELECT COUNT(*) FROM fires WHERE status IN ('intent', 'running') AND intent_at >= ?",
-                                     (iso(self.now() - STALE_RUN_S),)).fetchone()[0]
+        sending = self.store.db.execute("SELECT COUNT(*) FROM fires WHERE status='intent' AND intent_at >= ?",
+                                        (iso(self.now() - DRAIN_SEND_S),)).fetchone()[0]
+        left = len(self.own()) + len(self.station.live()) + sending
         try:
             refresh.write(os.path.join(base, "drain-left"), str(left))
         except OSError as e:

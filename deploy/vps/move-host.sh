@@ -25,7 +25,14 @@ put() {
 }
 
 OLD=$(value_in .env RERUN_APP_HOST)
-if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then put .env RERUN_OLD_APP_HOST "$OLD" "'"; fi
+if [ -n "$OLD" ] && [ "$OLD" != "$NEW" ]; then
+    put .env RERUN_OLD_APP_HOST "$OLD" "'"
+    if [ -f deploy/vps/.env ]; then
+        T=$(mktemp deploy/vps/.env.XXXXXX)
+        sed "s#https://$OLD#https://$NEW#g" deploy/vps/.env > "$T" && mv "$T" deploy/vps/.env
+        T=''
+    fi
+fi
 put .env RERUN_APP_HOST "$NEW" "'"
 put .env NEXT_PUBLIC_APP_URL "https://$NEW" "'"
 if [ -n "$(value_in .env RERUN_OLD_APP_HOST)" ]; then

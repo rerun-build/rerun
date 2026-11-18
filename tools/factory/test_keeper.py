@@ -294,8 +294,9 @@ class Keeper(unittest.TestCase):
         with open(os.path.join(DEPLOY, "update.sh"), encoding="utf-8") as f:
             text = f.read()
         tail = 'echo "== keeper"\nsh deploy/vps/keeper.sh install || echo "keeper install failed: the copy installed before stays"\n'
-        self.assertTrue(text.endswith(tail))
+        self.assertIn(tail, text)
         self.assertLess(text.index("docker compose up -d"), text.index("keeper.sh install"))
+        self.assertTrue(text.endswith('sh deploy/vps/doctor.sh || echo "The checks above found a problem. The deploy itself is done."\n'))
 
 
 if __name__ == "__main__":

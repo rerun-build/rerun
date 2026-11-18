@@ -46,6 +46,11 @@ class MoveHost(unittest.TestCase):
                          "SITE_URL=https://moldwright.example.org\n"
                          "ADDITIONAL_REDIRECT_URLS=https://rerun.example.org/**,https://moldwright.example.org/**\nJWT_EXPIRY=3600\n")
 
+    def test_the_factory_settings_follow_the_app_to_its_new_name(self):
+        self.write("deploy/vps/.env", "FACTORY_ACCOUNT_URL='https://rerun.example.org/api/mcp'\nOTHER='x'\n")
+        self.assertEqual(self.move("moldwright.example.org"), 0, self.out)
+        self.assertEqual(self.read("deploy/vps/.env"), "FACTORY_ACCOUNT_URL='https://moldwright.example.org/api/mcp'\nOTHER='x'\n")
+
     def test_running_it_again_changes_nothing(self):
         self.move("moldwright.example.org")
         env, supa = self.read(".env"), self.read("supabase.env")
