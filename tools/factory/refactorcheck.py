@@ -30,7 +30,7 @@ def main(argv=None):
     ap.add_argument("--base", required=True)
     args = ap.parse_args(argv)
     commits = [tuple(line.split("\t", 1)) for line in _git("log", "--format=%H%x09%s", args.base + "..HEAD").splitlines() if "\t" in line]
-    bad = offenders(commits, lambda sha: _git("diff-tree", "--no-commit-id", "--name-only", "-r", sha).split())
+    bad = offenders(commits, lambda sha: _git("diff-tree", "--no-commit-id", "--name-only", "-r", sha).splitlines())
     for line in bad:
         print(line)
     if bad:
