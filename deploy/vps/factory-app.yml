@@ -1,0 +1,35 @@
+services:
+  factory-token:
+    build:
+      context: deploy/vps
+      dockerfile: factory-runner.Dockerfile
+    working_dir: /app
+    command: ["python3", "-u", "/app/apptoken.py"]
+    environment:
+      FACTORY_APP_ID: ${FACTORY_APP_ID:?run sh deploy/vps/add-app.sh}
+      FACTORY_APP_INSTALLATION: ${FACTORY_APP_INSTALLATION:?run sh deploy/vps/add-app.sh}
+      HOME: /tmp
+    volumes:
+      - ./tools/factory:/app:ro
+      - factory-token:/token
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 64m
+    cpus: 0.1
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+        max-file: "2"
+    restart: unless-stopped
+    secrets:
+      - app_key
+
+secrets:
+  app_key:
+    file: ${FACTORY_APP_KEY_FILE:?run sh deploy/vps/add-app.sh}
