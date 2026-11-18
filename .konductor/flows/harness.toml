@@ -54,8 +54,7 @@ comments = ["blocking", "major", "minor", "nit"]
 skip_if_no_comments = true
 prompt = """
 Voici les {{comments.count}} remarques de la review, chacune avec sa sévérité.
-Planifie la correction de toutes les remarques blocking et major, et des minor / nit qui sont des quick wins.
-Pour chaque remarque que tu écartes, dis pourquoi.
+Corrige toutes les remarques bloquantes et majeures. Corrige aussi les mineures et les petits détails qui se règlent en quelques lignes. Pour chaque remarque que tu laisses de côté, dis en une phrase pourquoi.
 """
 
 [[steps]]
