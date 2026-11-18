@@ -16,9 +16,16 @@ def _line(text, key):
     return m.group(1).strip() if m else None
 
 
+def fence(*texts):
+    lines = [l for t in texts for l in re.findall(r"^~{4,}[ \t]*$", t or "", re.M)]
+    if not lines:
+        return FENCE
+    return "~" * (max(len(l.strip()) for l in lines) + 1)
+
+
 def _block(text, key):
-    m = re.search(r"^\*\*%s\*\*[ \t]*\n%s[ \t]*\n(.*?)(?:\n)?^%s[ \t]*$" % (key, FENCE, FENCE), text, re.M | re.S)
-    return m.group(1) if m else None
+    m = re.search(r"^\*\*%s\*\*[ \t]*\n(~{4,})[ \t]*\n(.*?)\n?^\1[ \t]*$" % key, text, re.M | re.S)
+    return m.group(2) if m else None
 
 
 def parse(issue):
@@ -26,6 +33,7 @@ def parse(issue):
         number, text = issue.get("number"), issue.get("body") or ""
     else:
         number, text = None, issue or ""
+    text = text.replace("\r\n", "\n")
     errors = []
     out = {"number": number}
     for key, name in (("Coworker", "coworker"), ("Cause", "cause"), ("Reason", "reason")):
@@ -39,7 +47,7 @@ def parse(issue):
         errors.append("the **Old text** block is missing")
     if new is None:
         errors.append("the **New text** block is missing")
-    elif not new.strip():
+    elif not new.strip() and not (old and out["reason"].startswith("Reverts #")):
         errors.append("the new text is empty")
     out["old"] = old or ""
     out["new"] = new or ""
@@ -50,6 +58,10 @@ def parse(issue):
 def apply(soul, old, new):
     if not old:
         return soul.rstrip("\n") + "\n\n" + new + "\n"
+    if new == "":
+        if soul.count(old) != 1 or not soul.rstrip("\n").endswith(old):
+            raise ValueError("an empty new text removes only text at the end of the instructions")
+        return soul.rstrip("\n")[:-len(old)].rstrip("\n") + "\n"
     n = soul.count(old)
     if n != 1:
         raise ValueError("the old text occurs %d times in the coworker's instructions; it must occur once" % n)
@@ -57,10 +69,11 @@ def apply(soul, old, new):
 
 
 def body(coworker, cause, reason, old, new):
+    f = fence(old, new)
     return (
         "**Coworker**: %s\n**Cause**: %s\n**Reason**: %s\n\n"
         "**Old text**\n%s\n%s\n%s\n\n**New text**\n%s\n%s\n%s\n"
-        % (coworker, cause, reason, FENCE, old, FENCE, FENCE, new, FENCE)
+        % (coworker, cause, reason, f, old, f, f, new, f)
     )
 
 
@@ -70,6 +83,7 @@ def revert_body(number, parsed, fact):
 
 
 def review_brief(repo, n, parsed):
+    f = fence(parsed["old"], parsed["new"])
     return "\n".join([
         "Review an instructions change: https://github.com/%s/issues/%s" % (repo, n),
         "Coworker: %s" % parsed["coworker"],
@@ -77,14 +91,14 @@ def review_brief(repo, n, parsed):
         "Reason: %s" % parsed["reason"],
         "",
         "Old text:",
-        FENCE,
+        f,
         parsed["old"],
-        FENCE,
+        f,
         "",
         "New text:",
-        FENCE,
+        f,
         parsed["new"],
-        FENCE,
+        f,
         "",
         "Accept only when all of these hold:",
         "- the new text removes the cause named and is the smallest change that does",
