@@ -7,6 +7,7 @@
 //   pnpm docs:media --changed             the scenes whose watched files changed since origin/dev
 //   pnpm docs:media --no-video            screenshots only (the loops need ffmpeg, or FFMPEG=<path>)
 //   pnpm docs:media --list                the scenes and what they watch
+//   pnpm docs:media --force               write every file again, even a screen that did not change
 //
 // Local stack only, like `pnpm verify:ui` (same checks): `pnpm db:start`, then `pnpm cloud env:local`.
 // It signs in as `maya@acmestudio.example`, starts a local engine on a fresh data-dir, and seeds Acme
@@ -35,6 +36,7 @@ import {
     ENGINE_PORT,
     PORT,
     REPO_ROOT,
+    UI_DIR,
     assertLocalProfile,
     assertMigrated,
     chromium,
@@ -58,12 +60,13 @@ const DEMO_EMAIL = 'maya@acmestudio.example'
 const ONBOARDING_EMAIL = 'leo@acmestudio.example'
 
 function parseArgs(argv) {
-    const options = { only: [], changed: false, video: true, list: false, keep: false, headed: false }
+    const options = { only: [], changed: false, video: true, force: false, list: false, keep: false, headed: false }
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i]
         if (arg === '--only') options.only.push(argv[++i])
         else if (arg === '--changed') options.changed = true
         else if (arg === '--no-video') options.video = false
+        else if (arg === '--force') options.force = true
         else if (arg === '--list') options.list = true
         else if (arg === '--keep') options.keep = true
         else if (arg === '--headed') options.headed = true
@@ -146,6 +149,9 @@ const base = `http://localhost:${PORT}`
 const workDir = join(REPO_ROOT, '.context/docs-media', new Date().toISOString().replace(/[:.]/g, '-'))
 const dataDir = join(REPO_ROOT, '.context/docs-media/engine-data')
 mkdirSync(workDir, { recursive: true })
+// A `next dev` cache left by another branch can serve a sign-in page that reloads itself forever:
+// a hub this script starts begins from a clean one.
+if (!listeningPid(PORT)) rmSync(join(UI_DIR, '.next/dev'), { recursive: true, force: true })
 const server = await ensureServer(base, workDir)
 // A hub left by an interrupted run may still be compiling.
 await waitFor(`${base}/api/version`)
@@ -185,7 +191,7 @@ try {
     for (const scene of picked) {
         log(`Scene ${scene.page}`)
         try {
-            await captureScene({ browser, base, states, scene, demo, workDir, video: options.video })
+            await captureScene({ browser, base, states, scene, demo, workDir, video: options.video, force: options.force })
         } catch (error) {
             failed = true
             log(`Scene ${scene.page} failed: ${error?.message ?? error}`)

@@ -2,13 +2,15 @@
 // in light and dark, written to apps/docs/images/<page>/.
 
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join, relative } from 'node:path'
 import { REPO_ROOT, UI_DIR, fail, log, settle } from '../verify/shared.mjs'
 import { DEMO_NOW } from './demo-workspace.mjs'
 
 const sharp = createRequire(join(UI_DIR, 'package.json'))('sharp')
+// libvips caches a file by its path: a file rewritten during the run would read back stale.
+sharp.cache(false)
 
 export const IMAGES_DIR = join(REPO_ROOT, 'apps/docs/images')
 export const THEMES = ['light', 'dark']
@@ -67,8 +69,23 @@ async function newContext(browser, base, storageState, theme, view, extra = {}) 
 
 const stateFor = (states, scene, shot) => states[shot.account ?? scene.account ?? 'demo']
 
-async function toWebp(png, path) {
+// A redraw of an unchanged screen still moves a few antialiased pixels (the edges of the icon tiles,
+// by up to ~90 levels), while a changed word or color moves some by far more: below that, the file on
+// disk is kept, so a run over unchanged screens leaves git with nothing to commit.
+const REDRAW_NOISE = 96
+
+async function sameAsOnDisk(image, path) {
+    if (!existsSync(path)) return false
+    const pixels = (source) => source.removeAlpha().raw().toBuffer({ resolveWithObject: true })
+    const [fresh, kept] = await Promise.all([pixels(image.clone()), pixels(sharp(readFileSync(path)))])
+    if (fresh.info.width !== kept.info.width || fresh.info.height !== kept.info.height || fresh.info.channels !== kept.info.channels) return false
+    for (let i = 0; i < fresh.data.length; i++) if (Math.abs(fresh.data[i] - kept.data[i]) > REDRAW_NOISE) return false
+    return true
+}
+
+async function toWebp(png, path, force) {
     const image = sharp(png).resize({ width: MAX_WIDTH, withoutEnlargement: true })
+    if (!force && (await sameAsOnDisk(image, path))) return { size: statSync(path).size, kept: true }
     let quality = 86
     let webp = await image.clone().webp({ quality, effort: 6 }).toBuffer()
     while (webp.length > WEBP_BUDGET && quality > 50) {
@@ -76,7 +93,7 @@ async function toWebp(png, path) {
         webp = await image.clone().webp({ quality, effort: 6 }).toBuffer()
     }
     writeFileSync(path, webp)
-    return webp.length
+    return { size: webp.length, kept: false }
 }
 
 // `fit` drops the fixed height a panel keeps for a longer list, so the picture ends with its content.
@@ -96,7 +113,7 @@ async function framed(shot, ctx) {
     return target
 }
 
-async function captureShot({ browser, base, states, scene, shot, demo, theme, workDir }) {
+async function captureShot({ browser, base, states, scene, shot, demo, theme, workDir, force }) {
     const { context, page } = await newContext(browser, base, stateFor(states, scene, shot), theme, shot.view ?? scene.view ?? 'board')
     try {
         const ctx = { page, base, demo }
@@ -105,8 +122,7 @@ async function captureShot({ browser, base, states, scene, shot, demo, theme, wo
         const target = await framed(shot, ctx)
         const png = await target.screenshot({ animations: 'disabled', type: 'png' })
         const path = join(IMAGES_DIR, scene.page, `${shot.name}.${theme}.webp`)
-        const size = await toWebp(png, path)
-        return [{ path, size }]
+        return [{ path, ...(await toWebp(png, path, force)) }]
     } catch (error) {
         const failure = join(workDir, `failed-${scene.page}-${shot.name}-${theme}.png`)
         await page.screenshot({ path: failure }).catch(() => {})
@@ -125,7 +141,9 @@ function union(a, b) {
     return { x: left, y: top, width: right - left, height: bottom - top }
 }
 
-async function captureLoop({ browser, base, states, scene, shot, demo, theme, workDir }) {
+// The recording of an unchanged screen is never the same twice: its `.mp4` is kept as long as the
+// poster, the screen before the gesture, has not changed.
+async function captureLoop({ browser, base, states, scene, shot, demo, theme, workDir, force }) {
     const videoDir = join(workDir, `${scene.page}-${shot.name}-${theme}`)
     rmSync(videoDir, { recursive: true, force: true })
     const startedAt = Date.now()
@@ -151,14 +169,15 @@ async function captureLoop({ browser, base, states, scene, shot, demo, theme, wo
         clip = union(before, await target.boundingBox())
         const posterPath = join(IMAGES_DIR, scene.page, `${shot.name}.${theme}.webp`)
         const posterCrop = await sharp(poster).extract({ left: clip.x, top: clip.y, width: clip.width, height: clip.height }).png().toBuffer()
-        outputs.push({ path: posterPath, size: await toWebp(posterCrop, posterPath) })
+        outputs.push({ path: posterPath, ...(await toWebp(posterCrop, posterPath, force)) })
     } finally {
         await context.close()
     }
     const recording = await page.video().path()
+    const mp4Path = join(IMAGES_DIR, scene.page, `${shot.name}.${theme}.mp4`)
+    if (outputs[0].kept && existsSync(mp4Path)) return [...outputs, { path: mp4Path, size: statSync(mp4Path).size, kept: true }]
     const duration = Math.min(playTo - playFrom, LOOP_MAX_SECONDS)
     const even = (value) => value - (value % 2)
-    const mp4Path = join(IMAGES_DIR, scene.page, `${shot.name}.${theme}.mp4`)
     const encode = (crf) =>
         execFileSync(FFMPEG, [
             '-loglevel', 'error', '-y',
@@ -173,21 +192,21 @@ async function captureLoop({ browser, base, states, scene, shot, demo, theme, wo
         crf += 3
         encode(crf)
     }
-    outputs.push({ path: mp4Path, size: statSync(mp4Path).size })
+    outputs.push({ path: mp4Path, size: statSync(mp4Path).size, kept: false })
     return outputs
 }
 
-export async function captureScene({ browser, base, states, scene, demo, workDir, video }) {
+export async function captureScene({ browser, base, states, scene, demo, workDir, video, force }) {
     mkdirSync(join(IMAGES_DIR, scene.page), { recursive: true })
     const written = []
     for (const shot of scene.shots ?? []) {
-        for (const theme of THEMES) written.push(...(await captureShot({ browser, base, states, scene, shot, demo, theme, workDir })))
+        for (const theme of THEMES) written.push(...(await captureShot({ browser, base, states, scene, shot, demo, theme, workDir, force })))
     }
     if (video) {
         for (const shot of scene.loops ?? []) {
-            for (const theme of THEMES) written.push(...(await captureLoop({ browser, base, states, scene, shot, demo, theme, workDir })))
+            for (const theme of THEMES) written.push(...(await captureLoop({ browser, base, states, scene, shot, demo, theme, workDir, force })))
         }
     }
-    for (const file of written) log(`${relative(REPO_ROOT, file.path)} · ${Math.round(file.size / 1024)} KB`)
+    for (const file of written) log(`${relative(REPO_ROOT, file.path)} · ${Math.round(file.size / 1024)} KB${file.kept ? ' · unchanged, kept' : ''}`)
     return written
 }
