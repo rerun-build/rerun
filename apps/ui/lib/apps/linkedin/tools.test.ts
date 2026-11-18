@@ -16,9 +16,19 @@ describe('the LinkedIn tool set', () => {
         expect(new Set(LINKEDIN_TOOLS.map(tool => tool.name)).size).toBe(LINKEDIN_TOOLS.length)
     })
 
+    it('reads LinkedIn with the account: no tool sends the coworker to paid data instead', () => {
+        for (const tool of LINKEDIN_TOOLS) expect(tool.description).not.toMatch(/paid_data|paid data/i)
+    })
+
     it('meters every action LinkedIn could restrict the account for', () => {
         for (const name of ['send_invitation', 'send_message', 'get_profile', 'search_people', 'comment_on_post', 'visit_profile', 'follow', 'answer_comment', 'repost', 'create_post', 'search_jobs', 'apply_to_job']) {
             expect(linkedinTool(name)?.quota).toBeDefined()
+        }
+    })
+
+    it('meters the reads of posts, comments and reactions, one per call', () => {
+        for (const name of ['read_feed', 'get_post', 'get_post_comments', 'get_post_reactions', 'get_profile_posts', 'get_profile_comments', 'get_profile_reactions']) {
+            expect(linkedinTool(name)?.quota).toEqual({ action: 'content_read' })
         }
     })
 })
@@ -26,7 +36,7 @@ describe('the LinkedIn tool set', () => {
 describe('reading LinkedIn', () => {
     it('scrolls the home feed page by page', () => {
         const feed = linkedinTool('read_feed')!
-        expect([feed.category, feed.action, feed.quota]).toEqual(['content', 'get_feed', undefined])
+        expect([feed.category, feed.action, feed.quota]).toEqual(['content', 'get_feed', { action: 'content_read' }])
         expect(toolParams(feed, { cursor: 'abc', count: 5000 })).toEqual({ cursor: 'abc', count: 100 })
     })
 

@@ -32,7 +32,7 @@ export type QuotaTable<A extends string> = {
     quotaRefusal: (action: A, env?: Env) => string
 }
 
-export function defineQuotas<A extends string>({ envPrefix, limits, nouns, refusal }: { envPrefix: string; limits: Record<A, QuotaLimit[]>; nouns: Record<A, string>; refusal: (noun: string, windows: string) => string }): QuotaTable<A> {
+export function defineQuotas<A extends string>({ envPrefix, limits, nouns, refusal }: { envPrefix: string; limits: Record<A, QuotaLimit[]>; nouns: Record<A, string>; refusal: (noun: string, windows: string, action: A) => string }): QuotaTable<A> {
     const override = (action: A, window: QuotaWindow, env: Env): number | null => {
         const raw = env[`${envPrefix}_${action.toUpperCase()}_${window.toUpperCase()}`]
         if (!raw) return null
@@ -46,7 +46,7 @@ export function defineQuotas<A extends string>({ envPrefix, limits, nouns, refus
             const current = quotaLimits(action, env)
             return { periods: current.map(limit => periodKey(limit.window, at)), maxes: current.map(limit => limit.max) }
         },
-        quotaRefusal: (action, env = process.env) => refusal(nouns[action], quotaLimits(action, env).map(limit => `${limit.max} per ${limit.window}`).join(', ')),
+        quotaRefusal: (action, env = process.env) => refusal(nouns[action], quotaLimits(action, env).map(limit => `${limit.max} per ${limit.window}`).join(', '), action),
     }
 }
 

@@ -149,7 +149,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'get_profile',
-        description: 'Read one LinkedIn profile you need to act on (before an invitation or a message). For enriching many profiles at once, use the paid_data tools instead: they do not spend this account’s daily profile views.',
+        description: "Read a LinkedIn profile with the user's account, free of Rerun credit. Each read counts against the account's daily profile views.",
         inputSchema: {
             type: 'object',
             properties: {
@@ -164,7 +164,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
     },
     {
         name: 'search_people',
-        description: "Search people on LinkedIn as the user, the way they would in LinkedIn's own search, ranked by their network. Give at least one filter. For bulk lead lists, prefer the paid_data tools.",
+        description: "Search people on LinkedIn as the user, the way they would in LinkedIn's own search, ranked by their network. Give at least one filter. Free of Rerun credit; each result counts against the account's daily search results.",
         inputSchema: {
             type: 'object',
             properties: {
@@ -227,6 +227,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(500), cursor, include_reshares: { type: 'boolean', description: 'Also return the posts they reshared' } }, required: ['profile_url'] },
         category: 'profiles',
         action: 'get_posts',
+        quota: { action: 'content_read' },
         clamp: { count: { default: 20, max: 500 } },
     },
     {
@@ -236,6 +237,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(100), cursor }, required: ['profile_url'] },
         category: 'profiles',
         action: 'get_comments',
+        quota: { action: 'content_read' },
         clamp: { count: { default: 20, max: 100 } },
     },
     {
@@ -245,6 +247,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { profile_url: profileUrl, count: count(100), cursor }, required: ['profile_url'] },
         category: 'profiles',
         action: 'get_reactions',
+        quota: { action: 'content_read' },
         clamp: { count: { default: 20, max: 100 } },
     },
     {
@@ -620,6 +623,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { count: count(100), cursor } },
         category: 'content',
         action: 'get_feed',
+        quota: { action: 'content_read' },
         clamp: { count: { default: 20, max: 100 } },
     },
     {
@@ -629,6 +633,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { post_url: postUrl }, required: ['post_url'] },
         category: 'content',
         action: 'get',
+        quota: { action: 'content_read' },
     },
     {
         name: 'get_post_analytics',
@@ -673,6 +678,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { post_url: postUrl, count: count(1000), offset }, required: ['post_url'] },
         category: 'content',
         action: 'get_comments',
+        quota: { action: 'content_read' },
         clamp: { count: { default: 20, max: 1000 } },
     },
     {
@@ -682,6 +688,7 @@ export const LINKEDIN_TOOLS: LinkedinTool[] = [
         inputSchema: { type: 'object', properties: { post_url: postUrl, count: count(1000), offset }, required: ['post_url'] },
         category: 'content',
         action: 'get_reactions',
+        quota: { action: 'content_read' },
         clamp: { count: { default: 20, max: 1000 } },
     },
     {
