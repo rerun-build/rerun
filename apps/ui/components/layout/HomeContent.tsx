@@ -57,10 +57,6 @@ import { oauthErrorCode, withoutOAuthError } from '@/lib/auth/oauth-error'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 
-// Durée minimale d'affichage du loader : le temps que le R se trace (45% d'un
-// cycle de 2.8s) pour que l'animation soit perceptible et pas un simple flash.
-const MIN_LOADER_MS = 1300
-
 function clearTemplateParam() {
     clearSearchParams('template')
 }
@@ -102,16 +98,6 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
         s.selectedAgentId !== null &&
         s.agents.some(a => a.id === s.selectedAgentId && a.status === 'working')
     )
-
-    // Si la session charge plus vite que l'animation du logo, l'écran de
-    // chargement disparaît en un flash : on le tient un minimum de temps
-    // (seulement s'il a commencé à s'afficher, pas de délai artificiel sinon).
-    const [holdLoader, setHoldLoader] = useState(loading)
-    useEffect(() => {
-        if (!holdLoader) return
-        const t = setTimeout(() => setHoldLoader(false), MIN_LOADER_MS)
-        return () => clearTimeout(t)
-    }, [holdLoader])
 
     const hydratedWorkspaceId = useRef<number | null>(null)
     useEffect(() => {
@@ -374,7 +360,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
     // elsewhere shows neither those spaces nor an empty board in their place (the recruit
     // placeholder): it keeps the loader until the store holds its own.
     const serverBoardMatchesTab = initialWorkspaceId === workspace?.id
-    const boardLoading = loading || holdLoader || (!serverBoardMatchesTab && !hydrated)
+    const boardLoading = loading || (!serverBoardMatchesTab && !hydrated)
     useEffect(() => {
         useAppBootStore.getState().setBoardReady(!boardLoading)
     }, [boardLoading])
