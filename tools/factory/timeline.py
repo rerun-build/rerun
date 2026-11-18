@@ -1,6 +1,8 @@
 import argparse, calendar, json, os, sqlite3, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import acceptance
+import cutshape
 import states
 
 END = states.END
@@ -8,6 +10,13 @@ CRIT = states.PROBLEM
 LONG_WAIT = 10 * 60
 DAY = 24 * 3600
 FMT = "%Y-%m-%dT%H:%M:%SZ"
+PHRASES = {
+    "unsent": "to be sent again",
+    "no_acceptor": "waits for an acceptor who built none of its jobs",
+    "gaps": "found gaps; the parent stays open",
+    "accepted": "accepted; the parent is closed",
+    "closed": "the parent was closed outside the factory",
+}
 
 
 def parse(s):
@@ -28,9 +37,16 @@ def read_rows(path):
                 continue
             holds.append({"kind": r["k"][len("hold:"):], "until": until})
         fires = {r["job"]: r["coworker"] for r in db.execute("SELECT job, coworker FROM fires ORDER BY id")}
+        accepts = {}
+        for r in db.execute("SELECT job, k, v FROM kv WHERE job LIKE 'accept:%'"):
+            try:
+                parent = int(r["job"][len("accept:"):])
+            except ValueError:
+                continue
+            accepts.setdefault(parent, {})[r["k"]] = r["v"]
     finally:
         db.close()
-    return {"jobs": jobs, "transitions": trs, "holds": holds, "fires": fires}
+    return {"jobs": jobs, "transitions": trs, "holds": holds, "fires": fires, "accepts": accepts}
 
 
 def _key(job):
@@ -75,7 +91,50 @@ def status_lines(rows, now):
         if j["state"] in states.RUNNING and cw:
             who = " | run on %s, copy %s" % (cw, data.get("copy") or 1)
         live.append("#%s %s for %d min | %s | %s%s%s" % (j["job"], j["state"], max(0, now - start) // 60, pr, waits, reason, who))
-    return held + live + done
+    return held + feature_lines(rows, now) + live + done
+
+
+def _acceptance_phrase(rec, kids, started, now):
+    state = rec.get("state")
+    if state is None:
+        pending = sorted(int(j["job"]) for j in kids if j["state"] not in acceptance.DONE)
+        if pending:
+            return "waits on %s" % ", ".join("#%d" % n for n in pending)
+        return "not sent yet"
+    if state == "running":
+        return "running on %s for %d min" % (rec.get("name") or "?", (now - started) // 60)
+    if state == "left":
+        return "left after %s sends" % (rec.get("sends") or "?")
+    return PHRASES.get(state, state)
+
+
+def feature_lines(rows, now):
+    groups = {}
+    for j in rows["jobs"]:
+        if not j["job"].isdigit():
+            continue
+        data = json.loads(j["data"] or "{}")
+        parent = cutshape.parse({"number": int(j["job"]), "body": data.get("body") or ""})["parent"]
+        if parent:
+            groups.setdefault(parent, []).append(j)
+    lines = []
+    for parent in sorted(groups):
+        kids = sorted(groups[parent], key=lambda j: int(j["job"]))
+        rec = (rows.get("accepts") or {}).get(parent, {})
+        state = rec.get("state")
+        try:
+            started = float(rec.get("started"))
+        except (TypeError, ValueError):
+            started = 0
+        if state in ("accepted", "closed", "gaps", "left") and now - started > DAY:
+            continue
+        newest = max(parse(j["updated_at"]) for j in kids)
+        if state is None and all(j["state"] in END for j in kids) and now - newest > DAY:
+            continue
+        done = sum(1 for j in kids if j["state"] in acceptance.DONE)
+        lines.append("feature #%d: %d of %d jobs done | acceptance %s" % (
+            parent, done, len(kids), _acceptance_phrase(rec, kids, started, now)))
+    return lines
 
 
 def _hm(t):

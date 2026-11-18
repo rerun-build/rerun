@@ -93,6 +93,24 @@ class Timeline(unittest.TestCase):
             "#172 review_wait for 5 min | pr - | no waits",
             "#173 reviewing for 8 min | pr - | no waits"])
 
+    def test_status_shows_each_feature_and_its_acceptance(self):
+        self.st.put_job("51", "merged", {"body": "**Part of**: #50\n"}, at=at("18:00"))
+        self.st.put_job("52", "building", {"body": "**Part of**: #50\n"}, at=at("18:00"))
+        self.st.put_job("61", "merged", {"body": "**Part of**: #60\n"}, at=at("18:00"))
+        self.st.set("accept:60", "state", "running")
+        self.st.set("accept:60", "name", "BARBARA")
+        self.st.set("accept:60", "started", T.parse(at("18:02")))
+        now = T.parse(at("18:10"))
+        rows = T.read_rows(self.path)
+        self.assertEqual(T.status_lines(rows, now)[:2], [
+            "feature #50: 1 of 2 jobs done | acceptance waits on #52",
+            "feature #60: 1 of 1 jobs done | acceptance running on BARBARA for 8 min"])
+        bare = {"jobs": rows["jobs"], "transitions": rows["transitions"]}
+        self.assertEqual(T.status_lines(bare, now)[1], "feature #60: 1 of 1 jobs done | acceptance not sent yet")
+        self.st.set("accept:60", "started", "x")
+        self.assertTrue(T.status_lines(T.read_rows(self.path), now)[1].startswith(
+            "feature #60: 1 of 1 jobs done | acceptance running on BARBARA for "))
+
     def test_end_states_listed_for_24_hours_and_crit_bars(self):
         self.st.put_job("1", "blocked", {}, reason="old", at="2026-11-10T10:00:00Z")
         self.st.put_job("2", "failed", {}, reason="boom", at=at("10:00"))
