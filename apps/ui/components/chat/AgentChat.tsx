@@ -24,7 +24,7 @@ import { useConnectorServices } from '@/hooks/useConnectorServices'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import type { CatalogEntry } from '@rerun/ui/new-agent'
 import { ChatComposer, type ChatComposerHandle } from '@/components/chat/ChatComposer'
-import { useMentionAutocomplete } from '@/components/chat/MentionAutocomplete'
+import { mentionMenuBox, useMentionAutocomplete, type MentionMenuBox } from '@/components/chat/MentionAutocomplete'
 import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { AuthoredGroup } from '@/components/chat/AuthoredGroup'
 import { ChatTimeSeparator } from '@/components/chat/ChatTimeSeparator'
@@ -177,13 +177,13 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     // The field is the composer in the footer or a pending question's answer in the thread, so the
     // menu is placed against the whole chat and sits on the field wherever it is.
     const chatRootRef = useRef<HTMLDivElement>(null)
-    const [mentionMenuTop, setMentionMenuTop] = useState(0)
+    const [mentionMenuPlace, setMentionMenuPlace] = useState<MentionMenuBox | null>(null)
     const mentionMenuOpen = mentionMenu !== null
     useLayoutEffect(() => {
         const root = chatRootRef.current
         const input = inputRef.current
         if (!mentionMenuOpen || !root || !input) return
-        setMentionMenuTop(input.getBoundingClientRect().top - root.getBoundingClientRect().top)
+        setMentionMenuPlace(mentionMenuBox(input, root))
     }, [mentionMenuOpen, inputRef])
 
     // An attachment in flight holds the queued message back until its last byte.
@@ -1130,7 +1130,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
             </Conversation>
             <MessageFeedbackDialog open={messageFeedback.dialogOpen} rating={messageFeedback.dialogRating} onOpenChange={messageFeedback.onDialogOpenChange} onSubmit={messageFeedback.submitDetails} />
 
-            {mentionMenu && <div className="absolute inset-x-3" style={{ top: mentionMenuTop }}>{mentionMenu}</div>}
+            {mentionMenu && mentionMenuPlace && <div className="absolute" style={mentionMenuPlace}>{mentionMenu}</div>}
             {footerVisible && (
                 <div className="border-t border-border p-3 *:mx-auto *:max-w-[var(--chat-column,none)]">
                     <AnimatePresence initial={false}>

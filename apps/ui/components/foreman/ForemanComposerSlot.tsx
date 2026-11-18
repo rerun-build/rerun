@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useLayoutEffect, useRef, useState, type ReactNode, type Ref } from 'react'
 
-import { useMentionAutocomplete } from '@/components/chat/MentionAutocomplete'
+import { mentionMenuBox, useMentionAutocomplete, type MentionMenuBox } from '@/components/chat/MentionAutocomplete'
 import { useMentionComputers } from '@/components/computers/useMentionComputers'
 import { ForemanComposer, type ForemanComposerMentionProps, type ForemanComposerProps } from '@/components/foreman/ForemanComposer'
 import { ForemanTrialGate } from '@rerun/cloud/billing.client'
@@ -59,13 +59,13 @@ export function ForemanComposerSlot({ aside, trialGate, framed = false, above, r
     // The composer folds inside an `overflow-hidden` box that would clip the menu, so the menu is
     // placed against the slot itself and sits on the field.
     const mentionMenuAnchorRef = useRef<HTMLDivElement>(null)
-    const [mentionMenuTop, setMentionMenuTop] = useState(0)
+    const [mentionMenuPlace, setMentionMenuPlace] = useState<MentionMenuBox | null>(null)
     const mentionMenuOpen = mentionMenu !== null
     useLayoutEffect(() => {
         const root = mentionMenuAnchorRef.current?.offsetParent
         const input = inputRef.current
         if (!mentionMenuOpen || !root || !input) return
-        setMentionMenuTop(input.getBoundingClientRect().top - root.getBoundingClientRect().top)
+        setMentionMenuPlace(mentionMenuBox(input, root))
     }, [mentionMenuOpen, inputRef])
 
     return (
@@ -101,7 +101,7 @@ export function ForemanComposerSlot({ aside, trialGate, framed = false, above, r
                 )}
             </AnimatePresence>
             {mentionMenu && (
-                <div ref={mentionMenuAnchorRef} className="absolute inset-x-3" style={{ top: mentionMenuTop }}>
+                <div ref={mentionMenuAnchorRef} className={cn('absolute', !mentionMenuPlace && 'invisible')} style={mentionMenuPlace ?? undefined}>
                     {mentionMenu}
                 </div>
             )}

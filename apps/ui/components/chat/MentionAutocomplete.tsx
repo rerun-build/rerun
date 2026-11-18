@@ -31,6 +31,16 @@ export function mentionTokensOf(agents: MentionAgent[], skills: MentionSkill[], 
     return [...agents.map(agent => ({ kind: 'agent' as const, ...agent })), ...skills.map(skill => ({ kind: 'skill' as const, ...skill })), ...computers.map(computer => ({ kind: 'computer' as const, ...computer }))].map(item => ({ text: mentionText(item), kind: item.kind }))
 }
 
+export type MentionMenuBox = { top: number; left: number; width: number }
+
+// The menu lines up with the composer's frame (the `InputGroup` of `PromptInput`), or with the bare
+// field of a pending question's answer, measured against the positioned box the menu is placed in.
+export function mentionMenuBox(input: HTMLTextAreaElement, root: Element): MentionMenuBox {
+    const frame = (input.closest('[data-slot="input-group"]') ?? input).getBoundingClientRect()
+    const origin = root.getBoundingClientRect()
+    return { top: frame.top - origin.top, left: frame.left - origin.left, width: frame.width }
+}
+
 const NO_COMPUTERS: MentionComputer[] = []
 
 export function useMentionAutocomplete(agents: MentionAgent[], skills: MentionSkill[] = [], onValueChange?: (text: string) => void, computers: MentionComputer[] = NO_COMPUTERS, onComputersWanted?: () => void) {
