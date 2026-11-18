@@ -29,11 +29,11 @@ Only the handle of a linked computer is one: `#marketing` in a post you are draf
 
 When a coworker wants to run a command on your computer, it shows the command in the chat and waits for your answer:
 
-- **Allow** runs exactly that command, for the task at hand. The next task asks again.
+- **Allow** runs exactly that command, in the folder the card shows, for the task at hand. The next task asks again.
 - **Always allow ffmpeg** runs it, and every later command that only uses `ffmpeg` runs without asking. You see what is always allowed, and take it back, in **Computers**.
 - **Deny** runs nothing.
 
-Always allowing a program that runs any code you give it (`python`, `node`…) allows anything: the card says so. A command that runs other commands the card cannot show (a `$(...)`, `bash -c`, `xargs`, `find -exec`) asks every time.
+Always allowing a program that runs any code you give it (`python`, `node`…) allows anything: the card says so. A command that runs other commands the card cannot show (a `$(...)`, `bash -c`, `xargs`, `find -exec`) asks every time. So does a command that sets a variable in front of a program (`FOO=1 ffmpeg …`) or names it by its path (`./ffmpeg`, `/opt/tools/ffmpeg`): only a program called by its plain name can be always allowed.
 
 Each computer has an approval mode, set in **Computers**:
 
@@ -43,11 +43,11 @@ Each computer has an approval mode, set in **Computers**:
 
 Whatever the mode, a coworker never runs a command that asks for administrator rights (`sudo`, `runas`, Windows' User Account Control) or that can wipe a disk or stop the computer.
 
-**Without anyone in the chat** lets schedules, triggers and other coworkers use the computer. When one of them needs your yes, it reaches you as a notification, and the work goes on once you answer. Turn it off and the computer only takes work while someone is in the chat.
+**Without anyone in the chat** lets schedules, triggers, other coworkers and a coworker woken by the end of a job use the computer. When one of them needs your yes, it reaches you as a notification, and the work goes on once you answer. Turn it off and the computer only takes work while someone is in the chat.
 
 ## Long jobs
 
-A render, a training or a big download runs as a job: the coworker starts it, tells you it is running, and is free for other work. A card in the chat shows how the job is doing, the last lines it printed, and a **Stop** button. When the job ends, the coworker wakes up in the same conversation with its result and tells you what came out of it.
+A render, a training or a big download runs as a job: the coworker starts it, tells you it is running, and is free for other work. A card in the chat shows how the job is doing, the last lines it printed, and a **Stop** button. When the job ends, the coworker wakes up in the same conversation with its result and tells you what came out of it. With **Without anyone in the chat** turned off, it still tells you, and runs nothing more on the computer until you are back.
 
 - A computer runs four jobs at once at most.
 - While a job runs, the computer does not go to sleep on its own. A closed laptop lid still puts it to sleep: the job goes on when it wakes.
@@ -60,7 +60,7 @@ Coworkers work on your files where they are: a 14 GB rush stays on your computer
 
 - Your **working folder** (`~/Rerun` unless you change it) and the folders you always allowed are open to the coworkers.
 - Anywhere else, the coworker asks first, with the path on the card. **Always allow this folder** keeps the yes for that folder.
-- Where secrets live (SSH keys, keychains, browser profiles, password managers, wallets, `.env` files) it always asks, even on a computer in full access.
+- Where secrets live (SSH keys, keychains, browser profiles, password managers, wallets, `.env` files) it always asks, even on a computer in full access. A yes to a folder does not cover the secrets inside it: they ask on their own.
 
 The computer checks every path itself, links followed, before it touches anything. Commands are not confined to a folder: a command you allowed can reach whatever your account can.
 

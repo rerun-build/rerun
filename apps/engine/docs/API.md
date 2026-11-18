@@ -265,27 +265,32 @@ command on one of them (`{ computer: "#studio-pc", command, cwd?, timeoutSeconds
 `request_computer_access` is the card that asks the person's yes. A command runs without a card when the
 computer's settings let it through (`full`, or `remember` and every program it starts is always
 allowed and it hides nothing it runs: no substitution, no shell or relay like `bash -c`, `xargs`,
-`env`, read by `analyzeCommand` of `@rerun/contracts` in the computer's own shell), and otherwise
-only once a yes in the conversation covers it, exactly as written: the yes of the latest card, for the run it starts and
+`env`, no variable set in front of the program, no program named by its path, read by
+`analyzeCommand` of `@rerun/contracts` in the computer's own shell), and otherwise
+only once a yes in the conversation covers it, exactly as written and in the folder the card named
+(`cwd` of `request_computer_access`, the working folder without one): the yes of the latest card, for the run it starts and
 the cards that run raises, until the person's next free message. Privilege raising (`sudo`, `runas`,
 UAC) and the commands that wipe a disk or stop the machine never run, approved or not. The reply the
 card sends is `Computer access: **APPROVED** — #studio-pc` (or `DECLINED`), read by
 `parseComputerAccessDecision` of `@rerun/contracts`. The card's own result carries
 `card: { computerId, always }`, the program "Always allow" would keep. A computer whose `unattended`
 setting is off refuses runs nobody is in the chat for (schedules, triggers, calls between
-coworkers). `remote_exec` with `background: true` starts a job (`job.start`, four at most per computer) that
+coworkers, a run woken by the end of a job). `remote_exec` with `background: true` starts a job (`job.start`, four at most per computer) that
 outlives the run; `remote_job` lists, reads, and stops them. The engine keeps them in the coworker's
-`system.db` (`remote_jobs`, step 5) and hands the computer an opaque context naming the conversation.
-The computer tells the end (`job.finished`) until it is acknowledged; the engine records it, then wakes
+`system.db` (`remote_jobs`, step 5) and hands the computer an opaque context naming the conversation,
+signed with the box key for that computer (unsigned on a box without a key): an end whose context
+does not check out is acknowledged and wakes no one.
+The computer tells the end (`job.finished`) until it is acknowledged; the engine records it, wakes
 the conversation once (`woke_at`) with a headless run whose trigger is `{ source: 'job' }`, after any
-run in flight and any card waiting for the person. `GET /remote/computers/:id/jobs`,
+run in flight and any card waiting for the person, and only then acknowledges it: an engine that
+restarts while it waits hears the end again at the computer's next connection. `GET /remote/computers/:id/jobs`,
 `GET /remote/computers/:id/jobs/:jobId` (the last 4 KB of output) and `POST …/:jobId/stop` read and
 stop them from the hub; they answer `409` while the computer is offline. File tools: `remote_file_list`, `remote_file_read` (text up to 100 KB, a binary
 file is described), `remote_file_write` (text), and `remote_transfer` (one file of up to 100 MB between the
 computer and the coworker's workspace, in 1 MB pieces checked with a sha256, refused when the box's disk
 would be left with less than 200 MB). A path inside the computer's working folder or an allowed folder
 goes through; elsewhere it needs a yes (`request_computer_access` with `paths`), and where secrets live it
-always does. The engine sends the computer the folders it may reach (`roots`) and whether the person said
+always does, by a yes to a path that is itself one of those: a yes to the home folder does not open the keys in it. The engine sends the computer the folders it may reach (`roots`) and whether the person said
 yes to a secret (`sensitiveOk`); the computer checks them on the real path, links followed. The prompt
 lists the linked computers in a `linked_computers` section.
 
