@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), authenticateEngineToken: vi.fn(), setForemanConversationStatus: vi.fn() }))
+const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), authenticateEngineToken: vi.fn(), setForemanConversationStatus: vi.fn(), openForemanRoutineThread: vi.fn() }))
 
 vi.mock('next/server', () => ({ after: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({}))
@@ -12,7 +12,7 @@ vi.mock('./chat.service', () => ({ ensureSessionRow: vi.fn() }))
 vi.mock('./notification-audience.service', () => ({ writeNotificationPrefs: vi.fn() }))
 vi.mock('./presence.service', () => ({ loadPresence: vi.fn() }))
 vi.mock('./workspace-engine.service', () => ({ authenticateEngineToken: mocks.authenticateEngineToken }))
-vi.mock('@/lib/foreman/conversation', () => ({ setForemanConversationStatus: mocks.setForemanConversationStatus }))
+vi.mock('@/lib/foreman/conversation', () => ({ setForemanConversationStatus: mocks.setForemanConversationStatus, openForemanRoutineThread: mocks.openForemanRoutineThread }))
 vi.mock('./workspace-owner.service', () => ({ resolveWorkspaceMemberEmail: vi.fn(), resolveWorkspaceOwner: vi.fn() }))
 
 const { membersReachingBox, recordNotification } = await import('./notification.service')
@@ -79,6 +79,15 @@ describe('recordNotification for the foreman', () => {
     it('marks the thread as waiting on a question the foreman asked', async () => {
         await recordNotification('token', foremanEvent('agent.notification', 'question'))
         expect(mocks.setForemanConversationStatus).toHaveBeenCalledWith(7, 'engine-1', 'awaiting_question')
+    })
+
+    // A routine of its own: the engine opened the session, nobody typed in it.
+    it('opens a thread for the conversation a routine of its own started, named after the routine', async () => {
+        mocks.openForemanRoutineThread.mockReset()
+        expect(await recordNotification('token', { event: 'agent.session.created', agentId: 'foreman', sessionId: 'engine-2', title: 'schedule: monday-review', source: 'schedule', timestamp: '2026-11-18T09:00:00.000Z' } as never)).toEqual({ ok: true })
+        expect(mocks.openForemanRoutineThread).toHaveBeenCalledWith(7, 'engine-2', 'schedule: monday-review')
+        expect(mocks.setForemanConversationStatus).not.toHaveBeenCalled()
+        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
     })
 
     it('marks the thread as failed when its run errored', async () => {

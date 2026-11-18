@@ -1,5 +1,6 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 
 import { listWorkspaceRoutinesAction, type WorkspaceRoutine } from '@/app/api/_actions/agent.actions'
@@ -19,14 +20,26 @@ function leaveForTheBoard() {
     if (coversTheBoard()) useForemanStore.getState().close()
 }
 
+// A routine of the Chief of Staff's own is edited on its card: its Routines screen, on that routine.
 function openEditor(routine: WorkspaceRoutine) {
     const board = useBoardStore.getState()
+    if (routine.agentId === FOREMAN_AGENT_ID) {
+        // Only the routine to land on: selecting it on the board would open a coworker's panel on nobody.
+        useBoardStore.setState({ agentScheduleFocus: { agentId: routine.agentId, slug: routine.slug } })
+        useForemanStore.getState().setCardScreen('scheduled')
+        return
+    }
     board.focusAgentOnBoard(routine.agentId, 'scheduled')
     board.openAgentSchedule(routine.agentId, routine.slug)
     leaveForTheBoard()
 }
 
 function openRun(routine: WorkspaceRoutine, sessionId: string, runId: string) {
+    // Its run is read in its chat, where the thread shows up as soon as the engine announces it.
+    if (routine.agentId === FOREMAN_AGENT_ID) {
+        useForemanStore.getState().setTab('assistant')
+        return
+    }
     const board = useBoardStore.getState()
     board.focusAgentOnBoard(routine.agentId, 'chat')
     board.setPendingOpenSession({ agentId: routine.agentId, sessionId, runId, title: routine.name })
@@ -36,6 +49,7 @@ function openRun(routine: WorkspaceRoutine, sessionId: string, runId: string) {
 // `active`: false while the list is mounted out of sight, so it reads nothing until it shows again.
 export function ForemanRoutines({ docked, active = true, className }: { docked: boolean; active?: boolean; className?: string }) {
     const t = useTranslations('foreman.routines')
+    const foremanName = useTranslations('workspaceView.foreman')('name')
     const agents = useBoardStore(state => state.agents)
     const list = useRoutines({ load: listWorkspaceRoutinesAction, enabled: active, onRunStarted: openRun })
 
@@ -55,7 +69,7 @@ export function ForemanRoutines({ docked, active = true, className }: { docked: 
         <RoutineList
             routines={list.routines}
             now={list.now}
-            agentNameOf={agentId => agents.find(agent => agent.id === agentId)?.name ?? t('unknownCoworker')}
+            agentNameOf={agentId => (agentId === FOREMAN_AGENT_ID ? foremanName : (agents.find(agent => agent.id === agentId)?.name ?? t('unknownCoworker')))}
             onOpen={openEditor}
             onToggle={list.toggle}
             isSaving={list.isSaving}

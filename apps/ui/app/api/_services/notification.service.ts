@@ -18,7 +18,7 @@ import { isPresent } from '@/lib/notifications/presence'
 import { emailReasonSentence } from '@/lib/notifications/reason-copy'
 import { computeRecipients, needsOwnerFollow, wantsIncidentEmail, wantsRecoveryEmail, type NotificationRecipients, type RoutedEvent, type RoutedMember } from '@/lib/notifications/routing'
 import { boardStatusOfKind } from '@/lib/og/team-board'
-import { setForemanConversationStatus } from '@/lib/foreman/conversation'
+import { openForemanRoutineThread, setForemanConversationStatus } from '@/lib/foreman/conversation'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -51,6 +51,11 @@ export async function recordNotification(token: string, payload: NotificationPay
     // email, or the first agent run that counts as activation. Where a run stopped still shows, on
     // its thread in General.
     if (payload.agentId === FOREMAN_AGENT_ID) {
+        // A session the engine opened on its own is a routine of the foreman's: it becomes a thread.
+        if (payload.event === 'agent.session.created') {
+            if (payload.sessionId) await openForemanRoutineThread(engine.workspaceId, payload.sessionId, payload.title ?? 'Scheduled run')
+            return { ok: true }
+        }
         await applyForemanStatus(engine.workspaceId, payload)
         return { ok: true }
     }

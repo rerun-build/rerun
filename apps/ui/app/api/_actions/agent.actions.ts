@@ -45,6 +45,7 @@ import {
     getAgentStats as engineGetAgentStats,
     getSchedule as engineGetSchedule,
     getSessionMessages as engineGetSessionMessages,
+    supportsForemanCoworker,
     supportsScheduleRename,
     getSkill as engineGetSkill,
     listAgentTools as engineListAgentTools,
@@ -568,12 +569,21 @@ export async function listWorkspaceRoutinesAction(): Promise<WorkspaceRoutines> 
     const workspaceId = actor.workspaceId
     const [{ data: agents }, visible] = await Promise.all([selectMany(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'disabled_at'] as const, { workspace_id: workspaceId }), visibleAgentIds(actor)])
     const runnable = keepVisible(agents ?? [], visible, agent => agent.id).filter(agent => agent.engine_agent_id && !agent.disabled_at)
-    if (runnable.length === 0) return { routines: [], canRename: false }
 
-    const conn = await getWorkspaceConnection(workspaceId)
+    // A workspace with no coworker and no machine has no routine to list, and nothing to fail on.
+    const conn = await getWorkspaceConnection(workspaceId).catch(err => {
+        if (runnable.length === 0) return null
+        throw err
+    })
+    if (!conn) return { routines: [], canRename: false }
+    // The Chief of Staff's own routines sit with the coworkers', for a person at the screen.
+    const owners = runnable.map(agent => ({ id: agent.id, engineAgentId: agent.engine_agent_id as string }))
+    if (actor.kind === 'user' && (await supportsForemanCoworker(conn))) owners.push({ id: FOREMAN_AGENT_ID, engineAgentId: FOREMAN_AGENT_ID })
+    if (owners.length === 0) return { routines: [], canRename: false }
+
     const now = new Date()
     const canRename = supportsScheduleRename(conn)
-    const perAgent = await Promise.allSettled(runnable.map(agent => routinesOf(conn, agent.id, agent.engine_agent_id as string, now)))
+    const perAgent = await Promise.allSettled(owners.map(owner => routinesOf(conn, owner.id, owner.engineAgentId, now)))
 
     return { routines: perAgent.flatMap(result => (result.status === 'fulfilled' ? result.value : [])).sort(byNextRun), canRename: await canRename }
 }

@@ -3,13 +3,15 @@
 import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { Orb } from '@rerun/ui/foreman'
 import { useTranslations } from 'next-intl'
-import { type ReactNode, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useMemo } from 'react'
 
+import { findForemanThreadAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { type CardDestination, DestinationRow, DestinationTile } from '@/components/agent/sheet/AgentCard'
 import { AgentView } from '@/components/agent/sheet/AgentView'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import type { AgentViewTab } from '@/lib/board/agent-sheet-views'
 import type { IsoAgent } from '@/lib/board/types'
+import { useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 // The tile a coworker's card opens its apps from, here on the servers connected to the Chief of
@@ -39,7 +41,22 @@ function useForemanAsAgent(): IsoAgent {
  */
 export function ForemanCard({ lead, onClose, children }: { lead?: ReactNode; onClose: () => void; children?: ReactNode }) {
     const agent = useForemanAsAgent()
-    const [screen, setScreen] = useState<AgentViewTab | null>(null)
+    const screen = useForemanStore(state => state.cardScreen)
+    const setScreen = useForemanStore(state => state.setCardScreen)
+
+    // A run of one of its routines is a thread of the member who reads it: theirs opens in its chat,
+    // another member's stays with them.
+    const openRun = useCallback(
+        async (engineSessionId: string) => {
+            const threadId = await findForemanThreadAction(engineSessionId)
+            if (!threadId) return
+            const store = useForemanStore.getState()
+            store.setTab('assistant')
+            store.openThread(threadId)
+            onClose()
+        },
+        [onClose],
+    )
 
     return (
         <PanelSteps stepKey={screen ?? 'card'} depth={screen ? 1 : 0}>
@@ -50,7 +67,7 @@ export function ForemanCard({ lead, onClose, children }: { lead?: ReactNode; onC
                     onTabChange={setScreen}
                     onBack={() => setScreen(null)}
                     onClose={onClose}
-                    onOpenSession={onClose}
+                    onOpenSession={sessionId => void openRun(sessionId)}
                     avatar={<Orb size={BREADCRUMB_ORB_SIZE} paused />}
                     withoutTabs={WITHOUT_TABS}
                 />

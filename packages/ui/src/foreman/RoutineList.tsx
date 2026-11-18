@@ -6,7 +6,10 @@ import { useMemo, useState, type ReactNode } from 'react'
 import { cn } from '../cn'
 import { Input, useRenameField } from '../forms'
 import { ChevronDownIcon } from '../icons'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+
 import { AgentBuddy } from '../iso-grid/components/buddy/AgentBuddy'
+import { Orb } from './Orb'
 import { ScrollFade, Switch } from '../primitives'
 import { TooltipDisabledReason } from '../Tooltip'
 import { groupByPeriod, isWithinTheHour } from './periods'
@@ -146,7 +149,7 @@ function RoutineRow<T extends RoutineEntry>({ routine, now, agentNameOf, onOpen,
         >
             {agentNameOf && (
                 <span className="shrink-0">
-                    <AgentBuddy agentId={routine.agentId} size={28} animated={false} facing="right" mood={routine.enabled ? 'idle' : 'asleep'} />
+                    {routine.agentId === FOREMAN_AGENT_ID ? <Orb size={28} paused facing="right" /> : <AgentBuddy agentId={routine.agentId} size={28} animated={false} facing="right" mood={routine.enabled ? 'idle' : 'asleep'} />}
                 </span>
             )}
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">

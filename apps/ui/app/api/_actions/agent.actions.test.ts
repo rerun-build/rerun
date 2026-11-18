@@ -40,6 +40,7 @@ vi.mock('@/lib/ai/parse-schedule', () => ({ parseSchedule: vi.fn() }))
 vi.mock('@/lib/services/registry', () => ({ connectorMcpServerNames: () => new Set(), connectorSkillOwners: () => new Map(), connectorSkillSlugs: vi.fn(), readRegistry: vi.fn() }))
 vi.mock('@/lib/chat/engine-history', () => ({ transformEngineMessages: (messages: unknown[]) => messages }))
 vi.mock('@/lib/engine/client', () => ({
+    supportsForemanCoworker: vi.fn(async () => false),
     createSkill: vi.fn(async () => ({ slug: 'skill' })),
     deleteSchedule: vi.fn(),
     listSkills: vi.fn(async () => []),
@@ -179,6 +180,37 @@ describe('listWorkspaceRoutinesAction', () => {
         expect(routines.map(routine => routine.agentId)).toEqual(['agent-seen'])
         expect(engine.listSchedules).toHaveBeenCalledTimes(1)
         expect(engine.listSchedules).toHaveBeenCalledWith(conn, 'engine-seen')
+    })
+})
+
+describe("listWorkspaceRoutinesAction with the Chief of Staff's own routines", () => {
+    const coworker = [{ id: 'agent-seen', engine_agent_id: 'engine-seen', disabled_at: null }]
+
+    beforeEach(() => {
+        mocks.visibleAgentIds.mockResolvedValue('all')
+        mocks.getWorkspaceConnection.mockResolvedValue(conn)
+        vi.mocked(engine.listSchedules).mockClear()
+    })
+
+    it('reads them beside the coworkers on a box that keeps them', async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(table => (table === 'agents' ? { data: coworker } : undefined)).client)
+        vi.mocked(engine.supportsForemanCoworker).mockResolvedValueOnce(true)
+        await actions.listWorkspaceRoutinesAction()
+        expect(vi.mocked(engine.listSchedules).mock.calls.map(call => call[1])).toEqual(['engine-seen', 'foreman'])
+    })
+
+    it('reads them on a workspace that has no coworker yet', async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(table => (table === 'agents' ? { data: [] } : undefined)).client)
+        vi.mocked(engine.supportsForemanCoworker).mockResolvedValueOnce(true)
+        await actions.listWorkspaceRoutinesAction()
+        expect(vi.mocked(engine.listSchedules).mock.calls.map(call => call[1])).toEqual(['foreman'])
+    })
+
+    it('lists nothing, and fails on nothing, with no coworker and no machine', async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(table => (table === 'agents' ? { data: [] } : undefined)).client)
+        mocks.getWorkspaceConnection.mockRejectedValue(new Error('no machine'))
+        await expect(actions.listWorkspaceRoutinesAction()).resolves.toEqual({ routines: [], canRename: false })
+        expect(engine.listSchedules).not.toHaveBeenCalled()
     })
 })
 

@@ -3,7 +3,7 @@ import 'server-only'
 import { FOREMAN_AGENT_ID, type Conversation, type SessionKind, type SessionStatus } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
-import type { WorkspaceContext } from '@/app/api/_auth/ownership'
+import { workspaceFounderUserId, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { FIRST_MESSAGE_MAX_CHARS, GENERAL_SESSION_TITLE, lastRunError, listSessionRuns, readUsageSeed, type SessionUsageSeed } from '@/app/api/_services/chat.service'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import type { Database } from '@/app/api/database.types'
@@ -16,6 +16,7 @@ import type { ForemanBackend } from './phase'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
 import { isKickoffText } from '@/lib/foreman/kickoff-marker'
+import { coworkerRuleOf, normalizeNotificationPrefs } from '@/lib/notifications/prefs'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
@@ -226,6 +227,41 @@ export async function startEngineConversation(ctx: WorkspaceContext, sessionId: 
 export async function touchForemanConversation(sessionId: string): Promise<void> {
     const supabase = createServiceRoleClient()
     await supabase.from('foreman_conversations').update<ConversationUpdate>({ updated_at: new Date().toISOString(), status: 'working' }).eq('id', sessionId)
+}
+
+// Who reads what a routine of the foreman did: a member who follows it, as the one who scheduled it
+// does, and the workspace's founder when nobody follows it.
+async function routineReaderOf(workspaceId: number): Promise<string | null> {
+    const supabase = createServiceRoleClient()
+    const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId })
+    const ids = (members ?? []).map(member => member.user_id)
+    const { data: users } = ids.length ? await selectMany(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: ids }) : { data: [] }
+    const follower = (users ?? []).find(user => coworkerRuleOf(normalizeNotificationPrefs(user.email_notification_prefs), FOREMAN_AGENT_ID).follow === true)
+    return follower?.id ?? (await workspaceFounderUserId(workspaceId))
+}
+
+// A routine of the foreman's own starts with nobody in front of it: its conversation becomes a
+// thread of the member who reads it, so what it did shows in their General like any other thread.
+// An engine session belongs to one row, so one member holds it. Never thrown: the engine's webhook
+// is not the place to fail for a thread.
+export async function openForemanRoutineThread(workspaceId: number, engineSessionId: string, title: string): Promise<void> {
+    const supabase = createServiceRoleClient()
+    try {
+        const { data: existing } = await selectMaybeSingle(supabase, 'foreman_conversations', ['id'] as const, { workspace_id: workspaceId, engine_session_id: engineSessionId })
+        if (existing) return
+        const userId = await routineReaderOf(workspaceId)
+        if (!userId) return
+        const { error } = await supabase.from('foreman_conversations').insert<ConversationInsert>({ workspace_id: workspaceId, user_id: userId, backend: 'engine', engine_session_id: engineSessionId, kind: 'thread', status: 'working', title })
+        if (error) console.error('[foreman] failed to open the thread of a routine', error)
+    } catch (err) {
+        console.error('[foreman] failed to open the thread of a routine', err)
+    }
+}
+
+// The caller's thread holding an engine conversation, when it is theirs to read.
+export async function findForemanThreadId(ctx: WorkspaceContext, engineSessionId: string): Promise<string | null> {
+    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'foreman_conversations', ['id'] as const, { workspace_id: ctx.workspace.id, user_id: ctx.userId, engine_session_id: engineSessionId })
+    return data?.id ?? null
 }
 
 // Where a run of the foreman stopped, as its thread shows it in General. The engine names the session

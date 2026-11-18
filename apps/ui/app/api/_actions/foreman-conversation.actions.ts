@@ -4,7 +4,16 @@ import type { Conversation } from '@rerun/contracts'
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
-import { listForemanConversations, readForemanEngineMessages } from '@/lib/foreman/conversation'
+import { findForemanThreadId, listForemanConversations, readForemanEngineMessages } from '@/lib/foreman/conversation'
+
+/** The caller's thread of an engine conversation of the Chief of Staff, null when it is another member's. */
+export async function findForemanThreadAction(engineSessionId: string): Promise<string | null> {
+    try {
+        return await findForemanThreadId(await requireWorkspaceContext(), engineSessionId)
+    } catch {
+        return null
+    }
+}
 
 /** General and its threads, for the column: the same list the app reads from /api/v1/foreman/conversations. */
 export async function listForemanConversationsAction(): Promise<Conversation[]> {

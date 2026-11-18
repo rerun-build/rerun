@@ -1,3 +1,4 @@
+import type { AgentViewTab } from '@/lib/board/agent-sheet-views'
 import { create } from 'zustand'
 
 import type { OrbActivity } from '@/components/foreman/Orb'
@@ -30,6 +31,8 @@ type ForemanState = {
     tab: ForemanTab
     /** The engine's foreman keeps things of its own, so its card has screens to open. */
     hasCard: boolean
+    /** The screen open on its card, null on the card itself. In the store so a routine picked in a list opens it. */
+    cardScreen: AgentViewTab | null
     /**
      * Ce que la colonne est en train de faire. `unknown` tant que la phase n'est pas revenue du
      * serveur : les fiches de liens profonds l'attendent pour savoir si elles ont le droit de
@@ -120,6 +123,7 @@ type ForemanState = {
     setDropTarget: (target: ForemanPlacement | null) => void
     setTab: (tab: ForemanTab) => void
     setHasCard: (hasCard: boolean) => void
+    setCardScreen: (screen: AgentViewTab | null) => void
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
     setGreetPending: (pending: boolean) => void
@@ -178,6 +182,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     dropTarget: null,
     tab: 'assistant',
     hasCard: false,
+    cardScreen: null,
     funnel: 'unknown',
     waitlisted: false,
     greetPending: false,
@@ -239,6 +244,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     setDropTarget: dropTarget => set({ dropTarget }),
     setTab: tab => set({ tab }),
     setHasCard: hasCard => set({ hasCard }),
+    setCardScreen: cardScreen => set({ cardScreen }),
     setFunnel: funnel => set({ funnel }),
     setWaitlisted: waitlisted => set({ waitlisted }),
     setGreetPending: greetPending => set({ greetPending }),
