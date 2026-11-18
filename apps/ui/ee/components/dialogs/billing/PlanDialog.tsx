@@ -12,17 +12,15 @@ import {
     cancelPendingSwitchAction,
     confirmCardSetupAction,
     createPlanCardSetupAction,
-    listInvoicesAction,
     resumeSubscriptionAction,
 } from '@/ee/actions/billing.actions'
 import { runPlanChange } from '@/ee/lib/billing/plan-payment'
-import type { InvoiceSummary, PlanSelection, SubscriptionState } from '@/ee/services/billing.service'
+import type { PlanSelection, SubscriptionState } from '@/ee/services/billing.service'
 import { Button } from '@/components/ui/button'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
-import { formatCredits, planDiscountCents, planPriceCents, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
-import { ChevronRightIcon, CoinsIcon, ExternalLinkIcon, Receipt } from '@/lib/icons'
+import { planDiscountCents, planPriceCents, type AddonQuantities, type BillingInterval } from '@/ee/lib/billing/plans'
 import { useSession } from '@/supabase/session/SessionProvider'
 import type { BillingHighlight } from '@/stores/billing.store'
 
@@ -37,7 +35,9 @@ import { CreditCard } from './credit-usage/CreditCard'
 import { CreditPane } from './CreditPane'
 import { UsagePane } from './credit-usage/UsagePane'
 import { useCreditUsage } from './credit-usage/useCreditUsage'
-import { longDate, shortDate } from './checkout-copy'
+import { shortDate } from './checkout-copy'
+import { InvoicesPane } from './InvoicesPane'
+import { CreditUsageRow, InvoicesRow } from './OverviewRows'
 import { BilledFlow, CardOnFile, CountFlow, IntervalToggle, Notice, PayFooter, PlanCard, RightTitle, SuccessPanel, SummaryRows, TermsConsent, usd } from './parts'
 import { StripeCheckoutProvider, StripePaymentFields, StripePaymentFieldsSkeleton } from './StripeCheckout'
 import { usePlanQuote } from './usePlanQuote'
@@ -262,24 +262,9 @@ function OverviewPane({
                 <div className="mt-6 flex flex-col gap-3">
                     <SummaryRows rows={rows} />
                     <CardOnFile card={state.card} action={t('plan.overview.update')} onAction={onCard} />
-                    <button type="button" onClick={onInvoices} className="flex items-center justify-between rounded-xl bg-background/60 px-4 py-3 text-sm ring-1 ring-border hover:bg-background">
-                        <span className="flex items-center gap-3">
-                            <Receipt className="size-4 text-muted-foreground" />
-                            {t('plan.overview.invoices')}
-                        </span>
-                        <span className="text-muted-foreground underline underline-offset-4">{t('plan.overview.viewAll')}</span>
-                    </button>
+                    <InvoicesRow onOpen={onInvoices} />
                     <BusinessDetailsRow business={state.business} onOpen={onBusiness} />
-                    <button type="button" onClick={onUsage} className="flex items-center justify-between rounded-xl bg-background/60 px-4 py-3 text-sm ring-1 ring-border hover:bg-background">
-                        <span className="flex items-center gap-3">
-                            <CoinsIcon className="size-4 text-muted-foreground" />
-                            {t('plan.overview.creditUsage')}
-                        </span>
-                        <span className="flex items-center gap-1 text-muted-foreground">
-                            {creditLeftMicros != null && <span className="tabular-nums">{t('plan.overview.creditsLeft', { credits: formatCredits(creditLeftMicros, locale) })}</span>}
-                            <ChevronRightIcon className="size-4" />
-                        </span>
-                    </button>
+                    <CreditUsageRow leftMicros={creditLeftMicros} onOpen={onUsage} />
                     {state.pendingSwitch && (
                         <Button variant="outline" onClick={() => void keepYearly()} disabled={keeping}>
                             {t('plan.overview.keepYearly')}
@@ -536,63 +521,3 @@ function PastDuePane({ state, onDone }: { state: SubscriptionState; onDone: () =
         </>
     )
 }
-
-function InvoicesPane({ onBack }: { onBack: () => void }) {
-    const locale = useLocale()
-    const t = useTranslations('billing.plan.invoices')
-    const errorText = useErrorText()
-    const [invoices, setInvoices] = useState<InvoiceSummary[] | null>(null)
-
-    useEffect(() => {
-        let cancelled = false
-        listInvoicesAction().then(result => {
-            if (cancelled) return
-            if (!result.ok) toast.error(t('loadFailed'), { description: errorText(result) })
-            setInvoices(result.ok ? result.invoices : [])
-        })
-        return () => {
-            cancelled = true
-        }
-    }, [])
-
-    return (
-        <>
-            <RightTitle onBack={onBack}>{t('title')}</RightTitle>
-            <div className="mt-6 flex flex-col divide-y divide-border rounded-xl bg-background/60 ring-1 ring-border">
-                {invoices === null
-                    ? Array.from({ length: 4 }, (_, index) => (
-                          <div key={index} className="flex items-center justify-between px-4 py-3">
-                              <Skeleton className="h-4 w-24" />
-                              <Skeleton className="h-4 w-16" />
-                          </div>
-                      ))
-                    : invoices.length === 0
-                      ? <p className="px-4 py-6 text-center text-sm text-muted-foreground">{t('empty')}</p>
-                      : invoices.map(invoice => (
-                            <a
-                                key={invoice.id}
-                                href={invoice.pdfUrl ?? invoice.hostedUrl ?? undefined}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center justify-between gap-4 px-4 py-3 text-sm hover:bg-background"
-                            >
-                                <span>{longDate(invoice.createdAt, locale)}</span>
-                                <span className="flex items-center gap-3">
-                                    {invoice.status !== 'paid' && <span className="text-xs text-muted-foreground capitalize">{invoiceStatusLabel(invoice.status, t)}</span>}
-                                    <span className="tabular-nums">{usd(invoice.amountCents)}</span>
-                                    <ExternalLinkIcon className="size-3.5 text-muted-foreground" />
-                                </span>
-                            </a>
-                        ))}
-            </div>
-        </>
-    )
-}
-
-const INVOICE_STATUSES = ['draft', 'open', 'uncollectible', 'void'] as const
-
-function invoiceStatusLabel(status: string, t: ReturnType<typeof useTranslations<'billing.plan.invoices'>>): string {
-    const known = INVOICE_STATUSES.find(candidate => candidate === status)
-    return known ? t(`status.${known}`) : status
-}
-

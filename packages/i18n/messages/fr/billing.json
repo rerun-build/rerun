@@ -128,6 +128,18 @@
             "checkoutFootnote": "Vous payez sur une page Stripe sécurisée, puis revenez ici."
         }
     },
+    "lifetime": {
+        "badge": "À vie",
+        "title": "Rerun à vie",
+        "subtitle": "Coworkers illimités · payé une fois, à vous pour de bon",
+        "appsDescription": "Des super-pouvoirs en plus pour vos coworkers, facturés chaque mois à part de votre offre à vie.",
+        "overview": {
+            "deal": "Offre à vie",
+            "paidOnce": "Payée une fois",
+            "apps": "Apps",
+            "aiProviders": "Fournisseurs d'IA"
+        }
+    },
     "apps": {
         "title": "Apps",
         "description": "Des super-pouvoirs en plus pour vos coworkers, sur la même facture que votre abonnement.",
@@ -198,11 +210,6 @@
             "title": "Impossible de charger votre abonnement",
             "description": "Stripe n'a pas répondu. Votre abonnement est intact, réessayez dans un instant.",
             "retry": "Réessayer"
-        },
-        "lifetime": {
-            "title": "Offre à vie",
-            "description": "Payée une fois, à vous pour de bon. Coworkers et sièges illimités, sur votre propre IA.",
-            "connectAi": "Connecter votre IA"
         }
     },
     "postPayment": {
@@ -457,6 +464,10 @@
                 "agents": "<b>Coworkers illimités</b> au travail",
                 "teammates": "Invitez <b>toute votre équipe</b>",
                 "credit": "<b>{credits, plural, one {# crédit} other {# crédits}} d'usage IA</b> par mois"
+            },
+            "lifetime": {
+                "ownAi": "Tourne sur <b>votre propre IA</b>",
+                "credit": "<b>Crédits Rerun</b> quand vous en avez besoin"
             }
         },
         "plan": {
@@ -478,7 +489,13 @@
             "remove": "Retirer le code promo"
         },
         "backToPlan": "Formule",
-        "terms": "J'accepte les <terms>Conditions</terms> et demande à Rerun de démarrer tout de suite. Si je suis un consommateur, mon droit de rétractation prend fin une fois le service commencé."
+        "terms": "J'accepte les <terms>Conditions</terms> et demande à Rerun de démarrer tout de suite. Si je suis un consommateur, mon droit de rétractation prend fin une fois le service commencé.",
+        "lifetime": {
+            "title": "Offre à vie",
+            "line": "Coworkers illimités · payée une fois",
+            "paidOnce": "Payée une fois",
+            "forGood": "à vous pour de bon"
+        }
     },
     "stripe": {
         "orPayWithCard": "ou payez par carte",

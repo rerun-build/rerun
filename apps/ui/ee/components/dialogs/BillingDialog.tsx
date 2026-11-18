@@ -4,31 +4,28 @@ import { track } from '@rerun/analytics/client'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { getSubscriptionStateAction } from '@/ee/actions/billing.actions'
+import { getLifetimeBillingStateAction, getSubscriptionStateAction } from '@/ee/actions/billing.actions'
 import type { SubscriptionState } from '@/ee/services/billing.service'
+import type { LifetimeBillingState } from '@/ee/services/lifetime-addons.service'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useWorkspaceAccess } from '@/hooks/useWorkspaceAccess'
 import { checkoutRouteFor, trialOffer, type CheckoutRoute } from '@/ee/lib/billing/checkout-variant'
-import { CreditCardIcon, RefreshCwIcon, TicketIcon } from '@/lib/icons'
+import { CreditCardIcon, RefreshCwIcon } from '@/lib/icons'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { useCreditCheckoutReturn } from '@/ee/lib/billing/useCreditCheckoutReturn'
 import { isLifetimePlan } from '@/ee/lib/billing/plans'
 import { useBillingStore } from '@/stores/billing.store'
 import { hasPendingStart, useOnboardingStore } from '@/stores/onboarding.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
-import { usePaidAppsStore } from '@/stores/paid-apps.store'
-import { AppIcon } from '@/components/apps/PaidAppViews'
-import { useEnabledPaidApps } from '@/components/layout/FeatureFlagsProvider'
-import { appInfo } from '@/lib/apps/catalog'
-import type { AppSlug } from '@/lib/apps/types'
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import { BillingDialogShell } from './billing/BillingDialogShell'
 import { CheckoutDialog } from './billing/CheckoutDialog'
 import { CreditPane, type CreditPurchased } from './billing/CreditPane'
+import { LifetimeDialog } from './billing/LifetimeDialog'
 import { SuccessPanel } from './billing/parts'
 import { PlanDialog } from './billing/PlanDialog'
 import { CancelSubscriptionDialog } from './cancel-subscription/CancelSubscriptionDialog'
@@ -47,6 +44,7 @@ export function BillingDialog() {
     const { access } = useWorkspaceAccess()
     const parked = useOnboardingStore(s => hasPendingStart(s))
     const [state, setState] = useState<SubscriptionState | null>(null)
+    const [lifetimeState, setLifetimeState] = useState<LifetimeBillingState | null>(null)
     const [resolved, setResolved] = useState<Resolved>({ kind: 'loading' })
     const [cancelOpen, setCancelOpen] = useState(false)
     useCreditCheckoutReturn()
@@ -79,15 +77,23 @@ export function BillingDialog() {
         return result
     }, [])
 
+    const loadLifetimeState = useCallback(async () => {
+        const result = await getLifetimeBillingStateAction()
+        if (result.ok) setLifetimeState(result.state)
+        return result
+    }, [])
+
     // An entitled workspace whose Stripe read failed is not one without a plan: deciding on nothing
     // would offer a paying customer to subscribe.
     const decide = useCallback(async () => {
-        // Paid once, outside Stripe: there is nothing to sell, and a Pro subscription would overwrite
-        // the plan, so cancelling it later would take the lifetime access away.
+        // Paid once, outside Stripe: no plan to sell, since a Pro subscription would overwrite the
+        // lifetime one and cancelling it later would take the lifetime access away. Credit and app
+        // slots are still sold, apart from the plan.
         if (isLifetimePlan(workspace)) {
-            const kind = highlightAddon === 'credit_pack' ? 'credit' : 'lifetime'
-            setResolved({ kind })
-            track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: kind })
+            setResolved({ kind: 'loading' })
+            const read = await loadLifetimeState()
+            setResolved({ kind: read.ok ? 'lifetime' : 'error' })
+            track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: 'lifetime' })
             return
         }
         setResolved({ kind: 'loading' })
@@ -100,7 +106,7 @@ export function BillingDialog() {
         const credit = !!route && highlightAddon === 'credit_pack'
         if (credit) setResolved({ kind: 'credit' })
         track('paywall_viewed', { trigger: trigger ?? 'manual', addon_shown: highlightAddon ?? undefined, variant: credit ? 'credit' : (route?.variant ?? 'plan') })
-    }, [workspace, entitled, loadState, resolve, trigger, highlightAddon])
+    }, [workspace, entitled, loadState, loadLifetimeState, resolve, trigger, highlightAddon])
 
     const opened = useRef(false)
     useEffect(() => {
@@ -125,15 +131,17 @@ export function BillingDialog() {
                 <AdminOnlyShell onClose={close} />
             ) : resolved.kind === 'loading' ? (
                 <LoadingShell />
-            ) : resolved.kind === 'lifetime' ? (
-                <LifetimeShell
+            ) : resolved.kind === 'lifetime' && lifetimeState ? (
+                <LifetimeDialog
+                    state={lifetimeState}
+                    highlightAddon={highlightAddon}
+                    onClose={close}
+                    onChanged={async () => {
+                        await loadLifetimeState()
+                    }}
                     onConnectAi={() => {
                         close()
                         useWorkspaceSettingsStore.getState().openAiProviders()
-                    }}
-                    onOpenApp={slug => {
-                        close()
-                        usePaidAppsStore.getState().openApp(slug)
                     }}
                 />
             ) : resolved.kind === 'credit' ? (
@@ -198,39 +206,6 @@ function CreditPurchaseShell({ onClose }: { onClose: () => void }) {
                     }}
                 />
             )}
-        </DialogContent>
-    )
-}
-
-// The paid apps are not part of the lifetime plan: they are bought apart, from their own dialog.
-function LifetimeShell({ onConnectAi, onOpenApp }: { onConnectAi: () => void; onOpenApp: (slug: AppSlug) => void }) {
-    const t = useTranslations('billing.dialog')
-    const apps = useEnabledPaidApps()
-    return (
-        <DialogContent aria-describedby={undefined} className="bg-popover sm:max-w-md">
-            <DialogTitle className="sr-only">{t('title')}</DialogTitle>
-            <EmptyState
-                icon={TicketIcon}
-                title={t('lifetime.title')}
-                description={t('lifetime.description')}
-                action={
-                    <div className="flex flex-col items-center gap-3">
-                        <Button size="sm" variant="outline" onClick={onConnectAi}>
-                            {t('lifetime.connectAi')}
-                        </Button>
-                        {apps.length > 0 && (
-                            <div className="flex flex-wrap justify-center gap-1">
-                                {apps.map(slug => (
-                                    <Button key={slug} size="sm" variant="ghost" onClick={() => onOpenApp(slug)}>
-                                        <AppIcon slug={slug} size="xs" />
-                                        {appInfo(slug).name}
-                                    </Button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                }
-            />
         </DialogContent>
     )
 }

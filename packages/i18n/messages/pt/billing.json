@@ -128,6 +128,18 @@
             "checkoutFootnote": "Você paga em uma página segura do Stripe e depois volta para cá."
         }
     },
+    "lifetime": {
+        "badge": "Vitalício",
+        "title": "Rerun vitalício",
+        "subtitle": "Coworkers ilimitados · pago uma vez, seu para sempre",
+        "appsDescription": "Superpoderes extras para seus coworkers, cobrados todo mês à parte do seu plano vitalício.",
+        "overview": {
+            "deal": "Plano vitalício",
+            "paidOnce": "Pago uma vez",
+            "apps": "Apps",
+            "aiProviders": "Provedores de IA"
+        }
+    },
     "apps": {
         "title": "Apps",
         "description": "Superpoderes extras para seus coworkers, na mesma fatura do seu plano.",
@@ -198,11 +210,6 @@
             "title": "Não foi possível carregar seu plano",
             "description": "A Stripe não respondeu. Sua assinatura não foi alterada, tente de novo em instantes.",
             "retry": "Tentar de novo"
-        },
-        "lifetime": {
-            "title": "Plano vitalício",
-            "description": "Pago uma vez, seu para sempre. Coworkers e assentos ilimitados, rodando na sua própria IA.",
-            "connectAi": "Conectar sua IA"
         }
     },
     "postPayment": {
@@ -457,6 +464,10 @@
                 "agents": "<b>Coworkers ilimitados</b> trabalhando",
                 "teammates": "Convide <b>toda a sua equipe</b>",
                 "credit": "<b>{credits, plural, one {# crédito} other {# créditos}} de uso de IA</b> por mês"
+            },
+            "lifetime": {
+                "ownAi": "Roda na <b>sua própria IA</b>",
+                "credit": "<b>Créditos Rerun</b> quando precisar"
             }
         },
         "plan": {
@@ -478,7 +489,13 @@
             "remove": "Remover cupom"
         },
         "backToPlan": "Plano",
-        "terms": "Concordo com os <terms>Termos</terms> e peço à Rerun para começar imediatamente. Se eu for consumidor, meu direito de arrependimento termina quando o serviço começar."
+        "terms": "Concordo com os <terms>Termos</terms> e peço à Rerun para começar imediatamente. Se eu for consumidor, meu direito de arrependimento termina quando o serviço começar.",
+        "lifetime": {
+            "title": "Plano vitalício",
+            "line": "Coworkers ilimitados · pago uma vez",
+            "paidOnce": "Pago uma vez",
+            "forGood": "seu para sempre"
+        }
     },
     "stripe": {
         "orPayWithCard": "ou pague com cartão",

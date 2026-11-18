@@ -128,6 +128,18 @@
             "checkoutFootnote": "Du bezahlst auf einer sicheren Stripe-Seite und kommst dann hierher zurück."
         }
     },
+    "lifetime": {
+        "badge": "Lifetime",
+        "title": "Rerun Lifetime",
+        "subtitle": "Unbegrenzte Coworker · einmal bezahlt, für immer deins",
+        "appsDescription": "Zusätzliche Superkräfte für deine Coworker, monatlich getrennt von deinem Lifetime-Tarif abgerechnet.",
+        "overview": {
+            "deal": "Lifetime-Tarif",
+            "paidOnce": "Einmal bezahlt",
+            "apps": "Apps",
+            "aiProviders": "KI-Anbieter"
+        }
+    },
     "apps": {
         "title": "Apps",
         "description": "Zusätzliche Superkräfte für deine Coworker, auf derselben Rechnung wie dein Tarif.",
@@ -198,11 +210,6 @@
             "title": "Dein Tarif konnte nicht geladen werden",
             "description": "Stripe hat nicht geantwortet. Dein Abo bleibt unverändert, versuch es gleich noch einmal.",
             "retry": "Erneut versuchen"
-        },
-        "lifetime": {
-            "title": "Lifetime-Tarif",
-            "description": "Einmal bezahlt, für immer deins. Unbegrenzte Coworker und Plätze, mit deiner eigenen KI.",
-            "connectAi": "Deine KI verbinden"
         }
     },
     "postPayment": {
@@ -457,6 +464,10 @@
                 "agents": "<b>Unbegrenzte Coworker</b> im Einsatz",
                 "teammates": "Lade <b>dein ganzes Team</b> ein",
                 "credit": "<b>{credits, plural, one {# Credit} other {# Credits}} für KI-Nutzung</b> pro Monat"
+            },
+            "lifetime": {
+                "ownAi": "Läuft mit <b>deiner eigenen KI</b>",
+                "credit": "<b>Rerun-Guthaben</b>, wann immer du es brauchst"
             }
         },
         "plan": {
@@ -478,7 +489,13 @@
             "remove": "Gutscheincode entfernen"
         },
         "backToPlan": "Tarif",
-        "terms": "Ich stimme den <terms>Bedingungen</terms> zu und bitte Rerun, sofort zu starten. Als Verbraucher erlischt mein Widerrufsrecht, sobald die Leistung begonnen hat."
+        "terms": "Ich stimme den <terms>Bedingungen</terms> zu und bitte Rerun, sofort zu starten. Als Verbraucher erlischt mein Widerrufsrecht, sobald die Leistung begonnen hat.",
+        "lifetime": {
+            "title": "Lifetime-Tarif",
+            "line": "Unbegrenzte Coworker · einmal bezahlt",
+            "paidOnce": "Einmal bezahlt",
+            "forGood": "für immer deins"
+        }
     },
     "stripe": {
         "orPayWithCard": "oder mit Karte bezahlen",

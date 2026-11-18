@@ -128,6 +128,18 @@
             "checkoutFootnote": "Pagas en una página segura de Stripe y luego vuelves aquí."
         }
     },
+    "lifetime": {
+        "badge": "De por vida",
+        "title": "Rerun de por vida",
+        "subtitle": "Coworkers ilimitados · pagado una vez, tuyo para siempre",
+        "appsDescription": "Superpoderes extra para tus coworkers, facturados cada mes aparte de tu plan de por vida.",
+        "overview": {
+            "deal": "Plan de por vida",
+            "paidOnce": "Pagado una vez",
+            "apps": "Apps",
+            "aiProviders": "Proveedores de IA"
+        }
+    },
     "apps": {
         "title": "Apps",
         "description": "Superpoderes extra para tus coworkers, en la misma factura que tu plan.",
@@ -198,11 +210,6 @@
             "title": "No se pudo cargar tu plan",
             "description": "Stripe no respondió. Tu suscripción sigue intacta, vuelve a intentarlo en un momento.",
             "retry": "Reintentar"
-        },
-        "lifetime": {
-            "title": "Plan de por vida",
-            "description": "Pagado una vez, tuyo para siempre. Coworkers y asientos ilimitados, con tu propia IA.",
-            "connectAi": "Conectar tu IA"
         }
     },
     "postPayment": {
@@ -457,6 +464,10 @@
                 "agents": "<b>Coworkers ilimitados</b> trabajando",
                 "teammates": "Invita a <b>todo tu equipo</b>",
                 "credit": "<b>{credits, plural, one {# crédito} other {# créditos}} de uso de IA</b> al mes"
+            },
+            "lifetime": {
+                "ownAi": "Funciona con <b>tu propia IA</b>",
+                "credit": "<b>Créditos de Rerun</b> cuando los necesites"
             }
         },
         "plan": {
@@ -478,7 +489,13 @@
             "remove": "Quitar código promocional"
         },
         "backToPlan": "Plan",
-        "terms": "Acepto las <terms>Condiciones</terms> y pido a Rerun que empiece ya. Si soy consumidor, mi derecho de desistimiento termina una vez empezado el servicio."
+        "terms": "Acepto las <terms>Condiciones</terms> y pido a Rerun que empiece ya. Si soy consumidor, mi derecho de desistimiento termina una vez empezado el servicio.",
+        "lifetime": {
+            "title": "Plan de por vida",
+            "line": "Coworkers ilimitados · pagado una vez",
+            "paidOnce": "Pagado una vez",
+            "forGood": "tuyo para siempre"
+        }
     },
     "stripe": {
         "orPayWithCard": "o paga con tarjeta",

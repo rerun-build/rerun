@@ -62,6 +62,8 @@ export type AppSlotsRow = { slug: AppSlug; value: number; current: number; slots
 
 type AppsSectionProps = {
     rows: AppSlotsRow[]
+    // How the slots are billed, when not on the plan's own invoice.
+    description?: string
     interval: BillingInterval
     renewal: string
     disabled?: boolean
@@ -70,13 +72,13 @@ type AppsSectionProps = {
 
 // The paid apps of the workspace, billed on the plan but each shown as its own app: plain lines
 // under the plan and the credits, so they do not read as products of their own.
-export function AppsSection({ rows, interval, renewal, disabled = false, onChange }: AppsSectionProps) {
+export function AppsSection({ rows, description, interval, renewal, disabled = false, onChange }: AppsSectionProps) {
     const t = useTranslations('billing.apps')
     return (
         <section className="@container flex flex-col gap-3">
             <div className="flex flex-col gap-1">
                 <h3 className="text-2xl font-semibold tracking-tight">{t('title')}</h3>
-                <p className="text-sm text-muted-foreground">{t('description')}</p>
+                <p className="text-sm text-muted-foreground">{description ?? t('description')}</p>
             </div>
             {rows.map(row => (
                 <AppSlotsLine key={row.slug} row={row} interval={interval} renewal={renewal} disabled={disabled} onChange={value => onChange(row.slug, value)} />

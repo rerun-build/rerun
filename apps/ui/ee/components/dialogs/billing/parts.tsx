@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { BASE_PLAN_CREDITS, DEFAULT_PRICE_ARM, PLAN_CURRENCY, TRIAL_ACTIVE_AGENTS, TRIAL_CREDITS, TRIAL_DAYS, ZERO_QUANTITIES, perMonthCents, planPriceCents, yearlyDiscountPercent, type BillingInterval, type PriceArm } from '@/ee/lib/billing/plans'
-import { ArrowLeft, BrainIcon, CheckIcon, CoinsIcon, CpuIcon, CreditCardIcon, Loader2Icon, Package, Repeat, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
+import { ArrowLeft, BrainIcon, CheckIcon, CoinsIcon, CpuIcon, CreditCardIcon, KeyIcon, Loader2Icon, Package, Repeat, TicketIcon, TriangleAlertIcon, UserPlus, XIcon, ZapIcon, type LucideIcon } from '@/lib/icons'
 import { TESTIMONIALS, testimonialCopy } from '@rerun/cloud/testimonials'
 import { landingUrl } from '@/lib/site'
 import { cn } from '@/lib/utils'
@@ -114,8 +114,20 @@ const RICH_STRONG = { b: (chunks: ReactNode) => <span className="font-medium tex
 
 // On a free trial the lines that differ from Pro say the trial's own limits first: the card sits under
 // a subtitle quoting them, and Pro's figures alone would read as what the trial gives.
-function features(t: ReturnType<typeof useTranslations<'billing.parts.features'>>, freeTrial: boolean): { id: string; icon: LucideIcon; text: ReactNode }[] {
-    if (freeTrial) {
+type FeatureVariant = 'pro' | 'trial' | 'lifetime'
+
+function features(t: ReturnType<typeof useTranslations<'billing.parts.features'>>, variant: FeatureVariant): { id: string; icon: LucideIcon; text: ReactNode }[] {
+    if (variant === 'lifetime') {
+        return [
+            { id: 'agents', icon: CpuIcon, text: t.rich('pro.agents', RICH_STRONG) },
+            { id: 'teammates', icon: UserPlus, text: t.rich('pro.teammates', RICH_STRONG) },
+            { id: 'runs', icon: Repeat, text: t.rich('runs', RICH_STRONG) },
+            { id: 'ownAi', icon: KeyIcon, text: t.rich('lifetime.ownAi', RICH_STRONG) },
+            { id: 'credit', icon: CoinsIcon, text: t.rich('lifetime.credit', RICH_STRONG) },
+            { id: 'autopilot', icon: ZapIcon, text: t.rich('autopilot', RICH_STRONG) },
+        ]
+    }
+    if (variant === 'trial') {
         return [
             { id: 'agents', icon: CpuIcon, text: t.rich('trial.agents', { ...RICH_STRONG, count: TRIAL_ACTIVE_AGENTS }) },
             { id: 'teammates', icon: UserPlus, text: t.rich('trial.teammates', RICH_STRONG) },
@@ -135,11 +147,11 @@ function features(t: ReturnType<typeof useTranslations<'billing.parts.features'>
     ]
 }
 
-function FeatureGrid({ freeTrial = false }: { freeTrial?: boolean }) {
+function FeatureGrid({ variant }: { variant: FeatureVariant }) {
     const t = useTranslations('billing.parts.features')
     return (
         <ul className="grid grid-cols-1 gap-x-6 gap-y-2.5 lg:grid-cols-2">
-            {features(t, freeTrial).map(feature => (
+            {features(t, variant).map(feature => (
                 <li key={feature.id} className="flex items-center gap-3 text-sm text-muted-foreground">
                     <Icon size="sm" icon={feature.icon} />
                     <span>{feature.text}</span>
@@ -188,7 +200,31 @@ export function PlanCard({ interval, priceArm = DEFAULT_PRICE_ARM, discountCents
                     <p className="text-sm text-muted-foreground">{freeTrial ? t('forDays', { days: TRIAL_DAYS }) : t('perMonth')}</p>
                 </div>
             </div>
-            <FeatureGrid freeTrial={freeTrial} />
+            <FeatureGrid variant={freeTrial ? 'trial' : 'pro'} />
+        </div>
+    )
+}
+
+// The lifetime twin of PlanCard: the same card, paid once instead of priced per month.
+export function LifetimeDealCard() {
+    const t = useTranslations('billing.parts.lifetime')
+    return (
+        <div className="relative flex flex-col gap-5 rounded-2xl bg-background/60 p-5 ring-1 ring-border sm:p-6">
+            <BorderBeam />
+            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+                <div className="flex min-w-0 items-center gap-4">
+                    <Icon size="lg" icon={TicketIcon} />
+                    <div className="min-w-0">
+                        <p className="text-lg font-medium">{t('title')}</p>
+                        <p className="text-sm text-muted-foreground">{t('line')}</p>
+                    </div>
+                </div>
+                <div className="ml-auto min-w-0 text-right">
+                    <p className="text-2xl font-semibold tracking-tight sm:text-3xl">{t('paidOnce')}</p>
+                    <p className="text-sm text-muted-foreground">{t('forGood')}</p>
+                </div>
+            </div>
+            <FeatureGrid variant="lifetime" />
         </div>
     )
 }

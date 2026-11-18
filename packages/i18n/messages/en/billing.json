@@ -223,6 +223,18 @@
             "checkoutFootnote": "You pay on a secure Stripe page, then come back here."
         }
     },
+    "lifetime": {
+        "badge": "Lifetime",
+        "title": "Rerun Lifetime",
+        "subtitle": "Unlimited coworkers · paid once, yours for good",
+        "appsDescription": "Extra superpowers for your coworkers, billed monthly apart from your lifetime deal.",
+        "overview": {
+            "deal": "Lifetime deal",
+            "paidOnce": "Paid once",
+            "apps": "Apps",
+            "aiProviders": "AI providers"
+        }
+    },
     "apps": {
         "title": "Apps",
         "description": "Extra superpowers for your coworkers, on the same invoice as your plan.",
@@ -293,11 +305,6 @@
             "title": "Your plan could not be loaded",
             "description": "Stripe did not answer. Your subscription is untouched, try again in a moment.",
             "retry": "Retry"
-        },
-        "lifetime": {
-            "title": "Lifetime plan",
-            "description": "Paid once, yours for good. Unlimited coworkers and seats, running on your own AI.",
-            "connectAi": "Connect your AI"
         }
     },
     "postPayment": {
@@ -552,6 +559,10 @@
                 "agents": "<b>Unlimited coworkers</b> at work",
                 "teammates": "Invite <b>all your teammates</b>",
                 "credit": "<b>{credits, plural, one {# credit} other {# credits}} of AI usage</b> a month"
+            },
+            "lifetime": {
+                "ownAi": "Runs on <b>your own AI</b>",
+                "credit": "<b>Rerun credits</b> when you need them"
             }
         },
         "plan": {
@@ -573,7 +584,13 @@
             "remove": "Remove promo code"
         },
         "backToPlan": "Plan",
-        "terms": "I agree to the <terms>Terms</terms> and ask Rerun to start right away. If I am a consumer, my right of withdrawal ends once the service has started."
+        "terms": "I agree to the <terms>Terms</terms> and ask Rerun to start right away. If I am a consumer, my right of withdrawal ends once the service has started.",
+        "lifetime": {
+            "title": "Lifetime deal",
+            "line": "Unlimited coworkers · paid once",
+            "paidOnce": "Paid once",
+            "forGood": "yours for good"
+        }
     },
     "stripe": {
         "orPayWithCard": "or pay with card",
