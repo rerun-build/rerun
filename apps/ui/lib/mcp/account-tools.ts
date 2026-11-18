@@ -134,6 +134,7 @@ const AGENT_TOOL_DEFS = [
                 soul: { type: 'string', description: 'Full replacement of the system prompt, in markdown.' },
                 ...MODEL_PIN_PROPERTIES,
                 verbosity: { type: 'string', description: 'How long its answers to the user are: minimal | concise | normal | detailed. Defaults to normal, the model native behaviour. It shapes the prose only, never how much work the coworker does.' },
+                contextSize: { type: 'string', enum: ['small', 'medium', 'large', 'off'], description: 'When this coworker compacts its context inside a run: small at 240k, medium at 480k, large at 940k tokens, off never. Used only where the model window is measured; elsewhere the provider default applies.' },
                 tools: { type: 'object', description: 'Capability families to toggle, e.g. {"shell": false, "browser": true}.', additionalProperties: { type: 'boolean' } },
                 selfImprovement: { type: 'object', description: 'e.g. {"allowSoulEdit": false}.', additionalProperties: { type: 'boolean' } },
                 setup: SETUP_PROPERTY,
