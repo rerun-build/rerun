@@ -1,8 +1,10 @@
+import { statSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
-import { dirname } from 'node:path'
+import { dirname, isAbsolute } from 'node:path'
 import { visibleText } from '@rerun/contracts'
 import { extractText, listMessages } from '../db/repos/messages.js'
-import { resolveInWorkspace } from '../tools/sandbox.js'
+import { resolveInWorkspace, resolveWithin } from '../tools/sandbox.js'
+import { workspaceDir } from '../config/paths.js'
 
 const RESULT_LIMIT = 2_000
 const RESULT_COUNT = 3
@@ -15,18 +17,35 @@ function parts(contentJson: string): Part[] {
     return Array.isArray(content) ? content.filter((p): p is Part => !!p && typeof p === 'object') : []
 }
 
-function shellPaths(command: string): string[] {
+function existsIn(root: string, token: string, seen: Map<string, boolean>): boolean {
+    const known = seen.get(token)
+    if (known !== undefined) return known
+    let found = false
+    try {
+        const target = isAbsolute(token) ? token : resolveWithin(root, token)
+        if (target !== root) {
+            const stat = statSync(target)
+            found = stat.isFile() || stat.isDirectory()
+        }
+    } catch {
+        found = false
+    }
+    seen.set(token, found)
+    return found
+}
+
+function shellPaths(command: string, root: string, seen: Map<string, boolean>): string[] {
     return command
         .split(/\s+/)
         .map(token => token.replace(/^["'`(]+|["'`);,]+$/g, ''))
-        .filter(token => token && !token.startsWith('-') && !token.includes('://') && (token.includes('/') || /^[\w.-]+\.[A-Za-z0-9]{1,5}$/.test(token)))
+        .filter(token => token && !token.startsWith('-') && !token.includes('://') && !/[$*?=|&<>]/.test(token) && existsIn(root, token, seen))
 }
 
-function pathsOf(part: Part): string[] {
+function pathsOf(part: Part, root: string, seen: Map<string, boolean>): string[] {
     const input = part.input as { path?: unknown; command?: unknown } | undefined
     if (typeof part.toolName !== 'string' || !input) return []
     if (PATH_TOOLS.test(part.toolName) && typeof input.path === 'string') return [input.path]
-    if (part.toolName === 'shell_exec' && typeof input.command === 'string') return shellPaths(input.command)
+    if (part.toolName === 'shell_exec' && typeof input.command === 'string') return shellPaths(input.command, root, seen)
     return []
 }
 
@@ -45,11 +64,13 @@ function resultBlock(part: Part): string {
 export async function buildHandoff(agentId: string, sessionId: string): Promise<string> {
     const rows = await listMessages(agentId, sessionId)
     const job = rows.filter(r => r.role === 'user').map(r => extractText(JSON.parse(r.contentJson))).find(Boolean) ?? ''
+    const root = workspaceDir(agentId)
+    const seen = new Map<string, boolean>()
     const paths = new Set<string>()
     const results: Part[] = []
     for (const row of rows) {
         for (const part of parts(row.contentJson)) {
-            if (part.type === 'tool-call') pathsOf(part).forEach(p => paths.add(p))
+            if (part.type === 'tool-call') pathsOf(part, root, seen).forEach(p => paths.add(p))
             if (part.type === 'tool-result') results.push(part)
         }
     }
