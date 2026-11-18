@@ -6,6 +6,7 @@ import { isPhoneStepPending } from '@rerun/cloud/phone.server'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
+import { embedTextShared } from '@/lib/services/embed'
 import { cancelRun, reconnectRun } from '@/lib/engine/client'
 import { cancelForemanSessionRuns, engineSessionOf, findForemanGeneral, ForemanGeneralAlreadyOpenError, loadForemanConversation, loadForemanConversationById, startEngineConversation, touchForemanConversation } from '@/lib/foreman/conversation'
 import { foremanEngineBrief } from '@/lib/foreman/engine-brief'
@@ -65,6 +66,9 @@ export async function POST(req: Request): Promise<Response> {
     let sessionId = typeof body.sessionId === 'string' ? body.sessionId : ''
     const text = typeof body.text === 'string' ? body.text.trim() : ''
     if (!sessionId || !text) return Response.json({ error: 'Missing session id or message' }, { status: 400 })
+    // Like a coworker, the foreman recalls its memories with the embedding of this message before it
+    // calls its model: asked for now, it is under way by the time the engine does.
+    embedTextShared(ctx.workspace.id, text).catch(() => {})
     const connectionId = typeof body.connectionId === 'string' ? body.connectionId : undefined
     const model = typeof body.model === 'string' ? body.model : undefined
     const queued = body.queued === true

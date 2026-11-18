@@ -6,6 +6,7 @@ import { recordSessionParticipant, recordSessionRead } from '@/app/api/_services
 import { recordSentMessage } from '@/app/api/_services/session-preview.service'
 import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
+import { embedTextShared } from '@/lib/services/embed'
 import { cancelRun, reconnectRun } from '@/lib/engine/client'
 import { QUEUED_RETRY_DELAYS_MS, startChat } from '@/lib/chat/start-chat'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
@@ -41,10 +42,12 @@ export async function POST(request: Request) {
     // route handler, so each one left to find the caller again would ask the database for it.
     let actor: Actor
     let callablePromise: Promise<string[] | undefined>
+    let workspaceId: number
     try {
         const ctx = await requireWorkspaceContext()
         author = messageAuthorOf(ctx)
         actor = actorFromContext(ctx)
+        workspaceId = ctx.workspace.id
         // Read alongside the body and awaited inside the engine call's try: a failure fails the send
         // rather than letting it through with every coworker callable.
         callablePromise = callableEngineAgentIds(actor)
@@ -75,6 +78,10 @@ export async function POST(request: Request) {
     if (!text) {
         return Response.json({ error: 'Missing message text' }, { status: 400 })
     }
+
+    // The coworker will ask for the embedding of this message to recall its memories, before it calls
+    // its model: asked for now, it is under way by the time the engine does.
+    embedTextShared(workspaceId, text).catch(() => {})
 
     // The conversation the request names is looked up while the coworker is: neither read waits on
     // the other. Its failure is answered further down, where it is awaited.

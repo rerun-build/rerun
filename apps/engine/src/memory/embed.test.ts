@@ -83,6 +83,26 @@ describe('embedText', () => {
         expect(await pending).toBeNull()
     })
 
+    it('gives up sooner when the caller cannot wait that long', async () => {
+        vi.useFakeTimers()
+        let aborted = false
+        mockFetch(
+            (_url, init) =>
+                new Promise((_resolve, reject) => {
+                    init.signal!.addEventListener('abort', () => {
+                        aborted = true
+                        reject(new DOMException('aborted', 'AbortError'))
+                    })
+                })
+        )
+        const pending = embedText('slow', { timeoutMs: 1000 })
+        await vi.advanceTimersByTimeAsync(999)
+        expect(aborted).toBe(false)
+        await vi.advanceTimersByTimeAsync(1)
+        expect(aborted).toBe(true)
+        expect(await pending).toBeNull()
+    })
+
     it('clears its timer once the request settles', async () => {
         vi.useFakeTimers()
         mockFetch(async () => Response.json({ embedding: [1] }))

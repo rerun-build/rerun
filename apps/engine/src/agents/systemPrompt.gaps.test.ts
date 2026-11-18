@@ -349,7 +349,7 @@ describe('recallContext', () => {
         const context = await recallContext(agentWith({ tools: { memory: true } }), 'write the weekly report')
 
         expect(context).toBe('<relevant_memories>\n- (preference) Prefers bullet points\n- (fact) Works for Acme\n</relevant_memories>')
-        expect(sources.recallCalls).toEqual([{ query: 'write the weekly report', k: 5, opts: { reinforce: 'touch', minSimilarity: 0.25 } }])
+        expect(sources.recallCalls).toEqual([{ query: 'write the weekly report', k: 5, opts: { reinforce: 'touch', minSimilarity: 0.25, embedTimeoutMs: 1000 } }])
     })
 
     it('adds nothing when nothing comes back', async () => {

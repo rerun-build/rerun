@@ -407,10 +407,14 @@ function alreadyInHistory(history: ModelMessage[]): string {
 
 const memoryLine = (m: { kind: string; content: string }) => `- (${m.kind}) ${m.content}`
 
+// The model is not called before this recall is back, so a hub or a provider having a slow moment
+// costs the person at most this much: past it, the turn goes on with what the keywords found.
+const RECALL_EMBED_TIMEOUT_MS = 1000
+
 // Started as soon as the run begins: it waits on the hub's embedding, and only needs the message.
 export async function recallMemories(agent: LoadedAgent, userText: string): Promise<RecalledMemory[]> {
     if (!agent.config.tools.memory || !userText) return []
-    return recallMemory(agent, userText, 5, { reinforce: 'touch', minSimilarity: AUTO_RECALL_MIN_SIMILARITY }).catch(() => [])
+    return recallMemory(agent, userText, 5, { reinforce: 'touch', minSimilarity: AUTO_RECALL_MIN_SIMILARITY, embedTimeoutMs: RECALL_EMBED_TIMEOUT_MS }).catch(() => [])
 }
 
 export function recallSection(memories: RecalledMemory[], history: ModelMessage[] = []): string {

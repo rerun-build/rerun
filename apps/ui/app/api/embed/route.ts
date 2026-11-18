@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
-import { embedText } from '@/lib/services/embed'
+import { embedTextShared } from '@/lib/services/embed'
 
 const bodySchema = z.object({ text: z.string().min(1) })
 
@@ -19,11 +19,12 @@ export async function POST(req: Request) {
     const parsed = bodySchema.safeParse(body)
     if (!parsed.success) return Response.json({ error: 'Invalid payload' }, { status: 400 })
 
-    if (!(await authenticateEngineToken(token))) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const engine = await authenticateEngineToken(token)
+    if (!engine) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
     // A memory stored without its vector is still found by keyword; a 500 would only lose the reason.
     try {
-        return Response.json({ embedding: await embedText(parsed.data.text) })
+        return Response.json({ embedding: await embedTextShared(engine.workspaceId, parsed.data.text) })
     } catch (err) {
         console.error('[embed] failed', err)
         return Response.json({ embedding: null })

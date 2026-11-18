@@ -219,6 +219,11 @@ the text to the app's `/api/embed` endpoint (reached at `RERUN_HUB_BASE_URL`, au
 `RERUN_API_KEY`), which owns the provider key. Without a reachable app, recall falls back to FTS
 only.
 
+Every turn also recalls on its own, with the message it was sent, before the model is called. That
+recall waits one second at most for the embedding (five for `memory_recall` and for a memory being
+written), then goes on by keyword. The app starts that embedding as the message reaches it, so the
+engine's request usually joins one already under way.
+
 ## Deployment
 
 The engine runs in Docker, one container per workspace, next to the app or on a machine of its own.

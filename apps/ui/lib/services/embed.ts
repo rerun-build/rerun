@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
 import { embed } from 'ai'
 import type { ServiceManifest } from './manifest'
@@ -37,6 +38,38 @@ export async function embedText(text: string): Promise<number[] | null> {
         const { embedding } = await embed({ model, value: text.slice(0, EMBED_RETRY_CHARS) })
         return embedding
     }
+}
+
+// A coworker recalls its memories with the embedding of the message it was just sent, and waits for
+// it before calling its model. The hub holds that message a moment before the engine does: the chat
+// routes ask for the embedding as the message comes in, and the engine's own request, a few hundred
+// milliseconds later, joins the one already under way instead of starting from nothing.
+//
+// Kept per workspace and for a moment only, in this process: an engine asking for another text, or
+// reaching another instance, gets a fresh embedding as before. A failure is not kept.
+const SHARED_MS = 30_000
+const SHARED_MAX = 500
+
+const shared = new Map<string, { vector: Promise<number[] | null>; until: number }>()
+
+export function embedTextShared(workspaceId: number, text: string): Promise<number[] | null> {
+    const key = `${workspaceId}:${createHash('sha256').update(text).digest('base64')}`
+    const now = Date.now()
+    const known = shared.get(key)
+    if (known && known.until > now) return known.vector
+
+    if (shared.size >= SHARED_MAX) {
+        for (const [other, entry] of shared) if (entry.until <= now) shared.delete(other)
+        if (shared.size >= SHARED_MAX) shared.clear()
+    }
+    const vector = embedText(text)
+    const entry = { vector, until: now + SHARED_MS }
+    shared.set(key, entry)
+    const forget = () => {
+        if (shared.get(key) === entry) shared.delete(key)
+    }
+    vector.then(embedding => embedding === null && forget(), forget)
+    return vector
 }
 
 // The searchable "document" for a service: everything a natural-language capability query

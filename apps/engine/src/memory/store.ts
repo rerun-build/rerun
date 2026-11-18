@@ -15,6 +15,8 @@ export type RecallOptions = {
     // Drops the hits whose cosine to the query is known and below this. A hit with no cosine (the
     // hub is unreachable, or the memory was stored without a vector) is kept: nothing says it is off.
     minSimilarity?: number
+    // How long the embedding of the query may take before the search goes on by keyword alone.
+    embedTimeoutMs?: number
 }
 
 export type RecalledMemory = {
@@ -64,7 +66,7 @@ function fuse(vectorHits: MemoryHit[], ftsHits: MemoryHit[]): MemoryHit[] {
 }
 
 export async function recallMemory(agent: LoadedAgent, query: string, k = 5, opts: RecallOptions = {}): Promise<RecalledMemory[]> {
-    const embedding = await embedText(query).catch(() => null)
+    const embedding = await embedText(query, { timeoutMs: opts.embedTimeoutMs }).catch(() => null)
     const vectorHits = embedding ? await vectorRecall(agent.id, embedding, k * 2).catch(() => []) : []
     const ftsHits = await ftsRecall(agent.id, query, k * 2, embedding).catch(() => [])
     const floor = opts.minSimilarity

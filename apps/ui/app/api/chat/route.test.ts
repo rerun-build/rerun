@@ -2,6 +2,7 @@ import { callableEngineAgentIds } from '@/app/api/_auth/access'
 import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, resolveAgentTarget, getExistingSession } from '@/app/api/_services/chat.service'
 import { recordSentMessage } from '@/app/api/_services/session-preview.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
+import { embedTextShared } from '@/lib/services/embed'
 import { buildInstallMessage } from '@/lib/chat/install-marker'
 import * as engine from '@/lib/engine/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -9,7 +10,8 @@ import { fakeSupabase } from '@/test/supabase-fake'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { POST } from './route'
 
-vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn().mockResolvedValue({ userId: 'me', authUser: { app_metadata: {}, user_metadata: {} } }) }))
+vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn().mockResolvedValue({ userId: 'me', workspace: { id: 7 }, authUser: { app_metadata: {}, user_metadata: {} } }) }))
+vi.mock('@/lib/services/embed', () => ({ embedTextShared: vi.fn().mockResolvedValue(null) }))
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind: 'user', userId: 'me', workspaceId: 7, role: 'member', boxScope: 'assigned' })), callableEngineAgentIds: vi.fn() }))
 vi.mock('@/app/api/_services/notification-audience.service', () => ({ recordSessionParticipant: vi.fn(), recordSessionRead: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', async importOriginal => ({
@@ -59,6 +61,21 @@ describe('POST /api/chat', () => {
         const actor = { kind: 'user', userId: 'me', workspaceId: 7, role: 'member', boxScope: 'assigned' }
         expect(resolveAgentTarget).toHaveBeenCalledWith('agent', actor)
         expect(getExistingSession).toHaveBeenCalledWith('session', actor)
+    })
+
+    it('asks for the embedding of the message as it comes in, for the recall the coworker runs before its model', async () => {
+        vi.mocked(engine.chat).mockImplementation(async () => streaming('run-1'))
+
+        await settle(POST(request({})))
+
+        expect(embedTextShared).toHaveBeenCalledWith(7, 'ship it')
+    })
+
+    it('sends the message even when that embedding fails', async () => {
+        vi.mocked(embedTextShared).mockRejectedValueOnce(new Error('provider away'))
+        vi.mocked(engine.chat).mockImplementation(async () => streaming('run-1'))
+
+        expect((await settle(POST(request({})))).status).toBe(200)
     })
 
     it('hands a queued message back rather than tailing the run holding the conversation', async () => {
