@@ -15,7 +15,7 @@ vi.mock('@/lib/search/web-search', () => ({ WEB_SEARCH_PAGE_SIZE: 20, searchTheW
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn(() => ({ from })) }))
 
 const WORKSPACE_ID = 7
-const RESULTS = [{ title: 'Moldwright', url: 'https://rerun.build', snippet: 'Coworkers that run' }]
+const RESULTS = [{ title: 'Rerun', url: 'https://rerun.build', snippet: 'Coworkers that run' }]
 const PAGE = Array.from({ length: 20 }, (_, i) => ({ title: `Result ${i + 1}`, url: `https://example.com/${i + 1}`, snippet: '' }))
 
 function searchRequest({ token = 'engine-key', body = { query: 'rerun', maxResults: 3 } }: { token?: string | null; body?: unknown } = {}) {
@@ -107,7 +107,7 @@ describe('POST /api/search', () => {
     it('asks the provider for a full page, keeps it, and returns only what was asked', async () => {
         vi.mocked(searchTheWeb).mockResolvedValue({ status: 200, ok: true, results: PAGE })
 
-        const response = await POST(searchRequest({ body: { query: '  Moldwright  AI ', maxResults: 3 } }))
+        const response = await POST(searchRequest({ body: { query: '  Rerun  AI ', maxResults: 3 } }))
 
         await expect(response.json()).resolves.toEqual({ results: PAGE.slice(0, 3) })
         expect(readCachedSearch).toHaveBeenCalledWith('rerun ai')
