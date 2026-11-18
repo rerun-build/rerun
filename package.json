@@ -27,7 +27,7 @@
         "dev:landing": "pnpm --dir cloud/apps/landing dev",
         "dev:emails": "pnpm --filter @rerun/emails dev",
         "dev:docs": "cd apps/docs && npx --yes mint dev --port 3333",
-        "check:docs": "cd apps/docs && npx --yes mint validate && npx --yes mint broken-links",
+        "check:docs": "node scripts/docs-media-check.mjs && cd apps/docs && npx --yes mint validate && npx --yes mint broken-links",
         "typecheck": "pnpm -r --if-present ts-check",
         "db:new": "supabase migration new",
         "db:start": "supabase start",

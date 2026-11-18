@@ -35,6 +35,29 @@
 - Tool parameters mirror `apps/ui/lib/mcp/account-tools.ts` and `apps/ui/lib/mcp/template-tools.ts`
 - Prices and plan contents mirror `packages/contracts/src/billing.ts` and `packages/contracts/src/template.ts`
 
+## Media
+
+Screenshots and short loops show the screen where a picture says it faster than a paragraph: a dialog, a card, a gesture. Not every page needs one.
+
+- The text stays complete without the media: the Chief of Staff reads `/llms-full.txt` and never sees an image, so a step, a label or a number that only lives in a picture is lost to it
+- Use the components of `/snippets/media.jsx`, never a raw `<img>`, `<video>` or `![]()`:
+
+```mdx
+import { Shot, Loop } from '/snippets/media.jsx'
+
+<Shot src="/images/vault/secret-form" alt="The masked form a coworker opens to ask for an API key" />
+<Loop src="/images/agents/approve-action" alt="Approving an action a coworker paused on" caption="Approve, and the run picks up where it stopped." />
+```
+
+- `src` names the media without its extension, under `images/<page>/`. `<Shot>` reads `<src>.light.webp` and `<src>.dark.webp`; `<Loop>` reads `<src>.light.mp4`, `<src>.dark.mp4` and a `.webp` poster for each theme
+- `alt` says what the media shows. `caption` is optional and short
+- A capture frames one element (the dialog, the panel, the card), not the whole screen, in light and dark
+- A loop is silent, under 15 seconds, and shows one gesture
+- Budgets: a `.webp` under 300 KB, an `.mp4` under 3 MB
+- Only demo data: no real customer, email, key or machine name, the repository is public
+- A media that no page shows any more is deleted with the screen it captured
+- `pnpm check:docs` checks all of the above except the content of the pictures
+
 ## Content boundaries
 
 - Document the product as a user sees it: Boxes, agents, apps, triggers, templates, billing
