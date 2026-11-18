@@ -5,7 +5,7 @@
         "message": "Dieses Modell hat gerade keine Kapazität. Versuch es gleich noch einmal oder wähle ein anderes Modell."
     },
     "titles": {
-        "budget": "Rerun-Guthaben aufgebraucht",
+        "budget": "Moldwright-Guthaben aufgebraucht",
         "unauthorized": "Verbindung abgemeldet",
         "overloaded": "Anbieter überlastet",
         "context_window": "Unterhaltung zu lang",
@@ -16,7 +16,7 @@
         "session_gone": "Unterhaltung nicht verfügbar"
     },
     "messages": {
-        "budget": "Rerun-Guthaben für diesen Zeitraum aufgebraucht. Lade Guthaben auf oder warte auf die monatliche Erneuerung.",
+        "budget": "Moldwright-Guthaben für diesen Zeitraum aufgebraucht. Lade Guthaben auf oder warte auf die monatliche Erneuerung.",
         "unauthorized": "Diese Verbindung muss neu angemeldet werden, bevor der Coworker arbeiten kann.",
         "overloaded": "Der Anbieter ist gerade überlastet. Versuch es gleich noch einmal.",
         "context_window": "Diese Unterhaltung passt nicht mehr ins Modell, und ein erneutes Senden stößt an dieselbe Grenze. Wechsle zu einem Modell mit größerem Kontextfenster oder starte eine neue Unterhaltung.",

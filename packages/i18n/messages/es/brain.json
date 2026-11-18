@@ -1,7 +1,7 @@
 {
     "unavailable": {
         "title": "El Brain aún no está en esta Box",
-        "description": "Tu Box ejecuta una versión de Rerun anterior al Brain. Aparecerá aquí cuando la Box se actualice."
+        "description": "Tu Box ejecuta una versión de Moldwright anterior al Brain. Aparecerá aquí cuando la Box se actualice."
     },
     "crumbs": {
         "brain": "Brain",
@@ -187,14 +187,14 @@
         "unreachableFallback": "No se pudo conectar con la máquina de este workspace.",
         "deleteFailed": "No se pudo eliminar la página",
         "noMachineTitle": "Tu Brain llega con tu primer coworker",
-        "noMachineDescription": "Vive en la máquina de tu workspace, que se prepara cuando Rerun crea tu primer coworker. A partir de ahí, lo que cada coworker sabe de tu empresa, y los archivos y tablas que comparten, aparecen aquí.",
+        "noMachineDescription": "Vive en la máquina de tu workspace, que se prepara cuando Moldwright crea tu primer coworker. A partir de ahí, lo que cada coworker sabe de tu empresa, y los archivos y tablas que comparten, aparecen aquí.",
         "unreachableTitle": "No se pudo conectar con tu workspace",
         "unreachableDescription": "La máquina de este workspace no respondió. Puede que aún se esté iniciando.",
         "retry": "Reintentar",
-        "seedingTitle": "Rerun está leyendo tu sitio web",
+        "seedingTitle": "Moldwright está leyendo tu sitio web",
         "emptyTitle": "El Brain de tu empresa está vacío",
         "seedingDescription": "La ficha de identidad de tu empresa aparecerá aquí en unos minutos: qué vendes, a quién, tu equipo, tu tono y tus herramientas.",
-        "emptyDescription": "Es lo que cada coworker lee sobre tu empresa antes de trabajar: qué vendes, a quién, tu equipo, tu tono y tus herramientas. Rerun puede rellenarlo desde tu sitio web.",
+        "emptyDescription": "Es lo que cada coworker lee sobre tu empresa antes de trabajar: qué vendes, a quién, tu equipo, tu tono y tus herramientas. Moldwright puede rellenarlo desde tu sitio web.",
         "refresh": "Actualizar",
         "writeYourself": "Escribir una página tú mismo",
         "missingPageTitle": "Aún no hay página \"{slug}\"",
@@ -229,7 +229,7 @@
         "googleBusiness": "Perfil de Empresa de Google"
     },
     "authors": {
-        "seed": "Rerun, a partir de tu sitio web",
+        "seed": "Moldwright, a partir de tu sitio web",
         "foreman": "Chief of Staff"
     }
 }

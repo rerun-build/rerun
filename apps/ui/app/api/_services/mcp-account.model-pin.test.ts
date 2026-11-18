@@ -27,7 +27,7 @@ function connection(id: string, name: string, provider: BoxConnection['provider'
     return { id, name, provider, models, extraModels: [], createdAt: '2026-01-01T00:00:00.000Z', connected, credentialRejected: false, planLimits: null, signIn: null, cliModels: null, providerModels: null, discoveredModels: null }
 }
 
-const CONNECTIONS = [connection('codex-clem', 'Codex Clem', 'codex', ['gpt-6-sol']), connection('claude-clem', 'Claude Clem', 'claude', ['claude-opus-5-5']), connection('claude-rerun', 'Rerun (person@example.com)', 'claude', ['claude-opus-5-5'])]
+const CONNECTIONS = [connection('codex-clem', 'Codex Clem', 'codex', ['gpt-6-sol']), connection('claude-clem', 'Claude Clem', 'claude', ['claude-opus-5-5']), connection('claude-rerun', 'Moldwright (person@example.com)', 'claude', ['claude-opus-5-5'])]
 
 function detail(resolvedConnectionId: string, model: string | null): EngineAgentDetail {
     return { config: { model, provider: 'claude' }, resolvedConnectionId, resolvedProvider: 'claude', resolvedModel: 'claude-opus-5-5' } as EngineAgentDetail
@@ -43,11 +43,11 @@ describe('dispatchAccountTool, what a coworker runs on', () => {
 
     it('lists the connections with the one that holds the default', async () => {
         await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'list_ai_connections', {})).resolves.toEqual({
-            default: { connectionId: 'claude-rerun', model: 'claude-opus-5-5', connectionName: 'Rerun (person@example.com)' },
+            default: { connectionId: 'claude-rerun', model: 'claude-opus-5-5', connectionName: 'Moldwright (person@example.com)' },
             connections: [
                 { id: 'codex-clem', name: 'Codex Clem', provider: 'codex', models: ['gpt-6-sol'], connected: true, isDefault: false, planLimits: null, signIn: null },
                 { id: 'claude-clem', name: 'Claude Clem', provider: 'claude', models: ['claude-opus-5-5'], connected: true, isDefault: false, planLimits: null, signIn: null },
-                { id: 'claude-rerun', name: 'Rerun (person@example.com)', provider: 'claude', models: ['claude-opus-5-5'], connected: true, isDefault: true, planLimits: null, signIn: null },
+                { id: 'claude-rerun', name: 'Moldwright (person@example.com)', provider: 'claude', models: ['claude-opus-5-5'], connected: true, isDefault: true, planLimits: null, signIn: null },
             ],
         })
     })
@@ -78,7 +78,7 @@ describe('dispatchAccountTool, what a coworker runs on', () => {
         vi.mocked(patchAgent).mockResolvedValue(detail('claude-rerun', 'claude-opus-5-5'))
 
         await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'update_agent', { agentId: 'agent-own', connectionId: 'claude-rerun', model: 'claude-opus-5-5' })).resolves.toMatchObject({
-            runsOn: { connectionId: 'claude-rerun', connectionName: 'Rerun (person@example.com)', provider: 'claude', model: 'claude-opus-5-5', followsWorkspaceDefault: false },
+            runsOn: { connectionId: 'claude-rerun', connectionName: 'Moldwright (person@example.com)', provider: 'claude', model: 'claude-opus-5-5', followsWorkspaceDefault: false },
         })
 
         expect(patchAgent).toHaveBeenCalledWith(CONN, 'engine-agent', { connectionId: 'claude-rerun', provider: 'claude', model: 'claude-opus-5-5' })

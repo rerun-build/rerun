@@ -1,4 +1,4 @@
-const RESEND_TEST_SENDER = 'Rerun <onboarding@resend.dev>'
+const RESEND_TEST_SENDER = 'Moldwright <onboarding@resend.dev>'
 
 export const DEFAULT_SENDERS: { transactional: string; experts: string; marketing: string; replyTo: string | undefined } = {
     transactional: RESEND_TEST_SENDER,

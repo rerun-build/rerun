@@ -19,7 +19,7 @@ const request = (client?: string) => new Request('https://app.rerun.build/api/v1
 
 const view: AiConnectionsView = {
     connections: [
-        { id: 'rerun', name: 'Rerun', provider: 'rerun', kind: 'included', status: 'connected', credentialOnFile: true, summary: '', isDefault: false, models: [], baseUrl: '', extraModels: [], planWindows: [] },
+        { id: 'rerun', name: 'Moldwright', provider: 'rerun', kind: 'included', status: 'connected', credentialOnFile: true, summary: '', isDefault: false, models: [], baseUrl: '', extraModels: [], planWindows: [] },
         { id: 'cnx-oc', name: 'OpenCode', provider: 'opencode', kind: 'plan', status: 'connected', credentialOnFile: true, summary: '', isDefault: true, models: [], baseUrl: '', extraModels: [], planWindows: [] },
     ],
     default: { connectionId: 'cnx-oc', model: 'go/deepseek-v4-pro', label: 'DeepSeek V4 Pro' },
@@ -32,7 +32,7 @@ const view: AiConnectionsView = {
 
 const models: AgentModels = {
     groups: [
-        { connectionId: 'rerun', label: 'Rerun', provider: 'rerun', models: [{ id: 'rerun-max', label: 'Rerun' }], defaultModel: 'rerun-max' },
+        { connectionId: 'rerun', label: 'Moldwright', provider: 'rerun', models: [{ id: 'rerun-max', label: 'Moldwright' }], defaultModel: 'rerun-max' },
         { connectionId: 'cnx-oc', label: 'OpenCode', provider: 'opencode', models: [{ id: 'go/deepseek-v4-pro', label: 'DeepSeek V4 Pro' }], defaultModel: 'go/deepseek-v4-pro' },
     ],
     pinned: null,

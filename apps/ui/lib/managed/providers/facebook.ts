@@ -72,13 +72,13 @@ const SCHEDULE = {
 const tools: ManagedTool[] = [
     {
         name: 'facebook_list_pages',
-        description: 'List the Facebook Pages the user shared with Rerun, with their id, name, category and follower count. Every other tool needs a Page id from here.',
+        description: 'List the Facebook Pages the user shared with Moldwright, with their id, name, category and follower count. Every other tool needs a Page id from here.',
         inputSchema: { type: 'object', properties: {} },
         execute: async (_args, token) => graph(token, 'GET', '/me/accounts', { fields: 'id,name,category,link,followers_count,fan_count', limit: MAX_PAGE_SIZE }),
     },
     {
         name: 'facebook_get_connected_account',
-        description: 'Get the Facebook identity Rerun acts as (id and name). Use it to confirm which account is connected.',
+        description: 'Get the Facebook identity Moldwright acts as (id and name). Use it to confirm which account is connected.',
         inputSchema: { type: 'object', properties: {} },
         execute: async (_args, token) => graph(token, 'GET', '/me', { fields: 'id,name' }),
     },

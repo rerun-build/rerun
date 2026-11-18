@@ -35,7 +35,7 @@ export function ChangelogOgStage({ entries }: { entries: ChangelogOgEntry[] }) {
                 <h2 className="bg-radial-[at_35%_30%] from-white from-15% via-[#b4b4be] via-55% to-[#6f6f7d] to-95% bg-clip-text text-[4.5rem] font-semibold leading-[1.05] tracking-[-0.035em] text-transparent">
                     What&apos;s new
                 </h2>
-                <p className="text-2xl leading-snug text-muted-foreground">Every change we ship to Rerun, newest first.</p>
+                <p className="text-2xl leading-snug text-muted-foreground">Every change we ship to Moldwright, newest first.</p>
             </div>
 
             <div className="absolute top-14 right-16 flex w-[556px] flex-col gap-9">

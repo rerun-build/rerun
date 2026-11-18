@@ -3,7 +3,7 @@ import { RERUN_MODELS, type RerunTier } from '@rerun/contracts'
 export const ENGINE_DEFAULT_PORT = 3000
 
 export const ENGINE_PROVIDERS: { id: string; label: string }[] = [
-    { id: 'rerun', label: 'Rerun' },
+    { id: 'rerun', label: 'Moldwright' },
     { id: 'anthropic', label: 'Anthropic' },
     { id: 'openai', label: 'OpenAI' },
     { id: 'google', label: 'Google' },

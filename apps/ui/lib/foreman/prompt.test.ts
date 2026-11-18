@@ -84,7 +84,7 @@ describe('foremanSystemPrompt in the app', () => {
             for (const trialSpent of [false, true]) {
                 const prompt = foremanSystemPrompt(stateWith({ phase, entitled: false, trialSpent, client, foreman: { ...stateWith({}).foreman, plan: PLAN } }))
                 expect(prompt).toContain(MOBILE_APP_BLOCK)
-                expect(prompt).toContain('They are in the Rerun mobile app.')
+                expect(prompt).toContain('They are in the Moldwright mobile app.')
                 expect(prompt).not.toMatch(PRICE)
             }
         }

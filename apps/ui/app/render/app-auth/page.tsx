@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { AppAuthBoard } from '@/components/auth/AppAuthBoard'
 
 export const metadata: Metadata = {
-    title: 'Rerun',
+    title: 'Moldwright',
     robots: { index: false, follow: false },
 }
 

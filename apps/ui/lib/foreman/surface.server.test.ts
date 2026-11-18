@@ -39,7 +39,7 @@ describe('resolveForemanSurface', () => {
         expect(ensureWorkspaceEngine).not.toHaveBeenCalled()
     })
 
-    it('never claims a machine on Rerun Cloud', async () => {
+    it('never claims a machine on Moldwright Cloud', async () => {
         expect(await resolveForemanSurface(7, { phase: 'companion' }, signedIn)).toBe('none')
         expect(ensureWorkspaceEngine).not.toHaveBeenCalled()
     })

@@ -26,7 +26,7 @@ describe('embedText', () => {
         else process.env.OPENROUTER_API_KEY = originalOpenRouterKey
     })
 
-    it('uses the dedicated embedding key when the Rerun key is also configured', async () => {
+    it('uses the dedicated embedding key when the Moldwright key is also configured', async () => {
         await expect(embedText('hello')).resolves.toEqual([0.1, 0.2])
 
         expect(createOpenAICompatible).toHaveBeenCalledWith({
@@ -36,7 +36,7 @@ describe('embedText', () => {
         })
     })
 
-    it('does not fall back to the Rerun key', async () => {
+    it('does not fall back to the Moldwright key', async () => {
         delete process.env.RERUN_EMBED_API_KEY
 
         await expect(embedText('hello')).resolves.toBeNull()

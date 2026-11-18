@@ -165,7 +165,7 @@ async function runTemplateTool(workspaceId: number, name: string, args: Record<s
             return {
                 templateId,
                 status: 'in_review',
-                note: 'Handed to the Rerun team. It stays private and frozen until they publish it or send it back. withdraw_template takes it back to draft.',
+                note: 'Handed to the Moldwright team. It stays private and frozen until they publish it or send it back. withdraw_template takes it back to draft.',
             }
         }
 
@@ -240,7 +240,7 @@ async function runTemplateTool(workspaceId: number, name: string, args: Record<s
                 alt: asString(args.alt),
                 cover: args.cover === true,
             })
-            return { templateId, url, position, galleryCount, note: 'Stored in Rerun media, not hotlinked from the URL you passed.' }
+            return { templateId, url, position, galleryCount, note: 'Stored in Moldwright media, not hotlinked from the URL you passed.' }
         }
 
         default:

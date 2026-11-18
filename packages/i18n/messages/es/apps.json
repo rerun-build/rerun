@@ -2,13 +2,13 @@
     "menu": {
         "label": "Apps"
     },
-    "linkedToRerun": "{provider} vinculado a Rerun",
+    "linkedToRerun": "{provider} vinculado a Moldwright",
     "slotPrice": {
         "monthly": "{price}/mes",
         "yearly": "{price}/año"
     },
     "blocked": {
-        "notSubscribed": "Suscríbete primero a Rerun",
+        "notSubscribed": "Suscríbete primero a Moldwright",
         "paused": "Tu workspace está en pausa",
         "trialSlot": "Una prueba incluye un solo espacio de {provider}. Mejora tu plan para añadir más.",
         "adminOnly": "Solo un admin puede gestionar las apps de pago"
@@ -139,7 +139,7 @@
         "signInFromHelp": "LinkedIn confía en un inicio de sesión desde el país donde sueles trabajar.",
         "searchCountry": "Buscar un país",
         "noCountry": "No se encontró ningún país",
-        "neverStored": "Rerun nunca guarda tu contraseña ni tu cookie.",
+        "neverStored": "Moldwright nunca guarda tu contraseña ni tu cookie.",
         "connect": "Conectar",
         "approval": {
             "figureLabel": "Un teléfono que muestra la solicitud de inicio de sesión, con la tecla de aprobar iluminada",
@@ -173,7 +173,7 @@
                 "qr": "Escanear un código QR",
                 "code": "Escribir un código"
             },
-            "linkedDevice": "Rerun se une como dispositivo vinculado, igual que WhatsApp Web. Tu teléfono sigue funcionando como siempre.",
+            "linkedDevice": "Moldwright se une como dispositivo vinculado, igual que WhatsApp Web. Tu teléfono sigue funcionando como siempre.",
             "submit": "Obtener el código"
         },
         "link": {

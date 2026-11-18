@@ -141,12 +141,12 @@ describe('a card and the message written after it', () => {
     it('keeps the blocks of a turn in the order they were streamed', () => {
         const listPages = { type: 'tool-call', toolCallId: 'c1', toolName: 'facebook_list_pages', input: {} }
         const replies = { type: 'tool-call', toolCallId: 'c2', toolName: 'mcp__rerun__suggest_replies', input: { replies: ['Post it'] } }
-        const content = [listPages, { type: 'tool-result', toolCallId: 'c1', toolName: 'facebook_list_pages', output: { pages: ['Rerun AI'] } }, { type: 'text', text: 'Yes, I can see the Rerun AI page. What do you want to do with it?' }, replies, { type: 'tool-result', toolCallId: 'c2', toolName: 'mcp__rerun__suggest_replies', output: 'Shown as buttons.' }, { type: 'text', text: 'Yes, I have access to your Rerun AI page.' }]
+        const content = [listPages, { type: 'tool-result', toolCallId: 'c1', toolName: 'facebook_list_pages', output: { pages: ['Moldwright AI'] } }, { type: 'text', text: 'Yes, I can see the Moldwright AI page. What do you want to do with it?' }, replies, { type: 'tool-result', toolCallId: 'c2', toolName: 'mcp__rerun__suggest_replies', output: 'Shown as buttons.' }, { type: 'text', text: 'Yes, I have access to your Moldwright AI page.' }]
         const [message] = transformEngineMessages([assistant('a1', content, 1)])
         expect(message.parts.map(p => p.type)).toEqual(['tool-facebook_list_pages', 'text', 'tool-mcp__rerun__suggest_replies', 'text'])
-        expect(message.parts[1]).toEqual({ type: 'text', text: 'Yes, I can see the Rerun AI page. What do you want to do with it?' })
-        expect(message.parts[3]).toEqual({ type: 'text', text: 'Yes, I have access to your Rerun AI page.' })
-        expect(message.parts[0]).toMatchObject({ state: 'output-available', output: { pages: ['Rerun AI'] } })
+        expect(message.parts[1]).toEqual({ type: 'text', text: 'Yes, I can see the Moldwright AI page. What do you want to do with it?' })
+        expect(message.parts[3]).toEqual({ type: 'text', text: 'Yes, I have access to your Moldwright AI page.' })
+        expect(message.parts[0]).toMatchObject({ state: 'output-available', output: { pages: ['Moldwright AI'] } })
     })
 
     it('reads a row stored as a plain string as one text block', () => {

@@ -10,7 +10,7 @@ import { text } from "../../theme";
 
 export const meta = {
   slug: "2026-09-24-machines-are-back",
-  subject: "New Rerun machines just opened up",
+  subject: "New Moldwright machines just opened up",
   preview: "A limited batch, first come, first served.",
   date: "2026-09-24",
   audience: "waitlist",
@@ -29,7 +29,7 @@ export default function MachinesAreBack({
     >
       <Heading style={text.heading}>Machines are back</Heading>
       <Text style={text.paragraph}>
-        You signed up for Rerun while every machine was taken, so you landed
+        You signed up for Moldwright while every machine was taken, so you landed
         on the waitlist. We just brought a new batch of machines online.
       </Text>
       <Text style={text.paragraph}>

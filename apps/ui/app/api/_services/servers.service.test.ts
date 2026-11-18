@@ -97,7 +97,7 @@ describe('detachWorkspaceServer', () => {
     it('never detaches a machine of the pool', async () => {
         vi.mocked(findWorkspaceEngine).mockResolvedValue({ instanceId: 'i', conn: { baseUrl: URL, apiKey: KEY }, managed: true })
 
-        await expect(detachWorkspaceServer(7)).rejects.toThrow('Rerun Cloud')
+        await expect(detachWorkspaceServer(7)).rejects.toThrow('Moldwright Cloud')
         expect(db.writes('engine_pool')).toHaveLength(0)
     })
 })

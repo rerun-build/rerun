@@ -78,7 +78,7 @@
         "configured": "{name} configurado",
         "connectTitle": "Conectar {name}",
         "signInOAuth": "Inicia sesión en {name} para que tu agente pueda usarlo.",
-        "signInManaged": "Inicia sesión con {name} para que tu agente pueda usarlo. Rerun se encarga de la conexión.",
+        "signInManaged": "Inicia sesión con {name} para que tu agente pueda usarlo. Moldwright se encarga de la conexión.",
         "setUp": "Configurar {name}",
         "authentication": "Autenticación",
         "backToMethods": "Volver a los métodos",

@@ -10,7 +10,7 @@ const t = createTranslator({ locale: 'en', messages: ENGLISH_MESSAGES, namespace
 const result = (problem: Parameters<typeof probeProblemMessage>[1]['problem'], detail: string | null = null) => ({ baseUrl: 'http://localhost:11434/v1', models: [], problem, detail })
 
 describe('presetsFor', () => {
-    it('keeps the servers that listen on the owner machine off Rerun Cloud', () => {
+    it('keeps the servers that listen on the owner machine off Moldwright Cloud', () => {
         expect(presetsFor(true).map(preset => preset.id)).toEqual(['groq', 'together', 'mistral', 'deepseek'])
         expect(presetsFor(false).map(preset => preset.id)).toEqual(['ollama', 'lmstudio', 'vllm', 'litellm', 'groq', 'together', 'mistral', 'deepseek'])
     })

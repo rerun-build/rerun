@@ -1,6 +1,6 @@
 {
     "_context": {
-        "seo.title": "Title of the pricing page in the browser tab and search results, followed by \" | Rerun\".",
+        "seo.title": "Title of the pricing page in the browser tab and search results, followed by \" | Moldwright\".",
         "billing.discount": "Badge on the yearly billing option: the saving, e.g. \"-20%\".",
         "price.perMonth": "Suffix right after a price, e.g. \"$29/month\".",
         "price.perMonthBilledYearly": "Suffix after the monthly price of a yearly plan; the argument \"total\" is the yearly amount, e.g. \"$276\".",
@@ -9,17 +9,17 @@
         "addons.items.credit_pack.unit": "How many credits one pack adds per month, e.g. \"+1,000 credits/mo\".",
         "plan.trialNote": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
         "faq.items.trial.answer": "The argument \"free\" is a zero price in the plan currency, e.g. \"$0\".",
-        "comparison.versus": "Link to the page comparing Rerun with a competitor, e.g. \"Rerun vs Zapier\"."
+        "comparison.versus": "Link to the page comparing Moldwright with a competitor, e.g. \"Moldwright vs Zapier\"."
     },
     "seo": {
         "title": "Pricing",
         "headline": "One plan. Everything included.",
-        "description": "One Rerun plan from {price} a month: unlimited agents, unlimited seats, your own private machine, every app and unlimited runs. Free {trialDays}-day trial.",
+        "description": "One Moldwright plan from {price} a month: unlimited agents, unlimited seats, your own private machine, every app and unlimited runs. Free {trialDays}-day trial.",
         "breadcrumbHome": "Home"
     },
     "hero": {
         "eyebrow": "Pricing",
-        "description": "Try Rerun free for {trialDays} days. Then pick how many Coworkers you need, and invite your whole team."
+        "description": "Try Moldwright free for {trialDays} days. Then pick how many Coworkers you need, and invite your whole team."
     },
     "price": {
         "perMonth": "/month",
@@ -89,7 +89,7 @@
         "name": "Enterprise",
         "description": "For large organizations with their own requirements",
         "features": {
-            "everything": "Everything in Rerun",
+            "everything": "Everything in Moldwright",
             "infrastructure": "Custom infrastructure",
             "infrastructureDetail": "Dedicated or self-hosted: your Coworkers run where your organization needs them to run.",
             "support": "Dedicated support",
@@ -144,7 +144,7 @@
         "lede": "Add-ons are quantities on the plan you already have, not another tier. Take one when you need it, drop it when you do not.",
         "items": {
             "credit_pack": {
-                "title": "Rerun credits",
+                "title": "Moldwright credits",
                 "unit": "+{credits, plural, one {# credit} other {# credits}}/mo",
                 "caption": "More credits for the models we host, on top of the plan."
             }
@@ -152,12 +152,12 @@
     },
     "comparison": {
         "badge": "Comparison",
-        "title": "Why people switch to Rerun.",
-        "compareWith": "Compare Rerun with",
-        "fullComparison": "Read the full Rerun vs {competitor} comparison",
+        "title": "Why people switch to Moldwright.",
+        "compareWith": "Compare Moldwright with",
+        "fullComparison": "Read the full Moldwright vs {competitor} comparison",
         "allComparisons": "All comparisons",
         "alsoCompared": "Also compared",
-        "versus": "Rerun vs {competitor}"
+        "versus": "Moldwright vs {competitor}"
     },
     "faq": {
         "label": "Pricing FAQ",

@@ -11,7 +11,7 @@ export async function uploadPrivateFile(supabase: SupabaseClient<Database>, buck
     return path
 }
 
-export const STORAGE_BUSY_ERROR = 'Rerun is very busy right now and could not fetch this file. Try again in a minute.'
+export const STORAGE_BUSY_ERROR = 'Moldwright is very busy right now and could not fetch this file. Try again in a minute.'
 
 const DOWNLOAD_RETRY_DELAYS_MS = [400, 1200, 3000]
 

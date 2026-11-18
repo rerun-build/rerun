@@ -22,7 +22,7 @@
         "budget.preTrial.body": "{credits} is an already formatted amount of credit, e.g. '$5 of credit'.",
         "budget.runOn": "Button. {plan} is the name of an AI subscription, e.g. 'Claude'.",
         "budget.subscribe.description": "{credits} is an already formatted amount of credit included in the plan.",
-        "budget.title": "Header of the notice shown when the workspace's Rerun credits (prepaid AI usage) ran out.",
+        "budget.title": "Header of the notice shown when the workspace's Moldwright credits (prepaid AI usage) ran out.",
         "budget.trial.continueWithPro": "{price} is an already formatted monthly price, e.g. '$49'. 'Pro' is the plan's name.",
         "budget.trial.useMyPlan": "Followed by two buttons: Claude and ChatGPT.",
         "budget.usedUp.trial": "{credits} is an already formatted amount of credit.",
@@ -410,7 +410,7 @@
         "detailsLabel": "Please provide details",
         "negativePlaceholder": "What was unsatisfying about this response?",
         "positivePlaceholder": "What was satisfying about this response?",
-        "disclaimer": "Submitting this report shares this conversation with the Rerun team so we can improve your coworkers.",
+        "disclaimer": "Submitting this report shares this conversation with the Moldwright team so we can improve your coworkers.",
         "cancel": "Cancel",
         "submit": "Submit",
         "categories": {
@@ -464,11 +464,11 @@
         }
     },
     "budget": {
-        "title": "Rerun credits",
+        "title": "Moldwright credits",
         "paused": {
-            "title": "Rerun credits paused",
-            "body": "Your coworkers can't use Rerun models or paid data until someone resumes them.",
-            "actionTitle": "Resume Rerun credits",
+            "title": "Moldwright credits paused",
+            "body": "Your coworkers can't use Moldwright models or paid data until someone resumes them.",
+            "actionTitle": "Resume Moldwright credits",
             "actionDescription": "Spending starts again right away.",
             "cta": "Resume"
         },
@@ -483,17 +483,17 @@
             "description": "{credits} included every month."
         },
         "topUp": {
-            "title": "Top up your Rerun credits",
+            "title": "Top up your Moldwright credits",
             "cta": "Top up",
             "description": "Or wait, it resets next month."
         },
         "usedUp": {
-            "noCredit": "This workspace has no Rerun credits yet.",
+            "noCredit": "This workspace has no Moldwright credits yet.",
             "trial": "You've used up the {credits} of your free trial.",
-            "period": "You've used up your Rerun credits for this period."
+            "period": "You've used up your Moldwright credits for this period."
         },
         "ownConnection": {
-            "body": "This conversation ran on Rerun, and your {plan} plan is connected."
+            "body": "This conversation ran on Moldwright, and your {plan} plan is connected."
         },
         "runOn": "Run on {plan}",
         "or": "Or",

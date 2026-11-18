@@ -79,7 +79,7 @@ export default function DesktopShellLab() {
             </div>
             <div className="max-w-full overflow-auto">
                 <div className={platform === 'mac' ? 'relative overflow-hidden rounded-[10px] shadow-2xl ring-1 ring-black/20' : 'relative overflow-hidden rounded-md shadow-2xl ring-1 ring-black/30'} style={{ width, height }}>
-                    <iframe key={`${platform}-${path}`} title="Rerun" src={`${path}${separator}${DESKTOP_SHELL_PREVIEW_PARAM}=${platform}`} className="size-full border-0" />
+                    <iframe key={`${platform}-${path}`} title="Moldwright" src={`${path}${separator}${DESKTOP_SHELL_PREVIEW_PARAM}=${platform}`} className="size-full border-0" />
                     {platform === 'mac' ? <MacButtons /> : <CaptionButtons />}
                 </div>
             </div>

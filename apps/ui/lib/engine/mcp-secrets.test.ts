@@ -11,7 +11,7 @@ describe('isSecretLike', () => {
         for (const arg of [
             '-y',
             '--config',
-            'github:Rerun-build/mcp-discord#v1.4.1-rerun.1',
+            'github:Moldwright-build/mcp-discord#v1.4.1-rerun.1',
             '@modelcontextprotocol/server-filesystem',
             'mcp-remote@0.1.29',
             '/Users/someone/projects/notes',
@@ -36,8 +36,8 @@ describe('isSecretLike', () => {
 
 describe('externalizeArgs', () => {
     it('names the variable after the flag that precedes the secret', () => {
-        const { value, keys } = externalizeArgs(['-y', 'github:Rerun-build/mcp-discord#v1.4.1-rerun.1', '--config', DISCORD_TOKEN], 'discord')
-        expect(value).toEqual(['-y', 'github:Rerun-build/mcp-discord#v1.4.1-rerun.1', '--config', '${MCP_DISCORD_CONFIG}'])
+        const { value, keys } = externalizeArgs(['-y', 'github:Moldwright-build/mcp-discord#v1.4.1-rerun.1', '--config', DISCORD_TOKEN], 'discord')
+        expect(value).toEqual(['-y', 'github:Moldwright-build/mcp-discord#v1.4.1-rerun.1', '--config', '${MCP_DISCORD_CONFIG}'])
         expect(keys).toEqual({ MCP_DISCORD_CONFIG: DISCORD_TOKEN })
     })
 

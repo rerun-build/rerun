@@ -13,7 +13,7 @@
         "business.add": "Shown when no tax number is saved: opens the form to add one.",
         "business.status.pending": "Badge: Stripe is still checking the tax number.",
         "business.typeLabel": "Field label: the kind of tax number.",
-        "cancel.comeback.coming_back": "Answer to 'Will you use Rerun again?' in the cancellation flow.",
+        "cancel.comeback.coming_back": "Answer to 'Will you use Moldwright again?' in the cancellation flow.",
         "cancel.daysLeft.paid": "<days> wraps the highlighted number of days left in the paid period.",
         "cancel.daysLeft.runsSoFar": "Under a coworker's name, during a trial. <figure> wraps the number of runs.",
         "cancel.daysLeft.runsThisWeek": "Under a coworker's name, on a paid plan. <figure> wraps the number of runs.",
@@ -48,7 +48,7 @@
         "checkout.variants.creditLocked.payCta": "Pay button. {amount} is the amount charged today in dollars.",
         "checkout.variants.creditLocked.subtitleCoworker": "{coworker} is the name of the coworker that stopped for lack of credits.",
         "checkout.variants.startTrial.subtitle": "{price} is an amount in dollars, {date} the day the trial ends.",
-        "credits": "A number of Rerun credits (the unit AI usage is billed in). {count} is the number, formatted by ICU.",
+        "credits": "A number of Moldwright credits (the unit AI usage is billed in). {count} is the number, formatted by ICU.",
         "dialog.adminOnly.gotIt": "Button that closes the dialog.",
         "layout.meter.left": "{figure} is a number of credits, already formatted (can be '<1').",
         "layout.pill.daysLeft": "Very short, in a pill button next to 'Free trial': days left in the trial ('3d left').",
@@ -73,7 +73,7 @@
         "plan.invoices.status.open": "Status of an invoice that is not paid yet.",
         "plan.invoices.status.uncollectible": "Status of an invoice Stripe gave up collecting.",
         "plan.invoices.status.void": "Status of an invoice that was cancelled.",
-        "plan.overview.creditsLeft": "{credits} is an already formatted number of Rerun credits, like \"1,250\" or \"<1\".",
+        "plan.overview.creditsLeft": "{credits} is an already formatted number of Moldwright credits, like \"1,250\" or \"<1\".",
         "plan.overview.update": "Button next to the saved card: replace it with another card.",
         "plan.status.ends": "Badge of a plan that was cancelled. {date} is a short date like \"Nov 12\".",
         "plan.status.monthlyFrom": "Badge of a yearly plan that switches to monthly billing on {date}.",
@@ -210,7 +210,7 @@
             "addedTitle": "Credits added",
             "addedBody": "You now get {count, plural, one {# credit} other {# credits}} every month. Your coworkers pick up where they stopped.",
             "unchangedBody": "Your credits stay as they are until your renewal.",
-            "title": "Add Rerun credits",
+            "title": "Add Moldwright credits",
             "eachPack": "Each pack adds {count, plural, one {# credit} other {# credits}} every month, for {price}.",
             "packs": "{count, plural, one {# pack} other {# packs}}",
             "perMonth": "+{count, plural, one {# credit} other {# credits}} a month",
@@ -322,7 +322,7 @@
         "fallbackTitle": "your template",
         "readyOne": "You own \"{title}\". Ready to place its coworker?",
         "readyMany": "You own \"{title}\". Ready to place its {count} coworkers?",
-        "needsPlan": "You own \"{title}\". An active Rerun plan is required to install it.",
+        "needsPlan": "You own \"{title}\". An active Moldwright plan is required to install it.",
         "finalizing": "Finalizing purchase",
         "close": "Close",
         "placeOne": "Place its coworker",
@@ -396,7 +396,7 @@
                 "footnote": "This ends your free trial today. To pay nothing today, keep your trial: Pro starts on {date} on its own."
             },
             "creditLocked": {
-                "title": "Rerun credits come with Pro",
+                "title": "Moldwright credits come with Pro",
                 "titleCoworker": "Keep going with Pro",
                 "subtitle": "Your {trialCredits, number} trial credits are used up. Pro includes {credits, plural, one {# credit} other {# credits}} every month, and you can add more anytime.",
                 "subtitleCoworker": "{coworker} picks up where it stopped.",
@@ -481,17 +481,17 @@
             "updateFailed": "Your plan could not be updated",
             "stillUpdating": "Your plan is still updating",
             "pleaseWait": "Please wait",
-            "freeFor": "Rerun Pro, free for {days} days",
-            "subscribe": "Subscribe to Rerun Pro",
+            "freeFor": "Moldwright Pro, free for {days} days",
+            "subscribe": "Subscribe to Moldwright Pro",
             "dueToday": "due today",
             "perYear": "per year",
             "perMonth": "per month",
             "thenPerMonth": "Then <amount></amount> per month, excl. VAT.",
-            "authorize": "By subscribing, you authorize Rerun to charge you until you cancel."
+            "authorize": "By subscribing, you authorize Moldwright to charge you until you cancel."
         },
         "card": {
             "exclVat": "Excl. VAT, computed from your address.",
-            "payLaterFootnote": "Paying now ends your free trial today, and you authorize Rerun to charge you until you cancel. Rather finish your trial? <later></later>",
+            "payLaterFootnote": "Paying now ends your free trial today, and you authorize Moldwright to charge you until you cancel. Rather finish your trial? <later></later>",
             "saving": "Saving…",
             "payOn": "Pay on {date}",
             "payOnLastDay": "Pay on the last day"
@@ -499,7 +499,7 @@
         "cardOnFile": {
             "back": "Your trial",
             "title": "Start Pro today",
-            "header": "End trial, start Rerun Pro",
+            "header": "End trial, start Moldwright Pro",
             "tax": "Tax",
             "taxFromAddress": "Tax, from your address",
             "dueToday": "Due today",
@@ -570,7 +570,7 @@
             "remove": "Remove promo code"
         },
         "backToPlan": "Plan",
-        "terms": "I agree to the <terms>Terms</terms> and ask Rerun to start right away. If I am a consumer, my right of withdrawal ends once the service has started."
+        "terms": "I agree to the <terms>Terms</terms> and ask Moldwright to start right away. If I am a consumer, my right of withdrawal ends once the service has started."
     },
     "stripe": {
         "orPayWithCard": "or pay with card",
@@ -661,7 +661,7 @@
         "reason": {
             "field": "What made you decide to leave?",
             "placeholder": "A sentence is plenty",
-            "comebackField": "Will you use Rerun again?",
+            "comebackField": "Will you use Moldwright again?",
             "missingComment": "Tell us in a few words why you are leaving",
             "missingComeback": "Tell us if you'll be back",
             "required": "Tell us in a few words why you are leaving.",
@@ -705,7 +705,7 @@
             "runsThisMonth": "Runs this month",
             "agents": "{count, plural, one {# agent} other {# agents}}",
             "agentsCaption": "set up, connected and working",
-            "creditsCaption": "Rerun credits left",
+            "creditsCaption": "Moldwright credits left",
             "runsSoFar": "Runs so far",
             "schedules": "Schedules"
         },
@@ -740,8 +740,8 @@
     },
     "usage": {
         "card": {
-            "title": "Rerun credits",
-            "subtitle": "Spent by your coworkers on Rerun models and paid data",
+            "title": "Moldwright credits",
+            "subtitle": "Spent by your coworkers on Moldwright models and paid data",
             "addCredits": "Add credits",
             "startProNow": "Start Pro now",
             "usedTrial": "Used · trial credits",
@@ -753,14 +753,14 @@
         "outOfCredits": {
             "trialTitle": "You're out of trial credits",
             "title": "You're out of credits",
-            "trialDescription": "Your coworkers can't use Rerun models or paid data. Pro comes with {count, plural, one {# credit} other {# credits}} every month.",
-            "description": "Your coworkers can't use Rerun models or paid data.",
-            "descriptionUntil": "Your coworkers can't use Rerun models or paid data until {date}."
+            "trialDescription": "Your coworkers can't use Moldwright models or paid data. Pro comes with {count, plural, one {# credit} other {# credits}} every month.",
+            "description": "Your coworkers can't use Moldwright models or paid data.",
+            "descriptionUntil": "Your coworkers can't use Moldwright models or paid data until {date}."
         },
         "switch": {
             "label": "Allow spending",
-            "on": "Coworkers can use Rerun models and paid data.",
-            "off": "Paused. Coworkers can't use Rerun models or paid data."
+            "on": "Coworkers can use Moldwright models and paid data.",
+            "off": "Paused. Coworkers can't use Moldwright models or paid data."
         },
         "kind": {
             "ai": "AI models",
@@ -974,7 +974,7 @@
             "noTrialCreditsLeft": "No trial credits left",
             "outOfCredits": "Out of credits",
             "left": "{figure} left",
-            "ariaUsed": "Rerun credits used"
+            "ariaUsed": "Moldwright credits used"
         }
     },
     "creditsBar": {

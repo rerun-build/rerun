@@ -30,7 +30,7 @@ describe('brainSourceLabel', () => {
     it('names the sources in the reader\'s language and keeps a cited source as written', () => {
         expect(sourceIn('site:pricing', french)).toBe('Page Tarifs')
         expect(sourceIn('Call with Marie', french)).toBe('Call with Marie')
-        expect(authorIn('seed', french)).toBe("Rerun, d'après votre site web")
+        expect(authorIn('seed', french)).toBe("Moldwright, d'après votre site web")
     })
 
     it('shows a link by its host and path, shortened', () => {
@@ -52,7 +52,7 @@ describe('brainSourceLabels', () => {
 
 describe('labels', () => {
     it('names the author of a page', () => {
-        expect(brainAuthorLabel('seed')).toBe('Rerun, from your website')
+        expect(brainAuthorLabel('seed')).toBe('Moldwright, from your website')
         expect(brainAuthorLabel('agent:Sales')).toBe('Sales')
         expect(brainAuthorLabel('agent:foreman')).toBe('Chief of Staff')
         expect(brainAuthorLabel('user:ana@acme.com')).toBe('ana@acme.com')

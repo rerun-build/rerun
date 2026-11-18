@@ -314,7 +314,7 @@
         "detailsLabel": "Donnez des détails",
         "negativePlaceholder": "Qu'est-ce qui ne vous a pas convenu dans cette réponse ?",
         "positivePlaceholder": "Qu'est-ce qui vous a plu dans cette réponse ?",
-        "disclaimer": "Envoyer ce signalement partage cette conversation avec l'équipe Rerun pour que nous puissions améliorer vos coworkers.",
+        "disclaimer": "Envoyer ce signalement partage cette conversation avec l'équipe Moldwright pour que nous puissions améliorer vos coworkers.",
         "cancel": "Annuler",
         "submit": "Envoyer",
         "categories": {
@@ -368,11 +368,11 @@
         }
     },
     "budget": {
-        "title": "Crédits Rerun",
+        "title": "Crédits Moldwright",
         "paused": {
-            "title": "Crédits Rerun en pause",
-            "body": "Vos coworkers ne peuvent plus utiliser les modèles Rerun ni les données payantes tant que personne ne les réactive.",
-            "actionTitle": "Réactiver les crédits Rerun",
+            "title": "Crédits Moldwright en pause",
+            "body": "Vos coworkers ne peuvent plus utiliser les modèles Moldwright ni les données payantes tant que personne ne les réactive.",
+            "actionTitle": "Réactiver les crédits Moldwright",
             "actionDescription": "Les dépenses reprennent immédiatement.",
             "cta": "Réactiver"
         },
@@ -387,17 +387,17 @@
             "description": "{credits} inclus chaque mois."
         },
         "topUp": {
-            "title": "Recharger vos crédits Rerun",
+            "title": "Recharger vos crédits Moldwright",
             "cta": "Recharger",
             "description": "Ou attendez, ils se renouvellent le mois prochain."
         },
         "usedUp": {
-            "noCredit": "Ce workspace n'a pas encore de crédits Rerun.",
+            "noCredit": "Ce workspace n'a pas encore de crédits Moldwright.",
             "trial": "Vous avez épuisé les {credits} de votre essai gratuit.",
-            "period": "Vous avez épuisé vos crédits Rerun pour cette période."
+            "period": "Vous avez épuisé vos crédits Moldwright pour cette période."
         },
         "ownConnection": {
-            "body": "Cette conversation tournait sur Rerun, et votre abonnement {plan} est connecté."
+            "body": "Cette conversation tournait sur Moldwright, et votre abonnement {plan} est connecté."
         },
         "runOn": "Utiliser {plan}",
         "or": "Ou",

@@ -1,6 +1,6 @@
 {
     "site": {
-        "title": "Rerun : des employés IA qui tournent sur votre abonnement ChatGPT ou Claude",
+        "title": "Moldwright : des employés IA qui tournent sur votre abonnement ChatGPT ou Claude",
         "description": "Embauchez des employés IA pour la vente, le support, le marketing et l'admin. Ils tournent sur votre abonnement ChatGPT ou Claude, des crédits inclus ou votre clé API. Essai gratuit de {trialDays} jours."
     },
     "nav": {
@@ -177,12 +177,12 @@
     },
     "github": {
         "star": "Star",
-        "ariaStar": "Mettre une étoile à Rerun sur GitHub",
-        "ariaCount": "Rerun sur GitHub, {count} étoiles"
+        "ariaStar": "Mettre une étoile à Moldwright sur GitHub",
+        "ariaCount": "Moldwright sur GitHub, {count} étoiles"
     },
     "heroCta": "Commencer gratuitement",
     "finalCta": {
-        "proof": "{count}+ entreprises tournent sur Rerun",
+        "proof": "{count}+ entreprises tournent sur Moldwright",
         "titleLead": "Des Coworkers sur l'offre <switch></switch>",
         "titleTail": "<mark>que vous payez déjà.</mark>",
         "steps": {
@@ -193,14 +193,14 @@
         "step": "{rank}. {label}"
     },
     "openSource": {
-        "announce": "Rerun est désormais open source<wide> sous AGPL-3.0</wide>",
+        "announce": "Moldwright est désormais open source<wide> sous AGPL-3.0</wide>",
         "cta": "Une étoile sur GitHub"
     },
     "footer": {
         "ctaTitle": "Votre premier coworker est<br></br>à trois minutes",
         "ctaButton": "Commencer gratuitement",
         "tagline": "Confiez votre travail à des coworkers. Créez-les, regardez-les travailler, et gardez un œil sur tout.",
-        "productHuntAlt": "Rerun : des coworkers IA open source qui font vraiment le travail | Product Hunt",
+        "productHuntAlt": "Moldwright : des coworkers IA open source qui font vraiment le travail | Product Hunt",
         "columns": {
             "features": "Fonctionnalités",
             "industries": "Secteurs",
@@ -226,7 +226,7 @@
             "affiliate": "Programme d'affiliation",
             "partnerBadge": "Badge partenaire"
         },
-        "compareLink": "Rerun vs {name}",
+        "compareLink": "Moldwright vs {name}",
         "guides": {
             "aiEmployees": "Employés IA",
             "smallBusiness": "Agents IA pour les petites entreprises",
@@ -245,7 +245,7 @@
             "cookies": "Politique de cookies",
             "dpa": "DPA"
         },
-        "copyright": "© {year} Rerun par {legalName}. Tous droits réservés.",
+        "copyright": "© {year} Moldwright par {legalName}. Tous droits réservés.",
         "language": "Langue",
         "categories": {
             "agencies": "Agences",
@@ -272,7 +272,7 @@
         "dismiss": "Fermer"
     },
     "notFound": {
-        "homeAria": "Accueil Rerun",
+        "homeAria": "Accueil Moldwright",
         "title": "Cette page est sortie du script.",
         "body": "La page que vous cherchez n'existe pas ou a été déplacée. On vous remet sur la bonne voie.",
         "back": "Retour à l'accueil"
@@ -301,7 +301,7 @@
             }
         },
         "compare": {
-            "vs": "Rerun vs",
+            "vs": "Moldwright vs",
             "cta": "Voir la comparaison"
         }
     },

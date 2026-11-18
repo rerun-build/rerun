@@ -10,7 +10,7 @@ describe('mcpRegisterCardOf', () => {
     })
 
     it('reads a registration waiting on a sign-in as saved', () => {
-        const output = 'Registered MCP server "linear" (http), but it requires sign-in. Rerun shows the user a Connect button for it right under this call.'
+        const output = 'Registered MCP server "linear" (http), but it requires sign-in. Moldwright shows the user a Connect button for it right under this call.'
         expect(mcpRegisterCardOf('mcp_register', input, output)?.outcome).toBe('saved')
     })
 
@@ -20,8 +20,8 @@ describe('mcpRegisterCardOf', () => {
     })
 
     it('keeps the whole first line of a refusal that names no transport', () => {
-        const output = 'The name "rerun" is reserved for the Rerun bridge.\nNothing was saved.'
-        expect(mcpRegisterCardOf('mcp_register', { name: 'rerun' }, output)?.failure).toBe('The name "rerun" is reserved for the Rerun bridge.')
+        const output = 'The name "rerun" is reserved for the Moldwright bridge.\nNothing was saved.'
+        expect(mcpRegisterCardOf('mcp_register', { name: 'rerun' }, output)?.failure).toBe('The name "rerun" is reserved for the Moldwright bridge.')
     })
 
     it('reads the output reloaded from history behind its envelope', () => {

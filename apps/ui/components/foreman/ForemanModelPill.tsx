@@ -15,7 +15,7 @@ export function ForemanModelPill({ backend }: { backend: ForemanBackend }) {
     if (backend === 'engine') return open === true ? <ModelSelector agentId={FOREMAN_AGENT_ID} /> : null
     return (
         <TooltipDisabledReason reason={t('hubReason')}>
-            <ModelPillTrigger provider="rerun" label="Rerun Balanced" disabled />
+            <ModelPillTrigger provider="rerun" label="Moldwright Balanced" disabled />
         </TooltipDisabledReason>
     )
 }

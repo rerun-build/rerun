@@ -66,7 +66,7 @@ describe('foremanEngineBrief', () => {
 
     it('lists the library templates', () => {
         const listTemplates = brief.tools.find(tool => tool.name === 'list_templates')
-        expect(listTemplates?.description).toContain('Rerun library')
+        expect(listTemplates?.description).toContain('Moldwright library')
         expect(brief.tools.filter(tool => tool.name === 'list_templates')).toHaveLength(1)
     })
 

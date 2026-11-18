@@ -274,7 +274,7 @@
             "aiProviders": {
                 "label": "Voir ses fournisseurs d'IA",
                 "blurb": "Modèle utilisé, crédit et quotas",
-                "help": "Permet au coworker de savoir sur quel fournisseur d'IA et quel modèle il tourne, quels autres fournisseurs sont connectés au workspace, et ce qu'il reste sur chacun : le crédit Rerun et les limites d'un abonnement Claude, Codex ou OpenCode. Il ne peut rien modifier."
+                "help": "Permet au coworker de savoir sur quel fournisseur d'IA et quel modèle il tourne, quels autres fournisseurs sont connectés au workspace, et ce qu'il reste sur chacun : le crédit Moldwright et les limites d'un abonnement Claude, Codex ou OpenCode. Il ne peut rien modifier."
             },
             "askUser": {
                 "label": "Vous poser des questions",
@@ -303,8 +303,8 @@
             },
             "paidData": {
                 "label": "Leads, SEO et données sociales",
-                "blurb": "Payé avec vos crédits Rerun",
-                "help": "Permet au coworker de trouver des prospects, leurs e-mails pro, leurs numéros et des données d'entreprise, de consulter volumes de recherche, idées de mots-clés et backlinks, de lire les résultats Google et les commerces locaux, et de lire profils et publications publics sur LinkedIn, TikTok, Instagram, X, YouTube, Facebook et Reddit, sans abonnement Apollo, Semrush ou de scraping. Chaque appel est payé avec vos crédits Rerun, et le coworker vous demande d'abord de valider un coût estimé."
+                "blurb": "Payé avec vos crédits Moldwright",
+                "help": "Permet au coworker de trouver des prospects, leurs e-mails pro, leurs numéros et des données d'entreprise, de consulter volumes de recherche, idées de mots-clés et backlinks, de lire les résultats Google et les commerces locaux, et de lire profils et publications publics sur LinkedIn, TikTok, Instagram, X, YouTube, Facebook et Reddit, sans abonnement Apollo, Semrush ou de scraping. Chaque appel est payé avec vos crédits Moldwright, et le coworker vous demande d'abord de valider un coût estimé."
             },
             "requestSecret": {
                 "label": "Demander un identifiant",
@@ -419,7 +419,7 @@
     },
     "modelsShared": {
         "boxManageReason": "Seul un admin ou un manager de cette Box peut modifier ceci",
-        "creditPaused": "Les crédits Rerun sont en pause"
+        "creditPaused": "Les crédits Moldwright sont en pause"
     },
     "modelSelector": {
         "setUp": "Configurer un modèle",

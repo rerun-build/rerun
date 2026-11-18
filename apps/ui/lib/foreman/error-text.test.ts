@@ -17,7 +17,7 @@ describe('foremanErrorText', () => {
         expect(classifyChatError(foremanErrorText(apiError(529)))).toBe('overloaded')
     })
 
-    it('shows a refused Rerun key as neither the budget wall nor a signed-out connection', () => {
+    it('shows a refused Moldwright key as neither the budget wall nor a signed-out connection', () => {
         expect(classifyChatError(foremanErrorText(apiError(402)))).toBe('generic')
         expect(classifyChatError(foremanErrorText(apiError(401)))).toBe('generic')
         expect(foremanErrorText(apiError(402))).not.toContain('402')

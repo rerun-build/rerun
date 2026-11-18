@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   },
   description: site.description,
   applicationName: site.name,
-  keywords: ["Rerun", "AI agents", "autonomous agents", "agent orchestration", "AI workforce", "no-code agents"],
+  keywords: ["Moldwright", "AI agents", "autonomous agents", "agent orchestration", "AI workforce", "no-code agents"],
   authors: [{ name: site.name }],
   metadataBase: new URL(site.url),
   formatDetection: { telephone: false, email: false, address: false },

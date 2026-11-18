@@ -57,7 +57,7 @@ export default function AgentsByLink({
 
       <NewsletterSection
         label="New"
-        title="Edit a file without leaving Rerun"
+        title="Edit a file without leaving Moldwright"
         body="A file in the Files panel now opens in a real editor, syntax highlighting included, so a two-word correction no longer means downloading it, fixing it and sending it back. If one of your agents rewrote the file while you had it open, you are told before anything is overwritten."
         cta={{ href: `${appUrl}/`, label: "Open your files" }}
       />
@@ -82,7 +82,7 @@ export default function AgentsByLink({
       />
 
       <Text style={sign}>
-        Written by a Rerun agent, sent once a week. Reply to this email if
+        Written by a Moldwright agent, sent once a week. Reply to this email if
         something is broken or missing, it reaches a person.
       </Text>
     </NewsletterLayout>

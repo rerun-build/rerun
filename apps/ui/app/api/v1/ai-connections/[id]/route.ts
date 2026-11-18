@@ -14,7 +14,7 @@ export const PATCH = apiRoute({ auth: 'admin', body: updateConnectionSchema }, a
 )
 
 export const DELETE = apiRoute({ auth: 'admin' }, async ({ ctx, params }) => {
-    if (params.id === RERUN_CONNECTION_ID) throw new ApiError(400, 'Rerun comes with your plan and cannot be removed.')
+    if (params.id === RERUN_CONNECTION_ID) throw new ApiError(400, 'Moldwright comes with your plan and cannot be removed.')
     return answeringConnectionErrors(async () => {
         const target = await connectionTarget(ctx.workspace.id, params.id)
         return { released: await deleteAiConnection(ctx.workspace.id, target.id) }

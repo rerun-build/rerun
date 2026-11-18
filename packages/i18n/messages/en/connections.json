@@ -41,7 +41,7 @@
         },
         "summary": "{kind} · {count, plural, one {# model} other {# models}}",
         "summaryWindow": "{name} {percent}",
-        "creditPaused": "Rerun credits are paused",
+        "creditPaused": "Moldwright credits are paused",
         "creditUsed": "{percent}% of this month's credits used",
         "creditUsedUpOn": "Monthly credits used up, back on {date}",
         "creditUsedUpNextMonth": "Monthly credits used up, back next month",
@@ -75,13 +75,13 @@
             "anthropic": {
                 "title": "How to get your Anthropic key",
                 "step1": "Open the [Anthropic Console](https://console.anthropic.com/settings/keys) and sign in.",
-                "step2": "Click **Create Key** and name it, for example \"Rerun\".",
+                "step2": "Click **Create Key** and name it, for example \"Moldwright\".",
                 "step3": "Copy the key (it starts with `sk-ant-`) and paste it above. It is shown only once."
             },
             "openai": {
                 "title": "How to get your OpenAI key",
                 "step1": "Open [OpenAI API keys](https://platform.openai.com/api-keys) and sign in.",
-                "step2": "Click **Create new secret key** and name it, for example \"Rerun\".",
+                "step2": "Click **Create new secret key** and name it, for example \"Moldwright\".",
                 "step3": "Copy the key (it starts with `sk-`) and paste it above. It is shown only once."
             },
             "google": {
@@ -105,11 +105,11 @@
         }
     },
     "_context": {
-        "panel.groups.included": "Heading of the group of AI sources that come with the Rerun plan (the Rerun credit).",
+        "panel.groups.included": "Heading of the group of AI sources that come with the Moldwright plan (the Moldwright credit).",
         "panel.default.change": "Button that opens the picker to change the workspace default model.",
         "panel.default.via": "{source} is the name of the connection the default model runs through.",
         "panel.default.stopped": "{source} is the name of the broken connection.",
-        "status.paused": "Badge: the Rerun credit is paused.",
+        "status.paused": "Badge: the Moldwright credit is paused.",
         "status.ready": "Badge: the connection works.",
         "subtitle.apiKey": "{provider} is a provider name such as OpenAI or Anthropic.",
         "planLimits.updatedAgo": "{age} is a short duration already localized, such as 5m, 3h, 2d, or a short date.",
@@ -139,9 +139,9 @@
         "detail.readOnly": "{reason} is a sentence without a final period that explains why the controls are disabled.",
         "sources.summary": "One line under a connection in the AI providers list. {kind} is already translated, such as Plan, API key or Custom endpoint.",
         "sources.summaryWindow": "One usage figure of a subscription, in the line under it. {name} is a plan window such as Session or Weekly, {percent} is already formatted, such as 42%. Several are joined with ' · '.",
-        "sources.creditPaused": "Line under the Rerun connection: a member paused the Rerun credit.",
-        "sources.creditUsed": "Line under the Rerun connection. {percent} is a whole number from 0 to 100.",
-        "sources.creditUsedUpOn": "Line under the Rerun connection. {date} is a short date already localized, such as Nov 12.",
+        "sources.creditPaused": "Line under the Moldwright connection: a member paused the Moldwright credit.",
+        "sources.creditUsed": "Line under the Moldwright connection. {percent} is a whole number from 0 to 100.",
+        "sources.creditUsedUpOn": "Line under the Moldwright connection. {date} is a short date already localized, such as Nov 12.",
         "sources.creditBackOn": "A fragment the iOS app sets inside its own sentence \"credits used up, back {backOn}\". {date} is a short date already localized, such as Nov 12. Keep the preposition the target sentence needs.",
         "sources.creditBackNextMonth": "A fragment the iOS app sets inside its own sentence \"credits used up, back {backOn}\", in place of a date.",
         "sources.windows.session": "Name of a usage window of a Claude or ChatGPT subscription: the rolling limit of a few hours.",
@@ -151,8 +151,8 @@
         "sources.windows.modelWeekly": "Name of the weekly usage window of one model of a subscription. {label} is a model family such as Opus.",
         "sources.windows.modelWeeklyUnnamed": "Name of the weekly usage window of one model of a subscription, when the model is not named.",
         "sources.windowResets": "Follows a usage figure, such as '42% used, resets in 3h'. {when} is a short relative time already localized, such as 'in 3h'.",
-        "sources.tiers.fast": "Hint under the Rerun Fast model in a model picker.",
-        "sources.tiers.smart": "Hint under the Rerun Smart model in a model picker.",
+        "sources.tiers.fast": "Hint under the Moldwright Fast model in a model picker.",
+        "sources.tiers.smart": "Hint under the Moldwright Smart model in a model picker.",
         "sources.opencodePlan.go": "Hint under an OpenCode model in a model picker: paid by the OpenCode Go subscription.",
         "sources.opencodePlan.console": "Hint under an OpenCode model in a model picker: paid with the OpenCode Console credits.",
         "sources.opencodePlan.free": "Hint under an OpenCode model in a model picker: the provider serves it for free, nobody pays for its tokens.",
@@ -251,7 +251,7 @@
             "automations": "{count, plural, one {# automation} other {# automations}} will fall back to the workspace default model.",
             "both": "{agents} and {count, plural, one {# automation} other {# automations}} will fall back to the workspace default model."
         },
-        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to Rerun.",
+        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to Moldwright.",
         "nothingRuns": "The credential is removed from the Box. Nothing runs on it.",
         "released": {
             "agents": "{agents} now run on the workspace default model.",
@@ -302,9 +302,9 @@
         "signedInAgain": "Signed in again",
         "creditsTitle": "This month's credits",
         "topUp": "Top up",
-        "creditsUsedUpOn": "Coworkers running on Rerun are paused until the credits are back on {date}. Top up or pick another default model to keep them going.",
-        "creditsUsedUpNextMonth": "Coworkers running on Rerun are paused until the credits are back next month. Top up or pick another default model to keep them going.",
-        "creditsIncluded": "Comes with your Rerun plan. No key, nothing to set up.",
+        "creditsUsedUpOn": "Coworkers running on Moldwright are paused until the credits are back on {date}. Top up or pick another default model to keep them going.",
+        "creditsUsedUpNextMonth": "Coworkers running on Moldwright are paused until the credits are back next month. Top up or pick another default model to keep them going.",
+        "creditsIncluded": "Comes with your Moldwright plan. No key, nothing to set up.",
         "signInRejected": "This sign-in was rejected. Coworkers using it are stopped until you sign in again.",
         "signInExpired": "This sign-in expired. Coworkers using it are stopped until you sign in again.",
         "reconnected": "Your coworkers start again",
@@ -328,12 +328,12 @@
         },
         "default": {
             "via": "Via {source}. Coworkers with no model of their own run on it.",
-            "pausedPick": "Rerun credits are paused, so coworkers with no model of their own are paused too. Pick another model to keep them going.",
-            "pausedAdd": "Rerun credits are paused, so coworkers with no model of their own are paused too. Add a plan or an API key to keep them going.",
-            "usedUpOnPick": "Rerun credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
-            "usedUpOnAdd": "Rerun credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
-            "usedUpNextMonthPick": "Rerun credits are used up until they are back next month, so coworkers with no model of their own are paused. Pick another model to keep them going.",
-            "usedUpNextMonthAdd": "Rerun credits are used up until they are back next month, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+            "pausedPick": "Moldwright credits are paused, so coworkers with no model of their own are paused too. Pick another model to keep them going.",
+            "pausedAdd": "Moldwright credits are paused, so coworkers with no model of their own are paused too. Add a plan or an API key to keep them going.",
+            "usedUpOnPick": "Moldwright credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+            "usedUpOnAdd": "Moldwright credits are used up until they are back on {date}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+            "usedUpNextMonthPick": "Moldwright credits are used up until they are back next month, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+            "usedUpNextMonthAdd": "Moldwright credits are used up until they are back next month, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
             "stopped": "Coworkers with no model of their own are stopped. Fix {source} or pick another model.",
             "noOtherModel": "No other model is ready. Add a plan or an API key first.",
             "change": "Change"
@@ -378,7 +378,7 @@
         },
         "copied": "Copied",
         "copyMessage": "Copy a message for them",
-        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Rerun."
+        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Moldwright."
     },
     "claude": {
         "remarks": {
@@ -387,7 +387,7 @@
             "checking": "Checking",
             "connected": "All set!"
         },
-        "approveStep": "Approve Rerun on Claude",
+        "approveStep": "Approve Moldwright on Claude",
         "opening": "Claude is opening in a new tab",
         "openAgain": "Open Claude again",
         "open": "Open Claude",

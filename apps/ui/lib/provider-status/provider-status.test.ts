@@ -20,7 +20,7 @@ const summary = (components: ({ id: string; name: string } & { status: string })
 })
 
 describe('parseStatusSummary', () => {
-    it('ignores an incident on a component Rerun does not call', () => {
+    it('ignores an incident on a component Moldwright does not call', () => {
         const json = summary(
             [
                 { ...CLAUDE_API, status: 'operational' },

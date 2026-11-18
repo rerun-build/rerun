@@ -49,7 +49,7 @@ describe('ai_status', () => {
 
         const out = await status('rerun', 'rerun-balanced', rerun)
 
-        expect(out.current).toEqual({ connectionId: 'rerun', connectionName: 'Rerun', provider: 'Rerun', model: 'rerun-balanced', answeringModel: 'upstream/balanced-model' })
+        expect(out.current).toEqual({ connectionId: 'rerun', connectionName: 'Rerun', provider: 'Moldwright', model: 'rerun-balanced', answeringModel: 'upstream/balanced-model' })
         expect(out.workspaceDefault).toEqual({ connectionId: 'claude-1', model: 'claude-sonnet-4-5' })
         expect(out.rerunCredit).toEqual({ remainingCredits: 1234, usedCredits: 766, totalCredits: 2000, paused: false, resetsAt: '2026-12-01T00:00:00Z' })
         expect(hub.calls).toEqual(['rerun_credit'])

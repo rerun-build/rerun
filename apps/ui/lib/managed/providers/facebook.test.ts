@@ -46,8 +46,8 @@ describe('facebook provider oauth', () => {
     })
 
     it('labels the connection with the shared Pages', async () => {
-        stubGraph(() => ({ data: [{ name: 'Rerun AI' }, { name: 'Atelier Nord' }] }))
-        await expect(facebookProvider.oauth.accountEmail?.('business-token')).resolves.toBe('Rerun AI, Atelier Nord')
+        stubGraph(() => ({ data: [{ name: 'Moldwright AI' }, { name: 'Atelier Nord' }] }))
+        await expect(facebookProvider.oauth.accountEmail?.('business-token')).resolves.toBe('Moldwright AI, Atelier Nord')
     })
 })
 

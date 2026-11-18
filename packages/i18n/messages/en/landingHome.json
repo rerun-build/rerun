@@ -19,14 +19,14 @@
             "lead": "Hire <keep>AI <chip>Coworkers</chip></keep>",
             "tail": "They work like you."
         },
-        "subtitle": "Chatbots tell you what to do. AI Coworkers get the job done. Plug the LLM you already pay for into Rerun and give them work.",
+        "subtitle": "Chatbots tell you what to do. AI Coworkers get the job done. Plug the LLM you already pay for into Moldwright and give them work.",
         "cta": "Start a 5-day trial for {price}",
-        "productHuntAlt": "Support Rerun on Product Hunt",
-        "trust": "{count, number}+ users trust Rerun for their business",
+        "productHuntAlt": "Support Moldwright on Product Hunt",
+        "trust": "{count, number}+ users trust Moldwright for their business",
         "pillLeads": {
             "jobs": "Hire a",
             "tasks": "Hire a Coworker to",
-            "sectors": "Rerun for"
+            "sectors": "Moldwright for"
         },
         "tiles": {
             "tour-research": {

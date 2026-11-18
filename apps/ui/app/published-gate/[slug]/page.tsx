@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic'
 type Params = { slug: string }
 type Search = Record<string, string | string[] | undefined>
 
-const RERUN_BRAND: GateBrand = { name: 'Rerun', iconUrl: null }
+const RERUN_BRAND: GateBrand = { name: 'Moldwright', iconUrl: null }
 
 function param(search: Search, key: string): string | undefined {
     const value = search[key]
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         description,
         robots: { index: false, follow: false },
         ...(origin ? { metadataBase: new URL(origin) } : {}),
-        openGraph: { title, description, images, siteName: 'Rerun' },
+        openGraph: { title, description, images, siteName: 'Moldwright' },
         twitter: { card: 'summary_large_image', title, description, images },
     }
 }

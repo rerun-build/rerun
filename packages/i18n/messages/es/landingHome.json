@@ -4,14 +4,14 @@
             "lead": "Contrata <keep><chip>Coworkers</chip> de IA</keep>",
             "tail": "Trabajan como tú."
         },
-        "subtitle": "Los chatbots te dicen qué hacer. Los Coworkers de IA hacen el trabajo. Conecta a Rerun el LLM que ya pagas y dales trabajo.",
+        "subtitle": "Los chatbots te dicen qué hacer. Los Coworkers de IA hacen el trabajo. Conecta a Moldwright el LLM que ya pagas y dales trabajo.",
         "cta": "Prueba 5 días por {price}",
-        "productHuntAlt": "Apoya a Rerun en Product Hunt",
-        "trust": "Más de {count, number} usuarios confían su negocio a Rerun",
+        "productHuntAlt": "Apoya a Moldwright en Product Hunt",
+        "trust": "Más de {count, number} usuarios confían su negocio a Moldwright",
         "pillLeads": {
             "jobs": "Contrata un",
             "tasks": "Contrata un Coworker para",
-            "sectors": "Rerun para"
+            "sectors": "Moldwright para"
         },
         "tiles": {
             "tour-research": {

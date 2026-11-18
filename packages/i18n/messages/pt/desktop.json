@@ -5,7 +5,7 @@
         "description": "A tela em que este coworker trabalha. O que você fizer aqui, ele encontra depois.",
         "takeoverDescription": "Você está no navegador do seu coworker. Clique em Concluído quando ele puder continuar.",
         "takeoverHoldsBrowser": "O navegador do seu coworker já está aberto para esta solicitação.",
-        "clipboardDenied": "Seu navegador não permitiu que o Rerun lesse a área de transferência.",
+        "clipboardDenied": "Seu navegador não permitiu que o Moldwright lesse a área de transferência.",
         "disconnectedDescription": "A conexão com a máquina foi encerrada. Nada nela foi perdido.",
         "reconnect": "Reconectar",
         "tryAgain": "Tentar novamente"

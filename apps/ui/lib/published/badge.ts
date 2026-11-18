@@ -21,7 +21,7 @@ function badgeMarkup(slug: string): string {
     return (
         `<style>${BADGE_STYLE}</style>` +
         `<div class="badge">` +
-        `<a href="${landing}" target="_blank" rel="noopener"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="${R_PATH}" fill="currentColor"/></svg>Made with Rerun</a>` +
+        `<a href="${landing}" target="_blank" rel="noopener"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="${R_PATH}" fill="currentColor"/></svg>Made with Moldwright</a>` +
         `<a class="report" href="${report}">Report</a>` +
         `<button type="button" aria-label="Hide">&#x2715;</button>` +
         `</div>`

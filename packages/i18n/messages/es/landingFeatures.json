@@ -29,7 +29,7 @@
             "title": "Contrata un Coworker de IA, no escribas un prompt.",
             "lede": "Dale un puesto, las apps que necesita y una hora para trabajar. Hace el trabajo en tus propias herramientas y te informa. Sin diagramas de flujo que dibujar, sin prompts que pulir.",
             "metaTitle": "Coworkers de IA: contrata un agente en vez de montar un workflow",
-            "metaDescription": "Un Coworker de Rerun recibe un puesto, tus apps y un horario, y luego hace el trabajo en tus propias herramientas y te informa. Sin diagramas de flujo ni prompts que pulir.",
+            "metaDescription": "Un Coworker de Moldwright recibe un puesto, tus apps y un horario, y luego hace el trabajo en tus propias herramientas y te informa. Sin diagramas de flujo ni prompts que pulir.",
             "stageCaption": "Dos Coworkers trabajando en la misma Box, contando lo que acaban de hacer.",
             "points": {
                 "first": {
@@ -52,7 +52,7 @@
                 },
                 "second": {
                     "question": "¿Necesito saber programar o escribir prompts?",
-                    "answer": "No. Describes el puesto en una frase y Rerun lo convierte en un Coworker, elige las apps que necesita y fija su horario. Todo lo que configuró sigue siendo legible y editable después."
+                    "answer": "No. Describes el puesto en una frase y Moldwright lo convierte en un Coworker, elige las apps que necesita y fija su horario. Todo lo que configuró sigue siendo legible y editable después."
                 },
                 "third": {
                     "question": "¿Cuántos Coworkers puedo contratar?",
@@ -64,9 +64,9 @@
         "coworker-manager": {
             "crumb": "Mánager de Coworkers",
             "title": "Un mánager para todos los Coworkers que contrates.",
-            "lede": "Rerun gestiona tu workspace: conoce a cada Coworker, contrata a los que te faltan y pasa cada petición a quien se encarga de ella. Háblale en voz alta o déjalo en piloto automático mientras no estás.",
+            "lede": "Moldwright gestiona tu workspace: conoce a cada Coworker, contrata a los que te faltan y pasa cada petición a quien se encarga de ella. Háblale en voz alta o déjalo en piloto automático mientras no estás.",
             "metaTitle": "Mánager de Coworkers: dirige tu equipo de IA por voz o en piloto automático",
-            "metaDescription": "Rerun gestiona tu workspace: contrata los Coworkers que necesitas, pasa cada petición al adecuado, te escucha cuando mantienes Espacio y funciona en piloto automático.",
+            "metaDescription": "Moldwright gestiona tu workspace: contrata los Coworkers que necesitas, pasa cada petición al adecuado, te escucha cuando mantienes Espacio y funciona en piloto automático.",
             "stageCaption": "Mantén Espacio y di lo que necesitas: el mánager se lo pasa al Coworker que se encarga.",
             "points": {
                 "first": {
@@ -102,7 +102,7 @@
             "faq": {
                 "first": {
                     "question": "¿Qué es el mánager de Coworkers?",
-                    "answer": "Es el propio Rerun, el mánager de tu workspace. Conoce a cada Coworker que contrataste, qué hace cada uno y en qué está trabajando. Le dices lo que necesitas y él se lo dice al Coworker adecuado, o contrata uno si el puesto aún no tiene a nadie."
+                    "answer": "Es el propio Moldwright, el mánager de tu workspace. Conoce a cada Coworker que contrataste, qué hace cada uno y en qué está trabajando. Le dices lo que necesitas y él se lo dice al Coworker adecuado, o contrata uno si el puesto aún no tiene a nadie."
                 },
                 "second": {
                     "question": "¿Cómo funciona dirigir por voz?",
@@ -194,7 +194,7 @@
             "title": "Autónomo, hasta que necesita un sí.",
             "lede": "Tu Coworker trabaja solo y se detiene antes de cualquier cosa importante: un pago, un envío, un borrado. Pregunta, espera, y cualquiera del equipo puede responder.",
             "metaTitle": "Humano en el circuito: tu agente de IA pregunta antes de actuar",
-            "metaDescription": "Un Coworker de Rerun trabaja solo y se detiene antes de cualquier cosa importante. Pregunta, espera un sí, y cualquiera del equipo puede responder.",
+            "metaDescription": "Un Coworker de Moldwright trabaja solo y se detiene antes de cualquier cosa importante. Pregunta, espera un sí, y cualquiera del equipo puede responder.",
             "stageCaption": "Un Coworker que se detiene a mitad de la ejecución, pregunta y espera a que alguien responda.",
             "points": {
                 "first": {
@@ -231,7 +231,7 @@
             "title": "Activo 24/7, en servidores en Europa.",
             "lede": "Tu workspace tiene su propia máquina, alojada en Alemania. Nunca duerme, así que la ejecución de las 7:00 ocurre tengas el portátil abierto o no.",
             "metaTitle": "Agentes de IA que funcionan 24/7 en servidores en Europa",
-            "metaDescription": "Cada workspace de Rerun tiene su propia máquina, alojada en Alemania. Tus Coworkers trabajan según su horario por la noche, el fin de semana y en tus vacaciones, con el portátil cerrado.",
+            "metaDescription": "Cada workspace de Moldwright tiene su propia máquina, alojada en Alemania. Tus Coworkers trabajan según su horario por la noche, el fin de semana y en tus vacaciones, con el portátil cerrado.",
             "stageCaption": "El mismo workspace a las 7:00 y a las 3:00: la ejecución ocurre igual.",
             "points": {
                 "first": {
@@ -305,7 +305,7 @@
             "title": "Una cuenta, un workspace por negocio.",
             "lede": "Un cliente, una marca, un proyecto personal: cada uno tiene su propio workspace, sus Coworkers, sus apps conectadas y su cerebro. Cambia desde la pastilla de la esquina.",
             "metaTitle": "Workspaces: mantén separado cada negocio, cliente o marca",
-            "metaDescription": "Una cuenta de Rerun tiene tantos workspaces como necesites, cada uno con sus Coworkers, sus apps y su cerebro. Nada pasa de uno a otro.",
+            "metaDescription": "Una cuenta de Moldwright tiene tantos workspaces como necesites, cada uno con sus Coworkers, sus apps y su cerebro. Nada pasa de uno a otro.",
             "stageCaption": "El selector: todos tus negocios en una cuenta, sin mezclar ninguno.",
             "points": {
                 "first": {
@@ -342,7 +342,7 @@
             "title": "Invita a todo tu equipo, sin coste extra.",
             "lede": "Los puestos son gratis. Todos ven el mismo tablero, hablan con los mismos Coworkers y pueden responder cuando uno de ellos pide un sí.",
             "metaTitle": "Invita a todo tu equipo: puestos gratis en todos los planes",
-            "metaDescription": "Rerun no cobra por puesto. Invita a todos, trabajad en el mismo tablero, hablad con los mismos Coworkers y deja que quien esté disponible apruebe una ejecución.",
+            "metaDescription": "Moldwright no cobra por puesto. Invita a todos, trabajad en el mismo tablero, hablad con los mismos Coworkers y deja que quien esté disponible apruebe una ejecución.",
             "stageCaption": "El mismo tablero, los mismos Coworkers, varias personas a la vez.",
             "points": {
                 "first": {

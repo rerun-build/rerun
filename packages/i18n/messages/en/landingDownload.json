@@ -20,9 +20,9 @@
         "alternatives.windowsArm64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads.",
         "alternatives.windowsX64": "Link under the download button, for a visitor whose computer has the other chip than the one the button downloads."
     },
-    "title": "Download the Rerun desktop app",
+    "title": "Download the Moldwright desktop app",
     "eyebrow": "Desktop app",
-    "headline": "Rerun on your desktop",
+    "headline": "Moldwright on your desktop",
     "description": "Your coworkers in a window of their own, with notifications, an icon in the menu bar or the system tray, and Quick ask.",
     "mac": "Download for macOS",
     "windows": "Download for Windows",
@@ -35,7 +35,7 @@
         "windowsX64": "Download for Windows x64"
     },
     "beta": "Beta",
-    "webApp": "Rerun also runs in your browser: <link>open the web app</link>.",
+    "webApp": "Moldwright also runs in your browser: <link>open the web app</link>.",
     "platforms": {
         "label": "Download",
         "title": "macOS, Windows and Linux",
@@ -62,18 +62,18 @@
     },
     "features": {
         "label": "What the app adds",
-        "title": "Everything in Rerun, a shortcut away",
+        "title": "Everything in Moldwright, a shortcut away",
         "notifications": {
             "title": "Notifications that bring you back",
             "body": "Your coworkers reach you as soon as you are in another app, and a click opens the conversation."
         },
         "quickAsk": {
             "title": "Quick ask",
-            "body": "⌘⇧Space on a Mac, Ctrl+Shift+Space on Windows and Linux: a question for your Chief of Staff from any app, and the answer waits in Rerun."
+            "body": "⌘⇧Space on a Mac, Ctrl+Shift+Space on Windows and Linux: a question for your Chief of Staff from any app, and the answer waits in Moldwright."
         },
         "always": {
             "title": "Always running",
-            "body": "Closing the window keeps Rerun in the menu bar or the system tray, with the count of what waits for you on its icon."
+            "body": "Closing the window keeps Moldwright in the menu bar or the system tray, with the count of what waits for you on its icon."
         }
     }
 }

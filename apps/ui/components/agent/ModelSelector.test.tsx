@@ -25,7 +25,7 @@ vi.mock('@/stores/board.store', () => ({ useBoardStore: (select: (state: { agent
 
 const connection = (id: string, provider: string, models: string[]) => ({
     id,
-    name: id === 'rerun' ? 'Rerun' : 'Claude',
+    name: id === 'rerun' ? 'Moldwright' : 'Claude',
     provider,
     models,
     extraModels: [],
@@ -113,7 +113,7 @@ describe('ModelSelector override', REIMPORT_TIMEOUT, () => {
         expect(onReadyChange).toHaveBeenLastCalledWith(true)
     })
 
-    it('repoints a pin that no longer resolves at the Box default, not at Rerun', async () => {
+    it('repoints a pin that no longer resolves at the Box default, not at Moldwright', async () => {
         mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'gone', model: 'gpt-6-astra', resolvedConnectionId: 'gone', resolvedModel: 'gpt-6-astra' }))
         await mount('stale-pin')
         expect(storedOverride('stale-pin')).toEqual({ connectionId: 'claude-1', model: 'claude-sonnet-5-5' })

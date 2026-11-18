@@ -152,10 +152,10 @@
         "reload": "Reload",
         "available": {
             "title": "New version available",
-            "description": "Reload to get the latest Rerun."
+            "description": "Reload to get the latest Moldwright."
         },
         "required": {
-            "title": "Rerun was updated",
+            "title": "Moldwright was updated",
             "description": "A new version is live. Reload to continue."
         }
     },
@@ -238,6 +238,6 @@
     "boxNameSuggestions": "Or pick a name",
     "dashboard": {
         "metaTitle": "Dashboard",
-        "metaDescription": "Your Boxes and coworkers on Rerun."
+        "metaDescription": "Your Boxes and coworkers on Moldwright."
     }
 }

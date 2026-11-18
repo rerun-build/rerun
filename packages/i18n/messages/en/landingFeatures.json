@@ -36,7 +36,7 @@
             "title": "Hire an AI Coworker, don’t write a prompt.",
             "lede": "Give it a job, the apps it needs and a time to run. It does the work in your own tools and reports back: no flow chart to draw, no prompt to engineer.",
             "metaTitle": "AI Coworkers: hire an agent instead of building a workflow",
-            "metaDescription": "A Rerun Coworker takes a job, your apps and a schedule, then does the work in your own tools and reports back. No flow chart, no prompt engineering.",
+            "metaDescription": "A Moldwright Coworker takes a job, your apps and a schedule, then does the work in your own tools and reports back. No flow chart, no prompt engineering.",
             "stageCaption": "Two Coworkers at work in the same Box, saying what they just did.",
             "points": {
                 "first": {
@@ -59,7 +59,7 @@
                 },
                 "second": {
                     "question": "Do I need to know how to code, or to prompt?",
-                    "answer": "No. You describe the job in one sentence and Rerun turns it into a Coworker, picks the apps it needs and sets its schedule. Everything it set up stays readable and editable afterwards."
+                    "answer": "No. You describe the job in one sentence and Moldwright turns it into a Coworker, picks the apps it needs and sets its schedule. Everything it set up stays readable and editable afterwards."
                 },
                 "third": {
                     "question": "How many Coworkers can I hire?",
@@ -71,9 +71,9 @@
         "coworker-manager": {
             "crumb": "Coworker manager",
             "title": "One manager for every Coworker you hire.",
-            "lede": "Rerun manages your workspace: it knows every Coworker, hires the ones you are missing, and passes each request to whoever handles it. Talk to it by voice, or leave it on autopilot while you are off.",
+            "lede": "Moldwright manages your workspace: it knows every Coworker, hires the ones you are missing, and passes each request to whoever handles it. Talk to it by voice, or leave it on autopilot while you are off.",
             "metaTitle": "Coworker manager: run your AI team by voice or on autopilot",
-            "metaDescription": "Rerun manages your workspace: it hires the Coworkers you need, passes each request to the right one, listens when you hold Space, and runs on autopilot.",
+            "metaDescription": "Moldwright manages your workspace: it hires the Coworkers you need, passes each request to the right one, listens when you hold Space, and runs on autopilot.",
             "stageCaption": "Hold Space, say what you need: the manager passes it to the Coworker that handles it.",
             "points": {
                 "first": {
@@ -109,7 +109,7 @@
             "faq": {
                 "first": {
                     "question": "What is the Coworker manager?",
-                    "answer": "It is Rerun itself, the manager of your workspace. It knows every Coworker you hired, what each one does and what it is working on. You tell it what you need and it tells the right Coworker, or hires one if the job has no owner yet."
+                    "answer": "It is Moldwright itself, the manager of your workspace. It knows every Coworker you hired, what each one does and what it is working on. You tell it what you need and it tells the right Coworker, or hires one if the job has no owner yet."
                 },
                 "second": {
                     "question": "How does managing by voice work?",
@@ -201,7 +201,7 @@
             "title": "Autonomous, until it needs a yes.",
             "lede": "Your Coworker runs alone and stops before anything consequential: a payment, a send, a deletion. It asks, waits, and anyone on the team can answer.",
             "metaTitle": "Human in the loop: your AI agent asks before it acts",
-            "metaDescription": "A Rerun Coworker runs on its own and stops before anything consequential. It asks, waits for a yes, and anyone on the team can answer.",
+            "metaDescription": "A Moldwright Coworker runs on its own and stops before anything consequential. It asks, waits for a yes, and anyone on the team can answer.",
             "stageCaption": "A Coworker that stops mid-run, asks, and waits for someone to answer.",
             "points": {
                 "first": {
@@ -238,7 +238,7 @@
             "title": "Runs 24/7, on servers in Europe.",
             "lede": "Your workspace gets its own machine, hosted in Germany. It never sleeps, so the 7am run happens whether your laptop is open or not.",
             "metaTitle": "AI agents that run 24/7 on servers in Europe",
-            "metaDescription": "Each Rerun workspace gets its own machine, hosted in Germany. Your Coworkers run on schedule through the night, the weekend and your holidays, laptop shut.",
+            "metaDescription": "Each Moldwright workspace gets its own machine, hosted in Germany. Your Coworkers run on schedule through the night, the weekend and your holidays, laptop shut.",
             "stageCaption": "The same workspace at 7am and at 3am: the run happens either way.",
             "points": {
                 "first": {
@@ -312,7 +312,7 @@
             "title": "One account, a workspace per business.",
             "lede": "A client, a brand, a side project: each gets its own workspace, its own Coworkers, its own connected apps and its own brain. Switch from the pill in the corner.",
             "metaTitle": "Workspaces: keep each business, client or brand apart",
-            "metaDescription": "One Rerun account carries as many workspaces as you need: each with its own Coworkers, its own apps and its own brain. Nothing crosses between them.",
+            "metaDescription": "One Moldwright account carries as many workspaces as you need: each with its own Coworkers, its own apps and its own brain. Nothing crosses between them.",
             "stageCaption": "The switcher: every business on one account, none of them mixed.",
             "points": {
                 "first": {
@@ -349,7 +349,7 @@
             "title": "Invite your whole team, at no extra cost.",
             "lede": "Seats are free. Everyone sees the same board, talks to the same Coworkers, and can answer when one of them asks for a yes.",
             "metaTitle": "Invite your whole team: free seats on every plan",
-            "metaDescription": "Rerun does not charge per seat. Invite everyone, work on the same board, talk to the same Coworkers, and let whoever is around approve a run.",
+            "metaDescription": "Moldwright does not charge per seat. Invite everyone, work on the same board, talk to the same Coworkers, and let whoever is around approve a run.",
             "stageCaption": "The same board, the same Coworkers, several people on it at once.",
             "points": {
                 "first": {

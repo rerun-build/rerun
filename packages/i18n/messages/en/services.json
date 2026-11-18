@@ -94,7 +94,7 @@
         "configured": "{name} configured",
         "connectTitle": "Connect {name}",
         "signInOAuth": "Sign in to {name} so your agent can use it.",
-        "signInManaged": "Sign in with {name} so your agent can use it. Rerun handles the connection for you.",
+        "signInManaged": "Sign in with {name} so your agent can use it. Moldwright handles the connection for you.",
         "setUp": "Set up {name}",
         "authentication": "Authentication",
         "backToMethods": "Back to methods",

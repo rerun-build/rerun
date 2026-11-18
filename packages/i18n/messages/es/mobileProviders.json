@@ -14,7 +14,7 @@
         "agentsFallBack": "Pasarán al modelo predeterminado del workspace: {agents}.",
         "automationsFallBack": "{count, plural, one {1 automatización pasará} other {# automatizaciones pasarán}} al modelo predeterminado del workspace.",
         "agentsAndAutomationsFallBack": "Pasarán al modelo predeterminado del workspace: {agents} y {count, plural, one {1 automatización} other {# automatizaciones}}.",
-        "holdsDefault": "Tiene el modelo predeterminado del workspace, que se quitará: cada coworker que no haya elegido ninguno volverá a Rerun.",
+        "holdsDefault": "Tiene el modelo predeterminado del workspace, que se quitará: cada coworker que no haya elegido ninguno volverá a Moldwright.",
         "nothingRuns": "Se elimina la credencial. No hay nada funcionando con ella."
     },
     "list": {
@@ -29,8 +29,8 @@
         "apiKeysPitch": "Paga directamente a tu proveedor, por token.",
         "addApiKey": "Añadir clave de API",
         "via": "Con {name}",
-        "creditsUsedUpPickModel": "Los créditos de Rerun están agotados hasta que vuelvan {backOn}, así que los coworkers sin modelo propio están en pausa. Elige otro modelo para que sigan.",
-        "creditsUsedUpAddSource": "Los créditos de Rerun están agotados hasta que vuelvan {backOn}, así que los coworkers sin modelo propio están en pausa. Añade un plan o una clave de API para que sigan.",
+        "creditsUsedUpPickModel": "Los créditos de Moldwright están agotados hasta que vuelvan {backOn}, así que los coworkers sin modelo propio están en pausa. Elige otro modelo para que sigan.",
+        "creditsUsedUpAddSource": "Los créditos de Moldwright están agotados hasta que vuelvan {backOn}, así que los coworkers sin modelo propio están en pausa. Añade un plan o una clave de API para que sigan.",
         "defaultBroken": "Los coworkers sin modelo propio están detenidos. Arregla {name} o elige otro modelo.",
         "signInAgain": "Volver a iniciar sesión",
         "addKey": "Añadir clave"
@@ -60,8 +60,8 @@
     "credit": {
         "title": "Créditos de este mes",
         "percent": "{percent} %",
-        "usedUp": "Los coworkers que funcionan con Rerun están en pausa hasta que vuelvan los créditos {backOn}. Elige otro modelo predeterminado para que sigan.",
-        "included": "Viene con tu plan de Rerun. Sin clave, nada que configurar."
+        "usedUp": "Los coworkers que funcionan con Moldwright están en pausa hasta que vuelvan los créditos {backOn}. Elige otro modelo predeterminado para que sigan.",
+        "included": "Viene con tu plan de Moldwright. Sin clave, nada que configurar."
     },
     "reconnect": {
         "signInRejected": "Este inicio de sesión fue rechazado. Los coworkers que lo usan están detenidos hasta que vuelvas a iniciar sesión.",
@@ -121,7 +121,7 @@
     "claude": {
         "claudeTokenIsApiKey": "Esta es una clave API de Anthropic. Añádela como conexión Anthropic (API).",
         "claudeTokenIsCode": "Ese es el código de Claude. Haz clic primero en Get token y luego pega el código aquí.",
-        "approve": "Aprueba Rerun en Claude",
+        "approve": "Aprueba Moldwright en Claude",
         "open": "Abrir Claude",
         "openAgain": "Volver a abrir Claude",
         "pasteStep": "Pega el código",
@@ -140,7 +140,7 @@
         "enterStep": "Introduce el código en OpenAI",
         "copied": "Copiado",
         "copyAdminMessage": "Copiar un mensaje para tu admin",
-        "adminMessage": "¡Hola! ¿Podrías activar \"Device code authorization for Codex\" en los ajustes de nuestro workspace de ChatGPT? Lo necesito para conectar mi plan de ChatGPT a Rerun.",
+        "adminMessage": "¡Hola! ¿Podrías activar \"Device code authorization for Codex\" en los ajustes de nuestro workspace de ChatGPT? Lo necesito para conectar mi plan de ChatGPT a Moldwright.",
         "copyCode": "Copiar código",
         "openOpenAI": "Abrir OpenAI",
         "enterHint": "Introdúcelo en la página de OpenAI y apruébalo. Esta pantalla lo detecta sola.",

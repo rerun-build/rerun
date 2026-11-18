@@ -285,7 +285,7 @@ async function resolveSpaceId(actor: Actor, requested?: string): Promise<string>
     const [{ data: all }, manageable] = await Promise.all([selectMany(supabase, 'spaces', ['id', 'name'] as const, { workspace_id: actor.workspaceId }), manageableSpaceIds(actor)])
     const spaces = keepVisible(all ?? [], manageable, space => space.id)
 
-    if (spaces.length === 0) throw new Error(all?.length ? 'You manage no Box in this workspace. Create one first, or ask an admin to make you a manager of one.' : 'This account has no Box yet — create one in the Rerun app first.')
+    if (spaces.length === 0) throw new Error(all?.length ? 'You manage no Box in this workspace. Create one first, or ask an admin to make you a manager of one.' : 'This account has no Box yet — create one in the Moldwright app first.')
     if (requested) {
         if (!spaces.some(space => space.id === requested)) throw new Error('Box not found')
         return requested
@@ -1066,7 +1066,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 message:
                     status === 'active'
                         ? `${name} is installed and its tools are available to the coworker.`
-                        : `${name} is declared on the coworker and waiting for the account owner to connect it from the Rerun app (coworker panel, Services tab). Do not ask anyone for credentials here.`,
+                        : `${name} is declared on the coworker and waiting for the account owner to connect it from the Moldwright app (coworker panel, Services tab). Do not ask anyone for credentials here.`,
             }
         }
 

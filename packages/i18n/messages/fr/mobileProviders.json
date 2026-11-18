@@ -14,7 +14,7 @@
         "agentsFallBack": "Passeront au modèle par défaut du workspace : {agents}.",
         "automationsFallBack": "{count, plural, one {1 automatisation passera} other {# automatisations passeront}} au modèle par défaut du workspace.",
         "agentsAndAutomationsFallBack": "Passeront au modèle par défaut du workspace : {agents} et {count, plural, one {1 automatisation} other {# automatisations}}.",
-        "holdsDefault": "Elle porte le modèle par défaut du workspace, qui sera retiré : chaque coworker qui n'en a choisi aucun repassera sur Rerun.",
+        "holdsDefault": "Elle porte le modèle par défaut du workspace, qui sera retiré : chaque coworker qui n'en a choisi aucun repassera sur Moldwright.",
         "nothingRuns": "L'identifiant est supprimé. Rien ne tourne dessus."
     },
     "list": {
@@ -29,8 +29,8 @@
         "apiKeysPitch": "Payez directement votre fournisseur, au token.",
         "addApiKey": "Ajouter une clé API",
         "via": "Via {name}",
-        "creditsUsedUpPickModel": "Les crédits Rerun sont épuisés jusqu'à leur retour {backOn}, donc les coworkers sans modèle à eux sont en pause. Choisissez un autre modèle pour qu'ils continuent.",
-        "creditsUsedUpAddSource": "Les crédits Rerun sont épuisés jusqu'à leur retour {backOn}, donc les coworkers sans modèle à eux sont en pause. Ajoutez un forfait ou une clé API pour qu'ils continuent.",
+        "creditsUsedUpPickModel": "Les crédits Moldwright sont épuisés jusqu'à leur retour {backOn}, donc les coworkers sans modèle à eux sont en pause. Choisissez un autre modèle pour qu'ils continuent.",
+        "creditsUsedUpAddSource": "Les crédits Moldwright sont épuisés jusqu'à leur retour {backOn}, donc les coworkers sans modèle à eux sont en pause. Ajoutez un forfait ou une clé API pour qu'ils continuent.",
         "defaultBroken": "Les coworkers sans modèle à eux sont arrêtés. Réparez {name} ou choisissez un autre modèle.",
         "signInAgain": "Se reconnecter",
         "addKey": "Ajouter une clé"
@@ -60,8 +60,8 @@
     "credit": {
         "title": "Crédits du mois",
         "percent": "{percent} %",
-        "usedUp": "Les coworkers qui tournent sur Rerun sont en pause jusqu'au retour des crédits {backOn}. Choisissez un autre modèle par défaut pour qu'ils continuent.",
-        "included": "Inclus dans votre forfait Rerun. Pas de clé, rien à configurer."
+        "usedUp": "Les coworkers qui tournent sur Moldwright sont en pause jusqu'au retour des crédits {backOn}. Choisissez un autre modèle par défaut pour qu'ils continuent.",
+        "included": "Inclus dans votre forfait Moldwright. Pas de clé, rien à configurer."
     },
     "reconnect": {
         "signInRejected": "Cette connexion a été refusée. Les coworkers qui l'utilisent sont arrêtés jusqu'à ce que vous vous reconnectiez.",
@@ -121,7 +121,7 @@
     "claude": {
         "claudeTokenIsApiKey": "Ceci est une clé API Anthropic. Ajoutez-la plutôt comme connexion Anthropic (API).",
         "claudeTokenIsCode": "C'est le code de Claude. Cliquez d'abord sur Get token, puis collez le code ici.",
-        "approve": "Autorisez Rerun sur Claude",
+        "approve": "Autorisez Moldwright sur Claude",
         "open": "Ouvrir Claude",
         "openAgain": "Rouvrir Claude",
         "pasteStep": "Collez le code",
@@ -140,7 +140,7 @@
         "enterStep": "Saisissez le code sur OpenAI",
         "copied": "Copié",
         "copyAdminMessage": "Copier un message à lui transmettre",
-        "adminMessage": "Bonjour ! Pourriez-vous activer « Device code authorization for Codex » dans les réglages de notre workspace ChatGPT ? J'en ai besoin pour connecter mon forfait ChatGPT à Rerun.",
+        "adminMessage": "Bonjour ! Pourriez-vous activer « Device code authorization for Codex » dans les réglages de notre workspace ChatGPT ? J'en ai besoin pour connecter mon forfait ChatGPT à Moldwright.",
         "copyCode": "Copier le code",
         "openOpenAI": "Ouvrir OpenAI",
         "enterHint": "Saisissez-le sur la page d'OpenAI et validez. Cet écran le détecte tout seul.",

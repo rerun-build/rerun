@@ -10,7 +10,7 @@ describe('readableToolError', () => {
         expect(readableToolError('<tool_use_error>Error: No such tool available: memory_recall</tool_use_error>', t)).toBe('Tool not found')
     })
 
-    it('reads a tool name a model got wrong in the Rerun loop as a tool not found, without the list of every tool', () => {
+    it('reads a tool name a model got wrong in the Moldwright loop as a tool not found, without the list of every tool', () => {
         expect(readableToolError("Model tried to call unavailable tool 'mcp__rerun__schedule_list'. Available tools: fs_read, fs_write, schedule_list.", t)).toBe('Tool not found')
     })
 

@@ -22,11 +22,11 @@ describe('agent models', () => {
     beforeEach(() => {
         Object.values(mocks).forEach(mock => mock.mockReset())
         mocks.resolveAgentTarget.mockResolvedValue({ conn: { host: 'box' }, engineAgentId: 'eng-1', contentLocked: false })
-        mocks.listConnections.mockResolvedValue({ connections: [connection({}), connection({ id: 'rerun', name: 'Rerun', provider: 'openrouter', models: ['rerun-fast', 'rerun-max'] }), connection({ id: 'gone', connected: false })], default: null })
+        mocks.listConnections.mockResolvedValue({ connections: [connection({}), connection({ id: 'rerun', name: 'Moldwright', provider: 'openrouter', models: ['rerun-fast', 'rerun-max'] }), connection({ id: 'gone', connected: false })], default: null })
         mocks.getAgent.mockResolvedValue({ config: { connectionId: 'claude', model: 'claude-opus-5-5' }, resolvedConnectionId: 'claude', resolvedModel: 'claude-opus-5-5' })
     })
 
-    it('lists the connected connections as the web picker does, Rerun first, with the pin and what runs', async () => {
+    it('lists the connected connections as the web picker does, Moldwright first, with the pin and what runs', async () => {
         const models = await readAgentModels(ctx, 'a1')
         expect(models.groups.map(group => group.connectionId)).toEqual(['rerun', 'claude'])
         expect(models.pinned).toEqual({ connectionId: 'claude', model: 'claude-opus-5-5' })

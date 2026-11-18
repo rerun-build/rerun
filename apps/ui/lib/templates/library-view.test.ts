@@ -34,7 +34,7 @@ function template(overrides: Partial<LibraryTemplate> = {}): LibraryTemplate {
 const creator = (slug: string): LibraryCreator => ({ slug, name: slug.toUpperCase(), kind: 'freelancer', avatarUrl: null, bannerUrl: null, location: null, bio: null, links: { x: null, linkedin: null, github: null, website: null }, verified: true })
 
 describe('creatorSummaries', () => {
-    it('groups by creator, most templates first, and leaves the Rerun team out', () => {
+    it('groups by creator, most templates first, and leaves the Moldwright team out', () => {
         const templates = [template({ slug: 'a', creator: creator('ada') }), template({ slug: 'b', creator: creator('bob') }), template({ slug: 'c', creator: creator('bob') }), template({ slug: 'd' })]
         expect(creatorSummaries(templates).map(c => [c.slug, c.templates.length])).toEqual([
             ['bob', 2],

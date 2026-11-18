@@ -1,6 +1,6 @@
 {
     "site": {
-        "title": "Rerun: AI Employees That Run on Your ChatGPT or Claude Plan",
+        "title": "Moldwright: AI Employees That Run on Your ChatGPT or Claude Plan",
         "description": "Hire AI employees for sales, support, marketing and admin. They run on your ChatGPT or Claude plan, included credits or your API key. Free {trialDays}-day trial."
     },
     "nav": {
@@ -177,12 +177,12 @@
     },
     "github": {
         "star": "Star",
-        "ariaStar": "Star Rerun on GitHub",
-        "ariaCount": "Rerun on GitHub, {count} stars"
+        "ariaStar": "Star Moldwright on GitHub",
+        "ariaCount": "Moldwright on GitHub, {count} stars"
     },
     "heroCta": "Start now for free",
     "finalCta": {
-        "proof": "{count}+ businesses run on Rerun",
+        "proof": "{count}+ businesses run on Moldwright",
         "titleLead": "Hire Coworkers on the <switch></switch>",
         "titleTail": "plan <mark>you already pay for.</mark>",
         "steps": {
@@ -193,14 +193,14 @@
         "step": "{rank}. {label}"
     },
     "openSource": {
-        "announce": "Rerun is now open source<wide> under AGPL-3.0</wide>",
+        "announce": "Moldwright is now open source<wide> under AGPL-3.0</wide>",
         "cta": "Star us on GitHub"
     },
     "footer": {
         "ctaTitle": "Your first coworker is<br></br>three minutes away",
         "ctaButton": "Start for free",
         "tagline": "Run your work on coworkers. Build them, watch them work, and keep your eyes on everything.",
-        "productHuntAlt": "Rerun - Open-source AI coworkers that actually do the work | Product Hunt",
+        "productHuntAlt": "Moldwright - Open-source AI coworkers that actually do the work | Product Hunt",
         "columns": {
             "features": "Features",
             "industries": "Industries",
@@ -226,7 +226,7 @@
             "affiliate": "Affiliate Program",
             "partnerBadge": "Partner badge"
         },
-        "compareLink": "Rerun vs {name}",
+        "compareLink": "Moldwright vs {name}",
         "guides": {
             "aiEmployees": "AI employees",
             "smallBusiness": "AI agents for small business",
@@ -245,7 +245,7 @@
             "cookies": "Cookie Policy",
             "dpa": "DPA"
         },
-        "copyright": "© {year} Rerun by {legalName}. All rights reserved.",
+        "copyright": "© {year} Moldwright by {legalName}. All rights reserved.",
         "language": "Language",
         "categories": {
             "agencies": "Agencies",
@@ -272,7 +272,7 @@
         "dismiss": "Dismiss"
     },
     "notFound": {
-        "homeAria": "Rerun home",
+        "homeAria": "Moldwright home",
         "title": "This page went off-script.",
         "body": "The page you are looking for does not exist or has moved. Let's get you back on track.",
         "back": "Back to home"
@@ -301,13 +301,13 @@
             }
         },
         "compare": {
-            "vs": "Rerun vs",
+            "vs": "Moldwright vs",
             "cta": "See the comparison"
         }
     },
     "composerPlaceholder": "Send a message...",
     "_context": {
-        "nav.logo": "Menu opened by a right click on the Rerun logo of the top bar.",
+        "nav.logo": "Menu opened by a right click on the Moldwright logo of the top bar.",
         "nav.goToApp": "Top bar button shown instead of the sign-up button to a visitor who is already signed in to the app.",
         "nav.trialCta": "The price stays in US dollars in every language.",
         "finalCta.titleLead": "<switch></switch> is a rotating pill naming the AI provider (ChatGPT, Claude...). The title is split in two lines: titleLead then titleTail.",

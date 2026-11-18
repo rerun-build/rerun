@@ -106,7 +106,7 @@
             "title": "Comment",
             "toast": {
                 "label": "Toast dans l'app",
-                "description": "S'affiche au-dessus de votre boîte de réception quand Rerun est ouvert."
+                "description": "S'affiche au-dessus de votre boîte de réception quand Moldwright est ouvert."
             },
             "sound": {
                 "label": "Son",
@@ -150,6 +150,6 @@
         "trialEndedDeclined": "Votre emplacement {provider} gratuit a pris fin et la carte a été refusée, donc {account, select, none {le compte} other {{account}}} est en pause. Ajoutez un emplacement dans Facturation sous une semaine pour le garder, sinon il sera déconnecté.",
         "rateLimited": "{provider} a demandé à {account, select, none {l'un de vos comptes} other {{account}}} de ralentir. Vos coworkers ne l'utiliseront pas pendant 24 heures, pour que le compte reste protégé.",
         "signedOut": "{provider} a déconnecté {account, select, none {l'un de vos comptes} other {{account}}}. Reconnectez-le depuis Paramètres → Apps pour que vos coworkers puissent de nouveau l'utiliser.",
-        "budgetExhausted": "Vos crédits Rerun de ce mois sont épuisés. Les exécutions planifiées et déclenchées sur les modèles Rerun sont en pause, et les coworkers ne peuvent plus acheter de prospects ni de données SEO ou réseaux sociaux, jusqu'à la remise à zéro ou jusqu'à ce que vous ajoutiez des crédits."
+        "budgetExhausted": "Vos crédits Moldwright de ce mois sont épuisés. Les exécutions planifiées et déclenchées sur les modèles Moldwright sont en pause, et les coworkers ne peuvent plus acheter de prospects ni de données SEO ou réseaux sociaux, jusqu'à la remise à zéro ou jusqu'à ce que vous ajoutiez des crédits."
     }
 }

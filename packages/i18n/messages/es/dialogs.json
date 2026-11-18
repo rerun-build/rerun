@@ -11,7 +11,7 @@
         "addEmail": "Añadir correo",
         "changePhone": "Cambiar número de teléfono",
         "addPhone": "Añadir número de teléfono",
-        "googleNeedsBrowser": "Abre Rerun en tu navegador para conectar Google."
+        "googleNeedsBrowser": "Abre Moldwright en tu navegador para conectar Google."
     },
     "members": {
         "title": "Miembros",
@@ -175,7 +175,7 @@
     },
     "auth": {
         "welcome": {
-            "title": "Bienvenido a Rerun",
+            "title": "Bienvenido a Moldwright",
             "subtitle": "Crea tu cuenta para empezar a formar tu equipo de coworkers."
         },
         "build": {
@@ -352,7 +352,7 @@
         "description": "Revisa lo que instala este template y coloca sus coworkers en tu tablero."
     },
     "createTemplate": {
-        "defaultDescription": "Prepara un template desde tu sandbox. El equipo de Rerun lo revisa antes de publicarlo.",
+        "defaultDescription": "Prepara un template desde tu sandbox. El equipo de Moldwright lo revisa antes de publicarlo.",
         "title": "Nuevo template",
         "doneLabel": "Abrir template",
         "titleField": "Título",
@@ -480,7 +480,7 @@
     },
     "shortcuts": {
         "title": "Atajos de teclado",
-        "description": "Muévete más rápido por Rerun con estos atajos.",
+        "description": "Muévete más rápido por Moldwright con estos atajos.",
         "groups": {
             "general": "General",
             "chat": "Chat",
@@ -614,7 +614,7 @@
         },
         "link": {
             "title": "Vincular el teléfono",
-            "hint": "WhatsApp añade Rerun como dispositivo vinculado",
+            "hint": "WhatsApp añade Moldwright como dispositivo vinculado",
             "cancel": "Cancelar la vinculación"
         }
     },
@@ -629,11 +629,11 @@
             "codex": "ChatGPT Plus o Pro"
         },
         "decline": {
-            "cloud": "Prefiero seguir con los créditos de Rerun",
+            "cloud": "Prefiero seguir con los créditos de Moldwright",
             "selfHosted": "Prefiero seguir con OpenRouter"
         },
         "offer": {
-            "title": "Rerun funciona mejor con tu suscripción de Claude o ChatGPT",
+            "title": "Moldwright funciona mejor con tu suscripción de Claude o ChatGPT",
             "description": "Conéctala y tus coworkers funcionan con el plan que ya pagas."
         },
         "arguments": {
@@ -642,12 +642,12 @@
                 "description": "Cada compañero conecta el plan que paga. Sin cuentas compartidas."
             },
             "password": {
-                "label": "Rerun nunca ve tu contraseña",
+                "label": "Moldwright nunca ve tu contraseña",
                 "description": "Lo apruebas en la página de Claude o de OpenAI, y en ningún otro sitio."
             },
             "unplug": {
                 "label": "Desconéctalo cuando quieras",
-                "descriptionCloud": "Desconecta con un clic y tus coworkers vuelven a los créditos de Rerun.",
+                "descriptionCloud": "Desconecta con un clic y tus coworkers vuelven a los créditos de Moldwright.",
                 "descriptionSelfHosted": "Desconecta con un clic y tus coworkers vuelven a tu clave de OpenRouter."
             }
         },

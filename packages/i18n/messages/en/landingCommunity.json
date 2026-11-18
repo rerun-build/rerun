@@ -6,7 +6,7 @@
         "filters.segment": "Screen reader label of a filter button: the filter name, then the value picked or the word for 'any'.",
         "card.hire": "Button on an expert card that opens a form to contact the expert.",
         "hire": "Dialog where a visitor sends a project request to an expert. {name} is the expert's name or studio name.",
-        "program.hero.title": "The empty mark tag is replaced by the Rerun logo, placed right before the word Rerun.",
+        "program.hero.title": "The empty mark tag is replaced by the Moldwright logo, placed right before the word Moldwright.",
         "program.showcase.carousel": "Accessible name of the carousel, read by screen readers inside the carousel arrow buttons (Previous / Next).",
         "program.valueProps.cells.ship.desc": "connectorCount is an already formatted number such as 1,000.",
         "visuals": "Mock content played in animated demos of the product: coworker names (Jules, Margo, Sam, Nora, Leo), companies and emails stay as they are.",
@@ -18,15 +18,15 @@
     "metadata": {
         "layout": {
             "title": "Experts",
-            "description": "Discover trusted builders and studios to design, ship and run your AI agents on Rerun."
+            "description": "Discover trusted builders and studios to design, ship and run your AI agents on Moldwright."
         },
         "directory": {
             "title": "Hire the best AI experts",
-            "description": "Work with vetted builders, freelancers and studios who design, ship and run AI agents that actually deliver. Browse Rerun experts by skill and location."
+            "description": "Work with vetted builders, freelancers and studios who design, ship and run AI agents that actually deliver. Browse Moldwright experts by skill and location."
         },
         "program": {
-            "title": "Become a Rerun expert",
-            "description": "Join the Rerun Expert Program: get listed in the directory, build client agents in a free sandbox, keep 95% of template sales and earn 20% recurring."
+            "title": "Become a Moldwright expert",
+            "description": "Join the Moldwright Expert Program: get listed in the directory, build client agents in a free sandbox, keep 95% of template sales and earn 20% recurring."
         }
     },
     "jsonLd": {
@@ -37,7 +37,7 @@
         "eyebrow": "{count, plural, one {# vetted expert} other {# vetted experts}}",
         "title": "Find your AI expert",
         "description": "Vetted builders and studios who set up your most complex systems, with Coworkers wired into every tool and process your business runs on.",
-        "joinAside": "Join the experts already listed on Rerun",
+        "joinAside": "Join the experts already listed on Moldwright",
         "becomeExpert": "Become an expert",
         "featured": {
             "label": "Featured",
@@ -147,7 +147,7 @@
     "program": {
         "hero": {
             "eyebrow": "Expert program",
-            "title": "Join the <mark></mark>Rerun Expert Program",
+            "title": "Join the <mark></mark>Moldwright Expert Program",
             "promises": {
                 "listed": "Get listed in the Expert directory and get matched with clients",
                 "workspace": "Get a free workspace to build everything you want",
@@ -155,23 +155,23 @@
                 "revenue": "Earn 20% recurring on every client plan you bring in"
             },
             "findExpert": "Find an expert",
-            "joined": "Join the experts already listed on Rerun"
+            "joined": "Join the experts already listed on Moldwright"
         },
         "showcase": {
             "label": "The directory",
             "title": "Be among the best talent.",
-            "lede": "The people already listed on Rerun, and the profile clients see before they reach out.",
-            "carousel": "Rerun experts",
+            "lede": "The people already listed on Moldwright, and the profile clients see before they reach out.",
+            "carousel": "Moldwright experts",
             "browseAll": "Browse all experts"
         },
         "cta": {
             "label": "Expert program",
-            "title": "Become a Rerun expert",
+            "title": "Become a Moldwright expert",
             "subtitle": "Apply once. We review every application by hand and reply by email with the next step."
         },
         "valueProps": {
-            "badge": "Why Rerun",
-            "title": "Why freelancers and studios build on Rerun.",
+            "badge": "Why Moldwright",
+            "title": "Why freelancers and studios build on Moldwright.",
             "subtitle": "You ship the Coworker, the client keeps it running. No infrastructure to rent, no handover doc nobody reads.",
             "cells": {
                 "ship": {
@@ -202,7 +202,7 @@
         },
         "benefits": {
             "badge": "What you get",
-            "title": "Grow faster as a Rerun Expert.",
+            "title": "Grow faster as a Moldwright Expert.",
             "subtitle": "One application, four ways to get paid for the work you already do.",
             "items": {
                 "listed": {
@@ -219,20 +219,20 @@
                 },
                 "revenue": {
                     "title": "Earn 20% on every client you bring",
-                    "desc": "When a client you onboarded subscribes, you earn 20% of their Rerun plan, every month, for as long as they stay."
+                    "desc": "When a client you onboarded subscribes, you earn 20% of their Moldwright plan, every month, for as long as they stay."
                 }
             }
         },
         "perks": {
             "badge": "Expert advantage",
-            "title": "What every Rerun Expert gets.",
+            "title": "What every Moldwright Expert gets.",
             "subtitle": "One tier, no points to farm. Here is what changes the day your application is accepted.",
             "regular": {
                 "title": "Regular account",
-                "subtitle": "Any Rerun user"
+                "subtitle": "Any Moldwright user"
             },
             "expert": {
-                "title": "Rerun Expert",
+                "title": "Moldwright Expert",
                 "subtitle": "Accepted into the program"
             },
             "rows": {

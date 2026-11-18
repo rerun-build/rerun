@@ -314,7 +314,7 @@
         "detailsLabel": "Dê mais detalhes",
         "negativePlaceholder": "O que não foi satisfatório nesta resposta?",
         "positivePlaceholder": "O que foi satisfatório nesta resposta?",
-        "disclaimer": "Ao enviar este relato, você compartilha esta conversa com a equipe do Rerun para melhorarmos seus coworkers.",
+        "disclaimer": "Ao enviar este relato, você compartilha esta conversa com a equipe do Moldwright para melhorarmos seus coworkers.",
         "cancel": "Cancelar",
         "submit": "Enviar",
         "categories": {
@@ -368,11 +368,11 @@
         }
     },
     "budget": {
-        "title": "Créditos Rerun",
+        "title": "Créditos Moldwright",
         "paused": {
-            "title": "Créditos Rerun pausados",
-            "body": "Seus coworkers não podem usar os modelos Rerun nem dados pagos até alguém reativá-los.",
-            "actionTitle": "Reativar os créditos Rerun",
+            "title": "Créditos Moldwright pausados",
+            "body": "Seus coworkers não podem usar os modelos Moldwright nem dados pagos até alguém reativá-los.",
+            "actionTitle": "Reativar os créditos Moldwright",
             "actionDescription": "Os gastos voltam na hora.",
             "cta": "Reativar"
         },
@@ -387,17 +387,17 @@
             "description": "{credits} incluídos todo mês."
         },
         "topUp": {
-            "title": "Recarregar seus créditos Rerun",
+            "title": "Recarregar seus créditos Moldwright",
             "cta": "Recarregar",
             "description": "Ou espere, eles renovam no mês que vem."
         },
         "usedUp": {
-            "noCredit": "Este workspace ainda não tem créditos Rerun.",
+            "noCredit": "Este workspace ainda não tem créditos Moldwright.",
             "trial": "Você usou todos os {credits} do seu teste grátis.",
-            "period": "Você usou todos os seus créditos Rerun deste período."
+            "period": "Você usou todos os seus créditos Moldwright deste período."
         },
         "ownConnection": {
-            "body": "Esta conversa rodou no Rerun, e seu plano {plan} está conectado."
+            "body": "Esta conversa rodou no Moldwright, e seu plano {plan} está conectado."
         },
         "runOn": "Usar {plan}",
         "or": "Ou",

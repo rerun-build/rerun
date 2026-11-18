@@ -13,7 +13,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 function requireId(args: Record<string, unknown>, field: string): string {
     const value = requireString(args[field], field)
-    if (!UUID.test(value)) throw new Error(`${field} must be the uuid of a ${field === 'shareId' ? 'share link, from list_agent_shares' : 'Rerun coworker, from list_agents'}.`)
+    if (!UUID.test(value)) throw new Error(`${field} must be the uuid of a ${field === 'shareId' ? 'share link, from list_agent_shares' : 'Moldwright coworker, from list_agents'}.`)
     return value
 }
 

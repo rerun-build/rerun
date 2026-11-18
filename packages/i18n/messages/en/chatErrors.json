@@ -29,7 +29,7 @@
         "session_gone": "Conversation unavailable"
     },
     "messages": {
-        "budget": "The account behind Rerun models has no balance left. Top it up, or switch to another model.",
+        "budget": "The account behind Moldwright models has no balance left. Top it up, or switch to another model.",
         "unauthorized": "This connection needs to be signed in again before the coworker can run.",
         "overloaded": "The provider is overloaded right now. Try again in a moment.",
         "context_window": "This conversation no longer fits the model, and sending it again will hit the same wall. Switch to a model with a larger context window, or start a new conversation.",

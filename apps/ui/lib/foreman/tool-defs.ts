@@ -58,7 +58,7 @@ export const FOREMAN_BOX_TOOL_DEFS = [
         inputSchema: {
             type: 'object',
             properties: {
-                names: { type: 'array', items: { type: 'string' }, description: 'One name per Box, in the order they should read on the board. Leave the array with a single empty string and Rerun names that Box after what the account does.' },
+                names: { type: 'array', items: { type: 'string' }, description: 'One name per Box, in the order they should read on the board. Leave the array with a single empty string and Moldwright names that Box after what the account does.' },
             },
             required: ['names'],
         },
@@ -88,7 +88,7 @@ export const FOREMAN_DOCS_TOOL_DEFS = [
     {
         name: 'search_docs',
         description:
-            'Search the Rerun documentation (https://docs.rerun.build) and get back the passages that answer the question, each with the link it comes from. Use it for any question about how Rerun itself works, its limits, its pricing or its API, rather than answering from memory, and whenever you or the user are stuck: a tool that fails in a way you did not expect, a step in the app they cannot find or cannot get through. Hand the user the link of the passage you used. Query in English, in keywords rather than a sentence, however the user wrote to you.',
+            'Search the Moldwright documentation (https://docs.rerun.build) and get back the passages that answer the question, each with the link it comes from. Use it for any question about how Moldwright itself works, its limits, its pricing or its API, rather than answering from memory, and whenever you or the user are stuck: a tool that fails in a way you did not expect, a step in the app they cannot find or cannot get through. Hand the user the link of the passage you used. Query in English, in keywords rather than a sentence, however the user wrote to you.',
         inputSchema: {
             type: 'object',
             properties: { query: { type: 'string', description: 'What to look up, e.g. "webhook trigger token" or "trial credit limit".' } },
@@ -119,13 +119,13 @@ const AGENT_TAB_HINTS: Record<AgentFocusTab, string> = {
 const SETTINGS_PANEL_HINTS: Record<SettingsPanel, string> = {
     workspace: 'the name and the icon of the workspace',
     members: 'who has access, and where a teammate is invited',
-    api_keys: 'the keys of the Rerun API and how to plug a client onto MCP, on an active subscription or trial',
+    api_keys: 'the keys of the Moldwright API and how to plug a client onto MCP, on an active subscription or trial',
     ai_providers: 'the AI subscriptions and API keys every coworker of the workspace runs on',
     knowledge_base: 'the company brain (the pages every coworker reads about the company, and the changes coworkers propose to them), plus the files and the tables the whole workspace shares',
     billing: 'the plan, the add-ons, the card and the invoices',
     notifications: 'what gets notified, coworker by coworker, and the account emails',
     shortcuts: 'the keyboard shortcuts of the board',
-    delete_account: 'where the user deletes their own Rerun account, only when they ask how to',
+    delete_account: 'where the user deletes their own Moldwright account, only when they ask how to',
 }
 
 function describeTabs<T extends string>(tabs: readonly T[], labels: Record<T, string>, hints: Record<T, string>): string {
@@ -284,7 +284,7 @@ export const FOREMAN_ONBOARDING_TOOL_DEFS = [
     {
         name: 'list_templates',
         description:
-            'Ready-made teams from the Rerun library, already included in the plan, for someone who asks for one. An installed template arrives with its SOUL, its skills and its schedules written. A team you build for someone is designed from what they told you, not picked in here: this is an answer to a request, never a first move. Filter by the industry you detected.',
+            'Ready-made teams from the Moldwright library, already included in the plan, for someone who asks for one. An installed template arrives with its SOUL, its skills and its schedules written. A team you build for someone is designed from what they told you, not picked in here: this is an answer to a request, never a first move. Filter by the industry you detected.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -394,7 +394,7 @@ export const FOREMAN_WIDGET_TOOL_DEFS = [
     {
         name: 'contact_team',
         description:
-            'Hand a stuck user to a person on the Rerun team, as a card under your message that they send with one click: the message lands in the support chat, under their account, and the team answers them there and by email. Nothing is sent before they click. Call it when you cannot get them through yourself: a second answer did not unblock them, the problem is something no answer of yours can fix (a form that will not go through, a button that is not there, a screen that froze, a bug), or they are upset or ask for a person. It answers sent once they sent it: then say in one line that the team has their message and will answer in the chat bubble and by email, and never offer it a second time. It answers unanswered when they kept typing instead.',
+            'Hand a stuck user to a person on the Moldwright team, as a card under your message that they send with one click: the message lands in the support chat, under their account, and the team answers them there and by email. Nothing is sent before they click. Call it when you cannot get them through yourself: a second answer did not unblock them, the problem is something no answer of yours can fix (a form that will not go through, a button that is not there, a screen that froze, a bug), or they are upset or ask for a person. It answers sent once they sent it: then say in one line that the team has their message and will answer in the chat bubble and by email, and never offer it a second time. It answers unanswered when they kept typing instead.',
         inputSchema: {
             type: 'object',
             properties: {

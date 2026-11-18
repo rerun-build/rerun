@@ -49,7 +49,7 @@
         "cards": {
             "model": {
                 "title": "Bring your own model",
-                "body": "Connect your own Claude or ChatGPT subscription, your API keys, or included Rerun credits."
+                "body": "Connect your own Claude or ChatGPT subscription, your API keys, or included Moldwright credits."
             },
             "team": {
                 "title": "Made for teams",
@@ -275,12 +275,12 @@
                 "tail": "knows your business."
             },
             "concretely": {
-                "lead": "What does Rerun",
+                "lead": "What does Moldwright",
                 "mid": "actually",
                 "tail": "bring to your business?"
             },
             "needs": {
-                "lead": "Rerun",
+                "lead": "Moldwright",
                 "mid": "is everything your",
                 "tail": "business needs."
             }
@@ -392,7 +392,7 @@
         "team": {
             "role": "Co-founder",
             "title": "Still have a question? <fade>Ask the founders.</fade>",
-            "sub": "There are two of us, and we build Rerun ourselves. Email us, or come ask in the Discord.",
+            "sub": "There are two of us, and we build Moldwright ourselves. Email us, or come ask in the Discord.",
             "email": "Email the founders",
             "discord": "Join the Discord"
         },
@@ -411,7 +411,7 @@
             },
             "experts": {
                 "question": "Can someone set my Coworkers up for me?",
-                "answer": "Yes. Rerun experts build and install Coworkers for a living, and you can browse them and hire one. The two of us who build Rerun also answer in the Discord, for free.",
+                "answer": "Yes. Moldwright experts build and install Coworkers for a living, and you can browse them and hire one. The two of us who build Moldwright also answer in the Discord, for free.",
                 "link": "experts"
             },
             "safe": {
@@ -467,12 +467,12 @@
                 "answer": "It waits, and anyone on your team can answer it. It picks up exactly where it stopped, seconds later. You can also leave it rules to answer by itself, so it only waits on the calls you want to make yourself."
             },
             "phone": {
-                "question": "Can I use Rerun from my phone?",
-                "answer": "Yes. Rerun runs in your phone browser and installs to your home screen like an app. The board, the conversation and the approvals are all built for a small screen, so you can unblock a Coworker from a queue."
+                "question": "Can I use Moldwright from my phone?",
+                "answer": "Yes. Moldwright runs in your phone browser and installs to your home screen like an app. The board, the conversation and the approvals are all built for a small screen, so you can unblock a Coworker from a queue."
             },
             "billing": {
                 "question": "How does billing work? Do I pay per person?",
-                "answer": "Never per person. {price} a month gets you unlimited Coworkers, their private machine and as many teammates as you want in the workspace, at no extra cost. The only thing that grows with you is your Rerun credit. That credit is not only for the models we host: it also pays for the requests your Coworkers make to the {connectors}+ tools."
+                "answer": "Never per person. {price} a month gets you unlimited Coworkers, their private machine and as many teammates as you want in the workspace, at no extra cost. The only thing that grows with you is your Moldwright credit. That credit is not only for the models we host: it also pays for the requests your Coworkers make to the {connectors}+ tools."
             },
             "subscription": {
                 "question": "Is a Claude or ChatGPT subscription required?",
@@ -484,7 +484,7 @@
             },
             "data": {
                 "question": "What do the emails, phone numbers and other data cost?",
-                "answer": "They come out of your Rerun credit, and an email or a phone number is only billed when it is found. Before a search, your Coworker tells you what it will cost and waits for your yes. There is no data provider to subscribe to."
+                "answer": "They come out of your Moldwright credit, and an email or a phone number is only billed when it is found. Before a search, your Coworker tells you what it will cost and waits for your yes. There is no data provider to subscribe to."
             }
         }
     },
@@ -563,7 +563,7 @@
         "steps.title": "<br></br> is a forced line break between the two halves of the title.",
         "steps.hire.mark": "Must be copied word for word from steps.hire.job: the product underlines this part of the sentence.",
         "steps.board.beats": "Chat bubbles above Coworkers in an animated board. Keep each under 30 characters.",
-        "layer.gainTitles": "Section titles split in pieces: the Rerun logo is drawn between `lead` and `mid`, and a line break falls before `tail`.",
+        "layer.gainTitles": "Section titles split in pieces: the Moldwright logo is drawn between `lead` and `mid`, and a line break falls before `tail`.",
         "layer.live.plan": "Plan line under the workspace name in a product menu.",
         "testimonials.title": "<keep> keeps its words on one line; <chip> is a small animated badge around the word Coworkers.",
         "testimonials.role": "The person's job title and their company: {role} and {company} stay in English. No space before <org>, the design adds it.",

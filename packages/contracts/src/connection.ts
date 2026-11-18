@@ -214,7 +214,7 @@ export const DEFAULT_CONNECTION_MODELS: Record<z.infer<typeof providerSchema>, s
 }
 
 export const PROVIDER_LABELS: Record<z.infer<typeof providerSchema>, string> = {
-    rerun: 'Rerun',
+    rerun: 'Moldwright',
     anthropic: 'Anthropic',
     claude: 'Claude',
     codex: 'Codex',

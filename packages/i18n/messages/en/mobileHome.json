@@ -52,7 +52,7 @@
         "deleteFailedTitle": "Could not delete your account",
         "deleteFailedMessage": "Try again in a moment.",
         "leaveServerTitle": "Leave {host}?",
-        "leaveServerMessage": "You will be signed out, and Rerun reopens on Rerun Cloud.",
+        "leaveServerMessage": "You will be signed out, and Moldwright reopens on Moldwright Cloud.",
         "leaveServer": "Leave"
     },
     "workspace": {
@@ -131,7 +131,7 @@
         "inbox.row.detail": "Under an inbox row: the coworker's name and the conversation's title.",
         "inbox.row.read": "Very short label of the swipe action that marks a row as read.",
         "section.label": "VoiceOver label of a collapsible section header: its name and how many rows it holds.",
-        "account.leaveServerTitle": "{host} is the web address of the Rerun server the app is connected to.",
+        "account.leaveServerTitle": "{host} is the web address of the Moldwright server the app is connected to.",
         "account.leaveServer": "Destructive button of the dialog that leaves a self-hosted server."
     }
 }

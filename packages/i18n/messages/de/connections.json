@@ -41,7 +41,7 @@
         },
         "summary": "{kind} · {count, plural, one {# Modell} other {# Modelle}}",
         "summaryWindow": "{name} {percent}",
-        "creditPaused": "Rerun-Guthaben ist pausiert",
+        "creditPaused": "Moldwright-Guthaben ist pausiert",
         "creditUsed": "{percent} % des Guthabens dieses Monats verbraucht",
         "creditUsedUpOn": "Monatsguthaben aufgebraucht, zurück am {date}",
         "creditUsedUpNextMonth": "Monatsguthaben aufgebraucht, zurück nächsten Monat",
@@ -75,13 +75,13 @@
             "anthropic": {
                 "title": "So bekommst du deinen Anthropic-Schlüssel",
                 "step1": "Öffne die [Anthropic Console](https://console.anthropic.com/settings/keys) und melde dich an.",
-                "step2": "Klick auf **Create Key** und gib ihm einen Namen, zum Beispiel \"Rerun\".",
+                "step2": "Klick auf **Create Key** und gib ihm einen Namen, zum Beispiel \"Moldwright\".",
                 "step3": "Kopiere den Schlüssel (er beginnt mit `sk-ant-`) und füge ihn oben ein. Er wird nur einmal angezeigt."
             },
             "openai": {
                 "title": "So bekommst du deinen OpenAI-Schlüssel",
                 "step1": "Öffne die [OpenAI API keys](https://platform.openai.com/api-keys) und melde dich an.",
-                "step2": "Klick auf **Create new secret key** und gib ihm einen Namen, zum Beispiel \"Rerun\".",
+                "step2": "Klick auf **Create new secret key** und gib ihm einen Namen, zum Beispiel \"Moldwright\".",
                 "step3": "Kopiere den Schlüssel (er beginnt mit `sk-`) und füge ihn oben ein. Er wird nur einmal angezeigt."
             },
             "google": {
@@ -179,7 +179,7 @@
             "automations": "{count, plural, one {# Automatisierung fällt} other {# Automatisierungen fallen}} auf das Standardmodell des Workspace zurück.",
             "both": "{agents} und {count, plural, one {# Automatisierung} other {# Automatisierungen}} fallen auf das Standardmodell des Workspace zurück."
         },
-        "holdsDefault": "Es ist das Standardmodell des Workspace, das entfernt wird: Jeder Coworker ohne eigenes Modell fällt auf Rerun zurück.",
+        "holdsDefault": "Es ist das Standardmodell des Workspace, das entfernt wird: Jeder Coworker ohne eigenes Modell fällt auf Moldwright zurück.",
         "nothingRuns": "Die Zugangsdaten werden von der Box entfernt. Nichts läuft darüber.",
         "released": {
             "agents": "{agents} laufen jetzt mit dem Standardmodell des Workspace.",
@@ -230,9 +230,9 @@
         "signedInAgain": "Neu angemeldet",
         "creditsTitle": "Guthaben diesen Monat",
         "topUp": "Aufladen",
-        "creditsUsedUpOn": "Coworker, die mit Rerun laufen, sind pausiert, bis das Guthaben am {date} zurück ist. Lade auf oder wähle ein anderes Standardmodell, damit sie weiterarbeiten.",
-        "creditsUsedUpNextMonth": "Coworker, die mit Rerun laufen, sind pausiert, bis das Guthaben nächsten Monat zurück ist. Lade auf oder wähle ein anderes Standardmodell, damit sie weiterarbeiten.",
-        "creditsIncluded": "In deinem Rerun-Tarif enthalten. Kein Schlüssel, nichts einzurichten.",
+        "creditsUsedUpOn": "Coworker, die mit Moldwright laufen, sind pausiert, bis das Guthaben am {date} zurück ist. Lade auf oder wähle ein anderes Standardmodell, damit sie weiterarbeiten.",
+        "creditsUsedUpNextMonth": "Coworker, die mit Moldwright laufen, sind pausiert, bis das Guthaben nächsten Monat zurück ist. Lade auf oder wähle ein anderes Standardmodell, damit sie weiterarbeiten.",
+        "creditsIncluded": "In deinem Moldwright-Tarif enthalten. Kein Schlüssel, nichts einzurichten.",
         "signInRejected": "Diese Anmeldung wurde abgelehnt. Coworker, die sie nutzen, sind gestoppt, bis du dich neu anmeldest.",
         "signInExpired": "Diese Anmeldung ist abgelaufen. Coworker, die sie nutzen, sind gestoppt, bis du dich neu anmeldest.",
         "reconnected": "Deine Coworker legen wieder los",
@@ -256,12 +256,12 @@
         },
         "default": {
             "via": "Über {source}. Coworker ohne eigenes Modell laufen damit.",
-            "pausedPick": "Das Rerun-Guthaben ist pausiert, daher sind auch Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
-            "pausedAdd": "Das Rerun-Guthaben ist pausiert, daher sind auch Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
-            "usedUpOnPick": "Das Rerun-Guthaben ist aufgebraucht, bis es am {date} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
-            "usedUpOnAdd": "Das Rerun-Guthaben ist aufgebraucht, bis es am {date} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
-            "usedUpNextMonthPick": "Das Rerun-Guthaben ist aufgebraucht, bis es nächsten Monat zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
-            "usedUpNextMonthAdd": "Das Rerun-Guthaben ist aufgebraucht, bis es nächsten Monat zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
+            "pausedPick": "Das Moldwright-Guthaben ist pausiert, daher sind auch Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
+            "pausedAdd": "Das Moldwright-Guthaben ist pausiert, daher sind auch Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
+            "usedUpOnPick": "Das Moldwright-Guthaben ist aufgebraucht, bis es am {date} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
+            "usedUpOnAdd": "Das Moldwright-Guthaben ist aufgebraucht, bis es am {date} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
+            "usedUpNextMonthPick": "Das Moldwright-Guthaben ist aufgebraucht, bis es nächsten Monat zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
+            "usedUpNextMonthAdd": "Das Moldwright-Guthaben ist aufgebraucht, bis es nächsten Monat zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
             "stopped": "Coworker ohne eigenes Modell sind gestoppt. Repariere {source} oder wähle ein anderes Modell.",
             "noOtherModel": "Kein anderes Modell ist bereit. Füge zuerst einen Tarif oder einen API-Schlüssel hinzu.",
             "change": "Ändern"
@@ -306,7 +306,7 @@
         },
         "copied": "Kopiert",
         "copyMessage": "Nachricht für den Admin kopieren",
-        "adminMessage": "Hallo! Könntest du \"Gerätecode-Autorisierung für Codex\" in den Einstellungen unseres ChatGPT-Workspace aktivieren? Ich brauche das, um meinen ChatGPT-Tarif mit Rerun zu verbinden."
+        "adminMessage": "Hallo! Könntest du \"Gerätecode-Autorisierung für Codex\" in den Einstellungen unseres ChatGPT-Workspace aktivieren? Ich brauche das, um meinen ChatGPT-Tarif mit Moldwright zu verbinden."
     },
     "claude": {
         "remarks": {
@@ -315,7 +315,7 @@
             "checking": "Prüfe",
             "connected": "Alles bereit!"
         },
-        "approveStep": "Rerun bei Claude zulassen",
+        "approveStep": "Moldwright bei Claude zulassen",
         "opening": "Claude öffnet sich in einem neuen Tab",
         "openAgain": "Claude erneut öffnen",
         "open": "Claude öffnen",

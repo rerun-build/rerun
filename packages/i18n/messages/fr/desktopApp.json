@@ -48,13 +48,13 @@
         }
     },
     "offline": {
-        "title": "Impossible de joindre Rerun",
+        "title": "Impossible de joindre Moldwright",
         "body": "Vérifiez votre connexion. L’app se reconnecte à {host} toute seule.",
         "unavailable": "{host} ne répond pas pour le moment. L’app réessaie toute seule.",
         "retry": "Réessayer"
     },
     "incompatible": {
-        "title": "Mettez Rerun à jour pour continuer",
+        "title": "Mettez Moldwright à jour pour continuer",
         "body": "Cette version de l’app est trop ancienne pour {host}.",
         "download": "Télécharger la dernière version",
         "downloading": "Téléchargement de la mise à jour… {percent} %",
@@ -76,22 +76,22 @@
     },
     "server": {
         "title": "Connectez-vous à votre serveur",
-        "description": "Saisissez l’adresse du serveur Rerun que vous utilisez.",
+        "description": "Saisissez l’adresse du serveur Moldwright que vous utilisez.",
         "label": "Adresse du serveur",
         "connect": "Se connecter",
         "invalid": "Saisissez une adresse comme rerun.example.com.",
         "unreachable": "Rien ne répond à cette adresse.",
-        "notRerun": "Cette adresse n’est pas un serveur Rerun.",
+        "notRerun": "Cette adresse n’est pas un serveur Moldwright.",
         "tooOld": "Ce serveur demande la version {version} de l’app ou plus récente.",
         "insecure": "Cette adresse n’est pas chiffrée. Utilisez https:// sauf si le serveur tourne sur cet ordinateur.",
-        "useRerunCloud": "Utiliser Rerun Cloud",
+        "useRerunCloud": "Utiliser Moldwright Cloud",
         "cancel": "Annuler"
     },
     "updates": {
         "upToDate": "Vous êtes à jour",
-        "upToDateDetail": "Rerun {version} est la dernière version.",
+        "upToDateDetail": "Moldwright {version} est la dernière version.",
         "failed": "Impossible de rechercher les mises à jour",
-        "readyToInstall": "Rerun {version} est prêt à être installé",
+        "readyToInstall": "Moldwright {version} est prêt à être installé",
         "readyDetail": "L’app redémarre pour terminer la mise à jour.",
         "restartNow": "Redémarrer maintenant",
         "later": "Plus tard"

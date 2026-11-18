@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# plantilla} other {# plantillas}}",
-        "rerunTeam": "Equipo de Rerun",
+        "rerunTeam": "Equipo de Moldwright",
         "verified": "Creador verificado"
     },
     "spotlight": {
@@ -121,14 +121,14 @@
             "featured": "Destacadas",
             "featuredSubtitle": "Configuraciones elegidas para ver primero.",
             "justAdded": "Recién añadidas",
-            "justAddedSubtitle": "Las últimas plantillas publicadas en Rerun."
+            "justAddedSubtitle": "Las últimas plantillas publicadas en Moldwright."
         },
         "empty": {
             "filtered": "Ninguna plantilla coincide con estos filtros",
             "none": "Todavía no hay plantillas aquí",
             "selfHosted": "Recluta un coworker y guárdalo como plantilla.",
-            "cloud": "Créala tú mismo y véndela en Rerun.",
-            "become": "Hazte experto de Rerun"
+            "cloud": "Créala tú mismo y véndela en Moldwright.",
+            "become": "Hazte experto de Moldwright"
         }
     },
     "scratch": {
@@ -362,7 +362,7 @@
                 "installAnswers": "Una respuesta de instalación para cada coworker",
                 "payouts": "Una cuenta de Stripe que pueda recibir pagos"
             },
-            "live": "Esta plantilla está publicada en el marketplace. Contacta con el equipo de Rerun para cambiarla.",
+            "live": "Esta plantilla está publicada en el marketplace. Contacta con el equipo de Moldwright para cambiarla.",
             "inReview": "Estamos revisando esta plantilla. Retírala para seguir editándola.",
             "withdraw": "Retirar",
             "completeChecklist": "Completa primero la lista",
@@ -388,11 +388,11 @@
             "recurring": "Suscripción mensual"
         },
         "helpers": {
-            "free": "Cualquiera con un plan de Rerun puede instalarla.",
+            "free": "Cualquiera con un plan de Moldwright puede instalarla.",
             "one_time": "Se cobra una vez. El comprador la conserva para siempre.",
             "recurring": "Se cobra cada mes. El acceso termina cuando el comprador cancela."
         },
-        "modelHelp": "{helper} Los compradores igualmente necesitan un plan de Rerun activo para instalar una plantilla.",
+        "modelHelp": "{helper} Los compradores igualmente necesitan un plan de Moldwright activo para instalar una plantilla.",
         "priceLabel": "Precio (USD)",
         "priceHelp": "Mínimo {min}. Cambiarlo después solo se aplica a compradores nuevos.",
         "payoutsTitle": "Los pagos no están activados",
@@ -400,7 +400,7 @@
         "setUpPayouts": "Configurar pagos",
         "payout": {
             "yourPrice": "Tu precio{recurring, select, true { al mes} other {}}",
-            "fee": "Comisión de Rerun ({fee})",
+            "fee": "Comisión de Moldwright ({fee})",
             "earn": "Ganas{recurring, select, true { al mes} other {}}",
             "vat": "El IVA se suma a tu precio al pagar y lo paga el comprador, así que nunca sale de tu parte. Lo que ganas es igual esté donde esté."
         }
@@ -411,14 +411,14 @@
         "subtitle": "Donde llega el dinero de tus plantillas de pago.",
         "yourPrice": "Tu precio",
         "yourPriceValue": "Lo fijas por plantilla, sin IVA",
-        "commission": "Comisión de Rerun",
+        "commission": "Comisión de Moldwright",
         "schedule": "Calendario de pagos",
         "scheduleValue": "Estándar de Stripe",
-        "planNote": "Los compradores igualmente necesitan un plan de Rerun activo para instalar una plantilla, así que una compra desbloquea la plantilla y nada más.",
+        "planNote": "Los compradores igualmente necesitan un plan de Moldwright activo para instalar una plantilla, así que una compra desbloquea la plantilla y nada más.",
         "states": {
             "not_started": {
                 "headline": "Cobra por tus plantillas",
-                "body": "Rerun se queda con el {fee} de cada venta. El resto llega a tu cuenta bancaria a través de Stripe.",
+                "body": "Moldwright se queda con el {fee} de cada venta. El resto llega a tu cuenta bancaria a través de Stripe.",
                 "cta": "Configurar pagos"
             },
             "incomplete": {
@@ -438,7 +438,7 @@
             },
             "ready": {
                 "headline": "Ya puedes recibir pagos",
-                "body": "Ponle precio a una plantilla y saldrá a la venta cuando la revisemos. Rerun se queda con el {fee} de cada venta.",
+                "body": "Ponle precio a una plantilla y saldrá a la venta cuando la revisemos. Moldwright se queda con el {fee} de cada venta.",
                 "cta": "Abrir el panel de Stripe"
             }
         },
@@ -503,7 +503,7 @@
         "type": "Tipo",
         "sales": "Ventas",
         "gross": "Bruto",
-        "fee": "Comisión de Rerun",
+        "fee": "Comisión de Moldwright",
         "pending": "Pago pendiente",
         "available": "Disponible ahora",
         "subscriptions": "{count, plural, one {# suscripción activa} other {# suscripciones activas}}",
@@ -555,7 +555,7 @@
         "trialUsedBilledSeparately": "Ya usaste tu prueba gratis. Se factura hoy y esta plantilla se factura aparte.",
         "resubscribe": "Volver a suscribirte por {price}/mes",
         "lapsed": "Tu suscripción terminó. Los coworkers que instaló esta plantilla están desactivados.",
-        "billedTo": "Se factura a {workspace}. Tu plan de Rerun ya está activo.",
+        "billedTo": "Se factura a {workspace}. Tu plan de Moldwright ya está activo.",
         "yours": "Tu plantilla, sin coste."
     }
 }

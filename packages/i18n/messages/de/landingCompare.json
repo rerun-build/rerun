@@ -1,27 +1,27 @@
 {
     "hub": {
-        "title": "Rerun vs Zapier, n8n, Lindy, Claude & mehr: Vergleiche",
-        "headline": "Rerun vs die Tools, die du schon kennst.",
-        "description": "Wie Rerun im Vergleich zu Zapier, Make, n8n, Lindy, Manus, Claude Cowork und sieben weiteren abschneidet: Bedienung, Teamarbeit, Flexibilität und Kosten im direkten Vergleich.",
+        "title": "Moldwright vs Zapier, n8n, Lindy, Claude & mehr: Vergleiche",
+        "headline": "Moldwright vs die Tools, die du schon kennst.",
+        "description": "Wie Moldwright im Vergleich zu Zapier, Make, n8n, Lindy, Manus, Claude Cowork und sieben weiteren abschneidet: Bedienung, Teamarbeit, Flexibilität und Kosten im direkten Vergleich.",
         "eyebrow": "Vergleich",
         "faqLabel": "FAQ",
-        "faqTitle": "Die Wahl zwischen Rerun und den anderen.",
+        "faqTitle": "Die Wahl zwischen Moldwright und den anderen.",
         "faq": {
             "1": {
-                "question": "Wofür ist Rerun eine Alternative?",
-                "answer": "Rerun ersetzt Workflow-Tools wie Zapier, Make und n8n bei Aufgaben, die Urteilsvermögen brauchen, nach Credits abgerechnete Agenten-Plattformen wie Lindy, Twin oder Dust und selbst gehostete Agenten wie OpenClaw oder Hermes Agent für Teams, die keinen Server betreiben wollen. Jeder Agent lebt auf der privaten Maschine deines Workspace und arbeitet rund um die Uhr."
+                "question": "Wofür ist Moldwright eine Alternative?",
+                "answer": "Moldwright ersetzt Workflow-Tools wie Zapier, Make und n8n bei Aufgaben, die Urteilsvermögen brauchen, nach Credits abgerechnete Agenten-Plattformen wie Lindy, Twin oder Dust und selbst gehostete Agenten wie OpenClaw oder Hermes Agent für Teams, die keinen Server betreiben wollen. Jeder Agent lebt auf der privaten Maschine deines Workspace und arbeitet rund um die Uhr."
             },
             "2": {
-                "question": "Ist Rerun ein Automatisierungstool oder eine KI-Agenten-Plattform?",
+                "question": "Ist Moldwright ein Automatisierungstool oder eine KI-Agenten-Plattform?",
                 "answer": "Eine KI-Agenten-Plattform. Du beschreibst eine Aufgabe in eigenen Worten, verbindest deine Apps, und der Agent plant die Schritte, merkt sich, was er gelernt hat, und fragt dich vor allem Riskanten. Es gibt kein Flussdiagramm zu bauen."
             },
             "3": {
-                "question": "Kann ich Rerun neben meinen bisherigen Tools nutzen?",
-                "answer": "Ja. Die meisten Teams behalten ihre einfachen Automatisierungen und Entwicklertools und geben Rerun die wiederkehrende Arbeit, die ständig kaputtgeht oder Nachdenken erfordert."
+                "question": "Kann ich Moldwright neben meinen bisherigen Tools nutzen?",
+                "answer": "Ja. Die meisten Teams behalten ihre einfachen Automatisierungen und Entwicklertools und geben Moldwright die wiederkehrende Arbeit, die ständig kaputtgeht oder Nachdenken erfordert."
             },
             "4": {
-                "question": "Was kostet Rerun im Vergleich zu diesen Tools?",
-                "answer": "Ein Tarif ab {price} im Monat mit einer gesicherten privaten Maschine, unbegrenzten Agenten und Modell-Guthaben sowie einer kostenlosen 5-Tage-Testphase. Rerun rechnet nie pro Aufgabe, pro Credit oder pro Ausführung ab, und deine Agenten können über dein bestehendes ChatGPT- oder Claude-Abo laufen."
+                "question": "Was kostet Moldwright im Vergleich zu diesen Tools?",
+                "answer": "Ein Tarif ab {price} im Monat mit einer gesicherten privaten Maschine, unbegrenzten Agenten und Modell-Guthaben sowie einer kostenlosen 5-Tage-Testphase. Moldwright rechnet nie pro Aufgabe, pro Credit oder pro Ausführung ab, und deine Agenten können über dein bestehendes ChatGPT- oder Claude-Abo laufen."
             }
         }
     },
@@ -30,7 +30,7 @@
         "home": "Startseite",
         "compare": "Vergleich"
     },
-    "vs": "Rerun vs {competitor}",
+    "vs": "Moldwright vs {competitor}",
     "actions": {
         "trial": "Kostenlos testen",
         "browse": "Fertige Agenten ansehen"
@@ -42,7 +42,7 @@
         "reviewed": "Zuletzt geprüft <time>{date}</time>, anhand der öffentlichen Preise und Dokumentation jedes Produkts.",
         "sideBySide": {
             "badge": "Im Vergleich",
-            "title": "Rerun vs {competitor} auf einen Blick."
+            "title": "Moldwright vs {competitor} auf einen Blick."
         },
         "switching": {
             "badge": "Wechsel",
@@ -63,21 +63,21 @@
         },
         "faq": {
             "label": "FAQ",
-            "title": "Rerun vs {competitor}: deine Fragen."
+            "title": "Moldwright vs {competitor}: deine Fragen."
         }
     },
     "verdict": {
         "shortAnswer": "Die kurze Antwort",
         "chooseThem": "Nimm {competitor}, wenn",
-        "chooseRerun": "Nimm Rerun, wenn"
+        "chooseRerun": "Nimm Moldwright, wenn"
     },
     "grid": {
         "rerunSubtitle": "Dein KI-Team",
-        "caption": "{competitor} vs Rerun, verglichen nach {criteria}"
+        "caption": "{competitor} vs Moldwright, verglichen nach {criteria}"
     },
     "differences": {
         "badge": "Unterschiede",
-        "title": "Wo sich Rerun und {competitor} unterscheiden.",
+        "title": "Wo sich Moldwright und {competitor} unterscheiden.",
         "subtitle": "Vier Unterschiede, die deinen Alltag verändern, gezeigt am echten Produkt.",
         "cta": {
             "connect": "Deine Tools verbinden",
@@ -91,22 +91,22 @@
         "assistant": {
             "badge": "KI-Assistenten",
             "title": "KI-Assistenten, die Aufgaben übernehmen",
-            "subtitle": "Assistenten, die inzwischen selbst Aufgaben ausführen. Rerun bringt ein Team von Agenten, jedes Modell und eine Maschine, die immer läuft."
+            "subtitle": "Assistenten, die inzwischen selbst Aufgaben ausführen. Moldwright bringt ein Team von Agenten, jedes Modell und eine Maschine, die immer läuft."
         },
         "developer-agent": {
             "badge": "Open Source",
             "title": "Open-Source-Agenten",
-            "subtitle": "Kostenlos und offen, aber du installierst, hostest und sicherst sie selbst. Rerun-Agenten laufen auf einer gesicherten privaten Maschine, eingerichtet im Browser."
+            "subtitle": "Kostenlos und offen, aber du installierst, hostest und sicherst sie selbst. Moldwright-Agenten laufen auf einer gesicherten privaten Maschine, eingerichtet im Browser."
         },
         "automation": {
             "badge": "Automatisierung",
             "title": "Tools für Workflow-Automatisierung",
-            "subtitle": "Du entwirfst jeden Schritt, und der Ablauf macht genau das. Rerun-Agenten bekommen das Ziel und finden die Schritte selbst."
+            "subtitle": "Du entwirfst jeden Schritt, und der Ablauf macht genau das. Moldwright-Agenten bekommen das Ziel und finden die Schritte selbst."
         },
         "agent-platform": {
             "badge": "Agenten-Plattformen",
             "title": "KI-Agenten-Plattformen",
-            "subtitle": "Gehostete Agenten, die du wie bei Rerun in eigenen Worten briefst. Der Unterschied: wie die Nutzung abgerechnet wird, welche KI sie antreibt und womit sie arbeiten dürfen."
+            "subtitle": "Gehostete Agenten, die du wie bei Moldwright in eigenen Worten briefst. Der Unterschied: wie die Nutzung abgerechnet wird, welche KI sie antreibt und womit sie arbeiten dürfen."
         }
     },
     "criteria": {
@@ -121,7 +121,7 @@
     "competitors": {
         "claude-cowork": {
             "subtitle": "Claudes Agent für Aufgaben, jetzt direkt in Claude",
-            "pitch": "Claude übernimmt die Aufgaben, die du ihm gibst, mit Claude-Modellen. Rerun erledigt deine wiederkehrende Arbeit mit einem Team von Agenten, mit jedem Modell, dein Claude-Abo inklusive.",
+            "pitch": "Claude übernimmt die Aufgaben, die du ihm gibst, mit Claude-Modellen. Moldwright erledigt deine wiederkehrende Arbeit mit einem Team von Agenten, mit jedem Modell, dein Claude-Abo inklusive.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du briefst jede Aufgabe und ihren Zeitplan selbst.",
@@ -166,7 +166,7 @@
                 "3": {
                     "label": "Ein Team von Agenten",
                     "them": "Dein Claude, organisiert in Projekten mit eigenen Dateien, Anweisungen und Gedächtnis.",
-                    "rerun": "Mehrere Agenten mit eigenen Aufgaben. Sag Rerun, was du vorhast, und es gibt jede Aufgabe an den richtigen weiter."
+                    "rerun": "Mehrere Agenten mit eigenen Aufgaben. Sag Moldwright, was du vorhast, und es gibt jede Aufgabe an den richtigen weiter."
                 },
                 "4": {
                     "label": "Arbeit in deinen Apps",
@@ -182,7 +182,7 @@
         },
         "manus": {
             "subtitle": "Allgemeiner KI-Agent mit eigenem Computer",
-            "pitch": "Manus liefert einmalige Recherchen, Präsentationen und Websites, abgerechnet in Credits. Rerun erledigt deine wiederkehrende Arbeit jeden Tag, zu einem Festpreis.",
+            "pitch": "Manus liefert einmalige Recherchen, Präsentationen und Websites, abgerechnet in Credits. Moldwright erledigt deine wiederkehrende Arbeit jeden Tag, zu einem Festpreis.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du beschreibst jede Aufgabe, und jeder Versuch kostet Credits.",
@@ -217,7 +217,7 @@
                 "1": {
                     "label": "Abrechnung der Nutzung",
                     "them": "Jede Aufgabe kostet Credits: $20 im Monat bringen 4,000, plus 300, die jeden Tag aufgefüllt werden.",
-                    "rerun": "Rerun zählt nie Aufgaben: {price} im Monat, pauschal."
+                    "rerun": "Moldwright zählt nie Aufgaben: {price} im Monat, pauschal."
                 },
                 "2": {
                     "label": "Wiederkehrende Arbeit",
@@ -227,7 +227,7 @@
                 "3": {
                     "label": "Ein Team von Agenten",
                     "them": "Ein Agent, der deine Aufgaben übernimmt, bis zu 20 gleichzeitig.",
-                    "rerun": "Mehrere Agenten mit eigenen Aufgaben. Sag Rerun, was du vorhast, und es gibt jede Aufgabe an den richtigen weiter."
+                    "rerun": "Mehrere Agenten mit eigenen Aufgaben. Sag Moldwright, was du vorhast, und es gibt jede Aufgabe an den richtigen weiter."
                 },
                 "4": {
                     "label": "Was erhalten bleibt",
@@ -243,7 +243,7 @@
         },
         "grok-bot": {
             "subtitle": "Immer aktive Agenten von xAI",
-            "pitch": "Grok Bot ist in den Abos von SuperGrok und Cursor enthalten, in der Beta. Rerun ist ein eigener Tarif, mit Agenten, die du auf dem Modell deiner Wahl installierst.",
+            "pitch": "Grok Bot ist in den Abos von SuperGrok und Cursor enthalten, in der Beta. Moldwright ist ein eigener Tarif, mit Agenten, die du auf dem Modell deiner Wahl installierst.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du briefst jeden Bot oder zeigst ihm einmal einen Workflow.",
@@ -288,12 +288,12 @@
                 "3": {
                     "label": "Modellwahl",
                     "them": "Nur die Modelle von xAI, mit eigenem Nutzungskontingent getrennt von deinem Grok- oder Cursor-Abo.",
-                    "rerun": "Deine Wahl für jeden Agenten: das im Tarif enthaltene Rerun-Modell, dein ChatGPT- oder Claude-Abo oder dein eigener Schlüssel."
+                    "rerun": "Deine Wahl für jeden Agenten: das im Tarif enthaltene Moldwright-Modell, dein ChatGPT- oder Claude-Abo oder dein eigener Schlüssel."
                 },
                 "4": {
                     "label": "Während du weg bist",
                     "them": "Bots melden sich bei dir, wenn etwas deine Freigabe braucht.",
-                    "rerun": "Mit Autopilot antwortet Rerun deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
+                    "rerun": "Mit Autopilot antwortet Moldwright deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
                 },
                 "5": {
                     "label": "Zugriff auf deine Tools",
@@ -309,7 +309,7 @@
         },
         "paperclip": {
             "subtitle": "Open-Source-Organigramm für KI-Agenten",
-            "pitch": "Paperclip gibt den Agenten, die du schon betreibst, ein Organigramm, Budgets und Freigabestufen, auf einem Server, den du hostest. Rerun gibt dir die Agenten selbst, bereits laufend auf einer Maschine, die wir pflegen.",
+            "pitch": "Paperclip gibt den Agenten, die du schon betreibst, ein Organigramm, Budgets und Freigabestufen, auf einem Server, den du hostest. Moldwright gibt dir die Agenten selbst, bereits laufend auf einer Maschine, die wir pflegen.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Ein Befehl installiert es, dann installierst du Node 24 und einen Coding-Agenten auf derselben Maschine, bevor die erste Einstellung funktioniert.",
@@ -375,7 +375,7 @@
         },
         "hermes": {
             "subtitle": "Selbstlernender Open-Source-Agent",
-            "pitch": "Hermes ist ein Agent, den du installierst und betreibst oder tageweise auf Hermes Cloud hostest. Rerun gibt dir ein Team von Agenten, das die Arbeit schon erledigt, auf einer Maschine, die im Tarif enthalten ist.",
+            "pitch": "Hermes ist ein Agent, den du installierst und betreibst oder tageweise auf Hermes Cloud hostest. Moldwright gibt dir ein Team von Agenten, das die Arbeit schon erledigt, auf einer Maschine, die im Tarif enthalten ist.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Eine Desktop-App oder eine Installation im Terminal, danach verkabelst du jedes Tool und jeden Kanal selbst.",
@@ -436,7 +436,7 @@
         },
         "openclaw": {
             "subtitle": "Persönlicher Open-Source-KI-Assistent",
-            "pitch": "OpenClaw ist ein Assistent, den du installierst, hostest und absicherst, und seine Stiftung verkauft nichts. Rerun-Agenten erledigen dieselben Aufgaben auf einer isolierten Maschine, die wir für dich betreiben.",
+            "pitch": "OpenClaw ist ein Assistent, den du installierst, hostest und absicherst, und seine Stiftung verkauft nichts. Moldwright-Agenten erledigen dieselben Aufgaben auf einer isolierten Maschine, die wir für dich betreiben.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du installierst ihn, lässt eine Maschine laufen und verbindest Modell und Kanäle selbst.",
@@ -497,7 +497,7 @@
         },
         "zapier": {
             "subtitle": "Automatisierung von App zu App",
-            "pitch": "Ein Zap verschiebt Daten zwischen Apps. Ein Rerun-Agent sortiert den Posteingang, antwortet dem Lead und fasst bei der Rechnung nach.",
+            "pitch": "Ein Zap verschiebt Daten zwischen Apps. Ein Moldwright-Agent sortiert den Posteingang, antwortet dem Lead und fasst bei der Rechnung nach.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du wählst den Auslöser, dann jede Aktion und jede Feldzuordnung, oder lässt Copilot sie entwerfen und pflegst sie danach.",
@@ -552,23 +552,23 @@
                 "5": {
                     "label": "Die KI dahinter",
                     "them": "KI-Schritte werden je nach Modellstufe in Tasks abgerechnet, und laut Zapiers eigenem Beispiel kostet ein MCP-Tool-Aufruf 2 Tasks.",
-                    "rerun": "Nutze das im Tarif enthaltene Rerun-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
+                    "rerun": "Nutze das im Tarif enthaltene Moldwright-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
                 },
                 "6": {
                     "label": "Während du weg bist",
                     "them": "Ein Human-in-the-Loop-Schritt pausiert den Zap, bis jemand antwortet oder die Zeit abläuft.",
-                    "rerun": "Mit Autopilot antwortet Rerun deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
+                    "rerun": "Mit Autopilot antwortet Moldwright deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
                 },
                 "7": {
                     "label": "Was der Betrieb kostet",
                     "them": "Jeder Aktionsschritt ist ein Task: 750 im Monat für $19,99 bei jährlicher Zahlung. Zapier Agents werden separat in Aktivitäten abgerechnet, 1.500 im Monat bei Pro, und eine Ausführung stoppt bei 40 und fragt dich.",
-                    "rerun": "{price} im Monat für unbegrenzte Agenten. Rerun zählt weder Ausführungen noch Schritte."
+                    "rerun": "{price} im Monat für unbegrenzte Agenten. Moldwright zählt weder Ausführungen noch Schritte."
                 }
             }
         },
         "make": {
             "subtitle": "Visuelle Automatisierungsszenarien",
-            "pitch": "Ein Make-Szenario reicht Daten von Modul zu Modul. Ein Rerun-Agent antwortet dem Lead, fasst bei der Rechnung nach und lernt aus deinen Korrekturen.",
+            "pitch": "Ein Make-Szenario reicht Daten von Modul zu Modul. Ein Moldwright-Agent antwortet dem Lead, fasst bei der Rechnung nach und lernt aus deinen Korrekturen.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du platzierst jedes Modul auf einer Fläche und ordnest die Daten zwischen ihnen zu, oder lässt den KI-Assistenten das erste entwerfen.",
@@ -623,18 +623,18 @@
                 "5": {
                     "label": "Die KI dahinter",
                     "them": "Der AI Provider von Make, abgerechnet in Credits, die je nach Tokens schwanken, oder dein eigener OpenAI- oder Anthropic-Schlüssel in einem bezahlten Tarif, zu einem Credit pro Operation.",
-                    "rerun": "Nutze das im Tarif enthaltene Rerun-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
+                    "rerun": "Nutze das im Tarif enthaltene Moldwright-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
                 },
                 "6": {
                     "label": "Was der Betrieb kostet",
                     "them": "Standardmäßig ein Credit pro Modulaktion, manche Funktionen dynamisch nach Tokens, Dateigröße oder Laufzeit abgerechnet, und 1.000 Credits im Monat im kostenlosen Tarif.",
-                    "rerun": "{price} im Monat für unbegrenzte Agenten. Rerun zählt weder Ausführungen noch Schritte."
+                    "rerun": "{price} im Monat für unbegrenzte Agenten. Moldwright zählt weder Ausführungen noch Schritte."
                 }
             }
         },
         "n8n": {
             "subtitle": "Workflow-Automatisierung, selbst gehostet oder Cloud",
-            "pitch": "n8n gibt Entwicklern Workflows zum Bauen und Hosten. Rerun gibt deinem Team Agenten, die Leads antworten und bei Rechnungen nachfassen, ohne etwas zu hosten.",
+            "pitch": "n8n gibt Entwicklern Workflows zum Bauen und Hosten. Moldwright gibt deinem Team Agenten, die Leads antworten und bei Rechnungen nachfassen, ohne etwas zu hosten.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du verbindest Nodes mit Expressions oder Code und hostest es dann selbst oder zahlst für n8n Cloud.",
@@ -684,7 +684,7 @@
                 "4": {
                     "label": "Während du weg bist",
                     "them": "Ein Prüfschritt pausiert den Workflow, bevor das Tool läuft, und wartet in Slack, Gmail, Teams oder dem Chat von n8n, bis jemand antwortet.",
-                    "rerun": "Mit Autopilot antwortet Rerun deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
+                    "rerun": "Mit Autopilot antwortet Moldwright deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
                 },
                 "5": {
                     "label": "Was es sich merkt",
@@ -694,17 +694,17 @@
                 "6": {
                     "label": "Was der Betrieb kostet",
                     "them": "n8n Cloud zählt Ausführungen: 2.500 im Monat für €20 bei jährlicher Zahlung bei Starter, 10.000 für €50 bei Pro. Selbst hosten ist kostenlos, der Server gehört dir.",
-                    "rerun": "{price} im Monat inklusive Maschine. Rerun zählt weder Ausführungen noch Schritte."
+                    "rerun": "{price} im Monat inklusive Maschine. Moldwright zählt weder Ausführungen noch Schritte."
                 }
             }
         },
         "lindy": {
             "subtitle": "KI-Assistent für dein Team und deine Tools",
-            "pitch": "Lindy rechnet jeden aktiven Nutzer ab und dann jede Aufgabe in Credits. Rerun erledigt dieselben Aufgaben zu einem Festpreis, mit der KI, die du schon bezahlst.",
+            "pitch": "Lindy rechnet jeden aktiven Nutzer ab und dann jede Aufgabe in Credits. Moldwright erledigt dieselben Aufgaben zu einem Festpreis, mit der KI, die du schon bezahlst.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Rund um Slack gebaut: Ein Admin verbindet es, bevor irgendwer loslegen kann.",
-                    "rerun": "Der Copilot von Rerun plant dein Team anhand deiner Website, oder installiere einen von {templates}+ Agenten."
+                    "rerun": "Der Copilot von Moldwright plant dein Team anhand deiner Website, oder installiere einen von {templates}+ Agenten."
                 },
                 "getTheJobDone": {
                     "them": "Aktionen mit Wirkung nach außen warten, bis du sie freigibst.",
@@ -724,7 +724,7 @@
                 },
                 "flexibility": {
                     "them": "1.500+ Integrationen, und jedes Modell wird in Credits zu je $0,01 abgerechnet.",
-                    "rerun": "Lass ihn über dein eigenes ChatGPT- oder Claude-Abo laufen, deinen eigenen Schlüssel oder das enthaltene Rerun-Modell."
+                    "rerun": "Lass ihn über dein eigenes ChatGPT- oder Claude-Abo laufen, deinen eigenen Schlüssel oder das enthaltene Moldwright-Modell."
                 },
                 "pricing": {
                     "them": "$49,99 pro aktivem Nutzer für 5.000 Credits; bei null pausiert Lindy bis zum nächsten Zyklus.",
@@ -740,17 +740,17 @@
                 "2": {
                     "label": "Abrechnung der Nutzung",
                     "them": "Ein Credit kostet $0,01, und jede Aufgabe verbraucht welche: 2 bis 250 für eine alltägliche Anfrage, 1.000 bis 2.500 für einen großen Build. Bei null pausiert Lindy bis zum nächsten Zyklus.",
-                    "rerun": "Rerun zählt nie Ausführungen, und Agenten mit deinem eigenen KI-Abo oder Schlüssel pausieren nie wegen des Budgets."
+                    "rerun": "Moldwright zählt nie Ausführungen, und Agenten mit deinem eigenen KI-Abo oder Schlüssel pausieren nie wegen des Budgets."
                 },
                 "3": {
                     "label": "Deine eigene KI mitbringen",
                     "them": "Du wählst das Modell, Lindy rechnet jedes in eigenen Credits ab. Einen eigenen Schlüssel oder ein eigenes KI-Abo mitzubringen ist nicht dokumentiert.",
-                    "rerun": "Nutze das im Tarif enthaltene Rerun-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
+                    "rerun": "Nutze das im Tarif enthaltene Moldwright-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
                 },
                 "4": {
                     "label": "Während du weg bist",
                     "them": "Aktionen mit Wirkung nach außen warten auf deine Freigabe, mit einer Schutzregel pro Integration in Slack.",
-                    "rerun": "Mit Autopilot antwortet Rerun deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
+                    "rerun": "Mit Autopilot antwortet Moldwright deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
                 },
                 "5": {
                     "label": "Fertige Agenten",
@@ -765,7 +765,7 @@
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du chattest mit Twin, und es richtet die Arbeit ein, die erste Aufgabe ist in Minuten erledigt.",
-                    "rerun": "Der Copilot von Rerun plant dein Team anhand deiner Website, oder installiere einen von {templates}+ Agenten."
+                    "rerun": "Der Copilot von Moldwright plant dein Team anhand deiner Website, oder installiere einen von {templates}+ Agenten."
                 },
                 "getTheJobDone": {
                     "them": "Entwürfe warten in einer Prüfliste: Nichts geht ohne dich raus.",
@@ -785,7 +785,7 @@
                 },
                 "flexibility": {
                     "them": "Twin wählt das Modell, ein eigener Schlüssel oder ein eigenes KI-Abo ist nicht vorgesehen.",
-                    "rerun": "Wähle das Modell: dein ChatGPT- oder Claude-Abo, dein eigener Schlüssel oder das enthaltene Rerun-Modell."
+                    "rerun": "Wähle das Modell: dein ChatGPT- oder Claude-Abo, dein eigener Schlüssel oder das enthaltene Moldwright-Modell."
                 },
                 "pricing": {
                     "them": "$29 im Monat, und $149 für den Browser-Agenten und die Lead-Daten.",
@@ -806,7 +806,7 @@
                 "3": {
                     "label": "Deine eigene KI mitbringen",
                     "them": "Twin leitet jede Aufgabe an das Modell, das es wählt, und kein Tarif erlaubt einen eigenen Schlüssel oder ein eigenes KI-Abo.",
-                    "rerun": "Du wählst für jeden Agenten: das im Tarif enthaltene Rerun-Modell, dein ChatGPT- oder Claude-Abo oder deinen eigenen Schlüssel."
+                    "rerun": "Du wählst für jeden Agenten: das im Tarif enthaltene Moldwright-Modell, dein ChatGPT- oder Claude-Abo oder deinen eigenen Schlüssel."
                 },
                 "4": {
                     "label": "Leads finden",
@@ -822,7 +822,7 @@
         },
         "dust": {
             "subtitle": "KI-Agenten auf deinem Firmenwissen",
-            "pitch": "Dust antwortet auf Basis der Dokumente deiner Firma, pro Platz abgerechnet. Rerun-Agenten erledigen die wiederkehrende Arbeit für das ganze Team, zu einem Preis.",
+            "pitch": "Dust antwortet auf Basis der Dokumente deiner Firma, pro Platz abgerechnet. Moldwright-Agenten erledigen die wiederkehrende Arbeit für das ganze Team, zu einem Preis.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Du baust Agenten in seinem Builder, und der Self-Service-Tarif verbindet höchstens 3 Datenquellen.",
@@ -867,7 +867,7 @@
                 "3": {
                     "label": "Automatisierte Nutzung",
                     "them": "Nutzung, die niemand eintippt, etwa ein API-Aufruf oder ein ausgelöster Lauf, wird mit $0,01 pro Credit abgerechnet, von deinen Credits oder denen des Workspace.",
-                    "rerun": "Geplante und per Webhook gestartete Ausführungen kosten bei Rerun nichts extra."
+                    "rerun": "Geplante und per Webhook gestartete Ausführungen kosten bei Moldwright nichts extra."
                 },
                 "4": {
                     "label": "Apps im Self-Service-Tarif",
@@ -882,13 +882,13 @@
                 "6": {
                     "label": "Die KI dahinter",
                     "them": "20+ Modelle, abgerechnet in Dust-Credits pro Nachricht.",
-                    "rerun": "Nutze das im Tarif enthaltene Rerun-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
+                    "rerun": "Nutze das im Tarif enthaltene Moldwright-Modell, melde dich mit dem ChatGPT- oder Claude-Abo an, das du schon bezahlst, oder bring einen API-Schlüssel mit."
                 }
             }
         },
         "squad": {
             "subtitle": "KI-Teammitglieder auf dem KI-Abo, das du mitbringst",
-            "pitch": "Squad kostet $99 im Monat zusätzlich zu dem KI-Abo, das du mitbringst. Rerun kostet weniger, enthält Modell-Guthaben und hat Agenten, die du sofort installieren kannst.",
+            "pitch": "Squad kostet $99 im Monat zusätzlich zu dem KI-Abo, das du mitbringst. Moldwright kostet weniger, enthält Modell-Guthaben und hat Agenten, die du sofort installieren kannst.",
             "scorecard": {
                 "easeOfUse": {
                     "them": "Ein KI-Chief of Staff entwirft deinen Squad, und du kaufst ein KI-Abo, bevor das erste Teammitglied läuft.",
@@ -938,7 +938,7 @@
                 "4": {
                     "label": "Während du weg bist",
                     "them": "Freigaben per Fingertipp warten in der Ticket-Liste, bis du dazu kommst.",
-                    "rerun": "Mit Autopilot antwortet Rerun deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
+                    "rerun": "Mit Autopilot antwortet Moldwright deinen Agenten nach deinen Regeln, nie bei Ausgaben oder Löschungen, und hat eine Zusammenfassung bereit, wenn du zurückkommst."
                 },
                 "5": {
                     "label": "Fertige Agenten",
@@ -955,11 +955,11 @@
     },
     "pages": {
         "claude-cowork": {
-            "metaTitle": "Rerun vs Claude Cowork: ein Team von Agenten (2026)",
-            "metaDescription": "Rerun vs Claude Cowork bei Modellen, geplanter Arbeit und Preis. Behalte dein Claude-Abo und lass ein Team von Agenten darauf laufen, oder auf jedem anderen Modell.",
-            "headline": "Rerun vs Claude Cowork",
-            "intro": "Cowork, seit September 2026 Teil der Claude-App, lässt Claude Aufgaben für dich übernehmen, mit Claude-Modellen. Rerun betreibt ein Team von Agenten auf einer immer eingeschalteten Maschine, mit jedem Modell, auch mit dem Claude-Abo, das du schon bezahlst.",
-            "verdict": "Nimm Claude, wenn Claude Aufgaben direkt in der App übernehmen soll, in der du schon chattest, mit seinen Connectoren, Skills, Cloud-Zeitplänen und den Docs und Slides, die es jetzt in der Unterhaltung schreibt. Nimm Rerun, wenn du mehrere Agenten mit eigenen Aufgaben willst, die für das ganze Team auf einer immer eingeschalteten Maschine arbeiten, mit dem Modell deiner Wahl. Beides passt zusammen: Melde einen Agenten bei deinem Claude-Abo an, und Rerun lässt ihn auf Claude laufen.",
+            "metaTitle": "Moldwright vs Claude Cowork: ein Team von Agenten (2026)",
+            "metaDescription": "Moldwright vs Claude Cowork bei Modellen, geplanter Arbeit und Preis. Behalte dein Claude-Abo und lass ein Team von Agenten darauf laufen, oder auf jedem anderen Modell.",
+            "headline": "Moldwright vs Claude Cowork",
+            "intro": "Cowork, seit September 2026 Teil der Claude-App, lässt Claude Aufgaben für dich übernehmen, mit Claude-Modellen. Moldwright betreibt ein Team von Agenten auf einer immer eingeschalteten Maschine, mit jedem Modell, auch mit dem Claude-Abo, das du schon bezahlst.",
+            "verdict": "Nimm Claude, wenn Claude Aufgaben direkt in der App übernehmen soll, in der du schon chattest, mit seinen Connectoren, Skills, Cloud-Zeitplänen und den Docs und Slides, die es jetzt in der Unterhaltung schreibt. Nimm Moldwright, wenn du mehrere Agenten mit eigenen Aufgaben willst, die für das ganze Team auf einer immer eingeschalteten Maschine arbeiten, mit dem Modell deiner Wahl. Beides passt zusammen: Melde einen Agenten bei deinem Claude-Abo an, und Moldwright lässt ihn auf Claude laufen.",
             "chooseRerun": {
                 "1": "Du willst manche Agenten auf GPT oder Gemini, nicht nur auf Claude",
                 "2": "Mehrere Agenten sollen Daten teilen und sich gegenseitig Arbeit übergeben",
@@ -974,11 +974,11 @@
             "differences": {
                 "1": {
                     "title": "Jedes Modell, dein Claude-Abo inklusive",
-                    "desc": "Claude läuft mit Claude-Modellen. Jeder Rerun-Agent kann sich mit deinem Claude-Abo anmelden oder mit deinem Schlüssel auf GPT, Gemini oder einem anderen Modell laufen, und du kannst pro Agent oder pro geplanter Aufgabe wechseln."
+                    "desc": "Claude läuft mit Claude-Modellen. Jeder Moldwright-Agent kann sich mit deinem Claude-Abo anmelden oder mit deinem Schlüssel auf GPT, Gemini oder einem anderen Modell laufen, und du kannst pro Agent oder pro geplanter Aufgabe wechseln."
                 },
                 "2": {
                     "title": "Eine Maschine, die an bleibt",
-                    "desc": "Die geplanten Aufgaben von Claude laufen in jedem bezahlten Tarif in der Cloud, höchstens stündlich, aber eine Aufgabe, die einen Ordner oder eine App auf deinem Computer braucht, läuft nur dort, solange er an ist. Rerun-Agenten laufen auf der privaten Maschine deines Workspace, minutengenau, dort, wo ihre Dateien, Datenbanken und ihr Browser liegen, Tag und Nacht."
+                    "desc": "Die geplanten Aufgaben von Claude laufen in jedem bezahlten Tarif in der Cloud, höchstens stündlich, aber eine Aufgabe, die einen Ordner oder eine App auf deinem Computer braucht, läuft nur dort, solange er an ist. Moldwright-Agenten laufen auf der privaten Maschine deines Workspace, minutengenau, dort, wo ihre Dateien, Datenbanken und ihr Browser liegen, Tag und Nacht."
                 },
                 "3": {
                     "title": "Ein Team, nicht ein Assistent",
@@ -986,7 +986,7 @@
                 },
                 "4": {
                     "title": "Das ganze Team antwortet",
-                    "desc": "Bei Claude arbeitet jede Person mit ihrem eigenen Abo, ab $20 pro Platz. Bei Rerun gehört jeder Agent dem Workspace, Plätze sind kostenlos und unbegrenzt, Teammitglieder sehen, was er getan hat, und jedes kann antworten, wenn er anhält und fragt. Mit Autopilot antwortet der Chief of Staff nach deinen Regeln, während alle weg sind."
+                    "desc": "Bei Claude arbeitet jede Person mit ihrem eigenen Abo, ab $20 pro Platz. Bei Moldwright gehört jeder Agent dem Workspace, Plätze sind kostenlos und unbegrenzt, Teammitglieder sehen, was er getan hat, und jedes kann antworten, wenn er anhält und fragt. Mit Autopilot antwortet der Chief of Staff nach deinen Regeln, während alle weg sind."
                 }
             },
             "switchSteps": {
@@ -1003,18 +1003,18 @@
                     "desc": "Agenten laufen auf ihrer Maschine nach Zeitplan oder per Webhook und fragen das Team, wenn sie eine Entscheidung brauchen."
                 }
             },
-            "theirPricing": "Cowork ist Teil der bezahlten Claude-Abos: Pro kostet $20 im Monat ($17 bei jährlicher Zahlung), Max ab $100 mit $100 bis $200 API-Guthaben, Team $25 pro Platz ($20 bei jährlicher Zahlung, mindestens zwei Plätze) mit bis zu $500 gemeinsamem API-Guthaben, und Enterprise $20 pro Platz mit Nutzung zu API-Preisen. Jedes Abo hat eigene Nutzungslimits. Rerun ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, die dein Team teilt, Plätze inklusive, und seine Agenten können über ein Claude-Abo laufen, das du schon hast.",
+            "theirPricing": "Cowork ist Teil der bezahlten Claude-Abos: Pro kostet $20 im Monat ($17 bei jährlicher Zahlung), Max ab $100 mit $100 bis $200 API-Guthaben, Team $25 pro Platz ($20 bei jährlicher Zahlung, mindestens zwei Plätze) mit bis zu $500 gemeinsamem API-Guthaben, und Enterprise $20 pro Platz mit Nutzung zu API-Preisen. Jedes Abo hat eigene Nutzungslimits. Moldwright ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, die dein Team teilt, Plätze inklusive, und seine Agenten können über ein Claude-Abo laufen, das du schon hast.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Claude Cowork?",
-                    "answer": "Eher eine Ergänzung. Claude übernimmt Aufgaben für die Person, die es nutzt, mit Claude-Modellen. Rerun betreibt ein Team von Agenten auf einer immer eingeschalteten Maschine, mit jedem Modell, und kann sie über dein Claude-Abo laufen lassen."
+                    "question": "Ist Moldwright eine Alternative zu Claude Cowork?",
+                    "answer": "Eher eine Ergänzung. Claude übernimmt Aufgaben für die Person, die es nutzt, mit Claude-Modellen. Moldwright betreibt ein Team von Agenten auf einer immer eingeschalteten Maschine, mit jedem Modell, und kann sie über dein Claude-Abo laufen lassen."
                 },
                 "2": {
-                    "question": "Kann ich mein Claude-Abo mit Rerun nutzen?",
-                    "answer": "Ja. Melde einen Agenten bei deinem Claude-Konto an, und er läuft über dein Abo, innerhalb der Nutzungslimits dieses Abos. Rerun fügt kein eigenes Limit hinzu."
+                    "question": "Kann ich mein Claude-Abo mit Moldwright nutzen?",
+                    "answer": "Ja. Melde einen Agenten bei deinem Claude-Konto an, und er läuft über dein Abo, innerhalb der Nutzungslimits dieses Abos. Moldwright fügt kein eigenes Limit hinzu."
                 },
                 "3": {
-                    "question": "Kann ich Rerun eine To-do-Liste geben?",
+                    "question": "Kann ich Moldwright eine To-do-Liste geben?",
                     "answer": "Ja. Schreib oder diktiere dem Chief of Staff, dem Assistenten, der deine Agenten führt, was du vorhast, oder halte die Leertaste gedrückt und sprich. Er gibt jede Aufgabe an den richtigen Agenten weiter, schlägt einen neuen Agenten vor, wenn keiner es kann, und behält, was nur du tun kannst, in deiner Aufgabenliste."
                 },
                 "4": {
@@ -1022,17 +1022,17 @@
                     "answer": "Anthropic hat Cowork am 16. September 2026 in die Claude-App integriert. Was Cowork konnte, ist jetzt in jeder Claude-Unterhaltung verfügbar: Pro und Max bekamen es zuerst, Team und Free folgen."
                 },
                 "5": {
-                    "question": "Laufen Rerun-Agenten, wenn mein Computer aus ist?",
+                    "question": "Laufen Moldwright-Agenten, wenn mein Computer aus ist?",
                     "answer": "Ja. Sie laufen auf der privaten Maschine deines Workspace in der Cloud, nach Zeitplan oder per Webhook, egal ob dein Laptop offen ist oder nicht. Bei Claude läuft eine Aufgabe, die einen lokalen Ordner oder eine lokale App braucht, nur auf deinem eigenen Computer."
                 }
             }
         },
         "manus": {
-            "metaTitle": "Rerun vs Manus: Festpreis für wiederkehrende Arbeit (2026)",
-            "metaDescription": "Rerun vs Manus bei Credits, Zeitplänen und Teams. Manus rechnet jede Aufgabe in Credits ab und begrenzt dich auf 20 geplante Aufgaben; Rerun ist ein Festpreis-Tarif ohne Limit.",
-            "headline": "Rerun vs Manus",
-            "intro": "Manus ist ein allgemeiner KI-Agent, der recherchiert, baut und liefert, abgerechnet in Credits pro Aufgabe. Rerun betreibt ein Team von Agenten für wiederkehrende Business-Arbeit, auf einer privaten Maschine, zu einem Festpreis.",
-            "verdict": "Nimm Manus für einmalige Ergebnisse wie eine gründliche Recherche, eine Präsentation oder eine Website, wofür sein allgemeiner Agent gebaut ist, und für Wide Research über viele Quellen gleichzeitig. Nimm Rerun für Arbeit, die sich wiederholt: so viele Zeitpläne und Webhooks, wie die Arbeit braucht, statt 20, Agenten, die Daten teilen und deinem ganzen Team antworten, für {price} im Monat statt Credits pro Aufgabe.",
+            "metaTitle": "Moldwright vs Manus: Festpreis für wiederkehrende Arbeit (2026)",
+            "metaDescription": "Moldwright vs Manus bei Credits, Zeitplänen und Teams. Manus rechnet jede Aufgabe in Credits ab und begrenzt dich auf 20 geplante Aufgaben; Moldwright ist ein Festpreis-Tarif ohne Limit.",
+            "headline": "Moldwright vs Manus",
+            "intro": "Manus ist ein allgemeiner KI-Agent, der recherchiert, baut und liefert, abgerechnet in Credits pro Aufgabe. Moldwright betreibt ein Team von Agenten für wiederkehrende Business-Arbeit, auf einer privaten Maschine, zu einem Festpreis.",
+            "verdict": "Nimm Manus für einmalige Ergebnisse wie eine gründliche Recherche, eine Präsentation oder eine Website, wofür sein allgemeiner Agent gebaut ist, und für Wide Research über viele Quellen gleichzeitig. Nimm Moldwright für Arbeit, die sich wiederholt: so viele Zeitpläne und Webhooks, wie die Arbeit braucht, statt 20, Agenten, die Daten teilen und deinem ganzen Team antworten, für {price} im Monat statt Credits pro Aufgabe.",
             "chooseRerun": {
                 "1": "Die Arbeit wiederholt sich jeden Tag oder bei jedem Ereignis",
                 "2": "Du brauchst mehr als 20 geplante Aufgaben oder eine, die alle paar Minuten läuft",
@@ -1047,19 +1047,19 @@
             "differences": {
                 "1": {
                     "title": "Wiederkehrende Arbeit ohne Limit",
-                    "desc": "Jeder Manus-Tarif endet bei 20 geplanten Aufgaben und 20 gleichzeitig laufenden, egal ob für $20, $40 oder $200. Rerun-Agenten nehmen so viele Zeitpläne und Webhooks, wie die Arbeit braucht, minutengenau, im selben Festpreis-Tarif, und eine Routines-Liste zeigt, was als Nächstes läuft, mit Pausieren und Jetzt ausführen."
+                    "desc": "Jeder Manus-Tarif endet bei 20 geplanten Aufgaben und 20 gleichzeitig laufenden, egal ob für $20, $40 oder $200. Moldwright-Agenten nehmen so viele Zeitpläne und Webhooks, wie die Arbeit braucht, minutengenau, im selben Festpreis-Tarif, und eine Routines-Liste zeigt, was als Nächstes läuft, mit Pausieren und Jetzt ausführen."
                 },
                 "2": {
                     "title": "Deine KI, kein Credit-Guthaben",
-                    "desc": "Jede Manus-Aufgabe kostet Credits: $20 im Monat bringen 4,000, plus 300, die jeden Tag aufgefüllt werden. Rerun zählt nie Aufgaben: Agenten laufen über dein ChatGPT- oder Claude-Abo, deinen eigenen Schlüssel oder das enthaltene Guthaben."
+                    "desc": "Jede Manus-Aufgabe kostet Credits: $20 im Monat bringen 4,000, plus 300, die jeden Tag aufgefüllt werden. Moldwright zählt nie Aufgaben: Agenten laufen über dein ChatGPT- oder Claude-Abo, deinen eigenen Schlüssel oder das enthaltene Guthaben."
                 },
                 "3": {
                     "title": "Ein Team von Agenten",
-                    "desc": "Manus behält Kontext, indem ein Zeitplan in derselben Aufgabe läuft oder ein Project Dateien und Konnektoren teilt. Bei Rerun haben mehrere Agenten je eine eigene Aufgabe, ein eigenes Gedächtnis und eigene Skills und teilen einen Ordner, eine Datenbank und ein Firmenwissen. Sag dem Chief of Staff, was du vorhast, und er gibt jede Aufgabe an den richtigen Agenten weiter."
+                    "desc": "Manus behält Kontext, indem ein Zeitplan in derselben Aufgabe läuft oder ein Project Dateien und Konnektoren teilt. Bei Moldwright haben mehrere Agenten je eine eigene Aufgabe, ein eigenes Gedächtnis und eigene Skills und teilen einen Ordner, eine Datenbank und ein Firmenwissen. Sag dem Chief of Staff, was du vorhast, und er gibt jede Aufgabe an den richtigen Agenten weiter."
                 },
                 "4": {
                     "title": "Ein Board für das ganze Team",
-                    "desc": "In einem Manus-Team-Tarif führt jedes Mitglied seine eigenen Aufgaben mit den gemeinsamen Credits aus, ab $20 pro Platz. Bei Rerun sind Plätze kostenlos und unbegrenzt, dein Team teilt dieselben Agenten, und jedes Teammitglied kann einem antworten, der anhält und fragt."
+                    "desc": "In einem Manus-Team-Tarif führt jedes Mitglied seine eigenen Aufgaben mit den gemeinsamen Credits aus, ab $20 pro Platz. Bei Moldwright sind Plätze kostenlos und unbegrenzt, dein Team teilt dieselben Agenten, und jedes Teammitglied kann einem antworten, der anhält und fragt."
                 }
             },
             "switchSteps": {
@@ -1076,36 +1076,36 @@
                     "desc": "Jeder Zeitplan oder Webhook, ohne Limit von 20. Er läuft auf seiner Maschine und fragt, wenn er eine Entscheidung braucht."
                 }
             },
-            "theirPricing": "Manus rechnet in Credits pro Aufgabe ab: $20 im Monat für 4.000 Credits, $40 für 8.000 und $200 für 40,000, jeweils mit 300 Credits, die jeden Tag aufgefüllt werden, 20 geplanten Aufgaben und 20 Aufgaben gleichzeitig. Team-Tarife beginnen bei $20 pro Platz und Monat mit 4.000 Credits pro Platz, zusammengelegt. Rerun ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, unbegrenzte Plätze inklusive, und zählt nie Aufgaben.",
+            "theirPricing": "Manus rechnet in Credits pro Aufgabe ab: $20 im Monat für 4.000 Credits, $40 für 8.000 und $200 für 40,000, jeweils mit 300 Credits, die jeden Tag aufgefüllt werden, 20 geplanten Aufgaben und 20 Aufgaben gleichzeitig. Team-Tarife beginnen bei $20 pro Platz und Monat mit 4.000 Credits pro Platz, zusammengelegt. Moldwright ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, unbegrenzte Plätze inklusive, und zählt nie Aufgaben.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Manus?",
-                    "answer": "Für wiederkehrende Arbeit, ja. Manus glänzt bei einmaligen Ergebnissen. Rerun-Agenten übernehmen Aufgaben, die sich wiederholen, nach Zeitplan oder per Webhook, zu einem Festpreis."
+                    "question": "Ist Moldwright eine Alternative zu Manus?",
+                    "answer": "Für wiederkehrende Arbeit, ja. Manus glänzt bei einmaligen Ergebnissen. Moldwright-Agenten übernehmen Aufgaben, die sich wiederholen, nach Zeitplan oder per Webhook, zu einem Festpreis."
                 },
                 "2": {
-                    "question": "Nutzt Rerun Credits wie Manus?",
-                    "answer": "Nein. Rerun zählt nie Aufgaben. Der Tarif enthält ein kleines Guthaben für die Modelle, die Rerun hostet, und Agenten mit deinem eigenen ChatGPT- oder Claude-Abo oder Schlüssel kosten bei Rerun nichts extra."
+                    "question": "Nutzt Moldwright Credits wie Manus?",
+                    "answer": "Nein. Moldwright zählt nie Aufgaben. Der Tarif enthält ein kleines Guthaben für die Modelle, die Moldwright hostet, und Agenten mit deinem eigenen ChatGPT- oder Claude-Abo oder Schlüssel kosten bei Moldwright nichts extra."
                 },
                 "3": {
-                    "question": "Kann ich Rerun eine To-do-Liste geben?",
+                    "question": "Kann ich Moldwright eine To-do-Liste geben?",
                     "answer": "Ja. Schreib oder diktiere dem Chief of Staff, dem Assistenten, der deine Agenten führt, was du vorhast. Er gibt jede Aufgabe an den richtigen Agenten weiter, schlägt einen neuen Agenten vor, wenn keiner es kann, und behält, was nur du tun kannst, in deiner Aufgabenliste."
                 },
                 "4": {
-                    "question": "Wie viele geplante Aufgaben kann ich auf Rerun laufen lassen?",
+                    "question": "Wie viele geplante Aufgaben kann ich auf Moldwright laufen lassen?",
                     "answer": "So viele, wie die Arbeit braucht: Jeder Agent kann mehrere Zeitpläne und Webhooks haben, minutengenau. Jeder Manus-Tarif endet bei 20 geplanten Aufgaben und 20 gleichzeitig laufenden."
                 },
                 "5": {
-                    "question": "Können Rerun-Agenten im Web surfen und Dateien erstellen?",
+                    "question": "Können Moldwright-Agenten im Web surfen und Dateien erstellen?",
                     "answer": "Ja. Sie suchen, steuern einen Browser, übernehmen einen Desktop für Apps ohne API und schreiben Dateien auf der privaten Maschine deines Workspace, und sie können eine Datei unter einem öffentlichen Link veröffentlichen."
                 }
             }
         },
         "grok-bot": {
-            "metaTitle": "Rerun vs Grok Bot: jedes Modell, voller Überblick (2026)",
-            "metaDescription": "Rerun vs Grok Bot von xAI im Vergleich: Zugang, Modelle, Transparenz und Kosten. Beide geben Agenten einen Computer in der Cloud. Finde heraus, was zu deinem Team passt.",
-            "headline": "Rerun vs Grok Bot",
-            "intro": "Grok Bot von xAI gibt immer aktiven KI-Teammitgliedern einen gemeinsamen Computer in der Cloud. Rerun auch, mit dem Modell deiner Wahl und einem Board, das dein ganzes Team lesen kann.",
-            "verdict": "Beide setzen Agenten auf einen Cloud-Computer, lassen sie sich bei deinen Tools anmelden und rund um die Uhr arbeiten, und bei beiden übergibt ein Agent Arbeit an einen anderen. Nimm Grok Bot, wenn du schon SuperGrok oder einen Cursor-Tarif bezahlst, der es enthält, und dir eine Beta in deren Apps reicht. Nimm Rerun, wenn du das Modell wählen, mit {templates}+ fertigen Agenten starten, dem ganzen Team ein Board zum Lesen geben und Agenten heute in einem eigenen Tarif mit veröffentlichten Preisen kaufen willst.",
+            "metaTitle": "Moldwright vs Grok Bot: jedes Modell, voller Überblick (2026)",
+            "metaDescription": "Moldwright vs Grok Bot von xAI im Vergleich: Zugang, Modelle, Transparenz und Kosten. Beide geben Agenten einen Computer in der Cloud. Finde heraus, was zu deinem Team passt.",
+            "headline": "Moldwright vs Grok Bot",
+            "intro": "Grok Bot von xAI gibt immer aktiven KI-Teammitgliedern einen gemeinsamen Computer in der Cloud. Moldwright auch, mit dem Modell deiner Wahl und einem Board, das dein ganzes Team lesen kann.",
+            "verdict": "Beide setzen Agenten auf einen Cloud-Computer, lassen sie sich bei deinen Tools anmelden und rund um die Uhr arbeiten, und bei beiden übergibt ein Agent Arbeit an einen anderen. Nimm Grok Bot, wenn du schon SuperGrok oder einen Cursor-Tarif bezahlst, der es enthält, und dir eine Beta in deren Apps reicht. Nimm Moldwright, wenn du das Modell wählen, mit {templates}+ fertigen Agenten starten, dem ganzen Team ein Board zum Lesen geben und Agenten heute in einem eigenen Tarif mit veröffentlichten Preisen kaufen willst.",
             "chooseRerun": {
                 "1": "Du willst mit Claude, ChatGPT oder deinem eigenen Modell arbeiten",
                 "2": "Du willst einen eigenen Tarif mit veröffentlichten Preisen, kein Bundle in der Beta",
@@ -1120,7 +1120,7 @@
             "differences": {
                 "1": {
                     "title": "Dein Modell, nicht ein Anbieter",
-                    "desc": "Grok Bot läuft mit den Modellen von xAI, mit eigenem Nutzungskontingent getrennt von deinem Grok- oder Cursor-Abo. Rerun-Agenten laufen mit dem im Tarif enthaltenen Modell oder mit Claude, ChatGPT, Gemini und mehr über dein eigenes Abo oder deinen Schlüssel und erreichen {connectors}+ Apps oder jeden MCP-Server."
+                    "desc": "Grok Bot läuft mit den Modellen von xAI, mit eigenem Nutzungskontingent getrennt von deinem Grok- oder Cursor-Abo. Moldwright-Agenten laufen mit dem im Tarif enthaltenen Modell oder mit Claude, ChatGPT, Gemini und mehr über dein eigenes Abo oder deinen Schlüssel und erreichen {connectors}+ Apps oder jeden MCP-Server."
                 },
                 "2": {
                     "title": "Ein Board, nicht nur ein Chat",
@@ -1128,11 +1128,11 @@
                 },
                 "3": {
                     "title": "Freigaben, die das ganze Team erteilen kann",
-                    "desc": "Bots melden sich bei der Person, der sie gehören, wenn sie eine Freigabe brauchen. Bei Rerun halten Agenten vor jedem riskanten Schritt an und fragen in der App, Plätze sind kostenlos, und jede Person im Workspace kann antworten. Mit Autopilot antwortet der Chief of Staff nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen."
+                    "desc": "Bots melden sich bei der Person, der sie gehören, wenn sie eine Freigabe brauchen. Bei Moldwright halten Agenten vor jedem riskanten Schritt an und fragen in der App, Plätze sind kostenlos, und jede Person im Workspace kann antworten. Mit Autopilot antwortet der Chief of Staff nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen."
                 },
                 "4": {
                     "title": "Ein eigener Tarif",
-                    "desc": "Grok Bot ist noch in der Beta, gebündelt mit SuperGrok- und Cursor-Tarifen, nie einzeln erhältlich, und für Enterprise gibt es eine Warteliste. Rerun ist ein Tarif ab {price} im Monat mit einer kostenlosen 5-Tage-Testphase."
+                    "desc": "Grok Bot ist noch in der Beta, gebündelt mit SuperGrok- und Cursor-Tarifen, nie einzeln erhältlich, und für Enterprise gibt es eine Warteliste. Moldwright ist ein Tarif ab {price} im Monat mit einer kostenlosen 5-Tage-Testphase."
                 }
             },
             "switchSteps": {
@@ -1149,32 +1149,32 @@
                     "desc": "Er läuft auf seiner Maschine, nach Zeitplan oder per Auslöser, und jede Aktion erscheint auf deinem Board."
                 }
             },
-            "theirPricing": "Grok Bot wird nicht einzeln verkauft: Es ist in der Beta in jeder SuperGrok-Stufe und in den Cursor-Tarifen Pro, Pro+, Ultra und Teams enthalten, und seine Nutzung wird getrennt von diesen Tarifen gezählt. Für Enterprise gibt es noch eine Warteliste. Rerun ist ein Tarif ab {price} im Monat, Plätze inklusive, und Ausführungen werden nie gezählt.",
+            "theirPricing": "Grok Bot wird nicht einzeln verkauft: Es ist in der Beta in jeder SuperGrok-Stufe und in den Cursor-Tarifen Pro, Pro+, Ultra und Teams enthalten, und seine Nutzung wird getrennt von diesen Tarifen gezählt. Für Enterprise gibt es noch eine Warteliste. Moldwright ist ein Tarif ab {price} im Monat, Plätze inklusive, und Ausführungen werden nie gezählt.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Grok Bot?",
-                    "answer": "Ja. Wie Grok Bot lässt Rerun deine Agenten auf einem Computer in der Cloud laufen und einen Agenten Arbeit an einen anderen übergeben. Bei Rerun wählst du das Modell, jede Aktion erscheint auf einem Board, das jedes Teammitglied lesen kann, und es gibt einen eigenen Tarif mit veröffentlichten Preisen."
+                    "question": "Ist Moldwright eine Alternative zu Grok Bot?",
+                    "answer": "Ja. Wie Grok Bot lässt Moldwright deine Agenten auf einem Computer in der Cloud laufen und einen Agenten Arbeit an einen anderen übergeben. Bei Moldwright wählst du das Modell, jede Aktion erscheint auf einem Board, das jedes Teammitglied lesen kann, und es gibt einen eigenen Tarif mit veröffentlichten Preisen."
                 },
                 "2": {
-                    "question": "Kann Rerun Grok-Modelle nutzen?",
+                    "question": "Kann Moldwright Grok-Modelle nutzen?",
                     "answer": "Ja, mit einem OpenRouter-Schlüssel: Grok steht in der Modellauswahl neben Claude, GPT, Gemini und weiteren."
                 },
                 "3": {
-                    "question": "Brauche ich für Rerun einen SuperGrok- oder Cursor-Tarif?",
-                    "answer": "Nein. Rerun hat einen eigenen Tarif ab {price} im Monat mit einer kostenlosen 5-Tage-Testphase."
+                    "question": "Brauche ich für Moldwright einen SuperGrok- oder Cursor-Tarif?",
+                    "answer": "Nein. Moldwright hat einen eigenen Tarif ab {price} im Monat mit einer kostenlosen 5-Tage-Testphase."
                 },
                 "4": {
-                    "question": "Wo laufen Rerun-Agenten?",
+                    "question": "Wo laufen Moldwright-Agenten?",
                     "answer": "Auf dem privaten, isolierten Computer deines Workspace, in jedem Tarif enthalten, mit einem Browser und einem Desktop, den sie steuern können. Deine Dateien und Daten bleiben darin."
                 }
             }
         },
         "paperclip": {
-            "metaTitle": "Rerun vs Paperclip: gehostete Agenten oder ein selbst gehostetes Organigramm? (2026)",
-            "metaDescription": "Rerun vs Paperclip bei Hosting, Agenten-Laufzeiten, Connectoren und echten Kosten: wann das Open-Source-Organigramm für Agenten passt und wann eine gehostete Paperclip-Alternative einfacher ist.",
-            "headline": "Rerun vs Paperclip",
-            "intro": "Paperclip ist eine Open-Source-Steuerungsebene, die du hostest: Sie gibt den Agenten, die du schon betreibst, ein Organigramm, Budgets und Freigabestufen. Rerun gibt dir die Agenten selbst, bereits laufend auf einer privaten Maschine in der Cloud.",
-            "verdict": "Nimm Paperclip, wenn du schon mehrere Coding-Agenten betreibst und ein Organigramm, Budgets pro Agent und Freigabestufen über alle willst, und du gern einen Node-Server samt Datenbank hostest. Nimm Rerun, wenn du die Agenten willst, nicht den Ort, um sie zu verwalten: Jeder läuft auf der privaten Maschine deines Workspace, mit {connectors}+ Apps per Klick und Gedächtnis zwischen den Ausführungen, für pauschal {price} im Monat.",
+            "metaTitle": "Moldwright vs Paperclip: gehostete Agenten oder ein selbst gehostetes Organigramm? (2026)",
+            "metaDescription": "Moldwright vs Paperclip bei Hosting, Agenten-Laufzeiten, Connectoren und echten Kosten: wann das Open-Source-Organigramm für Agenten passt und wann eine gehostete Paperclip-Alternative einfacher ist.",
+            "headline": "Moldwright vs Paperclip",
+            "intro": "Paperclip ist eine Open-Source-Steuerungsebene, die du hostest: Sie gibt den Agenten, die du schon betreibst, ein Organigramm, Budgets und Freigabestufen. Moldwright gibt dir die Agenten selbst, bereits laufend auf einer privaten Maschine in der Cloud.",
+            "verdict": "Nimm Paperclip, wenn du schon mehrere Coding-Agenten betreibst und ein Organigramm, Budgets pro Agent und Freigabestufen über alle willst, und du gern einen Node-Server samt Datenbank hostest. Nimm Moldwright, wenn du die Agenten willst, nicht den Ort, um sie zu verwalten: Jeder läuft auf der privaten Maschine deines Workspace, mit {connectors}+ Apps per Klick und Gedächtnis zwischen den Ausführungen, für pauschal {price} im Monat.",
             "chooseRerun": {
                 "1": "Du willst Agenten, die schon arbeiten, keine Steuerungsebene über Agenten, die du erst installieren musst",
                 "2": "Niemand im Team will einen Server, eine Datenbank und deren Backups hosten",
@@ -1190,19 +1190,19 @@
             "differences": {
                 "1": {
                     "title": "Die Agenten kommen mit der Maschine",
-                    "desc": "Paperclip stellt Agenten ein, die du dann selbst liefern musst: ein auf dem Host installiertes Harness für jede Rolle oder einen Sandbox-Anbieter, den du mitbringst und bezahlst. Ein Rerun-Agent kommt mit seiner Maschine, auf der er Dateien schreibt, Skripte ausführt, einen Browser steuert und seine eigenen Datenbanken behält."
+                    "desc": "Paperclip stellt Agenten ein, die du dann selbst liefern musst: ein auf dem Host installiertes Harness für jede Rolle oder einen Sandbox-Anbieter, den du mitbringst und bezahlst. Ein Moldwright-Agent kommt mit seiner Maschine, auf der er Dateien schreibt, Skripte ausführt, einen Browser steuert und seine eigenen Datenbanken behält."
                 },
                 "2": {
                     "title": "Nichts zu installieren oder zu hosten",
-                    "desc": "Paperclip ist ein Node-Server, den du installierst, mit einer Postgres verbindest und gepatcht hältst, und um ein Teammitglied hereinzulassen, schaltest du ihn in den authentifizierten Modus auf einem Server, den es erreicht, im LAN, per VPN oder im offenen Internet. Für Paperclip Cloud gibt es noch eine Warteliste. Rerun-Agenten laufen schon in der Cloud, nach Zeitplan, egal ob du online bist oder nicht."
+                    "desc": "Paperclip ist ein Node-Server, den du installierst, mit einer Postgres verbindest und gepatcht hältst, und um ein Teammitglied hereinzulassen, schaltest du ihn in den authentifizierten Modus auf einem Server, den es erreicht, im LAN, per VPN oder im offenen Internet. Für Paperclip Cloud gibt es noch eine Warteliste. Moldwright-Agenten laufen schon in der Cloud, nach Zeitplan, egal ob du online bist oder nicht."
                 },
                 "3": {
                     "title": "Apps, mit denen der Agent handeln kann",
-                    "desc": "Der Katalog von Paperclip umfasst 62 Connectoren, und die Einrichtung liegt bei dir: Sein Gmail kann nur lesen und Entwürfe erstellen, ein Mensch verschickt sie, und solange Google ihre App prüft, sind die Google-Connectoren aus der Liste ausgeblendet. Die verwaltete Anmeldung per Klick funktioniert nur auf Instanzen, die in Paperclip Cloud registriert sind. Bei Rerun gibt ein einziges Google-Login dem Agenten ein Gmail, in dem er liest, labelt, antwortet und sendet, und der Rest des Katalogs verbindet sich auf demselben Bildschirm oder über jeden MCP-Server."
+                    "desc": "Der Katalog von Paperclip umfasst 62 Connectoren, und die Einrichtung liegt bei dir: Sein Gmail kann nur lesen und Entwürfe erstellen, ein Mensch verschickt sie, und solange Google ihre App prüft, sind die Google-Connectoren aus der Liste ausgeblendet. Die verwaltete Anmeldung per Klick funktioniert nur auf Instanzen, die in Paperclip Cloud registriert sind. Bei Moldwright gibt ein einziges Google-Login dem Agenten ein Gmail, in dem er liest, labelt, antwortet und sendet, und der Rest des Katalogs verbindet sich auf demselben Bildschirm oder über jeden MCP-Server."
                 },
                 "4": {
                     "title": "Gedächtnis, das schon da ist",
-                    "desc": "Paperclip führt Gedächtnis und Wissen als Richtung für künftige Arbeit, mit experimentellen Anbindungen an Mem0, Zep oder Supermemory hinter einer Instanz-Einstellung. Rerun-Agenten behalten Gedächtnis, Skills und eine private Datenbank zwischen den Ausführungen und werden mit jeder Korrektur besser."
+                    "desc": "Paperclip führt Gedächtnis und Wissen als Richtung für künftige Arbeit, mit experimentellen Anbindungen an Mem0, Zep oder Supermemory hinter einer Instanz-Einstellung. Moldwright-Agenten behalten Gedächtnis, Skills und eine private Datenbank zwischen den Ausführungen und werden mit jeder Korrektur besser."
                 }
             },
             "switchSteps": {
@@ -1219,40 +1219,40 @@
                     "desc": "Der Agent läuft jetzt auf der Maschine deines Workspace, nach eigenem Zeitplan, und fragt vor allem Riskanten ein beliebiges Teammitglied."
                 }
             },
-            "theirPricing": "Paperclip ist kostenlos und MIT-lizenziert, und es gibt keinen Paperclip-Tarif zu kaufen. Ihr eigener Quickstart veranschlagt $5 bis $20 zum Ausprobieren und $20 bis $100 im Monat an Modellaufrufen für eine aktive Firma, zusätzlich zur Maschine, der Datenbank und der Wartung, mit fast jede Woche einem Release. Rerun ist ein Tarif ab {price} im Monat mit einer gesicherten privaten Maschine, unbegrenzten Agenten und Modell-Guthaben inklusive, und Ausführungen werden nie gezählt.",
+            "theirPricing": "Paperclip ist kostenlos und MIT-lizenziert, und es gibt keinen Paperclip-Tarif zu kaufen. Ihr eigener Quickstart veranschlagt $5 bis $20 zum Ausprobieren und $20 bis $100 im Monat an Modellaufrufen für eine aktive Firma, zusätzlich zur Maschine, der Datenbank und der Wartung, mit fast jede Woche einem Release. Moldwright ist ein Tarif ab {price} im Monat mit einer gesicherten privaten Maschine, unbegrenzten Agenten und Modell-Guthaben inklusive, und Ausführungen werden nie gezählt.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine gehostete Alternative zu Paperclip?",
-                    "answer": "Ja, mit einem Unterschied, den du zuerst kennen solltest. Paperclip organisiert Agenten, die du selbst installierst und hostest; die Agenten von Rerun gehören zum Produkt, laufen bereits auf der privaten Maschine deines Workspace, mit deinen Apps im Browser verbunden und einem Live-Board, das dein Team lesen kann."
+                    "question": "Ist Moldwright eine gehostete Alternative zu Paperclip?",
+                    "answer": "Ja, mit einem Unterschied, den du zuerst kennen solltest. Paperclip organisiert Agenten, die du selbst installierst und hostest; die Agenten von Moldwright gehören zum Produkt, laufen bereits auf der privaten Maschine deines Workspace, mit deinen Apps im Browser verbunden und einem Live-Board, das dein Team lesen kann."
                 },
                 "2": {
                     "question": "Betreibt Paperclip die Agenten selbst?",
-                    "answer": "Nein. Paperclip ist die Steuerungsebene: „Wenn er einen Heartbeat empfangen kann, ist er eingestellt.“ Du bringst die Laufzeitumgebung für jede Rolle mit, Claude Code, Codex, Cursor, OpenCode, Hermes oder OpenClaw, und installierst sie auf dem Host. Bei Rerun ist der Agent das Produkt, und du wählst nur, mit welchem Modell er läuft."
+                    "answer": "Nein. Paperclip ist die Steuerungsebene: „Wenn er einen Heartbeat empfangen kann, ist er eingestellt.“ Du bringst die Laufzeitumgebung für jede Rolle mit, Claude Code, Codex, Cursor, OpenCode, Hermes oder OpenClaw, und installierst sie auf dem Host. Bei Moldwright ist der Agent das Produkt, und du wählst nur, mit welchem Modell er läuft."
                 },
                 "3": {
                     "question": "Was kostet Paperclip wirklich?",
-                    "answer": "Die Software ist kostenlos und MIT-lizenziert. Du zahlst die Modellrechnung, und ihr Quickstart plant $5 bis $20 zum Ausprobieren und $20 bis $100 im Monat für eine aktive Firma ein, plus den Server, seine Postgres und die Zeit, beides aktuell zu halten. Rerun kostet {price} im Monat mit Maschine, unbegrenzten Agenten und Modell-Guthaben inklusive."
+                    "answer": "Die Software ist kostenlos und MIT-lizenziert. Du zahlst die Modellrechnung, und ihr Quickstart plant $5 bis $20 zum Ausprobieren und $20 bis $100 im Monat für eine aktive Firma ein, plus den Server, seine Postgres und die Zeit, beides aktuell zu halten. Moldwright kostet {price} im Monat mit Maschine, unbegrenzten Agenten und Modell-Guthaben inklusive."
                 },
                 "4": {
-                    "question": "Kann Rerun wie Paperclip über mein Claude- oder ChatGPT-Abo laufen?",
-                    "answer": "Ja, und Paperclip auch, hier liegt also nicht der Unterschied. Paperclip meldet sich über die CLI des Anbieters an, die auf seinem Host installiert ist; bei Rerun meldest du dich im Browser an und kannst auch einen API-Schlüssel oder das im Tarif enthaltene Guthaben nutzen."
+                    "question": "Kann Moldwright wie Paperclip über mein Claude- oder ChatGPT-Abo laufen?",
+                    "answer": "Ja, und Paperclip auch, hier liegt also nicht der Unterschied. Paperclip meldet sich über die CLI des Anbieters an, die auf seinem Host installiert ist; bei Moldwright meldest du dich im Browser an und kannst auch einen API-Schlüssel oder das im Tarif enthaltene Guthaben nutzen."
                 },
                 "5": {
-                    "question": "Hat Rerun Budgets und Freigaben wie Paperclip?",
-                    "answer": "Freigaben, ja: Agenten halten vor allem Folgenreichen an und fragen in der App, und jedes Teammitglied kann antworten. Bei Budgets liegt Paperclip vorn, mit Regeln pro Firma, Agent und Projekt, die die Arbeit bei 100% pausieren. Rerun begrenzt das enthaltene Modell-Guthaben und zählt nie Ausführungen."
+                    "question": "Hat Moldwright Budgets und Freigaben wie Paperclip?",
+                    "answer": "Freigaben, ja: Agenten halten vor allem Folgenreichen an und fragen in der App, und jedes Teammitglied kann antworten. Bei Budgets liegt Paperclip vorn, mit Regeln pro Firma, Agent und Projekt, die die Arbeit bei 100% pausieren. Moldwright begrenzt das enthaltene Modell-Guthaben und zählt nie Ausführungen."
                 },
                 "6": {
-                    "question": "Ist Rerun Open Source?",
-                    "answer": "Nein. Rerun ist ein gehostetes Produkt. Dedizierte oder selbst gehostete Infrastruktur gibt es mit Enterprise."
+                    "question": "Ist Moldwright Open Source?",
+                    "answer": "Nein. Moldwright ist ein gehostetes Produkt. Dedizierte oder selbst gehostete Infrastruktur gibt es mit Enterprise."
                 }
             }
         },
         "hermes": {
-            "metaTitle": "Rerun vs Hermes Agent: ein gehostetes Team von Agenten (2026)",
-            "metaDescription": "Rerun vs Hermes Agent (Nous Research) bei Hosting, Kosten und Apps: wann du Hermes selbst oder auf Hermes Cloud betreibst und wann ein gehostetes Team einfacher ist.",
-            "headline": "Rerun vs Hermes Agent",
-            "intro": "Hermes Agent von Nous Research ist ein Open-Source-Agent, der unterwegs Skills lernt und auf deiner eigenen Maschine in fünf Sandboxes läuft oder auf Hermes Cloud gehostet wird. Rerun gibt deinem Team Agenten, die ebenfalls lernen, gemeinsam gehostet auf einer privaten Maschine, mit den Apps und dem Board drumherum.",
-            "verdict": "Nimm Hermes Agent, wenn du MIT-lizenzierten Code, die Wahl zwischen fünf Backends von lokal bis Modal und volle Kontrolle über die Laufzeitumgebung willst, oder einen Agenten auf Hermes Cloud, den du über Telegram, Discord oder WhatsApp erreichst. Nimm Rerun, wenn du mehrere Agenten für ein Team auf einer Maschine willst, die in einem Festpreis-Tarif enthalten ist, {connectors}+ Apps im Browser verbunden und fertige Agenten als Startpunkt.",
+            "metaTitle": "Moldwright vs Hermes Agent: ein gehostetes Team von Agenten (2026)",
+            "metaDescription": "Moldwright vs Hermes Agent (Nous Research) bei Hosting, Kosten und Apps: wann du Hermes selbst oder auf Hermes Cloud betreibst und wann ein gehostetes Team einfacher ist.",
+            "headline": "Moldwright vs Hermes Agent",
+            "intro": "Hermes Agent von Nous Research ist ein Open-Source-Agent, der unterwegs Skills lernt und auf deiner eigenen Maschine in fünf Sandboxes läuft oder auf Hermes Cloud gehostet wird. Moldwright gibt deinem Team Agenten, die ebenfalls lernen, gemeinsam gehostet auf einer privaten Maschine, mit den Apps und dem Board drumherum.",
+            "verdict": "Nimm Hermes Agent, wenn du MIT-lizenzierten Code, die Wahl zwischen fünf Backends von lokal bis Modal und volle Kontrolle über die Laufzeitumgebung willst, oder einen Agenten auf Hermes Cloud, den du über Telegram, Discord oder WhatsApp erreichst. Nimm Moldwright, wenn du mehrere Agenten für ein Team auf einer Maschine willst, die in einem Festpreis-Tarif enthalten ist, {connectors}+ Apps im Browser verbunden und fertige Agenten als Startpunkt.",
             "chooseRerun": {
                 "1": "Mehrere Agenten sollen nebeneinander in einem Tarif laufen, nicht jeder auf eigener Instanz",
                 "2": "Nicht-technische Teammitglieder sollen die Agenten nutzen und steuern",
@@ -1267,11 +1267,11 @@
             "differences": {
                 "1": {
                     "title": "Eine Maschine für alle deine Agenten",
-                    "desc": "Hermes läuft dort, wo du ihn installierst, oder auf Hermes Cloud, wo jeder Agent eine eigene dedizierte Instanz bekommt, tageweise abgerechnet. Bei Rerun betreibt eine private Maschine pro Workspace alle deine Agenten, und sie ist im Tarif enthalten."
+                    "desc": "Hermes läuft dort, wo du ihn installierst, oder auf Hermes Cloud, wo jeder Agent eine eigene dedizierte Instanz bekommt, tageweise abgerechnet. Bei Moldwright betreibt eine private Maschine pro Workspace alle deine Agenten, und sie ist im Tarif enthalten."
                 },
                 "2": {
                     "title": "Lernen, das du nachlesen kannst",
-                    "desc": "Hermes speichert Unterhaltungen, Erinnerungen und Skills zwischen Sitzungen und schreibt Skills selbst. Rerun-Agenten auch, und du siehst auf einem Live-Board, was sie gelernt haben und jede Aktion, die sie ausgeführt haben, neben einem Firmenwissen, das der ganze Workspace teilt."
+                    "desc": "Hermes speichert Unterhaltungen, Erinnerungen und Skills zwischen Sitzungen und schreibt Skills selbst. Moldwright-Agenten auch, und du siehst auf einem Live-Board, was sie gelernt haben und jede Aktion, die sie ausgeführt haben, neben einem Firmenwissen, das der ganze Workspace teilt."
                 },
                 "3": {
                     "title": "Freigaben für das ganze Team",
@@ -1279,7 +1279,7 @@
                 },
                 "4": {
                     "title": "Apps und Modelle im Browser",
-                    "desc": "Hermes erreicht jeden MCP-Server, den du selbst konfigurierst und filterst. Bei Rerun verbinden sich {connectors}+ Apps im Browser mit geführter Anmeldung, jeder MCP-Server funktioniert weiterhin, und jeder Agent läuft mit dem im Tarif enthaltenen Rerun-Modell, deinem ChatGPT- oder Claude-Abo oder deinem eigenen Schlüssel."
+                    "desc": "Hermes erreicht jeden MCP-Server, den du selbst konfigurierst und filterst. Bei Moldwright verbinden sich {connectors}+ Apps im Browser mit geführter Anmeldung, jeder MCP-Server funktioniert weiterhin, und jeder Agent läuft mit dem im Tarif enthaltenen Moldwright-Modell, deinem ChatGPT- oder Claude-Abo oder deinem eigenen Schlüssel."
                 }
             },
             "switchSteps": {
@@ -1296,36 +1296,36 @@
                     "desc": "Der Agent läuft jetzt auf deiner privaten Maschine mit eigenem Zeitplan, und du zahlst und pflegst die Instanz nicht mehr, auf der Hermes lief."
                 }
             },
-            "theirPricing": "Hermes Agent ist kostenlos und MIT-lizenziert, wenn du ihn selbst betreibst, und du zahlst für das Modell und die Maschine. Hermes Cloud verlangt mindestens $2 Guthaben, bevor es einen Cloud Agent deployt, und rechnet dann jede Instanz tageweise ab, sekundengenau nach Laufzeit plus Speicher, Inferenz und Tool-Nutzung kommen dazu; Instanzgrößen und Preise stehen nur im Nous Portal, dessen Tarife $20, $100 oder $200 Guthaben im Monat kosten. Rerun ist ein Tarif ab {price} im Monat mit einer gesicherten privaten Maschine, unbegrenzten Agenten, unbegrenzten Plätzen und Modell-Guthaben inklusive.",
+            "theirPricing": "Hermes Agent ist kostenlos und MIT-lizenziert, wenn du ihn selbst betreibst, und du zahlst für das Modell und die Maschine. Hermes Cloud verlangt mindestens $2 Guthaben, bevor es einen Cloud Agent deployt, und rechnet dann jede Instanz tageweise ab, sekundengenau nach Laufzeit plus Speicher, Inferenz und Tool-Nutzung kommen dazu; Instanzgrößen und Preise stehen nur im Nous Portal, dessen Tarife $20, $100 oder $200 Guthaben im Monat kosten. Moldwright ist ein Tarif ab {price} im Monat mit einer gesicherten privaten Maschine, unbegrenzten Agenten, unbegrenzten Plätzen und Modell-Guthaben inklusive.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine gehostete Alternative zu Hermes Agent?",
-                    "answer": "Ja. Auch Nous hostet Hermes, eine dedizierte Instanz pro Agent auf Hermes Cloud. Rerun hostet ein Team von Agenten auf einer privaten Maschine pro Workspace, mit {connectors}+ Apps und einem Board, das dein ganzes Team nutzt."
+                    "question": "Ist Moldwright eine gehostete Alternative zu Hermes Agent?",
+                    "answer": "Ja. Auch Nous hostet Hermes, eine dedizierte Instanz pro Agent auf Hermes Cloud. Moldwright hostet ein Team von Agenten auf einer privaten Maschine pro Workspace, mit {connectors}+ Apps und einem Board, das dein ganzes Team nutzt."
                 },
                 "2": {
-                    "question": "Lernen Rerun-Agenten wie Hermes Agent?",
-                    "answer": "Ja. Rerun-Agenten bauen Skills auf und behalten ihr Gedächtnis zwischen den Ausführungen, und sie werden mit jeder Korrektur besser. Was sie gelernt haben, kannst du auf dem Board nachlesen."
+                    "question": "Lernen Moldwright-Agenten wie Hermes Agent?",
+                    "answer": "Ja. Moldwright-Agenten bauen Skills auf und behalten ihr Gedächtnis zwischen den Ausführungen, und sie werden mit jeder Korrektur besser. Was sie gelernt haben, kannst du auf dem Board nachlesen."
                 },
                 "3": {
                     "question": "Was kostet der Betrieb von Hermes Agent?",
-                    "answer": "Die Software ist kostenlos. Selbst gehostet zahlst du für das Modell und die Maschine. Auf Hermes Cloud brauchst du $2 Guthaben zum Deployen, jede laufende Instanz wird tageweise und sekundengenau abgerechnet, und Inferenz und Tools kommen dazu; die Nous-Portal-Tarife kosten $20, $100 oder $200 im Monat. Rerun bündelt Maschine, unbegrenzte Agenten, unbegrenzte Plätze und Modell-Guthaben in einem Tarif ab {price} im Monat."
+                    "answer": "Die Software ist kostenlos. Selbst gehostet zahlst du für das Modell und die Maschine. Auf Hermes Cloud brauchst du $2 Guthaben zum Deployen, jede laufende Instanz wird tageweise und sekundengenau abgerechnet, und Inferenz und Tools kommen dazu; die Nous-Portal-Tarife kosten $20, $100 oder $200 im Monat. Moldwright bündelt Maschine, unbegrenzte Agenten, unbegrenzte Plätze und Modell-Guthaben in einem Tarif ab {price} im Monat."
                 },
                 "4": {
-                    "question": "Kann ich Modelle von Nous oder OpenRouter auf Rerun nutzen?",
-                    "answer": "Rerun läuft mit Claude, ChatGPT und mehr, und ein OpenRouter-Schlüssel, auch mit eigenem Endpunkt, erreicht weitere Modelle."
+                    "question": "Kann ich Modelle von Nous oder OpenRouter auf Moldwright nutzen?",
+                    "answer": "Moldwright läuft mit Claude, ChatGPT und mehr, und ein OpenRouter-Schlüssel, auch mit eigenem Endpunkt, erreicht weitere Modelle."
                 },
                 "5": {
-                    "question": "Brauche ich für Rerun ein Terminal?",
+                    "question": "Brauche ich für Moldwright ein Terminal?",
                     "answer": "Nein. Du erstellst und verwaltest Agenten im Browser."
                 }
             }
         },
         "openclaw": {
-            "metaTitle": "Rerun vs OpenClaw: gehostete KI-Agenten (2026)",
-            "metaDescription": "Rerun vs OpenClaw bei Einrichtung, Hosting, Sicherheit und Kosten: wann der Open-Source-Assistent passt und wann eine gehostete OpenClaw-Alternative einfacher ist.",
-            "headline": "Rerun vs OpenClaw",
-            "intro": "OpenClaw ist ein persönlicher Open-Source-KI-Assistent, den du auf deiner eigenen Maschine oder deinem Server installierst und betreibst. Rerun betreibt deine Agenten für dich, auf einer privaten, isolierten Maschine in der Cloud.",
-            "verdict": "Nimm OpenClaw, wenn du kostenlose MIT-lizenzierte Software willst, die du lesen und ändern kannst, lokale Modelle auf deiner eigenen Hardware, und du gern eine Maschine laufen lässt und absicherst: Seine Stiftung „verkauft nichts: keinen bezahlten Tarif, keinen gehosteten Dienst, keinen Token.“ Nimm Rerun, wenn du dieselbe Autonomie willst, ohne etwas zu hosten oder abzusichern, mit Freigaben, fertigen Agenten und einem Board, das dein Team lesen kann.",
+            "metaTitle": "Moldwright vs OpenClaw: gehostete KI-Agenten (2026)",
+            "metaDescription": "Moldwright vs OpenClaw bei Einrichtung, Hosting, Sicherheit und Kosten: wann der Open-Source-Assistent passt und wann eine gehostete OpenClaw-Alternative einfacher ist.",
+            "headline": "Moldwright vs OpenClaw",
+            "intro": "OpenClaw ist ein persönlicher Open-Source-KI-Assistent, den du auf deiner eigenen Maschine oder deinem Server installierst und betreibst. Moldwright betreibt deine Agenten für dich, auf einer privaten, isolierten Maschine in der Cloud.",
+            "verdict": "Nimm OpenClaw, wenn du kostenlose MIT-lizenzierte Software willst, die du lesen und ändern kannst, lokale Modelle auf deiner eigenen Hardware, und du gern eine Maschine laufen lässt und absicherst: Seine Stiftung „verkauft nichts: keinen bezahlten Tarif, keinen gehosteten Dienst, keinen Token.“ Nimm Moldwright, wenn du dieselbe Autonomie willst, ohne etwas zu hosten oder abzusichern, mit Freigaben, fertigen Agenten und einem Board, das dein Team lesen kann.",
             "chooseRerun": {
                 "1": "Du willst keinen Agenten mit Shell-Zugriff auf deinem eigenen Laptop",
                 "2": "Du willst dafür keine Maschine laufen lassen, patchen und absichern",
@@ -1340,11 +1340,11 @@
             "differences": {
                 "1": {
                     "title": "Nichts zu installieren oder zu hosten",
-                    "desc": "OpenClaw läuft auf einer Maschine, die du laufen lässt, deinem Computer oder einem Server, und seine Stiftung bietet keinen gehosteten Dienst. Rerun-Agenten leben auf einer privaten Maschine in der Cloud und laufen nach Zeitplan, egal ob du online bist oder nicht."
+                    "desc": "OpenClaw läuft auf einer Maschine, die du laufen lässt, deinem Computer oder einem Server, und seine Stiftung bietet keinen gehosteten Dienst. Moldwright-Agenten leben auf einer privaten Maschine in der Cloud und laufen nach Zeitplan, egal ob du online bist oder nicht."
                 },
                 "2": {
                     "title": "Isoliert, mit Schutzregeln",
-                    "desc": "In OpenClaw sind „Sandboxing und Exec-Freigaben standardmäßig aus“, sodass seine Tools die Dateien und die Shell der Maschine erreichen, auf der er läuft, bis du ihn absicherst. Jeder Rerun-Workspace läuft auf seiner eigenen isolierten virtuellen Maschine, Agenten halten vor allem Riskanten an und warten in der App auf deine Freigabe, und eine kostenpflichtige Datenabfrage läuft erst, wenn du ihre Kosten freigibst."
+                    "desc": "In OpenClaw sind „Sandboxing und Exec-Freigaben standardmäßig aus“, sodass seine Tools die Dateien und die Shell der Maschine erreichen, auf der er läuft, bis du ihn absicherst. Jeder Moldwright-Workspace läuft auf seiner eigenen isolierten virtuellen Maschine, Agenten halten vor allem Riskanten an und warten in der App auf deine Freigabe, und eine kostenpflichtige Datenabfrage läuft erst, wenn du ihre Kosten freigibst."
                 },
                 "3": {
                     "title": "Apps ohne Einrichtung",
@@ -1352,7 +1352,7 @@
                 },
                 "4": {
                     "title": "Ein Team, ohne Gateway zu betreiben",
-                    "desc": "Ein OpenClaw-Team teilt sich ein Gateway, das jemand hostet, und ein Gateway ist eine Vertrauensdomäne: Wer einander nicht vertrauen soll, braucht jeweils ein eigenes. Bei Rerun lädst du Teammitglieder ohne Aufpreis ein, teilst Agenten und verfolgst jede Ausführung auf einem Live-Board, mit einem Gedächtnis, das den Agenten nach jeder Korrektur besser macht."
+                    "desc": "Ein OpenClaw-Team teilt sich ein Gateway, das jemand hostet, und ein Gateway ist eine Vertrauensdomäne: Wer einander nicht vertrauen soll, braucht jeweils ein eigenes. Bei Moldwright lädst du Teammitglieder ohne Aufpreis ein, teilst Agenten und verfolgst jede Ausführung auf einem Live-Board, mit einem Gedächtnis, das den Agenten nach jeder Korrektur besser macht."
                 }
             },
             "switchSteps": {
@@ -1369,36 +1369,36 @@
                     "desc": "Der Agent läuft jetzt auf seiner Maschine, rund um die Uhr, und fragt dich vor allem Riskanten."
                 }
             },
-            "theirPricing": "OpenClaw ist kostenlos und MIT-lizenziert, und die OpenClaw Foundation verkauft nichts: keinen bezahlten Tarif, keinen gehosteten Dienst, keinen Token. Du zahlst für das Modell, das du anschließt, und für die Maschine, auf der er läuft, und kümmerst dich selbst um Verfügbarkeit, Updates und Absicherung. Rerun ist ein Tarif ab {price} im Monat mit privater Maschine, Modell-Guthaben, unbegrenzten Agenten und unbegrenzten Plätzen inklusive, und Ausführungen werden nie gezählt.",
+            "theirPricing": "OpenClaw ist kostenlos und MIT-lizenziert, und die OpenClaw Foundation verkauft nichts: keinen bezahlten Tarif, keinen gehosteten Dienst, keinen Token. Du zahlst für das Modell, das du anschließt, und für die Maschine, auf der er läuft, und kümmerst dich selbst um Verfügbarkeit, Updates und Absicherung. Moldwright ist ein Tarif ab {price} im Monat mit privater Maschine, Modell-Guthaben, unbegrenzten Agenten und unbegrenzten Plätzen inklusive, und Ausführungen werden nie gezählt.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine gehostete Alternative zu OpenClaw?",
-                    "answer": "Ja. Rerun gibt dir autonome Agenten, ohne etwas zu installieren: Jeder läuft auf deiner privaten Maschine in der Cloud, mit Freigaben, Gedächtnis und einem Live-Board."
+                    "question": "Ist Moldwright eine gehostete Alternative zu OpenClaw?",
+                    "answer": "Ja. Moldwright gibt dir autonome Agenten, ohne etwas zu installieren: Jeder läuft auf deiner privaten Maschine in der Cloud, mit Freigaben, Gedächtnis und einem Live-Board."
                 },
                 "2": {
                     "question": "Ist OpenClaw auf meinem Computer sicher?",
-                    "answer": "Sandboxing und Exec-Freigaben sind in OpenClaw standardmäßig aus, sodass seine Tools ohne Konfiguration Shell- und Dateizugriff auf der Maschine haben, auf der er läuft; es gibt einen Befehl für Sicherheitsaudits, der Abweichungen prüft, und das Projekt veröffentlicht Sicherheitshinweise, die du verfolgen musst. Rerun-Agenten laufen auf einer isolierten Maschine statt auf deinem Laptop und warten vor allem Folgenreichen auf eine Freigabe."
+                    "answer": "Sandboxing und Exec-Freigaben sind in OpenClaw standardmäßig aus, sodass seine Tools ohne Konfiguration Shell- und Dateizugriff auf der Maschine haben, auf der er läuft; es gibt einen Befehl für Sicherheitsaudits, der Abweichungen prüft, und das Projekt veröffentlicht Sicherheitshinweise, die du verfolgen musst. Moldwright-Agenten laufen auf einer isolierten Maschine statt auf deinem Laptop und warten vor allem Folgenreichen auf eine Freigabe."
                 },
                 "3": {
-                    "question": "Kann ich wie bei OpenClaw mein eigenes Modell mit Rerun nutzen?",
-                    "answer": "Ja. Bring deinen eigenen API-Schlüssel oder dein Claude- oder ChatGPT-Login mit oder nutze die Modelle, die Rerun hostet. Bei lokalen Modellen auf deiner eigenen Hardware, über Ollama oder LM Studio, hat OpenClaw die Nase vorn."
+                    "question": "Kann ich wie bei OpenClaw mein eigenes Modell mit Moldwright nutzen?",
+                    "answer": "Ja. Bring deinen eigenen API-Schlüssel oder dein Claude- oder ChatGPT-Login mit oder nutze die Modelle, die Moldwright hostet. Bei lokalen Modellen auf deiner eigenen Hardware, über Ollama oder LM Studio, hat OpenClaw die Nase vorn."
                 },
                 "4": {
-                    "question": "Braucht Rerun ein Terminal?",
+                    "question": "Braucht Moldwright ein Terminal?",
                     "answer": "Nein. Alles passiert im Browser: Agenten erstellen, seine Aufgabe beschreiben, deine Apps verbinden."
                 },
                 "5": {
-                    "question": "Ist Rerun Open Source?",
-                    "answer": "Nein. Rerun ist ein gehostetes Produkt. Dedizierte oder selbst gehostete Infrastruktur gibt es mit Enterprise."
+                    "question": "Ist Moldwright Open Source?",
+                    "answer": "Nein. Moldwright ist ein gehostetes Produkt. Dedizierte oder selbst gehostete Infrastruktur gibt es mit Enterprise."
                 }
             }
         },
         "zapier": {
-            "metaTitle": "Rerun vs Zapier: KI-Agenten oder Zaps? (2026)",
-            "metaDescription": "Rerun vs Zapier bei Einrichtung, Wartung und Kosten: wann ein Schritt-für-Schritt-Zap reicht und wann ein anpassungsfähiger KI-Agent die bessere Zapier-Alternative ist.",
-            "headline": "Rerun vs Zapier",
-            "intro": "Zapier verbindet Apps mit Zaps, die du Schritt für Schritt baust. Rerun gibt dir KI-Agenten, die ein Ziel übernehmen, die Tools wählen und sich anpassen, wenn sich etwas ändert.",
-            "verdict": "Nimm Zapier für feste Auslöser mit hohem Volumen zwischen Apps, etwa einen Formulareintrag in eine Tabelle kopieren, oder wenn du eine seiner 10.000+ Integrationen brauchst. Nimm Rerun, wenn die Aufgabe Urteilsvermögen braucht: eine E-Mail lesen, entscheiden, was zu tun ist, nachfassen, mit Dateien und Gedächtnis auf der eigenen Maschine deines Workspace. Rerun kostet pauschal {price} im Monat für unbegrenzte Agenten und rechnet nie pro Task ab.",
+            "metaTitle": "Moldwright vs Zapier: KI-Agenten oder Zaps? (2026)",
+            "metaDescription": "Moldwright vs Zapier bei Einrichtung, Wartung und Kosten: wann ein Schritt-für-Schritt-Zap reicht und wann ein anpassungsfähiger KI-Agent die bessere Zapier-Alternative ist.",
+            "headline": "Moldwright vs Zapier",
+            "intro": "Zapier verbindet Apps mit Zaps, die du Schritt für Schritt baust. Moldwright gibt dir KI-Agenten, die ein Ziel übernehmen, die Tools wählen und sich anpassen, wenn sich etwas ändert.",
+            "verdict": "Nimm Zapier für feste Auslöser mit hohem Volumen zwischen Apps, etwa einen Formulareintrag in eine Tabelle kopieren, oder wenn du eine seiner 10.000+ Integrationen brauchst. Nimm Moldwright, wenn die Aufgabe Urteilsvermögen braucht: eine E-Mail lesen, entscheiden, was zu tun ist, nachfassen, mit Dateien und Gedächtnis auf der eigenen Maschine deines Workspace. Moldwright kostet pauschal {price} im Monat für unbegrenzte Agenten und rechnet nie pro Task ab.",
             "chooseRerun": {
                 "1": "Die Aufgabe sieht jedes Mal anders aus, und der Zap braucht ständig neue Pfade",
                 "2": "Du willst die Aufgabe in eigenen Worten beschreiben, statt Felder zuzuordnen",
@@ -1413,19 +1413,19 @@
             "differences": {
                 "1": {
                     "title": "Ein Ziel, kein Flussdiagramm",
-                    "desc": "In Zapier wählst du einen Auslöser, dann jede Aktion und jede Feldzuordnung, oder lässt Copilot sie entwerfen und pflegst sie weiter. In Rerun sagst du dem Agenten, was die Aufgabe ist, meldest dich bei Gmail, Notion oder Stripe an, und er findet bei jeder Ausführung die Schritte selbst."
+                    "desc": "In Zapier wählst du einen Auslöser, dann jede Aktion und jede Feldzuordnung, oder lässt Copilot sie entwerfen und pflegst sie weiter. In Moldwright sagst du dem Agenten, was die Aufgabe ist, meldest dich bei Gmail, Notion oder Stripe an, und er findet bei jeder Ausführung die Schritte selbst."
                 },
                 "2": {
                     "title": "Ein Computer, nicht nur Connectoren",
-                    "desc": "Ein Zap reicht Daten von einer App zur nächsten, und Code darin bekommt 30 Sekunden pro Schritt, bevor er einen weiteren Task kostet. Ein Rerun-Agent arbeitet auf der privaten Maschine deines Workspace: Er schreibt Dateien, führt Skripte aus, steuert einen Browser und behält seine eigenen Datenbanken, so kann er den Bericht erstellen, nicht nur die Zahlen verschieben."
+                    "desc": "Ein Zap reicht Daten von einer App zur nächsten, und Code darin bekommt 30 Sekunden pro Schritt, bevor er einen weiteren Task kostet. Ein Moldwright-Agent arbeitet auf der privaten Maschine deines Workspace: Er schreibt Dateien, führt Skripte aus, steuert einen Browser und behält seine eigenen Datenbanken, so kann er den Bericht erstellen, nicht nur die Zahlen verschieben."
                 },
                 "3": {
                     "title": "Er passt sich an, statt zu brechen",
-                    "desc": "Eine umbenannte Spalte oder ein neues E-Mail-Format kann die Feldzuordnung eines Zaps kaputt machen. Ein Rerun-Agent liest, was vor ihm liegt, merkt sich, was du korrigiert hast, und liest ein Firmenwissen mit deinem Angebot, deinen Preisen und deinem Ton."
+                    "desc": "Eine umbenannte Spalte oder ein neues E-Mail-Format kann die Feldzuordnung eines Zaps kaputt machen. Ein Moldwright-Agent liest, was vor ihm liegt, merkt sich, was du korrigiert hast, und liest ein Firmenwissen mit deinem Angebot, deinen Preisen und deinem Ton."
                 },
                 "4": {
                     "title": "Festpreis, Ausführungen nicht gezählt",
-                    "desc": "Zapier zählt jeden Aktionsschritt als Task, KI- und Code-Schritte aus demselben Kontingent, und rechnet Zapier Agents separat in Aktivitäten ab: 1.500 im Monat bei Pro, und eine einzelne Ausführung stoppt bei 40 und fragt dich. Rerun kostet {price} im Monat für unbegrenzte Agenten, und ein Agent, der jede Stunde arbeitet, kostet so viel wie einer, der einmal am Tag arbeitet."
+                    "desc": "Zapier zählt jeden Aktionsschritt als Task, KI- und Code-Schritte aus demselben Kontingent, und rechnet Zapier Agents separat in Aktivitäten ab: 1.500 im Monat bei Pro, und eine einzelne Ausführung stoppt bei 40 und fragt dich. Moldwright kostet {price} im Monat für unbegrenzte Agenten, und ein Agent, der jede Stunde arbeitet, kostet so viel wie einer, der einmal am Tag arbeitet."
                 }
             },
             "switchSteps": {
@@ -1442,36 +1442,36 @@
                     "desc": "Plane ihn ein oder starte ihn per Ereignis. Sobald eine Woche an Ausführungen stimmt, kannst du den Zap abschalten."
                 }
             },
-            "theirPricing": "Zapier rechnet pro Task ab: 100 Tasks im Monat im kostenlosen Tarif, und Professional beginnt bei $19,99 im Monat bei jährlicher Zahlung ($29,99 monatlich) für 750 Tasks. KI-Schritte, Code über 30 Sekunden und MCP-Aufrufe zehren vom selben Kontingent, laut Zapiers eigenem Beispiel kostet ein MCP-Tool-Aufruf 2 Tasks, und Zapier Agents werden separat in Aktivitäten abgerechnet, 1.500 im Monat bei Pro. Wer darüber liegt, zahlt für zusätzliche Tasks das 1.25-Fache des Grundpreises im Jahrestarif, das 2.5-Fache im Monatstarif. Rerun ist ein Tarif ab {price} im Monat, und Ausführungen werden nie gezählt.",
+            "theirPricing": "Zapier rechnet pro Task ab: 100 Tasks im Monat im kostenlosen Tarif, und Professional beginnt bei $19,99 im Monat bei jährlicher Zahlung ($29,99 monatlich) für 750 Tasks. KI-Schritte, Code über 30 Sekunden und MCP-Aufrufe zehren vom selben Kontingent, laut Zapiers eigenem Beispiel kostet ein MCP-Tool-Aufruf 2 Tasks, und Zapier Agents werden separat in Aktivitäten abgerechnet, 1.500 im Monat bei Pro. Wer darüber liegt, zahlt für zusätzliche Tasks das 1.25-Fache des Grundpreises im Jahrestarif, das 2.5-Fache im Monatstarif. Moldwright ist ein Tarif ab {price} im Monat, und Ausführungen werden nie gezählt.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Zapier?",
-                    "answer": "Ja, für Arbeit, die Urteilsvermögen braucht. Zapier verschiebt Daten zwischen Apps entlang eines Pfads, den du entwirfst. Rerun-Agenten übernehmen ein Ziel, wählen die Tools und bewältigen die Fälle, die ein fester Pfad nicht abdeckt. Viele Teams behalten einfache Zaps und verlagern die anfälligen zu Rerun."
+                    "question": "Ist Moldwright eine Alternative zu Zapier?",
+                    "answer": "Ja, für Arbeit, die Urteilsvermögen braucht. Zapier verschiebt Daten zwischen Apps entlang eines Pfads, den du entwirfst. Moldwright-Agenten übernehmen ein Ziel, wählen die Tools und bewältigen die Fälle, die ein fester Pfad nicht abdeckt. Viele Teams behalten einfache Zaps und verlagern die anfälligen zu Moldwright."
                 },
                 "2": {
-                    "question": "Rechnet Rerun wie Zapier pro Task ab?",
-                    "answer": "Nein. Rerun ist ein Festpreis-Tarif ab {price} im Monat und zählt nie Ausführungen oder Schritte. Du zahlst für Kapazität, also Agenten und Modell-Guthaben, Plätze sind kostenlos und unbegrenzt, und die KI kann statt des enthaltenen Guthabens über dein eigenes ChatGPT- oder Claude-Abo oder deinen API-Schlüssel laufen."
+                    "question": "Rechnet Moldwright wie Zapier pro Task ab?",
+                    "answer": "Nein. Moldwright ist ein Festpreis-Tarif ab {price} im Monat und zählt nie Ausführungen oder Schritte. Du zahlst für Kapazität, also Agenten und Modell-Guthaben, Plätze sind kostenlos und unbegrenzt, und die KI kann statt des enthaltenen Guthabens über dein eigenes ChatGPT- oder Claude-Abo oder deinen API-Schlüssel laufen."
                 },
                 "3": {
-                    "question": "Was unterscheidet Rerun von Zapier Agents?",
-                    "answer": "Zapier Agents laufen in Zapier und werden pro Aktivität abgerechnet: 1.500 im Monat bei Pro, und eine Ausführung stoppt bei 40 Aktivitäten und fragt nach deiner Eingabe. Ein Rerun-Agent arbeitet auf der privaten Maschine deines Workspace, behält Dateien, Datenbanken und Gedächtnis zwischen den Ausführungen und wird nie pro Ausführung gezählt."
+                    "question": "Was unterscheidet Moldwright von Zapier Agents?",
+                    "answer": "Zapier Agents laufen in Zapier und werden pro Aktivität abgerechnet: 1.500 im Monat bei Pro, und eine Ausführung stoppt bei 40 Aktivitäten und fragt nach deiner Eingabe. Ein Moldwright-Agent arbeitet auf der privaten Maschine deines Workspace, behält Dateien, Datenbanken und Gedächtnis zwischen den Ausführungen und wird nie pro Ausführung gezählt."
                 },
                 "4": {
-                    "question": "Kann Rerun die Apps nutzen, die ich in Zapier verbinde?",
-                    "answer": "Rerun erreicht {connectors}+ Apps und jeden MCP-Server. Die großen brauchen nur ein Login: Gmail, Google Calendar, Drive, Sheets, Notion, Stripe, Linear, Asana, Outlook; Slack und HubSpot brauchen einen Token, den du einmal erstellst und einfügst. Zapier hat mit 10.000+ Apps immer noch den größeren Katalog, prüfe also zuerst deine Nischen-Apps."
+                    "question": "Kann Moldwright die Apps nutzen, die ich in Zapier verbinde?",
+                    "answer": "Moldwright erreicht {connectors}+ Apps und jeden MCP-Server. Die großen brauchen nur ein Login: Gmail, Google Calendar, Drive, Sheets, Notion, Stripe, Linear, Asana, Outlook; Slack und HubSpot brauchen einen Token, den du einmal erstellst und einfügst. Zapier hat mit 10.000+ Apps immer noch den größeren Katalog, prüfe also zuerst deine Nischen-Apps."
                 },
                 "5": {
-                    "question": "Muss ich programmieren, um von Zapier zu Rerun zu wechseln?",
+                    "question": "Muss ich programmieren, um von Zapier zu Moldwright zu wechseln?",
                     "answer": "Nein. Du beschreibst die Aufgabe in eigenen Worten und verbindest deine Apps. Keine Felder zuzuordnen, nichts zu installieren."
                 }
             }
         },
         "make": {
-            "metaTitle": "Rerun vs Make: KI-Agenten oder Szenarien? (2026)",
-            "metaDescription": "Rerun vs Make (Integromat) bei Einrichtung, Wartung und Kosten: wann ein visuelles Szenario reicht und wann ein KI-Agent die bessere Make-Alternative ist.",
-            "headline": "Rerun vs Make",
-            "intro": "Make baut Automatisierungen als visuelle Szenarien, Modul für Modul. Rerun gibt dir KI-Agenten, die das Ziel übernehmen und die Schritte selbst erledigen.",
-            "verdict": "Nimm Make, wenn du auf einer Fläche präzise Kontrolle über Verzweigungen und Datenzuordnung willst und einen Credit-Preis pro Aktion, der bei hohem Volumen kaum zu schlagen ist. Nimm Rerun, wenn die Arbeit Urteilsvermögen braucht und du nicht jedes Mal ein Szenario umbauen willst, wenn sich eine Eingabe ändert. Rerun kostet pauschal {price} im Monat, ohne Credit pro Modul.",
+            "metaTitle": "Moldwright vs Make: KI-Agenten oder Szenarien? (2026)",
+            "metaDescription": "Moldwright vs Make (Integromat) bei Einrichtung, Wartung und Kosten: wann ein visuelles Szenario reicht und wann ein KI-Agent die bessere Make-Alternative ist.",
+            "headline": "Moldwright vs Make",
+            "intro": "Make baut Automatisierungen als visuelle Szenarien, Modul für Modul. Moldwright gibt dir KI-Agenten, die das Ziel übernehmen und die Schritte selbst erledigen.",
+            "verdict": "Nimm Make, wenn du auf einer Fläche präzise Kontrolle über Verzweigungen und Datenzuordnung willst und einen Credit-Preis pro Aktion, der bei hohem Volumen kaum zu schlagen ist. Nimm Moldwright, wenn die Arbeit Urteilsvermögen braucht und du nicht jedes Mal ein Szenario umbauen willst, wenn sich eine Eingabe ändert. Moldwright kostet pauschal {price} im Monat, ohne Credit pro Modul.",
             "chooseRerun": {
                 "1": "Deine Szenarien bekommen immer mehr Router und Fehlerbehandlungen",
                 "2": "Du willst die Arbeit erledigt haben, keine Fläche pflegen",
@@ -1486,19 +1486,19 @@
             "differences": {
                 "1": {
                     "title": "Keine Fläche zu verkabeln",
-                    "desc": "Ein Make-Szenario ist eine Kette von Modulen, die du platzierst und zuordnest, auch wenn der KI-Assistent das erste entwirft, und ein KI-Agent, den du hinzufügst, entscheidet innerhalb des Szenarios, das du um ihn herum gebaut hast. Ein Rerun-Agent bekommt eine Aufgabenbeschreibung, meldet sich bei Gmail, Notion oder Stripe an, erreicht {connectors}+ Apps und jeden MCP-Server und plant die ganze Aufgabe selbst."
+                    "desc": "Ein Make-Szenario ist eine Kette von Modulen, die du platzierst und zuordnest, auch wenn der KI-Assistent das erste entwirft, und ein KI-Agent, den du hinzufügst, entscheidet innerhalb des Szenarios, das du um ihn herum gebaut hast. Ein Moldwright-Agent bekommt eine Aufgabenbeschreibung, meldet sich bei Gmail, Notion oder Stripe an, erreicht {connectors}+ Apps und jeden MCP-Server und plant die ganze Aufgabe selbst."
                 },
                 "2": {
                     "title": "Gedächtnis ohne Datenspeicher zu bauen",
-                    "desc": "In Make kommt alles, was sich ein Szenario merken soll, in einen Datenspeicher, den du entwirfst. Rerun-Agenten behalten Gedächtnis, Dateien und Datenbanken auf ihrer Maschine und lesen ein Firmenwissen mit deinem Angebot und deinem Ton, so lernen sie, dass dieser Kunde immer zu spät zahlt, ohne dass du einen Filter hinzufügst."
+                    "desc": "In Make kommt alles, was sich ein Szenario merken soll, in einen Datenspeicher, den du entwirfst. Moldwright-Agenten behalten Gedächtnis, Dateien und Datenbanken auf ihrer Maschine und lesen ein Firmenwissen mit deinem Angebot und deinem Ton, so lernen sie, dass dieser Kunde immer zu spät zahlt, ohne dass du einen Filter hinzufügst."
                 },
                 "3": {
                     "title": "Dateien und Skripte, nicht nur Module",
-                    "desc": "In Make passiert alles innerhalb der Module, die du platzierst, und nichts überdauert die Ausführung. Ein Rerun-Agent arbeitet auf der privaten Maschine deines Workspace: Er schreibt Dateien, führt Skripte aus, steuert einen Browser, bedient eine App auf dem Bildschirm wie ein Mensch und behält seine eigenen Datenbanken zwischen den Ausführungen."
+                    "desc": "In Make passiert alles innerhalb der Module, die du platzierst, und nichts überdauert die Ausführung. Ein Moldwright-Agent arbeitet auf der privaten Maschine deines Workspace: Er schreibt Dateien, führt Skripte aus, steuert einen Browser, bedient eine App auf dem Bildschirm wie ein Mensch und behält seine eigenen Datenbanken zwischen den Ausführungen."
                 },
                 "4": {
                     "title": "Kein Credit pro Modul",
-                    "desc": "Make verbraucht standardmäßig einen Credit pro Modulaktion, rechnet manche Funktionen nach Tokens, Dateigröße oder Laufzeit ab, und auch der Chat seines KI-Agenten kostet Credits, Schleifen summieren sich also. Rerun ist ein Tarif ab {price} im Monat, und Ausführungen werden nie gezählt."
+                    "desc": "Make verbraucht standardmäßig einen Credit pro Modulaktion, rechnet manche Funktionen nach Tokens, Dateigröße oder Laufzeit ab, und auch der Chat seines KI-Agenten kostet Credits, Schleifen summieren sich also. Moldwright ist ein Tarif ab {price} im Monat, und Ausführungen werden nie gezählt."
                 }
             },
             "switchSteps": {
@@ -1515,36 +1515,36 @@
                     "desc": "Setze den Agenten auf denselben Zeitplan oder Auslöser, vergleiche eine Woche an Ergebnissen und pausiere dann das Szenario."
                 }
             },
-            "theirPricing": "Make rechnet in Credits ab: standardmäßig einer pro Modulaktion, manche Funktionen dynamisch nach Tokens, Dateigröße, Seiten oder Laufzeit, und ein KI-Agent verbraucht einen Credit pro Operation, plus Token-Credits, außer du bringst deinen eigenen OpenAI- oder Anthropic-Schlüssel mit. Router und Fehlerbehandlungen sind kostenlos. Der kostenlose Tarif enthält 1.000 Credits im Monat, und bezahlte Tarife werden nach Credit-Stufe verkauft, ab 10.000 Credits im Monat. Rerun ist ein Tarif ab {price} im Monat, und Ausführungen werden nie gezählt.",
+            "theirPricing": "Make rechnet in Credits ab: standardmäßig einer pro Modulaktion, manche Funktionen dynamisch nach Tokens, Dateigröße, Seiten oder Laufzeit, und ein KI-Agent verbraucht einen Credit pro Operation, plus Token-Credits, außer du bringst deinen eigenen OpenAI- oder Anthropic-Schlüssel mit. Router und Fehlerbehandlungen sind kostenlos. Der kostenlose Tarif enthält 1.000 Credits im Monat, und bezahlte Tarife werden nach Credit-Stufe verkauft, ab 10.000 Credits im Monat. Moldwright ist ein Tarif ab {price} im Monat, und Ausführungen werden nie gezählt.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Make?",
-                    "answer": "Ja, wenn die Arbeit Urteilsvermögen statt eines festen Pfads braucht. Make ist hervorragend bei präzisem Datenrouting. Rerun-Agenten lesen die Eingabe, entscheiden, was zu tun ist, und fragen dich vor allem Riskanten."
+                    "question": "Ist Moldwright eine Alternative zu Make?",
+                    "answer": "Ja, wenn die Arbeit Urteilsvermögen statt eines festen Pfads braucht. Make ist hervorragend bei präzisem Datenrouting. Moldwright-Agenten lesen die Eingabe, entscheiden, was zu tun ist, und fragen dich vor allem Riskanten."
                 },
                 "2": {
-                    "question": "Nutzt Rerun Credits oder Operationen wie Make?",
-                    "answer": "Nein. Rerun ist ein Festpreis-Tarif ab {price} im Monat und zählt nie Ausführungen. Du ergänzt nur Kapazität, etwa Agenten oder Modell-Guthaben, wenn du sie brauchst, und Plätze sind kostenlos."
+                    "question": "Nutzt Moldwright Credits oder Operationen wie Make?",
+                    "answer": "Nein. Moldwright ist ein Festpreis-Tarif ab {price} im Monat und zählt nie Ausführungen. Du ergänzt nur Kapazität, etwa Agenten oder Modell-Guthaben, wenn du sie brauchst, und Plätze sind kostenlos."
                 },
                 "3": {
-                    "question": "Was unterscheidet Rerun von Make AI Agents?",
-                    "answer": "Ein Make-Agent übernimmt ein Ziel und wählt seine Tools, Module, Szenarien oder MCP-Tools, lebt aber innerhalb des Szenarios, das du um ihn herum gebaut hast, und verbraucht bei jeder Operation Credits. Ein Rerun-Agent ist das Produkt selbst: Er übernimmt die ganze Aufgabe, lebt auf der privaten Maschine deines Workspace mit seinen Dateien, Datenbanken und seinem Gedächtnis, und du verfolgst seine Arbeit auf einem Live-Board."
+                    "question": "Was unterscheidet Moldwright von Make AI Agents?",
+                    "answer": "Ein Make-Agent übernimmt ein Ziel und wählt seine Tools, Module, Szenarien oder MCP-Tools, lebt aber innerhalb des Szenarios, das du um ihn herum gebaut hast, und verbraucht bei jeder Operation Credits. Ein Moldwright-Agent ist das Produkt selbst: Er übernimmt die ganze Aufgabe, lebt auf der privaten Maschine deines Workspace mit seinen Dateien, Datenbanken und seinem Gedächtnis, und du verfolgst seine Arbeit auf einem Live-Board."
                 },
                 "4": {
-                    "question": "Kann ich Make und Rerun parallel nutzen?",
-                    "answer": "Ja. Viele Teams behalten einfache Szenarien mit hohem Volumen in Make und geben die Aufgaben, die Urteilsvermögen brauchen, an Rerun-Agenten."
+                    "question": "Kann ich Make und Moldwright parallel nutzen?",
+                    "answer": "Ja. Viele Teams behalten einfache Szenarien mit hohem Volumen in Make und geben die Aufgaben, die Urteilsvermögen brauchen, an Moldwright-Agenten."
                 },
                 "5": {
-                    "question": "Muss ich eine Fläche lernen, um Rerun zu nutzen?",
+                    "question": "Muss ich eine Fläche lernen, um Moldwright zu nutzen?",
                     "answer": "Nein. Es gibt keine Fläche. Du beschreibst die Aufgabe in eigenen Worten, verbindest deine Apps, und der Agent richtet sich selbst ein."
                 }
             }
         },
         "n8n": {
-            "metaTitle": "Rerun vs n8n: KI-Agenten oder Workflows? (2026)",
-            "metaDescription": "Rerun vs n8n bei Einrichtung, Hosting und Kosten: wann ein n8n-Workflow sinnvoll ist und wann ein KI-Agent ohne Code die bessere n8n-Alternative ist.",
-            "headline": "Rerun vs n8n",
-            "intro": "n8n ist ein Tool für Workflow-Automatisierung für technische Teams, selbst gehostet oder in ihrer Cloud. Rerun gibt dir KI-Agenten, die auf deiner eigenen privaten Maschine laufen, ohne Nodes zu verkabeln.",
-            "verdict": "Nimm n8n, wenn du Entwickler hast, die Code-Nodes, Git und eigene Server wollen und sich um die Upgrades kümmern. Nimm Rerun, wenn du Agenten willst, die die Arbeit erledigen, ohne dass jemand Workflows oder Infrastruktur pflegt. Rerun kostet pauschal {price} im Monat und enthält die private Maschine, auf der deine Agenten laufen.",
+            "metaTitle": "Moldwright vs n8n: KI-Agenten oder Workflows? (2026)",
+            "metaDescription": "Moldwright vs n8n bei Einrichtung, Hosting und Kosten: wann ein n8n-Workflow sinnvoll ist und wann ein KI-Agent ohne Code die bessere n8n-Alternative ist.",
+            "headline": "Moldwright vs n8n",
+            "intro": "n8n ist ein Tool für Workflow-Automatisierung für technische Teams, selbst gehostet oder in ihrer Cloud. Moldwright gibt dir KI-Agenten, die auf deiner eigenen privaten Maschine laufen, ohne Nodes zu verkabeln.",
+            "verdict": "Nimm n8n, wenn du Entwickler hast, die Code-Nodes, Git und eigene Server wollen und sich um die Upgrades kümmern. Nimm Moldwright, wenn du Agenten willst, die die Arbeit erledigen, ohne dass jemand Workflows oder Infrastruktur pflegt. Moldwright kostet pauschal {price} im Monat und enthält die private Maschine, auf der deine Agenten laufen.",
             "chooseRerun": {
                 "1": "Niemand im Team will einen Server und seine Upgrades verantworten",
                 "2": "Die Leute, die die Automatisierung brauchen, schreiben keine Expressions",
@@ -1559,19 +1559,19 @@
             "differences": {
                 "1": {
                     "title": "Keine Nodes, keine Expressions",
-                    "desc": "n8n-Workflows sind Graphen aus Nodes, oft mit JSON-Expressions oder Code, auch wenn der AI Workflow Builder sie entwirft. Ein Rerun-Agent bekommt die Aufgabe in eigenen Worten, meldet sich bei Gmail, Notion oder Stripe an und erreicht {connectors}+ Apps und jeden MCP-Server."
+                    "desc": "n8n-Workflows sind Graphen aus Nodes, oft mit JSON-Expressions oder Code, auch wenn der AI Workflow Builder sie entwirft. Ein Moldwright-Agent bekommt die Aufgabe in eigenen Worten, meldet sich bei Gmail, Notion oder Stripe an und erreicht {connectors}+ Apps und jeden MCP-Server."
                 },
                 "2": {
                     "title": "Gehostet, isoliert, gepflegt",
-                    "desc": "n8n selbst zu hosten heißt Patches, Backups und Verfügbarkeit, und sein Business-Tarif ist nur selbst gehostet, für €667 im Monat. n8n Cloud rechnet stattdessen pro Ausführung ab. Jeder Rerun-Tarif enthält eine private Maschine, deinen eigenen isolierten Computer in der Cloud, auf dem Agenten ihre Dateien und Datenbanken behalten, für dich aktuell gehalten."
+                    "desc": "n8n selbst zu hosten heißt Patches, Backups und Verfügbarkeit, und sein Business-Tarif ist nur selbst gehostet, für €667 im Monat. n8n Cloud rechnet stattdessen pro Ausführung ab. Jeder Moldwright-Tarif enthält eine private Maschine, deinen eigenen isolierten Computer in der Cloud, auf dem Agenten ihre Dateien und Datenbanken behalten, für dich aktuell gehalten."
                 },
                 "3": {
                     "title": "Freigaben, die nicht auf dich warten",
-                    "desc": "n8n kann einen Agenten anhalten, bevor ein Tool läuft, und in Slack, Gmail, Teams oder seinem eigenen Chat warten, bis ein Mensch antwortet. Auch Rerun hält an und fragt in der App, und mit Autopilot antwortet der Chief of Staff, der Assistent, der deine Agenten führt, nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen, und fasst dann die Arbeit und die Stunden zusammen, die er dir gespart hat."
+                    "desc": "n8n kann einen Agenten anhalten, bevor ein Tool läuft, und in Slack, Gmail, Teams oder seinem eigenen Chat warten, bis ein Mensch antwortet. Auch Moldwright hält an und fragt in der App, und mit Autopilot antwortet der Chief of Staff, der Assistent, der deine Agenten führt, nach deinen Regeln, während du weg bist, nie bei Ausgaben oder Löschungen, und fasst dann die Arbeit und die Stunden zusammen, die er dir gespart hat."
                 },
                 "4": {
                     "title": "Ausführungen werden nicht gezählt",
-                    "desc": "n8n Cloud zählt jede Workflow-Ausführung, 2.500 im Monat bei Starter und 10.000 bei Pro. Ein Rerun-Agent kann alle paar Minuten oder bei jedem Webhook laufen, und der Tarif bleibt bei {price} im Monat."
+                    "desc": "n8n Cloud zählt jede Workflow-Ausführung, 2.500 im Monat bei Starter und 10.000 bei Pro. Ein Moldwright-Agent kann alle paar Minuten oder bei jedem Webhook laufen, und der Tarif bleibt bei {price} im Monat."
                 }
             },
             "switchSteps": {
@@ -1588,40 +1588,40 @@
                     "desc": "Plane ihn ein oder starte ihn per Auslöser. Wenn die Ergebnisse eine Woche lang stimmen, hast du einen Workflow weniger zu pflegen."
                 }
             },
-            "theirPricing": "n8n Cloud rechnet pro Workflow-Ausführung ab, ab €20 im Monat bei jährlicher Zahlung für 2.500 Ausführungen und ein geteiltes Projekt bei Starter, oder €50 für 10.000 und drei Projekte bei Pro. Business für €667 ist nur selbst gehostet. Die Community Edition ist kostenlos selbst zu hosten, aber Server, Upgrades und Sicherheit liegen bei dir. Rerun ist ein Tarif ab {price} im Monat, private Maschine inklusive, und Ausführungen werden nie gezählt.",
+            "theirPricing": "n8n Cloud rechnet pro Workflow-Ausführung ab, ab €20 im Monat bei jährlicher Zahlung für 2.500 Ausführungen und ein geteiltes Projekt bei Starter, oder €50 für 10.000 und drei Projekte bei Pro. Business für €667 ist nur selbst gehostet. Die Community Edition ist kostenlos selbst zu hosten, aber Server, Upgrades und Sicherheit liegen bei dir. Moldwright ist ein Tarif ab {price} im Monat, private Maschine inklusive, und Ausführungen werden nie gezählt.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu n8n?",
-                    "answer": "Ja, für Teams, die das Ergebnis wollen, ohne Workflows zu pflegen. n8n passt zu Entwicklern, die gern Graphen bauen und hosten. Rerun-Agenten übernehmen das Ziel in eigenen Worten und laufen auf einer Maschine, die für dich gepflegt wird."
+                    "question": "Ist Moldwright eine Alternative zu n8n?",
+                    "answer": "Ja, für Teams, die das Ergebnis wollen, ohne Workflows zu pflegen. n8n passt zu Entwicklern, die gern Graphen bauen und hosten. Moldwright-Agenten übernehmen das Ziel in eigenen Worten und laufen auf einer Maschine, die für dich gepflegt wird."
                 },
                 "2": {
-                    "question": "Kann ich Rerun wie n8n selbst hosten?",
+                    "question": "Kann ich Moldwright wie n8n selbst hosten?",
                     "answer": "Jeder Tarif gibt dir bereits eine private, isolierte Maschine. Dedizierte oder selbst gehostete Infrastruktur gibt es mit Enterprise, schreib uns an help@rerun.build."
                 },
                 "3": {
-                    "question": "Was unterscheidet Rerun vom AI-Agent-Node von n8n?",
-                    "answer": "Der n8n-Node ist ein Schritt in einem Workflow, den du entwirfst und hostest. Ein Rerun-Agent ist der ganze Mitarbeiter: Er plant die Schritte, behält Gedächtnis und Dateien, läuft nach eigenem Zeitplan und fragt dich vor allem Riskanten."
+                    "question": "Was unterscheidet Moldwright vom AI-Agent-Node von n8n?",
+                    "answer": "Der n8n-Node ist ein Schritt in einem Workflow, den du entwirfst und hostest. Ein Moldwright-Agent ist der ganze Mitarbeiter: Er plant die Schritte, behält Gedächtnis und Dateien, läuft nach eigenem Zeitplan und fragt dich vor allem Riskanten."
                 },
                 "4": {
-                    "question": "Rechnet Rerun pro Ausführung ab?",
-                    "answer": "Nein. Rerun ist ein Festpreis-Tarif ab {price} im Monat und zählt nie Ausführungen."
+                    "question": "Rechnet Moldwright pro Ausführung ab?",
+                    "answer": "Nein. Moldwright ist ein Festpreis-Tarif ab {price} im Monat und zählt nie Ausführungen."
                 },
                 "5": {
                     "question": "Was passiert, wenn ein Agent eine Freigabe braucht, während ich weg bin?",
                     "answer": "Er hält an und fragt, du bekommst eine E-Mail und antwortest in der App. In bezahlten Tarifen kannst du auch Autopilot einschalten: Während du weg bist, beantwortet der Chief of Staff, der Assistent, der deine Agenten führt, ihre Fragen und gibt Routineaktionen nach deinen Regeln frei. Geld ausgeben und Löschen warten immer auf dich, und jede Entscheidung wird protokolliert."
                 },
                 "6": {
-                    "question": "Muss ich mit Rerun Code schreiben?",
+                    "question": "Muss ich mit Moldwright Code schreiben?",
                     "answer": "Nein. Du beschreibst die Aufgabe, verbindest deine Apps, und der Agent richtet sich selbst ein. Entwickler können trotzdem jeden MCP-Server oder jede API anbinden."
                 }
             }
         },
         "lindy": {
-            "metaTitle": "Rerun vs Lindy: Festpreis, deine eigene KI (2026)",
-            "metaDescription": "Rerun vs Lindy bei Preis, Credits und Modellen. Lindy rechnet jeden aktiven Nutzer und jede Aufgabe in Credits ab; Rerun ist ein Festpreis-Tarif über das ChatGPT- oder Claude-Abo, das du schon bezahlst.",
-            "headline": "Rerun vs Lindy",
-            "intro": "Lindy ist ein KI-Assistent, den dein Team über Slack und seine Apps erreicht, abgerechnet pro aktivem Nutzer und in Credits. Rerun gibt deinem Team Agenten, die über dein eigenes KI-Abo laufen, auf einer privaten Maschine, zu einem Festpreis.",
-            "verdict": "Nimm Lindy, wenn dein Team in Slack lebt und einen Assistenten will, den alle per @-Erwähnung ansprechen, mit 1.500+ Integrationen, eingebauten Meeting-Notizen und HIPAA mit unterzeichnetem BAA bei Enterprise. Nimm Rerun, wenn du Agenten willst, deren Kosten nicht mit jeder Aufgabe oder jeder Person steigen: Ein Tarif ab {price} im Monat deckt unbegrenzte Agenten und dein ganzes Team ohne Aufpreis ab, und die KI läuft über das ChatGPT- oder Claude-Abo, das du schon bezahlst.",
+            "metaTitle": "Moldwright vs Lindy: Festpreis, deine eigene KI (2026)",
+            "metaDescription": "Moldwright vs Lindy bei Preis, Credits und Modellen. Lindy rechnet jeden aktiven Nutzer und jede Aufgabe in Credits ab; Moldwright ist ein Festpreis-Tarif über das ChatGPT- oder Claude-Abo, das du schon bezahlst.",
+            "headline": "Moldwright vs Lindy",
+            "intro": "Lindy ist ein KI-Assistent, den dein Team über Slack und seine Apps erreicht, abgerechnet pro aktivem Nutzer und in Credits. Moldwright gibt deinem Team Agenten, die über dein eigenes KI-Abo laufen, auf einer privaten Maschine, zu einem Festpreis.",
+            "verdict": "Nimm Lindy, wenn dein Team in Slack lebt und einen Assistenten will, den alle per @-Erwähnung ansprechen, mit 1.500+ Integrationen, eingebauten Meeting-Notizen und HIPAA mit unterzeichnetem BAA bei Enterprise. Nimm Moldwright, wenn du Agenten willst, deren Kosten nicht mit jeder Aufgabe oder jeder Person steigen: Ein Tarif ab {price} im Monat deckt unbegrenzte Agenten und dein ganzes Team ohne Aufpreis ab, und die KI läuft über das ChatGPT- oder Claude-Abo, das du schon bezahlst.",
             "chooseRerun": {
                 "1": "Nicht jede Aufgabe soll ein Credit-Guthaben aufbrauchen",
                 "2": "Du zahlst schon für ChatGPT oder Claude und willst, dass deine Agenten es nutzen",
@@ -1636,11 +1636,11 @@
             "differences": {
                 "1": {
                     "title": "Ein Festpreis, kein Credit-Zähler",
-                    "desc": "Bei Lindy kostet ein Credit $0,01, und jede Aufgabe verbraucht welche, von 2 für eine alltägliche Anfrage bis 2.500 für einen großen Build, und wenn sie aufgebraucht sind, pausiert Lindy Aktionen, die Credits nutzen, bis zum nächsten Zyklus. Rerun kostet {price} im Monat für unbegrenzte Agenten und zählt nie Ausführungen."
+                    "desc": "Bei Lindy kostet ein Credit $0,01, und jede Aufgabe verbraucht welche, von 2 für eine alltägliche Anfrage bis 2.500 für einen großen Build, und wenn sie aufgebraucht sind, pausiert Lindy Aktionen, die Credits nutzen, bis zum nächsten Zyklus. Moldwright kostet {price} im Monat für unbegrenzte Agenten und zählt nie Ausführungen."
                 },
                 "2": {
                     "title": "Die KI, die du schon bezahlst",
-                    "desc": "Lindy lässt dich das Modell wählen, rechnet aber jedes in eigenen Credits ab, ohne dokumentierten Weg, deinen Schlüssel mitzubringen. Bei Rerun kann sich jeder Agent mit deinem ChatGPT- oder Claude-Abo anmelden, deinen Anthropic-, OpenAI-, Google- oder OpenRouter-Schlüssel nutzen oder mit dem im Tarif enthaltenen Rerun-Modell laufen, und du kannst pro Agent wechseln."
+                    "desc": "Lindy lässt dich das Modell wählen, rechnet aber jedes in eigenen Credits ab, ohne dokumentierten Weg, deinen Schlüssel mitzubringen. Bei Moldwright kann sich jeder Agent mit deinem ChatGPT- oder Claude-Abo anmelden, deinen Anthropic-, OpenAI-, Google- oder OpenRouter-Schlüssel nutzen oder mit dem im Tarif enthaltenen Moldwright-Modell laufen, und du kannst pro Agent wechseln."
                 },
                 "3": {
                     "title": "Agenten, die eingearbeitet ankommen",
@@ -1648,7 +1648,7 @@
                 },
                 "4": {
                     "title": "Dein Team ist im Preis enthalten",
-                    "desc": "Lindy rechnet jeden aktiven Nutzer im Workspace ab, ab $49,99 im Monat pro Person, ein Team aus drei Personen beginnt also bei rund $150. Bei Rerun sind Plätze kostenlos und unbegrenzt, das Teammitglied, das die E-Mail eines Agenten freigibt, braucht also kein eigenes Abo."
+                    "desc": "Lindy rechnet jeden aktiven Nutzer im Workspace ab, ab $49,99 im Monat pro Person, ein Team aus drei Personen beginnt also bei rund $150. Bei Moldwright sind Plätze kostenlos und unbegrenzt, das Teammitglied, das die E-Mail eines Agenten freigibt, braucht also kein eigenes Abo."
                 }
             },
             "switchSteps": {
@@ -1665,18 +1665,18 @@
                     "desc": "Setze den Agenten auf denselben Zeitplan oder Auslöser, vergleiche die Ergebnisse und fahre Lindy dann herunter."
                 }
             },
-            "theirPricing": "Lindy wird pro aktivem Nutzer abgerechnet: Der kostenlose Tarif gibt $50 an Credits, die nach 7 Tagen verfallen, und Team beginnt bei $49,99 im Monat pro aktivem Nutzer für je 5.000 Credits, im Workspace zusammengelegt, mit größeren Credit-Stufen darüber. Ein Credit kostet $0,01, jede Aufgabe verbraucht welche, und bei null pausiert Lindy Aktionen, die Credits nutzen, bis zum nächsten Zyklus; ein Admin kann für $10 pro 1.000 Credits aufladen. Rerun ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, die dein ganzes Team nutzt, Plätze inklusive, und zählt nie Ausführungen.",
+            "theirPricing": "Lindy wird pro aktivem Nutzer abgerechnet: Der kostenlose Tarif gibt $50 an Credits, die nach 7 Tagen verfallen, und Team beginnt bei $49,99 im Monat pro aktivem Nutzer für je 5.000 Credits, im Workspace zusammengelegt, mit größeren Credit-Stufen darüber. Ein Credit kostet $0,01, jede Aufgabe verbraucht welche, und bei null pausiert Lindy Aktionen, die Credits nutzen, bis zum nächsten Zyklus; ein Admin kann für $10 pro 1.000 Credits aufladen. Moldwright ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, die dein ganzes Team nutzt, Plätze inklusive, und zählt nie Ausführungen.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Lindy?",
-                    "answer": "Ja. Beide geben dir KI-Agenten, die über deine Tools hinweg arbeiten. Rerun berechnet einen Festpreis statt eines Platzes plus Credits für jeden aktiven Nutzer und lässt deine Agenten über dein bestehendes ChatGPT- oder Claude-Abo, deinen eigenen Schlüssel oder das enthaltene Guthaben laufen."
+                    "question": "Ist Moldwright eine Alternative zu Lindy?",
+                    "answer": "Ja. Beide geben dir KI-Agenten, die über deine Tools hinweg arbeiten. Moldwright berechnet einen Festpreis statt eines Platzes plus Credits für jeden aktiven Nutzer und lässt deine Agenten über dein bestehendes ChatGPT- oder Claude-Abo, deinen eigenen Schlüssel oder das enthaltene Guthaben laufen."
                 },
                 "2": {
-                    "question": "Nutzt Rerun Credits wie Lindy?",
-                    "answer": "Rerun zählt nie Ausführungen oder Aufgaben. Der Tarif enthält ein kleines Guthaben für die Modelle, die Rerun hostet, und Agenten mit deinem eigenen ChatGPT- oder Claude-Abo oder API-Schlüssel kosten bei Rerun nichts extra."
+                    "question": "Nutzt Moldwright Credits wie Lindy?",
+                    "answer": "Moldwright zählt nie Ausführungen oder Aufgaben. Der Tarif enthält ein kleines Guthaben für die Modelle, die Moldwright hostet, und Agenten mit deinem eigenen ChatGPT- oder Claude-Abo oder API-Schlüssel kosten bei Moldwright nichts extra."
                 },
                 "3": {
-                    "question": "Kann ich mein ChatGPT- oder Claude-Abo mit Rerun nutzen?",
+                    "question": "Kann ich mein ChatGPT- oder Claude-Abo mit Moldwright nutzen?",
                     "answer": "Ja. Melde einen Agenten bei deinem Claude- oder ChatGPT-Abo an, und er läuft darüber, innerhalb der Nutzungslimits dieses Abos. Oder nutze einen Anthropic-, OpenAI-, Google- oder OpenRouter-Schlüssel. Lindy dokumentiert nichts Vergleichbares."
                 },
                 "4": {
@@ -1684,21 +1684,21 @@
                     "answer": "Er hält an und fragt, du bekommst eine E-Mail und antwortest in der App. In bezahlten Tarifen kannst du auch Autopilot einschalten: Während du weg bist, beantwortet der Chief of Staff, der Assistent, der deine Agenten führt, ihre Fragen und gibt Routineaktionen nach deinen Regeln frei. Geld ausgeben und Löschen warten immer auf dich, und jede Entscheidung wird protokolliert."
                 },
                 "5": {
-                    "question": "Funktioniert Rerun wie Lindy direkt in Slack?",
-                    "answer": "Rerun-Agenten lesen und posten in Slack über eine Slack-App, die du einmal erstellst, aber du briefst sie und beantwortest ihre Fragen in der Rerun-App. Wenn dein Team den ganzen Tag einen Assistenten in Slack per @-Erwähnung ansprechen will, ist Lindy genau dafür gebaut."
+                    "question": "Funktioniert Moldwright wie Lindy direkt in Slack?",
+                    "answer": "Moldwright-Agenten lesen und posten in Slack über eine Slack-App, die du einmal erstellst, aber du briefst sie und beantwortest ihre Fragen in der Moldwright-App. Wenn dein Team den ganzen Tag einen Assistenten in Slack per @-Erwähnung ansprechen will, ist Lindy genau dafür gebaut."
                 },
                 "6": {
                     "question": "Gibt es eine kostenlose Testphase?",
-                    "answer": "Rerun hat eine kostenlose 5-Tage-Testphase, Karte erforderlich, heute werden $0 berechnet, danach ein Tarif ab {price} im Monat. Der kostenlose Tarif von Lindy gibt $50 an Credits, die nach 7 Tagen verfallen."
+                    "answer": "Moldwright hat eine kostenlose 5-Tage-Testphase, Karte erforderlich, heute werden $0 berechnet, danach ein Tarif ab {price} im Monat. Der kostenlose Tarif von Lindy gibt $50 an Credits, die nach 7 Tagen verfallen."
                 }
             }
         },
         "twin": {
-            "metaTitle": "Rerun vs Twin: was jeder Festpreis-Tarif wirklich enthält (2026)",
-            "metaDescription": "Rerun vs Twin (twin.so): Beide haben jetzt Festpreise. Vergleiche, was der Einstiegstarif enthält, den Browser-Agenten für $149, Teammitglieder gegenüber Kunden und das Modell, auf dem du läufst.",
-            "headline": "Rerun vs Twin",
-            "intro": "Twin baut einen Agenten aus einem Chat und betreibt ihn zu einem Festpreis, ohne Credits. Rerun auch, und gibt jedem Agenten eine private Maschine, dein ganzes Team und das Modell deiner Wahl.",
-            "verdict": "Twin hat die Credits abgeschafft, die Frage ist also nicht mehr, was eine Ausführung kostet, sondern was der Tarif enthält. Twin kostet $29 im Monat für Agenten, Zeitpläne und App-Verbindungen und $149 für den Browser-Agenten, die Lead-Akquise und Deep Research. Rerun kostet {price} im Monat mit einer privaten Maschine ab dem ersten Tarif, einem Browser und einem Desktop, den der Agent wie ein Mensch bedient, kostenpflichtigen Daten, bei denen er vor jeder Ausgabe fragt, und deinem ganzen Team ohne Aufpreis. Nimm Twin, wenn du allein arbeitest, Kunden betreust und seinen Browser-Agenten willst; sein Store-Tarif stimmt einen Agenten pro Kunde ab.",
+            "metaTitle": "Moldwright vs Twin: was jeder Festpreis-Tarif wirklich enthält (2026)",
+            "metaDescription": "Moldwright vs Twin (twin.so): Beide haben jetzt Festpreise. Vergleiche, was der Einstiegstarif enthält, den Browser-Agenten für $149, Teammitglieder gegenüber Kunden und das Modell, auf dem du läufst.",
+            "headline": "Moldwright vs Twin",
+            "intro": "Twin baut einen Agenten aus einem Chat und betreibt ihn zu einem Festpreis, ohne Credits. Moldwright auch, und gibt jedem Agenten eine private Maschine, dein ganzes Team und das Modell deiner Wahl.",
+            "verdict": "Twin hat die Credits abgeschafft, die Frage ist also nicht mehr, was eine Ausführung kostet, sondern was der Tarif enthält. Twin kostet $29 im Monat für Agenten, Zeitpläne und App-Verbindungen und $149 für den Browser-Agenten, die Lead-Akquise und Deep Research. Moldwright kostet {price} im Monat mit einer privaten Maschine ab dem ersten Tarif, einem Browser und einem Desktop, den der Agent wie ein Mensch bedient, kostenpflichtigen Daten, bei denen er vor jeder Ausgabe fragt, und deinem ganzen Team ohne Aufpreis. Nimm Twin, wenn du allein arbeitest, Kunden betreust und seinen Browser-Agenten willst; sein Store-Tarif stimmt einen Agenten pro Kunde ab.",
             "chooseRerun": {
                 "1": "Deine Teammitglieder sollen die Agenten nutzen, nicht nur deine Kunden",
                 "2": "Du willst das Modell wählen oder über dein bestehendes ChatGPT- oder Claude-Abo laufen",
@@ -1713,19 +1713,19 @@
             "differences": {
                 "1": {
                     "title": "Eine Maschine, nicht nur ein Browser",
-                    "desc": "Der Browser-Agent von Twin arbeitet in jeder Website, im $149-Tarif. Bei Rerun hat jeder Agent ab {price} im Monat eine private Maschine: eine Shell, Dateien, zwei Datenbanken, einen Browser und einen Desktop, den er für Apps ohne API wie ein Mensch bedient."
+                    "desc": "Der Browser-Agent von Twin arbeitet in jeder Website, im $149-Tarif. Bei Moldwright hat jeder Agent ab {price} im Monat eine private Maschine: eine Shell, Dateien, zwei Datenbanken, einen Browser und einen Desktop, den er für Apps ohne API wie ein Mensch bedient."
                 },
                 "2": {
                     "title": "Du wählst das Modell",
-                    "desc": "Twin leitet jede Aufgabe an das Modell, das es wählt, und kein Tarif erlaubt einen eigenen Schlüssel oder ein eigenes KI-Abo. Bei Rerun wählst du pro Agent: das im Tarif enthaltene Rerun-Modell, dein ChatGPT- oder Claude-Abo oder einen Anthropic-, OpenAI-, Google- oder OpenRouter-Schlüssel, und du kannst jederzeit wechseln."
+                    "desc": "Twin leitet jede Aufgabe an das Modell, das es wählt, und kein Tarif erlaubt einen eigenen Schlüssel oder ein eigenes KI-Abo. Bei Moldwright wählst du pro Agent: das im Tarif enthaltene Moldwright-Modell, dein ChatGPT- oder Claude-Abo oder einen Anthropic-, OpenAI-, Google- oder OpenRouter-Schlüssel, und du kannst jederzeit wechseln."
                 },
                 "3": {
                     "title": "Dein Team, nicht nur deine Kunden",
-                    "desc": "Twin lädt bis zu 5 Kunden ein, jeden mit eigenem Dashboard, und sagt, dass nur du es nutzen musst. Bei Rerun sind Plätze kostenlos und unbegrenzt: Deine Teammitglieder teilen dasselbe Board, jedes kann einem Agenten antworten, der anhält und fragt, und mit Autopilot antwortet der Chief of Staff nach deinen Regeln, wenn niemand da ist."
+                    "desc": "Twin lädt bis zu 5 Kunden ein, jeden mit eigenem Dashboard, und sagt, dass nur du es nutzen musst. Bei Moldwright sind Plätze kostenlos und unbegrenzt: Deine Teammitglieder teilen dasselbe Board, jedes kann einem Agenten antworten, der anhält und fragt, und mit Autopilot antwortet der Chief of Staff nach deinen Regeln, wenn niemand da ist."
                 },
                 "4": {
                     "title": "Lead-Daten mit einem Preis, den du freigibst",
-                    "desc": "Lead-Akquise, Anreicherung und Kartierung lokaler Unternehmen gibt es bei Twin mit dem $149-Tarif. Bei Rerun sind verifizierte E-Mails, Telefonnummern, Google-Maps-Einträge und Suchrankings im Produkt: Der Agent berechnet den Preis des Pakets, zeigt dir die Kosten Zeile für Zeile, und die Abfrage läuft erst, wenn du sie freigibst."
+                    "desc": "Lead-Akquise, Anreicherung und Kartierung lokaler Unternehmen gibt es bei Twin mit dem $149-Tarif. Bei Moldwright sind verifizierte E-Mails, Telefonnummern, Google-Maps-Einträge und Suchrankings im Produkt: Der Agent berechnet den Preis des Pakets, zeigt dir die Kosten Zeile für Zeile, und die Abfrage läuft erst, wenn du sie freigibst."
                 }
             },
             "switchSteps": {
@@ -1742,36 +1742,36 @@
                     "desc": "Deine Teammitglieder kommen ohne Aufpreis auf dasselbe Board, verfolgen die Ausführungen und antworten den Agenten, wenn sie fragen."
                 }
             },
-            "theirPricing": "Twin hat Festpreise ohne Credits: Plus für $29 im Monat für unbegrenzte Agenten, geplante Ausführungen, Webhooks und App-Verbindungen, Pro für $149 für Browser-Agent, Lead-Akquise, Deep Research, Bild- und Videogenerierung und Immobiliendaten, und Store ab $399 für einen Agenten pro Kunde. Plus und Pro laden bis zu 5 Kunden ein, jeden mit eigenem Dashboard, und jeder Tarif hat eine kostenlose 7-Tage-Testphase ohne Karte. Hinweis: Die eigene Dokumentation von Twin beschreibt noch das alte Credit-System. Rerun ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, eine private Maschine, Modell-Guthaben und unbegrenzte Plätze, mit einer kostenlosen 5-Tage-Testphase.",
+            "theirPricing": "Twin hat Festpreise ohne Credits: Plus für $29 im Monat für unbegrenzte Agenten, geplante Ausführungen, Webhooks und App-Verbindungen, Pro für $149 für Browser-Agent, Lead-Akquise, Deep Research, Bild- und Videogenerierung und Immobiliendaten, und Store ab $399 für einen Agenten pro Kunde. Plus und Pro laden bis zu 5 Kunden ein, jeden mit eigenem Dashboard, und jeder Tarif hat eine kostenlose 7-Tage-Testphase ohne Karte. Hinweis: Die eigene Dokumentation von Twin beschreibt noch das alte Credit-System. Moldwright ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, eine private Maschine, Modell-Guthaben und unbegrenzte Plätze, mit einer kostenlosen 5-Tage-Testphase.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Twin?",
-                    "answer": "Ja, und die beiden sind sich näher als früher: Beide bauen Agenten aus einer einfachen Beschreibung, lassen sie nach Zeitplan oder per Ereignis laufen und berechnen einen Festpreis ohne Credits. Rerun bietet zusätzlich eine private Maschine im Einstiegstarif, freie Modellwahl, unbegrenzte kostenlose Plätze und {templates}+ fertige Agenten."
+                    "question": "Ist Moldwright eine Alternative zu Twin?",
+                    "answer": "Ja, und die beiden sind sich näher als früher: Beide bauen Agenten aus einer einfachen Beschreibung, lassen sie nach Zeitplan oder per Ereignis laufen und berechnen einen Festpreis ohne Credits. Moldwright bietet zusätzlich eine private Maschine im Einstiegstarif, freie Modellwahl, unbegrenzte kostenlose Plätze und {templates}+ fertige Agenten."
                 },
                 "2": {
                     "question": "Rechnet Twin noch in Credits ab?",
                     "answer": "Nicht auf seiner Preisseite, auf der jetzt „Unlimited Plans. No Credits.“ steht. Seine Dokumentation beschreibt noch die alten Credit-Stufen, maßgeblich sind also die Tarife: $29, $149 und ab $399 im Monat."
                 },
                 "3": {
-                    "question": "Kann ich bei Rerun das Modell wählen?",
-                    "answer": "Ja, pro Agent und sogar pro geplanter Aufgabe: das im Tarif enthaltene Rerun-Modell oder Claude, GPT, Gemini und mehr über dein eigenes Abo oder deinen Schlüssel. Twin wählt das Modell für dich."
+                    "question": "Kann ich bei Moldwright das Modell wählen?",
+                    "answer": "Ja, pro Agent und sogar pro geplanter Aufgabe: das im Tarif enthaltene Moldwright-Modell oder Claude, GPT, Gemini und mehr über dein eigenes Abo oder deinen Schlüssel. Twin wählt das Modell für dich."
                 },
                 "4": {
-                    "question": "Können Rerun-Agenten einen Browser nutzen?",
+                    "question": "Können Moldwright-Agenten einen Browser nutzen?",
                     "answer": "Ja, ab dem ersten Tarif. Agenten steuern einen Browser auf ihrer eigenen Maschine und können einen ganzen Desktop für Apps ohne API übernehmen, neben den {connectors}+ Apps, die sie über deren APIs erreichen. Der Browser-Agent von Twin ist für viel Klickarbeit über viele Websites gebaut, im $149-Tarif."
                 },
                 "5": {
-                    "question": "Kann mein Team Rerun nutzen?",
+                    "question": "Kann mein Team Moldwright nutzen?",
                     "answer": "Ja, und Plätze sind kostenlos und unbegrenzt. Alle sehen die Agenten bei der Arbeit und können einem antworten, der anhält und fragt. Die Einladungen von Twin sind für Kunden mit eigenem Dashboard, nicht für Teammitglieder."
                 }
             }
         },
         "dust": {
-            "metaTitle": "Rerun vs Dust: Festpreis, jede App, kostenlose Plätze (2026)",
-            "metaDescription": "Rerun vs Dust bei Plätzen, Credits und Connectoren. Dust berechnet jeden Platz und misst automatisierte Nutzung; Rerun ist ein Festpreis-Tarif mit unbegrenzten Plätzen und allen Apps inklusive.",
-            "headline": "Rerun vs Dust",
-            "intro": "Dust gibt jeder Person Agenten, die die Dokumente deiner Firma kennen, abgerechnet pro Platz und in Credits. Rerun gibt deinem Team Agenten, die die Arbeit selbst erledigen, auf einer privaten Maschine, zu einem Festpreis.",
-            "verdict": "Nimm Dust, wenn es darum geht, auf Basis von Firmenwissen aus Notion, Drive und Slack zu antworten, für ein großes Team, das SSO, SOC 2 Type II und Hosting in der EU oder den USA braucht. Nimm Rerun, wenn Agenten Abläufe selbst erledigen sollen, nach Zeitplan oder per Webhook, über {connectors}+ Apps, mit jeder Ausführung sichtbar für ein Team mit kostenlosen Plätzen, für {price} im Monat statt eines Platzes und eines Credit-Kontingents pro Person.",
+            "metaTitle": "Moldwright vs Dust: Festpreis, jede App, kostenlose Plätze (2026)",
+            "metaDescription": "Moldwright vs Dust bei Plätzen, Credits und Connectoren. Dust berechnet jeden Platz und misst automatisierte Nutzung; Moldwright ist ein Festpreis-Tarif mit unbegrenzten Plätzen und allen Apps inklusive.",
+            "headline": "Moldwright vs Dust",
+            "intro": "Dust gibt jeder Person Agenten, die die Dokumente deiner Firma kennen, abgerechnet pro Platz und in Credits. Moldwright gibt deinem Team Agenten, die die Arbeit selbst erledigen, auf einer privaten Maschine, zu einem Festpreis.",
+            "verdict": "Nimm Dust, wenn es darum geht, auf Basis von Firmenwissen aus Notion, Drive und Slack zu antworten, für ein großes Team, das SSO, SOC 2 Type II und Hosting in der EU oder den USA braucht. Nimm Moldwright, wenn Agenten Abläufe selbst erledigen sollen, nach Zeitplan oder per Webhook, über {connectors}+ Apps, mit jeder Ausführung sichtbar für ein Team mit kostenlosen Plätzen, für {price} im Monat statt eines Platzes und eines Credit-Kontingents pro Person.",
             "chooseRerun": {
                 "1": "Agenten sollen nach Zeitplan handeln, und das ganze Team soll die Ausführungen sehen",
                 "2": "Du brauchst mehr als 3 Connectoren ohne Enterprise-Vertrag",
@@ -1786,19 +1786,19 @@
             "differences": {
                 "1": {
                     "title": "Automatisierung wird nicht gemessen",
-                    "desc": "Dust berechnet Nutzung, die niemand eintippt, etwa einen API-Aufruf oder einen ausgelösten Lauf, mit $0,01 pro Credit, und ein Webhook-Auslöser feuert höchstens 42 Mal am Tag. Bei Rerun kosten geplante und per Webhook gestartete Ausführungen nichts extra: Der Tarif kostet {price} im Monat, Ausführungen werden nie gezählt, und ein Zeitplan kann jede Minute auslösen."
+                    "desc": "Dust berechnet Nutzung, die niemand eintippt, etwa einen API-Aufruf oder einen ausgelösten Lauf, mit $0,01 pro Credit, und ein Webhook-Auslöser feuert höchstens 42 Mal am Tag. Bei Moldwright kosten geplante und per Webhook gestartete Ausführungen nichts extra: Der Tarif kostet {price} im Monat, Ausführungen werden nie gezählt, und ein Zeitplan kann jede Minute auslösen."
                 },
                 "2": {
                     "title": "Jede App in jedem Tarif",
-                    "desc": "Der Self-Service-Tarif von Dust verbindet bis zu 3 Datenquellen und 5 Remote-MCP-Server. Jeder Rerun-Tarif erreicht {connectors}+ Apps, mit einem Login für Gmail, Drive, Notion oder Stripe und einem Token für den Rest, plus jeden MCP-Server."
+                    "desc": "Der Self-Service-Tarif von Dust verbindet bis zu 3 Datenquellen und 5 Remote-MCP-Server. Jeder Moldwright-Tarif erreicht {connectors}+ Apps, mit einem Login für Gmail, Drive, Notion oder Stripe und einem Token für den Rest, plus jeden MCP-Server."
                 },
                 "3": {
                     "title": "Ausführungen, die das ganze Team sieht",
-                    "desc": "Bei Dust „gehören Auslöser dem Mitglied, das sie erstellt hat“, und die Ausführung landet in dessen Verlauf, außer es legt die Unterhaltung in einem Pod ab. Bei Rerun steht jede Routine jedes Agenten in einer Routines-Liste, die der Workspace teilt, mit ihrer nächsten Ausführung, und jedes Teammitglied kann einem Agenten antworten, der anhält und fragt."
+                    "desc": "Bei Dust „gehören Auslöser dem Mitglied, das sie erstellt hat“, und die Ausführung landet in dessen Verlauf, außer es legt die Unterhaltung in einem Pod ab. Bei Moldwright steht jede Routine jedes Agenten in einer Routines-Liste, die der Workspace teilt, mit ihrer nächsten Ausführung, und jedes Teammitglied kann einem Agenten antworten, der anhält und fragt."
                 },
                 "4": {
                     "title": "Plätze sind kostenlos, das Wissen ist geteilt",
-                    "desc": "Dust berechnet jede Person, die es nutzt, jede mit eigenem Credit-Kontingent, das nicht übertragen wird. Bei Rerun sind Plätze kostenlos und unbegrenzt, und jeder Agent liest dasselbe Firmenwissen mit deinem Angebot, deinen Preisen, deinem Markt und deinem Ton, neben seinem eigenen Gedächtnis und seinen Dateien."
+                    "desc": "Dust berechnet jede Person, die es nutzt, jede mit eigenem Credit-Kontingent, das nicht übertragen wird. Bei Moldwright sind Plätze kostenlos und unbegrenzt, und jeder Agent liest dasselbe Firmenwissen mit deinem Angebot, deinen Preisen, deinem Markt und deinem Ton, neben seinem eigenen Gedächtnis und seinen Dateien."
                 }
             },
             "switchSteps": {
@@ -1815,36 +1815,36 @@
                     "desc": "Lege einen Zeitplan oder Webhook fest und lade dann das ganze Team ohne Aufpreis ein, die Ausführungen zu verfolgen und dem Agenten zu antworten."
                 }
             },
-            "theirPricing": "Dust berechnet jeden Platz: Pro kostet €24 im Monat bei jährlicher Zahlung oder €30 monatlich mit 8.000 Credits, Max €120 oder €150 mit 40,000, zzgl. MwSt., und ein kostenloser Platz bekommt einmalig 500 Credits. Credits werden nicht übertragen, automatisierte Nutzung wird mit $0,01 pro Credit abgerechnet, und der Self-Service-Tarif verbindet bis zu 3 Datenquellen und 5 Remote-MCP-Server. Rerun ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, mit unbegrenzten Plätzen und ohne Connector-Limit.",
+            "theirPricing": "Dust berechnet jeden Platz: Pro kostet €24 im Monat bei jährlicher Zahlung oder €30 monatlich mit 8.000 Credits, Max €120 oder €150 mit 40,000, zzgl. MwSt., und ein kostenloser Platz bekommt einmalig 500 Credits. Credits werden nicht übertragen, automatisierte Nutzung wird mit $0,01 pro Credit abgerechnet, und der Self-Service-Tarif verbindet bis zu 3 Datenquellen und 5 Remote-MCP-Server. Moldwright ist ein Tarif ab {price} im Monat für unbegrenzte Agenten, mit unbegrenzten Plätzen und ohne Connector-Limit.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Dust?",
-                    "answer": "Für Teams, die Agenten die Arbeit selbst erledigen lassen wollen, ja. Dust ist am stärksten darin, in Unterhaltungen auf Basis von Firmenwissen zu antworten. Rerun-Agenten laufen nach Zeitplan oder per Webhook, über {connectors}+ Apps, auf einer privaten Maschine, zu einem Festpreis."
+                    "question": "Ist Moldwright eine Alternative zu Dust?",
+                    "answer": "Für Teams, die Agenten die Arbeit selbst erledigen lassen wollen, ja. Dust ist am stärksten darin, in Unterhaltungen auf Basis von Firmenwissen zu antworten. Moldwright-Agenten laufen nach Zeitplan oder per Webhook, über {connectors}+ Apps, auf einer privaten Maschine, zu einem Festpreis."
                 },
                 "2": {
-                    "question": "Rechnet Rerun wie Dust pro Platz ab?",
-                    "answer": "Nein. Plätze sind in einem bezahlten Rerun-Tarif kostenlos und unbegrenzt, und sie haben kein Credit-Kontingent, das du im Blick behalten musst. Du zahlst für Agenten und Modell-Guthaben, und Ausführungen werden nie gezählt."
+                    "question": "Rechnet Moldwright wie Dust pro Platz ab?",
+                    "answer": "Nein. Plätze sind in einem bezahlten Moldwright-Tarif kostenlos und unbegrenzt, und sie haben kein Credit-Kontingent, das du im Blick behalten musst. Du zahlst für Agenten und Modell-Guthaben, und Ausführungen werden nie gezählt."
                 },
                 "3": {
-                    "question": "Kann Rerun wie Dust unsere Firmendokumente durchsuchen?",
+                    "question": "Kann Moldwright wie Dust unsere Firmendokumente durchsuchen?",
                     "answer": "Agenten lesen Notion, Google Drive, Gmail und andere Apps über ihre Verbindungen, und der Workspace führt ein Firmenwissen, das jeder Agent liest, mit den Seiten, die du über dein Unternehmen bestätigt hast. Für eine firmenweite Suche über jedes Dokument, mit Berechtigungen, ist Dust gezielt gebaut."
                 },
                 "4": {
-                    "question": "Wie oft kann ein Rerun-Agent laufen?",
+                    "question": "Wie oft kann ein Moldwright-Agent laufen?",
                     "answer": "So oft, wie die Arbeit braucht: Ein Zeitplan kann jede Minute auslösen, und Webhooks sind nicht begrenzt. Die Webhook-Auslöser von Dust laufen standardmäßig höchstens 42 Mal pro 24 Stunden."
                 },
                 "5": {
                     "question": "Gibt es eine kostenlose Testphase?",
-                    "answer": "Rerun hat eine kostenlose 5-Tage-Testphase, Karte erforderlich, heute werden $0 berechnet, danach ein Tarif ab {price} im Monat."
+                    "answer": "Moldwright hat eine kostenlose 5-Tage-Testphase, Karte erforderlich, heute werden $0 berechnet, danach ein Tarif ab {price} im Monat."
                 }
             }
         },
         "squad": {
-            "metaTitle": "Rerun vs Squad: ein Tarif, KI inklusive (2026)",
-            "metaDescription": "Rerun vs Squad (squad.so) bei Preis und Modellen. Squad kostet $99 im Monat zusätzlich zu dem KI-Abo, das du mitbringst; Rerun kostet weniger und enthält Modell-Guthaben.",
-            "headline": "Rerun vs Squad",
-            "intro": "Squad vermietet dir KI-Teammitglieder und verlangt, dass du die KI mitbringst. Rerun ist der ganze Workspace, in dem sie leben, Modell-Guthaben inklusive: eine Bibliothek fertiger Agenten zum Installieren, {connectors}+ Apps und ein Board, auf dem du der Arbeit zusiehst.",
-            "verdict": "Squad und Rerun sehen sich ähnlich: Agenten auf einem Cloud-Computer, mit Freigaben und Ausführungsprotokollen. Der Unterschied liegt in der Rechnung und dem, was drumherum kommt. Squad kostet $99 im Monat zusätzlich zu einem KI-Abo, das es für $100 bis $200 empfiehlt, die echte Untergrenze liegt also bei rund $200. Rerun kostet {price} im Monat mit Modell-Guthaben inklusive, {templates}+ fertigen Agenten, {connectors}+ Apps und Experten, die Agenten für dich bauen. Nimm Squad, wenn du mehrere KI-Konten mit Ausweichlösungen stapeln oder jedem Teammitglied ein eigenes E-Mail-Postfach geben willst.",
+            "metaTitle": "Moldwright vs Squad: ein Tarif, KI inklusive (2026)",
+            "metaDescription": "Moldwright vs Squad (squad.so) bei Preis und Modellen. Squad kostet $99 im Monat zusätzlich zu dem KI-Abo, das du mitbringst; Moldwright kostet weniger und enthält Modell-Guthaben.",
+            "headline": "Moldwright vs Squad",
+            "intro": "Squad vermietet dir KI-Teammitglieder und verlangt, dass du die KI mitbringst. Moldwright ist der ganze Workspace, in dem sie leben, Modell-Guthaben inklusive: eine Bibliothek fertiger Agenten zum Installieren, {connectors}+ Apps und ein Board, auf dem du der Arbeit zusiehst.",
+            "verdict": "Squad und Moldwright sehen sich ähnlich: Agenten auf einem Cloud-Computer, mit Freigaben und Ausführungsprotokollen. Der Unterschied liegt in der Rechnung und dem, was drumherum kommt. Squad kostet $99 im Monat zusätzlich zu einem KI-Abo, das es für $100 bis $200 empfiehlt, die echte Untergrenze liegt also bei rund $200. Moldwright kostet {price} im Monat mit Modell-Guthaben inklusive, {templates}+ fertigen Agenten, {connectors}+ Apps und Experten, die Agenten für dich bauen. Nimm Squad, wenn du mehrere KI-Konten mit Ausweichlösungen stapeln oder jedem Teammitglied ein eigenes E-Mail-Postfach geben willst.",
             "chooseRerun": {
                 "1": "Du willst kein KI-Abo für $100 kaufen, bevor der erste Agent läuft",
                 "2": "Du installierst lieber einen von {templates}+ fertigen Agenten, als einen leeren zu briefen",
@@ -1859,15 +1859,15 @@
             "differences": {
                 "1": {
                     "title": "Eine Rechnung statt zwei",
-                    "desc": "Squad verlangt $99 im Monat für die Plattform, und die Arbeit läuft über ein KI-Abo, das du mitbringst und das es für $100 bis $200 empfiehlt. Rerun kostet {price} im Monat mit Modell-Guthaben inklusive, und ein eigenes Abo mitzubringen bleibt eine Wahl, keine Bedingung."
+                    "desc": "Squad verlangt $99 im Monat für die Plattform, und die Arbeit läuft über ein KI-Abo, das du mitbringst und das es für $100 bis $200 empfiehlt. Moldwright kostet {price} im Monat mit Modell-Guthaben inklusive, und ein eigenes Abo mitzubringen bleibt eine Wahl, keine Bedingung."
                 },
                 "2": {
                     "title": "Agenten, die eingearbeitet ankommen",
-                    "desc": "Rerun startet mit {templates}+ fertigen Agenten von seiner Community und seinen Experten: Installiere einen, richte ihn auf deine Tools aus, ändere die Teile, die dir gehören. Er behält seine Dateien, Datenbanken und deine Korrekturen auf seiner Maschine und liest ein Firmenwissen, das der ganze Workspace teilt."
+                    "desc": "Moldwright startet mit {templates}+ fertigen Agenten von seiner Community und seinen Experten: Installiere einen, richte ihn auf deine Tools aus, ändere die Teile, die dir gehören. Er behält seine Dateien, Datenbanken und deine Korrekturen auf seiner Maschine und liest ein Firmenwissen, das der ganze Workspace teilt."
                 },
                 "3": {
                     "title": "Mehr von deinem Stack, im Browser",
-                    "desc": "Squad verbindet 70+ Tools. Rerun erreicht {connectors}+ Apps, mit einem Login für Gmail, Notion, Stripe oder Linear und einem Token für den Rest, plus jeden MCP-Server, und lässt jeden Agenten mit dem Modell laufen, das du wählst: dem im Tarif enthaltenen Rerun-Modell, deinem Claude- oder ChatGPT-Abo oder deinem eigenen Schlüssel."
+                    "desc": "Squad verbindet 70+ Tools. Moldwright erreicht {connectors}+ Apps, mit einem Login für Gmail, Notion, Stripe oder Linear und einem Token für den Rest, plus jeden MCP-Server, und lässt jeden Agenten mit dem Modell laufen, das du wählst: dem im Tarif enthaltenen Moldwright-Modell, deinem Claude- oder ChatGPT-Abo oder deinem eigenen Schlüssel."
                 },
                 "4": {
                     "title": "Dein Team auf demselben Board",
@@ -1881,17 +1881,17 @@
                 },
                 "2": {
                     "title": "Verbinde dieselben Apps, wähle das Modell",
-                    "desc": "Ein Login für Gmail, Stripe oder Notion. Lass ihn mit Rerun-Guthaben laufen, mit deinem eigenen API-Schlüssel oder dem ChatGPT- oder Claude-Abo, das du schon zu Squad mitgebracht hast."
+                    "desc": "Ein Login für Gmail, Stripe oder Notion. Lass ihn mit Moldwright-Guthaben laufen, mit deinem eigenen API-Schlüssel oder dem ChatGPT- oder Claude-Abo, das du schon zu Squad mitgebracht hast."
                 },
                 "3": {
                     "title": "Verfolge ihn auf dem Board, dann kündige",
                     "desc": "Er arbeitet auf seiner Maschine, nach Zeitplan oder per Auslöser, und jede Ausführung leuchtet auf dem Board auf, das dein Team verfolgt. Kündige Squad, sobald eine Woche an Ausführungen stimmt."
                 }
             },
-            "theirPricing": "Squad kostet $99 im Monat für unbegrenzte KI-Teammitglieder, einen dedizierten Cloud-Computer für den ganzen Squad und 70+ Integrationen, mit einem E-Mail-Postfach pro Teammitglied für je $10 im Monat. Die Arbeit läuft über ein KI-Abo, das du mitbringst und für das Squad $100 bis $200 im Monat empfiehlt, die echte Untergrenze liegt also bei rund $200. Squad bietet statt einer kostenlosen Testphase eine 7-Tage-Geld-zurück-Garantie. Rerun ist ein Tarif ab {price} im Monat mit privater Maschine, Modell-Guthaben, unbegrenzten Plätzen und {templates}+ fertigen Agenten, und einer kostenlosen 5-Tage-Testphase.",
+            "theirPricing": "Squad kostet $99 im Monat für unbegrenzte KI-Teammitglieder, einen dedizierten Cloud-Computer für den ganzen Squad und 70+ Integrationen, mit einem E-Mail-Postfach pro Teammitglied für je $10 im Monat. Die Arbeit läuft über ein KI-Abo, das du mitbringst und für das Squad $100 bis $200 im Monat empfiehlt, die echte Untergrenze liegt also bei rund $200. Squad bietet statt einer kostenlosen Testphase eine 7-Tage-Geld-zurück-Garantie. Moldwright ist ein Tarif ab {price} im Monat mit privater Maschine, Modell-Guthaben, unbegrenzten Plätzen und {templates}+ fertigen Agenten, und einer kostenlosen 5-Tage-Testphase.",
             "faq": {
                 "1": {
-                    "question": "Ist Rerun eine Alternative zu Squad?",
+                    "question": "Ist Moldwright eine Alternative zu Squad?",
                     "answer": "Ja, und es bringt mehr rund um die Agenten mit: eine Bibliothek mit {templates}+ fertigen Agenten, Experten, die einen für dich bauen, {connectors}+ Apps und ein Live-Board. Es beginnt bei {price} im Monat mit Modell-Guthaben inklusive, du musst also nichts weiter kaufen, bevor ein Agent arbeiten kann."
                 },
                 "2": {
@@ -1903,16 +1903,16 @@
                     "answer": "Eine Bibliothek mit {templates}+ Agenten, die du installierst statt sie zu briefen, ein Netzwerk von Experten, die den Agenten für dich bauen und übergeben, {connectors}+ Apps plus jeden MCP-Server, und verifizierte Lead-Daten, Telefonnummern, Google-Maps-Einträge und Suchrankings, bei denen der Agent fragt, bevor er Geld ausgibt."
                 },
                 "4": {
-                    "question": "Kann ich mein eigenes ChatGPT- oder Claude-Abo zu Rerun mitbringen?",
+                    "question": "Kann ich mein eigenes ChatGPT- oder Claude-Abo zu Moldwright mitbringen?",
                     "answer": "Ja, und es ist optional. Jeder Tarif enthält Modell-Guthaben, sodass Agenten ab dem ersten Tag laufen. Wenn du schon für Claude oder ChatGPT zahlst, kannst du stattdessen einen Agenten dort anmelden oder deinen eigenen API-Schlüssel nutzen, und jeder Agent kann mit einem anderen Modell laufen."
                 },
                 "5": {
-                    "question": "Gibt Rerun Agenten wie Squad einen Computer?",
+                    "question": "Gibt Moldwright Agenten wie Squad einen Computer?",
                     "answer": "Ja. Dein Workspace bekommt mit dem Tarif einen privaten, isolierten Computer in der Cloud, auf dem Agenten Dateien, Datenbanken und Gedächtnis zwischen den Ausführungen behalten, und mehrere Agenten können ihn teilen, um am selben Projekt zu arbeiten. Auch Squad gibt jedem Squad einen Cloud-Computer, mit einem eigenen Browserprofil pro Teammitglied."
                 },
                 "6": {
                     "question": "Gibt es eine kostenlose Testphase?",
-                    "answer": "Rerun hat eine kostenlose 5-Tage-Testphase, Karte erforderlich, heute werden $0 berechnet. Squad verlangt, dass du den ersten Monat bezahlst, und bietet stattdessen eine 7-Tage-Geld-zurück-Garantie."
+                    "answer": "Moldwright hat eine kostenlose 5-Tage-Testphase, Karte erforderlich, heute werden $0 berechnet. Squad verlangt, dass du den ersten Monat bezahlst, und bietet stattdessen eine 7-Tage-Geld-zurück-Garantie."
                 }
             }
         }

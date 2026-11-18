@@ -41,7 +41,7 @@
         },
         "summary": "{kind} · {count, plural, one {# modelo} other {# modelos}}",
         "summaryWindow": "{name} {percent}",
-        "creditPaused": "Los créditos de Rerun están en pausa",
+        "creditPaused": "Los créditos de Moldwright están en pausa",
         "creditUsed": "{percent} % de los créditos del mes usados",
         "creditUsedUpOn": "Créditos del mes agotados, vuelven el {date}",
         "creditUsedUpNextMonth": "Créditos del mes agotados, vuelven el mes que viene",
@@ -75,13 +75,13 @@
             "anthropic": {
                 "title": "Cómo conseguir tu clave de Anthropic",
                 "step1": "Abre la [consola de Anthropic](https://console.anthropic.com/settings/keys) e inicia sesión.",
-                "step2": "Haz clic en **Create Key** y ponle un nombre, por ejemplo \"Rerun\".",
+                "step2": "Haz clic en **Create Key** y ponle un nombre, por ejemplo \"Moldwright\".",
                 "step3": "Copia la clave (empieza por `sk-ant-`) y pégala arriba. Solo se muestra una vez."
             },
             "openai": {
                 "title": "Cómo conseguir tu clave de OpenAI",
                 "step1": "Abre [OpenAI API keys](https://platform.openai.com/api-keys) e inicia sesión.",
-                "step2": "Haz clic en **Create new secret key** y ponle un nombre, por ejemplo \"Rerun\".",
+                "step2": "Haz clic en **Create new secret key** y ponle un nombre, por ejemplo \"Moldwright\".",
                 "step3": "Copia la clave (empieza por `sk-`) y pégala arriba. Solo se muestra una vez."
             },
             "google": {
@@ -179,7 +179,7 @@
             "automations": "{count, plural, one {# automatización pasará} other {# automatizaciones pasarán}} al modelo predeterminado del workspace.",
             "both": "{agents} y {count, plural, one {# automatización} other {# automatizaciones}} pasarán al modelo predeterminado del workspace."
         },
-        "holdsDefault": "Tiene el modelo predeterminado del workspace, que se quita: todo coworker que no eligió ninguno vuelve a Rerun.",
+        "holdsDefault": "Tiene el modelo predeterminado del workspace, que se quita: todo coworker que no eligió ninguno vuelve a Moldwright.",
         "nothingRuns": "La credencial se quita de la Box. Nada la usa.",
         "released": {
             "agents": "{agents} ahora usan el modelo predeterminado del workspace.",
@@ -230,9 +230,9 @@
         "signedInAgain": "Sesión iniciada de nuevo",
         "creditsTitle": "Créditos de este mes",
         "topUp": "Recargar",
-        "creditsUsedUpOn": "Los coworkers que usan Rerun están en pausa hasta que vuelvan los créditos el {date}. Recarga o elige otro modelo predeterminado para que sigan.",
-        "creditsUsedUpNextMonth": "Los coworkers que usan Rerun están en pausa hasta que vuelvan los créditos el mes que viene. Recarga o elige otro modelo predeterminado para que sigan.",
-        "creditsIncluded": "Viene con tu plan de Rerun. Sin clave, nada que configurar.",
+        "creditsUsedUpOn": "Los coworkers que usan Moldwright están en pausa hasta que vuelvan los créditos el {date}. Recarga o elige otro modelo predeterminado para que sigan.",
+        "creditsUsedUpNextMonth": "Los coworkers que usan Moldwright están en pausa hasta que vuelvan los créditos el mes que viene. Recarga o elige otro modelo predeterminado para que sigan.",
+        "creditsIncluded": "Viene con tu plan de Moldwright. Sin clave, nada que configurar.",
         "signInRejected": "Este inicio de sesión fue rechazado. Los coworkers que lo usan están detenidos hasta que vuelvas a iniciar sesión.",
         "signInExpired": "Este inicio de sesión caducó. Los coworkers que lo usan están detenidos hasta que vuelvas a iniciar sesión.",
         "reconnected": "Tus coworkers vuelven a funcionar",
@@ -256,12 +256,12 @@
         },
         "default": {
             "via": "Mediante {source}. Los coworkers sin modelo propio lo usan.",
-            "pausedPick": "Los créditos de Rerun están en pausa, así que los coworkers sin modelo propio también. Elige otro modelo para que sigan.",
-            "pausedAdd": "Los créditos de Rerun están en pausa, así que los coworkers sin modelo propio también. Añade un plan o una clave API para que sigan.",
-            "usedUpOnPick": "Los créditos de Rerun están agotados hasta el {date}, así que los coworkers sin modelo propio están en pausa. Elige otro modelo para que sigan.",
-            "usedUpOnAdd": "Los créditos de Rerun están agotados hasta el {date}, así que los coworkers sin modelo propio están en pausa. Añade un plan o una clave API para que sigan.",
-            "usedUpNextMonthPick": "Los créditos de Rerun están agotados hasta el mes que viene, así que los coworkers sin modelo propio están en pausa. Elige otro modelo para que sigan.",
-            "usedUpNextMonthAdd": "Los créditos de Rerun están agotados hasta el mes que viene, así que los coworkers sin modelo propio están en pausa. Añade un plan o una clave API para que sigan.",
+            "pausedPick": "Los créditos de Moldwright están en pausa, así que los coworkers sin modelo propio también. Elige otro modelo para que sigan.",
+            "pausedAdd": "Los créditos de Moldwright están en pausa, así que los coworkers sin modelo propio también. Añade un plan o una clave API para que sigan.",
+            "usedUpOnPick": "Los créditos de Moldwright están agotados hasta el {date}, así que los coworkers sin modelo propio están en pausa. Elige otro modelo para que sigan.",
+            "usedUpOnAdd": "Los créditos de Moldwright están agotados hasta el {date}, así que los coworkers sin modelo propio están en pausa. Añade un plan o una clave API para que sigan.",
+            "usedUpNextMonthPick": "Los créditos de Moldwright están agotados hasta el mes que viene, así que los coworkers sin modelo propio están en pausa. Elige otro modelo para que sigan.",
+            "usedUpNextMonthAdd": "Los créditos de Moldwright están agotados hasta el mes que viene, así que los coworkers sin modelo propio están en pausa. Añade un plan o una clave API para que sigan.",
             "stopped": "Los coworkers sin modelo propio están detenidos. Arregla {source} o elige otro modelo.",
             "noOtherModel": "Ningún otro modelo está listo. Añade primero un plan o una clave API.",
             "change": "Cambiar"
@@ -306,7 +306,7 @@
         },
         "copied": "Copiado",
         "copyMessage": "Copiar un mensaje para tu admin",
-        "adminMessage": "¡Hola! ¿Podrías activar «Autorización con código de dispositivo para Codex» en la configuración de nuestro workspace de ChatGPT? La necesito para conectar mi plan de ChatGPT a Rerun."
+        "adminMessage": "¡Hola! ¿Podrías activar «Autorización con código de dispositivo para Codex» en la configuración de nuestro workspace de ChatGPT? La necesito para conectar mi plan de ChatGPT a Moldwright."
     },
     "claude": {
         "remarks": {
@@ -315,7 +315,7 @@
             "checking": "Comprobando",
             "connected": "¡Todo listo!"
         },
-        "approveStep": "Aprueba Rerun en Claude",
+        "approveStep": "Aprueba Moldwright en Claude",
         "opening": "Claude se abre en una pestaña nueva",
         "openAgain": "Abrir Claude de nuevo",
         "open": "Abrir Claude",

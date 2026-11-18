@@ -66,7 +66,7 @@
         "forms.remove": "Accessible label of the cross that removes {item} from a multiple choice.",
         "foreman.agentPicker.openTab": "{tab} is the name of a coworker panel tab (Skills, Schedules), {name} the coworker's name.",
         "experts.card.namePlaceholder": "Shown on a profile card before a name is typed.",
-        "experts.card.rolePlaceholder": "Shown on a profile card before a role is typed. Rerun is the brand.",
+        "experts.card.rolePlaceholder": "Shown on a profile card before a role is typed. Moldwright is the brand.",
         "isoGrid.countdown.minutes": "Very short countdown to a coworker's next run, on a tiny badge: keep the one-letter unit (m for minutes).",
         "isoGrid.status.paused": "Status of a coworker whose workspace is paused (unsubscribed): its machine is archived.",
         "isoGrid.status.restoring": "Status of a coworker while its paused workspace is being brought back.",
@@ -178,7 +178,7 @@
         "region": "Cookie consent",
         "title": "Cookies",
         "short": "We use analytics cookies. <policy>Cookie policy</policy>",
-        "long": "We use analytics cookies to understand how Rerun is used. Cookies needed to sign you in, run the support chat and remember your preferences are always on. <policy>Cookie policy</policy>"
+        "long": "We use analytics cookies to understand how Moldwright is used. Cookies needed to sign you in, run the support chat and remember your preferences are always on. <policy>Cookie policy</policy>"
     },
     "experts": {
         "wizard": {
@@ -208,7 +208,7 @@
             "name": "Name",
             "namePlaceholder": "e.g. Mira Labs",
             "email": "Email",
-            "emailHelper": "Private. Only the Rerun team can see it.",
+            "emailHelper": "Private. Only the Moldwright team can see it.",
             "type": "Type",
             "location": "Location",
             "locationPlaceholder": "e.g. Paris",
@@ -282,7 +282,7 @@
             "status": "Status",
             "links": "Links",
             "namePlaceholder": "Your name",
-            "rolePlaceholder": "Rerun Expert"
+            "rolePlaceholder": "Moldwright Expert"
         },
         "preview": {
             "hire": "Hire"

@@ -19,7 +19,7 @@
     },
     "resize": "Redimensionar o chat",
     "modelPill": {
-        "hubReason": "Este chat sempre roda no Rerun Balanced"
+        "hubReason": "Este chat sempre roda no Moldwright Balanced"
     },
     "signupGate": {
         "teamAt": "Sua equipe na {domain}",
@@ -199,12 +199,12 @@
     },
     "contact": {
         "defaultSummary": "Estou travado configurando meu primeiro coworker e preciso de uma ajuda.",
-        "sentWithEmail": "Enviado para a equipe do Rerun. Eles respondem no chat e em {email}.",
-        "sent": "Enviado para a equipe do Rerun. Eles respondem no chat.",
+        "sentWithEmail": "Enviado para a equipe do Moldwright. Eles respondem no chat e em {email}.",
+        "sent": "Enviado para a equipe do Moldwright. Eles respondem no chat.",
         "openChat": "Abrir o chat",
         "stillStuck": "Ainda travado? Alguém da equipe pode ajudar.",
         "send": "Enviar para a equipe",
-        "title": "Fale com alguém do Rerun",
+        "title": "Fale com alguém do Moldwright",
         "description": "Isto vai para a equipe com sua conta, e eles respondem no chat.",
         "notNow": "Agora não"
     },
@@ -358,8 +358,8 @@
         "owned": "{title} é seu",
         "recurring": "Cobrado mensalmente",
         "oneTime": "Compra única",
-        "billedTo": "Cobrado de {name}, à parte do seu plano Rerun. É instalado assim que o pagamento for aprovado.",
-        "billedToWorkspace": "Cobrado do seu workspace, à parte do seu plano Rerun. É instalado assim que o pagamento for aprovado.",
+        "billedTo": "Cobrado de {name}, à parte do seu plano Moldwright. É instalado assim que o pagamento for aprovado.",
+        "billedToWorkspace": "Cobrado do seu workspace, à parte do seu plano Moldwright. É instalado assim que o pagamento for aprovado.",
         "dueToday": "A pagar hoje",
         "perMonth": "/mês",
         "opening": "Abrindo…",
@@ -384,7 +384,7 @@
         "guide": {
             "title": "Como isso funciona?",
             "description": "Coworkers, Boxes, rotinas, em dois minutos",
-            "send": "Como o Rerun funciona?"
+            "send": "Como o Moldwright funciona?"
         },
         "checkWorking": {
             "title": "O que {name} está fazendo?",

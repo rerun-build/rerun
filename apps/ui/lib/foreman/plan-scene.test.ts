@@ -7,7 +7,7 @@ import { findRadialRect, type SpaceRect } from '@/lib/board/space-layout'
 import { isPlanPreviewId, planCardScene, planScene, settledPlanScene } from './plan-scene'
 
 const ORGANISATION = readPlan({
-    title: 'Retalk, laid out on Rerun',
+    title: 'Retalk, laid out on Moldwright',
     boxes: [{ name: 'Marketing', role: 'Everything that brings people in' }, { name: 'Sales' }, { name: 'Finance' }],
     items: [
         { kind: 'agent', name: 'Content Writer', role: 'Writes and publishes', box: 'Marketing', tools: ['notion'] },

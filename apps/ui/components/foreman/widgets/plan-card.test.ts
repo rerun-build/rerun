@@ -7,7 +7,7 @@ const names = (plan: ReturnType<typeof readPlan>) => plan.groups.map(group => [g
 describe('readPlan', () => {
     it('reads as an organisation chart, divisions in the order they were written', () => {
         const plan = readPlan({
-            title: 'Your company on Rerun',
+            title: 'Your company on Moldwright',
             boxes: [{ name: 'Marketing', role: 'Everything that brings people in' }, { name: 'Sales' }, { name: 'Finance', role: 'Invoices and reconciliation, later' }],
             items: [
                 { kind: 'agent', name: 'Content Writer', role: 'Writes and publishes', box: 'Marketing' },
@@ -15,7 +15,7 @@ describe('readPlan', () => {
             ],
         })
 
-        expect(plan.title).toBe('Your company on Rerun')
+        expect(plan.title).toBe('Your company on Moldwright')
         expect(names(plan)).toEqual([
             ['Marketing', ['Content Writer']],
             ['Sales', ['Lead Follow-up']],
