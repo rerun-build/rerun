@@ -36,7 +36,7 @@ class InstructionsTests(unittest.TestCase):
 
     def test_an_empty_old_text_means_the_new_text_is_added_at_the_end(self):
         self.assertEqual(instructions.apply("Soul\n\n", "", "Extra"), "Soul\n\nExtra\n")
-        body = BODY.replace(OLD + "\n~~~~\n\n**New", "~~~~\n\n**New", 1).replace("~~~~\n~~~~", "~~~~\n~~~~")
+        body = BODY.replace(OLD + "\n~~~~\n\n**New", "~~~~\n\n**New", 1)
         p = instructions.parse({"number": 1, "body": body})
         self.assertEqual(p["errors"], [])
         self.assertEqual(p["old"], "")
