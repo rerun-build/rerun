@@ -1,6 +1,6 @@
 import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from test_dispatch import Base, ready, run_shape, T0, PR_LINE
+from test_dispatch import Base, run_shape, T0, PR_LINE
 
 NOTE = "handover/b1/run1-2.md"
 LINE = "Continue from your handover note: %s in the shared space (read it with your shared files tool). Read it first; do not redo what it marks done." % NOTE
