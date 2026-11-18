@@ -14,7 +14,6 @@ _NUM = re.compile(r"#(\d+)")
 _PLAN = re.compile(r"^PLAN READY\b(.*)$")
 _DEV = re.compile(r"\bdev ([0-9a-f]{7,40})\b", re.I)
 _RUN = re.compile(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```")
-_CD = re.compile(r"^cd\s+\S+\s*&&\s*")
 UVX_ERROR = "run line: uvx is not on the CI runner; ruff runs in the Factory tools CI job, take the line out"
 TESTF = r"\.spec\.[jt]sx?$|\.test\.[jt]sx?$|(^|/)tests?/.*\.(ts|tsx|js|jsx|rs|py)$|__tests__/.*\.(ts|tsx|js|jsx)$|_test\.(py|go)$|(^|/)test_[^/]*\.py$"
 _EXEMPT = re.compile(r"(?mi)^\*\*Red before green\*\*:\s*not applicable\b")
@@ -22,6 +21,18 @@ _PATTERN_PATH = re.compile(r"\bunittest\b[^;&|]*\bdiscover\b[^;&|]*\s-p\s+[\"']?
 _SERVER_PATH = re.compile(r"(?:^|&&|;|\|\||\||\()\s*/data/")
 _PYTEST = re.compile(r"(?:^|&&|;|\|\||\||\()\s*(?:python3? (?:-I )?-m )?pytest\b")
 _CD_TARGET = re.compile(r"(?:^|&&|;|\|\||\()\s*cd\s+(\S+)")
+
+
+def _runs_uvx(line):
+    for part in re.split(r"&&|\|\||;|\|", line):
+        words = part.split()
+        if words and words[0] == "env":
+            words = words[1:]
+        while words and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", words[0]):
+            words = words[1:]
+        if words[:1] == ["uvx"] or words[:3] == ["uv", "tool", "run"] or words[:2] == ["pipx", "run"]:
+            return True
+    return False
 
 
 def _same_cd_twice(line):
@@ -169,8 +180,7 @@ def parse(issue):
             errors.append("plan line: the PLAN READY line must name the dev commit as 'dev <sha>' (7 to 40 hex)")
 
     for l in _run_lines(lines):
-        words = _CD.sub("", l).split()
-        if words and words[0] == "uvx":
+        if _runs_uvx(l):
             errors.append(UVX_ERROR)
             break
     for l in _run_lines(lines):
