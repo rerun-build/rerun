@@ -22,6 +22,7 @@ MAX_DIFF = 6000
 HEAD = re.compile(r"^NOTE\s+(\d+)\s+([A-Za-z]+)\s+([A-Za-z]+)\s*$")
 FIELD = re.compile(r"^(%s):\s?(.*)$" % "|".join(FIELDS))
 LAST = re.compile(r"^(REVIEW|FIXED|FRESH|CORRECTED|PLAN|CUT|BLOCKED):")
+VERDICT = re.compile(r"^(CONFIRM|REFUTE)\s+(\d+\.\d+)\s*:\s*(.*)$")
 SPACE = re.compile(r"\s+")
 
 FORMAT = """Write each point as one note block:
@@ -59,7 +60,7 @@ def parse(text):
             continue
         if cur is None:
             continue
-        if LAST.match(stripped):
+        if LAST.match(stripped) or VERDICT.match(stripped):
             cur = None
             continue
         field = FIELD.match(stripped)
@@ -128,12 +129,14 @@ def owner(notes):
 
 
 def render(note):
-    lines = ["NOTE %d %s %s" % (note["n"], note["kind"], note["severity"])]
+    lines = ["NOTE %s %s %s" % (note.get("id") or note["n"], note["kind"], note["severity"])]
     lines += ["QUOTE: %s" % q for q in note["QUOTE"]]
     for key in ("PROBLEM", "EVIDENCE", "FIX", "CATEGORY"):
         if note.get(key):
             lines.append("%s: %s" % (key, note[key]))
     lines += ["OPTION: %s" % o for o in note["OPTION"]]
+    if note.get("panel"):
+        lines.append("PANEL: %s" % note["panel"])
     return "\n".join(lines)
 
 
@@ -148,8 +151,17 @@ def comment(notes, dropped, round_no, mode):
     else:
         lines = [head, "", "```", render_all(notes), "```"]
     if dropped:
-        lines += ["", "Thrown away: " + "; ".join("note %d (%s)" % d for d in dropped)]
+        lines += ["", "Thrown away: " + "; ".join("note %s (%s)" % d for d in dropped)]
     return quiet("\n".join(lines))
+
+
+def verdicts(text):
+    out = []
+    for line in (text or "").splitlines():
+        m = VERDICT.match(line.strip())
+        if m:
+            out.append((m.group(1), m.group(2), m.group(3).strip()))
+    return out
 
 
 def diff(old, new):
