@@ -100,7 +100,7 @@ Two SQL databases a coworker writes coexist the same way: its private `data/agen
 | `agents/<id>/data/system.db` | `sessions`, `messages` (+ `messages_fts`), `memories` (embedding + FTS, each row points to its `.md`), `runs`, `run_steps`, `tool_calls`, `compaction_checkpoints`, `skill_proposals`, and the paid data calls behind table rows |
 | `agents/<id>/data/agent.db` | the coworker's own tables, plus the saved table views |
 | `shared-db/shared.db` | the tables every coworker shares, who created each, and the saved views |
-| `brain-db/brain.db` | `brain_pages`, `brain_chunks` (embeddings), `brain_links`, `brain_proposals`, `brain_revisions`; pages, chunks and links are rebuilt from `brain/*.md` |
+| `brain-db/brain.db` | `brain_pages`, `brain_chunks` (embeddings), `brain_links`, `brain_proposals`, `brain_revisions`, `brain_files` (tags, creator and Box of the shared folder's files), `brain_agent_boxes` (the Box of each coworker, sent by the app); pages, chunks and links are rebuilt from `brain/*.md` |
 
 Skills, schedules, triggers and the canonical memory text are **not** in a database: they are the `.md` files. The `memories` table is an index that makes those files searchable.
 
@@ -292,7 +292,7 @@ Tools are built per run and gated by `config.tools` (`src/tools/registry.ts`, th
 | `memory` | `memory_write`, `memory_recall`, `memory_delete` | Writes `.md` files + index; hybrid recall |
 | `db` | `db_query`, `db_execute`, `db_schema` | The agent's private `data/agent.db` |
 | `sharedDb` | `shared_db_query`, `shared_db_execute`, `shared_db_schema` | `shared-db/shared.db`, shared by every agent |
-| `brain` | `brain_search`, `brain_read`, `brain_write`, `brain_propose` | The company brain. A coworker writes at once only what a person told it in the conversation (`brain_write` refuses without one) and proposes the rest for review. The Chief of Staff gets `brain_write`, `brain_delete`, `brain_proposals` and `brain_decide` instead of `brain_propose` |
+| `brain` | `brain_search`, `brain_read`, `brain_write`, `brain_propose` | The company brain. A coworker writes at once only what a person told it in the conversation (`brain_write` refuses without one) and proposes the rest for review. What it writes or proposes carries its `tags` and is filed under its Box; `brain_search` ranks its Box's pages first and takes `tags` and `onlyMyBox` to narrow down. The Chief of Staff gets `brain_write`, `brain_delete`, `brain_proposals` and `brain_decide` instead of `brain_propose` |
 | `skills` | `skill_list`, `skill_read`, `skill_read_file`, `skill_create`, `skill_edit`, `skill_update`, `skill_delete`, `skill_write_file`, `skill_delete_file`, `skill_import`, `skill_propose` | Skill folders (section 9). `skill_propose` needs `selfImprovement.enabled` |
 | `self` | `verbosity_set`, `soul_update`, `tool_install`, `mcp_register`, `mcp_login`, `mcp_login_complete`, `mcp_status`, `request_mcp_sign_in` | Gated by `selfImprovement.enabled`; `soul_update` also by `allowSoulEdit`, the install and MCP tools by `allowToolInstall` |
 | `schedule` | `schedule_list`, `schedule_get`, `schedule_create`, `schedule_update`, `schedule_edit`, `schedule_delete` | Reads/writes schedule `.md` files; the agent can plan its own recurring tasks |

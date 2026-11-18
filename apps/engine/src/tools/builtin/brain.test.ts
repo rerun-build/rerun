@@ -10,6 +10,8 @@ const { brainTools, foremanBrainTools, FOREMAN_BRAIN_AUTHOR } = await import('./
 const { sharedTools } = await import('./shared.js')
 const { writePage, readPageFile, listRevisions, revertPage } = await import('../../brain/pages.js')
 const { acceptProposal, dismissProposal, listProposals, countOpenProposals, getProposal } = await import('../../brain/proposals.js')
+const { setAgentBoxes } = await import('../../brain/boxes.js')
+const { listFileMeta } = await import('../../brain/files.js')
 const { buildBrainSection, buildForemanBrainSection, BRAIN_NOTE, FOREMAN_BRAIN_NOTE, EMPTY_FOR_AGENTS, EMPTY_WHEN_CALLED } = await import('../../brain/prompt.js')
 
 const ctxFor = (id: string, name: string) => ({ agent: { id, config: { name } }, sessionId: 'session-1' }) as any
@@ -274,5 +276,43 @@ describe('unconfirmed sections, as the agents see them', () => {
         const found = await call(tools, 'brain_search', { query: 'recruiters list builders', limit: 5 })
         expect(found).toContain('> Audience / Presence (unconfirmed): Recruiters')
         expect(await buildBrainSection()).toContain('- [[icp]] Ideal customer (market, unconfirmed: Audience)')
+    })
+})
+
+describe('a coworker filing what it adds under its Box', () => {
+    const marketing = { agent: { id: 'agent-seo', config: { name: 'seo-writer' } }, sessionId: 'session-2', author: { id: 'u1', name: 'Théo' } } as any
+    const seoTools = brainTools(marketing)
+
+    it('writes a page under its Box with the tags it gives, and reads it back as its own', async () => {
+        await setAgentBoxes({ 'agent-seo': 'box-marketing', 'agent-sales': 'box-sales' })
+        const saved = JSON.parse(await call(seoTools, 'brain_write', { slug: 'seo-plan', title: 'SEO plan', type: 'priorities', content: 'Rank on agency keywords.', sources: ['told by the user in chat'], baseHash: null, tags: ['SEO', 'q1'] }))
+        expect(saved.status).toBe('saved')
+        expect(await readPageFile('seo-plan')).toMatchObject({ spaceId: 'box-marketing', tags: ['seo', 'q1'], createdBy: 'agent:seo-writer' })
+        expect(await call(seoTools, 'brain_read', { slug: 'seo-plan' })).toContain('filed under: your Box | tags: #seo #q1')
+        expect(await call(tools, 'brain_read', { slug: 'seo-plan' })).toContain('filed under: another Box')
+    })
+
+    it('keeps its search to a tag or to its Box when asked', async () => {
+        expect(await call(seoTools, 'brain_search', { query: 'agency keywords', limit: 5, tags: ['seo'], onlyMyBox: null })).toContain('[[seo-plan]] SEO plan (priorities) #seo #q1 · your Box')
+        expect(await call(tools, 'brain_search', { query: 'agency keywords', limit: 5, tags: null, onlyMyBox: true })).toContain('Nothing matches with these filters')
+    })
+
+    it('files an accepted proposal under the Box its coworker was in when it proposed', async () => {
+        const result = JSON.parse(await propose(tools, { slug: 'objections', title: 'Objections', type: 'note', content: 'Too expensive: show the ROI.', tags: ['playbook'] }))
+        await setAgentBoxes({ 'agent-sales': 'box-support' })
+        await acceptProposal(result.proposalId, 'user:1')
+        expect(await readPageFile('objections')).toMatchObject({ spaceId: 'box-sales', tags: ['playbook'], createdBy: 'agent:Sales' })
+    })
+
+    it('lists the pages and files of its Box first in its prompt', async () => {
+        await setAgentBoxes({ 'agent-seo': 'box-marketing' })
+        const shared = sharedTools(marketing)
+        await (shared.shared_write as any).execute({ path: 'seo/keywords.csv', content: 'agency,ai' }, { toolCallId: 'c', messages: [] })
+        expect(await listFileMeta()).toEqual(expect.arrayContaining([expect.objectContaining({ path: 'seo/keywords.csv', createdBy: 'agent:seo-writer', spaceId: 'box-marketing' })]))
+        const section = await buildBrainSection(false, 'agent-seo')
+        expect(section).toContain('Filed under your Box, read these first:\n- [[seo-plan]] SEO plan (priorities) #seo #q1')
+        expect(section).toContain('Files of the shared folder filed under your Box:\n- shared:seo/keywords.csv')
+        expect(section.indexOf('[[seo-plan]]')).toBeLessThan(section.indexOf('[[company]]'))
+        expect(await buildBrainSection()).not.toContain('Filed under your Box')
     })
 })

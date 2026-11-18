@@ -346,7 +346,7 @@ export async function buildSystemPrompt(
         ownStateSections(agent, provider, heldBackMcp),
         cfg.db ? readAgentDbSchema(agent.id).catch(() => '') : Promise.resolve(''),
         cfg.sharedDb ? readSharedDbSchema(SHARED_SCHEMA_BUDGET).catch(() => '') : Promise.resolve(''),
-        cfg.brain ? buildBrainSection(trigger.source === 'chat' && trigger.calledBy !== undefined).catch(() => '') : Promise.resolve(''),
+        cfg.brain ? buildBrainSection(trigger.source === 'chat' && trigger.calledBy !== undefined, agent.id).catch(() => '') : Promise.resolve(''),
     ])
 
     const computer = runOffersComputer(agent.config, provider, agent.resolved.model, agent.resolved.connection)

@@ -114,6 +114,8 @@ export const brainProposalInputSchema = z.object({
     reason: z.string().min(1).max(300),
     sources: z.array(z.string().max(500)).max(20),
     baseHash: z.string().nullable(),
+    // Normalised and capped on arrival rather than here: the schema rides in every coworker's tools.
+    tags: z.array(z.string()).nullable(),
 })
 export type BrainProposalInput = z.infer<typeof brainProposalInputSchema>
 
@@ -136,6 +138,7 @@ export const brainProposalSchema = z.object({
     reason: z.string(),
     sources: z.array(z.string()),
     baseHash: z.string().nullable(),
+    tags: z.array(z.string()).default([]),
     status: brainProposalStatusSchema,
     // The page moved since the agent read it (or was created meanwhile): the diff is against a
     // version the agent never saw.

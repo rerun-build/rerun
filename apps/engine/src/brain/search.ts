@@ -1,14 +1,31 @@
 import type { BrainPageRef, BrainPageType } from '@rerun/contracts'
 import { getBrainDb } from '../db/brainDb.js'
 import { embedText } from '../memory/embed.js'
+import { parseTags } from './pages.js'
 
 export type BrainPassage = { heading: string; content: string }
-export type BrainHit = { slug: string; title: string; type: BrainPageType; passages: BrainPassage[]; score: number }
+export type BrainHit = { slug: string; title: string; type: BrainPageType; passages: BrainPassage[]; score: number; tags: string[]; spaceId: string | null }
+
+export type BrainSearchOptions = {
+    limit?: number
+    // Pages carrying at least one of these tags.
+    tags?: string[]
+    // Only the pages filed under this Box.
+    onlySpaceId?: string
+    // The searching coworker's Box: its pages come first at equal relevance.
+    preferSpaceId?: string | null
+}
 export type BrainSearchResult = { hits: BrainHit[]; related: BrainPageRef[] }
 
 const RRF_K = 60
 const PASSAGES_PER_PAGE = 2
 const MAX_RELATED = 8
+// Two equally good pages still land on neighbouring ranks, under 2% apart in score: the boost lifts
+// a page of the coworker's own Box over its neighbour, never over a page two ranks up or found in
+// one more list.
+const OWN_BOX_BOOST = 1.02
+// The vector index cannot be filtered, so a filtered search reads further down it.
+const FILTERED_OVERFETCH = 12
 
 // Unicode-aware on purpose: the brain of a French company is written in French, and stripping
 // everything outside a-z would turn "procédure" into "proc dure".
@@ -23,9 +40,25 @@ function addRanked(scores: Map<string, number>, ids: string[]): void {
     ids.forEach((id, rank) => scores.set(id, (scores.get(id) ?? 0) + 1 / (RRF_K + rank + 1)))
 }
 
-export async function searchBrain(query: string, limit = 5): Promise<BrainSearchResult> {
+function pageFilter({ tags, onlySpaceId }: BrainSearchOptions): { sql: string; args: string[] } {
+    const clauses: string[] = []
+    const args: string[] = []
+    if (tags?.length) {
+        clauses.push(`EXISTS (SELECT 1 FROM json_each(COALESCE(p.tags_json, '[]')) t WHERE t.value IN (${tags.map(() => '?').join(', ')}))`)
+        args.push(...tags)
+    }
+    if (onlySpaceId) {
+        clauses.push('p.space_id = ?')
+        args.push(onlySpaceId)
+    }
+    return { sql: clauses.join(' AND '), args }
+}
+
+export async function searchBrain(query: string, options: BrainSearchOptions = {}): Promise<BrainSearchResult> {
+    const limit = options.limit ?? 5
+    const filter = pageFilter(options)
     const client = await getBrainDb()
-    const k = limit * 4
+    const k = limit * (filter.sql ? FILTERED_OVERFETCH : 4)
     const scores = new Map<string, number>()
 
     const embedding = await embedText(query).catch(() => null)
@@ -44,23 +77,31 @@ export async function searchBrain(query: string, limit = 5): Promise<BrainSearch
 
     const match = toMatchQuery(query)
     if (match) {
-        const rs = await client.execute({ sql: 'SELECT chunk_id FROM brain_chunks_fts WHERE brain_chunks_fts MATCH ? ORDER BY rank LIMIT ?', args: [match, k] })
+        const rs = filter.sql
+            ? await client.execute({
+                  sql: `SELECT brain_chunks_fts.chunk_id FROM brain_chunks_fts JOIN brain_chunks c ON c.id = brain_chunks_fts.chunk_id JOIN brain_pages p ON p.slug = c.slug
+                        WHERE brain_chunks_fts MATCH ? AND ${filter.sql} ORDER BY brain_chunks_fts.rank LIMIT ?`,
+                  args: [match, ...filter.args, k],
+              })
+            : await client.execute({ sql: 'SELECT chunk_id FROM brain_chunks_fts WHERE brain_chunks_fts MATCH ? ORDER BY rank LIMIT ?', args: [match, k] })
         addRanked(scores, rs.rows.map(r => String(r.chunk_id)))
     }
     if (scores.size === 0) return { hits: [], related: [] }
 
     const ids = [...scores.keys()]
     const rows = await client.execute({
-        sql: `SELECT c.id, c.slug, c.heading, c.content, p.title, p.type FROM brain_chunks c JOIN brain_pages p ON p.slug = c.slug
-              WHERE c.id IN (${ids.map(() => '?').join(', ')})`,
-        args: ids,
+        sql: `SELECT c.id, c.slug, c.heading, c.content, p.title, p.type, p.tags_json, p.space_id FROM brain_chunks c JOIN brain_pages p ON p.slug = c.slug
+              WHERE c.id IN (${ids.map(() => '?').join(', ')})${filter.sql ? ` AND ${filter.sql}` : ''}`,
+        args: [...ids, ...filter.args],
     })
 
     const pages = new Map<string, BrainHit & { ranked: { score: number; passage: BrainPassage }[] }>()
     for (const row of rows.rows) {
         const slug = String(row.slug)
-        const score = scores.get(String(row.id)) ?? 0
-        const page = pages.get(slug) ?? { slug, title: String(row.title), type: row.type as BrainPageType, passages: [], score: 0, ranked: [] }
+        const spaceId = row.space_id == null ? null : String(row.space_id)
+        const boost = options.preferSpaceId && spaceId === options.preferSpaceId ? OWN_BOX_BOOST : 1
+        const score = (scores.get(String(row.id)) ?? 0) * boost
+        const page = pages.get(slug) ?? { slug, title: String(row.title), type: row.type as BrainPageType, tags: parseTags(row.tags_json), spaceId, passages: [], score: 0, ranked: [] }
         page.ranked.push({ score, passage: { heading: String(row.heading), content: String(row.content) } })
         page.score = Math.max(page.score, score)
         pages.set(slug, page)

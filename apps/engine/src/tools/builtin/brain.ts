@@ -1,8 +1,9 @@
 import { tool, type ToolSet } from 'ai'
 import { z } from 'zod'
-import { brainProposalInputSchema, FOREMAN_AGENT_ID } from '@rerun/contracts'
+import { brainProposalInputSchema, FOREMAN_AGENT_ID, normalizeBrainTags } from '@rerun/contracts'
 import { deletePage, getPage, listPages, listRevisions, pageHash, readPageFile, writePage } from '../../brain/pages.js'
 import { searchBrain } from '../../brain/search.js'
+import { agentSpaceId } from '../../brain/boxes.js'
 import { acceptProposal, dismissProposal, findProposalByFingerprint, getProposal, insertProposal, listProposals, openProposalFor, proposalFingerprint, replaceOpenProposal } from '../../brain/proposals.js'
 import { HttpError } from '../../lib/errors.js'
 import type { RunContext } from '../../runtime/context.js'
@@ -31,23 +32,44 @@ const UNCONFIRMED_NOTE = 'imported from the public web, nobody at the company co
 
 const isUnconfirmed = (heading: string, unconfirmed: Set<string>) => heading.split(' / ').some(part => unconfirmed.has(part))
 
-function readTools(): ToolSet {
+const tagList = (tags: string[]) => tags.map(tag => `#${tag}`).join(' ')
+
+// Where a page is filed, as the coworker reading it sees it: its own Box, another one, or everyone.
+function filedUnder(pageSpaceId: string | null, ownSpaceId: string | null): string {
+    if (pageSpaceId === null) return 'everyone'
+    return ownSpaceId !== null && pageSpaceId === ownSpaceId ? 'your Box' : 'another Box'
+}
+
+type OwnBox = () => Promise<string | null>
+
+const NO_BOX: OwnBox = async () => null
+
+function readTools(ownBox: OwnBox): ToolSet {
     return {
         brain_search: tool({
             description:
-                'Search the company brain, what is known about this company (offering, products, pricing, customers, competitors, team, voice, tools, decisions), by meaning and by keyword. Returns the best passages of each matching page and the pages linked to them. brain_read a page to get all of it.',
+                'Search the company brain, what is known about this company (offering, products, pricing, customers, competitors, team, voice, tools, decisions), by meaning and by keyword. Returns the best passages of each matching page and the pages linked to them. brain_read a page to get all of it. Your Box\'s pages come first; tags or onlyMyBox narrow the search, null for the whole brain.',
             inputSchema: z.object({
                 query: z.string().min(1),
                 limit: z.number().int().positive().max(10).default(5),
+                tags: z.array(z.string()).nullable().default(null),
+                onlyMyBox: z.boolean().nullable().default(null),
             }),
-            execute: async ({ query, limit }) => {
-                const { hits, related } = await searchBrain(query, limit)
-                if (hits.length === 0) return 'Nothing in the company brain matches. It may simply not be written down yet.'
+            execute: async ({ query, limit, tags, onlyMyBox }) => {
+                const ownSpaceId = await ownBox()
+                if (onlyMyBox && !ownSpaceId) return 'You are not in a Box yet, so nothing is filed under yours. Search again without onlyMyBox.'
+                const wanted = tags ? normalizeBrainTags(tags) : []
+                const { hits, related } = await searchBrain(query, { limit, tags: wanted, onlySpaceId: onlyMyBox && ownSpaceId ? ownSpaceId : undefined, preferSpaceId: ownSpaceId })
+                if (hits.length === 0) {
+                    const filtered = wanted.length > 0 || onlyMyBox
+                    return filtered ? 'Nothing matches with these filters. Search again without them.' : 'Nothing in the company brain matches. It may simply not be written down yet.'
+                }
                 const files = await Promise.all(hits.map(hit => readPageFile(hit.slug)))
                 const blocks = hits.map((hit, i) => {
                     const unconfirmed = new Set(files[i]?.unconfirmed ?? [])
                     const passages = hit.passages.map(p => `  > ${p.heading}${isUnconfirmed(p.heading, unconfirmed) ? ' (unconfirmed)' : ''}: ${excerpt(p.content)}`)
-                    return [`[[${hit.slug}]] ${hit.title} (${hit.type})`, ...passages].join('\n')
+                    const filing = [hit.tags.length ? tagList(hit.tags) : '', ownSpaceId && hit.spaceId === ownSpaceId ? 'your Box' : ''].filter(Boolean).join(' · ')
+                    return [`[[${hit.slug}]] ${hit.title} (${hit.type})${filing ? ` ${filing}` : ''}`, ...passages].join('\n')
                 })
                 const relatedLine = related.length ? `\n\nLinked pages: ${related.map(r => `[[${r.slug}]] ${r.title}`).join(', ')}` : ''
                 return `${blocks.join('\n\n')}${relatedLine}`
@@ -57,14 +79,15 @@ function readTools(): ToolSet {
             description: 'Read one page of the company brain in full, with its hash (needed to propose a change to it), its sources and the pages that link to it.',
             inputSchema: z.object({ slug: z.string().min(1) }),
             execute: async ({ slug }) => {
-                const page = await getPage(slug)
+                const [page, ownSpaceId] = await Promise.all([getPage(slug), ownBox()])
                 if (!page) {
                     const slugs = (await listPages()).map(p => p.slug)
                     return `No page "${slug}" in the company brain.${slugs.length ? ` Existing pages: ${slugs.join(', ')}.` : ' The brain is still empty.'}`
                 }
                 const meta = [
                     `slug: ${page.slug} | type: ${page.type} | hash: ${page.hash}`,
-                    `updated ${page.updatedAt || 'at an unknown date'} by ${page.updatedBy}`,
+                    `updated ${page.updatedAt || 'at an unknown date'} by ${page.updatedBy}${page.createdBy && page.createdBy !== page.updatedBy ? `, added by ${page.createdBy}` : ''}`,
+                    `filed under: ${filedUnder(page.spaceId, ownSpaceId)}${page.tags.length ? ` | tags: ${tagList(page.tags)}` : ''}`,
                     page.sources.length ? `sources: ${page.sources.join('; ')}` : '',
                     page.unconfirmed.length ? `unconfirmed sections: ${page.unconfirmed.join(', ')} (${UNCONFIRMED_NOTE})` : '',
                     page.backlinks.length ? `linked from: ${page.backlinks.map(b => `[[${b.slug}]]`).join(', ')}` : '',
@@ -75,19 +98,23 @@ function readTools(): ToolSet {
     }
 }
 
+const TAGS_HOW = 'tags: topic tags to add (a customer, a project), or null.'
+
 export function brainTools(ctx: RunContext): ToolSet {
+    const ownBox: OwnBox = () => agentSpaceId(ctx.agent.id)
     return {
-        ...readTools(),
+        ...readTools(ownBox),
         // A person correcting a fact in the chat already decided it: every coworker reads the fix
         // from its next run instead of the old version waiting behind a review.
         brain_write: writeTool(
             `agent:${ctx.agent.config.name}`,
-            `Save at once a fact about the company the user told you, corrected or confirmed in this conversation (sources: "told by the user in chat"); every coworker reads it from its next run. A fact you found yourself goes to brain_propose. First brain_search the old fact and fix every page repeating it. ${WRITE_PAGE_HOW}`,
+            `Save at once a fact about the company the user told you, corrected or confirmed in this conversation (sources: "told by the user in chat"); every coworker reads it from its next run. A fact you found yourself goes to brain_propose. First brain_search the old fact and fix every page repeating it. ${WRITE_PAGE_HOW} ${TAGS_HOW}`,
+            ownBox,
             () => (ctx.author ? null : NO_PERSON_HERE)
         ),
         brain_propose: tool({
             description:
-                'Propose a new page or a change to a page of the company brain, for a fact you found on your own (on the web, in a file, in a tool result); a fact the user told you in this conversation goes to brain_write. It writes nothing: a person reviews the change and accepts or dismisses it. Give the complete page as content, in markdown, keeping everything still true; it replaces the whole page once accepted. The person decides from headline (the news in a few words, like a newspaper title: "Pricing is now public") and highlights (one to four facts that move, each with a short unique label, before: what the page says today or null when the fact is new, after: what it will say). To change an existing page, brain_read it first and pass its hash as baseHash; null for a new page. Slugs are lowercase kebab-case; link other pages with [[slug]]. reason says what changed and why, sources where the fact comes from (a URL, a document, "told by the user in chat").',
+                'Propose a new page or a change to a page of the company brain, for a fact you found on your own (on the web, in a file, in a tool result); a fact the user told you in this conversation goes to brain_write. It writes nothing: a person reviews the change and accepts or dismisses it. Give the complete page as content, in markdown, keeping everything still true; it replaces the whole page once accepted. The person decides from headline (the news in a few words, like a newspaper title: "Pricing is now public") and highlights (one to four facts that move, each with a short unique label, before: what the page says today or null when the fact is new, after: what it will say). To change an existing page, brain_read it first and pass its hash as baseHash; null for a new page. Slugs are lowercase kebab-case; link other pages with [[slug]]. reason says what changed and why, sources where the fact comes from (a URL, a document, "told by the user in chat"). ' + TAGS_HOW,
             inputSchema: brainProposalInputSchema,
             execute: async input => {
                 const slug = input.slug
@@ -115,6 +142,8 @@ export function brainTools(ctx: RunContext): ToolSet {
                     reason: input.reason.trim(),
                     sources: input.sources,
                     baseHash: current ? input.baseHash : null,
+                    tags: normalizeBrainTags(input.tags ?? []),
+                    spaceId: await ownBox(),
                     fingerprint,
                 }
                 const open = await openProposalFor(ctx.agent.id, slug)
@@ -147,7 +176,7 @@ async function recoverable(fn: () => Promise<string>): Promise<string> {
 const WRITE_PAGE_HOW =
     'Give the complete page as content, in markdown, keeping everything that is still true: it replaces the whole page. To change an existing page, brain_read it first and pass its hash as baseHash; for a new page, pass null. Slugs are lowercase kebab-case (e.g. "pricing", "acme-corp"); link other pages with [[slug]]. Put in sources where the fact comes from (a URL, a document, "told by the user in chat").'
 
-function writeTool(author: string, description: string, refusal: () => string | null = () => null) {
+function writeTool(author: string, description: string, ownBox: OwnBox, refusal: () => string | null = () => null) {
     return tool({
         description,
         inputSchema: brainProposalInputSchema.omit({ reason: true, headline: true, highlights: true }),
@@ -166,8 +195,11 @@ function writeTool(author: string, description: string, refusal: () => string | 
                     baseHash: current ? input.baseHash : null,
                     author,
                     separateRevision: true,
+                    tags: input.tags ?? [],
+                    spaceId: current ? null : await ownBox(),
                 })
-                if (current && page.hash === current.hash && page.updatedAt === current.updatedAt) return 'This is identical to the current page. Nothing written.'
+                const unchanged = current && page.hash === current.hash && page.updatedAt === current.updatedAt
+                if (unchanged && page.tags.join('\n') === current.tags.join('\n')) return 'This is identical to the current page. Nothing written.'
                 return changeResult('saved', page.slug, page.title, {
                     mode: current ? 'edit' : 'create',
                     hash: page.hash,
@@ -184,10 +216,11 @@ const NO_PERSON_HERE = 'No person is in this conversation, so nobody told you th
 // and settles what the agents proposed, each time because the person asked for it in the chat.
 export function foremanBrainTools(): ToolSet {
     return {
-        ...readTools(),
+        ...readTools(NO_BOX),
         brain_write: writeTool(
             FOREMAN_BRAIN_AUTHOR,
-            `Write a page of the company brain directly: it is saved at once and every coworker reads it from its next run. Only for a change the user asked for or confirmed in this conversation; a fact you found on your own goes to ask_user first. ${WRITE_PAGE_HOW}`
+            `Write a page of the company brain directly: it is saved at once and every coworker reads it from its next run. Only for a change the user asked for or confirmed in this conversation; a fact you found on your own goes to ask_user first. ${WRITE_PAGE_HOW} ${TAGS_HOW}`,
+            NO_BOX
         ),
         brain_delete: tool({
             description:

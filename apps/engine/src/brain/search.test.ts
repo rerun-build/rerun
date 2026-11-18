@@ -48,20 +48,20 @@ describe('toMatchQuery', () => {
 
 describe('searchBrain', () => {
     it('finds a passage by meaning alone and returns the right section, not the whole page', async () => {
-        const { hits } = await searchBrain('how much do we charge', 3)
+        const { hits } = await searchBrain('how much do we charge', { limit: 3 })
         expect(hits[0].slug).toBe('offering')
         expect(hits[0].passages[0].heading).toBe('Pricing')
     })
 
     it('finds a passage by keyword when the hub cannot embed the query', async () => {
         embed.down = true
-        const { hits } = await searchBrain('procédure', 3)
+        const { hits } = await searchBrain('procédure', { limit: 3 })
         embed.down = false
         expect(hits.map(h => h.slug)).toEqual(['onboarding'])
     })
 
     it('shows a page once with at most two passages, and the pages linked to it', async () => {
-        const { hits, related } = await searchBrain('widgets pricing plan', 5)
+        const { hits, related } = await searchBrain('widgets pricing plan', { limit: 5 })
         expect(hits.filter(h => h.slug === 'offering')).toHaveLength(1)
         expect(hits.find(h => h.slug === 'offering')!.passages.length).toBeLessThanOrEqual(2)
         expect(related.concat(hits)).toEqual(expect.arrayContaining([expect.objectContaining({ slug: 'acme-corp' })]))
@@ -69,21 +69,60 @@ describe('searchBrain', () => {
 
     it('follows a link backwards too', async () => {
         embed.down = true
-        const { hits, related } = await searchBrain('2024', 1)
+        const { hits, related } = await searchBrain('2024', { limit: 1 })
         embed.down = false
         expect(hits[0].slug).toBe('acme-corp')
         expect(related).toEqual([{ slug: 'offering', title: 'Offering' }])
     })
 
     it('falls back to keywords when the vector query itself fails', async () => {
-        const { hits } = await searchBrain('broken vector', 3)
+        const { hits } = await searchBrain('broken vector', { limit: 3 })
         expect(hits).toEqual([])
     })
 
     it('returns nothing when nothing matches', async () => {
         embed.down = true
-        expect(await searchBrain('zzzz', 3)).toEqual({ hits: [], related: [] })
-        expect(await searchBrain('?', 3)).toEqual({ hits: [], related: [] })
+        expect(await searchBrain('zzzz', { limit: 3 })).toEqual({ hits: [], related: [] })
+        expect(await searchBrain('?', { limit: 3 })).toEqual({ hits: [], related: [] })
         embed.down = false
+    })
+})
+
+describe('searchBrain by tag and by Box', () => {
+    beforeAll(async () => {
+        const write = (slug: string, title: string, spaceId: string, tags: string[]) =>
+            writePage(slug, { title, type: 'customer', content: filler('renewal meeting account'), sources: [], baseHash: null, author: 'agent:sales', spaceId, tags })
+        await write('globex', 'Globex', 'box-a', ['retail'])
+        await write('initech', 'Initech', 'box-b', ['saas'])
+        await embedPendingChunks()
+    })
+
+    it('puts the pages of the searching coworker\'s Box first at equal relevance', async () => {
+        embed.down = true
+        const forA = await searchBrain('renewal meeting', { limit: 2, preferSpaceId: 'box-a' })
+        const forB = await searchBrain('renewal meeting', { limit: 2, preferSpaceId: 'box-b' })
+        embed.down = false
+        expect(forA.hits.map(hit => hit.slug)).toEqual(['globex', 'initech'])
+        expect(forB.hits.map(hit => hit.slug)).toEqual(['initech', 'globex'])
+        expect(forB.hits[0]).toMatchObject({ tags: ['saas'], spaceId: 'box-b' })
+    })
+
+    it('lifts a page of the coworker\'s Box over its neighbour, never over a page two ranks up', async () => {
+        const write = (slug: string, spaceId: string, content: string) => writePage(slug, { title: slug, type: 'note', content, sources: [], baseHash: null, author: 'agent:sales', spaceId })
+        await write('zephyr-audit', 'box-c', filler('zephyr audit'))
+        await write('zephyr-review', 'box-c', filler('zephyr audit'))
+        await write('zephyr-memo', 'box-a', filler('zephyr'))
+        embed.down = true
+        const { hits } = await searchBrain('zephyr audit', { limit: 5, preferSpaceId: 'box-a' })
+        embed.down = false
+        expect(hits.map(hit => hit.slug).slice(0, 3)).toEqual([expect.stringMatching(/^zephyr-(audit|review)$/), 'zephyr-memo', expect.stringMatching(/^zephyr-(audit|review)$/)])
+    })
+
+    it('keeps to the pages carrying a tag, or filed under one Box', async () => {
+        const tagged = await searchBrain('renewal meeting', { limit: 5, tags: ['retail'] })
+        expect(tagged.hits.map(hit => hit.slug)).toEqual(['globex'])
+        const boxed = await searchBrain('renewal meeting', { limit: 5, onlySpaceId: 'box-b' })
+        expect(boxed.hits.map(hit => hit.slug)).toEqual(['initech'])
+        expect((await searchBrain('renewal meeting', { limit: 5, tags: ['nothing'] })).hits).toEqual([])
     })
 })

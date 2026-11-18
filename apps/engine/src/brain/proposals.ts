@@ -3,7 +3,7 @@ import type { BrainPageType, BrainProposal, BrainProposalAccept, BrainProposalHi
 import { getBrainDb } from '../db/brainDb.js'
 import { notFound } from '../lib/errors.js'
 import { newId, nowIso } from '../lib/ids.js'
-import { readPageFile, writePage, type BrainPageFile } from './pages.js'
+import { parseTags, readPageFile, writePage, type BrainPageFile } from './pages.js'
 
 export type ProposalRow = {
     id: string
@@ -20,6 +20,10 @@ export type ProposalRow = {
     reason: string
     sources: string[]
     baseHash: string | null
+    // Added to the page's tags once accepted, and the Box a new page is filed under: the
+    // proposing coworker's at the time it proposed.
+    tags: string[]
+    spaceId: string | null
     fingerprint: string
     status: BrainProposalStatus
     createdAt: string
@@ -50,6 +54,8 @@ function toRow(r: Record<string, unknown>): ProposalRow {
         reason: String(r.reason),
         sources: JSON.parse(String(r.sources_json)) as string[],
         baseHash: r.base_hash == null ? null : String(r.base_hash),
+        tags: parseTags(r.tags_json),
+        spaceId: r.space_id == null ? null : String(r.space_id),
         fingerprint: String(r.fingerprint),
         status: r.status as BrainProposalStatus,
         createdAt: String(r.created_at),
@@ -60,7 +66,7 @@ function toRow(r: Record<string, unknown>): ProposalRow {
 
 export function toBrainProposal(row: ProposalRow, current: BrainPageFile | null): BrainProposal {
     const outdated = row.status === 'proposed' && (row.mode === 'edit' ? current?.hash !== row.baseHash : current !== null)
-    const { fingerprint: _fingerprint, ...rest } = row
+    const { fingerprint: _fingerprint, spaceId: _spaceId, ...rest } = row
     return { ...rest, outdated, currentContent: current?.content ?? null }
 }
 
@@ -68,9 +74,29 @@ export async function insertProposal(input: InsertProposal): Promise<ProposalRow
     const row: ProposalRow = { ...input, id: newId(), status: 'proposed', createdAt: nowIso(), decidedAt: null, decidedBy: null }
     const client = await getBrainDb()
     await client.execute({
-        sql: `INSERT INTO brain_proposals(id, agent_id, agent_name, session_id, slug, mode, title, headline, highlights_json, type, content, reason, sources_json, base_hash, fingerprint, status, created_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        args: [row.id, row.agentId, row.agentName, row.sessionId, row.slug, row.mode, row.title, row.headline, JSON.stringify(row.highlights), row.type, row.content, row.reason, JSON.stringify(row.sources), row.baseHash, row.fingerprint, row.status, row.createdAt],
+        sql: `INSERT INTO brain_proposals(id, agent_id, agent_name, session_id, slug, mode, title, headline, highlights_json, type, content, reason, sources_json, base_hash, tags_json, space_id, fingerprint, status, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+            row.id,
+            row.agentId,
+            row.agentName,
+            row.sessionId,
+            row.slug,
+            row.mode,
+            row.title,
+            row.headline,
+            JSON.stringify(row.highlights),
+            row.type,
+            row.content,
+            row.reason,
+            JSON.stringify(row.sources),
+            row.baseHash,
+            JSON.stringify(row.tags),
+            row.spaceId,
+            row.fingerprint,
+            row.status,
+            row.createdAt,
+        ],
     })
     return row
 }
@@ -80,9 +106,25 @@ export async function insertProposal(input: InsertProposal): Promise<ProposalRow
 export async function replaceOpenProposal(id: string, input: InsertProposal): Promise<void> {
     const client = await getBrainDb()
     await client.execute({
-        sql: `UPDATE brain_proposals SET session_id = ?, mode = ?, title = ?, headline = ?, highlights_json = ?, type = ?, content = ?, reason = ?, sources_json = ?, base_hash = ?, fingerprint = ?, created_at = ?
+        sql: `UPDATE brain_proposals SET session_id = ?, mode = ?, title = ?, headline = ?, highlights_json = ?, type = ?, content = ?, reason = ?, sources_json = ?, base_hash = ?, tags_json = ?, space_id = ?, fingerprint = ?, created_at = ?
               WHERE id = ? AND status = 'proposed'`,
-        args: [input.sessionId, input.mode, input.title, input.headline, JSON.stringify(input.highlights), input.type, input.content, input.reason, JSON.stringify(input.sources), input.baseHash, input.fingerprint, nowIso(), id],
+        args: [
+            input.sessionId,
+            input.mode,
+            input.title,
+            input.headline,
+            JSON.stringify(input.highlights),
+            input.type,
+            input.content,
+            input.reason,
+            JSON.stringify(input.sources),
+            input.baseHash,
+            JSON.stringify(input.tags),
+            input.spaceId,
+            input.fingerprint,
+            nowIso(),
+            id,
+        ],
     })
 }
 
@@ -161,6 +203,8 @@ export async function acceptProposal(id: string, decidedBy: string, edits: Omit<
             force: true,
             author: `agent:${row.agentName}`,
             proposalId: row.id,
+            tags: row.tags,
+            spaceId: row.spaceId,
         })
     } catch (err) {
         await transition(id, ['accepted'], 'proposed', null)

@@ -28,6 +28,8 @@ async function proposal(content: string) {
         reason: 'New price',
         sources: [],
         baseHash: null,
+        tags: [],
+        spaceId: null,
         fingerprint: proposalFingerprint({ slug: 'pricing', content }),
     })
 }

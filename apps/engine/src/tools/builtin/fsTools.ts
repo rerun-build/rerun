@@ -10,9 +10,11 @@ type FsToolsOptions = {
     rootDir: string | ((input: Record<string, unknown>) => Promise<string>)
     // Extra input fields that pick the root, read by a rootDir function.
     scope?: z.ZodRawShape
+    // Called once a file landed through `<prefix>_write`.
+    onWrite?: (path: string) => Promise<void>
 }
 
-export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptions): ToolSet {
+export function makeFsTools({ prefix, label, rootDir, scope = {}, onWrite }: FsToolsOptions): ToolSet {
     const rootOf = async (input: Record<string, unknown>) => (typeof rootDir === 'string' ? rootDir : rootDir(input))
     return {
         [`${prefix}_read`]: tool({
@@ -29,6 +31,7 @@ export function makeFsTools({ prefix, label, rootDir, scope = {} }: FsToolsOptio
             execute: async input => {
                 const { path, content } = input
                 await store.writeText(await rootOf(input), path, content)
+                await onWrite?.(path)
                 return `Wrote ${content.length} bytes to ${path}`
             },
         }),

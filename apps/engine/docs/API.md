@@ -1224,7 +1224,8 @@ A path outside the shared folder is ignored.
 ```
 
 `tags` and `spaceId` replace what a path had when they are sent; `author` becomes the creator of the
-paths not filed yet. Moving or deleting a file through `/shared/files` carries its filing along.
+paths not filed yet. Moving or deleting a file through `/shared/files` carries its filing along, and
+a file a coworker writes with `shared_write` is filed under its Box with the coworker as creator.
 
 ### `PUT /brain/agent-boxes`
 
@@ -1255,7 +1256,7 @@ The changes coworkers proposed with `brain_propose`, optionally `?status=propose
 and the count of open ones (`{ "count": 2 }`).
 
 ```json
-{ "proposals": [ { "id": "...", "agentId": "...", "agentName": "scout", "sessionId": "...", "slug": "acme", "mode": "edit", "title": "Acme", "headline": "Acme moved to Lyon", "highlights": [{ "label": "City", "before": "Paris", "after": "Lyon" }], "type": "customer", "content": "...", "reason": "...", "sources": [], "baseHash": "...", "status": "proposed", "outdated": false, "currentContent": "...", "createdAt": "...", "decidedAt": null, "decidedBy": null } ] }
+{ "proposals": [ { "id": "...", "agentId": "...", "agentName": "scout", "sessionId": "...", "slug": "acme", "mode": "edit", "title": "Acme", "headline": "Acme moved to Lyon", "highlights": [{ "label": "City", "before": "Paris", "after": "Lyon" }], "type": "customer", "content": "...", "reason": "...", "sources": [], "baseHash": "...", "tags": ["acme"], "status": "proposed", "outdated": false, "currentContent": "...", "createdAt": "...", "decidedAt": null, "decidedBy": null } ] }
 ```
 
 `outdated` is true when the page moved since the coworker read it.
