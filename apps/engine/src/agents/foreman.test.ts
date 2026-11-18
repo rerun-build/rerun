@@ -218,8 +218,8 @@ describe('foreman routes', () => {
         ['PATCH', '/agents/foreman', { model: 'rerun-max', soul: 'hijacked' }],
         ['DELETE', '/agents/foreman', undefined],
         ['POST', '/agents/foreman/duplicate', { name: 'copy' }],
-        ['POST', '/agents/foreman/skills/import', {}],
-        ['GET', '/agents/foreman/files', undefined],
+        ['POST', '/agents/foreman/triggers', { name: 'hook' }],
+        ['GET', '/agents/foreman/archive', undefined],
     ])('refuses %s %s', async (method, path, body) => {
         expect((await request(method, path, body)).status).toBe(403)
     })

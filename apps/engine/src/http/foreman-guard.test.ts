@@ -29,6 +29,31 @@ describe('foremanGuard', () => {
         ['POST', '/agents/foreman/files/raw'],
         ['GET', '/agents/foreman/files/read'],
         ['DELETE', '/agents/foreman/files'],
+        ['GET', '/agents/foreman/files'],
+        ['PUT', '/agents/foreman/files'],
+        ['POST', '/agents/foreman/files/move'],
+        ['POST', '/agents/foreman/files/dir'],
+        ['GET', '/agents/foreman/memories'],
+        ['POST', '/agents/foreman/memories'],
+        ['POST', '/agents/foreman/memories/recall'],
+        ['DELETE', '/agents/foreman/memories/m1'],
+        ['GET', '/agents/foreman/skills'],
+        ['POST', '/agents/foreman/skills/import'],
+        ['PATCH', '/agents/foreman/skills/weekly-review'],
+        ['PUT', '/agents/foreman/skills/weekly-review/files/references/checklist.md'],
+        ['GET', '/agents/foreman/skill-proposals'],
+        ['POST', '/agents/foreman/skill-proposals/p1/accept'],
+        ['POST', '/agents/foreman/skill-proposals/p1/dismiss'],
+        ['GET', '/agents/foreman/schedules'],
+        ['POST', '/agents/foreman/schedules'],
+        ['POST', '/agents/foreman/schedules/weekly/run'],
+        ['DELETE', '/agents/foreman/schedules/weekly'],
+        ['PATCH', '/agents/foreman/mcp-servers'],
+        ['GET', '/agents/foreman/mcp-servers/status'],
+        ['PUT', '/agents/foreman/mcp/linear/token'],
+        ['DELETE', '/agents/foreman/mcp/linear/token'],
+        ['GET', '/agents/foreman/keys'],
+        ['PATCH', '/agents/foreman/keys'],
     ])('lets %s %s through', async (method, path) => {
         expect((await call(method, path)).status).toBe(200)
     })
@@ -39,22 +64,24 @@ describe('foremanGuard', () => {
     })
 
     it.each([
-        ['GET', '/agents/foreman/memories'],
-        ['POST', '/agents/foreman/memories'],
-        ['GET', '/agents/foreman/skills'],
         ['POST', '/agents/foreman/data/query'],
         ['GET', '/agents/foreman/triggers'],
-        ['POST', '/agents/foreman/schedules'],
+        ['POST', '/agents/foreman/triggers'],
         ['DELETE', '/agents/foreman'],
-        ['GET', '/agents/foreman/keys'],
+        ['POST', '/agents/foreman/duplicate'],
+        ['GET', '/agents/foreman/archive'],
+        ['GET', '/agents/foreman/archive/plan'],
+        ['POST', '/agents/foreman/automations/activate'],
+        ['GET', '/agents/foreman/tools'],
+        ['GET', '/agents/foreman/desktop'],
+        ['GET', '/agents/foreman/mcp-servers'],
+        ['POST', '/agents/foreman/mcp/linear/token'],
+        ['GET', '/agents/foreman/memoriesx'],
         ['POST', '/agents/foreman/sessions'],
         ['GET', '/agents/foreman/chat'],
         ['GET', '/agents/foreman/sessions/s1/messages/extra'],
         ['GET', '/agents/foreman/runs/r1/tools'],
-        ['GET', '/agents/foreman/files'],
-        ['PUT', '/agents/foreman/files'],
-        ['POST', '/agents/foreman/files/move'],
-        ['POST', '/agents/foreman/files/dir'],
+        ['POST', '/agents/foreman/files/copy'],
         ['GET', '/agents/foreman/usage'],
     ])('refuses %s %s with a 403', async (method, path) => {
         const res = await call(method, path)
@@ -68,6 +95,8 @@ describe('foremanGuard', () => {
         ['invalid JSON', '{not json'],
         ['a string', '"model"'],
         ['a field beyond the model', JSON.stringify({ model: 'x', name: 'renamed' })],
+        ['its kind', JSON.stringify({ kind: 'user' })],
+        ['its tool switches', JSON.stringify({ tools: { trigger: true } })],
     ])('refuses a PATCH whose body is %s', async (_, body) => {
         expect((await call('PATCH', '/agents/foreman', body)).status).toBe(403)
     })
@@ -82,7 +111,7 @@ describe('foremanGuard', () => {
     })
 
     it('refuses a model-only PATCH aimed at a sub-route', async () => {
-        expect((await call('PATCH', '/agents/foreman/keys', JSON.stringify({ model: 'x' }))).status).toBe(403)
+        expect((await call('PATCH', '/agents/foreman/triggers', JSON.stringify({ model: 'x' }))).status).toBe(403)
     })
 
     it('leaves every other agent untouched', async () => {

@@ -31,13 +31,21 @@ start. The desktop WebSocket is the one exception: it takes a signed ticket (see
 
 ### The Chief of Staff
 
-`foreman` is the agent id of the Chief of Staff, the built-in agent the engine rewrites from code at
-every boot. It is not in `GET /agents`. Under `/agents/foreman` only these routes are open: `GET`
-itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`, `/runs/:rid`,
-`/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
-`/runs/:rid/tasks/:taskId/cancel`, `GET /files/read`, `GET|PUT|POST /files/raw`, `DELETE /files`,
-and a `PATCH` that only carries `connectionId`, `provider` and `model`. Anything else answers
-`403 { "error": "The foreman is managed by the engine and cannot be changed" }`.
+`foreman` is the agent id of the Chief of Staff, the built-in agent whose configuration the engine
+rewrites from code at every boot. It is not in `GET /agents`. Under `/agents/foreman` these routes
+are open:
+
+- `GET` itself, `POST /chat`, `GET /sessions` and `/sessions/:sid/messages`, `GET /runs`,
+  `/runs/:rid`, `/runs/:rid/stream`, `/runs/:rid/steps`, `POST /runs/:rid/cancel` and
+  `/runs/:rid/tasks/:taskId/cancel`;
+- a `PATCH` that only carries `connectionId`, `provider` and `model`;
+- what it keeps of its own, like any coworker: every route under `/files`, `/memories`, `/skills`,
+  `/skill-proposals` and `/schedules`, `PATCH /mcp-servers`, `GET /mcp-servers/status`,
+  `PUT|DELETE /mcp/:name/token` and `GET|PATCH /keys`.
+
+Anything else answers `403 { "error": "The foreman is managed by the engine and cannot be changed" }`:
+deleting, duplicating or archiving it, changing its name, soul or tool switches, and its triggers,
+data, tools and desktop routes.
 
 ---
 
@@ -55,7 +63,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -69,7 +77,7 @@ version the folder is at against the one this build takes it to.
   the conversations holding a run (the two should move together), `desktopViewers` the open screen
   connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
-  routes), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
+  routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
   takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, and `desktop`
   only when the desktop packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,

@@ -31,6 +31,10 @@ export const ENGINE_CAPABILITY_FILES_STREAM = 'files.stream'
 // The foreman's own workspace takes the files of a chat message, and its runs can be read back.
 export const ENGINE_CAPABILITY_FOREMAN_FILES = 'foreman.files'
 
+// The foreman keeps a memory, skills, routines and connectors of its own, and its routes for them
+// answer: the hub shows its coworker card only to a box that says so.
+export const ENGINE_CAPABILITY_FOREMAN_COWORKER = 'foreman.coworker'
+
 // The box has a window manager and a VNC server, so its screen can be watched and driven.
 export const ENGINE_CAPABILITY_DESKTOP = 'desktop'
 

@@ -131,7 +131,7 @@ curl localhost:3000/health
   "activeRuns": 0,
   "claimedSessions": 0,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "monorepo",
@@ -251,7 +251,7 @@ rerun agent create --name Scout --provider anthropic --model claude-sonnet-4-6
 
 ### The Chief of Staff
 
-Every engine carries one built-in agent, the Chief of Staff (`kind: "foreman"`, id `foreman` in the code). Its configuration is rewritten from code at every boot (`ensureForeman`, `src/agents/foreman.ts`), keeping only its model, the MCP servers connected to it and its response length, and it is never listed in the agent index. Like any coworker it keeps a memory, skills (which it proposes with `skill_propose`), routines and the Vault items attached to it or shared with everyone: those are files beside its configuration, which a boot never touches. It cannot rewrite its soul, install packages, register an MCP server itself or hold a webhook trigger. It works on the engine with files, shell, web, the shared database, the brain (which it writes rather than proposes to), sub-agents, calls to other coworkers, the browser and file cards, and on the workspace through the tools the app hands it with each chat request (`foreman` in the body of `POST /agents/foreman/chat`). A routine of its own runs without those workspace tools: nobody is talking to it, so the app signed nothing. Over HTTP it can be chatted with and read, its runs stopped, files handed to it, and its model pinned; everything else answers `403`.
+Every engine carries one built-in agent, the Chief of Staff (`kind: "foreman"`, id `foreman` in the code). Its configuration is rewritten from code at every boot (`ensureForeman`, `src/agents/foreman.ts`), keeping only its model, the MCP servers connected to it and its response length, and it is never listed in the agent index. Like any coworker it keeps a memory, skills (which it proposes with `skill_propose`), routines and the Vault items attached to it or shared with everyone: those are files beside its configuration, which a boot never touches. It cannot rewrite its soul, install packages, register an MCP server itself or hold a webhook trigger. It works on the engine with files, shell, web, the shared database, the brain (which it writes rather than proposes to), sub-agents, calls to other coworkers, the browser and file cards, and on the workspace through the tools the app hands it with each chat request (`foreman` in the body of `POST /agents/foreman/chat`). A routine of its own runs without those workspace tools: nobody is talking to it, so the app signed nothing. Over HTTP it can be chatted with and read, its runs stopped, its model pinned, and its files, memories, skills, routines and connected servers managed like a coworker's; everything else answers `403`.
 
 ### The system prompt
 
@@ -451,7 +451,7 @@ Combined with the `self` tools (`soul_update`, `verbosity_set`, `tool_install`, 
 - **No cross-database reach:** `ATTACH` is rejected on every SQL path, so an agent cannot open a database file it was not granted through its tools.
 - **Command policy:** `shell_exec` blocks a denylist of destructive commands (e.g. `rm -rf /`, `mkfs`, fork bombs). It is not a jail: the shell runs as the engine's user.
 - **Secrets never leave:** agent, connection and Vault `.env` files are `chmod 600` and never returned by the API; reads answer variable names only.
-- **The Chief of Staff is read-only over HTTP** but for chat, its runs, its files and its model (`src/http/foreman-guard.ts`).
+- **The Chief of Staff's identity is read-only over HTTP:** its name, soul, tool switches and existence cannot be changed. Chat, its runs, its model and what it keeps of its own (files, memories, skills, routines, connected servers) are open (`src/http/foreman-guard.ts`).
 - **Containment:** self-improvement is powerful by design (real shell, real `npm install`). The intended deployment is the engine **inside its own Docker container**, one per workspace, so the blast radius is that container.
 - **API auth:** set `RERUN_API_KEY` to require a bearer token on every route except `/health`. The desktop WebSocket takes a short-lived signed ticket instead.
 
