@@ -1,4 +1,5 @@
-import os, sys, unittest
+import os, sys, sqlite3, unittest
+from unittest import mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import failures
 import store as ledger_store
@@ -76,6 +77,15 @@ class Ledger(Base):
         self.assertEqual(len(rows), 1)
         self.assertEqual((rows[0][1], rows[0][2]), ("6", "resolve"))
         self.assertTrue(rows[0][6].startswith("unreadable #6: "))
+
+    def test_a_failing_failure_write_does_not_fail_the_pass(self):
+        self.tick()
+        self.w.finish("b1", "BLOCKED: x")
+        with mock.patch.object(self.d.store, "add_failure", side_effect=sqlite3.OperationalError("locked")):
+            self.tick(2)
+        self.assertEqual(self.state(), "blocked")
+        reasons = [r[0] for r in self.w.rows("SELECT reason FROM transitions WHERE job='5' ORDER BY id")]
+        self.assertNotIn("pass failed", reasons)
 
     def test_failures_after_an_id_returns_only_newer_rows(self):
         s = ledger_store.Store(os.path.join(self.dir.name, "x.db"))
