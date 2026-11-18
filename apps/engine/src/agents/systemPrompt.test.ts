@@ -500,6 +500,14 @@ describe('paid data section', () => {
         expect(section).not.toContain('prefer web_search and web_fetch, which are free')
     })
 
+    it('reads with a connected app on the user account before buying the same data, and buys it only past what the app reads or its daily limit', async () => {
+        const section = await paidDataSection()
+        expect(section).toContain('posts or metrics that no connected app reads, paid_data is the tool from the first step')
+        expect(section).toContain("A connected app that reads the same platform on the user's own account (LinkedIn Pro for LinkedIn profiles, posts, comments and people search) comes first")
+        expect(section).toContain('once it says a daily limit is reached, telling the user why')
+        expect(section).not.toContain("never touches the user's own accounts")
+    })
+
     it('checks the rows it bought against every criterion, and the signals none of their fields carry on each site, before delivering', async () => {
         const section = await paidDataSection()
         expect(section).toContain('Rows paid_data returns are candidates, not your answer')

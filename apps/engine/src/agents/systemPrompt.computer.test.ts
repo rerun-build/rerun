@@ -153,10 +153,11 @@ describe('service catalog next to a computer', () => {
     it('keeps reading public data off the screen, through paid data when the agent has it', async () => {
         const withPaidData = catalogOf(await buildSystemPrompt(agentWith({ computer: true, paidData: true }), { source: 'chat' }))
         expect(withPaidData).not.toContain('scraping')
-        expect(withPaidData).toContain('is not this case: get it with paid_data, never on your screen')
+        expect(withPaidData).toContain("is not this case: get it with a connected app that reads it on the user's own account, else with paid_data, never on your screen")
         expect(withPaidData).toContain('using the web, the browser, paid_data, your database')
+        expect(withPaidData).toContain('never on your screen. Searching is how you learn')
         const withoutPaidData = catalogOf(await buildSystemPrompt(agentWith({ computer: true, paidData: false }), { source: 'chat' }))
-        expect(withoutPaidData).toContain('is not this case: get it with browser_navigate, never on your screen')
+        expect(withoutPaidData).toContain("is not this case: get it with a connected app that reads it on the user's own account, else with browser_navigate, never on your screen")
         expect(withoutPaidData).toContain('using the web, the browser, your database')
     })
 
