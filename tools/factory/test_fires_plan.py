@@ -29,7 +29,7 @@ class PlanRuns(Base):
         self.w.clock += 3000
         self.tick()
         self.assertEqual(self.fire_rows("plan:5"), [("error", 400, 20, 0)])
-        self.assertEqual(self.w.rows("SELECT v FROM kv WHERE job='plan:5' AND k='state'"), [("blocked",)])
+        self.assertEqual(self.w.rows("SELECT v FROM kv WHERE job='plan:5' AND k='state'"), [("resend",)])
 
     def test_lost_send_abandons_the_fire(self):
         self.tick()
