@@ -37,6 +37,7 @@ import {
 import { loadCancelFlowActivity, type CancelFlowActivity } from '@/ee/services/cancel-flow-activity.service'
 import { abandonCreditInvoice, buyCredit, confirmCreditCheckout, quoteCreditPurchase, settleCreditInvoice, type CreditPurchaseResult, type CreditQuote } from '@/ee/services/credit-purchase.service'
 import { getCreditUsage } from '@/ee/services/credit-usage.service'
+import { getLifetimeBillingState, type LifetimeBillingState } from '@/ee/services/lifetime-addons.service'
 import { markPaymentMethodAdded } from '@/app/api/_services/getting-started.service'
 import { CANCEL_COMEBACKS, cancelReasonTextSchema, type CancelReason, type RetentionOfferKind } from '@/ee/lib/billing/cancel-flow'
 import { readCancelReason } from '@/ee/lib/billing/read-cancel-reason'
@@ -112,6 +113,15 @@ export async function confirmCardSetupAction(sessionId: string): Promise<{ ok: t
 export async function getSubscriptionStateAction(): Promise<{ ok: true; state: SubscriptionState | null } | ActionFailure> {
     try {
         return { ok: true, state: await getSubscriptionState() }
+    } catch (err) {
+        return failureOf(err, 'loadSubscriptionFailedShort')
+    }
+}
+
+export async function getLifetimeBillingStateAction(): Promise<{ ok: true; state: LifetimeBillingState } | ActionFailure> {
+    try {
+        await requireBillingAdmin()
+        return { ok: true, state: await getLifetimeBillingState() }
     } catch (err) {
         return failureOf(err, 'loadSubscriptionFailedShort')
     }

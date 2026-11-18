@@ -608,7 +608,7 @@ export function savedCard(paymentMethod: string | Stripe.PaymentMethod | null): 
 }
 
 // Best effort: the dialog still opens on a plan whose upcoming invoice Stripe cannot preview.
-async function readNextInvoice(subscription: Stripe.Subscription): Promise<SubscriptionState['nextInvoice']> {
+export async function readNextInvoice(subscription: Stripe.Subscription): Promise<SubscriptionState['nextInvoice']> {
     try {
         const invoice = await stripe.invoices.createPreview({ subscription: subscription.id })
         const at = stripeTimestampIso(invoice.next_payment_attempt ?? invoice.period_end)
@@ -658,7 +658,7 @@ function customerTaxIds(customer: Stripe.Customer): Stripe.TaxId[] {
     return customer.tax_ids?.data ?? []
 }
 
-function businessDetailsOf(customer: Stripe.Customer | null): BusinessDetails {
+export function businessDetailsOf(customer: Stripe.Customer | null): BusinessDetails {
     if (!customer) return { name: null, country: null, taxId: null }
     const taxId = customerTaxIds(customer).find(id => id.type !== 'unknown')
     return {

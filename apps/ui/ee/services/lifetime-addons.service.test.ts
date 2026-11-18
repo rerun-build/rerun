@@ -2,12 +2,19 @@ import type Stripe from 'stripe'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeSupabase, writeMethodOf } from '@/test/supabase-fake'
 import { stripe } from '@/ee/lib/billing/stripe'
-import { applyLifetimeAddonsSubscription, createLifetimeAddonsCheckout, removeLifetimeAddonSlot, settleLifetimeAddonsCheckout } from './lifetime-addons.service'
+import { applyLifetimeAddonsSubscription, createLifetimeAddonsCheckout, getLifetimeBillingState, removeLifetimeAddonSlot, settleLifetimeAddonsCheckout } from './lifetime-addons.service'
 
-const m = vi.hoisted(() => ({ createServiceRoleClient: vi.fn(), findWorkspaceId: vi.fn(), syncWorkspaceAppSlots: vi.fn(), ensureStripeCustomer: vi.fn() }))
+const m = vi.hoisted(() => ({ createServiceRoleClient: vi.fn(), findWorkspaceId: vi.fn(), syncWorkspaceAppSlots: vi.fn(), ensureStripeCustomer: vi.fn(), readNextInvoice: vi.fn() }))
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: m.createServiceRoleClient }))
-vi.mock('./billing.service', () => ({ findWorkspaceId: m.findWorkspaceId, ensureStripeCustomer: m.ensureStripeCustomer, PLAN_PAYMENT_METHOD_TYPES: ['card', 'link'] }))
+vi.mock('./billing.service', () => ({
+    findWorkspaceId: m.findWorkspaceId,
+    ensureStripeCustomer: m.ensureStripeCustomer,
+    readNextInvoice: m.readNextInvoice,
+    businessDetailsOf: (customer: { name?: string } | null) => ({ name: customer?.name ?? null, country: null, taxId: null }),
+    PLAN_PAYMENT_METHOD_TYPES: ['card', 'link'],
+}))
+vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceId: async () => 7 }))
 vi.mock('@/lib/apps/slots-sync', () => ({ syncWorkspaceAppSlots: m.syncWorkspaceAppSlots }))
 vi.mock('@/lib/app-origin', () => ({ getAppOrigin: async () => 'https://app.rerun.test' }))
 vi.mock('@/ee/lib/billing/stripe', async importOriginal => ({
@@ -159,5 +166,65 @@ describe('settleLifetimeAddonsCheckout', () => {
         await settleLifetimeAddonsCheckout('cs_1')
         expect(stripe.subscriptions.retrieve).not.toHaveBeenCalled()
         expect(db.updates()).toEqual([])
+    })
+})
+
+describe('getLifetimeBillingState', () => {
+    function useBillingRow(row: { stripe_customer_id: string | null; stripe_addons_subscription_id: string | null; addons_current_period_end: string | null }) {
+        const fake = fakeSupabase(table => (table === 'workspaces' ? { data: row } : undefined))
+        m.createServiceRoleClient.mockReturnValue(fake.client)
+    }
+
+    it('shows nothing billed for a workspace that never paid on Stripe', async () => {
+        useBillingRow({ stripe_customer_id: null, stripe_addons_subscription_id: null, addons_current_period_end: null })
+
+        await expect(getLifetimeBillingState()).resolves.toEqual({
+            quantities: { linkedin_slot: 0, whatsapp_slot: 0 },
+            periodEnd: null,
+            nextInvoice: null,
+            cancelAtPeriodEnd: false,
+            hasCustomer: false,
+            business: { name: null, country: null, taxId: null },
+        })
+        expect(stripe.customers.retrieve).not.toHaveBeenCalled()
+    })
+
+    it('keeps the invoices of a customer who only bought credit', async () => {
+        useBillingRow({ stripe_customer_id: 'cus_1', stripe_addons_subscription_id: null, addons_current_period_end: null })
+        vi.mocked(stripe.customers.retrieve).mockResolvedValue({ id: 'cus_1', name: 'Acme' } as never)
+
+        const state = await getLifetimeBillingState()
+        expect(state).toMatchObject({ hasCustomer: true, business: { name: 'Acme' }, nextInvoice: null, quantities: { linkedin_slot: 0, whatsapp_slot: 0 } })
+    })
+
+    it('reads the slots and the next invoice of a live add-ons subscription', async () => {
+        useBillingRow({ stripe_customer_id: 'cus_1', stripe_addons_subscription_id: 'sub_addons', addons_current_period_end: PERIOD_END_ISO })
+        vi.mocked(stripe.customers.retrieve).mockResolvedValue({ id: 'cus_1', name: null } as never)
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(subscription() as never)
+        m.readNextInvoice.mockResolvedValue({ at: PERIOD_END_ISO, amountCents: 2700 })
+
+        await expect(getLifetimeBillingState()).resolves.toMatchObject({
+            quantities: { linkedin_slot: 2, whatsapp_slot: 1 },
+            periodEnd: PERIOD_END_ISO,
+            nextInvoice: { at: PERIOD_END_ISO, amountCents: 2700 },
+            cancelAtPeriodEnd: false,
+        })
+    })
+
+    it('bills nothing more once the last slot was given back', async () => {
+        useBillingRow({ stripe_customer_id: 'cus_1', stripe_addons_subscription_id: 'sub_addons', addons_current_period_end: PERIOD_END_ISO })
+        vi.mocked(stripe.customers.retrieve).mockResolvedValue({ id: 'cus_1' } as never)
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(subscription({ cancel_at_period_end: true }) as never)
+
+        await expect(getLifetimeBillingState()).resolves.toMatchObject({ nextInvoice: null, cancelAtPeriodEnd: true, periodEnd: PERIOD_END_ISO })
+        expect(m.readNextInvoice).not.toHaveBeenCalled()
+    })
+
+    it('reads an ended subscription as no slots at all', async () => {
+        useBillingRow({ stripe_customer_id: 'cus_1', stripe_addons_subscription_id: 'sub_addons', addons_current_period_end: PERIOD_END_ISO })
+        vi.mocked(stripe.customers.retrieve).mockResolvedValue({ id: 'cus_1' } as never)
+        vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(subscription({ status: 'canceled' }) as never)
+
+        await expect(getLifetimeBillingState()).resolves.toMatchObject({ quantities: { linkedin_slot: 0, whatsapp_slot: 0 }, periodEnd: null, nextInvoice: null })
     })
 })

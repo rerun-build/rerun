@@ -1,6 +1,7 @@
 import type Stripe from 'stripe'
-import { ADDON_KEYS, PLAN_CURRENCY, TRIAL_DAYS, ZERO_QUANTITIES, type AddonKey } from '@rerun/contracts'
+import { ADDON_KEYS, PLAN_CURRENCY, TRIAL_DAYS, ZERO_QUANTITIES, type AddonKey, type AddonQuantities } from '@rerun/contracts'
 import type { Database } from '@/app/api/database.types'
+import { requireWorkspaceId } from '@/app/api/_auth/ownership'
 import { LIFETIME_ADDONS_CONSENT } from '@/ee/lib/billing/consent'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { isLifetimeAddonsCheckoutSession, isLifetimeAddonsSubscription, LIFETIME_ADDONS_KIND } from '@/ee/lib/billing/lifetime-addons'
@@ -13,7 +14,7 @@ import { slotItem, slotQuantity } from '@/lib/apps/stripe-slots'
 import { PAID_APP_PARAM, SLOTS_CHECKOUT_PARAM, type AppSlug } from '@/lib/apps/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import { ensureStripeCustomer, findWorkspaceId, PLAN_PAYMENT_METHOD_TYPES } from './billing.service'
+import { businessDetailsOf, ensureStripeCustomer, findWorkspaceId, PLAN_PAYMENT_METHOD_TYPES, readNextInvoice, type BusinessDetails } from './billing.service'
 
 type WorkspaceUpdate = Database['public']['Tables']['workspaces']['Update']
 
@@ -118,6 +119,44 @@ export async function removeLifetimeAddonSlot(subscription: Stripe.Subscription,
     const quantity = item.quantity ?? 0
     const change = quantity > 1 ? { id: item.id, quantity: quantity - 1 } : { id: item.id, deleted: true }
     await stripe.subscriptions.update(subscription.id, { items: [change], proration_behavior: 'none' })
+}
+
+export type LifetimeBillingState = {
+    quantities: AddonQuantities
+    // The renewal of the add-ons subscription, null without one.
+    periodEnd: string | null
+    nextInvoice: { at: string; amountCents: number } | null
+    cancelAtPeriodEnd: boolean
+    // A workspace that never paid anything has no Stripe customer: no invoices, no business details.
+    hasCustomer: boolean
+    business: BusinessDetails
+}
+
+// What the billing dialog of a lifetime workspace shows: the plan was paid once outside Stripe, so the
+// only thing billed again is the subscription that carries its app slots.
+export async function getLifetimeBillingState(): Promise<LifetimeBillingState> {
+    const workspaceId = await requireWorkspaceId()
+    const { data: workspace } = await selectMaybeSingle(
+        createServiceRoleClient(),
+        'workspaces',
+        ['stripe_customer_id', 'stripe_addons_subscription_id', 'addons_current_period_end'] as const,
+        { id: workspaceId },
+    )
+    const [customer, subscription] = await Promise.all([
+        workspace?.stripe_customer_id ? stripe.customers.retrieve(workspace.stripe_customer_id, { expand: ['tax_ids'] }) : null,
+        workspace?.stripe_addons_subscription_id ? stripe.subscriptions.retrieve(workspace.stripe_addons_subscription_id) : null,
+    ])
+    const live = subscription && isSubscriptionEntitled(subscription.status) ? subscription : null
+    const liveCustomer = customer && !customer.deleted ? customer : null
+
+    return {
+        quantities: live ? quantitiesFromItems(live.items.data).quantities : ZERO_QUANTITIES,
+        periodEnd: live ? (workspace?.addons_current_period_end ?? null) : null,
+        nextInvoice: live && !live.cancel_at_period_end ? await readNextInvoice(live) : null,
+        cancelAtPeriodEnd: !!live?.cancel_at_period_end,
+        hasCustomer: !!liveCustomer,
+        business: businessDetailsOf(liveCustomer),
+    }
 }
 
 // A subscription set to end that is asked for a slot again runs on: what it still carries is already
