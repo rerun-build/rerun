@@ -1,4 +1,4 @@
-import { SERVICE_INSTANCE_ID_RE, serviceRegistryKey } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, SERVICE_INSTANCE_ID_RE, serviceRegistryKey } from '@rerun/contracts'
 import { loadManifest } from '@/app/api/_services/services.service'
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { ComposioApiError, composioUserId, executeTool, listToolkitTools } from '@/lib/composio/client'
@@ -154,8 +154,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
 
         const engineAgentId = req.headers.get('x-rerun-agent') ?? ''
         const supabase = createServiceRoleClient()
-        const { data: agent } = engineAgentId ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: engineAgentId, workspace_id: engine.workspaceId }) : { data: null }
-        if (!agent) return rpcError(id, -32603, 'Coworker does not belong to the authenticated workspace')
+        // The foreman has no row: it only ever acts as the account of a Vault entry it holds.
+        const foreman = engineAgentId === FOREMAN_AGENT_ID
+        const { data: agent } = engineAgentId && !foreman ? await selectMaybeSingle(supabase, 'agents', ['id'] as const, { engine_agent_id: engineAgentId, workspace_id: engine.workspaceId }) : { data: null }
+        if (!agent && !foreman) return rpcError(id, -32603, 'Coworker does not belong to the authenticated workspace')
 
         // A server of a Vault entry acts as the entry's account, once the calling coworker is proven to
         // hold it. The header is the engine's own: a server a coworker wrote itself never carries one.
@@ -165,7 +167,10 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
             vaultItem = await vaultEntryFor(engine.workspaceId, vaultItemId, engineAgentId, toolkit)
             if (!vaultItem) return rpcError(id, -32603, 'This coworker does not hold that Vault entry')
         }
-        const userId = vaultItem ? await composioVaultUserId(engine.workspaceId, vaultItem) : composioUserId(agent.id, instanceId)
+        let userId: string
+        if (vaultItem) userId = await composioVaultUserId(engine.workspaceId, vaultItem)
+        else if (agent) userId = composioUserId(agent.id, instanceId)
+        else return rpcError(id, -32603, 'This coworker does not hold that Vault entry')
 
         try {
             const out = await executeTool(name, userId, args)

@@ -1,11 +1,11 @@
 import 'server-only'
 
-import type { VaultConflict, VaultItemSummary } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type VaultConflict, type VaultItemSummary } from '@rerun/contracts'
 
 import { AccessDeniedError, assertAgentAccess, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { vaultFlag } from '@/flags'
-import { EngineRequestError, supportsVault } from '@/lib/engine/client'
+import { EngineRequestError, supportsForemanCoworker, supportsVault } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { VAULT_RELEASED } from '@/lib/features'
@@ -57,13 +57,21 @@ export type VaultCoworker = { id: string; engineAgentId: string; name: string; s
 
 export type VaultContext = { actor: Actor; conn: EngineConnection; coworkers: VaultCoworker[]; byEngineId: Map<string, VaultCoworker> }
 
+// The foreman holds entries like a coworker, with no row and no Box: it is listed under its fixed
+// id, in a Box that does not exist. Nobody manages that Box, so only an admin attaches to it.
+const FOREMAN_VAULT_COWORKER: VaultCoworker = { id: FOREMAN_AGENT_ID, engineAgentId: FOREMAN_AGENT_ID, name: FOREMAN_DISPLAY_NAME, spaceId: '' }
+
 export async function vaultContext(actor?: Actor): Promise<VaultContext> {
     const resolved = actor ?? (await requireLightSessionActor())
     const engine = await findWorkspaceEngine(resolved.workspaceId)
     if (!engine) throw new NoEngineError()
     if (!(await supportsVault(engine.conn))) throw new VaultUnavailableError()
-    const { data } = await selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id'] as const, { workspace_id: resolved.workspaceId })
+    const [{ data }, withForeman] = await Promise.all([
+        selectAll(createServiceRoleClient(), 'agents', ['id', 'engine_agent_id', 'name', 'space_id'] as const, { workspace_id: resolved.workspaceId }),
+        supportsForemanCoworker(engine.conn),
+    ])
     const coworkers = (data ?? []).flatMap(row => (row.engine_agent_id ? [{ id: row.id, engineAgentId: row.engine_agent_id, name: row.name, spaceId: row.space_id }] : []))
+    if (withForeman) coworkers.unshift(FOREMAN_VAULT_COWORKER)
     return { actor: resolved, conn: engine.conn, coworkers, byEngineId: new Map(coworkers.map(c => [c.engineAgentId, c])) }
 }
 

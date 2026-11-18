@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
 
 import { attachVaultPaidAccountAction, detachVaultPaidAccountAction } from '@/app/api/_actions/vault.actions'
@@ -27,6 +28,8 @@ export function VaultPaidAccountDetail({ account, listing, onBack, onChanged }: 
     const t = useTranslations('vault')
     const errorText = useErrorText()
     const [busy, setBusy] = useState<string | null>(null)
+    // A paid account is bound to a coworker's row, which the Chief of Staff does not have.
+    const coworkers = listing.coworkers.filter(coworker => coworker.id !== FOREMAN_AGENT_ID)
 
     const toggle = async (agentId: string, on: boolean) => {
         setBusy(agentId)
@@ -57,8 +60,8 @@ export function VaultPaidAccountDetail({ account, listing, onBack, onChanged }: 
                     <TooltipDisabledReason reason={t('reasons.paidAppEveryone')} className="flex w-full">
                         <PanelRow title={t('detail.everyone')} description={t('detail.everyoneHint')} actions={<Switch checked={false} disabled aria-label={t('detail.everyone')} />} />
                     </TooltipDisabledReason>
-                    {listing.coworkers.length === 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.noCoworkers')}</p>}
-                    {listing.coworkers.map(coworker => {
+                    {coworkers.length === 0 && <p className="px-1 text-xs text-muted-foreground">{t('detail.noCoworkers')}</p>}
+                    {coworkers.map(coworker => {
                         const reason = !coworker.canManage ? t('reasons.manageBox') : undefined
                         return (
                             <TooltipDisabledReason key={coworker.id} reason={reason} className="flex w-full">

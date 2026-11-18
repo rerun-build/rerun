@@ -14,7 +14,7 @@ import { seedSessionTitle } from '@/lib/chat/session-title'
 import { preferredLanguage } from '@/lib/foreman/language'
 import { stripVoiceMarker } from '@/lib/voice/marker'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { ENGINE_SESSION_NOT_FOUND, SESSION_NOT_FOUND, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
+import { ENGINE_SESSION_NOT_FOUND, FOREMAN_AGENT_ID, SESSION_NOT_FOUND, type MessageAuthor, type SessionKind, type SessionSource } from '@rerun/contracts'
 
 type ChatRequestBody = {
     agentId?: unknown
@@ -72,7 +72,9 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing message text' }, { status: 400 })
     }
 
-    const target = await getAgentChatTarget(agentId).catch(() => null)
+    // The foreman is talked to on its own route, which writes its brief and keeps each member's
+    // conversations apart.
+    const target = agentId === FOREMAN_AGENT_ID ? null : await getAgentChatTarget(agentId).catch(() => null)
     if (!target) {
         return Response.json({ error: 'Coworker not configured or not found' }, { status: 400 })
     }

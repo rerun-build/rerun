@@ -245,6 +245,21 @@ describe('POST /api/mcp/composio/[slug]', () => {
             vi.mocked(getWorkspaceConnection).mockResolvedValue({ baseUrl: 'https://engine.test', apiKey: null } as EngineConnection)
         })
 
+        // The foreman has no agent row: an entry it holds is the only account it ever acts as.
+        it('serves the foreman through an entry it holds, and only through one', async () => {
+            vi.mocked(getVaultItem).mockResolvedValue(entry({ agentIds: ['foreman'] }) as never)
+            await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1', 'x-rerun-agent': 'foreman' }), context())
+            expect(executeTool).toHaveBeenCalledWith('GMAIL_SEND_EMAIL', composioVaultOwnUserId(WORKSPACE_ID, 'item-1'), { to: 'a@b.c' })
+
+            vi.mocked(executeTool).mockClear()
+            const bare = await (await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-agent': 'foreman' }), context())).json()
+            expect(bare.error.message).toMatch(/does not hold/)
+            vi.mocked(getVaultItem).mockResolvedValue(entry() as never)
+            const notHeld = await (await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1', 'x-rerun-agent': 'foreman' }), context())).json()
+            expect(notHeld.error.message).toMatch(/does not hold/)
+            expect(executeTool).not.toHaveBeenCalled()
+        })
+
         it("acts as the entry's own Composio account", async () => {
             vi.mocked(getVaultItem).mockResolvedValue(entry() as never)
             await POST(request(toolCall('GMAIL_SEND_EMAIL'), { 'x-rerun-vault-item': 'item-1' }), context())

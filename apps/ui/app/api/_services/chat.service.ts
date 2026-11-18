@@ -1,4 +1,4 @@
-import { COWORKER_NOT_FOUND, assertSessionInWorkspace, enforce, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
+import { AccessDeniedError, COWORKER_NOT_FOUND, assertSessionInWorkspace, enforce, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
@@ -32,21 +32,32 @@ export async function resolveAgentTarget(agentId: string, actor?: Actor, access:
     return buildTarget(row, engine)
 }
 
+// The signed-in caller's way to a coworker, the foreman included: what a coworker's screens read and
+// change (its memories, skills, routines, connected servers, files) is the same for both.
 export async function getAgentChatTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
+    if (agentId === FOREMAN_AGENT_ID) return foremanTarget(access)
     return resolveAgentTarget(agentId, undefined, access)
 }
 
-// The foreman has no agent row: it lives on the workspace's engine under a fixed id, and any signed-in
-// member of the workspace may reach it. Only what reads or stops a run, picks its model or carries
-// the files of a chat message resolves through here. Talking to it stays with its own route, which
-// is where its brief is written.
-export async function resolveRunTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
-    if (agentId !== FOREMAN_AGENT_ID) return getAgentChatTarget(agentId, access)
+// The foreman has no agent row and sits in no Box: it lives on the workspace's engine under a fixed
+// id. Any signed-in member of the workspace reaches it; changing what it keeps of its own takes a
+// workspace admin, the one level that manages every Box. Only a person gets here, never an API key
+// nor the workspace itself. Talking to it stays with its own route, which is where its brief is
+// written.
+async function foremanTarget(access: AccessLevel): Promise<AgentChatTarget> {
     const ctx = await requireWorkspaceContext()
-    if (ctx.authUser.is_anonymous) throw new AuthorizationError('coworkerNotFound')
+    if (ctx.authUser.is_anonymous) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    if (access === 'manage' && ctx.role !== 'admin') throw new AccessDeniedError()
     const engine = await findWorkspaceEngine(ctx.workspace.id)
     if (!engine) throw new NoEngineError()
     return { conn: engine.conn, engineAgentId: FOREMAN_AGENT_ID }
+}
+
+// What reads or stops a run, picks a model or carries the files of a chat message. On the foreman
+// every member does those, whatever level the caller asks for: its conversations are each member's
+// own, and its model is the one setting any of them may change.
+export async function resolveRunTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
+    return getAgentChatTarget(agentId, agentId === FOREMAN_AGENT_ID ? 'use' : access)
 }
 
 async function fetchAgentRow(agentId: string) {

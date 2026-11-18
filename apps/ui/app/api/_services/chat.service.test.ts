@@ -3,6 +3,7 @@ vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOrigi
 
 const mocks = vi.hoisted(() => ({
     requireLightSessionActor: vi.fn(),
+    requireWorkspaceContext: vi.fn(),
     visibleSpaceIds: vi.fn(),
     selectMaybeSingle: vi.fn(),
     selectMaybeSingleWithJoins: vi.fn(),
@@ -14,6 +15,7 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/app/api/_auth/access', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/access')>()), requireLightSessionActor: mocks.requireLightSessionActor, visibleSpaceIds: mocks.visibleSpaceIds }))
+vi.mock('@/app/api/_auth/ownership', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/ownership')>()), requireWorkspaceContext: mocks.requireWorkspaceContext }))
 vi.mock('@/supabase/serviceRole', () => ({
     createServiceRoleClient: () => ({
         from: (table: string) => ({
@@ -41,7 +43,7 @@ vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: mocks.findWo
 const { AuthorizationError } = await import('@/app/api/_auth/ownership')
 const { AccessDeniedError, workspaceActor } = await import('@/app/api/_auth/access')
 type Actor = import('@/app/api/_auth/access').Actor
-const { clearSkillProposalAttention, findIdleSessions, lastRunError, resolveAgentTarget, resolveAgentTargetForTrigger, summarizeSessionRuns } = await import('./chat.service')
+const { clearSkillProposalAttention, findIdleSessions, getAgentChatTarget, lastRunError, resolveAgentTarget, resolveAgentTargetForTrigger, resolveRunTarget, summarizeSessionRuns } = await import('./chat.service')
 
 const conn = { baseUrl: 'https://engine', apiKey: 'k' }
 
@@ -143,6 +145,52 @@ describe('resolveAgentTarget', () => {
     it('refuses an agent the engine does not know yet', async () => {
         row = { ...row!, engine_agent_id: null }
         await expect(resolveAgentTarget('a1', workspaceActor(1))).rejects.toThrow('Coworker not configured or not found')
+    })
+})
+
+describe('the foreman as a target', () => {
+    const signedIn = (role: 'admin' | 'member', anonymous = false) => mocks.requireWorkspaceContext.mockResolvedValue({ workspace: { id: 1 }, role, authUser: { is_anonymous: anonymous } })
+    const foremanTarget = { conn, engineAgentId: 'foreman' }
+
+    beforeEach(() => {
+        mocks.findWorkspaceEngine.mockResolvedValue({ conn })
+    })
+
+    it('lets any member read what it keeps, with no agent row read', async () => {
+        signedIn('member')
+        await expect(getAgentChatTarget('foreman')).resolves.toEqual(foremanTarget)
+        expect(mocks.selectMaybeSingleWithJoins).not.toHaveBeenCalled()
+    })
+
+    it('lets a workspace admin change what it keeps, and tells a member it may not', async () => {
+        signedIn('admin')
+        await expect(getAgentChatTarget('foreman', 'manage')).resolves.toEqual(foremanTarget)
+        signedIn('member')
+        await expect(getAgentChatTarget('foreman', 'manage')).rejects.toBeInstanceOf(AccessDeniedError)
+    })
+
+    it('keeps its runs, its model and its chat files open to every member', async () => {
+        signedIn('member')
+        await expect(resolveRunTarget('foreman', 'manage')).resolves.toEqual(foremanTarget)
+    })
+
+    it('does not exist for an anonymous visitor', async () => {
+        signedIn('admin', true)
+        await expect(getAgentChatTarget('foreman')).rejects.toBeInstanceOf(AuthorizationError)
+        await expect(resolveRunTarget('foreman')).rejects.toBeInstanceOf(AuthorizationError)
+    })
+
+    // An API key and a foreman turn name their actor: neither is a person at the screen.
+    it('stays unreachable to an API key or the workspace itself', async () => {
+        row = null
+        await expect(resolveAgentTarget('foreman', workspaceActor(1), 'manage')).rejects.toBeInstanceOf(AuthorizationError)
+        await expect(resolveAgentTarget('foreman', admin)).rejects.toBeInstanceOf(AuthorizationError)
+    })
+
+    it('has nothing to reach on a workspace with no machine', async () => {
+        signedIn('admin')
+        mocks.findWorkspaceEngine.mockResolvedValue(null)
+        await expect(getAgentChatTarget('foreman')).rejects.toThrow()
     })
 })
 

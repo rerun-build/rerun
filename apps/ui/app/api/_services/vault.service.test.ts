@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Actor } from '@/app/api/_auth/access'
-import { EngineRequestError, supportsVault } from '@/lib/engine/client'
+import { EngineRequestError, supportsForemanCoworker, supportsVault } from '@/lib/engine/client'
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
@@ -30,7 +30,7 @@ vi.mock('@/lib/vault/composio', () => ({ revokeVaultComposioAccount: vi.fn(async
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/flags', () => ({ vaultFlag: vi.fn(async () => false) }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
-vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn() }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(), supportsForemanCoworker: vi.fn(async () => false) }))
 vi.mock('@/lib/engine/vault-client', () => ({
     listVaultItems: vi.fn(),
     getVaultItem: vi.fn(),
@@ -93,6 +93,7 @@ beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(findWorkspaceEngine).mockResolvedValue({ instanceId: 'i', conn, managed: true })
     vi.mocked(supportsVault).mockResolvedValue(true)
+    vi.mocked(supportsForemanCoworker).mockResolvedValue(false)
     vi.mocked(getVaultItem).mockResolvedValue(item() as never)
     vi.mocked(listVaultItems).mockResolvedValue([item(), item({ id: 'item-2', agentIds: ['e-alice', 'e-carol'] }), item({ id: 'item-3', sharedWithAll: true, agentIds: [] })] as never)
     vi.mocked(createServiceRoleClient).mockReturnValue(
@@ -188,6 +189,39 @@ describe('attaching', () => {
     it('refuses an entry the engine no longer has', async () => {
         vi.mocked(getVaultItem).mockRejectedValue(new EngineRequestError('404', 404))
         await expect(attachVaultEntry('gone', 'alice', admin)).rejects.toMatchObject({ code: 'vaultItemNotFound' })
+    })
+})
+
+describe('the foreman in the Vault', () => {
+    beforeEach(() => {
+        vi.mocked(supportsForemanCoworker).mockResolvedValue(true)
+        vi.mocked(attachVaultItem).mockReset().mockResolvedValue(item({ agentIds: ['foreman'] }) as never)
+    })
+
+    it('is listed first for an admin, who may attach to it', async () => {
+        const listing = await listVault(admin)
+        expect(listing.coworkers.map(c => [c.id, c.name, c.canManage])[0]).toEqual(['foreman', 'Chief of Staff', true])
+        await attachVaultEntry('item-1', 'foreman', admin)
+        expect(attachVaultItem).toHaveBeenCalledWith(conn, 'item-1', 'foreman')
+    })
+
+    it('sits in no Box, so nobody but an admin sees it or attaches to it', async () => {
+        expect((await listVault(managerOfA)).coworkers.map(c => c.id)).not.toContain('foreman')
+        await expect(attachVaultEntry('item-1', 'foreman', managerOfA)).rejects.toMatchObject({ code: 'coworkerNotFound' })
+        expect(attachVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('is counted, not named, on an entry it holds for a member who cannot see it', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([item({ agentIds: ['foreman'] })] as never)
+        const [entry] = (await listVault(user)).entries
+        expect(entry.coworkers).toEqual([])
+        expect(entry.hiddenCoworkers).toBe(1)
+    })
+
+    it('is not there on a box whose foreman keeps nothing of its own', async () => {
+        vi.mocked(supportsForemanCoworker).mockResolvedValue(false)
+        expect((await listVault(admin)).coworkers.map(c => c.id)).toEqual(['alice', 'bob', 'carol'])
+        await expect(attachVaultEntry('item-1', 'foreman', admin)).rejects.toMatchObject({ code: 'coworkerNotFound' })
     })
 })
 

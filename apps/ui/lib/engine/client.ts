@@ -11,6 +11,7 @@ import {
     type DesktopStatus,
     type TakeoverResult,
     ENGINE_CAPABILITY_FILES_STREAM,
+    ENGINE_CAPABILITY_FOREMAN_COWORKER,
     ENGINE_CAPABILITY_FOREMAN_FILES,
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
     ENGINE_CAPABILITY_VAULT,
@@ -663,6 +664,11 @@ export async function supportsStreamedUploads(conn: EngineConnection): Promise<b
 
 export async function supportsForemanFiles(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_FILES)
+}
+
+// The box's foreman keeps memories, skills, routines and connectors of its own, and serves them.
+export async function supportsForemanCoworker(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_FOREMAN_COWORKER)
 }
 
 export async function supportsDesktop(conn: EngineConnection): Promise<boolean> {
