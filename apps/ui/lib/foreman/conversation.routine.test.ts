@@ -16,7 +16,7 @@ const follows = (follow: boolean | undefined) => ({ version: 2, coworkers: follo
 function members(users: Array<{ id: string; follow?: boolean }>) {
     mocks.selectMany.mockImplementation(async (_client: unknown, table: string) => {
         if (table === 'workspace_members') return { data: users.map(user => ({ user_id: user.id })) }
-        return { data: users.map(user => ({ id: user.id, email_notification_prefs: follows(user.follow) })) }
+        return { data: [...users].reverse().map(user => ({ id: user.id, email_notification_prefs: follows(user.follow) })) }
     })
 }
 
@@ -33,6 +33,14 @@ describe('openForemanRoutineThread', () => {
         await openForemanRoutineThread(7, 'engine-2', 'schedule: monday-review')
         expect(mocks.insert).toHaveBeenCalledWith({ workspace_id: 7, user_id: 'scheduler', backend: 'engine', engine_session_id: 'engine-2', kind: 'thread', status: 'working', title: 'schedule: monday-review' })
         expect(mocks.workspaceFounderUserId).not.toHaveBeenCalled()
+    })
+
+    // The members are read by age, the users in whatever order the database answers.
+    it('opens it for the longest-standing member when several follow it', async () => {
+        members([{ id: 'founder' }, { id: 'first', follow: true }, { id: 'second', follow: true }])
+        await openForemanRoutineThread(7, 'engine-2', 'Weekly review')
+        expect(mocks.insert).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'first' }))
+        expect(mocks.selectMany.mock.calls[0][4]).toEqual({ column: 'created_at' })
     })
 
     it("falls back to the workspace's founder when nobody follows it", async () => {

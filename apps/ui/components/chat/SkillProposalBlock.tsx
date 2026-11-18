@@ -15,14 +15,18 @@ export type SkillProposalBlockProps = {
     pending?: boolean
     pinned?: boolean
     onDecide?: (proposalId: string, decision: 'accept' | 'dismiss') => void
+    // Where the applied skill is read, when it is not on a coworker's panel of the board.
+    onOpenSkill?: (slug: string) => void
 }
 
-export function SkillProposalBlock({ agentId, proposal, pending, pinned, onDecide }: SkillProposalBlockProps) {
-    const boxManageReason = useBoxManageReason()
+export function SkillProposalBlock({ agentId, proposal, pending, pinned, onDecide, onOpenSkill }: SkillProposalBlockProps) {
+    const manageReason = useBoxManageReason(agentId)
     const openAgentSkill = useBoardStore(s => s.openAgentSkill)
     const canManage = useCanDecide(agentId)
     const decidable = Boolean(onDecide)
     const appliedSlug = proposal.appliedSlug
+    // The Chief of Staff is no coworker of the board: selecting it there opens a panel on nobody.
+    const openSkill = onOpenSkill ?? (agentId && agentId !== FOREMAN_AGENT_ID ? (slug: string) => openAgentSkill(agentId, slug) : undefined)
 
     return (
         <SkillProposalBlockBase
@@ -37,8 +41,8 @@ export function SkillProposalBlock({ agentId, proposal, pending, pinned, onDecid
             pinned={pinned}
             onAccept={decidable ? () => onDecide?.(proposal.id, 'accept') : undefined}
             onDismiss={decidable ? () => onDecide?.(proposal.id, 'dismiss') : undefined}
-            decisionDisabledReason={canManage ? undefined : boxManageReason}
-            onOpenSkill={agentId && appliedSlug ? () => openAgentSkill(agentId, appliedSlug) : undefined}
+            decisionDisabledReason={canManage ? undefined : manageReason}
+            onOpenSkill={appliedSlug && openSkill ? () => openSkill(appliedSlug) : undefined}
         />
     )
 }

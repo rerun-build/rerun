@@ -7,7 +7,7 @@ import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { clearSkillProposalAttention, getAgentChatTarget, getSessionEngineContext, type SessionEngineContext } from '@/app/api/_services/chat.service'
 import { decideSkillProposal, listSkillProposals } from '@/lib/engine/client'
 import type { EngineSkillProposal } from '@/lib/engine/types'
-import { foremanSessionEngineContext } from '@/lib/foreman/conversation'
+import { clearForemanSkillProposalAttention, foremanSessionEngineContext } from '@/lib/foreman/conversation'
 import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
 
 // A coworker's session, or else one of the caller's own conversations with the Chief of Staff.
@@ -43,7 +43,8 @@ export async function decideSkillProposalAction(
         if (!ctx) return { success: false, ...refusal('coworkerNotReachable') }
         await getAgentChatTarget(ctx.agentId, 'manage')
         const proposal = await decideSkillProposal(ctx.conn, ctx.engineAgentId, proposalId, decision)
-        if (ctx.agentId !== FOREMAN_AGENT_ID) await clearSkillProposalAttention(sessionId, ctx.agentId, ctx.engineSessionId).catch(() => {})
+        const cleared = ctx.agentId === FOREMAN_AGENT_ID ? clearForemanSkillProposalAttention(ctx.conn, sessionId, ctx.engineSessionId) : clearSkillProposalAttention(sessionId, ctx.agentId, ctx.engineSessionId)
+        await cleared.catch(() => {})
         return { success: true, proposal }
     } catch (err) {
         return { success: false, ...refusalOf(err, 'updateProposalFailed'), denied: deniedCode(err) }

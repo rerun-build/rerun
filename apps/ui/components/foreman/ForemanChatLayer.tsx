@@ -46,6 +46,7 @@ import { ForemanWelcome } from './ForemanWelcome'
 import { EngineQuestionWidget } from './widgets/EngineQuestionWidget'
 import { planAgentShortcuts } from './widgets/agent-picks'
 import { renderForemanWidget, type AnswerWidget, type DismissWidget } from './widgets/renderForemanWidget'
+import { skillProposalRow, type ForemanSkillProposals } from './widgets/skill-proposal-row'
 
 // De quoi laisser un message entier se dissoudre plutôt que d'en gommer la dernière ligne.
 const SCROLL_FADE = 56
@@ -62,6 +63,9 @@ type ForemanChatLayerProps = {
     // transcript replayed outside the live column needs.
     onWidgetAnswer?: AnswerWidget
     onWidgetDismiss?: DismissWidget
+    // Its skill proposals, once its engine keeps skills of its own: a decided one is drawn where it
+    // was raised.
+    skillProposals?: ForemanSkillProposals
     // The widget the conversation is stopped on. An engine question is drawn after the last message;
     // any other one is already in the stack, inside the message that called it.
     pending?: PendingWidget | null
@@ -103,7 +107,7 @@ type ForemanChatLayerProps = {
  * Le défilement est celui du chat d'un agent : `Conversation` colle au bas et rend le même bouton de
  * retour en bas.
  */
-export function ForemanChatLayer({ messages, streaming, guided, restored, error, onWidgetAnswer, onWidgetDismiss, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
+export function ForemanChatLayer({ messages, streaming, guided, restored, error, onWidgetAnswer, onWidgetDismiss, skillProposals, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
     const tName = useTranslations('workspaceView.foreman')
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
@@ -135,6 +139,7 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
     const renderToolPart = onWidgetAnswer
         ? (part: Parameters<typeof renderForemanWidget>[0]) => {
               if (part.toolCallId === engineHitl?.toolCallId) return null
+              if (part.toolName === 'skill_propose' && skillProposals) return skillProposalRow(part.output, skillProposals)
               const widget = renderForemanWidget(part, onWidgetAnswer, onWidgetDismiss, shortcuts)
               if (!widget || !isForemanWidgetTool(part.toolName)) return widget
               return <div ref={part.toolCallId === pending?.toolCallId ? pendingRef : undefined}>{widget}</div>

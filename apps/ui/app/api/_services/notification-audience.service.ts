@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+
 import type { Database } from '@/app/api/database.types'
 import type { EngineCreatedEvent } from '@/lib/engine/types'
 import { coworkerRuleOf, normalizeNotificationPrefs, type NotificationPrefs } from '@/lib/notifications/prefs'
@@ -62,17 +64,21 @@ export async function followCoworker(userId: string | null | undefined, agentId:
 }
 
 // A schedule or a trigger the coworker wrote during a chat names the member who asked for it. Checked
-// against the workspace, so a box can never make someone outside it follow anything.
+// against the workspace, so a box can never make someone outside it follow anything. The foreman has
+// no agent row: it is followed under its fixed id, which is where a run of its routine looks for
+// who reads it.
 export async function followAuthorOfCreatedTask(workspaceId: number, event: EngineCreatedEvent): Promise<void> {
     const authorId = event.metadata?.authorId
     if (event.event === 'box.connection.connected' || typeof authorId !== 'string' || !event.agentId) return
     try {
         const supabase = createServiceRoleClient()
-        const [{ data: member }, { data: agent }] = await Promise.all([
+        const [{ data: member }, followedId] = await Promise.all([
             selectMaybeSingle(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId, user_id: authorId }),
-            selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, engine_agent_id: event.agentId }),
+            event.agentId === FOREMAN_AGENT_ID
+                ? FOREMAN_AGENT_ID
+                : selectMaybeSingle(supabase, 'agents', ['id'] as const, { workspace_id: workspaceId, engine_agent_id: event.agentId }).then(({ data: agent }) => agent?.id ?? null),
         ])
-        if (member && agent) await followCoworker(member.user_id, agent.id)
+        if (member && followedId) await followCoworker(member.user_id, followedId)
     } catch (err) {
         console.error('[notifications] failed to follow the author of a scheduled task', err)
     }

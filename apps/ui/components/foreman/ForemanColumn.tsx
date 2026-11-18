@@ -57,6 +57,7 @@ import { type ForemanPlacement, dockedForemanSide } from '@/lib/foreman-layout'
 import { browserPermission } from '@/lib/notifications/browser'
 import { useHoldAppBoot } from '@/stores/app-boot.store'
 import { useBoardCoverStore } from '@/stores/board-cover.store'
+import { useBoardStore } from '@/stores/board.store'
 import { selectForemanInThread, useForemanStore } from '@/stores/foreman.store'
 import { useTemplateFlowStore } from '@/stores/template-flow.store'
 import { templateCardImage } from '@/lib/templates/card-image'
@@ -88,6 +89,19 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     useEffect(() => {
         void refreshProposals().catch(() => {})
     }, [refreshProposals])
+    // Its skills are read on its card: the tab that holds it, or the column beside the chat in the Simple view.
+    const openCardSkill = useCallback(
+        (slug: string) => {
+            useBoardStore.setState({ agentSkillFocus: { agentId: FOREMAN_AGENT_ID, slug } })
+            const store = useForemanStore.getState()
+            store.setCardScreen('skills')
+            if (pinned) useSimpleDetailsStore.getState().setWanted(true)
+            else store.setTab('routines')
+        },
+        [pinned]
+    )
+    const { proposals, pinnedIds, pendingId: decidingProposalId, decide: decideProposal } = skillProposals
+    const transcriptProposals = useMemo(() => (hasCard ? { proposals, pinnedIds, pendingId: decidingProposalId, decide: decideProposal, onOpenSkill: openCardSkill } : undefined), [hasCard, proposals, pinnedIds, decidingProposalId, decideProposal, openCardSkill])
     useHoldAppBoot(open !== false && !guided && !restoreDone)
 
     // Ce que le board dessine à gauche pendant tout le tunnel. L'organisation vit dans le transcript
@@ -489,6 +503,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                                 error={noticeError}
                                 onWidgetAnswer={answerWidget}
                                 onWidgetDismiss={dismissWidget}
+                                skillProposals={transcriptProposals}
                                 pending={pendingWidget}
                                 answerAttachments={answerAttachments}
                                 nextSteps={nextSteps}

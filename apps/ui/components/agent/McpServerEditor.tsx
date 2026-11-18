@@ -49,7 +49,7 @@ export function McpServerEditor({
     onDone: () => void
     onBack: () => void
 }) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.mcpServerEditor')
     const errorText = useErrorText()
     const isEdit = !!server

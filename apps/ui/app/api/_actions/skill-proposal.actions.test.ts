@@ -6,13 +6,14 @@ const mocks = vi.hoisted(() => ({
     clearSkillProposalAttention: vi.fn(async () => {}),
     requireWorkspaceContext: vi.fn(),
     foremanSessionEngineContext: vi.fn(),
+    clearForemanSkillProposalAttention: vi.fn(async () => {}),
     listSkillProposals: vi.fn(),
     decideSkillProposal: vi.fn(),
 }))
 
 vi.mock('@/app/api/_services/chat.service', () => ({ getSessionEngineContext: mocks.getSessionEngineContext, getAgentChatTarget: mocks.getAgentChatTarget, clearSkillProposalAttention: mocks.clearSkillProposalAttention }))
 vi.mock('@/app/api/_auth/ownership', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/ownership')>()), requireWorkspaceContext: mocks.requireWorkspaceContext }))
-vi.mock('@/lib/foreman/conversation', () => ({ foremanSessionEngineContext: mocks.foremanSessionEngineContext }))
+vi.mock('@/lib/foreman/conversation', () => ({ foremanSessionEngineContext: mocks.foremanSessionEngineContext, clearForemanSkillProposalAttention: mocks.clearForemanSkillProposalAttention }))
 vi.mock('@/lib/engine/client', () => ({ listSkillProposals: mocks.listSkillProposals, decideSkillProposal: mocks.decideSkillProposal }))
 
 const { AuthorizationError } = await import('@/app/api/_auth/ownership')
@@ -52,6 +53,14 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
         expect(mocks.clearSkillProposalAttention).not.toHaveBeenCalled()
     })
 
+    it('stops its thread from waiting once the proposal is decided, without failing the decision when that cannot be done', async () => {
+        await decideSkillProposalAction('conversation-1', 'p1', 'dismiss')
+        expect(mocks.clearForemanSkillProposalAttention).toHaveBeenCalledWith(conn, 'conversation-1', 'engine-1')
+
+        mocks.clearForemanSkillProposalAttention.mockRejectedValueOnce(new Error('engine away'))
+        expect(await decideSkillProposalAction('conversation-1', 'p1', 'dismiss')).toEqual({ success: true, proposal })
+    })
+
     it('refuses a member who cannot change what it keeps', async () => {
         mocks.getAgentChatTarget.mockRejectedValue(new AccessDeniedError())
         expect(await decideSkillProposalAction('conversation-1', 'p1', 'accept')).toMatchObject({ success: false, denied: 'forbidden' })
@@ -63,5 +72,9 @@ describe('the skill proposals of a conversation with the Chief of Staff', () => 
         await listSkillProposalsAction('session-1')
         expect(mocks.listSkillProposals).toHaveBeenCalledWith(conn, 'e1', 's1')
         expect(mocks.foremanSessionEngineContext).not.toHaveBeenCalled()
+        mocks.getAgentChatTarget.mockResolvedValue({ conn, engineAgentId: 'e1' })
+        await decideSkillProposalAction('session-1', 'p1', 'accept')
+        expect(mocks.clearSkillProposalAttention).toHaveBeenCalledWith('session-1', 'agent-1', 's1')
+        expect(mocks.clearForemanSkillProposalAttention).not.toHaveBeenCalled()
     })
 })

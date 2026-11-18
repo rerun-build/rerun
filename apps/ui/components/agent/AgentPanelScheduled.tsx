@@ -47,7 +47,7 @@ type AgentPanelScheduledProps = {
 type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string } | { mode: 'runs'; slug: string }
 
 export function AgentPanelScheduled({ agentId, agentName, onOpenSession, focusSlug, onFocusConsumed }: AgentPanelScheduledProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.agentPanelScheduled')
     const [outcomes, setOutcomes] = useState<Record<string, TaskOutcome>>({})
     const [view, setView] = useState<View>({ mode: 'list' })
@@ -248,7 +248,7 @@ function SchedulePicker({ mode, cron, runAtLocal, disabled, onChange }: { mode: 
 }
 
 function ScheduleEditor({ agentId, agentName, slug, onDone, onBack, onShowHistory, onOpenSession }: { agentId: string; agentName: string; slug?: string; onDone: () => void; onBack: () => void; onShowHistory?: () => void; onOpenSession?: (sessionId: string, title: string, runId: string | null) => void }) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.agentPanelScheduled.editor')
     const errorText = useErrorText()
     const isEdit = !!slug

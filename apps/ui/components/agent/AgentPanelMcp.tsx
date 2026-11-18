@@ -34,7 +34,7 @@ function serverSummary(s: EngineMcpServer): string {
 }
 
 export function AgentPanelMcp({ agentId }: AgentPanelMcpProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.agentPanelMcp')
     const [servers, setServers] = useState<EngineMcpServer[]>([])
     // The connector store already joins every server name to the app or custom entry that owns it.

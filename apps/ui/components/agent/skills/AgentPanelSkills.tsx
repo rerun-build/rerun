@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useCanManageAgent } from '@/hooks/useBoxAccess'
+import { useBoxManageReason } from '@/hooks/useBoxManageReason'
 import type { EngineSkillWithSource } from '@/lib/engine/types'
 import { BlocksIcon, FileTextIcon, FolderUpIcon, Layers, Loader2Icon, PlusIcon, UploadIcon } from '@/lib/icons'
 import { EmptyState } from '@/components/ui/empty-state'
@@ -32,7 +33,7 @@ type View = { mode: 'list' } | { mode: 'create' } | { mode: 'edit'; slug: string
 export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentPanelSkillsProps) {
     const t = useTranslations('agent.agentPanelSkills')
     const errorText = useErrorText()
-    const tShared = useTranslations('agent.modelsShared')
+    const boxManageReason = useBoxManageReason(agentId)
     const [skills, setSkills] = useState<EngineSkillWithSource[]>([])
     const [loading, setLoading] = useState(true)
     const [view, setView] = useState<View>({ mode: 'list' })
@@ -42,7 +43,7 @@ export function AgentPanelSkills({ agentId, focusSlug, onFocusConsumed }: AgentP
     const fileInputRef = useRef<HTMLInputElement>(null)
     const folderInputRef = useRef<HTMLInputElement>(null)
     const canManage = useCanManageAgent(agentId)
-    const manageReason = canManage ? undefined : tShared('boxManageReason')
+    const manageReason = canManage ? undefined : boxManageReason
 
     // Kept in refs rather than in load's deps: the slug is honoured once, and the callback comes
     // inline from the panel, so a fresh identity on every render would refetch forever.

@@ -68,7 +68,7 @@ function MemoryRow({ memory, deleteDisabledReason, onDelete }: { memory: EngineM
 }
 
 export function AgentPanelMemories({ agentId }: AgentPanelMemoriesProps) {
-    const boxManageReason = useBoxManageReason()
+    const boxManageReason = useBoxManageReason(agentId)
     const t = useTranslations('agent.agentPanelMemories')
     const [memories, setMemories] = useState<EngineMemory[]>([])
     const [loading, setLoading] = useState(true)

@@ -10,7 +10,8 @@ import type { Database } from '@/app/api/database.types'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { seedSessionTitle } from '@/lib/chat/session-title'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
-import { cancelRun, getSessionMessages, listRuns } from '@/lib/engine/client'
+import { openSkillProposal, pendingRequestPeek } from '@/lib/chat/pending-request-peek'
+import { cancelRun, getSessionMessages, listRuns, listSkillProposals } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import type { ForemanBackend } from './phase'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
@@ -230,14 +231,15 @@ export async function touchForemanConversation(sessionId: string): Promise<void>
 }
 
 // Who reads what a routine of the foreman did: a member who follows it, as the one who scheduled it
-// does, and the workspace's founder when nobody follows it.
+// does, the longest-standing of them when several do, and the workspace's founder when nobody
+// follows it.
 async function routineReaderOf(workspaceId: number): Promise<string | null> {
     const supabase = createServiceRoleClient()
-    const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId })
-    const ids = (members ?? []).map(member => member.user_id)
-    const { data: users } = ids.length ? await selectMany(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: ids }) : { data: [] }
-    const follower = (users ?? []).find(user => coworkerRuleOf(normalizeNotificationPrefs(user.email_notification_prefs), FOREMAN_AGENT_ID).follow === true)
-    return follower?.id ?? (await workspaceFounderUserId(workspaceId))
+    const { data: members } = await selectMany(supabase, 'workspace_members', ['user_id'] as const, { workspace_id: workspaceId }, { column: 'created_at' })
+    const idsByAge = (members ?? []).map(member => member.user_id)
+    const { data: users } = idsByAge.length ? await selectMany(supabase, 'users', ['id', 'email_notification_prefs'] as const, { id: idsByAge }) : { data: [] }
+    const followers = new Set((users ?? []).filter(user => coworkerRuleOf(normalizeNotificationPrefs(user.email_notification_prefs), FOREMAN_AGENT_ID).follow === true).map(user => user.id))
+    return idsByAge.find(id => followers.has(id)) ?? (await workspaceFounderUserId(workspaceId))
 }
 
 // A routine of the foreman's own starts with nobody in front of it: its conversation becomes a
@@ -264,6 +266,18 @@ export async function foremanSessionEngineContext(ctx: WorkspaceContext, session
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'foreman_conversations', ['engine_session_id'] as const, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId, backend: 'engine' })
     if (!data) return null
     return { conn: await getWorkspaceConnection(ctx.workspace.id), engineSessionId: data.engine_session_id }
+}
+
+// The engine announces a skill proposal as an approval once its run is over, and nothing answers it
+// but the decision: without this the thread keeps asking for someone after Remember or No. It still
+// waits when another proposal is open, or when the run stopped on a request, which leaves the same
+// status.
+export async function clearForemanSkillProposalAttention(conn: EngineConnection, sessionId: string, engineSessionId: string | null): Promise<void> {
+    if (!engineSessionId) return
+    const [proposals, messages] = await Promise.all([listSkillProposals(conn, FOREMAN_AGENT_ID, engineSessionId), readEngineTranscript(conn, engineSessionId)])
+    if (openSkillProposal(proposals) || pendingRequestPeek(messages).pending) return
+    const { error } = await createServiceRoleClient().from('foreman_conversations').update<ConversationUpdate>({ status: 'idle' }).eq('id', sessionId).eq('status', 'awaiting_approval')
+    if (error) console.error('[foreman] failed to clear the skill proposal attention', error)
 }
 
 // The caller's thread holding an engine conversation, when it is theirs to read.
