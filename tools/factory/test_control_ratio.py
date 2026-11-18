@@ -50,6 +50,13 @@ class Follow(unittest.TestCase):
         self.assertIn("builders held at 8 of 11", lines[0])
         self.assertIn("reviewer", lines[0])
 
+    def test_a_checker_without_a_limit_is_named_in_the_hold_line(self):
+        copies = {"code": 8, "LARRY": 3, "LINUS": 3, "BRUCE": 3, "BARBARA": 1}
+        bounds = {"code": 8, "LARRY": 3, "LINUS": 3}
+        out, lines = control.follow(copies, TYPES, bounds, RATIO)
+        self.assertEqual(len(lines), 1)
+        self.assertIn("no limit in control-bounds.json for BRUCE", lines[0])
+
     def test_the_acceptor_follows_too(self):
         copies = {"code": 8, "LARRY": 2, "LINUS": 3, "BRUCE": 3, "BARBARA": 1}
         out, lines = control.follow(copies, TYPES, BOUNDS, {"acceptance": 0.25})
@@ -98,6 +105,31 @@ class Tick(unittest.TestCase):
             comments = [c for c in gh.calls if c[:2] == ["issue", "comment"]]
             self.assertEqual(len(comments), 1)
             self.assertIn("builders held at 8 of 11", comments[0][-1])
+            store.close()
+
+    def test_a_hold_alone_is_posted_under_the_hold_heading(self):
+        with tempfile.TemporaryDirectory() as d:
+            store = S.Store(os.path.join(d, "ledger.db"))
+            cfg = {
+                "repo": "o/r",
+                "check_ratio": RATIO,
+                "types": json.loads(json.dumps(TYPES)),
+            }
+            bounds = {
+                "settable": ["copies"],
+                "copies": dict(BOUNDS, LINUS=3, BRUCE=3),
+            }
+            rows = [{"number": 7, "title": control.TITLE,
+                     "body": body_of({"copies": {"code": 8, "LARRY": 3}})}]
+            gh = Fake(rows)
+            ctl = control.Control(cfg, gh, store, bounds)
+            ctl.tick(1)
+            comments = [c for c in gh.calls if c[:2] == ["issue", "comment"]]
+            self.assertEqual(len(comments), 1)
+            body = comments[0][-1]
+            self.assertTrue(body.startswith(
+                "Factory control: builder copies are held so the checker copies can follow.\n- "))
+            self.assertNotIn("were refused", body)
             store.close()
 
 

@@ -104,8 +104,12 @@ def follow(copies, types, bounds, ratio):
             cut = min(out[n], extra)
             out[n] -= cut
             extra -= cut
-        lines.append(f"copies: builders held at {keep} of {build} asked: the {kind} copies can follow"
-                     f" only {keep} ({float(per):g} per build copy, at most {have})")
+        unbounded = [n for n in names if n not in bounds]
+        line = (f"copies: builders held at {keep} of {build} asked: the {kind} copies can follow"
+                f" only {keep} ({float(per):g} per build copy, at most {have})")
+        if unbounded:
+            line += f"; no limit in control-bounds.json for {', '.join(unbounded)}"
+        lines.append(line)
     return out, lines
 
 
@@ -141,14 +145,14 @@ class Control:
         self.seen = True
         block, parse_errors = parse(issue.get("body") if issue else None)
         effective, errors = validate(block or {}, self.bounds, self.base, self.effective)
+        held = []
         if "copies" in effective:
             effective["copies"], held = follow(effective["copies"], self.cfg.get("types") or {},
                                                self.bounds.get("copies", {}), self.cfg.get("check_ratio"))
-            errors = errors + held
         self.record(effective)
         self.effective = effective
         self.apply()
-        self.complain(issue, parse_errors + errors)
+        self.complain(issue, parse_errors + errors, held)
 
     def record(self, effective):
         for key in sorted(set(effective) | set(self.effective)):
@@ -165,15 +169,22 @@ class Control:
                 if c.get("name") in copies:
                     c["runs"] = copies[c["name"]]
 
-    def complain(self, issue, errors):
+    def complain(self, issue, refused, held):
         if not issue:
             return
-        digest = hashlib.sha1("\n".join(errors).encode("utf-8")).hexdigest() if errors else ""
+        problems = list(refused) + list(held)
+        digest = hashlib.sha1("\n".join(problems).encode("utf-8")).hexdigest() if problems else ""
         if digest == self.store.get_all("-").get("control_errors"):
             return
-        if errors:
-            body = ("Factory control: these values were refused and the last valid values stay.\n"
-                    + "\n".join(f"- {e}" for e in errors))
+        if problems:
+            sections = []
+            if refused:
+                sections.append("Factory control: these values were refused and the last valid values stay.\n"
+                                + "\n".join(f"- {e}" for e in refused))
+            if held:
+                sections.append("Factory control: builder copies are held so the checker copies can follow.\n"
+                                + "\n".join(f"- {e}" for e in held))
+            body = "\n\n".join(sections)
             try:
                 self.gh(["issue", "comment", str(issue["number"]), "-R", self.cfg["repo"], "--body", body])
             except Exception:
