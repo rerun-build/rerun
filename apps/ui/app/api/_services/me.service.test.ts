@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 
-import { readMe } from './me.service'
+import { loadMe, readMe } from './me.service'
+const getAuthUser = vi.fn()
+vi.mock('@/supabase/session/getServerSession', () => ({ getAuthUser: () => getAuthUser() }))
 vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 const contextWith = (workspace: { subscription_status: string | null; is_sandbox: boolean }) =>
@@ -26,5 +28,34 @@ describe('readMe', () => {
 
     it('counts the expert sandbox as subscribed, as every other gate does', () => {
         expect(readMe(contextWith({ subscription_status: null, is_sandbox: true })).workspace.subscribed).toBe(true)
+    })
+})
+
+describe('loadMe', () => {
+    const context = (authUser: object) => ({ ...contextWith({ subscription_status: 'trialing', is_sandbox: false }), userLocale: 'fr', authUser }) as unknown as WorkspaceContext
+
+    it('answers the language and the name the session already holds, with no read of its own', async () => {
+        getAuthUser.mockReset()
+
+        const me = await loadMe(context({ user_metadata: { full_name: 'Ada Lovelace' }, app_metadata: {} }))
+
+        expect(me.user).toEqual(expect.objectContaining({ locale: 'fr', name: 'Ada Lovelace' }))
+        expect(getAuthUser).not.toHaveBeenCalled()
+    })
+
+    it('asks the auth server for a name the token was issued before', async () => {
+        getAuthUser.mockReset().mockResolvedValue({ user_metadata: { full_name: 'Ada', first_name: 'Ada' }, app_metadata: {} })
+
+        const me = await loadMe(context({ user_metadata: {}, app_metadata: {} }))
+
+        expect(me.user.name).toBe('Ada')
+    })
+
+    it('keeps what the token says when the auth server has nothing to add', async () => {
+        getAuthUser.mockReset().mockResolvedValue(null)
+
+        const me = await loadMe(context({ user_metadata: {}, app_metadata: {} }))
+
+        expect(me.user.name).toBeNull()
     })
 })

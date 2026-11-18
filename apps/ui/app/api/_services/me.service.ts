@@ -2,7 +2,7 @@ import { displayNameOf, PROFILE_NAME_MAX, readProfile } from '@/lib/auth/user-pr
 import { isSubscriptionEntitled } from '@rerun/cloud/billing'
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Me, MessageAuthor } from '@rerun/contracts'
-import { selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { getAuthUser } from '@/supabase/session/getServerSession'
 import type { User } from '@supabase/supabase-js'
 
 export { displayNameOf, readProfile, type UserProfile } from '@/lib/auth/user-profile'
@@ -33,7 +33,9 @@ export function readMe(ctx: WorkspaceContext, locale: string | null = null): Me 
 }
 
 // What the app shows its user, with the language their account picked so the iOS app follows it.
+// A token issued before the account had a name does not carry it until its next refresh: the auth
+// server is asked for that account, and only for it.
 export async function loadMe(ctx: WorkspaceContext): Promise<Me> {
-    const { data } = await selectMaybeSingle(ctx.supabase, 'users', ['locale'] as const, { id: ctx.userId })
-    return readMe(ctx, data?.locale ?? null)
+    const authUser = readProfile(ctx.authUser).name ? ctx.authUser : ((await getAuthUser()) ?? ctx.authUser)
+    return readMe({ ...ctx, authUser }, ctx.userLocale)
 }

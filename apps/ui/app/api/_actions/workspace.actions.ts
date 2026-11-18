@@ -9,7 +9,7 @@ import { BLOB_ILLUSTRATIONS, getBlobByFile, randomBlob } from '@/lib/blobs/catal
 import { uploadPublicImage } from '@/lib/images/upload'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { enterSandbox, ensureSandboxSpace } from '@/app/api/_services/sandbox.service'
-import { readFirstName } from '@/lib/naming/first-name'
+import { accountFirstName } from '@/lib/naming/account-first-name'
 import { WORKSPACE_NAME_MAX, workspaceNameFrom } from '@/lib/naming/workspace-name'
 import { fetchLogoBytes, rasterizeVectorLogo } from '@/lib/workspace/fetch-logo'
 import { LOGO_MAX_BYTES, logoLinkImageUrl, readLogoLink } from '@/lib/workspace/logo-input'
@@ -126,7 +126,7 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
     const { data: workspace, error: workspaceError } = await supabase
         .from('workspaces')
         .insert<Database['public']['Tables']['workspaces']['Insert']>({
-            name: name.trim() || workspaceNameFrom({ firstName: readFirstName(session?.user_metadata) }),
+            name: name.trim() || workspaceNameFrom({ firstName: await accountFirstName(session) }),
             icon_url: icon?.url ?? randomBlob()?.url ?? null,
             plan: BASE_PLAN_SLUG,
             ...baseLimitsToColumns(),

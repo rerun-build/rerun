@@ -6,7 +6,7 @@ import { resolveEngineWaitlist } from '@/app/api/_services/waitlist.service'
 import { readAgentShare } from '@/lib/agents/share-read'
 import { isSubscriptionEntitled, parsePriceArm, trialArm } from '@rerun/cloud/billing'
 import { RERUN_CLOUD } from '@rerun/cloud/edition'
-import { readFirstName } from '@/lib/naming/first-name'
+import { accountFirstName } from '@/lib/naming/account-first-name'
 import { loadServiceCatalog } from '@/lib/templates/catalog'
 import { LIBRARY_COLUMNS, toLibraryTemplates, type LibraryRow } from '@/lib/templates/library'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -56,11 +56,12 @@ async function describeIntent(ctx: WorkspaceContext, intent: KickoffIntent): Pro
 
 export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: string | null, intent: KickoffIntent | null = null, client: ForemanClient = 'web'): Promise<ForemanState> {
     const actor = actorFromContext(ctx)
-    const [onboarding, { data: spaces }, { data: agents }, reach] = await Promise.all([
+    const [onboarding, { data: spaces }, { data: agents }, reach, firstName] = await Promise.all([
         selectMaybeSingle(ctx.supabase, 'workspace_onboarding', ['answers'] as const, { workspace_id: ctx.workspace.id }),
         selectMany(ctx.supabase, 'spaces', SPACE_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }),
         selectMany(ctx.supabase, 'agents', AGENT_COLUMNS, { workspace_id: ctx.workspace.id }, { column: 'created_at' }),
         isAdminActor(actor) ? Promise.resolve(null) : spaceAccessMap(actor),
+        accountFirstName(ctx.authUser),
     ])
     // A member's foreman sees the board through their Boxes. The phase still reads the whole
     // workspace: a member with nothing open to them is not a workspace to onboard.
@@ -97,7 +98,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         answers,
         foreman,
         onboardingCompletedAt,
-        firstName: readFirstName(ctx.authUser.user_metadata),
+        firstName,
         language: accountLanguage(ctx.userLocale) ?? foreman.language ?? preferredLanguage(acceptLanguage),
         entitled,
         trialing,

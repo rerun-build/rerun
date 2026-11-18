@@ -6,9 +6,9 @@ import { WORKSPACE_NAME_MAX } from '@/lib/naming/workspace-name'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 import { sessionWithMembership } from '@/test/session-membership'
 
-const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), uploadPublicImage: vi.fn(), lookup: vi.fn(), grantRerunTopup: vi.fn() }))
+const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), getAuthUser: vi.fn(), uploadPublicImage: vi.fn(), lookup: vi.fn(), grantRerunTopup: vi.fn() }))
 
-vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
+vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession, getAuthUser: mocks.getAuthUser }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_auth/expert', () => ({ hasPendingCreatorTerms: vi.fn(), isExpertAccount: vi.fn(), requireSandboxWorkspaceId: vi.fn() }))
 vi.mock('@/app/api/_services/sandbox.service', () => ({ enterSandbox: vi.fn(), ensureSandboxSpace: vi.fn() }))
@@ -282,6 +282,14 @@ describe('createWorkspaceAction', () => {
 
         await expect(createWorkspaceAction('Acme')).resolves.toEqual({ ok: true, workspaceId: NEW_WORKSPACE_ID })
         expect(mocks.grantRerunTopup).toHaveBeenCalledWith(NEW_WORKSPACE_ID, SIGNUP_ALLOWANCE_MICROS)
+    })
+
+    it('names a workspace left unnamed after a first name the token does not carry yet', async () => {
+        const db = creatableDatabase()
+        mocks.getAuthUser.mockResolvedValue({ user_metadata: { first_name: 'ada' } })
+
+        await expect(createWorkspaceAction('  ')).resolves.toEqual({ ok: true, workspaceId: NEW_WORKSPACE_ID })
+        expect(db.writes('workspaces')[0].payload).toMatchObject({ name: "Ada's workspace" })
     })
 
     it('grants nothing when the workspace could not be created', async () => {

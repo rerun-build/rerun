@@ -57,7 +57,9 @@ export async function mergeForeman(ctx: WorkspaceContext, patch: ForemanProfile)
 export async function saveFirstName(ctx: WorkspaceContext, firstName: string): Promise<void> {
     const metadata = ctx.authUser.user_metadata ?? {}
     const fullName = typeof metadata.full_name === 'string' && metadata.full_name ? metadata.full_name : firstName
-    await ctx.supabase.auth.admin.updateUserById(ctx.userId, { user_metadata: { ...metadata, first_name: firstName, full_name: fullName } })
+    // Supabase merges the keys it is handed into the stored metadata: only what changes is sent, so
+    // nothing the token still holds from before is written back over a newer value.
+    await ctx.supabase.auth.admin.updateUserById(ctx.userId, { user_metadata: { first_name: firstName, full_name: fullName } })
 }
 
 export async function saveForemanProfile(ctx: WorkspaceContext, args: Record<string, unknown>): Promise<ForemanAnswers> {

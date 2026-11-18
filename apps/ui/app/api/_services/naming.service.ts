@@ -1,7 +1,7 @@
 import type { Database } from '@/app/api/database.types'
 import { workspaceFounderUserId } from '@/app/api/_auth/ownership'
 import { isBlobUrl } from '@/lib/blobs/catalog'
-import { readFirstName } from '@/lib/naming/first-name'
+import { accountFirstName } from '@/lib/naming/account-first-name'
 import { DEFAULT_WORKSPACE_NAME, workspaceNameFrom } from '@/lib/naming/workspace-name'
 import { boxNameFrom, companyNameFromAnswers, industryFromAnswers } from '@/lib/onboarding/box-name'
 import { faviconUrl, siteDomain } from '@/lib/onboarding/site-favicon'
@@ -25,7 +25,7 @@ async function onboardingProfile(workspaceId: number): Promise<Profile> {
         companyName: companyNameFromAnswers(answers),
         companyUrl: (answers as { company_url?: string } | null)?.company_url ?? null,
         industry: industryFromAnswers(answers),
-        firstName: readFirstName(session?.user_metadata) || null,
+        firstName: (await accountFirstName(session)) || null,
     }
 }
 
