@@ -38,6 +38,17 @@ class RunnerLines(unittest.TestCase):
     def test_a_cd_then_uvx_run_line_is_refused(self):
         self.assertIn(UVX_ERROR, errors_for("cd tools/factory && uvx ruff check ."))
 
+    def test_uvx_after_env_a_second_command_or_another_runner_is_refused(self):
+        for line in [
+            "env A=1 uvx ruff check .",
+            "cd tools/factory && python3 -V && uvx ruff check .",
+            "uv tool run ruff check .",
+            "pipx run ruff check .",
+            "A=1 uvx ruff",
+        ]:
+            with self.subTest(line=line):
+                self.assertIn(UVX_ERROR, errors_for(line))
+
     def test_python_run_lines_pass(self):
         run = "\n".join([
             'cd tools/factory && python3 -I -m unittest discover -s . -p "test_cutshape_runner.py" -v',
