@@ -215,7 +215,7 @@ describe('/api/chat/foreman/engine', () => {
     })
 
     it('reopens one conversation by its id, its transcript still at the top of the answer', async () => {
-        vi.mocked(loadForemanConversationById).mockResolvedValue({ sessionId: 'thread', title: 'Gmail', backend: 'engine', kind: 'thread', messages: [], usage: null, lastError: null, activeRunId: 'run-9' })
+        vi.mocked(loadForemanConversationById).mockResolvedValue({ sessionId: 'thread', title: 'Gmail', backend: 'engine', kind: 'thread', messages: [], proposals: [], usage: null, lastError: null, activeRunId: 'run-9' })
 
         const response = await GET(new Request(`${URL}?sessionId=thread`))
 

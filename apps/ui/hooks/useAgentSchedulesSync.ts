@@ -56,13 +56,19 @@ export function useAgentSchedulesSync(workspaceId: number | undefined) {
     )
     const refreshKey = useBoardStore(state => state.schedulesRefreshKey)
     const mounted = useRef(false)
+    // Read through a ref: the workspace arriving gives `sync` a new identity, which the interval
+    // above already answers with a read. Listed below, it asked for the same list again a beat later.
+    const latestSync = useRef(sync)
+    useEffect(() => {
+        latestSync.current = sync
+    }, [sync])
 
     useEffect(() => {
         if (!mounted.current) {
             mounted.current = true
             return
         }
-        const timer = setTimeout(sync, RUN_SETTLE_MS)
+        const timer = setTimeout(() => void latestSync.current(), RUN_SETTLE_MS)
         return () => clearTimeout(timer)
-    }, [sync, workingSessions, switchedOff, refreshKey])
+    }, [workingSessions, switchedOff, refreshKey])
 }

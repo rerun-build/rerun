@@ -25,6 +25,7 @@ import { sealPendingWidgets, withTypedAnswer } from '@/lib/foreman/seal-pending'
 import { selectForemanBackend, selectForemanOpen, useForemanStore } from '@/stores/foreman.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
 import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
+import type { EngineSkillProposal } from '@/lib/engine/types'
 
 // The foreman's chat, on whichever loop serves the conversation.
 //
@@ -41,7 +42,7 @@ import { useRealtimeSubscription } from '@/supabase/useRealtimeSubscription'
 // On the engine, the conversation on screen is General or one of its threads, and the chat is keyed
 // on it: switching reads the one that takes the screen from the server, as a reload would.
 
-type RestoredConversation = { sessionId: string; backend: ForemanBackend; messages: UIMessage[]; usage?: SessionUsageSeed | null; lastError?: string | null; activeRunId?: string | null }
+type RestoredConversation = { sessionId: string; backend: ForemanBackend; messages: UIMessage[]; usage?: SessionUsageSeed | null; lastError?: string | null; activeRunId?: string | null; proposals?: EngineSkillProposal[] }
 
 const ENGINE_ROUTE = '/api/chat/foreman/engine'
 
@@ -343,6 +344,8 @@ export function useForemanChat() {
     const [readDoneFor, setReadDoneFor] = useState<string | null>(null)
     const draftId = useForemanStore(state => state.draftId)
     const restoreDone = readDoneFor === sessionId || draftId === sessionId
+    // The skill proposals waiting in the conversation just read, which come with its transcript.
+    const [restoredProposals, setRestoredProposals] = useState<{ sessionId: string; rows: EngineSkillProposal[] } | null>(null)
     useEffect(() => {
         // Not before the Foreman is opened or called on from its pill: the column is mounted on every
         // board load, and a transcript carries its tool outputs with it. The 300ms the panel takes to
@@ -365,6 +368,7 @@ export function useForemanChat() {
                     readFor.current = conversation.sessionId
                     useForemanStore.getState().setGeneral(conversation.sessionId, backend)
                 }
+                if (conversation) setRestoredProposals({ sessionId: id, rows: conversation.proposals ?? [] })
                 if (!conversation?.messages?.length) return setReadDoneFor(id)
                 restored.current = { ...conversation, sessionId: id, backend, messages: conversation.messages }
                 setRestoredTick(tick => tick + 1)
@@ -450,5 +454,5 @@ export function useForemanChat() {
     // A stream being chased is not a failure yet: the error only shows once the chase gave up.
     const error = onEngine && reconnecting ? undefined : chat.error
 
-    return { ...chat, error, stop, stopping, sendMessage: send, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting: onEngine && reconnecting, activeRunId: onEngine ? activeRunId : null }
+    return { ...chat, error, stop, stopping, sendMessage: send, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, restoredProposals, composerBackend, backend, contextStats, runError, reconnecting: onEngine && reconnecting, activeRunId: onEngine ? activeRunId : null }
 }

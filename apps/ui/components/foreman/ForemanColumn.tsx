@@ -80,15 +80,15 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided && !pinned
     const hasCard = useForemanStore(state => state.hasCard)
     const { workspace, phoneStep } = useSession()
-    const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
+    const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, restoredProposals, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
     // Its skill proposals, as a coworker's chat reads them, once its engine keeps skills of its own.
     const skillProposals = useSkillProposals(hasCard && backend === 'engine' ? sessionId : null, status)
-    // A coworker's chat is handed its waiting proposals with the session it opens; the column reads them itself.
-    const refreshProposals = skillProposals.refresh
+    // Like a coworker's chat, the column is handed the waiting proposals with the conversation it opens.
+    const seedProposals = skillProposals.seed
     useEffect(() => {
-        void refreshProposals().catch(() => {})
-    }, [refreshProposals])
+        if (restoredProposals) seedProposals(restoredProposals.sessionId, restoredProposals.rows)
+    }, [restoredProposals, seedProposals])
     // Its skills are read on its card: the tab that holds it, or the column beside the chat in the Simple view.
     const openCardSkill = useCallback(
         (slug: string) => {

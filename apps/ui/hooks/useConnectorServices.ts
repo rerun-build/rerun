@@ -61,7 +61,9 @@ function subscribe(agentId: string, listener: () => void) {
         listeners.set(agentId, set)
     }
     set.add(listener)
-    if (!snapshots.has(agentId)) void load(agentId)
+    // A subscriber arriving while the first read runs waits for it: asking again would queue a
+    // second read of the same registry behind it.
+    if (!snapshots.has(agentId) && !inflight.has(agentId)) void load(agentId)
     return () => {
         set.delete(listener)
     }

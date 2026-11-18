@@ -2,6 +2,7 @@ import { actorFromContext, assertAgentAccess, assertSessionInWorkspace, keepVisi
 import { AuthorizationError, type WorkspaceContext } from '@/app/api/_auth/ownership'
 import { createSessionRow, getSessionEngineContext, lastRunError, listSessionRuns, readUsageSeed, resolveAgentTarget, type SessionUsageSeed, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { type HistoryMessage, transformEngineMessages } from '@/lib/chat/engine-history'
+import { EMPTY_SESSION_SNAPSHOT, type SessionSnapshot } from '@/lib/chat/session-snapshot'
 import { openSkillProposal, pendingRequestPeek, type PendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
@@ -365,16 +366,6 @@ export async function readPendingRequest(sessionId: string): Promise<PendingRequ
     const [messages, proposals] = await Promise.all([getSessionMessages(conn, engineAgentId, engineSessionId).then(transformEngineMessages), listSkillProposals(conn, engineAgentId, engineSessionId).catch(() => [])])
     return pendingRequestPeek(messages, openSkillProposal(proposals))
 }
-
-export type SessionSnapshot = {
-    messages: HistoryMessage[]
-    usage: SessionUsageSeed | null
-    lastError: string | null
-    activeRunId: string | null
-    proposals: EngineSkillProposal[]
-}
-
-export const EMPTY_SESSION_SNAPSHOT: SessionSnapshot = { messages: [], usage: null, lastError: null, activeRunId: null, proposals: [] }
 
 // Everything a reopened conversation shows, from one resolution of the session and one read of its
 // runs. Each part fails on its own: a transcript with no usage gauge beats no transcript at all.

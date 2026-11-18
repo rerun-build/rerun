@@ -12,7 +12,7 @@ import { seedSessionTitle } from '@/lib/chat/session-title'
 import { transformEngineMessages } from '@/lib/chat/engine-history'
 import { openSkillProposal, pendingRequestPeek } from '@/lib/chat/pending-request-peek'
 import { cancelRun, getSessionMessages, listRuns, listSkillProposals } from '@/lib/engine/client'
-import type { EngineConnection } from '@/lib/engine/types'
+import type { EngineConnection, EngineSkillProposal } from '@/lib/engine/types'
 import type { ForemanBackend } from './phase'
 import { stripAttachmentsRef } from '@/lib/chat/attachments-marker'
 import { dedupeMessagesById } from '@/lib/foreman/dedupe-messages'
@@ -31,7 +31,9 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 // run that died without answering and the run still in flight are read back with the transcript.
 export type ForemanRunState = { usage: SessionUsageSeed | null; lastError: string | null; activeRunId: string | null }
 
-export type ForemanConversation = { sessionId: string; title: string | null; backend: ForemanBackend; kind: SessionKind; messages: UIMessage[] } & ForemanRunState
+// `proposals`: the skill proposals still waiting in it, handed over with the transcript so the
+// column does not ask for them in a call of its own.
+export type ForemanConversation = { sessionId: string; title: string | null; backend: ForemanBackend; kind: SessionKind; messages: UIMessage[]; proposals: EngineSkillProposal[] } & ForemanRunState
 
 const NO_RUN_STATE: ForemanRunState = { usage: null, lastError: null, activeRunId: null }
 
@@ -94,14 +96,18 @@ async function readConversation(ctx: WorkspaceContext, data: ConversationRow): P
     const backend: ForemanBackend = data.backend === 'engine' ? 'engine' : 'hub'
     const base = { sessionId: data.id, title: data.title, backend, kind: data.kind }
     if (backend === 'engine') {
-        if (!data.engine_session_id) return { ...base, messages: [], ...NO_RUN_STATE }
+        if (!data.engine_session_id) return { ...base, messages: [], proposals: [], ...NO_RUN_STATE }
         const conn = await getWorkspaceConnection(ctx.workspace.id)
         // Each part fails on its own: a transcript with no gauge beats no transcript at all, and an
-        // engine that predates the foreman's run routes answers 403 to the second read.
-        const [messages, runState] = await Promise.all([readEngineTranscript(conn, data.engine_session_id), readRunState(conn, data.engine_session_id).catch(() => NO_RUN_STATE)])
-        return { ...base, messages, ...runState }
+        // engine that predates the foreman's run routes, or its skills, answers 403 to the other reads.
+        const [messages, runState, proposals] = await Promise.all([
+            readEngineTranscript(conn, data.engine_session_id),
+            readRunState(conn, data.engine_session_id).catch(() => NO_RUN_STATE),
+            listSkillProposals(conn, FOREMAN_AGENT_ID, data.engine_session_id).catch(() => []),
+        ])
+        return { ...base, messages, proposals, ...runState }
     }
-    return { ...base, messages: withMessageIds(data.id, dedupeMessagesById((data.messages ?? []) as unknown as UIMessage[])), ...NO_RUN_STATE }
+    return { ...base, messages: withMessageIds(data.id, dedupeMessagesById((data.messages ?? []) as unknown as UIMessage[])), proposals: [], ...NO_RUN_STATE }
 }
 
 const LIST_COLUMNS = ['id', 'kind', 'title', 'status', 'first_message', 'engine_session_id', 'created_at', 'updated_at'] as const

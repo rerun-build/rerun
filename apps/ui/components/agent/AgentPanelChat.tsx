@@ -1,6 +1,7 @@
 'use client'
 
-import { getGeneralSessionAction, renameSessionAction } from '@/app/api/_actions/session.actions'
+import { renameSessionAction } from '@/app/api/_actions/session.actions'
+import { fetchGeneralSession } from '@/lib/chat/session-snapshot'
 import { useAgentSetup } from '@/hooks/useAgentSetup'
 import { useAgentThreads } from '@/hooks/useAgentThreads'
 import { invalidateAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
@@ -74,7 +75,7 @@ export function AgentPanelChat({ agentId, agentName, selected, openSessionReques
     const [generalLookedUp, setGeneralLookedUp] = useState(false)
     useEffect(() => {
         let alive = true
-        getGeneralSessionAction(agentId)
+        fetchGeneralSession(agentId)
             .then(general => alive && general && setGeneralSessionId(general.id))
             .catch(() => {})
             .finally(() => alive && setGeneralLookedUp(true))

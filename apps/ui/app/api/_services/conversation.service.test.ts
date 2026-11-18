@@ -9,7 +9,8 @@ import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { adoptEngineSession, cancelSessionRuns, EMPTY_SESSION_SNAPSHOT, finalizeSession, listAgentConversations, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, renameSession, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
+import { adoptEngineSession, cancelSessionRuns, finalizeSession, listAgentConversations, listAgentThreads, listWorkspaceConversationOverview, markSessionsHandled, readSessionSnapshot, renameSession, searchWorkspaceConversations, THREAD_FEED_LIMIT } from './conversation.service'
+import { EMPTY_SESSION_SNAPSHOT } from '@/lib/chat/session-snapshot'
 
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectMaybeSingle: vi.fn() }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))

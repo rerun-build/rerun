@@ -36,7 +36,8 @@ import { ComputerAccessBlock } from '@/components/chat/computer/ComputerAccessBl
 import { SkeletonChat } from '@/components/ui/skeleton'
 
 import { cancelRunAction, getRunAction, updateAgentConfigAction } from '@/app/api/_actions/agent.actions'
-import { acknowledgeSessionAlertAction, cancelSessionRunsAction, fetchSessionActiveRun, fetchSessionMessages, finalizeSessionAction, openSessionAction } from '@/app/api/_actions/session.actions'
+import { acknowledgeSessionAlertAction, cancelSessionRunsAction, fetchSessionActiveRun, fetchSessionMessages, finalizeSessionAction } from '@/app/api/_actions/session.actions'
+import { fetchSessionSnapshot } from '@/lib/chat/session-snapshot'
 import type { SessionUsageSeed } from '@/app/api/_services/chat.service'
 import type { ThreadRow } from '@/app/api/_services/conversation.service'
 import { useAgentModel } from '@/hooks/useAgentModel'
@@ -501,7 +502,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         historyLoadedRef.current = sessionId
         setHistoryLoading(true)
         setSnapshotPendingFor(sessionId)
-        openSessionAction(sessionId)
+        fetchSessionSnapshot(sessionId)
             .then(snapshot => {
                 // A run attached while this fetch was in flight: the transcript is the stream's
                 // now, and writing the persisted history back would wipe what it has emitted.
