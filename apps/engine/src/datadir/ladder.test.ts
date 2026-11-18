@@ -14,6 +14,8 @@ const { writeEnvFile, readEnvFile } = await import('../lib/env-file.js')
 const { raw } = await import('../db/client.js')
 const { buildCommit } = await import('../runtime/build-info.js')
 const { listConnections, unloadConnection } = await import('../connections/registry.js')
+const { createConnection } = await import('../connections/store.js')
+const { loadConnectionFromDisk } = await import('../connections/loader.js')
 const { DATA_DIR_MIGRATIONS, DATA_DIR_VERSION } = await import('./migrations.js')
 const { migrateDataDir, prepareDataDir } = await import('./ladder.js')
 const { readDataVersion, writeDataVersion } = await import('./version.js')
@@ -259,6 +261,46 @@ describe('v4 to v5: vault', () => {
     })
 })
 
+describe('v6 to v7: gpt-6-2-models', () => {
+    const gpt62 = DATA_DIR_MIGRATIONS.find(s => s.id === 'gpt-6-2-models')!
+    const modelsOf = async (id: string) => (await loadConnectionFromDisk(id)).config.models
+
+    // The connections a box carried before GPT-6.2, curated the way their owners left them.
+    async function connectionsFromV6() {
+        const codex = await createConnection({ name: 'Codex', provider: 'codex', models: ['gpt-6-sol', 'gpt-6-luna'], extraModels: [], keys: {} })
+        const openai = await createConnection({ name: 'OpenAI', provider: 'openai', models: ['gpt-6-astra'], extraModels: [], keys: {} })
+        const openrouter = await createConnection({ name: 'OpenRouter', provider: 'openrouter', models: ['anthropic/claude-opus-5.5'], extraModels: ['openai/gpt-6.2-sol'], keys: {} })
+        const anthropic = await createConnection({ name: 'Anthropic', provider: 'anthropic', models: ['claude-opus-5-5'], extraModels: [], keys: {} })
+        return { codex: codex.id, openai: openai.id, openrouter: openrouter.id, anthropic: anthropic.id }
+    }
+
+    it('switches GPT-6.2 on after the models already there, from v6', async () => {
+        const ids = await connectionsFromV6()
+        await writeDataVersion(6)
+        await migrateDataDir()
+        expect(readDataVersion()).toBe(DATA_DIR_VERSION)
+        expect(await modelsOf(ids.codex)).toEqual(['gpt-6-sol', 'gpt-6-luna', 'gpt-6.2-sol', 'gpt-6.2-astra'])
+        expect(await modelsOf(ids.openai)).toEqual(['gpt-6-astra', 'gpt-6.2-astra', 'gpt-6.2-sol'])
+        expect(await modelsOf(ids.openrouter)).toEqual(['anthropic/claude-opus-5.5', 'openai/gpt-6.2-astra'])
+        expect(await modelsOf(ids.anthropic)).toEqual(['claude-opus-5-5'])
+    })
+
+    it('keeps a model already switched on where it is, and replays without harm', async () => {
+        const codex = await createConnection({ name: 'Codex', provider: 'codex', models: ['gpt-6.2-astra', 'gpt-6-sol'], extraModels: [], keys: {} })
+        await gpt62.up()
+        await gpt62.up()
+        expect(await modelsOf(codex.id)).toEqual(['gpt-6.2-astra', 'gpt-6-sol', 'gpt-6.2-sol'])
+    })
+
+    it('leaves a connection it cannot read as it is', async () => {
+        await mkdir(resolve(connectionsDir(), 'broken'), { recursive: true })
+        await writeFile(resolve(connectionsDir(), 'broken', 'connection.json'), 'not json', 'utf8')
+        const codex = await createConnection({ name: 'Codex', provider: 'codex', models: ['gpt-6-sol'], extraModels: [], keys: {} })
+        await expect(gpt62.up()).resolves.toBeUndefined()
+        expect(await modelsOf(codex.id)).toEqual(['gpt-6-sol', 'gpt-6.2-sol', 'gpt-6.2-astra'])
+    })
+})
+
 // Append-only: a shipped step is never removed nor renamed, because a data-dir archived before it
 // still needs it. Updating this snapshot is the change to look at twice.
 describe('data-dir ladder', () => {
@@ -293,6 +335,10 @@ describe('data-dir ladder', () => {
             [
               6,
               "vault-adopt",
+            ],
+            [
+              7,
+              "gpt-6-2-models",
             ],
           ]
         `)

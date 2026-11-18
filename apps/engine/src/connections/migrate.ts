@@ -101,6 +101,24 @@ async function renameAliasedModels(): Promise<void> {
     if (boxDefault && canonicalModelId(boxDefault.model) !== boxDefault.model) await writeBoxDefault({ ...boxDefault, model: canonicalModelId(boxDefault.model) })
 }
 
+// Switches newly released models on for the connections of the providers that serve them, at the end
+// of each list so the model a connection runs when none is named stays the same. A step of the
+// data-dir ladder calls it once per box: a model someone switches off afterwards stays off. A
+// connection that does not parse is left as it is rather than keeping the engine from booting.
+export async function switchOnModels(added: Partial<Record<Provider, string[]>>): Promise<void> {
+    for (const id of await listConnectionIds()) {
+        try {
+            const { config } = await loadConnectionFromDisk(id)
+            const missing = (added[config.provider] ?? []).filter(model => !config.models.includes(model) && !config.extraModels.includes(model))
+            if (!missing.length) continue
+            await patchConnection(id, { models: [...config.models, ...missing] })
+            logger.info({ connection: id, models: missing }, 'switched new models on for connection')
+        } catch (err) {
+            logger.warn({ connection: id, err: (err as Error).message }, 'new models left off on connection')
+        }
+    }
+}
+
 // Brings the connections in line with today's code on every boot, after the migration ladder:
 // these are not steps in the data-dir's history but whatever the current ids and rules happen to be.
 export async function reconcileConnections(): Promise<void> {

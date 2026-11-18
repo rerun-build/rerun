@@ -3,7 +3,7 @@ import { chmod, lstat, mkdir, readdir, rename, writeFile } from 'node:fs/promise
 import { resolve } from 'node:path'
 import { migrate } from '../db/migrate.js'
 import { latestVersion } from '../db/ladder.js'
-import { foldAgentKeysIntoConnections } from '../connections/migrate.js'
+import { foldAgentKeysIntoConnections, switchOnModels } from '../connections/migrate.js'
 import { agentsDir, boxPlanPath, configPath, isPathSegment, mcpDir, mcpPackagesDir, vaultDir } from '../config/paths.js'
 import { logger } from '../lib/logger.js'
 import { adoptConnectors } from '../vault/adopt.js'
@@ -120,6 +120,20 @@ export const DATA_DIR_MIGRATIONS: DataDirMigration[] = [
         up: async () => {
             await mkdir(vaultDir(), { recursive: true, mode: 0o700 })
             await adoptConnectors()
+        },
+    },
+    {
+        // GPT-6.2 Astra and Sol (17/11/2026), switched on for the ChatGPT, OpenAI and OpenRouter
+        // connections that already exist, as a new connection has them. The ids are written out
+        // rather than read from today's defaults, so a data-dir restored later gets exactly these.
+        version: 7,
+        id: 'gpt-6-2-models',
+        up: async () => {
+            await switchOnModels({
+                codex: ['gpt-6.2-sol', 'gpt-6.2-astra'],
+                openai: ['gpt-6.2-astra', 'gpt-6.2-sol'],
+                openrouter: ['openai/gpt-6.2-astra', 'openai/gpt-6.2-sol'],
+            })
         },
     },
 ]
