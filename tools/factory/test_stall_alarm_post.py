@@ -1,4 +1,5 @@
-import io, json, os, sys, tempfile, unittest
+import contextlib, io, json, os, sys, tempfile, unittest
+from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -107,6 +108,47 @@ class StallAlarmPost(unittest.TestCase):
         self.assertEqual(self.gh.posts, [])
         with open(self.boss) as f:
             self.assertEqual(len(f.read().splitlines()), 2)
+
+
+    def test_a_failed_post_does_not_stop_the_pass(self):
+        class TwoRuns(FakeEngine):
+            def list_agents(self):
+                return [{"id": "agt-coder", "name": "coder"}]
+
+            def list_runs(self, agent_id, status=None, limit=50):
+                self.calls.append((agent_id, status))
+                return [
+                    {"id": "r1", "agentId": "agt-coder", "status": "running", "startedAt": "2026-11-16T12:10:00.000Z", "jobRef": "rerun#52", "branch": None},
+                    {"id": "r2", "agentId": "agt-coder", "status": "running", "startedAt": "2026-11-16T12:10:00.000Z", "jobRef": "rerun#53", "branch": None},
+                ]
+
+        class Hang502(FakeGh):
+            def req(self, method, path, body=None):
+                if path == "/issues/52/comments":
+                    raise GhError("POST /issues/52/comments failed: HTTP 502", 502)
+                return FakeGh.req(self, method, path, body)
+
+        gh = Hang502()
+        lines = S.alarm(TwoRuns(), lambda repo: gh, self.boss, NOW)
+        first = "STALL coder run r1 job rerun#52 running 50 min, branch - last push - (not posted to rerun#52: POST /issues/52/comments failed: HTTP 502)"
+        second = "STALL coder run r2 job rerun#53 running 50 min, branch - last push -"
+        self.assertEqual(lines, [first, second])
+        self.assertEqual(gh.posts, [("POST", "/issues/53/comments", {"body": second})])
+        with open(self.boss) as f:
+            self.assertEqual(f.read(), first + "\n" + second + "\n")
+
+    def test_live_connects_engine_and_github(self):
+        solo = "STALL kent run run-solo job - running 60 min, branch - last push -"
+        with mock.patch.object(S, "Engine", return_value=FakeEngine()) as engine, \
+                mock.patch.object(S.ghclient, "Client", return_value=self.gh) as client, \
+                mock.patch.object(S.time, "time", return_value=NOW), \
+                contextlib.redirect_stdout(io.StringIO()) as out:
+            code = S.main(["stall_alarm.py", "--live", "--boss-file", self.boss])
+        self.assertEqual(code, 0)
+        engine.assert_called_once_with()
+        self.assertEqual(client.call_args_list, [mock.call("https://api.github.com", "special-place-ai-heaven/rerun")])
+        self.assertEqual(out.getvalue(), LINE + "\n" + solo + "\n")
+        self.assertEqual(self.gh.posts, [("POST", "/issues/52/comments", {"body": LINE})])
 
 
 if __name__ == "__main__":

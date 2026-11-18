@@ -61,7 +61,10 @@ def alarm(eng, gh_for, boss_file, now_s, limit_s=DEFAULT_LIMIT_S):
             gh = gh_for(repo)
         text = line(run, names[run["id"]], last_push(gh, run.get("branch")), now_s)
         if gh is not None:
-            gh.req("POST", "/issues/%s/comments" % number, {"body": text})
+            try:
+                gh.req("POST", "/issues/%s/comments" % number, {"body": text})
+            except (ghclient.GhError, OSError, ValueError) as e:
+                text += " (not posted to %s: %s)" % (job, e if isinstance(e, ghclient.GhError) else type(e).__name__)
         with open(boss_file, "a") as f:
             f.write(text + "\n")
         posted.append(text)
