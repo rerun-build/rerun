@@ -25,6 +25,6 @@ export function toolError(id: unknown, message: string): Response {
     return rpcResult(id, { content: [{ type: 'text', text: JSON.stringify({ error: message }) }], isError: true })
 }
 
-export function toolResult(id: unknown, data: unknown): Response {
-    return rpcResult(id, { content: [{ type: 'text', text: JSON.stringify(data) }] })
+export function toolResult(id: unknown, data: unknown, notes: string[] = []): Response {
+    return rpcResult(id, { content: [{ type: 'text', text: JSON.stringify(data) }, ...notes.map(note => ({ type: 'text', text: note }))] })
 }

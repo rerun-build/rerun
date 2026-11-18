@@ -26,7 +26,8 @@ export type AppDefinition = AppInfo & {
     tools: AppTool[]
     scopes: Record<string, AppScope>
     quotaClaim(action: string, at: Date): { periods: string[]; maxes: number[] }
-    quotaRefusal(action: string): string
+    quotaNotice(action: string, counts: number[]): string | null
+    quotaPace(action: string): string
     envelopeKind(envelope: LinkupEnvelope): EnvelopeKind
     wakePayload(event: string, envelope: LinkupEnvelope, accountLabel: string | null, attachments: AttachmentSummary[]): Record<string, unknown>
     // The ids a file of this envelope is downloaded with, besides its own.
@@ -53,7 +54,8 @@ const APPS: Record<AppSlug, AppDefinition> = {
         tools: LINKEDIN_TOOLS,
         scopes: LINKEDIN_SCOPES,
         quotaClaim: linkedinQuotas.quotaClaim,
-        quotaRefusal: linkedinQuotas.quotaRefusal,
+        quotaNotice: linkedinQuotas.quotaNotice,
+        quotaPace: linkedinQuotas.quotaPace,
         envelopeKind: linkedinEvents.envelopeKind,
         wakePayload: linkedinEvents.wakePayload,
         attachmentBase: linkedinEvents.attachmentBase,
@@ -71,7 +73,8 @@ const APPS: Record<AppSlug, AppDefinition> = {
         tools: WHATSAPP_TOOLS,
         scopes: WHATSAPP_SCOPES,
         quotaClaim: whatsappQuotas.quotaClaim,
-        quotaRefusal: whatsappQuotas.quotaRefusal,
+        quotaNotice: whatsappQuotas.quotaNotice,
+        quotaPace: whatsappQuotas.quotaPace,
         envelopeKind: whatsappEvents.envelopeKind,
         wakePayload: whatsappEvents.wakePayload,
         attachmentBase: whatsappEvents.attachmentBase,

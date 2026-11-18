@@ -330,7 +330,7 @@ export interface AnalyticsEventMap {
     app_slot_checkout: { app: string; trial: boolean }
     app_trial_started: { app: string }
     app_trial_converted: { app: string; outcome: 'charged' | 'declined' | 'nothing_to_charge' }
-    // A coworker stopped by a daily limit: how often the caps bite, and on what.
+    // An account that just went past its recommended pace for an action: how often, and on what.
     app_quota_hit: { app: string; action: string }
     // One provider event and the coworkers it woke, zero included.
     app_event_fired: { app: string; event: string; woken: number }

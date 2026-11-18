@@ -20,6 +20,14 @@ export async function claimQuota(supabase: Client, scope: string, action: string
     return data === true
 }
 
+// Counts a call against every window of its pace and returns the counts after it, in the order of
+// `periods`. Never refuses: a pace is a recommendation the coworker tells the user about.
+export async function countUsage(supabase: Client, scope: string, action: string, periods: string[], amount = 1): Promise<number[]> {
+    const { data, error } = await supabase.rpc('count_app_usage', { p_scope: scope, p_action: action, p_periods: periods, p_amount: amount })
+    if (error) throw new Error(error.message)
+    return data ?? []
+}
+
 export function connectionScope(connectionId: string): string {
     return `connection:${connectionId}`
 }

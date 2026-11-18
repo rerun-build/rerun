@@ -1,6 +1,7 @@
-// The daily and weekly limits a paid app puts on each connected account, and the counters they are
-// claimed against (claim_app_quota). Each app writes its own table; every limit can be raised from
-// the env without a deploy of code, e.g. LINKEDIN_QUOTA_INVITATION_DAY=40.
+// The daily and weekly pace a paid app recommends for each connected account, and the counters it is
+// measured against (count_app_usage). A pace never refuses a call: past it, the tool adds a notice so
+// the coworker tells the user the risk, and the user decides. Each app writes its own table; every
+// pace can be changed from the env without a deploy of code, e.g. LINKEDIN_QUOTA_INVITATION_DAY=40.
 
 export type QuotaWindow = 'day' | 'week'
 
@@ -29,10 +30,14 @@ export function periodKey(window: QuotaWindow, at: Date): string {
 export type QuotaTable<A extends string> = {
     quotaLimits: (action: A, env?: Env) => QuotaLimit[]
     quotaClaim: (action: A, at: Date, env?: Env) => { periods: string[]; maxes: number[] }
-    quotaRefusal: (action: A, env?: Env) => string
+    // The counts are those of quotaClaim's periods, after the call: null while none is past its pace.
+    quotaNotice: (action: A, counts: number[], env?: Env) => string | null
+    quotaPace: (action: A, env?: Env) => string
 }
 
-export function defineQuotas<A extends string>({ envPrefix, limits, nouns, refusal }: { envPrefix: string; limits: Record<A, QuotaLimit[]>; nouns: Record<A, string>; refusal: (noun: string, windows: string, action: A) => string }): QuotaTable<A> {
+const WINDOW_NOW: Record<QuotaWindow, string> = { day: 'today', week: 'this week' }
+
+export function defineQuotas<A extends string>({ envPrefix, limits, nouns, notice }: { envPrefix: string; limits: Record<A, QuotaLimit[]>; nouns: Record<A, string>; notice: (noun: string, overage: string, action: A) => string }): QuotaTable<A> {
     const override = (action: A, window: QuotaWindow, env: Env): number | null => {
         const raw = env[`${envPrefix}_${action.toUpperCase()}_${window.toUpperCase()}`]
         if (!raw) return null
@@ -46,7 +51,14 @@ export function defineQuotas<A extends string>({ envPrefix, limits, nouns, refus
             const current = quotaLimits(action, env)
             return { periods: current.map(limit => periodKey(limit.window, at)), maxes: current.map(limit => limit.max) }
         },
-        quotaRefusal: (action, env = process.env) => refusal(nouns[action], quotaLimits(action, env).map(limit => `${limit.max} per ${limit.window}`).join(', '), action),
+        quotaNotice: (action, counts, env = process.env) => {
+            const past = quotaLimits(action, env)
+                .map((limit, index) => ({ ...limit, count: counts[index] ?? 0 }))
+                .filter(limit => limit.count > limit.max)
+            if (past.length === 0) return null
+            return notice(nouns[action], past.map(limit => `${limit.count} ${WINDOW_NOW[limit.window]}, ${limit.max} per ${limit.window} recommended`).join('; '), action)
+        },
+        quotaPace: (action, env = process.env) => `Recommended ${nouns[action]} pace for this account: ${quotaLimits(action, env).map(limit => `${limit.max} per ${limit.window}`).join(', ')}.`,
     }
 }
 

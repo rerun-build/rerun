@@ -1,13 +1,15 @@
 import { describe, expect, it, vi } from 'vitest'
 import { APP_INFO, APP_LIST_TOOLS, APP_RUN_TOOL } from './catalog'
 import { listedTools, readDirectory, resolveRunTool } from './directory'
+import { quotaPace as linkedinPace } from './linkedin/quotas'
 import { LINKEDIN_SCOPES, LINKEDIN_TOOLS } from './linkedin/tools'
+import { quotaPace as whatsappPace } from './whatsapp/quotas'
 import { WHATSAPP_SCOPES, WHATSAPP_TOOLS } from './whatsapp/tools'
 
 vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/linkup/client')>()), runFlatEndpoint: vi.fn(), runAction: vi.fn() }))
 
-const linkedin = { ...APP_INFO.linkedin, tools: LINKEDIN_TOOLS, scopes: LINKEDIN_SCOPES }
-const whatsapp = { ...APP_INFO.whatsapp, tools: WHATSAPP_TOOLS, scopes: WHATSAPP_SCOPES }
+const linkedin = { ...APP_INFO.linkedin, tools: LINKEDIN_TOOLS, scopes: LINKEDIN_SCOPES, quotaPace: (action: string) => linkedinPace(action as Parameters<typeof linkedinPace>[0], {}) }
+const whatsapp = { ...APP_INFO.whatsapp, tools: WHATSAPP_TOOLS, scopes: WHATSAPP_SCOPES, quotaPace: (action: string) => whatsappPace(action as Parameters<typeof whatsappPace>[0], {}) }
 
 const loadedNames = (app: typeof linkedin | typeof whatsapp) => listedTools(app).map(tool => tool.name)
 
@@ -48,6 +50,16 @@ describe('the tools a paid app loads on every run', () => {
             expect(directory.description).toContain(`- ${scope} (${size} tools${requires ? `, needs ${requires}` : ''})`)
         }
         expect(directory.inputSchema.properties.scope.enum).toEqual(Object.keys(app.scopes))
+    })
+
+    it('ends the description of a metered tool with the pace recommended for the account', () => {
+        const listed = (name: string) => listedTools(linkedin).find(tool => tool.name === name)!.description
+        expect(listed('send_invitation')).toMatch(/Recommended invitation pace for this account: 25 per day, 150 per week\.$/)
+        expect(listed('get_my_profile')).not.toContain('Recommended')
+        const scope = readDirectory(linkedin, 'posts') as { tools: { name: string; description: string }[] }
+        const metered = scope.tools.filter(tool => LINKEDIN_TOOLS.find(candidate => candidate.name === tool.name)?.quota)
+        expect(metered.length).toBeGreaterThan(0)
+        for (const tool of metered) expect(tool.description).toContain('pace for this account')
     })
 
     // A tool a description names with the server prefix is one the coworker can call as such.

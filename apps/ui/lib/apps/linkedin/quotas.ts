@@ -2,13 +2,13 @@ import { defineQuotas, type QuotaLimit } from '@/lib/apps/quotas'
 
 export { isoWeekKey } from '@/lib/apps/quotas'
 
-// What one LinkedIn account may do through its coworkers. Lower than what Linkup calls safe for a
-// seasoned paid account: the account that gets restricted is the user's own, and most connected
-// accounts are neither paid nor warmed up.
+// The pace recommended for one LinkedIn account through its coworkers. Lower than what Linkup calls
+// safe for a seasoned paid account: the account that gets restricted is the user's own, and most
+// connected accounts are neither paid nor warmed up. Past it the call still goes through.
 
 export type QuotaAction = 'invitation' | 'message' | 'profile_view' | 'search_result' | 'content_read' | 'engagement' | 'post' | 'job_application' | 'attachment_download'
 
-// Reads paid data can take over once the account's share of the day is spent.
+// Reads paid data can take over once the account is past its pace of the day.
 const READ_ACTIONS: ReadonlySet<QuotaAction> = new Set(['profile_view', 'search_result', 'content_read'])
 
 const DEFAULT_QUOTAS: Record<QuotaAction, QuotaLimit[]> = {
@@ -39,12 +39,15 @@ const QUOTA_NOUNS: Record<QuotaAction, string> = {
     attachment_download: 'attachment download',
 }
 
-export const { quotaLimits, quotaClaim, quotaRefusal } = defineQuotas<QuotaAction>({
+const PAST_PACE = "Each one more raises the risk of LinkedIn restricting the user's own account. Tell the user once, in one line, with the count and that risk."
+const USER_DECIDES = "Going on is the user's call: keep doing what they ask, never refuse it because of this pace."
+
+export const { quotaLimits, quotaClaim, quotaNotice, quotaPace } = defineQuotas<QuotaAction>({
     envPrefix: 'LINKEDIN_QUOTA',
     limits: DEFAULT_QUOTAS,
     nouns: QUOTA_NOUNS,
-    refusal: (noun, windows, action) =>
+    notice: (noun, overage, action) =>
         READ_ACTIONS.has(action)
-            ? `The ${noun} limit of this LinkedIn account is reached (${windows}). It protects the account from a LinkedIn restriction: read no more of it with this account today. If you have paid_data and it reads what the task still needs, offer it to the user and say why; otherwise tell the user and pick the work up again tomorrow.`
-            : `The ${noun} limit of this LinkedIn account is reached (${windows}). It protects the account from a LinkedIn restriction. Do not retry today: tell the user and pick the work up again tomorrow.`,
+            ? `This LinkedIn account is past its recommended ${noun} pace (${overage}). This call went through. ${PAST_PACE} If you have paid_data and it reads what the task still needs, offer it as the safer way. ${USER_DECIDES}`
+            : `This LinkedIn account is past its recommended ${noun} pace (${overage}). This call went through. ${PAST_PACE} Let them choose between going on today and picking the rest up tomorrow. ${USER_DECIDES}`,
 })

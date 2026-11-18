@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isoWeekKey, quotaClaim, quotaLimits, quotaRefusal } from './quotas'
+import { isoWeekKey, quotaClaim, quotaLimits, quotaNotice, quotaPace } from './quotas'
 
 describe('isoWeekKey', () => {
     it('numbers weeks from Monday, ISO style', () => {
@@ -25,18 +25,41 @@ describe('quotaClaim', () => {
     })
 })
 
-describe('quotaRefusal', () => {
-    it('offers paid data for a read once the account has read its share of the day', () => {
-        expect(quotaRefusal('content_read', {})).toContain('post, comment and reaction read limit of this LinkedIn account is reached (100 per day)')
-        for (const action of ['profile_view', 'search_result', 'content_read'] as const) {
-            expect(quotaRefusal(action, {})).toContain('If you have paid_data and it reads what the task still needs, offer it to the user and say why')
+describe('quotaNotice', () => {
+    it('says nothing while the account is within its pace', () => {
+        expect(quotaNotice('content_read', [100], {})).toBeNull()
+        expect(quotaNotice('invitation', [25, 150], {})).toBeNull()
+    })
+
+    it('lets a read go past the pace, and offers paid data as the safer way', () => {
+        const notice = quotaNotice('content_read', [101], {})!
+        expect(notice).toContain('past its recommended post, comment and reaction read pace (101 today, 100 per day recommended)')
+        expect(notice).toContain('This call went through.')
+        expect(notice).toContain('offer it as the safer way')
+        for (const action of ['profile_view', 'search_result'] as const) {
+            expect(quotaNotice(action, [5000], {})).toContain('paid_data')
         }
     })
 
-    it('holds anything sent from the account until tomorrow, with no paid data', () => {
+    it('lets a send go past the pace, with no paid data, and leaves the choice to the user', () => {
         for (const action of ['invitation', 'message', 'engagement', 'post', 'job_application'] as const) {
-            expect(quotaRefusal(action, {})).toContain('Do not retry today: tell the user and pick the work up again tomorrow.')
-            expect(quotaRefusal(action, {})).not.toContain('paid_data')
+            const notice = quotaNotice(action, [1000, 1000], {})!
+            expect(notice).toContain("Going on is the user's call")
+            expect(notice).not.toContain('paid_data')
+            expect(notice).not.toMatch(/do not retry|stop/i)
         }
+    })
+
+    it('names only the window that is past its pace', () => {
+        const notice = quotaNotice('invitation', [3, 151], {})!
+        expect(notice).toContain('151 this week, 150 per week recommended')
+        expect(notice).not.toContain('per day recommended')
+    })
+})
+
+describe('quotaPace', () => {
+    it('gives the coworker the pace of the account before it reaches it', () => {
+        expect(quotaPace('invitation', {})).toBe('Recommended invitation pace for this account: 25 per day, 150 per week.')
+        expect(quotaPace('content_read', { LINKEDIN_QUOTA_CONTENT_READ_DAY: '250' })).toBe('Recommended post, comment and reaction read pace for this account: 250 per day.')
     })
 })

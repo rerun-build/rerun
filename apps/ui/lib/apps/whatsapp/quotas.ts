@@ -1,8 +1,9 @@
 import { defineQuotas, type QuotaLimit } from '@/lib/apps/quotas'
 
-// What one WhatsApp number may send through its coworkers. WhatsApp bans a number for unsolicited
-// messages far faster than LinkedIn restricts a profile: a first message to somebody counts twice,
-// once as a message and once as a new conversation, the limit that matters.
+// The pace recommended for one WhatsApp number through its coworkers, which never refuses a call.
+// WhatsApp bans a number for unsolicited messages far faster than LinkedIn restricts a profile: a
+// first message to somebody counts twice, once as a message and once as a new conversation, the pace
+// that matters.
 
 export type QuotaAction = 'message' | 'new_conversation' | 'number_check' | 'attachment_download'
 
@@ -20,10 +21,10 @@ const QUOTA_NOUNS: Record<QuotaAction, string> = {
     attachment_download: 'attachment download',
 }
 
-export const { quotaLimits, quotaClaim, quotaRefusal } = defineQuotas<QuotaAction>({
+export const { quotaLimits, quotaClaim, quotaNotice, quotaPace } = defineQuotas<QuotaAction>({
     envPrefix: 'WHATSAPP_QUOTA',
     limits: DEFAULT_QUOTAS,
     nouns: QUOTA_NOUNS,
-    refusal: (noun, windows) =>
-        `The ${noun} limit of this WhatsApp number is reached (${windows}). It protects the number from a WhatsApp ban. Do not retry today: tell the user and pick the work up again tomorrow.`,
+    notice: (noun, overage) =>
+        `This WhatsApp number is past its recommended ${noun} pace (${overage}). This call went through. Each one more raises the risk of WhatsApp banning the number. Tell the user once, in one line, with the count and that risk, and let them choose between going on today and picking the rest up tomorrow. Going on is the user's call: keep doing what they ask, never refuse it because of this pace.`,
 })

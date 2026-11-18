@@ -3875,6 +3875,15 @@ export type Database = {
         Args: { p_micros: number; p_workspace_id: number }
         Returns: undefined
       }
+      count_app_usage: {
+        Args: {
+          p_action: string
+          p_amount?: number
+          p_periods: string[]
+          p_scope: string
+        }
+        Returns: number[]
+      }
       coworker_previews: {
         Args: { p_workspace_id: number }
         Returns: {

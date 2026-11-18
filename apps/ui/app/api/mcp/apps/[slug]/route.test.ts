@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { authenticateEngineToken } from '@/app/api/_services/workspace-engine.service'
+import { reportWorkspaceEvent } from '@/lib/apps/analytics'
 import { runAction } from '@/lib/apps/linkup/client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
@@ -8,6 +9,7 @@ import { POST } from './route'
 
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn(), getWorkspaceConnection: vi.fn() }))
+vi.mock('@/lib/apps/analytics', () => ({ reportWorkspaceEvent: vi.fn() }))
 vi.mock('@/lib/apps/linkup/client', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/apps/linkup/client')>()), runAction: vi.fn() }))
 
 const BOX_KEY = 'box-key-of-workspace-7'
@@ -66,14 +68,15 @@ describe('POST /api/mcp/apps/[slug] for a coworker with no account attached', ()
     })
 })
 
-// A coworker bound to a connected LinkedIn account of its own workspace.
-function workspaceWithBoundAccount() {
+// A coworker bound to a connected LinkedIn account of its own workspace, whose counters read `counts`
+// after the call.
+function workspaceWithBoundAccount(counts = [1]) {
     return fakeSupabase(table => {
         if (table === 'agents') return { data: { id: 'agent-writer' } }
         if (table === 'app_connection_agents') return { data: { connection_id: 'connection-1' } }
         if (table === 'app_connections') return { data: { id: 'connection-1', workspace_id: WORKSPACE_ID, app_slug: 'linkedin', status: 'connected', provider_account_id: 'linkup-account-1', label: 'Jane' } }
         if (table === 'workspace_apps') return { data: { status: 'active' } }
-        if (table === 'rpc:claim_app_quota') return { data: true }
+        if (table === 'rpc:count_app_usage') return { data: counts }
         return undefined
     })
 }
@@ -134,7 +137,8 @@ describe('POST /api/mcp/apps/[slug] and the tools it does not load', () => {
 
         expect(JSON.parse(result.content[0].text)).toEqual({ visited: true })
         expect(runAction).toHaveBeenCalledWith('linkup-account-1', 'profiles', 'visit', { profile_url: 'https://www.linkedin.com/in/jane-doe' })
-        expect(supabase.chainsOn('rpc:claim_app_quota')[0][0].args[1]).toMatchObject({ p_scope: 'connection:connection-1', p_action: 'profile_view', p_amount: 1 })
+        expect(supabase.chainsOn('rpc:count_app_usage')[0][0].args[1]).toMatchObject({ p_scope: 'connection:connection-1', p_action: 'profile_view', p_amount: 1 })
+        expect(result.content).toHaveLength(1)
     })
 
     it('tells a coworker with no account so, whichever way the tool is called', async () => {
@@ -144,5 +148,38 @@ describe('POST /api/mcp/apps/[slug] and the tools it does not load', () => {
 
         expect(JSON.parse(result.content[0].text).error).toContain('call suggest_service with linkedin-pro so the user connects one')
         expect(runAction).not.toHaveBeenCalled()
+    })
+})
+
+describe('POST /api/mcp/apps/[slug] past the recommended pace of the account', () => {
+    beforeEach(() => {
+        vi.clearAllMocks()
+        vi.mocked(authenticateEngineToken).mockImplementation(async token => (token === BOX_KEY ? { workspaceId: WORKSPACE_ID, isSandbox: false } : null))
+        vi.mocked(runAction).mockResolvedValue({ name: 'Jane Doe' })
+    })
+
+    const getProfileCall = () => rpc('tools/call', { name: 'get_profile', arguments: { profile_url: 'https://www.linkedin.com/in/jane-doe' } })
+
+    it('still reads the profile, and adds a notice the coworker tells the user', async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue(workspaceWithBoundAccount([101]).client)
+
+        const result = await answer(getProfileCall())
+
+        expect(result.isError).toBeUndefined()
+        expect(runAction).toHaveBeenCalled()
+        expect(JSON.parse(result.content[0].text)).toEqual({ name: 'Jane Doe' })
+        expect(result.content[1].text).toContain('past its recommended profile view pace (101 today, 100 per day recommended)')
+        expect(result.content[1].text).toContain("Going on is the user's call")
+    })
+
+    it('reports the pace once, on the call that goes past it', async () => {
+        vi.mocked(createServiceRoleClient).mockReturnValue(workspaceWithBoundAccount([101]).client)
+        await answer(getProfileCall())
+        expect(reportWorkspaceEvent).toHaveBeenCalledWith(expect.anything(), WORKSPACE_ID, 'app_quota_hit', { app: 'linkedin', action: 'profile_view' })
+
+        vi.mocked(reportWorkspaceEvent).mockClear()
+        vi.mocked(createServiceRoleClient).mockReturnValue(workspaceWithBoundAccount([102]).client)
+        await answer(getProfileCall())
+        expect(reportWorkspaceEvent).not.toHaveBeenCalled()
     })
 })

@@ -504,7 +504,7 @@ describe('paid data section', () => {
         const section = await paidDataSection()
         expect(section).toContain('posts or metrics that no connected app reads, paid_data is the tool from the first step')
         expect(section).toContain("A connected app that reads the same platform on the user's own account (LinkedIn Pro for LinkedIn profiles, posts, comments and people search) comes first")
-        expect(section).toContain('once it says a daily limit is reached, telling the user why')
+        expect(section).toContain('once it says the account is past its recommended daily pace, telling the user why')
         expect(section).not.toContain("never touches the user's own accounts")
     })
 

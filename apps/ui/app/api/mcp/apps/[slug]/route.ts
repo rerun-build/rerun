@@ -1,7 +1,7 @@
 import { authenticateEngineToken, getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
 import { reportWorkspaceEvent } from '@/lib/apps/analytics'
 import { APP_LIST_TOOLS, APP_RUN_TOOL } from '@/lib/apps/catalog'
-import { agentConnection, claimQuota, connectionScope, markNeedsReconnect, pauseForRateLimit, updateConnection } from '@/lib/apps/connections'
+import { agentConnection, connectionScope, countUsage, markNeedsReconnect, pauseForRateLimit, updateConnection } from '@/lib/apps/connections'
 import { listedTools, readDirectory, resolveRunTool } from '@/lib/apps/directory'
 import { LinkupError, runAction } from '@/lib/apps/linkup/client'
 import { appDefinition } from '@/lib/apps/registry'
@@ -88,21 +88,24 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     if (missing.length > 0) return toolError(id, `Missing ${missing.join(', ')}.`)
 
     try {
-        // The stricter limit is claimed first: refused there, the call has not eaten the other one.
         const extra = await tool.extraQuota?.(connection.provider_account_id, linkupParams)
         const claims = [...(extra ? [{ action: extra, amount: 1 }] : []), ...(tool.quota ? [{ action: tool.quota.action, amount: tool.quota.amount?.(linkupParams) ?? 1 }] : [])]
+        const notes: string[] = []
         for (const claim of claims) {
             const { periods, maxes } = app.quotaClaim(claim.action, new Date())
-            if (!(await claimQuota(supabase, connectionScope(connection.id), claim.action, periods, maxes, claim.amount))) {
+            const counts = await countUsage(supabase, connectionScope(connection.id), claim.action, periods, claim.amount)
+            const notice = app.quotaNotice(claim.action, counts)
+            if (!notice) continue
+            notes.push(notice)
+            if (counts.some((count, index) => count - claim.amount <= maxes[index] && count > maxes[index])) {
                 await reportWorkspaceEvent(supabase, connection.workspace_id, 'app_quota_hit', { app: slug, action: claim.action })
-                return toolError(id, app.quotaRefusal(claim.action))
             }
         }
         const accountId = connection.provider_account_id
         const result = tool.run
             ? await tool.run({ slug, accountId, connectionId: connection.id, engineAgentId, engine: () => getWorkspaceConnection(engine.workspaceId) }, linkupParams)
             : await runAction(accountId, tool.category, tool.action, linkupParams)
-        return toolResult(id, result)
+        return toolResult(id, result, notes)
     } catch (err) {
         if (err instanceof AppToolRefusal) return toolError(id, err.message)
         if (!(err instanceof LinkupError)) {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { quotaClaim, quotaLimits, quotaRefusal } from './quotas'
+import { quotaClaim, quotaLimits, quotaNotice } from './quotas'
 
 describe('WhatsApp quotas', () => {
     it('holds new conversations far below messages', () => {
@@ -12,7 +12,11 @@ describe('WhatsApp quotas', () => {
         expect(quotaLimits('new_conversation', { LINKEDIN_QUOTA_NEW_CONVERSATION_DAY: '30' })).toEqual([{ window: 'day', max: 20 }])
     })
 
-    it('tells the coworker to stop for the day', () => {
-        expect(quotaRefusal('new_conversation', {})).toContain('new conversation limit of this WhatsApp number is reached (20 per day)')
+    it('lets a message go past the pace and tells the coworker the risk of a ban', () => {
+        expect(quotaNotice('new_conversation', [20], {})).toBeNull()
+        const notice = quotaNotice('new_conversation', [21], {})!
+        expect(notice).toContain('past its recommended new conversation pace (21 today, 20 per day recommended)')
+        expect(notice).toContain('risk of WhatsApp banning the number')
+        expect(notice).toContain("Going on is the user's call")
     })
 })

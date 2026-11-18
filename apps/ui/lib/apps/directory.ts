@@ -6,7 +6,7 @@ import { missingRequired, toolParams, type AppScope, type AppTool } from './tool
 // and reads the rest from a directory, one scope at a time, the way paid_data reads its catalog:
 // list_tools gives a scope's tools with their parameters, run_tool runs one of them.
 
-type AppDirectory = Pick<AppInfo, 'name' | 'serverName'> & { tools: AppTool[]; scopes: Record<string, AppScope> }
+type AppDirectory = Pick<AppInfo, 'name' | 'serverName'> & { tools: AppTool[]; scopes: Record<string, AppScope>; quotaPace(action: string): string }
 
 type ListedTool = Pick<AppTool, 'name' | 'description' | 'inputSchema'>
 
@@ -20,8 +20,8 @@ function scopeIndex(app: AppDirectory) {
     return Object.entries(app.scopes).map(([scope, { summary, requires }]) => ({ scope, tools: toolsOf(app, scope).length, summary, ...(requires ? { requires } : {}) }))
 }
 
-function listed({ name, description, inputSchema }: AppTool): ListedTool {
-    return { name, description, inputSchema }
+function listed(app: AppDirectory) {
+    return ({ name, description, inputSchema, quota }: AppTool): ListedTool => ({ name, description: quota ? `${description} ${app.quotaPace(quota.action)}` : description, inputSchema })
 }
 
 export function listedTools(app: AppDirectory): ListedTool[] {
@@ -29,15 +29,15 @@ export function listedTools(app: AppDirectory): ListedTool[] {
         .map(({ scope, tools, summary, requires }) => `- ${scope} (${tools} tools${requires ? `, needs ${requires}` : ''}): ${summary}`)
         .join('\n')
     return [
-        ...app.tools.filter(tool => !tool.scope).map(listed),
+        ...app.tools.filter(tool => !tool.scope).map(listed(app)),
         {
             name: APP_LIST_TOOLS,
-            description: `The ${app.name} tools that are not loaded, by scope. Free: nothing is sent, no daily limit is spent. Call it with a scope before the first task that needs it: it gives each tool of that scope, what it does and its parameters. Then run one with ${loadedAs(app, APP_RUN_TOOL)}. Scopes:\n${scopes}`,
+            description: `The ${app.name} tools that are not loaded, by scope. Free: nothing is sent, nothing counts toward a daily pace. Call it with a scope before the first task that needs it: it gives each tool of that scope, what it does and its parameters. Then run one with ${loadedAs(app, APP_RUN_TOOL)}. Scopes:\n${scopes}`,
             inputSchema: { type: 'object', properties: { scope: { type: 'string', enum: Object.keys(app.scopes) } } },
         },
         {
             name: APP_RUN_TOOL,
-            description: `Run a ${app.name} tool read in ${loadedAs(app, APP_LIST_TOOLS)}, on the same account and with the same daily limits as the loaded tools. Read its scope first: a tool or a parameter the scope does not list is refused.`,
+            description: `Run a ${app.name} tool read in ${loadedAs(app, APP_LIST_TOOLS)}, on the same account and with the same recommended daily pace as the loaded tools. Read its scope first: a tool or a parameter the scope does not list is refused.`,
             inputSchema: {
                 type: 'object',
                 properties: {
@@ -59,7 +59,7 @@ export function readDirectory(app: AppDirectory, scope: unknown) {
         scope,
         ...(entry.requires ? { requires: entry.requires } : {}),
         run_with: `${loadedAs(app, APP_RUN_TOOL)}, the name as tool and the parameters as arguments`,
-        tools: toolsOf(app, scope).map(listed),
+        tools: toolsOf(app, scope).map(listed(app)),
     }
 }
 
