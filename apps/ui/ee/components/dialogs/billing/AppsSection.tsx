@@ -59,7 +59,8 @@ export function useAppSlots(slugs: AppSlug[], skip = false): Partial<Record<AppS
 }
 
 // `moreReason` keeps the + button off and says why, when one more slot cannot be bought from here.
-export type AppSlotsRow = { slug: AppSlug; value: number; current: number; slotsState: AppSlotsState; moreReason?: string; onOpen?: () => void }
+// `lockedReason` does it for both buttons, when the slots cannot be changed at all.
+export type AppSlotsRow = { slug: AppSlug; value: number; current: number; slotsState: AppSlotsState; moreReason?: string; lockedReason?: string; onOpen?: () => void }
 
 type AppsSectionProps = {
     rows: AppSlotsRow[]
@@ -91,7 +92,7 @@ export function AppsSection({ rows, description, interval, renewal, disabled = f
 function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: AppSlotsRow; interval: BillingInterval; renewal: string; disabled: boolean; onChange: (value: number) => void }) {
     const locale = useLocale()
     const t = useTranslations('billing.apps')
-    const { slug, value, current, slotsState, moreReason, onOpen } = row
+    const { slug, value, current, slotsState, moreReason, lockedReason, onOpen } = row
     const { name, providerLabel } = appInfo(slug)
     const slotPrice = PLAN_PRICES_CENTS[interval][APP_ADDON_KEYS[slug]]
     const per = interval === 'yearly' ? t('unit.yearly') : t('unit.monthly')
@@ -102,7 +103,9 @@ function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: App
     const onlyTrialSlot = !!trialEndsAt && value === 0
     const lessReason = disabled
         ? undefined
-        : onlyTrialSlot
+        : lockedReason
+          ? lockedReason
+          : onlyTrialSlot
           ? t('lessReason.freeUntil', { date: trialUntil(trialEndsAt, locale) })
           : inUse === null
             ? t('lessReason.loading')
@@ -138,7 +141,7 @@ function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: App
                             </>
                         )}
                     </span>
-                    <SlotStepper label={providerLabel} value={value + trialSlots} lessReason={lessReason} moreReason={disabled ? undefined : moreReason} disabled={disabled} onChange={next => onChange(next - trialSlots)} />
+                    <SlotStepper label={providerLabel} value={value + trialSlots} lessReason={lessReason} moreReason={disabled ? undefined : (lockedReason ?? moreReason)} disabled={disabled} onChange={next => onChange(next - trialSlots)} />
                 </div>
             </div>
             <LeavingNote removed={removed} renewal={renewal} />

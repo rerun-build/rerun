@@ -34,8 +34,8 @@ export function LifetimeSlotsPane({
     state: LifetimeBillingState
     slots: AppSlots
     onReset: () => void
-    onApplied: (applied: SlotsApplied) => void
-    onFailed: () => void
+    onApplied: (applied: SlotsApplied) => Promise<void>
+    onFailed: () => Promise<void>
 }) {
     const locale = useLocale()
     const t = useTranslations('billing')
@@ -52,21 +52,22 @@ export function LifetimeSlotsPane({
     const renewal = state.periodEnd ? shortDate(state.periodEnd, locale) : t('plan.yourRenewal')
     const perMonth = t('apps.unit.monthly')
 
-    const fail = (message: string) => {
-        setSubmitting(false)
+    // The button stays busy until the state is read again: a click on the stale one would replay
+    // the calls that already went through.
+    const fail = async (message: string) => {
         setError(message)
-        onFailed()
+        try {
+            await onFailed()
+        } finally {
+            setSubmitting(false)
+        }
     }
 
+    // Slots are added before any is given back: giving back the only slot left sets the subscription
+    // to end, and the slot added next would resume it with the one given back still on it.
     const apply = async () => {
         setSubmitting(true)
         setError(null)
-        for (const slug of changed) {
-            for (let removed = 0; removed < current[slug] - slots[slug]; removed += 1) {
-                const result = await removeAppSlotAction(slug)
-                if (!result.ok) return fail(errorText(result))
-            }
-        }
         for (const slug of changed) {
             for (let added = 0; added < slots[slug] - current[slug]; added += 1) {
                 const result = await addAppSlotAction(slug, randomUuid())
@@ -74,8 +75,17 @@ export function LifetimeSlotsPane({
                 if (result.value.checkoutUrl) return window.location.assign(result.value.checkoutUrl)
             }
         }
-        setSubmitting(false)
-        onApplied(adding ? { title: t('lifetime.slots.addedTitle'), body: t('lifetime.slots.addedBody') } : { title: t('plan.change.changeScheduledTitle'), body: t('lifetime.slots.scheduledBody', { date: renewal }) })
+        for (const slug of changed) {
+            for (let removed = 0; removed < current[slug] - slots[slug]; removed += 1) {
+                const result = await removeAppSlotAction(slug)
+                if (!result.ok) return fail(errorText(result))
+            }
+        }
+        try {
+            await onApplied(adding ? { title: t('lifetime.slots.addedTitle'), body: t('lifetime.slots.addedBody') } : { title: t('plan.change.changeScheduledTitle'), body: t('lifetime.slots.scheduledBody', { date: renewal }) })
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     const title =

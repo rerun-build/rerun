@@ -66,6 +66,10 @@ export function LifetimeDialog({
     const dirty = APP_SLUGS.some(slug => slots[slug] !== currentSlots[slug])
     const added = APP_SLUGS.reduce((count, slug) => count + Math.max(0, slots[slug] - currentSlots[slug]), 0)
 
+    // Its last slot given back, the subscription still carries it until it ends: nothing is left to
+    // change on it from here.
+    const lockedReason = state.cancelAtPeriodEnd ? t('plan.status.ends', { date: renewal }) : undefined
+
     // Stripe's Checkout sells the first slot alone, and a running trial holds one slot per app.
     const moreReason = (slug: AppSlug) =>
         state.slotsCheckout && added > 0 ? t('lifetime.slots.oneOnCheckout') : state.trialing && slots[slug] > 0 ? t('lifetime.slots.oneDuringTrial') : undefined
@@ -95,6 +99,7 @@ export function LifetimeDialog({
                             current: currentSlots[slug],
                             slotsState: slotsStates[slug] ?? { overview: null, loaded: false },
                             moreReason: moreReason(slug),
+                            lockedReason,
                             onOpen: enabledApps.includes(slug)
                                 ? () => {
                                       onClose()
@@ -115,7 +120,7 @@ export function LifetimeDialog({
     const right = success ? (
         <SuccessPanel title={success.title} body={success.body} cta={t('plan.success.done')} onDone={onClose} />
     ) : dirty ? (
-        <LifetimeSlotsPane state={state} slots={slots} onReset={() => setSlots(currentSlots)} onApplied={next => void done(next)} onFailed={() => void onChanged()} />
+        <LifetimeSlotsPane state={state} slots={slots} onReset={() => setSlots(currentSlots)} onApplied={done} onFailed={onChanged} />
     ) : (
         <PanelSteps stepKey={drill} depth={drill === 'overview' ? 0 : 1}>
             {drill === 'invoices' ? (
