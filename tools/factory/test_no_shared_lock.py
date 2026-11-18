@@ -1,6 +1,4 @@
 import os, re, subprocess, sys, unittest
-from unittest import mock
-
 import test_clone_new as N
 
 T = N.T
@@ -56,6 +54,18 @@ class NoSharedLock(unittest.TestCase):
         self.assertGreaterEqual(seen, 1)
 
 
+FAKE_GH = """#!/bin/sh
+case "$1" in
+  pr) echo '[{"number": 9, "url": "https://github.com/FULL/pull/9", "headRefOid": "0000000"}]' ;;
+  api) case "$2" in
+         *actions/runs*) echo '{"workflow_runs": []}' ;;
+         *) echo '{"body": ""}' ;;
+       esac ;;
+  *) exit 1 ;;
+esac
+"""
+
+
 class FixOnAnOldWorktree(T.FactoryCase):
     def test_a_fix_on_an_old_green_worktree_pushes_without_any_lock(self):
         p = self.wt(chunk="1")
@@ -63,20 +73,21 @@ class FixOnAnOldWorktree(T.FactoryCase):
         open(F.marker(T.REPO, "chunk/7-1"), "w").close()
         with open(os.path.join(F.STATE, "builders.lock"), "w") as f:
             f.write("%d %d\n" % (os.getpid(), 0))
-        real_run = F.run
-
-        def fake_run(cmd, *a, **k):
-            if cmd[0] != F.GH:
-                return real_run(cmd, *a, **k)
-            return subprocess.CompletedProcess(cmd, 0, '[{"number": 9, "url": "https://github.com/%s/pull/9"}]' % FULL, "")
-
-        ctx = (p, FULL, "chunk/7-1", "dev", "7", "1")
-        with mock.patch.object(F, "wt_context", lambda: ctx), mock.patch.object(F, "run", fake_run), \
-                mock.patch.object(F, "api", lambda *a, **k: {"body": ""}), \
-                mock.patch.object(F, "preflight_lines", lambda *a, **k: None), \
-                mock.patch.object(F, "preflight_lint", lambda *a, **k: None), \
-                mock.patch.object(F, "LOCK_WAIT_S", 0, create=True):
-            code, out = self.call(F.cmd_pr_open, ["--fix"])
+        gh = os.path.join(self.tmp, "fake-gh")
+        with open(gh, "w") as f:
+            f.write(FAKE_GH.replace("FULL", FULL))
+        os.chmod(gh, 0o755)
+        saved_gh = F.GH
+        self.addCleanup(setattr, F, "GH", saved_gh)
+        F.GH = gh
+        link = os.path.join(self.tmp, "github.com", FULL + ".git")
+        os.makedirs(os.path.dirname(link))
+        os.symlink(self.origin, link)
+        T.git(p, "remote", "set-url", "origin", "file://" + link)
+        cwd = os.getcwd()
+        self.addCleanup(os.chdir, cwd)
+        os.chdir(p)
+        code, out = self.call(F.cmd_pr_open, ["--fix"])
         self.assertEqual(code, 0, out)
         self.assertIn("PUSHED fix to", out)
         self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), sha)
