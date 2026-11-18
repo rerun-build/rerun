@@ -213,18 +213,21 @@ const FOREMAN_SESSION = {
     ],
 }
 
-async function resetHubRows(admin, workspaceId) {
+// With `fixedIds`, the demo's own ids are cleared wherever they are: a demo account recreated under
+// another email gets a new workspace, and the rows of the old one would hold them.
+async function resetHubRows(admin, workspaceId, { fixedIds = false } = {}) {
     const agents = await check(admin.from('agents').select('id').eq('workspace_id', workspaceId), 'list the demo coworkers')
-    const agentIds = agents.map((agent) => agent.id)
+    const agentIds = [...new Set([...agents.map((agent) => agent.id), ...(fixedIds ? Object.values(COWORKERS).map((coworker) => coworker.id) : [])])]
     if (agentIds.length) {
         await check(admin.from('sessions').delete().in('agent_id', agentIds), 'clear the demo sessions')
         await check(admin.from('agents').delete().in('id', agentIds), 'clear the demo coworkers')
     }
     await check(admin.from('spaces').delete().eq('workspace_id', workspaceId), 'clear the demo Boxes')
+    if (fixedIds) await check(admin.from('spaces').delete().in('id', BOXES.map((box) => box.id)), 'clear the demo Boxes')
     await check(admin.from('foreman_conversations').delete().eq('workspace_id', workspaceId), 'clear the Chief of Staff conversation')
 }
 
-export async function seedDemoWorkspace({ admin, workspaceId, userId, apiKey, dataDir }) {
+export async function seedDemoWorkspace({ admin, workspaceId, userId, email, apiKey, dataDir }) {
     const engine = engineClient(apiKey)
 
     await check(
@@ -243,7 +246,7 @@ export async function seedDemoWorkspace({ admin, workspaceId, userId, apiKey, da
         'name the demo workspace',
     )
 
-    await resetHubRows(admin, workspaceId)
+    await resetHubRows(admin, workspaceId, { fixedIds: true })
     await check(
         admin.from('spaces').insert(BOXES.map((box, index) => ({ id: box.id, workspace_id: workspaceId, name: box.name, col_start: box.col, row_start: 0, col_end: box.col + 7, row_end: 7, sidebar_order: index }))),
         'create the demo Boxes',
@@ -311,7 +314,7 @@ export async function seedDemoWorkspace({ admin, workspaceId, userId, apiKey, da
     )
 
     for (const page of BRAIN_PAGES) {
-        await engine('PUT', `/brain/pages/${page.slug}`, { title: page.title, type: page.type, content: page.content, sources: [], baseHash: null, author: `user:${userId}` })
+        await engine('PUT', `/brain/pages/${page.slug}`, { title: page.title, type: page.type, content: page.content, sources: [], baseHash: null, author: `user:${email}` })
     }
 
     await engine('POST', '/vault', { kind: 'service', slug: 'gmail', name: 'gmail', label: 'hello@acmestudio.example', status: 'active', agentIds: [engineIds.leadScout, engineIds.inboxTriage] })
@@ -343,4 +346,17 @@ export async function seedDemoWorkspace({ admin, workspaceId, userId, apiKey, da
 
     log(`Seeded Acme Studio: ${Object.keys(COWORKERS).length} coworkers, ${BRAIN_PAGES.length} Brain pages, the Vault and routines.`)
     return { engineIds }
+}
+
+// A second account, still on its welcome page: the onboarding is only shown to a workspace with no
+// coworker that never finished it. A scene moves it from one question to the next with `answers`.
+export async function seedOnboardingWorkspace({ admin, workspaceId }) {
+    await check(
+        admin.from('workspaces').update({ name: null, icon_url: null, onboarded_at: null, subscription_status: null }).eq('id', workspaceId),
+        'reset the onboarding workspace',
+    )
+    await resetHubRows(admin, workspaceId)
+    const setAnswers = (answers) => check(admin.from('workspace_onboarding').upsert({ workspace_id: workspaceId, answers, updated_at: DEMO_NOW.toISOString() }, { onConflict: 'workspace_id' }), 'set the onboarding answers')
+    await setAnswers({})
+    return { setAnswers }
 }

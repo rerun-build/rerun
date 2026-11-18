@@ -27,8 +27,10 @@ export function assertFfmpeg() {
     }
 }
 
-// What would change from one run to the next or distract from the screen: the caret, the scrollbars.
+// What would change from one run to the next or distract from the screen: the caret, the scrollbars,
+// the badge of the Next dev server.
 const STILL_CSS = `
+nextjs-portal { display: none !important; }
 *, *::before, *::after { caret-color: transparent !important; }
 ::-webkit-scrollbar { display: none !important; }
 * { scrollbar-width: none !important; }
@@ -63,6 +65,8 @@ async function newContext(browser, base, storageState, theme, view, extra = {}) 
     return { context, page }
 }
 
+const stateFor = (states, scene, shot) => states[shot.account ?? scene.account ?? 'demo']
+
 async function toWebp(png, path) {
     const image = sharp(png).resize({ width: MAX_WIDTH, withoutEnlargement: true })
     let quality = 86
@@ -79,7 +83,7 @@ async function toWebp(png, path) {
 async function framed(shot, ctx) {
     const target = await shot.frame(ctx)
     await target.waitFor({ state: 'visible', timeout: 20_000 })
-    if (shot.ready) await shot.ready(ctx).waitFor({ state: 'visible', timeout: 20_000 })
+    if (shot.ready) await shot.ready(ctx).first().waitFor({ state: 'visible', timeout: 20_000 })
     await target.locator('[data-slot="skeleton"], .animate-pulse').first().waitFor({ state: 'hidden', timeout: 20_000 })
     await settle(ctx.page)
     if (shot.fit) {
@@ -92,8 +96,8 @@ async function framed(shot, ctx) {
     return target
 }
 
-async function captureShot({ browser, base, storageState, scene, shot, demo, theme }) {
-    const { context, page } = await newContext(browser, base, storageState, theme, shot.view ?? scene.view ?? 'board')
+async function captureShot({ browser, base, states, scene, shot, demo, theme, workDir }) {
+    const { context, page } = await newContext(browser, base, stateFor(states, scene, shot), theme, shot.view ?? scene.view ?? 'board')
     try {
         const ctx = { page, base, demo }
         await shot.open(ctx)
@@ -103,6 +107,10 @@ async function captureShot({ browser, base, storageState, scene, shot, demo, the
         const path = join(IMAGES_DIR, scene.page, `${shot.name}.${theme}.webp`)
         const size = await toWebp(png, path)
         return [{ path, size }]
+    } catch (error) {
+        const failure = join(workDir, `failed-${scene.page}-${shot.name}-${theme}.png`)
+        await page.screenshot({ path: failure }).catch(() => {})
+        throw new Error(`${shot.name} (${theme}, ${page.url().replace(base, '')}): ${error.message.split('\n')[0]}, see ${relative(REPO_ROOT, failure)}`)
     } finally {
         await context.close()
     }
@@ -117,11 +125,11 @@ function union(a, b) {
     return { x: left, y: top, width: right - left, height: bottom - top }
 }
 
-async function captureLoop({ browser, base, storageState, scene, shot, demo, theme, workDir }) {
+async function captureLoop({ browser, base, states, scene, shot, demo, theme, workDir }) {
     const videoDir = join(workDir, `${scene.page}-${shot.name}-${theme}`)
     rmSync(videoDir, { recursive: true, force: true })
     const startedAt = Date.now()
-    const { context, page } = await newContext(browser, base, storageState, theme, shot.view ?? scene.view ?? 'board', {
+    const { context, page } = await newContext(browser, base, stateFor(states, scene, shot), theme, shot.view ?? scene.view ?? 'board', {
         deviceScaleFactor: 1,
         recordVideo: { dir: videoDir, size: VIEWPORT },
     })
@@ -169,15 +177,15 @@ async function captureLoop({ browser, base, storageState, scene, shot, demo, the
     return outputs
 }
 
-export async function captureScene({ browser, base, storageState, scene, demo, workDir, video }) {
+export async function captureScene({ browser, base, states, scene, demo, workDir, video }) {
     mkdirSync(join(IMAGES_DIR, scene.page), { recursive: true })
     const written = []
     for (const shot of scene.shots ?? []) {
-        for (const theme of THEMES) written.push(...(await captureShot({ browser, base, storageState, scene, shot, demo, theme })))
+        for (const theme of THEMES) written.push(...(await captureShot({ browser, base, states, scene, shot, demo, theme, workDir })))
     }
     if (video) {
         for (const shot of scene.loops ?? []) {
-            for (const theme of THEMES) written.push(...(await captureLoop({ browser, base, storageState, scene, shot, demo, theme, workDir })))
+            for (const theme of THEMES) written.push(...(await captureLoop({ browser, base, states, scene, shot, demo, theme, workDir })))
         }
     }
     for (const file of written) log(`${relative(REPO_ROOT, file.path)} · ${Math.round(file.size / 1024)} KB`)

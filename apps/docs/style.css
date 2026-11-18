@@ -55,6 +55,11 @@
   box-shadow: none;
 }
 
+.rr-media a {
+  display: block;
+  border-bottom: none;
+}
+
 .rr-media .rr-media-dark,
 .dark .rr-media .rr-media-light {
   display: none;

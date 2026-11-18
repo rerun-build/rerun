@@ -204,9 +204,19 @@ export async function signIn(context, base, account) {
 
 // Spends the account's magic link in a page already open (a browser tab, the desktop app's window).
 export async function signInPage(page, base, account) {
-    await page.goto(`${base}/auth/confirm?token_hash=${account.tokenHash}&type=magiclink`)
-    // The confirm page is in the browser's language: its one submit button, whatever it says.
-    await page.locator('form button[type="submit"]').first().click()
+    // A cold `next dev` compiles the page on this first visit, past the default 30 seconds.
+    await page.goto(`${base}/auth/confirm?token_hash=${account.tokenHash}&type=magiclink`, { timeout: 180_000 })
+    // The confirm page is in the browser's language: the submit button of the form that carries the
+    // token, whatever it says. The onboarding layout around it has a form of its own.
+    // On a `next dev` still compiling, the page can come up without its form: one reload brings it,
+    // and the token is still unspent since only the click spends it.
+    const confirm = page.locator('form:has(input[name="token_hash"]) button[type="submit"]')
+    try {
+        await confirm.click({ timeout: 60_000 })
+    } catch {
+        await page.reload({ timeout: 180_000 })
+        await confirm.click({ timeout: 120_000 })
+    }
     await page.waitForURL((url) => !url.pathname.startsWith('/auth'), { timeout: 60_000 })
     await skipPhoneStep(account.admin, account.userId)
 }

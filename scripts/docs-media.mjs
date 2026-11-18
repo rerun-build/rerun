@@ -9,7 +9,7 @@
 //   pnpm docs:media --list                the scenes and what they watch
 //
 // Local stack only, like `pnpm verify:ui` (same checks): `pnpm db:start`, then `pnpm cloud env:local`.
-// It signs in as `docs-demo@rerun.local`, starts a local engine on a fresh data-dir, and seeds Acme
+// It signs in as `maya@acmestudio.example`, starts a local engine on a fresh data-dir, and seeds Acme
 // Studio (scripts/docs-media/demo-workspace.mjs) without calling a model.
 //
 // A scene is a module of scripts/docs-media/scenes/ for one docs page:
@@ -18,6 +18,7 @@
 //       page: 'vault',                                 // images land in apps/docs/images/vault/
 //       watches: ['apps/ui/components/vault/'],        // what --changed looks at
 //       view: 'board',                                 // or 'simple'
+//       account: 'demo',                               // or 'onboarding', a workspace still on its welcome page (also per shot)
 //       shots: [{ name, open: async ({ page, base, demo }) => …, frame: ({ page }) => locator, fit?: true }],
 //       loops: [{ name, open, frame, play: async ({ page }) => …, hold?: ms }],
 //   }
@@ -47,12 +48,14 @@ import {
     signInPage,
     startEngine,
     testAccount,
+    waitFor,
 } from './verify/shared.mjs'
 import { assertFfmpeg, captureScene } from './docs-media/capture.mjs'
-import { COWORKERS, seedDemoWorkspace } from './docs-media/demo-workspace.mjs'
+import { COWORKERS, seedDemoWorkspace, seedOnboardingWorkspace } from './docs-media/demo-workspace.mjs'
 
 const SCENES_DIR = join(REPO_ROOT, 'scripts/docs-media/scenes')
-const DEMO_EMAIL = 'docs-demo@rerun.local'
+const DEMO_EMAIL = 'maya@acmestudio.example'
+const ONBOARDING_EMAIL = 'leo@acmestudio.example'
 
 function parseArgs(argv) {
     const options = { only: [], changed: false, video: true, list: false, keep: false, headed: false }
@@ -105,6 +108,21 @@ function stopLeftoverEngine() {
     log(`Stopped the engine a previous run left on port ${ENGINE_PORT}.`)
 }
 
+async function signedIn(browser, base, account) {
+    const context = await browser.newContext()
+    const page = await context.newPage()
+    try {
+        await signInPage(page, base, account)
+    } catch (error) {
+        const shot = join(workDir, `sign-in-${account.email}.png`)
+        await page.screenshot({ path: shot }).catch(() => {})
+        fail(`Could not sign in as ${account.email} (${page.url().replace(base, '')}), see ${shot}: ${error.message.split('\n')[0]}`)
+    }
+    const state = await context.storageState()
+    await context.close()
+    return state
+}
+
 const options = parseArgs(process.argv.slice(2))
 const scenes = await loadScenes()
 
@@ -129,29 +147,45 @@ const workDir = join(REPO_ROOT, '.context/docs-media', new Date().toISOString().
 const dataDir = join(REPO_ROOT, '.context/docs-media/engine-data')
 mkdirSync(workDir, { recursive: true })
 const server = await ensureServer(base, workDir)
+// A hub left by an interrupted run may still be compiling.
+await waitFor(`${base}/api/version`)
 
 const browser = await chromium.launch({ headless: !options.headed, args: ['--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests'] })
 let engine = null
+// The hub and the engine write their logs through this process: left behind by a run that stopped
+// on an error, they block on the closed pipe and the next run finds a hub that never answers.
+process.on('exit', () => {
+    if (options.keep) return
+    for (const child of [server, engine]) {
+        try {
+            if (child) process.kill(-child.pid)
+        } catch {}
+    }
+})
 let failed = false
 try {
     const account = await testAccount(stack, { fresh: false, email: DEMO_EMAIL })
-    const signInContext = await browser.newContext()
-    const signInTab = await signInContext.newPage()
-    await signInPage(signInTab, base, account)
-    const storageState = await signInContext.storageState()
-    await signInContext.close()
+    const storageState = await signedIn(browser, base, account)
 
     const engineLink = await linkTestEngine(account.admin, account.userId)
     stopLeftoverEngine()
     rmSync(dataDir, { recursive: true, force: true })
     engine = await startEngine(base, engineLink.apiKey, workDir, dataDir)
-    const { engineIds } = await seedDemoWorkspace({ admin: account.admin, workspaceId: engineLink.workspaceId, userId: account.userId, apiKey: engineLink.apiKey, dataDir })
+    const { engineIds } = await seedDemoWorkspace({ admin: account.admin, workspaceId: engineLink.workspaceId, userId: account.userId, email: account.email, apiKey: engineLink.apiKey, dataDir })
     const demo = { coworkers: COWORKERS, engineIds, workspaceId: engineLink.workspaceId }
+    const states = { demo: storageState }
+
+    if (picked.some((scene) => [scene, ...(scene.shots ?? []), ...(scene.loops ?? [])].some((item) => item.account === 'onboarding'))) {
+        const newcomer = await testAccount(stack, { fresh: false, email: ONBOARDING_EMAIL })
+        states.onboarding = await signedIn(browser, base, newcomer)
+        const newcomerLink = await linkTestEngine(newcomer.admin, newcomer.userId)
+        demo.onboarding = await seedOnboardingWorkspace({ admin: newcomer.admin, workspaceId: newcomerLink.workspaceId })
+    }
 
     for (const scene of picked) {
         log(`Scene ${scene.page}`)
         try {
-            await captureScene({ browser, base, storageState, scene, demo, workDir, video: options.video })
+            await captureScene({ browser, base, states, scene, demo, workDir, video: options.video })
         } catch (error) {
             failed = true
             log(`Scene ${scene.page} failed: ${error?.message ?? error}`)
@@ -159,7 +193,6 @@ try {
     }
 } finally {
     await browser.close()
-    if (!options.keep) for (const child of [server, engine]) if (child) process.kill(-child.pid)
 }
 
 log('Look at every picture before committing it: apps/docs/images/')

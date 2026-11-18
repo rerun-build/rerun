@@ -1,6 +1,5 @@
-import { openWorkspaceMenu } from '../steps.mjs'
+import { dialog, openWorkspaceMenu } from '../steps.mjs'
 
-const dialog = ({ page }) => page.getByRole('dialog')
 
 const invoiceChaserSwitch = ({ page }) =>
     dialog({ page }).getByText('Invoice Chaser', { exact: true }).locator('xpath=ancestor::*[.//button[@role="switch"]][1]').getByRole('switch')
