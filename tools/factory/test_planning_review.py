@@ -220,7 +220,7 @@ class Ask(Station):
         self.assertEqual(self.rec()["state"], "revise")
         self.once()
         brief = self.last("boss")
-        self.assertIn("Rob answered these questions through the Foreman", brief)
+        self.assertIn("The questions put to Rob through the Foreman came back", brief)
         self.assertIn("#900: option 2, every member of the workspace", brief)
 
     def test_own_words_and_no_answer_are_both_read(self):

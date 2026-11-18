@@ -119,7 +119,7 @@ REVISE = ("The review of your last plan found the points below. Write a new `## 
           "where a point holds; where one does not, say why under `### Review answers`. You are the overseer for each DECIDE note: "
           "decide it yourself, take the recommended option unless the code or the goal page says otherwise, and write the decision "
           "with its reason and the options you dismissed. Use your council skill when two options are close.\n\n```\n%s\n```")
-ANSWERS = "Rob answered these questions through the Foreman. Each answer is his decision and binds the plan: write it in as his.\n%s"
+ANSWERS = "The questions put to Rob through the Foreman came back. An answer he gave is his decision and binds the plan: write it in as his. A question he did not answer is yours to decide.\n%s"
 CUT_NOTES = "The cutter's notes on it:\n\n```\n%s\n```"
 
 REVIEW_BRIEF = """One plan review, sent by the dispatcher: {repo} #{number}, "{title}", round {round}. You work alone: call no other coworker and send no question to Rob. You did not write this plan. Find what would make it fail before anything is cut or built.
@@ -766,10 +766,10 @@ class Station:
     def question_label(self):
         if getattr(self, "label_made", False):
             return
-        self.label_made = True
         try:
             self.gh(["label", "create", QUESTION_LABEL, "-R", self.repo, "--color", "FEF2C0", "--force",
                      "--description", "A question the factory asks Rob through the Foreman"])
+            self.label_made = True
         except Exception as e:
             log("-", "label %s not made: %s" % (QUESTION_LABEL, str(e)[:150]))
 

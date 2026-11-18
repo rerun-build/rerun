@@ -1227,10 +1227,11 @@ class Dispatcher:
     def recheck_settled(self, j):
         row = self.store.get_all("recheck:%d" % j["issue"])
         since = (j.get("recheck") or {}).get("at") or 0
-        if not self.recheck_tries() or (row.get("state") not in ("sending", "running") and self.now() - since > RECHECK_WAIT_S):
+        current = row.get("attempt") == str(j.get("rechecks"))
+        if not self.recheck_tries() or (not current and self.now() - since > RECHECK_WAIT_S):
             log(j["issue"], "fact recheck not answered: the job builds on what it has")
             return True
-        if row.get("attempt") != str(j.get("rechecks")):
+        if not current:
             return False
         if row.get("state") in ("fresh", "corrected"):
             log(j["issue"], "fact recheck %s: %s" % (row["state"], row.get("why") or "-"))
