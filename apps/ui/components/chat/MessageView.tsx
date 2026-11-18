@@ -20,6 +20,7 @@ import { MessageBubbles } from '@/components/chat/MessageBubbles'
 import { MessageTimeTooltip } from '@/components/chat/MessageTimeTooltip'
 import { PaidSourcesPill } from '@/components/chat/PaidSourcesPill'
 import { USER_BUBBLE_INK, USER_BUBBLE_SHAPE } from '@/components/chat/bubble-styles'
+import { ProviderSwitchDivider } from '@/components/chat/ProviderSwitchDivider'
 import { ReasoningStep } from '@/components/chat/ReasoningBlock'
 import { ScheduledRunBlock } from '@/components/chat/ScheduledRunBlock'
 import { BrainChangeBlock, brainChangeOf } from '@/components/chat/BrainChangeBlock'
@@ -51,7 +52,7 @@ import { parseTriggerPayload } from '@/lib/triggers/trigger-payload'
 import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { cn } from '@/lib/utils'
-import { QUICK_REPLIES_TOOL, fileCardSchema, messageText, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
+import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, fileCardSchema, messageText, providerSwitchSchema, quickRepliesOf, quickReplyDraft, skillProposalIdOf, tableCardSchema, toolActivityOf, type MessageFeedbackRating, type PaidTurnSources } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 import { BrainIcon, FoldVerticalIcon, RefreshCcwIcon, ThumbsDownIcon, ThumbsUpIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
@@ -213,6 +214,10 @@ function MessageViewInner({ message, isActive = false, isLastAssistant = false, 
                 const node = <SubRunBlock toolName={toolName} agentId={agentId} state={live ? 'input-available' : 'output-available'} progress={orphan} onStopTask={onStopTask} dense={!live} />
                 // A live sub-run opens itself and carries each task's stop button, so it stays out of the folded steps.
                 return live ? { kind: 'standalone', key: gkey, node, trace: true } : { kind: 'group-item', key: gkey, iconProps: toolDisplay(toolName).iconProps, node, status: 'done' }
+            }
+            if (part.type === PROVIDER_SWITCH_PART) {
+                const change = providerSwitchSchema.safeParse((part as { data?: unknown }).data)
+                return change.success ? { kind: 'standalone', key: gkey, node: <ProviderSwitchDivider change={change.data} /> } : null
             }
             if (part.type === 'data-compaction') {
                 const cp = part as unknown as { id?: string; data: CompactionData }

@@ -89,6 +89,11 @@ export const PLAN_LABELS: Partial<Record<AddableProvider, string>> = { claude: '
 
 const PLAN_NAMES: Partial<Record<Provider, string>> = { claude: 'Claude', codex: 'ChatGPT', opencode: 'OpenCode' }
 
+// What a person calls the plan behind a connection: "Claude", "ChatGPT", or the connection's own name.
+export function planName(source: { provider: Provider; name: string }): string {
+    return PLAN_NAMES[source.provider] ?? source.name
+}
+
 export const RERUN_FALLBACK: BoxDefault = { connectionId: RERUN_CONNECTION_ID, model: RERUN_MODEL }
 
 // What agents with no model of their own run on: a fresh workspace has no default, and runs on Rerun.

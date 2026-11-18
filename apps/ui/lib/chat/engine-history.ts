@@ -5,7 +5,7 @@ import { parseScheduledRun } from '@/lib/schedules/scheduled-run'
 import { encodePeaks } from '@/lib/voice/peaks'
 import { parseVoiceMessage } from '@/lib/voice/marker'
 import { hitlKindOf } from '@/lib/chat-hitl'
-import { isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, stripBridgePrefix, withHitlVersion, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata } from '@rerun/contracts'
+import { PROVIDER_SWITCH_PART, readProviderSwitchEntry, isContextPart, visibleText, billedMicrosOf, capabilityOfCall, isPaidDataTool, paidCallReceipt, stripBridgePrefix, withHitlVersion, type ConversationAttachment, type ConversationMessage, type ConversationMessageMetadata, type ProviderSwitch } from '@rerun/contracts'
 import { randomUuid } from '@/lib/random-uuid'
 
 type TextPart = { type: 'text'; text: string }
@@ -18,7 +18,8 @@ type ToolInvocationPart = {
     output?: unknown
     errorText?: string
 }
-type UIMessagePart = TextPart | ToolInvocationPart
+type ProviderSwitchPart = { type: typeof PROVIDER_SWITCH_PART; data: ProviderSwitch }
+type UIMessagePart = TextPart | ToolInvocationPart | ProviderSwitchPart
 export type HistoryMessage = { id: string; role: 'user' | 'assistant'; parts: UIMessagePart[]; metadata?: { authorId?: string; createdAt?: string } }
 
 function safeParse(json: string | null | undefined): unknown {
@@ -96,8 +97,17 @@ export function transformEngineMessages(messages: EngineMessage[]): HistoryMessa
             const text = extractText(content)
             if (text) parts.push({ type: 'text', text })
         }
+        // A switch line stored beside the row opens it: the model changed before this answer began.
         const tcParsed = safeParse(m.toolCallsJson)
-        if (Array.isArray(tcParsed)) for (const call of tcParsed) pushCall(call)
+        const switches: ProviderSwitchPart[] = []
+        if (Array.isArray(tcParsed)) {
+            for (const call of tcParsed) {
+                const change = readProviderSwitchEntry(call)
+                if (change) switches.push({ type: PROVIDER_SWITCH_PART, data: change })
+                else pushCall(call)
+            }
+        }
+        parts.unshift(...switches)
 
         if (parts.length === 0) continue
         // The message written for a card that went out bare lands in its own row, after the tool
@@ -140,7 +150,7 @@ function toolPartOf(call: unknown, toolResults: Map<string, unknown>): ToolInvoc
 
 function endsOnHitlCall(message: HistoryMessage): boolean {
     const last = message.parts[message.parts.length - 1]
-    return message.role === 'assistant' && last?.type !== 'text' && !!hitlKindOf(last?.toolName)
+    return message.role === 'assistant' && !!last && 'toolName' in last && !!hitlKindOf(last.toolName)
 }
 
 // The engine has no pagination, so a long research session comes back whole. Past this size a tool
@@ -218,7 +228,7 @@ export function toApiMessages(messages: HistoryMessage[]): ConversationMessage[]
         return {
             id: message.id,
             role: 'assistant',
-            parts: message.parts.map(part => (part.type !== 'text' && part.output !== undefined ? { ...part, output: trimOutput(part.toolName, part.input, part.output) } : part)),
+            parts: message.parts.map(part => ('output' in part && part.output !== undefined ? { ...part, output: trimOutput(part.toolName, part.input, part.output) } : part)),
             ...(message.metadata?.createdAt && { metadata: { createdAt: message.metadata.createdAt } }),
         }
     })

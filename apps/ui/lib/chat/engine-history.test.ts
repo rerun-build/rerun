@@ -235,3 +235,20 @@ describe('message times', () => {
         expect(message).toEqual({ id: 'u1', role: 'user', parts: [{ type: 'text', text: 'Hi' }], metadata: { createdAt: '2026-10-26T09:00:00Z' } })
     })
 })
+
+describe('switch lines stored beside a message', () => {
+    const change = { kind: 'switch', from: { connectionId: 'c1', provider: 'claude', model: 'claude-opus-5-5', name: 'Claude' }, to: { connectionId: 'c2', provider: 'codex', model: 'gpt-6-sol', name: 'ChatGPT' }, resetsAt: '2026-11-18T15:40:00.000Z' }
+
+    // The model changed before this answer began, so the line opens it, ahead of the quick replies
+    // stored in the same column.
+    it('opens the answer with the switch line, and keeps the other entries as calls', () => {
+        const replies = { type: 'tool-call', toolCallId: 'q1', toolName: 'quick_replies', input: { replies: ['More'] } }
+        const [message] = transformEngineMessages([
+            { id: 'a1', sessionId: 's1', role: 'assistant', contentJson: JSON.stringify([{ type: 'text', text: 'Report drafted.' }]), toolCallsJson: JSON.stringify([{ type: 'provider-switch', ...change }, replies]), createdAt: '2026-11-18T12:00:00.000Z' },
+        ] as never)
+
+        expect(message.parts[0]).toEqual({ type: 'data-provider-switch', data: change })
+        expect(message.parts[1]).toEqual({ type: 'text', text: 'Report drafted.' })
+        expect(message.parts[2]).toMatchObject({ toolCallId: 'q1' })
+    })
+})

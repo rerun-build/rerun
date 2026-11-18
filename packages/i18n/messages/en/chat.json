@@ -280,6 +280,12 @@
         "summarized": "{count, plural, one {# earlier message summarized} other {# earlier messages summarized}}",
         "recovered": "~{tokens} tokens recovered"
     },
+    "providerSwitch": {
+        "limit": "{plan} limit reached · {model}",
+        "limitUntil": "{plan} limit reached · {model} until {time}",
+        "limitUntilDate": "{plan} limit reached · {model} until {date}, {time}",
+        "back": "{plan} reset. Back on {model}."
+    },
     "scheduledRun": {
         "label": "Scheduled run",
         "viewPrompt": "View prompt",

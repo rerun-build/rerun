@@ -175,6 +175,12 @@
         "summarized": "{count, plural, one {# frühere Nachricht zusammengefasst} other {# frühere Nachrichten zusammengefasst}}",
         "recovered": "~{tokens} Tokens freigegeben"
     },
+    "providerSwitch": {
+        "limit": "{plan}-Limit erreicht · {model}",
+        "limitUntil": "{plan}-Limit erreicht · {model} bis {time}",
+        "limitUntilDate": "{plan}-Limit erreicht · {model} bis {date}, {time}",
+        "back": "{plan} ist zurückgesetzt. Wieder auf {model}."
+    },
     "scheduledRun": {
         "label": "Geplante Ausführung",
         "viewPrompt": "Prompt ansehen",

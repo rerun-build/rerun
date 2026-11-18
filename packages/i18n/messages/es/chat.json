@@ -175,6 +175,12 @@
         "summarized": "{count, plural, one {# mensaje anterior resumido} other {# mensajes anteriores resumidos}}",
         "recovered": "~{tokens} tokens recuperados"
     },
+    "providerSwitch": {
+        "limit": "Límite de {plan} alcanzado · {model}",
+        "limitUntil": "Límite de {plan} alcanzado · {model} hasta las {time}",
+        "limitUntilDate": "Límite de {plan} alcanzado · {model} hasta el {date}, {time}",
+        "back": "{plan} se restableció. De vuelta en {model}."
+    },
     "scheduledRun": {
         "label": "Ejecución programada",
         "viewPrompt": "Ver el prompt",
