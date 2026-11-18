@@ -463,6 +463,7 @@
     "computerNotFound": "Dieser Computer ist nicht mehr mit dem Workspace verknüpft.",
     "computersNeedMachine": "Dieser Workspace hat noch keine Maschine: Seine Coworker können keinen Computer nutzen.",
     "computersNeedEngineUpdate": "Computer kommen mit dem nächsten Update der Maschine dieses Workspace. Versuch es gleich noch einmal.",
+    "computersEngineUnreachable": "Die Maschine des Workspace antwortet nicht. Versuch es gleich noch einmal.",
     "computersOff": "Computer sind in diesem Workspace noch nicht verfügbar.",
     "computersAdminOnly": "Nur ein Admin kann einen Computer ändern oder trennen, den jemand anderes verknüpft hat."
 }

@@ -463,6 +463,7 @@
     "computerNotFound": "Esta computadora ya no está vinculada al workspace.",
     "computersNeedMachine": "Este workspace aún no tiene máquina: sus coworkers no pueden usar una computadora.",
     "computersNeedEngineUpdate": "Las computadoras llegan con la próxima actualización de la máquina de este workspace. Vuelve a intentarlo en un rato.",
+    "computersEngineUnreachable": "La máquina del workspace no responde. Vuelve a intentarlo en un momento.",
     "computersOff": "Las computadoras aún no están disponibles en este workspace.",
     "computersAdminOnly": "Solo un admin puede cambiar o desvincular una computadora que vinculó otra persona."
 }

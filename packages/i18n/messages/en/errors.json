@@ -472,6 +472,7 @@
     "computerNotFound": "This computer is no longer linked to the workspace.",
     "computersNeedMachine": "This workspace has no machine yet, so its coworkers cannot use a computer.",
     "computersNeedEngineUpdate": "Computers arrive with the next update of this workspace's machine. Try again in a little while.",
+    "computersEngineUnreachable": "The workspace's machine is not answering. Try again in a moment.",
     "computersOff": "Computers are not available on this workspace yet.",
     "computersAdminOnly": "Only an admin can change or unlink a computer someone else linked."
 }

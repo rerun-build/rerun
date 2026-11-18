@@ -5,12 +5,12 @@ import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } fro
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/lib/engine/client', () => ({ supportsRemoteComputers: vi.fn() }))
+vi.mock('@/lib/engine/client', () => ({ supportsRemoteComputers: vi.fn(), getEngineHealth: vi.fn() }))
 vi.mock('@/lib/engine/remote-client', () => ({ upsertRemoteComputer: vi.fn(), deleteRemoteComputer: vi.fn(), listRemoteComputers: vi.fn(), addRemoteComputerRule: vi.fn() }))
 vi.mock('@rerun/cloud/engines', () => ({ DESKTOP_DIRECT: false, desktopRelayBase: vi.fn(async (_base: string, hostId: string | null, boxIndex: number | null) => (hostId ? `wss://${hostId}.relay.test/box/${10 + (boxIndex ?? 0)}` : null)) }))
 
 const { createServiceRoleClient } = await import('@/supabase/serviceRole')
-const { supportsRemoteComputers } = await import('@/lib/engine/client')
+const { getEngineHealth, supportsRemoteComputers } = await import('@/lib/engine/client')
 const { upsertRemoteComputer, deleteRemoteComputer, listRemoteComputers, addRemoteComputerRule } = await import('@/lib/engine/remote-client')
 const service = await import('./remote-computers.service')
 
@@ -61,6 +61,7 @@ beforeEach(() => {
             return { data: null }
         }
         const found = matching(calls, computers)
+        if (calls.some(call => call.method === 'select' && (call.args[1] as { head?: boolean } | undefined)?.head)) return { data: null, count: found.length }
         return { data: calls.some(call => call.method === 'maybeSingle' || call.method === 'single') ? (found[0] ?? null) : found }
     })
     vi.mocked(createServiceRoleClient).mockReturnValue(db.client)
@@ -210,10 +211,13 @@ describe('managing a computer', () => {
         expect(addRemoteComputerRule).toHaveBeenCalledWith(expect.anything(), 'c1', { kind: 'program', program: 'ffmpeg' })
     })
 
-    it('says why settings cannot be changed on a workspace with no machine or an old one', async () => {
+    it('says why settings cannot be changed on a workspace with no machine, an old one, or one that does not answer', async () => {
         const { computer } = await link()
         vi.mocked(supportsRemoteComputers).mockResolvedValue(false)
+        vi.mocked(getEngineHealth).mockResolvedValue({} as never)
         await expect(service.updateComputerSettings(7, computer.id, { mode: 'ask' })).rejects.toMatchObject({ code: 'computersNeedEngineUpdate' })
+        vi.mocked(getEngineHealth).mockRejectedValue(new Error('ECONNREFUSED'))
+        await expect(service.updateComputerSettings(7, computer.id, { mode: 'ask' })).rejects.toMatchObject({ code: 'computersEngineUnreachable' })
         pool = null
         await expect(service.updateComputerSettings(7, computer.id, { mode: 'ask' })).rejects.toMatchObject({ code: 'computersNeedMachine' })
     })
@@ -253,13 +257,38 @@ describe('listWorkspaceComputers', () => {
         expect(vi.mocked(deleteRemoteComputer).mock.calls.map(call => call[1])).toEqual(['c2'])
     })
 
+    it('keeps a computer linked while the box was being read', async () => {
+        await link()
+        vi.mocked(listRemoteComputers).mockImplementation(async () => {
+            computers.push({ id: 'c-fresh', workspace_id: 7, name: 'Laptop', handle: 'laptop', revoked_at: null, created_at: new Date().toISOString() })
+            return [{ id: 'c1', online: true }, { id: 'c-fresh', online: false }] as never
+        })
+        vi.mocked(deleteRemoteComputer).mockClear()
+        await service.listWorkspaceComputers(7)
+        expect(deleteRemoteComputer).not.toHaveBeenCalled()
+    })
+
     it('reads every computer offline when the box does not answer, is too old, or is missing', async () => {
         await link()
         vi.mocked(listRemoteComputers).mockRejectedValue(new Error('timeout'))
         expect(await service.listWorkspaceComputers(7)).toMatchObject({ engine: 'unreachable', computers: [{ view: null }] })
         vi.mocked(supportsRemoteComputers).mockResolvedValue(false)
+        vi.mocked(getEngineHealth).mockResolvedValue({} as never)
         expect(await service.listWorkspaceComputers(7)).toMatchObject({ engine: 'needs-update', computers: [{ view: null }] })
+        // A box that does not answer offers no capability either: it is not one to update.
+        vi.mocked(getEngineHealth).mockRejectedValue(new Error('ECONNREFUSED'))
+        expect(await service.listWorkspaceComputers(7)).toMatchObject({ engine: 'unreachable', computers: [{ view: null }] })
         pool = null
         expect(await service.listWorkspaceComputers(7)).toMatchObject({ engine: 'none', computers: [{ view: null }] })
+    })
+})
+
+describe('hasLinkedComputers', () => {
+    it('counts only the computers still linked to the workspace', async () => {
+        expect(await service.hasLinkedComputers(7)).toBe(false)
+        await link()
+        expect(await service.hasLinkedComputers(7)).toBe(true)
+        computers[0].revoked_at = new Date().toISOString()
+        expect(await service.hasLinkedComputers(7)).toBe(false)
     })
 })

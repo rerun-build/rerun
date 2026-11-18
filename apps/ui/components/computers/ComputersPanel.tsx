@@ -226,6 +226,9 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
             const res = await updateComputerSettingsAction(computer.id, patch)
             if (!res.ok) toast.error(errorText(res))
             await onChanged()
+        } catch {
+            // The request itself did not go through (offline, the hub restarting).
+            toast.error(errorText({ code: 'generic' }))
         } finally {
             setPicked({})
         }
@@ -268,38 +271,43 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
                 <ComputerJobs computerId={computer.id} online={computer.status !== 'offline'} />
 
                 <DetailBlock title={tDetail('approvals')}>
-                    <div className="space-y-4">
-                        <SettingRow title={tDetail('commands')} description={t(`modes.${mode}.description`)}>
-                            <TooltipDisabledReason reason={reason}>
-                                <Select
-                                    value={mode}
-                                    onValueChange={value => void save({ mode: value as RemoteAccessMode })}
-                                    disabled={locked}
-                                >
-                                    <SelectTrigger size="sm" className="w-44 shrink-0" aria-label={tDetail('modeLabel')}>
-                                        <SelectValue>{t(`modes.${mode}.label`)}</SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" align="end" className={OPTION_LIST_CLASS}>
-                                        {MODES.map(value => (
-                                            <SelectItem key={value} value={value}>
-                                                <OptionWithDescription label={t(`modes.${value}.label`)} description={t(`modes.${value}.description`)} />
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </TooltipDisabledReason>
-                        </SettingRow>
-                        <SettingRow title={tDetail('unattended')} description={tDetail('unattendedHint')}>
-                            <TooltipDisabledReason reason={reason}>
-                                <Switch
-                                    checked={unattended}
-                                    aria-label={tDetail('unattended')}
-                                    onCheckedChange={value => void save({ unattended: value })}
-                                    disabled={locked}
-                                />
-                            </TooltipDisabledReason>
-                        </SettingRow>
-                    </div>
+                    {settings ? (
+                        <div className="space-y-4">
+                            <SettingRow title={tDetail('commands')} description={t(`modes.${mode}.description`)}>
+                                <TooltipDisabledReason reason={reason}>
+                                    <Select
+                                        value={mode}
+                                        onValueChange={value => void save({ mode: value as RemoteAccessMode })}
+                                        disabled={locked}
+                                    >
+                                        <SelectTrigger size="sm" className="w-44 shrink-0" aria-label={tDetail('modeLabel')}>
+                                            <SelectValue>{t(`modes.${mode}.label`)}</SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent position="popper" align="end" className={OPTION_LIST_CLASS}>
+                                            {MODES.map(value => (
+                                                <SelectItem key={value} value={value}>
+                                                    <OptionWithDescription label={t(`modes.${value}.label`)} description={t(`modes.${value}.description`)} />
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </TooltipDisabledReason>
+                            </SettingRow>
+                            <SettingRow title={tDetail('unattended')} description={tDetail('unattendedHint')}>
+                                <TooltipDisabledReason reason={reason}>
+                                    <Switch
+                                        checked={unattended}
+                                        aria-label={tDetail('unattended')}
+                                        onCheckedChange={value => void save({ unattended: value })}
+                                        disabled={locked}
+                                    />
+                                </TooltipDisabledReason>
+                            </SettingRow>
+                        </div>
+                    ) : (
+                        // What the box follows is unknown while it does not answer: no value is shown rather than a default.
+                        <p className="text-xs text-muted-foreground">{t('settingsNeedEngine')}</p>
+                    )}
                 </DetailBlock>
 
                 {mode !== 'ask' && settings && (
