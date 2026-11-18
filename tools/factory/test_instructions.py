@@ -77,6 +77,27 @@ class InstructionsTests(unittest.TestCase):
         self.assertIn("VERDICT: ACCEPT", brief.splitlines()[-1])
         self.assertIn("VERDICT: REJECT: <one sentence>", brief.splitlines()[-1])
 
+    def test_a_crlf_body_is_read(self):
+        p = instructions.parse({"number": 1, "body": BODY.replace("\n", "\r\n")})
+        self.assertEqual(p["errors"], [])
+        self.assertEqual((p["old"], p["new"]), (OLD, NEW))
+
+    def test_a_tilde_line_inside_a_text_is_carried_whole(self):
+        new = "a\n~~~~\nb"
+        p = instructions.parse({"number": 1, "body": instructions.body("linus", "c", "r", OLD, new)})
+        self.assertEqual(p["new"], new)
+
+    def test_the_revert_of_an_append_parses_and_restores_the_text(self):
+        p = instructions.parse({"number": 40, "body": instructions.body("linus", "c", "r", "", "Extra")})
+        r = instructions.parse({"number": 41, "body": instructions.revert_body(40, p, "3 of 5")})
+        self.assertEqual(r["errors"], [])
+        self.assertEqual((r["old"], r["new"]), ("Extra", ""))
+        self.assertEqual(instructions.apply(instructions.apply(SOUL, p["old"], p["new"]), r["old"], r["new"]), SOUL)
+
+    def test_an_empty_new_text_only_removes_at_the_end(self):
+        with self.assertRaises(ValueError):
+            instructions.apply(SOUL, OLD, "")
+
     def test_the_verdict_is_read_from_the_last_verdict_line(self):
         self.assertEqual(instructions.FORMS[0]["prefix"], "VERDICT: ")
         out = "x\nVERDICT: REJECT: no\nmore\nVERDICT: ACCEPT"
