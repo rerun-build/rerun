@@ -64,6 +64,33 @@ class RefactorTest(unittest.TestCase):
             finally:
                 os.chdir(cwd)
 
+    def test_main_catches_a_test_path_with_a_space(self):
+        with tempfile.TemporaryDirectory() as d:
+            def git(*a):
+                return subprocess.run(["git", "-C", d, "-c", "user.name=t", "-c", "user.email=t@t", *a], check=True, capture_output=True, text=True).stdout.strip()
+
+            def commit(path, msg):
+                full = os.path.join(d, path)
+                os.makedirs(os.path.dirname(full), exist_ok=True)
+                with open(full, "a") as f:
+                    f.write("x\n")
+                git("add", "-A")
+                git("commit", "-m", msg)
+
+            git("init", "-q")
+            commit("a.py", "base")
+            base = git("rev-parse", "HEAD")
+            commit("tests/test a.py", "refactor: bad")
+            cwd = os.getcwd()
+            os.chdir(d)
+            try:
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(out):
+                    self.assertEqual(refactorcheck.main(["--base", base]), 1)
+                self.assertIn("tests/test a.py", out.getvalue())
+            finally:
+                os.chdir(cwd)
+
 
 if __name__ == "__main__":
     unittest.main()
