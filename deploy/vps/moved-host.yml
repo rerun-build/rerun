@@ -1,0 +1,10 @@
+services:
+  app:
+    labels:
+      - "traefik.http.routers.app-old-host.rule=Host(`${RERUN_OLD_APP_HOST:?run sh deploy/vps/move-host.sh}`)"
+      - traefik.http.routers.app-old-host.entrypoints=websecure
+      - traefik.http.routers.app-old-host.tls.certresolver=letsencrypt
+      - traefik.http.routers.app-old-host.middlewares=app-moved
+      - "traefik.http.middlewares.app-moved.redirectregex.regex=^https://[^/]+/(.*)"
+      - "traefik.http.middlewares.app-moved.redirectregex.replacement=https://${RERUN_APP_HOST:?set RERUN_APP_HOST in .env}/$${1}"
+      - traefik.http.middlewares.app-moved.redirectregex.permanent=true
