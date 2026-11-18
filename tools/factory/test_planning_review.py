@@ -148,6 +148,7 @@ class Review(Station):
         self.planned()
         self.once()
         self.assertEqual(self.w.sends[-1][0], "ss")
+        self.assertEqual(self.w.issue(5)["comments"], [PLAN])
 
     def test_a_review_that_cannot_run_twice_lets_the_plan_through(self):
         self.build()
