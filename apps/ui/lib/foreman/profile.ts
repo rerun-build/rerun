@@ -54,7 +54,7 @@ export async function mergeForeman(ctx: WorkspaceContext, patch: ForemanProfile)
 // The first name lives on the auth user, beside the one Google writes, because that is where every
 // other surface reads it from. `full_name` is only filled when nothing holds a name yet, so a
 // Google account keeps the full one it arrived with.
-async function saveFirstName(ctx: WorkspaceContext, firstName: string): Promise<void> {
+export async function saveFirstName(ctx: WorkspaceContext, firstName: string): Promise<void> {
     const metadata = ctx.authUser.user_metadata ?? {}
     const fullName = typeof metadata.full_name === 'string' && metadata.full_name ? metadata.full_name : firstName
     await ctx.supabase.auth.admin.updateUserById(ctx.userId, { user_metadata: { ...metadata, first_name: firstName, full_name: fullName } })

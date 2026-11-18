@@ -7,9 +7,11 @@
 // transcript, on the other hand, is already persisted, so every turn re-derives the intent from it
 // exactly as the phase is re-derived from the database.
 
+import { FOREMAN_KICKOFF_MARKER } from '@rerun/contracts'
+
 import { readHeroAgentApps, readHeroAgentName } from '@/lib/onboarding/hero-handoff'
 
-export const KICKOFF_MARKER = '[[foreman:start]]'
+export const KICKOFF_MARKER = FOREMAN_KICKOFF_MARKER
 
 // A prompt comes with what the landing composer read in it, when it read anything: the name it gave
 // the agent and the catalogue slugs of its apps.

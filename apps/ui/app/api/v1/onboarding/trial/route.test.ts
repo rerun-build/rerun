@@ -18,9 +18,9 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => ({
 const { POST } = await import('./route')
 
 const segment = { params: Promise.resolve({}) }
-const request = (client?: string) => new Request('https://app.rerun.build/api/v1/foreman/trial', { method: 'POST', headers: client ? { 'x-rerun-client': client } : {} })
+const request = (client?: string) => new Request('https://app.rerun.build/api/v1/onboarding/trial', { method: 'POST', headers: client ? { 'x-rerun-client': client } : {} })
 
-describe('POST /api/v1/foreman/trial', () => {
+describe('POST /api/v1/onboarding/trial', () => {
     beforeEach(() => {
         workspace.subscription_status = null
         startCardlessTrial.mockReset().mockResolvedValue(true)

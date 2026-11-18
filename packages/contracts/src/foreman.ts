@@ -59,8 +59,13 @@ export function isMobileClient(client: ForemanClient | null | undefined): client
     return (CLIENT_PLATFORMS as readonly string[]).includes(client ?? '')
 }
 
-// GET /api/chat/foreman/state.
-export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string() })
+// The message an app sends for the Chief of Staff to speak first: never something the person wrote, so
+// no client shows it.
+export const FOREMAN_KICKOFF_MARKER = '[[foreman:start]]'
+
+// GET /api/chat/foreman/state. `greet`: the onboarding just handed over, and the Chief of Staff on the
+// engine owes them its first words.
+export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string(), greet: z.boolean().optional() })
 export type ForemanStateResponse = z.infer<typeof foremanStateSchema>
 
 // GET /api/chat/foreman/engine: the caller's General with the engine's foreman, null before they

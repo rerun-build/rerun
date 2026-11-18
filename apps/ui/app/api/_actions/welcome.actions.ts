@@ -10,9 +10,10 @@ import { decideIndustry } from '@/lib/company/decide-industry'
 import { companySiteUrl } from '@/lib/company/firecrawl'
 import { analyzeCompanyProfile } from '@/lib/company/profile'
 import type { ForemanAnswers } from '@/lib/foreman/phase'
-import { readAnswers, writeAnswers } from '@/lib/foreman/profile'
+import { readAnswers, saveFirstName, writeAnswers } from '@/lib/foreman/profile'
 import { failure, failureOf } from '@/lib/i18n/action-error'
 import { takeIntakeCall } from '@/lib/onboarding/anonymous-intake-quota'
+import type { ForemanIntake } from '@/lib/onboarding/intake'
 import type { ActionResult } from './space.actions'
 
 // The welcome page's answers, each written the moment it is given so a reload resumes on the next
@@ -86,6 +87,43 @@ export async function saveWelcomeSiteAction(site: string | null): Promise<Action
     } catch (err) {
         return failureOf(err, 'saveAnswerFailed')
     }
+}
+
+/**
+ * The app's welcome card: the site, the line of work and the role handed over at once, where the page
+ * above saves each as it is answered. What comes back is the industry that was stored.
+ */
+export async function saveWelcomeIntakeAction(intake: ForemanIntake): Promise<{ industry: TemplateCategory }> {
+    const ctx = await welcomeContext()
+    const url = intake.companyUrl && !platformHost(intake.companyUrl) ? companySiteUrl(intake.companyUrl) : null
+    const analysis = url ? await withinBudget(analyzeCompanyProfile(url), null) : null
+    const profile = analysis?.ok ? analysis.analysis.profile : null
+    const siteIndustry = profile?.industry && isTemplateCategory(profile.industry) ? profile.industry : null
+    // The one they picked is the only one that is not a guess; `other` when nothing could be told, so
+    // the question is not asked again.
+    const industry: TemplateCategory = intake.industry ?? siteIndustry ?? intake.decidedIndustry ?? 'other'
+
+    await saveAnswers(ctx, answers =>
+        withProgress(
+            {
+                ...answers,
+                company_url: analysis?.ok ? analysis.analysis.url : (url ?? answers.company_url),
+                company_name: profile?.name ?? answers.company_name,
+                company_description: profile?.description ?? answers.company_description,
+                company_offering: profile?.offering ?? intake.industryLabel ?? answers.company_offering,
+                company_audience: profile?.audience ?? answers.company_audience,
+                industry,
+                position: intake.position ?? answers.position,
+            },
+            { siteSkipped: !url, siteIndustry: siteIndustry ?? undefined, industryLabel: intake.industryLabel ?? undefined }
+        )
+    )
+
+    // Before the exploration, which looks for the person on LinkedIn by their first name.
+    if (intake.firstName) await saveFirstName(ctx, intake.firstName)
+    if (url) await requestCompanyExplore(ctx.supabase, ctx.workspace.id, url).catch(err => console.error('Failed to request a company exploration', ctx.workspace.id, err))
+    await ensureWorkspaceNamed({ workspaceId: ctx.workspace.id, userId: ctx.userId })
+    return { industry }
 }
 
 /**
