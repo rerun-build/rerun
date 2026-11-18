@@ -3,6 +3,26 @@ import unittest
 import renewal
 
 
+WEEK = 7 * 86400
+
+
+class Pace(unittest.TestCase):
+    def test_behind_or_on_the_week_runs_at_full_speed(self):
+        self.assertEqual(renewal.pace(30, 95, 0.5 * WEEK, 0), 1.0)
+        self.assertEqual(renewal.pace(0, 95, 0.1 * WEEK, 0), 1.0)
+
+    def test_ahead_of_the_week_spreads_what_is_left_over_the_time_left(self):
+        self.assertAlmostEqual(renewal.pace(68, 95, 0.694 * WEEK, 0), (27 / 95) / 0.694, places=6)
+
+    def test_at_or_past_the_mark_it_is_zero(self):
+        self.assertEqual(renewal.pace(95, 95, 0.5 * WEEK, 0), 0.0)
+        self.assertEqual(renewal.pace(99, 95, 0.5 * WEEK, 0), 0.0)
+
+    def test_without_a_reading_it_does_not_pace(self):
+        for used, mark, resets in ((None, 95, WEEK), (50, None, WEEK), (50, 95, None), (50, 95, -1)):
+            self.assertEqual(renewal.pace(used, mark, resets, 0), 1.0)
+
+
 class Renewal(unittest.TestCase):
     def test_only_the_default_connection_decides_and_a_bad_answer_never_holds(self):
         def c(minutes, default, i="x"):

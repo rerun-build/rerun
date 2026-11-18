@@ -20,6 +20,7 @@ import gatefiles
 import holds
 import inboxsort
 import instructions
+import limits
 import plancheck
 import planners
 import planning
@@ -459,6 +460,7 @@ class Dispatcher:
         self.renewal_unreadable = False
         self.connections = None
         self.plan_week_full = False
+        self.pace = 1.0
         self.draining = False
         self.report_logged = set()
         self.started = now()
@@ -513,10 +515,15 @@ class Dispatcher:
     def busy(self):
         return {j["agent"] for j in self.jobs() if j["state"] in RUNNING and j.get("agent")}
 
+    def pace_slots(self, total, pace=None):
+        pace = self.pace if pace is None else pace
+        return total if pace >= 1 else max(1, int(total * pace))
+
     def slot_quotas(self):
         total = self.cfg.get("slots")
         if not total:
             return None
+        total = self.pace_slots(total)
         waiting = {}
         for j in self.jobs():
             s = slots.station(j)
@@ -1698,10 +1705,17 @@ class Dispatcher:
             if not self.renewal_unreadable:
                 self.renewal_unreadable = True
                 log("-", "sign-in time not readable: no hold before a renewal")
+            self.pace = 1.0
             return
         self.renewal_unreadable = False
         now = self.now()
-        used, mark = (renewal.plan(answer, now) or {}).get("weekUsedPercent"), self.cfg.get("plan_week_hold_percent")
+        week = renewal.plan(answer, now) or {}
+        used, mark = week.get("weekUsedPercent"), self.cfg.get("plan_week_hold_percent")
+        resets = limits.ts(week["weekResetsAt"]) if week.get("weekResetsAt") else None
+        pace = renewal.pace(used, mark, resets, now)
+        if pace < 1 and self.cfg.get("slots") and round(pace, 1) != round(self.pace, 1):
+            log("-", "pacing the plan week: %d %% used, %.1f days left, %d of %d slots" % (used, (resets - now) / 86400, self.pace_slots(self.cfg["slots"], pace), self.cfg["slots"]))
+        self.pace = pace
         full = mark is not None and used is not None and used >= mark
         if full:
             if not self.plan_week_full:

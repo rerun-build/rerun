@@ -3,6 +3,17 @@ import limits
 import snapshot
 
 
+WEEK_S = 7 * 86400
+
+
+def pace(used, mark, resets_at, now):
+    if used is None or not mark or resets_at is None or resets_at <= now:
+        return 1.0
+    budget = max(0.0, mark - used) / mark
+    time = min(1.0, (resets_at - now) / WEEK_S)
+    return min(1.0, budget / time)
+
+
 def left(answer):
     if not isinstance(answer, dict):
         return None
