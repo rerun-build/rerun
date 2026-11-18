@@ -4,10 +4,10 @@ import { pendingOpencodePlanLimits } from './opencode-plan-limits.js'
 import type { LoadedConnection } from './types.js'
 
 // Waits for the plan-limit reads in flight at the moment of the call, capped since a CLI that hangs
-// must not hold anyone. The order of the call decides what is waited for: the connections list
-// calls it before its stale refreshes, so the rings it draws are the run's and the pickers never
-// wait on a read the list itself started; `ai_status` calls it after them, so the coworker answers
-// with a fresh reading of the quota it was asked about.
+// must not hold anyone. The order of the call decides what is waited for: the plain connections list
+// calls it before its stale refreshes, so it waits on a run's read or one an earlier list started,
+// never on its own; the list with `?fresh=1` (the AI providers panel) and `ai_status` call it after
+// them, so they answer with the reading they just started.
 const PENDING_PLAN_LIMITS_MAX_WAIT_MS = 5_000
 
 export async function awaitPendingPlanLimits(connections: LoadedConnection[]): Promise<void> {

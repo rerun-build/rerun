@@ -85,7 +85,6 @@ export async function updateConnectionKeys(id: string, { set, remove }: UpdateCo
         forgetPlanLimits(id)
         forgetCliModels(id)
         forgetOpencodePlanLimitsAttempt(id)
-    forgetClaudePlanLimitsAttempt(id)
         forgetClaudePlanLimitsAttempt(id)
         forgetCustomCatalog(id)
         forgetCredentialRejected(id)

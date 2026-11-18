@@ -62,7 +62,7 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
             inputSchema: z.object({}),
             execute: async () => {
                 const connections = await listConnections()
-                // Deliberately before the wait, unlike the connections list: the question is about
+                // Deliberately before the wait, like the panel's fresh list: the question is about
                 // the quota, so the coworker waits (capped) for the reading it starts here.
                 refreshStaleClaudePlanLimits(connections)
                 refreshStaleCodexPlanLimits(connections)

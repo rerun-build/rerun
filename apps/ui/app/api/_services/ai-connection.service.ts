@@ -154,6 +154,15 @@ export async function isCustomOfferedTo(workspaceId: number): Promise<boolean> {
     return isCustomOffered((await findWorkspaceEngine(workspaceId))?.conn)
 }
 
+// `opencodeOffered`: whether this workspace may add OpenCode, behind its flag and on an engine that
+// runs it. `customOffered`: whether its engine runs custom endpoints.
+export type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
+
+export async function listAiConnectionsWithOffers(workspaceId: number, { fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
+    const [list, opencodeOffered, customOffered] = await Promise.all([listAiConnections(workspaceId, { fresh }), isOpencodeOfferedTo(workspaceId).catch(() => false), isCustomOfferedTo(workspaceId).catch(() => false)])
+    return { ...list, opencodeOffered, customOffered }
+}
+
 
 // The mobile app and the routes reach this without the web's list, so the rule is held here too.
 async function assertClaudePlanOffered(workspaceId: number, provider: CreateBoxConnectionInput['provider']): Promise<void> {

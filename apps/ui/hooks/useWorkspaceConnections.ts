@@ -1,5 +1,6 @@
 'use client'
 
+import type { AiConnectionsList } from '@/app/api/_services/ai-connection.service'
 import { createAiConnectionAction, deleteAiConnectionAction, listAiConnectionsAction, refreshAiConnectionsAction, setBackupModelsAction, setDefaultModelAction, updateAiConnectionAction, updateAiConnectionKeysAction } from '@/app/api/_actions/workspace-connection.actions'
 import { invalidateLoadedAgentContexts } from '@/hooks/useAgentContext'
 import { connectionMethod, trackAiConnectionConnected, trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
@@ -41,18 +42,28 @@ function subscribe(listener: () => void) {
     }
 }
 
+// The fresh list waits for today's plan usage, so it goes through a route: a Server Action would hold
+// every later action of the tab behind it. One the route cannot serve falls back on the plain list.
+async function readFreshList(): Promise<AiConnectionsList> {
+    const res = await fetch('/api/ai-connections', { cache: 'no-store' }).catch(() => null)
+    return res?.ok ? ((await res.json()) as AiConnectionsList) : listAiConnectionsAction()
+}
+
 // Deduped: every mounted picker asks on mount, and they must add up to one request. A `fresh` ask
 // (the AI providers panel opening) is never folded into a plain one: it is the read that waits for
-// today's plan usage. Only the last list asked for lands, so a plain one sent first cannot answer
-// last with the older reading.
+// today's plan usage. A list asked for before the one already shown is dropped, so a plain one sent
+// first cannot answer last with the older reading.
 let lastAsked = 0
+let lastLanded = 0
 
 function fetchList({ fresh = false }: { fresh?: boolean } = {}): Promise<void> {
     if (inflight && !fresh) return inflight
     const asked = ++lastAsked
-    const task: Promise<void> = listAiConnectionsAction({ fresh })
+    const task: Promise<void> = (fresh ? readFreshList() : listAiConnectionsAction())
         .then(list => {
-            if (asked === lastAsked) setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
+            if (asked < lastLanded) return
+            lastLanded = asked
+            setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
         })
         .catch(() => {})
         .finally(() => {

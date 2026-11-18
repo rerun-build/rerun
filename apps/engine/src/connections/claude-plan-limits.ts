@@ -1,5 +1,6 @@
 import { logger } from '../lib/logger.js'
 import { acquireClaudeLease, claudeTokenOf, ensureFreshClaudeToken } from './claude-token.js'
+import { isCredentialRejected } from './credential-rejections.js'
 import { planLimitWindowsFromClaudeUsage, readPlanLimits, recordPlanLimits, type ClaudeUsageAnswer } from './plan-limits.js'
 import type { LoadedConnection } from './types.js'
 
@@ -16,10 +17,11 @@ const attemptedAt = new Map<string, number>()
 // The endpoint behind the CLI's `/usage`, which a run already reads in its Stop hook, asked off a
 // run so the usage spent outside Rerun (Claude Desktop, Claude Code elsewhere) shows before the next
 // run ends. Only a sign-in token carries the profile scope it needs: a `claude setup-token` value
-// would be refused on every ask, so it is never sent. Nothing here flags the token as refused: a
-// run answered with a 401 does that.
+// would be refused on every ask, so it is never sent. A refusal of the read flags nothing; the token
+// refresh it may start does flag a dead refresh token, and from then on nothing is asked until the
+// user signs in again.
 export function refreshClaudePlanLimits(connection: LoadedConnection | null): Promise<void> {
-    if (!connection || connection.config.provider !== 'claude' || !claudeTokenOf(connection) || !connection.env.CLAUDE_CODE_OAUTH_REFRESH_TOKEN) return Promise.resolve()
+    if (!connection || connection.config.provider !== 'claude' || !claudeTokenOf(connection) || !connection.env.CLAUDE_CODE_OAUTH_REFRESH_TOKEN || isCredentialRejected(connection.id)) return Promise.resolve()
 
     const pending = inFlight.get(connection.id)
     if (pending) return pending

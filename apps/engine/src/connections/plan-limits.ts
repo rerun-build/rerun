@@ -64,7 +64,7 @@ export function planLimitWindowsFromClaudeUsage(answer: ClaudeUsageAnswer | null
     })
 }
 
-type CodexWindow ={ usedPercent?: number | null; windowDurationMins?: number | null; resetsAt?: number | null } | null
+type CodexWindow = { usedPercent?: number | null; windowDurationMins?: number | null; resetsAt?: number | null } | null
 
 // The part of the app-server's `account/rateLimits/read` answer read here.
 export type CodexRateLimits = { rateLimits?: { primary?: CodexWindow; secondary?: CodexWindow } | null }

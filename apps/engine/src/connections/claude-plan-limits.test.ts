@@ -7,6 +7,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-claude-usage-'
 
 const { refreshClaudePlanLimits, refreshClaudePlanLimitsAfterRun, refreshStaleClaudePlanLimits, pendingClaudePlanLimits, forgetClaudePlanLimitsAttempt } = await import('./claude-plan-limits.js')
 const { forgetPlanLimits, readPlanLimits, recordPlanLimits } = await import('./plan-limits.js')
+const { forgetCredentialRejected, recordCredentialRejected } = await import('./credential-rejections.js')
 
 // The parts of a real `GET /api/oauth/usage` answer the gauge reads (18/11/2026), with the five-hour
 // window filled in: that account had none open when it was captured.
@@ -41,6 +42,7 @@ beforeEach(() => {
     globalThis.fetch = fetchMock as any
     forgetPlanLimits('claude-1')
     forgetClaudePlanLimitsAttempt('claude-1')
+    forgetCredentialRejected('claude-1')
 })
 
 afterEach(() => {
@@ -70,6 +72,16 @@ describe('refreshClaudePlanLimits', () => {
     it('never asks with a pasted token, which lacks the profile scope', async () => {
         answer(USAGE_ANSWER)
         await refreshClaudePlanLimits(connection({ CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat-pasted' }))
+        expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    // A dead refresh token would otherwise cost a refused refresh and a 401 on every list until the
+    // user signs in again.
+    it('never asks for a connection already flagged as signed out', async () => {
+        answer(USAGE_ANSWER)
+        recordCredentialRejected('claude-1')
+        await refreshClaudePlanLimits(signedIn())
+        refreshStaleClaudePlanLimits([signedIn()])
         expect(fetchMock).not.toHaveBeenCalled()
     })
 

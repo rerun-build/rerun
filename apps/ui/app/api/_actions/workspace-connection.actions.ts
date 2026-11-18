@@ -7,9 +7,7 @@ import {
     createAiConnection,
     deleteAiConnection,
     getAiConnectionUsage,
-    isCustomOfferedTo,
-    isOpencodeOfferedTo,
-    listAiConnections,
+    listAiConnectionsWithOffers,
     probeCustomEndpoint,
     setWorkspaceBackupModels,
     setWorkspaceDefaultModel,
@@ -17,11 +15,12 @@ import {
     startCodexSignIn,
     updateAiConnection,
     updateAiConnectionKeys,
+    type AiConnectionsList,
 } from '@/app/api/_services/ai-connection.service'
 import { NoPlanError } from '@/app/api/_services/capacity.service'
 import type { ClaudeOAuthStart } from '@/lib/engine/claude-oauth'
 import type { CodexDeviceAuthStart } from '@/lib/engine/codex-oauth'
-import type { BoxBackupModels, BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
+import type { BoxBackupModels, BoxConnection, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { NO_BOX_BACKUPS, customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
 import { refusal, refusalOf, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
@@ -51,19 +50,11 @@ function refusedNoPlan(code: ErrorCode): Refusal & { reason: 'no_plan' } {
 // to hold a credential, whatever the user pastes.
 type CreateResult = { success: true; connection: BoxConnection } | (Refusal & { reason?: 'no_plan' })
 
-// `opencodeOffered`: whether this workspace may add OpenCode, behind its flag and on an engine that
-// runs it. `customOffered`: whether its engine runs custom endpoints.
-type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
-
-async function readAiConnections({ fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
-    const workspaceId = await requireWorkspaceId()
-    const [list, opencodeOffered, customOffered] = await Promise.all([listAiConnections(workspaceId, { fresh }), isOpencodeOfferedTo(workspaceId).catch(() => false), isCustomOfferedTo(workspaceId).catch(() => false)])
-    return { ...list, opencodeOffered, customOffered }
-}
-
-export async function listAiConnectionsAction({ fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
+// Never the fresh read: an action holds every later action of the tab while it waits, and the plan
+// usage reads can take seconds. The AI providers panel asks GET /api/ai-connections for it instead.
+export async function listAiConnectionsAction(): Promise<AiConnectionsList> {
     try {
-        return await readAiConnections({ fresh })
+        return await listAiConnectionsWithOffers(await requireWorkspaceId())
     } catch {
         return { connections: [], default: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false }
     }
@@ -73,7 +64,7 @@ export async function listAiConnectionsAction({ fresh = false }: { fresh?: boole
 // so the caller keeps what it has instead of taking the empty list for the workspace's.
 export async function refreshAiConnectionsAction(): Promise<AiConnectionsList | null> {
     try {
-        return await readAiConnections()
+        return await listAiConnectionsWithOffers(await requireWorkspaceId())
     } catch {
         return null
     }

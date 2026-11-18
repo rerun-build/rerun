@@ -183,22 +183,26 @@ describe('setBackups', () => {
 })
 
 describe('the AI providers panel opening', () => {
+    const realFetch = globalThis.fetch
+    let fetchMock: ReturnType<typeof vi.fn>
+
     beforeEach(() => {
         vi.resetModules()
         mocks.listAiConnectionsAction.mockReset()
+        fetchMock = vi.fn()
+        globalThis.fetch = fetchMock as unknown as typeof fetch
     })
     afterEach(() => {
         act(() => root?.unmount())
         root = null
         container?.remove()
+        globalThis.fetch = realFetch
     })
 
-    async function mountWith(options: { revalidate?: boolean }) {
-        const { useWorkspaceConnections } = await import('./useWorkspaceConnections')
-        function Probe() {
-            seen = useWorkspaceConnections(options).connections
-            return null
-        }
+    const routeAnswers = (body: unknown, status = 200) => fetchMock.mockResolvedValue(new Response(JSON.stringify(body), { status }))
+    const percents = () => seen.map(c => c.planLimits?.windows[0]?.usedPercent)
+
+    async function mountProbe(Probe: () => null) {
         container = document.createElement('div')
         document.body.appendChild(container)
         root = createRoot(container)
@@ -206,31 +210,70 @@ describe('the AI providers panel opening', () => {
         await act(async () => {})
     }
 
-    it('asks for fresh plan usage, where a model picker does not', async () => {
+    async function mountWith(options: { revalidate?: boolean }) {
+        const { useWorkspaceConnections } = await import('./useWorkspaceConnections')
+        await mountProbe(() => {
+            seen = useWorkspaceConnections(options).connections
+            return null
+        })
+    }
+
+    // A Server Action holds every later action of the tab: the panel's read, which waits on the
+    // engine, must not be one.
+    it('reads fresh plan usage through the route, where a model picker uses the action', async () => {
         mocks.listAiConnectionsAction.mockResolvedValue(list([connection('c1', 40)]))
+        routeAnswers(list([connection('c1', 66)]))
         await mountWith({})
-        expect(mocks.listAiConnectionsAction).toHaveBeenLastCalledWith({ fresh: false })
+        expect(mocks.listAiConnectionsAction).toHaveBeenCalledTimes(1)
+        expect(fetchMock).not.toHaveBeenCalled()
 
         await act(async () => root!.unmount())
         await mountWith({ revalidate: true })
-        expect(mocks.listAiConnectionsAction).toHaveBeenLastCalledWith({ fresh: true })
+        expect(fetchMock).toHaveBeenCalledWith('/api/ai-connections', { cache: 'no-store' })
+        expect(mocks.listAiConnectionsAction).toHaveBeenCalledTimes(1)
+        expect(percents()).toEqual([66])
+    })
+
+    it('falls back on the plain list when the route cannot answer', async () => {
+        mocks.listAiConnectionsAction.mockResolvedValue(list([connection('c1', 40)]))
+        routeAnswers({ error: 'Unauthorized' }, 401)
+        await mountWith({ revalidate: true })
+        expect(mocks.listAiConnectionsAction).toHaveBeenCalledTimes(1)
+        expect(percents()).toEqual([40])
+    })
+
+    it('shows a plain list that answers first while the fresh one is still reading', async () => {
+        let answerFresh: (value: Response) => void = () => {}
+        fetchMock.mockImplementation(() => new Promise(resolve => (answerFresh = resolve)))
+        mocks.listAiConnectionsAction.mockResolvedValue(list([connection('c1', 40)]))
+        const { useWorkspaceConnections } = await import('./useWorkspaceConnections')
+        let loading = true
+        await mountProbe(() => {
+            useWorkspaceConnections()
+            const panel = useWorkspaceConnections({ revalidate: true })
+            seen = panel.connections
+            loading = panel.loading
+            return null
+        })
+        expect(loading).toBe(false)
+        expect(percents()).toEqual([40])
+
+        await act(async () => answerFresh(new Response(JSON.stringify(list([connection('c1', 66)])))))
+        await act(async () => {})
+        expect(percents()).toEqual([66])
     })
 
     it('keeps the fresh reading when a plain list sent before it answers last', async () => {
         let answerPlain: (value: unknown) => void = () => {}
-        mocks.listAiConnectionsAction.mockImplementation(({ fresh }: { fresh: boolean }) => (fresh ? Promise.resolve(list([connection('c1', 66)])) : new Promise(resolve => (answerPlain = resolve))))
+        mocks.listAiConnectionsAction.mockImplementation(() => new Promise(resolve => (answerPlain = resolve)))
+        routeAnswers(list([connection('c1', 66)]))
         const { useWorkspaceConnections } = await import('./useWorkspaceConnections')
-        function Probe() {
+        await mountProbe(() => {
             useWorkspaceConnections()
             seen = useWorkspaceConnections({ revalidate: true }).connections
             return null
-        }
-        container = document.createElement('div')
-        document.body.appendChild(container)
-        root = createRoot(container)
-        await act(async () => root!.render(createElement(Probe)))
-        await act(async () => {})
+        })
         await act(async () => answerPlain(list([connection('c1', 40)])))
-        expect(seen.map(c => c.planLimits?.windows[0]?.usedPercent)).toEqual([66])
+        expect(percents()).toEqual([66])
     })
 })
