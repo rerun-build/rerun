@@ -114,7 +114,7 @@ async function framed(shot, ctx) {
 }
 
 async function captureShot({ browser, base, states, scene, shot, demo, theme, workDir, force }) {
-    const { context, page } = await newContext(browser, base, stateFor(states, scene, shot), theme, shot.view ?? scene.view ?? 'board')
+    const { context, page } = await newContext(browser, base, stateFor(states, scene, shot), theme, shot.view ?? scene.view ?? 'board', shot.height ? { viewport: { ...VIEWPORT, height: shot.height } } : {})
     try {
         const ctx = { page, base, demo }
         await shot.open(ctx)

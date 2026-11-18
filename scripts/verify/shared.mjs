@@ -217,7 +217,7 @@ export async function signInPage(page, base, account) {
         await page.reload({ timeout: 180_000 })
         await confirm.click({ timeout: 120_000 })
     }
-    await page.waitForURL((url) => !url.pathname.startsWith('/auth'), { timeout: 60_000 })
+    await page.waitForURL((url) => !url.pathname.startsWith('/auth'), { timeout: 180_000 })
     await skipPhoneStep(account.admin, account.userId)
 }
 

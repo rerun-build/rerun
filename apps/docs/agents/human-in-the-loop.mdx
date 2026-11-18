@@ -3,11 +3,15 @@ title: "Human in the loop"
 description: "How a coworker asks you a question, requests an approval, collects a credential, or hands you its screen."
 ---
 
+import { Shot, Loop } from '/snippets/media.jsx'
+
 A coworker that never checks with you is a liability. Rerun gives every coworker eight ways to hand a decision back, and one way to tell you something without stopping.
 
 ## The pauses
 
 When a coworker uses any of these, it **stops its turn**. A card appears in the conversation, you answer it, and the run continues from your reply. The thread shows **Needs you** until then.
+
+<Shot src="/images/agents/human-in-the-loop/approval-card" alt="An Approval required card: Send 3 payment reminders, with the detail of each invoice and the Explain, Not now and Approve buttons" />
 
 <CardGroup cols={2}>
   <Card title="A question" icon="message-circle-question">
@@ -35,6 +39,8 @@ When a coworker uses any of these, it **stops its turn**. A card appears in the 
     Before it runs a command, or reaches a file outside the allowed folders, on a [computer you linked](/computers), the card names the computer (`#studio-pc`), each command as written and the folder it runs in, or the paths. Click **Allow**, **Deny**, or **Always allow** the program or the folder when the card offers it.
   </Card>
 </CardGroup>
+
+<Loop src="/images/agents/human-in-the-loop/approve-action" alt="Clicking Approve on the card: it turns into an approved receipt and the coworker carries on" caption="Approve, and the run picks up where it stopped." />
 
 A coworker asks one thing at a time, batching everything into a single card, so you are never facing three stacked cards. Closing a card without answering tells the coworker you skipped it, and it carries on from there.
 

@@ -3,6 +3,8 @@ title: "Automations"
 description: "Make a coworker run on a schedule, or on an event from another service."
 ---
 
+import { Shot } from '/snippets/media.jsx'
+
 A coworker that only answers when you write to it is a chatbot. Two things make it a worker: scheduled tasks and webhook triggers. Both live on the coworker's **Routines** screen: open the coworker card, then **Routines**, and pick the **Scheduled** or the **Triggers** tab.
 
 ```mermaid
@@ -23,6 +25,8 @@ Every automated run opens a thread of its own, so it never lands in the middle o
 A scheduled task is a schedule plus an instruction. When it fires, the coworker runs with no user message and follows that instruction, in a fresh thread each time.
 
 Click **New** on the **Scheduled** tab, or just ask the coworker to set it up.
+
+<Shot src="/images/agents/automations/scheduled-tasks" alt="The Scheduled tab of Lead Scout's Routines: Monday prospects, every Monday at 8:00 AM, switched on" />
 
 <ParamField path="Name" type="string">
   Also decides the slug the task is addressed by, so it cannot be changed afterwards.
@@ -83,6 +87,8 @@ The payload lands right after your prompt, so the coworker does not have to fetc
 <Warning>
   The URL is the credential: it carries a secret, and anyone holding it can start a run. Do not paste it into a shared document or a public repository. Copying it, previewing it in a chat or opening it in a browser starts nothing. If it leaks, click **Rotate the secret**: the current URL stops working right away, and you paste the new one wherever the trigger is called from.
 </Warning>
+
+<Shot src="/images/agents/automations/triggers" alt="The Triggers tab of Invoice Chaser's Routines, with the Stripe payment trigger" />
 
 Like a scheduled task, a trigger has **Enabled**, **Notify me** and **History**, and its list shows how many calls it received. See [Webhook triggers](/api/webhooks) for the full HTTP contract: methods, response codes, size limits and how link previews are filtered out.
 

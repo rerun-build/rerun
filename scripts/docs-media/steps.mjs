@@ -26,3 +26,16 @@ export async function showWholeBoard(page) {
         await page.waitForTimeout(600)
     }
 }
+
+// The coworker card has no landmark of its own: from an element inside it, climb to the first
+// ancestor about as tall as the window, and frame that.
+export async function panelAround(page, inner) {
+    await inner.first().waitFor({ timeout: 20_000 })
+    await inner.first().evaluate((element) => {
+        for (const marked of document.querySelectorAll('[data-docs-frame]')) marked.removeAttribute('data-docs-frame')
+        let node = element
+        while (node.parentElement && node.getBoundingClientRect().height < window.innerHeight * 0.9) node = node.parentElement
+        node.setAttribute('data-docs-frame', '')
+    })
+    return page.locator('[data-docs-frame]')
+}
