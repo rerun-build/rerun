@@ -20,7 +20,7 @@ describe('projectRun cached tokens', () => {
         expect(projectRun({ ...base, inputTokens: 1000, cachedInputTokens: 800 }).cachedInputTokens).toBe(800)
         expect(projectRun({ ...base, cachedInputTokens: null }).cachedInputTokens).toBeNull()
         expect(projectRun(base).cachedInputTokens).toBeNull()
-        expect(Object.keys(projectRun(base))).toEqual(['runId', 'status', 'sessionId', 'provider', 'model', 'trigger', 'steps', 'inputTokens', 'cachedInputTokens', 'outputTokens', 'totalTokens', 'costUsd', 'startedAt', 'finishedAt', 'error', 'goal', 'compactions', 'compactSummaryChars', 'compactAtTokens'])
+        expect(Object.keys(projectRun(base))).toEqual(['runId', 'status', 'sessionId', 'provider', 'model', 'trigger', 'steps', 'inputTokens', 'cachedInputTokens', 'outputTokens', 'totalTokens', 'costUsd', 'startedAt', 'finishedAt', 'error', 'goal', 'compactions', 'compactSummaryChars', 'compactAtTokens', 'handoverPath'])
     })
 })
 
@@ -28,5 +28,12 @@ describe('projectRun compaction', () => {
     it('carries the compaction count, summary size and trigger point of a run', () => {
         expect(projectRun({ ...base, compactions: 2, compactSummaryChars: 9000, compactAtTokens: 240000 })).toMatchObject({ compactions: 2, compactSummaryChars: 9000, compactAtTokens: 240000 })
         expect(projectRun(base)).toMatchObject({ compactions: null, compactSummaryChars: null, compactAtTokens: null })
+    })
+})
+
+describe('projectRun handover', () => {
+    it('carries the path of the last handover note, or null', () => {
+        expect(projectRun({ ...base, handoverPath: '/d/shared/handover/a/r-1.md' })).toMatchObject({ handoverPath: '/d/shared/handover/a/r-1.md' })
+        expect(projectRun(base)).toMatchObject({ handoverPath: null })
     })
 })

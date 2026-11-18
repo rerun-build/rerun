@@ -65,6 +65,7 @@ export const runs = sqliteTable('runs', {
     compactions: integer('compactions'),
     compactSummaryChars: integer('compact_summary_chars'),
     compactAtTokens: integer('compact_at_tokens'),
+    handoverPath: text('handover_path'),
 })
 
 export const runSteps = sqliteTable('run_steps', {

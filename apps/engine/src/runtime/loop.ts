@@ -7,6 +7,7 @@ import { repairToolPairs } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { goalStopHook } from '../agents/claude-goal-hook.js'
 import type { CompactListener } from '../agents/claude-context.js'
+import { saveHandover, wantsHandover } from '../agents/handover.js'
 import { CLI_PROVIDERS, resolveModel, type GoalOption, type ModelOverride } from '../agents/providers.js'
 import { offersQuickReplies, quickRepliesCall, type QuickRepliesCapture } from '../agents/quick-replies-stream.js'
 import { codexThreadToResume, forgetCodexThread, rememberCodexThread } from '../agents/codex-threads.js'
@@ -28,7 +29,7 @@ import { listAgentIndex } from '../db/repos/agents.js'
 import { appendMessage, lastMessageId, listSessionAuthorIds, setMessageToolCalls } from '../db/repos/messages.js'
 import type { MessageRow } from '../db/schema.js'
 import { isSharedConversation, signText } from './message-authors.js'
-import { bumpRunStep, cancelRun, failRun, finishRun, recordGoalVerdict, recordRunCompaction, setRunCompactAt, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } from '../db/repos/runs.js'
+import { bumpRunStep, cancelRun, failRun, finishRun, recordGoalVerdict, recordRunCompaction, setRunCompactAt, setRunContext, setRunHandover, setRunGoal, setRunLineage, startRun, updateRunLive } from '../db/repos/runs.js'
 import { insertRunStep, insertToolCall, updateToolCall } from '../db/repos/telemetry.js'
 import { touchSession } from '../db/repos/sessions.js'
 import { logger } from '../lib/logger.js'
@@ -171,7 +172,11 @@ const NO_TOOL_RESULT = 'no result: the run ended'
 
 function toolErrorText(error: unknown, secrets: string[]): string {
     const text = Array.isArray(error) ? error.map(block => (typeof block?.text === 'string' ? block.text : JSON.stringify(block))).join('\n') : typeof error === 'string' ? error : errorMessageOf(error)
-    return secrets.reduce((out, secret) => out.split(secret).join('[redacted]'), text).slice(0, TOOL_ERROR_CHARS)
+    return redactSecrets(text, secrets).slice(0, TOOL_ERROR_CHARS)
+}
+
+function redactSecrets(text: string, secrets: string[]): string {
+    return secrets.reduce((out, secret) => out.split(secret).join('[redacted]'), text)
 }
 
 function runSecrets(agent: LoadedAgent): string[] {
@@ -499,16 +504,23 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const cached = applyCaching(provider, { system, messages: turnMessages, sessionId, model })
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
-        const compactAt = provider === 'codex' ? 'default' : effectiveCompactAt((trigger.source === 'chat' ? trigger.contextSize : undefined) ?? agent.config.contextSize, provider, model, connection)
+        const contextSize = (trigger.source === 'chat' ? trigger.contextSize : undefined) ?? agent.config.contextSize
+        const compactAt = provider === 'codex' ? 'default' : effectiveCompactAt(contextSize, provider, model, connection)
         if (typeof compactAt === 'number') void setRunCompactAt(agent.id, run.id, compactAt).catch(() => {})
-        const onCompact: CompactListener = ({ trigger: kind, summaryChars }) => {
+        const handover = wantsHandover(provider, contextSize) ? { agentName: agent.config.name, runId: run.id } : undefined
+        const onCompact: CompactListener = ({ trigger: kind, summaryChars, summary, handoverN }) => {
             logger.info({ agent: agent.id, run: run.id, trigger: kind, summaryChars }, 'run context compacted')
             void recordRunCompaction(agent.id, run.id, summaryChars).catch(() => {})
+            if (handover && summary && handoverN) {
+                void saveHandover(agent.id, run.id, handoverN, redactSecrets(summary, runSecrets(agent)))
+                    .then(path => setRunHandover(agent.id, run.id, path))
+                    .catch(err => logger.warn({ err: String(err), agent: agent.id, run: run.id }, 'handover note not saved'))
+            }
         }
         const stepGuard = typeof compactAt === 'number' && !CLI_PROVIDERS.has(provider) ? stepContextGuard(ctx, override, systemText, toolPayloadChars(sentTools), compactAt, cached.messages.length - 1, onCompact) : undefined
 
         spawnToken = claudeTokenOf(connection)
-        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, compactAt, onCompact, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
+        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, compactAt, onCompact, handover, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         if (offersQuickReplies(agent.config)) quickReplies = resolvedModel.quickReplies

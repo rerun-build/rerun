@@ -34,6 +34,7 @@ export const runSchema = z.object({
     compactions: z.number().int().nullable().optional(),
     compactSummaryChars: z.number().int().nullable().optional(),
     compactAtTokens: z.number().int().nullable().optional(),
+    handoverPath: z.string().nullable().optional(),
 })
 export type Run = z.infer<typeof runSchema>
 
