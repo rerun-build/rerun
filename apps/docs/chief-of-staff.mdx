@@ -4,7 +4,7 @@ description: "The assistant of your workspace: it builds your team with you, run
 icon: "compass"
 ---
 
-The Chief of Staff is the assistant every workspace comes with. It is not one of your coworkers: it works on the whole workspace, builds coworkers, briefs them, follows their runs and answers your questions about Rerun itself.
+The Chief of Staff is the assistant every workspace comes with. It works like a coworker, with skills, knowledge, routines and apps of its own, and it reaches further than one: it works on the whole workspace, builds coworkers, briefs them, follows their runs and answers your questions about Rerun itself.
 
 <Note>
   The code and the API call the Chief of Staff the `foreman`. Same thing.
@@ -50,9 +50,31 @@ It has two tabs:
 | Tab | What it shows |
 | --- | --- |
 | **Ask** | Your conversation with the Chief of Staff |
-| **Routines** | Every scheduled task of the workspace, grouped by when it runs next. From the menu of a routine, **Run now**, **Rename** or **Edit** it, or pause it with its switch |
+| **Card** | What the Chief of Staff keeps of its own, on the same screens as a coworker's card (see [Its card](#its-card)), then every scheduled task of the workspace, grouped by when it runs next. From the menu of a routine, **Run now**, **Rename** or **Edit** it, or pause it with its switch |
 
-In the **Simple** view the chat has no tabs: the routines sit in the column on the right, under the Chief of Staff's name. Open it with the panel button at the end of the chat's bar, the same one that opens a coworker's card, and it stays open as you go from one to the other. Click a routine to open its coworker on it.
+In the **Simple** view the chat has no tabs: the card sits in the column on the right, under the Chief of Staff's name. Open it with the panel button at the end of the chat's bar, the same one that opens a coworker's card, and it stays open as you go from one to the other. Click a routine to open its coworker on it.
+
+<Note>
+  On a workspace whose machine has not updated yet, the second tab still reads **Routines** and only lists the scheduled tasks of the workspace.
+</Note>
+
+### Its card
+
+The card opens the screens a coworker's card opens, on what the Chief of Staff keeps of its own:
+
+| On the card | What it holds |
+| --- | --- |
+| **Apps** | The MCP servers connected to it. An app with an account goes through the [Vault](/vault): an admin attaches the entry to the Chief of Staff there |
+| **Skills** | The skills it follows. See [Skills](/agents/skills) |
+| **Knowledge** | What it remembers. See [Memory](/concepts#memory) |
+| **Routines** | Its own scheduled tasks |
+| **Files** | The files of its own folder |
+
+Every member of the workspace reads those screens. Changing them takes a workspace admin.
+
+Its skills and its knowledge belong to the workspace, not to one member: what it learns in your conversation, it knows in a teammate's.
+
+A routine of its own runs with nobody in front of it, so it works there like a coworker (files, web, its apps, the coworkers it can call) and creates or changes nothing in the workspace.
 
 ### General and threads
 
@@ -88,7 +110,8 @@ It answers questions about Rerun from this documentation rather than from memory
 ### What it does not do
 
 - It changes nothing inside the settings panels it opens: you set those yourself. The exception is the model a coworker runs on, which it can set.
-- It holds no app of the [Vault](/vault): apps go to coworkers.
+- It cannot be renamed, rewritten, duplicated or deleted, and it has no webhook trigger, no published page and no database of its own.
+- It takes no app of the library and no paid app: its apps are the entries an admin attaches to it in the [Vault](/vault) and the MCP servers of its card.
 - It never asks for a secret in the chat.
 
 ## Getting started

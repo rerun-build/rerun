@@ -227,7 +227,8 @@
         "tabs": {
             "assistant": "Perguntar",
             "tasks": "Tarefas",
-            "routines": "Rotinas"
+            "routines": "Rotinas",
+            "card": "Ficha"
         },
         "periods": {
             "running": "Em andamento",

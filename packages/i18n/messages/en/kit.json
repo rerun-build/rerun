@@ -304,7 +304,8 @@
         "tabs": {
             "assistant": "Ask",
             "tasks": "Tasks",
-            "routines": "Routines"
+            "routines": "Routines",
+            "card": "Card"
         },
         "periods": {
             "running": "Running",

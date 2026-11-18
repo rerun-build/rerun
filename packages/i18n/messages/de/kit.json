@@ -227,7 +227,8 @@
         "tabs": {
             "assistant": "Fragen",
             "tasks": "Aufgaben",
-            "routines": "Routinen"
+            "routines": "Routinen",
+            "card": "Karte"
         },
         "periods": {
             "running": "Läuft",

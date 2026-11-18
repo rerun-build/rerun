@@ -1,5 +1,7 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+
 import { useErrorText } from '@/hooks/useErrorText'
 import { deleteFileAction, readFileAction, readFileHeadAction, renameFileAction, writeFileAction } from '@/app/api/_actions/file.actions'
 import { listPublishedAction, publishFileAction, unpublishFileAction } from '@/app/api/_actions/publish.actions'
@@ -39,6 +41,8 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
     const [contentRevision, setContentRevision] = useState(0)
     const publishedAccess = usePublishedAccessEnabled()
     const [sharingSlug, setSharingSlug] = useState<string | null>(null)
+    // A published page belongs to a coworker's row, which the Chief of Staff does not have.
+    const canPublish = agentId !== FOREMAN_AGENT_ID
 
     const rawUrlFor = useCallback((filePath: string) => agentFileRawUrl(agentId, filePath), [agentId])
 
@@ -189,8 +193,8 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
                         writeFile={writeFile}
                         onSaved={handleSaved}
                         publicUrl={publishedByName[openFile.name]}
-                        onPublish={() => void handlePublish(openFile.name)}
-                        onUnpublish={() => void handleUnpublish(openFile.name)}
+                        onPublish={canPublish ? () => void handlePublish(openFile.name) : undefined}
+                        onUnpublish={canPublish ? () => void handleUnpublish(openFile.name) : undefined}
                         onShareSettings={publishedAccess && publishedFileByName[openFile.name] ? () => setSharingSlug(publishedFileByName[openFile.name].slug) : undefined}
                         openUrl={publishedAccess && publishedFileByName[openFile.name] ? openPublishedHref(publishedFileByName[openFile.name].slug) : undefined}
                     />
@@ -258,8 +262,8 @@ export function AgentPanelFiles({ agentId, focusPath, onFocusConsumed }: AgentPa
                                             onDownload={handleDownload}
                                             contentRevision={contentRevision}
                                             publishedByName={publishedByName}
-                                            onPublish={handlePublish}
-                                            onUnpublish={handleUnpublish}
+                                            onPublish={canPublish ? handlePublish : undefined}
+                                            onUnpublish={canPublish ? handleUnpublish : undefined}
                                         />
                                     </div>
                                 )}

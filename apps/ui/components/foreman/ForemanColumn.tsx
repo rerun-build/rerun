@@ -6,7 +6,7 @@ import { FOREMAN_AGENT_ID, MAX_UPLOAD_FILE_BYTES } from '@rerun/contracts'
 import { cancelSubRunAction } from '@/app/api/_actions/agent.actions'
 import { readFileAction } from '@/app/api/_actions/file.actions'
 import { readWorkspaceFileAction } from '@/app/api/_actions/workspace-file.actions'
-import { foremanEngineFilesAction, readForemanFileAction } from '@/app/api/_actions/foreman-file.actions'
+import { foremanCoworkerAction, foremanEngineFilesAction, readForemanFileAction } from '@/app/api/_actions/foreman-file.actions'
 import type { ChatComposerHandle } from '@/components/chat/ChatComposer'
 import { MessageFeedbackDialog } from '@/components/chat/MessageFeedbackDialog'
 import { ArrivalHeader, type ArrivalPick } from '@/components/foreman/arrival/ArrivalHeader'
@@ -16,6 +16,7 @@ import { ForemanChatLayer } from '@/components/foreman/ForemanChatLayer'
 import { ForemanHeader } from '@/components/foreman/ForemanHeader'
 import { ForemanHistory } from '@/components/foreman/ForemanHistory'
 import { ForemanTopBar } from '@/components/foreman/ForemanTopBar'
+import { ForemanCard } from '@/components/foreman/ForemanCard'
 import { ForemanDetails } from '@/components/foreman/ForemanDetails'
 import { DetailsColumn } from '@/components/workspace-view/DetailsColumn'
 import { DetailsToggle } from '@/components/workspace-view/DetailsToggle'
@@ -74,6 +75,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     // Le tunnel guidé n'affiche pas de tabs : un onglet resté ouvert avant ne doit pas y cacher le chat.
     // In the Simple view's middle the routines are in the panel beside the chat, not in a tab over it.
     const onRoutines = useForemanStore(state => state.tab === 'routines') && !guided && !pinned
+    const hasCard = useForemanStore(state => state.hasCard)
     const { workspace, phoneStep } = useSession()
     const { messages, sendMessage, status, error, stop, stopping, regenerate, retryLastTurn, answerWidget, dismissWidget, pendingWidget, restoreDone, composerBackend, backend, contextStats, runError, reconnecting, activeRunId } = useForemanChat()
     const busy = status === 'submitted' || status === 'streaming' || reconnecting
@@ -305,6 +307,9 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
         void foremanEngineFilesAction().then(supported => {
             if (!cancelled) setFilesOnEngine(supported)
         })
+        void foremanCoworkerAction().then(supported => {
+            if (!cancelled) useForemanStore.getState().setHasCard(supported)
+        })
         return () => {
             cancelled = true
         }
@@ -516,7 +521,14 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                         />
                     </div>
                     <MessageFeedbackDialog open={feedback.dialogOpen} rating={feedback.dialogRating} onOpenChange={feedback.onDialogOpenChange} onSubmit={feedback.submitDetails} />
-                    {onRoutines && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
+                    {onRoutines && !hasCard && <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1 pt-24" />}
+                    {onRoutines && hasCard && (
+                        <div className="flex min-h-0 flex-1 flex-col pt-28 md:pt-24">
+                            <ForemanCard onClose={() => useForemanStore.getState().setTab('assistant')}>
+                                <ForemanRoutines docked={placement.mode === 'dock'} className="min-h-0 flex-1" />
+                            </ForemanCard>
+                        </div>
+                    )}
                 </div>
                 {pinned && details.mounted && (
                     <DetailsColumn label={tDetails('label', { name: tView('name') })} open={detailsShown} slideIn={details.slideIn} onClose={() => useSimpleDetailsStore.getState().setWanted(false)}>

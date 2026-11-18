@@ -28,6 +28,8 @@ type ForemanState = {
     dropTarget: ForemanPlacement | null
     /** Une préférence d'écran comme la place : un changement de compte ne la touche pas. */
     tab: ForemanTab
+    /** The engine's foreman keeps things of its own, so its card has screens to open. */
+    hasCard: boolean
     /**
      * Ce que la colonne est en train de faire. `unknown` tant que la phase n'est pas revenue du
      * serveur : les fiches de liens profonds l'attendent pour savoir si elles ont le droit de
@@ -117,6 +119,7 @@ type ForemanState = {
     restorePlacement: (placement: ForemanPlacement) => void
     setDropTarget: (target: ForemanPlacement | null) => void
     setTab: (tab: ForemanTab) => void
+    setHasCard: (hasCard: boolean) => void
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
     setGreetPending: (pending: boolean) => void
@@ -174,6 +177,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     placement: null,
     dropTarget: null,
     tab: 'assistant',
+    hasCard: false,
     funnel: 'unknown',
     waitlisted: false,
     greetPending: false,
@@ -234,6 +238,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     },
     setDropTarget: dropTarget => set({ dropTarget }),
     setTab: tab => set({ tab }),
+    setHasCard: hasCard => set({ hasCard }),
     setFunnel: funnel => set({ funnel }),
     setWaitlisted: waitlisted => set({ waitlisted }),
     setGreetPending: greetPending => set({ greetPending }),

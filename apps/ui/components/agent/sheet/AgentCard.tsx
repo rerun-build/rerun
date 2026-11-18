@@ -88,16 +88,9 @@ export function AgentCard({ agent, onOpen, onClose, onShare, onDelete, onOpenCom
             )}
             <CardIdentity agent={agent} canRename={canManage} />
             <div className="grid shrink-0 grid-cols-4 gap-1.5 px-3 pb-3">
-                {TILES.map(tab => {
-                    const Glyph = DESTINATION_ICONS[tab]
-                    return (
-                        <Button key={tab} variant="outline" onClick={event => onOpen(tab, event.currentTarget, 'tile')} className="relative h-auto flex-col gap-1 py-2 text-[11px]">
-                            <Glyph className="size-4" />
-                            {t(`destinations.${tab}`)}
-                            {tab === 'services' && servicesNeedConfig && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
-                        </Button>
-                    )
-                })}
+                {TILES.map(tab => (
+                    <DestinationTile key={tab} tab={tab} dot={tab === 'services' && servicesNeedConfig} onClick={event => onOpen(tab, event.currentTarget, 'tile')} />
+                ))}
             </div>
             <div className="shrink-0 space-y-4 px-3 pb-3">
                 <div className="space-y-1.5">
@@ -225,7 +218,18 @@ function CardIdentity({ agent, canRename }: { agent: IsoAgent; canRename: boolea
     )
 }
 
-function DestinationRow({ tab, onClick }: { tab: CardDestination; onClick: (event: MouseEvent<HTMLButtonElement>) => void }) {
+export function DestinationTile({ tab, dot = false, onClick }: { tab: CardDestination; dot?: boolean; onClick: (event: MouseEvent<HTMLButtonElement>) => void }) {
+    const { label, icon: Glyph } = useDestination(tab)
+    return (
+        <Button variant="outline" onClick={onClick} className="relative h-auto flex-col gap-1 py-2 text-[11px]">
+            <Glyph className="size-4" />
+            {label}
+            {dot && <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-red-500 ring-2 ring-background" />}
+        </Button>
+    )
+}
+
+export function DestinationRow({ tab, onClick }: { tab: CardDestination; onClick: (event: MouseEvent<HTMLButtonElement>) => void }) {
     const { label, icon: Glyph } = useDestination(tab)
     return (
         <button type="button" onClick={onClick} className="flex w-full items-center gap-3 rounded-lg bg-muted/60 px-3 py-2.5 text-left transition-colors hover:bg-muted">

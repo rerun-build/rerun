@@ -1,5 +1,7 @@
 'use client'
 
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+
 import { boxAccessFor, type BoxAccess, type BoxViewer } from '@/lib/board/box-access'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
@@ -20,10 +22,15 @@ export function useSpaceAccess(spaceId: string | null | undefined): BoxAccess {
     return boxAccessFor(viewer, space, grants)
 }
 
-// A coworker carries no access of its own: it is its Box's.
+// A coworker carries no access of its own: it is its Box's. The Chief of Staff sits in no Box: every
+// member reaches it, and a workspace admin changes what it keeps.
 export function useAgentAccess(agentId: string | null | undefined): BoxAccess {
+    const { role } = useBoxViewer()
     const spaceId = useBoardStore(state => (agentId ? state.agents.find(a => a.id === agentId)?.spaceId : undefined))
-    return useSpaceAccess(spaceId)
+    const boxAccess = useSpaceAccess(spaceId)
+    if (agentId !== FOREMAN_AGENT_ID) return boxAccess
+    if (!role) return 'none'
+    return role === 'admin' ? 'manage' : 'use'
 }
 
 export function useCanManageAgent(agentId: string | null | undefined): boolean {

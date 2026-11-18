@@ -2,7 +2,7 @@
 
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { getWorkspaceConnection } from '@/app/api/_services/workspace-engine.service'
-import { supportsForemanFiles } from '@/lib/engine/client'
+import { supportsForemanCoworker, supportsForemanFiles } from '@/lib/engine/client'
 import { FOREMAN_FILES_BUCKET, foremanFileKey } from '@/lib/foreman/files'
 import { readForemanFile } from '@/lib/foreman/read-attachment'
 import { removePrivateFiles } from '@/lib/storage/private'
@@ -27,6 +27,16 @@ export async function foremanEngineFilesAction(): Promise<boolean> {
     try {
         const ctx = await requireWorkspaceContext()
         return await supportsForemanFiles(await getWorkspaceConnection(ctx.workspace.id))
+    } catch {
+        return false
+    }
+}
+
+/** Whether the foreman on the workspace's engine keeps skills, memories, routines and connectors of its own: what its card shows. */
+export async function foremanCoworkerAction(): Promise<boolean> {
+    try {
+        const ctx = await requireWorkspaceContext()
+        return await supportsForemanCoworker(await getWorkspaceConnection(ctx.workspace.id))
     } catch {
         return false
     }

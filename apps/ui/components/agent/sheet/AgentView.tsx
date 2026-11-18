@@ -26,10 +26,14 @@ type AgentViewProps = {
     onOpenSession: (sessionId: string, title: string, runId: string | null) => void
     // Covers the screen's body and leaves its header, whose back button is the way out.
     overlay?: ReactNode
+    // Who the breadcrumb shows when it is not a coworker's buddy.
+    avatar?: ReactNode
+    // Tabs this coworker has no use for, on top of the ones a flag or a role hides.
+    withoutTabs?: readonly AgentViewTab[]
 }
 
 /** A screen of the coworker, in place of the thread. Its header is a breadcrumb, coworker / screen, whose first step goes back to the card. */
-export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSession, overlay }: AgentViewProps) {
+export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSession, overlay, avatar, withoutTabs }: AgentViewProps) {
     const t = useTranslations('agent.agentView')
     const isTemplateAuthor = useIsTemplateAuthor()
     const mood = useAgentBuddyMood(agent.id)
@@ -37,8 +41,9 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
     const publishedAccess = usePublishedAccessEnabled()
     // The install editor is the template author's, and the Published tab waits for its launch:
     // anyone else sent there lands on the screen's first tab.
-    const hidden = (id: AgentViewTab) => (id === 'setup' && !isTemplateAuthor) || (id === 'published' && !publishedAccess)
-    const shown: AgentViewTab = hidden(tab) ? AGENT_SHEET_VIEWS[agentSheetViewOf(tab)][0] : tab
+    const hidden = (id: AgentViewTab) => (id === 'setup' && !isTemplateAuthor) || (id === 'published' && !publishedAccess) || !!withoutTabs?.includes(id)
+    const siblings: readonly AgentViewTab[] = AGENT_SHEET_VIEWS[agentSheetViewOf(tab)]
+    const shown: AgentViewTab = hidden(tab) ? (siblings.find(id => !hidden(id)) ?? siblings[0]) : tab
     const view = agentSheetViewOf(shown)
     const switcherTabs = (AGENT_SHEET_VIEWS[view] as readonly AgentViewTab[])
         .filter(id => !hidden(id))
@@ -49,9 +54,7 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
             <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border px-2">
                 <Button variant="ghost" size="sm" onClick={onBack} className="min-w-0 shrink pl-1.5">
                     <ChevronLeftIcon className="size-4" />
-                    <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-muted">
-                        <AgentBuddy agentId={agent.id} mood={mood} size={16} facing="right" />
-                    </span>
+                    <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-muted">{avatar ?? <AgentBuddy agentId={agent.id} mood={mood} size={16} facing="right" />}</span>
                     <span className="truncate text-muted-foreground">{agent.name}</span>
                 </Button>
                 <span className="text-muted-foreground/50">/</span>

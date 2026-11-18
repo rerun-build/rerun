@@ -1,5 +1,5 @@
-import type { Actor } from '@/app/api/_auth/access'
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import type { AccessLevel, Actor } from '@/app/api/_auth/access'
+import { getAgentChatTarget, resolveAgentTarget } from '@/app/api/_services/chat.service'
 import { installedFromRegistry } from '@/app/api/_services/services.service'
 import { deleteMcpToken, getAgent, getMcpServerStatuses, patchMcpServers } from '@/lib/engine/client'
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
@@ -41,17 +41,23 @@ export async function customMcpServersOf(conn: EngineConnection, engineAgentId: 
     return Promise.all(servers.map(async server => toCustomMcpServer(server, await lookOf(server, catalog))))
 }
 
+// A person at the screen reaches the Chief of Staff's servers too; an API key or a foreman turn
+// names its actor, and only ever reaches a coworker.
+function targetOf(agentId: string, actor: Actor | undefined, access: AccessLevel = 'use') {
+    return actor ? resolveAgentTarget(agentId, actor, access) : getAgentChatTarget(agentId, access)
+}
+
 // The catalog apps and the servers registered outside it, read off one registry so the two lists
 // never disagree on who owns a server. An unreachable engine still lists the apps.
 export async function listAgentConnectors(agentId: string, actor?: Actor): Promise<{ services: InstalledService[]; custom: CustomMcpServer[] }> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
+    const { conn, engineAgentId } = await targetOf(agentId, actor)
     const reg = await readRegistry(conn, engineAgentId)
     const [services, custom] = await Promise.all([installedFromRegistry(reg), customMcpServersOf(conn, engineAgentId, reg).catch(() => [])])
     return { services, custom }
 }
 
 export async function getCustomMcpStatuses(agentId: string, actor?: Actor): Promise<CustomMcpStatus[]> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
+    const { conn, engineAgentId } = await targetOf(agentId, actor)
     const detail = await getAgent(conn, engineAgentId)
     const names = unclaimedMcpServers(detail.config.mcpServers ?? [], await readRegistry(conn, engineAgentId)).map(server => server.name)
     if (names.length === 0) return []
@@ -62,7 +68,7 @@ export async function getCustomMcpStatuses(agentId: string, actor?: Actor): Prom
 
 // One server, probed alone: the chat card waits on it, and dialing every other server would slow it down.
 export async function getCustomMcpServer(agentId: string, name: string, actor?: Actor): Promise<{ server: CustomMcpServer; status: CustomMcpLiveStatus } | null> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
+    const { conn, engineAgentId } = await targetOf(agentId, actor)
     const server = (await customMcpServersOf(conn, engineAgentId, await readRegistry(conn, engineAgentId))).find(candidate => candidate.name === name)
     if (!server) return null
     const statuses = await getMcpServerStatuses(conn, engineAgentId, [name]).catch(() => null)
@@ -70,7 +76,7 @@ export async function getCustomMcpServer(agentId: string, name: string, actor?: 
 }
 
 export async function removeCustomMcpServer(agentId: string, name: string, actor?: Actor): Promise<void> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+    const { conn, engineAgentId } = await targetOf(agentId, actor, 'manage')
     if (connectorMcpServerNames(await readRegistry(conn, engineAgentId)).has(name)) {
         throw new Error(`"${name}" belongs to an app. Manage it from the Apps tab.`)
     }
