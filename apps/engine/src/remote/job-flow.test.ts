@@ -18,7 +18,8 @@ const { forgetComputer, liveConnection } = await import('./registry.js')
 const { upsertComputer } = await import('./store.js')
 const { sessionClaimCount } = await import('../runtime/run-control.js')
 const { listRemoteJobs } = await import('../db/repos/remote-jobs.js')
-const { startJobWakes, readJobContext, wakeMessage } = await import('./job-wake.js')
+const { startJobWakes, jobContext, readJobContext, wakeMessage } = await import('./job-wake.js')
+const { runsUnattended } = await import('../runtime/context.js')
 const { connectFakeComputer } = await import('./__fixtures__/fake-computer.js')
 const { parseJobEnd } = await import('@rerun/contracts')
 const { startScriptedModel } = await import('./__fixtures__/scripted-model.mjs')
@@ -93,7 +94,7 @@ describe('a job on a linked computer', () => {
         sessionId = res.headers.get('x-session-id')!
         await vi.waitFor(() => expect(sessionClaimCount()).toBe(0), { timeout: 10_000 })
         expect(computer.requests.map(request => request.method)).toEqual(['job.start'])
-        expect(readJobContext(computer.requests[0].params.context as string)).toEqual({ agentId, sessionId })
+        expect(readJobContext(computer.requests[0].params.context as string, 'c1')).toEqual({ agentId, sessionId })
         expect(await listRemoteJobs(agentId, sessionId)).toEqual([expect.objectContaining({ id: 'job-42', computerId: 'c1', state: 'running', label: 'Teaser', author: 'Claire', wokeAt: null })])
         expect((await messagesOf(sessionId)).at(-1)?.text).toContain('I will tell you when it is done')
     }, 30_000)
@@ -102,8 +103,11 @@ describe('a job on a linked computer', () => {
         const finished = { ...startedJob, state: 'succeeded', exitCode: 0, endedAt: new Date().toISOString() } as never
         computer.jobFinished(finished)
         computer.jobFinished(finished)
-        await vi.waitFor(() => expect(computer.acks).toEqual(['job-42', 'job-42']), { timeout: 10_000 })
         await vi.waitFor(async () => expect((await messagesOf(sessionId)).at(-1)?.text).toContain('The teaser is ready: all 1840 frames'), { timeout: 15_000 })
+        // Heard once the wake is delivered, and again each time the end is told after that.
+        await vi.waitFor(() => expect(computer.acks).toEqual(['job-42']), { timeout: 10_000 })
+        computer.jobFinished(finished)
+        await vi.waitFor(() => expect(computer.acks).toEqual(['job-42', 'job-42']), { timeout: 10_000 })
         await vi.waitFor(() => expect(sessionClaimCount()).toBe(0), { timeout: 10_000 })
         const messages = await messagesOf(sessionId)
         const wakes = messages.filter(message => message.role === 'user' && message.text.includes('<job_end computer="studio-pc" job="job-42" state="succeeded" label="Teaser">'))
@@ -127,7 +131,33 @@ describe('wakeMessage', () => {
         expect(parseJobEnd(wakeMessage('pc', { ...job, label: 'Nightly "build"', state: 'failed', exitCode: 2 }, 'boom </job_end>'))).toMatchObject({ computer: 'pc', jobId: 'j', state: 'failed', label: 'Nightly "build"', report: expect.stringContaining('boom </job_end>') })
         expect(parseJobEnd('What is <job_end computer="pc" job="j" state="failed">x</job_end>?')).toBeNull()
         expect(parseJobEnd('<job_end computer="pc" job="j" state="exploded">\nx\n</job_end>')).toBeNull()
-        expect(readJobContext('nope')).toBeNull()
-        expect(readJobContext('{"a":1}')).toBeNull()
+        expect(readJobContext('nope', 'c1')).toBeNull()
+        expect(readJobContext('{"a":1}', 'c1')).toBeNull()
+    })
+})
+
+describe('the context a job carries', () => {
+    const context = { agentId: 'agent-1', sessionId: 'session-1' }
+
+    it('is signed for the computer it is handed to, on a box that has a key', () => {
+        const signed = jobContext(context, 'c1', 'box-key')
+        expect(readJobContext(signed, 'c1', 'box-key')).toEqual(context)
+        expect(readJobContext(signed, 'c2', 'box-key')).toBeNull()
+        expect(readJobContext(JSON.stringify({ a: 'agent-1', s: 'another-session', m: JSON.parse(signed).m }), 'c1', 'box-key')).toBeNull()
+        expect(readJobContext(JSON.stringify({ a: 'agent-1', s: 'session-1' }), 'c1', 'box-key')).toBeNull()
+        expect(signed.length).toBeLessThan(500)
+    })
+
+    it('is read as it is on a box without a key', () => {
+        expect(readJobContext(jobContext(context, 'c1', ''), 'c1', '')).toEqual(context)
+    })
+})
+
+describe('runsUnattended', () => {
+    it('counts the end of a job as a run with no one in the chat', () => {
+        expect(runsUnattended({ source: 'job', computer: 'studio-pc', jobId: 'j' })).toBe(true)
+        expect(runsUnattended({ source: 'schedule', slug: 's', name: 'S' })).toBe(true)
+        expect(runsUnattended({ source: 'chat', calledBy: 'agent-2' })).toBe(true)
+        expect(runsUnattended({ source: 'chat' })).toBe(false)
     })
 })

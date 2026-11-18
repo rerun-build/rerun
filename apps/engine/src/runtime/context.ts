@@ -9,6 +9,10 @@ import type { ScreenshotStore } from './screenshots.js'
 
 export type RunTrigger = { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: string } | { source: 'schedule'; slug: string; name: string } | { source: 'trigger'; slug: string; name: string } | { source: 'job'; computer: string; jobId: string }
 
+// No one is in the chat: a schedule, a trigger, the end of a job on a linked computer, or another
+// coworker started the run.
+export const runsUnattended = (trigger: RunTrigger): boolean => trigger.source === 'schedule' || trigger.source === 'trigger' || trigger.source === 'job' || (trigger.source === 'chat' && trigger.calledBy !== undefined)
+
 export type PartialResult = { label: string; text: string }
 
 export type SkillProposalNotice = { proposalId: string; mode: string; title: string }
@@ -34,6 +38,6 @@ export type RunContext = {
     // The user's turn goes to the database without holding the run up: a tool that reads the
     // session history back waits on it first.
     userTurnStored?: Promise<unknown>
-    // No one is in the chat: a schedule, a trigger, or another coworker started the run.
+    // See `runsUnattended`.
     unattended?: boolean
 }

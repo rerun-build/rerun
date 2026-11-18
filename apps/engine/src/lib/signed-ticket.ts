@@ -1,9 +1,11 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { env } from '../config/env.js'
 
-function signedWith(key: string, payload: string, signature: string | undefined): boolean {
+export const signatureOf = (key: string, payload: string): string => createHmac('sha256', key).update(payload).digest('base64url')
+
+export function signedWith(key: string, payload: string, signature: string | undefined): boolean {
     if (!signature) return false
-    const expected = Buffer.from(createHmac('sha256', key).update(payload).digest('base64url'))
+    const expected = Buffer.from(signatureOf(key, payload))
     const given = Buffer.from(signature)
     return expected.length === given.length && timingSafeEqual(expected, given)
 }

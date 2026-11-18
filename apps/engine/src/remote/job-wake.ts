@@ -1,6 +1,8 @@
 import type { ModelMessage } from 'ai'
 import { buildJobEndMessage, type RemoteJob } from '@rerun/contracts'
 import { agentExists } from '../agents/loader.js'
+import { env } from '../config/env.js'
+import { signatureOf, signedWith } from '../lib/signed-ticket.js'
 import { getAgent } from '../agents/registry.js'
 import { listMessages } from '../db/repos/messages.js'
 import { claimRemoteJobWake, getRemoteJob, recordRemoteJob, settleRemoteJob } from '../db/repos/remote-jobs.js'
@@ -9,22 +11,34 @@ import { startHeadlessRun } from '../runtime/headless-run.js'
 import { sessionClaim } from '../runtime/run-control.js'
 import { findPendingHitl } from '../tools/builtin/hitl.js'
 import type { RemoteConnection } from './connection.js'
-import { onRemoteEvent } from './registry.js'
+import { liveConnection, onRemoteEvent } from './registry.js'
 import { getComputer } from './store.js'
 
 // The end of a job a coworker started on a computer wakes that coworker in the conversation it
 // started it from, once, with what came out of it. The wake waits for the conversation to be free:
 // a run in flight finishes first, and a card waiting for the person is answered first, since a
-// message landing under it would read as their answer.
+// message landing under it would read as their answer. The computer is told the end was heard only
+// once the wake is delivered: until then it tells it again, at each connection too, so an engine
+// that restarts while it waits picks the end up where it left it.
 
 export type JobContext = { agentId: string; sessionId: string }
 
-export const jobContext = (context: JobContext): string => JSON.stringify({ a: context.agentId, s: context.sessionId })
+const signedPart = (computerId: string, context: JobContext) => `${computerId}\n${context.agentId}\n${context.sessionId}`
 
-export function readJobContext(raw: string | undefined): JobContext | null {
+// Signed with the box key for the one computer it is handed to: a computer cannot name a
+// conversation the engine never started a job from on it. A box without a key signs nothing, like
+// its tickets (`lib/signed-ticket.ts`).
+export function jobContext(context: JobContext, computerId: string, key: string | undefined = env().RERUN_API_KEY): string {
+    return JSON.stringify({ a: context.agentId, s: context.sessionId, ...(key ? { m: signatureOf(key, signedPart(computerId, context)) } : {}) })
+}
+
+export function readJobContext(raw: string | undefined, computerId: string, key: string | undefined = env().RERUN_API_KEY): JobContext | null {
     try {
-        const parsed = JSON.parse(raw ?? '') as { a?: unknown; s?: unknown }
-        return typeof parsed.a === 'string' && typeof parsed.s === 'string' ? { agentId: parsed.a, sessionId: parsed.s } : null
+        const parsed = JSON.parse(raw ?? '') as { a?: unknown; s?: unknown; m?: unknown }
+        if (typeof parsed.a !== 'string' || typeof parsed.s !== 'string') return null
+        const context = { agentId: parsed.a, sessionId: parsed.s }
+        if (key && !signedWith(key, signedPart(computerId, context), typeof parsed.m === 'string' ? parsed.m : undefined)) return null
+        return context
     } catch {
         return null
     }
@@ -79,27 +93,41 @@ async function wakeWhenFree(context: JobContext, message: string, trigger: { com
         await new Promise(resolve => setTimeout(resolve, deps.pollMs ?? POLL_MS))
     }
     if (!agentExists(context.agentId)) return
+    // Once, across restarts too: the end may be told again after a wake that was already delivered.
+    if (!(await claimRemoteJobWake(context.agentId, trigger.jobId, new Date().toISOString()))) return
     const agent = await getAgent(context.agentId)
     await (deps.start ?? startHeadlessRun)(agent, context.sessionId, message, undefined, { source: 'job', ...trigger })
 }
 
+// The ends being delivered: the computer tells each one again every half minute meanwhile.
+const delivering = new Set<string>()
+
 export async function handleJobFinished(computerId: string, job: RemoteJob, connection: RemoteConnection, deps: WakeDeps = {}): Promise<void> {
-    const context = readJobContext(job.context)
+    const context = readJobContext(job.context, computerId)
     if (!context || !agentExists(context.agentId)) {
         connection.acknowledgeJob(job.id)
         return
     }
-    if (!(await getRemoteJob(context.agentId, job.id))) await recordRemoteJob(context.agentId, context.sessionId, computerId, job)
-    await settleRemoteJob(context.agentId, job)
-    // Heard once it is on record: an engine that dies before this hears it again at the next connection.
-    connection.acknowledgeJob(job.id)
-    if (!(await claimRemoteJobWake(context.agentId, job.id, new Date().toISOString()))) return
-    const tail = await connection
-        .call('job.logs', { jobId: job.id, tailBytes: TAIL_BYTES }, { timeoutMs: 10_000 })
-        .then(logs => logs.output)
-        .catch(() => '')
-    const handle = (await getComputer(computerId))?.handle ?? 'computer'
-    await wakeWhenFree(context, wakeMessage(handle, job, tail), { computer: handle, jobId: job.id }, deps)
+    const key = `${context.agentId}:${job.id}`
+    if (delivering.has(key)) return
+    delivering.add(key)
+    try {
+        const known = await getRemoteJob(context.agentId, job.id)
+        if (!known) await recordRemoteJob(context.agentId, context.sessionId, computerId, job)
+        await settleRemoteJob(context.agentId, job)
+        if (!known?.wokeAt) {
+            const tail = await connection
+                .call('job.logs', { jobId: job.id, tailBytes: TAIL_BYTES }, { timeoutMs: 10_000 })
+                .then(logs => logs.output)
+                .catch(() => '')
+            const handle = (await getComputer(computerId))?.handle ?? 'computer'
+            await wakeWhenFree(context, wakeMessage(handle, job, tail), { computer: handle, jobId: job.id }, deps)
+        }
+    } finally {
+        delivering.delete(key)
+    }
+    // The socket may have been replaced while the conversation was busy.
+    ;(liveConnection(computerId) ?? connection).acknowledgeJob(job.id)
 }
 
 export function startJobWakes(deps: WakeDeps = {}): () => void {
