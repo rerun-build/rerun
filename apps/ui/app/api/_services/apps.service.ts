@@ -253,8 +253,8 @@ export async function addAppSlot(slug: AppSlug, requestId: string): Promise<AddS
     return { trialSlot: false, checkoutUrl: null }
 }
 
-// A lifetime workspace has no billing dialog to change its slots in: it gives one back from the app.
-// A plan's slots are changed with the plan.
+// A lifetime workspace gives a slot back one at a time, from the app or from its billing dialog. A
+// plan's slots are changed with the plan.
 export async function removeAppSlot(slug: AppSlug): Promise<void> {
     const { workspace, supabase } = await requireWorkspaceContext()
     const state = await readSlotState(supabase, workspace.id, slug)

@@ -92,7 +92,9 @@
         "perks.headlines.credits": "Short perk of the paid plan, in a row of checkmarks: the monthly credit allowance.",
         "perks.headlines.team": "Short perk of the paid plan, in a row of checkmarks: teammates can be invited.",
         "plan.credit.packCredits": "Under the number of packs: the credits they add, which never expire.",
-        "plan.credit.dueBeforeTax": "Label of a summary row: the amount due today, tax added on the Stripe page."
+        "plan.credit.dueBeforeTax": "Label of a summary row: the amount due today, tax added on the Stripe page.",
+        "lifetime.slots.freeThen": "{price} is a monthly price like \"$9/mo\".",
+        "lifetime.slots.oneOnCheckout": "Tooltip of a disabled plus button: the first app slot is paid alone on a Stripe page."
     },
     "credits": "{count, plural, one {# credit} other {# credits}}",
     "plan": {
@@ -233,6 +235,20 @@
             "paidOnce": "Paid once",
             "apps": "Apps",
             "aiProviders": "AI providers"
+        },
+        "slots": {
+            "oneOnCheckout": "One slot on the first payment, add more right after",
+            "oneDuringTrial": "One slot per app during the free trial",
+            "slotLine": "{count, plural, one {# {provider} slot} other {# {provider} slots}}",
+            "freeThen": "Free for {days} days, then {price}",
+            "monthlyBill": "Apps, monthly",
+            "billedToday": "Billed today for what is left of the month, then monthly with your other slots.",
+            "freeDuringTrial": "Free until your trial ends, then billed monthly.",
+            "continueToPayment": "Continue to payment",
+            "confirm": "Confirm",
+            "addedTitle": "Slots added",
+            "addedBody": "Connect an account in the app to put them to work.",
+            "scheduledBody": "The slots you gave back stay usable until {date}, then leave your bill."
         }
     },
     "apps": {

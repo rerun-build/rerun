@@ -14,7 +14,7 @@ import type { BillingHighlight } from '@/stores/billing.store'
 import { usePaidAppsStore } from '@/stores/paid-apps.store'
 import { useSession } from '@/supabase/session/SessionProvider'
 
-import { AppsSection, appSlotsOf, useAppSlots, type AppSlotsState } from './AppsSection'
+import { AppsSection, appSlotsOf, useAppSlots, type AppSlots, type AppSlotsState } from './AppsSection'
 import { BillingDialogShell } from './BillingDialogShell'
 import { BusinessDetailsPane, BusinessDetailsRow } from './BusinessDetailsPane'
 import { shortDate } from './checkout-copy'
@@ -23,6 +23,7 @@ import { UsagePane } from './credit-usage/UsagePane'
 import { useCreditUsage } from './credit-usage/useCreditUsage'
 import { CreditPane } from './CreditPane'
 import { InvoicesPane } from './InvoicesPane'
+import { LifetimeSlotsPane } from './LifetimeSlotsPane'
 import { CreditUsageRow, InvoicesRow, OverviewLinkRow } from './OverviewRows'
 import { Headline, LifetimeDealCard, RightTitle, SuccessPanel, SummaryRows, usd } from './parts'
 
@@ -56,11 +57,18 @@ export function LifetimeDialog({
     const fetchedSlots = useAppSlots(shownApps, !!appSlots)
     const slotsStates = appSlots ?? fetchedSlots
     const openApp = usePaidAppsStore(s => s.openApp)
+    const [slots, setSlots] = useState<AppSlots>(currentSlots)
     const [drill, setDrill] = useState<Drill>(highlightAddon === 'credit_pack' ? 'credit' : 'overview')
     const [success, setSuccess] = useState<Success | null>(null)
     // A lifetime deal comes with no monthly credit: what it holds is bought, and never resets.
     const credit = { ...useCreditUsage(), resetsOn: null }
     const renewal = state.periodEnd ? shortDate(state.periodEnd, locale) : t('plan.yourRenewal')
+    const dirty = APP_SLUGS.some(slug => slots[slug] !== currentSlots[slug])
+    const added = APP_SLUGS.reduce((count, slug) => count + Math.max(0, slots[slug] - currentSlots[slug]), 0)
+
+    // Stripe's Checkout sells the first slot alone, and a running trial holds one slot per app.
+    const moreReason = (slug: AppSlug) =>
+        state.slotsCheckout && added > 0 ? t('lifetime.slots.oneOnCheckout') : state.trialing && slots[slug] > 0 ? t('lifetime.slots.oneDuringTrial') : undefined
 
     const done = async (next: Success) => {
         await refreshWorkspace()
@@ -83,9 +91,10 @@ export function LifetimeDialog({
                         description={t('lifetime.appsDescription')}
                         rows={shownApps.map(slug => ({
                             slug,
-                            value: currentSlots[slug],
+                            value: slots[slug],
                             current: currentSlots[slug],
                             slotsState: slotsStates[slug] ?? { overview: null, loaded: false },
+                            moreReason: moreReason(slug),
                             onOpen: enabledApps.includes(slug)
                                 ? () => {
                                       onClose()
@@ -95,8 +104,8 @@ export function LifetimeDialog({
                         }))}
                         interval="monthly"
                         renewal={renewal}
-                        disabled
-                        onChange={() => {}}
+                        disabled={!!success}
+                        onChange={(slug, value) => setSlots(current => ({ ...current, [slug]: value }))}
                     />
                 </div>
             )}
@@ -105,6 +114,8 @@ export function LifetimeDialog({
 
     const right = success ? (
         <SuccessPanel title={success.title} body={success.body} cta={t('plan.success.done')} onDone={onClose} />
+    ) : dirty ? (
+        <LifetimeSlotsPane state={state} slots={slots} onReset={() => setSlots(currentSlots)} onApplied={next => void done(next)} onFailed={() => void onChanged()} />
     ) : (
         <PanelSteps stepKey={drill} depth={drill === 'overview' ? 0 : 1}>
             {drill === 'invoices' ? (

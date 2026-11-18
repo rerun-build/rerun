@@ -138,6 +138,20 @@
             "paidOnce": "Einmal bezahlt",
             "apps": "Apps",
             "aiProviders": "KI-Anbieter"
+        },
+        "slots": {
+            "oneOnCheckout": "Ein Slot bei der ersten Zahlung, weitere gleich danach",
+            "oneDuringTrial": "Ein Slot pro App während der kostenlosen Testphase",
+            "slotLine": "{count, plural, one {# {provider}-Slot} other {# {provider}-Slots}}",
+            "freeThen": "{days} Tage kostenlos, dann {price}",
+            "monthlyBill": "Apps, monatlich",
+            "billedToday": "Heute für den Rest des Monats berechnet, dann monatlich mit deinen anderen Slots.",
+            "freeDuringTrial": "Kostenlos bis zum Ende deiner Testphase, dann monatlich berechnet.",
+            "continueToPayment": "Weiter zur Zahlung",
+            "confirm": "Bestätigen",
+            "addedTitle": "Slots hinzugefügt",
+            "addedBody": "Verbinde ein Konto in der App, um sie einzusetzen.",
+            "scheduledBody": "Die zurückgegebenen Slots bleiben bis {date} nutzbar und verschwinden dann von deiner Rechnung."
         }
     },
     "apps": {

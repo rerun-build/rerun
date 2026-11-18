@@ -127,6 +127,11 @@ export type LifetimeBillingState = {
     periodEnd: string | null
     nextInvoice: { at: string; amountCents: number } | null
     cancelAtPeriodEnd: boolean
+    // Its free trial is running: one slot per app until it ends.
+    trialing: boolean
+    // No live add-ons subscription: the next slot is bought alone through Checkout, free for
+    // `trialDays` when it is the first one the workspace ever starts.
+    slotsCheckout: { trialDays: number } | null
     // A workspace that never paid anything has no Stripe customer: no invoices, no business details.
     hasCustomer: boolean
     business: BusinessDetails
@@ -154,6 +159,8 @@ export async function getLifetimeBillingState(): Promise<LifetimeBillingState> {
         periodEnd: live ? (workspace?.addons_current_period_end ?? null) : null,
         nextInvoice: live && !live.cancel_at_period_end ? await readNextInvoice(live) : null,
         cancelAtPeriodEnd: !!live?.cancel_at_period_end,
+        trialing: live?.status === 'trialing',
+        slotsCheckout: live ? null : { trialDays: workspace?.stripe_addons_subscription_id ? 0 : TRIAL_DAYS },
         hasCustomer: !!liveCustomer,
         business: businessDetailsOf(liveCustomer),
     }

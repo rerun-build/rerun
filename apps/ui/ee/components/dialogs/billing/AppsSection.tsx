@@ -58,7 +58,8 @@ export function useAppSlots(slugs: AppSlug[], skip = false): Partial<Record<AppS
     return state
 }
 
-export type AppSlotsRow = { slug: AppSlug; value: number; current: number; slotsState: AppSlotsState; onOpen?: () => void }
+// `moreReason` keeps the + button off and says why, when one more slot cannot be bought from here.
+export type AppSlotsRow = { slug: AppSlug; value: number; current: number; slotsState: AppSlotsState; moreReason?: string; onOpen?: () => void }
 
 type AppsSectionProps = {
     rows: AppSlotsRow[]
@@ -90,7 +91,7 @@ export function AppsSection({ rows, description, interval, renewal, disabled = f
 function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: AppSlotsRow; interval: BillingInterval; renewal: string; disabled: boolean; onChange: (value: number) => void }) {
     const locale = useLocale()
     const t = useTranslations('billing.apps')
-    const { slug, value, current, slotsState, onOpen } = row
+    const { slug, value, current, slotsState, moreReason, onOpen } = row
     const { name, providerLabel } = appInfo(slug)
     const slotPrice = PLAN_PRICES_CENTS[interval][APP_ADDON_KEYS[slug]]
     const per = interval === 'yearly' ? t('unit.yearly') : t('unit.monthly')
@@ -137,7 +138,7 @@ function AppSlotsLine({ row, interval, renewal, disabled, onChange }: { row: App
                             </>
                         )}
                     </span>
-                    <SlotStepper label={providerLabel} value={value + trialSlots} lessReason={lessReason} disabled={disabled} onChange={next => onChange(next - trialSlots)} />
+                    <SlotStepper label={providerLabel} value={value + trialSlots} lessReason={lessReason} moreReason={disabled ? undefined : moreReason} disabled={disabled} onChange={next => onChange(next - trialSlots)} />
                 </div>
             </div>
             <LeavingNote removed={removed} renewal={renewal} />
@@ -191,7 +192,7 @@ function TrialSlotsCount({ value, inUse, trialEndsAt, price }: { value: number; 
     return t.rich('trial.withPaidInUse', { count: value, trial, n, inUse: () => <CountFlow value={inUse} /> })
 }
 
-function SlotStepper({ label, value, lessReason, disabled, onChange }: { label: string; value: number; lessReason?: string; disabled: boolean; onChange: (value: number) => void }) {
+function SlotStepper({ label, value, lessReason, moreReason, disabled, onChange }: { label: string; value: number; lessReason?: string; moreReason?: string; disabled: boolean; onChange: (value: number) => void }) {
     const t = useTranslations('billing.apps')
     return (
         <div className="flex shrink-0 items-center gap-2">
@@ -203,9 +204,11 @@ function SlotStepper({ label, value, lessReason, disabled, onChange }: { label: 
             <span className="min-w-6 text-center text-sm font-medium tabular-nums">
                 <CountFlow value={value} />
             </span>
-            <Button variant="outline" size="icon-sm" aria-label={t('moreAria', { provider: label })} disabled={disabled} onClick={() => onChange(value + 1)}>
-                <PlusIcon />
-            </Button>
+            <TooltipDisabledReason reason={moreReason}>
+                <Button variant="outline" size="icon-sm" aria-label={t('moreAria', { provider: label })} disabled={disabled || !!moreReason} onClick={() => onChange(value + 1)}>
+                    <PlusIcon />
+                </Button>
+            </TooltipDisabledReason>
         </div>
     )
 }

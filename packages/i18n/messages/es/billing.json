@@ -138,6 +138,20 @@
             "paidOnce": "Pagado una vez",
             "apps": "Apps",
             "aiProviders": "Proveedores de IA"
+        },
+        "slots": {
+            "oneOnCheckout": "Un slot en el primer pago, añade más justo después",
+            "oneDuringTrial": "Un slot por app durante la prueba gratuita",
+            "slotLine": "{count, plural, one {# slot de {provider}} other {# slots de {provider}}}",
+            "freeThen": "Gratis durante {days} días, luego {price}",
+            "monthlyBill": "Apps, al mes",
+            "billedToday": "Se factura hoy lo que queda del mes, luego cada mes con tus otros slots.",
+            "freeDuringTrial": "Gratis hasta que termine tu prueba, luego se factura cada mes.",
+            "continueToPayment": "Continuar al pago",
+            "confirm": "Confirmar",
+            "addedTitle": "Slots añadidos",
+            "addedBody": "Conecta una cuenta en la app para ponerlos a trabajar.",
+            "scheduledBody": "Los slots que devolviste siguen disponibles hasta el {date} y luego salen de tu factura."
         }
     },
     "apps": {

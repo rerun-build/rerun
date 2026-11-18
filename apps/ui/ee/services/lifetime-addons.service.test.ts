@@ -183,6 +183,8 @@ describe('getLifetimeBillingState', () => {
             periodEnd: null,
             nextInvoice: null,
             cancelAtPeriodEnd: false,
+            trialing: false,
+            slotsCheckout: { trialDays: 5 },
             hasCustomer: false,
             business: { name: null, country: null, taxId: null },
         })
@@ -208,6 +210,8 @@ describe('getLifetimeBillingState', () => {
             periodEnd: PERIOD_END_ISO,
             nextInvoice: { at: PERIOD_END_ISO, amountCents: 2700 },
             cancelAtPeriodEnd: false,
+            trialing: false,
+            slotsCheckout: null,
         })
     })
 
@@ -225,6 +229,6 @@ describe('getLifetimeBillingState', () => {
         vi.mocked(stripe.customers.retrieve).mockResolvedValue({ id: 'cus_1' } as never)
         vi.mocked(stripe.subscriptions.retrieve).mockResolvedValue(subscription({ status: 'canceled' }) as never)
 
-        await expect(getLifetimeBillingState()).resolves.toMatchObject({ quantities: { linkedin_slot: 0, whatsapp_slot: 0 }, periodEnd: null, nextInvoice: null })
+        await expect(getLifetimeBillingState()).resolves.toMatchObject({ quantities: { linkedin_slot: 0, whatsapp_slot: 0 }, periodEnd: null, nextInvoice: null, slotsCheckout: { trialDays: 0 } })
     })
 })
