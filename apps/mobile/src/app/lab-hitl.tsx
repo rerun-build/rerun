@@ -45,7 +45,10 @@ const FREE_TEXT = { questions: [{ question: 'What should the subject line say?',
 const LINEAR = { name: 'linear', displayName: 'Linear', host: 'mcp.linear.app', icon: null, status: 'needs_auth' as const, canSignIn: true }
 const SECRET = { reason: 'I need your Pipedrive key to sync the deals.', secrets: [{ key: 'PIPEDRIVE_API_KEY', label: 'Pipedrive API key', docsUrl: 'https://pipedrive.readme.io/docs/how-to-find-the-api-token' }] }
 
-const hitlProps = (toolCallId: string, input: Record<string, unknown>, kind: 'question' | 'approval' | 'secret' | 'takeover' = 'question') => ({ pending: { kind, toolCallId, input, output: undefined }, agentId: 'agent-scout', coworkerName: 'Scout', webUrl: 'https://app.rerun.build', onAnswer: noop, onDismiss: noop })
+const COMPUTER_COMMANDS = { computer: '#studio-pc', reason: 'Encode the rushes of day 2 for the teaser.', commands: ['ffmpeg -i day2.mov -c:v h264_videotoolbox teaser.mp4'], cwd: '~/Projects/client-site-redesign-2026/exports/teasers' }
+const COMPUTER_FILES = { computer: '#studio-pc', reason: 'Read the edit list of the teaser.', paths: ['~/Movies/rushes/day2/edit-list.txt'] }
+
+const hitlProps = (toolCallId: string, input: Record<string, unknown>, kind: 'question' | 'approval' | 'secret' | 'takeover' | 'computer' = 'question', output: unknown = undefined) => ({ pending: { kind, toolCallId, input, output }, agentId: 'agent-scout', coworkerName: 'Scout', webUrl: 'https://app.rerun.build', onAnswer: noop, onDismiss: noop })
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
     return (
@@ -91,6 +94,10 @@ export default function LabHitl() {
                             { action: 'Delete 12 old drafts', decision: 'declined', note: 'Keep them for now' },
                         ]}
                     />
+                </Group>
+                <Group title="Linked computers">
+                    <HitlBlock {...hitlProps('lab-c1', COMPUTER_COMMANDS, 'computer', { card: { computerId: 'c1', always: { rule: 'program', value: 'ffmpeg', interpreter: false } } })} />
+                    <HitlBlock {...hitlProps('lab-c2', COMPUTER_FILES, 'computer', { card: { computerId: 'c1', always: { rule: 'folder', value: '/Users/claire/Movies/rushes/day2', interpreter: false } } })} />
                 </Group>
                 <Group title="Credentials and notification">
                     <HitlBlock {...hitlProps('lab-s1', SECRET, 'secret')} />
