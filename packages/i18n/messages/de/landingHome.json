@@ -408,7 +408,8 @@
                     }
                 }
             }
-        }
+        },
+        "windowHint": "eine Live-Demo. klick dich durch."
     },
     "cases": {
         "title": "Stell <keep>KI-<chip>Coworker</chip></keep> ein",

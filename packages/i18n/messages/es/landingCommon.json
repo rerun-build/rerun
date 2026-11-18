@@ -173,7 +173,8 @@
             "brandKit": "Ver el kit de marca",
             "copy": "Copiar el logo (SVG)",
             "download": "Descargar el logo"
-        }
+        },
+        "downloadApp": "Descargar la app"
     },
     "github": {
         "star": "Star",
@@ -306,5 +307,17 @@
             "cta": "Ver la comparación"
         }
     },
-    "composerPlaceholder": "Enviar un mensaje..."
+    "composerPlaceholder": "Enviar un mensaje...",
+    "download": {
+        "cta": "Descargar gratis",
+        "chooseVersion": "Elegir otra versión",
+        "yourSystem": "Tu sistema",
+        "webApp": "Abrir la app web",
+        "versions": {
+            "macAppleSilicon": "macOS · Apple Silicon",
+            "macIntel": "macOS · Intel",
+            "windows": "Windows",
+            "linux": "Linux"
+        }
+    }
 }

@@ -173,7 +173,8 @@
             "brandKit": "View brand kit",
             "copy": "Copy logo (SVG)",
             "download": "Download logo"
-        }
+        },
+        "downloadApp": "Download app"
     },
     "github": {
         "star": "Star",
@@ -313,6 +314,21 @@
         "nav.trialCta": "The price stays in US dollars in every language.",
         "finalCta.titleLead": "<switch></switch> is a rotating pill naming the AI provider (ChatGPT, Claude...). The title is split in two lines: titleLead then titleTail.",
         "openSource.announce": "<wide> wraps the part hidden on small screens.",
-        "og.default.line1": "The social card of the site (1200x630 image): three short lines, the last one highlighted. Keep each line short."
+        "og.default.line1": "The social card of the site (1200x630 image): three short lines, the last one highlighted. Keep each line short.",
+        "download.versions.macAppleSilicon": "Operating system and Apple's name for its own Mac chips, keep both as is.",
+        "download.versions.macIntel": "Operating system and the Intel chip of older Macs, keep both as is.",
+        "download.yourSystem": "Accessible label of the check next to the version that matches the visitor's computer."
+    },
+    "download": {
+        "cta": "Download for free",
+        "chooseVersion": "Choose another version",
+        "yourSystem": "Your system",
+        "webApp": "Open web app",
+        "versions": {
+            "macAppleSilicon": "macOS · Apple Silicon",
+            "macIntel": "macOS · Intel",
+            "windows": "Windows",
+            "linux": "Linux"
+        }
     }
 }
