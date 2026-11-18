@@ -19,7 +19,8 @@
     "cut_by": ["Scope Shaper", "IKE"],
     "reader": {"model": "claude-haiku-5-5", "thinkingLevel": "low"},
     "reader_judgment": {"model": "claude-sonnet-5-5", "thinkingLevel": "medium"},
-    "review": {"by": ["BARBARA"], "type": "acceptor", "mode": "dry", "revisions": 2},
+    "review": {"panel": [{"by": "LESLIE", "type": "critic", "lens": "failure"}, {"by": "ADA", "type": "critic", "lens": "structure"},
+                         {"by": "BARBARA", "type": "acceptor", "lens": "goal"}], "mode": "dry", "revisions": 2},
     "repair": {"tries": 2},
     "recheck": {"tries": 2, "parallel": 2}
   },
@@ -109,6 +110,12 @@
           "name": "IKE",
           "runs": 3
         }
+      ]
+    },
+    "critic": {
+      "coworkers": [
+        {"id": "9eb638c7-b71e-48e6-9c89-d0c594de3c0e", "name": "LESLIE", "runs": 2},
+        {"id": "6e75f62d-4d9d-43b1-990e-816bfe064503", "name": "ADA", "runs": 2}
       ]
     },
     "acceptor": {
