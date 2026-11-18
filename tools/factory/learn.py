@@ -1,4 +1,5 @@
 import json
+import factory as F
 
 MAX_ITEMS = 3
 BRIEF_CUT = 6000
@@ -41,6 +42,7 @@ def record(store, job):
 
 def brief(record, repo, issue, max_items=MAX_ITEMS):
     name = repo.split("/")[-1]
+    name = F.FOLDER_NAMES.get(name, name)
     body = json.dumps(record, indent=1, sort_keys=True)
     return "\n".join([
         f"JOB {name}#{issue} LEARN",

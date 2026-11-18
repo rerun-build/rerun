@@ -5,7 +5,7 @@ import factory as F
 import mirror as M
 import refresh
 
-FULL = "special-place-ai-heaven/rerun"
+FULL = "special-place-ai-heaven/moldwright"
 
 
 def prefix():

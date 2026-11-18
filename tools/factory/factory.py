@@ -156,8 +156,12 @@ def repo_full(name):
     return full
 
 
+FOLDER_NAMES = {"moldwright": "rerun"}
+
+
 def short(full):
-    return full.split("/")[1]
+    name = full.split("/")[1]
+    return FOLDER_NAMES.get(name, name)
 
 
 def trim(s, n):
@@ -1065,7 +1069,7 @@ def cmd_risk(a):
         ro = base_roster(full)
     except RosterError as e:
         die("risk: " + str(e), 1)
-    if ro is None and full != home():
+    if ro is None and short(full) != short(home()):
         import roster as R
         need.setdefault(R.GATE_SENSITIVE, ["this project has no roster: every change needs the second reviewer", []])[1].extend(f["filename"] for f in files)
     if ro:

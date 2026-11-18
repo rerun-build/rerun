@@ -6,7 +6,7 @@ import factory as F
 
 H = "abcdef0123456789abcdef0123456789abcdef01"
 S8 = H[:8]
-HOME = "special-place-ai-heaven/rerun"
+HOME = "special-place-ai-heaven/moldwright"
 OTHER = "special-place-ai-heaven/other-project"
 
 
@@ -75,8 +75,9 @@ class TestGateProject(unittest.TestCase):
         self.assertTrue(line.startswith("REVIEWS PASS"), line)
 
     def test_the_home_without_a_roster_keeps_its_rules(self):
-        line, _ = _run_gate(HOME, ["src/a.ts"], ["LINUS"], _no_roster)
-        self.assertTrue(line.startswith("REVIEWS PASS"), line)
+        for home in (HOME, "special-place-ai-heaven/rerun"):
+            line, _ = _run_gate(home, ["src/a.ts"], ["LINUS"], _no_roster)
+            self.assertTrue(line.startswith("REVIEWS PASS"), (home, line))
 
     def test_a_project_with_its_own_roster_is_judged_by_it(self):
         line, _ = _run_gate(OTHER, ["apps/engine/src/config/env.ts"], ["LINUS"], _real_roster)
@@ -92,8 +93,9 @@ class TestGateProject(unittest.TestCase):
         self.assertNotIn("EXTRA REVIEWERS: none", out)
 
     def test_risk_of_the_home_without_a_roster_adds_no_reviewer(self):
-        out = _run_risk(HOME, ["src/a.ts"], _no_roster)
-        self.assertIn("EXTRA REVIEWERS: none. LINUS alone.", out)
+        for home in (HOME, "special-place-ai-heaven/rerun"):
+            out = _run_risk(home, ["src/a.ts"], _no_roster)
+            self.assertIn("EXTRA REVIEWERS: none. LINUS alone.", out, home)
 
     def test_a_roster_that_cannot_be_read_still_fails_closed(self):
         line, _ = _run_gate(OTHER, ["src/a.ts"], ["LINUS", "BRUCE"], _unreadable_roster)

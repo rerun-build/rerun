@@ -481,7 +481,7 @@ def load_token(cfg):
 
 def build(cfg=None, eng=None, clock=time.time, gh=None):
     cfg = load_runtime(cfg)
-    gh = gh or GH.Client(cfg.get("github_api", "https://api.github.com"), cfg.get("repo", "special-place-ai-heaven/rerun"))
+    gh = gh or GH.Client(cfg.get("github_api", "https://api.github.com"), cfg.get("repo", "special-place-ai-heaven/moldwright"))
     eng = eng or E.Engine()
     tokens = T.ensure_triggers(eng, cfg)
     st = S.Store(store_path(cfg))

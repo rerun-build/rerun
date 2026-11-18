@@ -277,7 +277,7 @@ def claims_line(ro, names, builder, others, verdict):
 
 def ledger_builders(full, jobrepo, jobn, ids, ref):
     import ledger as L
-    if F.repo_full(jobrepo) != full:
+    if F.short(F.repo_full(jobrepo)) != F.short(full):
         return [], "PR body names %s#%s but branch is %s" % (jobrepo, jobn, ref)
     mj = re.fullmatch(r"factory/job-(\d+)", ref)
     if mj and mj.group(1) != str(jobn):
@@ -413,7 +413,7 @@ def gate(repo, n):
     if ro:
         import roster as R
         need = R.required(ro, [f["filename"] for f in files], builder)
-    elif not roster_err and full != F.home():
+    elif not roster_err and F.short(full) != F.short(F.home()):
         import roster as R
         need.add(R.GATE_SENSITIVE)
     if len(files) > 25 or lines > 1200:

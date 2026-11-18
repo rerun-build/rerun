@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 import json, os, re, sqlite3, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from factory import FOLDER_NAMES
 A = os.environ.get("JOBCOST_AGENTS", "/data/agents")
 if len(sys.argv) < 2 or "#" not in sys.argv[1]:
     print("usage: job-cost <repo>#<issue> [--steps]"); sys.exit(2)
-tag = "JOB " + sys.argv[1].split("/")[-1]
+name, n = sys.argv[1].split("/")[-1].split("#", 1)
+tag = "JOB %s#%s" % (FOLDER_NAMES.get(name, name), n)
 RX = re.compile(r"JOB (?:[\w.-]+/)?%s(?!\d)" % re.escape(tag[4:]))
 rows = []
 for d in sorted(os.listdir(A)):
