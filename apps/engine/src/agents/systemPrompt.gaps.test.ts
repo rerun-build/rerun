@@ -272,9 +272,33 @@ describe('buildSystemPrompt for the foreman', () => {
         expect(prompt).toContain(sharedDir())
         expect(prompt).toContain('agent_files_')
         expect(prompt).toContain('<asking_the_user>')
-        expect(prompt).not.toContain('<skills>')
-        expect(prompt).not.toContain('<memory_index>')
         expect(prompt).not.toContain('<database>')
+    })
+
+    it('carries what it keeps of its own, like a coworker: skills, routines, memories and connected services', async () => {
+        sources.text = { skills: 'SKILL INDEX', schedules: 'SCHEDULE INDEX', triggers: 'TRIGGER INDEX', memory: 'MEMORY INDEX', mcp: 'MCP INDEX' }
+        const prompt = await buildSystemPrompt(foreman({ tools: { trigger: false } }))
+
+        expect(prompt).toMatch(/<skills>\nSKILL INDEX\n\nSkills are how you get better/)
+        expect(prompt).toContain('<scheduled_tasks>\nSCHEDULE INDEX\n</scheduled_tasks>')
+        expect(prompt).toContain('<memory_index>\nMEMORY INDEX\n</memory_index>')
+        expect(prompt).toContain('<connected_services>\nMCP INDEX\n</connected_services>')
+        expect(prompt).not.toContain('<webhook_triggers>')
+        expect(prompt.indexOf('<skills>')).toBeLessThan(prompt.indexOf('<company_brain>'))
+        expect(prompt.indexOf('<connected_services>')).toBeLessThan(prompt.indexOf('<current_time>'))
+    })
+
+    it('keeps none of those sections with the switches off', async () => {
+        sources.text = { skills: 'SKILL INDEX', schedules: 'SCHEDULE INDEX', memory: 'MEMORY INDEX' }
+        const prompt = await buildSystemPrompt(foreman({ tools: { skills: false, schedule: false, memory: false } }))
+
+        for (const tag of ['<skills>', '<scheduled_tasks>', '<memory_index>']) expect(prompt).not.toContain(tag)
+        expect(prompt).not.toContain('memory_write is the fallback')
+    })
+
+    it('is told nobody is watching when a routine starts it', async () => {
+        expect(await buildSystemPrompt(foreman(), { source: 'schedule', slug: 'weekly', name: 'Weekly' })).toContain('<unattended_run>')
+        expect(await buildSystemPrompt(foreman())).not.toContain('<unattended_run>')
     })
 
     it('shows what it asks about in the turn that asks, without the chat-only draft block', async () => {

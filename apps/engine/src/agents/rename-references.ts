@@ -2,7 +2,6 @@ import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { brainDbPath, installPath, schedulesDir, skillsDir, soulPath, triggersDir, agentDir } from '../config/paths.js'
-import { listAgentIndex } from '../db/repos/agents.js'
 import { rewriteMemoryText } from '../db/repos/memories.js'
 import { getSharedDb, renameTableOwner, sharedDbExists } from '../db/sharedDb.js'
 import { systemDbExists } from '../db/systemDb.js'
@@ -14,6 +13,7 @@ import { writeFileAtomic } from '../lib/atomic-write.js'
 import { logger } from '../lib/logger.js'
 import { withAgentLock } from './lock.js'
 import { unloadAgent } from './registry.js'
+import { listAgentIdsOnDisk } from './loader.js'
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -92,7 +92,7 @@ async function rewriteAgentMentions(id: string, fromHandle: string, rewrite: (te
 // to the agent: nothing fails at write time, only at run time. Past chats are left as they were.
 export async function rewriteRenamedAgentReferences(agentId: string, fromHandle: string, toHandle: string): Promise<void> {
     const rewrite = (text: string) => replaceMention(text, fromHandle, toHandle)
-    for (const { id } of await listAgentIndex()) await rewriteAgentMentions(id, fromHandle, rewrite)
+    for (const id of await listAgentIdsOnDisk()) await rewriteAgentMentions(id, fromHandle, rewrite)
     await attempt({ part: 'brain pages' }, () => reattributePages(`agent:${fromHandle}`, `agent:${toHandle}`))
     if (existsSync(brainDbPath())) await attempt({ part: 'brain proposals' }, () => renameProposalAuthor(agentId, toHandle))
     if (sharedDbExists()) await attempt({ part: 'shared db' }, async () => renameTableOwner(await getSharedDb(), fromHandle, toHandle))

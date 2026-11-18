@@ -19,6 +19,7 @@ const { beforeAll, beforeEach, describe, expect, it } = await import('vitest')
 const { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, foremanBriefSchema } = await import('@rerun/contracts')
 const { migrate } = await import('../db/migrate.js')
 const { ensureForeman } = await import('./foreman.js')
+const { writeAgentConfig } = await import('./config-write.js')
 const { getAgent } = await import('./registry.js')
 const { createAgent } = await import('./factory.js')
 const { listAgentIndex } = await import('../db/repos/agents.js')
@@ -79,7 +80,7 @@ describe('foreman', () => {
         const foreman = await getAgent(FOREMAN_AGENT_ID)
         expect(foreman.config.kind).toBe('foreman')
         expect(foreman.config.model).toBeNull()
-        expect(foreman.config.selfImprovement.enabled).toBe(false)
+        expect(foreman.config.selfImprovement).toEqual({ enabled: true, allowToolInstall: false, allowSoulEdit: false, autoMemory: true })
         expect((await listAgentIndex()).map(agent => agent.id)).not.toContain(FOREMAN_AGENT_ID)
     })
 
@@ -98,11 +99,18 @@ describe('foreman', () => {
         expect(names).not.toContain('brain_propose')
     })
 
-    it('keeps nothing of its own between conversations', async () => {
+    it('keeps a memory, skills and routines of its own, like a coworker', async () => {
         const { tools, close } = await foremanToolSet()
         const names = Object.keys(tools)
         await close()
-        for (const name of ['memory_write', 'skill_create', 'schedule_create', 'trigger_create', 'db_query', 'notify_user', 'suggest_service', 'request_secret', 'soul_update', 'install_complete']) expect(names).not.toContain(name)
+        expect(names).toEqual(expect.arrayContaining(['memory_write', 'memory_recall', 'skill_create', 'skill_propose', 'schedule_create', 'verbosity_set']))
+    })
+
+    it('cannot rewrite who it is, install on the box, or take what needs a place on the board', async () => {
+        const { tools, close } = await foremanToolSet()
+        const names = Object.keys(tools)
+        await close()
+        for (const name of ['soul_update', 'tool_install', 'mcp_register', 'request_mcp_sign_in', 'trigger_create', 'db_query', 'notify_user', 'suggest_service', 'request_secret', 'install_complete']) expect(names).not.toContain(name)
         expect(names.some(name => name.startsWith('rerun_hub_'))).toBe(false)
     })
 
@@ -164,7 +172,7 @@ describe('foreman', () => {
         }
     })
 
-    it('speaks from the brief, with the box around it and none of the agent sections', async () => {
+    it('speaks from the brief, with the box around it and what it keeps of its own', async () => {
         const prompt = systemPromptText(await buildSystemPrompt(await foremanWithBrief(), { source: 'chat' }, 'claude'))
         expect(prompt).toContain('Charter from the hub.')
         expect(prompt).toContain('<bridged_tools>')
@@ -178,9 +186,20 @@ describe('foreman', () => {
         expect(prompt).toContain('<company_brain>')
         expect(prompt).toContain('brain_write the complete new version')
         expect(prompt).not.toContain('You cannot write the brain.')
-        expect(prompt).not.toContain('<skills>')
-        expect(prompt).not.toContain('<memory_index>')
-        expect(prompt).not.toContain('<verbosity>')
+        expect(prompt).toContain('<skills>')
+        expect(prompt).toContain('skill_propose')
+        expect(prompt).toContain('memory_write is the fallback for what no skill governs')
+        expect(prompt).toContain('<verbosity>')
+        expect(prompt).not.toContain('request_mcp_sign_in')
+        expect(prompt).not.toContain('<unattended_run>')
+    })
+
+    // A routine reaches it with no brief: nobody is talking to it, so the hub signed nothing.
+    it('runs a routine of its own from its soul, told that nobody is watching', async () => {
+        const prompt = systemPromptText(await buildSystemPrompt(await getAgent(FOREMAN_AGENT_ID), { source: 'schedule', slug: 'weekly-review', name: 'Weekly review' }))
+        expect(prompt).toContain('You are the Chief of Staff of this Rerun workspace')
+        expect(prompt).toContain('<unattended_run>')
+        expect(prompt).toContain('a scheduled routine')
     })
 
     it('never lets an agent be created as a foreman', async () => {
@@ -222,6 +241,21 @@ describe('foreman routes', () => {
 
         expect((await request('PATCH', '/agents/foreman', { connectionId: null, provider: null, model: null })).status).toBe(200)
         expect((await getAgent(FOREMAN_AGENT_ID)).config.model).toBeNull()
+    })
+
+    it('keeps the servers connected to it and its response length across a reboot', async () => {
+        const servers = [{ name: 'linear', url: 'https://mcp.linear.app/mcp' }]
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...(await getAgent(FOREMAN_AGENT_ID)).config, mcpServers: servers as never, verbosity: 'concise', description: 'hijacked', tools: { ...(await getAgent(FOREMAN_AGENT_ID)).config.tools, trigger: true } })
+
+        await ensureForeman()
+        const { config } = await getAgent(FOREMAN_AGENT_ID)
+        expect(config.mcpServers.map(server => server.name)).toEqual(['linear'])
+        expect(config.verbosity).toBe('concise')
+        expect(config.description).not.toBe('hijacked')
+        expect(config.tools.trigger).toBe(false)
+
+        await writeAgentConfig(FOREMAN_AGENT_ID, { ...config, mcpServers: [], verbosity: 'normal' })
+        await ensureForeman()
     })
 
     it('leaves the other agents alone', async () => {

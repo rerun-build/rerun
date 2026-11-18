@@ -9,16 +9,9 @@ export type AgentMcpServer = McpServer & { vaultItemId?: string }
 
 type VaultHolder = Pick<LoadedAgent, 'id' | 'config'> & { hubAgentId?: string }
 
-// The coworker whose Vault a run draws on: itself, or the coworker a delegate works for. The
-// foreman installs connectors for others and holds none of them.
-export function vaultAgentId(agent: VaultHolder): string | null {
-    if (agent.config.kind === 'foreman') return null
-    return agent.hubAgentId ?? agent.id
-}
-
+// A run draws on its own coworker's Vault, and a delegate on the one of the coworker it works for.
 export function attachedVaultItems(agent: VaultHolder): LoadedVaultItem[] {
-    const id = vaultAgentId(agent)
-    return id ? vaultItemsForAgent(id) : []
+    return vaultItemsForAgent(agent.hubAgentId ?? agent.id)
 }
 
 // The variables of every attached item, for the coworker's shell. They win over the coworker's own

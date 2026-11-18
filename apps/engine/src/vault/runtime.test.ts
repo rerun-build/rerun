@@ -23,7 +23,7 @@ const { createServer } = await import('../http/server.js')
 const { migrate } = await import('../db/migrate.js')
 const { vaultDir, vaultTokenPath, skillDir, skillsDir, workspaceDir, configPath } = await import('../config/paths.js')
 const { forgetVaultCache, getVaultItem } = await import('./store.js')
-const { agentMcpServers, vaultEnvFor, vaultAgentId } = await import('./runtime.js')
+const { agentMcpServers, vaultEnvFor } = await import('./runtime.js')
 const { prepareMcpServer } = await import('../tools/mcp.js')
 const { agentProcessEnv } = await import('../agents/process-env.js')
 const { agentMcpSpawn } = await import('../tools/mcp-pool.js')
@@ -110,14 +110,13 @@ describe('what a coworker draws on', () => {
         expect(agentProcessEnv(await loaded(c)).env.LINEAR_EXTRA).toBeUndefined()
     })
 
-    it('gives an item shared with everyone to every coworker, the foreman excepted', async () => {
+    it('gives an item shared with everyone to every coworker, the foreman included', async () => {
         const a = await createAgent('Everyone A')
         const b = await createAgent('Everyone B')
         await createItem({ kind: 'secret', name: 'Shared', env: { SHARED_ALL: 'x' }, sharedWithAll: true })
         expect(vaultEnvFor(await loaded(a))).toEqual({ SHARED_ALL: 'x' })
         expect(vaultEnvFor(await loaded(b))).toEqual({ SHARED_ALL: 'x' })
-        expect(vaultAgentId({ id: 'f', config: { kind: 'foreman' } as never })).toBeNull()
-        expect(vaultEnvFor({ id: 'f', config: { kind: 'foreman', mcpServers: [] } as never })).toEqual({})
+        expect(vaultEnvFor({ id: 'f', config: { kind: 'foreman', mcpServers: [] } as never })).toEqual({ SHARED_ALL: 'x' })
     })
 
     it('lets a delegate draw on the Vault of the coworker it works for', async () => {
