@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import calendar, contextlib, fnmatch, json, os, re, shlex, signal, subprocess, sys, time, shutil, urllib.request
+import calendar, fnmatch, json, os, re, shlex, signal, subprocess, sys, time, shutil, urllib.request
 
 os.environ["GIT_TERMINAL_PROMPT"] = "0"
 GH, GIT = os.environ.get("FACTORY_GH") or "/data/tools/bin/gh", "/data/tools/bin/git"
@@ -8,27 +8,10 @@ WORK = os.environ.get("FACTORY_WORK", "/data/work")
 REPOS, WT, STATE = WORK + "/repos", WORK + "/wt", WORK + "/state"
 MIN_FREE_GB = 30
 LOAD_PER_CPU = 3.0
-MAX_BUILDERS = None
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ciwait
 import cutshape
-try:
-    import limits
-except Exception:
-    limits = None
-
-
-def max_builders():
-    if MAX_BUILDERS:
-        return MAX_BUILDERS
-    try:
-        return limits.capacity()
-    except Exception:
-        return 3
-
-
 MIN_FREE_MEM_GB, MEMINFO = 4, "/proc/meminfo"
-LOCK_WAIT_S, LOCK_STALE_S = 180, 900
 WT_IDLE_HOURS = 48
 CLONE_SAFE = 1
 QUEUE_LIMIT_S, SLICE_S = 30 * 60, 450
@@ -305,60 +288,6 @@ def avail_mem_gb():
     return None
 
 
-@contextlib.contextmanager
-def builder_lock():
-    lk, end = os.path.join(STATE, "builders.lock"), time.time() + LOCK_WAIT_S
-    told = False
-    while True:
-        try:
-            fd = os.open(lk, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            break
-        except FileExistsError:
-            if not told:
-                told = True
-                try:
-                    holder = open(lk).read().split()[0]
-                except (OSError, IndexError):
-                    holder = "unknown"
-                print("waiting for builders.lock (held by pid %s)" % holder, file=sys.stderr)
-            bk = lk + ".break"
-            try:
-                if time.time() - os.path.getmtime(lk) > LOCK_STALE_S:
-                    os.close(os.open(bk, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
-                    try:
-                        if time.time() - os.path.getmtime(lk) > LOCK_STALE_S:
-                            os.remove(lk)
-                    finally:
-                        os.remove(bk)
-                    continue
-            except FileExistsError:
-                with contextlib.suppress(OSError):
-                    if time.time() - os.path.getmtime(bk) > LOCK_STALE_S:
-                        os.remove(bk)
-            except OSError:
-                continue
-            if time.time() > end:
-                die("another `wt new` or `pr-open --fix` holds %s for over %d s. Try again; if it stays, tell @boss." % (lk, LOCK_WAIT_S))
-            time.sleep(0.2)
-    os.write(fd, ("%d %d\n" % (os.getpid(), time.time())).encode())
-    os.close(fd)
-    try:
-        yield
-    finally:
-        try:
-            os.remove(lk)
-        except OSError:
-            pass
-
-
-def cap_check(quiet=False):
-    active = [(r, d) for r, d, p in wt_dirs() if not os.path.exists(marker(r, run([GIT, "rev-parse", "--abbrev-ref", "HEAD"], cwd=p, check=False).stdout.strip()))]
-    if len(active) >= max_builders():
-        if quiet:
-            return True
-        die("%d builders are already active (%s). At most %d at once. Return BLOCKED to @boss." % (len(active), ", ".join("/".join(x) for x in active), max_builders()))
-
-
 PLAN_RE = re.compile(r"^\s*(PLAN READY|SMALL FIX)\b", re.M)
 
 
@@ -492,7 +421,7 @@ def cmd_wt(a):
         for p in wt_strays():
             print("stray, not a worktree: " + p)
         st = shutil.disk_usage(WORK if os.path.isdir(WORK) else "/")
-        print("active builders: %d of %d | %d job folders, %.1f GB | free %.0f GB (floor %d)" % (act, max_builders(), len(wt_dirs()), du_gb(WORK), st.free / 2**30, MIN_FREE_GB))
+        print("active builders: %d | %d job folders, %.1f GB | free %.0f GB (floor %d)" % (act, len(wt_dirs()), du_gb(WORK), st.free / 2**30, MIN_FREE_GB))
         return
     if len(a) < 4:
         die("usage: wt %s <repo> <issue> <chunk>" % a[0])
@@ -879,18 +808,10 @@ def cmd_pr_open(a):
                 % (head[:7], ciwait.pending_text(pending), short(full), ex[0]["number"]))
         preflight_lines(top, plan)
         preflight_lint(top, changed)
-        if clone:
-            try:
-                os.remove(marker(short(full), branch))
-            except OSError:
-                pass
-        elif os.path.exists(marker(short(full), branch)):
-            with builder_lock():
-                cap_check()
-                try:
-                    os.remove(marker(short(full), branch))
-                except OSError:
-                    pass
+        try:
+            os.remove(marker(short(full), branch))
+        except OSError:
+            pass
         run([GIT, "push", "--quiet", "origin", branch], cwd=top)
         print("PUSHED fix to %s\nPR %s\nNext: `ci-wait %s %s`" % (branch, ex[0]["url"], short(full), ex[0]["number"]))
         return

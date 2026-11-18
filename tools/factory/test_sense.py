@@ -70,8 +70,7 @@ class Readings(Base):
     def test_every_reading_is_a_value_or_null_with_a_reason(self):
         rs = sense.readings()
         names = by_name(rs)
-        for n in ("work_bytes", "wt_count", "wt_unsaved", "wt_oldest_unsaved_idle_h", "lock_held", "lock_age_s",
-                  "wt_new_count", "pr_open_oldest_s", "installs_count", "tests_count", "tools_commit"):
+        for n in ("work_bytes", "wt_count", "wt_unsaved", "wt_oldest_unsaved_idle_h", "wt_new_count", "pr_open_oldest_s", "installs_count", "tests_count", "tools_commit"):
             self.assertIn(n, names)
         for r in rs:
             self.assertEqual(sorted(r), ["name", "reason", "value"])
@@ -86,7 +85,7 @@ class Readings(Base):
         r = self.readings()
         self.assertIsNone(r["tools_commit"]["value"])
         self.assertEqual(r["tools_commit"]["reason"], "FileNotFoundError")
-        self.assertEqual(r["lock_held"]["value"], 0)
+        self.assertEqual(r["wt_count"]["value"], 0)
 
     def test_a_reading_over_its_time_cap_is_null(self):
         def slow():
@@ -99,7 +98,7 @@ class Readings(Base):
         self.assertLess(took, 1.5)
         self.assertIsNone(r["tests_count"]["value"])
         self.assertTrue(r["tests_count"]["reason"].startswith("over "))
-        self.assertEqual(r["lock_held"]["value"], 0)
+        self.assertEqual(r["wt_count"]["value"], 0)
 
 
 class FolderSize(Base):
@@ -162,29 +161,6 @@ class Folders(Base):
         self.assertEqual(r["wt_oldest_unsaved"]["reason"], "no folder with unsaved work")
 
 
-class Lock(Base):
-    def test_builders_lock_held_shows_pid_command_and_age(self):
-        self.put(self.state, "builders.lock", "4242 %d\n" % time.time())
-        old = time.time() - 200
-        os.utime(os.path.join(self.state, "builders.lock"), (old, old))
-        self.add_proc(4242, ["python3", "x"], ["HOME=/x", "FACTORY_CMD=wt"], 10)
-        r = self.readings()
-        self.assertEqual((r["lock_held"]["value"], r["lock_pid"]["value"], r["lock_cmd"]["value"]), (1, 4242, "wt"))
-        self.assertGreaterEqual(r["lock_age_s"]["value"], 199)
-
-    def test_a_lock_whose_process_is_gone_says_so(self):
-        self.put(self.state, "builders.lock", "999 1\n")
-        r = self.readings()
-        self.assertEqual(r["lock_held"]["value"], 1)
-        self.assertEqual(r["lock_cmd"]["reason"], "process gone")
-
-    def test_not_held(self):
-        r = self.readings()
-        self.assertEqual(r["lock_held"]["value"], 0)
-        for n in ("lock_pid", "lock_cmd", "lock_age_s"):
-            self.assertEqual(r[n]["reason"], "not held")
-
-
 class Commands(Base):
     def test_running_commands_are_counted_with_their_oldest_age(self):
         fp = "/data/tools/factory/factory.py"
@@ -206,13 +182,11 @@ class Commands(Base):
         self.assertEqual(r["wt_new_oldest_s"]["reason"], "none running")
 
     def test_a_full_reading_holds_no_token_shape_and_no_argument(self):
-        self.put(self.state, "builders.lock", "4242 1\n")
         self.add_proc(4242, ["python3", "-I", "/data/tools/factory/factory.py", "new", "/secret/path/" + TOKEN],
                       ["GH_TOKEN=" + TOKEN, "FACTORY_CMD=wt"], 10)
         text = json.dumps(sense.readings())
         self.assertIsNone(re.search(r"gh[pousr]_[A-Za-z0-9]{20,}|github_pat_|sk-[A-Za-z0-9]{20,}|Bearer ", text))
         self.assertNotIn("/secret/path", text)
-        self.assertIn('"wt"', text)
 
 
 class ToolsStamp(Base):

@@ -240,116 +240,19 @@ class WtDoneCleans(FactoryCase):
             return self.call(F.cmd_merge_dev, [REPO, "9"])
 
 
-class BuilderCap(FactoryCase):
+class MemInfo(FactoryCase):
     def setUp(self):
         super().setUp()
-        for k, v in (("MAX_BUILDERS", 2), ("MEMINFO", os.path.join(self.tmp, "no-meminfo")), ("LOCK_WAIT_S", 30)):
-            p = mock.patch.object(F, k, v)
-            p.start()
-            self.addCleanup(p.stop)
-        self.lock = os.path.join(F.STATE, "builders.lock")
-
-    def test_busy_lock_refuses_and_stale_lock_is_taken_over(self):
-        def grab(_):
-            with F.builder_lock():
-                pass
-        with mock.patch.object(F, "LOCK_WAIT_S", 0.3), F.builder_lock():
-            code, out = self.call(grab, [])
-        self.assertEqual(code, 2, out)
-        self.assertIn("holds", out)
-        self.assertFalse(os.path.exists(self.lock))
-        open(self.lock, "w").close()
-        old = os.path.getmtime(self.lock) - F.LOCK_STALE_S - 10
-        os.utime(self.lock, (old, old))
-        with mock.patch.object(F, "LOCK_WAIT_S", 0.3):
-            code, out = self.call(grab, [])
-        self.assertEqual(code, 0, out)
-        self.assertFalse(os.path.exists(self.lock))
-
-    def test_two_breakers_of_one_stale_lock_do_not_both_get_in(self):
-        open(self.lock, "w").close()
-        old = os.path.getmtime(self.lock) - F.LOCK_STALE_S - 10
-        os.utime(self.lock, (old, old))
-        real, swapped = os.path.getmtime, []
-
-        def getmtime(p):
-            t = real(p)
-            if p == self.lock and not swapped:
-                swapped.append(1)
-                os.remove(self.lock)
-                open(self.lock, "w").close()
-            return t
-
-        def grab(_):
-            with F.builder_lock():
-                pass
-        with mock.patch.object(F, "LOCK_WAIT_S", 0.3), mock.patch.object(F.os.path, "getmtime", getmtime):
-            code, out = self.call(grab, [])
-        self.assertEqual(code, 2, out)
-        self.assertIn("holds", out)
-        self.assertTrue(os.path.exists(self.lock))
-        self.assertFalse(os.path.exists(self.lock + ".break"))
-        os.remove(self.lock)
-
-    def test_lock_is_released_when_the_holder_refuses(self):
-        def refuse(_):
-            with F.builder_lock():
-                F.die("inside the lock")
-        code, out = self.call(refuse, [])
-        self.assertEqual(code, 2, out)
-        self.assertFalse(os.path.exists(self.lock))
-
-    def fix(self, chunk):
-        p = os.path.join(F.WT, REPO, "7-" + chunk)
-        real_run = F.run
-
-        def fake_run(cmd, *a, **k):
-            if cmd[0] != F.GH:
-                return real_run(cmd, *a, **k)
-            return subprocess.CompletedProcess(cmd, 0, '[{"number": 9, "url": "https://github.com/%s/pull/9"}]' % FULL, "")
-
-        ctx = (p, FULL, "chunk/7-" + chunk, "dev", "7", chunk)
-        with mock.patch.object(F, "wt_context", lambda: ctx), mock.patch.object(F, "run", fake_run):
-            return self.call(F.cmd_pr_open, ["--fix"])
-
-    def test_fix_on_a_green_worktree_at_the_cap_refuses_before_the_push(self):
-        sha = self.commit(self.wt(chunk="1"))
-        open(F.marker(REPO, "chunk/7-1"), "w").close()
-        self.wt(chunk="2")
-        self.wt(chunk="3")
-        code, out = self.fix("1")
-        self.assertEqual(code, 2, out)
-        self.assertIn("builders are already active", out)
-        self.assertTrue(os.path.exists(F.marker(REPO, "chunk/7-1")))
-        self.assertNotEqual(self.remote_sha("refs/heads/chunk/7-1"), sha)
-        self.assertFalse(os.path.exists(self.lock))
-
-    def test_fix_on_a_green_worktree_below_the_cap_turns_it_active(self):
-        sha = self.commit(self.wt(chunk="1"))
-        open(F.marker(REPO, "chunk/7-1"), "w").close()
-        self.wt(chunk="2")
-        code, out = self.fix("1")
-        self.assertEqual(code, 0, out)
-        self.assertIn("PUSHED fix to", out)
-        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), sha)
-        self.assertFalse(os.path.exists(F.marker(REPO, "chunk/7-1")))
-
-    def test_fix_on_an_active_worktree_needs_no_free_slot(self):
-        sha = self.commit(self.wt(chunk="1"))
-        self.wt(chunk="2")
-        self.wt(chunk="3")
-        code, out = self.fix("1")
-        self.assertEqual(code, 0, out)
-        self.assertEqual(self.remote_sha("refs/heads/chunk/7-1"), sha)
-
-    def meminfo(self, kb):
-        F.MEMINFO = os.path.join(self.tmp, "meminfo")
-        write(self.tmp, "meminfo", "MemTotal:       16384000 kB\nMemFree:          100000 kB\nMemAvailable:   %8d kB\n" % kb)
+        p = mock.patch.object(F, "MEMINFO", os.path.join(self.tmp, "no-meminfo"))
+        p.start()
+        self.addCleanup(p.stop)
 
     def test_meminfo_reader(self):
         self.assertIsNone(F.avail_mem_gb())
-        self.meminfo(2 * 1048576)
+        write(self.tmp, "meminfo", "MemTotal:       16384000 kB\nMemFree:          100000 kB\nMemAvailable:   %8d kB\n" % (2 * 1048576))
+        F.MEMINFO = os.path.join(self.tmp, "meminfo")
         self.assertEqual(F.avail_mem_gb(), 2.0)
+
 
 @contextlib.contextmanager
 def clone_fakes(case, gate=True):
@@ -413,7 +316,7 @@ class WtRegister(FactoryCase):
         rows = dict(l.split("  ", 1) for l in out.splitlines() if l.startswith(REPO + "/"))
         self.assertRegex(rows[REPO + "/7-3"], r"owner alice  age 0h  ACTIVE builder$")
         self.assertRegex(rows[REPO + "/7-1"], r"owner unknown  age \?  CI green, waits for merge$")
-        self.assertIn("active builders: 1 of %d | 2 job folders" % F.max_builders(), out)
+        self.assertIn("active builders: 1 | 2 job folders", out)
 
 
 class WtSweep(FactoryCase):
