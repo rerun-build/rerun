@@ -61,7 +61,7 @@
         "commands": "Befehle",
         "modeLabel": "Freigabemodus",
         "unattended": "Ohne jemanden im Chat",
-        "unattendedHint": "Zeitpläne, Trigger und andere Coworker können ihn nutzen",
+        "unattendedHint": "Zeitpläne, Trigger, andere Coworker und das Ende eines Jobs können ihn nutzen",
         "alwaysAllowed": "Immer erlaubt",
         "nothingAllowed": "Noch nichts. Wähle „Immer erlauben“ bei einer Freigabe im Chat.",
         "interpreterWarning": "Einen Interpreter zu erlauben erlaubt jeden Code, den er ausführt",

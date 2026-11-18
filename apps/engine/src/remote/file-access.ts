@@ -11,7 +11,10 @@ export function fileDecision(view: Pick<RemoteComputerView, 'settings' | 'facts'
     const inside = (root: string) => isInsideRemote(path, resolveRemotePath(root, facts.workDir, facts.os, facts.homeDir), facts.os, facts.homeDir)
     const approved = granted.some(inside)
     const sensitive = isSensitiveRemotePath(path, facts.os, facts.homeDir)
-    if (sensitive && !approved) return { kind: 'ask', path, sensitive: true }
+    // A yes to the home folder is not a yes to the keys in it: only a yes to a path where secrets
+    // live opens one.
+    const secretsApproved = granted.some(root => inside(root) && isSensitiveRemotePath(resolveRemotePath(root, facts.workDir, facts.os, facts.homeDir), facts.os, facts.homeDir))
+    if (sensitive && !secretsApproved) return { kind: 'ask', path, sensitive: true }
     if (view.settings.mode === 'full') return { kind: 'allowed', path, roots: null, sensitiveOk: sensitive }
     const roots = [facts.workDir, ...view.settings.allowedFolders, ...granted]
     if (!approved && !roots.some(inside)) return { kind: 'ask', path, sensitive: false }

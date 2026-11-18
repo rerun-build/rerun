@@ -52,6 +52,11 @@ export function ComputerWidget({ pending, onAnswer }: HitlWidgetProps) {
     return (
         <HitlCard symbol="shield-check" beam="orange" label={request.commands.length > 0 ? t('computer.runOn', { computer: request.computer }) : t('computer.filesOn', { computer: request.computer })}>
             {request.reason ? <AppText variant="footnote">{request.reason}</AppText> : null}
+            {request.cwd && request.commands.length > 0 ? (
+                <AppText variant="footnote" tone="muted" style={{ fontFamily: fonts.mono }}>
+                    {t('computer.inFolder', { folder: request.cwd })}
+                </AppText>
+            ) : null}
             <ScrollView style={{ maxHeight: 160, borderRadius: radius.md, backgroundColor: theme.muted }} contentContainerStyle={{ padding: spacing.md, gap: spacing.sm }}>
                 {lines.map((line, index) => (
                     <AppText key={index} variant="footnote" style={{ fontFamily: fonts.mono }} selectable>
@@ -62,6 +67,11 @@ export function ComputerWidget({ pending, onAnswer }: HitlWidgetProps) {
             {always?.interpreter && (
                 <AppText variant="footnote" tone="muted">
                     {t('computer.interpreterWarning', { program: always.value })}
+                </AppText>
+            )}
+            {always?.rule === 'folder' && computerId && (
+                <AppText variant="footnote" tone="muted">
+                    {t('computer.folderNote', { folder: always.value })}
                 </AppText>
             )}
             {failed && (

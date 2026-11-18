@@ -164,6 +164,8 @@
         "alwaysProgram": "Always allow {program}",
         "alwaysFolder": "Always allow this folder",
         "interpreterWarning": "Always allowing {program} allows any code it runs",
-        "alwaysFailed": "Could not keep the rule on the computer: allowed this once."
+        "alwaysFailed": "Could not keep the rule on the computer: allowed this once.",
+        "inFolder": "In {folder}",
+        "folderNote": "“Always” allows every file in {folder}"
     }
 }

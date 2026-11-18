@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { serializeAnswers, serializeComputerAccessDecision, serializeSpendDecision } from '@rerun/contracts'
-import { findComputerGrants, normalizeCommand } from './access.js'
+import { findComputerGrants, folderKey, normalizeCommand } from './access.js'
 
 const call = (id: string, input: Record<string, unknown>, toolName = 'request_computer_access') => ({ role: 'assistant', contentJson: JSON.stringify([{ type: 'tool-call', toolCallId: id, toolName, input }]) })
 const user = (text: string) => ({ role: 'user', contentJson: JSON.stringify([{ type: 'text', text }]) })
@@ -19,6 +19,18 @@ describe('findComputerGrants', () => {
     it('reads the commands of a model that sent them as a JSON string, through the bridge prefix', () => {
         const [grant] = findComputerGrants([call('t1', { computer: 'studio-pc', reason: 'x', commands: JSON.stringify(['ls -la']) }, 'mcp__rerun__request_computer_access'), approve('studio-pc')])
         expect([...grant.commands]).toEqual(['ls -la'])
+    })
+
+    it('keeps the folder the card showed, and reads a folder one way however it is written', () => {
+        const [grant] = findComputerGrants([call('t1', { computer: 'studio-pc', commands: ['rm -rf build'], cwd: ' ~/Projects/site ' }), approve('studio-pc')])
+        expect(grant.cwd).toBe('~/Projects/site')
+        const [plain] = findComputerGrants([call('t1', { computer: 'studio-pc', commands: ['ls'] }), approve('studio-pc')])
+        expect(plain.cwd).toBeNull()
+        const facts = { os: 'mac', workDir: '/Users/claire/Rerun', homeDir: '/Users/claire' } as never
+        expect(folderKey(null, facts)).toBe(folderKey('.', facts))
+        expect(folderKey(undefined, facts)).toBe(folderKey('/Users/Claire/Rerun/', facts))
+        expect(folderKey('~/Projects/site', facts)).toBe(folderKey('../Projects/site', facts))
+        expect(folderKey('~/Documents', facts)).not.toBe(folderKey(null, facts))
     })
 
     it('grants nothing on a no, an unanswered card, or a yes for another computer', () => {
@@ -44,7 +56,7 @@ describe('findComputerGrants', () => {
 
     it('keeps a yes to the screen for the whole conversation', () => {
         const grants = findComputerGrants([call('t1', { computer: 'studio-pc', screen: true }), approve('studio-pc'), user('another task'), call('t2', { computer: 'studio-pc', commands: ['ls'] })])
-        expect(grants).toEqual([{ computer: 'studio-pc', commands: new Set(), paths: [], screen: true }])
+        expect(grants).toEqual([{ computer: 'studio-pc', commands: new Set(), cwd: null, paths: [], screen: true }])
     })
 
     it('skips what it cannot read', () => {

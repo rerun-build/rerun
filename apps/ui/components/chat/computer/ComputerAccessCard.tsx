@@ -49,6 +49,7 @@ export function ComputerAccessCard({ request, always, warning, onSubmit }: Compu
                 </span>
             </div>
             {request.reason && <p className="text-sm text-foreground">{request.reason}</p>}
+            {request.cwd && request.commands.length > 0 && <p className="font-mono text-xs break-all text-muted-foreground">{t('inFolder', { folder: request.cwd })}</p>}
             {lines.length > 0 && (
                 <ScrollFade className="max-h-[22vh] rounded bg-background">
                     <div className="divide-y divide-border/60">

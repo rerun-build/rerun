@@ -545,7 +545,8 @@
         "alwaysFailed": "Não foi possível salvar a regra no computador: permitido só desta vez.",
         "titleFiles": "{count, plural, one {Usar um arquivo em <computer></computer>} other {Usar # arquivos em <computer></computer>}}",
         "alwaysAllowFolder": "Sempre permitir esta pasta",
-        "folderNote": "\"Sempre\" permite todos os arquivos de {folder}"
+        "folderNote": "\"Sempre\" permite todos os arquivos de {folder}",
+        "inFolder": "Em {folder}"
     },
     "computerJob": {
         "state": {

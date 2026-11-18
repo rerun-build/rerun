@@ -545,7 +545,8 @@
         "alwaysFailed": "Die Regel konnte nicht auf dem Computer gespeichert werden: nur dieses Mal erlaubt.",
         "titleFiles": "{count, plural, one {Eine Datei auf <computer></computer> nutzen} other {# Dateien auf <computer></computer> nutzen}}",
         "alwaysAllowFolder": "Diesen Ordner immer erlauben",
-        "folderNote": "„Immer“ erlaubt alle Dateien in {folder}"
+        "folderNote": "„Immer“ erlaubt alle Dateien in {folder}",
+        "inFolder": "In {folder}"
     },
     "computerJob": {
         "state": {

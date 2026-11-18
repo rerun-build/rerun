@@ -87,4 +87,11 @@ describe('fileDecision', () => {
         expect(fileDecision(view('full'), '~/.ssh/config', ['~/.ssh/config'])).toMatchObject({ kind: 'allowed', sensitiveOk: true })
         expect(fileDecision(view('remember', ['/Users/claire']), '/Users/claire/.aws/credentials', [])).toMatchObject({ kind: 'ask', sensitive: true })
     })
+
+    it('does not take a yes to a wide folder as a yes to the secrets under it', () => {
+        expect(fileDecision(view('remember'), '~/.ssh/id_ed25519', ['~'])).toEqual({ kind: 'ask', path: '/Users/claire/.ssh/id_ed25519', sensitive: true })
+        expect(fileDecision(view('full'), '/Users/claire/.aws/credentials', ['/'])).toMatchObject({ kind: 'ask', sensitive: true })
+        expect(fileDecision(view('remember'), '~/Documents/a.txt', ['~'])).toMatchObject({ kind: 'allowed', sensitiveOk: false })
+        expect(fileDecision(view('remember'), '~/.ssh/id_ed25519', ['~', '~/.ssh'])).toMatchObject({ kind: 'allowed', sensitiveOk: true })
+    })
 })

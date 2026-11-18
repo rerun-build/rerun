@@ -61,7 +61,7 @@
         "commands": "Commandes",
         "modeLabel": "Mode d'autorisation",
         "unattended": "Sans personne dans le chat",
-        "unattendedHint": "Les planifications, les déclencheurs et les autres coworkers peuvent l'utiliser",
+        "unattendedHint": "Les planifications, les déclencheurs, les autres coworkers et la fin d'une tâche peuvent l'utiliser",
         "alwaysAllowed": "Toujours autorisés",
         "nothingAllowed": "Rien pour l’instant. Choisissez « Toujours autoriser » sur une demande dans le chat.",
         "interpreterWarning": "Autoriser un interpréteur, c'est autoriser tout code qu'il exécute",

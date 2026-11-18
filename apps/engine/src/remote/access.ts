@@ -1,4 +1,4 @@
-import { computerHandleOf, parseComputerAccessDecision, parseHitlReply, pendingComputerAccess } from '@rerun/contracts'
+import { computerHandleOf, normalizeRemotePath, parseComputerAccessDecision, parseHitlReply, pendingComputerAccess, resolveRemotePath, type RemoteFacts } from '@rerun/contracts'
 import { extractText, listMessages } from '../db/repos/messages.js'
 import { canonicalHitlName } from '../tools/builtin/hitl.js'
 import type { RunContext } from '../runtime/context.js'
@@ -6,13 +6,20 @@ import type { RunContext } from '../runtime/context.js'
 // What the person said yes to on a computer's card, read back from the conversation. Messages only
 // reach the database when a run settles, so the history cannot change while this run uses its yes.
 
-export type ComputerGrant = { computer: string; commands: Set<string>; paths: string[]; screen: boolean }
+export type ComputerGrant = { computer: string; commands: Set<string>; cwd: string | null; paths: string[]; screen: boolean }
 
 type StoredMessage = { role: string; contentJson: string }
 type ContentPart = { type?: string; toolCallId?: string; toolName?: string; input?: unknown }
 
 // The same command, whatever the spaces around and between its words.
 export const normalizeCommand = (command: string): string => command.trim().replace(/\s+/g, ' ')
+
+// The folder a command runs in, written one way: the working folder when none is named.
+export function folderKey(cwd: string | null | undefined, facts: RemoteFacts | null): string {
+    const folder = cwd?.trim() || '.'
+    if (!facts) return folder
+    return normalizeRemotePath(resolveRemotePath(folder, facts.workDir, facts.os, facts.homeDir), facts.os, facts.homeDir)
+}
 
 function parseContent(json: string): unknown {
     try {
@@ -46,8 +53,8 @@ export function findComputerGrants(messages: StoredMessage[]): ComputerGrant[] {
         latestSeen = true
         if (decision?.decision !== 'approved' || decision.computer !== computerHandleOf(request.computer)) continue
         const current = isLatest && !afterReply.some(message => !isHitlReply(message))
-        if (current) grants.push({ computer: request.computer, commands: new Set(request.commands.map(normalizeCommand)), paths: request.paths, screen: request.screen })
-        else if (request.screen) grants.push({ computer: request.computer, commands: new Set(), paths: [], screen: true })
+        if (current) grants.push({ computer: request.computer, commands: new Set(request.commands.map(normalizeCommand)), cwd: request.cwd, paths: request.paths, screen: request.screen })
+        else if (request.screen) grants.push({ computer: request.computer, commands: new Set(), cwd: null, paths: [], screen: true })
     }
     return grants
 }
@@ -67,9 +74,12 @@ export function runGrants(ctx: RunContext): Promise<ComputerGrant[]> {
     return grants
 }
 
-export async function commandGranted(ctx: RunContext, computer: string, command: string): Promise<boolean> {
+// The yes is for the command in the folder the card showed: `rm -rf build` approved in one folder
+// does not run in another.
+export async function commandGranted(ctx: RunContext, computer: string, command: string, cwd: string | undefined, facts: RemoteFacts | null): Promise<boolean> {
     const normalized = normalizeCommand(command)
-    return (await runGrants(ctx)).some(grant => grant.computer === computer && grant.commands.has(normalized))
+    const folder = folderKey(cwd, facts)
+    return (await runGrants(ctx)).some(grant => grant.computer === computer && grant.commands.has(normalized) && folderKey(grant.cwd, facts) === folder)
 }
 
 // The paths the person said yes to on this computer, for the run in progress.

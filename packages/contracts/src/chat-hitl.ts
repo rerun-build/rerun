@@ -39,8 +39,9 @@ export type SpendRequest = { purpose: string; soFar?: string }
 export type SpendDecision = { purpose: string; decision: 'approved' | 'declined'; always?: boolean }
 
 // The coworker asking to do something on a computer linked to the workspace (`#studio-pc`): run
-// commands, reach paths outside the working folder, or use the screen.
-export type ComputerAccessRequest = { computer: string; reason: string; commands: string[]; paths: string[]; screen: boolean }
+// commands, reach paths outside the working folder, or use the screen. `cwd` is the folder the
+// commands run in, null for the computer's working folder: the yes is for the commands there.
+export type ComputerAccessRequest = { computer: string; reason: string; commands: string[]; cwd: string | null; paths: string[]; screen: boolean }
 
 // `always` is the rule the person kept with their yes, already written to the computer's settings.
 export type ComputerAccessDecision = { computer: string; decision: 'approved' | 'declined'; always?: string }
@@ -455,6 +456,7 @@ export function pendingComputerAccess(input: Record<string, unknown>): ComputerA
         computer: computerHandleOf(input.computer) || 'computer',
         reason: typeof input.reason === 'string' ? input.reason : '',
         commands: stringList(input.commands),
+        cwd: typeof input.cwd === 'string' && input.cwd.trim() ? input.cwd.trim() : null,
         paths: stringList(input.paths),
         screen: input.screen === true,
     }

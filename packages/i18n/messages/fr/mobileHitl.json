@@ -147,6 +147,8 @@
         "alwaysProgram": "Toujours autoriser {program}",
         "alwaysFolder": "Toujours autoriser ce dossier",
         "interpreterWarning": "Toujours autoriser {program}, c'est autoriser tout code qu'il exécute",
-        "alwaysFailed": "La règle n'a pas pu être enregistrée sur l'ordinateur : autorisé cette fois seulement."
+        "alwaysFailed": "La règle n'a pas pu être enregistrée sur l'ordinateur : autorisé cette fois seulement.",
+        "inFolder": "Dans {folder}",
+        "folderNote": "« Toujours » autorise tous les fichiers de {folder}"
     }
 }

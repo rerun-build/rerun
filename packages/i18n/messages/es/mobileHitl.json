@@ -147,6 +147,8 @@
         "alwaysProgram": "Permitir siempre {program}",
         "alwaysFolder": "Permitir siempre esta carpeta",
         "interpreterWarning": "Permitir siempre {program} permite cualquier código que ejecute",
-        "alwaysFailed": "No se pudo guardar la regla en la computadora: permitido solo esta vez."
+        "alwaysFailed": "No se pudo guardar la regla en la computadora: permitido solo esta vez.",
+        "inFolder": "En {folder}",
+        "folderNote": "«Siempre» permite todos los archivos de {folder}"
     }
 }

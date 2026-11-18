@@ -4,10 +4,15 @@
 
 const ELEVATION: RegExp[] = [/(?:^|[\s;&|(`$])sudo\b/i, /(?:^|[\s;&|(`$])doas\b/i, /(?:^|[\s;&|(`$])pkexec\b/i, /(?:^|[\s;&|(`$])su(?:\s+-|\s+root\b|\s*$)/i, /\brunas(?:\.exe)?\s/i, /-verb\s+["']?runas\b/i, /\bgsudo\b/i]
 
+// Where a command starts: the beginning, after a separator, or behind a program that only passes it
+// on. `grep -r shutdown src` names the word, it does not run it.
+const AT_COMMAND = String.raw`(?:^|[;&|(\n\`]|\$\()\s*(?:(?:nohup|exec|command|time|nice|env)\s+)*`
+
 const DESTRUCTIVE: RegExp[] = [
     /\brm\s+(?:-[a-z]*r[a-z]*f[a-z]*|-[a-z]*f[a-z]*r[a-z]*)\s+(?:\/|~\/?|\$HOME\/?)(?:\s|$|\*)/i,
     /\bmkfs(?:\.\w+)?\b/i,
-    /\b(?:shutdown|halt|poweroff|reboot|kexec)\b/i,
+    new RegExp(`${AT_COMMAND}(?:shutdown|halt|poweroff|reboot|kexec)\\b`, 'i'),
+    /\bsystemctl\s+(?:poweroff|reboot|halt|kexec)\b/i,
     /\b(?:tel)?init\s+[06]\b/,
     /sysrq-trigger/,
     /\bdd\s+[^|;&]*of=\/dev\//i,

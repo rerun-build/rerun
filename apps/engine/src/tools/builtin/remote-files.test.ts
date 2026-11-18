@@ -161,6 +161,25 @@ describe('remote_transfer', () => {
         ])
     })
 
+    it('ends a file that stops right on a piece with an empty final piece', async () => {
+        const exact = Buffer.alloc(2 * 1024 * 1024, 7)
+        await writeFile(resolve(workspaceDir(AGENT), 'exact.bin'), exact)
+        const computer = await connect({ 'fs.push': ({ path, offset, data, final }) => ({ path, size: (offset as number) + Buffer.from(String(data), 'base64').length, done: final }) })
+        expect(await run('remote_transfer', { computer: '#studio-pc', direction: 'to_computer', from: 'exact.bin' })).toBe('Copied exact.bin to /Users/claire/Rerun/exact.bin on #studio-pc (2.0 MB).')
+        expect(computer.requests.map(request => [request.params.offset, request.params.final])).toEqual([
+            [0, false],
+            [1024 * 1024, false],
+            [2 * 1024 * 1024, true],
+        ])
+        expect(computer.requests.at(-1)?.params.sha256).toBe(sha(exact))
+    })
+
+    it('does not call a copy done that the computer never confirmed', async () => {
+        await writeFile(resolve(workspaceDir(AGENT), 'small.txt'), 'abc')
+        await connect({ 'fs.push': ({ path }) => ({ path, size: 3, done: false }) })
+        expect(await run('remote_transfer', { computer: '#studio-pc', direction: 'to_computer', from: 'small.txt' })).toMatch(/^Not copied/)
+    })
+
     it('sends an empty file as one final piece, and says when the workspace has no such file', async () => {
         await writeFile(resolve(workspaceDir(AGENT), 'empty.txt'), '')
         const computer = await connect({ 'fs.push': ({ path, final }) => ({ path, size: 0, done: final }) })

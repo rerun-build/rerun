@@ -68,7 +68,7 @@
         "commands": "Commands",
         "modeLabel": "Approval mode",
         "unattended": "Without anyone in the chat",
-        "unattendedHint": "Schedules, triggers and other coworkers can use it",
+        "unattendedHint": "Schedules, triggers, other coworkers and the end of a job can use it",
         "alwaysAllowed": "Always allowed",
         "nothingAllowed": "Nothing yet. Choose “Always allow” on an approval in the chat.",
         "interpreterWarning": "Allowing an interpreter allows any code it runs",

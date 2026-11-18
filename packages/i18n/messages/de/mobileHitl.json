@@ -147,6 +147,8 @@
         "alwaysProgram": "{program} immer erlauben",
         "alwaysFolder": "Diesen Ordner immer erlauben",
         "interpreterWarning": "{program} immer zu erlauben erlaubt jeden Code, den es ausführt",
-        "alwaysFailed": "Die Regel konnte nicht auf dem Computer gespeichert werden: nur dieses Mal erlaubt."
+        "alwaysFailed": "Die Regel konnte nicht auf dem Computer gespeichert werden: nur dieses Mal erlaubt.",
+        "inFolder": "In {folder}",
+        "folderNote": "„Immer“ erlaubt alle Dateien in {folder}"
     }
 }

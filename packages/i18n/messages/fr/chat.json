@@ -545,7 +545,8 @@
         "alwaysFailed": "La règle n'a pas pu être enregistrée sur l'ordinateur : autorisé cette fois seulement.",
         "titleFiles": "{count, plural, one {Utiliser un fichier sur <computer></computer>} other {Utiliser # fichiers sur <computer></computer>}}",
         "alwaysAllowFolder": "Toujours autoriser ce dossier",
-        "folderNote": "« Toujours » autorise tous les fichiers de {folder}"
+        "folderNote": "« Toujours » autorise tous les fichiers de {folder}",
+        "inFolder": "Dans {folder}"
     },
     "computerJob": {
         "state": {

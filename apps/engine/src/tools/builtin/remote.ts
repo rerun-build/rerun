@@ -138,11 +138,11 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
                 if (busy) return busy
                 if (ctx.unattended && !view.settings.unattended) return `Not run: #${view.handle} only takes work while someone is in the chat (its owner switched off work without anyone there). Tell the user in your report.`
                 const verdict = commandVerdict(view, command)
-                if (!verdict.allowed && !(await commandGranted(ctx, view.handle, command))) {
-                    const why = verdict.analysis.opaque ? ' It runs other commands the approval cannot see (a substitution, a shell or a program that starts others), so it asks every time: prefer a plain command when you can.' : ''
+                if (!verdict.allowed && !(await commandGranted(ctx, view.handle, command, cwd, view.facts))) {
+                    const why = verdict.analysis.opaque ? ' It hides what it runs from the approval (a substitution, a shell or a program that starts others, a variable assigned before the program, a program named by its path), so it asks every time: prefer a plain command, the program by its name, when you can.' : ''
                     return {
                         status: 'needs_approval',
-                        instruction: `Not run: this command on #${view.handle} needs the user's yes first.${why} Call request_computer_access with computer "#${view.handle}", commands [this exact command] and a short reason, then end your turn. Once approved, run the same command again.`,
+                        instruction: `Not run: this command on #${view.handle} needs the user's yes first.${why} Call request_computer_access with computer "#${view.handle}", commands [this exact command]${cwd ? `, cwd "${cwd}"` : ''} and a short reason, then end your turn. Once approved, run the same command again${cwd ? ' in the same cwd' : ''}.`,
                     }
                 }
                 const connection = liveConnection(view.id)
@@ -167,12 +167,13 @@ export function remoteComputerTools(ctx: RunContext): ToolSet {
         }),
 
         request_computer_access: tool({
-            description: `Ask the user's yes before you run commands, or reach files outside the allowed folders, on a linked computer. Name the computer by its #handle, list the exact commands you will run (each one is approved as written) or the paths you will read or write, and say in a short reason what for. The user sees a card; a yes covers those for this task. ${cardCallTiming(ctx.turnOrder)}`,
+            description: `Ask the user's yes before you run commands, or reach files outside the allowed folders, on a linked computer. Name the computer by its #handle, list the exact commands you will run (each one is approved as written, in the cwd you give) or the paths you will read or write, and say in a short reason what for. The user sees a card; a yes covers those for this task. ${cardCallTiming(ctx.turnOrder)}`,
             inputSchema: z
                 .object({
                     computer: z.string().min(1).max(100).describe('The #handle of the computer'),
                     reason: z.string().min(1).max(500).describe('What it is for, in a sentence'),
                     commands: jsonTolerantArray(z.array(z.string().min(1).max(20_000)).max(10)).optional().describe('The exact commands you will run'),
+                    cwd: z.string().max(4096).optional().describe('The folder the commands will run in, when it is not the working folder. The yes is for the commands in that folder: pass the same cwd to remote_exec'),
                     paths: jsonTolerantArray(z.array(z.string().min(1).max(4096)).max(20)).optional().describe('The files or folders you will read or write'),
                 })
                 .refine(input => (input.commands?.length ?? 0) + (input.paths?.length ?? 0) > 0, 'Name the commands or the paths you ask for'),

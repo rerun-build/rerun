@@ -61,7 +61,7 @@
         "commands": "Comandos",
         "modeLabel": "Modo de aprobación",
         "unattended": "Sin nadie en el chat",
-        "unattendedHint": "Las programaciones, los disparadores y otros coworkers pueden usarla",
+        "unattendedHint": "Las programaciones, los disparadores, otros coworkers y el final de un trabajo pueden usarla",
         "alwaysAllowed": "Siempre permitidos",
         "nothingAllowed": "Nada por ahora. Elige «Permitir siempre» en una aprobación del chat.",
         "interpreterWarning": "Permitir un intérprete permite cualquier código que ejecute",

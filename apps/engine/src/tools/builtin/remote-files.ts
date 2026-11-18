@@ -181,7 +181,9 @@ export function remoteFileTools(ctx: RunContext): ToolSet {
                     hash.update(value)
                     pending = Buffer.concat([pending, Buffer.from(value)])
                 }
-                while (pending.length >= REMOTE_TRANSFER_CHUNK_BYTES || (done && (pending.length > 0 || offset === 0))) {
+                // The last piece says so, empty when the file ends right on a piece: the computer
+                // only puts the file in place once it hears it.
+                while (pending.length >= REMOTE_TRANSFER_CHUNK_BYTES || done) {
                     const piece = pending.subarray(0, REMOTE_TRANSFER_CHUNK_BYTES)
                     pending = pending.subarray(piece.length)
                     const final = done && pending.length === 0
@@ -191,6 +193,7 @@ export function remoteFileTools(ctx: RunContext): ToolSet {
                 }
                 if (done) break
             }
+            if (!last.done) return `Not copied: #${view.handle} did not confirm ${last.path}. Try again.`
             return `Copied ${from} to ${last.path} on #${view.handle} (${humanSize(last.size)}).`
         } catch (err) {
             if (ctx.abortSignal?.aborted) throw err

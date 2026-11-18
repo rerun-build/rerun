@@ -26,7 +26,7 @@ describe('toolCatalog', () => {
         state.remote = false
         expect(toolCatalog().map(f => f.family)).not.toContain('remoteComputers')
         state.remote = true
-        expect(toolCatalog().find(f => f.family === 'remoteComputers')?.tools.map(t => t.name).sort()).toEqual(['remote_computers', 'remote_exec', 'request_computer_access'])
+        expect(toolCatalog().find(f => f.family === 'remoteComputers')?.tools.map(t => t.name).sort()).toEqual(['remote_computers', 'remote_exec', 'remote_file_list', 'remote_file_read', 'remote_file_write', 'remote_job', 'remote_transfer', 'request_computer_access'])
     })
 
     it('leaves paid data out of the settings when the hub sells none', () => {
