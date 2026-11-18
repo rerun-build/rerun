@@ -1,6 +1,6 @@
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { resolve } from 'node:path'
+import { dirname, resolve } from 'node:path'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-handoff-'))
 process.env.RERUN_API_KEY = ''
@@ -8,6 +8,13 @@ process.env.RERUN_API_KEY = ''
 const { describe, expect, it } = await import('vitest')
 const { appendMessage } = await import('../db/repos/messages.js')
 const { buildHandoff, saveHandoff } = await import('./handoff.js')
+const { workspaceDir } = await import('../config/paths.js')
+
+function writeWorkspaceFile(agent: string, relative: string, content: string): void {
+    const file = resolve(workspaceDir(agent), relative)
+    mkdirSync(dirname(file), { recursive: true })
+    writeFileSync(file, content, 'utf8')
+}
 
 const call = (toolCallId: string, toolName: string, input: unknown) => ({ type: 'tool-call' as const, toolCallId, toolName, input })
 const result = (toolCallId: string, toolName: string, value: string) => ({ role: 'tool' as const, content: [{ type: 'tool-result' as const, toolCallId, toolName, output: { type: 'text' as const, value } }] })
@@ -29,6 +36,7 @@ async function seed(agent: string, session: string, finalText: string): Promise<
 
 describe('buildHandoff', () => {
     it('names the job, every file touched, the last results and the next step', async () => {
+        writeWorkspaceFile('ho', 'lib/lexer.ts', 'export const token = 1\n')
         await seed('ho', 's1', 'Next: run the importer tests.')
         const md = await buildHandoff('ho', 's1')
         expect(md).toContain('Fix the parser bug in the importer')
@@ -45,7 +53,21 @@ describe('buildHandoff', () => {
         const text = '  Line one\n\n**bold** `code`\n- item  '
         await seed('ho', 's2', text)
         const md = await buildHandoff('ho', 's2')
-        expect(md.endsWith(text) || md.includes(text)).toBe(true)
+        expect(md.endsWith(`## Next step\n\n${text}`)).toBe(true)
+    })
+})
+
+describe('shell paths', () => {
+    it('lists only shell tokens that exist in the workspace', async () => {
+        writeWorkspaceFile('ho2', 'Makefile', 'all:\n')
+        await appendMessage('ho2', 's4', { role: 'user', content: 'job' })
+        await appendMessage('ho2', 's4', { role: 'assistant', content: [call('d1', 'shell_exec', { command: 'cat Makefile; echo done/ok v1.2' })] })
+        await appendMessage('ho2', 's4', result('d1', 'shell_exec', 'out'))
+        await appendMessage('ho2', 's4', { role: 'assistant', content: [{ type: 'text', text: 'next' }] })
+        const md = await buildHandoff('ho2', 's4')
+        expect(md).toContain('- Makefile')
+        expect(md).not.toContain('done/ok')
+        expect(md).not.toContain('v1.2')
     })
 })
 
