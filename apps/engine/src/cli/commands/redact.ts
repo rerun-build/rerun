@@ -7,7 +7,7 @@ import { redactValue } from '../../db/repos/redact.js'
 import { dataDir } from '../../config/paths.js'
 import { nowIso } from '../../lib/ids.js'
 
-async function readStdinLine(): Promise<string> {
+export async function readStdinLine(): Promise<string> {
     const chunks: Buffer[] = []
     for await (const chunk of process.stdin) chunks.push(Buffer.from(chunk))
     return Buffer.concat(chunks).toString('utf8').split('\n')[0].replace(/\r$/, '')

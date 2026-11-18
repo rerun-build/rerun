@@ -21,6 +21,8 @@ export const agentsDir = () => resolve(dataDir(), 'agents')
 
 export const sharedDir = () => resolve(dataDir(), 'shared')
 
+export const sharedEnvPath = () => resolve(dataDir(), 'shared.env')
+
 export const sharedDbDir = () => resolve(dataDir(), 'shared-db')
 
 export const sharedDbPath = () => resolve(sharedDbDir(), 'shared.db')
