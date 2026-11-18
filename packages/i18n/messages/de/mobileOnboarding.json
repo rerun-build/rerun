@@ -51,46 +51,9 @@
         "saveFailed": "Speichern fehlgeschlagen. Versuch es noch mal."
     },
     "setup": {
-        "loadFailed": "Laden der Einrichtung fehlgeschlagen.",
-        "retry": "Erneut versuchen"
-    },
-    "conversation": {
-        "foremanRole": "Dein Chief of Staff",
-        "failed": "Das hat nicht geklappt.",
-        "tryAgain": "Erneut versuchen",
-        "composerPlaceholder": "Deinem Chief of Staff antworten"
-    },
-    "starter": {
-        "title": "Dein Starter-Team",
-        "full": "Bis zu {max} zum Start. Entferne einen, um diesen zu nehmen.",
-        "pickUpTo": "Wähle bis zu {max}. Jeder richtet sich mit dir ein.",
-        "hire": "{count, plural, =0 {Wähle mindestens einen} one {Diesen einstellen} other {Diese # einstellen}}",
-        "custom": "Keiner davon, ich sage dir, was ich brauche",
-        "customPlaceholder": "Was soll dein Coworker tun?",
-        "back": "Zurück",
-        "send": "Senden"
-    },
-    "plan": {
-        "defaultTitle": "Dein erster Coworker",
-        "confirmed": "Bestätigt",
-        "changesAsked": "Änderungen angefragt",
-        "skipped": "Übersprungen",
-        "build": "Meinen Coworker bauen",
-        "change": "Etwas ändern"
-    },
-    "question": {
-        "skip": "Frage überspringen",
-        "selectAll": "Alles Zutreffende auswählen",
-        "typeAnswer": "Deine Antwort…",
-        "somethingElse": "Etwas anderes",
-        "send": "Senden",
-        "neither": "Keins von beiden"
-    },
-    "team": {
-        "ready": "Workspace bereit",
         "starting": {
-            "title": "Dein Workspace wird vorbereitet",
-            "body": "Dein Coworker wird direkt danach gebaut."
+            "title": "Dein Workspace wird eingerichtet",
+            "body": "Dein Chief of Staff wird geweckt…"
         },
         "failed": {
             "title": "Das hat nicht geklappt",
@@ -101,16 +64,6 @@
             "body": "Schließe die Einrichtung auf {host} ab."
         },
         "tryAgain": "Erneut versuchen"
-    },
-    "build": {
-        "building": "Dein Team wird gebaut",
-        "empty": "Dein Team konnte nicht gebaut werden",
-        "ready": "Dein Team ist bereit",
-        "nothingLost": "Nichts ist verloren. Versuch es gleich noch mal.",
-        "oneFailed": "{name} konnte noch nicht gebaut werden.",
-        "someFailed": "{count, plural, one {# Coworker konnte noch nicht gebaut werden.} other {# Coworker konnten noch nicht gebaut werden.}}",
-        "tryAgain": "Erneut versuchen",
-        "startLead": "{name} installieren"
     },
     "waitlist": {
         "title": "Wir sind gerade voll ausgelastet",

@@ -1,4 +1,4 @@
-import { conversationSchema, foremanEngineConversationSchema, foremanEngineFilesSchema, foremanEngineMessagesSchema, foremanStateSchema, type Conversation, type ConversationMessage, type ForemanStateResponse, type ForemanSurface } from '@rerun/contracts'
+import { conversationSchema, foremanEngineConversationSchema, foremanEngineFilesSchema, foremanEngineMessagesSchema, foremanStateSchema, type Conversation, type ConversationMessage, type ForemanStateResponse } from '@rerun/contracts'
 
 import { api } from '@/api/client'
 
@@ -10,10 +10,6 @@ export type ForemanConversation = NonNullable<ReturnType<typeof foremanEngineCon
 
 export async function fetchForemanState(caller: Caller): Promise<ForemanStateResponse> {
     return foremanStateSchema.parse(await api('/api/chat/foreman/state', caller))
-}
-
-export async function fetchForemanSurface(caller: Caller): Promise<ForemanSurface> {
-    return (await fetchForemanState(caller)).surface
 }
 
 export async function fetchForemanEngineFiles(caller: Caller): Promise<boolean> {

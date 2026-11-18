@@ -7,14 +7,15 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { AuthProvider, useAuth } from '@/auth/AuthProvider'
 import { BuddyClock } from '@/components/buddy/motion'
+import { LAST_CONVERSATION } from '@/components/chat/ForemanChat'
 import { AiConsent } from '@/components/consent/AiConsent'
 import { NoPlan } from '@/components/home/NoPlan'
 import { sheetOptions } from '@/components/layout/sheet-options'
 import { SplitShell } from '@/components/layout/SplitShell'
-import { Onboarding, type LeadStarted } from '@/components/onboarding/Onboarding'
+import { WaitlistNotice } from '@/components/onboarding/notices'
+import { Onboarding } from '@/components/onboarding/Onboarding'
 import { OnboardingShell } from '@/components/onboarding/OnboardingShell'
 import { useOnboardingRoute } from '@/components/onboarding/useOnboardingRoute'
-import { WaitlistNotice } from '@/components/onboarding/widgets/TeamCards'
 import { SystemDialogHost } from '@/components/ui/system-dialogs'
 import { UpdateRequired } from '@/components/update/UpdateRequired'
 import { useUpdateRequired } from '@/components/update/useUpdateRequired'
@@ -51,23 +52,24 @@ function App() {
     const settled = signedIn && me !== null
     const aiConsent = useAiConsent(session?.user.id ?? null)
     const consentKnown = !signedIn || aiConsent.state !== 'loading'
-    // The first coworker the onboarding started, opened once the app has taken over from it.
-    const [lead, setLead] = useState<LeadStarted | null>(null)
+    // The onboarding just ended: the Chief of Staff's page opens once the app has taken over, and it
+    // speaks first there.
+    const [handedOver, setHandedOver] = useState(false)
     const pushTarget = usePushTarget()
 
     useEffect(() => {
-        if (!lead || route.kind !== 'app') return
+        if (!handedOver || route.kind !== 'app') return
         const timer = setTimeout(() => {
-            router.push({ pathname: '/chat/[id]', params: { id: lead.conversationId, to: lead.agentId } })
-            setLead(null)
+            router.push({ pathname: '/chat/[id]', params: { id: LAST_CONVERSATION } })
+            setHandedOver(false)
         }, 0)
         return () => clearTimeout(timer)
-    }, [lead, route.kind])
+    }, [handedOver, route.kind])
 
-    const onLeadStarted = async (started: LeadStarted) => {
-        setLead(started)
+    const onOnboarded = async () => {
+        setHandedOver(true)
         await refreshMe().catch(() => {})
-        await reload()
+        reload()
     }
 
     useEffect(() => {
@@ -97,7 +99,7 @@ function App() {
                     </OnboardingShell>
                 ) : settled && route.kind === 'onboarding' ? (
                     <OnboardingShell>
-                        <Onboarding key={me.workspace.id} state={route.state} onLeadStarted={started => void onLeadStarted(started)} />
+                        <Onboarding key={me.workspace.id} state={route.state} onDone={() => void onOnboarded()} onRefused={reload} />
                     </OnboardingShell>
                 ) : settled && route.kind === 'waitlist' ? (
                     <OnboardingShell>

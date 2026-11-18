@@ -51,46 +51,9 @@
         "saveFailed": "We could not save that. Try again."
     },
     "setup": {
-        "loadFailed": "We could not load your setup.",
-        "retry": "Retry"
-    },
-    "conversation": {
-        "foremanRole": "Your Chief of Staff",
-        "failed": "That did not go through.",
-        "tryAgain": "Try again",
-        "composerPlaceholder": "Answer your Chief of Staff"
-    },
-    "starter": {
-        "title": "Your starter team",
-        "full": "Up to {max} to start. Drop one to take this one.",
-        "pickUpTo": "Pick up to {max}. Each one sets itself up with you.",
-        "hire": "{count, plural, =0 {Pick at least one} one {Hire this one} other {Hire these #}}",
-        "custom": "None of these, tell me what you need",
-        "customPlaceholder": "What should your coworker do?",
-        "back": "Back",
-        "send": "Send"
-    },
-    "plan": {
-        "defaultTitle": "Your first coworker",
-        "confirmed": "Confirmed",
-        "changesAsked": "Asked for changes",
-        "skipped": "Skipped",
-        "build": "Build my coworker",
-        "change": "Change something"
-    },
-    "question": {
-        "skip": "Skip this question",
-        "selectAll": "Select all that apply",
-        "typeAnswer": "Type your answer…",
-        "somethingElse": "Something else",
-        "send": "Send",
-        "neither": "Neither"
-    },
-    "team": {
-        "ready": "Workspace ready",
         "starting": {
-            "title": "Getting your workspace ready",
-            "body": "Your coworker is built right after."
+            "title": "Setting up your workspace",
+            "body": "Waking up your Chief of Staff…"
         },
         "failed": {
             "title": "That did not go through",
@@ -101,16 +64,6 @@
             "body": "Finish setting it up at {host}."
         },
         "tryAgain": "Try again"
-    },
-    "build": {
-        "building": "Building your team",
-        "empty": "Your team could not be built",
-        "ready": "Your team is ready",
-        "nothingLost": "Nothing was lost. Try again in a moment.",
-        "oneFailed": "{name} could not be built yet.",
-        "someFailed": "{count, plural, one {# coworker could not be built yet.} other {# coworkers could not be built yet.}}",
-        "tryAgain": "Try again",
-        "startLead": "Start installing {name}"
     },
     "waitlist": {
         "title": "We're at full capacity right now",
@@ -125,12 +78,11 @@
         "body": "This version is no longer supported."
     },
     "_context": {
-        "team.blocked.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "setup.blocked.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
         "intake.progress": "VoiceOver label of the step dots of the welcome questions.",
-        "starter.hire": "Button under a rail of coworker cards: how many are picked.",
-        "build.oneFailed": "{name} is the name of a coworker the build could not create.",
-        "build.startLead": "{name} is the name of the first coworker, installed when the button is tapped.",
         "intake.role.placeholder": "Example job title in an empty field.",
-        "intake.name.placeholder": "Example first name in an empty field."
+        "intake.name.placeholder": "Example first name in an empty field.",
+        "setup.starting.title": "Title of the screen shown while the workspace is being prepared, right after the welcome questions.",
+        "setup.starting.body": "Line under that title. Never mentions a price, a card or a trial: the mobile app sells nothing."
     }
 }

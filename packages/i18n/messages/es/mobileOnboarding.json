@@ -51,46 +51,9 @@
         "saveFailed": "No pudimos guardarlo. Inténtalo de nuevo."
     },
     "setup": {
-        "loadFailed": "No pudimos cargar tu configuración.",
-        "retry": "Reintentar"
-    },
-    "conversation": {
-        "foremanRole": "Tu Chief of Staff",
-        "failed": "No se pudo enviar.",
-        "tryAgain": "Intentar de nuevo",
-        "composerPlaceholder": "Responde a tu Chief of Staff"
-    },
-    "starter": {
-        "title": "Tu equipo inicial",
-        "full": "Hasta {max} para empezar. Quita uno para elegir este.",
-        "pickUpTo": "Elige hasta {max}. Cada uno se configura contigo.",
-        "hire": "{count, plural, =0 {Elige al menos uno} one {Contratar este} other {Contratar estos #}}",
-        "custom": "Ninguno de estos, cuéntame qué necesitas",
-        "customPlaceholder": "¿Qué debería hacer tu coworker?",
-        "back": "Atrás",
-        "send": "Enviar"
-    },
-    "plan": {
-        "defaultTitle": "Tu primer coworker",
-        "confirmed": "Confirmado",
-        "changesAsked": "Cambios pedidos",
-        "skipped": "Omitido",
-        "build": "Crear mi coworker",
-        "change": "Cambiar algo"
-    },
-    "question": {
-        "skip": "Saltar esta pregunta",
-        "selectAll": "Selecciona todas las que correspondan",
-        "typeAnswer": "Escribe tu respuesta…",
-        "somethingElse": "Otra cosa",
-        "send": "Enviar",
-        "neither": "Ninguno"
-    },
-    "team": {
-        "ready": "Workspace listo",
         "starting": {
             "title": "Preparando tu workspace",
-            "body": "Tu coworker se crea justo después."
+            "body": "Despertando a tu Chief of Staff…"
         },
         "failed": {
             "title": "No se pudo completar",
@@ -101,16 +64,6 @@
             "body": "Termina de configurarlo en {host}."
         },
         "tryAgain": "Intentar de nuevo"
-    },
-    "build": {
-        "building": "Creando tu equipo",
-        "empty": "No se pudo crear tu equipo",
-        "ready": "Tu equipo está listo",
-        "nothingLost": "No se perdió nada. Inténtalo de nuevo en un momento.",
-        "oneFailed": "{name} aún no se pudo crear.",
-        "someFailed": "{count, plural, one {# coworker aún no se pudo crear.} other {# coworkers aún no se pudieron crear.}}",
-        "tryAgain": "Intentar de nuevo",
-        "startLead": "Empezar a instalar a {name}"
     },
     "waitlist": {
         "title": "Ahora mismo estamos al máximo de capacidad",

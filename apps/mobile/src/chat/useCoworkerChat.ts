@@ -1,6 +1,7 @@
 import { useChat } from '@ai-sdk/react'
+import { FOREMAN_KICKOFF_MARKER, messageText } from '@rerun/contracts'
 import type { FileUIPart } from 'ai'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppState } from 'react-native'
 
 import { useAuth } from '@/auth/AuthProvider'
@@ -281,5 +282,8 @@ export function useCoworkerChat({ endpoints, initialSessionId, onSessionCreated,
     // The run holding the conversation, as last named by the hub: what a queued message waits behind.
     const activeRunId = useCallback(() => runRef.current, [])
 
-    return { messages: chat.messages, status, runStartedAt, activeRunId, regenerate, error: error && !error.message.includes('run_in_flight') ? error : undefined, busy, sessionId, history, fresh, send, stop, retry: () => refresh({ resume: true }).catch(() => setHistory('error')) }
+    // What the app sent for the Chief of Staff to speak first is not theirs to read.
+    const messages = useMemo(() => chat.messages.filter(message => message.role !== 'user' || messageText(message).trim() !== FOREMAN_KICKOFF_MARKER), [chat.messages])
+
+    return { messages, status, runStartedAt, activeRunId, regenerate, error: error && !error.message.includes('run_in_flight') ? error : undefined, busy, sessionId, history, fresh, send, stop, retry: () => refresh({ resume: true }).catch(() => setHistory('error')) }
 }

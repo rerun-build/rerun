@@ -1,4 +1,4 @@
-import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type AgentModels, type Conversation, type ForemanSurface } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, FOREMAN_KICKOFF_MARKER, type AgentModels, type Conversation, type ForemanSurface } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
@@ -6,7 +6,7 @@ import { useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
-import { fetchForemanEngineFiles, fetchForemanSurface } from '@/api/foreman'
+import { fetchForemanEngineFiles, fetchForemanState } from '@/api/foreman'
 import { fetchAgentModels } from '@/api/models'
 import { useAuth } from '@/auth/AuthProvider'
 import { takePendingAsk } from '@/chat/pending-ask'
@@ -88,6 +88,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     // Where the last visit found the Foreman: the page opens on it.
     const [kept] = useState(() => (me ? cachedForeman(me.workspace.id).read() : null))
     const [surface, setSurface] = useState<SurfaceState>(kept?.surface ?? 'loading')
+    const [greetOwed, setGreetOwed] = useState(false)
     const [attempt, setAttempt] = useState(0)
     const { conversations, loaded: conversationsLoaded, reload: loadConversations } = useForemanConversations()
     const [draftKey, setDraftKey] = useState(() => `new-${Date.now()}`)
@@ -126,11 +127,12 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         const token = latestToken.current
         if (!signedIn || !token || !workspaceId) return
         let cancelled = false
-        fetchForemanSurface({ accessToken: token, workspaceId })
-            .then(next => {
+        fetchForemanState({ accessToken: token, workspaceId })
+            .then(state => {
                 if (cancelled) return
-                cachedForeman(workspaceId).save({ surface: next, last: kept?.last ?? null })
-                setSurface(next)
+                cachedForeman(workspaceId).save({ surface: state.surface, last: kept?.last ?? null })
+                setSurface(state.surface)
+                setGreetOwed(state.greet === true)
             })
             // Offline, the page stays on what the phone knew.
             .catch(() => {
@@ -205,6 +207,9 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         [loadConversations]
     )
 
+    // The first words the onboarding left owed, asked for once General is known to be empty.
+    const greeting = greetOwed && conversationsLoaded && !generalId ? FOREMAN_KICKOFF_MARKER : undefined
+
     const pages = conversationPages(openIds, bornKeys, draftKey, { sessionId: generalId })
     const activeIndex = activePageIndex(pages, activeId)
     const shownId = activeId === GENERAL_PAGE_ID && generalId ? generalId : activeId
@@ -248,7 +253,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
                             onStatusChange={loadConversations}
                             webUrl={`${environment.apiUrl}/`}
                             onScreen={onScreen}
-                            initialMessage={page.general ? ask : undefined}
+                            initialMessage={page.general ? (ask ?? greeting) : undefined}
                             canAttach={filesOnEngine}
                             threads={page.general ? generalThreads : undefined}
                             onOpenThread={select}
