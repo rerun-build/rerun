@@ -13,6 +13,19 @@ Content-Type: application/json
 
 Only `POST` is handled. A client that opens an SSE stream first will fail, and that is expected.
 
+```mermaid
+sequenceDiagram
+  participant C as MCP client
+  participant R as /api/mcp/account
+  C->>R: POST initialize
+  R-->>C: protocolVersion, capabilities: tools
+  C->>R: POST tools/list
+  R-->>C: every tool, in one page
+  C->>R: POST tools/call
+  R-->>C: the tool result
+  Note over C,R: each POST carries its own key, no session in between
+```
+
 ## initialize
 
 Optional in practice, since the server keeps no state, but every MCP client sends it.

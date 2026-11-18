@@ -16,6 +16,14 @@ Rerun exposes two programmatic surfaces, and only two.
   </Card>
 </CardGroup>
 
+```mermaid
+flowchart TB
+  client["Claude Code, Codex, Cursor<br/>or any MCP client"] -->|"POST /api/mcp/account<br/>Bearer rk_..."| mcp["MCP server"]
+  service["Stripe, a form, a cron,<br/>your own script"] -->|"POST /api/t/..."| trigger["Webhook trigger"]
+  mcp -->|build and drive| workspace["Your workspace<br/>coworkers, skills, schedules, data"]
+  trigger -->|start| run["A coworker run"]
+```
+
 <PaidPlanNote />
 
 ## There is no REST API

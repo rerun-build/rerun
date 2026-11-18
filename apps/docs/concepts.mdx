@@ -9,6 +9,30 @@ Your account. It holds your plan, your members, your Boxes and your coworkers, a
 
 An [API key](/api/authentication) is scoped to exactly one workspace.
 
+```mermaid
+flowchart TB
+  you([You and your team]) --> cos
+  subgraph workspace["Workspace"]
+    cos["Chief of Staff"]
+    subgraph machine["Machine: your private computer in the cloud"]
+      subgraph sales["Box: Sales"]
+        a1["Coworker"]
+        a2["Coworker"]
+      end
+      subgraph support["Box: Support"]
+        b1["Coworker"]
+      end
+      shared[("Shared folder<br/>and shared database")]
+      vault["Vault<br/>apps, MCP servers, secrets"]
+    end
+  end
+  cos -.->|creates and briefs| a1
+  a1 & a2 & b1 --- shared
+  b1 ~~~ vault
+```
+
+Boxes arrange coworkers, the machine runs them all: the shared folder and the shared database are common to every coworker, whichever Box it sits in, and each app of the Vault reaches the coworkers you switch it on for.
+
 ## Chief of Staff
 
 The assistant every workspace comes with. It works like a coworker, with skills, knowledge, routines and apps of its own, and it reaches further than one: it works on the whole workspace. It builds your first team with you, creates and briefs coworkers, follows their runs, keeps the Brain with you and answers your questions about Rerun. See [Chief of Staff](/chief-of-staff).

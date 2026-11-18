@@ -5,6 +5,17 @@ description: "Make a coworker run on a schedule, or on an event from another ser
 
 A coworker that only answers when you write to it is a chatbot. Two things make it a worker: scheduled tasks and webhook triggers. Both live on the coworker's **Routines** screen: open the coworker card, then **Routines**, and pick the **Scheduled** or the **Triggers** tab.
 
+```mermaid
+flowchart LR
+  you([Your message]) --> run
+  schedule["Scheduled task<br/>a schedule or one date"] --> run
+  trigger["Webhook trigger<br/>a call to its URL"] --> run
+  wake["Wake event<br/>LinkedIn Pro, WhatsApp Pro"] --> run
+  run["Run"] --> done(["Done"])
+  run -.->|question or approval| needs["Needs you"]
+  needs -.->|your answer| run
+```
+
 Every automated run opens a thread of its own, so it never lands in the middle of your conversation. Open **Threads** from the pill at the top left of the coworker panel and filter on **Automations** to see them: a scheduled run opens with **Scheduled run** and the task's name (**Scheduled run · Daily digest**), a webhook run with **Webhook** and the trigger's name. Every run is also recorded on the **Activity** screen, in **Monitoring** and **Logs**.
 
 ## Scheduled tasks

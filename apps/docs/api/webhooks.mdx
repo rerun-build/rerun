@@ -56,6 +56,24 @@ Each call opens a new session named `trigger: <slug>`. Two calls are always two 
 
 The call returns as soon as the run has started. It does not wait for the coworker to finish.
 
+```mermaid
+sequenceDiagram
+  participant S as Your service
+  participant R as Rerun
+  participant M as Your machine
+  S->>R: POST /api/t/{agentId}/{slug}/{token}
+  alt passive visit
+    R-->>S: 204, no run
+  else wrong URL, trigger off, no answer from the machine
+    R-->>S: 404
+  else accepted
+    R->>M: your prompt and the payload
+    M-->>R: run started, within 15 seconds
+    R-->>S: 202 { runId, sessionId, trigger }
+    Note over M: the coworker works on, in a new thread
+  end
+```
+
 | Code | Body | When |
 | --- | --- | --- |
 | `202` | `{ "runId": "…", "sessionId": "…", "trigger": "…" }` | The run started |

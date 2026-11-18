@@ -71,6 +71,79 @@
   opacity: 0.7;
 }
 
+/* Mermaid diagrams on the Rerun palette. Mermaid scopes its own theme under an id,
+   so only !important gets past it. */
+[data-component-name='mermaid-container'] {
+  --rr-diagram-node: #f3f1ff;
+  --rr-diagram-node-stroke: #8f7dff;
+  --rr-diagram-group: #fafafa;
+  --rr-diagram-group-stroke: #e4e4e7;
+  --rr-diagram-line: #a1a1aa;
+  --rr-diagram-label: #ffffff;
+  --rr-diagram-text: #18181b;
+  --rr-diagram-note: #fffbeb;
+  --rr-diagram-note-stroke: #fcd34d;
+}
+
+.dark [data-component-name='mermaid-container'] {
+  --rr-diagram-node: #1d1838;
+  --rr-diagram-node-stroke: #6650ff;
+  --rr-diagram-group: #121212;
+  --rr-diagram-group-stroke: #2a2a2e;
+  --rr-diagram-line: #71717a;
+  --rr-diagram-label: #171717;
+  --rr-diagram-text: #e4e4e7;
+  --rr-diagram-note: #2a2410;
+  --rr-diagram-note-stroke: #8a6d1a;
+}
+
+[data-component-name='mermaid-container'] :is(.node rect, .node polygon, .node circle, .node path, rect.actor) {
+  fill: var(--rr-diagram-node) !important;
+  stroke: var(--rr-diagram-node-stroke) !important;
+}
+
+[data-component-name='mermaid-container'] :is(.node rect, rect.actor) {
+  rx: 10px;
+  ry: 10px;
+}
+
+[data-component-name='mermaid-container'] .cluster rect {
+  fill: var(--rr-diagram-group) !important;
+  stroke: var(--rr-diagram-group-stroke) !important;
+  rx: 14px;
+  ry: 14px;
+}
+
+[data-component-name='mermaid-container'] :is(.flowchart-link, .actor-line, .messageLine0, .messageLine1) {
+  stroke: var(--rr-diagram-line) !important;
+}
+
+[data-component-name='mermaid-container'] :is(.marker, marker path) {
+  fill: var(--rr-diagram-line) !important;
+  stroke: var(--rr-diagram-line) !important;
+}
+
+[data-component-name='mermaid-container'] :is(.edgeLabel, .edgeLabel p, .labelBkg) {
+  background-color: var(--rr-diagram-label) !important;
+}
+
+[data-component-name='mermaid-container'] :is(.edgeLabel rect) {
+  fill: var(--rr-diagram-label) !important;
+}
+
+[data-component-name='mermaid-container'] :is(.nodeLabel, .cluster-label span, .edgeLabel, .label) {
+  color: var(--rr-diagram-text) !important;
+}
+
+[data-component-name='mermaid-container'] :is(.messageText, .noteText, text.actor, text.actor tspan, .cluster-label text) {
+  fill: var(--rr-diagram-text) !important;
+}
+
+[data-component-name='mermaid-container'] .note {
+  fill: var(--rr-diagram-note) !important;
+  stroke: var(--rr-diagram-note-stroke) !important;
+}
+
 code,
 pre,
 kbd,

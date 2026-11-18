@@ -36,6 +36,22 @@ You need a machine with Docker. It can be the same machine as the app, another c
 
 ### What happens behind the command
 
+```mermaid
+sequenceDiagram
+  participant Y as You
+  participant A as Rerun app
+  participant E as Engine, on your server
+  Y->>A: Add server, Copy the command
+  A-->>Y: docker run with a pairing token
+  Y->>E: run the command
+  E->>E: make its key, keep it in /data/engine.key
+  E->>A: POST /api/engines/pair with the key and the token
+  A->>E: GET /health
+  A->>E: a call that needs the key
+  A->>A: attach the server, spend the token
+  A-->>Y: Connected
+```
+
 1. The engine starts and makes up its own key. It keeps it in its data-dir, at `/data/engine.key`. The key never appears in the command nor in a URL.
 2. It sends the key and the token to your app, at `RERUN_HUB_URL/api/engines/pair`.
 3. The app checks it can reach the server: first `GET /health`, then a call that needs the key.
