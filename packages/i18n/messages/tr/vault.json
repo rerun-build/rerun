@@ -31,7 +31,10 @@
         "noCoworkers": "Bu çalışma alanında henüz coworker yok.",
         "hiddenCoworkers": "Göremediğiniz Boxes içinde {count, plural, one {# coworker} other {# coworker}}",
         "variables": "Değişkenler",
-        "reconnectFromCoworker": "Onu kullanan bir coworker'ın Uygulamalar sekmesinden yeniden bağlayın."
+        "reconnectFromCoworker": "Onu kullanan bir coworker'ın Uygulamalar sekmesinden yeniden bağlayın.",
+        "rename": "Hesabı yeniden adlandır",
+        "accountName": "Hesap adı",
+        "namePlaceholder": "Bu hesaba bir ad verin"
     },
     "delete": {
         "button": "Sil",
@@ -45,7 +48,8 @@
         "adminOnly": "Bunu yalnızca bir yönetici yapabilir",
         "manageBox": "Bu coworker'ın Box'ını yönetmiyorsunuz",
         "manageAny": "Vault'a eklemek için bir Box yönetin",
-        "paidAppEveryone": "Ücretli bir uygulama her coworker'a ayrı ayrı eklenir"
+        "paidAppEveryone": "Ücretli bir uygulama her coworker'a ayrı ayrı eklenir",
+        "updateBox": "Çalışma alanınızın makinesi bir sonraki güncellemeden sonra hesapları yeniden adlandırabilecek"
     },
     "addPage": {
         "title": "Vault'a ekle",

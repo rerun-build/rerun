@@ -5,7 +5,7 @@ import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type VaultConflict, type VaultI
 import { AccessDeniedError, assertAgentAccess, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { vaultFlag } from '@/flags'
-import { EngineRequestError, supportsForemanCoworker, supportsVault } from '@/lib/engine/client'
+import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultRename } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { VAULT_RELEASED } from '@/lib/features'
@@ -26,6 +26,7 @@ import { findWorkspaceEngine, NoEngineError } from './workspace-engine.service'
 // | Attach or detach a coworker               | `manage` on that coworker's Box       |
 // | Share with everyone, change, delete       | an admin, or whoever manages every    |
 // |                                           | coworker it reaches (change only)     |
+// | Rename an account                         | as change                             |
 
 export class VaultUnavailableError extends AppError {
     constructor() {
@@ -169,6 +170,8 @@ export type VaultListing = {
     coworkers: Array<VaultCoworker & { canManage: boolean }>
     canAdd: boolean
     isAdmin: boolean
+    // The box keeps the name given to an account; an older one would drop it.
+    canRename: boolean
 }
 
 // The box names an app it moved into the Vault on its own by its slug: it has no catalog to read.
@@ -183,7 +186,7 @@ async function withCatalogNames(items: VaultItemSummary[]): Promise<VaultItemSum
 
 export async function listVault(actor?: Actor): Promise<VaultListing> {
     const ctx = await vaultContext(actor)
-    const [items, visible, manageable] = await Promise.all([listVaultItems(ctx.conn).then(withCatalogNames), visibleSpaceIds(ctx.actor), manageableSpaceIds(ctx.actor)])
+    const [items, visible, manageable, canRename] = await Promise.all([listVaultItems(ctx.conn).then(withCatalogNames), visibleSpaceIds(ctx.actor), manageableSpaceIds(ctx.actor), supportsVaultRename(ctx.conn)])
     const sees = (c: VaultCoworker) => visible === 'all' || visible.has(c.spaceId)
     const manages = (c: VaultCoworker) => manageable === 'all' || manageable.has(c.spaceId)
     const entries = await Promise.all(
@@ -198,6 +201,7 @@ export async function listVault(actor?: Actor): Promise<VaultListing> {
         coworkers: ctx.coworkers.filter(sees).map(c => ({ ...c, canManage: manages(c) })),
         canAdd: manageable === 'all' || manageable.size > 0,
         isAdmin: isAdminActor(ctx.actor),
+        canRename,
     }
 }
 
@@ -223,6 +227,17 @@ export async function shareVaultEntry(itemId: string, sharedWithAll: boolean, ac
     const item = await readItem(ctx, itemId)
     if (sharedWithAll && item.app) throw new AccessDeniedError('vaultPaidAppEveryone')
     return rethrowConflict(ctx, () => patchVaultItem(ctx.conn, itemId, { sharedWithAll }))
+}
+
+// The name a person gives an account, kept apart from the label its sign-ins write. An empty name
+// gives the account back the one its connection reported.
+export async function renameVaultEntry(itemId: string, name: string | null, actor?: Actor): Promise<VaultItemSummary> {
+    const ctx = await vaultContext(actor)
+    const item = await readItem(ctx, itemId)
+    await assertCanChangeItem(ctx.actor, item, ctx)
+    if (item.kind !== 'service') throw new Error('Only the account of an app is renamed')
+    if (!(await supportsVaultRename(ctx.conn))) throw new AppError('vaultRenameUnsupported')
+    return patchVaultItem(ctx.conn, itemId, { customLabel: name?.trim() || null })
 }
 
 // The coworkers that lose the entry if it goes, those the caller sees by name and the others counted.

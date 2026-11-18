@@ -30,7 +30,7 @@ Each entry carries:
 | `name` | The app, server or secret name |
 | `kind` | `service` for an app of the library, `mcp` for an MCP server, `secret` for a secret |
 | `slug` | The library slug, for an app |
-| `account` | Which account it is: an email, a workspace name |
+| `account` | Which account it is: the name a member gave it in the Vault, else what its sign-in reported (an email, a workspace name) or `Gmail 2` for a second account |
 | `status` | `active`, `needs_auth` (waiting for a sign-in) or `needs_config` (waiting for a credential) |
 | `sharedWithAll` | `true` when every coworker gets it, including the ones added later |
 | `coworkers` | The coworkers that get it, `id` and `name` |

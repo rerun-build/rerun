@@ -63,7 +63,7 @@ version the folder is at against the one this build takes it to.
   "activeRuns": 1,
   "claimedSessions": 1,
   "desktopViewers": 0,
-  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "desktop"],
+  "capabilities": ["files.stream", "foreman.files", "foreman.coworker", "schedules.rename", "update.artifact", "connections.opencode", "connections.custom", "vault", "vault.rename", "desktop"],
   "commit": "e70322d",
   "startedAt": "2026-11-16T09:12:03.512Z",
   "layout": "release",
@@ -78,7 +78,8 @@ version the folder is at against the one this build takes it to.
   connections.
 - `capabilities`: `files.stream` (`PUT .../files/raw`), `foreman.files` (the Chief of Staff's file
   routes), `foreman.coworker` (its memories, skills, routines and connectors, and the routes for them), `schedules.rename` (a schedule `PATCH` takes `name`), `update.artifact` (`POST /update`
-  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, and `desktop`
+  takes a prebuilt artifact), `connections.opencode`, `connections.custom`, `vault`, `vault.rename` (a
+  Vault item takes `customLabel`), and `desktop`
   only when the desktop packages are installed.
 - `commit` is the short commit of the build, `null` when unknown. `layout` is `release`,
   `monorepo` or `image`. `lastUpdate` is what the last `rerun update` did (`status` `running`,
@@ -1513,6 +1514,12 @@ are the variables an item holds, `tokens` the servers holding an OAuth token.
 Kinds: `service` (a catalog app, `slug` set), `mcp` (a custom MCP server), `secret` (variables only).
 Statuses: `active`, `needs_auth`, `needs_config`.
 
+`label` tells an account from the other ones of its app: the ordinal given to an extra account
+(`Gmail 2`), or what its sign-in reported (an email, a workspace name), which every sign-in writes
+again. `customLabel` (1 to 60 characters) is the name a person gave the account: only a `PATCH`
+writes it, no sign-in touches it, and where both are set it is the one shown and the one the model
+reads (`account Acme org`).
+
 ### `GET /vault`
 
 `?agent=<id>` narrows the list to the items that coworker draws on, its own and the shared ones.
@@ -1560,7 +1567,8 @@ One item, as in the list. `404` when it does not exist.
 
 ### `PATCH /vault/:id`
 
-Change anything but the kind, the attachments and the secrets: `slug`, `name`, `label`, `status`,
+Change anything but the kind, the attachments and the secrets: `slug`, `name`, `label`,
+`customLabel`, `status`,
 `authMethodId`, `config`, `mcpServers`, `skills`, `oauth`, `managed`, `composio`, `app`,
 `sharedWithAll`. `null` removes an optional field. Answers the item.
 

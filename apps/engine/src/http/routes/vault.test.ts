@@ -20,6 +20,7 @@ type Summary = {
     kind: string
     name: string
     label?: string
+    customLabel?: string
     status: string
     agentIds: string[]
     sharedWithAll: boolean
@@ -149,6 +150,29 @@ describe('vault items', () => {
         expect(updated).toMatchObject({ status: 'active', name: 'Gmail support', slug: 'gmail', kind: 'service' })
         expect(updated.label).toBeUndefined()
         expect(updated.authMethodId).toBeUndefined()
+    })
+
+    it('keeps the name given to an account through the sign-ins that write its label', async () => {
+        const item = await createItem({ kind: 'service', slug: 'github', name: 'GitHub', label: 'GitHub 2', instanceId: 'k2a9xq' })
+        const renamed = await json<Summary>(await send('PATCH', `/vault/${item.id}`, { customLabel: '  Personal  ' }))
+        expect(renamed).toMatchObject({ label: 'GitHub 2', customLabel: 'Personal' })
+
+        const signedIn = await json<Summary>(await send('PATCH', `/vault/${item.id}`, { status: 'active', label: 'me@acme.test' }))
+        expect(signedIn).toMatchObject({ label: 'me@acme.test', customLabel: 'Personal' })
+
+        const reset = await json<Summary>(await send('PATCH', `/vault/${item.id}`, { customLabel: null }))
+        expect(reset.label).toBe('me@acme.test')
+        expect(reset.customLabel).toBeUndefined()
+    })
+
+    it.each([
+        ['an empty name', ''],
+        ['a name over 60 characters', 'x'.repeat(61)],
+    ])('refuses %s for an account', async (_, customLabel) => {
+        const item = await createItem({ kind: 'service', slug: 'github', name: 'GitHub', label: 'GitHub 2' })
+        const res = await send('PATCH', `/vault/${item.id}`, { customLabel })
+        expect(res.status).toBe(400)
+        expect((await json<Summary>(await send('GET', `/vault/${item.id}`))).customLabel).toBeUndefined()
     })
 
     it('never lets a patch change the kind, the attachments or the author', async () => {

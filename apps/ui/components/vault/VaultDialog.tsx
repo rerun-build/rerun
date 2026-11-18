@@ -12,7 +12,9 @@ export function VaultDialog({ open, onOpenChange }: { open: boolean; onOpenChang
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <PanelDialogContent className="sm:h-[min(48rem,90dvh)] sm:max-w-2xl">
+            {/* The dialog hears Escape on the document before the field renaming an account does: there,
+                it cancels the rename and leaves the Vault open. */}
+            <PanelDialogContent className="sm:h-[min(48rem,90dvh)] sm:max-w-2xl" onEscapeKeyDown={event => event.target instanceof HTMLElement && event.target.closest('[data-vault-account-name]') && event.preventDefault()}>
                 <VaultPanel listing={listing} paid={paid} error={error} onChanged={reload} />
             </PanelDialogContent>
         </Dialog>

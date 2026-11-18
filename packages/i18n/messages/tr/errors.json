@@ -453,6 +453,7 @@
     "vaultSharedItem": "Bu uygulama Vault'tan geliyor ve başka coworker'lar da kullanıyor. Vault'tan değiştirin.",
     "vaultPaidAppEveryone": "Ücretli bir uygulama her coworker'a ayrı ayrı eklenir",
     "vaultMethodUnsupported": "Bu uygulama henüz Vault'a eklenemiyor. Bir coworker'ın Uygulamalar sekmesinden bağlayın.",
+    "vaultRenameUnsupported": "Çalışma alanınızın makinesi henüz bir hesabı yeniden adlandıramıyor. Bir sonraki güncellemeyle yapabilecek.",
     "vaultConflictEveryone": "Her coworker {name} değerini zaten herkesle paylaşılan başka bir Vault kaydından alıyor",
     "vaultConflictSomeone": "Bir coworker {name} değerini zaten başka bir Vault kaydından alıyor",
     "vaultMcpTarget": "Sunucuya bir adres veya bir komut verin",

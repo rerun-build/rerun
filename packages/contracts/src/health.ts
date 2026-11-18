@@ -54,6 +54,10 @@ export const ENGINE_CAPABILITY_CUSTOM = 'connections.custom'
 // attached to the coworkers that use it. A box without it keeps every connector per coworker.
 export const ENGINE_CAPABILITY_VAULT = 'vault'
 
+// A Vault item takes a `customLabel`, the name a person gave the account, kept apart from the label
+// its sign-ins write.
+export const ENGINE_CAPABILITY_VAULT_RENAME = 'vault.rename'
+
 // The engine accepts linked computers on `/remote/ws` and answers `/remote/computers`.
 export const ENGINE_CAPABILITY_REMOTE_COMPUTERS = 'remote.computers'
 

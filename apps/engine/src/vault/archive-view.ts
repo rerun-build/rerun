@@ -16,6 +16,8 @@ export function withVaultFolded(agent: LoadedAgent): LoadedAgent {
 
 function registryEntryOf(item: LoadedVaultItem): RegistryEntry {
     const { config } = item
+    // Never the name a person gave the account: the archive's redaction only knows the labels a
+    // sign-in writes, and would let a name like "Acme org" through to the copy.
     return {
         status: config.status,
         ...(config.label ? { label: config.label } : {}),

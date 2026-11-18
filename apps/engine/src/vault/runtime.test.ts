@@ -30,6 +30,7 @@ const { agentMcpSpawn } = await import('../tools/mcp-pool.js')
 const { getAgent, unloadAgent } = await import('../agents/registry.js')
 const { saveVaultToken } = await import('./tokens.js')
 const { buildMcpIndex } = await import('../tools/mcp-index.js')
+const { registryWithVault } = await import('./archive-view.js')
 const { connectorSkillOwners } = await import('../services/registry.js')
 const { reconcileVault } = await import('./apply.js')
 const { setEnv } = await import('../config/env.js')
@@ -300,6 +301,20 @@ describe('what the model is told', () => {
         const index = await buildMcpIndex(await loaded(a))
         expect(index).toContain('- linear (http): not connected yet (app "linear", account ops@acme.test)')
         expect(index).toContain('not connected yet')
+    })
+
+    it('names a Vault account by the name it was given over the one its sign-in reported', async () => {
+        const a = await createAgent('Renamed')
+        await createItem(linearItem([a], { status: 'needs_auth', label: 'ops@acme.test', customLabel: 'Acme org' }))
+        expect(await buildMcpIndex(await loaded(a))).toContain('(app "linear", account Acme org)')
+    })
+
+    it("leaves the name given to an account out of the coworker's archive", async () => {
+        const a = await createAgent('Archived')
+        await createItem(linearItem([a], { label: 'Linear 2', customLabel: 'Acme org' }))
+        const registry = registryWithVault(await loaded(a), null)
+        expect(registry?.services.linear.label).toBe('Linear 2')
+        expect(JSON.stringify(registry)).not.toContain('Acme org')
     })
 
     it('calls an authenticated custom server of the Vault authenticated by its token', async () => {

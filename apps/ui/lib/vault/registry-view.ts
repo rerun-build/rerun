@@ -28,6 +28,7 @@ export function vaultRegistryEntry(item: VaultItemSummary): RegistryEntry {
         ...(item.app ? { app: item.app } : {}),
         ...(item.instanceId ? { instanceId: item.instanceId } : {}),
         ...(item.label ? { label: item.label } : {}),
+        ...(item.customLabel ? { customLabel: item.customLabel } : {}),
         installedAt: item.createdAt,
         vaultItemId: item.id,
         vaultSharedWithAll: item.sharedWithAll,

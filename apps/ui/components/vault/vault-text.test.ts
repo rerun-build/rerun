@@ -56,6 +56,10 @@ describe('matchesVaultQuery', () => {
         for (const query of ['gmail', 'SUPPORT@', 'gmail_token', 'alice', '  ']) expect(matchesVaultQuery(entry, query)).toBe(true)
         expect(matchesVaultQuery(entry, 'notion')).toBe(false)
     })
+
+    it('finds an account by the name it was given', () => {
+        expect(matchesVaultQuery({ ...entry, customLabel: 'Acme org' }, 'acme org')).toBe(true)
+    })
 })
 
 describe('vaultAccountsFor', () => {
@@ -68,6 +72,11 @@ describe('vaultAccountsFor', () => {
             { id: 'b', label: 'ops@acme.test' },
             { id: 'c', label: 'Gmail' },
         ])
+    })
+
+    it('offers an account by the name it was given over the one its sign-in reported', () => {
+        const available = [item({ id: 'a', label: 'Gmail 2', customLabel: 'Personal' })]
+        expect(vaultAccountsFor({ available }, 'gmail')).toEqual([{ id: 'a', label: 'Personal' }])
     })
 
     it('leaves out other apps, signed-out accounts, secrets and a missing Vault', () => {

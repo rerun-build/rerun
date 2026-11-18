@@ -16,7 +16,7 @@ import { useCatalogServices } from '@/hooks/useCatalogServices'
 import { useErrorText } from '@/hooks/useErrorText'
 import { KeyIcon, ServerIcon } from '@/lib/icons'
 import { serviceIconProps } from '@/lib/services/icons'
-import type { VaultItemSummary } from '@rerun/contracts'
+import { vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
 
 type Change = (item: VaultItemSummary, attach: boolean) => Promise<void>
@@ -58,7 +58,10 @@ function useVaultIcons(items: VaultItemSummary[]) {
     }
 }
 
-const titleOf = (item: VaultItemSummary) => (item.label ? `${item.name} · ${item.label}` : item.name)
+function titleOf(item: VaultItemSummary): string {
+    const label = vaultAccountLabel(item)
+    return label ? `${item.name} · ${label}` : item.name
+}
 
 export function VaultBadge() {
     const t = useTranslations('agent.agentPanelServices')

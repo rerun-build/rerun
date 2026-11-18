@@ -1,3 +1,5 @@
+import { vaultAccountLabel } from '@rerun/contracts'
+
 import type { LoadedAgent, McpServer } from '../agents/types.js'
 import type { ConnectorServerState } from '../services/registry.js'
 import { vaultItemsForAgent } from './store.js'
@@ -36,10 +38,11 @@ export function vaultServerStates(agent: VaultHolder): Map<string, ConnectorServ
     const states = new Map<string, ConnectorServerState>()
     for (const item of attachedVaultItems(agent)) {
         if (item.config.kind !== 'service' && item.config.status === 'active') continue
+        const label = vaultAccountLabel(item.config)
         const state: ConnectorServerState = {
             key: `vault:${item.id}`,
             slug: item.config.slug ?? item.config.name,
-            ...(item.config.label ? { label: item.config.label } : {}),
+            ...(label ? { label } : {}),
             status: item.config.status,
             isDefault: !item.config.instanceId,
         }

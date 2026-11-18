@@ -10,11 +10,13 @@ type RenameFieldOptions = {
     busy?: boolean
     // False for a field drawn already open, which must not take the focus from where it is.
     focus?: boolean
+    // A field emptied on purpose submits '': for a name that falls back to a default when it has none.
+    allowEmpty?: boolean
 }
 
-// A name edited in place: Enter or a click elsewhere saves, Escape cancels, a blank or unchanged
-// name cancels too. The field is mounted only while renaming, so the current name is its initial state.
-export function useRenameField({ name, onSubmit, onCancel, busy = false, focus = true }: RenameFieldOptions) {
+// A name edited in place: Enter or a click elsewhere saves, Escape cancels, an unchanged name
+// cancels too, and so does a blank one unless `allowEmpty`. The field is mounted only while renaming, so the current name is its initial state.
+export function useRenameField({ name, onSubmit, onCancel, busy = false, focus = true, allowEmpty = false }: RenameFieldOptions) {
     const [value, setValue] = useState(name)
     const inputRef = useRef<HTMLInputElement>(null)
 
@@ -44,7 +46,7 @@ export function useRenameField({ name, onSubmit, onCancel, busy = false, focus =
     const submit = () =>
         settle(() => {
             const next = value.trim()
-            if (next && next !== name) onSubmit(next)
+            if ((next || allowEmpty) && next !== name) onSubmit(next)
             else onCancel()
         })
 

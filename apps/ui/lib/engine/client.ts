@@ -15,6 +15,7 @@ import {
     ENGINE_CAPABILITY_FOREMAN_FILES,
     ENGINE_CAPABILITY_SCHEDULE_RENAME,
     ENGINE_CAPABILITY_VAULT,
+    ENGINE_CAPABILITY_VAULT_RENAME,
     ENGINE_CAPABILITY_REMOTE_COMPUTERS,
     engineDbGroupsSchema,
     engineRowUpdateResultSchema,
@@ -699,6 +700,11 @@ export async function supportsScheduleRename(conn: EngineConnection): Promise<bo
 // The box keeps the workspace's Vault. Without it, every connector stays in its coworker's folder.
 export async function supportsVault(conn: EngineConnection): Promise<boolean> {
     return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT)
+}
+
+// A Vault item keeps the name a person gave it apart from the label its sign-ins write.
+export async function supportsVaultRename(conn: EngineConnection): Promise<boolean> {
+    return (await engineCapabilities(conn)).has(ENGINE_CAPABILITY_VAULT_RENAME)
 }
 
 export async function supportsRemoteComputers(conn: EngineConnection): Promise<boolean> {

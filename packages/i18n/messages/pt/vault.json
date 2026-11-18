@@ -31,7 +31,10 @@
         "noCoworkers": "Ainda não há coworkers neste workspace.",
         "hiddenCoworkers": "{count, plural, one {# coworker} other {# coworkers}} em Boxes que você não vê",
         "variables": "Variáveis",
-        "reconnectFromCoworker": "Reconecte pela aba Apps de um coworker que o usa."
+        "reconnectFromCoworker": "Reconecte pela aba Apps de um coworker que o usa.",
+        "rename": "Renomear conta",
+        "accountName": "Nome da conta",
+        "namePlaceholder": "Dê um nome a esta conta"
     },
     "delete": {
         "button": "Excluir",
@@ -45,7 +48,8 @@
         "adminOnly": "Só um admin pode fazer isso",
         "manageBox": "Você não gerencia a Box deste coworker",
         "manageAny": "Gerencie uma Box para adicionar ao Vault",
-        "paidAppEveryone": "Um app pago é conectado coworker por coworker"
+        "paidAppEveryone": "Um app pago é conectado coworker por coworker",
+        "updateBox": "A máquina do seu workspace vai poder renomear contas depois da próxima atualização"
     },
     "addPage": {
         "title": "Adicionar ao Vault",

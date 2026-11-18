@@ -48,6 +48,9 @@ export type RegistryEntry = {
     instanceId?: string
     // Which account this entry is, for the user and the agent alike: the email, else "Gmail 2".
     label?: string
+    // The name a person gave a Vault account, shown over `label`. Read from the item, never written
+    // back by a write to the entry: only a rename sets it.
+    customLabel?: string
     installedAt: string
     // Set on an entry read from the workspace's Vault rather than the coworker's own registry: the
     // item behind it, which every write to the entry goes to, and whether every coworker holds it.

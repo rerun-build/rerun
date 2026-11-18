@@ -42,13 +42,18 @@ export const vaultComposioSchema = z.object({
 })
 export const vaultAppSchema = z.object({ appSlug: z.string(), serverName: z.string(), accountLabel: z.string().optional() })
 
+export const VAULT_ACCOUNT_LABEL_MAX = 60
+
 const itemFields = {
     kind: vaultItemKindSchema,
     // The catalog app an item installs; null for a custom MCP server and a free secret.
     slug: z.string().min(1).nullable().default(null),
     name: z.string().trim().min(1).max(120),
     // Which account this is, for people and coworkers alike: an email, a workspace name, "Gmail 2".
+    // A sign-in writes it again with what the connection reports.
     label: z.string().trim().max(200).optional(),
+    // The name a person gave the account. Only a rename writes it, so it outlives every sign-in.
+    customLabel: z.string().trim().min(1).max(VAULT_ACCOUNT_LABEL_MAX).optional(),
     status: vaultItemStatusSchema.default('active'),
     authMethodId: z.string().optional(),
     // The non-secret inputs of the install form, kept so a reconfigure opens filled in.
@@ -62,6 +67,12 @@ const itemFields = {
     // Set on an extra account of an app: it suffixes the item's server names and variables, so a
     // second Gmail never collides with the first one on a coworker holding both.
     instanceId: z.string().optional(),
+}
+
+// The line that tells an account from the other ones of its app: the name it was given, else the one
+// its connection reported.
+export function vaultAccountLabel(item: { label?: string; customLabel?: string }): string | undefined {
+    return item.customLabel ?? item.label
 }
 
 // `item.json`. `agentIds` are the box's own agent ids, the coworkers attached to the item. Kept as is
@@ -108,6 +119,7 @@ export const updateVaultItemSchema = z
         slug: itemFields.slug.unwrap().unwrap().nullable(),
         name: itemFields.name,
         label: z.string().trim().max(200).nullable(),
+        customLabel: z.string().trim().min(1).max(VAULT_ACCOUNT_LABEL_MAX).nullable(),
         status: vaultItemStatusSchema,
         authMethodId: z.string().nullable(),
         config: z.record(z.string(), z.string()),

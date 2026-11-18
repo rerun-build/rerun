@@ -1,4 +1,4 @@
-import { parseServiceRegistryKey, serviceRegistryKey, type VaultItemSummary } from '@rerun/contracts'
+import { parseServiceRegistryKey, serviceRegistryKey, vaultAccountLabel, type VaultItemSummary } from '@rerun/contracts'
 
 import { workspaceActor, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
@@ -383,8 +383,11 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
         const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor)
         const reg = await readRegistry(conn, engineAgentId)
         const entry = resolveRegistryEntry(reg, slugOrKey)?.entry
-        label = entry?.label
-        instances = entriesOfSlug(reg, manifest.slug).map(({ key, entry: other }) => ({ key, status: other.status, ...(other.label ? { label: other.label } : {}) }))
+        label = entry && vaultAccountLabel(entry)
+        instances = entriesOfSlug(reg, manifest.slug).map(({ key, entry: other }) => {
+            const otherLabel = vaultAccountLabel(other)
+            return { key, status: other.status, ...(otherLabel ? { label: otherLabel } : {}) }
+        })
         installStatus = entry?.status ?? null
         installedMethodId = entry?.authMethodId
         oauth = entry?.oauth
@@ -673,11 +676,12 @@ export async function installedFromRegistry(reg: ServiceRegistry): Promise<Insta
         entriesOfSlug(reg, slug).map(({ key, entry }) => {
             const cat = bySlug.get(slug)
             const { instanceId } = parseServiceRegistryKey(key)
+            const label = vaultAccountLabel(entry)
             return {
                 key,
                 slug,
                 ...(instanceId ? { instanceId } : {}),
-                ...(entry.label ? { label: entry.label } : {}),
+                ...(label ? { label } : {}),
                 name: cat?.name ?? slug,
                 icon: cat?.icon ?? null,
                 category: cat?.category ?? 'other',

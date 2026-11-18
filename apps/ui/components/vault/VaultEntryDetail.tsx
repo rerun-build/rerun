@@ -1,10 +1,12 @@
 'use client'
 
+import { VAULT_ACCOUNT_LABEL_MAX, vaultAccountLabel } from '@rerun/contracts'
+import { useRenameField } from '@rerun/ui/forms'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 
-import { attachVaultEntryAction, deleteVaultEntryAction, detachVaultEntryAction, markVaultEntryAuthorizedAction, shareVaultEntryAction, vaultCatalogAction, vaultEntryUsageAction } from '@/app/api/_actions/vault.actions'
+import { attachVaultEntryAction, deleteVaultEntryAction, detachVaultEntryAction, markVaultEntryAuthorizedAction, renameVaultEntryAction, shareVaultEntryAction, vaultCatalogAction, vaultEntryUsageAction } from '@/app/api/_actions/vault.actions'
 import type { VaultEntryView, VaultListing } from '@/app/api/_services/vault.service'
 import { McpOAuthAuthorize } from '@/components/agent/McpOAuthAuthorize'
 import { Group } from '@/components/connections/AiProvidersPanel'
@@ -15,10 +17,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { PanelScroller } from '@/components/ui/panel-list'
 import { PanelRow } from '@/components/ui/panel-row'
+import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { useErrorText } from '@/hooks/useErrorText'
-import { ChevronLeftIcon, Trash2Icon } from '@/lib/icons'
+import { ChevronLeftIcon, PencilIcon, Trash2Icon } from '@/lib/icons'
 import type { AuthMethodSummary } from '@/lib/services/types'
 import { VaultStatusBadge } from './VaultPanel'
 import { vaultSetupDriver } from './vault-setup-driver'
@@ -50,10 +53,14 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
                     <ChevronLeftIcon className="size-4" />
                 </Button>
                 {icon}
-                <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-sm font-medium">{entry.name}</span>
-                    {entry.label && <span className="truncate text-[11px] text-muted-foreground">{entry.label}</span>}
-                </div>
+                {entry.kind === 'service' ? (
+                    <AccountName entry={entry} listing={listing} onChanged={onChanged} />
+                ) : (
+                    <div className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate text-sm font-medium">{entry.name}</span>
+                        {entry.label && <span className="truncate text-[11px] text-muted-foreground">{entry.label}</span>}
+                    </div>
+                )}
                 <VaultStatusBadge entry={entry} />
             </div>
 
@@ -115,6 +122,61 @@ export function VaultEntryDetail({ entry, listing, icon, onBack, onChanged }: Pr
                     await onChanged()
                 }} />
             </PanelScroller>
+        </div>
+    )
+}
+
+// The app's name over the account's, and the pencil that renames the account in place. An emptied
+// field gives it back the name its connection reported.
+function AccountName({ entry, listing, onChanged }: { entry: VaultEntryView; listing: VaultListing; onChanged: () => Promise<void> }) {
+    const t = useTranslations('vault')
+    const errorText = useErrorText()
+    const [editing, setEditing] = useState(false)
+    const [saving, setSaving] = useState(false)
+    const label = vaultAccountLabel(entry)
+    const reason = !listing.canRename ? t('reasons.updateBox') : !entry.canChange ? (entry.sharedWithAll ? t('reasons.adminOnly') : t('reasons.manageBox')) : undefined
+
+    const save = async (name: string) => {
+        if (!name && !entry.customLabel) {
+            setEditing(false)
+            return
+        }
+        setSaving(true)
+        const res = await renameVaultEntryAction(entry.id, name || null)
+        if (!res.ok) toast.error(errorText(res as never, t('errors.changeFailed')))
+        await onChanged()
+        setSaving(false)
+        setEditing(false)
+    }
+
+    return (
+        <>
+            <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium">{entry.name}</span>
+                {editing ? (
+                    <AccountNameField name={label ?? ''} placeholder={entry.label ?? t('detail.namePlaceholder')} busy={saving} onSubmit={name => void save(name)} onCancel={() => setEditing(false)} />
+                ) : (
+                    label && <span className="truncate text-[11px] text-muted-foreground">{label}</span>
+                )}
+            </div>
+            {!editing && (
+                <TooltipDisabledReason reason={reason} className="shrink-0">
+                    <Button aria-label={t('detail.rename')} title={reason ? undefined : t('detail.rename')} variant="ghost" size="icon-sm" className="shrink-0 text-muted-foreground" disabled={!!reason} onClick={() => setEditing(true)}>
+                        <PencilIcon className="size-3.5" />
+                    </Button>
+                </TooltipDisabledReason>
+            )}
+        </>
+    )
+}
+
+function AccountNameField({ name, placeholder, busy, onSubmit, onCancel }: { name: string; placeholder: string; busy: boolean; onSubmit: (name: string) => void; onCancel: () => void }) {
+    const t = useTranslations('vault')
+    const { inputProps } = useRenameField({ name, onSubmit, onCancel, busy, allowEmpty: true })
+    return (
+        <div className="mt-0.5 flex h-6 items-center gap-1 rounded-md bg-background pr-1.5 pl-1.5 text-[11px] ring-1 ring-primary ring-inset">
+            <input {...inputProps} data-vault-account-name aria-label={t('detail.accountName')} placeholder={placeholder} maxLength={VAULT_ACCOUNT_LABEL_MAX} readOnly={busy} className="min-w-0 flex-1 bg-transparent outline-none selection:bg-foreground/20 read-only:opacity-60" />
+            {busy && <Spinner className="size-3 text-muted-foreground" />}
         </div>
     )
 }

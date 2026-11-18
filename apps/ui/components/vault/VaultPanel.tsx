@@ -1,5 +1,6 @@
 'use client'
 
+import { vaultAccountLabel } from '@rerun/contracts'
 import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
@@ -148,7 +149,7 @@ function VaultGroups({ listing, paid, query, iconOf, onOpen, onOpenPaid }: Vault
                 <div className="@container">
                     <div className="grid grid-cols-2 gap-2 @md:grid-cols-3">
                         {apps.map(entry => (
-                            <VaultAppTile key={entry.id} icon={iconOf(entry, 'md')} name={entry.name} label={entry.label} badges={<VaultStatusBadge entry={entry} />} usage={entry} onClick={() => onOpen(entry.id)} />
+                            <VaultAppTile key={entry.id} icon={iconOf(entry, 'md')} name={entry.name} label={vaultAccountLabel(entry)} badges={<VaultStatusBadge entry={entry} />} usage={entry} onClick={() => onOpen(entry.id)} />
                         ))}
                         {shownPaid.map(account => (
                             <VaultAppTile

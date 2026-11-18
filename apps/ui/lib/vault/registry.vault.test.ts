@@ -91,6 +91,16 @@ describe('the registry of a coworker on a box that keeps a Vault', () => {
         expect(writeFileText).not.toHaveBeenCalled()
     })
 
+    it('shows the name given to an account, and leaves it out of what a sign-in writes back', async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([item({ label: 'GitHub 2', customLabel: 'Personal' })] as never)
+        const reg = await readRegistry(conn, 'engine-agent')
+        expect(reg.services.gmail).toMatchObject({ label: 'GitHub 2', customLabel: 'Personal' })
+        await upsertRegistryEntry(conn, 'engine-agent', 'gmail', { ...reg.services.gmail, status: 'active', label: 'me@acme.test' })
+        const patch = vi.mocked(patchVaultItem).mock.calls[0][2]
+        expect(patch).toMatchObject({ status: 'active', label: 'me@acme.test' })
+        expect(patch).not.toHaveProperty('customLabel')
+    })
+
     it("writes the coworker's own entries to its own file, without the Vault's", async () => {
         await upsertRegistryEntry(conn, 'engine-agent', 'notion', own('needs_auth'))
         const written = JSON.parse(vi.mocked(writeFileText).mock.calls[0][3] as string)

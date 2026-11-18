@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Actor } from '@/app/api/_auth/access'
-import { EngineRequestError, supportsForemanCoworker, supportsVault } from '@/lib/engine/client'
+import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultRename } from '@/lib/engine/client'
 import { attachVaultItem, deleteVaultItem, detachVaultItem, getVaultItem, getVaultItemUsage, listVaultItems, patchVaultItem } from '@/lib/engine/vault-client'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
@@ -18,6 +18,7 @@ import {
     detachVaultEntry,
     listVault,
     markVaultEntryAuthorized,
+    renameVaultEntry,
     shareVaultEntry,
     vaultEntryUsage,
     vaultWritesEnabled,
@@ -30,7 +31,7 @@ vi.mock('@/lib/vault/composio', () => ({ revokeVaultComposioAccount: vi.fn(async
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@/flags', () => ({ vaultFlag: vi.fn(async () => false) }))
 vi.mock('./workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(), NoEngineError: class NoEngineError extends Error {} }))
-vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(), supportsForemanCoworker: vi.fn(async () => false) }))
+vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(), supportsVaultRename: vi.fn(), supportsForemanCoworker: vi.fn(async () => false) }))
 vi.mock('@/lib/engine/vault-client', () => ({
     listVaultItems: vi.fn(),
     getVaultItem: vi.fn(),
@@ -93,6 +94,7 @@ beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(findWorkspaceEngine).mockResolvedValue({ instanceId: 'i', conn, managed: true })
     vi.mocked(supportsVault).mockResolvedValue(true)
+    vi.mocked(supportsVaultRename).mockResolvedValue(true)
     vi.mocked(supportsForemanCoworker).mockResolvedValue(false)
     vi.mocked(getVaultItem).mockResolvedValue(item() as never)
     vi.mocked(listVaultItems).mockResolvedValue([item(), item({ id: 'item-2', agentIds: ['e-alice', 'e-carol'] }), item({ id: 'item-3', sharedWithAll: true, agentIds: [] })] as never)
@@ -270,6 +272,39 @@ describe('who may change an item', () => {
     it('keeps an item shared with everyone for admins', async () => {
         expect(await canChangeItem(managerOfA, item({ sharedWithAll: true, agentIds: [] }) as never, ctx)).toBe(false)
         expect(await canChangeItem(admin, item({ sharedWithAll: true, agentIds: [] }) as never, ctx)).toBe(true)
+    })
+})
+
+describe('renaming an account', () => {
+    it('writes the name apart from the label, trimmed, and gives the default back on an empty one', async () => {
+        await renameVaultEntry('item-1', '  Personal  ', managerOfA)
+        expect(patchVaultItem).toHaveBeenLastCalledWith(conn, 'item-1', { customLabel: 'Personal' })
+        await renameVaultEntry('item-1', '   ', managerOfA)
+        expect(patchVaultItem).toHaveBeenLastCalledWith(conn, 'item-1', { customLabel: null })
+        await renameVaultEntry('item-1', null, managerOfA)
+        expect(patchVaultItem).toHaveBeenLastCalledWith(conn, 'item-1', { customLabel: null })
+    })
+
+    it('follows who may change the item: an account shared with everyone is renamed by an admin only', async () => {
+        vi.mocked(getVaultItem).mockResolvedValue(item({ sharedWithAll: true, agentIds: [] }) as never)
+        await expect(renameVaultEntry('item-1', 'Personal', managerOfA)).rejects.toMatchObject({ code: 'vaultAdminOnly' })
+        await renameVaultEntry('item-1', 'Personal', admin)
+        expect(patchVaultItem).toHaveBeenCalledTimes(1)
+    })
+
+    it('refuses on a box that would drop the name, and never renames a secret', async () => {
+        vi.mocked(supportsVaultRename).mockResolvedValue(false)
+        await expect(renameVaultEntry('item-1', 'Personal', admin)).rejects.toMatchObject({ code: 'vaultRenameUnsupported' })
+        vi.mocked(supportsVaultRename).mockResolvedValue(true)
+        vi.mocked(getVaultItem).mockResolvedValue(item({ kind: 'secret', slug: null }) as never)
+        await expect(renameVaultEntry('item-1', 'Personal', admin)).rejects.toThrow()
+        expect(patchVaultItem).not.toHaveBeenCalled()
+    })
+
+    it('tells the screen whether the box can rename', async () => {
+        expect((await listVault(admin)).canRename).toBe(true)
+        vi.mocked(supportsVaultRename).mockResolvedValue(false)
+        expect((await listVault(admin)).canRename).toBe(false)
     })
 })
 

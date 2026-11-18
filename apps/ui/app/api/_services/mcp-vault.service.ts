@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { vaultAccountLabel } from '@rerun/contracts'
+
 import type { Actor } from '@/app/api/_auth/access'
 import { requireConfirmation, requireString } from '@/lib/mcp/args'
 import { dispatchShareTool } from './mcp-shares.service'
@@ -17,12 +19,13 @@ const coworkerView = (coworker: Pick<VaultCoworker, 'id' | 'name'>) => ({ id: co
 // What the caller reads of an entry: enough to name it, tell whether it works and who holds it.
 // Variable names, token servers, settings, Composio ids and who added it stay out.
 function entryView(entry: VaultEntryView, isAdmin: boolean) {
+    const account = vaultAccountLabel(entry)
     return {
         id: entry.id,
         name: entry.name,
         kind: entry.kind,
         ...(entry.slug ? { slug: entry.slug } : {}),
-        ...(entry.label ? { account: entry.label } : {}),
+        ...(account ? { account } : {}),
         status: entry.status,
         sharedWithAll: entry.sharedWithAll,
         coworkers: entry.coworkers.map(coworkerView),

@@ -54,7 +54,7 @@ For some apps whose sign-in Rerun handles for you, the Vault cannot sign them in
 
 Some apps can only be connected from a coworker: the Vault then says **This app can't be added to the Vault yet. Connect it from a coworker's Apps tab.** It lands in the Vault anyway, see [From a coworker](#from-a-coworker).
 
-An app that takes several accounts can be added several times, one entry per account.
+An app that takes several accounts can be added several times, one entry per account. The second one is named after the app and a number, like `GitHub 2`, until its sign-in reports an email or a workspace name. To tell them apart, [rename them](#rename-an-account).
 
 ### Add a secret
 
@@ -86,6 +86,14 @@ Open an entry to see its **Coworkers**:
 A coworker cannot get the same variable or the same server name from two entries: the Vault refuses with **already gets {name} from another Vault entry**.
 
 The entry also lists the names of its **Variables**, never their values.
+
+### Rename an account
+
+Open an app's entry and click the pencil next to its name, at the top. Type a name, up to 60 characters, like `Acme org` or `Personal`, then press Enter or click elsewhere. Escape cancels.
+
+The name replaces the account line under the app's name everywhere: on its tile, in a coworker's **Apps** tab, on the **Use** button of an app card in the chat, and in what coworkers read about their apps. Signing in to the account again keeps it.
+
+To go back to the name the account had, empty the field and press Enter: the field shows that name while it is empty.
 
 ### Delete an entry
 
@@ -123,7 +131,7 @@ The Vault follows the roles and the Box access of [Teams and workspaces](/teams)
 | Open the Vault | Every member |
 | Add an entry | A member who manages at least one Box (**Manage a Box to add to the Vault**) |
 | Switch an entry on or off for a coworker | A member who manages that coworker's Box (**You don't manage this coworker's Box**) |
-| Change an entry other coworkers use | An admin, or a member who manages the Box of every coworker that uses it |
-| Switch on **Every coworker**, change an entry shared with every coworker, delete an entry | An admin (**Only an admin can do this**) |
+| Change an entry other coworkers use, rename an account | An admin, or a member who manages the Box of every coworker that uses it |
+| Switch on **Every coworker**, change or rename an entry shared with every coworker, delete an entry | An admin (**Only an admin can do this**) |
 
 A member only sees the coworkers of the Boxes they can open. The coworkers of the other Boxes are counted, not named: an entry says **2 coworkers in Boxes you can't see**, and so does the confirmation before a delete.

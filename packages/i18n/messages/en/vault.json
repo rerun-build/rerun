@@ -5,6 +5,7 @@
         "row.usedByMore": "{names} is a comma-separated list of coworker names, {count} how many more there are.",
         "row.everyoneShort": "A tiny badge on an entry shared with every coworker of the workspace. One short word.",
         "detail.hiddenCoworkers": "Coworkers that sit in Boxes the reader cannot see.",
+        "detail.namePlaceholder": "Shown in an empty field naming one account of an app, such as a second GitHub account.",
         "delete.loses": "{names} is a comma-separated list of coworker names.",
         "addSecret.variable": "The environment variable name a coworker reads the secret under, like STRIPE_API_KEY.",
         "addMcp.header": "An HTTP header name, like Authorization."
@@ -41,7 +42,10 @@
         "noCoworkers": "No coworker in this workspace yet.",
         "hiddenCoworkers": "{count, plural, one {# coworker} other {# coworkers}} in Boxes you can't see",
         "variables": "Variables",
-        "reconnectFromCoworker": "Reconnect it from the Apps tab of a coworker that uses it."
+        "reconnectFromCoworker": "Reconnect it from the Apps tab of a coworker that uses it.",
+        "rename": "Rename account",
+        "accountName": "Account name",
+        "namePlaceholder": "Name this account"
     },
     "delete": {
         "button": "Delete",
@@ -55,7 +59,8 @@
         "adminOnly": "Only an admin can do this",
         "manageBox": "You don't manage this coworker's Box",
         "manageAny": "Manage a Box to add to the Vault",
-        "paidAppEveryone": "A paid app is attached coworker by coworker"
+        "paidAppEveryone": "A paid app is attached coworker by coworker",
+        "updateBox": "Your workspace's machine can rename accounts after its next update"
     },
     "addPage": {
         "title": "Add to the Vault",

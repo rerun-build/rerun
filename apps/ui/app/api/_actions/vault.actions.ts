@@ -12,6 +12,7 @@ import {
     detachVaultEntry,
     listVault,
     markVaultEntryAuthorized,
+    renameVaultEntry,
     shareVaultEntry,
     vaultEntryUsage,
     vaultSignedOutCount,
@@ -54,6 +55,10 @@ export async function detachVaultEntryAction(itemId: string, agentId: string): P
 
 export async function shareVaultEntryAction(itemId: string, sharedWithAll: boolean): Promise<Result<VaultItemSummary>> {
     return attempt(() => shareVaultEntry(itemId, sharedWithAll))
+}
+
+export async function renameVaultEntryAction(itemId: string, name: string | null): Promise<Result<VaultItemSummary>> {
+    return attempt(() => renameVaultEntry(itemId, name))
 }
 
 export async function vaultEntryUsageAction(itemId: string): Promise<Result<{ coworkers: VaultCoworker[]; hidden: number }>> {
