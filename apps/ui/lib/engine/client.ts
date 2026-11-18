@@ -58,6 +58,7 @@ import {
     type EngineAgentDetail,
     type EngineConnection,
     type BoxConnection,
+    type BoxBackupModels,
     type BoxConnectionsList,
     type BoxConnectionUsage,
     type BoxDefault,
@@ -209,6 +210,11 @@ export async function setBoxDefault(conn: EngineConnection, pick: BoxDefault | n
         return
     }
     await request(conn, '/connections/default', { method: 'PUT', body: JSON.stringify(pick) }, () => undefined)
+}
+
+// The whole list at once: its order is the setting.
+export async function setBoxBackups(conn: EngineConnection, next: BoxBackupModels): Promise<void> {
+    await request(conn, '/connections/backups', { method: 'PUT', body: JSON.stringify(next) }, () => undefined)
 }
 
 export async function createConnection(conn: EngineConnection, params: CreateBoxConnectionInput): Promise<BoxConnection> {

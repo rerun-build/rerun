@@ -163,7 +163,8 @@
         "saveConnectionFailed": "Verbindung konnte nicht gespeichert werden",
         "codeExpired": "Der Code ist abgelaufen, fang neu an",
         "deleteFailed": "Verbindung konnte nicht gelöscht werden",
-        "defaultFailed": "Standardmodell konnte nicht geändert werden"
+        "defaultFailed": "Standardmodell konnte nicht geändert werden",
+        "backupsFailed": "Ausweichmodelle konnten nicht gespeichert werden"
     },
     "addProvider": {
         "addKey": "Schlüssel hinzufügen"
@@ -243,6 +244,7 @@
         "adminOnly": "Nur ein Admin kann die KI-Anbieter ändern",
         "groups": {
             "default": "Standardmodell",
+            "backups": "Ausweichmodelle",
             "included": "Inklusive",
             "plans": "Deine Abos",
             "keys": "Deine API-Schlüssel",
@@ -267,6 +269,20 @@
             "stopped": "Coworker ohne eigenes Modell sind gestoppt. Repariere {source} oder wähle ein anderes Modell.",
             "noOtherModel": "Kein anderes Modell ist bereit. Füge zuerst einen Tarif oder einen API-Schlüssel hinzu.",
             "change": "Ändern"
+        },
+        "backups": {
+            "add": "Ausweichmodell hinzufügen",
+            "rank": "{rank, selectordinal, other {#.}} · über {source}",
+            "rankNotReady": "{rank, selectordinal, other {#.}} · {source} ist nicht bereit, übersprungen",
+            "moveUp": "{model} nach oben",
+            "moveDown": "{model} nach unten",
+            "remove": "{model} entfernen",
+            "full": "Bis zu {max} Ausweichmodelle",
+            "noneLeft": "Kein anderes Modell ist bereit. Füge zuerst einen Tarif oder einen API-Schlüssel hinzu.",
+            "credit": {
+                "title": "Rerun-Guthaben als letzter Ausweg",
+                "description": "Nur wenn alle Tarife aufgebraucht sind"
+            }
         },
         "addSubscription": "Abo hinzufügen",
         "addApiKey": "API-Schlüssel hinzufügen"

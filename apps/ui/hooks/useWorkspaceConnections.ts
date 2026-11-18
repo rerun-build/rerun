@@ -1,9 +1,10 @@
 'use client'
 
-import { createAiConnectionAction, deleteAiConnectionAction, listAiConnectionsAction, refreshAiConnectionsAction, setDefaultModelAction, updateAiConnectionAction, updateAiConnectionKeysAction } from '@/app/api/_actions/workspace-connection.actions'
+import { createAiConnectionAction, deleteAiConnectionAction, listAiConnectionsAction, refreshAiConnectionsAction, setBackupModelsAction, setDefaultModelAction, updateAiConnectionAction, updateAiConnectionKeysAction } from '@/app/api/_actions/workspace-connection.actions'
 import { invalidateLoadedAgentContexts } from '@/hooks/useAgentContext'
 import { connectionMethod, trackAiConnectionConnected, trackAiConnectionFailed } from '@/lib/engine/ai-connection-analytics'
-import type { BoxConnection, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
+import type { BoxBackupModels, BoxConnection, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
+import { NO_BOX_BACKUPS } from '@rerun/contracts'
 import type { AiConnectionSurface } from '@rerun/analytics'
 import { track } from '@rerun/analytics/client'
 import { useCallback, useEffect, useSyncExternalStore } from 'react'
@@ -19,10 +20,10 @@ import { useCallback, useEffect, useSyncExternalStore } from 'react'
 // Mutations update the shared list from the connection the engine echoes back, so a rename or a
 // model toggle lands without a second round-trip.
 
-type ConnectionsState = { connections: BoxConnection[]; boxDefault: BoxDefault | null; opencodeOffered: boolean; customOffered: boolean; loaded: boolean }
+type ConnectionsState = { connections: BoxConnection[]; boxDefault: BoxDefault | null; backups: BoxBackupModels; opencodeOffered: boolean; customOffered: boolean; loaded: boolean }
 
 // A shared constant, since useSyncExternalStore compares snapshots by reference.
-const EMPTY: ConnectionsState = { connections: [], boxDefault: null, opencodeOffered: false, customOffered: false, loaded: false }
+const EMPTY: ConnectionsState = { connections: [], boxDefault: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false, loaded: false }
 
 let snapshot: ConnectionsState = EMPTY
 const listeners = new Set<() => void>()
@@ -44,7 +45,7 @@ function subscribe(listener: () => void) {
 function fetchList(): Promise<void> {
     if (inflight) return inflight
     inflight = listAiConnectionsAction()
-        .then(list => setState({ connections: list.connections, boxDefault: list.default, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true }))
+        .then(list => setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true }))
         .catch(() => {})
         .finally(() => {
             inflight = null
@@ -53,6 +54,10 @@ function fetchList(): Promise<void> {
 }
 
 let refreshing: Promise<void> | null = null
+
+// A reorder is a few clicks in a row, each writing the whole list: they go out one after the other,
+// so the last click is the list the engine keeps.
+let backupsWrite: Promise<unknown> = Promise.resolve()
 
 // A plan's limits move with every run, and the engine reads them as the run ends: a chat calls
 // this when one finishes so the rings of its model pill follow. A read that fails leaves the list
@@ -63,7 +68,7 @@ export function refreshWorkspaceConnections(): Promise<void> {
     refreshing = (async () => {
         if (inflight) await inflight
         const list = await refreshAiConnectionsAction()
-        if (list) setState({ connections: list.connections, boxDefault: list.default, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
+        if (list) setState({ connections: list.connections, boxDefault: list.default, backups: list.backups, opencodeOffered: list.opencodeOffered, customOffered: list.customOffered, loaded: true })
     })().finally(() => {
         refreshing = null
     })
@@ -173,5 +178,16 @@ export function useWorkspaceConnections({ revalidate = false }: { revalidate?: b
         return result
     }, [])
 
-    return { connections: state.connections, boxDefault: state.boxDefault, opencodeOffered: state.opencodeOffered, customOffered: state.customOffered, loading: !state.loaded, refresh, create, update, updateKeys, remove, setDefault }
+    // Optimistic too: a reorder that waits for the round-trip makes the rows jump back and forth.
+    const setBackups = useCallback(async (next: BoxBackupModels) => {
+        const previous = snapshot.backups
+        setState({ backups: next })
+        const write = backupsWrite.then(() => setBackupModelsAction(next))
+        backupsWrite = write.catch(() => {})
+        const result = await write
+        if (!result.success && snapshot.backups === next) setState({ backups: previous })
+        return result
+    }, [])
+
+    return { connections: state.connections, boxDefault: state.boxDefault, backups: state.backups, setBackups, opencodeOffered: state.opencodeOffered, customOffered: state.customOffered, loading: !state.loaded, refresh, create, update, updateKeys, remove, setDefault }
 }

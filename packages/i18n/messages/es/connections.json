@@ -163,7 +163,8 @@
         "saveConnectionFailed": "No se pudo guardar la conexión",
         "codeExpired": "El código caducó, empieza de nuevo",
         "deleteFailed": "No se pudo eliminar la conexión",
-        "defaultFailed": "No se pudo cambiar el modelo predeterminado"
+        "defaultFailed": "No se pudo cambiar el modelo predeterminado",
+        "backupsFailed": "No se pudieron guardar los modelos de respaldo"
     },
     "addProvider": {
         "addKey": "Añadir clave"
@@ -243,6 +244,7 @@
         "adminOnly": "Solo un admin puede cambiar los proveedores de IA",
         "groups": {
             "default": "Modelo predeterminado",
+            "backups": "Respaldos",
             "included": "Incluido",
             "plans": "Tus suscripciones",
             "keys": "Tus claves API",
@@ -267,6 +269,20 @@
             "stopped": "Los coworkers sin modelo propio están detenidos. Arregla {source} o elige otro modelo.",
             "noOtherModel": "Ningún otro modelo está listo. Añade primero un plan o una clave API.",
             "change": "Cambiar"
+        },
+        "backups": {
+            "add": "Añadir respaldo",
+            "rank": "{rank, selectordinal, other {#.º}} · mediante {source}",
+            "rankNotReady": "{rank, selectordinal, other {#.º}} · {source} no está listo, se omite",
+            "moveUp": "Subir {model}",
+            "moveDown": "Bajar {model}",
+            "remove": "Quitar {model}",
+            "full": "Hasta {max} respaldos",
+            "noneLeft": "Ningún otro modelo está listo. Añade primero un plan o una clave API.",
+            "credit": {
+                "title": "Crédito de Rerun como último recurso",
+                "description": "Solo cuando todos los planes se agoten"
+            }
         },
         "addSubscription": "Añadir suscripción",
         "addApiKey": "Añadir clave API"

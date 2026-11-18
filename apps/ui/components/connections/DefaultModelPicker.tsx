@@ -9,24 +9,35 @@ import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { CheckIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { RERUN_CONNECTION_ID } from '@rerun/contracts'
 import { useDialogPortalContainer } from '@rerun/ui/forms'
 import { useTranslations } from 'next-intl'
 import { useState, type ReactNode } from 'react'
 
 type DefaultModelPickerProps = {
     connections: BoxConnection[]
-    current: BoxDefault
+    // Absent when the pick adds to a list rather than replacing one model: nothing gets a check.
+    current?: BoxDefault
+    // Pairs already taken elsewhere, as `pickKey` writes them, left out of the list.
+    exclude?: ReadonlySet<string>
+    // The Rerun credit has its own switch where the picker adds backups.
+    withoutRerun?: boolean
     credit: RerunCredit
     onPick: (pick: BoxDefault) => void
     children: ReactNode
 }
 
+export const pickKey = (pick: BoxDefault): string => `${pick.connectionId} ${pick.model}`
+
 // Grouped by source, like the chat's model picker: a model only means something next to who pays
 // for it.
-export function DefaultModelPicker({ connections, current, credit, onPick, children }: DefaultModelPickerProps) {
+export function DefaultModelPicker({ connections, current, exclude, withoutRerun = false, credit, onPick, children }: DefaultModelPickerProps) {
     const t = useTranslations('connections')
     const [open, setOpen] = useState(false)
-    const sources = connections.filter(c => isUsable(c, credit))
+    const sources = connections
+        .filter(c => isUsable(c, credit) && !(withoutRerun && c.id === RERUN_CONNECTION_ID))
+        .map(source => ({ source, models: enabledModels(source).filter(model => !exclude?.has(pickKey({ connectionId: source.id, model: model.id }))) }))
+        .filter(({ models }) => models.length > 0)
     const [triggerRef, portalContainer] = useDialogPortalContainer<HTMLButtonElement>()
 
     return (
@@ -37,10 +48,10 @@ export function DefaultModelPicker({ connections, current, credit, onPick, child
             <PopoverContent container={portalContainer} align="end" className="w-72 gap-0 p-0">
                 <Command>
                     <CommandList className="max-h-80">
-                        {sources.map(source => (
+                        {sources.map(({ source, models }) => (
                             <CommandGroup key={source.id} heading={source.name}>
-                                {enabledModels(source).map(model => {
-                                    const selected = current.connectionId === source.id && current.model === model.id
+                                {models.map(model => {
+                                    const selected = current?.connectionId === source.id && current.model === model.id
                                     const description = modelDescription(source, model.id, t)
                                     const pick = () => {
                                         setOpen(false)

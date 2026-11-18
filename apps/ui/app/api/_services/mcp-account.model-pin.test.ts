@@ -36,7 +36,7 @@ describe('dispatchAccountTool, what a coworker runs on', () => {
         vi.clearAllMocks()
         vi.mocked(resolveAgentTarget).mockResolvedValue({ conn: CONN, engineAgentId: 'engine-agent' })
         vi.mocked(getWorkspaceConnection).mockResolvedValue(CONN)
-        vi.mocked(listConnections).mockResolvedValue({ connections: CONNECTIONS, default: { connectionId: 'claude-rerun', model: 'claude-opus-5-5' } })
+        vi.mocked(listConnections).mockResolvedValue({ connections: CONNECTIONS, default: { connectionId: 'claude-rerun', model: 'claude-opus-5-5' }, backups: { backups: [], rerunCreditLastResort: false } })
     })
 
     it('lists the connections with the one that holds the default', async () => {

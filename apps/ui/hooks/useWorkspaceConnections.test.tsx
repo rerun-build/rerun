@@ -3,13 +3,13 @@ import { act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { BoxConnection } from '@/lib/engine/types'
+import type { BoxBackupModels, BoxConnection } from '@/lib/engine/types'
 
 // The list is refetched at the end of every run so the rings of the model pill follow the plan. A
 // refetch the engine cannot answer, right as it goes away, used to land as an empty list: every
 // picker read "Set up a model" and the composer locked until the providers dialog was opened.
 
-const mocks = vi.hoisted(() => ({ listAiConnectionsAction: vi.fn(), refreshAiConnectionsAction: vi.fn() }))
+const mocks = vi.hoisted(() => ({ listAiConnectionsAction: vi.fn(), refreshAiConnectionsAction: vi.fn(), setBackupModelsAction: vi.fn() }))
 
 vi.mock('@/app/api/_actions/workspace-connection.actions', () => ({
     listAiConnectionsAction: mocks.listAiConnectionsAction,
@@ -17,6 +17,7 @@ vi.mock('@/app/api/_actions/workspace-connection.actions', () => ({
     createAiConnectionAction: vi.fn(),
     deleteAiConnectionAction: vi.fn(),
     setDefaultModelAction: vi.fn(),
+    setBackupModelsAction: mocks.setBackupModelsAction,
     updateAiConnectionAction: vi.fn(),
     updateAiConnectionKeysAction: vi.fn(),
 }))
@@ -41,7 +42,7 @@ function connection(id: string, planPercent: number): BoxConnection {
     }
 }
 
-const list = (connections: BoxConnection[]) => ({ connections, default: null, opencodeOffered: false, customOffered: false })
+const list = (connections: BoxConnection[]) => ({ connections, default: null, backups: { backups: [], rerunCreditLastResort: false }, opencodeOffered: false, customOffered: false })
 
 let root: Root | null = null
 let container: HTMLElement | null = null
@@ -99,5 +100,84 @@ describe('refreshWorkspaceConnections', () => {
         const { refreshWorkspaceConnections } = await import('./useWorkspaceConnections')
         await act(async () => Promise.all([refreshWorkspaceConnections(), refreshWorkspaceConnections()]))
         expect(mocks.refreshAiConnectionsAction).toHaveBeenCalledTimes(1)
+    })
+})
+
+describe('setBackups', () => {
+    const next = { backups: [{ connectionId: 'c1', model: 'claude-opus-5-5' }], rerunCreditLastResort: true }
+    let hook: { backups: unknown; setBackups: (list: BoxBackupModels) => Promise<{ success: boolean }> } | null = null
+
+    async function mountHook() {
+        const { useWorkspaceConnections } = await import('./useWorkspaceConnections')
+        function Probe() {
+            hook = useWorkspaceConnections()
+            return null
+        }
+        container = document.createElement('div')
+        document.body.appendChild(container)
+        root = createRoot(container)
+        await act(async () => root!.render(createElement(Probe)))
+        await act(async () => {})
+    }
+
+    beforeEach(() => {
+        vi.resetModules()
+        mocks.listAiConnectionsAction.mockReset()
+        mocks.setBackupModelsAction.mockReset()
+        mocks.listAiConnectionsAction.mockResolvedValue(list([connection('c1', 10)]))
+    })
+    afterEach(() => {
+        act(() => root?.unmount())
+        root = null
+        container?.remove()
+    })
+
+    it('shows the new list at once and keeps it once the engine took it', async () => {
+        mocks.setBackupModelsAction.mockResolvedValue({ success: true })
+        await mountHook()
+
+        await act(async () => void (await hook!.setBackups(next)))
+
+        expect(mocks.setBackupModelsAction).toHaveBeenCalledWith(next)
+        expect(hook!.backups).toEqual(next)
+    })
+
+    // A reorder is several clicks in a row: the engine has to end on the last one.
+    it('sends quick edits one after the other, in click order', async () => {
+        const sent: unknown[] = []
+        let release!: () => void
+        mocks.setBackupModelsAction.mockImplementationOnce(async (list: unknown) => {
+            sent.push(list)
+            await new Promise<void>(r => (release = r))
+            return { success: true }
+        })
+        mocks.setBackupModelsAction.mockImplementation(async (list: unknown) => {
+            sent.push(list)
+            return { success: true }
+        })
+        await mountHook()
+        const last = { ...next, rerunCreditLastResort: false }
+
+        let both!: Promise<unknown>
+        await act(async () => {
+            both = Promise.all([hook!.setBackups(next), hook!.setBackups(last)])
+        })
+        expect(sent).toEqual([next])
+        await act(async () => {
+            release()
+            await both
+        })
+
+        expect(sent).toEqual([next, last])
+        expect(hook!.backups).toEqual(last)
+    })
+
+    it('puts the previous list back when the engine refuses it', async () => {
+        mocks.setBackupModelsAction.mockResolvedValue({ success: false })
+        await mountHook()
+
+        await act(async () => void (await hook!.setBackups(next)))
+
+        expect(hook!.backups).toEqual({ backups: [], rerunCreditLastResort: false })
     })
 })

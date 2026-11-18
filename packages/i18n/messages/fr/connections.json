@@ -163,7 +163,8 @@
         "saveConnectionFailed": "Impossible d’enregistrer la connexion",
         "codeExpired": "Le code a expiré, recommencez",
         "deleteFailed": "Impossible de supprimer la connexion",
-        "defaultFailed": "Impossible de changer le modèle par défaut"
+        "defaultFailed": "Impossible de changer le modèle par défaut",
+        "backupsFailed": "Impossible d’enregistrer les modèles de secours"
     },
     "addProvider": {
         "addKey": "Ajouter la clé"
@@ -243,6 +244,7 @@
         "adminOnly": "Seul un admin peut modifier les fournisseurs d’IA",
         "groups": {
             "default": "Modèle par défaut",
+            "backups": "Secours",
             "included": "Inclus",
             "plans": "Vos abonnements",
             "keys": "Vos clés API",
@@ -267,6 +269,20 @@
             "stopped": "Les coworkers sans modèle propre sont arrêtés. Réparez {source} ou choisissez un autre modèle.",
             "noOtherModel": "Aucun autre modèle n’est prêt. Ajoutez d’abord un forfait ou une clé API.",
             "change": "Changer"
+        },
+        "backups": {
+            "add": "Ajouter un secours",
+            "rank": "{rank, selectordinal, one {#er} other {#e}} · via {source}",
+            "rankNotReady": "{rank, selectordinal, one {#er} other {#e}} · {source} n’est pas prêt, ignoré",
+            "moveUp": "Monter {model}",
+            "moveDown": "Descendre {model}",
+            "remove": "Retirer {model}",
+            "full": "Jusqu’à {max} secours",
+            "noneLeft": "Aucun autre modèle n’est prêt. Ajoutez d’abord un forfait ou une clé API.",
+            "credit": {
+                "title": "Crédit Rerun en dernier recours",
+                "description": "Seulement quand tous les forfaits sont épuisés"
+            }
         },
         "addSubscription": "Ajouter un abonnement",
         "addApiKey": "Ajouter une clé API"

@@ -11,6 +11,7 @@ import {
     isOpencodeOfferedTo,
     listAiConnections,
     probeCustomEndpoint,
+    setWorkspaceBackupModels,
     setWorkspaceDefaultModel,
     startClaudeSignIn,
     startCodexSignIn,
@@ -20,8 +21,8 @@ import {
 import { NoPlanError } from '@/app/api/_services/capacity.service'
 import type { ClaudeOAuthStart } from '@/lib/engine/claude-oauth'
 import type { CodexDeviceAuthStart } from '@/lib/engine/codex-oauth'
-import type { BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
-import { customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
+import type { BoxBackupModels, BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, UpdateBoxConnectionInput } from '@/lib/engine/types'
+import { NO_BOX_BACKUPS, customProbeInputSchema, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
 import { refusal, refusalOf, type ActionRefusal, type ErrorCode } from '@/lib/i18n/action-error'
 
 // The AI providers of the workspace, for the web dialog. The workspace of the session is the whole
@@ -64,7 +65,7 @@ export async function listAiConnectionsAction(): Promise<AiConnectionsList> {
     try {
         return await readAiConnections()
     } catch {
-        return { connections: [], default: null, opencodeOffered: false, customOffered: false }
+        return { connections: [], default: null, backups: NO_BOX_BACKUPS, opencodeOffered: false, customOffered: false }
     }
 }
 
@@ -93,6 +94,15 @@ export async function setDefaultModelAction(pick: BoxDefault | null): Promise<Re
         return { success: true }
     } catch (err) {
         return refused(err, 'setDefaultModelFailed')
+    }
+}
+
+export async function setBackupModelsAction(next: BoxBackupModels): Promise<Result> {
+    try {
+        await setWorkspaceBackupModels(await requireProvidersAdminWorkspaceId(), next)
+        return { success: true }
+    } catch (err) {
+        return refused(err, 'setBackupModelsFailed')
     }
 }
 

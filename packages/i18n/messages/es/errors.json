@@ -171,6 +171,7 @@
     "trialToConnectModel": "Empieza tu prueba gratuita para conectar tu propio modelo.",
     "endpointUnreachable": "No se pudo acceder a este endpoint",
     "setDefaultModelFailed": "No se pudo definir el modelo predeterminado del workspace",
+    "setBackupModelsFailed": "No se pudieron guardar los modelos de respaldo",
     "trialToConnectClaude": "Empieza tu prueba gratuita para conectar tu propio plan de Claude o tu clave API.",
     "createConnectionFailed": "No se pudo crear la conexión",
     "updateConnectionFailed": "No se pudo actualizar la conexión",

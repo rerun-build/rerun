@@ -3,6 +3,7 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { AddProviderPage } from '@/components/connections/AddProviderPage'
 import { AddCustomProviderPage } from '@/components/connections/custom/AddCustomProviderPage'
+import { BackupsGroup } from '@/components/connections/BackupsGroup'
 import { ConnectionDetail } from '@/components/connections/ConnectionDetail'
 import { DefaultModelPicker } from '@/components/connections/DefaultModelPicker'
 import { NoPlanNotice, useClaudePlanOffered, useNeedsPlanToConnect } from '@/components/connections/NoPlanNotice'
@@ -38,7 +39,7 @@ import {
     type SourceKind,
 } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
-import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
+import type { BoxBackupModels, BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { ChevronDownIcon, ChevronRightIcon, PlusIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { RERUN_CONNECTION_ID } from '@rerun/contracts'
@@ -75,7 +76,7 @@ export function AiProvidersPanel({
 }) {
     const t = useTranslations('connections')
     const errorText = useErrorText()
-    const { connections, boxDefault, opencodeOffered, customOffered, loading, create, update, updateKeys, remove, setDefault } = useWorkspaceConnections({ revalidate: true })
+    const { connections, boxDefault, backups, opencodeOffered, customOffered, loading, create, update, updateKeys, remove, setDefault, setBackups } = useWorkspaceConnections({ revalidate: true })
     const credit = useRerunCredit()
     const needsPlan = useNeedsPlanToConnect()
     const claudePlanOffered = useClaudePlanOffered()
@@ -117,6 +118,11 @@ export function AiProvidersPanel({
             if (!result.success) toast.error(errorText(result, t('errors.defaultFailed')))
         })
 
+    const saveBackups = (next: BoxBackupModels) =>
+        void setBackups(next).then(result => {
+            if (!result.success) toast.error(errorText(result, t('errors.backupsFailed')))
+        })
+
     const planPitch = claudePlanOffered
         ? t(opencodeOffered ? 'panel.pitch.plansWithOpencode' : 'panel.pitch.plans')
         : t(opencodeOffered ? 'panel.pitch.plansWithoutClaudeWithOpencode' : 'panel.pitch.plansWithoutClaude')
@@ -149,6 +155,8 @@ export function AiProvidersPanel({
                     <Group title={t('panel.groups.default')}>
                         <DefaultRow connections={connections} current={current} credit={credit} onPick={pickDefault} onFix={open} readOnlyReason={readOnlyReason} />
                     </Group>
+
+                    <BackupsGroup connections={connections} backups={backups} current={current} credit={credit} onChange={saveBackups} readOnlyReason={readOnlyReason} />
 
                     <Group title={t('panel.groups.included')}>
                         {byKind('included').map(source => (

@@ -163,7 +163,8 @@
         "saveConnectionFailed": "Falha ao salvar a conexão",
         "codeExpired": "O código expirou, comece de novo",
         "deleteFailed": "Falha ao excluir a conexão",
-        "defaultFailed": "Falha ao mudar o modelo padrão"
+        "defaultFailed": "Falha ao mudar o modelo padrão",
+        "backupsFailed": "Falha ao salvar os modelos de reserva"
     },
     "addProvider": {
         "addKey": "Adicionar chave"
@@ -243,6 +244,7 @@
         "adminOnly": "Só um admin pode mudar os provedores de IA",
         "groups": {
             "default": "Modelo padrão",
+            "backups": "Reservas",
             "included": "Incluído",
             "plans": "Suas assinaturas",
             "keys": "Suas chaves de API",
@@ -267,6 +269,20 @@
             "stopped": "Os coworkers sem modelo próprio estão parados. Corrija {source} ou escolha outro modelo.",
             "noOtherModel": "Nenhum outro modelo está pronto. Adicione um plano ou uma chave de API primeiro.",
             "change": "Mudar"
+        },
+        "backups": {
+            "add": "Adicionar reserva",
+            "rank": "{rank, selectordinal, other {#º}} · via {source}",
+            "rankNotReady": "{rank, selectordinal, other {#º}} · {source} não está pronto, ignorado",
+            "moveUp": "Subir {model}",
+            "moveDown": "Descer {model}",
+            "remove": "Remover {model}",
+            "full": "Até {max} reservas",
+            "noneLeft": "Nenhum outro modelo está pronto. Adicione um plano ou uma chave de API primeiro.",
+            "credit": {
+                "title": "Crédito do Rerun como último recurso",
+                "description": "Só quando todos os planos se esgotarem"
+            }
         },
         "addSubscription": "Adicionar assinatura",
         "addApiKey": "Adicionar chave de API"

@@ -7,7 +7,7 @@ import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { fakeSupabase } from '@/test/supabase-fake'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createAiConnectionAction, updateAiConnectionKeysAction } from './workspace-connection.actions'
+import { createAiConnectionAction, setBackupModelsAction, updateAiConnectionKeysAction } from './workspace-connection.actions'
 
 // The lifetime plans only exist on Rerun Cloud: pinned to ee/, whatever the build resolves @rerun/cloud/billing to.
 vi.mock('@rerun/cloud/billing', async importOriginal => ({
@@ -29,6 +29,7 @@ vi.mock('@/lib/engine/client', () => ({
     getConnectionUsage: vi.fn(),
     listConnections: vi.fn(),
     patchConnection: vi.fn(),
+    setBoxBackups: vi.fn(),
     setBoxDefault: vi.fn(),
     updateConnectionKeys: vi.fn(),
 }))
@@ -134,5 +135,24 @@ describe('updateAiConnectionKeysAction', () => {
         await expect(updateAiConnectionKeysAction('cnx', { remove: ['OPENROUTER_API_KEY'] })).resolves.toEqual({ success: true })
         expect(engine.listConnections).toHaveBeenCalledTimes(1)
         expect(engine.updateConnectionKeys).toHaveBeenCalledTimes(2)
+    })
+})
+
+describe('setBackupModelsAction', () => {
+    const next = { backups: [{ connectionId: 'cnx', model: 'claude-opus-5-5' }], rerunCreditLastResort: false }
+
+    it('writes the list to the workspace machine for an admin', async () => {
+        vi.mocked(getWorkspaceConnection).mockResolvedValue(conn as never)
+
+        expect(await setBackupModelsAction(next)).toEqual({ success: true })
+        expect(requireAdminContext).toHaveBeenCalledWith('adminOnlyAiProviders')
+        expect(engine.setBoxBackups).toHaveBeenCalledWith(conn, next)
+    })
+
+    it('refuses a member before reaching the machine', async () => {
+        vi.mocked(requireAdminContext).mockRejectedValue(new AuthorizationError('adminOnlyAiProviders'))
+
+        expect(await setBackupModelsAction(next)).toMatchObject({ success: false })
+        expect(engine.setBoxBackups).not.toHaveBeenCalled()
     })
 })

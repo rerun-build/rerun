@@ -69,11 +69,22 @@ Open the workspace menu and click **AI providers**. Only an admin can change it.
 | Section | What it holds |
 | --- | --- |
 | **Default model** | What every coworker with no model of its own runs on. Click **Change** to pick another one |
+| **Backups** | Where a coworker carries on when a subscription hits its usage limit, in order. Click **Add backup**, then move or remove each one |
 | **Included** | On Rerun Cloud, the **Rerun** model, paid from the monthly credit of your plan. No key, nothing to set up |
 | **Your subscriptions** | A Claude or ChatGPT plan you already pay for. Click **Add subscription** and sign in once |
 | **Your API keys** | Your own Anthropic, OpenAI, Google or OpenRouter key, or a custom endpoint. Click **Add API key** |
 
 Open a connection to rename it, sign in again or replace its key, and choose which of its models your coworkers can use. A fresh workspace has no default of its own and runs on Rerun. Removing a connection moves every coworker and automation that used it back to the workspace default.
+
+### Backups
+
+When the Claude or ChatGPT plan a coworker runs on hits its usage limit (the 5-hour or the weekly limit), the coworker carries on with the first backup in the list, in the same conversation, without losing what it already did. A line in the chat says which model took over, and until when if the plan already gave its reset time, for example **Claude limit reached · GPT-6 Sol until 4:40 PM** or **Claude limit reached · GPT-6 Sol**. Once the plan resets, the next message runs on it again and the chat says **Claude reset. Back on Opus 5.5.**
+
+- Backups are tried in their order. One on the plan that ran out, one at its own limit or one that is not connected is skipped.
+- They apply to every coworker, whether it follows the default model or has one of its own, and to scheduled runs: a schedule fires on a backup instead of waiting for the reset.
+- You can add up to 5 backups.
+- **Rerun credit as last resort** is off by default. Switched on, the coworker moves to Rerun only once every plan in the list is out, and the credit is never spent otherwise.
+- With no backup, nothing changes: the run stops on the limit and the chat offers **Switch**.
 
 On a ChatGPT plan, a coworker also generates and edits images with the image tool built into Codex. On a self-hosted install, the models and providers are set up as described in [AI models](/self-host/models).
 

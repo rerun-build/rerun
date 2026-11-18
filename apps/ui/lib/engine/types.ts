@@ -69,6 +69,7 @@ import type {
     ConnectionsList,
     ConnectionUsage,
     BoxDefaultModel,
+    BoxBackups,
     CreateConnectionInput,
     UpdateConnectionInput,
     Schedule,
@@ -154,6 +155,8 @@ export type BoxConnection = ConnectionSummary
 export type BoxConnectionUsage = ConnectionUsage
 // The connection and model an agent runs on when it has picked none. Set once per box.
 export type BoxDefault = BoxDefaultModel
+// The models a run moves to, in order, when its subscription hits its usage limit.
+export type BoxBackupModels = BoxBackups
 export type BoxConnectionsList = ConnectionsList
 export type CreateBoxConnectionInput = CreateConnectionInput
 export type UpdateBoxConnectionInput = UpdateConnectionInput

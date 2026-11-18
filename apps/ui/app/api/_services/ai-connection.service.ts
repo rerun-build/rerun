@@ -39,6 +39,7 @@ import {
     supportsOpencode,
     listConnections as engineListConnections,
     patchConnection as enginePatchConnection,
+    setBoxBackups as engineSetBoxBackups,
     setBoxDefault as engineSetBoxDefault,
     updateConnectionKeys as engineUpdateConnectionKeys,
 } from '@/lib/engine/client'
@@ -46,14 +47,14 @@ import { type CodexDeviceAuthStart, codexKeysFrom, pollCodexDeviceAuth, startCod
 import { pinFirst } from '@/lib/engine/model-groups'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle } from '@/supabase/supabase-helpers'
-import type { BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, EngineConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
+import type { BoxBackupModels, BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, EngineConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { assertPublicUrl } from '@/lib/net/public-fetch'
 import { OPENCODE_ENABLED } from '@/lib/features'
 import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
-import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
+import { CONNECTION_TOKEN_KEY, DEFAULT_CONNECTION_MODELS, NO_BOX_BACKUPS, RERUN_CONNECTION_ID, canonicalModelId, canonicalModelIds, claudeTokenIssue, type AddableProvider, type AiConnectionView, type AiConnectionsView, type CustomProbeInput, type CustomProbeResult } from '@rerun/contracts'
 
 // The AI providers of a workspace, for both the web dialog's server actions and the app's /api/v1
 // routes. They live at the root of the engine's data dir, never under a Box: the workspace is the
@@ -107,6 +108,10 @@ export async function listAiConnections(workspaceId: number): Promise<BoxConnect
 
 export async function setWorkspaceDefaultModel(workspaceId: number, pick: BoxDefault | null): Promise<void> {
     await engineSetBoxDefault(await getWorkspaceConnection(workspaceId), pick)
+}
+
+export async function setWorkspaceBackupModels(workspaceId: number, next: BoxBackupModels): Promise<void> {
+    await engineSetBoxBackups(await getWorkspaceConnection(workspaceId), next)
 }
 
 // The widget already refuses these; this is the guard for every other caller.
@@ -299,7 +304,7 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
 // windows, credit) applied here, since the app has none of them.
 export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiConnectionsView> {
     const engine = await findWorkspaceEngine(ctx.workspace.id)
-    const list = engine ? await renameAliasedModels(engine.conn, await engineListConnections(engine.conn)) : { connections: [], default: null }
+    const list = engine ? await renameAliasedModels(engine.conn, await engineListConnections(engine.conn)) : { connections: [], default: null, backups: NO_BOX_BACKUPS }
     const credit = rerunCreditOf(ctx.workspace)
     const pick = effectiveDefault(list.default)
     const taken = list.connections.map(connection => connection.name)

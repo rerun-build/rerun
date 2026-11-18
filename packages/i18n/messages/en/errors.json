@@ -180,6 +180,7 @@
     "trialToConnectModel": "Start your free trial to connect your own model.",
     "endpointUnreachable": "Could not reach this endpoint",
     "setDefaultModelFailed": "Failed to set the workspace default model",
+    "setBackupModelsFailed": "Failed to save the backup models",
     "trialToConnectClaude": "Start your free trial to connect your own Claude plan or API key.",
     "createConnectionFailed": "Failed to create the connection",
     "updateConnectionFailed": "Failed to update the connection",

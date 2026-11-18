@@ -235,7 +235,8 @@
         "saveConnectionFailed": "Failed to save the connection",
         "codeExpired": "The code expired, start again",
         "deleteFailed": "Failed to delete the connection",
-        "defaultFailed": "Failed to change the default model"
+        "defaultFailed": "Failed to change the default model",
+        "backupsFailed": "Failed to save the backup models"
     },
     "addProvider": {
         "addKey": "Add key"
@@ -315,6 +316,7 @@
         "adminOnly": "Only an admin can change the AI providers",
         "groups": {
             "default": "Default model",
+            "backups": "Backups",
             "included": "Included",
             "plans": "Your subscriptions",
             "keys": "Your API keys",
@@ -339,6 +341,20 @@
             "stopped": "Coworkers with no model of their own are stopped. Fix {source} or pick another model.",
             "noOtherModel": "No other model is ready. Add a plan or an API key first.",
             "change": "Change"
+        },
+        "backups": {
+            "add": "Add backup",
+            "rank": "{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} · via {source}",
+            "rankNotReady": "{rank, selectordinal, one {#st} two {#nd} few {#rd} other {#th}} · {source} is not ready, skipped",
+            "moveUp": "Move {model} up",
+            "moveDown": "Move {model} down",
+            "remove": "Remove {model}",
+            "full": "Up to {max} backups",
+            "noneLeft": "No other model is ready. Add a plan or an API key first.",
+            "credit": {
+                "title": "Rerun credit as last resort",
+                "description": "Only when every plan is out"
+            }
         },
         "addSubscription": "Add subscription",
         "addApiKey": "Add API key"
