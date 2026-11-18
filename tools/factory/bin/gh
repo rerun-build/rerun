@@ -1,0 +1,46 @@
+#!/bin/sh
+KEY=${FACTORY_GH_KEY:-/data/tools/github/token}
+APP=${FACTORY_GH_APP:-/run/factory-token/token}
+REAL=${FACTORY_GH_REAL:-/data/tools/gh/bin/gh}
+if [ ! -r "$KEY" ]; then echo "gh wrapper: no GitHub token file yet ($KEY). Tell @boss." >&2; exit 78; fi
+export GH_CONFIG_DIR=${FACTORY_GH_CONFIG:-/data/tools/gh/config} GH_PROMPT_DISABLED=1 GH_NO_UPDATE_NOTIFIER=1
+export GIT_CONFIG_GLOBAL=${FACTORY_GIT_CONFIG:-/data/tools/git/gitconfig}
+case "$1 $2" in "auth token"|"auth status"|"auth login"|"auth logout"|"auth refresh"|"auth setup-git") echo "gh wrapper: 'gh auth' is disabled here." >&2; exit 64;; esac
+
+shared() {
+    GH_TOKEN=$(tr -d '\r\n' < "$KEY"); export GH_TOKEN
+    exec "$REAL" "$@"
+}
+
+APP_TOKEN=''
+APP_UNTIL=''
+if [ -r "$APP" ]; then
+    { IFS= read -r APP_TOKEN; IFS= read -r APP_UNTIL; } < "$APP" 2>/dev/null || true
+fi
+case "$APP_UNTIL" in ''|*[!0-9]*) shared "$@" ;; esac
+[ -n "$APP_TOKEN" ] && [ "$(date +%s)" -lt $((APP_UNTIL - 300)) ] || shared "$@"
+
+WORK=$(mktemp -d) || shared "$@"
+trap 'rm -rf "$WORK"' EXIT
+trap 'exit 143' TERM INT
+SAVED=''
+for a in "$@"; do
+    case "$a" in -|*=-|*=@-|@-|*/dev/stdin) SAVED=1; break ;; esac
+done
+[ -z "$SAVED" ] || cat > "$WORK/in"
+
+run_with() {
+    T=$1
+    shift
+    if [ -n "$SAVED" ]; then GH_TOKEN=$T "$REAL" "$@" < "$WORK/in"; else GH_TOKEN=$T "$REAL" "$@"; fi
+}
+
+{ run_with "$APP_TOKEN" "$@" 2> "$WORK/err"; echo $? > "$WORK/rc"; } | tee "$WORK/out"
+rc=$(cat "$WORK/rc")
+if [ "$rc" -ne 0 ] && [ ! -s "$WORK/out" ] && grep -qE 'Resource not accessible by integration|HTTP 40[34]|Could not resolve to a Repository|exceeded a secondary rate limit|submitted too quickly' "$WORK/err"; then
+    echo "gh wrapper: the factory App was refused here, so this ran again and used the shared key" >&2
+    run_with "$(tr -d '\r\n' < "$KEY")" "$@"
+    exit $?
+fi
+cat "$WORK/err" >&2
+exit "$rc"

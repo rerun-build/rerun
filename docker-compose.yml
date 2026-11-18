@@ -45,6 +45,7 @@ services:
       - rerun_engine_key
     volumes:
       - engine-data:/data
+      - factory-token:/run/factory-token:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
     shm_size: 2gb
@@ -61,6 +62,9 @@ services:
 volumes:
   engine-data:
     name: rerun_engine-data
+  factory-token:
+    name: rerun_factory-token
+    driver_opts: {type: tmpfs, device: tmpfs, o: "uid=10001,gid=10001,mode=0755,size=64k"}
 
 secrets:
   rerun_engine_key:

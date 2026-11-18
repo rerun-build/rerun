@@ -501,10 +501,10 @@ def stage_evidence(gh, st, f):
         return "NONE", str(e)
 
 TRUSTED_ASSOCIATIONS = ("OWNER", "MEMBER", "COLLABORATOR")
-FACTORY_LOGIN = "special-place-administrator"
+FACTORY_LOGINS = ("special-place-administrator", "moldwright-factory[bot]")
 
 def _trusted(item):
-    return item.get("author_association") in TRUSTED_ASSOCIATIONS or (item.get("user") or {}).get("login") == FACTORY_LOGIN
+    return item.get("author_association") in TRUSTED_ASSOCIATIONS or (item.get("user") or {}).get("login") in FACTORY_LOGINS
 
 def dev_roster(gh):
     try:
