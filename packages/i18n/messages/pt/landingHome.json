@@ -408,7 +408,8 @@
                     }
                 }
             }
-        }
+        },
+        "windowHint": "uma demo ao vivo. clique à vontade."
     },
     "cases": {
         "title": "Contrate <keep><chip>Coworkers</chip> de IA</keep>",

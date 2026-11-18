@@ -12,7 +12,8 @@
         "coworker.tools.gmail.typed2": "Typed letter by letter in a fixed-width window: 33 characters at most.",
         "coworker.always.place": "Where the Coworker's machine runs: a box id, then a city and its country.",
         "hero.screen": "A demo of the product playing inside a screen on the home page: Coworkers on a board, their chat threads, an inbox, the Chief of Staff. Names of companies and people are fictional and stay as they are.",
-        "hero.screen.foreman": "{writer}, {social}, {research}, {invoices} are Coworker job titles (hero.tiles.*.job) used as names: \"the Content Marketer\"."
+        "hero.screen.foreman": "{writer}, {social}, {research}, {invoices} are Coworker job titles (hero.tiles.*.job) used as names: \"the Content Marketer\".",
+        "hero.windowHint": "Small lowercase note in the title bar of the window that shows the live product demo; keep it lowercase and short."
     },
     "hero": {
         "title": {
@@ -423,7 +424,8 @@
                     }
                 }
             }
-        }
+        },
+        "windowHint": "a live demo. click around."
     },
     "cases": {
         "title": "Hire <keep>AI <chip>Coworkers</chip></keep>",

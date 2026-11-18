@@ -408,7 +408,8 @@
                     }
                 }
             }
-        }
+        },
+        "windowHint": "une démo en direct. cliquez partout."
     },
     "cases": {
         "title": "Embauchez des <keep><chip>Coworkers</chip> IA</keep>",
