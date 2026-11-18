@@ -7,6 +7,7 @@ type Service = {
   image?: unknown
   build?: { dockerfile?: unknown } | string
   environment?: Record<string, unknown> | unknown[]
+  env_file?: unknown
 }
 
 const root = fileURLToPath(new URL('../../../', import.meta.url))
