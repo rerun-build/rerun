@@ -111,18 +111,20 @@ class Resend(Cut):
     def test_a_note_of_another_stage_is_not_put_on_the_cut(self):
         self.build(TWO_STAGE)
         self.planned()
-        for k, v in (("handover", NOTE), ("handover_stage", "review"), ("handover_agent", "ss")):
+        for k, v in (("handover", NOTE), ("handover_stage", "review")):
             self.store.set("plan:5", k, v)
         self.station.once(1)
         self.assertNotIn("handover note", self.w.sends[0][1])
 
-    def test_a_note_of_another_agent_is_not_put_on_the_cut(self):
+    def test_a_re_send_to_the_other_coworker_of_the_same_stage_carries_the_note(self):
         self.build(TWO_STAGE)
-        self.planned()
-        for k, v in (("handover", NOTE), ("handover_stage", "cut"), ("handover_agent", "ike")):
-            self.store.set("plan:5", k, v)
-        self.station.once(1)
-        self.assertNotIn("handover note", self.w.sends[0][1])
+        self.seed(5, "cutting", "ss", "c1")
+        self.lose("ss", "c1", note=NOTE)
+        self.station.once(2)
+        self.seed(99, "cutting", "ss", "held")
+        self.station.once(3)
+        self.assertEqual(self.w.sends[0][0], "ike")
+        self.assertEqual(self.w.sends[0][1].split("\n")[0], LINE)
 
     def test_a_send_that_failed_keeps_the_note_for_the_next_try(self):
         self.build(TWO_STAGE)

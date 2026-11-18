@@ -41,12 +41,12 @@ class Handover(Base):
         self.tick(2)
         self.assertNotIn("handover note", " ".join(m for _, m, _ in self.w.sends[2:]))
 
-    def test_a_note_is_not_offered_to_another_coworker(self):
+    def test_a_note_is_offered_to_another_coworker_that_takes_the_step(self):
         self.tick()
         self.w.finish("b1", None, status="error")
-        self.w.runs["run1"]["handoverPath"] = NOTE
-        self.d.send(self.d.store.get_job("5"), "b2", "other", "plain", "building", 1)
-        self.assertEqual(self.w.sends[-1][1], "plain")
+        job = dict(self.d.store.get_job("5"), handover=NOTE)
+        self.d.send(job, "b2", "other", "plain", "building", 1)
+        self.assertEqual(self.w.sends[-1][1], LINE + "\n\nplain")
 
     def test_a_send_that_failed_keeps_the_note_and_the_next_send_still_carries_it(self):
         self.tick()

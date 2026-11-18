@@ -79,7 +79,7 @@ Continue from your handover note: <path> in the shared space (read it with your 
 ```
 
 - The dispatcher re-sends a job whose run ended without its goal line (build, review, proof, fix). It reads `handoverPath` from the run it already fetches.
-- Planning (`planning.py`) re-sends a lost PLAN, CUT, review or repair step once. A re-plan or revise is sent again with the same cut failure, review notes and answers it carried. The re-send is recorded on the plan record, so a second loss of the same step is blocked as before. The note is used only for the same step and the same coworker, and is kept until a run id is recorded.
+- Planning (`planning.py`) re-sends a lost PLAN, CUT, review or repair step once. A re-plan or revise is sent again with the same cut failure, review notes and answers it carried. The re-send is recorded on the plan record, so a second loss of the same step is blocked as before. The note is used only for the same step, by whichever coworker takes it, and is kept until a run id is recorded.
 
 For a chat run, such as Advisor to Boss, the note is kept and named in the run's error, but nothing re-sends it automatically.
 

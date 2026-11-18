@@ -984,7 +984,7 @@ class Dispatcher:
             j["run_model"] = run_model
 
     def send(self, j, agent, step, message, state, copy=1):
-        note = j.get("handover") if j.get("handover_by") == agent else None
+        note = j.get("handover")
         if state == "building" and self.store.get_all("-").get("room_probe") == "1":
             holds.arm(self.store, self.store.get_all("-").get("room_kind") or "load", self.now() + ROOM_PROBE_S)
             self.store.set("-", "room_probe", "sent")
@@ -1019,7 +1019,6 @@ class Dispatcher:
         self.store.fired(j["fire_id"], r["runId"])
         j.update(run=r["runId"], sending=None)
         j.pop("handover", None)
-        j.pop("handover_by", None)
         self.save(j, "sent " + step)
         log(j["issue"], "%s -> %s (run %s)%s" % (step, self.names.get(agent, agent[:8]), r["runId"],
                                                   " " + args["model"] + "/" + args["thinkingLevel"] if "model" in args else ""))
@@ -1039,7 +1038,6 @@ class Dispatcher:
             return self.clock_check(j, r)
         j.setdefault("warm", {})[j["agent"]] = [j["copy"], self.now()]
         j["handover"] = None if r.get("status") == "done" else r.get("handoverPath")
-        j["handover_by"] = j["agent"]
         self.record_tokens(j, r)
         ended = r.get("finishedAt")
         self.store.close_run(j["run"], {"done": "done", "cancelled": "cancelled"}.get(r.get("status"), "error"),
@@ -1172,7 +1170,6 @@ class Dispatcher:
         self.store.close_run(j["run"], "cancelled", error=why[:200])
         self.strike(j, False)
         j["handover"] = r.get("handoverPath")
-        j["handover_by"] = j["agent"]
         return self.failed_attempt(j, why, "cancel")
 
     def transient(self, j, reason, room=False):
