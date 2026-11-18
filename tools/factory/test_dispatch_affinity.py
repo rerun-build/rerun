@@ -1,6 +1,6 @@
 import unittest
 
-from test_dispatch import Base, HEAD, PR_LINE, World, ready, wf
+from test_dispatch import ACCEPT, Base, HEAD, PR_LINE, World, ready, wf
 from test_dispatch_proof import BODY
 import pools
 
@@ -49,7 +49,7 @@ class Warm(Base):
         self.tick(2)
         self.done("run2", PR_LINE)
         self.tick(2)
-        self.done("run3", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.done("run3", ACCEPT)
         self.done("run4", "bad\nVERDICT: REJECT @abcdef1: wrong sum")
         self.tick()
         self.w.clock += wait
@@ -82,7 +82,7 @@ class Warm(Base):
         self.w.issues[0]["body"] = BODY
         self.w.workflows[HEAD] = [wf("ci", "success")]
         self.to_review()
-        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.w.finish("r1", ACCEPT)
         self.tick(3)
         self.assertEqual(self.w.sends[-1][0], "r2")
         self.assertEqual(self.copy_of(), 1)

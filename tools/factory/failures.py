@@ -16,6 +16,8 @@ def kinds(old, new, msg):
         out.append("asked again")
     if old == "proving" and (msg.startswith("proof failed") or "proof:" in msg):
         out.append("proof fail")
+    if old == "reviewing" and "review without evidence" in msg:
+        out.append("review without evidence")
     if new in ENDS and WITHDRAWN not in msg:
         out.append("ended %s" % new)
     elif new == "fix_wait":

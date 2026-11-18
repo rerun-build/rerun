@@ -76,7 +76,7 @@ class Flow(P.ProofBase):
         self.tick()
         self.w.finish("b1", "PUSHED: fix")
         self.tick(2)
-        self.w.finish("r1", "ok\nVERDICT: ACCEPT @abcdef1")
+        self.w.finish("r1", P.T.ACCEPT)
         self.tick(2)
         self.tick()
         self.w.finish("r2", lines(3) + "\nPROOF: FAIL @abcdef1: 3")
