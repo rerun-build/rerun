@@ -45,7 +45,9 @@ export function ComputerJobCard({ computer, jobId, command, label }: { computer:
 
     const read = useCallback(async () => {
         const res = await computerJobAction(computer, jobId)
-        if (!res.ok) return setView(current => ({ job: current?.job ?? null, output: current?.output ?? '', offline: false, gone: true }))
+        // A read that failed is tried again at the next tick: the job is still running over there.
+        if (!res.ok) return
+        if (res.gone) return setView(current => ({ job: current?.job ?? null, output: current?.output ?? '', offline: false, gone: true }))
         setView(res.logs ? { job: res.logs.job, output: res.logs.output, offline: false } : current => ({ job: current?.job ?? null, output: current?.output ?? '', offline: true }))
     }, [computer, jobId])
 

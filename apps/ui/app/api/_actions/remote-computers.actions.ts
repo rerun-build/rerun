@@ -7,7 +7,8 @@ import { requireWorkspaceContext, type WorkspaceContext } from '@/app/api/_auth/
 import { addComputerRule, computerIdByHandle, computerJobLogs, computerJobs, linkComputer, listWorkspaceComputers, renameComputer, revokeComputer, stopComputerJob, updateComputerSettings, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
 import type { RemoteJob, RemoteJobLogs } from '@rerun/contracts'
 import type { ComputersList } from '@/lib/computers/types'
-import { assertComputersFor, canManageComputer, workspaceComputerItems } from '@/app/api/_services/remote-computer-items.service'
+import { assertComputersFor, canManageComputer, mentionComputerItems, workspaceComputerItems } from '@/app/api/_services/remote-computer-items.service'
+import { EngineRequestError } from '@/lib/engine/client'
 import { AppError, failure, failureOf, type ActionFailure } from '@/lib/i18n/action-error'
 import { remoteComputersFlag } from '@/flags'
 
@@ -22,6 +23,15 @@ export async function listComputersAction(): Promise<({ ok: true } & ComputersLi
     try {
         const ctx = await computersContext()
         return { ok: true, ...(await workspaceComputerItems(ctx)) }
+    } catch (err) {
+        return failureOf(err)
+    }
+}
+
+export async function listMentionComputersAction(): Promise<({ ok: true } & ComputersList) | ActionFailure> {
+    try {
+        const ctx = await computersContext()
+        return { ok: true, ...(await mentionComputerItems(ctx)) }
     } catch (err) {
         return failureOf(err)
     }
@@ -116,12 +126,15 @@ export async function computerJobsAction(computerId: string): Promise<{ ok: true
     }
 }
 
-// One job as the chat card shows it, read from the computer named by its #handle.
-export async function computerJobAction(handle: string, jobId: string): Promise<{ ok: true; logs: RemoteJobLogs | null } | ActionFailure> {
+// One job as the chat card shows it, read from the computer named by its #handle. `gone` says it
+// cannot be read any more: the computer was removed, or no longer knows the job. Any other failure
+// (the box restarting, the hub out of reach) is one to try again.
+export async function computerJobAction(handle: string, jobId: string): Promise<{ ok: true; logs: RemoteJobLogs | null; gone?: boolean } | ActionFailure> {
     try {
         const ctx = await computersContext()
         return { ok: true, logs: await computerJobLogs(ctx.workspace.id, handle, jobId) }
     } catch (err) {
+        if ((err instanceof AppError && err.code === 'computerNotFound') || (err instanceof EngineRequestError && err.status === 404)) return { ok: true, logs: null, gone: true }
         return failureOf(err)
     }
 }

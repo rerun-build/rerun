@@ -1,6 +1,6 @@
 'use client'
 
-import type { RemoteAccessMode, RemoteComputerSettingsPatch } from '@rerun/contracts'
+import { isInterpreterProgram, type RemoteAccessMode, type RemoteComputerSettingsPatch } from '@rerun/contracts'
 import { formatBytes, shortRelativeTime } from '@rerun/i18n/format'
 import { PanelRow, Skeleton } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
@@ -29,7 +29,6 @@ import { ComputerJobs } from './ComputerJobs'
 import { ThisComputerLinkRow } from './ThisComputer'
 
 const MODES: RemoteAccessMode[] = ['ask', 'remember', 'full']
-const INTERPRETERS = new Set(['python', 'python3', 'node', 'ruby', 'perl', 'php', 'deno', 'bun', 'pwsh', 'powershell'])
 
 type PanelProps = { list: ComputersList | null; error: string | null; onChanged: () => Promise<void> | void }
 
@@ -212,16 +211,24 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
     const [confirmRemove, setConfirmRemove] = useState(false)
     const [removing, setRemoving] = useState(false)
     const settings = computer.settings
-    const [mode, setMode] = useState<RemoteAccessMode>(settings?.mode ?? 'remember')
-    const [unattended, setUnattended] = useState(settings?.unattended ?? true)
+    // What the person just picked, shown until the box's own answer is read back: after a failed
+    // save the controls say what the computer follows, not what was clicked.
+    const [picked, setPicked] = useState<RemoteComputerSettingsPatch>({})
+    const mode: RemoteAccessMode = picked.mode ?? settings?.mode ?? 'remember'
+    const unattended = picked.unattended ?? settings?.unattended ?? true
     const readOnly = !computer.canManage
     const reason = readOnly ? t('managersOnly') : !settings ? t('settingsNeedEngine') : undefined
     const locked = readOnly || !settings
 
     const save = async (patch: RemoteComputerSettingsPatch) => {
-        const res = await updateComputerSettingsAction(computer.id, patch)
-        if (!res.ok) toast.error(errorText(res))
-        await onChanged()
+        setPicked(current => ({ ...current, ...patch }))
+        try {
+            const res = await updateComputerSettingsAction(computer.id, patch)
+            if (!res.ok) toast.error(errorText(res))
+            await onChanged()
+        } finally {
+            setPicked({})
+        }
     }
 
     const remove = async () => {
@@ -266,10 +273,7 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
                             <TooltipDisabledReason reason={reason}>
                                 <Select
                                     value={mode}
-                                    onValueChange={value => {
-                                        setMode(value as RemoteAccessMode)
-                                        void save({ mode: value as RemoteAccessMode })
-                                    }}
+                                    onValueChange={value => void save({ mode: value as RemoteAccessMode })}
                                     disabled={locked}
                                 >
                                     <SelectTrigger size="sm" className="w-44 shrink-0" aria-label={tDetail('modeLabel')}>
@@ -290,10 +294,7 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
                                 <Switch
                                     checked={unattended}
                                     aria-label={tDetail('unattended')}
-                                    onCheckedChange={value => {
-                                        setUnattended(value)
-                                        void save({ unattended: value })
-                                    }}
+                                    onCheckedChange={value => void save({ unattended: value })}
                                     disabled={locked}
                                 />
                             </TooltipDisabledReason>
@@ -306,7 +307,7 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
                         <div className="flex flex-wrap gap-1.5">
                             {settings.allowedPrograms.length === 0 && settings.allowedFolders.length === 0 && <p className="text-xs text-muted-foreground">{tDetail('nothingAllowed')}</p>}
                             {settings.allowedPrograms.map(program => (
-                                <AllowedChip key={program} icon={TerminalIcon} label={program} reason={reason} warn={INTERPRETERS.has(program.toLowerCase())} onRemove={() => save({ allowedPrograms: settings.allowedPrograms.filter(item => item !== program) })} />
+                                <AllowedChip key={program} icon={TerminalIcon} label={program} reason={reason} warn={isInterpreterProgram(program)} onRemove={() => save({ allowedPrograms: settings.allowedPrograms.filter(item => item !== program) })} />
                             ))}
                             {settings.allowedFolders.map(folder => (
                                 <AllowedChip key={folder} icon={FolderIcon} label={folder} reason={reason} onRemove={() => save({ allowedFolders: settings.allowedFolders.filter(item => item !== folder) })} />

@@ -3,7 +3,7 @@ import { remoteOsSchema } from '@rerun/contracts'
 
 import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 import { resolveMemberIdentities } from '@/app/api/_services/members.service'
-import { listWorkspaceComputers, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
+import { hasLinkedComputers, listWorkspaceComputers, type WorkspaceComputer } from '@/app/api/_services/remote-computers.service'
 import type { ComputerItem, ComputersList, ComputerStatus } from '@/lib/computers/types'
 import { AppError } from '@/lib/i18n/action-error'
 import { REMOTE_COMPUTERS_RELEASED } from '@/lib/features'
@@ -54,4 +54,11 @@ async function toItems(ctx: WorkspaceContext, computers: WorkspaceComputer[]): P
 export async function workspaceComputerItems(ctx: WorkspaceContext): Promise<ComputersList> {
     const { computers, engine } = await listWorkspaceComputers(ctx.workspace.id)
     return { computers: await toItems(ctx, computers), engine }
+}
+
+// What `#` offers in a composer, read each time one opens. A workspace without a computer, nearly
+// all of them, answers without a call to its box.
+export async function mentionComputerItems(ctx: WorkspaceContext): Promise<ComputersList> {
+    if (!(await hasLinkedComputers(ctx.workspace.id))) return { computers: [], engine: 'none' }
+    return workspaceComputerItems(ctx)
 }

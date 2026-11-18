@@ -13,7 +13,7 @@ import { EngineRequestError } from '@/lib/engine/client'
 import type { EngineConnection } from '@/lib/engine/types'
 import { AppError } from '@/lib/i18n/action-error'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { selectAll, selectMaybeSingle } from '@/supabase/supabase-helpers'
+import { selectAll, selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
 
 // The computers people link to a workspace from the desktop app. The hub holds who they are and the
 // token each app keeps (its hash only); the workspace's engine holds the socket, the rules and the
@@ -211,6 +211,7 @@ export async function listWorkspaceComputers(workspaceId: number): Promise<{ com
     } catch {
         return { computers: rows.map(row => ({ ...row, view: null })), engine: 'unreachable' }
     }
+    await forgetUnlinkedOnEngine(workspaceId, engine.conn, rows, views)
     const byId = new Map(views.map(view => [view.id, view]))
     const missing = rows.filter(row => !byId.has(row.id))
     for (const row of missing) {
@@ -218,6 +219,23 @@ export async function listWorkspaceComputers(workspaceId: number): Promise<{ com
         if (view) byId.set(row.id, view)
     }
     return { computers: rows.map(row => ({ ...row, view: byId.get(row.id) ?? null })), engine: 'ok' }
+}
+
+// A box that could not be told of an unlink (it was away, or the call failed) still lists the
+// computer, and would keep a new one of the same handle out of reach. Only a computer the hub holds
+// as unlinked is taken off: one it does not know at all may belong to another hub of the same box.
+async function forgetUnlinkedOnEngine(workspaceId: number, conn: EngineConnection, rows: RemoteComputerRow[], views: RemoteComputerView[]): Promise<void> {
+    const linked = new Set(rows.map(row => row.id))
+    for (const view of views) {
+        if (linked.has(view.id)) continue
+        const { data: row } = await selectMaybeSingle(createServiceRoleClient(), 'remote_computers', ['id', 'revoked_at'] as const, { id: view.id, workspace_id: workspaceId })
+        if (row?.revoked_at) await deleteRemoteComputer(conn, view.id).catch(err => console.warn('[computers] engine still lists an unlinked computer', err))
+    }
+}
+
+export async function hasLinkedComputers(workspaceId: number): Promise<boolean> {
+    const { data } = await selectCount(createServiceRoleClient(), 'remote_computers', { workspace_id: workspaceId, revoked_at: { isNull: true } })
+    return (data ?? 0) > 0
 }
 
 // A computer of the workspace named by its #handle, as the chat names it.

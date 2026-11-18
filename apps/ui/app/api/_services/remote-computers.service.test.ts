@@ -242,6 +242,17 @@ describe('listWorkspaceComputers', () => {
         ])
     })
 
+    it('takes off the box a computer the hub holds as unlinked, and leaves one it does not know', async () => {
+        await link()
+        await link({ name: 'Laptop' })
+        computers[1].revoked_at = new Date().toISOString()
+        vi.mocked(listRemoteComputers).mockResolvedValue([{ id: 'c1', online: true }, { id: 'c2', online: false }, { id: 'from-another-hub', online: true }] as never)
+        vi.mocked(deleteRemoteComputer).mockClear()
+        const { computers: listed } = await service.listWorkspaceComputers(7)
+        expect(listed.map(row => row.handle)).toEqual(['studio-pc'])
+        expect(vi.mocked(deleteRemoteComputer).mock.calls.map(call => call[1])).toEqual(['c2'])
+    })
+
     it('reads every computer offline when the box does not answer, is too old, or is missing', async () => {
         await link()
         vi.mocked(listRemoteComputers).mockRejectedValue(new Error('timeout'))

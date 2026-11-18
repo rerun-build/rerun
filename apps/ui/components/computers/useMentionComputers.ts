@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { listComputersAction } from '@/app/api/_actions/remote-computers.actions'
+import { listMentionComputersAction } from '@/app/api/_actions/remote-computers.actions'
 import type { MentionComputer } from '@/components/chat/MentionAutocomplete'
 import { useRemoteComputersEnabled } from '@/components/layout/FeatureFlagsProvider'
 
@@ -18,7 +18,7 @@ export function useMentionComputers(): { computers: MentionComputer[]; refresh: 
     const refresh = useCallback(() => {
         if (!enabled || Date.now() - readAt.current < FRESH_MS) return
         readAt.current = Date.now()
-        void listComputersAction().then(res => {
+        void listMentionComputersAction().then(res => {
             if (res.ok) setComputers(res.computers.map(({ id, name, handle, os, status }) => ({ id, name, handle, os, status })))
         })
     }, [enabled])
