@@ -112,6 +112,7 @@ class CloneNew(CloneCase):
         self.commit(p, "first.txt")
 
     def test_clone_from_the_mirror_survives_the_mirror_being_pruned_and_removed(self):
+        self.C.set_mode("clone", "test")
         self.call(lambda _: self.M.refresh(FULL), [])
         code, out = self.new()
         self.assertEqual(code, 0, out)
@@ -128,6 +129,7 @@ class CloneNew(CloneCase):
         self.assertTrue(self.remote_sha("refs/heads/chunk/7-1"))
 
     def test_a_mirror_behind_github_still_gives_todays_base(self):
+        self.C.set_mode("clone", "test")
         self.call(lambda _: self.M.refresh(FULL), [])
         seed = os.path.join(self.tmp, "seed")
         new = self.commit(seed, "later.txt")
@@ -137,6 +139,7 @@ class CloneNew(CloneCase):
         self.assertEqual(T.git(self.folder(), "rev-parse", "HEAD"), new)
 
     def test_github_unreachable_starts_from_the_mirror_and_says_so(self):
+        self.C.set_mode("clone", "test")
         self.call(lambda _: self.M.refresh(FULL), [])
         os.remove(os.path.join(self.tmp, "github.com", "special-place-ai-heaven", "rerun.git"))
         code, out = self.new()
@@ -172,6 +175,7 @@ class CloneNew(CloneCase):
                     self.assertNotIn(tok.encode(), fh.read(), os.path.join(d, f))
 
     def test_a_failed_github_fetch_of_a_job_branch_base_is_transient(self):
+        self.C.set_mode("clone", "test")
         self.call(lambda _: self.M.refresh(FULL), [])
         T.git(self.origin, "update-ref", "-d", "refs/heads/dev")
         code, out = self.new()
@@ -261,6 +265,7 @@ class KillAtEveryStep(CloneCase):
         self.assertEqual(os.listdir(self.C.tmp_root()), [])
 
     def test_killed_after_the_clone_from_the_mirror(self):
+        self.C.set_mode("clone", "test")
         self.call(lambda _: self.M.refresh(FULL), [])
         code, out = self.new(T_KILL="cloned")
         self.assertEqual(code, 137, out)
@@ -270,6 +275,7 @@ class KillAtEveryStep(CloneCase):
         self.assert_ready(self.folder())
 
     def test_killed_after_the_fetch_from_the_mirror(self):
+        self.C.set_mode("clone", "test")
         self.call(lambda _: self.M.refresh(FULL), [])
         self.check(T_KILL="fetched")
 

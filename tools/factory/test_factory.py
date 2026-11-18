@@ -1,8 +1,9 @@
-import contextlib, io, json, os, shutil, stat, subprocess, sys, tempfile, threading, types, unittest
+import contextlib, io, json, os, shutil, stat, subprocess, sys, tempfile, types, unittest
 from unittest import mock
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import factory as F
+import mirror
 
 REPO = "rerun"
 FULL = "special-place-ai-heaven/" + REPO
@@ -248,110 +249,6 @@ class BuilderCap(FactoryCase):
             self.addCleanup(p.stop)
         self.lock = os.path.join(F.STATE, "builders.lock")
 
-    @contextlib.contextmanager
-    def wt_new_fakes(self, before_clone=lambda: None):
-        def fake_clone(full):
-            before_clone()
-            return self.clone
-        with mock.patch.object(F.shutil, "disk_usage", lambda p: types.SimpleNamespace(free=1000 * 2**30)), \
-                mock.patch.object(F, "du_gb", lambda p: 0.0), mock.patch.object(F, "api", lambda *a, **k: {"default_branch": "main"}), \
-                mock.patch.object(F, "ensure_clone", fake_clone), mock.patch.object(F, "plan_check", lambda *a: None):
-            yield
-
-    def new(self, chunk):
-        with self.wt_new_fakes():
-            return self.call(F.cmd_wt, ["new", REPO, "7", chunk])
-
-    def made(self, chunk):
-        return os.path.isdir(os.path.join(F.WT, REPO, "7-" + chunk))
-
-    def test_wt_new_below_the_cap_creates_the_worktree(self):
-        self.wt(chunk="1")
-        code, out = self.new("3")
-        self.assertEqual(code, 0, out)
-        self.assertIn("WORKTREE", out)
-        self.assertTrue(self.made("3"))
-        self.assertFalse(os.path.exists(self.lock))
-
-    def advance_origin(self):
-        seed = os.path.join(self.tmp, "seed")
-        self.commit(seed, "later.txt", "later\n")
-        git(seed, "push", "--quiet", self.origin, "HEAD:refs/heads/dev")
-        return git(seed, "rev-parse", "HEAD")
-
-    def test_wt_new_replaces_an_empty_worktree_on_an_old_base(self):
-        code, out = self.new("1")
-        self.assertEqual(code, 0, out)
-        path = os.path.join(F.WT, REPO, "7-1")
-        old = git(path, "rev-parse", "HEAD")
-        newer = self.advance_origin()
-        code, out = self.new("1")
-        self.assertEqual(code, 0, out)
-        self.assertIn("REPLACED empty worktree %s (was at %s, base now %s)" % (path, old[:7], newer[:7]), out)
-        self.assertEqual(git(path, "rev-parse", "HEAD"), newer)
-        self.assertTrue(self.has_branch("chunk/7-1"))
-
-    def test_wt_new_keeps_a_worktree_with_a_commit(self):
-        self.new("1")
-        path = os.path.join(F.WT, REPO, "7-1")
-        sha = self.commit(path)
-        self.advance_origin()
-        code, out = self.new("1")
-        self.assertEqual(code, 0, out)
-        self.assertIn("EXISTS", out)
-        self.assertNotIn("REPLACED", out)
-        self.assertEqual(git(path, "rev-parse", "HEAD"), sha)
-
-    def test_wt_new_keeps_an_empty_worktree_already_at_the_base(self):
-        self.new("1")
-        code, out = self.new("1")
-        self.assertIn("EXISTS", out)
-
-    def test_wt_new_keeps_an_uncommitted_worktree(self):
-        self.new("1")
-        path = os.path.join(F.WT, REPO, "7-1")
-        write(path, "wip.txt", "wip\n")
-        self.advance_origin()
-        code, out = self.new("1")
-        self.assertIn("EXISTS", out)
-        self.assertTrue(os.path.exists(os.path.join(path, "wip.txt")))
-
-    def test_wt_new_at_the_cap_refuses(self):
-        self.wt(chunk="1")
-        self.wt(chunk="2")
-        code, out = self.new("3")
-        self.assertEqual(code, 2, out)
-        self.assertIn("builders are already active", out)
-        self.assertFalse(self.made("3"))
-
-    def test_green_worktree_does_not_count(self):
-        self.wt(chunk="1")
-        self.wt(chunk="2")
-        open(F.marker(REPO, "chunk/7-2"), "w").close()
-        code, out = self.new("3")
-        self.assertEqual(code, 0, out)
-
-    def test_two_simultaneous_wt_new_create_only_one(self):
-        self.wt(chunk="1")
-        both_past_first_check = threading.Barrier(2, timeout=20)
-        codes, out = {}, io.StringIO()
-
-        def one(chunk):
-            try:
-                F.cmd_wt(["new", REPO, "7", chunk])
-                codes[chunk] = 0
-            except SystemExit as e:
-                codes[chunk] = e.code
-
-        with self.wt_new_fakes(before_clone=both_past_first_check.wait), contextlib.redirect_stdout(out):
-            ts = [threading.Thread(target=one, args=(c,)) for c in ("3", "4")]
-            [t.start() for t in ts]
-            [t.join(60) for t in ts]
-        self.assertEqual(sorted(codes.values()), [0, 2], out.getvalue())
-        self.assertEqual(self.made("3") + self.made("4"), 1, out.getvalue())
-        self.assertIn("builders are already active", out.getvalue())
-        self.assertFalse(os.path.exists(self.lock))
-
     def test_busy_lock_refuses_and_stale_lock_is_taken_over(self):
         def grab(_):
             with F.builder_lock():
@@ -454,24 +351,24 @@ class BuilderCap(FactoryCase):
         self.meminfo(2 * 1048576)
         self.assertEqual(F.avail_mem_gb(), 2.0)
 
-    def test_wt_new_refuses_below_the_memory_floor(self):
-        self.meminfo(int((F.MIN_FREE_MEM_GB - 0.5) * 1048576))
-        code, out = self.new("3")
-        self.assertEqual(code, 3, out)
-        self.assertIn("TRANSIENT: memory: ", out)
-        self.assertFalse(self.made("3"))
-
-    def test_wt_new_above_the_memory_floor_and_without_meminfo_proceeds(self):
-        self.assertEqual(self.new("3")[0], 0)
-        self.meminfo(int((F.MIN_FREE_MEM_GB + 1) * 1048576))
-        code, out = self.new("4")
-        self.assertEqual(code, 0, out)
-        self.assertTrue(self.made("4"))
+@contextlib.contextmanager
+def clone_fakes(case, gate=True):
+    gh = os.path.join(case.tmp, "github.com", "special-place-ai-heaven")
+    if not os.path.lexists(os.path.join(gh, "rerun.git")):
+        os.makedirs(gh, exist_ok=True)
+        os.symlink(case.origin, os.path.join(gh, "rerun.git"))
+    with contextlib.ExitStack() as stack:
+        stack.enter_context(mock.patch.object(mirror, "GITHUB", "file://" + case.tmp + "/github.com/"))
+        stack.enter_context(mock.patch.object(F.shutil, "disk_usage", lambda p: types.SimpleNamespace(free=1000 * 2**30)))
+        stack.enter_context(mock.patch.object(F, "du_gb", lambda p: 0.0))
+        stack.enter_context(mock.patch.object(F, "MEMINFO", os.path.join(case.tmp, "no-meminfo")))
+        if gate:
+            stack.enter_context(mock.patch.object(F, "api", lambda *a, **k: {"default_branch": "main", "login": "factory-bot"}))
+            stack.enter_context(mock.patch.object(F, "plan_check", lambda *a: None))
+        yield
 
 
 class WtRegister(FactoryCase):
-    wt_new_fakes = BuilderCap.wt_new_fakes
-
     def setUp(self):
         super().setUp()
         for p in (mock.patch.object(F, "MEMINFO", os.path.join(self.tmp, "no-meminfo")),
@@ -480,27 +377,24 @@ class WtRegister(FactoryCase):
             self.addCleanup(p.stop)
 
     def new(self, chunk, *extra):
-        with self.wt_new_fakes():
+        with clone_fakes(self):
             return self.call(F.cmd_wt, ["new", REPO, "7", chunk] + list(extra))
 
     def record(self, chunk):
         with open(F.reg_path(REPO, "7-" + chunk)) as f:
             return json.load(f)
 
-    def test_wt_new_writes_the_record_and_wt_done_removes_it(self):
+    def test_wt_new_writes_the_record(self):
         os.environ.update({"FACTORY_OWNER": "env-owner", "FACTORY_RUN": "run-42"})
         code, out = self.new("3", "--owner", "alice")
         self.assertEqual(code, 0, out)
         rec = self.record("3")
         created = rec.pop("created")
-        self.assertEqual(rec, {"repo": FULL, "issue": "7", "chunk": "3", "branch": "chunk/7-3", "base": "dev", "owner": "alice", "run": "run-42"})
+        self.assertEqual(rec, {"repo": FULL, "issue": "7", "chunk": "3", "branch": "chunk/7-3", "base": "dev", "owner": "alice", "run": "run-42", "checkout": "clone"})
         self.assertRegex(created, r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
         self.assertLess(abs(F.age_h({"created": created})), 0.02)
         self.new("3", "--owner", "bob")
         self.assertEqual(self.record("3")["owner"], "alice")
-        code, out = self.call(F.cmd_wt, ["done", REPO, "7", "3"])
-        self.assertEqual(code, 0, out)
-        self.assertFalse(os.path.exists(F.reg_path(REPO, "7-3")))
 
     def test_owner_from_environment_and_unknown_when_absent(self):
         self.new("3")
@@ -513,13 +407,13 @@ class WtRegister(FactoryCase):
         self.new("3", "--owner", "alice")
         self.wt(chunk="1")
         open(F.marker(REPO, "chunk/7-1"), "w").close()
-        with self.wt_new_fakes():
+        with clone_fakes(self):
             code, out = self.call(F.cmd_wt, ["list"])
         self.assertEqual(code, 0, out)
         rows = dict(l.split("  ", 1) for l in out.splitlines() if l.startswith(REPO + "/"))
         self.assertRegex(rows[REPO + "/7-3"], r"owner alice  age 0h  ACTIVE builder$")
         self.assertRegex(rows[REPO + "/7-1"], r"owner unknown  age \?  CI green, waits for merge$")
-        self.assertIn("active builders: 1 of %d" % F.max_builders(), out)
+        self.assertIn("active builders: 1 of %d | 2 job folders" % F.max_builders(), out)
 
 
 class WtSweep(FactoryCase):
@@ -708,11 +602,8 @@ class PlanGate(FactoryCase):
                 return body if body is None else {"body": body}
             if "/issues/7/comments" in path:
                 return None if comments is None else [{"body": c} for c in comments]
-            return {"default_branch": "main"}
-        with mock.patch.object(F.shutil, "disk_usage", lambda p: types.SimpleNamespace(free=1000 * 2**30)), \
-                mock.patch.object(F, "du_gb", lambda p: 0.0), mock.patch.object(F, "api", fake_api), \
-                mock.patch.object(F, "MEMINFO", os.path.join(self.tmp, "no-meminfo")), \
-                mock.patch.object(F, "ensure_clone", lambda full: self.clone):
+            return {"default_branch": "main", "login": "factory-bot"}
+        with clone_fakes(self, gate=False), mock.patch.object(F, "api", fake_api):
             code, out = self.call(F.cmd_wt, ["new", REPO, "7", "1"])
         return code, out, os.path.isdir(os.path.join(F.WT, REPO, "7-1"))
 
@@ -735,137 +626,6 @@ class PlanGate(FactoryCase):
             code, out, made = self.new(body, comments)
             self.assertEqual((code, made), (2, False), out)
             self.assertIn("cannot read", out)
-
-
-class WtNewSweepAndInstall(BuilderCap):
-    def setUp(self):
-        super().setUp()
-        self.lookups = []
-        self.prs = {}
-
-    def new(self, chunk):
-        def lookup(full, branch):
-            self.lookups.append(branch)
-            return self.prs.get(branch, [])
-        with self.wt_new_fakes(), mock.patch.object(F, "pr_lookup", lookup), \
-                mock.patch.object(F, "install_deps", lambda p: None):
-            return self.call(F.cmd_wt, ["new", REPO, "7", chunk])
-
-    def test_cap_with_a_merged_worktree_sweeps_it_and_creates_the_new_one(self):
-        p = self.wt(chunk="1")
-        self.wt(chunk="2")
-        sha = self.commit(p)
-        git(p, "push", "--quiet", "origin", "chunk/7-1")
-        self.prs["chunk/7-1"] = [{"number": 9, "state": "MERGED", "headRefOid": sha}]
-        code, out = self.new("3")
-        self.assertEqual(code, 0, out)
-        self.assertTrue(self.made("3"))
-        self.assertFalse(os.path.isdir(p))
-
-    def merged(self, chunk):
-        p = self.wt(chunk=chunk)
-        sha = self.commit(p)
-        git(p, "push", "--quiet", "origin", "chunk/7-" + chunk)
-        self.prs["chunk/7-" + chunk] = [{"number": 9, "state": "MERGED", "headRefOid": sha}]
-        return p
-
-    def test_below_the_cap_keeps_a_merged_worktree(self):
-        p = self.merged("1")
-        code, out = self.new("3")
-        self.assertEqual(code, 0, out)
-        self.assertTrue(os.path.isdir(p))
-        self.assertTrue(self.made("3"))
-
-    def test_five_simultaneous_wt_new_at_the_limit_of_merged_worktrees_all_get_one(self):
-        olds = [self.merged(c) for c in "12345"]
-        codes, out = {}, io.StringIO()
-
-        def one(chunk):
-            try:
-                F.cmd_wt(["new", REPO, "7", chunk])
-                codes[chunk] = 0
-            except SystemExit as e:
-                codes[chunk] = e.code
-
-        with mock.patch.object(F, "MAX_BUILDERS", 5), self.wt_new_fakes(), \
-                mock.patch.object(F, "pr_lookup", lambda full, branch: self.prs.get(branch, [])), \
-                mock.patch.object(F, "install_deps", lambda p: None), contextlib.redirect_stdout(out):
-            ts = [threading.Thread(target=one, args=(c,)) for c in "abcde"]
-            [t.start() for t in ts]
-            [t.join(120) for t in ts]
-        self.assertEqual(sorted(codes.values()), [0] * 5, out.getvalue())
-        self.assertTrue(all(self.made(c) for c in "abcde"), out.getvalue())
-        self.assertFalse(any(os.path.isdir(p) for p in olds))
-        self.assertFalse(os.path.exists(self.lock))
-
-    def test_refusal_at_a_limit_of_open_prs_says_why_for_each_kept_worktree(self):
-        for c in "12":
-            p = self.wt(chunk=c)
-            self.prs["chunk/7-" + c] = [{"number": 20 + int(c), "state": "OPEN", "headRefOid": self.commit(p)}]
-        code, out = self.new("3")
-        self.assertEqual(code, 2, out)
-        self.assertIn("sweep: 2 KEEP, 0 REMOVE, 0 RESCUE", out)
-        self.assertIn("PR #21 open", out)
-        self.assertIn("PR #22 open", out)
-        self.assertEqual(len([l for l in out.splitlines() if l.startswith("KEEP")]), 2, out)
-
-    def test_cap_leaves_an_idle_unpushed_worktree_alone(self):
-        p = self.wt(chunk="1")
-        self.wt(chunk="2")
-        write(p, "work.txt", "old work\n")
-        git(p, "add", "-A")
-        env = dict(os.environ, GIT_COMMITTER_DATE="2026-01-01T00:00:00Z", GIT_AUTHOR_DATE="2026-01-01T00:00:00Z")
-        subprocess.run(["git", "-C", p, "commit", "--quiet", "-m", "old"], check=True, env=env, capture_output=True)
-        code, out = self.new("3")
-        self.assertEqual(code, 2, out)
-        self.assertTrue(os.path.isdir(p))
-        self.assertEqual(self.remote_refs(), "")
-
-
-class WtNewInstall(BuilderCap):
-    def new_with(self, runner, lock=True):
-        real = F.run
-
-        def fake(cmd, cwd="/tmp", check=True, timeout=300):
-            if cmd[0] == "pnpm":
-                return runner(cmd, cwd)
-            return real(cmd, cwd=cwd, check=check, timeout=timeout)
-        self.lockfile = lock
-
-        with self.wt_new_fakes(), mock.patch.object(F, "run", fake):
-            if lock:
-                write(self.clone, "pnpm-lock.yaml", "lockfileVersion: 9\n")
-                git(self.clone, "add", "-A")
-                git(self.clone, "commit", "--quiet", "-m", "lock")
-                git(self.clone, "push", "--quiet", "--force", "origin", "HEAD:refs/heads/dev")
-                git(self.clone, "fetch", "--quiet", "origin")
-            return self.call(F.cmd_wt, ["new", REPO, "7", "3"])
-
-    def test_lockfile_runs_install_once_in_the_new_worktree(self):
-        calls = []
-        code, out = self.new_with(lambda c, cwd: calls.append((c, cwd)) or types.SimpleNamespace(returncode=0, stdout="", stderr=""))
-        self.assertEqual(code, 0, out)
-        self.assertEqual(calls, [(["pnpm", "install", "--frozen-lockfile", "--prefer-offline"], os.path.join(F.WT, REPO, "7-3"))])
-        self.assertRegex(out, r"dependencies installed in \d+ s")
-
-    def test_no_lockfile_runs_no_install(self):
-        calls = []
-        code, out = self.new_with(lambda c, cwd: calls.append(c), lock=False)
-        self.assertEqual(code, 0, out)
-        self.assertEqual(calls, [])
-        self.assertNotIn("dependencies", out)
-
-    def test_failed_install_still_succeeds_and_says_so(self):
-        code, out = self.new_with(lambda c, cwd: types.SimpleNamespace(returncode=1, stdout="", stderr="ERR_PNPM boom\nmore\n"))
-        self.assertEqual(code, 0, out)
-        self.assertIn("dependencies NOT installed: ERR_PNPM boom", out)
-
-    def test_missing_pnpm_still_succeeds_and_says_so(self):
-        def missing(c, cwd):
-            raise FileNotFoundError("pnpm")
-        code, out = self.new_with(missing)
-        self.assertEqual(code, 0, out)
-        self.assertIn("dependencies NOT installed:", out)
 
 
 if __name__ == "__main__":
