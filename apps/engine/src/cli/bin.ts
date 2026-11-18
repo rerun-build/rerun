@@ -13,6 +13,7 @@ import { serviceCommand } from './commands/service.js'
 import { restoreFinalizeCommand } from './commands/restore-finalize.js'
 import { snapshotCommand } from './commands/snapshot.js'
 import { redactCommand } from './commands/redact.js'
+import { sharedEnvCommand } from './commands/shared-env.js'
 
 const HELP = `rerun-engine
 
@@ -25,6 +26,10 @@ Usage:
   rerun agent list                List agents
   rerun agent delete <id>         Delete an agent
   rerun redact <agentId>          Remove a value read from stdin from a coworker's run history
+  rerun shared-env list           List the shared variables every coworker gets (values are not shown)
+  rerun shared-env set <NAME>     Set a shared variable (value from stdin)
+  rerun shared-env remove <NAME>  Remove a shared variable
+  rerun shared-env run <cmd> [args]  Run a command with the shared variables
   rerun skill list <agentId>      List an agent's skills
   rerun schedule list <agentId>   List an agent's scheduled tasks
   rerun mcp login <id> <server>   Sign in to an OAuth MCP server
@@ -59,6 +64,8 @@ async function main() {
             return agentCommand(rest)
         case 'redact':
             return redactCommand(rest)
+        case 'shared-env':
+            return sharedEnvCommand(rest)
         case 'skill':
             return skillCommand(rest)
         case 'schedule':

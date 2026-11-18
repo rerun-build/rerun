@@ -4,16 +4,22 @@ import { resolve } from 'node:path'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-process-env-'))
 
-const { describe, expect, it } = await import('vitest')
+const { afterEach, describe, expect, it } = await import('vitest')
+const { rm } = await import('node:fs/promises')
 const { agentConfigSchema } = await import('@rerun/contracts')
 const { agentProcessEnv } = await import('./process-env.js')
-const { agentDataDbPath, sharedDbPath, workspaceDir } = await import('../config/paths.js')
+const { agentDataDbPath, dataDir, sharedDbPath, workspaceDir } = await import('../config/paths.js')
+const { writeSharedEnv } = await import('./shared-env.js')
 
 function agent(tools: Record<string, boolean>, env: Record<string, string> = {}) {
     return { id: 'env-agent', env, config: agentConfigSchema.parse({ name: 'Env test', tools }) }
 }
 
 describe('agentProcessEnv', () => {
+    afterEach(async () => {
+        await rm(resolve(dataDir(), 'shared.env'), { force: true })
+    })
+
     it('names the workspace and the private database, and creates them', () => {
         const { cwd, env } = agentProcessEnv(agent({ sharedDb: false }))
         expect(cwd).toBe(workspaceDir('env-agent'))
@@ -52,5 +58,13 @@ describe('agentProcessEnv', () => {
     it('gives the old result when labels are omitted', () => {
         expect(agentProcessEnv(agent({ sharedDb: true }), undefined)).toEqual(agentProcessEnv(agent({ sharedDb: true })))
         expect(agentProcessEnv(agent({ sharedDb: true }), {})).toEqual(agentProcessEnv(agent({ sharedDb: true })))
+    })
+
+    it('fills a missing name from the shared variables and lets the coworker value win', async () => {
+        await writeSharedEnv({ GH_TOKEN: 'tok-shared-12345', EVEROS_URL: 'https://everos.example', RERUN_WORKSPACE: '/shared' })
+        const { env } = agentProcessEnv(agent({ sharedDb: false }, { GH_TOKEN: 'own-token-123456' }))
+        expect(env.GH_TOKEN).toBe('own-token-123456')
+        expect(env.EVEROS_URL).toBe('https://everos.example')
+        expect(env.RERUN_WORKSPACE).toBe(workspaceDir('env-agent'))
     })
 })

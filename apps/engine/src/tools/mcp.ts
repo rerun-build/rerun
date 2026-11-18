@@ -13,6 +13,7 @@ import { withInstalledPackage } from './mcp-packages.js'
 import { resolveServerSecrets } from './mcp-resolve.js'
 import { toToolInputSchema } from './mcp-schema.js'
 import { logger } from '../lib/logger.js'
+import { readSharedEnvSync } from '../agents/shared-env.js'
 
 export type McpSpawn = { cwd: string; env: Record<string, string> }
 export type McpTool = Awaited<ReturnType<Client['listTools']>>['tools'][number]
@@ -81,7 +82,7 @@ export function mcpToolSet(serverName: string, tools: McpTool[], call: McpCall):
 }
 
 export async function prepareMcpServer(agentId: string, server: McpServer, env: Record<string, string>, hubAgentId = agentId): Promise<McpServer> {
-    const resolvable = { ...env, RERUN_WORKSPACE: workspaceDir(agentId) }
+    const resolvable = { ...readSharedEnvSync(), ...env, RERUN_WORKSPACE: workspaceDir(agentId) }
     return withInstalledPackage(withHubHeaders(resolveServerSecrets(await withAuth(agentId, server), resolvable), hubAgentId))
 }
 

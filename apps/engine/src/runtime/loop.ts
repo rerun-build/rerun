@@ -57,6 +57,7 @@ import { authorMetadata, sendNotification, type NotificationKind } from './notif
 import { emitRunTerminal } from './run-events.js'
 import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, errorMessageOf, isFailedFinish, ProviderRefusedError, ProviderStreamCutError, RUN_ERROR_CODES, refusalReason, unreachableEndpointError, type RunErrorCode } from './provider-errors.js'
 import { createLiveCounter, type LiveCounter } from './live-counter.js'
+import { readSharedEnvSync, secretValuesOf } from '../agents/shared-env.js'
 
 export type RunOutcome = { kind: 'done' | 'error' | 'cancelled'; error?: string; errorCode?: RunErrorCode | null }
 
@@ -180,7 +181,7 @@ function redactSecrets(text: string, secrets: string[]): string {
 }
 
 function runSecrets(agent: LoadedAgent): string[] {
-    return [...Object.values(agent.env), ...Object.values(agent.resolved.connection?.env ?? {})].filter(value => value.length >= 8)
+    return [...Object.values(agent.env), ...Object.values(agent.resolved.connection?.env ?? {}), ...secretValuesOf(readSharedEnvSync())].filter(value => value.length >= 8)
 }
 
 async function recordStepTelemetry(agentId: string, sessionId: string, runId: string, provider: string, model: string, stepNumber: number, durationMs: number, step: StepLike, costMicros: number | null, effort: string | null, secrets: string[], liveCalls: Map<string, string>): Promise<void> {
