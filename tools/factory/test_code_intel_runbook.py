@@ -18,6 +18,13 @@ def sh_lines():
     return out
 
 
+def section(n):
+    text = RUNBOOK.read_text()
+    start = text.index("## %d." % n)
+    end = text.find("\n## ", start + 1)
+    return text[start:] if end == -1 else text[start:end]
+
+
 def services():
     found = {}
     current = None
@@ -56,6 +63,23 @@ class CodeIntelRunbook(unittest.TestCase):
         for x in lines:
             self.assertTrue(x.startswith("sudo "), x)
             self.assertEqual(x.count("sudo"), 1, x)
+
+    def test_env_lines_run_once_under_sudo(self):
+        lines = [x for x in sh_lines() if ">> deploy/vps/.env" in x and "CODE_INTEL_" in x]
+        self.assertEqual(len(lines), 2)
+        for x in lines:
+            self.assertTrue(x.startswith("sudo sh -c '"), x)
+            self.assertTrue(x.endswith("'"), x)
+            inner = x[len("sudo sh -c '"):-1]
+            self.assertEqual(subprocess.run(["sh", "-n", "-c", inner]).returncode, 0, x)
+        self.assertIn("Run these two lines once", section(1))
+
+    def test_status_lines_named_by_kind(self):
+        self.assertNotIn("Every line must read", RUNBOOK.read_text())
+        self.assertIn("`<service> running`", section(4))
+        self.assertIn("`<repo> up ready`", section(4))
+        self.assertIn("as in step 4", section(5))
+        self.assertIn("`code-terminal-commander` not `running`", section(6))
 
     def test_config_line_matches_the_compose_services(self):
         svc = services()

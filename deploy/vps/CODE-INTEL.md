@@ -11,11 +11,11 @@ sudo docker volume ls --format '{{.Name}}'
 sudo docker network ls --format '{{.Name}}'
 ```
 
-Record the volume path and the first network in `deploy/vps/.env`:
+Record the volume path and the first network in `deploy/vps/.env`. Run these two lines once: each run appends, so a second run adds the same entries again.
 
 ```sh
-sudo docker volume inspect rerun_engine-data --format '{{.Mountpoint}}' | sed 's/^/CODE_INTEL_DATA=/' >> deploy/vps/.env
-echo CODE_INTEL_NETWORK=rerun-dev_default >> deploy/vps/.env
+sudo sh -c 'docker volume inspect rerun_engine-data --format "{{.Mountpoint}}" | sed "s/^/CODE_INTEL_DATA=/" >> deploy/vps/.env'
+sudo sh -c 'echo CODE_INTEL_NETWORK=rerun-dev_default >> deploy/vps/.env'
 ```
 
 ## 2. Key and config
@@ -40,7 +40,7 @@ sudo docker compose -f deploy/vps/code-intel.yml up -d
 sudo sh deploy/vps/code-intel-status.sh
 ```
 
-Every line must read `up ready`.
+The compose lines must read `<service> running`, one for each of the four servers. The status lines must read `<repo> up ready`, followed by the file count and the fetch age.
 
 ## 5. Beside the live engine
 
@@ -49,6 +49,8 @@ sudo sed -i 's/^CODE_INTEL_NETWORK=.*/CODE_INTEL_NETWORK=rerun_default/' deploy/
 sudo docker compose -f deploy/vps/code-intel.yml up -d --force-recreate
 sudo sh deploy/vps/code-intel-status.sh
 ```
+
+Expect the same lines as in step 4.
 
 ## 6. Fallback check
 
@@ -60,7 +62,7 @@ sudo sh deploy/vps/code-intel-status.sh
 sudo docker compose -f deploy/vps/code-intel.yml start code-terminal-commander
 ```
 
-Expect `terminal-commander down` and every other line `up ready`.
+Expect `terminal-commander down` in the status lines and `code-terminal-commander` not `running` in the compose lines; every other line reads as in step 4.
 
 ## 7. Undo
 
