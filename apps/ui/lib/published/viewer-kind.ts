@@ -56,10 +56,14 @@ export function isMarkdownDeck(path: string, markdown: string): boolean {
     return !!frontmatter && SLIDES_FLAG.test(frontmatter)
 }
 
+export function withoutFrontmatter(markdown: string): string {
+    return markdown.replace(FRONTMATTER, '')
+}
+
 // Slides are split on lines that are exactly `---`, never inside a fenced code block; the
 // frontmatter is dropped, and so are empty slides.
 export function splitMarkdownSlides(markdown: string): string[] {
-    const body = markdown.replace(FRONTMATTER, '')
+    const body = withoutFrontmatter(markdown)
     const slides: string[] = []
     let current: string[] = []
     let fenced = false

@@ -1,10 +1,15 @@
 'use client'
 
+import { DOCUMENT_CLASS } from '@/components/published/viewers/MarkdownViewer'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { filePreviewKind } from '@/lib/files/preview'
-import { DownloadIcon, FileIcon } from '@/lib/icons'
+import { filePreviewKind, framedHtmlDocument, textPreviewFormat, type TextPreviewFormat } from '@/lib/files/preview'
+import { Code2, DownloadIcon, EyeIcon, FileIcon } from '@/lib/icons'
+import { withoutFrontmatter } from '@/lib/published/viewer-kind'
+import { cn } from '@/lib/utils'
+import { Markdown } from '@rerun/ui/markdown'
 import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 
 type FilePreviewProps = {
     fileName: string
@@ -43,7 +48,9 @@ export function FilePreview({ fileName, content, rawUrl, loading }: FilePreviewP
         )
     }
     if (kind === 'text' && content !== null) {
-        return <pre className="h-full overflow-auto p-3 text-xs font-mono whitespace-pre-wrap break-all">{content}</pre>
+        const format = textPreviewFormat(fileName)
+        if (format === 'plain') return <SourceText content={content} />
+        return <RenderedText key={fileName} fileName={fileName} format={format} content={content} />
     }
 
     return (
@@ -56,6 +63,37 @@ export function FilePreview({ fileName, content, rawUrl, loading }: FilePreviewP
                     {t('download')}
                 </a>
             </Button>
+        </div>
+    )
+}
+
+function SourceText({ content, className }: { content: string; className?: string }) {
+    return <pre className={cn('h-full overflow-auto p-3 text-xs font-mono whitespace-pre-wrap break-all', className)}>{content}</pre>
+}
+
+function RenderedText({ fileName, format, content }: { fileName: string; format: Exclude<TextPreviewFormat, 'plain'>; content: string }) {
+    const t = useTranslations('files.preview')
+    const [showSource, setShowSource] = useState(false)
+    const toggleLabel = showSource ? t('showRendered') : t('showSource')
+
+    return (
+        <div className="relative h-full">
+            {showSource ? (
+                <SourceText content={content} className="pr-12" />
+            ) : format === 'html' ? (
+                // No scripts and an opaque origin: whatever a coworker wrote in the page can neither run
+                // nor reach the app's session. Popups only, so its links open in a tab of their own.
+                <iframe sandbox="allow-popups allow-popups-to-escape-sandbox" srcDoc={framedHtmlDocument(content)} title={fileName} className="h-full w-full bg-white" />
+            ) : (
+                <div className="h-full overflow-auto py-4 pr-12 pl-4 sm:pl-6">
+                    <Markdown content={withoutFrontmatter(content)} className={DOCUMENT_CLASS} />
+                </div>
+            )}
+            <div className="absolute top-2 right-2 rounded-md bg-background shadow-sm">
+                <Button size="icon-sm" variant="outline" onClick={() => setShowSource(current => !current)} title={toggleLabel} aria-label={toggleLabel}>
+                    {showSource ? <EyeIcon className="size-4" /> : <Code2 className="size-4" />}
+                </Button>
+            </div>
         </div>
     )
 }

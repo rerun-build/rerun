@@ -153,7 +153,7 @@ Coworkers can publish a file or a folder and share its link.
 | Variable | Required | Default | What it does |
 | --- | --- | --- | --- |
 | `RERUN_HUB_BASE_URL` | Recommended | `http://localhost:3050` | The address the share links of published files start with (`<address>/p/<slug>`). docker compose does not set it for the app, so set it to your `NEXT_PUBLIC_APP_URL`, or the links point at port 3050. |
-| `PUBLISH_HOST` | Optional | empty | A domain under which each published link gets its own host, `<slug>.<PUBLISH_HOST>`, served by the app over `https`. It needs a wildcard DNS record and a wildcard certificate pointing at the app. It lets published sites (folders with an `index.html`) open, and pages shared with a password or by invitation. Without it, a public file opens through a short-lived Storage link, any other only for a signed-in member of its workspace, and a published site does not open. |
+| `PUBLISH_HOST` | Optional | empty | A domain under which each published link gets its own host, `<slug>.<PUBLISH_HOST>`, served by the app over `https`. It needs a wildcard DNS record and a wildcard certificate pointing at the app. It lets published sites (folders with an `index.html`) open, and pages shared with a password or by invitation. Without it, a public file opens through a short-lived Storage link, any other only for a signed-in member of its workspace, and a published site does not open. Storage serves an HTML file as plain text, so without it a published page shows its source code instead of the page. |
 | `PUBLISHED_ACCESS_SECRET` | With `PUBLISH_HOST` | empty | Signs the access a visitor gets to a page behind a password, an invitation or workspace membership. |
 
 ## Desktop and mobile apps

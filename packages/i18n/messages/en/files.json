@@ -53,7 +53,9 @@
     "preview": {
         "noPreview": "No preview available for this file type",
         "download": "Download",
-        "readFailed": "This file could not be read"
+        "readFailed": "This file could not be read",
+        "showSource": "Show source",
+        "showRendered": "Show as page"
     },
     "publish": {
         "publish": "Publish",

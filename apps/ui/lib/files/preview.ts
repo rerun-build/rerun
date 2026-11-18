@@ -23,6 +23,31 @@ export function filePreviewKind(name: string): FilePreviewKind {
     return 'text'
 }
 
+export type TextPreviewFormat = 'html' | 'markdown' | 'plain'
+
+const HTML_EXTS = new Set(['html', 'htm'])
+const MARKDOWN_EXTS = new Set(['md', 'markdown'])
+
+// How a file read as text is drawn: a report a coworker wrote reads as a page, not as its source.
+export function textPreviewFormat(name: string): TextPreviewFormat {
+    const ext = fileExtension(name)
+    if (HTML_EXTS.has(ext)) return 'html'
+    if (MARKDOWN_EXTS.has(ext)) return 'markdown'
+    return 'plain'
+}
+
+const FRAMED_HTML_HEAD = '<meta name="referrer" content="no-referrer"><base href="about:srcdoc" target="_blank">'
+const IN_PAGE_LINK = /<a(?=\s[^>]*\bhref\s*=\s*["']?#)/gi
+
+// A report drawn in the preview's sandboxed frame: a link to another site opens in a new tab rather
+// than replacing the report with a page that refuses to be framed, while a table of contents still
+// scrolls the report. Without its own base, a srcdoc document resolves `#detail` against the app's
+// URL and loads the app inside the frame. A srcdoc document is never in quirks mode, so the tags
+// may come first.
+export function framedHtmlDocument(html: string): string {
+    return FRAMED_HTML_HEAD + html.replace(IN_PAGE_LINK, '<a target="_self"')
+}
+
 export function isArchive(name: string): boolean {
     return ARCHIVE_EXTS.has(fileExtension(name))
 }

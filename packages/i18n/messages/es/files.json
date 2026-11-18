@@ -36,7 +36,9 @@
     "preview": {
         "noPreview": "No hay vista previa para este tipo de archivo",
         "download": "Descargar",
-        "readFailed": "No se pudo leer este archivo"
+        "readFailed": "No se pudo leer este archivo",
+        "showSource": "Ver el código fuente",
+        "showRendered": "Ver como página"
     },
     "publish": {
         "publish": "Publicar",
