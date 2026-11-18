@@ -449,6 +449,8 @@ class Station:
             if cancelled.get("wasRunning") is False:
                 got = self.account("get_run", {"agentId": agent, "runId": run}) or {}
                 status = got.get("status")
+                if status == "running":
+                    return
             else:
                 why = "the %s run passed its limit of %s s" % ("plan" if state not in FAIL_OPEN else state[:-3], limit)
                 self.close(run, "error", got, why)

@@ -175,6 +175,23 @@ class Resend(Cut):
         self.assertNotIn("resent", rec)
         self.assertEqual(self.w.sends, [])
 
+    def test_a_run_still_running_after_a_cancel_that_found_it_stopped_is_left_for_the_next_beat(self):
+        self.build(TWO_STAGE)
+        self.seed(5, "cutting", "ss", "c1")
+        real = self.station.account
+
+        def account(tool, args):
+            if tool == "cancel_run":
+                return {"wasRunning": False}
+            return real(tool, args)
+
+        self.station = type(self.station)(self.cfg, self.store, account, self.station.gh, lambda: 1000.0 + 2701)
+        self.station.once(2)
+        rec = self.store.get_all("plan:5")
+        self.assertEqual(rec["state"], "cutting")
+        self.assertNotIn("resent", rec)
+        self.assertEqual(self.w.sends, [])
+
 
 if __name__ == "__main__":
     unittest.main()
