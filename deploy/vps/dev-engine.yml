@@ -4,7 +4,7 @@ x-required-key: ${RERUN_DEV_ENGINE_KEY:?set RERUN_DEV_ENGINE_KEY in deploy/vps/.
 
 services:
   engine-dev:
-    image: ghcr.io/special-place-ai-heaven/rerun-engine:${RERUN_DEV_IMAGE_TAG:-dev}
+    image: ghcr.io/special-place-ai-heaven/moldwright-engine:${RERUN_DEV_IMAGE_TAG:-dev}
     environment:
       RERUN_LOG_LEVEL: ${RERUN_LOG_LEVEL:-info}
       RERUN_API_KEY_FILE: /run/secrets/rerun_dev_engine_key

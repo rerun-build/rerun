@@ -2,7 +2,7 @@ name: rerun
 
 services:
   app:
-    image: ghcr.io/special-place-ai-heaven/rerun-app:${RERUN_IMAGE_TAG:-dev}
+    image: ghcr.io/special-place-ai-heaven/moldwright:${RERUN_IMAGE_TAG:-dev}
     build:
       context: .
       dockerfile: apps/ui/Dockerfile
@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   engine:
-    image: ghcr.io/special-place-ai-heaven/rerun-engine:${RERUN_IMAGE_TAG:-dev}
+    image: ghcr.io/special-place-ai-heaven/moldwright-engine:${RERUN_IMAGE_TAG:-dev}
     build:
       context: .
       dockerfile: apps/engine/Dockerfile

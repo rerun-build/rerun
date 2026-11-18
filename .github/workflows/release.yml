@@ -39,7 +39,7 @@ jobs:
       - uses: docker/metadata-action@v5
         id: meta
         with:
-          images: ghcr.io/${{ github.repository_owner }}/rerun-engine
+          images: ghcr.io/${{ github.repository_owner }}/moldwright-engine
           tags: |
             type=semver,pattern={{version}},value=${{ inputs.tag || github.ref_name }}
             type=semver,pattern={{major}}.{{minor}},value=${{ inputs.tag || github.ref_name }}

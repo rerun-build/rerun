@@ -17,7 +17,7 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 
-const ENGINE_IMAGE = 'ghcr.io/special-place-ai-heaven/rerun-engine:dev'
+const ENGINE_IMAGE = 'ghcr.io/special-place-ai-heaven/moldwright-engine:dev'
 const POLL_MS = 3000
 
 function SectionTitle({ children }: { children: string }) {

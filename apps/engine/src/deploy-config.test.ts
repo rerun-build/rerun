@@ -18,7 +18,7 @@ function services(text: string): Record<string, Service> {
 
 function engines(text: string): [string, Service][] {
   return Object.entries(services(text)).filter(([, service]) => {
-    const image = typeof service.image === 'string' && service.image.includes('rerun-engine')
+    const image = typeof service.image === 'string' && service.image.includes('moldwright-engine')
     const build = typeof service.build === 'object' && service.build?.dockerfile === 'apps/engine/Dockerfile'
     return image || build
   })
@@ -56,10 +56,10 @@ describe('deploy config', () => {
   })
 
   it('flags an engine service that lists RERUN_API_KEY under environment, as a map or a list', () => {
-    const a = 'services:\n  e:\n    image: x/rerun-engine:dev\n    environment:\n      RERUN_API_KEY: ${K}\n'
+    const a = 'services:\n  e:\n    image: x/moldwright-engine:dev\n    environment:\n      RERUN_API_KEY: ${K}\n'
     const b = 'services:\n  e:\n    build:\n      dockerfile: apps/engine/Dockerfile\n    environment:\n      - RERUN_API_KEY=${K}\n'
-    const c = 'services:\n  e:\n    image: x/rerun-engine:dev\n    environment:\n      - RERUN_API_KEY\n'
-    const d = 'services:\n  e:\n    image: x/rerun-engine:dev\n    environment:\n      RERUN_API_KEY_FILE: /run/secrets/k\n'
+    const c = 'services:\n  e:\n    image: x/moldwright-engine:dev\n    environment:\n      - RERUN_API_KEY\n'
+    const d = 'services:\n  e:\n    image: x/moldwright-engine:dev\n    environment:\n      RERUN_API_KEY_FILE: /run/secrets/k\n'
     expect(offenders(a)).toEqual(['e'])
     expect(offenders(b)).toEqual(['e'])
     expect(offenders(c)).toEqual(['e'])
