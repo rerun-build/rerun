@@ -6,7 +6,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-runs-'))
 process.env.RERUN_API_KEY = ''
 
 const { afterEach, describe, expect, it, vi } = await import('vitest')
-const { aggregateUsageByDay, bumpRunStep, cancelRun, failInterruptedRuns, failRun, finishRun, getRun, listRunsByAgent, recordGoalVerdict, recordRunCompaction, setRunCompactAt, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } = await import('./runs.js')
+const { aggregateUsageByDay, bumpRunStep, cancelRun, failInterruptedRuns, failRun, finishRun, getRun, listRunsByAgent, recordGoalVerdict, recordRunCompaction, setRunCompactAt, setRunHandover, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } = await import('./runs.js')
 
 afterEach(() => {
     vi.useRealTimers()
@@ -296,5 +296,17 @@ describe('run compactions', () => {
         await Promise.all([recordRunCompaction('comp', 'r-comp', 100), recordRunCompaction('comp', 'r-comp', 5)])
 
         expect(await getRun('comp', 'r-comp')).toMatchObject({ compactions: 4, compactSummaryChars: 1005, compactAtTokens: 240000 })
+    })
+})
+
+describe('run handover', () => {
+    it('starts unset, then keeps the last note path', async () => {
+        await startRun('hand', 's1', 'r-hand')
+        expect(await getRun('hand', 'r-hand')).toMatchObject({ handoverPath: null })
+
+        await setRunHandover('hand', 'r-hand', '/d/shared/handover/hand/r-hand-1.md')
+        await setRunHandover('hand', 'r-hand', '/d/shared/handover/hand/r-hand-2.md')
+
+        expect(await getRun('hand', 'r-hand')).toMatchObject({ handoverPath: '/d/shared/handover/hand/r-hand-2.md' })
     })
 })

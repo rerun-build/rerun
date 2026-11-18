@@ -122,6 +122,10 @@ describe('sqlite ladders', () => {
               9,
               "run-compactions",
             ],
+            [
+              10,
+              "run-handover",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`

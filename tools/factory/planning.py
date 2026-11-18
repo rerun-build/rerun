@@ -5,6 +5,7 @@ import json
 import re
 
 import cutshape
+import handover
 import notes
 import plancheck
 import pools
@@ -33,6 +34,8 @@ REPAIRED = re.compile(r"(?m)^(FIXED|BLOCKED):[ \t]*(.*)$")
 RECHECKED = re.compile(r"(?m)^(FRESH|CORRECTED|BLOCKED):[ \t]*(.*)$")
 LIVE = ("sending", "running", "planning", "cutting", "reviewing", "repairing")
 FAIL_OPEN = ("reviewing", "repairing")
+STAGES = {"planning": "plan", "running": "plan", "cutting": "cut", "reviewing": "review", "repairing": "repair"}
+AGAIN = {"cut": "planned", "review": "planned", "repair": "repair"}
 QUESTION_LABEL = "factory-question"
 ANSWER = re.compile(r"(?mi)^ANSWER:[ \t]*(.+)$")
 ISSUE_URL = re.compile(r"/issues/(\d+)\b")
@@ -441,16 +444,23 @@ class Station:
         status = got.get("status")
         if status == "running":
             limit = self.cfg.get("clocks", {}).get("run_limit_s", RUN_LIMIT)
-            if self.now() - epoch(row["started"]) > limit:
-                self.account("cancel_run", {"agentId": agent, "runId": run})
+            if self.now() - epoch(row["started"]) <= limit:
+                return
+            cancelled = self.account("cancel_run", {"agentId": agent, "runId": run}) or {}
+            if cancelled.get("wasRunning") is False:
+                got = self.account("get_run", {"agentId": agent, "runId": run}) or {}
+                status = got.get("status")
+                if status == "running":
+                    return
+            else:
                 why = "the %s run passed its limit of %s s" % ("plan" if state not in FAIL_OPEN else state[:-3], limit)
                 self.close(run, "error", got, why)
-                self.stopped(n, row, why)
-            return
+                self.lost(n, row, got, why)
+                return
         if status != "done":
             why = "the %s run ended %s" % ("plan" if state not in FAIL_OPEN else state[:-3], status)
             self.close(run, "error", got, why)
-            self.stopped(n, row, why)
+            self.lost(n, row, got, why)
             return
         self.close(run, "done", got)
         if state == "reviewing":
@@ -493,6 +503,45 @@ class Station:
             self.store.set(job, "state", "replan")
             return
         self.blocked(n, rest)
+
+    def lost(self, n, row, got, why):
+        job = "plan:%d" % n
+        stage = STAGES.get(row.get("state"))
+        done = json.loads(row.get("resent") or "[]")
+        if stage is None or stage in done:
+            self.stopped(n, row, why)
+            return
+        unstaged_plan = stage == "plan" and not self.staged()
+        if unstaged_plan and self.opened_children(n):
+            self.finish(n, "blocked", "the plan run was lost after it opened child issues")
+            return
+        self.store.set(job, "resent", json.dumps(done + [stage]))
+        self.store.set(job, "handover", got.get("handoverPath") or "")
+        self.store.set(job, "handover_stage", stage)
+        if unstaged_plan:
+            self.store.set(job, "intent", "")
+            self.store.set(job, "agent", "")
+            try:
+                self.gh(["issue", "edit", str(n), "-R", self.repo, "--remove-label", LABEL])
+            except Exception:
+                pass
+        self.store.set(job, "state", AGAIN.get(stage, "resend" if self.staged() else "unsent"))
+
+    def opened_children(self, n):
+        try:
+            return self.open_children(n)
+        except Exception:
+            return []
+
+    def noted(self, job, message, stage):
+        rec = self.store.get_all(job)
+        path = rec.get("handover")
+        if not path or rec.get("handover_stage") != stage:
+            return message
+        return "%s\n\n%s" % (handover.line(path), message)
+
+    def spent(self, job):
+        self.store.set(job, "handover", "")
 
     def stopped(self, n, row, why):
         state = row.get("state")
@@ -667,7 +716,7 @@ class Station:
         for name, value in (("agent", agent), ("copy", copy), ("started", at), ("run", ""), ("fire", fire),
                             ("review_round", str(round_no)), ("review_key", k), ("review_text", plan)):
             self.store.set(job, name, value)
-        args = {"agentId": agent, "message": message, "waitSeconds": 1, "goal": {"lastLineForms": REVIEW_GOAL, "turnLimit": 3}}
+        args = {"agentId": agent, "message": self.noted(job, message, "review"), "waitSeconds": 1, "goal": {"lastLineForms": REVIEW_GOAL, "turnLimit": 3}}
         args.update(self.model("review_plan") or {})
         try:
             result = self.account("send_message", args)
@@ -689,6 +738,7 @@ class Station:
 
     def running_as(self, job, fire, rid, stage, state):
         self.store.fired(fire, rid)
+        self.spent(job)
         self.store.set(job, "run", rid)
         self.store.set(job, "stage", stage)
         self.store.set(job, "state", state)
@@ -805,6 +855,15 @@ class Station:
         if not self.send({"number": n, "title": row.get("title", "")}, got, None, None, review=review or None, answers=answers or None):
             self.store.set("plan:%d" % n, "state", "revise")
 
+    def resend(self, n, row):
+        got = self.free("plan_by")
+        if got is None:
+            return
+        if not self.send({"number": n, "title": row.get("title", "")}, got, None, row.get("sent_retry") or None,
+                         review=row.get("sent_review") or None, answers=json.loads(row.get("sent_answers") or "[]") or None,
+                         cut_notes=row.get("sent_cut_notes") or None):
+            self.store.set("plan:%d" % n, "state", "resend")
+
     def repair(self, n, row):
         got = self.free("cut_by")
         if got is None:
@@ -817,7 +876,7 @@ class Station:
         for name, value in (("agent", agent), ("copy", copy), ("started", at), ("run", ""), ("fire", fire),
                             ("repair_tries", str(int(row.get("repair_tries") or 0) + 1))):
             self.store.set(job, name, value)
-        args = {"agentId": agent, "message": repair_brief(self.repo, n, faulty), "waitSeconds": 1,
+        args = {"agentId": agent, "message": self.noted(job, repair_brief(self.repo, n, faulty), "repair"), "waitSeconds": 1,
                 "goal": {"lastLineForms": REPAIR_GOAL, "turnLimit": 3}}
         args.update(self.model("repair", "small") or {})
         try:
@@ -937,8 +996,8 @@ class Station:
         return pools.pick_copy(self.cfg, "planner", self.running(), exclude=other)
 
     def advance(self, waiting):
-        steps = {"planned": self.after_plan, "replan": self.replan, "revise": self.revise, "repair": self.repair}
-        for state in ("planned", "replan", "revise", "repair"):
+        steps = {"planned": self.after_plan, "replan": self.replan, "revise": self.revise, "repair": self.repair, "resend": self.resend}
+        for state in ("planned", "replan", "revise", "repair", "resend"):
             for n in sorted(k for k, v in waiting.items() if v == state):
                 if self.parallel - len(self.live()) <= 0:
                     return
@@ -965,7 +1024,7 @@ class Station:
         for k, v in (("agent", agent), ("copy", copy), ("started", at), ("run", ""), ("fire", fire), ("cut_text", plans[-1])):
             self.store.set(job, k, v)
         left = notes.render_all(json.loads(row.get("open_notes") or "[]"))
-        args = {"agentId": agent, "message": cut_brief(item, self.repo, plans[-1], left or None), "waitSeconds": 1,
+        args = {"agentId": agent, "message": self.noted(job, cut_brief(item, self.repo, plans[-1], left or None), "cut"), "waitSeconds": 1,
                 "goal": {"lastLineForms": GOAL, "turnLimit": 3}}
         try:
             model = tiers.model_for("cut", tiers.tier_for("cut", "medium", self.cfg.get("tiers")), self.cfg.get("tier_models"))
@@ -992,6 +1051,7 @@ class Station:
 
     def cutting(self, job, fire, rid):
         self.store.fired(fire, rid)
+        self.spent(job)
         self.store.set(job, "run", rid)
         self.store.set(job, "stage", "cut")
         self.store.set(job, "state", "cutting")
@@ -1041,7 +1101,9 @@ class Station:
         names = pools.names(self.cfg)
         fire = self.store.intent(job, "", "plan", coworker=names.get(agent, agent), at=at)
         for k, v in (("state", "sending"), ("agent", agent), ("copy", copy), ("started", at),
-                     ("title", item["title"]), ("run", ""), ("why", ""), ("intent", at), ("fire", fire)):
+                     ("title", item["title"]), ("run", ""), ("why", ""), ("intent", at), ("fire", fire),
+                     ("sent_retry", retry or ""), ("sent_review", review or ""), ("sent_answers", json.dumps(answers or [])),
+                     ("sent_cut_notes", cut_notes or "")):
             self.store.set(job, k, v)
         try:
             self.gh(["issue", "edit", str(n), "-R", self.repo, "--add-label", LABEL])
@@ -1052,6 +1114,7 @@ class Station:
             else:
                 args = {"agentId": agent, "message": brief(item, self.repo), "waitSeconds": 1,
                         "goal": {"lastLineForms": GOAL, "turnLimit": 3}}
+            args["message"] = self.noted(job, args["message"], "plan")
             try:
                 model = tiers.model_for("plan", tiers.tier_for("plan", "medium", self.cfg.get("tiers")), self.cfg.get("tier_models"))
             except ValueError:
@@ -1067,6 +1130,7 @@ class Station:
                 pass
             if rid:
                 self.store.fired(fire, rid)
+                self.spent(job)
                 self.store.set(job, "run", rid)
                 self.store.set(job, "state", live)
                 if staged:
@@ -1081,6 +1145,7 @@ class Station:
                 pass
             return False
         self.store.fired(fire, result["runId"])
+        self.spent(job)
         self.store.set(job, "run", result["runId"])
         self.store.set(job, "state", live)
         if staged:

@@ -90,3 +90,5 @@ export const mcpDir = (id: string) => resolve(agentDir(id), 'mcp')
 export const mcpTokenPath = (id: string, name: string) => resolve(mcpDir(id), `${pathSegment(name, 'MCP server name')}.json`)
 
 export const mcpPendingPath = (id: string, name: string) => resolve(mcpDir(id), `${pathSegment(name, 'MCP server name')}.pending.json`)
+
+export const handoverDir = (agentId: string) => resolve(sharedDir(), 'handover', pathSegment(agentId, 'agent id'))

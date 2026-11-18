@@ -26,7 +26,7 @@ import { childProcessEnv, envOverlay } from '../lib/child-env.js'
 import { newId } from '../lib/ids.js'
 import { resolveTransport } from '../tools/mcp.js'
 import { relayMcpServer, type RunMcpServer } from '../tools/mcp-relay.js'
-import { claudeContextCapture, type ClaudeContextCapture, type CompactListener } from './claude-context.js'
+import { claudeContextCapture, type ClaudeContextCapture, type CompactListener, type HandoverTarget } from './claude-context.js'
 import { claudeScreenshotMiddleware } from './claude-stream.js'
 import { codexMcpCompatibilityMiddleware } from './codex-stream.js'
 import { createCodexImageMiddleware } from './codex-images.js'
@@ -240,7 +240,7 @@ export type GoalOption = { goal: RunGoal; record: (v: GoalVerdict) => Promise<vo
 
 export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: CompactPoint }
 
-export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: CompactPoint; onCompact?: CompactListener }
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; compactAt?: CompactPoint; onCompact?: CompactListener; handover?: HandoverTarget }
 
 function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
     return options?.sessionId ?? `${agent.id}:one-shot`
@@ -412,7 +412,7 @@ export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close
 
 const noClose = async (): Promise<void> => {}
 
-export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, labels, goal, compactAt, onCompact }: ResolveModelOptions = {}): ResolvedModel {
+export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, labels, goal, compactAt, onCompact, handover }: ResolveModelOptions = {}): ResolvedModel {
     const { provider, model } = pairFor(agent, override)
     const replies = createQuickRepliesCapture()
     const cardTags = createCardTagGuard(agent.id, provider)
@@ -422,7 +422,7 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
         return { model: wrapLanguageModel({ model: codex(model), middleware: [codexMcpCompatibilityMiddleware, createCodexImageMiddleware(agent.id), replies.middleware, cardTags, guard] }), close: () => codex.close(), quickReplies: replies.read }
     }
     if (provider === 'claude') {
-        const capture = claudeContextCapture(agent.resolved.connection?.id, onCompact)
+        const capture = claudeContextCapture(agent.resolved.connection?.id, onCompact, handover)
         const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, labels, goal, compactAt, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
         return { model: wrapLanguageModel({ model: claude, middleware: [claudeScreenshotMiddleware, replies.middleware, cardTags, guard] }), close: noClose, contextUsage: capture.read, quickReplies: replies.read }
     }
