@@ -43,6 +43,7 @@ import { withPooledRelays } from '../tools/mcp-relay.js'
 import { HostBreaker } from '../tools/host-breaker.js'
 import { runsUnattended, type PartialResult, type RunContext, type RunTrigger, type SkillProposalNotice } from './context.js'
 import { partialResultsNote } from './partial-results.js'
+import { streamedTurn } from './streamed-turn.js'
 import { registerRunAbort, setRunCancel, unregisterRunAbort } from './run-control.js'
 import { runCurator } from './curator.js'
 import { repairToolCall } from './tool-repair.js'
@@ -283,6 +284,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     let steps = handover?.steps ?? 0
     const partialResults: PartialResult[] = []
     const skillProposals: SkillProposalNotice[] = []
+    const streamed = streamedTurn()
 
     // The CLI process owns the bridged MCP server that calls back into `tools`, so it goes down
     // first. Codex's own token refresh only lands in auth.json once it has exited, hence the sync
@@ -617,7 +619,9 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                     ...(!CLI_PROVIDERS.has(provider) && hitlStepLacksMessage(steps) ? { toolChoice: 'none' as const } : {}),
                 }
             },
+            onChunk: ({ chunk }) => streamed.add(chunk),
             onStepFinish: async step => {
+                streamed.stepFinished(step.response.messages)
                 steps += 1
                 const now = Date.now()
                 const durationMs = now - lastStepAt
@@ -632,7 +636,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                     await settle({ kind: 'cancelled' })
                     return
                 }
-                await settle({ kind: 'error', error, errorCode: classifyProviderError(provider, error) })
+                await settle({ kind: 'error', error, errorCode: classifyProviderError(provider, error), messages: streamed.messages() })
             },
             // The only callback the SDK runs when the abort lands before the first step: without it
             // a run stopped early would never write its terminal row.
@@ -683,6 +687,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                           kind: 'error',
                           error: drainError ?? new ProviderStreamCutError(),
                           errorCode: drainError ? classifyProviderError(provider, drainError) : RUN_ERROR_CODES.streamIncomplete,
+                          messages: streamed.messages(),
                       },
             )
         })().catch(err => logger.warn({ err: String(err), agent: agent.id, run: run.id }, 'run drain failed'))

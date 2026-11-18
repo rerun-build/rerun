@@ -25,7 +25,7 @@ import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { track } from '@rerun/analytics/client'
 import { RERUN_CONNECTION_ID } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 type ModelSelectorProps = {
     agentId: string
@@ -42,6 +42,8 @@ type ModelSelectorProps = {
     onRefusedModelChange?: (reason: string | null) => void
     // The key a notice outside the composer requests this picker open by (see model-picker.store).
     pickerKey?: string
+    // A model picked in a picker that notice opened: the chat carries the turn the notice was about on.
+    onPicked?: () => void
 }
 
 // In-chat model picker shown in the prompt footer. One group per Box connection, so two Claude
@@ -51,12 +53,13 @@ type ModelSelectorProps = {
 //
 // The "Box default" entry is the one exception: it is not a per-conversation choice but a statement
 // about the agent, so it clears both the override and the pin in one click.
-export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey }: ModelSelectorProps) {
+export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, onConnectionChange, onRefusedModelChange, pickerKey, onPicked }: ModelSelectorProps) {
     const t = useTranslations('agent.modelSelector')
     const tShared = useTranslations('agent.modelsShared')
     const creditDetail = useRerunCreditDetail()
     const windowsSummary = usePlanWindowsSummary()
     const [open, setOpen] = useState(false)
+    const openedOnRequestRef = useRef(false)
     const { availableGroups, connectionOf, pinnedModel, pinnedConnectionId, resolvedModel, resolvedConnectionId, followsBoxDefault, supportsBoxDefault, boxDefaultPick, setDefault, followBoxDefault, refreshConnections, loading } =
         useAvailableModels(agentId)
     const { selection, select } = useAgentModel(agentId)
@@ -113,9 +116,29 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     useEffect(() => {
         if (!pickerKey || pickerRequestedFor !== pickerKey || loading) return
         consumePickerRequest()
-        if (hasAvailable) setOpen(true)
-        else openAiProviders()
+        if (hasAvailable) {
+            openedOnRequestRef.current = true
+            setOpen(true)
+        } else openAiProviders()
     }, [pickerRequestedFor, pickerKey, loading, hasAvailable, consumePickerRequest, openAiProviders])
+
+    const close = useCallback(() => {
+        openedOnRequestRef.current = false
+        setOpen(false)
+    }, [])
+    // A pick that writes the agent's config waits for it: the turn picked back up resolves its model
+    // from that config on the engine.
+    const closeOnPick = useCallback(
+        (saved?: Promise<unknown>) => {
+            const requested = openedOnRequestRef.current
+            close()
+            if (!requested || !onPicked) return
+            if (saved) void saved.catch(() => {}).then(onPicked)
+            else onPicked()
+        },
+        [close, onPicked]
+    )
+    const changeOpen = useCallback((next: boolean) => (next ? setOpen(true) : close()), [close])
 
     // A picker otherwise only loads the connections once per session, and a plan's limits move with
     // every run: opening the list is the moment someone is about to read them.
@@ -128,9 +151,8 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     // carry the model the user just walked away from.
     const useBoxDefault = useCallback(() => {
         select({})
-        if (canSetDefault) followBoxDefault()
-        setOpen(false)
-    }, [select, followBoxDefault, canSetDefault])
+        closeOnPick(canSetDefault ? followBoxDefault() : undefined)
+    }, [select, followBoxDefault, canSetDefault, closeOnPick])
 
     useEffect(() => {
         // Don't report "not ready" while still loading — that would block the composer and flash a
@@ -145,22 +167,22 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     const selectModel = useCallback(
         (group: ConnectionGroup, nextModel: string) => {
             select({ connectionId: group.connectionId, model: nextModel })
-            setOpen(false)
+            closeOnPick()
         },
-        [select]
+        [select, closeOnPick]
     )
 
     const manage = useCallback(() => {
-        setOpen(false)
+        close()
         openAiProviders()
-    }, [openAiProviders])
+    }, [close, openAiProviders])
 
     const addProvider = useCallback(
         (provider: AddableProvider) => {
-            setOpen(false)
+            close()
             addAiProvider(provider)
         },
-        [addAiProvider]
+        [close, addAiProvider]
     )
 
     const connectSubscription = useCallback(
@@ -208,7 +230,7 @@ export function ModelSelector({ agentId, onReadyChange, onOwnConnectionChange, o
     }
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={changeOpen}>
             {usageDetail ? (
                 <TooltipLabeled label={usageDetail} side="top">
                     {trigger}

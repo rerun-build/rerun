@@ -6,9 +6,10 @@ import { vi } from 'vitest'
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-backup-'))
 
 // Each connection answers its own way: the test says which one is out of its subscription.
-const { sent, answers } = vi.hoisted(() => ({
+const { sent, answers, prompts } = vi.hoisted(() => ({
     sent: [] as Array<Record<string, unknown>>,
-    answers: new Map<string, 'limit' | 'limit-after-text' | 'ok'>(),
+    answers: new Map<string, 'limit' | 'limit-after-text' | 'limit-after-tools' | 'ok'>(),
+    prompts: [] as Array<{ connectionId: string; prompt: string }>,
 }))
 
 vi.mock('./notify.js', async importOriginal => {
@@ -32,22 +33,35 @@ vi.mock('../agents/providers.js', async importOriginal => {
     return {
         ...actual,
         resolveModel: (agent: { resolved: { connection: { id: string } | null; model: string } }) => {
-            const answer = answers.get(agent.resolved.connection?.id ?? '') ?? 'ok'
+            const connectionId = agent.resolved.connection?.id ?? ''
+            const answer = answers.get(connectionId) ?? 'ok'
             const parts: unknown[] = [{ type: 'stream-start', warnings: [] }]
             if (answer === 'limit-after-text') parts.push({ type: 'text-start', id: '0' }, { type: 'text-delta', id: '0', delta: 'Pulling the deals.' }, { type: 'text-end', id: '0' })
+            // The Claude Code CLI: its whole tool loop is one step, and a spent plan is thrown at its end.
+            if (answer === 'limit-after-tools')
+                parts.push(
+                    { type: 'text-start', id: '0' },
+                    { type: 'text-delta', id: '0', delta: 'Writing the report.' },
+                    { type: 'text-end', id: '0' },
+                    { type: 'tool-call', toolCallId: 'toolu_1', toolName: 'mcp__rerun__fs_write', input: JSON.stringify({ path: 'report.md' }), providerExecuted: true },
+                    { type: 'tool-result', toolCallId: 'toolu_1', toolName: 'mcp__rerun__fs_write', result: { written: 'report.md' }, providerExecuted: true },
+                )
             if (answer === 'ok') parts.push({ type: 'text-start', id: '1' }, { type: 'text-delta', id: '1', delta: `answered by ${agent.resolved.model}` }, { type: 'text-end', id: '1' }, finish)
             else if (answer === 'limit-after-text') parts.push({ ...finish, finishReason: { unified: 'other', raw: 'usage_limit_exceeded' } })
             else parts.push({ type: 'error', error: new Error("You've hit your session limit · resets 4:40pm") })
             return {
                 model: new MockLanguageModelV3({
-                    doStream: async () => ({
-                        stream: new ReadableStream({
-                            start(controller) {
-                                for (const part of parts) controller.enqueue(part)
-                                controller.close()
-                            },
-                        }),
-                    }),
+                    doStream: async ({ prompt }) => {
+                        prompts.push({ connectionId, prompt: JSON.stringify(prompt) })
+                        return {
+                            stream: new ReadableStream({
+                                start(controller) {
+                                    for (const part of parts) controller.enqueue(part)
+                                    controller.close()
+                                },
+                            }),
+                        }
+                    },
                 }),
                 close: async () => {},
             }
@@ -123,6 +137,7 @@ describe('a turn whose subscription runs out moves to a backup', () => {
 
     afterEach(async () => {
         sent.length = 0
+        prompts.length = 0
         answers.clear()
         for (const connection of [primary, backup, second]) clearPlanLimitLatch(connection)
         await clearBoxBackups()
@@ -171,6 +186,36 @@ describe('a turn whose subscription runs out moves to a backup', () => {
         expect(rows.map(row => row.role)).toEqual(['user', 'assistant', 'assistant'])
         expect(rows[1].contentJson).toContain('Pulling the deals.')
         expect(storedSwitches(rows)).toHaveLength(1)
+    })
+
+    it('keeps the tools a turn ran before its plan ran out, and the backup carries on from them', async () => {
+        answers.set(primary, 'limit-after-tools')
+
+        const { outcome, sessionId } = await send('draft the report')
+
+        expect(outcome.kind).toBe('done')
+        const rows = await listMessages(id, sessionId)
+        expect(rows.map(row => row.role).slice(0, 2)).toEqual(['user', 'assistant'])
+        expect(rows[1].contentJson).toContain('mcp__rerun__fs_write')
+        expect(rows[1].contentJson).toContain('Writing the report.')
+        const backupPrompt = prompts.find(entry => entry.connectionId === backup)?.prompt
+        expect(backupPrompt).toContain('mcp__rerun__fs_write')
+        expect(backupPrompt).toContain('Continue from where it left off')
+    })
+
+    it('shows a model picked by hand after the limit what the cut turn already did', async () => {
+        await clearBoxBackups()
+        answers.set(primary, 'limit-after-tools')
+
+        const cut = await send('draft the report')
+        expect(cut.outcome).toMatchObject({ kind: 'error', errorCode: 'provider_usage_limit' })
+
+        prompts.length = 0
+        const picked = await runAgent(await getAgent(id), cut.sessionId, 'Continue where you left off.', { connectionId: backup, provider: 'anthropic', model: 'claude-sonnet-4-8' }, undefined, undefined, { source: 'chat' })
+        expect((await picked.settled).kind).toBe('done')
+        const pickedPrompt = prompts.find(entry => entry.connectionId === backup)?.prompt
+        expect(pickedPrompt).toContain('mcp__rerun__fs_write')
+        expect(pickedPrompt).toContain('Writing the report.')
     })
 
     it('skips a backup whose own subscription is out', async () => {

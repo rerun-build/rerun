@@ -725,8 +725,28 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     }, [openAiProviders])
     // A plan that is out, or that does not include the model, is fixed by picking another model for
     // this conversation, which is the composer's picker rather than the credentials dialog.
+    // Only a spent plan picks the stopped turn back up on the model chosen: the other errors may have
+    // failed before the engine stored the message, and Retry is what sends it again.
     const requestModelPicker = useModelPickerStore(state => state.request)
-    const switchModel = useCallback(() => requestModelPicker(uid), [requestModelPicker, uid])
+    const resumeOnPickRef = useRef(false)
+    const [resumePicks, setResumePicks] = useState(0)
+    const openModelPicker = useCallback(
+        (resumeOnPick: boolean) => {
+            resumeOnPickRef.current = resumeOnPick
+            requestModelPicker(uid)
+        },
+        [requestModelPicker, uid]
+    )
+    const switchModel = useCallback(() => openModelPicker(false), [openModelPicker])
+    const switchModelAndContinue = useCallback(() => openModelPicker(true), [openModelPicker])
+    const handlePicked = useCallback(() => {
+        if (!resumeOnPickRef.current) return
+        resumeOnPickRef.current = false
+        setResumePicks(count => count + 1)
+    }, [])
+    useEffect(() => {
+        resumeOnPickRef.current = false
+    }, [sessionId])
     // The keyless Rerun connection has no sign-in of its own, so it keeps the plain list.
     const reconnectAiProvider = useWorkspaceSettingsStore(state => state.reconnectAiProvider)
     const reconnectProvider = useCallback(() => {
@@ -884,6 +904,14 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
     useEffect(() => {
         if (resumeAfterUpgrade && upgradeLanded) pickTaskBackUp()
     }, [resumeAfterUpgrade, upgradeLanded, pickTaskBackUp])
+    // Run after the render that holds the new pick: the transport reads the model from a ref that
+    // render sets.
+    const resumedPicksRef = useRef(0)
+    useEffect(() => {
+        if (resumePicks === resumedPicksRef.current) return
+        resumedPicksRef.current = resumePicks
+        pickTaskBackUp()
+    }, [resumePicks, pickTaskBackUp])
     useEffect(() => {
         if (!resumeAfterUpgrade) return
         const timer = setTimeout(() => setResumeStalled(true), RESUME_STALL_MS)
@@ -1093,7 +1121,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                         )}
                         {displayedError !== null && errorKind !== null && (
                             <Message from="assistant">
-                                <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
+                                <MessageContent>{errorKind === 'budget' ? <BudgetExhaustedNotice onConnectProvider={connectProvider} ownConnection={runOnOwnConnection} trialing={workspace?.subscription_status === 'trialing' || resumeAfterUpgrade} paused={!!workspace?.rerun_credit_paused_at} noCredit={rerunCredit.budgetMicros === 0} lifetime={isLifetimePlan(workspace)} claudePlanOffered={isClaudePlanOffered(workspace)} {...trialUpgrade} /> : <ProviderErrorNotice kind={errorKind} message={displayedError} onSwitchModel={errorKind === 'usage_limit' ? switchModelAndContinue : switchModel} onReconnect={reconnectProvider} onStopRun={handleStop} onContinue={continueInterruptedRun} onRetry={canRetry ? retryLastTurn : undefined} onNewConversation={onNewConversation} />}</MessageContent>
                             </Message>
                         )}
                     </ConversationContent>
@@ -1124,7 +1152,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                                     onContinue={() => setup?.sessionId && onOpenInstall?.(setup.sessionId)}
                                     disabled={status === 'streaming' || status === 'submitted'}
                                     hint={modelHint}
-                                    modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />}
+                                    modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />}
                                     onStart={() => {
                                         if (!modelReady) {
                                             blockSend()
@@ -1141,7 +1169,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
                             </motion.div>
                         ) : (
                             <motion.div key="composer" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }} className="overflow-hidden pb-px">
-                                <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} />
+                                <ChatComposer ref={composerRef} uid={uid} active={active} placeholder={composerPlaceholder} uploadTarget={uploadTarget} status={status} busy={showLoader} onSend={text => sendMessage({ text })} onSent={() => onMessageSentRef.current?.()} onStop={handleStop} onUploadingChange={setUploading} queue={{ text: queued?.text ?? null, pending: stopping, enqueue: enqueueFromComposer, onSendNow: () => void sendQueuedNow(), onDiscard: clearQueued }} gate={{ ready: modelReady, onBlocked: blockSend, hint: modelHint }} modelSlot={<ModelSelector agentId={agentId} pickerKey={uid} onPicked={handlePicked} onReadyChange={setModelReady} onOwnConnectionChange={setHasOwnConnection} onConnectionChange={setActiveConnectionId} onRefusedModelChange={setRefusedModel} />} contextSlot={contextStats && <Context usedTokens={contextStats.used} maxTokens={contextStats.max ?? modelContextWindow(contextStats.model, contextStats.provider)} usage={contextStats.usage} modelId={contextStats.model} />} textareaRef={inputRef} textareaProps={mentionTextareaProps} mentionTokens={mentionTokens} />
                                 <ComposerSubscriptionCta open={!hasOwnConnection} claudePlanOffered={isClaudePlanOffered(workspace)} onClick={connectSubscription} />
                             </motion.div>
                         )}

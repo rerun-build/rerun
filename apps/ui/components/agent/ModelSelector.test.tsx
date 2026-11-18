@@ -59,14 +59,30 @@ async function settle() {
     for (let i = 0; i < 5; i++) await act(async () => new Promise(resolve => setTimeout(resolve, 0)))
 }
 
-async function mount(agentId: string, onReadyChange?: (ready: boolean) => void) {
+async function mount(agentId: string, onReadyChange?: (ready: boolean) => void, props: { pickerKey?: string; onPicked?: () => void } = {}) {
     const { ModelSelector } = await import('@/components/agent/ModelSelector')
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)
     await act(async () => {
-        root!.render(createElement(ModelSelector, { agentId, onReadyChange }))
+        root!.render(createElement(ModelSelector, { agentId, onReadyChange, ...props }))
     })
+    await settle()
+}
+
+async function openPicker() {
+    const trigger = container!.querySelector('button')!
+    await act(async () => {
+        trigger.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0 }))
+        trigger.click()
+    })
+    await settle()
+}
+
+async function pickModel(label: string) {
+    const option = [...document.querySelectorAll<HTMLElement>('[role="option"]')].find(item => item.textContent?.includes(label))
+    expect(option).toBeDefined()
+    await act(async () => option!.click())
     await settle()
 }
 
@@ -137,15 +153,6 @@ describe('ModelSelector coworker default', REIMPORT_TIMEOUT, () => {
         mocks.boardAgentIds = []
     })
 
-    async function openPicker() {
-        const trigger = container!.querySelector('button')!
-        await act(async () => {
-            trigger.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, button: 0 }))
-            trigger.click()
-        })
-        await settle()
-    }
-
     it('keeps the star out of reach of someone who only uses the coworker', async () => {
         mocks.canManage = false
         mocks.boardAgentIds = ['used']
@@ -162,5 +169,79 @@ describe('ModelSelector coworker default', REIMPORT_TIMEOUT, () => {
         await openPicker()
         const star = document.querySelector<HTMLButtonElement>('button[aria-label="Make Sonnet 5.5 this coworker\'s default"]')
         expect(star?.disabled).toBe(false)
+    })
+})
+
+// The usage limit notice opens the picker so the stopped turn goes on with the model picked there.
+// Any other way of changing the model must not send a turn the user never asked for.
+describe('ModelSelector opened by a notice', REIMPORT_TIMEOUT, () => {
+    beforeEach(() => {
+        vi.resetModules()
+        localStorage.clear()
+        mocks.getAgentContextAction.mockResolvedValue(FOLLOWS_CLAUDE)
+        mocks.listAiConnectionsAction.mockResolvedValue(CLAUDE_DEFAULT)
+    })
+    afterEach(() => {
+        act(() => root?.unmount())
+        root = null
+        container?.remove()
+    })
+
+    async function requestPicker(pickerKey: string) {
+        const { useModelPickerStore } = await import('@/stores/model-picker.store')
+        await act(async () => useModelPickerStore.getState().request(pickerKey))
+        await settle()
+    }
+
+    it('says a model was picked in a picker the notice opened', async () => {
+        const onPicked = vi.fn()
+        await mount('noticed', undefined, { pickerKey: 'tab-1', onPicked })
+        await requestPicker('tab-1')
+        await pickModel('Opus 5.5')
+        expect(onPicked).toHaveBeenCalledTimes(1)
+        expect(storedOverride('noticed')).toEqual({ connectionId: 'claude-1', model: 'claude-opus-5-5' })
+    })
+
+    it('waits for the coworker to follow the Box before saying the Box default was picked', async () => {
+        mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'claude-1', model: 'claude-opus-5-5', resolvedConnectionId: 'claude-1', resolvedModel: 'claude-opus-5-5' }))
+        let saveConfig!: () => void
+        mocks.updateAgentConfigAction.mockReturnValue(new Promise<void>(resolve => (saveConfig = resolve)))
+        const onPicked = vi.fn()
+        await mount('pinned', undefined, { pickerKey: 'tab-1', onPicked })
+        await requestPicker('tab-1')
+        await pickModel('Workspace default')
+        expect(mocks.updateAgentConfigAction).toHaveBeenCalledWith('pinned', { connectionId: null, provider: null, model: null })
+        expect(onPicked).not.toHaveBeenCalled()
+        await act(async () => saveConfig())
+        await settle()
+        expect(onPicked).toHaveBeenCalledTimes(1)
+    })
+
+    it('stays quiet for a model picked in a picker opened by hand', async () => {
+        const onPicked = vi.fn()
+        await mount('by-hand', undefined, { pickerKey: 'tab-1', onPicked })
+        await openPicker()
+        await pickModel('Opus 5.5')
+        expect(onPicked).not.toHaveBeenCalled()
+    })
+
+    it('stays quiet when the notice picker closes without a pick and a model is picked later', async () => {
+        const onPicked = vi.fn()
+        await mount('dismissed', undefined, { pickerKey: 'tab-1', onPicked })
+        await requestPicker('tab-1')
+        await act(async () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })))
+        await settle()
+        expect(document.querySelector('[role="option"]')).toBeNull()
+        await openPicker()
+        await pickModel('Opus 5.5')
+        expect(onPicked).not.toHaveBeenCalled()
+    })
+
+    it('stays quiet when it repoints a pin that no longer resolves', async () => {
+        mocks.getAgentContextAction.mockResolvedValue(modelContext({ connectionId: 'gone', model: 'gpt-6-astra', resolvedConnectionId: 'gone', resolvedModel: 'gpt-6-astra' }))
+        const onPicked = vi.fn()
+        await mount('repointed', undefined, { pickerKey: 'tab-1', onPicked })
+        expect(storedOverride('repointed')).toEqual({ connectionId: 'claude-1', model: 'claude-sonnet-5-5' })
+        expect(onPicked).not.toHaveBeenCalled()
     })
 })

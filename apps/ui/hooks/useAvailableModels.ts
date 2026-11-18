@@ -59,7 +59,7 @@ export function useAvailableModels(agentId: string) {
     // switches on: a leftover connectionId would still show up in a connection's usage.
     const followBoxDefault = useCallback(() => {
         patchAgentModel(agentId, { connectionId: null, model: null, resolvedConnectionId: boxDefaultPick?.connectionId ?? null, resolvedModel: boxDefaultPick?.model ?? null })
-        void updateAgentConfigAction(agentId, { connectionId: null, provider: null, model: null })
+        return updateAgentConfigAction(agentId, { connectionId: null, provider: null, model: null })
     }, [agentId, boxDefaultPick])
 
     return {
