@@ -8,14 +8,16 @@ import { Button } from '@/components/ui/button'
 import { FileUploadMenu } from '@/components/ui/file-upload-menu'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useBoxLabel } from '@/components/brain/BrainItemProperties'
+import { filesOfBox, pagesOfBox, type BrainFiling } from '@/lib/brain/items'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import { isCardType } from '@/lib/brain/labels'
 import { humanizeTableName } from '@/lib/data/table-name'
 import type { EngineDbTable } from '@/lib/engine/types'
 import type { UploadEntry } from '@/lib/files/upload'
-import { BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, type LucideIcon } from '@/lib/icons'
+import { ArchiveIcon, BoxIcon, BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
-import type { BrainPageSummary } from '@rerun/contracts'
+import type { BrainFileMeta, BrainPageSummary } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, type ReactNode, type Ref } from 'react'
 
@@ -29,9 +31,15 @@ type BrainSidebarProps = {
     files: SharedFilesTree
     // Null while the shared database is being listed.
     tables: EngineDbTable[] | null
+    filing: BrainFiling
     searchRef: Ref<HTMLInputElement>
     onSelect: (selection: BrainSelection) => void
     onUpload: (entries: UploadEntry[], dir: string) => void
+}
+
+function fileIcon(file: BrainFileMeta): LucideIcon {
+    if (file.kind === 'dir') return FolderIcon
+    return file.path.toLowerCase().endsWith('.zip') ? ArchiveIcon : FileIcon
 }
 
 function SidebarRow({
@@ -162,14 +170,18 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
 
 // One tree for everything the workspace shares, as Notion keeps its pages and databases side by
 // side: what agents proposed, the company pages, the shared folder and the shared database.
-export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, searchRef, onSelect, onUpload }: BrainSidebarProps) {
+export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, filing, searchRef, onSelect, onUpload }: BrainSidebarProps) {
     const t = useTranslations('brain.sidebar')
+    const boxLabel = useBoxLabel()
     const [query, setQuery] = useState('')
-    const card = pages.filter(page => isCardType(page.type))
-    const products = pages.filter(page => page.type === 'product')
-    const others = pages.filter(page => !isCardType(page.type) && page.type !== 'product')
+    const everyone = pagesOfBox(null, pages, filing.boxes)
+    const card = everyone.filter(page => isCardType(page.type))
+    const products = everyone.filter(page => page.type === 'product')
+    const others = everyone.filter(page => !isCardType(page.type) && page.type !== 'product')
     // Null until the person folds or unfolds it: open then only while one of them is selected.
     const [productsExpanded, setProductsExpanded] = useState<boolean | null>(null)
+    // A Box nobody folded or unfolded yet is open while it holds what is selected.
+    const [boxesExpanded, setBoxesExpanded] = useState<Record<string, boolean>>({})
 
     const results = useMemo(() => {
         const needle = query.trim().toLowerCase()
@@ -197,6 +209,63 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
         />
     )
 
+    const isFileSelected = (path: string) => (selection?.kind === 'file' || selection?.kind === 'folder') && selection.path === path
+
+    const boxRows = (boxId: string) => {
+        const boxPages = pagesOfBox(boxId, pages, filing.boxes)
+        const boxFiles = filesOfBox(boxId, filing.files)
+        const holdsSelection = boxPages.some(isSelected) || boxFiles.some(file => isFileSelected(file.path)) || (selection?.kind === 'box' && selection.spaceId === boxId)
+        const open = boxesExpanded[boxId] ?? holdsSelection
+        const box = filing.boxes.find(entry => entry.id === boxId) ?? null
+        const name = boxLabel(box)
+        return (
+            <div key={boxId}>
+                <SidebarRow
+                    icon={BoxIcon}
+                    label={name}
+                    active={selection?.kind === 'box' && selection.spaceId === boxId}
+                    expanded={open}
+                    leading={
+                        <button
+                            type="button"
+                            aria-label={open ? t('collapse', { name }) : t('expand', { name })}
+                            onClick={event => {
+                                event.stopPropagation()
+                                setBoxesExpanded(current => ({ ...current, [boxId]: !open }))
+                            }}
+                            className="-ml-0.5 flex size-4 shrink-0 items-center justify-center rounded hover:bg-foreground/10"
+                        >
+                            <ChevronRightIcon className={cn('size-3 transition-transform duration-150', open && 'rotate-90')} />
+                        </button>
+                    }
+                    trailing={<span className="text-[11px] tabular-nums text-muted-foreground/70">{boxPages.length + boxFiles.length}</span>}
+                    onClick={() => {
+                        setBoxesExpanded(current => ({ ...current, [boxId]: true }))
+                        onSelect({ kind: 'box', spaceId: boxId })
+                    }}
+                />
+                {open && boxPages.map(page => pageRow(page, 1))}
+                {open &&
+                    boxFiles.map(file => {
+                        const folder = file.kind === 'dir'
+                        return (
+                            <SidebarRow
+                                key={file.path}
+                                icon={fileIcon(file)}
+                                label={file.path.split('/').pop() ?? file.path}
+                                tooltip={file.path}
+                                depth={1}
+                                leading={<span className="w-3.5 shrink-0" />}
+                                active={isFileSelected(file.path)}
+                                draggableFile={folder ? undefined : { path: file.path, name: file.path.split('/').pop() ?? file.path }}
+                                onClick={() => onSelect({ kind: folder ? 'folder' : 'file', path: file.path })}
+                            />
+                        )
+                    })}
+            </div>
+        )
+    }
+
     const tableRow = (table: EngineDbTable) => (
         <SidebarRow
             key={table.name}
@@ -211,7 +280,7 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
     return (
         <div className="flex h-full min-h-0 flex-col">
             <div className="space-y-2 px-2 pb-1 pt-3">
-                <div className="flex items-center gap-2 px-2">
+                <div className="flex items-center gap-2 pl-2">
                     <BrainIcon className="size-4 shrink-0" />
                     <span className="text-sm font-semibold">{t('title')}</span>
                 </div>
@@ -259,19 +328,21 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
                             {publishedEnabled && <SidebarRow icon={GlobeIcon} label={t('published')} active={selection?.kind === 'published'} onClick={() => onSelect({ kind: 'published' })} />}
                         </div>
 
-                        <SectionHeader label={t('company')} />
-                        {pagesAvailable ? card.map(page => pageRow(page)) : <p className="px-2 py-1 text-xs text-muted-foreground/70">{t('notOnBox')}</p>}
+                        <SectionHeader
+                            label={t('everyone')}
+                            action={
+                                pagesAvailable && (
+                                    <Button size="icon-xs" variant="ghost" onClick={() => onSelect({ kind: 'new-page' })} aria-label={t('newPage')} title={t('newPage')}>
+                                        <PlusIcon />
+                                    </Button>
+                                )
+                            }
+                        />
+                        {!pagesAvailable && <p className="px-2 py-1 text-xs text-muted-foreground/70">{t('notOnBox')}</p>}
 
                         {pagesAvailable && (
                             <>
-                                <SectionHeader
-                                    label={t('pages')}
-                                    action={
-                                        <Button size="icon-xs" variant="ghost" onClick={() => onSelect({ kind: 'new-page' })} aria-label={t('newPage')} title={t('newPage')}>
-                                            <PlusIcon />
-                                        </Button>
-                                    }
-                                />
+                                {card.map(page => pageRow(page))}
                                 {products.length > 0 && (
                                     <>
                                         <SidebarRow
@@ -288,6 +359,13 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
                                 )}
                                 {others.map(page => pageRow(page))}
                                 <SidebarRow icon={PlusIcon} label={t('newPage')} active={selection?.kind === 'new-page'} onClick={() => onSelect({ kind: 'new-page' })} />
+                            </>
+                        )}
+
+                        {pagesAvailable && filing.boxes.length > 0 && (
+                            <>
+                                <SectionHeader label={t('boxes')} />
+                                {filing.boxes.map(box => boxRows(box.id))}
                             </>
                         )}
 

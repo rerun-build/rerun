@@ -43,6 +43,10 @@ import {
     brainProposalsListSchema,
     brainRevisionContentSchema,
     brainSeedResultSchema,
+    brainFilesMetaListSchema,
+    type BrainFileMeta,
+    type BrainFilesMetaWrite,
+    type BrainItemMetaPatch,
     type BrainPage,
     type BrainPageSummary,
     type BrainPageWrite,
@@ -979,6 +983,23 @@ export async function readBrainPage(conn: EngineConnection, slug: string): Promi
 
 export async function writeBrainPage(conn: EngineConnection, slug: string, body: BrainPageWrite): Promise<BrainPageDetail> {
     return request(conn, `/brain/pages/${encodeURIComponent(slug)}`, { method: 'PUT', body: JSON.stringify(body) }, d => brainPageResponseSchema.parse(d))
+}
+
+export async function setBrainPageMeta(conn: EngineConnection, slug: string, patch: BrainItemMetaPatch): Promise<BrainPageDetail> {
+    return request(conn, `/brain/pages/${encodeURIComponent(slug)}/meta`, { method: 'PATCH', body: JSON.stringify(patch) }, d => brainPageResponseSchema.parse(d))
+}
+
+// How the Brain files the shared folder: tags, who added each file and its Box.
+export async function listBrainFileMeta(conn: EngineConnection): Promise<BrainFileMeta[]> {
+    return request(conn, '/brain/files/meta', { method: 'GET' }, d => brainFilesMetaListSchema.parse(d).files)
+}
+
+export async function setBrainFileMeta(conn: EngineConnection, body: BrainFilesMetaWrite): Promise<BrainFileMeta[]> {
+    return request(conn, '/brain/files/meta', { method: 'PUT', body: JSON.stringify(body) }, d => brainFilesMetaListSchema.parse(d).files)
+}
+
+export async function setBrainAgentBoxes(conn: EngineConnection, boxes: Record<string, string | null>): Promise<void> {
+    await request(conn, '/brain/agent-boxes', { method: 'PUT', body: JSON.stringify({ boxes }) }, () => undefined)
 }
 
 export async function deleteBrainPage(conn: EngineConnection, slug: string): Promise<void> {

@@ -385,6 +385,7 @@
     "brainPageChangedSince": "This page changed since. Open it and restore a version from its history.",
     "restoreVersionFailed": "Could not restore this version",
     "confirmBrainPageFailed": "Could not confirm this page",
+    "fileBrainItemFailed": "Could not change the tags or the Box",
     "notAWebsiteAddress": "That does not look like a website address",
     "addWebsiteFirst": "Add your website first",
     "adminOnlyBilling": "Only an admin can manage billing",

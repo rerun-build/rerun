@@ -13,7 +13,9 @@
         "proposals": "Vorschläge",
         "versionHistory": "Versionsverlauf",
         "newPage": "Neue Seite",
-        "untitled": "Ohne Titel"
+        "untitled": "Ohne Titel",
+        "everyone": "Alle",
+        "boxes": "Boxes"
     },
     "topBar": {
         "showSidebar": "Seitenleiste einblenden",
@@ -181,7 +183,11 @@
         "emptyFolder": "Leerer Ordner",
         "noFiles": "Noch keine Dateien",
         "collapse": "{name} einklappen",
-        "expand": "{name} ausklappen"
+        "expand": "{name} ausklappen",
+        "everyone": "Alle",
+        "boxes": "Boxes",
+        "import": "Importieren",
+        "importHint": "Dateien, eine .zip oder einen Ordner importieren"
     },
     "workspace": {
         "unreachableFallback": "Die Maschine dieses Workspace ist nicht erreichbar.",
@@ -231,5 +237,44 @@
     "authors": {
         "seed": "Rerun, aus deiner Website",
         "foreman": "Chief of Staff"
+    },
+    "filing": {
+        "box": "Box",
+        "tags": "Tags",
+        "addedBy": "Hinzugefügt von",
+        "everyone": "Alle",
+        "untitledBox": "Unbenannte Box",
+        "addTag": "Tag hinzufügen",
+        "tagPlaceholder": "Tag",
+        "createTag": "#{tag} hinzufügen",
+        "tagHint": "Tag eingeben",
+        "removeTag": "{tag} entfernen",
+        "unknownAuthor": "Unbekannt"
+    },
+    "box": {
+        "readFirstBy": "Zuerst gelesen von",
+        "noCoworkers": "Noch kein Coworker in dieser Box",
+        "empty": "In dieser Box ist noch nichts abgelegt",
+        "import": "Importieren"
+    },
+    "import": {
+        "title": "Ins Brain importieren",
+        "description": "Dateien, .zip-Archive und ganze Ordner. Eine .zip wird entpackt, ein Ordner behält seine Struktur.",
+        "drop": "Dateien, eine .zip oder einen Ordner ablegen",
+        "dropOverlay": "Zum Importieren ablegen",
+        "chooseFiles": "Dateien auswählen",
+        "chooseFolder": "Ordner auswählen",
+        "tags": "Tags",
+        "box": "Box",
+        "boxHelp": "Ihre Coworker finden sie zuerst. Alle anderen können sie trotzdem lesen.",
+        "cancel": "Abbrechen",
+        "submit": "{count, plural, =0 {Importieren} one {# Datei importieren} other {# Dateien importieren}}",
+        "fromArchive": "{archive} → {name}",
+        "reading": "{name} wird geöffnet…",
+        "archiveFailed": "{name} konnte nicht geöffnet werden",
+        "tooMany": "Nur die ersten {max} Dateien werden importiert.",
+        "tooLarge": "{name} ist entpackt größer als {size} und wurde ausgelassen.",
+        "remove": "{name} entfernen",
+        "filingFailed": "Die Dateien konnten nicht abgelegt werden: Sie werden ohne Tags und Box importiert."
     }
 }

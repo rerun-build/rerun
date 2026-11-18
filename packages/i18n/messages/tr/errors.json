@@ -376,6 +376,7 @@
     "brainPageChangedSince": "Bu sayfa o zamandan beri değişti. Açın ve geçmişinden bir sürümü geri yükleyin.",
     "restoreVersionFailed": "Bu sürüm geri yüklenemedi",
     "confirmBrainPageFailed": "Bu sayfa onaylanamadı",
+    "fileBrainItemFailed": "Etiketler veya Box değiştirilemedi",
     "notAWebsiteAddress": "Bu bir web sitesi adresine benzemiyor",
     "addWebsiteFirst": "Önce web sitenizi ekleyin",
     "adminOnlyBilling": "Faturalandırmayı yalnızca bir yönetici yönetebilir",

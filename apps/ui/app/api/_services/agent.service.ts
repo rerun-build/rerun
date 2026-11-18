@@ -14,6 +14,7 @@ import type { EngineAgentConfigPatch } from '@/lib/engine/types'
 import { AGENT_SPAN, UNPLACED_COL, agentsOverlap, isPlaced } from '@/lib/board/iso'
 import type { GridPosition } from '@/lib/board/types'
 import { coworkerLanguageFor } from '@/app/api/_services/coworker-language.service'
+import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMany, selectSingle } from '@/supabase/supabase-helpers'
 import { sanitizeIdentifier } from '@/lib/utils'
@@ -105,6 +106,9 @@ export async function moveAgentToBox(agentId: string, spaceId: string, actor: Ac
     const { error } = await supabase.from('agents').update<Database['public']['Tables']['agents']['Update']>({ space_id: spaceId, col: position.col, row: position.row, sidebar_order: sidebarOrder ?? null }).eq('id', agentId)
     if (error) return { ok: false, error: `Failed to move agent: ${error.message}` }
 
+    // What it already added to the Brain stays filed under the Box it was in; what it adds next
+    // goes under this one.
+    await syncCoworkerBoxes(actor.workspaceId)
     return { ok: true, position }
 }
 
@@ -194,6 +198,7 @@ export async function createAgent(params: CreateAgentParams) {
         throw new Error(`Failed to persist agent: ${error?.message ?? 'unknown error'}`)
     }
 
+    await syncCoworkerBoxes(workspaceId)
     return agent
 }
 
@@ -258,6 +263,7 @@ export async function importAgent(params: ImportAgentParams) {
     // not start firing them.
     if (!enabled) await pauseAgentSchedules(agent.id).catch(err => console.error('[activation] failed to pause the schedules of an imported agent', agent.id, err))
 
+    await syncCoworkerBoxes(workspaceId)
     return { agent, imported }
 }
 

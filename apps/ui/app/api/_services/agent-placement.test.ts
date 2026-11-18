@@ -20,6 +20,7 @@ vi.mock('@/supabase/supabase-helpers', () => ({ selectMany: vi.fn(), selectSingl
 vi.mock('@/lib/copy-name', () => ({ duplicateAgentName: vi.fn() }))
 vi.mock('./capacity.service', () => ({ PLAN_LIMIT_REASON: 'plan_limit', hasFreeAgentSlot: vi.fn() }))
 vi.mock('./space.service', () => ({ getSpaceConnection: vi.fn() }))
+vi.mock('@/app/api/_services/coworker-box.service', () => ({ syncCoworkerBoxes: vi.fn() }))
 vi.mock('@/app/api/_auth/access', async importOriginal => ({ ...(await importOriginal<typeof import('@/app/api/_auth/access')>()), readSpaceAccess: vi.fn() }))
 
 const admin = workspaceActor(1)

@@ -5,7 +5,7 @@ import type { CompanyFindingsRow } from '@/lib/company/explore/findings'
 import { answersEvidence, brainEvidence, buildEvidence, evidenceForPrompt, findingsEvidence } from './evidence'
 
 function page(slug: string, title: string, content: string): BrainPage {
-    return { slug, title, type: 'market', hash: 'h', updatedAt: '2026-10-01T00:00:00Z', updatedBy: 'seed', content, sources: [], unconfirmed: [], links: [], backlinks: [] }
+    return { slug, title, type: 'market', hash: 'h', updatedAt: '2026-10-01T00:00:00Z', updatedBy: 'seed', tags: [], createdBy: null, spaceId: null, content, sources: [], unconfirmed: [], links: [], backlinks: [] }
 }
 
 describe('brainEvidence', () => {

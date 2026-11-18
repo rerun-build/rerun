@@ -376,6 +376,7 @@
     "brainPageChangedSince": "Diese Seite hat sich inzwischen geändert. Öffne sie und stell eine Version aus ihrem Verlauf wieder her.",
     "restoreVersionFailed": "Diese Version konnte nicht wiederhergestellt werden",
     "confirmBrainPageFailed": "Diese Seite konnte nicht bestätigt werden",
+    "fileBrainItemFailed": "Tags oder Box konnten nicht geändert werden",
     "notAWebsiteAddress": "Das sieht nicht nach einer Website-Adresse aus",
     "addWebsiteFirst": "Füge zuerst deine Website hinzu",
     "adminOnlyBilling": "Nur ein Admin kann die Abrechnung verwalten",

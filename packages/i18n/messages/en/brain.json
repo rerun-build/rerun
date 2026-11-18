@@ -32,7 +32,13 @@
         "sources.registry": "A source of facts: the official register of companies.",
         "authors.seed": "Author of a page Rerun filled by reading the company's website.",
         "authors.foreman": "Author of a page written by the Chief of Staff, the workspace's own assistant.",
-        "proposals.headlineEdit": "Title of a card proposing a change to a Brain page (the company's knowledge base). {title} is the page name."
+        "proposals.headlineEdit": "Title of a card proposing a change to a Brain page (the company's knowledge base). {title} is the page name.",
+        "crumbs.everyone": "A section of the Brain: what is filed for the whole workspace rather than under one Box (a Box is a group of coworkers on the board).",
+        "filing.box": "Label of the property saying which Box (a group of coworkers on the board) a page or a file is filed under. Keep \"Box\" as the product calls it.",
+        "filing.everyone": "The value of the Box property when an item is filed for the whole workspace rather than under one Box.",
+        "filing.addedBy": "Label of the property naming who first put the page or file in the Brain: a coworker, a person or the website import.",
+        "box.readFirstBy": "Label before the coworkers of a Box, who read the items filed under it before the others.",
+        "import.description": "A .zip is an archive file; \"unpacked\" means its files are extracted. A folder keeps its sub-folders."
     },
     "unavailable": {
         "title": "The Brain is not on this box yet",
@@ -48,7 +54,9 @@
         "proposals": "Proposals",
         "versionHistory": "Version history",
         "newPage": "New page",
-        "untitled": "Untitled"
+        "untitled": "Untitled",
+        "everyone": "Everyone",
+        "boxes": "Boxes"
     },
     "topBar": {
         "showSidebar": "Show sidebar",
@@ -216,7 +224,11 @@
         "emptyFolder": "Empty folder",
         "noFiles": "No files yet",
         "collapse": "Collapse {name}",
-        "expand": "Expand {name}"
+        "expand": "Expand {name}",
+        "everyone": "Everyone",
+        "boxes": "Boxes",
+        "import": "Import",
+        "importHint": "Import files, a .zip or a folder"
     },
     "workspace": {
         "unreachableFallback": "Could not reach the machine of this workspace.",
@@ -266,5 +278,44 @@
     "authors": {
         "seed": "Rerun, from your website",
         "foreman": "Chief of Staff"
+    },
+    "filing": {
+        "box": "Box",
+        "tags": "Tags",
+        "addedBy": "Added by",
+        "everyone": "Everyone",
+        "untitledBox": "Untitled Box",
+        "addTag": "Add tag",
+        "tagPlaceholder": "Tag",
+        "createTag": "Add #{tag}",
+        "tagHint": "Type a tag",
+        "removeTag": "Remove {tag}",
+        "unknownAuthor": "Unknown"
+    },
+    "box": {
+        "readFirstBy": "Read first by",
+        "noCoworkers": "No coworker in this Box yet",
+        "empty": "Nothing is filed under this Box yet",
+        "import": "Import"
+    },
+    "import": {
+        "title": "Import into the Brain",
+        "description": "Files, .zip archives and whole folders. A .zip is unpacked, a folder keeps its tree.",
+        "drop": "Drop files, a .zip or a folder",
+        "dropOverlay": "Drop to import",
+        "chooseFiles": "Choose files",
+        "chooseFolder": "Choose a folder",
+        "tags": "Tags",
+        "box": "Box",
+        "boxHelp": "Its coworkers find these first. Everyone else can still read them.",
+        "cancel": "Cancel",
+        "submit": "{count, plural, =0 {Import} one {Import # file} other {Import # files}}",
+        "fromArchive": "{archive} → {name}",
+        "reading": "Opening {name}…",
+        "archiveFailed": "Could not open {name}",
+        "tooMany": "Only the first {max} files are imported.",
+        "tooLarge": "{name} is over {size} once unpacked, so it was left out.",
+        "remove": "Remove {name}",
+        "filingFailed": "The files could not be filed: they are imported without tags or Box."
     }
 }

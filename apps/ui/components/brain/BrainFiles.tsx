@@ -1,6 +1,11 @@
 'use client'
 
 import { deleteWorkspaceFileAction, readWorkspaceFileAction, renameWorkspaceFileAction, writeWorkspaceFileAction } from '@/app/api/_actions/workspace-file.actions'
+import { setBrainFilesMetaAction } from '@/app/api/_actions/brain.actions'
+import { BrainFilingProperties } from '@/components/brain/BrainItemProperties'
+import { useErrorText } from '@/hooks/useErrorText'
+import { fileMetaOf, type BrainFiling } from '@/lib/brain/items'
+import type { BrainFileMeta, BrainItemMetaPatch } from '@rerun/contracts'
 import type { BrainSelection } from '@/components/brain/selection'
 import { BrainTopBar, type BrainCrumb } from '@/components/brain/BrainTopBar'
 import { joinPath, parentPath, type SharedFilesTree } from '@/components/brain/useSharedFilesTree'
@@ -11,7 +16,7 @@ import { sharedFileRawUrl } from '@/lib/files/raw-url'
 import type { UploadEntry } from '@/lib/files/upload'
 import { FileIcon, FolderIcon } from '@/lib/icons'
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 function folderCrumbs(path: string, rootLabel: string, onSelect: (selection: BrainSelection) => void): BrainCrumb[] {
@@ -31,9 +36,38 @@ function download(path: string) {
     anchor.remove()
 }
 
-type FolderProps = { path: string; files: SharedFilesTree; onSelect: (selection: BrainSelection) => void; onUpload: (entries: UploadEntry[], dir: string) => void }
+type FilingProps = { filing: BrainFiling; tagSuggestions: string[]; onFiled: (files: BrainFileMeta[]) => void }
 
-export function BrainFolderView({ path, files, onSelect, onUpload }: FolderProps) {
+// The Box, tags and author of a file or a folder of the shared folder, as the Brain files it. A file
+// inside an imported folder shows the folder's until it is filed on its own.
+function FileFiling({ path, filing, tagSuggestions, onFiled }: FilingProps & { path: string }) {
+    const errorText = useErrorText()
+    const meta = fileMetaOf(path, filing.files)
+    const [filed, setFiled] = useState({ tags: meta?.tags ?? [], spaceId: meta?.spaceId ?? null })
+
+    const file = async (patch: BrainItemMetaPatch) => {
+        const previous = filed
+        setFiled(current => ({ ...current, ...patch }))
+        // A file showing its folder's filing has no row of its own yet: the one it gets keeps both.
+        const sent = meta?.path === path ? patch : { ...previous, ...patch }
+        const result = await setBrainFilesMetaAction({ paths: [path], ...sent })
+        if (result.ok) onFiled(result.value)
+        else {
+            setFiled(previous)
+            toast.error(errorText(result))
+        }
+    }
+
+    return (
+        <div className="shrink-0 border-t border-border px-4 py-2 sm:px-6">
+            <BrainFilingProperties spaceId={filed.spaceId} tags={filed.tags} author={meta?.createdBy ?? null} filing={filing} suggestions={tagSuggestions} onChange={patch => void file(patch)} />
+        </div>
+    )
+}
+
+type FolderProps = FilingProps & { path: string; files: SharedFilesTree; onSelect: (selection: BrainSelection) => void; onUpload: (entries: UploadEntry[], dir: string) => void }
+
+export function BrainFolderView({ path, files, onSelect, onUpload, ...filingProps }: FolderProps) {
     const t = useTranslations('brain.files')
     const { expand, refresh } = files
 
@@ -62,6 +96,7 @@ export function BrainFolderView({ path, files, onSelect, onUpload }: FolderProps
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <BrainTopBar crumbs={folderCrumbs(path, t('root'), onSelect)} />
+            {path && <FileFiling key={path} path={path} {...filingProps} />}
             <FileList
                 title={path.split('/').filter(Boolean).pop() ?? t('root')}
                 entries={files.entriesOf(path)}
@@ -75,9 +110,9 @@ export function BrainFolderView({ path, files, onSelect, onUpload }: FolderProps
     )
 }
 
-type FileProps = { path: string; files: SharedFilesTree; onSelect: (selection: BrainSelection) => void }
+type FileProps = FilingProps & { path: string; files: SharedFilesTree; onSelect: (selection: BrainSelection) => void }
 
-export function BrainFileView({ path, files, onSelect }: FileProps) {
+export function BrainFileView({ path, files, onSelect, ...filingProps }: FileProps) {
     const t = useTranslations('brain.files')
     const dir = parentPath(path)
     const name = path.split('/').pop() ?? path
@@ -107,6 +142,7 @@ export function BrainFileView({ path, files, onSelect }: FileProps) {
     return (
         <div className="flex min-h-0 flex-1 flex-col">
             <BrainTopBar crumbs={[...folderCrumbs(dir, t('root'), onSelect), { label: name, icon: FileIcon }]} />
+            <FileFiling key={path} path={path} {...filingProps} />
             <div className="flex min-h-0 flex-1 flex-col border-t border-border">
                 <FileDetail
                     name={name}

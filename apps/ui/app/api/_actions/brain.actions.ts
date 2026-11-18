@@ -1,10 +1,15 @@
 'use server'
 
+import { actorFromContext, visibleSpaceIds } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { requireWorkspaceConnection } from '@/app/api/_auth/workspace-target'
+import { syncCoworkerBoxes } from '@/app/api/_services/coworker-box.service'
 import { getWorkspaceConnection, NoEngineError } from '@/app/api/_services/workspace-engine.service'
 import * as engine from '@/lib/engine/client'
-import type { BrainPageSummary, BrainPageType, BrainProposal, BrainRevision } from '@rerun/contracts'
+import type { EngineConnection } from '@/lib/engine/types'
+import type { BrainBox, BrainCoworker } from '@/lib/brain/items'
+import { selectMany } from '@/supabase/supabase-helpers'
+import { brainFilesMetaWriteSchema, brainItemMetaPatchSchema, type BrainFileMeta, type BrainItemMetaPatch, type BrainPageSummary, type BrainPageType, type BrainProposal, type BrainRevision } from '@rerun/contracts'
 import { failureOf, refusal, refusalOf, type ActionFailure, type ActionRefusal } from '@/lib/i18n/action-error'
 
 // A box that predates the brain answers 404 on every /brain route: the dialog shows an "update
@@ -19,13 +24,53 @@ async function authorContext() {
 
 // A workspace gets its machine when its first coworker is built: until then, an onboarding user who
 // opens the Brain reaches a workspace with nowhere to keep it.
-export type BrainOverview = { available: true; pages: BrainPageSummary[]; openProposals: number } | { available: false; reason: 'no_machine' | 'outdated' }
+export type BrainOverview =
+    | { available: true; pages: BrainPageSummary[]; openProposals: number; boxes: BrainBox[]; coworkers: BrainCoworker[]; files: BrainFileMeta[] }
+    | { available: false; reason: 'no_machine' | 'outdated' }
+
+// The Boxes the person can open, in the order of the sidebar, and the coworkers sitting in them: a
+// Box they cannot open stays out of the Brain's list, and its items read as filed for everyone.
+async function readBoxes(): Promise<{ boxes: BrainBox[]; coworkers: BrainCoworker[]; workspaceId: number }> {
+    const ctx = await requireWorkspaceContext()
+    const visible = await visibleSpaceIds(actorFromContext(ctx))
+    const [spaces, agents] = await Promise.all([
+        selectMany(ctx.supabase, 'spaces', ['id', 'name', 'sidebar_order', 'created_at'] as const, { workspace_id: ctx.workspace.id }),
+        selectMany(ctx.supabase, 'agents', ['id', 'name', 'handle', 'space_id', 'engine_agent_id'] as const, { workspace_id: ctx.workspace.id }),
+    ])
+    const canSee = (spaceId: string) => visible === 'all' || visible.has(spaceId)
+    const boxes = (spaces.data ?? [])
+        .filter(space => canSee(space.id))
+        .sort((a, b) => (a.sidebar_order ?? Number.MAX_SAFE_INTEGER) - (b.sidebar_order ?? Number.MAX_SAFE_INTEGER) || (a.created_at ?? '').localeCompare(b.created_at ?? ''))
+        .map(space => ({ id: space.id, name: space.name?.trim() || null }))
+    const coworkers = (agents.data ?? []).filter(agent => canSee(agent.space_id)).map(agent => ({ id: agent.id, name: agent.name, handle: agent.handle ?? null, spaceId: agent.space_id }))
+    return { boxes, coworkers, workspaceId: ctx.workspace.id }
+}
+
+// An engine from before filing answers 404 here: its files read as unfiled.
+async function readFileMeta(conn: EngineConnection): Promise<BrainFileMeta[]> {
+    try {
+        return await engine.listBrainFileMeta(conn)
+    } catch (err) {
+        if (isMissingRoute(err)) return []
+        throw err
+    }
+}
+
+// Read again as the files of an import land: they are filed before their bytes arrive.
+export async function listBrainFileMetaAction(): Promise<BrainFileMeta[] | null> {
+    try {
+        return await readFileMeta(await requireWorkspaceConnection())
+    } catch {
+        return null
+    }
+}
 
 export async function loadBrainAction(): Promise<BrainOverview> {
     try {
         const conn = await requireWorkspaceConnection()
-        const [pages, openProposals] = await Promise.all([engine.listBrainPages(conn), engine.countBrainProposals(conn)])
-        return { available: true, pages, openProposals }
+        const [pages, openProposals, files, { boxes, coworkers, workspaceId }] = await Promise.all([engine.listBrainPages(conn), engine.countBrainProposals(conn), readFileMeta(conn), readBoxes()])
+        await syncCoworkerBoxes(workspaceId)
+        return { available: true, pages, openProposals, boxes, coworkers, files }
     } catch (err) {
         if (err instanceof NoEngineError) return { available: false, reason: 'no_machine' }
         if (isMissingRoute(err)) return { available: false, reason: 'outdated' }
@@ -54,6 +99,27 @@ export async function saveBrainPageAction(slug: string, input: BrainPageInput): 
     } catch (err) {
         const conflict = err instanceof engine.EngineRequestError && err.status === 409
         return { ok: false, conflict, ...(conflict ? refusal('brainPageConflict') : refusalOf(err, 'saveBrainPageFailed')) }
+    }
+}
+
+export type BrainMetaResult<T> = { ok: true; value: T } | ActionFailure
+
+export async function setBrainPageMetaAction(slug: string, patch: BrainItemMetaPatch): Promise<BrainMetaResult<engine.BrainPageDetail>> {
+    try {
+        const conn = await requireWorkspaceConnection()
+        return { ok: true, value: await engine.setBrainPageMeta(conn, slug, brainItemMetaPatchSchema.parse(patch)) }
+    } catch (err) {
+        return failureOf(err, 'fileBrainItemFailed')
+    }
+}
+
+// Files the given paths of the shared folder; the person becomes the author of the ones not filed yet.
+export async function setBrainFilesMetaAction(input: { paths: string[] } & BrainItemMetaPatch): Promise<BrainMetaResult<BrainFileMeta[]>> {
+    try {
+        const { conn, author } = await authorContext()
+        return { ok: true, value: await engine.setBrainFileMeta(conn, brainFilesMetaWriteSchema.parse({ ...input, author })) }
+    } catch (err) {
+        return failureOf(err, 'fileBrainItemFailed')
     }
 }
 

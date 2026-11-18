@@ -2,21 +2,23 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { BrainEditor, type BrainEditorHandle } from '@/components/brain/editor/BrainEditor'
+import { BrainFilingProperties, useBoxLabel } from '@/components/brain/BrainItemProperties'
 import { PageColumn, PageProperty, PageTitle, PageTypeIcon, PageTypeSelect, UnconfirmedSections } from '@/components/brain/BrainPageParts'
 import { BrainTopBar } from '@/components/brain/BrainTopBar'
 import type { SharedFileRef } from '@/components/brain/useSharedFilesTree'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { confirmBrainSectionsAction } from '@/app/api/_actions/brain.actions'
+import { confirmBrainSectionsAction, setBrainPageMetaAction } from '@/app/api/_actions/brain.actions'
 import { useBrainAutosave, type AutosaveStatus } from '@/hooks/useBrainAutosave'
-import { brainAuthorLabel, brainSourceLabels, isCardType } from '@/lib/brain/labels'
+import { addedByOf, boxOfItem, type BrainFiling } from '@/lib/brain/items'
+import { brainAuthorLabel, brainSourceLabels } from '@/lib/brain/labels'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import type { BrainPageDetail } from '@/lib/engine/client'
-import { ChevronRightIcon, CopyIcon, EllipsisIcon, HistoryIcon, Trash2Icon } from '@/lib/icons'
+import { BoxIcon, ChevronRightIcon, CopyIcon, EllipsisIcon, HistoryIcon, Trash2Icon } from '@/lib/icons'
 import { shortRelativeTime } from '@/lib/time'
 import { cn } from '@/lib/utils'
-import type { BrainPage as BrainPageData, BrainPageSummary, BrainPageType, BrainProposal } from '@rerun/contracts'
+import type { BrainItemMetaPatch, BrainPage as BrainPageData, BrainPageSummary, BrainPageType, BrainProposal } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
@@ -28,6 +30,8 @@ type BrainPageProps = {
     titles: Map<string, string>
     files: SharedFileRef[]
     proposal: BrainProposal | null
+    filing: BrainFiling
+    tagSuggestions: string[]
     onOpenPage: (slug: string) => void
     onOpenFile: (path: string) => void
     onReviewProposals: () => void
@@ -71,7 +75,7 @@ function Backlinks({ links, onOpenPage }: { links: BrainPageData['backlinks']; o
 
 // A brain page is its own editor: the title, the type and the body are typed in place and saved as
 // they change, the way Notion does it.
-export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, onOpenFile, onReviewProposals, onSaved, onHistory, onDelete }: BrainPageProps) {
+export function BrainPage({ detail, pages, titles, files, proposal, filing, tagSuggestions, onOpenPage, onOpenFile, onReviewProposals, onSaved, onHistory, onDelete }: BrainPageProps) {
     const t = useTranslations('brain')
     const tPage = useTranslations('brain.page')
     const errorText = useErrorText()
@@ -86,6 +90,22 @@ export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, 
     const [deleting, setDeleting] = useState(false)
     const [confirming, setConfirming] = useState(false)
     const editorHandle = useRef<BrainEditorHandle>(null)
+    const boxLabel = useBoxLabel()
+    // Shown at once, then replaced by what the engine kept; put back if it refused.
+    const [filed, setFiled] = useState({ tags: page.tags, spaceId: page.spaceId })
+
+    const file = async (patch: BrainItemMetaPatch) => {
+        const previous = filed
+        setFiled(current => ({ ...current, ...patch }))
+        const result = await setBrainPageMetaAction(page.slug, patch)
+        if (result.ok) {
+            setFiled({ tags: result.value.page.tags, spaceId: result.value.page.spaceId })
+            onSaved(result.value)
+        } else {
+            setFiled(previous)
+            toast.error(errorText(result))
+        }
+    }
 
     const loadTheirs = async () => {
         const latest = await autosave.loadTheirs()
@@ -111,12 +131,12 @@ export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, 
         else toast.error(errorText(result))
     }
 
-    const section = isCardType(type) ? t('crumbs.company') : t('crumbs.pages')
+    const section = boxLabel(boxOfItem(filed.spaceId, filing.boxes))
     const status = saveLabel(autosave.status, page, locale, tPage)
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <BrainTopBar crumbs={[{ label: section }, { label: title.trim() || t('crumbs.untitled'), icon: BRAIN_PAGE_ICONS[type] }]} status={status && <span className={cn(autosave.status === 'error' && 'text-destructive')} title={autosave.error ?? undefined}>{status}</span>}>
+            <BrainTopBar crumbs={[{ label: section, icon: BoxIcon }, { label: title.trim() || t('crumbs.untitled'), icon: BRAIN_PAGE_ICONS[type] }]} status={status && <span className={cn(autosave.status === 'error' && 'text-destructive')} title={autosave.error ?? undefined}>{status}</span>}>
                 <Button size="icon-sm" variant="ghost" onClick={onHistory} aria-label={tPage('versionHistory')} title={tPage('versionHistory')}>
                     <HistoryIcon />
                 </Button>
@@ -192,6 +212,7 @@ export function BrainPage({ detail, pages, titles, files, proposal, onOpenPage, 
                     {!title.trim() && <p className="mt-1 text-xs text-muted-foreground">{tPage('titleRequired')}</p>}
 
                     <div className="mt-4 space-y-0.5 border-b border-border pb-4">
+                        <BrainFilingProperties spaceId={filed.spaceId} tags={filed.tags} author={addedByOf(page)} filing={filing} suggestions={tagSuggestions} onChange={patch => void file(patch)} />
                         <PageProperty label={tPage('type')}>
                             <PageTypeSelect
                                 value={type}

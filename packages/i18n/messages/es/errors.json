@@ -376,6 +376,7 @@
     "brainPageChangedSince": "Esta página cambió desde entonces. Ábrela y restaura una versión desde su historial.",
     "restoreVersionFailed": "No se pudo restaurar esta versión",
     "confirmBrainPageFailed": "No se pudo confirmar esta página",
+    "fileBrainItemFailed": "No se pudieron cambiar las etiquetas o la Box",
     "notAWebsiteAddress": "Eso no parece la dirección de un sitio web",
     "addWebsiteFirst": "Primero añade tu sitio web",
     "adminOnlyBilling": "Solo un admin puede gestionar la facturación",

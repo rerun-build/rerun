@@ -11,6 +11,8 @@ export type BrainSelection =
     // The database before a table is picked: lands on its first table, or says there is none yet.
     | { kind: 'database' }
     | { kind: 'table'; name: string }
+    // A Box: what its coworkers read first, and everything filed under it.
+    | { kind: 'box'; spaceId: string }
 
 export function selectionKey(selection: BrainSelection | null): string {
     if (!selection) return 'none'
@@ -23,6 +25,8 @@ export function selectionKey(selection: BrainSelection | null): string {
             return `${selection.kind}:${selection.path}`
         case 'table':
             return `table:${selection.name}`
+        case 'box':
+            return `box:${selection.spaceId}`
         default:
             return selection.kind
     }

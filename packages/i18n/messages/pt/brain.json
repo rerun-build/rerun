@@ -13,7 +13,9 @@
         "proposals": "Propostas",
         "versionHistory": "Histórico de versões",
         "newPage": "Nova página",
-        "untitled": "Sem título"
+        "untitled": "Sem título",
+        "everyone": "Todos",
+        "boxes": "Boxes"
     },
     "topBar": {
         "showSidebar": "Mostrar barra lateral",
@@ -181,7 +183,11 @@
         "emptyFolder": "Pasta vazia",
         "noFiles": "Nenhum arquivo ainda",
         "collapse": "Recolher {name}",
-        "expand": "Expandir {name}"
+        "expand": "Expandir {name}",
+        "everyone": "Todos",
+        "boxes": "Boxes",
+        "import": "Importar",
+        "importHint": "Importe arquivos, um .zip ou uma pasta"
     },
     "workspace": {
         "unreachableFallback": "Não foi possível acessar a máquina deste workspace.",
@@ -231,5 +237,44 @@
     "authors": {
         "seed": "Rerun, a partir do seu site",
         "foreman": "Chief of Staff"
+    },
+    "filing": {
+        "box": "Box",
+        "tags": "Tags",
+        "addedBy": "Adicionado por",
+        "everyone": "Todos",
+        "untitledBox": "Box sem título",
+        "addTag": "Adicionar tag",
+        "tagPlaceholder": "Tag",
+        "createTag": "Adicionar #{tag}",
+        "tagHint": "Digite uma tag",
+        "removeTag": "Remover {tag}",
+        "unknownAuthor": "Desconhecido"
+    },
+    "box": {
+        "readFirstBy": "Lido primeiro por",
+        "noCoworkers": "Ainda não há nenhum coworker nesta Box",
+        "empty": "Ainda não há nada nesta Box",
+        "import": "Importar"
+    },
+    "import": {
+        "title": "Importar para o Brain",
+        "description": "Arquivos, arquivos .zip e pastas inteiras. Um .zip é descompactado, uma pasta mantém sua estrutura.",
+        "drop": "Solte arquivos, um .zip ou uma pasta",
+        "dropOverlay": "Solte para importar",
+        "chooseFiles": "Escolher arquivos",
+        "chooseFolder": "Escolher uma pasta",
+        "tags": "Tags",
+        "box": "Box",
+        "boxHelp": "Os coworkers dela encontram esses arquivos primeiro. Os outros ainda podem lê-los.",
+        "cancel": "Cancelar",
+        "submit": "{count, plural, =0 {Importar} one {Importar # arquivo} other {Importar # arquivos}}",
+        "fromArchive": "{archive} → {name}",
+        "reading": "Abrindo {name}…",
+        "archiveFailed": "Não foi possível abrir {name}",
+        "tooMany": "Só os primeiros {max} arquivos são importados.",
+        "tooLarge": "{name} passa de {size} descompactado, então ficou de fora.",
+        "remove": "Remover {name}",
+        "filingFailed": "Não foi possível organizar os arquivos: eles são importados sem tags nem Box."
     }
 }

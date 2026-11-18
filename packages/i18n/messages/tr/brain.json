@@ -13,7 +13,9 @@
         "proposals": "Öneriler",
         "versionHistory": "Sürüm geçmişi",
         "newPage": "Yeni sayfa",
-        "untitled": "Adsız"
+        "untitled": "Adsız",
+        "everyone": "Herkes",
+        "boxes": "Boxes"
     },
     "topBar": {
         "showSidebar": "Kenar çubuğunu göster",
@@ -181,7 +183,11 @@
         "emptyFolder": "Boş klasör",
         "noFiles": "Henüz dosya yok",
         "collapse": "Daralt: {name}",
-        "expand": "Genişlet: {name}"
+        "expand": "Genişlet: {name}",
+        "everyone": "Herkes",
+        "boxes": "Boxes",
+        "import": "İçe aktar",
+        "importHint": "Dosya, .zip veya klasör içe aktar"
     },
     "workspace": {
         "unreachableFallback": "Bu çalışma alanının makinesine ulaşılamadı.",
@@ -231,5 +237,44 @@
     "authors": {
         "seed": "Rerun, web sitenizden",
         "foreman": "Chief of Staff"
+    },
+    "filing": {
+        "box": "Box",
+        "tags": "Etiketler",
+        "addedBy": "Ekleyen",
+        "everyone": "Herkes",
+        "untitledBox": "Adsız Box",
+        "addTag": "Etiket ekle",
+        "tagPlaceholder": "Etiket",
+        "createTag": "#{tag} ekle",
+        "tagHint": "Bir etiket yazın",
+        "removeTag": "{tag} kaldır",
+        "unknownAuthor": "Bilinmiyor"
+    },
+    "box": {
+        "readFirstBy": "İlk okuyanlar",
+        "noCoworkers": "Bu Box'ta henüz coworker yok",
+        "empty": "Bu Box'a henüz hiçbir şey eklenmedi",
+        "import": "İçe aktar"
+    },
+    "import": {
+        "title": "Brain'e içe aktar",
+        "description": ".zip arşivleri ve tüm klasörler dahil dosyalar. Bir .zip açılır, bir klasör ağaç yapısını korur.",
+        "drop": "Dosya, .zip veya klasör bırakın",
+        "dropOverlay": "İçe aktarmak için bırakın",
+        "chooseFiles": "Dosya seç",
+        "chooseFolder": "Klasör seç",
+        "tags": "Etiketler",
+        "box": "Box",
+        "boxHelp": "Coworker'ları bunları ilk bulur. Diğer herkes yine de okuyabilir.",
+        "cancel": "İptal",
+        "submit": "{count, plural, =0 {İçe aktar} one {# dosyayı içe aktar} other {# dosyayı içe aktar}}",
+        "fromArchive": "{archive} → {name}",
+        "reading": "{name} açılıyor…",
+        "archiveFailed": "{name} açılamadı",
+        "tooMany": "Yalnızca ilk {max} dosya içe aktarılır.",
+        "tooLarge": "{name} açıldığında {size} boyutunu aşıyor, bu yüzden dışarıda bırakıldı.",
+        "remove": "{name} kaldır",
+        "filingFailed": "Dosyalar düzenlenemedi: etiket ve Box olmadan içe aktarılıyor."
     }
 }

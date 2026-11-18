@@ -376,6 +376,7 @@
     "brainPageChangedSince": "Esta página mudou desde então. Abra-a e restaure uma versão do histórico.",
     "restoreVersionFailed": "Não foi possível restaurar esta versão",
     "confirmBrainPageFailed": "Não foi possível confirmar esta página",
+    "fileBrainItemFailed": "Não foi possível alterar as tags ou a Box",
     "notAWebsiteAddress": "Isso não parece um endereço de site",
     "addWebsiteFirst": "Adicione seu site primeiro",
     "adminOnlyBilling": "Só um admin pode gerenciar a cobrança",

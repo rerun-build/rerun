@@ -13,7 +13,9 @@
         "proposals": "Propositions",
         "versionHistory": "Historique des versions",
         "newPage": "Nouvelle page",
-        "untitled": "Sans titre"
+        "untitled": "Sans titre",
+        "everyone": "Tout le monde",
+        "boxes": "Boxes"
     },
     "topBar": {
         "showSidebar": "Afficher la barre latérale",
@@ -181,7 +183,11 @@
         "emptyFolder": "Dossier vide",
         "noFiles": "Aucun fichier pour l'instant",
         "collapse": "Replier {name}",
-        "expand": "Déplier {name}"
+        "expand": "Déplier {name}",
+        "everyone": "Tout le monde",
+        "boxes": "Boxes",
+        "import": "Importer",
+        "importHint": "Importer des fichiers, un .zip ou un dossier"
     },
     "workspace": {
         "unreachableFallback": "Impossible de joindre la machine de ce workspace.",
@@ -231,5 +237,44 @@
     "authors": {
         "seed": "Rerun, d'après votre site web",
         "foreman": "Chief of Staff"
+    },
+    "filing": {
+        "box": "Box",
+        "tags": "Tags",
+        "addedBy": "Ajouté par",
+        "everyone": "Tout le monde",
+        "untitledBox": "Box sans nom",
+        "addTag": "Ajouter un tag",
+        "tagPlaceholder": "Tag",
+        "createTag": "Ajouter #{tag}",
+        "tagHint": "Saisissez un tag",
+        "removeTag": "Retirer {tag}",
+        "unknownAuthor": "Inconnu"
+    },
+    "box": {
+        "readFirstBy": "Lu en premier par",
+        "noCoworkers": "Aucun coworker dans cette Box pour l’instant",
+        "empty": "Rien n’est encore rangé dans cette Box",
+        "import": "Importer"
+    },
+    "import": {
+        "title": "Importer dans le Brain",
+        "description": "Des fichiers, des archives .zip et des dossiers entiers. Un .zip est décompressé, un dossier garde son arborescence.",
+        "drop": "Déposez des fichiers, un .zip ou un dossier",
+        "dropOverlay": "Déposez pour importer",
+        "chooseFiles": "Choisir des fichiers",
+        "chooseFolder": "Choisir un dossier",
+        "tags": "Tags",
+        "box": "Box",
+        "boxHelp": "Ses coworkers les trouvent en premier. Les autres peuvent toujours les lire.",
+        "cancel": "Annuler",
+        "submit": "{count, plural, =0 {Importer} one {Importer # fichier} other {Importer # fichiers}}",
+        "fromArchive": "{archive} → {name}",
+        "reading": "Ouverture de {name}…",
+        "archiveFailed": "Impossible d’ouvrir {name}",
+        "tooMany": "Seuls les {max} premiers fichiers sont importés.",
+        "tooLarge": "{name} dépasse {size} une fois décompressé, il a été laissé de côté.",
+        "remove": "Retirer {name}",
+        "filingFailed": "Les fichiers n’ont pas pu être rangés : ils sont importés sans tags ni Box."
     }
 }
