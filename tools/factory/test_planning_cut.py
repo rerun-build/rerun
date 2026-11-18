@@ -149,6 +149,9 @@ class Cut(Base):
                      "every file that pins one is in Files", "inside the `**Run**` block", "**Size**"):
             self.assertIn(part, text)
 
+    def test_how_the_builder_starts_is_no_change_bullet(self):
+        self.assertIn("how the builder starts (a branch to merge, a command to run, a pull request to open) is no Change bullet", planning.CUT_RULES)
+
     def test_shipped_settings(self):
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "dispatch.json")) as f:
             cfg = json.load(f)

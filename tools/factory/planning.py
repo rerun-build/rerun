@@ -101,6 +101,7 @@ Before you file a child:
 - Search dev for every value, name and version the change alters; every file that pins one is in Files.
 - Every Run line is inside the `**Run**` block, exactly as you ran it.
 - The Change names functions; a line number is only a hint beside the name.
+- Each Change bullet says what the code does after the change, and the prover checks it against the diff: how the builder starts (a branch to merge, a command to run, a pull request to open) is no Change bullet.
 - Add the line `**Size**: small|medium|large` from the plan.
 - Check the asks against the checks that will run: nothing in Change asks for what lint, the type check or "No comments in code" refuses."""
 
