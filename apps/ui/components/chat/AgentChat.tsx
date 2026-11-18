@@ -45,6 +45,7 @@ import { useMessageFeedback } from '@/hooks/useMessageFeedback'
 import { useMessageTimes } from '@/hooks/useMessageTimes'
 import { useQueuedMessage } from '@/hooks/useQueuedMessage'
 import { useRunReconnect } from '@/hooks/useRunReconnect'
+import { useSessionResume } from '@/hooks/useSessionResume'
 import { invalidateAgentSkillSummaries } from '@/hooks/useAgentSkillSummaries'
 import { useSkillProposals } from '@/hooks/useSkillProposals'
 import { useModelPickerStore } from '@/stores/model-picker.store'
@@ -546,6 +547,26 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, sessionP
         resumeStream,
         setMessages: setMessages as (messages: never[]) => void,
         clearError,
+    })
+
+    useSessionResume({
+        sessionId,
+        enabled: active && !historyLoading && !reconnecting && (status === 'ready' || status === 'error'),
+        messages,
+        sendingRef,
+        onSnapshot: snapshot => {
+            if (!sessionId) return
+            if (!snapshot.messages.length && !snapshot.activeRunId && !snapshot.lastError) return
+            if (snapshot.messages.length > 0 && historyCovers(messages, snapshot.messages)) {
+                setMessages(snapshot.messages as Parameters<typeof setMessages>[0])
+                clearError()
+                setRunError(null)
+            }
+            if (snapshot.lastError) showReplayedRunError(snapshot.lastError)
+            if (snapshot.usage) setSeededUsage(snapshot.usage)
+            seedProposalsRef.current(sessionId, snapshot.proposals)
+            if (snapshot.activeRunId && snapshot.activeRunId !== attachedRunRef.current) setAttachRunId(snapshot.activeRunId)
+        },
     })
 
     // Whether the conversation is busy at all, this tab's own stream included. It decides the
