@@ -58,6 +58,7 @@ import {
     type BrainSeedResult,
 } from '@rerun/contracts'
 import { isNetworkFailure } from '@/lib/net/network-error'
+import { forgetMachineAt } from '@/lib/engine/engine-memory'
 import {
     type EngineAgentConfigPatch,
     type EngineMcpServer,
@@ -184,7 +185,10 @@ async function fetchEngine(url: string, init: RequestInit): Promise<Response> {
     try {
         return await fetch(url, init)
     } catch (err) {
-        if (isNetworkFailure(err)) throw new EngineUnreachableError(err)
+        if (isNetworkFailure(err)) {
+            forgetMachineAt(url)
+            throw new EngineUnreachableError(err)
+        }
         throw err
     }
 }

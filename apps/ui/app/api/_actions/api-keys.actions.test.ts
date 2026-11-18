@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { hashApiKey } from '@/lib/mcp/api-keys'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
+import { sessionWithMembership } from '@/test/session-membership'
 vi.mock('@rerun/cloud/billing', async importOriginal => ({ ...(await importOriginal<object>()), ...(await import('@/test/cloud-fakes')).CLOUD_ENTITLEMENTS }))
 
 const mocks = vi.hoisted(() => ({ getServerSession: vi.fn() }))
@@ -24,12 +25,14 @@ function database(resolve: (table: string, calls: readonly SupabaseCall[]) => { 
 }
 
 function signedIn(workspace: { subscription_status: string | null; is_sandbox: boolean }) {
-    mocks.getServerSession.mockResolvedValue({
-        user: { id: 'user-1', workspace_id: WORKSPACE_ID },
-        workspace: { id: WORKSPACE_ID, name: 'Acme', ...workspace },
-        session: { id: 'user-1', email: 'me@acme.test' },
-        workspaceRefused: false,
-    })
+    mocks.getServerSession.mockImplementation(
+        sessionWithMembership({
+            user: { id: 'user-1', workspace_id: WORKSPACE_ID },
+            workspace: { id: WORKSPACE_ID, name: 'Acme', ...workspace },
+            session: { id: 'user-1', email: 'me@acme.test' },
+            workspaceRefused: false,
+        }),
+    )
 }
 
 beforeEach(() => {

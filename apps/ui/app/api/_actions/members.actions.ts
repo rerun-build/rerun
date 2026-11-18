@@ -10,7 +10,7 @@ import { ownsEmail } from '@/lib/auth/account-emails'
 import { workspaceLocale } from '@/lib/i18n/recipient-locale'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { emailTranslator } from '@rerun/emails/i18n'
-import { getServerSession } from '@/supabase/session/getServerSession'
+import { getAuthUser, getServerSession } from '@/supabase/session/getServerSession'
 import { selectAll, selectCount, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { MemberProfile } from '@rerun/contracts'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -221,28 +221,28 @@ export async function loadInvitationAction(token: string): Promise<InvitationVie
 // The page is rendered again after the one that accepted (a refresh racing the sign-in navigation,
 // a reload): whoever it was meant for, already a member, is let in rather than told it was used.
 export async function joinedWorkspaceForInvitationAction(token: string): Promise<number | null> {
-    const { user, session } = await getServerSession()
-    if (!user?.id || !session?.email) return null
+    const [{ user }, account] = await Promise.all([getServerSession(), getAuthUser()])
+    if (!user?.id || !account?.email) return null
 
     const supabase = createServiceRoleClient()
     const { data: invite } = await selectMaybeSingle(supabase, 'workspace_invitations', ['workspace_id', 'email', 'status'] as const, { token })
     if (!invite || invite.status !== 'accepted') return null
-    if (!ownsEmail(session, invite.email)) return null
+    if (!ownsEmail(account, invite.email)) return null
 
     const { data: membership } = await selectMaybeSingle(supabase, 'workspace_members', ['user_id'] as const, { user_id: user.id, workspace_id: invite.workspace_id })
     return membership ? invite.workspace_id : null
 }
 
 export async function acceptInvitationAction(token: string): Promise<ActionResult<{ workspaceId: number }>> {
-    const { user, session } = await getServerSession()
-    if (!user?.id || !session?.email) return failure('signInToAcceptInvitation')
+    const [{ user }, account] = await Promise.all([getServerSession(), getAuthUser()])
+    if (!user?.id || !account?.email) return failure('signInToAcceptInvitation')
 
     const supabase = createServiceRoleClient()
     const { data: invite } = await selectMaybeSingle(supabase, 'workspace_invitations', ['id', 'workspace_id', 'email', 'status', 'expires_at', 'box_scope'] as const, { token })
     if (!invite) return failure('invitationNotFound')
     if (invite.status !== 'pending') return failure('invitationInvalid')
     if (new Date(invite.expires_at).getTime() < Date.now()) return failure('invitationExpired')
-    if (!ownsEmail(session, invite.email)) {
+    if (!ownsEmail(account, invite.email)) {
         return failure('invitationForEmail', { email: invite.email })
     }
 

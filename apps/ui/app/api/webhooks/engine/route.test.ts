@@ -10,6 +10,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { generateRunTitle } from '@/lib/ai/generate-run-title'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
 import { POST } from './route'
+import { forgetMachine } from '@/lib/engine/engine-memory'
 
 vi.mock('@trigger.dev/sdk/v3', async () => (await import('@/test/trigger-sdk')).triggerSdkMock())
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
@@ -104,6 +105,8 @@ describe('POST /api/webhooks/engine', () => {
 
     beforeEach(() => {
         vi.clearAllMocks()
+        // The workspace an engine key names is kept for a moment: each test starts without it.
+        forgetMachine(WORKSPACE_ID)
         sandbox = true
         session = null
         participants = []

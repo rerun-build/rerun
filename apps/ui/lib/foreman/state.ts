@@ -98,7 +98,7 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
         foreman,
         onboardingCompletedAt,
         firstName: readFirstName(ctx.authUser.user_metadata),
-        language: accountLanguage((await selectMaybeSingle(ctx.supabase, 'users', ['locale'] as const, { id: ctx.userId })).data?.locale) ?? foreman.language ?? preferredLanguage(acceptLanguage),
+        language: accountLanguage(ctx.userLocale) ?? foreman.language ?? preferredLanguage(acceptLanguage),
         entitled,
         trialing,
         trialSpent: !!ctx.workspace.trial_ends_at,

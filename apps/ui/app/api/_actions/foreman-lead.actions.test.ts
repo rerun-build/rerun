@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fakeSupabase, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
+import { sessionWithMembership } from '@/test/session-membership'
 
 const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), startAgentSetup: vi.fn() }))
 
@@ -38,12 +39,14 @@ beforeEach(() => {
     vi.clearAllMocks()
     MEMBERSHIP = ADMIN
     SPACE_VISIBILITY = 'workspace'
-    mocks.getServerSession.mockResolvedValue({
-        user: { id: 'user-1', workspace_id: WORKSPACE_ID },
-        workspace: { id: WORKSPACE_ID, name: 'Acme' },
-        session: { id: 'user-1', email: 'me@acme.test' },
-        workspaceRefused: false,
-    })
+    mocks.getServerSession.mockImplementation(
+        sessionWithMembership({
+            user: { id: 'user-1', workspace_id: WORKSPACE_ID },
+            workspace: { id: WORKSPACE_ID, name: 'Acme' },
+            session: { id: 'user-1', email: 'me@acme.test' },
+            workspaceRefused: false,
+        }),
+    )
 })
 
 describe('readLeadInstallAction', () => {

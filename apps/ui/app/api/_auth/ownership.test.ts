@@ -27,7 +27,8 @@ function sessionIn(workspaceId: number | null, extra: Record<string, unknown> = 
     return {
         user: workspaceId === null ? null : { id: 'u1', workspace_id: workspaceId },
         workspace: workspaceId === null ? null : { id: workspaceId },
-        session: workspaceId === null ? undefined : { id: 'u1', email: 'a@b.c' },
+        session: workspaceId === null ? null : { id: 'u1', email: 'a@b.c' },
+        membership: workspaceId === null ? null : { role: 'member', box_scope: 'assigned' },
         workspaceRefused: false,
         ...extra,
     }
@@ -64,16 +65,15 @@ describe('requireWorkspaceId', () => {
 })
 
 describe('requireWorkspaceContext', () => {
-    it('hands back the workspace once the membership is proven', async () => {
-        mocks.selectMaybeSingle.mockResolvedValue({ data: { role: 'member', box_scope: 'assigned' }, error: null })
+    it('hands back the workspace with the role the session proved, without reading the membership again', async () => {
+        mocks.getServerSession.mockResolvedValue({ ...sessionIn(1), user: { id: 'u1', workspace_id: 1, locale: 'fr' } })
         const context = await requireWorkspaceContext()
-        expect(context).toMatchObject({ userId: 'u1', userEmail: 'a@b.c', workspace: { id: 1 }, role: 'member', boxScope: 'assigned', supabase: mocks.client })
-        expect(mocks.selectMaybeSingle.mock.calls[0][1]).toBe('workspace_members')
-        expect(mocks.selectMaybeSingle.mock.calls[0][3]).toEqual({ user_id: 'u1', workspace_id: 1 })
+        expect(context).toMatchObject({ userId: 'u1', userEmail: 'a@b.c', userLocale: 'fr', workspace: { id: 1 }, role: 'member', boxScope: 'assigned', supabase: mocks.client })
+        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
     })
 
-    it('refuses a stale users.workspace_id whose membership row is gone', async () => {
-        mocks.selectMaybeSingle.mockResolvedValue({ data: null, error: null })
+    it('refuses a session that carries no membership', async () => {
+        mocks.getServerSession.mockResolvedValue({ ...sessionIn(1), membership: null })
         const error = await requireWorkspaceContext().catch(e => e)
         expect(error).toBeInstanceOf(AuthorizationError)
         expect(error).not.toBeInstanceOf(UnauthenticatedError)
@@ -86,7 +86,7 @@ describe('requireWorkspaceContext', () => {
     })
 
     it('throws UnauthenticatedError without an auth session', async () => {
-        mocks.getServerSession.mockResolvedValue({ ...sessionIn(1), session: undefined })
+        mocks.getServerSession.mockResolvedValue({ ...sessionIn(1), session: null })
         await expect(requireWorkspaceContext()).rejects.toBeInstanceOf(UnauthenticatedError)
     })
 })
@@ -117,12 +117,11 @@ describe('assertSpaceInWorkspace', () => {
 
 describe('requireAdminContext', () => {
     it('hands an admin their context', async () => {
-        mocks.selectMaybeSingle.mockResolvedValue({ data: { role: 'admin' }, error: null })
+        mocks.getServerSession.mockResolvedValue({ ...sessionIn(1), membership: { role: 'admin', box_scope: 'all' } })
         await expect(requireAdminContext()).resolves.toMatchObject({ userId: 'u1', role: 'admin' })
     })
 
     it('refuses a member with the reason given', async () => {
-        mocks.selectMaybeSingle.mockResolvedValue({ data: { role: 'member' }, error: null })
         const error = await requireAdminContext('adminOnlyMembers').catch(e => e)
         expect(error).toBeInstanceOf(AuthorizationError)
         expect(error.message).toBe('Only an admin can manage members')

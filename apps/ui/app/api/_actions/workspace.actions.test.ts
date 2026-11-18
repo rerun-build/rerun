@@ -4,6 +4,7 @@ import { BLOB_ILLUSTRATIONS, blobUrl } from '@/lib/blobs/catalog'
 import { faviconUrl } from '@/lib/onboarding/site-favicon'
 import { WORKSPACE_NAME_MAX } from '@/lib/naming/workspace-name'
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
+import { sessionWithMembership } from '@/test/session-membership'
 
 const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), uploadPublicImage: vi.fn(), lookup: vi.fn(), grantRerunTopup: vi.fn() }))
 
@@ -53,12 +54,14 @@ beforeEach(() => {
     vi.unstubAllGlobals()
     mocks.uploadPublicImage.mockResolvedValue(BUCKET_URL)
     mocks.lookup.mockResolvedValue([{ address: '93.184.215.14', family: 4 }])
-    mocks.getServerSession.mockResolvedValue({
-        user: { id: 'user-1', workspace_id: WORKSPACE_ID },
-        workspace: { id: WORKSPACE_ID, name: 'Acme' },
-        session: { id: 'user-1', email: 'me@acme.test' },
-        workspaceRefused: false,
-    })
+    mocks.getServerSession.mockImplementation(
+        sessionWithMembership({
+            user: { id: 'user-1', workspace_id: WORKSPACE_ID },
+            workspace: { id: WORKSPACE_ID, name: 'Acme' },
+            session: { id: 'user-1', email: 'me@acme.test' },
+            workspaceRefused: false,
+        }),
+    )
 })
 
 describe('switchWorkspaceAction', () => {
@@ -256,7 +259,7 @@ describe('createWorkspaceAction', () => {
         const db = creatableDatabase()
 
         await expect(createWorkspaceAction('Acme', iconUrl)).resolves.toEqual({ ok: false, error: 'Unknown icon', code: 'unknownIcon' })
-        expect(db.calls).toHaveLength(0)
+        expect(db.chainsOn('workspaces')).toHaveLength(0)
     })
 
     it('keeps an icon picked from the catalogue', async () => {

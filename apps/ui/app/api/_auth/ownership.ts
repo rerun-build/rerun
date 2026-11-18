@@ -3,9 +3,9 @@ import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors
 import { realEmail } from '@/lib/auth/placeholder-email'
 import type { Database, Enums } from '@/app/api/database.types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { getServerSession, getSessionWorkspace } from '@/supabase/session/getServerSession'
-import { selectMany, selectMaybeSingle, selectMaybeSingleWithJoins, selectSingle } from '@/supabase/supabase-helpers'
-import type { SupabaseClient, User } from '@supabase/supabase-js'
+import { getServerSession, getSessionWorkspace, type SessionIdentity } from '@/supabase/session/getServerSession'
+import { selectMany, selectMaybeSingleWithJoins, selectSingle } from '@/supabase/supabase-helpers'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { ErrorCode } from '@/lib/i18n/action-error'
 
 // Why this module exists: every mutation/read in the API goes through the
@@ -36,27 +36,25 @@ export async function requireWorkspaceId(): Promise<number> {
 export type WorkspaceContext = {
     userId: string
     userEmail: string | null
-    authUser: User
+    // The language the account chose, null while it follows the browser.
+    userLocale: string | null
+    authUser: SessionIdentity
     workspace: NonNullable<Awaited<ReturnType<typeof getServerSession>>['workspace']>
     role: WorkspaceRole
     boxScope: BoxScope
     supabase: SupabaseClient<Database>
 }
 
-// The same resolution as requireWorkspaceId, one step further: it also proves membership and
-// hands back the row and the service-role client the caller is about to need. A workspace can
-// stay on users.workspace_id after the membership is gone, so the membership is re-read rather
-// than inferred from the session.
+// The same resolution as requireWorkspaceId, one step further: it also hands back the workspace row,
+// the caller's role and the service-role client the caller is about to need. The membership is the
+// one the session read under RLS to accept the workspace, so a revoked one never gets this far.
 export async function requireWorkspaceContext(): Promise<WorkspaceContext> {
-    const { user, workspace, session, workspaceRefused } = await getServerSession()
+    const { user, workspace, session, membership, workspaceRefused } = await getServerSession()
     if (workspaceRefused) throw new AuthorizationError(NOT_A_MEMBER)
     if (!user?.id || !user.workspace_id || !workspace || !session) throw new UnauthenticatedError()
-
-    const supabase = createServiceRoleClient()
-    const { data: membership } = await selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: user.id, workspace_id: workspace.id })
     if (!membership) throw new AuthorizationError(NOT_A_MEMBER)
 
-    return { userId: user.id, userEmail: realEmail(session.email), authUser: session, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), supabase }
+    return { userId: user.id, userEmail: realEmail(session.email), userLocale: user.locale, authUser: session, workspace, role: membership.role, boxScope: toBoxScope(membership.box_scope), supabase: createServiceRoleClient() }
 }
 
 export const ADMIN_ONLY = 'adminOnly' satisfies ErrorCode

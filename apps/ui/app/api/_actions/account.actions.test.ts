@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), anonymizeAccount: vi.fn(), accountDeletionBlockers: vi.fn() }))
+const mocks = vi.hoisted(() => ({ getAuthUser: vi.fn(), anonymizeAccount: vi.fn(), accountDeletionBlockers: vi.fn() }))
 
-vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession }))
+vi.mock('@/supabase/session/getServerSession', () => ({ getAuthUser: mocks.getAuthUser }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn(() => ({})) }))
 vi.mock('@/app/api/_services/account-deletion.service', () => ({ anonymizeAccount: mocks.anonymizeAccount, accountDeletionBlockers: mocks.accountDeletionBlockers }))
 
@@ -12,14 +12,14 @@ const ACCOUNT = { id: 'user-1', email: 'ada@rerun.build' }
 
 beforeEach(() => {
     vi.clearAllMocks()
-    mocks.getServerSession.mockResolvedValue({ session: ACCOUNT })
+    mocks.getAuthUser.mockResolvedValue(ACCOUNT)
     mocks.anonymizeAccount.mockResolvedValue({ ok: true })
     mocks.accountDeletionBlockers.mockResolvedValue([])
 })
 
 describe('deleteMyAccountAction', () => {
     it('refuses an anonymous visitor', async () => {
-        mocks.getServerSession.mockResolvedValue({ session: { id: 'anon', is_anonymous: true } })
+        mocks.getAuthUser.mockResolvedValue({ id: 'anon', is_anonymous: true })
 
         await expect(deleteMyAccountAction({ confirmation: 'DELETE' })).resolves.toMatchObject({ ok: false })
         expect(mocks.anonymizeAccount).not.toHaveBeenCalled()

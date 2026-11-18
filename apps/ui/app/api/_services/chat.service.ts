@@ -105,8 +105,8 @@ export async function resolveAgentTargetForTrigger(agentId: string): Promise<Age
 }
 
 // Resolve an existing Supabase session row to its engine session id.
-export async function getExistingSession(sessionId: string): Promise<{ sessionId: string; agentId: string; engineSessionId: string | null }> {
-    const session = await assertSessionInWorkspace(sessionId)
+export async function getExistingSession(sessionId: string, actor?: Actor): Promise<{ sessionId: string; agentId: string; engineSessionId: string | null }> {
+    const session = await assertSessionInWorkspace(sessionId, actor)
     return { sessionId: session.id, agentId: session.agent_id, engineSessionId: session.engine_session_id || null }
 }
 

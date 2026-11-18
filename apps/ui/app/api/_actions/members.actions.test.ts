@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fakeSupabase, writeMethodOf, type FakeSupabase, type SupabaseCall } from '@/test/supabase-fake'
+import { sessionWithMembership } from '@/test/session-membership'
 
-const mocks = vi.hoisted(() => ({ revokeMemberComputers: vi.fn(async () => {}), getServerSession: vi.fn(), sendWorkspaceInviteEmail: vi.fn(), afterTasks: [] as Promise<unknown>[], emailDelivery: true }))
+const mocks = vi.hoisted(() => ({ revokeMemberComputers: vi.fn(async () => {}), getServerSession: vi.fn(), getAuthUser: vi.fn(), sendWorkspaceInviteEmail: vi.fn(), afterTasks: [] as Promise<unknown>[], emailDelivery: true }))
 
-vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
+vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession, getAuthUser: mocks.getAuthUser }))
 vi.mock('@/app/api/_services/remote-computers.service', () => ({ revokeMemberComputers: mocks.revokeMemberComputers }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({ get EMAIL_DELIVERY() { return mocks.emailDelivery }, sendWorkspaceInviteEmail: mocks.sendWorkspaceInviteEmail, BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => 'https://app.rerun.build/og/board?sig=x') }))
@@ -49,12 +50,14 @@ function database(rows: Record<string, Row[]>, emails: Record<string, string> = 
 }
 
 function signedIn(maxSeats: number | null = 3, email = 'me@acme.test') {
-    mocks.getServerSession.mockResolvedValue({
-        user: { id: ME, workspace_id: WORKSPACE_ID },
-        workspace: { id: WORKSPACE_ID, name: 'Acme', max_seats: maxSeats },
-        session: { id: ME, email },
-        workspaceRefused: false,
-    })
+    mocks.getServerSession.mockImplementation(
+        sessionWithMembership({
+            user: { id: ME, workspace_id: WORKSPACE_ID },
+            workspace: { id: WORKSPACE_ID, name: 'Acme', max_seats: maxSeats },
+            session: { id: ME, email },
+            workspaceRefused: false,
+        }),
+    )
 }
 
 function member(userId: string, workspaceId = WORKSPACE_ID, role: 'admin' | 'member' = 'admin', boxScope: 'all' | 'assigned' = 'all'): Row {
@@ -339,7 +342,8 @@ describe('removeMemberAction', () => {
 
 describe('acceptInvitationAction', () => {
     function signedInAs(email: string, identities: Row[] = []) {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: 1 }, session: { id: ME, email, identities } })
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: 1 }, session: { id: ME, email } })
+        mocks.getAuthUser.mockResolvedValue({ id: ME, email, identities })
     }
 
     it('refuses an invitation meant for another email', async () => {
@@ -393,6 +397,7 @@ describe('acceptInvitationAction', () => {
 
     it('refuses a visitor who is not signed in', async () => {
         mocks.getServerSession.mockResolvedValue({ user: null, session: null })
+        mocks.getAuthUser.mockResolvedValue(null)
         database({ workspace_invitations: [pendingInvite()] })
 
         await expect(acceptInvitationAction('tok')).resolves.toEqual({ ok: false, error: 'You must be signed in to accept an invitation.', code: 'signInToAcceptInvitation' })
@@ -490,7 +495,8 @@ describe('acceptInvitationAction', () => {
 
 describe('joinedWorkspaceForInvitationAction', () => {
     function signedInAs(email: string, identities: Row[] = []) {
-        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: WORKSPACE_ID }, session: { id: ME, email, identities } })
+        mocks.getServerSession.mockResolvedValue({ user: { id: ME, workspace_id: WORKSPACE_ID }, session: { id: ME, email } })
+        mocks.getAuthUser.mockResolvedValue({ id: ME, email, identities })
     }
 
     const acceptedInvite = (overrides: Row = {}) => pendingInvite({ status: 'accepted', ...overrides })
@@ -533,6 +539,7 @@ describe('joinedWorkspaceForInvitationAction', () => {
 
     it('keeps the invitation closed to a visitor who is not signed in', async () => {
         mocks.getServerSession.mockResolvedValue({ user: null, session: null })
+        mocks.getAuthUser.mockResolvedValue(null)
         database({ workspace_invitations: [acceptedInvite()], workspace_members: [member(ME)] })
 
         await expect(joinedWorkspaceForInvitationAction('tok')).resolves.toBeNull()

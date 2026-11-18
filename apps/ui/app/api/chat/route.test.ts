@@ -1,5 +1,5 @@
 import { callableEngineAgentIds } from '@/app/api/_auth/access'
-import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, getAgentChatTarget, getExistingSession } from '@/app/api/_services/chat.service'
+import { createSessionRow, findGeneralSession, GeneralAlreadyOpenError, resolveAgentTarget, getExistingSession } from '@/app/api/_services/chat.service'
 import { recordSentMessage } from '@/app/api/_services/session-preview.service'
 import { generateSessionTitle } from '@/lib/ai/generate-title'
 import { buildInstallMessage } from '@/lib/chat/install-marker'
@@ -14,7 +14,7 @@ vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: vi.fn(() => ({ kind
 vi.mock('@/app/api/_services/notification-audience.service', () => ({ recordSessionParticipant: vi.fn(), recordSessionRead: vi.fn() }))
 vi.mock('@/app/api/_services/chat.service', async importOriginal => ({
     ...(await importOriginal<typeof import('@/app/api/_services/chat.service')>()),
-    getAgentChatTarget: vi.fn(),
+    resolveAgentTarget: vi.fn(),
     getExistingSession: vi.fn(),
     createSessionRow: vi.fn(),
     findGeneralSession: vi.fn(),
@@ -42,13 +42,23 @@ describe('POST /api/chat', () => {
     beforeEach(() => {
         vi.clearAllMocks()
         vi.useFakeTimers()
-        vi.mocked(getAgentChatTarget).mockResolvedValue({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null } })
+        vi.mocked(resolveAgentTarget).mockResolvedValue({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null } })
         vi.mocked(getExistingSession).mockResolvedValue({ sessionId: 'session', agentId: 'agent', engineSessionId: 'engine-session' })
         vi.mocked(callableEngineAgentIds).mockResolvedValue(undefined)
     })
 
     afterEach(() => {
         vi.useRealTimers()
+    })
+
+    it('hands the caller it read once to the checks on the coworker and on the conversation', async () => {
+        vi.mocked(engine.chat).mockImplementation(async () => streaming('run-1'))
+
+        await settle(POST(request({})))
+
+        const actor = { kind: 'user', userId: 'me', workspaceId: 7, role: 'member', boxScope: 'assigned' }
+        expect(resolveAgentTarget).toHaveBeenCalledWith('agent', actor)
+        expect(getExistingSession).toHaveBeenCalledWith('session', actor)
     })
 
     it('hands a queued message back rather than tailing the run holding the conversation', async () => {

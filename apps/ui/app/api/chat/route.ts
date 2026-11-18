@@ -1,6 +1,6 @@
-import { actorFromContext, callableEngineAgentIds } from '@/app/api/_auth/access'
+import { actorFromContext, callableEngineAgentIds, type Actor } from '@/app/api/_auth/access'
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
-import { createSessionRow, ensureSessionRow, findGeneralSession, GeneralAlreadyOpenError, getAgentChatTarget, getExistingSession, updateSessionStatus } from '@/app/api/_services/chat.service'
+import { createSessionRow, ensureSessionRow, findGeneralSession, GeneralAlreadyOpenError, getExistingSession, resolveAgentTarget, updateSessionStatus } from '@/app/api/_services/chat.service'
 import { messageAuthorOf } from '@/app/api/_services/me.service'
 import { recordSessionParticipant, recordSessionRead } from '@/app/api/_services/notification-audience.service'
 import { recordSentMessage } from '@/app/api/_services/session-preview.service'
@@ -34,16 +34,20 @@ type ChatRequestBody = {
 const sessionNotFound = () => Response.json({ error: SESSION_NOT_FOUND }, { status: 404 })
 
 export async function POST(request: Request) {
-    // Reject unauthenticated callers up front. getAgentChatTarget below also
+    // Reject unauthenticated callers up front. resolveAgentTarget below also
     // enforces that the agent belongs to this workspace (defense in depth).
     let author: MessageAuthor
+    // Read once here and handed to every check below: nothing shares a read between the calls of a
+    // route handler, so each one left to find the caller again would ask the database for it.
+    let actor: Actor
     let callablePromise: Promise<string[] | undefined>
     try {
         const ctx = await requireWorkspaceContext()
         author = messageAuthorOf(ctx)
+        actor = actorFromContext(ctx)
         // Read alongside the body and awaited inside the engine call's try: a failure fails the send
         // rather than letting it through with every coworker callable.
-        callablePromise = callableEngineAgentIds(actorFromContext(ctx))
+        callablePromise = callableEngineAgentIds(actor)
         callablePromise.catch(() => {})
     } catch {
         return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -72,9 +76,14 @@ export async function POST(request: Request) {
         return Response.json({ error: 'Missing message text' }, { status: 400 })
     }
 
+    // The conversation the request names is looked up while the coworker is: neither read waits on
+    // the other. Its failure is answered further down, where it is awaited.
+    const namedSession = sessionId && agentId !== FOREMAN_AGENT_ID ? getExistingSession(sessionId, actor) : null
+    namedSession?.catch(() => {})
+
     // The foreman is talked to on its own route, which writes its brief and keeps each member's
     // conversations apart.
-    const target = agentId === FOREMAN_AGENT_ID ? null : await getAgentChatTarget(agentId).catch(() => null)
+    const target = agentId === FOREMAN_AGENT_ID ? null : await resolveAgentTarget(agentId, actor).catch(() => null)
     if (!target) {
         return Response.json({ error: 'Coworker not configured or not found' }, { status: 400 })
     }
@@ -98,7 +107,7 @@ export async function POST(request: Request) {
     if (sessionId) {
         let existing: Awaited<ReturnType<typeof getExistingSession>>
         try {
-            existing = await getExistingSession(sessionId)
+            existing = await (namedSession ?? getExistingSession(sessionId, actor))
         } catch {
             return Response.json({ error: 'Failed to resolve session' }, { status: 500 })
         }

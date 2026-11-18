@@ -15,7 +15,7 @@ import { PROFILE_NAME_MAX } from '@/lib/auth/user-profile'
 import { normalizeEmail } from '@/lib/email'
 import { uploadPublicImage } from '@/lib/images/upload'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import { getServerSession } from '@/supabase/session/getServerSession'
+import { getAuthUser } from '@/supabase/session/getServerSession'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { Database } from '@/app/api/database.types'
 import { isStableLocale, LOCALE_COOKIE, LOCALE_COOKIE_MAX_AGE, PSEUDO_LOCALE, type Locale } from '@rerun/i18n'
@@ -27,9 +27,9 @@ const AVATAR_MAX_SIZE = 512
 const AVATAR_MAX_BYTES = 8 * 1024 * 1024
 
 async function requireAccount(): Promise<User> {
-    const { session } = await getServerSession()
-    if (!session || session.is_anonymous) throw new AuthorizationError('signInToEditAccount')
-    return session
+    const account = await getAuthUser()
+    if (!account || account.is_anonymous) throw new AuthorizationError('signInToEditAccount')
+    return account
 }
 
 // Supabase merges the keys it is handed into the stored metadata, so only what changes is sent.

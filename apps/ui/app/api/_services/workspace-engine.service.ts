@@ -3,6 +3,7 @@ import type { Database } from '@/app/api/database.types'
 import { claimPoolEngine } from '@rerun/cloud/engines'
 import { requestCompanyBrainSeed } from '@/lib/brain/request-seed'
 import { buildBaseUrl } from '@/lib/engine/base-url'
+import { keepMachine, keepTokenWorkspace, keptMachine, keptTokenWorkspace } from '@/lib/engine/engine-memory'
 import type { EngineConnection } from '@/lib/engine/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectMaybeSingle, selectMaybeSingleWithJoins } from '@/supabase/supabase-helpers'
@@ -32,14 +33,18 @@ export type WorkspaceEngine = {
 }
 
 export async function findWorkspaceEngine(workspaceId: number): Promise<WorkspaceEngine | null> {
+    const known = keptMachine<WorkspaceEngine>(workspaceId)
+    if (known) return known
     const supabase = createServiceRoleClient()
     const { data } = await selectMaybeSingle(supabase, 'engine_pool', ENGINE_COLUMNS, { claimed_by_workspace_id: workspaceId })
     if (!data?.engine_host) return null
-    return {
+    const engine: WorkspaceEngine = {
         instanceId: data.id,
         conn: { baseUrl: buildBaseUrl(data.engine_host), apiKey: data.engine_api_key },
         managed: !!data.provider_server_id,
     }
+    keepMachine(workspaceId, engine)
+    return engine
 }
 
 export async function getWorkspaceConnection(workspaceId: number): Promise<EngineConnection> {
@@ -106,6 +111,8 @@ export type AuthenticatedWorkspace = { workspaceId: number; isSandbox: boolean }
 // as nobody.
 export async function authenticateEngineToken(token: string): Promise<AuthenticatedWorkspace | null> {
     if (!token) return null
+    const known = keptTokenWorkspace<AuthenticatedWorkspace>(token)
+    if (known) return known
     const supabase = createServiceRoleClient()
     const { data } = await selectMaybeSingleWithJoins(
         supabase,
@@ -115,5 +122,7 @@ export async function authenticateEngineToken(token: string): Promise<Authentica
         { engine_api_key: token },
     )
     if (!data?.claimed_by_workspace_id || !data.workspace) return null
-    return { workspaceId: data.workspace.id, isSandbox: data.workspace.is_sandbox }
+    const workspace: AuthenticatedWorkspace = { workspaceId: data.workspace.id, isSandbox: data.workspace.is_sandbox }
+    keepTokenWorkspace(token, workspace)
+    return workspace
 }

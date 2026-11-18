@@ -8,7 +8,7 @@ vi.mock('server-only', () => ({}))
 vi.mock('@/app/api/_services/naming.service', () => ({ ensureWorkspaceNamed: vi.fn() }))
 
 function context(db: ReturnType<typeof fakeSupabase>): WorkspaceContext {
-    return { userId: 'member-2', userEmail: null, authUser: {} as WorkspaceContext['authUser'], workspace: { id: 7 } as WorkspaceContext['workspace'], role: 'admin', boxScope: 'all', supabase: db.client }
+    return { userId: 'member-2', userEmail: null, userLocale: null, authUser: {} as WorkspaceContext['authUser'], workspace: { id: 7 } as WorkspaceContext['workspace'], role: 'admin', boxScope: 'all', supabase: db.client }
 }
 
 describe('foreman profile', () => {

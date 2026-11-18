@@ -4,7 +4,7 @@ import { acceptInvitationAction, joinedWorkspaceForInvitationAction, loadInvitat
 import { Card } from '@/components/ui/card'
 import { routes } from '@/lib/routes'
 import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
-import { getServerSession } from '@/supabase/session/getServerSession'
+import { getAuthUser } from '@/supabase/session/getServerSession'
 import { redirect } from 'next/navigation'
 import { InviteMismatch } from './InviteMismatch'
 import { InviteRedirect } from './InviteRedirect'
@@ -33,10 +33,10 @@ export default async function InvitePage({ params }: { params: Promise<{ token: 
     }
     if (invite.status === 'expired') return <Shell title={t('expired.title')} message={t('expired.message')} />
 
-    const { session } = await getServerSession()
+    const account = await getAuthUser()
 
-    if (!session?.email) return <InviteRedirect token={token} email={invite.email} workspaceName={invite.workspaceName} />
-    if (!ownsEmail(session, invite.email)) return <InviteMismatch inviteEmail={invite.email} currentEmail={accountLabel(session.email) ?? session.email} workspaceName={invite.workspaceName} />
+    if (!account?.email) return <InviteRedirect token={token} email={invite.email} workspaceName={invite.workspaceName} />
+    if (!ownsEmail(account, invite.email)) return <InviteMismatch inviteEmail={invite.email} currentEmail={accountLabel(account.email) ?? account.email} workspaceName={invite.workspaceName} />
 
     const result = await acceptInvitationAction(token)
     if (!result.ok) return <Shell title={t('joinFailed')} message={result.code ? tErrors(result.code, result.params as never) : result.error} />

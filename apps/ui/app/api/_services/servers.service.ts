@@ -3,6 +3,7 @@ import { createHash, randomBytes } from 'node:crypto'
 
 import type { Database } from '@/app/api/database.types'
 import { attachCustomEngine, findWorkspaceEngine } from '@/app/api/_services/workspace-engine.service'
+import { forgetMachine } from '@/lib/engine/engine-memory'
 import { buildBaseUrl } from '@/lib/engine/base-url'
 import { getEngineHealth, listConnections } from '@/lib/engine/client'
 import type { EngineHealth } from '@/lib/engine/types'
@@ -128,4 +129,5 @@ export async function detachWorkspaceServer(workspaceId: number): Promise<void> 
     if (engine.managed) throw new ServerPairingError('machineBelongsToCloud', 403)
     const { error } = await createServiceRoleClient().from('engine_pool').delete().eq('id', engine.instanceId)
     if (error) throw new Error(error.message)
+    forgetMachine(workspaceId)
 }
