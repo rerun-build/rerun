@@ -8,6 +8,7 @@ import { clearBoxDefault, readBoxDefault, writeBoxDefault } from '../../connecti
 import { dropConnectionBackups, readBoxBackups, writeBoxBackups } from '../../connections/backups.js'
 import { servesModel } from '../../connections/resolve.js'
 import { defaultModelOf, repairBoxDefault } from '../../agents/availability.js'
+import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limits.js'
 import { refreshCodexPlanLimits, refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
 import { refreshOpencodeCatalog, refreshStaleOpencodeCatalog } from '../../connections/opencode-catalog.js'
 import { refreshOpencodePlanLimits, refreshStaleOpencodePlanLimits } from '../../connections/opencode-plan-limits.js'
@@ -34,6 +35,7 @@ connectionRoutes.get('/', async c => {
         await repairBoxDefault(connection).catch(err => logger.warn({ err: String(err), connection: connection.id }, 'box default repair failed'))
     }
     await awaitPendingPlanLimits(connections)
+    refreshStaleClaudePlanLimits(connections)
     refreshStaleCodexPlanLimits(connections)
     refreshStaleOpencodePlanLimits(connections)
     if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()

@@ -14,6 +14,7 @@ import { reconcileInterruptedRuns } from '../../runtime/reconcile.js'
 import { installBrowserInBackground, installDesktopInBackground, updateCliToolsInBackground } from './update.js'
 import { CODEX_VERSION } from '../../runtime/codex-cli.js'
 import { listConnections } from '../../connections/registry.js'
+import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limits.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
 import { refreshStaleCustomCatalogs } from '../../connections/custom-catalog.js'
 import { refreshOpencodeCatalog } from '../../connections/opencode-catalog.js'
@@ -41,6 +42,7 @@ export async function runCommand(): Promise<void> {
     if (cliTools === 'no-root') logger.warn({ codex: CODEX_VERSION }, 'codex CLI off its pin and the service user cannot sudo: run `sudo rerun update-cli-tools`')
     void listConnections()
         .then(connections => {
+            refreshStaleClaudePlanLimits(connections)
             refreshStaleCodexPlanLimits(connections)
             refreshStaleOpencodePlanLimits(connections)
             if (connections.some(connection => connection.config.provider === 'opencode')) void refreshOpencodeCatalog()

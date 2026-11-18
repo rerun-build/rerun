@@ -18,6 +18,7 @@ import { recordRefusedModel } from '../connections/cli-models.js'
 import { refreshCodexPlanLimits } from '../connections/codex-plan-limits.js'
 import { armPlanLimitLatch, clearPlanLimitLatch } from '../connections/plan-limits.js'
 import { refreshOpencodePlanLimits } from '../connections/opencode-plan-limits.js'
+import { refreshClaudePlanLimitsAfterRun } from '../connections/claude-plan-limits.js'
 import { behaviourOf } from '../agents/opencode.js'
 import { buildSystemPrompt, nowBlock, recallMemories, recallSection, systemPromptText, userBlock, userLanguageBlock } from '../agents/systemPrompt.js'
 import type { LoadedAgent } from '../agents/types.js'
@@ -260,6 +261,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     // The run row and its abort controller exist before any preparation step can throw: for chat
     // and headless callers the row was already inserted, and a throw in `resolveRunModel` or the
     // tool/MCP setup would otherwise leave it `running` forever with no terminal event for the hub.
+    const startedAt = Date.now()
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
     const controller = handover?.controller ?? registerRunAbort(run.id, baseAgent.id)
     const author = trigger.source === 'chat' ? trigger.author : undefined
@@ -293,6 +295,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             void refreshCodexPlanLimits(connection)
         }
         if (provider === 'opencode') void refreshOpencodePlanLimits(connection)
+        if (provider === 'claude') refreshClaudePlanLimitsAfterRun(connection, startedAt)
     }
 
     const closeSafely = async (): Promise<boolean> => {

@@ -74,4 +74,20 @@ describe('ai_status', () => {
     it('never hands over a credential', async () => {
         expect(JSON.stringify(await status('openai', 'gpt-5', openai))).not.toMatch(/CLAUDE_CODE_OAUTH_TOKEN|OPENAI_API_KEY|box-key/)
     })
+
+    it('answers with a fresh reading of a Claude plan the last run read a while ago', async () => {
+        const signedIn = { id: 'claude-2', config: config('claude', 'Claude (Ada)', ['claude-sonnet-4-5']), env: { CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat-a', CLAUDE_CODE_OAUTH_REFRESH_TOKEN: 'sk-ant-ort-a', CLAUDE_CODE_OAUTH_EXPIRES_AT: String(Date.now() + 24 * 3_600_000) } }
+        connections.list = [rerun, signedIn]
+        vi.useFakeTimers({ now: Date.now() - 20 * 60_000, toFake: ['Date'] })
+        recordPlanLimits('claude-2', [{ kind: 'session', label: null, usedPercent: 40, resetsAt: null }])
+        vi.useRealTimers()
+        const realFetch = globalThis.fetch
+        globalThis.fetch = (async () => new Response(JSON.stringify({ five_hour: { utilization: 66, resets_at: null } }))) as unknown as typeof fetch
+        try {
+            const out = await status('claude', 'claude-sonnet-4-5', signedIn)
+            expect(out.connections[1].planLimits.windows).toEqual([{ kind: 'session', label: null, usedPercent: 66, resetsAt: null }])
+        } finally {
+            globalThis.fetch = realFetch
+        }
+    })
 })

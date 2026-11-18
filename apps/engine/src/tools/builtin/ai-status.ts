@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { PROVIDER_LABELS, creditsFromMicros, type HubRerunCredit, type Provider } from '@rerun/contracts'
 import { isUsable } from '../../agents/availability.js'
 import { answeringModel } from '../../agents/rerun-upstream.js'
+import { refreshStaleClaudePlanLimits } from '../../connections/claude-plan-limits.js'
 import { refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
 import { readBoxDefault } from '../../connections/default.js'
 import { toSummary } from '../../connections/loader.js'
@@ -63,6 +64,7 @@ export function aiStatusTools(ctx: RunContext): ToolSet {
                 const connections = await listConnections()
                 // Deliberately before the wait, unlike the connections list: the question is about
                 // the quota, so the coworker waits (capped) for the reading it starts here.
+                refreshStaleClaudePlanLimits(connections)
                 refreshStaleCodexPlanLimits(connections)
                 refreshStaleOpencodePlanLimits(connections)
                 const [, boxDefault, rerunCredit, answering] = await Promise.all([awaitPendingPlanLimits(connections), readBoxDefault(), readRerunCredit(ctx), answeringModel(ctx.provider, ctx.model)])

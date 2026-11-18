@@ -381,6 +381,34 @@ describe('plan limits on the list', () => {
         expect(await planLimitsOf(claude.id)).toBeNull()
     })
 
+    // RER-133: Claude Desktop said 66% while Rerun still showed the 40% the last run had read, until
+    // the next Claude run ended. The list now reads a Claude plan that has not been read for a while.
+    it('catches up with Claude usage spent outside Rerun, with no run in between', async () => {
+        const { recordPlanLimits } = await import('../../connections/plan-limits.js')
+        const { pendingClaudePlanLimits } = await import('../../connections/claude-plan-limits.js')
+        const res = await post('/', {
+            name: 'Claude signed in',
+            provider: 'claude',
+            models: ['opus'],
+            keys: { CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat-secret', CLAUDE_CODE_OAUTH_REFRESH_TOKEN: 'sk-ant-ort-secret', CLAUDE_CODE_OAUTH_EXPIRES_AT: String(Date.now() + 24 * 3_600_000) },
+        })
+        const claude = (await res.json()) as Summary
+        vi.useFakeTimers({ now: Date.now() - 20 * 60_000, toFake: ['Date'] })
+        recordPlanLimits(claude.id, [{ kind: 'session', label: null, usedPercent: 40, resetsAt: null }])
+        vi.useRealTimers()
+
+        const realFetch = globalThis.fetch
+        globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) =>
+            String(input) === 'https://api.anthropic.com/api/oauth/usage' ? new Response(JSON.stringify({ five_hour: { utilization: 66, resets_at: null } })) : realFetch(input, init)) as typeof fetch
+        try {
+            expect(await planLimitsOf(claude.id)).toMatchObject({ windows: [{ kind: 'session', usedPercent: 40 }] })
+            await pendingClaudePlanLimits(claude.id)
+            expect(await planLimitsOf(claude.id)).toMatchObject({ windows: [{ kind: 'session', usedPercent: 66 }] })
+        } finally {
+            globalThis.fetch = realFetch
+        }
+    })
+
     it('waits for the read a run left under way, so the list carries it', async () => {
         const { recordPlanLimits } = await import('../../connections/plan-limits.js')
         const claude = await createClaude()

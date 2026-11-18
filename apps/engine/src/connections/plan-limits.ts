@@ -46,7 +46,25 @@ export function planLimitWindowsFromClaude(usage: ClaudePlanUsage | null | undef
     return [...claudeWindow('session', null, limits.five_hour), ...claudeWindow('weekly', null, limits.seven_day), ...models]
 }
 
-type CodexWindow = { usedPercent?: number | null; windowDurationMins?: number | null; resetsAt?: number | null } | null
+type ClaudeLimit = { kind?: string; percent?: number | null; resets_at?: string | null; scope?: { model?: { display_name?: string | null } | null } | null } | null
+
+// The answer of `GET /api/oauth/usage`, the endpoint behind the CLI's `/usage`. It carries the same
+// fixed windows as the CLI's reading, and names the per-model buckets in `limits` rather than in
+// `model_scoped`.
+export type ClaudeUsageAnswer = Omit<NonNullable<ClaudePlanUsage['rate_limits']>, 'model_scoped'> & { limits?: ClaudeLimit[] | null }
+
+export function planLimitWindowsFromClaudeUsage(answer: ClaudeUsageAnswer | null | undefined): PlanLimitWindow[] {
+    if (!answer || typeof answer !== 'object') return []
+    const modelScoped = (Array.isArray(answer.limits) ? answer.limits : []).flatMap(limit => {
+        const name = limit?.kind === 'weekly_scoped' ? limit.scope?.model?.display_name : null
+        return name ? [{ display_name: name, utilization: limit?.percent ?? null, resets_at: limit?.resets_at ?? null }] : []
+    })
+    return planLimitWindowsFromClaude({
+        rate_limits: { five_hour: answer.five_hour, seven_day: answer.seven_day, seven_day_opus: answer.seven_day_opus, seven_day_sonnet: answer.seven_day_sonnet, model_scoped: modelScoped },
+    })
+}
+
+type CodexWindow ={ usedPercent?: number | null; windowDurationMins?: number | null; resetsAt?: number | null } | null
 
 // The part of the app-server's `account/rateLimits/read` answer read here.
 export type CodexRateLimits = { rateLimits?: { primary?: CodexWindow; secondary?: CodexWindow } | null }
@@ -94,9 +112,9 @@ export function spentPlanWindow(connectionId: string): PlanLimitWindow | null {
 
 // A spent subscription fails every run within seconds until its window resets, so the scheduler
 // holds the connection's schedules until then. The reset time is read when the hold is checked, not
-// when it is armed: Codex and OpenCode refresh their windows during the run's teardown, seconds
-// after the refusal armed the hold, and Claude only reads its usage when a run ends well, so the
-// reading a refused run leaves behind can still be under 100%. Without a reset time the hold lasts
+// when it is armed: every provider refreshes its windows during the run's teardown, seconds after
+// the refusal armed the hold, so the reading a refused run leaves behind can still be under 100%
+// when the hold is armed. Without a reset time the hold lasts
 // PLAN_LIMIT_PROBE_MS, and the next due run is the probe.
 const PLAN_LIMIT_PROBE_MS = 30 * 60_000
 
