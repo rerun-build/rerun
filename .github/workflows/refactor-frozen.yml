@@ -9,7 +9,7 @@ permissions:
 jobs:
   frozen:
     if: >-
-      github.repository == 'special-place-ai-heaven/rerun' &&
+      github.repository_owner == 'special-place-ai-heaven' &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       startsWith(github.head_ref, 'chunk/')
     name: Refactor commits leave tests alone
