@@ -69,7 +69,9 @@ const COMPACT_AT_TOKENS: Record<Exclude<ContextSize, 'off'>, number> = { small: 
 
 export const COMPACT_RESERVE_TOKENS = 33000
 
-const COMPACT_AT_MIN_TOKENS = 100000 - COMPACT_RESERVE_TOKENS
+const CLAUDE_MIN_WINDOW_TOKENS = 100000
+
+const COMPACT_AT_MIN_TOKENS = CLAUDE_MIN_WINDOW_TOKENS - COMPACT_RESERVE_TOKENS
 
 const COMPACT_AT_MAX_TOKENS = 1000000 - COMPACT_RESERVE_TOKENS
 
@@ -82,7 +84,7 @@ export function compactAtTokens(size?: ContextSize): number | null {
 }
 
 export function compactEnvFor(at: number | null): { CLAUDE_CODE_AUTO_COMPACT_WINDOW: string } | { DISABLE_AUTO_COMPACT: '1' } {
-    return at === null ? { DISABLE_AUTO_COMPACT: '1' } : { CLAUDE_CODE_AUTO_COMPACT_WINDOW: String(at + COMPACT_RESERVE_TOKENS) }
+    return at === null ? { DISABLE_AUTO_COMPACT: '1' } : { CLAUDE_CODE_AUTO_COMPACT_WINDOW: String(Math.max(CLAUDE_MIN_WINDOW_TOKENS, at + COMPACT_RESERVE_TOKENS)) }
 }
 
 export const CODEX_DISABLED_FEATURES = ['multi_agent', 'multi_agent_v2'] as const

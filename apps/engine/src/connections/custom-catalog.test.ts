@@ -150,8 +150,8 @@ describe('the live reading of a connection', () => {
         const cnx = connection({ models: ['big'], contextWindow: 1_000_000 })
         await refreshCustomCatalog(cnx)
         expect(runContextWindow('big', 'custom', cnx)).toBe(262_144)
-        expect(effectiveCompactAt('small', 'custom', 'big', cnx)).toBe(229_144)
-        expect(effectiveCompactAt('large', 'custom', 'big', cnx)).toBe(229_144)
+        expect(effectiveCompactAt('small', 'custom', 'big', cnx)).toBe(196_608)
+        expect(effectiveCompactAt('large', 'custom', 'big', cnx)).toBe(196_608)
     })
 
     it('keeps its last reading when the endpoint stops answering', async () => {

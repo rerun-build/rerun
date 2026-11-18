@@ -505,7 +505,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             logger.info({ agent: agent.id, run: run.id, trigger: kind, summaryChars }, 'run context compacted')
             void recordRunCompaction(agent.id, run.id, summaryChars).catch(() => {})
         }
-        const stepGuard = compactAt !== null && !CLI_PROVIDERS.has(provider) ? stepContextGuard(ctx, override, systemText, toolPayloadChars(sentTools), compactAt, onCompact) : undefined
+        const stepGuard = compactAt !== null && !CLI_PROVIDERS.has(provider) ? stepContextGuard(ctx, override, systemText, toolPayloadChars(sentTools), compactAt, cached.messages.length - 1, onCompact) : undefined
 
         spawnToken = claudeTokenOf(connection)
         const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, compactAt, onCompact, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
