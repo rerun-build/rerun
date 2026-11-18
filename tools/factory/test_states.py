@@ -12,7 +12,7 @@ ALLOWED = (
     ("proving", "checks"), ("proving", "fix_wait"), ("proving", "proof_wait"), ("checks", "merged"),
     ("building", "blocked"), ("queued", "failed"), ("blocked", "merged"), ("failed", "merged"),
     ("returned", "merged"), ("merged", "queued"), ("rejected", "waiting"),
-    ("checks", "review_wait"),
+    ("checks", "review_wait"), ("queued", "waiting"),
 )
 REFUSED = (
     ("queued", "checks"), ("merged", "blocked"), ("queued", "nowhere"), ("nowhere", "queued"), ("merged", "merged"),

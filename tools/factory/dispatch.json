@@ -18,7 +18,10 @@
     "plan_by": ["Boss"],
     "cut_by": ["Scope Shaper", "IKE"],
     "reader": {"model": "claude-haiku-5-5", "thinkingLevel": "low"},
-    "reader_judgment": {"model": "claude-sonnet-5-5", "thinkingLevel": "medium"}
+    "reader_judgment": {"model": "claude-sonnet-5-5", "thinkingLevel": "medium"},
+    "review": {"by": ["BARBARA"], "type": "acceptor", "mode": "dry", "revisions": 2},
+    "repair": {"tries": 2},
+    "recheck": {"tries": 2, "parallel": 2}
   },
   "proof": true,
   "fast_checks": {"names": ["Typecheck and lint", "No comments in code", "Factory tools tests"], "start_s": 120, "wait_s": 900, "fixes": 2},
@@ -147,7 +150,10 @@
     "replan": "medium",
     "plan": "high",
     "cut": "medium",
-    "resolve": "high"
+    "resolve": "high",
+    "review_plan": "medium",
+    "repair": "low",
+    "recheck": "medium"
   },
   "tier_models": {
     "build": {
@@ -215,6 +221,24 @@
     "resolve": {
       "high": {
         "model": "claude-opus-5-5",
+        "thinkingLevel": "medium"
+      }
+    },
+    "review_plan": {
+      "medium": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "medium"
+      }
+    },
+    "repair": {
+      "low": {
+        "model": "claude-sonnet-5-5",
+        "thinkingLevel": "low"
+      }
+    },
+    "recheck": {
+      "medium": {
+        "model": "claude-sonnet-5-5",
         "thinkingLevel": "medium"
       }
     }

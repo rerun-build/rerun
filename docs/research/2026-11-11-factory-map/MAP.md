@@ -218,6 +218,9 @@ question is most likely to be answered.
 | Board change: `BOARD.md` read first with a `driver:` line, "Rules learned" per repo | approved earlier | not applied; to be folded into the ledger and the Learn stage |
 | Review verdicts are not authenticated; `merge-dev` checks CI only | `tools/factory` | waiting for Rob's decision |
 | Resume after an engine restart; remote workers | #42, Ring 3 | not started |
+| Plan review: a critic copy marks up each plan with quoted notes, Boss decides open choices, only an owner-only choice becomes a question for the Foreman | `tools/factory/planning.py`, `notes.py`; [design](../2026-11-18-plan-quality/DESIGN.md) | built 2026-11-18; ships in dry mode (notes only, nothing sent back) until its notes are graded |
+| Format gate: checks from observed Run-line faults, a self-check command for cutters, a repair run instead of a dead-end comment | `tools/factory/cutshape.py`, `issuecheck.py`, `planning.py` | built 2026-11-18; on |
+| Fact recheck: a queued job whose facts dev changed is rechecked before its build | `tools/factory/drift.py`, `dispatch.py`, `planning.py` | built 2026-11-18; on |
 
 **Existing coworkers whose jobs overlap the new parts.** They keep their names and become the people side of a mechanism:
 Warden (usage watchdog) reads and comments on the usage page instead of collecting; Botsitter (completion checker) is replaced

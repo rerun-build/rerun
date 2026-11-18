@@ -11,6 +11,7 @@ import clocks
 import control
 import cutshape
 import digest
+import drift
 import escapes
 import failures
 from gist import gist
@@ -710,6 +711,8 @@ class Dispatcher:
                 old = self.store.get_job(str(i["number"]))
                 if old and old["state"] != "waiting" and not (old["state"] in END and old.get("relabelled")):
                     continue
+                if old and old["state"] == "waiting" and old.get("recheck") and not self.recheck_settled(old):
+                    continue
                 take = (old.get("take") or 1) + 1 if old and old["state"] in END else (old or {}).get("take")
                 before = (old.get("takes") or old.get("take") or 1) if old else 0
                 if not old or (old.get("body") or "") != (i.get("body") or ""):
@@ -761,9 +764,11 @@ class Dispatcher:
                             data["takes"] = takes
                             if old and old.get("replans"):
                                 data["replans"] = old["replans"]
+                            if old and old.get("rechecks"):
+                                data["rechecks"] = old["rechecks"]
                             self.save(data, line)
                             log(i["number"], line)
-                        digest = hashlib.sha256(json.dumps(dead).encode()).hexdigest()[:16] if dead else ""
+                        digest =hashlib.sha256(json.dumps(dead).encode()).hexdigest()[:16] if dead else ""
                         if self.store.get_all(str(i["number"])).get("dead_deps", "") != digest:
                             if dead:
                                 self.gh(["issue", "comment", str(i["number"]), "-R", self.repo, "--body", dead_comment(dead)])
@@ -782,6 +787,8 @@ class Dispatcher:
                             data["take"] = take
                         if old and old.get("replans"):
                             data["replans"] = old["replans"]
+                        if old and old.get("rechecks"):
+                            data["rechecks"] = old["rechecks"]
                         self.save(data, line)
                         log(i["number"], line)
                     continue
@@ -799,6 +806,8 @@ class Dispatcher:
                 job["takes"] = takes
                 if old and old.get("replans"):
                     job["replans"] = old["replans"]
+                if old and old.get("rechecks"):
+                    job["rechecks"] = old["rechecks"]
                 if old and old.get("pr") and json.loads(self.gh(["pr", "view", str(old["pr"]), "-R", self.repo, "--json", "state"])).get("state") == "OPEN":
                     job.update(state="review_wait", pr=old["pr"], builder=old.get("builder"))
                 rooms[parsed["worker"]] -= 1
@@ -1189,6 +1198,43 @@ class Dispatcher:
         j.update(kw, sending_step=step, attempt=j.pop("retry_attempt", 1))
         self.send(j, agent, step, self.message(dict(j, state=state)), state, copy)
 
+    def recheck_tries(self):
+        r = (self.cfg.get("planning") or {}).get("recheck")
+        return int(r.get("tries", 0)) if isinstance(r, dict) else 0
+
+    def recheck_first(self, j):
+        tries = self.recheck_tries()
+        if not tries or not j.get("plan_dev") or int(j.get("rechecks") or 0) >= tries:
+            return False
+        facts = drift.fact_paths(j.get("body"), j.get("paths"), j.get("test"))
+        try:
+            compare = json.loads(self.gh(["api", "repos/%s/compare/%s...dev" % (self.repo, j["plan_dev"]), "--jq", drift.query(facts)]))
+            found = drift.hits(compare, facts, drift.names(j.get("body")))
+        except (Error, ValueError, TypeError, AttributeError) as e:
+            log(j["issue"], "fact recheck skipped: %s" % e)
+            return False
+        if not found:
+            return False
+        if self.quota is not None:
+            station = slots.station(j)
+            self.quota[station] = self.quota.get(station, 0) + 1
+        n = int(j.get("rechecks") or 0) + 1
+        self.to(j, "waiting", "fact recheck %d of %d: %s" % (n, tries, gist(found[0], 150)), rechecks=n,
+                recheck={"why": found[:5], "from": j["plan_dev"]}, wait_line="waits for a fact recheck")
+        return True
+
+    def recheck_settled(self, j):
+        row = self.store.get_all("recheck:%d" % j["issue"])
+        if row.get("attempt") != str(j.get("rechecks")):
+            return False
+        if row.get("state") in ("fresh", "corrected"):
+            log(j["issue"], "fact recheck %s: %s" % (row["state"], row.get("why") or "-"))
+            return True
+        if row.get("state") == "blocked":
+            why = row.get("why") or "-"
+            self.end(j, "returned", why if why.lower().startswith("plan:") else "plan: recheck: " + why)
+        return False
+
     def stale_files(self, j):
         if not j.get("plan_dev"):
             return None
@@ -1212,6 +1258,8 @@ class Dispatcher:
         if st == "queued":
             got = self.free(j.get("worker", "coder"))
             if got and self.take(j):
+                if self.recheck_first(j):
+                    return
                 self.start(j, got[0], "build", "building", copy=got[1], builder=got[0], stale=self.stale_files(j))
         elif st == "building":
             out = self.finished_run(j)

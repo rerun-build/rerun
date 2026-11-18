@@ -16,6 +16,28 @@ _DEV = re.compile(r"\bdev ([0-9a-f]{7,40})\b", re.I)
 _RUN = re.compile(r"(?ms)^\*\*Run\*\*.*?```[a-z]*\n(.*?)```")
 _CD = re.compile(r"^cd\s+\S+\s*&&\s*")
 UVX_ERROR = "run line: uvx is not on the CI runner; ruff runs in the Factory tools CI job, take the line out"
+TESTF = r"\.spec\.[jt]sx?$|\.test\.[jt]sx?$|(^|/)tests?/.*\.(ts|tsx|js|jsx|rs|py)$|__tests__/.*\.(ts|tsx|js|jsx)$|_test\.(py|go)$|(^|/)test_[^/]*\.py$"
+_EXEMPT = re.compile(r"(?mi)^\*\*Red before green\*\*:\s*not applicable\b")
+_PATTERN_PATH = re.compile(r"\bunittest\b.*\bdiscover\b.*\s-p\s+[\"']?[^\"'\s]*/")
+_SERVER_PATH = re.compile(r"(?:^|&&|;|\|\||\||\()\s*/data/")
+_PYTEST = re.compile(r"(?:^|[\s;&|(])(?:python3? -m )?pytest\b")
+_CD_TARGET = re.compile(r"(?:^|&&|;|\|\||\()\s*cd\s+(\S+)")
+
+
+def _same_cd_twice(line):
+    targets = [t for t in _CD_TARGET.findall(line) if not t.startswith(("/", ".."))]
+    return len(set(targets)) < len(targets)
+
+
+RUN_FAULTS = (
+    (lambda l: l.startswith("("), "run line: the runner wraps each Run line in ( ), so a line that starts with ( becomes (( and bash reads it as arithmetic; take the outer parentheses off: %s"),
+    (_PATTERN_PATH.search, "run line: unittest's -p takes a file name pattern, not a path, so it matches no test and exits 5; use -s for the folder: %s"),
+    (_SERVER_PATH.search, "run line: /data/ exists only on the factory server, not on the CI runner: %s"),
+    (_PYTEST.search, "run line: the CI runner has no pytest; run the test with python3 -I -m unittest: %s"),
+    (_same_cd_twice, "run line: it changes into the same folder twice, and the second cd fails because the shell is already there; each Run line starts at the repository root: %s"),
+)
+TEST_ONLY_ERROR = ("files: every path is a test file, and the red-before-green check refuses a pull request that changes only tests; "
+                   "add the code file the change needs, or the line `**Red before green**: not applicable: <why>`")
 
 
 def _run_lines(lines):
@@ -135,6 +157,11 @@ def parse(issue):
         if words and words[0] == "uvx":
             errors.append(UVX_ERROR)
             break
+    for l in _run_lines(lines):
+        errors += [text % l for check, text in RUN_FAULTS if check(l)]
+
+    if paths and all(re.search(TESTF, p) for p in paths) and not _EXEMPT.search("\n".join(lines)):
+        errors.append(TEST_ONLY_ERROR)
 
     return {"number": number, "deps": deps, "worker": worker, "paths": paths, "test": test, "through": through, "refactor": refactor, "parent": parent, "dev": dev, "errors": errors}
 
