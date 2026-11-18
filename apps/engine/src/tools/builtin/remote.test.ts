@@ -190,9 +190,11 @@ describe('the rules of the computer', () => {
 describe('request_computer_access', () => {
     it('is a card: it hands back the delivery note and what "Always allow" would keep there', async () => {
         await connect()
-        const result = (await run('request_computer_access', { computer: '#studio-pc', reason: 'Encode', commands: ['/usr/local/bin/ffmpeg -i a.mov a.mp4'] })) as { status: string; card: unknown }
+        const result = (await run('request_computer_access', { computer: '#studio-pc', reason: 'Encode', commands: ['ffmpeg -i a.mov a.mp4'] })) as { status: string; card: unknown }
         expect(result.status).toBe('delivered')
         expect(result.card).toEqual({ computerId: 'c1', always: { rule: 'program', value: 'ffmpeg', interpreter: false } })
+        const byPath = (await run('request_computer_access', { computer: '#studio-pc', reason: 'Encode', commands: ['/usr/local/bin/ffmpeg -i a.mov a.mp4'] })) as { card: unknown }
+        expect(byPath.card).toEqual({ computerId: 'c1', always: null })
     })
 
     it('offers to keep the folder of files outside the allowed ones, never a place where secrets live', async () => {

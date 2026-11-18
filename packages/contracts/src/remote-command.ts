@@ -9,7 +9,8 @@ export type CommandAnalysis = {
     // The programs it starts, in order, without repeats: `ffmpeg`, `python3`.
     programs: string[]
     // It runs something the reading cannot see: a substitution, a string handed to another shell,
-    // a program that starts other programs (xargs, find -exec, env…).
+    // a program that starts other programs (xargs, find -exec, env…), a variable set for it, a program
+    // named by its path.
     opaque: boolean
     // One of the programs runs any code it is given (python, node…): allowing it allows anything.
     interpreter: boolean
@@ -99,9 +100,17 @@ function segmentsOf(command: string, shell: CommandShell): Token[][] | null {
             if (command[i + 1] === '&') i++
             continue
         }
-        if (char === '(' || char === ')' || char === '{' || char === '}') {
+        if (char === '(' || char === ')') {
             endSegment()
             continue
+        }
+        // `{ cmd; }` groups commands; `${HOME}` and `{a,b}.mp4` are part of a word.
+        if (char === '{' || char === '}') {
+            const alone = shell === 'powershell' || (!inWord && (char === '}' || i + 1 >= command.length || /\s/.test(command[i + 1]!)))
+            if (alone) {
+                endSegment()
+                continue
+            }
         }
         if (/\s/.test(char)) {
             endWord()
@@ -116,7 +125,21 @@ function segmentsOf(command: string, shell: CommandShell): Token[][] | null {
 }
 
 const ENV_ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/
-const REDIRECTION = /^(?:\d*>>?|<|\d*>&\d*|&>)/
+const REDIRECTION = /^(?:\d*[<>]|&>)/
+// The operator alone, its file in the next word: `> out.txt`, `2>> log`, `<<< text`.
+const BARE_REDIRECTION = /^(?:\d*(?:>>?|>\||<<?<?|<>|[<>]&)|&>>?)$/
+
+// The words of a simple command once its redirections are taken off. Without this `> ffmpeg rm x`
+// would read as ffmpeg, the file, instead of rm, the program.
+function commandWords(segment: Token[]): Token[] {
+    const words: Token[] = []
+    for (let i = 0; i < segment.length; i++) {
+        const token = segment[i]!
+        if (token.quoted || !REDIRECTION.test(token.text)) words.push(token)
+        else if (BARE_REDIRECTION.test(token.text)) i++
+    }
+    return words
+}
 
 // The name a program is allowed under: its file name, lower case, without the extension Windows adds.
 export function programName(word: string, shell: CommandShell = 'posix'): string {
@@ -126,6 +149,8 @@ export function programName(word: string, shell: CommandShell = 'posix'): string
     return shell === 'powershell' ? (POWERSHELL_ALIASES[name] ?? name) : name
 }
 
+export const isInterpreterProgram = (program: string): boolean => INTERPRETERS.has(program.toLowerCase())
+
 export function analyzeCommand(command: string, shell: CommandShell = 'posix'): CommandAnalysis {
     const segments = segmentsOf(command, shell)
     if (!segments) return { programs: [], opaque: true, interpreter: false }
@@ -133,9 +158,15 @@ export function analyzeCommand(command: string, shell: CommandShell = 'posix'): 
     let opaque = opaquePatterns.some(pattern => pattern.test(command))
     const programs: string[] = []
     for (const segment of segments) {
-        const words = segment.filter(token => token.quoted || !REDIRECTION.test(token.text))
-        const first = words.find(token => !(shell === 'posix' && !token.quoted && ENV_ASSIGNMENT.test(token.text)))
+        const words = commandWords(segment)
+        const at = words.findIndex(token => !(shell === 'posix' && !token.quoted && ENV_ASSIGNMENT.test(token.text)))
+        // A variable set for the command, or for the ones after it, changes what a program runs
+        // (PATH, GIT_SSH_COMMAND, LD_PRELOAD): the same as `env`.
+        if (shell === 'posix' && at !== 0) opaque = true
+        const first = words[at]
         if (!first) continue
+        // A program named by a path or a variable is whatever file sits there: `./ffmpeg` is not ffmpeg.
+        if (/[\\/$]/.test(first.text)) opaque = true
         // PowerShell's call operator and a dot-sourced script hide the program in the next word.
         if (shell === 'powershell' && first.text === '.') opaque = true
         const program = programName(first.text, shell)
@@ -145,7 +176,7 @@ export function analyzeCommand(command: string, shell: CommandShell = 'posix'): 
         if (program === 'git' && words.some(token => /^(-c|--exec-path|--upload-pack|--config)/.test(token.text))) opaque = true
         if (!programs.includes(program)) programs.push(program)
     }
-    return { programs, opaque, interpreter: programs.some(program => INTERPRETERS.has(program)) }
+    return { programs, opaque, interpreter: programs.some(isInterpreterProgram) }
 }
 
 export function shellOfComputer(shell: string | undefined): CommandShell {
