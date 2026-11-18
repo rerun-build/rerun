@@ -1,3 +1,4 @@
+import json
 import sqlite3
 import unittest
 
@@ -53,6 +54,41 @@ class Acceptance(Base):
         self.tick(12)
         self.assertNotEqual(self.state(), "merged")
         self.assertEqual(self.sent_to("a1"), [])
+
+    def test_children_closed_outside_the_ledger_are_listed_in_the_brief(self):
+        gh = self.w.gh
+        closed = [{"number": 4, "title": "Old part", "body": "Part of #9 (phase A)."},
+                  {"number": 3, "title": "Other", "body": "Part of #90"},
+                  {"number": 5, "title": "Fix x", "body": "**Part of**: #9"}]
+
+        def closed_list(args):
+            a = list(args)
+            if a[:2] == ["issue", "list"] and "--state" in a and a[a.index("--state") + 1] == "closed":
+                return json.dumps(closed)
+            return gh(a)
+
+        self.w.gh = closed_list
+        self.merge_child()
+        self.tick_until(lambda: self.sent_to("a1"))
+        brief = self.sent_to("a1")[0][1]
+        self.assertIn("Closed outside the factory's ledger (read each issue and its pull request yourself):", brief)
+        self.assertIn("- #4 Old part", brief)
+        self.assertNotIn("#3 Other", brief)
+        self.assertEqual(brief.count("#5 Fix x"), 1)
+        self.assertEqual(brief.count("- #5 Fix x (merged, pull request #42)"), 1)
+
+    def test_the_acceptor_never_judges_a_feature_it_built(self):
+        b1 = {"id": "b1", "name": "B1", "runs": 1}
+        self.cfg["types"]["coder"] = {"max_jobs": 8, "coworkers": [b1]}
+        self.cfg["types"]["acceptor"] = {"coworkers": [b1]}
+        self.merge_child()
+        self.tick(12)
+        self.assertEqual([s for s in self.sent_to("b1") if "One acceptance" in s[1]], [])
+        self.assertEqual(self.kv("accept:9", "state"), "no_acceptor")
+        self.cfg["types"]["acceptor"] = {"coworkers": [b1] + ACCEPTOR["coworkers"]}
+        self.tick(12)
+        acceptance_sends = [s[0] for s in self.w.sends if "One acceptance" in s[1]]
+        self.assertEqual(acceptance_sends, ["a1"])
 
     def test_a_parent_with_an_open_child_on_github_is_not_sent(self):
         self.w.open_children = [{"number": 30, "body": "**Part of**: #9\n"}]

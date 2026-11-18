@@ -65,6 +65,12 @@ class BriefTests(unittest.TestCase):
         for phrase in ("ACCEPTED: <one sentence>", "GAPS: #a", "P1", "**Part of**: #50", "**Repairs**: #<child>"):
             self.assertIn(phrase, t)
 
+    def test_the_brief_names_the_spec_the_run_lines_and_closed_children(self):
+        t = acceptance.brief("o/r", PARENT, "## Plan\nstep", KIDS, others=[{"number": 40, "title": "old"}], cut=True)
+        for phrase in ("The spec is the parent text and its", "run the lines under **Run** in its issue on today's dev", "- #40 old", "stopped at 200 closed issues"):
+            self.assertIn(phrase, t)
+        self.assertNotIn("Closed outside", self.text())
+
     def test_a_missing_plan_comment_is_said_so(self):
         t = self.text(None)
         self.assertIn("has no `## Plan` comment", t)
