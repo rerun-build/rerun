@@ -52,5 +52,17 @@ class TestOnly(unittest.TestCase):
         self.assertIs(gate.TESTF, cutshape.TESTF)
 
 
+class ValidLinesStayValid(unittest.TestCase):
+    def test_lines_the_review_found_refused_wrongly_now_pass(self):
+        for line in (
+            "python3 -I -m unittest discover -s tools/factory -p 'test_gate.py' -k pytest",
+            "! git grep -n 'import pytest' -- tools/factory",
+            "python3 -I -m unittest discover -s tools/factory -p 'test_x.py' && mkdir -p out/logs",
+            "(cd apps/ui && pnpm build) && test -f apps/ui/out.txt",
+            "cd apps/ui && pnpm vitest run a; cd ../.. && cd apps/ui && pnpm vitest run b",
+        ):
+            self.assertEqual(errors(line), [], line)
+
+
 if __name__ == "__main__":
     unittest.main()

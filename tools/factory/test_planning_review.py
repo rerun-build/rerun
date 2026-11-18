@@ -164,6 +164,18 @@ class Review(Station):
         self.once()
         self.assertEqual(self.w.sends[-1][0], "ss")
 
+    def test_a_review_that_cannot_be_sent_lets_the_plan_through_after_two_tries(self):
+        self.build()
+        self.planned()
+        self.w.invalid_goal = True
+        self.once()
+        self.assertEqual((self.rec()["state"], self.rec()["review_fails"]), ("planned", "1"))
+        self.once()
+        self.assertIn("could not run", self.w.issue(5)["comments"][-1])
+        self.w.invalid_goal = False
+        self.once()
+        self.assertEqual(self.w.sends[-1][0], "ss")
+
     def test_a_critic_that_ends_blocked_lets_the_plan_through(self):
         self.build()
         self.planned()
@@ -201,8 +213,11 @@ class Ask(Station):
         self.w.finish("barbara", OWNER)
         self.once()
         self.questions[900] = {"state": "CLOSED", "comments": ["thinking", "ANSWER: 2"]}
-        while self.rec()["state"] == "asked":
+        for _ in range(planning.EVERY):
+            if self.rec()["state"] != "asked":
+                break
             self.once()
+        self.assertEqual(self.rec()["state"], "revise")
         self.once()
         brief = self.last("boss")
         self.assertIn("Rob answered these questions through the Foreman", brief)
@@ -211,7 +226,7 @@ class Ask(Station):
     def test_own_words_and_no_answer_are_both_read(self):
         q = {"issue": 7, "options": ["a", "b"]}
         self.assertEqual(planning.answer_of(q, {"comments": [{"body": "ANSWER: only on weekdays"}]}), "#7: in his own words, only on weekdays")
-        self.assertIn("recommended option stands: a", planning.answer_of(q, {"comments": []}))
+        self.assertIn("it is not his decision", planning.answer_of(q, {"comments": []}))
 
 
 class Repair(Station):
@@ -311,6 +326,23 @@ class Recheck(Station):
         self.w.finish(self.w.sends[-1][0], "", status="error")
         self.once()
         self.assertEqual(self.store.get_all("recheck:7")["state"], "fresh")
+
+    def test_a_blocked_recheck_that_is_not_about_the_plan_lets_the_job_build(self):
+        self.build(review={}, extra={"recheck": {"tries": 2}}, issues=[])
+        self.waiting()
+        self.once()
+        self.w.finish(self.w.sends[-1][0], "BLOCKED: no dev checkout")
+        self.once()
+        self.assertEqual(self.store.get_all("recheck:7")["state"], "fresh")
+
+    def test_a_blocked_recheck_about_the_plan_is_kept(self):
+        self.build(review={}, extra={"recheck": {"tries": 2}}, issues=[])
+        self.waiting()
+        self.once()
+        self.w.finish(self.w.sends[-1][0], "BLOCKED: plan: dev already does it")
+        self.once()
+        row = self.store.get_all("recheck:7")
+        self.assertEqual((row["state"], row["why"]), ("blocked", "plan: dev already does it"))
 
     def test_without_recheck_settings_nothing_is_sent(self):
         self.build(review={}, issues=[])

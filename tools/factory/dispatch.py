@@ -54,6 +54,7 @@ REFRESH_EXIT = 75
 REPORT_QUIET_S = 90
 RECONCILE_MAX = 20
 MAX_REPLANS = 2
+RECHECK_WAIT_S = 3600
 REPLAN_BY = ("Boss", "Scope Shaper")
 ROOM_HOLD_MAX_S, ROOM_PROBE_S, ROOM_PROBLEM_ROW = 60 * 60, 3 * 60, 3
 CHECKOUT_FAULT = re.compile(r"Traceback \(most recent call last\):\n(?:[ \t]+.*\n)*?[ \t]+File \"/data/tools/(?:factory|factory-[0-9a-f]+)/.*|SWITCHED BACK to checkout.*|the ceiling of \d+ job folders.*|DOCTOR FAULT.*|under half the floor.*")
@@ -1220,11 +1221,15 @@ class Dispatcher:
             self.quota[station] = self.quota.get(station, 0) + 1
         n = int(j.get("rechecks") or 0) + 1
         self.to(j, "waiting", "fact recheck %d of %d: %s" % (n, tries, gist(found[0], 150)), rechecks=n,
-                recheck={"why": found[:5], "from": j["plan_dev"]}, wait_line="waits for a fact recheck")
+                recheck={"why": found[:5], "from": j["plan_dev"], "at": self.now()}, wait_line="waits for a fact recheck")
         return True
 
     def recheck_settled(self, j):
         row = self.store.get_all("recheck:%d" % j["issue"])
+        since = (j.get("recheck") or {}).get("at") or 0
+        if not self.recheck_tries() or (row.get("state") not in ("sending", "running") and self.now() - since > RECHECK_WAIT_S):
+            log(j["issue"], "fact recheck not answered: the job builds on what it has")
+            return True
         if row.get("attempt") != str(j.get("rechecks")):
             return False
         if row.get("state") in ("fresh", "corrected"):
@@ -1232,7 +1237,7 @@ class Dispatcher:
             return True
         if row.get("state") == "blocked":
             why = row.get("why") or "-"
-            self.end(j, "returned", why if why.lower().startswith("plan:") else "plan: recheck: " + why)
+            self.end(j, "returned", why)
         return False
 
     def stale_files(self, j):

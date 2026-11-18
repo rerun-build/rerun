@@ -36,6 +36,13 @@ ADD quotes the heading or the line where the missing part belongs. DECIDE is a c
     "%s (%s)" % (k, v) for k, v in OWNER_CATEGORIES.items())
 
 
+MENTION = re.compile(r"@(?=[A-Za-z0-9])")
+
+
+def quiet(text):
+    return MENTION.sub("", text or "")
+
+
 def norm(text):
     return SPACE.sub(" ", (text or "").replace("`", "")).strip()
 
@@ -142,7 +149,7 @@ def comment(notes, dropped, round_no, mode):
         lines = [head, "", "```", render_all(notes), "```"]
     if dropped:
         lines += ["", "Thrown away: " + "; ".join("note %d (%s)" % d for d in dropped)]
-    return "\n".join(lines)
+    return quiet("\n".join(lines))
 
 
 def diff(old, new):

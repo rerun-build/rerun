@@ -18,19 +18,35 @@ _CD = re.compile(r"^cd\s+\S+\s*&&\s*")
 UVX_ERROR = "run line: uvx is not on the CI runner; ruff runs in the Factory tools CI job, take the line out"
 TESTF = r"\.spec\.[jt]sx?$|\.test\.[jt]sx?$|(^|/)tests?/.*\.(ts|tsx|js|jsx|rs|py)$|__tests__/.*\.(ts|tsx|js|jsx)$|_test\.(py|go)$|(^|/)test_[^/]*\.py$"
 _EXEMPT = re.compile(r"(?mi)^\*\*Red before green\*\*:\s*not applicable\b")
-_PATTERN_PATH = re.compile(r"\bunittest\b.*\bdiscover\b.*\s-p\s+[\"']?[^\"'\s]*/")
+_PATTERN_PATH = re.compile(r"\bunittest\b[^;&|]*\bdiscover\b[^;&|]*\s-p\s+[\"']?[^\"'\s]*/")
 _SERVER_PATH = re.compile(r"(?:^|&&|;|\|\||\||\()\s*/data/")
-_PYTEST = re.compile(r"(?:^|[\s;&|(])(?:python3? -m )?pytest\b")
+_PYTEST = re.compile(r"(?:^|&&|;|\|\||\||\()\s*(?:python3? (?:-I )?-m )?pytest\b")
 _CD_TARGET = re.compile(r"(?:^|&&|;|\|\||\()\s*cd\s+(\S+)")
 
 
 def _same_cd_twice(line):
-    targets = [t for t in _CD_TARGET.findall(line) if not t.startswith(("/", ".."))]
-    return len(set(targets)) < len(targets)
+    seen = set()
+    for target in _CD_TARGET.findall(line):
+        if target.startswith(("/", "..")):
+            seen.clear()
+        elif target in seen:
+            return True
+        else:
+            seen.add(target)
+    return False
+
+
+def _closes_at_end(line):
+    depth = 0
+    for k, ch in enumerate(line):
+        depth += {"(": 1, ")": -1}.get(ch, 0)
+        if depth == 0:
+            return k == len(line) - 1
+    return False
 
 
 RUN_FAULTS = (
-    (lambda l: l.startswith("("), "run line: the runner wraps each Run line in ( ), so a line that starts with ( becomes (( and bash reads it as arithmetic; take the outer parentheses off: %s"),
+    (lambda l: l.startswith("(") and _closes_at_end(l), "run line: the runner wraps each Run line in ( ), so a line that starts with ( becomes (( and bash reads it as arithmetic; take the outer parentheses off: %s"),
     (_PATTERN_PATH.search, "run line: unittest's -p takes a file name pattern, not a path, so it matches no test and exits 5; use -s for the folder: %s"),
     (_SERVER_PATH.search, "run line: /data/ exists only on the factory server, not on the CI runner: %s"),
     (_PYTEST.search, "run line: the CI runner has no pytest; run the test with python3 -I -m unittest: %s"),

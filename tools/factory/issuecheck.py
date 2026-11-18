@@ -5,6 +5,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cutshape
 import plancheck
+import planning
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
 
@@ -18,6 +19,8 @@ def faults(body, tree, number=0):
     issue = {"number": number, "body": body}
     found = list(cutshape.parse(issue)["errors"])
     found += [f for f in plancheck.faults(issue, tree, own_tests=True) if f not in found]
+    if not planning.DEV.search(body or ""):
+        found.append("plan line: PLAN READY names no `dev <sha>`")
     return found
 
 

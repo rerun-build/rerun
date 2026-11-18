@@ -40,7 +40,7 @@ MAX_QUESTIONS = 3
 REVIEW_FAILS = 2
 
 WEIGHTS = {"P0": 8, "P1": 4, "P2": 2, "P3": 1}
-SKIP = frozenset(("factory", "factory-plan", "factory-done", "factory-blocked", "factory-unsolvable", "likely-fixed", "duplicate"))
+SKIP = frozenset(("factory", "factory-plan", "factory-question", "factory-done", "factory-blocked", "factory-unsolvable", "likely-fixed", "duplicate"))
 
 
 def names(issue):
@@ -202,7 +202,7 @@ def recheck_brief(repo, job, head):
 def question_issue(parent, note):
     options = "\n".join("%d. %s%s" % (i + 1, o, " (recommended)" if i == 0 else "") for i, o in enumerate(note["OPTION"]))
     category = note["CATEGORY"].strip().lower()
-    title = gist("Question for Rob on #%d: %s" % (parent, note.get("PROBLEM") or note["QUOTE"][0]), 110)
+    title = gist(notes.quiet("Question for Rob on #%d: %s" % (parent, note.get("PROBLEM") or note["QUOTE"][0])), 110)
     body = "\n".join([
         "**Question for**: #%d" % parent,
         "**Category**: %s (%s)" % (category, notes.OWNER_CATEGORIES.get(category, "")),
@@ -218,7 +218,7 @@ def question_issue(parent, note):
         "**How it is answered**: the Foreman puts this to Rob. His pick comes back as a comment `ANSWER: <option number>` or "
         "`ANSWER: <his own words>`, and the issue is closed. Only the plan of #%d waits for it." % parent,
     ])
-    return title, body
+    return title, notes.quiet(body)
 
 
 def answer_of(question, view):
@@ -232,7 +232,7 @@ def answer_of(question, view):
             return "#%d: option %s, %s" % (question["issue"], text, options[int(text) - 1])
         return "#%d: in his own words, %s" % (question["issue"], text)
     if options:
-        return "#%d: closed without an answer, so the recommended option stands: %s" % (question["issue"], options[0])
+        return "#%d: closed without Rob's answer, so it is not his decision: decide it yourself as overseer; the recommended option was %s" % (question["issue"], options[0])
     return "#%d: closed without an answer" % question["issue"]
 
 
@@ -520,10 +520,12 @@ class Station:
         return out
 
     def rechecks(self):
-        if not self.tries("recheck") or not self.pool:
+        if not self.pool:
             return
         for n, row in sorted(self.live_rechecks().items()):
             self.poll_recheck(n, row)
+        if not self.tries("recheck"):
+            return
         room = int(self.cfg["planning"]["recheck"].get("parallel", PARALLEL)) - len(self.live_rechecks())
         for j in self.store.jobs():
             if room <= 0:
@@ -571,8 +573,14 @@ class Station:
     def poll_recheck(self, n, row):
         job = "recheck:%d" % n
         if row.get("state") == "sending":
-            self.recheck_result(job, "fresh", "the recheck send was cut off: the job builds on what it has")
-            return
+            rid = self.try_adopt(n, row["agent"], row["started"])
+            if not rid:
+                self.recheck_result(job, "fresh", "the recheck send was cut off: the job builds on what it has")
+                return
+            self.store.fired(row["fire"], rid)
+            self.store.set(job, "run", rid)
+            self.store.set(job, "state", "running")
+            row = dict(row, run=rid)
         got = self.account("get_run", {"agentId": row["agent"], "runId": row["run"]}) or {}
         status = got.get("status")
         if status == "running":
@@ -592,6 +600,9 @@ class Station:
             self.recheck_result(job, "fresh", "the recheck gave no FRESH:, CORRECTED: or BLOCKED: line: the job builds on what it has")
             return
         kind, rest = found[-1]
+        if kind == "BLOCKED" and not rest.strip().lower().startswith("plan:"):
+            self.recheck_result(job, "fresh", "the recheck stopped (%s): the job builds on what it has" % gist(rest, 150))
+            return
         self.recheck_result(job, kind.lower(), gist(rest, 200))
 
     def recheck_result(self, job, state, why):
@@ -651,7 +662,7 @@ class Station:
         item = {"number": n, "title": row.get("title", "")}
         message = review_brief(item, self.repo, plan, round_no, earlier, notes.diff(row.get("reviewed_text") or "", plan) if earlier else "")
         at = stamp(self.now())
-        fire = self.store.intent(job, "", "review", coworker=pools.names(self.cfg).get(agent, agent), at=at)
+        fire = self.store.intent(job, "", "plan review", coworker=pools.names(self.cfg).get(agent, agent), at=at)
         for name, value in (("agent", agent), ("copy", copy), ("started", at), ("run", ""), ("fire", fire),
                             ("review_round", str(round_no)), ("review_key", k), ("review_text", plan)):
             self.store.set(job, name, value)
@@ -662,13 +673,12 @@ class Station:
         except Exception as e:
             rid = self.try_adopt(n, agent, at)
             if rid:
-                self.running_as(job, fire, rid, "review", "reviewing")
+                self.running_as(job, fire, rid, "plan review", "reviewing")
                 return
             self.store.abandon(fire, str(e)[:200])
-            self.store.set(job, "review_round", str(round_no - 1))
-            self.store.set(job, "why", str(e)[:200])
+            self.stopped(n, dict(self.store.get_all(job), state="reviewing"), "the review was not sent (%s)" % str(e)[:150])
             return
-        self.running_as(job, fire, result["runId"], "review", "reviewing")
+        self.running_as(job, fire, result["runId"], "plan review", "reviewing")
 
     def try_adopt(self, n, agent, at):
         try:
@@ -718,9 +728,11 @@ class Station:
 
     def ask(self, n, kept):
         job = "plan:%d" % n
-        self.store.set(job, "owner_notes", json.dumps(notes.owner(kept)[:MAX_QUESTIONS]))
+        own = notes.owner(kept)
+        overflow = [dict(k, kind="DECIDE") for k in own[MAX_QUESTIONS:]]
+        self.store.set(job, "owner_notes", json.dumps(own[:MAX_QUESTIONS]))
         self.store.set(job, "questions", "[]")
-        self.store.set(job, "revise_notes", json.dumps([k for k in kept if k["kind"] != "OWNER"]))
+        self.store.set(job, "revise_notes", json.dumps([k for k in kept if k["kind"] != "OWNER"] + overflow))
         self.store.set(job, "state", "asked")
         self.file_questions(n, self.store.get_all(job))
 
@@ -733,9 +745,8 @@ class Station:
             if note["n"] in done:
                 continue
             title, body = question_issue(n, note)
+            self.question_label()
             try:
-                self.gh(["label", "create", QUESTION_LABEL, "-R", self.repo, "--color", "FEF2C0", "--force",
-                         "--description", "A question the factory asks Rob through the Foreman"])
                 url = self.gh(["issue", "create", "-R", self.repo, "--title", title, "--body", body, "--label", QUESTION_LABEL])
             except Exception as e:
                 log(job, "question not filed: %s" % str(e)[:200])
@@ -751,6 +762,16 @@ class Station:
                             "together with the answers." % (n, ", ".join("#%d" % q["issue"] for q in filed)))
             self.store.set(job, "asked_comment", "1")
         return filed if len(filed) == len(own) else None
+
+    def question_label(self):
+        if getattr(self, "label_made", False):
+            return
+        self.label_made = True
+        try:
+            self.gh(["label", "create", QUESTION_LABEL, "-R", self.repo, "--color", "FEF2C0", "--force",
+                     "--description", "A question the factory asks Rob through the Foreman"])
+        except Exception as e:
+            log("-", "label %s not made: %s" % (QUESTION_LABEL, str(e)[:150]))
 
     def answers(self):
         for n, row in sorted(self.records().items()):
@@ -780,7 +801,8 @@ class Station:
         review = notes.render_all(json.loads(row.get("revise_notes") or "[]"))
         answers = json.loads(row.get("answers") or "[]")
         self.store.set("plan:%d" % n, "revisions", str(int(row.get("revisions") or 0) + 1))
-        self.send({"number": n, "title": row.get("title", "")}, got, None, None, review=review or None, answers=answers or None)
+        if not self.send({"number": n, "title": row.get("title", "")}, got, None, None, review=review or None, answers=answers or None):
+            self.store.set("plan:%d" % n, "state", "revise")
 
     def repair(self, n, row):
         got = self.free("cut_by")

@@ -191,6 +191,7 @@
   "never_touch": [
     "factory",
     "factory-plan",
+    "factory-question",
     "factory-paused",
     "factory-blocked",
     "factory-unsolvable",

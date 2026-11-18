@@ -81,6 +81,19 @@ class Recheck(Base):
         self.tick()
         self.assertEqual(self.state(), "building")
 
+    def test_switching_rechecks_off_releases_a_waiting_job(self):
+        self.tick()
+        self.assertEqual(self.state(), "waiting")
+        self.cfg["planning"] = {}
+        self.tick(fresh=True)
+        self.assertEqual(self.state(), "building")
+
+    def test_an_unanswered_recheck_releases_the_job_after_its_wait(self):
+        self.tick()
+        self.w.clock += D.RECHECK_WAIT_S + 1
+        self.tick()
+        self.assertEqual(self.state(), "building")
+
     def test_without_recheck_settings_dev_is_not_read(self):
         del self.cfg["planning"]
         self.tick()
