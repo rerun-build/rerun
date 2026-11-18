@@ -55,6 +55,7 @@ linear_comment = true
 prompt = """
 Lis {{issue.file}} et le diff du workspace (GetWorkspaceDiff). Ne crée ni commit, ni push, ni pull request.
 Résume pour la personne qui merge : l'amélioration, ce qui a changé, comment c'est testé. Court, en français.
+Si le travail est une stack de PRs, ouvre sur GitHub chaque PR et la page de la stack (`open <url>`).
 """
 
 [[steps]]

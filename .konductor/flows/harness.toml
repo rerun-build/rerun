@@ -69,6 +69,7 @@ Lis {{issue.file}} et le diff de ce workspace (GetWorkspaceDiff). Ne crée ni co
 c'est moi qui ouvre la PR.
 Écris un résumé pour la personne qui va relire et merger : le cas client, la cause, la couche corrigée et comment,
 la mesure avant / après, et ce qu'il reste à vérifier avant de merger. Court, en français.
+Si le travail est une stack de PRs, ouvre sur GitHub chaque PR et la page de la stack (`open <url>`).
 """
 
 [[steps]]
