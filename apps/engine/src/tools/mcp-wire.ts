@@ -43,6 +43,7 @@ export function mcpWireMiddleware(catalog: McpCatalogEntry[]): LanguageModelMidd
         specificationVersion: 'v3',
         transformParams: async ({ params }) => ({
             ...params,
+            tools: params.tools?.filter(sent => !isHeld(sent.name)),
             prompt: params.prompt.map(message => {
                 if (message.role === 'assistant') {
                     return {

@@ -514,7 +514,6 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             messages: cached.messages,
             providerOptions: mergeProviderOptions(mergeProviderOptions(cached.providerOptions, reasoningProviderOptions(provider, model, agent.config.thinkingLevel)), resumeThreadId ? { 'codex-app-server': { threadId: resumeThreadId } } : undefined),
             tools,
-            activeTools: sentNames,
             abortSignal: controller.signal,
             experimental_repairToolCall: repairToolCall,
             stopWhen: ({ steps }) => hitlTurnIsOver(steps, CLI_PROVIDERS.has(provider)),

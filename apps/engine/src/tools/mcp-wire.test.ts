@@ -111,6 +111,12 @@ describe('mcpWireMiddleware, to the model', () => {
         ])
     })
 
+    it('sends the provider every tool but the held-back ones, which the run can still execute', async () => {
+        const transform = wire.transformParams as unknown as (options: { params: { prompt: unknown[]; tools: Array<{ name: string }> } }) => Promise<{ tools: Array<{ name: string }> }>
+        const { tools } = await transform({ params: { prompt: [], tools: [{ name: 'linear_list_issues' }, { name: 'fs_read' }, { name: MCP_SEARCH_TOOL }, { name: MCP_CALL_TOOL }] } })
+        expect(tools.map(sent => sent.name)).toEqual(['fs_read', MCP_SEARCH_TOOL, MCP_CALL_TOOL])
+    })
+
     it('writes a conversation the same way every time, so its start stays in the provider cache', async () => {
         expect(JSON.stringify(await sent(conversation))).toBe(JSON.stringify(await sent(conversation)))
     })
