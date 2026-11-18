@@ -181,6 +181,14 @@ class OneDeploy(unittest.TestCase):
     def test_the_dispatcher_can_be_held_off(self):
         self.assertIn("    deploy:\n      replicas: ${FACTORY_DISPATCHER:-1}\n", code(read("factory-dispatcher.yml")))
 
+    def test_update_runs_the_copy_it_just_pulled_once_before_anything_else(self):
+        c = code(read("update.sh"))
+        pull, again = c.index("pull --ff-only"), c.index('UPDATE_PULLED=1 exec sh "$REPO/deploy/vps/update.sh"')
+        self.assertLess(pull, again)
+        self.assertLess(again, c.index("trap undrain EXIT"))
+        self.assertLess(again, c.index("touch /state/drain"))
+        self.assertIn('[ "${UPDATE_PULLED:-0}" = 1 ] ||', c)
+
     def test_update_stops_the_old_dispatcher_after_the_drain_and_keeps_its_data(self):
         c = code(read("update.sh"))
         drained, stop, up = c.index("\nwait_drained\n"), c.index("docker stop -t 150 $OLD"), c.index("docker compose up -d")

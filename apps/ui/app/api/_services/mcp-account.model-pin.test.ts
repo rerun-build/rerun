@@ -116,6 +116,12 @@ describe('dispatchAccountTool, what a coworker runs on', () => {
         expect(patchAgent).toHaveBeenCalledWith(CONN, 'engine-agent', { verbosity: 'concise' })
     })
 
+    it('sets when a coworker compacts its context, and refuses a class that does not exist', async () => {
+        await dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'update_agent', { agentId: 'agent-own', contextSize: 'large' })
+        expect(patchAgent).toHaveBeenCalledWith(CONN, 'engine-agent', { contextSize: 'large' })
+        await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'update_agent', { agentId: 'agent-own', contextSize: 'huge' })).rejects.toThrow('small, medium, large, off')
+    })
+
     it('sets the workspace default on a pair the workspace really holds', async () => {
         await expect(dispatchAccountTool(workspaceActor(WORKSPACE_ID), 'set_default_model', { connectionId: 'claude-clem', model: 'claude-opus-5-5' })).resolves.toEqual({
             default: { connectionId: 'claude-clem', connectionName: 'Claude Clem', provider: 'claude', model: 'claude-opus-5-5' },

@@ -146,6 +146,7 @@ function toSkillMarkdown(body: string): string {
 function readConfigPatch(args: Record<string, unknown>, pin: ModelPin | undefined): EngineAgentConfigPatch {
     const patch: EngineAgentConfigPatch = { ...pin }
     const verbosity = asString(args.verbosity)
+    const contextSize = asString(args.contextSize)
     const tools = asBooleanRecord(args.tools)
     const selfImprovement = asBooleanRecord(args.selfImprovement)
 
@@ -153,6 +154,11 @@ function readConfigPatch(args: Record<string, unknown>, pin: ModelPin | undefine
         const parsed = verbositySchema.safeParse(verbosity)
         if (!parsed.success) throw new Error(`Unknown verbosity "${verbosity}". Expected one of: ${verbositySchema.options.join(', ')}`)
         patch.verbosity = parsed.data
+    }
+    if (contextSize !== undefined) {
+        const parsed = contextSizeSchema.safeParse(contextSize)
+        if (!parsed.success) throw new Error(`Unknown contextSize "${contextSize}". Expected one of: ${contextSizeSchema.options.join(', ')}`)
+        patch.contextSize = parsed.data
     }
     if (tools !== undefined) patch.tools = tools
     if (selfImprovement !== undefined) patch.selfImprovement = selfImprovement
@@ -386,6 +392,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 model: detail.resolvedModel ?? detail.config.model,
                 runsOn: projectRunsOn(detail, aiConnections),
                 verbosity: detail.config.verbosity,
+                contextSize: detail.config.contextSize,
                 tools: detail.config.tools,
                 selfImprovement: detail.config.selfImprovement,
                 setup: { required: detail.config.setup.required, completedAt: detail.config.setup.completedAt, prompt: detail.install },
