@@ -1,0 +1,51 @@
+{
+    "linkOff": {
+        "title": "Bu bağlantı artık çalışmıyor",
+        "subtitle": "Paylaşan kişi bağlantıyı kapattı."
+    },
+    "unsubscribe": {
+        "title": "E-posta tercihleri",
+        "subtitle": "Rerun'ın size gönderdiği e-postaları güncelleyin. Hesaba giriş gerekmez.",
+        "subtitleRuns": "Coworker'larınızın size e-posta gönderip gönderemeyeceğini seçin. Hesaba giriş gerekmez.",
+        "invalid": "Bu abonelikten çıkma bağlantısı geçersiz veya süresi dolmuş.",
+        "logIn": "Tercihlerinizi yönetmek için giriş yapın"
+    },
+    "publishedView": {
+        "protectedTitle": "Korumalı sayfa",
+        "protectedDescription": "Paylaşan: {workspace}. Açmak için giriş yapın veya e-postanızı onaylayın.",
+        "publishedBy": "Yayınlayan: {agent}, {workspace}",
+        "publishedByUnknown": "Yayınlayan: bir coworker, {workspace}"
+    },
+    "publishedAuth": {
+        "metaTitle": "Bir sayfa açın",
+        "noAccess": "Erişiminiz yok",
+        "signedInAs": "{email} olarak giriş yaptınız. Bu sayfa yalnızca {workspace} üyeleri içindir.",
+        "signedInAsOther": "Başka bir hesapla giriş yaptınız. Bu sayfa yalnızca {workspace} üyeleri içindir."
+    },
+    "gate": {
+        "open": "Aç",
+        "errors": {
+            "limited": "Çok fazla deneme. Birkaç dakika bekleyin.",
+            "password": "Yanlış şifre",
+            "code": "Kod yanlış veya süresi dolmuş",
+            "email": "Geçerli bir e-posta girin"
+        },
+        "password": {
+            "subtitle": "Bu sayfa {workspace} tarafından şifreyle korunuyor",
+            "placeholder": "Şifre"
+        },
+        "code": {
+            "title": "Gelen kutunuzu kontrol edin",
+            "subtitle": "{email} bu sayfayı açabiliyorsa bir kod gönderildi",
+            "otherEmail": "Başka bir e-posta kullanın"
+        },
+        "email": {
+            "subtitle": "Açmak için e-postanızı onaylayın",
+            "submit": "Kod gönder"
+        },
+        "members": {
+            "subtitle": "{workspace} üyeleri için",
+            "continue": "Rerun ile devam et"
+        }
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "group": {
+        "steps": "{count, plural, one {# adım} other {# adım}}",
+        "stepsWithFailures": "{count, plural, one {# adım} other {# adım}}, {failed} başarısız",
+        "failed": "{failed} başarısız"
+    },
+    "tool": {
+        "input": "Girdi",
+        "error": "Hata",
+        "output": "Çıktı",
+        "completedInMs": "{ms} ms içinde tamamlandı",
+        "completedInSeconds": "{seconds} sn içinde tamamlandı"
+    },
+    "reasoning": {
+        "thinking": "Düşünüyor...",
+        "thought": "Düşündü"
+    },
+    "compaction": {
+        "running": "Bağlam sıkıştırılıyor…",
+        "failed": "Bağlam sıkıştırılamadı",
+        "done": "Bağlam sıkıştırıldı",
+        "summarized": "Önceki {count} mesaj özetlendi",
+        "recovered": "~{count} token geri kazanıldı"
+    },
+    "subRun": {
+        "failures": "{count, plural, one {# hata} other {# hata}}",
+        "idle": "{minutes} dk boşta",
+        "stop": "Bu görevi durdur",
+        "failed": "Başarısız",
+        "stopped": "Durduruldu, yapılan kısım korundu",
+        "earlier": "+{count} önceki",
+        "verbs": {
+            "web_search": "Aranıyor: {summary}",
+            "web_fetch": "Okunuyor: {summary}",
+            "browser_navigate": "Geziniyor: {summary}",
+            "shell_exec": "Çalıştırılıyor: {summary}",
+            "fs_read": "Okunuyor: {summary}",
+            "fs_write": "Yazılıyor: {summary}",
+            "fs_edit": "Düzenleniyor: {summary}"
+        }
+    }
+}

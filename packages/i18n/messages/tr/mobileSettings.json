@@ -1,0 +1,119 @@
+{
+    "preferences": {
+        "title": "Tercihler",
+        "close": "Kapat",
+        "yourAccount": "Hesabınız",
+        "workspace": "Çalışma alanı",
+        "aiProviders": "Yapay zeka sağlayıcıları",
+        "appearance": "Görünüm",
+        "appearanceSystem": "Sistem",
+        "appearanceLight": "Açık",
+        "appearanceDark": "Koyu",
+        "coworkers": "Coworker'lar",
+        "groupRecent": "Son kullanılanlar",
+        "groupByBox": "Box'a göre",
+        "language": "Dil",
+        "notifications": "Bildirimler",
+        "pushOff": "Bildirim kapalı",
+        "support": "Destek",
+        "contactSupport": "Destekle iletişime geçin",
+        "privacy": "Gizlilik Politikası",
+        "terms": "Hizmet Koşulları",
+        "about": "Hakkında",
+        "version": "Sürüm",
+        "environment": "Ortam",
+        "signOut": "Çıkış yap",
+        "deleteAccount": "Hesabı sil",
+        "server": "Sunucu"
+    },
+    "notifications": {
+        "title": "Bildirimler",
+        "saveFailed": "Kaydedilemedi",
+        "tryAgainShortly": "Birazdan tekrar deneyin.",
+        "loadFailed": "Ayarlarınız yüklenemedi. Birazdan tekrar deneyin.",
+        "push": {
+            "label": "Anlık bildirimler",
+            "off": "Kapalı",
+            "turnOn": "Aç",
+            "openSettings": "{platform, select, android {Android ayarlarını aç} other {iOS Ayarlarını aç}}",
+            "footnote": "{platform, select, android {Anlık bildirimler açılana kadar aşağıdakilerin hiçbiri bu telefona ulaşmaz.} other {Anlık bildirimler açılana kadar aşağıdakilerin hiçbiri bu iPhone'a ulaşmaz.}}"
+        },
+        "channels": {
+            "messages": {
+                "name": "Coworker mesajları",
+                "description": "Bir coworker size ihtiyaç duyduğunda veya bir şey söylemek istediğinde."
+            },
+            "silent": {
+                "name": "Biten görevler",
+                "description": "Bir coworker bir görevi bitirdiğinde, sessizce."
+            }
+        },
+        "scopeTitle": "Şunlar için bildir",
+        "recommended": "Önerilen",
+        "scopes": {
+            "everything": {
+                "label": "Her şey",
+                "detail": "Çalışma alanındaki her çalıştırma, kim başlatmış olursa olsun."
+            },
+            "mine": {
+                "label": "Çalıştırmalarım ve takip ettiklerim",
+                "detail": "Başlattığım çalıştırmalar, katıldığım sohbetler, takip ettiğim coworker'lar."
+            },
+            "needed": {
+                "label": "Yalnızca bana ihtiyaç olduğunda",
+                "detail": "Çalıştırmalarımdaki sorular, onaylar ve hatalar. Biten bir çalıştırma sessiz kalır."
+            },
+            "nothing": {
+                "label": "Hiçbir şey",
+                "detail": "Gelen kutusunu kendim kontrol ederim."
+            }
+        },
+        "email": {
+            "label": "E-posta",
+            "footnote": "Siz yokken size ihtiyaç olduğunda. Her olay için bir e-posta, asla her çalıştırma için değil."
+        },
+        "perCoworker": {
+            "title": "Coworker bazında",
+            "add": "Coworker ekle",
+            "pickTitle": "Bu coworker'ın her çalıştırması size ulaşır",
+            "cancel": "İptal",
+            "empty": "Her coworker yukarıdaki kuralı izler.",
+            "detail": "Her coworker'ın ayrıntılarından da ayarlanabilir.",
+            "rowLabel": "{name}, {value}",
+            "followsTasks": "Görevleri izler",
+            "yourSetting": "Ayarınız"
+        },
+        "accountEmails": {
+            "title": "Hesap e-postaları",
+            "billing": "Deneme ve faturalandırma",
+            "product": "Ürün güncellemeleri"
+        },
+        "modes": {
+            "default": {
+                "label": "Varsayılan",
+                "hint": "Ayarınızı izler."
+            },
+            "everything": {
+                "label": "Tüm etkinlik",
+                "hint": "Kim başlatırsa başlatsın, her çalıştırma."
+            },
+            "muted": {
+                "label": "Sessiz",
+                "hint": "Hiçbir şey. Pano yine de gösterir."
+            }
+        },
+        "coworker": {
+            "title": "{name} hakkında beni bilgilendir",
+            "yourSetting": "Ayarınız",
+            "quotedScope": "“{scope}”",
+            "follow": "Zamanlanmış görevlerini izle",
+            "nothingScheduled": "Henüz zamanlanmış bir şey yok.",
+            "scheduled": "{count} zamanlanmış görev, size kendi çalıştırmalarınız gibi ulaşır.",
+            "reachYou": "Size kendi çalıştırmalarınız gibi ulaşırlar.",
+            "tasksTitle": "Zamanlanmış görevler",
+            "tasksFailed": "Görevleri yüklenemedi. Birazdan tekrar deneyin.",
+            "taskSwitch": "{name} hakkında beni bilgilendir",
+            "muted": "{name} sessize alındı."
+        }
+    }
+}

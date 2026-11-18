@@ -1,0 +1,84 @@
+{
+    "title": "Vault",
+    "description": "Bir uygulamada bir kez oturum açın, ardından onu kullanacak coworker'ları seçin.",
+    "search": "Vault'ta ara",
+    "noMatch": "Eşleşen bir şey yok",
+    "groups": {
+        "apps": "Uygulamalar"
+    },
+    "add": "Ekle",
+    "emptyTitle": "Bir kez oturum açın, coworker'larınızla paylaşın",
+    "otherApp": "Başka bir uygulama",
+    "row": {
+        "everyone": "Tüm coworker'lar",
+        "everyoneShort": "Tümü",
+        "unused": "Henüz coworker yok",
+        "usedBy": "{names}",
+        "usedByMore": "{names} ve {count, plural, one {# diğeri} other {# diğeri}}"
+    },
+    "status": {
+        "needsAuth": "Oturum kapalı",
+        "needsConfig": "Kurulmadı"
+    },
+    "detail": {
+        "back": "Vault'a dön",
+        "signedOut": "Oturum kapalı: biri yeniden oturum açana kadar coworker'lar {name} uygulamasını kullanamaz.",
+        "notSetUp": "{name} henüz kurulmadı.",
+        "reconnect": "Yeniden bağlan",
+        "everyone": "Tüm coworker'lar",
+        "everyoneHint": "Sonradan eklenen coworker'lar da erişim alır.",
+        "coworkers": "Coworker'lar",
+        "noCoworkers": "Bu çalışma alanında henüz coworker yok.",
+        "hiddenCoworkers": "Göremediğiniz Boxes içinde {count, plural, one {# coworker} other {# coworker}}",
+        "variables": "Değişkenler",
+        "reconnectFromCoworker": "Onu kullanan bir coworker'ın Uygulamalar sekmesinden yeniden bağlayın."
+    },
+    "delete": {
+        "button": "Sil",
+        "title": "{name} silinsin mi?",
+        "loses": "Şu coworker'lar erişimini kaybeder: {names}.",
+        "nobody": "Hiçbir coworker kullanmıyor.",
+        "confirm": "Sil",
+        "deleted": "{name} silindi"
+    },
+    "reasons": {
+        "adminOnly": "Bunu yalnızca bir yönetici yapabilir",
+        "manageBox": "Bu coworker'ın Box'ını yönetmiyorsunuz",
+        "manageAny": "Vault'a eklemek için bir Box yönetin",
+        "paidAppEveryone": "Ücretli bir uygulama her coworker'a ayrı ayrı eklenir"
+    },
+    "addPage": {
+        "title": "Vault'a ekle",
+        "search": "Uygulama ara",
+        "mcp": "MCP sunucusu",
+        "secret": "Gizli anahtar"
+    },
+    "errors": {
+        "changeFailed": "Değişiklik kaydedilemedi"
+    },
+    "addSecret": {
+        "name": "Ad",
+        "namePlaceholder": "Stripe canlı anahtarı",
+        "variable": "Değişken",
+        "variableHint": "Coworker'lar onu bu adla okur.",
+        "variableInvalid": "Harf, rakam ve alt çizgi; rakamla başlamamalı",
+        "value": "Değer",
+        "valueHint": "Bir daha asla gösterilmez.",
+        "add": "Gizli anahtar ekle"
+    },
+    "addMcp": {
+        "name": "Ad",
+        "namePlaceholder": "Şirket belgeleri",
+        "target": "Adres veya komut",
+        "targetHint": "Bir https adresi veya makinenin başlattığı komut.",
+        "header": "Başlık",
+        "headerValue": "Değer",
+        "add": "Sunucu ekle"
+    },
+    "paid": {
+        "badge": "Ücretli",
+        "managedInApp": "Oturum açma, yer ve faturalandırma, Uygulamalar menüsündeki {provider} penceresinde yönetilir.",
+        "paused": "Duraklatıldı",
+        "connecting": "Bağlanıyor"
+    }
+}

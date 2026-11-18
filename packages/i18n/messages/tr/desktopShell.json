@@ -1,0 +1,94 @@
+{
+    "update": {
+        "ready": "Rerun {version} hazır",
+        "description": "Yeni sürümü kullanmak için uygulamayı yeniden başlatın.",
+        "restart": "Yeniden başlat"
+    },
+    "downloads": {
+        "done": "İndirildi: {filename}",
+        "failed": "İndirilemedi: {filename}",
+        "show": "Klasörde göster"
+    },
+    "handoff": {
+        "title": "{app} uygulamasında oturum açın",
+        "body": "{account} hesabıyla {app} uygulamasına devam edilsin mi?",
+        "continue": "Devam et",
+        "switchAccount": "Başka bir hesap kullan",
+        "doneTitle": "{app} uygulamasına dönün",
+        "doneBody": "{app} oturum açmayı kendisi tamamlar. Bu sekmeyi kapatabilirsiniz.",
+        "codeHint": "{app} açılmadıysa bu kodu oraya yapıştırın:",
+        "copyCode": "Kodu kopyala",
+        "failed": "Uygulamada oturum açılamadı. Tekrar deneyin.",
+        "invalidTitle": "Bu bağlantının süresi doldu",
+        "invalidBody": "Oturum açmayı masaüstü uygulamasından yeniden başlatın."
+    },
+    "signIn": {
+        "waitingTitle": "Tarayıcınızda devam edin",
+        "waitingBody": "Açılan tarayıcı penceresinde oturum açın, ardından buraya dönün.",
+        "reopen": "Tarayıcıyı yeniden aç",
+        "pasteCode": "Bunun yerine kod yapıştır",
+        "codeLabel": "Tarayıcıdaki kod",
+        "submit": "Oturum aç",
+        "back": "Geri",
+        "errors": {
+            "expired": "Bu kodun süresi doldu. Yeniden başlayın.",
+            "invalid": "Bu kod geçerli değil. Yeniden başlayın.",
+            "state-mismatch": "Bu oturum açma başka bir pencereden başlatıldı. Yeniden başlayın.",
+            "network": "Rerun'a ulaşılamadı. Bağlantınızı kontrol edin.",
+            "cancelled": "Oturum açma iptal edildi."
+        }
+    },
+    "settings": {
+        "openAtLogin": "Oturum açılışında başlat",
+        "openAtLoginMac": "Rerun Mac'inizle birlikte menü çubuğunda başlar.",
+        "openAtLoginOther": "Rerun bilgisayarınızla birlikte bildirim alanında başlar.",
+        "closeToTray": "Kapatınca çalışmaya devam et",
+        "closeToTrayHint": "Pencereyi kapatmak Rerun'ı bildirim alanında bırakır, böylece bildirimler gelmeye devam eder.",
+        "updates": "Güncellemeler",
+        "version": "Rerun {version}",
+        "checking": "Güncellemeler denetleniyor…",
+        "downloading": "Güncelleme indiriliyor… %{percent}",
+        "updateFailed": "Güncellemeler denetlenemedi.",
+        "check": "Güncellemeleri denetle",
+        "restart": "{version} sürümüne güncellemek için yeniden başlat",
+        "quickAsk": "Hızlı soru",
+        "quickAskHint": "{shortcut} herhangi bir uygulamadan Chief of Staff'ınız için bir alan açar.",
+        "quickAskOn": "Herhangi bir uygulamadan Chief of Staff'ınız için bir alan açar.",
+        "quickAskOff": "Kapalı. Açmak için bir kısayol kaydedin.",
+        "shortcut": {
+            "record": "Kısayol kaydet",
+            "typing": "Bir kısayol girin",
+            "tryAnother": "Başkasını deneyin",
+            "recordingHint": "Esc iptal eder, ⌫ kapatır",
+            "change": "Kısayol {keys}, değiştirmek için tıklayın",
+            "needsModifier": "{key} gibi bir değiştirici tuş ekleyin",
+            "reserved": "{keys} şunun tarafından kullanılıyor: {owner, select, spotlight {Spotlight} finder {Finder araması} inputSources {giriş kaynakları} appSwitcher {uygulama değiştirici} screenshot {ekran görüntüleri} windowMenu {pencere menüsü} system {sistem} other {tüm uygulamalar}}",
+            "taken": "{keys} başka bir uygulama tarafından kullanılıyor"
+        },
+        "quickAskVoice": "Sesli hızlı soru",
+        "quickAskVoiceOn": "Herhangi bir uygulamadan Chief of Staff'ınızla konuşun."
+    },
+    "openInApp": {
+        "title": "Bu sayfa {app} uygulamasında açılsın mı?",
+        "open": "Aç"
+    },
+    "quickAsk": {
+        "placeholder": "Chief of Staff'ınıza sorun…",
+        "hint": "Göndermek için Enter, kapatmak için Esc",
+        "send": "Gönder",
+        "holdToTalk": "Konuşmak için <key>Space</key> tuşunu basılı tutun",
+        "releaseToSend": "Göndermek için bırakın, iptal için Esc",
+        "sent": "Chief of Staff'ınıza gönderildi",
+        "nothingHeard": "Hiçbir şey duyulmadı. Space tuşunu basılı tutup konuşun.",
+        "transcriptionFailed": "Metne dönüştürülemedi. Tekrar deneyin ya da yazın.",
+        "micDeniedTitle": "Rerun sizi duyamıyor",
+        "micDeniedBody": "Sistem ayarlarınızdan Rerun için mikrofona izin verin.",
+        "openSettings": "Ayarları aç",
+        "typeInstead": "Bunun yerine yazın",
+        "toggleHint": "Göndermek için Enter, iptal için Esc",
+        "cancel": "İptal"
+    },
+    "server": {
+        "otherServer": "Başka bir Rerun sunucusu kullan"
+    }
+}

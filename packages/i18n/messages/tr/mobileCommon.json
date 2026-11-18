@@ -1,0 +1,29 @@
+{
+    "time": {
+        "today": "Bugün",
+        "yesterday": "Dün",
+        "now": "şimdi",
+        "minutesAgo": "{count} dk",
+        "hoursAgo": "{count} sa",
+        "daysAgo": "{count} g"
+    },
+    "actions": {
+        "close": "Kapat",
+        "cancel": "İptal",
+        "done": "Bitti",
+        "share": "Paylaş",
+        "update": "Güncelle"
+    },
+    "errors": {
+        "tryAgainShortly": "Birazdan tekrar deneyin.",
+        "generic": "Bir sorun oluştu. Lütfen tekrar deneyin.",
+        "requestFailed": "İstek başarısız oldu (hata {status})",
+        "uploadFailed": "Yükleme başarısız oldu (hata {status})"
+    },
+    "unread": "Okunmamış",
+    "viewer": {
+        "shareFailed": "Dosya paylaşılamadı",
+        "noPreview": "Bu dosya için önizleme yok. Başka bir uygulamada açmak için paylaşın.",
+        "position": "{index} / {total}"
+    }
+}

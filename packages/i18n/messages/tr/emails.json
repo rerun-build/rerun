@@ -1,0 +1,315 @@
+{
+    "common": {
+        "footer": {
+            "tagline": "İşinizi coworker'larla yürütün. Onları oluşturun, çalışmalarını izleyin ve her şeyi gözünüzün önünde tutun.",
+            "copyright": "© 2026 Rerun",
+            "unsubscribe": "Abonelikten çık"
+        },
+        "openConversation": "Sohbeti aç",
+        "openRerun": "Rerun'ı aç",
+        "useThisCoworker": "Bu coworker'ı kullan",
+        "yourWorkspace": "çalışma alanınız",
+        "dateAtTime": "{date}, {time} UTC",
+        "meta": {
+            "accessEnds": "Erişim bitişi",
+            "amount": "Tutar",
+            "amountDue": "Ödenecek tutar",
+            "archivedOn": "Arşivlenme tarihi",
+            "archivedSince": "Arşivlenme tarihi",
+            "coworker": "Coworker",
+            "coworkers": "Coworker'lar",
+            "coworkersSaved": "Kayıtlı coworker'lar",
+            "created": "Oluşturulma",
+            "declinedOn": "Reddedilme tarihi",
+            "deletedOn": "Silinme tarihi",
+            "included": "Dahil",
+            "lastOpened": "Son açılma",
+            "pausedSince": "Duraklatılma tarihi",
+            "renewsOn": "Yenilenme tarihi",
+            "run": "Çalıştırma",
+            "runs": "Çalıştırmalar",
+            "savedUntil": "Saklanma süresi",
+            "source": "Kaynak",
+            "then": "Sonra",
+            "trialEnded": "Deneme bitti",
+            "trialEnds": "Deneme bitişi",
+            "workspace": "Çalışma alanı",
+            "workspacePaused": "Çalışma alanı duraklatıldı"
+        }
+    },
+    "subjects": {
+        "signInCode": "Rerun kodunuz: {code}",
+        "publishedAccessCode": "{pageTitle} için açma kodunuz: {code}",
+        "lifetimeCode": "Rerun ömür boyu kodunuz: {code}",
+        "workspaceInvite": "Rerun'da {workspaceName} çalışma alanına davet edildiniz",
+        "runFailed": "{agentName} bir hatayla karşılaştı",
+        "agentDone": "{agentName} bir görevi tamamladı",
+        "agentInfo": "{agentName} ilginizi bekliyor",
+        "agentInput": "{agentName} yanıtınızı bekliyor",
+        "appNotice": "{appName}: işlem gerekiyor",
+        "incidentResolved": "{agentName} yeniden normal çalışıyor",
+        "budgetExhausted": "Rerun kredileriniz tükendi",
+        "onboardingResume": "Rerun kurulumunuz tamamlanmadı",
+        "agentRecommendations": "{count, plural, one {{company} için uygun # Rerun coworker} other {{company} için uygun # Rerun coworker}}",
+        "agentIdle": "{agentName} hazır ama henüz çalışmadı",
+        "teamInvite": "{workspaceName} için ekibinizi davet edin",
+        "automateAgent": "{agentName} adlı coworker'ı {manualRuns, plural, other {# kez}} elle çalıştırdınız, sonrakini zamanlayın",
+        "trialStarted": "{trialDays} günlük Rerun denemeniz etkin",
+        "trialEnding": "{daysLeft, plural, =1 {Rerun denemeniz yarın bitiyor} other {Rerun denemeniz # gün içinde bitiyor}}",
+        "trialFinalNoticeCard": "Rerun planınız 2 saat içinde başlıyor",
+        "trialFinalNoticeNoCard": "Rerun denemeniz 2 saat içinde bitiyor, coworker'larınızın çalışmaya devam etmesi için bir kart ekleyin",
+        "trialEndedPaymentFailed": "İlk Rerun ödemeniz başarısız oldu, çalışma alanınız 24 saat içinde duraklatılacak",
+        "trialEndedNoCard": "Rerun denemeniz sona erdi, çalışma alanınız 2 saat içinde duraklatılacak",
+        "paymentFailed": "Rerun ödemeniz reddedildi, çalışma alanınız 24 saat içinde duraklatılacak",
+        "subscriptionEnding": "{daysLeft, plural, =1 {Rerun aboneliğiniz yarın bitiyor} other {Rerun aboneliğiniz # gün içinde bitiyor}}",
+        "archiveExpiring": "{kind, select, sandbox {Arşivlenen Rerun sandbox'ınız {date} tarihinde silinecek} other {Duraklatılan Rerun çalışma alanınız {date} tarihinde silinecek}}",
+        "sandboxIdle": "Rerun sandbox'ınızı açmazsanız {date} tarihinde arşivlenecek",
+        "renewalReminder": "{daysLeft, plural, =1 {Rerun planınız yarın yenileniyor} other {Rerun planınız # gün içinde yenileniyor}}",
+        "creatorPitch": "Rerun'da oluşturduğunuz coworker'ları satın"
+    },
+    "reasons": {
+        "mine": "Bu çalıştırmayı siz başlattınız.",
+        "participant": "Bu sohbete katılıyorsunuz.",
+        "followed": "{agentName} adlı coworker'ın zamanlanmış görevlerini takip ediyorsunuz.",
+        "allActivity": "{agentName} adlı coworker'ın tüm etkinliklerini alıyorsunuz.",
+        "everything": "Çalışma alanındaki her çalıştırmayı alıyorsunuz.",
+        "workspace": "Bu, çalışma alanınızla ilgili."
+    },
+    "signInCode": {
+        "preview": "Rerun kodunuz: {code}",
+        "headingSignIn": "Rerun'da oturum açın",
+        "headingConfirm": "Yeni e-postanızı onaylayın",
+        "bodySignIn": "Bu kodu istediğiniz sekmeye girin veya hemen oturum açmak için aşağıdaki düğmeyi kullanın.",
+        "bodyConfirm": "Bu adresi hesabınızın e-postası yapmak için kodu Rerun hesap ayarlarınıza girin.",
+        "button": "Rerun'da oturum açın",
+        "footnoteSignIn": "Kodun ve düğmenin süresi {minutes, plural, other {# dakika}} içinde dolar ve yalnızca bir kez çalışır. Bunları siz istemediyseniz bu e-postayı yok sayabilirsiniz.",
+        "footnoteConfirm": "Kodun süresi {minutes, plural, other {# dakika}} içinde dolar ve yalnızca bir kez çalışır. Siz istemediyseniz bu e-postayı yok sayabilirsiniz."
+    },
+    "publishedAccessCode": {
+        "preview": "{pageTitle} için açma kodunuz: {code}",
+        "heading": "Sayfayı açın: {pageTitle}",
+        "body": "{workspaceName} bu sayfayı sizinle paylaştı. Sayfayı açmak için bu kodu sayfaya girin.",
+        "footnote": "Kodun süresi {minutes, plural, other {# dakika}} içinde dolar ve yalnızca bir kez çalışır. Siz istemediyseniz bu e-postayı yok sayabilirsiniz.",
+        "untitledPage": "adsız sayfa"
+    },
+    "lifetimeCode": {
+        "preview": "Rerun ömür boyu kodunuz: {code}",
+        "heading": "Ömür boyu erişiminiz hazır",
+        "body": "Satın alımınız için teşekkürler. Kodunuz burada: çalışma alanınızı ömür boyu plana geçirmek için onu Rerun çalışma alanınızda kullanın.",
+        "button": "Kodumu kullan",
+        "footnote": "Kod yalnızca bir kez, tek bir çalışma alanında çalışır. Bu e-postayı saklayın: satın alma kanıtınızdır. Sorunuz mu var? Bu e-postayı yanıtlayın."
+    },
+    "workspaceInvite": {
+        "preview": "Rerun'da {workspaceName} çalışma alanına davet edildiniz",
+        "heading": "Davet edildiniz",
+        "bodyWithInviter": "<strong>{inviter}</strong> sizi Rerun'da <strong>{workspaceName}</strong> çalışma alanına katılmaya davet etti.",
+        "bodyAnonymous": "Rerun'da <strong>{workspaceName}</strong> çalışma alanına katılmaya davet edildiniz.",
+        "pitch": "Rerun, işinizi otonom yapay zeka coworker'larıyla yürütür. Bu çalışma alanında birlikte çalışmaya başlamak için daveti kabul edin.",
+        "button": "{workspaceName} çalışma alanına katıl",
+        "footnote": "Bu davetin süresi 7 gün içinde dolar. Beklemiyorsanız bu e-postayı yok sayabilirsiniz."
+    },
+    "teamInvite": {
+        "preview": "{workspaceName} için ekibinizi davet edin",
+        "heading": "{workspaceName} için ekibinizi davet edin",
+        "firstRun": "<strong>{agentName}</strong> ilk başarılı çalıştırmasını tamamladı ve bu çalışma alanında hâlâ yalnızca siz varsınız.",
+        "access": "Sonuçlarını başka biri okuyacaksa, yapmak üzere olduğu şeyi onaylayacaksa veya siz yokken iş akışını sürdürecekse, kendi erişimine ihtiyacı var.",
+        "button": "Ekibinizi davet edin",
+        "footnote": "Kimin katılacağına siz karar verirsiniz. Siz bir davet gönderene kadar hiçbir şey paylaşılmaz.",
+        "fallbackAgent": "Coworker'ınız"
+    },
+    "runFailed": {
+        "preview": "{agentName} bir hatayla karşılaştı",
+        "heading": "Çalıştırma başarısız",
+        "body": "Coworker'ınız <strong>{agentName}</strong> bir hatayla durdu."
+    },
+    "budgetExhausted": {
+        "preview": "Rerun kredileriniz tükendi",
+        "heading": "Rerun kredileri tükendi",
+        "bodyNamed": "<strong>{workspaceName}</strong> çalışma alanının bu ayki Rerun kredileri tükendi. Rerun modelleriyle yapılan zamanlanmış ve tetiklenen çalıştırmalar, krediler sıfırlanana veya siz kredi ekleyene kadar duraklatıldı.",
+        "bodyUnnamed": "Çalışma alanınızın bu ayki Rerun kredileri tükendi. Rerun modelleriyle yapılan zamanlanmış ve tetiklenen çalıştırmalar, krediler sıfırlanana veya siz kredi ekleyene kadar duraklatıldı.",
+        "ownKeys": "Kendi API anahtarlarını kullanan coworker'lar çalışmaya devam eder.",
+        "button": "Kredi ekle"
+    },
+    "agentNotification": {
+        "done": {
+            "preview": "{agentName}: Görev tamamlandı",
+            "heading": "Görev tamamlandı",
+            "body": "Coworker'ınız <strong>{agentName}</strong> bir görevi tamamladı."
+        },
+        "info": {
+            "preview": "{agentName}: İlginizi bekliyor",
+            "heading": "İlginizi bekliyor",
+            "body": "Coworker'ınız <strong>{agentName}</strong> bir şeye bakmanızı istiyor."
+        },
+        "question": {
+            "preview": "{agentName}: Coworker'ın bir sorusu var",
+            "heading": "Coworker'ın bir sorusu var",
+            "body": "Coworker'ınız <strong>{agentName}</strong> devam etmek için bir yanıt bekliyor."
+        },
+        "approval": {
+            "preview": "{agentName}: Onay gerekiyor",
+            "heading": "Onay gerekiyor",
+            "body": "Coworker'ınız <strong>{agentName}</strong> onayınızı bekliyor."
+        },
+        "connector": {
+            "preview": "{agentName}: Uygulama kurulumu",
+            "heading": "Uygulama kurulumu",
+            "body": "Coworker'ınız <strong>{agentName}</strong> bir hizmeti bağlamanızı bekliyor."
+        }
+    },
+    "incidentResolved": {
+        "preview": "{source}, {agentName} için yeniden çalışıyor",
+        "heading": "Her şey normale döndü",
+        "body": "{source}, <strong>{agentName}</strong> için yeniden sorunsuz çalıştı. Tekrar bozulmadıkça bu konuda başka e-posta almayacaksınız.",
+        "sources": {
+            "schedule": "\"{slug}\" zamanlaması",
+            "anySchedule": "Zamanlanmış bir görev",
+            "trigger": "\"{slug}\" tetikleyicisi",
+            "anyTrigger": "Bir tetikleyici",
+            "conversation": "Bir sohbet"
+        }
+    },
+    "agentIdle": {
+        "preview": "{agentName} hazır ama henüz çalışmadı",
+        "heading": "{agentName} henüz çalışmadı",
+        "body": "<strong>{agentName}</strong> adlı coworker'ı oluşturdunuz ama henüz hiç çalıştırma başlatmadı. Önce ona küçük bir görev verin: bir dakikada okuyabileceğiniz bir sonuç, onu bir zamanlamaya koymadan önce kurulumun doğru olup olmadığını size gösterir.",
+        "button": "{agentName} sayfasını aç",
+        "footnote": "Bu sayfayı açmak bir çalıştırma başlatmaz.",
+        "createdHoursAgo": "{count, plural, one {# saat önce} other {# saat önce}}",
+        "createdYesterday": "dün",
+        "createdDaysAgo": "{count, plural, one {# gün önce} other {# gün önce}}"
+    },
+    "agentRecommendations": {
+        "preview": "{count, plural, one {{company} için uygun # Rerun coworker} other {{company} için uygun # Rerun coworker}}",
+        "yourCompany": "şirketiniz",
+        "heading": "{company} için nereden başlamalı",
+        "bodyWithSite": "Kurulum sırasında <strong>{domain}</strong> adresini paylaştınız. Orada anlatılan tekrarlayan işlere ve kullandığınızı söylediğiniz araçlara göre, başlamak için en net kurulumlar bunlar.",
+        "bodyWithoutSite": "Kullandığınızı söylediğiniz araçlara göre, başlamak için en net kurulumlar bunlar.",
+        "button": "Kütüphaneye göz atın",
+        "footnote": "Birini seçip kurulumunu gözden geçirene kadar hiçbir şey çalışmaz."
+    },
+    "automateAgent": {
+        "preview": "{agentName} adlı coworker'ı {manualRuns, plural, other {# kez}} elle başlattınız",
+        "heading": "{agentName} kendi kendine başlasın",
+        "body": "<strong>{agentName}</strong> adlı coworker'ı {period} <strong>{manualRuns, plural, other {# kez}}</strong> kendiniz başlattınız ve her biri tamamlandı.",
+        "workflowWorks": "İş akışı çalışıyor. Bir zamanlamayla, siz uygulamayı açıp başlatmadan aynı işi yapar.",
+        "button": "Sonraki çalıştırmayı zamanlayın",
+        "footnote": "Zamanlamayı kaydedilmeden önce gözden geçirirsiniz ve istediğiniz zaman duraklatabilirsiniz.",
+        "periods": {
+            "lastWeek": "son bir haftada",
+            "lastTwoWeeks": "son iki haftada"
+        }
+    },
+    "onboardingResume": {
+        "preview": "Rerun kurulumunuz tamamlanmadı",
+        "headingNamed": "{firstName}, kurulumunuz tamamlanmadı",
+        "heading": "Kurulumunuz tamamlanmadı",
+        "leftEarly": "Çalışma alanınız oluşturuldu ama kurulum bitmeden ayrıldınız. Yaklaşık bir dakika sürer: siteniz ve zaten kullandığınız araçlar.",
+        "whyItMatters": "Rerun'ın size hangi coworker'ları önereceğine bu iki yanıt karar verir. Onlar olmadan genel listeyi görürsünüz.",
+        "button": "Kurulumu tamamla",
+        "footnote": "Çalışma alanınıza geldiğinizde sorular kendiliğinden yeniden açılır."
+    },
+    "archiveExpiring": {
+        "preview": "{kind, select, sandbox {Arşivlenen Rerun sandbox'ınız {date} tarihinde silinecek} other {Duraklatılan Rerun çalışma alanınız {date} tarihinde silinecek}}",
+        "heading": "{kind, select, sandbox {Arşivlenen sandbox'ınız {date} tarihinde silinecek} other {Duraklatılan çalışma alanınız {date} tarihinde silinecek}}",
+        "statusNamed": "{kind, select, sandbox {<strong>{workspaceName}</strong>, <strong>{pausedOn}</strong> tarihinden beri arşivde. Coworker'ları ve bildikleri her şey hâlâ kayıtlı ve bu, kayıtlı kalacakları son hafta.} other {<strong>{workspaceName}</strong>, <strong>{pausedOn}</strong> tarihinden beri duraklatılmış durumda. Coworker'ları ve bildikleri her şey hâlâ kayıtlı ve bu, kayıtlı kalacakları son hafta.}}",
+        "statusUnnamed": "{kind, select, sandbox {Çalışma alanınız <strong>{pausedOn}</strong> tarihinden beri arşivde. Coworker'ları ve bildikleri her şey hâlâ kayıtlı ve bu, kayıtlı kalacakları son hafta.} other {Çalışma alanınız <strong>{pausedOn}</strong> tarihinden beri duraklatılmış durumda. Coworker'ları ve bildikleri her şey hâlâ kayıtlı ve bu, kayıtlı kalacakları son hafta.}}",
+        "deletion": "{kind, select, sandbox {<strong>{date}</strong> tarihinde kayıtlı kopya kalıcı olarak silinir ve geri getirilemez. Tam bıraktığınız gibi geri almak için o tarihten önce sandbox'ınızı açıp yeniden etkinleştirilmesini isteyin.} other {<strong>{date}</strong> tarihinde kayıtlı kopya kalıcı olarak silinir ve geri getirilemez. O tarihten önce abone olursanız çalışma alanınız tam bıraktığınız gibi geri gelir.}}",
+        "button": "{kind, select, sandbox {Sandbox'ımı aç} other {Çalışma alanımı geri getir}}",
+        "footnote": "{kind, select, sandbox {Bu, bu sandbox hakkındaki son e-posta.} other {Bu, bu çalışma alanı hakkındaki son e-posta.}}"
+    },
+    "creatorInvite": {
+        "previewOutreach": "Herkese açık çalışmalarınızdan hazırlandı. Profilinizi ve sandbox'ınızı alın.",
+        "previewApplication": "Kabul edildiniz. Sandbox'ınızı alın ve şablon oluşturmaya başlayın.",
+        "headingOutreach": "Tebrikler, {firstName}",
+        "headingApplication": "Kabul edildiniz, {firstName}",
+        "introOutreach": "Profiliniz, yapay zeka coworker'ları tasarlayıp devreye alan profesyonellerden oluşan dizinimize az önce eklendi. İlanınızı herkese açık çalışmalarınızdan önceden doldurduk.",
+        "introApplication": "Rerun Creator programına başvurunuzu inceledik ve sizi aramızda görmekten mutluluk duyarız.",
+        "cardAlt": "Rerun Uzman kartı: {firstName}",
+        "sandbox": "Aşağıdaki bağlantı, creator hesabınızı oluşturur ve size bir sandbox verir: coworker oluşturduğunuz, onları şablon olarak kaydettiğiniz ve pazar yerinde yayınladığınız sınırsız bir çalışma alanı. Creator'lar yayınladıkları her ücretli şablonun gelirini alır.",
+        "button": "Box'ımı al",
+        "conditions": "Sandbox açılmadan önce program koşullarını kabul etmeniz istenecek. Bir dakika sürer. Herkese açık ilanınızı istediğiniz zaman uygulamadan düzenleyebilirsiniz.",
+        "fallbackLink": "Düğme çalışmazsa bunu tarayıcınıza yapıştırın: <link>{url}</link>",
+        "signoff": "Rerun Ekibi",
+        "unsubscribe": "Profilimi kaldır"
+    },
+    "creatorPitch": {
+        "preview": "Rerun'da oluşturduğunuz coworker'ları satın",
+        "headingNamed": "{firstName}, oluşturduğunuzu satın",
+        "heading": "Oluşturduğunuzu satın",
+        "bodyWithAgent": "Rerun'da <strong>{agentName}</strong> adlı coworker'ı oluşturdunuz. Başkalarının da yaşadığı bir sorunu çözüyorsa, onu tek tıkla kurulan bir şablona dönüştürebilirsiniz.",
+        "bodyWithoutAgent": "Rerun'da çalışan coworker'lar oluşturdunuz. İçlerinden biri başkalarının da yaşadığı bir sorunu çözüyorsa, onu tek tıkla kurulan bir şablona dönüştürebilirsiniz.",
+        "creator": "Bir Rerun Creator olarak fiyatı siz belirlersiniz, ödemeyi ve size yapılacak ödemeleri biz yönetiriz; alıcılar zaten çalışan bir kuruluma ulaşır.",
+        "button": "Creator olun",
+        "footnoteWithAgent": "{agentName} ile başlayın veya pazar yeri için sıfırdan bir şey oluşturun.",
+        "footnoteWithoutAgent": "Zaten sahip olduğunuz bir coworker ile başlayın veya pazar yeri için sıfırdan bir şey oluşturun."
+    },
+    "paymentFailed": {
+        "preview": "Rerun ödemeniz reddedildi, çalışma alanınız {pausedAt} tarihinde duraklatılacak",
+        "heading": "Ödemeniz reddedildi",
+        "declined": "<strong>{workspace}</strong> için yenileme ödemesi <strong>{date}</strong> tarihinde gerçekleşmedi. Bankanız yalnızca onaylamanızı istiyor olabilir.",
+        "declinedWithAmount": "<strong>{workspace}</strong> için <strong>{amount}</strong> tutarındaki yenileme ödemesi <strong>{date}</strong> tarihinde gerçekleşmedi. Bankanız yalnızca onaylamanızı istiyor olabilir.",
+        "consequences": "Çalışma alanınız <strong>{pausedAt}</strong> tarihine kadar çalışmaya devam eder. Ardından <strong>duraklatılır</strong> ve coworker'larınız durur. Hiçbir şey silinmez: coworker'larınız ve bildikleri her şey <strong>{keptUntil}</strong> tarihine kadar saklanır. Faturayı ödeyin, aynı planla hiçbir şey değişmez.",
+        "button": "Faturayı öde",
+        "footnote": "Önümüzdeki birkaç gün içinde kartı yeniden deneyeceğiz. Denemelerden biri başarılı olursa çalışma alanınız devam eder veya zaten duraklatılmışsa kendiliğinden geri yüklenir."
+    },
+    "renewalReminder": {
+        "preview": "Rerun planınız {date} tarihinde yenileniyor",
+        "heading": "Planınız {daysLeft, plural, =1 {bir gün} other {# gün}} içinde yenileniyor",
+        "body": "<strong>{workspace}</strong> için plan yenilenmeden önce size hatırlatmamızı istediniz. Plan <strong>{date}</strong> tarihinde yenilenir ve kayıtlı kart o tarihte ücretlendirilir. O tarihe kadar coworker'larınız olduğu gibi çalışmaya devam eder.",
+        "button": "Planımı gözden geçir",
+        "footnote": "İptal mi etmek istiyorsunuz? {date} tarihinden önce çalışma alanı menünüzdeki Faturalandırma bölümünden iptal edin, kartınız yeniden ücretlendirilmez."
+    },
+    "sandboxIdle": {
+        "preview": "Rerun sandbox'ınızı açmazsanız {date} tarihinde arşivlenecek",
+        "heading": "Sandbox'ınız {date} tarihinde arşivlenecek",
+        "unused": "Rerun sandbox'ınız <strong>{lastActive}</strong> tarihinden beri açılmadı. Bir sandbox sizin için çalışan bir makineyi ayakta tutar, bu yüzden 30 gün kullanılmayan bir sandbox makineyi boşaltmak için arşivlenir.",
+        "openBefore": "Sandbox'ınızı <strong>{date}</strong> tarihinden önce açarsanız hiçbir şey değişmez. O tarihten sonra coworker'ları ve verileri saklanır, ancak geri almak için yeniden etkinleştirmeyi bizden istemeniz gerekir.",
+        "button": "Sandbox'ımı aç"
+    },
+    "subscriptionEnding": {
+        "preview": "Rerun aboneliğiniz {date} tarihinde bitiyor",
+        "heading": "{daysLeft, plural, =1 {Aboneliğiniz yarın bitiyor} other {Aboneliğiniz # gün içinde bitiyor}}",
+        "cancelled": "<strong>{workspace}</strong> aboneliği iptal edildi ve <strong>{date}</strong> tarihinde sona eriyor. O tarihte coworker'larınız durur ve çalışma alanınız duraklatılır.",
+        "nothingDeleted": "Hiçbir şey silinmez. Coworker'larınız, anıları, dosyaları ve geçmişleri <strong>{keptUntil}</strong> tarihine kadar saklanır; yeniden abone olursanız her şey tam bıraktığınız gibi geri gelir.",
+        "button": "Aboneliğimi sürdür",
+        "footnote": "Fikrinizi mi değiştirdiniz? {date} tarihinden önce yeniden etkinleştirirseniz her şey çalışmaya devam eder, geri yüklenecek bir şey kalmaz."
+    },
+    "trialEnded": {
+        "preview": "{reason, select, payment_failed {İlk Rerun ödemeniz başarısız oldu, çalışma alanınız {pausedAt} tarihinde duraklatılacak} other {Rerun denemeniz sona erdi, çalışma alanınız {pausedAt} tarihinde duraklatılacak}}",
+        "heading": "{reason, select, payment_failed {İlk ödemeniz başarısız oldu} other {Denemeniz sona erdi}}",
+        "ended": "{reason, select, payment_failed {<strong>{workspace}</strong> için deneme <strong>{date}</strong> tarihinde sona erdi ve kartınızdan ilk tahsilat gerçekleşmedi. Bankanız yalnızca onaylamanızı istiyor olabilir.} other {<strong>{workspace}</strong> için deneme <strong>{date}</strong> tarihinde sona erdi ve coworker'larınız durdu.}}",
+        "paused": "{reason, select, payment_failed {Çalışma alanınız <strong>{pausedAt} tarihinde duraklatılır</strong>. Hiçbir şey silinmez: coworker'larınız ve bildikleri her şey <strong>{keptUntil}</strong> tarihine kadar saklanır. Çalışmaya devam etmesi için duraklatılmadan önce faturayı ödeyin veya o tarihten önce istediğiniz zaman abone olun, her şey tam bıraktığınız gibi geri gelir.} other {Çalışma alanınız <strong>{pausedAt} tarihinde duraklatılır</strong>. Hiçbir şey silinmez: coworker'larınız ve bildikleri her şey <strong>{keptUntil}</strong> tarihine kadar saklanır. O tarihten önce istediğiniz zaman abone olun, her şey tam bıraktığınız gibi geri gelir.}}",
+        "button": "{reason, select, payment_failed {Faturayı öde} other {Planımı başlat}}",
+        "footnote": "Zamanı değil mi? Böyle bırakabilirsiniz, başka bir ücret alınmaz. Çalışma alanınız {keptUntil} tarihine kadar saklanır."
+    },
+    "trialEnding": {
+        "preview": "Rerun denemeniz {date} tarihinde bitiyor",
+        "heading": "Denemeniz {daysLeft, plural, =1 {bir gün} other {# gün}} içinde bitiyor",
+        "endsOn": "<strong>{workspace}</strong> için deneme <strong>{date}</strong> tarihinde bitiyor. O tarihten itibaren planınız her ay kayıtlı karttan ücretlendirilir. Kayıtlı kart yoksa coworker'larınız durur ve çalışma alanınız deneme bittikten 2 saat sonra duraklatılır.",
+        "nothingDeleted": "Hiçbir şey silinmez: coworker'larınız ve bildikleri her şey {keptUntil} tarihine kadar saklanır; abone olursanız her şey tam bıraktığınız gibi geri gelir.",
+        "button": "Planımı başlat",
+        "footnote": "Devam etmeyi düşünmüyor musunuz? {date} tarihinden önce çalışma alanı menünüzdeki Faturalandırma bölümünden iptal edin, hiçbir ücret alınmaz."
+    },
+    "trialFinalNotice": {
+        "previewCard": "Rerun planınız {date} itibarıyla başlıyor",
+        "previewNoCard": "Rerun coworker'larınızın çalışmaya devam etmesi için {date} öncesinde bir kart ekleyin",
+        "heading": "Denemeniz 2 saat içinde bitiyor",
+        "bodyCard": "<strong>{workspace}</strong> için deneme <strong>{date}</strong> itibarıyla bitiyor. Planınız o anda başlar ve ilk ayınız kayıtlı karttan ücretlendirilir. Coworker'larınız çalışmaya devam eder, yapmanız gereken bir şey yok.",
+        "noCard": "<strong>{workspace}</strong> için deneme <strong>{date}</strong> itibarıyla bitiyor ve kayıtlı bir kart yok.",
+        "noCardPause": "Plan olmadan coworker'larınız deneme sonunda durur ve çalışma alanınız <strong>{pausedAt} itibarıyla duraklatılır</strong>. Hiçbir şey silinmez: coworker'larınız ve bildikleri her şey {keptUntil} tarihine kadar saklanır; abone olursanız her şey tam bıraktığınız gibi geri gelir.",
+        "buttonCard": "Planımı gözden geçir",
+        "buttonNoCard": "Planımı başlat",
+        "footnoteCard": "Devam etmeyi düşünmüyor musunuz? {date} öncesinde çalışma alanı menünüzdeki Faturalandırma bölümünden iptal edin, kartınız ücretlendirilmez."
+    },
+    "trialStarted": {
+        "preview": "{trialDays} günlük Rerun denemeniz etkin",
+        "heading": "Denemeniz etkin",
+        "body": "<strong>{workspace}</strong> için {trialDays} günlük ücretsiz deneme başladı. Coworker'larınız çalışır, zamanlamalarınız tetiklenir ve bugün hiçbir ücret alınmaz.",
+        "included": "{coworkers, plural, one {# coworker} other {# coworker}} ve {credits, plural, one {# kredi} other {# kredi}}",
+        "perMonth": "{price}/ay",
+        "button": "Çalışma alanını aç",
+        "footnoteCard": "Planınız {date} tarihinde kendiliğinden başlar: eklediğiniz karttan {price} tahsil edilir, ardından her ay. Devam etmeyi düşünmüyor musunuz? {date} tarihinden önce çalışma alanı menünüzdeki Faturalandırma bölümünden iptal edin, hiçbir ücret alınmaz.",
+        "footnoteNoCard": "Deneme için kart gerekmez. {date} sonrasında devam etmek için çalışma alanı menünüzdeki Faturalandırma bölümünden bir kart ekleyin, planınız ayda {price} ile başlar. Kart olmadan coworker'larınız durur ve hiçbir ücret alınmaz."
+    }
+}

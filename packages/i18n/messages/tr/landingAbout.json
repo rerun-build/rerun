@@ -1,0 +1,50 @@
+{
+    "metaTitle": "Rerun hakkında: yapay zeka coworker'larınızın şirketi",
+    "metaDescription": "Rerun, ChatGPT veya Claude planınızla çalışan yapay zeka coworker'lar geliştirir. Açık kaynak, Lüksemburg'da Reunit SA tarafından işletilir.",
+    "eyebrow": "Hakkında",
+    "headline": "İşe almak istediğimiz coworker'ları geliştiriyoruz.",
+    "lede": "Rerun, ekiplere satış, destek, pazarlama ve yönetim işleri için yapay zeka coworker'lar sağlar. Kendi uygulamalarınızda, ChatGPT veya Claude planınızla, dahil krediler ya da kendi API anahtarınızla çalışırlar.",
+    "mission": {
+        "label": "Neden Rerun",
+        "title": "İş akışı değil, işin kendisini devredin.",
+        "first": "Çoğu yapay zeka aracı sizden bir akış şeması çizmenizi ya da bir sohbetin başında oturmanızı ister. Coworker ise bir işi üstlenir: ekibinizin yazdıklarını okur, uygulamalarınızı kendi ekranında açar, bir takvime göre çalışır ve önemli bir adımdan önce durup size sorar.",
+        "second": "Küçük bir ekip bu yardımı dakikalar içinde işe alabilmeli, herkesi ek ücret ödemeden davet edebilmeli ve dizüstü bilgisayar kapalıyken de çalışmaya devam ettirebilmeli."
+    },
+    "principles": {
+        "label": "Nasıl geliştirildi",
+        "title": "Bağlı kaldığımız üç tercih.",
+        "items": {
+            "machine": {
+                "title": "Her çalışma alanına bir makine",
+                "body": "Her çalışma alanı, Almanya'da barındırılan kendine ait bir makine alır. Coworker'larınız orada gece gündüz, diğer tüm müşterilerden ayrı çalışır."
+            },
+            "openSource": {
+                "title": "Açık kaynak",
+                "body": "Rerun, AGPL-3.0 lisansı altında açık kaynaktır. Kodu okuyun, her değişikliği takip edin ya da kendi sunucunuzda barındırın."
+            },
+            "yourModel": {
+                "title": "Sizin modeliniz, sizin planınız",
+                "body": "Coworker'lar zaten ödediğiniz ChatGPT veya Claude planıyla, bir planın içerdiği kredilerle ya da kendi API anahtarınızla çalışır."
+            }
+        }
+    },
+    "company": {
+        "label": "Şirket",
+        "title": "Lüksemburg'dan işletiliyor.",
+        "body": "Rerun, Lüksemburg'da kayıtlı bir société anonyme olan Reunit SA tarafından geliştirilir ve işletilir. Adres: 177 Rue de Luxembourg, L-8077 Bertrange.",
+        "founder": "Kurucu: <link>Clément Janssens</link>."
+    },
+    "contact": {
+        "label": "İletişime geçin",
+        "title": "Bizimle konuşun.",
+        "email": "Sorular, basın veya iş ortaklıkları için: <link>help@rerun.build</link>.",
+        "links": {
+            "docs": "Dokümantasyon",
+            "brandKit": "Marka kiti",
+            "github": "GitHub",
+            "x": "X",
+            "linkedin": "LinkedIn",
+            "discord": "Discord"
+        }
+    }
+}

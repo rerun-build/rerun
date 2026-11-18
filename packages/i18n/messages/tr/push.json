@@ -1,0 +1,13 @@
+{
+    "states": {
+        "done": "Tamamlandı",
+        "error": "Başarısız",
+        "question": "Soru",
+        "approval": "Onay bekliyor",
+        "connector": "Uygulama gerekiyor",
+        "info": "Güncelleme"
+    },
+    "subtitle": "{source} · {state}",
+    "androidTitle": "{agent} · {subtitle}",
+    "fallbackAgent": "coworker'ınız"
+}

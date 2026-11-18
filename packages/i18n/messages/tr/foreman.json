@@ -1,0 +1,351 @@
+{
+    "welcome": {
+        "title": "Merhaba, ilk görevinizi devretmeye hazır mısınız?",
+        "preparing": "Çalışma alanınız hazırlanıyor..."
+    },
+    "header": {
+        "closeDisabled": "Sohbeti kapatmak için kurulumu tamamlayın",
+        "move": "Taşı",
+        "moveChat": "Sohbeti taşı",
+        "position": {
+            "dockLeft": "Sola sabitle",
+            "dockRight": "Sağa sabitle",
+            "float": "Serbest"
+        },
+        "newTask": "Yeni görev",
+        "conversations": "Sohbetler"
+    },
+    "threads": {
+        "general": "Genel",
+        "back": "Genel'e dön",
+        "untitled": "Yeni görev"
+    },
+    "history": {
+        "title": "Sohbetler",
+        "close": "Kapat",
+        "empty": "Henüz konu yok."
+    },
+    "resize": "Sohbeti boyutlandır",
+    "modelPill": {
+        "hubReason": "Bu sohbet her zaman Rerun Balanced ile çalışır"
+    },
+    "nextSteps": {
+        "turnOn": "Coworker'ımı aç",
+        "yourInstallStarted": "Coworker'ınızın kurulumu başladı",
+        "installStarted": "{name} için kurulum başladı",
+        "startInstallingMine": "Coworker'ımı kurmaya başla",
+        "startInstalling": "Kurmaya başla: {name}",
+        "startTrial": "Ücretsiz denemeyi başlat",
+        "startPlan": "Planımı başlat",
+        "starting": "Başlatılıyor…",
+        "openChat": "Sohbeti aç",
+        "installFailed": "Kurulum başlatılamadı"
+    },
+    "notification": {
+        "title": "Chief of Staff",
+        "waiting": "Chief of Staff'ınız sizi bekliyor."
+    },
+    "dock": {
+        "tooltip": "Arayın veya Chief of Staff'ınıza sorun <key>{shortcut}</key>",
+        "failedReply": "Bu sefer bir şeyler ters gitti."
+    },
+    "nudge": {
+        "approval": "Onayınız gerekiyor",
+        "question": "Yanıtınız gerekiyor",
+        "more": "+{count} tane daha",
+        "review": "İncele",
+        "answer": "Yanıtla",
+        "later": "Sonra"
+    },
+    "reply": {
+        "open": "Sohbeti aç",
+        "dismiss": "Kapat"
+    },
+    "voice": {
+        "listening": "Dinleniyor · göndermek için Space tuşunu bırakın",
+        "transcribing": "Yazıya dökülüyor...",
+        "nothingHeard": "Bu kayıtta hiçbir şey duyulamadı.",
+        "sendFailed": "Sesli mesajınız gönderilemedi."
+    },
+    "pill": {
+        "prompts": {
+            "lastNight": "Dün gece ne çalıştı?",
+            "failedRun": "Bu çalıştırma neden başarısız oldu?",
+            "newCoworker": "Bana yeni bir coworker oluştur"
+        },
+        "ask": "Chief of Staff'ınıza sorun",
+        "send": "Gönder"
+    },
+    "routines": {
+        "resumeFailed": "Sürdürülemedi: {name}",
+        "pauseFailed": "Duraklatılamadı: {name}",
+        "renameFailed": "Yeniden adlandırılamadı: {name}",
+        "runFailed": "Çalıştırılamadı: {name}",
+        "started": "{name} başladı",
+        "emptyTitle": "Henüz rutin yok",
+        "emptyDescription": "Bir coworker'dan bir işi belirli bir programla yapmasını isteyin (günlük bir rapor, haftalık bir özet), burada görünür.",
+        "unknownCoworker": "Bilinmeyen coworker",
+        "options": "Seçenekler: {name}",
+        "rename": "Yeniden adlandır",
+        "edit": "Düzenle",
+        "runNow": "Şimdi çalıştır"
+    },
+    "ownEntry": "Ne istediğimi biliyorum",
+    "ownEntryPlaceholder": "Ne istediğimi biliyorum…",
+    "gettingStarted": {
+        "title": "Başlarken",
+        "hide": "Gizle",
+        "pillLabel": "Başlarken: {done} / {total} tamamlandı",
+        "steps": {
+            "phone": {
+                "title": "Telefon numaranızı doğrulayın",
+                "description": "Hesabınızı güvenceye alın ve coworker'larınızdan WhatsApp veya SMS ile haber alın."
+            },
+            "first_agent": {
+                "title": "İlk coworker'ınızı oluşturun",
+                "description": "Siz yokken çalışan bir ekip arkadaşı."
+            },
+            "ai_provider": {
+                "title": "Yapay zeka aboneliğinizi bağlayın",
+                "description": "Claude, ChatGPT, Gemini veya kendi API anahtarınız."
+            },
+            "invite": {
+                "title": "Bir ekip arkadaşı davet edin",
+                "description": "Coworker'larınızı birlikte çalıştığınız kişilerle paylaşın."
+            },
+            "schedule": {
+                "title": "Yinelenen bir görev planlayın",
+                "description": "Coworker'larınızdan birini otomatik pilota alın."
+            },
+            "payment_method": {
+                "title": "Ödeme yöntemi ekleyin",
+                "description": "Denemeniz bittiğinde coworker'larınız çalışmaya devam etsin. Bugün hiçbir ücret alınmaz."
+            }
+        },
+        "reward": {
+            "grantedTitle": "Denemenize {days} gün eklendi",
+            "grantedDescription": "Çalışma alanınız hazır. Ek sürenin tadını çıkarın.",
+            "claimingTitle": "Denemenize {days} gün ekleniyor",
+            "claimingDescription": "Bir saniye.",
+            "doneTitle": "Çalışma alanınız hazır",
+            "doneDescription": "Coworker'larınız artık kendi başlarına çalışabilir.",
+            "lockedTitle": "{days} gün daha ücretsiz deneme kazanın",
+            "lockedDescription": "Yukarıdaki {total} adımı tamamlayın. Kalan: {remaining}."
+        },
+        "prompts": {
+            "first_agent": "İlk coworker'ımı oluşturmama yardım et",
+            "ai_provider": "Claude veya ChatGPT aboneliğimi ya da bir API anahtarını bağlamama yardım et",
+            "invite": "Çalışma alanıma bir ekip arkadaşı davet etmeme yardım et",
+            "schedule": "Coworker'larımdan biri için yinelenen bir görev planla"
+        }
+    },
+    "contact": {
+        "defaultSummary": "İlk coworker'ımı kurarken takıldım ve yardıma ihtiyacım var.",
+        "sentWithEmail": "Rerun ekibine gönderildi. Sohbette ve şu adreste yanıt verirler: {email}.",
+        "sent": "Rerun ekibine gönderildi. Sohbette yanıt verirler.",
+        "openChat": "Sohbeti aç",
+        "stillStuck": "Hâlâ takıldınız mı? Ekipten biri yardımcı olabilir.",
+        "send": "Ekibe gönder",
+        "title": "Rerun'dan biriyle konuşun",
+        "description": "Bu mesaj hesap bilgilerinizle birlikte ekibe gider ve size sohbette yanıt verirler.",
+        "notNow": "Şimdi değil"
+    },
+    "template": {
+        "skipped": "Atlandı",
+        "buildingElse": "Başka bir şey oluşturuluyor",
+        "installing": "Bu şablon kuruluyor",
+        "install": "Bu şablonu kur",
+        "buildElse": "Bana başka bir şey oluştur",
+        "buildElseDescription": "Bunların hiçbiri uymuyor. Sana anlattıklarımdan yola çıkıp tasarla.",
+        "notNow": "Şimdi değil",
+        "somethingCustom": "Özel bir şey",
+        "label": "Şablon",
+        "agents": "{count, plural, one {# ajan} other {# ajan}}"
+    },
+    "question": {
+        "fallback": "Bir soru",
+        "skipped": "Atlandı",
+        "neither": "Hiçbiri",
+        "typed": "Sohbette yanıtlandı"
+    },
+    "plan": {
+        "defaultTitle": "İlk coworker'ınız",
+        "skipped": "Atlandı",
+        "confirmed": "Onaylandı",
+        "askedChanges": "Değişiklik istendi",
+        "goesAfter": "<label>Hedefi:</label> {need}",
+        "thisWeek": "Bu hafta elde edecekleriniz",
+        "previousBox": "Önceki Box",
+        "nextBox": "Sonraki Box",
+        "build": "Coworker'ımı oluştur",
+        "change": "Bir şeyi değiştir",
+        "standingBy": "Hazır bekliyor",
+        "lifeWorking": "Üzerinde çalışıyor",
+        "lifeDelivered": "Size teslim edildi"
+    },
+    "starterPack": {
+        "title": "Başlangıç ekibiniz",
+        "subtitle": "En fazla {max} tane seçin. Her biri panonuza geldiğinde kurulumunu sizinle birlikte yapar.",
+        "fullTitle": "Denemeniz {max} coworker çalıştırır",
+        "fullDescription": "Bunu almak için birini çıkarın. Diğerleri bir plana geçtiğinizde katılabilir.",
+        "pickAtLeastOne": "En az birini seçin",
+        "hireOne": "Bunu işe al",
+        "hireMany": "Bu {count} coworker'ı işe al",
+        "progress": "{count} / {max} seçildi",
+        "picked": "Seçildi",
+        "trialFull": "Deneme dolu",
+        "pick": "Seç"
+    },
+    "agentTabs": {
+        "chat": "Sohbet",
+        "actions": "Yapılacaklar",
+        "services": "Uygulamalar",
+        "mcp": "MCP",
+        "skills": "Skill'ler",
+        "data": "Veritabanı",
+        "memories": "Bilgi",
+        "files": "Dosyalar",
+        "published": "Yayınlananlar",
+        "scheduled": "Rutinler",
+        "triggers": "Tetikleyiciler",
+        "tools": "Yetenekler",
+        "monitoring": "İzleme",
+        "logs": "Günlükler",
+        "setup": "Kurulum",
+        "settings": "Ayarlar"
+    },
+    "arrival": {
+        "youPicked": "Seçiminiz",
+        "by": "Yazar: {name}",
+        "gestures": {
+            "account": "Hesap",
+            "trial": "Ücretsiz deneme",
+            "template": "Şablon",
+            "installed": "Kuruldu"
+        },
+        "headings": {
+            "account": {
+                "title": "{name} işe başlasın",
+                "description": "Hesabınızı oluşturun, {name} sizin için kurulsun. Kurulum formu yok, önce soru yok."
+            },
+            "phone": {
+                "title": "Son bir adım",
+                "description": "Telefon numaranızı ekleyin. Sırada {name} var."
+            },
+            "trial": {
+                "title": "{name} şablonunu {days} gün deneyin",
+                "description": "Denemeniz başladığı anda {name} kurulur."
+            },
+            "purchase": {
+                "title": "Edinin: {name}",
+                "description": "Denemeniz başladı. Bu şablonun kendi fiyatı var ve hemen ardından kurulur."
+            },
+            "installing": {
+                "title": "Kuruluyor: {name}",
+                "description": "Burada yapmanız gereken bir şey yok. Bir dakikadan kısa sürer."
+            }
+        }
+    },
+    "teamPulse": {
+        "coworkers": "{count, plural, one {# coworker} other {# coworker}}",
+        "working": "Şu anda {count} çalışıyor"
+    },
+    "trialGate": {
+        "plan": "Devam etmek için planınızı başlatın.",
+        "trial": "Devam etmek için ücretsiz denemenizi başlatın.",
+        "talk": "Ekiple konuşun"
+    },
+    "trial": {
+        "badge": {
+            "cardless": "Kart gerekmez",
+            "card_trial": "{days} günlük ücretsiz deneme",
+            "paid": "Ücretsiz deneme zaten kullanıldı"
+        },
+        "titleTrial": "{days} günlük ücretsiz denemenizi başlatın",
+        "titlePlan": "Planınızı başlatın",
+        "pitchPaidInstall": "{subject} hemen ardından kurulur. Çalışma alanından istediğiniz zaman iptal edin.",
+        "pitchPaidTeam": "Ekibiniz hemen ardından oluşturulur. Çalışma alanından istediğiniz zaman iptal edin.",
+        "pitchCardInstall": "Kart gerekli, bugün $0. Öncesinde iptal etmezseniz {date} tarihinde {price} tahsil edilir. {subject} hemen ardından kurulur.",
+        "pitchCardTeam": "Kart gerekli, bugün $0. Öncesinde iptal etmezseniz {date} tarihinde {price} tahsil edilir. Ekibiniz hemen ardından oluşturulur.",
+        "pitchCardlessInstall": "Kart gerekmez, bugün $0. Ayda {price} ile devam etmek için {date} tarihinden önce bir kart ekleyin. {subject} hemen ardından kurulur.",
+        "pitchCardlessTeam": "Kart gerekmez, bugün $0. Ayda {price} ile devam etmek için {date} tarihinden önce bir kart ekleyin. Ekibiniz hemen ardından oluşturulur.",
+        "includes": "Denemeniz {agents} coworker ve {credits, plural, one {# kredi} other {# kredi}} içerir.",
+        "thenPay": "Ardından bu şablon için {price}, ayrı faturalandırılır.",
+        "dueToday": "Bugün ödenecek",
+        "withCard": "Kartla",
+        "dueOn": "Tarih: {date}",
+        "then": "Ardından",
+        "perMonth": "/ay",
+        "today": "Bugün",
+        "todayInstall": "Denemeniz başlar ve {subject} kurulur.",
+        "todayTeam": "Denemeniz başlar ve ekibiniz oluşturulur.",
+        "reminder": "Size e-posta göndeririz, böylece süre asla habersiz bitmez.",
+        "chargeCardless": "Ayda {price} ile devam etmek için bir kart ekleyin. Kart olmadan coworker'larınız durur ve hiçbir ücret alınmaz.",
+        "chargeCard": "Eklediğiniz karttan {price} tahsil edilir, sonra her ay. Öncesinde iptal ederseniz hiçbir ücret alınmaz.",
+        "startingTrial": "Denemeniz başlatılıyor…",
+        "opening": "Açılıyor…",
+        "startAndInstall": "Denememi başlat ve kur",
+        "startTrial": "Ücretsiz denememi başlat",
+        "startPlan": "Planımı başlat"
+    },
+    "checkout": {
+        "started": "Deneme başladı",
+        "cardUsed": "Bu kart daha önce bir deneme için kullanıldı",
+        "startPlan": "Planımı başlat",
+        "pending": "Hâlâ Stripe bekleniyor",
+        "notStarted": "Deneme başlamadı. Başlayana kadar hiçbir şey oluşturulamaz.",
+        "startTrial": "Ücretsiz denemeyi başlat"
+    },
+    "purchase": {
+        "owned": "{title} artık sizin",
+        "recurring": "Aylık faturalandırılır",
+        "oneTime": "Tek seferlik satın alma",
+        "billedTo": "Rerun planınızdan ayrı olarak faturalandırılır: {name}. Ödeme geçtiği anda kurulur.",
+        "billedToWorkspace": "Rerun planınızdan ayrı olarak çalışma alanınıza faturalandırılır. Ödeme geçtiği anda kurulur.",
+        "dueToday": "Bugün ödenecek",
+        "perMonth": "/ay",
+        "opening": "Açılıyor…",
+        "subscribe": "Abone ol: {price}",
+        "pay": "Öde: {price}"
+    },
+    "teamEmptyState": {
+        "greeting": "Merhaba, ben Chief of Staff'ınızım",
+        "greetingNamed": "Merhaba {firstName}, ben Chief of Staff'ınızım",
+        "greetingWithTeam": "{greeting}. İşte ekibiniz.",
+        "emptySubtitle": "Henüz coworker'ınız yok. Devretmek istediğiniz bir işi söyleyin, ilkini ben oluşturayım.",
+        "buildPrompt": "Bana şunu yapan bir coworker oluştur: ",
+        "buildFirst": {
+            "title": "İlk coworker'ımı oluştur",
+            "description": "İşi bir cümleyle anlatın"
+        },
+        "template": {
+            "title": "Bir şablonla başlayın",
+            "description": "İşletmenizin türüne göre hazır coworker'lar",
+            "send": "İşletmeme uyan şablonları göster"
+        },
+        "guide": {
+            "title": "Bu nasıl çalışıyor?",
+            "description": "İki dakikada coworker'lar, Boxes, rutinler",
+            "send": "Rerun nasıl çalışıyor?"
+        },
+        "checkWorking": {
+            "title": "{name} ne yapıyor?",
+            "description": "Şu anda çalışıyor",
+            "send": "{mention} şu anda ne yapıyor?"
+        },
+        "checkIdle": {
+            "title": "{name} bugün ne yaptı?",
+            "description": "Son çalıştırmalarına göz atın",
+            "send": "{mention} bugün ne yaptı?"
+        },
+        "handOff": {
+            "title": "Görev verin: {name}",
+            "description": "Ben aktarır, sonuna kadar izlerim",
+            "prefill": "{mention} şunu yapsın: "
+        },
+        "build": {
+            "title": "Yeni bir coworker oluşturun",
+            "description": "Ekipte henüz kimsenin yapmadığı bir iş için"
+        }
+    }
+}

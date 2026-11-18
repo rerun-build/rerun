@@ -1,0 +1,80 @@
+{
+    "agentPicker": {
+        "open": "{tab, select, chat {Sohbeti aç: {name}} actions {Yapılacakları aç: {name}} services {Uygulamaları aç: {name}} mcp {MCP'yi aç: {name}} skills {Skill'leri aç: {name}} data {Veritabanını aç: {name}} memories {Bilgileri aç: {name}} files {Dosyaları aç: {name}} scheduled {Rutinleri aç: {name}} triggers {Tetikleyicileri aç: {name}} other {{name}}}"
+    },
+    "connect": {
+        "added": "{name} eklendi",
+        "connectedNote": "Bağlandı, coworker artık kullanabilir",
+        "signInNote": "Coworker'ın kullanabilmesi için bir kez oturum açın",
+        "connected": "Bağlı",
+        "signingIn": "Oturum açılıyor…",
+        "signIn": "Oturum aç",
+        "signInNeeded": "Oturum açılmalı",
+        "unreachable": "Erişilemiyor",
+        "couldNotConnect": "{name} bağlanamadı",
+        "notAdded": "Eklenmedi",
+        "customServer": "Özel MCP sunucusu",
+        "customServerAt": "Özel MCP sunucusu · {host}",
+        "connecting": "Bağlanıyor…",
+        "connect": "Bağla",
+        "installed": "{name} kuruldu",
+        "availableNextTurn": "Sonraki turda kullanılabilir: {tools}"
+    },
+    "event": {
+        "notification": "Size bir bildirim gönderdi",
+        "setUp": "{name} kuruldu",
+        "setupComplete": "Kurulum tamamlandı",
+        "schedules": "{count, plural, one {# zamanlama açık} other {# zamanlama açık}}",
+        "triggers": "{count, plural, one {# tetikleyici açık} other {# tetikleyici açık}}",
+        "newBrainPage": "Yeni Brain sayfası: {title}",
+        "brainChange": "Brain değişikliği: {title}",
+        "proposedNote": "İncelemeye sunuldu. Biri kabul edene kadar hiçbir şey değişmez.",
+        "undone": "Geri alındı: {title}",
+        "undoneNote": "Önceki sürüm geri geldi.",
+        "undo": "Geri al",
+        "undoFailed": "Bu değişiklik geri alınamadı",
+        "tryAgainShortly": "Birazdan tekrar deneyin."
+    },
+    "brain": {
+        "saved": "Brain güncellendi: {title}",
+        "created": "Yeni Brain sayfası: {title}",
+        "deleted": "Brain'den kaldırıldı: {title}",
+        "accepted": "Değişiklik kabul edildi: {title}",
+        "acceptedBy": "Değişiklik kabul edildi ({name}): {title}",
+        "dismissed": "Değişiklik reddedildi: {title}",
+        "dismissedBy": "Değişiklik reddedildi ({name}): {title}",
+        "notes": {
+            "saved": "Kaydedildi. Her coworker sonraki çalıştırmasında okur.",
+            "deleted": "Artık hiçbir coworker bunu okumuyor. Geçmişi saklanır.",
+            "accepted": "Kaydedildi. Her coworker sonraki çalıştırmasında okur.",
+            "dismissed": "Sayfa değişmedi."
+        }
+    },
+    "file": {
+        "open": "Aç: {name}",
+        "title": "{count, plural, =0 {Dosya} one {Dosya} other {# dosya}}",
+        "size": {
+            "b": "{value} B",
+            "kb": "{value} KB",
+            "mb": "{value} MB"
+        }
+    },
+    "skill": {
+        "remembering": "Hatırlanıyor",
+        "remembered": "Hatırlandı",
+        "failed": "Bu hatırlanamadı",
+        "retry": "Tekrar dene",
+        "dismiss": "Kapat",
+        "notRemembered": "Hatırlanmadı",
+        "remember": "Hatırla",
+        "no": "Hayır",
+        "hideDetails": "Ayrıntıları gizle",
+        "showDetails": "Ayrıntıları göster"
+    },
+    "sources": {
+        "count": "{count, plural, one {# kaynak} other {# kaynak}}"
+    },
+    "table": {
+        "partial": "{shown} / {total}"
+    }
+}

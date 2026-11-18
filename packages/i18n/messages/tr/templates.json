@@ -1,0 +1,561 @@
+{
+    "installFeedback": {
+        "noLongerAvailable": "\"{title}\" artık mevcut değil",
+        "buyFailed": "\"{title}\" satın alınamadı",
+        "alreadyOnBoard": "\"{title}\" zaten panonuzda",
+        "alreadyOnBoardHint": "Coworker'ları onları bıraktığınız yerde açılıyor.",
+        "notImported": "{name} içe aktarılamadı.",
+        "inactiveCount": "{count, plural, one {Bunlardan # tanesi etkin değil: planınızda boş coworker yeri yok.} other {Bunlardan # tanesi etkin değil: planınızda boş coworker yeri yok.}}",
+        "landed": "{count, plural, one {\"{title}\" şablonundan # coworker panonuza geldi} other {\"{title}\" şablonundan # coworker panonuza geldi}}",
+        "openOne": "Birini açın ve kurulumunu başlatın: ihtiyaç duyduğu bağlantıları sizinle birlikte yapar.",
+        "landedInactive": "Etkin olmadan geldi: planınızda boş coworker yeri yok.",
+        "agentLanded": "\"{name}\" panonuza geldi",
+        "openIt": "Açın ve kurulumunu başlatın: ihtiyaç duyduğu bağlantıları sizinle birlikte yapar.",
+        "webhooksMoved": "{count, plural, one {# webhook yeni bir URL aldı: hizmetlerinizi kopyanın kendi adresine yönlendirin.} other {# webhook yeni bir URL aldı: hizmetlerinizi kopyanın kendi adresine yönlendirin.}}",
+        "schedulesDoubled": "{count, plural, one {# zamanlama kopyada da çalışır. İşin iki kez yapılmaması gerekiyorsa kapatın.} other {# zamanlama kopyada da çalışır. İşin iki kez yapılmaması gerekiyorsa kapatın.}}",
+        "copyReady": "Orijinalde olan her şeyi taşıyor ve çalışmaya hazır.",
+        "prepareBoxFailed": "Box'ınız hazırlanamadı",
+        "settingUp": "\"{title}\" kuruluyor",
+        "settingUpHint": "Coworker'larınız birazdan panoda görünecek.",
+        "setUpFailed": "\"{title}\" kurulamadı"
+    },
+    "price": {
+        "free": "Ücretsiz",
+        "monthly": "{amount}/ay",
+        "useForFree": "Ücretsiz kullan",
+        "hire": "{count, plural, one {Bu coworker'ı işe alın · {price}} other {Bu # coworker'ı işe alın · {price}}}",
+        "hireCard": "İşe al · {price}",
+        "purchased": "Satın alındı",
+        "expired": "Süresi doldu",
+        "install": "Kur",
+        "renew": "Yenile"
+    },
+    "connectors": {
+        "none": "Uygulama gerekmez",
+        "label": "Uygulamalar: {names}"
+    },
+    "creator": {
+        "templateCount": "{count, plural, one {# şablon} other {# şablon}}",
+        "rerunTeam": "Rerun ekibi",
+        "verified": "Doğrulanmış creator"
+    },
+    "spotlight": {
+        "viewProfile": "Profili görüntüle: {name}",
+        "workWith": "{name} ile çalışın",
+        "badge": "Haftanın creator'ı",
+        "website": "Web sitesi",
+        "socialLabel": "{network} üzerinde {name}",
+        "openTemplate": "Şablonu aç",
+        "recognizedFor": "Öne çıktığı şablon"
+    },
+    "about": {
+        "showMore": "Daha fazla göster",
+        "showLess": "Daha az göster"
+    },
+    "agentCard": {
+        "comesWith": "Birlikte gelenler",
+        "apps": "Uygulamalar",
+        "skills": "Skill'ler",
+        "schedules": "Zamanlanmış görevler",
+        "webhooks": "Webhook'lar",
+        "more": "+{count} tane daha"
+    },
+    "detail": {
+        "price": "Fiyat",
+        "coworkers": "Coworker'lar",
+        "apps": "Uygulamalar",
+        "setupTime": "Kurulum süresi",
+        "minutes": "{minutes} dk",
+        "category": "Kategori",
+        "about": "Hakkında",
+        "whatYouNeed": "İhtiyacınız olanlar",
+        "carousel": "bu şablondaki coworker'lar",
+        "securityTitle": "Güvenlik",
+        "securityBody": "Kimlik bilgileri ve özel veriler bu şablondan çıkarıldı. Uygulamalar bağlantısız gelir, içe aktarmadan sonra onları siz yetkilendirirsiniz.",
+        "cancelAnytime": "Faturalandırma ayarlarınızdan istediğiniz zaman iptal edin."
+    },
+    "library": {
+        "title": "Şablon kütüphanesi",
+        "templates": "Şablonlar",
+        "hideDetails": "Ayrıntıları gizle",
+        "newCoworker": "Yeni coworker",
+        "createCoworker": "Yeni coworker oluştur",
+        "viewProfile": "Profili görüntüle",
+        "filters": {
+            "app": "Uygulama",
+            "status": "Durum"
+        },
+        "search": {
+            "placeholder": "Şablon ara",
+            "clear": "Aramayı temizle"
+        },
+        "nav": {
+            "discover": "Keşfet",
+            "forYou": "Size özel",
+            "all": "Tümü",
+            "allTemplates": "Tüm şablonlar",
+            "mine": "Kütüphanem",
+            "stack": "Araçlarınız",
+            "popularApps": "Popüler uygulamalar",
+            "categories": "Kategoriler"
+        },
+        "heading": {
+            "count": "{count, plural, one {# şablon} other {# şablon}}",
+            "results": "“{query}” için sonuçlar",
+            "discoverEmpty": "Oluşturduğunuz şablonlar buraya gelir.",
+            "discover": "Onları kullanan kişilerin hazırladığı hazır coworker'lar.",
+            "forYou": "Önce sektörünüze ve kullandığınız uygulamalara göre eşleştirildi.",
+            "mine": "Bu çalışma alanının sahip olduğu şablonlar.",
+            "app": "Uygulama",
+            "appSubtitle": "{app} kullanan {total}",
+            "thisApp": "bu uygulamayı",
+            "creator": "Creator"
+        },
+        "discover": {
+            "seeAll": "Tümünü gör",
+            "creators": "Creator'lar",
+            "creatorsSubtitle": "Şablonların arkasındaki kişiler.",
+            "allCreators": "Tüm creator'lar",
+            "forYou": "Size özel",
+            "forYouSubtitle": "Sektörünüze ve kullandığınız uygulamalara göre eşleştirildi.",
+            "featured": "Öne çıkanlar",
+            "featuredSubtitle": "Önce göz atmaya değer, özenle seçilmiş kurulumlar.",
+            "justAdded": "Yeni eklenenler",
+            "justAddedSubtitle": "Rerun'da yayınlanan en yeni şablonlar."
+        },
+        "empty": {
+            "filtered": "Bu filtrelerle eşleşen şablon yok",
+            "none": "Burada henüz şablon yok",
+            "selfHosted": "Bir coworker işe alın, ardından onu şablon olarak kaydedin.",
+            "cloud": "Kendiniz oluşturun ve Rerun'da satın.",
+            "become": "Rerun uzmanı olun"
+        }
+    },
+    "scratch": {
+        "title": "Sıfırdan başla",
+        "description": "Şablon yok. Coworker'ınıza bir ad verin ve onu ızgaraya bırakın."
+    },
+    "section": {
+        "back": "Tüm şablonlara dön",
+        "filterBy": "Filtrele: {title}"
+    },
+    "authoring": {
+        "prefill": "Sihirli doldurma",
+        "altText": "Alternatif metni yaz",
+        "content": {
+            "title": "İçerik",
+            "tagline": "Slogan",
+            "taglineHelp": "{count}/{limit}, tek cümle.",
+            "taglinePlaceholder": "Potansiyel müşterileri bulur, ilk mesajı yazar ve yanıt gelene kadar takip eder.",
+            "longDescription": "Uzun açıklama",
+            "longDescriptionPlaceholder": "Bu şablonun ne yaptığı, kimin için olduğu ve çalışmak için neye ihtiyaç duyduğu."
+        },
+        "faq": {
+            "title": "SSS",
+            "hint": "Herkese açık sayfada gösterilir ve arama motorlarına SSS yapılandırılmış verisi olarak gönderilir.",
+            "empty": "Henüz soru yok. Otomatik doldurun veya elle bir soru ekleyin.",
+            "question": "Soru",
+            "questionPlaceholder": "Hangi hesapları bağlamam gerekiyor?",
+            "answer": "Yanıt",
+            "answerPlaceholder": "Soruyu tek başına yanıtlayan iki üç cümle.",
+            "remove": "Bu soruyu kaldır",
+            "add": "Soru ekle"
+        },
+        "media": {
+            "title": "Medya",
+            "videoUrl": "Video URL'si",
+            "videoPlaceholder": "https://youtube.com/watch?v=… veya bir Loom bağlantısı",
+            "ogImage": "OG görseli değiştirme",
+            "ogImagePlaceholder": "Otomatik oluşturmak için boş bırakın",
+            "ogImageHelp": "Bunu yalnızca özel bir sosyal medya kartı için ayarlayın.",
+            "gallery": "Galeri",
+            "galleryHelp": "İsteğe bağlı: kartlar bunun yerine coworker panosunu çizer. Bunlar ayrıntı sayfasını süsler, ilki öne çıkar ve oluşturulan bir görsel de oraya eklenir. Kalıcı olması için kaydedin. Alternatif metin önerilir: bu görseller dizine eklenen bir sayfada yer alır.",
+            "altCover": "Alternatif metin (kapak)",
+            "alt": "Alternatif metin",
+            "cover": "Kapak",
+            "remove": "Kaldır",
+            "dropOverlay": "Görselleri bırakın",
+            "uploading": "Yükleniyor…",
+            "drop": "Görselleri buraya bırakın veya seçmek için tıklayın"
+        },
+        "meta": {
+            "title": "Meta veriler",
+            "titleLabel": "Başlık",
+            "titlePlaceholder": "Giden satış SDR'ı",
+            "slug": "Slug",
+            "category": "Kategori",
+            "setupTime": "Kurulum süresi (dakika)",
+            "setupTimeHelp": "Herkese açık sayfada gösterilir. Uygulama kurulumu konusunda dürüst olun.",
+            "tags": "Etiketler",
+            "tagsPlaceholder": "erişim, satış, otomasyon",
+            "tagsHelp": "Virgülle ayrılır. Herkese açık sayfada filtreleme için kullanılır.",
+            "metaTitle": "Meta başlık",
+            "metaTitlePlaceholder": "{title}, yapay zeka coworker şablonu",
+            "metaTitleDefault": "Varsayılan: başlık",
+            "metaDescription": "Meta açıklama",
+            "metaDescriptionHelp": "{count}/{limit}, yayınlamak için {min} ile {limit} karakter arası.",
+            "metaDescriptionPlaceholder": "Arama sonuçları için bir iki cümle."
+        }
+    },
+    "capture": {
+        "failedRequest": "İstek gerçekleşmedi. Bağlantınızı kontrol edip tekrar deneyin.",
+        "steps": {
+            "select": {
+                "title": "Coworker'ları yakala",
+                "description": "Klasörü bu şablona dönüşecek coworker'ları seçin."
+            },
+            "review": {
+                "title": "Güvenlik incelemesi",
+                "description": "Her coworker'ın neler taşıdığını kontrol edin, ardından yakalamadan önce onaylayın."
+            },
+            "done": {
+                "title": "Yakalandı",
+                "description": "Arşivler saklandı ve şablon artık bu coworker'ları tanımlıyor."
+            }
+        },
+        "stages": {
+            "title": {
+                "title": "Şablonunuza ad verin",
+                "description": "Onayladığınız anda taslak kaydedilir.",
+                "points": {
+                    "private": "Yayınlanana kadar gizli",
+                    "signed": "Adınızla imzalanır"
+                }
+            },
+            "select": {
+                "title": "Coworker'larınızı seçin",
+                "description": "Coworker klasörünün o anki anlık görüntüsü alınır.",
+                "points": {
+                    "snapshot": "Bir bağlantı değil, anlık görüntü",
+                    "edits": "Sonraki düzenlemeler sizde kalır"
+                }
+            },
+            "review": {
+                "title": "Güvenlik incelemesi",
+                "description": "Hiçbir şey Box'tan çıkmadan önce gizli bilgiler temizlenir.",
+                "points": {
+                    "env": "Ortam değerleri temizlenir",
+                    "apps": "Uygulamalar sıfırlanır",
+                    "scan": "Dosya ve yollarda gizli bilgi taraması",
+                    "memories": "Anılar geride kalır"
+                }
+            },
+            "done": {
+                "title": "Yakalama",
+                "description": "Arşiv gizli olarak saklanır ve şablonu tanımlar.",
+                "points": {
+                    "stored": "Erişilmez bir yerde saklanır",
+                    "warnings": "Sürpriz değil, uyarılar"
+                }
+            }
+        },
+        "select": {
+            "emptyTitle": "Yakalanacak coworker yok",
+            "emptyDescription": "Önce bir Box içinde bir coworker oluşturun, sonra buraya dönün.",
+            "box": "Box",
+            "boxPlaceholder": "Coworker'ların bulunduğu Box'ı seçin",
+            "boxFallback": "Box",
+            "coworkers": "Coworker'lar",
+            "coworkersIn": "{box} içindeki coworker'lar",
+            "search": "Ad veya kullanıcı adıyla ara",
+            "selected": "{total} içinden {selected} seçildi",
+            "clear": "Temizle",
+            "selectAll": "Tümünü seç",
+            "noMatch": "Bu aramayla eşleşen coworker yok."
+        },
+        "review": {
+            "reviewed": "{total, plural, one {# coworker içinden} other {# coworker içinden}} {approved} tanesi incelendi",
+            "files": "{total} dosyadan {kept} tanesi, {size}",
+            "tools": "Araçlar",
+            "apps": "Uygulamalar",
+            "skills": "Skill'ler",
+            "schedules": "Zamanlamalar",
+            "oneShot": "Tek seferlik",
+            "webhooks": "Webhook'lar",
+            "memories": "Anılar",
+            "memoriesNote": "{count} kayıtlı, varsayılan olarak arşive dahil edilmez",
+            "removed": "Çıkarken kaldırılanlar",
+            "toProvide": "Kopyada yeniden girilecekler",
+            "envKeys": "Ortam anahtarları",
+            "flagged": "İşaretli dosyalar",
+            "flaggedKept": "Kimlik bilgisi içeriyor gibi görünen {total} dosyadan {kept} tanesi hâlâ dahil. Arşivin içinde taşınacaklar.",
+            "flaggedOut": "{count, plural, one {# dosya} other {# dosya}} kimlik bilgisi içeriyor gibi görünüyor. Arşivin dışında kalır.",
+            "install": "Kurulum",
+            "filesGroup": "Dosyalar",
+            "hideFolder": "Klasörü gizle",
+            "showFolder": "Klasörü göster",
+            "kept": "{total} içinden {kept} tutuldu",
+            "confirm": "Bu coworker'ın taşıdıklarını inceledim",
+            "answerFirst": "Önce yukarıdaki kurulum sorusunu yanıtlayın.",
+            "writeFirst": "Önce yukarıdaki kurulum talimatlarını yazın.",
+            "flaggedTravel": "{count} işaretli dosya arşivin içinde taşınacak.",
+            "nothingSecret": "Bu listede gönderilmemesi gereken bir gizli bilgi yok.",
+            "more": "+{count} tane daha"
+        },
+        "tree": {
+            "collapse": "Daralt",
+            "expand": "Genişlet",
+            "flagged": "{count} işaretli"
+        },
+        "done": "{count, plural, one {# coworker yakalandı.} other {# coworker yakalandı.}} Skill'leri, zamanlamaları ve uygulamaları artık bu şablonu tanımlıyor.",
+        "panel": {
+            "inspect": "{count, plural, =0 {Coworker'ları incele} one {# coworker'ı incele} other {# coworker'ı incele}}",
+            "reviewEach": "Yakalamayı etkinleştirmek için her coworker'ı inceleyin ({approved}/{total})",
+            "back": "Geri",
+            "capture": "Yakala"
+        },
+        "dialog": {
+            "cancel": "İptal",
+            "done": "Bitti"
+        }
+    },
+    "expert": {
+        "agents": {
+            "title": "Coworker'lar ({count})",
+            "empty": "Henüz yakalanan coworker yok. İnsanların bu kurulumu yükleyebilmesi için sandbox'ınızdan bir tane yakalayın.",
+            "noRole": "Henüz rol yok",
+            "connectors": "{count, plural, one {# bağlayıcı} other {# bağlayıcı}}",
+            "setup": {
+                "guided": "Rehberli kurulum",
+                "none": "Kurulum yok",
+                "missing": "Kurulum yanıtı eksik"
+            },
+            "removeTitle": "{name} kaldırılsın mı?",
+            "removeDescription": "Klasöründen yakalanan arşiv de silinir. Coworker'ı geri eklemek için onu yeniden yakalamanız gerekir.",
+            "removeConfirm": "Kaldır",
+            "removeLabel": "Kaldır: {name}",
+            "capture": "Sandbox'ınızdan yakalayın",
+            "removeNote": "Bir coworker'ı kaldırmak, klasöründen yakalanan arşivi de siler. Geri eklemek için onu yeniden yakalamanız gerekir."
+        },
+        "list": {
+            "newTemplate": "Yeni şablon",
+            "emptyTitle": "Henüz şablon yok",
+            "emptyDescription": "Bir coworker kurulumunu bir kez tanımlayın, pazar yerine ulaşmadan önce onu biz inceleriz."
+        },
+        "row": {
+            "agents": "{count, plural, one {# agent} other {# agent}}"
+        },
+        "tabs": {
+            "details": "Ayrıntılar",
+            "pricing": "Fiyatlandırma",
+            "media": "Medya",
+            "faq": "SSS",
+            "agents": "Coworker'lar"
+        },
+        "dialog": {
+            "title": "Şablonlarım",
+            "description": "Sandbox'ınızdan bir şablon taslağı hazırlayın, ardından bize iletin. Yayına girmeden önce onu inceleriz.",
+            "pickTitle": "Bir şablon seçin",
+            "pickDescription": "Veya sandbox'ınızdan bir coworker yakalamak için yeni bir şablon başlatın."
+        },
+        "toasts": {
+            "saved": "Şablon kaydedildi.",
+            "submitted": "Gönderildi. Size geri döneceğiz."
+        },
+        "footer": {
+            "requirements": {
+                "title": "Bir başlık",
+                "tagline": "Bir slogan",
+                "description": "Bir açıklama",
+                "metaDescription": "{min} ile {max} karakter arası bir meta açıklama",
+                "agent": "En az bir yakalanmış coworker",
+                "installAnswers": "Her coworker için bir kurulum yanıtı",
+                "payouts": "Ödeme alabilen bir Stripe hesabı"
+            },
+            "live": "Bu şablon pazar yerinde yayında. Değiştirmek için Rerun ekibiyle iletişime geçin.",
+            "inReview": "Bu şablonu inceliyoruz. Düzenlemeye devam etmek için geri çekin.",
+            "withdraw": "Geri çek",
+            "completeChecklist": "Önce kontrol listesini tamamlayın",
+            "saveFirst": "Önce değişikliklerinizi kaydedin",
+            "sentBack": "Bunu size geri gönderdik",
+            "deleteTitle": "Bu şablon kalıcı olarak silinsin mi?",
+            "deleteDescription": "Şablon, medyası ve onun için yakalanan her coworker kaldırılır. Bu işlem geri alınamaz.",
+            "deleteTooltip": "Bu şablonu kalıcı olarak sil",
+            "deleteLabel": "Şablonu sil",
+            "checklistLabel": "Gönderim kontrol listesi: {met}/{total} tamam",
+            "ready": "Göndermeye hazır",
+            "checklistHint": "Bir şablonun incelemeden önce ihtiyaç duydukları.",
+            "setUpPayouts": "Ödemeleri ayarla",
+            "save": "Kaydet",
+            "submit": "İncelemeye gönder"
+        }
+    },
+    "pricing": {
+        "title": "Fiyatlandırma",
+        "models": {
+            "free": "Ücretsiz",
+            "one_time": "Tek seferlik satın alma",
+            "recurring": "Aylık abonelik"
+        },
+        "helpers": {
+            "free": "Rerun planı olan herkes kurabilir.",
+            "one_time": "Bir kez ücretlendirilir. Alıcı onu kalıcı olarak saklar.",
+            "recurring": "Her ay ücretlendirilir. Alıcı iptal ettiğinde erişim sona erer."
+        },
+        "modelHelp": "{helper} Alıcıların bir şablonu kurmak için yine de etkin bir Rerun planına ihtiyacı vardır.",
+        "priceLabel": "Fiyat (USD)",
+        "priceHelp": "En az {min}. Sonradan değiştirmek yalnızca yeni alıcılar için geçerli olur.",
+        "payoutsTitle": "Ödemeler etkin değil",
+        "payoutsBody": "Bu fiyatı şimdi kaydedebilirsiniz, ancak Stripe ödemeleri etkinleşene kadar ücretli bir şablon incelemeye gönderilemez.",
+        "setUpPayouts": "Ödemeleri ayarla",
+        "payout": {
+            "yourPrice": "Fiyatınız{recurring, select, true { (aylık)} other {}}",
+            "fee": "Rerun ücreti ({fee})",
+            "earn": "Kazancınız{recurring, select, true { (aylık)} other {}}",
+            "vat": "KDV, ödeme sırasında fiyatınızın üzerine eklenir ve alıcı tarafından ödenir, yani asla sizin payınızdan düşülmez. Alıcı nerede olursa olsun kazancınız aynıdır."
+        }
+    },
+    "payouts": {
+        "expired": "Kurulum bağlantınızın süresi doldu, Stripe yeniden açılıyor.",
+        "title": "Ödemeler",
+        "subtitle": "Ücretli şablonlarınızdan gelen paranın yattığı yer.",
+        "yourPrice": "Fiyatınız",
+        "yourPriceValue": "Her şablon için KDV hariç siz belirlersiniz",
+        "commission": "Rerun komisyonu",
+        "schedule": "Ödeme takvimi",
+        "scheduleValue": "Stripe standart",
+        "planNote": "Alıcıların bir şablonu kurmak için yine de etkin bir Rerun planına ihtiyacı vardır, yani bir satın alma yalnızca şablonun kilidini açar.",
+        "states": {
+            "not_started": {
+                "headline": "Şablonlarınızdan kazanç elde edin",
+                "body": "Rerun her satıştan {fee} alır. Kalanı Stripe üzerinden banka hesabınıza yatar.",
+                "cta": "Ödemeleri ayarla"
+            },
+            "incomplete": {
+                "headline": "Stripe kurulumunuzu tamamlayın",
+                "body": "Stripe'ın size ödeme yapabilmesi için birkaç bilgiye daha ihtiyacı var.",
+                "cta": "Kurulumu tamamla"
+            },
+            "pending_verification": {
+                "headline": "Stripe bilgilerinizi doğruluyor",
+                "body": "Bu genellikle birkaç dakika sürer. Bu sırada şablon taslakları hazırlamaya devam edebilirsiniz.",
+                "cta": "Durumu kontrol et"
+            },
+            "restricted": {
+                "headline": "Ödemeler duraklatıldı",
+                "body": "Stripe bu hesabı kısıtladı. Yayınlanan şablonlarınız çevrimiçi kalır, ancak bu sorun çözülene kadar kimse onları satın alamaz.",
+                "cta": "Stripe'ta düzelt"
+            },
+            "ready": {
+                "headline": "Ödemeler için hazırsınız",
+                "body": "Bir şablona fiyat verin, incelememizin ardından satışa çıkar. Rerun her satıştan {fee} alır.",
+                "cta": "Stripe panosunu aç"
+            }
+        },
+        "stripeReported": "Stripe bildirdi: {reason}",
+        "terms": "Devam ederek, iade ve ters ibrazların nasıl çözüldüğü dahil <link>Pazar Yeri Creator Koşulları</link> metnini kabul etmiş olursunuz.",
+        "sidebar": {
+            "payouts": "Ödemeler",
+            "revenue": "Gelir"
+        },
+        "stateLabels": {
+            "not_started": "Ayarlanmadı",
+            "incomplete": "İşlem gerekiyor",
+            "pending_verification": "İncelemede",
+            "restricted": "Kısıtlı",
+            "ready": "Hazır"
+        },
+        "requirements": {
+            "business_profile": {
+                "url": "Bir işletme web sitesi",
+                "mcc": "Faaliyet alanınız"
+            },
+            "external_account": "Bir banka hesabı",
+            "individual": {
+                "verification": {
+                    "document": "Bir kimlik belgesi",
+                    "additional_document": "Bir adres belgesi"
+                },
+                "id_number": "Ulusal kimlik numaranız",
+                "address": {
+                    "line1": "Adresiniz"
+                },
+                "dob": {
+                    "day": "Doğum tarihiniz"
+                }
+            },
+            "tos_acceptance": {
+                "date": "Stripe koşullarını kabul etme"
+            }
+        },
+        "saleKinds": {
+            "one_time": "Tek seferlik",
+            "recurring": "Aylık",
+            "refund": "İade"
+        }
+    },
+    "revenue": {
+        "ranges": {
+            "30d": "30 gün",
+            "12m": "12 ay",
+            "all": "Tüm zamanlar"
+        },
+        "noAccountTitle": "Henüz ödeme hesabı yok",
+        "noAccountDescription": "Şablonlarınızı satmaya başlamak için ödemeleri ayarlayın.",
+        "setUpPayouts": "Ödemeleri ayarla",
+        "title": "Gelir",
+        "openDashboard": "Stripe panosunu aç",
+        "youEarned": "Kazancınız",
+        "noSales": "Bu dönemde satış yok.",
+        "recentSales": "Son satışlar",
+        "date": "Tarih",
+        "template": "Şablon",
+        "type": "Tür",
+        "sales": "Satışlar",
+        "gross": "Brüt",
+        "fee": "Rerun ücreti",
+        "pending": "Bekleyen ödeme",
+        "available": "Şu an kullanılabilir",
+        "subscriptions": "{count, plural, one {# etkin abonelik} other {# etkin abonelik}}",
+        "perMonth": "{amount}/ay"
+    },
+    "categories": {
+        "agencies": "Ajanslar",
+        "ecommerce": "E-ticaret",
+        "saas": "SaaS",
+        "sales": "Satış",
+        "recruiting": "İşe alım",
+        "real-estate": "Gayrimenkul",
+        "legal": "Hukuk ve uyumluluk",
+        "creators": "İçerik üreticileri",
+        "productivity": "Verimlilik",
+        "other": "Diğer"
+    },
+    "status": {
+        "draft": "Taslak",
+        "in_review": "İncelemede",
+        "published": "Yayınlandı",
+        "unlisted": "Liste dışı",
+        "archived": "Arşivlendi"
+    },
+    "creatorKind": {
+        "studio": "Stüdyo",
+        "freelancer": "Serbest çalışan",
+        "expert": "Uzman"
+    },
+    "cta": {
+        "place": "{count, plural, one {# coworker yerleştir} other {# coworker yerleştir}}",
+        "placeCaption": "{count, plural, one {Panonuza sürükleyin, çalışmaya hazır.} other {Panonuza sürükleyin, çalışmaya hazırlar.}}",
+        "trialInstall": "Ücretsiz denemeyi başlat ve kur",
+        "trialThenSubscribe": "Ücretsiz denemeyi başlat, ardından {price}/ay abone ol",
+        "trialThenPay": "Ücretsiz denemeyi başlat, ardından {price} öde",
+        "planInstall": "{plan}/ay abone ol ve kur",
+        "planThenSubscribe": "{plan}/ay abone ol, ardından {price}/ay abone ol",
+        "planThenPay": "{plan}/ay abone ol, ardından {price} öde",
+        "subscribe": "{price}/ay abone ol",
+        "pay": "{price} öde",
+        "payCaption": "Bu şablon ayrı faturalandırılır.",
+        "useTemplate": "Bu şablonu kullan",
+        "nothingCaptured": "Bu şablona henüz hiçbir coworker yakalanmadı.",
+        "open": "Aç: {name}",
+        "alreadyOnBoard": "Zaten panonuzda.",
+        "installAgain": "Yeniden kur",
+        "sandboxCannotBuy": "Şablon satın almak için bir çalışma alanına geçin.",
+        "trialBilledSeparately": "{terms} Bu şablon ayrı faturalandırılır.",
+        "trialUsedBilledSeparately": "Ücretsiz denemenizi kullandınız. Bugün faturalandırılır; bu şablon ayrı faturalandırılır.",
+        "resubscribe": "{price}/ay yeniden abone ol",
+        "lapsed": "Aboneliğiniz sona erdi. Bu şablonun kurduğu coworker'lar devre dışı.",
+        "billedTo": "Fatura: {workspace}. Rerun planınız zaten etkin.",
+        "yours": "Sizin şablonunuz, ücret yok."
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "metadata": {
+        "title": "Banner dokuları",
+        "description": "Rerun uzman profiliniz için ücretsiz banner dokuları: hazır bir arka plan indirin ve bir dakikada herkese açık uzman sayfanıza ekleyin."
+    },
+    "banners": {
+        "eyebrow": "Uzmanlar için",
+        "title": "Banner dokuları",
+        "description": "Rerun uzman profillerinde kullandığımız akışkan cam dokulardan oluşan bir set. Ücretsiz indirin ve dilediğiniz gibi kullanın.",
+        "download": "İndir",
+        "downloadFile": "İndir: {file}",
+        "alts": {
+            "lime-glass-crumple": "Parlak limon yeşili cam, buruşuk katlanmış tabakalar",
+            "pastel-holographic-knot": "Holografik pastel düğümlü cam şeritler",
+            "blue-glass-crystal": "Elektrik mavisi faset kesimli kristal cam",
+            "violet-lime-swirl": "Mor ve limon yeşili dönen cam girdap",
+            "crimson-fluid-blob": "Parlak kızıl ve macenta akışkan damla",
+            "amber-droplet-blob": "Kehribar turuncusu cam damlalar, parlak kabarıklar",
+            "amber-chrome-swirl": "Turuncu ve siyah krom girdaplar",
+            "dark-lime-crumple": "Asit yeşili damarlı buruşuk siyah cam",
+            "pastel-iridescent-bloom": "Holografik pastel yanardöner cam çiçek",
+            "violet-lime-vortex": "Mor ve limon yeşili cam girdap tünelleri",
+            "lavender-glass-vortex": "Lavanta rengi dönen cam girdap",
+            "violet-lime-crystal": "Mor ve yeşil kristal cam parçaları",
+            "pink-swirl-vortex": "Canlı pembe ve kırmızı cam girdap",
+            "violet-lime-knot": "Mor ve limon yeşili düğümlü simit halkaları",
+            "lavender-glass-crystal": "Lavanta rengi faset kesimli kristal cam",
+            "blue-chrome-knot": "Mavi krom düğümlü simit halkaları",
+            "blue-plasma-smoke": "Cam üzerinde elektrik mavisi plazma dumanı",
+            "violet-iridescent-vortex": "Mor yanardöner dönen girdap",
+            "dark-lime-knot": "Asit yeşili parlayan siyah cam düğümler",
+            "pastel-holographic-vortex": "Pastel holografik dönen girdap",
+            "blue-liquid-ripple": "Yanardöner mavi dalgalı sıvı cam",
+            "blue-glass-bloom": "Kobalt mavisi fırfırlı cam taç yaprakları",
+            "blue-chrome-vortex": "Mavi krom dönen cam girdap",
+            "pastel-holographic-smoke": "Pastel holografik ince duman cam",
+            "crimson-swirl-vortex": "Koyu kırmızı ve macenta girdap",
+            "amethyst-crystal-facets": "Ametist moru kristal fasetler",
+            "violet-iridescent-crumple": "Mor yanardöner buruşuk kristal parçalar",
+            "violet-glossy-bloom": "Parlak mor cam taç yaprağı çiçeği",
+            "violet-lime-fluid-blob": "Mor ve asit yeşili parlak akışkan damlalar",
+            "dark-green-swirl-vortex": "Koyu yeşil ve siyah parlak girdap"
+        }
+    }
+}

@@ -1,0 +1,96 @@
+{
+    "title": "Bilgisayarlar",
+    "description": "Coworker'ların komut ve uzun işler çalıştırdığı kendi bilgisayarlarınız",
+    "thisComputer": {
+        "heading": "Bu bilgisayar",
+        "offer": "Coworker'lar burada komut ve uzun işler çalıştırsın",
+        "offerLong": "Coworker'lar burada komut ve uzun işler çalıştırabilir, her yeni program sizin onayınızla",
+        "link": "Bağla",
+        "inWorkspace": "{workspace} içinde",
+        "pause": "Duraklat",
+        "pauseHint": "Siz devam ettirene kadar burada hiçbir şey çalışmaz",
+        "folder": "Çalışma klasörü",
+        "changeFolder": "Değiştir",
+        "unlink": "Bu bilgisayarın bağlantısını kaldır",
+        "unlinkTitle": "Bu bilgisayarın bağlantısı kaldırılsın mı?",
+        "unlinkBody": "{workspace} çalışma alanının coworker'ları artık burada hiçbir şey çalıştırmayacak. Daha sonra yeniden bağlayabilirsiniz.",
+        "unlinkConfirm": "Bağlantıyı kaldır",
+        "noKeychain": "Bu sistemde anahtar zinciri yok: bağlantı yalnızca hesabınızın okuyabildiği bir dosyada tutulur."
+    },
+    "linked": "Bağlı",
+    "linkFromApp": "Masaüstü uygulamasından bir bilgisayar bağlayın.",
+    "getTheApp": "Uygulamayı edinin",
+    "lastSeen": "Son görülme: {when}",
+    "neverConnected": "Henüz bağlanmadı",
+    "engineNeedsUpdate": "Bilgisayarlar bu çalışma alanının makinesinin bir sonraki güncellemesiyle gelir. O zamana kadar çevrimdışı görünürler.",
+    "engineUnreachable": "Çalışma alanının makinesi yanıt vermiyor: bilgisayarlar şimdilik çevrimdışı görünüyor.",
+    "managersOnly": "Bunu yalnızca bir yönetici veya bağlayan kişi değiştirebilir",
+    "settingsNeedEngine": "Çalışma alanının makinesi yanıt verdiğinde kullanılabilir",
+    "empty": {
+        "title": "Bağlı bilgisayar yok",
+        "body": "Coworker'lar ağır işleri kendi makinenizde çalıştırır: video, yerel modeller, GPU'nuz.",
+        "getApp": "Masaüstü uygulamasını edinin"
+    },
+    "status": {
+        "online": "Çevrimiçi",
+        "busy": "{count, plural, one {Bir iş çalışıyor} other {# iş çalışıyor}}",
+        "paused": "Duraklatıldı",
+        "offline": "Çevrimdışı"
+    },
+    "modes": {
+        "ask": {
+            "label": "Her seferinde sor",
+            "description": "Her komut bir onay bekler"
+        },
+        "remember": {
+            "label": "Sor, sonra hatırla",
+            "description": "Güvendiğiniz bir programa her zaman izin verin"
+        },
+        "full": {
+            "label": "Tam erişim",
+            "description": "Hassas klasörler dışında sormadan çalışır"
+        }
+    },
+    "detail": {
+        "back": "Bilgisayarlara dön",
+        "linkedBy": "Bağlayan: {name}",
+        "offlineSince": "Çevrimdışı, son görülme: {when}. Coworker'lar bir şey çalıştırmak yerine bunu söyler.",
+        "neverConnected": "Henüz bağlanmadı. Rerun uygulaması üzerinde çalıştığında çevrimiçi görünür.",
+        "paused": "Bilgisayarın kendisinden duraklatıldı. Orada devam ettirilene kadar hiçbir şey çalışmaz.",
+        "approvals": "Onaylar",
+        "commands": "Komutlar",
+        "modeLabel": "Onay modu",
+        "unattended": "Sohbette kimse yokken",
+        "unattendedHint": "Zamanlamalar, tetikleyiciler, diğer coworker'lar ve bir işin bitişi bunu kullanabilir",
+        "alwaysAllowed": "Her zaman izin verilenler",
+        "nothingAllowed": "Henüz hiçbir şey yok. Sohbetteki bir onayda “Her zaman izin ver”i seçin.",
+        "interpreterWarning": "Bir yorumlayıcıya izin vermek, onun çalıştırdığı her koda izin verir",
+        "stopAllowing": "İzni kaldır: {label}",
+        "screen": "Ekran",
+        "screenOn": "Açık. Coworker'lar ekranı görebilir ve kullanabilir, her seferinde tek bir konuşma.",
+        "screenOff": "Kapalı. Yalnızca bu bilgisayardaki Rerun uygulamasından açılabilir.",
+        "machine": "Makine",
+        "system": "Sistem",
+        "processor": "İşlemci",
+        "graphics": "Grafik",
+        "memory": "Bellek",
+        "folder": "Klasör",
+        "remove": "Bilgisayarı kaldır",
+        "removeTitle": "{name} kaldırılsın mı?",
+        "removeBody": "Coworker'lar artık üzerinde hiçbir şey çalıştırmayacak. Kuralları unutulur ve masaüstü uygulamasından yeniden bağlanabilir.",
+        "removeConfirm": "Kaldır",
+        "jobs": "İşler"
+    },
+    "linkDialog": {
+        "title": "Bu bilgisayarı bağla",
+        "description": "Bu çalışma alanının coworker'ları burada komut çalıştırabilecek",
+        "name": "Ad",
+        "handle": "Sohbette: <handle></handle>",
+        "everyone": "Bu çalışma alanındaki herkes coworker'ları aracılığıyla kullanabilir",
+        "approval": "Her yeni program önce onayınızı ister",
+        "pauseAnyTime": "Buradan veya sistem tepsisinden istediğiniz zaman duraklatın ya da bağlantıyı kaldırın",
+        "cancel": "İptal",
+        "link": "Bağla",
+        "linked": "Bağlandı. Coworker'lar ona #{handle} olarak ulaşır"
+    }
+}

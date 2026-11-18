@@ -1,0 +1,116 @@
+{
+    "access": {
+        "short": {
+            "public": "Herkese açık",
+            "workspace": "Çalışma alanı",
+            "password": "Parola",
+            "invited": "Davetli"
+        },
+        "hint": {
+            "public": "Oturum açmak gerekmez",
+            "workspace": "Yalnızca oturum açmış üyeler",
+            "password": "Ziyaretçiler bir kez girer",
+            "invited": "Ziyaretçiler e-postalarını doğrular"
+        },
+        "label": {
+            "public": "Bağlantıya sahip herkes",
+            "workspace": "{workspace} üyeleri",
+            "password": "Parolaya sahip herkes",
+            "invited": "Yalnızca davet ettiğiniz kişiler"
+        },
+        "anyoneAt": "{domain} alan adındaki herkes",
+        "workspaceFallback": "Çalışma alanı"
+    },
+    "gate": {
+        "madeWith": "Rerun ile yapıldı",
+        "locked": "{workspace} sayfası, kilitli",
+        "code": "Kod",
+        "switchAccount": "Hesap değiştir"
+    },
+    "viewer": {
+        "download": "İndir",
+        "report": "Bildir",
+        "updated": "{when} güncellendi",
+        "slides": "{count, plural, one {# slayt} other {# slayt}}",
+        "page": "Sayfa {page}",
+        "previousSlide": "Önceki slayt",
+        "nextSlide": "Sonraki slayt"
+    },
+    "csv": {
+        "meta": "{rows, plural, one {# satır} other {# satır}}{truncated, select, true {+} other {}} · {columns, plural, one {# sütun} other {# sütun}}",
+        "truncated": "İlk {rows, plural, one {# satır} other {# satır}} gösteriliyor. Gerisi için dosyayı indirin."
+    },
+    "row": {
+        "more": "Daha fazla",
+        "open": "Aç",
+        "copyLink": "Bağlantıyı kopyala",
+        "shareSettings": "Paylaşım ayarları",
+        "unpublish": "Yayından kaldır",
+        "unpublishFailed": "Yayından kaldırılamadı"
+    },
+    "unpublishConfirm": {
+        "title": "{title} yayından kaldırılsın mı?",
+        "description": "Bağlantı, ona sahip herkes için hemen çalışmayı durdurur.",
+        "confirm": "Yayından kaldır"
+    },
+    "panel": {
+        "emptyTitle": "Henüz yayınlanan bir şey yok",
+        "emptyDescription": "{agent} adlı coworker'ın paylaştığı sayfalar, raporlar ve dosyalar burada görünür.",
+        "updated": "{when} güncellendi",
+        "copyLink": "Bağlantıyı kopyala"
+    },
+    "list": {
+        "filterAll": "Tümü {count}",
+        "emptyTitle": "Henüz yayınlanan bir şey yok",
+        "emptyDescription": "Coworker'larınızın paylaştığı sayfalar, raporlar ve dosyalar burada görünür.",
+        "fallbackCoworker": "Coworker"
+    },
+    "chat": {
+        "unpublished": "Yayından kaldırıldı",
+        "updateFailed": "Bağlantı güncellenemedi",
+        "copy": "Kopyala",
+        "open": "Aç",
+        "fallbackCoworker": "Coworker'ınız",
+        "asksPublic": "{coworker}, bağlantıya sahip herkesin açabilmesini istiyor",
+        "keepPrivate": "Gizli tut",
+        "makePublic": "Herkese aç",
+        "madePublicByYou": "Siz herkese açtınız",
+        "madePublic": "Herkese açıldı",
+        "keptFor": "{workspace} üyelerine özel tutuldu"
+    },
+    "share": {
+        "title": "Paylaş",
+        "description": "Bu bağlantıyı kimlerin açabileceğini seçin.",
+        "updateFailed": "Bağlantı güncellenemedi",
+        "unpublishFailed": "Yayından kaldırılamadı",
+        "unpublish": "Yayından kaldır",
+        "publicOff": "{workspace} için kapalı",
+        "noEmail": "Bu sunucu e-posta göndermiyor",
+        "passwordSet": "Parola ayarlandı",
+        "setPassword": "Parola belirleyin",
+        "password": "Parola",
+        "invitePlaceholder": "E-postalar veya @sirket.com",
+        "invite": "E-posta veya alan adı davet et",
+        "removeInvite": "{entry} kaldır",
+        "copyLink": "Bağlantıyı kopyala",
+        "copied": "Kopyalandı"
+    },
+    "policy": {
+        "label": "Herkese açık bağlantılar",
+        "people": {
+            "title": "Bağlantıyı yalnızca kişiler herkese açabilir",
+            "hint": "Coworker'lar {workspace} için yayınlar, herkese açmadan önce sorar"
+        },
+        "anyone": {
+            "title": "Coworker'lar bir bağlantıyı herkese açabilir",
+            "hint": "Erişimi kendileri seçer"
+        },
+        "never": {
+            "title": "Hiçbir şey herkese açılmaz",
+            "hint": "Yalnızca çalışma alanı, parolalı ve davetli bağlantılar"
+        },
+        "turnOffTitle": "Herkese açık bağlantılar kapatılsın mı?",
+        "turnOffDescription": "{count, plural, one {Kaydettiğinizde # herkese açık bağlantı yalnızca {workspace} üyelerine açık olur.} other {Kaydettiğinizde # herkese açık bağlantı yalnızca {workspace} üyelerine açık olur.}}",
+        "turnOff": "Kapat"
+    }
+}

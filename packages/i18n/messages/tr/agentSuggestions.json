@@ -1,0 +1,512 @@
+{
+    "default-seo": {
+        "title": "SEO'mu otomatikleştir",
+        "description": "Yapmaya değer düzeltmeler, sıralı ve brief'leriyle.",
+        "name": "SEO Asistanı",
+        "kickoff": "Web sitemin SEO'sunu denetle. Etkisi en yüksek on düzeltmeyi gereken eforla sıralayarak listele, ardından ihtiyacı olan sayfalar için içerik brief'lerini hazırla."
+    },
+    "default-inbox": {
+        "title": "Gelen kutumu düzenle",
+        "description": "Bugün sizi bekleyenler, yanıtları hazır.",
+        "name": "Gelen Kutusu Düzeni",
+        "kickoff": "Gelen kutumu eritmeme yardım et. Önce hangi hesap üzerinde çalışacağını sor, sonra gelenleri ayıkla, bugün gerçekten benim ilgilenmem gerekenleri söyle ve olduğu gibi gönderebileceğim yanıtları hazırla."
+    },
+    "default-research": {
+        "title": "Benim için araştırma yap",
+        "description": "Kaynaklarıyla, harekete geçebileceğiniz bir özet.",
+        "name": "Araştırma Asistanı",
+        "kickoff": "Benim için konuları araştırmanı istiyorum. Önce neye bakmak istediğimi sor, sonra konuyu etraflıca oku ve kaynaklarıyla birlikte harekete geçebileceğim bir özetle dön."
+    },
+    "default-content": {
+        "title": "İçeriklerimi yaz",
+        "description": "Sıradaki içerik taslağı ve yazılacak üç fikir daha.",
+        "name": "İçerik Yazarı",
+        "kickoff": "İçerik yazmama yardım et. Ne yayınladığımı, kimin okuduğunu ve üslubumu sor, ardından sıradaki içeriğin taslağını yaz ve sonrasında yazabileceğim üç içerik daha öner."
+    },
+    "default-meeting-notes": {
+        "title": "Toplantıları göreve çevir",
+        "description": "Notlar ve kimin neyi ne zamana yapacağı.",
+        "name": "Toplantı Notları",
+        "kickoff": "Toplantılarımı notlara ve görevlere çevir. Kayıtların veya dökümlerin nereye düştüğünü sor, ardından her birini özetle ve kimin neyi ne zamana kadar yapacağını listele."
+    },
+    "default-daily-brief": {
+        "title": "Her sabah beni bilgilendir",
+        "description": "Gününüz: toplantılar, e-postalar ve vadesi gelenler.",
+        "name": "Günlük Özet",
+        "kickoff": "Her sabah günümün nasıl göründüğünü söyle: toplantılarım, ilgilenmem gereken e-postalar ve vadesi gelen işler."
+    },
+    "default-follow-ups": {
+        "title": "Beklediklerimin peşine düş",
+        "description": "Size kimin yanıt borçlu olduğu ve gönderilecek hatırlatma.",
+        "name": "Takip Asistanı",
+        "kickoff": "Beklediğim şeyleri takip et. Her sabah bana kimin yanıt borçlu olduğunu söyle ve her biri için bir hatırlatma mesajı hazırla."
+    },
+    "default-weekly-report": {
+        "title": "Haftalık raporumu hazırla",
+        "description": "Rakamlar derlenip yazılmış halde, her cuma.",
+        "name": "Rapor Hazırlayıcı",
+        "kickoff": "Her cuma tablomdan haftanın rakamlarını çek ve ekibe gönderdiğim raporu yaz."
+    },
+    "agencies-client-report": {
+        "title": "Müşterilerime rapor ver",
+        "description": "Rakamların müşteri için yazılmış haftalık özeti.",
+        "name": "Müşteri Raporlama",
+        "kickoff": "Haftalık bir müşteri raporu kurmama yardım et. Hangi müşteriyle başlayacağımızı ve rakamlarının nerede durduğunu sor, sonra verileri çek, özeti sade bir dille yaz ve geçen haftadan bu yana neyin değiştiğini söyle."
+    },
+    "agencies-proposal": {
+        "title": "Tekliflerimi hazırla",
+        "description": "Kapsam, fiyat ve takvim, her zamanki üslubunuzla.",
+        "name": "Teklif Yazarı",
+        "kickoff": "Yeni müşteriler için teklif taslakları hazırlamanı istiyorum. Kapsamı, bütçe aralığını ve teslim edilecekleri sor, ardından müşterilerle hâlihazırda kullandığımız üslupla fiyatlandırma ve takvim içeren teklifi yaz."
+    },
+    "agencies-meeting-notes": {
+        "title": "Görüşmeleri aksiyona çevir",
+        "description": "Her müşteri görüşmesinden sonra notlar ve sorumlular.",
+        "name": "Toplantı Notları",
+        "kickoff": "Her müşteri görüşmesinden sonra notlar ve aksiyon maddeleri istiyorum. Kayıtların veya dökümlerin nereye düştüğünü sor, ardından her birini özetle, kimin neyi ne zamana kadar yapacağını listele ve kapsamı değiştiren her şeyi belirt."
+    },
+    "agencies-seo": {
+        "title": "SEO'mu otomatikleştir",
+        "description": "Yapmaya değer düzeltmeler, sıralı ve brief'leriyle.",
+        "name": "SEO Asistanı",
+        "kickoff": "Web sitemin SEO'sunu denetle. Etkisi en yüksek on düzeltmeyi gereken eforla sıralayarak listele, ardından ihtiyacı olan sayfalar için içerik brief'lerini hazırla."
+    },
+    "agencies-lead-responder": {
+        "title": "Yeni talepleri yanıtla",
+        "description": "Her talep yanıtlanır ve ekiple paylaşılır.",
+        "name": "Talep Yanıtlayıcı",
+        "kickoff": "İletişim formumuzdan gelen her yeni talebi yanıtla. Taleplerin nereye geldiğini sor, ardından dakikalar içinde yanıt ver, nitelendirme sorularını sor ve talebi Slack'te paylaş."
+    },
+    "agencies-case-studies": {
+        "title": "Vaka çalışmalarımı yaz",
+        "description": "Projeden çıkan, yayına hazır bir taslak.",
+        "name": "Vaka Çalışması Yazarı",
+        "kickoff": "Bir proje kapandığında vaka çalışmasının taslağını hazırla. Proje notlarının nerede durduğunu sor, sonra hikâyeyi, sonuçları ve öne çıkan bir alıntıyı yaz, yayınlamak için neyin eksik olduğunu söyle."
+    },
+    "agencies-inbox": {
+        "title": "Ortak gelen kutumuzu düzenle",
+        "description": "Ekibin bugün ilgilenmesi gerekenler, her sabah.",
+        "name": "Gelen Kutusu Düzeni",
+        "kickoff": "Her sabah ortak gelen kutumuzu ayıkla ve bugün ilgilenmemiz gerekenleri Slack'te bize söyle; olduğu gibi gönderebileceğim yanıtları da hazırla."
+    },
+    "agencies-invoices": {
+        "title": "Ödenmeyen faturaları kovala",
+        "description": "Kimin geciktiği ve gönderilecek hatırlatma.",
+        "name": "Fatura Takipçisi",
+        "kickoff": "Ödenmemiş faturaları takip etmeme yardım et. Faturalarımın nerede durduğunu sor, ardından her pazartesi kimin geciktiğini söyle ve her biri için hatırlatma mesajını hazırla."
+    },
+    "ecommerce-product-copy": {
+        "title": "Ürün sayfalarımı yaz",
+        "description": "Kataloğunuzla uyumlu başlıklar ve açıklamalar.",
+        "name": "Ürün Metinleri",
+        "kickoff": "Mağazam için ürün açıklamaları yazmanı istiyorum. Hangi ürünlerle başlayacağımızı sor, ardından kataloğun geri kalanıyla aynı dilde başlıklar, açıklamalar ve madde işaretli özellikler yaz."
+    },
+    "ecommerce-abandoned-cart": {
+        "title": "Terk edilen sepetleri kurtar",
+        "description": "Kurtarma dizisi ve her e-postanın gönderim zamanı.",
+        "name": "Sepet Kurtarma",
+        "kickoff": "Terk edilen sepetleri kurtarmama yardım et. Mevcut akışımın nasıl olduğunu sor, ardından e-posta dizisini yaz, her birinin ne zaman gönderilmesi gerektiğini söyle ve ilk olarak neyin test edileceğini öner."
+    },
+    "ecommerce-reviews": {
+        "title": "Müşteri yorumlarımı özetle",
+        "description": "Alıcıların sürekli şikâyet ettikleri, her hafta.",
+        "name": "Yorum Özeti",
+        "kickoff": "Son müşteri yorumlarımı ve destek mesajlarımı oku, arkalarındaki soruna göre grupla ve alıcıların neden şikâyet ettiğini, neyi sevdiğini anlatan haftalık bir özet ver."
+    },
+    "ecommerce-sales-report": {
+        "title": "Satışlarımı her sabah izle",
+        "description": "Ciro, siparişler ve olağandışı değişen her şey.",
+        "name": "Satış Raporu",
+        "kickoff": "Bana günlük satış raporu ver. Satış verilerimin nerede durduğunu sor, ardından her sabah ciroyu, siparişleri ve en çok satanları gönder, olağandışı değişen her şeyi ayrıca belirt."
+    },
+    "ecommerce-support": {
+        "title": "Müşterilerimi yanıtla",
+        "description": "Sipariş soruları yanıtlanır, sıra dışı olanlar işaretlenir.",
+        "name": "Destek Asistanı",
+        "kickoff": "Müşteri e-postalarını yanıtlamama yardım et. Nereye geldiklerini ve politikalarımın neler olduğunu sor, ardından her sipariş sorusuna yanıt taslağı hazırla ve benim ilgilenmem gerekenleri işaretle."
+    },
+    "ecommerce-ads": {
+        "title": "Reklam harcamamı izle",
+        "description": "Her kampanyanın getirisi ve durdurulacaklar.",
+        "name": "Reklam Takibi",
+        "kickoff": "Reklam kampanyalarıma göz kulak ol. Her pazartesi her birinin ne harcadığını ve ne getirdiğini, hangilerini durdurmam ya da hangilerine ağırlık vermem gerektiğini söyle."
+    },
+    "ecommerce-newsletter": {
+        "title": "Bültenimi yaz",
+        "description": "Mağazadaki yeniliklerden bu haftanın e-postası.",
+        "name": "Bülten Yazarı",
+        "kickoff": "Haftalık bültenimi yaz. Mağazada neyin yeni olduğunu ve genelde nasıl bir üslup kullandığımı sor, ardından e-postanın taslağını yaz ve iki konu satırı öner."
+    },
+    "ecommerce-stock": {
+        "title": "Stok bitmeden beni uyar",
+        "description": "Azalan stoklar ve yavaş satanlar, her hafta.",
+        "name": "Stok Takibi",
+        "kickoff": "Stoğumu izle. Her hafta, mevcut hızla hangi ürünlerin bitmek üzere olduğunu ve hangilerinin satışının durduğunu söyle."
+    },
+    "saas-changelog": {
+        "title": "Değişiklik günlüğümü yaz",
+        "description": "Bir müşterinin gerçekten okuyabileceği sürüm notları.",
+        "name": "Changelog Yazarı",
+        "kickoff": "Yayınladıklarımızdan bir değişiklik günlüğü yazılmasını istiyorum. Depomuzun ve sürümlerimizin nerede durduğunu sor, ardından birleştirilen işleri, müşteriler için neyi değiştirdiğine göre gruplanmış ve bir müşterinin okuyabileceği sürüm notlarına dönüştür."
+    },
+    "saas-issue-triage": {
+        "title": "Kayıtlarımı önceliklendir",
+        "description": "Etiketli, tekrarlardan arınmış, önem sırasına göre.",
+        "name": "Kayıt Önceliklendirme",
+        "kickoff": "Gelen kayıtları önceliklendirmeme yardım et. Nereye düştüklerini sor, ardından her birini etiketle, ne kadar acil olduğunu değerlendir, tekrarları tespit et ve her sabah bugün neyin ilgiyi hak ettiğini söyle."
+    },
+    "saas-onboarding-emails": {
+        "title": "Yeni kullanıcıları karşıla",
+        "description": "Kayıt sonrası dizi, yazılmış ve zamanlanmış.",
+        "name": "Onboarding E-postaları",
+        "kickoff": "Yeni kayıtlar için onboarding e-posta dizisini tasarla. Ürünün ne yaptığını ve ilk başarının neye benzediğini sor, ardından her e-postayı yaz ve ne zaman gönderilmesi gerektiğini söyle."
+    },
+    "saas-seo": {
+        "title": "SEO'mu otomatikleştir",
+        "description": "Yapmaya değer düzeltmeler, sıralı ve brief'leriyle.",
+        "name": "SEO Asistanı",
+        "kickoff": "Web sitemin SEO'sunu denetle. Etkisi en yüksek on düzeltmeyi gereken eforla sıralayarak listele, ardından ihtiyacı olan sayfalar için içerik brief'lerini hazırla."
+    },
+    "saas-churn": {
+        "title": "Ayrılmak üzere olanları bul",
+        "description": "Kimin sessizleştiği ve onlara ne gönderileceği.",
+        "name": "Churn Takibi",
+        "kickoff": "Ayrılmak üzere olan hesapları fark etmeme yardım et. Kullanım ve faturalandırma verilerinin nerede durduğunu sor, ardından her hafta kimin sessizleştiğini söyle ve onlara göndermem gereken mesajı hazırla."
+    },
+    "saas-support": {
+        "title": "Destek taleplerimi yanıtla",
+        "description": "Dokümanlardan yanıt taslağı, hatalar kayda geçer.",
+        "name": "Destek Asistanı",
+        "kickoff": "Destek konusunda bana yardım et. Taleplerin nereye geldiğini sor, ardından her biri için dokümanlarımızdan bir yanıt taslağı hazırla ve gerçek hatalar için bir kayıt aç."
+    },
+    "saas-errors": {
+        "title": "Hatalarımı önceliklendir",
+        "description": "Yeni hatalar gruplanmış, olası nedenleriyle.",
+        "name": "Hata Önceliklendirme",
+        "kickoff": "Her sabah Sentry'deki yeni hataları oku, nedenlerine göre grupla ve hangilerinin bugün düzeltilmeye değer olduğunu Slack'te söyle."
+    },
+    "saas-metrics": {
+        "title": "Haftalık metriklerimi gönder",
+        "description": "Kayıtlar, aktivasyon ve gelir, değişenlerle birlikte.",
+        "name": "Metrik Özeti",
+        "kickoff": "Her pazartesi bana önemli rakamları gönder: kayıtlar, aktivasyon, gelir ve churn; geçen haftadan bu yana neyin değiştiğini ve nedenini de ekle."
+    },
+    "sales-prospect-research": {
+        "title": "Müşteri adaylarımı araştır",
+        "description": "Her görüşmeden önce şirket hakkında bir özet.",
+        "name": "Müşteri Araştırması",
+        "kickoff": "Her görüşmeden önce potansiyel müşteri hakkında bir özet istiyorum. Önce kimi araştıracağını sor, ardından şirketi, kişileri, son duyurularını ve görüşmeye hangi açıdan girmem gerektiğini anlat."
+    },
+    "sales-follow-ups": {
+        "title": "Takiplerimi yürüt",
+        "description": "Kimin sessizleştiği ve onlara gönderilecek mesaj.",
+        "name": "Takip Asistanı",
+        "kickoff": "Takipleri aksatmamama yardım et. Satış hattımın nerede durduğunu sor, ardından her sabah kimin sessizleştiğini söyle ve her birine göndermem gereken takip mesajını hazırla."
+    },
+    "sales-outreach": {
+        "title": "Soğuk e-postalarımı yaz",
+        "description": "Her potansiyel müşteriye bir ilk e-posta ve iki takip.",
+        "name": "Outreach Yazarı",
+        "kickoff": "Benim için soğuk e-postalar yazmanı istiyorum. Kime ve ne sattığımızı sor, ardından şablon gibi değil, her potansiyel müşteriye özel bir ilk e-posta ve iki takip e-postası yaz."
+    },
+    "sales-crm-hygiene": {
+        "title": "CRM'imi temiz tut",
+        "description": "Eksik alanlar, eskimiş aşamalar ve tekrarlar, her hafta.",
+        "name": "CRM Asistanı",
+        "kickoff": "CRM'imi güncel tut. Hangi CRM'i kullandığımı sor, ardından eksik alanı, eskimiş aşaması ya da tekrarı olan kayıtları bul ve bana her hafta düzeltilecekler listesini ver."
+    },
+    "sales-reply-sorter": {
+        "title": "Kampanya yanıtlarını ayıkla",
+        "description": "İlgilenenler işaretlenir, yanıtlar hazırlanır.",
+        "name": "Yanıt Ayıklayıcı",
+        "kickoff": "Soğuk kampanyalarıma gelen her yanıtı ayıkla, ilgilenenlere vereceğim yanıtın taslağını hazırla ve bir potansiyel müşteri görüşmek istediğinde bana Slack'ten haber ver."
+    },
+    "sales-lead-responder": {
+        "title": "Gelen talepleri yanıtla",
+        "description": "Her form dakikalar içinde yanıtlanır.",
+        "name": "Talep Yanıtlayıcı",
+        "kickoff": "Her yeni iletişim formunu beş dakika içinde yanıtla. Formların nereye düştüğünü sor, ardından yanıt ver, talebi nitelendir ve Slack'te paylaş."
+    },
+    "sales-call-notes": {
+        "title": "Satış görüşmelerimi kaydet",
+        "description": "Notlar ve sonraki adımlar, CRM'e yazılmış halde.",
+        "name": "Görüşme Notları",
+        "kickoff": "Her satış görüşmesinden sonra notları ve sonraki adımları yaz, fırsatın kaydına ekle. Önce kayıtlarımın nereye düştüğünü sor."
+    },
+    "sales-pipeline": {
+        "title": "Satış hattımı gözden geçir",
+        "description": "Riskteki fırsatlar ve yapılacaklar, her pazartesi.",
+        "name": "Satış Hattı İncelemesi",
+        "kickoff": "Her pazartesi satış hattımı gözden geçir ve hangi fırsatların risk altında olduğunu, hangilerinin takıldığını ve bu hafta her biri için ne yapmam gerektiğini söyle."
+    },
+    "recruiting-screening": {
+        "title": "Adayları ön elemeden geçir",
+        "description": "Her başvuru okunur, özetlenir ve sıralanır.",
+        "name": "Aday Ön Eleme",
+        "kickoff": "Adayları ön elemeden geçirmeme yardım et. Pozisyonu ve onda en çok neyin önemli olduğunu sor, ardından her başvuruyu buna göre değerlendir, adayı beş satırda özetle ve benim için sırala."
+    },
+    "recruiting-sourcing": {
+        "title": "Benim için aday bul",
+        "description": "Uyan profiller ve her birine ilk mesaj.",
+        "name": "Aday Bulma Asistanı",
+        "kickoff": "Açık bir pozisyon için aday bulmanı istiyorum. Pozisyonu, kıdem seviyesini ve pazarı sor, ardından uyan profilleri bul ve her birine gönderilecek ilk mesajın taslağını hazırla."
+    },
+    "recruiting-job-posts": {
+        "title": "İş ilanlarımı yaz",
+        "description": "Pozisyon, gerçekten konuştuğunuz dille anlatılır.",
+        "name": "İlan Yazarı",
+        "kickoff": "Açtığım bir pozisyon için iş ilanını yaz. İşin gerçekte neleri kapsadığını ve neler sunduğumuzu sor, ardından ilanı iş sitelerinin diliyle değil, bizim konuştuğumuz gibi yaz."
+    },
+    "recruiting-scheduling": {
+        "title": "Mülakatlarımı planla",
+        "description": "Saatler önerilir, davetler gider, hatırlatmalar yapılır.",
+        "name": "Mülakat Planlayıcı",
+        "kickoff": "Mülakat planlamasını benim için üstlen. Takvimimin ve adaylarımın nerede durduğunu sor, ardından saat öner, davetleri gönder ve her mülakattan bir gün önce bana hatırlat."
+    },
+    "recruiting-updates": {
+        "title": "Adayları bilgilendir",
+        "description": "Kimse yanıt beklerken unutulmaz.",
+        "name": "Aday Bilgilendirme",
+        "kickoff": "Adayları bilgilendirmeye devam et. Aday sürecimin nerede durduğunu sor, ardından her hafta kimin yanıt beklediğini söyle ve her biri için bilgilendirme mesajını hazırla."
+    },
+    "recruiting-interview-prep": {
+        "title": "Mülakatlarıma hazırla",
+        "description": "Her birinden önce profil ve sorular.",
+        "name": "Mülakat Hazırlığı",
+        "kickoff": "Takvimimdeki her mülakattan önce bana aday hakkında bir özet ve bu pozisyon için sormam gereken soruları gönder."
+    },
+    "recruiting-references": {
+        "title": "Referanslarımı kontrol et",
+        "description": "Referanslarla iletişime geçilir, yanıtlar özetlenir.",
+        "name": "Referans Kontrolü",
+        "kickoff": "Referans kontrollerini üstlen. Adayı ve referanslarını sor, ardından her birine yaz, yanıtların peşine düş ve söylediklerini özetle."
+    },
+    "recruiting-offers": {
+        "title": "İş tekliflerimi hazırla",
+        "description": "İmzaya hazır teklif mektubu.",
+        "name": "Teklif Mektubu Yazarı",
+        "kickoff": "Teklif mektuplarını hazırla. Pozisyonu, ücret paketini ve başlangıç tarihini sor, ardından mektubu şablonumuzdan yaz ve imzaya hazırla."
+    },
+    "real-estate-leads": {
+        "title": "Taleplerimi takip et",
+        "description": "Her talep aynı gün yanıtlanır ve nitelendirilir.",
+        "name": "Talep Takibi",
+        "kickoff": "Yeni talepleri takip etmeme yardım et. Taleplerin nereye geldiğini sor, ardından her birine hızlıca yanıt ver, nitelendirme sorularını sor ve bugün kimi aramaya değer olduğunu söyle."
+    },
+    "real-estate-listings": {
+        "title": "İlanlarımı yaz",
+        "description": "Klişesiz açıklamalar ve öne çıkanlar.",
+        "name": "İlan Yazarı",
+        "kickoff": "Gayrimenkul ilanları yazmanı istiyorum. Mülkün ayrıntılarını sor, ardından alışılmış klişeler olmadan açıklamayı, öne çıkan özellikleri ve sosyal medya için kısa bir versiyon yaz."
+    },
+    "real-estate-market-watch": {
+        "title": "Piyasamı izle",
+        "description": "Yeni ilanlar, fiyat değişiklikleri ve satışlar, her hafta.",
+        "name": "Piyasa Takibi",
+        "kickoff": "Piyasama göz kulak ol. Hangi bölgelerde ve fiyat aralıklarında çalıştığımı sor, ardından her hafta yeni ilanlar, fiyat değişiklikleri ve satılanlar hakkında bir not gönder."
+    },
+    "real-estate-documents": {
+        "title": "Evraklarımı hazırla",
+        "description": "İşlemden doldurulan belgeler ve imzalanmayanlar.",
+        "name": "Belge Asistanı",
+        "kickoff": "Her işlemin evrak işlerinde bana yardım et. Hangi belgeleri kullandığımı sor, ardından bunları işlem bilgilerinden hazırla, eksik bir şey olmadığını kontrol et ve hâlâ imzalanmamış olanları takip et."
+    },
+    "real-estate-viewings": {
+        "title": "Gösterimlerimi ayarla",
+        "description": "Saatler önerilir, onaylanır ve hatırlatılır.",
+        "name": "Gösterim Planlayıcı",
+        "kickoff": "Gösterimleri benim için üstlen. Takvimimin nerede durduğunu sor, ardından her alıcıya saat öner, onayla ve bir gün önce herkese hatırlat."
+    },
+    "real-estate-seller-updates": {
+        "title": "Satıcılarıma rapor ver",
+        "description": "Ziyaretler ve geri bildirimler üzerine haftalık bilgi.",
+        "name": "Satıcı Bilgilendirme",
+        "kickoff": "Her cuma her satıcıya mülküyle ilgili bir bilgilendirme yaz: ziyaretler, geri bildirimler ve sıradaki önerim. Önce onları nerede takip ettiğimi sor."
+    },
+    "real-estate-social": {
+        "title": "İlanlarımı paylaş",
+        "description": "Her yeni mülk paylaşımlara dönüşür.",
+        "name": "İlan Paylaşımları",
+        "kickoff": "Yeni bir ilan eklediğimde onu sosyal medya hesaplarım için paylaşımlara dönüştür, her platform için ayrı bir açıklama yaz."
+    },
+    "real-estate-nurture": {
+        "title": "Eski müşterilerle bağ kur",
+        "description": "Bu ay kimi aramalı ve neden.",
+        "name": "Müşteri İlişkileri",
+        "kickoff": "Eski müşterilerimle iletişimi sürdürmeme yardım et. Her ay kime ulaşmam gerektiğini ve nedenini söyle, mesajın taslağını da hazırla."
+    },
+    "legal-contract-review": {
+        "title": "Sözleşmelerimi incele",
+        "description": "Riskli maddeler, boşluklar ve pazarlık edilecekler.",
+        "name": "Sözleşme İnceleme",
+        "kickoff": "Benim için sözleşmeleri incele. Önce neye bakacağını ve genelde hangi pozisyonları aldığımızı sor, ardından riskli maddeleri, eksikleri ve neyi pazarlık etmem gerektiğini belirt."
+    },
+    "legal-drafting": {
+        "title": "Belgelerimi hazırla",
+        "description": "Şablonlarınızdan bir taslak ve açık kalan kararlar.",
+        "name": "Belge Hazırlama",
+        "kickoff": "Hukuki belgeleri şablonlarımızdan hazırlamanı istiyorum. Hangi belge ve hangi dosya için olduğunu sor, ardından taslağı çıkar ve hâlâ benim karar vermem gereken her noktayı listele."
+    },
+    "legal-summaries": {
+        "title": "Dava dosyalarımı özetle",
+        "description": "Olgular, tarihler ve yükümlülükler, kaynaklarıyla.",
+        "name": "Dosya Özetleyici",
+        "kickoff": "Uzun belgeleri ve dava dosyalarını benim için özetle. Nerede olduklarını sor, ardından olguları, tarihleri, yükümlülükleri ve açık soruları, kaynağa atıflarıyla birlikte ver."
+    },
+    "legal-deadlines": {
+        "title": "Sürelerimi takip et",
+        "description": "Tarihli bir liste ve süre dolmadan bir uyarı.",
+        "name": "Süre Takibi",
+        "kickoff": "Benim için süreleri ve yenilemeleri takip et. Sözleşmelerin ve dosyaların nerede durduğunu sor, ardından tarihli bir liste tut ve herhangi bir sürenin dolmasından çok önce beni uyar."
+    },
+    "legal-intake": {
+        "title": "Yeni müvekkil başvuruları",
+        "description": "Yeni talepler ilk görüşmeden önce nitelendirilir.",
+        "name": "Müvekkil Kabulü",
+        "kickoff": "Yeni müvekkil taleplerini üstlen. Bir dosyayı almadan önce neyi bilmem gerektiğini sor, ardından bunu her talepten topla ve kimi aramaya değer olduğunu söyle."
+    },
+    "legal-signatures": {
+        "title": "İmzaların peşine düş",
+        "description": "Hâlâ imzalanmayanlar ve hatırlatma.",
+        "name": "İmza Takibi",
+        "kickoff": "İmzaya gönderilenleri takip et. Her sabah hangi belgelerin hâlâ imzalanmadığını söyle ve gecikenler için hatırlatmayı gönder."
+    },
+    "legal-research": {
+        "title": "Hukuki bir konuyu araştır",
+        "description": "Kaynakların söyledikleri, atıflarıyla.",
+        "name": "Hukuki Araştırma",
+        "kickoff": "Benim için hukuki soruları araştırmanı istiyorum. Soruyu ve yargı alanını sor, ardından kaynakların ne dediğini, kontrol edebileceğim atıflarla birlikte getir."
+    },
+    "legal-time-entries": {
+        "title": "Zaman kayıtlarımı hazırla",
+        "description": "Haftanın işi faturalanabilir satırlara dönüşür.",
+        "name": "Zaman Kayıtları",
+        "kickoff": "Her cuma takvimimi ve e-postalarımı gözden geçir ve haftanın zaman kayıtlarını dosya dosya, incelemem için hazırla."
+    },
+    "creators-content-calendar": {
+        "title": "İçeriğimi planla",
+        "description": "Her biri kanca ve açıyla, bir aylık paylaşım.",
+        "name": "İçerik Takvimi",
+        "kickoff": "İçeriğimi planlamama yardım et. Ne yayınladığımı ve kimin için yayınladığımı sor, ardından önümüzdeki ay için her paylaşıma bir kanca ve bir açı içeren bir takvim oluştur."
+    },
+    "creators-repurpose": {
+        "title": "İçeriklerimi yeniden kullan",
+        "description": "Tek bir içerik, bulunduğunuz her platform için yeniden yazılır.",
+        "name": "İçerik Dönüştürücü",
+        "kickoff": "Yayınladığım her içerikten daha fazlasını almak istiyorum. Yakın zamanda yayınladığım birini sor, ardından onu bulunduğum her platform için, kopyalamak yerine o platforma göre yeniden yazılmış paylaşımlara dönüştür."
+    },
+    "creators-newsletter": {
+        "title": "Bültenimi yaz",
+        "description": "Sizin sesinizle bir taslak ve çıkarılabilecekler.",
+        "name": "Bülten Yazarı",
+        "kickoff": "Bültenimi yazmama yardım et. Bu sayının neyi kapsaması gerektiğini ve genelde nasıl bir üslup kullandığımı sor, ardından taslağı yaz ve neyi çıkarabileceğimi söyle."
+    },
+    "creators-seo": {
+        "title": "SEO'mu otomatikleştir",
+        "description": "Yapmaya değer düzeltmeler, sıralı ve brief'leriyle.",
+        "name": "SEO Asistanı",
+        "kickoff": "Web sitemin SEO'sunu denetle. Etkisi en yüksek on düzeltmeyi gereken eforla sıralayarak listele, ardından ihtiyacı olan sayfalar için içerik brief'lerini hazırla."
+    },
+    "creators-comments": {
+        "title": "Yorumlarımı yanıtla",
+        "description": "Yanıtlar hazırlanır, zamanınıza değenler işaretlenir.",
+        "name": "Yorum Yanıtları",
+        "kickoff": "Yorumlara yetişmeme yardım et. Her gün videolarımdaki yeni yorumları oku, yanıtların taslağını hazırla ve hangilerinin benden bir yanıtı hak ettiğini söyle."
+    },
+    "creators-scheduler": {
+        "title": "Paylaşımlarımı zamanla",
+        "description": "Haftanın tamamı her platformda sırada.",
+        "name": "Paylaşım Zamanlayıcı",
+        "kickoff": "Her pazartesi hazır paylaşımlarımı al ve hafta boyunca platformlarıma, en iyi işleyen saatlere zamanla."
+    },
+    "creators-ideas": {
+        "title": "Yeni fikirler bul",
+        "description": "Kitlenizin sorduğu sorular, her hafta.",
+        "name": "Fikir Avcısı",
+        "kickoff": "Her hafta nişimdeki insanların neler sorduğuna ve tartıştığına bak, bana her birinin açısıyla birlikte paylaşıma değer beş fikir ver."
+    },
+    "creators-analytics": {
+        "title": "Rakamlarımı yorumla",
+        "description": "Bu hafta ne işe yaradı ve neyi tekrarlamalı.",
+        "name": "Kitle Raporu",
+        "kickoff": "Her pazartesi geçen haftanın içeriklerinin nasıl performans gösterdiğini söyle: ne büyüdü, ne tutmadı ve neyi daha çok yapmalıyım."
+    },
+    "productivity-inbox": {
+        "title": "Gelen kutumu düzenle",
+        "description": "Bugün sizi bekleyenler, yanıtları hazır.",
+        "name": "Gelen Kutusu Düzeni",
+        "kickoff": "Gelen kutumu eritmeme yardım et. Önce hangi hesap üzerinde çalışacağını sor, sonra gelenleri ayıkla, bugün gerçekten benim ilgilenmem gerekenleri söyle ve olduğu gibi gönderebileceğim yanıtları hazırla."
+    },
+    "productivity-meeting-notes": {
+        "title": "Toplantıları göreve çevir",
+        "description": "Notlar ve kimin neyi ne zamana yapacağı.",
+        "name": "Toplantı Notları",
+        "kickoff": "Toplantılarımı notlara ve görevlere çevir. Kayıtların veya dökümlerin nereye düştüğünü sor, ardından her birini özetle ve kimin neyi ne zamana kadar yapacağını listele."
+    },
+    "productivity-weekly-review": {
+        "title": "Haftalık değerlendirmem",
+        "description": "İlerleyenler ve takılanlar, her cuma.",
+        "name": "Haftalık Değerlendirme",
+        "kickoff": "Haftalık değerlendirmemi hazırla. İşlerimi nerede takip ettiğimi sor, ardından her cuma neyin ilerlediğini, neyin takıldığını ve yapacağımı söyleyip yapmadıklarımı söyle."
+    },
+    "productivity-research": {
+        "title": "Benim için araştırma yap",
+        "description": "Kaynaklarıyla, harekete geçebileceğiniz bir özet.",
+        "name": "Araştırma Asistanı",
+        "kickoff": "Benim için konuları araştırmanı istiyorum. Önce neye bakmak istediğimi sor, sonra konuyu etraflıca oku ve kaynaklarıyla birlikte harekete geçebileceğim bir özetle dön."
+    },
+    "productivity-daily-brief": {
+        "title": "Her sabah beni bilgilendir",
+        "description": "Gününüz: toplantılar, e-postalar ve vadesi gelenler.",
+        "name": "Günlük Özet",
+        "kickoff": "Her sabah günümün nasıl göründüğünü söyle: toplantılarım, ilgilenmem gereken e-postalar ve vadesi gelen işler."
+    },
+    "productivity-follow-ups": {
+        "title": "Beklediklerimin peşine düş",
+        "description": "Size kimin yanıt borçlu olduğu ve gönderilecek hatırlatma.",
+        "name": "Takip Asistanı",
+        "kickoff": "Beklediğim şeyleri takip et. Her sabah bana kimin yanıt borçlu olduğunu söyle ve her biri için bir hatırlatma mesajı hazırla."
+    },
+    "productivity-weekly-report": {
+        "title": "Haftalık raporumu hazırla",
+        "description": "Rakamlar derlenip yazılmış halde, her cuma.",
+        "name": "Rapor Hazırlayıcı",
+        "kickoff": "Her cuma tablomdan haftanın rakamlarını çek ve ekibe gönderdiğim raporu yaz."
+    },
+    "productivity-docs": {
+        "title": "Dokümanlarımı güncel tut",
+        "description": "Eskiyen sayfalar ve güncelleme taslakları.",
+        "name": "Doküman Sorumlusu",
+        "kickoff": "İç dokümanlarımızı güncel tut. Her hafta eskimiş sayfaları bul ve her biri için güncellemenin taslağını hazırla."
+    },
+    "support-help-center": {
+        "title": "Yardım merkezimi güncel tut",
+        "description": "Sürekli tekrar eden sorular makaleye dönüşür.",
+        "name": "Yardım Merkezi Yazarı",
+        "kickoff": "Yardım merkezimi güncel tutmama yardım et. Destek sorularının nereye geldiğini sor, ardından her hafta hangilerinin sürekli tekrar ettiğini söyle ve her birini yanıtlayan makalenin taslağını hazırla."
+    },
+    "support-escalations": {
+        "title": "Mutsuz müşterileri işaretle",
+        "description": "Bugün kim üzgün, neden ve ona ne söylenmeli.",
+        "name": "Şikâyet Takibi",
+        "kickoff": "Destek gelen kutumda mutsuz müşterileri izle. Her sabah kimin üzgün olduğunu ve nedenini söyle, her birine ne yanıt vermem gerektiğinin taslağını hazırla."
+    },
+    "finance-cash-brief": {
+        "title": "Haftalık nakit özetimi ver",
+        "description": "Ne girdi, ne çıktı, ne ödenecek.",
+        "name": "Nakit Özeti",
+        "kickoff": "Her pazartesi nakit durumumu söyle: geçen hafta ne girdi, ne çıktı ve önümüzdeki iki hafta hangi ödemeler yapılacak."
+    },
+    "finance-expenses": {
+        "title": "Fişlerimi düzenle",
+        "description": "Her fiş kaydedilir, eksikler belirtilir.",
+        "name": "Fiş Düzenleyici",
+        "kickoff": "Fişlerimi düzenli tutmama yardım et. Nereye geldiklerini sor, ardından her birini tutarı, tarihi ve kategorisiyle tabloma kaydet, ay sonunda hangilerinin eksik olduğunu söyle."
+    },
+    "finance-failed-payments": {
+        "title": "Başarısız ödemeleri kurtar",
+        "description": "Her başarısız tahsilat ve onu geri kazanacak e-posta.",
+        "name": "Ödeme Kurtarma",
+        "kickoff": "Başarısız ödemeleri kurtarmama yardım et. Her sabah dün başarısız olan tahsilatları listele ve her müşteriye göndermem gereken e-postanın taslağını hazırla."
+    }
+}

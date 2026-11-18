@@ -28,6 +28,7 @@ describe('resolveLocale', () => {
         expect(matchLocale('FR-ca')).toBe('fr')
         expect(matchLocale('pt-PT')).toBe('pt')
         expect(matchLocale('de-CH')).toBe('de')
+        expect(matchLocale('tr-TR')).toBe('tr')
         expect(parseAcceptLanguage('*, fr;q=0')).toBeNull()
     })
 
@@ -36,6 +37,7 @@ describe('resolveLocale', () => {
         expect(localeNativeName('es')).toBe('Español')
         expect(localeNativeName('pt')).toBe('Português')
         expect(localeNativeName('de')).toBe('Deutsch')
+        expect(localeNativeName('tr')).toBe('Türkçe')
         expect(localeNativeName('en')).toBe('English')
     })
 })

@@ -1,0 +1,32 @@
+{
+    "session": {
+        "title": "Masaüstü: {name}",
+        "titleFallback": "Masaüstü",
+        "description": "Bu coworker'ın çalıştığı ekran. Burada yaptıklarınızı sonradan o da görür.",
+        "takeoverDescription": "Coworker'ınızın tarayıcısındasınız. Devam edebileceği zaman Bitti'ye basın.",
+        "takeoverHoldsBrowser": "Coworker'ınızın tarayıcısı bu istek için zaten açık.",
+        "clipboardDenied": "Tarayıcınız Rerun'ın panoyu okumasına izin vermedi.",
+        "disconnectedDescription": "Makineyle bağlantı kapandı. Üzerindeki hiçbir şey kaybolmadı.",
+        "reconnect": "Yeniden bağlan",
+        "tryAgain": "Tekrar dene"
+    },
+    "screen": {
+        "connecting": "Ekrana bağlanılıyor...",
+        "unavailable": "Ekran kullanılamıyor",
+        "wentAway": "Ekran bağlantısı kesildi",
+        "resize": "Ekranı yeniden boyutlandır"
+    },
+    "notch": {
+        "browser": "Tarayıcı",
+        "closeBrowser": "Tarayıcıyı kapat",
+        "files": "Dosyalar",
+        "terminal": "Terminal",
+        "paste": "Yapıştır",
+        "done": "Bitti",
+        "close": "Kapat"
+    },
+    "screenCard": {
+        "openBrowser": "Tarayıcıyı aç",
+        "takeControl": "Kontrolü al"
+    }
+}

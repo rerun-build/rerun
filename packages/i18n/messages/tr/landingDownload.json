@@ -1,0 +1,58 @@
+{
+    "title": "Rerun masaüstü uygulamasını indirin",
+    "eyebrow": "Masaüstü uygulaması",
+    "headline": "Rerun masaüstünüzde",
+    "description": "Coworker'larınız kendi pencerelerinde: bildirimler, menü çubuğunda veya sistem tepsisinde bir simge ve hızlı soru.",
+    "mac": "macOS için indir",
+    "windows": "Windows için indir",
+    "linux": "Linux için indir",
+    "allPlatforms": "Tüm platformlar",
+    "alternatives": {
+        "macIntel": "Intel işlemcili Mac için indir",
+        "macAppleSilicon": "Apple Silicon'lı Mac için indir",
+        "windowsArm64": "Arm üzerinde Windows için indir",
+        "windowsX64": "Windows x64 için indir"
+    },
+    "beta": "Beta",
+    "webApp": "Rerun tarayıcınızda da çalışır: <link>web uygulamasını açın</link>.",
+    "platforms": {
+        "label": "İndir",
+        "title": "macOS, Windows ve Linux",
+        "mac": {
+            "name": "macOS",
+            "requirements": "macOS 13 veya üzeri, Apple Silicon ve Intel.",
+            "appleSilicon": "Apple Silicon",
+            "intel": "Intel"
+        },
+        "windows": {
+            "name": "Windows",
+            "requirements": "Windows 10 veya üzeri, x64 ve Arm.",
+            "warning": "Windows uygulaması henüz imzalı değil. Windows \"Windows kişisel bilgisayarınızı korudu\" uyarısını gösterirse Ek bilgi'ye, ardından Yine de çalıştır'a tıklayın.",
+            "x64": "x64",
+            "arm64": "Arm"
+        },
+        "linux": {
+            "name": "Linux",
+            "requirements": "x64. AppImage çoğu dağıtımda çalışır ve kendini günceller.",
+            "appImage": "AppImage",
+            "deb": ".deb (Debian, Ubuntu)",
+            "rpm": ".rpm (Fedora, openSUSE)"
+        }
+    },
+    "features": {
+        "label": "Uygulamanın kattıkları",
+        "title": "Rerun'ın her şeyi bir kısayol uzağınızda",
+        "notifications": {
+            "title": "Sizi geri getiren bildirimler",
+            "body": "Başka bir uygulamaya geçtiğiniz anda coworker'larınız size ulaşır, bir tıklama konuşmayı açar."
+        },
+        "quickAsk": {
+            "title": "Hızlı soru",
+            "body": "Mac'te ⌘⇧Space, Windows ve Linux'ta Ctrl+Shift+Space: herhangi bir uygulamadan Chief of Staff'ınıza bir soru sorun, yanıt Rerun'da sizi bekler."
+        },
+        "always": {
+            "title": "Her zaman çalışır",
+            "body": "Pencereyi kapatmak Rerun'ı menü çubuğunda veya sistem tepsisinde tutar, simgesinde sizi bekleyenlerin sayısı görünür."
+        }
+    }
+}

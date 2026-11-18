@@ -1,0 +1,16 @@
+{
+    "save": "Kaydet",
+    "saving": "Kaydediliyor",
+    "cancel": "İptal",
+    "somethingWentWrong": "Bir sorun oluştu. Lütfen tekrar deneyin.",
+    "backToDashboard": "Panele dön",
+    "notFound": {
+        "title": "Sayfa bulunamadı",
+        "body": "Bu sayfa yok ya da taşındı. Sizi doğru yola geri götürelim."
+    },
+    "crash": {
+        "title": "Bir sorun oluştu",
+        "body": "Bu sayfada beklenmeyen bir hata oluştu. Coworker'larınız ve çalışmaları güvende. Kaldığınız yerden devam etmek için yeniden yükleyin.",
+        "reload": "Yeniden yükle"
+    }
+}

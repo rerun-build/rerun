@@ -70,6 +70,20 @@ import deMobileSettings from '@rerun/i18n/messages/de/mobileSettings.json'
 import deMobileSteps from '@rerun/i18n/messages/de/mobileSteps.json'
 import deSubRuns from '@rerun/i18n/messages/de/subRuns.json'
 import deTools from '@rerun/i18n/messages/de/tools.json'
+import trChatErrors from '@rerun/i18n/messages/tr/chatErrors.json'
+import trMobileAuth from '@rerun/i18n/messages/tr/mobileAuth.json'
+import trMobileCards from '@rerun/i18n/messages/tr/mobileCards.json'
+import trMobileChat from '@rerun/i18n/messages/tr/mobileChat.json'
+import trMobileCommon from '@rerun/i18n/messages/tr/mobileCommon.json'
+import trMobileCoworker from '@rerun/i18n/messages/tr/mobileCoworker.json'
+import trMobileHitl from '@rerun/i18n/messages/tr/mobileHitl.json'
+import trMobileHome from '@rerun/i18n/messages/tr/mobileHome.json'
+import trMobileOnboarding from '@rerun/i18n/messages/tr/mobileOnboarding.json'
+import trMobileProviders from '@rerun/i18n/messages/tr/mobileProviders.json'
+import trMobileSettings from '@rerun/i18n/messages/tr/mobileSettings.json'
+import trMobileSteps from '@rerun/i18n/messages/tr/mobileSteps.json'
+import trSubRuns from '@rerun/i18n/messages/tr/subRuns.json'
+import trTools from '@rerun/i18n/messages/tr/tools.json'
 
 // Only the app's own namespaces ship in the bundle: the web's strings would weigh on every launch.
 const english = { chatErrors: enChatErrors, mobileAuth: enMobileAuth, mobileCards: enMobileCards, mobileChat: enMobileChat, mobileCommon: enMobileCommon, mobileCoworker: enMobileCoworker, mobileHitl: enMobileHitl, mobileHome: enMobileHome, mobileOnboarding: enMobileOnboarding, mobileProviders: enMobileProviders, mobileSettings: enMobileSettings, mobileSteps: enMobileSteps, subRuns: enSubRuns, tools: enTools }
@@ -77,10 +91,11 @@ const french = { chatErrors: frChatErrors, mobileAuth: frMobileAuth, mobileCards
 const spanish = { chatErrors: esChatErrors, mobileAuth: esMobileAuth, mobileCards: esMobileCards, mobileChat: esMobileChat, mobileCommon: esMobileCommon, mobileCoworker: esMobileCoworker, mobileHitl: esMobileHitl, mobileHome: esMobileHome, mobileOnboarding: esMobileOnboarding, mobileProviders: esMobileProviders, mobileSettings: esMobileSettings, mobileSteps: esMobileSteps, subRuns: esSubRuns, tools: esTools }
 const portuguese = { chatErrors: ptChatErrors, mobileAuth: ptMobileAuth, mobileCards: ptMobileCards, mobileChat: ptMobileChat, mobileCommon: ptMobileCommon, mobileCoworker: ptMobileCoworker, mobileHitl: ptMobileHitl, mobileHome: ptMobileHome, mobileOnboarding: ptMobileOnboarding, mobileProviders: ptMobileProviders, mobileSettings: ptMobileSettings, mobileSteps: ptMobileSteps, subRuns: ptSubRuns, tools: ptTools }
 const german = { chatErrors: deChatErrors, mobileAuth: deMobileAuth, mobileCards: deMobileCards, mobileChat: deMobileChat, mobileCommon: deMobileCommon, mobileCoworker: deMobileCoworker, mobileHitl: deMobileHitl, mobileHome: deMobileHome, mobileOnboarding: deMobileOnboarding, mobileProviders: deMobileProviders, mobileSettings: deMobileSettings, mobileSteps: deMobileSteps, subRuns: deSubRuns, tools: deTools }
+const turkish = { chatErrors: trChatErrors, mobileAuth: trMobileAuth, mobileCards: trMobileCards, mobileChat: trMobileChat, mobileCommon: trMobileCommon, mobileCoworker: trMobileCoworker, mobileHitl: trMobileHitl, mobileHome: trMobileHome, mobileOnboarding: trMobileOnboarding, mobileProviders: trMobileProviders, mobileSettings: trMobileSettings, mobileSteps: trMobileSteps, subRuns: trSubRuns, tools: trTools }
 
 export type MobileMessages = typeof english
 
-const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german }
+const PACKS: Record<Locale, Partial<Record<keyof MobileMessages, object>>> = { en: english, fr: french, es: spanish, pt: portuguese, de: german, tr: turkish }
 
 const merged = new Map<Locale, MobileMessages>()
 

@@ -1,0 +1,560 @@
+{
+    "jobs": {
+        "bookkeeper": "Muhasebeci",
+        "executiveAssistant": "Yönetici asistanı",
+        "contentMarketer": "İçerik pazarlamacısı",
+        "outreach": "Erişim",
+        "sdr": "SDR",
+        "customerSupport": "Müşteri desteği",
+        "seoWriter": "SEO yazarı",
+        "cashController": "Nakit kontrolörü",
+        "officeManager": "Ofis yöneticisi",
+        "salesRep": "Satış temsilcisi",
+        "socialManager": "Sosyal medya yöneticisi",
+        "newsletterWriter": "Bülten yazarı"
+    },
+    "heroSuggestions": {
+        "leads": {
+            "title": "Lead toplama",
+            "description": "Her sabah yeni bir lead listesi.",
+            "name": "Lead Bulucu",
+            "kickoff": "Her sabah yeni lead bul ve listeme ekle"
+        },
+        "ads": {
+            "title": "Reklam ve satış",
+            "description": "Kendi rakamlarınıza göre neyi kesmeli, neyi büyütmeli.",
+            "name": "Reklam Gözcüsü",
+            "kickoff": "Reklam harcamamı ve satışlarımı izle, kesilecekleri bildir"
+        },
+        "inbound": {
+            "title": "Gelen talep yanıtları",
+            "description": "Yeni lead'ler, ilgileri sıcakken yanıtlanır.",
+            "name": "Lead Yanıtlayıcı",
+            "kickoff": "Yeni lead'lere saatler değil, dakikalar içinde yanıt ver"
+        },
+        "seo": {
+            "title": "SEO yazarı",
+            "description": "Haftada bir makale: araştırılmış, yazılmış ve yayınlanmış.",
+            "name": "SEO Yazarı",
+            "kickoff": "Her pazartesi bir makale yaz ve yayınla"
+        }
+    },
+    "boards": {
+        "crew": {
+            "label": "Çalışma alanları",
+            "invite": "Ekip arkadaşlarını davet et"
+        }
+    },
+    "plan": {
+        "cards": {
+            "model": {
+                "title": "Kendi modelinizi getirin",
+                "body": "Kendi Claude veya ChatGPT aboneliğinizi, API anahtarlarınızı ya da dahil olan Rerun kredilerini bağlayın."
+            },
+            "team": {
+                "title": "Ekipler için tasarlandı",
+                "body": "Tüm ekibinizi ücretsiz davet edin, ek ücret yok."
+            },
+            "runs": {
+                "title": "Görev ve tetikleyici zamanlayın",
+                "body": "Her sabah, her pazartesi ya da bir uygulama çağırdığında."
+            }
+        },
+        "machine": {
+            "connected": "Bağlı",
+            "usage": "Oturumun %23'ü kullanıldı, 2 sa içinde sıfırlanır",
+            "subscriptions": "Abonelikleriniz",
+            "keys": "API anahtarlarınız"
+        },
+        "sources": {
+            "claude": {
+                "name": "Claude Pro veya Max",
+                "hint": "Claude hesabınızla oturum açıldı"
+            },
+            "chatgpt": {
+                "name": "ChatGPT Plus veya Pro",
+                "hint": "ChatGPT hesabınızla oturum açıldı"
+            },
+            "anthropic": {
+                "name": "Anthropic",
+                "hint": "Claude modelleri, token başına ücretli"
+            },
+            "openai": {
+                "name": "OpenAI",
+                "hint": "GPT modelleri, token başına ücretli"
+            },
+            "google": {
+                "name": "Google",
+                "hint": "Gemini modelleri, token başına ücretli"
+            },
+            "openrouter": {
+                "name": "OpenRouter",
+                "hint": "Tek bir anahtarın ardında tüm modeller"
+            }
+        },
+        "composer": "Dubai'deki lojistik firmalarından 30 CFO bul.",
+        "members": {
+            "title": "Üyeler",
+            "lead": "Ekip arkadaşlarınızı bu çalışma alanına davet edin.",
+            "field": "E-postayla davet et",
+            "action": "Davet et",
+            "owner": "Sahip",
+            "pending": "Bekliyor"
+        },
+        "routines": {
+            "title": "Rutinler",
+            "action": "Yeni",
+            "items": {
+                "invoices": {
+                    "name": "Ödenmemiş faturaları takip et",
+                    "when": "Her hafta içi 07:00 · Europe/Paris",
+                    "badge": "34 dk sonra"
+                },
+                "payment": {
+                    "name": "Başarısız ödemeyi bildir",
+                    "when": "Stripe webhook'u çağırdığında",
+                    "badge": "dinliyor"
+                },
+                "drafts": {
+                    "name": "Bugünün üç taslağını paylaş",
+                    "when": "Her gün 11:30",
+                    "badge": "11:30"
+                },
+                "welcome": {
+                    "name": "Yeni müşteriyi karşıla",
+                    "when": "CRM'iniz webhook'u çağırdığında",
+                    "badge": "dinliyor"
+                },
+                "ranking": {
+                    "name": "Haftalık sıralama raporu",
+                    "when": "Her cuma 09:00",
+                    "badge": "Cum 09:00"
+                },
+                "close": {
+                    "name": "Ayı kapat",
+                    "when": "Ayın son günü 18:00",
+                    "badge": "31/10"
+                }
+            }
+        },
+        "schedule": {
+            "repeat": "Tekrarla",
+            "every": "Her hafta içi",
+            "hook": "Webhook URL'si",
+            "next": "Sonraki çalıştırma bugün 07:00",
+            "save": "Kaydet"
+        }
+    },
+    "steps": {
+        "label": "Nasıl başlar",
+        "title": "Ücretsiz başlamak için <br></br>üç basit adım.",
+        "items": {
+            "connect": {
+                "title": "Zaten ödediğiniz hizmeti bağlayın",
+                "body": "Claude veya ChatGPT hesabınız, tek bir oturum açma. Ya da bir anahtar veya plana dahil kredi."
+            },
+            "hire": {
+                "title": "Bir Coworker işe alın",
+                "body": "Hazır olanlardan birini seçip sorularını yanıtlayın. Ya da işi bir cümleyle anlatın."
+            },
+            "run": {
+                "title": "Coworker'lar işi halleder",
+                "body": "Bir zamanlamayla, bir tetikleyiciyle ya da istek üzerine, bir meslektaşa vereceğiniz her görev için."
+            }
+        },
+        "rail": {
+            "board": "Pano",
+            "hire": "Yeni Coworker",
+            "inbox": "Gelen kutusu",
+            "brain": "Brain",
+            "providers": "AI sağlayıcıları"
+        },
+        "connect": {
+            "label": "AI sağlayıcıları",
+            "description": "Coworker'larınızın kullandığı planlar ve API anahtarları.",
+            "subscriptions": "Abonelikleriniz",
+            "keys": "API anahtarlarınız",
+            "ready": "Hazır",
+            "connect": "Bağla",
+            "connecting": "Bağlanıyor",
+            "sources": {
+                "chatgpt": {
+                    "name": "ChatGPT planı",
+                    "summary": "Codex, kendi aboneliğinizle."
+                },
+                "claude": {
+                    "name": "Claude planı",
+                    "summary": "Claude Code, kendi aboneliğinizle."
+                },
+                "google": {
+                    "name": "Google API anahtarı",
+                    "summary": "Gemini modelleri, token başına ücretli."
+                },
+                "openrouter": {
+                    "name": "OpenRouter API anahtarı",
+                    "summary": "Tek bir anahtarın ardında tüm modeller."
+                },
+                "anthropic": {
+                    "name": "Anthropic API anahtarı",
+                    "summary": "Claude modelleri, token başına ücretli."
+                }
+            }
+        },
+        "hire": {
+            "label": "Yeni Coworker",
+            "description": "İşi anlatın ya da sizin için seçilmiş bir Coworker'la başlayın.",
+            "job": "Ödenmemiş her faturayı takip et ve pazartesi bana nasıl gittiğini anlat.",
+            "mark": "pazartesi",
+            "schedule": "her pazartesi",
+            "title": "Yeni Coworker'ınız ne yapsın?",
+            "titleNamed": "{name} ne yapsın?"
+        },
+        "board": {
+            "box": "Operasyon",
+            "beats": {
+                "chased": "Pzt 7:00. 3 fatura takipte",
+                "drafted": "Acme yazdı. Yanıt hazırlandı",
+                "closed": "Acme ödedi. Fatura kapandı",
+                "followUp": "Hatırlatma gönderildi"
+            }
+        }
+    },
+    "layer": {
+        "eyebrows": {
+            "live": "Çalışma alanınız",
+            "gains": "Çalışma alanınız",
+            "week": "Sıradan bir hafta",
+            "anatomy": "Coworker nedir",
+            "jobs": "Hâlâ elle yapılanlar",
+            "steps": "Nasıl başlar",
+            "cloud": "Neleri kapsarlar"
+        },
+        "gainTitles": {
+            "tidy": {
+                "lead": "Tüm şirketiniz,",
+                "mid": "düzenli."
+            },
+            "organized": {
+                "lead": "Tüm şirketiniz,",
+                "mid": "düzenli.",
+                "tail": "Ve kendiliğinden öyle kalır."
+            },
+            "never": {
+                "lead": "İşinizi düzenlemeye",
+                "mid": "bir saat bile",
+                "tail": "harcamayın artık."
+            },
+            "once": {
+                "lead": "İşinizi",
+                "mid": "bir kez düzenleyin.",
+                "tail": "Bir daha asla dağılmaz."
+            },
+            "board": {
+                "lead": "Görebildiğiniz",
+                "mid": "bir işletme,",
+                "tail": "içinde kaybolduğunuz bir klasör değil."
+            },
+            "mess": {
+                "lead": "Yirmi",
+                "mid": "Coworker.",
+                "tail": "Arkalarında toplanacak sıfır dağınıklık."
+            },
+            "files": {
+                "lead": "Her şey",
+                "mid": "yerli yerinde,",
+                "tail": "ve siz hiçbir şeyi dosyalamadınız."
+            },
+            "brief": {
+                "lead": "Çalışma alanınızı",
+                "mid": "bir kez kurun.",
+                "tail": "Hiçbir Coworker'a iki kez anlatmayın."
+            },
+            "workspace": {
+                "lead": "İşinizi",
+                "mid": "tanıyan bir",
+                "tail": "çalışma alanı."
+            },
+            "concretely": {
+                "lead": "Rerun işinize",
+                "mid": "gerçekte",
+                "tail": "ne katar?"
+            },
+            "needs": {
+                "lead": "Rerun,",
+                "mid": "işinizin ihtiyaç duyduğu",
+                "tail": "her şeydir."
+            }
+        },
+        "boxes": {
+            "marketing": "Pazarlama",
+            "sales": "Satış",
+            "finance": "Finans",
+            "admin": "Yönetim",
+            "support": "Destek"
+        },
+        "says": {
+            "posts": "Bu hafta altı gönderi sırada",
+            "founders": "Bugün 40 kurucuya e-posta gitti",
+            "invoices": "3 geciken fatura takipte",
+            "emails": "41 yeni e-posta ayıklanıyor",
+            "demos": "Bu hafta 12 demo ayarlandı",
+            "inbox": "Gelen kutusu yine sıfırda"
+        },
+        "live": {
+            "tablist": "Çalışma alanı adımları",
+            "steps": {
+                "boxes": {
+                    "tab": "Boxes",
+                    "title": "İşinizi Boxes içinde düzenleyin",
+                    "body": "Pazarlama, Satış, Finans, Yönetim. Her departman, müşteri veya proje için bir Box."
+                },
+                "coworkers": {
+                    "tab": "Coworker'lar",
+                    "title": "İhtiyacınız olan Coworker'ları işe alın",
+                    "body": "Erişim, muhasebe, destek: her biri kendi belleği ve kendi uygulamalarıyla kendi Box'ına yerleşir."
+                },
+                "brain": {
+                    "tab": "Şirket beyni",
+                    "title": "Şirket için tek bir beyin",
+                    "body": "Teklifiniz, pazarınız, üslubunuz. Bir kez yazılır ve her Coworker her çalıştırmadan önce okur."
+                },
+                "workspaces": {
+                    "tab": "Çalışma alanları",
+                    "title": "Aynı anda birden çok çalışma alanı yönetin",
+                    "body": "Bir müşteri, bir marka, bir yan iş. Her biri kendi Coworker'larını ve kendi makinesini korur."
+                }
+            },
+            "brain": "Şirket beyni",
+            "workspaces": {
+                "company": "Şirketiniz",
+                "studio": "İkinci Şirketiniz",
+                "spare": "Yan Projeniz"
+            },
+            "plan": "{coworkers, plural, one {# coworker} other {# coworker}} · {seats, plural, one {# kullanıcı} other {# kullanıcı}}",
+            "menu": {
+                "settings": "Ayarlar",
+                "invite": "Davet et",
+                "brain": "Brain",
+                "aiProviders": "AI sağlayıcıları",
+                "apiKeys": "API anahtarları ve MCP",
+                "pro": "PRO",
+                "billing": "Faturalandırma",
+                "newWorkspace": "Yeni çalışma alanı"
+            }
+        },
+        "brain": {
+            "title": "Brain",
+            "search": "Ara",
+            "company": "Şirket",
+            "lead": "Her Coworker'ın okuduğu şey.",
+            "pages": {
+                "offering": "Teklif",
+                "market": "Pazar",
+                "voice": "Üslup",
+                "team": "Ekip",
+                "stack": "Araçlar"
+            },
+            "sources": {
+                "pricingPage": "Fiyatlandırma sayfası",
+                "webSearch": "Web araması",
+                "website": "Web sitesi"
+            }
+        },
+        "workspaces": {
+            "new": "Yeni çalışma alanı",
+            "newHint": "Kendi Coworker'ları, kendi makinesi, kendi üyeleri"
+        }
+    },
+    "testimonials": {
+        "label": "Müşteriler",
+        "title": "<keep>Onların <chip>Coworker'ları</chip></keep> çoktan işbaşında.",
+        "sub": "Gerçek çalışma alanları, kendi sözleriyle.",
+        "role": "{role},<org>{company}</org>",
+        "carousel": "Müşteri yorumları",
+        "slide": "{index} / {total}",
+        "dots": "Bir yorum seçin",
+        "dot": "{company}, yorum {index} / {total}"
+    },
+    "faq": {
+        "label": "Sorular",
+        "title": "Sıkça sorulan <mark>sorular</mark>.",
+        "sub": "İnsanların ilk Coworker'larını işe almadan önce sorduğu her şey. Sorunuz burada yoksa kurucular hemen aşağıda.",
+        "categories": {
+            "general": "Genel",
+            "how": "Nasıl çalışır",
+            "features": "Özellikler ve kullanım",
+            "billing": "Planlar ve faturalandırma"
+        },
+        "migrate": {
+            "label": "Tüm kurulumunuzu beş dakikada taşıyın.",
+            "aria": "Başka bir araçtan geliyorum"
+        },
+        "team": {
+            "role": "Kurucu ortak",
+            "title": "Hâlâ bir sorunuz mu var? <fade>Kuruculara sorun.</fade>",
+            "sub": "İki kişiyiz ve Rerun'ı kendimiz geliştiriyoruz. Bize e-posta gönderin ya da Discord'a gelip sorun.",
+            "email": "Kuruculara e-posta gönderin",
+            "discord": "Discord'a katılın"
+        },
+        "items": {
+            "better": {
+                "question": "Aynı görevde bir Coworker neden Claude veya ChatGPT'den daha iyi?",
+                "answer": "Çünkü bir sohbet botu yanıtta durur. E-postayı yazar, ama sekmeyi açmak, metni kopyalamak, eski portala giriş yapıp göndermek yine size kalır. Bir Coworker'ın kendi bilgisayarı ve sizin uygulamalarınız vardır, bu yüzden bu adımları kendisi yapar ve siz hiçbir şey açmadan sabah 7'de kendiliğinden başlar."
+            },
+            "start": {
+                "question": "İlk olarak ne vereceğimi bilmiyorum. Nereden başlamalıyım?",
+                "answer": "Her hafta yeniden yaptığınız ve yapmaktan çekindiğiniz işi seçin: fatura takibi, gelen kutusunu ayıklama, pazartesi raporu. Bu sayfadaki örnekler insanların ilk devrettiği işlerdir."
+            },
+            "readyMade": {
+                "question": "Hazır bir şeyle başlayabilir miyim?",
+                "answer": "Evet. Kütüphanede bir sektör için önceden hazırlanmış Coworker'lar var: ajanslar, e-ticaret, SaaS, satış, işe alım ve daha fazlası. Birini yükleyin, kendi uygulamalarınıza bağlayın ve sizin çalışma şeklinize uymayan kısımları değiştirin."
+            },
+            "experts": {
+                "question": "Coworker'larımı benim yerime biri kurabilir mi?",
+                "answer": "Evet. Rerun uzmanları işi Coworker kurmak ve yüklemek olan kişilerdir; onlara göz atıp birini işe alabilirsiniz. Rerun'ı geliştiren ikimiz de Discord'da ücretsiz yanıt veriyoruz.",
+                "link": "uzmanları"
+            },
+            "safe": {
+                "question": "Verilerim güvende mi?",
+                "answer": "Çalışma alanınızın, diğer tüm müşterilerden ayrılmış kendi özel makinesi vardır ve verileriniz orada kalır. İçeriğiniz üzerinde model eğitmiyoruz, çağırdığımız model sağlayıcılarına da bu sözleşmeyle yasaktır."
+            },
+            "setup": {
+                "question": "Gerçekte neyi kurmam gerekiyor?",
+                "answer": "Bir kerelik üç şey. İşletmenizin zaten kullandığı uygulamaları bağlayın, bir Coworker işe alıp işini söyleyin, sonra ne zaman çalışması gerektiğini belirtin. Gerisini o halleder."
+            },
+            "howLong": {
+                "question": "İlk Coworker'ım ne kadar sürede çalışmaya başlar?",
+                "answer": "Birkaç dakikada. Hazır bir Coworker seçin ya da işi kendi sözlerinizle anlatın, bir iki araç bağlayın ve başlasın."
+            },
+            "where": {
+                "question": "Coworker'larım gerçekte nerede çalışır?",
+                "answer": "Bulutta, Avrupa'da, kendi makinelerinde: her çalışma alanı için bir tane, herkesten yalıtılmış. Her zaman açıktır ve dosyaları, belleği ve veritabanları onun içinde kalır."
+            },
+            "laptop": {
+                "question": "Dizüstü bilgisayarım kapalıyken çalışmaya devam eder mi?",
+                "answer": "Evet. Coworker'larınız bulutta, hiç uyumayan kendi makinelerinde yaşar. Dizüstünüzü kapatın, yatın: sabah 7 çalıştırması yine gerçekleşir ve döndüğünüzde sonuç orada olur."
+            },
+            "memory": {
+                "question": "Bir Coworker çalıştırmalar arasında işimi hatırlar mı?",
+                "answer": "Evet, değerinin çoğu da buradan gelir. Kendi dosyalarını, kendi notlarını ve teklifiniz, pazarınız ve müşterileriniz hakkında öğrendiklerini saklar; böylece siz iki kez söylemeden Acme'nin 60 günde ödediğini bilir. Pazartesi bir sohbet botu sıfırdan başlar; Coworker'ınız haftalardır doldurduğu dosyayı açar."
+            },
+            "unwanted": {
+                "question": "Bir Coworker istemediğim bir şey yaparsa ne olur?",
+                "answer": "Önce durur ve sorar. Para harcamak, bir müşteriye e-posta göndermek veya bir şeyi silmek gibi önemli bir işten önce bekler ve onayınızı ister. Ayrıca her çalıştırma panodadır, yani sonradan göremeyeceğiniz hiçbir şey olmaz."
+            },
+            "tools": {
+                "question": "Coworker'larım hangi araçları kullanabilir?",
+                "answer": "Stripe, HubSpot, Notion, Linear, Google Drive ve {connectors}+ araç daha, ayrıca her MCP sunucusu; Coworker'ınız işinin gerektirdiklerini kendisi bağlar. Bağlayıcısı olmayan araçları bile kullanır: onları kendi bilgisayarında, sizin yapacağınız gibi açar."
+            },
+            "together": {
+                "question": "Coworker'lar birlikte çalışabilir mi?",
+                "answer": "Evet. İşi birbirlerine devrederler: biri potansiyel müşterileri bulur, sonraki onlara yazar, üçüncüsü sonucu dosyalar. Bir kez istersiniz, zincir siz araya girmeden işler."
+            },
+            "watch": {
+                "question": "Çalışmalarını canlı izleyebilir miyim?",
+                "answer": "Evet, bütün fikir bu. Her Coworker tek bir panodadır, çalışırken gerçek zamanlı güncellenir ve ayrıntı istediğinizde her çalıştırmanın tam geçmişi oradadır."
+            },
+            "takeOver": {
+                "question": "Bir çalıştırmanın ortasında kontrolü alabilir miyim?",
+                "answer": "Evet. Ekranını açın ve fareyi alın: girişi kendiniz yapın, yanlış doldurduğu alanı düzeltin, sonra ona geri verin. O sayfadan devam eder."
+            },
+            "wrong": {
+                "question": "Bir şeyler ters gittiğinde nasıl haberim olur?",
+                "answer": "Size söyler. Başarısız bir çalıştırma, bir soru, bekleyen bir onay, bağlantısını kaybeden bir uygulama: her biri Coworker'ı panoda öne çıkarır ve hangileri için haber almak istiyorsanız size e-postayla ya da bildirimle ulaşır."
+            },
+            "stuck": {
+                "question": "Ben yokken bir Coworker takılırsa ne olur?",
+                "answer": "Bekler ve ekibinizden herhangi biri ona yanıt verebilir. Saniyeler sonra tam kaldığı yerden devam eder. Kendi başına yanıt vermesi için ona kurallar da bırakabilirsiniz, böylece yalnızca kendiniz vermek istediğiniz kararlar için bekler."
+            },
+            "phone": {
+                "question": "Rerun'ı telefonumdan kullanabilir miyim?",
+                "answer": "Evet. Rerun telefonunuzun tarayıcısında çalışır ve bir uygulama gibi ana ekranınıza yüklenir. Pano, konuşma ve onaylar küçük ekran için tasarlandı, böylece bir kuyrukta beklerken bile bir Coworker'ın önünü açabilirsiniz."
+            },
+            "billing": {
+                "question": "Faturalandırma nasıl işliyor? Kişi başına mı ödüyorum?",
+                "answer": "Asla kişi başına değil. Ayda {price} ile sınırsız Coworker, onların özel makinesi ve çalışma alanında istediğiniz kadar ekip arkadaşı, ek ücret olmadan sizin. Sizinle birlikte büyüyen tek şey Rerun krediniz. Bu kredi yalnızca barındırdığımız modeller için değil: Coworker'larınızın {connectors}+ araca yaptığı istekleri de karşılar."
+            },
+            "subscription": {
+                "question": "Claude veya ChatGPT aboneliği gerekli mi?",
+                "answer": "Hayır. Her plan, barındırdığımız modellerde kullanılacak krediyle gelir, böylece Coworker'larınız ilk günden hiçbir şey bağlamadan çalışır. Kendi Claude veya ChatGPT planınızı bağlamak, zaten bir tanesine ödeme yapıyorsanız içindir: o çalıştırmalar bizim tarafımızda size hiçbir şeye mal olmaz ve onları asla saymayız."
+            },
+            "models": {
+                "question": "Hangi AI modellerini kullanabilirim?",
+                "answer": "Claude, ChatGPT, Grok ve daha fazlası; seçimi her Coworker için siz yaparsınız: gelen kutusunu ayıklamak için hızlı ve ucuz model, doğru olması gereken iş için en güçlüsü."
+            },
+            "data": {
+                "question": "E-postalar, telefon numaraları ve diğer veriler ne kadar tutar?",
+                "answer": "Rerun kredinizden düşülür ve bir e-posta ya da telefon numarası yalnızca bulunduğunda ücretlendirilir. Bir aramadan önce Coworker'ınız size ne kadar tutacağını söyler ve onayınızı bekler. Abone olmanız gereken bir veri sağlayıcısı yoktur."
+            }
+        }
+    },
+    "foreman": {
+        "role": "Chief of Staff'ınız",
+        "title": "Yeni favori ekip arkadaşınızla tanışın.",
+        "powers": {
+            "voice": {
+                "title": "Coworker'larınızı sesle yönetin",
+                "detail": "<kbd>Space</kbd> tuşunu basılı tutun ve ne istediğinizi söyleyin. Doğru Coworker'a iletir."
+            },
+            "partner": {
+                "title": "İşiniz için proaktif bir ortak",
+                "detail": "Siz sormadan, tüm işinizde ve her Coworker'da harekete geçer."
+            },
+            "autopilot": {
+                "title": "İşinizi otomatik pilota alın",
+                "detail": "Siz yokken Coworker'larınızı yönetir ve onlara sizin kurallarınıza göre yanıt verir."
+            }
+        },
+        "voice": {
+            "listening": "Dinliyor · göndermek için Space'i bırakın",
+            "transcribing": "Yazıya dökülüyor...",
+            "thinking": "Düşünüyor...",
+            "running": "Message Coworker çalışıyor",
+            "space": "Space",
+            "prompts": {
+                "lastNight": "Dün gece ne çalıştı?",
+                "failed": "O çalıştırma neden başarısız oldu?",
+                "build": "Bana yeni bir Coworker oluştur"
+            },
+            "reply": "Hemen! 🙌 Satış Geliştirme Temsilcinizden bu haftanın yeni potansiyel müşterilerini istedim. Öğlene kadar gelen kutunuzda olacaklar.",
+            "open": "Konuşmayı aç"
+        },
+        "partner": {
+            "thinking": "Düşünüyor...",
+            "pastDue": "Bu hafta 12 faturanın vadesi geçti.",
+            "offer": "Onları her pazartesi takip etmesi için bir Muhasebeci işe alayım mı?",
+            "yes": "Evet, yap.",
+            "running": "Create Coworker çalışıyor",
+            "steps": "{count, plural, one {# adım} other {# adım}}",
+            "done": "Tamam! Muhasebeciniz pazartesi 9'da başlıyor."
+        },
+        "autopilot": {
+            "name": "Otomatik pilot",
+            "answering": "Yanıtlanıyor: {job}...",
+            "leftForYou": "Size bırakılanlar",
+            "answered": "Yanıtlananlar",
+            "rules": "Kurallarınıza göre yanıtlar",
+            "now": "şimdi",
+            "waiting": "Sizi bekliyor",
+            "byAutopilot": "Otomatik pilot yanıtladı",
+            "to": "Otomatik pilot · {job} için",
+            "asks": {
+                "reminder": {
+                    "topic": "Ödenmemiş faturalar",
+                    "question": "Acme'ye üçüncü hatırlatma bugün gitsin mi?",
+                    "answer": "Evet, bugün. Samimi tut."
+                },
+                "leads": {
+                    "topic": "Yeni lead'ler",
+                    "question": "12 yeni lead'e şimdi e-posta gitsin mi?",
+                    "answer": "Evet, nisan şablonuyla."
+                },
+                "verify": {
+                    "topic": "Lead araştırması",
+                    "question": "50 lead doğrulamak için {amount} ödensin mi?",
+                    "answer": "Harcamalar onayınızı bekler."
+                }
+            }
+        }
+    }
+}

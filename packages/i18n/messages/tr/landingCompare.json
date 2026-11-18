@@ -1,0 +1,1960 @@
+{
+    "hub": {
+        "title": "Rerun vs Zapier, n8n, Lindy, Claude ve dahası: karşılaştırma",
+        "headline": "Rerun ve zaten tanıdığınız araçlar.",
+        "description": "Rerun; Zapier, Make, n8n, Lindy, Manus, Claude Cowork ve yedi araçla yan yana: kullanım kolaylığı, ekip çalışması, esneklik ve maliyet.",
+        "eyebrow": "Karşılaştır",
+        "faqLabel": "SSS",
+        "faqTitle": "Rerun ile diğerleri arasında seçim yapmak.",
+        "faq": {
+            "1": {
+                "question": "Rerun neyin alternatifi?",
+                "answer": "Rerun; muhakeme gerektiren işlerde Zapier, Make ve n8n gibi iş akışı araçlarının, Lindy, Twin veya Dust gibi krediyle ölçülen ajan platformlarının ve sunucu yönetmek istemeyen ekipler için OpenClaw veya Hermes Agent gibi kendi sunucunuzda barındırılan ajanların yerini alır. Her ajan çalışma alanınızın özel makinesinde yaşar ve günün her saati çalışır."
+            },
+            "2": {
+                "question": "Rerun bir otomasyon aracı mı, yoksa bir yapay zeka ajan platformu mu?",
+                "answer": "Bir yapay zeka ajan platformu. Bir işi sade bir dille anlatırsınız, uygulamalarınızı bağlarsınız; ajan adımları planlar, öğrendiklerini hatırlar ve riskli bir şeyden önce size sorar. Kurmanız gereken bir akış şeması yoktur."
+            },
+            "3": {
+                "question": "Rerun'ı zaten kullandığım araçlarla birlikte kullanabilir miyim?",
+                "answer": "Evet. Çoğu ekip basit otomasyonlarını ve geliştirici araçlarını korur, sürekli bozulan ya da düşünmeyi gerektiren tekrarlayan işleri Rerun'a devreder."
+            },
+            "4": {
+                "question": "Rerun bu araçlara kıyasla ne kadar tutar?",
+                "answer": "Aylık {price} fiyatından başlayan tek bir plan: güvenli bir özel makine, sınırsız ajan ve model kredisi, 5 günlük ücretsiz deneme. Rerun asla görev, kredi veya yürütme başına ücret almaz; ajanlarınız zaten ödediğiniz ChatGPT veya Claude planıyla çalışabilir."
+            }
+        }
+    },
+    "breadcrumb": {
+        "aria": "İçerik haritası",
+        "home": "Ana sayfa",
+        "compare": "Karşılaştır"
+    },
+    "vs": "Rerun vs {competitor}",
+    "actions": {
+        "trial": "Ücretsiz denemeyi başlatın",
+        "browse": "Hazır ajanlara göz atın"
+    },
+    "card": {
+        "cta": "Karşılaştırmayı okuyun"
+    },
+    "page": {
+        "reviewed": "Son inceleme: <time>{date}</time>, her ürünün herkese açık fiyatları ve belgelerine göre.",
+        "sideBySide": {
+            "badge": "Yan yana",
+            "title": "Bir bakışta Rerun vs {competitor}."
+        },
+        "switching": {
+            "badge": "Geçiş",
+            "title": "{competitor} ürününden üç adımda geçin.",
+            "subtitle": "Taşıma projesi yok. Size en pahalıya mal olan tek bir işle başlayın ve kendini kanıtlamasına izin verin."
+        },
+        "pricing": {
+            "badge": "Fiyatlandırma",
+            "title": "Gerçekte ne ödersiniz."
+        },
+        "furtherReading": {
+            "label": "Daha fazla okuma",
+            "title": "{competitor} ve alternatifleri hakkında daha fazlası."
+        },
+        "others": {
+            "label": "Diğer karşılaştırmalar",
+            "title": "Başka bir şey mi tartıyorsunuz?"
+        },
+        "faq": {
+            "label": "SSS",
+            "title": "Rerun vs {competitor}: sorularınız."
+        }
+    },
+    "verdict": {
+        "shortAnswer": "Kısa cevap",
+        "chooseThem": "{competitor} ne zaman seçilir?",
+        "chooseRerun": "Rerun ne zaman seçilir?"
+    },
+    "grid": {
+        "rerunSubtitle": "Yapay zeka ekibiniz",
+        "caption": "{competitor} vs Rerun, karşılaştırılan ölçütler: {criteria}"
+    },
+    "differences": {
+        "badge": "Temel farklar",
+        "title": "Rerun ve {competitor} nerede ayrışıyor.",
+        "subtitle": "Gündelik işinizi değiştiren dört fark, gerçek ürün üzerinde gösteriliyor.",
+        "cta": {
+            "connect": "Araçlarınızı bağlayın",
+            "approvals": "Onayları ayarlayın",
+            "memory": "Nasıl öğrendiğini görün",
+            "triggers": "Bir işi otomatikleştirin",
+            "computer": "Ona bir makine verin"
+        }
+    },
+    "families": {
+        "assistant": {
+            "badge": "Yapay zeka asistanları",
+            "title": "Görev üstlenen yapay zeka asistanları",
+            "subtitle": "Artık görevleri kendi başına yürüten asistanlar. Rerun bunlara bir ajan ekibi, istediğiniz model ve hep açık bir makine ekler."
+        },
+        "developer-agent": {
+            "badge": "Açık kaynak",
+            "title": "Açık kaynak ajanlar",
+            "subtitle": "Ücretsiz ve açık, ama kurmak, barındırmak ve güvenliğini sağlamak size kalır. Rerun ajanları tarayıcıdan kurulan, güvenli bir özel makinede çalışır."
+        },
+        "automation": {
+            "badge": "Otomasyon",
+            "title": "İş akışı otomasyon araçları",
+            "subtitle": "Her adımı siz tasarlarsınız, akış da tam olarak onu yapar. Rerun ajanları hedefi alır ve adımları kendisi çıkarır."
+        },
+        "agent-platform": {
+            "badge": "Ajan platformları",
+            "title": "Yapay zeka ajan platformları",
+            "subtitle": "Rerun gibi, sade bir dille görev verdiğiniz barındırılan ajanlar. Fark; kullanımın nasıl faturalandığında, onları hangi yapay zekanın çalıştırdığında ve neyle çalıştıklarındadır."
+        }
+    },
+    "criteria": {
+        "easeOfUse": "Kullanım kolaylığı",
+        "getTheJobDone": "İşi bitirmek",
+        "agentTeamwork": "Ajan ekip çalışması",
+        "collaboration": "İş birliği",
+        "business": "İşletme",
+        "flexibility": "Esneklik",
+        "pricing": "Fiyatlandırma"
+    },
+    "competitors": {
+        "claude-cowork": {
+            "subtitle": "Claude'un görevler için ajanı, artık Claude'un içinde",
+            "pitch": "Claude, verdiğiniz görevleri Claude modelleriyle üstlenir. Rerun ise tekrarlayan işlerinizi bir ajan ekibiyle, Claude planınız dahil istediğiniz herhangi bir modelle yürütür.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Her görevi ve zamanlamasını kendiniz tarif edersiniz.",
+                    "rerun": "Her iş için bir ajan kurun, ilk günden kendi başına çalışsın."
+                },
+                "getTheJobDone": {
+                    "them": "Bilgisayarınızdaki bir klasöre veya uygulamaya ihtiyaç duyan bir görev yalnızca bilgisayar açıkken çalışır.",
+                    "rerun": "Siz yokken de çalışmaya devam eder: Autopilot, kurallarınız dahilinde ajanlarınıza yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Tek bir asistan her görevi üstlenir.",
+                    "rerun": "Birbiriyle konuşan uzmanlardan oluşan bir ekip; her görev doğru ajana yönlendirilir."
+                },
+                "collaboration": {
+                    "them": "Her ekip arkadaşı kendi Claude'uyla çalışır, kullanıcı başına $20'dan başlayarak.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Koddan sunumlara kadar her şey için genel bir asistan.",
+                    "rerun": "İşletmeler için tasarlandı: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, ayrıca sizinkini kuracak uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Yalnızca Claude modelleri.",
+                    "rerun": "Her ajan için istediğiniz model, Claude planınız dahil."
+                },
+                "pricing": {
+                    "them": "Kişi başına bir plan: Pro'da $20, Team'de kullanıcı başına $25, her birinin kullanım sınırları var.",
+                    "rerun": "Sınırsız ajan ve güvenli bir makine için aylık {price}; ajanlar Claude planınızla da çalışabilir."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Model seçimi",
+                    "them": "Yalnızca Claude modelleri.",
+                    "rerun": "Zaten sahip olduğunuz Claude planıyla Claude ya da GPT, Gemini ve daha fazlası, her ajan için ayrı seçilir."
+                },
+                "2": {
+                    "label": "Zamanlanmış işler",
+                    "them": "Zamanlanmış görevler her ücretli planda bulutta çalışır, en sık saatte bir. Bilgisayarınızdaki bir klasöre veya uygulamaya ihtiyaç duyan görev yalnızca orada, bilgisayar açıkken çalışır.",
+                    "rerun": "Ajanlar, dosyalarının ve veritabanlarının bulunduğu, hep açık kendi makinelerinde dakika hassasiyetinde çalışır."
+                },
+                "3": {
+                    "label": "Bir ajan ekibi",
+                    "them": "Kendi dosyaları, talimatları ve hafızası olan projelerde düzenlenmiş Claude'unuz.",
+                    "rerun": "Her biri kendi işine sahip birkaç ajan. Aklınızdakini Rerun'a anlatın, her görevi doğru ajana o versin."
+                },
+                "4": {
+                    "label": "Uygulamalarınızda çalışmak",
+                    "them": "Bağlayıcılarınız, skill'leriniz ve projeleriniz sohbetten aktarılır; Claude, Docs ve Slides belgelerini konuşmanın içinde yazar.",
+                    "rerun": "Ajanlar {connectors}+ uygulamaya ve herhangi bir MCP sunucusuna erişir; betik çalıştırdıkları, tarayıcı kullandıkları ve ekrandaki bir uygulamayı insan gibi kullandıkları bir makinede çalışırlar."
+                },
+                "5": {
+                    "label": "Fiyat",
+                    "them": "Claude planlarına dahil: Pro aylık $20 (yıllık faturalandırmada $17), Max $100'dan başlayarak, Team kullanıcı başına $25 (yıllık $20, en az iki kullanıcı), her birinin kullanım sınırları var.",
+                    "rerun": "Ekibinizin paylaştığı sınırsız ajan için aylık {price}; ajanlar zaten ödediğiniz bir Claude planıyla da çalışabilir."
+                }
+            }
+        },
+        "manus": {
+            "subtitle": "Kendi bilgisayarı olan genel amaçlı yapay zeka ajanı",
+            "pitch": "Manus tek seferlik araştırma, sunum ve site üretir, kredi ile faturalandırır. Rerun ise tekrarlayan işlerinizi her gün, tek bir sabit fiyatla yürütür.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Her görevi siz tarif edersiniz ve her deneme kredi harcar.",
+                    "rerun": "Hazır bir ajan kurun ve uygulamalarınızı tarayıcıdan bağlayın."
+                },
+                "getTheJobDone": {
+                    "them": "Her bireysel planda 20 zamanlanmış görev ve aynı anda 20 görev.",
+                    "rerun": "İşin gerektirdiği kadar zamanlama ve webhook; siz yokken Autopilot yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Paralel işler için Wide Research ile tek bir genel ajan.",
+                    "rerun": "Birbiriyle konuşan uzmanlardan oluşan bir ekip; her görev doğru ajana yönlendirilir."
+                },
+                "collaboration": {
+                    "them": "Kullanıcı başına $20; her üye ortak kredilerle kendi görevlerini yürütür.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Araştırma, sunum ve web siteleri için genel bir ajan.",
+                    "rerun": "İşletmeler için tasarlandı: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, ayrıca sizinkini kuracak uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Hazır bağlayıcılar ve kredi ile faturalanan her görev.",
+                    "rerun": "Kendi ChatGPT veya Claude planınız, {connectors}+ uygulama ve herhangi bir MCP sunucusu."
+                },
+                "pricing": {
+                    "them": "Her görev kredi harcar: $20 ile ayda 4,000 kredi alırsınız, artı günde 300.",
+                    "rerun": "Aylık {price}, çalıştırmalar asla sayılmaz: güvenli bir makine, sınırsız ajan ve model kredisi."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Kullanım nasıl faturalanır",
+                    "them": "Her görev kredi harcar: aylık $20 ile 4,000 kredi alırsınız, artı her gün yenilenen 300 kredi.",
+                    "rerun": "Rerun görevleri asla saymaz: aylık sabit {price}."
+                },
+                "2": {
+                    "label": "Tekrarlayan işler",
+                    "them": "20 zamanlanmış görev ve aynı anda çalışan 20 görev; $20, $40 ve $200 planlarında aynı.",
+                    "rerun": "İşin gerektirdiği kadar zamanlama ve webhook, dakika hassasiyetinde, hepsi tek bir Routines listesinde."
+                },
+                "3": {
+                    "label": "Bir ajan ekibi",
+                    "them": "Görevlerinizi alan tek bir ajan, aynı anda en fazla 20 görev.",
+                    "rerun": "Her biri kendi işine sahip birkaç ajan. Aklınızdakini Rerun'a anlatın, her görevi doğru ajana o versin."
+                },
+                "4": {
+                    "label": "Neler aktarılır",
+                    "them": "Bir zamanlama aynı görevin içinde çalışıp onun dosyalarını ve sonuçlarını yeniden kullanabilir; bir Project ise dosyaları, skill'leri ve bağlayıcıları paylaşır.",
+                    "rerun": "Her ajan hafızasını, skill'lerini, dosyalarını ve kendi veritabanını korur; tüm ajanlar tek bir şirket beynini okur: teklifiniz, fiyatlarınız, üslubunuz."
+                },
+                "5": {
+                    "label": "Ekibiniz",
+                    "them": "Team planları aylık kullanıcı başına $20'dan başlar, kullanıcı başına 4,000 kredi, ortak havuzda.",
+                    "rerun": "Ekibinizi ek ücret ödemeden aynı çalışma alanına davet edin: herkes ajanları görür ve onlara yanıt verir."
+                }
+            }
+        },
+        "grok-bot": {
+            "subtitle": "xAI'dan hep açık ajanlar",
+            "pitch": "Grok Bot, SuperGrok ve Cursor planlarının içinde beta olarak gelir. Rerun ise kendine ait bir plan; seçtiğiniz modelle kurulmaya hazır ajanlar sunar.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Her Bot'a görevini anlatırsınız ya da bir iş akışını bir kez gösterirsiniz.",
+                    "rerun": "{templates}+ hazır ajan ya da sizin için bir uzmanın kurduğu ajan."
+                },
+                "getTheJobDone": {
+                    "them": "Bot'lar bir bulut bilgisayarında günün her saati çalışır ve onaya ihtiyaç duyduklarında size döner.",
+                    "rerun": "Siz yokken de çalışmaya devam eder: Autopilot, kurallarınız dahilinde ajanlarınıza yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Bot'lar birbirine mesaj atar ve bir genel koordinatör Bot uzmanları yönetir.",
+                    "rerun": "Ajanlarınız birbiriyle konuşur ve işi devreder: gelen kutusu ajanı yeni bir müşteri adayını satışa aktarır."
+                },
+                "collaboration": {
+                    "them": "Masaüstü ve iOS'ta, SuperGrok veya Cursor hesabınıza bağlı.",
+                    "rerun": "Tüm ekibinizi herhangi bir tarayıcıdan tek bir panoya davet edin."
+                },
+                "business": {
+                    "them": "Grok ve Cursor içinde genel bir asistan.",
+                    "rerun": "İşletmeler için tasarlandı: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, ayrıca sizinkini kuracak uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Yalnızca xAI modelleri; Bot'lar Grok ve Cursor uygulamalarının içinde yaşar.",
+                    "rerun": "Her ajan için Claude, GPT, Gemini veya Grok, artı {connectors}+ uygulama."
+                },
+                "pricing": {
+                    "them": "Yalnızca bir SuperGrok veya Cursor planıyla, hâlâ betada, kendi kullanım havuzuyla.",
+                    "rerun": "Kendine ait bir plan: güvenli bir makineyle aylık {price}, 5 gün ücretsiz."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Nasıl edinilir",
+                    "them": "Beta olarak her SuperGrok planına ve Cursor Pro, Pro+, Ultra ve Teams planlarına dahil. Enterprise için hâlâ bekleme listesi var.",
+                    "rerun": "Kendine ait bir plan: aylık {price}, 5 günlük ücretsiz denemeyle."
+                },
+                "2": {
+                    "label": "Nerede kullanılır",
+                    "them": "Masaüstü uygulaması ve iOS.",
+                    "rerun": "Herhangi bir tarayıcıda, tüm ekibinizin paylaştığı canlı bir panoda."
+                },
+                "3": {
+                    "label": "Model seçimi",
+                    "them": "Yalnızca xAI modelleri; Grok veya Cursor planınızdan ayrı, kendi kullanım havuzlarıyla.",
+                    "rerun": "Her ajan için sizin seçiminiz: plana dahil Rerun modeli, ChatGPT veya Claude planınız ya da kendi anahtarınız."
+                },
+                "4": {
+                    "label": "Siz yokken",
+                    "them": "Bir şey onayınızı gerektirdiğinde Bot'lar size döner.",
+                    "rerun": "Autopilot açıkken Rerun, kurallarınız dahilinde ajanlarınıza yanıt verir, harcama veya silme için asla; döndüğünüzde bir özet hazırdır."
+                },
+                "5": {
+                    "label": "Araçlarınıza erişim",
+                    "them": "Bot'lar uygulamalarınızda oturum açar ve API'si veya MCP'si olmayan siteleri bir insan gibi kullanır.",
+                    "rerun": "API'leri üzerinden {connectors}+ uygulama, artı API'si olmayan siteler için bir tarayıcı ve bir masaüstü."
+                },
+                "6": {
+                    "label": "Hazır ajanlar",
+                    "them": "Her Bot'a görevini sohbette anlatırsınız ya da bir iş akışını bir kez gösterirsiniz.",
+                    "rerun": "Kurabileceğiniz {templates}+ hazır ajan ya da bir uzmanın sizin için kurduğu bir ajan."
+                }
+            }
+        },
+        "paperclip": {
+            "subtitle": "Açık kaynak yapay zeka organizasyon şeması",
+            "pitch": "Paperclip, zaten çalıştırdığınız ajanlara kendi barındırdığınız bir sunucuda organizasyon şeması, bütçeler ve onay kapıları verir. Rerun ise size ajanların kendisini, bizim bakımını yaptığımız bir makinede zaten çalışır halde verir.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Tek bir komutla kurulur, ardından ilk işe alım çalışmadan önce aynı makineye Node 24 ve bir kodlama ajanı kurarsınız.",
+                    "rerun": "Kurulacak bir şey yok: hazır bir ajan seçin, Gmail'i tek tıkla bağlayın, çalışmaya başlasın."
+                },
+                "getTheJobDone": {
+                    "them": "Ajanlar kurduğunuz yerde çalışır, bu yüzden o makinenin açık, güncel ve yedekli kalması gerekir.",
+                    "rerun": "Siz yokken de çalışmaya devam eder: Autopilot, kurallarınız dahilinde ajanlarınıza yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Görev devriyle gerçek bir organizasyon şeması, her rol için bir çalışma ortamı sağladığınız anda.",
+                    "rerun": "Birbiriyle konuşan uzmanlardan oluşan bir ekip; her görev doğru ajana yönlendirilir."
+                },
+                "collaboration": {
+                    "them": "Ekip arkadaşlarının kimlik doğrulamalı moda ve bir LAN, VPN ya da açık internet üzerinden erişebilecekleri bir sunucuya ihtiyacı vardır.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Katalogdaki ekipler kodlama ajanları etrafında kurulmuş yönetim, mühendislik, tasarım ve içerik ekipleridir.",
+                    "rerun": "İşletmeler için tasarlandı: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, ayrıca sizinkini kuracak uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Claude veya ChatGPT oturumunuz dahil her harness ve her model, her biri sunucuya kurulmuş olarak.",
+                    "rerun": "Her ajan için istediğiniz model ya da ChatGPT veya Claude planınız, tarayıcıdan bağlanan {connectors}+ uygulama."
+                },
+                "pricing": {
+                    "them": "Ücretsiz ve MIT lisanslı, ardından model faturası, sunucu ve bakım gelir: kendi hızlı başlangıç kılavuzları aktif bir şirket için ayda $20 ile $100 arası bütçe öngörür.",
+                    "rerun": "Aylık {price}: güvenli bir makine, sınırsız ajan ve model kredisi dahil."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Ajanın kendisi",
+                    "them": "Paperclip işçi değil yöneticidir: her rol için sunucusuna bir harness kurarsınız (Claude Code, Codex veya Cursor) ve ona bir anahtar ya da oturum verirsiniz.",
+                    "rerun": "Ajan ürünle birlikte gelir. Onu tarayıcıda oluşturur ve modelini seçersiniz ya da zaten ödediğiniz Claude veya ChatGPT planıyla oturum açtırırsınız."
+                },
+                "2": {
+                    "label": "Nerede çalışır",
+                    "them": "Kurduğunuz makinede. Ajanları başka bir yerde çalıştırmak, bir sandbox sağlayıcısını getirip ona ödeme yapmak demektir: E2B, Modal, Daytona, Cloudflare ya da kendi Kubernetes'iniz.",
+                    "rerun": "Çalışma alanı başına, sizin için açık ve güncel tutulan, tarayıcısı, kabuğu ve kendi veritabanları olan özel bir sanal makine."
+                },
+                "3": {
+                    "label": "Başlangıç",
+                    "them": "Boş bir şirket: bir CEO işe alırsınız, yazdığı stratejiyi onaylarsınız ve oluşturduğu görevler panoya düşer. Hazır ekipler yönetim, mühendislik, tasarım ve içeriktir.",
+                    "rerun": "Satış, gelen kutusu, faturalar ve raporlama için kurabileceğiniz {templates}+ hazır ajan ya da sizinkini kurup size teslim eden bir uzman."
+                },
+                "4": {
+                    "label": "Ekibiniz",
+                    "them": "Çok kullanıcılı giriş, örneği kimlik doğrulamalı moda geçirmek ve ekip arkadaşlarınızın erişebileceği bir yere, bir LAN, VPN ya da açık internete koymak demektir.",
+                    "rerun": "Bir ekip arkadaşınızı e-postayla davet edin. Aynı panoyu kendi tarayıcısında açar ve soru soran her ajana yanıt verebilir."
+                },
+                "5": {
+                    "label": "Uygulamaları bağlamak",
+                    "them": "62 bağlayıcı ve bazıları bilerek yarıda kalır: Gmail bağlayıcıları okur ve taslak oluşturur, gönderme kapalıdır, taslağı Gmail'den bir insan gönderir.",
+                    "rerun": "Tek bir Google girişiyle ajan okur, etiketler, yanıtlar ve gönderir. Diğer {connectors}+ uygulama aynı ekrandan; oturum açarak, anahtarla ya da herhangi bir MCP sunucusu üzerinden bağlanır."
+                },
+                "6": {
+                    "label": "Ne ödersiniz",
+                    "them": "Yazılım ücretsizdir. Model çağrılarını ödersiniz; kendi hızlı başlangıç kılavuzları aktif bir şirket için ayda $20 ile $100 arası bütçe öngörür, buna sunucu, veritabanı ve neredeyse her hafta uygulanacak bir sürüm eklenir.",
+                    "rerun": "Her şey dahil aylık {price}: makine, sınırsız ajan, model kredisi ve tüm ekibiniz; çalıştırmalar asla sayılmaz."
+                }
+            }
+        },
+        "hermes": {
+            "subtitle": "Kendini geliştiren açık kaynak ajan",
+            "pitch": "Hermes, kurup çalıştırdığınız ya da günlük ücretle Hermes Cloud'da barındırdığınız tek bir ajandır. Rerun ise size işi zaten yapan bir ajan ekibini, plana dahil tek bir makinede verir.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Bir masaüstü uygulaması ya da terminal kurulumu; ardından her aracı ve kanalı bağlamak size kalır.",
+                    "rerun": "Kurulacak bir şey yok: hazır bir ajan seçin, Gmail'i tek tıkla bağlayın, çalışmaya başlasın."
+                },
+                "getTheJobDone": {
+                    "them": "Kendi sunucunuzda, makineniz açık kaldığı sürece çalışır; Hermes Cloud'da ajan başına bir örnek açık kalır ve günlük faturalanır.",
+                    "rerun": "Bizim bakımını yaptığımız bir makinede 7/24 çalışır, siz yokken de Autopilot ona yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Kendi alt ajanlarını başlatan tek bir ajan.",
+                    "rerun": "Ajanlarınız birbiriyle konuşur ve işi devreder: gelen kutusu ajanı yeni bir müşteri adayını satışa aktarır."
+                },
+                "collaboration": {
+                    "them": "Kişi başına bir ajan; Telegram, Discord, Slack veya e-postayla erişilir.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Genel amaçlı bir ajan: kutudan çıktığı haliyle hiçbir iş görevini bilmez.",
+                    "rerun": "İşletmeler için tasarlandı: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, ayrıca sizinkini kuracak uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Siz yapılandırdıktan sonra her model, her MCP sunucusu ve beş sandbox.",
+                    "rerun": "İstediğiniz model ya da ChatGPT veya Claude planınız, tarayıcıdan {connectors}+ iş uygulaması."
+                },
+                "pricing": {
+                    "them": "Kendi sunucunuzda ücretsiz; Hermes Cloud'da örnek günlük faturalanır, çıkarım ve araçlar da üstüne eklenir.",
+                    "rerun": "Aylık {price}: güvenli bir makine, sınırsız ajan ve model kredisi dahil."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Nerede çalışır",
+                    "them": "Bilgisayarınız veya sunucunuz, seçebileceğiniz beş altyapıdan biriyle, ya da her ajanın kendine ayrılmış bir örnek aldığı Hermes Cloud.",
+                    "rerun": "Çalışma alanı başına tek bir özel makine tüm ajanlarınızı çalıştırır, plana dahildir."
+                },
+                "2": {
+                    "label": "Fiyat",
+                    "them": "Kendi sunucunuzda ücretsiz. Hermes Cloud dağıtımdan önce $2 kredi ister, ardından örneği saniye hassasiyetinde ölçerek günlük faturalar; çıkarım ve araçlar üstüne eklenir. Nous Portal planları aylık $20, $100 veya $200 kredidir.",
+                    "rerun": "Güvenli bir makine, sınırsız ajan ve model kredisi için aylık {price}."
+                },
+                "3": {
+                    "label": "Uygulamaları bağlamak",
+                    "them": "Sizin yapılandırıp filtrelediğiniz herhangi bir MCP sunucusu.",
+                    "rerun": "Rehberli oturum açmayla {connectors}+ uygulama, artı herhangi bir MCP sunucusu."
+                },
+                "4": {
+                    "label": "Çalışmasını nereden izlersiniz",
+                    "them": "Telegram, Discord, Slack, WhatsApp, Signal, e-posta veya CLI.",
+                    "rerun": "Her çalıştırmanın, araç çağrısının ve yeni hafızanın sergilendiği, her ekip arkadaşının ajana yanıt verebildiği tarayıcıdaki bir pano."
+                },
+                "5": {
+                    "label": "Başlangıç noktası",
+                    "them": "İlerledikçe kendi skill'lerini yazan boş bir ajan.",
+                    "rerun": "Kurabileceğiniz {templates}+ hazır ajan ya da bir uzmanın sizin için kurduğu bir ajan."
+                }
+            }
+        },
+        "openclaw": {
+            "subtitle": "Açık kaynak kişisel yapay zeka asistanı",
+            "pitch": "OpenClaw, kurduğunuz, barındırdığınız ve güvenliğini sağladığınız bir asistandır; vakfı hiçbir şey satmaz. Rerun ajanları aynı işleri sizin için çalıştırdığımız yalıtılmış bir makineden yapar.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Onu kurarsınız, bir makineyi açık tutarsınız, modeli ve kanalları bağlarsınız.",
+                    "rerun": "Kurulacak bir şey yok: hazır bir ajan seçin, Gmail'i tek tıkla bağlayın, çalışmaya başlasın."
+                },
+                "getTheJobDone": {
+                    "them": "Bir sunucuda gateway çalıştırmadığınız sürece bilgisayarınız kapanınca durur.",
+                    "rerun": "Kendine ait yalıtılmış bir makinede 7/24 çalışır, siz yokken de Autopilot ona yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Varsayılan olarak tek bir kişisel asistan; paylaşılan bir gateway birkaç kişiyi ve oturumu tek bir yerde toplar.",
+                    "rerun": "Ajanlarınız birbiriyle konuşur ve işi devreder: gelen kutusu ajanı yeni bir müşteri adayını satışa aktarır."
+                },
+                "collaboration": {
+                    "them": "Bir ekip, birinin barındırdığı tek bir gateway'i paylaşır ve o gateway tek bir güven alanıdır.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Her şey için kişisel bir asistan, iş görevleri etrafında kurulmamış.",
+                    "rerun": "İşletmeler için tasarlandı: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, ayrıca sizinkini kuracak uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Çok açık, yerel modeller dahil; her skill'i ve eklentiyi kurmak size kalır.",
+                    "rerun": "ChatGPT veya Claude planınız ya da istediğiniz model, tarayıcıdan {connectors}+ iş uygulaması."
+                },
+                "pricing": {
+                    "them": "Ücretsiz, güvenliğini siz sağlarsınız: sandbox ve komut onayları varsayılan olarak kapalıdır.",
+                    "rerun": "Aylık {price}: güvenli bir makine, sınırsız ajan ve model kredisi dahil."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Nerede çalışır",
+                    "them": "Açık tuttuğunuz bir makinede, bilgisayarınızda ya da bir sunucuda. Vakıf “hiçbir şey satmaz: ücretli katman yok, barındırılan hizmet yok, token yok”.",
+                    "rerun": "Bulutta, sizin için açık ve güncel tutulan özel, yalıtılmış bir makinede."
+                },
+                "2": {
+                    "label": "Yalıtım",
+                    "them": "Sandbox ve komut onayları birlikte gelir ama varsayılan olarak kapalıdır; siz sıkılaştırana kadar araçları, çalıştığı makinenin dosyalarına ve kabuğuna erişir.",
+                    "rerun": "Her çalışma alanı, dizüstü bilgisayarınızdan ve diğer müşterilerden ayrı, kendi sanal makinesini alır."
+                },
+                "3": {
+                    "label": "Bakım",
+                    "them": "Güncellemeleri, çalışma süresini ve güvenlik bildirimlerini takip etmek size kalır; sapmaları yakalamak için bir güvenlik denetimi komutu vardır.",
+                    "rerun": "Yamalanacak, yükseltilecek ya da açık tutulacak bir şey yok."
+                },
+                "4": {
+                    "label": "Ekibiniz",
+                    "them": "Varsayılan olarak kişisel. Bir ekip, birinin barındırdığı bir gateway'i paylaşır ve bir gateway tek bir güven alanıdır: birbirine güvenmemesi gereken kişilerin her birine ayrı bir tane gerekir.",
+                    "rerun": "Tarayıcıda bir çalışma alanı: ekip arkadaşlarınızı ek ücret ödemeden davet edin, ajanları paylaşın, sorularına yanıt verin."
+                },
+                "5": {
+                    "label": "Uygulamalar",
+                    "them": "Sizin kurup yapılandırdığınız skill'ler ve eklentiler.",
+                    "rerun": "Tarayıcıdan {connectors}+ uygulama, artı herhangi bir MCP sunucusu."
+                }
+            }
+        },
+        "zapier": {
+            "subtitle": "Uygulamadan uygulamaya otomasyon",
+            "pitch": "Bir Zap, verileri uygulamalar arasında taşır. Bir Rerun ajanı ise gelen kutusunu düzenler, müşteri adayına yanıt verir ve faturayı takip eder.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Tetikleyiciyi, ardından her eylemi ve alan eşlemesini siz seçersiniz ya da Copilot'a taslağını yazdırıp sonrasında bakımını siz yaparsınız.",
+                    "rerun": "İşi tek cümleyle anlatın ve uygulamalarınızı bağlayın. Kurulacak bir akış yok."
+                },
+                "getTheJobDone": {
+                    "them": "Hep aynı adımları çalıştırır: yeni bir e-posta biçimi ya da yeniden adlandırılmış bir alan başka bir yol gerektirir.",
+                    "rerun": "Kimsenin öngörmediği durumları ele alır, emin olmadığında sorar ve yapılanı raporlar."
+                },
+                "agentTeamwork": {
+                    "them": "Zap'ler birbiriyle konuşmaz: aralarını Tables veya alt Zap'lerle siz bağlarsınız.",
+                    "rerun": "Ajanlarınız birbiriyle kendiliğinden konuşur ve tek bir veritabanını paylaşır. Bağlanacak bir şey yok."
+                },
+                "collaboration": {
+                    "them": "Paylaşılan Zap'ler Team planıyla başlar: 2,000 görev için aylık $69.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Verileri uygulamalar arasında taşır; onlarla ne yapılacağı sizin çizdiğiniz Zap'tir.",
+                    "rerun": "İş görevleri için tasarlanmış ajanlar: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, her düzeltmeden öğrenir."
+                },
+                "flexibility": {
+                    "them": "10,000+ uygulama ve her yeni durum kendi yolunu gerektirir.",
+                    "rerun": "Yeni durumları ele alır, kendi makinesinde betik ve tarayıcı çalıştırır, istediğiniz modelle."
+                },
+                "pricing": {
+                    "them": "Görev başına faturalanır: $19.99'a ayda 750 görev; yapay zeka, kod ve MCP çağrıları aynı havuzdan düşer.",
+                    "rerun": "Aylık {price}, çalıştırmalar asla sayılmaz: güvenli bir makine, sınırsız ajan ve model kredisi."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Kurulum",
+                    "them": "Bir tetikleyici seçin, ardından her adımı ekleyip eşleyin. Copilot Zap'in taslağını çıkarabilir, sonrasında her adımın bakımını siz yaparsınız.",
+                    "rerun": "İşi “her sabah gelen kutumu düzenle” gibi tek bir cümleyle anlatın. Ajan adımları kendisi planlar."
+                },
+                "2": {
+                    "label": "Görmediği bir durum",
+                    "them": "Zap her seferinde aynı adımları çalıştırır, bu yüzden yeni bir tür e-posta veya kayıt başka bir yol ya da filtre demektir. Bir Zapier Agent, bir çalıştırmaya izin verilen 40 etkinlik içinde kendi kararını verir.",
+                    "rerun": "Ajan her durumu okur, neye ihtiyacı olduğuna karar verir ve emin olmadığında size sorar."
+                },
+                "3": {
+                    "label": "Dosyalar, kod, bir tarayıcı",
+                    "them": "Kod, Zap'in içinde bir adım olarak çalışır: Pro'da adım başına 30 saniye dahildir, ardından her ek 30 saniyelik blok bir görevdir. Hiçbir makine çalıştırmalar arasında dosya veya tarayıcı tutmaz.",
+                    "rerun": "Çalışma alanınızın özel makinesi: ajanlar orada dosya yazar, betik çalıştırır, tarayıcı kullanır ve çalıştırmalar arasında veritabanlarını korur."
+                },
+                "4": {
+                    "label": "Neyi hatırlar",
+                    "them": "Her çalıştırma sıfırdan başlar. Aktarılacak her şey sizin kurduğunuz bir Table'a veya depolama adımına gider.",
+                    "rerun": "Düzelttiğiniz şeyi not eder, dosyalarını ve tablolarını korur; böylece 50. çalıştırma, 1. çalıştırmanın öğrendiğini bilir."
+                },
+                "5": {
+                    "label": "Arkasındaki yapay zeka",
+                    "them": "Yapay zeka adımları model katmanına göre görev olarak faturalanır; Zapier'in kendi örneğine göre tek bir MCP araç çağrısı 2 görevdir.",
+                    "rerun": "Plana dahil Rerun modeliyle çalıştırın, zaten ödediğiniz ChatGPT veya Claude planıyla oturum açın ya da bir API anahtarı getirin."
+                },
+                "6": {
+                    "label": "Siz yokken",
+                    "them": "Bir Human in the Loop adımı, bir inceleyici yanıt verene ya da süre dolana kadar Zap'i duraklatır.",
+                    "rerun": "Autopilot açıkken Rerun, kurallarınız dahilinde ajanlarınıza yanıt verir, harcama veya silme için asla; döndüğünüzde bir özet hazırdır."
+                },
+                "7": {
+                    "label": "Çalıştırmanın maliyeti",
+                    "them": "Her eylem adımı bir görevdir: yıllık faturalandırmayla $19.99'a ayda 750 görev. Zapier Agents ayrıca, etkinlik olarak faturalanır, Pro'da ayda 1,500; bir çalıştırma 40'ta durur ve size sorar.",
+                    "rerun": "Sınırsız ajan için aylık {price}. Rerun ne çalıştırmaları ne de adımları sayar."
+                }
+            }
+        },
+        "make": {
+            "subtitle": "Görsel otomasyon senaryoları",
+            "pitch": "Bir Make senaryosu verileri modülden modüle aktarır. Bir Rerun ajanı ise müşteri adayına yanıt verir, faturayı takip eder ve düzeltmelerinizden öğrenir.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Her modülü bir tuvale yerleştirir ve aralarındaki verileri eşlersiniz ya da ilkinin taslağını yapay zeka asistanına yazdırırsınız.",
+                    "rerun": "İşi tek cümleyle anlatın ve uygulamalarınızı bağlayın. Kurulacak bir akış yok."
+                },
+                "getTheJobDone": {
+                    "them": "Rotalarını izler: yeni bir girdi türü başka bir router gerektirir.",
+                    "rerun": "Kimsenin öngörmediği durumları ele alır, emin olmadığında sorar ve yapılanı raporlar."
+                },
+                "agentTeamwork": {
+                    "them": "Senaryolar sizin tasarladığınız veri depolarını paylaşır; bir yapay zeka ajanı diğerini yalnızca sizin bağladığınız bir araç olarak çağırır.",
+                    "rerun": "Ajanlarınız birbiriyle kendiliğinden konuşur ve tek bir veritabanını paylaşır. Bağlanacak bir şey yok."
+                },
+                "collaboration": {
+                    "them": "Ekip rolleri Teams planıyla başlar.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Verileri uygulamalar arasında yönlendirir; kararlar yerleştirdiğiniz modüllerde kalır.",
+                    "rerun": "İş görevleri için tasarlanmış ajanlar: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, her düzeltmeden öğrenir."
+                },
+                "flexibility": {
+                    "them": "3,500+ uygulama ve her modül eyleminde bir kredi.",
+                    "rerun": "Yeni durumları ele alır, kendi makinesinde betik ve tarayıcı çalıştırır, istediğiniz modelle."
+                },
+                "pricing": {
+                    "them": "Modül eylemi başına bir kredi, bu yüzden döngüler birikir; yapay zeka ajanının sohbeti de kredi harcar.",
+                    "rerun": "Aylık {price}, çalıştırmalar asla sayılmaz: güvenli bir makine, sınırsız ajan ve model kredisi."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Kurulum",
+                    "them": "Her modülü bir tuvale yerleştirip aralarındaki verileri eşleyin ya da yapay zeka asistanına ilk senaryonun taslağını yazdırın; sonrasında bakımını siz yaparsınız.",
+                    "rerun": "Sonucu tek bir cümleyle anlatın ve uygulamalarınızı bağlayın. Ajan adımları kendisi planlar."
+                },
+                "2": {
+                    "label": "Görmediği bir durum",
+                    "them": "Senaryo rotalarını izler, bu yüzden yeni bir girdi türü başka bir router ya da filtre demektir. Yapay zeka ajanları araçlarını çalışma anında, etraflarına kurduğunuz senaryonun içinde seçer.",
+                    "rerun": "Ajan her girdiyi okur, ne yapacağına karar verir ve emin olmadığında size sorar."
+                },
+                "3": {
+                    "label": "Dosyalar, kod, bir tarayıcı",
+                    "them": "Kod bir modülün içinde çalışır ve hiçbir şey çalıştırmalar arasında dosya veya tarayıcı tutmaz.",
+                    "rerun": "Çalışma alanınızın özel makinesi: dosyalar, betikler, bir tarayıcı ve veritabanları, hepsi çalıştırmalar arasında korunur."
+                },
+                "4": {
+                    "label": "Neyi hatırlar",
+                    "them": "Bir veri deposu tasarlayıp onu geri okumadığınız sürece hiçbir şey aktarılmaz.",
+                    "rerun": "Düzelttiğiniz şeyi not eder, kendi dosyalarını ve tablolarını çalıştırmalar arasında korur."
+                },
+                "5": {
+                    "label": "Arkasındaki yapay zeka",
+                    "them": "Make'in AI Provider'ı, token'lara göre değişen kredilerle faturalanır, ya da ücretli bir planda işlem başına bir krediyle kendi OpenAI veya Anthropic anahtarınız.",
+                    "rerun": "Plana dahil Rerun modeliyle çalıştırın, zaten ödediğiniz ChatGPT veya Claude planıyla oturum açın ya da bir API anahtarı getirin."
+                },
+                "6": {
+                    "label": "Çalıştırmanın maliyeti",
+                    "them": "Varsayılan olarak modül eylemi başına bir kredi; bazı özellikler token, dosya boyutu veya çalışma süresine göre dinamik faturalanır; ücretsiz planda ayda 1,000 kredi.",
+                    "rerun": "Sınırsız ajan için aylık {price}. Rerun ne çalıştırmaları ne de adımları sayar."
+                }
+            }
+        },
+        "n8n": {
+            "subtitle": "İş akışı otomasyonu, kendi sunucunuzda veya bulutta",
+            "pitch": "n8n mühendislere kuracakları ve barındıracakları iş akışları verir. Rerun ise ekibinize, barındıracak hiçbir şey olmadan müşteri adaylarına yanıt veren ve faturaları takip eden ajanlar verir.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Düğümleri ifadeler veya kodla bağlarsınız, ardından kendiniz barındırır ya da n8n Cloud'a ödeme yaparsınız.",
+                    "rerun": "İşi sade bir dille anlatın. Bağlanacak, barındırılacak ya da güvenliği sağlanacak bir şey yok."
+                },
+                "getTheJobDone": {
+                    "them": "Kurduğunuz dalları izler; AI Agent düğümü yalnızca kendi adımı içinde karar verir.",
+                    "rerun": "Yeni durumları ele alır, emin olmadığında sorar; siz yokken de Autopilot ona yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "İş akışları yalnızca sizin bağladığınız alt iş akışları üzerinden konuşur.",
+                    "rerun": "Ajanlarınız birbiriyle kendiliğinden konuşur ve tek bir veritabanını paylaşır. Bağlanacak bir şey yok."
+                },
+                "collaboration": {
+                    "them": "Sınırsız kullanıcı; Starter'da bir, Pro'da üç paylaşılan proje.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Mühendisler için bir iş akışı motoru: iş, sizin çizdiğiniz graftır.",
+                    "rerun": "İş görevleri için tasarlanmış ajanlar: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan, her düzeltmeden öğrenir."
+                },
+                "flexibility": {
+                    "them": "Düğümleri yazdıktan sonra her API ve her kod.",
+                    "rerun": "İstediğiniz model, kendi yapay zeka planınız, {connectors}+ uygulama, betikler ve bir tarayıcı."
+                },
+                "pricing": {
+                    "them": "n8n Cloud yürütmeleri sayar: Starter'da €20'ya ayda 2,500 yürütme.",
+                    "rerun": "Aylık {price}, çalıştırmalar asla sayılmaz: güvenli bir makine, sınırsız ajan ve model kredisi."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Kurulum",
+                    "them": "Düğümleri bir tuval üzerinde, çoğu zaman JSON ifadeleri veya kodla bağlayın. AI Workflow Builder ilk sürümün taslağını çıkarabilir.",
+                    "rerun": "İşi sade bir dille anlatın. Ajan adımları planlar ve kendi zamanlamasını kurar."
+                },
+                "2": {
+                    "label": "Barındırma",
+                    "them": "Kendi sunucunuzda barındırıp yükseltmeleri, yedekleri ve çalışma süresini üstlenin ya da n8n Cloud'a ödeme yapın. Business planı yalnızca kendi sunucunuzda çalışır.",
+                    "rerun": "Sizin için, güncel tutulan özel ve yalıtılmış bir makinede barındırılır."
+                },
+                "3": {
+                    "label": "Görmediği bir durum",
+                    "them": "İş akışı düğümlerini izler. AI Agent düğümü yalnızca onu yerleştirdiğiniz adımın içinde karar verir.",
+                    "rerun": "İşin tamamı ajanındır: her durumu okur, araçlarını seçer ve emin olmadığında size sorar."
+                },
+                "4": {
+                    "label": "Siz yokken",
+                    "them": "Bir inceleme adımı, araç çalışmadan önce iş akışını duraklatır ve biri yanıt verene kadar Slack, Gmail, Teams veya n8n sohbetinde bekler.",
+                    "rerun": "Autopilot açıkken Rerun, kurallarınız dahilinde ajanlarınıza yanıt verir, harcama veya silme için asla; döndüğünüzde bir özet hazırdır."
+                },
+                "5": {
+                    "label": "Neyi hatırlar",
+                    "them": "Hafıza, sizin yapılandırdığınız bir veritabanına dayanan, eklediğiniz bir düğümdür.",
+                    "rerun": "Hafıza, dosyalar ve veritabanları kendi makinesinde yaşar; her düzeltme kalıcı olur."
+                },
+                "6": {
+                    "label": "Çalıştırmanın maliyeti",
+                    "them": "n8n Cloud yürütmeleri sayar: Starter'da yıllık faturalandırmayla €20'ya ayda 2,500, Pro'da €50'ye 10,000. Kendi sunucunuzda barındırmak ücretsizdir, sunucu sizindir.",
+                    "rerun": "Makine dahil aylık {price}. Rerun ne çalıştırmaları ne de adımları sayar."
+                }
+            }
+        },
+        "lindy": {
+            "subtitle": "Ekibiniz ve araçlarınız için yapay zeka asistanı",
+            "pitch": "Lindy her aktif kullanıcıyı, ardından her görevi kredi olarak faturalar. Rerun aynı işleri tek bir sabit fiyatla, zaten ödediğiniz yapay zekayla yürütür.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Slack etrafında kurulu: kimse başlamadan önce bir yöneticinin onu bağlaması gerekir.",
+                    "rerun": "Rerun'ın copilot'u ekibinizi web sitenizden planlar ya da {templates}+ ajandan birini kurun."
+                },
+                "getTheJobDone": {
+                    "them": "Dış etkisi olan eylemler siz onaylayana kadar bekler.",
+                    "rerun": "Siz yokken de çalışmaya devam eder: Autopilot, kurallarınız dahilinde ajanlarınıza yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Tek bir asistan herkes için her şeyi yapar.",
+                    "rerun": "Birbiriyle konuşan uzmanlardan oluşan bir ekip; her görev doğru ajana yönlendirilir."
+                },
+                "collaboration": {
+                    "them": "Çalışma alanındaki her aktif kullanıcı, aylık $49.99'dan başlayarak faturalanır.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "40+ yerleşik skill, her şirket için aynı.",
+                    "rerun": "Sektörünüz ve işleriniz için tasarlanmış {templates}+ ajan, ayrıca sizinkini kuracak uzmanlar."
+                },
+                "flexibility": {
+                    "them": "1,500+ entegrasyon ve her model, tanesi $0.01 olan kredilerle faturalanır.",
+                    "rerun": "Kendi ChatGPT veya Claude planınızla, kendi anahtarınızla ya da dahil olan Rerun modeliyle çalıştırın."
+                },
+                "pricing": {
+                    "them": "5,000 kredi için aktif kullanıcı başına $49.99; krediler bitince Lindy bir sonraki döneme kadar durur.",
+                    "rerun": "Sınırsız ajan ve güvenli bir makine için aylık {price}. Çalıştırmalar asla sayılmaz."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Üç kişilik bir ekip için fiyat",
+                    "them": "Her aktif kullanıcı faturalanır, her biri 5,000 kredi için aylık $49.99'dan başlar; yani üçünüz için yaklaşık $150.",
+                    "rerun": "Üçünüz için sınırsız ajanla aylık {price}."
+                },
+                "2": {
+                    "label": "Kullanım nasıl faturalanır",
+                    "them": "Bir kredi $0.01'dir ve her görev kredi harcar: gündelik bir istek için 2 ile 250, büyük bir proje için 1,000 ile 2,500. Krediler bitince Lindy bir sonraki döneme kadar durur.",
+                    "rerun": "Rerun çalıştırmaları asla saymaz; kendi yapay zeka planınız veya anahtarınızla çalışan ajanlar bütçe yüzünden asla durmaz."
+                },
+                "3": {
+                    "label": "Kendi yapay zekanızı getirmek",
+                    "them": "Modeli siz seçersiniz, Lindy her birini kendi kredileriyle faturalar. Kendi anahtarınızı veya yapay zeka planınızı getirmek belgelenmemiştir.",
+                    "rerun": "Plana dahil Rerun modeliyle çalıştırın, zaten ödediğiniz ChatGPT veya Claude planıyla oturum açın ya da bir API anahtarı getirin."
+                },
+                "4": {
+                    "label": "Siz yokken",
+                    "them": "Dış etkisi olan eylemler, Slack'te entegrasyon başına bir güvenlik kuralıyla onayınızı bekler.",
+                    "rerun": "Autopilot açıkken Rerun, kurallarınız dahilinde ajanlarınıza yanıt verir, harcama veya silme için asla; döndüğünüzde bir özet hazırdır."
+                },
+                "5": {
+                    "label": "Hazır ajanlar",
+                    "them": "Başlangıç için 40+ yerleşik skill.",
+                    "rerun": "{templates}+ hazır ajan, ayrıca sizinkini kurup size teslim eden uzmanlar."
+                }
+            }
+        },
+        "twin": {
+            "subtitle": "Tek bir operatör ve müşterileri için yapay zeka ajanları",
+            "pitch": "Twin'in de sabit bir fiyatı var, ama tarayıcı ajanı ve müşteri adayı verileri $149 planında; davet ettiğiniz kişiler de ekip arkadaşı değil, müşteridir.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Twin ile sohbet edersiniz, işi o kurar; ilk görev dakikalar içinde biter.",
+                    "rerun": "Rerun'ın copilot'u ekibinizi web sitenizden planlar ya da {templates}+ ajandan birini kurun."
+                },
+                "getTheJobDone": {
+                    "them": "Taslaklar bir inceleme kuyruğunda bekler: sizsiz hiçbir şey gönderilmez.",
+                    "rerun": "Siz yokken de çalışmaya devam eder: Autopilot, kurallarınız dahilinde ajanlarınıza yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Her biri kendi işinde sınırsız ajan.",
+                    "rerun": "Ajanlarınız birbiriyle konuşur ve işi devreder: gelen kutusu ajanı yeni bir müşteri adayını satışa aktarır."
+                },
+                "collaboration": {
+                    "them": "Davet edilecek ekip arkadaşı yok: Plus ve Pro, her biri bir panele sahip en fazla 5 müşteri davet eder.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Müşteri adayı arama, erişim, içerik, reklam ve raporlama, sizin tarifinize göre kurulur.",
+                    "rerun": "{templates}+ hazır iş ajanı, ayrıca sizinkini kurup size teslim eden uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Modeli Twin seçer; kendi anahtarınızı veya yapay zeka planınızı getirme seçeneği sunulmaz.",
+                    "rerun": "Modeli siz seçin: ChatGPT veya Claude planınız, kendi anahtarınız ya da dahil olan Rerun modeli."
+                },
+                "pricing": {
+                    "them": "Aylık $29, tarayıcı ajanı ve müşteri adayı verileri için $149.",
+                    "rerun": "Aylık {price}: güvenli bir makine, sınırsız ajan ve model kredisi dahil."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Giriş planı neler sunar",
+                    "them": "Aylık $29 ile sınırsız ajan, zamanlanmış çalıştırmalar ve webhook'lar alırsınız, uygulamalarınız da bağlanır. Tarayıcı ajanı, müşteri adayı arama ve derin araştırma $149'dan başlar.",
+                    "rerun": "Aylık {price}, ilk plandan itibaren her ajana kabuğu, tarayıcısı ve bir insan gibi kullandığı masaüstü olan özel bir makine verir."
+                },
+                "2": {
+                    "label": "Ekibiniz",
+                    "them": "Hiçbir şey kullanıcı başına faturalanmaz, ama ekip arkadaşı davet etmenin de yolu yoktur: her biri kendi paneline sahip en fazla 5 müşteri davet edersiniz.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin. Herkes ajanların çalışmasını izler ve durup soru soran bir ajana her ekip arkadaşı yanıt verebilir."
+                },
+                "3": {
+                    "label": "Kendi yapay zekanızı getirmek",
+                    "them": "Twin her görevi kendi seçtiği modele yönlendirir; hiçbir plan kendi anahtarınızı veya yapay zeka aboneliğinizi kullanmanıza izin vermez.",
+                    "rerun": "Her ajan için siz seçersiniz: plana dahil Rerun modeli, ChatGPT veya Claude planınız ya da kendi anahtarınız."
+                },
+                "4": {
+                    "label": "Müşteri adayı bulmak",
+                    "them": "Müşteri adayı arama, veri zenginleştirme ve yerel işletme haritalama $149 planıyla gelir.",
+                    "rerun": "Doğrulanmış e-postalar, telefon numaraları, Google Maps kayıtları ve arama sıralamaları üründe hazır; ajan sorgunun maliyetini hesaplar ve tek kuruş harcamadan önce sorar."
+                },
+                "5": {
+                    "label": "Neyi hatırlar",
+                    "them": "Twin, taslaklarında yaptığınız düzenlemelerden öğrenir.",
+                    "rerun": "Hafıza, skill'ler, dosyalar, kendi veritabanı ve çalışma alanının paylaştığı veritabanı, artı her ajanın okuduğu bir şirket beyni: teklifiniz, fiyatlarınız, üslubunuz."
+                }
+            }
+        },
+        "dust": {
+            "subtitle": "Şirket bilginizle çalışan yapay zeka ajanları",
+            "pitch": "Dust, şirketinizin belgelerinden yanıt verir ve kullanıcı başına fiyatlanır. Rerun ajanları ise tüm ekip için tekrarlayan işleri tek bir fiyatla yapar.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Ajanları onun oluşturucusunda kurarsınız; self-servis plan en fazla 3 veri kaynağı bağlar.",
+                    "rerun": "Hazır bir ajan kurun ve {connectors}+ uygulamadan istediğinizi tarayıcıdan bağlayın."
+                },
+                "getTheJobDone": {
+                    "them": "Zamanlamalar ve webhook'lar bir ajanı başlatır; bir webhook günde en fazla 42 kez tetiklenir.",
+                    "rerun": "Kendi makinesinde 7/24 çalışır, siz yokken de Autopilot ona yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Oluşturucusunda sizin tasarladığınız çok ajanlı iş akışları.",
+                    "rerun": "Ajanlarınız birbiriyle konuşur ve işi devreder: gelen kutusu ajanı yeni bir müşteri adayını satışa aktarır."
+                },
+                "collaboration": {
+                    "them": "Bir tetikleyici onu oluşturan kişiye aittir ve çalıştırmaları o kişinin geçmişine düşer.",
+                    "rerun": "Tüm ekibinizi davet edin: herkes her çalıştırmayı görür ve ajana yanıt verebilir."
+                },
+                "business": {
+                    "them": "Öncelikle şirket belgelerinden yanıt vermek için tasarlandı.",
+                    "rerun": "İşi yürütmek için tasarlandı: satış, gelen kutusu, faturalar ve raporlama için {templates}+ ajan."
+                },
+                "flexibility": {
+                    "them": "Self-servis planda yalnızca 3 bağlayıcı ve 5 uzak MCP sunucusu.",
+                    "rerun": "{connectors}+ uygulama ve herhangi bir MCP sunucusu, isterseniz kendi yapay zeka planınızla."
+                },
+                "pricing": {
+                    "them": "Her biri 8,000 krediyle kullanıcı başına €24 ile €30 arası, artı otomatik kullanım için kredi başına $0.01.",
+                    "rerun": "Sınırsız ajan ve güvenli bir makine için aylık {price}. Otomasyonlar ek ücret gerektirmez."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Üç kişilik bir ekip için fiyat",
+                    "them": "Yıllık faturalandırmayla aylık kullanıcı başına €24, aylık ödemede €30: KDV hariç €72 ile €90 arası.",
+                    "rerun": "Üçünüz için sınırsız ajanla aylık {price}."
+                },
+                "2": {
+                    "label": "Ekip arkadaşı eklemek",
+                    "them": "Onu kullanan herkes, kendi kredi hakkı olan ücretli bir kullanıcıdır ve krediler bir sonraki aya devretmez.",
+                    "rerun": "Kullanıcılar ücretsiz ve sınırsızdır: bir ajanın e-postasını onaylayan ekip arkadaşının hiçbir maliyeti yoktur."
+                },
+                "3": {
+                    "label": "Otomatik kullanım",
+                    "them": "Bir API çağrısı veya tetikleyici çalıştırması gibi kimsenin yazmadığı kullanım, sizin ya da çalışma alanının kredilerinden kredi başına $0.01 olarak faturalanır.",
+                    "rerun": "Zamanlanmış ve webhook çalıştırmaları Rerun tarafında ek ücret gerektirmez."
+                },
+                "4": {
+                    "label": "Self-servis plandaki uygulamalar",
+                    "them": "En fazla 3 veri bağlayıcısı ve 5 uzak MCP sunucusu.",
+                    "rerun": "{connectors}+ uygulamanın tamamı ve herhangi bir MCP sunucusu, her planda."
+                },
+                "5": {
+                    "label": "Zamanlanmış çalıştırmalar",
+                    "them": "“Tetikleyiciler onları oluşturan üyeye aittir”: kişi onu bir Pod'a koymadıkça çalıştırma o kişinin geçmişine düşer; bir webhook tetikleyicisi günde en fazla 42 kez tetiklenir.",
+                    "rerun": "Her ajanın her rutini, çalışma alanının paylaştığı tek bir Routines listesinde bir sonraki çalıştırmasıyla birlikte durur ve her ekip arkadaşı ajana yanıt verebilir."
+                },
+                "6": {
+                    "label": "Arkasındaki yapay zeka",
+                    "them": "20+ model, mesaj başına Dust kredisiyle faturalanır.",
+                    "rerun": "Plana dahil Rerun modeliyle çalıştırın, zaten ödediğiniz ChatGPT veya Claude planıyla oturum açın ya da bir API anahtarı getirin."
+                }
+            }
+        },
+        "squad": {
+            "subtitle": "Kendi yapay zeka planınızla çalışan ekip arkadaşları",
+            "pitch": "Squad, getirdiğiniz yapay zeka planının üstüne aylık $99'dır. Rerun daha ucuzdur, model kredisi içerir ve kurulmaya hazır ajanları vardır.",
+            "scorecard": {
+                "easeOfUse": {
+                    "them": "Bir yapay zeka Chief of Staff ekibinizi tasarlar; ilk ekip arkadaşı çalışmadan önce bir yapay zeka planı satın alırsınız.",
+                    "rerun": "Yapay zeka dahil {templates}+ hazır ajan ya da sizinkini bir uzman kurar."
+                },
+                "getTheJobDone": {
+                    "them": "Tek dokunuşla onaylar, siz ilgilenene kadar kuyrukta bekler.",
+                    "rerun": "Siz yokken de çalışmaya devam eder: Autopilot, kurallarınız dahilinde ajanlarınıza yanıt verir."
+                },
+                "agentTeamwork": {
+                    "them": "Ekip arkadaşları tek bir hafızayı, bir belge kitaplığını ve bir gizli bilgi kasasını paylaşır.",
+                    "rerun": "Ajanlarınız birbiriyle konuşur ve işi devreder: gelen kutusu ajanı yeni bir müşteri adayını satışa aktarır."
+                },
+                "collaboration": {
+                    "them": "Ekibiniz için tek bir çalışma alanı, ekip arkadaşı başına aylık $10'a bir e-posta gelen kutusu.",
+                    "rerun": "Tüm ekibinizi ek ücret ödemeden davet edin: herkes ajanları çalışırken görür ve onlara yanıt verebilir."
+                },
+                "business": {
+                    "them": "Hazır ajan yok: her birine yeni bir çalışan gibi görevini anlatırsınız.",
+                    "rerun": "{templates}+ hazır iş ajanı, ayrıca sizinkini kurup size teslim eden uzmanlar."
+                },
+                "flexibility": {
+                    "them": "Yalnızca getirdiğiniz yapay zeka planlarıyla, 70+ entegrasyonla çalışır.",
+                    "rerun": "Sizin yapay zeka planınız ya da plana dahil bizimki, tarayıcıdan {connectors}+ uygulama."
+                },
+                "pricing": {
+                    "them": "Aylık $99, artı önerdiği $100 ile $200 arası bir yapay zeka planı.",
+                    "rerun": "Model kredisi ve güvenli bir makineyle aylık {price}, 5 gün ücretsiz."
+                }
+            },
+            "rows": {
+                "1": {
+                    "label": "Fiyat",
+                    "them": "Aylık $99, artı getirdiğiniz yapay zeka planı; Squad bunun için aylık $100 ile $200 arası önerir.",
+                    "rerun": "Model kredisi dahil aylık {price}. Kendi yapay zeka planınızı getirmek isteğe bağlıdır."
+                },
+                "2": {
+                    "label": "Denemek",
+                    "them": "Ücretsiz deneme yok: ilk ayı ödersiniz, 7 günlük para iade garantisiyle.",
+                    "rerun": "5 günlük ücretsiz deneme: kart gerekir ve bugün $0 tahsil edilir."
+                },
+                "3": {
+                    "label": "Uygulamalar",
+                    "them": "Erişimi ekip arkadaşı başına ayarlanan 70+ entegrasyon.",
+                    "rerun": "Tarayıcıdan {connectors}+ uygulama, artı herhangi bir MCP sunucusu."
+                },
+                "4": {
+                    "label": "Siz yokken",
+                    "them": "Tek dokunuşla onaylar, siz ilgilenene kadar talep kuyruğunda bekler.",
+                    "rerun": "Autopilot açıkken Rerun, kurallarınız dahilinde ajanlarınıza yanıt verir, harcama veya silme için asla; döndüğünüzde bir özet hazırdır."
+                },
+                "5": {
+                    "label": "Hazır ajanlar",
+                    "them": "Bir yapay zeka Chief of Staff ekibinizi sizinle birlikte tasarlar.",
+                    "rerun": "Kurabileceğiniz {templates}+ hazır ajan ya da kısa bir tariften sizin için kurulan bir ekip."
+                },
+                "6": {
+                    "label": "Kurulumda yardım",
+                    "them": "Squad ekibinden başlangıç desteği ve yardım.",
+                    "rerun": "Ajanınızı kurup çalışmaya hazır şekilde size teslim eden bir uzmanlar ağı."
+                }
+            }
+        }
+    },
+    "pages": {
+        "claude-cowork": {
+            "metaTitle": "Rerun vs Claude Cowork: bir ajan ekibi (2026)",
+            "metaDescription": "Rerun ve Claude Cowork; modeller, zamanlanmış işler ve fiyat açısından. Claude planınızı koruyun, onunla ya da başka bir modelle bir ajan ekibi çalıştırın.",
+            "headline": "Rerun ve Claude Cowork karşılaştırması",
+            "intro": "Eylül 2026'da Claude uygulamasına katılan Cowork, Claude'un sizin için görevleri Claude modelleriyle üstlenmesini sağlar. Rerun ise her zaman açık bir makinede, zaten ödediğiniz Claude planı dahil herhangi bir modelde bir ajan ekibi çalıştırır.",
+            "verdict": "Claude'un görevleri zaten sohbet ettiğiniz uygulamadan; bağlayıcıları, skill'leri, bulut zamanlamaları ve artık sohbette yazdığı Docs ve Slides dosyalarıyla üstlenmesini istiyorsanız Claude'u seçin. Her biri kendi işinden sorumlu, her zaman açık bir makineden tüm ekip için seçtiğiniz modelde çalışan birden çok ajan istiyorsanız Rerun'ı seçin. İkisi birlikte de çalışır: bir ajanda Claude planınızla oturum açın, Rerun onu Claude üzerinde çalıştırsın.",
+            "chooseRerun": {
+                "1": "Bazı ajanların yalnızca Claude'da değil, GPT veya Gemini'de de çalışmasını istiyorsunuz",
+                "2": "Birden çok ajan veri paylaşmalı ve işi birbirine devretmeli",
+                "3": "Ajanların her zaman açık bir makinede duran dosyalara ve veritabanlarına ihtiyacı var",
+                "4": "Tüm ekip, herkese ayrı kullanıcı lisansı gerekmeden ajanları görmeli ve onlara yanıt vermeli"
+            },
+            "chooseThem": {
+                "1": "Görevleri Claude'un, zaten sohbet ettiğiniz uygulamanın içinde halletmesini istiyorsunuz",
+                "2": "İşiniz kendi bilgisayarınızdaki dosyalarda duruyor",
+                "3": "Yalnızca Claude modellerine ihtiyacınız var"
+            },
+            "differences": {
+                "1": {
+                    "title": "Her model, Claude planınız dahil",
+                    "desc": "Claude, Claude modelleriyle çalışır. Her Rerun ajanı Claude planınızla oturum açabilir ya da kendi anahtarınızla GPT, Gemini veya başka bir modelde çalışabilir; modeli ajan başına ya da zamanlanmış görev başına değiştirebilirsiniz."
+                },
+                "2": {
+                    "title": "Hiç kapanmayan bir makine",
+                    "desc": "Claude'un zamanlanmış görevleri tüm ücretli planlarda bulutta, en sık saatte bir çalışır; ancak bilgisayarınızdaki bir klasöre veya uygulamaya ihtiyaç duyan bir görev yalnızca orada ve bilgisayar açıkken çalışır. Rerun ajanları, dosyalarının, veritabanlarının ve tarayıcılarının bulunduğu çalışma alanınızın özel makinesinde, dakikası dakikasına, gece gündüz çalışır."
+                },
+                "3": {
+                    "title": "Tek bir asistan değil, bir ekip",
+                    "desc": "Aklınızdakini, ajanlarınızı yöneten asistan Chief of Staff'a söyleyin: her görevi o işten sorumlu ajana verir ya da yeni bir ajan önerir. Ajanlar tek bir klasörü, tek bir veritabanını ve tek bir şirket beynini paylaşır; böylece gelen kutusu ajanı yeni bir potansiyel müşteriyi satış ajanına devredebilir."
+                },
+                "4": {
+                    "title": "Tüm ekip yanıt verir",
+                    "desc": "Claude'da herkes kendi planıyla, kullanıcı başına $20'dan başlayan fiyatla çalışır. Rerun'da her ajan çalışma alanına aittir, kullanıcılar ücretsiz ve sınırsızdır; ekip arkadaşları ajanın ne yaptığını görür ve ajan bir şey sormak için durduğunda herhangi biri yanıt verebilir. Autopilot açıkken herkes uzaktayken Chief of Staff kurallarınız dahilinde yanıt verir."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Claude planınızı koruyun",
+                    "desc": "Bir ajanda Claude hesabınızla oturum açın; iş, zaten ödediğiniz abonelik üzerinde çalışsın."
+                },
+                "2": {
+                    "title": "İşi görevlere bölün",
+                    "desc": "Her tekrarlayan görevi kendi ajanına verin ya da kitaplıktan hazır bir ajan yükleyin."
+                },
+                "3": {
+                    "title": "Zamanlayın ve dizüstünü kapatın",
+                    "desc": "Ajanlar kendi makinelerinde bir zamanlamayla ya da bir webhook ile çalışır ve bir karar gerektiğinde ekibe sorar."
+                }
+            },
+            "theirPricing": "Cowork, Claude'un ücretli planlarına dahildir: Pro aylık $20 (yıllık faturalandırmada $17), Max $100'dan başlar ve $100 ile $200 arası API kredisi içerir, Team kullanıcı başına $25'tır (yıllık faturalandırmada $20, en az iki kullanıcı) ve $500'a kadar ortak API kredisi sunar, Enterprise ise kullanıcı başına $20 olup kullanım API fiyatlarıyla faturalandırılır. Her planın kendi kullanım limitleri vardır. Rerun, ekibinizin paylaştığı sınırsız ajan için aylık {price} fiyatla başlayan tek bir plandır, kullanıcılar dahildir ve ajanları zaten sahip olduğunuz bir Claude planında çalışabilir.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Claude Cowork'e bir alternatif mi?",
+                    "answer": "Daha çok bir tamamlayıcıdır. Claude, onu kullanan kişi için görevleri Claude modelleriyle üstlenir. Rerun ise her zaman açık bir makinede, herhangi bir modelde bir ajan ekibi çalıştırır ve bu ajanları Claude planınızda da çalıştırabilir."
+                },
+                "2": {
+                    "question": "Claude planımı Rerun ile kullanabilir miyim?",
+                    "answer": "Evet. Bir ajanda Claude hesabınızla oturum açın; ajan, planınızın kullanım limitleri dahilinde sizin planınızda çalışır. Rerun kendi tarafında hiçbir limit eklemez."
+                },
+                "3": {
+                    "question": "Rerun'a bir yapılacaklar listesi verebilir miyim?",
+                    "answer": "Evet. Aklınızdakini, ajanlarınızı yöneten asistan Chief of Staff'a yazın ya da dikte edin, veya Space tuşunu basılı tutup söyleyin. Her görevi doğru ajana verir, hiçbir ajan yapamıyorsa yeni bir ajan önerir ve yalnızca sizin yapabileceğiniz işleri görev listenizde tutar."
+                },
+                "4": {
+                    "question": "Claude Cowork hâlâ var mı?",
+                    "answer": "Anthropic, Cowork'ü 16 Eylül 2026'da Claude uygulamasına kattı. Cowork'ün yaptıkları artık her Claude sohbetinden kullanılabiliyor: önce Pro ve Max kullanıcılarına geldi, ardından Team ve Free izledi."
+                },
+                "5": {
+                    "question": "Bilgisayarım kapalıyken Rerun ajanları çalışır mı?",
+                    "answer": "Evet. Dizüstünüz açık olsun ya da olmasın, bulutta çalışma alanınızın özel makinesinde, bir zamanlamayla ya da bir webhook ile çalışırlar. Claude'da yerel bir klasöre veya uygulamaya ihtiyaç duyan bir görev yalnızca kendi bilgisayarınızda çalışır."
+                }
+            }
+        },
+        "manus": {
+            "metaTitle": "Rerun vs Manus: tekrarlayan işe sabit fiyat (2026)",
+            "metaDescription": "Rerun ve Manus; krediler, zamanlamalar ve ekipler. Manus görevleri krediyle ücretlendirir, 20 zamanlanmış görevle sınırlar; Rerun sınırsız, sabit tek plan.",
+            "headline": "Rerun ve Manus karşılaştırması",
+            "intro": "Manus; araştıran, üreten ve teslim eden, görev başına kredi ile ücretlendirilen genel bir yapay zeka ajanıdır. Rerun ise tekrarlayan iş süreçlerinde, özel bir makinede, tek bir sabit fiyatla bir ajan ekibi çalıştırır.",
+            "verdict": "Derin araştırma, bir sunum veya bir web sitesi gibi, genel ajanının tam da bunun için tasarlandığı tek seferlik çıktılar ve aynı anda birçok kaynakta Wide Research için Manus'u seçin. Tekrarlayan işler için Rerun'ı seçin: 20 yerine işin gerektirdiği kadar zamanlama ve webhook, veri paylaşan ve tüm ekibinize yanıt veren ajanlar, görev başına kredi yerine aylık {price}.",
+            "chooseRerun": {
+                "1": "İş her gün ya da her olayda tekrarlanıyor",
+                "2": "20'den fazla zamanlanmış göreve ya da birkaç dakikada bir çalışan bir göreve ihtiyacınız var",
+                "3": "Her görevin kredi harcamasını istemiyorsunuz",
+                "4": "Birden çok ajan veri paylaşmalı ve işi birbirine devretmeli"
+            },
+            "chooseThem": {
+                "1": "Tek seferlik bir araştırmaya, sunuma veya web sitesine ihtiyacınız var",
+                "2": "Aynı anda birçok kaynakta Wide Research istiyorsunuz",
+                "3": "Ayda birkaç görev çalıştırıyorsunuz ve kullandıkça ödemeyi tercih ediyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Sınırsız tekrarlayan iş",
+                    "desc": "Her Manus planı, $20, $40 ve $200 seviyelerinde aynı şekilde, 20 zamanlanmış görevde ve aynı anda çalışan 20 görevde durur. Rerun ajanları, aynı sabit planda, işin gerektirdiği kadar zamanlama ve webhook alır, dakikası dakikasına; tek bir Routines listesi de sırada neyin çalışacağını duraklatma ve hemen çalıştırma seçenekleriyle gösterir."
+                },
+                "2": {
+                    "title": "Kredi bakiyesi değil, kendi yapay zekanız",
+                    "desc": "Her Manus görevi kredi harcar: ayda $20 ile 4.000 kredi alırsınız, artı her gün yenilenen 300 kredi. Rerun görevleri asla saymaz: ajanlar ChatGPT veya Claude planınızda, kendi anahtarınızla ya da dahil olan krediyle çalışır."
+                },
+                "3": {
+                    "title": "Bir ajan ekibi",
+                    "desc": "Manus bağlamı, bir zamanlamayı aynı görevin içinde çalıştırarak ya da bir Project'in dosyalarını ve bağlayıcılarını paylaşarak korur. Rerun'da birden çok ajanın her biri bir işten sorumludur, kendi belleğini ve skill'lerini tutar; hepsi tek bir klasörü, tek bir veritabanını ve tek bir şirket beynini paylaşır. Aklınızdakini Chief of Staff'a söyleyin, her görevi doğru ajana versin."
+                },
+                "4": {
+                    "title": "Tüm ekip için tek pano",
+                    "desc": "Manus ekip planında her üye, kullanıcı başına $20'dan başlayan fiyatla, ortak krediler üzerinden kendi görevlerini çalıştırır. Rerun'da kullanıcılar ücretsiz ve sınırsızdır, ekibiniz aynı ajanları paylaşır ve bir şey sormak için duran bir ajana herhangi bir ekip arkadaşı yanıt verebilir."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "En sık zamanladığınız görevi seçin",
+                    "desc": "Onu sade sözcüklerle anlatın ya da bu işi zaten yapan hazır bir ajan yükleyin."
+                },
+                "2": {
+                    "title": "Uygulamalarınızı ve yapay zekanızı bağlayın",
+                    "desc": "Her uygulama için bir oturum açma, isteyenler için bir token. ChatGPT veya Claude planınızla oturum açın ya da kendi anahtarınızı kullanın."
+                },
+                "3": {
+                    "title": "Bir zamanlamaya bağlayın",
+                    "desc": "20 sınırı olmadan her türlü zamanlama veya webhook. Kendi makinesinde çalışır ve bir karar gerektiğinde sorar."
+                }
+            },
+            "theirPricing": "Manus görev başına kredi ile ücretlendirir: ayda 4.000 kredi için $20, 8.000 için $40 ve 40.000 için $200; her biri her gün yenilenen 300 kredi, 20 zamanlanmış görev ve aynı anda 20 görev içerir. Ekip planları kullanıcı başına aylık $20'dan başlar ve kullanıcı başına ortak havuzda 4.000 kredi sunar. Rerun, sınırsız ajan ve sınırsız kullanıcı içeren, aylık {price} fiyatla başlayan tek bir plandır ve görevleri asla saymaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Manus'a bir alternatif mi?",
+                    "answer": "Tekrarlayan işler için evet. Manus tek seferlik çıktılarda parlar. Rerun ajanları ise bir zamanlamayla ya da bir webhook ile tekrarlanan işleri, tek bir sabit fiyatla üstlenir."
+                },
+                "2": {
+                    "question": "Rerun da Manus gibi kredi kullanıyor mu?",
+                    "answer": "Hayır. Rerun görevleri asla saymaz. Plan, Rerun'ın barındırdığı modeller için küçük bir kredi içerir; kendi ChatGPT veya Claude planınızda ya da kendi anahtarınızla çalışan ajanlar Rerun tarafında ek bir maliyet getirmez."
+                },
+                "3": {
+                    "question": "Rerun'a bir yapılacaklar listesi verebilir miyim?",
+                    "answer": "Evet. Aklınızdakini, ajanlarınızı yöneten asistan Chief of Staff'a yazın ya da dikte edin. Her görevi doğru ajana verir, hiçbir ajan yapamıyorsa yeni bir ajan önerir ve yalnızca sizin yapabileceğiniz işleri görev listenizde tutar."
+                },
+                "4": {
+                    "question": "Rerun'da kaç zamanlanmış görev çalıştırabilirim?",
+                    "answer": "İşin gerektirdiği kadar: her ajanın dakikası dakikasına birkaç zamanlaması ve webhook'u olabilir. Her Manus planı 20 zamanlanmış görevde ve aynı anda çalışan 20 görevde durur."
+                },
+                "5": {
+                    "question": "Rerun ajanları web'de gezinip dosya oluşturabilir mi?",
+                    "answer": "Evet. Arama yapar, bir tarayıcı kullanır, API'si olmayan uygulamalar için bir masaüstünü devralır, çalışma alanınızın özel makinesinde dosya yazar ve bir dosyayı herkese açık bir bağlantıyla yayımlayabilirler."
+                }
+            }
+        },
+        "grok-bot": {
+            "metaTitle": "Rerun vs Grok Bot: her model, tam görünürlük (2026)",
+            "metaDescription": "xAI'nin Grok Bot'u ile Rerun; erişim, modeller, görünürlük ve maliyet açısından. İkisi de ajanlara bulutta bir bilgisayar verir. Ekibinize uyanı görün.",
+            "headline": "Rerun ve Grok Bot karşılaştırması",
+            "intro": "xAI'nin Grok Bot'u, hep açık yapay zeka ekip arkadaşlarına bulutta paylaştıkları bir bilgisayar verir. Rerun da öyle yapar; üstelik seçtiğiniz modelde ve tüm ekibinizin okuyabileceği bir panoyla.",
+            "verdict": "İkisi de ajanları bulutta bir bilgisayara yerleştirir, araçlarınızda oturum açmalarını ve gece gündüz çalışmalarını sağlar; ikisinde de bir ajan işi başka bir ajana devreder. Grok Bot'u içeren SuperGrok'a veya bir Cursor planına zaten ödeme yapıyorsanız ve onların uygulamalarındaki bir beta sürümü size yetiyorsa Grok Bot'u seçin. Modeli seçmek, {templates}+ hazır ajanla başlamak, tüm ekibe okuyabileceği bir pano vermek ve ajanları bugünden kendi yayımlanmış planıyla satın almak istiyorsanız Rerun'ı seçin.",
+            "chooseRerun": {
+                "1": "Claude, ChatGPT veya kendi modelinizle çalışmak istiyorsunuz",
+                "2": "Beta sürümünde bir paket değil, fiyatları yayımlanmış bağımsız bir plan istiyorsunuz",
+                "3": "Ekibinizin kişi başına bir hesap değil, paylaşılan bir panoya ve ücretsiz kullanıcılara ihtiyacı var",
+                "4": "Bir şablon kitaplığından hazır ajanlar istiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Zaten SuperGrok veya Cursor Pro ve üstü için ödüyorsunuz ve ajanların dahil olmasını istiyorsunuz",
+                "2": "Kullandığınız araçların API'si yok ve arayüzleri üzerinden kullanılmaları gerekiyor",
+                "3": "Ajanlarınızın masaüstünde ve iOS'ta Grok veya Cursor uygulamalarının içinde yaşamasını istiyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Tek bir sağlayıcı değil, kendi modeliniz",
+                    "desc": "Grok Bot, Grok veya Cursor planınızdan ayrı kendi kullanım havuzuyla xAI'nin modellerinde çalışır. Rerun ajanları plana dahil modelde ya da kendi aboneliğiniz veya anahtarınızla Claude, ChatGPT, Gemini ve daha fazlasında çalışır ve {connectors}+ uygulamaya veya herhangi bir MCP sunucusuna erişir."
+                },
+                "2": {
+                    "title": "Yalnızca bir sohbet değil, bir pano",
+                    "desc": "Her çalıştırma, her araç çağrısı ve ajanın artık hatırladıkları, sohbetin yanında canlı bir panoda, herhangi bir tarayıcıda gösterilir. Grok Bot ise masaüstü ve iOS uygulamalarında yaşar."
+                },
+                "3": {
+                    "title": "Tüm ekibin yanıtlayabileceği onaylar",
+                    "desc": "Bot'lar bir onaya ihtiyaç duyduklarında sahibi olan kişiye döner. Rerun'da ajanlar riskli bir şeyden önce durup uygulamada sorar, kullanıcılar ücretsizdir ve çalışma alanındaki herkes yanıt verebilir. Autopilot açıkken siz uzaktayken Chief of Staff kurallarınız dahilinde yanıt verir; harcama veya silme için asla."
+                },
+                "4": {
+                    "title": "Kendine ait bir plan",
+                    "desc": "Grok Bot hâlâ beta sürümünde, SuperGrok ve Cursor planlarıyla paket hâlinde sunuluyor, asla tek başına satılmıyor ve Enterprise erişimi bir bekleme listesinde. Rerun, aylık {price} fiyatla başlayan ve 5 günlük ücretsiz deneme sunan tek bir plandır."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Ajana işini verin",
+                    "desc": "Neyden sorumlu olduğunu anlatın ya da kitaplıktaki hazır bir ajanla başlayın."
+                },
+                "2": {
+                    "title": "Modeli ve uygulamaları seçin",
+                    "desc": "Claude, ChatGPT veya kendi planınızı seçin, ardından araçlarınızda oturum açın."
+                },
+                "3": {
+                    "title": "Çalışmasını izleyin",
+                    "desc": "Kendi makinesinde, bir zamanlamayla ya da bir tetikleyiciyle çalışır ve her eylem panonuzda görünür."
+                }
+            },
+            "theirPricing": "Grok Bot tek başına satılmaz: beta olarak her SuperGrok seviyesine ve Cursor Pro, Pro+, Ultra ve Teams planlarına dahildir; kullanımı bu planlardan ayrı sayılır. Enterprise erişimi hâlâ bir bekleme listesinde. Rerun, kullanıcılar dahil aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmalar asla sayılmaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Grok Bot'a bir alternatif mi?",
+                    "answer": "Evet. Grok Bot gibi Rerun da ajanlarınızı bulutta bir bilgisayarda çalıştırır ve bir ajanın işi başka birine devretmesini sağlar. Rerun modeli seçmenize izin verir, her eylemi herhangi bir ekip arkadaşının okuyabileceği bir panoda gösterir ve kendi yayımlanmış planıyla satın alınabilir."
+                },
+                "2": {
+                    "question": "Rerun, Grok modellerini kullanabilir mi?",
+                    "answer": "Evet, bir OpenRouter anahtarıyla: Grok, model seçicide Claude, GPT, Gemini ve diğerlerinin yanında yer alır."
+                },
+                "3": {
+                    "question": "Rerun için SuperGrok veya Cursor planına ihtiyacım var mı?",
+                    "answer": "Hayır. Rerun'ın aylık {price} fiyatla başlayan ve 5 günlük ücretsiz deneme sunan kendi planı vardır."
+                },
+                "4": {
+                    "question": "Rerun ajanları nerede çalışır?",
+                    "answer": "Çalışma alanınızın üzerinde çalıştığı, her plana dahil olan özel ve yalıtılmış bilgisayarda; kullanabilecekleri bir tarayıcı ve bir masaüstüyle. Dosyalarınız ve verileriniz onun içinde kalır."
+                }
+            }
+        },
+        "paperclip": {
+            "metaTitle": "Rerun vs Paperclip: barındırma mı, kendi sunucunuz mu?",
+            "metaDescription": "Rerun ve Paperclip; barındırma, bağlayıcılar ve maliyet: ajanlar için açık kaynak organizasyon şeması mı, daha basit bir barındırılan alternatif mi?",
+            "headline": "Rerun ve Paperclip karşılaştırması",
+            "intro": "Paperclip, kendiniz barındırdığınız açık kaynaklı bir kontrol katmanıdır: zaten çalıştırdığınız ajanlara bir organizasyon şeması, bütçeler ve onay kapıları verir. Rerun ise size ajanların kendisini, bulutta özel bir makinede zaten çalışır hâlde verir.",
+            "verdict": "Zaten birkaç kodlama ajanı çalıştırıyorsanız ve hepsinin üzerinde tek bir organizasyon şeması, ajan başına bütçeler ve onay kapıları istiyorsanız, bir Node sunucusunu ve veritabanını barındırmaktan da çekinmiyorsanız Paperclip'i seçin. Onları yöneteceğiniz yeri değil, ajanların kendisini istiyorsanız Rerun'ı seçin: her biri çalışma alanınızın özel makinesinde çalışır, tek tıkla {connectors}+ uygulama ve çalıştırmalar arasında bellek sunar, aylık sabit {price}.",
+            "chooseRerun": {
+                "1": "Hâlâ kurmanız gereken ajanların üzerinde bir kontrol katmanı değil, zaten çalışan ajanlar istiyorsunuz",
+                "2": "Ekipte kimse bir sunucuyu, bir veritabanını ve yedeklerini barındırmak istemiyor",
+                "3": "Ekip arkadaşları ajanlara VPN olmadan bir tarayıcıdan yanıt verebilmeli",
+                "4": "E-postayı yalnızca taslak olarak hazırlamakla kalmayıp gönderebilen bir ajan istiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Zaten birkaç kodlama ajanı çalıştırıyorsunuz ve hepsinin üzerinde tek bir organizasyon şeması istiyorsunuz",
+                "2": "Okuyabileceğiniz, fork'layabileceğiniz ve eklentilerle genişletebileceğiniz ücretsiz, MIT lisanslı bir yazılım istiyorsunuz",
+                "3": "%100'de kesin olarak duran ajan başına ve proje başına bütçeler istiyorsunuz",
+                "4": "İşiniz depolar, pull request'ler ve önizleme URL'lerinden oluşuyor"
+            },
+            "differences": {
+                "1": {
+                    "title": "Ajanlar makineleriyle birlikte gelir",
+                    "desc": "Paperclip, sonra sizin sağlamanız gereken ajanları işe alır: her rol için sunucuya kurulan bir harness ya da sizin getirip ödediğiniz bir sandbox sağlayıcısı. Bir Rerun ajanı ise makinesiyle birlikte gelir; orada dosya yazar, betik çalıştırır, bir tarayıcı kullanır ve kendi veritabanlarını tutar."
+                },
+                "2": {
+                    "title": "Kurulacak ya da barındırılacak bir şey yok",
+                    "desc": "Paperclip, kurduğunuz, bir Postgres'e bağladığınız ve güncel tuttuğunuz bir Node sunucusudur; bir ekip arkadaşını içeri almak için onu, kişinin bir LAN, VPN ya da açık internet üzerinden erişebileceği bir sunucuda kimlik doğrulamalı moda geçirmeniz gerekir. Paperclip Cloud hâlâ bir bekleme listesinde. Rerun ajanları ise siz çevrimiçi olun ya da olmayın, zamanlamalarına göre bulutta zaten çalışır."
+                },
+                "3": {
+                    "title": "Ajanın kullanabildiği uygulamalar",
+                    "desc": "Paperclip'in kataloğunda 62 bağlayıcı var ve kurulum size kalıyor: Gmail bağlayıcısı yalnızca okumak ve taslak oluşturmakla sınırlı, taslakları bir kişi gönderiyor; Google uygulamalarını incelerken Google bağlayıcıları listede gizli. Tek tıkla yönetilen oturum açma da yalnızca Paperclip Cloud'a kayıtlı örneklerde çalışıyor. Rerun'da tek bir Google oturum açma işlemi ajana okuyabildiği, etiketleyebildiği, yanıtlayabildiği ve e-posta gönderebildiği bir Gmail verir; kataloğun geri kalanı aynı ekrandan ya da herhangi bir MCP sunucusu üzerinden bağlanır."
+                },
+                "4": {
+                    "title": "Zaten hazır olan bellek",
+                    "desc": "Paperclip, bellek ve bilgiyi gelecekteki çalışmalar için bir yön olarak listeliyor; Mem0, Zep veya Supermemory ile deneysel bağlantılar bir örnek ayarının arkasında. Rerun ajanları çalıştırmalar arasında belleği, skill'leri ve özel bir veritabanını korur ve onları her düzelttiğinizde daha da keskinleşir."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Size en çok saat kaybettiren ajanı seçin",
+                    "desc": "İşini sade sözcüklerle anlatın. Ajan kendi talimatlarını ve skill'lerini yazar, kurulacak bir harness yok."
+                },
+                "2": {
+                    "title": "Uygulamaları ve modelinizi bağlayın",
+                    "desc": "Uygulama başına tek tık. Zaten ödediğiniz Claude veya ChatGPT oturumunu ya da bir API anahtarını kullanmaya devam edin."
+                },
+                "3": {
+                    "title": "Sunucuyu kapatın",
+                    "desc": "Ajan artık çalışma alanınızın makinesinde, kendi zamanlamasıyla çalışır ve riskli bir şeyden önce herhangi bir ekip arkadaşına sorar."
+                }
+            },
+            "theirPricing": "Paperclip ücretsiz ve MIT lisanslıdır; satın alınacak bir Paperclip planı yoktur. Kendi hızlı başlangıç kılavuzları, model çağrıları için denemeye $5 ile $20, aktif bir şirket için ayda $20 ile $100 arası bütçe öngörür; buna makine, veritabanı ve neredeyse her hafta çıkan sürümlerle gelen bakım eklenir. Rerun, güvenli bir özel makine, sınırsız ajan ve model kredisi dahil aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmalar asla sayılmaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, barındırılan bir Paperclip alternatifi mi?",
+                    "answer": "Evet, önce bilmeye değer bir farkla. Paperclip, kendiniz kurup barındırdığınız ajanları düzenler; Rerun'ın ajanları ise ürünle birlikte gelir, çalışma alanınızın özel makinesinde zaten çalışır, uygulamalarınız tarayıcıdan bağlanır ve ekibinizin okuyabileceği canlı bir pano vardır."
+                },
+                "2": {
+                    "question": "Paperclip ajanları kendisi mi çalıştırıyor?",
+                    "answer": "Hayır. Paperclip bir kontrol katmanıdır: “bir heartbeat alabiliyorsa işe alınmıştır.” Her rol için çalışma ortamını, yani Claude Code, Codex, Cursor, OpenCode, Hermes veya OpenClaw'ı siz getirir ve sunucuya kurarsınız. Rerun'da ajan ürünün kendisidir; yalnızca hangi modelde çalışacağını seçersiniz."
+                },
+                "3": {
+                    "question": "Paperclip gerçekte ne kadara mal olur?",
+                    "answer": "Yazılım ücretsiz ve MIT lisanslıdır. Model faturasını siz ödersiniz; hızlı başlangıç kılavuzları denemek için $5 ile $20, aktif bir şirket için ayda $20 ile $100 öngörür, buna sunucu, Postgres'i ve ikisini güncel tutmak için harcanan zaman eklenir. Rerun; makine, sınırsız ajan ve model kredisi dahil aylık {price} tutarındadır."
+                },
+                "4": {
+                    "question": "Rerun da Paperclip gibi Claude veya ChatGPT planımla çalışabilir mi?",
+                    "answer": "Evet, Paperclip de çalışabilir, yani fark burada değil. Paperclip, sunucusuna kurulu sağlayıcı CLI'ı ile oturum açar; Rerun'da tarayıcıdan oturum açarsınız, ayrıca bir API anahtarı ya da plana dahil krediyi de kullanabilirsiniz."
+                },
+                "5": {
+                    "question": "Rerun'da Paperclip gibi bütçeler ve onaylar var mı?",
+                    "answer": "Onaylar, evet: ajanlar önemli bir şeyden önce durup uygulamada sorar ve herhangi bir ekip arkadaşı yanıt verebilir. Bütçelerde ise Paperclip önde: şirket, ajan ve proje başına, %100'de işi duraklatan politikalar sunar. Rerun dahil model kredisine bir üst sınır koyar ve çalıştırmaları asla saymaz."
+                },
+                "6": {
+                    "question": "Rerun açık kaynak mı?",
+                    "answer": "Hayır. Rerun barındırılan bir üründür. Enterprise planında özel veya kendi sunucunuzda barındırılan altyapı sunulur."
+                }
+            }
+        },
+        "hermes": {
+            "metaTitle": "Rerun vs Hermes Agent: barındırılan bir ajan ekibi (2026)",
+            "metaDescription": "Rerun ve Hermes Agent (Nous Research); barındırma, maliyet ve uygulamalar: Hermes kendi sunucunuzda mı, Hermes Cloud'da mı, yoksa barındırılan bir ekip mi?",
+            "headline": "Rerun ve Hermes Agent karşılaştırması",
+            "intro": "Nous Research'ün Hermes Agent'ı, ilerledikçe skill öğrenen açık kaynaklı bir ajandır; beş sandbox seçeneğiyle kendi makinenizde çalışır ya da Hermes Cloud'da barındırılır. Rerun ise ekibinize de öğrenen ajanlar verir; hepsi tek bir özel makinede, etraflarındaki uygulamalar ve panoyla birlikte barındırılır.",
+            "verdict": "MIT lisanslı kod, yerelden Modal'a beş arka uç seçeneği ve çalışma ortamı üzerinde tam kontrol istiyorsanız ya da Telegram, Discord veya WhatsApp'tan ulaştığınız Hermes Cloud'da tek bir ajan istiyorsanız Hermes Agent'ı seçin. Sabit bir plana dahil tek bir makinede bir ekip için birden çok ajan, tarayıcıdan bağlanan {connectors}+ uygulama ve başlangıç için hazır ajanlar istiyorsanız Rerun'ı seçin.",
+            "chooseRerun": {
+                "1": "Birden çok ajan, her biri için ayrı bir örnek değil, tek bir planda yan yana çalışmalı",
+                "2": "Teknik olmayan ekip arkadaşlarının ajanları kullanması ve yönlendirmesi gerekiyor",
+                "3": "Uygulamaların elle yapılandırılmasını değil, tarayıcıdan bağlanmasını istiyorsunuz",
+                "4": "Hazır ajanlarla başlamak istiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Açık kaynak kod ve çalışma ortamı üzerinde tam kontrol istiyorsunuz",
+                "2": "Kendi sandbox'ınızı seçmek istiyorsunuz: yerel, Docker, SSH, Singularity veya Modal",
+                "3": "Ajanınızla çoğunlukla Telegram, Discord, WhatsApp veya Signal üzerinden konuşuyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Tüm ajanlarınız için tek makine",
+                    "desc": "Hermes, onu kurduğunuz yerde ya da her ajanın günlük faturalandırılan kendine ait bir örnek aldığı Hermes Cloud'da çalışır. Rerun'da çalışma alanı başına tek bir özel makine tüm ajanlarınızı çalıştırır ve bu makine plana dahildir."
+                },
+                "2": {
+                    "title": "Okuyabildiğiniz öğrenme",
+                    "desc": "Hermes oturumlar arasında sohbetleri, anıları ve skill'leri saklar ve kendi başına skill yazar. Rerun ajanları da öyle; üstelik ne öğrendiklerini ve yaptıkları her eylemi, tüm çalışma alanının paylaştığı tek şirket beyninin yanında, canlı bir panoda görürsünüz."
+                },
+                "3": {
+                    "title": "Tüm ekip için onaylar",
+                    "desc": "Ajanlar önemli bir şeyden önce durup uygulamada sorar, kullanıcılar ücretsizdir ve herhangi bir ekip arkadaşı yanıt verebilir. Autopilot açıkken siz uzaktayken Chief of Staff kurallarınız dahilinde yanıt verir; harcama veya silme için asla."
+                },
+                "4": {
+                    "title": "Tarayıcıdan uygulamalar ve modeller",
+                    "desc": "Hermes, kendiniz yapılandırıp filtrelediğiniz herhangi bir MCP sunucusuna erişir. Rerun'da {connectors}+ uygulama, rehberli bir oturum açmayla tarayıcıdan bağlanır, herhangi bir MCP sunucusu yine çalışır ve her ajan plana dahil Rerun modelinde, ChatGPT veya Claude planınızda ya da kendi anahtarınızla çalışır."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Hermes'in yaptığını anlatın",
+                    "desc": "Ajana işi sade sözcüklerle verin. Kendi talimatlarını ve skill'lerini yazar."
+                },
+                "2": {
+                    "title": "Uygulamaları ve modelinizi bağlayın",
+                    "desc": "Sevdiğiniz model sağlayıcısını koruyun ve araçlarınızda tarayıcıdan oturum açın."
+                },
+                "3": {
+                    "title": "Eski kurulumu emekliye ayırın",
+                    "desc": "Ajan artık kendi zamanlamasıyla özel makinenizde çalışır; Hermes'in çalıştığı örnek için ödeme yapmayı ve onun bakımını bırakırsınız."
+                }
+            },
+            "theirPricing": "Hermes Agent, kendiniz çalıştırmanız için ücretsiz ve MIT lisanslıdır; model ve makine için siz ödersiniz. Hermes Cloud, bir Cloud Agent dağıtmadan önce en az $2 kredi ister, ardından her örneği gün bazında, çalışma süresinin saniyesine kadar ölçerek ve depolama ekleyerek faturalandırır; çıkarım ve araç kullanımı ayrıca faturalandırılır. Örnek boyutları ve fiyatları yalnızca planları ayda $20, $100 veya $200 kredi olan Nous Portal içinde listelenir. Rerun, güvenli bir özel makine, sınırsız ajan, sınırsız kullanıcı ve model kredisi dahil aylık {price} fiyatla başlayan tek bir plandır.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, barındırılan bir Hermes Agent alternatifi mi?",
+                    "answer": "Evet. Nous da Hermes'i barındırıyor: Hermes Cloud'da ajan başına kendine ait bir örnek. Rerun ise çalışma alanı başına tek bir özel makinede, {connectors}+ uygulama ve tüm ekibinizin kullandığı bir panoyla bir ajan ekibi barındırır."
+                },
+                "2": {
+                    "question": "Rerun ajanları Hermes Agent gibi öğrenir mi?",
+                    "answer": "Evet. Rerun ajanları skill oluşturur, çalıştırmalar arasında belleklerini korur ve onları her düzelttiğinizde daha da keskinleşir. Ne öğrendiklerini panodan okuyabilirsiniz."
+                },
+                "3": {
+                    "question": "Hermes Agent'ı çalıştırmanın maliyeti nedir?",
+                    "answer": "Yazılım ücretsizdir. Kendi sunucunuzda model ve makine için siz ödersiniz. Hermes Cloud'da dağıtım için $2 krediye ihtiyacınız vardır, çalışan her örnek gün bazında faturalandırılır ve saniyesine kadar ölçülür, çıkarım ve araçlar ise ayrıca faturalandırılır; Nous Portal planları ayda $20, $100 veya $200'dır. Rerun makineyi, sınırsız ajanı, sınırsız kullanıcıyı ve model kredisini aylık {price} fiyatla başlayan tek bir planda toplar."
+                },
+                "4": {
+                    "question": "Rerun'da Nous veya OpenRouter modellerini kullanabilir miyim?",
+                    "answer": "Rerun; Claude, ChatGPT ve daha fazlasında çalışır, özel bir uç nokta da dahil bir OpenRouter anahtarıyla başka modellere de erişir."
+                },
+                "5": {
+                    "question": "Rerun için terminale ihtiyacım var mı?",
+                    "answer": "Hayır. Ajanları tarayıcıda oluşturur ve yönetirsiniz."
+                }
+            }
+        },
+        "openclaw": {
+            "metaTitle": "Rerun vs OpenClaw: barındırılan yapay zeka ajanları (2026)",
+            "metaDescription": "Rerun ve OpenClaw; kurulum, barındırma, güvenlik ve maliyet: açık kaynak asistan ne zaman uyar, barındırılan bir OpenClaw alternatifi ne zaman daha basit?",
+            "headline": "Rerun ve OpenClaw karşılaştırması",
+            "intro": "OpenClaw, kendi makinenize ya da sunucunuza kurup çalıştırdığınız açık kaynaklı, kişisel bir yapay zeka asistanıdır. Rerun ise ajanlarınızı sizin yerinize, bulutta özel ve yalıtılmış bir makinede çalıştırır.",
+            "verdict": "Okuyup değiştirebileceğiniz ücretsiz, MIT lisanslı bir yazılım ve kendi donanımınızda yerel modeller istiyorsanız, bir makineyi açık tutup sağlamlaştırmaktan da çekinmiyorsanız OpenClaw'ı seçin: vakfı “hiçbir şey satmaz: ücretli seviye yok, barındırılan hizmet yok, token yok.” Hiçbir şeyi barındırmadan ya da güvenceye almadan aynı özerkliği; onaylar, hazır ajanlar ve ekibinizin okuyabileceği bir panoyla istiyorsanız Rerun'ı seçin.",
+            "chooseRerun": {
+                "1": "Kendi dizüstünüzde shell erişimi olan bir ajan istemiyorsunuz",
+                "2": "Bunun için bir makineyi açık, güncel ve sağlamlaştırılmış tutmak istemiyorsunuz",
+                "3": "Ekip arkadaşları, kimse bir gateway yönetmeden ajanları kullanabilmeli",
+                "4": "Uygulamaların elle yapılandırılmasını değil, tarayıcıdan bağlanmasını istiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Okuyup değiştirebileceğiniz ücretsiz, açık kaynaklı bir yazılım istiyorsunuz",
+                "2": "Asistanın mesajlaşma uygulamalarınızın içinde olmasını istiyorsunuz",
+                "3": "Ollama veya LM Studio üzerinden kendi donanımınızda yerel modeller çalıştırmak istiyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Kurulacak ya da barındırılacak bir şey yok",
+                    "desc": "OpenClaw, açık tuttuğunuz bir makinede, bilgisayarınızda ya da bir sunucuda çalışır ve vakfı barındırılan bir hizmet sunmaz. Rerun ajanları bulutta özel bir makinede yaşar ve siz çevrimiçi olun ya da olmayın zamanlamalarına göre çalışır."
+                },
+                "2": {
+                    "title": "Yalıtılmış, korumalarla",
+                    "desc": "OpenClaw'da “sandbox ve exec onayları varsayılan olarak kapalıdır”; yani siz sağlamlaştırana kadar araçları çalıştığı makinenin dosyalarına ve shell'ine erişir. Her Rerun çalışma alanı kendi yalıtılmış sanal makinesinde çalışır, ajanlar riskli bir şeyden önce durup uygulamada onayınızı bekler ve ücretli bir veri sorgusu, maliyetini onaylayana kadar çalışmaz."
+                },
+                "3": {
+                    "title": "Kurulumsuz uygulamalar",
+                    "desc": "Gmail, Google Calendar, Notion, Stripe ve {connectors}+ uygulama tarayıcıdan, çoğu tek bir oturum açmayla bağlanır; buna herhangi bir MCP sunucusu veya API da eklenir. Kendi model planınızı ya da anahtarınızı getirin veya bizimkini kullanın."
+                },
+                "4": {
+                    "title": "Yönetilecek bir gateway olmadan bir ekip",
+                    "desc": "Bir OpenClaw ekibi, birinin barındırdığı bir gateway'i paylaşır ve tek bir gateway tek bir güven alanıdır: birbirine güvenmemesi gereken kişilerin her birine ayrı bir tane gerekir. Rerun'da ekip arkadaşlarınızı ek ücret ödemeden davet edin, ajanları paylaşın ve her çalıştırmayı canlı bir panoda izleyin; bellek de her düzeltmeden sonra ajanı daha keskin hâle getirir."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "OpenClaw'a verdiğiniz işi seçin",
+                    "desc": "Onu sade sözcüklerle anlatın. Ajan kendi talimatlarını ve skill'lerini kurar."
+                },
+                "2": {
+                    "title": "Uygulamaları ve modelinizi bağlayın",
+                    "desc": "Uygulama başına bir oturum açma. Kullandığınız modeli kendi API anahtarınızla ya da oturumunuzla kullanmaya devam edin."
+                },
+                "3": {
+                    "title": "Yerel daemon'ı kapatın",
+                    "desc": "Ajan artık kendi makinesinde, gece gündüz çalışır ve riskli bir şeyden önce size sorar."
+                }
+            },
+            "theirPricing": "OpenClaw ücretsiz ve MIT lisanslıdır; OpenClaw Foundation hiçbir şey satmaz: ücretli seviye yok, barındırılan hizmet yok, token yok. Bağladığınız model ve üzerinde çalıştığı makine için siz ödersiniz; çalışma süresi, güncellemeler ve sağlamlaştırma da sizin sorumluluğunuzdadır. Rerun; özel makine, model kredisi, sınırsız ajan ve sınırsız kullanıcı dahil aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmalar asla sayılmaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, barındırılan bir OpenClaw alternatifi mi?",
+                    "answer": "Evet. Rerun, hiçbir şey kurmadan size özerk ajanlar verir: her biri bulutta özel makinenizde; onaylar, bellek ve canlı bir panoyla çalışır."
+                },
+                "2": {
+                    "question": "OpenClaw'ı bilgisayarımda çalıştırmak güvenli mi?",
+                    "answer": "OpenClaw'da sandbox ve exec onayları varsayılan olarak kapalıdır; bu yüzden siz yapılandırmadıkça araçları, çalıştığı makinede shell ve dosya erişimine sahiptir. Sapmaları denetlemek için bir güvenlik denetimi komutu vardır ve proje, takip etmeniz gereken güvenlik bildirimleri yayımlar. Rerun ajanları ise dizüstünüz yerine yalıtılmış bir makinede çalışır ve önemli bir şeyden önce onay için durur."
+                },
+                "3": {
+                    "question": "OpenClaw'daki gibi Rerun'da da kendi modelimi kullanabilir miyim?",
+                    "answer": "Evet. Kendi API anahtarınızı ya da Claude veya ChatGPT oturumunuzu getirin veya Rerun'ın barındırdığı modelleri kullanın. Ollama veya LM Studio üzerinden kendi donanımınızda yerel modeller ise OpenClaw'ın üstün olduğu nokta."
+                },
+                "4": {
+                    "question": "Rerun terminal gerektiriyor mu?",
+                    "answer": "Hayır. Her şey tarayıcıda olur: ajanı oluşturun, işini anlatın, uygulamalarınızı bağlayın."
+                },
+                "5": {
+                    "question": "Rerun açık kaynak mı?",
+                    "answer": "Hayır. Rerun barındırılan bir üründür. Enterprise planında özel veya kendi sunucunuzda barındırılan altyapı sunulur."
+                }
+            }
+        },
+        "zapier": {
+            "metaTitle": "Rerun vs Zapier: yapay zeka ajanları mı, Zap'ler mi? (2026)",
+            "metaDescription": "Rerun ve Zapier; kurulum, bakım ve maliyet: adım adım bir Zap ne zaman yeterli, uyum sağlayan bir yapay zeka ajanı ne zaman daha iyi bir alternatif?",
+            "headline": "Rerun ve Zapier karşılaştırması",
+            "intro": "Zapier, uygulamaları adım adım kurduğunuz Zap'lerle birbirine bağlar. Rerun ise size bir hedef alan, araçları seçen ve bir şey değiştiğinde uyum sağlayan yapay zeka ajanları verir.",
+            "verdict": "Bir form girişini bir tabloya kopyalamak gibi uygulamalar arası sabit ve yüksek hacimli tetikleyiciler için ya da 10.000+ entegrasyonundan birine ihtiyacınız olduğunda Zapier'i seçin. İş muhakeme gerektirdiğinde Rerun'ı seçin: bir e-postayı okumak, ne yapılacağına karar vermek, takip etmek; dosyalar ve bellek de çalışma alanınızın kendi makinesinde tutulur. Rerun, sınırsız ajan için aylık sabit {price} tutarındadır ve asla görev başına ücret almaz.",
+            "chooseRerun": {
+                "1": "Görev her seferinde farklı bir biçim alıyor ve Zap sürekli yeni yollar gerektiriyor",
+                "2": "Alan eşlemek yerine işi sade sözcüklerle anlatmak istiyorsunuz",
+                "3": "İş yalnızca uygulamalar arası çağrılar değil; dosya, betik veya tarayıcı gerektiriyor",
+                "4": "Faturanın her adımla büyümesini istemiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Günde binlerce kez aynı şekilde bir tetikleyiciye ve bir eyleme ihtiyacınız var",
+                "2": "Altyapınız, Zapier'in 10.000+ entegrasyonu arasındaki niş bir uygulamaya dayanıyor",
+                "3": "Ekibiniz zaten sorunsuz çalışan yüzlerce Zap kullanıyor"
+            },
+            "differences": {
+                "1": {
+                    "title": "Akış şeması değil, bir hedef",
+                    "desc": "Zapier'de bir tetikleyici, ardından her eylemi ve alan eşlemesini seçersiniz ya da Copilot'tan bunları taslak olarak hazırlamasını ister ve bakımını sürdürürsünüz. Rerun'da ajana işin ne olduğunu söyler, Gmail, Notion veya Stripe'ta oturum açarsınız; ajan her çalıştırmada adımları kendisi belirler."
+                },
+                "2": {
+                    "title": "Yalnızca bağlayıcılar değil, bir bilgisayar",
+                    "desc": "Bir Zap, veriyi bir uygulamadan diğerine aktarır ve içindeki kod, ek bir görev maliyeti doğmadan önce adım başına 30 saniye alır. Bir Rerun ajanı çalışma alanınızın özel makinesinde çalışır: dosya yazar, betik çalıştırır, bir tarayıcı kullanır ve kendi veritabanlarını tutar; böylece yalnızca rakamları taşımakla kalmaz, raporu da hazırlar."
+                },
+                "3": {
+                    "title": "Bozulmak yerine uyum sağlar",
+                    "desc": "Yeniden adlandırılmış bir sütun ya da yeni bir e-posta biçimi, bir Zap'in alan eşlemesini bozabilir. Bir Rerun ajanı önündekini okur, düzelttiklerinizi hatırlar ve teklifinizi, fiyatlarınızı ve üslubunuzu tutan tek bir şirket beynini okur."
+                },
+                "4": {
+                    "title": "Sabit fiyat, çalıştırmalar sayılmaz",
+                    "desc": "Zapier, yapay zeka ve kod adımları aynı havuzda olmak üzere her eylem adımını bir görev olarak sayar ve Zapier Agents'ı ayrıca etkinlik bazında faturalandırır: Pro'da ayda 1.500 etkinlik; tek bir çalıştırma 40'ta durur ve size sormak için geri döner. Rerun, sınırsız ajan için aylık {price} tutarındadır; saatte bir çalışan bir ajan, günde bir kez çalışanla aynı maliyettedir."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "En sık bozulan Zap'i seçin",
+                    "desc": "Adımları değil, neyi başarması gerektiğini anlatın. Ajanınız kendini buna göre kurar."
+                },
+                "2": {
+                    "title": "Aynı uygulamaları bağlayın",
+                    "desc": "Gmail, Sheets, Notion veya Stripe için tek bir oturum açma; Slack ve HubSpot bir kez yapıştırdığınız bir token ister. Bizim yapay zekamızda, kendi anahtarınızla ya da ChatGPT planınızla çalıştırın."
+                },
+                "3": {
+                    "title": "Çalışmasına izin verin, sonra Zap'i kapatın",
+                    "desc": "Zamanlayın ya da bir olayla tetikleyin. Bir haftalık çalıştırmalar doğru göründüğünde Zap'i kapatabilirsiniz."
+                }
+            },
+            "theirPricing": "Zapier görev başına ücretlendirir: ücretsiz planda ayda 100 görev; Professional ise 750 görev için yıllık faturalandırmada aylık $19.99'dan (aylık ödemede $29.99) başlar. Yapay zeka adımları, 30 saniyeyi aşan kod ve MCP çağrıları aynı havuzdan düşer; Zapier'in kendi örneğinde tek bir MCP araç çağrısı 2 görev tutar. Zapier Agents ise ayrıca etkinlik bazında faturalandırılır, Pro'da ayda 1.500. Sınırı aşarsanız ek görevler yıllık planda temel fiyatın 1,25 katı, aylık planda 2,5 katıdır. Rerun, aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmalar asla sayılmaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Zapier'e bir alternatif mi?",
+                    "answer": "Evet, muhakeme gerektiren işler için. Zapier, veriyi sizin tasarladığınız bir yol boyunca uygulamalar arasında taşır. Rerun ajanları bir hedef alır, araçları seçer ve sabit bir yolun kapsamadığı durumları ele alır. Birçok ekip basit Zap'lerini korur, kırılgan olanları Rerun'a taşır."
+                },
+                "2": {
+                    "question": "Rerun, Zapier gibi görev başına ücret alıyor mu?",
+                    "answer": "Hayır. Rerun, aylık {price} fiyatla başlayan sabit bir plandır ve çalıştırmaları ya da adımları asla saymaz. Kapasite, yani ajanlar ve model kredisi için ödersiniz; kullanıcılar ücretsiz ve sınırsızdır, yapay zeka da dahil olan kredi yerine kendi ChatGPT veya Claude planınızda ya da API anahtarınızla çalışabilir."
+                },
+                "3": {
+                    "question": "Rerun, Zapier Agents'tan nasıl ayrılıyor?",
+                    "answer": "Zapier Agents, Zapier'in içinde çalışır ve etkinlik başına faturalandırılır: Pro'da ayda 1.500; tek bir çalıştırma 40 etkinlikte durur ve sizden girdi ister. Bir Rerun ajanı çalışma alanınızın özel makinesinde çalışır, çalıştırmalar arasında dosyaları, veritabanlarını ve belleği korur ve asla çalıştırma başına sayılmaz."
+                },
+                "4": {
+                    "question": "Rerun, Zapier'de bağladığım uygulamaları kullanabilir mi?",
+                    "answer": "Rerun, {connectors}+ uygulamaya ve herhangi bir MCP sunucusuna erişir. Büyük olanlar tek bir oturum açmayla bağlanır: Gmail, Google Calendar, Drive, Sheets, Notion, Stripe, Linear, Asana, Outlook; Slack ve HubSpot ise bir kez oluşturup yapıştırdığınız bir token ister. Zapier, 10.000+ uygulamayla hâlâ daha geniş bir kataloğa sahip, bu yüzden önce niş uygulamalarınızı kontrol edin."
+                },
+                "5": {
+                    "question": "Zapier'den Rerun'a geçmek için kod yazmam gerekir mi?",
+                    "answer": "Hayır. İşi sade sözcüklerle anlatır ve uygulamalarınızı bağlarsınız. Eşlenecek alan da kurulacak bir şey de yoktur."
+                }
+            }
+        },
+        "make": {
+            "metaTitle": "Rerun vs Make: yapay zeka ajanları mı, senaryolar mı? (2026)",
+            "metaDescription": "Rerun ve Make (Integromat); kurulum, bakım ve maliyet: görsel bir senaryo ne zaman yeterli, bir yapay zeka ajanı ne zaman daha iyi bir Make alternatifi?",
+            "headline": "Rerun ve Make karşılaştırması",
+            "intro": "Make, otomasyonları her seferinde bir modül ekleyerek görsel senaryolar hâlinde kurar. Rerun ise size hedefi alan ve adımları kendisi yürüten yapay zeka ajanları verir.",
+            "verdict": "Bir tuval üzerinde dallanma ve veri eşleme üzerinde hassas kontrol ile yüksek hacimde rakipsiz, eylem başına kredi fiyatı istediğinizde Make'i seçin. İş muhakeme gerektirdiğinde ve her girdi değiştiğinde bir senaryoyu yeniden kurmak istemediğinizde Rerun'ı seçin. Rerun aylık sabit {price} tutarındadır ve modül başına kredi harcanmaz.",
+            "chooseRerun": {
+                "1": "Senaryolarınızda router'lar ve hata işleyiciler giderek çoğalıyor",
+                "2": "Bakımını yapacağınız bir tuval değil, işin yapılmasını istiyorsunuz",
+                "3": "Döngüler ve yoklamalar kredilerinizi tüketiyor",
+                "4": "Çalıştırmalar arasında bağlamı hatırlayan bir ajana ihtiyacınız var"
+            },
+            "chooseThem": {
+                "1": "Veri yolunu tam olarak kendiniz tasarlamayı seviyorsunuz",
+                "2": "Hacminiz yüksek ve her çalıştırma aynı yolu izliyor",
+                "3": "3.500+ uygulamalık kataloglarından belirli bir uygulamaya ihtiyacınız var"
+            },
+            "differences": {
+                "1": {
+                    "title": "Bağlanacak bir tuval yok",
+                    "desc": "Bir Make senaryosu, yapay zeka asistanı ilkini taslak olarak hazırlasa bile, yerleştirip eşlediğiniz bir modül zinciridir; eklediğiniz bir yapay zeka ajanı da etrafına kurduğunuz senaryonun içinde karar verir. Bir Rerun ajanı ise bir iş tanımı alır, Gmail, Notion veya Stripe'ta oturum açar, {connectors}+ uygulamaya ve herhangi bir MCP sunucusuna erişir ve tüm işi kendisi planlar."
+                },
+                "2": {
+                    "title": "Veri deposu kurmadan bellek",
+                    "desc": "Make'te bir senaryonun hatırlaması gereken her şey sizin tasarladığınız bir veri deposuna gider. Rerun ajanları belleği, dosyaları ve veritabanlarını kendi makinelerinde tutar, teklifinizi ve üslubunuzu içeren tek bir şirket beynini okur; böylece siz filtre eklemeden bu müşterinin hep geç ödediğini öğrenir."
+                },
+                "3": {
+                    "title": "Yalnızca modüller değil, dosyalar ve betikler",
+                    "desc": "Make'te her şey yerleştirdiğiniz modüllerin içinde olur ve çalıştırma bitince hiçbir şey kalmaz. Bir Rerun ajanı çalışma alanınızın özel makinesinde çalışır: dosya yazar, betik çalıştırır, bir tarayıcı kullanır, ekrandaki bir uygulamayı bir insan gibi kullanır ve çalıştırmalar arasında kendi veritabanlarını tutar."
+                },
+                "4": {
+                    "title": "Modül başına kredi yok",
+                    "desc": "Make varsayılan olarak her modül eylemi için bir kredi harcar, bazı özellikleri token, dosya boyutu veya çalışma süresi üzerinden faturalandırır ve yapay zeka ajanının sohbeti de kredi harcar; bu yüzden döngüler hızla birikir. Rerun, aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmalar asla sayılmaz."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "En sık yeniden kurduğunuz senaryoyu seçin",
+                    "desc": "Neyi başarması gerektiğini bir iki cümleyle yazın. Kurulumun tamamı bu."
+                },
+                "2": {
+                    "title": "Aynı uygulamaları bağlayın",
+                    "desc": "Gmail, Sheets veya Notion için bir oturum açma, isteyenler için bir token. Bizim yapay zekamızda, kendi ChatGPT veya Claude planınızda ya da bir API anahtarıyla çalıştırın."
+                },
+                "3": {
+                    "title": "İkisini çalıştırın, sonra senaryoyu kapatın",
+                    "desc": "Ajanı aynı zamanlamaya veya tetikleyiciye bağlayın, bir haftalık sonuçları karşılaştırın, ardından senaryoyu duraklatın."
+                }
+            },
+            "theirPricing": "Make kredi ile ücretlendirir: varsayılan olarak modül eylemi başına bir kredi; bazı özellikler token, dosya boyutu, sayfa veya çalışma süresine göre dinamik olarak faturalandırılır, bir yapay zeka ajanı da işlem başına bir kredi harcar, kendi OpenAI veya Anthropic anahtarınızı getirmediğiniz sürece buna token kredileri eklenir. Router'lar ve hata işleyiciler ücretsizdir. Ücretsiz plan ayda 1.000 kredi içerir; ücretli planlar ayda 10.000 krediden başlayan kredi kademeleriyle satılır. Rerun, aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmalar asla sayılmaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Make'e bir alternatif mi?",
+                    "answer": "Evet, iş sabit bir yol yerine muhakeme gerektirdiğinde. Make, hassas veri yönlendirmede mükemmeldir. Rerun ajanları girdiyi okur, ne yapacağına karar verir ve riskli bir şeyden önce size sorar."
+                },
+                "2": {
+                    "question": "Rerun, Make gibi kredi ya da işlem kullanıyor mu?",
+                    "answer": "Hayır. Rerun, aylık {price} fiyatla başlayan sabit bir plandır ve çalıştırmaları asla saymaz. Yalnızca ihtiyaç duyduğunuzda ajan veya model kredisi gibi kapasite eklersiniz; kullanıcılar ücretsizdir."
+                },
+                "3": {
+                    "question": "Rerun, Make AI Agents'tan nasıl ayrılıyor?",
+                    "answer": "Bir Make ajanı bir hedef alır ve araçlarını, yani modülleri, senaryoları veya MCP araçlarını seçer; ancak etrafına kurduğunuz senaryonun içinde yaşar ve her işlemde kredi harcar. Bir Rerun ajanı ise ürünün kendisidir: tüm işten sorumludur, dosyaları, veritabanları ve belleğiyle çalışma alanınızın özel makinesinde yaşar ve çalışmasını canlı bir panoda izlersiniz."
+                },
+                "4": {
+                    "question": "Make'i ve Rerun'ı birlikte kullanabilir miyim?",
+                    "answer": "Evet. Birçok ekip basit, yüksek hacimli senaryoları Make'te tutar ve muhakeme gerektiren görevleri Rerun ajanlarına verir."
+                },
+                "5": {
+                    "question": "Rerun'ı kullanmak için bir tuval öğrenmem gerekir mi?",
+                    "answer": "Hayır. Tuval yok. İşi sade sözcüklerle anlatır, uygulamalarınızı bağlarsınız ve ajan kendini kurar."
+                }
+            }
+        },
+        "n8n": {
+            "metaTitle": "Rerun vs n8n: yapay zeka ajanları mı, iş akışları mı? (2026)",
+            "metaDescription": "Rerun ve n8n; kurulum, barındırma ve maliyet: bir n8n iş akışı ne zaman mantıklı, kodsuz bir yapay zeka ajanı ne zaman daha iyi bir n8n alternatifi?",
+            "headline": "Rerun ve n8n karşılaştırması",
+            "intro": "n8n, teknik ekipler için kendi sunucunuzda ya da onların bulutunda çalışan bir iş akışı otomasyon aracıdır. Rerun ise size, bağlanacak hiçbir düğüm olmadan, kendi özel makinenizde çalışan yapay zeka ajanları verir.",
+            "verdict": "Kod düğümleri, Git ve kendi sunucularını isteyen ve güncellemeleri üstlenecek mühendisleriniz varsa n8n'i seçin. Kimse iş akışlarının ya da altyapının bakımını yapmadan işi gören ajanlar istiyorsanız Rerun'ı seçin. Rerun aylık sabit {price} tutarındadır ve ajanlarınızın çalıştığı özel makineyi içerir.",
+            "chooseRerun": {
+                "1": "Ekipte kimse bir sunucuyu ve güncellemelerini üstlenmek istemiyor",
+                "2": "Otomasyona ihtiyaç duyan kişiler ifade yazmıyor",
+                "3": "Uç durumlarda bozulan iş akışları yerine uyum sağlayan ajanlar istiyorsunuz",
+                "4": "Tüm ekibin ajanların ne yaptığını canlı olarak görmesini istiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Her şeyi ücretsiz olarak kendi altyapınızda çalıştırmanız gerekiyor",
+                "2": "Ekibiniz her iş akışında JavaScript veya Python istiyor",
+                "3": "Otomasyonlar için Git tabanlı sürüm kontrolüne güveniyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Düğüm yok, ifade yok",
+                    "desc": "n8n iş akışları, AI Workflow Builder taslak olarak hazırlasa bile, çoğu zaman JSON ifadeleri veya kod içeren düğüm grafikleridir. Bir Rerun ajanı ise işi sade sözcüklerle alır, Gmail, Notion veya Stripe'ta oturum açar ve {connectors}+ uygulamaya ve herhangi bir MCP sunucusuna erişir."
+                },
+                "2": {
+                    "title": "Barındırılan, yalıtılmış, bakımı yapılan",
+                    "desc": "n8n'i kendi sunucunuzda barındırmak güncelleme, yedekleme ve çalışma süresi takibi demektir; Business planı ise yalnızca kendi sunucunuzda, ayda €667'dır. n8n Cloud bunun yerine çalıştırma başına ücretlendirir. Her Rerun planı, ajanların dosyalarını ve veritabanlarını tuttuğu, sizin için güncel tutulan, bulutta size ait yalıtılmış bir bilgisayar olan özel bir makine içerir."
+                },
+                "3": {
+                    "title": "Sizi beklemeyen onaylar",
+                    "desc": "n8n, bir araç çalışmadan önce bir ajanı duraklatıp bir kişi yanıt verene kadar Slack, Gmail, Teams veya kendi sohbetinde bekleyebilir. Rerun da durup uygulamada sorar; Autopilot açıkken siz uzaktayken ajanlarınızı yöneten asistan Chief of Staff kurallarınız dahilinde yanıt verir, harcama veya silme için asla; ardından yapılan işi ve size kazandırdığı saatleri özetler."
+                },
+                "4": {
+                    "title": "Çalıştırmalar sayılmaz",
+                    "desc": "n8n Cloud her iş akışı çalıştırmasını sayar: Starter'da ayda 2.500, Pro'da 10.000. Bir Rerun ajanı birkaç dakikada bir ya da her webhook'ta çalışabilir ve plan aylık {price} olarak kalır."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "En çok bakımını yaptığınız iş akışını seçin",
+                    "desc": "Sonucunu sade sözcüklerle anlatın. Ajan kendi planını buradan yazar."
+                },
+                "2": {
+                    "title": "Uygulamalarınızı ve yapay zekanızı bağlayın",
+                    "desc": "Uygulama başına bir oturum açma, isteyenler için bir token, buna ek olarak herhangi bir MCP sunucusu veya API. Bizim modellerimizi ya da kendi anahtarlarınızı kullanın."
+                },
+                "3": {
+                    "title": "Çalıştırın, sonra iş akışını emekliye ayırın",
+                    "desc": "Zamanlayın ya da tetikleyin. Sonuçlar bir hafta boyunca tutarlı kaldığında bakımını yapacağınız bir iş akışı eksilir."
+                }
+            },
+            "theirPricing": "n8n Cloud iş akışı çalıştırması başına ücretlendirir: Starter'da 2.500 çalıştırma ve tek bir paylaşılan proje için yıllık faturalandırmada aylık €20'dan, Pro'da 10.000 çalıştırma ve üç proje için €50'dan başlar. €667 olan Business yalnızca kendi sunucunuzda çalışır. Community Edition'ı kendi sunucunuzda ücretsiz barındırabilirsiniz, ancak sunucu, güncellemeler ve güvenlik sizin sorumluluğunuzdadır. Rerun, özel makine dahil aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmalar asla sayılmaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, n8n'e bir alternatif mi?",
+                    "answer": "Evet, iş akışlarının bakımını yapmadan sonuç isteyen ekipler için. n8n, grafik kurmayı ve barındırmayı seven mühendislere uyar. Rerun ajanları hedefi sade sözcüklerle alır ve bakımı sizin için yapılan bir makinede çalışır."
+                },
+                "2": {
+                    "question": "Rerun'ı n8n gibi kendi sunucumda barındırabilir miyim?",
+                    "answer": "Her plan size zaten özel ve yalıtılmış bir makine verir. Enterprise planında özel veya kendi sunucunuzda barındırılan altyapı sunulur; help@rerun.build adresinden bize yazın."
+                },
+                "3": {
+                    "question": "Rerun, n8n AI Agent düğümünden nasıl ayrılıyor?",
+                    "answer": "n8n düğümü, tasarlayıp barındırdığınız bir iş akışının içindeki tek bir adımdır. Bir Rerun ajanı ise çalışanın tamamıdır: adımları planlar, belleği ve dosyaları korur, kendi zamanlamasıyla çalışır ve riskli bir şeyden önce size sorar."
+                },
+                "4": {
+                    "question": "Rerun çalıştırma başına ücret alıyor mu?",
+                    "answer": "Hayır. Rerun, aylık {price} fiyatla başlayan sabit bir plandır ve çalıştırmaları asla saymaz."
+                },
+                "5": {
+                    "question": "Ben uzaktayken bir ajanın onaya ihtiyacı olursa ne olur?",
+                    "answer": "Durup sorar, size bir e-posta gelir ve uygulamada yanıt verirsiniz. Ücretli planlarda Autopilot'u da açabilirsiniz: siz uzaktayken ajanlarınızı yöneten asistan Chief of Staff, kurallarınız dahilinde sorularını yanıtlar ve rutin eylemleri onaylar. Para harcamak ve silmek her zaman sizi bekler ve her karar kayda geçer."
+                },
+                "6": {
+                    "question": "Rerun ile kod yazmam gerekir mi?",
+                    "answer": "Hayır. İşi anlatır, uygulamalarınızı bağlarsınız ve ajan kendini kurar. Geliştiriciler yine de herhangi bir MCP sunucusunu veya API'yi bağlayabilir."
+                }
+            }
+        },
+        "lindy": {
+            "metaTitle": "Rerun vs Lindy: sabit fiyat, kendi yapay zekanız (2026)",
+            "metaDescription": "Rerun ve Lindy; fiyat, krediler ve modeller. Lindy her kullanıcıyı ve görevi kredi ile ücretlendirir; Rerun, ChatGPT veya Claude planınızla tek sabit plan.",
+            "headline": "Rerun ve Lindy karşılaştırması",
+            "intro": "Lindy, ekibinizin Slack'ten ve kendi uygulamalarından ulaştığı, aktif kullanıcı başına ve kredi ile ücretlendirilen bir yapay zeka asistanıdır. Rerun ise ekibinize, kendi yapay zeka planınızda, özel bir makinede, tek bir sabit fiyatla çalışan ajanlar verir.",
+            "verdict": "Ekibiniz Slack'te yaşıyorsa ve herkesin @mention ile çağırabileceği tek bir asistan, 1.500+ entegrasyon, yerleşik toplantı notları ve Enterprise planında imzalı BAA ile HIPAA istiyorsa Lindy'yi seçin. Maliyeti her görevle ya da her kişiyle artmayan ajanlar istiyorsanız Rerun'ı seçin: aylık {price} fiyatla başlayan tek bir plan sınırsız ajanı ve ek ücret olmadan tüm ekibinizi kapsar; yapay zeka da zaten ödediğiniz ChatGPT veya Claude planında çalışır.",
+            "chooseRerun": {
+                "1": "Her görevin bir kredi bakiyesinden düşmesini istemiyorsunuz",
+                "2": "Zaten ChatGPT veya Claude için ödüyorsunuz ve ajanlarınızın onu kullanmasını istiyorsunuz",
+                "3": "{templates}+ hazır ajanla başlamak ya da kendi ajanınızı bir uzmana kurdurmak istiyorsunuz",
+                "4": "Üç kişilik bir ekip üç aboneliğe mal olmamalı"
+            },
+            "chooseThem": {
+                "1": "Ekibiniz Slack'te çalışıyor ve paylaşılan tek bir asistanı @mention ile çağırmak istiyor",
+                "2": "İmzalı BAA ile HIPAA'ya ihtiyacınız var",
+                "3": "Yerleşik toplantı kaydı ve notları istiyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Kredi sayacı değil, sabit bir plan",
+                    "desc": "Lindy'de bir kredi $0.01'dır ve her görev kredi harcar: gündelik bir istek için 2'den büyük bir kurulum için 2.500'e kadar; krediler bittiğinde Lindy, kredi kullanan eylemleri bir sonraki döneme kadar duraklatır. Rerun, sınırsız ajan için aylık {price} tutarındadır ve çalıştırmaları asla saymaz."
+                },
+                "2": {
+                    "title": "Zaten ödediğiniz yapay zeka",
+                    "desc": "Lindy modeli seçmenize izin verir ancak hepsini kendi kredileriyle faturalandırır ve kendi anahtarınızı getirmenin belgelenmiş bir yolu yoktur. Rerun'da her ajan ChatGPT veya Claude planınızla oturum açabilir, Anthropic, OpenAI, Google veya OpenRouter anahtarınızı kullanabilir ya da plana dahil Rerun modelinde çalışabilir; modeli ajan başına değiştirebilirsiniz."
+                },
+                "3": {
+                    "title": "Eğitilmiş gelen ajanlar",
+                    "desc": "Topluluğun ve uzmanların oluşturduğu {templates}+ hazır ajanla başlayın ya da kendi ajanınızı bir uzmana kurdurup teslim alın. Her biri düzeltmelerinizden öğrenmeye devam eder ve hepsi tek bir şirket beynini okur: teklifiniz, fiyatlarınız, üslubunuz."
+                },
+                "4": {
+                    "title": "Ekibiniz fiyata dahil",
+                    "desc": "Lindy, çalışma alanındaki her aktif kullanıcıyı, kişi başına aylık $49.99'dan başlayan fiyatla faturalandırır; yani üç kişilik bir ekip yaklaşık $150'dan başlar. Rerun'da kullanıcılar ücretsiz ve sınırsızdır; bir ajanın e-postasını onaylayan ekip arkadaşının kendine ait bir aboneliğe ihtiyacı yoktur."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Lindy'nin en çok yaptığı işi seçin",
+                    "desc": "Onu sade sözcüklerle anlatın ya da bu işi zaten yapan hazır ajanı yükleyin."
+                },
+                "2": {
+                    "title": "Uygulamalarınızı ve yapay zekanızı bağlayın",
+                    "desc": "Her uygulama için bir oturum açma, isteyenler için bir token. ChatGPT veya Claude planınızla oturum açın ya da kendi anahtarınızı kullanın."
+                },
+                "3": {
+                    "title": "Bir hafta ikisini de çalıştırın",
+                    "desc": "Ajanı aynı zamanlamaya veya tetikleyiciye bağlayın, sonuçları karşılaştırın, ardından Lindy'yi kademeli olarak kapatın."
+                }
+            },
+            "theirPricing": "Lindy aktif kullanıcı başına ücretlendirilir: ücretsiz plan 7 gün sonra sona eren $50 kredi verir; Team, aktif kullanıcı başına aylık $49.99'dan başlar ve kişi başına 5.000 kredi sunar, krediler çalışma alanında ortak havuzda toplanır, üstünde daha büyük kredi kademeleri vardır. Bir kredi $0.01'dır, her görev kredi harcar ve bakiye sıfırlandığında Lindy kredi kullanan eylemleri bir sonraki döneme kadar duraklatır; bir yönetici 1.000 kredi başına $10 ile yükleme yapabilir. Rerun, tüm ekibinizin kullandığı sınırsız ajan için kullanıcılar dahil aylık {price} fiyatla başlayan tek bir plandır ve çalıştırmaları asla saymaz.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Lindy'ye bir alternatif mi?",
+                    "answer": "Evet. İkisi de araçlarınız genelinde çalışan yapay zeka ajanları verir. Rerun, her aktif kullanıcı için bir kullanıcı ücreti artı kredi yerine tek bir sabit plan ücreti alır ve ajanlarınızı zaten ödediğiniz ChatGPT veya Claude planında, kendi anahtarınızla ya da dahil olan krediyle çalıştırır."
+                },
+                "2": {
+                    "question": "Rerun, Lindy gibi kredi kullanıyor mu?",
+                    "answer": "Rerun çalıştırmaları ya da görevleri asla saymaz. Plan, Rerun'ın barındırdığı modeller için küçük bir kredi içerir; kendi ChatGPT veya Claude planınızda ya da API anahtarınızla çalışan ajanlar Rerun tarafında ek bir maliyet getirmez."
+                },
+                "3": {
+                    "question": "ChatGPT veya Claude aboneliğimi Rerun ile kullanabilir miyim?",
+                    "answer": "Evet. Bir ajanda Claude veya ChatGPT planınızla oturum açın; ajan, o planın kendi kullanım limitleri dahilinde onun üzerinde çalışır. Ya da bir Anthropic, OpenAI, Google veya OpenRouter anahtarı kullanın. Lindy'de bunun belgelenmiş bir karşılığı yoktur."
+                },
+                "4": {
+                    "question": "Ben uzaktayken bir ajanın onaya ihtiyacı olursa ne olur?",
+                    "answer": "Durup sorar, size bir e-posta gelir ve uygulamada yanıt verirsiniz. Ücretli planlarda Autopilot'u da açabilirsiniz: siz uzaktayken ajanlarınızı yöneten asistan Chief of Staff, kurallarınız dahilinde sorularını yanıtlar ve rutin eylemleri onaylar. Para harcamak ve silmek her zaman sizi bekler ve her karar kayda geçer."
+                },
+                "5": {
+                    "question": "Rerun, Lindy gibi Slack içinde çalışıyor mu?",
+                    "answer": "Rerun ajanları, bir kez oluşturduğunuz bir Slack uygulaması aracılığıyla Slack'te okur ve gönderi paylaşır, ancak onlara talimatı Rerun uygulamasında verir ve sorularını orada yanıtlarsınız. Ekibiniz gün boyu Slack içinde @mention ile çağıracağı tek bir asistan istiyorsa Lindy tam bunun için tasarlanmıştır."
+                },
+                "6": {
+                    "question": "Ücretsiz deneme var mı?",
+                    "answer": "Rerun'ın 5 günlük ücretsiz denemesi vardır; kart gerekir ve bugün $0 tahsil edilir, ardından aylık {price} fiyatla başlayan tek bir plan gelir. Lindy'nin ücretsiz planı 7 gün sonra sona eren $50 kredi verir."
+                }
+            }
+        },
+        "twin": {
+            "metaTitle": "Rerun vs Twin: sabit planlar gerçekte neler içeriyor (2026)",
+            "metaDescription": "Rerun ve Twin (twin.so): ikisi de sabit fiyatlı. Giriş planını, $149'lık tarayıcı ajanını, ekip ve müşteri farkını, kullandığınız modeli karşılaştırın.",
+            "headline": "Rerun ve Twin karşılaştırması",
+            "intro": "Twin, bir sohbetten bir ajan oluşturur ve onu kredisiz, sabit bir planda çalıştırır. Rerun da öyle yapar; üstelik her ajana özel bir makine, tüm ekibinizi ve seçtiğiniz modeli verir.",
+            "verdict": "Twin kredileri bıraktı, dolayısıyla soru artık bir çalıştırmanın ne kadara mal olduğu değil, planın neleri içerdiği. Twin; ajanlar, zamanlamalar ve uygulama bağlantıları için aylık $29, tarayıcı ajanı, potansiyel müşteri bulma ve derin araştırma için $149. Rerun ise ilk plandan itibaren özel bir makine, ajanın bir insan gibi kullandığı bir tarayıcı ve masaüstü, harcamadan önce onayınızı isteyen ücretli veriler ve ek ücret olmadan davet edilen tüm ekibinizle aylık {price}. Tek başınıza çalışıyorsanız, müşterilere hizmet veriyorsanız ve tarayıcı ajanını istiyorsanız Twin'i seçin; Store planı her müşteri için ayrı ayarlanmış bir ajan sunar.",
+            "chooseRerun": {
+                "1": "Ajanları yalnızca müşterilerinizin değil, ekip arkadaşlarınızın da kullanması gerekiyor",
+                "2": "Modeli seçmek ya da zaten ödediğiniz ChatGPT veya Claude planında çalışmak istiyorsunuz",
+                "3": "Tarayıcıyı ve gerçek bir bilgisayarı $149'da değil, giriş planında istiyorsunuz",
+                "4": "Boş bir ajana talimat vermek yerine {templates}+ hazır ajandan birini yüklemeyi tercih ediyorsunuz"
+            },
+            "chooseThem": {
+                "1": "İşin çoğu API'si olmayan web sitelerinde tıklamaktan oluşuyor",
+                "2": "Bir ajans yönetiyorsunuz ve her müşteri için kendi panosu olan, ayrı ayarlanmış bir ajan istiyorsunuz",
+                "3": "Kart bilgisi girmeden başlamak istiyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Yalnızca bir tarayıcı değil, bir makine",
+                    "desc": "Twin'in tarayıcı ajanı, $149'lık planında herhangi bir web sitesinin içinde çalışır. Rerun'da her ajanın aylık {price} fiyattan itibaren özel bir makinesi vardır: bir shell, dosyalar, iki veritabanı, bir tarayıcı ve API'si olmayan uygulamalar için bir insan gibi kullandığı bir masaüstü."
+                },
+                "2": {
+                    "title": "Modeli siz seçersiniz",
+                    "desc": "Twin her görevi kendi seçtiği modele yönlendirir ve planlarının hiçbiri kendi anahtarınızı ya da yapay zeka planınızı getirmenize izin vermez. Rerun'da ajan başına seçersiniz: plana dahil Rerun modeli, ChatGPT veya Claude planınız ya da bir Anthropic, OpenAI, Google veya OpenRouter anahtarı; istediğiniz zaman değiştirebilirsiniz."
+                },
+                "3": {
+                    "title": "Yalnızca müşterileriniz değil, ekibiniz",
+                    "desc": "Twin, her birinin bir panosu olan en fazla 5 müşteri davet etmenize izin verir ve onu yalnızca sizin kullanmanız gerektiğini söyler. Rerun'da kullanıcılar ücretsiz ve sınırsızdır: ekip arkadaşlarınız aynı panoyu paylaşır, bir şey sormak için duran bir ajana herhangi biri yanıt verebilir; Autopilot açıkken kimse yokken Chief of Staff kurallarınız dahilinde yanıt verir."
+                },
+                "4": {
+                    "title": "Fiyatını onayladığınız potansiyel müşteri verisi",
+                    "desc": "Twin'in potansiyel müşteri bulma, veri zenginleştirme ve yerel işletme haritalama özellikleri $149'lık planla gelir. Rerun'da doğrulanmış e-postalar, telefon numaraları, Google Maps kayıtları ve arama sıralamaları ürünün içindedir: ajan toplu sorgunun fiyatını çıkarır, maliyeti satır satır gösterir ve siz onaylayana kadar sorgu çalışmaz."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "En sık çalıştırdığınız ajanı seçin",
+                    "desc": "İşini sade sözcüklerle anlatın ya da bu işi zaten yapan hazır ajanı yükleyin."
+                },
+                "2": {
+                    "title": "Aynı uygulamaları bağlayın, modeli seçin",
+                    "desc": "Gmail, Sheets veya Notion için bir oturum açma. Ardından modeli seçin: bizimki, kendi anahtarınız ya da zaten ödediğiniz ChatGPT veya Claude planı."
+                },
+                "3": {
+                    "title": "Dışarıda kalanları davet edin",
+                    "desc": "Ekip arkadaşlarınız ek ücret olmadan aynı panoya katılır, çalıştırmaları izler ve ajanlar sorduğunda yanıt verir."
+                }
+            },
+            "theirPricing": "Twin kredisiz, sabit fiyatlıdır: Plus; sınırsız ajan, zamanlanmış çalıştırmalar, webhook'lar ve uygulama bağlantıları için aylık $29, Pro; tarayıcı ajanı, potansiyel müşteri bulma, derin araştırma, görsel ve video üretimi ve mülk verileri için $149, Store ise müşteri başına ayarlanmış tek bir ajan için $399'dan başlar. Plus ve Pro, her birinin bir panosu olan en fazla 5 müşteri davet etmenize izin verir ve her plan kart gerektirmeyen 7 günlük ücretsiz deneme sunar. Twin'in kendi belgelerinin hâlâ eski kredi sistemini anlattığını unutmayın. Rerun; sınırsız ajan, özel bir makine, model kredisi ve sınırsız kullanıcı için aylık {price} fiyatla başlayan, 5 günlük ücretsiz denemeli tek bir plandır.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Twin'e bir alternatif mi?",
+                    "answer": "Evet, ve ikisi eskisinden daha yakın: ikisi de sade bir tanımdan ajan oluşturur, onları bir zamanlamayla ya da bir olayla çalıştırır ve kredisiz, sabit bir fiyat alır. Rerun buna giriş planında özel bir makine, model seçimi, sınırsız ücretsiz kullanıcı ve {templates}+ hazır ajan ekler."
+                },
+                "2": {
+                    "question": "Twin hâlâ kredi ile ücretlendiriyor mu?",
+                    "answer": "Artık “Unlimited Plans. No Credits.” yazan fiyatlandırma sayfasında hayır. Belgeleri hâlâ eski kredi kademelerini anlatıyor, bu yüzden esas alınması gereken planlardır: aylık $29, $149 ve $399'dan başlayan."
+                },
+                "3": {
+                    "question": "Rerun'da modeli seçebilir miyim?",
+                    "answer": "Evet, ajan başına ve hatta zamanlanmış görev başına: plana dahil Rerun modeli ya da kendi aboneliğiniz veya anahtarınızla Claude, GPT, Gemini ve daha fazlası. Twin modeli sizin yerinize seçer."
+                },
+                "4": {
+                    "question": "Rerun ajanları tarayıcı kullanabilir mi?",
+                    "answer": "Evet, ilk plandan itibaren. Ajanlar kendi makinelerinde bir tarayıcı kullanır ve API'leri üzerinden eriştikleri {connectors}+ uygulamanın yanında, API'si olmayan uygulamalar için tam bir masaüstünü devralabilir. Twin'in tarayıcı ajanı ise $149'lık planında, birçok web sitesinde yoğun tıklama için özel olarak tasarlanmıştır."
+                },
+                "5": {
+                    "question": "Ekip arkadaşlarım Rerun'ı kullanabilir mi?",
+                    "answer": "Evet, kullanıcılar ücretsiz ve sınırsızdır. Herkes ajanları çalışırken görür ve bir şey sormak için duran bir ajana yanıt verebilir. Twin'in davetleri ise ekip arkadaşları için değil, kendi panosu olan müşteriler içindir."
+                }
+            }
+        },
+        "dust": {
+            "metaTitle": "Rerun vs Dust: sabit fiyat, tüm uygulamalar, ücretsiz ekip",
+            "metaDescription": "Rerun ve Dust; kullanıcılar, krediler ve bağlayıcılar. Dust her kullanıcıyı fiyatlar, otomasyonu ölçer; Rerun sınırsız kullanıcılı, tüm uygulamalı plan.",
+            "headline": "Rerun ve Dust karşılaştırması",
+            "intro": "Dust, herkese şirketinizin belgelerini bilen, kullanıcı başına ve kredi ile fiyatlandırılan ajanlar verir. Rerun ise ekibinize işi kendi başına yürüten ajanlar verir; özel bir makinede, tek bir sabit fiyatla.",
+            "verdict": "İş; SSO, SOC 2 Type II ve AB ya da ABD barındırması gereken büyük bir ekip için Notion, Drive ve Slack genelinde şirket bilgisinden yanıt vermekse Dust'ı seçin. Ajanlar operasyonları kendi başlarına, bir zamanlamayla ya da bir webhook ile, {connectors}+ uygulama genelinde yürütecekse ve her çalıştırma kullanıcıları ücretsiz bir ekibe görünür olacaksa Rerun'ı seçin: kişi başına bir kullanıcı ücreti ve kredi kotası yerine aylık {price}.",
+            "chooseRerun": {
+                "1": "Ajanlar bir zamanlamaya göre harekete geçmeli ve tüm ekip çalıştırmaları görmeli",
+                "2": "Kurumsal bir sözleşme olmadan 3'ten fazla bağlayıcıya ihtiyacınız var",
+                "3": "Otomatik çalıştırmalar kredi başına ölçülmemeli",
+                "4": "Bir ajana haftada yalnızca iki kez yanıt veren iş arkadaşınız için ödeme yapmak istemiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Asıl iş, şirketinizin belgelerinde arama yapmak ve yanıt vermek",
+                "2": "Bugün AB'de veri yerleşimine, SSO'ya ve SOC 2 Type II'ye ihtiyacınız var",
+                "3": "Tüm şirkete tek bir asistan sunuyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "Otomasyon ölçülmez",
+                    "desc": "Dust, bir API çağrısı ya da bir tetikleyici çalıştırması gibi kimsenin yazmadığı kullanımı kredi başına $0.01 ile faturalandırır ve bir webhook tetikleyicisi günde en fazla 42 kez çalışır. Rerun'da zamanlanmış ve webhook çalıştırmaları ek bir maliyet getirmez: plan aylık {price} tutarındadır, çalıştırmalar asla sayılmaz ve bir zamanlama her dakika çalışabilir."
+                },
+                "2": {
+                    "title": "Her planda tüm uygulamalar",
+                    "desc": "Dust'ın self servis planı en fazla 3 veri kaynağı ve 5 uzak MCP sunucusu bağlar. Her Rerun planı {connectors}+ uygulamaya erişir: Gmail, Drive, Notion veya Stripe için bir oturum açma, geri kalanı için bir token, buna ek olarak herhangi bir MCP sunucusu."
+                },
+                "3": {
+                    "title": "Tüm ekibin görebildiği çalıştırmalar",
+                    "desc": "Dust'ta “tetikleyiciler onları oluşturan üyeye aittir” ve o kişi sohbeti bir Pod'a koymadıkça çalıştırma onun geçmişine düşer. Rerun'da her ajanın her rutini, çalışma alanının paylaştığı tek bir Routines listesinde bir sonraki çalıştırmasıyla birlikte yer alır ve bir şey sormak için duran bir ajana herhangi bir ekip arkadaşı yanıt verebilir."
+                },
+                "4": {
+                    "title": "Kullanıcılar ücretsiz, bilgi paylaşılır",
+                    "desc": "Dust, onu kullanan herkesi, her birinin bir sonraki aya devretmeyen kendi kredi kotasıyla fiyatlandırır. Rerun'da kullanıcılar ücretsiz ve sınırsızdır ve her ajan, kendi belleği ve dosyalarının yanında, teklifinizi, fiyatlarınızı, pazarınızı ve üslubunuzu tutan aynı şirket beynini okur."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Ekibinizin en sık tetiklediği ajanı seçin",
+                    "desc": "İşini sade sözcüklerle anlatın ya da bu işi zaten yapan hazır bir ajan yükleyin."
+                },
+                "2": {
+                    "title": "Aynı kaynakları bağlayın",
+                    "desc": "Notion, Drive, Gmail ve {connectors}+ uygulama daha; bağlayıcı sınırı ve üstüne bir kredi sayacı olmadan."
+                },
+                "3": {
+                    "title": "Bir zamanlamaya bağlayın ve herkesi davet edin",
+                    "desc": "Bir zamanlama ya da bir webhook ayarlayın, ardından çalıştırmaları izlemesi ve ajana yanıt vermesi için tüm ekibi ek ücret olmadan davet edin."
+                }
+            },
+            "theirPricing": "Dust her kullanıcıyı fiyatlandırır: Pro, 8.000 krediyle yıllık faturalandırmada aylık €24 veya aylık ödemede €30, Max ise 40.000 krediyle €120 veya €150'dır, KDV hariç; ücretsiz bir kullanıcı bir kereye mahsus 500 kredi alır. Krediler bir sonraki aya devretmez, otomatik kullanım kredi başına $0.01 ile faturalandırılır ve self servis plan en fazla 3 veri kaynağı ve 5 uzak MCP sunucusu bağlar. Rerun, sınırsız kullanıcı ve bağlayıcı sınırı olmadan, sınırsız ajan için aylık {price} fiyatla başlayan tek bir plandır.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Dust'a bir alternatif mi?",
+                    "answer": "Ajanların işi kendi başlarına yürütmesini isteyen ekipler için evet. Dust, sohbetlerde şirket bilgisinden yanıt vermede en güçlüdür. Rerun ajanları ise bir zamanlamayla ya da bir webhook ile, {connectors}+ uygulama genelinde, özel bir makinede, tek bir sabit fiyatla çalışır."
+                },
+                "2": {
+                    "question": "Rerun, Dust gibi kullanıcı başına ücret alıyor mu?",
+                    "answer": "Hayır. Ücretli bir Rerun planında kullanıcılar ücretsiz ve sınırsızdır ve takip etmeniz gereken bir kredi kotası taşımazlar. Ajanlar ve model kredisi için ödersiniz, çalıştırmalar asla sayılmaz."
+                },
+                "3": {
+                    "question": "Rerun, şirket belgelerimizde Dust gibi arama yapabilir mi?",
+                    "answer": "Ajanlar Notion, Google Drive, Gmail ve diğer uygulamaları bağlantıları üzerinden okur; çalışma alanı da işletmeniz hakkında onayladığınız sayfaları içeren, her ajanın okuduğu bir şirket beyni tutar. Tüm belgelerde, izinlerle birlikte şirket çapında arama için Dust özel olarak tasarlanmıştır."
+                },
+                "4": {
+                    "question": "Bir Rerun ajanı ne sıklıkla çalışabilir?",
+                    "answer": "İşin gerektirdiği sıklıkta: bir zamanlama her dakika çalışabilir ve webhook'larda sınır yoktur. Dust'ın webhook tetikleyicileri varsayılan olarak 24 saatte en fazla 42 kez çalışır."
+                },
+                "5": {
+                    "question": "Ücretsiz deneme var mı?",
+                    "answer": "Rerun'ın 5 günlük ücretsiz denemesi vardır; kart gerekir ve bugün $0 tahsil edilir, ardından aylık {price} fiyatla başlayan tek bir plan gelir."
+                }
+            }
+        },
+        "squad": {
+            "metaTitle": "Rerun vs Squad: tek plan, yapay zeka dahil (2026)",
+            "metaDescription": "Rerun ve Squad (squad.so); fiyat ve modeller. Squad, getirdiğiniz yapay zeka planına ek olarak aylık $99; Rerun daha ucuz ve model kredisi içerir.",
+            "headline": "Rerun ve Squad karşılaştırması",
+            "intro": "Squad size yapay zeka ekip arkadaşları kiralar ve yapay zekayı sizin getirmenizi ister. Rerun ise onların yaşadığı, model kredisi dahil çalışma alanının tamamıdır: yüklemeye hazır bir ajan kitaplığı, {connectors}+ uygulama ve işin yapılışını izlediğiniz bir pano.",
+            "verdict": "Squad ve Rerun birbirine benzer: bulutta bir bilgisayarda, onaylar ve çalıştırma kayıtlarıyla çalışan ajanlar. Fark faturada ve etrafında sunulanlarda. Squad, önerdiği $100 ile $200 arası bir yapay zeka planına ek olarak aylık $99'dır, yani gerçek taban fiyat $200 civarındadır. Rerun ise model kredisi, {templates}+ hazır ajan, {connectors}+ uygulama ve sizin için ajan kuran uzmanlarla aylık {price}. Yedekleme seçenekleriyle birkaç yapay zeka hesabını üst üste kullanmak ya da her ekip arkadaşına kendi e-posta kutusunu vermek istiyorsanız Squad'ı seçin.",
+            "chooseRerun": {
+                "1": "İlk ajan çalışmadan önce $100'lık bir yapay zeka planı satın almak istemiyorsunuz",
+                "2": "Boş bir ajana talimat vermek yerine {templates}+ hazır ajandan birini yüklemeyi tercih ediyorsunuz",
+                "3": "70'ten fazla entegrasyona ihtiyacınız var",
+                "4": "Ajanınızı bir uzmanın kurup çalışmaya hazır şekilde teslim etmesini istiyorsunuz"
+            },
+            "chooseThem": {
+                "1": "Birkaç yapay zeka hesabını üst üste kullanmak ve biri sınırına ulaştığında diğerine geçmek istiyorsunuz",
+                "2": "Her ekip arkadaşının kendi e-posta adresi ve gelen kutusu olsun istiyorsunuz",
+                "3": "Kadronuzu sizinle birlikte tasarlayacak bir yapay zeka Chief of Staff istiyorsunuz"
+            },
+            "differences": {
+                "1": {
+                    "title": "İki fatura yerine tek fatura",
+                    "desc": "Squad platform için aylık $99 alır ve iş, getirdiğiniz ve $100 ile $200 arası önerdiği bir yapay zeka planında çalışır. Rerun model kredisi dahil aylık {price} tutarındadır; kendi planınızı getirmek bir koşul değil, bir seçenek olarak kalır."
+                },
+                "2": {
+                    "title": "Eğitilmiş gelen ajanlar",
+                    "desc": "Rerun, topluluğunun ve uzmanlarının oluşturduğu {templates}+ hazır ajanla açılır: birini yükleyin, araçlarınıza yönlendirin, size özgü kısımları değiştirin. Ajan dosyalarını, veritabanlarını ve düzeltmelerinizi kendi makinesinde tutar ve tüm çalışma alanının paylaştığı bir şirket beynini okur."
+                },
+                "3": {
+                    "title": "Altyapınızın daha fazlası, tarayıcıdan",
+                    "desc": "Squad 70+ araca bağlanır. Rerun {connectors}+ uygulamaya erişir: Gmail, Notion, Stripe veya Linear için bir oturum açma, geri kalanı için bir token, buna ek olarak herhangi bir MCP sunucusu; her ajanı da seçtiğiniz modelde çalıştırır: plana dahil Rerun modeli, Claude veya ChatGPT planınız ya da kendi anahtarınız."
+                },
+                "4": {
+                    "title": "Ekibiniz aynı panoda",
+                    "desc": "Ekibinizi ek ücret olmadan davet edin, ajanları Box'lara ayırın; herkes aynı canlı panoyu izler. Bir ajan önemli bir şeyden önce sormak için durduğunda herhangi bir ekip arkadaşı yanıt verebilir; Autopilot açıkken kimse yokken Chief of Staff kurallarınız dahilinde yanıt verir."
+                }
+            },
+            "switchSteps": {
+                "1": {
+                    "title": "Boş bir sayfadan değil, bir ajandan başlayın",
+                    "desc": "Kitaplıktan hazır bir ajan yükleyin ya da işi sade sözcüklerle anlatıp kendi talimatlarını ve skill'lerini yazmasına izin verin."
+                },
+                "2": {
+                    "title": "Aynı uygulamaları bağlayın, modeli seçin",
+                    "desc": "Gmail, Stripe veya Notion için bir oturum açma. Rerun kredisiyle, kendi API anahtarınızla ya da zaten Squad'a getirdiğiniz ChatGPT veya Claude planıyla çalıştırın."
+                },
+                "3": {
+                    "title": "Panoda izleyin, sonra iptal edin",
+                    "desc": "Kendi makinesinde, bir zamanlamayla ya da bir tetikleyiciyle çalışır ve her çalıştırma ekibinizin izlediği panoda belirir. Bir haftalık çalıştırmalar doğru göründüğünde Squad'ı iptal edin."
+                }
+            },
+            "theirPricing": "Squad; sınırsız yapay zeka ekip arkadaşı, tüm ekip için tek bir özel bulut bilgisayar ve 70+ entegrasyon için aylık $99'dır; ekip arkadaşı başına e-posta kutusu ise her biri için aylık $10'dır. İş, getirdiğiniz ve Squad'ın aylık $100 ile $200 arası önerdiği bir yapay zeka planında çalışır, yani gerçek taban fiyat $200 civarındadır. Squad ücretsiz deneme yerine 7 günlük para iade garantisi sunar. Rerun; özel bir makine, model kredisi, sınırsız kullanıcı ve {templates}+ hazır ajan içeren, aylık {price} fiyatla başlayan, 5 günlük ücretsiz denemeli tek bir plandır.",
+            "faq": {
+                "1": {
+                    "question": "Rerun, Squad'a bir alternatif mi?",
+                    "answer": "Evet, üstelik ajanların etrafında daha fazlasını sunar: {templates}+ hazır ajanlık bir kitaplık, sizin için ajan kuran uzmanlar, {connectors}+ uygulama ve canlı bir pano. Model kredisi dahil aylık {price} fiyatla başlar, yani bir ajanın çalışabilmesi için satın alınacak başka bir şey yoktur."
+                },
+                "2": {
+                    "question": "Squad gerçekte ne kadara mal olur?",
+                    "answer": "Squad aylık $99'dır ve iş, getirdiğiniz bir yapay zeka planında çalışır. Squad aylık $100 ile $200 arası ChatGPT önerir, yani gerçek taban fiyat $200 civarındadır; buna her ekip arkadaşı e-posta kutusu için aylık $10 eklenir."
+                },
+                "3": {
+                    "question": "Squad'ın satmadığı neler alırım?",
+                    "answer": "Talimat vermek yerine yüklediğiniz {templates}+ ajanlık bir kitaplık, ajanı sizin için kurup teslim eden bir uzman ağı, {connectors}+ uygulama ve herhangi bir MCP sunucusu, ayrıca ajanın harcamadan önce onayınızı istediği doğrulanmış potansiyel müşteri verileri, telefon numaraları, Google Maps kayıtları ve arama sıralamaları."
+                },
+                "4": {
+                    "question": "Kendi ChatGPT veya Claude planımı Rerun'a getirebilir miyim?",
+                    "answer": "Evet, isteğe bağlıdır. Her plan model kredisiyle gelir, böylece ajanlar ilk günden çalışır. Zaten Claude veya ChatGPT için ödüyorsanız bunun yerine bir ajanda o planla oturum açabilir ya da kendi API anahtarınızı kullanabilirsiniz; her ajan farklı bir modelde çalışabilir."
+                },
+                "5": {
+                    "question": "Rerun, Squad gibi ajanlara bir bilgisayar veriyor mu?",
+                    "answer": "Evet. Çalışma alanınız, planla birlikte bulutta özel ve yalıtılmış bir bilgisayar alır; ajanlar orada çalıştırmalar arasında dosyaları, veritabanlarını ve belleği tutar ve aynı proje üzerinde çalışmak için birkaç ajan onu paylaşabilir. Squad da her ekibe, ekip arkadaşı başına ayrı bir tarayıcı profiliyle tek bir bulut bilgisayar verir."
+                },
+                "6": {
+                    "question": "Ücretsiz deneme var mı?",
+                    "answer": "Rerun'ın 5 günlük ücretsiz denemesi vardır; kart gerekir ve bugün $0 tahsil edilir. Squad ise ilk ayı ödemenizi ister ve bunun yerine 7 günlük para iade garantisi sunar."
+                }
+            }
+        }
+    },
+    "howItWorks": {
+        "step": "Adım {number}",
+        "steps": {
+            "job": {
+                "title": "Coworker'ınıza bir iş verin",
+                "desc": "İşi kendi sözlerinizle anlatın. Kendini kendisi kurar."
+            },
+            "stack": {
+                "title": "Araçlarınızı ve yapay zekanızı bağlayın",
+                "desc": "Gmail, Slack, Notion, her biri tek tıkla. Claude, ChatGPT veya kendi planınızla çalışır."
+            },
+            "work": {
+                "title": "İşi sizin yerinize yapar",
+                "desc": "Bir zamanlamayla ya da bir tetikleyiciyle çalışır. Uyandığınızda iş bitmiş olur."
+            }
+        },
+        "job": {
+            "chaseInvoices": {
+                "title": "Faturaları takip et",
+                "meta": "Her pazartesi"
+            },
+            "replyToLeads": {
+                "title": "Müşteri adaylarını yanıtla",
+                "meta": "Her yeni e-postada"
+            },
+            "findLeads": {
+                "title": "20 yeni müşteri adayı bul",
+                "meta": "Her gün, 8:00"
+            }
+        },
+        "work": {
+            "title": "Bu sabah",
+            "running": "Çalışıyor",
+            "runs": {
+                "sortInbox": "Gelen kutusunu düzenle",
+                "chaseInvoices": "2 faturayı takip et",
+                "weeklyReport": "Haftalık raporu yaz"
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "price": {
+        "free": "Ücretsiz",
+        "monthly": "{amount}/ay",
+        "useForFree": "Ücretsiz kullanın",
+        "hire": "{count, plural, one {Bu coworker'ı işe alın · {price}} other {Bu # coworker'ı işe alın · {price}}}",
+        "hireCard": "İşe alın · {price}"
+    },
+    "categories": {
+        "agencies": "Ajanslar",
+        "ecommerce": "E-ticaret",
+        "saas": "SaaS",
+        "sales": "Satış",
+        "recruiting": "İşe alım",
+        "real-estate": "Gayrimenkul",
+        "legal": "Hukuk ve uyum",
+        "creators": "İçerik üreticileri",
+        "productivity": "Verimlilik",
+        "other": "Diğer"
+    }
+}

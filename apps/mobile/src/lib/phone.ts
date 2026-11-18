@@ -5,6 +5,7 @@ import english from 'i18n-iso-countries/langs/en.json'
 import spanish from 'i18n-iso-countries/langs/es.json'
 import french from 'i18n-iso-countries/langs/fr.json'
 import portuguese from 'i18n-iso-countries/langs/pt.json'
+import turkish from 'i18n-iso-countries/langs/tr.json'
 import { getLocales } from 'expo-localization'
 import { AsYouType, getCountries, getCountryCallingCode, getExampleNumber, parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js/min'
 import mobileExamples from 'libphonenumber-js/mobile/examples'
@@ -14,6 +15,7 @@ countries.registerLocale(french)
 countries.registerLocale(spanish)
 countries.registerLocale(portuguese)
 countries.registerLocale(german)
+countries.registerLocale(turkish)
 
 export type PhoneCountry = { code: CountryCode; name: string; callingCode: string; flag: string }
 
@@ -29,6 +31,7 @@ const MISSING_NAMES: Record<Locale, Partial<Record<CountryCode, string>>> = {
     es: { AC: 'Isla Ascensión', TA: 'Tristán de Acuña' },
     pt: { AC: 'Ilha de Ascensão', TA: 'Tristão da Cunha' },
     de: { AC: 'Ascension', TA: 'Tristan da Cunha' },
+    tr: { AC: 'Ascension Adası', TA: 'Tristan da Cunha' },
 }
 
 // i18n-iso-countries only has European Portuguese: these are the names Brazil writes differently.

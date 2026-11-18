@@ -1,0 +1,926 @@
+{
+    "credits": "{count, plural, one {# kredi} other {# kredi}}",
+    "plan": {
+        "billed": {
+            "monthly": "{price}/ay",
+            "yearly": "{price}/yıl"
+        },
+        "yourRenewal": "yenileme",
+        "status": {
+            "paymentFailed": "Ödeme başarısız",
+            "ends": "Bitiş: {date}",
+            "ending": "Sona eriyor",
+            "monthlyFrom": "Aylık, başlangıç: {date}",
+            "active": "Aktif"
+        },
+        "summary": {
+            "monthlyRenews": "Sınırsız coworker · aylık fatura · {renewal} tarihinde yenilenir",
+            "monthlyEnds": "Sınırsız coworker · aylık fatura · {renewal} tarihinde biter",
+            "yearlyRenews": "Sınırsız coworker · yıllık fatura · {renewal} tarihinde yenilenir",
+            "yearlyEnds": "Sınırsız coworker · yıllık fatura · {renewal} tarihinde biter"
+        },
+        "success": {
+            "done": "Bitti",
+            "paymentReceivedTitle": "Ödeme alındı",
+            "paymentReceivedBody": "Kartınız güncellendi ve Pro yeniden aktif.",
+            "backOnTitle": "Pro yeniden açık",
+            "backOnBody": "Planınız {date} tarihinde yenilenir."
+        },
+        "cardUpdated": "Kart güncellendi",
+        "acceptTerms": "Önce koşulları kabul edin",
+        "pleaseWait": "Lütfen bekleyin",
+        "nextInvoice": "Sonraki fatura",
+        "overview": {
+            "keepYearlyFailed": "Yıllık planınız korunamadı",
+            "billed": "Faturalandırma",
+            "billedYearly": "Yıllık, vergi dahil",
+            "billedMonthly": "Aylık, vergi dahil",
+            "from": "Başlangıç: {date}",
+            "monthlyPrice": "Aylık · {price}",
+            "title": "Faturalandırma",
+            "update": "Güncelle",
+            "invoices": "Faturalar",
+            "viewAll": "Tümünü gör",
+            "creditUsage": "Kredi kullanımı",
+            "creditsLeft": "{credits} kaldı",
+            "keepYearly": "Yıllık planımı koru",
+            "switchHint": "Yeni fiyatı görmek için faturalandırmayı değiştirin.",
+            "cancelPlan": "Planı iptal et"
+        },
+        "change": {
+            "planLabel": "Sınırsız coworker{slots}",
+            "switchScheduledTitle": "Geçiş planlandı",
+            "switchScheduledBody": "Yıllık planınız sonuna kadar sürer. Aylık faturalandırma {date} tarihinde başlar.",
+            "changeScheduledTitle": "Değişiklik planlandı",
+            "changeScheduledBody": "{renewal} tarihine kadar {current} sizde kalır, ardından {price} karşılığında {next} başlar.",
+            "planUpdatedTitle": "Plan güncellendi",
+            "planUpdatedBodyMonthly": "{plan}, aylık faturalandırılır. Makbuzunuz e-postayla gönderiliyor.",
+            "planUpdatedBodyYearly": "{plan}, yıllık faturalandırılır. Makbuzunuz e-postayla gönderiliyor.",
+            "switchToMonthly": "Aylığa geç",
+            "changeToSlots": "{count, plural, one {<n></n> {provider} yerine geç} other {<n></n> {provider} yerine geç}}",
+            "changeAppSlots": "Uygulama yerlerinizi değiştirin",
+            "switchToYearly": "Yıllığa geç",
+            "proLineMonthly": "Pro · {plan}, aylık",
+            "proLineYearly": "Pro · {plan}, yıllık",
+            "unusedTimeMonthly": "Aylık planınızdaki kullanılmayan süre",
+            "unusedTimeYearly": "Yıllık planınızdaki kullanılmayan süre",
+            "dueTodayTaxIncluded": "Bugün ödenecek, vergi dahil",
+            "from": "Başlangıç: {date}",
+            "until": "Bitiş: {date}",
+            "monthlyFrom": "Aylık · <price></price>",
+            "keepMyPlan": "Planımı koru",
+            "confirmAndPay": "Onayla ve öde",
+            "switchOn": "{date} tarihinde geç",
+            "scheduleFor": "{date} tarihine planla",
+            "billedNowSlots": "Yeni yerler için şimdi faturalandırılır. Aylık faturalandırma {date} tarihinde başlar.",
+            "slotsReady": "Yeni yerler, ödeme geçer geçmez hazır olur.",
+            "yearlyStarts": "Yıllık planınız, ödeme geçer geçmez başlar.",
+            "nothingToday": "Bugün hiçbir ücret alınmaz."
+        },
+        "cancelPending": {
+            "endOfPeriod": "dönem sonu",
+            "resumeFailed": "Planınız sürdürülemedi",
+            "title": "Pro {date} tarihinde bitiyor",
+            "body": "Coworker'larınız o zamana kadar çalışmaya devam eder. Ardından çalışma alanı duraklatılır ve verileri 90 gün saklanır.",
+            "none": "Yok",
+            "resume": "Pro'yu sürdür",
+            "footnote": "Sürdürürseniz planınız korunur ve {date} tarihinde {price} faturalandırılır."
+        },
+        "card": {
+            "notSaved": "Kartınız kaydedilemedi",
+            "title": "Kartınızı güncelleyin",
+            "save": "Kartı kaydet",
+            "footnote": "Sonraki faturalarınız bu karttan tahsil edilir."
+        },
+        "pastDue": {
+            "declinedOn": "{date} tarihli {amount} tutarındaki ödemeniz reddedildi.",
+            "declined": "{amount} tutarındaki ödemeniz reddedildi.",
+            "lastDeclined": "Son ödemeniz reddedildi.",
+            "paused": "Çalışma alanınız duraklatıldı, ödeme geçer geçmez geri gelir.",
+            "keepRunning": "Çalışma alanınızın çalışmaya devam etmesi için şimdi ödeyin.",
+            "ctaAmount": "Kartı güncelle ve {amount} öde",
+            "cta": "Kartı güncelle ve öde"
+        },
+        "invoices": {
+            "loadFailed": "Faturalarınız yüklenemedi",
+            "title": "Faturalar",
+            "empty": "Henüz fatura yok.",
+            "status": {
+                "draft": "Taslak",
+                "open": "Açık",
+                "uncollectible": "Tahsil edilemez",
+                "void": "Geçersiz"
+            }
+        },
+        "credit": {
+            "addedTitle": "Kredi eklendi",
+            "addedBody": "{count, plural, one {# kredi çalışma alanınızda.} other {# kredi çalışma alanınızda.}} Süreleri asla dolmaz ve coworker'larınız kaldıkları yerden devam eder.",
+            "title": "Rerun kredisi satın alın",
+            "eachPack": "Her paket, tek seferlik {price} karşılığında {count, plural, one {# kredi} other {# kredi}} ekler. Süreleri asla dolmaz.",
+            "packs": "{count, plural, one {# paket} other {# paket}}",
+            "packCredits": "{count, plural, one {# kredi} other {# kredi}}, süresi dolmaz",
+            "lessAria": "Bir paket eksik",
+            "moreAria": "Bir paket fazla",
+            "dueBeforeTax": "Bugün ödenecek, vergi hariç",
+            "buy": "Kredi satın al",
+            "payOnStripe": "Stripe'ta öde",
+            "chargedOnce": "Bu karttan bir kez tahsil edilir.",
+            "checkoutFootnote": "Güvenli bir Stripe sayfasında ödeyip buraya geri dönersiniz."
+        }
+    },
+    "lifetime": {
+        "badge": "Ömür boyu",
+        "title": "Rerun ömür boyu",
+        "subtitle": "Sınırsız coworker · bir kez ödenir, sonsuza dek sizin",
+        "appsDescription": "Coworker'larınız için ek süper güçler, ömür boyu anlaşmanızdan ayrı olarak aylık faturalandırılır.",
+        "overview": {
+            "deal": "Ömür boyu anlaşma",
+            "paidOnce": "Bir kez ödendi",
+            "apps": "Uygulamalar",
+            "aiProviders": "Yapay zeka sağlayıcıları"
+        },
+        "slots": {
+            "oneOnCheckout": "İlk ödemede bir yer, hemen ardından daha fazlasını ekleyin",
+            "oneDuringTrial": "Ücretsiz deneme boyunca uygulama başına bir yer",
+            "slotLine": "{count, plural, one {# {provider} yeri} other {# {provider} yeri}}",
+            "freeThen": "{days} gün ücretsiz, ardından {price}",
+            "monthlyBill": "Uygulamalar, aylık",
+            "billedToday": "Ayın kalanı için bugün faturalandırılır, ardından diğer yerlerinizle birlikte aylık.",
+            "freeDuringTrial": "Denemeniz bitene kadar ücretsiz, ardından aylık faturalandırılır.",
+            "continueToPayment": "Ödemeye devam et",
+            "confirm": "Onayla",
+            "addedTitle": "Yerler eklendi",
+            "addedBody": "Onları çalıştırmak için uygulamada bir hesap bağlayın.",
+            "scheduledBody": "Bıraktığınız yerler {date} tarihine kadar kullanılabilir, ardından faturanızdan çıkar."
+        }
+    },
+    "apps": {
+        "title": "Uygulamalar",
+        "description": "Coworker'larınız için ek süper güçler, planınızla aynı faturada.",
+        "slotsSuffix": "{count, plural, one { + # {provider} yeri} other { + # {provider} yeri}}",
+        "unit": {
+            "monthly": "/ay",
+            "yearly": "/yıl"
+        },
+        "lessReason": {
+            "freeUntil": "{date} tarihine kadar ücretsiz",
+            "loading": "Hesaplarınız yükleniyor",
+            "disconnectFirst": "Önce {app} uygulamasında bir hesabın bağlantısını kesin"
+        },
+        "free": "Ücretsiz",
+        "slots": {
+            "none": "Henüz yer yok",
+            "used": "{total, plural, one {<used></used> / <n></n> yer kullanılıyor} other {<used></used> / <n></n> yer kullanılıyor}}",
+            "count": "{total, plural, one {<n></n> yer} other {<n></n> yer}}",
+            "lineMonthly": "<slots></slots>, her biri {price}/ay",
+            "lineYearly": "<slots></slots>, her biri {price}/yıl"
+        },
+        "trial": {
+            "free": "<b>{date} tarihine kadar 1 yer ücretsiz</b>, ardından {price}",
+            "withPaid": "{count, plural, one {<trial></trial>, artı <n></n> ücretli yer} other {<trial></trial>, artı <n></n> ücretli yer}}",
+            "withPaidInUse": "{count, plural, one {<trial></trial>, artı <n></n> ücretli yer (<inUse></inUse> kullanımda)} other {<trial></trial>, artı <n></n> ücretli yer (<inUse></inUse> kullanımda)}}"
+        },
+        "lessAria": "Bir {provider} yeri eksik",
+        "moreAria": "Bir {provider} yeri fazla",
+        "leaving": "{count, plural, one {{date} tarihinde # yer ayrılıyor} other {{date} tarihinde # yer ayrılıyor}}"
+    },
+    "business": {
+        "noAddress": "Önce bir kart ekleyin",
+        "title": "Şirket bilgileri",
+        "add": "Ekle",
+        "saved": "Şirket bilgileri kaydedildi",
+        "removeFailed": "Numara kaldırılamadı",
+        "removed": "Numara kaldırıldı",
+        "noTaxId": "Stripe şu ülke için vergi numarası almıyor: {country}.",
+        "nameLabel": "Şirket adı",
+        "typeLabel": "Tür",
+        "euVat": "AB KDV",
+        "field": {
+            "vat": "KDV numarası",
+            "taxId": "Vergi numarası"
+        },
+        "confirm": {
+            "title": "Bu numara kaldırılsın mı?",
+            "description": "Sonraki faturalarınızda görünmez.",
+            "confirm": "Kaldır"
+        },
+        "removeNumber": "Numarayı kaldır",
+        "save": "Kaydet",
+        "footnote": "Sonraki faturalarınızda gösterilir.",
+        "status": {
+            "verified": "Doğrulandı",
+            "pending": "Kontrol ediliyor",
+            "unverified": "Doğrulanmadı"
+        }
+    },
+    "dialog": {
+        "title": "Faturalandırma",
+        "adminOnly": {
+            "title": "Faturalandırmayı bir yönetici yönetir",
+            "description": "Planı değiştirmek veya kredi eklemek için bu çalışma alanının bir yöneticisine başvurun.",
+            "gotIt": "Anladım"
+        },
+        "error": {
+            "title": "Planınız yüklenemedi",
+            "description": "Stripe yanıt vermedi. Aboneliğiniz değişmedi, birazdan tekrar deneyin.",
+            "retry": "Tekrar dene"
+        }
+    },
+    "postPayment": {
+        "title": "Her şey hazır",
+        "ready": {
+            "place": "Planınız aktif. \"{title}\" şablonunu panonuza yerleştirin.",
+            "setUp": "Planınız aktif. \"{title}\" kurulumuna hazır mısınız?",
+            "first": "Planınız aktif. İlk coworker'ınıza hayat vermeye hazır mısınız?"
+        },
+        "finalizing": "Aboneliğiniz tamamlanıyor, bu yalnızca bir dakika sürer.",
+        "button": {
+            "placeOne": "Coworker'ınızı yerleştirin",
+            "placeMany": "{count} coworker'ınızı yerleştirin",
+            "placingOne": "Coworker'ınız yerleştiriliyor",
+            "placingMany": "{count} coworker'ınız yerleştiriliyor",
+            "startOne": "Coworker'ınızı başlatın",
+            "startMany": "{count} coworker'ınızı başlatın",
+            "startingOne": "Coworker'ınız başlatılıyor",
+            "startingMany": "{count} coworker'ınız başlatılıyor",
+            "finalizing": "Abonelik tamamlanıyor"
+        }
+    },
+    "templatePurchase": {
+        "title": "Satın aldığınız için teşekkürler",
+        "waiting": "Satın alma işleminiz tamamlanıyor, bu yalnızca bir dakika sürer.",
+        "timeout": "Ödemeniz geçti. Görünmesi her zamankinden uzun sürüyor, birazdan sayfayı yenileyin.",
+        "fallbackTitle": "şablonunuz",
+        "readyOne": "\"{title}\" artık sizin. Coworker'ını yerleştirmeye hazır mısınız?",
+        "readyMany": "\"{title}\" artık sizin. {count} coworker'ını yerleştirmeye hazır mısınız?",
+        "needsPlan": "\"{title}\" artık sizin. Kurmak için aktif bir Rerun planı gerekir.",
+        "finalizing": "Satın alma tamamlanıyor",
+        "close": "Kapat",
+        "placeOne": "Coworker'ını yerleştir",
+        "placeMany": "{count} coworker'ı yerleştir",
+        "subscribe": "Abone ol"
+    },
+    "checkout": {
+        "trialEndFallback": "deneme bitiş",
+        "badge": {
+            "freeTrial": "Ücretsiz deneme",
+            "freeTrialEndsToday": "Ücretsiz deneme · bugün bitiyor",
+            "freeTrialDaysLeft": "Ücretsiz deneme · {count, plural, one {# gün kaldı} other {# gün kaldı}}",
+            "trialDays": "{days} günlük ücretsiz deneme",
+            "complimentary": "Ücretsiz erişim",
+            "paused": "Duraklatıldı",
+            "pausedUntil": "Duraklatıldı · saklama: {date}",
+            "yourCoworker": "Coworker'ınız",
+            "parkedMany": "{title} · {count} coworker"
+        },
+        "timeline": {
+            "today": "Bugün",
+            "anytime": "İstediğiniz zaman",
+            "cancelTitle": "Tek tıkla iptal",
+            "noNotice": "İhbar süresi yok",
+            "reminderDayBefore": "Bir gün önce hatırlatma",
+            "proStarts": "Pro başlar",
+            "unlimitedCoworkers": "Sınırsız coworker",
+            "nextInvoice": "Sonraki fatura",
+            "billedExclVat": "<billed></billed>, KDV hariç",
+            "trialEndsProStarts": "Deneme biter, Pro başlar",
+            "chargedToday": "Bugün <billed></billed> tahsil edilir, sınırsız coworker",
+            "trialRunning": "Deneme sürüyor",
+            "zeroToday": "Bugün $0",
+            "trialEnds": "Deneme biter",
+            "nothingCharged": "Ücret alınmaz",
+            "reminder": "E-postayla hatırlatma",
+            "reminderDetail": "Sakin karar vermeniz için bir gün önce",
+            "firstCharge": "{charge}, önce iptal ederseniz ücretsiz",
+            "trialStarts": "Deneme başlar",
+            "trialStartsDetail": "Bugün $0, {agents} coworker ve {credits, plural, one {# kredi} other {# kredi}} yapay zeka kullanımı",
+            "proStartsDetail": "{charge} tahsil edilir, sınırsız coworker ve ayda {credits, plural, one {# kredi} other {# kredi}}",
+            "restoreStarts": "Geri yükleme başlar",
+            "restoreDetail": "Coworker'lar bir dakikada geri gelir",
+            "installs": "Kurulum yapılır",
+            "placedCount": "{count, plural, one {# coworker yerleştirildi} other {# coworker yerleştirildi}}",
+            "placedOnBoard": "Panonuza yerleştirildi"
+        },
+        "variants": {
+            "startTrial": {
+                "title": "Ücretsiz denemenizi başlatın",
+                "subtitle": "Kart gerekli, bugün $0. Öncesinde iptal etmezseniz {date} tarihinde {price} tahsil edilir.",
+                "cta": "Ücretsiz denemeyi başlat",
+                "footnote": "Bugün $0. {date} tarihinden önce iptal ederseniz ücret alınmaz."
+            },
+            "trialCardless": {
+                "title": "Pro'ya geçin",
+                "subtitle": "Deneme sırasında oluşturduğunuz her şey kalır ve çalışmaya devam eder.",
+                "cta": "Denemeyi bitir ve abone ol"
+            },
+            "trialCard": {
+                "title": "Ücretsiz denemeniz",
+                "subtitle": "Bugün ödenecek bir şey yok. Pro {date} tarihinde kendiliğinden başlar.",
+                "subtitleWithReminder": "Bugün ödenecek bir şey yok. Pro {date} tarihinde kendiliğinden başlar, bir gün önce size e-posta göndeririz.",
+                "subtitleCancelled": "Denemenizi iptal ettiniz. Coworker'larınız {date} tarihine kadar çalışmaya devam eder ve ücret alınmaz.",
+                "cta": "Şimdi Pro'ya geç"
+            },
+            "trialCardPayNow": {
+                "title": "Pro'ya geçin",
+                "subtitle": "Deneme {agents} coworker çalıştırır. Sınırsız coworker için Pro'yu şimdi başlatın ya da deneme {date} tarihinde Pro'ya geçsin.",
+                "cta": "Denemeyi bitir ve Pro'yu başlat",
+                "footnote": "Bu, ücretsiz denemenizi bugün bitirir. Bugün hiçbir şey ödememek için denemenizi koruyun: Pro {date} tarihinde kendiliğinden başlar."
+            },
+            "creditLocked": {
+                "title": "Rerun kredisi Pro ile gelir",
+                "titleCoworker": "Pro ile devam edin",
+                "subtitle": "{trialCredits, number} deneme krediniz tükendi. Pro her ay {credits, plural, one {# kredi} other {# kredi}} içerir ve istediğiniz zaman daha fazlasını ekleyebilirsiniz.",
+                "subtitleCoworker": "{coworker} kaldığı yerden devam eder.",
+                "cta": "Denemeyi bitir ve abone ol",
+                "ctaCoworker": "Öde ve sürdür",
+                "payCta": "{amount} öde ve sürdür",
+                "footnote": "Bunu kapatırsanız ücret alınmaz. Denemeniz olduğu gibi kalır."
+            },
+            "noPlan": {
+                "title": "Pro'ya abone olun",
+                "subtitle": "Sınırsız coworker, tek fiyat. İstediğiniz zaman iptal edin.",
+                "cta": "Abone ol"
+            },
+            "complimentary": {
+                "title": "Pro'ya abone olun",
+                "subtitle": "Çalışma alanınızın ücretsiz erişimi var. Bunun üzerine kredi eklemek için abone olun.",
+                "cta": "Abone ol"
+            },
+            "paused": {
+                "title": "Pro'yu yeniden başlatın",
+                "subtitle": "Coworker'larınız, anılarınız ve dosyalarınız arşivlendi. Bıraktığınız gibi geri gelirler.",
+                "cta": "Pro'yu yeniden başlat"
+            },
+            "template": {
+                "title": "Kurmak için Pro'ya geçin",
+                "subtitle": "Hazır. Abone olduğunuz anda panonuza gelir.",
+                "cta": "Abone ol"
+            }
+        },
+        "refusal": {
+            "unchanged": "{message} Denemeniz değişmedi.",
+            "nothingCharged": "{message} Ücret alınmadı ve denemeniz değişmedi."
+        },
+        "usageBack": {
+            "trial": "Deneme",
+            "back": "Geri"
+        },
+        "success": {
+            "plan": "Plan",
+            "planValue": "Pro · Sınırsız coworker",
+            "nextInvoice": "Sonraki fatura",
+            "backToBoard": "Panoma dön",
+            "lastDayFallback": "deneme bitiş",
+            "placeCoworkers": "{count} coworker'ı yerleştir",
+            "placeOnBoard": "Panoma yerleştir",
+            "startCoworker": "Coworker'ımı başlat",
+            "paid": {
+                "title": "Artık Pro'dasınız",
+                "body": "Makbuzunuz e-postayla gönderiliyor."
+            },
+            "cardSaved": {
+                "title": "Kart kaydedildi",
+                "body": "Denemeniz devam ediyor. Pro {date} tarihinde başlar ve bu karttan {charge} tahsil edilir."
+            },
+            "trialStarted": {
+                "title": "Denemeniz başladı",
+                "body": "Bugün ücret alınmadı. Öncesinde iptal etmezseniz {date} tarihinde {charge} tahsil edilir.",
+                "cta": "Coworker'larımı oluştur"
+            },
+            "restoring": {
+                "title": "Tekrar hoş geldiniz",
+                "body": "Çalışma alanınız geri yükleniyor. Coworker'larınız yaklaşık bir dakika içinde uyanır."
+            },
+            "creditUnlocked": {
+                "body": "{coworker} göreve geri dönmeye hazır. Makbuzunuz e-postayla gönderiliyor.",
+                "bodyNoCoworker": "Coworker'ınız göreve geri dönmeye hazır. Makbuzunuz e-postayla gönderiliyor.",
+                "credits": "Kredi",
+                "creditsValue": "Ayda {credits, plural, one {# kredi} other {# kredi}}",
+                "coworkers": "Coworker'lar",
+                "coworkersValue": "Sınırsız",
+                "resume": "Göreve devam et"
+            }
+        },
+        "pay": {
+            "tryAgain": "Tekrar dene",
+            "trialRefused": "Bu kart zaten ücretsiz denemede kullanıldı",
+            "trialRefusedDescription": "Yine de abone olabilirsiniz, bugün faturalandırılır.",
+            "genericError": "Bir şeyler ters gitti",
+            "acceptTerms": "Önce koşulları kabul edin",
+            "updateFailed": "Planınız güncellenemedi",
+            "stillUpdating": "Planınız hâlâ güncelleniyor",
+            "pleaseWait": "Lütfen bekleyin",
+            "freeFor": "Rerun Pro, {days} gün ücretsiz",
+            "subscribe": "Rerun Pro'ya abone olun",
+            "dueToday": "bugün ödenecek",
+            "perYear": "yıllık",
+            "perMonth": "aylık",
+            "thenPerMonth": "Ardından ayda <amount></amount>, KDV hariç.",
+            "authorize": "Abone olarak, iptal edene kadar Rerun'ın sizden ücret almasına izin verirsiniz."
+        },
+        "card": {
+            "exclVat": "KDV hariç, adresinize göre hesaplanır.",
+            "payLaterFootnote": "Şimdi ödemek ücretsiz denemenizi bugün bitirir ve iptal edene kadar Rerun'ın sizden ücret almasına izin verirsiniz. Denemenizi sonuna kadar kullanmak mı istersiniz? <later></later>",
+            "saving": "Kaydediliyor…",
+            "payOn": "{date} tarihinde öde",
+            "payOnLastDay": "Son gün öde"
+        },
+        "cardOnFile": {
+            "back": "Denemeniz",
+            "title": "Pro'yu bugün başlatın",
+            "header": "Denemeyi bitir, Rerun Pro'yu başlat",
+            "tax": "Vergi",
+            "taxFromAddress": "Vergi, adresinize göre",
+            "dueToday": "Bugün ödenecek",
+            "change": "Değiştir"
+        },
+        "cancelTrial": "Denemeyi iptal et",
+        "trial": {
+            "title": "Ücretsiz denemeniz",
+            "included": "Dahil",
+            "includedValue": "{agents} coworker ve {credits, plural, one {# kredi} other {# kredi}}",
+            "slots": "{count, plural, one {{provider} yeri × #} other {{provider} yeri × #}}",
+            "slotPriceMonthly": "Şimdi $0, {date} itibarıyla {amount}/ay",
+            "slotPriceYearly": "Şimdi $0, {date} itibarıyla {amount}/yıl",
+            "ends": "Deneme biter",
+            "reminder": "E-postayla hatırlatma",
+            "firstCharge": "İlk tahsilat",
+            "firstChargeValue": "{date} tarihinde <charge></charge>",
+            "cancelBefore": "{date} tarihinden önce iptal ederseniz ücret alınmaz. Coworker'larınız o zamana kadar çalışmaya devam eder.",
+            "continue": "Denememe devam et"
+        },
+        "trialCancelled": {
+            "resumeFailed": "Denemeniz sürdürülemedi",
+            "title": "Deneme bitişi",
+            "unit": "ücret alınmaz",
+            "body": "Denemenizi iptal ettiniz. Coworker'larınız o zamana kadar çalışmaya devam eder ve ücret alınmaz.",
+            "resume": "Denememi sürdür"
+        },
+        "paneError": "Ödeme formu açılamadı"
+    },
+    "parts": {
+        "interval": {
+            "monthly": "Aylık",
+            "yearly": "Yıllık",
+            "perYear": "<amount></amount>/yıl",
+            "perMonth": "<amount></amount>/ay"
+        },
+        "features": {
+            "runs": "<b>Sınırsız çalıştırma</b>, 7/24",
+            "models": "<b>Akıllı modeller</b> dahil",
+            "autopilot": "İşiniz için <b>otomatik pilot</b>",
+            "trial": {
+                "agents": "Deneme boyunca <b>{count} coworker</b>, Pro'da sınırsız",
+                "teammates": "İlk günden <b>ekibinizi</b> davet edin",
+                "credit": "<b>{credits, plural, one {# kredi} other {# kredi}} yapay zeka kullanımı</b>, ardından ayda {monthly, number}"
+            },
+            "pro": {
+                "agents": "<b>Sınırsız coworker</b> iş başında",
+                "teammates": "<b>Tüm ekip arkadaşlarınızı</b> davet edin",
+                "credit": "Ayda <b>{credits, plural, one {# kredi} other {# kredi}} yapay zeka kullanımı</b>"
+            },
+            "lifetime": {
+                "ownAi": "<b>Kendi yapay zekanızla</b> çalışır",
+                "credit": "İhtiyaç duyduğunuzda <b>Rerun kredisi</b>"
+            }
+        },
+        "plan": {
+            "title": "Pro planı",
+            "freeTrialLine": "Ücretsiz deneme, ardından sınırsız coworker",
+            "unlimited": "Sınırsız coworker",
+            "billedYearly": "yıllık <amount></amount> faturalandırılır",
+            "billedMonthly": "aylık faturalandırılır",
+            "forDays": "{days} gün boyunca",
+            "perMonth": "aylık"
+        },
+        "showTestimonial": "{company} yorumunu göster",
+        "quoted": "“{quote}”",
+        "cardOnFile": "Kayıtlı kart",
+        "promo": {
+            "add": "Promosyon kodu ekle",
+            "label": "Promosyon kodu",
+            "apply": "Uygula",
+            "remove": "Promosyon kodunu kaldır"
+        },
+        "backToPlan": "Plan",
+        "terms": "<terms>Koşulları</terms> kabul ediyorum ve Rerun'dan hemen başlamasını istiyorum. Tüketiciysem, hizmet başladığında cayma hakkım sona erer.",
+        "lifetime": {
+            "title": "Ömür boyu anlaşma",
+            "line": "Sınırsız coworker · bir kez ödenir",
+            "paidOnce": "Bir kez ödenir",
+            "forGood": "sonsuza dek sizin"
+        }
+    },
+    "stripe": {
+        "orPayWithCard": "veya kartla ödeyin",
+        "percentOff": "%{percent} indirim",
+        "amountOff": "{amount} indirim"
+    },
+    "perks": {
+        "feature": "Özellik",
+        "trial": "Deneme",
+        "pro": "Pro",
+        "rows": {
+            "credits": {
+                "title": "Yapay zeka kullanımı",
+                "trial": "{credits, plural, one {# kredi} other {# kredi}}, bir kez",
+                "pro": "Her ay {credits, plural, one {# kredi} other {# kredi}}"
+            },
+            "coworkers": {
+                "title": "Coworker'lar",
+                "trial": "{count} aktif",
+                "pro": "Sınırsız"
+            },
+            "team": {
+                "title": "Ekip arkadaşları",
+                "trial": "Yalnızca siz",
+                "pro": "Tüm ekibinizi davet edin"
+            }
+        },
+        "headlines": {
+            "credits": "{credits, plural, one {# kredi/ay} other {# kredi/ay}}",
+            "coworkers": "Sınırsız coworker",
+            "team": "Ekibinizi davet edin"
+        }
+    },
+    "cancel": {
+        "toasts": {
+            "openFailed": "İptal ekranı açılamadı",
+            "remindFailed": "Hatırlatma ayarlanamadı",
+            "claimFailed": "Teklif uygulanamadı",
+            "cancelFailed": "Aboneliğiniz iptal edilemedi",
+            "resumeFailed": "Aboneliğiniz sürdürülemedi",
+            "trialResumed": "Denemeniz yeniden açık",
+            "subscriptionResumed": "Aboneliğiniz yeniden açık"
+        },
+        "header": {
+            "goodbyeTitle": "Emin değil misiniz? {date} tarihinde karar verin",
+            "goodbyeTrialDescription": "Denemeniz devam etsin. İlk tahsilattan bir gün önce size e-posta göndeririz.",
+            "goodbyePaidDescription": "Coworker'larınız çalışmaya devam etsin. Ücret alınmadan bir hafta önce size e-posta göndeririz, o zaman da iptal edebilirsiniz.",
+            "sunkTrialTitle": "Coworker'larınız zaten kuruldu",
+            "sunkTrialDescription": "Zor kısım bitti. Şimdi ayrılırsanız onlar da çalışmayı bırakır.",
+            "sunkPaidTitle": "Bunun ücretini zaten ödediniz",
+            "sunkPaidDescription": "Her durumda {date} tarihine kadar sizin. Kullanmadığınız krediler de onunla gider.",
+            "reasonTitle": "Neden ayrılıyorsunuz?",
+            "reasonDescription": "Kendi sözlerinizle. Önce neyi düzeltmemiz gerektiğini bize söyler.",
+            "offerDescription": "Planınız ve coworker'larınız olduğu gibi kalır.",
+            "farewellTitle": "Coworker'larınız {date} tarihinde susacak",
+            "farewellDescription": "Zamanlamalar çalışmayı bırakır ve çalışma alanınız duraklatılır.",
+            "claimedTitle": "Kaldığınız için teşekkürler",
+            "claimedDescription": "Coworker'larınız hiç durmadı.",
+            "remindedTitle": "{date} tarihinde size hatırlatacağız",
+            "remindedDescription": "O zamana kadar hiçbir şey değişmez. Coworker'larınız çalışmaya devam eder.",
+            "cancelledTitle": "İptal onaylandı",
+            "cancelledDescription": "Bir daha faturalandırılmayacaksınız. Coworker'larınız {date} tarihine kadar çalışır."
+        },
+        "offerTitle": {
+            "too_expensive": "Sizi kaybetmektense fiyatı düşürmeyi tercih ederiz",
+            "unused": "Bir ay daha şans verin",
+            "too_complex": "Kurmak için bir ay daha alın",
+            "low_quality": "Sizi üzdüğümüz için özür dileriz",
+            "missing_features": "Her hafta yenilik yayınlıyoruz",
+            "switched_service": "Geçiş yapmadan önce",
+            "other": "Gitmeden önce"
+        },
+        "comeback": {
+            "coming_back": "Geri döneceğim!",
+            "maybe": "Belki geri dönerim.",
+            "not_coming_back": "Muhtemelen hayır."
+        },
+        "reason": {
+            "field": "Ayrılmaya neden karar verdiniz?",
+            "placeholder": "Bir cümle yeterli",
+            "comebackField": "Rerun'ı yeniden kullanacak mısınız?",
+            "missingComment": "Neden ayrıldığınızı birkaç kelimeyle anlatın",
+            "missingComeback": "Geri dönüp dönmeyeceğinizi söyleyin",
+            "required": "Neden ayrıldığınızı birkaç kelimeyle anlatın.",
+            "tooLong": "{max, number} karakterin altında tutun.",
+            "notAReason": "Bu bir neden gibi görünmüyor. Ayrılmaya neden karar verdiniz?"
+        },
+        "milestones": {
+            "youStay": "Kalırsınız",
+            "email": "E-posta",
+            "reminder": "Hatırlatma",
+            "firstCharge": "İlk tahsilat",
+            "renewal": "Yenileme"
+        },
+        "daysLeft": {
+            "trial": "Denemenizin bitmesine <days>{count, plural, one {# gün} other {# gün}}</days> var",
+            "paid": "Planınızda <days>{count, plural, one {# gün} other {# gün}}</days> daha var",
+            "runsSoFar": "{count, plural, one {Şimdiye kadar <figure>#</figure> çalıştırma} other {Şimdiye kadar <figure>#</figure> çalıştırma}}",
+            "runsThisWeek": "{count, plural, one {Bu hafta <figure>#</figure> çalıştırma} other {Bu hafta <figure>#</figure> çalıştırma}}"
+        },
+        "offerCard": {
+            "billedOn": "{date} tarihinde"
+        },
+        "offer": {
+            "trialHalf": {
+                "headline": "İlk ayınıza %50 indirim",
+                "terms": "Ardından {fullFrom} tarihinden itibaren {full}/ay. {endsOn} tarihinden önce size e-posta göndeririz, o zamana kadar ücretsiz iptal edebilirsiniz.",
+                "claim": "%50 indirimi al",
+                "claimed": "İlk faturanız {endsOn} tarihinde {price}, ardından {full}/ay."
+            },
+            "nextMonth": {
+                "headline": "Gelecek ay $1",
+                "terms": "Ardından {fullFrom} tarihinden itibaren {full}/ay.",
+                "termsWithAddons": "Eklentileriniz {addons}/ay olarak kalır. Ardından {fullFrom} tarihinden itibaren {full}/ay.",
+                "claim": "Gelecek ayı $1'a al",
+                "claimed": "Sonraki faturanız {price}. Faturalandırma {fullFrom} tarihinde {full}/ay tutarına döner."
+            }
+        },
+        "sunk": {
+            "paidCaption": "bu ayın tutarı, zaten ödendi",
+            "creditsLeft": "Kalan kredi",
+            "runsThisMonth": "Bu ayki çalıştırmalar",
+            "agents": "{count, plural, one {# ajan} other {# ajan}}",
+            "agentsCaption": "kuruldu, bağlandı ve çalışıyor",
+            "creditsCaption": "kalan Rerun kredisi",
+            "runsSoFar": "Toplam çalıştırma",
+            "schedules": "Zamanlamalar"
+        },
+        "remindMe": "{date} tarihinde hatırlat",
+        "keepRunning": "Coworker'larım çalışmaya devam etsin",
+        "keepCoworkers": "Coworker'larımı koru",
+        "saved": {
+            "title": "{date} tarihine kadar saklanır",
+            "description": "Anılar, dosyalar ve skill'ler saklanır. O tarihten önce yeniden abone olursanız her şey geri gelir."
+        },
+        "done": {
+            "emailTitle": "{date} tarihinde e-posta",
+            "emailTrialDescription": "İlk tahsilattan bir gün önce. İsterseniz o e-postadan iptal edin.",
+            "emailPaidDescription": "Planınız {date} tarihinde yenilenmeden bir hafta önce.",
+            "activeTitle": "{date} tarihine kadar aktif",
+            "activeTrialDescription": "Denemeniz sonuna kadar sürer. Ücret alınmaz.",
+            "activePaidDescription": "O zamana kadar her şey çalışmaya devam eder.",
+            "changedMindTitle": "Fikrinizi mi değiştirdiniz?",
+            "changedMindDescription": "{endsOn} tarihinden önce sürdürürseniz hiçbir şey durmaz. Sonrasında çalışma alanınız {keptUntil} tarihine kadar saklanır."
+        },
+        "buttons": {
+            "resumeTrial": "Denemeyi sürdür",
+            "resumeSubscription": "Aboneliği sürdür",
+            "done": "Bitti",
+            "goBack": "Geri dön",
+            "continueToCancel": "İptale devam et",
+            "continue": "Devam et",
+            "noThanks": "Hayır, teşekkürler",
+            "cancelTrial": "Denemeyi iptal et",
+            "cancelSubscription": "Aboneliği iptal et"
+        }
+    },
+    "usage": {
+        "card": {
+            "title": "Rerun kredisi",
+            "subtitle": "Coworker'larınızın Rerun modellerine ve ücretli verilere harcadığı",
+            "addCredits": "Kredi ekle",
+            "startProNow": "Pro'yu şimdi başlat",
+            "usedTrial": "Kullanılan · deneme kredisi",
+            "used": "Kullanılan",
+            "usedResets": "Kullanılan · sıfırlama: {date}",
+            "usedOf": "{used} / {whole} kredi",
+            "seeUsage": "Kullanımı gör"
+        },
+        "outOfCredits": {
+            "trialTitle": "Deneme krediniz tükendi",
+            "title": "Krediniz tükendi",
+            "trialDescription": "Coworker'larınız Rerun modellerini veya ücretli verileri kullanamaz. Pro her ay {count, plural, one {# kredi} other {# kredi}} ile gelir.",
+            "description": "Coworker'larınız Rerun modellerini veya ücretli verileri kullanamaz.",
+            "descriptionUntil": "Coworker'larınız {date} tarihine kadar Rerun modellerini veya ücretli verileri kullanamaz."
+        },
+        "switch": {
+            "label": "Harcamaya izin ver",
+            "on": "Coworker'lar Rerun modellerini ve ücretli verileri kullanabilir.",
+            "off": "Duraklatıldı. Coworker'lar Rerun modellerini veya ücretli verileri kullanamaz."
+        },
+        "kind": {
+            "ai": "Yapay zeka modelleri",
+            "data": "Ücretli veri"
+        },
+        "tier": {
+            "fast": "Hızlı model",
+            "balanced": "Dengeli model",
+            "smart": "Akıllı model"
+        },
+        "bar": {
+            "aiSpent": "Yapay zeka modelleri · {figure} kredi",
+            "dataSpent": "Ücretli veri · {figure} kredi",
+            "leftThisMonth": "Bu ay kalan · {figure} kredi",
+            "left": "Kalan · {figure} kredi",
+            "topup": "Ek kredi, süresi dolmaz · {figure} kredi"
+        },
+        "legendLeft": "Kalan",
+        "calls": "{count, plural, one {# çağrı} other {# çağrı}}",
+        "otherCoworker": "Diğer",
+        "pace": {
+            "onTopup": "Bu ayın kredisi harcandı. Coworker'lar artık ek kredinizi kullanıyor, {figure} kaldı.",
+            "runsOutBeforeTrialEnds": "Bu hızla krediniz {date} civarında, denemeniz bitmeden {days, plural, one {# gün} other {# gün}} önce tükenir.",
+            "runsOutBeforeReset": "Bu hızla krediniz {date} civarında, sıfırlamadan {days, plural, one {# gün} other {# gün}} önce tükenir."
+        },
+        "pane": {
+            "title": "Kredi kullanımı",
+            "loadFailed": "Kredi kullanımınız yüklenemedi. Birazdan tekrar deneyin.",
+            "creditsUsed": "{figure} <muted>kredi kullanıldı</muted>",
+            "periodLeft": "{start} - {end} · {left} kaldı",
+            "perDay": "Günlük",
+            "pace": "Hız",
+            "nothingSpentTrial": "Bu denemede henüz harcama yok.",
+            "nothingSpentPeriod": "Bu dönemde henüz harcama yok.",
+            "bySource": "Kaynağa göre",
+            "byCoworker": "Coworker'a göre",
+            "latestCharges": "Son harcamalar"
+        },
+        "chart": {
+            "spentSoFar": "Şimdiye kadar <value>{figure}</value> harcandı",
+            "ai": "Yapay zeka <value>{figure}</value>",
+            "data": "Veri <value>{figure}</value>",
+            "perDay": "Günlük kredi",
+            "paceCaption": "Şimdiye kadar harcanan ve bu hızın varacağı nokta",
+            "monthly": "Aylık {figure}",
+            "trialCredits": "Deneme kredisi {figure}",
+            "topup": "+ ek kredi {figure}",
+            "credits": "Kredi {figure}",
+            "today": "Bugün",
+            "trialEnds": "Deneme bitişi: {date}",
+            "resets": "Sıfırlama: {date}"
+        },
+        "paidData": {
+            "people": {
+                "search": "Profiller",
+                "email": {
+                    "find": "İş e-postaları",
+                    "verify": "E-posta doğrulamaları"
+                },
+                "phone": {
+                    "find": "Telefon numaraları"
+                },
+                "enrich": "Kişi profilleri",
+                "identity": {
+                    "resolve": "LinkedIn sorguları"
+                }
+            },
+            "companies": {
+                "search": "Şirketler",
+                "enrich": "Şirket profilleri",
+                "similar": "Benzer şirket aramaları",
+                "jobs": {
+                    "search": "İş ilanı aramaları"
+                },
+                "news": "Şirket haberi aramaları"
+            },
+            "google": {
+                "serp": {
+                    "organic": "Google sıralamaları",
+                    "maps": "Google Maps aramaları",
+                    "local": "Yerel sıralamalar",
+                    "news": "Google News aramaları"
+                },
+                "keywords": {
+                    "volume": "Anahtar kelime hacmi kontrolleri",
+                    "ideas": "Anahtar kelime fikri listeleri",
+                    "trends": "Trend grafikleri"
+                }
+            },
+            "ai-search": {
+                "perplexity": {
+                    "answer": "Perplexity yanıtları"
+                }
+            },
+            "web": {
+                "backlinks": {
+                    "summary": "Backlink raporları",
+                    "list": "Backlink listeleri"
+                },
+                "anchors": {
+                    "list": "Bağlantı metni listeleri"
+                },
+                "url": {
+                    "metrics": "Otorite kontrolleri"
+                }
+            },
+            "linkedin": {
+                "user": {
+                    "profile": "LinkedIn profilleri",
+                    "posts": "LinkedIn gönderi listeleri"
+                },
+                "company": {
+                    "profile": "LinkedIn şirket sayfaları"
+                },
+                "post": {
+                    "detail": "LinkedIn gönderileri",
+                    "comments": "LinkedIn yorum listeleri",
+                    "reactions": "LinkedIn tepki listeleri"
+                }
+            },
+            "tiktok": {
+                "user": {
+                    "profile": "TikTok profilleri",
+                    "videos": "TikTok video listeleri"
+                },
+                "search": {
+                    "users": "TikTok hesap aramaları",
+                    "videos": "TikTok video aramaları"
+                },
+                "video": {
+                    "detail": "TikTok videoları",
+                    "comments": "TikTok yorum listeleri"
+                },
+                "comment": {
+                    "replies": "TikTok yanıt listeleri"
+                }
+            },
+            "instagram": {
+                "user": {
+                    "profile": "Instagram profilleri",
+                    "posts": "Instagram gönderi listeleri",
+                    "reels": "Instagram reels listeleri"
+                },
+                "search": {
+                    "users": "Instagram hesap aramaları",
+                    "reels": "Instagram reels aramaları"
+                },
+                "hashtag": {
+                    "posts": "Instagram hashtag aramaları"
+                },
+                "post": {
+                    "detail": "Instagram gönderileri",
+                    "comments": "Instagram yorum listeleri"
+                }
+            },
+            "x": {
+                "user": {
+                    "profile": "X profilleri",
+                    "posts": "X gönderi listeleri"
+                },
+                "search": {
+                    "posts": "X aramaları"
+                },
+                "post": {
+                    "comments": "X yanıt listeleri"
+                }
+            },
+            "youtube": {
+                "channel": {
+                    "profile": "YouTube kanalları",
+                    "videos": "YouTube video listeleri"
+                },
+                "search": {
+                    "videos": "YouTube aramaları"
+                },
+                "video": {
+                    "detail": "YouTube videoları",
+                    "comments": "YouTube yorum listeleri"
+                }
+            },
+            "facebook": {
+                "user": {
+                    "profile": "Facebook sayfaları",
+                    "posts": "Facebook gönderi listeleri"
+                },
+                "post": {
+                    "comments": "Facebook yorum listeleri"
+                }
+            },
+            "reddit": {
+                "subreddit": {
+                    "posts": "Subreddit akışları"
+                },
+                "post": {
+                    "detail": "Reddit gönderileri"
+                }
+            }
+        }
+    },
+    "layout": {
+        "pill": {
+            "updatePayment": "Ödemeyi güncelle",
+            "freeTrial": "Ücretsiz deneme",
+            "upgrade": "Yükselt",
+            "daysLeft": "{count}g kaldı",
+            "underADayLeft": "'<'1g kaldı"
+        },
+        "meter": {
+            "trialCredits": "Deneme kredisi",
+            "credits": "Kredi",
+            "noTrialCreditsLeft": "Deneme kredisi kalmadı",
+            "outOfCredits": "Kredi tükendi",
+            "left": "{figure} kaldı",
+            "ariaUsed": "Kullanılan Rerun kredisi"
+        }
+    },
+    "creditsBar": {
+        "used": "Kullanılan kredi",
+        "resetsOn": "Sıfırlama: {date}"
+    },
+    "trialOffer": {
+        "limitsDuringTrial": "Deneme boyunca {agents} coworker ve {credits, plural, one {# kredi} other {# kredi}}.",
+        "chargeLine": "Kart gerekli, bugün $0. Öncesinde iptal etmezseniz {date} tarihinde {price} tahsil edilir.",
+        "cardlessLine": "Kart gerekmez, bugün $0. Ayda {price} ile devam etmek için {date} tarihinden önce bir kart ekleyin.",
+        "startTrial": "{days} günlük ücretsiz denemenizi başlatın",
+        "subscribe": "Abone ol: {price}/ay",
+        "billedToday": "Bugün faturalandırılır. İstediğiniz zaman iptal edin.",
+        "trialUsed": "Ücretsiz denemenizi kullandınız. Bugün faturalandırılır, istediğiniz zaman iptal edin."
+    },
+    "startPlan": {
+        "trialFailed": "Denemeniz başlatılamadı",
+        "trialStarted": "Deneme başladı"
+    }
+}

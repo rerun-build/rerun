@@ -1,0 +1,332 @@
+{
+    "hub": {
+        "eyebrow": "Sektörler",
+        "title": "Sektörünüz için yapay zeka coworker'ları",
+        "headline": "İşinize uygun coworker'ları bulun.",
+        "description": "Ajanslar, serbest çalışanlar, e-ticaret, gayrimenkul, startup'lar, SaaS, hukuk ve işe alım: her birinin önce işe aldığı sekiz coworker ve nedenleri.",
+        "gridLabel": "{count, plural, one {# sektör} other {# sektör}}",
+        "gridTitle": "Gerçekte yaptığınız işten başlayın.",
+        "gridLede": "Her sayfa, o sektörün önce işe aldığı sekiz coworker ile açılır."
+    },
+    "page": {
+        "breadcrumbLabel": "Sayfa yolu",
+        "breadcrumbRoot": "Sektörler",
+        "wallLabel": "Kimi işe alırsınız",
+        "wallLede": "Her biri kütüphanedeki bir şablon: kurun, uygulamalarını bağlayın, çalışmaya başlasın.",
+        "painsLabel": "Neden zorlanıyorsunuz",
+        "proofLabel": "Neden işe yarıyor",
+        "proofTitle": "Bir coworker'ın sohbet penceresinde olmayan özellikleri.",
+        "faqLabel": "SSS",
+        "faqTitle": "Rerun ile {industry}: sorularınız.",
+        "othersLabel": "Diğer sektörler",
+        "othersTitle": "Tam olarak sizin işiniz değil mi?",
+        "othersLink": "Tüm sektörler",
+        "notFoundTitle": "Sektör bulunamadı"
+    },
+    "industries": {
+        "agencies": {
+            "crumb": "Ajanslar",
+            "title": "Ajanslar için yapay zeka coworker'ları.",
+            "lede": "Her müşteride tekrar eden işler (müşteri bulma, SEO denetimleri, haftalık müşteri raporu, ödenmemiş faturanın takibi), bunları kendi araçlarınızda yapıp size rapor veren coworker'lara devredin.",
+            "metaTitle": "Ajanslar için AI ajanları: satış, SEO, müşteri raporu",
+            "metaDescription": "Ajanslar her müşteride aynı işi tekrarlar. Müşteri bulma, SEO denetimi, sosyal medya, müşteri raporları ve ödenmemiş faturalar için coworker'lar.",
+            "wallTitle": "Bir ajansın önce işe alacağı sekiz coworker.",
+            "templatesLink": "Ajans şablonları",
+            "painsTitle": "Bir ajansın artık elle yapmadığı işler.",
+            "pains": {
+                "1": {
+                    "title": "İki teslimat arasında yeni iş",
+                    "body": "Bir proje geciktiğinde ilk aksayan şey müşteri bulmaktır. Bir coworker, hafta sakin olsa da olmasa da listeyi oluşturmaya ve yazmaya devam eder."
+                },
+                "2": {
+                    "title": "Aynı rapor, on iki müşteri için",
+                    "body": "Rakamlar çekilir, yorumlanır ve gönderilir, her müşteri için bir sunum. İş her ay aynıdır ve kimse yapmak istemez."
+                },
+                "3": {
+                    "title": "Kimsenin takip etmeye cesaret edemediği faturalar",
+                    "body": "31. günde gitmesi gereken hatırlatma 60. günde gider. Bir coworker onu 31. günde, sizin ifadelerinizle gönderir."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Her müşteriyi ayrı tutabilir miyim?",
+                    "answer": "Evet, tutmalısınız da. Her müşteriye kendi çalışma alanını verin: kendi coworker'ları, kendi bağlı uygulamaları, kendi Brain'i. Bir hesaptan diğerine hiçbir şey geçmez ve köşedeki etiketten geçiş yaparsınız."
+                },
+                "2": {
+                    "question": "İşler bizim gibi mi görünecek, yoksa bir robot gibi mi?",
+                    "answer": "Üslubunuz, teklifiniz ve kurallarınız çalışma alanının Brain'inde durur ve her coworker yazmadan önce bunları okur. Bir müşteri çalışma alanında bu, sizin değil müşterinin üslubudur."
+                },
+                "3": {
+                    "question": "Müşteri başına mı yoksa kişi başına mı ödüyorum?",
+                    "answer": "İkisi de değil. Plan çalışma alanını kapsar ve kullanıcılar ücretsizdir; böylece tüm ekip, isterseniz müşteri de, coworker'ların ne yaptığını okuyabilir ve biri soru sorduğunda yanıt verebilir."
+                }
+            }
+        },
+        "freelancers": {
+            "crumb": "Serbest çalışanlar",
+            "title": "Serbest çalışanlar için yapay zeka coworker'ları.",
+            "lede": "Hem teslimatı yapan, hem satış ekibi, hem de muhasebe departmanı sizsiniz. Son ikisini, siz bir müşteri projesindeyken çalışan coworker'lara devredin.",
+            "metaTitle": "Serbest çalışanlar için AI ajanları: satış, e-posta, fatura",
+            "metaDescription": "Teslimat, satış ve muhasebe sizsiniz. Müşteri bulma, gelen kutusu, takipler, faturalar ve içerik için yapay zeka coworker'larını işe alın.",
+            "wallTitle": "Akşamlarınızı size geri veren sekiz coworker.",
+            "templatesLink": "Verimlilik şablonları",
+            "painsTitle": "Tek kişilik bir işin sürekli aksattıkları.",
+            "pains": {
+                "1": {
+                    "title": "Yoğun olduğunuz hafta satış durur",
+                    "body": "Mevcut proje bittiği anda satış hattı boşalır, çünkü proje sırasında kimse müşteri aramadı. Bir coworker proje sırasında arar."
+                },
+                "2": {
+                    "title": "Takip edilmeyen faturalar",
+                    "body": "Bir müşteriye borcunu hatırlatmak hep yarına ertelenen iştir. Bunu zamanında bir coworker'a göndertmenin hiçbir maliyeti yok."
+                },
+                "3": {
+                    "title": "Günde beş kez okuduğunuz bir gelen kutusu",
+                    "body": "Gerçekten size ihtiyaç duyan üç mesaj var. Bir coworker hangi üçü olduğunu söyler ve geri kalanlar için yanıt taslakları hazırlar."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Tek bir kişi için buna değer mi?",
+                    "answer": "Tam da bunun için tasarlandı: işe almak mantıklı olsaydı bir serbest çalışanın işe alacağı işler: yarım gün müşteri bulma, bir saat faturalama, gelen kutusu. Tek bir plan hepsini kapsar."
+                },
+                "2": {
+                    "question": "Dizüstü bilgisayarım kapalıyken çalışır mı?",
+                    "answer": "Evet. Coworker'larınız Avrupa'daki bir bulut makinesinde çalışır. Pazartesi sabahı çalıştırması, masanızda, bir müşteriyle ya da uzakta olsanız da gerçekleşir."
+                },
+                "3": {
+                    "question": "Sormadan benim adıma bir şeyler gönderebilir mi?",
+                    "answer": "Yalnızca izin verdiğiniz kadar. Bir coworker onay olmadan para harcayamaz ve kendi başına mı göndereceğine yoksa size bir taslak mı vereceğine talimatlarında siz karar verirsiniz."
+                }
+            }
+        },
+        "ecommerce": {
+            "crumb": "E-ticaret",
+            "title": "E-ticaret için yapay zeka coworker'ları.",
+            "lede": "Mağazanızın bu hafta ne yaptığı, neyin tükenmek üzere olduğu, hangi sepetlerin kurtarılabileceği ve rakiplerinizin ne değiştirdiği: her gün okunur, gereği yapılır ve size tek bir mesajla bildirilir.",
+            "metaTitle": "E-ticaret için AI ajanları: sipariş, stok, sepet, rakipler",
+            "metaDescription": "Mağazanızı her hafta okuyan, düşük stoğu erken yakalayan, terk edilen sepetleri kurtaran, rakip fiyatlarını izleyen yapay zeka coworker'larını işe alın.",
+            "wallTitle": "Hiç kapanmayan bir mağaza için sekiz coworker.",
+            "templatesLink": "E-ticaret şablonları",
+            "painsTitle": "Bir mağaza sahibinin çok geç öğrendikleri.",
+            "pains": {
+                "1": {
+                    "title": "Cuma günü tükenen çok satan ürün",
+                    "body": "Siparişler durana kadar kimse stoğa bakmadı. Bir coworker her gün bakar ve size bir hafta önceden haber verir."
+                },
+                "2": {
+                    "title": "Bir müşteriden öğrendiğiniz rakip fiyatı",
+                    "body": "Kampanyaları pazartesi başladı ve siz perşembe günü bir yorumda duydunuz. Bir coworker sayfalarını sizin için okur."
+                },
+                "3": {
+                    "title": "Terk edilip hiç takip edilmeyen sepetler",
+                    "body": "Kurmayı planladığınız akış hâlâ bir not olarak duruyor. Bir coworker gerçekten ne aldıklarına göre segmentlere ayırır ve takip mesajını yazar."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Shopify'a ve diğer araçlarıma bağlanır mı?",
+                    "answer": "Shopify, Stripe, e-posta platformunuz, reklam hesaplarınız, tablolarınız ve 3.000'den fazla başka araç. API'si olmayan bir yönetim paneline bile ulaşılabilir: coworker onu kendi ekranında açar ve tıklayarak ilerler."
+                },
+                "2": {
+                    "question": "Bir coworker fiyatları kendi başına değiştirebilir veya kampanya gönderebilir mi?",
+                    "answer": "Harcama kilitlidir: bir onay olmadan reklam ya da başka bir şey satın alamaz. Gerisine siz karar verirsiniz: kampanyanın taslağını hazırlayıp göndermeyi size bıraksın ya da kendisi gönderip rapor versin."
+                },
+                "3": {
+                    "question": "Kataloğumu ne kadar hızlı öğrenir?",
+                    "answer": "İlk çalıştırmada okur ve önemli olanı çalışma alanının Brain'inde tutar: ürün yelpazeniz, marjlarınız, üslubunuz. Sonradan işe aldığınız her coworker aynı sayfalardan başlar."
+                }
+            }
+        },
+        "real-estate": {
+            "crumb": "Gayrimenkul",
+            "title": "Gayrimenkul için yapay zeka coworker'ları.",
+            "lede": "Satmaya yakın mülk sahipleri, dakikalar içinde yanıtlanan talepler, ziyaret tazeyken yazılan ilanlar, kendi kendini takip eden kiralar. Bir emlakçının haftasını dolduran işler, coworker'lar tarafından yapılır.",
+            "metaTitle": "Gayrimenkul için AI ajanları: satıcı, talep, ilan, kira",
+            "metaDescription": "Satmaya yakın mülk sahiplerini bulan, her talebi değerlendiren, ilanı yazan, gerçek emsallerle fiyatlayan ve kiraları takip eden coworker'ları işe alın.",
+            "wallTitle": "Hiçbir talebi kaçırmayan bir emlak ofisi için sekiz coworker.",
+            "templatesLink": "Gayrimenkul şablonları",
+            "painsTitle": "Bir emlak ofisinin yetkiyi kaybettiği yerler.",
+            "pains": {
+                "1": {
+                    "title": "Üç saat geç yanıtlanan talep",
+                    "body": "İlk yanıt veren emlakçı gösterimi alır. Bir coworker dakikalar içinde yanıt verir, ön değerlendirme sorularını sorar ve randevuyu takvime ekler."
+                },
+                "2": {
+                    "title": "Hafızadan savunulan bir fiyat",
+                    "body": "Mülk sahibi bir rakam ve bir gerekçe ister. Bir coworker randevudan önce, yakınlarda gerçekten satılanlardan karşılaştırmayı hazırlar."
+                },
+                "3": {
+                    "title": "Hiç iletişime geçmediğiniz mülk sahipleri",
+                    "body": "Sinyaller herkese açık: süresi dolan ilanlar, miras süreçleri, uzun süre piyasada kalan mülkler. Bir coworker bunları her hafta okur ve kimin aranacağını sıralar."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "CRM'imle çalışır mı?",
+                    "answer": "CRM'inizin bir API'si veya MCP sunucusu varsa bağlanır. İkisi de olmayan eski bir portalsa, coworker onu kendi ekranında açar ve sizin yapacağınız gibi doldurur."
+                },
+                "2": {
+                    "question": "Müşteri adaylarına benim adıma yanıt verebilir mi?",
+                    "answer": "Evet, ne kadar ileri gideceğini siz belirlersiniz: yalnızca taslak ya da gönder ve randevu al. Her iki durumda da yazışma okunabilir kalır ve emin olmadığı her şey size gelir."
+                },
+                "3": {
+                    "question": "Piyasa verileri güvenilir mi?",
+                    "answer": "Bir coworker kullandığı kaynakları belirtir. Karşılaştırmayı gerçekten okuduğu ilan ve işlemlerden oluşturur; havadan bir rakam yerine kaynakları rakamın yanında görürsünüz."
+                }
+            }
+        },
+        "startups": {
+            "crumb": "Startup'lar",
+            "title": "Startup'lar için yapay zeka coworker'ları.",
+            "lede": "On beş kişinin işini yapan beş kişi. Henüz kadro açamadığınız işler için coworker'ları işe alın: planlanan demolar, okunan satış hattı, hazırlanan lansman, pazartesi gelen kutunuzda metrikler.",
+            "metaTitle": "Startup'lar için AI ajanları: satış, lansman, metrikler",
+            "metaDescription": "Küçük bir ekip her iş için işe alım yapamaz. Demo planlayan, satış hattını okuyan, lansmanı hazırlayan ve pazartesi metrikleri raporlayan coworker'lar.",
+            "wallTitle": "Henüz işe alamadığınız roller için sekiz coworker.",
+            "templatesLink": "SaaS şablonları",
+            "painsTitle": "Küçük bir ekibin yetişemedikleri.",
+            "pains": {
+                "1": {
+                    "title": "Kimsenin sahiplenmediği roller",
+                    "body": "Outbound, sürüm notları, haftalık rakamlar. Herkes önemli olduklarında hemfikir ve kimsenin bunlara ayıracak bir günü yok."
+                },
+                "2": {
+                    "title": "Pazartesi elle çekilen rakamlar",
+                    "body": "Biri dışa aktarır, yapıştırır, yorumlar, paylaşır. Haftada kırk dakika; bir coworker bunu sabah 7'de ücretsiz yapar."
+                },
+                "3": {
+                    "title": "Küçük işler yüzünden kayan lansmanlar",
+                    "body": "Mesajlar, değişiklik günlüğü, e-posta, gönderi. Siz geliştirirken bir coworker hepsinin taslağını belirtimden hazırlar."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Bir coworker ne kadar sürede işe yarar hale gelir?",
+                    "answer": "Bir şablondan başlarsanız dakikalar içinde: uygulamalarını bağlarsınız, zamanlamasını kontrol edersiniz ve çalışmaya başlar. Kendi tarifinizden bir tane oluşturmak, işi yazmak kadar sürer."
+                },
+                "2": {
+                    "question": "Tüm ekip kullanabilir mi?",
+                    "answer": "Evet, ek ücreti de yok: kullanıcılar ücretsiz. Herkes aynı panoyu görür, bir coworker'a iş verebilir ve onay istediğinde yanıt verebilir."
+                },
+                "3": {
+                    "question": "Otomasyon araçlarımızın yerini alır mı?",
+                    "answer": "Sürekli bakımını yaptıklarınızın yerini alır. Bir coworker'a iş anlatılır, akış olarak çizilmez; bu yüzden yeni bir alan ya da yeniden adlandırılan bir sütun onu bir düğüm grafiği gibi bozmaz."
+                }
+            }
+        },
+        "saas": {
+            "crumb": "SaaS",
+            "title": "SaaS ekipleri için yapay zeka coworker'ları.",
+            "lede": "Yalnızca bir şey bozulduğunda okuduğunuz sinyaller (önemli bir hesapta düşen kullanım, beş talepte aynı istek, standup'tan önce biriken hatalar), bunları her gün okuyup size getiren coworker'lar tarafından takip edilir.",
+            "metaTitle": "SaaS için AI ajanları: churn, geri bildirim, sürüm, metrik",
+            "metaDescription": "Churn riskindeki hesapları bulan, geri bildirimleri temalara ayıran, hata raporlarını sınıflandıran, sürüm notları yazan ve metrik raporlayan coworker'lar.",
+            "wallTitle": "Ürün ve gelir işleri için sekiz coworker.",
+            "templatesLink": "SaaS şablonları",
+            "painsTitle": "Bir SaaS ekibinin çok geç okuduğu sinyaller.",
+            "pains": {
+                "1": {
+                    "title": "Yenileme tarihinde fark edilen churn",
+                    "body": "Kullanım sekiz hafta önce düştü ve kimse bakmadı. Bir coworker hesapları izler ve hâlâ vakit varken size haber verir."
+                },
+                "2": {
+                    "title": "Dört araca dağılmış geri bildirimler",
+                    "body": "Destek talepleri, görüşmeler, topluluk, yorumlar. Bir coworker hepsini okur ve sürekli tekrar edenleri alıntılarıyla birlikte getirir."
+                },
+                "3": {
+                    "title": "Notları olmadan yayınlanan sürümler",
+                    "body": "Değişiklikler PR'larda duruyor ve müşteriler bunları hiç duymuyor. Bir coworker notları gerçekten yayınlananlardan yazar."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Kullanım ve faturalama verilerimizi nereden okur?",
+                    "answer": "Zaten kullandığınız araçlardan: Stripe, veritabanınız veya veri ambarınız, ürün analitiğiniz, destek masanız. Bunları bir kez bağlarsınız ve çalışma alanındaki her coworker okuyabilir."
+                },
+                "2": {
+                    "question": "Sorun takip aracımıza yazabilir mi?",
+                    "answer": "Evet. Bir hatayı sınıflandırmak; onu tekilleştirmek, bağlamı eklemek ve ekibinizin gerçekten baktığı yere kaydetmek demektir: Linear, Jira, GitHub, Notion."
+                },
+                "3": {
+                    "question": "Verilerimiz bir modeli eğitmek için kullanılıyor mu?",
+                    "answer": "Hayır. Çalışma alanınız Avrupa'da kendine ait bir makinede çalışır ve coworker'larınızın okudukları orada kalır. Zaten ödediğiniz Claude veya ChatGPT planını da bağlayabilir, mevcut model ilişkinizi koruyabilirsiniz."
+                }
+            }
+        },
+        "legal": {
+            "crumb": "Hukuk ve uyum",
+            "title": "Hukuk ve uyum için yapay zeka coworker'ları.",
+            "lede": "Kimsenin vakit bulamadığı okumalar: kendi kurallarınıza göre kontrol edilen sözleşmeler, çıkarılan yükümlülükler ve bildirim tarihleri, açıklanan mevzuat değişiklikleri, toplanan denetim kanıtları. Son onay her zaman bir insanda.",
+            "metaTitle": "Hukuk ve uyum için AI ajanları: sözleşme ve denetim",
+            "metaDescription": "Sözleşmeleri kurallarınıza göre inceleyen, yükümlülükleri ve yenileme tarihlerini çıkaran, mevzuatı izleyen ve denetim kanıtı toplayan coworker'lar.",
+            "wallTitle": "Kimsenin zamanında okumadığı evraklar için sekiz coworker.",
+            "templatesLink": "Hukuk ve uyum şablonları",
+            "painsTitle": "Riskin gerçekte bulunduğu yer.",
+            "pains": {
+                "1": {
+                    "title": "Bir hafta kaçırılan bildirim süresi",
+                    "body": "Madde dokuzuncu sayfadaydı ve tarih kimsenin takviminde yoktu. Bir coworker tüm yenileme tarihlerini çıkarır ve süre dolmadan sizi uyarır."
+                },
+                "2": {
+                    "title": "İkinci kez okunmadan imzalanan sözleşmeler",
+                    "body": "Ticari ekip buna dün ihtiyaç duyuyordu. Bir coworker sözleşmeyi kendi kurallarınıza göre okur ve yalnızca zamanınızı hak edenleri işaretler."
+                },
+                "3": {
+                    "title": "Belge aramakla geçen bir denetim",
+                    "body": "Kanıtlar var, altı sürücüde ve bir gelen kutusunda. Bir coworker onları bulur, adlandırır ve her gereksinimin altına dosyalar."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Bir coworker hukuki tavsiye verir mi?",
+                    "answer": "Hayır. Okur, çıkarır ve işaretler; her çıktı yetkin bir insanın incelemesi için yazılır. Her noktanın belgede nereden geldiğini söyler, böylece saniyeler içinde kontrol edebilirsiniz."
+                },
+                "2": {
+                    "question": "Belgeler nerede duruyor?",
+                    "answer": "Coworker'ın, verdiğiniz erişimle okuduğu kendi sürücülerinizde ve araçlarınızda. Makinesi Avrupa'dadır ve dosyalar çalışma alanınızın içinde kalır."
+                },
+                "3": {
+                    "question": "Kendi madde standartlarımızı tanımlayabilir miyiz?",
+                    "answer": "Evet. Pozisyonlarınız, kırmızı çizgileriniz ve yedek ifadeleriniz çalışma alanının Brain'ine girer ve coworker genel bir kontrol listesine göre değil, bunlara göre inceler."
+                }
+            }
+        },
+        "recruiting": {
+            "crumb": "İşe alım ve İK",
+            "title": "İşe alım ve İK için yapay zeka coworker'ları.",
+            "lede": "Her başvuru role göre aynı şekilde okunur, mülakatlar özgeçmişten hazırlanır, değerlendirmeler bir karara dönüşür ve hiçbir aday yanıtsız kalmaz.",
+            "metaTitle": "İşe alım için AI ajanları: eleme, mülakat, takip",
+            "metaDescription": "Her başvuruyu role göre eleyen, özgeçmişleri kanıtlarıyla özetleyen, mülakatları hazırlayan ve adayları bilgilendiren yapay zeka coworker'larını işe alın.",
+            "wallTitle": "Sözünü tutan bir işe alım süreci için sekiz coworker.",
+            "templatesLink": "İşe alım şablonları",
+            "painsTitle": "Bir işe alım sürecinin sessizleştiği yerler.",
+            "pains": {
+                "1": {
+                    "title": "İki yüz başvuru, bir öğleden sonra",
+                    "body": "Son ellisine otuzar saniye düşer. Bir coworker hepsini aynı kriterlere göre okur ve kanıtlarını gösterir."
+                },
+                "2": {
+                    "title": "Hiç yanıt alamayan adaylar",
+                    "body": "Kabalıktan değil, yoğunluktan. Bir coworker her adayı her aşamada, sizin ifadelerinizle bilgilendirir."
+                },
+                "3": {
+                    "title": "Hiç karara dönüşmeyen değerlendirmeler",
+                    "body": "Dört farklı formatta dört not. Bir coworker bunları kanıtlara, açık sorulara ve role göre bir karşılaştırmaya dönüştürür."
+                }
+            },
+            "faq": {
+                "1": {
+                    "question": "Kimin işe alınacağına bir coworker mı karar verir?",
+                    "answer": "Hayır. Yazdığınız kriterlere göre okur ve doğrulayamadıkları dahil her noktanın arkasındaki kanıtı gösterir. Kısa liste bir okumadır, karar ekibinizde kalır."
+                },
+                "2": {
+                    "question": "Aday verilerini nasıl ele alır?",
+                    "answer": "Başvuruları bağladığınız araçlarda okur ve Avrupa'da çalışma alanınıza ait bir makinede çalışır. Hiçbir şey ortak bir havuza kopyalanmaz."
+                },
+                "3": {
+                    "question": "ATS'imize yazabilir mi?",
+                    "answer": "ATS'inizin bir API'si veya MCP sunucusu varsa evet. Yoksa coworker onu kendi ekranında açar ve bir insanın yapacağı gibi doldurur."
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,288 @@
+{
+    "composer": {
+        "attach": "Ekle",
+        "camera": "Kamera",
+        "coworkers": "Coworker'lar",
+        "discardRecording": "Kaydı sil",
+        "files": "Dosyalar",
+        "modelLabel": "Model: {model}",
+        "photos": "Fotoğraflar",
+        "recordVoice": "Sesli mesaj kaydet",
+        "removeAttachment": "Kaldır: {name}",
+        "retryRecording": "Kaydı yeniden göndermeyi dene",
+        "send": "Gönder",
+        "sendRecording": "Kaydı gönder",
+        "sendTo": "Gönder: {name}",
+        "skills": "Skill'ler",
+        "stop": "Durdur",
+        "tooLargeBody": "{files}: en fazla {megabytes} MB.",
+        "tooLargeTitle": "{count, plural, one {Bu dosya çok büyük} other {Bu dosyalar çok büyük}}",
+        "tooManyBody": "En fazla {max}: {files} dışarıda kaldı.",
+        "tooManyTitle": "Çok fazla dosya",
+        "computers": "Bilgisayarlar",
+        "offline": "çevrimdışı"
+    },
+    "desktop": {
+        "connecting": "Ekrana bağlanılıyor…",
+        "dropping": "Ekran bağlantısı sürekli kopuyor. Birazdan tekrar deneyin.",
+        "handingBack": "Geri veriliyor…",
+        "keys": {
+            "delete": "Sil",
+            "return": "Enter",
+            "tab": "Sekme"
+        },
+        "retry": "Yeniden dene",
+        "screen": "Ekran",
+        "screenOf": "{name} ekranı",
+        "type": "Yaz",
+        "typePlaceholder": "Ekrana yazın",
+        "unreachable": "Ekrana ulaşılamadı."
+    },
+    "empty": {
+        "asleep": "Uyuyor. Bir mesaj onu uyandırır.",
+        "loading": "Yükleniyor",
+        "pulseCoworkers": "{count, plural, one {# coworker} other {# coworker}}",
+        "pulseWorking": "{count} şu an çalışıyor",
+        "sendToCoworker": "Bu coworker'a mesaj gönderin",
+        "startTitle": "Bir sohbet başlatın",
+        "starters": {
+            "capabilities": "Neler yapabilirsin?",
+            "recentWork": "Son çalışmalarını özetle",
+            "projectFiles": "Proje dosyalarımı incele",
+            "tools": "Hangi araçlara erişimin var?"
+        },
+        "team": {
+            "greeting": "Merhaba, ben Chief of Staff'ınız",
+            "greetingNamed": "Merhaba {firstName}, ben Chief of Staff'ınız",
+            "greetingWithTeam": "{greeting}. İşte ekibiniz.",
+            "emptySubtitle": "Henüz coworker'ınız yok. Devretmek istediğiniz bir işi söyleyin, ilkini ben oluşturayım.",
+            "buildPrompt": "Şu işi yapacak bir coworker oluştur: ",
+            "buildFirst": {
+                "title": "İlk coworker'ımı oluştur",
+                "description": "İşi bir cümleyle anlatın"
+            },
+            "template": {
+                "title": "Bir şablonla başlayın",
+                "description": "İşletme türünüze uygun hazır coworker'lar",
+                "send": "İşletmeme uygun şablonları göster"
+            },
+            "guide": {
+                "title": "Bu nasıl çalışıyor?",
+                "description": "Coworker'lar, Boxes, rutinler, iki dakikada",
+                "send": "Rerun nasıl çalışıyor?"
+            },
+            "checkWorking": {
+                "title": "{name} ne yapıyor?",
+                "description": "Şu anda çalışıyor",
+                "send": "{mention} şu anda ne yapıyor?"
+            },
+            "checkIdle": {
+                "title": "{name} bugün ne yaptı?",
+                "description": "Son çalıştırmalarına göz atın",
+                "send": "{mention} bugün ne yaptı?"
+            },
+            "handOff": {
+                "title": "Görev verin: {name}",
+                "description": "Ben anlatır, sonuna kadar izlerim",
+                "prefill": "{mention} şunu yapsın: "
+            },
+            "build": {
+                "title": "Yeni bir coworker oluşturun",
+                "description": "Ekipte henüz kimsenin yapmadığı bir iş için"
+            }
+        }
+    },
+    "error": {
+        "connectChatGpt": "ChatGPT'yi bağla",
+        "connectClaude": "Claude'u bağla",
+        "creditsBody": "Bu dönem için Rerun kredilerinizi tükettiniz. Zaten Claude veya ChatGPT için ödeme yapıyor musunuz? Coworker'larınızı burada ek ücret ödemeden o planla çalıştırın.",
+        "creditsTitle": "Rerun kredileri",
+        "fallbackTitle": "Bir sorun oluştu",
+        "reconnect": "Yeniden bağlan",
+        "switchModel": "Modeli değiştir",
+        "tryAgain": "Tekrar dene"
+    },
+    "feedback": {
+        "cancel": "İptal",
+        "categories": {
+            "did_not_follow": "İsteğimi izlemedi",
+            "incomplete": "Eksik yanıt",
+            "memory": "Bellekle ilgili sorun",
+            "not_factual": "Bilgi olarak doğru değil",
+            "other": "Diğer",
+            "too_slow": "Çok yavaş",
+            "tool_error": "Araç veya bağlantı hatası",
+            "ui_bug": "Arayüz hatası",
+            "wrong_tool": "Yanlış araç veya uygulama"
+        },
+        "categoryLabel": "Ne tür bir sorun bildirmek istiyorsunuz?",
+        "disclaimer": "Bu raporu göndermek, coworker'larınızı geliştirebilmemiz için bu sohbeti Rerun ekibiyle paylaşır.",
+        "negativePlaceholder": "Bu yanıtta sizi memnun etmeyen neydi?",
+        "negativeTitle": "Olumsuz geri bildirim verin",
+        "positivePlaceholder": "Bu yanıtta sizi memnun eden neydi?",
+        "removeFailed": "Geri bildiriminiz kaldırılamadı",
+        "saveFailed": "Geri bildiriminiz kaydedilemedi",
+        "skip": "Atla",
+        "submit": "Gönder"
+    },
+    "foreman": {
+        "away": {
+            "none": {
+                "body": "Bu çalışma alanının şu anda makinesi yok. Durumu şuradan kontrol edin: {host}.",
+                "title": "Rerun çalışmıyor"
+            },
+            "onboarding": {
+                "body": "Kurulumu şurada tamamlayın: {host}.",
+                "title": "Rerun çalışma alanınızı kuruyor"
+            }
+        },
+        "retry": "Yeniden dene",
+        "role": "Chief of Staff'ınız",
+        "unreachableBody": "Bağlantınızı kontrol edip tekrar deneyin.",
+        "unreachableTitle": "Rerun'a ulaşamadık"
+    },
+    "header": {
+        "back": "Geri",
+        "conversationCount": "{count, plural, one {# sohbet} other {# sohbet}}",
+        "conversations": "Sohbetler",
+        "coworkerDetails": "Coworker ayrıntıları",
+        "earlier": "Daha önce",
+        "general": "Genel",
+        "identityLabel": "{name}, {title}",
+        "newChat": "Yeni sohbet",
+        "newConversation": "Yeni sohbet",
+        "newThread": "Yeni konu",
+        "sections": {
+            "needs-you": "Sizi bekliyor",
+            "new": "Okunmamış",
+            "running": "Çalışıyor"
+        },
+        "threadCount": "{count, plural, one {# konu} other {# konu}}",
+        "threads": "Konular"
+    },
+    "markdown": {
+        "code": "kod",
+        "copied": "Kopyalandı",
+        "copy": "Kopyala",
+        "draft": "Taslak",
+        "image": "Görsel"
+    },
+    "messages": {
+        "askRerun": "Chief of Staff'ınıza sorun",
+        "badResponse": "Kötü yanıt",
+        "compacting": "Sıkıştırılıyor",
+        "copy": "Kopyala",
+        "goodResponse": "İyi yanıt",
+        "needsYourAnswer": "Yanıtınızı bekliyor",
+        "open": "Aç: {name}",
+        "photo": "Fotoğraf",
+        "regenerate": "Yeniden oluştur",
+        "replyBelow": "Aşağıdan yanıtlayın.",
+        "runningTool": "Çalıştırılıyor: {tool}",
+        "scrollToLatest": "Son mesaja kaydır",
+        "sentBy": "Gönderen: {name}",
+        "share": "Paylaş",
+        "showLess": "Daha az göster",
+        "showMore": "Daha fazla göster",
+        "thinking": "Düşünüyor"
+    },
+    "origins": {
+        "copied": "Kopyalandı",
+        "copy": "Kopyala",
+        "installComplete": "Kurulum tamamlandı",
+        "installGuideOf": "{name} kurulum kılavuzu",
+        "installStarted": "Kurulum başladı",
+        "noPayload": "Yük yok",
+        "payload": "Yük",
+        "prompt": "Prompt",
+        "promptOf": "{name} prompt'u",
+        "scheduledRun": "Zamanlanmış çalıştırma",
+        "startedBy": "Bu oturumu <strong>{name}</strong> başlattı",
+        "truncated": "kısaltıldı",
+        "viewDetails": "Ayrıntıları gör",
+        "viewGuide": "Kılavuzu gör",
+        "viewPayload": "Yükü gör",
+        "viewPrompt": "Prompt'u gör",
+        "webhookReceived": "Webhook alındı",
+        "jobEnded": "İş bitti: #{computer}",
+        "viewReport": "Raporu gör",
+        "reportOf": "#{computer} raporu"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {# kaynak} other {# kaynak}}",
+        "emailsVerified": "{checked, plural, one {# e-postadan} other {# e-postadan}} {valid} tanesi doğrulandı",
+        "title": "Kaynaklar"
+    },
+    "pane": {
+        "answerPlaceholder": "Yanıtla: {name}",
+        "attachFailed": "Dosyalar eklenemedi",
+        "defaultModel": "Varsayılan · {model}",
+        "foremanPlaceholder": "Chief of Staff'ınıza her şeyi sorun",
+        "loadFailed": "Bu sohbeti yükleyemedik.",
+        "loading": "Sohbet yükleniyor",
+        "messagePlaceholder": "Mesaj: {name}",
+        "newPlaceholder": "Ne üzerinde çalışalım?",
+        "openBrowser": "Tarayıcıyı aç",
+        "retry": "Yeniden dene",
+        "stopTaskFailed": "Bu görev durdurulamadı",
+        "takeControl": "Kontrolü al"
+    },
+    "queued": {
+        "attachmentsOnly": "Yalnızca ekler",
+        "badge": "Sırada",
+        "remove": "Sıradaki mesajı kaldır",
+        "sendNow": "Şimdi gönder",
+        "sendNowStops": "Şimdi gönder, mevcut çalıştırmayı durdurur"
+    },
+    "runPhase": {
+        "label": "{name}: {phase}",
+        "thinking": "Düşünüyor",
+        "waking": "Uyanıyor",
+        "working": "Çalışıyor"
+    },
+    "screen": {
+        "disconnected": "Ekran bağlantısı kesildi",
+        "error": "Ekran kullanılamıyor",
+        "handBackFailed": "Tarayıcı geri verilemedi",
+        "resize": "Ekranı yeniden boyutlandır"
+    },
+    "skillUpdateFailed": "Skill güncellenemedi",
+    "takeover": {
+        "closing": "Kapatılıyor…",
+        "done": "Bitti",
+        "openAgain": "Yeniden aç",
+        "openBrowser": "Tarayıcıyı aç",
+        "opened": "Tarayıcı, coworker'ınızın masaüstünde açık. İşiniz bitince buraya dönün.",
+        "opensBrowser": "Coworker'ınızın tarayıcısını sizin kullanmanız için açar.",
+        "opensSite": "{site} sitesini coworker'ınızın tarayıcısında sizin kullanmanız için açar.",
+        "privacy": "Giriş yaptığınız hesaplar makinenizdeki bu coworker'ın tarayıcısında kalır.",
+        "skip": "Atla",
+        "skipTakeover": "Tarayıcıyı devralmayı atla"
+    },
+    "threadBranch": {
+        "needs": "Sizi bekliyor",
+        "error": "Hata",
+        "running": "Çalışıyor",
+        "open": "Konuyu aç: {title}",
+        "opener": {
+            "schedule": "Zamanlanmış çalıştırma · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "İsteyen: {name}",
+            "askedByUnknown": "Başka bir coworker istedi",
+            "started": "Bir konu başlattı"
+        }
+    },
+    "voice": {
+        "copyTranscript": "Dökümü kopyala",
+        "hideTranscript": "Dökümü gizle",
+        "pause": "Duraklat",
+        "play": "Sesli mesajı oynat",
+        "recording": "Kaydediliyor",
+        "seek": "Sar",
+        "sendFailed": "Bu kayıt gönderilemedi.",
+        "sending": "Kayıt gönderiliyor",
+        "silent": "Bu kayıtta hiçbir şey duyulmadı.",
+        "transcript": "Döküm",
+        "waitingForMicrophone": "Mikrofon bekleniyor…"
+    }
+}

@@ -1,0 +1,154 @@
+{
+    "actions": {
+        "notNow": "Şimdi değil",
+        "explain": "Açıkla",
+        "skip": "Atla",
+        "connect": "Bağla",
+        "connecting": "Bağlanıyor…",
+        "continue": "Devam et",
+        "loading": "Yükleniyor…",
+        "openOnWeb": "Web'de aç",
+        "back": "Geri",
+        "confirm": "Onayla",
+        "send": "Gönder",
+        "next": "İleri",
+        "save": "Kaydet",
+        "saving": "Kaydediliyor…"
+    },
+    "pending": {
+        "question": "{count, plural, =0 {Bekleyen soru} one {Bekleyen soru} other {# bekleyen soru}}",
+        "approval": "{count, plural, =0 {Onay gerekli} one {Onay gerekli} other {# onay gerekli}}",
+        "secret": "{count, plural, =0 {Kimlik bilgisi gerekli} one {Kimlik bilgisi gerekli} other {# kimlik bilgisi gerekli}}",
+        "mcpNamed": "Giriş yapın: {name}",
+        "mcp": "Giriş gerekli",
+        "service": "{count, plural, =0 {Bağlanacak uygulama} one {Bağlanacak uygulama} other {Bağlanacak # uygulama}}",
+        "takeover": "Ekranda sıra sizde",
+        "jumpTo": "{label}, oraya git",
+        "spend": "Onay bekleyen harcama",
+        "computer": "#{computer} üzerinde bir komutu onaylayın"
+    },
+    "alert": {
+        "label": "Bildirim",
+        "failed": "Okundu olarak işaretlenemedi. Tekrar deneyin.",
+        "marking": "İşaretleniyor…",
+        "markAsRead": "Okundu olarak işaretle"
+    },
+    "approval": {
+        "label": "Onay gerekli",
+        "approved": "Onaylandı",
+        "approve": "Onayla"
+    },
+    "decline": {
+        "placeholder": "Neden olmasın? (isteğe bağlı)",
+        "reason": "Neden"
+    },
+    "fallback": {
+        "replyBelow": "Aşağıdan yanıtlayın veya",
+        "needsYou": "{name} sizi bekliyor"
+    },
+    "steps": {
+        "previous": "Önceki adım",
+        "next": "Sonraki adım",
+        "goTo": "Adıma git: {step} / {count}",
+        "position": "{step} / {count}"
+    },
+    "mcp": {
+        "label": "Giriş gerekli",
+        "connected": "Bağlı",
+        "signInNeeded": "Giriş gerekli",
+        "unreachable": "Ulaşılamıyor",
+        "customServer": "Özel MCP sunucusu",
+        "customServerAt": "Özel MCP sunucusu · {host}",
+        "signInTo": "Giriş yapın: {name}",
+        "loadFailed": "Bu sunucu yüklenemedi. Web'de bağlayın veya atlayın."
+    },
+    "question": {
+        "dismiss": "Soruları kapat",
+        "selectAll": "Uygun olanların tümünü seçin",
+        "typeAnswer": "Yanıtınızı yazın…",
+        "somethingElse": "Başka bir şey",
+        "yourAnswer": "Yanıtınız",
+        "record": "Sesinizle yanıtlayın",
+        "useRecording": "Bu kaydı kullan",
+        "discardRecording": "Kaydı sil",
+        "retryRecording": "Yazıya dökmeyi tekrar dene",
+        "uploadFailed": "Bu dosyalar eklenemedi. Tekrar deneyin."
+    },
+    "secret": {
+        "labelOne": "Kimlik bilgisi gerekli",
+        "labelMany": "Kimlik bilgileri gerekli",
+        "dismiss": "Kimlik bilgisi isteğini kapat",
+        "storedAs": "Şu adla saklanır: {key}",
+        "alreadySaved": "Zaten kayıtlı. Değiştirmek için yazın",
+        "paste": "Değeri yapıştırın",
+        "whereToFind": "Nerede bulunur",
+        "storedNote": "Box'ınızda bir coworker değişkeni olarak saklanır. Modele asla gönderilmez.",
+        "saveFailed": "Kimlik bilgileri kaydedilemedi"
+    },
+    "service": {
+        "label": "Bağlanacak uygulama",
+        "loadFailed": "Uygulamalar yüklenemedi. Web'de bağlayın veya atlayın.",
+        "loading": "Uygulamalar yükleniyor…",
+        "webOnly": "Bu uygulama hesabını web'de seçer. Orada bağlayın veya atlayın.",
+        "connectFailed": "Uygulama bağlanamadı",
+        "connected": "{name} bağlandı",
+        "notFound": "Katalogda bulunamadı, atlandı.",
+        "skipped": "Atlandı."
+    },
+    "receipts": {
+        "cancelled": {
+            "question": "Soruları atladınız",
+            "service": "Uygulama kurulumunu kapattınız",
+            "secret": "Anahtarları paylaşmayı reddettiniz",
+            "mcp": "Girişi atladınız",
+            "takeover": "Tarayıcıyı coworker'ınıza bıraktınız"
+        },
+        "answer": "Yanıt",
+        "answers": "Yanıtlar",
+        "answeredCount": "{answered} / {total} yanıtlandı",
+        "skipped": "Atlandı",
+        "approval": "Onay",
+        "approvals": "Onaylar",
+        "approvalCount": "{approved} onaylandı, {declined} şimdi değil",
+        "approved": "Onaylandı",
+        "notNow": "Şimdi değil",
+        "quotedNote": "“{note}”",
+        "connected": "Bağlandı",
+        "notReconnected": "Yeniden bağlanmadı",
+        "notFound": "Bulunamadı",
+        "apps": "Uygulamalar",
+        "appsConnected": "{connected} / {total} bağlandı",
+        "instead": "{name} (yerine: {replaced})",
+        "keys": "Anahtarlar",
+        "keysStored": "{stored} / {total} saklandı",
+        "stored": "Saklandı",
+        "storedOnBox": "Box'ta saklanır. Coworker yalnızca adları görür.",
+        "mcpServer": "MCP sunucusu",
+        "handedBackOn": "Tarayıcıyı şu adreste geri verdiniz: {url}",
+        "handedBack": "Tarayıcıyı geri verdiniz",
+        "spend": "Ücretli veri",
+        "approvedOnce": "Bir kez onaylandı",
+        "alwaysAllowed": "Her zaman izinli"
+    },
+    "spend": {
+        "estimatedTotal": "Tahmini toplam",
+        "creditsUnit": "{count, plural, one {kredi} other {kredi}}",
+        "creditsShort": "Yalnızca {amount} {count, plural, one {kredi} other {kredi}} kaldı: web'de kredi ekleyin veya şimdi değil deyin.",
+        "alwaysAllow": "Her zaman izin ver",
+        "approveOnce": "Bir kez onayla",
+        "addCredits": "Kredi ekle",
+        "alwaysAllowFailed": "\"Sormadan harca\" açılamadı. Bu onay, tahmini tutara kadar geçerli kalır."
+    },
+    "computer": {
+        "runOn": "#{computer} üzerinde çalıştır",
+        "filesOn": "#{computer} dosyalarını kullan",
+        "deny": "Reddet",
+        "allow": "İzin ver",
+        "alwaysProgram": "{program} için her zaman izin ver",
+        "alwaysFolder": "Bu klasöre her zaman izin ver",
+        "interpreterWarning": "{program} için her zaman izin vermek, çalıştırdığı her koda izin verir",
+        "alwaysFailed": "Kural bilgisayarda tutulamadı: yalnızca bu seferlik izin verildi.",
+        "inFolder": "Klasör: {folder}",
+        "folderNote": "“Her zaman”, {folder} içindeki her dosyaya izin verir"
+    }
+}

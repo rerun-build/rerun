@@ -1,0 +1,168 @@
+{
+    "toast": {
+        "close": "Bildirimi kapat",
+        "openConversation": "Sohbeti aç",
+        "coworker": "Coworker",
+        "scheduledTask": "{name} · Zamanlanmış görev"
+    },
+    "inbox": {
+        "unknownCoworker": "Coworker",
+        "detail": {
+            "close": "Kapat",
+            "back": "Geri",
+            "seeAll": "Tümünü gör",
+            "seeAllCount": "Tümünü gör ({count})",
+            "markRead": "Okundu işaretle",
+            "notInList": "Bu güncelleme henüz listenizde değil",
+            "openConversation": "Sohbeti aç",
+            "noCoworker": "Bu güncelleme bir coworker'a bağlı değil",
+            "status": {
+                "error": "Hata",
+                "awaiting_question": "Soru",
+                "awaiting_approval": "Onay",
+                "awaiting_ack": "Okunmamış",
+                "done": "Tamamlandı",
+                "waiting_human": "Bekliyor"
+            }
+        },
+        "peek": {
+            "close": "Kapat",
+            "back": "Geri",
+            "openConversation": "Sohbeti aç",
+            "showMore": "Daha fazla göster",
+            "showLess": "Daha az göster",
+            "sent": "Gönderildi: {agent}",
+            "stale": "Bu zaten yanıtlandı.",
+            "openToAnswer": "Yanıtlamak için sohbeti açın.",
+            "busy": "{agent} hâlâ çalışıyor. Birazdan tekrar deneyin.",
+            "failed": "Yanıtınız iletilemedi. Tekrar deneyin."
+        },
+        "markAll": {
+            "title": "Tümü okundu olarak işaretlensin mi?",
+            "description": "{count, plural, one {# öğe} other {# öğe}} bu listeden çıkacak. Yanıt bekleyen istekler de yanıtlanmadan temizlenir.",
+            "confirm": "Tümünü okundu işaretle"
+        },
+        "rowMenu": {
+            "options": "Bildirim seçenekleri",
+            "undo": "Geri al",
+            "unfollow": "Zamanlanmış görevlerini takip etmeyi bırak",
+            "unfollowed": "{name} adlı coworker'ın zamanlanmış görevlerini artık takip etmiyorsunuz.",
+            "mute": "Sessize al: {name}",
+            "muted": "{name} sessize alındı.",
+            "settings": "Bildirim ayarları"
+        },
+        "untitledSession": "Adsız oturum",
+        "reasons": {
+            "mine": "Bu çalıştırmayı siz başlattınız",
+            "participant": "Bu sohbette yer alıyorsunuz",
+            "followed": "{agentName} adlı coworker'ın zamanlanmış görevlerini takip ediyorsunuz",
+            "allActivity": "{agentName} adlı coworker'ın tüm etkinliğini alıyorsunuz",
+            "everything": "Çalışma alanındaki her çalıştırmayı alıyorsunuz",
+            "workspace": "Bu, çalışma alanınızla ilgili"
+        }
+    },
+    "settings": {
+        "scopeTitle": "Bildirim almak istediklerim",
+        "recommended": "Önerilen",
+        "notificationsFor": "Bildirimler: {name}",
+        "scopes": {
+            "everything": {
+                "label": "Her şey",
+                "detail": "Kim başlatırsa başlatsın, çalışma alanındaki her çalıştırma."
+            },
+            "mine": {
+                "label": "Çalıştırmalarım ve takip ettiklerim",
+                "detail": "Başlattığım çalıştırmalar, yer aldığım sohbetler, takip ettiğim coworker'lar."
+            },
+            "needed": {
+                "label": "Yalnızca bana ihtiyaç olduğunda",
+                "detail": "Çalıştırmalarımdaki sorular, onaylar ve hatalar. Biten bir çalıştırma bildirim göndermez."
+            },
+            "nothing": {
+                "label": "Hiçbir şey",
+                "detail": "Gelen kutusunu kendim kontrol ederim."
+            }
+        },
+        "modes": {
+            "default": {
+                "label": "Varsayılan",
+                "yourSetting": "Ayarınız: “{scope}”."
+            },
+            "everything": {
+                "label": "Tüm etkinlik",
+                "hint": "Kim başlatırsa başlatsın, her çalıştırma."
+            },
+            "muted": {
+                "label": "Sessiz",
+                "hint": "Hiçbir şey. Pano yine de gösterir."
+            }
+        },
+        "bell": {
+            "title": "Bildirimler: {name}",
+            "follow": "Zamanlanmış görevlerini takip et",
+            "noSchedule": "{name} için henüz zamanlanmış görev yok",
+            "nothingScheduled": "Henüz zamanlanmış bir şey yok.",
+            "scheduled": "{count} zamanlanmış görev, size kendi çalıştırmalarınız gibi ulaşır.",
+            "allSettings": "Tüm bildirim ayarları"
+        },
+        "perCoworker": {
+            "title": "Coworker bazında",
+            "detail": "Her coworker'daki zil simgesinden de ayarlanabilir.",
+            "add": "Ekle",
+            "allListed": "Tüm coworker'lar zaten listede",
+            "empty": "Her coworker yukarıdaki kurala uyar.",
+            "following": "Zamanlanmış görevleri takip ediliyor",
+            "alreadyDefault": "{name} zaten ayarınızı kullanıyor",
+            "reset": "Sıfırla: {name}"
+        },
+        "channels": {
+            "title": "Nasıl",
+            "toast": {
+                "label": "Uygulama içi bildirim",
+                "description": "Rerun açıkken gelen kutunuzun üstünde belirir."
+            },
+            "sound": {
+                "label": "Ses",
+                "description": "Yalnızca bir coworker'ın size ihtiyacı olduğunda veya bir şey bozulduğunda.",
+                "play": "Bildirim sesini çal"
+            },
+            "email": {
+                "label": "E-posta",
+                "description": "Siz uzaktayken size ihtiyaç olduğunda. Her olay için bir e-posta, asla her çalıştırma için değil."
+            }
+        },
+        "accountEmails": {
+            "title": "Hesap e-postaları",
+            "billing": {
+                "label": "Deneme ve faturalandırma",
+                "description": "Aboneliğinizle ilgili deneme hatırlatmaları ve fatura bildirimleri."
+            },
+            "product": {
+                "label": "Ürün güncellemeleri",
+                "description": "Yeni özellikler, ipuçları ve ara sıra ürün haberleri."
+            }
+        },
+        "saveFailed": "Bildirim ayarlarınız kaydedilemedi",
+        "networkError": "Ağ hatası"
+    },
+    "emailPreferences": {
+        "coworkerTitle": "Coworker bildirimleri",
+        "email": {
+            "label": "E-posta",
+            "description": "Siz uzaktayken bir coworker'ın size ihtiyacı olduğunda veya bir sorun çıktığında. Her olay için bir e-posta, asla her çalıştırma için değil."
+        },
+        "saveFailed": "Tercihler kaydedilemedi",
+        "saving": "Kaydediliyor…",
+        "saved": "Tüm değişiklikler kaydedildi"
+    },
+    "notices": {
+        "slotsPaused": "Planınızda artık {slots, plural, one {# {provider} yeri} other {# {provider} yeri}} var, bu yüzden {paused, plural, one {# bağlı hesap} other {# bağlı hesap}} duraklatıldı. Geri getirmek için Faturalandırma bölümünden bir yer ekleyin.",
+        "workspaceBack": "Çalışma alanınız geri geldi. Coworker'larınızın yeniden kullanabilmesi için {provider} hesabınızı Ayarlar → Uygulamalar bölümünden yeniden bağlayın.",
+        "trialEndsSoon": "Ücretsiz {provider} yeriniz {endsAt, date, long} tarihinde sona eriyor. Ardından planınızda ücretli bir yere dönüşür. Saklamak istemiyorsanız hesabın bağlantısını o tarihten önce Ayarlar → Uygulamalar bölümünden kesin.",
+        "trialEndedPlanInactive": "Planınız aktif değilken ücretsiz {provider} yeriniz sona erdi, bu yüzden {account, select, none {hesap} other {{account}}} duraklatıldı. Saklamak için bir hafta içinde Faturalandırma bölümünden bir yer ekleyin, aksi takdirde bağlantı kesilecek.",
+        "trialEndedDeclined": "Ücretsiz {provider} yeriniz sona erdi ve kart reddedildi, bu yüzden {account, select, none {hesap} other {{account}}} duraklatıldı. Saklamak için bir hafta içinde Faturalandırma bölümünden bir yer ekleyin, aksi takdirde bağlantı kesilecek.",
+        "rateLimited": "{provider}, {account, select, none {hesaplarınızdan birinin} other {{account} hesabının}} yavaşlamasını istedi. Hesabınız güvende kalsın diye coworker'larınız onu 24 saat kullanmayacak.",
+        "signedOut": "{provider}, {account, select, none {hesaplarınızdan birinin} other {{account} hesabının}} oturumunu kapattı. Coworker'larınızın yeniden kullanabilmesi için Ayarlar → Uygulamalar bölümünden yeniden bağlayın.",
+        "budgetExhausted": "Bu ayki Rerun kredileriniz tükendi. Rerun modelleriyle zamanlanmış ve tetiklenmiş çalıştırmalar duraklatıldı; krediler sıfırlanana veya siz kredi ekleyene kadar coworker'lar potansiyel müşteri, SEO veya sosyal medya verisi satın alamaz."
+    }
+}

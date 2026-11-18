@@ -1,0 +1,123 @@
+{
+    "title": "Coworker'lar",
+    "loadFailed": "Coworker'larınızı yükleyemedik.",
+    "retry": "Tekrar dene",
+    "empty": "Henüz coworker yok.",
+    "loadingCoworkers": "Coworker'lar yükleniyor",
+    "newCoworker": "Yeni coworker",
+    "untitledBox": "Adsız Box",
+    "teammate": "Ekip arkadaşı",
+    "pinned": {
+        "dragToReorder": "Sıralamak için sürükleyin",
+        "done": "Bitti",
+        "unpin": "Sabitlemeyi kaldır",
+        "details": "Coworker ayrıntıları",
+        "edit": "Sabitlenenleri düzenle",
+        "unreadLabel": "{name}, okunmadı"
+    },
+    "row": {
+        "label": "{name}, {line}",
+        "opensConversation": "Sohbeti açar",
+        "pin": "Sabitle",
+        "unpin": "Sabitlemeyi kaldır",
+        "pinToTop": "En üste sabitle"
+    },
+    "line": {
+        "paused": "Duraklatıldı",
+        "waiting": "Sizi bekliyor",
+        "error": "Bir şeyler ters gitti",
+        "working": "Çalışıyor",
+        "workingOn": "Çalışıyor · {detail}",
+        "asleep": "Uykuda",
+        "asleepAbout": "Uykuda · {about}",
+        "you": "Siz: {message}"
+    },
+    "foreman": {
+        "askAnything": "İstediğinizi sorun"
+    },
+    "header": {
+        "account": "Hesap"
+    },
+    "account": {
+        "preferences": "Tercihler",
+        "contactSupport": "Destekle iletişime geçin",
+        "signOut": "Çıkış yap",
+        "subscriptionTitle": "Önce aboneliği iptal edin",
+        "subscriptionMessage": "Şu çalışma alanlarının aboneliği hâlâ yenileniyor: {workspaces}. rerun.build üzerinde Faturalandırma bölümünden iptal edin, ardından hesabınızı silin.",
+        "deleteTitle": "Hesabınız silinsin mi?",
+        "deleteMessage": "Paylaştığınız çalışma alanlarından ayrılırsınız. Yalnızca sizin bulunduğunuz bir çalışma alanı, coworker'ları ve dosyalarıyla birlikte kalıcı olarak kapanır. Bu işlem geri alınamaz.",
+        "delete": "Sil",
+        "cancel": "İptal",
+        "reauthTitle": "Hesabınızı silmek için yeniden giriş yapın",
+        "reauthMessage": "Güvenliğiniz için hesabınızı silmek yeni bir giriş gerektirir. Yeniden giriş yapın, ardından buradan silin.",
+        "deleteFailedTitle": "Hesabınız silinemedi",
+        "deleteFailedMessage": "Biraz sonra tekrar deneyin.",
+        "leaveServerTitle": "{host} sunucusundan çıkılsın mı?",
+        "leaveServerMessage": "Oturumunuz kapatılır ve Rerun, Rerun Cloud üzerinde yeniden açılır.",
+        "leaveServer": "Ayrıl"
+    },
+    "workspace": {
+        "untitled": "Çalışma alanım",
+        "menuLabel": "Çalışma alanı {name}"
+    },
+    "section": {
+        "label": "{label}, {count}"
+    },
+    "search": {
+        "title": "Ara",
+        "back": "Geri",
+        "placeholder": "Coworker'larda ve sohbetlerde ara",
+        "askRerun": "Chief of Staff'ınıza sorun",
+        "quotedAsk": "“{query}”",
+        "coworkers": "Coworker'lar",
+        "conversations": "Sohbetler",
+        "noCoworker": "Bu adda bir coworker yok.",
+        "newConversation": "Yeni sohbet",
+        "hitDetail": "{coworker} · {time}"
+    },
+    "inbox": {
+        "notifications": "Bildirimler",
+        "bellLabel": "Bildirimler, {count}",
+        "close": "Kapat",
+        "settings": "Bildirim ayarları",
+        "markAllRead": "Tümünü okundu işaretle",
+        "markAllTitle": "Tümü okundu sayılsın mı?",
+        "markAllMessage": "{count, plural, one {# öğe} other {# öğe}} bu listeden kaldırılacak. Hâlâ yanıt bekleyen istekler de yanıtlanmadan temizlenir.",
+        "cancel": "İptal",
+        "running": "{count, plural, one {# görev çalışıyor} other {# görev çalışıyor}}",
+        "loadFailed": "Bildirimlerinizi yükleyemedik.",
+        "retry": "Tekrar dene",
+        "emptyTitle": "Yapılacak bir şey yok",
+        "emptyDescription": "Bir coworker'ın size ihtiyacı olduğunda ya da bir görevi bitirdiğinde burada görünür.",
+        "undo": "Geri al",
+        "ok": "Tamam",
+        "sections": {
+            "needsYou": "Sizi bekliyor",
+            "headsUps": "Bilgilendirmeler",
+            "errors": "Hatalar",
+            "done": "Tamamlananlar"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} size bir soru sordu",
+            "awaiting_approval": "{agent} onayınızı bekliyor",
+            "awaiting_connector": "{agent} bir uygulama bağlantısı bekliyor",
+            "waiting_human": "{agent} sizi bekliyor",
+            "awaiting_ack": "{agent} dikkatinize bir şey sundu",
+            "error": "{agent} bir hatayla karşılaştı",
+            "done": "{agent} çalıştırmasını tamamladı"
+        },
+        "row": {
+            "detail": "{agent} · {title}",
+            "label": "{headline}, {detail}",
+            "read": "Okundu",
+            "markRead": "Okundu olarak işaretle",
+            "opensConversation": "Sohbeti açar",
+            "unfollow": "Zamanlanmış görevlerini takip etmeyi bırak",
+            "unfollowed": "{name} adlı coworker'ın zamanlanmış görevlerini artık takip etmiyorsunuz.",
+            "mute": "Sessize al: {name}",
+            "muted": "{name} sessize alındı.",
+            "settings": "Bildirim ayarları",
+            "cancel": "İptal"
+        }
+    }
+}

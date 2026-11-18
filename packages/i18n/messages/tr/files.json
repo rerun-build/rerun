@@ -1,0 +1,97 @@
+{
+    "detail": {
+        "readOnly": "Bu dosya salt okunur",
+        "stillLoading": "Dosya hâlâ yükleniyor",
+        "previousFile": "Önceki dosya",
+        "nextFile": "Sonraki dosya",
+        "editNotText": "Burada yalnızca metin dosyaları düzenlenebilir.",
+        "editTruncated": "Bu dosya {limit} karakterden uzun ve burada düzenlenemez. İndirin veya coworker'dan düzenlemesini isteyin.",
+        "editBinary": "Bu dosya metin değil, burada düzenlemek onu bozar."
+    },
+    "actions": {
+        "truncated": "Kısaltıldı",
+        "edit": "Düzenle",
+        "download": "İndir",
+        "deleteFile": "Dosyayı sil"
+    },
+    "delete": {
+        "title": "{name} silinsin mi?",
+        "file": "Dosya Box'tan silinir. Bu işlem geri alınamaz.",
+        "folder": "Klasör ve içindeki her şey Box'tan silinir. Bu işlem geri alınamaz."
+    },
+    "editor": {
+        "unsaved": "Kaydedilmedi",
+        "cancel": "İptal",
+        "noChanges": "Kaydedilecek değişiklik yok",
+        "save": "Değişiklikleri kaydet",
+        "conflictTitle": "{name} Box üzerinde değişti",
+        "conflictDescription": "Siz açtıktan sonra biri veya bir coworker bu dosyaya yazdı. Şimdi kaydederseniz onların sürümü sizinkiyle değiştirilir.",
+        "overwrite": "Üzerine yaz",
+        "keepTheirs": "Onlarınkini koru",
+        "discardTitle": "Değişiklikleriniz atılsın mı?",
+        "discardDescription": "{name} dosyasındaki düzenlemeleriniz henüz kaydedilmedi. Düzenleyiciyi kapatırsanız kaybolurlar.",
+        "discard": "Değişiklikleri at",
+        "keepEditing": "Düzenlemeye devam et"
+    },
+    "preview": {
+        "noPreview": "Bu dosya türü için önizleme yok",
+        "download": "İndir",
+        "readFailed": "Bu dosya okunamadı",
+        "showSource": "Kaynağı göster",
+        "showRendered": "Sayfa olarak göster"
+    },
+    "publish": {
+        "publish": "Yayınla",
+        "publishPublicly": "Herkese açık yayınla",
+        "publishedLink": "Yayınlanan bağlantı",
+        "publicLink": "Herkese açık bağlantı",
+        "open": "Aç",
+        "openPublicLink": "Herkese açık bağlantıyı aç",
+        "copyLink": "Bağlantıyı kopyala",
+        "copyPublicLink": "Açık bağlantıyı kopyala",
+        "shareSettings": "Paylaşım ayarları",
+        "unpublish": "Yayından kaldır",
+        "unshare": "Paylaşımı durdur",
+        "unpublishTitle": "{name} yayından kaldırılsın mı?",
+        "unshareTitle": "{name} paylaşımı durdurulsun mu?",
+        "unpublishDescription": "Bağlantı, ona sahip herkes için hemen çalışmayı durdurur.",
+        "unshareDescription": "Herkese açık bağlantı hemen çalışmayı durdurur. Ona sahip olan herkes 404 hatası alır."
+    },
+    "empty": {
+        "title": "Boş klasör",
+        "goUp": "Bir üst düzey"
+    },
+    "grid": {
+        "parentDirectory": "Üst klasör",
+        "openFolder": "Klasörü aç",
+        "open": "Aç",
+        "download": "İndir",
+        "rename": "Yeniden adlandır",
+        "delete": "Sil",
+        "published": "Yayınlandı"
+    },
+    "list": {
+        "newName": "Yeni ad",
+        "dropHere": "Yüklemek için dosya veya klasörleri buraya bırakın",
+        "name": "Ad",
+        "size": "Boyut",
+        "type": "Tür",
+        "empty": "Burada henüz bir şey yok. Bir coworker'ın tüm çalışma alanı için indirdiği, oluşturduğu veya düzenlediği her şey bu klasöre gelir, bu sayfaya bıraktıklarınız da.",
+        "actionsFor": "{name} için işlemler",
+        "folder": "Klasör",
+        "file": "Dosya"
+    },
+    "uploadOutcome": {
+        "allFailed": "Yükleme başarısız oldu",
+        "someFailed": "{total, plural, one {# dosyadan} other {# dosyadan}} {failed} tanesi yüklenemedi",
+        "uploaded": "{count, plural, one {# dosya} other {# dosya}} yüklendi",
+        "sessionExpired": "Oturumunuzun süresi doldu. Sayfayı yenileyip tekrar deneyin.",
+        "tooLarge": "Bu dosya yüklemek için çok büyük.",
+        "retryLater": "Yükleme başarısız. Birazdan tekrar deneyin.",
+        "networkFailed": "Yükleme başarısız oldu. Bağlantınızı kontrol edip tekrar deneyin.",
+        "oversized": "{limit} MB sınırını aşan {count, plural, one {# dosya} other {# dosya}}: {names}{more, plural, =0 {} one { ve # dosya daha} other { ve # dosya daha}}.",
+        "machineUpdating": "Bu çalışma alanının makinesi güncelleniyordu. Yüklemeyi tekrar deneyin.",
+        "engineUpdateNeeded": "Bu çalışma alanı, {limit} MB üzerindeki dosyaları kabul etmek için motor güncellemesi gereken bir makinede çalışıyor. Kendini güncelliyor, birkaç dakika sonra tekrar deneyin.",
+        "machineUnreachable": "{name} yüklenemedi. Makinenize ulaşılamıyor olabilir."
+    }
+}

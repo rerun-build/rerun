@@ -1,0 +1,93 @@
+{
+    "title": "Hesap",
+    "tabs": {
+        "profile": {
+            "label": "Profil",
+            "description": "Ekip arkadaşlarınızın gördüğü fotoğrafınız ve adınız."
+        },
+        "signIn": {
+            "label": "Giriş",
+            "description": "Bu hesaba giriş yapma yollarınız."
+        },
+        "language": {
+            "label": "Dil",
+            "description": "Rerun'ın sizinle kullandığı dil."
+        },
+        "desktop": {
+            "label": "Masaüstü uygulaması",
+            "description": "Rerun uygulamasının bu bilgisayardaki davranışı."
+        },
+        "delete": {
+            "label": "Hesabı sil",
+            "description": "Rerun hesabınızı kalıcı olarak kapatın."
+        }
+    },
+    "language": {
+        "field": "Dil",
+        "automatic": "Otomatik",
+        "automaticHint": "Tarayıcınızı izler: {language}.",
+        "failed": "Dil değiştirilemedi. Tekrar deneyin."
+    },
+    "profile": {
+        "photo": "Fotoğraf",
+        "photoHelp": "Ekip arkadaşlarınıza mesajlarınızın ve imlecinizin yanında gösterilir.",
+        "dropPhoto": "Fotoğrafınızı bırakın",
+        "changePhoto": "Fotoğrafı değiştir",
+        "uploadPhoto": "Fotoğraf yükle",
+        "removePhoto": "Kaldır",
+        "name": "Ad",
+        "namePlaceholder": "ör. Ada Lovelace",
+        "save": "Kaydet",
+        "notAnImage": "Lütfen bir görsel dosyası seçin.",
+        "nameUpdated": "Ad güncellendi",
+        "failed": "Bir sorun oluştu. Lütfen tekrar deneyin."
+    },
+    "signIn": {
+        "email": {
+            "title": "E-posta",
+            "empty": "Bağlı değil. Gelen kutunuza gönderilen bir kodla giriş yapmak için bir e-posta ekleyin."
+        },
+        "phone": {
+            "title": "Telefon",
+            "empty": "Bağlı değil. WhatsApp veya SMS ile gelen bir kodla giriş yapmak için bir numara ekleyin.",
+            "otherAccount": "Bu numara başka bir Rerun hesabına giriş yapıyor. Burada telefonla giriş yapmak için numarayı değiştirin."
+        },
+        "change": "Değiştir",
+        "add": "Ekle",
+        "connect": "Bağla",
+        "disconnect": "Bağlantıyı kes",
+        "connected": "Bağlı",
+        "notConnected": "Bağlı değil.",
+        "onlyMethod": "Bu hesaba bağlı tek giriş yöntemi: {provider}.",
+        "disconnectTitle": "{provider} bağlantısı kesilsin mi?",
+        "disconnectDescription": "Artık bu hesaba {provider} ile giriş yapamayacaksınız. Diğer giriş yöntemleriniz çalışmaya devam eder.",
+        "linkError": {
+            "identityTaken": "Bu {provider} hesabı zaten başka bir Rerun hesabına giriş yapıyor.",
+            "denied": "{provider} bağlanmadı.",
+            "failed": "{provider} bağlanamadı. Tekrar deneyin."
+        }
+    },
+    "delete": {
+        "consequences": {
+            "shared": {
+                "title": "Paylaşılan çalışma alanları",
+                "description": "Ekip arkadaşlarınızla paylaştığınız her çalışma alanından ayrılırsınız. Onlar çalışma alanını coworker'ları ve dosyalarıyla birlikte korur."
+            },
+            "own": {
+                "title": "Kendi çalışma alanlarınız",
+                "description": "Yalnızca sizin bulunduğunuz bir çalışma alanı kalıcı olarak durur: coworker'ları kapatılır ve makinesi dosyalarıyla birlikte silinir."
+            },
+            "signIn": {
+                "title": "Giriş",
+                "description": "Her yerde oturumunuz kapatılır. E-postanız, Google hesabınız ve telefon numaranız serbest kalır, böylece daha sonra yeniden kaydolabilirsiniz."
+            }
+        },
+        "blocker": {
+            "current": "Aboneliği hâlâ yenileniyor. Hesabınızı silmeden önce Faturalandırma'dan iptal edin.",
+            "other": "Aboneliği hâlâ yenileniyor. Hesabınızı silmeden önce bu çalışma alanına geçip Faturalandırma'dan iptal edin.",
+            "openBilling": "Faturalandırmayı aç"
+        },
+        "submit": "Hesabı sil",
+        "failed": "Hesabınız silinemedi."
+    }
+}

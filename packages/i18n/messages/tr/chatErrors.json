@@ -1,0 +1,71 @@
+{
+    "generic": "Bir sorun oluştu. Mesajınızı yeniden göndermeyi deneyin.",
+    "modelAtCapacity": {
+        "title": "Model kapasitesi dolu",
+        "message": "Bu modelde şu anda yer yok. Birazdan tekrar deneyin veya başka bir model seçin."
+    },
+    "anthropicKeyNotScoped": {
+        "title": "Anthropic anahtarı bir çalışma alanına bağlı değil",
+        "message": "Bu anahtar, Anthropic kuruluşunun tüm çalışma alanlarında geçerli. Anthropic Console'da tek bir çalışma alanı içinde anahtar oluşturun, ardından yeniden bağlanın."
+    },
+    "titles": {
+        "budget": "Rerun kredileri tükendi",
+        "unauthorized": "Bağlantının oturumu kapandı",
+        "overloaded": "Sağlayıcı aşırı yüklü",
+        "context_window": "Konuşma çok uzun",
+        "provider_error": "Model yanıt veremedi",
+        "thinking_replay": "Çalıştırma devam edemedi",
+        "interrupted": "Çalıştırma kesildi",
+        "run_in_flight": "Bu konuşma hâlâ meşgul",
+        "session_gone": "Konuşma kullanılamıyor"
+    },
+    "messages": {
+        "budget": "Bu dönemin Rerun kredileri tükendi. Kredi ekleyin veya aylık yenilenmeyi bekleyin.",
+        "unauthorized": "Coworker'ın çalışabilmesi için bu bağlantıda yeniden oturum açılması gerekiyor.",
+        "overloaded": "Sağlayıcı şu anda aşırı yüklü. Birazdan tekrar deneyin.",
+        "context_window": "Bu konuşma artık modele sığmıyor ve yeniden göndermek aynı engele takılacak. Daha geniş bağlam penceresine sahip bir modele geçin veya yeni bir konuşma başlatın.",
+        "provider_error": "Model sağlayıcısı bu isteği reddetti ve yeniden göndermek aynı yanıtı alacak. Devam etmek için başka bir modele geçin.",
+        "thinking_replay": "Motor bu turu, model sağlayıcısının reddettiği bir şekilde yeniden oynattı. Bu bir motor hatası, modelle ilgili değil: model değiştirmek işe yaramaz. Tekrar deneyin ve sorun sürerse motoru güncelleyin.",
+        "interrupted": "Çalıştırma tamamlanamadan kesildi.",
+        "session_gone": "Bu coworker artık bu konuşmaya erişemiyor, bu yüzden mesaj gönderilmedi. Devam etmek için yeni bir konuşma başlatın."
+    },
+    "limits": {
+        "titles": {
+            "usageLimit": "Kullanım sınırına ulaşıldı",
+            "modelUnavailable": "{model} kullanılamıyor",
+            "anyModelUnavailable": "Model kullanılamıyor",
+            "modelNotInPlan": "{model}, {plan} planınızda yok",
+            "anyModelNotInPlan": "Model, {plan} planınızda yok",
+            "credits": "{plan} kullanım kredileri tükendi",
+            "spend": "{plan} harcama sınırına ulaşıldı",
+            "window": "{plan} {window, select, weekly {haftalık} other {aylık}} sınırına ulaşıldı",
+            "model": "{plan} {model} sınırına ulaşıldı",
+            "claudeSession": "{plan} oturum sınırına ulaşıldı",
+            "usage": "{plan} kullanım sınırına ulaşıldı",
+            "opencodeCredits": "OpenCode kredileri tükendi",
+            "opencodeWindow": "OpenCode Go {window, select, weekly {haftalık} other {aylık}} sınırına ulaşıldı",
+            "opencode": "OpenCode Go sınırına ulaşıldı",
+            "openaiCredits": "OpenAI API kredileri tükendi",
+            "anthropicCredits": "Anthropic API kredileri tükendi"
+        },
+        "messages": {
+            "openaiCredits": "OpenAI API hesabınızda kredi kalmadı. platform.openai.com üzerinden kredi ekleyin veya bu coworker'ı başka bir modele geçirin.",
+            "anthropicCredits": "Anthropic API hesabınızda kredi kalmadı. Anthropic Console'da Billing bölümünden kredi ekleyin veya bu coworker'ı başka bir modele geçirin.",
+            "opencodeCredits": "Console kredisi kalmadı. opencode.ai üzerinden kredi ekleyin veya devam etmek için bir Go modeli seçin.",
+            "opencodeWindowResets": "OpenCode Go planınız {window, select, weekly {haftalık} monthly {aylık} other {5 saatlik}} sınırına ulaştı. Sıfırlanma zamanı: {resetsAt}. O zamana kadar bir Console modeline veya başka bir sağlayıcıya geçin.",
+            "opencodeWindow": "OpenCode Go planınız {window, select, weekly {haftalık} monthly {aylık} other {5 saatlik}} sınırına ulaştı. Sıfırlanana kadar bir Console modeline veya başka bir sağlayıcıya geçin.",
+            "modelUnavailable": "Bu bağlantı {model} modelini çalıştıramıyor. Devam etmek için başka bir model seçin.",
+            "anyModelUnavailable": "Bu bağlantı bu modeli çalıştıramıyor. Devam etmek için başka bir model seçin.",
+            "modelNotInPlan": "{plan} planınız {model} modelini içermiyor. Devam etmek için başka bir model seçin.",
+            "anyModelNotInPlan": "{plan} planınız bu modeli içermiyor. Devam etmek için başka bir model seçin.",
+            "usageLimit": "Bu abonelik kullanım sınırına ulaştı. Başka bir modele geçin veya sınırın sıfırlanmasını bekleyin.",
+            "credits": "{plan} planınız kullanım kredilerini tüketti. Devam etmek için planınızın içerdiği bir model seçin.",
+            "spend": "Kuruluşunuz aylık {plan} harcama sınırına ulaştı. Bir yönetici sınırı yükseltebilir; bu arada bu coworker'ı başka bir modele geçirin.",
+            "weeklyResets": "{plan} planınız haftalık sınırına ulaştı. Sıfırlanma zamanı: {resetsAt}. O zamana kadar bu coworker'ı başka bir modele geçirin.",
+            "weekly": "{plan} planınız haftalık sınırına ulaştı. Yeni hafta başlayana kadar bu coworker'ı başka bir modele geçirin.",
+            "model": "{plan} planınız {model} sınırına ulaştı. Diğer {plan} modelleri hâlâ çalışıyor: bunlardan birine geçin.",
+            "sessionResets": "{plan} planınız mevcut kullanım penceresini tüketti. Yenilenme zamanı: {resetsAt}. Bu arada bu coworker'ı başka bir modele geçirin.",
+            "session": "{plan} planınız mevcut kullanım penceresini tüketti. Kendiliğinden yenilenecek; bu arada bu coworker'ı başka bir modele geçirin."
+        }
+    }
+}

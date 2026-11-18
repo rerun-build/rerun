@@ -1,0 +1,655 @@
+{
+    "hero": {
+        "title": {
+            "lead": "<keep>AI <chip>Coworker'lar</chip></keep> işe alın",
+            "tail": "Sizin gibi çalışırlar."
+        },
+        "subtitle": "Sohbet botları ne yapacağınızı söyler. AI Coworker'lar işi bitirir. Zaten ödediğiniz LLM'i Rerun'a bağlayın ve onlara iş verin.",
+        "cta": "{price} ile 5 günlük denemeyi başlatın",
+        "productHuntAlt": "Product Hunt'ta Rerun'ı destekleyin",
+        "trust": "{count, number}+ kullanıcı işleri için Rerun'a güveniyor",
+        "pillLeads": {
+            "jobs": "İşe alın:",
+            "tasks": "Bir Coworker'a verin:",
+            "sectors": "Rerun, şunlar için:"
+        },
+        "tiles": {
+            "tour-research": {
+                "job": "B2B satış temsilcisi",
+                "pill": "Satış temsilcisi",
+                "task": "Yeni müşteriler bulmak"
+            },
+            "tour-social": {
+                "job": "Topluluk yöneticisi",
+                "pill": "Topluluk yöneticisi",
+                "task": "Sosyal medyada paylaşmak"
+            },
+            "tour-docs": {
+                "job": "Müşteri desteği",
+                "pill": "Destek uzmanı",
+                "task": "E-postalarınızı yanıtlamak"
+            },
+            "tour-invoices": {
+                "job": "Yönetici asistanı",
+                "pill": "Yönetici asistanı",
+                "task": "İdari işleri yürütmek"
+            },
+            "tour-watch": {
+                "job": "Pazar analisti",
+                "pill": "Pazar analisti",
+                "task": "Rakipleri izlemek"
+            },
+            "tour-writer": {
+                "job": "İçerik pazarlamacısı"
+            },
+            "tour-desk": {
+                "job": "Gelir analisti"
+            }
+        },
+        "boxes": {
+            "tour-marketing": "Pazarlama",
+            "tour-sales": "Satış",
+            "tour-ops": "Yönetim"
+        },
+        "handoffs": {
+            "handoff-marketing-sales": "Dünkü gönderi 14 talep getirdi. Dördü iş e-postası bıraktı.",
+            "handoff-marketing-ops": "Acme vaka çalışması perşembe yayında. Faturaları geldi mi?"
+        },
+        "sources": {
+            "lead": "Zaten ödediğiniz abonelikle çalışır",
+            "router": "ya da başka bir model, şununla:<router></router>"
+        },
+        "tools": {
+            "title": "<chip>Coworker'lar</chip> araçlarınızla çalışır.",
+            "count": "{count, number}+ entegrasyon"
+        },
+        "screen": {
+            "hint": {
+                "tap": "Çalışırken görmek için bir coworker'a dokunun",
+                "click": "Çalışırken görmek için bir coworker'a tıklayın ya da Chief of Staff'ınıza sorun"
+            },
+            "inboxSettings": "Tercihler: Kendi çalışma alanınızda kullanılabilir",
+            "useCases": {
+                "find-leads": {
+                    "label": "Lead bul",
+                    "ask": "Fransa'da satış ekibi işe almaya yeni başlamış SaaS şirketlerini bul.",
+                    "request": "HubSpot'ta zaten olanları çıkarınca 26 şirket kaldı. Nasıl sıralayayım?"
+                },
+                "post-on-social": {
+                    "label": "Sosyal medyada paylaş",
+                    "ask": "Bu haftanın blog yazısını X ve Instagram gönderilerine dönüştür.",
+                    "request": "Flood için iki giriş cümlesi var. Hangisi size benziyor?"
+                },
+                "reply-to-customers": {
+                    "label": "Müşterilere yanıt ver",
+                    "ask": "Her sabah destek gelen kutusunu gözden geçir ve yapabildiklerinin taslağını hazırla.",
+                    "request": "Hazırlanan 31 yanıtı gönder"
+                },
+                "handle-admin": {
+                    "label": "İdari işleri yürüt",
+                    "ask": "Faturaları her gece mutabakat yap. Beni yalnızca takıldığında uyandır.",
+                    "request": "Gece üç fatura mutabakat edilemedi, toplam 4.210 $. Acme ve Northwind'in kartlarının süresi dolmuş, yeni bir ödeme yöntemi olmadan tahsilatı yeniden deneyemem."
+                },
+                "track-sales": {
+                    "label": "Satışları takip et",
+                    "ask": "Geliri takip et ve gerçekten bir şey değiştiğinde bana haber ver.",
+                    "request": "Geriye kayan iki hesabı #sales kanalına gönder"
+                },
+                "watch-competitors": {
+                    "label": "Rakipleri izle",
+                    "ask": "Üç rakibimiz önemli bir şeyi değiştirdiğinde bana haber ver.",
+                    "request": "Bu tür değişiklikleri gördüğüm anda mı istersiniz, yoksa toplu olarak mı?"
+                },
+                "create-content": {
+                    "label": "İçerik üret",
+                    "ask": "Bu haftanın makalesini sıralamaya en yakın olduğumuz anahtar kelime üzerine yaz.",
+                    "request": "“Agent orchestration” ayda 2.400 aramayla 11. sırada. Mevcut yazıyı mı yeniden yazayım, yoksa yeni bir yazı mı?"
+                }
+            },
+            "scripts": {
+                "find-leads": {
+                    "steps": {
+                        "1": "LinkedIn iş ilanları okunuyor",
+                        "2": "ICP'nizle eşleştiriliyor",
+                        "3": "CRM'iniz kontrol ediliyor"
+                    },
+                    "say": "Zaten görüştüğünüz şirketleri çıkarınca 62 iş ilanı 26 şirkete indi.",
+                    "checks": {
+                        "linkedin": "62 iş ilanı okundu",
+                        "apollo": "38 şirket zenginleştirildi",
+                        "hubspot": "12 çıkarıldı · zaten sizde"
+                    },
+                    "found": "26 şirket, uyuma göre ilk 3",
+                    "cards": {
+                        "forma": {
+                            "name": "Forma",
+                            "meta": "Satış Müdürü",
+                            "line": "2 satış yöneticisi alıyor"
+                        },
+                        "northstar": {
+                            "name": "Northstar",
+                            "meta": "Satış Direktörü",
+                            "line": "Paris'te satış ekibi kuruyor"
+                        },
+                        "arc-labs": {
+                            "name": "Arc Labs",
+                            "meta": "Satış Başkan Yardımcısı",
+                            "line": "3 SDR alıyor"
+                        }
+                    },
+                    "relay": "Northstar giriş planını iki saat önce 59 $'a indirdi. Görüşmeyi bununla açmaya değer.",
+                    "reply": "İlk 3 doğru görünüyor. HubSpot'a ekle ve bunu her pazartesi çalıştır.",
+                    "routine": "Her pazartesi 09:00, yalnızca yeni isimler"
+                },
+                "post-on-social": {
+                    "steps": {
+                        "1": "Bu haftanın makalesi okunuyor",
+                        "2": "5 karusel slaytı çiziliyor",
+                        "3": "İki gönderi sıraya alınıyor"
+                    },
+                    "say": "Bir makale, iki gönderi: bugün X için bir flood, yarın 09:00'da beş slaytlık bir karusel.",
+                    "checks": {
+                        "canva": "5 slayt tasarlandı",
+                        "buffer": "2 gönderi zamanlandı"
+                    },
+                    "found": "2 gönderi, onayınızı bekliyor",
+                    "cards": {
+                        "x": {
+                            "name": "X flood'u",
+                            "meta": "Bugün",
+                            "line": "Herkesin tekrarladığı 20 destek talebiyle açılıyor"
+                        },
+                        "instagram": {
+                            "name": "Instagram",
+                            "meta": "Yarın, 09:00",
+                            "line": "5 slayt, her birinde bir fikir"
+                        }
+                    },
+                    "relay": "Makale bir saat önce yayına girdi. Karuseli doğrudan ondan çıkardım.",
+                    "reply": "İkisi de iyi. Her makaleden sonra bunu yap.",
+                    "routine": "Yayınladığınız her makaleden sonra"
+                },
+                "reply-to-customers": {
+                    "steps": {
+                        "1": "Okunmamış 34 ileti dizisi okunuyor",
+                        "2": "Yardım belgelerine bakılıyor",
+                        "3": "Önceki yanıtlarımız kontrol ediliyor"
+                    },
+                    "say": "34 iletinin 31'i daha önce gönderdiğimiz yanıtlardan hazırlandı, bu üçü ise size kalıyor.",
+                    "checks": {
+                        "gmail": "34 dizi okundu · 31 taslak",
+                        "notion": "19 yardım belgesi eşleşti",
+                        "intercom": "7 eski konuşma kullanıldı"
+                    },
+                    "found": "Size kalan 3 ileti dizisi",
+                    "cards": {
+                        "refund": {
+                            "name": "İade #1042",
+                            "meta": "2 gündür bekliyor",
+                            "line": "İtiraz edilen ödeme, politika dışı"
+                        },
+                        "renewal": {
+                            "name": "Sözleşme yenileme",
+                            "meta": "1 gündür bekliyor",
+                            "line": "Özel bir SLA istiyor"
+                        },
+                        "export": {
+                            "name": "Veri dışa aktarma",
+                            "meta": "4 saattir bekliyor",
+                            "line": "Hukuki ifade, tahmin yürütmem"
+                        }
+                    },
+                    "relay": "#1042 iadesi bankadan hiç geçmedi, ben kapatana kadar onu bekletin.",
+                    "reply": "31'ini gönder. Bu üçünü ben hallederim.",
+                    "routine": "Her sabah 07:30, yalnızca zor olanlar"
+                },
+                "handle-admin": {
+                    "steps": {
+                        "1": "Ödenmiş 148 fatura kontrol ediliyor",
+                        "2": "Banka hareketleriyle eşleştiriliyor",
+                        "3": "Her makbuz dosyalanıyor"
+                    },
+                    "say": "148 makbuzun hepsi dosyalandı, yalnızca üç fatura mutabakat edilemedi, toplam 4.210 $.",
+                    "checks": {
+                        "stripe": "148 fatura mutabakat edildi",
+                        "mercury": "141 banka havalesi eşleşti",
+                        "gmail": "148 makbuz dosyalandı"
+                    },
+                    "found": "3 fatura, 4.210 $ takıldı",
+                    "cards": {
+                        "acme": {
+                            "name": "Acme",
+                            "meta": "#1042",
+                            "line": "Kartın süresi dolmuş, tahsilatı yeniden deneyemem"
+                        },
+                        "northwind": {
+                            "name": "Northwind",
+                            "meta": "#1057",
+                            "line": "Kartın süresi dolmuş, yeni kart gerekiyor"
+                        },
+                        "halden": {
+                            "name": "Halden Group",
+                            "meta": "#1061",
+                            "line": "Havale 120 $ eksik geldi"
+                        }
+                    },
+                    "relay": "Halden'daki 120 $ fark banka masrafı, eksik ödeme değil. Kapatılabilir.",
+                    "reply": "O zaman Halden'ı kapat. Diğer ikisini her gece takip et.",
+                    "routine": "Her gece 02:00, sizi yalnızca takılırsam uyandırırım"
+                },
+                "track-sales": {
+                    "steps": {
+                        "1": "Son 30 gün toplanıyor",
+                        "2": "Açık 54 fırsat okunuyor",
+                        "3": "Gelir tablosu güncelleniyor"
+                    },
+                    "say": "Gelir aylık bazda %11 arttı, 482 bin $, ama en büyük beş fırsatınızdan ikisi geriye kaydı.",
+                    "checks": {
+                        "stripe": "30 günde 482 bin $",
+                        "hubspot": "Açık 54 fırsat okundu",
+                        "sheets": "3 sekme güncellendi"
+                    },
+                    "found": "3 hareket, 2'si ters yönde",
+                    "cards": {
+                        "halden": {
+                            "name": "Halden Group",
+                            "meta": "84.000 $",
+                            "line": "Teklif aşamasına döndü, kapanış tarihi geçti"
+                        },
+                        "vessel": {
+                            "name": "Vessel",
+                            "meta": "61.500 $",
+                            "line": "Kapanıştan Müzakereye geriledi"
+                        },
+                        "petra": {
+                            "name": "Petra",
+                            "meta": "38.000 $",
+                            "line": "İlerledi, Tekliften Kapanışa"
+                        }
+                    },
+                    "relay": "Petra ilerledi çünkü satış başkan yardımcıları dün yanıt verdi. Görüşmeyi ayarladım.",
+                    "reply": "Güzel. Hafta içi bir şey değiştiğinde bana haber ver.",
+                    "routine": "Her hafta içi 08:00, yalnızca değişiklik olunca"
+                },
+                "watch-competitors": {
+                    "steps": {
+                        "1": "3 fiyat sayfasına yeniden bakılıyor",
+                        "2": "Yeni lansmanlar aranıyor",
+                        "3": "212 kelime boşluğu karşılaştırılıyor"
+                    },
+                    "say": "Üçünden yalnızca biri değişti ve size mal olan da o: Northstar'ın fiyatları.",
+                    "checks": {
+                        "firecrawl": "3 fiyat sayfası tarandı",
+                        "producthunt": "1 lansman bulundu",
+                        "semrush": "212 kelime boşluğu karşılaştırıldı"
+                    },
+                    "found": "3 rakip, 1 gerçek değişiklik",
+                    "cards": {
+                        "northstar": {
+                            "name": "Northstar",
+                            "meta": "2 saat önce",
+                            "line": "Giriş planı 79 $'dan 59 $'a, ücretsiz katman eklendi"
+                        },
+                        "cobalt": {
+                            "name": "Cobalt",
+                            "meta": "Dün",
+                            "line": "Bir entegrasyon dizini başlattı"
+                        },
+                        "tenley": {
+                            "name": "Tenley",
+                            "meta": "Bugün kontrol edildi",
+                            "line": "Değişiklik yok, fiyatlar aynı"
+                        }
+                    },
+                    "relay": "Fiyat sayfamızı onların 59 $'ına karşı şimdiden yeniden yazıyorum. Taslak bu akşama hazır.",
+                    "reply": "Fiyatlar değiştiğinde bir saat içinde haber ver.",
+                    "routine": "Fiyatlar bir saat içinde, gerisi cuma"
+                },
+                "create-content": {
+                    "steps": {
+                        "1": "1.204 arama sorgusu okunuyor",
+                        "2": "İlk 3 sonuç açılıyor",
+                        "3": "Yazı yeniden yazılıyor"
+                    },
+                    "say": "Arkasında sıralanacak yeni bir yazıya başlamak yerine elimizdeki yazıyı yeniden yazdım.",
+                    "checks": {
+                        "searchConsole": "1.204 sorgu okundu",
+                        "firecrawl": "ilk 3 sonuç açıldı",
+                        "notion": "1.850 kelimelik taslak"
+                    },
+                    "found": "1 taslak, 1.850 kelime",
+                    "cards": {
+                        "orchestration": {
+                            "name": "Orkestrasyon",
+                            "meta": "11. sıra",
+                            "line": "Ayda 2.400 arama, bugün ikinci sayfada"
+                        },
+                        "rewrite": {
+                            "name": "Yeni yazım",
+                            "meta": "1.850 kelime",
+                            "line": "İlk sayfanın yanıtladığı 3 soru üzerine kurulu"
+                        }
+                    },
+                    "relay": "Northstar iki gün önce bu anahtar kelimede sıralanmaya başladı. Yeniden yazmaya değer.",
+                    "reply": "Yayınla. Her salı aynısını yap.",
+                    "routine": "Her salı 10:00, en yakın anahtar kelime"
+                }
+            },
+            "chat": {
+                "customer": "Müşteri",
+                "routineCreated": "Rutin oluşturuldu · {routine}",
+                "relayFrom": "Gönderen: {agent}",
+                "wantTitle": "{name} gibi bir coworker ister misiniz?",
+                "wantBody": "Kendi uygulamalarınızla, {price} ile 5 günlük deneme.",
+                "start": "Bu coworker'la başlayın"
+            },
+            "panel": {
+                "chats": "Sohbetler",
+                "card": "Coworker kartı",
+                "close": "Coworker'ı kapat",
+                "newConversation": "Yeni konuşma"
+            },
+            "foreman": {
+                "newTask": "Yeni görev",
+                "unknown": "Bilinmeyen coworker",
+                "running": {
+                    "prompt": "Şu anda ne çalışıyor?",
+                    "tool": "Coworker'ları listele",
+                    "toolResult": "{count} coworker",
+                    "answer": "Şu anda **3 coworker** çalışıyor. {writer} bu haftanın makalesini hazırlıyor, {research} 40 yeni lead'i zenginleştiriyor ve {invoices} vadesi geçmiş faturaları gözden geçiriyor."
+                },
+                "waiting": {
+                    "prompt": "Beni kim bekliyor?",
+                    "tool": "Gelen kutusunu oku",
+                    "toolResult": "{count} açık",
+                    "answer": "**{count, plural, one {# coworker} other {# coworker}}** sizi bekliyor. En eskisi: {name}. {message}",
+                    "empty": "Şu anda kimse yok. Gelen kutusu boş ve her coworker ya çalışıyor ya da işini bitirdi."
+                },
+                "handoff": {
+                    "prompt": "{writer}, {social} için brif hazırlasın",
+                    "ask": "{writer}, bu haftanın makalesi hakkında {social} için brif hazırlasın.",
+                    "plan": "Makaleyi {writer} yazdı, paylaşım ise {social} rolünün işi. Kendim yeniden yazmak yerine işi devrediyorum.",
+                    "tool": "Mesaj gönder: {writer}",
+                    "toolResult": "gönderildi",
+                    "answer": "Tamam. {writer} taslağını {social} rolüne iletiyor; o da bunu bir LinkedIn gönderisine ve X için bir flood'a dönüştürüyor."
+                },
+                "routines": {
+                    "chase-overdue": {
+                        "name": "Vadesi geçmiş faturaları takip et",
+                        "frequency": "4 saatte bir"
+                    },
+                    "enrich-leads": {
+                        "name": "Yeni lead'leri zenginleştir",
+                        "frequency": "Saatte bir"
+                    },
+                    "overnight-tickets": {
+                        "name": "Gece gelen destek taleplerini yanıtla",
+                        "frequency": "Her gün 07:00"
+                    },
+                    "competitor-digest": {
+                        "name": "Günlük rakip özeti",
+                        "frequency": "Her gün 08:00"
+                    },
+                    "morning-thread": {
+                        "name": "Sabah flood'unu paylaş",
+                        "frequency": "Her gün 09:00"
+                    },
+                    "pipeline-digest": {
+                        "name": "Satış hattı özeti",
+                        "frequency": "Her gün 17:00"
+                    },
+                    "weekly-seo": {
+                        "name": "Haftalık SEO raporu",
+                        "frequency": "Her hafta 08:00"
+                    },
+                    "churn-review": {
+                        "name": "Aylık kayıp incelemesi",
+                        "frequency": "Her ayın 1'i 09:00"
+                    }
+                }
+            }
+        }
+    },
+    "cases": {
+        "title": "<keep>AI <chip>Coworker'lar</chip></keep> işe alın",
+        "industriesLead": "Sektör:",
+        "industries": {
+            "agency": "Ajans",
+            "freelancer": "Serbest çalışan",
+            "ecommerce": "E-ticaret",
+            "real-estate": "Gayrimenkul",
+            "startup": "Girişim",
+            "other": "Diğer"
+        },
+        "create": "Kendi Coworker'ınızı oluşturun",
+        "quoteByline": "<author>{name}</author>, {role}, {company}",
+        "quoted": "“{quote}”",
+        "card": {
+            "tasks": "· {count, plural, one {# görev} other {# görev}}",
+            "noApps": "Uygulama gerekmez",
+            "apps": "Uygulamalar: {list}",
+            "run": "Coworker'ı çalıştır",
+            "priceMonthly": "{price}/ay"
+        }
+    },
+    "coworker": {
+        "label": "Onları güçlü kılan ne",
+        "title": "<keep><chip>Coworker'lar</chip></keep> güçlendirilmiş ekip arkadaşlarıdır.",
+        "traits": {
+            "delivers": {
+                "title": "Gerçek işi bitirirler.",
+                "body": "{count, number}+ araca ve ChatGPT veya Claude'un kendi başına ulaşamadığı verilere bağlıdırlar."
+            },
+            "tools": {
+                "title": "Bir insan gibi bilgisayarda çalışır",
+                "body": "Uygulamalarınızı kendi ekranında açar ve içlerinde tıklayarak ilerler, hiçbir şeyin bağlanamadığı uygulamalarda bile."
+            },
+            "always": {
+                "title": "Kendi makinesinde 7/24 çalışır",
+                "body": "Geceleri, hafta sonları, dizüstünüz kapalıyken: yine çalışır. Sizinki kapalı, onun makinesi asla."
+            },
+            "asks": {
+                "title": "Onay gerekene kadar otonom",
+                "body": "Tek başına çalışır ve önemli bir şeyden önce durur. Ekipten herkes onay verebilir."
+            },
+            "together": {
+                "title": "Coworker'lar birlikte çalışır",
+                "body": "Biri lead'leri bulur, sonraki onlara yazar, üçüncüsü CRM'inize kaydeder."
+            }
+        },
+        "subjectJob": "Muhasebeci",
+        "delivers": {
+            "ask": "En iyi müşterilerimize benzeyen 50 lead bul ve HubSpot'a ekle.",
+            "steps": {
+                "deals": {
+                    "label": "Kazanılan 42 fırsatınız okundu",
+                    "elapsed": "6 sn"
+                },
+                "screen": {
+                    "label": "312 şirket tarandı, en yakın 50'si tutuldu",
+                    "elapsed": "1 dk 12 sn"
+                },
+                "verify": {
+                    "label": "47 iş e-postası doğrulandı, hiçbiri tahmin edilmedi",
+                    "elapsed": "48 sn"
+                },
+                "create": {
+                    "label": "50 lead oluşturuldu, sahibi: siz",
+                    "elapsed": "19 sn"
+                }
+            },
+            "table": {
+                "name": "Lead'ler",
+                "noun": "lead",
+                "company": "Şirket",
+                "contact": "Kişi",
+                "fit": "Neden uygun",
+                "rows": {
+                    "alvera": {
+                        "company": "Alvera Logistics",
+                        "contact": "Camille Perrin · COO",
+                        "fit": "Ölçeğiniz ve araçlarınız"
+                    },
+                    "northbay": {
+                        "company": "Northbay Freight",
+                        "contact": "Tom Vasquez · Operasyon Müdürü",
+                        "fit": "Shopify'a yeni geçti"
+                    },
+                    "kerio": {
+                        "company": "Kerio Supply",
+                        "contact": "Lena Haas · Tedarik sorumlusu",
+                        "fit": "Ocak'ta 4 milyon € yatırım aldı"
+                    },
+                    "portside": {
+                        "company": "Portside Group",
+                        "contact": "Marc Dubreuil · CFO",
+                        "fit": "Bir rakipten ayrıldı"
+                    },
+                    "mairon": {
+                        "company": "Mairon & Co",
+                        "contact": "Sofia Lindqvist · CEO",
+                        "fit": "Uygun, e-posta bulunamadı"
+                    }
+                }
+            },
+            "reply": "HubSpot'ta 50 lead var, kazanılan 42 fırsatınıza göre seçildi. 47'sinin iş e-postasını doğruladım. Doğrulayamadığım üçünü tahmin etmek yerine boş bıraktım."
+        },
+        "tools": {
+            "windowTitle": "Gelen Kutusu - Gmail - Chromium",
+            "tab": "Gelen Kutusu (12)",
+            "available": "<strong>{count, number}</strong> uygulama kullanılabilir",
+            "gmail": {
+                "search": "Postalarda arayın",
+                "compose": "Oluştur",
+                "folders": {
+                    "inbox": "Gelen Kutusu",
+                    "starred": "Yıldızlı",
+                    "snoozed": "Ertelenenler",
+                    "sent": "Gönderilmiş Postalar",
+                    "drafts": "Taslaklar"
+                },
+                "threads": {
+                    "invoice4412": {
+                        "subject": "Fatura #4412",
+                        "preview": "- vadesi 14 gün önce doldu, ödeme alınmadı",
+                        "at": "09:12"
+                    },
+                    "payment": {
+                        "subject": "Ödeme alındı",
+                        "preview": "- teşekkürler, #4408 ödendi",
+                        "at": "08:40"
+                    },
+                    "summary": {
+                        "subject": "Haftalık özetiniz",
+                        "preview": "- 62 ödemede 14.208 € tahsil edildi",
+                        "at": "07:55"
+                    },
+                    "statement": {
+                        "subject": "Hesap özeti hazır",
+                        "preview": "- Eylül 2026 indirilebilir",
+                        "at": "1 Eki"
+                    },
+                    "vat": {
+                        "subject": "KDV beyannamesi taslağı",
+                        "preview": "- 3 kayıt beyandan önce kategori bekliyor",
+                        "at": "30 Eyl"
+                    },
+                    "invoice4390": {
+                        "subject": "Fatura #4390 ödendi",
+                        "preview": "- makbuz ekte, iş birliğiniz için teşekkürler",
+                        "at": "28 Eyl"
+                    },
+                    "payout": {
+                        "subject": "Ödemeniz yolda",
+                        "preview": "- 3.912 € 3 Ekim'de hesabınızda",
+                        "at": "27 Eyl"
+                    },
+                    "card": {
+                        "subject": "Kart hesap özeti",
+                        "preview": "- Eylül'de mutabakat bekleyen 48 işlem",
+                        "at": "25 Eyl"
+                    },
+                    "invoice4377": {
+                        "subject": "Fatura #4377 kapatıldı",
+                        "preview": "- işlem gerekmiyor, geçen hafta dosyalandı",
+                        "at": "24 Eyl"
+                    }
+                },
+                "newMessage": "Yeni İleti",
+                "to": "Alıcı",
+                "subject": "Üçüncü hatırlatma: fatura #4412",
+                "typed1": "Merhaba, #4412 faturası 14 gün gecikmede.",
+                "typed2": "Ödeme tarihini onaylar mısınız?",
+                "send": "Gönder",
+                "sent": "İleti gönderildi",
+                "undo": "Geri al",
+                "view": "İletiyi görüntüle"
+            }
+        },
+        "always": {
+            "box": "Operasyon",
+            "desks": {
+                "invoices": "Muhasebeci",
+                "inbox": "Yönetici asistanı",
+                "nova": "Destek uzmanı"
+            },
+            "lines": {
+                "prep": "Sabah 9 brifingi hazırlanıyor",
+                "tickets": "12 talep yanıtlandı",
+                "ready": "Brifinginiz hazır"
+            },
+            "place": "box-4417 · Falkenstein, Almanya",
+            "clock": "Yerel saat {time}",
+            "theme": "Tema",
+            "themes": {
+                "system": "Sistem",
+                "light": "Açık",
+                "dark": "Koyu"
+            }
+        },
+        "asks": {
+            "box": "Finans",
+            "desk": "Muhasebeci",
+            "requests": {
+                "figma": {
+                    "action": "Figma planını yenile, yıllık 144 $",
+                    "resumes": "Yenilendi. Faturalara dönüyorum"
+                },
+                "aws": {
+                    "action": "AWS faturasını öde, 312 $",
+                    "resumes": "Ödendi. 11 fatura kaldı"
+                }
+            }
+        },
+        "together": {
+            "desks": {
+                "scout": "Lead Bulucu",
+                "quill": "Metin yazarı",
+                "ledger": "CRM yöneticisi"
+            },
+            "says": {
+                "scout": "50 yeni lead, hepsi senin.",
+                "quill": "50 e-posta taslağı hazır. Sıra sende.",
+                "ledger": "Tamam. 50'si de HubSpot'ta."
+            }
+        },
+        "apps": {
+            "caption": "{count, number}+ uygulama ve her MCP sunucusu",
+            "beyond": "+{count, number}"
+        }
+    },
+    "workspaces": {
+        "your-company": {
+            "name": "Şirketiniz",
+            "crew": "6 Coworker · Pazarlama, Finans, Yönetim"
+        },
+        "your-second-company": {
+            "name": "İkinci Şirketiniz",
+            "crew": "3 Coworker · Satış, Destek"
+        },
+        "your-side-project": {
+            "name": "Yan Projeniz",
+            "crew": "1 Coworker · İçerik"
+        }
+    }
+}

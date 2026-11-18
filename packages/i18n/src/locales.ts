@@ -8,6 +8,7 @@ export const SUPPORTED_LOCALES = {
     es: 'stable',
     pt: 'stable',
     de: 'stable',
+    tr: 'beta',
 } as const satisfies Record<string, LocaleStatus>
 
 export type Locale = keyof typeof SUPPORTED_LOCALES

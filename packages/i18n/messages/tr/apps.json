@@ -1,0 +1,218 @@
+{
+    "menu": {
+        "label": "Uygulamalar"
+    },
+    "linkedToRerun": "{provider}, Rerun'a bağlı",
+    "slotPrice": {
+        "monthly": "{price}/ay",
+        "yearly": "{price}/yıl"
+    },
+    "blocked": {
+        "notSubscribed": "Önce Rerun'a abone olun",
+        "paused": "Çalışma alanınız duraklatıldı",
+        "trialSlot": "Deneme süresi bir {provider} yeri içerir. Daha fazlası için planınızı yükseltin.",
+        "lifetimeTrialSlot": "Ücretsiz denemeniz bir {provider} yeri içerir. Deneme bitince daha fazla ekleyin.",
+        "adminOnly": "Ücretli uygulamaları yalnızca bir yönetici yönetebilir"
+    },
+    "slots": {
+        "footer": "<b>{used} / {total, plural, one {# yer} other {# yer}} kullanılıyor</b>, {description}",
+        "subscriberTrial": "ilki {date} tarihine kadar ücretsiz, sonra {price}",
+        "workspaceTrial": "denemeniz boyunca $0, sonrasında planınızla faturalandırılır",
+        "paid": "her biri {price}, planınızla faturalandırılır",
+        "lifetime": "her biri {price}, aylık faturalandırılır",
+        "lifetimeTrial": "denemeniz boyunca ücretsiz, sonra her biri {price}",
+        "lifetimeEnding": "bitiş tarihi: {date}"
+    },
+    "offer": {
+        "subscriberTrial": {
+            "headline": "{days} gün ücretsiz",
+            "detail": "Sonra hesap başına {price}, planınızla faturalandırılır"
+        },
+        "workspaceTrial": {
+            "headline": "Denemeniz boyunca $0",
+            "detail": "Sonra hesap başına {price}, planınızla faturalandırılır"
+        },
+        "lifetimeTrial": {
+            "detail": "Sonra hesap başına {price}, aylık faturalandırılır"
+        },
+        "freeSlot": {
+            "headline": "Bir yer sizi bekliyor",
+            "detail": "Zaten planınızda var",
+            "detailLifetime": "Zaten aylık yerlerinizde var",
+            "detailLifetimeEnding": "Yerlerinizin bitiş tarihi: {date}"
+        },
+        "buySlot": {
+            "headline": "Hesap başına {price}",
+            "detail": "Planınıza eklenir, dönemin kalanı için bugün faturalandırılır"
+        },
+        "lifetimeSlot": {
+            "detail": "Ömür boyu planınızdan ayrı olarak aylık faturalandırılır"
+        }
+    },
+    "connectHint": {
+        "reconnect": "{label} olarak yeniden giriş yapın",
+        "subscriberTrial": "{days} gün ücretsiz, sonra {price}",
+        "workspaceTrial": "Denemeniz boyunca $0, sonra planınızla {price}",
+        "default": "Coworker'larınızın kullanacağı hesap"
+    },
+    "addSlot": {
+        "title": "Bir {provider} yeri eklensin mi?",
+        "description": "Planınıza {price} eklenir. Mevcut dönemin kalanı için bugün ücretlendirilirsiniz.",
+        "descriptionLifetime": "Aylık yerlerinize {price} eklenir. Ayın kalanı için bugün ücretlendirilirsiniz.",
+        "confirm": "Yer ekle",
+        "button": "Yer ekle",
+        "startTrial": "Ücretsiz denemeyi başlat"
+    },
+    "intro": {
+        "connect": "{provider} hesabını bağla"
+    },
+    "presentation": {
+        "pitch": {
+            "linkedin": "Coworker'larınız LinkedIn hesabınızdan potansiyel müşteri arar. Sizin için yazar, bağlantı kurar ve takip eder.",
+            "whatsapp": "Coworker'larınız WhatsApp numaranızdan yanıt verir. Sohbeti okur, yanıtlar ve sizin için takip eder."
+        },
+        "capabilities": {
+            "linkedinMessages": {
+                "title": "Mesajlar ve davetler",
+                "text": "LinkedIn'in günlük sınırları içinde potansiyel müşterilere yazar ve takip eder."
+            },
+            "linkedinSearch": {
+                "title": "Profil arama ve okuma",
+                "text": "Doğru kişileri bulur ve yazmadan önce profillerini okur."
+            },
+            "linkedinReplies": {
+                "title": "Yanıtlarla uyanır",
+                "text": "Bir yanıt veya kabul edilen bir davet coworker'ı hemen başlatır."
+            },
+            "whatsappReplies": {
+                "title": "Yanıtlar ve takipler",
+                "text": "Size yazan kişilere metin, dosya ve sesli notlarla yanıt verir."
+            },
+            "whatsappMessages": {
+                "title": "Mesajlarla uyanır",
+                "text": "Yeni bir mesaj coworker'ı hemen başlatır."
+            },
+            "whatsappCareful": {
+                "title": "Numaranıza özen gösterir",
+                "text": "WhatsApp'ın günlük sınırları içinde kalır ve tanımadığı kişilere asla yazmaz."
+            }
+        }
+    },
+    "accounts": {
+        "pausedAlert": "Çalışma alanınız duraklatıldığı için {provider} hesaplarının oturumu kapatıldı. Çalışma alanını geri getirin, ardından hesapları yeniden bağlayın.",
+        "freeSlot": "Boş yer",
+        "freeSlotHint": {
+            "subscriberTrial": "Bir hesap bağlayın, {days} gün ücretsiz",
+            "workspaceTrial": "Bir hesap bağlayın, denemeniz boyunca $0",
+            "default": "Doldurmak için bir {provider} hesabı bağlayın"
+        },
+        "addAnother": "Başka bir hesap ekle",
+        "addAnotherHint": "Planınıza {price} karşılığında bir yer ekler",
+        "addAnotherHintLifetime": "{price} karşılığında bir yer ekler",
+        "status": {
+            "connected": "Hazır",
+            "needsReconnect": "Yeniden giriş yapın",
+            "paused": "Duraklatıldı",
+            "connecting": "Bağlanıyor",
+            "disconnected": "Bağlantı kesildi"
+        },
+        "summary": {
+            "signedOutWhilePaused": "Çalışma alanı duraklatılmışken oturumu kapatıldı",
+            "signedOut": "{provider} bu hesabın oturumunu kapattı",
+            "rateLimited": "Bir gün dinleniyor, {provider} yavaşlamasını istedi",
+            "unpaid": "Yerinin ödemesi yapılmadı",
+            "unused": "Henüz hiçbir coworker kullanmıyor. Bir coworker'ın Servisler bölümünden seçin.",
+            "usedBy": "Kullanan: {names}"
+        },
+        "defaultName": "{provider} hesabı",
+        "reconnect": "Yeniden bağla",
+        "disconnectLabel": "Bağlantıyı kes: {name}",
+        "disconnectTitle": "{name} bağlantısı kesilsin mi?",
+        "disconnectDescription": "Coworker'ları {provider} araçlarını hemen kaybeder. Yer, Faturalandırma'dan kaldırana kadar planınızda kalır.",
+        "disconnectDescriptionLifetime": "Coworker'ları {provider} araçlarını hemen kaybeder. Yer, buradan iade edene kadar sizin kalır.",
+        "disconnect": "Bağlantıyı kes",
+        "disconnectTooltip": "Bu hesabın bağlantısını kes",
+        "giveBack": "İade et",
+        "giveBackTitle": "Bu {provider} yeri iade edilsin mi?",
+        "giveBackDescription": "Bir sonraki yenilemenizden itibaren faturalandırılmaz ve o zamana kadar kullanılabilir kalır."
+    },
+    "success": {
+        "connectedIcon": "{provider} bağlandı",
+        "title": "{app} etkin",
+        "body": "<b>{label}</b> bağlandı. Çalıştırmak için bir coworker'ın Servisler bölümünden seçin.",
+        "yourAccount": "Hesabınız",
+        "done": "Tamam"
+    },
+    "linkedin": {
+        "method": {
+            "password": "E-posta ve şifre",
+            "cookie": "Oturum çerezi"
+        },
+        "cookieLabel": "Oturum çerezi (li_at)",
+        "cookieHelp": "Google veya Apple ile açtığınız bir hesap için. Tarayıcınızdan linkedin.com'un li_at çerezini kopyalayın.",
+        "emailLabel": "LinkedIn e-postası",
+        "emailPlaceholder": "jane@company.com",
+        "passwordLabel": "LinkedIn şifresi",
+        "passwordPlaceholder": "LinkedIn şifreniz",
+        "signInFrom": "Giriş konumu",
+        "signInFromHelp": "LinkedIn, genellikle çalıştığınız ülkeden yapılan girişlere güvenir.",
+        "searchCountry": "Ülke ara",
+        "noCountry": "Ülke bulunamadı",
+        "neverStored": "Rerun şifrenizi veya çerezinizi asla saklamaz.",
+        "connect": "Bağlan",
+        "approval": {
+            "figureLabel": "Giriş isteğini gösteren, onay tuşu yanan bir telefon",
+            "title": "Telefonunuzdan onaylayın",
+            "body": "LinkedIn telefonunuza bir giriş isteği gönderdi. LinkedIn uygulamasını açın ve <b>Evet</b>'e dokunun.",
+            "approved": "Onayladım",
+            "polling": "Onayınız bekleniyor",
+            "slow": "Hâlâ bir şey yok mu? LinkedIn uygulamasını kontrol edin, ardından aşağıya dokunun."
+        },
+        "code": {
+            "title": "Kodu girin",
+            "description": "{where} {length} haneli kod.",
+            "where": {
+                "authenticator": "Doğrulayıcı uygulamanızdaki",
+                "sentTo": "LinkedIn'in gönderdiği ({sentTo})",
+                "sms": "LinkedIn'in SMS ile gönderdiği",
+                "email": "LinkedIn'in e-postayla gönderdiği"
+            },
+            "resend": "Yeni kod gönder",
+            "verify": "Doğrula"
+        }
+    },
+    "whatsapp": {
+        "connect": {
+            "phoneLabel": "WhatsApp numarası",
+            "invalidPhone": "Bu tam bir telefon numarasına benzemiyor.",
+            "linkBy": "Bağlama yöntemi",
+            "linkByQr": "Burada gösterilen kodu telefonla tarayın.",
+            "linkByCode": "Bu sayfa o telefonda açıksa: bunun yerine WhatsApp'a bir kod yazın.",
+            "method": {
+                "qr": "QR kodu tara",
+                "code": "Kod yaz"
+            },
+            "linkedDevice": "Rerun, WhatsApp Web gibi bağlı cihaz olarak katılır. Telefonunuz her zamanki gibi çalışmaya devam eder.",
+            "submit": "Kodu al"
+        },
+        "link": {
+            "steps": {
+                "open": "Telefonda WhatsApp'ı açın",
+                "settings": "Ayarlar, ardından Bağlı cihazlar, ardından Cihaz bağla",
+                "pointQr": "Telefonu bu koda doğrultun",
+                "typeCode": "Bunun yerine Telefon numarasıyla bağla'ya dokunun, ardından bu kodu yazın"
+            },
+            "expiredTitle": "Bu kodun süresi doldu",
+            "scanTitle": "WhatsApp ile tarayın",
+            "typeTitle": "Bu kodu WhatsApp'a yazın",
+            "expiredBody": "Kodlar üç dakika geçerlidir. Yeni bir kod isteyin, ardından telefonu hemen bağlayın.",
+            "onPhone": "<b>{phone}</b> numaralı telefonda",
+            "waiting": "Telefon bekleniyor",
+            "switchToCode": "Bunun yerine kod yaz",
+            "switchToQr": "Bunun yerine QR kodu tara",
+            "newCode": "Yeni kod",
+            "codeLabel": "Kod {code}",
+            "qrAlt": "WhatsApp'ı bağlamak için QR kodu"
+        }
+    }
+}

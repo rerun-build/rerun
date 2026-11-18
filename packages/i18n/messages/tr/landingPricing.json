@@ -1,0 +1,277 @@
+{
+    "seo": {
+        "title": "Fiyatlandırma",
+        "headline": "Tek plan. Her şey dahil.",
+        "description": "Ayda {price} itibarıyla tek Rerun planı: sınırsız coworker ve kullanıcı, size özel makine, tüm uygulamalar, sınırsız çalıştırma. {trialDays} gün ücretsiz deneme.",
+        "breadcrumbHome": "Ana sayfa"
+    },
+    "hero": {
+        "eyebrow": "Fiyatlandırma",
+        "description": "Rerun'ı {trialDays} gün ücretsiz deneyin. Ardından kaç Coworker'a ihtiyacınız olduğunu seçin ve tüm ekibinizi davet edin."
+    },
+    "price": {
+        "perMonth": "/ay",
+        "perMonthBilledYearly": "/ay, yıllık {total} faturalandırılır",
+        "once": "tek seferlik"
+    },
+    "billing": {
+        "label": "Faturalandırma dönemi",
+        "monthly": "Aylık",
+        "yearly": "Yıllık",
+        "discount": "-%{percent}"
+    },
+    "tiers": {
+        "trial": {
+            "name": "Ücretsiz deneme",
+            "description": "İlk Coworker'larınızı işe koyun ve neler yapabildiklerini görün.",
+            "control": "Deneme bir kartla başlar ve {trialDays} gün boyunca hiçbir ücret alınmaz. Öncesinde iptal ederseniz hiçbir şey ödemezsiniz.",
+            "cta": "{trialDays} günlük ücretsiz denemeyi başlatın",
+            "featuresLabel": "Ücretsiz deneme şunları içerir",
+            "features": {
+                "agents": "İlk görevlerinizi devretmek için <b>en fazla {agents} Coworker</b>",
+                "seats": "Ekibinizle denemek için <b>sınırsız kullanıcı</b>",
+                "credits": "Denemek için <b>{credits, plural, one {# ücretsiz kredi} other {# ücretsiz kredi}}</b>",
+                "models": "Pro ile aynı <b>akıllı modeller</b>",
+                "privacy": "Verileriniz <b>özel ve güvenli bir çalışma alanında</b> kalır",
+                "apps": "Coworker'larınızın çalışabileceği <b>{connectors}+ uygulama ve MCP</b>",
+                "byom": "<b>Kendi yapay zeka aboneliğinizi</b> veya API anahtarınızı bağlayın"
+            }
+        },
+        "pro": {
+            "name": "Pro",
+            "description": "Coworker'ları her gün çalıştıran ekipler için.",
+            "cta": "Başlayın",
+            "featuresLabel": "Ücretsiz denemedeki her şey, artı",
+            "features": {
+                "coworkers": "Sizin için yan yana çalışan <b>sınırsız Coworker</b>",
+                "seats": "<b>Sınırsız kullanıcı</b>, kullanıcı başına ücret yok",
+                "team": "Coworker'larınızı <b>tüm ekibinizle</b> yönetin",
+                "credits": "Her ay <b>{credits, plural, one {# kredi bizden} other {# kredi bizden}}</b>",
+                "autopilot": "İşinizi <b>Autopilot</b> moduna alın"
+            },
+            "creditsNote": "İstediğiniz zaman yükleyin"
+        }
+    },
+    "socialApps": {
+        "label": "Eklentiler",
+        "caption": "Hesabınıza tam erişim, tıpkı sizin gibi.",
+        "lede": "Elle yaptığınız her şeyi Coworker'larınız da yapabilir.",
+        "details": "{app} ile Coworker'larınızın yapabilecekleri",
+        "add": "{app} ekle",
+        "price": "<b>+{price}</b>/ay",
+        "can": {
+            "linkedin_slot": {
+                "search": "Kişi arama, profil okuma",
+                "invite": "Davet gönderme ve kabul etme",
+                "message": "Mesaj yazma, tüm sohbetleri okuma",
+                "post": "Gönderi paylaşma, yorum ve tepki"
+            },
+            "whatsapp_slot": {
+                "send": "Mesaj, dosya ve sesli not gönderme",
+                "reply": "Tüm sohbetleri okuma ve yanıtlama",
+                "check": "WhatsApp numaralarını doğrulama"
+            }
+        }
+    },
+    "enterprise": {
+        "name": "Kurumsal",
+        "description": "Kendine özgü gereksinimleri olan büyük kuruluşlar için",
+        "features": {
+            "everything": "Rerun'daki her şey",
+            "infrastructure": "Özel altyapı",
+            "infrastructureDetail": "Özel veya kendi sunucunuzda: Coworker'larınız kuruluşunuzun ihtiyaç duyduğu yerde çalışır.",
+            "support": "Özel destek",
+            "sso": "SSO",
+            "sla": "SLA"
+        },
+        "cta": "Satışla görüşün",
+        "ctaNote": "Kuruluşunuza göre uyarlanmış özel fiyat"
+    },
+    "plan": {
+        "tagline": "Coworker'ları işe koymak için ihtiyacınız olan her şey",
+        "from": "Başlangıç",
+        "flexible": "İhtiyaç duyduğunuzda Coworker veya kredi ekleyin.",
+        "cta": "Ücretsiz denemeyi başlatın",
+        "trialNote": "{trialDays} günlük ücretsiz deneme · kart gerekli, bugün {free}",
+        "included": "Dahil",
+        "alsoIncluded": "Ayrıca dahil",
+        "features": {
+            "coworkers": {
+                "label": "Sınırsız Coworker",
+                "caption": "İhtiyacınız kadar Coworker, yan yana çalışır, her birinin kendi işi ve araçları vardır."
+            },
+            "machine": {
+                "label": "Size özel makine",
+                "caption": "Çalışma alanınızdaki tüm Coworker'ların yaşadığı, dosyalarını ve verilerini paylaştığı bulutta özel bir bilgisayar. Yalnızca sizin."
+            },
+            "seats": {
+                "label": "Sınırsız kullanıcı",
+                "caption": "Tüm ekibiniz aynı çalışma alanında, kullanıcı başına ücret olmadan."
+            },
+            "byoAi": {
+                "label": "Kendi yapay zekanızı getirin",
+                "caption": "İsteğe bağlı: kendi anahtarınız, aboneliğiniz veya yerel modeliniz."
+            },
+            "apps": {
+                "label": "{connectors}+ uygulama",
+                "caption": "Bağlanmaya hazır tüm araçlarınız, ayrıca her MCP veya API."
+            },
+            "delegate": {
+                "label": "Her görevi devredin",
+                "caption": "Rutin işleri devredin. Coworker'larınız onları gece gündüz yürütür."
+            },
+            "invite": {
+                "label": "Ekip arkadaşlarınızı davet edin",
+                "caption": "Çalışma alanınızı paylaşın ve Coworker'larınızı birlikte oluşturun."
+            }
+        }
+    },
+    "addons": {
+        "label": "Eklentiler",
+        "title": "Her seferinde bir parça büyüyün.",
+        "lede": "Yeni bir paket değil. İhtiyacınız olduğunda daha fazlasını alın.",
+        "items": {
+            "credit_pack": {
+                "title": "Rerun kredisi",
+                "unit": "+{credits, plural, one {# kredi} other {# kredi}}, süresi dolmaz",
+                "caption": "Barındırdığımız modeller için planın üzerine ek kredi. Tek seferlik ödeme."
+            }
+        }
+    },
+    "comparison": {
+        "badge": "Karşılaştırma",
+        "title": "İnsanlar neden Rerun'a geçiyor?",
+        "compareWith": "Rerun'ı karşılaştırın:",
+        "fullComparison": "Rerun ve {competitor} karşılaştırmasının tamamını okuyun",
+        "allComparisons": "Tüm karşılaştırmalar",
+        "alsoCompared": "Diğer karşılaştırmalar",
+        "versus": "Rerun vs {competitor}"
+    },
+    "faq": {
+        "label": "Fiyatlandırma SSS",
+        "title": "Faturayla ilgili sorular.",
+        "items": {
+            "basePlan": {
+                "question": "Temel planla neler alırım?",
+                "answer": "Sınırsız Coworker, bulutta size özel bir makine, sınırsız kullanıcı ve her ay {credits, plural, one {# kredi} other {# kredi}}, ayrıca tüm uygulamalar, tüm şablonlar ve sınırsız çalıştırma. Daha üst bir pakete kilitlenmiş hiçbir özellik yok."
+            },
+            "trial": {
+                "question": "Ücretsiz deneme var mı?",
+                "answer": "Evet, {agents} coworker ve {trialCredits, plural, one {# kredi} other {# kredi}} ile {trialDays} gün. Kart gerekir, bugün {free} tahsil edilir ve plan {trialDays}. günde başlar. İlk ekibinizi kurar, çalışmasını izler ve sonra karar verirsiniz. Deneme bitmeden iptal ederseniz hiçbir ücret alınmaz."
+            },
+            "perTask": {
+                "question": "Görev veya çalıştırma başına ücret alıyor musunuz?",
+                "answer": "Hayır. Coworker'larınız kaç tane olursa olsun, günün her saati aynı sabit fiyatla çalışabilir. Çalıştırmalar asla sayılmaz."
+            },
+            "ownAi": {
+                "question": "Kendi yapay zeka aboneliğimi veya API anahtarlarımı kullanabilir miyim?",
+                "answer": "Evet. Claude veya ChatGPT aboneliğinizi, kendi API anahtarlarınızı ya da yerel bir modeli bağlayın; modeller bizim tarafımızda size hiçbir maliyet çıkarmaz. Dahil krediler, bunu tercih etmediğiniz durumlar için vardır."
+            },
+            "whereRun": {
+                "question": "Coworker'larım tam olarak nerede çalışıyor?",
+                "answer": "Bulutta size özel bir bilgisayarda, her çalışma alanı için bir tane; Coworker'larınız orada yaşar ve verileriniz orada kalır. İçinde onları istediğiniz kadar Boxes halinde düzenlersiniz: ekibe, müşteriye veya projeye göre."
+            },
+            "addons": {
+                "question": "Eklentiler nasıl çalışır?",
+                "answer": "Ayrı bir plan değiller. Rerun kredisi bir kez ödenir ve süresi dolmaz: ihtiyaç duyduğunuzda daha fazlasını alın."
+            },
+            "removeAddon": {
+                "question": "Bir eklentiyi kaldırdığımda ne olur?",
+                "answer": "Ödediğiniz şeyi faturalandırma döneminin sonuna kadar kullanırsınız, daha düşük tutar bir sonraki faturadan itibaren geçerli olur. Ay ortasında hiçbir şey kesilmez."
+            },
+            "cancel": {
+                "question": "İstediğim zaman iptal edebilir miyim?",
+                "answer": "Evet, faturalandırma ayarlarınızdan tek tıkla, bildirim süresi olmadan ve kimseye e-posta yazmadan. Geri kalan her şeyi iade politikamız açıklar."
+            },
+            "taxes": {
+                "question": "Vergiler fiyata dahil mi?",
+                "answer": "Fiyatlar vergi hariç gösterilir. Ülkeniz için geçerliyse KDV veya satış vergisi ödeme sırasında hesaplanıp eklenir."
+            },
+            "enterprise": {
+                "question": "Kurumsal fiyatlandırma sunuyor musunuz?",
+                "answer": "Evet. Kuruluşunuza göre fiyatlandırılan özel veya kendi sunucunuzda altyapı, SSO, SLA ve özel destek. help@rerun.build adresinden bize ulaşın."
+            }
+        }
+    },
+    "lifetime": {
+        "seo": {
+            "title": "Rerun ömür boyu erişim fırsatı",
+            "description": "Bir kez {price} ödeyin, Rerun ömür boyu sizin olsun: size özel makinede sınırsız coworker ve ekip arkadaşı, kendi yapay zekanızla."
+        },
+        "eyebrow": "Ömür boyu fırsat",
+        "headline": "Ömür boyu Rerun, tek ödeme",
+        "description": "Size özel makinede sınırsız coworker ve ekip arkadaşı. Tek ödeme, abonelik yok.",
+        "price": {
+            "once": "tek seferlik",
+            "instead": "<s>ayda {monthly}</s> yerine"
+        },
+        "cta": "Ömür boyu erişim alın",
+        "tiers": {
+            "label": "Fiyatlandırma",
+            "title": "{months, plural, one {# ayda} other {# ayda}} kendini amorti eder",
+            "lede": "Aylık plan ayda {monthly}. Ömür boyu fırsat ise tek seferde {price}.",
+            "pro": {
+                "description": "Rerun'ı kullandığınız sürece her ay ödeyin.",
+                "control": "Bu da yılda {yearly}, 3 yılda {threeYears} demek.",
+                "featuresLabel": "Pro şunları içerir"
+            },
+            "lifetime": {
+                "name": "Ömür boyu",
+                "description": "Bir kez ödeyin, Rerun kalıcı olarak sizin olsun.",
+                "control": "{months, plural, one {# ayda} other {# ayda}} kendini amorti eder. Yenilenecek bir şey yok.",
+                "featuresLabel": "Ömür boyu plan şunları içerir",
+                "features": {
+                    "coworkers": "Sizin için yan yana çalışan <b>sınırsız Coworker</b>",
+                    "seats": "<b>Sınırsız kullanıcı</b>, kullanıcı başına ücret yok",
+                    "machine": "Gece gündüz çalışan, size <b>özel makine</b>",
+                    "ownAi": "Kendi yapay zekanız: <b>bir API anahtarı</b> veya <b>ChatGPT aboneliğiniz</b>",
+                    "noCredits": "Rerun kredisi <b>dahil değil</b>"
+                }
+            }
+        },
+        "plan": {
+            "label": "Dahil",
+            "title": "Yapay zekanız, ekibiniz, sizin programınız"
+        },
+        "steps": {
+            "label": "Nasıl çalışır",
+            "title": "Üç adım, iki dakika",
+            "pay": {
+                "title": "Bir kez ödeyin",
+                "body": "Stripe'ta bir dakikadan kısa sürede ödeme yapın."
+            },
+            "code": {
+                "title": "Kodunuzu alın",
+                "body": "Ödemenin hemen ardından görünür ve gelen kutunuza da gelir."
+            },
+            "redeem": {
+                "title": "Kodu kullanın",
+                "body": "Oturum açın, kodu yapıştırın; çalışma alanınız ömür boyu plana geçer."
+            }
+        },
+        "faq": {
+            "label": "SSS",
+            "title": "Sorular",
+            "subscribed": {
+                "question": "Zaten aylık bir plan için ödüyorum. Geçiş yapabilir miyim?",
+                "answer": "Evet. Kodunuzu kullanmadan önce help@rerun.build adresine yazın, çalışma alanınızı ömür boyu plana taşıyalım."
+            },
+            "workspaces": {
+                "question": "Bir kod birden fazla çalışma alanının kilidini açabilir mi?",
+                "answer": "Bir kod tek bir çalışma alanını geçirir. Her çalışma alanı için bir kod satın alın."
+            },
+            "ownAi": {
+                "question": "Coworker'larım hangi yapay zekayla çalışır?",
+                "answer": "Kendi yapay zekanızla: seçtiğiniz sağlayıcıdan bir API anahtarı veya ChatGPT aboneliğiniz. Rerun kredisi bu fırsata dahil değildir."
+            },
+            "notIncluded": {
+                "question": "Neler dahil değil?",
+                "answer": "Kullanıma göre faturalandırdığımız yapay zeka olan Rerun kredisi. Coworker'larınız bunun yerine kendi API anahtarınız veya ChatGPT aboneliğinizle çalışır."
+            },
+            "updates": {
+                "question": "Yeni özellikleri alacak mıyım?",
+                "answer": "Evet. Ömür boyu çalışma alanı, güncellemeler dahil, diğer tüm çalışma alanlarıyla aynı Rerun'ı çalıştırır."
+            }
+        }
+    }
+}

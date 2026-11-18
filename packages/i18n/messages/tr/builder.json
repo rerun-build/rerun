@@ -1,0 +1,132 @@
+{
+    "contextMenu": {
+        "openChat": "Sohbeti aç",
+        "rename": "Yeniden adlandır",
+        "settings": "Ayarlar",
+        "share": "Paylaş",
+        "duplicate": "Çoğalt",
+        "moveToBox": "Box'a taşı",
+        "noOtherBox": "Yönettiğiniz başka Box yok",
+        "delete": "Sil",
+        "manageAccess": "Erişimi yönet",
+        "boxAccessAdminOnly": "Box erişimini yalnızca bir yönetici değiştirebilir",
+        "manageReason": "Bunu yalnızca bir yönetici ya da bu Box'ın sorumlusu yapabilir",
+        "untitledBox": "Adsız Box",
+        "thisCoworker": "bu coworker"
+    },
+    "toolbar": {
+        "placementPrompt": "{name} için bir kareye dokunun",
+        "placementPromptDefault": "Coworker'ınız için bir kareye dokunun",
+        "placementProgress": "Coworker {current}/{total}",
+        "newCoworker": "Yeni coworker",
+        "template": "Şablon",
+        "create": "Oluştur",
+        "search": "Ara",
+        "unplaced": "{count} yerleştirilmedi"
+    },
+    "isoBoard": {
+        "boxCta": "{name} şablonlarını keşfedin",
+        "boxCtaFallback": "Şablonları keşfedin",
+        "recruitFirst": "İlk coworker'ınızı almak için tıklayın",
+        "createBox": "Box oluşturmak için tıklayın",
+        "preparingSandbox": "Sandbox'ınız hazırlanıyor…",
+        "settingUpTemplate": "Kuruluyor: {title}…",
+        "settingUpCoworker": "Coworker'ınız kuruluyor…",
+        "installTemplate": "Kurmak için tıklayın: {title}",
+        "addBoxOnSide": "Bu tarafa Box ekle"
+    },
+    "discoveries": {
+        "statusDigging": "{name} şirketini tanıyoruz",
+        "statusDone": "Bir bakışta {name}",
+        "found": "{count} bulundu",
+        "sources": {
+            "website": "Web siteniz",
+            "domain": "Alan adınız",
+            "registry": "Resmi sicil",
+            "web": "Web"
+        },
+        "teasers": {
+            "profile": "Okunuyor: {domain}…",
+            "stack": "{domain} sitesinin altyapısına bakılıyor…",
+            "dns": "E-posta altyapınıza bakılıyor…",
+            "registry": "Resmi sicilde aranıyorsunuz…",
+            "site": "{domain} sitesinin tüm sayfaları okunuyor…",
+            "search": "Web'de aranıyor: {name}…",
+            "linkedinPerson": "LinkedIn'de sizi arıyoruz…",
+            "linkedinCompany": "LinkedIn'de aranıyor: {name}…",
+            "googleBusiness": "Google yorumlarınız okunuyor…",
+            "catalog": "{domain} mağazasına göz atılıyor…",
+            "synthesis": "Her şey bir araya getiriliyor…"
+        },
+        "cards": {
+            "identity": {
+                "title": "Sizi bulduk"
+            },
+            "audience": {
+                "title": "Kime satıyorsunuz"
+            },
+            "tools": {
+                "title": "Fark ettiğimiz araçlar"
+            },
+            "mail": {
+                "title": "Gelen kutunuz",
+                "runsOn": "E-posta altyapısı: <b>{provider}</b>"
+            },
+            "social": {
+                "title": "Nerede görünüyorsunuz"
+            },
+            "brand": {
+                "title": "Markanız"
+            },
+            "registry": {
+                "title": "Resmi kayıtlarda",
+                "since": "Kuruluş: <b>{year}</b>",
+                "people": "<b>{headcount}</b> kişi"
+            },
+            "person": {
+                "title": "Bu siz misiniz, {firstName}?"
+            },
+            "linkedin": {
+                "title": "LinkedIn sayfanız",
+                "followers": "takipçi",
+                "team": "ekipte"
+            },
+            "reviews": {
+                "title": "Müşteriler ne diyor",
+                "count": "<n>{count}</n> Google yorumu"
+            },
+            "products": {
+                "title": "Ne satıyorsunuz"
+            },
+            "competitors": {
+                "title": "Rakipleriniz"
+            },
+            "customers": {
+                "title": "Kimler zaten satın alıyor"
+            },
+            "brain": {
+                "title": "Şirket Brain'i",
+                "pages": "{count, plural, one {Coworker'larınızın başlamadan okuduğu # sayfa} other {Coworker'larınızın başlamadan okuduğu # sayfa}}",
+                "productsAndCompetitors": "+ {products, plural, one {# ürün} other {# ürün}}, {competitors, plural, one {# rakip} other {# rakip}}",
+                "productsOnly": "+ {products, plural, one {# ürün} other {# ürün}}",
+                "competitorsOnly": "+ {competitors, plural, one {# rakip} other {# rakip}}"
+            }
+        }
+    },
+    "boardToasts": {
+        "createdInactive": "\"{name}\" oluşturuldu ama etkin değil",
+        "createdInactiveHint": "Planınızda boş coworker yeri yok. Coworker panelinden etkinleştirin.",
+        "addFailed": "Bu coworker eklenemedi",
+        "duplicateFailed": "Bu coworker çoğaltılamadı",
+        "importFailed": "Bu şablon içe aktarılamadı",
+        "importInterrupted": "İçe aktarma yarıda kesildi",
+        "importInterruptedHint": "Yeniden içe aktarmadan önce makinenizi kontrol edin.",
+        "moveAgentFailed": "Bu coworker taşınamadı",
+        "moveBoxFailed": "Bu Box taşınamadı",
+        "deleteBoxFailed": "Bu Box silinemedi",
+        "checkConnection": "Bağlantınızı kontrol edip tekrar deneyin.",
+        "shareLinkGone": "Bu paylaşım bağlantısı artık kullanılamıyor",
+        "prepareBoxFailed": "Box'ınız hazırlanamadı",
+        "startCoworkerFailed": "Coworker'ınız başlatılamadı"
+    }
+}

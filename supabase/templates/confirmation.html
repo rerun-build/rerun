@@ -23,6 +23,11 @@
     <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
     <p>Er ist 15 Minuten gültig. Du kannst auch diesen Link auf demselben Gerät öffnen: <a href="{{ .ConfirmationURL }}">bei Rerun anmelden</a>.</p>
     <p style="color: #666; font-size: 13px">Wenn du ihn nicht angefordert hast, ignoriere diese E-Mail.</p>
+    {{ else if eq .Data.locale "tr" }}
+    <p>Rerun kodunuz:</p>
+    <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>
+    <p>Kod 15 dakika geçerlidir. Bu bağlantıyı aynı cihazda da açabilirsiniz: <a href="{{ .ConfirmationURL }}">Rerun'da oturum açın</a>.</p>
+    <p style="color: #666; font-size: 13px">Bu kodu siz istemediyseniz bu e-postayı yok sayın.</p>
     {{ else }}
     <p>Your Rerun code:</p>
     <p style="font-size: 28px; font-weight: 600; letter-spacing: 6px">{{ .Token }}</p>

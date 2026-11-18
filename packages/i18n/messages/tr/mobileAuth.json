@@ -1,0 +1,100 @@
+{
+    "start": {
+        "title": "Rerun'a hoş geldiniz",
+        "continueWithApple": "Apple ile devam et",
+        "continueWithGoogle": "Google ile devam et",
+        "continueWithPhone": "Telefonla devam et",
+        "continueWithEmail": "E-postayla devam et",
+        "or": "Veya",
+        "welcome": "Rerun'a hoş geldiniz",
+        "ownServer": "Kendi sunucunuzu kullanın",
+        "useCloud": "Rerun Cloud'u kullanın"
+    },
+    "back": "Geri",
+    "phone": {
+        "title": "Telefon numaranız",
+        "unsupportedCountry": "Bu ülkeye henüz kod gönderemiyoruz.",
+        "consent": "Devam ederek Rerun'un sizinle WhatsApp veya SMS üzerinden iletişime geçmesini kabul edersiniz.",
+        "sendByWhatsapp": "WhatsApp ile gönder",
+        "sendBySms": "SMS ile gönder",
+        "countryLabel": "Ülke: {name}",
+        "numberLabel": "Telefon numarası"
+    },
+    "email": {
+        "title": "E-postayla devam et",
+        "label": "E-posta",
+        "placeholder": "siz@sirket.com",
+        "send": "Kod gönder"
+    },
+    "code": {
+        "title": "Kodu girin",
+        "sentByPhone": "{channel} ile gönderildi, alıcı: {number}",
+        "sentByEmail": "Gönderildiği adres: {email}",
+        "fieldLabel": "Doğrulama kodu",
+        "continue": "Devam et",
+        "resendIn": "Kodu yeniden gönder ({seconds} sn)",
+        "resend": "Kodu yeniden gönder",
+        "switchChannel": "Bunun yerine {channel} ile gönder",
+        "differentNumber": "Başka bir numara kullan",
+        "differentEmail": "Başka bir e-posta kullan"
+    },
+    "country": {
+        "search": "Ara",
+        "searchLabel": "Ülke ara"
+    },
+    "errors": {
+        "generic": "Bir sorun oluştu. Tekrar deneyin.",
+        "offline": "Rerun'a ulaşamadık. Bağlantınızı kontrol edip tekrar deneyin.",
+        "session": "Oturumunuzu açamadık. Tekrar deneyin.",
+        "apple": "Apple ile girişinizi yapamadık. Tekrar deneyin.",
+        "google": "Google ile girişinizi yapamadık. Tekrar deneyin.",
+        "phone": {
+            "taken": "Bu numara zaten başka bir Rerun hesabına giriş için kullanılıyor.",
+            "same_number": "Bu zaten hesabınızın numarası.",
+            "not_required": "Telefon numaranız zaten doğrulandı.",
+            "too_soon": "Bir kod zaten yolda. Yenisini istemeden önce biraz bekleyin.",
+            "too_many": "Bu numara için çok fazla kod istendi. Daha sonra tekrar deneyin.",
+            "invalid_number": "Geçerli bir cep telefonu numarası girin.",
+            "unsupported_country": "Bu ülkeye henüz kod gönderemiyoruz. Bunun yerine e-posta veya Google kullanın.",
+            "undeliverable": "Bu numaraya kod iletemedik. Diğer kanalı deneyin ya da e-posta veya Google kullanın.",
+            "blocked": "Bu numaraya kod gönderemiyoruz. Bunun yerine e-posta veya Google kullanın.",
+            "rate_limited": "Bu numarada çok fazla deneme yapıldı. Daha sonra tekrar deneyin.",
+            "wrong_code": "Bu kod yanlış ya da süresi dolmuş.",
+            "expired": "Bu kodun süresi doldu. Yeni bir kod isteyin.",
+            "unavailable": "Telefonunuza ulaşamadık. Tekrar deneyin ya da diğer kanalı kullanın.",
+            "busy": "Telefonla giriş şu anda yoğun. Bunun yerine e-posta veya Google kullanın.",
+            "captcha_failed": "Robot olmadığınızı doğrulayamadık. Tekrar deneyin.",
+            "signed_out": "Önce hesabınızı oluşturun."
+        },
+        "email": {
+            "invalid_email": "Geçerli bir e-posta girin",
+            "captcha_failed": "Robot olmadığınızı doğrulayamadık. Tekrar deneyin.",
+            "blocked_domain": "Bu e-posta alan adı kabul edilmiyor. Başka bir adres kullanın.",
+            "too_many": "Ağınızdan çok fazla hesap oluşturuldu. Daha sonra tekrar deneyin.",
+            "too_many_codes": "Ağınızdan çok fazla kod istendi. Daha sonra tekrar deneyin.",
+            "unavailable": "Kodunuzu gönderemedik. Tekrar deneyin.",
+            "rate_limited": "Bu adres için çok fazla kod istendi. Daha sonra tekrar deneyin.",
+            "wrong_code": "Bu kod yanlış ya da süresi dolmuş."
+        }
+    },
+    "consent": {
+        "title": "Coworker'larınız yapay zekayla çalışır",
+        "body": "Görevlerinizi yapmak için Rerun mesajlarınızı, fotoğraflarınızı, sesli mesajlarınızı, dosyalarınızı ve web sitenizi yapay zeka sağlayıcılarına gönderir: OpenRouter üzerinden OpenAI, Anthropic ve Google ile kendi bağladığınız tüm sağlayıcılar.",
+        "noTraining": "Rerun'un sağlayıcıları verilerinizle model eğitmez.",
+        "privacy": "Gizlilik Politikası",
+        "notNow": "Şimdi değil",
+        "agree": "Kabul et ve devam et"
+    },
+    "server": {
+        "title": "Rerun sunucunuz",
+        "address": "Sunucu adresi",
+        "connect": "Bağlan",
+        "problems": {
+            "invalid": "Rerun sunucunuzun adresini girin.",
+            "insecure": "Yerel ağınızın dışında https:// kullanın.",
+            "unreachable": "Bu sunucuya ulaşılamadı.",
+            "not-rerun": "Bu adres bir Rerun sunucusu değil.",
+            "outdated": "Uygulamadan kullanmak için bu Rerun sunucusunu güncelleyin."
+        }
+    }
+}

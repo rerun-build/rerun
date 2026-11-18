@@ -1,0 +1,168 @@
+{
+    "sheet": {
+        "back": "Geri",
+        "close": "Kapat"
+    },
+    "badge": {
+        "creditsUsedUp": "Krediler tükendi",
+        "signInAgain": "Yeniden giriş yapın",
+        "keyRejected": "Anahtar reddedildi",
+        "keyMissing": "Anahtar eksik",
+        "ready": "Hazır"
+    },
+    "usage": {
+        "agentsFallBack": "Çalışma alanının varsayılan modeline geçecek: {agents}.",
+        "automationsFallBack": "{count, plural, one {1 otomasyon} other {# otomasyon}} çalışma alanının varsayılan modeline geçecek.",
+        "agentsAndAutomationsFallBack": "Çalışma alanının varsayılan modeline geçecek: {agents} ve {count, plural, one {1 otomasyon} other {# otomasyon}}.",
+        "holdsDefault": "Çalışma alanının varsayılan modelini barındırıyor, bu model temizlenir: model seçmemiş her coworker Rerun'a geçer.",
+        "nothingRuns": "Kimlik bilgisi kaldırılır. Onunla çalışan hiçbir şey yok."
+    },
+    "list": {
+        "title": "Yapay zeka sağlayıcıları",
+        "notAnswering": "Bu çalışma alanının makinesi yanıt vermiyor. Birazdan tekrar deneyin.",
+        "defaultModel": "Varsayılan model",
+        "included": "Dahil",
+        "subscriptions": "Abonelikleriniz",
+        "subscriptionsPitch": "Zaten Claude Code veya Codex mi kullanıyorsunuz? Coworker'larınız sizin planınızla çalışabilir.",
+        "addSubscription": "Abonelik ekle",
+        "apiKeys": "API anahtarlarınız",
+        "apiKeysPitch": "Sağlayıcınıza doğrudan, token başına ödeyin.",
+        "addApiKey": "API anahtarı ekle",
+        "via": "Aracı: {name}",
+        "creditsUsedUpPickModel": "Rerun kredileri tükendi, yenilenme tarihi: {backOn}. Bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için başka bir model seçin.",
+        "creditsUsedUpAddSource": "Rerun kredileri tükendi, yenilenme tarihi: {backOn}. Bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
+        "defaultBroken": "Kendi modeli olmayan coworker'lar durduruldu. {name} bağlantısını düzeltin veya başka bir model seçin.",
+        "signInAgain": "Yeniden giriş yapın",
+        "addKey": "Anahtar ekle"
+    },
+    "add": {
+        "addSubscription": "Abonelik ekle",
+        "addApiKey": "API anahtarı ekle",
+        "addProvider": "Sağlayıcı ekle",
+        "subscriptions": "Abonelikler",
+        "apiKeys": "API anahtarları"
+    },
+    "defaultModel": {
+        "title": "Varsayılan model",
+        "changeFailed": "Varsayılan model değiştirilemedi"
+    },
+    "detail": {
+        "name": "Ad",
+        "removeButton": "Kaldır: {name}",
+        "saveFailed": "Kaydedilemedi",
+        "renameTitle": "Yeniden adlandır",
+        "renameMessage": "Her coworker'ın model seçicisinde gösterilir.",
+        "keySaveFailed": "Kimlik bilgisi kaydedilemedi",
+        "removeTitle": "{name} kaldırılsın mı?",
+        "removeConfirm": "Kaldır",
+        "deleteFailed": "Bağlantı silinemedi"
+    },
+    "credit": {
+        "title": "Bu ayın kredileri",
+        "percent": "%{percent}",
+        "usedUp": "Rerun ile çalışan coworker'lar krediler yenilenene kadar duraklatıldı, yenilenme tarihi: {backOn}. Devam etmeleri için başka bir varsayılan model seçin.",
+        "included": "Rerun planınıza dahildir. Anahtar yok, kurulacak bir şey yok."
+    },
+    "reconnect": {
+        "signInRejected": "Bu giriş reddedildi. Onu kullanan coworker'lar siz yeniden giriş yapana kadar durduruldu.",
+        "signInExpired": "Bu girişin süresi doldu. Onu kullanan coworker'lar siz yeniden giriş yapana kadar durduruldu.",
+        "signInAgain": "Yeniden giriş yapın",
+        "keyRejected": "Bu anahtar reddedildi. Onu kullanan coworker'lar siz yeni bir anahtar yapıştırana kadar durduruldu.",
+        "keyMissing": "Kayıtlı anahtar yok. Onu kullanan coworker'lar siz bir anahtar yapıştırana kadar durduruldu.",
+        "keyLabel": "API anahtarı",
+        "keyPlaceholder": "Anahtarınızı yapıştırın",
+        "save": "Kaydet"
+    },
+    "planUsage": {
+        "title": "Plan kullanımı",
+        "empty": "Kullanım, bu plandaki bir sonraki çalıştırmadan sonra burada görünür.",
+        "percent": "%{percent}"
+    },
+    "models": {
+        "title": "Coworker'larınızın kullanabildikleri",
+        "enabledCount": "{enabled} / {total}",
+        "lockDefault": "Varsayılan model",
+        "lockCustom": "Özel model. Aşağıdan kaldırın.",
+        "lockLast": "Coworker'ların bu kaynaktan en az bir modele ihtiyacı var."
+    },
+    "baseUrl": {
+        "label": "Özel temel URL",
+        "help": "İstekleri kendi OpenRouter uyumlu yönlendiricinize gönderin",
+        "save": "Kaydet"
+    },
+    "customModels": {
+        "title": "Özel modeller",
+        "remove": "Kaldır",
+        "addLabel": "Model ekle",
+        "addHelp": "Herhangi bir OpenRouter model kimliği, ör. x-ai/grok-4.",
+        "add": "Ekle"
+    },
+    "apiKey": {
+        "name": "Ad",
+        "keyLabel": "API anahtarı",
+        "keyPlaceholder": "Anahtarınızı yapıştırın",
+        "connect": "Bağla"
+    },
+    "modelSheet": {
+        "close": "Kapat",
+        "title": "Model seçin",
+        "notAnswering": "Bu çalışma alanının makinesi yanıt vermiyor. Birazdan tekrar deneyin.",
+        "workspaceDefault": "Çalışma alanı varsayılanı",
+        "addProvider": "Sağlayıcı ekle"
+    },
+    "ending": {
+        "coworkersStart": "Coworker'larınız yeniden çalışmaya başlıyor",
+        "nameIt": "Ad verin",
+        "connectionName": "Bağlantı adı",
+        "nameHelp": "Her coworker'ın model seçicisinde gösterilir.",
+        "saving": "Kaydediliyor…",
+        "done": "Bitti"
+    },
+    "claude": {
+        "claudeTokenIsApiKey": "Bu bir Anthropic API anahtarı. Bunun yerine Anthropic (API) bağlantısı olarak ekleyin.",
+        "claudeTokenIsCode": "Bu, Claude'dan gelen kod. Önce Token al'a tıklayın, sonra kodu buraya yapıştırın.",
+        "approve": "Claude'da Rerun'ı onaylayın",
+        "open": "Claude'u aç",
+        "openAgain": "Claude'u tekrar aç",
+        "pasteStep": "Kodu yapıştırın",
+        "codeLabel": "Claude'dan gelen kod",
+        "checking": "Kod kontrol ediliyor…",
+        "paste": "Yapıştır",
+        "connect": "Bağla"
+    },
+    "chatgpt": {
+        "allowStep": "ChatGPT'de kodla girişe izin verin",
+        "openSettings": "ChatGPT ayarlarını aç",
+        "alreadyOn": "Zaten açık",
+        "adminSwitches": "ChatGPT yöneticiniz bunu tüm çalışma alanı için açar.",
+        "onPlusOrPro": "Plus veya Pro kullanıyorum",
+        "onBusiness": "ChatGPT Business veya Enterprise mı kullanıyorsunuz?",
+        "enterStep": "Kodu OpenAI'da girin",
+        "copied": "Kopyalandı",
+        "copyAdminMessage": "Onlar için bir mesaj kopyalayın",
+        "adminMessage": "Merhaba! ChatGPT çalışma alanı ayarlarımızda \"Device code authorization for Codex\" seçeneğini açabilir misiniz? ChatGPT planımı Rerun'a bağlamak için buna ihtiyacım var.",
+        "copyCode": "Kodu kopyala",
+        "openOpenAI": "OpenAI'ı aç",
+        "enterHint": "Kodu OpenAI sayfasına girip onaylayın. Bu ekran onu kendiliğinden algılar.",
+        "gettingCode": "Kod alınıyor…",
+        "getNewCode": "Yeni kod al",
+        "getCode": "Kod al",
+        "stuck": {
+            "expiredAdmin": "Kodun süresi doldu. Yöneticiniz muhtemelen henüz kodla girişe izin vermedi.",
+            "errorAdmin": "OpenAI sayfasında hata mı var? Yöneticiniz muhtemelen henüz kodla girişe izin vermedi.",
+            "expiredSetting": "Kodun süresi doldu. Kodla giriş muhtemelen hâlâ kapalı: <link>Settings → Security</link> bölümünden açın, sonra yeni bir kod alın.",
+            "errorSetting": "OpenAI sayfasında hata mı var? Kodla giriş muhtemelen hâlâ kapalı: <link>Settings → Security</link> bölümünden açın, sonra kodu tekrar girin."
+        }
+    },
+    "connect": {
+        "renameFailed": "Bağlantı yeniden adlandırılamadı",
+        "startFailed": "Bağlantı başlatılamadı",
+        "notSignedIn": "Giriş yapılmadı",
+        "createFailed": "Bağlantı oluşturulamadı"
+    },
+    "oauth": {
+        "unfinished": "Giriş tamamlanmadı. Tekrar deneyin.",
+        "authorizationFailed": "Yetkilendirme başarısız oldu",
+        "startFailed": "Giriş başlatılamadı"
+    }
+}

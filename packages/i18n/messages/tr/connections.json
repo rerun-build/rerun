@@ -1,0 +1,379 @@
+{
+    "sources": {
+        "kinds": {
+            "included": "Dahil",
+            "plan": "Plan",
+            "key": "API anahtarı"
+        },
+        "pitch": {
+            "claude": {
+                "title": "Claude Pro veya Max",
+                "hint": "Claude hesabınızla giriş yapın"
+            },
+            "codex": {
+                "title": "ChatGPT Plus veya Pro",
+                "hint": "ChatGPT hesabınızla giriş yapın"
+            },
+            "anthropic": {
+                "title": "Anthropic",
+                "hint": "Claude modelleri, token başına ödeme"
+            },
+            "openai": {
+                "title": "OpenAI",
+                "hint": "GPT modelleri, token başına ödeme"
+            },
+            "google": {
+                "title": "Google",
+                "hint": "Gemini modelleri, token başına ödeme"
+            },
+            "openrouter": {
+                "title": "OpenRouter",
+                "hint": "Tüm modeller tek bir anahtarla"
+            },
+            "opencode": {
+                "title": "OpenCode Go veya Console",
+                "hint": "OpenCode anahtarınızı yapıştırın"
+            },
+            "custom": {
+                "title": "Özel uç nokta",
+                "hint": "Ollama, LM Studio, vLLM veya OpenAI uyumlu herhangi bir sunucu"
+            }
+        },
+        "summary": "{kind} · {count, plural, one {# model} other {# model}}",
+        "summaryWindow": "{name} {percent}",
+        "creditPaused": "Rerun kredileri duraklatıldı",
+        "creditUsed": "Bu ayın kredilerinin %{percent} kadarı kullanıldı",
+        "creditUsedUpOn": "Aylık krediler tükendi, yenilenme: {date}",
+        "creditUsedUpNextMonth": "Aylık krediler tükendi, gelecek ay yenilenir",
+        "creditBackOn": "{date} tarihinde",
+        "creditBackNextMonth": "gelecek ay",
+        "windows": {
+            "session": "Oturum",
+            "fiveHour": "5 saatlik",
+            "weekly": "Haftalık",
+            "monthly": "Aylık",
+            "modelWeekly": "{label} haftalık",
+            "modelWeeklyUnnamed": "Model haftalık"
+        },
+        "windowResets": "{when} sıfırlanır",
+        "tiers": {
+            "fast": "Hızlı ve ucuz",
+            "smart": "En akıllısı"
+        },
+        "opencodePlan": {
+            "go": "Go'ya dahil",
+            "console": "Console kredileri",
+            "free": "Ücretsiz"
+        },
+        "unavailable": {
+            "opencodeRetired": "OpenCode artık sunmuyor",
+            "codexOutdated": "Bu Box'taki Codex CLI eski",
+            "notInChatgptPlan": "ChatGPT planınızda yok"
+        },
+        "pricePerMillion": "{input} giriş · {output} çıkış /M",
+        "guide": {
+            "anthropic": {
+                "title": "Anthropic anahtarınızı nasıl alırsınız",
+                "step1": "[Anthropic Console](https://console.anthropic.com/settings/keys) sayfasını açın ve giriş yapın.",
+                "step2": "**Create Key** düğmesine tıklayın ve bir ad verin, örneğin \"Rerun\".",
+                "step3": "Anahtarı kopyalayın (`sk-ant-` ile başlar) ve yukarıya yapıştırın. Yalnızca bir kez gösterilir."
+            },
+            "openai": {
+                "title": "OpenAI anahtarınızı nasıl alırsınız",
+                "step1": "[OpenAI API keys](https://platform.openai.com/api-keys) sayfasını açın ve giriş yapın.",
+                "step2": "**Create new secret key** düğmesine tıklayın ve bir ad verin, örneğin \"Rerun\".",
+                "step3": "Anahtarı kopyalayın (`sk-` ile başlar) ve yukarıya yapıştırın. Yalnızca bir kez gösterilir."
+            },
+            "google": {
+                "title": "Google anahtarınızı nasıl alırsınız",
+                "step1": "[Google AI Studio](https://aistudio.google.com/apikey) sayfasını açın ve Google hesabınızla giriş yapın.",
+                "step2": "**Create API key** düğmesine tıklayın ve bir Google Cloud projesi seçin.",
+                "step3": "Anahtarı kopyalayın ve yukarıya yapıştırın."
+            },
+            "openrouter": {
+                "title": "OpenRouter anahtarınızı nasıl alırsınız",
+                "step1": "[OpenRouter keys](https://openrouter.ai/keys) sayfasını açın ve giriş yapın.",
+                "step2": "**Create API Key** düğmesine tıklayın, bakiyeniz boşsa kredi ekleyin.",
+                "step3": "Anahtarı kopyalayın (`sk-or-` ile başlar) ve yukarıya yapıştırın. Yalnızca bir kez gösterilir."
+            },
+            "opencode": {
+                "title": "OpenCode anahtarınızı nasıl alırsınız",
+                "step1": "[OpenCode](https://opencode.ai/auth) sayfasını açın ve giriş yapın.",
+                "step2": "**OpenCode Go** aboneliği alın ya da Console modellerini kullanmak için kredi ekleyin.",
+                "step3": "Bir API anahtarı oluşturun, kopyalayın (`oc_sk_` ile başlar) ve yukarıya yapıştırın."
+            }
+        }
+    },
+    "noPlan": {
+        "trialText": "Kendi Claude planınızı, ChatGPT planınızı veya API anahtarınızı bağlamak için ücretsiz denemenizi başlatın.",
+        "subscribeText": "Kendi Claude planınızı, ChatGPT planınızı veya API anahtarınızı bağlamak için abone olun.",
+        "startTrial": "Ücretsiz denemeyi başlat",
+        "subscribe": "Abone ol"
+    },
+    "baseUrl": {
+        "label": "Özel temel URL",
+        "helper": "İstekleri kendi OpenRouter uyumlu yönlendiricinize gönderin",
+        "inputLabel": "OpenRouter temel URL'si"
+    },
+    "planLimits": {
+        "title": "Plan kullanımı",
+        "empty": "Kullanım, bu plandaki bir sonraki çalıştırmadan sonra burada görünür.",
+        "updatedJustNow": "Az önce güncellendi",
+        "updatedAgo": "{age} önce güncellendi",
+        "used": "{percent} kullanıldı",
+        "usedWithReset": "{percent} kullanıldı, {reset}"
+    },
+    "meter": {
+        "planLimit": "{name} limiti kullanımı",
+        "monthlyCredits": "Kullanılan aylık krediler"
+    },
+    "providerPicker": {
+        "added": "Eklendi"
+    },
+    "status": {
+        "paused": "Duraklatıldı",
+        "creditsUsedUp": "Krediler tükendi",
+        "signInAgain": "Yeniden giriş yapın",
+        "keyRejected": "Anahtar reddedildi",
+        "keyMissing": "Anahtar eksik",
+        "ready": "Hazır"
+    },
+    "backToProviders": "Yapay zeka sağlayıcılarına dön",
+    "subtitle": {
+        "included": "Planınıza dahil",
+        "apiKey": "{provider} API anahtarı"
+    },
+    "key": {
+        "label": "API anahtarı",
+        "placeholder": "Anahtarınızı yapıştırın"
+    },
+    "name": {
+        "label": "Ad",
+        "helper": "Her coworker'ın model seçicisinde gösterilir"
+    },
+    "becomesDefault": "Bu, çalışma alanının varsayılanı olur: kendi modeli olmayan her coworker bununla çalışır.",
+    "connecting": "Bağlanıyor…",
+    "errors": {
+        "nameRequired": "Bu bağlantıya bir ad verin",
+        "createFailed": "Bağlantı oluşturulamadı",
+        "renameFailed": "Bağlantı yeniden adlandırılamadı",
+        "saveFailed": "Kaydedilemedi",
+        "startFailed": "Bağlantı başlatılamadı",
+        "saveTokenFailed": "Token kaydedilemedi",
+        "saveConnectionFailed": "Bağlantı kaydedilemedi",
+        "codeExpired": "Kodun süresi doldu, yeniden başlayın",
+        "deleteFailed": "Bağlantı silinemedi",
+        "defaultFailed": "Varsayılan model değiştirilemedi",
+        "backupsFailed": "Yedek modeller kaydedilemedi"
+    },
+    "addProvider": {
+        "addKey": "Anahtar ekle"
+    },
+    "remove": {
+        "button": "Kaldır: {name}",
+        "confirmTitle": "{name} kaldırılsın mı?",
+        "confirm": "Kaldır",
+        "removed": "{name} kaldırıldı",
+        "checking": "Üzerinde ne çalıştığına bakılıyor…",
+        "fallBack": {
+            "agents": "{agents} çalışma alanının varsayılan modeline geri döner.",
+            "automations": "{count, plural, one {# otomasyon} other {# otomasyon}} çalışma alanının varsayılan modeline geri döner.",
+            "both": "{agents} ve {count, plural, one {# otomasyon} other {# otomasyon}} çalışma alanının varsayılan modeline geri döner."
+        },
+        "holdsDefault": "Çalışma alanının varsayılan modeli bunda, o da temizlenir: model seçmemiş her coworker Rerun'a geri döner.",
+        "nothingRuns": "Kimlik bilgisi Box'tan kaldırıldı. Üzerinde hiçbir şey çalışmıyor.",
+        "released": {
+            "agents": "{agents} artık çalışma alanının varsayılan modeliyle çalışıyor.",
+            "automations": "{count, plural, one {# otomasyon} other {# otomasyon}} artık çalışma alanının varsayılan modeliyle çalışıyor.",
+            "both": "{agents} ve {count, plural, one {# otomasyon} other {# otomasyon}} artık çalışma alanının varsayılan modeliyle çalışıyor."
+        },
+        "defaultCleared": "Çalışma alanının varsayılanı temizlendi."
+    },
+    "customModels": {
+        "remove": "Kaldır",
+        "add": "Ekle",
+        "addCustom": "Özel model ekle",
+        "openrouterHint": "Herhangi bir OpenRouter model kimliği ekleyin (ör. <mono>x-ai/grok-4</mono>).",
+        "serverHint": "Sunucunun sunduğu ama listelemediği bir model ekleyin (ör. <mono>llama3.3:70b</mono>).",
+        "idPlaceholder": "model kimliği"
+    },
+    "models": {
+        "title": "Modeller",
+        "defaultModel": "Varsayılan model",
+        "turnOff": "Kapat: {model}",
+        "turnOn": "Aç: {model}",
+        "lockDefault": "Bu varsayılan model. Önce başka bir varsayılan seçin.",
+        "lockLast": "Coworker'ların bu kaynaktan en az bir modele ihtiyacı var.",
+        "lockCustom": "Özel model. Aşağıdan kaldırın.",
+        "available": "Coworker'larınız kullanabilir",
+        "count": "{on}/{total}",
+        "availableEmpty": "Coworker'lar kullansın diye bir modeli buraya sürükleyin.",
+        "hidden": "Kapalı",
+        "hiddenEmpty": "Coworker'lar kullanmasın diye bir modeli buraya sürükleyin."
+    },
+    "opencode": {
+        "goTitle": "OpenCode Go'ya dahil",
+        "goHint": "Go planınızla ödenir. Ücretsiz olanlar siz açana kadar kapalıdır.",
+        "consoleTitle": "Console, kredilerinizle ödenir",
+        "consoleHint": "Token başına ücretlendirilir, siz açana kadar kapalıdır.",
+        "included": "Dahil",
+        "credits": "Krediler",
+        "free": "Ücretsiz",
+        "new": "Yeni",
+        "noVision": "Görsel yok",
+        "search": "Model ara",
+        "emptySection": "OpenCode şu anda burada hiçbir model listelemiyor.",
+        "noMatch": "“{query}” ile eşleşen model yok."
+    },
+    "detail": {
+        "readOnly": "{reason}.",
+        "keyReplaced": "Anahtar değiştirildi",
+        "signedInAgain": "Yeniden giriş yapıldı",
+        "creditsTitle": "Bu ayın kredileri",
+        "topUp": "Yükle",
+        "creditsUsedUpOn": "Rerun ile çalışan coworker'lar, krediler {date} tarihinde yenilenene kadar duraklatıldı. Devam etmeleri için kredi yükleyin veya başka bir varsayılan model seçin.",
+        "creditsUsedUpNextMonth": "Rerun ile çalışan coworker'lar, krediler gelecek ay yenilenene kadar duraklatıldı. Devam etmeleri için kredi yükleyin veya başka bir varsayılan model seçin.",
+        "creditsIncluded": "Rerun planınızla birlikte gelir. Anahtar yok, kurulacak bir şey yok.",
+        "signInRejected": "Bu giriş reddedildi. Bunu kullanan coworker'lar siz yeniden giriş yapana kadar durduruldu.",
+        "signInExpired": "Bu girişin süresi doldu. Bunu kullanan coworker'lar siz yeniden giriş yapana kadar durduruldu.",
+        "reconnected": "Coworker'larınız yeniden başlıyor",
+        "keyRejected": "Bu anahtar reddedildi. Bunu kullanan coworker'lar siz yenisini yapıştırana kadar durduruldu.",
+        "keyMissing": "Kayıtlı anahtar yok. Bunu kullanan coworker'lar siz bir anahtar yapıştırana kadar durduruldu."
+    },
+    "panel": {
+        "adminOnly": "Sağlayıcıları yalnızca bir yönetici değiştirebilir",
+        "groups": {
+            "default": "Varsayılan model",
+            "backups": "Yedekler",
+            "included": "Dahil",
+            "plans": "Abonelikleriniz",
+            "keys": "API anahtarlarınız",
+            "noPlan": "Abonelikleriniz ve API anahtarlarınız"
+        },
+        "pitch": {
+            "plansWithOpencode": "Zaten Claude Code, Codex veya OpenCode kullanıyor musunuz? Coworker'larınız planınızla çalışabilir.",
+            "plans": "Zaten Claude Code veya Codex kullanıyor musunuz? Coworker'larınız planınızla çalışabilir.",
+            "plansWithoutClaudeWithOpencode": "Zaten Codex veya OpenCode kullanıyor musunuz? Coworker'larınız planınızla çalışabilir.",
+            "plansWithoutClaude": "Zaten Codex kullanıyor musunuz? Coworker'larınız ChatGPT planınızla çalışabilir.",
+            "keysWithCustom": "Sağlayıcınıza token başına doğrudan ödeyin ya da kendi modelinizi çalıştırın.",
+            "keys": "Sağlayıcınıza token başına doğrudan ödeyin."
+        },
+        "default": {
+            "via": "{source} üzerinden. Kendi modeli olmayan coworker'lar bununla çalışır.",
+            "pausedPick": "Rerun kredileri duraklatıldı, bu yüzden kendi modeli olmayan coworker'lar da duraklatıldı. Devam etmeleri için başka bir model seçin.",
+            "pausedAdd": "Rerun kredileri duraklatıldı, bu yüzden kendi modeli olmayan coworker'lar da duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
+            "usedUpOnPick": "Rerun kredileri {date} tarihinde yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için başka bir model seçin.",
+            "usedUpOnAdd": "Rerun kredileri {date} tarihinde yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
+            "usedUpNextMonthPick": "Rerun kredileri gelecek ay yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için başka bir model seçin.",
+            "usedUpNextMonthAdd": "Rerun kredileri gelecek ay yenilenene kadar tükendi, bu yüzden kendi modeli olmayan coworker'lar duraklatıldı. Devam etmeleri için bir plan veya API anahtarı ekleyin.",
+            "stopped": "Kendi modeli olmayan coworker'lar durduruldu. {source} bağlantısını düzeltin veya başka bir model seçin.",
+            "noOtherModel": "Hazır başka model yok. Önce bir plan veya API anahtarı ekleyin.",
+            "change": "Değiştir"
+        },
+        "backups": {
+            "add": "Yedek ekle",
+            "rank": "{rank, selectordinal, other {#.}} · {source} üzerinden",
+            "rankNotReady": "{rank, selectordinal, other {#.}} · {source} hazır değil, atlandı",
+            "moveUp": "Yukarı taşı: {model}",
+            "moveDown": "Aşağı taşı: {model}",
+            "remove": "Kaldır: {model}",
+            "full": "En fazla {max} yedek",
+            "noneLeft": "Hazır başka model yok. Önce bir plan veya API anahtarı ekleyin.",
+            "credit": {
+                "title": "Son çare olarak Rerun kredisi",
+                "description": "Yalnızca tüm planlar tükendiğinde"
+            }
+        },
+        "addSubscription": "Abonelik ekle",
+        "addApiKey": "API anahtarı ekle"
+    },
+    "chatgpt": {
+        "allowStep": "ChatGPT'de kodla girişe izin verin",
+        "openSettings": "ChatGPT ayarlarını aç",
+        "alreadyOn": "Zaten açık",
+        "codeStep": "Kodu OpenAI'da girin",
+        "remarks": {
+            "connected": "Her şey hazır!",
+            "starting": "Kod alınıyor",
+            "expired": "O kodun süresi doldu.",
+            "stuck": "OpenAI'dan hâlâ ses yok.",
+            "waiting": "OpenAI bekleniyor",
+            "grabCode": "Şimdi bir kod alın.",
+            "turnOn": "Bunu bir kez açın."
+        },
+        "setting": {
+            "path": "Ayarın ChatGPT'deki yeri",
+            "settings": "Ayarlar",
+            "security": "Güvenlik",
+            "deviceCode": "Codex için cihaz kodu yetkilendirmesini etkinleştir"
+        },
+        "adminSwitches": "ChatGPT yöneticiniz bunu tüm çalışma alanı için açar. <copy></copy>",
+        "plusOrPro": "Plus veya Pro kullanıyorum",
+        "businessQuestion": "ChatGPT Business veya Enterprise mı?",
+        "copyCode": "Kodu kopyala",
+        "enterCode": "Kodu <link>OpenAI sayfasında</link> girin ve onaylayın. Bu pencere onu kendiliğinden algılar.",
+        "opening": "OpenAI yeni bir sekmede açılıyor",
+        "gettingCode": "Kod alınıyor…",
+        "newCode": "Yeni kod al",
+        "getCode": "Kod al",
+        "stuck": {
+            "expiredAdmin": "Kodun süresi doldu. Yöneticiniz büyük olasılıkla kodla girişe henüz izin vermedi. <copy></copy>",
+            "errorAdmin": "OpenAI sayfasında hata mı var? Yöneticiniz büyük olasılıkla kodla girişe henüz izin vermedi. <copy></copy>",
+            "expiredSelf": "Kodun süresi doldu. Kodla giriş büyük olasılıkla hâlâ kapalı: <link>Ayarlar → Güvenlik</link> bölümünden açın, ardından yeni bir kod alın.",
+            "errorSelf": "OpenAI sayfasında hata mı var? Kodla giriş büyük olasılıkla hâlâ kapalı: <link>Ayarlar → Güvenlik</link> bölümünden açın, ardından kodu yeniden girin."
+        },
+        "copied": "Kopyalandı",
+        "copyMessage": "Onlar için bir mesaj kopyalayın",
+        "adminMessage": "Merhaba! ChatGPT çalışma alanı ayarlarımızda \"Codex için cihaz kodu yetkilendirmesi\" seçeneğini açabilir misiniz? ChatGPT planımı Rerun'a bağlamak için buna ihtiyacım var."
+    },
+    "claude": {
+        "remarks": {
+            "idle": "Burada bekliyorum.",
+            "waiting": "Claude'un size verdiğini yapıştırın.",
+            "checking": "Kontrol ediliyor",
+            "connected": "Her şey hazır!"
+        },
+        "approveStep": "Claude'da Rerun'u onaylayın",
+        "opening": "Claude yeni bir sekmede açılıyor",
+        "openAgain": "Claude'u yeniden aç",
+        "open": "Claude'u aç",
+        "pasteStep": "Kodu yapıştırın",
+        "checkingCode": "Kod kontrol ediliyor…",
+        "codeAccepted": "Kod kabul edildi",
+        "codePlaceholder": "Claude'dan gelen kod",
+        "paste": "Yapıştır",
+        "pasteHint": "⌘V veya Ctrl+V ile alana yapıştırın."
+    },
+    "nameStep": {
+        "title": "Ad verin",
+        "remark": "Son bir şey: bir ad.",
+        "fieldLabel": "Bağlantı adı",
+        "saving": "Kaydediliyor…",
+        "done": "Bitti",
+        "helper": "Her coworker'ın model seçicisinde gösterilir."
+    },
+    "letsGo": "Başlayalım",
+    "custom": {
+        "server": "Sunucu",
+        "other": "Diğer",
+        "baseUrl": "Temel URL",
+        "keyOptionalPlaceholder": "Yerel sunucu için gerekmez",
+        "modelId": "Model kimliği",
+        "connect": "Bağlan",
+        "endpoint": "Uç nokta",
+        "contextWindow": "Bağlam penceresi",
+        "contextWindowHelper": "Token cinsinden, boyutunu sunucunun kendisi belirlemediği modeller için",
+        "vision": "Modeller görselleri görür",
+        "visionHelper": "Ekran görüntüleri ve bilgisayar için gerekli",
+        "probe": {
+            "unreachableCloud": "{host} adresine ulaşılamadı. Yanıt veren herkese açık bir adres olmalı.",
+            "unreachableLocal": "{host} adresine ulaşılamadı. Sunucunun çalıştığını ve motordan erişilebilir olduğunu kontrol edin.",
+            "unauthorized": "Sunucu bu anahtarı reddetti. Tamamen kopyalandığını kontrol edin.",
+            "notListed": "Bu sunucu modellerini listelemiyor. Çalıştırılacak modelin kimliğini yazın.",
+            "refused": "Sunucu {model} modelini reddetti: {detail}",
+            "refusedPlain": "Sunucu {model} modelini reddetti.",
+            "refusedUnnamedDetail": "Sunucu bu modeli reddetti: {detail}",
+            "refusedUnnamed": "Sunucu bu modeli reddetti."
+        }
+    }
+}

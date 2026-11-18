@@ -1,0 +1,52 @@
+{
+    "switch": {
+        "label": "Görünüm",
+        "board": "3D",
+        "simple": "Basit"
+    },
+    "list": {
+        "label": "Coworker'lar",
+        "search": "Ara",
+        "empty": "Henüz coworker yok",
+        "newBox": "Yeni Box",
+        "emptyBox": "Coworker yok",
+        "boxMore": "İşlemler: {name}"
+    },
+    "tile": {
+        "more": "Diğer: {name}",
+        "newConversation": "Yeni konuşma",
+        "allConversations": "Tüm konuşmalar",
+        "card": "Coworker kartı",
+        "pin": "Başa sabitle",
+        "unpin": "Sabitlemeyi kaldır"
+    },
+    "chat": {
+        "allConversations": "Tüm konuşmalar",
+        "pick": "Soldan bir coworker seçin.",
+        "card": "Coworker kartı"
+    },
+    "line": {
+        "paused": "Duraklatıldı",
+        "waiting": "Sizi bekliyor",
+        "error": "Bir sorun oluştu",
+        "working": "Çalışıyor",
+        "workingOn": "Çalışıyor · {detail}",
+        "asleep": "Uykuda",
+        "asleepAbout": "Uykuda · {about}",
+        "you": "Siz: {message}"
+    },
+    "foreman": {
+        "name": "Chief of Staff",
+        "line": "Ne isterseniz sorun",
+        "card": "Chief of Staff kartı"
+    },
+    "details": {
+        "label": "Kart: {name}"
+    },
+    "phone": {
+        "pinned": "Sabitlenenler",
+        "recent": "Son kullanılanlar",
+        "byBox": "Box'a göre",
+        "section": "{label}, {count}"
+    }
+}

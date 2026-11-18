@@ -1,0 +1,374 @@
+{
+    "labels": {
+        "shell_exec": "Terminal",
+        "fs_read": "Dosya oku",
+        "fs_write": "Dosya yaz",
+        "fs_edit": "Dosya düzenle",
+        "fs_list": "Dosyaları listele",
+        "fs_search": "Dosyalarda ara",
+        "shared_read": "Paylaşılan dosyayı oku",
+        "shared_write": "Paylaşılan dosyaya yaz",
+        "shared_edit": "Paylaşılan dosyayı düzenle",
+        "shared_list": "Paylaşılan dosyaları listele",
+        "shared_search": "Paylaşılan dosyalarda ara",
+        "browser_navigate": "Web'de gezin",
+        "computer": "Bilgisayarını kullandı",
+        "computer_open_app": "Bir uygulama açtı",
+        "web_fetch": "Sayfayı getir",
+        "web_search": "Web araması",
+        "WebSearch": "Web araması",
+        "leads_people_search": "Kişi bul",
+        "leads_email_find": "E-posta bul",
+        "leads_email_verify": "E-posta doğrula",
+        "leads_phone_find": "Telefon bul",
+        "google_serp": "Google sonuçları",
+        "google_maps_search": "Google Maps araması",
+        "paid_data": "Ücretli veri",
+        "paid_data_catalog": "Ücretli veri kataloğu",
+        "paid_data_read": "Ücretli veri oku",
+        "download": "İndir",
+        "memory_write": "Belleğe kaydet",
+        "memory_recall": "Bellekten hatırla",
+        "brain_search": "Brain'de ara",
+        "brain_read": "Brain'i oku",
+        "brain_propose": "Brain'e öner",
+        "brain_write": "Brain'e yaz",
+        "brain_delete": "Brain'den kaldır",
+        "brain_proposals": "Brain değişikliklerini incele",
+        "brain_decide": "Brain değişikliğine karar ver",
+        "vision_analyze": "Görseli analiz et",
+        "delegate_tasks": "Görev devret",
+        "call_agent": "Coworker çağır",
+        "team_status": "Ekip durumu",
+        "team_list_schedules": "Coworker zamanlamalarını listele",
+        "team_list_triggers": "Coworker tetikleyicilerini listele",
+        "team_list_runs": "Coworker çalıştırmalarını listele",
+        "team_get_run": "Coworker çalıştırmasını oku",
+        "ai_status": "AI sağlayıcılarını kontrol et",
+        "schedule_list": "Zamanlamaları listele",
+        "schedule_create": "Zamanlama oluştur",
+        "schedule_update": "Zamanlamayı güncelle",
+        "schedule_delete": "Zamanlamayı sil",
+        "trigger_list": "Tetikleyicileri listele",
+        "trigger_create": "Tetikleyici oluştur",
+        "trigger_get": "Tetikleyiciyi oku",
+        "trigger_update": "Tetikleyiciyi güncelle",
+        "trigger_rotate_token": "Tetikleyici sırrını yenile",
+        "trigger_delete": "Tetikleyiciyi sil",
+        "skill_list": "Skill'leri listele",
+        "skill_read": "Skill oku",
+        "skill_read_file": "Skill dosyası oku",
+        "skill_write_file": "Skill dosyası yaz",
+        "skill_delete_file": "Skill dosyası sil",
+        "skill_create": "Skill oluştur",
+        "skill_import": "Skill içe aktar",
+        "skill_edit": "Skill düzenle",
+        "skill_update": "Skill güncelle",
+        "skill_delete": "Skill sil",
+        "skill_propose": "Skill önerisi",
+        "soul_update": "Kişiliği güncelle",
+        "verbosity_set": "Yanıt uzunluğunu ayarla",
+        "tool_install": "Araç kur",
+        "mcp_register": "Entegrasyon bağla",
+        "mcp_login": "Entegrasyonda oturum aç",
+        "mcp_login_complete": "Oturum açmayı bitir",
+        "mcp_status": "Entegrasyon durumu",
+        "mcp_search": "Araç bul",
+        "card_table": "Tablo göster",
+        "card_file": "Dosya göster",
+        "image_generation": "Görsel oluştur",
+        "table_view_save": "Tablo görünümünü kaydet",
+        "table_view_delete": "Tablo görünümünü sil",
+        "rerun_hub_service_search": "Uygulama ara",
+        "rerun_hub_service_details": "Uygulama ayrıntıları",
+        "rerun_hub_service_install": "Uygulama kur",
+        "rerun_hub_service_list_installed": "Uygulamaları listele",
+        "rerun_hub_service_uninstall": "Uygulamayı kaldır",
+        "rerun_hub_publish_file": "Dosya yayınla",
+        "rerun_hub_unpublish_file": "Dosyayı yayından kaldır",
+        "rerun_hub_list_published": "Yayınlanan dosyaları listele",
+        "task_complete": "Görev tamamlandı",
+        "list_spaces": "Boxes listesi",
+        "list_agents": "Coworker'ları listele",
+        "get_agent": "Coworker oku",
+        "create_agent": "Coworker oluştur",
+        "update_agent": "Coworker güncelle",
+        "delete_agent": "Coworker sil",
+        "list_ai_connections": "AI sağlayıcılarını listele",
+        "set_default_model": "Varsayılan modeli ayarla",
+        "list_skills": "Skill'leri listele",
+        "get_skill": "Skill oku",
+        "upsert_skill": "Skill yaz",
+        "delete_skill": "Skill sil",
+        "list_schedules": "Zamanlanmış görevleri listele",
+        "upsert_schedule": "Görev zamanla",
+        "run_schedule_now": "Görevi şimdi çalıştır",
+        "delete_schedule": "Zamanlanmış görevi sil",
+        "list_runs": "Çalıştırmaları listele",
+        "get_run": "Çalıştırmayı oku",
+        "search_connectors": "Uygulama ara",
+        "list_agent_connectors": "Uygulamaları listele",
+        "attach_connector": "Uygulama ekle",
+        "detach_connector": "Uygulamayı kaldır",
+        "send_message": "Coworker'a mesaj gönder",
+        "create_boxes": "Boxes oluştur",
+        "build_team": "Ekip kur",
+        "write_agent": "SOUL ve kurulumu yazılıyor",
+        "rename_box": "Box'ı yeniden adlandır",
+        "delete_box": "Box'ı sil",
+        "focus_agent": "Coworker aç",
+        "show_agents": "Coworker'ları göster",
+        "open_connector_setup": "Uygulama kurulumunu aç",
+        "open_settings": "Ayarları aç",
+        "recenter_board": "Panoyu ortala",
+        "open_brain_page": "Brain'i aç",
+        "read_attachment": "Eki oku",
+        "search_docs": "Belgelerde ara",
+        "rerun_hub_search_docs": "Belgelerde ara",
+        "analyze_website": "Web sitesini oku",
+        "save_profile": "Profili kaydet",
+        "save_needs": "İhtiyaçları kaydet",
+        "list_templates": "Şablonlara göz at",
+        "propose_plan": "Plan yaz",
+        "install_template": "Şablon kur",
+        "install_shared_agent": "Paylaşılan coworker kur",
+        "open_template_card": "Şablonu aç",
+        "start_agent_setup": "Kurulumu devret",
+        "open_checkout": "Denemeyi başlat",
+        "open_template_purchase": "Şablon satın al",
+        "ask_choice": "Kullanıcıya sordu",
+        "ask_either": "Kullanıcıya sordu",
+        "ask_input": "Kullanıcıya sordu",
+        "show_templates": "Şablonları gösterdi",
+        "show_plan": "Planı gösterdi",
+        "show_starter_pack": "Başlangıç paketini gösterdi",
+        "contact_team": "Ekiple iletişim önerdi",
+        "ask_user": "Kullanıcıya sordu",
+        "request_approval": "Onay istedi",
+        "suggest_service": "Bir uygulama önerdi",
+        "request_secret": "Kimlik bilgisi istedi",
+        "request_mcp_sign_in": "Bir MCP sunucusunda oturum açmanızı istedi",
+        "request_takeover": "Tarayıcıyı devralmanızı istedi",
+        "request_spend": "Kredi harcamak için izin istedi",
+        "notify_user": "Size bildirim gönderdi",
+        "install_complete": "Kurulumu tamamladı",
+        "remote_computers": "Bağlı bilgisayarlara baktı",
+        "remote_exec": "#{computer} üzerinde {program, select, none {bir komut çalıştırdı} other {{program} çalıştırdı}}",
+        "request_computer_access": "#{computer} için izin istedi",
+        "remote_job": "#{computer} üzerinde iş kontrol etti",
+        "remote_file_list": "#{computer} dosyalarını listeledi",
+        "remote_file_read": "#{computer} üzerinde bir dosya okudu",
+        "remote_file_write": "#{computer} üzerine bir dosya yazdı",
+        "remote_transfer": "#{computer} ile bir dosya kopyaladı"
+    },
+    "activities": {
+        "shell_exec": "Komut çalıştırılıyor",
+        "fs_read": "Dosya okunuyor",
+        "fs_write": "Dosya yazılıyor",
+        "fs_edit": "Dosya düzenleniyor",
+        "fs_list": "Dosyalar listeleniyor",
+        "fs_search": "Dosyalarda aranıyor",
+        "shared_read": "Paylaşılan dosya okunuyor",
+        "shared_write": "Paylaşılan dosya yazılıyor",
+        "shared_edit": "Paylaşılan dosya düzenleniyor",
+        "shared_list": "Paylaşılan dosyalar listeleniyor",
+        "shared_search": "Paylaşılan dosyalarda aranıyor",
+        "browser_navigate": "Web'de geziniyor",
+        "computer": "Bilgisayarını kullanıyor",
+        "computer_open_app": "Bir uygulama açıyor",
+        "web_fetch": "Sayfa okunuyor",
+        "web_search": "Web'de aranıyor",
+        "WebSearch": "Web'de aranıyor",
+        "leads_people_search": "Kişiler bulunuyor",
+        "leads_email_find": "E-posta bulunuyor",
+        "leads_email_verify": "E-posta doğrulanıyor",
+        "leads_phone_find": "Telefon numarası bulunuyor",
+        "google_serp": "Google'da aranıyor",
+        "google_maps_search": "Google Maps'te aranıyor",
+        "download": "İndiriliyor",
+        "memory_write": "Belleğe kaydediliyor",
+        "memory_recall": "Bellekten hatırlanıyor",
+        "brain_search": "Brain'de aranıyor",
+        "brain_read": "Brain okunuyor",
+        "brain_propose": "Brain değişikliği öneriliyor",
+        "brain_write": "Brain'e yazılıyor",
+        "vision_analyze": "Bir görsele bakıyor",
+        "image_generation": "Görsel oluşturuluyor",
+        "delegate_tasks": "Görevler devrediliyor",
+        "call_agent": "Bir coworker çağrılıyor",
+        "team_status": "Ekip kontrol ediliyor",
+        "team_list_runs": "Coworker çalıştırmaları okunuyor",
+        "team_get_run": "Coworker çalıştırması okunuyor",
+        "ai_status": "AI sağlayıcıları kontrol ediliyor",
+        "skill_read": "Skill okunuyor",
+        "skill_read_file": "Skill okunuyor",
+        "skill_create": "Skill oluşturuluyor",
+        "skill_edit": "Skill düzenleniyor",
+        "skill_update": "Skill güncelleniyor",
+        "mcp_search": "Araçlar bulunuyor",
+        "rerun_hub_service_search": "Uygulamalarda aranıyor",
+        "rerun_hub_service_install": "Uygulama kuruluyor",
+        "list_agents": "Ekibe bakıyor",
+        "create_agent": "Coworker oluşturuluyor",
+        "update_agent": "Coworker güncelleniyor",
+        "send_message": "Coworker'a mesaj gönderiyor",
+        "build_team": "Ekip kuruluyor",
+        "search_docs": "Belgelerde aranıyor",
+        "rerun_hub_search_docs": "Belgelerde aranıyor",
+        "analyze_website": "Web sitesi okunuyor",
+        "list_templates": "Şablonlara göz atıyor",
+        "propose_plan": "Plan yazılıyor",
+        "install_template": "Şablon kuruluyor",
+        "remote_computers": "Bağlı bilgisayarlara bakıyor",
+        "remote_exec": "#{computer} üzerinde {program, select, none {bir komut çalıştırılıyor} other {{program} çalıştırılıyor}}"
+    },
+    "paidData": {
+        "people": {
+            "search": "Kişiler bulunuyor",
+            "email": {
+                "find": "E-postalar bulunuyor",
+                "verify": "E-postalar doğrulanıyor"
+            },
+            "phone": {
+                "find": "Telefon numaraları bulunuyor"
+            },
+            "enrich": "Kişiler zenginleştiriliyor",
+            "identity": {
+                "resolve": "LinkedIn profilleri bulunuyor"
+            }
+        },
+        "companies": {
+            "search": "Şirketler bulunuyor",
+            "enrich": "Şirketler zenginleştiriliyor",
+            "similar": "Benzer şirketler bulunuyor",
+            "jobs": {
+                "search": "İş ilanları okunuyor"
+            },
+            "news": "Şirket haberleri okunuyor"
+        },
+        "google": {
+            "serp": {
+                "organic": "Google sonuçları okunuyor",
+                "maps": "Google Maps'te aranıyor",
+                "local": "Yerel sıralamalar okunuyor",
+                "news": "Google News okunuyor"
+            },
+            "keywords": {
+                "volume": "Arama hacimleri kontrol ediliyor",
+                "ideas": "Kelime fikirleri bulunuyor",
+                "trends": "Google Trends okunuyor"
+            }
+        },
+        "ai-search": {
+            "perplexity": {
+                "answer": "Perplexity'ye soruluyor"
+            }
+        },
+        "web": {
+            "backlinks": {
+                "summary": "Backlink'ler okunuyor",
+                "list": "Backlink'ler listeleniyor"
+            },
+            "anchors": {
+                "list": "Bağlantı metinleri okunuyor"
+            },
+            "url": {
+                "metrics": "Alan adı otoritesi kontrol ediliyor"
+            }
+        },
+        "linkedin": {
+            "user": {
+                "profile": "LinkedIn okunuyor",
+                "posts": "LinkedIn gönderileri okunuyor"
+            },
+            "company": {
+                "profile": "LinkedIn okunuyor"
+            },
+            "post": {
+                "detail": "LinkedIn gönderileri okunuyor",
+                "comments": "LinkedIn yorumları okunuyor",
+                "reactions": "LinkedIn tepkileri okunuyor"
+            }
+        },
+        "tiktok": {
+            "user": {
+                "profile": "TikTok okunuyor",
+                "videos": "TikTok videoları okunuyor"
+            },
+            "search": {
+                "users": "TikTok'ta aranıyor",
+                "videos": "TikTok'ta aranıyor"
+            },
+            "video": {
+                "detail": "TikTok videoları okunuyor",
+                "comments": "TikTok yorumları okunuyor"
+            },
+            "comment": {
+                "replies": "TikTok yorumları okunuyor"
+            }
+        },
+        "instagram": {
+            "user": {
+                "profile": "Instagram okunuyor",
+                "posts": "Instagram gönderileri okunuyor",
+                "reels": "Instagram reels okunuyor"
+            },
+            "search": {
+                "users": "Instagram'da aranıyor",
+                "reels": "Instagram'da aranıyor"
+            },
+            "hashtag": {
+                "posts": "Instagram hashtag'leri okunuyor"
+            },
+            "post": {
+                "detail": "Instagram gönderileri okunuyor",
+                "comments": "Instagram yorumları okunuyor"
+            }
+        },
+        "x": {
+            "user": {
+                "profile": "X okunuyor",
+                "posts": "X gönderileri okunuyor"
+            },
+            "search": {
+                "posts": "X'te aranıyor"
+            },
+            "post": {
+                "comments": "X yanıtları okunuyor"
+            }
+        },
+        "youtube": {
+            "channel": {
+                "profile": "YouTube okunuyor",
+                "videos": "YouTube videoları okunuyor"
+            },
+            "search": {
+                "videos": "YouTube'da aranıyor"
+            },
+            "video": {
+                "detail": "YouTube videoları okunuyor",
+                "comments": "YouTube yorumları okunuyor"
+            }
+        },
+        "facebook": {
+            "user": {
+                "profile": "Facebook okunuyor",
+                "posts": "Facebook gönderileri okunuyor"
+            },
+            "post": {
+                "comments": "Facebook yorumları okunuyor"
+            }
+        },
+        "reddit": {
+            "subreddit": {
+                "posts": "Reddit okunuyor"
+            },
+            "post": {
+                "detail": "Reddit okunuyor"
+            }
+        }
+    },
+    "errors": {
+        "notFound": "Araç bulunamadı"
+    }
+}

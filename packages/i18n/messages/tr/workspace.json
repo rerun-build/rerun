@@ -1,0 +1,29 @@
+{
+    "settings": {
+        "coworkersLanguage": "Coworker'ların dili",
+        "coworkersLanguageHint": "Coworker'larınızın bir zamanlamayla veya tetikleyiciyle kendi başlarına çalışırken yazdığı dil.",
+        "fallbackName": "Çalışma alanı",
+        "adminOnly": "Çalışma alanı ayarlarını yalnızca bir yönetici değiştirebilir",
+        "nameRequired": "Ad zorunludur",
+        "nameTooLong": "En fazla {max} karakter olmalı",
+        "title": "Çalışma alanı ayarları",
+        "description": "Ekibinizin ve davetlerinizin gördüğü çalışma alanı adınız ve logonuz.",
+        "uploadLogo": "Logo yükle",
+        "name": "Ad",
+        "namePlaceholder": "ör. Acme A.Ş.",
+        "logoLink": "Siteden veya bağlantıdan logo",
+        "noLogoFound": "Bu adreste logo bulunamadı",
+        "pickIllustration": "Veya bir illüstrasyon seçin",
+        "showLess": "Daha az göster",
+        "showAll": "Tümünü göster ({count})"
+    },
+    "access": {
+        "paused": "Önce çalışma alanınızı geri yüklemek için abone olun",
+        "restoring": "Çalışma alanınız geri yüklendiğinde kullanılabilir",
+        "paymentFailed": "Önce çalışma alanınızı geri yüklemek için ödeme bilginizi güncelleyin",
+        "sandboxArchived": "Sandbox'ınız yeniden etkinleştirildiğinde kullanılabilir",
+        "sandboxNone": "Uzman sandbox'ının kendine ait bir ayarı yok",
+        "adminsOnly": "Yalnızca yöneticiler",
+        "sandboxSingleBox": "Bir sandbox'ta tek bir Box bulunur"
+    }
+}

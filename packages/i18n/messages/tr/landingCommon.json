@@ -1,0 +1,310 @@
+{
+    "site": {
+        "title": "Rerun: ChatGPT veya Claude planınızla yapay zeka çalışanları",
+        "description": "Satış, destek, pazarlama ve yönetim için yapay zeka çalışanları. ChatGPT veya Claude planınız, krediler ya da API anahtarınızla çalışır. {trialDays} gün ücretsiz."
+    },
+    "nav": {
+        "items": {
+            "features": "Özellikler",
+            "useCases": "Kullanım alanları",
+            "industries": "Sektörler",
+            "templates": "Şablonlar",
+            "pricing": "Fiyatlandırma",
+            "community": "Topluluk",
+            "resources": "Kaynaklar"
+        },
+        "features": {
+            "coworkers": {
+                "label": "Coworker'lar",
+                "description": "Birine bir iş verin, işi bitmiş olarak geri getirsin."
+            },
+            "coworker-manager": {
+                "label": "Coworker yöneticisi",
+                "description": "Neye ihtiyacınız olduğunu söyleyin, doğru coworker'a iletsin."
+            },
+            "computer-use": {
+                "label": "Bilgisayar kullanımı",
+                "description": "Uygulamalarınızda bir insan gibi çalışır."
+            },
+            "tools": {
+                "label": "{count}+ araç dahil",
+                "description": "Gmail, Stripe, HubSpot ve her MCP sunucusu."
+            },
+            "human-in-the-loop": {
+                "label": "Döngüde insan",
+                "description": "Önemli bir şey yapmadan önce size sorarlar."
+            },
+            "runs-24-7": {
+                "label": "7/24 çalışır, Avrupa'da",
+                "description": "Gece, hafta sonu, dizüstü kapalı: çalışmaya devam eder."
+            },
+            "second-brain": {
+                "label": "İkinci beyin",
+                "description": "Teklifinizi, pazarınızı ve üslubunuzu bilir."
+            },
+            "workspaces": {
+                "label": "Çalışma alanları",
+                "description": "Tek hesap, her işletme için bir çalışma alanı."
+            },
+            "invite-your-team": {
+                "label": "Tüm ekibinizi davet edin",
+                "description": "Herkes, ek ücret olmadan, aynı panoda."
+            },
+            "coworkers-work-together": {
+                "label": "Coworker'lar birlikte çalışır",
+                "description": "Biri potansiyel müşterileri bulur, diğeri onlara yazar."
+            }
+        },
+        "industries": {
+            "agencies": {
+                "label": "Ajans",
+                "description": "Yeni iş, teslimat ve müşteri raporları."
+            },
+            "freelancers": {
+                "label": "Serbest çalışan",
+                "description": "Hiç vakit bulamadığınız arka ofis."
+            },
+            "ecommerce": {
+                "label": "E-ticaret",
+                "description": "Siparişler, stok, yorumlar ve rakipler."
+            },
+            "real-estate": {
+                "label": "Gayrimenkul",
+                "description": "Satıcılar, talepler, ilanlar ve kiralamalar."
+            },
+            "startups": {
+                "label": "Girişim",
+                "description": "Satış hattı, lansmanlar, metrikler ve destek."
+            },
+            "saas": {
+                "label": "SaaS",
+                "description": "Kayıp, geri bildirim, sürümler ve gelen talepler."
+            },
+            "legal": {
+                "label": "Hukuk ve uyum",
+                "description": "Sözleşmeler, yükümlülükler, son tarihler ve denetimler."
+            },
+            "recruiting": {
+                "label": "İşe alım ve İK",
+                "description": "Ön eleme, mülakatlar ve aday takibi."
+            }
+        },
+        "useCases": {
+            "findLeads": {
+                "label": "Müşteri adayı bulun",
+                "description": "İş ilanları, çalışan sayısı ve CRM'iniz, karşılaştırılmış."
+            },
+            "trackSales": {
+                "label": "Satışları takip edin",
+                "description": "Gelir, satış hattı ve tablo, her sabah."
+            },
+            "runAds": {
+                "label": "Reklamlarınızı yönetin",
+                "description": "Harcama her gün okunur, zarar edenler durdurulur."
+            },
+            "watchCompetitors": {
+                "label": "Rakipleri izleyin",
+                "description": "Fiyatları, lansmanları, sizin anahtar kelime açıklarınız."
+            },
+            "createContent": {
+                "label": "İçerik üretin",
+                "description": "Düşen sorgudan yeniden yayımlanan yazıya."
+            },
+            "postSocial": {
+                "label": "Sosyal medyada paylaşın",
+                "description": "Her sabah bir gönderi, yorumlar yanıtlanmış."
+            },
+            "replyCustomers": {
+                "label": "Müşterilere yanıt verin",
+                "description": "Okunmamış konuşmalar sıralanır ve sizin üslubunuzla yanıtlanır."
+            },
+            "triageInbox": {
+                "label": "Gelen kutunuzu ayıklayın",
+                "description": "Etiketlenmiş, yanıtlar taslak hazır, size ikisi kalır."
+            },
+            "prepareMeetings": {
+                "label": "Toplantılarınıza hazırlanın",
+                "description": "Her görüşmeden önce kiminle buluşacağınıza dair kısa bir özet."
+            },
+            "trackOrders": {
+                "label": "Siparişlerinizi takip edin",
+                "description": "Gecikenler tespit edilir, önce müşterileriniz bilgilendirilir."
+            }
+        },
+        "community": {
+            "experts": {
+                "label": "Uzmanlar",
+                "description": "Onaylı coworker geliştiricilerine göz atın ve onları işe alın."
+            },
+            "discord": {
+                "label": "Discord",
+                "description": "Topluluğa katılın ve anında yardım alın."
+            }
+        },
+        "resources": {
+            "docs": {
+                "label": "Dokümantasyon",
+                "description": "Coworker'larınızı oluşturun, bağlayın ve yayına alın."
+            },
+            "blog": {
+                "label": "Blog",
+                "description": "Ürün haberleri, rehberler ve coworker taktikleri."
+            }
+        },
+        "faq": "SSS",
+        "solution": "Çözüm",
+        "trialCta": "$0 ile denemeye başla",
+        "openMenu": "Menüyü aç",
+        "closeMenu": "Menüyü kapat",
+        "menu": "Menü",
+        "main": "Ana",
+        "starOnGithub": "GitHub'da yıldız verin",
+        "login": "Giriş yap",
+        "download": "İndir",
+        "openWebApp": "Web uygulamasını aç",
+        "browseAll": {
+            "label": "Tüm şablonlara göz atın",
+            "description": "Kütüphanenin tamamı, tüm kategoriler tek sayfada."
+        },
+        "becomeExpert": "Uzman olun",
+        "startFree": "Ücretsiz başlayın",
+        "goToApp": "Uygulamaya git",
+        "logo": {
+            "brandKit": "Marka kitini görüntüle",
+            "copy": "Logoyu kopyala (SVG)",
+            "download": "Logoyu indir"
+        }
+    },
+    "github": {
+        "star": "Yıldız ver",
+        "ariaStar": "GitHub'da Rerun'a yıldız verin",
+        "ariaCount": "GitHub'da Rerun, {count} yıldız"
+    },
+    "heroCta": "Hemen ücretsiz başlayın",
+    "finalCta": {
+        "proof": "{count}+ işletme Rerun ile çalışıyor",
+        "titleLead": "Zaten ödediğiniz <switch></switch>",
+        "titleTail": "planıyla <mark>coworker'lar işe alın.</mark>",
+        "steps": {
+            "plug": "Aboneliğinizi bağlayın",
+            "hire": "Coworker'larınızı kurun",
+            "run": "İşinizi coworker'larla yürütün"
+        },
+        "step": "{rank}. {label}"
+    },
+    "openSource": {
+        "announce": "Rerun artık açık kaynak<wide>, AGPL-3.0 lisansıyla</wide>",
+        "cta": "GitHub'da yıldız verin"
+    },
+    "footer": {
+        "ctaTitle": "İlk coworker'ınız<br></br>üç dakika uzakta",
+        "ctaButton": "Ücretsiz başlayın",
+        "tagline": "İşlerinizi coworker'lara yaptırın. Onları oluşturun, çalışmalarını izleyin ve her şeyi gözünüzün önünde tutun.",
+        "productHuntAlt": "Rerun - İşi gerçekten yapan açık kaynak yapay zeka coworker'ları | Product Hunt",
+        "columns": {
+            "features": "Özellikler",
+            "industries": "Sektörler",
+            "solutions": "Çözümler",
+            "compare": "Karşılaştır",
+            "guides": "Rehberler",
+            "resources": "Kaynaklar",
+            "legal": "Yasal"
+        },
+        "resources": {
+            "about": "Hakkımızda",
+            "docs": "Dokümanlar",
+            "github": "GitHub",
+            "pricing": "Fiyatlandırma",
+            "support": "Destek",
+            "templates": "Şablonlar",
+            "compare": "Karşılaştır",
+            "blog": "Blog",
+            "findExpert": "Uzman bulun",
+            "becomeExpert": "Uzman olun",
+            "whatsNew": "Yenilikler",
+            "brandKit": "Marka kiti",
+            "community": "Topluluk",
+            "affiliate": "Satış Ortaklığı Programı",
+            "partnerBadge": "İş ortağı rozeti"
+        },
+        "compareLink": "Rerun ve {name}",
+        "guides": {
+            "aiEmployees": "Yapay zeka çalışanları",
+            "smallBusiness": "Küçük işletmeler için yapay zeka ajanları",
+            "cost": "Yapay zeka çalışanı maliyeti",
+            "noCode": "Kodsuz yapay zeka ajanı oluşturucular",
+            "n8n": "n8n alternatifleri",
+            "personal": "Kişisel yapay zeka ajanları",
+            "hermes": "Hermes alternatifleri"
+        },
+        "legal": {
+            "terms": "Hizmet Koşulları",
+            "refunds": "İade Politikası",
+            "acceptableUse": "Kabul Edilebilir Kullanım",
+            "creatorTerms": "Üretici Koşulları",
+            "privacy": "Gizlilik Politikası",
+            "cookies": "Çerez Politikası",
+            "dpa": "Veri İşleme Sözleşmesi"
+        },
+        "copyright": "© {year} Rerun, {legalName}. Tüm hakları saklıdır.",
+        "language": "Dil",
+        "categories": {
+            "agencies": "Ajanslar",
+            "ecommerce": "E-ticaret",
+            "saas": "SaaS",
+            "sales": "Satış",
+            "recruiting": "İşe alım",
+            "real-estate": "Gayrimenkul",
+            "legal": "Hukuk ve uyum",
+            "creators": "İçerik üreticileri",
+            "productivity": "Verimlilik",
+            "other": "Diğer"
+        },
+        "cookieSettings": "Çerez ayarları"
+    },
+    "discord": "Discord'umuza katılın",
+    "tabNudge": {
+        "firstCoworker": "İlk coworker'ınıza 3 dk",
+        "allDay": "Sizin için 7/24 çalışan coworker'lar",
+        "welcomeGuest": "Tekrar hoş geldiniz. İlk coworker'ınız 3 dakika uzakta.",
+        "welcomeMember": "Tekrar hoş geldiniz. Coworker'larınız uygulamada çalışıyor.",
+        "start": "Ücretsiz başlayın",
+        "goToApp": "Uygulamaya git",
+        "dismiss": "Kapat"
+    },
+    "notFound": {
+        "homeAria": "Rerun ana sayfası",
+        "title": "Bu sayfa senaryodan çıktı.",
+        "body": "Aradığınız sayfa yok ya da taşındı. Sizi doğru yola geri götürelim.",
+        "back": "Ana sayfaya dön"
+    },
+    "crash": {
+        "title": "Bir sorun oluştu.",
+        "body": "Bu sayfada beklenmeyen bir hata oluştu. Kaldığınız yerden devam etmek için yeniden yükleyin.",
+        "reload": "Yeniden yükle",
+        "back": "Ana sayfaya dön"
+    },
+    "og": {
+        "default": {
+            "line1": "Görevlerinizi",
+            "line2": "yapay zeka yapsın",
+            "accent": "Siz uyurken bile."
+        },
+        "experts": {
+            "line1": "En iyi yapay zeka",
+            "accent": "uzmanlarını işe alın",
+            "cta": "Uzman tutun",
+            "hire": "İşe al",
+            "badges": {
+                "Studio": "Stüdyo",
+                "Freelancer": "Serbest çalışan",
+                "Expert": "Uzman"
+            }
+        },
+        "compare": {
+            "vs": "Rerun ve",
+            "cta": "Karşılaştırmayı görün"
+        }
+    },
+    "composerPlaceholder": "Bir mesaj gönderin..."
+}

@@ -34,7 +34,7 @@ const GROUPINGS: { value: GroupMode; label: 'groupRecent' | 'groupByBox' }[] = [
 ]
 
 // Each language in its own words, whatever the current one: Hermes has no Intl.DisplayNames.
-const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', fr: 'Français', es: 'Español', pt: 'Português', de: 'Deutsch' }
+const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', fr: 'Français', es: 'Español', pt: 'Português', de: 'Deutsch', tr: 'Türkçe' }
 
 const AVATAR_SIZE = 44
 

@@ -1,0 +1,128 @@
+{
+    "menu": {
+        "app": {
+            "about": "{name} Hakkında",
+            "hide": "{name} Uygulamasını Gizle",
+            "hideOthers": "Diğerlerini Gizle",
+            "showAll": "Tümünü Göster",
+            "quit": "{name} Uygulamasından Çık",
+            "checkForUpdates": "Güncellemeleri Denetle…",
+            "changeServer": "Sunucuyu Değiştir…"
+        },
+        "file": {
+            "title": "Dosya",
+            "closeWindow": "Pencereyi Kapat",
+            "newWindow": "Yeni Pencere"
+        },
+        "edit": {
+            "title": "Düzen",
+            "undo": "Geri Al",
+            "redo": "Yinele",
+            "cut": "Kes",
+            "copy": "Kopyala",
+            "paste": "Yapıştır",
+            "pasteAndMatchStyle": "Yapıştır ve Stili Eşleştir",
+            "delete": "Sil",
+            "selectAll": "Tümünü Seç",
+            "find": "Bul…"
+        },
+        "view": {
+            "title": "Görüntü",
+            "reload": "Yeniden Yükle",
+            "forceReload": "Zorla Yeniden Yükle",
+            "toggleDevTools": "Geliştirici Araçlarını Aç/Kapat",
+            "actualSize": "Gerçek Boyut",
+            "zoomIn": "Yakınlaştır",
+            "zoomOut": "Uzaklaştır",
+            "toggleFullScreen": "Tam Ekranı Aç/Kapat"
+        },
+        "window": {
+            "title": "Pencere",
+            "minimize": "Küçült",
+            "zoom": "Büyüt",
+            "front": "Tümünü Öne Getir"
+        },
+        "help": {
+            "title": "Yardım",
+            "docs": "Belgeler"
+        }
+    },
+    "offline": {
+        "title": "Rerun'a ulaşılamıyor",
+        "body": "Bağlantınızı kontrol edin. Uygulama şu sunucuya kendiliğinden yeniden bağlanır: {host}",
+        "unavailable": "{host} şu anda yanıt vermiyor. Uygulama kendiliğinden tekrar dener.",
+        "retry": "Tekrar dene"
+    },
+    "incompatible": {
+        "title": "Devam etmek için Rerun'ı güncelleyin",
+        "body": "Uygulamanın bu sürümü şu sunucu için çok eski: {host}",
+        "download": "En son sürümü indir",
+        "downloading": "Güncelleme indiriliyor… %{percent}",
+        "restart": "Yeniden başlat ve güncelle"
+    },
+    "unload": {
+        "message": "Bu sayfadan ayrılınsın mı?",
+        "detail": "Bir coworker hâlâ çalışıyor veya bir dosyada kaydedilmemiş değişiklikler var.",
+        "leave": "Ayrıl",
+        "stay": "Kal"
+    },
+    "find": {
+        "placeholder": "Sayfada bul",
+        "matches": "{active} / {total}",
+        "noMatches": "Sonuç yok",
+        "previous": "Önceki eşleşme",
+        "next": "Sonraki eşleşme",
+        "close": "Kapat"
+    },
+    "server": {
+        "title": "Sunucunuza bağlanın",
+        "description": "Kullandığınız Rerun sunucusunun adresini girin.",
+        "label": "Sunucu adresi",
+        "connect": "Bağlan",
+        "invalid": "rerun.example.com gibi bir adres girin.",
+        "unreachable": "Bu adreste yanıt veren bir şey yok.",
+        "notRerun": "Bu adres bir Rerun sunucusu değil.",
+        "tooOld": "Bu sunucu uygulamanın {version} veya daha yeni bir sürümünü gerektiriyor.",
+        "insecure": "Bu adres şifrelenmemiş. Sunucu bu bilgisayarda çalışmıyorsa https:// kullanın.",
+        "useRerunCloud": "Rerun Cloud'u kullan",
+        "cancel": "İptal"
+    },
+    "updates": {
+        "upToDate": "Güncelsiniz",
+        "upToDateDetail": "Rerun {version} en son sürüm.",
+        "failed": "Güncellemeler denetlenemedi",
+        "readyToInstall": "Rerun {version} yüklenmeye hazır",
+        "readyDetail": "Güncellemeyi tamamlamak için uygulama yeniden başlar.",
+        "restartNow": "Şimdi Yeniden Başlat",
+        "later": "Daha Sonra"
+    },
+    "tray": {
+        "open": "{name} Uygulamasını Aç",
+        "waiting": "{count, plural, one {# sizi bekliyor} other {# sizi bekliyor}}",
+        "openAtLogin": "Girişte Aç",
+        "stillRunning": "{name} burada çalışmaya devam ediyor. Bu simgeden çıkabilirsiniz.",
+        "quickAsk": "Hızlı Sor",
+        "quickAskVoice": "Sesli Hızlı Sor"
+    },
+    "context": {
+        "addToDictionary": "Sözlüğe Ekle",
+        "openLink": "Bağlantıyı Tarayıcıda Aç",
+        "copyLink": "Bağlantıyı Kopyala",
+        "copyImage": "Görseli Kopyala",
+        "saveImage": "Görseli Kaydet"
+    },
+    "computer": {
+        "defaultName": "Bilgisayarım",
+        "chooseFolder": "Coworker'ların çalışacağı klasörü seçin",
+        "trayOnline": "Bu bilgisayar: çevrimiçi",
+        "trayOffline": "Bu bilgisayar: çevrimdışı",
+        "trayPaused": "Bu bilgisayar: duraklatıldı",
+        "trayJobs": "{count, plural, one {Bu bilgisayar: # iş çalışıyor} other {Bu bilgisayar: # iş çalışıyor}}",
+        "pause": "Bu Bilgisayarda Coworker'ları Duraklat",
+        "resume": "Bu Bilgisayarda Coworker'ları Sürdür",
+        "quitWithJobs": "{count, plural, one {Bu bilgisayarda bir coworker işi çalışıyor} other {Bu bilgisayarda # coworker işi çalışıyor}}",
+        "quitWithJobsDetail": "Rerun'dan çıkmak işi durdurur. Çalışmaya devam etmesi için bunun yerine pencereyi kapatın.",
+        "quitAnyway": "Yine de Çık",
+        "keepRunning": "Çalışmaya Devam Et"
+    }
+}

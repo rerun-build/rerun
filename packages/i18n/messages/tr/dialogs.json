@@ -1,0 +1,681 @@
+{
+    "account": {
+        "emailChangeNeedsCurrentAddress": "Bu değişikliğin hâlâ mevcut adresinizden onaylanması gerekiyor.",
+        "emailUpdated": "E-posta güncellendi",
+        "phoneUpdated": "Telefon numarası güncellendi",
+        "connectFailed": "{provider} bağlanamadı. Tekrar deneyin.",
+        "disconnectFailed": "{provider} bağlantısı kesilemedi. Tekrar deneyin.",
+        "onlySignInMethod": "{provider}, bu hesaba bağlı tek oturum açma yöntemi.",
+        "disconnected": "{provider} bağlantısı kesildi",
+        "changeEmail": "E-postayı değiştir",
+        "addEmail": "E-posta ekle",
+        "changePhone": "Telefon numarasını değiştir",
+        "addPhone": "Telefon numarası ekle",
+        "googleNeedsBrowser": "Google'ı bağlamak için Rerun'ı tarayıcınızda açın."
+    },
+    "members": {
+        "title": "Üyeler",
+        "description": "Yöneticiler faturalandırmayı, üyeleri ve ayarları yönetir. Üyeler coworker'ları kullanır.",
+        "adminOnly": "Üyeleri yalnızca bir yönetici yönetebilir",
+        "seatsFullOne": "Çalışma alanınız tek kullanıcıyla sınırlı.",
+        "seatsFull": "Çalışma alanınız {count, plural, one {# kullanıcı} other {# kullanıcı}} ile sınırlı.",
+        "fallbackLabel": "Üye",
+        "nowAdmin": "{name} artık yönetici",
+        "nowMember": "{name} artık üye",
+        "removed": "{name} çalışma alanından çıkarıldı",
+        "unknownUser": "Bilinmeyen kullanıcı",
+        "lastAdmin": "Çalışma alanında en az bir yönetici olmalı",
+        "you": "Siz",
+        "adminBadge": "Yönetici",
+        "manage": "Yönet: {email}",
+        "makeAdmin": "Yönetici yap",
+        "makeMember": "Üye yap",
+        "remove": "Çıkar",
+        "removeConfirm": {
+            "title": "{email} çıkarılsın mı?",
+            "description": "Bu çalışma alanına ve içindeki her şeye erişimini hemen kaybeder. Daha sonra yeniden davet edebilirsiniz."
+        },
+        "revokeConfirm": {
+            "title": "{email} daveti iptal edilsin mi?",
+            "description": "Davet bağlantısı çalışmayı durdurur. İstediğiniz zaman yenisini gönderebilirsiniz.",
+            "confirm": "İptal et"
+        },
+        "invite": {
+            "assignLater": "sonra atanacak",
+            "pending": "Bekliyor",
+            "revoke": "Daveti iptal et",
+            "linkHint": "Bu bağlantıyı şu adrese gönderin: {email}. Yalnızca o kişi için, bir kez çalışır.",
+            "copyLink": "Davet bağlantısını kopyala",
+            "emailLabel": "E-postayla davet et",
+            "emailPlaceholder": "teammate@rerun.build",
+            "boxes": "Boxes",
+            "submit": "Davet et",
+            "sent": "Davet gönderildi: {email}"
+        },
+        "scope": {
+            "all": {
+                "label": "Tüm Boxes",
+                "description": "Çalışma alanına açık her Box"
+            },
+            "assigned": {
+                "label": "Hiçbiri, sonra ata",
+                "description": "Yalnızca sizin verdiğiniz Boxes"
+            }
+        },
+        "boxes": {
+            "title": "{person} için Boxes",
+            "back": "Üyelere dön",
+            "adminsSeeAll": "Yöneticiler her Box'a erişebilir",
+            "sharedField": "Çalışma alanıyla paylaşılan Boxes",
+            "sharedAll": "Herkese açık her Box'ı kullanır",
+            "sharedAssigned": "Yalnızca aşağıda adı geçen Boxes'ı kullanır",
+            "limit": {
+                "title": "{person}, adı geçen Boxes ile sınırlansın mı?",
+                "confirm": "Sınırla"
+            },
+            "group": "Boxes",
+            "empty": "Henüz Box yok",
+            "everyone": {
+                "label": "Herkes",
+                "description": "Kullanabilir, Box çalışma alanına açık"
+            },
+            "coworkers": "{count, plural, one {# coworker} other {# coworker}}",
+            "coworkersRestricted": "{count, plural, one {# coworker} other {# coworker}} · Yalnızca seçilen kişiler",
+            "accessTo": "Erişim: {box}",
+            "restrictBox": "Bu Box'ı kısıtla",
+            "restrict": {
+                "title": "{box} kısıtlansın mı?",
+                "description": "Yalnızca {person}, üzerinde zaten adı geçen kişiler ve yöneticiler erişimi korur.",
+                "confirm": "Kısıtla"
+            },
+            "removeAccess": {
+                "title": "{box} erişimi kaldırılsın mı?",
+                "confirm": "Kaldır"
+            }
+        }
+    },
+    "createWorkspace": {
+        "nameRequired": "Ad gerekli",
+        "invitesFailed": "Çalışma alanı oluşturuldu, ancak {count, plural, one {# davet} other {# davet}} gönderilemedi. Ekip arkadaşlarınızı davet etmek için planınızı yükseltin.",
+        "steps": {
+            "name": {
+                "title": "Çalışma alanınıza ad verin",
+                "description": "Bir çalışma alanı Boxes, coworker'lar ve ekibinizi bir araya getirir. Adını sonra değiştirebilirsiniz."
+            },
+            "icon": {
+                "title": "Bir simge seçin",
+                "description": "Çalışma alanınız için bir görsel seçin. Daha sonra değiştirebilirsiniz."
+            },
+            "team": {
+                "title": "Ekibinizi davet edin",
+                "description": "Bu çalışma alanında birlikte çalışmak için ekip arkadaşlarınızı ekleyin."
+            }
+        },
+        "name": "Ad",
+        "namePlaceholder": "ör. Acme A.Ş.",
+        "email": "E-posta",
+        "emailPlaceholder": "teammate@rerun.build",
+        "emailHint": "Çalışma alanını oluşturduğunuzda ekip arkadaşlarınıza e-posta daveti gider. Davet için Team veya Scale planı gerekir.",
+        "add": "Ekle",
+        "removeMember": "Çıkar: {email}",
+        "open": "Çalışma alanını aç",
+        "back": "Geri",
+        "continue": "Devam et",
+        "creating": "Oluşturuluyor",
+        "create": "Çalışma alanı oluştur",
+        "preview": {
+            "you": "siz",
+            "namePlaceholder": "Çalışma alanı adı",
+            "solo": "Tek kişi",
+            "members": "Üyeler",
+            "owner": "Sahip"
+        }
+    },
+    "deleteAccount": {
+        "title": "Hesabınız silinsin mi?",
+        "description": "Oturumunuz kapatılacak ve bu hesaba bir daha giriş yapamayacaksınız. Yalnızca sizin bulunduğunuz çalışma alanları kalıcı olarak durur. Bu işlem geri alınamaz.",
+        "typeToConfirm": "Onaylamak için <strong>{word}</strong> yazın.",
+        "confirm": "Sil"
+    },
+    "deleteBox": {
+        "title": "Box silinsin mi?",
+        "holdsCoworkers": "Bu Box hâlâ {count, plural, one {# coworker içeriyor. Önce onu başka bir Box'a taşıyın veya silin.} other {# coworker içeriyor. Önce onları başka bir Box'a taşıyın veya silin.}}",
+        "description": "Bu işlem geri alınamaz. Box kalıcı olarak kaldırılacak.",
+        "typeToConfirm": "Onaylamak için <strong>{name}</strong> yazın.",
+        "confirm": "Sil"
+    },
+    "claimBox": {
+        "title": "Yeni Box",
+        "description": "Box'a ad verin veya önerilen bir adı seçin.",
+        "boxFirst": {
+            "heading": "Önce bir Box oluşturun",
+            "description": "Yeni coworker'ınız oraya yerleşir ve onu siz yönetirsiniz."
+        }
+    },
+    "boxExplainer": {
+        "title": "Box nedir?",
+        "points": {
+            "room": {
+                "label": "Çalışma alanının bir odası",
+                "description": "Her ekip, müşteri veya proje için bir tane."
+            },
+            "home": {
+                "label": "Birçok coworker'ın evi",
+                "description": "Coworker'lar içinde yan yana yaşar ve çalışır."
+            },
+            "shared": {
+                "label": "Hiçbir şey duvarla ayrılmaz",
+                "description": "Her coworker, çalışma alanının dosyalarını ve verilerini paylaşır."
+            },
+            "free": {
+                "label": "Ücretsiz ve anında",
+                "description": "İşin gerektirdiği kadar oluşturun."
+            }
+        }
+    },
+    "phoneVerification": {
+        "title": "Son bir adım",
+        "subtitle": "Telefon numaranızı ekleyin."
+    },
+    "boxAccess": {
+        "title": "Erişim: {box}",
+        "description": "Erişim bu Box'taki her coworker için geçerlidir",
+        "unnamedBox": "Adsız Box",
+        "visibilityField": "Bu Box'ı kimler kullanabilir",
+        "visibility": {
+            "workspace": "Çalışma alanındaki herkes",
+            "restricted": "Yalnızca seçilen kişiler"
+        },
+        "people": "Kişiler",
+        "addPeople": "Kişi ekle",
+        "emptyRestricted": "Şimdilik bu Box'ı yalnızca yöneticiler kullanabilir.",
+        "emptyOpen": "Bu Box'ı yönetebilmeleri için kişileri ekleyin.",
+        "restrict": {
+            "title": "{box} kısıtlansın mı?",
+            "descriptionWithPeople": "Erişimi yalnızca burada listelenen kişiler ve yöneticiler korur.",
+            "descriptionEmpty": "Siz kişi ekleyene kadar erişimi yalnızca yöneticiler korur.",
+            "confirm": "Kısıtla"
+        },
+        "admin": "Yönetici",
+        "createdBox": "Bu Box'ı oluşturdu",
+        "accessOf": "Erişim: {person}",
+        "remove": {
+            "title": "{person} çıkarılsın mı?",
+            "confirm": "Çıkar",
+            "ariaLabel": "Çıkar: {person}"
+        },
+        "add": {
+            "title": "Kişi ekle",
+            "back": "Erişime dön",
+            "peopleField": "Kişiler",
+            "placeholder": "Ekip arkadaşlarını seçin",
+            "search": "Ada veya e-postaya göre ara",
+            "empty": "Eklenecek kimse kalmadı",
+            "accessField": "Erişim",
+            "submit": "Ekle",
+            "submitMany": "{count, plural, one {# kişi} other {# kişi}} ekle"
+        },
+        "levels": {
+            "none": {
+                "label": "Erişim yok",
+                "description": "Bu Box'ı görmez"
+            },
+            "use": {
+                "label": "Kullanabilir",
+                "description": "Coworker'larıyla sohbet eder ve işlerini görür"
+            },
+            "manage": {
+                "label": "Yönetebilir",
+                "description": "Ayrıca coworker'ları düzenler, taşır ve siler"
+            }
+        },
+        "teammate": "Ekip arkadaşı",
+        "adminOnly": "Bir Box'a kimin erişebileceğini yalnızca bir yönetici değiştirebilir",
+        "adminsAlways": "Yöneticiler her zaman erişebilir",
+        "manageReason": "Bunu yalnızca bir yönetici veya bu Box'ın yöneticisi değiştirebilir",
+        "outcome": {
+            "admin": "Yöneticiler her Box'a erişimini korur; bu yalnızca satırı kaldırır.",
+            "restricted": "Bu Box'a ve coworker'larına erişimini hemen kaybeder.",
+            "manage": "Bu Box'ı yönetmeyi bırakır. Box çalışma alanındaki herkese açık kalır.",
+            "use": "Kendi erişimi kalkar. Box çalışma alanındaki herkese açık kalır.",
+            "scope": "Yalnızca aşağıda adı geçen Boxes kalır. Herkese açık her Box'a erişimini hemen kaybeder.",
+            "level": "Bu Box'a ve coworker'larına erişimini hemen kaybeder."
+        }
+    },
+    "newBox": {
+        "heading": "Yeni Box'ınıza ad verin",
+        "description": "Box, panonuzdaki bir addır; coworker'larınızı departmana göre ayırdığınız bir yer.",
+        "creating": "Oluşturuluyor…",
+        "createNamed": "Oluştur: {name}",
+        "create": "Box oluştur",
+        "nameLabel": "Box adı",
+        "failed": "Box oluşturulamadı",
+        "placeholderName": "Pazarlama",
+        "suggestedNames": {
+            "clients": "Müşteriler",
+            "marketing": "Pazarlama",
+            "newBusiness": "Yeni İş",
+            "operations": "Operasyonlar",
+            "finance": "Finans",
+            "personal": "Kişisel",
+            "store": "Mağaza",
+            "customerCare": "Müşteri Hizmetleri",
+            "supplyChain": "Tedarik Zinciri",
+            "product": "Ürün",
+            "engineering": "Mühendislik",
+            "support": "Destek",
+            "sales": "Satış",
+            "accounts": "Muhasebe",
+            "recruiting": "İşe Alım",
+            "listings": "İlanlar",
+            "legal": "Hukuk",
+            "compliance": "Uyum",
+            "content": "İçerik",
+            "business": "İşletme",
+            "community": "Topluluk",
+            "sponsors": "Sponsorlar",
+            "work": "İş",
+            "projects": "Projeler",
+            "admin": "Yönetim",
+            "ops": "Ops"
+        }
+    },
+    "renameBox": {
+        "title": "Box'ı yeniden adlandır",
+        "description": "Panoda okuduğunuz ad. Başka hiçbir şey buna bağlı değil.",
+        "nameLabel": "Ad",
+        "placeholder": "Adsız Box",
+        "submit": "Yeniden adlandır",
+        "nameRequired": "Ad gerekli",
+        "nameTooLong": "En fazla {max} karakter kullanın"
+    },
+    "newAgent": {
+        "title": "Yeni coworker",
+        "description": "İşi tarif edin veya bir öneriden ya da şablondan başlayın.",
+        "headingNamed": "{name} ne yapmalı?",
+        "heading": "Yeni coworker'ınız ne yapmalı?",
+        "suggestionsForBox": "Veya {boxName} için seçilenlerden biriyle başlayın"
+    },
+    "renameAgent": {
+        "title": "Coworker'ı yeniden adlandır",
+        "description": "Panoda ve sohbetlerde görünen ad. @handle da buna uyar.",
+        "nameLabel": "Ad",
+        "submit": "Yeniden adlandır",
+        "nameRequired": "Ad gerekli",
+        "nameTooLong": "En fazla {max} karakter kullanın"
+    },
+    "deleteAgent": {
+        "title": "Bu coworker silinsin mi?",
+        "description": "Bu işlem coworker'ı ve motordaki verilerini kalıcı olarak siler. Bu işlem geri alınamaz.",
+        "typeToConfirm": "Onaylamak için <b>{name}</b> yazın.",
+        "confirm": "Sil"
+    },
+    "importAgent": {
+        "title": "Coworker içe aktar",
+        "description": "Ajanınız skill'leri, görevleri ve hafızasıyla birlikte kendini buraya taşır.",
+        "connectorUrl": "Bağlayıcı URL'si",
+        "copyConnectorUrl": "Bağlayıcı URL'sini kopyala",
+        "pasteIn": "Şuraya yapıştırın: {source}",
+        "expires": "24 saatte sona erer.",
+        "copyPrompt": "Prompt'u kopyala",
+        "otherSource": "Diğer",
+        "grokConnectorStep": "URL'yi grok.com/connectors sayfasında özel bağlayıcı olarak ekleyin, ardından prompt'u yapıştırın."
+    },
+    "agentShare": {
+        "unavailable": "Bu paylaşım bağlantısı artık kullanılamıyor",
+        "titleNamed": "Ekle: {name}",
+        "title": "Bu coworker'ı ekle",
+        "description": "Bu coworker'ın ne yaptığını inceleyin, ardından panonuza yerleştirin.",
+        "sentBy": "{name} size bu coworker'ın bir kopyasını gönderdi. Kendi Box'ınızda çalışacak.",
+        "sentBySomeone": "Biri size bu coworker'ın bir kopyasını gönderdi. Kendi Box'ınızda çalışacak."
+    },
+    "templateDeepLink": {
+        "unavailable": "Bu şablon bağlantısı artık kullanılamıyor",
+        "titleNamed": "\"{title}\" şablonunu yükle",
+        "title": "Bu şablonu yükle",
+        "description": "Bu şablonun neler yüklediğini inceleyin, ardından coworker'larını panonuza yerleştirin."
+    },
+    "createTemplate": {
+        "defaultDescription": "Sandbox'ınızdan bir şablon taslağı hazırlayın. Rerun ekibi yayına girmeden önce inceler.",
+        "title": "Yeni şablon",
+        "doneLabel": "Şablonu aç",
+        "titleField": "Başlık",
+        "titlePlaceholder": "ör. Outbound SDR",
+        "helperWithSlug": "{length}/{limit} · /templates/{slug}",
+        "helperEmpty": "{length}/{limit} · Herkese açık adres başlıktan oluşturulur.",
+        "titleRequired": "Başlık gerekli",
+        "continue": "Devam et"
+    },
+    "expertProfile": {
+        "title": "Herkese açık profiliniz",
+        "submit": "Kaydet ve yayınla",
+        "submitting": "Kaydediliyor…",
+        "saved": "Herkese açık profiliniz güncellendi."
+    },
+    "apiKeys": {
+        "title": "API anahtarları",
+        "description": "Claude Code'u veya herhangi bir MCP istemcisini bu çalışma alanına bağlayın.",
+        "connectSection": "İstemci bağla",
+        "keysSection": "Anahtarlar",
+        "docsLink": "API anahtarları",
+        "newKeyName": "Yeni anahtar adı",
+        "newKeyPlaceholder": "ör. Claude Code, MacBook",
+        "create": "Anahtar oluştur",
+        "revoked": "{name} iptal edildi",
+        "adminOnly": "API anahtarlarını yalnızca bir yönetici yönetebilir",
+        "empty": "Henüz anahtar yok. Bir anahtar tüm çalışma alanına erişim verir, ona bir parola gibi davranın.",
+        "lastUsed": "{time} kullanıldı",
+        "neverUsed": "Hiç kullanılmadı",
+        "revokeThisKey": "Bu anahtarı iptal et",
+        "created": {
+            "warning": "Bu anahtarı şimdi kopyalayın. Bir daha gösterilmeyecek.",
+            "copyKey": "Anahtarı kopyala",
+            "dismiss": "Kopyaladım"
+        },
+        "revoke": {
+            "title": "Bu anahtar iptal edilsin mi?",
+            "description": "{name} hemen çalışmayı durdurur ve onunla çalışan her şey çalışma alanına erişimini kaybeder. Anahtar geri getirilemez, ancak yenisini oluşturabilirsiniz.",
+            "descriptionUnnamed": "Bu anahtar hemen çalışmayı durdurur ve onunla çalışan her şey çalışma alanına erişimini kaybeder. Anahtar geri getirilemez, ancak yenisini oluşturabilirsiniz.",
+            "confirm": "İptal et"
+        }
+    },
+    "copy": {
+        "snippet": "Kopyala: {label}",
+        "fullGuide": "Tam kurulum kılavuzu"
+    },
+    "servers": {
+        "title": "Sunucular",
+        "description": "Coworker'larınızın çalıştığı makine. Çalışma alanı başına bir tane.",
+        "connected": "Bağlı",
+        "unreachable": "Ulaşılamıyor",
+        "runningSummary": "{address} · {count, plural, other {# coworker çalışıyor}}",
+        "runningSummaryWithCommit": "{address} · {count, plural, other {# coworker çalışıyor}} · {commit}",
+        "unreachableSummary": "{address} · uygulama şu anda ona ulaşamıyor",
+        "thisWorkspace": "Bu çalışma alanının sunucusu",
+        "remove": "Kaldır",
+        "manualSection": "Sunucuyu elle girin",
+        "address": "Adres",
+        "apiKey": "API anahtarı",
+        "apiKeyPlaceholder": "Motorun RERUN_API_KEY değeri",
+        "back": "Geri",
+        "connect": "Bağlan",
+        "addSection": "Sunucu ekle",
+        "addIntro": "Coworker'larınız size ait bir makinede çalışır. Bunu Docker kurulu olan o makinede çalıştırın. Kendiliğinden bağlanır.",
+        "publicAddress": "Uygulamanın ona ulaştığı adres (isteğe bağlı)",
+        "copyCommand": "Komutu kopyala",
+        "waiting": "Sunucu bekleniyor. Komut bir kez, 15 dakika boyunca çalışır.",
+        "enterManually": "Adres ve anahtar girin",
+        "add": "Sunucu ekle",
+        "removed": "Sunucu kaldırıldı",
+        "confirmRemove": {
+            "title": "Bu sunucu kaldırılsın mı?",
+            "description": "Yeniden bir sunucu bağlanana kadar coworker'larınız yanıt vermez. Bildikleri her şey makinede kalır: onları geri almak için makineyi yeniden bağlayın.",
+            "confirm": "Kaldır"
+        }
+    },
+    "aiProviders": {
+        "title": "Yapay zeka sağlayıcıları",
+        "description": "Coworker'larınızın çalıştığı planlar ve API anahtarları."
+    },
+    "knowledgeBase": {
+        "title": "Brain",
+        "description": "Bu çalışma alanındaki her coworker'ın şirketiniz hakkında bildikleri ve paylaştıkları dosyalar ile tablolar."
+    },
+    "clearMemories": {
+        "title": "Tüm anılar silinsin mi?",
+        "description": "Bu işlem bu coworker'ın tüm anılarını kalıcı olarak siler. Bu işlem geri alınamaz.",
+        "confirm": "Tümünü sil"
+    },
+    "deleteTable": {
+        "title": "“{table}” tablosu silinsin mi?",
+        "description": "Bu işlem tablonun tamamını ve tüm satırlarını kalıcı olarak siler. Bu işlem geri alınamaz.",
+        "confirm": "Sil"
+    },
+    "purgeTable": {
+        "title": "“{table}” tablosu boşaltılsın mı?",
+        "description": "Bu işlem, geçerli aramanın gizlediği satırlar dahil tablodaki her satırı siler. Tablo ve sütunları kalır. Bu işlem geri alınamaz.",
+        "confirm": "Boşalt"
+    },
+    "notifications": {
+        "title": "Bildirimler",
+        "tabs": {
+            "coworkers": "Coworker'lar",
+            "account": "Hesap"
+        },
+        "descriptions": {
+            "coworkers": "Sizi rahatsız etmeye değecek şeyler. Siz değiştirdikçe kaydedilir.",
+            "account": "Hangi hesap e-postalarını alacağınızı seçin."
+        },
+        "pickCoworker": "Bir coworker seçin"
+    },
+    "notificationPermission": {
+        "title": "Coworker'ınız bitirdiğinde bildirim almak ister misiniz?",
+        "description": "Bu sekmeyi kapattıktan sonra da çalışmaya devam eder. Size ihtiyaç duyduğunda haber veririz.",
+        "enable": "Bildirimleri aç",
+        "later": "Şimdi değil"
+    },
+    "confirm": {
+        "confirm": "Sil"
+    },
+    "closeRunningTab": {
+        "title": "Bu konuşma kapatılsın mı?",
+        "description": "Ajan bu konuşma üzerinde hâlâ çalışıyor. Sekmeyi kapatmak çalıştırmayı durdurmaz: arka planda devam eder.",
+        "confirm": "Kapat"
+    },
+    "shortcuts": {
+        "title": "Klavye kısayolları",
+        "description": "Bu kısayollarla Rerun'da daha hızlı gezinin.",
+        "groups": {
+            "general": "Genel",
+            "chat": "Sohbet",
+            "files": "Dosyalar"
+        },
+        "actions": {
+            "controlCenter": "Kontrol merkezini aç",
+            "askRerun": "Sohbet dışında Chief of Staff'ınıza sorun",
+            "holdToTalk": "Chief of Staff'ınızla konuşmak için basılı tutun",
+            "searchInPage": "Sayfada ara",
+            "newConversation": "Yeni konuşma",
+            "closeTab": "Etkin sekmeyi kapat",
+            "sendMessage": "Mesaj gönder",
+            "newLine": "Yeni satır",
+            "previousFile": "Önceki dosya",
+            "nextFile": "Sonraki dosya"
+        }
+    },
+    "viewSettings": {
+        "layoutDescriptions": {
+            "table": "Değerleri sütunlar arasında karşılaştırın.",
+            "list": "Bir adla okunan satırlar: kişiler, şirketler, mesajlar.",
+            "gallery": "Bir resimle tanınan satırlar: ürünler, ilanlar.",
+            "board": "Durumlar arasında ilerleyen satırlar: bir satış hattı, görevler."
+        },
+        "editTitle": "Görünümü düzenle",
+        "newTitle": "Yeni görünüm",
+        "description": "<mono>{table}</mono> tablosunun bir görünümü. Bu tabloyu açan herkes onu görür ve coworker onu sohbette çizebilir.",
+        "name": "Ad",
+        "namePlaceholder": "ör. Satış hattı",
+        "layout": "Düzen",
+        "columns": "Sütunlar",
+        "columnsHint": "İşaretlenmemiş sütunlar tabloda kalır, yalnızca bu görünümde gizlenir.",
+        "groupBy": "Grupla",
+        "roles": {
+            "title": "Başlık",
+            "subtitle": "Alt başlık",
+            "image": "Görsel",
+            "badge": "Rozet",
+            "value": "Değer",
+            "date": "Tarih"
+        },
+        "pictureShape": "Resim biçimi",
+        "shapes": {
+            "square": "Kare",
+            "landscape": "Yatay",
+            "portrait": "Dikey"
+        },
+        "sortBy": "Sırala",
+        "insertionOrder": "Ekleme sırası",
+        "ascending": "Artan",
+        "descending": "Azalan",
+        "formats": "Biçimler",
+        "formatsHint": "Her değerin nasıl okunacağı: fiyat, tarih, puan, durum.",
+        "formatOf": "Biçim: {column}",
+        "plainFormat": "Düz",
+        "colors": "Renkler",
+        "colorsBoardHint": "Burada listelenen sütunlar bu sırayla önce gelir.",
+        "emptyValue": "Boş",
+        "colorOf": "Renk: {value}",
+        "colorOfEmpty": "Boş değerlerin rengi",
+        "automaticColor": "Otomatik",
+        "create": "Görünüm oluştur",
+        "none": "Yok",
+        "pickColumn": "Bir sütun seçin",
+        "preview": "Önizleme",
+        "nameRequired": "Görünüme ad verin",
+        "titleColumnRequired": "Her öğenin adını veren sütunu seçin",
+        "groupByRequired": "Değerleri sütunlara dönüşecek sütunu seçin"
+    },
+    "engineWaitlist": {
+        "title": "Şu anda kapasitemiz dolu",
+        "subtitle": "Bugün çok fazla ekip katıldı ve tüm makineler dolu. Bekleme listesindesiniz: yanıtlarınız kaydedildi ve bir makine boşalır boşalmaz bu sayfa kendiliğinden açılacak.",
+        "signedInAs": "<b>{email}</b> olarak oturum açıldı",
+        "signOut": "Oturumu kapat"
+    },
+    "sandboxReactivation": {
+        "title": "Yeniden etkinleştirme iste",
+        "description": "İsteğinizi onayladığımızda sandbox'ınız geri gelir.",
+        "asideTitle": "Sandbox'ım neden arşivlendi?",
+        "points": {
+            "archived": {
+                "label": "30 gün kullanılmadığı için arşivlendi",
+                "description": "Sandbox bir makineyi çalışır tutar; kimsenin açmadığı sandbox makineyi geri verir."
+            },
+            "kept": {
+                "label": "Hiçbir şey atılmadı",
+                "description": "Coworker'larınız, hafızaları ve dosyaları arşivle birlikte kaydedilir."
+            },
+            "reviewed": {
+                "label": "Her isteği inceliyoruz",
+                "description": "Ne geliştirdiğinizi anlatın, sandbox'ınızı geri getirelim."
+            },
+            "restored": {
+                "label": "Tam bıraktığınız gibi geri gelir",
+                "description": "Onaylandıktan sonra geri yükleme birkaç dakika sürer."
+            }
+        },
+        "noteLabel": "Ne geliştirmeyi planlıyorsunuz?",
+        "noteHint": "Bir iki cümle yeterli.",
+        "submit": "İstek gönder",
+        "failed": "İsteğiniz gönderilemedi. Lütfen tekrar deneyin."
+    },
+    "paidApp": {
+        "slotAdded": "Planınıza yer eklendi.",
+        "slotAddedTrial": "Yer eklendi, denemeniz boyunca {price}.",
+        "slotRemoved": "Yer iade edildi. Bir sonraki yenilemenize kadar kullanılabilir."
+    },
+    "linkedinPro": {
+        "description": "Coworker'larınızın kullandığı LinkedIn hesapları.",
+        "connectDescription": "Coworker'larınızın kullanacağı LinkedIn hesabını bağlayın.",
+        "approvalNotSeen": "LinkedIn henüz onayı görmedi. Uygulamada Evet'e dokunun, ardından tekrar deneyin.",
+        "codeResent": "Yeni bir kod yolda.",
+        "connect": {
+            "title": "LinkedIn'i bağla",
+            "reconnectTitle": "LinkedIn'i yeniden bağla",
+            "back": "LinkedIn Pro'ya dön"
+        },
+        "checkpoint": {
+            "title": "Siz olduğunuzu onaylayın",
+            "hint": "LinkedIn ikinci bir adım istiyor",
+            "cancel": "Oturum açmayı iptal et"
+        }
+    },
+    "whatsappPro": {
+        "description": "Coworker'larınızın kullandığı WhatsApp numaraları.",
+        "connectDescription": "Coworker'larınızın kullanacağı WhatsApp numarasını bağlayın.",
+        "connect": {
+            "title": "WhatsApp'ı bağla",
+            "reconnectTitle": "WhatsApp'ı yeniden bağla",
+            "back": "WhatsApp Pro'ya dön"
+        },
+        "link": {
+            "title": "Telefonu bağla",
+            "hint": "WhatsApp, Rerun'ı bağlı cihaz olarak ekler",
+            "cancel": "Bağlamayı iptal et"
+        }
+    },
+    "subscriptionOffer": {
+        "title": "Coworker'larınızı Claude veya ChatGPT planınızla çalıştırın",
+        "titleWithoutClaude": "Coworker'larınızı ChatGPT planınızla veya bir API anahtarıyla çalıştırın",
+        "back": "Geri",
+        "connect": "Bağla",
+        "or": "veya",
+        "useApiKey": "API anahtarı kullan",
+        "plans": {
+            "claude": "Claude Pro veya Max",
+            "codex": "ChatGPT Plus veya Pro"
+        },
+        "decline": {
+            "cloud": "Rerun kredileriyle devam edeyim",
+            "selfHosted": "OpenRouter ile devam edeyim"
+        },
+        "offer": {
+            "title": "Rerun, Claude veya ChatGPT aboneliğinizle daha iyi çalışır",
+            "description": "Bağlayın, coworker'larınız zaten ödediğiniz planla çalışsın.",
+            "titleWithoutClaude": "Coworker'larınız kendi yapay zekanızla çalışır",
+            "descriptionWithoutClaude": "ChatGPT planınızı veya bir API anahtarını bağlayın, coworker'larınız onunla çalışsın."
+        },
+        "arguments": {
+            "ownPlan": {
+                "label": "Herkes kendininkini getirir",
+                "description": "Her ekip arkadaşı ödediği planı bağlar. Elden ele dolaşan hesap yok."
+            },
+            "password": {
+                "label": "Rerun parolanızı asla görmez",
+                "description": "Onayı Claude'un veya OpenAI'ın kendi sayfasında verirsiniz, başka hiçbir yerde değil."
+            },
+            "unplug": {
+                "label": "İstediğiniz zaman ayırın",
+                "descriptionCloud": "Tek tıkla bağlantıyı kesin, coworker'larınız Rerun kredilerine geri döner.",
+                "descriptionSelfHosted": "Tek tıkla bağlantıyı kesin, coworker'larınız OpenRouter anahtarınıza geri döner."
+            }
+        },
+        "board": {
+            "title": "Her coworker size ait bir bağlantıda",
+            "description": "İki abonelik ve bir API anahtarı, aynı panoda yan yana.",
+            "crew": {
+                "sales": "Satış",
+                "customer_support": "Müşteri Desteği",
+                "accounting": "Muhasebe"
+            }
+        },
+        "plan": {
+            "title": "{name} planınızı bağlayın",
+            "linked": "Coworker'larınız {name} ile çalışıyor",
+            "switching": "Coworker'larınız {name} planına geçiyor"
+        },
+        "key": {
+            "title": "API anahtarı kullan",
+            "detail": "Coworker'larınız anahtarınızla çalışır, sağlayıcısı token başına faturalandırır.",
+            "opencodeTitle": "OpenCode'u bağla",
+            "opencodeDetail": "OpenCode anahtarınızı yapıştırın: Go modelleri planınızla, Console modelleri kredilerinizle çalışır.",
+            "field": "API anahtarı",
+            "placeholder": "Anahtarınızı yapıştırın",
+            "add": "Anahtar ekle",
+            "connecting": "Bağlanıyor…",
+            "failed": "Anahtar eklenemedi",
+            "somethingWentWrong": "Bir sorun oluştu. Lütfen tekrar deneyin."
+        },
+        "connected": {
+            "title": "{name} bağlandı",
+            "planDetail": "Coworker'larınız artık {name} planınızla çalışıyor.",
+            "opencodeDetail": "Coworker'larınız artık OpenCode Go planınızla çalışıyor.",
+            "keyDetail": "Coworker'larınız artık bu anahtarla çalışıyor.",
+            "done": "Bitti"
+        }
+    },
+    "boxPicker": {
+        "title": "Bir Box seçin",
+        "description": "Yeni coworker boş bir yere, bu Box'a katılır.",
+        "coworkers": "{count, plural, =0 {Henüz coworker yok} one {# coworker} other {# coworker}}"
+    }
+}

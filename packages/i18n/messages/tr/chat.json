@@ -1,0 +1,571 @@
+{
+    "actions": {
+        "copy": "Kopyala",
+        "copied": "Kopyalandı",
+        "connect": "Bağla",
+        "cancel": "İptal",
+        "continue": "Devam et",
+        "notNow": "Şimdi değil",
+        "copiedExclaim": "Kopyalandı!"
+    },
+    "sources": {
+        "used": "{count, plural, one {# kaynak kullanıldı} other {# kaynak kullanıldı}}"
+    },
+    "draft": {
+        "label": "Taslak"
+    },
+    "mcpServer": {
+        "failed": "{name} bağlanamadı",
+        "notAdded": "Eklenmedi",
+        "added": "{name} eklendi",
+        "custom": "Özel MCP sunucusu",
+        "customWithHost": "Özel MCP sunucusu · {host}"
+    },
+    "mcpSignIn": {
+        "title": "{name} için giriş yapın"
+    },
+    "mentions": {
+        "coworkers": "Coworker'lar",
+        "skills": "Skill'ler",
+        "computers": "Bilgisayarlar"
+    },
+    "paidSources": {
+        "count": "{count, plural, one {# kaynak} other {# kaynak}}",
+        "emailsVerified": "{valid} / {checked} e-posta doğrulandı"
+    },
+    "tableCard": {
+        "openDisabledReason": "Veritabanına göz atmak için bu coworker'ı panodan açın."
+    },
+    "conversation": {
+        "emptyTitle": "Henüz mesaj yok",
+        "emptyDescription": "Mesajları burada görmek için bir konuşma başlatın",
+        "scrollToLatest": "Son mesaja kaydır"
+    },
+    "brainProposal": {
+        "create": "Yeni Brain sayfası: {title}",
+        "edit": "Brain değişikliği: {title}",
+        "description": "İncelemeye önerildi. Biri kabul edene kadar hiçbir şey değişmez.",
+        "review": "İncele"
+    },
+    "attachments": {
+        "attach": "Dosya ekle",
+        "open": "{name} dosyasını aç",
+        "position": "{current} / {total}",
+        "previous": "Önceki ek",
+        "next": "Sonraki ek",
+        "download": "İndir",
+        "waiting": "Bekliyor",
+        "finishing": "Tamamlanıyor",
+        "progress": "%{percent}",
+        "progressWithEta": "%{percent} · {eta}",
+        "fileFallback": "dosya",
+        "uploading": "{name} yükleniyor",
+        "retryUpload": "Yüklemeyi yeniden dene",
+        "cancelUpload": "Yüklemeyi iptal et",
+        "remove": "Eki kaldır",
+        "openMore": "{count} tane daha aç",
+        "uploadFailed": "Yükleme başarısız",
+        "uploadingProgress": "Yükleniyor · %{percent}",
+        "retryUploading": "{name} dosyasını yeniden yükle",
+        "removeNamed": "{name} dosyasını kaldır"
+    },
+    "screen": {
+        "openBrowser": "Tarayıcıyı aç",
+        "takeControl": "Kontrolü al"
+    },
+    "composer": {
+        "link": {
+            "open": "Aç",
+            "unlink": "Bağlantıyı kaldır"
+        },
+        "subscriptionCta": "Zaten bir yapay zeka aboneliğine mi ödüyorsunuz? Bu coworker'ı onunla çalıştırın.",
+        "placeholder": "Bir mesaj gönderin...",
+        "attachmentsMissing": "Bazı ekler yüklenmedi. Göndermeden önce onları kaldırıp yeniden ekleyin.",
+        "attachmentsFailed": "{count, plural, one {# ek yüklenemedi. Göndermeden önce yeniden deneyin veya kaldırın.} other {# ek yüklenemedi. Göndermeden önce yeniden deneyin veya kaldırın.}}",
+        "noFiles": "Bu sohbet henüz dosya kabul etmiyor.",
+        "sendFailed": "Mesajınız gönderilemedi",
+        "openEditor": "Tam düzenleyiciyi aç",
+        "stop": "Geçerli çalıştırmayı durdur",
+        "editor": {
+            "title": "Mesajınızı yazın",
+            "description": "Uzun bir mesajı düzenlemek için alan. Enter yeni satır başlatır.",
+            "hint": "Cmd + Enter ile gönderin",
+            "cancel": "İptal",
+            "send": "Gönder"
+        }
+    },
+    "message": {
+        "showLess": "Daha az göster",
+        "showMore": "Daha fazla göster",
+        "openFile": "{path} dosyasını aç",
+        "branch": {
+            "previous": "Önceki dal",
+            "next": "Sonraki dal",
+            "page": "{current} / {total}"
+        },
+        "goodResponse": "İyi yanıt",
+        "badResponse": "Kötü yanıt",
+        "regenerate": "Yeniden oluştur"
+    },
+    "installGate": {
+        "title": "{name} kurulumu",
+        "inProgressTitle": "{name} kuruluyor",
+        "inProgressHint": "Başka bir konuşmada",
+        "facts": "{apps, plural, =0 {~{minutes} dk} one {# uygulama · ~{minutes} dk} other {# uygulama · ~{minutes} dk}}",
+        "continue": "Kuruluma devam et",
+        "installing": "Yükleniyor",
+        "install": "Yükle: {name}",
+        "skip": "Şimdilik atla"
+    },
+    "activity": {
+        "thinking": "Düşünüyor...",
+        "processing": "İsteğiniz işleniyor...",
+        "crafting": "Yanıt hazırlanıyor...",
+        "writing": "Yazıyor...",
+        "runningTool": "Çalıştırılıyor: {tool}",
+        "waitingOn": "Bekleniyor: {name}",
+        "building": "Oluşturuluyor: {name}",
+        "buildingCoworkers": "{count, plural, one {# coworker oluşturuluyor} other {# coworker oluşturuluyor}} · {done} tamamlandı",
+        "waitingOnSubCoworkers": "{count, plural, one {# alt coworker bekleniyor} other {# alt coworker bekleniyor}} · {done} tamamlandı"
+    },
+    "hitlCue": {
+        "question": "{count, plural, =0 {Bekleyen soru} one {Bekleyen soru} other {# bekleyen soru}}",
+        "approval": "{count, plural, =0 {Onay gerekli} one {Onay gerekli} other {# onay gerekli}}",
+        "secret": "{count, plural, =0 {Kimlik bilgisi gerekli} one {Kimlik bilgisi gerekli} other {# kimlik bilgisi gerekli}}",
+        "mcpNamed": "{name} için giriş yapın",
+        "mcp": "Giriş gerekli",
+        "service": "{count, plural, =0 {Bağlanacak uygulama} one {Bağlanacak uygulama} other {Bağlanacak # uygulama}}",
+        "takeover": "Ekranda sıra sizde",
+        "spend": "Onaylanacak harcama",
+        "computer": "#{computer} üzerinde bir komutu onaylayın"
+    },
+    "pendingHitl": {
+        "goTo": "{label}, oraya git"
+    },
+    "reasoning": {
+        "thinking": "Düşünüyor...",
+        "thought": "Düşünce"
+    },
+    "secretRequest": {
+        "saveFailed": "Kimlik bilgileri kaydedilemedi"
+    },
+    "brainChange": {
+        "headline": {
+            "saved": "Brain güncellendi: {title}",
+            "created": "Yeni Brain sayfası: {title}",
+            "deleted": "Brain'den kaldırıldı: {title}",
+            "accepted": "Değişiklik kabul edildi: {title}",
+            "acceptedBy": "Öneri kabul edildi ({name}): {title}",
+            "dismissed": "Değişiklik reddedildi: {title}",
+            "dismissedBy": "Öneri reddedildi ({name}): {title}"
+        },
+        "notes": {
+            "saved": "Kaydedildi. Her coworker bir sonraki çalıştırmasından itibaren okur.",
+            "deleted": "Artık hiçbir coworker okumuyor. Geçmişi saklanır.",
+            "accepted": "Kaydedildi. Her coworker bir sonraki çalıştırmasından itibaren okur.",
+            "dismissed": "Sayfa değişmedi."
+        },
+        "undone": "Geri alındı: {title}",
+        "undoneNote": "Önceki sürüm geri geldi.",
+        "undo": "Geri al",
+        "open": "Aç"
+    },
+    "compaction": {
+        "running": "Bağlam sıkıştırılıyor…",
+        "failed": "Bağlam sıkıştırılamadı",
+        "done": "Bağlam sıkıştırıldı",
+        "summarized": "{count, plural, one {Önceki # mesaj özetlendi} other {Önceki # mesaj özetlendi}}",
+        "recovered": "~{tokens} token geri kazanıldı"
+    },
+    "providerSwitch": {
+        "limit": "{plan} sınırına ulaşıldı · {model}",
+        "limitUntil": "{plan} sınırına ulaşıldı · {time} saatine kadar {model}",
+        "limitUntilDate": "{plan} sınırına ulaşıldı · {date}, {time} saatine kadar {model}",
+        "back": "{plan} sıfırlandı. Yine {model} kullanılıyor."
+    },
+    "scheduledRun": {
+        "label": "Zamanlanmış çalıştırma",
+        "viewPrompt": "Prompt'u görüntüle",
+        "promptTitle": "Prompt: {name}"
+    },
+    "steps": {
+        "count": "{count, plural, one {# adım} other {# adım}}",
+        "countWithFailures": "{count, plural, one {# adım} other {# adım}}, {failed} başarısız",
+        "failed": "{failed} başarısız",
+        "thinking": "Düşünüyor",
+        "compacting": "Sıkıştırılıyor"
+    },
+    "subRun": {
+        "failuresInARow": "Art arda {count} hata",
+        "idle": "{minutes} dk boşta",
+        "stopTask": "Bu görevi durdur",
+        "stopped": "Durduruldu, yapılan kısım korundu",
+        "failed": "Başarısız",
+        "earlier": "+{count} önceki",
+        "verbs": {
+            "search": "Arama {summary}",
+            "read": "Okuma {summary}",
+            "browse": "Gezinme {summary}",
+            "run": "Çalıştırma {summary}",
+            "write": "Yazma {summary}",
+            "edit": "Düzenleme {summary}"
+        }
+    },
+    "triggerPayload": {
+        "truncated": "kısaltıldı",
+        "empty": "İçerik yok",
+        "payload": "İçerik"
+    },
+    "voice": {
+        "sendFailed": "Bu kayıt gönderilemedi.",
+        "sendFailedHint": "Yeniden deneyin ya da silin.",
+        "waitingForMicrophone": "Mikrofon bekleniyor...",
+        "microphone": "Mikrofon...",
+        "transcribing": "Yazıya dökülüyor...",
+        "hideTranscript": "Dökümü gizle",
+        "transcript": "Döküm",
+        "copyTranscript": "Dökümü kopyala",
+        "pause": "Duraklat",
+        "play": "Sesli mesajı oynat",
+        "seek": "Konuma git",
+        "record": "Sesli mesaj kaydet",
+        "discard": "Sil",
+        "discardLabel": "Kaydı sil",
+        "retry": "Yeniden dene",
+        "send": "Gönder",
+        "retryLabel": "Kaydı göndermeyi yeniden dene",
+        "sendLabel": "Kaydı gönder",
+        "unsupported": "Bu tarayıcı sesli mesajları desteklemiyor.",
+        "microphoneBlocked": "Mikrofon erişimi engellendi. Kayıt yapmak için tarayıcı ayarlarınızdan izin verin.",
+        "noMicrophone": "Kullanılabilir mikrofon yok.",
+        "startFailed": "Kayıt başlatılamadı.",
+        "nothingHeard": "Bu kayıtta hiçbir şey duyulamadı.",
+        "voiceMessageFailed": "Sesli mesajınız gönderilemedi.",
+        "nothingRecorded": "Hiçbir şey kaydedilmedi."
+    },
+    "agentInstall": {
+        "started": "Kurulum başladı",
+        "complete": "Kurulum tamamlandı",
+        "viewGuide": "Rehberi görüntüle",
+        "guideTitle": "Kurulum rehberi: {name}"
+    },
+    "setupEvents": {
+        "notificationSent": "Size bir bildirim gönderdi",
+        "read": "Okundu",
+        "schedulesOn": "{count, plural, one {# zamanlama açık} other {# zamanlama açık}}",
+        "triggersOn": "{count, plural, one {# tetikleyici açık} other {# tetikleyici açık}}",
+        "setUp": "{name} kuruldu",
+        "setupComplete": "Kurulum tamamlandı",
+        "connectedHint": "Bağlandı, coworker kullanabilir",
+        "signInHint": "Coworker'ın kullanabilmesi için bir kez giriş yapın",
+        "connected": "Bağlı",
+        "signIn": "Giriş yap"
+    },
+    "takeover": {
+        "opened": "Tarayıcı coworker'ınızın masaüstünde açık. İşiniz bitince buraya dönün.",
+        "opensSite": "Kontrolü sizde olacak şekilde {site} sitesini coworker'ınızın tarayıcısında açar.",
+        "opens": "Kontrolü sizde olacak şekilde coworker'ınızın tarayıcısını açar.",
+        "skipLabel": "Tarayıcı devralmayı atla",
+        "privacy": "Giriş yaptığınız hesaplar, makinenizdeki bu coworker'ın tarayıcısında kalır.",
+        "openAgain": "Yeniden aç",
+        "closing": "Kapatılıyor…",
+        "done": "Bitti",
+        "skip": "Atla",
+        "openBrowser": "Tarayıcıyı aç"
+    },
+    "video": {
+        "play": "Oynat: {name}",
+        "pause": "Duraklat: {name}",
+        "previewUnavailable": "Önizleme kullanılamıyor",
+        "openFullScreen": "Tam ekran aç: {name}"
+    },
+    "tool": {
+        "error": "Hata",
+        "output": "Çıktı",
+        "input": "Girdi",
+        "completedIn": "Tamamlanma süresi: {duration}"
+    },
+    "webhookRun": {
+        "label": "Webhook alındı",
+        "viewPrompt": "Prompt'u görüntüle",
+        "viewPayload": "İçeriği görüntüle",
+        "promptTitle": "Prompt: {name}",
+        "payloadTitle": "İçerik: {name}"
+    },
+    "question": {
+        "tooManyFiles": "En fazla {max} dosya ekleyebilirsiniz. Eklenmeyen: {rejected}.",
+        "uploadsFailed": "{count, plural, one {# ek yüklenemedi. Yanıtlamadan önce yeniden deneyin veya kaldırın.} other {# ek yüklenemedi. Yanıtlamadan önce yeniden deneyin veya kaldırın.}}"
+    },
+    "queued": {
+        "stopping": "Geçerli çalıştırma durduruluyor",
+        "badge": "Sırada",
+        "attachmentsOnly": "Yalnızca ekler",
+        "sendNowStops": "Şimdi gönder, geçerli çalıştırma durur",
+        "sendNow": "Şimdi gönder",
+        "sendNowLabel": "Sıradaki mesajı şimdi gönder",
+        "remove": "Kaldır",
+        "removeLabel": "Sıradaki mesajı kaldır"
+    },
+    "context": {
+        "usedLabel": "Kullanılan bağlam: %{percent}",
+        "title": "Bağlam",
+        "input": "Girdi",
+        "cached": "Önbellekte",
+        "reasoning": "Akıl yürütme",
+        "output": "Çıktı",
+        "total": "Toplam"
+    },
+    "feedback": {
+        "negativeTitle": "Olumsuz geri bildirim verin",
+        "positiveTitle": "Olumlu geri bildirim verin",
+        "categoryLabel": "Ne tür bir sorun bildirmek istiyorsunuz?",
+        "categoryPlaceholder": "Seçin…",
+        "detailsLabel": "Lütfen ayrıntı verin",
+        "negativePlaceholder": "Bu yanıtta sizi tatmin etmeyen neydi?",
+        "positivePlaceholder": "Bu yanıtta sizi tatmin eden neydi?",
+        "disclaimer": "Bu raporu göndermek, coworker'larınızı geliştirebilmemiz için bu konuşmayı Rerun ekibiyle paylaşır.",
+        "cancel": "İptal",
+        "submit": "Gönder",
+        "categories": {
+            "ui_bug": "Arayüz hatası",
+            "did_not_follow": "İsteğime uymadı",
+            "not_factual": "Bilgi olarak yanlış",
+            "incomplete": "Eksik yanıt",
+            "wrong_tool": "Yanlış araç veya uygulama kullanıldı",
+            "tool_error": "Araç veya bağlantı hatası",
+            "too_slow": "Çok yavaş",
+            "memory": "Hafıza sorunu",
+            "other": "Diğer"
+        },
+        "removeFailed": "Geri bildiriminiz kaldırılamadı",
+        "saveFailed": "Geri bildiriminiz kaydedilemedi",
+        "thanks": "Geri bildiriminiz için teşekkürler"
+    },
+    "providerError": {
+        "fallbackTitle": "Bir sorun oluştu",
+        "runInFlight": "Daha önce başlayan bir çalıştırma bu konuşmayı hâlâ meşgul ediyor. Mesajınızı göndermek için onu durdurun.",
+        "stop": {
+            "title": "Bu çalıştırmayı durdurun",
+            "cta": "Çalıştırmayı durdur",
+            "description": "Konuşmayı mesajınız için serbest bırakır."
+        },
+        "newConversation": {
+            "title": "Yeni bir konuşma başlatın",
+            "cta": "Yeni konuşma",
+            "description": "Bu coworker ile yeni bir konuşma açar."
+        },
+        "continue": {
+            "title": "Çalıştırmaya devam edin",
+            "cta": "Devam et",
+            "description": "Coworker'ın kesildiği yerden devam eder."
+        },
+        "retry": {
+            "title": "Tekrar deneyin",
+            "cta": "Yeniden dene",
+            "description": "Son mesajınızı yeniden gönderir."
+        },
+        "switch": {
+            "title": "Başka bir modele geçin",
+            "cta": "Değiştir",
+            "descriptionModel": "Bu konuşma için başka bir model seçin.",
+            "descriptionConnection": "Bu çalışma alanının başka bir bağlantısını seçin."
+        },
+        "reconnect": {
+            "title": "Yeniden bağlanın",
+            "cta": "Yeniden bağlan",
+            "description": "Bu coworker'ın çalıştığı bağlantıda yeniden giriş yapın.",
+            "descriptionReplaceKey": "Yeni anahtarı bu coworker'ın çalıştığı bağlantıya yapıştırın."
+        }
+    },
+    "budget": {
+        "title": "Rerun kredileri",
+        "paused": {
+            "title": "Rerun kredileri duraklatıldı",
+            "body": "Biri devam ettirene kadar coworker'larınız Rerun modellerini veya ücretli verileri kullanamaz.",
+            "actionTitle": "Rerun kredilerini devam ettirin",
+            "actionDescription": "Harcama hemen yeniden başlar.",
+            "cta": "Devam ettir"
+        },
+        "preTrial": {
+            "body": "Yeni hesapla gelen kredinin tamamını kullandınız: {credits}. Gerisi abonelikle açılır.",
+            "actionDescription": "Coworker'larınız çalışmaya devam eder, istediğiniz zaman iptal edin."
+        },
+        "subscribe": {
+            "title": "Hemen abone olun",
+            "cta": "Abone ol",
+            "descriptionTrial": "Denemeniz bugün sona erer. Her ay dahil: {credits}.",
+            "description": "Her ay dahil: {credits}."
+        },
+        "topUp": {
+            "title": "Rerun kredilerinizi yükleyin",
+            "cta": "Kredi yükle",
+            "description": "Ya da bekleyin, gelecek ay sıfırlanır."
+        },
+        "usedUp": {
+            "noCredit": "Bu çalışma alanının henüz Rerun kredisi yok.",
+            "trial": "Ücretsiz denemenizin kredisini tamamen kullandınız: {credits}.",
+            "period": "Bu dönemin Rerun kredilerini tamamen kullandınız."
+        },
+        "ownConnection": {
+            "body": "Bu konuşma Rerun üzerinde çalıştı ve {plan} planınız bağlı."
+        },
+        "runOn": "{plan} ile çalıştır",
+        "or": "Veya",
+        "connectProvider": {
+            "body": "Zaten Claude veya ChatGPT için ödüyor musunuz? Coworker'larınızı bu planla, burada ek ücret ödemeden çalıştırın.",
+            "claude": "Claude'u bağla",
+            "chatgpt": "ChatGPT'yi bağla"
+        },
+        "subscribeToKeepWorking": "Coworker'larınızın çalışmaya devam etmesi için abone olun.",
+        "resetsNextMonth": "Gelecek ay sıfırlanır.",
+        "lifetime": {
+            "ownConnection": "Ömür boyu planınız kendi yapay zekanızla çalışır ve {plan} planınız bağlı.",
+            "connectProvider": "Ömür boyu planınız kendi yapay zekanızla çalışır. Coworker'larınızın çalışmaya devam etmesi için bir API anahtarı ekleyin veya ChatGPT'yi bağlayın.",
+            "connectProviderWithClaude": "Ömür boyu planınız kendi yapay zekanızla çalışır. Coworker'larınızın çalışmaya devam etmesi için bir API anahtarı ekleyin veya Claude ya da ChatGPT'yi bağlayın.",
+            "apiKeyTitle": "API anahtarı kullanın",
+            "apiKeyDescription": "Anthropic, OpenAI, Google, OpenRouter veya özel bir uç nokta.",
+            "apiKeyCta": "Anahtar ekle",
+            "body": "Ömür boyu planınız kendi yapay zekanızla çalışır.",
+            "connectTitle": "Yapay zekanızı bağlayın",
+            "connectDescription": "Bir API anahtarı veya ChatGPT.",
+            "connectDescriptionWithClaude": "Bir API anahtarı, Claude veya ChatGPT.",
+            "connectCta": "Bağla"
+        },
+        "trial": {
+            "onPro": "Pro plandasınız.",
+            "resuming": "Coworker'ınız göreve kaldığı yerden devam ediyor.",
+            "resumingNamed": "{name} göreve kaldığı yerden devam ediyor.",
+            "title": "Deneme kredileri tükendi",
+            "stopped": "{name} durdu.",
+            "continueWithPro": "Pro ile devam et · {price}/ay",
+            "useMyPlan": "Ya da planımı kullan:"
+        }
+    },
+    "receipt": {
+        "status": {
+            "connected": "Bağlandı",
+            "skipped": "Atlandı",
+            "notReconnected": "Yeniden bağlanmadı",
+            "notFound": "Bulunamadı",
+            "stored": "Kaydedildi",
+            "approved": "Onaylandı",
+            "notNow": "Şimdi değil"
+        },
+        "apps": {
+            "title": "Uygulamalar",
+            "meta": "{connected} / {total} bağlandı",
+            "insteadOf": "{name} yerine"
+        },
+        "answers": {
+            "title": {
+                "one": "Yanıt",
+                "other": "Yanıtlar"
+            },
+            "meta": "{answered} / {total} yanıtlandı"
+        },
+        "keys": {
+            "title": "Anahtarlar",
+            "meta": "{stored} / {total} kaydedildi",
+            "note": "Box üzerinde saklanır. Coworker yalnızca adları görür."
+        },
+        "approvals": {
+            "title": {
+                "one": "Onay",
+                "other": "Onaylar"
+            },
+            "metaBoth": "{approved} onaylandı, {declined} şimdi değil",
+            "metaApproved": "{approved} onaylandı",
+            "metaDeclined": "{declined} şimdi değil"
+        },
+        "mcp": {
+            "title": "MCP sunucusu"
+        },
+        "takeover": {
+            "handedBackOn": "Tarayıcıyı şu sayfada geri verdiniz: {url}",
+            "handedBack": "Tarayıcıyı geri verdiniz"
+        },
+        "dismissed": {
+            "service": "Uygulama kurulumunu kapattınız",
+            "question": "Soruları atladınız",
+            "secret": "Anahtarları paylaşmayı reddettiniz",
+            "mcp": "Girişi atladınız",
+            "takeover": "Tarayıcıyı coworker'ınıza bıraktınız"
+        },
+        "computer": {
+            "allowed": "<computer></computer> üzerinde izin verildi",
+            "always": "<computer></computer> üzerinde {rule} için her zaman izin verildi",
+            "denied": "<computer></computer> üzerinde reddedildi"
+        }
+    },
+    "agentChat": {
+        "stopFailed": "Geçerli çalıştırma durdurulamadı. Mesajınız çalıştırma bitince gönderilecek.",
+        "selectModel": "Başlamak için bir model seçin: aşağıdaki model menüsünü açın.",
+        "emptyTitle": "Bir konuşma başlatın",
+        "emptyDescription": "Bu coworker'a bir mesaj gönderin",
+        "runStoppedResponding": "Çalıştırma yanıt vermeyi bıraktı. Başka bir mesaj göndermek için onu durdurun.",
+        "continueWhereLeftOff": "Kaldığınız yerden devam edin.",
+        "alwaysAllowFailed": "\"Sormadan harca\" açılamadı. Bu onay, tahmini tutara kadar geçerli olmaya devam ediyor."
+    },
+    "promptInput": {
+        "tooLarge": "{count, plural, one {{names} eklenemeyecek kadar büyük.} =2 {{names} eklenemeyecek kadar büyük.} other {{names} ve {more} dosya daha eklenemeyecek kadar büyük.}}",
+        "addFiles": "Fotoğraf veya dosya ekle",
+        "takeScreenshot": "Ekran görüntüsü al",
+        "noMatchingFiles": "Kabul edilen türlere uyan dosya yok.",
+        "tooManyFiles": "En fazla {max} dosya ekleyebilirsiniz. Eklenmeyen: {rejected}.",
+        "uploadFiles": "Dosya yükle",
+        "dropFiles": "Eklemek için dosyaları bırakın",
+        "placeholder": "Ne öğrenmek istersiniz?",
+        "stop": "Durdur",
+        "submit": "Gönder"
+    },
+    "spend": {
+        "estimatedTotal": "Tahmini toplam",
+        "creditsUnit": "{count, plural, one {kredi} other {kredi}}",
+        "creditsLeft": "{amount} {count, plural, one {kredi} other {kredi}} kaldı",
+        "creditsMissing": "{amount} eksik",
+        "notNow": "Şimdi değil",
+        "alwaysAllow": "Her zaman izin ver",
+        "approveOnce": "Bir kez onayla",
+        "addCredits": "Kredi ekle",
+        "receipt": {
+            "approvedOnce": "Bir kez onaylandı",
+            "alwaysAllowed": "Her zaman izinli",
+            "notNow": "Şimdi değil",
+            "ofTotal": "/ {amount} {count, plural, one {kredi} other {kredi}}"
+        }
+    },
+    "computerAccess": {
+        "titleCommand": "<computer></computer> üzerinde bir komut çalıştır",
+        "titleCommands": "<computer></computer> üzerinde {count} komut çalıştır",
+        "titleScreen": "<computer></computer> ekranını kullan",
+        "deny": "Reddet",
+        "allow": "İzin ver",
+        "alwaysAllow": "{program} için her zaman izin ver",
+        "interpreterWarning": "{program} için her zaman izin vermek, onun çalıştırdığı her koda izin verir",
+        "alwaysFailed": "Kural bilgisayarda tutulamadı: bu seferlik izin verildi.",
+        "titleFiles": "{count, plural, one {<computer></computer> üzerinde bir dosya kullan} other {<computer></computer> üzerinde # dosya kullan}}",
+        "alwaysAllowFolder": "Bu klasöre her zaman izin ver",
+        "folderNote": "“Her zaman”, şu klasördeki her dosyaya izin verir: {folder}",
+        "inFolder": "Klasör: {folder}"
+    },
+    "computerJob": {
+        "state": {
+            "running": "Çalışıyor",
+            "succeeded": "Bitti",
+            "failed": "Başarısız",
+            "stopped": "Durduruldu",
+            "lost": "Kayboldu",
+            "offline": "Bilgisayar çevrimdışı",
+            "gone": "Kullanılamıyor"
+        },
+        "stop": "Durdur",
+        "offlineNote": "Orada çalışmaya devam ediyor. Bilgisayar geri gelince coworker'a haber gelir.",
+        "lostNote": "Çalışırken bilgisayarda Rerun kapatıldı.",
+        "goneNote": "Bu iş artık okunamıyor: bilgisayar kaldırıldı ya da artık bu işi tanımıyor."
+    },
+    "jobEnd": {
+        "label": "İş <computer>#{handle}</computer> üzerinde bitti",
+        "viewReport": "Raporu görüntüle",
+        "reportTitle": "#{computer} raporu"
+    }
+}

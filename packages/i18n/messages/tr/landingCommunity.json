@@ -1,0 +1,510 @@
+{
+    "metadata": {
+        "layout": {
+            "title": "Uzmanlar",
+            "description": "Rerun'da yapay zeka ajanlarınızı tasarlayacak, yayına alacak ve yürütecek güvenilir geliştiricileri ve stüdyoları keşfedin."
+        },
+        "directory": {
+            "title": "En iyi yapay zeka uzmanlarını işe alın",
+            "description": "Sonuç veren yapay zeka ajanları kuran onaylı geliştiriciler, serbest çalışanlar ve stüdyolarla çalışın. Rerun uzmanlarını beceri ve konuma göre bulun."
+        },
+        "program": {
+            "title": "Rerun uzmanı olun",
+            "description": "Rerun Uzman Programı'na katılın: dizinde yer alın, ücretsiz sandbox'ta ajanlar kurun, şablon satışlarının %95'ini alın ve %20 yinelenen gelir kazanın."
+        }
+    },
+    "jsonLd": {
+        "home": "Ana sayfa",
+        "experts": "Uzmanlar"
+    },
+    "directory": {
+        "eyebrow": "{count, plural, one {# onaylı uzman} other {# onaylı uzman}}",
+        "title": "Yapay zeka uzmanınızı bulun",
+        "description": "En karmaşık sistemlerinizi kuran onaylı geliştiriciler ve stüdyolar: coworker'lar işletmenizin kullandığı her araca ve sürece bağlanır.",
+        "joinAside": "Rerun'da listelenen uzmanlara katılın",
+        "becomeExpert": "Uzman olun",
+        "featured": {
+            "label": "Öne çıkanlar",
+            "title": "Önce aranmaya değer uzmanlar.",
+            "carousel": "öne çıkan uzmanlar"
+        },
+        "grid": {
+            "allLabel": "Tüm uzmanlar",
+            "resultsLabel": "Sonuçlar",
+            "title": "{count, plural, one {# onaylı geliştirici.} other {# onaylı geliştirici ve stüdyo.}}",
+            "clear": "Filtreleri temizle",
+            "empty": "Bu filtrelere uyan uzman yok."
+        }
+    },
+    "filters": {
+        "facets": {
+            "type": {
+                "label": "Tür",
+                "search": "Tür ara"
+            },
+            "availability": {
+                "label": "Müsaitlik",
+                "search": "Müsaitlik ara"
+            },
+            "budget": {
+                "label": "Bütçe",
+                "search": "Bütçe ara"
+            },
+            "skill": {
+                "label": "Beceri",
+                "search": "Beceri ara"
+            },
+            "language": {
+                "label": "Dil",
+                "search": "Dil ara"
+            }
+        },
+        "types": {
+            "studio": "Stüdyo",
+            "freelancer": "Serbest çalışan",
+            "expert": "Uzman"
+        },
+        "availabilities": {
+            "available": "Müsait",
+            "soon": "Yakında müsait",
+            "unavailable": "Müsait değil"
+        },
+        "segment": "{label}: {value}",
+        "any": "tümü",
+        "clear": "Temizle",
+        "noResults": "Sonuç yok",
+        "skills": {
+            "agent-design": "Ajan tasarımı",
+            "workflow-automation": "İş akışı otomasyonu",
+            "rag-knowledge-bases": "RAG ve bilgi tabanları",
+            "integrations-apis": "Entegrasyonlar ve API'ler",
+            "mcp-servers": "MCP sunucuları",
+            "prompt-engineering": "Prompt mühendisliği",
+            "data-pipelines": "Veri hatları",
+            "chatbots-support": "Sohbet botları ve destek",
+            "voice-agents": "Sesli ajanlar",
+            "lead-gen-outreach": "Müşteri adayı ve erişim",
+            "crm-automation": "CRM otomasyonu",
+            "web-scraping": "Web kazıma",
+            "e-commerce-automation": "E-ticaret otomasyonu",
+            "analytics-reporting": "Analitik ve raporlama",
+            "fine-tuning": "İnce ayar",
+            "no-code-automation": "Kodsuz otomasyon"
+        }
+    },
+    "card": {
+        "hire": "İşe al"
+    },
+    "hire": {
+        "title": "{name} ile çalışın",
+        "description": "Projenizi anlatın. Size doğrudan e-postayla yanıt verirler.",
+        "fields": {
+            "name": "Adınız",
+            "namePlaceholder": "Ada Lovelace",
+            "email": "E-posta",
+            "emailPlaceholder": "siz@sirket.com",
+            "website": "Şirket web sitesi",
+            "message": "Mesaj",
+            "messagePlaceholder": "Ne geliştiriyorsunuz ve neye yardıma ihtiyacınız var?"
+        },
+        "submit": "Talep gönder",
+        "sending": "Gönderiliyor...",
+        "sent": {
+            "title": "Talep gönderildi",
+            "description": "{name} size e-postayla dönüş yapacak. Genellikle 24 saat içinde.",
+            "close": "Kapat"
+        },
+        "validation": {
+            "nameRequired": "Ad gerekli",
+            "emailRequired": "E-posta gerekli",
+            "emailInvalid": "Geçersiz e-posta",
+            "urlProtocol": "http:// veya https:// ile başlamalı",
+            "messageTooShort": "Uzmana projeniz hakkında biraz daha bilgi verin",
+            "messageTooLong": "Mesaj çok uzun"
+        },
+        "errors": {
+            "unavailable": "Bu uzman artık müsait değil.",
+            "invalid": "Lütfen formu kontrol edip tekrar deneyin.",
+            "failed": "Bir sorun oluştu. Lütfen tekrar deneyin."
+        }
+    },
+    "program": {
+        "hero": {
+            "eyebrow": "Uzman programı",
+            "title": "<mark></mark>Rerun Uzman Programı'na katılın",
+            "promises": {
+                "listed": "Uzman dizininde yer alın ve müşterilerle eşleşin",
+                "workspace": "İstediğiniz her şeyi kurmak için ücretsiz bir çalışma alanı alın",
+                "templates": "Coworker'lar oluşturun veya içe aktarın, şablon olarak satın ve her satışın %95'ini alın",
+                "revenue": "Getirdiğiniz her müşteri planından %20 yinelenen gelir kazanın"
+            },
+            "findExpert": "Uzman bulun",
+            "joined": "Rerun'da listelenen uzmanlara katılın"
+        },
+        "showcase": {
+            "label": "Dizin",
+            "title": "En iyi yeteneklerin arasında olun.",
+            "lede": "Rerun'da listelenen kişiler ve müşterilerin iletişime geçmeden önce gördüğü profil.",
+            "carousel": "Rerun uzmanları",
+            "browseAll": "Tüm uzmanlara göz atın"
+        },
+        "cta": {
+            "label": "Uzman programı",
+            "title": "Rerun uzmanı olun",
+            "subtitle": "Bir kez başvurun. Her başvuruyu elle inceliyor ve sonraki adımla e-postayla yanıt veriyoruz."
+        },
+        "valueProps": {
+            "badge": "Neden Rerun",
+            "title": "Serbest çalışanlar ve stüdyolar neden Rerun ile çalışıyor.",
+            "subtitle": "Siz coworker'ı teslim edersiniz, müşteri onu çalıştırmaya devam eder. Kiralanacak altyapı yok, kimsenin okumadığı devir belgesi yok.",
+            "cells": {
+                "ship": {
+                    "title": "Aylarda değil, günlerde teslim edin",
+                    "desc": "Kullanıma hazır coworker'lar ve {connectorCount}+ uygulamayla, her biri tek tıkla başlayın. İlk demonuzdan önce kurulacak bir şey yok."
+                },
+                "harness": {
+                    "title": "Yalnızca prompt'u değil, tüm düzeneği kurun",
+                    "desc": "Coworker'ın tam olarak neler yapabileceğini seçin: dosyalar, kabuk, web, hafıza, kendi veritabanı, skill'ler. Her yetenek bir anahtardır."
+                },
+                "board": {
+                    "title": "Sohbet geçmişi değil, canlı bir pano teslim edin",
+                    "desc": "Çalıştırmalar, maliyet, başarı oranı ve insan gerektiren işler panoda canlı. Müşteriniz durum sormak için size yazmadan işin yapıldığını görür."
+                },
+                "handoff": {
+                    "title": "Elinden tutmadan devredin",
+                    "desc": "Hassas bir işten önce coworker durur ve müşterinize sorar. Müşteri uygulamadan veya Slack'ten onaylar, böylece döngüde sonsuza dek siz kalmazsınız."
+                },
+                "running": {
+                    "title": "Siz gittikten sonra da çalışır",
+                    "desc": "Coworker'lar müşterinin kendi makinesinde, bir zamanlamayla veya bir tetikleyiciyle 7/24 çalışır. Bekçilik yok, gece 2'de acil arama yok."
+                },
+                "improving": {
+                    "title": "Sattığınız coworker gelişmeye devam eder",
+                    "desc": "Müşteri hakkında öğrendiklerini not eder, böylece teslim ettiğiniz iş eskimek yerine kendiliğinden keskinleşir."
+                }
+            }
+        },
+        "benefits": {
+            "badge": "Neler kazanırsınız",
+            "title": "Rerun uzmanı olarak daha hızlı büyüyün.",
+            "subtitle": "Tek başvuru, zaten yaptığınız iş için dört farklı kazanç yolu.",
+            "items": {
+                "listed": {
+                    "title": "Uzman dizininde yer alın",
+                    "desc": "Müşterilerin göz attığı, beceri ve bütçeye göre filtrelediği ve tek tıkla iletişime geçtiği herkese açık bir profil. Gelen her talep doğrudan gelen kutunuza düşer."
+                },
+                "sandbox": {
+                    "title": "Sandbox'ınızda ücretsiz geliştirin",
+                    "desc": "Uzman hesapları coworker sınırı ve fatura olmayan bir sandbox alır. Prototip yapın, demo gösterin, sonra bitmiş coworker'ı müşteriye teslim edin."
+                },
+                "templates": {
+                    "title": "Şablon satışlarınızın %95'ini alın",
+                    "desc": "Bir coworker'ı şablon olarak paketleyin, pazar yerinde yayımlayın ve biri onu her yüklediğinde kazanın. Fiyatı siz belirlersiniz, her satışın %95'i sizin, ödemeyi biz hallederiz."
+                },
+                "revenue": {
+                    "title": "Getirdiğiniz her müşteriden %20 kazanın",
+                    "desc": "Sisteme aldığınız bir müşteri abone olduğunda, kaldığı sürece her ay Rerun planının %20'sini kazanırsınız."
+                }
+            }
+        },
+        "perks": {
+            "badge": "Uzman avantajı",
+            "title": "Her Rerun uzmanının aldıkları.",
+            "subtitle": "Tek seviye, toplanacak puan yok. Başvurunuz kabul edildiği gün değişenler şunlar.",
+            "regular": {
+                "title": "Normal hesap",
+                "subtitle": "Her Rerun kullanıcısı"
+            },
+            "expert": {
+                "title": "Rerun uzmanı",
+                "subtitle": "Programa kabul edilmiş"
+            },
+            "rows": {
+                "directory": {
+                    "label": "Dizinde yer alma",
+                    "regular": "Listelenmez, müşteriler sizi bulamaz",
+                    "expert": "Müşterilerin bulup filtreleyebildiği herkese açık bir profil"
+                },
+                "matching": {
+                    "label": "Müşteri eşleştirme",
+                    "regular": "Müşteri adaylarınızı kendiniz ararsınız",
+                    "expert": "Gelen talepler beceri ve bütçeye göre size yönlendirilir"
+                },
+                "sandbox": {
+                    "label": "Sandbox",
+                    "regular": "Coworker sınırları ve her çalışma alanında fatura",
+                    "expert": "Müşteri coworker'larını kurmak ve göstermek için sınırsız ve ücretsiz"
+                },
+                "marketplace": {
+                    "label": "Şablon pazar yeri",
+                    "regular": "Şablonlara göz atın ve yükleyin",
+                    "expert": "Coworker'larınızı yayımlayın ve her satışın %95'ini alın"
+                },
+                "revenue": {
+                    "label": "Gelir paylaşımı",
+                    "regular": "Yok",
+                    "expert": "Getirdiğiniz müşteri planlarından %20 yinelenen gelir"
+                },
+                "community": {
+                    "label": "Topluluk",
+                    "regular": "Dokümanlar ve ortak destek kutusu",
+                    "expert": "Özel bir kanal ve ekiple doğrudan iletişim"
+                },
+                "earlyAccess": {
+                    "label": "Erken erişim",
+                    "regular": "Özellikler herkese açıldığında",
+                    "expert": "Yeni özellikler ve modeller herkese açılmadan önce"
+                },
+                "coMarketing": {
+                    "label": "Ortak pazarlama",
+                    "regular": "Yok",
+                    "expert": "Öne çıkan profiller, vaka çalışmaları ve lansman desteği"
+                }
+            }
+        },
+        "apply": {
+            "button": "Uzman olarak başvurun",
+            "sent": {
+                "title": "Başvuru alındı",
+                "description": "Her başvuruyu elle inceliyoruz. Uygun olursa üretici hesabınızı ve sandbox'ınızı almanız için bağlantı içeren bir e-posta alırsınız.",
+                "close": "Kapat"
+            },
+            "title": "Uzman Programı'na başvurun",
+            "description": "Bize kendinizi anlatın. Sonraki adımla e-postayla yanıt veriyoruz.",
+            "fields": {
+                "name": "Ad veya stüdyo",
+                "namePlaceholder": "Ada Lovelace",
+                "email": "E-posta",
+                "emailPlaceholder": "siz@studyo.com",
+                "type": "Çalışma şekliniz",
+                "location": "Konum",
+                "locationPlaceholder": "İstanbul, Türkiye",
+                "website": "Web sitesi veya portfolyo",
+                "linkedin": "LinkedIn",
+                "x": "X"
+            },
+            "types": {
+                "freelancer": "Serbest çalışan",
+                "studio": "Stüdyo"
+            },
+            "submit": "Başvuruyu gönder",
+            "sending": "Gönderiliyor...",
+            "validation": {
+                "nameRequired": "Ad gerekli",
+                "emailRequired": "E-posta gerekli",
+                "emailInvalid": "Geçersiz e-posta",
+                "locationTooLong": "Konum çok uzun",
+                "urlProtocol": "http:// veya https:// ile başlamalı"
+            },
+            "errors": {
+                "alreadyApplied": "Bu e-posta zaten kayıtlı. Size dönüş yapacağız.",
+                "invalid": "Lütfen formu kontrol edip tekrar deneyin.",
+                "failed": "Bir sorun oluştu. Lütfen tekrar deneyin."
+            }
+        }
+    },
+    "visuals": {
+        "harness": {
+            "capabilities": {
+                "filesystem": {
+                    "label": "Dosya okuma ve yazma",
+                    "blurb": "Çalışma alanındaki dosyalarla çalışır"
+                },
+                "shell": {
+                    "label": "Komut çalıştırma",
+                    "blurb": "Box'ında komutlar çalıştırır"
+                },
+                "web": {
+                    "label": "Web'de gezinme",
+                    "blurb": "Web sayfalarını arar ve okur"
+                },
+                "memory": {
+                    "label": "Hatırlama",
+                    "blurb": "Bilgileri kaydeder ve hatırlar"
+                },
+                "db": {
+                    "label": "Verilere erişim",
+                    "blurb": "Kendi veritabanını sorgular"
+                },
+                "skills": {
+                    "label": "Skill kullanma",
+                    "blurb": "Yüklü skill'leri çalıştırır"
+                },
+                "self": {
+                    "label": "Kendini geliştirme",
+                    "blurb": "Kendi ayarlarını düzenler"
+                },
+                "schedule": {
+                    "label": "Görev zamanlama",
+                    "blurb": "İşleri sonraya planlar"
+                },
+                "callAgent": {
+                    "label": "Diğer coworker'larla çalışma",
+                    "blurb": "Ekip arkadaşlarına iş devreder"
+                },
+                "askUser": {
+                    "label": "Size soru sorma",
+                    "blurb": "Durup yanıt seçenekleriyle sorar"
+                },
+                "requestApproval": {
+                    "label": "Onay isteme",
+                    "blurb": "Onayınızı beklemek için durur"
+                }
+            }
+        },
+        "hitl": {
+            "agent": "Margo · Fatura Takibi",
+            "question": "acme.com'daki iki faturanın vadesi 20 gün geçti. Nasıl takip edeyim?",
+            "options": {
+                "remind": "billing@acme.com adresine kesin bir hatırlatma gönder",
+                "call": "Önce muhasebe sorumlularını ara",
+                "escalate": "Hesap sahibine ilet"
+            },
+            "approval": {
+                "action": "Margo, acme.com'a 230 $ iade göndermek istiyor",
+                "detail": "Fatura #1042 · itiraz edilen ödeme"
+            },
+            "permission": {
+                "label": "E-posta gönder",
+                "message": "Ödeme hatırlatmasını billing@acme.com adresine gönder",
+                "preview": "Konu: Fatura #1042: ödeme gecikti\n\nMerhaba, #1042 numaralı faturanın (230 $) son ödeme tarihi 20 Ağustos'tu."
+            },
+            "resume": {
+                "question": "Muhasebe sorumlusu aranıyor · hatırlatma sırada",
+                "approval": "İade gönderildi · müşteri bilgilendirildi",
+                "permission": "E-posta billing@acme.com adresine gönderildi"
+            }
+        },
+        "monitor": {
+            "runs": {
+                "title": "Bugünkü çalıştırmalar",
+                "subtitle": "Canlı"
+            },
+            "status": {
+                "title": "Coworker durumu",
+                "subtitle": "Şu an çalışan: {count}"
+            },
+            "tokens": {
+                "title": "Kullanılan token",
+                "subtitle": "Son 7 gün"
+            },
+            "success": {
+                "title": "Başarı oranı",
+                "subtitle": "Son 24 saat"
+            },
+            "logs": {
+                "title": "Çalıştırma kayıtları",
+                "subtitle": "Jules · Gelen Satış"
+            },
+            "revenue": {
+                "title": "Kapanan gelir",
+                "subtitle": "Bu ay"
+            },
+            "agents": {
+                "a1": "Jules · Gelen Satış",
+                "a2": "Margo · Fatura Takibi",
+                "a3": "Sam · Gelen Kutusu Ayıklama",
+                "a4": "Nora · Destek",
+                "a5": "Leo · Raporlama"
+            }
+        },
+        "triggers": {
+            "listening": "dinliyor",
+            "status": {
+                "triggered": "tetiklendi",
+                "running": "çalışıyor",
+                "done": "bitti"
+            },
+            "events": {
+                "morning": {
+                    "source": "Her sabah 7:00'de",
+                    "action": "Sam gelen kutunuzu ayıkladı"
+                },
+                "lead": {
+                    "source": "Bir adaydan yeni e-posta",
+                    "action": "Jules bir yanıt hazırlıyor"
+                },
+                "payment": {
+                    "source": "Bir ödeme az önce başarısız oldu",
+                    "action": "Margo takip ediyor"
+                },
+                "signup": {
+                    "source": "Yeni kayıt",
+                    "action": "Karşılama süreci başladı"
+                },
+                "meeting": {
+                    "source": "Bir toplantı az önce bitti",
+                    "action": "Sam özeti yazıyor"
+                }
+            }
+        },
+        "memory": {
+            "files": "{count, plural, one {dosya} other {dosya}}",
+            "updated": "az önce güncellendi",
+            "kinds": {
+                "skill": "skill",
+                "context": "bağlam",
+                "preference": "tercih"
+            },
+            "cards": {
+                "invoiceChasing": {
+                    "name": "Fatura takibi",
+                    "description": "Müşteriyi kaçırmadan vadesi geçmiş faturaları takip edin.",
+                    "lines": {
+                        "1": "## Prosedür",
+                        "2": "1. Ödenmemiş faturaları her gün Stripe'tan çek",
+                        "3": "2. Vadeden 7 gün sonra ilk hatırlatmayı gönder",
+                        "4": "3. 2 denemeden sonra hesap sahibine ilet",
+                        "5": "4. Her teması CRM kaydına işle",
+                        "6": "## İstisnalar",
+                        "7": "- 50 $ altındaki faturaları asla takip etme",
+                        "8": "- İletmeden önce references/tone.md dosyasını oku"
+                    }
+                },
+                "acme": {
+                    "name": "Acme A.Ş.",
+                    "description": "Coworker'ın bu hesap hakkında bildikleri.",
+                    "lines": {
+                        "1": "## Faturalandırma",
+                        "2": "- 30. gün civarında öder, bazen daha geç",
+                        "3": "- Her faturada sipariş numarası zorunlu",
+                        "4": "- Faturalar Dana'ya değil, ap@acme.co adresine gider",
+                        "5": "## Kişiler",
+                        "6": "- Operasyonu Dana Reyes yönetir, bir gün içinde yanıt verir",
+                        "7": "- Üst düzey konular COO'ları üzerinden gider"
+                    }
+                },
+                "emailTone": {
+                    "name": "E-posta üslubu",
+                    "description": "Adaylara nasıl yazılmasını istediğiniz.",
+                    "lines": {
+                        "1": "## Ses",
+                        "2": "- İngilizce, resmi, emoji yok",
+                        "3": "- Asistan olarak değil, kurucu olarak imzala",
+                        "4": "- 120 kelimeyi geçme",
+                        "5": "## Zamanlama",
+                        "6": "- İki kez takip et, sonra dur",
+                        "7": "- Taslak hazır olunca gönder"
+                    }
+                }
+            },
+            "rounds": {
+                "confirmed": {
+                    "label": "Doğrulandı",
+                    "text": "Acme yine 44. günde ödedi",
+                    "after": "- 45 gün vadeyle öder, 3 faturada doğrulandı"
+                },
+                "preference": {
+                    "label": "Tercih",
+                    "text": "Müşteriye asla 9:00 öncesi e-posta atma",
+                    "after": "- Yerel saatleriyle asla 9:00 öncesi gönderme"
+                },
+                "learned": {
+                    "label": "Öğrenildi",
+                    "text": "Acme'de üst düzey konular COO'ları üzerinden gider",
+                    "after": "3. 2 denemeden sonra COO'larına ilet"
+                }
+            }
+        }
+    }
+}

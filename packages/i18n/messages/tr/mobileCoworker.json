@@ -1,0 +1,86 @@
+{
+    "access": {
+        "boxManage": "Bunu yalnızca bir yönetici veya bu Box'ın sorumlusu değiştirebilir.",
+        "aiProvidersAdminOnly": "Yapay zeka sağlayıcılarını yalnızca bir yönetici değiştirebilir.",
+        "noManagedBox": "Coworker eklemek için yönettiğiniz bir Box gerekir. Şu adreste oluşturun: {host}. Ya da bir yöneticiye sorun.",
+        "boxesFailed": "Boxes listeniz yüklenemedi. Birazdan tekrar deneyin.",
+        "noBoxYet": "Bu çalışma alanında henüz Box yok. Şu adreste oluşturun: {host}."
+    },
+    "page": {
+        "loadFailed": "Bu yüklenemedi. Birazdan tekrar deneyin."
+    },
+    "details": {
+        "back": "Geri",
+        "more": "Daha fazla",
+        "delete": "Coworker'ı sil",
+        "edit": "Düzenle",
+        "files": "Dosyalar",
+        "apps": "Uygulamalar",
+        "routines": "Rutinler",
+        "computer": "Bilgisayar",
+        "notifications": "Bildirimler",
+        "working": "Çalışıyor",
+        "idle": "Boşta",
+        "off": "Kapalı",
+        "none": "Yok",
+        "appsToConnect": "{count} bağlanacak",
+        "appsConnected": "{count} bağlı",
+        "filesCount": "{count}",
+        "filesTruncated": "{count}+",
+        "routinesOn": "{count} açık",
+        "renameTitle": "Yeniden adlandır",
+        "save": "Kaydet",
+        "renameFailed": "Yeniden adlandırılamadı",
+        "deleteTitle": "{name} silinsin mi?",
+        "deleteMessage": "Bu işlem coworker'ı ve verilerini kalıcı olarak siler. Geri alınamaz.",
+        "deleteConfirm": "Sil",
+        "deleteFailed": "Silinemedi"
+    },
+    "apps": {
+        "title": "Uygulamalar",
+        "status": {
+            "needsSignIn": "Giriş gerekli",
+            "needsSetup": "Kurulum gerekli",
+            "error": "Hata"
+        },
+        "connect": "Bağla",
+        "empty": "Henüz uygulama yok.",
+        "askInChat": "Uygulama eklemek için sohbette {name} adlı coworker'a sorun.",
+        "connectFailed": "Bağlanamadı: {name}"
+    },
+    "files": {
+        "title": "Dosyalar",
+        "media": "Medya",
+        "docs": "Belgeler",
+        "earlier": "Daha önce",
+        "thisMonth": "Bu ay",
+        "open": "Aç: {name}",
+        "fileFallback": "dosya",
+        "noMedia": "Medya yok",
+        "noDocs": "Belge yok",
+        "emptyHint": "{name} adlı coworker'ın ürettikleri burada görünür.",
+        "truncated": "Yalnızca en yeni dosyalar. Tümü web'de."
+    },
+    "routines": {
+        "title": "Rutinler",
+        "once": "Bir kez, {date}",
+        "webhook": "Webhook",
+        "empty": "Henüz rutin yok.",
+        "askInChat": "Kurmak için sohbette {name} adlı coworker'a sorun.",
+        "turnOnFailed": "Açılamadı: {name}",
+        "turnOffFailed": "Kapatılamadı: {name}"
+    },
+    "create": {
+        "title": "Yeni coworker",
+        "nameLabel": "Ad",
+        "namePlaceholder": "Scout",
+        "descriptionLabel": "Ne yapmalı?",
+        "descriptionPlaceholder": "Lyon'daki pazarlama ajanslarını bul ve her birine ilk e-postayı hazırla",
+        "descriptionHelp": "İlk görevi. Hemen başlar.",
+        "boxLabel": "Box",
+        "submit": "Oluştur",
+        "pausedTitle": "{name} duraklatıldı",
+        "pausedMessage": "Planınızda boş coworker yeri yok. Sınırsız coworker için rerun.build adresinde Pro'yu başlatın.",
+        "failed": "Coworker oluşturulamadı"
+    }
+}

@@ -4,6 +4,7 @@ import english from "@rerun/i18n/messages/en/emails.json";
 import spanish from "@rerun/i18n/messages/es/emails.json";
 import french from "@rerun/i18n/messages/fr/emails.json";
 import portuguese from "@rerun/i18n/messages/pt/emails.json";
+import turkish from "@rerun/i18n/messages/tr/emails.json";
 import { createTranslator } from "use-intl/core";
 
 export type { Locale as EmailLocale };
@@ -14,6 +15,7 @@ const PACKS: Record<Locale, typeof english | Partial<typeof english>> = {
   es: spanish,
   pt: portuguese,
   de: german,
+  tr: turkish,
 };
 
 // Built synchronously: an email is rendered once, outside any request, by code that already knows

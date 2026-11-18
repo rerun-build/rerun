@@ -1,0 +1,100 @@
+{
+    "browser": {
+        "tableNotFound": "Tablo bulunamadı",
+        "deleteRowsFailed": "Satırlar silinemedi",
+        "saveRowFailed": "Bu satır kaydedilemedi",
+        "deleteTableFailed": "Tablo silinemedi",
+        "purgeTableFailed": "Tablo boşaltılamadı",
+        "addViewFailed": "Bu görünüm eklenemedi",
+        "deleteViewFailed": "Bu görünüm silinemedi",
+        "unavailable": "Veritabanı kullanılamıyor",
+        "tryAgain": "Tekrar deneyin",
+        "rowCount": "{count, plural, one {{total} satır} other {{total} satır}}",
+        "rowCountFound": "{count, plural, one {{total} satır bulundu} other {{total} satır bulundu}}",
+        "noRows": "Satır yok",
+        "noSearchMatch": "Bu aramayla eşleşen satır yok.",
+        "tableEmpty": "Bu tablo boş."
+    },
+    "pagination": {
+        "count": "Toplam <value>{count}</value>",
+        "rowsPerPage": "Sayfa başına satır",
+        "perPage": "Sayfa başına {size}",
+        "range": "{range} / {total}",
+        "firstPage": "İlk sayfa",
+        "previousPage": "Önceki sayfa",
+        "nextPage": "Sonraki sayfa",
+        "lastPage": "Son sayfa"
+    },
+    "toolbar": {
+        "selected": "{count, plural, other {# seçili}}",
+        "deleteRowTitle": "Bu satır silinsin mi?",
+        "deleteRowsTitle": "{count} satır silinsin mi?",
+        "deleteRowDescription": "Satır tablodan kalıcı olarak kaldırılır. Bu işlem geri alınamaz.",
+        "deleteRowsDescription": "Satırlar tablodan kalıcı olarak kaldırılır. Bu işlem geri alınamaz.",
+        "delete": "Sil",
+        "clearSelection": "Seçimi temizle",
+        "search": "Ara",
+        "searchRows": "Satırlarda ara",
+        "clearSearch": "Aramayı temizle",
+        "tableActions": "Tablo işlemleri",
+        "export": "Dışa aktar",
+        "purgeTable": "Tabloyu boşalt",
+        "deleteTable": "Tabloyu sil"
+    },
+    "viewBar": {
+        "allRows": "Tüm satırlar",
+        "viewOptions": "Seçenekler: {name}",
+        "editView": "Görünümü düzenle",
+        "deleteView": "Görünümü sil",
+        "addView": "Görünüm ekle",
+        "addNewView": "Yeni görünüm ekle",
+        "expand": "Genişlet",
+        "deleteViewTitle": "\"{name}\" görünümü silinsin mi?",
+        "deleteViewDescription": "Yalnızca görünüm kaldırılır. Tablonun satırlarına dokunulmaz."
+    },
+    "layouts": {
+        "table": "Tablo",
+        "list": "Liste",
+        "gallery": "Galeri",
+        "board": "Pano"
+    },
+    "table": {
+        "selectAllRows": "Bu sayfadaki tüm satırları seç",
+        "selectRow": "Satırı seç",
+        "sources": "Kaynaklar"
+    },
+    "cell": {
+        "yes": "Evet",
+        "no": "Hayır"
+    },
+    "board": {
+        "moveFailed": "Bu satır taşınamadı",
+        "unavailable": "Pano kullanılamıyor",
+        "showMore": "{count} tane daha göster"
+    },
+    "sources": {
+        "verdicts": {
+            "verified": {
+                "label": "Doğrulandı",
+                "detail": "Posta kutusu mevcut"
+            },
+            "unconfirmed": {
+                "label": "Doğrulanmadı",
+                "detail": "Posta kutusu doğrulanmadı"
+            },
+            "invalid": {
+                "label": "Geçersiz",
+                "detail": "Posta kutusu mevcut değil"
+            }
+        },
+        "openSource": "Kaynağı aç",
+        "verified": "Doğrulandı",
+        "row": "Satır",
+        "cellLabel": "Kaynaklar: {names}"
+    },
+    "shared": {
+        "emptyTitle": "Henüz paylaşılan tablo yok",
+        "emptyDescription": "Çalışma alanındaki her coworker bu veritabanını okur ve yazar. Ortak bir kayda (bir katalog, bir kuyruk, birkaç coworker'ın üzerinde çalıştığı bir liste) ihtiyaç duyduklarında burada tablolar oluştururlar, siz de bunlara istediğiniz zaman göz atabilirsiniz.",
+        "unreachable": "Bu çalışma alanının makinesine ulaşılamadı."
+    }
+}

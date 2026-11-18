@@ -1,0 +1,970 @@
+{
+    "untitledBox": "Adsız Box",
+    "agentCard": {
+        "destinations": {
+            "services": "Uygulamalar",
+            "skills": "Skill'ler",
+            "memories": "Bilgi",
+            "scheduled": "Rutinler",
+            "files": "Dosyalar",
+            "data": "Veritabanı",
+            "monitoring": "Etkinlik",
+            "settings": "Ayarlar"
+        },
+        "delete": "Bu coworker'ı sil",
+        "share": "Paylaş",
+        "close": "Kartı kapat",
+        "nameField": "Coworker adı",
+        "rename": "Yeniden adlandır: {name}"
+    },
+    "agentChatsList": {
+        "title": "Konular",
+        "newThread": "Yeni konu",
+        "close": "Kapat",
+        "filters": {
+            "all": "Tümü",
+            "chats": "Sohbetler",
+            "automations": "Otomasyonlar",
+            "needs": "Sizi bekliyor"
+        },
+        "markAllRead": {
+            "title": "Tümü okundu olarak işaretlensin mi?",
+            "description": "{count, plural, one {# konu} other {# konu}} bu listeden çıkacak. Yanıt bekleyen istekler de yanıtlanmadan temizlenir.",
+            "confirm": "Tümünü okundu işaretle"
+        },
+        "emptyNeeds": "Sizi bekleyen bir şey yok.",
+        "emptyThreads": "Henüz konu yok.",
+        "emptyAutomations": "Henüz otomatik çalıştırma yok.",
+        "running": "Çalışıyor",
+        "startedBy": "Başlatan: {name}",
+        "moreFor": "Diğer işlemler: {title}"
+    },
+    "agentComputerThumbnail": {
+        "working": "Bilgisayarında çalışıyor",
+        "live": "Bilgisayarı",
+        "computer": "Bilgisayar",
+        "wentAway": "Ekran kapandı"
+    },
+    "agentView": {
+        "closePanel": "Paneli kapat",
+        "views": {
+            "apps": "Uygulamalar",
+            "skills": "Skill'ler",
+            "knowledge": "Bilgi",
+            "files": "Dosyalar",
+            "data": "Veritabanı",
+            "routines": "Rutinler",
+            "activity": "Etkinlik",
+            "settings": "Ayarlar"
+        },
+        "tabs": {
+            "services": "Uygulamalar",
+            "mcp": "MCP",
+            "skills": "Skill'ler",
+            "memories": "Bilgi",
+            "files": "Dosyalar",
+            "published": "Yayınlananlar",
+            "data": "Veritabanı",
+            "scheduled": "Zamanlanmış",
+            "triggers": "Tetikleyiciler",
+            "monitoring": "İzleme",
+            "logs": "Kayıtlar",
+            "settings": "Genel",
+            "tools": "Yetenekler",
+            "setup": "Kurulum"
+        }
+    },
+    "openChatsTabs": {
+        "closeTab": "Kapat: {title}",
+        "closeTabMenu": "Sekmeyi kapat",
+        "newThread": "Yeni konu",
+        "general": "Genel"
+    },
+    "sessionRename": {
+        "rename": "Yeniden adlandır",
+        "label": "Sohbet adı",
+        "failed": "Yeniden adlandırılamadı. Tekrar deneyin."
+    },
+    "threadBranch": {
+        "needs": "Sizi bekliyor",
+        "error": "Hata",
+        "opener": {
+            "schedule": "Zamanlanmış çalıştırma · {name}",
+            "trigger": "Webhook · {name}",
+            "askedBy": "İsteyen: {name}",
+            "askedByUnknown": "Başka bir coworker istedi",
+            "started": "Bir konu başlattı"
+        }
+    },
+    "floating": {
+        "backToChat": "Sohbete dön"
+    },
+    "agentPanelServices": {
+        "uninstallFailed": "Uygulama kaldırılamadı",
+        "removeServerFailed": "Sunucu kaldırılamadı",
+        "loadServerFailed": "Bu sunucu engine'den yüklenemedi.",
+        "alternativeLoadFailed": "{name} yüklenemedi.",
+        "signInHint": "Coworker'ın araçlarını kullanabilmesi için oturum açın: {host}.",
+        "searchPlaceholder": "Uygulama ara…",
+        "allCategories": "Tümü",
+        "installed": "Kurulu",
+        "library": "Kitaplık",
+        "needsAuthHint": "Coworker'ın bu uygulamayı kullanabilmesi için oturum açmanız gerekiyor. Bağla'ya tıklayın.",
+        "needsConfigHint": "Coworker'ın bu uygulamayı kullanabilmesi için kimlik bilgileri gerekiyor. Kurmak için Yapılandır'a tıklayın.",
+        "configure": "Yapılandır",
+        "connect": "Bağla",
+        "account": "Hesap",
+        "reconnect": "Yeniden bağla",
+        "uninstall": "Kaldır: {name}",
+        "uninstallLabeled": "Kaldır: {name} ({label})",
+        "uninstallConfirm": "{name} kaldırılsın mı?",
+        "uninstallLabeledConfirm": "{name} ({label}) kaldırılsın mı?",
+        "uninstallDescription": "Coworker bu servisi ve araçlarını kaybeder. Bağlantısı iptal edilir, yeniden kurmak için tekrar bağlanmanız gerekir.",
+        "uninstallAction": "Kaldır",
+        "requestHint": "Hâlâ arıyor musunuz? İhtiyacınız olan uygulamayı ekleyebiliriz.",
+        "requestApp": "Uygulama iste",
+        "vaultBadge": "Vault",
+        "fromVault": "Vault'tan",
+        "vaultAdd": "Ekle",
+        "vaultShared": "Her coworker bunu Vault'tan alır. Değişikliği orada yapın.",
+        "vaultRemove": "{name} uygulamasını bu coworker'dan kaldır",
+        "vaultRemoveConfirm": "{name} bu coworker'dan kaldırılsın mı?",
+        "vaultRemoveDescription": "Diğer coworker'lar ve sonrası için Vault'ta kalır.",
+        "vaultRemoveAction": "Kaldır",
+        "vaultAttachFailed": "{name} eklenemedi"
+    },
+    "agentPanelMcp": {
+        "unreachableTitle": "Engine'e erişilemiyor",
+        "unreachableDescription": "Bu coworker'ın engine'ine erişilemedi.",
+        "new": "Yeni",
+        "emptyTitle": "Henüz MCP sunucusu yok",
+        "emptyDescription": "MCP sunucuları, coworker'ınıza yerleşik uygulamaların ötesinde ek araçlar sağlar. Yapabileceklerini genişletmek için bir tane ekleyin.",
+        "appBadge": "Uygulama"
+    },
+    "mcpOAuthAuthorize": {
+        "discoveryFailed": "Keşif başarısız oldu",
+        "authorizationFailed": "Yetkilendirme başarısız oldu",
+        "startFailed": "OAuth başlatılamadı",
+        "discovering": "OAuth sağlayıcısı aranıyor...",
+        "connected": "Bağlı",
+        "retry": "Tekrar dene",
+        "waiting": "Yetkilendirme bekleniyor…",
+        "connect": "Bağla"
+    },
+    "mcpServerEditor": {
+        "invalidName": "Ad 1 ile 64 karakter arasında olmalı: harf, rakam, alt çizgi veya kısa çizgi.",
+        "storeCredentialsFailed": "Kimlik bilgileri saklanamadı",
+        "saveFailed": "Kaydedilemedi",
+        "deleteFailed": "Silinemedi",
+        "secretWarning": "Burada bir gizli bilgi algılandı. Kaydettiğinizde engine'e taşınır ve bir {token} olur.",
+        "titleReadOnly": "MCP sunucusu",
+        "titleEdit": "MCP sunucusunu düzenle",
+        "titleNew": "Yeni MCP sunucusu",
+        "providedByApp": "Bu MCP sunucusu bir uygulama tarafından sağlanır ve otomatik olarak yönetilir.",
+        "name": "Ad",
+        "nameHelper": "Araçlar \"{prefix}_{tool}\" biçiminde birleştirilir.",
+        "namePrefixFallback": "ad",
+        "transport": "Aktarım",
+        "command": "Komut",
+        "arguments": "Argümanlar",
+        "argumentsHelper": "Her satıra bir argüman.",
+        "argumentsHelperEditable": "Her satıra bir argüman. Arkasındaki değeri değiştirmek için vurgulanan bir {token} öğesine tıklayın.",
+        "url": "URL",
+        "urlHelper": "Arkasındaki değeri değiştirmek için vurgulanan bir {token} öğesine tıklayın.",
+        "environment": "Ortam",
+        "environmentHelper": "Her satıra bir ANAHTAR=değer. Değerler engine'de saklanır.",
+        "environmentHelperEditable": "Her satıra bir ANAHTAR=değer. Değerler engine'de saklanır; arkasındaki değeri değiştirmek için vurgulanan bir {token} öğesine tıklayın.",
+        "headers": "Başlıklar",
+        "headersHelper": "Her satıra bir Başlık=değer. Her istekle gönderilir (kimlik doğrulama için kullanın).",
+        "headersHelperEditable": "Her satıra bir Başlık=değer. Her istekle gönderilir (kimlik doğrulama için kullanın). Arkasındaki değeri değiştirmek için vurgulanan bir {token} öğesine tıklayın.",
+        "deleteServer": "Sunucuyu sil",
+        "deleteConfirm": "{name} silinsin mi?",
+        "deleteConfirmUnnamed": "Bu sunucu silinsin mi?",
+        "deleteDescription": "Coworker bu sunucunun sunduğu tüm araçları kaybeder. Saklanan değişkenleri de silinir.",
+        "saveChanges": "Değişiklikleri kaydet",
+        "createServer": "Sunucu oluştur"
+    },
+    "mcpVariableToken": {
+        "editVariable": "Değişkeni düzenle: {name}",
+        "statusSaved": "Kaydedildi",
+        "statusEngine": "Engine'de tanımlı",
+        "statusUnset": "Tanımlı değil",
+        "placeholderOverride": "Geçersiz kılmak için bir değer girin",
+        "placeholderNew": "Bir değer girin",
+        "helperSaved": "Engine'de saklanır ve bir daha gösterilmez. Değiştirmek için yeni bir değer yazın.",
+        "helperEngine": "Engine ortamı tarafından sağlanır. Bir değer kaydetmek bu coworker için onu geçersiz kılar.",
+        "helperUnset": "Engine'de saklanır, tarayıcının ve veritabanının erişemeyeceği bir yerde.",
+        "remove": "Kaldır: {name}",
+        "save": "Kaydet",
+        "removeConfirm": "{name} kaldırılsın mı?",
+        "removeDescription": "Değer engine'den silinir. Bu değişkeni kullanan her sunucu, siz yeniden tanımlayana kadar çalışmaz.",
+        "removeAction": "Kaldır"
+    },
+    "agentPanelTools": {
+        "unreachable": "Bu coworker'ın engine'ine erişilemedi.",
+        "updateFailed": "Güncellenemedi",
+        "unavailableTitle": "Yetenekler kullanılamıyor",
+        "intro": "Bu coworker'ın neler yapabileceğini seçin. Değişiklikler bir sonraki çalıştırmada geçerli olur.",
+        "about": "Hakkında: {capability}",
+        "includes": "İçerir",
+        "selfImprovement": {
+            "allowToolInstall": {
+                "label": "Araç ve MCP kurma",
+                "description": "Coworker'ın npm ile paket kurmasına ve MCP sunucusu kaydetmesine izin verin."
+            },
+            "allowSoulEdit": {
+                "label": "Kendi soul'unu düzenleme",
+                "description": "Coworker'ın SOUL.md kimliğini yeniden yazmasına izin verin."
+            },
+            "autoMemory": {
+                "label": "Otomatik bellek",
+                "description": "Her turdan sonra anıları otomatik olarak düzenler."
+            }
+        },
+        "capabilities": {
+            "filesystem": {
+                "label": "Dosya okuma ve yazma",
+                "blurb": "Çalışma alanındaki dosyalarla çalışır",
+                "help": "Coworker'ın kendi çalışma alanında dosya açmasına, oluşturmasına ve düzenlemesine izin verir."
+            },
+            "shell": {
+                "label": "Komut çalıştırma",
+                "blurb": "Kendi makinesinde komut çalıştırır",
+                "help": "Coworker'ın araç kurmak ve görevleri otomatikleştirmek için terminal komutları çalıştırmasına izin verir."
+            },
+            "web": {
+                "label": "Web'de gezinme",
+                "blurb": "Web sayfalarında arar ve okur",
+                "help": "Coworker'ın bilgi bulmak için internette arama yapmasına ve web sayfalarını okumasına izin verir."
+            },
+            "memory": {
+                "label": "Hatırlama",
+                "blurb": "Bilgileri kaydeder ve hatırlar",
+                "help": "Coworker'ın çalıştırmalar arasında bilgileri saklamasına ve sonra hatırlamasına izin verir."
+            },
+            "db": {
+                "label": "Verilere erişim",
+                "blurb": "Veritabanını sorgular",
+                "help": "Coworker'ın kendi veritabanında yapılandırılmış veri okumasına ve yazmasına izin verir."
+            },
+            "brain": {
+                "label": "Şirket Brain'ini kullanma",
+                "blurb": "Şirketin onayladıklarını okur",
+                "help": "Coworker'ın Brain'de, yani ekibinizin şirket hakkında onayladığı sayfalarda arama yapmasına ve okumasına, ayrıca kaydedilmeden önce sizin incelediğiniz değişiklikler önermesine izin verir."
+            },
+            "sharedDb": {
+                "label": "Paylaşılan verilere erişim",
+                "blurb": "Paylaşılan veritabanını sorgular",
+                "help": "Coworker'ın, çalışma alanındaki tüm coworker'ların paylaştığı veritabanını okumasına ve yazmasına izin verir."
+            },
+            "skills": {
+                "label": "Skill kullanma",
+                "blurb": "Kurulu skill'leri çalıştırır",
+                "help": "Coworker'ın uzmanlık gerektiren görevler için kurduğunuz skill'leri kullanmasına izin verir."
+            },
+            "self": {
+                "label": "Kendini geliştirme",
+                "blurb": "Kendi kurulumunu ayarlar",
+                "help": "Coworker'ın zamanla kendi talimatlarını ve yapılandırmasını iyileştirmesine izin verir."
+            },
+            "schedule": {
+                "label": "Görev zamanlama",
+                "blurb": "İşi sonraya planlar",
+                "help": "Coworker'ın seçilen bir zamanda otomatik çalışacak görevler zamanlamasına izin verir."
+            },
+            "trigger": {
+                "label": "Webhook'lara tepki verme",
+                "blurb": "Başka bir uygulama çağırınca çalışır",
+                "help": "Coworker'ın, harici bir servis çağırdığında çalıştırma başlatan herkese açık URL'ler sunmasına izin verir."
+            },
+            "callAgent": {
+                "label": "Diğer coworker'larla çalışma",
+                "blurb": "Ekip arkadaşlarına iş devreder",
+                "help": "Coworker'ın çalışma alanındaki diğer coworker'lara iş devretmesine izin verir."
+            },
+            "team": {
+                "label": "Diğer coworker'ları görme",
+                "blurb": "Rutinlerini ve çalıştırmalarını okur",
+                "help": "Coworker'ın çalışma alanındaki diğer coworker'ları incelemesine izin verir: durumları, zamanlanmış görevleri, tetikleyicileri ve son çalıştırmaları; bir hatayı anlaması gerektiğinde her çalıştırmanın çağırdığı araçlar da dahil. Hiçbir şeyi değiştiremez. Bir çalıştırma, diğer coworker'ın bağlı uygulamalarından veriler içerebilir."
+            },
+            "aiProviders": {
+                "label": "AI sağlayıcılarını görme",
+                "blurb": "Kullanılan model, kredi ve kotalar",
+                "help": "Coworker'ın hangi AI sağlayıcısı ve modelle çalıştığını, çalışma alanına bağlı diğer sağlayıcıları ve her birinde ne kaldığını kontrol etmesine izin verir: Rerun kredisi ve Claude, Codex veya OpenCode aboneliğinin limitleri. Hiçbir şeyi değiştiremez."
+            },
+            "askUser": {
+                "label": "Size soru sorma",
+                "blurb": "Durup yanıt seçenekleriyle sorar",
+                "help": "Coworker'ın devam etmeden önce durup size yanıt seçenekleriyle bir soru sormasına izin verir."
+            },
+            "requestApproval": {
+                "label": "Onay isteme",
+                "blurb": "Onayınız için bekler",
+                "help": "Coworker'ın bir işlemi çalıştırmadan önce durup onaylamanızı veya reddetmenizi istemesine izin verir."
+            },
+            "cards": {
+                "label": "Sohbette kart gösterme",
+                "blurb": "Tablo veya dosyayı satır içinde önizler",
+                "help": "Coworker'ın sohbete bir önizleme kartı eklemesine izin verir: tablolarından birinin ilk satırları veya çalışma alanındaki bir dosya; tek tıkla açabilirsiniz."
+            },
+            "quickReplies": {
+                "label": "Yanıt önerme",
+                "blurb": "Tek tıkla yanıtlar sunar",
+                "help": "Coworker'ın bir mesajı, tek tıkla gönderebileceğiniz en fazla üç kısa yanıtla bitirmesine izin verir, örneğin \"100 tane daha bul\"."
+            },
+            "computer": {
+                "label": "Bilgisayarını kullanma",
+                "blurb": "Kendi ekranını görür ve kullanır",
+                "help": "Coworker'ın kendi masaüstüne bakmasına ve tarayıcısında, dosyalarında ve terminalinde tıklama, yazma ve kaydırma yapmasına izin verir; bir uygulamada veya sitede elle yapılması gereken işler için. Canlı izleyebilirsiniz, ekranı siz kullanırken durur."
+            },
+            "remoteComputers": {
+                "label": "Bağlı bilgisayarları kullanma",
+                "blurb": "Bağlı bilgisayarlarda çalışır",
+                "help": "Coworker'ın, kişilerin Rerun masaüstü uygulamasından çalışma alanına bağladığı ve # ile adlandırılan bilgisayarlarda komut çalıştırmasına, dosya okuyup yazmasına ve uzun işler başlatmasına izin verir. Bilgisayarın sahibi aksini belirtmedikçe her komut ve izin verilenlerin dışındaki her klasör, sohbetteki kişinin onayını bekler."
+            },
+            "paidData": {
+                "label": "Müşteri adayı, SEO, sosyal veri",
+                "blurb": "Rerun kredilerinizden ödenir",
+                "help": "Coworker'ın Apollo, Semrush veya scraping aboneliği olmadan potansiyel müşteriler, iş e-postaları, telefon numaraları ve şirket verileri bulmasına; arama hacimlerini, anahtar kelime fikirlerini ve backlink'leri kontrol etmesine; Google sonuçlarını ve yerel işletmeleri okumasına; LinkedIn, TikTok, Instagram, X, YouTube, Facebook ve Reddit'teki herkese açık profilleri ve gönderileri okumasına izin verir. Her çağrı Rerun kredilerinizden ödenir ve coworker önce tahmini bir maliyeti onaylamanızı ister."
+            },
+            "requestSecret": {
+                "label": "Kimlik bilgisi isteme",
+                "blurb": "Güvenle girilen bir anahtar için bekler",
+                "help": "Coworker'ın durup sizden maskelenmiş bir formda API anahtarı veya token istemesine izin verir. Değer bir coworker değişkeni olarak saklanır ve sohbete asla girmez."
+            }
+        },
+        "paidDataAlwaysAllow": {
+            "label": "Sormadan harca",
+            "description": "Maliyet onayını atlar; böylece siz yokken zamanlanmış çalıştırmalar ve devredilen görevler ücretli verileri kullanabilir."
+        }
+    },
+    "agentPanelTriggers": {
+        "new": "Yeni",
+        "emptyTitle": "Henüz tetikleyici yok",
+        "emptyDescription": "Tetikleyici, coworker'ınıza herkese açık bir URL verir. Başka bir servis bu URL'yi çağırdığında coworker, aldığı verilerle çalışır.",
+        "summary": "{methods} · {count, plural, one {# çağrı} other {# çağrı}}",
+        "paused": "duraklatıldı",
+        "neverCalled": "Henüz hiç çağrılmadı"
+    },
+    "triggerEditor": {
+        "saveFailed": "Kaydedilemedi",
+        "rotateFailed": "Gizli anahtar yenilenemedi",
+        "deleteFailed": "Silinemedi",
+        "titleEdit": "Tetikleyiciyi düzenle",
+        "titleReadOnly": "Tetikleyici",
+        "titleNew": "Yeni tetikleyici",
+        "history": "Geçmiş",
+        "name": "Ad",
+        "nameLockedHelper": "Ad değiştirilemez (URL'yi belirler).",
+        "nameHelper": "URL bu addan türetilir.",
+        "namePlaceholder": "GitHub push olayı",
+        "description": "Açıklama",
+        "descriptionPlaceholder": "main dalına bir commit geldiğinde çalışır",
+        "methods": "Kabul edilen yöntemler",
+        "methodsGetHelper": "GET, yalnızca düz bir URL çağırabilen servisler içindir. Bağlantı önizlemeleri ve tarayıcı ziyaretleri yok sayılır.",
+        "methodsHelper": "Çoğu servis POST gönderir.",
+        "modelHelper": "Bu tetikleyici çalıştığında kullanılan model. Sağlayıcının API anahtarını gerektirir.",
+        "enabled": "Etkin",
+        "prompt": "Tetikleyici prompt'u",
+        "promptDialogTitle": "Tetikleyici prompt'unu düzenle",
+        "promptHelper": "URL çağrıldığında coworker'ın çalıştırdığı şey (her seferinde yeni bir oturum). Çağıranın gönderdiği veri altına eklenir.",
+        "promptPlaceholder": "Yeni bir commit geldi. Verideki diff'i inceleyin ve Slack'e bir özet gönderin.",
+        "delete": "Tetikleyiciyi sil",
+        "deleteConfirm": "{name} silinsin mi?",
+        "deleteConfirmUnnamed": "Bu tetikleyici silinsin mi?",
+        "deleteDescription": "Webhook URL'si hemen yanıt vermeyi bırakır. Onu hâlâ çağıran her şey hata vermeye başlar.",
+        "saveChanges": "Değişiklikleri kaydet",
+        "create": "Tetikleyici oluştur"
+    },
+    "triggerUrlField": {
+        "label": "Webhook URL'si",
+        "noSecretHelper": "Yenileme, yeni bir gizli anahtar ve ona bağlı URL'yi oluşturur.",
+        "noSecret": "Bu tetikleyicinin henüz gizli anahtarı yok, bu yüzden URL'si de yok.",
+        "getUrl": "URL al",
+        "helper": "Bu URL'ye sahip olan herkes bir çalıştırma başlatabilir. Onu gizli tutun. Kopyalamak, bir sohbette önizlemek veya tarayıcıda açmak hiçbir şey başlatmaz.",
+        "copy": "Webhook URL'sini kopyala",
+        "rotateConfirm": "Webhook gizli anahtarı yenilensin mi?",
+        "rotateDescription": "Mevcut URL hemen çalışmayı bırakır. Yenisini, bu tetikleyicinin çağrıldığı her yere yapıştırmanız gerekir.",
+        "rotateAction": "Yenile",
+        "rotate": "Gizli anahtarı yenile"
+    },
+    "agentPanelScheduled": {
+        "new": "Yeni",
+        "emptyTitle": "Henüz zamanlanmış görev yok",
+        "emptyDescription": "Coworker'ınızdan bir şeyi belirli aralıklarla yapmasını isteyin (günlük rapor, haftalık özet), tekrarlayan görevler burada görünür.",
+        "paused": "duraklatıldı",
+        "noExecutions": "Henüz çalıştırma yok",
+        "picker": {
+            "when": "Ne zaman",
+            "notSet": "Ayarlanmadı",
+            "describe": "Zamanlamayı tarif edin",
+            "describePlaceholder": "hafta içi her gün saat 8'de",
+            "update": "Zamanlamayı güncelle"
+        },
+        "editor": {
+            "saveFailed": "Kaydedilemedi",
+            "runFailed": "Görev çalıştırılamadı",
+            "deleteFailed": "Silinemedi",
+            "titleEdit": "Görevi düzenle",
+            "titleReadOnly": "Görev",
+            "titleNew": "Yeni görev",
+            "history": "Geçmiş",
+            "name": "Ad",
+            "nameLockedHelper": "Ad değiştirilemez (slug'ı belirler).",
+            "namePlaceholder": "Günlük özet",
+            "description": "Açıklama",
+            "descriptionPlaceholder": "Sabah özeti",
+            "timezone": "Saat dilimi",
+            "modelHelper": "Bu görev çalıştığında kullanılan model. Sağlayıcının API anahtarını gerektirir.",
+            "enabled": "Etkin",
+            "prompt": "Görev prompt'u",
+            "promptDialogTitle": "Görev prompt'unu düzenle",
+            "promptHelper": "Görev çalıştığında coworker'ın çalıştırdığı prompt (her seferinde yeni bir oturum).",
+            "promptPlaceholder": "Dünkü notları özetle ve bana e-postayla bir özet gönder.",
+            "setupPendingContinue": "Test çalıştırması kurulum bitince açılır. <link>Kuruluma devam et</link>",
+            "setupPendingStart": "Test çalıştırması kurulum bitince açılır. Önce sohbetten başlatın.",
+            "delete": "Görevi sil",
+            "deleteConfirm": "{name} silinsin mi?",
+            "deleteConfirmUnnamed": "Bu görev silinsin mi?",
+            "deleteDescription": "Görev artık çalışmaz ve zamanlaması kaldırılır. Daha önce ürettiği çalıştırmalar saklanır.",
+            "testRun": "Test et",
+            "saveChanges": "Değişiklikleri kaydet",
+            "create": "Görev oluştur"
+        }
+    },
+    "taskNotifyField": {
+        "label": "Bana bildir",
+        "muted": "Bu coworker sessize alındı"
+    },
+    "taskOutcomeFooter": {
+        "lastRun": "son çalıştırma {time} önce",
+        "neverRan": "Hiç çalışmadı",
+        "failed": "Başarısız",
+        "done": "Tamamlandı"
+    },
+    "modelsShared": {
+        "boxManageReason": "Bunu yalnızca bu Box'ın yöneticisi veya sorumlusu değiştirebilir",
+        "creditPaused": "Rerun kredileri duraklatıldı"
+    },
+    "modelSelector": {
+        "setUp": "Model kur",
+        "defaultLabel": "Varsayılan · {model}",
+        "select": "Model seç",
+        "loading": "Yükleniyor",
+        "empty": "Kullanılabilir model yok",
+        "workspaceDefault": "Çalışma alanı varsayılanı",
+        "coworkerDefault": "Coworker varsayılanı",
+        "setCoworkerDefault": "Coworker varsayılanı yap",
+        "makeDefault": "{model} bu coworker'ın varsayılanı olsun",
+        "refused": "{model} · {reason}. Aşağıdan başka bir model seçin."
+    },
+    "modelPickerProviders": {
+        "pitch": {
+            "claude": {
+                "plan": "Claude Pro veya Max",
+                "hint": "Claude hesabınızla oturum açın",
+                "nudge": "Claude Pro veya Max'iniz var mı?"
+            },
+            "codex": {
+                "plan": "ChatGPT Plus veya Pro",
+                "hint": "ChatGPT hesabınızla oturum açın",
+                "nudge": "ChatGPT Plus veya Pro'nuz var mı?"
+            }
+        },
+        "hints": {
+            "claude": "Pro veya Max",
+            "codex": "Plus veya Pro",
+            "anthropic": "Claude modelleri",
+            "openai": "GPT modelleri",
+            "google": "Gemini modelleri",
+            "openrouter": "Tüm modeller"
+        },
+        "pitchHeading": "Zaten ödediğiniz planla çalıştırın",
+        "connect": "Bağla",
+        "addProvider": "Sağlayıcı ekle",
+        "sections": {
+            "subscription": "Abonelik",
+            "api": "API anahtarı"
+        },
+        "connected": "Bağlı",
+        "manage": "Bağlantıları yönet"
+    },
+    "runModelField": {
+        "label": "Model",
+        "placeholder": "Model seçin",
+        "coworkerDefault": "Coworker varsayılanı",
+        "coworkerDefaultWithModel": "Coworker varsayılanı · {model}",
+        "current": "Geçerli"
+    },
+    "planLimitHint": {
+        "windows": {
+            "session": "Oturum",
+            "fiveHour": "5 saatlik",
+            "weekly": "Haftalık",
+            "monthly": "Aylık",
+            "modelWeekly": "{label} haftalık",
+            "modelWeeklyUnnamed": "Model haftalık"
+        },
+        "windowUsed": "{name}: {percent} kullanıldı",
+        "windowResets": "{name}: {percent} kullanıldı, sıfırlanma: {when}",
+        "paused": "Duraklatıldı",
+        "credit": {
+            "usedUpOn": "Aylık krediler tükendi, yenilenme: {date}",
+            "usedUpNextMonth": "Aylık krediler tükendi, gelecek ay yenilenir",
+            "usageOn": "Aylık krediler: %{percent} kullanıldı, sıfırlanma: {date}",
+            "usageNextMonth": "Aylık krediler: %{percent} kullanıldı, gelecek ay sıfırlanır"
+        }
+    },
+    "skillEditor": {
+        "titleView": "Skill",
+        "titleEdit": "Skill'i düzenle",
+        "titleNew": "Yeni skill",
+        "download": "Skill'i indir",
+        "connectorManaged": "Bu skill bir uygulama tarafından sağlanır ve otomatik olarak yönetilir.",
+        "name": "Ad",
+        "nameLocked": "Ad değiştirilemez (slug'ı belirler).",
+        "namePlaceholder": "Web Araştırması",
+        "description": "Açıklama",
+        "descriptionPlaceholder": "Bir konu nasıl araştırılır",
+        "procedure": "Prosedür",
+        "procedureDialogTitle": "Prosedürü düzenle",
+        "procedurePlaceholder": "1. Kaynakları belirle\n2. Getir\n3. Özetle",
+        "delete": "Skill'i sil",
+        "deleteTitle": "{name} silinsin mi?",
+        "deleteTitleUnnamed": "Bu skill silinsin mi?",
+        "deleteDescription": "Skill ve onunla gelen tüm dosyalar coworker'dan kaldırılır. Bu işlem geri alınamaz.",
+        "saveChanges": "Değişiklikleri kaydet",
+        "create": "Skill oluştur",
+        "saveFailed": "Kaydedilemedi",
+        "downloadFailed": "Skill indirilemedi",
+        "deleteFailed": "Silinemedi"
+    },
+    "skillFileEditor": {
+        "readFailed": "Bu dosya okunamadı",
+        "saveFailed": "Kaydedilemedi",
+        "deleteFailed": "Silinemedi",
+        "truncated": "Bu dosya burada düzenlenemeyecek kadar büyük; yalnızca ilk 100 000 karakteri gösteriliyor.",
+        "delete": "Dosyayı sil",
+        "deleteTitle": "{path} silinsin mi?",
+        "deleteDescription": "Dosya skill'den kaldırılır. Bu işlem geri alınamaz.",
+        "saveChanges": "Değişiklikleri kaydet"
+    },
+    "skillFilesSection": {
+        "label": "Ekli dosyalar",
+        "helper": "Uzun kontrol listeleri, bankalar ve derlemler burada durur. Coworker bir dosyayı yalnızca prosedür onu gösterdiğinde okur.",
+        "empty": "Ekli dosya yok.",
+        "pathRequired": "Bir dosya yolu girin, örneğin references/checklist.md",
+        "createFailed": "Dosya oluşturulamadı",
+        "deleteFailed": "Dosya silinemedi",
+        "deleteLabel": "Sil: {path}",
+        "deleteTitle": "{path} silinsin mi?",
+        "deleteDescription": "Dosya skill'den kaldırılır. Bu işlem geri alınamaz.",
+        "add": "Ekle",
+        "cancel": "İptal",
+        "addFile": "Dosya ekle"
+    },
+    "agentPanelSkills": {
+        "notFound": "Skill bulunamadı",
+        "fileTooLarge": "Dosya çok büyük (en fazla 10 MB)",
+        "importFailed": "Skill içe aktarılamadı",
+        "folderImportFailed": "içe aktarılamadı",
+        "folderFailure": "{name}: {error}",
+        "readFolderFailed": "Klasör okunamadı",
+        "imported": "{count, plural, one {# skill} other {# skill}} içe aktarıldı",
+        "importedSkipped": "{count, plural, one {# skill} other {# skill}} içe aktarıldı, {skipped, plural, one {# metin dışı dosya} other {# metin dışı dosya}} atlandı",
+        "upload": "Yükle",
+        "markdownFile": "Markdown dosyası",
+        "skillFolder": "Skill klasörü",
+        "newSkill": "Yeni",
+        "emptyTitle": "Henüz skill yok",
+        "emptyDescription": "Skill'ler, coworker'ınızın öğrendiği yeniden kullanılabilir adım adım talimatlardır; böylece tekrarlayan görevleri her seferinde aynı şekilde yapar.",
+        "appBadge": "Uygulama"
+    },
+    "shareAgentDialog": {
+        "titleLink": "Paylaşım bağlantınız",
+        "titleShare": "Paylaş: {name}",
+        "descriptionLink": "Kopyası olması gereken kişiye gönderin. Henüz bir hesaba ihtiyacı yok.",
+        "descriptionShare": "Kopyayla birlikte neyin gideceğini seçin. Onu coworker yapan her şey zaten gider.",
+        "done": "Bitti",
+        "cancel": "İptal",
+        "packing": "Coworker paketleniyor…",
+        "createLink": "Bağlantı oluştur",
+        "carried": {
+            "memories": "{count, plural, one {# anı} other {# anı}}",
+            "database": "veritabanı ({size}, gizli bilgiler için taranmadı)",
+            "files": "{count, plural, one {# çalışma alanı dosyası} other {# çalışma alanı dosyası}}"
+        },
+        "confirmTitle": "{name} verileriyle birlikte gönderilsin mi?",
+        "confirmDescription": "Kopya şunları taşıyacak: {items}. Siz iptal edene kadar bağlantıya sahip olan herkes hepsini okuyabilir."
+    },
+    "shareAgentLink": {
+        "label": "Paylaşım bağlantısı",
+        "reused": "Bu coworker için aynı yanıtlarla bir bağlantı zaten vardı, ikinci bir kopya yerine o gösteriliyor.",
+        "fresh": "Bu bağlantıya sahip olan herkes bu coworker'ın bir kopyasını kendi panosuna ekleyebilir. İstediğiniz zaman iptal edin.",
+        "copy": "Paylaşım bağlantısını kopyala"
+    },
+    "shareAgentOptions": {
+        "memories": "Anılar",
+        "memoriesCount": "{count, plural, one {# anı} other {# anı}} · {size}",
+        "memoriesEmpty": "Henüz hatırlanan bir şey yok",
+        "database": "Coworker veritabanı",
+        "databaseSize": "{size} · gizli bilgiler için taranmadı",
+        "databaseEmpty": "Henüz tablo yok",
+        "files": "Çalışma alanı dosyaları",
+        "filesCount": "{count, plural, one {# dosya} other {# dosya}} · {size}",
+        "filesEmpty": "Henüz dosya yok"
+    },
+    "shareAgentSafety": {
+        "title": "Hassas veriler çıkarılır",
+        "description": "Yukarıda ne seçerseniz seçin, API anahtarları, bağlı hesaplar ve sohbet geçmişi çalışma alanınızdan asla çıkmaz. Kimlik bilgisi içeriyor gibi görünen dosyalar atılır ve uygulamalar, bağlantıyı açan kişinin kendisi yetkilendirmesi için bağlantısız gelir."
+    },
+    "sharedLinksSection": {
+        "revokeFailed": "Bu bağlantı iptal edilemedi",
+        "revoked": "Bağlantı iptal edildi",
+        "revokedDescription": "Taşıdığı kopya silindi. Şimdi açan kişi hiçbir şey almaz.",
+        "label": "Paylaşım bağlantıları",
+        "helper": "Birine sahip olan herkes bu coworker'ın bir kopyasını kendi panosuna ekleyebilir.",
+        "carried": {
+            "memories": "Anılar",
+            "database": "Veritabanı",
+            "files": "Dosyalar"
+        },
+        "notUsed": "Henüz kullanılmadı",
+        "added": "{count, plural, one {# kez eklendi} other {# kez eklendi}}",
+        "agentOnly": "Yalnızca coworker, veri yok",
+        "copy": "Paylaşım bağlantısını kopyala",
+        "revokeTitle": "Bu paylaşım bağlantısı iptal edilsin mi?",
+        "revokeDescription": "Taşıdığı kopya hemen silinir. Coworker'ı zaten eklemiş olanlar kendi kopyalarını korur.",
+        "revoke": "İptal et",
+        "revokeLabel": "Bu bağlantıyı iptal et"
+    },
+    "sharedAgentContents": {
+        "memories": "{count, plural, one {# anı} other {# anı}}",
+        "memoriesSubtitle": "Şimdiye kadar öğrendiği her şey",
+        "database": "Veritabanı",
+        "databaseSubtitle": "Kendi tabloları, satırlarıyla birlikte",
+        "files": "{count, plural, one {# çalışma alanı dosyası} other {# çalışma alanı dosyası}}",
+        "keys": "{count, plural, one {# API anahtarı} other {# API anahtarı}}",
+        "keysSubtitle": "Sizin doldurmanız gerekir",
+        "mcpAuth": "{count, plural, one {Yeniden oturum açılacak # servis} other {Yeniden oturum açılacak # servis}}",
+        "mcpAuthSubtitle": "Kendi hesaplarınızla",
+        "agentOnly": "Yalnızca coworker",
+        "agentOnlySubtitle": "Onunla birlikte hiçbir veri gitmez",
+        "connectorsNote": "Bunları kendi hesaplarınızla bağlayacaksınız.",
+        "triggersNote": "Her biri kendine ait yeni bir URL alır."
+    },
+    "useShareAgentFlow": {
+        "failedRequest": "İstek iletilemedi. Bağlantınızı kontrol edip tekrar deneyin."
+    },
+    "agentTabs": {
+        "chat": {
+            "label": "Sohbet",
+            "description": "Bu coworker ile konuşun"
+        },
+        "actions": {
+            "label": "Yapılacaklar",
+            "description": "İlginizi bekleyen öğeler"
+        },
+        "services": {
+            "label": "Uygulamalar",
+            "description": "Bu coworker'ın kullanabileceği hazır entegrasyonlar"
+        },
+        "mcp": {
+            "label": "MCP",
+            "description": "Model Context Protocol sunucuları"
+        },
+        "skills": {
+            "label": "Skill'ler",
+            "description": "Coworker'ın çalıştırabildiği skill'ler"
+        },
+        "data": {
+            "label": "Veritabanı",
+            "description": "Bu coworker'ın verileri"
+        },
+        "memories": {
+            "label": "Bilgi",
+            "description": "Bu coworker'ın hatırladıkları"
+        },
+        "files": {
+            "label": "Dosyalar",
+            "description": "Bu coworker'ın dosyaları"
+        },
+        "published": {
+            "label": "Yayınlananlar",
+            "description": "Bu coworker'ın yayınladıkları ve kimlerin açabileceği"
+        },
+        "scheduled": {
+            "label": "Rutinler",
+            "description": "Tekrarlayan ve zamanlanmış görevler"
+        },
+        "triggers": {
+            "label": "Tetikleyiciler",
+            "description": "Çağrıldığında çalıştırma başlatan herkese açık URL'ler"
+        },
+        "tools": {
+            "label": "Yetenekler",
+            "description": "Bu coworker'ın kullanabileceği araçlar"
+        },
+        "monitoring": {
+            "label": "İzleme",
+            "description": "Bu coworker'ın kullanımı, maliyeti ve etkinliği"
+        },
+        "logs": {
+            "label": "Kayıtlar",
+            "description": "Etkinlik ve çalıştırma kayıtları"
+        },
+        "setup": {
+            "label": "Kurulum",
+            "description": "Biri bu coworker'ı ilk kez kurduğunda yaptıkları"
+        },
+        "settings": {
+            "label": "Ayarlar",
+            "description": "Bu coworker'ı yapılandırın"
+        }
+    },
+    "accessSummary": {
+        "youManage": "Bu coworker'ı siz yönetiyorsunuz",
+        "youCanUse": "Bu coworker'ı kullanabilirsiniz",
+        "youManageViaBox": "Bu coworker'ı {box} Box'ı üzerinden yönetiyorsunuz",
+        "youCanUseViaBox": "Bu coworker'ı {box} Box'ı üzerinden kullanabilirsiniz",
+        "viaBox": "{box} Box'ı üzerinden",
+        "everyone": "Çalışma alanındaki herkes",
+        "adminsOnly": "Yalnızca yöneticiler",
+        "peopleViaBox": "{count, plural, one {# kişi} other {# kişi}}, {box} Box'ı üzerinden"
+    },
+    "agentLockedOverlay": {
+        "saved": "Sohbetleri, belleği, skill'leri, zamanlamaları ve dosyaları kayıtlı.",
+        "savedUntil": "Sohbetleri, belleği, skill'leri, zamanlamaları ve dosyaları şu tarihe kadar kayıtlı: {date}.",
+        "paused": {
+            "title": "{name}, çalışma alanınızla birlikte duraklatıldı",
+            "subscribeToResume": "Abone olun, {name} tam kaldığı yerden devam etsin.",
+            "updatePaymentToResume": "Ödeme bilgilerinizi güncelleyin, {name} tam kaldığı yerden devam etsin.",
+            "updatePayment": "Ödemeyi güncelle",
+            "subscribe": "Geri getirmek için abone ol"
+        },
+        "sandboxArchived": {
+            "title": "{name}, sandbox'ınızla birlikte arşivlendi",
+            "requestReactivation": "Panodan yeniden etkinleştirme isteyin, {name} tam kaldığı yerden devam etsin."
+        },
+        "restoring": {
+            "title": "{name} geri dönüyor",
+            "description": "Çalışma alanınız geri yükleniyor. {name} bir iki dakika içinde onunla birlikte uyanır."
+        },
+        "slot": {
+            "activateFailed": "Bu coworker etkinleştirilemedi",
+            "backOnline": "{name} yeniden çevrimiçi",
+            "inactive": "{name} etkin değil",
+            "templateEnded": "Bu coworker'ın geldiği şablon aboneliği sona erdi. Geri getirmek için şablonu yeniden satın alın.",
+            "nothingLost": "Hiçbir şey kaybolmadı: anıları, dosyaları ve skill'leri hâlâ burada. Yeniden çalışması için yalnızca boş bir coworker yeri gerekiyor.",
+            "fixedLimit": "Bu çalışma alanının sabit bir coworker limiti var. Artırmak için destekle iletişime geçin.",
+            "upgradeToActivate": "Etkinleştirmek için yükseltin",
+            "activeCount": "{active} / {max} coworker etkin",
+            "activating": "Etkinleştiriliyor…",
+            "activate": "Etkinleştir"
+        }
+    },
+    "panelsShared": {
+        "yourCoworker": "coworker'ınız",
+        "closePanel": "Paneli kapat"
+    },
+    "agentPanel": {
+        "threads": "Konular",
+        "coworkerCard": "Coworker kartı"
+    },
+    "agentAccessRow": {
+        "label": "Erişim",
+        "manage": "Erişimi yönet"
+    },
+    "agentCombobox": {
+        "unassigned": "Atanmamış",
+        "selectMany": "Coworker seçin",
+        "selectOne": "Bir coworker seçin",
+        "search": "Coworker ara…",
+        "empty": "Coworker bulunamadı"
+    },
+    "timezoneCombobox": {
+        "placeholder": "Saat dilimi seçin",
+        "search": "Saat dilimi ara…",
+        "empty": "Saat dilimi bulunamadı"
+    },
+    "agentFileNavigation": {
+        "notFound": "Dosya bulunamadı"
+    },
+    "agentSetupFields": {
+        "yes": "Evet",
+        "no": "Hayır",
+        "resetToDefault": "Varsayılan şablona sıfırla",
+        "useDefault": "Varsayılan şablonu kullan",
+        "needsSetup": {
+            "label": "Bu coworker'ın kurulumdan sonra yapılandırılması gerekiyor mu?",
+            "helper": "Bir kez yanıtlayın. Bu coworker'ı kuran herkes sonucu görür, bu yüzden yanıtlanmamış bir coworker yayınlanamaz."
+        },
+        "instructions": {
+            "label": "Kurulum talimatları",
+            "helper": "Kullanıcıya değil, coworker'a yazılır: coworker bunu okur ve sohbette kullanıcıya adım adım yol gösterir.",
+            "dialogTitle": "Kurulum talimatlarını düzenle"
+        },
+        "resetConfirm": {
+            "title": "Varsayılan şablona sıfırlansın mı?",
+            "description": "Burada yazılanlar varsayılan talimatlarla değiştirilir. Bu işlem geri alınamaz.",
+            "confirm": "Sıfırla"
+        }
+    },
+    "agentPanelData": {
+        "unreachable": "Bu coworker'ın engine'ine erişilemedi.",
+        "emptyTitle": "Henüz tablo yok",
+        "emptyDescription": "Coworker'ınızın kendine ait özel bir veritabanı var. Yapılandırılmış veri saklaması gerektiğinde (kişiler, sonuçlar, takip listeleri) burada istediğiniz zaman göz atabileceğiniz tablolar oluşturur.",
+        "dialogTitle": "Coworker veritabanı",
+        "dialogDescription": "Bu coworker'ın özel veritabanı, tam boyutta."
+    },
+    "agentSheetChat": {
+        "anotherCoworker": "başka bir coworker",
+        "messagePlaceholder": "Mesaj yazın: {name}...",
+        "replyPlaceholder": "Yanıtla: {title}...",
+        "startedBy": "Bu oturumu <b>{name}</b> başlattı"
+    },
+    "agentPanelChat": {
+        "notSetUp": "Bu coworker henüz kurulmadı",
+        "setUp": "Kur"
+    },
+    "agentPanelSetup": {
+        "unreachable": "Bu coworker'ın engine'ine erişilemedi.",
+        "saveFailed": "Kaydedilemedi",
+        "intro": "Bu coworker'ın bir kopyası başka birinin hesabına kimlik bilgisi olmadan ve hiçbir şey bağlı olmadan gelir. Bu talimatlar, o kişi onu ilk kez açtığında kendi başına çalıştırdığı şeydir.",
+        "saved": "Kaydedildi",
+        "saving": "Kaydediliyor...",
+        "save": "Kaydet"
+    },
+    "agentPanelSettings": {
+        "unreachable": "Bu coworker'ın engine'ine erişilemedi.",
+        "saveFailed": "Kaydedilemedi",
+        "name": "Ad",
+        "inactive": "Bu coworker etkin değil, bu yüzden yapılandırması yüklenemez veya değiştirilemez.",
+        "soul": {
+            "label": "Soul (sistem prompt'u)",
+            "dialogTitle": "Sistem prompt'unu düzenle",
+            "placeholder": "Sen..."
+        },
+        "verbosity": {
+            "label": "Ayrıntı düzeyi",
+            "helper": "Yanıtlarının ne kadar uzun olduğu, ne kadar iş yaptığı değil.",
+            "minimal": "En az",
+            "concise": "Kısa",
+            "normal": "Normal",
+            "detailed": "Ayrıntılı"
+        },
+        "notifications": {
+            "label": "Bildirimler",
+            "choose": "Size neyin ulaşacağını seçin"
+        },
+        "delete": "Coworker'ı sil",
+        "saved": "Kaydedildi",
+        "save": "Değişiklikleri kaydet"
+    },
+    "agentPanelLogs": {
+        "empty": {
+            "title": "Henüz çalıştırma yok",
+            "description": "Coworker'ınızın her çalıştırması burada kaydedilir; böylece ne yaptığını ve nedenini adım adım inceleyebilirsiniz."
+        },
+        "tokens": "{total} token",
+        "tokensShort": "{total} tok",
+        "stepCount": "{count, plural, one {# adım} other {# adım}}",
+        "step": "Adım {number}",
+        "noSteps": "Bu çalıştırma için kaydedilmiş adım yok.",
+        "input": "Girdi",
+        "output": "Çıktı"
+    },
+    "agentRunHistory": {
+        "tokens": "{total} token",
+        "stepCount": "{count, plural, one {# adım} other {# adım}}"
+    },
+    "agentPanelMemories": {
+        "dormant": "uykuda",
+        "delete": {
+            "label": "Anıyı sil",
+            "confirmTitle": "Bu anı silinsin mi?",
+            "confirmDescription": "Coworker bunu kalıcı olarak unutur. Bu işlem geri alınamaz."
+        },
+        "recallPlaceholder": "Anılarda ara...",
+        "new": "Yeni",
+        "clearAll": "Tüm anıları temizle",
+        "searching": "Aranıyor…",
+        "recalled": "{count, plural, one {\"{query}\" için # anı bulundu} other {\"{query}\" için # anı bulundu}}",
+        "form": {
+            "contentPlaceholder": "Kullanıcı kısa yanıtları tercih ediyor.",
+            "kindPlaceholder": "tür (ör. tercih)",
+            "tagsPlaceholder": "etiketler, virgülle",
+            "save": "Anıyı kaydet"
+        },
+        "empty": {
+            "noMatches": "Eşleşme yok",
+            "title": "Henüz anı yok",
+            "description": "Coworker'ınız sizinle ve işiyle ilgili kalıcı bilgileri burada saklar; böylece sohbetler arasında bağlamı korur.",
+            "add": "Anı ekle"
+        }
+    },
+    "agentPanelMonitoring": {
+        "charts": {
+            "kpiRuns": "Çalıştırmalar",
+            "kpiCost": "Toplam maliyet",
+            "kpiTokens": "Toplam token",
+            "kpiErrorRate": "Hata oranı",
+            "runsOverTime": "Zaman içinde çalıştırmalar",
+            "costOverTime": "Zaman içinde maliyet",
+            "avgDuration": "Ort. çalıştırma süresi",
+            "runsByModel": "Modele göre çalıştırmalar",
+            "topTools": "En çok çağrılan araçlar",
+            "toolErrors": "Araç hataları"
+        },
+        "tokenUsage": {
+            "title": "Token kullanımı",
+            "subtitle": "Günlük token"
+        },
+        "ranges": {
+            "24h": {
+                "short": "24 sa",
+                "label": "Son 24 saat"
+            },
+            "7d": {
+                "short": "7 g",
+                "label": "Son 7 gün"
+            },
+            "30d": {
+                "short": "30 g",
+                "label": "Son 30 gün"
+            },
+            "90d": {
+                "short": "90 g",
+                "label": "Son 90 gün"
+            }
+        },
+        "empty": {
+            "title": "Henüz etkinlik yok",
+            "description": "Bu coworker çalışmaya başladığında kullanım, maliyet ve çalıştırma analizleri burada görünür."
+        },
+        "expand": "Genişlet: {title}"
+    },
+    "agentPanelFiles": {
+        "publishFailed": "{name} yayınlanamadı",
+        "dropToUpload": "Yüklemek için dosya veya klasör bırakın",
+        "hideHidden": "Gizli dosyaları gizle",
+        "showHidden": "Gizli dosyaları göster",
+        "emptyDescription": "Burası coworker'ınızın çalışma alanı. Çalıştırmaları sırasında indirdiği, oluşturduğu veya düzenlediği dosyalar burada saklanır."
+    },
+    "shareCta": {
+        "placeLabel": "Coworker'ı yerleştir",
+        "placeCaption": "Panonuza bırakın, çalışmaya hazır.",
+        "trialAdd": "Ücretsiz denemeyi başlat ve ekle",
+        "planAdd": "{price}/ay abone ol ve ekle",
+        "add": "Panoma ekle"
+    },
+    "schedule": {
+        "once": "bir kez · {date}",
+        "onceOn": "Bir kez, {date}",
+        "everyMinutes": "Her {count} dakikada bir",
+        "everyDay": "Her gün saat {time}",
+        "weekdays": "Hafta içi saat {time}",
+        "everyWeekday": "Her {day} saat {time}",
+        "monthly": "Her ayın {day}. günü, saat {time}"
+    }
+}

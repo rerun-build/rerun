@@ -1,0 +1,216 @@
+{
+    "loading": "Yükleniyor...",
+    "theme": "Tema",
+    "language": "Dil",
+    "signIn": "Oturum aç",
+    "purchaseCancelled": "Satın alma iptal edildi",
+    "help": {
+        "label": "Yardım",
+        "contactSupport": "Destekle iletişime geç"
+    },
+    "menu": {
+        "whatsNew": "Yenilikler",
+        "gettingStarted": "Başlarken",
+        "docs": "Belgeler",
+        "community": "Topluluk",
+        "shortcuts": "Kısayollar",
+        "installApp": "Uygulamayı yükle",
+        "desktopApp": "Masaüstü uygulamasını edinin",
+        "hireExpert": "Uzman tut"
+    },
+    "power": {
+        "menuItem": "Makineyi yeniden başlat",
+        "cancel": "İptal",
+        "failed": "Bir sorun oluştu",
+        "restart": {
+            "title": "Makine yeniden başlatılsın mı?",
+            "description": "Bu çalışma alanındaki tüm coworker'lara birkaç dakika boyunca ulaşılamayacak.",
+            "confirmLabel": "Yeniden başlat",
+            "pending": "Makine yeniden başlatılıyor…",
+            "success": "Yeniden başlatma başladı, makine birkaç dakika içinde geri gelecek."
+        }
+    },
+    "providerStatus": {
+        "headline": {
+            "one": "{providers} sorun yaşıyor.",
+            "many": "{providers} sorun yaşıyor."
+        },
+        "headlineLong": {
+            "one": "{providers} sorun yaşıyor. Coworker'larınız yavaşlayabilir veya başarısız olabilir.",
+            "many": "{providers} sorun yaşıyor. Coworker'larınız yavaşlayabilir veya başarısız olabilir."
+        },
+        "viewStatus": "Durumu görüntüle",
+        "dismiss": "Sağlayıcı durumunu kapat"
+    },
+    "sidePanel": {
+        "close": "Paneli kapat",
+        "resize": "Paneli boyutlandır"
+    },
+    "paused": {
+        "title": "Çalışma alanı duraklatıldı.",
+        "paymentFailed": "Ödeme başarısız, çalışma alanı duraklatıldı.",
+        "saved": "Coworker'larınız ve verileri kayıtlı.",
+        "savedUntil": "Coworker'larınız ve verileri şu tarihe kadar kayıtlı: {date}.",
+        "updatePayment": "Ödemeyi güncelle",
+        "subscribe": "Geri yüklemek için abone olun"
+    },
+    "sandboxArchived": {
+        "title": "Sandbox, 30 gün kullanılmadığı için arşivlendi.",
+        "requested": "Yeniden etkinleştirme istendi.",
+        "declined": "Yeniden etkinleştirme reddedildi.",
+        "declinedHint": "Bunun bir hata olduğunu düşünüyorsanız bizimle iletişime geçin.",
+        "savedUntil": "Coworker'larınız ve verileri şu tarihe kadar kayıtlı: {date}.",
+        "expired": "Kayıtlı verilerinin süresi doldu, yeniden etkinleştirme boş bir sandbox ile başlar.",
+        "requestedReason": "İsteğinizi inceliyoruz",
+        "request": "Yeniden etkinleştirme iste"
+    },
+    "restoring": {
+        "title": "Çalışma alanınız geri yükleniyor…",
+        "waitingApproved": "Yeniden etkinleştirme onaylandı, sıradaki ilk sizsiniz.",
+        "waitingPaid": "Ödeme alındı, sıradaki ilk sizsiniz.",
+        "waitingHint": "Birkaç dakika içinde kendiliğinden geri gelir.",
+        "failed": "Geri yüklemenizin bizim tarafımızda kontrol edilmesi gerekiyor.",
+        "failedApproved": "Uyarı aldık, sandbox'ınızı elle geri getiriyoruz.",
+        "failedPaid": "Ödeme alındı. Uyarı aldık, çalışma alanınızı elle geri getiriyoruz.",
+        "steps": {
+            "machine": "Makine atandı",
+            "machineActive": "Makine atanıyor",
+            "data": "Verileriniz geri yükleniyor",
+            "agents": "Coworker'larınız uyandırılıyor"
+        }
+    },
+    "workspaceMenu": {
+        "defaultName": "Çalışma alanı",
+        "summary": {
+            "sandbox": "Uzman sandbox'ı",
+            "seats": "{count, plural, one {# kullanıcı} other {# kullanıcı}}",
+            "unlimitedSeats": "sınırsız kullanıcı",
+            "limits": "{agents} coworker · {seats}",
+            "trial": "Deneme · {limits}",
+            "lifetime": "Ömür boyu · {limits}",
+            "limitsUnlimited": "sınırsız coworker · {seats}"
+        },
+        "adminOnly": {
+            "apiKeys": "API anahtarlarını yalnızca bir yönetici yönetebilir",
+            "settings": "Çalışma alanı ayarlarını yalnızca bir yönetici değiştirebilir",
+            "servers": "Sunucuları yalnızca bir yönetici yönetebilir",
+            "billing": "Faturalandırmayı yalnızca bir yönetici yönetebilir"
+        },
+        "needsPlan": "Ücretsiz denemeniz başladığında kullanılabilir",
+        "apiKeys": "API anahtarları ve MCP",
+        "settings": "Ayarlar",
+        "members": "Üyeler",
+        "brain": "Brain",
+        "brainProposals": "{count, plural, one {İncelenecek # öneri} other {İncelenecek # öneri}}",
+        "aiProviders": "Yapay zeka sağlayıcıları",
+        "vault": "Vault",
+        "vaultSignedOut": "Vault'taki bir uygulamanın oturumu kapalı",
+        "computers": "Bilgisayarlar",
+        "servers": "Sunucular",
+        "billing": "Faturalandırma",
+        "newWorkspace": "Yeni çalışma alanı",
+        "templates": "Şablonlar",
+        "myTemplates": "Şablonlarım",
+        "newTemplate": "Yeni şablon",
+        "expert": "Uzman",
+        "sandbox": "Sandbox",
+        "preparingSandbox": "Sandbox hazırlanıyor…",
+        "publicProfile": "Herkese açık profil",
+        "admin": "Yönetici",
+        "adminPanel": "Yönetim paneli",
+        "notifications": "Bildirimler",
+        "account": "Hesap",
+        "signOut": "Oturumu kapat"
+    },
+    "update": {
+        "reload": "Yeniden yükle",
+        "available": {
+            "title": "Yeni sürüm mevcut",
+            "description": "Son Rerun sürümü için yeniden yükleyin."
+        },
+        "required": {
+            "title": "Rerun güncellendi",
+            "description": "Yeni bir sürüm yayında. Devam etmek için yeniden yükleyin."
+        }
+    },
+    "controlCenter": {
+        "title": "Kontrol merkezi",
+        "description": "Bir ajana, bir ayara veya bir konuşmaya gidin ya da Chief of Staff'ınıza sorun.",
+        "back": "Geri",
+        "askRerun": "Chief of Staff'ınıza sorun",
+        "quotedQuery": "“{query}”",
+        "unnamedBox": "Adsız Box",
+        "pro": "Pro",
+        "boxAgents": "{count, plural, one {# agent} other {# agent}}",
+        "status": {
+            "off": "Kapalı",
+            "waiting_human": "Sizi bekliyor",
+            "working": "Çalışıyor",
+            "error": "Hata",
+            "offline": "Çevrimdışı"
+        },
+        "headings": {
+            "actions": "İşlemler",
+            "settings": "Ayarlar",
+            "agents": "Ajanlar",
+            "needsYou": "Sizi bekliyor",
+            "recent": "Son kullanılanlar",
+            "boxes": "Boxes",
+            "conversations": "Konuşmalar",
+            "recentConversations": "Son konuşmalar",
+            "assistant": "Chief of Staff",
+            "open": "Aç",
+            "moveTo": "Taşı"
+        },
+        "agent": {
+            "desktop": "Masaüstü",
+            "desktopDetail": "Bu coworker'ın ekranının kontrolünü alın",
+            "move": "Başka bir Box'a taşı",
+            "notifications": "Bildirimler",
+            "notificationsDetail": "Bu ajan size ne zaman ulaşır"
+        },
+        "placeholder": {
+            "rootAssistant": "Arayın veya Chief of Staff'ınıza sorun…",
+            "root": "Ajan, ayar, konuşma arayın…",
+            "agent": "Ara: {name}…",
+            "agentUnknown": "Bu ajanda ara…",
+            "box": "Bu Box'taki ajanlarda ara…",
+            "move": "Bir Box seçin…"
+        },
+        "empty": {
+            "box": "Bu Box'ta henüz ajan yok.",
+            "noMatch": "Eşleşen bir şey yok."
+        },
+        "hints": {
+            "open": "Aç",
+            "more": "Daha fazla",
+            "searchPage": "Sayfada aramak için tekrar <keys></keys>"
+        },
+        "commands": {
+            "new_agent": "Yeni ajan",
+            "browse_templates": "Şablonlara göz at",
+            "new_box": "Yeni Box",
+            "ask_assistant": "Chief of Staff'ınıza sorun",
+            "contact_support": "Destekle iletişime geç",
+            "recenter_board": "Panoyu ortala",
+            "toggle_theme_light": "Açık temaya geç",
+            "toggle_theme_dark": "Koyu temaya geç",
+            "workspace": "Çalışma alanı ayarları",
+            "members": "Üyeler",
+            "billing": "Faturalandırma",
+            "ai_providers": "Yapay zeka sağlayıcıları",
+            "api_keys": "API anahtarları ve MCP",
+            "company_brain": "Şirket Brain'i",
+            "shared_files": "Paylaşılan dosyalar",
+            "account": "Hesap",
+            "notifications": "Bildirimler",
+            "shortcuts": "Klavye kısayolları",
+            "whats_new": "Yenilikler"
+        }
+    },
+    "boxNameSuggestions": "Veya bir ad seçin",
+    "dashboard": {
+        "metaTitle": "Pano",
+        "metaDescription": "Rerun'da Boxes ve coworker'larınız."
+    }
+}

@@ -1,0 +1,415 @@
+{
+    "hub": {
+        "name": "Özellikler",
+        "metaTitle": "Özellikler: bir yapay zeka Coworker'ının sunduğu her şey",
+        "headline": "Bir Coworker'ın sunduğu her şey.",
+        "description": "Bir Coworker araçlarınıza erişir, kendi ekranında çalışır, Avrupa'da 7/24 çalışır ve önemli her işlemden önce sorar. On özelliğin her biri için bir sayfa.",
+        "count": "{count, plural, one {# özellik} other {# özellik}}",
+        "pickTitle": "Aradığınızı seçin.",
+        "pickLede": "Her sayfa, özelliği bir şemada değil, ürünün içinde çalışırken gösterir."
+    },
+    "page": {
+        "breadcrumbLabel": "Sayfa yolu",
+        "notFound": "Özellik bulunamadı",
+        "libraryLabel": "Kütüphaneden",
+        "browseTemplates": "Tüm şablonlara göz atın",
+        "faqLabel": "SSS",
+        "faqTitle": "{crumb}: sorularınız.",
+        "moreLabel": "Diğer özellikler",
+        "moreTitle": "Bir Coworker'ın sunduğu diğer her şey.",
+        "allFeatures": "Tüm özellikler"
+    },
+    "stage": {
+        "job": "Muhasebeci",
+        "shift": "Her pazartesi, 07:00"
+    },
+    "items": {
+        "coworkers": {
+            "crumb": "Coworker'lar",
+            "title": "Prompt yazmayın, bir yapay zeka Coworker'ı işe alın.",
+            "lede": "Ona bir iş, ihtiyaç duyduğu uygulamaları ve bir çalışma saati verin. İşi kendi araçlarınızda yapar ve size rapor verir: çizilecek akış şeması yok, uğraşılacak prompt yok.",
+            "metaTitle": "Yapay zeka Coworker'ları: iş akışı kurmak yerine ajan alın",
+            "metaDescription": "Bir Rerun Coworker'ı bir işi, uygulamalarınızı ve bir programı alır, işi kendi araçlarınızda yapıp rapor verir. Ne akış şeması ne prompt mühendisliği.",
+            "stageCaption": "Aynı Box'ta çalışan iki Coworker, az önce ne yaptıklarını söylüyor.",
+            "points": {
+                "first": {
+                    "title": "Bir tetikleyici değil, bir iş üstlenir",
+                    "body": "Onu bir rol için işe alırsınız (muhasebeci, satış temsilcisi, topluluk yöneticisi) ve bu rolü bir çalıştırmadan diğerine korur."
+                },
+                "second": {
+                    "title": "İşinizi hatırlar",
+                    "body": "Her Coworker kendi belleğini tutar: ne sattığınızı, nasıl yazdığınızı ve son çalıştırmada ne yaptığını."
+                },
+                "third": {
+                    "title": "Kendiliğinden işe koyulur",
+                    "body": "Her sabah, her pazartesi ya da uygulamalarınızdan birinde bir şey olduğunda. Onu hiç başlatmanız gerekmez."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Yapay zeka Coworker'ı nedir?",
+                    "answer": "Coworker, çizdiğiniz bir iş akışı değil, bir iş için işe aldığınız bir ajandır. Bir adı, bir rolü, kendi belleği, ihtiyaç duyduğu uygulamalar ve bir programı vardır. İşe alındıktan sonra o işi tekrar tekrar yapar ve her seferinde ne yaptığını size anlatır."
+                },
+                "second": {
+                    "question": "Kod yazmayı ya da prompt yazmayı bilmem gerekiyor mu?",
+                    "answer": "Hayır. İşi tek bir cümleyle anlatırsınız, Rerun onu bir Coworker'a dönüştürür, ihtiyaç duyduğu uygulamaları seçer ve programını ayarlar. Kurduğu her şey sonrasında okunabilir ve düzenlenebilir kalır."
+                },
+                "third": {
+                    "question": "Kaç Coworker işe alabilirim?",
+                    "answer": "Çalışma alanınız ne kadar gerektiriyorsa. Aynı makineyi ve aynı planı paylaşırlar, aynı bağlı uygulamaları kullanabilirler ve birbirlerine iş devredebilirler."
+                }
+            },
+            "templatesTitle": "Bugün işe alabileceğiniz üç Coworker."
+        },
+        "coworker-manager": {
+            "crumb": "Coworker yöneticisi",
+            "title": "İşe aldığınız tüm Coworker'lar için tek yönetici.",
+            "lede": "Rerun çalışma alanınızı yönetir: her Coworker'ı tanır, eksik olanları işe alır ve her isteği onu üstlenen kişiye iletir. Onunla sesli konuşun ya da siz yokken otomatik pilotta bırakın.",
+            "metaTitle": "Coworker yöneticisi: ekibinizi sesle ya da otomatik yönetin",
+            "metaDescription": "Rerun çalışma alanınızı yönetir: gereken Coworker'ları işe alır, her isteği doğru olana iletir, Space'e basınca dinler ve otomatik pilotta çalışır.",
+            "stageCaption": "Space'e basılı tutun, ne istediğinizi söyleyin: yönetici bunu ilgili Coworker'a iletir.",
+            "points": {
+                "first": {
+                    "title": "Tüm ekibinizi tanır",
+                    "body": "Kimi işe aldığınızı, her birinin ne yaptığını ve şu anda ne üzerinde çalıştığını. Coworker'a değil, yöneticiye sorarsınız."
+                },
+                "second": {
+                    "title": "Space'e basılı tutun ve konuşun",
+                    "body": "Çalışma alanının herhangi bir yerinde ne istediğinizi yüksek sesle söyleyin. Yazıya döker, doğru Coworker'ı bulur ve işi ona verir."
+                },
+                "third": {
+                    "title": "Siz yokken işleri yürütür",
+                    "body": "Otomatik pilotta, Coworker'larınızın sorularını belirlediğiniz kurallara göre yanıtlar, böylece bir çalıştırma sizi beklemek yerine tamamlanır."
+                }
+            },
+            "acts": {
+                "voice": {
+                    "eyebrow": "Sesle yönetin",
+                    "title": "Ona gerçekten neler söyleyebilirsiniz.",
+                    "body": "“Muhasebeciye Dupont faturasında ne durumda olduğumuzu sor.” “Satış temsilcisine ajanslara yazmayı bırakmasını söyle.” “Coworker'larım bu hafta sonu neler yaptı?” Coworker'ı değil, işi söylersiniz: yönetici o işi kimin yaptığını bilir. Henüz kimse yapmıyorsa, biri için işe alım yapmayı önerir."
+                },
+                "partner": {
+                    "eyebrow": "Proaktif bir ortak",
+                    "title": "Tüm işinizi baştan sona okur.",
+                    "body": "Bir Coworker yalnızca kendi işini görür. Yönetici hepsini aynı anda görür: üç gündür başarısız olan çalıştırmayı, kimsenin göndermediği yanıtı, elle yeniden yazıp durduğunuz taslağı. Sorulmasını beklemeden bunları size getirir."
+                },
+                "autopilot": {
+                    "eyebrow": "Otomatik pilot",
+                    "title": "Siz yokken neye karar verir.",
+                    "body": "Kuralları bir kez yazarsınız: ne kadarını onaylayabileceğini, asla ne göndermemesi gerektiğini, bir Coworker emin olmadığında ne yapacağını. Otomatik pilot bu kurallar içinde yanıt verir, böylece iş tamamlanır ve döndüğünüzde verdiği her karar konuda yer alır. Kuralların dışındaki her şey yine sizi bekler."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Coworker yöneticisi nedir?",
+                    "answer": "Rerun'un kendisi, yani çalışma alanınızın yöneticisidir. İşe aldığınız her Coworker'ı, her birinin ne yaptığını ve ne üzerinde çalıştığını bilir. Ne istediğinizi ona söylersiniz, o da doğru Coworker'a iletir ya da işin henüz sahibi yoksa birini işe alır."
+                },
+                "second": {
+                    "question": "Sesle yönetim nasıl çalışır?",
+                    "answer": "Çalışma alanınızın herhangi bir yerinde Space tuşunu basılı tutun ve ne istediğinizi söyleyin. Söyledikleriniz yöneticinin çubuğunda yazıya dökülür, yönetici işi üstlenen Coworker'ı seçer ve yanıt aynı yere gelir."
+                },
+                "third": {
+                    "question": "Otomatik pilot tam olarak ne yapar?",
+                    "answer": "Bir Coworker bir şey sormak için durduğunda ve siz orada değilseniz, otomatik pilot belirlediğiniz kurallara göre yanıt verir, böylece çalıştırma beklemek yerine tamamlanır. Döndüğünüzde verdiği her karar konuda yer alır."
+                }
+            },
+            "templatesTitle": "Ona yönetecek bir ekip verin."
+        },
+        "computer-use": {
+            "crumb": "Bilgisayar kullanımı",
+            "title": "Her Coworker kendi ekranında çalışır.",
+            "lede": "Bir uygulamanın API'si yoksa Coworker'ınız onu kendi ekranında açar ve bir insan gibi tıklayarak kullanır. Çalışırken izleyebilir, istediğiniz an fareyi geri alabilirsiniz.",
+            "metaTitle": "Bilgisayar kullanımı: uygulamalarınızda tıklayan yapay zeka",
+            "metaDescription": "Coworker'ınız kendi ekranında gerçek bir tarayıcı açar ve API'si olmayan portallarda tıklayarak ilerler. Canlı izleyin, fareyi istediğiniz an geri alın.",
+            "stageCaption": "Coworker'ın kendi ekranında, hesabınıza giriş yapmış gerçek bir tarayıcı.",
+            "points": {
+                "first": {
+                    "title": "Kazıyıcı değil, gerçek bir ekran",
+                    "body": "Bulutta, üzerinde tarayıcı olan tam bir masaüstü. API'si olmayan tedarikçi portalına da diğer araçlar gibi erişilir."
+                },
+                "second": {
+                    "title": "Canlı izleyin",
+                    "body": "Çalışırken ekranı açın ve her tıklamayı takip edin. Fareyi istediğiniz an geri alın, sonra yeniden devredin."
+                },
+                "third": {
+                    "title": "Bir kez giriş yapılır",
+                    "body": "İlk seferde onun ekranında giriş yaparsınız. Oturum, çalışma alanınızın içinde, onun makinesinde kalır."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Bilgisayar kullanımı nedir?",
+                    "answer": "Çalışma alanınızın makinesinde, bir Coworker'ın görebildiği ve tıklayabildiği gerçek bir masaüstüdür. API'si olmayan bir uygulamayı kullanmasını sağlayan budur: tarayıcıyı açar, gezinir, formu doldurur ve sonucu bir insan gibi okur."
+                },
+                "second": {
+                    "question": "Ne yaptığını izleyebilir miyim?",
+                    "answer": "Evet. Çalışırken ekranını açın, her tıklamayı gerçekleştiği anda görün. Fareyi istediğiniz an geri alabilir, bir adımı kendiniz yapabilir ve sonra devam etmesine izin verebilirsiniz."
+                },
+                "third": {
+                    "question": "Hesaplarıma nasıl giriş yapar?",
+                    "answer": "Yeni bir dizüstü bilgisayarda yapacağınız gibi, onun ekranında bir kez giriş yaparsınız. Oturum, çalışma alanınızın içinde o makinede kalır ve Coworker bir sonraki çalıştırmada onu yeniden kullanır."
+                }
+            },
+            "templatesTitle": "API'nin gitmediği yere giden Coworker'lar."
+        },
+        "tools": {
+            "crumb": "Araçlar",
+            "title": "{count, number}+ araçla yerel bağlantı.",
+            "lede": "Gmail, Slack, Stripe, HubSpot, Notion, Shopify ve gösterdiğiniz her MCP sunucusu. Bağlamak için tıklayın, Coworker'ınız bir sonraki çalıştırmada kullanır. Entegrasyon projesi yok, ek fatura yok.",
+            "metaTitle": "{count, number}+ araç ve entegrasyon, plana dahil",
+            "metaDescription": "Coworker'larınız Gmail, Slack, Stripe, HubSpot, Shopify ve {count, number}+ diğer araca, ayrıca her MCP sunucusuna erişir. Tıklayıp bağlayın, ek fatura yok.",
+            "stageCaption": "Bir Coworker'ın açabildiği uygulamalar ve ötesinde eriştiği {count, number}+ araç.",
+            "points": {
+                "first": {
+                    "title": "Tıklayıp bağlayın",
+                    "body": "Uygulamayı seçin, bir kez giriş yapın, çalışma alanındaki her Coworker onu kullanabilsin. Dağıtılacak hiçbir şey yok."
+                },
+                "second": {
+                    "title": "Her MCP sunucusu",
+                    "body": "Kendi iç sunucunuz ya da zaten barındırılan binlercesinden biri. Coworker'ınızı ona yönlendirin, araçlarını kullansın."
+                },
+                "third": {
+                    "title": "Dahil, ölçülmez",
+                    "body": "Bir araç bağlamak plana ek bir maliyet getirmez. Görev başına da bağlayıcı başına da ücret yok."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Hangi {count, number} araç dahil?",
+                    "answer": "Küçük bir işletmenin gerçekten kullandıkları: e-posta ve takvim, Slack, CRM'ler, Stripe, reklam platformları, Notion ve depolama alanları, e-ticaret yönetim panelleri, veritabanları. Bunların ötesindeki her şeye barındırılan bir MCP sunucusu ya da Coworker'ın kendi ekranı üzerinden erişilir."
+                },
+                "second": {
+                    "question": "Aracım listede yoksa ne olur?",
+                    "answer": "İki yol var. Bir MCP sunucusu varsa Coworker'ınızı ona yönlendirin, araçlarını hemen kullanır. Hiç API'si yoksa Coworker onu kendi ekranında açar ve bir insan gibi tıklayarak kullanır."
+                },
+                "third": {
+                    "question": "Bağlı uygulamalar ek ücretli mi?",
+                    "answer": "Hayır. Bir araç bağlamak plana dahildir; kaç tane bağladığınız ve Coworker'larınızın onları ne sıklıkla kullandığı fark etmez."
+                }
+            },
+            "templatesTitle": "Uygulamalarınızda yaşayan Coworker'lar."
+        },
+        "human-in-the-loop": {
+            "crumb": "Döngüde insan",
+            "title": "Bir onay gerekene kadar otonom.",
+            "lede": "Coworker'ınız tek başına çalışır ve önemli her işlemden önce durur: bir ödeme, bir gönderim, bir silme. Sorar, bekler ve ekipten herkes yanıt verebilir.",
+            "metaTitle": "Döngüde insan: yapay zeka ajanınız harekete geçmeden sorar",
+            "metaDescription": "Bir Rerun Coworker'ı kendi başına çalışır ve önemli her işlemden önce durur. Sorar, bir onay bekler ve ekipten herkes yanıt verebilir.",
+            "stageCaption": "Çalıştırmanın ortasında duran, soran ve birinin yanıtlamasını bekleyen bir Coworker.",
+            "points": {
+                "first": {
+                    "title": "Bağlayıcı bir adım atmadan durur",
+                    "body": "Harcama ürünün kendisinde kilitlidir; geri kalanını (ne gönderdiği, ne sildiği) talimatlarında siz belirlersiniz."
+                },
+                "second": {
+                    "title": "Ekipten herkes yanıt verebilir",
+                    "body": "Soru panoya ve bildirimlerinize düşer. İlk ulaşan kişi çalıştırmanın önünü açar."
+                },
+                "third": {
+                    "title": "Her çalıştırma kayıt altında",
+                    "body": "Ne sorduğu, kimin yanıtladığı ve sonra ne yaptığı konuda kalır. Hiçbir şey kayıt dışı olmaz."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Bir Coworker neyin önünde durur?",
+                    "answer": "Para harcamak ürünün içinde kilitlidir: bir Coworker onay olmadan hiçbir şey satın alamaz. Geri kalan her şey (bir müşteriye e-posta göndermek, kayıt silmek, yayınlamak) talimatlarında belirlenir, böylece ona ne kadar serbestlik tanıyacağınıza siz karar verirsiniz."
+                },
+                "second": {
+                    "question": "Bir isteği kim onaylayabilir?",
+                    "answer": "Çalışma alanındaki herkes. Kullanıcı koltukları ücretsiz olduğundan, karar vermesi gereken kişi, isteği hesabın sahibine iletmek yerine kararı kendisi verebilir."
+                },
+                "third": {
+                    "question": "Kimse yanıt vermezse ne olur?",
+                    "answer": "Çalıştırma bekler ve soru panoda kalır. Otomatik pilotu açarsanız Chief of Staff'ınız yazdığınız kurallara göre yanıt verir, böylece çalıştırma siz olmadan tamamlanır."
+                }
+            },
+            "templatesTitle": "Kısa tasmayla tutmak isteyeceğiniz Coworker'lar."
+        },
+        "runs-24-7": {
+            "crumb": "7/24 çalışır",
+            "title": "Avrupa'daki sunucularda 7/24 çalışır.",
+            "lede": "Çalışma alanınız Almanya'da barındırılan kendi makinesini alır. Hiç uyumaz, bu yüzden saat 7'deki çalıştırma dizüstü bilgisayarınız açık olsa da olmasa da gerçekleşir.",
+            "metaTitle": "Avrupa'daki sunucularda 7/24 çalışan yapay zeka ajanları",
+            "metaDescription": "Her Rerun çalışma alanının Almanya'da kendi makinesi var. Coworker'larınız gece, hafta sonu ve tatilde, dizüstü kapalıyken programa göre çalışır.",
+            "stageCaption": "Aynı çalışma alanı saat 7'de ve gece 3'te: çalıştırma her iki durumda da gerçekleşir.",
+            "points": {
+                "first": {
+                    "title": "Kendi makineniz",
+                    "body": "Ortak bir kuyruk değil: Coworker'larınızın dosyalarını, oturumlarını ve ekranlarını tuttuğu, çalışma alanınıza ait bir makine."
+                },
+                "second": {
+                    "title": "Almanya'da barındırılır",
+                    "body": "Makineler Avrupa'dadır; Coworker'larınız verileriniz üzerinde çalışırken veriler de orada kalır."
+                },
+                "third": {
+                    "title": "Programla ya da bir olayla",
+                    "body": "Her sabah, her pazartesi ya da uygulamalarınızdan birine bir şey düştüğü anda. Kimsenin başlat düğmesine basması gerekmez."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Bilgisayarımın açık kalması gerekiyor mu?",
+                    "answer": "Hayır. Coworker'larınız dizüstü bilgisayarınızda değil, buluttaki bir makinede çalışır. Kapatın, bir yere uçun, pazartesi sabahki çalıştırma yine gerçekleşir."
+                },
+                "second": {
+                    "question": "Sunucular nerede?",
+                    "answer": "Almanya'da. Çalışma alanınızın orada kendi makinesi vardır; Coworker'larınız orada çalışır ve çalıştırmalar arasında ihtiyaç duyduklarını orada tutar."
+                },
+                "third": {
+                    "question": "Bir Coworker saatini beklemek yerine bir olaya tepki verebilir mi?",
+                    "answer": "Evet. Bir Coworker bir programa göre çalışabilir ve bağlı uygulamalarınızdan birinde bir şey olduğunda da başlayabilir: yeni bir e-posta, yeni bir sipariş, yeni bir satır."
+                }
+            },
+            "templatesTitle": "Siz uyurken çalışan Coworker'lar."
+        },
+        "second-brain": {
+            "crumb": "İkinci beyin",
+            "title": "İşletmeniz için ikinci bir beyin.",
+            "lede": "Coworker'larınız aynı sayfaları okur: ne sattığınızı, kime sattığınızı, nasıl yazdığınızı. Bu sayfaları güncel tutarlar ve her çalıştırma onlardan başlar.",
+            "metaTitle": "Coworker'ların her çalıştırmadan önce okuduğu ikinci beyin",
+            "metaDescription": "Teklifiniz, pazarınız, üslubunuz ve kurallarınız, her Coworker'ın okuduğu sayfalara bir kez yazılır. Onları güncel tutarlar, bağlam yapıştırmazsınız.",
+            "stageCaption": "Coworker'larınızın okuduğu sayfalar ve bunları besledikleri kaynaklar.",
+            "points": {
+                "first": {
+                    "title": "Prompt değil, sayfalar",
+                    "body": "Teklifiniz, müşterileriniz, üslubunuz ve kurallarınız, bir kez yazılır ve her Coworker tarafından okunur."
+                },
+                "second": {
+                    "title": "Kendini güncel tutar",
+                    "body": "Coworker'lar bir çalıştırmada öğrendiklerini geri yazar, böylece beyin hiçbir zaman ilk ay yazdığınız sürümde kalmaz."
+                },
+                "third": {
+                    "title": "Tüm ekip tarafından paylaşılır",
+                    "body": "Yeni bir Coworker işe alın, işletmeyi zaten tanıyor olsun. İş arkadaşlarınız aynı sayfaları okur ve düzeltir."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "İkinci beyne neler girer?",
+                    "answer": "Yeni bir çalışana ilk haftasında anlatacaklarınız: ne sattığınız ve hangi fiyata, kimin satın aldığı, kimlerle rekabet ettiğiniz, nasıl yazdığınız ve asla çiğnemediğiniz kurallar. Yapıştırdığınız bir prompt olarak değil, sayfalar halinde durur."
+                },
+                "second": {
+                    "question": "Onu elle güncel tutmam gerekiyor mu?",
+                    "answer": "Hayır. Coworker'larınız bir çalıştırmada bulduklarını geri yazar (bir rakibin yeni fiyatı, müşterilerin sürekli sorduğu bir soru), böylece sayfalar eskimek yerine işletmeyi takip eder."
+                },
+                "third": {
+                    "question": "Her Coworker'ın kendi belleği de var mı?",
+                    "answer": "Evet. Beyin tüm çalışma alanının paylaştığı şeydir; bunun üzerine her Coworker kendi işinin ve son seferde ne yaptığının belleğini tutar."
+                }
+            },
+            "templatesTitle": "Sizin gibi konuşması gereken Coworker'lar."
+        },
+        "workspaces": {
+            "crumb": "Çalışma alanları",
+            "title": "Tek hesap, her işletmeye bir çalışma alanı.",
+            "lede": "Bir müşteri, bir marka, bir yan proje: her biri kendi çalışma alanını, kendi Coworker'larını, kendi bağlı uygulamalarını ve kendi beynini alır. Köşedeki düğmeden geçiş yapın.",
+            "metaTitle": "Çalışma alanları: her işletmeyi, müşteriyi, markayı ayırın",
+            "metaDescription": "Tek bir Rerun hesabı istediğiniz kadar çalışma alanı taşır: her birinin kendi Coworker'ları, uygulamaları ve beyni vardır. Aralarında hiçbir şey geçmez.",
+            "stageCaption": "Geçiş menüsü: tüm işletmeler tek hesapta, hiçbiri birbirine karışmadan.",
+            "points": {
+                "first": {
+                    "title": "Hiçbir şey karışmaz",
+                    "body": "Ayrı Coworker'lar, ayrı uygulamalar, ayrı beyin. Bir müşterinin gelen kutusu hiçbir zaman diğerininkiyle karışmaz."
+                },
+                "second": {
+                    "title": "Her birinin içinde departmanlar",
+                    "body": "Pazarlama, Finans, Yönetim: Coworker'larınızı Boxes içinde gruplayın, böylece çalışma alanı büyüdükçe okunabilir kalır."
+                },
+                "third": {
+                    "title": "Tek geçiş menüsü, tek giriş",
+                    "body": "Çalışma alanını köşedeki düğmeden değiştirin. Aynı hesap, aynı şifre, farklı şirket."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Ne zaman birden fazla çalışma alanı kullanmalıyım?",
+                    "answer": "İşletmelerin paylaşacak hiçbir şeyi olmadığında: her müşteri için bir tane kullanan bir ajans, bir şirketi ve bir yan projesi olan bir kurucu, her marka için bir tane kullanan bir grup. Birden fazla ekibi olan aynı işletmeyse, bunun yerine tek bir çalışma alanında Boxes kullanın."
+                },
+                "second": {
+                    "question": "Her çalışma alanının kendi uygulamaları mı olmalı?",
+                    "answer": "Evet, mesele de bu: her biri kendi Gmail'ini, kendi Stripe'ını, kendi CRM'ini bağlar. Bir Coworker yalnızca içinde bulunduğu çalışma alanının uygulamalarına erişebilir."
+                },
+                "third": {
+                    "question": "Ekibim birden fazla çalışma alanında olabilir mi?",
+                    "answer": "Evet. Kişiler çalışma alanı bazında davet edilir, böylece bir iş arkadaşınız ikisinde, bir müşteri ise yalnızca birinde olabilir."
+                }
+            },
+            "templatesTitle": "Bir çalışma alanı, bir iş kolu."
+        },
+        "invite-your-team": {
+            "crumb": "Tüm ekibiniz",
+            "title": "Tüm ekibinizi ek ücret ödemeden davet edin.",
+            "lede": "Koltuklar ücretsiz. Herkes aynı panoyu görür, aynı Coworker'larla konuşur ve biri onay istediğinde yanıt verebilir.",
+            "metaTitle": "Tüm ekibinizi davet edin: her planda ücretsiz koltuk",
+            "metaDescription": "Rerun koltuk başına ücret almaz. Herkesi davet edin, aynı panoda çalışın, aynı Coworker'larla konuşun ve o an kim varsa bir çalıştırmayı onaylasın.",
+            "stageCaption": "Aynı pano, aynı Coworker'lar, aynı anda birkaç kişi.",
+            "points": {
+                "first": {
+                    "title": "Kullanıcı başı fiyat değil, ücretsiz koltuk",
+                    "body": "Plan kişi sayısını değil, çalışma alanını kapsar. Bir iş arkadaşı eklemek faturayı değiştirmez."
+                },
+                "second": {
+                    "title": "Tek ortak pano",
+                    "body": "Birbirinizin imleçlerini, çalışan Coworker'ları ve az önce bitirdiklerini canlı görürsünüz."
+                },
+                "third": {
+                    "title": "Herkes çalıştırmanın önünü açabilir",
+                    "body": "Bir Coworker onay istediğinde o an kim varsa yanıt verir. Hiçbir şey tek bir kişinin girişini beklemez."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Ek bir koltuk ne kadar?",
+                    "answer": "Hiçbir şey. Plan kişi başına değil, çalışma alanı başınadır; böylece haftada bir soruya yanıt veren kişiler dahil tüm ekibi davet edebilirsiniz."
+                },
+                "second": {
+                    "question": "Herkes her şeyi görür mü?",
+                    "answer": "Bir çalışma alanının içinde, evet: aynı pano, aynı Coworker'lar, aynı konular. Ayrı kalması gereken bir şey varsa, onu kendi çalışma alanına koyun ve yalnızca ihtiyacı olanları davet edin."
+                },
+                "third": {
+                    "question": "İş arkadaşım, işe aldığım bir Coworker ile konuşabilir mi?",
+                    "answer": "Evet. Bir Coworker onu işe alan kişiye değil, çalışma alanına aittir. Herkes ona iş verebilir, ne yaptığını okuyabilir ve sorularını yanıtlayabilir."
+                }
+            },
+            "templatesTitle": "Tüm ekibin güvendiği Coworker'lar."
+        },
+        "coworkers-work-together": {
+            "crumb": "Birlikte çalışma",
+            "title": "Coworker'larınız birbirine iş devreder.",
+            "lede": "Biri potansiyel müşterileri bulur, sonraki onlara yazar, üçüncüsü onları CRM'inize kaydeder. Aralarında kimse bir şey kopyalamaz ve tüm zinciri tek bir yerde okursunuz.",
+            "metaTitle": "Birbirine iş devreden yapay zeka Coworker'ları",
+            "metaDescription": "Bir Coworker potansiyel müşterileri bulur, sonraki onlara yazar, üçüncüsü CRM'inize kaydeder. İşi doğrudan aktarır ve okunabilir tek bir konu bırakırlar.",
+            "stageCaption": "Aynı işi sırayla birbirine aktaran üç Coworker.",
+            "points": {
+                "first": {
+                    "title": "İşi bir sonrakine aktarırlar",
+                    "body": "Kendi kısmını bitiren bir Coworker, bulduklarıyla birlikte bir sonrakine haber verir. Kurye siz değilsiniz."
+                },
+                "second": {
+                    "title": "Aynı uygulamalar, aynı beyin",
+                    "body": "Çalışma alanının bağlı araçlarını ve ikinci beynini paylaşırlar, böylece hiçbir şeyin iki kez anlatılması gerekmez."
+                },
+                "third": {
+                    "title": "Okunacak tek bir konu",
+                    "body": "Zincir gerçekleştikçe panoda görünür: kim neyi, hangi sırayla yaptı ve sonunda ne çıktı."
+                }
+            },
+            "faq": {
+                "first": {
+                    "question": "Coworker'lar birbirine nasıl iş devreder?",
+                    "answer": "Bir Coworker, sizin yapacağınız gibi diğerine mesaj göndererek bulduklarını aktarabilir. Zincir panoda ilerler ve üç ayrı konu açmadan takip edebilirsiniz."
+                },
+                "second": {
+                    "question": "Zinciri kendim mi kurmam gerekiyor?",
+                    "answer": "Hayır. Her birinin neden sorumlu olduğunu söylersiniz; Chief of Staff'ınız kimin neyle ilgilendiğini bilir ve aralarında yönlendirme yapar. Sıra önemliyse, bir Coworker'ın talimatlarında bir sonraki Coworker'ı da belirtebilirsiniz."
+                },
+                "third": {
+                    "question": "Bu, çok ajanlı bir iş akışıyla aynı şey mi?",
+                    "answer": "Aynı sorunu şema olmadan çözer. Bakımı yapılacak bir düğüm tuvali yok: işler için insanlar işe alırsınız ve iş, bir ekipte olduğu gibi aralarında dolaşır."
+                }
+            },
+            "templatesTitle": "Birkaç Coworker'ın işi paylaştığı kurulumlar."
+        }
+    }
+}

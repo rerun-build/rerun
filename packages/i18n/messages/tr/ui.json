@@ -1,0 +1,57 @@
+{
+    "close": "Kapat",
+    "back": "Geri",
+    "moreOptions": "Diğer seçenekler",
+    "deleteConfirmTitle": "{label}?",
+    "command": {
+        "title": "Komut paleti",
+        "description": "Çalıştırılacak bir komut arayın..."
+    },
+    "combobox": {
+        "placeholder": "Bir seçenek seçin",
+        "placeholderMultiple": "Seçenekleri seçin",
+        "search": "Ara…",
+        "empty": "Sonuç bulunamadı",
+        "selected": "Seçilenler",
+        "remove": "Kaldır: {option}",
+        "reorder": "Yeniden sırala: {option}"
+    },
+    "filter": {
+        "search": "Ara: {label}…",
+        "empty": "Eşleşme yok",
+        "clear": "Temizle"
+    },
+    "phone": {
+        "code": "Ülke telefon kodu, bir kod ya da ülke yazın",
+        "noCountry": "Ülke bulunamadı"
+    },
+    "powerBars": "Güç: {filled}/{max}",
+    "markdown": {
+        "openEditor": "Tam düzenleyiciyi aç",
+        "done": "Bitti"
+    },
+    "upload": {
+        "menu": "Yükle",
+        "files": "Dosya yükle",
+        "folder": "Klasör yükle",
+        "failed": "Yükleme başarısız oldu",
+        "finishing": "Tamamlanıyor",
+        "waiting": "Bekliyor · {size}",
+        "progress": "Yükleme ilerlemesi",
+        "uploadingFile": "Yükleniyor: {name}",
+        "totalProgress": "Toplam yükleme ilerlemesi",
+        "retry": "Yeniden dene",
+        "cancel": "İptal",
+        "cancelAll": "Tümünü iptal et",
+        "dismiss": "Kapat",
+        "headingFailed": "{total} dosyadan {failed} tanesi yüklenemedi",
+        "headingDone": "{count, plural, one {# dosya yüklendi} other {# dosya yüklendi}}",
+        "headingUploading": "Yükleniyor: {current}/{total}",
+        "more": "+ {count} tane daha"
+    },
+    "waveform": {
+        "live": "Canlı ses dalga formu",
+        "processing": "Ses işleniyor",
+        "idle": "Ses dalga formu boşta"
+    }
+}

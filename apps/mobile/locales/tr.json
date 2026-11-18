@@ -1,0 +1,7 @@
+{
+    "ios": {
+        "NSPhotoLibraryUsageDescription": "Rerun, bir mesaja fotoğraf eklemek için fotoğraf arşivinizi kullanır.",
+        "NSCameraUsageDescription": "Rerun, bir mesaja fotoğraf eklemek için kamerayı kullanır.",
+        "NSMicrophoneUsageDescription": "Rerun, sesli mesaj kaydetmek için mikrofonu kullanır."
+    }
+}

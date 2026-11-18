@@ -1,0 +1,144 @@
+{
+    "appAccount": {
+        "addAccount": "Hesap ekle",
+        "connectTitle": "{provider} hesabı bağlayın",
+        "connectHint": "Çalışma alanı için bir kez bağlanır, sonra her coworker bu hesapla işlem yapabilir.",
+        "connect": "{provider} bağla",
+        "actsAs": "Kullanılan hesap",
+        "accountName": "{provider} hesabı",
+        "selected": "Bu coworker bu hesapla işlem yapar",
+        "appAccount": "{app} hesabı",
+        "needsAttention": "{app} tarafında ilgilenilmesi gerekiyor",
+        "wakeWhen": "Bu coworker'ı şu durumda uyandır",
+        "timing": {
+            "rightAway": "Hemen",
+            "everyFewHours": "Birkaç saatte bir kontrol edilir"
+        },
+        "unavailable": "{app} bu çalışma alanında henüz kullanılamıyor."
+    },
+    "authMethod": {
+        "label": {
+            "oauth": "Oturum aç",
+            "key": "API anahtarı",
+            "stdio": "Yerel",
+            "app": "Çalışma alanı hesabı",
+            "other": "Bağla"
+        },
+        "description": {
+            "oauth": "Güvenli bir açılır pencereyle oturum açın.",
+            "key": "Servisten aldığınız API anahtarını yapıştırın.",
+            "stdio": "Engine'inizde yerel olarak çalışır.",
+            "app": "Çalışma alanına bağlı bir hesap seçin.",
+            "other": "Kimlik bilgisi gerekmez."
+        }
+    },
+    "connect": {
+        "authorizationFailed": "Yetkilendirme başarısız oldu",
+        "startFailed": "Bağlantı başlatılamadı",
+        "startOAuthFailed": "OAuth başlatılamadı",
+        "connectedAs": "Bağlı hesap: {account}",
+        "connected": "Bağlı",
+        "retry": "Tekrar dene",
+        "secureTitle": "Güvenli bağlantı",
+        "secureBody": "Bu bağlantı güvenilir iş ortaklarımızdan biri tarafından yönetilir.",
+        "waiting": "Yetkilendirme bekleniyor…",
+        "connect": "Bağla"
+    },
+    "credentialGuide": {
+        "title": "{label} nasıl alınır"
+    },
+    "customMcp": {
+        "custom": "Özel",
+        "connect": "Bağla",
+        "edit": "Düzenle: {name}",
+        "remove": "Kaldır: {name}",
+        "removeTitle": "{name} kaldırılsın mı?",
+        "removeDescription": "Coworker bu sunucunun sunduğu tüm araçları kaybeder ve oturumu silinir.",
+        "removeConfirm": "Kaldır",
+        "status": {
+            "connected": "Bağlı · {count, plural, one {# araç} other {# araç}}",
+            "needsAuth": "Oturum açılmalı",
+            "unreachable": "Erişilemiyor",
+            "noAnswer": "Sunucu yanıt vermedi."
+        }
+    },
+    "requestApp": {
+        "required": "Lütfen ihtiyacınız olan uygulamayı açıklayın",
+        "sent": "İstek gönderildi. Teşekkürler, inceleyeceğiz.",
+        "title": "Uygulama iste",
+        "description": "Hangi uygulamaya ihtiyacınız olduğunu ve nasıl kullanacağınızı anlatın. Gerisini biz hallederiz.",
+        "placeholder": "İhtiyacınız olan uygulamayı açıklayın…",
+        "cancel": "İptal",
+        "send": "İstek gönder"
+    },
+    "alternatives": {
+        "label": "Şunlarla da çalışır"
+    },
+    "configForm": {
+        "configured": "{name} yapılandırıldı",
+        "connectTitle": "{name} bağla",
+        "signInOAuth": "Ajanınızın kullanabilmesi için oturum açın: {name}.",
+        "signInManaged": "Ajanınızın kullanabilmesi için {name} ile oturum açın. Bağlantıyı Rerun sizin için yönetir.",
+        "setUp": "{name} kurulumu",
+        "authentication": "Kimlik doğrulama",
+        "backToMethods": "Yöntemlere dön",
+        "connecting": "Bağlanıyor…",
+        "connect": "Bağla",
+        "installing": "Kuruluyor…",
+        "chooseAccount": "Bir hesap seçin",
+        "install": "Kur",
+        "noTarget": "Bu servis oturum açmayı gerektiriyor ama bağlantı hedefi döndürmedi.",
+        "missingFields": "Bazı zorunlu alanlar hâlâ eksik."
+    },
+    "fields": {
+        "selectPlaceholder": "Seçin…"
+    },
+    "installed": {
+        "title": "{name} kuruldu",
+        "nextTurn": "Sonraki turda kullanılabilir: {tools}"
+    },
+    "list": {
+        "emptyTitle": "Uygulama bulunamadı",
+        "emptyDescription": "Aramanızla eşleşen bir uygulama bulamadık.",
+        "request": "Uygulama iste",
+        "installed": "Kurulu",
+        "addAccount": "Hesap ekle",
+        "needsSignIn": "Oturum açılmalı",
+        "needsSetup": "Kurulum gerekli",
+        "removeApp": "Uygulamayı kaldır",
+        "finishSetup": "Kurulumu bitir",
+        "install": "Kur"
+    },
+    "suggestion": {
+        "loading": "Önerilen uygulamalar yükleniyor…",
+        "loadFailed": "{name} yüklenemedi.",
+        "notFoundSkipped": "Katalogda bulunamadı, atlandı.",
+        "notNow": "Şimdi değil",
+        "connect": "Bağla",
+        "cancel": "İptal",
+        "connected": "{name} bağlandı",
+        "reconnect": "Yeniden bağla",
+        "notFound": "Katalogda bulunamadı.",
+        "skipped": "Atlandı.",
+        "skip": "Atla",
+        "finish": "Bitir",
+        "nextApp": "Sonraki uygulama",
+        "fromVault": "Zaten Vault'ta",
+        "useAccount": "Kullan: {label}",
+        "connectNew": "Yeni hesap"
+    },
+    "signInPopup": {
+        "connecting": "Bağlanılıyor: {name}…"
+    },
+    "categories": {
+        "payments": "Ödemeler",
+        "ecommerce": "E-ticaret",
+        "crm": "CRM",
+        "marketing": "Pazarlama",
+        "seo": "SEO",
+        "analytics": "Analitik",
+        "dev": "Geliştirici",
+        "productivity": "Verimlilik",
+        "other": "Diğer"
+    }
+}

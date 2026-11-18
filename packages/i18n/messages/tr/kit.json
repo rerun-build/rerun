@@ -1,0 +1,489 @@
+{
+    "close": "Kapat",
+    "chat": {
+        "actionApproval": {
+            "title": "Onay gerekli",
+            "previous": "Önceki onay",
+            "next": "Sonraki onay",
+            "decline": "Şimdi değil",
+            "explain": "Açıkla",
+            "approve": "Onayla",
+            "approved": "Onaylandı"
+        },
+        "alert": {
+            "title": "Bildirim",
+            "markAsRead": "Okundu olarak işaretle"
+        },
+        "approval": {
+            "title": "Onay gerekli: {label}",
+            "responded": "Yanıt: <b>{choice}</b>",
+            "choices": {
+                "once": "Bir kez izin ver",
+                "session": "Bu oturum",
+                "always": "Her zaman",
+                "deny": "Reddet"
+            }
+        },
+        "decline": {
+            "placeholder": "Neden olmasın? (isteğe bağlı)",
+            "back": "Geri",
+            "confirm": "Onayla"
+        },
+        "question": {
+            "typeAnswer": "Yanıtınızı yazın…",
+            "somethingElse": "Başka bir şey",
+            "attachFiles": "Dosya ekle",
+            "dropFiles": "Eklemek için dosyaları bırakın",
+            "record": "Sesinizle yanıtlayın",
+            "useRecording": "Bu kaydı kullan",
+            "discardRecording": "Kaydı sil",
+            "selectAll": "Uygun olanların hepsini seçin",
+            "dismiss": "Soruları kapat",
+            "skip": "Atla",
+            "submit": "Yanıtları gönder",
+            "next": "Sonraki soru"
+        },
+        "reasoning": {
+            "thinking": "Düşünüyor...",
+            "thoughtFor": "{duration} boyunca düşündü",
+            "thought": "Düşündü"
+        },
+        "secret": {
+            "saveFailed": "Kimlik bilgileri kaydedilemedi",
+            "titleOne": "Kimlik bilgisi gerekli",
+            "titleMany": "Kimlik bilgileri gerekli",
+            "dismiss": "Kimlik bilgisi isteğini kapat",
+            "storedAs": "{key} olarak saklandı",
+            "replacePlaceholder": "Zaten kaydedildi. Değiştirmek için bir değer girin",
+            "placeholder": "Değeri yapıştırın",
+            "whereToFind": "Nerede bulunur",
+            "storageNote": "Motorunuzda bir coworker değişkeni olarak saklanır. Modele asla gönderilmez.",
+            "skip": "Atla",
+            "saving": "Kaydediliyor…",
+            "save": "Kaydet"
+        },
+        "skillProposal": {
+            "remembering": "Hatırlanıyor",
+            "remembered": "Hatırlandı",
+            "failed": "Bu hatırlanamadı",
+            "retry": "Tekrar dene",
+            "dismiss": "Kapat",
+            "notRemembered": "Hatırlanmadı",
+            "remember": "Hatırla",
+            "no": "Hayır",
+            "view": "Görüntüle",
+            "hideDetails": "Ayrıntıları gizle",
+            "showDetails": "Ayrıntıları göster"
+        },
+        "steps": {
+            "previous": "Önceki adım",
+            "next": "Sonraki adım",
+            "goTo": "{step}. adıma git"
+        },
+        "table": {
+            "boxDatabase": "Box veritabanı",
+            "coworkerDatabase": "Coworker veritabanı",
+            "rows": "{count, plural, one {# satır} other {# satır}}",
+            "columnsHidden": "bazı sütunlar gizli",
+            "groupedBy": "gruplama: {column}",
+            "open": "Veritabanını aç",
+            "empty": "Henüz satır yok.",
+            "more": "+ {count} tane daha",
+            "rating": "5 üzerinden {value}"
+        }
+    },
+    "canvas": {
+        "zoomIn": "Yakınlaştır",
+        "zoomOut": "Uzaklaştır",
+        "recenter": "Ortala",
+        "recenterView": "Görünümü ortala"
+    },
+    "consent": {
+        "rejectAll": "Tümünü reddet",
+        "acceptAll": "Tümünü kabul et",
+        "region": "Çerez onayı",
+        "title": "Çerezler",
+        "short": "Analiz çerezleri kullanıyoruz. <policy>Çerez politikası</policy>",
+        "long": "Rerun'ın nasıl kullanıldığını anlamak için analiz çerezleri kullanıyoruz. Giriş yapmanız, destek sohbetinin çalışması ve tercihlerinizin hatırlanması için gereken çerezler her zaman açıktır. <policy>Çerez politikası</policy>"
+    },
+    "experts": {
+        "wizard": {
+            "steps": {
+                "identity": {
+                    "title": "Kimliğiniz",
+                    "description": "Fotoğrafınız, banner'ınız, adınız ve çalışma şekliniz."
+                },
+                "about": {
+                    "title": "Hakkınızda",
+                    "description": "Nerede olduğunuz ve ne yaptığınız."
+                },
+                "pricing": {
+                    "title": "Ücretler ve müsaitlik",
+                    "description": "Müsaitliğiniz ve ücretleriniz hakkında bir fikir."
+                },
+                "expertise": {
+                    "title": "Uzmanlığınız",
+                    "description": "Çalıştığınız beceriler ve diller. İsteğe bağlı."
+                },
+                "links": {
+                    "title": "Bağlantılar ve yayınlama",
+                    "description": "Bağlantılarınızı ekleyin, ardından profilinizi yayınlayın."
+                }
+            },
+            "name": "Ad",
+            "namePlaceholder": "ör. Mira Labs",
+            "email": "E-posta",
+            "emailHelper": "Gizli. Yalnızca Rerun ekibi görebilir.",
+            "type": "Tür",
+            "location": "Konum",
+            "locationPlaceholder": "ör. İstanbul",
+            "bio": "Biyografi",
+            "bioPlaceholder": "Ne geliştirdiğiniz ve kime yardım ettiğiniz.",
+            "availability": "Müsaitlik",
+            "budget": "Bütçe",
+            "budgetPlaceholder": "Bir aralık seçin",
+            "skills": "Beceriler",
+            "skillsPlaceholder": "Beceri seçin",
+            "languages": "Diller",
+            "languagesPlaceholder": "Dil seçin",
+            "website": "Web sitesi",
+            "back": "Geri",
+            "continue": "Devam et"
+        },
+        "types": {
+            "studio": {
+                "title": "Stüdyo",
+                "description": "Müşteriler için geliştiren bir ajans veya ekip"
+            },
+            "freelancer": {
+                "title": "Serbest çalışan",
+                "description": "Tek başına geliştiren bağımsız biri"
+            },
+            "expert": {
+                "title": "Uzman",
+                "description": "Danışmanlık ve rehberlik sunan bir uzman"
+            }
+        },
+        "availability": {
+            "tooltip": "{label}: {hint}",
+            "available": {
+                "label": "Müsait",
+                "hint": "Şu anda yeni iş alıyor"
+            },
+            "soon": {
+                "label": "Yakında müsait",
+                "hint": "Yakında yer açılıyor"
+            },
+            "unavailable": {
+                "label": "Müsait değil",
+                "hint": "Şimdilik tamamen dolu"
+            }
+        },
+        "validation": {
+            "nameRequired": "Ad gerekli",
+            "nameTooLong": "Ad çok uzun",
+            "nameInvalid": "Ad < veya > içeremez",
+            "emailRequired": "E-posta gerekli",
+            "emailInvalid": "Geçersiz e-posta",
+            "bioTooLong": "Biyografi çok uzun",
+            "budgetInvalid": "Geçersiz bütçe",
+            "skillInvalid": "Geçersiz beceri",
+            "languageInvalid": "Geçersiz dil"
+        },
+        "images": {
+            "title": "Fotoğraf ve banner",
+            "drop": "Bırakın",
+            "dropBanner": "Banner'ınızı bırakın",
+            "dropPhoto": "Fotoğrafınızı bırakın",
+            "upload": "Yükle",
+            "uploading": "Yükleniyor…",
+            "changeBanner": "Banner'ı değiştir",
+            "uploadPhoto": "Fotoğraf yükle",
+            "remove": "Kaldır",
+            "notAnImage": "Lütfen bir görsel dosyası seçin."
+        },
+        "card": {
+            "location": "Konum",
+            "status": "Durum",
+            "links": "Bağlantılar",
+            "namePlaceholder": "Adınız",
+            "rolePlaceholder": "Rerun Uzmanı"
+        },
+        "preview": {
+            "hire": "İşe al"
+        }
+    },
+    "foreman": {
+        "orbLabel": "Chief of Staff'ınıza sorun",
+        "tabsLabel": "Chief of Staff",
+        "empty": {
+            "title": "Çalışma alanınızla ilgili her şeyi sorun",
+            "description": "Chief of Staff'ınız coworker'larınızı sizinle birlikte oluşturur ve çalıştırır"
+        },
+        "header": {
+            "closeChat": "Sohbeti kapat",
+            "resize": "Sohbeti yeniden boyutlandır"
+        },
+        "tabs": {
+            "assistant": "Sor",
+            "tasks": "Görevler",
+            "routines": "Rutinler",
+            "card": "Kart"
+        },
+        "periods": {
+            "running": "Çalışıyor",
+            "morning": "Bu sabah",
+            "afternoon": "Bu öğleden sonra",
+            "tonight": "Bu akşam",
+            "tomorrow": "Yarın",
+            "week": "Bu hafta",
+            "later": "Daha sonra",
+            "paused": "Duraklatıldı"
+        },
+        "routines": {
+            "setupFirst": "Önce kurulumu tamamlayın",
+            "pause": "Duraklat: {name}",
+            "resume": "Sürdür: {name}",
+            "nameLabel": "Rutin adı",
+            "runningJustNow": "Çalışıyor · <1 dk",
+            "runningMinutes": "Çalışıyor · {minutes} dk",
+            "runningHours": "Çalışıyor · {hours} sa",
+            "startsNow": "Şimdi başlıyor",
+            "startsInMinutes": "{minutes} dk sonra başlar",
+            "startsInHours": "{hours} sa sonra başlar"
+        },
+        "agentPicker": {
+            "openTab": "{name} için {tab} sekmesini aç"
+        }
+    },
+    "forms": {
+        "optional": "İsteğe bağlı",
+        "hidePassword": "Şifreyi gizle",
+        "showPassword": "Şifreyi göster",
+        "select": "Seçin…",
+        "search": "Aramak için yazın…",
+        "noResults": "Sonuç yok",
+        "dropFile": "Dosyanızı buraya bırakın",
+        "remove": "Kaldır: {item}"
+    },
+    "primitives": {
+        "loading": "Yükleniyor",
+        "scrollLeft": "Sola kaydır",
+        "scrollRight": "Sağa kaydır",
+        "carousel": {
+            "previous": "Önceki: {label}",
+            "next": "Sonraki: {label}",
+            "goTo": "Şuraya git: {label} {index}"
+        }
+    },
+    "monitoring": {
+        "metrics": {
+            "count": "Sayı",
+            "totalTokens": "Toplam token",
+            "inputTokens": "Girdi token'ları",
+            "outputTokens": "Çıktı token'ları",
+            "cachedInputTokens": "Önbellekteki token'lar",
+            "reasoningTokens": "Akıl yürütme token'ları",
+            "cost": "Maliyet",
+            "avgDurationMs": "Ort. süre",
+            "errorCount": "Hatalar",
+            "errorRate": "Hata oranı"
+        },
+        "live": "Canlı",
+        "runStatus": {
+            "running": "Çalışıyor",
+            "done": "Tamamlandı",
+            "error": "Hata",
+            "cancelled": "İptal edildi"
+        },
+        "runs": {
+            "emptyTitle": "Henüz çalıştırma yok",
+            "emptyDescription": "Coworker'ın her çalıştırması burada kaydedilir",
+            "steps": "{count, plural, one {# adım} other {# adım}}",
+            "tokens": "{tokens} token"
+        },
+        "agentStatus": {
+            "idle": "Boşta",
+            "working": "Çalışıyor",
+            "error": "Hata",
+            "waiting_human": "Bir kişiyi bekliyor",
+            "offline": "Çevrimdışı",
+            "empty": "Gösterilecek coworker yok."
+        },
+        "chart": {
+            "rowCount": {
+                "runs": "{count} çalıştırma",
+                "runSteps": "{count} çalıştırma adımı",
+                "toolCalls": "{count} araç çağrısı",
+                "sessions": "{count} oturum"
+            },
+            "other": "Diğer",
+            "loading": "Yükleniyor...",
+            "noData": "Bu dönemde veri yok."
+        },
+        "usage": {
+            "input": "Girdi",
+            "output": "Çıktı",
+            "cached": "Önbellekte",
+            "cost": "Maliyet",
+            "tokens": "Token",
+            "totalCost": "Toplam maliyet",
+            "totalTokens": "Toplam token",
+            "runs": "{count, plural, one {# çalıştırma} other {# çalıştırma}}",
+            "noUsage": "Bu dönemde kullanım yok."
+        }
+    },
+    "inbox": {
+        "title": "Bildirimler",
+        "resize": "Bildirimleri yeniden boyutlandır",
+        "close": "Bildirimleri kapat",
+        "preferences": "Tercihler",
+        "preferencesUnavailable": "Tercihler burada kullanılamıyor",
+        "markAllRead": "Tümünü okundu işaretle",
+        "nothingToMark": "Okundu işaretlenecek bir şey yok",
+        "markRead": "Okundu işaretle",
+        "noUpdates": "Güncelleme yok",
+        "pillLabel": "Bildirimler: {summary}",
+        "pillLabelEmpty": "Bildirimler: güncelleme yok",
+        "needsYouRow": "Sizi bekliyor",
+        "needsYouCount": "{count, plural, one {# sizi bekliyor} other {# sizi bekliyor}}",
+        "doneCount": "{count, plural, other {# tamamlandı}}",
+        "needsYouRich": "{count, plural, one {<b>#</b> sizi bekliyor} other {<b>#</b> sizi bekliyor}}",
+        "doneRich": "{count, plural, other {<b>#</b> tamamlandı}}",
+        "newUpdates": "{count, plural, one {<b>#</b> yeni güncelleme} other {<b>#</b> yeni güncelleme}}",
+        "running": "{count, plural, one {<n>#</n> görev çalışıyor} other {<n>#</n> görev çalışıyor}}",
+        "empty": {
+            "title": "İlgilenilecek bir şey yok",
+            "description": "Bir coworker'ın size ihtiyacı olduğunda veya bir görevi bitirdiğinde burada görünür."
+        },
+        "sections": {
+            "needsYou": "Sizi bekliyor",
+            "headsUps": "Bilgilendirmeler",
+            "errors": "Hatalar",
+            "done": "Tamamlandı"
+        },
+        "sentences": {
+            "awaiting_question": "{agent} size bir soru sordu",
+            "awaiting_approval": "{agent} onayınızı bekliyor",
+            "awaiting_connector": "{agent} bir uygulamanın bağlanmasını bekliyor",
+            "waiting_human": "{agent} sizi bekliyor",
+            "awaiting_ack": "{agent} size bir şey bildirdi",
+            "error": "{agent} bir hatayla karşılaştı",
+            "done": "{agent} çalıştırmasını bitirdi"
+        }
+    },
+    "richText": {
+        "bold": "Kalın",
+        "italic": "İtalik",
+        "heading": "Başlık",
+        "subheading": "Alt başlık",
+        "bulletList": "Madde işaretli liste",
+        "numberedList": "Numaralı liste",
+        "quote": "Alıntı",
+        "inlineCode": "Satır içi kod",
+        "codeBlock": "Kod bloğu",
+        "link": "Bağlantı",
+        "linkPrompt": "Bağlantı URL'si"
+    },
+    "theme": {
+        "label": "Tema",
+        "options": {
+            "system": "Sistem",
+            "light": "Açık",
+            "dark": "Koyu"
+        }
+    },
+    "newAgent": {
+        "create": "Oluştur: {name}",
+        "createCoworker": "Coworker oluştur",
+        "apps": "Uygulamalar",
+        "pickedApps": "Uygulamalar: {apps}",
+        "or": "Veya",
+        "browseTemplates": "Şablonlara göz atın",
+        "job": {
+            "placeholder": "İşi, bir ekip arkadaşınıza anlatır gibi açıklayın.",
+            "label": "Yeni coworker'ınız ne yapmalı?"
+        },
+        "name": {
+            "placeholder": "Coworker'ınıza bir ad verin",
+            "label": "Coworker adı"
+        },
+        "forYou": {
+            "heading": "Veya sizin için seçilmiş biriyle başlayın",
+            "closeToIdea": "Fikrinize yakın",
+            "otherIdeas": "Diğer fikirler"
+        },
+        "appsPicker": {
+            "search": "Uygulama ara",
+            "all": "Tümü",
+            "empty": "Bu adda uygulama yok.",
+            "limit": "Başlangıç için en fazla {max} uygulama. Coworker'ınız daha sonra fazlasını bağlayabilir.",
+            "categories": {
+                "payments": "Ödemeler",
+                "ecommerce": "E-ticaret",
+                "crm": "CRM",
+                "marketing": "Pazarlama",
+                "seo": "SEO",
+                "analytics": "Analitik",
+                "dev": "Geliştirici",
+                "productivity": "Verimlilik",
+                "other": "Diğer"
+            }
+        },
+        "schedule": {
+            "button": "Zamanla",
+            "readFromDescription": "Açıklamanızdan anlaşıldı",
+            "onASchedule": "Zamanlanmış",
+            "custom": "Özel",
+            "noSchedule": "Zamanlama yok",
+            "onDemand": "Yalnızca ben istediğimde",
+            "timeOfDay": "Günün saati",
+            "presets": {
+                "weekday": {
+                    "label": "Hafta içi her gün 9:00'da",
+                    "detail": "Pazartesiden cumaya"
+                },
+                "monday": {
+                    "label": "Her pazartesi 9:00'da",
+                    "detail": "Haftada bir"
+                }
+            },
+            "everyDay": "Her gün saat {time}",
+            "everyWeekday": "Hafta içi her gün saat {time}",
+            "everyDays": "Her {days}, saat {time}"
+        }
+    },
+    "isoGrid": {
+        "board": "Coworker panosu",
+        "addBlock": "Bu tarafa bir blok ekle",
+        "status": {
+            "idle": "Boşta",
+            "working": "Çalışıyor",
+            "error": "Hata",
+            "offline": "Çevrimdışı",
+            "waiting_human": "Sizi bekliyor",
+            "disabled": "Etkin değil",
+            "paused": "Duraklatıldı",
+            "restoring": "Geri yükleniyor"
+        },
+        "countdown": {
+            "seconds": "{count}sn",
+            "minutes": "{count}dk",
+            "hours": "{count}sa",
+            "days": "{count}g"
+        },
+        "untitledBox": "Adsız Box",
+        "boxAria": "Box: {name}",
+        "tileAria": "{name}, {state}{toHandle, plural, =0 {} other {, # ilgilenilecek}}{results, plural, =0 {} one {, # yeni sonuç} other {, # yeni sonuç}}"
+    },
+    "templateStory": {
+        "states": {
+            "running": "Çalışıyor",
+            "approval": "Sizi bekliyor",
+            "success": "Tamamlandı",
+            "done": "Tamamlandı"
+        },
+        "approve": "Onayla",
+        "edit": "Düzenle"
+    }
+}

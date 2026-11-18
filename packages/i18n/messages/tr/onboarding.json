@@ -1,0 +1,106 @@
+{
+    "metaTitle": "Hoş geldiniz",
+    "back": "Geri",
+    "continue": "Devam et",
+    "site": {
+        "title": "Web siteniz nedir?",
+        "titleNamed": "Merhaba {name}, web siteniz nedir?",
+        "description": "Sitenizi okuyup panonuzu kadroyla doldururuz.",
+        "label": "Şirket web sitesi",
+        "placeholder": "acme.com",
+        "continue": "Devam et",
+        "skip": "Web sitem yok"
+    },
+    "industry": {
+        "title": "Hangi sektörde çalışıyorsunuz?",
+        "description": "Ekibiniz buna göre değişir.",
+        "other": "Diğer",
+        "otherLabel": "Sektörünüz",
+        "otherPlaceholder": "Fırın, diş kliniği, spor salonu…"
+    },
+    "role": {
+        "title": "Orada ne iş yapıyorsunuz?",
+        "description": "İlk coworker'ınız sizin için çalışır.",
+        "other": "Başka bir şey",
+        "otherLabel": "Rolünüz",
+        "otherPlaceholder": "Büyüme Direktörü"
+    },
+    "roles": {
+        "founderAgencyOwner": "Kurucu / Ajans sahibi",
+        "accountOrClientLead": "Müşteri temsilcisi",
+        "marketingCreative": "Pazarlama / Kreatif",
+        "operations": "Operasyon",
+        "founderStoreOwner": "Kurucu / Mağaza sahibi",
+        "marketingGrowth": "Pazarlama / Büyüme",
+        "customerCare": "Müşteri hizmetleri",
+        "operationsLogistics": "Operasyon / Lojistik",
+        "founderCeo": "Kurucu / CEO",
+        "productOrEngineering": "Ürün veya Mühendislik",
+        "salesOrSupport": "Satış veya Destek",
+        "salesRepOrAe": "Satış temsilcisi veya AE",
+        "salesLeadership": "Satış yönetimi",
+        "marketingDemandGen": "Pazarlama / Talep yaratma",
+        "recruiter": "İşe alım uzmanı",
+        "talentOrHrLead": "Yetenek veya İK yöneticisi",
+        "founderBroker": "Kurucu / Broker",
+        "agent": "Emlak danışmanı",
+        "propertyOrPortfolioManager": "Mülk veya portföy yöneticisi",
+        "marketing": "Pazarlama",
+        "founderPartner": "Kurucu / Ortak",
+        "lawyerOrCounsel": "Avukat veya hukuk müşaviri",
+        "paralegalOrLegalOps": "Hukuk asistanı veya hukuk operasyonları",
+        "businessDevelopment": "İş geliştirme",
+        "creatorFounder": "İçerik üreticisi / Kurucu",
+        "editorOrWriter": "Editör veya yazar",
+        "communityOrSocial": "Topluluk veya sosyal medya",
+        "sponsorshipsBusiness": "Sponsorluk / İş",
+        "financeOrAdmin": "Finans veya İdari işler",
+        "projectOrTeamLead": "Proje veya ekip lideri",
+        "sales": "Satış"
+    },
+    "team": {
+        "title": "Ekibinizi davet edin",
+        "description": "Coworker'larınız hepiniz için çalışır.",
+        "label": "Bir ekip arkadaşının e-postası",
+        "placeholder": "ad@sirket.com",
+        "invite": "Davet et",
+        "invited": "Davet edildi",
+        "link": "Davet bağlantısı",
+        "copy": "Kopyala",
+        "copied": "Kopyalandı",
+        "skip": "Atla"
+    },
+    "trial": {
+        "title": "Ücretsiz denemenizi başlatın",
+        "description": "Coworker'larınız deneme başladığı anda çalışmaya başlar.",
+        "start": "Ücretsiz denememi başlat"
+    },
+    "engine": {
+        "title": "Çalışma alanınız hazırlanıyor",
+        "milestones": {
+            "trial": "Denemeniz onaylanıyor…",
+            "machine": "Makineniz ayrılıyor…",
+            "engine": "Chief of Staff'ınız uyandırılıyor…"
+        },
+        "ready": "Ekibinizi birlikte kuralım.",
+        "greeting": "Merhaba, ben Chief of Staff'ınız",
+        "greetingNamed": "Merhaba {name}, ben Chief of Staff'ınız",
+        "failed": "Makineniz her zamankinden uzun sürüyor.",
+        "retry": "Tekrar dene",
+        "enterAnyway": "Yine de gir",
+        "enter": "Başlayalım",
+        "wait": "Bir saniye"
+    },
+    "industries": {
+        "agencies": "Ajanslar",
+        "ecommerce": "E-ticaret",
+        "saas": "SaaS",
+        "sales": "Satış",
+        "recruiting": "İşe alım",
+        "real-estate": "Gayrimenkul",
+        "legal": "Hukuk ve uyum",
+        "creators": "İçerik üreticileri",
+        "productivity": "Verimlilik",
+        "other": "Diğer"
+    }
+}
