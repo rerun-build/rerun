@@ -1,3 +1,6 @@
+include:
+  - deploy/vps/factory-dispatcher.yml
+
 services:
   app:
     ports: !reset []

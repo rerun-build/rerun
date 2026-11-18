@@ -60,6 +60,7 @@ services:
 
 volumes:
   engine-data:
+    name: rerun_engine-data
 
 secrets:
   rerun_engine_key:

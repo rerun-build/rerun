@@ -36,6 +36,7 @@ wait_drained() {
 
 echo "== 1/4 code"
 su "$(stat -c '%U' "$REPO")" -s /bin/sh -c "git -C '$REPO' pull --ff-only"
+docker compose config -q || { echo "The compose files do not resolve: set the values named above (factory ones in deploy/vps/.env), then run this again."; exit 1; }
 
 trap undrain EXIT
 trap 'exit 130' INT TERM HUP
@@ -67,7 +68,18 @@ unset PW SUPABASE_DB_URL
 
 wait_drained
 echo "== 4/4 restart"
+if docker compose config --services | grep -qx factory-dispatcher; then
+    OLD=$(docker ps -aq --filter label=com.docker.compose.project=rerun-factory)
+    if [ -n "$OLD" ]; then
+        docker compose build factory-dispatcher
+        echo "The factory moves into this project: its old container stops first, its data stays."
+        docker stop -t 150 $OLD
+        docker rm $OLD
+        DISPATCHER=
+    fi
+fi
 docker compose up -d
+DISPATCHER=$(docker ps -qf name=factory-dispatcher | head -n 1)
 docker compose ps
 docker image prune -f
 echo "== keeper"
