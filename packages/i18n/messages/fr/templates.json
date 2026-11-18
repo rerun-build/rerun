@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# template} other {# templates}}",
-        "rerunTeam": "Équipe Rerun",
+        "rerunTeam": "Équipe Moldwright",
         "verified": "Créateur vérifié"
     },
     "spotlight": {
@@ -121,14 +121,14 @@
             "featured": "À la une",
             "featuredSubtitle": "Des configurations choisies à regarder en premier.",
             "justAdded": "Nouveautés",
-            "justAddedSubtitle": "Les derniers templates publiés sur Rerun."
+            "justAddedSubtitle": "Les derniers templates publiés sur Moldwright."
         },
         "empty": {
             "filtered": "Aucun template ne correspond à ces filtres",
             "none": "Aucun template ici pour l’instant",
             "selfHosted": "Recrutez un coworker, puis enregistrez-le comme template.",
-            "cloud": "Créez-le vous-même et vendez-le sur Rerun.",
-            "become": "Devenir expert Rerun"
+            "cloud": "Créez-le vous-même et vendez-le sur Moldwright.",
+            "become": "Devenir expert Moldwright"
         }
     },
     "scratch": {
@@ -362,7 +362,7 @@
                 "installAnswers": "Une réponse d'installation pour chaque coworker",
                 "payouts": "Un compte Stripe qui peut recevoir des virements"
             },
-            "live": "Ce template est en ligne sur la marketplace. Contactez l’équipe Rerun pour le modifier.",
+            "live": "Ce template est en ligne sur la marketplace. Contactez l’équipe Moldwright pour le modifier.",
             "inReview": "Nous examinons ce template. Retirez-le pour continuer à le modifier.",
             "withdraw": "Retirer",
             "completeChecklist": "Complétez d’abord la checklist",
@@ -388,11 +388,11 @@
             "recurring": "Abonnement mensuel"
         },
         "helpers": {
-            "free": "Toute personne avec un plan Rerun peut l’installer.",
+            "free": "Toute personne avec un plan Moldwright peut l’installer.",
             "one_time": "Facturé une fois. L’acheteur le garde pour toujours.",
             "recurring": "Facturé chaque mois. L’accès prend fin quand l’acheteur résilie."
         },
-        "modelHelp": "{helper} Les acheteurs ont quand même besoin d’un plan Rerun actif pour installer un template.",
+        "modelHelp": "{helper} Les acheteurs ont quand même besoin d’un plan Moldwright actif pour installer un template.",
         "priceLabel": "Prix (USD)",
         "priceHelp": "Minimum {min}. Une modification ultérieure ne s’applique qu’aux nouveaux acheteurs.",
         "payoutsTitle": "Les versements ne sont pas activés",
@@ -400,7 +400,7 @@
         "setUpPayouts": "Configurer les versements",
         "payout": {
             "yourPrice": "Votre prix{recurring, select, true { par mois} other {}}",
-            "fee": "Frais Rerun ({fee})",
+            "fee": "Frais Moldwright ({fee})",
             "earn": "Vous gagnez{recurring, select, true { par mois} other {}}",
             "vat": "La TVA s’ajoute à votre prix au paiement et est payée par l’acheteur, elle ne sort donc jamais de votre part. Ce que vous gagnez est le même où qu’il soit."
         }
@@ -411,14 +411,14 @@
         "subtitle": "Là où arrive l’argent de vos templates payants.",
         "yourPrice": "Votre prix",
         "yourPriceValue": "Vous le fixez par template, hors TVA",
-        "commission": "Commission Rerun",
+        "commission": "Commission Moldwright",
         "schedule": "Calendrier des versements",
         "scheduleValue": "Standard Stripe",
-        "planNote": "Les acheteurs ont quand même besoin d’un plan Rerun actif pour installer un template : un achat débloque le template et rien d’autre.",
+        "planNote": "Les acheteurs ont quand même besoin d’un plan Moldwright actif pour installer un template : un achat débloque le template et rien d’autre.",
         "states": {
             "not_started": {
                 "headline": "Soyez payé pour vos templates",
-                "body": "Rerun garde {fee} de chaque vente. Le reste arrive sur votre compte bancaire via Stripe.",
+                "body": "Moldwright garde {fee} de chaque vente. Le reste arrive sur votre compte bancaire via Stripe.",
                 "cta": "Configurer les versements"
             },
             "incomplete": {
@@ -438,7 +438,7 @@
             },
             "ready": {
                 "headline": "Vous êtes prêt à recevoir des versements",
-                "body": "Fixez un prix à un template et il est mis en vente après notre revue. Rerun garde {fee} de chaque vente.",
+                "body": "Fixez un prix à un template et il est mis en vente après notre revue. Moldwright garde {fee} de chaque vente.",
                 "cta": "Ouvrir le tableau de bord Stripe"
             }
         },
@@ -503,7 +503,7 @@
         "type": "Type",
         "sales": "Ventes",
         "gross": "Brut",
-        "fee": "Frais Rerun",
+        "fee": "Frais Moldwright",
         "pending": "Versement en attente",
         "available": "Disponible maintenant",
         "subscriptions": "{count, plural, one {# abonnement actif} other {# abonnements actifs}}",
@@ -555,7 +555,7 @@
         "trialUsedBilledSeparately": "Votre essai gratuit a déjà été utilisé. Facturé aujourd'hui. Ce template est facturé à part.",
         "resubscribe": "Se réabonner à {price}/mois",
         "lapsed": "Votre abonnement a pris fin. Les coworkers installés par ce template sont désactivés.",
-        "billedTo": "Facturé à {workspace}. Votre plan Rerun est déjà actif.",
+        "billedTo": "Facturé à {workspace}. Votre plan Moldwright est déjà actif.",
         "yours": "Votre template, sans frais."
     }
 }

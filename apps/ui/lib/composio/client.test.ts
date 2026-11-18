@@ -48,7 +48,7 @@ describe('resolveAuthConfigId', () => {
         const [url, init] = fetchMock.mock.calls[1]
         expect(url).toBe('https://backend.composio.dev/api/v3.1/auth_configs')
         expect(init.method).toBe('POST')
-        expect(JSON.parse(init.body)).toEqual({ toolkit: { slug: 'slack' }, auth_config: { type: 'use_composio_managed_auth', name: 'Rerun slack' } })
+        expect(JSON.parse(init.body)).toEqual({ toolkit: { slug: 'slack' }, auth_config: { type: 'use_composio_managed_auth', name: 'Moldwright slack' } })
 
         await expect(resolveAuthConfigId({ toolkit: 'slack', authConfigId: '' })).resolves.toBe('ac_new')
         expect(fetchMock).toHaveBeenCalledTimes(2)

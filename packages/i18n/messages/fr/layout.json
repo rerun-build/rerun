@@ -123,10 +123,10 @@
         "reload": "Recharger",
         "available": {
             "title": "Nouvelle version disponible",
-            "description": "Rechargez pour obtenir la dernière version de Rerun."
+            "description": "Rechargez pour obtenir la dernière version de Moldwright."
         },
         "required": {
-            "title": "Rerun a été mis à jour",
+            "title": "Moldwright a été mis à jour",
             "description": "Une nouvelle version est en ligne. Rechargez pour continuer."
         }
     },
@@ -208,6 +208,6 @@
     "boxNameSuggestions": "Ou choisissez un nom",
     "dashboard": {
         "metaTitle": "Tableau de bord",
-        "metaDescription": "Vos Boxes et vos coworkers sur Rerun."
+        "metaDescription": "Vos Boxes et vos coworkers sur Moldwright."
     }
 }

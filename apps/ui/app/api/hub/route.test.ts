@@ -106,7 +106,7 @@ describe('POST /api/hub', () => {
         expect(dispatchAccountTool).not.toHaveBeenCalled()
     })
 
-    it('answers a coworker asking for the Rerun credit of the workspace its engine key names', async () => {
+    it('answers a coworker asking for the Moldwright credit of the workspace its engine key names', async () => {
         vi.mocked(selectMaybeSingle).mockResolvedValue({ data: { id: 'agent-1' }, error: null })
         vi.mocked(readRerunCredit).mockResolvedValue({ credit: null })
 

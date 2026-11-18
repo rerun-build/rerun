@@ -128,7 +128,7 @@ export function enabledModels(source: BoxConnection): CatalogModel[] {
 }
 
 export function modelName(connectionId: string, model: string) {
-    return connectionId === RERUN_CONNECTION_ID && canonicalModelId(model) !== RERUN_MODEL ? `Rerun ${modelLabel(model)}` : modelLabel(model)
+    return connectionId === RERUN_CONNECTION_ID && canonicalModelId(model) !== RERUN_MODEL ? `Moldwright ${modelLabel(model)}` : modelLabel(model)
 }
 
 export function isModelLocked(connectionId: string, model: string, premiumAllowed: boolean): boolean {

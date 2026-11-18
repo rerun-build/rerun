@@ -113,7 +113,7 @@ const send = (handler: (req: Request, segment: { params: Promise<Record<string, 
     handler(new Request(`${base}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined }), { params: Promise.resolve(params) })
 
 const connection = (overrides: object) => ({ name: 'X', provider: 'anthropic', models: [], extraModels: [], createdAt: '', connected: true, credentialRejected: false, planLimits: null, ...overrides })
-const rerun = connection({ id: 'rerun', name: 'Rerun', provider: 'rerun', models: ['rerun-max'] })
+const rerun = connection({ id: 'rerun', name: 'Moldwright', provider: 'rerun', models: ['rerun-max'] })
 const claude = connection({ id: 'cnx-claude', name: 'Claude', provider: 'claude', models: ['claude-opus-5-5', 'claude-sonnet-4-6'] })
 
 beforeEach(() => {
@@ -133,7 +133,7 @@ beforeEach(() => {
 })
 
 describe('GET /api/v1/ai-connections', () => {
-    it('shapes the web dialog for the app: Rerun first, the default on Rerun when none is set, premium models locked on a trial', async () => {
+    it('shapes the web dialog for the app: Moldwright first, the default on Moldwright when none is set, premium models locked on a trial', async () => {
         workspace.subscription_status = 'trialing'
         const view = await (await send(list.GET, 'GET')).json()
         workspace.subscription_status = 'active'
@@ -228,7 +228,7 @@ describe('custom endpoints', () => {
         expect(engine.createConnection).not.toHaveBeenCalled()
     })
 
-    it('refuse a private address on Rerun Cloud and take it on a self-hosted install', async () => {
+    it('refuse a private address on Moldwright Cloud and take it on a self-hosted install', async () => {
         engine.supportsCustomProvider.mockResolvedValue(true)
         const refused = await create({ baseUrl: 'http://192.168.1.20:11434/v1' })
         expect(refused.status).toBe(400)
@@ -274,7 +274,7 @@ describe('POST /api/v1/ai-connections', () => {
 })
 
 describe('PUT /api/v1/ai-connections/default', () => {
-    it('sets the pair, clears it back to Rerun, and refuses a model the plan does not include', async () => {
+    it('sets the pair, clears it back to Moldwright, and refuses a model the plan does not include', async () => {
         expect((await send(defaultRoute.PUT, 'PUT', '/default', { connectionId: 'cnx-claude', model: 'claude-sonnet-4-6' })).status).toBe(204)
         expect(engine.setBoxDefault).toHaveBeenLastCalledWith(conn, { connectionId: 'cnx-claude', model: 'claude-sonnet-4-6' })
         expect((await send(defaultRoute.PUT, 'PUT', '/default', { connectionId: null, model: null })).status).toBe(204)
@@ -288,13 +288,13 @@ describe('PUT /api/v1/ai-connections/default', () => {
 })
 
 describe('/api/v1/ai-connections/:id', () => {
-    it('replaces the key of the connection under its provider’s env var, drops the old refresh material, and never touches Rerun', async () => {
+    it('replaces the key of the connection under its provider’s env var, drops the old refresh material, and never touches Moldwright', async () => {
         expect((await send(keysRoute.PUT, 'PUT', '/cnx-claude/keys', { apiKey: 'sk-ant-oat01-new' }, { id: 'cnx-claude' })).status).toBe(204)
         expect(engine.updateConnectionKeys).toHaveBeenCalledWith(conn, 'cnx-claude', { set: { CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat01-new' }, remove: ['CLAUDE_CODE_OAUTH_REFRESH_TOKEN', 'CLAUDE_CODE_OAUTH_EXPIRES_AT'] })
         expect((await send(keysRoute.PUT, 'PUT', '/rerun/keys', { apiKey: 'x' }, { id: 'rerun' })).status).toBe(404)
     })
 
-    it('reads a connection the machine no longer has as missing, and never deletes Rerun', async () => {
+    it('reads a connection the machine no longer has as missing, and never deletes Moldwright', async () => {
         expect((await send(connectionRoute.PATCH, 'PATCH', '/gone', { name: 'New' }, { id: 'gone' })).status).toBe(404)
         expect(engine.patchConnection).not.toHaveBeenCalled()
         expect((await send(connectionRoute.DELETE, 'DELETE', '/rerun', undefined, { id: 'rerun' })).status).toBe(400)

@@ -2,7 +2,7 @@
     "_context": {
         "viewer.fallbackAgentName": "Stands in for a coworker whose name is unknown, inside sentences like award cards.",
         "weekPicker.new": "Badge on the newest week the user has not watched yet.",
-        "intro.headline": "Title of the first slide of the weekly recap story. \"rerun\" plays on the product name Rerun: the week replayed.",
+        "intro.headline": "Title of the first slide of the weekly recap story. \"rerun\" plays on the product name Moldwright: the week replayed.",
         "intro.clockedInOne": "Under the title: exactly one coworker worked this week.",
         "intro.clockedInOther": "Under the title: {count} coworkers worked this week.",
         "hours.units.hours": "Unit shown in big type right after an animated number of hours.",

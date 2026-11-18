@@ -213,7 +213,7 @@ function DefaultRow({ connections, current, credit, onPick, onFix, readOnlyReaso
     const canChange = connections.some(c => isUsable(c, credit))
 
     const description = !broken
-        ? t('panel.default.via', { source: source?.name ?? 'Rerun' })
+        ? t('panel.default.via', { source: source?.name ?? 'Moldwright' })
         : creditPaused
           ? canChange
               ? t('panel.default.pausedPick')

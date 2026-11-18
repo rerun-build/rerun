@@ -20,7 +20,7 @@ const RERUN_DEMO_MODEL_POWER: Record<(typeof RERUN_DEMO_MODEL_IDS)[number], numb
 export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
     {
         provider: 'rerun',
-        label: 'Rerun',
+        label: 'Moldwright',
         keyName: '',
         section: 'free',
         models: RERUN_DEMO_MODEL_IDS.map(id => model(id, RERUN_DEMO_MODEL_POWER[id])),

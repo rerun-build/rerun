@@ -4,19 +4,19 @@
         "update.restart": "Button of that toast: restarts the desktop app to install the new version.",
         "downloads.done": "Toast inside the desktop app when a file finished downloading. {filename} is the file name.",
         "downloads.show": "Button of that toast: shows the file in Finder (macOS) or Explorer (Windows).",
-        "handoff.title": "Page opened in the web browser by the Rerun desktop app to sign it in. {app} is the app name (Rerun, Rerun Staging).",
+        "handoff.title": "Page opened in the web browser by the Moldwright desktop app to sign it in. {app} is the app name (Moldwright, Moldwright Staging).",
         "handoff.body": "{account} is the email address (or phone number) of the signed-in account.",
         "handoff.codeHint": "Shown after confirming, in case the desktop app did not open by itself.",
         "signIn.waitingTitle": "Shown in the desktop app after it opened the web browser to sign in.",
         "signIn.codeLabel": "Label of the field where the person pastes the code shown by the browser.",
         "settings.version": "Under the Updates row of the desktop app settings. {version} is like 0.4.0.",
-        "openInApp.title": "Toast in the web browser, offering to open the current page in the Rerun desktop app. {app} is the app name.",
+        "openInApp.title": "Toast in the web browser, offering to open the current page in the Moldwright desktop app. {app} is the app name.",
         "quickAsk.placeholder": "Placeholder of the small floating window of the desktop app where the person types a question for the Chief of Staff (the workspace assistant).",
         "settings.quickAskHint": "{shortcut} is the keyboard shortcut, like ⌘⇧Space.",
-        "server.otherServer": "Discreet link on the sign-in page of the desktop app, for people whose company hosts Rerun itself."
+        "server.otherServer": "Discreet link on the sign-in page of the desktop app, for people whose company hosts Moldwright itself."
     },
     "update": {
-        "ready": "Rerun {version} is ready",
+        "ready": "Moldwright {version} is ready",
         "description": "Restart the app to use the new version.",
         "restart": "Restart"
     },
@@ -50,18 +50,18 @@
             "expired": "This code has expired. Start again.",
             "invalid": "This code isn’t valid. Start again.",
             "state-mismatch": "This sign-in was started from another window. Start again.",
-            "network": "Couldn’t reach Rerun. Check your connection.",
+            "network": "Couldn’t reach Moldwright. Check your connection.",
             "cancelled": "The sign-in was cancelled."
         }
     },
     "settings": {
         "openAtLogin": "Open at login",
-        "openAtLoginMac": "Rerun starts with your Mac, in the menu bar.",
-        "openAtLoginOther": "Rerun starts with your computer, in the notification area.",
+        "openAtLoginMac": "Moldwright starts with your Mac, in the menu bar.",
+        "openAtLoginOther": "Moldwright starts with your computer, in the notification area.",
         "closeToTray": "Keep running when closed",
-        "closeToTrayHint": "Closing the window leaves Rerun in the notification area, so notifications still arrive.",
+        "closeToTrayHint": "Closing the window leaves Moldwright in the notification area, so notifications still arrive.",
         "updates": "Updates",
-        "version": "Rerun {version}",
+        "version": "Moldwright {version}",
         "checking": "Checking for updates…",
         "downloading": "Downloading the update… {percent}%",
         "updateFailed": "Couldn’t check for updates.",
@@ -80,6 +80,6 @@
         "send": "Send"
     },
     "server": {
-        "otherServer": "Use another Rerun server"
+        "otherServer": "Use another Moldwright server"
     }
 }

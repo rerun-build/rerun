@@ -14,7 +14,7 @@
         "description": "The screen this coworker works on. What you do here, it finds afterwards.",
         "takeoverDescription": "You are in your coworker’s browser. Press Done when it can carry on.",
         "takeoverHoldsBrowser": "Your coworker’s browser is already open for this request.",
-        "clipboardDenied": "Your browser did not let Rerun read the clipboard.",
+        "clipboardDenied": "Your browser did not let Moldwright read the clipboard.",
         "disconnectedDescription": "The connection to the machine closed. Nothing on it was lost.",
         "reconnect": "Reconnect",
         "tryAgain": "Try again"

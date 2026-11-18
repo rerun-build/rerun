@@ -25,7 +25,7 @@
         "price.useForFree": "Button on a free template.",
         "price.hire": "Button on a paid template's page. {count} is the number of coworkers it installs, {price} its price like \"$29\" or \"$29/mo\".",
         "price.hireCard": "Short button revealed on a paid template card. {price} is its price like \"$29\" or \"$29/mo\".",
-        "status.in_review": "A template its author submitted to the Rerun team, not published yet.",
+        "status.in_review": "A template its author submitted to the Moldwright team, not published yet.",
         "status.unlisted": "A template reachable by its link but shown in no listing.",
         "creatorKind.studio": "The kind of creator who sells templates: a small agency.",
         "cta.place": "Button: drop the template's coworkers on the board.",
@@ -51,7 +51,7 @@
         "library.heading.appSubtitle": "Subtitle of the templates that use one app. {total} is a library.heading.count sentence, {app} the app's name or library.heading.thisApp.",
         "library.nav.all": "Short tab of the compact navigation that lists every template.",
         "library.nav.stack": "Group of apps the viewer said they use.",
-        "library.empty.become": "Link to the program for people who build and sell templates on Rerun.",
+        "library.empty.become": "Link to the program for people who build and sell templates on Moldwright.",
         "section.filterBy": "Accessible label of a section heading that narrows the library to that section. {title} is the section's title.",
         "authoring.prefill": "Button that fills the fields of a section from what the template already says, with AI.",
         "authoring.meta.metaTitlePlaceholder": "{title} is the template's title.",
@@ -98,7 +98,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# template} other {# templates}}",
-        "rerunTeam": "Rerun team",
+        "rerunTeam": "Moldwright team",
         "verified": "Verified creator"
     },
     "spotlight": {
@@ -183,14 +183,14 @@
             "featured": "Featured",
             "featuredSubtitle": "Hand-picked setups worth a look first.",
             "justAdded": "Just added",
-            "justAddedSubtitle": "The latest templates published on Rerun."
+            "justAddedSubtitle": "The latest templates published on Moldwright."
         },
         "empty": {
             "filtered": "No template matches these filters",
             "none": "No template here yet",
             "selfHosted": "Recruit a coworker, then save it as a template.",
-            "cloud": "Build it yourself and sell it on Rerun.",
-            "become": "Become a Rerun expert"
+            "cloud": "Build it yourself and sell it on Moldwright.",
+            "become": "Become a Moldwright expert"
         }
     },
     "scratch": {
@@ -424,7 +424,7 @@
                 "installAnswers": "An install answer for every coworker",
                 "payouts": "A Stripe account that can receive payouts"
             },
-            "live": "This template is live on the marketplace. Reach out to the Rerun team to change it.",
+            "live": "This template is live on the marketplace. Reach out to the Moldwright team to change it.",
             "inReview": "We are reviewing this template. Withdraw it to keep editing.",
             "withdraw": "Withdraw",
             "completeChecklist": "Complete the checklist first",
@@ -450,11 +450,11 @@
             "recurring": "Monthly subscription"
         },
         "helpers": {
-            "free": "Anyone on a Rerun plan can install it.",
+            "free": "Anyone on a Moldwright plan can install it.",
             "one_time": "Charged once. The buyer keeps it for good.",
             "recurring": "Charged every month. Access ends when the buyer cancels."
         },
-        "modelHelp": "{helper} Buyers still need an active Rerun plan to install a template.",
+        "modelHelp": "{helper} Buyers still need an active Moldwright plan to install a template.",
         "priceLabel": "Price (USD)",
         "priceHelp": "Minimum {min}. Changing it later only applies to new buyers.",
         "payoutsTitle": "Payouts are not enabled",
@@ -462,7 +462,7 @@
         "setUpPayouts": "Set up payouts",
         "payout": {
             "yourPrice": "Your price{recurring, select, true { per month} other {}}",
-            "fee": "Rerun fee ({fee})",
+            "fee": "Moldwright fee ({fee})",
             "earn": "You earn{recurring, select, true { per month} other {}}",
             "vat": "VAT is added on top of your price at checkout and paid by the buyer, so it never comes out of your side. What you earn is the same wherever they are."
         }
@@ -473,14 +473,14 @@
         "subtitle": "Where the money from your paid templates lands.",
         "yourPrice": "Your price",
         "yourPriceValue": "You set it per template, excluding VAT",
-        "commission": "Rerun commission",
+        "commission": "Moldwright commission",
         "schedule": "Payout schedule",
         "scheduleValue": "Stripe standard",
-        "planNote": "Buyers still need an active Rerun plan to install a template, so a purchase unlocks the template and nothing else.",
+        "planNote": "Buyers still need an active Moldwright plan to install a template, so a purchase unlocks the template and nothing else.",
         "states": {
             "not_started": {
                 "headline": "Get paid for your templates",
-                "body": "Rerun keeps {fee} of each sale. It lands on your bank account through Stripe.",
+                "body": "Moldwright keeps {fee} of each sale. It lands on your bank account through Stripe.",
                 "cta": "Set up payouts"
             },
             "incomplete": {
@@ -500,7 +500,7 @@
             },
             "ready": {
                 "headline": "You are set up for payouts",
-                "body": "Price a template and it goes on sale once we review it. Rerun keeps {fee} of each sale.",
+                "body": "Price a template and it goes on sale once we review it. Moldwright keeps {fee} of each sale.",
                 "cta": "Open Stripe dashboard"
             }
         },
@@ -565,7 +565,7 @@
         "type": "Type",
         "sales": "Sales",
         "gross": "Gross",
-        "fee": "Rerun fee",
+        "fee": "Moldwright fee",
         "pending": "Pending payout",
         "available": "Available now",
         "subscriptions": "{count, plural, one {# active subscription} other {# active subscriptions}}",
@@ -617,7 +617,7 @@
         "trialUsedBilledSeparately": "Your free trial has been used. Billed today; this template is billed separately.",
         "resubscribe": "Resubscribe {price}/mo",
         "lapsed": "Your subscription ended. The coworkers this template installed are disabled.",
-        "billedTo": "Billed to {workspace}. Your Rerun plan is already active.",
+        "billedTo": "Billed to {workspace}. Your Moldwright plan is already active.",
         "yours": "Your template, no charge."
     }
 }

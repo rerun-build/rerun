@@ -54,7 +54,7 @@ describe('toLibraryTemplates', () => {
         expect(template.access).toBe('none')
     })
 
-    it('credits the published fiche of the author, and the Rerun team otherwise', () => {
+    it('credits the published fiche of the author, and the Moldwright team otherwise', () => {
         const fiche = { slug: 'ada', name: 'Ada', kind: 'freelancer' as const, avatarUrl: null, bannerUrl: null, location: null, bio: null, links: { x: null, linkedin: null, github: null, website: null }, verified: true }
         const [signed, unsigned] = toLibraryTemplates([row({ id: 'a' }), row({ id: 'b', creator_id: 'stranger' })], null, undefined, new Map([['author', fiche]]))
         expect(signed.creator).toEqual(fiche)

@@ -19,7 +19,7 @@
     },
     "resize": "Redimensionner le chat",
     "modelPill": {
-        "hubReason": "Ce chat tourne toujours sur Rerun Balanced"
+        "hubReason": "Ce chat tourne toujours sur Moldwright Balanced"
     },
     "signupGate": {
         "teamAt": "Votre équipe chez {domain}",
@@ -200,12 +200,12 @@
     },
     "contact": {
         "defaultSummary": "Je suis bloqué en configurant mon premier coworker et j'ai besoin d'aide.",
-        "sentWithEmail": "Envoyé à l'équipe Rerun. Elle répond dans le chat et à {email}.",
-        "sent": "Envoyé à l'équipe Rerun. Elle répond dans le chat.",
+        "sentWithEmail": "Envoyé à l'équipe Moldwright. Elle répond dans le chat et à {email}.",
+        "sent": "Envoyé à l'équipe Moldwright. Elle répond dans le chat.",
         "openChat": "Ouvrir le chat",
         "stillStuck": "Toujours bloqué ? Quelqu'un de l'équipe peut vous aider.",
         "send": "Envoyer à l'équipe",
-        "title": "Parler à quelqu'un chez Rerun",
+        "title": "Parler à quelqu'un chez Moldwright",
         "description": "Ceci part à l'équipe avec votre compte, et elle vous répond dans le chat.",
         "notNow": "Pas maintenant"
     },
@@ -359,8 +359,8 @@
         "owned": "{title} est à vous",
         "recurring": "Facturé chaque mois",
         "oneTime": "Achat unique",
-        "billedTo": "Facturé à {name}, en plus de votre plan Rerun. Il est installé dès que le paiement passe.",
-        "billedToWorkspace": "Facturé à votre workspace, en plus de votre plan Rerun. Il est installé dès que le paiement passe.",
+        "billedTo": "Facturé à {name}, en plus de votre plan Moldwright. Il est installé dès que le paiement passe.",
+        "billedToWorkspace": "Facturé à votre workspace, en plus de votre plan Moldwright. Il est installé dès que le paiement passe.",
         "dueToday": "À payer aujourd'hui",
         "perMonth": "/mois",
         "opening": "Ouverture…",
@@ -385,7 +385,7 @@
         "guide": {
             "title": "Comment ça marche ?",
             "description": "Coworkers, Boxes, routines, en deux minutes",
-            "send": "Comment fonctionne Rerun ?"
+            "send": "Comment fonctionne Moldwright ?"
         },
         "checkWorking": {
             "title": "Que fait {name} ?",

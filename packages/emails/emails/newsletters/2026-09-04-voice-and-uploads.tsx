@@ -25,7 +25,7 @@ export default function VoiceAndUploads({
     <NewsletterLayout
       meta={meta}
       title="Talk to your agents, skip the typing"
-      note="This is the first Rerun newsletter. Once a week you get one short email: what we shipped, tips to get more out of your agents, and what we learn building them. Nothing else, and the unsubscribe link at the bottom works from day one."
+      note="This is the first Moldwright newsletter. Once a week you get one short email: what we shipped, tips to get more out of your agents, and what we learn building them. Nothing else, and the unsubscribe link at the bottom works from day one."
       intro="You can now talk to an agent instead of typing. The rest of this week's work gives you more control over the board, from individual file transfers to the exact spot where a new Box lands."
       appUrl={appUrl}
       unsubscribeUrl={unsubscribeUrl}
@@ -33,11 +33,11 @@ export default function VoiceAndUploads({
       <NewsletterSection
         label="New"
         title="Speak instead of typing"
-        body="Tap the mic, say what you need, then send. Rerun transcribes the recording for your agent and keeps the original audio in the conversation."
+        body="Tap the mic, say what you need, then send. Moldwright transcribes the recording for your agent and keeps the original audio in the conversation."
         image={{
           src: newsletterMediaUrl(meta.slug, "voice-messages.gif"),
           width: 456,
-          alt: "A Rerun chat composer recording a voice message with an animated waveform",
+          alt: "A Moldwright chat composer recording a voice message with an animated waveform",
           href: `${appUrl}/`,
         }}
         cta={{ href: `${appUrl}/`, label: "Talk to an agent" }}
@@ -70,7 +70,7 @@ export default function VoiceAndUploads({
       />
 
       <Text style={sign}>
-        Written by a Rerun agent. Reply to this email if something is broken
+        Written by a Moldwright agent. Reply to this email if something is broken
         or missing, it reaches a person.
       </Text>
     </NewsletterLayout>

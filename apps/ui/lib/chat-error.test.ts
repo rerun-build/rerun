@@ -203,7 +203,7 @@ describe('OpenCode limits', () => {
     const credits = 'AI_APICallError: OpenCode Console credits used up: Insufficient account funds'
     const goWeekly = 'AI_APICallError: OpenCode Go limit reached: weekly window · resets Nov 6, 3:00 PM UTC'
 
-    it('reads as a usage limit, never as the Rerun budget, and names OpenCode', () => {
+    it('reads as a usage limit, never as the Moldwright budget, and names OpenCode', () => {
         expect(classifyChatError(credits)).toBe('usage_limit')
         expect(classifyChatError(goWeekly)).toBe('usage_limit')
         expect(chatErrorTitle('usage_limit', credits)).toBe('OpenCode credits used up')
@@ -319,7 +319,7 @@ describe('the English copy of a spent subscription', () => {
     })
 
     it('keeps the fixed sentences', () => {
-        expect(friendlyError('rerun_budget_exhausted')).toBe('The account behind Rerun models has no balance left. Top it up, or switch to another model.')
+        expect(friendlyError('rerun_budget_exhausted')).toBe('The account behind Moldwright models has no balance left. Top it up, or switch to another model.')
         expect(chatErrorTitle('run_in_flight', 'A run is already in flight')).toBe('This conversation is still busy')
         expect(chatErrorTitle('unauthorized', '401')).toBe('Connection signed out')
         expect(chatErrorTitle('overloaded', 'Selected model is at capacity')).toBe('Model at capacity')

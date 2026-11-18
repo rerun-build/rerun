@@ -52,7 +52,7 @@
         "deleteFailedTitle": "Impossible de supprimer votre compte",
         "deleteFailedMessage": "Réessayez dans un instant.",
         "leaveServerTitle": "Quitter {host} ?",
-        "leaveServerMessage": "Vous serez déconnecté, et Rerun se rouvrira sur Rerun Cloud.",
+        "leaveServerMessage": "Vous serez déconnecté, et Moldwright se rouvrira sur Moldwright Cloud.",
         "leaveServer": "Quitter"
     },
     "workspace": {

@@ -84,8 +84,8 @@
         "failed": "Could not create the coworker"
     },
     "_context": {
-        "access.noManagedBox": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
-        "access.noBoxYet": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "access.noManagedBox": "{host} is the web address of the Moldwright server the app is connected to (rerun.build, or a self-hosted one).",
+        "access.noBoxYet": "{host} is the web address of the Moldwright server the app is connected to (rerun.build, or a self-hosted one).",
         "details.filesCount": "The number of files the coworker keeps, shown as the value of the Files row.",
         "details.filesTruncated": "More files than the app read: the count followed by a plus sign.",
         "details.routinesOn": "How many of the coworker's routines are switched on.",

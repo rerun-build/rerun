@@ -49,7 +49,7 @@
         "cards": {
             "model": {
                 "title": "Bring dein eigenes Modell mit",
-                "body": "Verbinde dein eigenes Claude- oder ChatGPT-Abo, deine API-Schlüssel oder das inklusive Rerun Guthaben."
+                "body": "Verbinde dein eigenes Claude- oder ChatGPT-Abo, deine API-Schlüssel oder das inklusive Moldwright Guthaben."
             },
             "team": {
                 "title": "Für Teams gemacht",
@@ -275,12 +275,12 @@
                 "tail": "dein Business kennt."
             },
             "concretely": {
-                "lead": "Was bringt Rerun",
+                "lead": "Was bringt Moldwright",
                 "mid": "konkret",
                 "tail": "für dein Business?"
             },
             "needs": {
-                "lead": "Rerun",
+                "lead": "Moldwright",
                 "mid": "ist alles, was dein",
                 "tail": "Business braucht."
             }
@@ -392,7 +392,7 @@
         "team": {
             "role": "Mitgründer",
             "title": "Noch eine Frage? <fade>Frag die Gründer.</fade>",
-            "sub": "Wir sind zu zweit und bauen Rerun selbst. Schreib uns eine E-Mail oder frag im Discord.",
+            "sub": "Wir sind zu zweit und bauen Moldwright selbst. Schreib uns eine E-Mail oder frag im Discord.",
             "email": "Den Gründern schreiben",
             "discord": "Dem Discord beitreten"
         },
@@ -411,7 +411,7 @@
             },
             "experts": {
                 "question": "Kann jemand meine Coworker für mich einrichten?",
-                "answer": "Ja. Rerun Experten bauen und installieren Coworker beruflich, du kannst sie durchsehen und einen beauftragen. Wir zwei, die Rerun bauen, antworten auch im Discord, kostenlos.",
+                "answer": "Ja. Moldwright Experten bauen und installieren Coworker beruflich, du kannst sie durchsehen und einen beauftragen. Wir zwei, die Moldwright bauen, antworten auch im Discord, kostenlos.",
                 "link": "Experten"
             },
             "safe": {
@@ -467,12 +467,12 @@
                 "answer": "Er wartet, und jeder in deinem Team kann ihm antworten. Er macht Sekunden später genau dort weiter, wo er aufgehört hat. Du kannst ihm auch Regeln hinterlassen, nach denen er selbst antwortet, sodass er nur auf die Entscheidungen wartet, die du selbst treffen willst."
             },
             "phone": {
-                "question": "Kann ich Rerun auf meinem Handy nutzen?",
-                "answer": "Ja. Rerun läuft im Browser deines Handys und lässt sich wie eine App auf den Homescreen legen. Board, Unterhaltung und Freigaben sind alle für kleine Bildschirme gebaut, sodass du einen Coworker aus der Warteschlange heraus freigeben kannst."
+                "question": "Kann ich Moldwright auf meinem Handy nutzen?",
+                "answer": "Ja. Moldwright läuft im Browser deines Handys und lässt sich wie eine App auf den Homescreen legen. Board, Unterhaltung und Freigaben sind alle für kleine Bildschirme gebaut, sodass du einen Coworker aus der Warteschlange heraus freigeben kannst."
             },
             "billing": {
                 "question": "Wie funktioniert die Abrechnung? Zahle ich pro Person?",
-                "answer": "Nie pro Person. Für {price} im Monat bekommst du unbegrenzt viele Coworker, ihre private Maschine und so viele Teammitglieder im Workspace, wie du willst, ohne Aufpreis. Das Einzige, was mit dir wächst, ist dein Rerun Guthaben. Dieses Guthaben gilt nicht nur für die Modelle, die wir hosten: Es bezahlt auch die Anfragen, die deine Coworker an die {connectors}+ Tools stellen."
+                "answer": "Nie pro Person. Für {price} im Monat bekommst du unbegrenzt viele Coworker, ihre private Maschine und so viele Teammitglieder im Workspace, wie du willst, ohne Aufpreis. Das Einzige, was mit dir wächst, ist dein Moldwright Guthaben. Dieses Guthaben gilt nicht nur für die Modelle, die wir hosten: Es bezahlt auch die Anfragen, die deine Coworker an die {connectors}+ Tools stellen."
             },
             "subscription": {
                 "question": "Brauche ich ein Claude- oder ChatGPT-Abo?",
@@ -484,7 +484,7 @@
             },
             "data": {
                 "question": "Was kosten die E-Mails, Telefonnummern und anderen Daten?",
-                "answer": "Sie gehen von deinem Rerun Guthaben ab, und eine E-Mail oder Telefonnummer wird nur berechnet, wenn sie gefunden wird. Vor einer Suche sagt dir dein Coworker, was sie kostet, und wartet auf dein Ja. Du musst keinen Datenanbieter abonnieren."
+                "answer": "Sie gehen von deinem Moldwright Guthaben ab, und eine E-Mail oder Telefonnummer wird nur berechnet, wenn sie gefunden wird. Vor einer Suche sagt dir dein Coworker, was sie kostet, und wartet auf dein Ja. Du musst keinen Datenanbieter abonnieren."
             }
         }
     },

@@ -100,9 +100,9 @@ export function modelContextWindow(id: string | null | undefined, provider?: str
 
 export const MODEL_LABEL: Record<string, string> = {
     'rerun-fast': 'Fast',
-    'rerun-max': 'Rerun',
+    'rerun-max': 'Moldwright',
     'rerun-smart': 'Smart',
-    'qwen/qwen3.7-max': 'Rerun',
+    'qwen/qwen3.7-max': 'Moldwright',
     'claude-fable-5-2': 'Fable 5.2',
     'claude-fable-5-1': 'Fable 5.1',
     'claude-fable-5': 'Fable 5',

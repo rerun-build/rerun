@@ -1,4 +1,4 @@
-export const AGENT_CAPABILITIES = `What a Rerun coworker can do:
+export const AGENT_CAPABILITIES = `What a Moldwright coworker can do:
 - Work inside the apps it is connected to, through their connectors: read and write records, send messages, create documents.
 - Run on a schedule (every morning, every Monday), or when something arrives: an email, a form, a webhook from another app.
 - Read a public web page it is given the address of, and read files it is handed.

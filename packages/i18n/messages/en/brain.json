@@ -24,19 +24,19 @@
         "editor.slash.text": "Block type: a plain paragraph.",
         "editor.slash.code": "Block type: a code block.",
         "sidebar.search": "Placeholder of the search field.",
-        "workspace.seedingTitle": "Rerun is reading the company's website to fill the Brain.",
+        "workspace.seedingTitle": "Moldwright is reading the company's website to fill the Brain.",
         "workspace.missingPageTitle": "{slug} is the page identifier a link pointed to.",
         "workspace.missingTableTitle": "{name} is the table name a link pointed to.",
         "sources.dns": "A source of facts about the company: its email DNS records (MX, SPF).",
         "sources.stack": "A source of facts: the tools detected on the company's website (analytics, CRM...).",
         "sources.registry": "A source of facts: the official register of companies.",
-        "authors.seed": "Author of a page Rerun filled by reading the company's website.",
+        "authors.seed": "Author of a page Moldwright filled by reading the company's website.",
         "authors.foreman": "Author of a page written by the Chief of Staff, the workspace's own assistant.",
         "proposals.headlineEdit": "Title of a card proposing a change to a Brain page (the company's knowledge base). {title} is the page name."
     },
     "unavailable": {
         "title": "The Brain is not on this box yet",
-        "description": "Your box runs a version of Rerun from before the Brain. It shows up here once the box is updated."
+        "description": "Your box runs a version of Moldwright from before the Brain. It shows up here once the box is updated."
     },
     "crumbs": {
         "brain": "Brain",
@@ -222,14 +222,14 @@
         "unreachableFallback": "Could not reach the machine of this workspace.",
         "deleteFailed": "Could not delete the page",
         "noMachineTitle": "Your Brain comes with your first coworker",
-        "noMachineDescription": "It lives on your workspace's machine, which is set up when Rerun builds your first coworker. From then on, what every coworker knows about your company, and the files and tables they share, show up here.",
+        "noMachineDescription": "It lives on your workspace's machine, which is set up when Moldwright builds your first coworker. From then on, what every coworker knows about your company, and the files and tables they share, show up here.",
         "unreachableTitle": "Could not reach your workspace",
         "unreachableDescription": "The machine of this workspace did not answer. It may still be waking up.",
         "retry": "Retry",
-        "seedingTitle": "Rerun is reading your website",
+        "seedingTitle": "Moldwright is reading your website",
         "emptyTitle": "Your company brain is empty",
         "seedingDescription": "The identity card of your company shows up here in a few minutes: what you sell, to whom, your team, your voice and your tools.",
-        "emptyDescription": "It is what every coworker reads about your company before it works: what you sell, to whom, your team, your voice and your tools. Rerun can fill it from your website.",
+        "emptyDescription": "It is what every coworker reads about your company before it works: what you sell, to whom, your team, your voice and your tools. Moldwright can fill it from your website.",
         "refresh": "Refresh",
         "writeYourself": "Write a page yourself",
         "missingPageTitle": "No page \"{slug}\" yet",
@@ -264,7 +264,7 @@
         "googleBusiness": "Google Business Profile"
     },
     "authors": {
-        "seed": "Rerun, from your website",
+        "seed": "Moldwright, from your website",
         "foreman": "Chief of Staff"
     }
 }

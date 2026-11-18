@@ -1,6 +1,6 @@
 {
     "site": {
-        "title": "Rerun: KI-Mitarbeiter, die mit deinem ChatGPT- oder Claude-Abo laufen",
+        "title": "Moldwright: KI-Mitarbeiter, die mit deinem ChatGPT- oder Claude-Abo laufen",
         "description": "Stell KI-Mitarbeiter für Vertrieb, Support, Marketing und Verwaltung ein. Sie laufen mit deinem ChatGPT- oder Claude-Abo, inklusivem Guthaben oder deinem API-Schlüssel. {trialDays} Tage kostenlos testen."
     },
     "nav": {
@@ -177,12 +177,12 @@
     },
     "github": {
         "star": "Stern",
-        "ariaStar": "Rerun auf GitHub einen Stern geben",
-        "ariaCount": "Rerun auf GitHub, {count} Sterne"
+        "ariaStar": "Moldwright auf GitHub einen Stern geben",
+        "ariaCount": "Moldwright auf GitHub, {count} Sterne"
     },
     "heroCta": "Jetzt kostenlos starten",
     "finalCta": {
-        "proof": "{count}+ Unternehmen laufen mit Rerun",
+        "proof": "{count}+ Unternehmen laufen mit Moldwright",
         "titleLead": "Coworker mit dem <switch></switch>-Abo,",
         "titleTail": "<mark>das du schon bezahlst.</mark>",
         "steps": {
@@ -193,14 +193,14 @@
         "step": "{rank}. {label}"
     },
     "openSource": {
-        "announce": "Rerun ist jetzt Open Source<wide> unter AGPL-3.0</wide>",
+        "announce": "Moldwright ist jetzt Open Source<wide> unter AGPL-3.0</wide>",
         "cta": "Gib uns einen Stern auf GitHub"
     },
     "footer": {
         "ctaTitle": "Dein erster Coworker ist<br></br>nur drei Minuten entfernt",
         "ctaButton": "Kostenlos starten",
         "tagline": "Lass deine Arbeit von Coworkern erledigen. Bau sie, sieh ihnen bei der Arbeit zu und behalte alles im Blick.",
-        "productHuntAlt": "Rerun - Open-Source-KI-Coworker, die die Arbeit wirklich erledigen | Product Hunt",
+        "productHuntAlt": "Moldwright - Open-Source-KI-Coworker, die die Arbeit wirklich erledigen | Product Hunt",
         "columns": {
             "features": "Funktionen",
             "industries": "Branchen",
@@ -226,7 +226,7 @@
             "affiliate": "Partnerprogramm",
             "partnerBadge": "Partner-Badge"
         },
-        "compareLink": "Rerun vs. {name}",
+        "compareLink": "Moldwright vs. {name}",
         "guides": {
             "aiEmployees": "KI-Mitarbeiter",
             "smallBusiness": "KI-Agenten für kleine Unternehmen",
@@ -245,7 +245,7 @@
             "cookies": "Cookie-Richtlinie",
             "dpa": "AVV"
         },
-        "copyright": "© {year} Rerun von {legalName}. Alle Rechte vorbehalten.",
+        "copyright": "© {year} Moldwright von {legalName}. Alle Rechte vorbehalten.",
         "language": "Sprache",
         "categories": {
             "agencies": "Agenturen",
@@ -272,7 +272,7 @@
         "dismiss": "Schließen"
     },
     "notFound": {
-        "homeAria": "Rerun Startseite",
+        "homeAria": "Moldwright Startseite",
         "title": "Diese Seite ist vom Skript abgewichen.",
         "body": "Die gesuchte Seite gibt es nicht oder sie wurde verschoben. Wir bringen dich zurück.",
         "back": "Zur Startseite"
@@ -301,7 +301,7 @@
             }
         },
         "compare": {
-            "vs": "Rerun vs.",
+            "vs": "Moldwright vs.",
             "cta": "Zum Vergleich"
         }
     },

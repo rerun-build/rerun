@@ -191,7 +191,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'list_ai_connections',
         description:
-            'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT, OpenCode) and API keys plugged into it, plus the keyless Rerun one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default; for each subscription the plan windows (per cent used and reset time) and, for a Claude sign-in, the minutes it has left and whether a renewal is due. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',
+            'The AI connections of the workspace, which is what every coworker runs on: the subscriptions (Claude, ChatGPT, OpenCode) and API keys plugged into it, plus the keyless Moldwright one. For each: its `id`, the name the user gave it (often the account email), its provider, the models it serves, whether it is signed in, and whether it holds the workspace default; for each subscription the plan windows (per cent used and reset time) and, for a Claude sign-in, the minutes it has left and whether a renewal is due. `default` is the connection and model every coworker that picked nothing runs on. Read this before changing what a coworker runs on, and whenever the user names a subscription or an account: the id is the only way to tell two accounts of the same provider apart. Connections are added and removed by the user, in AI providers.',
         inputSchema: { type: 'object', properties: {} },
     },
     {
@@ -622,7 +622,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'search_connectors',
         description:
-            'Semantic search over the Rerun app library (Stripe, Gmail, Notion, Slack, …) — the ready-made integrations a coworker can be given. Describe the capability in natural language ("send emails", "read a CRM") and use the returned slug with attach_connector. `setup` tells you what declaring it will actually leave behind: "active" (works straight away), "needs_auth" (waiting for a sign-in) or "needs_config" (waiting for a credential, or for the owner to pick between several ways to connect). This search returns the best matches only — use list_connectors when you need to know whether something exists at all.',
+            'Semantic search over the Moldwright app library (Stripe, Gmail, Notion, Slack, …) — the ready-made integrations a coworker can be given. Describe the capability in natural language ("send emails", "read a CRM") and use the returned slug with attach_connector. `setup` tells you what declaring it will actually leave behind: "active" (works straight away), "needs_auth" (waiting for a sign-in) or "needs_config" (waiting for a credential, or for the owner to pick between several ways to connect). This search returns the best matches only — use list_connectors when you need to know whether something exists at all.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -656,7 +656,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'attach_connector',
         description:
-            'Declare an app on a coworker. When the app needs no credentials and no sign-in it is installed right away; otherwise it is recorded as pending and the account owner finishes the connection from the Rerun app, where the sign-in and the credential form live. The returned `status` is the truth, whatever the catalog suggested, and `key` names the account it declared. NEVER ask anyone for an API key, a password or a token: this tool takes no secret, by design. Declaring an app on a coworker that will become a template is exactly the intended use — the person installing the template connects their own account.',
+            'Declare an app on a coworker. When the app needs no credentials and no sign-in it is installed right away; otherwise it is recorded as pending and the account owner finishes the connection from the Moldwright app, where the sign-in and the credential form live. The returned `status` is the truth, whatever the catalog suggested, and `key` names the account it declared. NEVER ask anyone for an API key, a password or a token: this tool takes no secret, by design. Declaring an app on a coworker that will become a template is exactly the intended use — the person installing the template connects their own account.',
         inputSchema: {
             type: 'object',
             properties: {

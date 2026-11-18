@@ -103,7 +103,7 @@
         "region": "Cookie-Einwilligung",
         "title": "Cookies",
         "short": "Wir nutzen Analyse-Cookies. <policy>Cookie-Richtlinie</policy>",
-        "long": "Wir nutzen Analyse-Cookies, um zu verstehen, wie Rerun genutzt wird. Cookies, die für deine Anmeldung, den Support-Chat und deine Einstellungen nötig sind, sind immer aktiv. <policy>Cookie-Richtlinie</policy>"
+        "long": "Wir nutzen Analyse-Cookies, um zu verstehen, wie Moldwright genutzt wird. Cookies, die für deine Anmeldung, den Support-Chat und deine Einstellungen nötig sind, sind immer aktiv. <policy>Cookie-Richtlinie</policy>"
     },
     "experts": {
         "wizard": {
@@ -133,7 +133,7 @@
             "name": "Name",
             "namePlaceholder": "z. B. Mira Labs",
             "email": "E-Mail",
-            "emailHelper": "Privat. Nur das Rerun-Team kann sie sehen.",
+            "emailHelper": "Privat. Nur das Moldwright-Team kann sie sehen.",
             "type": "Typ",
             "location": "Standort",
             "locationPlaceholder": "z. B. Berlin",
@@ -207,7 +207,7 @@
             "status": "Status",
             "links": "Links",
             "namePlaceholder": "Dein Name",
-            "rolePlaceholder": "Rerun-Experte"
+            "rolePlaceholder": "Moldwright-Experte"
         },
         "preview": {
             "hire": "Beauftragen"

@@ -35,7 +35,7 @@ export const ENGLISH_TEAM_EMPTY_STATE_COPY: TeamEmptyStateCopy = {
     buildPrompt: 'Build me a coworker that ',
     buildFirst: { title: 'Build my first coworker', description: 'Describe the job in a sentence' },
     template: { title: 'Start from a template', description: 'Ready-made coworkers for your kind of business', send: 'Show me templates that fit my business' },
-    guide: { title: 'How does this work?', description: 'Coworkers, Boxes, routines, in two minutes', send: 'How does Rerun work?' },
+    guide: { title: 'How does this work?', description: 'Coworkers, Boxes, routines, in two minutes', send: 'How does Moldwright work?' },
     checkWorking: (name, mention) => ({ title: `What is ${name} doing?`, description: 'Working now', send: `What is ${mention} doing right now?` }),
     checkIdle: (name, mention) => ({ title: `What did ${name} do today?`, description: 'Catch up on its latest runs', send: `What did ${mention} do today?` }),
     handOff: (name, mention) => ({ title: `Give ${name} a task`, description: 'I brief it and follow it through', prefill: `Ask ${mention} to ` }),

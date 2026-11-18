@@ -1,9 +1,9 @@
 import { TRIAL_DAYS } from '@rerun/contracts'
 
 export const site = {
-    name: 'Rerun',
-    title: 'Rerun | Get your tasks done by AI, even while you sleep',
-    titleTemplate: '%s | Rerun',
+    name: 'Moldwright',
+    title: 'Moldwright | Get your tasks done by AI, even while you sleep',
+    titleTemplate: '%s | Moldwright',
     description:
         `Pick a ready-to-run AI agent from the library or build your own, connect your tools, and it runs 24/7 on your own private machine in the cloud. Free ${TRIAL_DAYS}-day trial.`,
     url: 'https://app.rerun.build',

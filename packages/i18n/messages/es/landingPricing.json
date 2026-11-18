@@ -2,12 +2,12 @@
     "seo": {
         "title": "Precios",
         "headline": "Un plan. Todo incluido.",
-        "description": "Un solo plan de Rerun desde {price} al mes: agentes ilimitados, puestos ilimitados, tu propia máquina privada, todas las apps y ejecuciones ilimitadas. Prueba gratis de {trialDays} días.",
+        "description": "Un solo plan de Moldwright desde {price} al mes: agentes ilimitados, puestos ilimitados, tu propia máquina privada, todas las apps y ejecuciones ilimitadas. Prueba gratis de {trialDays} días.",
         "breadcrumbHome": "Inicio"
     },
     "hero": {
         "eyebrow": "Precios",
-        "description": "Prueba Rerun gratis durante {trialDays} días. Luego elige cuántos Coworkers necesitas e invita a todo tu equipo."
+        "description": "Prueba Moldwright gratis durante {trialDays} días. Luego elige cuántos Coworkers necesitas e invita a todo tu equipo."
     },
     "price": {
         "perMonth": "/mes",
@@ -77,7 +77,7 @@
         "name": "Enterprise",
         "description": "Para grandes organizaciones con sus propios requisitos",
         "features": {
-            "everything": "Todo lo de Rerun",
+            "everything": "Todo lo de Moldwright",
             "infrastructure": "Infraestructura a medida",
             "infrastructureDetail": "Dedicada o autoalojada: tus Coworkers funcionan donde tu organización lo necesite.",
             "support": "Soporte dedicado",
@@ -132,7 +132,7 @@
         "lede": "Los complementos son cantidades sobre el plan que ya tienes, no otro nivel. Añade uno cuando lo necesites y quítalo cuando no.",
         "items": {
             "credit_pack": {
-                "title": "Créditos de Rerun",
+                "title": "Créditos de Moldwright",
                 "unit": "+{credits, plural, one {# crédito} other {# créditos}}/mes",
                 "caption": "Más créditos para los modelos que alojamos, además del plan."
             }
@@ -140,12 +140,12 @@
     },
     "comparison": {
         "badge": "Comparativa",
-        "title": "Por qué la gente se pasa a Rerun.",
-        "compareWith": "Comparar Rerun con",
-        "fullComparison": "Lee la comparativa completa de Rerun vs {competitor}",
+        "title": "Por qué la gente se pasa a Moldwright.",
+        "compareWith": "Comparar Moldwright con",
+        "fullComparison": "Lee la comparativa completa de Moldwright vs {competitor}",
         "allComparisons": "Todas las comparativas",
         "alsoCompared": "También comparado",
-        "versus": "Rerun vs {competitor}"
+        "versus": "Moldwright vs {competitor}"
     },
     "faq": {
         "label": "Preguntas sobre precios",

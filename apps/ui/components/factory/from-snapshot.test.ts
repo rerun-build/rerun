@@ -238,7 +238,7 @@ describe('belts ask for chevrons', () => {
     }
     const html = (style: object, extra: object = {}) => renderToStaticMarkup(createElement(TileBuddy, { id: 'x', style, width: 120, height: 120, floorOffset: 0, ...extra } as never))
 
-    it("draws each coworker's look from its pool id, as Rerun's panel does", () => {
+    it("draws each coworker's look from its pool id, as Moldwright's panel does", () => {
         const f = sceneFromSnapshot(sample(), NOW)
         for (const [name, id] of [['code', 'code-1'], ['LARRY', 'larry-1'], ['LINUS', 'linus-1'], ['BRUCE', 'bruce-1'], ['search', 'search-1'], ['DIETER', 'dieter-1']]) {
             const b = f.tiles.find(t => t.id === name)!.style.buddy as BuddyLook

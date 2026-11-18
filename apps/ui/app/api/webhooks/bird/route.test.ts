@@ -73,7 +73,7 @@ describe('POST /api/webhooks/bird', () => {
         expect(vi.mocked(applyWhatsAppProgress).mock.calls[0].slice(1)).toEqual(['row-1', { status, at: AT, birdMessageId: 'wam_1' }])
     })
 
-    it('leaves alone a message Rerun did not send through deliverWhatsApp', async () => {
+    it('leaves alone a message Moldwright did not send through deliverWhatsApp', async () => {
         const response = await POST(signed(messageEvent('whatsapp.delivered', { metadata: null })))
 
         expect(response.status).toBe(200)

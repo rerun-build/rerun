@@ -52,7 +52,7 @@
         "deleteFailedTitle": "Konto konnte nicht gelöscht werden",
         "deleteFailedMessage": "Versuch es gleich noch mal.",
         "leaveServerTitle": "{host} verlassen?",
-        "leaveServerMessage": "Du wirst abgemeldet, und Rerun öffnet sich wieder mit Rerun Cloud.",
+        "leaveServerMessage": "Du wirst abgemeldet, und Moldwright öffnet sich wieder mit Moldwright Cloud.",
         "leaveServer": "Verlassen"
     },
     "workspace": {

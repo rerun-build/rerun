@@ -16,7 +16,7 @@
         "session_gone": "Conversation indisponible"
     },
     "messages": {
-        "budget": "Le compte derrière les modèles Rerun n'a plus de solde. Rechargez-le ou passez à un autre modèle.",
+        "budget": "Le compte derrière les modèles Moldwright n'a plus de solde. Rechargez-le ou passez à un autre modèle.",
         "unauthorized": "Cette connexion doit être reconnectée avant que le coworker puisse travailler.",
         "overloaded": "Le fournisseur est surchargé pour le moment. Réessayez dans un instant.",
         "context_window": "Cette conversation ne tient plus dans le modèle, et la renvoyer se heurtera à la même limite. Passez à un modèle avec une fenêtre de contexte plus grande, ou démarrez une nouvelle conversation.",

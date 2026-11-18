@@ -122,7 +122,7 @@
         "notifications.perCoworker.followsTasks": "Value of a coworker's row: it keeps the global setting but also follows the coworker's scheduled tasks.",
         "notifications.coworker.quotedScope": "Hint under the 'Your setting' option: the label of the global setting, quoted.",
         "notifications.coworker.scheduled": "{count} is the number of scheduled tasks of the coworker.",
-        "preferences.server": "Settings row showing the self-hosted Rerun server the app is connected to.",
+        "preferences.server": "Settings row showing the self-hosted Moldwright server the app is connected to.",
         "preferences.groupByBox": "Option of the Coworkers picker: the Home lists the coworkers grouped by Box.",
         "notifications.channels.messages.name": "Name of an Android notification channel, shown in the Android settings of the app: the pushes that ring.",
         "notifications.channels.silent.name": "Name of an Android notification channel, shown in the Android settings of the app: the quiet pushes about a finished task."

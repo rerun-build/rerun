@@ -33,7 +33,7 @@ export type WorkspaceBrand = { name: string; iconUrl: string | null }
 
 export async function loadWorkspaceBrand(workspaceId: number): Promise<WorkspaceBrand> {
     const { data } = await selectMaybeSingle(createServiceRoleClient(), 'workspaces', ['name', 'icon_url'] as const, { id: workspaceId })
-    return { name: data?.name ?? 'Rerun', iconUrl: data?.icon_url ?? null }
+    return { name: data?.name ?? 'Moldwright', iconUrl: data?.icon_url ?? null }
 }
 
 export function isHtmlContentType(contentType: string): boolean {

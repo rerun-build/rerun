@@ -1,7 +1,7 @@
 {
-    "title": "Télécharger l’app de bureau Rerun",
+    "title": "Télécharger l’app de bureau Moldwright",
     "eyebrow": "App de bureau",
-    "headline": "Rerun sur votre bureau",
+    "headline": "Moldwright sur votre bureau",
     "description": "Vos coworkers dans une fenêtre à eux, avec les notifications, une icône dans la barre des menus ou la zone de notification, et la question rapide.",
     "mac": "Télécharger pour macOS",
     "windows": "Télécharger pour Windows",
@@ -14,7 +14,7 @@
         "windowsX64": "Télécharger pour Windows x64"
     },
     "beta": "Bêta",
-    "webApp": "Rerun fonctionne aussi dans votre navigateur : <link>ouvrir l’app web</link>.",
+    "webApp": "Moldwright fonctionne aussi dans votre navigateur : <link>ouvrir l’app web</link>.",
     "platforms": {
         "label": "Télécharger",
         "title": "macOS, Windows et Linux",
@@ -41,18 +41,18 @@
     },
     "features": {
         "label": "Ce que l’app ajoute",
-        "title": "Tout Rerun, à un raccourci",
+        "title": "Tout Moldwright, à un raccourci",
         "notifications": {
             "title": "Des notifications qui vous ramènent",
             "body": "Vos coworkers vous joignent dès que vous êtes dans une autre app, et un clic ouvre la conversation."
         },
         "quickAsk": {
             "title": "Question rapide",
-            "body": "⌘⇧Espace sur Mac, Ctrl+Maj+Espace sur Windows et Linux : une question pour votre Chief of Staff depuis n’importe quelle app, et la réponse vous attend dans Rerun."
+            "body": "⌘⇧Espace sur Mac, Ctrl+Maj+Espace sur Windows et Linux : une question pour votre Chief of Staff depuis n’importe quelle app, et la réponse vous attend dans Moldwright."
         },
         "always": {
             "title": "Toujours là",
-            "body": "Fermer la fenêtre garde Rerun dans la barre des menus ou la zone de notification, avec sur son icône le nombre de ce qui vous attend."
+            "body": "Fermer la fenêtre garde Moldwright dans la barre des menus ou la zone de notification, avec sur son icône le nombre de ce qui vous attend."
         }
     }
 }

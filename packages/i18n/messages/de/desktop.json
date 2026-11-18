@@ -5,7 +5,7 @@
         "description": "Der Bildschirm, auf dem dieser Coworker arbeitet. Was du hier tust, findet er danach wieder.",
         "takeoverDescription": "Du bist im Browser deines Coworkers. Klicke auf Fertig, wenn er weitermachen kann.",
         "takeoverHoldsBrowser": "Der Browser deines Coworkers ist für diese Anfrage bereits geöffnet.",
-        "clipboardDenied": "Dein Browser hat Rerun das Lesen der Zwischenablage verweigert.",
+        "clipboardDenied": "Dein Browser hat Moldwright das Lesen der Zwischenablage verweigert.",
         "disconnectedDescription": "Die Verbindung zur Maschine wurde getrennt. Dabei ging nichts verloren.",
         "reconnect": "Neu verbinden",
         "tryAgain": "Erneut versuchen"

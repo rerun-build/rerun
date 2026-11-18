@@ -274,7 +274,7 @@
             "aiProviders": {
                 "label": "Ver sus proveedores de IA",
                 "blurb": "Modelo en uso, crédito y cuotas",
-                "help": "Permite al coworker saber con qué proveedor de IA y qué modelo funciona, qué otros proveedores están conectados al workspace y cuánto queda en cada uno: el crédito de Rerun y los límites de una suscripción de Claude, Codex u OpenCode. No puede cambiar nada."
+                "help": "Permite al coworker saber con qué proveedor de IA y qué modelo funciona, qué otros proveedores están conectados al workspace y cuánto queda en cada uno: el crédito de Moldwright y los límites de una suscripción de Claude, Codex u OpenCode. No puede cambiar nada."
             },
             "askUser": {
                 "label": "Hacerte preguntas",
@@ -303,8 +303,8 @@
             },
             "paidData": {
                 "label": "Leads, SEO y datos sociales",
-                "blurb": "Se paga con tus créditos de Rerun",
-                "help": "Permite al coworker encontrar prospectos, sus correos de trabajo, teléfonos y datos de empresa, consultar volúmenes de búsqueda, ideas de palabras clave y backlinks, leer resultados de Google y negocios locales, y leer perfiles y publicaciones públicos en LinkedIn, TikTok, Instagram, X, YouTube, Facebook y Reddit, sin una suscripción a Apollo, Semrush o de scraping. Cada llamada se paga con tus créditos de Rerun, y el coworker te pide primero que apruebes un costo estimado."
+                "blurb": "Se paga con tus créditos de Moldwright",
+                "help": "Permite al coworker encontrar prospectos, sus correos de trabajo, teléfonos y datos de empresa, consultar volúmenes de búsqueda, ideas de palabras clave y backlinks, leer resultados de Google y negocios locales, y leer perfiles y publicaciones públicos en LinkedIn, TikTok, Instagram, X, YouTube, Facebook y Reddit, sin una suscripción a Apollo, Semrush o de scraping. Cada llamada se paga con tus créditos de Moldwright, y el coworker te pide primero que apruebes un costo estimado."
             },
             "requestSecret": {
                 "label": "Pedir una credencial",
@@ -419,7 +419,7 @@
     },
     "modelsShared": {
         "boxManageReason": "Solo un admin o un manager de esta Box puede cambiar esto",
-        "creditPaused": "Los créditos de Rerun están en pausa"
+        "creditPaused": "Los créditos de Moldwright están en pausa"
     },
     "modelSelector": {
         "setUp": "Configura un modelo",

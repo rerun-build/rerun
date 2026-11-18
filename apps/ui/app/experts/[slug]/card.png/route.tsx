@@ -263,7 +263,7 @@ function CardImage({ data, photoDataUrl, s }: { data: ExpertCard; photoDataUrl: 
                         color: 'transparent',
                     }}
                 >
-                    Rerun Experts
+                    Moldwright Experts
                 </span>
                 <HeaderMarks s={s} />
             </div>

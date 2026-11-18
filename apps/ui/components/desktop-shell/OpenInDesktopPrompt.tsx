@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 const ASKED_KEY = 'rerun:open-in-desktop-asked'
-const APP_NAMES = { stable: 'Rerun', staging: 'Rerun Staging', dev: 'Rerun Dev' } as const
+const APP_NAMES = { stable: 'Moldwright', staging: 'Moldwright Staging', dev: 'Moldwright Dev' } as const
 
 function desktopChannel() {
     const value = document.cookie.match(new RegExp(`(?:^|; )${DESKTOP_APP_COOKIE}=([^;]*)`))?.[1]

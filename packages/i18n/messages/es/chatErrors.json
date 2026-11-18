@@ -16,7 +16,7 @@
         "session_gone": "Conversación no disponible"
     },
     "messages": {
-        "budget": "La cuenta detrás de los modelos de Rerun se ha quedado sin saldo. Recárgala o cambia a otro modelo.",
+        "budget": "La cuenta detrás de los modelos de Moldwright se ha quedado sin saldo. Recárgala o cambia a otro modelo.",
         "unauthorized": "Vuelve a conectar esta conexión antes de que el coworker pueda trabajar.",
         "overloaded": "El proveedor está saturado ahora mismo. Inténtalo de nuevo en un momento.",
         "context_window": "Esta conversación ya no cabe en el modelo, y volver a enviarla chocará con el mismo límite. Cambia a un modelo con una ventana de contexto más grande, o empieza una conversación nueva.",

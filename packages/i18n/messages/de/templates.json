@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
-        "rerunTeam": "Rerun-Team",
+        "rerunTeam": "Moldwright-Team",
         "verified": "Verifizierter Creator"
     },
     "spotlight": {
@@ -121,14 +121,14 @@
             "featured": "Empfohlen",
             "featuredSubtitle": "Handverlesene Setups, die einen ersten Blick wert sind.",
             "justAdded": "Neu hinzugefügt",
-            "justAddedSubtitle": "Die neuesten auf Rerun veröffentlichten Vorlagen."
+            "justAddedSubtitle": "Die neuesten auf Moldwright veröffentlichten Vorlagen."
         },
         "empty": {
             "filtered": "Keine Vorlage passt zu diesen Filtern",
             "none": "Hier gibt es noch keine Vorlage",
             "selfHosted": "Stell einen Coworker ein und speichere ihn dann als Vorlage.",
-            "cloud": "Bau sie selbst und verkauf sie auf Rerun.",
-            "become": "Werde Rerun-Experte"
+            "cloud": "Bau sie selbst und verkauf sie auf Moldwright.",
+            "become": "Werde Moldwright-Experte"
         }
     },
     "scratch": {
@@ -362,7 +362,7 @@
                 "installAnswers": "Eine Installationsantwort für jeden Coworker",
                 "payouts": "Ein Stripe-Konto, das Auszahlungen empfangen kann"
             },
-            "live": "Diese Vorlage ist live im Marketplace. Wende dich an das Rerun-Team, um sie zu ändern.",
+            "live": "Diese Vorlage ist live im Marketplace. Wende dich an das Moldwright-Team, um sie zu ändern.",
             "inReview": "Wir prüfen diese Vorlage. Zieh sie zurück, um weiter zu bearbeiten.",
             "withdraw": "Zurückziehen",
             "completeChecklist": "Schließ zuerst die Checkliste ab",
@@ -388,11 +388,11 @@
             "recurring": "Monatsabo"
         },
         "helpers": {
-            "free": "Alle mit einem Rerun-Tarif können sie installieren.",
+            "free": "Alle mit einem Moldwright-Tarif können sie installieren.",
             "one_time": "Einmal berechnet. Der Käufer behält sie dauerhaft.",
             "recurring": "Jeden Monat berechnet. Der Zugriff endet, wenn der Käufer kündigt."
         },
-        "modelHelp": "{helper} Käufer brauchen trotzdem einen aktiven Rerun-Tarif, um eine Vorlage zu installieren.",
+        "modelHelp": "{helper} Käufer brauchen trotzdem einen aktiven Moldwright-Tarif, um eine Vorlage zu installieren.",
         "priceLabel": "Preis (USD)",
         "priceHelp": "Mindestens {min}. Spätere Änderungen gelten nur für neue Käufer.",
         "payoutsTitle": "Auszahlungen sind nicht aktiviert",
@@ -400,7 +400,7 @@
         "setUpPayouts": "Auszahlungen einrichten",
         "payout": {
             "yourPrice": "Dein Preis{recurring, select, true { pro Monat} other {}}",
-            "fee": "Rerun-Gebühr ({fee})",
+            "fee": "Moldwright-Gebühr ({fee})",
             "earn": "Du verdienst{recurring, select, true { pro Monat} other {}}",
             "vat": "Die MwSt. kommt an der Kasse auf deinen Preis obendrauf und wird vom Käufer bezahlt, sie geht also nie von deinem Anteil ab. Was du verdienst, ist überall gleich."
         }
@@ -411,14 +411,14 @@
         "subtitle": "Wo das Geld aus deinen kostenpflichtigen Vorlagen landet.",
         "yourPrice": "Dein Preis",
         "yourPriceValue": "Du legst ihn pro Vorlage fest, ohne MwSt.",
-        "commission": "Rerun-Provision",
+        "commission": "Moldwright-Provision",
         "schedule": "Auszahlungsrhythmus",
         "scheduleValue": "Stripe-Standard",
-        "planNote": "Käufer brauchen trotzdem einen aktiven Rerun-Tarif, um eine Vorlage zu installieren, ein Kauf schaltet also nur die Vorlage frei.",
+        "planNote": "Käufer brauchen trotzdem einen aktiven Moldwright-Tarif, um eine Vorlage zu installieren, ein Kauf schaltet also nur die Vorlage frei.",
         "states": {
             "not_started": {
                 "headline": "Lass dich für deine Vorlagen bezahlen",
-                "body": "Rerun behält {fee} jedes Verkaufs. Der Rest landet über Stripe auf deinem Bankkonto.",
+                "body": "Moldwright behält {fee} jedes Verkaufs. Der Rest landet über Stripe auf deinem Bankkonto.",
                 "cta": "Auszahlungen einrichten"
             },
             "incomplete": {
@@ -438,7 +438,7 @@
             },
             "ready": {
                 "headline": "Du bist für Auszahlungen bereit",
-                "body": "Gib einer Vorlage einen Preis, und sie geht in den Verkauf, sobald wir sie geprüft haben. Rerun behält {fee} jedes Verkaufs.",
+                "body": "Gib einer Vorlage einen Preis, und sie geht in den Verkauf, sobald wir sie geprüft haben. Moldwright behält {fee} jedes Verkaufs.",
                 "cta": "Stripe-Dashboard öffnen"
             }
         },
@@ -503,7 +503,7 @@
         "type": "Art",
         "sales": "Verkäufe",
         "gross": "Brutto",
-        "fee": "Rerun-Gebühr",
+        "fee": "Moldwright-Gebühr",
         "pending": "Ausstehende Auszahlung",
         "available": "Jetzt verfügbar",
         "subscriptions": "{count, plural, one {# aktives Abo} other {# aktive Abos}}",
@@ -555,7 +555,7 @@
         "trialUsedBilledSeparately": "Dein kostenloser Test ist schon genutzt. Heute abgerechnet; diese Vorlage wird separat abgerechnet.",
         "resubscribe": "Für {price}/Monat erneut abonnieren",
         "lapsed": "Dein Abo ist beendet. Die Coworker, die diese Vorlage installiert hat, sind deaktiviert.",
-        "billedTo": "Abgerechnet an {workspace}. Dein Rerun-Tarif ist bereits aktiv.",
+        "billedTo": "Abgerechnet an {workspace}. Dein Moldwright-Tarif ist bereits aktiv.",
         "yours": "Deine Vorlage, kostenlos."
     }
 }

@@ -56,8 +56,8 @@
         "modelsShared.boxManageReason": "Tooltip on a disabled control: the person lacks the rights on the Box (group of coworkers) holding this coworker.",
         "modelTierRow.pro": "Badge on a model only available on the paid Pro plan.",
         "openChatsTabs.general": "Tab of the coworker's main conversation, always open.",
-        "planLimitHint.credit.usedUpOn": "Monthly Rerun credits are exhausted. {date} is a short date like \"Nov 12\".",
-        "planLimitHint.paused": "Badge: the Rerun credits are paused.",
+        "planLimitHint.credit.usedUpOn": "Monthly Moldwright credits are exhausted. {date} is a short date like \"Nov 12\".",
+        "planLimitHint.paused": "Badge: the Moldwright credits are paused.",
         "planLimitHint.windowResets": "{name} is a usage window (Session, Weekly...), {percent} like 42%, {when} a relative time like \"in 5m\" or a short date.",
         "planLimitHint.windows.fiveHour": "Name of a rolling five-hour usage window of an AI subscription.",
         "planLimitHint.windows.modelWeekly": "Weekly usage window of one model family. {label} is the family name (e.g. Opus).",
@@ -369,7 +369,7 @@
             "aiProviders": {
                 "label": "See its AI providers",
                 "blurb": "Model in use, credit and quotas",
-                "help": "Lets the coworker check which AI provider and model it runs on, the other providers connected to the workspace, and what is left on each: the Rerun credit and the limits of a Claude, Codex or OpenCode subscription. It cannot change anything."
+                "help": "Lets the coworker check which AI provider and model it runs on, the other providers connected to the workspace, and what is left on each: the Moldwright credit and the limits of a Claude, Codex or OpenCode subscription. It cannot change anything."
             },
             "askUser": {
                 "label": "Ask you questions",
@@ -398,8 +398,8 @@
             },
             "paidData": {
                 "label": "Leads, SEO & social data",
-                "blurb": "Paid from your Rerun credits",
-                "help": "Lets the coworker find prospects, their work emails and phone numbers and company data, check search volumes, keyword ideas and backlinks, read Google results and local businesses, and read public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, without an Apollo, Semrush or scraping subscription. Each call is paid from your Rerun credits, and the coworker asks you to approve an estimated cost first."
+                "blurb": "Paid from your Moldwright credits",
+                "help": "Lets the coworker find prospects, their work emails and phone numbers and company data, check search volumes, keyword ideas and backlinks, read Google results and local businesses, and read public profiles and posts on LinkedIn, TikTok, Instagram, X, YouTube, Facebook and Reddit, without an Apollo, Semrush or scraping subscription. Each call is paid from your Moldwright credits, and the coworker asks you to approve an estimated cost first."
             },
             "requestSecret": {
                 "label": "Ask for a credential",
@@ -514,7 +514,7 @@
     },
     "modelsShared": {
         "boxManageReason": "Only an admin or a manager of this Box can change this",
-        "creditPaused": "Rerun credits are paused"
+        "creditPaused": "Moldwright credits are paused"
     },
     "modelSelector": {
         "setUp": "Set up a model",

@@ -12,7 +12,7 @@ import { SERVERS_ENABLED } from './servers'
 import { SUPPORT_CHAT_ENABLED } from './support'
 
 describe('the self-hosted side of @rerun/cloud', () => {
-    it('is not Rerun Cloud and sells nothing', () => {
+    it('is not Moldwright Cloud and sells nothing', () => {
         expect(RERUN_CLOUD).toBe(false)
         expect(BILLING_ENABLED).toBe(false)
         expect(MARKETPLACE_ENABLED).toBe(false)
@@ -57,8 +57,8 @@ describe('the email of a self-hosted install', () => {
         expect(email.EMAIL_DELIVERY).toBe(true)
     })
 
-    it('sends from no domain of Rerun until its own senders are set, and has no WhatsApp number', () => {
-        for (const sender of [DEFAULT_SENDERS.transactional, DEFAULT_SENDERS.experts, DEFAULT_SENDERS.marketing]) expect(sender).toBe('Rerun <onboarding@resend.dev>')
+    it('sends from no domain of Moldwright until its own senders are set, and has no WhatsApp number', () => {
+        for (const sender of [DEFAULT_SENDERS.transactional, DEFAULT_SENDERS.experts, DEFAULT_SENDERS.marketing]) expect(sender).toBe('Moldwright <onboarding@resend.dev>')
         expect(DEFAULT_SENDERS.replyTo).toBeUndefined()
         expect(DEFAULT_WHATSAPP_FROM).toBeNull()
     })

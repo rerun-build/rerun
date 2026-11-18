@@ -36,7 +36,7 @@
     },
     "creator": {
         "templateCount": "{count, plural, one {# template} other {# templates}}",
-        "rerunTeam": "Equipe Rerun",
+        "rerunTeam": "Equipe Moldwright",
         "verified": "Criador verificado"
     },
     "spotlight": {
@@ -121,14 +121,14 @@
             "featured": "Destaques",
             "featuredSubtitle": "Configurações escolhidas a dedo para ver primeiro.",
             "justAdded": "Recém-adicionados",
-            "justAddedSubtitle": "Os templates publicados mais recentemente no Rerun."
+            "justAddedSubtitle": "Os templates publicados mais recentemente no Moldwright."
         },
         "empty": {
             "filtered": "Nenhum template corresponde a estes filtros",
             "none": "Nenhum template aqui ainda",
             "selfHosted": "Recrute um coworker e salve-o como template.",
-            "cloud": "Crie você mesmo e venda no Rerun.",
-            "become": "Torne-se um especialista Rerun"
+            "cloud": "Crie você mesmo e venda no Moldwright.",
+            "become": "Torne-se um especialista Moldwright"
         }
     },
     "scratch": {
@@ -362,7 +362,7 @@
                 "installAnswers": "Uma resposta de instalação para cada coworker",
                 "payouts": "Uma conta Stripe que possa receber repasses"
             },
-            "live": "Este template está no ar no marketplace. Fale com a equipe do Rerun para alterá-lo.",
+            "live": "Este template está no ar no marketplace. Fale com a equipe do Moldwright para alterá-lo.",
             "inReview": "Estamos revisando este template. Retire-o para continuar editando.",
             "withdraw": "Retirar",
             "completeChecklist": "Complete o checklist primeiro",
@@ -388,11 +388,11 @@
             "recurring": "Assinatura mensal"
         },
         "helpers": {
-            "free": "Qualquer pessoa com um plano Rerun pode instalar.",
+            "free": "Qualquer pessoa com um plano Moldwright pode instalar.",
             "one_time": "Cobrado uma vez. O comprador fica com ele para sempre.",
             "recurring": "Cobrado todo mês. O acesso termina quando o comprador cancela."
         },
-        "modelHelp": "{helper} Os compradores ainda precisam de um plano Rerun ativo para instalar um template.",
+        "modelHelp": "{helper} Os compradores ainda precisam de um plano Moldwright ativo para instalar um template.",
         "priceLabel": "Preço (USD)",
         "priceHelp": "Mínimo {min}. Mudanças futuras só valem para novos compradores.",
         "payoutsTitle": "Os repasses não estão ativados",
@@ -400,7 +400,7 @@
         "setUpPayouts": "Configurar repasses",
         "payout": {
             "yourPrice": "Seu preço{recurring, select, true { por mês} other {}}",
-            "fee": "Taxa do Rerun ({fee})",
+            "fee": "Taxa do Moldwright ({fee})",
             "earn": "Você recebe{recurring, select, true { por mês} other {}}",
             "vat": "O IVA é somado ao seu preço no checkout e pago pelo comprador, então nunca sai do seu lado. O que você recebe é o mesmo, onde quer que ele esteja."
         }
@@ -411,14 +411,14 @@
         "subtitle": "Para onde vai o dinheiro dos seus templates pagos.",
         "yourPrice": "Seu preço",
         "yourPriceValue": "Você define por template, sem IVA",
-        "commission": "Comissão do Rerun",
+        "commission": "Comissão do Moldwright",
         "schedule": "Calendário de repasses",
         "scheduleValue": "Padrão do Stripe",
-        "planNote": "Os compradores ainda precisam de um plano Rerun ativo para instalar um template, então uma compra libera o template e nada mais.",
+        "planNote": "Os compradores ainda precisam de um plano Moldwright ativo para instalar um template, então uma compra libera o template e nada mais.",
         "states": {
             "not_started": {
                 "headline": "Receba pelos seus templates",
-                "body": "O Rerun fica com {fee} de cada venda. O resto cai na sua conta bancária pelo Stripe.",
+                "body": "O Moldwright fica com {fee} de cada venda. O resto cai na sua conta bancária pelo Stripe.",
                 "cta": "Configurar repasses"
             },
             "incomplete": {
@@ -438,7 +438,7 @@
             },
             "ready": {
                 "headline": "Você está pronto para receber repasses",
-                "body": "Defina o preço de um template e ele entra à venda depois da nossa revisão. O Rerun fica com {fee} de cada venda.",
+                "body": "Defina o preço de um template e ele entra à venda depois da nossa revisão. O Moldwright fica com {fee} de cada venda.",
                 "cta": "Abrir painel do Stripe"
             }
         },
@@ -503,7 +503,7 @@
         "type": "Tipo",
         "sales": "Vendas",
         "gross": "Bruto",
-        "fee": "Taxa do Rerun",
+        "fee": "Taxa do Moldwright",
         "pending": "Repasse pendente",
         "available": "Disponível agora",
         "subscriptions": "{count, plural, one {# assinatura ativa} other {# assinaturas ativas}}",
@@ -555,7 +555,7 @@
         "trialUsedBilledSeparately": "Seu teste grátis já foi usado. Cobrado hoje; este template é cobrado à parte.",
         "resubscribe": "Assinar de novo por {price}/mês",
         "lapsed": "Sua assinatura terminou. Os coworkers que este template instalou estão desativados.",
-        "billedTo": "Cobrado de {workspace}. Seu plano Rerun já está ativo.",
+        "billedTo": "Cobrado de {workspace}. Seu plano Moldwright já está ativo.",
         "yours": "Seu template, sem custo."
     }
 }

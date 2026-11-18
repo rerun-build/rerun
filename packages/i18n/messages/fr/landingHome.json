@@ -4,14 +4,14 @@
             "lead": "Embauchez des <keep><chip>Coworkers</chip> IA</keep>",
             "tail": "Ils travaillent comme vous."
         },
-        "subtitle": "Les chatbots vous disent quoi faire. Les Coworkers IA font le travail. Branchez dans Rerun le LLM que vous payez déjà et confiez-leur du travail.",
+        "subtitle": "Les chatbots vous disent quoi faire. Les Coworkers IA font le travail. Branchez dans Moldwright le LLM que vous payez déjà et confiez-leur du travail.",
         "cta": "Essai de 5 jours à {price}",
-        "productHuntAlt": "Soutenez Rerun sur Product Hunt",
-        "trust": "Plus de {count, number} utilisateurs confient leur activité à Rerun",
+        "productHuntAlt": "Soutenez Moldwright sur Product Hunt",
+        "trust": "Plus de {count, number} utilisateurs confient leur activité à Moldwright",
         "pillLeads": {
             "jobs": "Embauchez un",
             "tasks": "Confiez à un Coworker :",
-            "sectors": "Rerun pour"
+            "sectors": "Moldwright pour"
         },
         "tiles": {
             "tour-research": {

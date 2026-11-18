@@ -45,7 +45,7 @@ describe('POST /api/mcp/managed/[provider]', () => {
         listForms.mockResolvedValue({ items: [] })
     })
 
-    it('answers 404 for a provider Rerun does not manage', async () => {
+    it('answers 404 for a provider Moldwright does not manage', async () => {
         const response = await POST(request(toolCall('list_forms')), context('gmail'))
 
         expect(response.status).toBe(404)

@@ -1,7 +1,7 @@
 {
     "_context": {
         "menu.label": "Heading of the section of the workspace menu that lists the paid apps (LinkedIn, WhatsApp).",
-        "linkedToRerun": "Accessible label of a picture of the app's logo linked to Rerun's. {provider} is the app's brand (LinkedIn, WhatsApp).",
+        "linkedToRerun": "Accessible label of a picture of the app's logo linked to Moldwright's. {provider} is the app's brand (LinkedIn, WhatsApp).",
         "slots.footer": "Footer of the list of accounts. {description} is one of the slots.* sentences, starting lower case.",
         "slots.subscriberTrial": "Starts lower case: it follows a comma in slots.footer.",
         "slots.workspaceTrial": "Starts lower case: it follows a comma in slots.footer.",
@@ -20,13 +20,13 @@
     "menu": {
         "label": "Apps"
     },
-    "linkedToRerun": "{provider} linked to Rerun",
+    "linkedToRerun": "{provider} linked to Moldwright",
     "slotPrice": {
         "monthly": "{price}/mo",
         "yearly": "{price}/yr"
     },
     "blocked": {
-        "notSubscribed": "Subscribe to Rerun first",
+        "notSubscribed": "Subscribe to Moldwright first",
         "paused": "Your workspace is paused",
         "trialSlot": "A trial holds one {provider} slot. Upgrade your plan to add more.",
         "adminOnly": "Only an admin can manage paid apps"
@@ -157,7 +157,7 @@
         "signInFromHelp": "LinkedIn trusts a sign-in from the country you usually work from.",
         "searchCountry": "Search a country",
         "noCountry": "No country found",
-        "neverStored": "Rerun never stores your password or your cookie.",
+        "neverStored": "Moldwright never stores your password or your cookie.",
         "connect": "Connect",
         "approval": {
             "figureLabel": "A phone showing the sign-in request, its approve key lit",
@@ -191,7 +191,7 @@
                 "qr": "Scan a QR code",
                 "code": "Type a code"
             },
-            "linkedDevice": "Rerun joins as a linked device, the way WhatsApp Web does. Your phone keeps working as usual.",
+            "linkedDevice": "Moldwright joins as a linked device, the way WhatsApp Web does. Your phone keeps working as usual.",
             "submit": "Get the code"
         },
         "link": {

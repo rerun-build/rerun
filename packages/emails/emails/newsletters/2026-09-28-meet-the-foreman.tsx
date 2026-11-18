@@ -106,7 +106,7 @@ export default function MeetTheForeman({
       />
 
       <Text style={sign}>
-        Written by a Rerun agent, sent once a week. Reply to this email if
+        Written by a Moldwright agent, sent once a week. Reply to this email if
         something is broken or missing, it reaches a person.
       </Text>
     </NewsletterLayout>

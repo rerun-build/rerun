@@ -52,7 +52,7 @@
         "deleteFailedTitle": "Não foi possível excluir sua conta",
         "deleteFailedMessage": "Tente de novo daqui a pouco.",
         "leaveServerTitle": "Sair de {host}?",
-        "leaveServerMessage": "Você será desconectado, e o Rerun reabre no Rerun Cloud.",
+        "leaveServerMessage": "Você será desconectado, e o Moldwright reabre no Moldwright Cloud.",
         "leaveServer": "Sair"
     },
     "workspace": {

@@ -23,7 +23,7 @@ const contentSchema = z.object({
     tagline: z
         .string()
         .describe(
-            `One sentence, ${TAGLINE_LIMIT} characters maximum, describing what the coworker actually does and what it produces. No trailing period is required. Never mention Rerun by name.`,
+            `One sentence, ${TAGLINE_LIMIT} characters maximum, describing what the coworker actually does and what it produces. No trailing period is required. Never mention Moldwright by name.`,
         ),
     longDescription: z
         .string()

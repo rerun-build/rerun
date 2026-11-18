@@ -4,14 +4,14 @@
             "lead": "Hol dir <keep>KI-<chip>Coworker</chip></keep>",
             "tail": "Sie arbeiten wie du."
         },
-        "subtitle": "Chatbots sagen dir, was zu tun ist. KI-Coworker erledigen die Arbeit. Verbinde das LLM, für das du schon zahlst, mit Rerun und gib ihnen Aufgaben.",
+        "subtitle": "Chatbots sagen dir, was zu tun ist. KI-Coworker erledigen die Arbeit. Verbinde das LLM, für das du schon zahlst, mit Moldwright und gib ihnen Aufgaben.",
         "cta": "5 Tage testen für {price}",
-        "productHuntAlt": "Unterstütze Rerun auf Product Hunt",
-        "trust": "{count, number}+ Nutzer vertrauen Rerun für ihr Geschäft",
+        "productHuntAlt": "Unterstütze Moldwright auf Product Hunt",
+        "trust": "{count, number}+ Nutzer vertrauen Moldwright für ihr Geschäft",
         "pillLeads": {
             "jobs": "Dein neuer",
             "tasks": "Lass einen Coworker",
-            "sectors": "Rerun für"
+            "sectors": "Moldwright für"
         },
         "tiles": {
             "tour-research": {

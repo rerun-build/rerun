@@ -1,4 +1,4 @@
-export const STAGING_GATE_CHALLENGE = 'Basic realm="Rerun staging", charset="UTF-8"'
+export const STAGING_GATE_CHALLENGE = 'Basic realm="Moldwright staging", charset="UTF-8"'
 
 const OPEN_PREFIXES = ['/api/', '/ingest/'] as const
 

@@ -67,7 +67,7 @@
             "guide": {
                 "title": "Comment ça marche ?",
                 "description": "Coworkers, Boxes, routines, en deux minutes",
-                "send": "Comment fonctionne Rerun ?"
+                "send": "Comment fonctionne Moldwright ?"
             },
             "checkWorking": {
                 "title": "Que fait {name} ?",
@@ -93,8 +93,8 @@
     "error": {
         "connectChatGpt": "Connecter ChatGPT",
         "connectClaude": "Connecter Claude",
-        "creditsBody": "Vous avez épuisé vos crédits Rerun pour cette période. Vous payez déjà Claude ou ChatGPT ? Faites tourner vos coworkers sur cet abonnement, sans frais supplémentaires ici.",
-        "creditsTitle": "Crédits Rerun",
+        "creditsBody": "Vous avez épuisé vos crédits Moldwright pour cette période. Vous payez déjà Claude ou ChatGPT ? Faites tourner vos coworkers sur cet abonnement, sans frais supplémentaires ici.",
+        "creditsTitle": "Crédits Moldwright",
         "fallbackTitle": "Une erreur est survenue",
         "reconnect": "Reconnecter",
         "switchModel": "Changer de modèle",
@@ -114,7 +114,7 @@
             "wrong_tool": "Mauvais outil ou mauvaise app"
         },
         "categoryLabel": "Quel type de problème souhaitez-vous signaler ?",
-        "disclaimer": "Envoyer ce signalement partage cette conversation avec l'équipe Rerun pour que nous puissions améliorer vos coworkers.",
+        "disclaimer": "Envoyer ce signalement partage cette conversation avec l'équipe Moldwright pour que nous puissions améliorer vos coworkers.",
         "negativePlaceholder": "Qu'est-ce qui ne vous a pas convenu dans cette réponse ?",
         "negativeTitle": "Donner un avis négatif",
         "positivePlaceholder": "Qu'est-ce qui vous a plu dans cette réponse ?",
@@ -127,17 +127,17 @@
         "away": {
             "none": {
                 "body": "Ce workspace n'a pas de machine pour le moment. Vérifiez sur {host}.",
-                "title": "Rerun n'est pas en marche"
+                "title": "Moldwright n'est pas en marche"
             },
             "onboarding": {
                 "body": "Terminez la configuration sur {host}.",
-                "title": "Rerun configure votre workspace"
+                "title": "Moldwright configure votre workspace"
             }
         },
         "retry": "Réessayer",
         "role": "Votre Chief of Staff",
         "unreachableBody": "Vérifiez votre connexion et réessayez.",
-        "unreachableTitle": "Impossible de joindre Rerun"
+        "unreachableTitle": "Impossible de joindre Moldwright"
     },
     "header": {
         "back": "Retour",

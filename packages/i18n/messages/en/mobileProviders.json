@@ -14,7 +14,7 @@
         "agentsFallBack": "{agents} will fall back to the workspace default model.",
         "automationsFallBack": "{count, plural, one {1 automation} other {# automations}} will fall back to the workspace default model.",
         "agentsAndAutomationsFallBack": "{agents} and {count, plural, one {1 automation} other {# automations}} will fall back to the workspace default model.",
-        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to Rerun.",
+        "holdsDefault": "It holds the workspace default model, which is cleared: every coworker that picked none falls back to Moldwright.",
         "nothingRuns": "The credential is removed. Nothing runs on it."
     },
     "list": {
@@ -29,8 +29,8 @@
         "apiKeysPitch": "Pay your provider directly, per token.",
         "addApiKey": "Add API key",
         "via": "Via {name}",
-        "creditsUsedUpPickModel": "Rerun credits are used up until they are back {backOn}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
-        "creditsUsedUpAddSource": "Rerun credits are used up until they are back {backOn}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
+        "creditsUsedUpPickModel": "Moldwright credits are used up until they are back {backOn}, so coworkers with no model of their own are paused. Pick another model to keep them going.",
+        "creditsUsedUpAddSource": "Moldwright credits are used up until they are back {backOn}, so coworkers with no model of their own are paused. Add a plan or an API key to keep them going.",
         "defaultBroken": "Coworkers with no model of their own are stopped. Fix {name} or pick another model.",
         "signInAgain": "Sign in again",
         "addKey": "Add key"
@@ -60,8 +60,8 @@
     "credit": {
         "title": "This month's credits",
         "percent": "{percent}%",
-        "usedUp": "Coworkers running on Rerun are paused until the credits are back {backOn}. Pick another default model to keep them going.",
-        "included": "Comes with your Rerun plan. No key, nothing to set up."
+        "usedUp": "Coworkers running on Moldwright are paused until the credits are back {backOn}. Pick another default model to keep them going.",
+        "included": "Comes with your Moldwright plan. No key, nothing to set up."
     },
     "reconnect": {
         "signInRejected": "This sign-in was rejected. Coworkers using it are stopped until you sign in again.",
@@ -121,7 +121,7 @@
     "claude": {
         "claudeTokenIsApiKey": "This is an Anthropic API key. Add it as an Anthropic (API) connection instead.",
         "claudeTokenIsCode": "That's the code from Claude. Click Get token first, then paste the code here.",
-        "approve": "Approve Rerun on Claude",
+        "approve": "Approve Moldwright on Claude",
         "open": "Open Claude",
         "openAgain": "Open Claude again",
         "pasteStep": "Paste the code",
@@ -140,7 +140,7 @@
         "enterStep": "Enter the code on OpenAI",
         "copied": "Copied",
         "copyAdminMessage": "Copy a message for them",
-        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Rerun.",
+        "adminMessage": "Hi! Could you turn on \"Device code authorization for Codex\" in our ChatGPT workspace settings? I need it to connect my ChatGPT plan to Moldwright.",
         "copyCode": "Copy code",
         "openOpenAI": "Open OpenAI",
         "enterHint": "Enter it on OpenAI's page and approve. This screen picks it up on its own.",
@@ -166,7 +166,7 @@
         "startFailed": "Could not start the sign-in"
     },
     "_context": {
-        "list.via": "Under the default model: the connection it runs through, for example \"Via Rerun\".",
+        "list.via": "Under the default model: the connection it runs through, for example \"Via Moldwright\".",
         "list.creditsUsedUpPickModel": "{backOn} comes from the server in English, for example \"on Mar 1\".",
         "chatgpt.adminMessage": "A message the user copies and sends to their ChatGPT admin. Keep the quoted setting name in English: it is ChatGPT's label.",
         "chatgpt.stuck.expiredSetting": "<link>Settings → Security</link> is ChatGPT's own menu path: keep it in English.",

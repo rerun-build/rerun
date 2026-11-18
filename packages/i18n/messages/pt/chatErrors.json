@@ -5,7 +5,7 @@
         "message": "Este modelo está sem espaço agora. Tente de novo em instantes ou escolha outro modelo."
     },
     "titles": {
-        "budget": "Créditos Rerun esgotados",
+        "budget": "Créditos Moldwright esgotados",
         "unauthorized": "Conexão desconectada",
         "overloaded": "Provedor sobrecarregado",
         "context_window": "Conversa longa demais",
@@ -16,7 +16,7 @@
         "session_gone": "Conversa indisponível"
     },
     "messages": {
-        "budget": "Os créditos Rerun deste período acabaram. Adicione créditos ou aguarde a renovação mensal.",
+        "budget": "Os créditos Moldwright deste período acabaram. Adicione créditos ou aguarde a renovação mensal.",
         "unauthorized": "Esta conexão precisa de um novo login antes que o coworker possa executar.",
         "overloaded": "O provedor está sobrecarregado agora. Tente de novo em instantes.",
         "context_window": "Esta conversa não cabe mais no modelo, e enviá-la de novo vai bater no mesmo limite. Mude para um modelo com uma janela de contexto maior ou comece uma nova conversa.",

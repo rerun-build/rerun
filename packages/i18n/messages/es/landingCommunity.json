@@ -2,15 +2,15 @@
     "metadata": {
         "layout": {
             "title": "Expertos",
-            "description": "Encuentra builders y estudios de confianza para diseñar, lanzar y operar tus agentes de IA en Rerun."
+            "description": "Encuentra builders y estudios de confianza para diseñar, lanzar y operar tus agentes de IA en Moldwright."
         },
         "directory": {
             "title": "Contrata a los mejores expertos en IA",
-            "description": "Trabaja con builders, freelancers y estudios verificados que diseñan, lanzan y operan agentes de IA que de verdad cumplen. Explora los expertos de Rerun por habilidad y ubicación."
+            "description": "Trabaja con builders, freelancers y estudios verificados que diseñan, lanzan y operan agentes de IA que de verdad cumplen. Explora los expertos de Moldwright por habilidad y ubicación."
         },
         "program": {
-            "title": "Hazte experto de Rerun",
-            "description": "Únete al programa Rerun Expert: aparece en el directorio, crea agentes para tus clientes en un sandbox gratis, quédate con el 95 % de tus ventas de templates y gana un 20 % recurrente."
+            "title": "Hazte experto de Moldwright",
+            "description": "Únete al programa Moldwright Expert: aparece en el directorio, crea agentes para tus clientes en un sandbox gratis, quédate con el 95 % de tus ventas de templates y gana un 20 % recurrente."
         }
     },
     "jsonLd": {
@@ -21,7 +21,7 @@
         "eyebrow": "{count, plural, one {# experto verificado} other {# expertos verificados}}",
         "title": "Encuentra tu experto en IA",
         "description": "Builders y estudios verificados que montan tus sistemas más complejos, con Coworkers conectados a cada herramienta y proceso de tu negocio.",
-        "joinAside": "Únete a los expertos que ya están en Rerun",
+        "joinAside": "Únete a los expertos que ya están en Moldwright",
         "becomeExpert": "Hazte experto",
         "featured": {
             "label": "Destacados",
@@ -131,7 +131,7 @@
     "program": {
         "hero": {
             "eyebrow": "Programa de expertos",
-            "title": "Únete al programa <mark></mark>Rerun Expert",
+            "title": "Únete al programa <mark></mark>Moldwright Expert",
             "promises": {
                 "listed": "Aparece en el directorio de expertos y conecta con clientes",
                 "workspace": "Consigue un workspace gratis para construir todo lo que quieras",
@@ -139,23 +139,23 @@
                 "revenue": "Gana un 20 % recurrente por cada plan de cliente que traigas"
             },
             "findExpert": "Buscar un experto",
-            "joined": "Únete a los expertos que ya están en Rerun"
+            "joined": "Únete a los expertos que ya están en Moldwright"
         },
         "showcase": {
             "label": "El directorio",
             "title": "Forma parte del mejor talento.",
-            "lede": "Los expertos que ya están en Rerun, y el perfil que ven los clientes antes de escribirles.",
-            "carousel": "expertos de Rerun",
+            "lede": "Los expertos que ya están en Moldwright, y el perfil que ven los clientes antes de escribirles.",
+            "carousel": "expertos de Moldwright",
             "browseAll": "Ver todos los expertos"
         },
         "cta": {
             "label": "Programa de expertos",
-            "title": "Hazte experto de Rerun",
+            "title": "Hazte experto de Moldwright",
             "subtitle": "Postúlate una vez. Revisamos cada solicitud a mano y te respondemos por email con el siguiente paso."
         },
         "valueProps": {
-            "badge": "Por qué Rerun",
-            "title": "Por qué los freelancers y estudios construyen en Rerun.",
+            "badge": "Por qué Moldwright",
+            "title": "Por qué los freelancers y estudios construyen en Moldwright.",
             "subtitle": "Tú entregas el Coworker, el cliente lo mantiene en marcha. Sin infraestructura que alquilar, sin documentos de traspaso que nadie lee.",
             "cells": {
                 "ship": {
@@ -186,7 +186,7 @@
         },
         "benefits": {
             "badge": "Lo que obtienes",
-            "title": "Crece más rápido como experto de Rerun.",
+            "title": "Crece más rápido como experto de Moldwright.",
             "subtitle": "Una solicitud, cuatro formas de cobrar por el trabajo que ya haces.",
             "items": {
                 "listed": {
@@ -203,20 +203,20 @@
                 },
                 "revenue": {
                     "title": "Gana un 20 % por cada cliente que traigas",
-                    "desc": "Cuando un cliente que incorporaste se suscribe, ganas el 20 % de su plan de Rerun, cada mes, mientras siga."
+                    "desc": "Cuando un cliente que incorporaste se suscribe, ganas el 20 % de su plan de Moldwright, cada mes, mientras siga."
                 }
             }
         },
         "perks": {
             "badge": "Ventaja de experto",
-            "title": "Lo que obtiene cada experto de Rerun.",
+            "title": "Lo que obtiene cada experto de Moldwright.",
             "subtitle": "Un solo nivel, sin puntos que acumular. Esto es lo que cambia el día que aceptan tu solicitud.",
             "regular": {
                 "title": "Cuenta normal",
-                "subtitle": "Cualquier usuario de Rerun"
+                "subtitle": "Cualquier usuario de Moldwright"
             },
             "expert": {
-                "title": "Experto de Rerun",
+                "title": "Experto de Moldwright",
                 "subtitle": "Aceptado en el programa"
             },
             "rows": {

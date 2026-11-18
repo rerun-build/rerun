@@ -106,7 +106,7 @@
             "title": "Cómo",
             "toast": {
                 "label": "Aviso en la app",
-                "description": "Aparece sobre tu bandeja de entrada mientras Rerun está abierto."
+                "description": "Aparece sobre tu bandeja de entrada mientras Moldwright está abierto."
             },
             "sound": {
                 "label": "Sonido",
@@ -150,6 +150,6 @@
         "trialEndedDeclined": "Tu espacio gratuito de {provider} terminó y se rechazó la tarjeta, así que {account, select, none {la cuenta} other {{account}}} está en pausa. Añade un espacio en Facturación en menos de una semana para conservarla o se desconectará.",
         "rateLimited": "{provider} pidió a {account, select, none {una de tus cuentas} other {{account}}} que bajara el ritmo. Tus coworkers no la usarán durante 24 horas, para que la cuenta siga a salvo.",
         "signedOut": "{provider} cerró la sesión de {account, select, none {una de tus cuentas} other {{account}}}. Vuelve a conectarla desde Ajustes → Apps para que tus coworkers puedan usarla de nuevo.",
-        "budgetExhausted": "Tus créditos de Rerun de este mes se agotaron. Las ejecuciones programadas y activadas con modelos de Rerun están en pausa, y los coworkers no pueden comprar leads ni datos de SEO o redes sociales hasta que se reinicien o añadas créditos."
+        "budgetExhausted": "Tus créditos de Moldwright de este mes se agotaron. Las ejecuciones programadas y activadas con modelos de Moldwright están en pausa, y los coworkers no pueden comprar leads ni datos de SEO o redes sociales hasta que se reinicien o añadas créditos."
     }
 }

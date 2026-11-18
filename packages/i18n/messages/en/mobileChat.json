@@ -67,7 +67,7 @@
             "guide": {
                 "title": "How does this work?",
                 "description": "Coworkers, Boxes, routines, in two minutes",
-                "send": "How does Rerun work?"
+                "send": "How does Moldwright work?"
             },
             "checkWorking": {
                 "title": "What is {name} doing?",
@@ -93,8 +93,8 @@
     "error": {
         "connectChatGpt": "Connect ChatGPT",
         "connectClaude": "Connect Claude",
-        "creditsBody": "You've used up your Rerun credits for this period. Already paying for Claude or ChatGPT? Run your coworkers on that plan, at no extra cost here.",
-        "creditsTitle": "Rerun credits",
+        "creditsBody": "You've used up your Moldwright credits for this period. Already paying for Claude or ChatGPT? Run your coworkers on that plan, at no extra cost here.",
+        "creditsTitle": "Moldwright credits",
         "fallbackTitle": "Something went wrong",
         "reconnect": "Reconnect",
         "switchModel": "Switch model",
@@ -114,7 +114,7 @@
             "wrong_tool": "Wrong tool or app used"
         },
         "categoryLabel": "What type of issue do you wish to report?",
-        "disclaimer": "Submitting this report shares this conversation with the Rerun team so we can improve your coworkers.",
+        "disclaimer": "Submitting this report shares this conversation with the Moldwright team so we can improve your coworkers.",
         "negativePlaceholder": "What was unsatisfying about this response?",
         "negativeTitle": "Give negative feedback",
         "positivePlaceholder": "What was satisfying about this response?",
@@ -127,17 +127,17 @@
         "away": {
             "none": {
                 "body": "This workspace has no machine right now. Check it at {host}.",
-                "title": "Rerun is not running"
+                "title": "Moldwright is not running"
             },
             "onboarding": {
                 "body": "Finish setting it up at {host}.",
-                "title": "Rerun is setting up your workspace"
+                "title": "Moldwright is setting up your workspace"
             }
         },
         "retry": "Retry",
         "role": "Your Chief of Staff",
         "unreachableBody": "Check your connection and try again.",
-        "unreachableTitle": "We could not reach Rerun"
+        "unreachableTitle": "We could not reach Moldwright"
     },
     "header": {
         "back": "Back",
@@ -281,8 +281,8 @@
         "waitingForMicrophone": "Waiting for the microphone…"
     },
     "_context": {
-        "foreman.away.none.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
-        "foreman.away.onboarding.body": "{host} is the web address of the Rerun server the app is connected to (rerun.build, or a self-hosted one).",
+        "foreman.away.none.body": "{host} is the web address of the Moldwright server the app is connected to (rerun.build, or a self-hosted one).",
+        "foreman.away.onboarding.body": "{host} is the web address of the Moldwright server the app is connected to (rerun.build, or a self-hosted one).",
         "desktop.keys.delete": "The Backspace key of a keyboard, on a button that sends it to a remote screen.",
         "desktop.keys.return": "The Return/Enter key of a keyboard, on a button that sends it to a remote screen.",
         "header.sections.needs-you": "Section of a menu: conversations waiting on the person.",

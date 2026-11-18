@@ -116,7 +116,7 @@
             "addedTitle": "Créditos adicionados",
             "addedBody": "Agora você recebe {count, plural, one {# crédito} other {# créditos}} todo mês. Seus coworkers continuam de onde pararam.",
             "unchangedBody": "Seus créditos continuam iguais até a renovação.",
-            "title": "Adicionar créditos Rerun",
+            "title": "Adicionar créditos Moldwright",
             "eachPack": "Cada pacote adiciona {count, plural, one {# crédito} other {# créditos}} por mês, por {price}.",
             "packs": "{count, plural, one {# pacote} other {# pacotes}}",
             "perMonth": "+{count, plural, one {# crédito} other {# créditos}} por mês",
@@ -228,7 +228,7 @@
         "fallbackTitle": "seu template",
         "readyOne": "\"{title}\" é seu. Pronto para colocar o coworker dele?",
         "readyMany": "\"{title}\" é seu. Pronto para colocar os {count} coworkers dele?",
-        "needsPlan": "\"{title}\" é seu. É preciso um plano Rerun ativo para instalá-lo.",
+        "needsPlan": "\"{title}\" é seu. É preciso um plano Moldwright ativo para instalá-lo.",
         "finalizing": "Finalizando compra",
         "close": "Fechar",
         "placeOne": "Colocar o coworker",
@@ -302,7 +302,7 @@
                 "footnote": "Isso encerra seu teste grátis hoje. Para não pagar nada hoje, mantenha seu teste: o Pro começa sozinho em {date}."
             },
             "creditLocked": {
-                "title": "Os créditos Rerun vêm com o Pro",
+                "title": "Os créditos Moldwright vêm com o Pro",
                 "titleCoworker": "Continue com o Pro",
                 "subtitle": "Seus {trialCredits, number} créditos de teste acabaram. O Pro inclui {credits, plural, one {# crédito} other {# créditos}} todo mês, e você pode adicionar mais quando quiser.",
                 "subtitleCoworker": "{coworker} continua de onde parou.",
@@ -387,17 +387,17 @@
             "updateFailed": "Não foi possível atualizar seu plano",
             "stillUpdating": "Seu plano ainda está sendo atualizado",
             "pleaseWait": "Aguarde",
-            "freeFor": "Rerun Pro, grátis por {days} dias",
-            "subscribe": "Assinar o Rerun Pro",
+            "freeFor": "Moldwright Pro, grátis por {days} dias",
+            "subscribe": "Assinar o Moldwright Pro",
             "dueToday": "a pagar hoje",
             "perYear": "por ano",
             "perMonth": "por mês",
             "thenPerMonth": "Depois <amount></amount> por mês, sem impostos.",
-            "authorize": "Ao assinar, você autoriza a Rerun a cobrar você até cancelar."
+            "authorize": "Ao assinar, você autoriza a Moldwright a cobrar você até cancelar."
         },
         "card": {
             "exclVat": "Sem impostos, calculados a partir do seu endereço.",
-            "payLaterFootnote": "Pagar agora encerra seu teste grátis hoje, e você autoriza a Rerun a cobrar você até cancelar. Prefere terminar seu teste? <later></later>",
+            "payLaterFootnote": "Pagar agora encerra seu teste grátis hoje, e você autoriza a Moldwright a cobrar você até cancelar. Prefere terminar seu teste? <later></later>",
             "saving": "Salvando…",
             "payOn": "Pagar em {date}",
             "payOnLastDay": "Pagar no último dia"
@@ -405,7 +405,7 @@
         "cardOnFile": {
             "back": "Seu teste",
             "title": "Comece o Pro hoje",
-            "header": "Encerrar teste, começar o Rerun Pro",
+            "header": "Encerrar teste, começar o Moldwright Pro",
             "tax": "Impostos",
             "taxFromAddress": "Impostos, pelo seu endereço",
             "dueToday": "A pagar hoje",
@@ -476,7 +476,7 @@
             "remove": "Remover cupom"
         },
         "backToPlan": "Plano",
-        "terms": "Concordo com os <terms>Termos</terms> e peço à Rerun para começar imediatamente. Se eu for consumidor, meu direito de arrependimento termina quando o serviço começar."
+        "terms": "Concordo com os <terms>Termos</terms> e peço à Moldwright para começar imediatamente. Se eu for consumidor, meu direito de arrependimento termina quando o serviço começar."
     },
     "stripe": {
         "orPayWithCard": "ou pague com cartão",
@@ -567,7 +567,7 @@
         "reason": {
             "field": "O que fez você decidir sair?",
             "placeholder": "Uma frase já basta",
-            "comebackField": "Você vai usar o Rerun de novo?",
+            "comebackField": "Você vai usar o Moldwright de novo?",
             "missingComment": "Conte em poucas palavras por que está saindo",
             "missingComeback": "Diga se você vai voltar",
             "required": "Conte em poucas palavras por que está saindo.",
@@ -611,7 +611,7 @@
             "runsThisMonth": "Execuções este mês",
             "agents": "{count, plural, one {# agente} other {# agentes}}",
             "agentsCaption": "configurados, conectados e trabalhando",
-            "creditsCaption": "créditos Rerun restantes",
+            "creditsCaption": "créditos Moldwright restantes",
             "runsSoFar": "Execuções até agora",
             "schedules": "Agendamentos"
         },
@@ -646,8 +646,8 @@
     },
     "usage": {
         "card": {
-            "title": "Créditos Rerun",
-            "subtitle": "Gastos pelos seus coworkers em modelos Rerun e dados pagos",
+            "title": "Créditos Moldwright",
+            "subtitle": "Gastos pelos seus coworkers em modelos Moldwright e dados pagos",
             "addCredits": "Adicionar créditos",
             "startProNow": "Começar o Pro agora",
             "usedTrial": "Usados · créditos de teste",
@@ -659,14 +659,14 @@
         "outOfCredits": {
             "trialTitle": "Seus créditos de teste acabaram",
             "title": "Seus créditos acabaram",
-            "trialDescription": "Seus coworkers não podem usar modelos Rerun nem dados pagos. O Pro vem com {count, plural, one {# crédito} other {# créditos}} todo mês.",
-            "description": "Seus coworkers não podem usar modelos Rerun nem dados pagos.",
-            "descriptionUntil": "Seus coworkers não podem usar modelos Rerun nem dados pagos até {date}."
+            "trialDescription": "Seus coworkers não podem usar modelos Moldwright nem dados pagos. O Pro vem com {count, plural, one {# crédito} other {# créditos}} todo mês.",
+            "description": "Seus coworkers não podem usar modelos Moldwright nem dados pagos.",
+            "descriptionUntil": "Seus coworkers não podem usar modelos Moldwright nem dados pagos até {date}."
         },
         "switch": {
             "label": "Permitir gastos",
-            "on": "Os coworkers podem usar modelos Rerun e dados pagos.",
-            "off": "Pausado. Os coworkers não podem usar modelos Rerun nem dados pagos."
+            "on": "Os coworkers podem usar modelos Moldwright e dados pagos.",
+            "off": "Pausado. Os coworkers não podem usar modelos Moldwright nem dados pagos."
         },
         "kind": {
             "ai": "Modelos de IA",
@@ -880,7 +880,7 @@
             "noTrialCreditsLeft": "Sem créditos de teste",
             "outOfCredits": "Sem créditos",
             "left": "{figure} restantes",
-            "ariaUsed": "Créditos Rerun usados"
+            "ariaUsed": "Créditos Moldwright usados"
         }
     },
     "creditsBar": {

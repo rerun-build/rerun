@@ -38,7 +38,7 @@ export function OutroSlide({ payload, agentName, onReplay, onClose }: RewindSlid
                     <RewindReveal delay={0.5}>
                         <Card className="gap-0 px-5 py-5 shadow-2xl shadow-black/40 rewind-wide:px-8 rewind-wide:py-8">
                             <Badge tone="brand" size="xs" className="mb-2 self-start">
-                                Rerun Rewind
+                                Moldwright Rewind
                             </Badge>
                             <p className="text-sm text-muted-foreground">{formatWeekRange(payload.weekStart, payload.weekEnd, locale)}</p>
                             <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 rewind-wide:mt-6 rewind-wide:gap-y-5">

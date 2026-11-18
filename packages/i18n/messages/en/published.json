@@ -6,8 +6,8 @@
         "access.label.workspace": "{workspace} is the name of the workspace.",
         "access.anyoneAt": "An invite that covers a whole email domain. {domain} is a domain such as company.com.",
         "gate.locked": "Screen reader label of the picture of a locked page. {workspace} is the workspace that owns it.",
-        "gate.madeWith": "Link to the Rerun website, at the bottom of a published page.",
-        "viewer.report": "Link at the bottom of a published page to report abusive content to Rerun.",
+        "gate.madeWith": "Link to the Moldwright website, at the bottom of a published page.",
+        "viewer.report": "Link at the bottom of a published page to report abusive content to Moldwright.",
         "viewer.updated": "{when} is a relative date already translated, such as 'yesterday' or '5 min ago'.",
         "csv.meta": "Size of a table. {truncated} is true when the table goes on past what is shown: the row count is then followed by a plus sign.",
         "row.more": "Screen reader label of the button that opens the menu of a published link.",
@@ -46,7 +46,7 @@
         "workspaceFallback": "Workspace"
     },
     "gate": {
-        "madeWith": "Made with Rerun",
+        "madeWith": "Made with Moldwright",
         "locked": "{workspace} page, locked",
         "code": "Code",
         "switchAccount": "Switch account"

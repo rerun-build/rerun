@@ -67,7 +67,7 @@
             "guide": {
                 "title": "Wie funktioniert das?",
                 "description": "Coworker, Boxes, Routinen, in zwei Minuten",
-                "send": "Wie funktioniert Rerun?"
+                "send": "Wie funktioniert Moldwright?"
             },
             "checkWorking": {
                 "title": "Was macht {name}?",
@@ -93,8 +93,8 @@
     "error": {
         "connectChatGpt": "ChatGPT verbinden",
         "connectClaude": "Claude verbinden",
-        "creditsBody": "Du hast dein Rerun-Guthaben für diesen Zeitraum aufgebraucht. Zahlst du schon für Claude oder ChatGPT? Lass deine Coworker mit diesem Plan laufen, ohne Zusatzkosten hier.",
-        "creditsTitle": "Rerun-Guthaben",
+        "creditsBody": "Du hast dein Moldwright-Guthaben für diesen Zeitraum aufgebraucht. Zahlst du schon für Claude oder ChatGPT? Lass deine Coworker mit diesem Plan laufen, ohne Zusatzkosten hier.",
+        "creditsTitle": "Moldwright-Guthaben",
         "fallbackTitle": "Etwas ist schiefgelaufen",
         "reconnect": "Neu verbinden",
         "switchModel": "Modell wechseln",
@@ -114,7 +114,7 @@
             "wrong_tool": "Falsches Tool oder falsche App genutzt"
         },
         "categoryLabel": "Welche Art von Problem möchtest du melden?",
-        "disclaimer": "Mit dieser Meldung teilst du diese Unterhaltung mit dem Rerun-Team, damit wir deine Coworker verbessern können.",
+        "disclaimer": "Mit dieser Meldung teilst du diese Unterhaltung mit dem Moldwright-Team, damit wir deine Coworker verbessern können.",
         "negativePlaceholder": "Was war an dieser Antwort unbefriedigend?",
         "negativeTitle": "Negatives Feedback geben",
         "positivePlaceholder": "Was war an dieser Antwort gut?",
@@ -127,17 +127,17 @@
         "away": {
             "none": {
                 "body": "Dieser Workspace hat gerade keine Maschine. Sieh auf {host} nach.",
-                "title": "Rerun läuft nicht"
+                "title": "Moldwright läuft nicht"
             },
             "onboarding": {
                 "body": "Schließe die Einrichtung auf {host} ab.",
-                "title": "Rerun richtet deinen Workspace ein"
+                "title": "Moldwright richtet deinen Workspace ein"
             }
         },
         "retry": "Erneut versuchen",
         "role": "Dein Chief of Staff",
         "unreachableBody": "Prüfe deine Verbindung und versuch es erneut.",
-        "unreachableTitle": "Rerun ist nicht erreichbar"
+        "unreachableTitle": "Moldwright ist nicht erreichbar"
     },
     "header": {
         "back": "Zurück",

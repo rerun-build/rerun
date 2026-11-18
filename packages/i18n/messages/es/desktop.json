@@ -5,7 +5,7 @@
         "description": "La pantalla en la que trabaja este coworker. Lo que hagas aquí, lo encuentra después.",
         "takeoverDescription": "Estás en el navegador de tu coworker. Pulsa Listo cuando pueda continuar.",
         "takeoverHoldsBrowser": "El navegador de tu coworker ya está abierto para esta solicitud.",
-        "clipboardDenied": "Tu navegador no dejó que Rerun leyera el portapapeles.",
+        "clipboardDenied": "Tu navegador no dejó que Moldwright leyera el portapapeles.",
         "disconnectedDescription": "La conexión con la máquina se cerró. No se perdió nada.",
         "reconnect": "Reconectar",
         "tryAgain": "Reintentar"

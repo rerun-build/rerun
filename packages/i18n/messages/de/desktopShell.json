@@ -1,6 +1,6 @@
 {
     "update": {
-        "ready": "Rerun {version} ist bereit",
+        "ready": "Moldwright {version} ist bereit",
         "description": "Starte die App neu, um die neue Version zu nutzen.",
         "restart": "Neu starten"
     },
@@ -34,18 +34,18 @@
             "expired": "Dieser Code ist abgelaufen. Fang neu an.",
             "invalid": "Dieser Code ist ungültig. Fang neu an.",
             "state-mismatch": "Diese Anmeldung wurde in einem anderen Fenster gestartet. Fang neu an.",
-            "network": "Rerun ist nicht erreichbar. Prüfe deine Verbindung.",
+            "network": "Moldwright ist nicht erreichbar. Prüfe deine Verbindung.",
             "cancelled": "Die Anmeldung wurde abgebrochen."
         }
     },
     "settings": {
         "openAtLogin": "Bei der Anmeldung öffnen",
-        "openAtLoginMac": "Rerun startet mit deinem Mac, in der Menüleiste.",
-        "openAtLoginOther": "Rerun startet mit deinem Computer, im Infobereich.",
+        "openAtLoginMac": "Moldwright startet mit deinem Mac, in der Menüleiste.",
+        "openAtLoginOther": "Moldwright startet mit deinem Computer, im Infobereich.",
         "closeToTray": "Nach dem Schließen weiterlaufen",
-        "closeToTrayHint": "Beim Schließen des Fensters bleibt Rerun im Infobereich, Benachrichtigungen kommen weiter an.",
+        "closeToTrayHint": "Beim Schließen des Fensters bleibt Moldwright im Infobereich, Benachrichtigungen kommen weiter an.",
         "updates": "Updates",
-        "version": "Rerun {version}",
+        "version": "Moldwright {version}",
         "checking": "Suche nach Updates…",
         "downloading": "Update wird geladen… {percent} %",
         "updateFailed": "Suche nach Updates fehlgeschlagen.",
@@ -64,6 +64,6 @@
         "send": "Senden"
     },
     "server": {
-        "otherServer": "Anderen Rerun-Server nutzen"
+        "otherServer": "Anderen Moldwright-Server nutzen"
     }
 }

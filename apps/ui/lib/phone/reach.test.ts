@@ -8,12 +8,12 @@ describe('reachableChannels', () => {
         expect(reachableChannels('FR', 'rerun')).toEqual(['whatsapp', 'sms'])
     })
 
-    it('drops WhatsApp for codes where Bird Verify cannot carry them, not for Rerun’s own number', () => {
+    it('drops WhatsApp for codes where Bird Verify cannot carry them, not for Moldwright’s own number', () => {
         expect(reachableChannels('IN', 'verify')).toEqual(['sms'])
         expect(reachableChannels('IN', 'rerun')).toEqual(['whatsapp', 'sms'])
     })
 
-    it('drops WhatsApp for Rerun’s own number where Meta keeps it out, not for codes', () => {
+    it('drops WhatsApp for Moldwright’s own number where Meta keeps it out, not for codes', () => {
         expect(reachableChannels('BR', 'rerun')).toEqual(['sms'])
         expect(reachableChannels('BR', 'rerun_marketing')).toEqual(['sms'])
         expect(reachableChannels('BR', 'verify')).toEqual(['whatsapp', 'sms'])

@@ -45,7 +45,7 @@ const SOURCE_LABEL: Record<DiscoverySource, { brand: string } | { key: Described
     linkedinPerson: { brand: 'LinkedIn' },
     linkedinCompany: { brand: 'LinkedIn' },
     googleBusiness: { brand: 'Google' },
-    synthesis: { brand: 'Rerun' },
+    synthesis: { brand: 'Moldwright' },
 }
 
 export function useDiscoverySourceLabel() {

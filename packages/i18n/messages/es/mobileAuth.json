@@ -1,20 +1,20 @@
 {
     "start": {
-        "title": "Te damos la bienvenida a Rerun",
+        "title": "Te damos la bienvenida a Moldwright",
         "continueWithApple": "Continuar con Apple",
         "continueWithGoogle": "Continuar con Google",
         "continueWithPhone": "Continuar con el teléfono",
         "continueWithEmail": "Continuar con el correo",
         "or": "O",
-        "welcome": "Te damos la bienvenida a Rerun",
+        "welcome": "Te damos la bienvenida a Moldwright",
         "ownServer": "Usar tu propio servidor",
-        "useCloud": "Usar Rerun Cloud"
+        "useCloud": "Usar Moldwright Cloud"
     },
     "back": "Atrás",
     "phone": {
         "title": "Tu número de teléfono",
         "unsupportedCountry": "Todavía no podemos enviar códigos a este país.",
-        "consent": "Al continuar, aceptas que Rerun te contacte por WhatsApp o SMS.",
+        "consent": "Al continuar, aceptas que Moldwright te contacte por WhatsApp o SMS.",
         "sendByWhatsapp": "Enviar por WhatsApp",
         "sendBySms": "Enviar por SMS",
         "countryLabel": "País, {name}",
@@ -44,12 +44,12 @@
     },
     "errors": {
         "generic": "Algo salió mal. Inténtalo de nuevo.",
-        "offline": "No pudimos conectar con Rerun. Revisa tu conexión e inténtalo de nuevo.",
+        "offline": "No pudimos conectar con Moldwright. Revisa tu conexión e inténtalo de nuevo.",
         "session": "No pudimos abrir tu sesión. Inténtalo de nuevo.",
         "apple": "No pudimos iniciar tu sesión con Apple. Inténtalo de nuevo.",
         "google": "No pudimos iniciar tu sesión con Google. Inténtalo de nuevo.",
         "phone": {
-            "taken": "Este número ya inicia sesión en otra cuenta de Rerun.",
+            "taken": "Este número ya inicia sesión en otra cuenta de Moldwright.",
             "same_number": "Este ya es el número de tu cuenta.",
             "not_required": "Tu número de teléfono ya está verificado.",
             "too_soon": "Ya hay un código en camino. Espera un momento antes de pedir uno nuevo.",
@@ -79,22 +79,22 @@
     },
     "consent": {
         "title": "Tus coworkers funcionan con IA",
-        "body": "Para hacer tus tareas, Rerun envía tus mensajes, fotos, mensajes de voz, archivos y sitio web a proveedores de IA: OpenAI, Anthropic y Google a través de OpenRouter, y cualquier proveedor que conectes tú.",
-        "noTraining": "Los proveedores de Rerun no entrenan con tus datos.",
+        "body": "Para hacer tus tareas, Moldwright envía tus mensajes, fotos, mensajes de voz, archivos y sitio web a proveedores de IA: OpenAI, Anthropic y Google a través de OpenRouter, y cualquier proveedor que conectes tú.",
+        "noTraining": "Los proveedores de Moldwright no entrenan con tus datos.",
         "privacy": "Política de privacidad",
         "notNow": "Ahora no",
         "agree": "Aceptar y continuar"
     },
     "server": {
-        "title": "Tu servidor Rerun",
+        "title": "Tu servidor Moldwright",
         "address": "Dirección del servidor",
         "connect": "Conectar",
         "problems": {
-            "invalid": "Escribe la dirección de tu servidor Rerun.",
+            "invalid": "Escribe la dirección de tu servidor Moldwright.",
             "insecure": "Usa https:// fuera de tu red local.",
             "unreachable": "No se pudo conectar con este servidor.",
-            "not-rerun": "Esta dirección no es un servidor Rerun.",
-            "outdated": "Actualiza este servidor Rerun para usarlo desde la app."
+            "not-rerun": "Esta dirección no es un servidor Moldwright.",
+            "outdated": "Actualiza este servidor Moldwright para usarlo desde la app."
         }
     }
 }

@@ -68,7 +68,7 @@
         "subscriptionOffer.connected.title": "{name} is the provider or plan just connected (Claude, ChatGPT, OpenCode, OpenRouter...).",
         "subscriptionOffer.plan.linked": "Last step of the plan connection, once connected. {name} is Claude or ChatGPT.",
         "subscriptionOffer.plan.switching": "Last step of the plan connection, before it is connected. {name} is Claude or ChatGPT.",
-        "subscriptionOffer.decline.cloud": "Button that declines the offer and keeps the coworkers on Rerun's own paid credits.",
+        "subscriptionOffer.decline.cloud": "Button that declines the offer and keeps the coworkers on Moldwright's own paid credits.",
         "subscriptionOffer.decline.selfHosted": "Button that declines the offer and keeps the coworkers on the OpenRouter key already set up.",
         "subscriptionOffer.arguments.unplug.label": "Selling point: the subscription can be disconnected at any time.",
         "subscriptionOffer.key.add": "Button: save the pasted API key.",
@@ -87,7 +87,7 @@
         "addEmail": "Add email",
         "changePhone": "Change phone number",
         "addPhone": "Add phone number",
-        "googleNeedsBrowser": "Open Rerun in your browser to connect Google."
+        "googleNeedsBrowser": "Open Moldwright in your browser to connect Google."
     },
     "members": {
         "title": "Members",
@@ -251,7 +251,7 @@
     },
     "auth": {
         "welcome": {
-            "title": "Welcome to Rerun",
+            "title": "Welcome to Moldwright",
             "subtitle": "Create your account to start building your coworker team."
         },
         "build": {
@@ -428,7 +428,7 @@
         "description": "Review what this template installs, then place its coworkers on your board."
     },
     "createTemplate": {
-        "defaultDescription": "Draft a template from your sandbox. The Rerun team reviews it before it goes live.",
+        "defaultDescription": "Draft a template from your sandbox. The Moldwright team reviews it before it goes live.",
         "title": "New template",
         "doneLabel": "Open template",
         "titleField": "Title",
@@ -556,7 +556,7 @@
     },
     "shortcuts": {
         "title": "Keyboard shortcuts",
-        "description": "Move faster around Rerun with these shortcuts.",
+        "description": "Move faster around Moldwright with these shortcuts.",
         "groups": {
             "general": "General",
             "chat": "Chat",
@@ -690,7 +690,7 @@
         },
         "link": {
             "title": "Link the phone",
-            "hint": "WhatsApp adds Rerun as a linked device",
+            "hint": "WhatsApp adds Moldwright as a linked device",
             "cancel": "Cancel the link"
         }
     },
@@ -705,11 +705,11 @@
             "codex": "ChatGPT Plus or Pro"
         },
         "decline": {
-            "cloud": "I'd rather stay on Rerun credits",
+            "cloud": "I'd rather stay on Moldwright credits",
             "selfHosted": "I'd rather stay on OpenRouter"
         },
         "offer": {
-            "title": "Rerun works better with your Claude or ChatGPT subscription",
+            "title": "Moldwright works better with your Claude or ChatGPT subscription",
             "description": "Connect it and your coworkers run on the plan you already pay for."
         },
         "arguments": {
@@ -718,12 +718,12 @@
                 "description": "Each teammate connects the plan they pay for. No account passed around."
             },
             "password": {
-                "label": "Rerun never sees your password",
+                "label": "Moldwright never sees your password",
                 "description": "You approve it on Claude's or OpenAI's own page, and nowhere else."
             },
             "unplug": {
                 "label": "Unplug it whenever",
-                "descriptionCloud": "Disconnect in one click and your coworkers fall back on Rerun credits.",
+                "descriptionCloud": "Disconnect in one click and your coworkers fall back on Moldwright credits.",
                 "descriptionSelfHosted": "Disconnect in one click and your coworkers fall back on your OpenRouter key."
             }
         },

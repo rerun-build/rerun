@@ -14,7 +14,7 @@
         "agentsFallBack": "{agents} fallen auf das Standardmodell des Workspace zurück.",
         "automationsFallBack": "{count, plural, one {1 Automatisierung fällt} other {# Automatisierungen fallen}} auf das Standardmodell des Workspace zurück.",
         "agentsAndAutomationsFallBack": "{agents} und {count, plural, one {1 Automatisierung} other {# Automatisierungen}} fallen auf das Standardmodell des Workspace zurück.",
-        "holdsDefault": "Es ist das Standardmodell des Workspace, das entfernt wird: Jeder Coworker ohne eigenes Modell fällt auf Rerun zurück.",
+        "holdsDefault": "Es ist das Standardmodell des Workspace, das entfernt wird: Jeder Coworker ohne eigenes Modell fällt auf Moldwright zurück.",
         "nothingRuns": "Die Zugangsdaten werden entfernt. Nichts läuft darüber."
     },
     "list": {
@@ -29,8 +29,8 @@
         "apiKeysPitch": "Bezahl deinen Anbieter direkt, pro Token.",
         "addApiKey": "API-Schlüssel hinzufügen",
         "via": "Über {name}",
-        "creditsUsedUpPickModel": "Das Rerun-Guthaben ist aufgebraucht, bis es {backOn} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
-        "creditsUsedUpAddSource": "Das Rerun-Guthaben ist aufgebraucht, bis es {backOn} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
+        "creditsUsedUpPickModel": "Das Moldwright-Guthaben ist aufgebraucht, bis es {backOn} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Wähle ein anderes Modell, damit sie weiterarbeiten.",
+        "creditsUsedUpAddSource": "Das Moldwright-Guthaben ist aufgebraucht, bis es {backOn} zurück ist, daher sind Coworker ohne eigenes Modell pausiert. Füge einen Tarif oder einen API-Schlüssel hinzu, damit sie weiterarbeiten.",
         "defaultBroken": "Coworker ohne eigenes Modell sind gestoppt. Repariere {name} oder wähle ein anderes Modell.",
         "signInAgain": "Neu anmelden",
         "addKey": "Schlüssel hinzufügen"
@@ -60,8 +60,8 @@
     "credit": {
         "title": "Guthaben diesen Monat",
         "percent": "{percent} %",
-        "usedUp": "Coworker, die mit Rerun laufen, sind pausiert, bis das Guthaben {backOn} zurück ist. Wähle ein anderes Standardmodell, damit sie weiterarbeiten.",
-        "included": "In deinem Rerun-Tarif enthalten. Kein Schlüssel, nichts einzurichten."
+        "usedUp": "Coworker, die mit Moldwright laufen, sind pausiert, bis das Guthaben {backOn} zurück ist. Wähle ein anderes Standardmodell, damit sie weiterarbeiten.",
+        "included": "In deinem Moldwright-Tarif enthalten. Kein Schlüssel, nichts einzurichten."
     },
     "reconnect": {
         "signInRejected": "Diese Anmeldung wurde abgelehnt. Coworker, die sie nutzen, sind gestoppt, bis du dich neu anmeldest.",
@@ -121,7 +121,7 @@
     "claude": {
         "claudeTokenIsApiKey": "Das ist ein Anthropic-API-Schlüssel. Füge ihn stattdessen als Anthropic-(API-)Verbindung hinzu.",
         "claudeTokenIsCode": "Das ist der Code von Claude. Klick zuerst auf Get token und füge dann den Code hier ein.",
-        "approve": "Rerun bei Claude zulassen",
+        "approve": "Moldwright bei Claude zulassen",
         "open": "Claude öffnen",
         "openAgain": "Claude erneut öffnen",
         "pasteStep": "Code einfügen",
@@ -140,7 +140,7 @@
         "enterStep": "Code bei OpenAI eingeben",
         "copied": "Kopiert",
         "copyAdminMessage": "Nachricht für den Admin kopieren",
-        "adminMessage": "Hallo! Könntest du \"Device code authorization for Codex\" in den Einstellungen unseres ChatGPT-Workspace aktivieren? Ich brauche das, um meinen ChatGPT-Tarif mit Rerun zu verbinden.",
+        "adminMessage": "Hallo! Könntest du \"Device code authorization for Codex\" in den Einstellungen unseres ChatGPT-Workspace aktivieren? Ich brauche das, um meinen ChatGPT-Tarif mit Moldwright zu verbinden.",
         "copyCode": "Code kopieren",
         "openOpenAI": "OpenAI öffnen",
         "enterHint": "Gib ihn auf der Seite von OpenAI ein und bestätige. Dieser Bildschirm erkennt es von selbst.",

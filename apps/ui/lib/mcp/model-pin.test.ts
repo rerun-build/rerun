@@ -10,7 +10,7 @@ function connection(id: string, name: string, provider: BoxConnection['provider'
 
 const CODEX = connection('codex-clem', 'Codex Clem', 'codex', ['gpt-6-sol'])
 const CLAUDE_OLD = connection('claude-clem', 'Claude Clem', 'claude', ['claude-opus-5-5', 'claude-sonnet-5-5'])
-const CLAUDE_NEW = connection('claude-rerun', 'Rerun (person@example.com)', 'claude', ['claude-opus-5-5'])
+const CLAUDE_NEW = connection('claude-rerun', 'Moldwright (person@example.com)', 'claude', ['claude-opus-5-5'])
 const WORKSPACE = [CODEX, CLAUDE_OLD, CLAUDE_NEW]
 
 describe('readModelPin', () => {
@@ -63,7 +63,7 @@ describe('readModelPin', () => {
     })
 
     it('writes a renamed model under the spelling the connection still lists', () => {
-        const legacy = connection('rerun', 'Rerun', 'rerun', ['qwen/qwen3.7-max'])
+        const legacy = connection('rerun', 'Moldwright', 'rerun', ['qwen/qwen3.7-max'])
         expect(readModelPin({ connectionId: 'rerun', model: 'rerun-max' }, [legacy])).toMatchObject({ model: 'qwen/qwen3.7-max' })
     })
 })

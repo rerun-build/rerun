@@ -13,7 +13,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { approveDesktopSignIn } from './actions'
 
-const APP_NAMES: Record<DesktopShellChannel, string> = { stable: 'Rerun', staging: 'Rerun Staging', dev: 'Rerun Dev' }
+const APP_NAMES: Record<DesktopShellChannel, string> = { stable: 'Moldwright', staging: 'Moldwright Staging', dev: 'Moldwright Dev' }
 
 type Props = { challenge: string; state: string; channel: DesktopShellChannel; provider: DesktopSignInProvider | null; account: string | null }
 

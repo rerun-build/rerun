@@ -48,13 +48,13 @@
         }
     },
     "offline": {
-        "title": "Não foi possível acessar o Rerun",
+        "title": "Não foi possível acessar o Moldwright",
         "body": "Verifique sua conexão. O app se reconecta a {host} sozinho.",
         "unavailable": "{host} não está respondendo agora. O app tenta de novo sozinho.",
         "retry": "Tentar de novo"
     },
     "incompatible": {
-        "title": "Atualize o Rerun para continuar",
+        "title": "Atualize o Moldwright para continuar",
         "body": "Esta versão do app é antiga demais para {host}.",
         "download": "Baixar a versão mais recente",
         "downloading": "Baixando a atualização… {percent}%",
@@ -76,22 +76,22 @@
     },
     "server": {
         "title": "Conecte-se ao seu servidor",
-        "description": "Digite o endereço do servidor Rerun que você usa.",
+        "description": "Digite o endereço do servidor Moldwright que você usa.",
         "label": "Endereço do servidor",
         "connect": "Conectar",
         "invalid": "Digite um endereço como rerun.example.com.",
         "unreachable": "Nada respondeu neste endereço.",
-        "notRerun": "Este endereço não é um servidor Rerun.",
+        "notRerun": "Este endereço não é um servidor Moldwright.",
         "tooOld": "Este servidor exige a versão {version} do app ou mais recente.",
         "insecure": "Este endereço não é criptografado. Use https:// a menos que o servidor rode neste computador.",
-        "useRerunCloud": "Usar o Rerun Cloud",
+        "useRerunCloud": "Usar o Moldwright Cloud",
         "cancel": "Cancelar"
     },
     "updates": {
         "upToDate": "Você está atualizado",
-        "upToDateDetail": "O Rerun {version} é a versão mais recente.",
+        "upToDateDetail": "O Moldwright {version} é a versão mais recente.",
         "failed": "Não foi possível buscar atualizações",
-        "readyToInstall": "O Rerun {version} está pronto para instalar",
+        "readyToInstall": "O Moldwright {version} está pronto para instalar",
         "readyDetail": "O app reinicia para concluir a atualização.",
         "restartNow": "Reiniciar agora",
         "later": "Depois"

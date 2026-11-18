@@ -52,14 +52,14 @@ export function Layout({
                       src={LOGO_URL}
                       width={LOGO_SIZE}
                       height={LOGO_SIZE}
-                      alt="Rerun"
+                      alt="Moldwright"
                       style={logo}
                     />
                   </Link>
                 </td>
                 <td style={brandCell}>
                   <Link href={SITE_URL} style={brand}>
-                    Rerun
+                    Moldwright
                   </Link>
                 </td>
               </tr>

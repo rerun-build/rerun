@@ -13,7 +13,7 @@
         "isoBoard.settingUpTemplate": "{title} is the name of a template being installed.",
         "isoBoard.installTemplate": "{title} is the name of a template the person came to install.",
         "isoBoard.addBoxOnSide": "Button on the side of a Box on the board: adds a new Box next to it.",
-        "discoveries.statusDigging": "Onboarding: Rerun is researching the person's company. {name} is the company name.",
+        "discoveries.statusDigging": "Onboarding: Moldwright is researching the person's company. {name} is the company name.",
         "discoveries.statusDone": "Title once the research on the company is done. {name} is the company name.",
         "discoveries.found": "Badge: how many facts were found about the company.",
         "discoveries.cards.brain.title": "Company Brain: the pages of knowledge about the company that coworkers read before working.",

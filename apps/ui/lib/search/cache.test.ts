@@ -6,7 +6,7 @@ import { readCachedSearch, searchCacheKey, storeSearch } from './cache'
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
 
 const NOW = new Date('2026-10-12T10:00:00.000Z')
-const RESULTS = [{ title: 'Rerun', url: 'https://rerun.build', snippet: 'Coworkers that run' }]
+const RESULTS = [{ title: 'Moldwright', url: 'https://rerun.build', snippet: 'Coworkers that run' }]
 
 function database(resolve: SupabaseResolver) {
     const db = fakeSupabase(resolve)
@@ -16,7 +16,7 @@ function database(resolve: SupabaseResolver) {
 
 describe('searchCacheKey', () => {
     it('folds case and whitespace so the same question shares one entry', () => {
-        expect(searchCacheKey('  Rerun   AI\tagents ')).toBe('rerun ai agents')
+        expect(searchCacheKey('  Moldwright   AI\tagents ')).toBe('rerun ai agents')
         expect(searchCacheKey('rerun ai agents')).toBe('rerun ai agents')
     })
 })

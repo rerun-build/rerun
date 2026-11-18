@@ -120,7 +120,7 @@ describe('pillUsage', () => {
         expect(pillUsage(claude([]), credit)).toBeNull()
     })
 
-    it('rings the Rerun credit of the month, unless there is none or it is paused', () => {
+    it('rings the Moldwright credit of the month, unless there is none or it is paused', () => {
         const spending: RerunCredit = { usedMicros: 840_000, budgetMicros: 2_000_000, resetAt: null, percent: 42 }
         expect(pillUsage(rerun, spending)).toEqual({ inner: 42, outer: null, windows: [] })
         expect(pillUsage(rerun, credit)).toBeNull()

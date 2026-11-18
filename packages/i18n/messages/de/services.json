@@ -78,7 +78,7 @@
         "configured": "{name} konfiguriert",
         "connectTitle": "{name} verbinden",
         "signInOAuth": "Melde dich bei {name} an, damit dein Agent es nutzen kann.",
-        "signInManaged": "Melde dich mit {name} an, damit dein Agent es nutzen kann. Rerun kümmert sich um die Verbindung.",
+        "signInManaged": "Melde dich mit {name} an, damit dein Agent es nutzen kann. Moldwright kümmert sich um die Verbindung.",
         "setUp": "{name} einrichten",
         "authentication": "Authentifizierung",
         "backToMethods": "Zurück zu den Methoden",

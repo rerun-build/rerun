@@ -30,7 +30,7 @@ export function CreditsUsageBar(_props: { usedMicros?: number | null; budgetMicr
     return null
 }
 
-export const OUT_OF_CREDIT_MESSAGE = 'The account behind Rerun models has no balance left. Top up the OpenRouter account of this install, or switch to another model.'
+export const OUT_OF_CREDIT_MESSAGE = 'The account behind Moldwright models has no balance left. Top up the OpenRouter account of this install, or switch to another model.'
 
 export function BudgetExhaustedNotice({ ownConnection }: {
     onConnectProvider?: (provider: SubscriptionProvider) => void

@@ -135,15 +135,15 @@ export function predictInstall(manifest: ServiceManifest): { outcome: InstallOut
             outcome: 'needs_config',
             reason:
                 manifest.authMethods.length > 1
-                    ? 'Several ways to connect this one, so the account owner picks in the Rerun app.'
-                    : 'Waiting for a credential the account owner pastes in the Rerun app.',
+                    ? 'Several ways to connect this one, so the account owner picks in the Moldwright app.'
+                    : 'Waiting for a credential the account owner pastes in the Moldwright app.',
         }
     }
     if (appTarget(method)) {
         return { outcome: 'needs_auth', reason: 'Installed, but waiting for the account owner to pick which connected account the coworker acts with.' }
     }
     if (oauthServer(method) || managedTarget(method) || composioTarget(method)) {
-        return { outcome: 'needs_auth', reason: 'Installed, but waiting for the account owner to sign in from the Rerun app.' }
+        return { outcome: 'needs_auth', reason: 'Installed, but waiting for the account owner to sign in from the Moldwright app.' }
     }
     return { outcome: 'active', reason: 'Installs on its own, no credential and no sign-in.' }
 }
