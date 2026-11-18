@@ -10,6 +10,7 @@ import { BuddyClock } from '@/components/buddy/motion'
 import { LAST_CONVERSATION } from '@/components/chat/ForemanChat'
 import { AiConsent } from '@/components/consent/AiConsent'
 import { NoPlan } from '@/components/home/NoPlan'
+import { useIsSplit } from '@/components/layout/PaneSize'
 import { sheetOptions } from '@/components/layout/sheet-options'
 import { SplitShell } from '@/components/layout/SplitShell'
 import { WaitlistNotice } from '@/components/onboarding/notices'
@@ -53,18 +54,19 @@ function App() {
     const aiConsent = useAiConsent(session?.user.id ?? null)
     const consentKnown = !signedIn || aiConsent.state !== 'loading'
     // The onboarding just ended: the Chief of Staff's page opens once the app has taken over, and it
-    // speaks first there.
+    // speaks first there. A wide window already opens on that page: a push would stack a second one.
     const [handedOver, setHandedOver] = useState(false)
+    const split = useIsSplit()
     const pushTarget = usePushTarget()
 
     useEffect(() => {
         if (!handedOver || route.kind !== 'app') return
         const timer = setTimeout(() => {
-            router.push({ pathname: '/chat/[id]', params: { id: LAST_CONVERSATION } })
+            if (!split) router.push({ pathname: '/chat/[id]', params: { id: LAST_CONVERSATION } })
             setHandedOver(false)
         }, 0)
         return () => clearTimeout(timer)
-    }, [handedOver, route.kind])
+    }, [handedOver, route.kind, split])
 
     const onOnboarded = async () => {
         setHandedOver(true)

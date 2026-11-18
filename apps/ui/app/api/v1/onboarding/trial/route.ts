@@ -4,6 +4,7 @@ import { appPlatformOf } from '@/app/api/v1/_lib/client-platform'
 import { isSubscriptionEntitled } from '@/ee/lib/billing/entitlement'
 import { mergeForeman } from '@/lib/foreman/profile'
 import { PHONE_REQUIRED_MESSAGE } from '@/lib/phone/verification'
+import { BILLING_ENABLED } from '@rerun/cloud/billing'
 import type { ForemanTrialResult } from '@rerun/contracts'
 
 export const dynamic = 'force-dynamic'
@@ -11,6 +12,9 @@ export const dynamic = 'force-dynamic'
 // The trial the app starts once the questions are answered: without a card, whatever the arm of the
 // trial test, since the app sells nothing. The answer only says whether the workspace is now on.
 export const POST = apiRoute({ auth: 'admin' }, async ({ req, ctx }): Promise<ForemanTrialResult> => {
+    // A self-hosted install sells nothing: every workspace is on from its first minute, and there is
+    // no Stripe to start a trial on.
+    if (!BILLING_ENABLED) return { entitled: true }
     const platform = appPlatformOf(req)
     const alreadyOn = isSubscriptionEntitled(ctx.workspace.subscription_status)
     let entitled: boolean

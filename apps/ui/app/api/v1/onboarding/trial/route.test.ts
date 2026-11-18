@@ -3,7 +3,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const startCardlessTrial = vi.fn()
 const mergeForeman = vi.fn()
 const workspace = { id: 7, subscription_status: null as string | null }
+const billing = vi.hoisted(() => ({ enabled: true }))
 
+vi.mock('@rerun/cloud/billing', async () => ({
+    ...(await vi.importActual<typeof import('@/ee/lib/billing/entitlement')>('@/ee/lib/billing/entitlement')),
+    ...(await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')),
+    get BILLING_ENABLED() {
+        return billing.enabled
+    },
+}))
 vi.mock('@/ee/services/billing.service', () => ({
     ENGINE_WAITLIST_MESSAGE: 'Every machine is taken right now.',
     startCardlessTrial: (...args: unknown[]) => startCardlessTrial(...args),
@@ -23,6 +31,7 @@ const request = (client?: string) => new Request('https://app.rerun.build/api/v1
 describe('POST /api/v1/onboarding/trial', () => {
     beforeEach(() => {
         workspace.subscription_status = null
+        billing.enabled = true
         startCardlessTrial.mockReset().mockResolvedValue(true)
         mergeForeman.mockReset().mockResolvedValue({})
     })
@@ -51,6 +60,13 @@ describe('POST /api/v1/onboarding/trial', () => {
     it('answers false for a spent trial, which only the web can take further', async () => {
         startCardlessTrial.mockResolvedValue(false)
         expect(await (await POST(request(), segment)).json()).toEqual({ entitled: false })
+        expect(mergeForeman).not.toHaveBeenCalled()
+    })
+
+    it('answers that the workspace is on where nothing is sold, without asking for a trial', async () => {
+        billing.enabled = false
+        expect(await (await POST(request(), segment)).json()).toEqual({ entitled: true })
+        expect(startCardlessTrial).not.toHaveBeenCalled()
         expect(mergeForeman).not.toHaveBeenCalled()
     })
 
