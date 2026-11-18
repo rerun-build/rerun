@@ -4,7 +4,7 @@ import { mkdir, open, readdir, readFile, rename, rm, stat, writeFile } from 'nod
 import { join } from 'node:path'
 import { REMOTE_MAX_JOBS, type RemoteJob } from '@rerun/contracts'
 import { RemoteFailure } from './failure'
-import { killTree } from './process-tree'
+import { killTree, processStartedAt } from './process-tree'
 import type { ShellSpec } from './shell'
 
 // The long commands of this computer: each one runs in its own process group, apart from the socket,
@@ -27,17 +27,12 @@ export type JobsDeps = {
     platform: NodeJS.Platform
     onFinished: (job: JobMeta) => void
     onCountChange: (running: number) => void
+    startedAt?: typeof processStartedAt
 }
 
-const isAlive = (pid: number | null): boolean => {
-    if (!pid) return false
-    try {
-        process.kill(pid, 0)
-        return true
-    } catch {
-        return false
-    }
-}
+// A pid outlives its process: after a quit or a reboot the system hands it to another one. A job
+// started within these seconds of what holds the pid now is that job; anything else is left alone.
+const SAME_PROCESS_MS = 10_000
 
 export class Jobs {
     private readonly running = new Map<string, { child: ChildProcess; log: WriteStream; written: number; stopping: boolean; finishing: boolean; tail: string }>()
@@ -79,7 +74,7 @@ export class Jobs {
                     continue
                 }
                 if (meta.state === 'running') {
-                    if (isAlive(meta.pid)) killGroup(meta.pid!, this.deps.platform)
+                    if (meta.pid && (await this.stillRuns(meta.pid, meta.startedAt))) killGroup(meta.pid, this.deps.platform)
                     await this.save({ ...meta, state: 'lost', endedAt: new Date().toISOString(), acked: false })
                     continue
                 }
@@ -87,6 +82,11 @@ export class Jobs {
             }
         })()
         return this.loaded
+    }
+
+    private async stillRuns(pid: number, startedAt: string): Promise<boolean> {
+        const at = await (this.deps.startedAt ?? processStartedAt)(pid, this.deps.platform)
+        return at !== null && Math.abs(at - Date.parse(startedAt)) <= SAME_PROCESS_MS
     }
 
     count(): number {

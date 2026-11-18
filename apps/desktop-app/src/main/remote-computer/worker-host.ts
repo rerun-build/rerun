@@ -29,7 +29,7 @@ export class WorkerHost {
     constructor(
         private readonly initMessage: () => MainToWorker,
         private readonly onMessage: (message: WorkerToMain) => void,
-        private readonly logPath: string,
+        private readonly logPath: () => string,
     ) {}
 
     get running(): boolean {
@@ -41,10 +41,10 @@ export class WorkerHost {
         this.stopping = false
         const child = utilityProcess.fork(join(import.meta.dirname, 'worker.js'), [], { serviceName: 'Rerun Computer', stdio: 'pipe' })
         this.child = child
-        const log = (chunk: Buffer) => appendLog(this.logPath, chunk.toString('utf8'))
+        const log = (chunk: Buffer) => appendLog(this.logPath(), chunk.toString('utf8'))
         child.stdout?.on('data', log)
         child.stderr?.on('data', log)
-        appendLog(this.logPath, `[${new Date().toISOString()}] worker started\n`)
+        appendLog(this.logPath(), `[${new Date().toISOString()}] worker started\n`)
         const startedAt = Date.now()
         child.on('message', (message: WorkerToMain) => {
             if (message.type === 'ready') child.postMessage(this.initMessage())
@@ -55,7 +55,7 @@ export class WorkerHost {
             if (this.stopping) return
             if (Date.now() - startedAt > 60_000) this.restarts = 0
             const delay = Math.min(MAX_RESTART_DELAY_MS, 1_000 * 2 ** this.restarts++)
-            appendLog(this.logPath, `[${new Date().toISOString()}] worker exited (${code}), restarting in ${delay} ms\n`)
+            appendLog(this.logPath(), `[${new Date().toISOString()}] worker exited (${code}), restarting in ${delay} ms\n`)
             this.restartTimer = setTimeout(() => {
                 this.restartTimer = null
                 this.start()

@@ -31,7 +31,8 @@ function localSettings(): WorkerLocalSettings {
 const host = new WorkerHost(
     () => ({ type: 'init', dataDir: join(app.getPath('userData'), 'computer'), appVersion: app.getVersion(), settings: localSettings(), links: workerLinks() }),
     message => receive(message),
-    join(app.getPath('userData'), 'computer', 'worker.log'),
+    // Read when used: this module loads before index.ts points userData at the channel's own folder.
+    () => join(app.getPath('userData'), 'computer', 'worker.log'),
 )
 
 function receive(message: WorkerToMain): void {

@@ -100,6 +100,19 @@ describe.runIf(posix)('the jobs of a linked computer', () => {
         await vi.waitFor(() => expect(alive(orphan.pid!)).toBe(false), { timeout: 10_000 })
     })
 
+    it('leaves alone a process that only took the pid of a job long gone', async () => {
+        const dir = mkdtempSync(join(tmpdir(), 'rerun-jobs-'))
+        const { spawn } = await import('node:child_process')
+        const bystander = spawn('sleep', ['60'], { detached: true, stdio: 'ignore' })
+        mkdirSync(join(dir, 'old'))
+        writeFileSync(join(dir, 'old', 'meta.json'), JSON.stringify({ id: 'old', command: 'sleep 60', cwd: '/', state: 'running', exitCode: null, startedAt: new Date(Date.now() - 3 * 60 * 60_000).toISOString(), endedAt: null, computerId: 'c1', pid: bystander.pid, acked: false }))
+        const { jobs } = jobsIn(dir)
+        await jobs.load()
+        expect(jobs.unacknowledged('c1')).toEqual([expect.objectContaining({ id: 'old', state: 'lost' })])
+        expect(alive(bystander.pid!)).toBe(true)
+        process.kill(-bystander.pid!, 'SIGKILL')
+    })
+
     it('drops the middle of a log that grows past its limit, keeping the end', async () => {
         const { jobs, finished } = jobsIn()
         await jobs.start({ command: 'head -c 12000000 /dev/zero | tr "\\0" "x"; echo; echo THE-END', cwd: tmpdir() }, 'c1', 'chatty')
