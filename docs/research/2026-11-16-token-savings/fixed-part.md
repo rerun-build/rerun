@@ -5,10 +5,10 @@ Issue #936 (part of #916). Read 2026-11-16 (UTC) on dev c815bbd and the live eng
 ## Summary
 
 - A step re-sends the same block every time: the instructions, the tool definitions, the skills index and the memory index. Measured per step it is about 26k tokens for code, 34k for LINUS, 35k for BRUCE and 46k for Boss. (verified fit, see Method)
-- Tool results are small next to it: about 0.4k to 1.3k tokens per step. The fixed part is 5 to 6 times (code, LINUS, BRUCE) and 40 times (Boss) a step's results.
+- Tool results are small next to it: about 0.4k to 1.3k tokens per step. The fixed part is about 65 times (code), 43 times (LINUS) and 29 times (BRUCE) a step's results, and about 40 times (Boss).
 - Every run is 91% to 97% cached input, so the saving in money is smaller than the saving in tokens. Tokens below are input tokens re-sent.
 - In the last 20 runs each coworker called only `shell_exec` (plus 1 `fs_edit` for code and 1 `shared_edit` for LINUS). No `skill_read`, no `call_agent`, no `web`, no `brain`, no `memory`, no EverOS call. (verified)
-- Largest cut by saving per run: Boss (about 240k per run), then LINUS and BRUCE (about 36k to 37k), then code (about 54k at 9.3 steps, if memory, brain, web, shared and EverOS go).
+- Largest cut by saving per run: Boss (about 240k per run), then code (about 57k at 9.3 steps, if memory, brain, web, shared and EverOS go), then LINUS and BRUCE (about 36k to 37k).
 
 ## Method
 
