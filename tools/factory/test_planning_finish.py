@@ -100,15 +100,24 @@ class Finish(unittest.TestCase):
     def test_error_status(self):
         r = Rig()
         r.status = {"status": "error"}
+        r.store.set("plan:12", "resent", '["plan"]')
         r.station.once(2)
         self.assertEqual(r.record()["state"], "blocked")
         self.assertEqual(r.record()["why"], "the plan run ended error")
 
     def test_over_limit_cancels(self):
         r = Rig(now=3701.0)
+        r.store.set("plan:12", "resent", '["plan"]')
         r.station.once(2)
         self.assertEqual(r.acalls, ["get_run", "cancel_run"])
         self.assertEqual(r.record()["state"], "blocked")
+
+    def test_first_loss_of_the_plan_step_is_kept_for_one_send_again(self):
+        r = Rig()
+        r.status = {"status": "error", "handoverPath": "/d/n.md"}
+        r.station.once(2)
+        rec = r.record()
+        self.assertEqual((rec["state"], rec["resent"], rec["handover"]), ("unsent", '["plan"]', "/d/n.md"))
 
     def test_sending_is_lost(self):
         r = Rig(state="sending")

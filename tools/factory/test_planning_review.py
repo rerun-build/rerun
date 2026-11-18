@@ -153,6 +153,7 @@ class Review(Station):
         self.build()
         self.planned()
         self.once()
+        self.store.set("plan:5", "resent", '["review"]')
         self.w.finish("barbara", "", status="error")
         self.once()
         self.assertEqual((self.rec()["state"], self.rec()["review_fails"]), ("planned", "1"))
