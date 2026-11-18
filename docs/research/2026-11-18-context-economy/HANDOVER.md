@@ -1,6 +1,6 @@
 # Planner handover: design (2026-11-18)
 
-Status: proposed, for review. Nothing here is built yet.
+Status: built in #1480.
 
 ## Why
 
@@ -70,13 +70,20 @@ Both are equally resumable once the note is on disk, and the fresh session only 
 
 ### The resume path
 
-The dispatcher already re-sends a job whose run ended without its goal line. A lost run's run record carries `handover_path`, and the re-send puts one line in front of the brief:
+The note is saved in the shared space and the run records its shared-space path (`handover/<agent>/<run-id>-<n>.md`), which the coworker's shared files tool opens. The note text has the engine's secret values redacted before it is written.
+
+Two places re-send a lost step, and each puts one line in front of the brief:
 
 ```text
-Continue from your handover note: <path>. Read it first; do not redo what it marks done.
+Continue from your handover note: <path> in the shared space (read it with your shared files tool). Read it first; do not redo what it marks done.
 ```
 
-This applies to dispatcher sends with a goal (PLAN, CUT, resolve). For a chat run, such as Advisor to Boss, the note is kept and named in the run's error, but nothing re-sends it automatically.
+- The dispatcher re-sends a job whose run ended without its goal line (build, review, proof, fix). It reads `handoverPath` from the run it already fetches.
+- Planning (`planning.py`) re-sends a lost PLAN, CUT, review or repair step once. A re-plan or revise is sent again with the same cut failure, review notes and answers it carried. The re-send is recorded on the plan record, so a second loss of the same step is blocked as before. The note is used only for the same step and the same coworker, and is kept until a run id is recorded.
+
+For a chat run, such as Advisor to Boss, the note is kept and named in the run's error, but nothing re-sends it automatically.
+
+A review can now run three times before it fails open: one re-send for a lost run, then the existing two failures (`REVIEW_FAILS`).
 
 ### The thrash error
 

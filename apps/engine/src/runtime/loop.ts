@@ -172,7 +172,11 @@ const NO_TOOL_RESULT = 'no result: the run ended'
 
 function toolErrorText(error: unknown, secrets: string[]): string {
     const text = Array.isArray(error) ? error.map(block => (typeof block?.text === 'string' ? block.text : JSON.stringify(block))).join('\n') : typeof error === 'string' ? error : errorMessageOf(error)
-    return secrets.reduce((out, secret) => out.split(secret).join('[redacted]'), text).slice(0, TOOL_ERROR_CHARS)
+    return redactSecrets(text, secrets).slice(0, TOOL_ERROR_CHARS)
+}
+
+function redactSecrets(text: string, secrets: string[]): string {
+    return secrets.reduce((out, secret) => out.split(secret).join('[redacted]'), text)
 }
 
 function runSecrets(agent: LoadedAgent): string[] {
@@ -508,7 +512,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             logger.info({ agent: agent.id, run: run.id, trigger: kind, summaryChars }, 'run context compacted')
             void recordRunCompaction(agent.id, run.id, summaryChars).catch(() => {})
             if (handover && summary && handoverN) {
-                void saveHandover(agent.id, run.id, handoverN, summary)
+                void saveHandover(agent.id, run.id, handoverN, redactSecrets(summary, runSecrets(agent)))
                     .then(path => setRunHandover(agent.id, run.id, path))
                     .catch(err => logger.warn({ err: String(err), agent: agent.id, run: run.id }, 'handover note not saved'))
             }

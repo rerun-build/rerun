@@ -2,8 +2,8 @@ import os, sys, unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from test_dispatch import Base, ready, run_shape, T0, PR_LINE
 
-NOTE = "/data/shared/handover/b1/run1-2.md"
-LINE = "Continue from your handover note: %s. Read it first; do not redo what it marks done." % NOTE
+NOTE = "handover/b1/run1-2.md"
+LINE = "Continue from your handover note: %s in the shared space (read it with your shared files tool). Read it first; do not redo what it marks done." % NOTE
 
 
 class Handover(Base):
@@ -47,6 +47,22 @@ class Handover(Base):
         self.w.runs["run1"]["handoverPath"] = NOTE
         self.d.send(self.d.store.get_job("5"), "b2", "other", "plain", "building", 1)
         self.assertEqual(self.w.sends[-1][1], "plain")
+
+    def test_a_send_that_failed_keeps_the_note_and_the_next_send_still_carries_it(self):
+        self.tick()
+        self.w.finish("b1", None, status="error")
+        self.w.runs["run1"]["handoverPath"] = NOTE
+        self.w.cut_off_next_send = True
+        self.tick()
+        self.assertEqual(self.d.store.get_job("5")["handover"], NOTE)
+        self.assertEqual(self.w.sends[1][1].split("\n")[0], LINE)
+
+    def test_the_note_is_dropped_from_the_job_once_a_run_id_is_kept(self):
+        self.tick()
+        self.w.finish("b1", None, status="error")
+        self.w.runs["run1"]["handoverPath"] = NOTE
+        self.tick()
+        self.assertNotIn("handover", self.d.store.get_job("5"))
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import { vi } from 'vitest'
 
 process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-loop-handover-'))
 
-const seen = vi.hoisted(() => ({ options: undefined as { onCompact?: (event: unknown) => void; handover?: unknown } | undefined, save: vi.fn() }))
+const seen = vi.hoisted(() => ({ options: undefined as { onCompact?: (event: unknown) => void; handover?: unknown } | undefined, save: vi.fn(), summary: 'abc' }))
 
 vi.mock('../tools/registry.js', () => ({
     buildTools: async () => ({ tools: {}, close: async () => {} }),
@@ -26,7 +26,7 @@ vi.mock('../agents/providers.js', async importOriginal => {
             return {
                 model: new MockLanguageModelV3({
                     doStream: async () => {
-                        seen.options?.onCompact?.({ trigger: 'auto', summaryChars: 3, summary: 'abc', handoverN: 1 })
+                        seen.options?.onCompact?.({ trigger: 'auto', summaryChars: 3, summary: seen.summary, handoverN: 1 })
                         return {
                             stream: new ReadableStream({
                                 start(controller) {
@@ -55,7 +55,8 @@ const { mkdir } = await import('node:fs/promises')
 const { migrate } = await import('../db/migrate.js')
 const { agentConfigSchema } = await import('../agents/types.js')
 const { writeAgentConfig } = await import('../agents/config-write.js')
-const { agentDir } = await import('../config/paths.js')
+const { agentDir, agentEnvPath, sharedDir } = await import('../config/paths.js')
+const { readFile, writeFile } = await import('node:fs/promises')
 const { getAgent } = await import('../agents/registry.js')
 const { createSession } = await import('../db/repos/sessions.js')
 const { getRun } = await import('../db/repos/runs.js')
@@ -72,10 +73,11 @@ async function run(id: string) {
 describe('run handover', () => {
     beforeAll(async () => {
         await migrate()
-        for (const [id, contextSize] of [['hoplanner', 'large'], ['hobuilder', 'small']] as const) {
+        for (const [id, contextSize] of [['hoplanner', 'large'], ['hobuilder', 'small'], ['hosecret', 'medium']] as const) {
             await mkdir(agentDir(id), { recursive: true })
             await writeAgentConfig(id, agentConfigSchema.parse({ name: id, provider: 'claude', contextSize }))
         }
+        await writeFile(agentEnvPath('hosecret'), 'HO_TOKEN=planted-secret-value-1234\n')
     })
 
     it('leaves the run done and its handover path unset when the note cannot be written', async () => {
@@ -90,6 +92,21 @@ describe('run handover', () => {
         seen.save.mockResolvedValue('/d/shared/handover/hoplanner/r-1.md')
         const row = await run('hoplanner')
         await vi.waitFor(async () => expect((await getRun('hoplanner', row?.id ?? ''))?.handoverPath).toBe('/d/shared/handover/hoplanner/r-1.md'))
+    })
+
+    it('keeps a secret value of the coworker out of the saved note', async () => {
+        const actual = await vi.importActual<typeof import('../agents/handover.js')>('../agents/handover.js')
+        seen.save.mockImplementation(actual.saveHandover)
+        seen.summary = 'the token is planted-secret-value-1234 for now'
+        const row = await run('hosecret')
+        const path = (await vi.waitFor(async () => {
+            const got = (await getRun('hosecret', row?.id ?? ''))?.handoverPath
+            expect(got).toBeTruthy()
+            return got
+        })) as string
+        const text = await readFile(resolve(sharedDir(), path), 'utf8')
+        expect(text).toBe('the token is [redacted] for now')
+        seen.summary = 'abc'
     })
 
     it('asks for no handover on a small run', async () => {
