@@ -5,7 +5,6 @@ import { SHARED_FILE_DRAG_TYPE } from '@/components/brain/editor/file-link'
 import type { BrainSelection } from '@/components/brain/selection'
 import { joinPath, type SharedFileRef, type SharedFilesTree } from '@/components/brain/useSharedFilesTree'
 import { Button } from '@/components/ui/button'
-import { FileUploadMenu } from '@/components/ui/file-upload-menu'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useBoxLabel } from '@/components/brain/BrainItemProperties'
@@ -14,8 +13,7 @@ import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
 import { isCardType } from '@/lib/brain/labels'
 import { humanizeTableName } from '@/lib/data/table-name'
 import type { EngineDbTable } from '@/lib/engine/types'
-import type { UploadEntry } from '@/lib/files/upload'
-import { ArchiveIcon, BoxIcon, BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, type LucideIcon } from '@/lib/icons'
+import { ArchiveIcon, BoxIcon, BrainIcon, ChevronRightIcon, FileIcon, FolderIcon, GlobeIcon, InboxIcon, PlusIcon, SearchIcon, TableIcon, UploadIcon, type LucideIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import type { BrainFileMeta, BrainPageSummary } from '@rerun/contracts'
 import { useTranslations } from 'next-intl'
@@ -34,7 +32,8 @@ type BrainSidebarProps = {
     filing: BrainFiling
     searchRef: Ref<HTMLInputElement>
     onSelect: (selection: BrainSelection) => void
-    onUpload: (entries: UploadEntry[], dir: string) => void
+    // Opens the import, set to file what comes in under this Box (null for everyone).
+    onImport: (spaceId: string | null) => void
 }
 
 function fileIcon(file: BrainFileMeta): LucideIcon {
@@ -170,7 +169,7 @@ function FileTreeRow({ dir, entry, depth, files, selection, onSelect }: { dir: s
 
 // One tree for everything the workspace shares, as Notion keeps its pages and databases side by
 // side: what agents proposed, the company pages, the shared folder and the shared database.
-export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, filing, searchRef, onSelect, onUpload }: BrainSidebarProps) {
+export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, publishedEnabled, files, tables, filing, searchRef, onSelect, onImport }: BrainSidebarProps) {
     const t = useTranslations('brain.sidebar')
     const boxLabel = useBoxLabel()
     const [query, setQuery] = useState('')
@@ -282,7 +281,10 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
             <div className="space-y-2 px-2 pb-1 pt-3">
                 <div className="flex items-center gap-2 pl-2">
                     <BrainIcon className="size-4 shrink-0" />
-                    <span className="text-sm font-semibold">{t('title')}</span>
+                    <span className="flex-1 text-sm font-semibold">{t('title')}</span>
+                    <Button size="icon-xs" variant="ghost" onClick={() => onImport(null)} aria-label={t('import')} title={t('importHint')}>
+                        <UploadIcon />
+                    </Button>
                 </div>
                 <div className="relative">
                     <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -373,7 +375,11 @@ export function BrainSidebar({ pages, pagesAvailable, selection, openProposals, 
                             label={t('files')}
                             active={selection?.kind === 'folder' && selection.path === ''}
                             onClick={() => onSelect({ kind: 'folder', path: '' })}
-                            action={<FileUploadMenu onPick={entries => onUpload(entries, '')} />}
+                            action={
+                                <Button size="icon-xs" variant="ghost" onClick={() => onImport(null)} aria-label={t('import')} title={t('importHint')}>
+                                    <UploadIcon />
+                                </Button>
+                            }
                         />
                         <FolderRows dir="" depth={0} files={files} selection={selection} onSelect={onSelect} />
 

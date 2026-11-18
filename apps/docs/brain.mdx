@@ -24,9 +24,9 @@ The sidebar holds everything, with a search field on top (<kbd>⌘</kbd> <kbd>K<
 | --- | --- |
 | **Proposals** | The changes your coworkers want to make, waiting for you. See [Proposals](#proposals) |
 | **Published** | The links your coworkers published, and who can open each. See [Data and files](/agents/data) |
-| **Company** | The identity card of your company: one page each for **Company**, **Offering**, **Market**, **Team**, **Voice**, **Tools** and **Priorities** |
-| **Pages** | Every other page: **Customer**, **Competitor**, **Person**, **Product**, **Decision** and **Note** pages. Product pages fold into a **Products** group. Click **New page** to write one |
-| **Files** | The shared folder of the workspace. Upload a file or a folder from the section header |
+| **Everyone** | What is filed for the whole workspace: the identity card of your company (one page each for **Company**, **Offering**, **Market**, **Team**, **Voice**, **Tools** and **Priorities**), then every other page not filed under a Box: **Customer**, **Competitor**, **Person**, **Product**, **Decision** and **Note** pages. Product pages fold into a **Products** group. Click **New page** to write one |
+| **Boxes** | One entry per Box you can open, with the number of pages and files filed under it. Unfold it to see them, click its name to open the Box. See [Filed by Box](#filed-by-box) |
+| **Files** | The shared folder of the workspace. Click the upload button of the section header to [import](#import-files-zip-archives-and-folders) |
 | **Database** | The shared database of the workspace, one row per table |
 
 The shared folder and the shared database belong to the whole workspace, whatever Box a coworker sits in. See [Data and files](/agents/data).
@@ -55,6 +55,7 @@ A page is a document you edit in place, and it saves as you type (**Saving…**,
 - Type `[[` to link another page. Coworkers link to a page as `[[slug]]`, shown under the title of a new page.
 - Pick **File** in the <kbd>/</kbd> menu, or drag a file from the sidebar, to cite a file of the shared folder.
 - Change the **Type** of the page from its properties, which also show its **Sources** and when it was **Last edited**, and by whom.
+- File it under a **Box** and give it **Tags** from the same properties. See [Filed by Box](#filed-by-box).
 
 From the **More** menu of a page: **Copy link**, **Version history** or **Delete**. Deleting a page means coworkers stop reading it, and the pages linking to it lose the link.
 
@@ -65,6 +66,30 @@ If someone else changes a page while you edit it, the page says so: **Load their
 Every change is kept. Open **Version history** from the **More** menu: each version shows who made it, a person, a coworker, the Chief of Staff, or **Rerun, from your website**. Your own edits made a few minutes apart count as one version.
 
 Pick a version and click **Restore this version**. The page goes back to what it said then, and the current version stays in the history.
+
+## Filed by Box
+
+There is one Brain per workspace, but every page and every file of the shared folder says where it belongs, so each team finds its own things first:
+
+- **Box**: the Box it is filed under, or **Everyone**. What a coworker writes or proposes is filed under its own Box; what you import goes under the Box you pick. Change it from the page or the file at any time.
+- **Tags**: free words like `#acme` or `#pricing`, added from the page or the file with **Add tag**. Coworkers tag what they write, and you can add or remove tags.
+- **Added by**: the coworker, the person or the website import that first put it in the Brain. It stays the same after later edits.
+
+Filing never hides anything: every coworker can still read every page and every file. A coworker reads the pages of its own Box first, its index lists them on top, and it can keep a search to its Box or to some tags when the whole Brain is too broad.
+
+Moving a coworker to another Box leaves what it already added where it was; what it adds next goes under its new Box. A page filed under a Box you cannot open shows under **Everyone**.
+
+Click a Box in the sidebar to open it: **Read first by** lists its coworkers, then everything filed under it with its tags. **Import** from there files what you bring in under that Box.
+
+## Import files, .zip archives and folders
+
+Click the upload button at the top of the sidebar, in the **Files** header, or **Import** in a Box. Drop files, a `.zip` or a folder, or click **Choose files** or **Choose a folder**.
+
+- A `.zip` is unpacked into a folder named after it, its own folders kept. The files a Mac adds (`__MACOSX`, `.DS_Store`) are left out.
+- A folder keeps its tree.
+- The **Tags** and the **Box** you set apply to every file of the import, and to the folder it came in, which shows under its Box as one item.
+
+The list shows what will be imported before you click **Import**, and you can remove a file from it. One import takes up to 500 files and 500 MB once unpacked; each file can weigh up to 100 MB. The files land in the shared folder and the upload tray shows their progress.
 
 ## Proposals
 
@@ -82,7 +107,7 @@ When nothing waits, **Proposals** says **All caught up**.
 
 ## How coworkers read it
 
-Every coworker starts each run with the Company card and an index of the pages. Before it writes about your company or one of your products, it searches the Brain and reads the page it needs. What a person wrote or confirmed wins over its own memory.
+Every coworker starts each run with the Company card and an index of the pages, the pages and files filed under its Box first. Before it writes about your company or one of your products, it searches the Brain and reads the page it needs. What a person wrote or confirmed wins over its own memory.
 
 How a page changes depends on where the fact comes from:
 

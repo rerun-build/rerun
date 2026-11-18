@@ -2,9 +2,10 @@
 
 import { useErrorText } from '@/hooks/useErrorText'
 import { listWorkspaceTablesAction } from '@/app/api/_actions/workspace-db.actions'
-import { deleteBrainPageAction, listBrainFileMetaAction, listBrainProposalsAction, loadBrainAction, readBrainPageAction, revertBrainPageAction, type BrainOverview } from '@/app/api/_actions/brain.actions'
+import { deleteBrainPageAction, listBrainFileMetaAction, listBrainProposalsAction, loadBrainAction, readBrainPageAction, revertBrainPageAction, setBrainFilesMetaAction, type BrainOverview } from '@/app/api/_actions/brain.actions'
 import { BrainBoxView } from '@/components/brain/BrainBoxView'
 import { BrainFileView, BrainFolderView } from '@/components/brain/BrainFiles'
+import { BrainImportDialog } from '@/components/brain/BrainImportDialog'
 import { BrainNewPage } from '@/components/brain/BrainNewPage'
 import { BrainPage } from '@/components/brain/BrainPage'
 import { BrainPageHistory } from '@/components/brain/BrainPageHistory'
@@ -30,6 +31,7 @@ import { humanizeTableName } from '@/lib/data/table-name'
 import type { BrainPageDetail } from '@/lib/engine/client'
 import type { EngineDbTable } from '@/lib/engine/types'
 import type { UploadEntry } from '@/lib/files/upload'
+import { importedPaths, type ImportFile } from '@/lib/brain/import'
 import { allTags, EMPTY_FILING, type BrainFiling } from '@/lib/brain/items'
 import { BrainIcon, DatabaseIcon, RefreshCwIcon, TableIcon } from '@/lib/icons'
 import { useBrainStore } from '@/stores/brain.store'
@@ -92,6 +94,14 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
     const [seeding, setSeeding] = useState(false)
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [uploadDir, setUploadDir] = useState('')
+    // The Box the import files what comes in under; undefined while the import is closed.
+    const [importSpaceId, setImportSpaceId] = useState<string | null | undefined>(undefined)
+    // A fresh import each time it opens, without cutting its closing animation short.
+    const [importRun, setImportRun] = useState(0)
+    const openImport = useCallback((spaceId: string | null) => {
+        setImportSpaceId(spaceId)
+        setImportRun(run => run + 1)
+    }, [])
     const searchRef = useRef<HTMLInputElement>(null)
     const focusSearchOnOpenRef = useRef(false)
     const selectionRef = useRef(selection)
@@ -240,12 +250,39 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
         },
     })
 
+    // A folder or a .zip lands outside the open directory, so nothing above reloads for it: the tree
+    // and the filing are read again once the whole batch is in.
+    const refreshFiles = files.refresh
+    const wasUploading = useRef(false)
+    useEffect(() => {
+        if (uploads.active) {
+            wasUploading.current = true
+            return
+        }
+        if (!wasUploading.current) return
+        wasUploading.current = false
+        void refreshFiles('')
+        void listBrainFileMetaAction().then(list => list && filedFiles(list))
+    }, [uploads.active, refreshFiles, filedFiles])
+
     const upload = useCallback(
         (entries: UploadEntry[], dir: string) => {
             setUploadDir(dir)
             uploads.enqueue(entries, dir)
         },
         [uploads],
+    )
+
+    // The filing lands first: the files then show under their Box as they arrive. A filing the
+    // engine refuses still lets the files in, unfiled.
+    const importFiles = useCallback(
+        async (picked: ImportFile[], tags: string[], spaceId: string | null) => {
+            const filed = await setBrainFilesMetaAction({ paths: importedPaths(picked), tags, spaceId })
+            if (filed.ok) filedFiles(filed.value)
+            else toast.error(t('import.filingFailed'))
+            upload(picked.map(file => file.entry), '')
+        },
+        [filedFiles, upload, t],
     )
 
     const openPage = useCallback((slug: string) => select({ kind: 'page', slug }), [select])
@@ -476,7 +513,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
             case 'file':
                 return <BrainFileView path={selection.path} files={files} onSelect={select} filing={filing} tagSuggestions={tagSuggestions} onFiled={filedFiles} />
             case 'box':
-                return <BrainBoxView spaceId={selection.spaceId} pages={pages} filing={filing} onSelect={select} />
+                return <BrainBoxView spaceId={selection.spaceId} pages={pages} filing={filing} onSelect={select} onImport={openImport} />
             case 'database':
                 if (!tables || tables.length > 0) return <PageSkeleton />
                 return (
@@ -533,7 +570,7 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
             filing={filing}
             searchRef={searchRef}
             onSelect={select}
-            onUpload={upload}
+            onImport={openImport}
         />
     ) : (
         <div className="space-y-3 p-3">
@@ -575,6 +612,16 @@ export function BrainWorkspace({ request, publishedEnabled, onRequestConsumed, o
                         {renderMain()}
                     </PanelSteps>
                 </main>
+
+                <BrainImportDialog
+                    key={importRun}
+                    open={importSpaceId !== undefined}
+                    defaultSpaceId={importSpaceId ?? null}
+                    boxes={filing.boxes}
+                    suggestions={tagSuggestions}
+                    onOpenChange={open => !open && setImportSpaceId(undefined)}
+                    onImport={(picked, tags, spaceId) => void importFiles(picked, tags, spaceId)}
+                />
 
                 <UploadTray items={uploads.items} totalProgress={uploads.totalProgress} onCancel={uploads.cancel} onRetry={uploads.retry} onDismiss={uploads.active ? uploads.cancelAll : uploads.clearFinished} />
             </div>

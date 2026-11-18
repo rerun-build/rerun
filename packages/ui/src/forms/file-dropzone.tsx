@@ -15,10 +15,12 @@ interface FileDropzoneProps {
     disabled?: boolean
     overlayLabel?: string
     className?: string
+    // Takes the drop whole instead of its flat list of files: a dropped folder keeps its tree there.
+    onDropTransfer?: (dataTransfer: DataTransfer) => void
     children: React.ReactNode | ((state: FileDropzoneRenderProps) => React.ReactNode)
 }
 
-export function FileDropzone({ onFiles, accept, multiple = false, disabled, overlayLabel, className, children }: FileDropzoneProps) {
+export function FileDropzone({ onFiles, accept, multiple = false, disabled, overlayLabel, className, onDropTransfer, children }: FileDropzoneProps) {
     const t = useKitTranslations()
     const inputId = useId()
     const [dragOver, setDragOver] = useState(false)
@@ -44,9 +46,10 @@ export function FileDropzone({ onFiles, accept, multiple = false, disabled, over
             e.preventDefault()
             setDragOver(false)
             if (disabled) return
-            emit(e.dataTransfer.files)
+            if (onDropTransfer) onDropTransfer(e.dataTransfer)
+            else emit(e.dataTransfer.files)
         },
-        [disabled, emit],
+        [disabled, emit, onDropTransfer],
     )
 
     const handleDragOver = useCallback(

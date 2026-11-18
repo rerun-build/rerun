@@ -4,9 +4,10 @@ import { TagBadge, useBoxLabel } from '@/components/brain/BrainItemProperties'
 import { PageColumn } from '@/components/brain/BrainPageParts'
 import { BrainTopBar } from '@/components/brain/BrainTopBar'
 import type { BrainSelection } from '@/components/brain/selection'
+import { Button } from '@/components/ui/button'
 import { filesOfBox, pagesOfBox, type BrainFiling } from '@/lib/brain/items'
 import { BRAIN_PAGE_ICONS } from '@/lib/brain/page-icons'
-import { ArchiveIcon, BoxIcon, FileIcon, FolderIcon, type LucideIcon } from '@/lib/icons'
+import { ArchiveIcon, BoxIcon, FileIcon, FolderIcon, UploadIcon, type LucideIcon } from '@/lib/icons'
 import type { BrainPageSummary } from '@rerun/contracts'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
@@ -29,7 +30,7 @@ function ItemRow({ row, onSelect }: { row: Row; onSelect: (selection: BrainSelec
 }
 
 // A Box seen from the Brain: the coworkers that read it first, and everything filed under it.
-export function BrainBoxView({ spaceId, pages, filing, onSelect }: { spaceId: string; pages: BrainPageSummary[]; filing: BrainFiling; onSelect: (selection: BrainSelection) => void }) {
+export function BrainBoxView({ spaceId, pages, filing, onSelect, onImport }: { spaceId: string; pages: BrainPageSummary[]; filing: BrainFiling; onSelect: (selection: BrainSelection) => void; onImport: (spaceId: string) => void }) {
     const t = useTranslations('brain')
     const boxLabel = useBoxLabel()
     const box = filing.boxes.find(entry => entry.id === spaceId) ?? null
@@ -47,7 +48,12 @@ export function BrainBoxView({ spaceId, pages, filing, onSelect }: { spaceId: st
 
     return (
         <div className="flex min-h-0 flex-1 flex-col">
-            <BrainTopBar crumbs={[{ label: t('crumbs.boxes') }, { label: name, icon: BoxIcon }]} />
+            <BrainTopBar crumbs={[{ label: t('crumbs.boxes') }, { label: name, icon: BoxIcon }]}>
+                <Button size="sm" variant="outline" onClick={() => onImport(spaceId)} aria-label={t('box.import')}>
+                    <UploadIcon />
+                    <span className="max-sm:hidden">{t('box.import')}</span>
+                </Button>
+            </BrainTopBar>
             <div className="min-h-0 flex-1 overflow-y-auto">
                 <PageColumn>
                     <BoxIcon className="mb-4 size-8 text-muted-foreground" />
