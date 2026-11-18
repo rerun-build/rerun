@@ -21,7 +21,10 @@ vi.mock('../../runtime/loop.js', async importOriginal => ({
         releaseSession(runId)
         return {
             runId,
+            provider: 'claude',
+            model: 'opus',
             settled: Promise.resolve({ kind: 'done' }),
+            attempt: Promise.resolve({ kind: 'done' }),
             result: {
                 toUIMessageStream: () =>
                     new ReadableStream({

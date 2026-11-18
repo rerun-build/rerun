@@ -59,6 +59,8 @@ vi.mock('../schedules/cron.js', () => ({
     isDue: (schedule: { slug: string }) => state.due.has(schedule.slug),
 }))
 vi.mock('../memory/maintenance.js', () => ({ sweepMemoriesIfDue: state.sweep }))
+const backupFree = vi.hoisted(() => ({ value: false }))
+vi.mock('../agents/backups.js', () => ({ pickBackup: async () => (backupFree.value ? { connection: { id: 'codex-sub' }, provider: 'codex', model: 'gpt-6-sol' } : null) }))
 vi.mock('./notify.js', () => ({
     sendNotification: async (input: Record<string, unknown>) => {
         state.sent.push(input)
@@ -128,6 +130,7 @@ afterEach(async () => {
     state.sweep.mockClear()
     clearBudgetLatch()
     clearPlanLimitLatch('claude-sub')
+    backupFree.value = false
     unregisterRunAbort('live-call')
     for (const runId of state.liveRunIds.splice(0)) unregisterRunAbort(runId)
     vi.useRealTimers()
@@ -218,6 +221,18 @@ describe('fireSchedule', () => {
         vi.useFakeTimers({ now: now + 31 * 60_000, toFake: ['Date'] })
         await fireSchedule('on', schedule('spent'))
         expect(state.runs).toHaveLength(2)
+    })
+
+    // The run itself moves to the backup: the schedule only has to stop holding it back.
+    it('fires while its subscription is spent when a backup is free', async () => {
+        state.provider = 'claude'
+        state.connectionId = 'claude-sub'
+        armPlanLimitLatch('claude-sub')
+        backupFree.value = true
+
+        await fireSchedule('on', schedule('spent-with-backup'))
+
+        expect(state.runs).toHaveLength(1)
     })
 
     it('fires a manual run through every latch', async () => {

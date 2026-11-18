@@ -25,11 +25,13 @@ async function drain(stream: ReadableStream<UIMessageChunk>): Promise<UIMessageC
     return out
 }
 
-function fakeRun(chunks: UIMessageChunk[], contextUsage?: AgentRun['contextUsage']) {
+function fakeRun(chunks: UIMessageChunk[], contextUsage?: AgentRun['contextUsage'], served = { provider: 'claude', model: 'opus' }) {
     const captured: { messageMetadata?: MetadataFn } = {}
     const run = {
         runId: 'r1',
+        ...served,
         settled: Promise.resolve({ kind: 'done' } as RunOutcome),
+        attempt: Promise.resolve({ kind: 'done' } as RunOutcome),
         contextUsage,
         result: {
             toUIMessageStream: (options: { messageMetadata: MetadataFn }) => {
@@ -71,7 +73,7 @@ describe('mergeRunStream', () => {
             { type: 'tool-output-available', toolCallId: 'c1', output: { status: 'delivered' } },
         ])
 
-        mergeRunStream(writer, run, { provider: 'claude', model: 'opus' })
+        mergeRunStream(writer, run)
         const chunks = (await drain(merged())) as Array<{ toolName?: string }>
 
         expect(chunks.map(c => c.toolName)).toEqual(['ask_user', 'ask_user', 'request_approval', 'mcp__files__read', undefined])
@@ -88,7 +90,7 @@ describe('mergeRunStream', () => {
             { type: 'tool-input-available', toolCallId: 'c2', toolName: 'ask_user', input: plain },
         ])
 
-        mergeRunStream(writer, run, { provider: 'claude', model: 'opus' })
+        mergeRunStream(writer, run)
         const chunks = (await drain(merged())) as Array<{ input?: unknown }>
 
         expect(chunks[0]).toMatchObject({ toolName: 'ask_user', input: { ...described, v: 2 } })
@@ -96,8 +98,8 @@ describe('mergeRunStream', () => {
     })
 
     it('stamps each finished step with the provider, the model and its usage', () => {
-        const { run, writer, captured } = fakeRun([])
-        mergeRunStream(writer, run, { provider: 'rerun', model: 'rerun-max' })
+        const { run, writer, captured } = fakeRun([], undefined, { provider: 'rerun', model: 'rerun-max' })
+        mergeRunStream(writer, run)
 
         const metadata = captured.messageMetadata!({ part: { type: 'finish-step', usage: { inputTokens: 120, outputTokens: 30, totalTokens: 150 } } })
 
@@ -111,7 +113,7 @@ describe('mergeRunStream', () => {
     it('adds the context window occupancy when the run captured one', () => {
         const context = { usedTokens: 42_000, maxTokens: 200_000 }
         const { run, writer, captured } = fakeRun([], () => context as any)
-        mergeRunStream(writer, run, { provider: 'claude', model: 'opus' })
+        mergeRunStream(writer, run)
 
         const metadata = captured.messageMetadata!({ part: { type: 'finish-step', usage: { inputTokens: 1, outputTokens: 2, totalTokens: 3, reasoningTokens: 4, cachedInputTokens: 5 } } }) as { usage: unknown }
 
@@ -120,7 +122,7 @@ describe('mergeRunStream', () => {
 
     it('leaves the usage bare when the capture has nothing yet', () => {
         const { run, writer, captured } = fakeRun([], () => undefined)
-        mergeRunStream(writer, run, { provider: 'claude', model: 'opus' })
+        mergeRunStream(writer, run)
 
         const metadata = captured.messageMetadata!({ part: { type: 'finish-step', usage: { inputTokens: 1 } } }) as { usage: Record<string, unknown> }
 
@@ -128,8 +130,8 @@ describe('mergeRunStream', () => {
     })
 
     it('attaches no metadata to any other part', () => {
-        const { run, writer, captured } = fakeRun([])
-        mergeRunStream(writer, run, { provider: 'rerun', model: 'rerun-max' })
+        const { run, writer, captured } = fakeRun([], undefined, { provider: 'rerun', model: 'rerun-max' })
+        mergeRunStream(writer, run)
 
         expect(captured.messageMetadata!({ part: { type: 'text-delta', text: 'hi' } })).toBeUndefined()
         expect(captured.messageMetadata!({ part: { type: 'finish', totalUsage: {} } })).toBeUndefined()
@@ -225,5 +227,37 @@ describe('cutOffWhenSettled edge cases', () => {
         const drained = drain(cutOffWhenSettled(fromChunks([{ type: 'finish', finishReason: 'stop' }]), new Promise<RunOutcome>(() => {})))
 
         expect(await drained).toEqual([{ type: 'finish', finishReason: 'stop' }])
+    })
+})
+
+describe('a turn handed to a backup', () => {
+    // The chat keeps one answer: what the first model said, the switch line, then the backup. The
+    // error of the subscription that ran out never reaches it, so no red notice shows.
+    it('streams the backup on in the same answer, after the switch line, with no error', async () => {
+        const change = { kind: 'switch', from: { connectionId: 'c1', provider: 'claude', model: 'opus', name: 'Claude' }, to: { connectionId: 'c2', provider: 'codex', model: 'gpt-6-sol', name: 'ChatGPT' }, resetsAt: null } as const
+        const next = {
+            runId: 'r1',
+            provider: 'codex',
+            model: 'gpt-6-sol',
+            providerSwitch: change,
+            settled: Promise.resolve({ kind: 'done' } as RunOutcome),
+            attempt: Promise.resolve({ kind: 'done' } as RunOutcome),
+            result: { toUIMessageStream: () => fromChunks([{ type: 'start' }, { type: 'text-delta', id: '1', delta: 'from the backup' }, { type: 'finish' }]) },
+        } as unknown as AgentRun
+        const first = {
+            runId: 'r1',
+            provider: 'claude',
+            model: 'opus',
+            settled: next.settled,
+            attempt: Promise.resolve({ kind: 'handover', next }),
+            result: { toUIMessageStream: () => fromChunks([{ type: 'start' }, { type: 'text-delta', id: '0', delta: 'from the first' }, { type: 'error', errorText: 'usage limit reached' }, { type: 'finish', finishReason: 'error' } as UIMessageChunk]) },
+        } as unknown as AgentRun
+        let merged: ReadableStream<UIMessageChunk> | undefined
+        mergeRunStream({ merge: (stream: ReadableStream<UIMessageChunk>) => (merged = stream), write() {} } as unknown as UIMessageStreamWriter, first)
+
+        const chunks = await drain(merged!)
+
+        expect(chunks.map(chunk => chunk.type)).toEqual(['start', 'text-delta', 'start', 'data-provider-switch', 'text-delta', 'finish'])
+        expect(chunks[3]).toEqual({ type: 'data-provider-switch', data: change })
     })
 })

@@ -11,7 +11,6 @@ import { registerRun } from './stream.js'
 // error they used to get for a failed run preparation instead of losing it inside the stream.
 export async function startHeadlessRun(agent: LoadedAgent, sessionId: string, message: string, override: ModelOverride | undefined, trigger: RunTrigger): Promise<AgentRun> {
     const run = await startRun(agent.id, sessionId)
-    const meta = { provider: override?.provider ?? agent.resolved.provider, model: override?.model ?? agent.resolved.model }
 
     let started!: (value: AgentRun) => void
     let failed!: (reason: unknown) => void
@@ -29,7 +28,7 @@ export async function startHeadlessRun(agent: LoadedAgent, sessionId: string, me
             throw err
         }
         started(agentRun)
-        mergeRunStream(writer, agentRun, meta)
+        mergeRunStream(writer, agentRun)
     })
 
     // No body means nothing drains the run, so it would never start and the caller would wait

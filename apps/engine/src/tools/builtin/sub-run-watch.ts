@@ -155,7 +155,7 @@ type StreamPart = { type: string; text?: string; toolName?: string; toolCallId?:
  * already said comes back with the stop reason, so the caller keeps the partial work.
  */
 export async function followSubRun(
-    run: Pick<AgentRun, 'result' | 'runId'> & Partial<Pick<AgentRun, 'settled'>>,
+    run: Pick<AgentRun, 'result' | 'runId'> & Partial<Pick<AgentRun, 'settled' | 'attempt'>>,
     progress: SubRunProgress,
     { onChange, parentSignal, taskSignal, idleTimeoutMs = SUB_RUN_IDLE_TIMEOUT_MS }: FollowOptions,
 ): Promise<SubRunOutcome> {
@@ -181,7 +181,8 @@ export async function followSubRun(
     if (taskSignal?.aborted) onTaskAbort()
     else taskSignal?.addEventListener('abort', onTaskAbort, { once: true })
 
-    const iterator = (run.result.fullStream as AsyncIterable<StreamPart>)[Symbol.asyncIterator]()
+    let attempt = run
+    let iterator = (attempt.result.fullStream as AsyncIterable<StreamPart>)[Symbol.asyncIterator]()
     let text = ''
     let streamError: string | undefined
     armIdleTimer()
@@ -193,7 +194,22 @@ export async function followSubRun(
                 await run.settled
                 return { text, stopReason: next.stopReason }
             }
-            if (next.done) break
+            if (next.done) {
+                // A sub-coworker whose subscription ran out carries on on a backup, in a stream of its own.
+                const ended = await Promise.race([attempt.attempt ?? Promise.resolve({ kind: 'done' as const }), stopped])
+                if ('kind' in ended && ended.kind === 'handover') {
+                    attempt = ended.next
+                    iterator = (attempt.result.fullStream as AsyncIterable<StreamPart>)[Symbol.asyncIterator]()
+                    streamError = undefined
+                    continue
+                }
+                if ('stopReason' in ended) {
+                    abortRun(run.runId)
+                    await run.settled
+                    return { text, stopReason: ended.stopReason }
+                }
+                break
+            }
 
             const part = next.value
             progress.lastActivityAt = Date.now()

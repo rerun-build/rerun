@@ -1,5 +1,5 @@
 import { streamText, wrapLanguageModel, type LanguageModelUsage, type ModelMessage, type StreamTextResult, type ToolSet, type UIMessageStreamWriter } from 'ai'
-import { RERUN_CONNECTION_ID, contextTextPart, type ContextOccupancy, type MessageAuthor } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, contextTextPart, providerSwitchEntry, type ContextOccupancy, type MessageAuthor, type ProviderSwitch } from '@rerun/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
 import { prepareRunHistory } from './compaction/compact.js'
@@ -8,7 +8,8 @@ import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessa
 import { CLI_PROVIDERS, resolveModel, type ModelOverride } from '../agents/providers.js'
 import { offersQuickReplies, quickRepliesCall, type QuickRepliesCapture } from '../agents/quick-replies-stream.js'
 import { codexThreadToResume, forgetCodexThread, rememberCodexThread } from '../agents/codex-threads.js'
-import { repairBoxDefault, resolveRunModel } from '../agents/availability.js'
+import { repairBoxDefault, toOverride, type RunModel } from '../agents/availability.js'
+import { hasBackups, limitReached, pickBackup, servedRunModel, switchOpeningTurn } from '../agents/backups.js'
 import { claudeTokenOf, claudeTokenOutlived } from '../connections/claude-token.js'
 import { ensureCliAuth } from '../connections/cli-auth.js'
 import { syncCodexAuth } from '../connections/codex-auth.js'
@@ -23,7 +24,7 @@ import type { LoadedAgent } from '../agents/types.js'
 import { turnOrder } from '../agents/turn-order.js'
 import { answeringModel } from '../agents/rerun-upstream.js'
 import { listAgentIndex, setAgentStatus } from '../db/repos/agents.js'
-import { appendMessage, lastMessageId, listSessionAuthorIds, setMessageToolCalls } from '../db/repos/messages.js'
+import { appendMessage, lastMessageId, lastProviderSwitch, listSessionAuthorIds, setMessageToolCalls } from '../db/repos/messages.js'
 import type { MessageRow } from '../db/schema.js'
 import { isSharedConversation, signText } from './message-authors.js'
 import { bumpRunStep, cancelRun, failRun, finishRun, setRunContext, startRun } from '../db/repos/runs.js'
@@ -53,14 +54,38 @@ import { agentMcpServers } from '../vault/runtime.js'
 
 export type RunOutcome = { kind: 'done' | 'error' | 'cancelled'; error?: string; errorCode?: RunErrorCode | null }
 
+// How one provider's go at a turn ended. A turn whose subscription ran out mid-way is handed to a
+// backup: the same run carries on as `next`, on another provider, in the same stream.
+export type AttemptOutcome = RunOutcome | { kind: 'handover'; next: AgentRun }
+
 export type AgentRun = {
     result: StreamTextResult<ToolSet, never>
     runId: string
-    // Always resolves, exactly once, whatever the provider does. Callers that need to know a run is
-    // over must await this rather than `result.finishReason`, which never settles when a stream hangs.
+    // Always resolves, exactly once, whatever the provider does, with how the whole run ended once
+    // every backup it was handed to is done. Callers that need to know a run is over must await
+    // this rather than `result.finishReason`, which never settles when a stream hangs.
     settled: Promise<RunOutcome>
+    attempt: Promise<AttemptOutcome>
+    provider: string
+    model: string
+    // The line the chat shows before this attempt's answer, when it runs on another model than the
+    // conversation's last one.
+    providerSwitch?: ProviderSwitch
     contextUsage?: () => ContextOccupancy | undefined
     quickReplies?: () => QuickRepliesCapture | undefined
+}
+
+// What a backup takes over from the attempt that hit the limit: the run's abort controller and
+// session claim, the subscriptions already tried, and the switch lines not yet stored with a message.
+type Handover = { controller: AbortController; tried: Set<string>; to: RunModel; change: ProviderSwitch; unstored: ProviderSwitch[]; steps: number }
+
+const CONTINUE_AFTER_SWITCH = 'The previous model stopped partway through this turn. Continue from where it left off.'
+
+// The turn is already stored and ends the history, unless the model that ran out had started to
+// answer: a turn has to end on the user's side, so a note asks the backup to carry on.
+function continuationTurn(history: ModelMessage[]): ModelMessage[] {
+    if (history.at(-1)?.role === 'user') return history
+    return [...history, { role: 'user', content: [contextTextPart(CONTINUE_AFTER_SWITCH)] }]
 }
 
 export type { RunTrigger }
@@ -212,7 +237,7 @@ async function recordStepTelemetry(agentId: string, sessionId: string, runId: st
 }
 
 export async function runAgent(agent: LoadedAgent, sessionId: string, userText: string, override?: ModelOverride, writer?: UIMessageStreamWriter, runId?: string, trigger: RunTrigger = { source: 'chat' }): Promise<AgentRun> {
-    return runTurn(agent, sessionId, userText, override, writer, runId, trigger)
+    return runTurn(agent, sessionId, userText, override, writer, runId, trigger, undefined)
 }
 
 // How a turn ends. Everything terminal about a run is expressed as one of these three and handed to
@@ -222,16 +247,20 @@ type Settlement =
     | { kind: 'error'; error: unknown; errorCode?: RunErrorCode | null; messages?: ModelMessage[] }
     | { kind: 'cancelled' }
 
-async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: string, override: ModelOverride | undefined, writer: UIMessageStreamWriter | undefined, runId: string | undefined, trigger: RunTrigger): Promise<AgentRun> {
+async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: string, override: ModelOverride | undefined, writer: UIMessageStreamWriter | undefined, runId: string | undefined, trigger: RunTrigger, handover: Handover | undefined): Promise<AgentRun> {
     // The run row and its abort controller exist before any preparation step can throw: for chat
     // and headless callers the row was already inserted, and a throw in `resolveRunModel` or the
     // tool/MCP setup would otherwise leave it `running` forever with no terminal event for the hub.
     const run = runId ? { id: runId } : await startRun(baseAgent.id, sessionId)
-    const controller = registerRunAbort(run.id, baseAgent.id)
+    const controller = handover?.controller ?? registerRunAbort(run.id, baseAgent.id)
     const author = trigger.source === 'chat' ? trigger.author : undefined
+    const tried = handover?.tried ?? new Set<string>()
 
     let agent = baseAgent
-    let { connection, provider, model } = baseAgent.resolved
+    let runOverride = handover ? toOverride(handover.to) : override
+    let { connection, provider, model } = handover?.to ?? baseAgent.resolved
+    let providerSwitch: ProviderSwitch | undefined = handover?.change
+    const unstoredSwitches = [...(handover?.unstored ?? []), ...(handover ? [handover.change] : [])]
     let closeTools = async (): Promise<void> => {}
     let closeModel = async (): Promise<void> => {}
     let appendP: Promise<unknown> = Promise.resolve()
@@ -240,7 +269,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     let cliAuthP: Promise<() => void> | undefined
     let spawnToken: string | undefined
     let codexThreadId: string | undefined
-    let steps = 0
+    let steps = handover?.steps ?? 0
     const partialResults: PartialResult[] = []
     const skillProposals: SkillProposalNotice[] = []
 
@@ -271,16 +300,48 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     }
 
     let settled = false
-    let resolveSettled!: (outcome: RunOutcome) => void
-    const settledPromise = new Promise<RunOutcome>(resolve => {
+    let resolveSettled!: (outcome: AttemptOutcome) => void
+    const settledPromise = new Promise<AttemptOutcome>(resolve => {
         resolveSettled = resolve
     })
+
+    // Each switch line this attempt opened with sits beside its first answer, where a reload puts it
+    // back. With nothing written, they wait for the next message the run stores.
+    const storeSwitches = async (rows: MessageRow[]): Promise<Map<string, unknown[]>> => {
+        const sidecar = new Map<string, unknown[]>()
+        const first = rows.find(row => row.role === 'assistant')
+        if (first && unstoredSwitches.length) sidecar.set(first.id, unstoredSwitches.splice(0).map(providerSwitchEntry))
+        return sidecar
+    }
+    const writeSidecar = async (sidecar: Map<string, unknown[]>): Promise<void> => {
+        for (const [rowId, calls] of sidecar) await setMessageToolCalls(agent.id, rowId, calls).catch(() => {})
+    }
+
+    // The subscription is out and a backup is free: the run goes on there instead of failing. The
+    // session stays claimed and the run stays open, so nothing can slip in between the two.
+    const handOver = async (to: RunModel): Promise<AttemptOutcome> => {
+        if (!(await closeSafely()) && provider === 'codex') forgetCodexThread(agent.id, sessionId)
+        void cliAuthP?.then(release => release(), () => {})
+        const from = { connection, provider, model }
+        const change = limitReached(from, to)
+        logger.warn({ agent: agent.id, run: run.id, from: `${connection?.id}:${model}`, to: `${to.connection?.id}:${to.model}` }, 'subscription limit reached, handing the turn to a backup')
+        let outcome: AttemptOutcome
+        try {
+            const next = await runTurn(baseAgent, sessionId, userText, override, writer, run.id, trigger, { controller, tried, to, change, unstored: unstoredSwitches, steps })
+            outcome = { kind: 'handover', next }
+        } catch (err) {
+            // The backup's own preparation failed and already closed the run, row and event included.
+            outcome = { kind: 'error', error: errorMessageOf(err), errorCode: null }
+        }
+        resolveSettled(outcome)
+        return outcome
+    }
 
     // The one and only terminal path of a run. `streamText` gives no guarantee that `onFinish` or
     // `onError` is ever called -- a CLI provider that wedges on an expired token simply stops
     // streaming -- so every way a turn can end funnels here, and the guard makes a second arrival
     // a no-op instead of a duplicate row write and a duplicate hub event.
-    const settle = async (settlement: Settlement): Promise<RunOutcome> => {
+    const settle = async (settlement: Settlement): Promise<AttemptOutcome> => {
         if (settled) return settledPromise
         settled = true
 
@@ -294,15 +355,18 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
 
         if (settlement.kind === 'done') {
             const messages = canonicalizeHitlNames(settlement.messages)
-            let answerRow: MessageRow | undefined
+            const rows: MessageRow[] = []
             for (const message of messages) {
                 const row = await appendMessage(agent.id, sessionId, message).catch(() => undefined)
-                if (row?.role === 'assistant') answerRow = row
+                if (row) rows.push(row)
             }
+            const answerRow = rows.findLast(row => row.role === 'assistant')
             pending = findPendingHitl(messages)
+            const sidecar = await storeSwitches(rows)
             // A turn that ends on a card ignores the replies: the card already says how to answer.
             const replies = quickReplies?.()
-            if (replies && answerRow && !pending) await setMessageToolCalls(agent.id, answerRow.id, [quickRepliesCall(replies)]).catch(() => {})
+            if (replies && answerRow && !pending) sidecar.set(answerRow.id, [...(sidecar.get(answerRow.id) ?? []), quickRepliesCall(replies)])
+            await writeSidecar(sidecar)
             if (provider === 'rerun') clearBudgetLatch()
             if (provider === 'codex') await keepCodexThread().catch(() => forgetCodexThread(agent.id, sessionId))
             await finishRun(agent.id, run.id, settlement.usage, steps, settlement.costMicros, contextUsage?.()).catch(() => {})
@@ -346,7 +410,14 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             }
             // A turn that failed mid-flight still said things worth keeping; without this the user
             // loses everything the agent had already produced.
-            if (settlement.messages) for (const message of canonicalizeHitlNames(settlement.messages)) await appendMessage(agent.id, sessionId, message).catch(() => {})
+            const rows: MessageRow[] = []
+            for (const message of canonicalizeHitlNames(settlement.messages ?? [])) {
+                const row = await appendMessage(agent.id, sessionId, message).catch(() => undefined)
+                if (row) rows.push(row)
+            }
+            await writeSidecar(await storeSwitches(rows))
+            const backup = errorCode === RUN_ERROR_CODES.usageLimit && connection && !controller.signal.aborted ? await pickBackup(tried) : null
+            if (backup) return handOver(backup)
             await failRun(agent.id, run.id, errorMessage).catch(() => {})
             outcome = { kind: 'error', error: errorMessage, errorCode }
         }
@@ -388,10 +459,23 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         }
 
         if (outcome.kind === 'done' && !pending && agent.config.selfImprovement.enabled && userText) {
-            void runCurator(agent, sessionId, userText, text ?? '', override).catch(e => logger.warn({ err: String(e) }, 'curator failed'))
+            void runCurator(agent, sessionId, userText, text ?? '', runOverride).catch(e => logger.warn({ err: String(e) }, 'curator failed'))
         }
 
         return outcome
+    }
+
+    // A subscription already out sends the turn straight to a backup, and the conversation says so
+    // once; a turn served again by the subscription it had left says it is back.
+    const servedOpening = async (): Promise<RunModel> => {
+        const { served, asked, askedOut } = await servedRunModel(baseAgent, override)
+        if (served !== asked) runOverride = toOverride(served)
+        if (served !== asked || (await hasBackups())) {
+            const last = await lastProviderSwitch(baseAgent.id, sessionId).catch(() => null)
+            providerSwitch = switchOpeningTurn(asked, served, last, askedOut)
+            if (providerSwitch) unstoredSwitches.push(providerSwitch)
+        }
+        return served
     }
 
     // The thread is only worth resuming once it holds the same turns as the session: the marker is
@@ -411,13 +495,15 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
     try {
         // The recall waits on the hub's embedding: it runs alongside the whole preparation rather
         // than after it. It never rejects, a failed search only means no memories this turn.
-        const memoriesP = recallMemories(baseAgent, userText)
+        // A backup carrying on a turn finds it stored already, recalled memories included.
+        const memoriesP = handover ? Promise.resolve([]) : recallMemories(baseAgent, userText)
         // An override can name a different box connection than the agent's default, so the run works
         // off a view of the agent bound to the connection it will actually bill. The connection object
         // itself stays the shared instance, so a token refreshed here is refreshed for everyone.
-        const resolved = await resolveRunModel(baseAgent, override)
+        const resolved = handover ? handover.to : await servedOpening()
         agent = resolved === baseAgent.resolved ? baseAgent : { ...baseAgent, resolved }
         ;({ connection, provider, model } = resolved)
+        if (connection) tried.add(connection.id)
         const t0 = Date.now()
         const order = turnOrder(provider, await answeringModel(provider, model))
         const callableAgentIds = trigger.source === 'chat' ? trigger.callableAgentIds : undefined
@@ -461,7 +547,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         // the prompt, and the provider would read the whole conversation again outside its cache.
         const sentNames = heldBackMcp ? sentToolNames(tools, heldBackMcp) : undefined
         const sentTools = sentNames ? Object.fromEntries(sentNames.map(name => [name, tools[name]])) : tools
-        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, override, shared, toolPayloadChars(sentTools)))
+        const history = repairToolPairs(await prepareRunHistory(ctx, systemText, runOverride, shared, toolPayloadChars(sentTools)))
 
         const [memories, mcpServers] = await Promise.all([memoriesP, mcpServersP, cliAuthP])
         const recall = recallSection(memories, history)
@@ -476,18 +562,20 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         // A shared conversation already signs each turn with its sender.
         const suffix = [recall, shared ? '' : userBlock(author?.name), userLanguageBlock(trigger.source === 'chat' ? trigger.userLanguage : undefined), nowBlock()].filter(Boolean).join('\n\n')
         const context = suffix ? [contextTextPart(suffix)] : []
-        appendP = appendMessage(agent.id, sessionId, { role: 'user', content: [{ type: 'text', text: userText }, ...context] }, author)
-        appendP.catch(err => logger.error({ err: String(err), agent: agent.id }, 'append user message failed'))
+        if (!handover) {
+            appendP = appendMessage(agent.id, sessionId, { role: 'user', content: [{ type: 'text', text: userText }, ...context] }, author)
+            appendP.catch(err => logger.error({ err: String(err), agent: agent.id }, 'append user message failed'))
+        }
         ctx.userTurnStored = appendP.catch(() => {})
 
         const turnText = shared ? signText(userText, author) : userText
-        const turnMessages: ModelMessage[] = [...history, { role: 'user', content: [{ type: 'text', text: turnText }, ...context] }]
+        const turnMessages: ModelMessage[] = handover ? continuationTurn(history) : [...history, { role: 'user', content: [{ type: 'text', text: turnText }, ...context] }]
 
         const cached = applyCaching(provider, { system, messages: turnMessages, sessionId, model })
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
         spawnToken = claudeTokenOf(connection)
-        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId })
+        const resolvedModel = resolveModel(agent, runOverride, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         // Cut out of the text whoever wrote it; only a coworker that offers replies gets the buttons.
@@ -587,7 +675,8 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             )
         })().catch(err => logger.warn({ err: String(err), agent: agent.id, run: run.id }, 'run drain failed'))
 
-        return { result, runId: run.id, settled: settledPromise, contextUsage, quickReplies }
+        const settledRun = settledPromise.then(outcome => (outcome.kind === 'handover' ? outcome.next.settled : outcome))
+        return { result, runId: run.id, settled: settledRun, attempt: settledPromise, provider, model, providerSwitch, contextUsage, quickReplies }
     } catch (err) {
         // Everything past `streamText` is handled by its own callbacks: the `return` above makes
         // this catch unreachable once the stream has started, so a run is closed exactly once.

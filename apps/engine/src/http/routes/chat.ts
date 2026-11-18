@@ -1,6 +1,5 @@
 import { chatRequestSchema, ENGINE_SESSION_NOT_FOUND, type SessionSource } from '@rerun/contracts'
 import { Hono } from 'hono'
-import { resolveRunModel } from '../../agents/availability.js'
 import { getAgent } from '../../agents/registry.js'
 import { claimInstallSession } from '../../agents/setup.js'
 import { createSession, getSession } from '../../db/repos/sessions.js'
@@ -34,10 +33,6 @@ chatRoutes.post('/chat', async c => {
     const session = claim ? claim.session : await resolveSession(agentId, body.sessionId, source)
     if (!session) return c.json({ error: ENGINE_SESSION_NOT_FOUND }, 404)
     const override = { connectionId: body.connectionId, provider: body.provider, model: body.model }
-    // The same resolution the run makes, so the message names the pair that really ran: the
-    // provider of the connection the override picked, and the model the plan lets it run.
-    const { provider, model } = await resolveRunModel(agent, override)
-    const meta = { provider, model }
     const runId = newId()
     const holder = claimSession(session.id, runId, body.author?.id)
     if (holder) {
@@ -53,7 +48,7 @@ chatRoutes.post('/chat', async c => {
     const response = toResumableStreamResponse(run.id, async writer => {
         try {
             const agentRun = await runAgent(runAgentView, session.id, body.message, override, writer, run.id, { source: 'chat', author: body.author, userLanguage: claim ? body.userLanguage : undefined, callableAgentIds: body.callableAgentIds })
-            mergeRunStream(writer, agentRun, meta)
+            mergeRunStream(writer, agentRun)
         } catch (err) {
             // runAgent registers the run's abort controller itself, and unregistering it is what
             // frees the session. It never got that far here, so free the claim by hand.

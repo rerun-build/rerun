@@ -10,7 +10,7 @@ const state = vi.hoisted(() => ({
     started: 0,
     prepError: null as Error | null,
     calls: [] as unknown[][],
-    merges: [] as Array<{ agentRun: unknown; meta: unknown }>,
+    merges: [] as Array<{ agentRun: unknown }>,
 }))
 
 vi.mock('../db/repos/runs.js', () => ({
@@ -24,8 +24,8 @@ vi.mock('./loop.js', () => ({
     },
 }))
 vi.mock('./run-stream-merge.js', () => ({
-    mergeRunStream: (writer: { write: (chunk: unknown) => void }, agentRun: unknown, meta: unknown) => {
-        state.merges.push({ agentRun, meta })
+    mergeRunStream: (writer: { write: (chunk: unknown) => void }, agentRun: unknown) => {
+        state.merges.push({ agentRun })
         writer.write({ type: 'data-marker', data: { merged: true } })
     },
 }))
@@ -69,22 +69,11 @@ describe('startHeadlessRun', () => {
         expect(replay).toContain('"merged":true')
     })
 
-    it('labels the stream with the agent model when there is no override', async () => {
-        await startHeadlessRun(agent, 'sess-3', 'do it', undefined, trigger)
+    // The run names the pair it is served on, a backup included, so the stream takes it from there.
+    it('merges the run the loop handed back', async () => {
+        const run = await startHeadlessRun(agent, 'sess-3', 'do it', undefined, trigger)
 
-        expect(state.merges[0].meta).toEqual({ provider: 'openai', model: 'gpt-default' })
-    })
-
-    it('labels the stream with the override model when there is one', async () => {
-        await startHeadlessRun(agent, 'sess-4', 'do it', { provider: 'rerun', model: 'fast' }, trigger)
-
-        expect(state.merges[0].meta).toEqual({ provider: 'rerun', model: 'fast' })
-    })
-
-    it('fills a partial override from the agent', async () => {
-        await startHeadlessRun(agent, 'sess-5', 'do it', { model: 'only-model' }, trigger)
-
-        expect(state.merges[0].meta).toEqual({ provider: 'openai', model: 'only-model' })
+        expect(state.merges[0].agentRun).toMatchObject({ runId: run.runId })
     })
 
     it('rejects with the preparation error instead of losing it in the stream', async () => {

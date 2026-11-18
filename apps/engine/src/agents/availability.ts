@@ -118,7 +118,7 @@ export async function resolveAutomationModel(agent: LoadedAgent, requested?: Mod
     return toOverride(isUsable(fallback.connection, fallback.model) ? fallback : agent.resolved)
 }
 
-function toOverride(run: RunModel): ModelOverride {
+export function toOverride(run: RunModel): ModelOverride {
     return { connectionId: run.connection?.id, provider: run.provider, model: run.model }
 }
 

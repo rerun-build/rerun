@@ -1,4 +1,5 @@
 import { automationModel } from '../agents/availability.js'
+import { pickBackup } from '../agents/backups.js'
 import { listAgentIdsOnDisk } from '../agents/loader.js'
 import { getAgent } from '../agents/registry.js'
 import { createSession } from '../db/repos/sessions.js'
@@ -38,7 +39,9 @@ export async function fireSchedule(agentId: string, schedule: Schedule, opts?: {
     // Only the managed provider burns the workspace budget, so an agent on its own key still fires.
     const override = await automationModel(agent, schedule, 'schedule')
     if (!opts?.manual && override.provider === 'rerun' && isBudgetLatched()) throw budgetExhausted()
-    if (!opts?.manual && override.connectionId && isPlanLimitLatched(override.connectionId)) throw subscriptionLimited()
+    // A subscription that ran out still lets the schedule fire when a backup is free: the run goes
+    // there on its own. With none, it stays due until the reset.
+    if (!opts?.manual && override.connectionId && isPlanLimitLatched(override.connectionId) && !(await pickBackup(new Set([override.connectionId])))) throw subscriptionLimited()
     // Stamped before the launch, not after: a schedule whose run preparation keeps throwing would
     // otherwise stay due forever and re-fire on every 30s tick. The trade-off is at-most-once — a
     // crash mid-run costs that occurrence instead of replaying work that may already be done.

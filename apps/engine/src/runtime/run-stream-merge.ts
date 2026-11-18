@@ -1,9 +1,9 @@
 import type { Usage } from '@rerun/contracts'
 import type { LanguageModelUsage, UIMessageChunk, UIMessageStreamWriter } from 'ai'
-import { QUICK_REPLIES_TOOL, withHitlVersion } from '@rerun/contracts'
+import { PROVIDER_SWITCH_PART, QUICK_REPLIES_TOOL, withHitlVersion } from '@rerun/contracts'
 import { canonicalHitlName, isHitlToolName } from '../tools/builtin/hitl.js'
 import type { QuickRepliesCapture } from '../agents/quick-replies-stream.js'
-import type { AgentRun, RunOutcome } from './loop.js'
+import type { AgentRun, AttemptOutcome } from './loop.js'
 
 // A settled run whose provider stream never closes would otherwise keep the SSE response and the
 // replay buffer alive: the dashboard reconnects to a stream that will never emit again, and the
@@ -61,22 +61,49 @@ export function withQuickReplies(stream: ReadableStream<UIMessageChunk>, read: (
 
 const isCleanFinish = (finishReason: string | undefined): boolean => finishReason === undefined || finishReason === 'stop' || finishReason === 'tool-calls'
 
-export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled: Promise<RunOutcome>): ReadableStream<UIMessageChunk> {
-    const reader = body.getReader()
+// What the chat must not see from an attempt that may hand its turn to a backup: the error and the
+// failed finish of a subscription that ran out. Held until the attempt says how it ended.
+const mayBeHandedOver = (chunk: UIMessageChunk): boolean => chunk.type === 'error' || (chunk.type === 'finish' && !isCleanFinish(chunk.finishReason))
+
+export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled: Promise<AttemptOutcome>, continueWith?: (next: AgentRun) => ReadableStream<UIMessageChunk>): ReadableStream<UIMessageChunk> {
+    let reader = body.getReader()
     let cutTimer: ReturnType<typeof setTimeout> | undefined
     let closed = false
+    const held: UIMessageChunk[] = []
     return new ReadableStream<UIMessageChunk>({
         start(controller) {
-            const finish = (outcome?: RunOutcome): void => {
-                if (closed) return
-                closed = true
-                if (outcome?.kind === 'error') controller.enqueue({ type: 'error', errorText: outcome.error ?? 'The run failed.' })
+            const close = (): void => {
                 try {
                     controller.close()
                 } catch {
                     // The consumer already went away.
                 }
+            }
+            // The backup's stream goes on in this one, so the chat keeps a single answer.
+            const carryOn = async (next: AgentRun): Promise<void> => {
+                reader = continueWith!(next).getReader()
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read()
+                        if (done) break
+                        controller.enqueue(value)
+                    }
+                } catch {
+                    // The backup's stream already closed itself with its own outcome.
+                }
+                close()
+            }
+            const finish = (outcome?: AttemptOutcome): void => {
+                if (closed) return
+                closed = true
                 void reader.cancel().catch(() => {})
+                if (outcome?.kind === 'handover' && continueWith) {
+                    void carryOn(outcome.next)
+                    return
+                }
+                for (const chunk of held.splice(0)) controller.enqueue(chunk)
+                if (outcome?.kind === 'error') controller.enqueue({ type: 'error', errorText: outcome.error ?? 'The run failed.' })
+                close()
             }
             // A run that reached `done` produced its finish part, so its stream closes on its own:
             // cutting it would truncate the tail of a perfectly good answer.
@@ -91,7 +118,8 @@ export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled:
                         const { done, value } = await reader.read()
                         if (done || closed) break
                         if (value.type === 'finish') endedCleanly = isCleanFinish(value.finishReason)
-                        controller.enqueue(value)
+                        if (continueWith && mayBeHandedOver(value)) held.push(value)
+                        else controller.enqueue(value)
                     }
                 } catch {
                     // Fall through: the run's own outcome is what the client needs, not this read error.
@@ -112,25 +140,49 @@ export function cutOffWhenSettled(body: ReadableStream<UIMessageChunk>, settled:
     })
 }
 
-export function mergeRunStream(writer: UIMessageStreamWriter, run: AgentRun, meta: { provider: string; model: string }): void {
-    writer.merge(
-        cutOffWhenSettled(
-            withQuickReplies(
-                normalizeHitlStream(
-                    run.result.toUIMessageStream({
-                        messageMetadata: ({ part }) => {
-                            if (part.type === 'finish-step') {
-                                const usage = addUsage(undefined, part.usage)
-                                const context = run.contextUsage?.()
-                                return { ...meta, usage: context ? { ...usage, context } : usage }
-                            }
-                            return undefined
-                        },
-                    }),
-                ),
-                run.quickReplies,
-            ),
-            run.settled,
-        ),
+// The switch line goes right after the message opens, before anything the model says.
+function withLeadingPart(body: ReadableStream<UIMessageChunk>, part: UIMessageChunk): ReadableStream<UIMessageChunk> {
+    let sent = false
+    return body.pipeThrough(
+        new TransformStream<UIMessageChunk, UIMessageChunk>({
+            transform(chunk, controller) {
+                if (!sent && chunk.type !== 'start') {
+                    sent = true
+                    controller.enqueue(part)
+                }
+                controller.enqueue(chunk)
+            },
+            flush(controller) {
+                if (!sent) controller.enqueue(part)
+            },
+        }),
     )
+}
+
+function attemptStream(run: AgentRun): ReadableStream<UIMessageChunk> {
+    const meta = { provider: run.provider, model: run.model }
+    const body = cutOffWhenSettled(
+        withQuickReplies(
+            normalizeHitlStream(
+                run.result.toUIMessageStream({
+                    messageMetadata: ({ part }) => {
+                        if (part.type === 'finish-step') {
+                            const usage = addUsage(undefined, part.usage)
+                            const context = run.contextUsage?.()
+                            return { ...meta, usage: context ? { ...usage, context } : usage }
+                        }
+                        return undefined
+                    },
+                }),
+            ),
+            run.quickReplies,
+        ),
+        run.attempt,
+        attemptStream,
+    )
+    return run.providerSwitch ? withLeadingPart(body, { type: PROVIDER_SWITCH_PART, data: run.providerSwitch }) : body
+}
+
+export function mergeRunStream(writer: UIMessageStreamWriter, run: AgentRun): void {
+    writer.merge(attemptStream(run))
 }

@@ -286,6 +286,14 @@ Up to 5 backups. `400` for the `rerun` connection (the credit is the `rerunCredi
 tried only once every listed backup is out), a duplicate pair or a model the connection does not
 offer; `404` for an unknown connection. Deleting a connection drops its backups.
 
+When a run fails on a usage limit and a backup is free (not the subscription that ran out, not
+itself at its limit, usable), the same run carries on there: same run id, same stream, the user
+message stored once. The stream gets a `data-provider-switch` part before the backup's answer, and
+the marker is stored in the `toolCallsJson` of the first message the backup writes. While a
+subscription's limit lasts, new runs on it start on the first free backup, and a scheduled run fires
+there instead of being skipped. Once the limit resets, the next run is back on the subscription and
+says so with a `back` marker.
+
 ### `POST /connections`
 
 ```json

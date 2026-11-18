@@ -1,6 +1,6 @@
-import { and, asc, desc, eq, gt, gte, isNotNull, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gt, gte, isNotNull, like, sql } from 'drizzle-orm'
 import type { ModelMessage } from 'ai'
-import { visibleText, type MessageAuthor } from '@rerun/contracts'
+import { PROVIDER_SWITCH_ENTRY, readProviderSwitchEntry, visibleText, type MessageAuthor, type ProviderSwitch } from '@rerun/contracts'
 import { getSystemDb } from '../systemDb.js'
 import { messages, type MessageRow } from '../schema.js'
 import { newId, nowIso } from '../../lib/ids.js'
@@ -35,6 +35,21 @@ export async function appendMessage(agentId: string, sessionId: string, message:
 export async function setMessageToolCalls(agentId: string, messageId: string, calls: unknown[]): Promise<void> {
     const { db } = await getSystemDb(agentId)
     await db.update(messages).set({ toolCallsJson: JSON.stringify(calls) }).where(eq(messages.id, messageId))
+}
+
+// The last time this conversation moved between a subscription and a backup, read off the markers
+// stored beside its messages.
+export async function lastProviderSwitch(agentId: string, sessionId: string): Promise<ProviderSwitch | null> {
+    const { db } = await getSystemDb(agentId)
+    const [row] = await db
+        .select({ toolCallsJson: messages.toolCallsJson })
+        .from(messages)
+        .where(and(eq(messages.sessionId, sessionId), like(messages.toolCallsJson, `%"${PROVIDER_SWITCH_ENTRY}"%`)))
+        .orderBy(desc(messages.createdAt), desc(sql`rowid`))
+        .limit(1)
+    if (!row?.toolCallsJson) return null
+    const entries = JSON.parse(row.toolCallsJson) as unknown[]
+    return entries.map(readProviderSwitchEntry).filter(change => change !== null).at(-1) ?? null
 }
 
 export async function listMessages(agentId: string, sessionId: string): Promise<MessageRow[]> {
