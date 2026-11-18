@@ -75,6 +75,9 @@ export const vaultTokenPath = (id: string, server: string) => resolve(vaultToken
 // this file stays invisible to the listing.
 export const boxDefaultPath = () => resolve(connectionsDir(), 'default.json')
 
+// The models a run moves to when its subscription hits its usage limit, beside the default.
+export const boxBackupsPath = () => resolve(connectionsDir(), 'backups.json')
+
 // What the hub last said about the workspace's plan, which decides whether premium models run.
 export const boxPlanPath = () => resolve(dataDir(), 'plan.json')
 

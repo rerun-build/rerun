@@ -1,10 +1,11 @@
 import { Hono } from 'hono'
-import { RERUN_CONNECTION_ID, boxDefaultModelSchema, createConnectionSchema, customProbeInputSchema, updateConnectionKeysSchema, updateConnectionSchema } from '@rerun/contracts'
+import { RERUN_CONNECTION_ID, boxBackupsSchema, boxDefaultModelSchema, createConnectionSchema, customProbeInputSchema, updateConnectionKeysSchema, updateConnectionSchema } from '@rerun/contracts'
 import { connectionExists, isConnected, toSummary } from '../../connections/loader.js'
 import { findConnection, getConnection, listConnections } from '../../connections/registry.js'
 import { assertConnectionDeletable, createConnection, deleteConnection, patchConnection, updateConnectionKeys } from '../../connections/store.js'
 import { connectionUsage, releaseConnection } from '../../connections/release.js'
 import { clearBoxDefault, readBoxDefault, writeBoxDefault } from '../../connections/default.js'
+import { dropConnectionBackups, readBoxBackups, writeBoxBackups } from '../../connections/backups.js'
 import { servesModel } from '../../connections/resolve.js'
 import { defaultModelOf, repairBoxDefault } from '../../agents/availability.js'
 import { refreshCodexPlanLimits, refreshStaleCodexPlanLimits } from '../../connections/codex-plan-limits.js'
@@ -37,7 +38,7 @@ connectionRoutes.get('/', async c => {
     refreshStaleOpencodePlanLimits(connections)
     if (connections.some(connection => connection.config.provider === 'opencode')) refreshStaleOpencodeCatalog()
     refreshStaleCustomCatalogs(connections)
-    return c.json({ connections: connections.map(toSummary), default: await readBoxDefault() })
+    return c.json({ connections: connections.map(toSummary), default: await readBoxDefault(), backups: await readBoxBackups() })
 })
 
 // Registered before `/:id`: Hono matches same-method routes in registration order, so `/default`
@@ -53,6 +54,22 @@ connectionRoutes.put('/default', async c => {
 connectionRoutes.delete('/default', async c => {
     await clearBoxDefault()
     return c.json({ default: null })
+})
+
+// The whole list at once: the order is the setting, so a reorder is a write of the list.
+connectionRoutes.put('/backups', async c => {
+    const next = boxBackupsSchema.parse(await c.req.json())
+    const seen = new Set<string>()
+    for (const { connectionId, model } of next.backups) {
+        if (connectionId === RERUN_CONNECTION_ID) return c.json({ error: 'The Rerun credit is its own switch, not a backup' }, 400)
+        const key = `${connectionId}\n${model}`
+        if (seen.has(key)) return c.json({ error: `${model} is already a backup` }, 400)
+        seen.add(key)
+        const connection = await findConnection(connectionId)
+        if (!connection) return c.json({ error: 'connection not found' }, 404)
+        if (!servesModel(connection, model)) return c.json({ error: `This connection does not offer ${model}` }, 400)
+    }
+    return c.json(await writeBoxBackups(next))
 })
 
 // Asked from the box rather than from the hub: on a self-hosted install the endpoint sits on the
@@ -111,6 +128,7 @@ connectionRoutes.delete('/:id', async c => {
     assertConnectionDeletable(id)
     const released = await releaseConnection(id)
     await deleteConnection(id)
+    await dropConnectionBackups(id)
     return c.json({ deleted: id, released })
 })
 

@@ -250,12 +250,14 @@ app. It cannot be renamed or deleted, only re-curated.
 ```json
 {
   "connections": [ { "id": "abc...", "name": "Claude Clement", "provider": "claude", "models": ["opus", "sonnet"], "extraModels": [], "connected": true, "createdAt": "2026-08-22T..." } ],
-  "default": { "connectionId": "abc...", "model": "opus" }
+  "default": { "connectionId": "abc...", "model": "opus" },
+  "backups": { "backups": [ { "connectionId": "def...", "model": "gpt-6-sol" } ], "rerunCreditLastResort": false }
 }
 ```
 
 `connected` says whether the credential is present, without disclosing it. `default` is the engine
-default model (see below), `null` when nobody set one.
+default model (see below), `null` when nobody set one. `backups` is the backup list (see
+`PUT /connections/backups`), empty with the credit off when nobody set one.
 
 ### `PUT /connections/default`
 
@@ -269,6 +271,20 @@ engine, stored in `connections/default.json`.
 `404` when the connection is unknown, `400` when it does not offer that model. `DELETE
 /connections/default` clears it (`{ "default": null }`), and resolution falls back to the keyless
 `rerun` connection until a connection adopts the default again (see `POST /connections`).
+
+### `PUT /connections/backups`
+
+Where a run goes when the subscription it runs on hits its usage limit (`provider_usage_limit`), in
+order. One record for the whole engine, stored in `connections/backups.json`; the whole list is
+written at once, so a reorder is a `PUT` of the new order.
+
+```json
+{ "backups": [ { "connectionId": "def...", "model": "gpt-6-sol" } ], "rerunCreditLastResort": false }
+```
+
+Up to 5 backups. `400` for the `rerun` connection (the credit is the `rerunCreditLastResort` switch,
+tried only once every listed backup is out), a duplicate pair or a model the connection does not
+offer; `404` for an unknown connection. Deleting a connection drops its backups.
 
 ### `POST /connections`
 

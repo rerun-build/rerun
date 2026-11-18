@@ -42,6 +42,7 @@ config.env                  environment file of the systemd unit (release layout
 agents/<id>/                one folder per coworker (below); agents/foreman/ is the Chief of Staff
 connections/<id>/           an AI provider credential: connection.json, .env (0600), .codex/
 connections/default.json    the connection and model a coworker with no pin of its own runs on
+connections/backups.json    the models a run moves to, in order, when its subscription hits its limit
 vault/<id>/                 the Vault: item.json, .env (0600), tokens/<server>.json
 shared/                     files every coworker reads and writes (shared_* tools, /shared/files)
 shared-db/shared.db         SQL database every coworker shares (shared_db_* tools, /shared/data)

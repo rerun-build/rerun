@@ -109,10 +109,22 @@ export type ConnectionSummary = z.infer<typeof connectionSummarySchema>
 export const boxDefaultModelSchema = z.object({ connectionId: z.string(), model: z.string() })
 export type BoxDefaultModel = z.infer<typeof boxDefaultModelSchema>
 
+export const MAX_BOX_BACKUPS = 5
+
+// Where a run goes when the subscription it runs on hits its usage limit, in order. The Rerun credit
+// is never one of them: spending it is its own switch, tried only once every listed plan is out.
+export const boxBackupsSchema = z.object({
+    backups: z.array(boxDefaultModelSchema).max(MAX_BOX_BACKUPS).default([]),
+    rerunCreditLastResort: z.boolean().default(false),
+})
+export type BoxBackups = z.infer<typeof boxBackupsSchema>
+export const NO_BOX_BACKUPS: BoxBackups = { backups: [], rerunCreditLastResort: false }
+
 export const connectionsListSchema = z.object({
     connections: z.array(connectionSummarySchema),
     // Defaulted rather than required: an engine older than box defaults answers a list without it.
     default: boxDefaultModelSchema.nullable().default(null),
+    backups: boxBackupsSchema.default(NO_BOX_BACKUPS),
 })
 export type ConnectionsList = z.infer<typeof connectionsListSchema>
 

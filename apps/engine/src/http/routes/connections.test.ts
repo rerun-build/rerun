@@ -43,6 +43,7 @@ const { readEnvFile } = await import('../../lib/env-file.js')
 const { ensureRerunConnection } = await import('../../connections/store.js')
 const { unloadConnection } = await import('../../connections/registry.js')
 const { clearBoxDefault, readBoxDefault } = await import('../../connections/default.js')
+const { clearBoxBackups, readBoxBackups } = await import('../../connections/backups.js')
 const { readSchedule } = await import('../../schedules/loader.js')
 
 type Summary = { id: string; name: string; provider: string; models: string[]; connected: boolean }
@@ -87,6 +88,7 @@ beforeEach(async () => {
     opencodeLive.refreshed = 0
     unloadConnection(RERUN_CONNECTION_ID)
     await clearBoxDefault()
+    await clearBoxBackups()
     await rm(connectionsDir(), { recursive: true, force: true })
     await rm(agentsDir(), { recursive: true, force: true })
     await ensureRerunConnection()
@@ -420,5 +422,37 @@ describe('plan limits on the list', () => {
             pendingReads.delete(claude.id)
             vi.useRealTimers()
         }
+    })
+})
+
+describe('backup models', () => {
+    it('answers an empty list with the credit off on a box nobody configured', async () => {
+        const body = (await (await connectionRoutes.request('/')).json()) as { backups: unknown }
+        expect(body.backups).toEqual({ backups: [], rerunCreditLastResort: false })
+    })
+
+    it('keeps the order it was given and echoes it on the next list', async () => {
+        const created = await createClaude()
+        const next = { backups: [{ connectionId: created.id, model: 'sonnet' }, { connectionId: created.id, model: 'opus' }], rerunCreditLastResort: true }
+        expect((await put('/backups', next)).status).toBe(200)
+        const body = (await (await connectionRoutes.request('/')).json()) as { backups: unknown }
+        expect(body.backups).toEqual(next)
+    })
+
+    it('refuses the Rerun connection, a duplicate and a model the connection does not offer', async () => {
+        const created = await createClaude()
+        expect((await put('/backups', { backups: [{ connectionId: RERUN_CONNECTION_ID, model: 'rerun' }] })).status).toBe(400)
+        expect((await put('/backups', { backups: [{ connectionId: created.id, model: 'opus' }, { connectionId: created.id, model: 'opus' }] })).status).toBe(400)
+        expect((await put('/backups', { backups: [{ connectionId: created.id, model: 'haiku' }] })).status).toBe(400)
+        expect((await put('/backups', { backups: [{ connectionId: 'nope', model: 'opus' }] })).status).toBe(404)
+        expect(await readBoxBackups()).toEqual({ backups: [], rerunCreditLastResort: false })
+    })
+
+    it('drops the backups of a deleted connection and keeps the others', async () => {
+        const first = await createClaude('First')
+        const second = await createClaude('Second')
+        await put('/backups', { backups: [{ connectionId: first.id, model: 'opus' }, { connectionId: second.id, model: 'sonnet' }], rerunCreditLastResort: true })
+        expect((await connectionRoutes.request(`/${first.id}`, { method: 'DELETE' })).status).toBe(200)
+        expect(await readBoxBackups()).toEqual({ backups: [{ connectionId: second.id, model: 'sonnet' }], rerunCreditLastResort: true })
     })
 })
