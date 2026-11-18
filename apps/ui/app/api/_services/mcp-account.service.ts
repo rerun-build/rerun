@@ -1,5 +1,5 @@
-import type { RunGoal } from '@rerun/contracts'
-import { MCP_SERVER_NAME_RE, connectorSkillReadOnlyError, FACTORY_SNAPSHOT_MAX_BYTES, factorySnapshotSchema, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, runGoalSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import type { ContextSize, RunGoal } from '@rerun/contracts'
+import { MCP_SERVER_NAME_RE, connectorSkillReadOnlyError, contextSizeSchema, FACTORY_SNAPSHOT_MAX_BYTES, factorySnapshotSchema, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, runGoalSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentInWorkspace, callableEngineAgentIds, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import { putFactorySnapshot } from '@/lib/factory/snapshot-store'
@@ -884,7 +884,14 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 thinkingLevel = args.thinkingLevel
             }
 
-            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, ...(goal ? { goal } : {}), ...(model ? { model } : {}), ...(thinkingLevel ? { thinkingLevel } : {}) })
+            let contextSize: ContextSize | undefined
+            if (args.contextSize !== undefined) {
+                const parsed = contextSizeSchema.safeParse(args.contextSize)
+                if (!parsed.success) throw new Error('invalid_run_model: contextSize must be small, medium or large')
+                contextSize = parsed.data
+            }
+
+            const res = await engineChat(conn, engineAgentId, { message: requireString(args.message, 'message'), sessionId: asString(args.sessionId), source: 'api', callableAgentIds, ...(goal ? { goal } : {}), ...(model ? { model } : {}), ...(thinkingLevel ? { thinkingLevel } : {}), ...(contextSize ? { contextSize } : {}) })
             if (!res.ok) {
                 const body = await res.text().catch(() => '')
                 if (res.status === 400 && body.includes('invalid_goal')) throw new Error(`invalid_goal: the engine refused the goal. ${body}`.trim())

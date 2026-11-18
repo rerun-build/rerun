@@ -289,6 +289,17 @@ describe('resolveModel on the claude subscription', () => {
         expect(settings).not.toHaveProperty('mcpServers')
     })
 
+    it('sets the compaction window from the run size, then the agent config, then small', () => {
+        const agent = agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 't' })
+        const sized = { ...agent, config: { ...agent.config, contextSize: 'medium' as const } }
+        resolveModel(agent)
+        resolveModel(agent, undefined, undefined, undefined, { contextSize: 'large' })
+        resolveModel(sized)
+        resolveModel(sized, undefined, undefined, undefined, { contextSize: 'large' })
+
+        expect(claudeCalls.map(call => call.defaultSettings.env.CLAUDE_CODE_AUTO_COMPACT_WINDOW)).toEqual(['273000', '973000', '513000', '973000'])
+    })
+
     it('exposes the bridged tools and reports no context occupancy before the run', () => {
         const tools = { fs_read: tool({ description: 'read', inputSchema: z.object({ path: z.string() }), execute: async () => 'ok' }) }
         const resolved = resolveModel(agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 't' }), undefined, tools)

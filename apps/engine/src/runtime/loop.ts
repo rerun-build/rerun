@@ -499,7 +499,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
         spawnToken = claudeTokenOf(connection)
-        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
+        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, contextSize: trigger.source === 'chat' ? trigger.contextSize : undefined, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         if (offersQuickReplies(agent.config)) quickReplies = resolvedModel.quickReplies

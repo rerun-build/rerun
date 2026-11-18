@@ -467,6 +467,7 @@ const AGENT_TOOL_DEFS = [
                 waitSeconds: { type: 'number', description: 'How long to wait for the answer. Default 120, max 600.' },
                 model: { type: 'string', minLength: 1, maxLength: 100, description: 'Model for this run only, inside the coworker\'s own provider.' },
                 thinkingLevel: { type: 'string', enum: ['low', 'medium', 'high'] },
+                contextSize: { type: 'string', enum: ['small', 'medium', 'large'], description: 'Context window class for this run: small 240k, medium 480k, large 940k tokens before compaction. Default small.' },
                 goal: {
                     type: 'object',
                     description: 'The final state the run must end in; checked by the engine after each answer.',

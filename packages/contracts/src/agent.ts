@@ -110,6 +110,9 @@ export function isSetupAnswered(setup: { required: boolean | null; prompt: strin
 export const thinkingLevelSchema = z.enum(['low', 'medium', 'high', 'xhigh'])
 export type ThinkingLevel = z.infer<typeof thinkingLevelSchema>
 
+export const contextSizeSchema = z.enum(['small', 'medium', 'large'])
+export type ContextSize = z.infer<typeof contextSizeSchema>
+
 export const agentConfigSchema = z.object({
     name: z.string(),
     kind: z.enum(['user', 'foreman']).default('user'),
@@ -122,6 +125,7 @@ export const agentConfigSchema = z.object({
     model: z.string().nullable().default(null),
     verbosity: verbositySchema.default('normal'),
     thinkingLevel: thinkingLevelSchema.nullable().optional(),
+    contextSize: contextSizeSchema.optional(),
     pages: z.object({ skim: z.boolean().optional(), standingInstructions: z.literal(false).optional() }).strict().optional(),
     disabledSkills: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)).optional(),
     language: z.string().nullable().default(null),

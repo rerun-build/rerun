@@ -16,7 +16,7 @@ import {
     type LocalTool,
 } from 'ai-sdk-provider-codex-cli'
 import type { ZodObject, ZodRawShape, ZodType } from 'zod'
-import type { ContextOccupancy, McpServer, Provider } from '@rerun/contracts'
+import type { ContextOccupancy, ContextSize, McpServer, Provider } from '@rerun/contracts'
 import { env } from '../config/env.js'
 import { codexPath } from '../runtime/codex-cli.js'
 import { codexHomeDir } from '../config/paths.js'
@@ -55,7 +55,6 @@ const CODEX_MIN_VERSION = '0.144.0'
 const BRIDGE_TOOL_TIMEOUT_SEC = 3600
 
 export const CLAUDE_HARNESS_ENV = {
-    DISABLE_AUTO_COMPACT: '1',
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1',
     CLAUDE_CODE_DISABLE_AUTO_MEMORY: '1',
     CLAUDE_CODE_DISABLE_BUNDLED_SKILLS: '1',
@@ -65,6 +64,18 @@ export const CLAUDE_HARNESS_ENV = {
     CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: '1',
     CLAUDE_CODE_DISABLE_CRON: '1',
 } as const
+
+const COMPACT_AT_TOKENS: Record<ContextSize, number> = { small: 240000, medium: 480000, large: 940000 }
+
+const COMPACT_RESERVE_TOKENS = 33000
+
+export function compactAtTokens(size?: ContextSize): number {
+    return COMPACT_AT_TOKENS[size ?? 'small']
+}
+
+export function compactEnvFor(size?: ContextSize): { CLAUDE_CODE_AUTO_COMPACT_WINDOW: string } {
+    return { CLAUDE_CODE_AUTO_COMPACT_WINDOW: String(compactAtTokens(size) + COMPACT_RESERVE_TOKENS) }
+}
 
 export const CODEX_DISABLED_FEATURES = ['multi_agent', 'multi_agent_v2'] as const
 
@@ -214,9 +225,9 @@ export function codexMcpConfig(tools?: ToolSet, mcpServers: McpServer[] = []): R
 
 export type GoalOption = { goal: RunGoal; record: (v: GoalVerdict) => Promise<void>; hook?: ReturnType<typeof goalStopHook> }
 
-export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption }
+export type CliModelOptions = { system?: string; claudeTools?: readonly string[]; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; contextSize?: ContextSize }
 
-export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption }
+export type ResolveModelOptions = { system?: string; screenshots?: ScreenshotLookup; sessionId?: string; labels?: Record<string, string>; goal?: GoalOption; contextSize?: ContextSize }
 
 function oneShotSessionId(agent: LoadedAgent, options?: { sessionId?: string }): string {
     return options?.sessionId ?? `${agent.id}:one-shot`
@@ -267,6 +278,7 @@ function claudeProvider(agent: LoadedAgent, tools?: ToolSet, mcpServers: RunMcpS
                 ...claudeAuthEnv(connectionEnv(agent)),
                 ANTHROPIC_API_KEY: undefined,
                 MCP_TOOL_TIMEOUT: String(BRIDGE_TOOL_TIMEOUT_SEC * 1000),
+                ...compactEnvFor(options.contextSize),
             },
             ...(options.system !== undefined ? { systemPrompt: options.system } : {}),
             ...(allowedTools.length ? { mcpServers: servers, allowedTools } : {}),
@@ -387,7 +399,7 @@ export type ResolvedModel = { model: ReturnType<typeof wrapLanguageModel>; close
 
 const noClose = async (): Promise<void> => {}
 
-export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, labels, goal }: ResolveModelOptions = {}): ResolvedModel {
+export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools?: ToolSet, mcpServers?: RunMcpServer[], { system, screenshots, sessionId, labels, goal, contextSize }: ResolveModelOptions = {}): ResolvedModel {
     const { provider, model } = pairFor(agent, override)
     const replies = createQuickRepliesCapture()
     const cardTags = createCardTagGuard(agent.id, provider)
@@ -398,7 +410,7 @@ export function resolveModel(agent: LoadedAgent, override?: ModelOverride, tools
     }
     if (provider === 'claude') {
         const capture = claudeContextCapture(agent.resolved.connection?.id)
-        const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, labels, goal, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
+        const claude = claudeProvider(agent, tools, mcpServers, capture, { system, screenshots, labels, goal, contextSize: contextSize ?? agent.config.contextSize, claudeTools: agent.config.tools.web ? CLAUDE_RUN_TOOLS : [] }).languageModel(model)
         return { model: wrapLanguageModel({ model: claude, middleware: [claudeScreenshotMiddleware, replies.middleware, cardTags, guard] }), close: noClose, contextUsage: capture.read, quickReplies: replies.read }
     }
     if (provider === 'opencode') {
