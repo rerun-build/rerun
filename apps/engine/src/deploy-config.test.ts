@@ -7,6 +7,7 @@ type Service = {
   image?: unknown
   build?: { dockerfile?: unknown } | string
   environment?: Record<string, unknown> | unknown[]
+  env_file?: unknown
 }
 
 const root = fileURLToPath(new URL('../../../', import.meta.url))
@@ -34,7 +35,7 @@ function keyed(service: Service): boolean {
 
 function offenders(text: string): string[] {
   return engines(text)
-    .filter(([, service]) => keyed(service))
+    .filter(([, service]) => keyed(service) || service.env_file !== undefined)
     .map(([name]) => name)
 }
 
@@ -64,5 +65,14 @@ describe('deploy config', () => {
     expect(offenders(b)).toEqual(['e'])
     expect(offenders(c)).toEqual(['e'])
     expect(offenders(d)).toEqual([])
+  })
+
+  it('flags an engine service that takes an env_file, and passes an empty environment block', () => {
+    const a = 'services:\n  e:\n    image: x/moldwright-engine:dev\n    env_file: .env\n'
+    const b = 'services:\n  e:\n    image: x/moldwright-engine:dev\n    env_file:\n      - .env\n'
+    const c = 'services:\n  e:\n    image: x/moldwright-engine:dev\n    environment:\n'
+    expect(offenders(a)).toEqual(['e'])
+    expect(offenders(b)).toEqual(['e'])
+    expect(offenders(c)).toEqual([])
   })
 })
