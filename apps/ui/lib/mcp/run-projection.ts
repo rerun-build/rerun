@@ -1,6 +1,6 @@
 import type { RunGoalRecord } from '@rerun/contracts'
 
-export function projectRun(run: { id: string; status: string; sessionId: string; provider: string | null; model: string | null; triggerSource: string | null; triggerSlug: string | null; stepCount: number; inputTokens: number | null; cachedInputTokens?: number | null; outputTokens: number | null; totalTokens: number | null; costMicros: number | null; startedAt: string; finishedAt: string | null; error: string | null; goal?: RunGoalRecord | null }) {
+export function projectRun(run: { id: string; status: string; sessionId: string; provider: string | null; model: string | null; triggerSource: string | null; triggerSlug: string | null; stepCount: number; inputTokens: number | null; cachedInputTokens?: number | null; outputTokens: number | null; totalTokens: number | null; costMicros: number | null; startedAt: string; finishedAt: string | null; error: string | null; goal?: RunGoalRecord | null; compactions?: number | null; compactSummaryChars?: number | null; compactAtTokens?: number | null }) {
     return {
         runId: run.id,
         status: run.status,
@@ -18,5 +18,8 @@ export function projectRun(run: { id: string; status: string; sessionId: string;
         finishedAt: run.finishedAt,
         error: run.error,
         goal: run.goal ?? null,
+        compactions: run.compactions ?? null,
+        compactSummaryChars: run.compactSummaryChars ?? null,
+        compactAtTokens: run.compactAtTokens ?? null,
     }
 }

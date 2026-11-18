@@ -1,8 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { tool, dynamicTool, jsonSchema, type ToolSet } from 'ai'
 import { z } from 'zod'
 import type { McpServer } from '@rerun/contracts'
-import { CLAUDE_HARNESS_ENV, CODEX_DISABLED_FEATURES, CODEX_HARNESS_OVERRIDES, CODEX_SKILL_OVERRIDES, claudeAuthEnv, claudeBridgeHandler, claudeMcpConfig, codexMcpConfig, modelFor, resolveModel } from './providers.js'
+import { CLAUDE_HARNESS_ENV, CODEX_DISABLED_FEATURES, CODEX_HARNESS_OVERRIDES, CODEX_SKILL_OVERRIDES, claudeAuthEnv, claudeBridgeHandler, claudeMcpConfig, codexMcpConfig, compactAtTokens, compactEnvFor, modelFor, resolveModel } from './providers.js'
 import { askUserTool, canonicalBridgeName, canonicalHitlName, isHitlToolName, requestApprovalTool } from '../tools/builtin/hitl.js'
 
 const captured = vi.hoisted(() => {
@@ -103,8 +103,9 @@ describe('claudeMcpConfig', () => {
 })
 
 describe('CLAUDE_HARNESS_ENV', () => {
-    it('leaves compaction to the engine', () => {
-        expect(CLAUDE_HARNESS_ENV.DISABLE_AUTO_COMPACT).toBe('1')
+    it('no longer disables compaction in the CLI', () => {
+        expect(CLAUDE_HARNESS_ENV).not.toHaveProperty('DISABLE_AUTO_COMPACT')
+        expect(CLAUDE_HARNESS_ENV).not.toHaveProperty('CLAUDE_AUTOCOMPACT_PCT_OVERRIDE')
     })
 
     it('closes what would outlive the turn', () => {
@@ -117,6 +118,45 @@ describe('CLAUDE_HARNESS_ENV', () => {
             expect(name).toMatch(/^[A-Z][A-Z0-9_]+$/)
             expect(value).toBe('1')
         }
+    })
+})
+
+describe('compactAtTokens', () => {
+    afterEach(() => {
+        for (const size of ['SMALL', 'MEDIUM', 'LARGE']) delete process.env[`RERUN_COMPACT_AT_${size}`]
+    })
+
+    it('maps each size to its trigger point and defaults to small', () => {
+        expect(compactAtTokens('small')).toBe(240000)
+        expect(compactAtTokens('medium')).toBe(480000)
+        expect(compactAtTokens('large')).toBe(940000)
+        expect(compactAtTokens()).toBe(240000)
+        expect(compactAtTokens('off')).toBeNull()
+    })
+
+    it('takes a point from the environment when it is an integer from 67000 to 967000, and ignores anything else', () => {
+        process.env.RERUN_COMPACT_AT_SMALL = '300000'
+        process.env.RERUN_COMPACT_AT_MEDIUM = '67000'
+        process.env.RERUN_COMPACT_AT_LARGE = '967000'
+        expect([compactAtTokens('small'), compactAtTokens('medium'), compactAtTokens('large')]).toEqual([300000, 67000, 967000])
+        for (const bad of ['66999', '967001', '240000.5', 'abc', '', '-1']) {
+            process.env.RERUN_COMPACT_AT_SMALL = bad
+            expect(compactAtTokens('small')).toBe(240000)
+        }
+    })
+
+    it('sets the window so the CLI trigger (window minus 20000 output reserve minus 13000 buffer) lands on the point', () => {
+        expect(compactEnvFor(240000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '273000' })
+        expect(compactEnvFor(480000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '513000' })
+        expect(compactEnvFor(940000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '973000' })
+        expect(compactEnvFor('off')).toEqual({ DISABLE_AUTO_COMPACT: '1' })
+        expect(compactEnvFor('default')).toEqual({})
+    })
+
+    it('never states a window below the CLI minimum of 100000', () => {
+        expect(compactEnvFor(24576)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '100000' })
+        expect(compactEnvFor(67000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '100000' })
+        expect(compactEnvFor(68000)).toEqual({ CLAUDE_CODE_AUTO_COMPACT_WINDOW: '101000' })
     })
 })
 

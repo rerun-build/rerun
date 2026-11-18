@@ -31,6 +31,9 @@ export const runSchema = z.object({
     branch: z.string().nullable().optional(),
     copyIndex: z.number().int().nullable().optional(),
     goal: runGoalRecordSchema.nullable().optional(),
+    compactions: z.number().int().nullable().optional(),
+    compactSummaryChars: z.number().int().nullable().optional(),
+    compactAtTokens: z.number().int().nullable().optional(),
 })
 export type Run = z.infer<typeof runSchema>
 

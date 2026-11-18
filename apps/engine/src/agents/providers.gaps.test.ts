@@ -289,6 +289,30 @@ describe('resolveModel on the claude subscription', () => {
         expect(settings).not.toHaveProperty('mcpServers')
     })
 
+    it('sets the compaction window from the stated point, else from the agent size, else small', () => {
+        const agent = agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 't' })
+        const sized = { ...agent, config: { ...agent.config, contextSize: 'medium' as const } }
+        resolveModel(agent)
+        resolveModel(sized)
+        resolveModel(sized, undefined, undefined, undefined, { compactAt: 150000 })
+        resolveModel(sized, undefined, undefined, undefined, { compactAt: 'off' })
+        resolveModel(sized, undefined, undefined, undefined, { compactAt: 'default' })
+
+        const envs = claudeCalls.map(call => call.defaultSettings.env)
+        expect(envs.map(env => env.CLAUDE_CODE_AUTO_COMPACT_WINDOW)).toEqual(['273000', '513000', '183000', undefined, undefined])
+        expect(envs[3].DISABLE_AUTO_COMPACT).toBe('1')
+        expect(envs[4]).not.toHaveProperty('DISABLE_AUTO_COMPACT')
+        expect(envs[4]).not.toHaveProperty('CLAUDE_CODE_AUTO_COMPACT_WINDOW')
+    })
+
+    it('hands the compaction hook of the capture to the claude settings', async () => {
+        const seen: unknown[] = []
+        resolveModel(agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 't' }), undefined, undefined, undefined, { onCompact: e => seen.push(e) })
+        const hook = claudeCalls[0]!.defaultSettings.hooks.PostCompact[0].hooks[0]
+        await hook({ hook_event_name: 'PostCompact', trigger: 'auto', compact_summary: 'abcd' })
+        expect(seen).toEqual([{ trigger: 'auto', summaryChars: 4 }])
+    })
+
     it('exposes the bridged tools and reports no context occupancy before the run', () => {
         const tools = { fs_read: tool({ description: 'read', inputSchema: z.object({ path: z.string() }), execute: async () => 'ok' }) }
         const resolved = resolveModel(agentOn('claude', 'opus', { CLAUDE_CODE_OAUTH_TOKEN: 't' }), undefined, tools)

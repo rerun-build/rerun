@@ -1,9 +1,10 @@
-import { customContextWindow } from '../../connections/custom-catalog.js'
+import { customContextWindow, customMeasuredContextWindow } from '../../connections/custom-catalog.js'
 import type { LoadedConnection } from '../../connections/types.js'
 import { opencodeModel } from '../../connections/opencode-catalog.js'
 import { generateText, type ModelMessage } from 'ai'
-import { isContextPart, modelContextWindow, type Provider } from '@rerun/contracts'
-import { modelFor, type ModelOverride } from '../../agents/providers.js'
+import { isContextPart, modelContextWindow, type ContextSize, type Provider } from '@rerun/contracts'
+import type { CompactListener } from '../../agents/claude-context.js'
+import { compactAtTokens, modelFor, type CompactPoint, type ModelOverride } from '../../agents/providers.js'
 import { withoutQuickRepliesCalls } from '../../agents/quick-replies-stream.js'
 import { CLI_PROVIDERS } from '../../agents/types.js'
 import { ensureCliAuth } from '../../connections/cli-auth.js'
@@ -25,6 +26,11 @@ const SUMMARY_PREAMBLE =
 
 const SUMMARY_SYSTEM =
     'You compress a coworker conversation transcript into a dense handoff summary. Preserve facts, decisions, file paths, identifiers, command outputs, error messages, and anything needed to continue the work. Use these sections: Historical Task Snapshot, Completed Actions, Blocked / Open Issues, Pending User Asks. Be concise; drop pleasantries and redundant detail. Never invent information.'
+
+const IN_RUN_PREAMBLE =
+    'The following summarises the work already done on the current task, which is still in progress. The latest request after it is still to be finished: continue from where this summary leaves off. Use it as background and do not repeat finished work.'
+
+const SUMMARY_FLOOR_MARGIN_TOKENS = 4_000
 
 const COMPACTION_TIMEOUT_MS = 15 * 60 * 1000
 
@@ -84,6 +90,15 @@ export function runContextWindow(model: string, provider: Provider, connection?:
     if (provider === 'opencode') return opencodeModel(model)?.contextWindow ?? modelContextWindow(model, provider)
     if (provider === 'custom') return customContextWindow(connection, model)
     return modelContextWindow(model, provider)
+}
+
+export function effectiveCompactAt(size: ContextSize | undefined, provider: Provider, model: string, connection?: LoadedConnection | null): CompactPoint {
+    const at = compactAtTokens(size)
+    if (at === null) return 'off'
+    if (provider === 'claude') return at
+    const window = provider === 'custom' ? customMeasuredContextWindow(connection, model) : runContextWindow(model, provider, connection)
+    if (window === undefined) return 'default'
+    return Math.min(at, Math.floor(window * COMPACTION_TRIGGER_RATIO))
 }
 
 export function compactionThreshold(contextWindow: number, provider: Provider): number {
@@ -157,5 +172,45 @@ export async function prepareRunHistory(ctx: RunContext, system: string, overrid
         ctx.writer?.write({ type: 'data-compaction', id: checkpointId, data: { status: 'error' } })
         ctx.logger.error({ agent: agentId, err: String(error) }, 'compaction failed')
         return working
+    }
+}
+
+export function stepContextGuard(ctx: RunContext, override: ModelOverride | undefined, system: string, toolChars: number, at: number, turnIndex: number, onCompact: CompactListener): (messages: ModelMessage[]) => Promise<ModelMessage[] | undefined> {
+    let summary: { message: ModelMessage; kept?: ModelMessage; covers: number } | undefined
+    let pruning = false
+    let summaryFailed = false
+    const mayTrySummary = at >= estimateTokens([], system, toolChars) + COMPACTION_TAIL_TOKEN_BUDGET + COMPACTION_SUMMARY_TOKENS_CEILING + SUMMARY_FLOOR_MARGIN_TOKENS
+    return async messages => {
+        const head = summary ? (summary.kept ? 2 : 1) : 0
+        const base = summary ? [summary.message, ...(summary.kept ? [summary.kept] : []), ...messages.slice(summary.covers)] : messages
+        if (estimateTokens(base, system, toolChars) < at) return summary ? repairToolPairs(base) : undefined
+        const turnAt = summary ? (summary.kept ? 1 : turnIndex - summary.covers + 1) : turnIndex
+        const tailStart = tailStartIndex(base, COMPACTION_TAIL_TOKEN_BUDGET)
+        const pruned = pruneToolOutputs(base, tailStart).messages
+        if (estimateTokens(pruned, system, toolChars) < at || tailStart <= head || !mayTrySummary || summaryFailed) {
+            if (!pruning) ctx.logger.info({ agent: ctx.agent.id, session: ctx.sessionId }, 'in-run tool outputs pruned')
+            pruning = true
+            return repairToolPairs(pruned)
+        }
+        try {
+            const kept = turnAt < tailStart ? pruned[turnAt] : undefined
+            const middle = pruned.slice(0, tailStart).filter((_, index) => index !== turnAt || !kept)
+            const text = await summarizeMiddle(ctx, override, middle)
+            const message: ModelMessage = { role: 'user', content: `${IN_RUN_PREAMBLE}\n\n${text}` }
+            summary = { message, kept, covers: (summary?.covers ?? 0) + tailStart - head }
+            pruning = false
+            onCompact({ trigger: 'summary', summaryChars: text.length })
+            const next = repairToolPairs([message, ...(kept ? [kept] : []), ...pruned.slice(tailStart)])
+            if (estimateTokens(next, system, toolChars) >= at) {
+                summaryFailed = true
+                ctx.logger.info({ agent: ctx.agent.id, session: ctx.sessionId }, 'in-run summary did not get under the point')
+            }
+            return next
+        } catch (error) {
+            summaryFailed = true
+            ctx.writer?.write({ type: 'data-compaction', id: newId(), data: { status: 'error' } })
+            ctx.logger.error({ agent: ctx.agent.id, err: String(error) }, 'in-run compaction failed')
+            return repairToolPairs(pruned)
+        }
     }
 }

@@ -1,4 +1,4 @@
-import type { MessageAuthor, Provider, RunGoal } from '@rerun/contracts'
+import type { ContextSize, MessageAuthor, Provider, RunGoal } from '@rerun/contracts'
 import type { UIMessageStreamWriter } from 'ai'
 import type { TurnOrder } from '../agents/turn-order.js'
 import type { LoadedAgent } from '../agents/types.js'
@@ -9,7 +9,7 @@ import type { ScreenshotStore } from './screenshots.js'
 
 export type RunLineage = { initiatorAgentId?: string; initiatorRunId?: string; initiatorSessionId?: string; initiatorUserId?: string; jobRef?: string; branch?: string }
 
-export type RunTrigger = { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: string; lineage?: RunLineage; goal?: RunGoal } | { source: 'schedule'; slug: string; name: string } | { source: 'trigger'; slug: string; name: string }
+export type RunTrigger = { source: 'chat'; author?: MessageAuthor; userLanguage?: string; callableAgentIds?: string[]; calledBy?: string; lineage?: RunLineage; goal?: RunGoal; contextSize?: ContextSize } | { source: 'schedule'; slug: string; name: string } | { source: 'trigger'; slug: string; name: string }
 
 export type PartialResult = { label: string; text: string }
 

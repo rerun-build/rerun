@@ -94,6 +94,9 @@ export async function startRun(agentId: string, sessionId: string, id: string = 
         goalState: null,
         goalTurns: null,
         goalVerdictsJson: null,
+        compactions: null,
+        compactSummaryChars: null,
+        compactAtTokens: null,
     }
     const { db } = await getSystemDb(agentId)
     await db.insert(runs).values(row)
@@ -121,6 +124,19 @@ export async function setRunGoal(agentId: string, id: string, goalJson: string):
         .update(runs)
         .set({ goalJson, goalState: 'running', goalTurns: 0, goalVerdictsJson: '[]' })
         .where(and(eq(runs.id, id), isNull(runs.goalJson)))
+}
+
+export async function setRunCompactAt(agentId: string, id: string, compactAtTokens: number): Promise<void> {
+    const { db } = await getSystemDb(agentId)
+    await db.update(runs).set({ compactAtTokens }).where(eq(runs.id, id))
+}
+
+export async function recordRunCompaction(agentId: string, id: string, summaryChars: number): Promise<void> {
+    const { db } = await getSystemDb(agentId)
+    await db
+        .update(runs)
+        .set({ compactions: sql`coalesce(${runs.compactions}, 0) + 1`, compactSummaryChars: sql`coalesce(${runs.compactSummaryChars}, 0) + ${summaryChars}` })
+        .where(eq(runs.id, id))
 }
 
 export type GoalVerdict = { turn: number; met: boolean; reason: string }

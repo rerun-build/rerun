@@ -2,10 +2,11 @@ import { streamText, ToolChoiceViolationError, wrapLanguageModel, type LanguageM
 import { RERUN_CONNECTION_ID, contextTextPart, type ContextOccupancy, type GoalVerdict, type MessageAuthor } from '@rerun/contracts'
 import { applyCaching, withTailBreakpoint } from '../agents/caching.js'
 import { mergeProviderOptions, reasoningProviderOptions } from '../agents/reasoning.js'
-import { prepareRunHistory } from './compaction/compact.js'
+import { effectiveCompactAt, prepareRunHistory, stepContextGuard } from './compaction/compact.js'
 import { repairToolPairs } from './compaction/repair.js'
 import { approvalSummary, canonicalHitlName, findPendingHitl, hitlStepLacksMessage, hitlTurnIsOver, isHitlToolName, secretSummary, takeoverSummary, type PendingHitl } from '../tools/builtin/hitl.js'
 import { goalStopHook } from '../agents/claude-goal-hook.js'
+import type { CompactListener } from '../agents/claude-context.js'
 import { CLI_PROVIDERS, resolveModel, type GoalOption, type ModelOverride } from '../agents/providers.js'
 import { offersQuickReplies, quickRepliesCall, type QuickRepliesCapture } from '../agents/quick-replies-stream.js'
 import { codexThreadToResume, forgetCodexThread, rememberCodexThread } from '../agents/codex-threads.js'
@@ -27,7 +28,7 @@ import { listAgentIndex } from '../db/repos/agents.js'
 import { appendMessage, lastMessageId, listSessionAuthorIds, setMessageToolCalls } from '../db/repos/messages.js'
 import type { MessageRow } from '../db/schema.js'
 import { isSharedConversation, signText } from './message-authors.js'
-import { bumpRunStep, cancelRun, failRun, finishRun, recordGoalVerdict, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } from '../db/repos/runs.js'
+import { bumpRunStep, cancelRun, failRun, finishRun, recordGoalVerdict, recordRunCompaction, setRunCompactAt, setRunContext, setRunGoal, setRunLineage, startRun, updateRunLive } from '../db/repos/runs.js'
 import { insertRunStep, insertToolCall, updateToolCall } from '../db/repos/telemetry.js'
 import { touchSession } from '../db/repos/sessions.js'
 import { logger } from '../lib/logger.js'
@@ -498,8 +499,16 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
         const cached = applyCaching(provider, { system, messages: turnMessages, sessionId, model })
         logger.debug({ agent: agent.id, provider, prepMs: Date.now() - t0 }, 'run prep done')
 
+        const compactAt = provider === 'codex' ? 'default' : effectiveCompactAt((trigger.source === 'chat' ? trigger.contextSize : undefined) ?? agent.config.contextSize, provider, model, connection)
+        if (typeof compactAt === 'number') void setRunCompactAt(agent.id, run.id, compactAt).catch(() => {})
+        const onCompact: CompactListener = ({ trigger: kind, summaryChars }) => {
+            logger.info({ agent: agent.id, run: run.id, trigger: kind, summaryChars }, 'run context compacted')
+            void recordRunCompaction(agent.id, run.id, summaryChars).catch(() => {})
+        }
+        const stepGuard = typeof compactAt === 'number' && !CLI_PROVIDERS.has(provider) ? stepContextGuard(ctx, override, systemText, toolPayloadChars(sentTools), compactAt, cached.messages.length - 1, onCompact) : undefined
+
         spawnToken = claudeTokenOf(connection)
-        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
+        const resolvedModel = resolveModel(agent, override, tools, mcpServers, { system: systemText, screenshots: id => ctx.screenshots?.get(id), sessionId, goal: goalOption, compactAt, onCompact, labels: sessionLabels({ agentId: agent.id, agentName: agent.config.name, sessionId, runId: run.id, jobRef: ctx.lineage?.jobRef, branch: ctx.lineage?.branch }) })
         closeModel = resolvedModel.close
         contextUsage = resolvedModel.contextUsage
         if (offersQuickReplies(agent.config)) quickReplies = resolvedModel.quickReplies
@@ -517,9 +526,12 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
             abortSignal: controller.signal,
             experimental_repairToolCall: repairToolCall,
             stopWhen: ({ steps }) => hitlTurnIsOver(steps, CLI_PROVIDERS.has(provider)),
-            prepareStep: ({ messages, steps }) => {
+            prepareStep: async ({ messages: stepMessages, steps }) => {
+                const guarded = await stepGuard?.(stepMessages)
+                const messages = guarded ?? stepMessages
                 const step = stepWithScreenshots(messages, ctx.screenshots, provider, model, connection)
                 return {
+                    ...(guarded ? { messages: guarded } : {}),
                     ...step,
                     ...(behaviourOf(provider, model) === 'anthropic' ? { messages: withTailBreakpoint(step.messages ?? messages) } : {}),
                     ...(!CLI_PROVIDERS.has(provider) && hitlStepLacksMessage(steps) ? { toolChoice: 'none' as const } : {}),

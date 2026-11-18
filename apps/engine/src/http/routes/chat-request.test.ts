@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { chatRequestSchema } from '@rerun/contracts'
+import { agentConfigSchema, chatRequestSchema } from '@rerun/contracts'
 
 describe('chatRequestSchema thinkingLevel', () => {
     it('accepts low, medium and high', () => {
@@ -26,5 +26,33 @@ describe('chatRequestSchema thinkingLevel', () => {
         expect(chatRequestSchema.safeParse({ message: 'hi', model: 'some-model' }).success).toBe(true)
         expect(chatRequestSchema.safeParse({ message: 'hi' }).success).toBe(true)
         expect(chatRequestSchema.safeParse({ message: 'hi', model: 5 }).success).toBe(false)
+    })
+})
+
+describe('chatRequestSchema contextSize', () => {
+    it('accepts small, medium and large', () => {
+        for (const size of ['small', 'medium', 'large']) {
+            const parsed = chatRequestSchema.safeParse({ message: 'hi', contextSize: size })
+            expect(parsed.success && parsed.data.contextSize).toBe(size)
+        }
+    })
+
+    it('accepts a request without contextSize', () => {
+        const parsed = chatRequestSchema.safeParse({ message: 'hi' })
+        expect(parsed.success && parsed.data.contextSize).toBeUndefined()
+    })
+
+    it('refuses an unknown size, an empty string and a number', () => {
+        for (const bad of ['huge', '', 480000]) {
+            expect(chatRequestSchema.safeParse({ message: 'hi', contextSize: bad }).success).toBe(false)
+        }
+    })
+})
+
+describe('agentConfigSchema contextSize', () => {
+    it('keeps a valid size, leaves it unset by default and refuses an unknown one', () => {
+        expect(agentConfigSchema.parse({ name: 'a', contextSize: 'large' }).contextSize).toBe('large')
+        expect(agentConfigSchema.parse({ name: 'a' }).contextSize).toBeUndefined()
+        expect(agentConfigSchema.safeParse({ name: 'a', contextSize: 'huge' }).success).toBe(false)
     })
 })

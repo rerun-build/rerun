@@ -118,6 +118,10 @@ describe('sqlite ladders', () => {
               8,
               "messages-session-role-created-index",
             ],
+            [
+              9,
+              "run-compactions",
+            ],
           ]
         `)
         expect(SHARED_DB_MIGRATIONS.map(s => [s.version, s.id])).toMatchInlineSnapshot(`

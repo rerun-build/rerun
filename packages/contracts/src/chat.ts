@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { providerSchema, thinkingLevelSchema } from './agent.js'
+import { contextSizeSchema, providerSchema, thinkingLevelSchema } from './agent.js'
 import { sessionSourceSchema } from './session.js'
 import { foremanBriefSchema } from './foreman.js'
 import { runGoalSchema } from './run-goal.js'
@@ -24,6 +24,7 @@ export const chatRequestSchema = z.object({
     install: z.boolean().optional(),
     userLanguage: z.string().optional(),
     goal: runGoalSchema.optional(),
+    contextSize: contextSizeSchema.optional(),
 })
 
 export const contextOccupancySchema = z.object({

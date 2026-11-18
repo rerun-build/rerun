@@ -101,3 +101,24 @@ describe('claudeContextCapture', () => {
         })
     })
 })
+
+describe('claudeContextCapture compaction hook', () => {
+    it('reports each compaction with its trigger and the length of its summary', async () => {
+        const seen: unknown[] = []
+        const capture = claudeContextCapture(undefined, e => seen.push(e))
+        const hook = capture.settings.hooks!.PostCompact![0]!.hooks[0]!
+        await expect(hook({ hook_event_name: 'PostCompact', trigger: 'auto', compact_summary: 'x'.repeat(120) })).resolves.toEqual({ continue: true })
+        await hook({ hook_event_name: 'PostCompact', trigger: 'manual', compact_summary: 'yy' })
+        await hook({})
+        expect(seen).toEqual([
+            { trigger: 'auto', summaryChars: 120 },
+            { trigger: 'manual', summaryChars: 2 },
+            { trigger: 'unknown', summaryChars: 0 },
+        ])
+    })
+
+    it('works without a listener', async () => {
+        const hook = claudeContextCapture().settings.hooks!.PostCompact![0]!.hooks[0]!
+        await expect(hook({ trigger: 'auto', compact_summary: 'x' })).resolves.toEqual({ continue: true })
+    })
+})
