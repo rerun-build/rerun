@@ -97,14 +97,17 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
         keyName: 'CODEX_OAUTH_TOKEN',
         section: 'subscription',
         apiKeyUrl: 'https://developers.openai.com/codex/cli',
-        // `gpt-6.1-sol` and `gpt-6.1-terra` need Codex CLI 0.159.1. A model the box's Codex does not
-        // list for the account is locked (`cliModels`), whether the binary or the plan lacks it.
-        // `gpt-5.5` left Codex for ChatGPT sign-ins on 2026-10-14. GPT-6.1 Sol is still rolling out
-        // plan by plan, so `gpt-6-sol` stays first: the backend can answer 400 "not supported when
-        // using Codex with a ChatGPT account" on a plan that does not have it yet.
+        // `gpt-6.1-sol` and `gpt-6.1-terra` need Codex CLI 0.159.1, `gpt-6.2-sol` and `gpt-6.2-astra`
+        // 0.170.0. A model the box's Codex does not list for the account is locked (`cliModels`),
+        // whether the binary or the plan lacks it. `gpt-5.5` left Codex for ChatGPT sign-ins on
+        // 2026-10-14. GPT-6.2 rolls out plan by plan (off by default on Enterprise and Edu), so
+        // `gpt-6-sol` stays first: the backend can answer 400 "not supported when using Codex with a
+        // ChatGPT account" on a plan that does not have it yet.
         models: [
             model('gpt-6-sol', 5),
             model('gpt-6.1-sol', 5),
+            model('gpt-6.2-sol', 5),
+            model('gpt-6.2-astra', 6),
             model('gpt-6-astra', 6),
             model('gpt-6.1-terra', 4),
             model('gpt-6-luna', 3),
@@ -121,6 +124,8 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
         apiKeyUrl: 'https://platform.openai.com/api-keys',
         models: [
             model('gpt-6-astra', 6),
+            model('gpt-6.2-astra', 6),
+            model('gpt-6.2-sol', 5),
             model('gpt-6.1-sol', 5),
             model('gpt-6-sol', 5),
             model('gpt-6.1-terra', 4),
@@ -155,6 +160,8 @@ export const ENGINE_MODEL_CATALOG: CatalogProvider[] = [
             model('anthropic/claude-fable-5.1', 6),
             model('anthropic/claude-opus-5.5', 5),
             model('anthropic/claude-sonnet-5.5', 4),
+            model('openai/gpt-6.2-astra', 6),
+            model('openai/gpt-6.2-sol', 5),
             model('openai/gpt-6-astra', 6),
             model('openai/gpt-6.1-sol', 5),
             model('openai/gpt-6-sol', 5),
