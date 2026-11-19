@@ -13,6 +13,7 @@ import { EASE_OUT } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { fonts, spacing, withAlpha } from '@/theme/tokens'
 
+import { useLinkOrigin } from './link-origin'
 import { CodeBlock, DraftBlock, inlineCodeBackground } from './markdown/CodeBlock'
 import { MarkdownImage } from './markdown/MarkdownImage'
 import { MarkdownTable } from './markdown/MarkdownTable'
@@ -59,6 +60,7 @@ export function fileUrlOf(owner: FileOwner | null, src: string | undefined): str
 function InlineLink({ token, children }: { token: Tokens.Link; children: ReactNode }) {
     const ink = useInk()
     const { owner } = use(Scope)
+    const originOf = useLinkOrigin()
     const openWorkspaceFile = useOpenWorkspaceFile()
     const workspacePath = agentWorkspacePathFromHref(token.href)
     const onPress = () => {
@@ -66,7 +68,7 @@ function InlineLink({ token, children }: { token: Tokens.Link; children: ReactNo
             openWorkspaceFile(owner.agentId, workspacePath)
             return
         }
-        openExternalUrl(token.href)
+        openExternalUrl(token.href, originOf())
     }
     return (
         <Text onPress={onPress} accessibilityRole="link" style={{ color: ink.link, textDecorationLine: 'underline', fontFamily: workspacePath ? fonts.medium : undefined }}>

@@ -50,6 +50,7 @@ import type { StartedBy } from './origins/StartedByBanner'
 import type { VoiceSender } from './useVoiceMessage'
 import { AlertWidget } from './hitl/AlertWidget'
 import { HitlBlock, UnknownCallBlock } from './hitl/HitlBlock'
+import { LinkAuthorScope } from './link-origin'
 import { PendingHitlPill } from './hitl/PendingHitlPill'
 import { QueuedMessagePill } from './QueuedMessagePill'
 import { RISE_IN, ScrollToEndButton, SINK_OUT } from './ScrollToEndButton'
@@ -110,7 +111,16 @@ type ConversationPaneProps = {
 }
 
 // One conversation on screen: the transcript, what waits on an answer, and the composer.
-export function ConversationPane({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, updatedAt = null, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
+// The links of every message here open with the coworker who wrote them under the page.
+export function ConversationPane(props: ConversationPaneProps) {
+    return (
+        <LinkAuthorScope author={props.coworker}>
+            <ConversationPaneBody {...props} />
+        </LinkAuthorScope>
+    )
+}
+
+function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSessionCreated, models, status, updatedAt = null, onStatusChange, webUrl, onScreen = true, startedBy = null, initialMessage, canAttach = true, threads, onOpenThread }: ConversationPaneProps) {
     noteRender('ConversationPane')
     const { session, me } = useAuth()
     const caller = session && me ? { accessToken: session.access_token, workspaceId: me.workspace.id } : null

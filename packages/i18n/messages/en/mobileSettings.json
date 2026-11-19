@@ -12,6 +12,9 @@
         "coworkers": "Coworkers",
         "groupRecent": "Recent",
         "groupByBox": "By box",
+        "openLinksIn": "Open links in",
+        "linksBrowser": "Browser",
+        "linksRerun": "Rerun",
         "language": "Language",
         "notifications": "Notifications",
         "pushOff": "Push off",
@@ -151,6 +154,8 @@
         "notifications.actions.answer": "Button under a push notification with a question from a coworker: opens a text field to answer it. Keep it short.",
         "notifications.actions.reply": "Button under a push notification saying a coworker finished a task: opens a text field to send it a message. Keep it short.",
         "notifications.receipts.approve": "Notification shown after the person approved from the lock screen. {agent} is the coworker name.",
-        "notifications.receipts.failed": "{reason} is the reason the hub gave, already translated."
+        "notifications.receipts.failed": "{reason} is the reason the hub gave, already translated.",
+        "preferences.linksBrowser": "Option of the \"Open links in\" setting: links open in the phone's own web browser (Safari, Chrome).",
+        "preferences.linksRerun": "Option of the \"Open links in\" setting: links open inside the Rerun app. Rerun is the product name, keep it."
     }
 }

@@ -18,6 +18,7 @@ import type { FileOwner } from '@/api/files'
 import { isImageItem, openViewer, type ViewerItem } from '@/components/viewer/viewer-store'
 
 import { AuthedImage } from './cards/CardParts'
+import { LinkMessageScope } from './link-origin'
 import { Markdown } from './Markdown'
 import { MessageTimeReveal, type MessageStamp } from './MessageTimeReveal'
 import { splitIntoBubbles } from './markdown/blocks'
@@ -150,7 +151,9 @@ export function AssistantMessage({ text, showActions, streaming = false, owner =
     }
     return (
         <View style={{ gap: spacing.xs }}>
-            <AssistantBubbles text={text} streaming={streaming} owner={owner} />
+            <LinkMessageScope text={text}>
+                <AssistantBubbles text={text} streaming={streaming} owner={owner} />
+            </LinkMessageScope>
             {showActions && (
                 <View style={{ flexDirection: 'row', marginLeft: -spacing.sm }}>
                     <Action
