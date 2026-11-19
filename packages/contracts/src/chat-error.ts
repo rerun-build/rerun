@@ -98,6 +98,15 @@ const THINKING_REPLAY_REJECTED = /invalid `?signature`? in `?thinking`? block/i
 export const ENGINE_SESSION_NOT_FOUND = 'session not found for this agent'
 export const SESSION_NOT_FOUND = 'session_not_found'
 
+// A bare 402 is the Rerun proxy's: the SDK drops its `rerun_budget_exhausted` body for the status
+// text. A custom endpoint's 402 comes as the provider's own refusal, which can quote a "402" of its
+// own (a team id) and says nothing of the Rerun credit.
+function isRerunCreditRefusal(m: string): boolean {
+    if (m.includes('rerun_budget_exhausted')) return true
+    if (m.includes('provider returned error')) return false
+    return m.includes('payment required') || m.includes('402')
+}
+
 // Classified on the text rather than on a code, because what reaches the chat is `runs.error`, the
 // flattened provider message the engine stored. The patterns mirror the engine's own
 // `classifyProviderError`, so both ends agree on what a spent subscription looks like.
@@ -108,7 +117,7 @@ export function classifyChatError(message: string): ChatErrorKind {
     // built the request wrong, so another model fails the same way while a fresh run starts clean.
     // Checked first, since the refusal quotes message indexes ("messages.402") a looser test catches.
     if (THINKING_REPLAY_REJECTED.test(m)) return 'thinking_replay'
-    if (m.includes('rerun_budget_exhausted') || m.includes('payment required') || m.includes('402')) return 'budget'
+    if (isRerunCreditRefusal(m)) return 'budget'
     if (m.includes('run_in_flight')) return 'run_in_flight'
     if (m.includes(SESSION_NOT_FOUND) || m.includes(ENGINE_SESSION_NOT_FOUND)) return 'session_gone'
     if (SUBSCRIPTION_LIMIT.test(m)) return 'usage_limit'

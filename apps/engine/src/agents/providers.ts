@@ -1,5 +1,4 @@
 import { createProviderRegistry, wrapLanguageModel, type LanguageModel, type ToolSet } from 'ai'
-import { Agent as UndiciAgent } from 'undici'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
@@ -36,6 +35,7 @@ import { openrouterReasoningMiddleware, reasoningFetch } from './openrouter-reas
 import { cacheBreakpointsFetch } from './openrouter-cache.js'
 import { openrouterStreamRetryMiddleware } from './openrouter-stream-retry.js'
 import { opencodeLanguageModel } from './opencode.js'
+import { customEndpointFetch } from './custom-endpoint-fetch.js'
 import { opencodeChatReasoningMiddleware, opencodeUsageMiddleware } from './opencode-stream.js'
 import { agentProcessEnv } from './process-env.js'
 import { BRIDGE_SERVER_NAME, CLI_PROVIDERS, type LoadedAgent } from './types.js'
@@ -406,14 +406,6 @@ function openrouterCompatibleOptions(agent: LoadedAgent, provider: 'rerun' | 'op
     }
 }
 
-// A local model on modest hardware reads a long prompt for minutes before its first token, and
-// sends no response header until then: past the five minutes Node allows, the request is dropped and
-// retried from scratch, three times over. Measured on a CPU box: a 20k-token prompt takes 25 minutes.
-const CUSTOM_ENDPOINT_PATIENCE_MS = 60 * 60_000
-const customEndpointDispatcher = new UndiciAgent({ headersTimeout: CUSTOM_ENDPOINT_PATIENCE_MS, bodyTimeout: CUSTOM_ENDPOINT_PATIENCE_MS })
-
-const customEndpointFetch: typeof fetch = (input, init) => fetch(input, { ...init, dispatcher: customEndpointDispatcher } as RequestInit)
-
 // Any server that speaks the OpenAI chat format, at the address its owner gave. Nothing of
 // OpenRouter's dialect is added to the request: a strict server answers an unknown field with a 400.
 // The SDK refuses to build without a key, and a local server ignores the header it puts it in.
@@ -421,7 +413,7 @@ function customOptions(agent: LoadedAgent): Parameters<typeof createOpenAI>[0] {
     return {
         apiKey: connectionEnv(agent)[CONNECTION_TOKEN_KEY.custom] || 'none',
         baseURL: (agent.resolved.connection?.config.baseUrl ?? '').trim().replace(/\/+$/, ''),
-        fetch: customEndpointFetch,
+        fetch: customEndpointFetch(),
     }
 }
 

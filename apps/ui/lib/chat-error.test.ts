@@ -98,6 +98,15 @@ describe('classifyChatError', () => {
         expect(classifyChatError('ProviderRefusedError: Provider returned error: tools.0.custom.input_schema: invalid')).toBe('provider_error')
     })
 
+    // A custom endpoint (xAI here) answering 402 for its own account: the engine keeps its sentence as
+    // a refusal, and a "402" inside it (a team id) is not the Rerun credit.
+    it('tells a custom endpoint 402 apart from the Rerun credit', () => {
+        expect(classifyChatError('AI_APICallError: Provider returned error: Your team 4021a7 has either used all available credits or reached its monthly spending limit.')).toBe('provider_error')
+        expect(classifyChatError('AI_APICallError: Provider returned error: Payment Required')).toBe('provider_error')
+        expect(classifyChatError('AI_APICallError: Payment Required')).toBe('budget')
+        expect(classifyChatError('rerun_budget_exhausted')).toBe('budget')
+    })
+
     // Anthropic refusing a signed thinking block the engine replayed against another tool list. It
     // reads "Provider returned error" too, but switching models does not help: a fresh run does.
     it('tells a rejected thinking replay apart from a refusal', () => {
