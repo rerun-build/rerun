@@ -148,6 +148,25 @@ class Acceptance(Base):
         self.tick(12)
         self.assertEqual(len(self.sent_to("a1")), 1)
 
+    def test_an_open_gap_issue_holds_the_parent_when_github_search_finds_nothing(self):
+        self.w.search_finds = False
+        self.w.issues.append(gap())
+        self.w.unlabelled.add(30)
+        self.merge_child()
+        self.tick_until(lambda: self.sent_to("a1"))
+        self.w.open_children = [{"number": 30, "body": "**Part of**: #9\n"}]
+        self.w.finish("a1", "looked\nGAPS: #30")
+        self.tick()
+        self.tick(12)
+        self.assertEqual(len(self.sent_to("a1")), 1)
+        self.assertEqual(self.w.rows("SELECT k FROM kv WHERE job='escaped'"), [("5|gap #30",)])
+
+    def test_a_full_open_issue_list_holds_the_parent(self):
+        self.w.open_children = [{"number": 1000 + k, "body": "**Part of**: #90\n"} for k in range(1000)]
+        self.merge_child()
+        self.tick(12)
+        self.assertEqual(self.sent_to("a1"), [])
+
     def test_the_brief_asks_for_one_issue_per_parent_listing_every_gap(self):
         self.merge_child()
         self.tick_until(lambda: self.sent_to("a1"))
