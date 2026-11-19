@@ -18,7 +18,6 @@ KINDS = ("wt_new", "pr_open", "installs", "tests")
 NAMES = {
     "size": ["work_bytes", "work_bytes_age_s"],
     "folders": ["wt_count", "wt_unsaved", "wt_clean", "wt_foreign", "wt_oldest_unsaved", "wt_oldest_unsaved_idle_h"],
-    "lock": ["lock_held", "lock_pid", "lock_cmd", "lock_age_s"],
     "procs": [k + s for k in KINDS for s in ("_count", "_oldest_s")],
     "tools": ["tools_commit", "tools_installed_at"],
 }
@@ -120,31 +119,6 @@ def env_value(pid, key):
     return None
 
 
-def safe_word(s):
-    return re.sub(r"[^A-Za-z0-9._-]", "", s)[:64]
-
-
-def lock_group():
-    path = os.path.join(F.STATE, "builders.lock")
-    try:
-        text = read(path)
-        age = int(time.time() - os.path.getmtime(path))
-    except FileNotFoundError:
-        no = "not held"
-        return {"lock_held": (0, None), "lock_pid": (None, no), "lock_cmd": (None, no), "lock_age_s": (None, no)}
-    pid = int(text.split()[0])
-    cmd = None
-    try:
-        cmd = env_value(pid, "FACTORY_CMD")
-        if cmd is None:
-            cmd = read(os.path.join(PROC, str(pid), "comm")).strip()
-        cmd = safe_word(cmd) or None
-    except OSError:
-        cmd = None
-    return {"lock_held": (1, None), "lock_pid": (pid, None),
-            "lock_cmd": (cmd, None if cmd else "process gone"), "lock_age_s": (age, None)}
-
-
 def base(a):
     return os.path.basename(a)
 
@@ -218,7 +192,7 @@ def tools_group():
     return {"tools_commit": commit, "tools_installed_at": when}
 
 
-GROUPS = {"size": size_group, "folders": folders_group, "lock": lock_group, "procs": procs_group, "tools": tools_group}
+GROUPS = {"size": size_group, "folders": folders_group, "procs": procs_group, "tools": tools_group}
 
 
 def run_group(key, box):
