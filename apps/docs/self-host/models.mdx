@@ -3,6 +3,8 @@ title: "AI models"
 description: "The Rerun models on your OpenRouter key, your own API keys, and your Claude, ChatGPT or OpenCode plan."
 ---
 
+import { Shot } from '/snippets/media.jsx'
+
 Every coworker thinks with one model at a time. On a self-hosted Rerun you pay the AI provider directly: there is no credit, no meter and no plan in between.
 
 ## The Rerun models
@@ -33,11 +35,15 @@ Open the workspace menu, the pill in the top left corner, and click **AI provide
 | **OpenRouter** | Every model OpenRouter carries. Also accepts a custom base URL and custom model ids, to point coworkers at your own router |
 | **Custom endpoint** | Any server that speaks the OpenAI chat format: your own model, or a provider not listed here. See below |
 
+<Shot src="/images/self-host/models/your-api-keys" alt="The Your API keys section of AI providers, with Anthropic, OpenAI, Google, OpenRouter and Custom endpoint" />
+
 Provider credentials belong to the workspace. They are stored on the workspace's server, in its data-dir, and never in Supabase. Every coworker of the workspace can use them.
 
 ## Your own model
 
 Under **Your API keys**, pick **Custom endpoint** to run coworkers on a model you host or on any OpenAI-compatible provider. Pick a server, check the address, paste a key if it needs one, and click **Connect**. The engine asks the server which models it serves and switches them on.
+
+<Shot src="/images/self-host/models/custom-endpoint" alt="The Custom endpoint form: Server, Name, Base URL and an optional API key, then Connect" />
 
 | Server | Base URL | Key |
 | --- | --- | --- |

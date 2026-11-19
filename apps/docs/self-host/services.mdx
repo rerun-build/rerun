@@ -3,6 +3,8 @@ title: "Services and apps"
 description: "The catalog that ships with Rerun, any MCP server you add, Composio for Google, Microsoft and the rest, and the OAuth apps an install brings itself."
 ---
 
+import { Shot } from '/snippets/media.jsx'
+
 A coworker reaches your tools through apps: Stripe, Notion, Slack, GitHub and hundreds more. On your install, they come from three places: the catalog, any MCP server you register, and Composio if you turn it on.
 
 How a coworker installs and uses an app is the same as on Rerun Cloud. See [Apps](/agents/apps).
@@ -29,6 +31,8 @@ When the catalog does not have what you need, register the service's MCP server 
 
 - **For one coworker**: open its **Apps**, then the **MCP** tab, and add an HTTP, SSE or local command server, with its own headers, OAuth or environment variables.
 - **For the whole workspace**: in the [Vault](/vault#add-an-mcp-server), click **Add**, pick **MCP server**, give it an https address or the command the machine starts, then pick the coworkers that use it.
+
+<Shot src="/images/self-host/services/mcp-server-editor" alt="The New MCP server form of a coworker: name, transport stdio, sse or http, command, arguments and environment" />
 
 Reference a stored secret with `${VARIABLE_NAME}`: it resolves on your server at run time. Anything with an MCP server works with Rerun this way, catalog or not. An MCP server that signs in by OAuth needs `MOBILE_OAUTH_TICKET_SECRET`, like the catalog's.
 
