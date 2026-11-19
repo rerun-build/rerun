@@ -68,6 +68,13 @@ class Status(unittest.TestCase):
         self.assertEqual([(h["job"], h["state"], h["since"]) for h in out["planner_holders"]],
                          [("plan:12", "reviewing", "2026-11-19T00:00:00Z"), ("recheck:40", "running", "2026-11-18T17:00:00Z")])
 
+    def test_the_digest_shows_planner_copies_as_the_controls_set_them(self):
+        self.make()
+        self.planner()
+        self.d.cfg["types"]["planner"]["coworkers"][0]["runs"] = 0
+        out = self.d.status({"digest": {}, "holds": []})
+        self.assertEqual((out["planner_copies"], out["planner_free"]), ({"Boss": 0}, 0))
+
     def test_a_broken_plan_record_still_posts_the_digest(self):
         self.make()
         self.capture()

@@ -2001,6 +2001,7 @@ class Dispatcher:
             out["plans"] = {str(n): r.get("state") for n, r in sorted(records.items()) if r.get("state") not in planning.ENDED}
             out["planner_free"] = len(pools.free_copies(dict(self.cfg, held=False), "planner", self.station.running()))
             out["planner_room"] = self.station.parallel - len(live)
+            out["planner_copies"] = {c["name"]: c["runs"] for c in (pools.types(self.cfg).get("planner") or {}).get("coworkers", [])}
             rows = [("plan:%d" % n, r) for n, r in sorted(live.items())]
             rows += [("recheck:%d" % n, r) for n, r in sorted(self.station.live_rechecks().items())]
             out["planner_holders"] = [{"job": job, "by": self.names.get(r.get("agent"), str(r.get("agent"))[:8]), "state": r.get("state"),
