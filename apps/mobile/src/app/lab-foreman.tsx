@@ -125,7 +125,7 @@ function KeyboardProbe({ keyboard, lift }: { keyboard: AnimatedKeyboardInfo; lif
 }
 
 // The same layout as ConversationPane, fed by mock messages, lifted above the keyboard the same way.
-export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = FOREMAN_DISPLAY_NAME, probe = false }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string; probe?: boolean }) {
+export function MockPane({ state, topInset = spacing.lg, seeThrough = true, coworkerName = FOREMAN_DISPLAY_NAME, probe = false, onScreen = true }: { state: LabState; topInset?: number; seeThrough?: boolean; coworkerName?: string; probe?: boolean; onScreen?: boolean }) {
     const insets = useSafeAreaInsets()
     const [draft, setDraft] = useState('')
     const [footerHeight, setFooterHeight] = useState(0)
@@ -161,7 +161,7 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
                     {(state === 'conversation' || state === 'long') && !draft && <Suggestions items={SUGGESTIONS} onPick={noop} />}
                     {!blockShown && (
                         <View style={{ paddingHorizontal: spacing.md }}>
-                            <Composer value={draft} onChangeText={setDraft} onSend={noop} onStop={noop} running={running} placeholder={!messages.length ? 'What should we work on?' : seeThrough ? 'Ask your Chief of Staff anything' : `Message ${coworkerName}`} canAttach={!seeThrough} />
+                            <Composer value={draft} onChangeText={setDraft} onSend={noop} onStop={noop} running={running} placeholder={!messages.length ? 'What should we work on?' : seeThrough ? 'Ask your Chief of Staff anything' : `Message ${coworkerName}`} canAttach={!seeThrough} onScreen={onScreen} />
                         </View>
                     )}
                 </View>

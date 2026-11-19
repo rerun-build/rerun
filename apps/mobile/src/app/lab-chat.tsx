@@ -41,7 +41,7 @@ export default function ChatLab() {
     const progress = useSharedValue(activeIndex)
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={index => setActiveId(pages[index]?.sessionId ?? null)} renderPage={page => <MockPane state={page.sessionId ? (params.state ?? STATES[pages.indexOf(page) % STATES.length]) : 'empty'} topInset={insets.top + CHAT_HEADER_HEIGHT + spacing.lg} seeThrough={false} coworkerName={coworker.name} probe={params.probe === '1'} />} />
+            <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={index => setActiveId(pages[index]?.sessionId ?? null)} renderPage={(page, onScreen) => <MockPane onScreen={onScreen} state={page.sessionId ? (params.state ?? STATES[pages.indexOf(page) % STATES.length]) : 'empty'} topInset={insets.top + CHAT_HEADER_HEIGHT + spacing.lg} seeThrough={false} coworkerName={coworker.name} probe={params.probe === '1'} />} />
             <ChatHeader coworker={coworker} tabs={tabs} activeId={activeId ?? undefined} progress={progress} allSessions={[...tabs, ...AUTOMATED_RUNS]} onBack={() => router.back()} onSelect={setActiveId} onNewSession={() => setActiveId(null)} onOpenDetails={() => router.push('/lab-coworker')} />
         </View>
     )

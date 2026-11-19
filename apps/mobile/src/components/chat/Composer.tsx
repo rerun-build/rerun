@@ -1,6 +1,6 @@
 import { type SkillSummary } from '@rerun/contracts'
 import { type Ref, useEffect, useEffectEvent, useImperativeHandle, useRef, useState } from 'react'
-import { Text, TextInput, View, type TextInputInstance } from 'react-native'
+import { StyleSheet, Text, TextInput, View, type TextInputInstance } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { addHardwareReturnListener, addPasteImagesListener } from '@/chat/composer-paste'
@@ -46,14 +46,19 @@ type ComposerProps = {
     mentionAgents?: MentionAgent[]
     mentionComputers?: MentionComputer[]
     autoFocus?: boolean
+    // False while its page waits beside the one on screen. iOS draws no glass on a view set up off
+    // screen, and never draws it later: the glass is laid again each time the composer comes on screen.
+    onScreen?: boolean
     ref?: Ref<ComposerHandle>
 }
 
 // A pill at rest, a card once in use (focused, holding text or attachments, or listening).
-export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], mentionComputers = [], autoFocus, ref }: ComposerProps) {
+export function Composer({ value, onChangeText, attachments = [], onAttachmentsChange = () => {}, onSend, onStop, running, placeholder, model, onOpenModel, canAttach = true, voice, target, skills = [], mentionAgents = [], mentionComputers = [], autoFocus, onScreen = true, ref }: ComposerProps) {
     noteRender('Composer')
     const theme = useTheme()
     const glass = useGlassStyle()
+    const [arrivals, setArrivals] = useState({ onScreen, count: 0 })
+    if (arrivals.onScreen !== onScreen) setArrivals({ onScreen, count: arrivals.count + (onScreen ? 1 : 0) })
     const [focused, setFocused] = useState(Boolean(autoFocus))
     const input = useRef<TextInputInstance>(null)
     useImperativeHandle(ref, () => ({ focus: () => input.current?.focus() }), [])
@@ -148,7 +153,9 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
     return (
         <View style={{ gap: spacing.sm }}>
             {mention && suggestions.length > 0 && <MentionSuggestions trigger={mention.trigger} items={suggestions} onPick={pickMention} />}
-            <GlassSurface key={theme.scheme} colorScheme={theme.scheme} glassEffectStyle={glass} style={{ borderRadius: expanded ? radius.xl : radius.pill, borderCurve: 'continuous', paddingHorizontal: expanded ? spacing.md : spacing.sm, paddingTop: expanded ? spacing.md : spacing.sm, paddingBottom: spacing.sm, gap: spacing.sm }}>
+            {/* The glass sits behind the composer rather than around it: laid again, it leaves the field and its focus alone. */}
+            <View style={{ borderRadius: expanded ? radius.xl : radius.pill, borderCurve: 'continuous', paddingHorizontal: expanded ? spacing.md : spacing.sm, paddingTop: expanded ? spacing.md : spacing.sm, paddingBottom: spacing.sm, gap: spacing.sm }}>
+                <GlassSurface key={`${theme.scheme}:${arrivals.count}`} testID="composer-glass" pointerEvents="none" colorScheme={theme.scheme} glassEffectStyle={glass} style={[StyleSheet.absoluteFill, { borderRadius: expanded ? radius.xl : radius.pill, borderCurve: 'continuous' }]} />
                 {expanded && target && (
                     <View style={{ paddingHorizontal: spacing.xs }}>
                         <TargetPicker target={target.coworker} choices={target.choices} onPick={target.onPick} />
@@ -190,7 +197,7 @@ export function Composer({ value, onChangeText, attachments = [], onAttachmentsC
                         )}
                     </View>
                 )}
-            </GlassSurface>
+            </View>
         </View>
     )
 }

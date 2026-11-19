@@ -2,7 +2,7 @@ import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf
 import { router, useFocusEffect } from 'expo-router'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
-import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideInDown, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
@@ -517,15 +517,13 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                             <QueuedMessagePill text={queue.queued.text} busy={chat.busy} pending={stopping} onSendNow={sendQueuedNow} onDiscard={queue.clear} />
                         </Animated.View>
                     )}
-                    {/* The composer's glass goes blank under a parent below full opacity, and when it mounts mid-slide:
-                        it slides rather than fades, and the page opens with it already in place. */}
-                    <LayoutAnimationConfig skipEntering>
-                        {!replacesComposer && (
-                            <Animated.View entering={SlideInDown.duration(280)} exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
-                                <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} />
-                            </Animated.View>
-                        )}
-                    </LayoutAnimationConfig>
+                    {/* The composer's glass goes blank under a parent below full opacity, and when it is laid while
+                        moving: it comes back in place once a block is answered, and only leaves with a slide. */}
+                    {!replacesComposer && (
+                        <Animated.View exiting={SlideOutDown.duration(280)} style={{ paddingHorizontal: spacing.md }}>
+                            <Composer ref={composer} value={draft} onChangeText={setDraft} attachments={attachments} onAttachmentsChange={setAttachments} skills={skills} mentionAgents={mentionAgents} mentionComputers={mentionComputers} onSend={() => submit(draft)} onStop={chat.stop} running={chat.busy || uploading} placeholder={placeholder} model={model} onOpenModel={openModel} canAttach={canAttach && !pending} voice={voice} autoFocus={!initialSessionId && onScreen} onScreen={onScreen} />
+                        </Animated.View>
+                    )}
                 </View>
             </View>
         </Animated.View>

@@ -78,3 +78,23 @@ describeOnIos('Composer on an iPad hardware keyboard', () => {
         expect(onChangeText).not.toHaveBeenCalled()
     })
 })
+
+// iOS draws no glass on a view set up off screen (a page of the pager beside the one shown): the glass is
+// laid again when the composer comes on screen, and only then.
+describeOnIos('the composer glass', () => {
+    const composer = (value: string, onScreen: boolean) => <Composer value={value} onChangeText={() => {}} onSend={() => {}} onStop={() => {}} running={false} placeholder="Message Pulse" onScreen={onScreen} />
+
+    it('is laid again when its page comes on screen', async () => {
+        const { rerender } = await render(composer('', false))
+        const offScreen = screen.getByTestId('composer-glass')
+        await rerender(composer('', true))
+        expect(screen.getByTestId('composer-glass')).not.toBe(offScreen)
+    })
+
+    it('stays the same while someone types or the page stays on screen', async () => {
+        const { rerender } = await render(composer('', true))
+        const glass = screen.getByTestId('composer-glass')
+        await rerender(composer('Hello', true))
+        expect(screen.getByTestId('composer-glass')).toBe(glass)
+    })
+})
