@@ -2102,6 +2102,13 @@ class Dispatcher:
             out["label_drift"] = labelcheck.check(labelcheck.read(self.gh, self.repo), data, rows)
         except Exception as e:  # noqa: BLE001
             out["label_drift_error"] = type(e).__name__
+            return out
+        try:
+            out["label_fixed"] = labelcheck.fix(self.gh, self.repo, self.store, out["label_drift"])
+            for f in out["label_fixed"]:
+                log(f["issue"], "label fix: " + f["did"])
+        except Exception as e:  # noqa: BLE001
+            out["label_fixed_error"] = type(e).__name__
         return out
 
     def report_line(self):

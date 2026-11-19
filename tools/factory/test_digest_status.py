@@ -83,6 +83,7 @@ class Status(unittest.TestCase):
         self.addCleanup(setattr, D.labelcheck, "read", real)
         out = self.d.status({"digest": {}, "holds": []})
         self.assertEqual(out["label_drift"]["plan_label_no_plan"], [30])
+        self.assertEqual(out["label_fixed"], [{"issue": 30, "did": "removed factory-plan"}])
 
     def test_an_unreadable_issue_list_still_posts_the_registry(self):
         self.make()
