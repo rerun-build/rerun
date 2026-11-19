@@ -18,6 +18,11 @@ class RepoName(unittest.TestCase):
         self.assertEqual(F.short("special-place-ai-heaven/rerun"), "rerun")
         self.assertEqual(F.short("special-place-ai-heaven/testpilot"), "testpilot")
 
+    def test_the_old_name_and_the_folder_name_open_work_on_the_renamed_repository(self):
+        self.assertEqual(F.named("special-place-ai-heaven/rerun"), "special-place-ai-heaven/moldwright")
+        self.assertEqual(F.named("special-place-ai-heaven/moldwright"), "special-place-ai-heaven/moldwright")
+        self.assertEqual(F.named("special-place-ai-heaven/testpilot"), "special-place-ai-heaven/testpilot")
+
 
 if __name__ == "__main__":
     unittest.main()
