@@ -14,6 +14,7 @@ ASKS = 2
 RUN_LIMIT = 2700
 HELD = ("running", "accepted", "closed", "left")
 CLOSED_LIMIT = 200
+OPEN_LIMIT = 1000
 
 
 def due(jobs):
@@ -123,10 +124,13 @@ class Station:
         return [(r["agent"], int(r["copy"])) for r in self.live().values()]
 
     def open_children(self, n):
-        found = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--search",
-                                    "Part of #%d in:body" % n, "--json", "number,body", "--limit", "100"]))
+        raw = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json", "number,body",
+                                  "--limit", str(OPEN_LIMIT)]))
+        if len(raw) >= OPEN_LIMIT:
+            self.log(n, "acceptance waits: the open issue list reached %d, so not every open child can be seen" % OPEN_LIMIT)
+            return raw
         pattern = re.compile(r"Part of\W*#%d\b" % n)
-        return [i for i in found if pattern.search(i.get("body") or "")]
+        return [i for i in raw if pattern.search(i.get("body") or "")]
 
     def closed_children(self, n):
         raw = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "closed", "--search",
