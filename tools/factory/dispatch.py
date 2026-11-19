@@ -191,6 +191,17 @@ def where(j):
     return j.get("repo") or "rerun"
 
 
+def build_asks(j):
+    asks = proof.change_asks(j.get("body"))
+    if not asks:
+        return []
+    return [
+        'The asks of the Change, in order:',
+        *["ASK %d: %s" % (n, a) for n, a in enumerate(asks, 1)],
+        '',
+    ]
+
+
 def build_brief(j):
     return "\n".join([
         'One job, sent by the dispatcher and not by Boss: %s #%s, "%s". You work alone on it: call no other coworker, not Boss either, and send no question to Rob.' % (where(j), j["issue"], j["title"]),
@@ -202,8 +213,9 @@ def build_brief(j):
         *(['   This job was taken before and returned. Open a new worktree with the suffix a%d, `/data/tools/bin/wt new %s %s a%d`, and not the earlier attempt\'s: its files follow the old plan. Write every file from the issue text as it is now.' % (j["take"], where(j), j["issue"], j["take"])] if j.get("take", 1) > 1 else []),
         '2. Where the issue names a done-test, write it first and see it fail. Then make the change, in the files the issue names and nowhere else.',
         NO_COMMENTS,
+        *build_asks(j),
         '3. Run only the test files you touched, with the worker pool capped at 2. No full suite. Then run the lint and the type check of every package the change touched (`pnpm --filter <package> lint`, `pnpm --filter <package> ts-check`), and for Python files under `tools/factory` run `ruff check` on them where ruff is installed; fix what they report before opening the pull request. Lint warnings do not block; lint errors do. Give the lint and the type check each a shell call of their own, with `timeoutMs` set above the default of 120000 (the limit is 600000); never chain them with the commit or `pr-open`.',
-        '4. Commit, push, and open one pull request into dev. Title: the issue title plus "(#%s)". Body: what changed, which test failed before and passes now, and the line "Closes #%s". The body also holds a section `## Asks` with one line per **Change** bullet of the issue, `- <the bullet in a few words>: <file>:<line>`, where `git diff origin/dev...HEAD` does it. A Change bullet you cannot point to in that diff is not done: do it before pr-open.' % (j["issue"], j["issue"]),
+        '4. Commit, push, and open one pull request into dev. Title: the issue title plus "(#%s)". Body: what changed, which test failed before and passes now, and the line "Closes #%s". The body also holds a section `## Asks` with one line per **Change** bullet of the issue, `ASK <n>: <file>:<line>`, where `git diff origin/dev...HEAD` does it. A Change bullet you cannot point to in that diff is not done: do it before pr-open.' % (j["issue"], j["issue"]),
         '5. Leave the worktree open. It is closed after the merge by a sweep.',
         'A file you write that is not part of the change (the pull request body before pr-open, a note) goes into `/tmp`, carries the issue number in its name, and is removed once it is used. Never put one in your worktree or in the folder above it.',
         '',
