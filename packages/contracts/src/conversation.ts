@@ -153,7 +153,7 @@ export type ConversationReply = z.infer<typeof conversationReplySchema>
 export const conversationReplyResultSchema = z.object({ runId: z.string().nullable() })
 export type ConversationReplyResult = z.infer<typeof conversationReplyResultSchema>
 
-export const markHandledSchema =z.union([z.object({ sessionIds: z.array(z.string()).min(1) }), z.object({ all: z.literal(true) })])
+export const markHandledSchema = z.union([z.object({ sessionIds: z.array(z.string()).min(1) }), z.object({ all: z.literal(true) })])
 export type MarkHandledInput = z.infer<typeof markHandledSchema>
 
 export const inboxStatusSchema = z.enum(['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'waiting_human', 'awaiting_ack', 'error', 'done'])
