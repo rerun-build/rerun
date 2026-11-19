@@ -1,4 +1,4 @@
-import contextlib, io, json, os, shutil, stat, subprocess, sys, tempfile, time, types, unittest
+import contextlib, io, json, os, re, shutil, stat, subprocess, sys, tempfile, time, types, unittest
 from unittest import mock
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -537,6 +537,7 @@ class PrOpenRetry(FactoryCase):
         self.body = os.path.join(self.tmp, "body.md")
         write(self.tmp, "body.md", "\n\n".join(F.PR_HEADS) + "\n\nbody\n")
         self.creates = []
+        self.created_bodies = []
 
     def pr_open(self, results):
         pending = list(results)
@@ -552,6 +553,8 @@ class PrOpenRetry(FactoryCase):
                 return subprocess.CompletedProcess(cmd, 0, json.dumps(issue), "")
             if cmd[:3] == [F.GH, "pr", "create"]:
                 self.creates.append(cmd)
+                with open(cmd[cmd.index("--body-file") + 1]) as f:
+                    self.created_bodies.append(f.read())
                 rc, out, err = pending.pop(0)
                 return subprocess.CompletedProcess(cmd, rc, out, err)
             if cmd[0] == F.GH:
@@ -590,6 +593,18 @@ class PrOpenRetry(FactoryCase):
         self.assertEqual(len(self.creates), 4)
         self.assertEqual(sleeps, [60, 120, 240])
         self.assertIn("(tried 4 times over 7 minutes)", out)
+
+    def test_pr_open_adds_the_closes_line_when_the_body_lacks_it(self):
+        write(self.tmp, "body.md", "\n\n".join(F.PR_HEADS) + "\n\nbody\n")
+        code, out, sleeps = self.pr_open([(0, "https://github.com/x/y/pull/9\n", "")])
+        self.assertEqual(code, 0, out)
+        self.assertTrue(self.created_bodies[0].rstrip().endswith("Closes #1572"), self.created_bodies[0])
+
+    def test_pr_open_keeps_one_closes_line(self):
+        write(self.tmp, "body.md", "\n\n".join(F.PR_HEADS) + "\n\nbody\n\nCloses #1572\n")
+        code, out, sleeps = self.pr_open([(0, "https://github.com/x/y/pull/9\n", "")])
+        self.assertEqual(code, 0, out)
+        self.assertEqual(len(re.findall(r"(?mi)^Closes #1572\s*$", self.created_bodies[0])), 1, self.created_bodies[0])
 
     def test_pr_open_other_failure_is_not_retried(self):
         code, out, sleeps = self.pr_open([(1, "", "HTTP 422 Validation Failed")])

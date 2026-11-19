@@ -832,6 +832,8 @@ def cmd_pr_open(a):
     preflight_lines(top, plan)
     preflight_lint(top, changed)
     body = "Job: %s#%s, chunk %s\n\n%s" % (named(full), issue, chunk, body)
+    if not re.search(r"(?mi)^Closes #%s\s*$" % issue, body):
+        body += "\n\nCloses #%s\n" % issue
     tmp = os.path.join(STATE, "prbody-%d.md" % os.getpid())
     open(tmp, "w").write(body)
     run([GIT, "push", "--quiet", "-u", "origin", branch], cwd=top)
