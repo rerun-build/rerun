@@ -1,4 +1,5 @@
 import type { SessionKind, SessionStatus } from '@rerun/contracts'
+import { useState } from 'react'
 import { Platform, Pressable, View } from 'react-native'
 import Animated, { Extrapolation, FadeIn, interpolate, LayoutAnimationConfig, useAnimatedStyle, type SharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -25,6 +26,9 @@ const AVATAR_INSET = (PILL_HEIGHT - AVATAR) / 2
 const AVATAR_SPACE = AVATAR_INSET + AVATAR + spacing.sm
 export const CHAT_HEADER_HEIGHT = PILL_HEIGHT + spacing.sm
 const CHIP_MAX_WIDTH = 240
+// The text beside the face never narrows below this, so a short name still reads as a pill.
+const TITLE_MIN_WIDTH = 56
+const TITLE_END_PADDING = spacing.lg
 
 // A conversation as the header shows it. `title` is null until the first message names it, and
 // `loading` while the hub has not said yet what the conversation is called. `status`, `unseen` and
@@ -47,10 +51,12 @@ type ChipPageProps = {
     progress?: SharedValue<number>
     index?: number
     untitled?: string
+    // The width the name and the title take, for the pill to hug them. Given, they are centered.
+    onContentWidth?: (width: number) => void
 }
 
 // One conversation inside the header's pill, beside the coworker's face: its name over the conversation's title.
-export function ChipPage({ coworker, session, active, width, progress, index = 0, untitled }: ChipPageProps) {
+export function ChipPage({ coworker, session, active, width, progress, index = 0, untitled, onContentWidth }: ChipPageProps) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.header')
     const general = session.kind === 'general'
@@ -61,8 +67,8 @@ export function ChipPage({ coworker, session, active, width, progress, index = 0
         return { opacity: interpolate(distance, [0, 0.6], [1, 0], Extrapolation.CLAMP) }
     })
     return (
-        <Animated.View style={[{ width, height: PILL_HEIGHT, justifyContent: 'center', paddingRight: spacing.md }, fade]}>
-            <View style={{ maxWidth: '100%', alignItems: 'flex-start' }}>
+        <Animated.View style={[{ width, height: PILL_HEIGHT, justifyContent: 'center', alignItems: onContentWidth ? 'center' : 'flex-start', paddingRight: onContentWidth ? 0 : spacing.md }, fade]}>
+            <View onLayout={onContentWidth ? event => onContentWidth(Math.ceil(event.nativeEvent.layout.width)) : undefined} style={{ maxWidth: '100%', alignItems: onContentWidth ? 'center' : 'flex-start' }}>
                 <AppText variant="caption" tone="muted" medium numberOfLines={1} maxFontSizeMultiplier={1.2}>
                     {coworker.name}
                 </AppText>
@@ -154,7 +160,10 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     const t = useTranslations('mobileChat.header')
     const { width: paneWidth } = usePaneSize()
     const chipWidth = Math.min(CHIP_MAX_WIDTH, paneWidth - pane.left - pane.right - 2 * (spacing.lg + GLASS_BUTTON_SIZE + spacing.sm))
-    const titleWidth = chipWidth - AVATAR_SPACE
+    // Each page keeps the widest slot the pill may take; the pill itself hugs the page on screen, and
+    // follows the finger from one page's width to the next.
+    const titleWidth = chipWidth - AVATAR_SPACE - TITLE_END_PADDING
+    const [contentWidths, setContentWidths] = useState<Record<string, number>>({})
     const hasConversations = tabs.length > 0
     const general = tabs[0]?.kind === 'general' ? tabs[0] : null
     const untitled = general ? t('newThread') : t('newConversation')
@@ -164,24 +173,40 @@ export function ChatHeader({ coworker, tabs, activeId, progress, allSessions, on
     const activeIndex = hasConversations && activeId ? tabs.findIndex(session => session.id === activeId) : tabs.length
     const activeTitle = tabs[activeIndex]?.kind === 'general' ? t('general') : (tabs[activeIndex]?.title ?? untitled)
     const running = tabs[activeIndex]?.running ?? false
-    const track = useAnimatedStyle(() => ({ transform: [{ translateX: hasConversations ? -progress.value * titleWidth : 0 }] }))
+    const shownWidths = pages.map(session => Math.min(titleWidth, Math.max(TITLE_MIN_WIDTH, contentWidths[session.id] ?? titleWidth)))
+    const lastPage = shownWidths.length - 1
+    const widthAt = (position: number) => {
+        'worklet'
+        const at = Math.min(Math.max(position, 0), lastPage)
+        const below = Math.floor(at)
+        const from = shownWidths[below]
+        return from + (shownWidths[Math.min(below + 1, lastPage)] - from) * (at - below)
+    }
+    const viewport = useAnimatedStyle(() => ({ width: widthAt(hasConversations ? progress.value : lastPage) }))
+    // The page on screen is centered in the pill whatever the pill's width: its slot slides by a whole
+    // slot per page, less the half of the slot the pill leaves out.
+    const track = useAnimatedStyle(() => {
+        const at = hasConversations ? progress.value : lastPage
+        return { transform: [{ translateX: -at * titleWidth - (titleWidth - widthAt(at)) / 2 }] }
+    })
+    const measure = (id: string) => (width: number) => setContentWidths(known => (known[id] === width ? known : { ...known, [id]: width }))
     const identityLabel = t('identityLabel', { name: coworker.name, title: hasConversations ? activeTitle : t('newChat') })
     // The coworker's face beside its name and the conversation, in one glass pill; a tap opens the coworker.
     const pill = (
-        <GlassSurface isInteractive={Boolean(onOpenDetails)} colorScheme={theme.scheme} glassEffectStyle={glass} style={{ width: chipWidth, height: PILL_HEIGHT, flexDirection: 'row', alignItems: 'center', borderRadius: PILL_HEIGHT / 2, overflow: 'hidden' }}>
+        <GlassSurface isInteractive={Boolean(onOpenDetails)} colorScheme={theme.scheme} glassEffectStyle={glass} style={{ height: PILL_HEIGHT, flexDirection: 'row', alignItems: 'center', borderRadius: PILL_HEIGHT / 2, overflow: 'hidden' }}>
             <View style={{ marginLeft: AVATAR_INSET, marginRight: spacing.sm }}>
                 <CoworkerAvatar coworker={{ ...coworker, status: running ? 'working' : coworker.status === 'working' ? 'idle' : coworker.status }} size={AVATAR} />
             </View>
-            <View style={{ width: titleWidth, height: PILL_HEIGHT, overflow: 'hidden' }}>
+            <Animated.View testID="chat-header-titles" style={[{ height: PILL_HEIGHT, marginRight: TITLE_END_PADDING, overflow: 'hidden' }, viewport]}>
                 {/* A title known when the chat opens is there at once; on Android its fade could hold it hidden for seconds. */}
                 <LayoutAnimationConfig skipEntering>
                     <Animated.View style={[{ flexDirection: 'row', width: pages.length * titleWidth }, track]}>
                         {pages.map((session, index) => (
-                            <ChipPage key={session.id} coworker={coworker} session={hasConversations ? session : { ...session, title: t('newChat') }} active={index === activeIndex} width={titleWidth} progress={hasConversations ? progress : undefined} index={index} untitled={untitled} />
+                            <ChipPage key={session.id} coworker={coworker} session={hasConversations ? session : { ...session, title: t('newChat') }} active={index === activeIndex} width={titleWidth} progress={hasConversations ? progress : undefined} index={index} untitled={untitled} onContentWidth={measure(session.id)} />
                         ))}
                     </Animated.View>
                 </LayoutAnimationConfig>
-            </View>
+            </Animated.View>
         </GlassSurface>
     )
 
