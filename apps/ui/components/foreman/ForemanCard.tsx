@@ -13,6 +13,7 @@ import type { AgentViewTab } from '@/lib/board/agent-sheet-views'
 import type { IsoAgent } from '@/lib/board/types'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useForemanName } from '@/hooks/useForemanName'
 
 const TILES: { tile: CardDestination; screen: AgentViewTab }[] = [
     { tile: 'services', screen: 'services' },
@@ -27,7 +28,7 @@ const WITHOUT_TABS: readonly AgentViewTab[] = ['published', 'triggers']
 const BREADCRUMB_ORB_SIZE = 16
 
 function useForemanAsAgent(): IsoAgent {
-    const name = useTranslations('workspaceView.foreman')('name')
+    const name = useTranslations('workspaceView.foreman')('name', useForemanName())
     const workspaceId = useSession().workspace?.id ?? 0
     return useMemo(() => ({ id: FOREMAN_AGENT_ID, name, handle: null, description: null, templateId: null, status: 'idle', position: { col: 0, row: 0 }, workspaceId, spaceId: '', disabledAt: null, disabledReason: null }), [name, workspaceId])
 }

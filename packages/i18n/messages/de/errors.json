@@ -547,5 +547,7 @@
     "stopTaskFailed": "Diese Aufgabe konnte nicht gestoppt werden",
     "mcpServerNotFound": "MCP-Server nicht gefunden: {name}",
     "mcpNoSignInHere": "{name} hat keine Anmeldung, die sich von hier öffnen lässt.",
-    "loadReferralsFailed": "Deine Empfehlungen konnten nicht geladen werden"
+    "loadReferralsFailed": "Deine Empfehlungen konnten nicht geladen werden",
+    "foremanNameInvalid": "Verwende 1 bis {max} Buchstaben, Ziffern, Leerzeichen, Punkte, Apostrophe oder Bindestriche.",
+    "saveForemanNameFailed": "Der Name konnte nicht gespeichert werden."
 }

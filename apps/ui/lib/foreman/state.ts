@@ -16,6 +16,7 @@ import { AGENT_COLUMNS, SPACE_COLUMNS } from './board-map'
 import { foremanHubApiKey } from './hub-api-key'
 import type { KickoffIntent } from './kickoff-marker'
 import { accountLanguage, preferredLanguage } from './language'
+import { sanitizeForemanName } from './name'
 import { stampWorkspaceOnboarded } from './profile'
 import { foremanPhase, isNamedReadyMade, type ArrivingIntent, type ForemanAnswers, type ForemanState } from './phase'
 
@@ -70,7 +71,10 @@ export async function loadForemanState(ctx: WorkspaceContext, acceptLanguage: st
     const visibleAgents = reach ? (agents ?? []).filter(agent => visibleSpaceIds.has(agent.space_id)) : (agents ?? [])
 
     const answers = readAnswers(onboarding.data?.answers)
-    const foreman = answers.foreman ?? {}
+    // Read back through the same rule it was written with: the name goes into the prompt on every turn.
+    const { name: storedName, ...profile } = answers.foreman ?? {}
+    const name = sanitizeForemanName(storedName)
+    const foreman = name ? { ...profile, name } : profile
     const entitled = isSubscriptionEntitled(ctx.workspace.subscription_status)
     const trialing = ctx.workspace.subscription_status === 'trialing'
     const onboardingCompletedAt = ctx.workspace.onboarded_at ?? null

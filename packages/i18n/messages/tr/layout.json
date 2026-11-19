@@ -137,9 +137,9 @@
     },
     "controlCenter": {
         "title": "Kontrol merkezi",
-        "description": "Bir ajana, bir ayara veya bir konuşmaya gidin ya da Chief of Staff'ınıza sorun.",
+        "description": "{named, select, yes {Bir ajana, bir ayara veya bir konuşmaya gidin ya da {name} ile konuşun.} other {Bir ajana, bir ayara veya bir konuşmaya gidin ya da Chief of Staff'ınıza sorun.}}",
         "back": "Geri",
-        "askRerun": "Chief of Staff'ınıza sorun",
+        "askRerun": "{named, select, yes {{name} ile konuşun} other {Chief of Staff'ınıza sorun}}",
         "quotedQuery": "“{query}”",
         "unnamedBox": "Adsız Box",
         "pro": "Pro",
@@ -160,7 +160,7 @@
             "boxes": "Boxes",
             "conversations": "Konuşmalar",
             "recentConversations": "Son konuşmalar",
-            "assistant": "Chief of Staff",
+            "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "Aç",
             "moveTo": "Taşı"
         },
@@ -172,7 +172,7 @@
             "notificationsDetail": "Bu ajan size ne zaman ulaşır"
         },
         "placeholder": {
-            "rootAssistant": "Arayın veya Chief of Staff'ınıza sorun…",
+            "rootAssistant": "{named, select, yes {Arayın veya {name} ile konuşun…} other {Arayın veya Chief of Staff'ınıza sorun…}}",
             "root": "Ajan, ayar, konuşma arayın…",
             "agent": "Ara: {name}…",
             "agentUnknown": "Bu ajanda ara…",
@@ -192,7 +192,7 @@
             "new_agent": "Yeni ajan",
             "browse_templates": "Şablonlara göz at",
             "new_box": "Yeni Box",
-            "ask_assistant": "Chief of Staff'ınıza sorun",
+            "ask_assistant": "{named, select, yes {{name} ile konuşun} other {Chief of Staff'ınıza sorun}}",
             "contact_support": "Destekle iletişime geç",
             "recenter_board": "Panoyu ortala",
             "toggle_theme_light": "Açık temaya geç",

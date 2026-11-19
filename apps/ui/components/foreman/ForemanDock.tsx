@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils'
 import { useControlCenterStore } from '@/stores/control-center.store'
 import { foremanOrbState, selectForemanOpen, selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useForemanName } from '@/hooks/useForemanName'
 
 // `fixed` et pas `absolute` : l'orbe n'appartient à aucun cadre, elle est posée sur le viewport.
 // C'est ce qui l'affranchit des `overflow-hidden` qui coupaient son halo. Le prix du `fixed`, c'est
@@ -65,6 +66,7 @@ export function ForemanDock() {
     const { workspace } = useSession()
     const mod = useModKeyLabel()
     const t = useTranslations('foreman.dock')
+    const foremanName = useForemanName()
 
     // `size` pilote la boîte du svg et la taille des yeux, donc aucune classe responsive ne peut le
     // faire à notre place. La variante `resolved` rend `null` tant que la media query n'a pas été
@@ -243,7 +245,7 @@ export function ForemanDock() {
                 <TooltipLabeled
                     side={corner.startsWith('bottom') ? 'top' : 'bottom'}
                     hidden={!announcesShortcut}
-                    label={t.rich('tooltip', { shortcut: `${mod}F`, key: chunks => <span className="opacity-60">{chunks}</span> })}
+                    label={t.rich('tooltip', { ...foremanName, shortcut: `${mod}F`, key: chunks => <span className="opacity-60">{chunks}</span> })}
                 >
                     <span className="block">
                         <Orb

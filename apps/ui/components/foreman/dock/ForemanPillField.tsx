@@ -8,6 +8,7 @@ import { ChromeButton } from '@rerun/ui/chrome'
 import { Kbd } from '@/components/ui/kbd'
 import { usePageAttention } from '@/hooks/usePageAttention'
 import { MicIcon, SendIcon } from '@/lib/icons'
+import { useForemanName } from '@/hooks/useForemanName'
 
 import { useTypewriter } from './useTypewriter'
 
@@ -37,6 +38,7 @@ type ForemanPillFieldProps = {
 /** What is typed here is sent from here and answered above the ball. Only the ball opens the column. */
 export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange, onFocusChange, onEngage, onSubmit }: ForemanPillFieldProps) {
     const t = useTranslations('foreman.pill')
+    const foremanName = useForemanName()
     const reducedMotion = useReducedMotion()
     const prompts = useMemo(() => [t('prompts.lastNight'), t('prompts.failedRun'), t('prompts.newCoworker')], [t])
     const unattended = usePageAttention() !== 'focused'
@@ -78,7 +80,7 @@ export function ForemanPillField({ inputRef, mod, draft, focused, onDraftChange,
                         if (event.key === 'Escape') event.currentTarget.blur()
                     }}
                     placeholder={suggestion}
-                    aria-label={t('ask')}
+                    aria-label={t('ask', foremanName)}
                     autoComplete="off"
                     className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 />

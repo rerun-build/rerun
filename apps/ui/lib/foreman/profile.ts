@@ -20,13 +20,17 @@ import type { ForemanAnswers, ForemanProfile } from './phase'
 // The profile and the date belong to the workspace, not to whoever filled them in: a workspace is
 // onboarded once, when it is created, and a member invited later inherits it rather than owing it.
 
-export async function readAnswers(ctx: WorkspaceContext): Promise<ForemanAnswers> {
+// The answers belong to the workspace: a turn of the Chief of Staff, which has no session, reads and
+// writes them with the service role, as the hub does for a signed-in person.
+type AnswersScope = Pick<WorkspaceContext, 'supabase'> & { workspace: { id: number } }
+
+export async function readAnswers(ctx: AnswersScope): Promise<ForemanAnswers> {
     const { data } = await selectMaybeSingle(ctx.supabase, 'workspace_onboarding', ['answers'] as const, { workspace_id: ctx.workspace.id })
     const value = data?.answers
     return value && typeof value === 'object' && !Array.isArray(value) ? (value as ForemanAnswers) : {}
 }
 
-export async function writeAnswers(ctx: WorkspaceContext, answers: ForemanAnswers, completed: boolean): Promise<void> {
+export async function writeAnswers(ctx: AnswersScope, answers: ForemanAnswers, completed: boolean): Promise<void> {
     const { error } = await ctx.supabase
         .from('workspace_onboarding')
         .upsert<Database['public']['Tables']['workspace_onboarding']['Insert']>({ workspace_id: ctx.workspace.id, answers: answers as unknown as Json, updated_at: new Date().toISOString() }, { onConflict: 'workspace_id' })
@@ -35,7 +39,7 @@ export async function writeAnswers(ctx: WorkspaceContext, answers: ForemanAnswer
 }
 
 // Never over an earlier date: the first stamp is the day the workspace was onboarded.
-export async function stampWorkspaceOnboarded(ctx: WorkspaceContext): Promise<void> {
+export async function stampWorkspaceOnboarded(ctx: AnswersScope): Promise<void> {
     const { error } = await ctx.supabase
         .from('workspaces')
         .update<Database['public']['Tables']['workspaces']['Update']>({ onboarded_at: new Date().toISOString() })
@@ -44,11 +48,19 @@ export async function stampWorkspaceOnboarded(ctx: WorkspaceContext): Promise<vo
     if (error) throw new Error(error.message)
 }
 
-export async function mergeForeman(ctx: WorkspaceContext, patch: ForemanProfile): Promise<ForemanAnswers> {
+export async function mergeForeman(ctx: AnswersScope, patch: ForemanProfile): Promise<ForemanAnswers> {
     const answers = await readAnswers(ctx)
     const next: ForemanAnswers = { ...answers, foreman: { ...answers.foreman, ...patch } }
     await writeAnswers(ctx, next, false)
     return next
+}
+
+// `null` gives the Chief of Staff back its default name.
+export async function saveForemanName(ctx: AnswersScope, name: string | null): Promise<void> {
+    const answers = await readAnswers(ctx)
+    const foreman: ForemanProfile = { ...answers.foreman, name: name ?? undefined }
+    if (!name) delete foreman.name
+    await writeAnswers(ctx, { ...answers, foreman }, false)
 }
 
 // The first name lives on the auth user, beside the one Google writes, because that is where every

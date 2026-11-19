@@ -13,6 +13,7 @@ import { CalendarClockIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
+import { useForemanName } from '@/hooks/useForemanName'
 import { RoutineList } from '@rerun/ui/foreman'
 
 function leaveForTheBoard() {
@@ -49,7 +50,7 @@ function openRun(routine: WorkspaceRoutine, sessionId: string, runId: string) {
 // `active`: false while the list is mounted out of sight, so it reads nothing until it shows again.
 export function ForemanRoutines({ docked, active = true, className }: { docked: boolean; active?: boolean; className?: string }) {
     const t = useTranslations('foreman.routines')
-    const foremanName = useTranslations('workspaceView.foreman')('name')
+    const foremanName = useTranslations('workspaceView.foreman')('name', useForemanName())
     const agents = useBoardStore(state => state.agents)
     const list = useRoutines({ load: listWorkspaceRoutinesAction, enabled: active, onRunStarted: openRun })
 

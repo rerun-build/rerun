@@ -6,10 +6,12 @@ import { Orb } from '@/components/foreman/Orb'
 import { useForemanInCenter } from '@/components/workspace-view/useForemanInCenter'
 import { cn } from '@/lib/utils'
 import { foremanOrbState, selectForemanVisible, useForemanStore } from '@/stores/foreman.store'
+import { useForemanName } from '@/hooks/useForemanName'
 
 /** The Chief of Staff at the top of the list, in place of the orb that floats over the board. */
 export function ForemanTile() {
     const t = useTranslations('workspaceView.foreman')
+    const foremanName = useForemanName()
     const visible = useForemanStore(selectForemanVisible)
     const open = useForemanInCenter()
     const activity = useForemanStore(s => s.activity)
@@ -26,7 +28,7 @@ export function ForemanTile() {
                 <Orb size={26} state={foremanOrbState({ open, activity })} facing="right" />
             </span>
             <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium">{t('name')}</span>
+                <span className="block truncate text-sm font-medium">{t('name', foremanName)}</span>
                 <span className="block truncate text-xs text-muted-foreground">{t('line')}</span>
             </span>
         </button>

@@ -478,8 +478,8 @@
         },
         "actions": {
             "controlCenter": "Kontrol merkezini aç",
-            "askRerun": "Sohbet dışında Chief of Staff'ınıza sorun",
-            "holdToTalk": "Chief of Staff'ınızla konuşmak için basılı tutun",
+            "askRerun": "{named, select, yes {Sohbet dışında {name} ile konuşun} other {Sohbet dışında Chief of Staff'ınıza sorun}}",
+            "holdToTalk": "{named, select, yes {{name} ile konuşmak için basılı tutun} other {Chief of Staff'ınızla konuşmak için basılı tutun}}",
             "searchInPage": "Sayfada ara",
             "newConversation": "Yeni konuşma",
             "closeTab": "Etkin sekmeyi kapat",

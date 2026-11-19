@@ -41,7 +41,8 @@
         "mcpNoSignInHere": "{name} is the name of an MCP server.",
         "signInForAnotherApp": "The sign-in finished in the browser belongs to another app than the one being connected.",
         "cancelReasonTooLong": "The text where a customer says why they cancel their subscription.",
-        "templateSlugTaken": "{slug} is the identifier of a template in its address, kept as is."
+        "templateSlugTaken": "{slug} is the identifier of a template in its address, kept as is.",
+        "foremanNameInvalid": "Refusal of the name someone gave the Chief of Staff, the workspace's AI assistant. {max} is the longest name allowed."
     },
     "generic": "Something went wrong. Please try again.",
     "notAuthenticated": "Not authenticated",
@@ -591,5 +592,7 @@
     "taskNotFound": "Task not found",
     "stopTaskFailed": "Could not stop this task",
     "mcpServerNotFound": "MCP server not found: {name}",
-    "mcpNoSignInHere": "{name} has no sign-in to open from here."
+    "mcpNoSignInHere": "{name} has no sign-in to open from here.",
+    "foremanNameInvalid": "Use 1 to {max} letters, digits, spaces, dots, apostrophes or hyphens.",
+    "saveForemanNameFailed": "Could not save the name."
 }

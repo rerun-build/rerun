@@ -547,5 +547,7 @@
     "stopTaskFailed": "Impossible d'arrêter cette tâche",
     "mcpServerNotFound": "Serveur MCP introuvable : {name}",
     "mcpNoSignInHere": "{name} n'a aucune connexion à ouvrir depuis ici.",
-    "loadReferralsFailed": "Impossible de charger vos parrainages"
+    "loadReferralsFailed": "Impossible de charger vos parrainages",
+    "foremanNameInvalid": "Utilisez 1 à {max} lettres, chiffres, espaces, points, apostrophes ou tirets.",
+    "saveForemanNameFailed": "Impossible d'enregistrer le nom."
 }

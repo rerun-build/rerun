@@ -64,6 +64,7 @@ import { templateCardImage } from '@/lib/templates/card-image'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useSimpleDetailsStore } from '@/stores/simple-details.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useForemanName } from '@/hooks/useForemanName'
 import { useTranslations } from 'next-intl'
 
 const TRANSITION_MS = 300
@@ -145,12 +146,13 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
     // Where a coworker's chat names who it is talking to, or the thread it answers in.
     const tAgent = useTranslations('agent.agentSheetChat')
     const tView = useTranslations('workspaceView.foreman')
+    const foremanName = useForemanName()
     const tDetails = useTranslations('workspaceView.details')
     const detailsShown = useDetailsOpen() && pinned && open === true
     // Mounted the first time it opens, then kept: opening it again only slides it in.
     const [details, setDetails] = useState({ mounted: false, slideIn: false })
     if (detailsShown && !details.mounted) setDetails({ mounted: true, slideIn: restoreDone })
-    const framedPlaceholder = !pinned ? undefined : threadOnScreen && threadOnScreen.title !== tThreads('untitled') ? tAgent('replyPlaceholder', { title: threadOnScreen.title }) : tAgent('messagePlaceholder', { name: tView('name') })
+    const framedPlaceholder = !pinned ? undefined : threadOnScreen && threadOnScreen.title !== tThreads('untitled') ? tAgent('replyPlaceholder', { title: threadOnScreen.title }) : tAgent('messagePlaceholder', { name: tView('name', foremanName) })
 
     // The kickoff marker goes through here too, and the store turns it away like every message of
     // the funnel: the browser notification permission is only asked once the onboarding is over.
@@ -475,7 +477,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                             onShowGeneral={backToGeneral}
                             onOpenThread={openThread}
                             onNewTask={startNewChat}
-                            end={<DetailsToggle label={tView('card')} />}
+                            end={<DetailsToggle label={tView('card', foremanName)} />}
                             history={hasThreads && <ForemanHistory inBar open={historyOpen} onOpenChange={setHistoryOpen} waiting={threadWaiting} entries={threadEntries} activeThreadId={inThread ? sessionId : null} onOpenGeneral={backToGeneral} onOpenThread={openThread} onNewTask={startNewChat} />}
                         />
                     ) : (
@@ -562,7 +564,7 @@ export function ForemanColumn({ open, placement, pinned = false }: { open: boole
                     )}
                 </div>
                 {pinned && details.mounted && (
-                    <DetailsColumn label={tDetails('label', { name: tView('name') })} open={detailsShown} slideIn={details.slideIn} onClose={() => useSimpleDetailsStore.getState().setWanted(false)}>
+                    <DetailsColumn label={tDetails('label', { name: tView('name', foremanName) })} open={detailsShown} slideIn={details.slideIn} onClose={() => useSimpleDetailsStore.getState().setWanted(false)}>
                         <ForemanDetails shown={detailsShown} onClose={() => useSimpleDetailsStore.getState().setWanted(false)} />
                     </DetailsColumn>
                 )}

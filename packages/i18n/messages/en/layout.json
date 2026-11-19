@@ -27,7 +27,12 @@
         "workspaceMenu.summary.limits": "Under the workspace name. {agents} is a number. {seats} is already translated (\"3 seats\").",
         "workspaceMenu.summary.limitsUnlimited": "Under the workspace name, when the plan has no coworker limit. {seats} is already translated (\"3 seats\").",
         "site.title": "Browser tab title and link preview title of the app's pages that have none of their own. Keep \"Rerun | \" at the start.",
-        "site.description": "Meta description of the app's pages, shown under the title in search results and link previews. {trialDays} is a number of days."
+        "site.description": "Meta description of the app's pages, shown under the title in search results and link previews. {trialDays} is a number of days.",
+        "controlCenter.description": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "controlCenter.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "controlCenter.headings.assistant": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "controlCenter.placeholder.rootAssistant": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "controlCenter.commands.ask_assistant": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
     },
     "loading": "Loading...",
     "theme": "Theme",
@@ -167,9 +172,9 @@
     },
     "controlCenter": {
         "title": "Control center",
-        "description": "Jump to an agent, a setting or a conversation, or ask your Chief of Staff.",
+        "description": "{named, select, yes {Jump to an agent, a setting or a conversation, or ask {name}.} other {Jump to an agent, a setting or a conversation, or ask your Chief of Staff.}}",
         "back": "Back",
-        "askRerun": "Ask your Chief of Staff",
+        "askRerun": "{named, select, yes {Ask {name}} other {Ask your Chief of Staff}}",
         "quotedQuery": "“{query}”",
         "unnamedBox": "Untitled Box",
         "pro": "Pro",
@@ -190,7 +195,7 @@
             "boxes": "Boxes",
             "conversations": "Conversations",
             "recentConversations": "Recent conversations",
-            "assistant": "Chief of Staff",
+            "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "Open",
             "moveTo": "Move to"
         },
@@ -202,7 +207,7 @@
             "notificationsDetail": "When this agent reaches you"
         },
         "placeholder": {
-            "rootAssistant": "Search or ask your Chief of Staff…",
+            "rootAssistant": "{named, select, yes {Search or ask {name}…} other {Search or ask your Chief of Staff…}}",
             "root": "Search agents, settings, conversations…",
             "agent": "Search in {name}…",
             "agentUnknown": "Search in this agent…",
@@ -222,7 +227,7 @@
             "new_agent": "New agent",
             "browse_templates": "Browse templates",
             "new_box": "New Box",
-            "ask_assistant": "Ask your Chief of Staff",
+            "ask_assistant": "{named, select, yes {Ask {name}} other {Ask your Chief of Staff}}",
             "contact_support": "Contact Support",
             "recenter_board": "Recenter the board",
             "toggle_theme_light": "Switch to light theme",

@@ -36,9 +36,10 @@
         "you": "Siz: {message}"
     },
     "foreman": {
-        "name": "Chief of Staff",
+        "name": "{named, select, yes {{name}} other {Chief of Staff}}",
         "line": "Ne isterseniz sorun",
-        "card": "Chief of Staff kartı"
+        "card": "{named, select, yes {{name} kartı} other {Chief of Staff kartı}}",
+        "rename": "Chief of Staff'ınıza bir ad verin"
     },
     "details": {
         "label": "Kart: {name}"

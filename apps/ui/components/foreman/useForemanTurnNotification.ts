@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react'
 
 import { showBrowserNotification } from '@/lib/notifications/browser'
 import { useForemanStore } from '@/stores/foreman.store'
+import { useForemanName } from '@/hooks/useForemanName'
 
 // A client tool answering flips the chat to `ready` for an instant before the turn resumes on its
 // own: only a `ready` that holds is a Foreman waiting on the user.
@@ -24,8 +25,9 @@ function lastAssistantText(messages: UIMessage[]): string | null {
 export function useForemanTurnNotification({ messages, status, guided }: { messages: UIMessage[]; status: ChatStatus; guided: boolean }) {
     const t = useTranslations('foreman.notification')
     const busy = status === 'submitted' || status === 'streaming'
-    const waitingText = t('waiting')
-    const titleText = t('title')
+    const foremanName = useForemanName()
+    const waitingText = t('waiting', foremanName)
+    const titleText = t('title', foremanName)
 
     // Read when the turn starts: the turn that builds the team leaves the funnel before it ends.
     const turnGuided = useRef(false)

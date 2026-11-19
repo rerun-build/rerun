@@ -42,11 +42,11 @@
         "installFailed": "Kurulum başlatılamadı"
     },
     "notification": {
-        "title": "Chief of Staff",
-        "waiting": "Chief of Staff'ınız sizi bekliyor."
+        "title": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "waiting": "{named, select, yes {{name} sizi bekliyor.} other {Chief of Staff'ınız sizi bekliyor.}}"
     },
     "dock": {
-        "tooltip": "Arayın veya Chief of Staff'ınıza sorun <key>{shortcut}</key>",
+        "tooltip": "{named, select, yes {Arayın veya {name} ile konuşun} other {Arayın veya Chief of Staff'ınıza sorun}} <key>{shortcut}</key>",
         "failedReply": "Bu sefer bir şeyler ters gitti."
     },
     "nudge": {
@@ -73,7 +73,7 @@
             "failedRun": "Bu çalıştırma neden başarısız oldu?",
             "newCoworker": "Bana yeni bir coworker oluştur"
         },
-        "ask": "Chief of Staff'ınıza sorun",
+        "ask": "{named, select, yes {{name} ile konuşun} other {Chief of Staff'ınıza sorun}}",
         "send": "Gönder"
     },
     "routines": {
@@ -313,8 +313,8 @@
         "pay": "Öde: {price}"
     },
     "teamEmptyState": {
-        "greeting": "Merhaba, ben Chief of Staff'ınızım",
-        "greetingNamed": "Merhaba {firstName}, ben Chief of Staff'ınızım",
+        "greeting": "{named, select, yes {Merhaba, ben {name}} other {Merhaba, ben Chief of Staff'ınızım}}",
+        "greetingNamed": "{named, select, yes {Merhaba {firstName}, ben {name}} other {Merhaba {firstName}, ben Chief of Staff'ınızım}}",
         "greetingWithTeam": "{greeting}. İşte ekibiniz.",
         "emptySubtitle": "Henüz coworker'ınız yok. Devretmek istediğiniz bir işi söyleyin, ilkini ben oluşturayım.",
         "buildPrompt": "Bana şunu yapan bir coworker oluştur: ",

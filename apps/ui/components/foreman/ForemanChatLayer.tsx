@@ -37,6 +37,7 @@ import { isClaudePlanOffered, isLifetimePlan, isSubscriptionEntitled } from '@re
 import { useSession } from '@/supabase/session/SessionProvider'
 
 import { isKickoffText, stripKickoff } from '@/lib/foreman/kickoff-marker'
+import { useForemanName } from '@/hooks/useForemanName'
 
 import { ForemanTeamEmptyStateSlot } from './empty-state/ForemanTeamEmptyStateSlot'
 import { ForemanNextSteps } from './ForemanNextSteps'
@@ -110,6 +111,7 @@ type ForemanChatLayerProps = {
  */
 export function ForemanChatLayer({ messages, streaming, guided, restored, error, onWidgetAnswer, onWidgetDismiss, skillProposals, pending = null, answerAttachments = null, nextSteps, onSuggestion, onPrefill, onStop, onRetry, onStopTask, actions, rawUrlFor, readFile, sharedFiles, threads, onOpenThread, underCrumb = false, framed = false, onStackElement, orbPaused, className }: ForemanChatLayerProps) {
     const tName = useTranslations('workspaceView.foreman')
+    const foremanName = useForemanName()
     const tHitlCue = useTranslations('chat.hitlCue')
     const { workspace } = useSession()
     const priceArm = usePriceArm()
@@ -160,7 +162,7 @@ export function ForemanChatLayer({ messages, streaming, guided, restored, error,
     const shortcuts = planAgentShortcuts(visible)
     const messageTimes = useMessageTimes(visible)
     const threadRows = useMemo(() => threadsByMessage(messageTimes, threads ?? []), [messageTimes, threads])
-    const threadOwner = useMemo(() => ({ agentId: FOREMAN_AGENT_ID, agentName: tName('name') }), [tName])
+    const threadOwner = useMemo(() => ({ agentId: FOREMAN_AGENT_ID, agentName: tName('name', foremanName) }), [tName, foremanName])
     const threadBranches = (rows: ThreadRow[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} owner={threadOwner} onOpen={() => onOpenThread?.(thread.id)} />)
 
     // Une pile vide veut dire deux choses opposées, et elles ne se rendent pas pareil. En tunnel,

@@ -64,8 +64,9 @@ export function isMobileClient(client: ForemanClient | null | undefined): client
 export const FOREMAN_KICKOFF_MARKER = '[[foreman:start]]'
 
 // GET /api/chat/foreman/state. `greet`: the onboarding just handed over, and the Chief of Staff on the
-// engine owes them its first words.
-export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string(), greet: z.boolean().optional() })
+// engine owes them its first words. `name`: what the workspace calls it, absent until someone gave it
+// one, and absent from a hub that predates it.
+export const foremanStateSchema = z.looseObject({ surface: foremanSurfaceSchema, phase: foremanPhaseSchema, firstName: z.string(), greet: z.boolean().optional(), name: z.string().optional() })
 export type ForemanStateResponse = z.infer<typeof foremanStateSchema>
 
 // GET /api/chat/foreman/engine: the caller's General with the engine's foreman, null before they

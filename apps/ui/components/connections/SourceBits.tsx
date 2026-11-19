@@ -1,17 +1,16 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { EditableName } from '@/components/ui/editable-name'
 import { Progress } from '@/components/ui/progress'
 import { connectMethod, providerPitch, sourceKind, isCreditExhausted, isRerunPaused, planLimitTone, type AddableProvider, type RerunCredit } from '@/lib/engine/ai-sources'
 import { ProviderIcon } from '@/lib/engine/provider-icons'
 import type { BoxConnection } from '@/lib/engine/types'
-import { ChevronLeftIcon, PencilIcon } from '@/lib/icons'
+import { ChevronLeftIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { RERUN_CONNECTION_ID, addableProviderSchema } from '@rerun/contracts'
 import { Badge } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 
 export function SourceStatus({ source, credit }: { source: BoxConnection; credit: RerunCredit }) {
     const t = useTranslations('connections.status')
@@ -59,37 +58,6 @@ export function CreditMeter({ percent, className }: { percent: number; className
 
 export function PlanLimitMeter({ percent, label, className }: { percent: number; label: string; className?: string }) {
     return <Progress value={percent} size="md" tone={planLimitTone(percent)} label={label} className={className} />
-}
-
-function EditableName({ name, onRename }: { name: string; onRename: (name: string) => void }) {
-    const [draft, setDraft] = useState<string | null>(null)
-
-    if (draft !== null) {
-        const commit = () => {
-            if (draft.trim() && draft.trim() !== name) onRename(draft.trim())
-            setDraft(null)
-        }
-        return (
-            <Input
-                autoFocus
-                value={draft}
-                onChange={e => setDraft(e.target.value)}
-                onBlur={commit}
-                onKeyDown={e => {
-                    if (e.key === 'Enter') commit()
-                    if (e.key === 'Escape') setDraft(null)
-                }}
-                className="h-7 text-sm"
-            />
-        )
-    }
-
-    return (
-        <button type="button" onClick={() => setDraft(name)} className="group/name inline-flex min-w-0 items-center gap-1.5 text-left">
-            <span className="truncate text-sm font-medium">{name}</span>
-            <PencilIcon className="size-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/name:opacity-100" />
-        </button>
-    )
 }
 
 function BackButton({ onBack }: { onBack: () => void }) {

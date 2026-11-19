@@ -26,7 +26,7 @@ import { useSession } from '@/supabase/session/SessionProvider'
 // workspace that is already running, and the column only learns which foreman it talks to, the one
 // on the engine, or none at all when the workspace has no machine. The welcome page's hand-over
 // comes back `greet`: the foreman on the engine owes them its first words (ForemanColumn).
-type ForemanStateAnswer = { phase: ForemanPhase; firstName?: string; arrival?: ForemanArrival | null; surface: ForemanSurface; greet?: boolean }
+type ForemanStateAnswer = { phase: ForemanPhase; firstName?: string; arrival?: ForemanArrival | null; surface: ForemanSurface; greet?: boolean; name?: string }
 
 async function fetchForemanState(query = ''): Promise<ForemanStateAnswer | null> {
     const res = await fetch(`/api/chat/foreman/state${query}`)
@@ -41,6 +41,7 @@ export async function refreshForemanSurface(): Promise<void> {
     const state = await fetchForemanState().catch(() => null)
     if (!state) return
     useForemanStore.getState().setSurface(state.surface)
+    useForemanStore.getState().setName(state.name ?? null)
     if (state.phase === 'companion') useForemanStore.getState().setFunnel('companion')
 }
 
@@ -104,6 +105,7 @@ export function useForemanKickoff({ send, messageCount, restoreDone }: { send: (
             .then(async state => {
                 const store = useForemanStore.getState()
                 if (state) store.setSurface(state.surface)
+                store.setName(state?.name ?? null)
                 // Tout ce qui n'est pas un tunnel rend la main à ce qui existait avant : la fiche
                 // d'un lien profond, elle, n'attend que ça pour s'ouvrir.
                 if (!state || state.phase === 'companion') {

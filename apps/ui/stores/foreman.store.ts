@@ -46,6 +46,8 @@ type ForemanState = {
     waitlisted: boolean
     /** The onboarding just ended and the Chief of Staff of the engine owes them its first words. */
     greetPending: boolean
+    /** What the workspace calls its Chief of Staff, null until someone gave it a name. */
+    name: string | null
     activity: OrbActivity
     /** The run the engine foreman is streaming or was reattached to, so it can be stopped or picked up again. */
     engineRunId: string | null
@@ -127,6 +129,7 @@ type ForemanState = {
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
     setGreetPending: (pending: boolean) => void
+    setName: (name: string | null) => void
     /** Entrer dans le tunnel : le mode et l'ouverture, d'un seul coup. */
     startFunnel: () => void
     setArrival: (arrival: ForemanArrival | null) => void
@@ -186,6 +189,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     funnel: 'unknown',
     waitlisted: false,
     greetPending: false,
+    name: null,
     activity: 'idle',
     engineRunId: null,
     ...freshGeneral(),
@@ -248,6 +252,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
     setFunnel: funnel => set({ funnel }),
     setWaitlisted: waitlisted => set({ waitlisted }),
     setGreetPending: greetPending => set({ greetPending }),
+    setName: name => set({ name }),
     startFunnel: () => {
         useBoardStore.getState().selectAgent(null)
         useBoardStore.getState().selectSpace(null)
@@ -307,6 +312,7 @@ export const useForemanStore = create<ForemanState>()((set, get) => ({
             funnel: 'unknown',
             waitlisted: false,
             greetPending: false,
+            name: null,
             activity: 'idle',
             engineRunId: null,
             ...freshGeneral(),

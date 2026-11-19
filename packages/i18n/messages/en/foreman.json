@@ -4,7 +4,7 @@
         "header.newConversation": "Button that starts a new conversation with the Chief of Staff.",
         "header.position.float": "Menu option: the chat floats in a corner of the screen instead of being docked.",
         "modelPill.hubReason": "Tooltip on the disabled model picker. Rerun Balanced is the name of a model, keep it as is.",
-        "dock.tooltip": "Tooltip of the Chief of Staff orb. <key> wraps the keyboard shortcut, {shortcut} is that shortcut (e.g. ⌘F).",
+        "dock.tooltip": "Tooltip of the Chief of Staff orb. <key> wraps the keyboard shortcut, {shortcut} is that shortcut (e.g. ⌘F). {named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
         "nudge.more": "Count of other questions waiting besides the one shown.",
         "nudge.answer": "Button: go and answer the question.",
         "nudge.later": "Button: dismiss the card for now.",
@@ -39,7 +39,12 @@
         "header.conversations": "Tooltip and label of the clock button that lists every conversation with the Chief of Staff.",
         "history.title": "Title of the list of every conversation with the Chief of Staff: General and its threads.",
         "plan.scene.planned": "Screen reader label of a Box or a coworker drawn on the board as part of a plan, not built yet. {name} is its name.",
-        "plan.scene.plannedBox": "Screen reader label of a Box with no name drawn on the board as part of a plan, not built yet."
+        "plan.scene.plannedBox": "Screen reader label of a Box with no name drawn on the board as part of a plan, not built yet.",
+        "notification.title": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "notification.waiting": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "pill.ask": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "teamEmptyState.greeting": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "teamEmptyState.greetingNamed": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
     },
     "welcome": {
         "title": "Hey, ready to hand off your first task?",
@@ -84,11 +89,11 @@
         "installFailed": "Could not start the installation"
     },
     "notification": {
-        "title": "Chief of Staff",
-        "waiting": "Your Chief of Staff is waiting for you."
+        "title": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "waiting": "{named, select, yes {{name} is waiting for you.} other {Your Chief of Staff is waiting for you.}}"
     },
     "dock": {
-        "tooltip": "Search or ask your Chief of Staff <key>{shortcut}</key>",
+        "tooltip": "{named, select, yes {Search or ask {name}} other {Search or ask your Chief of Staff}} <key>{shortcut}</key>",
         "failedReply": "Something went wrong on that one."
     },
     "nudge": {
@@ -115,7 +120,7 @@
             "failedRun": "Why did that run fail?",
             "newCoworker": "Build me a new coworker"
         },
-        "ask": "Ask your Chief of Staff",
+        "ask": "{named, select, yes {Ask {name}} other {Ask your Chief of Staff}}",
         "send": "Send"
     },
     "routines": {
@@ -355,8 +360,8 @@
         "pay": "Pay {price}"
     },
     "teamEmptyState": {
-        "greeting": "Hi, I'm your Chief of Staff",
-        "greetingNamed": "Hi {firstName}, I'm your Chief of Staff",
+        "greeting": "{named, select, yes {Hi, I'm {name}} other {Hi, I'm your Chief of Staff}}",
+        "greetingNamed": "{named, select, yes {Hi {firstName}, I'm {name}} other {Hi {firstName}, I'm your Chief of Staff}}",
         "greetingWithTeam": "{greeting}. Here is your team.",
         "emptySubtitle": "You have no coworkers yet. Tell me a job you would hand off and I'll build the first one.",
         "buildPrompt": "Build me a coworker that ",

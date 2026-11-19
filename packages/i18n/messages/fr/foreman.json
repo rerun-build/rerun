@@ -42,11 +42,11 @@
         "installFailed": "Impossible de lancer l'installation"
     },
     "notification": {
-        "title": "Chief of Staff",
-        "waiting": "Votre Chief of Staff vous attend."
+        "title": "{named, select, yes {{name}} other {Chief of Staff}}",
+        "waiting": "{named, select, yes {{name} vous attend.} other {Votre Chief of Staff vous attend.}}"
     },
     "dock": {
-        "tooltip": "Rechercher ou demander à votre Chief of Staff <key>{shortcut}</key>",
+        "tooltip": "{named, select, yes {Rechercher ou demander à {name}} other {Rechercher ou demander à votre Chief of Staff}} <key>{shortcut}</key>",
         "failedReply": "Un problème est survenu sur celle-ci."
     },
     "nudge": {
@@ -73,7 +73,7 @@
             "failedRun": "Pourquoi ce run a échoué ?",
             "newCoworker": "Crée-moi un nouveau coworker"
         },
-        "ask": "Demander à votre Chief of Staff",
+        "ask": "{named, select, yes {Demander à {name}} other {Demander à votre Chief of Staff}}",
         "send": "Envoyer"
     },
     "routines": {
@@ -313,8 +313,8 @@
         "pay": "Payer {price}"
     },
     "teamEmptyState": {
-        "greeting": "Bonjour, je suis votre Chief of Staff",
-        "greetingNamed": "Bonjour {firstName}, je suis votre Chief of Staff",
+        "greeting": "{named, select, yes {Bonjour, je suis {name}} other {Bonjour, je suis votre Chief of Staff}}",
+        "greetingNamed": "{named, select, yes {Bonjour {firstName}, je suis {name}} other {Bonjour {firstName}, je suis votre Chief of Staff}}",
         "greetingWithTeam": "{greeting}. Voici votre équipe.",
         "emptySubtitle": "Vous n'avez pas encore de coworker. Décrivez-moi une tâche à déléguer et je crée le premier.",
         "buildPrompt": "Crée-moi un coworker qui ",

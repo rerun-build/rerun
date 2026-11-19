@@ -1,6 +1,7 @@
 import { AGENT_FOCUS_TABS, AGENT_TAB_LABELS, type AgentFocusTab } from '@/lib/board/types'
 import type { ForemanPlanItem } from './phase'
 import { MAX_PLAN_BOXES, MAX_PLAN_ITEMS } from './plan-items'
+import { FOREMAN_NAME_MAX } from './name'
 import { ACCOUNT_TOOL_DEFS } from '@/lib/mcp/account-tools'
 import { SETTINGS_PANELS, SETTINGS_PANEL_LABELS, type SettingsPanel } from '@/lib/settings/panels'
 
@@ -88,6 +89,20 @@ export const FOREMAN_BOX_TOOL_DEFS = [
             type: 'object',
             properties: { boxId: { type: 'string' }, confirm: { type: 'boolean' } },
             required: ['boxId', 'confirm'],
+        },
+    },
+] as const
+
+// What the Chief of Staff keeps about itself on the workspace. Only an admin's turn may change it:
+// the name is the one every member reads.
+export const FOREMAN_SELF_TOOL_DEFS = [
+    {
+        name: 'set_name',
+        description: `Save the name the user gave you, the one every member of the workspace will read on your chat and call you by. Only once they gave it, never one you made up. A first name or a short nickname: 1 to ${FOREMAN_NAME_MAX} letters, digits, spaces, dots, apostrophes or hyphens.`,
+        inputSchema: {
+            type: 'object',
+            properties: { name: { type: 'string', description: 'The name, as the user wrote it.' } },
+            required: ['name'],
         },
     },
 ] as const

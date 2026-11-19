@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Kbd } from '@/components/ui/kbd'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
 import { useShortcutsStore } from '@/stores/shortcuts.store'
+import { useForemanName } from '@/hooks/useForemanName'
 import { useTranslations } from 'next-intl'
 
 type ShortcutAction = 'controlCenter' | 'askRerun' | 'holdToTalk' | 'searchInPage' | 'newConversation' | 'closeTab' | 'sendMessage' | 'newLine' | 'previousFile' | 'nextFile'
@@ -44,6 +45,7 @@ function buildGroups(mod: string): ShortcutGroup[] {
 
 export function ShortcutsDialog() {
     const t = useTranslations('dialogs.shortcuts')
+    const foremanName = useForemanName()
     const { open, setOpen } = useShortcutsStore()
     const mod = useModKeyLabel()
 
@@ -61,7 +63,7 @@ export function ShortcutsDialog() {
                             <div className="flex flex-col gap-1.5">
                                 {group.shortcuts.map((sc, i) => (
                                     <div key={i} className="flex items-center justify-between gap-4">
-                                        <span className="text-sm text-foreground">{t(`actions.${sc.action}`)}</span>
+                                        <span className="text-sm text-foreground">{t(`actions.${sc.action}`, foremanName)}</span>
                                         <span className="flex items-center gap-1">
                                             {sc.keys.map((k, j) => (
                                                 <Kbd key={j}>{k}</Kbd>

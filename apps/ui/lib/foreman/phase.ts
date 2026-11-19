@@ -43,6 +43,8 @@ export type ForemanNeed = { job: string; pain: string; today?: string }
 // lifecycle emails, the template category priority).
 export type ForemanProfile = {
     profileAt?: string
+    // What the user calls the Chief of Staff, once they gave it a name (sanitizeForemanName).
+    name?: string
     // The jobs they ticked on the discovery card, in the order they read on the form: one agent
     // each, unless two of them were merged and the plan said so.
     useCases?: string[]

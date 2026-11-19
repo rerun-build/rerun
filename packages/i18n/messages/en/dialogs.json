@@ -83,7 +83,9 @@
         "mcpConnect.labels.stdioClients": "Label above a command for MCP clients that only support the stdio transport. Keep \"stdio\" as it is.",
         "mcpConnect.hints.codexCliOnly": "Under the ChatGPT command: it works in the Codex CLI, not in the ChatGPT app.",
         "newAgent.jobHeading": "Said by the new coworker itself, which now stands where the assistant's orb was, before its job is described.",
-        "newAgent.lookHeading": "Above the picker of the new coworker's colour, eyes and mouth."
+        "newAgent.lookHeading": "Above the picker of the new coworker's colour, eyes and mouth.",
+        "shortcuts.actions.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "shortcuts.actions.holdToTalk": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
     },
     "account": {
         "emailChangeNeedsCurrentAddress": "This change still has to be confirmed from your current address.",
@@ -564,8 +566,8 @@
         },
         "actions": {
             "controlCenter": "Open the control center",
-            "askRerun": "Ask your Chief of Staff, outside a chat",
-            "holdToTalk": "Hold to talk to your Chief of Staff",
+            "askRerun": "{named, select, yes {Ask {name}, outside a chat} other {Ask your Chief of Staff, outside a chat}}",
+            "holdToTalk": "{named, select, yes {Hold to talk to {name}} other {Hold to talk to your Chief of Staff}}",
             "searchInPage": "Search in the page",
             "newConversation": "New conversation",
             "closeTab": "Close active tab",

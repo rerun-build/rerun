@@ -36,9 +36,10 @@
         "you": "Tú: {message}"
     },
     "foreman": {
-        "name": "Chief of Staff",
+        "name": "{named, select, yes {{name}} other {Chief of Staff}}",
         "line": "Pregunta lo que quieras",
-        "card": "Ficha del Chief of Staff"
+        "card": "{named, select, yes {Ficha de {name}} other {Ficha del Chief of Staff}}",
+        "rename": "Ponle nombre a tu Chief of Staff"
     },
     "details": {
         "label": "Ficha de {name}"

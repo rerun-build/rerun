@@ -137,9 +137,9 @@
     },
     "controlCenter": {
         "title": "Centre de contrôle",
-        "description": "Accédez à un agent, un paramètre ou une conversation, ou demandez à votre Chief of Staff.",
+        "description": "{named, select, yes {Accédez à un agent, un paramètre ou une conversation, ou demandez à {name}.} other {Accédez à un agent, un paramètre ou une conversation, ou demandez à votre Chief of Staff.}}",
         "back": "Retour",
-        "askRerun": "Demander à votre Chief of Staff",
+        "askRerun": "{named, select, yes {Demander à {name}} other {Demander à votre Chief of Staff}}",
         "quotedQuery": "« {query} »",
         "unnamedBox": "Box sans nom",
         "pro": "Pro",
@@ -160,7 +160,7 @@
             "boxes": "Boxes",
             "conversations": "Conversations",
             "recentConversations": "Conversations récentes",
-            "assistant": "Chief of Staff",
+            "assistant": "{named, select, yes {{name}} other {Chief of Staff}}",
             "open": "Ouvrir",
             "moveTo": "Déplacer vers"
         },
@@ -172,7 +172,7 @@
             "notificationsDetail": "Quand cet agent vous contacte"
         },
         "placeholder": {
-            "rootAssistant": "Rechercher ou demander à votre Chief of Staff…",
+            "rootAssistant": "{named, select, yes {Rechercher ou demander à {name}…} other {Rechercher ou demander à votre Chief of Staff…}}",
             "root": "Rechercher agents, paramètres, conversations…",
             "agent": "Rechercher dans {name}…",
             "agentUnknown": "Rechercher dans cet agent…",
@@ -192,7 +192,7 @@
             "new_agent": "Nouvel agent",
             "browse_templates": "Parcourir les templates",
             "new_box": "Nouvelle Box",
-            "ask_assistant": "Demander à votre Chief of Staff",
+            "ask_assistant": "{named, select, yes {Demander à {name}} other {Demander à votre Chief of Staff}}",
             "contact_support": "Contacter le support",
             "recenter_board": "Recentrer le board",
             "toggle_theme_light": "Passer au thème clair",

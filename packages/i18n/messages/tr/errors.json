@@ -547,5 +547,7 @@
     "stopTaskFailed": "Bu görev durdurulamadı",
     "mcpServerNotFound": "MCP sunucusu bulunamadı: {name}",
     "mcpNoSignInHere": "{name} için buradan açılacak bir giriş yok.",
-    "loadReferralsFailed": "Davetleriniz yüklenemedi"
+    "loadReferralsFailed": "Davetleriniz yüklenemedi",
+    "foremanNameInvalid": "1 ile {max} arasında harf, rakam, boşluk, nokta, kesme işareti veya kısa çizgi kullanın.",
+    "saveForemanNameFailed": "Ad kaydedilemedi."
 }

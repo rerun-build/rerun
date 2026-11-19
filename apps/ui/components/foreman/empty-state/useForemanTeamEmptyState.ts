@@ -8,6 +8,7 @@ import { teamEmptyStateOf, type TeamEmptyStateModel } from '@/lib/foreman/team-e
 import { readFirstName } from '@/lib/naming/first-name'
 import { useBoardStore } from '@/stores/board.store'
 import { useSession } from '@/supabase/session/SessionProvider'
+import { useForemanName } from '@/hooks/useForemanName'
 
 // Null until the board is hydrated: an empty agent list before that would flash the "no coworkers
 // yet" screen at someone who has a team.
@@ -19,9 +20,10 @@ export function useForemanTeamEmptyState(): { model: TeamEmptyStateModel; now: n
     const firstName = readFirstName(session?.user.user_metadata)
     const [now] = useState(() => Date.now())
     const t = useTranslations('foreman.teamEmptyState')
+    const foremanName = useForemanName()
     const copy = useMemo<TeamEmptyStateCopy>(
         () => ({
-            greeting: name => (name ? t('greetingNamed', { firstName: name }) : t('greeting')),
+            greeting: name => (name ? t('greetingNamed', { ...foremanName, firstName: name }) : t('greeting', foremanName)),
             greetingWithTeam: greeting => t('greetingWithTeam', { greeting }),
             emptySubtitle: t('emptySubtitle'),
             buildPrompt: t('buildPrompt'),
@@ -33,7 +35,7 @@ export function useForemanTeamEmptyState(): { model: TeamEmptyStateModel; now: n
             handOff: (name, mention) => ({ title: t('handOff.title', { name }), description: t('handOff.description'), prefill: t('handOff.prefill', { mention }) }),
             build: { title: t('build.title'), description: t('build.description') },
         }),
-        [t],
+        [t, foremanName],
     )
 
     return useMemo(() => (hydrated ? { model: teamEmptyStateOf({ agents, schedules, firstName, now, copy }), now } : null), [hydrated, agents, schedules, firstName, now, copy])

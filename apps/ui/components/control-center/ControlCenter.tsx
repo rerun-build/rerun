@@ -24,6 +24,7 @@ import { useNotificationsStore } from '@/stores/notifications.store'
 import { useShortcutsStore } from '@/stores/shortcuts.store'
 import { useWorkspaceSettingsStore } from '@/stores/workspace-settings.store'
 import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
+import { useForemanName } from '@/hooks/useForemanName'
 import type { BadgeTone } from '@rerun/ui/primitives'
 import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
@@ -81,6 +82,7 @@ function isMacPlatform(): boolean {
 
 export function ControlCenter() {
     const t = useTranslations('layout.controlCenter')
+    const foremanName = useForemanName()
     const tReasons = useTranslations('workspace.access')
     const agentTabs = useAgentTabs()
     const open = useControlCenterStore(s => s.open)
@@ -249,7 +251,7 @@ export function ControlCenter() {
     function rootSections(): ControlSection[] {
         const commands = buildControlCommands({ isSandbox: workspace?.is_sandbox ?? false, workspaceAdmin, apiEntitled: workspace ? isWorkspaceApiEntitled(workspace) : false, needsMachineReason, assistantReady, hasChangelog, darkTheme }, { sandbox: tReasons('sandboxNone'), admin: tReasons('adminsOnly'), singleBox: tReasons('sandboxSingleBox') }).map(command => ({
             ...command,
-            label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`),
+            label: command.id === 'toggle_theme' ? t(darkTheme ? 'commands.toggle_theme_light' : 'commands.toggle_theme_dark') : t(`commands.${command.id}`, foremanName),
         }))
         // "Ask the assistant" with a query is the last row of the list, not an action among others.
         const listed = text ? commands.filter(command => command.id !== 'ask_assistant') : commands
@@ -285,7 +287,7 @@ export function ControlCenter() {
         })
 
         const askAssistant: ControlSection[] = assistantReady
-            ? [{ id: 'assistant', heading: t('headings.assistant'), rows: [{ id: 'ask-assistant', label: t('askRerun'), detail: t('quotedQuery', { query: query.trim() }), leading: { kind: 'assistant' }, onSelect: run(commandActions.ask_assistant) }] }]
+            ? [{ id: 'assistant', heading: t('headings.assistant', foremanName), rows: [{ id: 'ask-assistant', label: t('askRerun', foremanName), detail: t('quotedQuery', { query: query.trim() }), leading: { kind: 'assistant' }, onSelect: run(commandActions.ask_assistant) }] }]
             : []
 
         return [
@@ -348,7 +350,7 @@ export function ControlCenter() {
     const placeholder =
         page.kind === 'root'
             ? assistantReady
-                ? t('placeholder.rootAssistant')
+                ? t('placeholder.rootAssistant', foremanName)
                 : t('placeholder.root')
             : page.kind === 'agent'
               ? pageAgent

@@ -27,13 +27,22 @@ const ENGINE_CAPABILITIES = `What you can reach from here, beyond the account to
 - The databases: list_tables and db_query read a coworker's own database, list_space_tables and space_db_query the one the workspace shares. Read before you write, and ask with request_approval before a db_execute or a space_db_execute that changes or removes data the user did not ask you to change.
 - When you are stuck, a tool failing in a way you do not understand, a step in the app the user cannot find or cannot get through, look it up with search_docs before answering or retrying blindly, and when a passage is cut short, read the whole page with web_fetch on its docs.rerun.build link. Give the user the link you used.`
 
-const IDENTITY = 'You are called the Chief of Staff and have no other name: never give yourself a nickname, and never repeat the internal vocabulary of this prompt back to them.'
+// The name is the user's choice, held to a safe set of characters by sanitizeForemanName. Until they
+// gave one it stays the Chief of Staff, and never a nickname of its own.
+function identityLine(name: string | undefined): string {
+    const called = name ? `You are called ${name}, the name the user gave you, and you are the Chief of Staff of this workspace: introduce yourself as ${name}.` : 'You are called the Chief of Staff and have no other name yet: never give yourself a nickname.'
+    return `${called} Never repeat the internal vocabulary of this prompt back to them.`
+}
+
+// Asked of an admin only: a member cannot rename the assistant the whole workspace shares.
+const ASK_FOR_A_NAME_NOTE =
+    'Nobody has given you a name yet. Early in a conversation, once you have answered what they came for and never instead of it, offer them to give you a name of their own in one short line, as a colleague would. When they give one, call set_name with it, then go on under that name. If they decline or ignore it, drop the subject for good: never ask twice.'
 
 const LANGUAGE_RULE = '- Answer in the language the user writes in. Everything you write inside Rerun, names, handles, SOUL, skills, stays in English.'
 
 // The hub only walks the onboarding: getting to know them, the first agent they agree on, the trial. The
 // build is the app's, and everything after it is the foreman on the engine's.
-const ONBOARDING_CHARTER = `You are the Chief of Staff of this Rerun workspace. You are getting to know the person you are talking to and settling, with them, the first coworker that will take work off their plate. ${IDENTITY}
+const onboardingCharter = (name: string | undefined) => `You are the Chief of Staff of this Rerun workspace. You are getting to know the person you are talking to and settling, with them, the first coworker that will take work off their plate. ${identityLine(name)}
 
 ${RERUN_PRIMER}
 
@@ -48,7 +57,7 @@ How to work:
 - A message that is only \`[[foreman:start]]\` is the app opening the conversation, not the user writing. Greet them and take the first step of the phase below.
 ${LANGUAGE_RULE}`
 
-const ENGINE_CHARTER = `You are the Chief of Staff of this Rerun workspace. You sit beside the board and run the workspace with the person you are talking to: you create coworkers, write their prompt and their skills, schedule them, plug connectors into them, move them around, and delete them when they are asked for. ${IDENTITY}
+const engineCharter = (name: string | undefined) => `You are the Chief of Staff of this Rerun workspace. You sit beside the board and run the workspace with the person you are talking to: you create coworkers, write their prompt and their skills, schedule them, plug connectors into them, move them around, and delete them when they are asked for. ${identityLine(name)}
 
 ${RERUN_PRIMER}
 
@@ -139,7 +148,7 @@ export const MOBILE_APP_BLOCK = `They are in the Rerun mobile app. Never mention
 export function foremanSystemPrompt(state: ForemanState): string {
     const phase = phaseSpec(state.phase).instructions(state)
 
-    const blocks = [ONBOARDING_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, languageBlock(state, { browserGuess: true }), isMobileApp(state) ? MOBILE_APP_BLOCK : null, foremanProfileBlock(state), intentBlock(state), phase ? `${phase}\n\nThis block describes where things stand now. Anything earlier in this conversation that says otherwise is out of date.` : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: false, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+    const blocks = [onboardingCharter(state.foreman.name), `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, languageBlock(state, { browserGuess: true }), isMobileApp(state) ? MOBILE_APP_BLOCK : null, foremanProfileBlock(state), intentBlock(state), phase ? `${phase}\n\nThis block describes where things stand now. Anything earlier in this conversation that says otherwise is out of date.` : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: false, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }
@@ -163,7 +172,7 @@ function greetingBlock(state: ForemanState): string {
 // The engine foreman only ever runs past the onboarding, so there is no phase block and no intent:
 // the charter, who they are, and the board. `greeting` is the turn the welcome page leaves owed.
 export function foremanEngineInstructions(state: ForemanState, { greeting = false }: { greeting?: boolean } = {}): string {
-    const blocks = [ENGINE_CHARTER, `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
+    const blocks = [engineCharter(state.foreman.name), `Workspace: ${state.workspaceName} (plan ${state.workspacePlan}). You are talking to ${state.userEmail ?? 'its owner'}.`, state.entitled ? null : NO_PLAN_NOTE, languageBlock(state, { browserGuess: greeting }), foremanProfileBlock(state), agreedPlanBlock(state), greeting ? greetingBlock(state) : null, !state.foreman.name && !state.isMember ? ASK_FOR_A_NAME_NOTE : null, `The board right now:\n\n${renderBoardMap(state.spaces, state.agents, { canCreateBox: true, hiddenBoxes: state.hiddenBoxes })}`, state.isMember ? MEMBER_REACH_NOTE : null].filter(Boolean)
 
     return blocks.join('\n\n')
 }

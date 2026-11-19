@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useModKeyLabel } from '@/hooks/useModKeyLabel'
 import { ArrowLeftIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
+import { useForemanName } from '@/hooks/useForemanName'
 import { Orb } from '@rerun/ui/foreman'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { Badge } from '@rerun/ui/primitives'
@@ -70,6 +71,7 @@ function measureOrbAnchor(): OrbAnchor | null {
 
 export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...panel }: ControlCenterPanelProps & { open: boolean; onOpenChange: (open: boolean) => void; anchorToOrb?: boolean }) {
     const t = useTranslations('layout.controlCenter')
+    const foremanName = useForemanName()
     const [anchor, setAnchor] = useState<OrbAnchor | null>(null)
     const [wasOpen, setWasOpen] = useState(false)
     if (wasOpen !== open) {
@@ -80,7 +82,7 @@ export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...
     const header = (
         <DialogHeader className="sr-only">
             <DialogTitle>{t('title')}</DialogTitle>
-            <DialogDescription>{t('description')}</DialogDescription>
+            <DialogDescription>{t('description', foremanName)}</DialogDescription>
         </DialogHeader>
     )
 
@@ -119,6 +121,7 @@ export function ControlCenterView({ open, onOpenChange, anchorToOrb = false, ...
 
 export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey, depth, crumbs, onBack, sections, emptyLabel, mod }: ControlCenterPanelProps) {
     const t = useTranslations('layout.controlCenter')
+    const foremanName = useForemanName()
     const rows = sections.flatMap(section => section.rows)
     const firstRowId = rows.find(row => !row.disabledReason)?.id ?? ''
     const [selectedId, setSelectedId] = useState(firstRowId)
@@ -194,7 +197,7 @@ export function ControlCenterPanel({ query, onQueryChange, placeholder, pageKey,
                     <span className="flex items-center gap-1.5 max-sm:hidden">
                         <Kbd className={HINT_KEY}>{mod}</Kbd>
                         <Kbd className={HINT_KEY}>↵</Kbd>
-                        {t('askRerun')}
+                        {t('askRerun', foremanName)}
                     </span>
                 ) : (
                     <span className="flex items-center gap-1.5 max-sm:hidden">

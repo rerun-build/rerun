@@ -1,7 +1,7 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, sleep, type ForemanIntent } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, FOREMAN_INTENT_PART, isToolPart, sleep, toolNameOf, type ForemanIntent } from '@rerun/contracts'
 import { DefaultChatTransport, type UIMessage } from 'ai'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
@@ -147,10 +147,12 @@ export function useForemanChat() {
             const { tool, input } = part.data as ForemanIntent
             if (isForemanClientTool(tool)) runForemanClientTool(tool, input, gates.current)
         },
-        onFinish: ({ isAbort, isDisconnect, isError }) => {
+        onFinish: ({ message, isAbort, isDisconnect, isError }) => {
             // Only the engine foreman has a model pill reading the store; the hub's is fixed.
             if (selectForemanBackend(useForemanStore.getState()) === 'engine' && !isDisconnect && !isError) void refreshWorkspaceConnections()
             if (isAbort || isDisconnect || isError) return
+            // It just took the name they gave it: every label that names it follows.
+            if (message.parts.some(part => isToolPart(part) && toolNameOf(part) === 'set_name' && part.state === 'output-available')) void refreshForemanSurface()
             completedRef.current = true
             holdRun(null)
         },

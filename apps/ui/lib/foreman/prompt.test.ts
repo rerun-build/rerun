@@ -134,3 +134,22 @@ describe('foremanSystemPrompt in the app', () => {
         expect(foremanSystemPrompt(stateWith({ phase: 'trial', entitled: false, client: 'web' }))).not.toContain('mobile app')
     })
 })
+
+describe('foremanEngineInstructions and its name', () => {
+    it('stays the Chief of Staff and offers an admin, once, to give it a name, until it has one', () => {
+        const text = foremanEngineInstructions(stateWith({}))
+        expect(text).toContain('You are called the Chief of Staff and have no other name yet')
+        expect(text).toMatch(/call set_name/)
+        expect(text).toMatch(/never ask twice/)
+    })
+
+    it('introduces itself under the name it was given, and stops asking for one', () => {
+        const text = foremanEngineInstructions(stateWith({ foreman: { profileAt: 'then', name: 'Max' } }))
+        expect(text).toContain('You are called Max, the name the user gave you')
+        expect(text).not.toMatch(/call set_name/)
+    })
+
+    it('never asks a member for a name they could not give it', () => {
+        expect(foremanEngineInstructions(stateWith({ isMember: true }))).not.toMatch(/call set_name/)
+    })
+})

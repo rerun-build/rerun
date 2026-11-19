@@ -478,8 +478,8 @@
         },
         "actions": {
             "controlCenter": "Ouvrir le centre de contrôle",
-            "askRerun": "Demander à votre Chief of Staff, hors d'un chat",
-            "holdToTalk": "Maintenir pour parler à votre Chief of Staff",
+            "askRerun": "{named, select, yes {Demander à {name}, hors d'un chat} other {Demander à votre Chief of Staff, hors d'un chat}}",
+            "holdToTalk": "{named, select, yes {Maintenir pour parler à {name}} other {Maintenir pour parler à votre Chief of Staff}}",
             "searchInPage": "Rechercher dans la page",
             "newConversation": "Nouvelle conversation",
             "closeTab": "Fermer l'onglet actif",
