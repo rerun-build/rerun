@@ -48,9 +48,9 @@ export default function WorkspaceInvite({
 
 WorkspaceInvite.PreviewProps = {
   workspaceName: "Acme Inc.",
-  inviteUrl: "https://app.rerun.build/invite/abc123",
+  inviteUrl: "https://moldwright.robagentic.tech/invite/abc123",
   invitedByEmail: "ada@acme.com",
-  appUrl: "https://app.rerun.build",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies WorkspaceInviteProps;
 
 const cta: React.CSSProperties = {

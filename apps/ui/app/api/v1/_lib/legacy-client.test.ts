@@ -15,7 +15,7 @@ const legacyAgentView = agentViewSchema.extend({
         .nullable(),
 })
 
-const request = (client?: string) => new Request('https://app.rerun.build/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
+const request = (client?: string) => new Request('https://moldwright.robagentic.tech/api/v1/agents/a1', { headers: client ? { 'x-rerun-client': client } : {} })
 
 const view: AiConnectionsView = {
     connections: [

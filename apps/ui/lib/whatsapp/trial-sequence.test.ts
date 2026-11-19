@@ -16,7 +16,7 @@ vi.mock('./trial-phrases', () => ({
 }))
 vi.mock('@/lib/auth/recipient', () => ({ loadFirstName: vi.fn(async () => 'Lucien') }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ findWorkspaceEngine: vi.fn(async () => null) }))
-vi.mock('@/lib/og/board-image', () => ({ boardImageUrl: vi.fn((scene: unknown) => `https://app.rerun.build/og/board?scene=${JSON.stringify(scene)}`) }))
+vi.mock('@/lib/og/board-image', () => ({ boardImageUrl: vi.fn((scene: unknown) => `https://moldwright.robagentic.tech/og/board?scene=${JSON.stringify(scene)}`) }))
 
 type Tables = Partial<Record<'workspaces' | 'workspace_members' | 'agents' | 'notifications' | 'sessions' | 'user_phones' | 'whatsapp_messages' | 'workspace_getting_started', SupabaseResult>>
 

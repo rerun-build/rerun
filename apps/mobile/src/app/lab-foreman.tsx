@@ -141,8 +141,8 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
                             {messages.map((message, index) => (
                                 <MessageView key={message.id} message={message} isLastAssistant={index === messages.length - 1} running={running} agentId={null} fileOwner={null} coworkerName={coworkerName} hiddenCallId={null} />
                             ))}
-                            {state === 'question' && <HitlBlock pending={{ kind: 'question', toolCallId: 'lab-q', input: QUESTION, output: undefined }} agentId="foreman" coworkerName={FOREMAN_DISPLAY_NAME} webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
-                            {state === 'approval' && <HitlBlock pending={{ kind: 'approval', toolCallId: 'lab-a', input: APPROVAL, output: undefined }} agentId="agent-pulse" coworkerName={coworkerName} webUrl="https://app.rerun.build" onAnswer={noop} onDismiss={noop} />}
+                            {state === 'question' && <HitlBlock pending={{ kind: 'question', toolCallId: 'lab-q', input: QUESTION, output: undefined }} agentId="foreman" coworkerName={FOREMAN_DISPLAY_NAME} webUrl="https://moldwright.robagentic.tech" onAnswer={noop} onDismiss={noop} />}
+                            {state === 'approval' && <HitlBlock pending={{ kind: 'approval', toolCallId: 'lab-a', input: APPROVAL, output: undefined }} agentId="agent-pulse" coworkerName={coworkerName} webUrl="https://moldwright.robagentic.tech" onAnswer={noop} onDismiss={noop} />}
                             {running && <RunStatus coworker={FOREMAN} phase="working" />}
                         </View>
                     )}

@@ -9,7 +9,7 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => ({
 
 const { POST } = await import('./route')
 
-const cancel = (runId: string, taskId: string) => POST(new Request('https://app.rerun.build/api/v1/agents/agent-1/runs/x/tasks/y/cancel', { method: 'POST' }), { params: Promise.resolve({ id: 'agent-1', runId, taskId }) })
+const cancel = (runId: string, taskId: string) => POST(new Request('https://moldwright.robagentic.tech/api/v1/agents/agent-1/runs/x/tasks/y/cancel', { method: 'POST' }), { params: Promise.resolve({ id: 'agent-1', runId, taskId }) })
 
 describe('POST /api/v1/agents/:id/runs/:runId/tasks/:taskId/cancel', () => {
     beforeEach(() => cancelSubRunAction.mockReset().mockResolvedValue(true))

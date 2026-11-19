@@ -19,7 +19,7 @@ const server = await import('./route')
 const connect = await import('./connect/route')
 
 const segment = { params: Promise.resolve({ id: 'agent-1', name: 'linear' }) }
-const request = (method: string) => new Request('https://app.rerun.build/api/v1/agents/agent-1/mcp/linear', { method })
+const request = (method: string) => new Request('https://moldwright.robagentic.tech/api/v1/agents/agent-1/mcp/linear', { method })
 const LINEAR = { name: 'linear', displayName: 'Linear', transport: 'http', host: 'mcp.linear.app', icon: 'https://cdn/linear.svg', signInUrl: 'https://mcp.linear.app/mcp' }
 
 describe('/api/v1/agents/:id/mcp/:name', () => {

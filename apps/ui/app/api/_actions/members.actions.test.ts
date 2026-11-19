@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({ getServerSession: vi.fn(), sendWorkspaceInvite
 
 vi.mock('@/supabase/session/getServerSession', () => ({ getServerSession: mocks.getServerSession, getSessionWorkspace: mocks.getServerSession }))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@moldwright/cloud/email', () => ({ get EMAIL_DELIVERY() { return mocks.emailDelivery }, sendWorkspaceInviteEmail: mocks.sendWorkspaceInviteEmail, BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => 'https://app.rerun.build/og/board?sig=x') }))
+vi.mock('@moldwright/cloud/email', () => ({ get EMAIL_DELIVERY() { return mocks.emailDelivery }, sendWorkspaceInviteEmail: mocks.sendWorkspaceInviteEmail, BANNER_WARM_BACKGROUND_MS: 0, emailBoardBanner: vi.fn(async () => 'https://moldwright.robagentic.tech/og/board?sig=x') }))
 vi.mock('next/server', () => ({ after: (task: () => Promise<unknown>) => void mocks.afterTasks.push(task()) }))
 
 const afterResponse = () => Promise.all(mocks.afterTasks.splice(0))
@@ -91,7 +91,7 @@ describe('inviteToWorkspaceAction', () => {
         const [write] = db.writes('workspace_invitations')
         expect(write.method).toBe('insert')
         expect(write.payload).toMatchObject({ workspace_id: WORKSPACE_ID, email: 'new@acme.test', invited_by: ME, status: 'pending', box_scope: 'all' })
-        expect(mocks.sendWorkspaceInviteEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'new@acme.test', boardUrl: 'https://app.rerun.build/og/board?sig=x' }))
+        expect(mocks.sendWorkspaceInviteEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'new@acme.test', boardUrl: 'https://moldwright.robagentic.tech/og/board?sig=x' }))
     })
 
     it('hands the link back to the person inviting where no email leaves', async () => {

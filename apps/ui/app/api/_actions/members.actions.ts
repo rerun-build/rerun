@@ -18,7 +18,7 @@ import { failure, failureOf, type ErrorCode } from '@/lib/i18n/action-error'
 import type { ActionResult } from './space.actions'
 import { randomUuid } from '@/lib/random-uuid'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.rerun.build'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://moldwright.robagentic.tech'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const MEMBERS_ADMIN_ONLY = 'adminOnlyMembers' satisfies ErrorCode

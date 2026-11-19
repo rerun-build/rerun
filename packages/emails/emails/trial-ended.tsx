@@ -92,8 +92,8 @@ TrialEnded.PreviewProps = {
   pausedLabel: "12 March, 16:00 UTC",
   keptUntilLabel: "10 June",
   summary: { agents: 3, runs: 41 },
-  billingUrl: "https://app.rerun.build/?billing=1",
-  appUrl: "https://app.rerun.build",
+  billingUrl: "https://moldwright.robagentic.tech/?billing=1",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies TrialEndedProps;
 
 const meta: React.CSSProperties = {

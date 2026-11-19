@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { decidePermission } from '../src/main/permission-policy'
 
-const SERVER = 'https://app.rerun.build'
+const SERVER = 'https://moldwright.robagentic.tech'
 
 describe('decidePermission', () => {
     it('grants the server what its features use', () => {

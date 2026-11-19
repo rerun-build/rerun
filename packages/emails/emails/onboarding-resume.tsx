@@ -44,9 +44,9 @@ export default function OnboardingResume({
 
 OnboardingResume.PreviewProps = {
   firstName: "Clément",
-  resumeUrl: "https://app.rerun.build",
-  appUrl: "https://app.rerun.build",
-  unsubscribeUrl: "https://app.rerun.build/unsubscribe",
+  resumeUrl: "https://moldwright.robagentic.tech",
+  appUrl: "https://moldwright.robagentic.tech",
+  unsubscribeUrl: "https://moldwright.robagentic.tech/unsubscribe",
 } satisfies OnboardingResumeProps;
 
 const cta: React.CSSProperties = {

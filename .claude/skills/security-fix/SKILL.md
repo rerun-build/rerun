@@ -1,6 +1,6 @@
 ---
 name: security-fix
-description: Fix a vulnerability in private, through the temporary private fork of a GitHub security advisory, never through a branch of the public repository (every branch pushed to rerun-build/rerun is public at once). Use whenever the work is a vulnerability fix, a security audit finding, a private report (help@rerun.build or "Report a vulnerability"), or when someone says "security fix", "fix this vulnerability", « correctif de sécurité », « corrige cette faille », « fix de sécu », or when the pre-push hook refused a push for mentioning a vulnerability.
+description: Fix a vulnerability in private, through the temporary private fork of a GitHub security advisory, never through a branch of the public repository (every branch pushed to rerun-build/rerun is public at once). Use whenever the work is a vulnerability fix, a security audit finding, a private report (help@moldwright.robagentic.tech or "Report a vulnerability"), or when someone says "security fix", "fix this vulnerability", « correctif de sécurité », « corrige cette faille », « fix de sécu », or when the pre-push hook refused a push for mentioning a vulnerability.
 ---
 
 # security-fix: a vulnerability fix stays private until it is published

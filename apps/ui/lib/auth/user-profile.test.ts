@@ -26,7 +26,7 @@ describe('readProfile', () => {
 
 describe('displayNameOf', () => {
     it('falls back on the front of the address, never on a placeholder one', () => {
-        expect(displayNameOf({ app_metadata: {}, user_metadata: {}, email: 'ada@rerun.build' })).toBe('ada')
+        expect(displayNameOf({ app_metadata: {}, user_metadata: {}, email: 'ada@moldwright.robagentic.tech' })).toBe('ada')
         expect(displayNameOf({ app_metadata: {}, user_metadata: {}, email: '33612345678@phone.rerun.build' })).toBeNull()
     })
 

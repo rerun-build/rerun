@@ -43,7 +43,7 @@ PublishedAccessCode.PreviewProps = {
   workspaceName: "Acme",
   pageTitle: "Q3 proposal for Northwind",
   expiresInMinutes: 10,
-  appUrl: "https://app.rerun.build",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies PublishedAccessCodeProps;
 
 const codeBox: React.CSSProperties = {

@@ -6,7 +6,7 @@ description: "JSON-RPC 2.0 over HTTP: the handshake, the call shape, and how err
 The Rerun MCP server is a stateless JSON-RPC 2.0 endpoint. There is no SSE stream, no session id and no long-lived connection. Every request is a `POST` that carries its own authentication and gets a complete answer.
 
 ```
-POST https://app.rerun.build/api/mcp/account
+POST https://moldwright.robagentic.tech/api/mcp/account
 Authorization: Bearer rk_your_key
 Content-Type: application/json
 ```
@@ -138,7 +138,7 @@ A ninth asks for the same agreement without destroying anything. `create_agent_s
 Nothing about this endpoint requires an MCP client.
 
 ```bash
-curl -s https://app.rerun.build/api/mcp/account \
+curl -s https://moldwright.robagentic.tech/api/mcp/account \
   -H "Authorization: Bearer $RERUN_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{

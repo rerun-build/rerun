@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { recommendTemplates, resolvePicks, scoreCandidate, shortlistTemplates, type RecommendContext, type TemplateCandidate } from './recommend'
 
 const NOW = new Date('2026-09-03T12:00:00.000Z')
-const APP_URL = 'https://app.rerun.build'
+const APP_URL = 'https://moldwright.robagentic.tech'
 
 function candidate(overrides: Partial<TemplateCandidate> & { slug: string }): TemplateCandidate {
     return {

@@ -74,7 +74,7 @@ describe('verifyUnsubscribeToken', () => {
 
 describe('buildUnsubscribeUrl', () => {
     it('points at the unsubscribe page with a token that verifies', () => {
-        const url = new URL(buildUnsubscribeUrl(USER_ID, 'https://app.rerun.build', 'runs'))
+        const url = new URL(buildUnsubscribeUrl(USER_ID, 'https://moldwright.robagentic.tech', 'runs'))
 
         expect(url.pathname).toBe('/unsubscribe')
         expect(verifyUnsubscribeToken(url.searchParams.get('token')!)).toEqual({ userId: USER_ID, scope: 'runs' })
@@ -83,14 +83,14 @@ describe('buildUnsubscribeUrl', () => {
 
 describe('listUnsubscribeHeaders', () => {
     it('derives the one-click endpoint from the page URL', () => {
-        expect(listUnsubscribeHeaders('https://app.rerun.build/unsubscribe?token=abc')).toEqual({
-            'List-Unsubscribe': '<https://app.rerun.build/api/unsubscribe?token=abc>',
+        expect(listUnsubscribeHeaders('https://moldwright.robagentic.tech/unsubscribe?token=abc')).toEqual({
+            'List-Unsubscribe': '<https://moldwright.robagentic.tech/api/unsubscribe?token=abc>',
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         })
     })
 
     it('adds nothing without an unsubscribe page URL', () => {
         expect(listUnsubscribeHeaders()).toEqual({})
-        expect(listUnsubscribeHeaders('https://app.rerun.build/settings')).toEqual({})
+        expect(listUnsubscribeHeaders('https://moldwright.robagentic.tech/settings')).toEqual({})
     })
 })

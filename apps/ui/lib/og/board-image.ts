@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 import { CARD_HEIGHT, CARD_THEME, CARD_THEMES, CARD_WIDTH } from './size'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://app.rerun.build'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://moldwright.robagentic.tech'
 
 const AGENT_STATUSES = ['idle', 'working', 'waiting_human', 'error', 'offline'] as const satisfies readonly AgentStatus[]
 

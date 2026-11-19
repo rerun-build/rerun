@@ -15,7 +15,7 @@ const segment = { params: Promise.resolve({}) }
 
 function ask(body: object, client?: string) {
     const headers: Record<string, string> = { 'x-forwarded-for': '203.0.113.7', 'accept-language': 'fr-FR', ...(client ? { 'x-rerun-client': client } : {}) }
-    return POST(new Request('https://app.rerun.build/api/v1/auth/phone/code', { method: 'POST', body: JSON.stringify(body), headers }), segment)
+    return POST(new Request('https://moldwright.robagentic.tech/api/v1/auth/phone/code', { method: 'POST', body: JSON.stringify(body), headers }), segment)
 }
 
 describe('POST /api/v1/auth/phone/code', () => {

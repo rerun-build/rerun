@@ -69,8 +69,8 @@ RenewalReminder.PreviewProps = {
   renewsLabel: "29 October",
   daysLeft: 7,
   amountLabel: "$49.00",
-  billingUrl: "https://app.rerun.build/?billing=1",
-  appUrl: "https://app.rerun.build",
+  billingUrl: "https://moldwright.robagentic.tech/?billing=1",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies RenewalReminderProps;
 
 const meta: React.CSSProperties = {

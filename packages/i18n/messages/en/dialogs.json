@@ -123,7 +123,7 @@
             "linkHint": "Send this link to {email}. It works for them only, once.",
             "copyLink": "Copy the invitation link",
             "emailLabel": "Invite by email",
-            "emailPlaceholder": "teammate@rerun.build",
+            "emailPlaceholder": "teammate@moldwright.robagentic.tech",
             "boxes": "Boxes",
             "submit": "Invite",
             "sent": "Invitation sent to {email}"
@@ -190,7 +190,7 @@
         "name": "Name",
         "namePlaceholder": "e.g. Acme Inc.",
         "email": "Email",
-        "emailPlaceholder": "teammate@rerun.build",
+        "emailPlaceholder": "teammate@moldwright.robagentic.tech",
         "emailHint": "Teammates get an email invite when you create the workspace. Inviting requires a Team or Scale plan.",
         "add": "Add",
         "removeMember": "Remove {email}",

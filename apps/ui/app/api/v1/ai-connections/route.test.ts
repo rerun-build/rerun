@@ -108,7 +108,7 @@ const claudeFinish = await import('./claude/finish/route')
 const codexPoll = await import('./codex/poll/route')
 const { EngineRequestError } = await import('@/lib/engine/client')
 
-const base = 'https://app.rerun.build/api/v1/ai-connections'
+const base = 'https://moldwright.robagentic.tech/api/v1/ai-connections'
 const send = (handler: (req: Request, segment: { params: Promise<Record<string, string>> }) => Promise<Response>, method: string, path = '', body?: object, params: Record<string, string> = {}, headers: Record<string, string> = {}) =>
     handler(new Request(`${base}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined }), { params: Promise.resolve(params) })
 

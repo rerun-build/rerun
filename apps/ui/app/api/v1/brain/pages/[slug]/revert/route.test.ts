@@ -12,7 +12,7 @@ vi.mock('@/app/api/_auth/ownership', async importOriginal => ({
 const revert = await import('./route')
 const cancel = await import('@/app/api/v1/agents/[id]/runs/[runId]/tasks/[taskId]/cancel/route')
 
-const request = (body?: object) => new Request('https://app.rerun.build/api/v1/x', { method: 'POST', body: body ? JSON.stringify(body) : undefined })
+const request = (body?: object) => new Request('https://moldwright.robagentic.tech/api/v1/x', { method: 'POST', body: body ? JSON.stringify(body) : undefined })
 
 describe('/api/v1/brain/pages/:slug/revert', () => {
     beforeEach(() => revertBrainPageAction.mockReset().mockResolvedValue({ ok: true, detail: {} }))

@@ -83,8 +83,8 @@ ArchiveExpiring.PreviewProps = {
   pausedLabel: "12 March",
   deletionLabel: "10 June",
   agentCount: 3,
-  billingUrl: "https://app.rerun.build/?billing=1",
-  appUrl: "https://app.rerun.build",
+  billingUrl: "https://moldwright.robagentic.tech/?billing=1",
+  appUrl: "https://moldwright.robagentic.tech",
 } satisfies ArchiveExpiringProps;
 
 const meta: React.CSSProperties = {

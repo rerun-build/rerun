@@ -64,7 +64,7 @@ describe('attachments', () => {
     })
 
     it('hands the coworker each file as it was summarized, and nothing when there is none', () => {
-        const voice: AttachmentSummary = { type: 'audio', name: 'audio-3EB0.ogg', mimeType: 'audio/ogg', byteSize: 41_000, durationMs: 12_000, downloadUrl: '/v2/messages/attachment?message_id=3EB0', url: 'https://app.rerun.build/api/public/attachments/t/audio-3EB0.ogg', expiresAt: '2026-10-29T09:12:00.000Z', transcript: 'On se voit demain' }
+        const voice: AttachmentSummary = { type: 'audio', name: 'audio-3EB0.ogg', mimeType: 'audio/ogg', byteSize: 41_000, durationMs: 12_000, downloadUrl: '/v2/messages/attachment?message_id=3EB0', url: 'https://moldwright.robagentic.tech/api/public/attachments/t/audio-3EB0.ogg', expiresAt: '2026-10-29T09:12:00.000Z', transcript: 'On se voit demain' }
         expect(wakePayload('message_received', parseEnvelope(MESSAGE)!, null, [voice]).attachments).toEqual([voice])
         expect(wakePayload('message_received', parseEnvelope(MESSAGE)!, null)).not.toHaveProperty('attachments')
     })

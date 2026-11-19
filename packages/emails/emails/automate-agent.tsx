@@ -64,9 +64,9 @@ AutomateAgent.PreviewProps = {
   periodLabel: "the last two weeks",
   lastResult:
     "Checked 84 invoices against the Stripe payouts, 2 did not match and are listed in the Notion page.",
-  scheduleUrl: "https://app.rerun.build/?agent=8f2b",
-  appUrl: "https://app.rerun.build",
-  unsubscribeUrl: "https://app.rerun.build/unsubscribe",
+  scheduleUrl: "https://moldwright.robagentic.tech/?agent=8f2b",
+  appUrl: "https://moldwright.robagentic.tech",
+  unsubscribeUrl: "https://moldwright.robagentic.tech/unsubscribe",
 } satisfies AutomateAgentProps;
 
 const cta: React.CSSProperties = {

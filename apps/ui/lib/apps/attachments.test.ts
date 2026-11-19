@@ -65,7 +65,7 @@ describe('attachmentUrl', () => {
 
     it('ends with the file name and lives a day', () => {
         vi.stubEnv('APP_ATTACHMENT_URL_SECRET', 'secret')
-        vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://app.rerun.build/')
+        vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://moldwright.robagentic.tech/')
         const link = attachmentUrl('conn-1', { message_id: '3EB0' }, { name: 'voice note.ogg', mimeType: 'audio/ogg' }, 0)!
         expect(link.url).toMatch(/^https:\/\/app\.rerun\.build\/api\/public\/attachments\/[\w-]+\.[\w-]+\/voice%20note\.ogg$/)
         expect(link.expiresAt).toBe(new Date(ATTACHMENT_URL_TTL_MS).toISOString())

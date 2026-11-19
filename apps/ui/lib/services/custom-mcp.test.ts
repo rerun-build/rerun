@@ -54,7 +54,7 @@ describe('mcpIconDomain', () => {
         expect(mcpIconDomain(host)).toBe(domain)
     })
 
-    it.each(['localhost', '127.0.0.1', 'my-mcp.workers.dev', 'thing.vercel.app', 'x.up.railway.app', 'app.rerun.build', 'co.uk'])('draws no brand for %s', host => {
+    it.each(['localhost', '127.0.0.1', 'my-mcp.workers.dev', 'thing.vercel.app', 'x.up.railway.app', 'moldwright.robagentic.tech', 'co.uk'])('draws no brand for %s', host => {
         expect(mcpIconDomain(host)).toBeNull()
     })
 

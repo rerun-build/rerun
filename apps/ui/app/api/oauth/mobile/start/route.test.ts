@@ -19,7 +19,7 @@ vi.mock('@/lib/mcp-oauth', async importOriginal => ({
 
 const { GET } = await import('./route')
 
-const open = (ticket: string) => GET(new Request(`https://app.rerun.build/api/oauth/mobile/start?t=${encodeURIComponent(ticket)}`, { headers: { host: 'app.rerun.build', 'x-forwarded-proto': 'https' } }))
+const open = (ticket: string) => GET(new Request(`https://moldwright.robagentic.tech/api/oauth/mobile/start?t=${encodeURIComponent(ticket)}`, { headers: { host: 'moldwright.robagentic.tech', 'x-forwarded-proto': 'https' } }))
 const serverTicket = () => mintConnectTicket({ agentId: 'agent-1', server: 'linear', workspaceId: 7, userId: 'user-1' })
 
 beforeEach(() => {

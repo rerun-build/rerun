@@ -4,7 +4,7 @@ import { undeliverableReason } from './deliverability'
 describe('undeliverableReason', () => {
     it('keeps ordinary addresses, including the shapes a strict regex would drop', () => {
         expect(undeliverableReason('someone@gmail.com')).toBeNull()
-        expect(undeliverableReason('first.last+newsletter@rerun.build')).toBeNull()
+        expect(undeliverableReason('first.last+newsletter@moldwright.robagentic.tech')).toBeNull()
         expect(undeliverableReason("o'brien@company.co.uk")).toBeNull()
         expect(undeliverableReason('hey@startup.engineering')).toBeNull()
         expect(undeliverableReason('  Someone@Gmail.com  ')).toBeNull()

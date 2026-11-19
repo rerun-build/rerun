@@ -75,8 +75,8 @@ AgentNotification.PreviewProps = {
   message:
     "I found two candidate database schemas. Which one should I use for the migration?",
   reason: "You started this conversation.",
-  appUrl: "https://app.rerun.build",
-  conversationUrl: "https://app.rerun.build/?notification=preview",
+  appUrl: "https://moldwright.robagentic.tech",
+  conversationUrl: "https://moldwright.robagentic.tech/?notification=preview",
 } satisfies AgentNotificationProps;
 
 const reasonLine: React.CSSProperties = {

@@ -12,7 +12,7 @@ const { POST } = await import('./route')
 const segment = { params: Promise.resolve({}) }
 
 function ask(email: string) {
-    return POST(new Request('https://app.rerun.build/api/v1/auth/email/code', { method: 'POST', body: JSON.stringify({ email }), headers: { 'x-forwarded-for': '203.0.113.7' } }), segment)
+    return POST(new Request('https://moldwright.robagentic.tech/api/v1/auth/email/code', { method: 'POST', body: JSON.stringify({ email }), headers: { 'x-forwarded-for': '203.0.113.7' } }), segment)
 }
 
 describe('POST /api/v1/auth/email/code', () => {

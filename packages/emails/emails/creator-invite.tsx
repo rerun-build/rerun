@@ -85,10 +85,10 @@ export default function CreatorInvite({
 
 CreatorInvite.PreviewProps = {
   firstName: "Alex",
-  joinUrl: "https://app.rerun.build/creator/join/q3qmbe89",
-  appUrl: "https://app.rerun.build",
+  joinUrl: "https://moldwright.robagentic.tech/creator/join/q3qmbe89",
+  appUrl: "https://moldwright.robagentic.tech",
   context: "outreach",
-  cardImageUrl: "https://app.rerun.build/experts/alex-mercier/card.png",
+  cardImageUrl: "https://moldwright.robagentic.tech/experts/alex-mercier/card.png",
   unsubscribeUrl: "https://rerun.build/community/experts/unsubscribe/q3qmbe89",
 } satisfies CreatorInviteProps;
 

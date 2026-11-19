@@ -90,8 +90,8 @@ export default function AgentsByLink({
 }
 
 AgentsByLink.PreviewProps = {
-  appUrl: "https://app.rerun.build",
-  unsubscribeUrl: "https://app.rerun.build/unsubscribe?token=preview",
+  appUrl: "https://moldwright.robagentic.tech",
+  unsubscribeUrl: "https://moldwright.robagentic.tech/unsubscribe?token=preview",
 } satisfies NewsletterProps;
 
 const sign: React.CSSProperties = {

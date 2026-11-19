@@ -22,7 +22,7 @@ const segment = { params: Promise.resolve({}) }
 const SIGNED_IN = { ok: true, created: true, session: { accessToken: 'access', refreshToken: 'refresh' } }
 
 function verify(code: string) {
-    return POST(new Request('https://app.rerun.build/api/v1/auth/phone/session', { method: 'POST', headers: { 'x-real-ip': '203.0.113.9' }, body: JSON.stringify({ phone: '0612345678', country: 'FR', channel: 'sms', code }) }), segment)
+    return POST(new Request('https://moldwright.robagentic.tech/api/v1/auth/phone/session', { method: 'POST', headers: { 'x-real-ip': '203.0.113.9' }, body: JSON.stringify({ phone: '0612345678', country: 'FR', channel: 'sms', code }) }), segment)
 }
 
 describe('POST /api/v1/auth/phone/session', () => {
