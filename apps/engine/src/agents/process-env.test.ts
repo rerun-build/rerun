@@ -10,6 +10,9 @@ const { agentConfigSchema } = await import('@rerun/contracts')
 const { agentProcessEnv } = await import('./process-env.js')
 const { agentDataDbPath, dataDir, sharedDbPath, workspaceDir } = await import('../config/paths.js')
 const { writeSharedEnv } = await import('./shared-env.js')
+const { childProcessEnv } = await import('../lib/child-env.js')
+const { execFileSync } = await import('node:child_process')
+const { mkdtempSync: mkTemp } = await import('node:fs')
 
 function agent(tools: Record<string, boolean>, env: Record<string, string> = {}) {
     return { id: 'env-agent', env, config: agentConfigSchema.parse({ name: 'Env test', tools }) }
@@ -66,5 +69,31 @@ describe('agentProcessEnv', () => {
         expect(env.GH_TOKEN).toBe('own-token-123456')
         expect(env.EVEROS_URL).toBe('https://everos.example')
         expect(env.RERUN_WORKSPACE).toBe(workspaceDir('env-agent'))
+    })
+
+    it('git answers github.com credentials from the shared GH_TOKEN', async () => {
+        await writeSharedEnv({ GH_TOKEN: 'tok-git-123456' })
+        const base = agentProcessEnv(agent({ sharedDb: false }))
+        const env = childProcessEnv(base.env, { HOME: mkdtempSync(resolve(tmpdir(), 'rerun-git-home-')), GIT_CONFIG_NOSYSTEM: '1', GIT_TERMINAL_PROMPT: '0' })
+        const out = execFileSync('git', ['credential', 'fill'], { input: 'protocol=https\nhost=github.com\n\n', env, encoding: 'utf8' })
+        expect(out).toContain('username=x-access-token')
+        expect(out).toContain('password=tok-git-123456')
+        const carriers = Object.values(base.env).filter(value => value.includes('tok-git-123456'))
+        expect(carriers).toHaveLength(1)
+    })
+
+    it('adds no git credential entries without a GH_TOKEN', () => {
+        const { env } = agentProcessEnv(agent({ sharedDb: false }))
+        expect(env.GIT_CONFIG_COUNT).toBeUndefined()
+        expect(env.GIT_CONFIG_KEY_1).toBeUndefined()
+    })
+
+    it("leaves a coworker's own git config entries untouched", async () => {
+        await writeSharedEnv({ GH_TOKEN: 'tok-shared-12345' })
+        const { env } = agentProcessEnv(agent({ sharedDb: false }, { GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'user.name', GIT_CONFIG_VALUE_0: 'own' }))
+        expect(env.GIT_CONFIG_COUNT).toBe('1')
+        expect(env.GIT_CONFIG_KEY_0).toBe('user.name')
+        expect(env.GIT_CONFIG_VALUE_0).toBe('own')
+        expect(env.GIT_CONFIG_KEY_1).toBeUndefined()
     })
 })
