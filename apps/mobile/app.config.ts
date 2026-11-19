@@ -68,6 +68,7 @@ function withAndroidDevClient(config: ConfigContext['config']): ConfigContext['c
 // Store builds leave it unset. Such a team cannot sign the push capability either, so its builds leave
 // the notifications plugin out: the app runs, it just never gets a push token.
 const personalTeam = process.env.RERUN_PERSONAL_TEAM === '1'
+const paidTeam = process.env.RERUN_PAID_TEAM === '1'
 
 // The languages iOS and Android offer in the app's own settings, and the permission prompts in each of
 // them. The English prompts of app.json stay the default for any other language. Android only lists an
@@ -96,7 +97,8 @@ export default ({ config: base }: ConfigContext): ExpoConfig => {
         name: config.name!,
         slug: config.slug!,
         // A free Apple ID gets neither push nor an app group, which the widgets share their data through.
-        plugins: config.plugins?.filter(plugin => !PERSONAL_TEAM_DROPS.has(Array.isArray(plugin) ? plugin[0] : plugin)),
+        // A paid one (RERUN_PAID_TEAM=1) keeps both, to try them on a phone.
+        plugins: paidTeam ? config.plugins : config.plugins?.filter(plugin => !PERSONAL_TEAM_DROPS.has(Array.isArray(plugin) ? plugin[0] : plugin)),
         ios: {
             ...config.ios,
             bundleIdentifier: process.env.RERUN_IOS_BUNDLE_ID ?? `${config.ios?.bundleIdentifier}.dev`,
