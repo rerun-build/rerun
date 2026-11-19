@@ -11,9 +11,11 @@ services:
       FACTORY_DATA_DIR: /state
       HOME: /tmp
       DISPATCH_ACCOUNT_URL: ${FACTORY_ACCOUNT_URL:?set FACTORY_ACCOUNT_URL in deploy/vps/.env}
+      FACTORY_KEEPER_FILE: /keeper/machine.json
     volumes:
       - ../../tools/factory:/app:ro
       - factory-dispatcher-data:/state
+      - /var/lib/rerun-keeper:/keeper:ro
       - factory-token:/token:ro
     read_only: true
     tmpfs:

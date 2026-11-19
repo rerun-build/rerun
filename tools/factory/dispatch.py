@@ -25,6 +25,7 @@ import holds
 import inboxsort
 import instructions
 import limits
+import machine
 import plancheck
 import planners
 import planning
@@ -507,6 +508,7 @@ class Dispatcher:
         self.beat_line = ""
         del HEARD[:]
         self.resolver = resolver.Resolver(log, problem_brief)
+        self.machine = None
         self.renewal_unreadable = False
         self.connections = None
         self.plan_week_full = False
@@ -2000,6 +2002,13 @@ class Dispatcher:
                 self.save(j, "pass failed")
                 if j["errors"] >= 20 and j["state"] not in END:
                     self.end(j, "failed", "20 passes in a row failed in state %s" % j["state"])
+        try:
+            p = machine.path()
+            self.machine = machine.read(self.now(), p) if p else None
+        except Exception as e:
+            clean = False
+            self.machine = None
+            log("-", "machine: %s" % type(e).__name__)
         heard, HEARD[:] = list(HEARD), []
         known = set(self.resolver.records(self, closed=True))
         try:
@@ -2107,7 +2116,7 @@ class Dispatcher:
         try:
             snap = snapshot.build_snapshot(self.store, self.cfg, now, held, beat=self.beats,
                                            read_epic=self.read_epic, planning=self.planners.read(self.beats),
-                                           plan=renewal.plan(self.connections, now))
+                                           plan=renewal.plan(self.connections, now), machine=self.machine)
             digest.alarm(self.store, snap.get("digest"), now)
             snap.update(self.extra())
             status = self.status(snap)
