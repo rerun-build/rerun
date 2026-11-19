@@ -51,6 +51,9 @@ class Numbers(unittest.TestCase):
             "  reviewer: ready 0, running 0, waiting 0 | mean wait: review_wait 10 min, proof_wait -",
             "  researcher: " + OTHER,
             "  designer: " + OTHER,
+            "  security: " + OTHER,
+            "  data: " + OTHER,
+            "  contracts: " + OTHER,
             "numbers by feature, whole wave:",
             "  #9: 1 of 2 done, convergence running, tokens per merged 1200"])
 
