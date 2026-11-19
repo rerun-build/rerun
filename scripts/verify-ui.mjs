@@ -147,7 +147,6 @@ const server = await ensureServer(base, outDir)
 // (127.0.0.1:54421) and the dev server's HMR socket behind a permission prompt nobody answers.
 const browser = await chromium.launch({ headless: !options.headed, args: ['--disable-features=LocalNetworkAccessChecks,BlockInsecurePrivateNetworkRequests'] })
 // A language pack is picked by the cookie the Account dialog writes, and the browser asks for it too.
-// The test accounts (`@rerun.local`) are in the early access of the language packs.
 const context = await browser.newContext(options.locale ? { locale: options.locale } : {})
 await context.addCookies([
     { name: 'rerun-consent', value: `v1:denied:${Date.now()}`, url: base },

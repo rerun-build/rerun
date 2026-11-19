@@ -67,6 +67,3 @@ Read the generated `fr/*.json` and `es/*.json` in the diff. Fix a wrong word by 
 `pnpm verify:ui --locale fr` (then `es`, then `en-XA`, the pseudo-locale that stretches every string
 by a third and accents it: an English string left in the code shows up unaccented). Look at every
 width: French and Spanish run longer than English.
-
-The language picker (Account → Language) only shows while the `i18n` flag is open for you
-(`I18N_RELEASED` in `apps/ui/lib/features.ts`, admins and early access before that).

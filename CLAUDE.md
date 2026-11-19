@@ -87,6 +87,17 @@ until the documentation says what the code now does. Follow the `update-docs` sk
 - every number, default and limit written in a page is read from the code
 - the pull request description lists the pages it changed, or says why none needed to
 
+# A feature ships on, never behind a flag
+
+Rerun has no feature flags: no `*_RELEASED` constant, no early access for admins or email domains,
+no build variable that switches a feature on. A feature that is not ready to be seen stays on its
+branch or its stack until it is.
+
+- What really decides whether something shows (the plan, a capability of the engine, a role, the
+  desktop shell) is a condition of the product, written where it applies, never a flag.
+- A self-hosted install may turn a feature off with a documented setting (`RERUN_DESKTOP=off`); the
+  default is on.
+
 # i18n
 
 Rerun ships language packs (`packages/i18n`, see its README). The source is English; French, Spanish,
