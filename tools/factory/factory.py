@@ -835,7 +835,20 @@ def cmd_pr_open(a):
     tmp = os.path.join(STATE, "prbody-%d.md" % os.getpid())
     open(tmp, "w").write(body)
     run([GIT, "push", "--quiet", "-u", "origin", branch], cwd=top)
-    r = run([GH, "pr", "create", "-R", full, "--base", base, "--head", branch, "--title", title, "--body-file", tmp])
+    cmd = [GH, "pr", "create", "-R", full, "--base", base, "--head", branch, "--title", title, "--body-file", tmp]
+    delays = [60, 120, 240]
+    while True:
+        r = run(cmd, check=False)
+        if not r.returncode:
+            break
+        text = (r.stderr or r.stdout).strip()
+        slow = "submitted too quickly" in text or "secondary rate limit" in text
+        if slow and delays:
+            time.sleep(delays.pop(0))
+            continue
+        os.remove(tmp)
+        suffix = " (tried 4 times over 7 minutes)" if slow else ""
+        die("command failed: %s\n%s%s" % (" ".join(cmd[:6]), text[-600:], suffix), 1)
     os.remove(tmp)
     url = r.stdout.strip().splitlines()[-1]
     print("PR %s\nbase %s <- %s | %s commits | %d files\nNext: `ci-wait %s %s`. Fix a red result yourself; hand over only when green." % (url, base, branch, ahead, len(changed), short(full), url.rsplit("/", 1)[-1]))
