@@ -84,6 +84,7 @@ The name `returned` is already a build-job end state, so the handover statuses u
    - a parked issue with a `sent` or `taken` handover;
    - duplicate open `Gaps of #N`;
    - an ended or blocked issue with no label saying so.
+   - Built as shipped (2026-11-19), digest key `label_drift`: `plan_label_no_plan`; `ready_label_ended_job` (end label and `factory` side by side, a half-done relabel); `ready_waiting` is a count, not drift (intake leaves labelled issues without a job while pools are full); `parked_but_moving` lists only a paused issue with a taken station run (plan, recheck, acceptance, instructions, classify), since a queued or already running build is allowed by slice 0; `duplicate_gaps`; `ended_unlabelled` only after the job's report relabelled it, not for an issue carrying `factory` again (a requeue), and not when a re-plan was cut. Read from the project repository.
 3. **Rules that fix drift**, one per PR, each tested, each logged in the digest when it acts, each acting at most once per issue:
    - a stray `factory-plan` comes off;
    - an older duplicate gap issue is closed in favour of the newest, after one dry-run digest that lists what it would close.
