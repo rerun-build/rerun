@@ -900,6 +900,7 @@ def cmd_risk(a):
     pr = api("repos/%s/pulls/%s" % (full, n))
     files = api("repos/%s/pulls/%s/files?per_page=100" % (full, n)) or []
     need, plain = {}, []
+    claims_ok, claim_lines = True, []
     for f in files:
         fn, hit = f["filename"], False
         test_only = re.search(r"\.spec\.ts$|\.test\.[jt]sx?$|(^|/)tests?/|__tests__|\.md$", fn)
@@ -920,11 +921,37 @@ def cmd_risk(a):
         import roster as R
         need = {k: v for k, v in need.items() if k == "STOP"}
         plain = []
+        order = [x["name"] for x in ro["areas"]] + ["default"]
+        sens = {x["name"] for x in ro["areas"] + [ro["default"]] if x["sensitive"]}
+        by_who = {}
         for f in files:
             fn = f["filename"]
-            for area, _ in R.areas(ro, [fn]).items():
-                for who in R.required(ro, [fn]):
-                    need.setdefault(who, ["roster owner (area %s)" % area, []])[1].append(fn)
+            for area in R.areas(ro, [fn]):
+                for who in [R.owner(ro, area)] + ([R.GATE_SENSITIVE] if area in sens else []):
+                    got = by_who.setdefault(who, [set(), []])
+                    got[0].add(area)
+                    if fn not in got[1]:
+                        got[1].append(fn)
+        for who, (areas_of_who, files_of_who) in by_who.items():
+            need[who] = ["roster owner (area %s)" % ", ".join(x for x in order if x in areas_of_who), files_of_who]
+        import gate as G
+        m = re.search(r"Job: [\w./-]+#(\d+)", (pr or {}).get("body") or "")
+        if not m:
+            m = re.fullmatch(r"chunk/(\d+)-\w+", ((pr or {}).get("head") or {}).get("ref", ""))
+        jobn = m.group(1) if m else None
+        try:
+            others = G.open_claims(full, n, jobn)
+        except G.NoAnswer as e:
+            die("risk: cannot list open work: " + str(e), 1)
+        s8 = ((pr or {}).get("head") or {}).get("sha", "")[:8]
+        verdict = {}
+        for cm in sorted(api("repos/%s/issues/%s/comments?per_page=100" % (full, n), paginate=True) or [], key=lambda c: c["created_at"]):
+            body = cm.get("body") or ""
+            mm = G.REVIEW_RE.match(body)
+            if mm and mm.group(2) == s8:
+                verdict[mm.group(3).upper()] = (mm.group(4), "", body[mm.end():])
+        names = [f["filename"] for f in files]
+        claims_ok, claim_lines = R.claims_check([(x, r, R.owner(ro, x)) for x, refs in R.overlaps(ro, names, others).items() for r in refs], verdict)
     tops = {f["filename"].split("/")[0] for f in files}
     lines = sum(f["additions"] + f["deletions"] for f in files)
     if len(files) > 25 or lines > 1200:
@@ -942,6 +969,10 @@ def cmd_risk(a):
         print("EXTRA REVIEWERS: none. LINUS alone.")
     if jev_note:
         print(jev_note)
+    for line in claim_lines:
+        print(line)
+    if not claims_ok:
+        sys.exit(1)
 
 
 def jev_risk(title, files, need):
