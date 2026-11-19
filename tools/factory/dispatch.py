@@ -1289,7 +1289,10 @@ class Dispatcher:
         if outside:
             return self.end(j, "returned", "plan: the proven branch changes files outside Files: %s; push %s again from today's dev, or take out the **Proven branch** line" % (", ".join(outside), plan))
         head = "chunk/%s-p" % j["issue"]
-        self.gh(["api", "-X", "POST", "repos/%s/git/refs" % self.repo, "-f", "ref=refs/heads/%s" % head, "-f", "sha=%s" % sha])
+        try:
+            self.gh(["api", "-X", "POST", "repos/%s/git/refs" % self.repo, "-f", "ref=refs/heads/%s" % head, "-f", "sha=%s" % sha])
+        except Error as e:
+            log(j["issue"], "ref %s not created, going on to the pull request: %s" % (head, e))
         notes = [
             "The change is the one pushed as `%s` at %s." % (plan, sha[:7]),
             "Proven on dev by the planner: the done-test failed there and passes at `%s`." % sha[:7],

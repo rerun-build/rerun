@@ -43,6 +43,23 @@ class ProvenTest(Base):
             self.assertIn(heading, body)
         self.assertTrue(body.rstrip().endswith("Closes #5"))
 
+    def test_a_proven_job_whose_branch_creation_fails_still_gets_its_pull_request(self):
+        gh = self.w.gh
+
+        def refs_fail(args):
+            if args[0] == "api" and "-X" in args and any(x.endswith("/git/refs") for x in args):
+                raise D.Error("gh api failed: exit 1: Reference already exists")
+            return gh(args)
+
+        self.w.gh = refs_fail
+        self.tick()
+        self.assertEqual(self.state(), "review_wait")
+        job = self.d.store.get_job("5")
+        self.assertEqual(job["pr"], 42)
+        self.assertEqual(job["head_branch"], "chunk/5-p")
+        self.assertEqual(len(self.pr_creates()), 1)
+        self.assertIn("ref chunk/5-p not created, going on to the pull request", self.log_text())
+
     def test_the_proven_job_goes_through_review_checks_and_proof_and_merges(self):
         self.tick(2)
         self.assertEqual(len(self.w.sends), 1)
