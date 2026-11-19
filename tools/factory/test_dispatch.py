@@ -34,6 +34,8 @@ class World:
         self.open_numbers = {7, 129}
         self.close_reasons = {}
         self.open_prs = []
+        self.branches = {}
+        self.compare_files = []
         self.ledger = None
         self.intent_seen = []
         self.cancels, self.sent_at, self.hide_runs = [], {}, False
