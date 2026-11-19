@@ -86,7 +86,14 @@ export function RoutineList<T extends RoutineEntry>({ routines, now, docked = fa
                     )
                     return (
                         <section key={group.key}>
-                            <div className={cn('sticky top-0 z-10 -mx-3 flex items-center bg-background px-4 pb-2.5', groupIndex === 0 ? 'pt-2' : 'pt-7', docked && 'dark:md:bg-frame')}>
+                            {/* The heading fades out over its bottom padding, so the rows scrolling under it dissolve instead of being cut. */}
+                            <div
+                                className={cn(
+                                    'sticky top-0 z-10 -mx-3 flex items-center bg-linear-to-b from-background from-[calc(100%-0.75rem)] to-transparent px-4 pb-3',
+                                    groupIndex === 0 ? 'pt-2' : 'pt-7',
+                                    docked && 'dark:md:from-frame'
+                                )}
+                            >
                                 {isPaused ? (
                                     <button type="button" onClick={() => setPausedOpen(value => !value)} className="flex items-baseline gap-2 text-base font-semibold tracking-tight text-foreground">
                                         {heading}
