@@ -44,7 +44,8 @@ const LEAD_SCOUT_SESSION = 'demo-session-lead-scout'
 export default async function coworkerDockScenario({ app, page, step, base, admin, workspaceId, account }) {
     const { data: pool } = await admin.from('engine_pool').select('engine_api_key').eq('claimed_by_workspace_id', workspaceId).single()
     await seedDemoWorkspace({ admin, workspaceId, userId: account.userId, email: account.email, apiKey: pool.engine_api_key, dataDir: join(REPO_ROOT, '.context/verify/engine-data') })
-    await page.goto(base)
+    // A cold `next dev` compiles the home on this first visit, past the default 30 seconds.
+    await page.goto(base, { timeout: 180_000 })
     await page.waitForSelector('[data-foreman-split]', { timeout: 60_000 })
 
     const initial = await page.evaluate(() => window.rerunShell.settings.get())
@@ -100,6 +101,25 @@ export default async function coworkerDockScenario({ app, page, step, base, admi
     await admin.from('workspaces').update({ boxes_archived_at: null }).eq('id', workspaceId)
     await page.reload()
     await waitUntil(() => newCoworker.isDisabled(), (disabled) => !disabled, 'the "+" comes back once the workspace runs again')
+
+    // The bottom edge of the rail dragged up: the rail stops growing there and its coworkers scroll,
+    // its top stays put. A double click on the edge lets it grow with them again.
+    const bottomEdge = dock.getByRole('separator', { name: 'Resize' }).last()
+    const railBox = () => bottomEdge.evaluate((edge) => edge.parentElement.getBoundingClientRect().toJSON())
+    const tall = await railBox()
+    const grip = await bottomEdge.boundingBox()
+    await dock.mouse.move(grip.x + grip.width / 2, grip.y + grip.height / 2)
+    await dock.mouse.down()
+    await dock.mouse.move(grip.x + grip.width / 2, tall.top - 500, { steps: 5 })
+    await dock.mouse.up()
+    const shortView = await waitUntil(() => dock.evaluate(() => window.rerunShell.coworkerDock.get()), (view) => view.maxHeight !== null, 'the shell keeps the height the rail was dragged to')
+    check(shortView.maxHeight === 120, `never shorter than the grip, a coworker and the "+" (${shortView.maxHeight})`)
+    const short = await railBox()
+    check(Math.round(short.height) <= 120 && Math.abs(short.top - tall.top) <= 1, `the rail shrinks from its bottom edge (${JSON.stringify({ tall, short })})`)
+    await step('dock resized', { target: dock })
+    await bottomEdge.dblclick()
+    await waitUntil(() => dock.evaluate(() => window.rerunShell.coworkerDock.get()), (view) => view.maxHeight === null, 'a double click on the edge lets it grow again')
+    await waitUntil(railBox, (box) => Math.round(box.height) === Math.round(tall.height), 'back to the height of its coworkers')
 
     // Let go on the left half of the screen, it moves to the left edge, and stays there.
     await dock.evaluate(() => window.rerunShell.coworkerDock.drop({ x: screen.availLeft + 10, y: screen.availTop + 200 }))

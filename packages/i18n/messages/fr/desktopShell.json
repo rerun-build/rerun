@@ -96,6 +96,7 @@
     "coworkerDock": {
         "newCoworker": "Nouveau coworker",
         "move": "Déplacer",
-        "show": "Afficher les coworkers"
+        "show": "Afficher les coworkers",
+        "resize": "Redimensionner"
     }
 }

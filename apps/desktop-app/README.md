@@ -103,8 +103,9 @@ follows the server the window shows, not only the configured one.
   so the dock follows its workspace and its badge; a click on a buddy or on "+" goes back to it. A
   workspace without coworkers publishes nothing, and "+" carries the reason it is disabled
   (`createBlockedReason`). A full navigation of the main window that publishes nothing again within
-  10 s (the offline page, sign-in) hides the dock. The edge, the height, the display and the folded
-  state live in `settings.json`.
+  10 s (the offline page, sign-in) hides the dock. The edge, the position along it, how tall the rail
+  may grow (`maxHeight`, dragged from its top or bottom edge, `COWORKER_DOCK_MIN_HEIGHT` at least),
+  the display and the folded state live in `settings.json`.
 - New Window (⌘⇧N): another window of the same session; each keeps its own workspace (the web
   holds it per tab).
 - Menus and tray in the language the person reads Rerun in (`locale.set`), a right-click menu

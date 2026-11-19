@@ -3,7 +3,7 @@
 import type { CoworkerDockCoworker, CoworkerDockEdge } from '@rerun/contracts'
 import { AgentBuddy } from '@rerun/ui/iso-grid'
 import { useTranslations } from 'next-intl'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import type { PointerEvent as ReactPointerEvent, RefObject } from 'react'
 
 import { TooltipDisabledReason, TooltipLabeled } from '@/components/ui/tooltip'
 import { GripVerticalIcon, PlusIcon } from '@/lib/icons'
@@ -19,6 +19,8 @@ export type DockProps = {
     onCreate: () => void
     onToggleCollapsed: () => void
     onGrab: (event: ReactPointerEvent) => void
+    // The element the coworkers scroll in, for the page that measures them while the rail is resized.
+    scrollRef?: RefObject<HTMLDivElement | null>
 }
 
 // The side a tooltip opens to: towards the middle of the screen, away from the edge.
@@ -81,5 +83,23 @@ export function DockGrip({ onGrab, onToggleCollapsed }: { onGrab: (event: ReactP
         >
             <GripVerticalIcon className="size-3.5 rotate-90" />
         </button>
+    )
+}
+
+// A thin band on the top or the bottom edge of the rail: drag it to set how tall the rail may grow, a
+// double click lets it grow with its coworkers again.
+export function DockResizeEdge({ side, onGrab, onReset }: { side: 'top' | 'bottom'; onGrab: (event: ReactPointerEvent) => void; onReset: () => void }) {
+    const t = useTranslations('desktopShell.coworkerDock')
+    return (
+        <div
+            role="separator"
+            aria-orientation="horizontal"
+            aria-label={t('resize')}
+            onPointerDown={onGrab}
+            onDoubleClick={onReset}
+            className={cn('group absolute inset-x-0 z-10 flex h-1.5 cursor-ns-resize touch-none justify-center', side === 'top' ? 'top-0 items-start' : 'bottom-0 items-end')}
+        >
+            <span className="h-0.5 w-5 rounded-full bg-transparent transition-colors group-hover:bg-muted-foreground/50" />
+        </div>
     )
 }

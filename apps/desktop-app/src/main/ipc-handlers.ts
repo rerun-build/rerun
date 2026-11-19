@@ -72,6 +72,7 @@ export function registerIpcHandlers(): void {
     handle(IPC.coworkerDockOpen, ['app'], coworkerDockHandlers.open)
     handle(IPC.coworkerDockCreate, ['app'], coworkerDockHandlers.create)
     handle(IPC.coworkerDockDrop, ['app'], coworkerDockHandlers.drop)
+    handle(IPC.coworkerDockResize, ['app'], coworkerDockHandlers.resize)
     handle(IPC.coworkerDockSetCollapsed, ['app'], coworkerDockHandlers.setCollapsed)
     handle(IPC.coworkerDockShowMenu, ['app'], coworkerDockHandlers.showMenu)
     handle(IPC.coworkerDockSetInteractive, ['app'], coworkerDockHandlers.setInteractive)

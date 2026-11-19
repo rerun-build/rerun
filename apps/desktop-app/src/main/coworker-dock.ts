@@ -1,7 +1,7 @@
 import { BrowserWindow, Menu, screen, type IpcMainInvokeEvent, type WebContents } from 'electron'
 import { COWORKER_DOCK_MOODS, COWORKER_DOCK_PATH, type CoworkerDockCoworker, type CoworkerDockMood, type CoworkerDockState, type CoworkerDockView } from '@rerun/contracts'
 import { IPC_EVENTS } from '../shared/ipc-channels'
-import { dockBounds, dockDisplay, dropPlacement, pointInRect, storedDockPlacement, type DockPlacement } from './coworker-dock-placement'
+import { clamp01, dockBounds, dockDisplay, dockMaxHeight, dropPlacement, pointInRect, storedDockPlacement, type DockPlacement } from './coworker-dock-placement'
 import { currentServer, getMainWindow, openExternal, PRELOAD_PATH, showMainWindow } from './main-window'
 import { t } from './messages'
 import { partitionFor } from './server'
@@ -40,8 +40,8 @@ function savePlacement(patch: StoredCoworkerDock): void {
 }
 
 function view(): CoworkerDockView {
-    const { edge, y, collapsed } = placement()
-    return { state, edge, y, collapsed }
+    const { edge, y, collapsed, maxHeight } = placement()
+    return { state, edge, y, collapsed, maxHeight }
 }
 
 function liveWindow(): BrowserWindow | null {
@@ -281,6 +281,14 @@ export const coworkerDockHandlers = {
         const display = screen.getDisplayNearestPoint({ x: Math.round(at.x), y: Math.round(at.y) })
         savePlacement({ ...dropPlacement(at, display.workArea), displayId: display.id })
         place(window)
+        sendView()
+    },
+    resize: (event: IpcMainInvokeEvent, raw: unknown) => {
+        if (!fromDock(event) || !raw || typeof raw !== 'object') return
+        const { y, maxHeight } = raw as Record<string, unknown>
+        const next = Number(y)
+        if (!Number.isFinite(next)) return
+        savePlacement({ y: clamp01(next), maxHeight: dockMaxHeight(maxHeight) })
         sendView()
     },
     setCollapsed: (event: IpcMainInvokeEvent, collapsed: unknown) => {

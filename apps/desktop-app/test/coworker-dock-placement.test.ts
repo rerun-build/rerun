@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { COWORKER_DOCK_MIN_HEIGHT } from '@rerun/contracts'
 import { DOCK_WINDOW_WIDTH, dockBounds, dockDisplay, dropPlacement, pointInRect, storedDockPlacement } from '../src/main/coworker-dock-placement'
 
 const main = { id: 1, workArea: { x: 0, y: 25, width: 1440, height: 875 } }
@@ -6,12 +7,19 @@ const external = { id: 2, workArea: { x: 1440, y: 0, width: 1920, height: 1080 }
 
 describe('storedDockPlacement', () => {
     it('puts a fresh install on, on the right edge, in the middle', () => {
-        expect(storedDockPlacement(undefined)).toEqual({ enabled: true, edge: 'right', y: 0.5, collapsed: false, displayId: null })
+        expect(storedDockPlacement(undefined)).toEqual({ enabled: true, edge: 'right', y: 0.5, maxHeight: null, collapsed: false, displayId: null })
     })
 
     it('keeps what the person chose, and clamps a height out of bounds', () => {
-        expect(storedDockPlacement({ enabled: false, edge: 'left', y: 3, collapsed: true, displayId: 2 })).toEqual({ enabled: false, edge: 'left', y: 1, collapsed: true, displayId: 2 })
+        expect(storedDockPlacement({ enabled: false, edge: 'left', y: 3, collapsed: true, displayId: 2 })).toEqual({ enabled: false, edge: 'left', y: 1, maxHeight: null, collapsed: true, displayId: 2 })
         expect(storedDockPlacement({ y: Number.NaN }).y).toBe(0.5)
+    })
+
+    it('keeps the height the rail was dragged to, never shorter than the grip, a coworker and the "+"', () => {
+        expect(storedDockPlacement({ maxHeight: 320.4 }).maxHeight).toBe(320)
+        expect(storedDockPlacement({ maxHeight: 10 }).maxHeight).toBe(COWORKER_DOCK_MIN_HEIGHT)
+        expect(storedDockPlacement({ maxHeight: null }).maxHeight).toBeNull()
+        expect(storedDockPlacement({ maxHeight: Number.NaN }).maxHeight).toBeNull()
     })
 })
 

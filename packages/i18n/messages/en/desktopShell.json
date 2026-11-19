@@ -29,6 +29,7 @@
         "quickAsk.toggleHint": "Shown while the Quick ask window records the person's voice after the voice keyboard shortcut was pressed.",
         "coworkerDock.move": "Accessible name of the grip at the top of the coworker dock, a small bar of coworker avatars on the edge of the screen: drag it to move the bar.",
         "coworkerDock.show": "Accessible name of the folded coworker dock, a small tab on the edge of the screen: a click unfolds it.",
+        "coworkerDock.resize": "Accessible name of the thin band on the top or the bottom edge of the coworker dock, a small bar of coworker avatars on the edge of the screen: drag it to make the bar taller or shorter.",
         "settings.coworkerDock": "Setting of the desktop app: a small bar of the person's AI coworkers on the edge of the screen, above every other app."
     },
     "update": {
@@ -128,6 +129,7 @@
     "coworkerDock": {
         "newCoworker": "New coworker",
         "move": "Move",
-        "show": "Show coworkers"
+        "show": "Show coworkers",
+        "resize": "Resize"
     }
 }

@@ -27,7 +27,7 @@ export type ShellSettings = {
     coworkerDock?: StoredCoworkerDock
 }
 
-export type StoredCoworkerDock = { enabled?: boolean; edge?: 'left' | 'right'; y?: number; displayId?: number; collapsed?: boolean }
+export type StoredCoworkerDock = { enabled?: boolean; edge?: 'left' | 'right'; y?: number; maxHeight?: number | null; displayId?: number; collapsed?: boolean }
 
 const FILE_NAME = 'settings.json'
 

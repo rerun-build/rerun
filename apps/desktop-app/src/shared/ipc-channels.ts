@@ -43,6 +43,7 @@ export const IPC = {
     coworkerDockOpen: 'rerun-shell:coworker-dock:open',
     coworkerDockCreate: 'rerun-shell:coworker-dock:create',
     coworkerDockDrop: 'rerun-shell:coworker-dock:drop',
+    coworkerDockResize: 'rerun-shell:coworker-dock:resize',
     coworkerDockSetCollapsed: 'rerun-shell:coworker-dock:set-collapsed',
     coworkerDockShowMenu: 'rerun-shell:coworker-dock:show-menu',
     coworkerDockSetInteractive: 'rerun-shell:coworker-dock:set-interactive',

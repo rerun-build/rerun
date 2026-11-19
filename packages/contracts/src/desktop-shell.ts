@@ -146,9 +146,13 @@ export type CoworkerDockState = { coworkers: CoworkerDockCoworker[]; createBlock
 
 export type CoworkerDockEdge = 'left' | 'right'
 
+// The shortest the rail gets when its edge is dragged: the grip, one coworker and the "+".
+export const COWORKER_DOCK_MIN_HEIGHT = 120
+
 // What the dock window draws: the coworkers, and where the person put the rail. `y` is the middle of
-// the rail, from 0 (top of the screen) to 1 (bottom).
-export type CoworkerDockView = { state: CoworkerDockState; edge: CoworkerDockEdge; y: number; collapsed: boolean }
+// the rail, from 0 (top of the screen) to 1 (bottom). `maxHeight`: how tall the person let the rail
+// grow, in pixels, before its coworkers scroll; null, it grows with them up to the screen.
+export type CoworkerDockView = { state: CoworkerDockState; edge: CoworkerDockEdge; y: number; collapsed: boolean; maxHeight: number | null }
 
 // This computer as the app sees it: the workspaces it is linked to and how each link is doing.
 export type DesktopRemoteLinkStatus = 'connecting' | 'online' | 'offline' | 'revoked'
@@ -285,6 +289,8 @@ export type DesktopShellApi = {
         create(): void
         // The rail was let go at this point of the screen: the shell picks the display and the edge.
         drop(point: { x: number; y: number }): void
+        // The top or the bottom edge of the rail was dragged: its new height limit, and where it now stands.
+        resize(placement: { y: number; maxHeight: number | null }): void
         setCollapsed(collapsed: boolean): void
         showMenu(): void
         // The window lets clicks through to the apps under it, except over the rail. `rect` is the

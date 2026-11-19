@@ -96,6 +96,7 @@
     "coworkerDock": {
         "newCoworker": "Yeni coworker",
         "move": "Taşı",
-        "show": "Coworker'ları göster"
+        "show": "Coworker'ları göster",
+        "resize": "Yeniden boyutlandır"
     }
 }
