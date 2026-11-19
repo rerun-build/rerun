@@ -7,7 +7,7 @@ import { setPaidDataAlwaysAllow } from '@/api/paid-data'
 import { useAuth } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
 import * as Haptics from '@/lib/haptics'
-import { openExternalUrl } from '@/lib/url'
+import { openInPhoneBrowser } from '@/lib/url'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -98,7 +98,7 @@ export function SpendWidget({ pending, agentId, onAnswer, webUrl }: HitlWidgetPr
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, justifyContent: 'flex-end' }}>
                 <HitlAction label={t('actions.notNow')} tone="destructive" disabled={busy} onPress={() => void decide('declined')} />
                 {short ? (
-                    <HitlAction label={t('spend.addCredits')} primary onPress={() => openExternalUrl(webUrl)} />
+                    <HitlAction label={t('spend.addCredits')} primary onPress={() => openInPhoneBrowser(webUrl)} />
                 ) : (
                     <>
                         <HitlAction label={t('spend.alwaysAllow')} disabled={busy} onPress={() => void decide('approved', true)} />

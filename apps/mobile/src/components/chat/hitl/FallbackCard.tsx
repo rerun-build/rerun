@@ -1,9 +1,9 @@
-import * as WebBrowser from 'expo-web-browser'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { AppText } from '@/components/ui/AppText'
 import type { IconName } from '@/components/ui/Icon'
+import { openInPhoneBrowser } from '@/lib/url'
 import { spacing } from '@/theme/tokens'
 
 import { HitlAction, HitlCard } from './HitlCard'
@@ -19,7 +19,7 @@ export function FallbackCard({ symbol, label, ask, webUrl }: { symbol: IconName;
                 <AppText variant="footnote" tone="muted">
                     {t('fallback.replyBelow')}
                 </AppText>
-                <HitlAction label={t('actions.openOnWeb')} primary onPress={() => WebBrowser.openBrowserAsync(webUrl)} />
+                <HitlAction label={t('actions.openOnWeb')} primary onPress={() => openInPhoneBrowser(webUrl)} />
             </View>
         </HitlCard>
     )

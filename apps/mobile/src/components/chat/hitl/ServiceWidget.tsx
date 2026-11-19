@@ -1,6 +1,5 @@
 import { HITL_CANCELLED, pendingServices, serializeServiceSetupResult, type AuthMethodSummary, type ResolvedService, type ServiceSetupOutcome } from '@rerun/contracts'
 import { Image } from 'expo-image'
-import * as WebBrowser from 'expo-web-browser'
 import { useEffect, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
@@ -12,6 +11,7 @@ import { TextField } from '@/components/ui/TextField'
 import { FromVault } from '@/components/vault/FromVault'
 import { useVaultAccounts } from '@/data/useVaultAccounts'
 import { runConnect } from '@/lib/oauth-connect'
+import { openInPhoneBrowser } from '@/lib/url'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 
@@ -98,7 +98,7 @@ export function ServiceWidget({ pending, agentId, onAnswer, webUrl }: HitlWidget
                 </AppText>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: spacing.sm }}>
                     <HitlAction label={t('actions.notNow')} onPress={() => onAnswer(HITL_CANCELLED.service)} />
-                    <HitlAction label={t('actions.openOnWeb')} primary onPress={() => WebBrowser.openBrowserAsync(webUrl)} />
+                    <HitlAction label={t('actions.openOnWeb')} primary onPress={() => openInPhoneBrowser(webUrl)} />
                 </View>
             </HitlCard>
         )

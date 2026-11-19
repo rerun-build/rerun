@@ -1,8 +1,12 @@
-import * as WebBrowser from 'expo-web-browser'
+import { Linking } from 'react-native'
 
-import { hostOf, openExternalUrl } from './url'
+import { hostOf, openExternalUrl, openInPhoneBrowser } from './url'
 
-jest.mock('expo-web-browser', () => ({ openBrowserAsync: jest.fn(async () => ({ type: 'dismiss' })) }))
+const openURL = jest.spyOn(Linking, 'openURL')
+
+beforeEach(() => {
+    openURL.mockReset().mockResolvedValue(undefined)
+})
 
 describe('hostOf', () => {
     it('reads the host a person would be sent to, userinfo, port and www set aside', () => {
@@ -15,11 +19,25 @@ describe('hostOf', () => {
 })
 
 describe('openExternalUrl', () => {
-    it('opens a web page and nothing else', async () => {
+    it("opens a web page in the phone's browser and nothing else", async () => {
         expect(await openExternalUrl('https://stripe.com/docs')).toBe(true)
-        expect(WebBrowser.openBrowserAsync).toHaveBeenCalledWith('https://stripe.com/docs')
+        expect(openURL).toHaveBeenCalledWith('https://stripe.com/docs')
         expect(await openExternalUrl('javascript:alert(1)')).toBe(false)
         expect(await openExternalUrl('file:///etc/passwd')).toBe(false)
-        expect(WebBrowser.openBrowserAsync).toHaveBeenCalledTimes(1)
+        expect(openURL).toHaveBeenCalledTimes(1)
+    })
+
+    it('says nothing opened when no app takes the link', async () => {
+        openURL.mockRejectedValueOnce(new Error('No activity found'))
+        expect(await openExternalUrl('https://stripe.com/docs')).toBe(false)
+    })
+})
+
+describe('openInPhoneBrowser', () => {
+    it("sends Rerun's web app to the phone's browser and nothing else", async () => {
+        expect(await openInPhoneBrowser('https://app.rerun.build/?agent=scout')).toBe(true)
+        expect(openURL).toHaveBeenCalledWith('https://app.rerun.build/?agent=scout')
+        expect(await openInPhoneBrowser('javascript:alert(1)')).toBe(false)
+        expect(openURL).toHaveBeenCalledTimes(1)
     })
 })
