@@ -63,6 +63,7 @@ export const CLAUDE_HARNESS_ENV = {
     CLAUDE_CODE_DISABLE_WORKFLOWS: '1',
     CLAUDE_CODE_DISABLE_BACKGROUND_TASKS: '1',
     CLAUDE_CODE_DISABLE_CRON: '1',
+    CLAUDE_CODE_EXPERIMENTAL_CODE_MODE: '1',
 } as const
 
 const COMPACT_AT_TOKENS: Record<Exclude<ContextSize, 'off'>, number> = { small: 240000, medium: 480000, large: 940000 }

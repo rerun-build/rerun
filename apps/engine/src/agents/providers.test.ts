@@ -108,6 +108,10 @@ describe('CLAUDE_HARNESS_ENV', () => {
         expect(CLAUDE_HARNESS_ENV).not.toHaveProperty('CLAUDE_AUTOCOMPACT_PCT_OVERRIDE')
     })
 
+    it('asks for code mode, which scripts tool calls and saves tokens where the CLI allows it', () => {
+        expect(CLAUDE_HARNESS_ENV.CLAUDE_CODE_EXPERIMENTAL_CODE_MODE).toBe('1')
+    })
+
     it('closes what would outlive the turn', () => {
         expect(CLAUDE_HARNESS_ENV.CLAUDE_CODE_DISABLE_BACKGROUND_TASKS).toBe('1')
         expect(CLAUDE_HARNESS_ENV.CLAUDE_CODE_DISABLE_CRON).toBe('1')
