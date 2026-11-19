@@ -86,10 +86,15 @@ export async function loadForemanConversation(ctx: WorkspaceContext, backend: Fo
     return data ? readConversation(ctx, data) : null
 }
 
-// One conversation of the caller, General or a thread, with what it takes to reopen it.
+// One conversation of the caller, General or a thread, with what it takes to reopen it. Opening it is
+// reading it: a thread a check-in left waiting for them stops waiting.
 export async function loadForemanConversationById(ctx: WorkspaceContext, sessionId: string): Promise<ForemanConversation | null> {
-    const { data } = await selectMaybeSingle(createServiceRoleClient(), 'foreman_conversations', CONVERSATION_COLUMNS, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId })
-    return data ? readConversation(ctx, data) : null
+    const supabase = createServiceRoleClient()
+    const { data } = await selectMaybeSingle(supabase, 'foreman_conversations', CONVERSATION_COLUMNS, { id: sessionId, workspace_id: ctx.workspace.id, user_id: ctx.userId })
+    if (!data) return null
+    const { error } = await supabase.from('foreman_conversations').update<ConversationUpdate>({ status: 'idle' }).eq('id', sessionId).eq('user_id', ctx.userId).eq('status', 'awaiting_ack')
+    if (error) console.error('[foreman] failed to mark the thread as read', error)
+    return readConversation(ctx, data)
 }
 
 async function readConversation(ctx: WorkspaceContext, data: ConversationRow): Promise<ForemanConversation> {
@@ -252,17 +257,32 @@ async function routineReaderOf(workspaceId: number): Promise<string | null> {
 // thread of the member who reads it, so what it did shows in their General like any other thread.
 // An engine session belongs to one row, so one member holds it. Never thrown: the engine's webhook
 // is not the place to fail for a thread.
-export async function openForemanRoutineThread(workspaceId: number, engineSessionId: string, title: string): Promise<void> {
+//
+// A check-in that spoke names who it is for, already checked (`target`), and is opened waiting to be
+// read: what its run said is a message for them. Hands back the thread it opened, null when it
+// opened none, the engine telling it a second time included.
+export type ForemanThreadTarget = { userId: string | null; status: SessionStatus }
+
+export async function openForemanRoutineThread(workspaceId: number, engineSessionId: string, title: string, target?: ForemanThreadTarget): Promise<{ id: string; userId: string } | null> {
     const supabase = createServiceRoleClient()
     try {
         const { data: existing } = await selectMaybeSingle(supabase, 'foreman_conversations', ['id'] as const, { workspace_id: workspaceId, engine_session_id: engineSessionId })
-        if (existing) return
-        const userId = await routineReaderOf(workspaceId)
-        if (!userId) return
-        const { error } = await supabase.from('foreman_conversations').insert<ConversationInsert>({ workspace_id: workspaceId, user_id: userId, backend: 'engine', engine_session_id: engineSessionId, kind: 'thread', status: 'working', title })
-        if (error) console.error('[foreman] failed to open the thread of a routine', error)
+        if (existing) return null
+        const userId = target?.userId ?? (await routineReaderOf(workspaceId))
+        if (!userId) return null
+        const { data, error } = await supabase
+            .from('foreman_conversations')
+            .insert<ConversationInsert>({ workspace_id: workspaceId, user_id: userId, backend: 'engine', engine_session_id: engineSessionId, kind: 'thread', status: target?.status ?? 'working', title })
+            .select('id')
+            .single()
+        if (error || !data) {
+            console.error('[foreman] failed to open the thread of a routine', error)
+            return null
+        }
+        return { id: data.id, userId }
     } catch (err) {
         console.error('[foreman] failed to open the thread of a routine', err)
+        return null
     }
 }
 

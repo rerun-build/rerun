@@ -27,6 +27,7 @@ import { cardTools, foremanCardTools } from './builtin/cards.js'
 import { askUserTool, offersTakeover, requestApprovalTool, requestSecretTool, requestTakeoverTool, suggestServiceTool } from './builtin/hitl.js'
 import { installTools } from './builtin/install.js'
 import { foremanTools } from './builtin/foreman.js'
+import { reportToMemberTool } from './builtin/checkin.js'
 import { agentFilesTools } from './builtin/agent-files.js'
 import { hasPendingSetup } from '../agents/setup.js'
 import { pooledMcpServers, pooledMcpToolSet } from './mcp-pool.js'
@@ -69,6 +70,7 @@ export const CHECKIN_TOOL_NAMES: ReadonlySet<string> = new Set([
     'schedule_get',
     'shared_db_query',
     'shared_db_schema',
+    'report_to_member',
 ])
 
 // The hub tools of a check-in's brief are its own read-only ones, and the token it came with opens
@@ -86,6 +88,7 @@ function checkinTools(ctx: RunContext): ToolSet {
         ...(cfg.brain ? foremanBrainTools() : {}),
         ...(cfg.schedule ? scheduleTools(ctx) : {}),
         ...(cfg.sharedDb ? sharedDbTools(ctx) : {}),
+        ...reportToMemberTool(ctx),
     }
     if (CLI_PROVIDERS.has(ctx.provider)) delete offered.web_search
     const tools = Object.fromEntries(Object.entries(offered).filter(([name]) => CHECKIN_TOOL_NAMES.has(name)))

@@ -76,7 +76,7 @@ describe('agent.schedule.created', () => {
     })
 
     it('names the member whose chat message led the agent to create it', async () => {
-        const tools = scheduleTools({ agent: { id: 'agent-1' }, provider: 'claude', model: 'claude-opus-4-8', author: { id: 'u1', name: 'Marie' } } as any)
+        const tools = scheduleTools({ agent: { id: 'agent-1', config: { kind: 'user' } }, provider: 'claude', model: 'claude-opus-4-8', author: { id: 'u1', name: 'Marie' } } as any)
         await (tools.schedule_create as any).execute({ name: 'Morning brief', description: 'Daily', body: 'Read the inbox.', cron: '0 8 * * *' }, {})
         expect(events('agent.schedule.created')).toEqual([expect.objectContaining({ metadata: { scheduleSlug: 'morning-brief', authorId: 'u1' } })])
     })

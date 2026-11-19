@@ -23,7 +23,7 @@ function members(users: Array<{ id: string; follow?: boolean }>) {
 beforeEach(() => {
     vi.clearAllMocks()
     mocks.selectMaybeSingle.mockResolvedValue({ data: null })
-    mocks.insert.mockResolvedValue({ error: null })
+    mocks.insert.mockReturnValue({ select: () => ({ single: async () => ({ data: { id: 'thread-1' }, error: null }) }) })
     mocks.workspaceFounderUserId.mockResolvedValue('founder')
 })
 
@@ -49,6 +49,17 @@ describe('openForemanRoutineThread', () => {
         expect(mocks.insert).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'founder' }))
     })
 
+    it('opens a check-in that spoke for the member it names, waiting to be read, and hands the thread back', async () => {
+        members([{ id: 'founder' }, { id: 'scheduler', follow: true }])
+        expect(await openForemanRoutineThread(7, 'engine-3', 'Your invoices coworker keeps failing', { userId: 'ana', status: 'awaiting_ack' })).toEqual({ id: 'thread-1', userId: 'ana' })
+        expect(mocks.insert).toHaveBeenCalledWith(expect.objectContaining({ user_id: 'ana', status: 'awaiting_ack', kind: 'thread', engine_session_id: 'engine-3' }))
+    })
+
+    it('leaves a check-in nobody checked to whoever reads its routines', async () => {
+        members([{ id: 'founder' }, { id: 'scheduler', follow: true }])
+        expect(await openForemanRoutineThread(7, 'engine-3', 'A thing to look at', { userId: null, status: 'awaiting_ack' })).toEqual({ id: 'thread-1', userId: 'scheduler' })
+    })
+
     // The engine announces a session once, but its webhook retries.
     it('opens it once for an engine conversation', async () => {
         mocks.selectMaybeSingle.mockResolvedValue({ data: { id: 'row-1' } })
@@ -62,7 +73,7 @@ describe('openForemanRoutineThread', () => {
         await openForemanRoutineThread(7, 'engine-2', 'Scheduled run')
         expect(mocks.insert).not.toHaveBeenCalled()
         mocks.selectMaybeSingle.mockRejectedValue(new Error('database away'))
-        await expect(openForemanRoutineThread(7, 'engine-2', 'Scheduled run')).resolves.toBeUndefined()
+        await expect(openForemanRoutineThread(7, 'engine-2', 'Scheduled run')).resolves.toBeNull()
     })
 })
 

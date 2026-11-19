@@ -1,3 +1,4 @@
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { automationModel } from '../agents/availability.js'
 import { pickBackup } from '../agents/backups.js'
 import { listAgentIdsOnDisk } from '../agents/loader.js'
@@ -16,7 +17,9 @@ import { sendNotification } from './notify.js'
 import { isBudgetLatched } from './budget-latch.js'
 import { agentHasLiveRun } from './run-control.js'
 import { nowIso } from '../lib/ids.js'
-import { agentDisabled, budgetExhausted, coworkerBusy, HttpError, subscriptionLimited } from '../lib/errors.js'
+import { PROMISE_DAILY_CAP, promisesInLastDay, startCheckin } from '../checkins/run.js'
+import { announcePendingCheckins } from '../checkins/settle.js'
+import { agentDisabled, budgetExhausted, coworkerBusy, HttpError, promiseCapReached, subscriptionLimited } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 
 const TICK_MS = 30_000
@@ -30,6 +33,7 @@ export async function fireSchedule(agentId: string, schedule: Schedule, opts?: {
 
     const agent = await getAgent(agentId)
     if (!agent.config.enabled) throw agentDisabled()
+    if (agent.config.kind === 'foreman' && schedule.checkIn) return firePromise(schedule, opts)
     // A coworker has one screen, taken by the first of its runs to act on it, which may come well
     // after that run started. A schedule firing beside a live run (a chat, a call from another
     // coworker) would race it for the screen, so it stays due and fires on the tick after that run.
@@ -84,7 +88,18 @@ export async function fireSchedule(agentId: string, schedule: Schedule, opts?: {
     return started
 }
 
+// A routine the Chief of Staff set itself to come back to something: a check-in, under a daily cap.
+// The occurrence is spent either way, so a capped or switched-off one does not fire on every tick.
+async function firePromise(schedule: Schedule, opts?: { markFired?: boolean; manual?: boolean }): Promise<{ runId: string; sessionId: string }> {
+    const capped = !opts?.manual && (await promisesInLastDay()) >= PROMISE_DAILY_CAP
+    if (opts?.markFired !== false) await markFired(FOREMAN_AGENT_ID, schedule.slug, nowIso())
+    if (capped) throw promiseCapReached()
+    return startCheckin('promise', schedule)
+}
+
 const SKIP_REASONS: Record<string, string> = {
+    promise_cap: 'promises of the Chief of Staff capped for the day',
+    checkins_disabled: 'check-ins of the Chief of Staff switched off',
     budget_latched: 'rerun budget latched',
     coworker_busy: 'another run of the coworker is live',
     subscription_limited: 'subscription limit latched',
@@ -112,6 +127,7 @@ async function tick(): Promise<void> {
         logger.error({ err: String(err) }, 'scheduler tick failed to list agents')
         return
     }
+    void announcePendingCheckins().catch(err => logger.warn({ err: String(err) }, 'check-in announcements failed'))
     void sweepMemoriesIfDue(agentIds)
     void maintainBrainIfDue()
     void sweepCodexHomesIfDue()

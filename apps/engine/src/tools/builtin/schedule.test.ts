@@ -10,7 +10,7 @@ const { scheduleTools } = await import('./schedule.js')
 const { readSchedule, writeSchedule } = await import('../../schedules/loader.js')
 
 const id = 'testagent'
-const ctx = { agent: { id, resolved: { connection: { id: 'cnx-claude' }, provider: 'claude', model: 'claude-opus-4-8' } }, provider: 'claude', model: 'claude-opus-4-8' } as any
+const ctx = { agent: { id, config: { kind: 'user' }, resolved: { connection: { id: 'cnx-claude' }, provider: 'claude', model: 'claude-opus-4-8' } }, provider: 'claude', model: 'claude-opus-4-8' } as any
 const tools = scheduleTools(ctx)
 const slug = 'daily-research'
 
@@ -98,3 +98,27 @@ describe('schedule_update', () => {
         expect(schedule.enabled).toBe(false)
     })
 })
+
+describe('a promise of the Chief of Staff', () => {
+    const foreman = scheduleTools({ ...ctx, agent: { ...ctx.agent, id: 'foreman', config: { kind: 'foreman' } } })
+
+    it('is a routine it creates with checkIn, which wakes it in a check-in', async () => {
+        const res = await (foreman.schedule_create as any).execute({ name: 'Back on the invoices', description: 'Check the invoices coworker', body: 'See whether the Stripe sign-in of the invoices coworker was fixed, for Ana.', runAt: '2026-11-21T08:00:00.000Z', checkIn: true }, {})
+        expect(res).toBe('Created schedule back-on-the-invoices: it wakes you in a check-in')
+        expect((await readSchedule('foreman', 'back-on-the-invoices')).checkIn).toBe(true)
+        expect(await (foreman.schedule_get as any).execute({ slug: 'back-on-the-invoices' }, {})).toContain('Wakes you in a check-in')
+    })
+
+    it('is not offered to a coworker, whose routines stay plain runs', async () => {
+        expect(JSON.stringify((tools.schedule_create as any).inputSchema)).not.toContain('checkIn')
+        await run('schedule_create', { name: 'Sneaky', description: 'x', body: 'y', cron: '0 8 * * *', checkIn: true })
+        expect((await readSchedule(id, 'sneaky')).checkIn).toBe(false)
+    })
+
+    it('keeps the file of every other routine as it was', async () => {
+        const { readFile } = await import('node:fs/promises')
+        const { scheduleFile } = await import('../../config/paths.js')
+        expect(await readFile(scheduleFile(id, slug), 'utf8')).not.toContain('checkIn')
+    })
+})
+

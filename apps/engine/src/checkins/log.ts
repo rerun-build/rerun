@@ -4,12 +4,14 @@ import { z } from 'zod'
 import { getSystemDb } from '../db/systemDb.js'
 import { runs } from '../db/schema.js'
 
-// What a check-in made of its run, kept on the run row: why it woke, the note it left when it had
-// nothing to say, and once it spoke, to whom, under which title and when the hub was told.
+// What a check-in made of its run, kept on the run row: why it woke and what it concluded (`note`,
+// its final message), and once it decided to speak, to whom, about which coworkers, under which title,
+// and when the hub was told.
 export const checkinLogSchema = z.object({
     reason: checkinReasonSchema,
     note: z.string().optional(),
     reportedTo: z.string().optional(),
+    about: z.array(z.string()).optional(),
     title: z.string().optional(),
     announcedAt: z.string().optional(),
 })

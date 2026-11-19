@@ -26,7 +26,20 @@ const state = vi.hoisted(() => ({
     deleteFiredOneOff: vi.fn(async (_agentId: string, _fired: { slug: string }, _at: string): Promise<boolean> => true),
     sweep: vi.fn(async (_ids: string[]) => {}),
     sessions: 0,
+    promisesToday: 0,
+    checkins: [] as Array<{ reason: string; slug?: string }>,
+    announce: vi.fn(async () => {}),
 }))
+
+vi.mock('../checkins/run.js', () => ({
+    PROMISE_DAILY_CAP: 3,
+    promisesInLastDay: async () => state.promisesToday,
+    startCheckin: async (reason: string, schedule?: { slug: string }) => {
+        state.checkins.push({ reason, slug: schedule?.slug })
+        return { runId: 'checkin-run', sessionId: 'checkin-session' }
+    },
+}))
+vi.mock('../checkins/settle.js', () => ({ announcePendingCheckins: state.announce }))
 
 vi.mock('../agents/availability.js', () => ({
     automationModel: async (_agent: unknown, schedule: { model?: string | null }) => ({ provider: state.provider, model: schedule.model ?? 'm', ...(state.connectionId ? { connectionId: state.connectionId } : {}) }),
@@ -104,7 +117,7 @@ const { logger } = await import('../lib/logger.js')
 type Schedule = import('../schedules/loader.js').Schedule
 
 function schedule(slug: string, extra: Partial<Schedule> = {}): Schedule {
-    return { slug, name: `Name ${slug}`, description: '', enabled: true, cron: '* * * * *', runAt: null, timezone: null, lastRunAt: null, connectionId: null, provider: null, model: null, body: `do ${slug}`, createdAt: '2026-01-01T00:00:00.000Z', ...extra }
+    return { slug, name: `Name ${slug}`, description: '', enabled: true, cron: '* * * * *', runAt: null, timezone: null, lastRunAt: null, connectionId: null, provider: null, model: null, checkIn: false, body: `do ${slug}`, createdAt: '2026-01-01T00:00:00.000Z', ...extra }
 }
 
 const flush = async () => {
@@ -121,6 +134,8 @@ beforeEach(() => {
     state.computer = true
     state.liveRuns = false
     state.launchError = null
+    state.promisesToday = 0
+    state.checkins = []
 })
 
 afterEach(async () => {
@@ -132,6 +147,7 @@ afterEach(async () => {
     state.deleteFiredOneOff.mockReset()
     state.deleteFiredOneOff.mockImplementation(async () => true)
     state.sweep.mockClear()
+    state.announce.mockClear()
     clearBudgetLatch()
     clearPlanLimitLatch('claude-sub')
     backupFree.value = false
@@ -351,6 +367,40 @@ describe('fireSchedule', () => {
     })
 })
 
+describe('fireSchedule on a promise of the Chief of Staff', () => {
+    beforeEach(() => {
+        state.agents.foreman = { id: 'foreman', config: { enabled: true, kind: 'foreman' } } as never
+    })
+
+    it('wakes it in a check-in for that promise, with no scheduled run and no session announced', async () => {
+        expect(await fireSchedule('foreman', schedule('come-back', { checkIn: true }))).toEqual({ runId: 'checkin-run', sessionId: 'checkin-session' })
+        expect(state.checkins).toEqual([{ reason: 'promise', slug: 'come-back' }])
+        expect(state.markFired).toHaveBeenCalledWith('foreman', 'come-back', expect.any(String))
+        expect(state.runs).toEqual([])
+        expect(state.sent).toEqual([])
+    })
+
+    it('spends the occurrence without waking it once the promises of the day are used up', async () => {
+        state.promisesToday = 3
+        await expect(fireSchedule('foreman', schedule('come-back', { checkIn: true }))).rejects.toMatchObject({ code: 'promise_cap' })
+        expect(state.markFired).toHaveBeenCalledTimes(1)
+        expect(state.checkins).toEqual([])
+    })
+
+    it('still wakes it past the cap when someone pressed Run now', async () => {
+        state.promisesToday = 3
+        await fireSchedule('foreman', schedule('come-back', { checkIn: true }), { manual: true })
+        expect(state.checkins).toEqual([{ reason: 'promise', slug: 'come-back' }])
+    })
+
+    it('runs its other routines, and a coworker asking for a check-in, as before', async () => {
+        await fireSchedule('foreman', schedule('weekly'))
+        await fireSchedule('on', schedule('sneaky', { checkIn: true }))
+        expect(state.checkins).toEqual([])
+        expect(state.runs.map(run => run.agentId)).toEqual(['foreman', 'on'])
+    })
+})
+
 describe('startScheduler', () => {
     it('ticks at once and then every 30 seconds until stopped', async () => {
         vi.useFakeTimers()
@@ -369,6 +419,8 @@ describe('startScheduler', () => {
         stop()
         await vi.advanceTimersByTimeAsync(90_000)
         expect(state.sweep).toHaveBeenCalledTimes(3)
+        // The check-ins whose thread the hub did not hear yet are told again on every tick.
+        expect(state.announce).toHaveBeenCalledTimes(3)
     })
 
     it('fires only the due schedules of enabled agents', async () => {

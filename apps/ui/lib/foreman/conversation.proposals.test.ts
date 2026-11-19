@@ -5,10 +5,28 @@ import type { WorkspaceContext } from '@/app/api/_auth/ownership'
 // The column used to ask for the skill proposals waiting in a conversation in a call of its own,
 // on every board load. They now come with the conversation it reads.
 
-const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), listSkillProposals: vi.fn(), getSessionMessages: vi.fn() }))
+const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), listSkillProposals: vi.fn(), getSessionMessages: vi.fn(), updates: [] as Array<{ patch: unknown; filters: Array<[string, unknown]> }> }))
+
+// What the read writes back: a thread a check-in left waiting stops waiting once opened.
+function updateChain() {
+    return {
+        update: (patch: unknown) => {
+            const entry = { patch, filters: [] as Array<[string, unknown]> }
+            mocks.updates.push(entry)
+            const chain = {
+                eq: (column: string, value: unknown) => {
+                    entry.filters.push([column, value])
+                    return chain
+                },
+                then: (resolve: (value: { error: null }) => unknown) => resolve({ error: null }),
+            }
+            return chain
+        },
+    }
+}
 
 vi.mock('server-only', () => ({}))
-vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }))
+vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({ from: () => updateChain() }) }))
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle, selectMany: vi.fn() }))
 vi.mock('@/app/api/_auth/ownership', () => ({ workspaceFounderUserId: vi.fn() }))
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ getWorkspaceConnection: vi.fn(async () => ({ baseUrl: 'https://engine.test', apiKey: null })) }))
@@ -61,3 +79,24 @@ describe('a Chief of Staff conversation read with its skill proposals', () => {
         expect(mocks.listSkillProposals).not.toHaveBeenCalled()
     })
 })
+
+describe('a Chief of Staff thread a check-in left waiting', () => {
+    beforeEach(() => {
+        mocks.updates.length = 0
+        mocks.selectMaybeSingle.mockResolvedValue({ data: { id: 'row-2', title: 'Invoices keep failing', messages: null, backend: 'engine', engine_session_id: 'engine-2', kind: 'thread' } })
+        mocks.getSessionMessages.mockResolvedValue([])
+        mocks.listSkillProposals.mockResolvedValue([])
+    })
+
+    it('stops waiting once its reader opens it, and only if it was still waiting on them', async () => {
+        await loadForemanConversationById(ctx, 'row-2')
+        expect(mocks.updates).toEqual([{ patch: { status: 'idle' }, filters: [['id', 'row-2'], ['user_id', 'user-1'], ['status', 'awaiting_ack']] }])
+    })
+
+    it('writes nothing for a conversation that is not theirs', async () => {
+        mocks.selectMaybeSingle.mockResolvedValue({ data: null })
+        expect(await loadForemanConversationById(ctx, 'row-2')).toBeNull()
+        expect(mocks.updates).toEqual([])
+    })
+})
+

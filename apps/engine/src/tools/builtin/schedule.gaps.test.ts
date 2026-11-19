@@ -23,7 +23,7 @@ let agentCount = 0
 
 function freshAgent() {
     const id = `sched-${++agentCount}`
-    const tools = scheduleTools({ agent: { id, resolved: { connection: { id: 'cnx-openai' }, provider: 'openai', model: 'gpt-5' } }, provider: 'openai', model: 'gpt-5' } as any)
+    const tools = scheduleTools({ agent: { id, config: { kind: 'user' }, resolved: { connection: { id: 'cnx-openai' }, provider: 'openai', model: 'gpt-5' } }, provider: 'openai', model: 'gpt-5' } as any)
     const run = async (name: string, args: Record<string, unknown>) => (await (tools[name] as any).execute(args, {} as any)) as string
     return { id, run }
 }

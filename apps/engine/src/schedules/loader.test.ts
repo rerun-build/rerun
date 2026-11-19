@@ -48,6 +48,7 @@ describe('reading a schedule file', () => {
             connectionId: null,
             provider: null,
             model: null,
+            checkIn: false,
             body: 'Do the thing.',
             createdAt: '',
         })

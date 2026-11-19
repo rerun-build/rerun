@@ -1335,6 +1335,12 @@ the failure again. `409` while the agent's guided setup is pending and the sched
 
 Agents can also manage their own schedules at runtime with the `schedule_*` tools (gated by `config.tools.schedule`).
 
+A schedule of the foreman can carry `checkIn: true` in its front matter, which its own `schedule_create`
+sets when it promises to come back to something. Such a schedule fires as a check-in for that
+promise (`reason: "promise"`, see [Check-ins](#check-ins)) rather than as a scheduled run, at most
+three times a day across all of them (an occurrence over the cap is spent without a run); `run`
+fires it whatever the cap says. On any other agent the field means nothing.
+
 ---
 
 ## Triggers
@@ -1452,7 +1458,7 @@ It runs on the brief the app returns to `POST {RERUN_HUB_BASE_URL}/api/foreman/c
 the hub only accepts for those, for an hour. When the app has no such route or does not answer, it
 runs on a charter written in the engine, with no hub tool.
 
-Its tools only read: `fs_`, `shared_` and `agent_files_` `read`, `list` and `search`, `web_search`
+Its tools only read, with one exception, `report_to_member`: `fs_`, `shared_` and `agent_files_` `read`, `list` and `search`, `web_search`
 and `web_fetch`, `memory_recall`, `skill_list`, `skill_read` and `skill_read_file`, `brain_search`,
 `brain_read` and `brain_proposals`, `schedule_list` and `schedule_get`, `shared_db_query` and
 `shared_db_schema`, `tool_result_read` for a result cut at 40,000 characters, plus the hub tools of its brief. No shell, no sub-agent, no call to a coworker,
@@ -1464,6 +1470,15 @@ Its settings are `proactive` in the foreman's configuration, kept across boots:
 `{ "enabled": true, "connectionId": null, "model": null }`. `enabled: false` stops every check-in;
 `connectionId` and `model` pin what they run on, `null` runs them on the foreman's own model.
 `RERUN_FOREMAN_CHECKINS=off` stops them on the whole engine, whatever the setting says.
+
+A check-in that has something to say calls `report_to_member({ member?, about?, title })`: `member`
+is the id of the person it is for (the owner when left out), `about` the app's ids of the coworkers
+it is about, `title` the title of the thread. Its final message is what that person reads. Once the
+run is over the engine sends, in this order, `agent.session.created` (`title`, `message` the first
+200 characters of the message, `source: "schedule"`, `metadata: { checkin: { reason }, memberId,
+aboutAgentIds }`) then `agent.schedule.completed`. When the first is not delivered, both are sent
+again on the next ticks of the scheduler, for two days, never the second alone. A check-in that does
+not call it tells the app nothing.
 
 #### `POST /agents/foreman/checkins/run`
 

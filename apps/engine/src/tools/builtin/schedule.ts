@@ -6,8 +6,39 @@ import { isValidCron, isValidTimezone, nextRunAt } from '../../schedules/cron.js
 import type { RunContext } from '../../runtime/context.js'
 import { PROVIDER_WITHOUT_MODEL, pinnedModel } from './automation-model.js'
 
+const SCHEDULE_CREATE_DESCRIPTION =
+    'Schedule a task to run without a user message: cron to recur, runAt (ISO 8601) for a one-shot. Something to do once ("at 7pm") is runAt, never a cron. A one-shot deletes itself once it succeeds. The body is what you run when it fires.'
+
+const createInput = z.object({
+    name: z.string(),
+    description: z.string().describe('One line describing the routine'),
+    body: z.string().describe('The instruction to run when the task fires'),
+    cron: z.string().optional().describe("Cron expression, e.g. '0 8 * * *'"),
+    runAt: z.string().optional().describe('ISO 8601 timestamp for a one-shot task'),
+    timezone: z.string().optional().describe("IANA timezone, e.g. 'Europe/Paris'"),
+    provider: providerSchema.optional().describe('Model provider to run this task under. Only with a model, and only for a provider plugged into this box.'),
+    model: z.string().optional().describe("Model id to run this task under, e.g. 'claude-opus-4-8'. Only if the user asks for one: left out, the task follows your model."),
+})
+
+// Only the Chief of Staff keeps a promise this way.
+const foremanCreateInput = createInput.extend({
+    checkIn: z.boolean().optional().describe('true for a promise to come back to something: when it fires you wake in a check-in, which only reads, and you write to the person only if there is something to say. The body says what you will look at and for whom.'),
+})
+
 export function scheduleTools(ctx: RunContext): ToolSet {
     const id = ctx.agent.id
+    const foreman = ctx.agent.config.kind === 'foreman'
+    const create = async ({ name, description, body, cron, runAt, timezone, provider, model, checkIn }: z.infer<typeof foremanCreateInput>) => {
+        if (!cron && !runAt) return 'Provide either cron (recurring) or runAt (one-shot).'
+        if (cron && runAt) return 'Provide only one of cron or runAt, not both.'
+        if (cron && !isValidCron(cron)) return `Invalid cron expression: ${cron}`
+        if (runAt && Number.isNaN(new Date(runAt).getTime())) return `Invalid runAt timestamp: ${runAt}`
+        if (timezone && !isValidTimezone(timezone)) return `Invalid timezone: ${timezone}. Use an IANA name, e.g. 'Europe/Paris' or 'America/New_York'.`
+        const pin = await pinnedModel(ctx, provider, model)
+        if ('refusal' in pin) return pin.refusal
+        const schedule = await writeSchedule(id, { name, description, body, cron, runAt, timezone, ...pin, ...(foreman && checkIn ? { checkIn: true } : {}) }, ctx.author)
+        return schedule.checkIn ? `Created schedule ${schedule.slug}: it wakes you in a check-in` : `Created schedule ${schedule.slug}`
+    }
     return {
         schedule_list: tool({
             description: 'List your scheduled tasks (cron and one-shot), without their bodies: read one in full with schedule_get.',
@@ -40,37 +71,14 @@ export function scheduleTools(ctx: RunContext): ToolSet {
                     schedule.enabled ? `Next run: ${nextRunAt(schedule, new Date()) ?? 'never'}` : '',
                     schedule.lastRunAt ? `Last run: ${schedule.lastRunAt}` : '',
                     schedule.model ? `Model: ${schedule.model}${schedule.provider ? ` (${schedule.provider})` : ''}` : '',
+                    schedule.checkIn ? 'Wakes you in a check-in' : '',
                     '',
                     schedule.body,
                 ]
                 return lines.filter(Boolean).join('\n')
             },
         }),
-        schedule_create: tool({
-            description:
-                'Schedule a task to run without a user message: cron to recur, runAt (ISO 8601) for a one-shot. Something to do once ("at 7pm") is runAt, never a cron. A one-shot deletes itself once it succeeds. The body is what you run when it fires.',
-            inputSchema: z.object({
-                name: z.string(),
-                description: z.string().describe('One line describing the routine'),
-                body: z.string().describe('The instruction to run when the task fires'),
-                cron: z.string().optional().describe("Cron expression, e.g. '0 8 * * *'"),
-                runAt: z.string().optional().describe('ISO 8601 timestamp for a one-shot task'),
-                timezone: z.string().optional().describe("IANA timezone, e.g. 'Europe/Paris'"),
-                provider: providerSchema.optional().describe('Model provider to run this task under. Only with a model, and only for a provider plugged into this box.'),
-                model: z.string().optional().describe("Model id to run this task under, e.g. 'claude-opus-4-8'. Only if the user asks for one: left out, the task follows your model."),
-            }),
-            execute: async ({ name, description, body, cron, runAt, timezone, provider, model }) => {
-                if (!cron && !runAt) return 'Provide either cron (recurring) or runAt (one-shot).'
-                if (cron && runAt) return 'Provide only one of cron or runAt, not both.'
-                if (cron && !isValidCron(cron)) return `Invalid cron expression: ${cron}`
-                if (runAt && Number.isNaN(new Date(runAt).getTime())) return `Invalid runAt timestamp: ${runAt}`
-                if (timezone && !isValidTimezone(timezone)) return `Invalid timezone: ${timezone}. Use an IANA name, e.g. 'Europe/Paris' or 'America/New_York'.`
-                const pin = await pinnedModel(ctx, provider, model)
-                if ('refusal' in pin) return pin.refusal
-                const schedule = await writeSchedule(id, { name, description, body, cron, runAt, timezone, ...pin }, ctx.author)
-                return `Created schedule ${schedule.slug}`
-            },
-        }),
+        schedule_create: foreman ? tool({ description: SCHEDULE_CREATE_DESCRIPTION, inputSchema: foremanCreateInput, execute: create }) : tool({ description: SCHEDULE_CREATE_DESCRIPTION, inputSchema: createInput, execute: create }),
         schedule_update: tool({
             description:
                 'Update an existing scheduled task (description, cron, runAt, timezone, provider, model, or enable/disable it). Passing body overwrites the entire instruction body, discarding all of its existing content: use it ONLY for a deliberate full rewrite of a body you have just read with schedule_get, never for one you reconstructed from memory. For ANY partial change to the body, use schedule_edit instead.',

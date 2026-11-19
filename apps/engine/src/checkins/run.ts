@@ -1,4 +1,5 @@
 import { FOREMAN_AGENT_ID, type CheckinReason } from '@rerun/contracts'
+import { and, eq, gte } from 'drizzle-orm'
 import { automationModel } from '../agents/availability.js'
 import { pickBackup } from '../agents/backups.js'
 import { getAgent } from '../agents/registry.js'
@@ -6,13 +7,15 @@ import { checkinsEnabled } from '../config/env.js'
 import { isPlanLimitLatched } from '../connections/plan-limits.js'
 import { listMembers } from '../db/repos/members.js'
 import { createSession } from '../db/repos/sessions.js'
+import { runs } from '../db/schema.js'
+import { getSystemDb } from '../db/systemDb.js'
 import { budgetExhausted, checkinsDisabled, subscriptionLimited } from '../lib/errors.js'
 import { logger } from '../lib/logger.js'
 import { isBudgetLatched } from '../runtime/budget-latch.js'
 import { startHeadlessRun } from '../runtime/headless-run.js'
 import type { Schedule } from '../schedules/loader.js'
 import { fetchCheckinBrief } from './brief.js'
-import { writeCheckinLog } from './log.js'
+import { parseCheckinLog, writeCheckinLog } from './log.js'
 import { buildCheckinMessage } from './message.js'
 
 export const CHECKIN_SLUG = 'checkin'
@@ -61,4 +64,19 @@ async function launch(reason: CheckinReason, schedule: Pick<Schedule, 'slug' | '
         if (running?.runId === runId) running = null
     })
     return started
+}
+
+// What its own routines can wake it for in a day, whatever they say: a promise is a check-in, and a
+// check-in costs the workspace a run of the model.
+export const PROMISE_DAILY_CAP = 3
+
+const DAY_MS = 24 * 60 * 60_000
+
+export async function promisesInLastDay(now = Date.now()): Promise<number> {
+    const { db } = await getSystemDb(FOREMAN_AGENT_ID)
+    const rows = await db
+        .select({ checkinJson: runs.checkinJson })
+        .from(runs)
+        .where(and(eq(runs.triggerSource, 'checkin'), gte(runs.startedAt, new Date(now - DAY_MS).toISOString())))
+    return rows.filter(row => parseCheckinLog(row.checkinJson)?.reason === 'promise').length
 }

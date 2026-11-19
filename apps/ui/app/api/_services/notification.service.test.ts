@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), authenticateEngineToken: vi.fn(), setForemanConversationStatus: vi.fn(), openForemanRoutineThread: vi.fn() }))
+const mocks = vi.hoisted(() => ({ selectMaybeSingle: vi.fn(), selectMany: vi.fn(), authenticateEngineToken: vi.fn(), setForemanConversationStatus: vi.fn(), openForemanRoutineThread: vi.fn(), openCheckinThread: vi.fn() }))
 
 vi.mock('next/server', () => ({ after: vi.fn() }))
 vi.mock('@rerun/cloud/email', () => ({}))
@@ -13,6 +13,7 @@ vi.mock('./notification-audience.service', () => ({ writeNotificationPrefs: vi.f
 vi.mock('./presence.service', () => ({ loadPresence: vi.fn() }))
 vi.mock('./workspace-engine.service', () => ({ authenticateEngineToken: mocks.authenticateEngineToken }))
 vi.mock('@/lib/foreman/conversation', () => ({ setForemanConversationStatus: mocks.setForemanConversationStatus, openForemanRoutineThread: mocks.openForemanRoutineThread }))
+vi.mock('@/lib/foreman/checkin-thread', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/foreman/checkin-thread')>()), openCheckinThread: mocks.openCheckinThread }))
 vi.mock('./workspace-owner.service', () => ({ resolveWorkspaceMemberEmail: vi.fn(), resolveWorkspaceOwner: vi.fn() }))
 
 const { membersReachingBox, recordNotification } = await import('./notification.service')
@@ -88,6 +89,14 @@ describe('recordNotification for the foreman', () => {
         expect(mocks.openForemanRoutineThread).toHaveBeenCalledWith(7, 'engine-2', 'schedule: monday-review')
         expect(mocks.setForemanConversationStatus).not.toHaveBeenCalled()
         expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+    })
+
+    it('opens a check-in that decided to speak as a thread waiting to be read, pushed outside a sandbox', async () => {
+        mocks.openForemanRoutineThread.mockReset()
+        const announced = { event: 'agent.session.created', kind: 'info', agentId: 'foreman', sessionId: 'engine-5', message: 'Your invoices coworker failed three nights in a row.', title: 'Invoices keep failing', source: 'schedule', metadata: { checkin: { reason: 'pulse' }, memberId: 'ana', aboutAgentIds: [] }, timestamp: '2026-11-19T09:00:00.000Z' }
+        expect(await recordNotification('token', announced as never)).toEqual({ ok: true })
+        expect(mocks.openCheckinThread).toHaveBeenCalledWith(7, announced, { push: true })
+        expect(mocks.openForemanRoutineThread).not.toHaveBeenCalled()
     })
 
     it('marks the thread as failed when its run errored', async () => {

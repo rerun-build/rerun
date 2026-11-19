@@ -20,6 +20,9 @@ export type Schedule = {
     connectionId: string | null
     provider: Provider | null
     model: string | null
+    // A routine the Chief of Staff set itself to come back to something: it fires as a check-in,
+    // which reads and speaks only when there is something to say.
+    checkIn: boolean
     body: string
     createdAt: string
 }
@@ -35,6 +38,7 @@ export type ScheduleInput = {
     connectionId?: string | null
     provider?: Provider | null
     model?: string | null
+    checkIn?: boolean
 }
 
 const PROVIDERS: Provider[] = providerSchema.options
@@ -62,6 +66,7 @@ function toSchedule(slug: string, raw: string): Schedule {
         connectionId: str(data.connection),
         provider: toProvider(data.provider),
         model: str(data.model),
+        checkIn: data.checkIn === true,
         body: parsed.content.trim(),
         createdAt: typeof data.createdAt === 'string' ? data.createdAt : '',
     }
@@ -79,6 +84,8 @@ function serialize(schedule: Schedule): string {
         connection: schedule.connectionId,
         provider: schedule.provider,
         model: schedule.model,
+        // Written only when set, so every other routine keeps the file it had.
+        ...(schedule.checkIn ? { checkIn: true } : {}),
         createdAt: schedule.createdAt,
     })
 }
@@ -141,6 +148,7 @@ export async function writeSchedule(agentId: string, input: ScheduleInput, autho
             connectionId: input.connectionId !== undefined ? input.connectionId : (existing?.connectionId ?? null),
             provider: input.provider !== undefined ? input.provider : (existing?.provider ?? null),
             model: input.model !== undefined ? input.model : (existing?.model ?? null),
+            checkIn: input.checkIn ?? existing?.checkIn ?? false,
             body: input.body,
             createdAt: existing?.createdAt || nowIso(),
         }
