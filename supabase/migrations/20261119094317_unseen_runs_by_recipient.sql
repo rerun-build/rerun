@@ -4,8 +4,8 @@
 -- index serve an operator marked leakproof, and jsonb's `?` is not. So the function now runs as its
 -- owner and writes the three policies it relied on into its own query, word for word:
 -- notifications (workspace, visible coworker, visible Box), sessions (visible coworker, the one of
--- the notification) and session_reads (the caller's own). Through the index: 38 ms, 7,300 blocks
--- instead of 42,000. Same signature, same rows.
+-- the notification) and session_reads (the caller's own). In plpgsql, so the session keeps its plan
+-- between calls. Through the index: 22 ms, 6,200 blocks instead of 42,000. Same signature, same rows.
 --
 -- A change to the select policy of `notifications` or `sessions` has to be carried here too.
 create index if not exists notifications_done_recipients_idx on public.notifications using gin (recipients) where kind = 'done';

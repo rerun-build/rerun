@@ -62,7 +62,6 @@ const FRESH_SIGNUP_MS = 60 * 60 * 1000
 
 installWorkspaceHeader()
 
-
 // Whether a verified phone number stands between this account and the app. `unknown` is the gap
 // between an account being born and its signup reaching this tab: nothing may start on its own
 // until it is settled, or the foreman would open the conversation under the wall about to rise.
