@@ -3,6 +3,8 @@ title: "Computers"
 description: "Link your own computer so your coworkers can run commands and long jobs on it."
 ---
 
+import { Shot } from '/snippets/media.jsx'
+
 Your coworkers live on your workspace's machine in the cloud. A computer you link to the workspace becomes a pair of hands for them: they can run commands there, with your approval, for the work that belongs on your own machine: video editing, local models, your GPU, files you keep there.
 
 The coworker stays where it is. The computer only runs what it is asked, and only while the Rerun desktop app is running on it.
@@ -10,7 +12,7 @@ The coworker stays where it is. The computer only runs what it is asked, and onl
 ## Link a computer
 
 1. Install the [desktop app](/desktop-app) on the computer and sign in.
-2. Open your account, then the **Desktop** tab.
+2. Open your account, then the **Desktop app** tab.
 3. Under **This computer**, click **Link**, give the computer a name and click **Link**.
 
 The name gives the computer a handle, like `#studio-pc`, the word your coworkers know it by. The handle stays the same if you rename the computer later.
@@ -65,6 +67,10 @@ The computer checks every path itself, links followed, before it touches anythin
 ## See your computers
 
 Open the workspace menu and click **Computers**. Each computer says whether it is online, paused or offline, and when it was last seen. Click one to see its machine (system, processor or graphics card, memory, working folder, and the programs found on it) and its approval settings.
+
+<Shot src="/images/computers/computers-list" alt="The Computers window with one linked computer, Studio Mac, offline and last seen 25 minutes ago" />
+
+<Shot src="/images/computers/computer-detail" alt="Studio Mac opened in Computers: its machine, the programs found on it, its approval mode set to Ask, then remember, and the programs always allowed" />
 
 An admin, or the person who linked a computer, can change its settings and remove it. Removing it stops everything at once: the computer can be linked again from the desktop app.
 

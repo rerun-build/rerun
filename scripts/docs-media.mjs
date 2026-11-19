@@ -20,12 +20,12 @@
 //       watches: ['apps/ui/components/vault/'],        // what --changed looks at
 //       view: 'board',                                 // or 'simple'
 //       account: 'demo',                               // or 'onboarding', a workspace still on its welcome page (also per shot)
-//       shots: [{ name, open: async ({ page, base, demo }) => …, frame: ({ page }) => locator, fit?: true, height?: 560 }],
+//       shots: [{ name, open: async ({ page, base, demo }) => …, frame: ({ page }) => locator, fit?: true, width?: 640, height?: 560 }],
 //       loops: [{ name, open, frame, play: async ({ page }) => …, hold?: ms }],
 //   }
 //
 // `open` brings the screen up, `frame` returns the element to capture (`fit` lets a panel of fixed
-// height shrink to its content, `height` shortens the window for a panel as tall as it), `play` is
+// height shrink to its content, `height` and `width` size the window for a panel as tall as it or a small window of the desktop app), `play` is
 // the gesture a loop records. Each shot is taken in light and dark at 1440 × 900, device scale 2, with the clock fixed
 // to the demo's morning, so two runs give the same pictures.
 

@@ -3,7 +3,7 @@
 // the local stack and the local engine, so no model is ever called. The ids are fixed: a coworker's
 // buddy is drawn from its id, so the pictures stay the same from one run to the next.
 
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
 import { ENGINE_PORT, fail, log } from '../verify/shared.mjs'
@@ -227,6 +227,56 @@ async function resetHubRows(admin, workspaceId, { fixedIds = false } = {}) {
     await check(admin.from('foreman_conversations').delete().eq('workspace_id', workspaceId), 'clear the Chief of Staff conversation')
 }
 
+const COMPUTER = { id: '5c2e8f14-7a3b-4d6e-9f01-2b3c4d5e6f70', handle: 'studio-mac', name: 'Studio Mac' }
+
+// A computer linked from the desktop app, as the hub and the engine keep it. The engine learns its
+// machine from the app once it connects: here that file is written the way it would have been, and
+// the computer reads as last seen this morning.
+async function seedComputer({ admin, workspaceId, userId, dataDir }) {
+    await check(admin.from('remote_computers').delete().eq('id', COMPUTER.id), 'clear the demo computer')
+    await check(
+        admin.from('remote_computers').insert({
+            id: COMPUTER.id,
+            workspace_id: workspaceId,
+            name: COMPUTER.name,
+            handle: COMPUTER.handle,
+            os: 'mac',
+            arch: 'arm64',
+            hostname: 'studio-mac.local',
+            app_version: '0.9.0',
+            token_hash: `docs-demo-${COMPUTER.id}`,
+            linked_by: userId,
+            last_seen_at: minutesAgo(25),
+            created_at: minutesAgo(60 * 24 * 3),
+        }),
+        'link the demo computer',
+    )
+    const dir = join(dataDir, 'remote')
+    mkdirSync(dir, { recursive: true })
+    const computer = {
+        ...COMPUTER,
+        settings: { mode: 'remember', unattended: true, allowedPrograms: ['ffmpeg', 'magick'], allowedFolders: ['~/Projects/Acme'], screenAlways: false },
+        lastSeenAt: minutesAgo(25),
+        appVersion: '0.9.0',
+        protocol: 1,
+        capabilities: ['shell', 'files', 'jobs', 'screen'],
+        facts: {
+            hostname: 'studio-mac.local',
+            os: 'mac',
+            osVersion: '26.1',
+            arch: 'arm64',
+            cpu: 'Apple M4 Pro',
+            cores: 14,
+            memoryBytes: 48 * 1024 ** 3,
+            shell: 'zsh',
+            homeDir: '/Users/studio',
+            workDir: '/Users/studio/Rerun',
+            software: ['ffmpeg', 'magick', 'python3', 'node', 'git'],
+        },
+    }
+    writeFileSync(join(dir, 'computers.json'), `${JSON.stringify({ computers: [computer] }, null, 4)}\n`, { mode: 0o600 })
+}
+
 export async function seedDemoWorkspace({ admin, workspaceId, userId, email, apiKey, dataDir }) {
     const engine = engineClient(apiKey)
 
@@ -364,7 +414,9 @@ export async function seedDemoWorkspace({ admin, workspaceId, userId, email, api
             ('INV-2053', 'Northwind', 5200, '2026-11-28', 'open', NULL)`,
     })
 
-    log(`Seeded Acme Studio: ${Object.keys(COWORKERS).length} coworkers, ${BRAIN_PAGES.length} Brain pages, the Vault, routines, a skill and a payments table.`)
+    await seedComputer({ admin, workspaceId, userId, dataDir })
+
+    log(`Seeded Acme Studio: ${Object.keys(COWORKERS).length} coworkers, ${BRAIN_PAGES.length} Brain pages, the Vault, routines, a skill, a payments table and a computer.`)
     return { engineIds }
 }
 
