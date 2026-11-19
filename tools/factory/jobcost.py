@@ -7,7 +7,8 @@ if len(sys.argv) < 2 or "#" not in sys.argv[1]:
     print("usage: job-cost <repo>#<issue> [--steps]"); sys.exit(2)
 name, n = sys.argv[1].split("/")[-1].split("#", 1)
 tag = "JOB %s#%s" % (FOLDER_NAMES.get(name, name), n)
-RX = re.compile(r"JOB (?:[\w.-]+/)?%s(?!\d)" % re.escape(tag[4:]))
+owner = sys.argv[1].split("/")[0] if "/" in sys.argv[1] else "special-place-ai-heaven"
+RX = re.compile(r"JOB (?:%s/)?%s(?!\d)" % (re.escape(owner), re.escape(tag[4:])), re.I)
 rows = []
 for d in sorted(os.listdir(A)):
     db, cf = "%s/%s/data/system.db" % (A, d), "%s/%s/config.json" % (A, d)
