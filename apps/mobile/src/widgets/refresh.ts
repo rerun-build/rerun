@@ -6,8 +6,8 @@ import { toHomeCoworkers } from '@/components/home/board'
 import { translatorFor } from '@/i18n/translator'
 
 import CrewWidget from './CrewWidget'
-import { crewWidgetPropsOf, type CrewWidgetProps } from './crew-props'
-import { syncCrewActivity } from './live-activity'
+import { crewWidgetPropsOf, EMPTY_CREW_WIDGET, type CrewWidgetProps } from './crew-props'
+import { endCrewActivity, syncCrewActivity } from './live-activity'
 
 type Caller = { accessToken: string; workspaceId: number }
 
@@ -25,4 +25,11 @@ export async function refreshWidgets(caller: Caller): Promise<void> {
     const props = withDrawnFaces(crewWidgetPropsOf(toHomeCoworkers(agents, overview), translatorFor('mobileHome'), facesDirectory))
     CrewWidget.updateSnapshot(props)
     await syncCrewActivity(props)
+}
+
+// Nobody is signed in any more: the home screen and the lock screen stop showing the crew of whoever
+// was, which no refresh would ever replace without a session.
+export async function clearWidgets(): Promise<void> {
+    CrewWidget.updateSnapshot(EMPTY_CREW_WIDGET)
+    await endCrewActivity()
 }

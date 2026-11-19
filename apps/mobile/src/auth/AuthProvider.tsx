@@ -12,6 +12,7 @@ import { supabase } from '@/auth/supabase'
 import { cachedMe, clearLocalCache } from '@/data/local-cache'
 import { forgetPerson, identifyPerson, registerWorkspace } from '@/lib/analytics'
 import { registerDevice, unregisterDevice } from '@/notifications/push'
+import { clearWidgets } from '@/widgets/refresh'
 
 // Each device keeps its own active workspace, as the hub expects: it is named on every request
 // instead of moving the account's default under the web session.
@@ -154,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setMe(null)
         picked.current = null
         clearLocalCache()
+        clearWidgets().catch(error => console.warn('[widgets] not cleared', error))
         if (caller) unregisterDevice(caller).catch(() => {})
         await SecureStore.deleteItemAsync(WORKSPACE_KEY).catch(() => {})
         await supabase.auth.signOut({ scope: 'local' }).catch(error => console.warn('[auth] signing out failed', error))

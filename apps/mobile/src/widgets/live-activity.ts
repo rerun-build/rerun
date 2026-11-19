@@ -33,6 +33,16 @@ async function syncLiveUpdate(props: CrewWidgetProps): Promise<void> {
     )
 }
 
+// Taken down at once, without the closing state a crew that finished leaves on the lock screen.
+export async function endCrewActivity(): Promise<void> {
+    try {
+        if (Platform.OS === 'android') await LiveUpdate?.end()
+        if (Platform.OS === 'ios') await Promise.all(CrewActivity.getInstances().map(instance => instance.end('immediate')))
+    } catch (error) {
+        console.warn('[live activity] not ended', error)
+    }
+}
+
 export async function syncCrewActivity(props: CrewWidgetProps): Promise<void> {
     if (Platform.OS === 'android') return syncLiveUpdate(props).catch(error => console.warn('[live update] not updated', error))
     if (Platform.OS !== 'ios') return

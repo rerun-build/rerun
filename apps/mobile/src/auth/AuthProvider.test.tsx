@@ -63,6 +63,8 @@ jest.mock('expo-secure-store', () => ({
 jest.mock('@/auth/google', () => ({ forgetGoogleAccount: () => {} }))
 jest.mock('@/lib/analytics', () => ({ identifyPerson: () => {}, registerWorkspace: () => {}, forgetPerson: async () => {} }))
 jest.mock('@/notifications/push', () => ({ registerDevice: async () => {}, unregisterDevice: async () => {} }))
+const mockClearWidgets = jest.fn(async () => {})
+jest.mock('@/widgets/refresh', () => ({ clearWidgets: () => mockClearWidgets() }))
 
 function Probe({ onAuth }: { onAuth: (value: ReturnType<typeof useAuth>) => void }) {
     const value = useAuth()
@@ -164,5 +166,18 @@ describe('the active workspace', () => {
 
         await act(() => auth.refreshMe())
         expect(auth.me?.workspace).toMatchObject({ id: B, role: 'member' })
+    })
+})
+
+describe('signing out', () => {
+    it('empties the widgets and the lock screen of the crew it showed', async () => {
+        mockClearWidgets.mockClear()
+        mockBootstrap.mockResolvedValue(meOf(B))
+        await renderSignedIn()
+
+        await act(() => auth.signOut())
+
+        expect(auth.me).toBeNull()
+        expect(mockClearWidgets).toHaveBeenCalledTimes(1)
     })
 })

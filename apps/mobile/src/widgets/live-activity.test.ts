@@ -1,5 +1,5 @@
 import type { CrewWidgetMember, CrewWidgetProps } from './crew-props'
-import { activityStepOf, syncCrewActivity } from './live-activity'
+import { activityStepOf, endCrewActivity, syncCrewActivity } from './live-activity'
 
 jest.mock('./CrewActivity', () => ({ __esModule: true, default: {} }))
 
@@ -47,5 +47,13 @@ describe('the Live Update on Android', () => {
         mockLiveUpdate.isShowing.mockResolvedValueOnce(true)
         await syncCrewActivity(crew())
         expect(mockLiveUpdate.end).toHaveBeenCalled()
+    })
+
+    onAndroid('takes it down on sign-out without asking whether it shows', async () => {
+        mockLiveUpdate.end.mockClear()
+        mockLiveUpdate.isShowing.mockClear()
+        await endCrewActivity()
+        expect(mockLiveUpdate.end).toHaveBeenCalledTimes(1)
+        expect(mockLiveUpdate.isShowing).not.toHaveBeenCalled()
     })
 })
