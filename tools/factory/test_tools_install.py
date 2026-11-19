@@ -230,6 +230,53 @@ class AutoInstall(T.FactoryCase):
         self.assertEqual(code, 0, out)
         self.assertIn("TOOLS installed %s" % self.good[:8], out)
 
+    def stub(self):
+        with open(os.path.join(self.pre, "factory-" + self.good, "webguide.py"), "w") as f:
+            f.write("import os, sys, time\n"
+                    "open(sys.argv[2] + '.called', 'w').write(' '.join(sys.argv[1:]))\n"
+                    "time.sleep(float(os.environ.get('T_GUIDE_SLEEP', '0')))\n"
+                    "print('webguide: stub')\n")
+
+    def called(self):
+        return os.path.join(self.pre, "webguide.called")
+
+    def test_every_clean_run_has_the_current_copy_ensure_the_guide_copy(self):
+        self.run_u()
+        self.stub()
+        code, out = self.run_u()
+        self.assertEqual(code, 0, out)
+        self.assertIn("TOOLS current", out)
+        self.assertEqual(out.strip().splitlines()[-1], "webguide: stub")
+        with open(self.called()) as f:
+            self.assertEqual(f.read(), "--dir %s ensure" % os.path.join(self.pre, "webguide"))
+
+    def test_a_failed_update_leaves_the_guide_copy_alone(self):
+        self.run_u()
+        self.stub()
+        self.green = self.bad
+        code, out = self.run_u()
+        self.assertEqual(code, 2, out)
+        self.assertTrue(out.strip().splitlines()[-1].startswith("INSTALL FAILED"), out)
+        self.assertFalse(os.path.exists(self.called()))
+
+    def test_a_late_run_leaves_the_guide_copy_to_the_next_run(self):
+        self.run_u()
+        self.stub()
+        ticks = [0, 51]
+        code, out = self.call(lambda _: sys.exit(self.U.main([], gh=self.gh, clock=lambda: ticks.pop(0) if len(ticks) > 1 else ticks[0])), [])
+        self.assertEqual(code, 0, out)
+        self.assertIn("webguide: not checked", out)
+        self.assertFalse(os.path.exists(self.called()))
+
+    def test_an_ensure_past_its_timeout_is_stopped_and_says_when_it_retries(self):
+        self.run_u()
+        self.stub()
+        started = time.monotonic()
+        with mock.patch.dict(os.environ, {"T_GUIDE_SLEEP": "5"}):
+            code, out = self.call(lambda _: self.U.guides(self.pre, timeout=1), [])
+        self.assertLess(time.monotonic() - started, 5)
+        self.assertEqual(out.strip(), "webguide: ensure stopped at 1 s; next try after the one-hour wait")
+
     def test_github_unreachable_is_transient(self):
         def down(args):
             raise RuntimeError("HTTP 502")
