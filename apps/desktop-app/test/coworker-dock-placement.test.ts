@@ -53,6 +53,11 @@ describe('dropPlacement', () => {
         expect(dropPlacement({ x: 1400, y: 2000 }, main.workArea).y).toBe(1)
         expect(dropPlacement({ x: 1400, y: 25 + 40 + (875 - 80) / 2 }, main.workArea).y).toBeCloseTo(0.5)
     })
+
+    it('keeps the rail where the page moved it under the pointer', () => {
+        expect(dropPlacement({ x: 1400, y: 800 }, main.workArea, 0.2)).toEqual({ edge: 'right', y: 0.2 })
+        expect(dropPlacement({ x: 100, y: 800 }, main.workArea, 4)).toEqual({ edge: 'left', y: 1 })
+    })
 })
 
 describe('pointInRect', () => {

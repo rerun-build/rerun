@@ -279,7 +279,8 @@ export const coworkerDockHandlers = {
         const at = cleanRect({ ...(point as object), width: 0, height: 0 })
         if (!window || !at) return
         const display = screen.getDisplayNearestPoint({ x: Math.round(at.x), y: Math.round(at.y) })
-        savePlacement({ ...dropPlacement(at, display.workArea), displayId: display.id })
+        const railY = Number((point as Record<string, unknown>).railY)
+        savePlacement({ ...dropPlacement(at, display.workArea, Number.isFinite(railY) ? railY : null), displayId: display.id })
         place(window)
         sendView()
     },

@@ -104,7 +104,7 @@ if (bootstrap?.audience === 'app') {
             onChange: (callback) => subscribe<CoworkerDockView>(IPC_EVENTS.coworkerDockView, callback),
             open: (agentId) => void ipcRenderer.invoke(IPC.coworkerDockOpen, String(agentId)),
             create: () => void ipcRenderer.invoke(IPC.coworkerDockCreate),
-            drop: (point) => void ipcRenderer.invoke(IPC.coworkerDockDrop, { x: Number(point.x), y: Number(point.y) }),
+            drop: (point) => void ipcRenderer.invoke(IPC.coworkerDockDrop, { x: Number(point.x), y: Number(point.y), railY: point.railY === undefined ? undefined : Number(point.railY) }),
             resize: (placement) => void ipcRenderer.invoke(IPC.coworkerDockResize, { y: Number(placement.y), maxHeight: placement.maxHeight === null ? null : Number(placement.maxHeight) }),
             setCollapsed: (collapsed) => void ipcRenderer.invoke(IPC.coworkerDockSetCollapsed, collapsed === true),
             showMenu: () => void ipcRenderer.invoke(IPC.coworkerDockShowMenu),

@@ -288,7 +288,9 @@ export type DesktopShellApi = {
         open(agentId: string): void
         create(): void
         // The rail was let go at this point of the screen: the shell picks the display and the edge.
-        drop(point: { x: number; y: number }): void
+        // `railY`: where the rail now stands along the edge, as `CoworkerDockView.y`; without it, the
+        // shell places it from the pointer.
+        drop(point: { x: number; y: number; railY?: number }): void
         // The top or the bottom edge of the rail was dragged: its new height limit, and where it now stands.
         resize(placement: { y: number; maxHeight: number | null }): void
         setCollapsed(collapsed: boolean): void

@@ -50,8 +50,10 @@ export function dockBounds(workArea: Area, edge: CoworkerDockEdge): Area {
 }
 
 // Let go on the left half of a display, it hugs the left edge; its height follows the pointer.
-export function dropPlacement(point: { x: number; y: number }, workArea: Area): { edge: CoworkerDockEdge; y: number } {
+// `railY`: where the page moved the rail along the edge, kept as it is; without it, from the pointer.
+export function dropPlacement(point: { x: number; y: number }, workArea: Area, railY: number | null = null): { edge: CoworkerDockEdge; y: number } {
     const edge: CoworkerDockEdge = point.x < workArea.x + workArea.width / 2 ? 'left' : 'right'
+    if (railY !== null) return { edge, y: clamp01(railY) }
     const travel = Math.max(1, workArea.height - DOCK_DRAG_MARGIN * 2)
     return { edge, y: clamp01((point.y - workArea.y - DOCK_DRAG_MARGIN) / travel) }
 }
