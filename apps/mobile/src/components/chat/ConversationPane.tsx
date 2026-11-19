@@ -1,6 +1,6 @@
 import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf, queuedPreview, runUsesScreen, scrollCueOf, screenSite, shouldFlush, shouldKeepQueued, buildAttachmentsRef, findPendingAlert, findPendingHitl, findUnknownPendingCall, needsHuman, paidDataSourcesByTurn, pendingTakeover, quickRepliesOf, quickReplyDraft, type AgentModels, type AgentView, type SessionStatus } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
 import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -14,10 +14,12 @@ import { setPendingDesktopOpen } from '@/desktop/pending-open'
 import { track } from '@/lib/analytics'
 import * as Haptics from '@/lib/haptics'
 import { useKeyboardHeight } from '@/lib/keyboard-height'
+import { useStableCallback } from '@/lib/use-stable-callback'
 import { askForPushOnce, setConversationOnScreen } from '@/notifications/push'
 import { noteRender } from '@/perf/renders'
 import { endTiming } from '@/perf/timing'
 import type { ChatEndpoints } from '@/chat/endpoints'
+import type { FileOwner } from '@/api/files'
 import { useCoworkerChat } from '@/chat/useCoworkerChat'
 import { useMessageTimes } from '@/chat/useMessageTimes'
 import { useMessageFeedback } from '@/chat/useMessageFeedback'
@@ -43,7 +45,7 @@ import { Composer, type ComposerHandle } from './Composer'
 import { ErrorCard, type ErrorCardActions } from './ErrorCard'
 import { ConversationSkeleton } from './ConversationSkeleton'
 import { CoworkerEmptyState, ForemanEmptyState } from './EmptyStates'
-import { StartedByBanner, type StartedBy } from './origins/StartedByBanner'
+import type { StartedBy } from './origins/StartedByBanner'
 import type { VoiceSender } from './useVoiceMessage'
 import { AlertWidget } from './hitl/AlertWidget'
 import { HitlBlock, UnknownCallBlock } from './hitl/HitlBlock'
@@ -53,7 +55,6 @@ import { RISE_IN, ScrollToEndButton, SINK_OUT } from './ScrollToEndButton'
 import { widgetFor } from './hitl/registry'
 import { HITL_WIDGETS } from './hitl/widgets'
 import { mentionAgentsOf } from './mentions'
-import { MessageView } from './MessageView'
 import { runPhase, stepGroupShowsActivity } from './run-phase'
 import { RunStatus } from './RunStatus'
 import { ChatScreen } from './screen/ChatScreen'
@@ -63,8 +64,7 @@ import { useAgentScreen } from './screen/useAgentScreen'
 import { useTakeoverRequest } from './screen/useTakeoverRequest'
 import { Suggestions } from './Suggestions'
 import type { ThreadItem } from './threads/general-threads'
-import { ThreadBranch } from './threads/ThreadBranch'
-import { TimedTurns } from './TimedTurns'
+import { Transcript } from './Transcript'
 import { useKeyboardShown } from './useKeyboardShown'
 
 // The transcript scrolls under the suggestions and the composer, going out of focus this far above
@@ -121,7 +121,9 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const queue = useQueuedMessage(`${coworker.id}-${chat.sessionId ?? 'new'}`)
     const proposals = useSkillProposals(coworker.kind === 'coworker' ? chat.sessionId : null, chat.busy)
     // A decision lifts the wait the proposal raised on the session, as on the web.
-    const skillProposals = { ...proposals, decide: (proposalId: string, decision: 'accept' | 'dismiss') => proposals.decide(proposalId, decision).then(onStatusChange) }
+    const statusChanged = useStableCallback(onStatusChange)
+    const { proposals: proposalsById, pinned: pinnedProposals, pinnedIds, pendingId: pendingProposalId, decide: decideProposal } = proposals
+    const skillProposals = useMemo(() => ({ proposals: proposalsById, pinned: pinnedProposals, pinnedIds, pendingId: pendingProposalId, decide: (proposalId: string, decision: 'accept' | 'dismiss') => decideProposal(proposalId, decision).then(statusChanged) }), [proposalsById, pinnedProposals, pinnedIds, pendingProposalId, decideProposal, statusChanged])
     const feedback = useMessageFeedback(chat.sessionId, coworker.kind === 'foreman' ? 'foreman' : 'agent')
     enqueueRef.current = queue.enqueue
     const [stopping, setStopping] = useState(false)
@@ -129,7 +131,10 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const composer = useRef<ComposerHandle>(null)
     const [attachments, setAttachments] = useState<ComposerAttachment[]>([])
     const [uploading, setUploading] = useState(false)
-    const [belowFold, setBelowFold] = useState(0)
+    // Where the end of the thread stands below the screen, kept as the two answers the cue reads: every
+    // scroll event would otherwise draw the pane again.
+    const belowFold = useRef(0)
+    const [fold, setFold] = useState({ nearEnd: true, pastBlock: false })
     // The web's stick-to-bottom: the thread follows what arrives only while the person sits at its
     // end. Scrolling up lets go; scrolling back down, sending or the arrow takes it again. Only the
     // person's own scrolling decides, never the scrolls the pane makes itself.
@@ -143,6 +148,16 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const touching = useRef(false)
     const metrics = useRef({ content: 0, viewport: 0 })
     const [blockHeight, setBlockHeight] = useState(0)
+    const placeFold = (below: number, block: number) => {
+        belowFold.current = below
+        const nearEnd = below <= AT_BOTTOM
+        const pastBlock = block > 0 && below > block
+        if (nearEnd !== fold.nearEnd || pastBlock !== fold.pastBlock) setFold({ nearEnd, pastBlock })
+    }
+    const measureBlock = (height: number) => {
+        setBlockHeight(height)
+        placeFold(belowFold.current, height)
+    }
     const [scrollTop, setScrollTop] = useState(0)
     const [viewport, setViewport] = useState(0)
     const [threadTop, setThreadTop] = useState(0)
@@ -164,10 +179,17 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const lastAssistant = chat.messages.findLastIndex(message => message.role === 'assistant')
     const messageTimes = useMessageTimes(chat.messages)
     const threadRows = useMemo(() => threadsByMessage(messageTimes, threads ?? []), [messageTimes, threads])
-    const threadBranches = (rows: ThreadItem[] | undefined) => rows?.map(thread => <ThreadBranch key={thread.id} thread={thread} onOpen={() => onOpenThread?.(thread.id)} />)
+    const openThread = useStableCallback((sessionId: string) => onOpenThread?.(sessionId))
+    const isForeman = coworker.kind === 'foreman'
     // The Foreman is the person's own assistant: nobody else writes there, so nothing is signed.
-    const authorIds = coworker.kind === 'foreman' ? [] : [...new Set(chat.messages.flatMap(message => authorIdOf(message) ?? []))]
+    const authorIds = isForeman ? [] : [...new Set(chat.messages.flatMap(message => authorIdOf(message) ?? []))]
     const profileOf = useMemberProfiles(authorIds)
+    const authorOf = useCallback((authorId: string) => (isForeman ? undefined : profileOf(authorId)), [isForeman, profileOf])
+    const startedByName = startedBy?.name
+    const startedByAgentId = startedBy?.agentId ?? null
+    const banner = useMemo(() => (startedByName ? { agentId: startedByAgentId, name: startedByName } : null), [startedByAgentId, startedByName])
+    const ownerKey = JSON.stringify(endpoints.fileOwner(chat.sessionId))
+    const fileOwner = useMemo(() => JSON.parse(ownerKey) as FileOwner, [ownerKey])
     const [dismissedCallId, setDismissedCallId] = useState<string | null>(null)
     // A live call never reads `idle` (it goes `working`, then `awaiting_*`): an idle session is one whose
     // block was closed, and it stays closed across a reload, as on the web.
@@ -179,7 +201,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     // fallback card keeps it: typing is the only way to answer what the app cannot draw.
     const replacesComposer = pending !== null && widgetFor(pending, HITL_WIDGETS) !== null
     // Scrolled up past the whole block: the cue says what waits down the thread, as on the web.
-    const blockOutOfSight = pending !== null && blockHeight > 0 && belowFold > blockHeight
+    const blockOutOfSight = pending !== null && blockHeight > 0 && fold.pastBlock
     const [acknowledged, setAcknowledged] = useState<string | null>(null)
     const waitingOnHuman = status !== null && status !== 'error' && needsHuman(status)
     const pendingAlert = status === 'awaiting_ack' && settled ? findPendingAlert(chat.messages) : null
@@ -288,7 +310,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     }
     // Following the end counts as being there, as on the web: the stream outruns the scroll for a
     // moment on every chunk, and the arrow must not blink through it.
-    const cue = scrollCueOf({ pending: pending !== null, pendingInView: !blockOutOfSight, atBottom: following || belowFold <= AT_BOTTOM })
+    const cue = scrollCueOf({ pending: pending !== null, pendingInView: !blockOutOfSight, atBottom: following || fold.nearEnd })
 
     // A reply that announces a value the user still has to type is finished in the composer, as on the web.
     const pickReply = (reply: string) => {
@@ -344,7 +366,6 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const chip = runningModel(models)
     const model = chip && !models?.pinned ? { ...chip, label: t('defaultModel', { model: chip.label }) } : chip
 
-    const isForeman = coworker.kind === 'foreman'
     const skills = useCoworkerSkills(isForeman ? null : coworker.id)
     const mentionComputers = useMentionComputers()
     const workspaceAgents = useWorkspaceAgents()
@@ -365,10 +386,11 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
             router.push(connectHref(provider))
         },
     }
-    const stopTask = (taskId: string) => {
+    const stopTask = useStableCallback((taskId: string) => {
         const runId = chat.activeRunId()
         if (caller && runId) cancelSubRun(caller, coworker.id, runId, taskId).catch(() => Alert.alert(t('stopTaskFailed'), tc('tryAgainShortly')))
-    }
+    })
+    const regenerate = useStableCallback(() => void chat.regenerate())
     const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : !chat.sessionId ? t('newPlaceholder') : isForeman ? t('foremanPlaceholder') : t('messagePlaceholder', { name: coworker.name })
 
     return (
@@ -385,7 +407,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                     onScroll={({ nativeEvent: { contentSize, contentOffset, layoutMeasurement } }) => {
                         const below = Math.max(0, contentSize.height - contentOffset.y - layoutMeasurement.height - BLUR_ABOVE_FOOTER)
                         metrics.current = { content: contentSize.height, viewport: layoutMeasurement.height }
-                        setBelowFold(below)
+                        placeFold(below, blockHeight)
                         if (screenInThread) {
                             setScrollTop(contentOffset.y)
                             setViewport(layoutMeasurement.height)
@@ -428,20 +450,9 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                         // new conversation, sent as the list appears, still rises.
                         <LayoutAnimationConfig skipEntering={!chat.busy}>
                             <View style={{ gap: spacing.xl }} onLayout={event => setThreadTop(event.nativeEvent.layout.y)}>
-                                {startedBy && <StartedByBanner startedBy={startedBy} />}
-                                {threadBranches(threadRows.leading)}
-                                <TimedTurns
-                                    messages={chat.messages}
-                                    authorOf={authorId => (isForeman ? undefined : profileOf(authorId))}
-                                    renderMessage={(message, index, stamp) => (
-                                        <Fragment key={message.id}>
-                                            <MessageView message={message} isLastAssistant={index === lastAssistant} running={chat.busy} agentId={isForeman ? null : coworker.id} fileOwner={endpoints.fileOwner(chat.sessionId)} coworkerName={coworker.name} hiddenCallId={alert?.toolCallId ?? null} skillProposals={skillProposals} onStopTask={stopTask} onRegenerate={pending ? undefined : () => void chat.regenerate()} feedback={feedback} stamp={stamp} paidSources={paidSourcesByTurn.get(message.id)} />
-                                            {threadBranches(threadRows.after.get(index))}
-                                        </Fragment>
-                                    )}
-                                />
+                                <Transcript messages={chat.messages} busy={chat.busy} agentId={isForeman ? null : coworker.id} coworkerName={coworker.name} fileOwner={fileOwner} hiddenCallId={alert?.toolCallId ?? null} skillProposals={skillProposals} onStopTask={stopTask} onRegenerate={pending ? undefined : regenerate} ratingOf={feedback.ratingOf} onRate={feedback.rate} paidSourcesByTurn={paidSourcesByTurn} authorOf={authorOf} startedBy={banner} threadRows={threadRows} onOpenThread={openThread} />
                                 {pending && !takeoverPending && (
-                                    <Animated.View key={pending.toolCallId} entering={FadeInDown.duration(280)} onLayout={event => setBlockHeight(event.nativeEvent.layout.height)}>
+                                    <Animated.View key={pending.toolCallId} entering={FadeInDown.duration(280)} onLayout={event => measureBlock(event.nativeEvent.layout.height)}>
                                         <HitlBlock
                                             pending={pending}
                                             agentId={coworker.id}
@@ -463,7 +474,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                                         onLayout={event => {
                                             const { y, height } = event.nativeEvent.layout
                                             setScreenBox({ y, height })
-                                            if (takeoverPending) setBlockHeight(height)
+                                            if (takeoverPending) measureBlock(height)
                                         }}
                                     >
                                         <ChatScreen status={screen.status} uri={screen.uri} onMessage={screen.onMessage} attachWebView={screen.attachWebView} site={screenSite(chat.messages, takeoverPending ? (pendingTakeover(takeoverPending.input).url ?? null) : null)} takeover={takeover} onTakeControl={takeControl} />

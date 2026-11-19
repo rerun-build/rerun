@@ -7,8 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { CHAT_HEADER_HEIGHT } from '@/components/chat/ChatHeader'
 import { Composer } from '@/components/chat/Composer'
-import { MessageView } from '@/components/chat/MessageView'
-import { TimedTurns } from '@/components/chat/TimedTurns'
+import { Transcript } from '@/components/chat/Transcript'
 import { useKeyboardHeight } from '@/lib/keyboard-height'
 import { FrameMonitor } from '@/perf/FrameMonitor'
 import { longTranscript, withStreamedReply } from '@/perf/long-transcript'
@@ -16,7 +15,7 @@ import { countRenders, stopCountingRenders, type RenderCounts } from '@/perf/ren
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 
-// Dev only: a conversation of 200 messages laid out as the coworker's chat lays it out, to watch what
+// Dev only: a conversation of 200 messages drawn by the chat's own Transcript, to watch what
 // typing, scrolling and a streamed reply cost. The corner shows the frames missed each second; a run
 // prints how many times each piece redrew and how long the thread took to open.
 //   /lab-perf?messages=200&run=type   messages: how long the thread is; run: type | stream | scroll, started on open
@@ -27,10 +26,13 @@ const RUN_MS = 4000
 
 const noop = () => {}
 const owner = { kind: 'agent' as const, agentId: 'lab-perf' }
+const noRating = () => null
+const unsigned = () => undefined
+const noThreads = { leading: [], after: new Map() }
+const noPaidSources = new Map()
 
 function Thread({ messages, running }: { messages: UIMessage[]; running: boolean }) {
-    const lastAssistant = messages.findLastIndex(message => message.role === 'assistant')
-    return <TimedTurns messages={messages} authorOf={() => undefined} renderMessage={(message, index, stamp) => <MessageView key={message.id} message={message} isLastAssistant={index === lastAssistant} running={running} agentId="lab-perf" fileOwner={owner} coworkerName="Pulse" hiddenCallId={null} stamp={stamp} />} />
+    return <Transcript messages={messages} busy={running} agentId="lab-perf" coworkerName="Pulse" fileOwner={owner} hiddenCallId={null} onStopTask={noop} ratingOf={noRating} onRate={noop} paidSourcesByTurn={noPaidSources} authorOf={unsigned} startedBy={null} threadRows={noThreads} onOpenThread={noop} />
 }
 
 export default function PerfLab() {

@@ -8,7 +8,7 @@ import { longTranscript, withStreamedReply } from './long-transcript'
 import { countRenders, stopCountingRenders, type RenderCounts } from './renders'
 
 // What a conversation of 200 messages redraws while someone types, scrolls, or reads a reply arrive.
-// The budgets are what the pane costs today: a change that makes it redraw more fails here.
+// Typing and scrolling redraw no message; a streamed reply redraws the message it writes and no other.
 
 type MockChatState = { messages: UIMessage[]; busy: boolean; status: string }
 
@@ -110,8 +110,8 @@ describeOnIos('a conversation of 200 messages', () => {
         const counts = await measure('typing 10 characters', async () => {
             for (const draft of ['H', 'He', 'Hel', 'Hell', 'Hello', 'Hello ', 'Hello t', 'Hello th', 'Hello the', 'Hello there']) await fireEvent.changeText(input, draft)
         })
-        expect(counts.MessageView ?? 0).toBeLessThanOrEqual(2000)
-        expect(counts.Markdown ?? 0).toBeLessThanOrEqual(3400)
+        expect(counts.MessageView ?? 0).toBe(0)
+        expect(counts.Markdown ?? 0).toBe(0)
     })
 
     it('redraws its messages within budget while the thread scrolls', async () => {
@@ -120,8 +120,9 @@ describeOnIos('a conversation of 200 messages', () => {
         const counts = await measure('scrolling 10 events', async () => {
             for (let step = 1; step <= 10; step++) await fireEvent.scroll(thread, { nativeEvent: { contentOffset: { x: 0, y: 4000 - step * 120 }, contentSize: { width: 390, height: 20_000 }, layoutMeasurement: { width: 390, height: 844 } } })
         })
-        expect(counts.MessageView ?? 0).toBeLessThanOrEqual(2000)
-        expect(counts.Markdown ?? 0).toBeLessThanOrEqual(3400)
+        expect(counts.MessageView ?? 0).toBe(0)
+        expect(counts.Markdown ?? 0).toBe(0)
+        expect(counts.ConversationPane ?? 0).toBeLessThanOrEqual(1)
     })
 
     it('redraws its messages within budget while a reply streams in', async () => {
@@ -130,7 +131,8 @@ describeOnIos('a conversation of 200 messages', () => {
         const counts = await measure('streaming 10 chunks', async () => {
             for (let chunk = 1; chunk <= 10; chunk++) await act(async () => mockChat.set({ messages: withStreamedReply(messages, chunk * 24), busy: true, status: 'streaming' }))
         })
-        expect(counts.MessageView ?? 0).toBeLessThanOrEqual(2020)
-        expect(counts.Markdown ?? 0).toBeLessThanOrEqual(3420)
+        // The first chunk adds the reply and wakes the answer before it, whose buttons wait for the run.
+        expect(counts.MessageView ?? 0).toBeLessThanOrEqual(12)
+        expect(counts.Markdown ?? 0).toBeLessThanOrEqual(20)
     })
 })

@@ -1,10 +1,10 @@
 import { hitlKindOf, isSubRunLive, pairSubRuns, parseHitlReply, parseInstallMessage, parseJobEnd, parseScheduledRun, parseTriggerPayload, QUICK_REPLIES_TOOL, isToolPart, messageText, skillProposalIdOf, SUB_RUN_TOOL_NAMES, toolActivityOf, toolLabelOf, toolNameOf, type ConversationMessageMetadata, type JobEnd, type MessageFeedbackRating, type PaidTurnSources, type TriggerPayload } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
+import { memo } from 'react'
 import { View } from 'react-native'
 import { useTranslations } from 'use-intl'
 
 import { ownedFileUrl, type FileOwner } from '@/api/files'
-import type { MessageFeedback } from '@/chat/useMessageFeedback'
 import type { SkillProposals } from '@/chat/useSkillProposals'
 import type { ViewerItem } from '@/components/viewer/viewer-store'
 import { noteRender } from '@/perf/renders'
@@ -79,7 +79,9 @@ type MessageViewProps = {
     onStopTask?: (taskId: string) => void
     // Sends the last turn again, as the web's Regenerate.
     onRegenerate?: () => void
-    feedback?: MessageFeedback
+    // The person's thumb on this answer, and how to change it; no thumbs without `onRate`.
+    rating?: MessageFeedbackRating | null
+    onRate?: (messageId: string, rating: MessageFeedbackRating, text: string) => void
     // When the message was sent, brought up under a bubble on a tap. Origins and receipts carry none.
     stamp?: MessageStamp
     // The data the turn bought, given only to the turn's last assistant message.
@@ -88,7 +90,19 @@ type MessageViewProps = {
 
 type Block = { key: string; node: React.ReactNode }
 
-export function MessageView({ message, isLastAssistant, running, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, feedback, stamp, paidSources }: MessageViewProps) {
+// Drawn again only when what it shows changed: a stamp's `onToggle` only ever reaches its own message,
+// so a new one from the same time and the same state draws nothing new.
+export const MessageView = memo(MessageViewBody, (previous, next) => {
+    const keys = new Set([...Object.keys(previous), ...Object.keys(next)] as (keyof MessageViewProps)[])
+    for (const key of keys) {
+        if (key === 'stamp') {
+            if (previous.stamp?.createdAt !== next.stamp?.createdAt || previous.stamp?.shown !== next.stamp?.shown) return false
+        } else if (previous[key] !== next[key]) return false
+    }
+    return true
+})
+
+function MessageViewBody({ message, isLastAssistant, running, agentId, fileOwner, coworkerName, hiddenCallId, skillProposals, onStopTask, onRegenerate, rating = null, onRate, stamp, paidSources }: MessageViewProps) {
     noteRender('MessageView')
     const t = useTranslations('mobileChat.messages')
     const tTools = useTranslations('tools')
@@ -229,7 +243,7 @@ export function MessageView({ message, isLastAssistant, running, agentId, fileOw
     const sources = message.parts.filter(part => part.type === 'source-url').map(part => ({ url: (part as Source).url, title: (part as Source).title }))
 
     const answer = messageText(message)
-    const actions = { onRegenerate, rating: feedback?.ratingOf(message.id) ?? null, onRate: feedback ? (rating: MessageFeedbackRating) => void feedback.rate(message.id, rating, answer) : undefined }
+    const actions = { onRegenerate, rating, onRate: onRate ? (vote: MessageFeedbackRating) => onRate(message.id, vote, answer) : undefined }
     if (closing.trim().length > 0) blocks.push({ key: 'closing', node: <AssistantMessage text={closing} showActions={isLastAssistant && !running} streaming={isLastAssistant && running} owner={fileOwner} actions={actions} /> })
     blocks.push(...held)
     if (sources.length > 0) blocks.push({ key: 'sources', node: <Sources sources={sources} /> })
