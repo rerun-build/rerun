@@ -36,3 +36,8 @@ jest.mock('expo-haptics', () => ({
     notificationAsync: jest.fn(async () => {}),
     performAndroidHapticsAsync: jest.fn(async () => {}),
 }))
+
+// Jest cannot load expo-router (its navigators ship as ESM), and every link opened from a message may
+// push Rerun's browser: the router is stubbed for every test, and a test that checks navigation mocks
+// its own.
+jest.mock('expo-router', () => ({ router: { push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: () => true } }))

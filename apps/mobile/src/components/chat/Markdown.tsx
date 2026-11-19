@@ -1,6 +1,6 @@
 import { agentImageRef, agentWorkspacePathFromHref } from '@rerun/contracts'
 import { Lexer, type Token, type Tokens } from 'marked'
-import { createContext, use, useMemo, type ReactNode } from 'react'
+import { createContext, use, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { Text, View, type TextStyle } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import remend from 'remend'
@@ -27,6 +27,10 @@ export type MarkdownSurface = 'page' | 'bubble' | 'brand'
 type MarkdownScope = { surface: MarkdownSurface; owner: FileOwner | null; shortLinks: boolean; muted: boolean }
 
 const Scope = createContext<MarkdownScope>({ surface: 'page', owner: null, shortLinks: false, muted: false })
+
+// The whole markdown drawn, shown under a link opened in Rerun's browser. Held in a ref so a streamed
+// word does not redraw every link.
+const SourceText = createContext<RefObject<string>>({ current: '' })
 
 const HEADINGS: Record<number, TextStyle> = {
     1: { fontSize: 24, lineHeight: 32 },
@@ -56,9 +60,19 @@ export function fileUrlOf(owner: FileOwner | null, src: string | undefined): str
     return ref.scope === 'agent' ? ownedFileUrl(owner, ref.path) : null
 }
 
+// The message as one plain line: links keep their words, the marks of emphasis, code and headings go.
+function plainTextOf(markdown: string): string {
+    return markdown
+        .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+        .replace(/[*_`#>~|]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+}
+
 function InlineLink({ token, children }: { token: Tokens.Link; children: ReactNode }) {
     const ink = useInk()
     const { owner } = use(Scope)
+    const source = use(SourceText)
     const openWorkspaceFile = useOpenWorkspaceFile()
     const workspacePath = agentWorkspacePathFromHref(token.href)
     const onPress = () => {
@@ -66,7 +80,7 @@ function InlineLink({ token, children }: { token: Tokens.Link; children: ReactNo
             openWorkspaceFile(owner.agentId, workspacePath)
             return
         }
-        openExternalUrl(token.href)
+        openExternalUrl(token.href, plainTextOf(source.current))
     }
     return (
         <Text onPress={onPress} accessibilityRole="link" style={{ color: ink.link, textDecorationLine: 'underline', fontFamily: workspacePath ? fonts.medium : undefined }}>
@@ -298,11 +312,17 @@ export function Markdown({ text, streaming = false, surface = 'page', owner = nu
     noteRender('Markdown')
     const tokens = useMemo(() => Lexer.lex(remend(text), { gfm: true }), [text])
     const scope = useMemo(() => ({ surface, owner, shortLinks, muted: false }), [surface, owner, shortLinks])
+    const source = useRef(text)
+    useEffect(() => {
+        source.current = text
+    }, [text])
     return (
         <Scope value={scope}>
-            <View style={{ gap: spacing.md }}>
-                <Blocks tokens={tokens} streaming={streaming} />
-            </View>
+            <SourceText value={source}>
+                <View style={{ gap: spacing.md }}>
+                    <Blocks tokens={tokens} streaming={streaming} />
+                </View>
+            </SourceText>
         </Scope>
     )
 }

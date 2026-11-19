@@ -17,6 +17,7 @@ import { Card, Section, SectionTitle, Separator, SettingsRow } from '@/component
 import { SegmentedControl } from '@/components/ui/SegmentedControl'
 import { environment, onCustomServer, webHost } from '@/config/environment'
 import { track } from '@/lib/analytics'
+import { useLinkTarget, type LinkTarget } from '@/lib/link-target'
 import { usePushPermission } from '@/notifications/usePushPermission'
 import { useAppearancePreference, type AppearancePreference } from '@/theme/appearance'
 import { useTheme } from '@/theme/theme'
@@ -33,6 +34,11 @@ const GROUPINGS: { value: GroupMode; label: 'groupRecent' | 'groupByBox' }[] = [
     { value: 'box', label: 'groupByBox' },
 ]
 
+const LINK_TARGETS: { value: LinkTarget; label: 'linksBrowser' | 'linksRerun' }[] = [
+    { value: 'browser', label: 'linksBrowser' },
+    { value: 'app', label: 'linksRerun' },
+]
+
 // Each language in its own words, whatever the current one: Hermes has no Intl.DisplayNames.
 const LANGUAGE_NAMES: Record<Locale, string> = { en: 'English', fr: 'Français', es: 'Español', pt: 'Português', de: 'Deutsch', tr: 'Türkçe' }
 
@@ -46,6 +52,7 @@ export function PreferencesSheet() {
     const { me, session, signOut } = useAuth()
     const [appearance, chooseAppearance] = useAppearancePreference()
     const [group, chooseGroup] = useGroupMode()
+    const [linkTarget, chooseLinkTarget] = useLinkTarget()
     const push = usePushPermission().status
     const t = useTranslations('mobileSettings.preferences')
     const locale = useLocale()
@@ -102,6 +109,11 @@ export function PreferencesSheet() {
             <View style={{ gap: spacing.sm }}>
                 <SectionTitle>{t('coworkers')}</SectionTitle>
                 <SegmentedControl options={GROUPINGS.map(option => ({ value: option.value, label: t(option.label) }))} value={group} onChange={chooseGroup} />
+            </View>
+
+            <View style={{ gap: spacing.sm }}>
+                <SectionTitle>{t('openLinksIn')}</SectionTitle>
+                <SegmentedControl options={LINK_TARGETS.map(option => ({ value: option.value, label: t(option.label) }))} value={linkTarget} onChange={chooseLinkTarget} />
             </View>
 
             <Section>

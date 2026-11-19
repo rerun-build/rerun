@@ -12,6 +12,9 @@
         "coworkers": "Coworkers",
         "groupRecent": "Recent",
         "groupByBox": "By box",
+        "openLinksIn": "Open links in",
+        "linksBrowser": "Browser",
+        "linksRerun": "Rerun",
         "language": "Language",
         "notifications": "Notifications",
         "pushOff": "Push off",
@@ -125,6 +128,8 @@
         "preferences.server": "Settings row showing the self-hosted Rerun server the app is connected to.",
         "preferences.groupByBox": "Option of the Coworkers picker: the Home lists the coworkers grouped by Box.",
         "notifications.channels.messages.name": "Name of an Android notification channel, shown in the Android settings of the app: the pushes that ring.",
-        "notifications.channels.silent.name": "Name of an Android notification channel, shown in the Android settings of the app: the quiet pushes about a finished task."
+        "notifications.channels.silent.name": "Name of an Android notification channel, shown in the Android settings of the app: the quiet pushes about a finished task.",
+        "preferences.linksBrowser": "Option of the \"Open links in\" setting: links open in the phone's own web browser (Safari, Chrome).",
+        "preferences.linksRerun": "Option of the \"Open links in\" setting: links open inside the Rerun app. Rerun is the product name, keep it."
     }
 }
