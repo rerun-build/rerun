@@ -9,6 +9,8 @@ An app is a ready-made integration from the Rerun library: Stripe, Gmail, Notion
   No credential ever goes through the API. `attach_connector` takes no secret, by design. Never ask anyone for an API key, a password or a token: the account owner finishes the connection in the Rerun app.
 </Warning>
 
+The [Chief of Staff](/chief-of-staff) holds apps too. `list_agent_connectors`, `attach_connector` and `detach_connector` take `foreman` as `agentId` for it. Its apps live in the [Vault](/vault), attached to it, so `attach_connector` needs a machine that keeps a Vault, and the two [paid apps](/billing#paid-apps) stay with coworkers.
+
 ## search_connectors
 
 Semantic search over the library. Describe the capability in natural language.
@@ -73,7 +75,7 @@ Declares an app on a coworker.
   Add another account of an app that supports several. Ignored for an app limited to one account.
 </ParamField>
 
-When the app needs no credential and no sign-in, it is installed right away. Otherwise it is recorded as pending, and the account owner finishes the connection from the Rerun app, in the coworker panel under **Apps**.
+When the app needs no credential and no sign-in, it is installed right away. Otherwise it is recorded as pending, and the account owner finishes the connection from the Rerun app, in the coworker panel under **Apps**, or on the Chief of Staff's card for an app declared on it.
 
 The response carries the resulting `status`, the `key` of the account it declared, the available `authMethods` when one is still pending, and a `message` describing what is left to do.
 

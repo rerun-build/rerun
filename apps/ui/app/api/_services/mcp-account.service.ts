@@ -1,4 +1,4 @@
-import { connectorSkillReadOnlyError, coworkerLookSchema, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
+import { connectorSkillReadOnlyError, coworkerLookSchema, FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, isSetupAnswered, MAX_TEXT_WRITE_CHARS, providerSchema, sleep, triggerMethodSchema, verbositySchema } from '@rerun/contracts'
 import { AccessDeniedError, assertAgentInWorkspace, callableEngineAgentIds, isAdminActor, keepVisible, manageableSpaceIds, spaceAccessMap, visibleAgentIds, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
 import type { Database } from '@/app/api/database.types'
 import {
@@ -51,7 +51,7 @@ import { createServiceRoleClient } from '@/supabase/serviceRole'
 import { selectCount, selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import { changeAgentHandle, createAgent, deleteAgent, moveAgentToBox, renameAgent, setAgentLook } from './agent.service'
 import { declareService, installServiceSlugs } from './agent-setup.service'
-import { ensureSessionRow, resolveAgentTarget } from './chat.service'
+import { ensureSessionRow, getAgentChatTarget, resolveAgentTarget } from './chat.service'
 import { followCoworker, recordSessionParticipant } from './notification-audience.service'
 import { resolveSpaceTarget } from './space.service'
 import { dispatchVaultTool } from './mcp-vault.service'
@@ -913,7 +913,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
         case 'attach_connector': {
             const agentId = requireString(args.agentId, 'agentId')
             const slug = requireString(args.slug, 'slug')
-            const [, manifest] = await Promise.all([resolveAgentTarget(agentId, actor, 'manage'), loadManifest(slug)])
+            const [, manifest] = await Promise.all([getAgentChatTarget(agentId, 'manage', actor), loadManifest(slug)])
             if (!manifest || manifest.slug !== slug) throw new Error(`Unknown app "${slug}". Use search_connectors to find the right slug.`)
 
             const instance = args.newInstance === true && manifest.multiInstance ? await allocateServiceInstance(agentId, manifest, actor) : undefined
@@ -927,6 +927,7 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
             const status = installed?.status ?? 'needs_config'
             const name = installed?.name ?? manifest.name
             const label = installed?.label ?? instance?.label
+            const [holder, appsScreen] = agentId === FOREMAN_AGENT_ID ? [`the ${FOREMAN_DISPLAY_NAME}`, `the ${FOREMAN_DISPLAY_NAME}'s card, Apps`] : ['the coworker', 'coworker panel, Services tab']
 
             return {
                 key,
@@ -937,8 +938,8 @@ export async function dispatchAccountTool(actor: Actor, name: string, args: Reco
                 ...(declared === 'needs_config' ? { authMethods: toAuthMethodSummaries(manifest).map(method => ({ id: method.id, label: method.label, kind: method.kind, requiresSecrets: method.requiresSecrets })) } : {}),
                 message:
                     status === 'active'
-                        ? `${name} is installed and its tools are available to the coworker.`
-                        : `${name} is declared on the coworker and waiting for the account owner to connect it from the Rerun app (coworker panel, Services tab). Do not ask anyone for credentials here.`,
+                        ? `${name} is installed and its tools are available to ${holder}.`
+                        : `${name} is declared on ${holder} and waiting for the account owner to connect it from the Rerun app (${appsScreen}). Do not ask anyone for credentials here.`,
             }
         }
 

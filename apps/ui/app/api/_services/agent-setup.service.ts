@@ -3,10 +3,10 @@ import { compileService } from '@/lib/services/compiler'
 import { type ServiceManifest, autoInstallableMethod, serviceManifestSchema } from '@/lib/services/manifest'
 import type { ServiceChecklistItem } from '@/lib/services/types'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
-import type { CoworkerLook } from '@rerun/contracts'
+import { FOREMAN_AGENT_ID, type CoworkerLook } from '@rerun/contracts'
 import { selectSingle } from '@/supabase/supabase-helpers'
 import { createAgent } from './agent.service'
-import { type ServiceInstanceSeed, markServiceNeedsConfig, toAuthMethodSummaries } from './services.service'
+import { type ServiceInstanceSeed, installService, markServiceNeedsConfig, toAuthMethodSummaries } from './services.service'
 
 // Install each catalog service onto an agent. Services with required secrets can't be
 // auto-supplied, so they're marked needs_config and returned in the checklist for the user
@@ -30,6 +30,11 @@ export async function installServiceSlugs(agentId: string, slugs: string[], acto
 // account of the app instead of its base one.
 export async function declareService(agentId: string, manifest: ServiceManifest, actor?: Actor, instance?: ServiceInstanceSeed): Promise<'compiled' | 'needs_config'> {
     const method = autoInstallableMethod(manifest)
+    // The Chief of Staff keeps its apps in the Vault only, which installService writes.
+    if (agentId === FOREMAN_AGENT_ID) {
+        const { status } = await installService(agentId, instance?.key ?? manifest.slug, {}, method?.id, actor, { pending: !method })
+        return status === 'needs_config' ? 'needs_config' : 'compiled'
+    }
     if (method) {
         await compileService(agentId, manifest, {}, method.id, actor, instance)
         return 'compiled'

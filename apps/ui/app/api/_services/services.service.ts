@@ -429,13 +429,15 @@ export async function getServiceDetails(agentId: string, slugOrKey: string, acto
 // caller (chat renderer / settings panel) can show the config form.
 // `newInstance` adds another account next to the ones the coworker holds, only for an app whose
 // manifest allows it: anywhere else it is ignored and the base account is (re)installed.
+// `pending` leaves the app waiting for its owner even when nothing is missing: an app declared
+// through the API with several ways to connect is theirs to choose.
 export async function installService(
     agentId: string,
     slugOrKey: string,
     values: Record<string, string> = {},
     authMethodId?: string,
     actor?: Actor,
-    opts?: { newInstance?: boolean },
+    opts?: { newInstance?: boolean; pending?: boolean },
 ): Promise<InstallResult> {
     const manifest = await loadManifest(slugOrKey)
     if (!manifest) throw new Error(`Service not found: ${slugOrKey}`)
@@ -451,7 +453,7 @@ export async function installService(
     const vault = await vaultInstallTarget(agentId, key, method.kind, actor)
     // Outside the Vault an app lives under a coworker's row, which the Chief of Staff does not have.
     if (!vault && agentId === FOREMAN_AGENT_ID) throw new VaultUnavailableError()
-    if (missing.length > 0) {
+    if (missing.length > 0 || opts?.pending) {
         if (vault) await rethrowConflict(vault.ctx, () => markVaultNeedsConfig(vault, manifest, method.id, instance))
         else await markServiceNeedsConfig(agentId, key, method.id, actor, instance ? { instanceId: instance.instanceId, label: instance.label } : undefined)
         return { status: 'needs_config', key, slug: manifest.slug, name: manifest.name, authMethods: toAuthMethodSummaries(manifest), authMethodId: method.id, message: `${manifest.name} needs configuration. A form has been shown to the user — ask them to fill it in.` }

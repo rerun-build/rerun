@@ -1,4 +1,4 @@
-import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS } from '@rerun/contracts'
+import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS, FOREMAN_AGENT_ID } from '@rerun/contracts'
 import { SHARE_TOOL_DEFS } from './share-tools'
 import { TEMPLATE_TOOL_DEFS } from './template-tools'
 import { VAULT_TOOL_DEFS } from './vault-tools'
@@ -56,6 +56,12 @@ const MODEL_PIN_PROPERTIES = {
 const AUTOMATION_MODEL_PIN_PROPERTIES = {
     connectionId: { type: 'string', description: 'Run this one on a given AI connection, by its id from list_ai_connections, instead of the one its coworker runs on. Goes with `model`.' },
     model: { type: ['string', 'null'], description: 'Run this one on a model of its own. Omit it and it runs whatever its coworker runs, following it when that changes. Pass null to go back to that.' },
+} as const
+
+// The Chief of Staff holds apps too, under its fixed id.
+const CONNECTOR_HOLDER_ID = {
+    type: 'string',
+    description: `A coworker's id, or "${FOREMAN_AGENT_ID}" for the Chief of Staff, whose apps live in the workspace's Vault and are changed by an admin.`,
 } as const
 
 const AGENT_TOOL_DEFS = [
@@ -560,7 +566,7 @@ const AGENT_TOOL_DEFS = [
             'List the apps declared on a coworker with their status: "active" (ready to use), "needs_config" (waiting for credentials) or "needs_auth" (waiting for a sign-in). An app can be connected several times, one account each: every row carries its `key` (the bare slug for the first account, `slug@id` for the others) and the `label` that tells the accounts apart.',
         inputSchema: {
             type: 'object',
-            properties: { agentId: { type: 'string' } },
+            properties: { agentId: CONNECTOR_HOLDER_ID },
             required: ['agentId'],
         },
     },
@@ -571,7 +577,7 @@ const AGENT_TOOL_DEFS = [
         inputSchema: {
             type: 'object',
             properties: {
-                agentId: { type: 'string' },
+                agentId: CONNECTOR_HOLDER_ID,
                 slug: { type: 'string', description: 'Catalog slug, from search_connectors.' },
                 newInstance: { type: 'boolean', description: 'Add another account of an app that supports several; ignored otherwise.' },
             },
@@ -584,7 +590,7 @@ const AGENT_TOOL_DEFS = [
         inputSchema: {
             type: 'object',
             properties: {
-                agentId: { type: 'string' },
+                agentId: CONNECTOR_HOLDER_ID,
                 key: { type: 'string', description: 'Account key from list_agent_connectors, e.g. gmail@k3x9ab.' },
                 slug: { type: 'string', description: 'Catalog slug, removes the first account of the app.' },
                 confirm: { type: 'boolean' },

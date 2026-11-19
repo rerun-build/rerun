@@ -161,6 +161,12 @@ describe('the Chief of Staff, which holds its apps in the Vault only', () => {
         expect(compileService).not.toHaveBeenCalled()
     })
 
+    it('leaves an app declared for its owner pending in the Vault, even with nothing missing', async () => {
+        await expect(installService('foreman', 'linear', {}, 'oauth', undefined, { pending: true })).resolves.toMatchObject({ status: 'needs_config', key: 'linear' })
+        expect(createVaultItem).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ kind: 'service', slug: 'linear', status: 'needs_config', authMethodId: 'oauth', agentIds: ['foreman'] }))
+        expect(compileIntoVault).not.toHaveBeenCalled()
+    })
+
     it('connects nothing on a box without a Vault, where an app would need a coworker row', async () => {
         vi.mocked(supportsVault).mockResolvedValueOnce(false)
         await expect(installService('foreman', 'linear', {}, 'oauth')).rejects.toMatchObject({ code: 'vaultUnavailable' })
