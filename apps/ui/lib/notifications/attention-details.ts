@@ -14,7 +14,6 @@ export const ATTENTION_NOTIFICATION_COLUMNS = ['agent_id', 'engine_session_id', 
 // never says what waits on the user, and taking it would bury the heads-up under the same line every time.
 export function attentionNotificationsFilter(sessions: AttentionSessionRow[]) {
     const engineSessionIds = sessions.flatMap(s => (s.engine_session_id ? [s.engine_session_id] : []))
-    // engine_session_id has no index: the agent_id filter is what lets the (agent_id, event) index narrow the scan.
     const agentIds = [...new Set(sessions.map(s => s.agent_id))]
     return engineSessionIds.length ? { agent_id: { in: agentIds }, engine_session_id: { in: engineSessionIds }, kind: { neq: 'done' as const } } : null
 }

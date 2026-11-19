@@ -5,21 +5,24 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path to public, extensions;
 
-select plan(28);
+select plan(46);
 
--- Fixtures: one workspace, an admin, a member scoped to `all`, a member scoped to `assigned`.
+-- Fixtures: one workspace, an admin, a member scoped to `all`, a member scoped to `assigned`, and
+-- someone who belongs to no workspace. The `all` member is also the admin of a second workspace.
 insert into auth.users (id, email) values
     ('00000000-0000-0000-0000-00000000a001', 'rls-admin@rerun.test'),
     ('00000000-0000-0000-0000-00000000a002', 'rls-member@rerun.test'),
-    ('00000000-0000-0000-0000-00000000a003', 'rls-assigned@rerun.test');
-insert into public.workspaces (id, icon_url, name) values (990001, '', 'RLS test');
+    ('00000000-0000-0000-0000-00000000a003', 'rls-assigned@rerun.test'),
+    ('00000000-0000-0000-0000-00000000a004', 'rls-stranger@rerun.test');
+insert into public.workspaces (id, icon_url, name) values (990001, '', 'RLS test'), (990002, '', 'RLS second');
 insert into public.users (id, workspace_id)
 select id, 990001 from auth.users where email like 'rls-%@rerun.test'
 on conflict (id) do update set workspace_id = excluded.workspace_id;
 insert into public.workspace_members (user_id, workspace_id, role, box_scope) values
     ('00000000-0000-0000-0000-00000000a001', 990001, 'admin', 'all'),
     ('00000000-0000-0000-0000-00000000a002', 990001, 'member', 'all'),
-    ('00000000-0000-0000-0000-00000000a003', 990001, 'member', 'assigned');
+    ('00000000-0000-0000-0000-00000000a003', 990001, 'member', 'assigned'),
+    ('00000000-0000-0000-0000-00000000a002', 990002, 'admin', 'all');
 
 -- Open: open to the workspace. Closed: restricted, nobody named. Shared: restricted, the `all`
 -- member named with `use`. Managed: open, the `assigned` member named with `manage`.
@@ -27,7 +30,8 @@ insert into public.spaces (id, workspace_id, name, col_start, row_start, col_end
     ('00000000-0000-0000-0000-0000000b0001', 990001, 'Open', 0, 0, 3, 3, 'workspace'),
     ('00000000-0000-0000-0000-0000000b0002', 990001, 'Closed', 4, 0, 7, 3, 'restricted'),
     ('00000000-0000-0000-0000-0000000b0003', 990001, 'Shared', 8, 0, 11, 3, 'restricted'),
-    ('00000000-0000-0000-0000-0000000b0004', 990001, 'Managed', 12, 0, 15, 3, 'workspace');
+    ('00000000-0000-0000-0000-0000000b0004', 990001, 'Managed', 12, 0, 15, 3, 'workspace'),
+    ('00000000-0000-0000-0000-0000000b0005', 990002, 'Elsewhere', 0, 0, 3, 3, 'restricted');
 insert into public.space_members (space_id, user_id, workspace_id, access) values
     ('00000000-0000-0000-0000-0000000b0003', '00000000-0000-0000-0000-00000000a002', 990001, 'use'),
     ('00000000-0000-0000-0000-0000000b0004', '00000000-0000-0000-0000-00000000a003', 990001, 'manage');
@@ -35,10 +39,11 @@ insert into public.agents (id, workspace_id, space_id, name, col, "row") values
     ('00000000-0000-0000-0000-0000000c0001', 990001, '00000000-0000-0000-0000-0000000b0001', 'open-agent', 1, 1),
     ('00000000-0000-0000-0000-0000000c0002', 990001, '00000000-0000-0000-0000-0000000b0002', 'closed-agent', 1, 1),
     ('00000000-0000-0000-0000-0000000c0003', 990001, '00000000-0000-0000-0000-0000000b0003', 'shared-agent', 1, 1),
-    ('00000000-0000-0000-0000-0000000c0004', 990001, '00000000-0000-0000-0000-0000000b0004', 'managed-agent', 1, 1);
-insert into public.sessions (agent_id, engine_session_id) values
-    ('00000000-0000-0000-0000-0000000c0001', 'rls-open'),
-    ('00000000-0000-0000-0000-0000000c0002', 'rls-closed');
+    ('00000000-0000-0000-0000-0000000c0004', 990001, '00000000-0000-0000-0000-0000000b0004', 'managed-agent', 1, 1),
+    ('00000000-0000-0000-0000-0000000c0005', 990002, '00000000-0000-0000-0000-0000000b0005', 'elsewhere-agent', 1, 1);
+insert into public.sessions (id, agent_id, engine_session_id) values
+    ('00000000-0000-0000-0000-0000000d0001', '00000000-0000-0000-0000-0000000c0001', 'rls-open'),
+    ('00000000-0000-0000-0000-0000000d0002', '00000000-0000-0000-0000-0000000c0002', 'rls-closed');
 insert into public.notifications (workspace_id, agent_id, space_id, message) values
     (990001, '00000000-0000-0000-0000-0000000c0001', '00000000-0000-0000-0000-0000000b0001', 'open'),
     (990001, '00000000-0000-0000-0000-0000000c0002', '00000000-0000-0000-0000-0000000b0002', 'closed'),
@@ -49,6 +54,38 @@ insert into public.message_feedback (workspace_id, agent_id, message_id, rating,
 create function pg_temp.act_as(uid uuid) returns void language sql as $$
     select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated')::text, true);
 $$;
+
+-- visible_agent_ids() and visible_space_ids() (rewritten in 20261119083712): exactly the coworkers
+-- and the Boxes of each rule, across every workspace of the caller, nothing without a membership.
+set local role authenticated;
+select pg_temp.act_as('00000000-0000-0000-0000-00000000a001');
+select set_eq($$ select * from public.visible_agent_ids() $$, array['00000000-0000-0000-0000-0000000c0001', '00000000-0000-0000-0000-0000000c0002', '00000000-0000-0000-0000-0000000c0003', '00000000-0000-0000-0000-0000000c0004']::uuid[], 'admin: every coworker of the workspace, restricted Boxes included');
+select set_eq($$ select * from public.visible_space_ids() $$, array['00000000-0000-0000-0000-0000000b0001', '00000000-0000-0000-0000-0000000b0002', '00000000-0000-0000-0000-0000000b0003', '00000000-0000-0000-0000-0000000b0004']::uuid[], 'admin: every Box of the workspace');
+select pg_temp.act_as('00000000-0000-0000-0000-00000000a002');
+select set_eq($$ select * from public.visible_agent_ids() $$, array['00000000-0000-0000-0000-0000000c0001', '00000000-0000-0000-0000-0000000c0003', '00000000-0000-0000-0000-0000000c0004', '00000000-0000-0000-0000-0000000c0005']::uuid[], 'member (all) of one workspace, admin of another: the open and named Boxes of the first, everything of the second');
+select set_eq($$ select * from public.visible_space_ids() $$, array['00000000-0000-0000-0000-0000000b0001', '00000000-0000-0000-0000-0000000b0003', '00000000-0000-0000-0000-0000000b0004', '00000000-0000-0000-0000-0000000b0005']::uuid[], 'member of two workspaces: the Boxes each membership reaches');
+select pg_temp.act_as('00000000-0000-0000-0000-00000000a003');
+select set_eq($$ select * from public.visible_agent_ids() $$, array['00000000-0000-0000-0000-0000000c0004']::uuid[], 'member (assigned): only the coworkers of the Box named to them');
+select set_eq($$ select * from public.visible_space_ids() $$, array['00000000-0000-0000-0000-0000000b0004']::uuid[], 'member (assigned): only the Box named to them');
+select pg_temp.act_as('00000000-0000-0000-0000-00000000a004');
+select is((select count(*)::int from public.visible_agent_ids()), 0, 'no membership: no coworker');
+select is((select count(*)::int from public.visible_space_ids()), 0, 'no membership: no Box');
+select set_config('request.jwt.claims', '', true);
+select is((select count(*)::int from public.visible_agent_ids()), 0, 'no token: no coworker');
+select is((select count(*)::int from public.visible_space_ids()), 0, 'no token: no Box');
+
+-- Recording a read: on a conversation the caller sees, again and again, never for someone else nor
+-- on a conversation of a hidden coworker.
+select pg_temp.act_as('00000000-0000-0000-0000-00000000a002');
+select lives_ok($$ insert into public.session_reads (session_id, user_id) values ('00000000-0000-0000-0000-0000000d0001', '00000000-0000-0000-0000-00000000a002') $$, 'a member records a read on a visible conversation');
+select lives_ok($$ insert into public.session_reads (session_id, user_id) values ('00000000-0000-0000-0000-0000000d0001', '00000000-0000-0000-0000-00000000a002') on conflict (session_id, user_id) do update set seen_at = excluded.seen_at $$, 'the same read recorded again moves it forward');
+select throws_ok($$ insert into public.session_reads (session_id, user_id) values ('00000000-0000-0000-0000-0000000d0002', '00000000-0000-0000-0000-00000000a002') $$, '42501', null, 'no read on a conversation of a hidden coworker');
+select throws_ok($$ insert into public.session_reads (session_id, user_id) values ('00000000-0000-0000-0000-0000000d0001', '00000000-0000-0000-0000-00000000a001') $$, '42501', null, 'no read recorded in someone else''s name');
+reset role;
+select ok(has_function_privilege('authenticated', 'public.visible_agent_ids()', 'execute') and has_function_privilege('authenticated', 'public.visible_space_ids()', 'execute'), 'a signed-in browser can still call both functions');
+select ok(not has_function_privilege('anon', 'public.visible_agent_ids()', 'execute') and not has_function_privilege('anon', 'public.visible_space_ids()', 'execute'), 'a visitor without an account cannot');
+select has_index('public', 'spaces', 'spaces_workspace_idx', 'spaces are read by workspace through an index');
+select has_index('public', 'notifications', 'notifications_engine_session_idx', 'the notifications of a conversation are read through an index');
 
 -- Admin: everything.
 set local role authenticated;
@@ -81,8 +118,8 @@ select throws_ok(
 select throws_ok(
     $$ insert into public.space_members (space_id, user_id, workspace_id, access) values ('00000000-0000-0000-0000-0000000b0002', '00000000-0000-0000-0000-00000000a002', 990001, 'manage') $$,
     '42501', null, 'a member cannot grant themselves access');
-update public.workspace_members set role = 'admin' where user_id = '00000000-0000-0000-0000-00000000a002';
-select is((select role::text from public.workspace_members where user_id = '00000000-0000-0000-0000-00000000a002'), 'member', 'a member cannot promote themselves');
+update public.workspace_members set role = 'admin' where user_id = '00000000-0000-0000-0000-00000000a002' and workspace_id = 990001;
+select is((select role::text from public.workspace_members where user_id = '00000000-0000-0000-0000-00000000a002' and workspace_id = 990001), 'member', 'a member cannot promote themselves');
 
 -- Member scoped to assigned: only what is named to them, and they manage it.
 select pg_temp.act_as('00000000-0000-0000-0000-00000000a003');
