@@ -36,6 +36,8 @@ insert into public.sessions (id, agent_id, engine_session_id) values
     ('00000000-0000-0000-0000-00000000c005', '00000000-0000-0000-0000-0000000a0e01', 'ur-no-recipients'),
     ('00000000-0000-0000-0000-00000000c006', '00000000-0000-0000-0000-0000000a0e01', 'ur-member-only'),
     ('00000000-0000-0000-0000-00000000c007', '00000000-0000-0000-0000-0000000a0e03', 'ur-theirs');
+-- The routine's name the session keeps, for a one-off whose schedule deleted itself after its run.
+update public.sessions set automation_name = 'Daily digest' where id = '00000000-0000-0000-0000-00000000c001';
 
 -- Times are relative to now(), the transaction's start, so they all fall after the floor the
 -- function carries, except the one placed before it on purpose.
@@ -75,9 +77,9 @@ select results_eq(
     'admin: one row per unread conversation, newest first, closed Box included; read since, unaddressed and before the floor left out'
 );
 select results_eq(
-    $$ select run_count, message, slug from public.unseen_runs(990101) where session_id = '00000000-0000-0000-0000-00000000c001' $$,
-    $$ values (2, 'second', 'daily') $$,
-    'two finished runs of one conversation: counted together, the latest one speaks, a question is not a run'
+    $$ select run_count, message, slug, automation_name from public.unseen_runs(990101) where session_id = '00000000-0000-0000-0000-00000000c001' $$,
+    $$ values (2, 'second', 'daily', 'Daily digest') $$,
+    'two finished runs of one conversation: counted together, the latest one speaks, a question is not a run, the routine keeps its name'
 );
 select is((select count(*)::int from public.unseen_runs(990102)), 0, 'a workspace the caller does not belong to gives nothing, even addressed to them');
 

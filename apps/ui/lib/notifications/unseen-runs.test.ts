@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { groupUnseenRuns, unseenCount, withoutSeenLocally, type UnseenRun } from './unseen-runs'
+import { groupUnseenRuns, unseenCount, unseenGroupLabel, withoutSeenLocally, type UnseenRun } from './unseen-runs'
 
 const run = (over: Partial<UnseenRun>): UnseenRun => ({
     session_id: 's1',
@@ -11,6 +11,7 @@ const run = (over: Partial<UnseenRun>): UnseenRun => ({
     message: 'Found 20 founders.',
     last_at: '2026-10-20T10:00:00Z',
     run_count: 1,
+    automation_name: null,
     ...over,
 })
 
@@ -30,6 +31,24 @@ describe('groupUnseenRuns', () => {
 
     it('keeps two conversations apart, even with the same title', () => {
         expect(groupUnseenRuns([run({ session_id: 'c1' }), run({ session_id: 'c2' })])).toHaveLength(2)
+    })
+})
+
+describe('unseenGroupLabel', () => {
+    const [scheduled] = groupUnseenRuns([run({ source: 'schedule', slug: 'call-back', title: 'Called Anna back', automation_name: 'Call Anna back at 7pm' })])
+
+    it('names a scheduled task after the schedule while it exists', () => {
+        expect(unseenGroupLabel(scheduled, new Map([['a1:call-back', 'Call Anna back']]))).toBe('Call Anna back')
+    })
+
+    it('keeps the name its session kept once the task deleted itself, then falls back on the slug', () => {
+        expect(unseenGroupLabel(scheduled, new Map())).toBe('Call Anna back at 7pm')
+        expect(unseenGroupLabel({ ...scheduled, automationName: null }, new Map())).toBe('call-back')
+    })
+
+    it('leaves a trigger under its slug and a conversation under its title', () => {
+        expect(unseenGroupLabel({ ...scheduled, source: 'trigger' }, new Map())).toBe('call-back')
+        expect(unseenGroupLabel(groupUnseenRuns([run({})])[0], new Map())).toBe('Find founders in Lyon')
     })
 })
 

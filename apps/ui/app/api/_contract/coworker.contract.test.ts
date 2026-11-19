@@ -102,7 +102,7 @@ const notifications: Rows<'notifications'> = [
     { id: '2c3d4e5f-6a7b-4c8d-9e0f-1a2b3c4d5e6f', workspace_id: 7, agent_id: SCOUT, engine_agent_id: 'scout', engine_session_id: 'eng-thread', event: 'agent.question', kind: 'question', message: 'Should I include the bakeries of Villeurbanne?', metadata: null, recipients: null, created_at: '2026-11-18T09:30:00.000Z' },
 ]
 const unseenRuns: Database['public']['Functions']['unseen_runs']['Returns'] = [
-    { agent_id: SCOUT, session_id: GENERAL, last_at: '2026-11-18T08:00:00.000Z', message: 'Your weekly list is ready.', run_count: 1, slug: 'weekly-leads', source: 'schedule', title: 'Weekly leads' },
+    { agent_id: SCOUT, session_id: GENERAL, last_at: '2026-11-18T08:00:00.000Z', message: 'Your weekly list is ready.', run_count: 1, slug: 'weekly-leads', source: 'schedule', title: 'Weekly leads', automation_name: null },
 ]
 
 const workspace = (maxAgents: number): Rows<'workspaces'>[number] => ({ id: 7, name: 'Atelier Nord', max_agents: maxAgents, subscription_status: 'active', locale: 'en' })

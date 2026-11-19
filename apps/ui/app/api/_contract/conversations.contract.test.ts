@@ -84,9 +84,9 @@ const notifications: Row<'notifications'>[] = [
 ]
 
 const unseenRuns: Database['public']['Functions']['unseen_runs']['Returns'] = [
-    { session_id: MORNING_RUN_2, agent_id: AGENT, source: 'schedule', slug: 'morning-prospects', title: 'Found 4 new bakeries', message: '4 bakeries added to the sheet.', run_count: 1, last_at: '2026-11-19T07:30:00.000Z' },
-    { session_id: MORNING_RUN_1, agent_id: AGENT, source: 'schedule', slug: 'morning-prospects', title: 'Found 2 new bakeries', message: '2 bakeries added to the sheet.', run_count: 1, last_at: '2026-11-18T07:30:00.000Z' },
-    { session_id: ELSEWHERE, agent_id: 'agent-other-workspace', source: 'dashboard', slug: null, title: 'Not for this inbox', message: 'Done.', run_count: 1, last_at: '2026-11-19T09:00:00.000Z' },
+    { session_id: MORNING_RUN_2, agent_id: AGENT, source: 'schedule', slug: 'morning-prospects', title: 'Found 4 new bakeries', message: '4 bakeries added to the sheet.', run_count: 1, last_at: '2026-11-19T07:30:00.000Z', automation_name: null },
+    { session_id: MORNING_RUN_1, agent_id: AGENT, source: 'schedule', slug: 'morning-prospects', title: 'Found 2 new bakeries', message: '2 bakeries added to the sheet.', run_count: 1, last_at: '2026-11-18T07:30:00.000Z', automation_name: null },
+    { session_id: ELSEWHERE, agent_id: 'agent-other-workspace', source: 'dashboard', slug: null, title: 'Not for this inbox', message: 'Done.', run_count: 1, last_at: '2026-11-19T09:00:00.000Z', automation_name: null },
 ]
 
 const messageFeedback: Row<'message_feedback'>[] = [

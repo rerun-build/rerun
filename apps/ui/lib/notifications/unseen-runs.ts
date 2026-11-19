@@ -11,6 +11,7 @@ export type UnseenGroup = {
     agentId: string
     source: UnseenRun['source']
     slug: string | null
+    automationName: string | null
     title: string
     message: string
     sessionIds: string[]
@@ -31,14 +32,22 @@ export function groupUnseenRuns(runs: UnseenRun[]): UnseenGroup[] {
         const at = new Date(run.last_at).getTime()
         const group = groups.get(key)
         if (!group) {
-            groups.set(key, { key, agentId: run.agent_id, source: run.source, slug: run.slug, title: run.title, message: run.message, sessionIds: [run.session_id], latestSessionId: run.session_id, count: run.run_count, at })
+            groups.set(key, { key, agentId: run.agent_id, source: run.source, slug: run.slug, automationName: run.automation_name ?? null, title: run.title, message: run.message, sessionIds: [run.session_id], latestSessionId: run.session_id, count: run.run_count, at })
             continue
         }
         group.sessionIds.push(run.session_id)
         group.count += run.run_count
-        if (at > group.at) Object.assign(group, { at, title: run.title, message: run.message, latestSessionId: run.session_id })
+        if (at > group.at) Object.assign(group, { at, title: run.title, message: run.message, latestSessionId: run.session_id, automationName: run.automation_name ?? group.automationName })
     }
     return [...groups.values()].sort((a, b) => b.at - a.at)
+}
+
+// A scheduled task under its current name, or the one its session kept once the task is gone (a
+// one-off deletes itself after its run), then its slug. `scheduleNames` is keyed `agentId:slug`.
+export function unseenGroupLabel(group: UnseenGroup, scheduleNames: Map<string, string>): string {
+    if (!isScheduledSource(group.source) || !group.slug) return group.title
+    if (group.source !== 'schedule') return group.slug
+    return scheduleNames.get(`${group.agentId}:${group.slug}`) || group.automationName || group.slug
 }
 
 export const unseenCount = (runs: UnseenRun[]) => runs.reduce((sum, run) => sum + run.run_count, 0)

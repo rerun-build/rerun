@@ -4124,6 +4124,7 @@ export type Database = {
         Args: { p_workspace_id: number }
         Returns: {
           agent_id: string
+          automation_name: string | null
           last_at: string
           message: string
           run_count: number
