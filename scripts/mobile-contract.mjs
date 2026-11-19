@@ -88,7 +88,7 @@ async function check() {
     }
     rmSync(tmp, { force: true })
     if (problems.length) {
-        console.error(`\n${problems.join('\n\n')}\n\nA shipped build keeps the schemas it was compiled with: see .claude/skills/mobile-api-change.`)
+        console.error(`\n${problems.join('\n\n')}\n\nA shipped build keeps the schemas it was compiled with: see apps/mobile/api-contract/README.md.`)
         process.exit(1)
     }
     console.log(`\nThe contract is up to date and the ${snapshots.length} shipped builds still read the hub.`)

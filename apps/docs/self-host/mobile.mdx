@@ -42,6 +42,9 @@ What **Connect** says when it refuses an address:
 | --- | --- |
 | `MOBILE_OAUTH_TICKET_SECRET` | Needed to connect an app by OAuth from the phone, and to sign in to a Claude or ChatGPT plan from it. See [Secrets](/self-host/configuration#secrets). |
 | `MOBILE_IOS_MIN_BUILD` | The oldest build of the app your install still talks to. An older one is sent to the App Store to update. Empty: every build is let through. |
+| `MOBILE_ANDROID_MIN_BUILD` | The same for the Android app, sent to Google Play. |
+
+Before you raise a minimum build, check who still runs an older one: your server counts, in the `app_build_days` table of its database, one row per person, build and day the app called it.
 | `MOBILE_IOS_CUSTOM_BUILD`, `MOBILE_IOS_OPENCODE_BUILD` | The first iPhone build that knows **Custom endpoint** and OpenCode connections. While they are empty, the app does not list those connections. |
 
 ## What is different from Rerun Cloud

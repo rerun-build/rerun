@@ -62,12 +62,15 @@ pnpm --filter rerun-engine test
 pnpm --filter rerun-mobile test
 pnpm --filter rerun-desktop test
 pnpm i18n:check
+pnpm mobile:contract:check
 ```
 
 CI (`.github/workflows/ci.yml`) runs these, builds the desktop app, applies every migration and the
 seed to an empty database, builds both Docker images and the desktop installers, and tests the
 Android native modules. It runs on every push and pull request to `master` and `staging`. A pull
-request to `dev` does not start it, so run the checks yourself before you open one.
+request to `dev` does not start it, so run the checks yourself before you open one. A change to what the
+mobile app calls (`packages/contracts/src/mobile-api.ts`) regenerates its contract first:
+`pnpm build:contracts && pnpm mobile:contract` (see `apps/mobile/api-contract/README.md`).
 
 ## The code
 

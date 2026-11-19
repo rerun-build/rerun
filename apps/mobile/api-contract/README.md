@@ -43,6 +43,16 @@ Raising `MOBILE_IOS_MIN_BUILD` to 23 sends the people still on them to the store
 
 ## Retiring a build
 
-Only once nobody runs it: raise the minimum build of its platform (`MOBILE_IOS_MIN_BUILD`,
-`MOBILE_ANDROID_MIN_BUILD`), delete its snapshot and its `.adapted`, then the adaptations of
-`legacy-client.ts` no build left needs.
+Only once nobody runs it: the hub counts, in `app_build_days`, one row per person, build and day of the
+calls to `/api/v1` (`apps/ui/app/api/v1/_lib/build-days.ts`). Then raise the minimum build of its platform
+(`MOBILE_IOS_MIN_BUILD`, `MOBILE_ANDROID_MIN_BUILD`), delete its snapshot and its `.adapted`, then the
+adaptations of `legacy-client.ts` no build left needs.
+
+## A build that ships
+
+The release runs `pnpm mobile:contract:check` before it pushes, and CI runs it on every pull request to
+`master`. Each build sent to the stores gets its snapshot, from the commit it was built from:
+
+```bash
+pnpm build:contracts && pnpm mobile:contract:snapshot ios 39 --commit <gitCommitHash of the EAS build>
+```

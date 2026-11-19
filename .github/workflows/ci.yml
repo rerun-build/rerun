@@ -35,6 +35,24 @@ jobs:
       - run: pnpm --filter rerun-desktop test
       - run: pnpm --filter rerun-desktop build
 
+  # What the mobile builds in people's hands read from the hub (apps/mobile/api-contract): a change that
+  # breaks one of them does not reach master. Only on master: a pull request to `dev` starts nothing, and
+  # `pnpm mobile:contract:check` runs the same check by hand.
+  mobile-contract:
+    if: github.repository == 'rerun-build/rerun' && (github.ref == 'refs/heads/master' || github.base_ref == 'master')
+    name: Mobile API contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @rerun/contracts build
+      - run: pnpm mobile:contract:check
+
   # No network and no install: the check only reads packages/i18n, so it answers in seconds instead of
   # waiting behind the typecheck.
   i18n:

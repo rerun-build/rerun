@@ -138,6 +138,23 @@ A spread payload (`.insert({ ...row })`) escapes excess-property checking, so pi
 
 Before finishing any feature touching Supabase, grep your own diff for `.from('` and check nothing reads raw and every write carries its generic.
 
+# The mobile API never breaks a shipped build
+
+A build of the app keeps the schemas it was compiled with for as long as it stays installed, while the hub
+runs the latest ones. Every call of the app is an entry of `mobileApi` (`packages/contracts/src/mobile-api.ts`),
+and `apps/mobile/api-contract` holds what each shipped build reads. Follow the `mobile-api-change` skill.
+
+- The app reaches the hub only through the registry: `hub(mobileApi.x, …)` or `hubPath(mobileApi.x, …)`, never
+  a path written by hand. A route of `/api/v1` the app calls is `apiRoute(mobileApi.x, { auth }, …)`, and every
+  entry has a contract test that reads a real answer of its route (`expectContract`).
+- Add, never take away: a response keeps every field, type and value a shipped build reads, a request never
+  requires what an older build does not send. A new enum value or a new kind of part goes only to the builds
+  that know it: answer by build (`x-rerun-client`, `apps/ui/app/api/v1/_lib/legacy-client.ts`).
+- After a change to the registry: `pnpm build:contracts && pnpm mobile:contract`, and commit `current.json`.
+  `pnpm mobile:contract:check` must pass; a file of `shipped/` is never edited to make it pass.
+- A build is retired only once nobody runs it (`app_build_days`): raise `MOBILE_IOS_MIN_BUILD` or
+  `MOBILE_ANDROID_MIN_BUILD` first, then delete its snapshot and the adaptations no build left needs.
+
 # Engine data-dir migrations
 
 An engine data-dir can be archived and restored weeks later onto a newer engine. Anything that changes what the engine keeps on disk (a file, a folder, a SQLite schema) is a new numbered step at the end of its ladder: `DATA_DIR_MIGRATIONS` in `apps/engine/src/datadir/migrations.ts`, `SYSTEM_DB_MIGRATIONS`, `SHARED_DB_MIGRATIONS` or `BRAIN_DB_MIGRATIONS` (`apps/engine/src/db/`).
