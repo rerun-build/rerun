@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { CrispChat } from '@rerun/cloud/support'
+import { CoworkerLooks } from '@/components/agent/CoworkerLooks'
 import { BoardChatSplit } from '@/components/layout/BoardChatSplit'
 import { FeatureFlagsProvider } from '@/components/layout/FeatureFlagsProvider'
 import { WorkspaceSwitchLoader } from '@/components/layout/WorkspaceSwitchLoader'
@@ -37,7 +38,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <SessionProvider initial={initialSession}>
             <FeatureFlagsProvider computer={computer} published={published} i18n={i18n} vault={vault} simpleView={simpleView} remoteComputers={remoteComputers} apps={apps}>
                 <WorkspaceViewProvider initialView={workspaceView}>
-                    <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
+                    <CoworkerLooks>
+                        <BoardChatSplit initialOpen={foremanOpen} initialPlacement={foremanPlacement}>{children}</BoardChatSplit>
+                    </CoworkerLooks>
                     <CrispChat hideLauncher position="left" />
                     <WorkspaceSwitchLoader />
                     <QuickAskReceiver />

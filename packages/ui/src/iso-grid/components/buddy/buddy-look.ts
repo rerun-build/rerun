@@ -1,13 +1,14 @@
+import { COWORKER_COLORS, COWORKER_EYES, COWORKER_MOUTHS } from '@rerun/contracts'
 import { hashUnit } from '../../iso'
 import type { AgentStatus } from '../../presets'
 import type { BuddyEyes, BuddyLook, BuddyMood, BuddyMouth, TileStyle } from '../../types'
 
 export type { BuddyMood }
 
-export const BUDDY_EYES: BuddyEyes[] = ['pill', 'round', 'happy', 'googly', 'visor', 'sleepy', 'wink', 'pixel', 'star', 'heart', 'dot', 'brows', 'cyclops', 'shades', 'glasses', 'sparkle', 'line']
+export const BUDDY_EYES: readonly BuddyEyes[] = COWORKER_EYES
 
 // Most buddies have no mouth: the eyes carry the face, and a board full of smiles gets loud.
-export const BUDDY_MOUTHS: BuddyMouth[] = ['none', 'smile', 'open', 'cat', 'flat']
+export const BUDDY_MOUTHS: readonly BuddyMouth[] = COWORKER_MOUTHS
 const MOUTH_ODDS: BuddyMouth[] = ['none', 'none', 'none', 'smile', 'open', 'cat', 'flat']
 
 // The body keeps the tile preset's state colours, so the board reads the way it does today: amber
@@ -20,9 +21,8 @@ export const BUDDY_STATE_COLOR: Record<BuddyMood, string> = {
     asleep: 'var(--iso-buddy-asleep)',
 }
 
-// The colour of a resting agent's top. Amber, red and cyan are left out: on the board they already
-// mean working, broken and waiting for you.
-const IDENTITY = ['#0f52ff', '#4fb800', '#f0127f', '#7a2cf5', '#e935c1', '#3b32e8', '#00b862', '#a81fe0']
+// The colour of a resting agent's top, without the amber, red and cyan the board keeps for states.
+const IDENTITY: readonly string[] = COWORKER_COLORS
 
 export function buddyLook(style: TileStyle): BuddyLook {
     return style.buddy === true || style.buddy == null ? {} : style.buddy

@@ -8,9 +8,11 @@ import { hashUnit } from '../../iso'
 import type { BuddyEyes, BuddyLook } from '../../types'
 import { BUDDY_GEOMETRY, BuddyArt } from './BuddyArt'
 import { buddyEyes, type BuddyMood } from './buddy-look'
+import { useBuddyLookOf } from './buddy-looks'
 import type { BoxGeometry } from './RoundedBox'
 
-// An agent's buddy away from the board: the same block, colour and eyes, drawn from the same id.
+// An agent's buddy away from the board: the same block, colour and eyes as on it, the ones its
+// coworker was given or else the ones its id hashes to.
 
 // Below this width the board's block is too squat for its face to read: the buddy stands taller,
 // its face is painted flat and larger, and it loses its mouth.
@@ -19,11 +21,9 @@ const SMALL_GEOMETRY: BoxGeometry = { ...BUDDY_GEOMETRY, depth: 30 }
 const SMALL_FACE_SCALE = 1.6
 // Eyes whose thin strokes do not survive a few pixels are drawn as their closest solid shape.
 const SMALL_EYES: Partial<Record<BuddyEyes, BuddyEyes>> = { glasses: 'round', shades: 'visor', line: 'pill', dot: 'round' }
-const FULL_LOOK: BuddyLook = {}
-
-function smallLook(agentId: string): BuddyLook {
-    const eyes = buddyEyes(agentId, FULL_LOOK)
-    return { mouth: 'none', eyes: SMALL_EYES[eyes] ?? eyes }
+function smallLook(agentId: string, look: BuddyLook): BuddyLook {
+    const eyes = buddyEyes(agentId, look)
+    return { ...look, mouth: 'none', eyes: SMALL_EYES[eyes] ?? eyes }
 }
 
 const MARGIN = 2
@@ -31,6 +31,9 @@ const MOTION: Partial<Record<BuddyMood, 'bob' | 'shudder'>> = { working: 'bob', 
 
 type AgentBuddyProps = {
     agentId: string
+    // Drawn instead of the look its coworker wears: a picker previewing a choice, a coworker not
+    // created yet.
+    look?: BuddyLook
     mood?: BuddyMood
     // Width in pixels of the square the block is centred in.
     size: number
@@ -47,7 +50,9 @@ type AgentBuddyProps = {
     className?: string
 }
 
-export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, alive = false, facing = 'left', badge, className }: AgentBuddyProps) {
+export function AgentBuddy({ agentId, look: shownLook, mood = 'idle', size, animated = true, alive = false, facing = 'left', badge, className }: AgentBuddyProps) {
+    const worn = useBuddyLookOf(agentId)
+    const look = shownLook ?? worn
     const uid = useId().replace(/[^a-zA-Z0-9]/g, '')
     const reducedMotion = usePrefersReducedMotion()
     useBuddyBlinks()
@@ -79,7 +84,7 @@ export function AgentBuddy({ agentId, mood = 'idle', size, animated = true, aliv
             }
         >
             <svg viewBox={viewBox} width="100%" height="100%" style={{ overflow: 'visible', transform: facing === 'right' ? 'scaleX(-1)' : undefined }}>
-                <BuddyArt uid={uid} id={agentId} mood={mood} look={small ? smallLook(agentId) : FULL_LOOK} geometry={geometry} lit={!small} faceScale={small ? SMALL_FACE_SCALE : 1} />
+                <BuddyArt uid={uid} id={agentId} mood={mood} look={small ? smallLook(agentId, look) : look} geometry={geometry} lit={!small} faceScale={small ? SMALL_FACE_SCALE : 1} />
             </svg>
             {badge && <span className={cn('absolute -bottom-1 flex', facing === 'right' ? '-left-1' : '-right-1')}>{badge}</span>}
         </span>

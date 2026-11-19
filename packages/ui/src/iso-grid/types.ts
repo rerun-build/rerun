@@ -1,3 +1,4 @@
+import type { CoworkerLook } from '@rerun/contracts'
 import type { ReactNode } from 'react'
 import type { BadgeTone } from '../primitives/badge'
 import type { CanvasViewControlsPlacement } from '../CanvasViewControls'
@@ -64,26 +65,9 @@ export type TileStyle = {
     buddy?: true | BuddyLook
 }
 
-export type BuddyEyes =
-    | 'pill'
-    | 'round'
-    | 'happy'
-    | 'googly'
-    | 'visor'
-    | 'sleepy'
-    | 'wink'
-    | 'pixel'
-    | 'star'
-    | 'heart'
-    | 'dot'
-    | 'brows'
-    | 'cyclops'
-    | 'shades'
-    | 'glasses'
-    | 'sparkle'
-    | 'line'
+export type BuddyEyes = CoworkerLook['eyes']
 
-export type BuddyMouth = 'none' | 'smile' | 'open' | 'cat' | 'flat'
+export type BuddyMouth = CoworkerLook['mouth']
 
 export type BuddyMood = 'idle' | 'working' | 'error' | 'waiting' | 'asleep'
 
