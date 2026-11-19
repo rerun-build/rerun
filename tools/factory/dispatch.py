@@ -23,6 +23,7 @@ import gatefiles
 import handover
 import holds
 import inboxsort
+import labelcheck
 import instructions
 import limits
 import plancheck
@@ -2091,9 +2092,16 @@ class Dispatcher:
             if not digest.due(self.store, self.now()):
                 return out
             at = planning.stamp(self.now())
-            out["registry"] = registry.summary(registry.rows(registry.read(self.store), at), at, self.cfg)
+            data = registry.read(self.store)
+            rows = registry.rows(data, at)
+            out["registry"] = registry.summary(rows, at, self.cfg)
         except Exception as e:  # noqa: BLE001
             out["registry_error"] = type(e).__name__
+            return out
+        try:
+            out["label_drift"] = labelcheck.check(labelcheck.read(self.gh, self.repo), data, rows)
+        except Exception as e:  # noqa: BLE001
+            out["label_drift_error"] = type(e).__name__
         return out
 
     def report_line(self):

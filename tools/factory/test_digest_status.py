@@ -74,6 +74,26 @@ class Status(unittest.TestCase):
         self.d.store.set("-", "digest_at", self.d.now())
         self.assertNotIn("registry", self.d.status({"digest": {}, "holds": []}))
 
+    def test_the_digest_carries_the_label_check(self):
+        self.make()
+        self.planner()
+        real = D.labelcheck.read
+        D.labelcheck.read = lambda gh, repo: [{"number": 12, "title": "t", "labels": [{"name": "factory-plan"}]},
+                                              {"number": 30, "title": "t", "labels": [{"name": "factory-plan"}]}]
+        self.addCleanup(setattr, D.labelcheck, "read", real)
+        out = self.d.status({"digest": {}, "holds": []})
+        self.assertEqual(out["label_drift"]["plan_label_no_plan"], [30])
+
+    def test_an_unreadable_issue_list_still_posts_the_registry(self):
+        self.make()
+        self.planner()
+        real = D.labelcheck.read
+        D.labelcheck.read = lambda gh, repo: (_ for _ in ()).throw(RuntimeError("gh"))
+        self.addCleanup(setattr, D.labelcheck, "read", real)
+        out = self.d.status({"digest": {}, "holds": []})
+        self.assertEqual(out["label_drift_error"], "RuntimeError")
+        self.assertIn("registry", out)
+
     def test_a_broken_ledger_read_still_posts_the_planner_numbers(self):
         self.make()
         self.planner()
