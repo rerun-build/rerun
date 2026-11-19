@@ -10,6 +10,7 @@ import { translatorFor } from '@/i18n/translator'
 
 import CrewWidget from './CrewWidget'
 import { crewWidgetPropsOf, faceFileName, type CrewWidgetProps } from './crew-props'
+import { syncCrewActivity } from './live-activity'
 import { facesDirectory } from './refresh'
 
 const FACE_SIZE = 120
@@ -62,6 +63,7 @@ export function WidgetSync({ coworkers }: { coworkers: HomeCoworker[] }) {
         if (serialized === pushed.current) return
         pushed.current = serialized
         CrewWidget.updateSnapshot(props)
+        void syncCrewActivity(props)
     }, [next, props])
 
     if (!next) return null

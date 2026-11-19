@@ -13,6 +13,8 @@ export type CrewWidgetMember = {
     face: string
     // Where a tap on its row lands: the conversation it waits or works in.
     url: string
+    // When it started waiting or working, for the clocks of the Live Activity that run on their own.
+    since: string | null
 }
 
 // Everything a widget draws, worded here: a widget runs apart from the app, with no translations.
@@ -56,6 +58,7 @@ export function crewWidgetPropsOf(coworkers: readonly HomeCoworker[], t: HomeTra
             badge: badgeOf(member, now, t),
             face: facesDirectory ? `${facesDirectory}/${faceFileName(member.id, member.state)}` : '',
             url: `rerun://chat/${conversationOf.get(member.id)}?to=${encodeURIComponent(member.id)}`,
+            since: member.since,
         })
     )
     const first = members[0]

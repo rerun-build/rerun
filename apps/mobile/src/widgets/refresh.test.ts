@@ -3,6 +3,8 @@ import { refreshWidgets } from './refresh'
 const mockSnapshot = jest.fn()
 jest.mock('./CrewWidget', () => ({ __esModule: true, default: { updateSnapshot: (props: unknown) => mockSnapshot(props) } }))
 jest.mock('expo-widgets', () => ({ widgetsDirectory: 'file:///group/widgets/' }))
+const mockActivity = jest.fn()
+jest.mock('./live-activity', () => ({ syncCrewActivity: async (props: unknown) => mockActivity(props) }))
 const mockDrawn = new Set(['file:///group/widgets/buddy-closer-waiting.png'])
 jest.mock('expo-file-system', () => ({
     File: class {
@@ -31,5 +33,6 @@ describe('refreshWidgets', () => {
             ['closer', 'file:///group/widgets/buddy-closer-waiting.png'],
             ['scout', ''],
         ])
+        expect(mockActivity).toHaveBeenCalledWith(props)
     })
 })
