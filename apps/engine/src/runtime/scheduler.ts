@@ -3,7 +3,7 @@ import { pickBackup } from '../agents/backups.js'
 import { listAgentIdsOnDisk } from '../agents/loader.js'
 import { getAgent } from '../agents/registry.js'
 import { createSession } from '../db/repos/sessions.js'
-import { listSchedules, markFired, type Schedule } from '../schedules/loader.js'
+import { deleteFiredOneOff, listSchedules, markFired, type Schedule } from '../schedules/loader.js'
 import { buildScheduledRunMessage } from '../schedules/message.js'
 import { isDue } from '../schedules/cron.js'
 import { sweepMemoriesIfDue } from '../memory/maintenance.js'
@@ -45,7 +45,9 @@ export async function fireSchedule(agentId: string, schedule: Schedule, opts?: {
     // Stamped before the launch, not after: a schedule whose run preparation keeps throwing would
     // otherwise stay due forever and re-fire on every 30s tick. The trade-off is at-most-once — a
     // crash mid-run costs that occurrence instead of replaying work that may already be done.
-    if (opts?.markFired !== false) await markFired(agentId, schedule.slug, nowIso())
+    const stamped = opts?.markFired !== false
+    const firedAt = nowIso()
+    if (stamped) await markFired(agentId, schedule.slug, firedAt)
     const session = await createSession(agentId, `schedule: ${schedule.slug}`, undefined, 'schedule')
     await sendNotification({
         event: 'agent.session.created',
@@ -65,9 +67,17 @@ export async function fireSchedule(agentId: string, schedule: Schedule, opts?: {
 
     // `settled` always resolves; `result.finishReason` does not when a provider stream hangs, and
     // an entry left in `inFlight` freezes this schedule for the lifetime of the process.
+    // A one-off that did its job leaves the list. One that failed, was cancelled or stopped on a
+    // question stays, switched off, so its outcome is still there to read and run again.
     void settled
-        .then(outcome => {
+        .then(async outcome => {
             if (outcome.kind === 'error') logger.error({ agent: agentId, schedule: schedule.slug, err: outcome.error }, 'scheduled run failed')
+            if (outcome.kind !== 'done' || outcome.awaitingHuman || !stamped || !schedule.runAt) return
+            try {
+                if (await deleteFiredOneOff(agentId, schedule, firedAt)) logger.info({ agent: agentId, schedule: schedule.slug }, 'one-off schedule deleted after its run')
+            } catch (err) {
+                logger.warn({ agent: agentId, schedule: schedule.slug, err: String(err) }, 'one-off schedule delete failed')
+            }
         })
         .finally(() => inFlight.delete(key))
 

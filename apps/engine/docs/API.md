@@ -1301,6 +1301,8 @@ One-shot:
 
 Returns the created schedule `201`. `400` for an invalid cron, `runAt` or time zone.
 
+A one-shot is disabled when it fires and deleted once its run ends `done`; after a failed or cancelled run, or one that ended on a human-in-the-loop card, it stays, disabled. Its runs stay in the `runs` table either way.
+
 ### `GET /agents/:id/schedules/:slug`
 
 Return one schedule. `404` if unknown.

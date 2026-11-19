@@ -54,7 +54,7 @@ Click **New** on the **Scheduled** tab, or just ask the coworker to set it up.
 
 Once the task exists, its editor also shows **Enabled**, to pause it without deleting it, **Notify me**, to get a [notification](/agents/human-in-the-loop#notifications) each time it finishes, and **History**, the runs it produced.
 
-A one-off task fires once at its date, then switches itself off.
+A one-off task fires once at its date. Once its run succeeds, it deletes itself: the run stays in the coworker's threads. If the run fails, is stopped or ends on a question waiting for your answer, the task stays, switched off, so you can see what happened and run it again.
 
 The **Scheduled** tab lists the tasks by when they run next (**This morning**, **Tomorrow**, **This week**, **Later**…), the paused ones folded under **Paused**, the same list as the [Chief of Staff's routines](/chief-of-staff#its-chat). Each row has a switch to pause or resume the task, and a menu to **Rename**, **Edit** or **Run now**.
 

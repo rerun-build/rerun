@@ -7,7 +7,7 @@ process.env.RERUN_DATA_DIR = mkdtempSync(resolve(tmpdir(), 'rerun-scheduler-'))
 process.env.RERUN_API_KEY = ''
 process.env.RERUN_LOG_LEVEL = 'fatal'
 
-type Outcome = { kind: 'done' | 'error' | 'cancelled'; error?: string }
+type Outcome = { kind: 'done' | 'error' | 'cancelled'; error?: string; awaitingHuman?: boolean }
 
 const state = vi.hoisted(() => ({
     agents: {} as Record<string, { id: string; config: { enabled: boolean } } | Error>,
@@ -23,6 +23,7 @@ const state = vi.hoisted(() => ({
     sent: [] as Array<Record<string, unknown>>,
     runs: [] as Array<{ agentId: string; sessionId: string; message: string; override: unknown; trigger: unknown; runId: string; finish: (o: Outcome) => void }>,
     markFired: vi.fn(async (_agentId: string, _slug: string, _at: string) => {}),
+    deleteFiredOneOff: vi.fn(async (_agentId: string, _fired: { slug: string }, _at: string): Promise<boolean> => true),
     sweep: vi.fn(async (_ids: string[]) => {}),
     sessions: 0,
 }))
@@ -54,6 +55,7 @@ vi.mock('../schedules/loader.js', () => ({
         return list
     },
     markFired: state.markFired,
+    deleteFiredOneOff: state.deleteFiredOneOff,
 }))
 vi.mock('../schedules/cron.js', () => ({
     isDue: (schedule: { slug: string }) => state.due.has(schedule.slug),
@@ -127,6 +129,8 @@ afterEach(async () => {
     state.runs = []
     state.sent = []
     state.markFired.mockClear()
+    state.deleteFiredOneOff.mockReset()
+    state.deleteFiredOneOff.mockImplementation(async () => true)
     state.sweep.mockClear()
     clearBudgetLatch()
     clearPlanLimitLatch('claude-sub')
@@ -284,6 +288,58 @@ describe('fireSchedule', () => {
         expect(second.runId).not.toBe(first.runId)
         expect(state.runs).toHaveLength(2)
         expect(logger.error).toHaveBeenCalledWith(expect.objectContaining({ schedule: 'again', err: 'boom' }), 'scheduled run failed')
+    })
+
+    it('deletes a one-off once its run is done, as it was fired and at the stamp it was fired with', async () => {
+        const once = schedule('once', { cron: null, runAt: '2026-10-01T00:00:00.000Z' })
+        await fireSchedule('on', once)
+        expect(state.deleteFiredOneOff).not.toHaveBeenCalled()
+
+        state.runs[0].finish({ kind: 'done' })
+        await flush()
+
+        const firedAt = state.markFired.mock.calls[0][2]
+        expect(state.deleteFiredOneOff).toHaveBeenCalledWith('on', once, firedAt)
+    })
+
+    it('keeps a one-off whose run stopped on a question', async () => {
+        await fireSchedule('on', schedule('once', { cron: null, runAt: '2026-10-01T00:00:00.000Z' }))
+        state.runs[0].finish({ kind: 'done', awaitingHuman: true })
+        await flush()
+
+        expect(state.deleteFiredOneOff).not.toHaveBeenCalled()
+    })
+
+    it.each(['error', 'cancelled'] as const)('keeps a one-off whose run ended %s', async kind => {
+        vi.spyOn(logger, 'error').mockImplementation(() => undefined as never)
+        await fireSchedule('on', schedule('once', { cron: null, runAt: '2026-10-01T00:00:00.000Z' }))
+        state.runs[0].finish({ kind, error: 'boom' })
+        await flush()
+
+        expect(state.deleteFiredOneOff).not.toHaveBeenCalled()
+    })
+
+    it('never deletes a cron, nor a one-off run by hand', async () => {
+        await fireSchedule('on', schedule('daily'))
+        await fireSchedule('on', schedule('once', { cron: null, runAt: '2026-10-01T00:00:00.000Z' }), { markFired: false, manual: true })
+        for (const run of state.runs) run.finish({ kind: 'done' })
+        await flush()
+
+        expect(state.deleteFiredOneOff).not.toHaveBeenCalled()
+    })
+
+    it('frees the schedule even when the delete throws', async () => {
+        vi.spyOn(logger, 'warn').mockImplementation(() => undefined as never)
+        state.deleteFiredOneOff.mockImplementation(async () => {
+            throw new Error('disk gone')
+        })
+        const first = await fireSchedule('on', schedule('once', { cron: null, runAt: '2026-10-01T00:00:00.000Z' }))
+        state.runs[0].finish({ kind: 'done' })
+        await flush()
+
+        const second = await fireSchedule('on', schedule('once', { cron: null, runAt: '2026-10-01T00:00:00.000Z' }))
+        expect(second.runId).not.toBe(first.runId)
+        expect(logger.warn).toHaveBeenCalledWith(expect.objectContaining({ schedule: 'once', err: 'Error: disk gone' }), 'one-off schedule delete failed')
     })
 
     it('does not collapse two calls racing before the first run has started', async () => {

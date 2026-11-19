@@ -10,7 +10,7 @@ export function scheduleTools(ctx: RunContext): ToolSet {
     const id = ctx.agent.id
     return {
         schedule_list: tool({
-            description: 'List your scheduled tasks (recurring cron jobs and one-shot reminders). Instruction bodies are not included here; read one in full with schedule_get.',
+            description: 'List your scheduled tasks (cron and one-shot), without their bodies: read one in full with schedule_get.',
             inputSchema: z.object({}),
             execute: async () => {
                 const schedules = await listSchedules(id)
@@ -48,7 +48,7 @@ export function scheduleTools(ctx: RunContext): ToolSet {
         }),
         schedule_create: tool({
             description:
-                'Schedule a task to run later without a user message. Provide a cron expression for a recurring task OR runAt (ISO 8601) for a one-shot. The body is the instruction you will execute when it fires.',
+                'Schedule a task to run without a user message: cron to recur, runAt (ISO 8601) for a one-shot. Something to do once ("at 7pm") is runAt, never a cron. A one-shot deletes itself once it succeeds. The body is what you run when it fires.',
             inputSchema: z.object({
                 name: z.string(),
                 description: z.string().describe('One line describing the routine'),

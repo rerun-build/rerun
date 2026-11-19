@@ -301,7 +301,7 @@ const AGENT_TOOL_DEFS = [
     {
         name: 'upsert_schedule',
         description:
-            'Create a scheduled task, or update it when `slug` is given. `body` is the instruction the coworker receives when it fires, written as if you were talking to it. Pass `cron` for a recurring task (5-field cron) or `runAt` for a one-off ISO date. It runs on whatever its coworker runs unless you pass `model` (and `connectionId`) to give it a model of its own. Three things to know: passing `body` on an update replaces the whole instruction, so read the current one with list_schedules and edit that text — never write a body from memory; the slug is derived from the name and is what run_schedule_now and delete_schedule address, so read it back from the response; and an update can change a cron but cannot clear it nor turn a recurring task into a one-off — delete and recreate for that.',
+            'Create a scheduled task, or update it when `slug` is given. `body` is the instruction the coworker receives when it fires, written as if you were talking to it. Pass `cron` for a recurring task (5-field cron) or `runAt` for a one-off ISO date: something to do once ("at 7pm") is always `runAt`, never a cron, and a one-off deletes itself once its run succeeds. It runs on whatever its coworker runs unless you pass `model` (and `connectionId`) to give it a model of its own. Three things to know: passing `body` on an update replaces the whole instruction, so read the current one with list_schedules and edit that text — never write a body from memory; the slug is derived from the name and is what run_schedule_now and delete_schedule address, so read it back from the response; and an update can change a cron but cannot clear it nor turn a recurring task into a one-off — delete and recreate for that.',
         inputSchema: {
             type: 'object',
             properties: {
@@ -311,7 +311,7 @@ const AGENT_TOOL_DEFS = [
                 description: { type: 'string' },
                 body: { type: 'string', description: 'The instruction sent to the coworker when the task fires.' },
                 cron: { type: 'string', description: 'e.g. "0 9 * * 1" for every Monday at 9.' },
-                runAt: { type: 'string', description: 'ISO date for a one-off run.' },
+                runAt: { type: 'string', description: 'ISO date for a one-off run. Deleted once its run succeeds.' },
                 timezone: { type: 'string', description: 'IANA timezone, e.g. "Europe/Paris".' },
                 enabled: { type: 'boolean' },
                 ...AUTOMATION_MODEL_PIN_PROPERTIES,

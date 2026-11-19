@@ -19,7 +19,7 @@ vi.mock('../runtime/notify.js', async importOriginal => ({
 const { beforeEach, describe, expect, it } = await import('vitest')
 const { mkdir, readdir, readFile, rm, writeFile } = await import('node:fs/promises')
 const { agentDir, scheduleFile, schedulesDir } = await import('../config/paths.js')
-const { clearScheduleModel, deleteSchedule, listSchedules, markFired, readSchedule, scheduleExists, setScheduleEnabled, updateScheduleAt, writeSchedule } = await import('./loader.js')
+const { clearScheduleModel, deleteFiredOneOff, deleteSchedule, listSchedules, markFired, readSchedule, scheduleExists, setScheduleEnabled, updateScheduleAt, writeSchedule } = await import('./loader.js')
 
 const id = 'scheduler'
 
@@ -194,6 +194,36 @@ describe('updating a schedule in place', () => {
         await clearScheduleModel(id, 'ghost')
         expect(scheduleExists(id, 'ghost')).toBe(false)
         expect(await listSchedules(id)).toEqual([])
+    })
+
+    it('deletes a one-off the scheduler stamped, and only that one', async () => {
+        const firedAt = '2026-10-01T00:00:01.000Z'
+        const once = await writeSchedule(id, { name: 'Once', body: 'x', runAt: '2026-10-01T00:00:00.000Z' })
+        const daily = await writeSchedule(id, { name: 'Daily', body: 'x', cron: '0 9 * * *' })
+        await markFired(id, 'once', firedAt)
+        await markFired(id, 'daily', firedAt)
+
+        expect(await deleteFiredOneOff(id, daily, firedAt)).toBe(false)
+        expect(await deleteFiredOneOff(id, once, '2026-10-01T00:00:02.000Z')).toBe(false)
+        expect(await deleteFiredOneOff(id, once, firedAt)).toBe(true)
+
+        expect(scheduleExists(id, 'once')).toBe(false)
+        expect(scheduleExists(id, 'daily')).toBe(true)
+        expect(await deleteFiredOneOff(id, once, firedAt)).toBe(false)
+    })
+
+    it('keeps a one-off edited while its run was going, even left switched off', async () => {
+        const firedAt = '2026-10-01T00:00:01.000Z'
+        const fired = await Promise.all(['Redated', 'Rewritten', 'Rearmed', 'Now a cron'].map(name => writeSchedule(id, { name, body: 'x', runAt: '2026-10-01T00:00:00.000Z' })))
+        for (const { slug } of fired) await markFired(id, slug, firedAt)
+
+        await updateScheduleAt(id, 'redated', { runAt: '2026-10-02T00:00:00.000Z', enabled: false })
+        await updateScheduleAt(id, 'rewritten', { body: 'y', enabled: false })
+        await updateScheduleAt(id, 'rearmed', { enabled: true })
+        await updateScheduleAt(id, 'now-a-cron', { cron: '0 9 * * *' })
+
+        for (const schedule of fired) expect(await deleteFiredOneOff(id, schedule, firedAt)).toBe(false)
+        expect(await listSchedules(id)).toHaveLength(4)
     })
 
     it('deletes, and deleting twice is fine', async () => {

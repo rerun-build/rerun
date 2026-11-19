@@ -95,7 +95,12 @@ export async function listSchedules(agentId: string): Promise<Schedule[]> {
     for (const entry of entries) {
         if (!entry.isFile() || !entry.name.endsWith('.md')) continue
         const slug = entry.name.slice(0, -3)
-        schedules.push(toSchedule(slug, await readFile(scheduleFile(agentId, slug), 'utf8')))
+        // A one-off deletes itself once its run is done, possibly between the readdir and this read.
+        const raw = await readFile(scheduleFile(agentId, slug), 'utf8').catch((err: NodeJS.ErrnoException) => {
+            if (err.code === 'ENOENT') return null
+            throw err
+        })
+        if (raw !== null) schedules.push(toSchedule(slug, raw))
     }
     return schedules
 }
@@ -186,6 +191,21 @@ export async function markFired(agentId: string, slug: string, firedAt: string):
         schedule.lastRunAt = firedAt
         if (schedule.runAt) schedule.enabled = false
         await writeFileAtomic(scheduleFile(agentId, slug), serialize(schedule))
+    })
+}
+
+// Only the file the scheduler stamped at `firedAt` goes, still as it was fired: an edit made while the
+// run was going (a new date, a new body, a cron, switched back on) is the user's newer intent and
+// keeps the schedule.
+export async function deleteFiredOneOff(agentId: string, fired: Schedule, firedAt: string): Promise<boolean> {
+    const { slug } = fired
+    if (!scheduleExists(agentId, slug)) return false
+    return withScheduleLock(agentId, slug, async () => {
+        const current = await readScheduleForUpdate(agentId, slug)
+        if (!current.runAt || current.cron || current.enabled || current.lastRunAt !== firedAt) return false
+        if (current.runAt !== fired.runAt || current.body !== fired.body) return false
+        await rm(scheduleFile(agentId, slug), { force: true })
+        return true
     })
 }
 

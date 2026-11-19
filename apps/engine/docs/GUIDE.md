@@ -416,7 +416,8 @@ How it works (`src/runtime/scheduler.ts`):
 - `startScheduler()` is launched from `rerun run` (once the data-dir is ready) and ticks every 30 seconds.
 - Each tick lists every agent on disk, loads its schedules, and asks `isDue(schedule, now)` (`src/schedules/cron.ts`, backed by [`croner`](https://www.npmjs.com/package/croner)).
 - For each due task it starts a **fresh session** (`schedule: <slug>`) and calls the same `runAgent` used by the HTTP routes, so the run is recorded in the `runs` table. Continuity across fires comes from the agent's memory, not the session.
-- On success it writes `lastRunAt` back into the file (and disables one-shots). A **failed** run is **not** marked, so it is retried on the next tick. An in-memory guard prevents the same task from overlapping itself.
+- Before the run starts it writes `lastRunAt` back into the file and disables one-shots: a fire is at most once, so a run that fails is not retried on the next tick. An in-memory guard prevents the same task from overlapping itself.
+- A one-shot whose run ends `done` deletes its file, unless the file was edited during the run. One that failed, was cancelled or ended on a human-in-the-loop card stays, disabled, with its outcome. A manual `POST /agents/:id/schedules/:slug/run` never deletes anything.
 - `rerun restore-finalize` marks the tasks an archived data-dir slept through as just fired, so a restore does not fire them all at once.
 
 Manage tasks over the API (`GET/POST /agents/:id/schedules`, `GET/PATCH/DELETE /agents/:id/schedules/:slug`, `POST /agents/:id/schedules/:slug/run`), with `rerun schedule list <agentId>`, or let the agent manage its own with the `schedule_*` tools (gated by `config.tools.schedule`).

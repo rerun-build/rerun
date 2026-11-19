@@ -36,7 +36,7 @@ Creates a scheduled task, or updates it when `slug` is given.
 </ParamField>
 
 <ParamField body="runAt" type="string">
-  ISO date for a one-off run. The task disables itself after it fires.
+  ISO date for a one-off run. The task deletes itself once its run succeeds; after a run that failed, was stopped or waits for an answer it stays, disabled.
 </ParamField>
 
 <ParamField body="timezone" type="string">

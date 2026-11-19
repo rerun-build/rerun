@@ -57,7 +57,9 @@ import { ClaudeSignInRenewedError, classifyFinishReason, classifyProviderError, 
 import { armBudgetLatch, clearBudgetLatch, RERUN_BUDGET_ERROR_CODE } from './budget-latch.js'
 import { agentMcpServers } from '../vault/runtime.js'
 
-export type RunOutcome = { kind: 'done' | 'error' | 'cancelled'; error?: string; errorCode?: RunErrorCode | null }
+// `awaitingHuman`: the turn ended on a card (a question, an approval) and the work it was for has
+// not happened yet.
+export type RunOutcome = { kind: 'done' | 'error' | 'cancelled'; error?: string; errorCode?: RunErrorCode | null; awaitingHuman?: boolean }
 
 // How one provider's go at a turn ended. A turn whose subscription ran out mid-way is handed to a
 // backup: the same run carries on as `next`, on another provider, in the same stream.
@@ -388,7 +390,7 @@ async function runTurn(baseAgent: LoadedAgent, sessionId: string, userText: stri
                 forgetCredentialRejected(connection.id)
                 clearPlanLimitLatch(connection.id)
             }
-            outcome = { kind: 'done' }
+            outcome = pending ? { kind: 'done', awaitingHuman: true } : { kind: 'done' }
         } else if (settlement.kind === 'cancelled') {
             forgetCodexThread(agent.id, sessionId)
             if (partialResults.length) await appendMessage(agent.id, sessionId, { role: 'assistant', content: partialResultsNote(partialResults) }).catch(() => {})
