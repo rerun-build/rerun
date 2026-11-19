@@ -334,6 +334,9 @@ export interface AnalyticsEventMap {
     app_quota_hit: { app: string; action: string }
     // One provider event and the coworkers it woke, zero included.
     app_event_fired: { app: string; event: string; woken: number }
+    // The mobile app read a hub answer only once it had left out what it could not read: the call, and
+    // how many items or fields went. A hub change a shipped build does not know shows here first.
+    api_answer_salvaged: { call: string; dropped: number }
 }
 
 export type EventName = keyof AnalyticsEventMap

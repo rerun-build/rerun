@@ -1,6 +1,7 @@
 import { CLIENT_HEADER, formatClientHeader, hubPath, isRecord, type HubBody, type HubEndpoint, type HubPathParams, type HubQuery, type HubQueryValues, type HubResponse } from '@rerun/contracts'
 import * as Application from 'expo-application'
 
+import { readSalvaging, type ResponseSchema } from '@/api/salvage'
 import { environment } from '@/config/environment'
 import type { MobileMessages } from '@/i18n/messages'
 import { translatorFor } from '@/i18n/translator'
@@ -111,27 +112,34 @@ type HubCall<E extends JsonEndpoint> = Pick<ApiRequest, 'accessToken' | 'workspa
 
 type AnyCall = Pick<ApiRequest, 'accessToken' | 'workspaceId' | 'signal'> & { params?: Record<string, string>; body?: unknown; query?: HubQueryValues }
 
-type Parser = { parse: (value: unknown) => unknown }
+type HubClientOptions = { onSalvage?: (call: string, dropped: string[]) => void }
 
-// One call of the registry: its method and path, and its answer read with the schema the hub promised.
-export function createHubClient(request: ApiClient) {
+// One call of the registry: its method and path, and its answer read with the schema the hub promised,
+// leaving out what this build cannot read rather than failing the whole answer (salvage.ts).
+export function createHubClient(request: ApiClient, { onSalvage }: HubClientOptions = {}) {
     return async function hub<E extends JsonEndpoint>(endpoint: E, call: HubCall<E>): Promise<HubResponse<E>> {
         const { params, body, query, accessToken, workspaceId, signal } = call as AnyCall
         const payload = await request<unknown>(hubPath(endpoint, (params ?? {}) as HubPathParams<E>, query), { method: endpoint.method, body, accessToken, workspaceId, signal })
-        if (typeof endpoint.response === 'string') return undefined as HubResponse<E>
-        return (endpoint.response as Parser).parse(payload) as HubResponse<E>
+        return readAnswer(endpoint, payload, onSalvage)
     }
+}
+
+function readAnswer<E extends JsonEndpoint>(endpoint: E, payload: unknown, onSalvage: HubClientOptions['onSalvage']): HubResponse<E> {
+    if (typeof endpoint.response === 'string') return undefined as HubResponse<E>
+    const { data, dropped } = readSalvaging(endpoint.response as ResponseSchema, payload)
+    if (dropped.length) onSalvage?.(`${endpoint.method} ${endpoint.path}`, dropped)
+    return data as HubResponse<E>
 }
 
 type ConditionalReader = ReturnType<typeof createConditionalReader>
 
 // A read of the registry the app may already hold: the answer read with its schema, or a null
 // `payload` when the hub said it is still the one named by `etag`.
-export function createConditionalHubReader(read: ConditionalReader) {
+export function createConditionalHubReader(read: ConditionalReader, { onSalvage }: HubClientOptions = {}) {
     return async function hubConditional<E extends JsonEndpoint>(endpoint: E, call: HubCall<E> & { etag: string | null }): Promise<ConditionalRead<HubResponse<E>>> {
         const { params, query, accessToken, workspaceId, etag } = call as AnyCall & { etag: string | null }
         const answer = await read<unknown>(hubPath(endpoint, (params ?? {}) as HubPathParams<E>, query), { accessToken, workspaceId, etag })
-        const payload = answer.payload === null || typeof endpoint.response === 'string' ? null : ((endpoint.response as Parser).parse(answer.payload) as HubResponse<E>)
+        const payload = answer.payload === null ? null : readAnswer(endpoint, answer.payload, onSalvage)
         return { ...answer, payload }
     }
 }
@@ -142,6 +150,14 @@ export const clientHeader = formatClientHeader({ platform: clientPlatform, versi
 
 const api = createApiClient({ baseUrl: environment.apiUrl, clientHeader })
 
-export const hub = createHubClient(api)
+const salvage: HubClientOptions = {
+    onSalvage: (call, dropped) => {
+        console.warn(`[hub] ${call}: left out ${dropped.join(', ')}`)
+        // Loaded only then: the client stays clear of the analytics SDK it seldom needs.
+        void import('@/lib/analytics').then(({ track }) => track('api_answer_salvaged', { call, dropped: dropped.length }))
+    },
+}
 
-export const hubConditional = createConditionalHubReader(createConditionalReader({ baseUrl: environment.apiUrl, clientHeader }))
+export const hub = createHubClient(api, salvage)
+
+export const hubConditional = createConditionalHubReader(createConditionalReader({ baseUrl: environment.apiUrl, clientHeader }), salvage)

@@ -108,6 +108,13 @@ describe('createHubClient', () => {
         await expect(hub(mobileApi.getActiveRun, { params: { id: 'c-1' } })).rejects.toThrow()
     })
 
+    it('leaves out what this build cannot read, and says so', async () => {
+        const { request } = clientAnswering(json([{ id: 'a1', name: 'Scout', handle: null, description: null, templateId: null, status: 'hibernating', workspaceId: 7, spaceId: 's1', disabledAt: null, disabledReason: null }]))
+        const salvaged = jest.fn()
+        await expect(createHubClient(request, { onSalvage: salvaged })(mobileApi.listAgents, {})).resolves.toEqual([])
+        expect(salvaged).toHaveBeenCalledWith('GET /api/v1/agents', ['0'])
+    })
+
     it('reads nothing from a call whose answer the app ignores', async () => {
         const { hub } = hubAnswering(json({ released: { workspace: 1 } }))
         await expect(hub(mobileApi.deleteAiConnection, { params: { id: 'cnx-1' } })).resolves.toBeUndefined()
