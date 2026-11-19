@@ -46,7 +46,9 @@ MAX_QUESTIONS = 3
 REVIEW_FAILS = 2
 
 WEIGHTS = {"P0": 8, "P1": 4, "P2": 2, "P3": 1}
-SKIP = frozenset(("factory", "factory-plan", "factory-question", "factory-done", "factory-blocked", "factory-unsolvable", "likely-fixed", "duplicate"))
+SKIP = frozenset(("factory", "factory-plan", "factory-question", "factory-done", "factory-blocked", "factory-unsolvable", "likely-fixed", "duplicate",
+                  "factory-paused"))
+TOKENS = "tokens"
 
 
 def names(issue):
@@ -59,7 +61,7 @@ def weight(issue):
 
 def unplanned(issues):
     kept = [i for i in issues if weight(i) > 0 and not names(i) & SKIP]
-    return sorted(kept, key=lambda i: (-weight(i), i.get("createdAt") or "", i["number"]))
+    return sorted(kept, key=lambda i: (TOKENS not in names(i), -weight(i), i.get("createdAt") or "", i["number"]))
 
 
 def brief_lines(issue, repo):
@@ -1096,7 +1098,7 @@ class Station:
         if queued >= self.cfg.get("planning", {}).get("max_queue", MAX_QUEUE):
             return
         issues = json.loads(self.gh(["issue", "list", "-R", self.repo, "--state", "open", "--json",
-                                     "number,title,labels,createdAt", "--limit", "100"]))
+                                     "number,title,labels,createdAt", "--limit", "1000"]))
         records = self.records()
         held = bool(self.cfg.get("held"))
         if held != self.held:
