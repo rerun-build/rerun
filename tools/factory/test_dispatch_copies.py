@@ -60,6 +60,11 @@ class Copies(unittest.TestCase):
         self.assertIn("`timeoutMs` set above the default of 120000", b)
         self.assertIn("never chain them with the commit or `pr-open`", b)
 
+    def test_the_replan_brief_runs_issuecheck_before_saving(self):
+        b = D.replan_brief({"issue": 7, "title": "Fix x", "reason": "r"}, "o/r", 1)
+        self.assertIn("tools/factory/issuecheck.py", b)
+        self.assertIn("save only when it prints OK", b)
+
     def test_the_briefs_say_where_a_file_outside_the_change_goes(self):
         j = {"issue": 1, "title": "t", "round": 1}
         for b in (D.build_brief(j), D.fix_brief(j, 3, "no")):
