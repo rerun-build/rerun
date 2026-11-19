@@ -1,6 +1,7 @@
 import unittest
 
 import cutshape
+import test_dispatch
 
 FORM = """PLAN READY (cut of #1; facts read on dev 4296d1f)
 
@@ -24,6 +25,15 @@ def issue(n, deps_line, extra=""):
 
 
 class CutShape(unittest.TestCase):
+    def test_the_narrower_worker_types_are_read_and_others_refused(self):
+        body = test_dispatch.ready()
+        for w in ("security", "data", "contracts"):
+            p = cutshape.parse({"number": 5, "body": body.replace("**Worker**: coder", "**Worker**: " + w)})
+            self.assertEqual(p["worker"], w)
+            self.assertEqual([e for e in p["errors"] if e.startswith("worker:")], [])
+        p = cutshape.parse({"number": 5, "body": body.replace("**Worker**: coder", "**Worker**: tester")})
+        self.assertIn("worker: 'tester' is not one of coder, reviewer, researcher, designer, security, data, contracts", p["errors"])
+
     def test_number_on_the_next_line_is_unreadable(self):
         p = cutshape.parse(issue(5, "**Depends on**:\n#3"))
         self.assertEqual(p["deps"], [])

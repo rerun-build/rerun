@@ -19,7 +19,7 @@ class Flow(unittest.TestCase):
         ]
         self.assertEqual(flow.beat_text(jobs, {}, TODAY),
                          "by type: coder ready 0 running 1 waiting 0, reviewer ready 1 running 0 waiting 0, "
-                         "researcher ready 0 running 0 waiting 1, designer ready 0 running 0 waiting 0 "
+                         "researcher ready 0 running 0 waiting 1, designer ready 0 running 0 waiting 0, security ready 0 running 0 waiting 0, data ready 0 running 0 waiting 0, contracts ready 0 running 0 waiting 0 "
                          "| features: #9 1/3 convergence waiting")
 
     def test_convergence_passed_and_due(self):
@@ -29,10 +29,10 @@ class Flow(unittest.TestCase):
 
     def test_no_jobs(self):
         empty_types = ("by type: coder ready 0 running 0 waiting 0, reviewer ready 0 running 0 waiting 0, "
-                       "researcher ready 0 running 0 waiting 0, designer ready 0 running 0 waiting 0")
+                       "researcher ready 0 running 0 waiting 0, designer ready 0 running 0 waiting 0, security ready 0 running 0 waiting 0, data ready 0 running 0 waiting 0, contracts ready 0 running 0 waiting 0")
         self.assertEqual(flow.beat_text([], {}, TODAY), empty_types + " | features: none")
         self.assertEqual(flow.by_type([]), {t: {"ready": 0, "running": 0, "waiting": 0}
-                                            for t in ("coder", "reviewer", "researcher", "designer")})
+                                            for t in ("coder", "reviewer", "researcher", "designer", "security", "data", "contracts")})
         self.assertEqual(flow.by_feature([], {}, TODAY), [])
 
     def test_an_odd_record_counts_without_an_error(self):

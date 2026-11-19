@@ -1,6 +1,6 @@
 import re
 
-WORKERS = ("coder", "reviewer", "researcher", "designer")
+WORKERS = ("coder", "reviewer", "researcher", "designer", "security", "data", "contracts")
 _DEP = re.compile(r"^\s*\*\*Depends on(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _PART = re.compile(r"^\s*\*\*Part of(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)
 _WORKER = re.compile(r"^\s*\*\*Worker(?:\*\*\s*:|\s*:\s*\*\*)(.*)$", re.I)

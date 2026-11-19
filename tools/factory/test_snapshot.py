@@ -1,4 +1,4 @@
-import json, os, sys, tempfile, unittest, unittest.mock
+import json, os, re, sys, tempfile, unittest, unittest.mock
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import snapshot
 import store as ledger_store
@@ -109,6 +109,18 @@ class Snapshot(unittest.TestCase):
         self.assertNotIn("closedOutside", j[6])
         json.dumps(snap)
 
+
+    def test_the_snapshot_types_are_the_worker_types_of_the_contract(self):
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "packages", "contracts", "src", "factory-snapshot.ts")
+        text = open(path, encoding="utf-8").read()
+        inner = re.search(r"factoryWorkerTypeSchema = z\.enum\(\[([^\]]*)\]\)", text).group(1)
+        self.assertEqual(re.findall(r"'([^']+)'", inner), list(snapshot.TYPES))
+
+    def test_a_pool_of_a_narrower_type_is_left_out_of_the_snapshot(self):
+        cfg = {"repo": "o/r", "types": {"coder": {"max_jobs": 8, "coworkers": [{"id": "b1", "name": "CODE", "runs": 1}]},
+                                        "security": {"max_jobs": 1, "coworkers": [{"id": "s1", "name": "BRUCE", "runs": 1}]}}}
+        snap = snapshot.build_snapshot(self.st, cfg, NOW, None)
+        self.assertEqual([p["type"] for p in snap["pools"]], ["coder"])
 
 if __name__ == "__main__":
     unittest.main()
