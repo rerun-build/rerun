@@ -67,7 +67,11 @@ async function statusLine(name, url, key) {
     const mtime = statSync(join(config.checkouts, name, '.git', 'FETCH_HEAD')).mtimeMs;
     age = `${Math.floor(Math.max(0, Date.now() - mtime) / 3600000)}h ago`;
   } catch {}
-  return [`${name} up ready ${files[1]} files fetched ${age}`, true];
+  const w = /^Watcher: ([a-z-]+)/m.exec(first);
+  if (w && w[1] === 'starting') return [`${name} up loading`, false];
+  const field = !w ? 'watching unknown' : w[1] === 'active' ? 'watching' : 'not watching';
+  const ok = !w || w[1] === 'active';
+  return [`${name} up ready ${files[1]} files ${field} fetched ${age}`, ok];
 }
 
 if (statusMode) {

@@ -8,8 +8,8 @@ import unittest
 
 from test_code_q import CODE_Q, Stub, text
 
-READY = "Status: Ready\nFiles:  4789 indexed (4712 parsed, 77 partial, 0 failed)"
-READY_LINE = "alpha up ready 4789 files fetched 2h ago"
+READY = "Status: Ready\nFiles:  4789 indexed (4712 parsed, 77 partial, 0 failed)\nWatcher: active (idle; event-driven, waiting for filesystem changes, debounce: 200ms)"
+READY_LINE = "alpha up ready 4789 files watching fetched 2h ago"
 
 
 @unittest.skipIf(shutil.which("node") is None, "no node")
@@ -74,6 +74,21 @@ class CodeQStatus(unittest.TestCase):
         code, lines = self.status({"alpha": s.url, "beta": dead_url})
         self.assertEqual(lines, [READY_LINE, "beta down"])
         self.assertEqual(code, 1)
+
+    def test_watcher_states(self):
+        base = "Status: Ready\nFiles:  4789 indexed (4712 parsed, 77 partial, 0 failed)\n"
+        self.fetched("alpha", 7300)
+        cases = [
+            ("Watcher: degraded (event stream failed after 3 processed events, overflows: 0, reconcile repairs: 0)", (1, ["alpha up ready 4789 files not watching fetched 2h ago"])),
+            ("Watcher: local-fallback (no watcher attached; daemon proxy unavailable)", (1, ["alpha up ready 4789 files not watching fetched 2h ago"])),
+            ("Watcher: off", (1, ["alpha up ready 4789 files not watching fetched 2h ago"])),
+            ("Watcher: starting (registering filesystem watch; index will stay fresh once the watch is registered)", (1, ["alpha up loading"])),
+            ("", (0, ["alpha up ready 4789 files watching unknown fetched 2h ago"])),
+        ]
+        for w, expected in cases:
+            with self.subTest(watcher=w):
+                s = self.stub([text(base + w)])
+                self.assertEqual(self.status({"alpha": s.url}), expected)
 
     def test_loading_and_refused_key(self):
         a = self.stub([text("Index is loading, try again")])
