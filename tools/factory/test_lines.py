@@ -27,8 +27,9 @@ class Pair(Base):
 
     def new(self):
         clock = lambda: self.w.clock
-        return L.Lines(self.cfg, None, None, now=clock, make=lambda c: D.Dispatcher(
-            c, self.worlds[c["repo"]].account, self.worlds[c["repo"]].gh, now=clock))
+        with contextlib.redirect_stdout(self.out):
+            return L.Lines(self.cfg, None, None, now=clock, make=lambda c: D.Dispatcher(
+                c, self.worlds[c["repo"]].account, self.worlds[c["repo"]].gh, now=clock))
 
     def start(self, passed=True):
         self.d = self.new()
@@ -201,6 +202,43 @@ class Two(Pair):
         self.assertRegex(first["at"], r"^\d{4}-\d\d-\d\dT")
         self.assertEqual(self.w.reports[-1]["switch"]["repo"], "o/r")
         self.assertEqual(len(self.lines_said("#project o/r -> p/q by rob@example.com; finishing")), 1)
+
+    def test_a_kill_between_the_project_and_its_events_row_is_repaired_at_the_restart(self):
+        self.start()
+        self.select("p/q")
+        self.tick(2)
+        self.w.report_answer = self.p.report_answer = None
+        self.close()
+        db = sqlite3.connect(self.cfg["ledger_file"])
+        db.execute("DELETE FROM events WHERE key='project'")
+        db.commit()
+        db.close()
+        self.tick(2, fresh=True)
+        self.tick(2, fresh=True)
+        self.assertEqual(self.d.active, "p/q")
+        kv = self.w.rows("SELECT v FROM kv WHERE job='-' AND k='project'")[0][0]
+        rows = self.w.rows("SELECT old, new FROM events WHERE key='project'")
+        self.assertEqual([(json.loads(a), json.loads(b)) for a, b in rows], [("o/r", kv)])
+        self.assertEqual(len(self.lines_said("the switch to p/q had no events row; it is written now")), 1)
+
+    def test_a_home_ledger_of_another_project_stops_the_start_and_leaves_the_store_closed(self):
+        s = S.Store(self.cfg["ledger_file"])
+        s.claim("a/b", "a/b")
+        s.close()
+        with self.assertRaises(S.Refused) as got:
+            self.new()
+        self.assertEqual(str(got.exception), "the ledger ledger.db belongs to a/b, not to o/r")
+        S.Store(self.cfg["ledger_file"]).close()
+        self.assertEqual(self.w.sends, [])
+
+    def test_who_made_the_switch_is_one_printable_line_of_at_most_100_characters(self):
+        self.start()
+        self.select("p/q", by="rob\n2026-11-19T00:00:00Z #- forged\x00" + "x" * 200)
+        self.tick(3)
+        saved = json.loads(self.w.rows("SELECT v FROM kv WHERE job='-' AND k='project'")[0][0])
+        self.assertEqual(saved["by"], ("rob 2026-11-19T00:00:00Z #- forged " + "x" * 200)[:100])
+        self.assertEqual(len(self.lines_said("forged")), 1)
+        self.assertEqual(self.lines_said("forged"), self.lines_said("#project o/r -> p/q by rob 2026"))
 
     def test_the_dispatcher_started_by_main_is_the_lines_with_main_s_own_module(self):
         seen = []

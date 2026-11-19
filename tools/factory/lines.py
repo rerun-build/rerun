@@ -43,6 +43,7 @@ class Lines:
                     self.problem("project %s not opened: %s" % (repo, e if isinstance(e, RuntimeError) else type(e).__name__))
         if saved.get("repo") in self.lines:
             self.active, self.last = saved["repo"], saved
+            self.mend()
         self.roles()
 
     def read(self, key, default):
@@ -51,6 +52,12 @@ class Lines:
         except ValueError:
             return default
         return got if isinstance(got, type(default)) else default
+
+    def mend(self):
+        raw = self.kv.get_all("-").get("project")
+        if not any(e["key"] == "project" and e["to"] == raw for e in self.kv.events()):
+            self.kv.add_event("project", self.last.get("from"), raw)
+            self.problem("project: the switch to %s had no events row; it is written now" % self.active)
 
     def open(self, repo):
         self.lines[repo] = self.make(line_cfg(self.cfg, repo))
@@ -106,7 +113,7 @@ class Lines:
         except Exception as e:
             return self.problem("project %s not taken: %s; the factory stays on %s" % (repo, e if isinstance(e, RuntimeError) else type(e).__name__, self.active))
         old, self.active = self.active, repo
-        self.last = {"repo": repo, "from": old, "by": str(p.get("by") or "")[:100], "at": self.mod.iso(self.now())}
+        self.last = {"repo": repo, "from": old, "by": "".join(c if c.isprintable() else " " for c in str(p.get("by") or ""))[:100], "at": self.mod.iso(self.now())}
         self.roles()
         self.kv.set("-", "project", json.dumps(self.last))
         self.kv.add_event("project", old, json.dumps(self.last))
