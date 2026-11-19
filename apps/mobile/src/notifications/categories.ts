@@ -1,17 +1,20 @@
 import { PUSH_ACTIONS, PUSH_CATEGORIES } from '@rerun/contracts'
 import * as Notifications from 'expo-notifications'
+import { Platform } from 'react-native'
 
 import { translatorFor } from '@/i18n/translator'
 
-// Every answer asks for Face ID first: a lock screen is in anyone's hands, and an approval or a line
-// sent to a coworker acts in the person's name. Open is the only button that brings the app up.
-const IN_PLACE = { opensAppToForeground: false, isAuthenticationRequired: true, isDestructive: false }
+// No answer leaves a locked phone: a lock screen is in anyone's hands, and an approval or a line sent
+// to a coworker acts in the person's name. iOS asks for Face ID and answers without opening the app.
+// Android has no such guard on a button, so there it opens the app, which the system only does once
+// the phone is unlocked, and the answer leaves from the open app.
+const IN_PLACE = { opensAppToForeground: Platform.OS === 'android', isAuthenticationRequired: true, isDestructive: false }
 const OPENS_APP = { opensAppToForeground: true, isAuthenticationRequired: false, isDestructive: false }
 
 const IN_PLACE_ACTIONS: ReadonlySet<string> = new Set([PUSH_ACTIONS.approve, PUSH_ACTIONS.deny, PUSH_ACTIONS.reply])
 
-// A button that answers without opening the app. A tap on the push itself, or on Open, is the
-// routing's to handle.
+// A button that answers without opening a conversation. A tap on the push itself, or on Open, is
+// the routing's to handle.
 export function answersInPlace(response: Notifications.NotificationResponse): boolean {
     return IN_PLACE_ACTIONS.has(response.actionIdentifier)
 }

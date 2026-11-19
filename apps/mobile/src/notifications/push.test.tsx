@@ -163,7 +163,7 @@ describe('push registration', () => {
         const categories = Object.fromEntries(mockSetCategory.mock.calls.map(([id, actions]) => [id, (actions as { identifier: string; buttonTitle: string; options: { opensAppToForeground: boolean; isAuthenticationRequired: boolean } }[]).map(action => `${action.identifier}:${action.buttonTitle}`)]))
         expect(categories).toEqual({ 'rerun.approval': ['approve:Approve', 'deny:Deny', 'open:Open'], 'rerun.question': ['reply:Answer', 'open:Open'], 'rerun.reply': ['reply:Reply'] })
         const approve = (mockSetCategory.mock.calls.find(([id]) => id === 'rerun.approval')![1] as { options: object }[])[0]
-        expect(approve.options).toMatchObject({ opensAppToForeground: false, isAuthenticationRequired: true })
+        expect(approve.options).toMatchObject({ opensAppToForeground: Platform.OS === 'android', isAuthenticationRequired: true })
     })
 
     it('drops the token on sign-out', async () => {
