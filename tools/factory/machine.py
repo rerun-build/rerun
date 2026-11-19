@@ -16,6 +16,8 @@ TOKEN = re.compile(r"gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-
 MADE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2})$")
 NOT_ASCII = re.compile(r"[^ -~]")
 OVER = "keeper file over %d bytes" % MAX_BYTES
+SILENT = "keeper silent"
+HOW = "The keeper timer on the host writes /var/lib/rerun-keeper/machine.json every 5 minutes (deploy/vps/keeper.sh); see it with: systemctl list-timers rerun-keeper.timer"
 
 
 def path():
@@ -143,3 +145,12 @@ def load(now, p):
             r["value"], r["reason"] = None, STALE
         block.update(engine="unknown", skippedTicks=0, housekeeping=[])
     return fit(block)
+
+
+def alarm(m):
+    if not isinstance(m, dict) or m["fresh"]:
+        return {}
+    if m["fileAgeS"] is None:
+        return {SILENT: "no keeper file: %s. %s" % (m["readings"][0]["reason"], HOW)}
+    return {SILENT: "keeper file made %s, older than %d s: every keeper value shows as unknown. %s" % (
+        m["fileMadeAt"] or "at an unknown time", STALE_S, HOW)}

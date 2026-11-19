@@ -5,6 +5,7 @@ import re
 import clocks
 import holds
 import inboxsort
+import machine
 import pools
 import problems
 import snapshot
@@ -18,7 +19,7 @@ OWNER = "owner"
 POOL = "resolver"
 KINDS = ("dev red", "idle line", "repeating error", "dead", "unreadable", "ended", "checkout failed", "no room")
 SYSTEMIC = KINDS[1:3]
-NOTICE = (inboxsort.ALARM,)
+NOTICE = (inboxsort.ALARM, machine.SILENT)
 NEW_MAX = 10
 OPEN_MAX = 30
 CLEAR_BEATS = 3
@@ -116,6 +117,7 @@ class Resolver:
         held = holds.active(d.store, d.now()) is not None
         self.found = self.watch.find(jobs, d.refused, self.open_issues, line, d.now(), heard, since, held, d.no_room())
         self.found.update(inboxsort.alarm(d.store.get_all("-")))
+        self.found.update(machine.alarm(getattr(d, "machine", None)))
         self.tickets(d, self.found, resolve)
         if resolve:
             self.station(d, self.found)
