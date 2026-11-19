@@ -284,5 +284,14 @@
         "silent": "Bu kayıtta hiçbir şey duyulmadı.",
         "transcript": "Döküm",
         "waitingForMicrophone": "Mikrofon bekleniyor…"
+    },
+    "browser": {
+        "close": "Kapat",
+        "reload": "Yeniden yükle",
+        "pageActions": "{host} için işlemler",
+        "share": "Paylaş",
+        "openInBrowser": "Tarayıcıda aç",
+        "copyLink": "Bağlantıyı kopyala",
+        "backToChat": "Sohbete dön"
     }
 }

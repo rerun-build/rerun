@@ -284,5 +284,14 @@
         "silent": "Rien n'a été entendu dans cet enregistrement.",
         "transcript": "Transcription",
         "waitingForMicrophone": "En attente du micro…"
+    },
+    "browser": {
+        "close": "Fermer",
+        "reload": "Recharger",
+        "pageActions": "Actions pour {host}",
+        "share": "Partager",
+        "openInBrowser": "Ouvrir dans le navigateur",
+        "copyLink": "Copier le lien",
+        "backToChat": "Revenir à la conversation"
     }
 }

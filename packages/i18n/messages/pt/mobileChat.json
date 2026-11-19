@@ -284,5 +284,14 @@
         "silent": "Não deu para ouvir nada nessa gravação.",
         "transcript": "Transcrição",
         "waitingForMicrophone": "Aguardando o microfone…"
+    },
+    "browser": {
+        "close": "Fechar",
+        "reload": "Recarregar",
+        "pageActions": "Ações para {host}",
+        "share": "Compartilhar",
+        "openInBrowser": "Abrir no navegador",
+        "copyLink": "Copiar link",
+        "backToChat": "Voltar à conversa"
     }
 }

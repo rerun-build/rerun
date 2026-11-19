@@ -32,6 +32,9 @@ const SYSTEM_SYMBOLS = {
     camera: 'camera',
     folder: 'folder',
     book: 'book',
+    share: 'square.and.arrow.up',
+    globe: 'globe',
+    copy: 'doc.on.doc',
 } as const satisfies Partial<Record<IconName, SystemSymbol>>
 
 export type SystemSymbolIcon = keyof typeof SYSTEM_SYMBOLS
