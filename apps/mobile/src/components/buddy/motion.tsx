@@ -12,10 +12,13 @@ const AnimatedRect = Animated.createAnimatedComponent(Rect)
 // list of them never bobs nor blinks in step.
 const Clock = createContext<SharedValue<number> | null>(null)
 
-export function BuddyClock({ children }: { children: ReactNode }) {
+// `resting`: true while the buddies under this clock are out of sight (a screen covered by another):
+// the clock stands still, and nothing drawn from it moves on the UI thread.
+export function BuddyClock({ children, resting }: { children: ReactNode; resting?: SharedValue<boolean> }) {
     const seconds = useSharedValue(0)
     const reducedMotion = useReducedMotion()
     useFrameCallback(frame => {
+        if (resting?.value) return
         seconds.value = frame.timeSinceFirstFrame / 1000
     }, !reducedMotion)
     return <Clock value={reducedMotion ? null : seconds}>{children}</Clock>

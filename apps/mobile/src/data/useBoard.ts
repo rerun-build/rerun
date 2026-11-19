@@ -13,6 +13,23 @@ type Board = { state: 'loading' } | { state: 'error' } | { state: 'ready'; cowor
 
 const boardOf = ({ agents, overview, boxes }: BoardRead, fresh: boolean): Board => ({ state: 'ready', coworkers: toHomeCoworkers(agents, overview), boxes, fresh })
 
+// Realtime takes at most this many values in an `in` filter; a larger workspace hears every session.
+const FILTERED_AGENTS_MAX = 100
+
+// The sessions of the Home's coworkers only, rather than every session the caller may read: a busy
+// workspace's runs elsewhere no longer wake the Home. A new coworker changes the agents first, which
+// opens a channel that names it.
+export function sessionsFilterOf(agentIds: readonly string[]): string | undefined {
+    if (agentIds.length === 0 || agentIds.length > FILTERED_AGENTS_MAX) return undefined
+    return `agent_id=in.(${[...agentIds].sort().join(',')})`
+}
+
+function digestOf(text: string): string {
+    let hash = 5381
+    for (let index = 0; index < text.length; index++) hash = ((hash * 33) ^ text.charCodeAt(index)) | 0
+    return (hash >>> 0).toString(36)
+}
+
 // The coworkers of the active workspace with their latest conversation, read again whenever an agent
 // or a session changes in Realtime, and when the app comes back to the foreground, where Realtime
 // may have missed what happened while iOS held the app. A workspace already read opens on its rows,
@@ -31,14 +48,16 @@ export function useBoard(): Board & { reload: () => void } {
     // The coworker list can be mounted twice for a moment (the Home leaving the stack as the sidebar of a
     // wide window takes over): supabase.channel() hands back the instance of a topic already taken.
     const channelId = useId()
+    const agentIds = useMemo(() => read.value?.agents.map(agent => agent.id) ?? [], [read.value])
+    const sessionsFilter = sessionsFilterOf(agentIds)
     useLiveReload(
-        workspaceId ? `home:${workspaceId}:${userId ?? ''}:${channelId}` : null,
+        workspaceId ? `home:${workspaceId}:${userId ?? ''}:${digestOf(sessionsFilter ?? '')}:${channelId}` : null,
         (channel, changed) => {
             channel
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'agents', filter: `workspace_id=eq.${workspaceId}` }, changed)
                 // A delete only carries the primary key, so the workspace filter above never lets one through.
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'agents' }, changed)
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions' }, changed)
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions', ...(sessionsFilter ? { filter: sessionsFilter } : {}) }, changed)
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'spaces', filter: `workspace_id=eq.${workspaceId}` }, changed)
             // A Box named to the caller or taken back from them: its coworkers appear or leave the home.
             if (userId) channel.on('postgres_changes', { event: '*', schema: 'public', table: 'space_members', filter: `user_id=eq.${userId}` }, changed)

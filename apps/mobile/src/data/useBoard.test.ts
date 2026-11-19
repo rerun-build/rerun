@@ -6,7 +6,7 @@ import { cachedBoard, clearLocalCache } from '@/data/local-cache'
 import { BURST_MS } from '@/data/useLiveReload'
 import { realtime } from '@/test/realtime'
 
-import { useBoard } from './useBoard'
+import { sessionsFilterOf, useBoard } from './useBoard'
 
 const mockFetchBoard = jest.fn<Promise<BoardRead>, []>()
 
@@ -30,6 +30,32 @@ describe('useBoard', () => {
         await renderHook(() => useBoard())
         await act(async () => {})
         expect(realtime.live().flatMap(channel => channel.bindings)).toContainEqual(expect.objectContaining({ table: 'space_members', filter: 'user_id=eq.u1' }))
+    })
+
+    it('hears the sessions of its own coworkers only', async () => {
+        mockFetchBoard.mockResolvedValue(boardWith(agent('a2', 'Writer'), agent('a1', 'Scout')))
+        await renderHook(() => useBoard())
+        await act(async () => {})
+        const sessions = realtime.live().flatMap(channel => channel.bindings).filter(binding => binding.table === 'sessions')
+        expect(sessions.at(-1)).toEqual(expect.objectContaining({ filter: 'agent_id=in.(a1,a2)' }))
+    })
+
+    it('hears every session past what one filter can name, and none for an empty board', () => {
+        expect(sessionsFilterOf([])).toBeUndefined()
+        expect(sessionsFilterOf(Array.from({ length: 101 }, (_, index) => `a${index}`))).toBeUndefined()
+        expect(sessionsFilterOf(['b', 'a'])).toBe('agent_id=in.(a,b)')
+    })
+
+    // A run moving elsewhere reads the board again: an answer that changed nothing draws nothing.
+    it('keeps the same rows when the hub says the same again', async () => {
+        mockFetchBoard.mockResolvedValue(boardWith(agent('a1', 'Scout')))
+        const { result } = await renderHook(() => useBoard())
+        await act(async () => {})
+        const rows = result.current.state === 'ready' ? result.current.coworkers : null
+        await act(async () => result.current.reload())
+        await act(async () => {})
+        expect(mockFetchBoard).toHaveBeenCalledTimes(2)
+        expect(result.current.state === 'ready' && result.current.coworkers).toBe(rows)
     })
 
     it('opens on the rows kept from the last visit, then on the hub copy', async () => {

@@ -120,7 +120,8 @@ function App() {
                             <SplitShell enabled={signedIn}>
                                 <Stack screenOptions={{ headerShown: false }}>
                                     <Stack.Protected guard={signedIn} redirectTo="/sign-in">
-                                        <Stack.Screen name="index" />
+                                        {/* Under a conversation, the Home does not draw again until it is back. */}
+                                        <Stack.Screen name="index" options={{ freezeOnBlur: true }} />
                                         <Stack.Screen name="chat/[id]" />
                                         <Stack.Screen name="search" options={{ animation: 'fade' }} />
                                         <Stack.Screen name="coworker/[id]/index" />

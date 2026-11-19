@@ -1,12 +1,13 @@
 import { FOREMAN_AGENT_ID, sectionsByBox, withPinned } from '@rerun/contracts'
-import { router, useGlobalSearchParams, usePathname, type Href } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { router, useFocusEffect, useGlobalSearchParams, usePathname, type Href } from 'expo-router'
+import { useCallback, useEffect, useState } from 'react'
 import { Pressable, ScrollView, View } from 'react-native'
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated'
+import Animated, { FadeIn, FadeOut, useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
 import { useAuth } from '@/auth/AuthProvider'
+import { BuddyClock } from '@/components/buddy/motion'
 import { coworkerEndpoints } from '@/chat/endpoints'
 import { preloadGenerals } from '@/chat/preload'
 import { foremanOnBoard, lineOf, minutesSince, moodStatus, recentCoworkers, type HomeCoworker } from '@/components/home/board'
@@ -56,6 +57,17 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const [collapsed, setCollapsed] = useState<string[]>([])
     const fill = useBootFill(board.state === 'ready')
     const t = useTranslations('mobileHome')
+
+    // A conversation pushed over the Home covers its buddies: they stand still until it is back.
+    const covered = useSharedValue(false)
+    useFocusEffect(
+        useCallback(() => {
+            covered.set(false)
+            return () => {
+                covered.set(true)
+            }
+        }, [covered])
+    )
 
     const pathname = usePathname()
     const { to } = useGlobalSearchParams<{ to?: string }>()
@@ -115,86 +127,88 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const headerHeight = insets.top + spacing.sm + GLASS_BUTTON_SIZE
 
     return (
-        <View style={{ flex: 1, backgroundColor: theme.background }}>
-            <ScrollView scrollEnabled={!reordering} contentContainerStyle={{ paddingTop: headerHeight + spacing.xl, paddingBottom: insets.bottom + 120, paddingLeft: pane.left, paddingRight: pane.right }} contentInsetAdjustmentBehavior="never">
-                {board.state === 'loading' && <HomeSkeleton />}
+        <BuddyClock resting={covered}>
+            <View style={{ flex: 1, backgroundColor: theme.background }}>
+                <ScrollView scrollEnabled={!reordering} contentContainerStyle={{ paddingTop: headerHeight + spacing.xl, paddingBottom: insets.bottom + 120, paddingLeft: pane.left, paddingRight: pane.right }} contentInsetAdjustmentBehavior="never">
+                    {board.state === 'loading' && <HomeSkeleton />}
 
-                {board.state === 'error' && (
-                    <View style={{ alignItems: 'flex-start', gap: spacing.md, paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
-                        <AppText variant="callout" tone="muted">
-                            {t('loadFailed')}
-                        </AppText>
-                        <PillButton label={t('retry')} variant="secondary" onPress={board.reload} />
-                    </View>
-                )}
+                    {board.state === 'error' && (
+                        <View style={{ alignItems: 'flex-start', gap: spacing.md, paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
+                            <AppText variant="callout" tone="muted">
+                                {t('loadFailed')}
+                            </AppText>
+                            <PillButton label={t('retry')} variant="secondary" onPress={board.reload} />
+                        </View>
+                    )}
 
-                <View>
-                    {pinned.length > 0 && (
-                        <Animated.View layout={layout} entering={fill.playing ? fill.rowEntering(0) : undefined} style={{ marginTop: spacing.md, marginBottom: spacing.lg }}>
-                            {reordering && (
-                                <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: HOME_GUTTER, paddingVertical: spacing.sm }}>
-                                    <AppText variant="footnote" tone="muted" medium style={{ flex: 1 }}>
-                                        {t('pinned.dragToReorder')}
-                                    </AppText>
-                                    <Pressable onPress={() => setReordering(false)} accessibilityRole="button" hitSlop={10}>
-                                        <AppText variant="footnote" medium style={{ color: theme.foreground }}>
-                                            {t('pinned.done')}
+                    <View>
+                        {pinned.length > 0 && (
+                            <Animated.View layout={layout} entering={fill.playing ? fill.rowEntering(0) : undefined} style={{ marginTop: spacing.md, marginBottom: spacing.lg }}>
+                                {reordering && (
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: HOME_GUTTER, paddingVertical: spacing.sm }}>
+                                        <AppText variant="footnote" tone="muted" medium style={{ flex: 1 }}>
+                                            {t('pinned.dragToReorder')}
                                         </AppText>
-                                    </Pressable>
-                                </View>
-                            )}
-                            {reordering ? (
-                                <View style={{ paddingHorizontal: HOME_GUTTER }}>
-                                    <SortableGrid items={pinned} columns={cell.columns} cellWidth={cell.width} renderCell={coworker => <PinnedAvatar coworker={coworker} cell={cell} animated={false} />} onReorder={pins.reorder} />
-                                </View>
-                            ) : (
-                                <PinnedGrid coworkers={pinned} onOpen={open} onUnpin={coworker => pins.unpin(coworker.id)} onDetails={coworker => router.push({ pathname: '/coworker/[id]', params: { id: coworker.id, name: coworker.name } })} onEdit={pinned.length > 1 ? () => setReordering(true) : undefined} />
-                            )}
-                        </Animated.View>
-                    )}
+                                        <Pressable onPress={() => setReordering(false)} accessibilityRole="button" hitSlop={10}>
+                                            <AppText variant="footnote" medium style={{ color: theme.foreground }}>
+                                                {t('pinned.done')}
+                                            </AppText>
+                                        </Pressable>
+                                    </View>
+                                )}
+                                {reordering ? (
+                                    <View style={{ paddingHorizontal: HOME_GUTTER }}>
+                                        <SortableGrid items={pinned} columns={cell.columns} cellWidth={cell.width} renderCell={coworker => <PinnedAvatar coworker={coworker} cell={cell} animated={false} />} onReorder={pins.reorder} />
+                                    </View>
+                                ) : (
+                                    <PinnedGrid coworkers={pinned} onOpen={open} onUnpin={coworker => pins.unpin(coworker.id)} onDetails={coworker => router.push({ pathname: '/coworker/[id]', params: { id: coworker.id, name: coworker.name } })} onEdit={pinned.length > 1 ? () => setReordering(true) : undefined} />
+                                )}
+                            </Animated.View>
+                        )}
 
-                    {board.state === 'ready' && !foremanPinned && (
-                        <Animated.View key="foreman" layout={layout} entering={fill.playing ? fill.rowEntering(0) : FadeIn.duration(180)} exiting={FadeOut.duration(120)}>
-                            <ForemanRow last={foreman} selected={openAgentId === FOREMAN_AGENT_ID} onPress={openForeman} pin={{ pinned: false, onToggle: () => pins.pin(FOREMAN_AGENT_ID) }} />
-                        </Animated.View>
-                    )}
+                        {board.state === 'ready' && !foremanPinned && (
+                            <Animated.View key="foreman" layout={layout} entering={fill.playing ? fill.rowEntering(0) : FadeIn.duration(180)} exiting={FadeOut.duration(120)}>
+                                <ForemanRow last={foreman} selected={openAgentId === FOREMAN_AGENT_ID} onPress={openForeman} pin={{ pinned: false, onToggle: () => pins.pin(FOREMAN_AGENT_ID) }} />
+                            </Animated.View>
+                        )}
 
-                    {board.state === 'ready' && board.coworkers.length === 0 && (
-                        <AppText variant="callout" tone="muted" style={{ paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
-                            {t('empty')}
-                        </AppText>
-                    )}
+                        {board.state === 'ready' && board.coworkers.length === 0 && (
+                            <AppText variant="callout" tone="muted" style={{ paddingHorizontal: HOME_GUTTER, paddingTop: spacing.lg }}>
+                                {t('empty')}
+                            </AppText>
+                        )}
 
-                    {recent.map((coworker, index) => (
-                        <Animated.View key={`recent:${coworker.id}`} layout={layout} entering={fill.rowEntering(index + 1)} exiting={FadeOut.duration(120)}>
-                            {coworkerRow(coworker)}
-                        </Animated.View>
-                    ))}
+                        {recent.map((coworker, index) => (
+                            <Animated.View key={`recent:${coworker.id}`} layout={layout} entering={fill.rowEntering(index + 1)} exiting={FadeOut.duration(120)}>
+                                {coworkerRow(coworker)}
+                            </Animated.View>
+                        ))}
 
-                    {sections.map((section, index) => (
-                        <Animated.View key={`box:${section.key}`} layout={layout} entering={fill.playing ? fill.rowEntering(index + 1) : undefined}>
-                            <SectionHeader label={section.label} count={section.members.length} collapsed={collapsed.includes(section.key)} onToggle={() => toggle(section.key)} />
-                            {!collapsed.includes(section.key) &&
-                                section.members.map(coworker => (
-                                    <Animated.View key={coworker.id} layout={layout} entering={fill.playing ? undefined : FadeIn.duration(180)} exiting={FadeOut.duration(120)}>
-                                        {coworkerRow(coworker)}
-                                    </Animated.View>
-                                ))}
-                        </Animated.View>
-                    ))}
+                        {sections.map((section, index) => (
+                            <Animated.View key={`box:${section.key}`} layout={layout} entering={fill.playing ? fill.rowEntering(index + 1) : undefined}>
+                                <SectionHeader label={section.label} count={section.members.length} collapsed={collapsed.includes(section.key)} onToggle={() => toggle(section.key)} />
+                                {!collapsed.includes(section.key) &&
+                                    section.members.map(coworker => (
+                                        <Animated.View key={coworker.id} layout={layout} entering={fill.playing ? undefined : FadeIn.duration(180)} exiting={FadeOut.duration(120)}>
+                                            {coworkerRow(coworker)}
+                                        </Animated.View>
+                                    ))}
+                            </Animated.View>
+                        ))}
 
-                    {fill.playing && <SkeletonFade reveal={fill.reveal} staggered={fill.staggered} />}
-                </View>
-            </ScrollView>
+                        {fill.playing && <SkeletonFade reveal={fill.reveal} staggered={fill.staggered} />}
+                    </View>
+                </ScrollView>
 
-            <EdgeFade edge="top" height={headerHeight + spacing.xl} />
-            <EdgeFade edge="bottom" height={insets.bottom + 90} />
-            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: topBar.left, right: topBar.right }}>
-                <HomeHeader inboxCount={inbox.state === 'ready' ? inboxCount(inbox.items) : 0} onInbox={() => router.push('/inbox')} onNewCoworker={() => router.push('/new-coworker')} />
-            </Animated.View>
-            <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: bottomBarInset(insets.bottom) }}>
-                <HomeBottomBar onSearch={() => router.push('/search')} />
-            </Animated.View>
-        </View>
+                <EdgeFade edge="top" height={headerHeight + spacing.xl} />
+                <EdgeFade edge="bottom" height={insets.bottom + 90} />
+                <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', top: insets.top + spacing.sm, left: topBar.left, right: topBar.right }}>
+                    <HomeHeader inboxCount={inbox.state === 'ready' ? inboxCount(inbox.items) : 0} onInbox={() => router.push('/inbox')} onNewCoworker={() => router.push('/new-coworker')} />
+                </Animated.View>
+                <Animated.View entering={fill.chromeEntering} pointerEvents="box-none" style={{ position: 'absolute', left: pane.left, right: pane.right, bottom: bottomBarInset(insets.bottom) }}>
+                    <HomeBottomBar onSearch={() => router.push('/search')} />
+                </Animated.View>
+            </View>
+        </BuddyClock>
     )
 }
