@@ -394,12 +394,16 @@ def block(d):
     return MARK + "\n```json\n" + json.dumps(d, sort_keys=True) + "\n```"
 
 
+def due(store, now):
+    last = store.get_all("-").get("digest_at")
+    return last is None or now - float(last) >= POST_EVERY_S
+
+
 def post(gh, store, repo, d, now):
     try:
         if d is None:
             return False
-        last = store.get_all("-").get("digest_at")
-        if last is not None and now - float(last) < POST_EVERY_S:
+        if not due(store, now):
             return False
         store.set("-", "digest_at", now)
         rows = json.loads(gh(["issue", "list", "-R", repo, "--state", "open", "--search",

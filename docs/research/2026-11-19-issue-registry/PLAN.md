@@ -64,7 +64,7 @@ The name `returned` is already a build-job end state, so the handover statuses u
 | `refused` | it could not be handed over | accept `unsent` with `sends>0`, or `left`; instr `refused` / `unreadable`; a `factory-paused` issue (labels) |
 | `lost` | taken, but the run is gone | newest `fires` row `status='lost'`; plan `lost`; no live account call |
 
-- **`since`:** for build jobs, the newest transition with `from_state != to_state`. `save()` writes a row on every save, and those bookkeeping rows are skipped, as `digest.py` already does. For kv records, a new `moved_at` stamp, written beside every `store.set(job, "state", …)`. All times are ISO. Today plan and recheck `started` is ISO, while accept and instr `started` is an epoch.
+- **`since`:** for build jobs, the newest transition with `from_state != to_state`. `save()` writes a row on every save, and those bookkeeping rows are skipped, as `digest.py` already does. For kv records, the `moves` table: `Store.set(job, "state", v)` records the new state, the one before and when it changed, only when it changes (one place, so no station can forget it; `get_all` is unchanged). All times are ISO. Today plan and recheck `started` is ISO, while accept and instr `started` is an epoch.
 - **`why`:** the job's `wait_reason` / `reason` or the record's `why`, not the last transition's reason.
 - Plan records are overwritten in place, so a plan's earlier send-backs have no history. The registry shows the current handover only.
 
@@ -75,7 +75,8 @@ The name `returned` is already a build-job end state, so the handover statuses u
    - `read(store)` makes one pass over the ledger: jobs, the newest real move per job (`MAX(id) … WHERE from_state != to_state GROUP BY job`), the `plan:`, `recheck:`, `accept:`, `instr:` and `classify:` records, and the newest fire per job.
    - `rows(data, now)` is pure.
    - `summary(rows, now, cfg)` gives `steps` (count per step) and `stuck`, capped like `MAX_THREADS`. Stuck means: `sent` longer than a limit while copies are free, `taken` past the run limit, `lost`, `refused`, `with-owner`.
-   - `moved_at` stamps are added in planning, recheck, acceptance and instructions.
+   - State moves are stamped in the `moves` table by `Store.set`.
+   - Built as shipped (2026-11-19): a live recheck shows over its waiting build; `sent` in `waiting`/`queued` is never stuck (the "while copies are free" test is not done, so a starved queue does not show); `taken` is stuck past `clocks.run_limit_s`; `stuck` is newest first; `taken` leaves out what `stuck` shows; the registry is read only when a digest post is due; instr `applied` is `done`; accept `unsent` after a send is `retry`. Not done: `planned` mapped by its `stage`, and the lost check per chunk.
    - Wired into `Dispatcher.status()` inside its try. It replaces `planner_holders`.
 2. **`labelcheck.py`, report only.** `drift.py` is taken. It reads the open issues with labels only when the digest is about to post (every 10 minutes), not every beat. It reports:
    - `factory-plan` with no live plan;
@@ -93,7 +94,7 @@ The name `returned` is already a build-job end state, so the handover statuses u
 
 ## Limits
 
-- Derived, not stored, apart from the `moved_at` stamps: a restart loses nothing, and a wrong row is fixed in one place.
+- Derived, not stored, apart from the `moves` stamps: a restart loses nothing, and a wrong row is fixed in one place.
 - Slices 1 and 2 only read. Slices 3 and 4 write to GitHub within caps.
 - Comments stay under GitHub's 65,536-character limit: `stuck` and the drift lists are capped.
 
