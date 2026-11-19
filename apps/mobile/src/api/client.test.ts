@@ -1,4 +1,5 @@
 import { ApiError, createApiClient } from '@/api/client'
+import { setCurrentLocale, translatorFor } from '@/i18n/translator'
 
 type Call = { url: string; init: RequestInit }
 
@@ -46,5 +47,28 @@ describe('createApiClient', () => {
     it('still throws a readable error when the body is not JSON', async () => {
         const { request } = clientAnswering(new Response('<html>Bad gateway</html>', { status: 502 }))
         await expect(request('/api/v1/me')).rejects.toMatchObject({ status: 502, message: 'Request failed with 502' })
+    })
+
+    describe('a refusal with a code', () => {
+        beforeEach(() => setCurrentLocale('fr'))
+        afterEach(() => setCurrentLocale('en'))
+
+        it('reads a code the app knows in the reader language, and keeps the code and its params', async () => {
+            const { request } = clientAnswering(json({ error: 'Keep the name under 40 characters', code: 'nameTooLong', params: { max: 40 } }, 422))
+            const failure = await request('/api/v1/agents').catch(error => error)
+            const french = translatorFor('errors')('nameTooLong', { max: 40 })
+            expect(french).not.toBe('Keep the name under 40 characters')
+            expect(failure).toMatchObject({ status: 422, message: french, code: 'nameTooLong', params: { max: 40 } })
+        })
+
+        it('falls back to the hub English for a code the app has never heard of', async () => {
+            const { request } = clientAnswering(json({ error: 'A refusal from a newer hub', code: 'notInThisBuild' }, 422))
+            await expect(request('/api/v1/agents')).rejects.toMatchObject({ status: 422, message: 'A refusal from a newer hub', code: 'notInThisBuild' })
+        })
+
+        it('falls back to the request failure text when the hub sent nothing', async () => {
+            const { request } = clientAnswering(new Response(null, { status: 500 }))
+            await expect(request('/api/v1/me')).rejects.toMatchObject({ status: 500, message: translatorFor('mobileCommon')('errors.requestFailed', { status: 500 }), code: null })
+        })
     })
 })

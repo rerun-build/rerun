@@ -1,17 +1,23 @@
-import { CLIENT_HEADER, formatClientHeader } from '@rerun/contracts'
+import { CLIENT_HEADER, formatClientHeader, isRecord } from '@rerun/contracts'
 import * as Application from 'expo-application'
 
 import { environment } from '@/config/environment'
+import type { MobileMessages } from '@/i18n/messages'
 import { translatorFor } from '@/i18n/translator'
 import { clientPlatform } from '@/lib/client-platform'
 
 const WORKSPACE_HEADER = 'x-workspace-id'
 
+type ErrorCode = keyof Omit<MobileMessages['errors'], '_context'>
+type ErrorParams = Record<string, string | number>
+
 export class ApiError extends Error {
     constructor(
         readonly status: number,
         message: string,
-        readonly body: unknown = null
+        readonly body: unknown = null,
+        readonly code: string | null = null,
+        readonly params: ErrorParams | null = null
     ) {
         super(message)
         this.name = 'ApiError'
@@ -28,9 +34,29 @@ export type ApiRequest = {
 
 type ApiClientConfig = { baseUrl: string; clientHeader: string; fetch?: typeof fetch }
 
-function errorMessageOf(payload: unknown): string | null {
-    if (typeof payload !== 'object' || payload === null || !('error' in payload)) return null
-    return typeof payload.error === 'string' ? payload.error : null
+function stringFieldOf(payload: unknown, field: 'error' | 'code'): string | null {
+    if (!isRecord(payload)) return null
+    const value = payload[field]
+    return typeof value === 'string' ? value : null
+}
+
+function paramsOf(payload: unknown): ErrorParams | null {
+    return isRecord(payload) && isRecord(payload.params) ? (payload.params as ErrorParams) : null
+}
+
+// Only a code this build's `errors` catalog knows is translated: a hub deployed ahead of the app may
+// send one it has never heard of, which then reads in the hub's English.
+function translatedRefusal(code: string | null, params: ErrorParams | null): string | null {
+    if (!code || code === '_context') return null
+    const t = translatorFor('errors')
+    const key = code as ErrorCode
+    return t.has(key) ? t(key, (params ?? undefined) as never) : null
+}
+
+export function apiErrorOf(status: number, payload: unknown, fallback: string): ApiError {
+    const code = stringFieldOf(payload, 'code')
+    const params = paramsOf(payload)
+    return new ApiError(status, translatedRefusal(code, params) ?? stringFieldOf(payload, 'error') ?? fallback, payload, code, params)
 }
 
 // What every call to the hub carries: the build, and once signed in the token and the workspace.
@@ -50,7 +76,7 @@ export function createApiClient({ baseUrl, clientHeader, fetch: fetchImpl = fetc
         if (res.status === 204) return undefined as T
 
         const payload: unknown = await res.json().catch(() => null)
-        if (!res.ok) throw new ApiError(res.status, errorMessageOf(payload) ?? translatorFor('mobileCommon')('errors.requestFailed', { status: res.status }), payload)
+        if (!res.ok) throw apiErrorOf(res.status, payload, translatorFor('mobileCommon')('errors.requestFailed', { status: res.status }))
         return payload as T
     }
 }
