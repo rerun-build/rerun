@@ -5,6 +5,7 @@ import { ApiError } from '@/lib/api-error'
 
 const engineChat = vi.fn()
 let status = 'awaiting_approval'
+let claimed = true
 let transcript: { role: string; parts: unknown[] }[] = []
 
 vi.mock('@/app/api/_auth/access', () => ({ actorFromContext: () => ({ kind: 'user', userId: 'me', workspaceId: 7 }), callableEngineAgentIds: async () => undefined }))
@@ -16,6 +17,8 @@ vi.mock('@/app/api/_services/chat.service', () => ({
     }),
     resolveAgentTarget: async () => ({ engineAgentId: 'engine-agent', conn: { baseUrl: 'https://engine.test', apiKey: null } }),
     recordMessageSent: vi.fn(),
+    claimWaitingSession: vi.fn(async () => claimed),
+    updateSessionStatus: vi.fn(),
 }))
 vi.mock('@/app/api/_services/conversation.service', () => ({ readSessionTranscript: async () => ({ messages: transcript, updatedAt: null }) }))
 // The queue's retries are start-chat's, covered by the tests of /api/chat.
@@ -24,7 +27,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }
 vi.mock('@/supabase/supabase-helpers', () => ({ selectMaybeSingle: async () => ({ data: { status } }) }))
 
 const { replyToConversation } = await import('./reply.service')
-const { recordMessageSent } = await import('@/app/api/_services/chat.service')
+const { claimWaitingSession, recordMessageSent, updateSessionStatus } = await import('@/app/api/_services/chat.service')
 
 const ctx = {} as never
 const approvalCard = (toolCallId: string) => [{ role: 'assistant', parts: [{ type: 'tool-request_approval', toolCallId, input: { approvals: [{ action: 'Send 12 emails' }] } }] }]
@@ -40,6 +43,8 @@ describe('replyToConversation', () => {
     beforeEach(() => {
         status = 'awaiting_approval'
         transcript = approvalCard('call-1')
+        claimed = true
+        vi.mocked(updateSessionStatus).mockClear()
         engineChat.mockReset().mockImplementation(async () => started())
         vi.mocked(recordMessageSent).mockClear()
     })
@@ -58,6 +63,22 @@ describe('replyToConversation', () => {
         status = 'working'
         expect((await refusalOf(replyToConversation(ctx, 'conv-1', { action: 'deny', toolCallId: 'call-1' }))).code).toBe('requestAlreadyAnswered')
         expect(engineChat).not.toHaveBeenCalled()
+    })
+
+    it('lets one of two answers sent at the same moment through, and takes the card before the engine hears of it', async () => {
+        await replyToConversation(ctx, 'conv-1', { action: 'approve', toolCallId: 'call-1' })
+        expect(claimWaitingSession).toHaveBeenCalledWith('conv-1', 'awaiting_approval')
+        engineChat.mockClear()
+        claimed = false
+        expect((await refusalOf(replyToConversation(ctx, 'conv-1', { action: 'approve', toolCallId: 'call-1' }))).code).toBe('requestAlreadyAnswered')
+        expect(engineChat).not.toHaveBeenCalled()
+    })
+
+    it('gives the card back when the engine did not take the answer', async () => {
+        engineChat.mockImplementation(async () => new Response('down', { status: 502 }))
+        expect((await refusalOf(replyToConversation(ctx, 'conv-1', { action: 'approve', toolCallId: 'call-1' }))).status).toBe(502)
+        expect(updateSessionStatus).toHaveBeenCalledWith('conv-1', 'awaiting_approval')
+        expect(recordMessageSent).not.toHaveBeenCalled()
     })
 
     it('sends a reply to a finished run as a plain message', async () => {

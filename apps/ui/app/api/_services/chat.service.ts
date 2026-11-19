@@ -211,6 +211,14 @@ export async function updateSessionStatus(sessionId: string, status: SessionStat
     await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ status }).eq('id', sessionId)
 }
 
+// Takes a conversation that waits on a person, for the one answer that moves it on: false when
+// another answer took it first. The status is the lock, so two taps on the same card cannot both pass.
+export async function claimWaitingSession(sessionId: string, waitingAs: SessionStatus): Promise<boolean> {
+    const supabase = createServiceRoleClient()
+    const { data } = await supabase.from('sessions').update<Database['public']['Tables']['sessions']['Update']>({ status: 'working' }).eq('id', sessionId).eq('status', waitingAs).select('id').maybeSingle()
+    return Boolean(data)
+}
+
 // What a message sent to a running coworker leaves behind: the conversation working, its author a
 // participant who has read it, and, for anything but an install's guide, the line under the coworker.
 // The preview is not awaited: it would land after the reply it asked for.

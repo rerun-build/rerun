@@ -327,6 +327,7 @@ describe('a conversation in the mobile app', () => {
             const { POST } = await import('@/app/api/v1/conversations/[id]/reply/route')
             expect(await expectContract(mobileApi.replyToConversation, await callRoute(POST, mobileApi.replyToConversation, { params: { id: FOR_GRACE }, body: { action: 'approve', toolCallId: 'call-grace' } }))).toEqual({ runId: 'run-grace' })
             expect(engine.chat.mock.calls[0][2]).toMatchObject({ sessionId: 'eng-grace', message: expect.stringContaining('1. **APPROVED** — Send the Q4 deck to the board') })
+            expect(state.db?.writes('sessions')[0]).toMatchObject({ method: 'update', payload: { status: 'working' }, filters: expect.arrayContaining([expect.objectContaining({ method: 'eq', args: ['status', 'awaiting_approval'] })]) })
             expect(await expectContract(mobileApi.replyToConversation, await callRoute(POST, mobileApi.replyToConversation, { params: { id: FOR_GRACE }, body: { action: 'deny', toolCallId: 'call-older' } }), 409)).toMatchObject({ code: 'requestAlreadyAnswered' })
         })
 
