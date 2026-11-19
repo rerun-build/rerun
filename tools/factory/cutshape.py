@@ -19,6 +19,7 @@ TESTF = r"\.spec\.[jt]sx?$|\.test\.[jt]sx?$|(^|/)tests?/.*\.(ts|tsx|js|jsx|rs|py
 _EXEMPT = re.compile(r"(?mi)^\*\*Red before green\*\*:\s*not applicable\b")
 _PATTERN_PATH = re.compile(r"\bunittest\b[^;&|]*\bdiscover\b[^;&|]*\s-p\s+[\"']?[^\"'\s]*/")
 _SERVER_PATH = re.compile(r"(?:^|&&|;|\|\||\||\()\s*/data/")
+_ISOLATED_MODULE = re.compile(r"python3? -I -m unittest (?!discover\b)[A-Za-z_]")
 _PYTEST = re.compile(r"(?:^|&&|;|\|\||\||\()\s*(?:python3? (?:-I )?-m )?pytest\b")
 _CD_TARGET = re.compile(r"(?:^|&&|;|\|\||\()\s*cd\s+(\S+)")
 
@@ -61,6 +62,7 @@ RUN_FAULTS = (
     (_PATTERN_PATH.search, "run line: unittest's -p takes a file name pattern, not a path, so it matches no test and exits 5; use -s for the folder: %s"),
     (_SERVER_PATH.search, "run line: /data/ exists only on the factory server, not on the CI runner: %s"),
     (_PYTEST.search, "run line: the CI runner has no pytest; run the test with python3 -I -m unittest: %s"),
+    (_ISOLATED_MODULE.search, "run line: -I keeps the current directory off sys.path, so python3 -I -m unittest <module> cannot import the test; from the repository root run python3 -I -m unittest discover -s <folder> -p \"<file>\": %s"),
     (_same_cd_twice, "run line: it changes into the same folder twice, and the second cd fails because the shell is already there; each Run line starts at the repository root: %s"),
 )
 TEST_ONLY_ERROR = ("files: every path is a test file, and the red-before-green check refuses a pull request that changes only tests; "
