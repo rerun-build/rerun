@@ -35,6 +35,7 @@ Usage:
   rerun mcp login <id> <server>   Sign in to an OAuth MCP server
   rerun mcp status <agentId>      Check MCP server connections
   rerun mcp logout <id> <server>  Clear a stored MCP token
+  rerun mcp set-all <server>       Replace that MCP server on every coworker that has it (JSON on stdin)
   rerun doctor                    Check the environment
   rerun update                    Pull, rebuild, migrate and restart the service (git checkout)
   rerun update --artifact <url> --sha256 <hex> --commit <sha>
