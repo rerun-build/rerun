@@ -61,6 +61,20 @@ describe('pushNotification', () => {
         expect(inserted).toEqual([{ table: 'notification_push_dispatches', row: { user_id: 'user-1', source_key: 'question:agent-1' } }])
     })
 
+    it('puts the approval buttons and the card they answer on both platforms', async () => {
+        devices = [
+            { token: 'ExponentPushToken[ios]', platform: 'ios' },
+            { token: 'ExponentPushToken[android]', platform: 'android' },
+        ]
+        expo.mockResolvedValue(new Response(JSON.stringify({ data: [{ status: 'ok' }, { status: 'ok' }] })))
+        await pushNotification(supabase, context({ notification: { kind: 'approval', message: 'Send the 12 emails?', event: 'agent.notification', metadata: { toolCallId: 'call-1', toolName: 'request_approval' } } }))
+        const [ios, android] = JSON.parse(expo.mock.calls[0][1].body)
+        for (const message of [ios, android]) {
+            expect(message.categoryId).toBe('rerun.approval')
+            expect(message.data).toEqual({ workspaceId: 1, agentId: 'agent-1', conversationId: 'conv-1', kind: 'approval', toolCallId: 'call-1' })
+        }
+    })
+
     it('writes in the language the recipient picked', async () => {
         userLocale = 'es'
         await pushNotification(supabase, context())

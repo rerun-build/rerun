@@ -46,13 +46,24 @@ export const ROUTE_ID_PATTERN = /^[\w-]+$/
 // What a push carries for the app to open the right conversation. `conversationId` is the hub's
 // conversation, null for a run with no conversation of its own. `workspaceId` is the workspace it
 // lives in, which the phone switches to first; a push sent before it existed carries none.
+// `toolCallId` is the card the coworker stopped on, which an action button answers without opening
+// the app; absent from a push that asks nothing, and from a hub older than the buttons.
 export const pushDataSchema = z.object({
     workspaceId: z.number().int().positive().optional(),
     agentId: z.string().regex(ROUTE_ID_PATTERN).nullable(),
     conversationId: z.string().regex(ROUTE_ID_PATTERN).nullable(),
     kind: z.string(),
+    toolCallId: z.string().max(256).optional(),
 })
 export type PushData = z.infer<typeof pushDataSchema>
+
+// The buttons under a push, registered by the app at launch and named by the hub on each push. A
+// phone that does not know a category (a build older than the buttons) shows the push without any.
+export const PUSH_CATEGORIES = { approval: 'rerun.approval', question: 'rerun.question', reply: 'rerun.reply' } as const
+export type PushCategory = (typeof PUSH_CATEGORIES)[keyof typeof PUSH_CATEGORIES]
+
+export const PUSH_ACTIONS = { approve: 'approve', deny: 'deny', reply: 'reply', open: 'open' } as const
+export type PushAction = (typeof PUSH_ACTIONS)[keyof typeof PUSH_ACTIONS]
 
 // The Android notification channels the app creates before it asks for a token, and the hub names on
 // each Android push. A push naming a channel the phone does not know is dropped, and only the
