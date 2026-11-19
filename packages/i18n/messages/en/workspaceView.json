@@ -21,11 +21,12 @@
         "phone.byBox": "Option of the phone's list: the coworkers grouped by Box (a group of coworkers) rather than by recency.",
         "foreman.name": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
         "foreman.rename": "Accessible label of the name of the Chief of Staff (the workspace's AI assistant) on its card, which an admin clicks to give it a name of their own. Emptying the field gives it back its default name.",
-        "checkins.title": "Section of the Chief of Staff's card (the workspace's AI assistant) about its check-ins: it wakes up on its own, reads the workspace and writes to someone only when something is worth their time.",
+        "checkins.title": "Row of the Chief of Staff's card (the workspace's AI assistant), and title of the screen it opens, about its check-ins: it wakes up on its own, reads the workspace and writes to someone only when something is worth their time.",
         "checkins.next": "{when} is a short relative time such as 'in 3h' or 'now'. The next time the assistant looks at the workspace on its own.",
         "checkins.waiting": "Shown when check-ins are on but nobody has written in the workspace yet, so the assistant does not know when someone's day starts.",
         "checkins.unavailable": "The server the workspace runs on has check-ins switched off by its operator.",
         "checkins.switchedOff": "Tooltip of the disabled Check in now button while check-ins are off.",
+        "checkins.recent": "Heading of the timeline of its past check-ins, on the Check-ins screen of the Chief of Staff's card.",
         "checkins.reasons.pulse": "A line in the list of past check-ins: the daily one found nothing worth saying."
     },
     "switch": {
@@ -87,7 +88,7 @@
         "off": "Off",
         "unavailable": "Switched off on this server",
         "switchedOff": "Turn check-ins on first",
-        "modelHelper": "What its check-ins run on.",
+        "recent": "Recent",
         "runNow": "Check in now",
         "started": "Checking in. It writes to you only if there is something to say.",
         "empty": "No check-in yet",

@@ -229,11 +229,17 @@ export function DestinationTile({ tab, dot = false, onClick }: { tab: CardDestin
 }
 
 export function DestinationRow({ tab, onClick }: { tab: CardDestination; onClick: (event: MouseEvent<HTMLButtonElement>) => void }) {
-    const { label, icon: Glyph } = useDestination(tab)
+    const { label, icon } = useDestination(tab)
+    return <CardRowButton icon={icon} label={label} onClick={onClick} />
+}
+
+/** A full-width row of the card that opens one of its screens, `detail` saying its state at the end. */
+export function CardRowButton({ icon: Glyph, label, detail, onClick }: { icon: ComponentType<{ className?: string }>; label: string; detail?: string; onClick: (event: MouseEvent<HTMLButtonElement>) => void }) {
     return (
         <button type="button" onClick={onClick} className="flex w-full items-center gap-3 rounded-lg bg-muted/60 px-3 py-2.5 text-left transition-colors hover:bg-muted">
             <Glyph className="size-4 shrink-0 text-muted-foreground" />
-            <span className="min-w-0 flex-1 truncate text-sm">{label}</span>
+            <span className={cn('truncate text-sm', detail ? 'shrink-0' : 'min-w-0 flex-1')}>{label}</span>
+            {detail && <span className="min-w-0 flex-1 truncate text-right text-xs text-muted-foreground">{detail}</span>}
             <ChevronRightIcon className="size-3.5 shrink-0 text-muted-foreground/60" />
         </button>
     )

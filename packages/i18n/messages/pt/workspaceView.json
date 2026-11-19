@@ -58,7 +58,7 @@
         "off": "Desativados",
         "unavailable": "Desativados neste servidor",
         "switchedOff": "Ative os check-ins primeiro",
-        "modelHelper": "O modelo dos check-ins dele.",
+        "recent": "Recentes",
         "runNow": "Fazer um check-in agora",
         "started": "Fazendo um check-in. Ele só escreve se tiver algo a dizer.",
         "empty": "Nenhum check-in ainda",

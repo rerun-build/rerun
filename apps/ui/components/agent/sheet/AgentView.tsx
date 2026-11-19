@@ -31,6 +31,25 @@ type AgentViewProps = {
     withoutTabs?: readonly AgentViewTab[]
 }
 
+/** The breadcrumb over a screen of a card, owner / screen: its first step goes back to the card. */
+export function AgentViewHeader({ name, avatar, title, onBack, onClose }: { name: string; avatar: ReactNode; title: string; onBack: () => void; onClose: () => void }) {
+    const t = useTranslations('agent.agentView')
+    return (
+        <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border px-2">
+            <Button variant="ghost" size="sm" onClick={onBack} className="min-w-0 shrink pl-1.5">
+                <ChevronLeftIcon className="size-4" />
+                <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-muted">{avatar}</span>
+                <span className="truncate text-muted-foreground">{name}</span>
+            </Button>
+            <span className="text-muted-foreground/50">/</span>
+            <span className="shrink-0 px-1.5 text-sm font-semibold">{title}</span>
+            <Button aria-label={t('closePanel')} variant="ghost" size="icon-sm" onClick={onClose} className="ml-auto">
+                <XIcon className="size-4" />
+            </Button>
+        </div>
+    )
+}
+
 /** A screen of the coworker, in place of the thread. Its header is a breadcrumb, coworker / screen, whose first step goes back to the card. */
 export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSession, overlay, avatar, withoutTabs }: AgentViewProps) {
     const t = useTranslations('agent.agentView')
@@ -48,18 +67,7 @@ export function AgentView({ agent, tab, onTabChange, onBack, onClose, onOpenSess
 
     return (
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-            <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border px-2">
-                <Button variant="ghost" size="sm" onClick={onBack} className="min-w-0 shrink pl-1.5">
-                    <ChevronLeftIcon className="size-4" />
-                    <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-muted">{avatar ?? <AgentBuddy agentId={agent.id} mood={mood} size={16} facing="right" />}</span>
-                    <span className="truncate text-muted-foreground">{agent.name}</span>
-                </Button>
-                <span className="text-muted-foreground/50">/</span>
-                <span className="shrink-0 px-1.5 text-sm font-semibold">{t(`views.${view}`)}</span>
-                <Button aria-label={t('closePanel')} variant="ghost" size="icon-sm" onClick={onClose} className="ml-auto">
-                    <XIcon className="size-4" />
-                </Button>
-            </div>
+            <AgentViewHeader name={agent.name} avatar={avatar ?? <AgentBuddy agentId={agent.id} mood={mood} size={16} facing="right" />} title={t(`views.${view}`)} onBack={onBack} onClose={onClose} />
             <SidePanelTabSwitcher tabs={switcherTabs} value={shown} onChange={onTabChange} />
             <div className="relative min-h-0 flex-1 overflow-hidden">
                 <div className="absolute inset-0 flex flex-col">

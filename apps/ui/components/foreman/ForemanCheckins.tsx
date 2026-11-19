@@ -1,109 +1,36 @@
 'use client'
 
-import { FOREMAN_AGENT_ID, type CheckinEntry, type ForemanCheckins as Checkins, type Proactive } from '@rerun/contracts'
+import type { CheckinEntry, ForemanCheckins as Checkins } from '@rerun/contracts'
 import { shortRelativeTime, shortUntil } from '@rerun/i18n/format'
 import { Skeleton } from '@rerun/ui/primitives'
 import { useLocale, useTranslations } from 'next-intl'
-import { useCallback, useEffect, useState } from 'react'
+import { type ReactNode, useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { loadForemanCheckinsAction, runForemanCheckinAction, updateForemanCheckinsAction } from '@/app/api/_actions/foreman-checkins.actions'
-import { RunModelField } from '@/components/agent/RunModelField'
+import { CardRowButton } from '@/components/agent/sheet/AgentCard'
+import { AgentViewHeader } from '@/components/agent/sheet/AgentView'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
-import { useAvailableModels } from '@/hooks/useAvailableModels'
-import type { ConnectionGroup } from '@/lib/engine/model-groups'
 import { useErrorText } from '@/hooks/useErrorText'
+import { Play, Sunrise } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
-const SHOWN_CHECKINS = 5
-
-function CheckinRow({ checkin, locale }: { checkin: CheckinEntry; locale: string }) {
-    const t = useTranslations('workspaceView.checkins')
-    const spoke = !!checkin.announcedAt
-    return (
-        <li className="flex min-w-0 items-baseline gap-2 py-1.5 text-sm">
-            <span className={cn('size-1.5 shrink-0 -translate-y-0.5 rounded-full', spoke ? 'bg-brand' : 'bg-muted-foreground/40')} aria-hidden />
-            <span className={cn('min-w-0 flex-1 truncate', !spoke && 'text-muted-foreground')}>{spoke ? checkin.title : checkin.status === 'error' ? t('failed') : t(`reasons.${checkin.reason}`)}</span>
-            <span className="shrink-0 text-xs text-muted-foreground">{shortRelativeTime(checkin.startedAt, locale)}</span>
-        </li>
-    )
-}
-
-export function ForemanCheckinsSkeleton() {
-    return (
-        <section className="shrink-0 space-y-2 px-4 pb-3" aria-busy>
-            <div className="flex items-center justify-between gap-3">
-                <div className="space-y-1.5">
-                    <Skeleton className="h-3 w-20" />
-                    <Skeleton className="h-3 w-28" />
-                </div>
-                <Skeleton className="h-5 w-9 rounded-full" />
-            </div>
-            <Skeleton className="h-8 w-full rounded-md" />
-        </section>
-    )
-}
-
-type ForemanCheckinsViewProps = {
-    checkins: Checkins
-    availableGroups: ConnectionGroup[]
-    agentModel: string | null
+type CheckinsControls = {
+    checkins: Checkins | null | undefined
     running: boolean
-    onSave: (proactive: Proactive) => void
-    onRunNow: () => void
-    now?: Date
+    setEnabled: (enabled: boolean) => void
+    runNow: () => void
 }
 
-/** The switch, the model its check-ins run on, a button to check in now, and the last few it made. */
-export function ForemanCheckinsView({ checkins, availableGroups, agentModel, running, onSave, onRunNow, now }: ForemanCheckinsViewProps) {
-    const t = useTranslations('workspaceView.checkins')
-    const locale = useLocale()
-    const { proactive, available } = checkins
-    const on = available && proactive.enabled
-    const status = !available ? t('unavailable') : !proactive.enabled ? t('off') : checkins.nextAt ? t('next', { when: shortUntil(checkins.nextAt, locale, now) }) : t('waiting')
-
-    return (
-        <section className="shrink-0 space-y-3 px-4 pb-3" aria-label={t('title')}>
-            <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                    <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{t('title')}</h3>
-                    <p className="truncate text-xs text-muted-foreground">{status}</p>
-                </div>
-                <TooltipDisabledReason reason={available ? undefined : t('unavailable')}>
-                    <Switch aria-label={t('toggle')} checked={on} disabled={!available} onCheckedChange={enabled => onSave({ ...proactive, enabled })} />
-                </TooltipDisabledReason>
-            </div>
-            {on && <RunModelField id="checkin-model" value={{ connectionId: proactive.connectionId, model: proactive.model }} onChange={pick => onSave({ ...proactive, connectionId: pick.connectionId, model: pick.model })} availableGroups={availableGroups} agentModel={agentModel} helperText={t('modelHelper')} />}
-            <TooltipDisabledReason reason={on ? undefined : t('switchedOff')}>
-                <Button variant="outline" size="sm" className="w-full" disabled={!on || running} onClick={onRunNow}>
-                    {t('runNow')}
-                </Button>
-            </TooltipDisabledReason>
-            {checkins.checkins.length > 0 ? (
-                <ul className="divide-y divide-border/60">
-                    {checkins.checkins.slice(0, SHOWN_CHECKINS).map(checkin => (
-                        <CheckinRow key={checkin.runId} checkin={checkin} locale={locale} />
-                    ))}
-                </ul>
-            ) : (
-                <p className="text-xs text-muted-foreground">{t('empty')}</p>
-            )}
-        </section>
-    )
-}
-
-/**
- * The Chief of Staff waking on its own, on its card, for an admin. Absent on a box that has no
- * check-ins yet, read again each time the card shows.
- */
-export function ForemanCheckins({ active }: { active: boolean }) {
+// What the card reads of its check-ins: undefined while loading, null on a box that has none. They
+// run on the model picked in its composer, so nothing is pinned here.
+function useForemanCheckins(active: boolean): CheckinsControls {
     const t = useTranslations('workspaceView.checkins')
     const errorText = useErrorText()
     const [checkins, setCheckins] = useState<Checkins | null | undefined>(undefined)
     const [running, setRunning] = useState(false)
-    const { availableGroups, resolvedModel } = useAvailableModels(FOREMAN_AGENT_ID)
 
     const reload = useCallback(() => {
         void loadForemanCheckinsAction().then(setCheckins)
@@ -113,10 +40,9 @@ export function ForemanCheckins({ active }: { active: boolean }) {
         if (active) reload()
     }, [active, reload])
 
-    if (checkins === null) return null
-    if (checkins === undefined) return <ForemanCheckinsSkeleton />
-
-    const save = async (proactive: Proactive) => {
+    const setEnabled = async (enabled: boolean) => {
+        if (!checkins) return
+        const proactive = { enabled, connectionId: null, model: null }
         setCheckins({ ...checkins, proactive })
         const result = await updateForemanCheckinsAction(proactive)
         if (!result.ok) toast.error(errorText(result))
@@ -131,5 +57,129 @@ export function ForemanCheckins({ active }: { active: boolean }) {
         reload()
     }
 
-    return <ForemanCheckinsView checkins={checkins} availableGroups={availableGroups} agentModel={resolvedModel} running={running} onSave={proactive => void save(proactive)} onRunNow={() => void runNow()} />
+    return { checkins, running, setEnabled: enabled => void setEnabled(enabled), runNow: () => void runNow() }
+}
+
+function useCheckinsStatus(checkins: Checkins, now?: Date): string {
+    const t = useTranslations('workspaceView.checkins')
+    const locale = useLocale()
+    if (!checkins.available) return t('unavailable')
+    if (!checkins.proactive.enabled) return t('off')
+    return checkins.nextAt ? t('next', { when: shortUntil(checkins.nextAt, locale, now) }) : t('waiting')
+}
+
+/** The row of the card that opens its check-ins, with where they stand. Absent on a box without them. */
+export function ForemanCheckinsRow({ active, onOpen }: { active: boolean; onOpen: () => void }) {
+    const { checkins } = useForemanCheckins(active)
+    if (checkins === null) return null
+    if (checkins === undefined) return <Skeleton className="h-10 w-full rounded-lg" />
+    return <ForemanCheckinsRowView checkins={checkins} onOpen={onOpen} />
+}
+
+export function ForemanCheckinsRowView({ checkins, onOpen, now }: { checkins: Checkins; onOpen: () => void; now?: Date }) {
+    const t = useTranslations('workspaceView.checkins')
+    return <CardRowButton icon={Sunrise} label={t('title')} detail={useCheckinsStatus(checkins, now)} onClick={onOpen} />
+}
+
+/** The screen of the card its row opens: the switch, a discreet way to check in now, and what it did. */
+export function ForemanCheckinsScreen({ name, avatar, onBack, onClose }: { name: string; avatar: ReactNode; onBack: () => void; onClose: () => void }) {
+    const t = useTranslations('workspaceView.checkins')
+    const { checkins, running, setEnabled, runNow } = useForemanCheckins(true)
+    return (
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+            <AgentViewHeader name={name} avatar={avatar} title={t('title')} onBack={onBack} onClose={onClose} />
+            <div className="min-h-0 flex-1 overflow-y-auto">{checkins ? <ForemanCheckinsView checkins={checkins} running={running} onEnabledChange={setEnabled} onRunNow={runNow} /> : <ForemanCheckinsSkeleton />}</div>
+        </div>
+    )
+}
+
+export function ForemanCheckinsSkeleton() {
+    return (
+        <div className="space-y-5 p-4" aria-busy>
+            <div className="flex items-center justify-between gap-3">
+                <div className="space-y-1.5">
+                    <Skeleton className="h-3.5 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                </div>
+                <Skeleton className="h-5 w-9 rounded-full" />
+            </div>
+            <div className="space-y-4">
+                {[0, 1, 2].map(index => (
+                    <div key={index} className="flex items-center gap-3">
+                        <Skeleton className="size-2.5 rounded-full" />
+                        <Skeleton className="h-3 flex-1" />
+                        <Skeleton className="h-3 w-6" />
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+type ForemanCheckinsViewProps = {
+    checkins: Checkins
+    running: boolean
+    onEnabledChange: (enabled: boolean) => void
+    onRunNow: () => void
+    now?: Date
+}
+
+export function ForemanCheckinsView({ checkins, running, onEnabledChange, onRunNow, now }: ForemanCheckinsViewProps) {
+    const t = useTranslations('workspaceView.checkins')
+    const status = useCheckinsStatus(checkins, now)
+    const on = checkins.available && checkins.proactive.enabled
+
+    return (
+        <div className="space-y-5 p-4">
+            <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                    <p className="text-sm font-medium">{t('toggle')}</p>
+                    <p className="truncate text-xs text-muted-foreground">{status}</p>
+                </div>
+                <TooltipDisabledReason reason={checkins.available ? undefined : t('unavailable')}>
+                    <Switch aria-label={t('toggle')} checked={on} disabled={!checkins.available} onCheckedChange={onEnabledChange} />
+                </TooltipDisabledReason>
+            </div>
+            <section className="space-y-3" aria-label={t('recent')}>
+                <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{t('recent')}</h3>
+                    <TooltipDisabledReason reason={on ? undefined : t('switchedOff')}>
+                        <Button variant="ghost" size="sm" className="-mr-2 h-7 gap-1.5 px-2 text-xs text-muted-foreground" disabled={!on || running} onClick={onRunNow}>
+                            <Play className="size-3" />
+                            {t('runNow')}
+                        </Button>
+                    </TooltipDisabledReason>
+                </div>
+                {checkins.checkins.length > 0 ? <CheckinTimeline checkins={checkins.checkins} now={now} /> : <p className="text-xs text-muted-foreground">{t('empty')}</p>}
+            </section>
+        </div>
+    )
+}
+
+function CheckinTimeline({ checkins, now }: { checkins: CheckinEntry[]; now?: Date }) {
+    const t = useTranslations('workspaceView.checkins')
+    const locale = useLocale()
+    return (
+        <ol>
+            {checkins.map((checkin, index) => {
+                const spoke = !!checkin.announcedAt
+                const failed = !spoke && checkin.status === 'error'
+                return (
+                    <li key={checkin.runId} className="relative flex gap-3 pb-4 last:pb-0">
+                        {index < checkins.length - 1 && <span aria-hidden className="absolute top-4 bottom-0 left-[4.5px] w-px bg-border" />}
+                        <span aria-hidden className="flex h-5 w-2.5 shrink-0 items-center justify-center">
+                            <span className={cn('rounded-full', spoke ? 'size-2.5 bg-brand ring-4 ring-brand/15' : failed ? 'size-2 bg-destructive' : 'size-2 border border-muted-foreground/50 bg-background')} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                            <div className="flex items-baseline gap-2">
+                                <span className={cn('min-w-0 flex-1 truncate text-sm leading-5', !spoke && 'text-muted-foreground')}>{spoke ? checkin.title : failed ? t('failed') : t(`reasons.${checkin.reason}`)}</span>
+                                <span className="shrink-0 text-xs text-muted-foreground">{shortRelativeTime(checkin.startedAt, locale, now)}</span>
+                            </div>
+                            {spoke && checkin.note && <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{checkin.note}</p>}
+                        </div>
+                    </li>
+                )
+            })}
+        </ol>
+    )
 }

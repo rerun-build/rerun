@@ -10,6 +10,9 @@ import type { ForemanSurface } from '@/lib/foreman/surface'
 import { rememberForemanOpen } from '@/lib/foreman-open'
 import { useBoardStore } from '@/stores/board.store'
 import type { ForemanTab } from '@rerun/ui/foreman'
+
+// A screen of its card: one a coworker's card has too, or its check-ins, which only it has.
+export type ForemanCardScreen = AgentViewTab | 'checkins'
 import { randomUuid } from '@/lib/random-uuid'
 
 export type ForemanFunnel = 'unknown' | 'guided' | 'companion'
@@ -32,7 +35,7 @@ type ForemanState = {
     /** The engine's foreman keeps things of its own, so its card has screens to open. */
     hasCard: boolean
     /** The screen open on its card, null on the card itself. In the store so a routine picked in a list opens it. */
-    cardScreen: AgentViewTab | null
+    cardScreen: ForemanCardScreen | null
     /**
      * Ce que la colonne est en train de faire. `unknown` tant que la phase n'est pas revenue du
      * serveur : les fiches de liens profonds l'attendent pour savoir si elles ont le droit de
@@ -125,7 +128,7 @@ type ForemanState = {
     setDropTarget: (target: ForemanPlacement | null) => void
     setTab: (tab: ForemanTab) => void
     setHasCard: (hasCard: boolean) => void
-    setCardScreen: (screen: AgentViewTab | null) => void
+    setCardScreen: (screen: ForemanCardScreen | null) => void
     setFunnel: (funnel: ForemanFunnel) => void
     setWaitlisted: (waitlisted: boolean) => void
     setGreetPending: (pending: boolean) => void

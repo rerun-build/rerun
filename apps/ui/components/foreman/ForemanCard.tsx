@@ -8,11 +8,12 @@ import { type ReactNode, useCallback, useMemo } from 'react'
 import { findForemanThreadAction } from '@/app/api/_actions/foreman-conversation.actions'
 import { type CardDestination, DestinationRow, DestinationTile } from '@/components/agent/sheet/AgentCard'
 import { AgentView } from '@/components/agent/sheet/AgentView'
+import { ForemanCheckinsRow, ForemanCheckinsScreen } from '@/components/foreman/ForemanCheckins'
 import { PanelSteps } from '@/components/ui/panel-steps'
 import type { AgentViewTab } from '@/lib/board/agent-sheet-views'
 import type { IsoAgent } from '@/lib/board/types'
 import { useForemanStore } from '@/stores/foreman.store'
-import { useSession } from '@/supabase/session/SessionProvider'
+import { useIsWorkspaceAdmin, useSession } from '@/supabase/session/SessionProvider'
 import { useForemanName } from '@/hooks/useForemanName'
 
 const TILES: { tile: CardDestination; screen: AgentViewTab }[] = [
@@ -35,11 +36,12 @@ function useForemanAsAgent(): IsoAgent {
 
 /**
  * The Chief of Staff's card: what it keeps of its own, each on the screen a coworker's card opens.
- * `lead` and `children` are what the card carries above and under its tiles, and `onClose` where
- * the close button of a screen leads.
+ * `lead` and `children` are what the card carries above and under its tiles, `onClose` where the
+ * close button of a screen leads, and `active` false while it is mounted out of sight.
  */
-export function ForemanCard({ lead, onClose, children }: { lead?: ReactNode; onClose: () => void; children?: ReactNode }) {
+export function ForemanCard({ lead, onClose, active = true, children }: { lead?: ReactNode; onClose: () => void; active?: boolean; children?: ReactNode }) {
     const agent = useForemanAsAgent()
+    const admin = useIsWorkspaceAdmin()
     const screen = useForemanStore(state => state.cardScreen)
     const setScreen = useForemanStore(state => state.setCardScreen)
 
@@ -59,7 +61,9 @@ export function ForemanCard({ lead, onClose, children }: { lead?: ReactNode; onC
 
     return (
         <PanelSteps stepKey={screen ?? 'card'} depth={screen ? 1 : 0}>
-            {screen ? (
+            {screen === 'checkins' ? (
+                <ForemanCheckinsScreen name={agent.name} avatar={<Orb size={BREADCRUMB_ORB_SIZE} paused />} onBack={() => setScreen(null)} onClose={onClose} />
+            ) : screen ? (
                 <AgentView
                     agent={agent}
                     tab={screen}
@@ -78,8 +82,9 @@ export function ForemanCard({ lead, onClose, children }: { lead?: ReactNode; onC
                             <DestinationTile key={tile} tab={tile} onClick={() => setScreen(target)} />
                         ))}
                     </div>
-                    <div className="shrink-0 px-3 pb-3">
+                    <div className="shrink-0 space-y-1.5 px-3 pb-3">
                         <DestinationRow tab="files" onClick={() => setScreen('files')} />
+                        {admin && <ForemanCheckinsRow active={active} onOpen={() => setScreen('checkins')} />}
                     </div>
                     {children}
                 </div>

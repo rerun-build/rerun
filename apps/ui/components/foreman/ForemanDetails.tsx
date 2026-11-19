@@ -8,7 +8,6 @@ import { renameForemanAction } from '@/app/api/_actions/foreman-name.actions'
 
 import { WELCOME_ORB_SIZE } from '@/components/foreman/constants'
 import { ForemanCard } from '@/components/foreman/ForemanCard'
-import { ForemanCheckins } from '@/components/foreman/ForemanCheckins'
 import { ForemanRoutines } from '@/components/foreman/ForemanRoutines'
 import { Button } from '@/components/ui/button'
 import { EditableName } from '@/components/ui/editable-name'
@@ -61,7 +60,6 @@ export function ForemanDetails({ shown, onClose }: { shown: boolean; onClose: ()
     )
     const routines = (
         <>
-            {admin && <ForemanCheckins active={shown} />}
             <h3 className="shrink-0 px-4 pt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">{tCard('destinations.scheduled')}</h3>
             <ForemanRoutines docked={false} active={shown} className="min-h-0 flex-1" />
         </>
@@ -76,7 +74,7 @@ export function ForemanDetails({ shown, onClose }: { shown: boolean; onClose: ()
         )
     }
     return (
-        <ForemanCard lead={identity} onClose={onClose}>
+        <ForemanCard lead={identity} onClose={onClose} active={shown}>
             {routines}
         </ForemanCard>
     )

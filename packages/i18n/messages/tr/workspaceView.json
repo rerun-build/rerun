@@ -58,7 +58,7 @@
         "off": "Kapalı",
         "unavailable": "Bu sunucuda kapalı",
         "switchedOff": "Önce check-in'leri açın",
-        "modelHelper": "Check-in'lerinin modeli.",
+        "recent": "Son check-in'ler",
         "runNow": "Şimdi check-in yap",
         "started": "Check-in yapılıyor. Yalnızca söyleyecek bir şey olduğunda size yazar.",
         "empty": "Henüz check-in yok",
