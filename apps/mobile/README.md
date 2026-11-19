@@ -78,6 +78,9 @@ End-to-end flows (Maestro) live in `.maestro/`, with their own README.
 - `EXPO_PUBLIC_PERF=1 pnpm dev:mobile` prints in Metro's log how long a conversation took to open from
   the Home, on the copy kept on the phone and then on the hub's, and every second that missed frames
   on the JavaScript or the UI thread. A counter in the corner shows the same frames on screen.
+- `EXPO_PUBLIC_START_ROUTE=/lab-chat?tabs=3&cycle=1` opens a development build on that route, for a
+  remote simulator to reach a lab without a tap (`cycle=1` moves the chat lab to its next page every
+  few seconds).
 
 ## Rules
 

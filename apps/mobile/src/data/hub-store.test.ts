@@ -5,7 +5,7 @@ import { forgetHub, useHub } from './hub-store'
 
 let appStateListeners: ((state: AppStateStatus) => void)[] = []
 
-const deferred = <T,>() => {
+const deferred = <T>() => {
     let resolve: (value: T) => void = () => {}
     const promise = new Promise<T>(done => (resolve = done))
     return { promise, resolve }
@@ -75,7 +75,37 @@ describe('the hub store', () => {
         await renderHook(() => useHub('skills:7:pulse', fetch))
         await act(async () => {})
         forgetHub()
-        const { result } = await renderHook(() => useHub('skills:7:pulse', jest.fn(() => new Promise<string[]>(() => {}))))
+        const { result } = await renderHook(() =>
+            useHub(
+                'skills:7:pulse',
+                jest.fn(() => new Promise<string[]>(() => {}))
+            )
+        )
         expect(result.current.value).toBeNull()
+    })
+
+    // A read made as the change lands may predate it: the reload asked for the change reads again after it.
+    it('reads once more after the read on its way when asked to read again', async () => {
+        const first = deferred<string[]>()
+        const fetch = jest.fn<Promise<string[]>, []>().mockReturnValueOnce(first.promise).mockResolvedValue(['after the change'])
+        const { result } = await renderHook(() => useHub('conversations:7:pulse', fetch))
+        let reloaded: Promise<string[] | null> = Promise.resolve(null)
+        await act(async () => {
+            reloaded = result.current.reload()
+        })
+        await act(async () => first.resolve(['before the change']))
+        await act(async () => void (await reloaded))
+        expect(fetch).toHaveBeenCalledTimes(2)
+        expect(result.current.value).toEqual(['after the change'])
+    })
+
+    it('says whether the hub answered since the screen opened, not only earlier in the launch', async () => {
+        const fetch = jest.fn(async () => ['weekly-report'])
+        const opened = await renderHook(() => useHub('skills:7:pulse', fetch))
+        await act(async () => {})
+        expect(opened.result.current.answeredHere).toBe(true)
+        await opened.unmount()
+        const again = await renderHook(() => useHub('skills:7:pulse', fetch))
+        expect(again.result.current).toMatchObject({ fresh: true, answeredHere: false })
     })
 })

@@ -3,8 +3,10 @@ import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, 
 
 import { fetchInbox, markInboxRead } from '@/api/inbox'
 import { useAuth } from '@/auth/AuthProvider'
+import { inboxCount } from '@/components/inbox/inbox'
 import { cachedInbox } from '@/data/local-cache'
 import { useBurstReload, useLiveReload } from '@/data/useLiveReload'
+import { setBadge } from '@/notifications/push'
 
 // `fresh`: read from the hub since the app opened, not the copy the phone kept from the last visit.
 type InboxState = { state: 'loading' } | { state: 'error' } | { state: 'ready'; items: InboxItem[]; running: number; fresh: boolean }
@@ -91,6 +93,13 @@ export function InboxProvider({ children }: { children: ReactNode }) {
 
     const markRead = useCallback((items: InboxItem[]) => write(items.flatMap(item => item.sessionIds), items.map(item => item.id)), [write])
     const markAllRead = useCallback(() => write('all', shown.state === 'ready' ? shown.items.map(item => item.id) : []), [write, shown])
+
+    // The app icon shows the bell's count, never off the copy kept from the last visit, whatever screen
+    // is up: the Home rests frozen under a conversation.
+    const unread = shown.state === 'ready' && shown.fresh ? inboxCount(shown.items) : null
+    useEffect(() => {
+        if (unread !== null) setBadge(unread).catch(() => {})
+    }, [unread])
 
     return <InboxContext value={{ ...shown, markRead, markAllRead, reload }}>{children}</InboxContext>
 }

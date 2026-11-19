@@ -29,6 +29,7 @@ import { MockStore } from '@/mocks/store'
 import { OpenPushTarget, usePushTarget } from '@/notifications/PushRouting'
 import { FrameMonitor } from '@/perf/FrameMonitor'
 import { PERF_LOG } from '@/perf/timing'
+import { OpenStartRoute } from '@/lib/start-route'
 import { useAppearanceLoaded } from '@/theme/appearance'
 import { ReducedMotionOverride } from '@/theme/ReducedMotionOverride'
 import { useColorSchemeName } from '@/theme/theme'
@@ -171,6 +172,7 @@ function App() {
                             <MediaViewerHost />
                             <SystemDialogHost />
                             {PERF_LOG && <FrameMonitor top={4} />}
+                            <OpenStartRoute />
                         </InboxProvider>
                     </MockStore>
                 )}

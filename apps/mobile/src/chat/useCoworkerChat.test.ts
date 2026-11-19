@@ -178,6 +178,7 @@ describe('useCoworkerChat with a kept transcript', () => {
         saveTranscript(7, 's1', kept, { etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' })
         const endpoints = fakeEndpoints(null)
         endpoints.messages = jest.fn(async () => ({ messages: null, etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' }))
+        mockChat.messages = kept
 
         const { result } = await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1' }))
 
@@ -187,6 +188,22 @@ describe('useCoworkerChat with a kept transcript', () => {
         expect(endpoints.messages).toHaveBeenCalledWith({ accessToken: 't', workspaceId: 7 }, 's1', '"v1"')
         expect(mockChat.setMessages).not.toHaveBeenCalled()
         expect(result.current.fresh).toBe(true)
+        mockChat.messages = []
+    })
+
+    // Regenerate takes the last answer off the screen first: a failed one leaves the screen on less than
+    // the hub's copy, even when that copy did not move.
+    it('puts the hub copy back when the screen moved away from it, whatever the hub says', async () => {
+        saveTranscript(7, 's1', kept, { etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' })
+        const endpoints = fakeEndpoints(null)
+        endpoints.messages = jest.fn(async () => ({ messages: null, etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' }))
+        mockChat.messages = []
+
+        await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1' }))
+        await act(async () => {})
+
+        expect(mockChat.setMessages).toHaveBeenCalledWith(kept)
+        mockChat.messages = []
     })
 
     // The list the hub just sent names the version the transcript was kept at: what waits on the person

@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import { useSharedValue } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -16,16 +16,18 @@ import { MockPane, type LabState } from './lab-foreman'
 // Dev only: a coworker's conversations with their tabs, over mock messages, swiped through as on a coworker.
 //   /lab-chat?tabs=3&active=1&state=loading&coworker=foreman   tabs: how many are open; active: the index
 //   on screen; state: what every open conversation shows, loading also leaving the tabs unnamed;
-//   coworker: whose chat, Pulse when left out; probe=1: the keyboard heights the pane is lifted by
+//   coworker: whose chat, Pulse when left out; probe=1: the keyboard heights the pane is lifted by;
+//   cycle=1: moves to the next page every few seconds, to watch each page come on screen without a tap
 const TITLES = ['Lyon agencies', 'LinkedIn post on pricing', 'Salutation amicale et prise de nouvelles', 'Q4 prospects', 'Weekly recap', 'Support triage']
 const AUTOMATED_RUNS: ChatTab[] = [
     { id: 'lab-run-1', title: '4 applications sent: Doctolib, Qonto, Alan', running: false, empty: false, automationName: 'Daily missions apply', updatedAt: new Date(Date.now() - 3 * 3_600_000).toISOString() },
     { id: 'lab-run-2', title: 'No new mission this morning', running: false, empty: false, automationName: 'Daily missions apply', updatedAt: new Date(Date.now() - 27 * 3_600_000).toISOString() },
 ]
+const CYCLE_MS = 3000
 const STATES: LabState[] = ['running', 'conversation', 'long', 'question', 'conversation', 'long']
 
 export default function ChatLab() {
-    const params = useLocalSearchParams<{ tabs?: string; active?: string; state?: LabState; coworker?: string; probe?: string }>()
+    const params = useLocalSearchParams<{ tabs?: string; active?: string; state?: LabState; coworker?: string; probe?: string; cycle?: string }>()
     const loading = params.state === 'loading'
     const theme = useTheme()
     const insets = useSafeAreaInsets()
@@ -39,6 +41,12 @@ export default function ChatLab() {
     )
     const activeIndex = activePageIndex(pages, activeId)
     const progress = useSharedValue(activeIndex)
+    const cycling = params.cycle === '1'
+    useEffect(() => {
+        if (!cycling) return
+        const timer = setTimeout(() => setActiveId(pages[(activeIndex + 1) % pages.length]?.sessionId ?? null), CYCLE_MS)
+        return () => clearTimeout(timer)
+    }, [cycling, activeIndex, pages])
     return (
         <View style={{ flex: 1, backgroundColor: theme.background }}>
             <ConversationPager pages={pages} activeIndex={activeIndex} progress={progress} onSettle={index => setActiveId(pages[index]?.sessionId ?? null)} renderPage={(page, onScreen) => <MockPane onScreen={onScreen} state={page.sessionId ? (params.state ?? STATES[pages.indexOf(page) % STATES.length]) : 'empty'} topInset={insets.top + CHAT_HEADER_HEIGHT + spacing.lg} seeThrough={false} coworkerName={coworker.name} probe={params.probe === '1'} />} />

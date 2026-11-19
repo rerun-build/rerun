@@ -93,9 +93,10 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
             // A send left while the read was on its way: the hub's copy predates it, and the stream
             // on screen is already the one to follow. The end of that run reads the transcript again.
             if (statusRef.current === 'submitted' || statusRef.current === 'streaming') return
-            // The hub's copy is the one kept, already on screen unless a stream wrote over it since.
-            const { messages, unchanged } = transcript
-            if (!(unchanged && messages === cached?.messages) && !sameTranscript(messages, shownRef.current)) setMessages(messages)
+            // The hub's copy is set unless it is the very one on screen: a regenerate or a send that
+            // failed since left the screen on something else, even when the hub's copy did not move.
+            const { messages } = transcript
+            if (messages !== shownRef.current && !sameTranscript(messages, shownRef.current)) setMessages(messages)
             if (!runId) return
             runRef.current = runId
             setRunStartedAt(Date.now())

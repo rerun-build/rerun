@@ -58,6 +58,8 @@ export function useBoard(): Board & { reload: () => void } {
                 // A delete only carries the primary key, so the workspace filter above never lets one through.
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'agents' }, changed)
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'sessions', ...(sessionsFilter ? { filter: sessionsFilter } : {}) }, changed)
+                // As for agents, a delete only carries the primary key: no filter on the coworkers lets one through.
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'sessions' }, changed)
                 .on('postgres_changes', { event: '*', schema: 'public', table: 'spaces', filter: `workspace_id=eq.${workspaceId}` }, changed)
             // A Box named to the caller or taken back from them: its coworkers appear or leave the home.
             if (userId) channel.on('postgres_changes', { event: '*', schema: 'public', table: 'space_members', filter: `user_id=eq.${userId}` }, changed)

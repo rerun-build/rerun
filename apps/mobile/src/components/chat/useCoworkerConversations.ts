@@ -8,7 +8,7 @@ import { useHub } from '@/data/hub-store'
 import { coworkerScreenPart } from '@/data/local-cache'
 import { useBurstReload, useLiveReload } from '@/data/useLiveReload'
 
-// `fresh`: the list is the hub's answer of this launch, not the copy kept from the last visit.
+// `fresh`: the hub sent this list since the screen opened, not earlier in the launch nor on a past visit.
 type LiveConversations = { conversations: Conversation[]; loaded: boolean; fresh: boolean; reload: () => void }
 
 const NONE: Conversation[] = []
@@ -41,7 +41,8 @@ function useLiveConversations(agentId: string): LiveConversations {
             const fetched = await (foreman ? fetchForemanConversations(caller) : fetchAgentConversations(caller, agentId))
             return [...fetched].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
         },
-        { persisted }
+        // Read at each opening: a conversation answered elsewhere meanwhile must not open as it was.
+        { persisted, freshFor: 0 }
     )
     const { reload } = list
     // A run writes its row several times in a row (its status, then its preview, its title): one read for the burst.
@@ -60,5 +61,5 @@ function useLiveConversations(agentId: string): LiveConversations {
         reloadSoon
     )
 
-    return { conversations: list.value ?? NONE, loaded: list.value !== null || list.fresh || list.failed, fresh: list.fresh, reload }
+    return { conversations: list.value ?? NONE, loaded: list.value !== null || list.fresh || list.failed, fresh: list.answeredHere, reload }
 }

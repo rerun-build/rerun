@@ -36,8 +36,13 @@ describe('useBoard', () => {
         mockFetchBoard.mockResolvedValue(boardWith(agent('a2', 'Writer'), agent('a1', 'Scout')))
         await renderHook(() => useBoard())
         await act(async () => {})
-        const sessions = realtime.live().flatMap(channel => channel.bindings).filter(binding => binding.table === 'sessions')
-        expect(sessions.at(-1)).toEqual(expect.objectContaining({ filter: 'agent_id=in.(a1,a2)' }))
+        const sessions = realtime
+            .live()
+            .flatMap(channel => channel.bindings)
+            .filter(binding => binding.table === 'sessions')
+        expect(sessions).toContainEqual(expect.objectContaining({ filter: 'agent_id=in.(a1,a2)' }))
+        // A delete carries no agent: it is heard unfiltered.
+        expect(sessions).toContainEqual(expect.objectContaining({ event: 'DELETE', filter: undefined }))
     })
 
     it('hears every session past what one filter can name, and none for an empty board', () => {

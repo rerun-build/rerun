@@ -58,18 +58,25 @@ export default function PerfLab() {
         setRunning(kind)
         setReport(null)
         let step = 0
-        const timer = setInterval(() => {
-            step += 1
-            if (kind === 'type') setDraft(TYPED.slice(0, step % (TYPED.length + 1)))
-            if (kind === 'stream') setStreamed(step * 18)
-            if (kind === 'scroll') scroll.current?.scrollTo({ y: Math.max(0, 30_000 - step * 400), animated: true })
-            if (performance.now() - startedAt < RUN_MS) return
-            clearInterval(timer)
-            const result: RenderCounts = counts()
-            stopCountingRenders()
-            setRunning(null)
-            setReport(`${kind} · ${step} steps · ${Object.entries(result).map(([name, count]) => `${name} ${count}`).join(' · ')}`)
-        }, kind === 'stream' ? 80 : 60)
+        const timer = setInterval(
+            () => {
+                step += 1
+                if (kind === 'type') setDraft(TYPED.slice(0, step % (TYPED.length + 1)))
+                if (kind === 'stream') setStreamed(step * 18)
+                if (kind === 'scroll') scroll.current?.scrollTo({ y: Math.max(0, 30_000 - step * 400), animated: true })
+                if (performance.now() - startedAt < RUN_MS) return
+                clearInterval(timer)
+                const result: RenderCounts = counts()
+                stopCountingRenders()
+                setRunning(null)
+                setReport(
+                    `${kind} · ${step} steps · ${Object.entries(result)
+                        .map(([name, count]) => `${name} ${count}`)
+                        .join(' · ')}`
+                )
+            },
+            kind === 'stream' ? 80 : 60
+        )
     }
 
     const autoRun = params.run

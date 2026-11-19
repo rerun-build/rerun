@@ -34,7 +34,6 @@ import { PillButton } from '@/components/ui/PillButton'
 import { loadTranscript } from '@/data/local-cache'
 import { useInbox } from '@/data/InboxProvider'
 import { useBoard } from '@/data/useBoard'
-import { setBadge } from '@/notifications/push'
 import { startTiming } from '@/perf/timing'
 import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
@@ -99,12 +98,6 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
         const timer = setTimeout(() => void preloadGenerals({ accessToken, workspaceId }, coworkersRead), PRELOAD_AFTER_MS)
         return () => clearTimeout(timer)
     }, [coworkersRead, accessToken, workspaceId])
-
-    // The app icon shows the bell's count, never off the copy kept from the last visit.
-    const unread = inbox.state === 'ready' && inbox.fresh ? inboxCount(inbox.items) : null
-    useEffect(() => {
-        if (unread !== null) setBadge(unread).catch(() => {})
-    }, [unread])
 
     const open = (coworker: HomeCoworker) => {
         startTiming('chat open', 'chat fresh')

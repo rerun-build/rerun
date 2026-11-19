@@ -52,7 +52,11 @@ export function useKeyboardLift(height: SharedValue<number>, bottomInset: number
 // How far the chat stands raised once the keyboard is at rest: the top of its thread is that much
 // under the header, and the thread scrolls that much further to bring it back.
 export function useRaiseAtRest(bottomInset: number): number {
-    const [raised, setRaised] = useState(0)
+    // A chat opened while the keyboard is up (a page picked from the header's menu) starts raised.
+    const [raised, setRaised] = useState(() => {
+        const metrics = Keyboard.isVisible() ? Keyboard.metrics() : undefined
+        return metrics ? raiseOf(visibleHeight(metrics) ?? metrics.height, bottomInset) : 0
+    })
     useEffect(() => {
         const shown = Keyboard.addListener('keyboardDidShow', event => setRaised(raiseOf(visibleHeight(event.endCoordinates) ?? event.endCoordinates.height, bottomInset)))
         const hidden = Keyboard.addListener('keyboardDidHide', () => setRaised(0))
