@@ -139,15 +139,17 @@ export const cachedNotificationPrefs = (userId: string): CacheEntry<Notification
 
 export const cachedAiConnections = (workspaceId: number): CacheEntry<AiConnectionsView> => entry(`ai-${workspaceId}`, value => aiConnectionsViewSchema.parse(value))
 
-export type ForemanRead = { surface: ForemanSurface; last: { sessionId: string; title: string | null } | null }
+// `name`: what the workspace calls its Chief of Staff, absent from what an older app kept.
+export type ForemanRead = { surface: ForemanSurface; last: { sessionId: string; title: string | null } | null; name?: string | null }
 
 export const cachedForeman = (workspaceId: number): CacheEntry<ForemanRead> =>
-    entry(`foreman-${workspaceId}`, value => {
-        const { surface, last } = fieldsOf(value)
-        if (last === null) return { surface: foremanSurfaceSchema.parse(surface), last: null }
+    entry(`foreman-${workspaceId}`, (value): ForemanRead => {
+        const { surface, last, name } = fieldsOf(value)
+        const named = typeof name === 'string' && name ? { name } : {}
+        if (last === null) return { surface: foremanSurfaceSchema.parse(surface), last: null, ...named }
         const { sessionId, title } = fieldsOf(last)
         if (typeof sessionId !== 'string' || (title !== null && typeof title !== 'string')) throw new Error('not a conversation')
-        return { surface: foremanSurfaceSchema.parse(surface), last: { sessionId, title } }
+        return { surface: foremanSurfaceSchema.parse(surface), last: { sessionId, title }, ...named }
     })
 
 export type CoworkerDetailsRead = Partial<{ view: AgentView; boxes: Box[]; files: CoworkerFiles; apps: InstalledServiceView[]; routines: RoutineView[] }>

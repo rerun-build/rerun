@@ -67,7 +67,7 @@
         "title": "Search",
         "back": "Back",
         "placeholder": "Search coworkers and conversations",
-        "askRerun": "Ask your Chief of Staff",
+        "askRerun": "{named, select, yes {Ask {name}} other {Ask your Chief of Staff}}",
         "quotedAsk": "“{query}”",
         "coworkers": "Coworkers",
         "conversations": "Conversations",
@@ -155,6 +155,7 @@
         "widgets.headline.both": "Home screen and lock screen widget: how many coworkers wait on the person, then how many are working. Short, it sits above the clock.",
         "widgets.needsYou": "Small solid chip on a widget, in capitals: a coworker waits on the person. Two words at most.",
         "widgets.minutes": "How long a coworker has been working, very short, e.g. 12m.",
-        "widgets.asks": "Lock screen widget title: {name} is a coworker that waits on the person."
+        "widgets.asks": "Lock screen widget title: {name} is a coworker that waits on the person.",
+        "search.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
     }
 }

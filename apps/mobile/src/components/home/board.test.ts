@@ -105,3 +105,11 @@ describe('moveIn', () => {
         expect(moveIn(['a', 'b', 'c', 'd'], 3, 1)).toEqual(['a', 'd', 'b', 'c'])
     })
 })
+
+describe('foremanOnBoard', () => {
+    it('carries the name the workspace gave the Chief of Staff, and its default name until then', () => {
+        expect(foremanOnBoard(false, 'Max').name).toBe('Max')
+        expect(foremanOnBoard(true).name).toBe('Chief of Staff')
+    })
+})
+

@@ -52,8 +52,8 @@
             "tools": "What tools do you have access to?"
         },
         "team": {
-            "greeting": "Hi, I'm your Chief of Staff",
-            "greetingNamed": "Hi {firstName}, I'm your Chief of Staff",
+            "greeting": "{named, select, yes {Hi, I'm {name}} other {Hi, I'm your Chief of Staff}}",
+            "greetingNamed": "{named, select, yes {Hi {firstName}, I'm {name}} other {Hi {firstName}, I'm your Chief of Staff}}",
             "greetingWithTeam": "{greeting}. Here is your team.",
             "emptySubtitle": "You have no coworkers yet. Tell me a job you would hand off and I'll build the first one.",
             "buildPrompt": "Build me a coworker that ",
@@ -168,7 +168,7 @@
         "image": "Image"
     },
     "messages": {
-        "askRerun": "Ask your Chief of Staff",
+        "askRerun": "{named, select, yes {Ask {name}} other {Ask your Chief of Staff}}",
         "badResponse": "Bad response",
         "compacting": "Compacting",
         "copy": "Copy",
@@ -217,7 +217,7 @@
         "answerPlaceholder": "Answer {name}",
         "attachFailed": "Could not attach the files",
         "defaultModel": "Default · {model}",
-        "foremanPlaceholder": "Ask your Chief of Staff anything",
+        "foremanPlaceholder": "{named, select, yes {Ask {name} anything} other {Ask your Chief of Staff anything}}",
         "loadFailed": "We could not load this conversation.",
         "loading": "Loading the conversation",
         "messagePlaceholder": "Message {name}",
@@ -318,6 +318,10 @@
         "threadBranch.opener.trigger": "Stands in for the first message of a thread a webhook started. {name} is the trigger's name.",
         "browser.pageActions": "Accessibility label of the menu button of the app's in-app web browser. {host} is the web address of the page shown, like notion.so.",
         "browser.openInBrowser": "Menu item: opens the page in the phone's own web browser (Safari, Chrome), where the person is signed in.",
-        "browser.brand": "Name of the app, shown under a web page opened in the app, beside the coworker who wrote the link. Rerun is the product name, keep it."
+        "browser.brand": "Name of the app, shown under a web page opened in the app, beside the coworker who wrote the link. Rerun is the product name, keep it.",
+        "empty.team.greeting": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "empty.team.greetingNamed": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "messages.askRerun": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used.",
+        "pane.foremanPlaceholder": "{named} is yes once the workspace gave its Chief of Staff (the workspace's AI assistant) a name of its own, {name}; otherwise the default wording is used."
     }
 }

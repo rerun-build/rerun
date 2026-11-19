@@ -24,6 +24,7 @@ import { cachedBoard } from '@/data/local-cache'
 import { useTimeAgo } from '@/lib/time'
 import { fonts, radius, spacing } from '@/theme/tokens'
 import { useTheme } from '@/theme/theme'
+import { foremanNameValues, useForemanName } from '@/data/useForemanName'
 
 // The web's control center, minus its commands: coworkers by name, conversations by title. Same rules
 // as the web: a leading `@` keeps to coworkers, conversations are looked up from two letters on.
@@ -109,6 +110,7 @@ export default function Search() {
     const topBar = usePaneInsets({ clearWindowControls: true })
     const team = useTeam()
     const t = useTranslations('mobileHome')
+    const foremanName = useForemanName()
     const [query, setQuery] = useState('')
     const [collapsed, setCollapsed] = useState<string[]>([])
     const toggle = (key: string) => setCollapsed(current => (current.includes(key) ? current.filter(entry => entry !== key) : [...current, key]))
@@ -143,7 +145,7 @@ export default function Search() {
                         <ForemanOrb size={28} />
                         <View style={{ flex: 1, gap: 1 }}>
                             <AppText variant="callout" medium>
-                                {t('search.askRerun')}
+                                {t('search.askRerun', foremanNameValues(foremanName))}
                             </AppText>
                             <AppText variant="footnote" tone="muted" numberOfLines={1}>
                                 {t('search.quotedAsk', { query: asked })}

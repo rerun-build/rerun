@@ -1,4 +1,4 @@
-import { CLIENT_HEADER, formatClientHeader, hubPath, isRecord, type HubBody, type HubEndpoint, type HubPathParams, type HubQuery, type HubQueryValues, type HubResponse } from '@rerun/contracts'
+import { CLIENT_HEADER, TIME_ZONE_HEADER, formatClientHeader, hubPath, isRecord, type HubBody, type HubEndpoint, type HubPathParams, type HubQuery, type HubQueryValues, type HubResponse } from '@rerun/contracts'
 import * as Application from 'expo-application'
 
 import { readSalvaging, type ResponseSchema } from '@/api/salvage'
@@ -60,10 +60,21 @@ export function apiErrorOf(status: number, payload: unknown, fallback: string): 
     return new ApiError(status, translatedRefusal(code, params) ?? stringFieldOf(payload, 'error') ?? fallback, payload, code, params)
 }
 
-// What every call to the hub carries: the build, and once signed in the token and the workspace.
+function deviceTimeZone(): string | null {
+    try {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone || null
+    } catch {
+        return null
+    }
+}
+
+// What every call to the hub carries: the build, and once signed in the token, the workspace and the
+// time zone of the phone, which tells the Chief of Staff the hour of this person's day.
 export function hubHeaders(clientHeader: string, { accessToken, workspaceId }: Pick<ApiRequest, 'accessToken' | 'workspaceId'>): Record<string, string> {
     const headers: Record<string, string> = { [CLIENT_HEADER]: clientHeader }
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`
+    const timeZone = accessToken ? deviceTimeZone() : null
+    if (timeZone) headers[TIME_ZONE_HEADER] = timeZone
     if (workspaceId != null) headers[WORKSPACE_HEADER] = String(workspaceId)
     return headers
 }

@@ -17,6 +17,7 @@ import { AppText } from '@/components/ui/AppText'
 import { PillButton } from '@/components/ui/PillButton'
 import { environment, webHost } from '@/config/environment'
 import { cachedForeman } from '@/data/local-cache'
+import { foremanLabel, rememberForemanName, useForemanName } from '@/data/useForemanName'
 import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -80,7 +81,8 @@ function Notice({ title, body, onRetry }: { title: string; body: string; onRetry
 export function ForemanChat({ sessionId }: { sessionId: string | null }) {
     const theme = useTheme()
     const t = useTranslations('mobileChat.foreman')
-    const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, role: t('role') }), [t])
+    const name = useForemanName()
+    const foreman = useMemo<ChatCoworker>(() => ({ ...FOREMAN, name: foremanLabel(name), role: t('role') }), [t, name])
     const back = useChatBack()
     const { session, me } = useAuth()
     const opensGeneral = sessionId === LAST_CONVERSATION || sessionId === GENERAL_PAGE_ID
@@ -130,7 +132,7 @@ export function ForemanChat({ sessionId }: { sessionId: string | null }) {
         fetchForemanState({ accessToken: token, workspaceId })
             .then(state => {
                 if (cancelled) return
-                cachedForeman(workspaceId).save({ surface: state.surface, last: kept?.last ?? null })
+                rememberForemanName(workspaceId, state.name ?? null, state.surface)
                 setSurface(state.surface)
                 setGreetOwed(state.greet === true)
             })

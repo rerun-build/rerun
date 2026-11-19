@@ -39,6 +39,7 @@ import { layoutTransition as layout } from '@/theme/motion'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
 import { WidgetSync } from '@/widgets/WidgetSync'
+import { useForemanName } from '@/data/useForemanName'
 
 // The Home has drawn and settled before anything is read in the background.
 const PRELOAD_AFTER_MS = 1500
@@ -81,11 +82,12 @@ export function HomeScreen({ sidebar = false }: { sidebar?: boolean }) {
     const openForeman = () => go({ pathname: '/chat/[id]', params: { id: LAST_CONVERSATION } })
 
     const foreman = useForemanLast()
+    const foremanName = useForemanName()
     const pins = usePinnedAgents()
     const cell = usePinnedCell()
     const [reordering, setReordering] = useState(false)
     const foremanPinned = pins.pinned.includes(FOREMAN_AGENT_ID)
-    const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned, board.state === 'ready' ? foremanOnBoard(foreman.running) : undefined)
+    const { pinned, others } = withPinned(board.state === 'ready' ? board.coworkers : [], pins.pinned, board.state === 'ready' ? foremanOnBoard(foreman.running, foremanName) : undefined)
     const sections = board.state === 'ready' && group === 'box' ? sectionsByBox(others, board.boxes, t('untitledBox')) : []
     const recent = board.state === 'ready' && group === 'recent' ? recentCoworkers(others) : []
 

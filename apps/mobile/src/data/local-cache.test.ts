@@ -1,7 +1,7 @@
 import type { Me } from '@rerun/contracts'
 import type { UIMessage } from 'ai'
 
-import { cachedBoard, cachedMe, clearLocalCache, loadCoworkerDetail, loadTranscript, readCoworkerDetails, readCoworkerScreen, readTranscript, sameTranscript, saveCoworkerScreen, saveTranscript } from './local-cache'
+import { cachedBoard, cachedForeman, cachedMe, clearLocalCache, loadCoworkerDetail, loadTranscript, readCoworkerDetails, readCoworkerScreen, readTranscript, sameTranscript, saveCoworkerScreen, saveTranscript } from './local-cache'
 
 // The cache folder as a map of file name to its text, written in order.
 const mockDisk = new Map<string, { text: string; writtenAt: number }>()
@@ -138,6 +138,14 @@ describe('chat cache', () => {
 
         expect(cachedMe('u1').read()).toBeNull()
         expect(cachedBoard(7).read()).toBeNull()
+    })
+
+    it("keeps the name of the Chief of Staff, and reads a file an older app wrote without it", () => {
+        mockDisk.set('foreman-7.json', { text: JSON.stringify({ v: 1, value: { surface: 'engine', last: null } }), writtenAt: 1 })
+        mockDisk.set('foreman-8.json', { text: JSON.stringify({ v: 1, value: { surface: 'engine', last: { sessionId: 's1', title: 'Invoices' }, name: 'Max' } }), writtenAt: 1 })
+
+        expect(cachedForeman(7).read()).toEqual({ surface: 'engine', last: null })
+        expect(cachedForeman(8).read()).toEqual({ surface: 'engine', last: { sessionId: 's1', title: 'Invoices' }, name: 'Max' })
     })
 
     it('never lets a burst of transcripts push the home off the phone', () => {

@@ -67,7 +67,7 @@
         "title": "Rechercher",
         "back": "Retour",
         "placeholder": "Rechercher des coworkers et des conversations",
-        "askRerun": "Demander à votre Chief of Staff",
+        "askRerun": "{named, select, yes {Demander à {name}} other {Demander à votre Chief of Staff}}",
         "quotedAsk": "« {query} »",
         "coworkers": "Coworkers",
         "conversations": "Conversations",

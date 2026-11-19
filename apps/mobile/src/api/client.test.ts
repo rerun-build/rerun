@@ -34,6 +34,15 @@ describe('createApiClient', () => {
         })
     })
 
+    it("tells the hub the time zone of the phone once signed in, and only then", async () => {
+        const anonymous = clientAnswering(json({ ok: true }))
+        await anonymous.request('/api/v1/client')
+        expect(anonymous.calls[0].init.headers).not.toHaveProperty('x-rerun-time-zone')
+        const signedIn = clientAnswering(json({ ok: true }))
+        await signedIn.request('/api/chat/foreman/engine', { method: 'POST', body: {}, accessToken: 'jwt', workspaceId: 7 })
+        expect((signedIn.calls[0].init.headers as Record<string, string>)['x-rerun-time-zone']).toBe(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    })
+
     it('reads a 204 as no payload', async () => {
         const { request } = clientAnswering(new Response(null, { status: 204 }))
         await expect(request('/api/v1/conversations/c-1/stop', { method: 'POST' })).resolves.toBeUndefined()

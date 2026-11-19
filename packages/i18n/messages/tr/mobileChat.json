@@ -52,8 +52,8 @@
             "tools": "Hangi araçlara erişimin var?"
         },
         "team": {
-            "greeting": "Merhaba, ben Chief of Staff'ınız",
-            "greetingNamed": "Merhaba {firstName}, ben Chief of Staff'ınız",
+            "greeting": "{named, select, yes {Merhaba, ben {name}} other {Merhaba, ben Chief of Staff'ınız}}",
+            "greetingNamed": "{named, select, yes {Merhaba {firstName}, ben {name}} other {Merhaba {firstName}, ben Chief of Staff'ınız}}",
             "greetingWithTeam": "{greeting}. İşte ekibiniz.",
             "emptySubtitle": "Henüz coworker'ınız yok. Devretmek istediğiniz bir işi söyleyin, ilkini ben oluşturayım.",
             "buildPrompt": "Şu işi yapacak bir coworker oluştur: ",
@@ -168,7 +168,7 @@
         "image": "Görsel"
     },
     "messages": {
-        "askRerun": "Chief of Staff'ınıza sorun",
+        "askRerun": "{named, select, yes {{name} ile konuşun} other {Chief of Staff'ınıza sorun}}",
         "badResponse": "Kötü yanıt",
         "compacting": "Sıkıştırılıyor",
         "copy": "Kopyala",
@@ -217,7 +217,7 @@
         "answerPlaceholder": "Yanıtla: {name}",
         "attachFailed": "Dosyalar eklenemedi",
         "defaultModel": "Varsayılan · {model}",
-        "foremanPlaceholder": "Chief of Staff'ınıza her şeyi sorun",
+        "foremanPlaceholder": "{named, select, yes {{name} ile istediğiniz her şeyi konuşun} other {Chief of Staff'ınıza her şeyi sorun}}",
         "loadFailed": "Bu sohbeti yükleyemedik.",
         "loading": "Sohbet yükleniyor",
         "messagePlaceholder": "Mesaj: {name}",

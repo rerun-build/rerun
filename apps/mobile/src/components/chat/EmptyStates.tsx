@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { useWorkspaceAgents } from '@/data/useWorkspaceAgents'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
+import { foremanNameValues, useForemanName } from '@/data/useForemanName'
 
 const PULSE_BUDDIES = 6
 const STARTER_KEYS = ['capabilities', 'recentWork', 'projectFiles', 'tools'] as const
@@ -146,9 +147,10 @@ function ForemanEmptyStateSkeleton() {
 
 function useTeamEmptyStateCopy(): TeamEmptyStateCopy {
     const t = useTranslations('mobileChat.empty.team')
+    const foremanName = useForemanName()
     return useMemo<TeamEmptyStateCopy>(
         () => ({
-            greeting: name => (name ? t('greetingNamed', { firstName: name }) : t('greeting')),
+            greeting: name => (name ? t('greetingNamed', { ...foremanNameValues(foremanName), firstName: name }) : t('greeting', foremanNameValues(foremanName))),
             greetingWithTeam: greeting => t('greetingWithTeam', { greeting }),
             emptySubtitle: t('emptySubtitle'),
             buildPrompt: t('buildPrompt'),
@@ -160,7 +162,7 @@ function useTeamEmptyStateCopy(): TeamEmptyStateCopy {
             handOff: (name, mention) => ({ title: t('handOff.title', { name }), description: t('handOff.description'), prefill: t('handOff.prefill', { mention }) }),
             build: { title: t('build.title'), description: t('build.description') },
         }),
-        [t]
+        [t, foremanName]
     )
 }
 

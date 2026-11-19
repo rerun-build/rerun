@@ -52,8 +52,8 @@
             "tools": "¿A qué herramientas tienes acceso?"
         },
         "team": {
-            "greeting": "Hola, soy tu Chief of Staff",
-            "greetingNamed": "Hola {firstName}, soy tu Chief of Staff",
+            "greeting": "{named, select, yes {Hola, soy {name}} other {Hola, soy tu Chief of Staff}}",
+            "greetingNamed": "{named, select, yes {Hola {firstName}, soy {name}} other {Hola {firstName}, soy tu Chief of Staff}}",
             "greetingWithTeam": "{greeting}. Este es tu equipo.",
             "emptySubtitle": "Aún no tienes coworkers. Cuéntame un trabajo que delegarías y crearé el primero.",
             "buildPrompt": "Créame un coworker que ",
@@ -168,7 +168,7 @@
         "image": "Imagen"
     },
     "messages": {
-        "askRerun": "Pregunta a tu Chief of Staff",
+        "askRerun": "{named, select, yes {Pregunta a {name}} other {Pregunta a tu Chief of Staff}}",
         "badResponse": "Mala respuesta",
         "compacting": "Compactando",
         "copy": "Copiar",
@@ -217,7 +217,7 @@
         "answerPlaceholder": "Responder a {name}",
         "attachFailed": "No se pudieron adjuntar los archivos",
         "defaultModel": "Predeterminado · {model}",
-        "foremanPlaceholder": "Pregunta lo que quieras a tu Chief of Staff",
+        "foremanPlaceholder": "{named, select, yes {Pregunta lo que quieras a {name}} other {Pregunta lo que quieras a tu Chief of Staff}}",
         "loadFailed": "No pudimos cargar esta conversación.",
         "loading": "Cargando la conversación",
         "messagePlaceholder": "Escribir a {name}",

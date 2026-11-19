@@ -67,7 +67,7 @@
         "title": "Ara",
         "back": "Geri",
         "placeholder": "Coworker'larda ve sohbetlerde ara",
-        "askRerun": "Chief of Staff'ınıza sorun",
+        "askRerun": "{named, select, yes {{name} ile konuşun} other {Chief of Staff'ınıza sorun}}",
         "quotedAsk": "“{query}”",
         "coworkers": "Coworker'lar",
         "conversations": "Sohbetler",

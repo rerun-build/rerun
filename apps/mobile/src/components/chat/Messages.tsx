@@ -16,6 +16,7 @@ import { brand, radius, spacing, withAlpha } from '@/theme/tokens'
 
 import type { FileOwner } from '@/api/files'
 import { isImageItem, openViewer, type ViewerItem } from '@/components/viewer/viewer-store'
+import { foremanLabelValues } from '@/data/useForemanName'
 
 import { AuthedImage } from './cards/CardParts'
 import { LinkMessageScope } from './link-origin'
@@ -201,7 +202,7 @@ export function EmptyConversation({ coworker }: { coworker: Coworker }) {
             <CoworkerAvatar coworker={coworker} size={96} />
             <View style={{ alignItems: 'center', gap: 2 }}>
                 <AppText variant="title" numberOfLines={1}>
-                    {coworker.kind === 'foreman' ? t('messages.askRerun') : coworker.name}
+                    {coworker.kind === 'foreman' ? t('messages.askRerun', foremanLabelValues(coworker.name)) : coworker.name}
                 </AppText>
                 <AppText variant="callout" tone="muted" numberOfLines={2} style={{ textAlign: 'center' }}>
                     {coworker.role}

@@ -38,6 +38,7 @@ import { moodOf } from '@/components/ui/CoworkerAvatar'
 import { PillButton } from '@/components/ui/PillButton'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
+import { foremanLabelValues } from '@/data/useForemanName'
 
 import { uploadAttachments, type ComposerAttachment } from './attachments'
 import { PinnedSkillProposal } from './cards/SkillProposalRow'
@@ -415,7 +416,7 @@ function ConversationPaneBody({ coworker, makeEndpoints, initialSessionId, onSes
     })
     const regenerate = useStableCallback(() => void chat.regenerate())
     const transcript = { messages: chat.messages, busy: chat.busy, agentId: isForeman ? null : coworker.id, coworkerName: coworker.name, fileOwner, hiddenCallId: alert?.toolCallId ?? null, skillProposals, onStopTask: stopTask, onRegenerate: pending ? undefined : regenerate, ratingOf: feedback.ratingOf, onRate: feedback.rate, paidSourcesByTurn, authorOf, startedBy: banner, threadRows, onOpenThread: openThread }
-    const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : !chat.sessionId ? t('newPlaceholder') : isForeman ? t('foremanPlaceholder') : t('messagePlaceholder', { name: coworker.name })
+    const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : !chat.sessionId ? t('newPlaceholder') : isForeman ? t('foremanPlaceholder', foremanLabelValues(coworker.name)) : t('messagePlaceholder', { name: coworker.name })
 
     return (
         <Animated.View style={[{ flex: 1, paddingBottom: LIFTS_BY_SLIDING ? insets.bottom : 0 }, lift]}>
