@@ -3,7 +3,6 @@
 import { useErrorText } from '@/hooks/useErrorText'
 import { getCatalogServicesBySlugsAction, getServiceAlternativesAction, getServiceDetailsAction } from '@/app/api/_actions/services.actions'
 import { attachVaultEntryAction, coworkerVaultAction } from '@/app/api/_actions/vault.actions'
-import { vaultAccountsFor, type VaultAccount } from '@/components/vault/vault-text'
 import { useVaultEnabled } from '@/components/layout/FeatureFlagsProvider'
 import { TooltipDisabledReason } from '@/components/ui/tooltip'
 import { ServiceAlternatives } from '@/components/services/ServiceAlternatives'
@@ -21,6 +20,7 @@ import { cn } from '@/lib/utils'
 import { MAX_OFFERED_ALTERNATIVES } from '@/lib/services/alternatives'
 import type { AgentServiceStatus, AuthMethodSummary, ComposioTarget, ManagedTarget, OAuthTarget, ServiceAlternative, ServiceDetails } from '@/lib/services/types'
 import { BorderBeam } from '@rerun/ui'
+import { vaultAccounts, type VaultAccount } from '@rerun/contracts'
 import { ArrowRight, CheckIcon, Loader2Icon, RefreshCwIcon } from '@/lib/icons'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
@@ -116,7 +116,7 @@ export function ServiceSuggestionBlock({ agentId, services, onDone, inline }: Se
             ])
             if (cancelled) return
             const iconBySlug = new Map(catalog.map(c => [c.slug, c.icon]))
-            setResolved(suggested.map((s, i) => ({ ...toResolved(s, details[i], iconBySlug.get(s.slug) ?? null, alternatives[s.slug] ?? []), vaultAccounts: vaultAccountsFor(vault, s.slug), canAttachVault: vault?.canAttach ?? false })))
+            setResolved(suggested.map((s, i) => ({ ...toResolved(s, details[i], iconBySlug.get(s.slug) ?? null, alternatives[s.slug] ?? []), vaultAccounts: vaultAccounts(vault?.available ?? []).filter(account => account.slug === s.slug), canAttachVault: vault?.canAttach ?? false })))
         }
         load()
         return () => {

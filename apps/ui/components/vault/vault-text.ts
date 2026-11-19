@@ -1,6 +1,4 @@
-import { vaultAccountLabel } from '@rerun/contracts'
-
-import type { CoworkerVault, VaultEntryView } from '@/app/api/_services/vault.service'
+import type { VaultEntryView } from '@/app/api/_services/vault.service'
 
 type VaultGroup = 'apps' | 'mcp' | 'secrets'
 
@@ -44,11 +42,4 @@ export function matchesVaultQuery(entry: Pick<VaultEntryView, 'name' | 'label' |
     const q = query.trim().toLowerCase()
     if (!q) return true
     return [entry.name, entry.label ?? '', entry.customLabel ?? '', entry.slug ?? '', ...entry.envKeys, ...entry.coworkers.map(c => c.name)].some(text => text.toLowerCase().includes(q))
-}
-
-export type VaultAccount = { id: string; label: string }
-
-// What the user can hand a coworker from the Vault instead of signing in to the app again.
-export function vaultAccountsFor(vault: Pick<CoworkerVault, 'available'> | null, slug: string): VaultAccount[] {
-    return (vault?.available ?? []).filter(item => item.kind === 'service' && item.slug === slug && item.status === 'active').map(item => ({ id: item.id, label: vaultAccountLabel(item) ?? item.name }))
 }

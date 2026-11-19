@@ -174,3 +174,17 @@ export function redactVaultValue(value: string): string {
 
 export const isVaultItemId = (value: string): boolean => VAULT_ITEM_ID_RE.test(value)
 export const isMcpServerName = (value: string): boolean => MCP_SERVER_NAME_RE.test(value)
+
+// An account of an app the user can hand a coworker from the Vault instead of signing in to the app again.
+const vaultAccountSchema = z.object({ id: z.string(), slug: z.string(), label: z.string() })
+export type VaultAccount = z.infer<typeof vaultAccountSchema>
+
+export function vaultAccounts(items: Pick<VaultItemSummary, 'id' | 'kind' | 'slug' | 'status' | 'name' | 'label' | 'customLabel'>[]): VaultAccount[] {
+    return items.flatMap(item => (item.kind === 'service' && item.slug && item.status === 'active' ? [{ id: item.id, slug: item.slug, label: vaultAccountLabel(item) ?? item.name }] : []))
+}
+
+// The accounts one coworker can be lent, and whether the caller may lend them (they manage its Box).
+export const coworkerVaultAccountsSchema = z.object({ canAttach: z.boolean(), accounts: z.array(vaultAccountSchema) })
+export type CoworkerVaultAccounts = z.infer<typeof coworkerVaultAccountsSchema>
+
+export const attachVaultAccountInputSchema = z.object({ itemId: z.string().regex(VAULT_ITEM_ID_RE) })

@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { VaultItemSummary } from '@rerun/contracts'
-
-import { coworkerFaces, matchesVaultQuery, usedBySummary, vaultAccountsFor, vaultGroupOf, type UsedByText } from './vault-text'
+import { coworkerFaces, matchesVaultQuery, usedBySummary, vaultGroupOf, type UsedByText } from './vault-text'
 
 const text: UsedByText = {
     everyone: 'Every coworker',
@@ -59,29 +57,5 @@ describe('matchesVaultQuery', () => {
 
     it('finds an account by the name it was given', () => {
         expect(matchesVaultQuery({ ...entry, customLabel: 'Acme org' }, 'acme org')).toBe(true)
-    })
-})
-
-describe('vaultAccountsFor', () => {
-    const item = (over: Partial<VaultItemSummary>) => ({ id: 'x', kind: 'service', slug: 'gmail', name: 'Gmail', status: 'active', ...over }) as VaultItemSummary
-
-    it('offers every signed-in account of the app, by its label', () => {
-        const available = [item({ id: 'a', label: 'sales@acme.test' }), item({ id: 'b', label: 'ops@acme.test' }), item({ id: 'c' })]
-        expect(vaultAccountsFor({ available }, 'gmail')).toEqual([
-            { id: 'a', label: 'sales@acme.test' },
-            { id: 'b', label: 'ops@acme.test' },
-            { id: 'c', label: 'Gmail' },
-        ])
-    })
-
-    it('offers an account by the name it was given over the one its sign-in reported', () => {
-        const available = [item({ id: 'a', label: 'Gmail 2', customLabel: 'Personal' })]
-        expect(vaultAccountsFor({ available }, 'gmail')).toEqual([{ id: 'a', label: 'Personal' }])
-    })
-
-    it('leaves out other apps, signed-out accounts, secrets and a missing Vault', () => {
-        const available = [item({ id: 'a', slug: 'slack' }), item({ id: 'b', status: 'needs_auth' }), item({ id: 'c', kind: 'secret', slug: undefined })]
-        expect(vaultAccountsFor({ available }, 'gmail')).toEqual([])
-        expect(vaultAccountsFor(null, 'gmail')).toEqual([])
     })
 })
