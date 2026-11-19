@@ -13,7 +13,7 @@ class IssueCheck(unittest.TestCase):
     tree = {"tools/factory/x.py", "tools/factory/test_x.py"}
 
     def test_a_clean_body_has_no_faults(self):
-        self.assertEqual(issuecheck.faults(body("cd tools/factory && python3 -I -m unittest test_x"), self.tree), [])
+        self.assertEqual(issuecheck.faults(body('python3 -I -m unittest discover -s tools/factory -p "test_x.py"'), self.tree), [])
 
     def test_a_format_fault_is_named(self):
         found = issuecheck.faults(body("python3 -m pytest tools/factory/test_x.py"), self.tree)
