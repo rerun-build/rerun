@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { Logo } from '@/components/layout/Logo'
 import { GateCodeField } from '@/components/published/GateCodeField'
-import { GateMessage, GateScreen, RerunTile, type GateBrand } from '@/components/published/GateScreen'
+import { GateMessage, GateScreen, MoldwrightTile, type GateBrand } from '@/components/published/GateScreen'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { GateInput } from '@/components/published/GateInput'
@@ -88,7 +88,7 @@ export default async function PublishedGatePage({ params, searchParams }: { para
     const t = await getTranslations('publicPages.gate')
 
     if (!entry || param(search, 'gate') === 'gone') {
-        return <GateScreen brand={brand} lock={null} mark={<RerunTile />} title={tPages('linkOff.title')} subtitle={tPages('linkOff.subtitle')} />
+        return <GateScreen brand={brand} lock={null} mark={<MoldwrightTile />} title={tPages('linkOff.title')} subtitle={tPages('linkOff.subtitle')} />
     }
 
     const title = entry.title ?? tPages('publishedView.protectedTitle')

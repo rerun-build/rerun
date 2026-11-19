@@ -4,7 +4,7 @@ import type { Database } from '@/app/api/database.types'
 import { AuthorizationError, requireAdminContext, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { hasPendingCreatorTerms, isExpertAccount, requireSandboxWorkspaceId } from '@/app/api/_auth/expert'
 import { BASE_PLAN_SLUG, baseLimitsToColumns, SIGNUP_BUDGET_MICROS } from '@moldwright/cloud/billing'
-import { grantRerunTopup } from '@moldwright/cloud/billing.server'
+import { grantMoldwrightTopup } from '@moldwright/cloud/billing.server'
 import { BLOB_ILLUSTRATIONS, getBlobByFile, randomBlob } from '@/lib/blobs/catalog'
 import { uploadPublicImage } from '@/lib/images/upload'
 import { createServiceRoleClient } from '@/supabase/serviceRole'
@@ -141,7 +141,7 @@ export async function createWorkspaceAction(name: string, iconUrl?: string): Pro
     })
     if (membershipError) return { ok: false, error: membershipError.message }
 
-    await grantRerunTopup(workspaceId, SIGNUP_BUDGET_MICROS)
+    await grantMoldwrightTopup(workspaceId, SIGNUP_BUDGET_MICROS)
 
     const { error: switchError } = await supabase.from('users').update<Database['public']['Tables']['users']['Update']>({ workspace_id: workspaceId }).eq('id', userId)
     if (switchError) return { ok: false, error: switchError.message }

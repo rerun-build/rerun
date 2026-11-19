@@ -1,4 +1,4 @@
-import { rerunUpstreamModelsSchema, type Provider } from '@moldwright/contracts'
+import { moldwrightUpstreamModelsSchema, type Provider } from '@moldwright/contracts'
 import { env } from '../config/env.js'
 import { logger } from '../lib/logger.js'
 
@@ -14,7 +14,7 @@ async function askHub(): Promise<void> {
     if (!hub || !token) return
     const res = await fetch(`${hub.replace(/\/$/, '')}/api/llm/models`, { headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
     if (!res.ok) throw new Error(`hub answered ${res.status}`)
-    known = rerunUpstreamModelsSchema.parse(await res.json()).models
+    known = moldwrightUpstreamModelsSchema.parse(await res.json()).models
 }
 
 async function upstreamModels(): Promise<Record<string, string>> {

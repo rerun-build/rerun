@@ -67,18 +67,18 @@ export const providerSchema = z.enum(['rerun', 'anthropic', 'claude', 'codex', '
 export type Provider = z.infer<typeof providerSchema>
 
 export const RERUN_MODELS = { fast: 'rerun-fast', balanced: 'rerun-max', smart: 'rerun-smart' } as const
-export type RerunTier = keyof typeof RERUN_MODELS
+export type MoldwrightTier = keyof typeof RERUN_MODELS
 
-export const RERUN_TIERS = Object.keys(RERUN_MODELS) as RerunTier[]
+export const RERUN_TIERS = Object.keys(RERUN_MODELS) as MoldwrightTier[]
 
 export const RERUN_MODEL = RERUN_MODELS.balanced
 
-export function rerunTierOf(model: unknown): RerunTier {
+export function moldwrightTierOf(model: unknown): MoldwrightTier {
     return RERUN_TIERS.find(tier => RERUN_MODELS[tier] === model) ?? 'balanced'
 }
 
-export const rerunUpstreamModelsSchema = z.object({ models: z.record(z.string(), z.string()) })
-export type RerunUpstreamModels = z.infer<typeof rerunUpstreamModelsSchema>
+export const moldwrightUpstreamModelsSchema = z.object({ models: z.record(z.string(), z.string()) })
+export type MoldwrightUpstreamModels = z.infer<typeof moldwrightUpstreamModelsSchema>
 
 export const DEFAULT_PROVIDER_MODEL: Record<Provider, string> = {
     rerun: RERUN_MODEL,

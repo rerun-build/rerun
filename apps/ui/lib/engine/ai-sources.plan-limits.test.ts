@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { RERUN_CONNECTION_ID, type PlanLimitWindow } from '@moldwright/contracts'
-import { isUsable, livePlanWindows, pillUsage, planLimitTone, planWindowName, providerPitch, sourceSummary, tightestPlanWindow, type RerunCredit } from './ai-sources'
+import { isUsable, livePlanWindows, pillUsage, planLimitTone, planWindowName, providerPitch, sourceSummary, tightestPlanWindow, type MoldwrightCredit } from './ai-sources'
 import { englishTranslator } from '@/lib/i18n/english-translator'
 import type { BoxConnection } from './types'
 
 const NOW = Date.parse('2026-10-05T12:00:00.000Z')
 const session: PlanLimitWindow = { kind: 'session', label: null, usedPercent: 42, resetsAt: '2026-10-05T14:00:00.000Z' }
 const weekly: PlanLimitWindow = { kind: 'weekly', label: null, usedPercent: 81, resetsAt: '2026-10-09T08:00:00.000Z' }
-const credit: RerunCredit = { usedMicros: 0, budgetMicros: 0, resetAt: null, percent: 0 }
+const credit: MoldwrightCredit = { usedMicros: 0, budgetMicros: 0, resetAt: null, percent: 0 }
 
 function plan(windows: PlanLimitWindow[] | null): BoxConnection {
     return {
@@ -121,7 +121,7 @@ describe('pillUsage', () => {
     })
 
     it('rings the Moldwright credit of the month, unless there is none or it is paused', () => {
-        const spending: RerunCredit = { usedMicros: 840_000, budgetMicros: 2_000_000, resetAt: null, percent: 42 }
+        const spending: MoldwrightCredit = { usedMicros: 840_000, budgetMicros: 2_000_000, resetAt: null, percent: 42 }
         expect(pillUsage(rerun, spending)).toEqual({ inner: 42, outer: null, windows: [] })
         expect(pillUsage(rerun, credit)).toBeNull()
         expect(pillUsage(rerun, { ...spending, paused: true })).toBeNull()

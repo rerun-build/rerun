@@ -1,6 +1,6 @@
 import { requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import { isPhoneStepPending } from '@moldwright/cloud/phone.server'
-import { logRerunUsage } from '@moldwright/cloud/billing.server'
+import { logMoldwrightUsage } from '@moldwright/cloud/billing.server'
 import { saveForemanConversation } from '@/lib/foreman/conversation'
 import { prepareScript } from '@/lib/foreman/scripted'
 import { loadForemanState } from '@/lib/foreman/state'
@@ -13,7 +13,7 @@ import { POST } from './route'
 
 vi.mock('@/app/api/_auth/ownership', () => ({ requireWorkspaceContext: vi.fn() }))
 vi.mock('@moldwright/cloud/phone.server', () => ({ isPhoneStepPending: vi.fn() }))
-vi.mock('@moldwright/cloud/billing.server', async importOriginal => ({ ...(await importOriginal<typeof import('@moldwright/cloud/billing.server')>()), logRerunUsage: vi.fn() }))
+vi.mock('@moldwright/cloud/billing.server', async importOriginal => ({ ...(await importOriginal<typeof import('@moldwright/cloud/billing.server')>()), logMoldwrightUsage: vi.fn() }))
 vi.mock('@/lib/foreman/conversation', () => ({ engineSessionOf: vi.fn().mockResolvedValue(null), loadForemanConversation: vi.fn(), saveForemanConversation: vi.fn().mockResolvedValue(undefined) }))
 vi.mock('@/lib/foreman/state', () => ({ loadForemanState: vi.fn() }))
 vi.mock('@/lib/foreman/scripted', () => ({ prepareScript: vi.fn(), runScript: vi.fn() }))
@@ -93,7 +93,7 @@ describe('POST /api/chat/foreman', () => {
 
             await (await POST(request(hello))).text()
 
-            expect(logRerunUsage).toHaveBeenCalledWith({ workspaceId: 7, model: 'openai/gpt-6-sol', tier: 'smart', inputTokens: 120, outputTokens: 4, costMicros: 3000 })
+            expect(logMoldwrightUsage).toHaveBeenCalledWith({ workspaceId: 7, model: 'openai/gpt-6-sol', tier: 'smart', inputTokens: 120, outputTokens: 4, costMicros: 3000 })
         })
 
         it('saves a transcript whose answers were pushed twice with each answer once', async () => {

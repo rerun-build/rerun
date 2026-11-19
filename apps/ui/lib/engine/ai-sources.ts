@@ -1,9 +1,9 @@
-import { rerunCreditTotalMicros, type RerunCreditColumns } from '@moldwright/cloud/billing'
+import { moldwrightCreditTotalMicros, type MoldwrightCreditColumns } from '@moldwright/cloud/billing'
 import { catalogFor, modelLabel, modelPower, type CatalogModel } from '@/lib/engine/models'
 import type { BoxConnection, BoxDefault } from '@/lib/engine/types'
 import { shortUntil } from '@/lib/time'
 import { formatNumber, shortDate } from '@moldwright/i18n/format'
-import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, isPremiumModel, opencodePlanOf, opencodeServesModel, toProviderModel, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type RerunTier } from '@moldwright/contracts'
+import { PROVIDER_LABELS, RERUN_CONNECTION_ID, RERUN_MODEL, RERUN_MODELS, RERUN_TIERS, OPENCODE_SNAPSHOT, canonicalModelId, cliServesModel, isFreeOpencodeModel, isPremiumModel, opencodePlanOf, opencodeServesModel, toProviderModel, type OpencodePlan, type ProviderModel, type PlanLimitWindow, type Provider, type MoldwrightTier } from '@moldwright/contracts'
 
 export type SourceKind = 'included' | 'plan' | 'key'
 
@@ -81,20 +81,20 @@ export function effectiveDefault(boxDefault: BoxDefault | null): BoxDefault {
     return boxDefault ?? RERUN_FALLBACK
 }
 
-export type RerunCredit = { usedMicros: number; budgetMicros: number; resetAt: string | null; percent: number; paused?: boolean }
+export type MoldwrightCredit = { usedMicros: number; budgetMicros: number; resetAt: string | null; percent: number; paused?: boolean }
 
-export function rerunCreditOf(workspace: (RerunCreditColumns & { current_period_end?: string | null; rerun_credit_paused_at?: string | null }) | null | undefined): RerunCredit {
+export function moldwrightCreditOf(workspace: (MoldwrightCreditColumns & { current_period_end?: string | null; rerun_credit_paused_at?: string | null }) | null | undefined): MoldwrightCredit {
     const usedMicros = workspace?.rerun_used_micros ?? 0
-    const budgetMicros = rerunCreditTotalMicros(workspace)
+    const budgetMicros = moldwrightCreditTotalMicros(workspace)
     const percent = budgetMicros > 0 ? Math.min(100, Math.round((usedMicros / budgetMicros) * 100)) : 0
     return { usedMicros, budgetMicros, resetAt: workspace?.current_period_end ?? null, percent, paused: !!workspace?.rerun_credit_paused_at }
 }
 
-export function isCreditUsedUp(credit: RerunCredit) {
+export function isCreditUsedUp(credit: MoldwrightCredit) {
     return credit.budgetMicros > 0 && credit.usedMicros >= credit.budgetMicros
 }
 
-export function creditResetPhrase(credit: RerunCredit, t: SourceCopy, locale: string) {
+export function creditResetPhrase(credit: MoldwrightCredit, t: SourceCopy, locale: string) {
     return credit.resetAt ? t('sources.creditBackOn', { date: shortDate(credit.resetAt, locale) }) : t('sources.creditBackNextMonth')
 }
 
@@ -144,7 +144,7 @@ export function cliUnavailableReason(connection: Pick<BoxConnection, 'provider' 
 
 export const PREMIUM_MODEL_BILLING_TRIGGER = 'premium_model'
 
-const RERUN_TIER_DESCRIPTION: Partial<Record<RerunTier, 'fast' | 'smart'>> = { fast: 'fast', smart: 'smart' }
+const RERUN_TIER_DESCRIPTION: Partial<Record<MoldwrightTier, 'fast' | 'smart'>> = { fast: 'fast', smart: 'smart' }
 
 export function opencodePlanDescription(connection: Pick<BoxConnection, 'provider' | 'providerModels'>, model: string, t: SourceCopy): string | undefined {
     if (connection.provider !== 'opencode') return undefined
@@ -156,7 +156,7 @@ export function opencodePlanDescription(connection: Pick<BoxConnection, 'provide
 }
 
 export function modelDescription(connection: Pick<BoxConnection, 'id' | 'provider' | 'providerModels'>, model: string, t: SourceCopy): string | undefined {
-    return rerunTierDescription(connection.id, model, t) ?? opencodePlanDescription(connection, model, t)
+    return moldwrightTierDescription(connection.id, model, t) ?? opencodePlanDescription(connection, model, t)
 }
 
 export function inPlanOrder<T extends { id: string }>(provider: string, models: T[]): T[] {
@@ -185,7 +185,7 @@ export function pricePerMillion(price: ProviderModel['price'], t: SourceCopy, lo
     return t('sources.pricePerMillion', { input: usd(price.input), output: usd(price.output) })
 }
 
-export function rerunTierDescription(connectionId: string, model: string, t: SourceCopy): string | undefined {
+export function moldwrightTierDescription(connectionId: string, model: string, t: SourceCopy): string | undefined {
     if (connectionId !== RERUN_CONNECTION_ID) return undefined
     const id = canonicalModelId(model)
     const tier = RERUN_TIERS.find(candidate => RERUN_MODELS[candidate] === id)
@@ -202,16 +202,16 @@ export function inTierOrder<T extends { id: string }>(connectionId: string, mode
     return [...models].sort((a, b) => rank(a.id) - rank(b.id))
 }
 
-export function isCreditExhausted(source: BoxConnection, credit: RerunCredit) {
+export function isCreditExhausted(source: BoxConnection, credit: MoldwrightCredit) {
     return source.id === RERUN_CONNECTION_ID && isCreditUsedUp(credit)
 }
 
-export function isRerunPaused(source: BoxConnection, credit: RerunCredit) {
+export function isMoldwrightPaused(source: BoxConnection, credit: MoldwrightCredit) {
     return source.id === RERUN_CONNECTION_ID && !!credit.paused
 }
 
-export function isUsable(source: BoxConnection, credit: RerunCredit) {
-    return source.connected && !source.credentialRejected && !isCreditExhausted(source, credit) && !isRerunPaused(source, credit)
+export function isUsable(source: BoxConnection, credit: MoldwrightCredit) {
+    return source.connected && !source.credentialRejected && !isCreditExhausted(source, credit) && !isMoldwrightPaused(source, credit)
 }
 
 export function livePlanWindows(source: Pick<BoxConnection, 'planLimits'>, now = Date.now()): PlanLimitWindow[] {
@@ -224,7 +224,7 @@ export function tightestPlanWindow(windows: PlanLimitWindow[]): PlanLimitWindow 
 
 export type PillUsage = { inner: number; outer: number | null; windows: PlanLimitWindow[] }
 
-export function pillUsage(group: { connectionId: string; planWindows: PlanLimitWindow[] }, credit: RerunCredit): PillUsage | null {
+export function pillUsage(group: { connectionId: string; planWindows: PlanLimitWindow[] }, credit: MoldwrightCredit): PillUsage | null {
     if (group.connectionId === RERUN_CONNECTION_ID) {
         if (credit.paused || credit.budgetMicros <= 0) return null
         return { inner: credit.percent, outer: null, windows: [] }
@@ -260,13 +260,13 @@ export function planWindowReset(window: PlanLimitWindow, t: SourceCopy, locale: 
     return window.resetsAt ? t('sources.windowResets', { when: shortUntil(window.resetsAt, locale) }) : null
 }
 
-function creditSummary(credit: RerunCredit, t: SourceCopy, locale: string): string {
+function creditSummary(credit: MoldwrightCredit, t: SourceCopy, locale: string): string {
     if (credit.paused) return t('sources.creditPaused')
     if (!isCreditUsedUp(credit)) return t('sources.creditUsed', { percent: credit.percent })
     return credit.resetAt ? t('sources.creditUsedUpOn', { date: shortDate(credit.resetAt, locale) }) : t('sources.creditUsedUpNextMonth')
 }
 
-export function sourceSummary(source: BoxConnection, credit: RerunCredit, t: SourceCopy, locale: string): string {
+export function sourceSummary(source: BoxConnection, credit: MoldwrightCredit, t: SourceCopy, locale: string): string {
     if (source.id === RERUN_CONNECTION_ID) return creditSummary(credit, t, locale)
     const planWindows = livePlanWindows(source).filter(window => window.kind !== 'model')
     if (planWindows.length) return planWindows.map(window => t('sources.summaryWindow', { name: planWindowName(window, t, source.provider), percent: planWindowPercent(window) })).join(' · ')

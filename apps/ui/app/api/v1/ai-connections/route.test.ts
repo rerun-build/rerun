@@ -7,7 +7,7 @@ vi.mock('@moldwright/cloud/billing', async importOriginal => ({
     ...(await importOriginal<typeof import('@moldwright/cloud/billing')>()),
     BILLING_ENABLED: true,
     isPremiumModelEntitled: (plan: { subscription_status: string | null }) => plan.subscription_status !== 'trialing',
-    rerunCreditTotalMicros: (credit: { rerun_budget_micros?: number | null } | null | undefined) => credit?.rerun_budget_micros ?? 0,
+    moldwrightCreditTotalMicros: (credit: { rerun_budget_micros?: number | null } | null | undefined) => credit?.rerun_budget_micros ?? 0,
 }))
 vi.mock('@/app/api/_auth/ownership', async importOriginal => {
     const actual = await importOriginal<typeof import('@/app/api/_auth/ownership')>()

@@ -17,7 +17,7 @@ export function ViewerPage({ slug, bar, children, className }: { slug: string; b
         <div {...{ [PUBLISHED_PAGE_MARKER]: '' }} className="relative flex h-dvh flex-col bg-background text-foreground">
             {bar}
             <main className={cn('min-h-0 flex-1 overflow-auto', className)}>{children}</main>
-            <MadeWithRerun slug={slug} className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] max-md:right-3" />
+            <MadeWithMoldwright slug={slug} className="fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] max-md:right-3" />
         </div>
     )
 }
@@ -46,7 +46,7 @@ export function ViewerTopBar({ icon: FormatIcon, name, meta, children }: { icon:
     )
 }
 
-export function MadeWithRerun({ slug, className }: { slug: string; className?: string }) {
+export function MadeWithMoldwright({ slug, className }: { slug: string; className?: string }) {
     const t = useTranslations('published')
     const landing = `${LANDING_URL}/?utm_source=published&utm_medium=badge&utm_content=${slug}`
     const report = `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(`Report published page ${slug}`)}`

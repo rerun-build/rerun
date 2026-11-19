@@ -1,4 +1,4 @@
-import { RerunWordmark } from '@/components/brand/RerunWordmark'
+import { MoldwrightWordmark } from '@/components/brand/MoldwrightWordmark'
 import type { ChangelogOgEntry } from '@/lib/changelog/og'
 import { OG_HEIGHT, OG_WIDTH } from '@/lib/og/size'
 
@@ -28,7 +28,7 @@ export function ChangelogOgStage({ entries }: { entries: ChangelogOgEntry[] }) {
     return (
         <div className="dark relative overflow-hidden bg-[#0a0a0a] text-white" style={{ width: OG_WIDTH, height: OG_HEIGHT }}>
             <div className="absolute left-16 top-14 z-20">
-                <RerunWordmark />
+                <MoldwrightWordmark />
             </div>
 
             <div className="absolute inset-y-0 left-16 z-20 flex max-w-[440px] flex-col justify-center gap-5">

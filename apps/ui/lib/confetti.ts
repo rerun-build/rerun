@@ -15,7 +15,7 @@ function rotatedColors() {
     return [...COLORS.slice(offset), ...COLORS.slice(0, offset)]
 }
 
-export async function fireRerunConfetti() {
+export async function fireMoldwrightConfetti() {
     if (firing) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     firing = true

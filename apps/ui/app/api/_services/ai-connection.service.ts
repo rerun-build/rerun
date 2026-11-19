@@ -21,14 +21,14 @@ import {
     offeredModels,
     planWindowName,
     planWindowReset,
-    rerunCreditOf,
+    moldwrightCreditOf,
     modelDescription,
     sourceKind,
     sourceSummary,
     suggestName,
     type GuidedProvider,
     type KeyProvider,
-    type RerunCredit,
+    type MoldwrightCredit,
     type SourceCopy,
 } from '@/lib/engine/ai-sources'
 import { type ClaudeOAuthStart, buildClaudeAuthorize, exchangeClaudeCode } from '@/lib/engine/claude-oauth'
@@ -219,7 +219,7 @@ async function takenNames(workspaceId: number): Promise<string[]> {
     return (await engineListConnections(engine.conn)).connections.map(connection => connection.name)
 }
 
-function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: RerunCredit, premiumAllowed: boolean, t: SourceCopy, locale: string): AiConnectionView {
+function connectionView(source: BoxConnection, list: BoxConnectionsList, credit: MoldwrightCredit, premiumAllowed: boolean, t: SourceCopy, locale: string): AiConnectionView {
     const status = !source.connected || source.credentialRejected ? 'reconnect' : isCreditExhausted(source, credit) ? 'credit_used_up' : 'connected'
     return {
         id: source.id,
@@ -246,7 +246,7 @@ function connectionView(source: BoxConnection, list: BoxConnectionsList, credit:
 export async function readAiConnectionsView(ctx: WorkspaceContext): Promise<AiConnectionsView> {
     const engine = await findWorkspaceEngine(ctx.workspace.id)
     const list = engine ? await renameAliasedModels(engine.conn, await engineListConnections(engine.conn)) : { connections: [], default: null }
-    const credit = rerunCreditOf(ctx.workspace)
+    const credit = moldwrightCreditOf(ctx.workspace)
     const premiumAllowed = isPremiumModelEntitled(ctx.workspace)
     const pick = effectiveDefault(list.default)
     const taken = list.connections.map(connection => connection.name)

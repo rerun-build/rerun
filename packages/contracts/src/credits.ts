@@ -6,7 +6,7 @@ export const creditsFromUsd = (usd: number) => Math.round(usd * CREDITS_PER_USD)
 
 export const creditsFromMicros = (micros: number) => Math.round(micros / MICROS_PER_CREDIT)
 
-export type HubRerunCredit = { remainingMicros: number; usedMicros: number; totalMicros: number; paused: boolean; resetsAt: string | null }
+export type HubMoldwrightCredit = { remainingMicros: number; usedMicros: number; totalMicros: number; paused: boolean; resetsAt: string | null }
 
 export function formatCredits(micros: number, locale = 'en'): string {
     const value = micros / MICROS_PER_CREDIT

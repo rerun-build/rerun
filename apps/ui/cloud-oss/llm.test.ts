@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/app/api/_services/workspace-engine.service', () => ({ authenticateEngineToken: vi.fn(async () => ({ workspaceId: 1 })) }))
 
-const { rerunChatCompletions } = await import('./llm')
+const { moldwrightChatCompletions } = await import('./llm')
 
 const request = () => new Request('http://app/api/llm/chat/completions', { method: 'POST', headers: { authorization: 'Bearer box' }, body: JSON.stringify({ model: 'rerun-pro', messages: [] }) })
 
-describe('rerunChatCompletions', () => {
+describe('moldwrightChatCompletions', () => {
     beforeEach(() => vi.stubEnv('OPENROUTER_API_KEY', 'sk-test'))
     afterEach(() => {
         vi.unstubAllEnvs()
@@ -17,7 +17,7 @@ describe('rerunChatCompletions', () => {
         const answer = JSON.stringify({ choices: [{ message: { content: 'ok' } }] })
         vi.stubGlobal('fetch', vi.fn(async () => new Response(answer, { headers: { 'content-type': 'application/json', 'content-encoding': 'gzip', 'content-length': '12' } })))
 
-        const response = await rerunChatCompletions(request())
+        const response = await moldwrightChatCompletions(request())
 
         expect(response.headers.get('content-encoding')).toBeNull()
         expect(response.headers.get('content-length')).toBeNull()
@@ -30,7 +30,7 @@ describe('rerunChatCompletions', () => {
         const upstream = vi.fn()
         vi.stubGlobal('fetch', upstream)
 
-        const response = await rerunChatCompletions(request())
+        const response = await moldwrightChatCompletions(request())
 
         expect(response.status).toBe(403)
         const body = (await response.json()) as { error: { message: string } }
@@ -42,6 +42,6 @@ describe('rerunChatCompletions', () => {
         vi.stubGlobal('fetch', vi.fn(async () => Response.json({ error: 'nope' }, { status: 402 })))
         vi.spyOn(console, 'error').mockImplementation(() => {})
 
-        expect((await rerunChatCompletions(request())).status).toBe(402)
+        expect((await moldwrightChatCompletions(request())).status).toBe(402)
     })
 })

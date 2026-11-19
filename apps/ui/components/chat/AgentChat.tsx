@@ -67,7 +67,7 @@ import { lastUserText } from '@/lib/chat-payload'
 import { historyCovers, needsReconcile } from '@/lib/chat/transcript-reconcile'
 import { browserPermission } from '@/lib/notifications/browser'
 import { modelContextWindow } from '@/lib/engine/models'
-import { rerunCreditOf } from '@/lib/engine/ai-sources'
+import { moldwrightCreditOf } from '@/lib/engine/ai-sources'
 import { toGroup } from '@/lib/engine/model-groups'
 import { isLifetimePlan, isPremiumModelEntitled } from '@moldwright/cloud/billing'
 import { createClient } from '@/supabase/client'
@@ -359,7 +359,7 @@ export function AgentChat({ uid, active, agentId, agentName, sessionId, onSessio
 
     const [runError, setRunError] = useState<string | null>(null)
 
-    const rerunCredit = useMemo(() => rerunCreditOf(workspace), [workspace])
+    const rerunCredit = useMemo(() => moldwrightCreditOf(workspace), [workspace])
     const creditHasRoom = !rerunCredit.paused && rerunCredit.budgetMicros > rerunCredit.usedMicros
     const creditHasRoomRef = useRef(creditHasRoom)
     useEffect(() => {

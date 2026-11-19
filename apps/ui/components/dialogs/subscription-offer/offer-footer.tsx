@@ -9,7 +9,7 @@ import { ArrowLeftIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { useTranslations } from 'next-intl'
 
-import { RerunGlyph } from './offer-plans'
+import { MoldwrightGlyph } from './offer-plans'
 
 export function OfferFooter({ onBack, children }: { onBack?: () => void; children: ReactNode }) {
     const t = useTranslations('dialogs.subscriptionOffer')
@@ -30,7 +30,7 @@ export function DeclineButton({ onClick }: { onClick: () => void }) {
     const t = useTranslations('dialogs.subscriptionOffer')
     return (
         <Button variant="destructive" onClick={onClick}>
-            <RerunGlyph className="size-3.5" />
+            <MoldwrightGlyph className="size-3.5" />
             {RERUN_CLOUD ? t('decline.cloud') : t('decline.selfHosted')}
         </Button>
     )

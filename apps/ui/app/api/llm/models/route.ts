@@ -1,5 +1,5 @@
-import { rerunModels } from '@moldwright/cloud/llm'
+import { moldwrightModels } from '@moldwright/cloud/llm'
 
 export async function GET(req: Request) {
-    return rerunModels(req)
+    return moldwrightModels(req)
 }

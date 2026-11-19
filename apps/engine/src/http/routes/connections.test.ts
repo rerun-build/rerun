@@ -37,7 +37,7 @@ const { connectionRoutes } = await import('./connections.js')
 const { createServer } = await import('../server.js')
 const { agentDir, agentsDir, boxDefaultPath, configPath, connectionConfigPath, connectionEnvPath, connectionsDir, scheduleFile, schedulesDir } = await import('../../config/paths.js')
 const { readEnvFile } = await import('../../lib/env-file.js')
-const { ensureRerunConnection } = await import('../../connections/store.js')
+const { ensureMoldwrightConnection } = await import('../../connections/store.js')
 const { unloadConnection } = await import('../../connections/registry.js')
 const { clearBoxDefault, readBoxDefault } = await import('../../connections/default.js')
 const { readSchedule } = await import('../../schedules/loader.js')
@@ -86,7 +86,7 @@ beforeEach(async () => {
     await clearBoxDefault()
     await rm(connectionsDir(), { recursive: true, force: true })
     await rm(agentsDir(), { recursive: true, force: true })
-    await ensureRerunConnection()
+    await ensureMoldwrightConnection()
 })
 
 describe('connections API', () => {
@@ -172,7 +172,7 @@ describe('connections API', () => {
     it('switches the Rerun models back on at boot on a box where they were off', async () => {
         await writeFile(connectionConfigPath(RERUN_CONNECTION_ID), JSON.stringify({ name: 'Rerun', provider: 'rerun', models: [], extraModels: [], createdAt: new Date().toISOString() }), 'utf8')
         unloadConnection(RERUN_CONNECTION_ID)
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const { connections } = (await (await connectionRoutes.request('/')).json()) as { connections: Summary[] }
         expect(connections.find(c => c.id === RERUN_CONNECTION_ID)?.models).toEqual(['rerun-max', 'rerun-fast', 'rerun-smart'])
     })

@@ -46,7 +46,7 @@ function cursorConfig(url: string, key: string): string {
     return JSON.stringify({ mcpServers: { [SERVER_NAME]: { url, headers: { Authorization: authorizationHeader(key) } } } }, null, 2)
 }
 
-function rerunAgentConfig(url: string, key: string): string {
+function moldwrightAgentConfig(url: string, key: string): string {
     return JSON.stringify({ name: SERVER_NAME, transport: 'http', url, headers: { Authorization: authorizationHeader(key) } }, null, 2)
 }
 
@@ -69,7 +69,7 @@ export function mcpClientSnippets(client: McpClientId, url: string, key: string)
             return [
                 {
                     label: 'Coworker panel, MCP, New',
-                    value: rerunAgentConfig(url, key),
+                    value: moldwrightAgentConfig(url, key),
                     block: true,
                     hint: 'Gives one of your coworkers the same reach over this workspace as an outside client.',
                 },

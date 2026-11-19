@@ -12,7 +12,7 @@ const { afterEach, beforeEach, describe, expect, it, vi } = await import('vitest
 const { rm } = await import('node:fs/promises')
 const { DEFAULT_CONNECTION_MODELS, RERUN_CONNECTION_ID, RERUN_MODEL, agentConfigSchema } = await import('@moldwright/contracts')
 const { connectionsDir } = await import('../config/paths.js')
-const { createConnection, ensureRerunConnection } = await import('../connections/store.js')
+const { createConnection, ensureMoldwrightConnection } = await import('../connections/store.js')
 const { clearAgentCache } = await import('./registry.js')
 const { clearBoxDefault } = await import('../connections/default.js')
 const { logger } = await import('../lib/logger.js')
@@ -76,7 +76,7 @@ describe('automationModel', () => {
     })
 
     it('warns with what was asked and what runs instead when it falls back', async () => {
-        await ensureRerunConnection()
+        await ensureMoldwrightConnection()
         const claude = await connect('claude', {})
         const agent = await makeAgent(claude.id, 'claude', 'opus')
 

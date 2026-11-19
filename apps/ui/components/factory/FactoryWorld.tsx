@@ -4,7 +4,7 @@ import type { FactorySnapshot } from '@moldwright/contracts'
 import { IsoGrid, frameTemplateBoard, routeTileLinks, useRenderedFrame, type AxisPoint, type Tile } from '@moldwright/ui/iso-grid'
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react'
 
-import { fireRerunConfetti } from '@/lib/confetti'
+import { fireMoldwrightConfetti } from '@/lib/confetti'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { applyMoves, canMove, copyTree, dropReason, layoutStorageKey, loadLayout, readMoves, saveLayout, subscribeLayout, treeRoutes } from './factory-layout'
@@ -76,7 +76,7 @@ export function FactoryWorld({ theme = 'dark', scene = factoryScene, workspace =
     const fullCabinets = frame.cabinets.filter(c => c.slots.every(s => s.state !== 'empty')).length
     const full = useRef(fullCabinets)
     useEffect(() => {
-        if (fullCabinets > full.current) void fireRerunConfetti()
+        if (fullCabinets > full.current) void fireMoldwrightConfetti()
         full.current = fullCabinets
     }, [fullCabinets])
 

@@ -34,9 +34,9 @@ export function baseLimitsToColumns(): WorkspaceLimitColumns {
     return { max_agents: null, max_seats: null, model_access: 'best', custom_integrations: true, rerun_budget_micros: 0 }
 }
 
-export type RerunCreditColumns = { rerun_budget_micros?: number | null; rerun_used_micros?: number | null; rerun_topup_micros?: number | null }
+export type MoldwrightCreditColumns = { rerun_budget_micros?: number | null; rerun_used_micros?: number | null; rerun_topup_micros?: number | null }
 
-export function rerunCreditTotalMicros(_workspace: RerunCreditColumns | null | undefined): number {
+export function moldwrightCreditTotalMicros(_workspace: MoldwrightCreditColumns | null | undefined): number {
     return 0
 }
 
