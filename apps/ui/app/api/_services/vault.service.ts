@@ -208,8 +208,36 @@ export async function listVault(actor?: Actor): Promise<VaultListing> {
 export async function attachVaultEntry(itemId: string, agentId: string, actor?: Actor): Promise<VaultItemSummary> {
     const ctx = await vaultContext(actor)
     const coworker = await assertManagesCoworker(ctx.actor, ctx.coworkers.find(c => c.id === agentId))
-    await readItem(ctx, itemId)
-    return rethrowConflict(ctx, () => attachVaultItem(ctx.conn, itemId, coworker.engineAgentId))
+    const item = await readItem(ctx, itemId)
+    const twins = isRegistryItem(item) && item.status === 'active' ? await detachPendingTwins(ctx, item, coworker.engineAgentId) : []
+    try {
+        const attached = await rethrowConflict(ctx, () => attachVaultItem(ctx.conn, itemId, coworker.engineAgentId))
+        for (const twin of twins) if (twin.agentIds.length === 0 && neverSignedIn(twin)) await deleteVaultItem(ctx.conn, twin.id)
+        return attached
+    } catch (err) {
+        for (const twin of twins) await attachVaultItem(ctx.conn, twin.id, coworker.engineAgentId).catch(undo => console.warn(`[vault] entry ${twin.id} left off ${coworker.engineAgentId}:`, undo instanceof Error ? undo.message : undo))
+        throw err
+    }
+}
+
+// The coworker's own install of the app still waiting on its sign-in sits on the same registry key as
+// the account about to be lent: it holds the same server, which the engine refuses next to it, and
+// would win over it when the registry is read. It is taken off the coworker before the account goes on,
+// the way a detach does, so the migration copy dropped with it cannot take the lent account along.
+async function detachPendingTwins(ctx: VaultContext, lent: VaultItemSummary & { slug: string }, engineAgentId: string): Promise<VaultItemSummary[]> {
+    const key = vaultRegistryKey(lent)
+    const twins = (await listVaultItems(ctx.conn, engineAgentId)).filter(other => other.id !== lent.id && other.status !== 'active' && !other.sharedWithAll && isRegistryItem(other) && vaultRegistryKey(other) === key)
+    const detached: VaultItemSummary[] = []
+    for (const twin of twins) {
+        detached.push(await detachVaultItem(ctx.conn, twin.id, engineAgentId))
+        await dropMigrationCopy(ctx.conn, engineAgentId, key, twin)
+    }
+    return detached
+}
+
+// Deleting an entry is an admin's call: the lend only clears away an install nobody ever signed in to.
+function neverSignedIn(item: VaultItemSummary): boolean {
+    return item.tokens.length === 0 && !item.composio?.connectedAccountId && !item.managed?.accountEmail && !item.customLabel
 }
 
 export async function detachVaultEntry(itemId: string, agentId: string, actor?: Actor): Promise<VaultItemSummary> {

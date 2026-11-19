@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { Actor } from '@/app/api/_auth/access'
 import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultRename } from '@/lib/engine/client'
@@ -191,6 +191,67 @@ describe('attaching', () => {
     it('refuses an entry the engine no longer has', async () => {
         vi.mocked(getVaultItem).mockRejectedValue(new EngineRequestError('404', 404))
         await expect(attachVaultEntry('gone', 'alice', admin)).rejects.toMatchObject({ code: 'vaultItemNotFound' })
+    })
+
+    describe("an account lent over the coworker's own install still waiting on its sign-in", () => {
+        const pending = [
+            item({ id: 'never-signed-in', status: 'needs_auth', tokens: [], agentIds: ['e-alice'] }),
+            item({ id: 'signed-out', status: 'needs_auth', tokens: ['gmail'], agentIds: ['e-alice'] }),
+            item({ id: 'shared-pending', status: 'needs_auth', tokens: [], agentIds: ['e-alice', 'e-bob'] }),
+            item({ id: 'second-account', status: 'needs_auth', tokens: [], instanceId: 'x2', agentIds: ['e-alice'] }),
+            item({ id: 'other-app', slug: 'slack', status: 'needs_auth', tokens: [], agentIds: ['e-alice'] }),
+        ]
+
+        beforeEach(() => {
+            vi.mocked(getVaultItem).mockResolvedValue(item({ id: 'lent', agentIds: [] }) as never)
+            vi.mocked(listVaultItems).mockResolvedValue([item({ id: 'lent', agentIds: [] }), ...pending] as never)
+            vi.mocked(detachVaultItem).mockImplementation(async (_conn, id, agentId) => {
+                const twin = pending.find(other => other.id === id)!
+                return { ...twin, agentIds: twin.agentIds.filter(other => other !== agentId) } as never
+            })
+            vi.mocked(attachVaultItem).mockReset().mockResolvedValue(item({ id: 'lent' }) as never)
+        })
+
+        afterEach(() => {
+            vi.mocked(detachVaultItem).mockReset().mockResolvedValue({ id: 'item-1' } as never)
+        })
+
+        it('takes the install off the coworker first, so the engine sees no clash and the copy cannot take the account along', async () => {
+            await attachVaultEntry('lent', 'alice', managerOfA)
+
+            expect(vi.mocked(detachVaultItem).mock.calls.map(call => call[1])).toEqual(['never-signed-in', 'signed-out', 'shared-pending'])
+            expect(dropMigrationCopy).toHaveBeenCalledTimes(3)
+            const lentAt = vi.mocked(attachVaultItem).mock.invocationCallOrder[0]
+            expect(Math.max(...vi.mocked(detachVaultItem).mock.invocationCallOrder, ...vi.mocked(dropMigrationCopy).mock.invocationCallOrder)).toBeLessThan(lentAt)
+            expect(attachVaultItem).toHaveBeenCalledWith(conn, 'lent', 'e-alice')
+        })
+
+        it('deletes only an install nobody else holds and nobody ever signed in to', async () => {
+            await attachVaultEntry('lent', 'alice', managerOfA)
+
+            expect(deleteVaultItem).toHaveBeenCalledTimes(1)
+            expect(deleteVaultItem).toHaveBeenCalledWith(conn, 'never-signed-in')
+            expect(revokeVaultComposioAccount).not.toHaveBeenCalled()
+        })
+
+        it('puts the installs back when the engine refuses the account', async () => {
+            vi.mocked(attachVaultItem)
+                .mockRejectedValueOnce(new EngineRequestError(`rerun-engine PUT /vault/lent/agents/e-alice failed: 409 ${JSON.stringify({ error: 'x', conflicts: [{ agentId: 'e-alice', itemId: 'item-9', kind: 'env', name: 'GMAIL_KEY' }] })}`, 409))
+                .mockResolvedValue(item() as never)
+
+            await expect(attachVaultEntry('lent', 'alice', managerOfA)).rejects.toBeInstanceOf(VaultConflictError)
+
+            expect(vi.mocked(attachVaultItem).mock.calls.slice(1).map(call => call[1])).toEqual(['never-signed-in', 'signed-out', 'shared-pending'])
+            expect(deleteVaultItem).not.toHaveBeenCalled()
+        })
+    })
+
+    it('leaves the pending installs alone when the account lent is not signed in either', async () => {
+        vi.mocked(attachVaultItem).mockResolvedValue(item({ id: 'lent' }) as never)
+        vi.mocked(getVaultItem).mockResolvedValue(item({ id: 'lent', status: 'needs_auth' }) as never)
+        await attachVaultEntry('lent', 'alice', admin)
+        expect(listVaultItems).not.toHaveBeenCalledWith(conn, 'e-alice')
+        expect(deleteVaultItem).not.toHaveBeenCalled()
     })
 })
 
