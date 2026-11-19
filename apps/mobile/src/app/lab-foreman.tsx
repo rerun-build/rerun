@@ -3,7 +3,7 @@ import type { UIMessage } from 'ai'
 import { router, useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Keyboard, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native'
-import Animated, { useAnimatedKeyboard, useAnimatedReaction, useAnimatedStyle, type AnimatedKeyboardInfo, type DerivedValue } from 'react-native-reanimated'
+import Animated, { useAnimatedKeyboard, useAnimatedReaction, type AnimatedKeyboardInfo, type DerivedValue } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -22,7 +22,7 @@ import { SectionHeader } from '@/components/home/SectionHeader'
 import { EdgeFade } from '@/components/ui/EdgeFade'
 import { ProgressiveBlur } from '@/components/ui/ProgressiveBlur'
 import { statusLine } from '@/components/ui/status'
-import { useKeyboardHeight } from '@/lib/keyboard-height'
+import { LIFTS_BY_SLIDING, useKeyboardHeight, useKeyboardLift, useRaiseAtRest } from '@/lib/keyboard-height'
 import { coworkers, MOCK_VOICE_PEAKS, sessions } from '@/mocks/data'
 import { useTheme } from '@/theme/theme'
 import { spacing } from '@/theme/tokens'
@@ -137,12 +137,14 @@ export function MockPane({ state, topInset = spacing.lg, seeThrough = true, cowo
     const blockShown = state === 'question' || state === 'approval'
     const keyboard = useAnimatedKeyboard()
     const keyboardHeight = useKeyboardHeight()
-    const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboardHeight.height.value + spacing.sm, insets.bottom) }))
+    const empty = messages.length === 0 && !loading
+    const lift = useKeyboardLift(keyboardHeight.height, insets.bottom, !empty)
+    const keyboardRaise = useRaiseAtRest(insets.bottom)
     useKeyboardShown(() => scroll.current?.scrollToEnd({ animated: true }))
     return (
-        <Animated.View style={[{ flex: 1 }, lift]}>
+        <Animated.View style={[{ flex: 1, paddingBottom: LIFTS_BY_SLIDING ? insets.bottom : 0 }, lift]}>
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-                <ScrollView ref={scroll} style={StyleSheet.absoluteFill} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ flexGrow: 1, justifyContent: messages.length || loading ? 'flex-end' : 'center', paddingTop: topInset, paddingBottom: footerHeight + 32, paddingHorizontal: spacing.xl - 4 }}>
+                <ScrollView ref={scroll} style={StyleSheet.absoluteFill} contentInset={{ top: empty ? 0 : keyboardRaise }} onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ flexGrow: 1, justifyContent: messages.length || loading ? 'flex-end' : 'center', paddingTop: topInset, paddingBottom: footerHeight + 32, paddingHorizontal: spacing.xl - 4 }}>
                     {loading && <ConversationSkeleton />}
                     {messages.length === 0 && !loading && <ForemanEmptyStateView model={teamEmptyStateOf({ agents: coworkers.map(coworker => ({ id: coworker.id, name: coworker.name, handle: null, status: coworker.status, disabledAt: null })), nextRoutine: null, firstName: 'Clément' })} onSend={noop} onPrefill={noop} />}
                     {messages.length > 0 && (

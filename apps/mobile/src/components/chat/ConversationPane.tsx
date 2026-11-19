@@ -183,8 +183,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const [footerHeight, setFooterHeight] = useState(0)
 
     const keyboard = useKeyboardHeight()
-    const lift = useKeyboardLift(keyboard.height, insets.bottom)
-    const raisedAtRest = useRaiseAtRest(insets.bottom)
+    const keyboardRaise = useRaiseAtRest(insets.bottom)
 
     const lastAssistant = chat.messages.findLastIndex(message => message.role === 'assistant')
     const messageTimes = useMessageTimes(chat.messages)
@@ -221,6 +220,9 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const replies = !settled || pending || unknownCall || lastAssistant < 0 || lastAssistant !== chat.messages.length - 1 ? [] : quickRepliesOf(chat.messages[lastAssistant])
     // A General with no message yet but threads already opened shows them, not the empty state, as on the web.
     const empty = chat.history === 'ready' && chat.messages.length === 0 && !chat.busy && threadRows.leading.length === 0
+    // The empty state is centered in the room the keyboard leaves: it is not slid under the header.
+    const lift = useKeyboardLift(keyboard.height, insets.bottom, !empty)
+    const raisedAtRest = empty ? 0 : keyboardRaise
     // A takeover the app can draw is asked on the screen it is about, not in a block of its own.
     const takeoverPending = pending?.kind === 'takeover' && replacesComposer ? pending : null
     const runOnScreen = useMemo(() => runUsesScreen(chat.messages), [chat.messages])

@@ -1,5 +1,6 @@
 import type { BoardAgent } from '@rerun/contracts'
 import { act, renderHook } from '@testing-library/react-native'
+import { AppState, type AppStateStatus } from 'react-native'
 
 import type { BoardRead } from '@/api/board'
 import { cachedBoard, clearLocalCache } from '@/data/local-cache'
@@ -94,6 +95,31 @@ describe('useBoard', () => {
         await act(async () => {})
 
         expect(result.current.state).toBe('error')
+    })
+
+    describe('back in the foreground', () => {
+        beforeEach(() => jest.useFakeTimers())
+        afterEach(() => {
+            jest.useRealTimers()
+            jest.restoreAllMocks()
+        })
+
+        it('reads the board once, not once for the store and once for the live rows', async () => {
+            const listeners: ((state: AppStateStatus) => void)[] = []
+            jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, listener) => {
+                listeners.push(listener as (state: AppStateStatus) => void)
+                return { remove: jest.fn() } as unknown as ReturnType<typeof AppState.addEventListener>
+            })
+            mockFetchBoard.mockResolvedValue(boardWith(agent('a1', 'Scout')))
+            await renderHook(() => useBoard())
+            await act(async () => {})
+            expect(mockFetchBoard).toHaveBeenCalledTimes(1)
+
+            await act(async () => listeners.forEach(listener => listener('active')))
+            await act(async () => jest.advanceTimersByTime(BURST_MS))
+
+            expect(mockFetchBoard).toHaveBeenCalledTimes(2)
+        })
     })
 
     describe('a chat started on the web while Realtime was away (RER-7)', () => {

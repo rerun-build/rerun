@@ -70,6 +70,33 @@ describe('the hub store', () => {
         expect(fetch).toHaveBeenCalledTimes(2)
     })
 
+    // A list followed live is read again on return by the screen that follows it.
+    it('leaves the return to the foreground to a screen that reads its rows again itself', async () => {
+        const fetch = jest.fn(async () => ['general'])
+        await renderHook(() => useHub('conversations:7:pulse', fetch, { foreground: false }))
+        await act(async () => {})
+        await act(async () => appStateListeners.forEach(listener => listener('active')))
+        expect(fetch).toHaveBeenCalledTimes(1)
+    })
+
+    // The Home moved on to another workspace while one more read of the first was owed.
+    it('reads a key again with the fetch drawn for it, once the screen has moved on to another', async () => {
+        const first = deferred<string[]>()
+        const fetchA = jest.fn<Promise<string[]>, []>().mockReturnValueOnce(first.promise).mockResolvedValue(['a, after'])
+        const fetchB = jest.fn(async () => ['b'])
+        const { result, rerender } = await renderHook(({ workspace }: { workspace: 'a' | 'b' }) => useHub(`board:${workspace}`, workspace === 'a' ? fetchA : fetchB), { initialProps: { workspace: 'a' as 'a' | 'b' } })
+        let reloaded: Promise<string[] | null> = Promise.resolve(null)
+        await act(async () => {
+            reloaded = result.current.reload()
+        })
+        await rerender({ workspace: 'b' })
+        await act(async () => first.resolve(['a, before']))
+        await act(async () => void (await reloaded))
+        expect(fetchA).toHaveBeenCalledTimes(2)
+        expect(fetchB).toHaveBeenCalledTimes(1)
+        expect(result.current.value).toEqual(['b'])
+    })
+
     it('forgets what it held once the person signs out', async () => {
         const fetch = jest.fn(async () => ['weekly-report'])
         await renderHook(() => useHub('skills:7:pulse', fetch))

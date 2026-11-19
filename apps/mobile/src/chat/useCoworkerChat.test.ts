@@ -512,6 +512,26 @@ describe('useCoworkerChat on a page kept beside the one shown', () => {
         expect(endpoints.messages).toHaveBeenCalledTimes(1)
     })
 
+    // Kept drawn beside the page shown, it hears nothing of its own conversation: the list does.
+    it('reads its transcript again on return when the list names another version than the one read', async () => {
+        const endpoints = fakeEndpoints(null)
+        endpoints.messages = jest.fn(async () => ({ messages: [], etag: '"v1"', updatedAt: '2026-11-19T08:00:00Z' }))
+        const page = (onScreen: boolean, knownUpdatedAt: string) => ({ onScreen, knownUpdatedAt })
+        const { rerender } = await renderHook(({ onScreen, knownUpdatedAt }: ReturnType<typeof page>) => useCoworkerChat({ endpoints, initialSessionId: 's1', onScreen, knownUpdatedAt }), { initialProps: page(true, '2026-11-19T08:00:00Z') })
+        await act(async () => {})
+        jest.clearAllMocks()
+
+        await rerender(page(false, '2026-11-19T08:00:00Z'))
+        await rerender(page(true, '2026-11-19T08:00:00Z'))
+        await act(async () => {})
+        expect(endpoints.messages).not.toHaveBeenCalled()
+
+        await rerender(page(false, '2026-11-19T08:05:00Z'))
+        await rerender(page(true, '2026-11-19T08:05:00Z'))
+        await act(async () => {})
+        expect(endpoints.messages).toHaveBeenCalledTimes(1)
+    })
+
     it('reads again at once when it is the one on screen', async () => {
         const endpoints = fakeEndpoints(null)
         await renderHook(() => useCoworkerChat({ endpoints, initialSessionId: 's1', onScreen: true }))

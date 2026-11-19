@@ -40,7 +40,7 @@ export function useBoard(): Board & { reload: () => void } {
     const workspaceId = me?.workspace.id
     const userId = me?.user.id
     const persisted = useMemo(() => (workspaceId === undefined ? undefined : cachedBoard(workspaceId)), [workspaceId])
-    const read = useHub(accessToken && workspaceId ? `board:${workspaceId}` : null, () => fetchBoard({ accessToken: accessToken!, workspaceId: workspaceId! }), { persisted, freshFor: 0 })
+    const read = useHub(accessToken && workspaceId ? `board:${workspaceId}` : null, () => fetchBoard({ accessToken: accessToken!, workspaceId: workspaceId! }), { persisted, freshFor: 0, foreground: false })
     const { reload: readAgain } = read
     const reload = useCallback(() => void readAgain(), [readAgain])
     const reloadSoon = useBurstReload(reload)

@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { AppState } from 'react-native'
-
-import { useStableCallback } from '@/lib/use-stable-callback'
 
 // One copy of each thing the hub said, shared by every screen that reads it. Three pages of the same
 // coworker ask for its skills once; a screen opened again within `freshFor` asks for nothing; coming
-// back to the foreground reads again what the screens on show hold, once each.
+// back to the foreground reads again what the screens on show hold, once each. A screen that already
+// reads its rows again on return (`useLiveReload`) says `foreground: false`, so they are read once.
 
 // Where a value lives between launches: an entry of `local-cache`, or nowhere.
 export type Persisted<T> = { read: () => T | null; save: (value: T) => void }
@@ -79,11 +78,18 @@ export function loadHub<T>(key: string, fetch: () => Promise<T>, persisted?: Per
 
 let foreground: { remove: () => void } | null = null
 
-function wakeOnForeground() {
+function wakeOnForeground(key: string, wake: () => void): () => void {
+    const keyWakers = wakers.get(key) ?? new Set()
+    keyWakers.add(wake)
+    wakers.set(key, keyWakers)
     foreground ??= AppState.addEventListener('change', state => {
         if (state !== 'active') return
-        for (const keyWakers of wakers.values()) keyWakers.values().next().value?.()
+        for (const woken of wakers.values()) woken.values().next().value?.()
     })
+    return () => {
+        keyWakers.delete(wake)
+        if (keyWakers.size === 0) wakers.delete(key)
+    }
 }
 
 // Nothing the hub said stays in memory once the person signs out.
@@ -94,13 +100,19 @@ export function forgetHub() {
     foreground = null
 }
 
-type HubOptions<T> = { persisted?: Persisted<T>; freshFor?: number }
+type HubOptions<T> = { persisted?: Persisted<T>; freshFor?: number; foreground?: boolean }
 
 // What the hub said for `key`, read when the screen opens unless it is fresh, and again when the app
-// comes back to the foreground. Null `key`: nothing to read yet.
+// comes back to the foreground unless `foreground` is false. Null `key`: nothing to read yet.
 // `answeredHere`: the hub answered since this screen opened, not only earlier in the launch.
-export function useHub<T>(key: string | null, fetch: () => Promise<T>, { persisted, freshFor = FRESH_FOR_MS }: HubOptions<T> = {}): HubState<T> & { answeredHere: boolean; reload: () => Promise<T | null> } {
-    const ask = useStableCallback(fetch)
+export function useHub<T>(key: string | null, fetch: () => Promise<T>, { persisted, freshFor = FRESH_FOR_MS, foreground: wakes = true }: HubOptions<T> = {}): HubState<T> & { answeredHere: boolean; reload: () => Promise<T | null> } {
+    // The latest `fetch` drawn for each key: a read put off (one more after the read on its way, a
+    // burst timer) still asks for its own key once the screen has moved on to another.
+    const asks = useRef(new Map<string, () => Promise<T>>())
+    useLayoutEffect(() => {
+        if (key) asks.current.set(key, fetch)
+    })
+    const ask = useCallback(() => asks.current.get(key ?? '')!(), [key])
     const [answeredFor, setAnsweredFor] = useState<string | null>(null)
     const subscribe = useCallback(
         (listener: () => void) => {
@@ -123,18 +135,13 @@ export function useHub<T>(key: string | null, fetch: () => Promise<T>, { persist
         let alive = true
         const answered = () => alive && setAnsweredFor(key)
         if (Date.now() - slot.readAt > freshFor) loadHub(key, ask).then(answered, () => {})
-        const wake = () => void loadHub(key, ask).catch(() => {})
-        const keyWakers = wakers.get(key) ?? new Set()
-        keyWakers.add(wake)
-        wakers.set(key, keyWakers)
-        wakeOnForeground()
+        const stopWaking = wakes ? wakeOnForeground(key, () => void loadHub(key, ask).catch(() => {})) : undefined
         return () => {
             alive = false
-            keyWakers.delete(wake)
-            if (keyWakers.size === 0) wakers.delete(key)
+            stopWaking?.()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [key, freshFor, ask])
+    }, [key, freshFor, ask, wakes])
 
     const reload = useCallback(() => (key ? loadHub(key, ask, undefined, { again: true }).catch(() => null) : Promise.resolve(null)), [key, ask])
     return { ...state, answeredHere: answeredFor === key, reload }

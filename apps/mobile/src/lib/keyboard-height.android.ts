@@ -12,7 +12,7 @@ export function useKeyboardHeight() {
 // keyboard by its padding.
 export const LIFTS_BY_SLIDING = false
 
-export function useKeyboardLift(height: SharedValue<number>, bottomInset: number) {
+export function useKeyboardLift(height: SharedValue<number>, bottomInset: number, _slides = true) {
     return useAnimatedStyle(() => ({ paddingBottom: Math.max(height.value + spacing.sm, bottomInset) }))
 }
 

@@ -42,7 +42,7 @@ function useLiveConversations(agentId: string): LiveConversations {
             return [...fetched].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
         },
         // Read at each opening: a conversation answered elsewhere meanwhile must not open as it was.
-        { persisted, freshFor: 0 }
+        { persisted, freshFor: 0, foreground: false }
     )
     const { reload } = list
     // A run writes its row several times in a row (its status, then its preview, its title): one read for the burst.

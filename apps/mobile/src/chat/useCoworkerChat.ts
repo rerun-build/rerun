@@ -23,7 +23,7 @@ const GRACE_MARGIN_S = 5
 // `knownUpdatedAt`: the version of the conversation in the list the app holds. A transcript kept at
 // that same version is the hub's own: the conversation opens on it ready to act on.
 // `onScreen`: false for a page kept beside the one shown, which reads its transcript again only once
-// it comes back on screen.
+// it comes back on screen, when the app left meanwhile or the list names another version than the one read.
 export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = null, onScreen = true, onSessionCreated, onRefused }: { endpoints: ChatEndpoints; initialSessionId: string | null; knownUpdatedAt?: string | null; onScreen?: boolean; onSessionCreated?: (sessionId: string) => void; onRefused?: (text: string, behindRunId: string | null) => void }) {
     const { session, me } = useAuth()
     const callerRef = useRef<ChatCaller | null>(null)
@@ -39,6 +39,8 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
     // replaces it behind, the way a messaging app opens a thread.
     const [cached] = useState(() => (initialSessionId && me ? readTranscript(me.workspace.id, initialSessionId) : null))
     const [history, setHistory] = useState<HistoryState>(initialSessionId && !cached ? 'loading' : 'ready')
+    // The version of the conversation the transcript on screen was last read at.
+    const readAtRef = useRef(cached?.updatedAt ?? null)
     // False while what is on screen is only the kept transcript: nothing that acts on the run's
     // current state (a question to answer, quick replies) is offered on it, unless it was kept at the
     // version the list of conversations names.
@@ -88,6 +90,7 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
             // The running run is looked up while the transcript loads; the stream is only picked up
             // once the transcript is in place, since it goes on from the messages already there.
             const [transcript, runId] = await Promise.all([loadTranscript(caller.workspaceId, id, etag => endpoints.messages(caller, id, etag)), resume ? endpoints.activeRun(caller, id).catch(() => null) : null])
+            readAtRef.current = transcript.updatedAt
             setHistory('ready')
             setRead(true)
             // A send left while the read was on its way: the hub's copy predates it, and the stream
@@ -126,7 +129,7 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
         busyRef.current = busy
     }, [busy])
     // Back from the background, only the page on screen reads again at once; one kept beside it does
-    // when it is shown.
+    // when it is shown. So does one whose conversation moved while it was kept: nothing else reads it.
     const onScreenRef = useRef(onScreen)
     const staleRef = useRef(false)
 
@@ -242,11 +245,14 @@ export function useCoworkerChat({ endpoints, initialSessionId, knownUpdatedAt = 
     }, [refresh, rejoin, letGo, endGrace, clearError, comeBack])
 
     useEffect(() => {
+        const arrived = onScreen && !onScreenRef.current
         onScreenRef.current = onScreen
-        if (!onScreen || !staleRef.current) return
+        if (!arrived) return
+        const moved = !busyRef.current && !!knownUpdatedAt && !!readAtRef.current && knownUpdatedAt !== readAtRef.current
+        if (!staleRef.current && !moved) return
         staleRef.current = false
         refresh({ resume: true }).catch(() => {})
-    }, [onScreen, refresh])
+    }, [onScreen, knownUpdatedAt, refresh])
 
     // The stream picked up again speaks for itself: busy follows the status from here.
     useEffect(() => {

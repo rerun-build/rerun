@@ -45,8 +45,14 @@ const raiseOf = (keyboardHeight: number, bottomInset: number) => {
     return Math.max(keyboardHeight + spacing.sm, bottomInset) - bottomInset
 }
 
-export function useKeyboardLift(height: SharedValue<number>, bottomInset: number) {
-    return useAnimatedStyle(() => ({ transform: [{ translateY: -raiseOf(height.value, bottomInset) }] }))
+// `slides` false for a thread centered in the room the keyboard leaves (an empty conversation): slid,
+// it would stay centered in the whole height, half of it under the header. It makes room by its
+// padding instead, which costs nothing with no message to lay out.
+export function useKeyboardLift(height: SharedValue<number>, bottomInset: number, slides = true) {
+    return useAnimatedStyle(() => {
+        const raise = raiseOf(height.value, bottomInset)
+        return slides ? { paddingBottom: bottomInset, transform: [{ translateY: -raise }] } : { paddingBottom: bottomInset + raise, transform: [{ translateY: 0 }] }
+    })
 }
 
 // How far the chat stands raised once the keyboard is at rest: the top of its thread is that much
