@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { modelLogLabel } from '@/lib/engine/models'
 import type { EngineRun, EngineRunStep, EngineToolCall } from '@/lib/engine/types'
 import { toolIconOf } from '@/lib/tool-meta'
+import { COMPACTION_FINISH_REASON } from '@rerun/contracts'
 import { formatDate, formatNumber } from '@rerun/i18n/format'
 import { RunStatusBadge } from '@rerun/ui/monitoring'
 import { CheckIcon, ChevronRightIcon, ScrollTextIcon, XIcon } from '@/lib/icons'
@@ -145,7 +146,7 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
                     ) : (
                         <div className="flex flex-col gap-2">
                             {detail.steps.map(step => (
-                                <StepRow key={step.id} step={step} tools={detail.tools.filter(tool => tool.stepNumber === step.stepNumber)} />
+                                <StepRow key={step.id} step={step} tools={step.finishReason === COMPACTION_FINISH_REASON ? [] : detail.tools.filter(tool => tool.stepNumber === step.stepNumber)} />
                             ))}
                         </div>
                     )}
@@ -157,12 +158,14 @@ function RunRow({ run, detail, onOpen }: { run: EngineRun; detail?: RunDetail; o
 
 function StepRow({ step, tools }: { step: EngineRunStep; tools: EngineToolCall[] }) {
     const t = useTranslations('agent.agentPanelLogs')
+    const tCompaction = useTranslations('chat.compaction')
     const locale = useLocale()
+    const compaction = step.finishReason === COMPACTION_FINISH_REASON
     return (
         <div className="divide-y divide-border/40">
             <div className="flex items-center gap-2 py-1.5 text-xs">
-                <span className="font-medium">{t('step', { number: step.stepNumber })}</span>
-                {step.finishReason && <span className="text-muted-foreground">{step.finishReason}</span>}
+                <span className="font-medium">{compaction ? tCompaction('done') : t('step', { number: step.stepNumber })}</span>
+                {!compaction && step.finishReason && <span className="text-muted-foreground">{step.finishReason}</span>}
                 <span className="flex-1" />
                 {step.totalTokens != null && <span className="text-muted-foreground">{t('tokensShort', { total: formatNumber(step.totalTokens, locale) })}</span>}
                 {step.durationMs != null && <span className="text-muted-foreground">{formatDuration(step.durationMs)}</span>}
