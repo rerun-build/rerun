@@ -18,6 +18,8 @@ writeFileSync(resolve(root, 'big.txt'), 'x'.repeat(150_000))
 writeFileSync(resolve(root, 'many.txt'), Array.from({ length: 10 }, (_, i) => `hit ${i}`).join('\n'))
 writeFileSync(resolve(root, 'same.txt'), 'keep me')
 writeFileSync(resolve(root, 'lines.txt'), Array.from({ length: 500 }, (_, i) => `line ${i + 1}`).join('\n') + '\n')
+writeFileSync(resolve(root, 'wide.txt'), Array.from({ length: 2000 }, () => 'w'.repeat(99)).join('\n') + '\n')
+writeFileSync(resolve(root, 'empty.txt'), '')
 
 const tools = makeFsTools({ prefix: 'box', label: 'test root', rootDir: root })
 
@@ -45,6 +47,21 @@ describe('makeFsTools', () => {
     it('stops at the last line', async () => {
         const out = await run('box_read', { path: 'lines.txt', startLine: 498, endLine: 900 })
         expect(out).toBe('lines 498-500 of 500\nline 498\nline 499\nline 500')
+    })
+
+    it('caps a wide range at 100k characters of whole lines and names the last line returned', async () => {
+        const out = await run('box_read', { path: 'wide.txt', startLine: 1, endLine: 2000 })
+        const [header] = out.split('\n')
+        expect(header).toBe('lines 1-1000 of 2000')
+        expect(out).toHaveLength(100_020)
+    })
+
+    it('cuts a single line longer than the cap in a range read', async () => {
+        expect(await run('box_read', { path: 'big.txt', startLine: 1 })).toBe('lines 1-1 of 1\n' + 'x'.repeat(100_000))
+    })
+
+    it('reads an empty file as 0 lines', async () => {
+        expect(await run('box_read', { path: 'empty.txt', startLine: 1, endLine: 5 })).toBe('startLine 1 is past the end of empty.txt (0 lines)')
     })
 
     it('answers an error past the end', async () => {

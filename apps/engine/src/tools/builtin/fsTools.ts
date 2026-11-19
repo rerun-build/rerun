@@ -22,6 +22,8 @@ function isWithin(root: string, path: string): boolean {
     }
 }
 
+const READ_CHARS = 100_000
+
 export function makeFsTools({ prefix, label: baseLabel, rootDir, scope = {}, extraRoots = [] }: FsToolsOptions): ToolSet {
     const extraRootOf = (path: unknown) => (typeof path === 'string' && isAbsolute(path) ? extraRoots.find(root => isWithin(root, path)) : undefined)
     const rootOf = async (input: Record<string, unknown>) => extraRootOf(input.path) ?? (typeof rootDir === 'string' ? rootDir : rootDir(input))
@@ -39,15 +41,24 @@ export function makeFsTools({ prefix, label: baseLabel, rootDir, scope = {}, ext
             }),
             execute: async input => {
                 const content = await store.readText(await rootOf(input), input.path)
-                if (input.startLine === undefined && input.endLine === undefined) return content.slice(0, 100_000)
-                const lines = content.split('\n')
+                if (input.startLine === undefined && input.endLine === undefined) return content.slice(0, READ_CHARS)
+                const lines = content === '' ? [] : content.split('\n')
                 if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop()
                 const total = lines.length
                 const start = input.startLine ?? 1
                 if (start > total) return `startLine ${start} is past the end of ${input.path} (${total} lines)`
                 const end = Math.min(input.endLine ?? total, total)
                 if (end < start) return `endLine ${end} is before startLine ${start}`
-                return [`lines ${start}-${end} of ${total}`, ...lines.slice(start - 1, end)].join('\n')
+                const taken: string[] = []
+                let used = 0
+                for (let i = start - 1; i < end; i++) {
+                    const cost = (taken.length ? 1 : 0) + lines[i].length
+                    if (used + cost > READ_CHARS) break
+                    taken.push(lines[i])
+                    used += cost
+                }
+                if (taken.length === 0) taken.push(lines[start - 1].slice(0, READ_CHARS))
+                return [`lines ${start}-${start + taken.length - 1} of ${total}`, ...taken].join('\n')
             },
         }),
         [`${prefix}_write`]: tool({
