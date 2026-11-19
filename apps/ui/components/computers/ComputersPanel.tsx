@@ -365,7 +365,7 @@ function ComputerDetail({ computer, onBack, onChanged }: { computer: ComputerIte
 
             <div className="border-t p-3">
                 <TooltipDisabledReason reason={readOnly ? t('managersOnly') : undefined}>
-                    <Button variant="outline" size="sm" className="text-destructive" disabled={readOnly} onClick={() => setConfirmRemove(true)}>
+                    <Button variant="destructive" size="sm" disabled={readOnly} onClick={() => setConfirmRemove(true)}>
                         {tDetail('remove')}
                     </Button>
                 </TooltipDisabledReason>

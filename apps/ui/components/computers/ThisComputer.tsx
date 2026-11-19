@@ -172,7 +172,7 @@ export function ThisComputerSection() {
                     </Field>
                     {here && (
                         <div>
-                            <Button size="sm" variant="outline" className="text-destructive" onClick={() => setUnlinking(here)}>
+                            <Button size="sm" variant="destructive" onClick={() => setUnlinking(here)}>
                                 {t('unlink')}
                             </Button>
                         </div>
