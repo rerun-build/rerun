@@ -104,6 +104,11 @@ const describeOnIos = Platform.OS === 'ios' ? describe : describe.skip
 describeOnIos('a conversation of 200 messages', () => {
     afterEach(stopCountingRenders)
 
+    it('opens on its last messages, the earlier ones drawn as the thread is scrolled up to them', async () => {
+        const counts = await measure('opening 200 messages', () => openLongConversation())
+        expect(counts.MessageView ?? 0).toBeLessThanOrEqual(40)
+    })
+
     it('redraws its messages within budget while someone types', async () => {
         await openLongConversation()
         const input = screen.getByTestId('composer-input')

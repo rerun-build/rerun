@@ -1,6 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Dimensions, Keyboard, type KeyboardEvent, type KeyboardMetrics } from 'react-native'
-import { KeyboardState, useAnimatedKeyboard, useDerivedValue, useSharedValue } from 'react-native-reanimated'
+import { KeyboardState, useAnimatedKeyboard, useAnimatedStyle, useDerivedValue, useSharedValue, type SharedValue } from 'react-native-reanimated'
+
+import { spacing } from '@/theme/tokens'
 
 // iOS gives the keyboard frame in screen coordinates. An iPad window smaller than the screen (Stage
 // Manager, Slide Over) does not end at the screen's bottom, so there the height stays Reanimated's,
@@ -32,4 +34,32 @@ export function useKeyboardHeight() {
         return moving || announced.value === null ? keyboard.height.value : announced.value
     })
     return { height }
+}
+
+// A chat slides up with the keyboard rather than shrinking: a transform moves it on the UI thread,
+// where a padding would lay the whole thread out again at every frame of the keyboard's move.
+export const LIFTS_BY_SLIDING = true
+
+const raiseOf = (keyboardHeight: number, bottomInset: number) => {
+    'worklet'
+    return Math.max(keyboardHeight + spacing.sm, bottomInset) - bottomInset
+}
+
+export function useKeyboardLift(height: SharedValue<number>, bottomInset: number) {
+    return useAnimatedStyle(() => ({ transform: [{ translateY: -raiseOf(height.value, bottomInset) }] }))
+}
+
+// How far the chat stands raised once the keyboard is at rest: the top of its thread is that much
+// under the header, and the thread scrolls that much further to bring it back.
+export function useRaiseAtRest(bottomInset: number): number {
+    const [raised, setRaised] = useState(0)
+    useEffect(() => {
+        const shown = Keyboard.addListener('keyboardDidShow', event => setRaised(raiseOf(visibleHeight(event.endCoordinates) ?? event.endCoordinates.height, bottomInset)))
+        const hidden = Keyboard.addListener('keyboardDidHide', () => setRaised(0))
+        return () => {
+            shown.remove()
+            hidden.remove()
+        }
+    }, [bottomInset])
+    return raised
 }

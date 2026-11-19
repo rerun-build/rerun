@@ -2,7 +2,7 @@ import { RERUN_CONNECTION_ID, appendAttachmentsRef, threadsByMessage, authorIdOf
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, View, type ScrollViewInstance } from 'react-native'
-import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideOutDown, useAnimatedStyle } from 'react-native-reanimated'
+import Animated, { FadeInDown, FadeOutDown, LayoutAnimationConfig, SlideOutDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslations } from 'use-intl'
 
@@ -13,7 +13,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { setPendingDesktopOpen } from '@/desktop/pending-open'
 import { track } from '@/lib/analytics'
 import * as Haptics from '@/lib/haptics'
-import { useKeyboardHeight } from '@/lib/keyboard-height'
+import { LIFTS_BY_SLIDING, useKeyboardHeight, useKeyboardLift, useRaiseAtRest } from '@/lib/keyboard-height'
 import { useStableCallback } from '@/lib/use-stable-callback'
 import { askForPushOnce, setConversationOnScreen } from '@/notifications/push'
 import { noteRender } from '@/perf/renders'
@@ -65,6 +65,7 @@ import { useTakeoverRequest } from './screen/useTakeoverRequest'
 import { Suggestions } from './Suggestions'
 import type { ThreadItem } from './threads/general-threads'
 import { Transcript } from './Transcript'
+import { useTranscriptWindow } from './transcript-window'
 import { useKeyboardShown } from './useKeyboardShown'
 
 // The transcript scrolls under the suggestions and the composer, going out of focus this far above
@@ -74,6 +75,8 @@ export const BLUR_ABOVE_FOOTER = 32
 const AT_BOTTOM = 24
 // Under the fade at the top of the thread a block is not really seen, even when it is on screen.
 const SEEN_BAND = 24
+// A stretch of earlier messages drawn above the one on screen leaves it where it was.
+const KEEP_PLACE_ABOVE = { minIndexForVisible: 0 }
 
 export type ChatCoworker = { id: string; kind: 'coworker' | 'foreman'; name: string; role: string; status: AgentView['agent']['status'] }
 
@@ -174,7 +177,8 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const [footerHeight, setFooterHeight] = useState(0)
 
     const keyboard = useKeyboardHeight()
-    const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
+    const lift = useKeyboardLift(keyboard.height, insets.bottom)
+    const raisedAtRest = useRaiseAtRest(insets.bottom)
 
     const lastAssistant = chat.messages.findLastIndex(message => message.role === 'assistant')
     const messageTimes = useMessageTimes(chat.messages)
@@ -190,6 +194,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const banner = useMemo(() => (startedByName ? { agentId: startedByAgentId, name: startedByName } : null), [startedByAgentId, startedByName])
     const ownerKey = JSON.stringify(endpoints.fileOwner(chat.sessionId))
     const fileOwner = useMemo(() => JSON.parse(ownerKey) as FileOwner, [ownerKey])
+    const transcriptWindow = useTranscriptWindow(chat.messages)
     const [dismissedCallId, setDismissedCallId] = useState<string | null>(null)
     // A live call never reads `idle` (it goes `working`, then `awaiting_*`): an idle session is one whose
     // block was closed, and it stays closed across a reload, as on the web.
@@ -219,7 +224,7 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
     const screen = useAgentScreen(coworker.id, screenShown && onScreen && focused)
     const screenUnavailable = screen.status === 'error' || screen.status === 'disconnected'
     const screenInThread = screenShown && (!screenUnavailable || !!takeoverPending)
-    const visibleTop = scrollTop + insets.top + CHAT_HEADER_HEIGHT + SEEN_BAND
+    const visibleTop = scrollTop + raisedAtRest + insets.top + CHAT_HEADER_HEIGHT + SEEN_BAND
     const visibleBottom = scrollTop + viewport - footerHeight
     const screenSeen = !screenBox || seenInThread({ top: threadTop + screenBox.y, bottom: threadTop + screenBox.y + screenBox.height }, { top: visibleTop, bottom: visibleBottom })
     const floatingShown = screenInThread && screen.status === 'live' && !screenSeen && focused
@@ -391,23 +396,28 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
         if (caller && runId) cancelSubRun(caller, coworker.id, runId, taskId).catch(() => Alert.alert(t('stopTaskFailed'), tc('tryAgainShortly')))
     })
     const regenerate = useStableCallback(() => void chat.regenerate())
+    const transcript = { messages: chat.messages, busy: chat.busy, agentId: isForeman ? null : coworker.id, coworkerName: coworker.name, fileOwner, hiddenCallId: alert?.toolCallId ?? null, skillProposals, onStopTask: stopTask, onRegenerate: pending ? undefined : regenerate, ratingOf: feedback.ratingOf, onRate: feedback.rate, paidSourcesByTurn, authorOf, startedBy: banner, threadRows, onOpenThread: openThread }
     const placeholder = pending || unknownCall ? t('answerPlaceholder', { name: coworker.name }) : !chat.sessionId ? t('newPlaceholder') : isForeman ? t('foremanPlaceholder') : t('messagePlaceholder', { name: coworker.name })
 
     return (
-        <Animated.View style={[{ flex: 1 }, lift]}>
+        <Animated.View style={[{ flex: 1, paddingBottom: LIFTS_BY_SLIDING ? insets.bottom : 0 }, lift]}>
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                 <ScrollView
                     ref={scroll}
                     testID="conversation-thread"
                     style={StyleSheet.absoluteFill}
-                    scrollIndicatorInsets={{ bottom: footerHeight }}
+                    contentInset={{ top: raisedAtRest }}
+                    scrollIndicatorInsets={{ top: raisedAtRest, bottom: footerHeight }}
                     keyboardDismissMode="interactive"
                     keyboardShouldPersistTaps="handled"
                     scrollEventThrottle={64}
+                    maintainVisibleContentPosition={KEEP_PLACE_ABOVE}
                     onScroll={({ nativeEvent: { contentSize, contentOffset, layoutMeasurement } }) => {
                         const below = Math.max(0, contentSize.height - contentOffset.y - layoutMeasurement.height - BLUR_ABOVE_FOOTER)
                         metrics.current = { content: contentSize.height, viewport: layoutMeasurement.height }
                         placeFold(below, blockHeight)
+                        // A screen from the top of what is drawn, the stretch before it comes in above.
+                        if (transcriptWindow.hasEarlier && contentOffset.y < layoutMeasurement.height) transcriptWindow.showEarlier()
                         if (screenInThread) {
                             setScrollTop(contentOffset.y)
                             setViewport(layoutMeasurement.height)
@@ -449,8 +459,13 @@ export function ConversationPane({ coworker, makeEndpoints, initialSessionId, on
                         // The transcript a conversation opens on is already there; the first bubble of a
                         // new conversation, sent as the list appears, still rises.
                         <LayoutAnimationConfig skipEntering={!chat.busy}>
-                            <View style={{ gap: spacing.xl }} onLayout={event => setThreadTop(event.nativeEvent.layout.y)}>
-                                <Transcript messages={chat.messages} busy={chat.busy} agentId={isForeman ? null : coworker.id} coworkerName={coworker.name} fileOwner={fileOwner} hiddenCallId={alert?.toolCallId ?? null} skillProposals={skillProposals} onStopTask={stopTask} onRegenerate={pending ? undefined : regenerate} ratingOf={feedback.ratingOf} onRate={feedback.rate} paidSourcesByTurn={paidSourcesByTurn} authorOf={authorOf} startedBy={banner} threadRows={threadRows} onOpenThread={openThread} />
+                            {transcriptWindow.earlier.map(range => (
+                                <View key={range.key} style={{ gap: spacing.xl, marginBottom: spacing.xl }}>
+                                    <Transcript {...transcript} from={range.from} to={range.to} />
+                                </View>
+                            ))}
+                            <View key="recent" style={{ gap: spacing.xl }} onLayout={event => setThreadTop(event.nativeEvent.layout.y)}>
+                                {transcriptWindow.recent && <Transcript {...transcript} from={transcriptWindow.recent.from} to={transcriptWindow.recent.to} />}
                                 {pending && !takeoverPending && (
                                     <Animated.View key={pending.toolCallId} entering={FadeInDown.duration(280)} onLayout={event => measureBlock(event.nativeEvent.layout.height)}>
                                         <HitlBlock

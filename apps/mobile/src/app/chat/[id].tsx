@@ -14,5 +14,5 @@ export default function Chat() {
     if (!ROUTE_ID_PATTERN.test(id) || (to !== undefined && !ROUTE_ID_PATTERN.test(to)) || (general !== undefined && !ROUTE_ID_PATTERN.test(general))) return <Redirect href="/" />
     const sessionId = id === NEW ? null : id
     if (!to || to === FOREMAN_AGENT_ID) return <ForemanChat sessionId={sessionId} />
-    return <CoworkerChat agentId={to} sessionId={sessionId} knownGeneralId={general ?? null} />
+    return <CoworkerChat key={to} agentId={to} sessionId={sessionId} knownGeneralId={general ?? null} />
 }

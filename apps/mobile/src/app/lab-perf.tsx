@@ -2,13 +2,13 @@ import type { UIMessage } from 'ai'
 import { useLocalSearchParams } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View, type ScrollViewInstance } from 'react-native'
-import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+import Animated from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { CHAT_HEADER_HEIGHT } from '@/components/chat/ChatHeader'
 import { Composer } from '@/components/chat/Composer'
 import { Transcript } from '@/components/chat/Transcript'
-import { useKeyboardHeight } from '@/lib/keyboard-height'
+import { LIFTS_BY_SLIDING, useKeyboardHeight, useKeyboardLift } from '@/lib/keyboard-height'
 import { FrameMonitor } from '@/perf/FrameMonitor'
 import { longTranscript, withStreamedReply } from '@/perf/long-transcript'
 import { countRenders, stopCountingRenders, type RenderCounts } from '@/perf/renders'
@@ -32,7 +32,7 @@ const noThreads = { leading: [], after: new Map() }
 const noPaidSources = new Map()
 
 function Thread({ messages, running }: { messages: UIMessage[]; running: boolean }) {
-    return <Transcript messages={messages} busy={running} agentId="lab-perf" coworkerName="Pulse" fileOwner={owner} hiddenCallId={null} onStopTask={noop} ratingOf={noRating} onRate={noop} paidSourcesByTurn={noPaidSources} authorOf={unsigned} startedBy={null} threadRows={noThreads} onOpenThread={noop} />
+    return <Transcript messages={messages} from={0} to={messages.length} busy={running} agentId="lab-perf" coworkerName="Pulse" fileOwner={owner} hiddenCallId={null} onStopTask={noop} ratingOf={noRating} onRate={noop} paidSourcesByTurn={noPaidSources} authorOf={unsigned} startedBy={null} threadRows={noThreads} onOpenThread={noop} />
 }
 
 export default function PerfLab() {
@@ -49,7 +49,7 @@ export default function PerfLab() {
     const [mountedAt] = useState(() => performance.now())
     const opened = useRef(false)
     const keyboard = useKeyboardHeight()
-    const lift = useAnimatedStyle(() => ({ paddingBottom: Math.max(keyboard.height.value + spacing.sm, insets.bottom) }))
+    const lift = useKeyboardLift(keyboard.height, insets.bottom)
     const messages = streamed > 0 ? withStreamedReply(base, streamed) : base
 
     const run = (kind: Run) => {
@@ -82,7 +82,7 @@ export default function PerfLab() {
     }, [])
 
     return (
-        <Animated.View style={[{ flex: 1, backgroundColor: theme.background }, lift]}>
+        <Animated.View style={[{ flex: 1, backgroundColor: theme.background, paddingBottom: LIFTS_BY_SLIDING ? insets.bottom : 0 }, lift]}>
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
                 <ScrollView
                     ref={scroll}

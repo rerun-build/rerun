@@ -9,6 +9,9 @@ import type { ConversationPage } from './conversation-pages'
 
 // How far past the first or the last page, in pages, a drag goes before it bumps into the end of the row.
 const EDGE_BUMP = 0.08
+// The page opened is drawn alone while the screen slides in; its neighbours come once it is in place,
+// or as soon as a finger starts to drag.
+const NEIGHBOURS_AFTER_MS = 450
 
 const tickOnto = (draft: boolean) => (draft ? Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light) : Haptics.selectionAsync())
 const bumpIntoEdge = () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft)
@@ -22,8 +25,9 @@ type ConversationPagerProps = {
     renderPage: (page: ConversationPage, onScreen: boolean) => ReactNode
 }
 
-// The coworker's conversations side by side, swiped through as the header's tabs. Only the page on
-// screen and its two neighbours are mounted, so a drag already shows the next transcript.
+// The coworker's conversations side by side, swiped through as the header's tabs. The page on screen
+// and its two neighbours are mounted, so a drag already shows the next transcript, and a page once
+// drawn stays drawn: coming back to it is instant.
 export function ConversationPager({ pages, activeIndex, progress, onSettle, renderPage }: ConversationPagerProps) {
     const scroll = useAnimatedRef<Animated.ScrollView>()
     const reduceMotion = useReducedMotion()
@@ -35,6 +39,15 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
     const restingIndex = useRef(activeIndex)
     const restingKey = useRef(pages[activeIndex]?.key)
     const lastIndex = pages.length - 1
+    const [neighboursShown, setNeighboursShown] = useState(false)
+    const [visited, setVisited] = useState<ReadonlySet<string>>(() => new Set())
+    const activeKey = pages[activeIndex]?.key
+    if (activeKey && !visited.has(activeKey)) setVisited(new Set(visited).add(activeKey))
+    useEffect(() => {
+        const timer = setTimeout(() => setNeighboursShown(true), NEIGHBOURS_AFTER_MS)
+        return () => clearTimeout(timer)
+    }, [])
+    const mounted = (page: ConversationPage, index: number) => visited.has(page.key) || (neighboursShown && Math.abs(index - activeIndex) <= 1)
 
     // A tab picked in the header slides there, even one just added before the draft. Tabs read late
     // from the device shift the row under the resting page, and the pager jumps to stay on the same
@@ -67,6 +80,7 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
         },
         onBeginDrag: () => {
             dragging.value = true
+            scheduleOnRN(setNeighboursShown, true)
         },
         onMomentumEnd: event => {
             dragging.value = false
@@ -117,7 +131,7 @@ export function ConversationPager({ pages, activeIndex, progress, onSettle, rend
                         const onScreen = index === activeIndex
                         return (
                             <View key={page.key} accessibilityElementsHidden={!onScreen} importantForAccessibility={onScreen ? 'auto' : 'no-hide-descendants'} style={{ width: size.width, height: size.height, overflow: 'hidden' }}>
-                                {Math.abs(index - activeIndex) <= 1 && renderPage(page, onScreen)}
+                                {mounted(page, index) && renderPage(page, onScreen)}
                             </View>
                         )
                     })}
