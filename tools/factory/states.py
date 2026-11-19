@@ -21,7 +21,7 @@ def _end(problem, then=()):
 
 TABLE = {
     "waiting": _row("wait", ("queued", "review_wait"), "intake", reason=True, slow_wait=True),
-    "queued": _row("wait", ("building", "waiting"), reason=True, queue=True, slow_wait=True),
+    "queued": _row("wait", ("building", "waiting", "review_wait"), reason=True, queue=True, slow_wait=True),
     "building": _row("running", ("review_wait", "queued"), deadline="stall_clock", back="queued", goal=BUILD_FORMS),
     "review_wait": _row("wait", ("reviewing", "fix_wait"), reason=True, queue=True),
     "reviewing": _row("running", ("checks", "fix_wait", "review_wait"), deadline="stall_clock", back="review_wait", goal=VERDICT),

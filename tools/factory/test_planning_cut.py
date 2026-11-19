@@ -13,7 +13,7 @@ ISSUE = {"number": 5, "title": "Fix x", "body": ready(), "comments": [], "labels
          "createdAt": "2026-11-01T00:00:00Z"}
 FLOOR = {"number": 612, "title": "Floor: show the queue", "body": "SECRET BODY"}
 TWO_STAGE = {"plan_by": ["Boss"], "cut_by": ["Scope Shaper", "IKE"]}
-BRIEF_SHA256 = "efde6f42ab9df9f7c5ef521a092607a6b9db753dfea9f8918a23e095fffa8657"
+BRIEF_SHA256 = "c2f1bf5a956ee9d07ae6b1f2e8f57b781024afe4c93fa8c8a6c3fd301167ecd0"
 
 
 def settings(planning_cfg):
@@ -145,7 +145,7 @@ class Cut(Base):
 
     def test_cut_brief_asks_for_a_proved_child(self):
         text = planning.cut_brief(FLOOR, "o/rerun", PLAN)
-        for part in ("check command of every assumption", "risk without an answer", "throwaway change",
+        for part in ("check command of every assumption", "risk without an answer", "Write the change that makes it pass",
                      "every file that pins one is in Files", "inside the `**Run**` block", "**Size**"):
             self.assertIn(part, text)
 
