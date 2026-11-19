@@ -34,7 +34,7 @@ export async function setMessageToolCalls(agentId: string, messageId: string, ca
 
 export async function listMessages(agentId: string, sessionId: string): Promise<MessageRow[]> {
     const { db } = await getSystemDb(agentId)
-    return db.select().from(messages).where(eq(messages.sessionId, sessionId)).orderBy(asc(messages.createdAt))
+    return db.select().from(messages).where(eq(messages.sessionId, sessionId)).orderBy(asc(messages.createdAt), asc(sql`rowid`))
 }
 
 export async function lastMessageId(agentId: string, sessionId: string): Promise<string | undefined> {
@@ -52,7 +52,7 @@ export async function listSessionAuthorIds(agentId: string, sessionId: string): 
 export async function listMessagesAfter(agentId: string, sessionId: string, after?: string): Promise<MessageRow[]> {
     const { db } = await getSystemDb(agentId)
     const where = after ? and(eq(messages.sessionId, sessionId), gt(messages.createdAt, after)) : eq(messages.sessionId, sessionId)
-    return db.select().from(messages).where(where).orderBy(asc(messages.createdAt))
+    return db.select().from(messages).where(where).orderBy(asc(messages.createdAt), asc(sql`rowid`))
 }
 
 export async function collectAssistantText(agentId: string, sessionId: string, from: string, to: string | null): Promise<string> {
