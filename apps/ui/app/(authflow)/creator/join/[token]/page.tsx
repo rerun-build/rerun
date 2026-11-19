@@ -26,7 +26,7 @@ export default async function CreatorJoinPage({ params }: { params: Promise<{ to
         return <JoinShell title={t('taken.title')} message={t('taken.message')} />
     }
 
-    if (result.invite.termsAccepted) redirect(routes.home)
+    if (result.invite.termsAccepted) redirect(routes.board)
 
     return <CreatorOnboarding invite={result.invite} token={token} />
 }

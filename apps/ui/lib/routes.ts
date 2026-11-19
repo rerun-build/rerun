@@ -1,5 +1,6 @@
 export const routes = {
     home: '/',
+    board: '/board',
     auth: '/auth',
     authCallback: '/auth/callback',
     authCodeError: '/auth/auth-code-error',

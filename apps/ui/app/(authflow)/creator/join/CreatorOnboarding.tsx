@@ -49,7 +49,7 @@ export function CreatorOnboarding({ invite, token }: { invite: CreatorInvite; to
                 ) : stepper.index === 1 ? (
                     <ClaimStep error={claimError} onRetry={claim} />
                 ) : (
-                    <TermsStep onDone={() => router.push(routes.home)} />
+                    <TermsStep onDone={() => router.push(routes.board)} />
                 )}
             </StepTransition>
         </JoinCard>

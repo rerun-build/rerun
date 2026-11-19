@@ -57,6 +57,10 @@ describe('factory command', () => {
         expect(find({ isSandbox: true, workspaceAdmin: false, needsMachineReason: 'Subscribe first' }, 'factory')).toMatchObject({ group: 'actions', disabledReason: null, paid: false })
     })
 
+    it('offers a Board command next to it, never disabled', () => {
+        expect(find({ isSandbox: true, workspaceAdmin: false, needsMachineReason: 'Subscribe first' }, 'board')).toMatchObject({ group: 'actions', disabledReason: null, paid: false })
+    })
+
     it('keeps every command id unique', () => {
         const ids = buildControlCommands(OPEN).map(command => command.id)
         expect(new Set(ids).size).toBe(ids.length)

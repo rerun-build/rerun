@@ -35,10 +35,10 @@ afterEach(() => {
 })
 
 describe('GET /auth/callback', () => {
-    it('sends a sign-in home', async () => {
+    it('sends a sign-in to the board', async () => {
         const response = await callback('?code=abc')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/')
+        expect(response.headers.get('location')).toBe('https://app.rerun.build/board')
     })
 
     it('sends a sign-in that came from an invitation back to it', async () => {
@@ -139,7 +139,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?code=abc')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in')
+        expect(response.headers.get('location')).toBe('https://app.rerun.build/board?account=sign-in')
         expect(response.cookies.get('rr_link_intent')?.value).toBe('')
     })
 
@@ -148,7 +148,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?error=server_error&error_code=identity_already_exists')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in&link_error=identity_already_exists&link_provider=google')
+        expect(response.headers.get('location')).toBe('https://app.rerun.build/board?account=sign-in&link_error=identity_already_exists&link_provider=google')
         expect(exchangeCodeForSession).not.toHaveBeenCalled()
         expect(signInWithOAuth).not.toHaveBeenCalled()
     })
@@ -158,7 +158,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?error=access_denied&error_code=access_denied')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in&link_error=access_denied&link_provider=apple')
+        expect(response.headers.get('location')).toBe('https://app.rerun.build/board?account=sign-in&link_error=access_denied&link_provider=apple')
     })
 
     it('brings a Google connection whose code could not be exchanged back with a failure', async () => {
@@ -167,7 +167,7 @@ describe('GET /auth/callback', () => {
 
         const response = await callback('?code=abc')
 
-        expect(response.headers.get('location')).toBe('https://app.rerun.build/?account=sign-in&link_error=failed&link_provider=google')
+        expect(response.headers.get('location')).toBe('https://app.rerun.build/board?account=sign-in&link_error=failed&link_provider=google')
     })
 
     it('forgets the signup intent of an account that was signed up before this sign-in', async () => {

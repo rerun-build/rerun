@@ -30,7 +30,7 @@ vi.mock('@/stores/board.store', () => {
     return { useBoardStore }
 })
 
-import FactoryPage from '@/app/(dashboard)/factory/page'
+import { FactoryPage } from '@/components/factory/FactoryPage'
 
 let host: HTMLDivElement
 let root: Root
