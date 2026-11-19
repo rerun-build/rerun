@@ -746,6 +746,9 @@
                                         "greet": {
                                             "type": "boolean"
                                         },
+                                        "name": {
+                                            "type": "string"
+                                        },
                                         "phase": {
                                             "enum": [
                                                 "waitlist",
