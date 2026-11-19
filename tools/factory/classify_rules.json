@@ -176,6 +176,8 @@
     }
   ],
   "similar_title": 0.6,
+  "similar_max": 3,
+  "similar_ignore": ["dev", "main"],
   "stop_words": [
     "the",
     "and",

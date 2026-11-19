@@ -14,6 +14,7 @@ TITLE_WORD_RE = re.compile(r"[a-z0-9]{3,}")
 ANSWER_RE = re.compile(r"^CLASS:\s+(\S+)\s+(\S+)\s+(P[0-3])\s+(.+)$")
 KINDS = ("follow-up", "operator", "plan", "bug", "feature", "problem")
 BODY_CUT = 6000
+FILE_NAME_RE = re.compile(r"\.(?:py|mjs|js|ts|tsx|json|md|yml|yaml|toml|sh)$")
 
 
 def load(path=RULES):
@@ -47,6 +48,10 @@ def skipped(issue, rules):
 
 def paths(body):
     return PATH_RE.findall(body)
+
+
+def cited_files(body):
+    return [p for p in paths(body) if "." in p.rsplit("/", 1)[-1]]
 
 
 def has_word(body, word):
@@ -302,12 +307,23 @@ class Pass:
             self.store.set(job, "how", "rules")
         self.similar_pass(repo, rules, [i for i in listed if i["number"] not in joined], cap, calls)
 
+    def similar_counts(self):
+        counts = {}
+        for (job,) in self.store.db.execute("SELECT DISTINCT job FROM kv WHERE job LIKE 'similar:%'").fetchall():
+            for number in job.split(":", 1)[1].split("-"):
+                counts[int(number)] = counts.get(int(number), 0) + 1
+        return counts
+
     def similar_pass(self, repo, rules, listed, cap, calls):
         eligible = [i for i in listed if not untouchable(i, rules)]
+        most = rules["similar_max"]
+        counts = self.similar_counts()
         for a, b, why in similar(eligible, rules):
             low, high = min(a, b), max(a, b)
             job = "similar:%d-%d" % (low, high)
             if self.store.get_all(job):
+                continue
+            if counts.get(a, 0) >= most or counts.get(b, 0) >= most:
                 continue
             flag = self.store.get_all("-").get("similar_label")
             if calls + (4 if flag else 5) > cap:
@@ -316,11 +332,13 @@ class Pass:
                 self.gh(["label", "create", "similar", "-R", repo, "--force", "--description", "Another open issue looks like this one"])
                 self.store.set("-", "similar_label", "1")
                 calls += 1
+            self.store.set(job, "why", why)
+            counts[a] = counts.get(a, 0) + 1
+            counts[b] = counts.get(b, 0) + 1
             for num, other in ((a, b), (b, a)):
                 self.gh(["issue", "edit", str(num), "-R", repo, "--add-label", "similar"])
                 self.gh(["issue", "comment", str(num), "-R", repo, "--body", "Similar to #%d: %s." % (other, why)])
             calls += 4
-            self.store.set(job, "why", why)
             self.store.set(job, "at", int(self.now()))
 
 
@@ -333,6 +351,11 @@ def functions(body):
     return found
 
 
+def similar_names(body, rules):
+    ignored = set(rules["similar_ignore"])
+    return [n for n in functions(body) if n not in ignored and not FILE_NAME_RE.search(n)]
+
+
 def title_words(issue, rules):
     stop = set(rules["stop_words"])
     return set(TITLE_WORD_RE.findall((issue.get("title") or "").lower())) - stop
@@ -343,10 +366,10 @@ def similar(issues, rules):
     for i, a in enumerate(issues):
         for b in issues[i + 1:]:
             text_a, text_b = text(a), text(b)
-            paths_b = set(paths(text_b))
-            funcs_b = set(functions(text_b))
-            common_path = next((p for p in paths(text_a) if p in paths_b), None)
-            common_func = next((f for f in functions(text_a) if f in funcs_b), None)
+            paths_b = set(cited_files(text_b))
+            funcs_b = set(similar_names(text_b, rules))
+            common_path = next((p for p in cited_files(text_a) if p in paths_b), None)
+            common_func = next((f for f in similar_names(text_a, rules) if f in funcs_b), None)
             if common_path and common_func:
                 why = "both cite " + common_path + " and " + common_func
             else:
