@@ -51,6 +51,7 @@ beforeAll(async () => {
     await mkdir(resolve(root, 'memory/archive'), { recursive: true })
     await mkdir(resolve(root, 'workspace/.rerun/paid-data'), { recursive: true })
     await mkdir(resolve(root, 'workspace/.rerun/pages/acme.com'), { recursive: true })
+    await mkdir(resolve(root, 'workspace/.rerun/tool-results'), { recursive: true })
 
     await writeFile(resolve(root, 'config.json'), JSON.stringify(config, null, 2))
     await writeFile(resolve(root, 'SOUL.md'), 'You are a research agent.')
@@ -76,6 +77,7 @@ beforeAll(async () => {
     await writeFile(resolve(root, 'workspace/brief.md'), 'A reference brief.')
     await writeFile(resolve(root, 'workspace/.rerun/paid-data/people.email.find-2026-10-15-call_1.json'), JSON.stringify({ output: { email: 'jane@acme.com' } }))
     await writeFile(resolve(root, 'workspace/.rerun/pages/acme.com/index.served.html'), '<html><body>Acme</body></html>')
+    await writeFile(resolve(root, 'workspace/.rerun/tool-results/gmail_fetch-2026-11-19-abc.txt'), '{"messages":[{"from":"jane@acme.com"}]}')
     await writeFile(resolve(root, 'workspace/leaked.md'), 'key is sk-ant-BBBBBBBBBBBBBBBBBBBBBBBB')
     await writeFile(resolve(root, 'workspace/.secrets/linkedin_cookie.json'), JSON.stringify({ li_at: 'AQEDAoPaqueOpaque' }))
     await writeFile(
@@ -118,6 +120,11 @@ describe('listArchivablePaths', () => {
     it('never carries the pages the coworker read', async () => {
         const paths = await listArchivablePaths(AGENT_ID)
         expect(paths.some(p => p.startsWith('workspace/.rerun/pages'))).toBe(false)
+    })
+
+    it('never carries the tool results it cut and saved', async () => {
+        const paths = await listArchivablePaths(AGENT_ID)
+        expect(paths.some(p => p.startsWith('workspace/.rerun/tool-results'))).toBe(false)
     })
 
     it('never exposes OAuth bundles, transcripts, retired memories or caches', async () => {

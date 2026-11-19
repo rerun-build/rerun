@@ -12,7 +12,7 @@ vi.mock('./mcp-pool.js', async importOriginal => ({
     ...(await importOriginal<typeof import('./mcp-pool.js')>()),
     acquireMcp: async (agentId: string, server: { name: string }, spawn: { cwd: string }) => {
         pool.acquired.push({ agentId, name: server.name, cwd: spawn.cwd })
-        return pool.reachable.has(server.name) ? { name: server.name, tools: [], call: async () => ({ content: [] }) } : null
+        return pool.reachable.has(server.name) ? { agentId, name: server.name, tools: [], call: async () => ({ content: [] }) } : null
     },
 }))
 
@@ -21,6 +21,9 @@ const { Client } = await import('@modelcontextprotocol/sdk/client/index.js')
 const { InMemoryTransport } = await import('@modelcontextprotocol/sdk/inMemory.js')
 const { relayMcpServer, withPooledRelays } = await import('./mcp-relay.js')
 const { workspaceDir } = await import('../config/paths.js')
+const { TOOL_RESULT_CHAR_LIMIT } = await import('./builtin/tool-result-file.js')
+const { readFile } = await import('node:fs/promises')
+const { join } = await import('node:path')
 
 type Relay = Parameters<typeof relayMcpServer>[0]
 
@@ -64,20 +67,20 @@ const SEND_EMAIL = {
 describe('relayMcpServer', () => {
     it('lists a tool without a root union exactly as the server did', async () => {
         const inputSchema = { type: 'object' as const, properties: { channel: { type: 'string', oneOf: [{ minLength: 1 }] } } }
-        const client = await clientOf({ name: 'discord', tools: [{ name: 'send', description: 'Send a message', inputSchema }], call: async () => ({ content: [] }) })
+        const client = await clientOf({ agentId: 'relay-agent', name: 'discord', tools: [{ name: 'send', description: 'Send a message', inputSchema }], call: async () => ({ content: [] }) })
         expect((await client.listTools()).tools).toEqual([{ name: 'send', description: 'Send a message', inputSchema }])
     })
 
     it('lifts a root oneOf and tells the model the rule in the description', async () => {
         const inputSchema = { type: 'object' as const, properties: { channel: { type: 'string' }, user: { type: 'string' } }, oneOf: [{ required: ['channel'] }, { required: ['user'] }] }
-        const client = await clientOf({ name: 'discord', tools: [{ name: 'send', description: 'Send a message', inputSchema }], call: async () => ({ content: [] }) })
+        const client = await clientOf({ agentId: 'relay-agent', name: 'discord', tools: [{ name: 'send', description: 'Send a message', inputSchema }], call: async () => ({ content: [] }) })
         expect((await client.listTools()).tools).toEqual([
             { name: 'send', description: 'Send a message\n\nProvide exactly one of: channel, user.', inputSchema: { type: 'object', properties: inputSchema.properties } },
         ])
     })
 
     it('lists the mail server send_email without its root anyOf, the nested one kept', async () => {
-        const client = await clientOf({ name: 'email', tools: [SEND_EMAIL], call: async () => ({ content: [] }) })
+        const client = await clientOf({ agentId: 'relay-agent', name: 'email', tools: [SEND_EMAIL], call: async () => ({ content: [] }) })
         expect((await client.listTools()).tools).toEqual([
             {
                 name: 'send_email',
@@ -96,6 +99,7 @@ describe('relayMcpServer', () => {
     it('passes each call on to the pooled connection, with the tool timeout', async () => {
         const calls: unknown[] = []
         const client = await clientOf({
+            agentId: 'relay-agent',
             name: 'discord',
             tools: [{ name: 'send', inputSchema: { type: 'object' } }],
             call: async (name, args, options) => {
@@ -109,6 +113,7 @@ describe('relayMcpServer', () => {
 
     it('turns a failed call into a tool error the model can read', async () => {
         const client = await clientOf({
+            agentId: 'relay-agent',
             name: 'discord',
             tools: [{ name: 'send', inputSchema: { type: 'object' } }],
             call: async () => {
@@ -121,6 +126,7 @@ describe('relayMcpServer', () => {
     it('passes a call without arguments as an empty object, and reads any thrown value', async () => {
         const seen: unknown[] = []
         const client = await clientOf({
+            agentId: 'relay-agent',
             name: 'discord',
             tools: [{ name: 'ping', inputSchema: { type: 'object' } }],
             call: async (_name, args) => {
@@ -130,6 +136,41 @@ describe('relayMcpServer', () => {
         })
         expect(await client.callTool({ name: 'ping' })).toEqual({ isError: true, content: [{ type: 'text', text: 'gone' }] })
         expect(seen).toEqual([{}])
+    })
+})
+
+describe('relayMcpServer result cap', () => {
+    const MEGABYTE = 'x'.repeat(1_000_000)
+
+    it('lists a tool without its output schema, which a cut result could not meet', async () => {
+        const outputSchema = { type: 'object' as const, properties: { messages: { type: 'array' } } }
+        const client = await clientOf({ agentId: 'relay-agent', name: 'gmail', tools: [{ name: 'fetch', inputSchema: { type: 'object' }, outputSchema }], call: async () => ({ content: [] }) })
+        expect((await client.listTools()).tools).toEqual([{ name: 'fetch', inputSchema: { type: 'object' } }])
+    })
+
+    it('cuts a 1 MB result, saves it whole in the workspace, and keeps an image part', async () => {
+        const image = { type: 'image', data: 'aGk=', mimeType: 'image/png' }
+        const client = await clientOf({
+            agentId: 'relay-agent',
+            name: 'gmail',
+            tools: [{ name: 'GMAIL_FETCH_EMAILS', inputSchema: { type: 'object' } }],
+            call: async () => ({ content: [{ type: 'text', text: MEGABYTE }, image], structuredContent: { messages: [MEGABYTE] } }),
+        })
+        const result = (await client.callTool({ name: 'GMAIL_FETCH_EMAILS', arguments: {} })) as { content: Array<{ type: string; text?: string }>; structuredContent?: unknown }
+        expect(result.structuredContent).toBeUndefined()
+        expect(result.content[1]).toEqual(image)
+        const text = result.content[0]!.text!
+        expect(text.length).toBeLessThan(TOOL_RESULT_CHAR_LIMIT + 1_000)
+        expect(text).toContain(`of ${MEGABYTE.length} characters`)
+        expect(text).toContain('mcp__gmail__GMAIL_FETCH_EMAILS')
+        const saved = /saved at (\S+\.txt)/.exec(text)![1]!
+        expect(await readFile(join(workspaceDir('relay-agent'), saved), 'utf8')).toBe(MEGABYTE)
+    })
+
+    it('passes a result under the limit through untouched, its structured part included', async () => {
+        const answer = { content: [{ type: 'text', text: 'small' }], structuredContent: { ok: true } }
+        const client = await clientOf({ agentId: 'relay-agent', name: 'gmail', tools: [{ name: 'fetch', inputSchema: { type: 'object' } }], call: async () => answer })
+        expect(await client.callTool({ name: 'fetch', arguments: {} })).toEqual(answer)
     })
 })
 

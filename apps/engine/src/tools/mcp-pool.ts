@@ -22,6 +22,7 @@ type Session = { client: Client; tools: McpTool[] }
 type Entry = { fingerprint: string; opening: Promise<Session>; inFlight: number; timer?: NodeJS.Timeout }
 
 export type PooledMcp = {
+    agentId: string
     name: string
     tools: McpTool[]
     call: (name: string, args: Record<string, unknown>, options?: RequestOptions) => Promise<CallResult>
@@ -104,6 +105,7 @@ export async function acquireMcp(agentId: string, server: McpServer, spawn: McpS
     const first = await connect(agentId, server, spawn)
     if (!first) return null
     return {
+        agentId,
         name: server.name,
         tools: first.session.tools,
         call: async (name, args, options) => {

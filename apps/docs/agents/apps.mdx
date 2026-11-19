@@ -40,6 +40,14 @@ Every tool an app brings is described to the model on each step of a run, which 
 
 This applies to a coworker running on the Rerun model or on an API key. On a Claude or ChatGPT subscription, the subscription's own client loads the apps' tools itself.
 
+## Long results are saved, not read whole
+
+A single call can return far more than a model should read: a mailbox fetched in one go can weigh a million characters, and whatever the coworker reads is read again at every later step of its task. So no tool result reaches the model past 40,000 characters, whether it comes from an app, the Rerun hub or the coworker's own tools.
+
+A longer result is saved whole in the coworker's workspace. The coworker reads its first 40,000 characters, its total size and where it is saved, then reads on a page at a time when the task needs it, a step the chat shows as **Read Full Result**. Saved results are kept 30 days, up to 200 MB per coworker, and never travel with a copy or a share of the coworker.
+
+On a ChatGPT subscription, its own client calls the apps, and their results are not cut.
+
 ## How an app authenticates
 
 A service can offer several ways to connect, and you pick one at install time.

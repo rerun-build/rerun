@@ -1,22 +1,17 @@
-import { mkdir, readdir, readFile, stat, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { basename, join } from 'node:path'
 import { resolveInWorkspace } from '../sandbox.js'
+import { fileSafe, pruneSavedFiles, READ_BUDGET } from './saved-files.js'
 
 // Every paid answer is kept whole in the coworker's workspace: one too big for a tool result is
 // read back from here, a page at a time, for free rather than bought again. Kept out of any capture
 // or share of the agent, the data being the workspace's own.
 export const PAID_ANSWERS_DIR = '.rerun/paid-data'
-const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000
-const MAX_TOTAL_BYTES = 200 * 1024 * 1024
-// Under what any provider takes as one tool result, with room for the path and the paging.
-const READ_BUDGET = 38_000
 
 // What the hub sends back for a saved answer: Treg's output and the provider's raw body, never a cost.
 export type FullPaidAnswer = { output: unknown; raw: unknown; notes?: unknown; rawDropped?: boolean }
 
 type SavedPaidAnswer = { capability: string; params: Record<string, unknown>; callId: string; savedAt: string } & FullPaidAnswer
-
-const fileSafe = (text: string): string => text.replace(/[^\w.-]/g, '_').slice(0, 80)
 
 // Best effort: a full disk or an unwritable workspace leaves the call answered, only unsaved.
 export async function savePaidAnswer(agentId: string, answer: Omit<SavedPaidAnswer, 'savedAt'>): Promise<string | null> {
@@ -28,23 +23,10 @@ export async function savePaidAnswer(agentId: string, answer: Omit<SavedPaidAnsw
         const { output, raw, notes, rawDropped, ...meta } = answer
         // Indented so a grep through shell_exec answers with one key per line, not the whole file.
         await writeFile(join(dir, name), JSON.stringify({ ...meta, savedAt, notes, output, raw, ...(rawDropped ? { rawDropped } : {}) }, null, 2))
-        await prunePaidAnswers(dir, name)
+        await pruneSavedFiles(dir, name, '.json')
         return `${PAID_ANSWERS_DIR}/${name}`
     } catch {
         return null
-    }
-}
-
-async function prunePaidAnswers(dir: string, keep: string): Promise<void> {
-    const files = await Promise.all(
-        (await readdir(dir)).filter(name => name.endsWith('.json') && name !== keep).map(async name => ({ name, ...(await stat(join(dir, name))) })),
-    )
-    const now = Date.now()
-    let total = files.reduce((sum, file) => sum + file.size, 0)
-    for (const file of files.sort((a, b) => a.mtimeMs - b.mtimeMs)) {
-        if (now - file.mtimeMs <= MAX_AGE_MS && total <= MAX_TOTAL_BYTES) break
-        await unlink(join(dir, file.name)).catch(() => undefined)
-        total -= file.size
     }
 }
 

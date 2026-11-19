@@ -30,6 +30,7 @@ import { foremanTools } from './builtin/foreman.js'
 import { agentFilesTools } from './builtin/agent-files.js'
 import { hasPendingSetup } from '../agents/setup.js'
 import { pooledMcpServers, pooledMcpToolSet } from './mcp-pool.js'
+import { capToolSet, toolResultReadTool } from './builtin/tool-result-file.js'
 import { MCP_CALL_TOOL, MCP_SEARCH_TOOL, mcpSearchTool, mcpToolCatalog, mcpToolsAreDeferred, type McpCatalogEntry } from './mcp-search.js'
 import { mcpCallTool } from './mcp-wire.js'
 import { CLI_PROVIDERS } from '../agents/providers.js'
@@ -82,6 +83,8 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     // Only exists while there is an installation to close, so no other agent carries a tool it
     // could never legitimately call.
     if (hasPendingSetup(ctx.agent)) Object.assign(tools, installTools(ctx))
+    // Any tool's result can be cut and saved, so the way to read the rest is always there.
+    Object.assign(tools, toolResultReadTool(ctx.agent.id))
 
     // The connections are the pool's, kept across runs: the run's close leaves them open.
     let heldBackMcp: McpCatalogEntry[] | undefined
@@ -98,7 +101,7 @@ export async function buildTools(ctx: RunContext): Promise<{ tools: ToolSet; hel
     }
 
     return {
-        tools,
+        tools: capToolSet(tools, ctx.agent.id),
         heldBackMcp,
         // The shared database is one handle for the whole process, so it is deliberately left
         // open: closing it here would break a run another agent still has in flight.

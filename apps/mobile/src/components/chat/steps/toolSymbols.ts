@@ -32,6 +32,7 @@ const TOOL_SYMBOLS: Record<string, IconName> = {
     paid_data: 'circle-dollar-sign',
     paid_data_catalog: 'book',
     paid_data_read: 'book',
+    tool_result_read: 'book',
     download: 'download',
 
     memory_write: 'brain',

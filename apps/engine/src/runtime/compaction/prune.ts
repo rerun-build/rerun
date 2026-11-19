@@ -1,5 +1,6 @@
 import type { ModelMessage } from 'ai'
 import { COMPACTION_PRUNE_OUTPUT_CHAR_THRESHOLD } from './config.js'
+import { TOOL_RESULT_READ_TOOL } from '../../tools/builtin/tool-result-file.js'
 
 type ToolResultOutput = { type: string; value?: unknown; reason?: string }
 type ToolResultPart = { type: 'tool-result'; toolCallId: string; toolName: string; output: ToolResultOutput; providerOptions?: unknown }
@@ -18,11 +19,14 @@ function prunablePart(part: ToolResultPart): boolean {
     return outputSize(part.output) > COMPACTION_PRUNE_OUTPUT_CHAR_THRESHOLD
 }
 
-// A paid answer or a page saved whole stays reachable once its result is pruned: the pointer survives.
+// A paid answer, a page or a cut tool result saved whole stays reachable once its result is pruned: the pointer survives.
 function savedPointerOf(output: ToolResultOutput): string {
     const value = output.value as { saved?: unknown } | string | undefined
     const page = typeof value === 'string' ? /Saved whole: (\.rerun\/pages\/\S+)/.exec(value)?.[1] : undefined
     if (page) return `; the whole page is saved at ${page}, read or grep it`
+    // The last one: the head of a cut result can quote the note of another one, a run read by team_get_run.
+    const cut = typeof value === 'string' ? [...value.matchAll(/saved at (\.rerun\/tool-results\/[\w.-]+\.txt)/g)].at(-1)?.[1] : undefined
+    if (cut) return `; the whole result is saved at ${cut}, read it with ${TOOL_RESULT_READ_TOOL}`
     const answer = typeof value === 'string' ? /"saved":"(\.rerun\/paid-data\/[^"]+)"/.exec(value)?.[1] : typeof value?.saved === 'string' ? value.saved : undefined
     return answer ? `; the whole answer is saved at ${answer}, read it with paid_data_read` : ''
 }

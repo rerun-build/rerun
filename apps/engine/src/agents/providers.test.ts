@@ -46,7 +46,7 @@ describe('claudeMcpConfig', () => {
     // The engine holds the connection: the CLI gets an in-process relay under the same name, so the
     // tools keep their `mcp__<server>__<tool>` names and the allow list does not change.
     it('hands a server the engine already holds to the CLI as an in-process relay under its own name', () => {
-        const relay = { name: 'discord', tools: [], call: async () => ({ content: [] }) }
+        const relay = { agentId: 'a1', name: 'discord', tools: [], call: async () => ({ content: [] }) }
         const { mcpServers, allowedTools } = claudeMcpConfig(undefined, [{ ...server({ name: 'discord', command: 'npx', args: ['-y', 'mcp-discord'] }), relay }, server({ name: 'gh', url: 'https://gh.example/mcp' })])
         expect(mcpServers.discord).toMatchObject({ type: 'sdk', name: 'discord' })
         expect(mcpServers.gh).toEqual({ type: 'http', url: 'https://gh.example/mcp', headers: {} })

@@ -41,9 +41,9 @@ export const ARCHIVE_ROOTS = ['SOUL.md', 'INSTALL.md', 'config.json', '.env', 's
 const SKIP_DIRS = new Set(['node_modules', '.git', '__pycache__', '.venv', 'venv', '.next', 'dist', '.cache', '.pytest_cache', '.turbo'])
 
 // Archived memories are the ones the decay sweep already retired; `listMemoryFiles` hides them
-// from the agent too. Paid answers are data the workspace bought (emails, phones), and saved pages
-// what it read, not behaviour.
-const SKIP_PATHS = new Set(['memory/archive', 'workspace/.rerun/paid-data', 'workspace/.rerun/pages'])
+// from the agent too. Paid answers are data the workspace bought (emails, phones), saved pages and
+// cut tool results what it read, not behaviour.
+const SKIP_PATHS = new Set(['memory/archive', 'workspace/.rerun/paid-data', 'workspace/.rerun/pages', 'workspace/.rerun/tool-results'])
 // Which skills a Vault item wrote names the box's items: an archive carries those skills as the
 // coworker's own. A duplicate keeps it, or the copy would take them for its own and keep them forever.
 const ARCHIVE_SKIP_FILES = new Set([`skills/${VAULT_SKILLS_MARKER}`])

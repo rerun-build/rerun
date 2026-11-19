@@ -61,12 +61,13 @@ describe('callMcpTool', () => {
         expect(await callMcpTool(client, 'generate', {})).toEqual(STARTED)
     })
 
-    it('lets the CLI behind the relay read the reason, though the relayed tool keeps its output schema', async () => {
+    // The relay lists the tool without its output schema, which a result it cuts could not meet.
+    it('lets the CLI behind the relay read the reason', async () => {
         const kie = await kieClient(REFUSED)
-        const { instance } = relayMcpServer({ name: 'kie-ai', tools: [GENERATE], call: (name, args) => callMcpTool(kie, name, args) }, 1234)
+        const { instance } = relayMcpServer({ agentId: 'kie-agent', name: 'kie-ai', tools: [GENERATE], call: (name, args) => callMcpTool(kie, name, args) }, 1234)
         const cli = await link(instance)
 
-        expect((await cli.listTools()).tools[0].outputSchema).toEqual(GENERATE.outputSchema)
+        expect((await cli.listTools()).tools[0].outputSchema).toBeUndefined()
         expect(await cli.callTool({ name: 'generate', arguments: {} })).toEqual({ isError: true, content: REFUSED.content })
     })
 })

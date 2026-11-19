@@ -26,6 +26,7 @@
         "paid_data": "Données payantes",
         "paid_data_catalog": "Catalogue de données payantes",
         "paid_data_read": "Lire des données payantes",
+        "tool_result_read": "Lire le résultat complet",
         "download": "Télécharger",
         "memory_write": "Enregistrer en mémoire",
         "memory_recall": "Consulter la mémoire",

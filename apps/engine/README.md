@@ -61,7 +61,8 @@ agents/<id>/
   config.json               model, connection, tool families, MCP servers, self-improvement, setup state
   .env                      the coworker's own variables (0600, never returned by the API)
   workspace/                private root of the fs_* tools and working directory of the shell
-                            (which is not confined to it); .rerun/services.json lists its apps
+                            (which is not confined to it); .rerun/services.json lists its apps,
+                            .rerun/tool-results/ keeps whole the tool results cut at 40,000 chars
   skills/<slug>/SKILL.md    reusable procedures, with bundled files beside them
   memory/<id>.md            durable memories (markdown + frontmatter)
   schedules/<slug>.md       scheduled tasks (cron or one-shot)

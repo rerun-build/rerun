@@ -26,6 +26,7 @@
         "paid_data": "Dados pagos",
         "paid_data_catalog": "Catálogo de dados pagos",
         "paid_data_read": "Ler dados pagos",
+        "tool_result_read": "Ler o resultado completo",
         "download": "Baixar",
         "memory_write": "Salvar na memória",
         "memory_recall": "Consultar a memória",

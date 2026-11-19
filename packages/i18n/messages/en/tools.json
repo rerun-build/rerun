@@ -33,6 +33,7 @@
         "paid_data": "Paid data",
         "paid_data_catalog": "Paid data catalog",
         "paid_data_read": "Read paid data",
+        "tool_result_read": "Read Full Result",
         "download": "Download",
         "memory_write": "Save to Memory",
         "memory_recall": "Recall Memory",

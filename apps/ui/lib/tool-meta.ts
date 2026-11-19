@@ -93,6 +93,7 @@ const TOOL_ICONS: Record<string, LucideIcon> = {
     paid_data: CoinsIcon,
     paid_data_catalog: BookOpenIcon,
     paid_data_read: BookOpenIcon,
+    tool_result_read: BookOpenIcon,
     download: DownloadIcon,
 
     memory_write: BrainIcon,

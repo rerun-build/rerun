@@ -93,6 +93,30 @@ describe('pruneToolOutputs', () => {
         expect((out[1].content as Array<{ output: { value: string } }>)[0].output.value).toContain(`the whole page is saved at ${saved}, read or grep it`)
     })
 
+    it('keeps where a cut tool result is saved, not a path quoted in its head', () => {
+        const saved = '.rerun/tool-results/gmail_fetch-2026-11-19-abc.txt'
+        const quoted = 'The whole result of x is saved at .rerun/tool-results/x-2026-11-01-old.txt: read on'
+        const result = `${quoted}${'y'.repeat(5000)}\n…\n[Cut at 40000 of 1048000 characters. The whole result of gmail_fetch is saved at ${saved}: read on with tool_result_read from offset 40000.]`
+        const messages = [assistantCall('a', 'gmail_fetch'), toolResult('a', result, 'gmail_fetch'), userText('recent')]
+
+        const { messages: out } = pruneToolOutputs(messages, 2)
+
+        expect((out[1].content as Array<{ output: { value: string } }>)[0].output.value).toContain(`the whole result is saved at ${saved}, read it with tool_result_read`)
+    })
+
+    it('keeps where a page read back from a cut result is saved, and the tool that reads it', () => {
+        const saved = '.rerun/tool-results/gmail_fetch-2026-11-19-abc.txt'
+        const quoted = 'The whole result of x is saved at .rerun/tool-results/x-2026-11-01-old.txt: read on'
+        const page = `${quoted}${'y'.repeat(5000)}\n[Characters 40000 to 78000 of 1048000 of the result saved at ${saved}: read on with tool_result_read from offset 78000.]`
+        const messages = [assistantCall('a', 'tool_result_read'), toolResult('a', page, 'tool_result_read'), userText('recent')]
+
+        const { messages: out } = pruneToolOutputs(messages, 2)
+
+        const value = (out[1].content as Array<{ output: { value: string } }>)[0].output.value
+        expect(value).toContain(`the whole result is saved at ${saved}, read it with tool_result_read`)
+        expect(value).not.toContain('paid_data_read')
+    })
+
     it('leaves small outputs untouched', () => {
         const messages = [assistantCall('a'), toolResult('a', 'ok'), userText('recent')]
         const { prunedCount } = pruneToolOutputs(messages, 3)

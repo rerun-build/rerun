@@ -24,7 +24,7 @@ vi.mock('./mcp-pool.js', () => ({
     pooledMcpServers: async (agent: { id: string }) => {
         state.connected.push(agent.id)
         const prefix = `${state.mcpServer}_`
-        return [{ name: state.mcpServer, tools: Object.entries(state.mcpTools).map(([name, t]) => ({ name: name.slice(prefix.length), description: (t as { description?: string }).description, inputSchema: { type: 'object' } })), call: async () => ({ content: [] }) }]
+        return [{ agentId: agent.id, name: state.mcpServer, tools: Object.entries(state.mcpTools).map(([name, t]) => ({ name: name.slice(prefix.length), description: (t as { description?: string }).description, inputSchema: { type: 'object' } })), call: async () => ({ content: [] }) }]
     },
     pooledMcpToolSet: () => state.mcpTools,
 }))
@@ -50,6 +50,7 @@ const { MCP_CALL_TOOL, MCP_SEARCH_TOOL, sentToolNames } = await import('./mcp-se
 const { dynamicTool, jsonSchema } = await import('ai')
 const { toolCatalog } = await import('./catalog.js')
 const { agentConfigSchema } = await import('../agents/types.js')
+const { TOOL_RESULT_CHAR_LIMIT, TOOL_RESULT_READ_TOOL } = await import('./builtin/tool-result-file.js')
 
 const quiet = { warn() {}, info() {}, error() {}, debug() {} }
 const familyTools = Object.fromEntries(toolCatalog().map(f => [f.family, f.tools.map(t => t.name)]))
@@ -79,7 +80,7 @@ beforeEach(() => {
 // The schemas ride along on every step of every run: the budget is what the whole set may cost a
 // prompt (a ratchet, set just above what the set weighs today and lowered as families move on
 // demand), and the per-tool cap is what the OpenAI chat API accepts for a description.
-const TOOL_PAYLOAD_CHARS_BUDGET = 73_075
+const TOOL_PAYLOAD_CHARS_BUDGET = 73_550
 const TOOL_DESCRIPTION_CHARS_CAP = 1_024
 
 describe('tool payload', () => {
@@ -190,6 +191,20 @@ describe('buildTools', () => {
         const { tools, close } = await buildTools(ctxWith({ mcpServers: [{ name: 'fs', url: 'https://fs.example/mcp' }] }))
         await close()
         expect(tools.fs_read).toBe(impostor)
+    })
+
+    it('cuts any tool result over the limit, an MCP one included, and offers the way to read the rest', async () => {
+        state.mcpServer = 'gmail'
+        state.mcpTools = { gmail_fetch: dynamicTool({ description: 'mcp', inputSchema: jsonSchema({ type: 'object' }), execute: async () => 'm'.repeat(1_000_000) }) }
+        for (const provider of ['rerun', 'claude', 'codex']) {
+            const { tools, close } = await buildTools(ctxWith({ mcpServers: [{ name: 'gmail', url: 'https://gmail.example/mcp' }] }, { provider }))
+            await close()
+            expect(Object.keys(tools), provider).toContain(TOOL_RESULT_READ_TOOL)
+            if (provider !== 'rerun') continue
+            const out = (await tools.gmail_fetch!.execute!({}, { toolCallId: 'c', messages: [] })) as string
+            expect(out.length).toBeLessThan(TOOL_RESULT_CHAR_LIMIT + 500)
+            expect(out).toContain('of 1000000 characters')
+        }
     })
 
     describe('MCP tools on demand', () => {

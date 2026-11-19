@@ -6,7 +6,7 @@ const LABELLED_TOOLS = [
     'shell_exec', 'fs_read', 'fs_write', 'fs_edit', 'fs_list', 'fs_search', 'shared_read', 'shared_write', 'shared_edit', 'shared_list',
     'shared_search', 'browser_navigate', 'computer', 'computer_open_app', 'web_fetch', 'web_search', 'WebSearch', 'leads_people_search',
     'leads_email_find', 'leads_email_verify', 'leads_phone_find', 'google_serp', 'google_maps_search', 'paid_data', 'paid_data_catalog',
-    'paid_data_read', 'download', 'memory_write', 'memory_recall', 'brain_search', 'brain_read', 'brain_propose', 'brain_write', 'brain_delete',
+    'paid_data_read', 'tool_result_read', 'download', 'memory_write', 'memory_recall', 'brain_search', 'brain_read', 'brain_propose', 'brain_write', 'brain_delete',
     'brain_proposals', 'brain_decide', 'vision_analyze', 'delegate_tasks', 'call_agent', 'team_status', 'team_list_schedules', 'team_list_triggers',
     'team_list_runs', 'team_get_run', 'ai_status', 'schedule_list', 'schedule_create', 'schedule_update', 'schedule_delete', 'trigger_list', 'trigger_create',
     'trigger_get', 'trigger_update', 'trigger_rotate_token', 'trigger_delete', 'skill_list', 'skill_read', 'skill_read_file', 'skill_write_file',

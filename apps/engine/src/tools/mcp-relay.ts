@@ -3,7 +3,8 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import type { McpSdkServerConfigWithInstance } from 'ai-sdk-provider-claude-code'
 import type { LoadedAgent, McpServer } from '../agents/types.js'
 import { acquireMcp, agentMcpSpawn, type PooledMcp } from './mcp-pool.js'
-import { modelReadyMcpTool } from './mcp.js'
+import { mcpToolNameFor, modelReadyMcpTool, type McpCallResult, type McpTool } from './mcp.js'
+import { capToolResult, TOOL_RESULT_CHAR_LIMIT } from './builtin/tool-result-file.js'
 
 // A server the engine already holds a connection to, as the run hands it to a provider: the CLI is
 // given the relay in its place, the stored entry stays for the providers that dial it themselves.
@@ -16,16 +17,38 @@ export type RunMcpServer = McpServer & { relay?: PooledMcp }
 // reply_to_email and continue_email_thread answered "No such tool available".
 export function relayMcpServer(relay: PooledMcp, toolTimeoutMs: number): McpSdkServerConfigWithInstance {
     const server = new SdkMcpServer({ name: relay.name, version: '1.0.0' }, { capabilities: { tools: {} } })
-    const tools = relay.tools.map(tool => modelReadyMcpTool(relay.name, tool))
+    const tools = relay.tools.map(tool => withoutOutputSchema(modelReadyMcpTool(relay.name, tool)))
     server.server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools }))
     server.server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
         try {
-            return await relay.call(request.params.name, request.params.arguments ?? {}, { signal: extra.signal, timeout: toolTimeoutMs })
+            const result = await relay.call(request.params.name, request.params.arguments ?? {}, { signal: extra.signal, timeout: toolTimeoutMs })
+            return await capRelayedResult(relay.agentId, mcpToolNameFor('claude', relay.name, request.params.name), result)
         } catch (error) {
             return { isError: true, content: [{ type: 'text' as const, text: error instanceof Error ? error.message : String(error) }] }
         }
     })
     return { type: 'sdk', name: relay.name, instance: server }
+}
+
+// A cut result goes out without its structured part, which would carry the whole of it again, so
+// the CLI is never told of an output schema it would then hold the result to.
+function withoutOutputSchema(tool: McpTool): McpTool {
+    const { outputSchema: _outputSchema, ...listed } = tool
+    return listed
+}
+
+type ContentPart = { type: string; text?: string }
+
+// The same limit as every other tool result: the text the model would read is cut and saved whole,
+// an image it sees as an image stays.
+async function capRelayedResult(agentId: string, toolName: string, result: McpCallResult): Promise<McpCallResult> {
+    if (!('content' in result) || !Array.isArray(result.content)) return result
+    const content = result.content as ContentPart[]
+    const texts = content.filter(part => part.type === 'text').map(part => part.text ?? '')
+    const text = texts.length > 0 ? texts.join('\n') : (JSON.stringify(result.structuredContent ?? '') ?? '')
+    if (text.length <= TOOL_RESULT_CHAR_LIMIT) return result
+    const { structuredContent: _structuredContent, ...rest } = result
+    return { ...rest, content: [{ type: 'text', text: await capToolResult(agentId, toolName, text) }, ...content.filter(part => part.type !== 'text')] } as McpCallResult
 }
 
 // Each server the pool can hold carries its relay; one it cannot reach stays as declared, and the CLI
