@@ -1,5 +1,5 @@
 import type { Actor } from '@/app/api/_auth/access'
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { createSkill, deleteMcpToken, deleteSkill, listSkills, patchMcpServers, updateAgentKeys, updateSkill } from '@/lib/engine/client'
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
 import type { InputDef, McpServerTemplate, ServiceManifest, ServiceSkill } from './manifest'
@@ -185,7 +185,7 @@ export async function compileService(
     actor?: Actor,
     instance?: ServiceInstanceTarget,
 ): Promise<CompileResult> {
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
     const compiled = compileServiceParts(manifest, values, authMethodId, engineAgentId, instance?.instanceId)
 
     // 1. Secrets → engine .env (never Supabase, never cleartext in config.json).

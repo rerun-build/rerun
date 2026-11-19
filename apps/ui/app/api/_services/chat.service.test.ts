@@ -180,8 +180,19 @@ describe('the foreman as a target', () => {
         await expect(resolveRunTarget('foreman')).rejects.toBeInstanceOf(AuthorizationError)
     })
 
-    // An API key and a foreman turn name their actor: neither is a person at the screen.
-    it('stays unreachable to an API key or the workspace itself', async () => {
+    // Its apps pass the caller they checked, an OAuth callback the workspace once the session was held to it.
+    it('takes the actor a caller passes, to the same rule', async () => {
+        mocks.requireWorkspaceContext.mockClear()
+        await expect(getAgentChatTarget('foreman', 'use', member('assigned'))).resolves.toEqual(foremanTarget)
+        await expect(getAgentChatTarget('foreman', 'manage', member('all'))).rejects.toBeInstanceOf(AccessDeniedError)
+        await expect(getAgentChatTarget('foreman', 'manage', admin)).resolves.toEqual(foremanTarget)
+        await expect(getAgentChatTarget('foreman', 'manage', workspaceActor(1))).resolves.toEqual(foremanTarget)
+        expect(mocks.requireWorkspaceContext).not.toHaveBeenCalled()
+        expect(mocks.selectMaybeSingleWithJoins).not.toHaveBeenCalled()
+    })
+
+    // Talking to it, or anything else a coworker's row carries, stays with its own routes.
+    it('is no coworker row to the resolver every other route goes through', async () => {
         row = null
         await expect(resolveAgentTarget('foreman', workspaceActor(1), 'manage')).rejects.toBeInstanceOf(AuthorizationError)
         await expect(resolveAgentTarget('foreman', admin)).rejects.toBeInstanceOf(AuthorizationError)

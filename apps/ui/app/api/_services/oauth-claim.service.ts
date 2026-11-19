@@ -1,6 +1,6 @@
 import 'server-only'
 import type { Actor } from '@/app/api/_auth/access'
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { markComposioAuthorized, markManagedAuthorized, markServiceAuthorized } from '@/app/api/_services/services.service'
 import { ApiError } from '@/lib/api-error'
 import { putConnectorToken } from '@/lib/vault/tokens'
@@ -28,7 +28,7 @@ export async function finishParkedSignIn(agentId: string, actor: Actor, parked: 
         await markComposioAuthorized(agentId, parked.key, parked.connectedAccountId, undefined, actor)
         return
     }
-    const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+    const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
     if (parked.kind === 'mcp') {
         const clientSecret = parked.mcpUrl ? engineClientSecret({ mcpUrl: parked.mcpUrl, clientId: parked.token.clientId, clientSecret: parked.token.clientSecret }) : parked.token.clientSecret
         await putConnectorToken(conn, engineAgentId, parked.serverName, { ...parked.token, clientSecret })

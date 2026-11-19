@@ -13,7 +13,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: vi.fn(), selectMaybeSingle: mocks.selectMaybeSingle, selectMaybeSingleWithJoins: mocks.selectMaybeSingleWithJoins, selectMany: mocks.selectMany, selectAll: mocks.selectAll }))
 
 const { AuthorizationError } = await import('./ownership')
-const { AccessDeniedError, assertAgentAccess, assertSessionInWorkspace, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, visibleSpaceIds, workspaceActor } = await import('./access')
+const { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, assertSessionInWorkspace, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, visibleSpaceIds, workspaceActor } = await import('./access')
 type Actor = import('./access').Actor
 
 const admin: Actor = { kind: 'user', userId: 'u-admin', workspaceId: 1, role: 'admin', boxScope: 'all' }
@@ -129,6 +129,30 @@ describe('assertAgentAccess', () => {
         mocks.getSessionWorkspace.mockResolvedValue({ user: { id: 'u-member', workspace_id: 1 }, workspaceRefused: false, membership: { role: 'member', box_scope: 'assigned' } })
         readsAnswering({ agents: agent, spaces: { id: 'box-1', ...openBox } })
         await expect(assertAgentAccess('a1', 'use')).rejects.toThrow('Coworker not found')
+    })
+})
+
+describe('assertAgentOrForemanAccess', () => {
+    beforeEach(() => {
+        mocks.getSessionWorkspace.mockReset()
+        mocks.selectMaybeSingle.mockReset()
+    })
+
+    it('lets every member use the Chief of Staff and an admin change it, with no agent row read', async () => {
+        await expect(assertAgentOrForemanAccess('foreman', 'use', member('assigned'))).resolves.toEqual(member('assigned'))
+        await expect(assertAgentOrForemanAccess('foreman', 'manage', admin)).resolves.toEqual(admin)
+        await expect(assertAgentOrForemanAccess('foreman', 'manage', workspaceActor(1))).resolves.toEqual(workspaceActor(1))
+        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+    })
+
+    it('refuses a change of the Chief of Staff to a member, with a reason it can show', async () => {
+        const error = await assertAgentOrForemanAccess('foreman', 'manage', member('all')).catch(e => e)
+        expect(error).toBeInstanceOf(AccessDeniedError)
+    })
+
+    it("holds a coworker to its Box", async () => {
+        readsAnswering({ agents: { workspace_id: 1, space_id: 'box-1', engine_agent_id: 'e1' }, spaces: { id: 'box-1', ...restrictedBox } })
+        await expect(assertAgentOrForemanAccess('a1', 'use', member('all'))).rejects.toThrow('Coworker not found')
     })
 })
 

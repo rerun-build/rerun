@@ -3,7 +3,7 @@ import { getCustomMcpServer } from '@/app/api/_services/custom-mcp.service'
 import { getServiceDetails, loadManifest } from '@/app/api/_services/services.service'
 import { composioConfigured, initiateConnectedAccount } from '@/lib/composio/client'
 import { composioUserForKey } from '@/lib/vault/composio'
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, composioCallbackUrl, createComposioState, encodeComposioContext } from '@/lib/composio/oauth'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, type ManagedOAuthContext, buildManagedAuthorizeUrl, createPkceState, encodeManagedContext, managedCallbackUrl } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
@@ -95,7 +95,7 @@ export async function GET(req: Request) {
             if (!method?.composio) throw new Error(`${details.name} has no Composio connection to set up.`)
 
             const state = createComposioState()
-            const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+            const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
             const userId = await composioUserForKey(conn, workspaceId, engineAgentId, agentId, key)
             const { connectedAccountId, redirectUrl } = await initiateConnectedAccount(userId, method.composio.authConfigId, composioCallbackUrl(req, state))
             const ctx: ComposioOAuthContext = { agentId, key, toolkit: method.composio.toolkit, serverName: details.composio.serverName, connectedAccountId, mobileGrant }

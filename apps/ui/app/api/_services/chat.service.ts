@@ -1,4 +1,4 @@
-import { AccessDeniedError, COWORKER_NOT_FOUND, assertSessionInWorkspace, enforce, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
+import { COWORKER_NOT_FOUND, actorFromContext, assertSessionInWorkspace, enforce, foremanAccessOf, requireLightSessionActor, spaceAccessFor, visibleSpaceIds, type AccessLevel, type Actor } from '@/app/api/_auth/access'
 import { AuthorizationError, requireWorkspaceContext } from '@/app/api/_auth/ownership'
 import type { Database } from '@/app/api/database.types'
 import type { SessionStatus } from '@/lib/board/types'
@@ -34,23 +34,27 @@ export async function resolveAgentTarget(agentId: string, actor?: Actor, access:
     return buildTarget(row, engine)
 }
 
-// The signed-in caller's way to a coworker, the foreman included: what a coworker's screens read and
-// change (its memories, skills, routines, connected servers, files) is the same for both.
-export async function getAgentChatTarget(agentId: string, access: AccessLevel = 'use'): Promise<AgentChatTarget> {
-    if (agentId === FOREMAN_AGENT_ID) return foremanTarget(access)
-    return resolveAgentTarget(agentId, undefined, access)
+// The caller's way to a coworker, the foreman included: what a coworker's screens read and change
+// (its memories, skills, routines, apps, connected servers, files) is the same for both. Without
+// `actor` it is the signed-in browser session; the apps pass theirs, an OAuth callback included.
+export async function getAgentChatTarget(agentId: string, access: AccessLevel = 'use', actor?: Actor): Promise<AgentChatTarget> {
+    if (agentId === FOREMAN_AGENT_ID) return actor ? foremanTargetFor(actor, access) : foremanTarget(access)
+    return resolveAgentTarget(agentId, actor, access)
 }
 
 // The foreman has no agent row and sits in no Box: it lives on the workspace's engine under a fixed
 // id. Any signed-in member of the workspace reaches it; changing what it keeps of its own takes a
-// workspace admin, the one level that manages every Box. Only a person gets here, never an API key
-// nor the workspace itself. Talking to it stays with its own route, which is where its brief is
-// written.
+// workspace admin, the one level that manages every Box. Talking to it stays with its own route,
+// which is where its brief is written.
 async function foremanTarget(access: AccessLevel): Promise<AgentChatTarget> {
     const ctx = await requireWorkspaceContext()
     if (ctx.authUser.is_anonymous) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    if (access === 'manage' && ctx.role !== 'admin') throw new AccessDeniedError()
-    const engine = await findWorkspaceEngine(ctx.workspace.id)
+    return foremanTargetFor(actorFromContext(ctx), access)
+}
+
+async function foremanTargetFor(actor: Actor, access: AccessLevel): Promise<AgentChatTarget> {
+    enforce(foremanAccessOf(actor), access, COWORKER_NOT_FOUND)
+    const engine = await findWorkspaceEngine(actor.workspaceId)
     if (!engine) throw new NoEngineError()
     return { conn: engine.conn, engineAgentId: FOREMAN_AGENT_ID }
 }

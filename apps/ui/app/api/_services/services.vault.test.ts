@@ -13,7 +13,7 @@ import { installService, resetServiceConnection, uninstallService } from './serv
 
 vi.mock('server-only', () => ({}))
 vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: vi.fn() }))
-vi.mock('@/app/api/_services/chat.service', () => ({ resolveAgentTarget: vi.fn(async () => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: 'engine-agent' })) }))
+vi.mock('@/app/api/_services/chat.service', () => ({ getAgentChatTarget: vi.fn(async (agentId: string) => ({ conn: { baseUrl: 'https://engine.test' }, engineAgentId: agentId === 'foreman' ? 'foreman' : 'engine-agent' })) }))
 vi.mock('@/lib/services/compiler', () => ({
     compileService: vi.fn(async () => ({ toolNames: ['linear'], oauth: null, managed: null, composio: null, app: null })),
     decompileService: vi.fn(),
@@ -26,6 +26,7 @@ vi.mock('@/lib/vault/tokens', () => ({ deleteConnectorToken: vi.fn(async () => {
 vi.mock('@/lib/engine/client', async importOriginal => ({ EngineRequestError: (await importOriginal<typeof import('@/lib/engine/client')>()).EngineRequestError, supportsVault: vi.fn(async () => true) }))
 vi.mock('@/lib/engine/vault-client', () => ({ getVaultItem: vi.fn(async () => ({ id: 'item-1', agentIds: ['engine-agent'] })), patchVaultItem: vi.fn(), createVaultItem: vi.fn(), detachVaultItem: vi.fn() }))
 vi.mock('./vault.service', async () => ({
+    VaultUnavailableError: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).VaultUnavailableError,
     rethrowConflict: (await vi.importActual<typeof import('./vault.service')>('./vault.service')).rethrowConflict,
     vaultWritesEnabled: vi.fn(async () => true),
     vaultContext: vi.fn(async () => ({ actor: { kind: 'user', userId: 'user-1', workspaceId: 7 }, byEngineId: new Map() })),
@@ -142,6 +143,34 @@ describe('installService on a box without a Vault, or with the feature off', () 
         expect(compileService).toHaveBeenCalled()
         expect(compileIntoVault).not.toHaveBeenCalled()
         expect(createVaultItem).not.toHaveBeenCalled()
+    })
+})
+
+describe('the Chief of Staff, which holds its apps in the Vault only', () => {
+    beforeEach(() => {
+        const manifest = { ...MANIFEST, authMethods: [oauthMethod, keyMethod, composioMethod] }
+        vi.mocked(createServiceRoleClient).mockReturnValue(fakeSupabase(table => (table === 'services' ? { data: { manifest, enabled: true } } : undefined)).client)
+    })
+
+    it('puts the app it connects in the Vault, attached to it', async () => {
+        await installService('foreman', 'linear', {}, 'key')
+        expect(createVaultItem).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ kind: 'service', slug: 'linear', status: 'needs_config', agentIds: ['foreman'] }))
+
+        await installService('foreman', 'linear', {}, 'oauth')
+        expect(compileIntoVault).toHaveBeenCalledWith(expect.objectContaining({ itemId: null, engineAgentId: 'foreman' }))
+        expect(compileService).not.toHaveBeenCalled()
+    })
+
+    it('connects nothing on a box without a Vault, where an app would need a coworker row', async () => {
+        vi.mocked(supportsVault).mockResolvedValueOnce(false)
+        await expect(installService('foreman', 'linear', {}, 'oauth')).rejects.toMatchObject({ code: 'vaultUnavailable' })
+        expect(compileService).not.toHaveBeenCalled()
+    })
+
+    it('detaches itself from the entry on uninstall, and leaves the account in the Vault', async () => {
+        vi.mocked(readRegistry).mockResolvedValue({ services: { linear: entry({ vaultItemId: 'item-1' }) } })
+        await uninstallService('foreman', 'linear')
+        expect(detachVaultItem).toHaveBeenCalledWith(expect.anything(), 'item-1', 'foreman')
     })
 })
 

@@ -1,5 +1,5 @@
-import { assertAgentAccess } from '@/app/api/_auth/access'
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { assertAgentOrForemanAccess } from '@/app/api/_auth/access'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { MANAGED_COOKIE_PATH, MANAGED_COOKIE_PREFIX, type ManagedOAuthContext, buildManagedAuthorizeUrl, createPkceState, encodeManagedContext, managedCallbackUrl } from '@/lib/managed/oauth'
 import { getManagedProvider } from '@/lib/managed/registry'
 import { readRegistry, resolveRegistryEntry } from '@/lib/services/registry'
@@ -18,11 +18,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
         const body = (await req.json()) as { agentId: string; key?: string; slug?: string; serverName?: string }
         const { agentId } = body
         const key = body.key ?? body.slug ?? ''
-        const { actor } = await assertAgentAccess(agentId, 'manage')
+        const actor = await assertAgentOrForemanAccess(agentId, 'manage')
 
         // The token is stored under this name and the compiled server reads it back from there, so
         // the registry entry wins over whatever the page sent.
-        const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
         const entry = resolveRegistryEntry(await readRegistry(conn, engineAgentId), key)?.entry
         const serverName = entry?.managed?.serverName || body.serverName
         if (!serverName) return NextResponse.json(refusal('noProviderConnectionToSetUp', { key, provider: provider.label }), { status: 400 })

@@ -2,7 +2,7 @@ import 'server-only'
 
 import { FOREMAN_AGENT_ID, FOREMAN_DISPLAY_NAME, type VaultConflict, type VaultItemSummary } from '@rerun/contracts'
 
-import { AccessDeniedError, assertAgentAccess, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor } from '@/app/api/_auth/access'
+import { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, foremanAccessOf, isAdminActor, manageableSpaceIds, requireLightSessionActor, visibleSpaceIds, type Actor, type BoxAccess } from '@/app/api/_auth/access'
 import { AuthorizationError } from '@/app/api/_auth/ownership'
 import { vaultFlag } from '@/flags'
 import { EngineRequestError, supportsForemanCoworker, supportsVault, supportsVaultRename } from '@/lib/engine/client'
@@ -321,14 +321,23 @@ export type CoworkerVault = {
 
 export async function coworkerVault(agentId: string, actor?: Actor): Promise<CoworkerVault | null> {
     const resolved = actor ?? (await requireLightSessionActor())
-    const { agent, access } = await assertAgentAccess(agentId, 'use', resolved)
+    const { engineAgentId, access } = await vaultHolder(agentId, resolved)
     const engine = await findWorkspaceEngine(resolved.workspaceId)
-    if (!engine || !agent.engine_agent_id || !(await supportsVault(engine.conn))) return null
+    if (!engine || !engineAgentId || !(await supportsVault(engine.conn))) return null
     const items = await withCatalogNames(await listVaultItems(engine.conn))
-    const holds = (item: VaultItemSummary) => item.sharedWithAll || item.agentIds.includes(agent.engine_agent_id as string)
+    const holds = (item: VaultItemSummary) => item.sharedWithAll || item.agentIds.includes(engineAgentId)
     return {
         attached: items.filter(item => holds(item) && item.kind !== 'service'),
         available: items.filter(item => !holds(item)),
         canAttach: access === 'manage',
     }
+}
+
+async function vaultHolder(agentId: string, actor: Actor): Promise<{ engineAgentId: string | null; access: BoxAccess }> {
+    if (agentId === FOREMAN_AGENT_ID) {
+        await assertAgentOrForemanAccess(agentId, 'use', actor)
+        return { engineAgentId: FOREMAN_AGENT_ID, access: foremanAccessOf(actor) }
+    }
+    const { agent, access } = await assertAgentAccess(agentId, 'use', actor)
+    return { engineAgentId: agent.engine_agent_id, access }
 }

@@ -429,6 +429,15 @@ describe("a coworker's side of the Vault", () => {
         expect((await coworkerVault('bob', managerOfA))?.canAttach).toBe(false)
     })
 
+    it("shows the Chief of Staff's side to every member, and lets only an admin attach to it", async () => {
+        vi.mocked(listVaultItems).mockResolvedValue([item({ id: 'mine', kind: 'secret', slug: null, agentIds: ['foreman'] }), item({ id: 'other', kind: 'secret', slug: null, agentIds: ['e-bob'] })] as never)
+        const forAdmin = await coworkerVault('foreman', admin)
+        expect(forAdmin?.attached.map(i => i.id)).toEqual(['mine'])
+        expect(forAdmin?.available.map(i => i.id)).toEqual(['other'])
+        expect(forAdmin?.canAttach).toBe(true)
+        expect((await coworkerVault('foreman', managerOfA))?.canAttach).toBe(false)
+    })
+
     it('says nothing on a box without a Vault, and hides a coworker the caller cannot see', async () => {
         vi.mocked(supportsVault).mockResolvedValue(false)
         expect(await coworkerVault('alice', admin)).toBeNull()

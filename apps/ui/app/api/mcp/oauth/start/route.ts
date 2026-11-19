@@ -1,4 +1,4 @@
-import { assertAgentInWorkspace } from '@/app/api/_auth/access'
+import { assertAgentOrForemanAccess } from '@/app/api/_auth/access'
 import { assertCanAdd, vaultContext } from '@/app/api/_services/vault.service'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, type OAuthContext, buildAuthorizeUrl, callbackUrl, createPkce, discoverAuthServer, encodeContext, resolveClient } from '@/lib/mcp-oauth'
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
             mcpUrl = item.oauth.url
             vault = { itemId: item.id, workspaceId: ctx.actor.workspaceId }
         } else {
-            await assertAgentInWorkspace(agentId, 'manage')
+            await assertAgentOrForemanAccess(agentId, 'manage')
         }
 
         const metadata = await discoverAuthServer(mcpUrl)

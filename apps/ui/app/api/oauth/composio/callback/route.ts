@@ -2,7 +2,7 @@ import { sleep } from '@rerun/contracts'
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
 import { getConnectedAccount } from '@/lib/composio/client'
 import { composioUserForKey } from '@/lib/vault/composio'
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { COMPOSIO_COOKIE_PATH, COMPOSIO_COOKIE_PREFIX, type ComposioOAuthContext, decodeComposioContext } from '@/lib/composio/oauth'
 import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
 import { refusal, refusalOf, type ActionRefusal } from '@/lib/i18n/action-error'
@@ -83,7 +83,7 @@ export async function GET(req: Request) {
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
-        const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, actor, 'manage')
+        const { conn, engineAgentId } = await getAgentChatTarget(ctx.agentId, 'manage', actor)
         const userId = await composioUserForKey(conn, workspaceId, engineAgentId, ctx.agentId, ctx.key)
         const method = (await loadManifest(ctx.key))?.authMethods.find(m => m.kind === 'composio' && m.composio)
         if (!method?.composio) return finish({ ok: false, ...refusal('noProviderConnectionToSetUp', { key: ctx.key, provider: 'Composio' }) })

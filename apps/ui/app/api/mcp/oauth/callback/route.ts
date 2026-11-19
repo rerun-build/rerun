@@ -1,4 +1,4 @@
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { putConnectorToken } from '@/lib/vault/tokens'
 import { oauthPopupResponse, popupFailureLabel } from '@/lib/oauth/popup-result'
 import { OAUTH_COOKIE_PATH, OAUTH_COOKIE_PREFIX, decodeContext, engineClientSecret, exchangeCode } from '@/lib/mcp-oauth'
@@ -82,7 +82,7 @@ export async function GET(req: Request) {
         const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
-        const { conn, engineAgentId } = await resolveAgentTarget(ctx.agentId, actor, 'manage')
+        const { conn, engineAgentId } = await getAgentChatTarget(ctx.agentId, 'manage', actor)
         const token = await exchangeCode(ctx, code)
         const bundle = {
             accessToken: token.accessToken,

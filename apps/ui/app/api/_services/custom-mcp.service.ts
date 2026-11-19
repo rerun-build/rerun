@@ -1,5 +1,5 @@
 import type { AccessLevel, Actor } from '@/app/api/_auth/access'
-import { getAgentChatTarget, resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { installedFromRegistry } from '@/app/api/_services/services.service'
 import { deleteMcpToken, getAgent, getMcpServerStatuses, patchMcpServers } from '@/lib/engine/client'
 import type { EngineConnection, EngineMcpServer } from '@/lib/engine/types'
@@ -41,10 +41,8 @@ export async function customMcpServersOf(conn: EngineConnection, engineAgentId: 
     return Promise.all(servers.map(async server => toCustomMcpServer(server, await lookOf(server, catalog))))
 }
 
-// A person at the screen reaches the Chief of Staff's servers too; an API key or a foreman turn
-// names its actor, and only ever reaches a coworker.
 function targetOf(agentId: string, actor: Actor | undefined, access: AccessLevel = 'use') {
-    return actor ? resolveAgentTarget(agentId, actor, access) : getAgentChatTarget(agentId, access)
+    return getAgentChatTarget(agentId, access, actor)
 }
 
 // The catalog apps and the servers registered outside it, read off one registry so the two lists

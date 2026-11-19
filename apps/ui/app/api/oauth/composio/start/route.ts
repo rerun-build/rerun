@@ -1,6 +1,6 @@
 import { parseServiceRegistryKey } from '@rerun/contracts'
-import { assertAgentAccess } from '@/app/api/_auth/access'
-import { resolveAgentTarget } from '@/app/api/_services/chat.service'
+import { assertAgentOrForemanAccess } from '@/app/api/_auth/access'
+import { getAgentChatTarget } from '@/app/api/_services/chat.service'
 import { loadManifest } from '@/app/api/_services/services.service'
 import { composioConfigured, initiateConnectedAccount } from '@/lib/composio/client'
 import { composioUserForKey } from '@/lib/vault/composio'
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
         const body = (await req.json()) as { agentId: string; key?: string; slug?: string }
         const { agentId } = body
         const key = body.key ?? body.slug ?? ''
-        const { actor } = await assertAgentAccess(agentId, 'manage')
+        const actor = await assertAgentOrForemanAccess(agentId, 'manage')
 
         if (!composioConfigured()) return NextResponse.json(refusal('composioNotConfigured'), { status: 400 })
 
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         const manifest = await loadManifest(key)
         const method = manifest?.authMethods.find(m => m.kind === 'composio' && m.composio)
         // An extra account's server is `<template>-<instanceId>`, a name only its registry entry holds.
-        const { conn, engineAgentId } = await resolveAgentTarget(agentId, actor, 'manage')
+        const { conn, engineAgentId } = await getAgentChatTarget(agentId, 'manage', actor)
         const entry = resolveRegistryEntry(await readRegistry(conn, engineAgentId), key)?.entry
         const serverName = entry?.composio?.serverName ?? (instanceId ? undefined : method?.mcpServers[0]?.name)
         if (!manifest || !method?.composio || !serverName) {

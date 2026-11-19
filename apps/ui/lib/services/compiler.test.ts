@@ -5,7 +5,7 @@ import { deleteSkill, patchMcpServers, updateAgentKeys } from '@/lib/engine/clie
 import { readRegistry, upsertRegistryEntry } from './registry'
 
 vi.mock('@/app/api/_services/chat.service', () => ({
-    resolveAgentTarget: vi.fn(async () => ({ conn: {}, engineAgentId: 'engine-agent' })),
+    getAgentChatTarget: vi.fn(async () => ({ conn: {}, engineAgentId: 'engine-agent' })),
 }))
 vi.mock('@/lib/engine/client', () => ({
     createSkill: vi.fn(async () => ({ slug: 'skill' })),

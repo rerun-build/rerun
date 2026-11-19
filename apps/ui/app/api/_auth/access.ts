@@ -1,3 +1,5 @@
+import { FOREMAN_AGENT_ID } from '@rerun/contracts'
+
 import { AuthorizationError, UnauthenticatedError } from '@/app/api/_auth/errors'
 import type { ErrorCode } from '@/lib/i18n/action-error'
 import { toBoxScope, type BoxScope } from '@/app/api/_auth/box-scope'
@@ -130,6 +132,21 @@ export async function assertAgentAccess(agentId: string, need: AccessLevel, acto
     return { actor: resolved, access, agent }
 }
 
+// The foreman has no row and sits in no Box: every member uses it, and the one level that manages
+// every Box, an admin or the workspace itself, manages it.
+export function foremanAccessOf(actor: Actor): BoxAccess {
+    return isAdminActor(actor) ? 'manage' : 'use'
+}
+
+// The gate of what a coworker and the foreman both keep (their apps): the agent's Box, or the
+// foreman's own rule.
+export async function assertAgentOrForemanAccess(agentId: string, need: AccessLevel, actor?: Actor): Promise<Actor> {
+    if (agentId !== FOREMAN_AGENT_ID) return (await assertAgentAccess(agentId, need, actor)).actor
+    const resolved = actor ?? (await requireLightSessionActor())
+    enforce(foremanAccessOf(resolved), need, COWORKER_NOT_FOUND)
+    return resolved
+}
+
 // Every Box of the workspace with the actor's level on it, in two reads. The lists and the board use
 // it; a single Box goes through spaceAccessFor.
 export async function spaceAccessMap(actor: Actor): Promise<Map<string, BoxAccess>> {
@@ -194,6 +211,7 @@ export async function assertAgentInWorkspace(agentId: string, need: AccessLevel 
 export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel = 'manage'): Promise<number> {
     const { user } = await getSessionWorkspace()
     if (!user?.id) throw new UnauthenticatedError()
+    if (agentId === FOREMAN_AGENT_ID) return (await assertAgentOrForemanAccess(agentId, need)).workspaceId
     const supabase = createServiceRoleClient()
     const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })
     if (!agent) throw new AuthorizationError(COWORKER_NOT_FOUND)

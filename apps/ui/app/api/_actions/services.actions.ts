@@ -1,6 +1,6 @@
 'use server'
 
-import { assertAgentAccess, assertSpaceAccess } from '@/app/api/_auth/access'
+import { assertAgentOrForemanAccess, assertSpaceAccess } from '@/app/api/_auth/access'
 import { coworkerLookSchema, type CoworkerLook } from '@rerun/contracts'
 import { createAgentWithSetup } from '@/app/api/_services/agent-setup.service'
 import { getCatalogServicesBySlugs, getServiceAlternatives, getServiceDetails, installService, listCatalogServices, markServiceAuthorized, resetServiceConnection, searchServices, uninstallService, withoutPaidApps } from '@/app/api/_services/services.service'
@@ -21,7 +21,7 @@ export async function installServiceAction(
     opts?: { newInstance?: boolean },
 ): Promise<{ ok: true; result: InstallResult } | ActionFailure> {
     try {
-        const { actor } = await assertAgentAccess(agentId, 'manage')
+        const actor = await assertAgentOrForemanAccess(agentId, 'manage')
         const result = await installService(agentId, key, values, authMethodId, actor, opts)
         return { ok: true, result }
     } catch (err) {
@@ -32,7 +32,7 @@ export async function installServiceAction(
 // Browse the library (optionally filtered). `installed` is resolved per agent.
 export async function searchServicesAction(agentId: string, query?: string, category?: string): Promise<ServiceSearchResult[]> {
     try {
-        const { actor } = await assertAgentAccess(agentId, 'use')
+        const actor = await assertAgentOrForemanAccess(agentId, 'use')
         const { results } = await searchServices(agentId, query, category, actor)
         return results
     } catch {
@@ -72,7 +72,7 @@ export async function getServiceAlternativesAction(slugs: string[]): Promise<Rec
 
 export async function getServiceDetailsAction(agentId: string, key: string): Promise<ServiceDetails | null> {
     try {
-        const { actor } = await assertAgentAccess(agentId, 'use')
+        const actor = await assertAgentOrForemanAccess(agentId, 'use')
         return await getServiceDetails(agentId, key, actor)
     } catch {
         return null
@@ -82,7 +82,7 @@ export async function getServiceDetailsAction(agentId: string, key: string): Pro
 // Flip an OAuth service to active after the user finishes the sign-in popup.
 export async function markServiceAuthorizedAction(agentId: string, key: string): Promise<{ success: boolean }> {
     try {
-        const { actor } = await assertAgentAccess(agentId, 'manage')
+        const actor = await assertAgentOrForemanAccess(agentId, 'manage')
         await markServiceAuthorized(agentId, key, actor)
         return { success: true }
     } catch {
@@ -94,7 +94,7 @@ export async function markServiceAuthorizedAction(agentId: string, key: string):
 // Non-destructive: nothing the install compiled is removed, only the stored token.
 export async function resetServiceConnectionAction(agentId: string, key: string): Promise<{ ok: true; result: ResetConnectionResult } | ActionFailure> {
     try {
-        const { actor } = await assertAgentAccess(agentId, 'manage')
+        const actor = await assertAgentOrForemanAccess(agentId, 'manage')
         return { ok: true, result: await resetServiceConnection(agentId, key, actor) }
     } catch (err) {
         return failureOf(err, 'resetAppFailed')
@@ -103,7 +103,7 @@ export async function resetServiceConnectionAction(agentId: string, key: string)
 
 export async function uninstallServiceAction(agentId: string, key: string): Promise<SuccessResult> {
     try {
-        const { actor } = await assertAgentAccess(agentId, 'manage')
+        const actor = await assertAgentOrForemanAccess(agentId, 'manage')
         await uninstallService(agentId, key, actor)
         return { success: true }
     } catch (err) {
