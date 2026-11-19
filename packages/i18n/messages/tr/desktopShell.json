@@ -90,5 +90,10 @@
     },
     "server": {
         "otherServer": "Başka bir Rerun sunucusu kullan"
+    },
+    "coworkerDock": {
+        "newCoworker": "Yeni coworker",
+        "move": "Taşı",
+        "show": "Coworker'ları göster"
     }
 }

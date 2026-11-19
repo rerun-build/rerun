@@ -4,8 +4,9 @@ import { useSyncExternalStore, type ReactNode } from 'react'
 import { PUBLISHED_PAGE_MARKER } from '@/lib/published/marker'
 
 const subscribe = () => () => {}
-// The desktop app's Quick ask window (`data-quick-ask`) is one field over another app: none of it either.
-const isAppPage = () => !document.querySelector(`[${PUBLISHED_PAGE_MARKER}], [data-quick-ask]`)
+// The desktop app's Quick ask window (`data-quick-ask`) is one field over another app, its coworker dock
+// (`data-coworker-dock`) a rail on the edge of the screen: none of it either.
+const isAppPage = () => !document.querySelector(`[${PUBLISHED_PAGE_MARKER}], [data-quick-ask], [data-coworker-dock]`)
 const onServer = () => false
 
 // What the app runs around every page (cookie banner, analytics, deploy watcher, service worker),

@@ -8,24 +8,19 @@ import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 import { InboxDetailCard } from '@/components/notifications/InboxDetailCard'
 import { InboxPeekCard } from '@/components/notifications/InboxPeekCard'
 import { InboxRowMenu } from '@/components/notifications/InboxRowMenu'
-import { useAttentionSessions, type AttentionSession } from '@/hooks/useAttentionSessions'
 import { useInboxAnnouncer } from '@/hooks/useInboxAnnouncer'
+import { inboxCount, useInboxItems, type InboxItem } from '@/hooks/useInboxItems'
 import { useInboxPeek, type InboxPeekTarget } from '@/hooks/useInboxPeek'
 import { useTabSignals } from '@/hooks/useTabSignals'
-import { useUnseenGroups } from '@/hooks/useUnseenGroups'
-import type { SessionStatus } from '@/lib/board/types'
 import { PEEK_STATUSES } from '@/lib/chat/pending-request-peek'
 import type { AnnouncedNotification } from '@/lib/notifications/announcement'
 import { openConversationFromNotification } from '@/lib/notifications/open-conversation'
+import { openInboxItem } from '@/lib/notifications/open-inbox-item'
 import { reasonSentence } from '@/lib/notifications/reason-copy'
 import { useBoardStore } from '@/stores/board.store'
 import { useForemanStore } from '@/stores/foreman.store'
 import { useNotificationsStore } from '@/stores/notifications.store'
 import { useUnseenRunsStore } from '@/stores/unseen-runs.store'
-
-// A `done` row is one finished conversation, or every unseen run of one scheduled task, so it
-// carries the sessions it stands for.
-export type InboxItem = Omit<AttentionSession, 'status'> & { status: SessionStatus | 'done'; agentName: string; count?: number; sessionIds?: string[]; latestSessionId?: string }
 
 // Declared once, outside the inbox: a component reference the memoised rows can compare, where a render function would hand them a new element on every pass.
 function InboxItemMenu({ item, onOpenChange }: RowMenuProps<InboxItem>) {
@@ -45,41 +40,15 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
     const hydrated = useBoardStore(s => s.hydrated)
     const setSessionStatus = useBoardStore(s => s.setSessionStatus)
     const markSessionsHandled = useBoardStore(s => s.markSessionsHandled)
-    const sessions = useAttentionSessions()
+    const { items, sessions } = useInboxItems()
     // Until its notification is read, a row may well be someone else's: it waits rather than flashes.
     const reasonsLoaded = sessions.every(s => s.reason !== undefined)
 
-    const unseen = useUnseenGroups()
     const liveSessions = useBoardStore(s => s.sessions)
 
-    const items = useMemo<InboxItem[]>(() => {
-        const names = new Map(agents.map(a => [a.id, a.name]))
-        const attention = sessions.flatMap(s => {
-            const agentName = names.get(s.agentId)
-            return agentName && s.reason ? [{ ...s, agentName }] : []
-        })
-        const done = unseen.flatMap(group => {
-            const agentName = names.get(group.agentId)
-            if (!agentName) return []
-            return [{
-                id: `done:${group.key}`,
-                agentId: group.agentId,
-                agentName,
-                engineSessionId: null,
-                status: 'done' as const,
-                title: group.label,
-                message: group.scheduled ? null : group.message,
-                updatedAt: new Date(group.at).toISOString(),
-                count: group.count,
-                sessionIds: group.sessionIds,
-                latestSessionId: group.latestSessionId,
-            }]
-        })
-        return [...attention, ...done]
-    }, [sessions, agents, unseen])
 
     const shown = onEngine
-    useTabSignals(shown ? items.reduce((sum, item) => sum + (item.count ?? 1), 0) : 0)
+    useTabSignals(shown ? inboxCount(items) : 0)
 
     const running = useMemo(() => {
         const known = new Set(agents.map(a => a.id))
@@ -147,11 +116,7 @@ export function WorkspaceInbox({ trigger = 'pill' }: { trigger?: 'pill' | 'row' 
             return
         }
         setView(null)
-        const board = useBoardStore.getState()
-        board.focusAgentOnBoard(item.agentId, 'chat')
-        board.setPendingOpenSession({ agentId: item.agentId, sessionId: item.latestSessionId ?? item.id, runId: null })
-        // The conversation opened marks itself read; the other runs of the same task go with it.
-        if (item.sessionIds) void useUnseenRunsStore.getState().markSeen(item.sessionIds)
+        openInboxItem(item)
     }, [])
     const openPeekConversation = useCallback((peek: Peek) => {
         setView(null)

@@ -19,6 +19,7 @@ import { WorkspaceDialogs } from '@/components/layout/WorkspaceDialogs'
 import { WorkspaceSwitcher } from '@/components/layout/WorkspaceSwitcher'
 import { ChangelogDialog } from '@/components/changelog/ChangelogDialog'
 import { ControlCenter } from '@/components/control-center/ControlCenter'
+import { CoworkerDockPublisher } from '@/components/desktop-shell/CoworkerDockPublisher'
 import { useChangelogLauncher } from '@/components/changelog/useChangelogLauncher'
 import { useEnsureSandboxSpace } from '@/lib/sandbox/useEnsureSandboxSpace'
 import { useAgentHealthSync } from '@/hooks/useAgentHealthSync'
@@ -403,6 +404,7 @@ export function HomeContent({ initialSpaces = [], initialWorkspaceId = null }: {
             <ChangelogDialog />
             <ControlCenter />
             <WorkspaceDialogs />
+            {hydrated && <CoworkerDockPublisher />}
         </div>
     )
 }

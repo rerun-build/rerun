@@ -90,5 +90,10 @@
     },
     "server": {
         "otherServer": "Anderen Rerun-Server nutzen"
+    },
+    "coworkerDock": {
+        "newCoworker": "Neuer Coworker",
+        "move": "Verschieben",
+        "show": "Coworker anzeigen"
     }
 }

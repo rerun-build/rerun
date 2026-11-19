@@ -579,13 +579,14 @@ html[data-desktop-shell] [data-slot='sheet-content'][data-side='top'] {
   top: var(--shell-titlebar-h);
 }
 
-/* The Quick ask window is frameless and rounded: no strip, and nothing painted around its card. */
-html[data-desktop-shell]:has([data-quick-ask]) {
+/* The Quick ask window is frameless and rounded: no strip, and nothing painted around its card. The
+   coworker dock is a transparent strip on the edge of the screen: only its rail is painted. */
+html[data-desktop-shell]:has([data-quick-ask], [data-coworker-dock]) {
   --shell-titlebar-h: 0px;
 }
 
-html:has([data-quick-ask]),
-html:has([data-quick-ask]) body {
+html:has([data-quick-ask], [data-coworker-dock]),
+html:has([data-quick-ask], [data-coworker-dock]) body {
   background: transparent;
 }
 

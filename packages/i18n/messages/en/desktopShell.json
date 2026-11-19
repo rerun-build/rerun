@@ -26,7 +26,9 @@
         "quickAsk.releaseToSend": "Shown while the Quick ask window records the person's voice, with Space held down.",
         "quickAsk.sent": "Badge shown for a second once the spoken question left for the Chief of Staff (the workspace assistant).",
         "quickAsk.micDeniedBody": "The computer does not let Rerun use the microphone. A button next to it opens the system settings.",
-        "quickAsk.toggleHint": "Shown while the Quick ask window records the person's voice after the voice keyboard shortcut was pressed."
+        "quickAsk.toggleHint": "Shown while the Quick ask window records the person's voice after the voice keyboard shortcut was pressed.",
+        "coworkerDock.move": "Accessible name of the grip at the top of the coworker dock, a small bar of coworker avatars on the edge of the screen: drag it to move the bar.",
+        "coworkerDock.show": "Accessible name of the folded coworker dock, a small tab on the edge of the screen: a click unfolds it."
     },
     "update": {
         "ready": "Rerun {version} is ready",
@@ -119,5 +121,10 @@
     },
     "server": {
         "otherServer": "Use another Rerun server"
+    },
+    "coworkerDock": {
+        "newCoworker": "New coworker",
+        "move": "Move",
+        "show": "Show coworkers"
     }
 }
