@@ -4,6 +4,8 @@ import planning
 import states
 
 CAP = 30
+FIXES = 5
+TRIES = 3
 LIMIT = "1000"
 PAUSED = "factory-paused"
 GAPS = re.compile(r"^Gaps of #(\d+):")
@@ -29,7 +31,7 @@ def check(issues, data, rows):
         n, have = i["number"], names(i)
         j = jobs.get(str(n))
         plan = (kv.get("plan:%d" % n) or {}).get("state")
-        if planning.LABEL in have and (plan is None or plan in planning.ENDED):
+        if planning.LABEL in have and (plan is None or plan in planning.ENDED + ("unsent",)):
             out["plan_label_no_plan"].append(n)
         if PAUSED in have and str(n) in moving:
             out["parked_but_moving"].append(n)
@@ -50,3 +52,24 @@ def check(issues, data, rows):
     for k in LISTS:
         out[k] = out[k][:CAP]
     return out
+
+
+def fix(gh, repo, store, drift):
+    done = []
+    for n in drift.get("plan_label_no_plan") or []:
+        if len(done) >= FIXES:
+            break
+        job = "labelfix:%d" % n
+        rec = store.get_all(job)
+        tries = int(rec.get("tries") or 0)
+        if rec.get("plan") or tries >= TRIES:
+            continue
+        store.set(job, "tries", tries + 1)
+        try:
+            gh(["issue", "edit", str(n), "-R", repo, "--remove-label", planning.LABEL])
+        except Exception as e:  # noqa: BLE001
+            done.append({"issue": n, "did": "could not remove %s: %s" % (planning.LABEL, type(e).__name__)})
+            continue
+        store.set(job, "plan", "1")
+        done.append({"issue": n, "did": "removed " + planning.LABEL})
+    return done

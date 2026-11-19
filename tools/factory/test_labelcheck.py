@@ -21,9 +21,10 @@ def row(n, status, station="job"):
 
 class Check(unittest.TestCase):
     def test_a_plan_label_with_no_live_plan_is_drift(self):
-        d = data(kv={"plan:2": {"state": "planning"}, "plan:3": {"state": "blocked"}})
-        out = labelcheck.check([issue(1, "factory-plan"), issue(2, "factory-plan"), issue(3, "factory-plan")], d, [])
-        self.assertEqual(out["plan_label_no_plan"], [1, 3])
+        d = data(kv={"plan:2": {"state": "planning"}, "plan:3": {"state": "blocked"}, "plan:8": {"state": "unsent"},
+                     "plan:9": {"state": "planned"}})
+        issues = [issue(n, "factory-plan") for n in (1, 2, 3, 8, 9)]
+        self.assertEqual(labelcheck.check(issues, d, [])["plan_label_no_plan"], [1, 3, 8])
 
     def test_a_ready_label_left_on_a_relabelled_job_is_drift_and_waiting_ones_are_counted(self):
         d = data(jobs={"4": job("merged"), "5": job("building"), "25": job("blocked")})
@@ -68,6 +69,48 @@ class Check(unittest.TestCase):
         issues = [issue(i, "factory-plan") for i in range(labelcheck.CAP + 3)]
         out = labelcheck.check(issues, data(), [])
         self.assertEqual((len(out["plan_label_no_plan"]), out["more"]["plan_label_no_plan"]), (labelcheck.CAP, 3))
+
+
+class Fix(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        from store import Store
+        self.s = Store(os.path.join(tempfile.mkdtemp(), "f.db"))
+        self.addCleanup(self.s.close)
+        self.calls = []
+
+    def gh(self, args):
+        self.calls.append(args)
+        return ""
+
+    def test_a_stray_plan_label_comes_off_once(self):
+        drift = {"plan_label_no_plan": [3, 4]}
+        self.assertEqual(labelcheck.fix(self.gh, "o/r", self.s, drift), [{"issue": 3, "did": "removed factory-plan"},
+                                                                          {"issue": 4, "did": "removed factory-plan"}])
+        self.assertEqual(self.calls[0], ["issue", "edit", "3", "-R", "o/r", "--remove-label", "factory-plan"])
+        self.assertEqual(labelcheck.fix(self.gh, "o/r", self.s, drift), [])
+        self.assertEqual(len(self.calls), 2)
+
+    def test_at_most_a_few_fixes_per_post(self):
+        drift = {"plan_label_no_plan": list(range(1, 20))}
+        self.assertEqual(len(labelcheck.fix(self.gh, "o/r", self.s, drift)), labelcheck.FIXES)
+
+    def test_a_refused_edit_is_tried_again_a_few_times_then_left(self):
+        def gh(args):
+            raise RuntimeError("no")
+        drift = {"plan_label_no_plan": [5]}
+        for _ in range(labelcheck.TRIES):
+            self.assertEqual(labelcheck.fix(gh, "o/r", self.s, drift),
+                             [{"issue": 5, "did": "could not remove factory-plan: RuntimeError"}])
+        self.assertEqual(labelcheck.fix(self.gh, "o/r", self.s, drift), [])
+
+    def test_a_refused_edit_that_works_next_time_is_done(self):
+        def gh(args):
+            raise RuntimeError("no")
+        drift = {"plan_label_no_plan": [6]}
+        labelcheck.fix(gh, "o/r", self.s, drift)
+        self.assertEqual(labelcheck.fix(self.gh, "o/r", self.s, drift), [{"issue": 6, "did": "removed factory-plan"}])
+        self.assertEqual(labelcheck.fix(self.gh, "o/r", self.s, drift), [])
 
 
 class Read(unittest.TestCase):
