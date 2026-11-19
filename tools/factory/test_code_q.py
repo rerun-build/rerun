@@ -15,6 +15,8 @@ STAND_IN = """#!/usr/bin/env python3
 import json, os, sys
 with open(os.environ["MARKER"], "w") as f:
     f.write(os.getcwd())
+with open(os.environ["MARKER"] + ".daemon", "w") as f:
+    f.write(os.environ.get("SYMFORGE_NO_DAEMON", ""))
 for line in sys.stdin:
     m = json.loads(line)
     if "id" not in m:
@@ -91,6 +93,7 @@ class CodeQ(unittest.TestCase):
         with open(cfg, "w") as f:
             json.dump({"symforge": self.stand_in, "checkouts": self.checkouts, "keyFile": self.key, "servers": servers}, f)
         env = dict(os.environ, CODE_Q_CONFIG=cfg, CODE_Q_RETRY_MS="10", MARKER=self.marker)
+        env.pop("SYMFORGE_NO_DAEMON", None)
         return subprocess.run(["node", CODE_Q, *args], capture_output=True, text=True, env=env, timeout=60)
 
     def stub(self, *a, **k):
@@ -132,6 +135,12 @@ class CodeQ(unittest.TestCase):
         r = self.run_q({}, "r1", "search_text")
         self.assertIn("code-q: no server for r1; asking a one-off symforge instead", r.stderr.splitlines())
         self.assertEqual(r.stdout.strip(), "stdio answer")
+
+    def test_the_one_off_symforge_starts_no_daemon(self):
+        r = self.run_q({}, "r1", "search_text")
+        self.assertEqual(r.stdout.strip(), "stdio answer")
+        with open(self.marker + ".daemon") as f:
+            self.assertEqual(f.read(), "1")
 
     def test_refused_key_exits_1_without_fallback(self):
         s = self.stub([text("x")], status=401)

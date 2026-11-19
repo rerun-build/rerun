@@ -143,7 +143,7 @@ async function viaStdio() {
     console.error(`code-q: no checkout ${cwd}`);
     return 2;
   }
-  const child = spawn(config.symforge, [], { cwd, stdio: ['pipe', 'pipe', 'ignore'] });
+  const child = spawn(config.symforge, [], { cwd, stdio: ['pipe', 'pipe', 'ignore'], env: { ...process.env, SYMFORGE_NO_DAEMON: '1' } });
   let buf = '';
   let nextId = 1;
   const waiting = new Map();
