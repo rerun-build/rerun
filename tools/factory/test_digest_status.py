@@ -64,9 +64,24 @@ class Status(unittest.TestCase):
         self.d.names = D.pools.names(self.d.cfg)
         out = self.d.status({"digest": {}, "holds": []})
         self.assertEqual(out["planner_free"], 0)
-        self.assertEqual({h["by"] for h in out["planner_holders"]}, {"Boss"})
-        self.assertEqual([(h["job"], h["state"], h["since"]) for h in out["planner_holders"]],
-                         [("plan:12", "reviewing", "2026-11-19T00:00:00Z"), ("recheck:40", "running", "2026-11-18T17:00:00Z")])
+        taken = [(t["issue"], t["station"], t["step"], t["by"]) for t in out["registry"]["taken"]]
+        self.assertEqual(taken, [("12", "plan", "plan-review", "Boss"), ("40", "recheck", "queued", "Boss")])
+        self.assertNotIn("planner_holders", out)
+
+    def test_the_registry_is_read_only_when_the_digest_is_due(self):
+        self.make()
+        self.planner()
+        self.d.store.set("-", "digest_at", self.d.now())
+        self.assertNotIn("registry", self.d.status({"digest": {}, "holds": []}))
+
+    def test_a_broken_ledger_read_still_posts_the_planner_numbers(self):
+        self.make()
+        self.planner()
+        real = D.registry.read
+        D.registry.read = lambda store: (_ for _ in ()).throw(RuntimeError("db"))
+        self.addCleanup(setattr, D.registry, "read", real)
+        out = self.d.status({"digest": {}, "holds": []})
+        self.assertEqual((out["registry_error"], out["planner_free"]), ("RuntimeError", 1))
 
     def test_the_digest_shows_planner_copies_as_the_controls_set_them(self):
         self.make()

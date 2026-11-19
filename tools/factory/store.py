@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS fires(
   error TEXT, refire INTEGER NOT NULL DEFAULT 0);
 DROP INDEX IF EXISTS fires_run;  -- was UNIQUE: chunks of one batch share a run id; an index drop, no row change
 CREATE INDEX IF NOT EXISTS fires_run_id ON fires(run_id) WHERE run_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS fires_job ON fires(job, id);
 CREATE TABLE IF NOT EXISTS kv(job TEXT NOT NULL, k TEXT NOT NULL, v TEXT NOT NULL, PRIMARY KEY(job, k));
+CREATE TABLE IF NOT EXISTS moves(job TEXT PRIMARY KEY, state TEXT NOT NULL, prev TEXT, at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS queue(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   job TEXT NOT NULL, stage TEXT NOT NULL, chunk TEXT NOT NULL DEFAULT '',
@@ -144,9 +146,17 @@ class Store:
 
     def set(self, job, k, v):
         self.db.execute("INSERT INTO kv VALUES(?,?,?) ON CONFLICT(job,k) DO UPDATE SET v=excluded.v", (job, k, str(v)))
+        if k == "state":
+            self.db.execute("INSERT INTO moves VALUES(?,?,NULL,?) ON CONFLICT(job) DO UPDATE SET prev=moves.state, "
+                            "state=excluded.state, at=excluded.at WHERE moves.state != excluded.state", (job, str(v), now()))
+
+    def moved(self, job):
+        r = self.db.execute("SELECT state, prev, at FROM moves WHERE job=?", (job,)).fetchone()
+        return dict(r) if r else None
 
     def forget(self, job):
         self.db.execute("DELETE FROM kv WHERE job=?", (job,))
+        self.db.execute("DELETE FROM moves WHERE job=?", (job,))
 
     def get_all(self, job):
         return {r["k"]: r["v"] for r in self.db.execute("SELECT k,v FROM kv WHERE job=?", (job,))}

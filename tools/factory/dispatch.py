@@ -32,6 +32,7 @@ import pools
 import problems
 import proof
 import refresh
+import registry
 import renewal
 import resolver
 import sifter
@@ -2084,12 +2085,15 @@ class Dispatcher:
             out["planner_free"] = len(pools.free_copies(dict(self.cfg, held=False), "planner", self.station.running()))
             out["planner_room"] = self.station.parallel - len(live)
             out["planner_copies"] = {c["name"]: c["runs"] for c in (pools.types(self.cfg).get("planner") or {}).get("coworkers", [])}
-            rows = [("plan:%d" % n, r) for n, r in sorted(live.items())]
-            rows += [("recheck:%d" % n, r) for n, r in sorted(self.station.live_rechecks().items())]
-            out["planner_holders"] = [{"job": job, "by": self.names.get(r.get("agent"), str(r.get("agent"))[:8]), "state": r.get("state"),
-                                       "since": r.get("started")} for job, r in rows]
         except Exception as e:  # noqa: BLE001
             out["planner_error"] = type(e).__name__
+        try:
+            if not digest.due(self.store, self.now()):
+                return out
+            at = planning.stamp(self.now())
+            out["registry"] = registry.summary(registry.rows(registry.read(self.store), at), at, self.cfg)
+        except Exception as e:  # noqa: BLE001
+            out["registry_error"] = type(e).__name__
         return out
 
     def report_line(self):
