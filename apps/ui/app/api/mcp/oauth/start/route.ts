@@ -17,6 +17,7 @@ export async function POST(req: Request) {
         let { mcpUrl } = body
         const agentId = body.agentId ?? ''
         let vault: OAuthContext['vault']
+        let workspaceId: number | undefined
         if (body.vaultItemId) {
             // An entry signs in where it was compiled to: its own server and address, never the caller's.
             const ctx = await vaultContext()
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
             mcpUrl = item.oauth.url
             vault = { itemId: item.id, workspaceId: ctx.actor.workspaceId }
         } else {
-            await assertAgentOrForemanAccess(agentId, 'manage')
+            workspaceId = (await assertAgentOrForemanAccess(agentId, 'manage')).workspaceId
         }
 
         const metadata = await discoverAuthServer(mcpUrl)
@@ -44,6 +45,7 @@ export async function POST(req: Request) {
             clientId: clientInfo.clientId,
             clientSecret: clientInfo.clientSecret,
             redirectUri: callbackUrl(req),
+            ...(workspaceId !== undefined ? { workspaceId } : {}),
             ...(vault ? { vault } : {}),
         }
 

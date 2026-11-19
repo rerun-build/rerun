@@ -1,3 +1,4 @@
+import { requireAgentWorkspaceId } from '@/app/api/_auth/access'
 import { loadManifest, markComposioAuthorized } from '@/app/api/_services/services.service'
 import { type ComposioConnectedAccount, getConnectedAccount } from '@/lib/composio/client'
 import { getVaultItem } from '@/lib/engine/vault-client'
@@ -87,6 +88,14 @@ describe('GET /api/oauth/composio/callback', () => {
         expect(getConnectedAccount).toHaveBeenCalledWith('ca_1')
         expect(markComposioAuthorized).toHaveBeenCalledWith('agent-1', 'gmail', 'ca_1', undefined, { kind: 'workspace', workspaceId: 7 })
         expect(deletesStateCookie(res)).toBe(true)
+    })
+
+    it('resolves the workspace from the one the sign-in started in', async () => {
+        withContext({ ...CONTEXT, agentId: 'foreman', workspaceId: 3 })
+
+        await callback({ state: STATE, status: 'success' })
+
+        expect(requireAgentWorkspaceId).toHaveBeenCalledWith('foreman', 'manage', 3)
     })
 
     it('marks the extra account it was started for and names it in the popup message', async () => {

@@ -38,6 +38,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ provide
             provider: providerId,
             serverName,
             redirectUri: managedCallbackUrl(req, providerId),
+            workspaceId: actor.workspaceId,
         }
 
         const res = NextResponse.json({ authorizationUrl: buildManagedAuthorizeUrl(provider.oauth, clientId, ctx, challenge, state) })

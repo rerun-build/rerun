@@ -175,6 +175,29 @@ describe('GET /api/mcp/oauth/callback', () => {
         expect(putMcpToken).toHaveBeenCalledOnce()
     })
 
+    it("stores the Chief of Staff's token on the engine of the workspace the sign-in started in, not of the one the session last picked", async () => {
+        withContext({ ...CONTEXT, agentId: 'foreman', workspaceId: OTHER_WORKSPACE })
+
+        const res = await callback({ code: 'code-1', state: STATE })
+
+        expect(await res.text()).toContain('mcp-oauth-success')
+        expect(findWorkspaceEngine).toHaveBeenCalledWith(OTHER_WORKSPACE)
+        expect(findWorkspaceEngine).not.toHaveBeenCalledWith(SESSION_WORKSPACE)
+        expect(putMcpToken).toHaveBeenCalledWith({ baseUrl: 'https://engine.test', apiKey: null }, 'foreman', 'acme', expect.objectContaining({ accessToken: 'access' }))
+    })
+
+    it('writes no token for the Chief of Staff when its sign-in names no workspace, or for a member who is no admin', async () => {
+        withContext({ ...CONTEXT, agentId: 'foreman' })
+        expect(await (await callback({ code: 'code-1', state: STATE })).text()).toContain('Authorization failed: Coworker not found')
+
+        role = 'member'
+        withContext({ ...CONTEXT, agentId: 'foreman', workspaceId: OTHER_WORKSPACE })
+        await callback({ code: 'code-1', state: STATE })
+
+        expect(exchangeCode).not.toHaveBeenCalled()
+        expect(putMcpToken).not.toHaveBeenCalled()
+    })
+
     it('writes no token for a member who only uses the Box of the coworker', async () => {
         role = 'member'
         withContext(CONTEXT)

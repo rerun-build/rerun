@@ -30,6 +30,9 @@ export type OAuthContext = {
     clientId: string
     clientSecret?: string
     redirectUri: string
+    // The workspace of the tab that started the sign-in. The callback's popup names none, and the
+    // Chief of Staff has no row to name its own.
+    workspaceId?: number
     // Started from the iOS app: the callback redirects back into it instead of answering with the
     // popup page, and reads the workspace from this signed grant since that browser has no session.
     mobileGrant?: string

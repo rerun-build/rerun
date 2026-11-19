@@ -207,18 +207,18 @@ export async function assertAgentInWorkspace(agentId: string, need: AccessLevel 
 
 // For an OAuth callback, which lands in a popup that names no workspace: the agent names its own,
 // held to the caller's membership like a workspace a tab names. Connecting an app to a coworker
-// changes what it is, so it takes `manage` on its Box.
-export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel = 'manage'): Promise<number> {
+// changes what it is, so it takes `manage` on its Box. The foreman has no row to name a workspace:
+// its sign-in carries the one it started in (`startedIn`), never the one the session last picked.
+export async function requireAgentWorkspaceId(agentId: string, need: AccessLevel = 'manage', startedIn?: number): Promise<number> {
     const { user } = await getSessionWorkspace()
     if (!user?.id) throw new UnauthenticatedError()
-    if (agentId === FOREMAN_AGENT_ID) return (await assertAgentOrForemanAccess(agentId, need)).workspaceId
     const supabase = createServiceRoleClient()
-    const { data: agent } = await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })
-    if (!agent) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    const { data: membership } = await selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: user.id, workspace_id: agent.workspace_id })
+    const workspaceId = agentId === FOREMAN_AGENT_ID ? startedIn : (await selectMaybeSingle(supabase, 'agents', ['workspace_id'] as const, { id: agentId })).data?.workspace_id
+    if (workspaceId === undefined) throw new AuthorizationError(COWORKER_NOT_FOUND)
+    const { data: membership } = await selectMaybeSingle(supabase, 'workspace_members', ['role', 'box_scope'] as const, { user_id: user.id, workspace_id: workspaceId })
     if (!membership) throw new AuthorizationError(COWORKER_NOT_FOUND)
-    await assertAgentAccess(agentId, need, { kind: 'user', userId: user.id, workspaceId: agent.workspace_id, role: membership.role, boxScope: toBoxScope(membership.box_scope) })
-    return agent.workspace_id
+    await assertAgentOrForemanAccess(agentId, need, { kind: 'user', userId: user.id, workspaceId, role: membership.role, boxScope: toBoxScope(membership.box_scope) })
+    return workspaceId
 }
 
 type OwnedSession = { id: string; agent_id: string; engine_session_id: string | null; engine_agent_id: string | null; updated_at: string }

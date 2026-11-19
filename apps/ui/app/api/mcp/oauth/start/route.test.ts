@@ -87,7 +87,8 @@ describe('POST /api/mcp/oauth/start', () => {
         const [cookie] = res.cookies.getAll()
         expect(cookie.name).toBe(`mcp_oauth_${authorize.searchParams.get('state')}`)
         expect(cookie).toMatchObject({ httpOnly: true, maxAge: 600, sameSite: 'lax', path: '/api/mcp/oauth' })
-        expect(decodeContext(cookie.value)).toMatchObject({ agentId: 'agent-1', serverName: 'acme', tokenEndpoint: 'https://auth.acme.test/token', clientId: CLIENT_METADATA_DOCUMENT })
+        // The workspace it started in goes along: the callback's popup names none.
+        expect(decodeContext(cookie.value)).toMatchObject({ agentId: 'agent-1', serverName: 'acme', tokenEndpoint: 'https://auth.acme.test/token', clientId: CLIENT_METADATA_DOCUMENT, workspaceId: SESSION_WORKSPACE })
         expect(decodeContext(cookie.value)).not.toHaveProperty('scope')
     })
 

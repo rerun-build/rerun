@@ -48,6 +48,7 @@ export async function POST(req: Request) {
             toolkit: method.composio.toolkit,
             serverName,
             connectedAccountId,
+            workspaceId: actor.workspaceId,
         }
 
         const res = NextResponse.json({ authorizationUrl: redirectUrl })

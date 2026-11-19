@@ -13,7 +13,7 @@ vi.mock('@/supabase/serviceRole', () => ({ createServiceRoleClient: () => ({}) }
 vi.mock('@/supabase/supabase-helpers', () => ({ selectSingle: vi.fn(), selectMaybeSingle: mocks.selectMaybeSingle, selectMaybeSingleWithJoins: mocks.selectMaybeSingleWithJoins, selectMany: mocks.selectMany, selectAll: mocks.selectAll }))
 
 const { AuthorizationError } = await import('./ownership')
-const { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, assertSessionInWorkspace, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, visibleSpaceIds, workspaceActor } = await import('./access')
+const { AccessDeniedError, assertAgentAccess, assertAgentOrForemanAccess, assertSessionInWorkspace, boxAccessOf, callableEngineAgentIds, hasAccess, keepVisible, requireAgentWorkspaceId, visibleSpaceIds, workspaceActor } = await import('./access')
 type Actor = import('./access').Actor
 
 const admin: Actor = { kind: 'user', userId: 'u-admin', workspaceId: 1, role: 'admin', boxScope: 'all' }
@@ -81,7 +81,7 @@ describe('keepVisible', () => {
     })
 })
 
-type Tables = { agents?: unknown; spaces?: unknown; space_members?: unknown }
+type Tables = { agents?: unknown; spaces?: unknown; space_members?: unknown; workspace_members?: unknown }
 
 function readsAnswering(tables: Tables) {
     mocks.selectMaybeSingle.mockImplementation(async (_client: unknown, table: keyof Tables) => ({ data: tables[table] ?? null, error: null }))
@@ -153,6 +153,41 @@ describe('assertAgentOrForemanAccess', () => {
     it("holds a coworker to its Box", async () => {
         readsAnswering({ agents: { workspace_id: 1, space_id: 'box-1', engine_agent_id: 'e1' }, spaces: { id: 'box-1', ...restrictedBox } })
         await expect(assertAgentOrForemanAccess('a1', 'use', member('all'))).rejects.toThrow('Coworker not found')
+    })
+})
+
+describe('requireAgentWorkspaceId', () => {
+    beforeEach(() => {
+        mocks.getSessionWorkspace.mockReset()
+        mocks.selectMaybeSingle.mockReset()
+        // The workspace the session last picked anywhere, which a popup's callback falls back on.
+        mocks.getSessionWorkspace.mockResolvedValue({ user: { id: 'u-admin', workspace_id: 1 }, workspaceRefused: false, membership: { role: 'admin', box_scope: 'all' } })
+    })
+
+    it("holds the Chief of Staff's sign-in to the workspace it started in, not to the one the session last picked", async () => {
+        readsAnswering({ workspace_members: { role: 'admin', box_scope: 'all' } })
+        await expect(requireAgentWorkspaceId('foreman', 'manage', 2)).resolves.toBe(2)
+        const [, table, , filters] = mocks.selectMaybeSingle.mock.calls[0]
+        expect(table).toBe('workspace_members')
+        expect(filters).toEqual({ user_id: 'u-admin', workspace_id: 2 })
+    })
+
+    it('refuses the Chief of Staff to a member of that workspace, and to someone who left it', async () => {
+        readsAnswering({ workspace_members: { role: 'member', box_scope: 'all' } })
+        await expect(requireAgentWorkspaceId('foreman', 'manage', 2)).rejects.toBeInstanceOf(AccessDeniedError)
+        readsAnswering({})
+        await expect(requireAgentWorkspaceId('foreman', 'manage', 2)).rejects.toThrow('Coworker not found')
+    })
+
+    it('refuses the Chief of Staff when the sign-in names no workspace', async () => {
+        readsAnswering({ workspace_members: { role: 'admin', box_scope: 'all' } })
+        await expect(requireAgentWorkspaceId('foreman')).rejects.toThrow('Coworker not found')
+        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+    })
+
+    it("answers a coworker's own workspace, whatever the sign-in names", async () => {
+        readsAnswering({ agents: { workspace_id: 3, space_id: 'box-1', engine_agent_id: 'e1' }, workspace_members: { role: 'admin', box_scope: 'all' }, spaces: { id: 'box-1', workspace_id: 3, visibility: 'workspace' } })
+        await expect(requireAgentWorkspaceId('a1', 'manage', 2)).resolves.toBe(3)
     })
 })
 

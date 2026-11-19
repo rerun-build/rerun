@@ -119,6 +119,27 @@ describe('GET /api/oauth/managed/[provider]/callback', () => {
         expect(deletesStateCookie(res)).toBe(true)
     })
 
+    it("stores the Chief of Staff's token on the engine of the workspace the sign-in started in, not of the one the session last picked", async () => {
+        withContext({ ...CONTEXT, agentId: 'foreman', workspaceId: OTHER_WORKSPACE })
+
+        const res = await callback({ code: 'code-1', state: STATE })
+
+        expect(await res.text()).toContain('Connected as me@acme.test')
+        expect(findWorkspaceEngine).toHaveBeenCalledWith(OTHER_WORKSPACE)
+        expect(findWorkspaceEngine).not.toHaveBeenCalledWith(SESSION_WORKSPACE)
+        expect(putMcpToken).toHaveBeenCalledWith({ baseUrl: 'https://engine.test', apiKey: null }, 'foreman', 'acme', expect.objectContaining({ accessToken: 'access' }))
+        expect(markManagedAuthorized).toHaveBeenCalledWith('foreman', 'acme', 'me@acme.test', { kind: 'workspace', workspaceId: OTHER_WORKSPACE })
+    })
+
+    it('writes no token for the Chief of Staff when its sign-in names no workspace', async () => {
+        withContext({ ...CONTEXT, agentId: 'foreman' })
+
+        const res = await callback({ code: 'code-1', state: STATE })
+
+        expect(await res.text()).toContain('Coworker not found')
+        expect(putMcpToken).not.toHaveBeenCalled()
+    })
+
     it('reports the error and its description the provider sent back', async () => {
         vi.spyOn(console, 'warn').mockImplementation(() => {})
         withContext(CONTEXT)

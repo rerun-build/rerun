@@ -77,7 +77,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ provider
         if (ctx.provider !== providerId) return finish({ ok: false, ...refusal('providerMismatch') })
         const grant = callbackGrant(ctx)
         desktop = grant?.desktop
-        const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId))
+        const workspaceId = grant?.workspaceId ?? (await requireAgentWorkspaceId(ctx.agentId, 'manage', ctx.workspaceId))
         // The session passed `manage` on the coworker's Box just above, or the grant was minted for someone who did.
         const actor = workspaceActor(workspaceId)
         const { conn, engineAgentId } = await getAgentChatTarget(ctx.agentId, 'manage', actor)

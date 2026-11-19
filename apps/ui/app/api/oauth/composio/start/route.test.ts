@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { loadManifest } from '@/app/api/_services/services.service'
 import { composioUserId, composioVaultOwnUserId, initiateConnectedAccount } from '@/lib/composio/client'
+import { decodeComposioContext } from '@/lib/composio/oauth'
 import { getVaultItem } from '@/lib/engine/vault-client'
 import { serviceManifestSchema } from '@/lib/services/manifest'
 import { readRegistry, type RegistryEntry, type ServiceRegistry } from '@/lib/services/registry'
@@ -52,6 +53,15 @@ describe('POST /api/oauth/composio/start', () => {
 
         expect(await res.json()).toEqual({ authorizationUrl: 'https://connect.composio.dev/link/x' })
         expect(initiateConnectedAccount).toHaveBeenCalledWith(composioUserId(AGENT_ID), 'ac_gmail', expect.any(String))
+    })
+
+    it("names the workspace it started in, which the callback's popup cannot", async () => {
+        vi.mocked(readRegistry).mockResolvedValue({ services: { gmail: entry } })
+
+        const res = await start()
+
+        const [cookie] = res.cookies.getAll()
+        expect(decodeComposioContext(cookie.value)).toMatchObject({ agentId: AGENT_ID, key: 'gmail', workspaceId: 7 })
     })
 
     it("connects an account the Vault lends as the entry's own user of the workspace, whatever user the box names", async () => {
