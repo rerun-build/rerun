@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -32,9 +33,10 @@ for line in sys.stdin:
 
 
 class Stub:
-    def __init__(self, replies, status=200):
+    def __init__(self, replies, status=200, delays=None):
         self.replies = list(replies)
         self.status = status
+        self.delays = delays
         self.requests = []
         outer = self
 
@@ -43,6 +45,7 @@ class Stub:
                 n = int(self.headers.get("content-length", 0))
                 body = json.loads(self.rfile.read(n) or b"{}")
                 outer.requests.append((self.path, dict(self.headers), body))
+                time.sleep((outer.delays or {}).get(len(outer.requests), 0))
                 if outer.status != 200:
                     data = b"Unauthorized: missing or invalid Bearer token"
                     self.send_response(outer.status)
@@ -173,6 +176,81 @@ class CodeQ(unittest.TestCase):
             r = self.run_q({}, *args)
             self.assertEqual(r.returncode, 2, args)
             self.assertIn("usage:", r.stderr)
+
+    def test_check_passes_when_warm_and_no_longer(self):
+        s = self.stub([text("stdio answer")])
+        r = self.run_q({"r1": s.url}, "--check", "r1", "search_text", '{"query": "x"}')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        lines = r.stdout.splitlines()
+        self.assertEqual(len(lines), 13, r.stdout)
+        for i in range(1, 12):
+            self.assertRegex(lines[i - 1], rf"^lookup {i} \d+ ms$")
+        self.assertEqual(lines[11], "server answer 13 characters, one-off answer 13 characters")
+        self.assertEqual(lines[12], "PASS")
+        self.assertEqual(len(s.requests), 11)
+        for _, _, body in s.requests:
+            self.assertEqual(body["method"], "tools/call")
+            self.assertEqual(body["params"], {"name": "search_text", "arguments": {"query": "x"}})
+        self.assertTrue(os.path.exists(self.marker))
+        with open(self.marker + ".daemon") as f:
+            self.assertEqual(f.read(), "1")
+
+    def test_check_fails_on_a_slow_lookup(self):
+        s = self.stub([text("stdio answer")], delays={3: 1.2})
+        r = self.run_q({"r1": s.url}, "--check", "r1", "search_text", '{"query": "x"}')
+        self.assertEqual(r.returncode, 1, r.stderr)
+        last = r.stdout.splitlines()[-1]
+        self.assertTrue(last.startswith("FAIL: "), last)
+        self.assertIn("lookup 3 took", last)
+
+    def test_check_fails_when_the_server_answer_is_longer(self):
+        s = self.stub([text("stdio answer, and longer")])
+        r = self.run_q({"r1": s.url}, "--check", "r1", "search_text", '{"query": "x"}')
+        self.assertEqual(r.returncode, 1, r.stderr)
+        self.assertEqual(r.stdout.splitlines()[-1], "FAIL: the server answer is longer than the one-off answer")
+
+    def test_check_never_falls_back(self):
+        r = self.run_q({}, "--check", "r1", "search_text")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("code-q: no server for r1; --check needs one", r.stderr.splitlines())
+        self.assertFalse(os.path.exists(self.marker))
+        s = Stub([text("x")])
+        url = s.url
+        s.close()
+        r = self.run_q({"r1": url}, "--check", "r1", "search_text")
+        self.assertEqual(r.returncode, 1)
+        self.assertTrue(any(l.startswith("code-q: the server for r1 did not answer (") for l in r.stderr.splitlines()), r.stderr)
+        self.assertFalse(os.path.exists(self.marker))
+
+    def test_check_reports_a_bad_reply(self):
+        s = self.stub([text("x")], status=500)
+        r = self.run_q({"r1": s.url}, "--check", "r1", "search_text")
+        self.assertEqual(r.returncode, 1)
+        self.assertTrue(any(l.startswith("code-q: the server for r1 sent a bad reply: ") for l in r.stderr.splitlines()), r.stderr)
+        self.assertFalse(os.path.exists(self.marker))
+
+    def test_check_needs_a_readable_key(self):
+        s = self.stub([text("x")])
+        os.remove(self.key)
+        r = self.run_q({"r1": s.url}, "--check", "r1", "search_text")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn(f"code-q: cannot read the key file {self.key}", r.stderr.splitlines())
+        self.assertEqual(s.requests, [])
+
+    def test_check_refuses_index_folder_and_bad_usage(self):
+        s = self.stub([text("x")])
+        r = self.run_q({"r1": s.url}, "--check", "r1", "index_folder", "{}")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("code-q: index_folder is not allowed", r.stderr.splitlines())
+        for args in (("--check",), ("--check", "r1"), ("--check", "r1", "--list"), ("--check", "r1", "t", "{}", "extra")):
+            r = self.run_q({"r1": s.url}, *args)
+            self.assertEqual(r.returncode, 2, args)
+            self.assertIn("usage:", r.stderr)
+        r = self.run_q({"r1": s.url}, "--check", "r1", "search_text", "{bad")
+        self.assertEqual(r.returncode, 2)
+        self.assertTrue(any(l.startswith("code-q: the json argument is not valid JSON: ") for l in r.stderr.splitlines()), r.stderr)
+        self.assertEqual(s.requests, [])
+        self.assertFalse(os.path.exists(self.marker))
 
     def test_install_copies_code_q(self):
         if sys.platform == "win32" or shutil.which("sh") is None:

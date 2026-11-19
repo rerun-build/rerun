@@ -3,11 +3,13 @@ import { spawn } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const USAGE = 'usage: code-q <repo> <tool> [json] | <repo> --list | --status';
+const USAGE = 'usage: code-q <repo> [PROMPT_INJECTION] [json] | <repo> --list | --status | --check <repo> [PROMPT_INJECTION] [json]';
 const args = process.argv.slice(2);
-const [repo, tool, json] = args;
-const statusMode = args.length === 1 && repo === '--status';
-if (!statusMode && (!repo || !tool || args.length > 3 || (tool === '--list' && args.length !== 2))) {
+const checkMode = args[0] === '--check';
+const rest = checkMode ? args.slice(1) : args;
+const [repo, tool, json] = rest;
+const statusMode = !checkMode && args.length === 1 && args[0] === '--status';
+if (!statusMode && (!repo || !tool || rest.length > 3 || (tool === '--list' && (checkMode || rest.length !== 2)))) {
   console.error(USAGE);
   process.exit(2);
 }
@@ -103,6 +105,10 @@ function show(r) {
   return 0;
 }
 
+function answerText(r) {
+  return (r.result?.content || []).filter(c => c.type === 'text').map(c => c.text + '\n').join('');
+}
+
 class Refused extends Error {}
 
 async function viaServer(url) {
@@ -137,11 +143,11 @@ async function viaServer(url) {
   return r;
 }
 
-async function viaStdio() {
+async function askStdio() {
   const cwd = join(config.checkouts, repo);
   if (!existsSync(cwd)) {
     console.error(`code-q: no checkout ${cwd}`);
-    return 2;
+    return { code: 2 };
   }
   const child = spawn(config.symforge, [], { cwd, stdio: ['pipe', 'pipe', 'ignore'], env: { ...process.env, SYMFORGE_NO_DAEMON: '1' } });
   let buf = '';
@@ -168,6 +174,7 @@ async function viaStdio() {
     send({ id, method, params });
     setTimeout(() => rej(new Error('timeout: ' + method)), 120000);
   });
+  let reply;
   let code = 0;
   try {
     await ask('initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'code-q', version: '1' } });
@@ -182,7 +189,7 @@ async function viaStdio() {
         await sleep(retryMs);
       }
     }
-    code = show(r);
+    reply = r;
   } catch (e) {
     console.error(String(e.message));
     code = 1;
@@ -190,8 +197,84 @@ async function viaStdio() {
   child.stdin.end();
   child.kill();
   await Promise.race([new Promise(r => child.once('exit', r)), sleep(3000)]);
-  return code;
+  return reply ? { reply } : { code };
 }
+
+async function viaStdio() {
+  const a = await askStdio();
+  if (!a.reply) return a.code;
+  try {
+    return show(a.reply);
+  } catch (e) {
+    console.error(String(e.message));
+    return 1;
+  }
+}
+
+function serverFailure(e) {
+  if (e instanceof Refused) return `code-q: the server for ${repo} refused the key`;
+  if (e instanceof SyntaxError || (e instanceof TypeError && !e.cause)) return `code-q: the server for ${repo} sent a bad reply: ${e.message}`;
+  return `code-q: the server for ${repo} did not answer (${e.message})`;
+}
+
+async function check() {
+  try {
+    JSON.parse(json || '{}');
+  } catch (e) {
+    console.error(`code-q: the json argument is not valid JSON: ${e.message}`);
+    return 2;
+  }
+  const url = config.servers[repo];
+  if (!url) {
+    console.error(`code-q: no server for ${repo}; --check needs one`);
+    return 1;
+  }
+  try {
+    readFileSync(config.keyFile, 'utf8');
+  } catch {
+    console.error(`code-q: cannot read the key file ${config.keyFile}`);
+    return 1;
+  }
+  const times = [];
+  let last;
+  for (let i = 1; i <= 11; i++) {
+    const t0 = performance.now();
+    let r;
+    try {
+      r = await viaServer(url);
+    } catch (e) {
+      console.error(serverFailure(e));
+      return 1;
+    }
+    const ms = performance.now() - t0;
+    times.push(ms);
+    console.log(`lookup ${i} ${Math.round(ms)} ms`);
+    if (r.error) {
+      console.error(`error: ${r.error.message}`);
+      return 1;
+    }
+    last = r;
+  }
+  const a = await askStdio();
+  const n = answerText(last).length;
+  const m = a.reply ? answerText(a.reply).length : 0;
+  console.log(`server answer ${n} characters, one-off answer ${m} characters`);
+  const reasons = [];
+  times.forEach((ms, k) => {
+    if (k > 0 && ms >= 1000) reasons.push(`lookup ${k + 1} took ${Math.round(ms)} ms`);
+  });
+  if (!a.reply) reasons.push('no one-off answer');
+  else if (a.reply.error) reasons.push('the one-off answered with an error');
+  else if (n > m) reasons.push('the server answer is longer than the one-off answer');
+  if (!reasons.length) {
+    console.log('PASS');
+    return 0;
+  }
+  console.log(`FAIL: ${reasons.join('; ')}`);
+  return 1;
+}
+
+if (checkMode) process.exit(await check());
 
 let code;
 const url = config.servers[repo];
