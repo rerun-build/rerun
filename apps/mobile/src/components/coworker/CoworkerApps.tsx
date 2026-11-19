@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card, GROUPED_ROW_HEIGHT, Separator } from '@/components/ui/GroupedList'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { FromVault } from '@/components/vault/FromVault'
+import type { VaultLending } from '@/data/useVaultAccounts'
 import { useTheme } from '@/theme/theme'
 import { radius, spacing } from '@/theme/tokens'
 import { webHost } from '@/config/environment'
@@ -41,27 +43,35 @@ function AppIcon({ app }: { app: InstalledServiceView }) {
     )
 }
 
-type AppRowProps = { app: InstalledServiceView; connecting: boolean; readOnly: boolean; onConnect: () => void }
+type AppRowProps = { app: InstalledServiceView; connecting: boolean; readOnly: boolean; onConnect: () => void; vault?: VaultLending; onLent: () => void }
 
-function AppRow({ app, connecting, readOnly, onConnect }: AppRowProps) {
+function AppRow({ app, connecting, readOnly, onConnect, vault, onLent }: AppRowProps) {
     const t = useTranslations('mobileCoworker.apps')
     const attention = ATTENTION[app.status]
+    const fromVault = app.status === 'needs_auth' && vault !== undefined && vault.accountsFor(app.slug).length > 0
     return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT + 8, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm }}>
-            <AppIcon app={app} />
-            <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: 'flex-start' }}>
-                <AppText variant="body" medium numberOfLines={1}>
-                    {app.name}
-                </AppText>
-                {attention ? (
-                    <Badge label={t(`status.${attention.label}`)} tone={attention.tone} size="xs" />
-                ) : app.label ? (
-                    <AppText variant="footnote" tone="muted" numberOfLines={1}>
-                        {app.label}
+        <View style={{ gap: spacing.sm, paddingHorizontal: spacing.lg, paddingVertical: spacing.sm }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: GROUPED_ROW_HEIGHT - 8 }}>
+                <AppIcon app={app} />
+                <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: 'flex-start' }}>
+                    <AppText variant="body" medium numberOfLines={1}>
+                        {app.name}
                     </AppText>
-                ) : null}
+                    {attention ? (
+                        <Badge label={t(`status.${attention.label}`)} tone={attention.tone} size="xs" />
+                    ) : app.label ? (
+                        <AppText variant="footnote" tone="muted" numberOfLines={1}>
+                            {app.label}
+                        </AppText>
+                    ) : null}
+                </View>
+                {app.status === 'needs_auth' && <Button label={fromVault ? t('connectNew') : t('connect')} variant="outline" size="sm" loading={connecting} disabled={readOnly || vault?.lending != null} onPress={onConnect} />}
             </View>
-            {app.status === 'needs_auth' && <Button label={t('connect')} variant="outline" size="sm" loading={connecting} disabled={readOnly} onPress={onConnect} />}
+            {fromVault && (
+                <View style={{ paddingLeft: ICON_SIZE + spacing.md }}>
+                    <FromVault slug={app.slug} vault={vault} disabled={connecting} onLent={onLent} />
+                </View>
+            )}
         </View>
     )
 }
@@ -88,6 +98,9 @@ type CoworkerAppsProps = {
     apps: InstalledServiceView[] | null
     connectingKey: string | null
     onConnect: (app: InstalledServiceView) => void
+    // The Vault's accounts an app waiting on a sign-in can be lent instead.
+    vault?: VaultLending
+    onLent?: () => void
     failed?: boolean
     // Whether the caller can change the coworker's apps, and why not when they cannot.
     lock?: ManageLock
@@ -96,7 +109,7 @@ type CoworkerAppsProps = {
 
 // What the coworker is connected to. Adding an app goes through the chat: the coworker picks it, and
 // its card connects it.
-export function CoworkerApps({ name, apps, connectingKey, onConnect, failed, lock = OPEN_LOCK, onBack }: CoworkerAppsProps) {
+export function CoworkerApps({ name, apps, connectingKey, onConnect, vault, onLent = () => {}, failed, lock = OPEN_LOCK, onBack }: CoworkerAppsProps) {
     const t = useTranslations('mobileCoworker.apps')
     const tAccess = useTranslations('mobileCoworker.access')
     return (
@@ -119,7 +132,7 @@ export function CoworkerApps({ name, apps, connectingKey, onConnect, failed, loc
                             return (
                                 <Fragment key={key}>
                                     {index > 0 && <Separator inset={ROW_INSET} />}
-                                    <AppRow app={app} connecting={connectingKey === key} readOnly={lock.locked} onConnect={() => onConnect(app)} />
+                                    <AppRow app={app} connecting={connectingKey === key} readOnly={lock.locked} onConnect={() => onConnect(app)} vault={vault} onLent={onLent} />
                                 </Fragment>
                             )
                         })}

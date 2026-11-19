@@ -9,6 +9,8 @@ import { useAuth } from '@/auth/AuthProvider'
 import { AppText } from '@/components/ui/AppText'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { FromVault } from '@/components/vault/FromVault'
+import { useVaultAccounts } from '@/data/useVaultAccounts'
 import { runConnect, runMcpConnect } from '@/lib/oauth-connect'
 import { hostOf } from '@/lib/url'
 
@@ -56,6 +58,8 @@ function NeedsAuthCard({ agentId, slug, name }: { agentId: string; slug: string;
 
     const done = connected || service?.installStatus === 'active'
     const pending = service?.installStatus === 'needs_auth' && !connected
+    const vault = useVaultAccounts(agentId, pending)
+    const fromVault = pending && vault.accountsFor(slug).length > 0
 
     const connect = async () => {
         if (!caller) return
@@ -73,7 +77,8 @@ function NeedsAuthCard({ agentId, slug, name }: { agentId: string; slug: string;
             icon={logoOf(service?.icon)}
             title={t('added', { name })}
             note={error ?? (done ? t('connectedNote') : t('signInNote'))}
-            trailing={done ? <Badge size="xs" tone="green" label={t('connected')} /> : pending ? <Button size="sm" variant="outline" label={busy ? t('signingIn') : t('signIn')} symbol="user-check" loading={busy} onPress={connect} /> : undefined}
+            trailing={done ? <Badge size="xs" tone="green" label={t('connected')} /> : pending ? <Button size="sm" variant="outline" label={busy ? t('signingIn') : fromVault ? t('connectNew') : t('signIn')} symbol={fromVault ? undefined : 'user-check'} loading={busy} disabled={vault.lending !== null} onPress={connect} /> : undefined}
+            footer={fromVault ? <FromVault slug={slug} vault={vault} disabled={busy} onLent={() => setConnected(true)} /> : undefined}
         />
     )
 }

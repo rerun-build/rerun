@@ -9,6 +9,7 @@
         "connected": "Connected",
         "signingIn": "Signing in…",
         "signIn": "Sign in",
+        "connectNew": "New account",
         "signInNeeded": "Sign-in needed",
         "unreachable": "Unreachable",
         "couldNotConnect": "Couldn't connect {name}",

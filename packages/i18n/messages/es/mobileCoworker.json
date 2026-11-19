@@ -44,6 +44,7 @@
             "error": "Error"
         },
         "connect": "Conectar",
+        "connectNew": "Cuenta nueva",
         "empty": "Aún no hay ninguna app.",
         "askInChat": "Pídele a {name} en el chat que añada una app.",
         "connectFailed": "No se pudo conectar {name}"

@@ -44,6 +44,7 @@
             "error": "Hata"
         },
         "connect": "Bağla",
+        "connectNew": "Yeni hesap",
         "empty": "Henüz uygulama yok.",
         "askInChat": "Uygulama eklemek için sohbette {name} adlı coworker'a sorun.",
         "connectFailed": "Bağlanamadı: {name}"

@@ -15,27 +15,33 @@ import { radius, spacing } from '@/theme/tokens'
 
 import type { EventCard } from './cards'
 
+const EVENT_TILE = 28
+
 // One thing the coworker did, on the muted surface of the thread's cards: its glyph (or the app's
-// logo), what happened, a note, and on the right what the person can still do about it.
-export function EventRow({ symbol, icon, title, note, trailing, children }: { symbol: IconName; icon?: ReactNode; title: string; note?: string; trailing?: ReactNode; children?: ReactNode }) {
+// logo), what happened, a note, and on the right what the person can still do about it. `footer`
+// sits under the whole row, lined up with the title, so the trailing action stays on the title's line.
+export function EventRow({ symbol, icon, title, note, trailing, children, footer }: { symbol: IconName; icon?: ReactNode; title: string; note?: string; trailing?: ReactNode; children?: ReactNode; footer?: ReactNode }) {
     const theme = useTheme()
     return (
-        <View style={{ flexDirection: 'row', gap: spacing.md, padding: spacing.md, borderRadius: radius.lg, borderCurve: 'continuous', backgroundColor: theme.muted }}>
-            <View style={{ width: 28, height: 28, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: theme.card }}>
-                {icon ?? <Icon name={symbol} size={14} color={theme.foreground} />}
-            </View>
-            <View style={{ flex: 1, gap: 2 }}>
-                <AppText variant="callout" medium>
-                    {title}
-                </AppText>
-                {note ? (
-                    <AppText variant="footnote" tone="muted">
-                        {note}
+        <View style={{ gap: spacing.sm, padding: spacing.md, borderRadius: radius.lg, borderCurve: 'continuous', backgroundColor: theme.muted }}>
+            <View style={{ flexDirection: 'row', gap: spacing.md }}>
+                <View style={{ width: EVENT_TILE, height: EVENT_TILE, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: theme.card }}>
+                    {icon ?? <Icon name={symbol} size={14} color={theme.foreground} />}
+                </View>
+                <View style={{ flex: 1, gap: 2 }}>
+                    <AppText variant="callout" medium>
+                        {title}
                     </AppText>
-                ) : null}
-                {children}
+                    {note ? (
+                        <AppText variant="footnote" tone="muted">
+                            {note}
+                        </AppText>
+                    ) : null}
+                    {children}
+                </View>
+                {trailing ? <View style={{ alignSelf: 'center' }}>{trailing}</View> : null}
             </View>
-            {trailing ? <View style={{ alignSelf: 'center' }}>{trailing}</View> : null}
+            {footer ? <View style={{ paddingLeft: EVENT_TILE + spacing.md }}>{footer}</View> : null}
         </View>
     )
 }

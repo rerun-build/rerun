@@ -10,6 +10,7 @@ import { useAuth } from '@/auth/AuthProvider'
 import { CoworkerApps } from '@/components/coworker/CoworkerApps'
 import { loadCoworkerDetail, readCoworkerDetails } from '@/data/local-cache'
 import { useCoworkerAccess } from '@/data/useCoworkerAccess'
+import { useVaultAccounts } from '@/data/useVaultAccounts'
 import { runConnect } from '@/lib/oauth-connect'
 
 const keyOf = (app: InstalledServiceView) => app.key ?? app.slug
@@ -22,6 +23,7 @@ export default function CoworkerAppsScreen() {
     const [failed, setFailed] = useState(false)
     const [connectingKey, setConnectingKey] = useState<string | null>(null)
     const lock = manageLock(useCoworkerAccess(agentId))
+    const vault = useVaultAccounts(agentId)
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
 
@@ -47,5 +49,5 @@ export default function CoworkerAppsScreen() {
         if (outcome.status === 'connected') load()
     }
 
-    return <CoworkerApps name={name} apps={apps} failed={failed} lock={lock} connectingKey={connectingKey} onConnect={connect} onBack={() => router.back()} />
+    return <CoworkerApps name={name} apps={apps} failed={failed} lock={lock} connectingKey={connectingKey} onConnect={connect} vault={vault} onLent={load} onBack={() => router.back()} />
 }

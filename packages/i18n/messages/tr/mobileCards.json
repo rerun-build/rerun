@@ -9,6 +9,7 @@
         "connected": "Bağlı",
         "signingIn": "Oturum açılıyor…",
         "signIn": "Oturum aç",
+        "connectNew": "Yeni hesap",
         "signInNeeded": "Oturum açılmalı",
         "unreachable": "Erişilemiyor",
         "couldNotConnect": "{name} bağlanamadı",

@@ -9,6 +9,7 @@
         "connected": "Conectada",
         "signingIn": "Iniciando sesión…",
         "signIn": "Iniciar sesión",
+        "connectNew": "Cuenta nueva",
         "signInNeeded": "Inicio de sesión necesario",
         "unreachable": "Inaccesible",
         "couldNotConnect": "No se pudo conectar {name}",
