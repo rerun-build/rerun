@@ -163,7 +163,6 @@
     "claudeTokenIsCode": "Bu, Claude'dan gelen kod. Önce Token al'a tıklayın, ardından kodu buraya yapıştırın.",
     "baseUrlNotPublic": "Temel URL herkese açık bir web adresi olmalı.",
     "customNeedsUpdate": "Özel uç noktalar bu makinenin bir sonraki güncellemesiyle gelir. Biraz sonra tekrar deneyin.",
-    "opencodeNotAvailable": "OpenCode henüz kullanılamıyor.",
     "claudePlanNotOffered": "Ömür boyu plan bir API anahtarı veya ChatGPT planıyla çalışır, Claude aboneliğiyle çalışmaz.",
     "opencodeNeedsUpdate": "OpenCode bu makinenin bir sonraki güncellemesiyle gelir. Biraz sonra tekrar deneyin.",
     "claudePlanTokenAsApiKey": "Bu bir Claude plan token'ı. Bunun yerine Claude Pro veya Max altına ekleyin.",

@@ -207,7 +207,6 @@
     "claudeTokenIsCode": "That's the code from Claude. Click Get token first, then paste the code here.",
     "baseUrlNotPublic": "The base URL must be a public web address.",
     "customNeedsUpdate": "Custom endpoints arrive with the next update of this machine. Try again in a little while.",
-    "opencodeNotAvailable": "OpenCode is not available yet.",
     "claudePlanNotOffered": "The lifetime plan runs on an API key or a ChatGPT plan, not on a Claude subscription.",
     "opencodeNeedsUpdate": "OpenCode arrives with the next update of this machine. Try again in a little while.",
     "claudePlanTokenAsApiKey": "This is a Claude plan token. Add it under Claude Pro or Max instead.",

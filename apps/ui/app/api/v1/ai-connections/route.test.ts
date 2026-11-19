@@ -47,13 +47,6 @@ vi.mock('@/app/api/_services/workspace-engine.service', () => ({
     ensureWorkspaceEngine: (...args: unknown[]) => ensureWorkspaceEngine(...args),
     getWorkspaceConnection: async () => conn,
 }))
-let opencodeEnabled = false
-vi.mock('@/lib/features', async importOriginal => ({
-    ...(await importOriginal<typeof import('@/lib/features')>()),
-    get OPENCODE_ENABLED() {
-        return opencodeEnabled
-    },
-}))
 let cloud = true
 vi.mock('@rerun/cloud/edition', () => ({
     get RERUN_CLOUD() {
@@ -125,7 +118,6 @@ beforeEach(() => {
     engine.listConnections.mockResolvedValue({ connections: [claude, rerun], default: null })
     engine.createConnection.mockImplementation(async (_conn: unknown, params: { name: string; provider: string }) => connection({ id: 'cnx-new', ...params }))
     providerKeyProblem.mockResolvedValue(null)
-    opencodeEnabled = false
     engine.supportsOpencode.mockResolvedValue(true)
     engine.supportsCustomProvider.mockResolvedValue(false)
     cloud = true
@@ -181,19 +173,15 @@ describe('OpenCode', () => {
     const addable = async (headers: Record<string, string> = {}) => ((await (await send(list.GET, 'GET', '', undefined, {}, headers)).json()) as { addable: { provider: string }[] }).addable.map(entry => entry.provider)
     const iosBuild = (build: number) => ({ 'x-rerun-client': `ios/1.4.0 (${build})` })
 
-    it('is offered only behind its flag, and only on a machine whose engine runs it', async () => {
+    it('is offered only on a machine whose engine runs it', async () => {
         vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', '40')
-        expect(await addable(iosBuild(40))).not.toContain('opencode')
-        opencodeEnabled = true
         expect(await addable(iosBuild(40))).toEqual(['claude', 'codex', 'opencode', 'anthropic', 'openai', 'google', 'openrouter'])
         engine.supportsOpencode.mockResolvedValue(false)
         expect(await addable(iosBuild(40))).not.toContain('opencode')
     })
 
-    it('refuses to create one with the flag off, or on an engine that predates it', async () => {
+    it('refuses to create one on an engine that predates it', async () => {
         const create = () => send(list.POST, 'POST', '', { provider: 'opencode', apiKey: 'oc_sk_key' })
-        expect((await (await create()).json()).error).toBe('OpenCode is not available yet.')
-        opencodeEnabled = true
         engine.supportsOpencode.mockResolvedValue(false)
         expect((await (await create()).json()).error).toContain('next update of this machine')
         engine.supportsOpencode.mockResolvedValue(true)
@@ -203,7 +191,6 @@ describe('OpenCode', () => {
 
     // An iOS build that predates OpenCode parses the provider strictly and would drop the whole list.
     it('stays out of the list an older iOS build reads, or one that sends no header', async () => {
-        opencodeEnabled = true
         engine.listConnections.mockResolvedValue({ connections: [rerun, opencode], default: { connectionId: 'cnx-oc', model: 'go/deepseek-v4-pro' } })
         vi.stubEnv('MOBILE_IOS_OPENCODE_BUILD', '40')
         const ids = async (headers: Record<string, string>) => ((await (await send(list.GET, 'GET', '', undefined, {}, headers)).json()) as { connections: { id: string }[] }).connections.map(entry => entry.id)

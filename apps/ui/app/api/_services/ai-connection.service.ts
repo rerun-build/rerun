@@ -50,7 +50,6 @@ import { selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { BoxBackupModels, BoxConnection, BoxConnectionsList, BoxConnectionUsage, BoxDefault, CreateBoxConnectionInput, EngineConnection, UpdateBoxConnectionInput } from '@/lib/engine/types'
 import { providerKeyProblem } from '@/lib/engine/verify-provider-key'
 import { assertPublicUrl } from '@/lib/net/public-fetch'
-import { OPENCODE_ENABLED } from '@/lib/features'
 import { AppError, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 import { recipientLocale } from '@/lib/i18n/recipient-locale'
 import { translatorFor } from '@/lib/i18n/server-translator'
@@ -136,11 +135,10 @@ async function assertPublicBaseUrl(baseUrl: string | undefined): Promise<void> {
 // OpenCode runs inside the engine's own loop, so a machine on an older engine would store the key and
 // fail every run with it.
 export async function isOpencodeOffered(conn: EngineConnection | null | undefined): Promise<boolean> {
-    return OPENCODE_ENABLED && !!conn && (await supportsOpencode(conn))
+    return !!conn && (await supportsOpencode(conn))
 }
 
 export async function isOpencodeOfferedTo(workspaceId: number): Promise<boolean> {
-    if (!OPENCODE_ENABLED) return false
     return isOpencodeOffered((await findWorkspaceEngine(workspaceId))?.conn)
 }
 
@@ -154,8 +152,8 @@ export async function isCustomOfferedTo(workspaceId: number): Promise<boolean> {
     return isCustomOffered((await findWorkspaceEngine(workspaceId))?.conn)
 }
 
-// `opencodeOffered`: whether this workspace may add OpenCode, behind its flag and on an engine that
-// runs it. `customOffered`: whether its engine runs custom endpoints.
+// `opencodeOffered`: whether this workspace's engine runs OpenCode. `customOffered`: whether it runs
+// custom endpoints.
 export type AiConnectionsList = BoxConnectionsList & { opencodeOffered: boolean; customOffered: boolean }
 
 export async function listAiConnectionsWithOffers(workspaceId: number, { fresh = false }: { fresh?: boolean } = {}): Promise<AiConnectionsList> {
@@ -174,7 +172,6 @@ async function assertClaudePlanOffered(workspaceId: number, provider: CreateBoxC
 async function assertProviderOffered(provider: CreateBoxConnectionInput['provider'], conn: EngineConnection): Promise<void> {
     if (provider === 'custom' && !(await supportsCustomProvider(conn))) throw new ConnectionInputError('customNeedsUpdate')
     if (provider !== 'opencode') return
-    if (!OPENCODE_ENABLED) throw new ConnectionInputError('opencodeNotAvailable')
     if (!(await supportsOpencode(conn))) throw new ConnectionInputError('opencodeNeedsUpdate')
 }
 

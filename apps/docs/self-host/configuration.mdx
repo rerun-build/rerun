@@ -168,11 +168,10 @@ Coworkers can publish a file or a folder and share its link.
 
 See [Mobile app](/self-host/mobile).
 
-## Feature switches and tuning
+## Tuning
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `NEXT_PUBLIC_OPENCODE_ENABLED` | empty | `1` offers [OpenCode](/self-host/models#opencode) as an AI provider. It is read at build time and `docker-compose.yml` does not pass it to the build, so with docker compose it stays off. |
 | `ENGINE_CHAT_TIMEOUT_MS` | `3600000` (one hour) | How long the app waits on one chat call to an engine before giving up. |
 
 ## Set by docker compose

@@ -55,7 +55,6 @@ vi.mock('@rerun/cloud/billing', async () => ({
     ...(await vi.importActual<typeof import('@/ee/lib/billing/plans')>('@/ee/lib/billing/plans')),
     BILLING_ENABLED: true,
 }))
-vi.mock('@/lib/features', async importOriginal => ({ ...(await importOriginal<typeof import('@/lib/features')>()), OPENCODE_ENABLED: true }))
 vi.mock('@/lib/engine/client', async importOriginal => ({ ...(await importOriginal<EngineClient>()), ...engine }))
 vi.mock('@/lib/engine/verify-provider-key', () => ({ providerKeyProblem }))
 
