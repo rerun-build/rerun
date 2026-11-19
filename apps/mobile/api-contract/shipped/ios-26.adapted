@@ -1,0 +1,13 @@
+# This build parses the provider of a connection strictly and knows neither opencode nor custom. The hub
+# leaves them out of what it answers a build that does not know them: apps/ui/app/api/v1/_lib/legacy-client.ts
+# (aiConnectionsForClient, agentViewForClient, agentModelsForClient), tested in legacy-client.test.ts.
+GET /api/v1/agents/{id} added the new `custom` enum value to the `detail/config/provider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `custom` enum value to the `detail/resolvedProvider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `opencode` enum value to the `detail/config/provider` response property for the response status `200`
+GET /api/v1/agents/{id} added the new `opencode` enum value to the `detail/resolvedProvider` response property for the response status `200`
+GET /api/v1/agents/{id}/models added the new `custom` enum value to the `groups/items/provider` response property for the response status `200`
+GET /api/v1/agents/{id}/models added the new `opencode` enum value to the `groups/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `custom` enum value to the `addable/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `custom` enum value to the `connections/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `opencode` enum value to the `addable/items/provider` response property for the response status `200`
+GET /api/v1/ai-connections added the new `opencode` enum value to the `connections/items/provider` response property for the response status `200`

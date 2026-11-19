@@ -1,0 +1,125 @@
+{
+    "chunks": [
+        {
+            "type": "start",
+            "messageId": "message-1"
+        },
+        {
+            "type": "start-step"
+        },
+        {
+            "type": "reasoning-start",
+            "id": "r1"
+        },
+        {
+            "type": "reasoning-delta",
+            "id": "r1",
+            "delta": "Lyon first, then the email."
+        },
+        {
+            "type": "reasoning-end",
+            "id": "r1"
+        },
+        {
+            "type": "text-start",
+            "id": "t1"
+        },
+        {
+            "type": "text-delta",
+            "id": "t1",
+            "delta": "Looking for leads in Lyon."
+        },
+        {
+            "type": "text-end",
+            "id": "t1"
+        },
+        {
+            "type": "data-delegate",
+            "id": "call-leads",
+            "data": {
+                "tasks": [
+                    {
+                        "id": "task-1",
+                        "title": "Leads in Lyon",
+                        "status": "done"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "tool-input-available",
+            "toolCallId": "call-leads",
+            "toolName": "find_leads",
+            "input": {
+                "city": "Lyon"
+            }
+        },
+        {
+            "type": "tool-input-available",
+            "toolCallId": "call-email",
+            "toolName": "send_email",
+            "input": {
+                "to": "hello@maison-nord.fr"
+            }
+        },
+        {
+            "type": "tool-output-available",
+            "toolCallId": "call-leads",
+            "output": {
+                "leads": [
+                    {
+                        "name": "Maison Nord",
+                        "city": "Lyon"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "tool-output-error",
+            "toolCallId": "call-email",
+            "errorText": "The mailbox refused the address"
+        },
+        {
+            "type": "finish-step"
+        },
+        {
+            "type": "message-metadata",
+            "messageMetadata": {
+                "provider": "rerun",
+                "model": "rerun-max",
+                "usage": {}
+            }
+        },
+        {
+            "type": "start-step"
+        },
+        {
+            "type": "text-start",
+            "id": "t2"
+        },
+        {
+            "type": "text-delta",
+            "id": "t2",
+            "delta": "Found Maison Nord. The email did not go out."
+        },
+        {
+            "type": "text-end",
+            "id": "t2"
+        },
+        {
+            "type": "finish-step"
+        },
+        {
+            "type": "message-metadata",
+            "messageMetadata": {
+                "provider": "rerun",
+                "model": "rerun-max",
+                "usage": {}
+            }
+        },
+        {
+            "type": "finish",
+            "finishReason": "stop"
+        }
+    ]
+}
