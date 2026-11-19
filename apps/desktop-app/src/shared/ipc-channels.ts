@@ -38,6 +38,14 @@ export const IPC = {
     remoteComputerUnlink: 'rerun-shell:remote-computer:unlink',
     remoteComputerSetPaused: 'rerun-shell:remote-computer:set-paused',
     remoteComputerChooseWorkDir: 'rerun-shell:remote-computer:choose-work-dir',
+    coworkerDockPublish: 'rerun-shell:coworker-dock:publish',
+    coworkerDockGet: 'rerun-shell:coworker-dock:get',
+    coworkerDockOpen: 'rerun-shell:coworker-dock:open',
+    coworkerDockCreate: 'rerun-shell:coworker-dock:create',
+    coworkerDockDrop: 'rerun-shell:coworker-dock:drop',
+    coworkerDockSetCollapsed: 'rerun-shell:coworker-dock:set-collapsed',
+    coworkerDockShowMenu: 'rerun-shell:coworker-dock:show-menu',
+    coworkerDockSetInteractive: 'rerun-shell:coworker-dock:set-interactive',
 } as const
 
 export const IPC_EVENTS = {
@@ -52,6 +60,9 @@ export const IPC_EVENTS = {
     quickAskShortcut: 'rerun-shell:event:quick-ask-shortcut',
     quickAskHidden: 'rerun-shell:event:quick-ask-hidden',
     remoteComputerState: 'rerun-shell:event:remote-computer-state',
+    coworkerDockView: 'rerun-shell:event:coworker-dock-view',
+    coworkerDockOpen: 'rerun-shell:event:coworker-dock-open',
+    coworkerDockCreate: 'rerun-shell:event:coworker-dock-create',
 } as const
 
 export type AppBootstrap = {

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { QUICK_ASK_SHORTCUT } from '@rerun/contracts'
-import type { DesktopDownloadEvent, DesktopOAuthReturn, DesktopRemoteComputerState, DesktopRemoteLinkInput, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState, QuickAskShortcutKind, QuickAskShortcutResult } from '@rerun/contracts'
+import type { CoworkerDockView, DesktopDownloadEvent, DesktopOAuthReturn, DesktopRemoteComputerState, DesktopRemoteLinkInput, DesktopSettings, DesktopShellApi, DesktopSignInResult, DesktopUpdateState, DesktopWindowState, QuickAskShortcutKind, QuickAskShortcutResult } from '@rerun/contracts'
 import { IPC, IPC_EVENTS, type FindRequest, type FindResult, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 
 // Runs before any script of the page, in an isolated world, in the main frame only. It asks the
@@ -61,7 +61,7 @@ if (bootstrap?.audience === 'app') {
         },
         settings: {
             get: () => ipcRenderer.invoke(IPC.settingsGet) as Promise<DesktopSettings>,
-            set: (patch) => ipcRenderer.invoke(IPC.settingsSet, { openAtLogin: patch.openAtLogin, closeToTray: patch.closeToTray, quickAsk: patch.quickAsk }) as Promise<DesktopSettings>,
+            set: (patch) => ipcRenderer.invoke(IPC.settingsSet, { openAtLogin: patch.openAtLogin, closeToTray: patch.closeToTray, quickAsk: patch.quickAsk, coworkerDock: patch.coworkerDock }) as Promise<DesktopSettings>,
         },
         locale: {
             set: (locale) => void ipcRenderer.invoke(IPC.localeSet, String(locale)),
@@ -86,6 +86,29 @@ if (bootstrap?.audience === 'app') {
                 return unsubscribe
             },
             onHidden: (callback) => subscribe<void>(IPC_EVENTS.quickAskHidden, () => callback()),
+        },
+        coworkerDock: {
+            publish: (state) =>
+                void ipcRenderer.invoke(
+                    IPC.coworkerDockPublish,
+                    state
+                        ? {
+                              coworkers: state.coworkers.map((coworker) => ({ id: String(coworker.id), name: String(coworker.name), mood: String(coworker.mood), pending: Number(coworker.pending) || 0 })),
+                              createBlockedReason: typeof state.createBlockedReason === 'string' ? state.createBlockedReason : null,
+                          }
+                        : null,
+                ),
+            onOpen: (callback) => subscribe<string>(IPC_EVENTS.coworkerDockOpen, callback),
+            onCreate: (callback) => subscribe<void>(IPC_EVENTS.coworkerDockCreate, () => callback()),
+            get: () => ipcRenderer.invoke(IPC.coworkerDockGet) as Promise<CoworkerDockView>,
+            onChange: (callback) => subscribe<CoworkerDockView>(IPC_EVENTS.coworkerDockView, callback),
+            open: (agentId) => void ipcRenderer.invoke(IPC.coworkerDockOpen, String(agentId)),
+            create: () => void ipcRenderer.invoke(IPC.coworkerDockCreate),
+            drop: (point) => void ipcRenderer.invoke(IPC.coworkerDockDrop, { x: Number(point.x), y: Number(point.y) }),
+            setCollapsed: (collapsed) => void ipcRenderer.invoke(IPC.coworkerDockSetCollapsed, collapsed === true),
+            showMenu: () => void ipcRenderer.invoke(IPC.coworkerDockShowMenu),
+            setInteractive: (interactive, rect) =>
+                void ipcRenderer.invoke(IPC.coworkerDockSetInteractive, interactive === true, rect ? { x: Number(rect.x), y: Number(rect.y), width: Number(rect.width), height: Number(rect.height) } : undefined),
         },
         remoteComputer: {
             getState: () => ipcRenderer.invoke(IPC.remoteComputerGetState) as Promise<DesktopRemoteComputerState>,

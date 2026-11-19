@@ -26,7 +26,10 @@
         "tray.quickAsk": "Tray menu item opening the small window where the person types a question for the Chief of Staff (the workspace assistant), from any app.",
         "tray.quickAskVoice": "Menu item of the desktop app (File menu and the menu bar icon) that opens Quick ask listening to the person's voice. Quick ask is a small window to ask the workspace assistant from any app.",
         "computer.trayOnline": "A disabled line of the menu-bar / tray menu: the state of this computer, linked to Rerun so coworkers can run commands on it.",
-        "computer.pause": "Menu item, title case like the other menu items. Stops coworkers from using this computer until resumed."
+        "computer.pause": "Menu item, title case like the other menu items. Stops coworkers from using this computer until resumed.",
+        "dock.collapse": "Item of the right-click menu of the coworker dock (a small bar of coworker avatars on the edge of the screen): folds it into a small tab.",
+        "dock.moveLeft": "Item of the right-click menu of the coworker dock: moves the bar to the left edge of the screen.",
+        "dock.hide": "Item of the right-click menu of the coworker dock: turns the dock off (it can be turned back on in the settings)."
     },
     "menu": {
         "app": {
@@ -153,5 +156,12 @@
         "quitWithJobsDetail": "Quitting Rerun stops it. Close the window instead to keep it running.",
         "quitAnyway": "Quit Anyway",
         "keepRunning": "Keep Running"
+    },
+    "dock": {
+        "collapse": "Collapse",
+        "expand": "Expand",
+        "moveLeft": "Move to Left Edge",
+        "moveRight": "Move to Right Edge",
+        "hide": "Hide Dock"
     }
 }

@@ -13,7 +13,7 @@ export type DesktopShellPlatform = (typeof DESKTOP_SHELL_PLATFORMS)[number]
 export const DESKTOP_SHELL_CHANNELS = ['stable', 'staging', 'dev'] as const
 export type DesktopShellChannel = (typeof DESKTOP_SHELL_CHANNELS)[number]
 
-export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut', 'remoteComputer'] as const
+export const DESKTOP_SHELL_CAPABILITIES = ['window', 'find', 'links', 'update', 'auth', 'downloads', 'oauth', 'notifications', 'badge', 'settings', 'locale', 'quickAsk', 'server', 'quickAskShortcut', 'quickAskVoice', 'quickAskVoiceShortcut', 'remoteComputer', 'coworkerDock'] as const
 export type DesktopShellCapability = (typeof DESKTOP_SHELL_CAPABILITIES)[number]
 
 // Appended to the browser's User-Agent by the shell: `RerunDesktop/0.1.0 (mac; stable)`. The server
@@ -114,6 +114,8 @@ export type DesktopSettings = {
     quickAskShortcut?: string | null
     // The shortcut that opens Quick ask listening, or null when off. `quickAskVoiceShortcut` capability.
     quickAskVoiceShortcut?: string | null
+    // The coworker dock on the edge of the screen. `coworkerDock` capability.
+    coworkerDock?: boolean
 }
 
 // `taken`: the system or another app holds the keys, the previous shortcut stays. `invalid`: not a
@@ -126,6 +128,27 @@ export const QUICK_ASK_PATH = '/quick-ask'
 // Electron's accelerator syntax: ⌘⇧Space on macOS, Ctrl+Shift+Space elsewhere. The shortcut every
 // shell shipped with; a person can now change it (`DesktopSettings.quickAskShortcut`).
 export const QUICK_ASK_SHORTCUT = 'CommandOrControl+Shift+Space'
+
+// The page the coworker dock window shows: a rail on the edge of the screen, one buddy per coworker.
+export const COWORKER_DOCK_PATH = '/coworker-dock'
+
+export const COWORKER_DOCK_MOODS = ['idle', 'working', 'error', 'waiting', 'asleep'] as const
+export type CoworkerDockMood = (typeof COWORKER_DOCK_MOODS)[number]
+
+// `pending` counts what the coworker has for the person (an unread answer, a question, an approval),
+// the same items the badge of the app icon adds up.
+export type CoworkerDockCoworker = { id: string; name: string; mood: CoworkerDockMood; pending: number }
+
+// Published by the main window; null once it shows no workspace (signed out, another page) or a
+// workspace without coworkers. `createBlockedReason`: why "+" is disabled (a paused workspace), as
+// the main window says it.
+export type CoworkerDockState = { coworkers: CoworkerDockCoworker[]; createBlockedReason?: string | null } | null
+
+export type CoworkerDockEdge = 'left' | 'right'
+
+// What the dock window draws: the coworkers, and where the person put the rail. `y` is the middle of
+// the rail, from 0 (top of the screen) to 1 (bottom).
+export type CoworkerDockView = { state: CoworkerDockState; edge: CoworkerDockEdge; y: number; collapsed: boolean }
 
 // This computer as the app sees it: the workspaces it is linked to and how each link is doing.
 export type DesktopRemoteLinkStatus = 'connecting' | 'online' | 'offline' | 'revoked'
@@ -246,6 +269,27 @@ export type DesktopShellApi = {
         // (the text shortcut, the tray, a click elsewhere). A hidden page is not told otherwise: it
         // stops listening.
         onHidden(callback: () => void): Unsubscribe
+    }
+    // Only with the `coworkerDock` capability.
+    coworkerDock?: {
+        // Main window: what the dock shows, sent again on every change.
+        publish(state: CoworkerDockState): void
+        // Main window: a coworker of the dock was clicked, the shell already brought the window up.
+        onOpen(callback: (agentId: string) => void): Unsubscribe
+        // Main window: the "+" of the dock was clicked.
+        onCreate(callback: () => void): Unsubscribe
+        // Dock window.
+        get(): Promise<CoworkerDockView>
+        onChange(callback: (view: CoworkerDockView) => void): Unsubscribe
+        open(agentId: string): void
+        create(): void
+        // The rail was let go at this point of the screen: the shell picks the display and the edge.
+        drop(point: { x: number; y: number }): void
+        setCollapsed(collapsed: boolean): void
+        showMenu(): void
+        // The window lets clicks through to the apps under it, except over the rail. `rect` is the
+        // rail, in the window's coordinates.
+        setInteractive(interactive: boolean, rect?: { x: number; y: number; width: number; height: number }): void
     }
     // Only with the `remoteComputer` capability.
     remoteComputer?: {

@@ -34,9 +34,10 @@ export default async function launchScenario({ app, page, step, base }) {
     check(new URL(second.url()).pathname !== '/auth', 'the second window shares the session: signed in')
     check((await second.evaluate(() => window.rerunShell?.apiVersion)) === 1, 'the bridge is there too')
     check((await second.evaluate(() => sessionStorage.getItem('rerun:e2e-window'))) === null, 'each window keeps its own tab state (its workspace)')
-    const bounds = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id).map((window) => window.getBounds()))
+    // The coworker dock is a window of the app too: the counts leave it out.
+    const bounds = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).sort((a, b) => a.id - b.id).map((window) => window.getBounds()))
     check(bounds.length === 2 && bounds[1].x > bounds[0].x, 'the new window cascades from the first')
     await step('second window', { target: second })
-    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id)[1].close())
-    await waitUntil(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length), (count) => count === 1, 'closing it leaves the main window')
+    await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).sort((a, b) => a.id - b.id)[1].close())
+    await waitUntil(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).length), (count) => count === 1, 'closing it leaves the main window')
 }

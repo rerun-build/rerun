@@ -21,7 +21,8 @@ async function waitUntil(read, predicate, message, timeoutMs = 20_000) {
     throw new Error(`Timed out: ${message} (last value: ${JSON.stringify(value)})`)
 }
 
-const windowUrls = (app) => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id).map((window) => window.webContents.getURL()))
+// The coworker dock is a window of the app too: the counts leave it out.
+const windowUrls = (app) => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).sort((a, b) => a.id - b.id).map((window) => window.webContents.getURL()))
 
 export default async function linksScenario({ app, page, step, base }) {
     await page.goto(base)
@@ -51,7 +52,7 @@ export default async function linksScenario({ app, page, step, base }) {
     check(urls[0].startsWith(base), 'the main window stays on the app')
     check(!(await opened()).some((url) => url.includes('checkout.stripe.com')), 'Checkout does not leave for the browser')
     await app.evaluate(async ({ BrowserWindow }, target) => {
-        const payment = BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id).at(-1)
+        const payment = BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).sort((a, b) => a.id - b.id).at(-1)
         await payment.webContents.executeJavaScript(`location.href = ${JSON.stringify(target)}`).catch(() => {})
     }, `${base}/?billing=success`)
     await waitUntil(() => windowUrls(app), (list) => list.length === before, 'the payment window closes when Stripe sends the person back')
@@ -62,7 +63,7 @@ export default async function linksScenario({ app, page, step, base }) {
     await page.evaluate((url) => window.open(url, '_blank'), `${base}/api/version`)
     await waitUntil(() => windowUrls(app), (list) => list.length === before + 1, 'a same-origin page opens in a child window')
     await app.evaluate(async ({ BrowserWindow }) => {
-        const child = BrowserWindow.getAllWindows().sort((a, b) => a.id - b.id).at(-1)
+        const child = BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).sort((a, b) => a.id - b.id).at(-1)
         await child.webContents.executeJavaScript(`location.href = 'https://published.example.rerun.site/?ticket=abc'`).catch(() => {})
     })
     await waitUntil(opened, (list) => list.includes('https://published.example.rerun.site/?ticket=abc'), 'the published page opens in the browser')

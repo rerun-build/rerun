@@ -124,5 +124,12 @@
         "quitWithJobsDetail": "Quitter Rerun l'arrête. Fermez plutôt la fenêtre pour le laisser tourner.",
         "quitAnyway": "Quitter quand même",
         "keepRunning": "Laisser tourner"
+    },
+    "dock": {
+        "collapse": "Replier",
+        "expand": "Déplier",
+        "moveLeft": "Placer sur le bord gauche",
+        "moveRight": "Placer sur le bord droit",
+        "hide": "Masquer le dock"
     }
 }

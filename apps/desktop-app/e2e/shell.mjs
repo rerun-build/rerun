@@ -78,11 +78,12 @@ export default async function shellScenario({ app, page, step, base }) {
     })
     await page.waitForTimeout(500)
     check(page.url() === before && !(await opened()).some((url) => url.startsWith('file:')), 'a file:// link goes nowhere')
-    const idsBefore = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().map((window) => window.id))
+    // The coworker dock is a window of the app too: the counts leave it out.
+    const idsBefore = await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).map((window) => window.id))
     await page.evaluate(() => window.open('about:blank', 'rerun-sign-in', 'popup=yes,width=500,height=640'))
-    await waitUntil(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length), (count) => count === idsBefore.length + 1, 'a blank popup stays a child window of the app')
+    await waitUntil(() => app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).length), (count) => count === idsBefore.length + 1, 'a blank popup stays a child window of the app')
     check(true, 'a sign-in popup opens as a child window in the app')
-    await app.evaluate(({ BrowserWindow }, ids) => BrowserWindow.getAllWindows().filter((window) => !ids.includes(window.id)).forEach((window) => window.destroy()), idsBefore)
+    await app.evaluate(({ BrowserWindow }, ids) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).filter((window) => !ids.includes(window.id)).forEach((window) => window.destroy()), idsBefore)
 
     // 4. Permissions: what the app uses, nothing else.
     const permissions = await page.evaluate(async () => {
@@ -160,6 +161,6 @@ export default async function shellScenario({ app, page, step, base }) {
     const appPath = await app.evaluate(({ app: electronApp }) => electronApp.getAppPath())
     const second = spawnSync(electronPath, [appPath], { env: { ...process.env, RERUN_DESKTOP_USER_DATA: userData, RERUN_DESKTOP_URL: base }, timeout: 20_000 })
     check(second.status === 0, `a second instance exits at once (status ${second.status})`)
-    check((await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().length)) === 1, 'the first instance keeps its single window')
+    check((await app.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows().filter((window) => !window.webContents.getURL().endsWith('/coworker-dock')).length)) === 1, 'the first instance keeps its single window')
     check(existsSync(userData), 'the run used its own data folder')
 }

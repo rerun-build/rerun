@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain, session as electronSession } from 'electro
 import { isDesktopOpenPath, type DesktopNotification, type DesktopSettings, type DesktopUpdateState } from '@rerun/contracts'
 import { IPC, type FindRequest, type ServerConnectResult, type ServerInfo, type ShellBootstrap } from '../shared/ipc-channels'
 import { completeFromPastedCode, startBrowserSignIn } from './browser-sign-in'
+import { coworkerDockHandlers, resetCoworkerDock } from './coworker-dock'
 import { showDownload } from './downloads'
 import { closeFindBar, find, openFindBar } from './find-bar'
 import { bootstrapPayload, shellPlatform } from './identity'
@@ -51,7 +52,7 @@ export function registerIpcHandlers(): void {
     )
     handle(IPC.badgeSet, ['app'], (_event, count: number) => setBadge(Number(count)))
     handle(IPC.settingsGet, ['app'], () => desktopSettings())
-    handle(IPC.settingsSet, ['app'], (_event, patch: Partial<DesktopSettings>) => changeDesktopSettings({ openAtLogin: patch?.openAtLogin, closeToTray: patch?.closeToTray, quickAsk: patch?.quickAsk }))
+    handle(IPC.settingsSet, ['app'], (_event, patch: Partial<DesktopSettings>) => changeDesktopSettings({ openAtLogin: patch?.openAtLogin, closeToTray: patch?.closeToTray, quickAsk: patch?.quickAsk, coworkerDock: patch?.coworkerDock }))
     handle(IPC.serverOpenPicker, ['app'], () => showServerPicker())
     handle(IPC.quickAskClose, ['app'], () => hideQuickAsk())
     handle(IPC.quickAskSent, ['app'], (_event, path: string) => {
@@ -66,6 +67,14 @@ export function registerIpcHandlers(): void {
     handle(IPC.quickAskHold, ['app'], (_event, busy: unknown) => holdQuickAsk(busy === true))
     handle(IPC.quickAskOpenMicrophoneSettings, ['app'], () => openMicrophoneSettings())
     handle(IPC.quickAskTakePending, ['app'], () => takePendingQuickAsk())
+    handle(IPC.coworkerDockPublish, ['app'], coworkerDockHandlers.publish)
+    handle(IPC.coworkerDockGet, ['app'], coworkerDockHandlers.get)
+    handle(IPC.coworkerDockOpen, ['app'], coworkerDockHandlers.open)
+    handle(IPC.coworkerDockCreate, ['app'], coworkerDockHandlers.create)
+    handle(IPC.coworkerDockDrop, ['app'], coworkerDockHandlers.drop)
+    handle(IPC.coworkerDockSetCollapsed, ['app'], coworkerDockHandlers.setCollapsed)
+    handle(IPC.coworkerDockShowMenu, ['app'], coworkerDockHandlers.showMenu)
+    handle(IPC.coworkerDockSetInteractive, ['app'], coworkerDockHandlers.setInteractive)
     handle(IPC.localeSet, ['app'], (_event, locale: string) => setShellLocale(String(locale).slice(0, 16)))
 
     handle(IPC.localFind, ['local'], (_event, request: FindRequest) => find({ text: String(request?.text ?? '').slice(0, 500), forward: request?.forward !== false, findNext: !!request?.findNext }))
@@ -98,6 +107,7 @@ export function registerIpcHandlers(): void {
         // Answered before the window that asked is replaced.
         setTimeout(() => {
             resetQuickAsk()
+            resetCoworkerDock()
             replaceMainWindow(origin)
         }, 50)
         return { ok: true }

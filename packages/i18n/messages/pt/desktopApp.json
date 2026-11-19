@@ -124,5 +124,12 @@
         "quitWithJobsDetail": "Sair do Rerun interrompe a tarefa. Feche a janela para deixá-la rodando.",
         "quitAnyway": "Sair mesmo assim",
         "keepRunning": "Continuar rodando"
+    },
+    "dock": {
+        "collapse": "Recolher",
+        "expand": "Expandir",
+        "moveLeft": "Mover para a borda esquerda",
+        "moveRight": "Mover para a borda direita",
+        "hide": "Ocultar dock"
     }
 }

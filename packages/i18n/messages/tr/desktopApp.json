@@ -124,5 +124,12 @@
         "quitWithJobsDetail": "Rerun'dan çıkmak işi durdurur. Çalışmaya devam etmesi için bunun yerine pencereyi kapatın.",
         "quitAnyway": "Yine de Çık",
         "keepRunning": "Çalışmaya Devam Et"
+    },
+    "dock": {
+        "collapse": "Daralt",
+        "expand": "Genişlet",
+        "moveLeft": "Sol Kenara Taşı",
+        "moveRight": "Sağ Kenara Taşı",
+        "hide": "Dock'u Gizle"
     }
 }

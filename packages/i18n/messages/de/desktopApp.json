@@ -124,5 +124,12 @@
         "quitWithJobsDetail": "Rerun zu beenden stoppt ihn. Schließ lieber das Fenster, damit er weiterläuft.",
         "quitAnyway": "Trotzdem beenden",
         "keepRunning": "Weiterlaufen lassen"
+    },
+    "dock": {
+        "collapse": "Einklappen",
+        "expand": "Ausklappen",
+        "moveLeft": "An den linken Rand",
+        "moveRight": "An den rechten Rand",
+        "hide": "Dock ausblenden"
     }
 }

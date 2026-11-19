@@ -8,6 +8,8 @@ import trayColor from '../../resources/tray/tray.png?asset'
 import trayTemplate from '../../resources/tray/trayTemplate.png?asset'
 import trayTemplate2x from '../../resources/tray/trayTemplate@2x.png?asset'
 import { IPC_EVENTS } from '../shared/ipc-channels'
+import { setCoworkerDockEnabled } from './coworker-dock'
+import { storedDockPlacement } from './coworker-dock-placement'
 import { PRODUCT_NAME, shellPlatform } from './identity'
 import { getMainWindow, showMainWindow } from './main-window'
 import { t } from './messages'
@@ -93,6 +95,7 @@ export function desktopSettings(): DesktopSettings {
         quickAsk: shortcut !== null,
         quickAskShortcut: shortcut,
         quickAskVoiceShortcut: storedQuickAskVoiceShortcut(settings),
+        coworkerDock: storedDockPlacement(settings.coworkerDock).enabled,
     }
 }
 
@@ -103,6 +106,10 @@ export function changeDesktopSettings(patch: Partial<DesktopSettings>): DesktopS
         applyOpenAtLogin(next.openAtLogin)
     }
     if (typeof patch.closeToTray === 'boolean') next.closeToTray = patch.closeToTray
+    if (typeof patch.coworkerDock === 'boolean' && patch.coworkerDock !== next.coworkerDock) {
+        next.coworkerDock = patch.coworkerDock
+        setCoworkerDockEnabled(patch.coworkerDock)
+    }
     updateSettings({ openAtLogin: next.openAtLogin, closeToTray: next.closeToTray })
     // The switch of the web apps that predate the recorder: off clears the shortcut, on restores the default.
     if (typeof patch.quickAsk === 'boolean' && patch.quickAsk !== next.quickAsk) return changeQuickAskShortcut('text', patch.quickAsk ? defaultQuickAskAccelerator(shellPlatform()) : null).settings

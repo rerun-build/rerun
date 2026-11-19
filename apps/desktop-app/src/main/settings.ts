@@ -23,7 +23,11 @@ export type ShellSettings = {
     explainedTray?: boolean
     // This computer, as the coworkers of the linked workspaces use it.
     remoteComputer?: { paused?: boolean; workDir?: string }
+    // The coworker dock: on unless turned off, and where the person put it.
+    coworkerDock?: StoredCoworkerDock
 }
+
+export type StoredCoworkerDock = { enabled?: boolean; edge?: 'left' | 'right'; y?: number; displayId?: number; collapsed?: boolean }
 
 const FILE_NAME = 'settings.json'
 

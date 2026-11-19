@@ -124,5 +124,12 @@
         "quitWithJobsDetail": "Salir de Rerun lo detiene. Cierra la ventana para que siga.",
         "quitAnyway": "Salir de todos modos",
         "keepRunning": "Seguir ejecutando"
+    },
+    "dock": {
+        "collapse": "Contraer",
+        "expand": "Expandir",
+        "moveLeft": "Mover al borde izquierdo",
+        "moveRight": "Mover al borde derecho",
+        "hide": "Ocultar dock"
     }
 }
