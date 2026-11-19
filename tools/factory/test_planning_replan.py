@@ -8,20 +8,25 @@ OLD = {"agent": T.P1, "intent": "1970-01-01T00:00:00Z", "resent": '["plan"]', "r
 
 
 class Rig(T.Rig):
-    def __init__(self, refuse=(), **kw):
+    def __init__(self, refuse=(), refuse_comment=0, **kw):
         super().__init__(**kw)
         self.refuse = set(refuse)
+        self.refuse_comment = refuse_comment
 
     def gh(self, args):
+        if args[:2] == ["issue", "comment"] and self.refuse_comment:
+            self.refuse_comment -= 1
+            self.calls.append(list(args))
+            raise RuntimeError("HTTP 502")
         if args[:2] == ["issue", "edit"] and "--remove-label" in args and args[args.index("--remove-label") + 1] in self.refuse:
             self.calls.append(list(args))
             raise RuntimeError("HTTP 502")
         return super().gh(args)
 
 
-def rig(labels, state, refuse=(), children=None):
+def rig(labels, state, refuse=(), children=None, refuse_comment=0):
     T.BACKLOG[:] = [{"number": 12, "title": "T12", "labels": [{"name": n} for n in labels], "createdAt": "2026-11-05T00:00:00Z"}]
-    r = Rig(refuse=refuse, children=children)
+    r = Rig(refuse=refuse, children=children, refuse_comment=refuse_comment)
     for k, v in dict(OLD, state=state).items():
         r.store.set("plan:12", k, v)
     return r
@@ -100,6 +105,85 @@ class Replan(unittest.TestCase):
         self.assertEqual(removed(r), [planning.REPLAN])
         self.assertEqual(r.sends, [])
         self.assertEqual(r.store.get_all("plan:12")["run"], "run9")
+
+
+def notes_of(r):
+    return [c[c.index("--body") + 1] for c in r.calls if c[:2] == ["issue", "comment"]]
+
+
+class Waiting(unittest.TestCase):
+    def setUp(self):
+        self.saved = list(T.BACKLOG)
+
+    def tearDown(self):
+        T.BACKLOG[:] = self.saved
+
+    def test_a_waiting_label_says_why_once(self):
+        r = rig(["P0", planning.REPLAN, "factory-question"], "blocked")
+        r.station.once(1)
+        r.station.once(6)
+        said = notes_of(r)
+        self.assertEqual(len(said), 1)
+        self.assertIn("factory-question", said[0])
+
+    def test_each_reason_is_said(self):
+        cases = ((["P0", planning.REPLAN], "planned", {}, "in progress"),
+                 (["P0", planning.REPLAN], "cut", {12: [{"number": 101, "body": "**Part of**: #12"}]}, "#101"))
+        for labels, state, children, word in cases:
+            r = rig(labels, state, children=children)
+            r.station.once(1)
+            self.assertEqual(len(notes_of(r)), 1, state)
+            self.assertIn(word, notes_of(r)[0])
+
+    def test_a_new_reason_is_said_again(self):
+        r = rig(["P0", planning.REPLAN, "factory-question"], "blocked")
+        r.station.once(1)
+        T.BACKLOG[0]["labels"] = [{"name": n} for n in ("P0", planning.REPLAN, "duplicate")]
+        r.station.once(6)
+        self.assertEqual(len(notes_of(r)), 2)
+
+    def test_a_replan_that_runs_posts_no_note_and_forgets_old_ones(self):
+        r = rig(["P0", planning.REPLAN], "blocked")
+        r.store.set("replan:12", "said:progress", "1")
+        r.station.once(1)
+        self.assertEqual(notes_of(r), [])
+        self.assertEqual(r.store.get_all("replan:12"), {})
+
+    def test_a_closing_child_posts_nothing_new(self):
+        kids = {12: [{"number": 102, "body": "**Part of**: #12"}, {"number": 101, "body": "**Part of**: #12"}]}
+        r = rig(["P0", planning.REPLAN], "cut", children=kids)
+        r.station.once(1)
+        self.assertIn("#101, #102", notes_of(r)[0])
+        kids[12].pop(0)
+        r.station.once(6)
+        self.assertEqual(len(notes_of(r)), 1)
+
+    def test_a_reason_that_comes_back_is_not_said_twice(self):
+        r = rig(["P0", planning.REPLAN, "factory-question"], "blocked")
+        r.station.once(1)
+        T.BACKLOG[0]["labels"] = [{"name": n} for n in ("P0", planning.REPLAN, "duplicate")]
+        r.station.once(6)
+        T.BACKLOG[0]["labels"] = [{"name": n} for n in ("P0", planning.REPLAN, "factory-question")]
+        r.station.once(11)
+        self.assertEqual(len(notes_of(r)), 2)
+
+    def test_a_note_that_failed_is_posted_next_time(self):
+        r = rig(["P0", planning.REPLAN, "duplicate"], "blocked", refuse_comment=1)
+        r.station.once(1)
+        r.station.once(6)
+        self.assertEqual(len(notes_of(r)), 2)
+        self.assertEqual(r.store.get_all("replan:12"), {"said:labels:duplicate": "1"})
+
+    def test_held_sends_are_logged(self):
+        import io, contextlib
+        r = rig(["P0"], "unsent")
+        r.cfg["held"] = True
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            r.station.once(1)
+            r.station.once(6)
+        self.assertEqual(r.sends, [])
+        self.assertEqual(out.getvalue().count("planning: sends held"), 1)
 
 
 if __name__ == "__main__":
