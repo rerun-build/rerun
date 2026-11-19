@@ -46,6 +46,10 @@
             "silent": {
                 "name": "Finished tasks",
                 "description": "When a coworker finishes a task, without a sound."
+            },
+            "crew": {
+                "name": "Crew at work",
+                "description": "Who is at work and who needs you, kept at the top while it lasts."
             }
         },
         "scopeTitle": "Notify me about",

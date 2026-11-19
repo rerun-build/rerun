@@ -46,6 +46,10 @@
             "silent": {
                 "name": "Erledigte Aufgaben",
                 "description": "Wenn ein Coworker eine Aufgabe erledigt, ohne Ton."
+            },
+            "crew": {
+                "name": "Team bei der Arbeit",
+                "description": "Wer arbeitet und wer dich braucht, oben gehalten, solange es dauert."
             }
         },
         "scopeTitle": "Benachrichtige mich über",

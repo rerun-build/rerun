@@ -46,6 +46,10 @@
             "silent": {
                 "name": "Tareas terminadas",
                 "description": "Cuando un coworker termina una tarea, sin sonido."
+            },
+            "crew": {
+                "name": "Equipo trabajando",
+                "description": "Quién trabaja y quién te necesita, arriba mientras dure."
             }
         },
         "scopeTitle": "Notificarme sobre",

@@ -1,11 +1,15 @@
 import { AppState, Platform } from 'react-native'
 
+import { translatorFor } from '@/i18n/translator'
+
 import CrewActivity from './CrewActivity'
 import type { CrewWidgetProps } from './crew-props'
+import { LiveUpdate } from './live-update'
 
-// What the Live Activity should do with the crew the app just read: one activity for the whole crew,
-// up while someone works or waits, gone once nobody does. iOS only lets an app in the foreground start
-// one; the background refresh of a push can update or end it.
+// What the live surface (the Live Activity on iOS, the Live Update on Android) should do with the crew
+// the app just read: one for the whole crew, up while someone works or waits, gone once nobody does.
+// It starts with the app in the foreground only, which iOS requires and Android follows so that it
+// never appears out of nowhere; the background refresh of a push can update or end it.
 export type ActivityStep = 'start' | 'update' | 'end' | 'none'
 
 export function activityStepOf(props: CrewWidgetProps, running: boolean, foreground: boolean): ActivityStep {
@@ -15,7 +19,22 @@ export function activityStepOf(props: CrewWidgetProps, running: boolean, foregro
     return foreground ? 'start' : 'none'
 }
 
+// Android 16 shows the chip in the status bar only while someone waits, and only a few characters of it.
+async function syncLiveUpdate(props: CrewWidgetProps): Promise<void> {
+    if (!LiveUpdate) return
+    const step = activityStepOf(props, await LiveUpdate.isShowing(), AppState.currentState === 'active')
+    if (step === 'end') return LiveUpdate.end()
+    if (step === 'none') return
+    const focus = props.members[0]
+    const asking = focus?.state === 'waiting'
+    await LiveUpdate.show(
+        { title: asking ? props.asksLine : (focus?.name ?? props.headline), text: [focus?.line, props.othersLine].filter(Boolean).join(' · '), chip: asking ? props.needsYouLabel : null, url: focus?.url ?? 'rerun://' },
+        translatorFor('mobileSettings')('notifications.channels.crew.name')
+    )
+}
+
 export async function syncCrewActivity(props: CrewWidgetProps): Promise<void> {
+    if (Platform.OS === 'android') return syncLiveUpdate(props).catch(error => console.warn('[live update] not updated', error))
     if (Platform.OS !== 'ios') return
     try {
         const [current, ...strays] = CrewActivity.getInstances()

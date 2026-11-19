@@ -1,5 +1,5 @@
 import type { CrewWidgetMember, CrewWidgetProps } from './crew-props'
-import { activityStepOf } from './live-activity'
+import { activityStepOf, syncCrewActivity } from './live-activity'
 
 jest.mock('./CrewActivity', () => ({ __esModule: true, default: {} }))
 
@@ -20,5 +20,32 @@ describe('activityStepOf', () => {
         expect(activityStepOf(crew(), true, false)).toBe('end')
         expect(activityStepOf(crew('error'), true, true)).toBe('end')
         expect(activityStepOf(crew('error'), false, true)).toBe('none')
+    })
+})
+
+const mockLiveUpdate = { show: jest.fn(async () => {}), isShowing: jest.fn(async () => false), end: jest.fn(async () => {}) }
+// Read when the code runs: the factory itself runs before this file's constants exist.
+jest.mock('./live-update', () => ({
+    get LiveUpdate() {
+        return mockLiveUpdate
+    },
+}))
+
+describe('the Live Update on Android', () => {
+    const { Platform } = jest.requireActual('react-native') as typeof import('react-native')
+    const onAndroid = Platform.OS === 'android' ? it : it.skip
+
+    onAndroid('keeps whoever waits on top, with the chip, and opens its conversation', async () => {
+        mockLiveUpdate.isShowing.mockResolvedValueOnce(true)
+        const props = { ...crew('waiting', 'working'), asksLine: 'Closer asks', needsYouLabel: 'Needs you', othersLine: '+1 at work' }
+        props.members[0] = { ...props.members[0], line: 'Approve 12 emails', url: 'rerun://chat/conv-1?to=closer' }
+        await syncCrewActivity(props)
+        expect(mockLiveUpdate.show).toHaveBeenCalledWith({ title: 'Closer asks', text: 'Approve 12 emails · +1 at work', chip: 'Needs you', url: 'rerun://chat/conv-1?to=closer' }, 'Crew at work')
+    })
+
+    onAndroid('takes it down once nobody works nor waits', async () => {
+        mockLiveUpdate.isShowing.mockResolvedValueOnce(true)
+        await syncCrewActivity(crew())
+        expect(mockLiveUpdate.end).toHaveBeenCalled()
     })
 })

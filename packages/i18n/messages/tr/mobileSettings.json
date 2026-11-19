@@ -46,6 +46,10 @@
             "silent": {
                 "name": "Biten görevler",
                 "description": "Bir coworker bir görevi bitirdiğinde, sessizce."
+            },
+            "crew": {
+                "name": "Çalışan ekip",
+                "description": "Kimin çalıştığı ve kimin sizi beklediği, sürdüğü sürece en üstte."
             }
         },
         "scopeTitle": "Şunlar için bildir",
