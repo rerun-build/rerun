@@ -1,4 +1,3 @@
-import { pushDataSchema, type PushData } from '@rerun/contracts'
 import { getLocales } from 'expo-localization'
 import * as Notifications from 'expo-notifications'
 import * as TaskManager from 'expo-task-manager'
@@ -18,20 +17,10 @@ const PUSH_TASK = 'rerun-push'
 // widget refreshed there is worded in it. The account's own choice takes over once the app opens.
 setCurrentLocale(appLocaleOf(null, getLocales().map(locale => locale.languageTag)))
 
-// A headless push carries its data as a JSON string, a shown one as the notification's content.
-function pushDataOfTask(payload: Notifications.NotificationTaskPayload): PushData | null {
-    const record = payload as { data?: { dataString?: unknown }; notification?: { request?: { content?: { data?: unknown } } } | null }
-    const raw = record.data?.dataString
-    try {
-        const parsed = pushDataSchema.safeParse(typeof raw === 'string' ? JSON.parse(raw) : record.notification?.request?.content?.data)
-        return parsed.success ? parsed.data : null
-    } catch {
-        return null
-    }
-}
-
-async function refreshFromPush(data: PushData | null): Promise<void> {
-    const caller = await backgroundCaller(data?.workspaceId)
+// The widgets show the workspace this phone is on, whichever workspace the push came from: their
+// links open in the app, which answers for no other.
+async function refreshFromPush(): Promise<void> {
+    const caller = await backgroundCaller(undefined)
     if (caller) await refreshWidgets(caller)
 }
 
@@ -42,7 +31,7 @@ TaskManager.defineTask<Notifications.NotificationTaskPayload>(PUSH_TASK, async (
         return Notifications.BackgroundNotificationTaskResult.NoData
     }
     try {
-        await refreshFromPush(pushDataOfTask(data))
+        await refreshFromPush()
         return Notifications.BackgroundNotificationTaskResult.NewData
     } catch (error) {
         console.warn('[push] the widgets were not refreshed', error)
