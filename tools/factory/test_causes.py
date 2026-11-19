@@ -107,6 +107,10 @@ class Outcome(unittest.TestCase):
     def test_none_is_none(self):
         self.assertEqual(causes.outcome("nothing clear\nCAUSES: none", self.groups), ("none", [], "CAUSES: none"))
 
+    def test_text_after_the_last_line_or_zero_changes_is_bad(self):
+        self.assertEqual(causes.outcome(block(1, G1) + "CAUSES: 1 changes\nthanks", self.groups)[0], "bad")
+        self.assertEqual(causes.outcome("CAUSES: 0 changes", self.groups)[0], "bad")
+
     def test_changes_are_read_per_cause(self):
         out = block(1, G1) + "\n" + block(2, G2, "coworker instructions", 302) + "\nCAUSES: 2 changes"
         kind, rows, line = causes.outcome(out, self.groups)
