@@ -31,6 +31,11 @@ const openSession = cache(async (): Promise<SessionBase> => {
     return { supabase, identity: await readSessionIdentity(supabase, token), requestedWorkspaceId }
 })
 
+// Who is calling, from the token alone: no read of `users` nor of the workspace.
+export async function getSessionIdentity(): Promise<SessionIdentity | null> {
+    return (await openSession()).identity
+}
+
 function readStoredUser(supabase: SupabaseClient<Database>) {
     return selectSingle(supabase, 'users', ['id', 'workspace_id', 'email_notification_prefs', 'locale'] as const, {})
 }

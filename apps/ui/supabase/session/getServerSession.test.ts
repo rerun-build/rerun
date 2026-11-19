@@ -17,7 +17,7 @@ vi.mock('@/supabase/server', () => ({
 }))
 vi.mock('../supabase-helpers', () => ({ selectMaybeSingle: mocks.selectMaybeSingle, selectSingle: mocks.selectSingle }))
 
-const { getAuthUser, getServerSession, getSessionWorkspace } = await import('./getServerSession')
+const { getAuthUser, getServerSession, getSessionIdentity, getSessionWorkspace } = await import('./getServerSession')
 
 describe('getServerSession', () => {
     beforeEach(() => {
@@ -155,5 +155,27 @@ describe('getAuthUser', () => {
         mocks.getUser.mockReset().mockResolvedValue({ data: { user: { id: 'u1', identities: [{ provider: 'google' }] } } })
         await expect(getAuthUser()).resolves.toEqual({ id: 'u1', identities: [{ provider: 'google' }] })
         expect(mocks.getUser).toHaveBeenCalledWith('token')
+    })
+})
+
+describe('getSessionIdentity', () => {
+    beforeEach(() => {
+        mocks.getUser.mockReset()
+        mocks.selectSingle.mockReset()
+        mocks.selectMaybeSingle.mockReset()
+    })
+
+    it('answers from the verified token alone: no auth server, no table', async () => {
+        mocks.getClaims.mockReset().mockResolvedValue({ data: { claims: { sub: 'u1', email: 'me@acme.test', is_anonymous: true } }, error: null })
+        await expect(getSessionIdentity()).resolves.toMatchObject({ id: 'u1', email: 'me@acme.test', is_anonymous: true })
+        expect(mocks.getClaims).toHaveBeenCalledWith('token')
+        expect(mocks.getUser).not.toHaveBeenCalled()
+        expect(mocks.selectSingle).not.toHaveBeenCalled()
+        expect(mocks.selectMaybeSingle).not.toHaveBeenCalled()
+    })
+
+    it('answers null for a token that does not verify', async () => {
+        mocks.getClaims.mockReset().mockRejectedValue(new Error('invalid JWT'))
+        await expect(getSessionIdentity()).resolves.toBeNull()
     })
 })

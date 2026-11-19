@@ -1,14 +1,14 @@
 import { isAdminEmail } from '@/lib/auth/admin-emails'
 import { COMPUTER_RELEASED, I18N_RELEASED, PUBLISHED_ACCESS_RELEASED, REMOTE_COMPUTERS_RELEASED, SIMPLE_VIEW_RELEASED, VAULT_RELEASED } from '@/lib/features'
-import { createClient } from '@/supabase/server'
+import { getSessionIdentity } from '@/supabase/session/getServerSession'
 import { dedupe, flag } from 'flags/next'
 
 type Entities = { user?: { email: string } }
 
+// The email of the token: one changed since it was issued opens its early access at the next
+// refresh, under an hour, and no flag guards a permission.
 export const identify = dedupe(async (): Promise<Entities> => {
-    const supabase = await createClient()
-    const { data } = await supabase.auth.getUser()
-    const email = data.user?.email
+    const email = (await getSessionIdentity())?.email
     return { user: email ? { email: email.toLowerCase() } : undefined }
 })
 

@@ -2,6 +2,7 @@ import { HomeContent } from '@/components/layout/HomeContent'
 import { hasPendingCreatorTerms } from '@/app/api/_auth/expert'
 import { resolveCreatorLandingWorkspace } from '@/app/api/_services/sandbox.service'
 import { createClient } from '@/supabase/server'
+import { getSessionIdentity } from '@/supabase/session/getServerSession'
 import { selectMany, selectMaybeSingle } from '@/supabase/supabase-helpers'
 import type { SpacePublic } from '@/lib/board/types'
 import { WORKSPACE_PARAM } from '@/lib/workspace/workspace-header'
@@ -27,10 +28,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Hom
     let initialSpaces: SpacePublic[] = []
     let initialWorkspaceId: number | null = null
 
-    const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    // The token is checked locally: the middleware already asked the auth server on this page load.
+    const [supabase, user] = await Promise.all([createClient(), getSessionIdentity()])
 
     if (user) {
         const { data: userRow } = await selectMaybeSingle(supabase, 'users', ['workspace_id', 'account_role'] as const, { id: user.id })
@@ -51,7 +50,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<Hom
             // The admin of a workspace that never went through the onboarding goes through it first,
             // on the welcome page. Read only while the workspace is not stamped onboarded, which is
             // never again once it is.
-            const { data: workspaceRow } = await selectMaybeSingle(supabase, 'workspaces', ['onboarded_at'] as const, { id: workspaceId })
+            const [{ data: workspaceRow }, { data: spaces }] = await Promise.all([
+                selectMaybeSingle(supabase, 'workspaces', ['onboarded_at'] as const, { id: workspaceId }),
+                selectMany(supabase, 'spaces', ['id', 'workspace_id', 'name', 'col_start', 'row_start', 'col_end', 'row_end', 'created_at'] as const, { workspace_id: workspaceId }),
+            ])
             if (workspaceRow && !workspaceRow.onboarded_at) {
                 const ctx = await requireWorkspaceContext().catch(() => null)
                 if (ctx?.workspace.id === workspaceId && (await readWelcomeState(ctx)).needed) {
@@ -59,7 +61,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<Hom
                     redirect(back === '/' ? '/welcome' : `/welcome?next=${encodeURIComponent(back)}`)
                 }
             }
-            const { data: spaces } = await selectMany(supabase, 'spaces', ['id', 'workspace_id', 'name', 'col_start', 'row_start', 'col_end', 'row_end', 'created_at'] as const, { workspace_id: workspaceId })
             initialSpaces = (spaces ?? []) as SpacePublic[]
         }
     }
