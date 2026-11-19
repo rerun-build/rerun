@@ -1120,7 +1120,9 @@ class Heartbeat(Base):
         line = open(self.cfg["heartbeat_file"], encoding="utf-8").read().strip()
         self.assertEqual(line, "1970-01-01T00:16:40Z beat 2 | waiting 1, queued 0, building 1, review_wait 0, reviewing 0, "
                                "fix_wait 0, fixing 0, checks 0, proof_wait 0, proving 0 | ended today: merged 1, blocked 0, failed 0, returned 0,"
-                               " rejected 0 | unreadable 0, dead waits 0 | problems 0 open, 0 owner")
+                               " rejected 0 | by type: coder ready 0 running 1 waiting 1, reviewer ready 0 running 0 waiting 0, "
+                               "researcher ready 0 running 0 waiting 0, designer ready 0 running 0 waiting 0 | features: none | "
+                               "unreadable 0, dead waits 0 | problems 0 open, 0 owner")
         self.assertIn(line, self.out.getvalue().splitlines())
         
         self.assertFalse([f for f in os.listdir(self.dir.name) if f.startswith("heartbeat") and f != "heartbeat"])
