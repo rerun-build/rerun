@@ -91,4 +91,7 @@ Demande-moi (AskUserQuestion) si on ajoute ou met à jour la carte dans la base 
 
 La PR de {{issue.identifier}} est mergée. Passe la carte Linear en Done si elle n'y est pas déjà, puis écris sa mise à
 jour finale : la PR, ce qui a été livré. Court, en français, sans clé ni contenu privé du client.
+
+Pour finir, demande-moi (AskUserQuestion) si on publie une entrée « What's new » dans l'app pour cette feature. Si oui,
+suis le skill `add-changelog`.
 """
