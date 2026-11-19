@@ -1,8 +1,8 @@
 import type { BoardAgent } from '@rerun/contracts'
-import { useEffect, useState } from 'react'
 
 import { fetchBoardAgents } from '@/api/board'
 import { useAuth } from '@/auth/AuthProvider'
+import { useHub } from '@/data/hub-store'
 import { cachedBoard } from '@/data/local-cache'
 
 // The coworkers of the workspace, for a screen that names or draws them outside the Home: served from
@@ -11,20 +11,6 @@ export function useWorkspaceAgents(): BoardAgent[] | null {
     const { session, me } = useAuth()
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
-    const [agents, setAgents] = useState<BoardAgent[] | null>(() => (workspaceId === undefined ? null : (cachedBoard(workspaceId).read()?.agents ?? null)))
-
-    useEffect(() => {
-        if (!accessToken || workspaceId === undefined) return
-        let alive = true
-        fetchBoardAgents({ accessToken, workspaceId })
-            .then(list => {
-                if (alive) setAgents(list)
-            })
-            .catch(() => {})
-        return () => {
-            alive = false
-        }
-    }, [accessToken, workspaceId])
-
-    return agents
+    const { value } = useHub(accessToken && workspaceId !== undefined ? `agents:${workspaceId}` : null, () => fetchBoardAgents({ accessToken: accessToken!, workspaceId: workspaceId! }))
+    return value ?? (workspaceId === undefined ? null : (cachedBoard(workspaceId).read()?.agents ?? null))
 }

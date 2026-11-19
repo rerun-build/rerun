@@ -3,6 +3,7 @@ import type { UIMessage } from 'ai'
 import { Directory, File, Paths } from 'expo-file-system'
 
 import type { BoardRead } from '@/api/board'
+import { forgetHub } from '@/data/hub-store'
 
 // Bumped when what is stored changes shape: a file of another version is read as nothing. What comes
 // from the hub is also checked against its contract, so a file left by an older app is read as nothing too.
@@ -212,12 +213,18 @@ export function saveCoworkerScreen(workspaceId: number, agentId: string, part: P
     write(coworkerKey(workspaceId, agentId), { ...readCoworkerScreen(workspaceId, agentId), ...part })
 }
 
+// One part of a coworker's screen, kept with the others in the same file.
+export function coworkerScreenPart<K extends keyof CoworkerScreen>(workspaceId: number, agentId: string, part: K): { read: () => CoworkerScreen[K]; save: (value: NonNullable<CoworkerScreen[K]>) => void } {
+    return { read: () => readCoworkerScreen(workspaceId, agentId)[part], save: value => saveCoworkerScreen(workspaceId, agentId, { [part]: value }) }
+}
+
 export function sameTranscript(a: UIMessage[], b: UIMessage[]): boolean {
     return a.length === b.length && JSON.stringify(a) === JSON.stringify(b)
 }
 
 // Nothing the hub said stays on the phone once the person signs out.
 export function clearLocalCache() {
+    forgetHub()
     generation += 1
     memory.clear()
     inFlight.clear()

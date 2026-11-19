@@ -1,6 +1,6 @@
-import type { AgentModels, AgentView, Conversation } from '@rerun/contracts'
+import type { AgentView, Conversation } from '@rerun/contracts'
 import { router, useFocusEffect } from 'expo-router'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View } from 'react-native'
 import { useSharedValue } from 'react-native-reanimated'
 
@@ -11,7 +11,8 @@ import { useAuth } from '@/auth/AuthProvider'
 import { coworkerEndpoints } from '@/chat/endpoints'
 import { useChatBack } from '@/components/layout/useChatBack'
 import { environment } from '@/config/environment'
-import { readCoworkerScreen, saveCoworkerScreen } from '@/data/local-cache'
+import { useHub } from '@/data/hub-store'
+import { coworkerScreenPart } from '@/data/local-cache'
 import * as Haptics from '@/lib/haptics'
 import { useTheme } from '@/theme/theme'
 
@@ -44,10 +45,16 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
     const theme = useTheme()
     const back = useChatBack()
     const { session, me } = useAuth()
+    const accessToken = session?.access_token
+    const workspaceId = me?.workspace.id
+    const caller = accessToken && workspaceId !== undefined ? { accessToken, workspaceId } : null
     // The header opens on what the last visit read: name, tabs and model are there before the hub answers.
-    const [kept] = useState(() => (me ? readCoworkerScreen(me.workspace.id, agentId) : null))
-    const [view, setView] = useState<AgentView | null>(kept?.view ?? null)
-    const [models, setModels] = useState<AgentModels | null>(kept?.models ?? null)
+    const persistedView = useMemo(() => (workspaceId === undefined ? undefined : coworkerScreenPart(workspaceId, agentId, 'view')), [workspaceId, agentId])
+    const persistedModels = useMemo(() => (workspaceId === undefined ? undefined : coworkerScreenPart(workspaceId, agentId, 'models')), [workspaceId, agentId])
+    const viewRead = useHub(caller ? `view:${caller.workspaceId}:${agentId}` : null, () => fetchAgentView(caller!, agentId), { persisted: persistedView })
+    const modelsRead = useHub(caller ? `models:${caller.workspaceId}:${agentId}` : null, () => fetchAgentModels(caller!, agentId), { persisted: persistedModels })
+    const view = viewRead.value
+    const models = modelsRead.value
     const { conversations, loaded: conversationsLoaded, reload: loadConversations } = useCoworkerConversations(agentId)
     const [draftKey, setDraftKey] = useState(() => `new-${Date.now()}`)
     const [bornKeys, setBornKeys] = useState<Record<string, string>>({})
@@ -56,26 +63,20 @@ export function CoworkerChat({ agentId, sessionId, knownGeneralId = null }: { ag
     const coworker = coworkerOf(agentId, view)
     const generalId = conversations.find(conversation => conversation.kind === 'general')?.id ?? knownGeneralId
     const generalThreads = useMemo(() => generalThreadsOf(conversations), [conversations])
-    const accessToken = session?.access_token
-    const workspaceId = me?.workspace.id
-
     // Read again when the model sheet closes on a new pick, or the details come back on a new name.
+    // The first focus is the opening, which the reads above already cover.
+    const focusedBefore = useRef(false)
+    const reloadView = viewRead.reload
+    const reloadModels = modelsRead.reload
     useFocusEffect(
         useCallback(() => {
-            if (!accessToken || !workspaceId) return
-            fetchAgentView({ accessToken, workspaceId }, agentId)
-                .then(fetched => {
-                    setView(fetched)
-                    saveCoworkerScreen(workspaceId, agentId, { view: fetched })
-                })
-                .catch(() => {})
-            fetchAgentModels({ accessToken, workspaceId }, agentId)
-                .then(fetched => {
-                    setModels(fetched)
-                    saveCoworkerScreen(workspaceId, agentId, { models: fetched })
-                })
-                .catch(() => {})
-        }, [accessToken, workspaceId, agentId])
+            if (!focusedBefore.current) {
+                focusedBefore.current = true
+                return
+            }
+            reloadView()
+            reloadModels()
+        }, [reloadView, reloadModels])
     )
 
     // On screen is read: a finished run leaves Unread once its conversation is the open one. Only an

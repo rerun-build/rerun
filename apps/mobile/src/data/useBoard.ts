@@ -1,9 +1,10 @@
 import type { Box } from '@rerun/contracts'
-import { useCallback, useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useId, useMemo } from 'react'
 
 import { fetchBoard, type BoardRead } from '@/api/board'
 import { useAuth } from '@/auth/AuthProvider'
 import { toHomeCoworkers, type HomeCoworker } from '@/components/home/board'
+import { useHub } from '@/data/hub-store'
 import { cachedBoard } from '@/data/local-cache'
 import { useBurstReload, useLiveReload } from '@/data/useLiveReload'
 
@@ -14,37 +15,18 @@ const boardOf = ({ agents, overview, boxes }: BoardRead, fresh: boolean): Board 
 
 // The coworkers of the active workspace with their latest conversation, read again whenever an agent
 // or a session changes in Realtime, and when the app comes back to the foreground, where Realtime
-// may have missed what happened while iOS held the app.
+// may have missed what happened while iOS held the app. A workspace already read opens on its rows,
+// and an answer that changed nothing leaves the Home as it is.
 export function useBoard(): Board & { reload: () => void } {
     const { session, me } = useAuth()
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
     const userId = me?.user.id
-    // Tied to the workspace it was read for, so a switch never shows the rows of the one left.
-    const [read, setRead] = useState<{ workspaceId: number; board: Board } | null>(null)
-    const [version, setVersion] = useState(0)
-
-    const reload = useCallback(() => setVersion(current => current + 1), [])
+    const persisted = useMemo(() => (workspaceId === undefined ? undefined : cachedBoard(workspaceId)), [workspaceId])
+    const read = useHub(accessToken && workspaceId ? `board:${workspaceId}` : null, () => fetchBoard({ accessToken: accessToken!, workspaceId: workspaceId! }), { persisted, freshFor: 0 })
+    const { reload: readAgain } = read
+    const reload = useCallback(() => void readAgain(), [readAgain])
     const reloadSoon = useBurstReload(reload)
-
-    useEffect(() => {
-        if (!accessToken || !workspaceId) return
-        let cancelled = false
-        const caller = { accessToken, workspaceId }
-        cachedBoard(workspaceId)
-            .load(() => fetchBoard(caller))
-            .then(fresh => {
-                if (!cancelled) setRead({ workspaceId, board: boardOf(fresh, true) })
-            })
-            .catch(() => {
-                if (cancelled) return
-                const kept = cachedBoard(workspaceId).read()
-                setRead(current => (current?.workspaceId === workspaceId && current.board.state === 'ready' ? current : { workspaceId, board: kept ? boardOf(kept, false) : { state: 'error' } }))
-            })
-        return () => {
-            cancelled = true
-        }
-    }, [accessToken, workspaceId, version])
 
     // The coworker list can be mounted twice for a moment (the Home leaving the stack as the sidebar of a
     // wide window takes over): supabase.channel() hands back the instance of a topic already taken.
@@ -64,12 +46,6 @@ export function useBoard(): Board & { reload: () => void } {
         reloadSoon
     )
 
-    // A workspace already read opens on its rows, the hub's copy replaces them when it lands.
-    const kept = useMemo(() => {
-        if (!workspaceId || read?.workspaceId === workspaceId) return null
-        const stored = cachedBoard(workspaceId).read()
-        return stored ? boardOf(stored, false) : null
-    }, [workspaceId, read?.workspaceId])
-    const board: Board = read && read.workspaceId === workspaceId ? read.board : (kept ?? { state: 'loading' })
+    const board = useMemo((): Board => (read.value ? boardOf(read.value, read.fresh) : read.failed ? { state: 'error' } : { state: 'loading' }), [read.value, read.fresh, read.failed])
     return { ...board, reload }
 }

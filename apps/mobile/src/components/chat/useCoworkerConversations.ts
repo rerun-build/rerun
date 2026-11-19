@@ -1,13 +1,16 @@
 import { FOREMAN_AGENT_ID, type Conversation } from '@rerun/contracts'
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useId, useMemo } from 'react'
 
 import { fetchAgentConversations } from '@/api/chat'
 import { fetchForemanConversations } from '@/api/foreman'
 import { useAuth } from '@/auth/AuthProvider'
-import { readCoworkerScreen, saveCoworkerScreen } from '@/data/local-cache'
+import { useHub } from '@/data/hub-store'
+import { coworkerScreenPart } from '@/data/local-cache'
 import { useBurstReload, useLiveReload } from '@/data/useLiveReload'
 
 type LiveConversations = { conversations: Conversation[]; loaded: boolean; reload: () => void }
+
+const NONE: Conversation[] = []
 
 // A coworker's conversations, newest first, opened on what the last visit read.
 export function useCoworkerConversations(agentId: string): LiveConversations {
@@ -23,29 +26,23 @@ function useLiveConversations(agentId: string): LiveConversations {
     const { session, me } = useAuth()
     const foreman = agentId === FOREMAN_AGENT_ID
     const userId = me?.user.id
-    const [kept] = useState(() => (me ? readCoworkerScreen(me.workspace.id, agentId).conversations : null))
-    const [conversations, setConversations] = useState<Conversation[]>(kept ?? [])
-    const [loaded, setLoaded] = useState(!!kept)
     // Two chats of the same coworker can be stacked (a push opens a second one): each needs its own
-    // channel, supabase.channel() hands back the existing instance for a topic already taken.
+    // channel, supabase.channel() hands back the existing instance for a topic already taken. They
+    // share one list.
     const channelId = useId()
     const accessToken = session?.access_token
     const workspaceId = me?.workspace.id
-
-    const reload = useCallback(() => {
-        if (!accessToken || !workspaceId) return
-        const caller = { accessToken, workspaceId }
-        ;(foreman ? fetchForemanConversations(caller) : fetchAgentConversations(caller, agentId))
-            .then(list => {
-                const sorted = [...list].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-                setConversations(sorted)
-                saveCoworkerScreen(workspaceId, agentId, { conversations: sorted })
-            })
-            .catch(() => {})
-            .finally(() => setLoaded(true))
-    }, [accessToken, workspaceId, agentId, foreman])
-
-    useEffect(reload, [reload])
+    const persisted = useMemo(() => (workspaceId === undefined ? undefined : coworkerScreenPart(workspaceId, agentId, 'conversations')), [workspaceId, agentId])
+    const list = useHub(
+        accessToken && workspaceId !== undefined ? `conversations:${workspaceId}:${agentId}` : null,
+        async () => {
+            const caller = { accessToken: accessToken!, workspaceId: workspaceId! }
+            const fetched = await (foreman ? fetchForemanConversations(caller) : fetchAgentConversations(caller, agentId))
+            return [...fetched].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+        },
+        { persisted }
+    )
+    const { reload } = list
     // A run writes its row several times in a row (its status, then its preview, its title): one read for the burst.
     const reloadSoon = useBurstReload(reload)
 
@@ -62,5 +59,5 @@ function useLiveConversations(agentId: string): LiveConversations {
         reloadSoon
     )
 
-    return { conversations, loaded, reload }
+    return { conversations: list.value ?? NONE, loaded: list.value !== null || list.fresh || list.failed, reload }
 }
