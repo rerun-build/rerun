@@ -17,8 +17,9 @@ def body(n, depends=True, path="tools/factory/y.py"):
 
 
 class Rig:
-    def __init__(self, state="running", now=1100.0, bodies=None, changed=None):
+    def __init__(self, state="running", now=1100.0, bodies=None, changed=None, open_issues=None):
         self.dir = tempfile.TemporaryDirectory()
+        self.open_issues = open_issues
         self.store = S.Store(os.path.join(self.dir.name, "s.db"))
         self.cfg = json.loads(json.dumps(CFG))
         self.bodies = bodies or {}
@@ -35,6 +36,8 @@ class Rig:
         if args[:2] == ["issue", "view"]:
             k = int(args[2])
             return json.dumps({"number": k, "title": "C%d" % k, "labels": [], "body": self.bodies.get(k, body(k))})
+        if args[:2] == ["issue", "list"] and self.open_issues is not None:
+            return json.dumps([{"number": k} for k in self.open_issues])
         if args[0] == "api":
             return json.dumps({"status": "ahead", "files": [{"filename": f} for f in self.changed]})
         return ""
@@ -51,6 +54,12 @@ class Rig:
 
     def comments(self):
         return [c for c in self.calls if c[:2] == ["issue", "comment"]]
+
+    def child_comments(self):
+        return [c for c in self.calls if c[:2] == ["issue", "comment"] and c[2] != "12"]
+
+    def shape(self):
+        return [c[c.index("--body") + 1] for c in self.calls if c[:2] == ["issue", "comment"] and c[2] == "12"]
 
     def record(self):
         return self.store.get_all("plan:12")
@@ -75,17 +84,62 @@ class Finish(unittest.TestCase):
         r = Rig(bodies={602: body(602, depends=False)})
         r.status = {"status": "done", "output": "CUT: #601, #602"}
         r.station.once(2)
-        self.assertEqual(len(r.comments()), 1)
-        self.assertEqual(r.comments()[0][2], "602")
+        self.assertEqual(len(r.child_comments()), 1)
+        self.assertEqual(r.child_comments()[0][2], "602")
         self.assertEqual(r.edits(), [("601", "factory"), ("12", "-factory-plan")])
+        self.assertEqual(len(r.shape()), 1)
+        self.assertIn("| all | 2 | 1 |", r.shape()[0])
+        self.assertIn("refused by the checks: #602", r.shape()[0])
 
     def test_stale_path_gets_comment_no_label(self):
         r = Rig(changed=["tools/factory/x.py", "tools/factory/y.py"])
         r.status = {"status": "done", "output": "CUT: #601"}
         r.station.once(2)
-        self.assertEqual(len(r.comments()), 1)
-        self.assertEqual(r.comments()[0][2], "601")
+        self.assertEqual(len(r.child_comments()), 1)
+        self.assertEqual(r.child_comments()[0][2], "601")
         self.assertEqual(r.edits(), [("12", "-factory-plan")])
+
+    def test_cut_posts_its_shape_by_type(self):
+        r = Rig(bodies={602: body(602).replace("**Depends on**: none", "**Depends on**: #601"),
+                        603: body(603).replace("**Worker**: coder", "**Worker**: researcher")})
+        r.status = {"status": "done", "output": "CUT: #601, #602, #603"}
+        r.station.once(2)
+        self.assertEqual(len(r.shape()), 1)
+        text = r.shape()[0]
+        self.assertTrue(text.startswith("## Cut shape"))
+        for line in ("Children: #601, #602, #603", "| coder | 2 | 1 |", "| researcher | 1 | 1 |", "| all | 3 | 2 |"):
+            self.assertIn(line, text)
+
+    def test_an_open_outside_dependency_waits(self):
+        r = Rig(bodies={601: body(601).replace("**Depends on**: none", "**Depends on**: #700"),
+                        602: body(602).replace("**Depends on**: none", "**Depends on**: #701")},
+                open_issues=[700])
+        r.status = {"status": "done", "output": "CUT: #601, #602"}
+        r.station.once(2)
+        self.assertEqual(len(r.shape()), 1)
+        self.assertIn("| coder | 2 | 1 |", r.shape()[0])
+
+    def test_unread_open_issues_count_as_waiting(self):
+        r = Rig(bodies={601: body(601).replace("**Depends on**: none", "**Depends on**: #700")})
+        r.status = {"status": "done", "output": "CUT: #601"}
+        r.station.once(2)
+        self.assertEqual(len(r.shape()), 1)
+        self.assertIn("| coder | 1 | 0 |", r.shape()[0])
+        self.assertIn("could not be read", r.shape()[0])
+        self.assertEqual(r.record()["state"], "cut")
+
+    def test_cut_after_repair_posts_its_shape(self):
+        r = Rig(state="repairing", bodies={602: body(602, depends=False)})
+        r.cfg["planning"] = {"repair": {"tries": 1}}
+        r.store.set("plan:12", "cut_children", json.dumps([601, 602]))
+        r.store.set("plan:12", "repair", json.dumps({"602": ["dependency line"]}))
+        r.store.set("plan:12", "repair_tries", "1")
+        r.status = {"status": "done", "output": "FIXED: the dependency line"}
+        r.station.once(2)
+        self.assertEqual(r.record()["state"], "cut")
+        self.assertEqual(len(r.shape()), 1)
+        for line in ("Children: #601, #602", "| coder | 2 | 1 |", "| all | 2 | 1 |", "refused by the checks: #602"):
+            self.assertIn(line, r.shape()[0])
 
     def test_blocked_comments(self):
         r = Rig()
