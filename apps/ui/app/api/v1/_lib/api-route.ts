@@ -5,6 +5,7 @@ import { createClient, getRequestAccessToken } from '@/supabase/server'
 import { CLIENT_HEADER, hubErrorSchema, type HubEndpoint, type HubPathParams } from '@rerun/contracts'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { z } from 'zod'
+import { recordBuildDay } from '@/app/api/v1/_lib/build-days'
 import { ApiError } from '@/lib/api-error'
 import { AppError, refusal, type ErrorCode, type ErrorParams } from '@/lib/i18n/action-error'
 
@@ -136,6 +137,7 @@ function route(options: Route, handler: (args: HandlerArgs<AuthLevel, z.ZodType 
             console.error(`[api/v1] ${req.method} ${path} auth failed`, err)
             return codedResponse(500, 'Internal error', 'generic')
         }
+        if (ctx) recordBuildDay(req, 'user' in ctx ? ctx.user.id : ctx.userId)
 
         let res: Response
         try {

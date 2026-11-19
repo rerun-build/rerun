@@ -235,6 +235,30 @@ export type Database = {
           },
         ]
       }
+      app_build_days: {
+        Row: {
+          build: number
+          day: string
+          platform: string
+          user_id: string
+          version: string
+        }
+        Insert: {
+          build: number
+          day: string
+          platform: string
+          user_id: string
+          version: string
+        }
+        Update: {
+          build?: number
+          day?: string
+          platform?: string
+          user_id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       app_connection_agents: {
         Row: {
           agent_id: string
@@ -3819,6 +3843,16 @@ export type Database = {
       anonymize_auth_user: {
         Args: { p_email: string; p_user_id: string }
         Returns: undefined
+      }
+      app_build_usage: {
+        Args: { p_since: string }
+        Returns: {
+          build: number
+          last_day: string
+          people: number
+          platform: string
+          version: string
+        }[]
       }
       before_user_created: { Args: { event: Json }; Returns: Json }
       check_email_exists: { Args: { email: string }; Returns: boolean }

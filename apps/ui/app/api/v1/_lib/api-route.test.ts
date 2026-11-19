@@ -2,7 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { hubEndpoint, hubErrorSchema } from '@rerun/contracts'
 import { z } from 'zod'
 
-const mocks = vi.hoisted(() => ({ requireWorkspaceContext: vi.fn(), requireAdminContext: vi.fn() }))
+const mocks = vi.hoisted(() => ({ requireWorkspaceContext: vi.fn(), requireAdminContext: vi.fn(), recordBuildDay: vi.fn() }))
+
+vi.mock('@/app/api/v1/_lib/build-days', () => ({ recordBuildDay: mocks.recordBuildDay }))
 
 vi.mock('@/supabase/server', () => ({
     createClient: async () => ({ auth: { getUser: async () => ({ data: { user: null } }) } }),
@@ -144,6 +146,16 @@ describe('apiRoute', () => {
         expect(await json.json()).toEqual({ ok: true })
         const empty = await apiRoute({ auth: 'member' }, async () => undefined)(post(''), segment)
         expect(empty.status).toBe(204)
+    })
+
+    it('counts the build of the app behind a signed-in call, and of nobody on a public one', async () => {
+        mocks.recordBuildDay.mockReset()
+        const req = new Request('https://app.rerun.build/api/v1/me', { headers: { 'x-rerun-client': 'ios/1.0.2 (38)' } })
+        await apiRoute({ auth: 'member' }, async () => ({ ok: true }))(req, segment)
+        expect(mocks.recordBuildDay).toHaveBeenCalledWith(req, 'user-1')
+        mocks.recordBuildDay.mockReset()
+        await apiRoute({ auth: 'public' }, async () => ({ ok: true }))(req, segment)
+        expect(mocks.recordBuildDay).not.toHaveBeenCalled()
     })
 
     it('answers 403 to a member who only uses the Box, not the 422 of a refusal meant for the person', async () => {
