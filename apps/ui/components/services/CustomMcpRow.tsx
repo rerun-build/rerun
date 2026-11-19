@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
@@ -16,6 +17,7 @@ type CustomMcpRowProps = {
     server: CustomMcpServer
     status: CustomMcpStatus | undefined
     statusLoading: boolean
+    description?: ReactNode
     onConnect: () => void
     onEdit: () => void
     onRemove: () => void
@@ -23,7 +25,7 @@ type CustomMcpRowProps = {
     disabledReason?: string
 }
 
-export function CustomMcpRow({ server, status, statusLoading, onConnect, onEdit, onRemove, disabledReason }: CustomMcpRowProps) {
+export function CustomMcpRow({ server, status, statusLoading, description, onConnect, onEdit, onRemove, disabledReason }: CustomMcpRowProps) {
     const t = useTranslations('services.customMcp')
     const disabled = !!disabledReason
     const canSignIn = status?.status === 'needs_auth' && !!server.signInUrl
@@ -38,12 +40,9 @@ export function CustomMcpRow({ server, status, statusLoading, onConnect, onEdit,
                     </Badge>
                 </span>
             }
-            description={server.host ?? server.transport}
+            description={description ?? server.host ?? server.transport}
             actions={
                 <>
-                    <span className="mr-2 flex items-center empty:hidden">
-                        <CustomMcpStatusBadge status={status} loading={statusLoading} />
-                    </span>
                     {canSignIn && (
                         <TooltipDisabledReason reason={disabledReason}>
                             <Button size="sm" variant="outline" disabled={disabled} onClick={onConnect}>
@@ -68,6 +67,11 @@ export function CustomMcpRow({ server, status, statusLoading, onConnect, onEdit,
                     </TooltipDisabledReason>
                 </>
             }
-        />
+        >
+            {/* Under the address rather than beside the buttons: on a phone the row keeps room for its name. */}
+            <span className="flex pt-0.5 empty:hidden">
+                <CustomMcpStatusBadge status={status} loading={statusLoading} />
+            </span>
+        </PanelRow>
     )
 }

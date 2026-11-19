@@ -123,6 +123,6 @@ Two ways forward.
 
 **Ask for it.** Under the library, click **Request an app**. Requests go to the Rerun team and the library grows from them.
 
-**Add the MCP server yourself.** Open the coworker card, then **Apps**, then the **MCP** tab, and click **New**. Register any Model Context Protocol server: HTTP, SSE or a local command, with its own arguments, headers or environment variables. Its tools are merged as `<name>_<tool>`. To share a server between coworkers, add it to the [Vault](/vault#add-an-mcp-server) instead. Anything with an MCP server works with Rerun today, app or not.
+**Add the MCP server yourself.** Open the coworker card, then **Apps**, then the **MCP** tab, and click **New**. Register any Model Context Protocol server: HTTP, SSE or a local command, with its own arguments, headers or environment variables. A server that signs in by OAuth shows **Connect** next to its name once saved: click it to sign in. Its tools are merged as `<name>_<tool>`. To share a server between coworkers, add it to the [Vault](/vault#add-an-mcp-server) instead. Anything with an MCP server works with Rerun today, app or not.
 
 Reference a stored secret in an MCP config with `${VARIABLE_NAME}`. It resolves on your workspace's machine at run time. A secret typed straight into a field is detected, moved to the machine and replaced by a `${VARIABLE_NAME}` when you save.
