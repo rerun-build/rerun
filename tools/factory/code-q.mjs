@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const USAGE = 'usage: code-q <repo> [PROMPT_INJECTION] [json] | <repo> --list | --status | --check <repo> [PROMPT_INJECTION] [json]';
+const USAGE = 'usage: code-q <repo> <tool> [json] | <repo> --list | --status | --check <repo> <tool> [json]';
 const args = process.argv.slice(2);
 const checkMode = args[0] === '--check';
 const rest = checkMode ? args.slice(1) : args;

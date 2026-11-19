@@ -170,6 +170,10 @@ class CodeQ(unittest.TestCase):
     def test_usage_exits_2(self):
         r = self.run_q({}, "r1")
         self.assertEqual(r.returncode, 2)
+        self.assertIn(
+            "usage: code-q <repo> <tool> [json] | <repo> --list | --status | --check <repo> <tool> [json]",
+            r.stderr.splitlines(),
+        )
 
     def test_extra_arguments_exit_2_with_usage(self):
         for args in (("r1", "--list", "x"), ("r1", "t", "{}", "extra"), ("r1", "t", "{}", "a", "b")):
