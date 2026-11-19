@@ -52,6 +52,9 @@ export const conversationSchema = z.object({
     // Optional for a hub older than it. What a thread opened with, when a person typed it; null
     // for a run the engine started.
     firstMessage: z.string().nullable().optional(),
+    // Sent by the overview alone, optional for a hub older than it. The last thing said, as one line;
+    // `mine` when the caller wrote it. Null in a conversation older than the hub's record of it.
+    lastMessage: z.object({ text: z.string(), mine: z.boolean() }).nullable().optional(),
 })
 export type Conversation = z.infer<typeof conversationSchema>
 

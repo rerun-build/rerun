@@ -36,6 +36,14 @@ describe('home board', () => {
         expect(lineOf(one({ status: 'idle', description: null }))).toEqual({ text: '', tone: 'muted' })
     })
 
+    it('shows the last thing said at rest, as the web list does, "You:" when the reader wrote it', () => {
+        const said = (lastMessage: { text: string; mine: boolean } | null, status: BoardAgent['status'] = 'idle') => lineOf(one({ status }, [{ agentId: 'a1', latest: latest({ lastMessage }), pending: 0 }]))
+        expect(said({ text: 'Send the recap', mine: true })).toEqual({ text: 'You: Send the recap', tone: 'muted' })
+        expect(said({ text: 'Done, the recap is out.', mine: false })).toEqual({ text: 'Done, the recap is out.', tone: 'muted' })
+        expect(said(null)).toEqual({ text: 'Q4 prospects', tone: 'muted' })
+        expect(said({ text: 'Send the recap', mine: true }, 'working')).toEqual({ text: 'Working · Q4 prospects', tone: 'muted' })
+    })
+
     it('orders the most recently active first, those never talked to last', () => {
         const fresh = one({ id: 'a1' }, [{ agentId: 'a1', latest: latest({ updatedAt: '2026-10-21T12:00:00Z' }), pending: 0 }])
         const old = { ...one({ id: 'a2' }), latest: latest({ updatedAt: '2026-10-01T12:00:00Z' }) }

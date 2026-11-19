@@ -33,44 +33,74 @@ function session(agentId: string, id: string, updatedAt: string, status = 'idle'
     return { id, agent_id: agentId, title: `${id} title`, status, updated_at: updatedAt, created_at: updatedAt, engine_session_id: `engine-${id}`, source: 'dashboard', kind: 'thread' }
 }
 
-// selectMany is called four times in order: agents, the latest scan, the pending count, then the Generals.
-function answers(agents: { id: string }[], recent: ReturnType<typeof session>[], pending: { agent_id: string }[], generals: { id: string; agent_id: string }[] = []) {
+type Preview = { agent_id: string; session_id: string | null; title: string | null; status: string | null; updated_at: string | null; last_message: string | null; last_message_from: string | null; last_message_at: string | null; last_message_author_id: string | null }
+
+function preview(agentId: string, sessionId: string, updatedAt: string, status = 'idle', last: Partial<Preview> = {}): Preview {
+    return { agent_id: agentId, session_id: sessionId, title: `${sessionId} title`, status, updated_at: updatedAt, last_message: null, last_message_from: null, last_message_at: null, last_message_author_id: null, ...last }
+}
+
+const quiet = (agentId: string): Preview => ({ agent_id: agentId, session_id: null, title: null, status: null, updated_at: null, last_message: null, last_message_from: null, last_message_at: null, last_message_author_id: null })
+
+const rpc = vi.fn()
+
+// The previews come from the caller's `coworker_previews`; selectMany answers in order: the agents, the
+// pending count, the Generals, then the engine ids and sources of the latest conversations.
+function answers(agents: { id: string }[], previews: Preview[], pending: { agent_id: string }[], generals: { id: string; agent_id: string }[] = []) {
+    rpc.mockResolvedValueOnce({ data: previews, error: null })
+    vi.mocked(createClient).mockResolvedValue({ rpc } as never)
+    const details = previews.flatMap(row => (row.session_id ? [{ id: row.session_id, engine_session_id: `engine-${row.session_id}`, source: 'dashboard' }] : []))
     vi.mocked(selectMany)
         .mockResolvedValueOnce({ data: agents, error: null } as never)
-        .mockResolvedValueOnce({ data: recent, error: null } as never)
         .mockResolvedValueOnce({ data: pending, error: null } as never)
         .mockResolvedValueOnce({ data: generals, error: null } as never)
+        .mockResolvedValueOnce({ data: details, error: null } as never)
 }
 
 describe('listWorkspaceConversationOverview', () => {
     beforeEach(() => vi.clearAllMocks())
 
-    it('keeps the most recently updated conversation of each agent', async () => {
-        answers(
-            [{ id: 'a' }, { id: 'b' }],
-            [session('a', 's3', '2026-09-18T10:00:00Z'), session('b', 's2', '2026-09-17T10:00:00Z'), session('a', 's1', '2026-09-16T10:00:00Z')],
-            []
-        )
+    it('keeps the latest conversation of each agent, read once per coworker', async () => {
+        answers([{ id: 'a' }, { id: 'b' }], [preview('a', 's3', '2026-09-18T10:00:00Z'), preview('b', 's2', '2026-09-17T10:00:00Z')], [])
 
         const overview = await listWorkspaceConversationOverview(ctx)
 
-        expect(overview.map(row => [row.agentId, row.latest?.id])).toEqual([
-            ['a', 's3'],
-            ['b', 's2'],
+        expect(overview.map(row => [row.agentId, row.latest?.id, row.latest?.engineSessionId])).toEqual([
+            ['a', 's3', 'engine-s3'],
+            ['b', 's2', 'engine-s2'],
         ])
+        expect(rpc).toHaveBeenCalledWith('coworker_previews', { p_workspace_id: 7 })
+        expect(vi.mocked(selectMany).mock.calls[3][3]).toEqual({ id: ['s3', 's2'] })
     })
 
     it('reports an agent nobody has talked to with a null latest', async () => {
-        answers([{ id: 'a' }, { id: 'quiet' }], [session('a', 's1', '2026-09-18T10:00:00Z')], [])
+        answers([{ id: 'a' }, { id: 'quiet' }], [preview('a', 's1', '2026-09-18T10:00:00Z'), quiet('quiet')], [])
 
         const overview = await listWorkspaceConversationOverview(ctx)
 
         expect(overview.find(row => row.agentId === 'quiet')).toEqual({ agentId: 'quiet', latest: null, pending: 0, generalSessionId: null })
     })
 
+    // The Home says "You:" to the member who wrote the last message, never to their teammates.
+    it('carries the last thing said, marked as the caller\'s own only when they wrote it', async () => {
+        answers(
+            [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }],
+            [
+                preview('a', 's1', '2026-09-18T10:00:00Z', 'idle', { last_message: 'Send it', last_message_from: 'user', last_message_author_id: 'admin' }),
+                preview('b', 's2', '2026-09-18T10:00:00Z', 'idle', { last_message: 'Send it', last_message_from: 'user', last_message_author_id: 'teammate' }),
+                preview('c', 's3', '2026-09-18T10:00:00Z', 'idle', { last_message: 'Done, sent.', last_message_from: 'agent' }),
+                preview('d', 's4', '2026-09-18T10:00:00Z'),
+            ],
+            []
+        )
+
+        const overview = await listWorkspaceConversationOverview(ctx)
+
+        expect(overview.map(row => row.latest?.lastMessage)).toEqual([{ text: 'Send it', mine: true }, { text: 'Send it', mine: false }, { text: 'Done, sent.', mine: false }, null])
+    })
+
     // The app opens a coworker on its General, whichever conversation moved last.
     it('names each coworker\'s General, read for the coworkers alone', async () => {
-        answers([{ id: 'a' }, { id: 'b' }], [session('a', 'thread-1', '2026-09-18T10:00:00Z')], [], [{ id: 'general-a', agent_id: 'a' }])
+        answers([{ id: 'a' }, { id: 'b' }], [preview('a', 'thread-1', '2026-09-18T10:00:00Z'), quiet('b')], [], [{ id: 'general-a', agent_id: 'a' }])
 
         const overview = await listWorkspaceConversationOverview(ctx)
 
@@ -78,11 +108,11 @@ describe('listWorkspaceConversationOverview', () => {
             ['a', 'thread-1', 'general-a'],
             ['b', null, null],
         ])
-        expect(vi.mocked(selectMany).mock.calls[3][3]).toEqual({ agent_id: ['a', 'b'], kind: 'general' })
+        expect(vi.mocked(selectMany).mock.calls[2][3]).toEqual({ agent_id: ['a', 'b'], kind: 'general' })
     })
 
     it('counts the pending conversations per agent', async () => {
-        answers([{ id: 'a' }, { id: 'b' }], [session('a', 's1', '2026-09-18T10:00:00Z', 'awaiting_question')], [{ agent_id: 'a' }, { agent_id: 'a' }, { agent_id: 'b' }])
+        answers([{ id: 'a' }, { id: 'b' }], [preview('a', 's1', '2026-09-18T10:00:00Z', 'awaiting_question'), quiet('b')], [{ agent_id: 'a' }, { agent_id: 'a' }, { agent_id: 'b' }])
 
         const overview = await listWorkspaceConversationOverview(ctx)
 
@@ -90,23 +120,23 @@ describe('listWorkspaceConversationOverview', () => {
     })
 
     it('asks only for the agents of this workspace, and never touches a Box', async () => {
-        answers([{ id: 'a' }], [session('a', 's1', '2026-09-18T10:00:00Z')], [])
+        answers([{ id: 'a' }], [preview('a', 's1', '2026-09-18T10:00:00Z')], [])
 
         await listWorkspaceConversationOverview(ctx)
 
         expect(vi.mocked(selectMany).mock.calls[0][3]).toEqual({ workspace_id: 7 })
-        expect(vi.mocked(selectMany).mock.calls[1][3]).toEqual({ agent_id: ['a'] })
+        expect(vi.mocked(selectMany).mock.calls[1][3]).toMatchObject({ agent_id: ['a'] })
     })
 
     it('leaves out the coworkers of a Box the member does not reach, without asking for their conversations', async () => {
         vi.mocked(visibleSpaceIds).mockResolvedValueOnce(new Set(['open']))
-        answers([{ id: 'a', space_id: 'open' }, { id: 'hidden', space_id: 'closed' }] as never, [session('a', 's1', '2026-09-18T10:00:00Z')], [])
+        answers([{ id: 'a', space_id: 'open' }, { id: 'hidden', space_id: 'closed' }] as never, [preview('a', 's1', '2026-09-18T10:00:00Z'), preview('hidden', 's9', '2026-09-19T10:00:00Z')], [])
 
         const overview = await listWorkspaceConversationOverview(memberCtx)
 
         expect(overview.map(row => row.agentId)).toEqual(['a'])
-        expect(vi.mocked(selectMany).mock.calls[1][3]).toEqual({ agent_id: ['a'] })
-        expect(vi.mocked(selectMany).mock.calls[2][3]).toMatchObject({ agent_id: ['a'] })
+        expect(vi.mocked(selectMany).mock.calls[1][3]).toMatchObject({ agent_id: ['a'] })
+        expect(vi.mocked(selectMany).mock.calls[3][3]).toEqual({ id: ['s1'] })
     })
 
     it('does not query anything else when the workspace has no agent', async () => {
@@ -114,6 +144,7 @@ describe('listWorkspaceConversationOverview', () => {
 
         expect(await listWorkspaceConversationOverview(ctx)).toEqual([])
         expect(selectMany).toHaveBeenCalledTimes(1)
+        expect(rpc).not.toHaveBeenCalled()
     })
 })
 

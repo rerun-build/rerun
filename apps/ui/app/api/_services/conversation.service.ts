@@ -180,49 +180,62 @@ async function reachableAgents(ctx: WorkspaceContext): Promise<{ id: string; nam
     return keepVisible(data ?? [], spaces, agent => agent.space_id)
 }
 
-const OVERVIEW_COLUMNS = ['id', 'agent_id', 'title', 'status', 'updated_at', 'engine_session_id', 'source'] as const
+const OVERVIEW_COLUMNS = ['id', 'engine_session_id', 'source'] as const
 
 // What the app badges on an agent row: a conversation it cannot move forward without a human. An
 // errored one is not counted, the row says "Error" on its own.
 const PENDING_STATUSES = ['awaiting_question', 'awaiting_approval', 'awaiting_connector', 'awaiting_ack'] as const
 
-// PostgREST caps a select at 1000 rows, so the scan that finds each agent's latest conversation is
-// ordered and bounded explicitly rather than left to that cap (see the board's live sessions, same
-// trap). The pending count is a query of its own: filtered on the four statuses it is small by
-// construction, and stays exact however many conversations the workspace holds.
-const LATEST_SCAN_LIMIT = 1000
+type CoworkerPreviewRow = Database['public']['Functions']['coworker_previews']['Returns'][number]
 
-// The whole Chats screen in one request. Engine-only conversations (opened on this agent by
+function lastMessageOf(row: CoworkerPreviewRow, userId: string): Conversation['lastMessage'] {
+    if (!row.last_message || (row.last_message_from !== 'user' && row.last_message_from !== 'agent')) return null
+    return { text: row.last_message, mine: row.last_message_from === 'user' && row.last_message_author_id === userId }
+}
+
+// The whole Chats screen in one request, bounded by the coworkers rather than their conversations:
+// `coworker_previews` reads each coworker's latest conversation in one probe of an index, with the
+// last thing said in it, as the web's list does. Engine-only conversations (opened on this agent by
 // another one, not adopted yet) are left out on purpose: they are always idle, so they change
 // neither the count nor the latest row, and skipping them is what keeps this off the Boxes.
 export async function listWorkspaceConversationOverview(ctx: WorkspaceContext): Promise<AgentConversationsOverview> {
     const agentIds = (await reachableAgents(ctx)).map(a => a.id)
     if (agentIds.length === 0) return []
 
-    // A coworker has one General at most: that read is bounded by the coworkers, not the conversations.
-    const [{ data: recent, error: recentError }, { data: pendingRows, error: pendingError }, { data: generalRows, error: generalError }] = await Promise.all([
-        selectMany(ctx.supabase, 'sessions', OVERVIEW_COLUMNS, { agent_id: agentIds }, { column: 'updated_at', ascending: false }, LATEST_SCAN_LIMIT),
+    // As the caller, like the web's list: the function is theirs to run, and its policies stop at the Boxes they reach.
+    const asCaller = await createClient()
+    // A coworker has one General at most: that read is bounded by the coworkers too.
+    const [previews, { data: pendingRows, error: pendingError }, { data: generalRows, error: generalError }] = await Promise.all([
+        asCaller.rpc('coworker_previews', { p_workspace_id: ctx.workspace.id }),
         selectMany(ctx.supabase, 'sessions', ['agent_id'] as const, { agent_id: agentIds, status: [...PENDING_STATUSES] }),
         selectMany(ctx.supabase, 'sessions', ['id', 'agent_id'] as const, { agent_id: agentIds, kind: 'general' }),
     ])
-    if (recentError) throw recentError
+    if (previews.error) throw previews.error
     if (pendingError) throw pendingError
     if (generalError) throw generalError
 
+    const reachable = new Set(agentIds)
+    const latestRows = (previews.data ?? []).filter((row): row is CoworkerPreviewRow & { session_id: string; title: string; status: SessionStatus; updated_at: string } => reachable.has(row.agent_id) && !!row.session_id && row.title !== null && !!row.status && !!row.updated_at)
+    const { data: details, error: detailsError } = latestRows.length > 0 ? await selectMany(ctx.supabase, 'sessions', OVERVIEW_COLUMNS, { id: latestRows.map(row => row.session_id) }) : { data: [], error: null }
+    if (detailsError) throw detailsError
+    const detailsById = new Map((details ?? []).map(row => [row.id, row]))
+
     const latestByAgent = new Map<string, Conversation>()
-    for (const row of recent ?? []) {
-        if (latestByAgent.has(row.agent_id)) continue
+    for (const row of latestRows) {
+        const detail = detailsById.get(row.session_id)
+        if (!detail) continue
         latestByAgent.set(row.agent_id, {
-            id: row.id,
+            id: row.session_id,
             agentId: row.agent_id,
-            engineSessionId: row.engine_session_id,
+            engineSessionId: detail.engine_session_id,
             title: row.title,
             status: row.status,
-            source: (row.source ?? 'dashboard') as SessionSource,
+            source: (detail.source ?? 'dashboard') as SessionSource,
             updatedAt: row.updated_at,
             // Resolving the origin agent would cost a second lookup for a label the row never
             // shows: the Chats screen prints the status, the agent's own history prints the name.
             originAgentName: null,
+            lastMessage: lastMessageOf(row, ctx.userId),
         })
     }
 
